@@ -1,0 +1,28 @@
+---
+// One-paragraph status summary from the generated data.
+import bom from '../data/generated/bom.json';
+import checks from '../data/generated/checks.json';
+
+const withBikes = bom.totals.module_empty + bom.bikes.reduce((s: number, b: any) => s + b.mass_kg, 0);
+const res = checks.results as any[];
+const failed = res.filter((r) => !r.ok && r.severity === 'fail');
+const below = res.filter((r) => !r.ok && r.severity === 'report');
+const short: Record<string, string> = { 'Aprilia Tuareg 660 Rally': 'Tuareg', 'Triumph Street Triple 765': 'Street Triple' };
+const name = (r: any) => `${r.id}${r.sub ? ' ' + (short[r.sub] ?? r.sub) : ''}`;
+const words = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+const count = (k: number) => words[k] ?? String(k);
+const what = (r: any) =>
+  r.type === 'landing'
+    ? `${name(r)} (${r.title}) puts the foot ${Math.abs(r.measured_mm).toFixed(1)} mm ${r.measured_mm < 0 ? 'below' : 'above'} the floor, against a limit of a ${r.limit.replace('gap ', '')} gap`
+    : `${name(r)} (${r.title}) measures ${r.measured_mm.toFixed(1)} mm against ${r.limit.replace('>= ', 'at least ')}`;
+const parts = [
+  `The module weighs ${bom.totals.module_empty.toFixed(1)} kg empty and ${withBikes.toFixed(1)} kg with both bikes aboard.`,
+  `The model is measured against ${res.length} check results from the design.`,
+  failed.length === 0
+    ? 'Every design check passes.'
+    : `${count(failed.length)} design ${failed.length === 1 ? 'check fails' : 'checks fail'}. ${failed.map(what).join('. ')}.`,
+  ...below.map((r) => `${what(r)}. It is a reported case, not a design failure.`),
+];
+---
+
+<p>{parts.join(' ')}</p>

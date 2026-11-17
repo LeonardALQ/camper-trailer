@@ -1,0 +1,54 @@
+---
+title: Camper trailer design
+description: The design of a one-off off-road camper trailer that carries two motorcycles under a queen bed.
+---
+
+import Summary from '../../components/Summary.astro';
+import { withBase } from '../../lib/url';
+
+This site holds the design of a one-off off-road camper trailer. The owner is designing it and will build it
+himself in Australia. It will be built to VSB1, the Australian guide for light trailers, then inspected for
+registration and reviewed by an engineer.
+
+The trailer carries two motorcycles in a garage, with a queen bed above them. It is towed by a Porsche Cayenne
+GTS. Most of its life is highway towing, plus grass, desert tracks, fire trails, light mud and shallow river
+crossings.
+
+Everything on this site comes from one set of data files. The 3D model, the clearance checks, the mass schedule,
+the drawings and the parts lists are generated from them, so they always agree. When a number changes in the
+data, the whole site is rebuilt.
+
+## The constraints
+
+- The body is 2,400 mm wide at most. That is a hard limit. With 35 mm walls it leaves 2,330 mm inside.
+- The body is 6,000 mm long at most. The target is about 5,000 mm to save weight, so every part of the layout should be as short as it can be.
+- With the roof collapsed, the inside is 1,800 mm high measured from the garage floor. That is the target, and 2,000 mm is the hard limit. A raising roof adds headroom at camp.
+- The Cayenne can tow 3,500 kg with trailer brakes, and its towball limit is about 140 kg.
+- The garage floor is flat, with no wheel arches inside the garage.
+
+## How products are chosen
+
+Each product is chosen in this order. First comes reliability and a record of hard use, for example in race
+trailers, toy haulers, boats or overland caravans. Next comes parts and service, in Australia if possible. Then
+comes serviceability, so a part can be repaired or swapped, ideally in the field. Only then does weight decide,
+and the lightest product that passes the first three wins. Price is ignored.
+
+## What is done
+
+- Five research reports: the tech stack for this site, design and drawing practice, bike restraint, the bed and its materials, and the bike geometry. They are under Research in the menu.
+- The design baseline for the garage and bed module, with its bill of materials.
+- This first version of the site: a parametric 3D model of the module, the design checks measured on that model, a mass schedule, three draft drawings and eleven draft build steps.
+- Revision B of the design, from the first model run: the deck laps over partition B, an owner-built ladder reaches the living-area floor, and the note on converting to the trailer datum is corrected. Drawings CT-401 and CT-501 are at revision B.
+
+<Summary />
+
+The <a href={withBase('/garage-bed/')}>Garage and bed</a> page has the details.
+
+## What is next
+
+- Build a full-size mock-up of the garage and measure both bikes in it. Several bike dimensions on this site are estimates, and the chock's nose and cradle rise are not published. Build step 1 lists what to measure.
+- Decide how the bikes are loaded: a winch with a fixed bed, or a powered bed lift used with the roof raised.
+- Decide whether anyone will sleep in the trailer with fuelled bikes inside, because that changes the garage ventilation.
+- Place the chassis and coupling, so the towball load can be worked out for each load case.
+- Design the body, the garage door and the raising roof.
+- Ask the engineer to review the drawings, the restraint design and the bed structure.

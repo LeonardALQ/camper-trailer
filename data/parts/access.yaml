@@ -1,0 +1,39 @@
+# Access and safety (garage-bed/BOM.md, research/04).
+group: access
+parts:
+  A-01:
+    name: Ladder
+    product: Owner-built ladder, Capral SHS 25x1.6 stiles with 25 mm rungs, about 1,580 mm long
+    maker: Owner-built (Capral SHS 25x1.6 stiles)
+    part_no: E22103 (stile section)
+    qty: 1
+    unit: each
+    mass: {basis: declared, unit_kg: 2.0, maturity: estimate, source: "research/04-bed-and-materials.md section 8 (owner-built ladder)", note: "Cross-check from the model, 2 stiles of 1.58 m at 0.404 kg/m is 1.28 kg, plus rungs 0.7 kg est."}
+    size: About 1,580 mm long, SHS 25x1.6 stiles, five 25 mm rungs, rubber feet, 15 deg lean
+    rating: Designed to the owner's load (to be set with the engineer)
+    links:
+      stile_section: https://shop.capral.com.au/808512/
+    stockist_au: https://shop.capral.com.au/808512/
+    notes: Revision B. Hooks on the deck edge at partition B and stands in the living area. It replaces the Fiamma Deluxe 4B (1,500 mm, 2.4 kg, 100 kg max), which stopped about 80 mm above the floor. Its Y position in the model is a placeholder.
+    # Length and lean come from the assembly (ladder_length, ladder_lean_deg). The stile tops sit at the
+    # deck-top level under the hooks, the ends are cut level, and the stiles hang `clear` mm outboard of
+    # the cleat on top of partition B. Width, rung count and hook sizes are estimates (research/04: five
+    # rungs of 0.33 m).
+    geometry: {generator: ladder, params: {width: 330, stile: 25, rung_d: 25, rungs: 5, hook_w: 30, hook_t: 4, hook_reach: 30, clear: 2}}
+    color: "#aab7b8"
+  A-02:
+    name: Safety net
+    product: Reimo alcove safety net 1,500 x 580
+    maker: Reimo
+    part_no: "461770"
+    qty: 1
+    unit: each
+    mass: {basis: declared, unit_kg: 0.6, maturity: estimate, source: "research/04-bed-and-materials.md section 8"}
+    size: 1,500 x 580 mm
+    rating: TÜV/GS tested
+    links:
+      maker: https://www.reimo.com/nl/kampeerartikelen/comfort-gemak/opbergnet-caravan-camper/10076/veiligheidsnet-150x58
+    stockist_au: null
+    notes: Clips on when the roof is raised. Shown in its roof-raised position, so it rises through the 1,800 mm collapsed ceiling plane.
+    geometry: {generator: net, params: {length: 1500, height: 580, thickness: 6}}
+    color: "#16a085"

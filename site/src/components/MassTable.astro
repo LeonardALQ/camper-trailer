@@ -1,0 +1,61 @@
+---
+// Mass schedule (MASS-01) and the load cases, from build/bom/bom.json.
+import bom from '../data/generated/bom.json';
+
+interface Props {
+  kind: 'schedule' | 'cases';
+}
+const { kind } = Astro.props;
+const f1 = (v: number | null) => (v == null ? '' : (Math.abs(v) < 0.05 ? 0 : v).toFixed(0));
+const qty = (l: any) => (l.basis === 'declared' ? `${l.qty_bom} ${l.unit ?? ''}` : `${Number(l.qty).toFixed(2)} ${l.unit}`);
+const unitMass = (l: any) =>
+  l.basis === 'per_length' ? `${l.unit_mass} kg/m` : l.basis === 'per_area' ? `${l.unit_mass} kg/m²` : l.unit_mass == null ? 'lot' : `${l.unit_mass}`;
+const src = (s: string) => (s.startsWith('http') ? new URL(s).hostname.replace('www.', '') : s);
+---
+
+{kind === 'schedule' && (
+  <div class="data-table">
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Item</th><th>Qty</th><th class="num">Unit mass</th><th class="num">Total kg</th><th>Source</th><th>Maturity</th><th class="num">Growth</th><th class="num">CoG X</th><th class="num">CoG Y</th><th class="num">CoG Z</th><th>Removable</th></tr>
+      </thead>
+      <tbody>
+        {bom.lines.map((l: any) => (
+          <tr>
+            <td>{l.id}</td><td>{l.item}</td><td>{qty(l)}</td><td class="num">{unitMass(l)}</td>
+            <td class="num">{l.mass_kg.toFixed(2)}</td>
+            <td>{l.source.startsWith('http') ? <a href={l.source}>{src(l.source)}</a> : l.source}</td>
+            <td>{l.maturity}</td><td class="num">{l.growth_pct} %</td>
+            <td class="num">{f1(l.cog[0])}</td><td class="num">{f1(l.cog[1])}</td><td class="num">{f1(l.cog[2])}</td>
+            <td>{l.removable ? 'yes' : ''}</td>
+          </tr>
+        ))}
+        {bom.bikes.map((b: any) => (
+          <tr>
+            <td>{b.part}</td><td>{b.item} (payload)</td><td>1</td><td class="num">{b.mass_kg}</td><td class="num">{b.mass_kg.toFixed(2)}</td>
+            <td>{b.source}</td><td>{b.maturity}</td><td class="num">0 %</td>
+            <td class="num">{f1(b.cog[0])}</td><td class="num">{f1(b.cog[1])}</td><td class="num">{f1(b.cog[2])}</td><td>payload</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+{kind === 'cases' && (
+  <div class="data-table">
+    <table>
+      <thead>
+        <tr><th>Case</th><th>What is aboard</th><th class="num">Mass kg</th><th class="num">With growth kg</th><th class="num">CoG X</th><th class="num">CoG Y</th><th class="num">CoG Z</th><th>Towball load</th></tr>
+      </thead>
+      <tbody>
+        {bom.load_cases.map((c: any) => (
+          <tr>
+            <td>{c.id}</td><td>{c.name}</td><td class="num">{c.mass_kg.toFixed(1)}</td><td class="num">{c.mass_with_growth_kg.toFixed(1)}</td>
+            <td class="num">{f1(c.cog[0])}</td><td class="num">{f1(c.cog[1])}</td><td class="num">{f1(c.cog[2])}</td>
+            <td class="muted">needs the chassis</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}

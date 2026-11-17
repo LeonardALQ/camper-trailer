@@ -1,0 +1,39 @@
+# Drawing register for the garage and bed module (numbering per 02-design-practice 1.7).
+# Revision changes are classed per REV-04: memo, notice (configuration change) or rework bulletin.
+owner: Camper trailer project (owner-builder)
+project: Off-road camper trailer, garage and bed module
+drawn_by: Kiro (AI agent)
+sheets_total: 3
+drawings:
+  - number: CT-401
+    title: Garage and bed general arrangement
+    subtitle: Plan, kerb-side elevation and section looking at partition A
+    sheet: 1
+    size: A3
+    scale: 25
+    status: DRAFT
+    structural: true
+    revisions:
+      - {rev: A, date: 2026-11-16, description: First draft from design v1 baseline, drawn: Kiro, checked: "", approved: ""}
+      - {rev: B, date: 2026-11-17, description: "Notice: deck laps over partition B and its top cleat, owner-built 1580 ladder, datum note", drawn: Kiro, checked: "", approved: ""}
+  - number: CT-402
+    title: Garage floor, tie-down anchor layout
+    subtitle: Track rows and anchor positions from the module datum
+    sheet: 2
+    size: A3
+    scale: 20
+    status: DRAFT
+    structural: true
+    revisions:
+      - {rev: A, date: 2026-11-16, description: First draft from design v1 baseline, drawn: Kiro, checked: "", approved: ""}
+  - number: CT-501
+    title: Bed platform
+    subtitle: Beam layout, section through the bed stack, ledger detail and deck lap detail
+    sheet: 3
+    size: A3
+    scale: 20
+    status: DRAFT
+    structural: true
+    revisions:
+      - {rev: A, date: 2026-11-16, description: First draft from design v1 baseline, drawn: Kiro, checked: "", approved: ""}
+      - {rev: B, date: 2026-11-17, description: "Notice: deck 1845 long, laps over partition B and its top cleat (detail G)", drawn: Kiro, checked: "", approved: ""}

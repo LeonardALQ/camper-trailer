@@ -1,0 +1,69 @@
+# Camper trailer design
+
+Design data, parametric model, checks, drawings and a static website for a one-off off-road camper trailer.
+Version 1 covers the garage and bed module: two motorcycles in a garage under a queen bed.
+
+The site is published at https://leonardalq.github.io/camper-trailer/ and rebuilds from this repository on every
+push to `main`.
+
+The design baseline is `DESIGN.md`, its parts list is `garage-bed/BOM.md`, and the research behind both is in
+`research/`. The build reads those files and never edits them.
+
+## Layout
+
+```
+data/                 the single source of truth
+  parts/*.yaml        one entry per BOM line (G-01 to A-02), the bikes, and context parts (no mass)
+  assemblies/         garage-bed.yaml: named parameters and every placement from DESIGN.md
+  checks.yaml         CLR-01 to CLR-06b and CON-01 (plus the CLR-01b sensitivity)
+  load_cases.yaml     the five load cases from DESIGN.md
+  steps.yaml          eleven draft build steps (STEP-01 to STEP-08)
+  drawings.yaml       drawing register, revisions and status
+cad/
+  partsdb.py          Pydantic models, loader, parameter expressions, instance expansion
+  model/              build123d generators: bikes from research/05, bought envelopes, made parts
+  massprops.py        mass schedule (MASS-01), growth allowance (MASS-06), CoG per load case
+  checks.py           clearance, height and contact checks on the B-rep model
+  fixsearch.py        smallest passing change for a failing check, in 10 mm steps (report only)
+  export.py           STEP, GLB, three-cad-viewer JSON, per-step viewer states, BOM CSV
+  drawings/           A3 sheet module and the sheets CT-401, CT-402, CT-501
+  sitedata.py         copies build outputs into the site and generates the step and research pages
+  tests/              pytest: design checks and data rules
+site/                 Astro 7 + Starlight 0.43 static site, three-cad-viewer 5.1.3
+shot/                 Playwright screenshot and scroll-check scripts
+docker/               the build image (Python 3.12, build123d 0.13, OCCT 8, Node 24)
+.github/workflows/    builds the site in the same image and publishes it to GitHub Pages
+build/                generated, git-ignored
+```
+
+## Build
+
+Everything runs in Docker, so the host only needs Docker and make. The OCCT kernel's wheels need glibc 2.28 or
+newer, which older Linux hosts do not have.
+
+```
+make            # image, data, model, check, drawings, site (about 3 minutes from scratch)
+make strict     # the same, but fail if a design check fails
+make serve      # python3 -m http.server 8791 --bind 127.0.0.1 --directory site/dist
+make shots      # screenshots and scroll checks into build/shots (needs make serve running)
+make clean      # remove generated files
+```
+
+A plain `make` builds the site for the root of a local server. The GitHub Pages build sets `SITE_URL` and
+`SITE_BASE=/camper-trailer`, so every link and model path gets that prefix.
+
+`make check` runs pytest over `data/checks.yaml` on the real geometry and prints every measured value. Its
+result is written to `build/checks/` and shown on the site. A failing check does not stop `make`, so the site can
+show it in red. Use `make strict` where a failure must stop the build.
+
+Outputs: `build/model/garage-bed.step` and `.glb`, `build/bom/garage-bed-bom.csv`, `build/drawings/CT-*.pdf|svg|png`,
+`build/checks/checks.json`, and the site in `site/dist`.
+
+## Conventions
+
+- Module frame (DESIGN.md): origin on the garage floor at partition A's inner face on the centreline. X towards
+  partition B, Y towards the kerb side, Z up, millimetres.
+- Masses that depend on size are computed from the model: kg/m for extrusions and track, kg/m2 for panels.
+  Bought items keep their declared mass. Each line records its source and maturity (spec, calculated, estimate).
+- Limits in `checks.yaml` are DESIGN.md's. Never change geometry or limits to make a check pass.
+- Placeholders for things DESIGN.md does not place are marked PLACEHOLDER in the data.

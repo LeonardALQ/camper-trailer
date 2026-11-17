@@ -1,0 +1,60 @@
+---
+// Key dimensions and the height stack-up, read from the assembly parameters (build/model/instances.json).
+import inst from '../data/generated/instances.json';
+
+interface Props {
+  kind: 'dims' | 'stack' | 'bikes';
+}
+const { kind } = Astro.props;
+const P: any = inst.params;
+const n = (v: number) => Math.round(v).toLocaleString('en-AU');
+const stack = [
+  ['Garage floor', null, 0],
+  ['Beam underside', null, P.beam_underside_z],
+  ['Beams, RHS 50x25x2.5 on edge', P.beam_h, P.deck_z],
+  ['Deck, 20 mm honeycomb', P.deck_t, P.froli_z],
+  ['Froli Star Mobil base', P.froli_h, P.mattress_z],
+  ['Mattress', P.mattress_t, P.mattress_z + P.mattress_t],
+  ['Bedding allowance', P.bedding_allowance, P.mattress_z + P.mattress_t + P.bedding_allowance],
+  ['Ceiling with the roof collapsed', null, P.ceiling_z],
+];
+const dims = [
+  ['Interior width', `${n(P.interior_width)} mm`, 'Y from -1,165 to +1,165 (2,400 mm body with 35 mm walls)'],
+  ['Garage length', `${n(P.garage_length)} mm`, 'X from partition A (0) to partition B (1,800)'],
+  ['Ceiling, roof collapsed', `${n(P.ceiling_z)} mm`, 'Target. The hard limit is 2,000 mm'],
+  ['Tuareg centreline', `X ${n(P.tuareg_x)}`, 'Next to partition A'],
+  ['Street Triple centreline', `X ${n(P.st_x)}`, `Bike spacing ${n(P.bike_spacing)} mm`],
+  ['Front tyre leading edge', `Y ${n(P.front_tyre_y)}`, '50 mm left for the chock nose at the road-side wall'],
+  ['Front and rear track rows', `Y ${n(P.front_row_y)} and +${n(P.rear_row_y)}`, 'Full garage length, flush with the floor'],
+  ['Beam underside', `Z ${n(P.beam_underside_z)}`, 'Five beams at Y -932, -466, 0, 466 and 932'],
+  ['Deck', `${n(P.deck_length)} x ${n(P.interior_width)} mm`, `X 0 to ${n(P.deck_length)}, lapping over the top edge of partition B (revision B)`],
+  ['Ladder', `${n(P.ladder_length)} mm at ${P.ladder_lean_deg} degrees`, 'Hooked on the deck edge, foot on the living-area floor (revision B)'],
+  ['Garage door opening', `${n(P.door_x1 - P.door_x0)} x ${n(P.door_h)} mm`, `X ${n(P.door_x0)} to ${n(P.door_x1)} in the kerb-side wall`],
+  ['Partition B doorway', `${n(P.doorway_w)} x ${n(P.doorway_h)} mm`, 'Position across the trailer is a placeholder'],
+];
+const bikes = inst.bike_sizes as any;
+---
+
+{kind === 'dims' && (
+  <div class="data-table"><table>
+    <thead><tr><th>Dimension</th><th>Value</th><th>Note</th></tr></thead>
+    <tbody>{dims.map(([a, b, c]) => <tr><td>{a}</td><td class="num">{b}</td><td>{c}</td></tr>)}</tbody>
+  </table></div>
+)}
+{kind === 'stack' && (
+  <div class="data-table"><table>
+    <thead><tr><th>Layer</th><th class="num">Thickness (mm)</th><th class="num">Top above the floor (mm)</th></tr></thead>
+    <tbody>{stack.map(([a, t, z]: any) => <tr><td>{a}</td><td class="num">{t == null ? '' : n(t)}</td><td class="num">{n(z)}</td></tr>)}</tbody>
+  </table></div>
+)}
+{kind === 'bikes' && (
+  <div class="data-table"><table>
+    <thead><tr><th>Envelope</th><th class="num">Model L x W x H (mm)</th><th class="num">Owner (mm)</th><th class="num">Pitch in the chock</th></tr></thead>
+    <tbody>{Object.entries(bikes).map(([k, b]: any) => (
+      <tr><td>{b.label}</td>
+        <td class="num">{n(b.model.length)} x {n(b.model.width)} x {n(b.model.height)}</td>
+        <td class="num">{n(b.owner.length)} x {n(b.owner.width)} x {n(b.owner.height)}</td>
+        <td class="num">{b.pitch_deg} deg</td></tr>
+    ))}</tbody>
+  </table></div>
+)}

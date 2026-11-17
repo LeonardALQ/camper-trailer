@@ -1,0 +1,50 @@
+# Partitions and living-side door (garage-bed/BOM.md, research/04).
+group: partitions
+parts:
+  P-01:
+    name: Partitions A and B
+    product: 20 mm aluminium honeycomb panel
+    maker: PanelMate (WA)
+    part_no: null
+    qty: 7.71
+    unit: m2
+    mass: {basis: per_area, kg_per_m2: 3.3, maturity: calculated, source: "https://pcsaluminium.com/wp-content/uploads/2025/06/PCS-ALUSTEP_500_uk_rev7.pdf", note: "PCS Alustep 500 figure for 20 mm"}
+    size: A 2,330 x 1,800, B 2,330 x 1,510
+    rating: null
+    links:
+      maker: https://panelmate.com.au/
+    stockist_au: https://panelmate.com.au/
+    notes: Partition B's doorway leaf is cut from the same panel, so it is counted in this line.
+    geometry: {generator: panel, params: {thickness: 20}}
+    color: "#c9d6df"
+  P-02:
+    name: Partition cleats
+    product: Capral angle 25x25x1.6, EK9216
+    maker: Capral
+    part_no: EK9216
+    qty: 19.9
+    unit: m
+    mass: {basis: per_length, kg_per_m: 0.209, maturity: calculated, source: "https://shop.capral.com.au/813740/"}
+    size: 25 x 25 x 1.6 angle
+    rating: null
+    links:
+      maker: https://shop.capral.com.au/813740/
+    stockist_au: https://shop.capral.com.au/813740/
+    notes: Perimeter of both partitions and the doorway frame. Modelled on the non-garage face with butt joints, so the vertical pieces are 50 mm shorter than the edge.
+    geometry: {generator: angle, params: {leg: 25, thickness: 1.6}}
+    color: "#8899a6"
+  P-03:
+    name: Door hardware
+    product: Aluminium piano hinge, EPDM D-seal, 2 compression latches
+    maker: Product to choose
+    part_no: null
+    qty: 1
+    unit: set
+    mass: {basis: declared, unit_kg: 0.6, maturity: estimate, source: "research/04-bed-and-materials.md section 9"}
+    size: Door 700 x 1,300
+    rating: null
+    links: {}
+    stockist_au: null
+    notes: Hinge 1.3 m, seal round the frame, two latches.
+    geometry: null
+    cog: {at: ["garage_length + partition_t / 2", "doorway_y", "doorway_z0 + doorway_h / 2"], basis: "Centre of partition B's doorway"}

@@ -1,0 +1,174 @@
+---
+// three-cad-viewer island. Without `step` it shows the whole module (loading-only items hidden).
+// With `step` it shows that step's new parts in their own colours against the earlier work in grey.
+import { withBase } from '../lib/url';
+
+interface Props {
+  src?: string;
+  states?: string;
+  step?: string;
+  height?: number;
+}
+const { src = withBase('/models/garage-bed.json'), states = withBase('/models/steps.json'), step = '', height = 520 } = Astro.props;
+---
+
+<cad-viewer class="not-content" data-src={src} data-states={states} data-step={step} data-height={height}>
+  <p class="cad-loading">Loading the 3D model (about 3 MB)...</p>
+</cad-viewer>
+<p class="cad-help">
+  Drag to rotate and right-drag to pan. To zoom, pinch on a trackpad or hold Ctrl (⌘ on a Mac) while you scroll.
+  Plain scrolling moves the page. The tree on the left hides and shows parts, and the tabs above it have clip
+  planes for sections and a measuring tool.
+</p>
+
+<style>
+  cad-viewer {
+    display: block;
+    margin: 1rem 0 0.4rem 0;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+  }
+  .cad-help {
+    font-size: 0.8rem;
+    color: var(--sl-color-gray-3);
+    margin-top: 0.2rem;
+  }
+  cad-viewer :global(.cad-wheel-hint) {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 0.5rem 0.9rem;
+    border-radius: 0.4rem;
+    background: rgba(20, 20, 20, 0.78);
+    color: #fff;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 20;
+  }
+  cad-viewer :global(.cad-wheel-hint.show) {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    cad-viewer :global(.cad-wheel-hint) {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import { Display, Viewer } from 'three-cad-viewer';
+  import 'three-cad-viewer/css';
+  import { withBase } from '../lib/url';
+
+  type Node = { id: string; name: string; parts?: Node[] };
+  const leaves = (n: Node, acc: Node[] = []): Node[] => {
+    for (const p of n.parts ?? []) {
+      if (p.parts) leaves(p, acc);
+      else acc.push(p);
+    }
+    return acc;
+  };
+  const under = (id: string, prefixes: string[]) => prefixes.some((p) => id === p || id.startsWith(p + '/'));
+
+  class CadViewerElement extends HTMLElement {
+    async connectedCallback() {
+      const st = await fetch(this.dataset.states!).then((r) => r.json());
+      const stepId = this.dataset.step || '';
+      const step = st.steps.find((s: any) => s.id === stepId);
+      const src = step ? withBase(`/models/${step.model}`) : this.dataset.src!;
+      const shapes = await fetch(src).then((r) => r.json());
+      this.innerHTML = '';
+      const treeWidth = 250;
+      const cadWidth = Math.max(420, this.clientWidth - treeWidth - 4);
+      const height = Number(this.dataset.height ?? 520);
+      const opts = { cadWidth, height, treeWidth, glass: false, tools: true, measureTools: true, explodeTool: true };
+      const display = new Display(this, { ...opts, theme: 'light', pinning: false });
+      const viewer = new Viewer(display, { ...opts, target: [0, 0, 0], up: 'Z' } as any, () => {});
+      viewer.render(
+        shapes,
+        { edgeColor: 0x404040, ambientIntensity: 1.0, directIntensity: 1.1, metalness: 0.3, roughness: 0.65, defaultOpacity: 0.5, normalLen: 0 },
+        { ...opts, up: 'Z', ortho: true, collapse: 1 } as any,
+      );
+      viewer.resizeCadView(cadWidth, treeWidth, height, false);
+      (this as any).viewer = viewer;
+
+      // Let the mouse wheel scroll the page over the model too. The model only zooms with Ctrl or Cmd held, or
+      // with a trackpad pinch, which the browser sends as a wheel event with Ctrl held. Stopping the event on the
+      // way down keeps it away from the viewer's zoom handler, and the browser then scrolls the page as normal.
+      const hint = document.createElement('div');
+      hint.className = 'cad-wheel-hint';
+      hint.textContent = 'To zoom the model, pinch or hold Ctrl (⌘ on a Mac) while you scroll';
+      this.append(hint);
+      let hideHint = 0;
+      this.addEventListener(
+        'wheel',
+        (e) => {
+          if (e.ctrlKey || e.metaKey) return;
+          e.stopPropagation();
+          const canvas = (e.target as Element).closest('canvas');
+          if (!canvas) return;
+          const c = canvas.getBoundingClientRect();
+          const me = this.getBoundingClientRect();
+          hint.style.left = `${c.left - me.left + c.width / 2}px`;
+          hint.style.top = `${c.top - me.top + c.height / 2}px`;
+          hint.classList.add('show');
+          clearTimeout(hideHint);
+          hideHint = window.setTimeout(() => hint.classList.remove('show'), 1500);
+        },
+        { capture: true, passive: true },
+      );
+
+      const all = leaves(shapes);
+      const states: Record<string, [number, number]> = {};
+      if (step) {
+        for (const leaf of all) {
+          const on = under(leaf.id, step.new) || under(leaf.id, step.earlier);
+          states[leaf.id] = on ? [1, 1] : [0, 0];
+        }
+        viewer.setStates(states as any);
+      }
+      if (step) {
+        // grey out the earlier work so the new parts stand out (STEP-03)
+        const groups = (viewer as any).nestedGroup.groups as Record<string, any>;
+        for (const [path, g] of Object.entries(groups)) {
+          if (!under(path, step.earlier) || under(path, step.new)) continue;
+          g.traverse?.((o: any) => {
+            const ms = Array.isArray(o.material) ? o.material : o.material ? [o.material] : [];
+            for (const m of ms) {
+              if (m.type === 'LineBasicMaterial' || m.type === 'LineMaterial') {
+                m.opacity = 0.35;
+                m.transparent = true;
+              } else if (m.color) {
+                m.color.set(0xb9bec4);
+                m.transparent = true;
+                m.opacity = 0.35;
+                m.depthWrite = false;
+              }
+              m.needsUpdate = true;
+            }
+          });
+        }
+        (viewer as any).update?.(true);
+      }
+      // Reserve the full height of the viewer (canvas, tree and info panel) so nothing overlaps the text below.
+      const reserve = () => {
+        const top = this.getBoundingClientRect().top;
+        let bottom = top;
+        this.querySelectorAll('*').forEach((el) => {
+          const r = (el as HTMLElement).getBoundingClientRect();
+          if (r.height > 0 && r.bottom > bottom) bottom = r.bottom;
+        });
+        this.style.height = `${Math.ceil(bottom - top) + 8}px`;
+      };
+      reserve();
+      setTimeout(reserve, 300);
+      document.body.dataset.cadReady = 'yes';
+    }
+  }
+  customElements.define('cad-viewer', CadViewerElement);
+</script>

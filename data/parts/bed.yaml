@@ -1,0 +1,84 @@
+# Bed BOM lines (garage-bed/BOM.md, research/04).
+group: bed
+parts:
+  B-01:
+    name: Mattress
+    product: Pure Sleep Lyra Slimline, Firm (latex layer), full queen, built at 150 mm
+    maker: Pure Sleep
+    part_no: Lyra Slimline campervan mattress
+    qty: 1
+    unit: each
+    mass: {basis: declared, unit_kg: 19.0, maturity: estimate, source: "research/04-bed-and-materials.md section 2"}
+    size: 1,530 x 2,030 x 150
+    rating: null
+    links:
+      maker: https://puresleep.com.au/product/lyra-slimline-campervan-mattress/
+    stockist_au: https://puresleep.com.au/product/lyra-slimline-campervan-mattress/
+    notes: Made to order in Brisbane. Ask for the real weight.
+    geometry: {generator: box, params: {dx: 1530, dy: 2030, dz: 150, fillet: 25}}
+    color: "#f3efe4"
+  B-02:
+    name: Ventilated sprung base
+    product: Froli Star Mobil basic pack
+    maker: Froli
+    part_no: Froli Star Mobil basic pack
+    qty: 2
+    unit: pack
+    mass: {basis: declared, unit_kg: 3.66, maturity: calculated, source: "https://www.froli.com/shop/schlafen-unterwegs/bettsysteme/168/froli-star-mobil", note: "60 springs per pack at 61 g each"}
+    size: 43 mm high
+    rating: null
+    links:
+      maker: https://www.froli.com/shop/schlafen-unterwegs/bettsysteme/168/froli-star-mobil
+    stockist_au: null
+    notes: Import, no Australian stockist found. Modelled as two layers, each half the mattress width.
+    geometry: {generator: froli, params: {dz: 43, pitch: 115}}
+    color: "#5d9cec"
+  B-03:
+    name: Deck and garage ceiling
+    product: 20 mm aluminium honeycomb panel with glass-fibre skins
+    maker: PanelMate (WA), PCS Alustep 500 as benchmark
+    part_no: null
+    qty: 4.30
+    unit: m2
+    mass: {basis: per_area, kg_per_m2: 3.3, maturity: calculated, source: "https://pcsaluminium.com/wp-content/uploads/2025/06/PCS-ALUSTEP_500_uk_rev7.pdf", note: "PCS figure. Ask PanelMate for theirs"}
+    size: 1,845 x 2,330 x 20, laps over partition B and its top cleat
+    rating: null
+    links:
+      maker: https://panelmate.com.au/
+      datasheet: https://pcsaluminium.com/wp-content/uploads/2025/06/PCS-ALUSTEP_500_uk_rev7.pdf
+    stockist_au: https://panelmate.com.au/
+    notes: Runs from X 0 to 1,845, so it laps over the top edge of partition B and the cleat on its living-area face (revision B). Bonded and riveted to the beams, the ledgers, the top of partition B and that cleat, and sealed to the partitions and walls.
+    geometry: {generator: panel, params: {thickness: 20}}
+    color: "#d8cfa8"
+  B-04:
+    name: Beams
+    product: Capral RHS 50x25x2.5, 6106-T6, die EU7751
+    maker: Capral
+    part_no: EU7751
+    qty: 9.0
+    unit: m
+    mass: {basis: per_length, kg_per_m: 0.945, maturity: calculated, source: "https://shop.capral.com.au/913184/"}
+    size: 50 x 25 x 2.5 RHS on edge, 5 off
+    rating: I = 10.85 cm4
+    links:
+      maker: https://shop.capral.com.au/913184/
+    stockist_au: https://shop.capral.com.au/913184/
+    notes: About 5 mm deflection under 255 kg spread over the bed, by the research/04 check. The engineer confirms it.
+    geometry: {generator: rhs, params: {height: 50, width: 25, wall: 2.5, outer_radius: 2.5}}
+    color: "#b8c4ce"
+  B-05:
+    name: Ledgers
+    product: Capral angle 40x40x3, 6060-T5, EK9124
+    maker: Capral
+    part_no: EK9124
+    qty: 8.3
+    unit: m
+    mass: {basis: per_length, kg_per_m: 0.624, maturity: calculated, source: "https://shop.capral.com.au/813676/"}
+    size: 40 x 40 x 3 angle
+    rating: I = 3.58 cm4 (leg axis)
+    links:
+      maker: https://shop.capral.com.au/813676/
+    stockist_au: https://shop.capral.com.au/813676/
+    notes: On both partitions under the beam ends, and on both side walls under the deck edges.
+    geometry: {generator: angle, params: {leg: 40, thickness: 3}}
+    color: "#7f95a6"

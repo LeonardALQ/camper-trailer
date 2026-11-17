@@ -1,0 +1,80 @@
+/* Wider content column for the viewer and the data tables. */
+:root {
+  --sl-content-width: 58rem;
+}
+
+/* The 3D viewer's stylesheet (three-cad-viewer) also styles the page body: overflow hidden, no text selection
+   and its own background. That stopped every page from scrolling and turned dark mode white. revert-layer puts
+   back Starlight's own values for those three properties. */
+html body {
+  overflow: revert-layer;
+  user-select: revert-layer;
+  background-color: revert-layer;
+}
+
+.data-table {
+  font-size: 0.82rem;
+  overflow-x: auto;
+  display: block;
+}
+.data-table table {
+  width: 100%;
+}
+.data-table td,
+.data-table th {
+  padding: 0.25rem 0.45rem;
+  vertical-align: top;
+}
+.data-table td:first-child {
+  white-space: nowrap;
+}
+.data-table .num {
+  text-align: right;
+  white-space: nowrap;
+}
+.status-pass {
+  color: #1a7f37;
+  font-weight: 600;
+}
+.status-fail {
+  color: #c00000;
+  font-weight: 700;
+}
+.row-fail td {
+  background: #ffe5e5;
+  color: #900;
+}
+.status-report {
+  color: #b05a00;
+  font-weight: 600;
+}
+.row-report td {
+  background: #fff4e0;
+}
+.muted {
+  color: var(--sl-color-gray-3);
+}
+.step-meta dt {
+  font-weight: 600;
+  margin-top: 0.6rem;
+}
+.step-meta dd {
+  margin-left: 1rem;
+}
+.hold {
+  border-left: 4px solid #c00000;
+  padding: 0.4rem 0.8rem;
+  background: #fff0f0;
+  color: #600;
+}
+.attention {
+  border-left: 4px solid #b05a00;
+  padding: 0.4rem 0.8rem;
+  background: #fff7e8;
+  color: #5a3200;
+}
+.drawing-card img {
+  border: 1px solid var(--sl-color-gray-5);
+  width: 100%;
+  height: auto;
+}

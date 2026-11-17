@@ -1,0 +1,26 @@
+# Load cases from DESIGN.md (Mass). `include` selects BOM groups or tags. Bikes are payload items.
+# removable = the kit that can stay home with the bikes: chocks, straps, loops, harness, ramp, winch (BOM.md).
+load_cases:
+  - id: LC1
+    name: Module with the removable kit fitted, no bikes
+    module: all
+    bikes: []
+  - id: LC2
+    name: Both bikes in
+    module: all
+    bikes: [TU, ST]
+  - id: LC3
+    name: Bikes out, removable kit taken out
+    module: fixed_only
+    bikes: []
+  - id: LC4
+    name: Tuareg only
+    module: all
+    bikes: [TU]
+  - id: LC5
+    name: Street Triple only
+    module: all
+    bikes: [ST]
+towball:
+  computable: false
+  note: The towball load cannot be computed until the chassis exists, because it needs the coupling and axle positions in the module frame (MASS-04).

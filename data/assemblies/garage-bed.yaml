@@ -1,0 +1,251 @@
+# Garage and bed module assembly: placements from DESIGN.md, driven by named parameters.
+# Module frame (DESIGN.md): origin on the garage floor at the inner face of partition A on the trailer
+# centreline. X towards partition B (living-area side), Y to the kerb side (garage door), Z up. mm.
+# Converting to the project datum (DIM-01, X from the ball, positive rearward) needs an offset, and X
+# also changes sign if partition B ends up nearer the front of the trailer than partition A (DESIGN.md rev B).
+# Any number may be an expression over `params` (+ - * / and parentheses, min, max, abs, sqrt).
+id: ASM-GB
+name: Garage and bed module
+revision: B
+
+params:
+  # Envelope
+  interior_width: 2330
+  half_width: interior_width / 2
+  wall_t: 35
+  garage_length: 1800
+  partition_t: 20
+  ceiling_z: 1800
+  ceiling_limit_z: 2000
+  body_x0: -100            # context walls and floor run past the partitions (display only)
+  body_x1: garage_length + 120
+  # Bikes
+  bike_spacing: 760
+  tuareg_x: 560
+  st_x: tuareg_x + bike_spacing
+  front_tyre_y: -1115
+  chock_rise: 25
+  # Restraint
+  front_row_y: -915
+  rear_row_y: 883
+  tu_strap_dx: 450
+  st_strap_dx: 400
+  wheel_strap_dx: 250
+  track_w: 34.5
+  track_h: 13.7
+  fitting_h: 22
+  # Bed stack
+  beam_underside_z: 1460
+  beam_h: 50
+  beam_y: [-932, -466, 0, 466, 932]
+  ledger_leg: 40
+  ledger_t: 3
+  deck_z: beam_underside_z + beam_h
+  deck_t: 20
+  deck_length: garage_length + partition_t + cleat_leg   # rev B: X 0 to 1,845, laps over partition B and its top cleat
+  froli_z: deck_z + deck_t
+  froli_h: 43
+  mattress_z: froli_z + froli_h
+  mattress_t: 150
+  mattress_x: 1530
+  mattress_y: 2030
+  bedding_allowance: 50
+  # Partitions and doors
+  partition_b_h: deck_z
+  doorway_w: 700
+  doorway_h: 1300
+  doorway_y: 0             # PLACEHOLDER: DESIGN.md does not place the doorway
+  doorway_z0: 100          # PLACEHOLDER: sill height; BOM.md counts cleats on all four doorway sides
+  door_leaf_gap: 3
+  cleat_leg: 25
+  door_x0: 40
+  door_x1: 1760
+  door_h: 1440
+  # Placeholders for items DESIGN.md does not place
+  vent_x: 940
+  winch_z0: 600
+  ladder_y: 800
+  ladder_length: 1580      # A-01 rev B: foot about 4 mm above the floor at 15 deg, closed by the rubber feet
+  ladder_lean_deg: 15      # A-01 rev B: lean from vertical, into the living area
+  living_floor_x1: 2420    # end of the living-area floor shown under the ladder (display only)
+  net_y0: -900
+  ground_drop: 900         # assumed ground below the floor for the loading step (DESIGN.md: 800 to 1,000)
+
+items:
+  # ---------------------------------------------------------------- bikes
+  - {ref: TU, part: BIKE-TU, group: bikes, label: Aprilia Tuareg 660 Rally, step: S11,
+     bike: {centre_x: tuareg_x, front_tyre_y: front_tyre_y, front_rise: chock_rise}}
+  - {ref: ST, part: BIKE-ST, group: bikes, label: Triumph Street Triple 765, step: S11,
+     bike: {centre_x: st_x, front_tyre_y: front_tyre_y, front_rise: chock_rise}}
+  # Variants used only by the checks (not exported, no mass)
+  - {ref: TU-2263, part: BIKE-TU, group: bikes, label: "Tuareg with the photo-measured 2,263 mm length", check_only: true,
+     bike: {centre_x: tuareg_x, front_tyre_y: front_tyre_y, front_rise: chock_rise, length: 2263}}
+  - {ref: TU-1390, part: BIKE-TU, group: bikes, label: "Tuareg with the photo-measured 1,390 mm screen", check_only: true,
+     bike: {centre_x: tuareg_x, front_tyre_y: front_tyre_y, front_rise: chock_rise, screen_top_z: 1390}}
+
+  # ---------------------------------------------------------------- partitions
+  - {ref: "1", part: P-01, group: partitions, label: Partition A (full height), step: S05,
+     at: [-partition_t, -half_width, 0],
+     params: {dx: partition_t, dy: interior_width, dz: ceiling_z, normal: x}}
+  - {ref: "2", part: P-01, group: partitions, label: Partition B with doorway, step: S06,
+     at: [garage_length, -half_width, 0],
+     params: {dx: partition_t, dy: interior_width, dz: partition_b_h, normal: x,
+              cutouts: [[doorway_y - doorway_w / 2 + half_width, doorway_z0, doorway_w, doorway_h]]}}
+  - {ref: "3", part: P-01, group: partitions, label: Partition B door leaf (closed), step: S06,
+     at: [garage_length, doorway_y - doorway_w / 2 + door_leaf_gap, doorway_z0 + door_leaf_gap],
+     params: {dx: partition_t, dy: doorway_w - 2 * door_leaf_gap, dz: doorway_h - 2 * door_leaf_gap, normal: x}}
+  # Cleats on the non-garage faces, mitred at the corners (lengths are the long-point cut lengths)
+  - ref: "4"
+    part: P-02
+    group: partitions
+    label: Partition cleat
+    copies:
+      # partition A, bathroom face (X = -20), legs pointing to -X
+      - {id: A-bottom, step: S05, cleat: {face_x: -partition_t, dir_x: -1, axis: y, at_u: -half_width, length: interior_width, at_z: 0, corner: floor}}
+      - {id: A-top, step: S05, cleat: {face_x: -partition_t, dir_x: -1, axis: y, at_u: -half_width, length: interior_width, at_z: ceiling_z, corner: ceiling}}
+      - {id: A-road, step: S05, cleat: {face_x: -partition_t, dir_x: -1, axis: z, at_u: -half_width, length: ceiling_z, at_z: 0, corner: wall_neg}}
+      - {id: A-kerb, step: S05, cleat: {face_x: -partition_t, dir_x: -1, axis: z, at_u: half_width, length: ceiling_z, at_z: 0, corner: wall_pos}}
+      # partition B, living-area face (X = 1,820), legs pointing to +X
+      - {id: B-bottom, step: S06, cleat: {face_x: garage_length + partition_t, dir_x: 1, axis: y, at_u: -half_width, length: interior_width, at_z: 0, corner: floor}}
+      - {id: B-top, step: S06, cleat: {face_x: garage_length + partition_t, dir_x: 1, axis: y, at_u: -half_width, length: interior_width, at_z: partition_b_h, corner: ceiling}}
+      - {id: B-road, step: S06, cleat: {face_x: garage_length + partition_t, dir_x: 1, axis: z, at_u: -half_width, length: partition_b_h, at_z: 0, corner: wall_neg}}
+      - {id: B-kerb, step: S06, cleat: {face_x: garage_length + partition_t, dir_x: 1, axis: z, at_u: half_width, length: partition_b_h, at_z: 0, corner: wall_pos}}
+      # doorway frame on B's living-area face
+      - {id: D-sill, step: S06, cleat: {face_x: garage_length + partition_t, dir_x: 1, axis: y, at_u: doorway_y - doorway_w / 2, length: doorway_w, at_z: doorway_z0, corner: ceiling}}
+      - {id: D-head, step: S06, cleat: {face_x: garage_length + partition_t, dir_x: 1, axis: y, at_u: doorway_y - doorway_w / 2, length: doorway_w, at_z: doorway_z0 + doorway_h, corner: floor}}
+      - {id: D-road, step: S06, cleat: {face_x: garage_length + partition_t, dir_x: 1, axis: z, at_u: doorway_y - doorway_w / 2, length: doorway_h, at_z: doorway_z0, corner: wall_pos}}
+      - {id: D-kerb, step: S06, cleat: {face_x: garage_length + partition_t, dir_x: 1, axis: z, at_u: doorway_y + doorway_w / 2, length: doorway_h, at_z: doorway_z0, corner: wall_neg}}
+
+  # ---------------------------------------------------------------- bed
+  # Ledgers: 40x40x3 angle. Partition ledgers hang below a shelf whose top is the beam underside.
+  - ref: "5"
+    part: B-05
+    group: bed
+    label: Ledger
+    copies:
+      - {id: on-A, step: S05, ledger: {wall: partition_a, length: interior_width, top_z: beam_underside_z}}
+      - {id: on-B, step: S06, ledger: {wall: partition_b, length: interior_width, top_z: beam_underside_z}}
+      - {id: road-wall, step: S07, ledger: {wall: road, length: garage_length, top_z: deck_z}}
+      - {id: kerb-wall, step: S07, ledger: {wall: kerb, length: garage_length, top_z: deck_z}}
+  - ref: "6"
+    part: B-04
+    group: bed
+    label: Beam
+    for: {y: beam_y}
+    step: S07
+    at: [0, y, beam_underside_z]
+    params: {length: garage_length}
+  - {ref: "7", part: B-03, group: bed, label: Deck and garage ceiling, step: S08,
+     at: [0, -half_width, deck_z], params: {dx: deck_length, dy: interior_width, dz: deck_t, normal: z}}
+  - ref: "8"
+    part: B-02
+    group: bed
+    label: Froli Star Mobil pack
+    step: S10
+    copies:
+      - {id: road, at: [0, -mattress_y / 2, froli_z], params: {dx: mattress_x, dy: mattress_y / 2}}
+      - {id: kerb, at: [0, 0, froli_z], params: {dx: mattress_x, dy: mattress_y / 2}}
+  - {ref: "9", part: B-01, group: bed, label: Mattress, step: S10,
+     at: [0, -mattress_y / 2, mattress_z], params: {dx: mattress_x, dy: mattress_y, dz: mattress_t}}
+  # Ladder hooked on the deck edge (rev B): `at` is the deck end (X), ladder centreline (Y), deck top (Z)
+  - {ref: "18", part: A-01, group: bed, label: Ladder (living area), step: S10,
+     at: [deck_length, ladder_y, froli_z], params: {length: ladder_length, lean_deg: ladder_lean_deg}}
+  - {ref: "19", part: A-02, group: bed, label: Safety net (roof raised), step: S10,
+     at: [garage_length - 10, net_y0, froli_z]}
+
+  # ---------------------------------------------------------------- restraint
+  - ref: "10"
+    part: G-01
+    group: restraint
+    label: Condor chock
+    step: S03
+    copies:
+      - {id: TU, at: [tuareg_x, -half_width, 0]}
+      - {id: ST, at: [st_x, -half_width, 0]}
+  - ref: "11"
+    part: G-02
+    group: restraint
+    label: L-track row
+    step: S03
+    copies:
+      - {id: front, at: [0, front_row_y, -track_h], params: {length: garage_length}}
+      - {id: rear, at: [0, rear_row_y, -track_h], params: {length: garage_length}}
+  - ref: "12"
+    part: G-03
+    group: restraint
+    label: Track fitting
+    step: S11
+    copies:
+      - {id: TU-FR, at: [tuareg_x - tu_strap_dx, front_row_y, 0]}
+      - {id: TU-FL, at: [tuareg_x + tu_strap_dx, front_row_y, 0]}
+      - {id: TU-RR, at: [tuareg_x - tu_strap_dx, rear_row_y, 0]}
+      - {id: TU-RL, at: [tuareg_x + tu_strap_dx, rear_row_y, 0]}
+      - {id: TU-WR, at: [tuareg_x - wheel_strap_dx, rear_row_y, 0]}
+      - {id: TU-WL, at: [tuareg_x + wheel_strap_dx, rear_row_y, 0]}
+      - {id: ST-FR, at: [st_x - st_strap_dx, front_row_y, 0]}
+      - {id: ST-FL, at: [st_x + st_strap_dx, front_row_y, 0]}
+      - {id: ST-RR, at: [st_x - st_strap_dx, rear_row_y, 0]}
+      - {id: ST-RL, at: [st_x + st_strap_dx, rear_row_y, 0]}
+      - {id: ST-WR, at: [st_x - wheel_strap_dx, rear_row_y, 0]}
+      - {id: ST-WL, at: [st_x + wheel_strap_dx, rear_row_y, 0]}
+  # Straps: from the bike tie-down point (05) to the top of its track fitting.
+  # side +1 is the bike's left (module +X). Wheel straps pass through the rear wheel round the rim.
+  - ref: "13"
+    part: G-05
+    group: restraint
+    label: Ratchet strap
+    step: S11
+    copies:
+      - {id: TU-F+, strap: {bike: TU, point: handlebar_inboard, side: 1, anchor: [tuareg_x + tu_strap_dx, front_row_y, fitting_h]}}
+      - {id: TU-F-, strap: {bike: TU, point: handlebar_inboard, side: -1, anchor: [tuareg_x - tu_strap_dx, front_row_y, fitting_h]}}
+      - {id: TU-R+, strap: {bike: TU, point: pillion_peg_hangers, side: 1, anchor: [tuareg_x + tu_strap_dx, rear_row_y, fitting_h]}}
+      - {id: TU-R-, strap: {bike: TU, point: pillion_peg_hangers, side: -1, anchor: [tuareg_x - tu_strap_dx, rear_row_y, fitting_h]}}
+      - {id: TU-W, strap: {bike: TU, point: rear_wheel, anchors: [[tuareg_x - wheel_strap_dx, rear_row_y, fitting_h], [tuareg_x + wheel_strap_dx, rear_row_y, fitting_h]]}}
+      - {id: ST-F+, strap: {bike: ST, point: handlebar_beside_risers, side: 1, anchor: [st_x + st_strap_dx, front_row_y, fitting_h]}}
+      - {id: ST-F-, strap: {bike: ST, point: handlebar_beside_risers, side: -1, anchor: [st_x - st_strap_dx, front_row_y, fitting_h]}}
+      - {id: ST-R+, strap: {bike: ST, point: pillion_peg_hangers, side: 1, anchor: [st_x + st_strap_dx, rear_row_y, fitting_h]}}
+      - {id: ST-R-, strap: {bike: ST, point: pillion_peg_hangers, side: -1, anchor: [st_x - st_strap_dx, rear_row_y, fitting_h]}}
+      - {id: ST-W, strap: {bike: ST, point: rear_wheel, anchors: [[st_x - wheel_strap_dx, rear_row_y, fitting_h], [st_x + wheel_strap_dx, rear_row_y, fitting_h]]}}
+  - ref: "14"
+    part: G-11
+    group: restraint
+    label: Winch on its quick-release plate (Tuareg bay)
+    step: S09
+    at: [tuareg_x, -half_width, winch_z0]
+  - {ref: 14P, part: G-11-PLATE, group: restraint, label: Spare winch plate (Street Triple bay), step: S09,
+     at: [st_x, -half_width, winch_z0]}
+  - {ref: "20", part: G-10, group: restraint, label: Loading ramp (deployed), step: S11, display: loading_only,
+     ramp: {centre_x: tuareg_x, sill_y: half_width + wall_t, drop: ground_drop}}
+
+  # ---------------------------------------------------------------- garage safety (positions are placeholders)
+  - ref: "15"
+    part: G-12
+    group: safety
+    label: Vent
+    step: S09
+    copies:
+      - {id: low-road, at: [vent_x, -half_width, 30], params: {facing: 1}}
+      - {id: low-door, at: [vent_x, half_width, 30], params: {facing: -1}}
+      - {id: high-road, at: [vent_x, -half_width, 1300], params: {facing: 1}}
+  - ref: "16"
+    part: G-13
+    group: safety
+    label: Fume detector
+    step: S09
+    copies:
+      - {id: sensor-A, at: [0, 0, 100], params: {facing_x: 1}}
+      - {id: sensor-B, at: [garage_length, 600, 100], params: {facing_x: -1}}
+      - {id: display, at: [1650, -half_width, 1560], params: {facing_y: 1, height: 67, width: 67}}
+  - {ref: "17", part: G-14, group: safety, label: Extinguisher by the garage door, step: S09,
+     at: [70, half_width - 85, 600]}
+
+  # ---------------------------------------------------------------- context (no mass)
+  - {ref: C1, part: CTX-FLOOR, group: context, label: Floor, step: S02, at: [body_x0, -half_width - wall_t, 0]}
+  - {ref: C2, part: CTX-WALL-R, group: context, label: Road-side wall, step: S02, at: [body_x0, -half_width - wall_t, 0], params: {side: road}}
+  - {ref: C3, part: CTX-WALL-K, group: context, label: Kerb-side wall with door opening, step: S02, at: [body_x0, half_width, 0], params: {side: kerb}}
+  - {ref: C4, part: CTX-DOOR, group: context, label: Garage door (closed), step: S11, display: closed_only, at: [door_x0, half_width, 0]}
+  - {ref: C5, part: CTX-CEIL, group: context, label: Ceiling plane (roof collapsed), step: S02, at: [-partition_t, -half_width, ceiling_z]}
+  - {ref: C6, part: CTX-GROUND, group: context, label: Assumed ground, step: S11, display: loading_only,
+     at: [tuareg_x - 750, half_width + wall_t, -ground_drop - 10]}
+  - {ref: C7, part: CTX-FLOOR-LIV, group: context, label: Living-area floor (assumed at Z 0), step: S10,
+     at: [body_x1, -half_width - wall_t, -30]}

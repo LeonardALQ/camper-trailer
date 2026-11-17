@@ -1,0 +1,269 @@
+# Build steps for the garage and bed module (draft), written to STEP-01 to STEP-08 (research/02).
+# new: items added in the step (highlighted in its 3D view). Earlier steps' items show greyed.
+# Bikes shown in a step are not carried into later steps. parts.qty is the quantity used in the step.
+steps:
+  - id: S01
+    title: Build a full-size mock-up and measure both bikes
+    action: Mock up the garage in cheap material and measure both bikes in it.
+    why: Several bike dimensions are estimates, and the chock nose and cradle rise are not published. PROC-03 asks for a full-size mock-up before any panel is ordered.
+    new: [TU, ST]
+    parts: []
+    tools: [Tape measure, Laser level, Plumb bob, Straightedge, Camera]
+    consumables: [Plywood or cardboard for the walls and the beam line, Timber battens, Masking tape]
+    drawings: [CT-401]
+    instructions:
+      - Mark the 2,330 mm interior width and the 1,800 mm garage length on a flat floor, with the 1,720 x 1,440 mm door opening in the kerb-side wall.
+      - Set a batten at 1,460 mm above the floor across the trailer to show the beam underside.
+      - Wheel each bike in nose first through the door opening, with the Tuareg's mirrors folded, and stand it in a borrowed or bought Condor chock.
+      - Measure the points in the checks list and record them in the build log.
+    checks:
+      - Tuareg screen top with mirrors folded, with the front wheel in the chock (the model uses 1,370 mm plus the cradle rise).
+      - Tuareg overall length including the plate hanger (2,220 or about 2,263 mm, CLR-06 and CLR-06b).
+      - Tuareg fairing and radiator-shroud half-width between 900 and 1,100 mm high (the model uses 300 mm).
+      - Peg tip widths of both bikes (the model uses 320 and 220 mm from the centreline).
+      - Condor chock nose depth ahead of the tyre (DESIGN.md allows 50 mm) and the cradle rise (the model uses 25 mm).
+      - Gap between the Street Triple's right bar end and the Tuareg's left fairing at 760 mm spacing (CLR-03 needs 30 mm).
+    hold_points:
+      - Do not order panels, track or beams until every value above is measured and the checks are re-run with the measured values.
+    attention:
+      - The Tuareg may be about 43 mm longer than the owner's 2,220 mm figure because of its plate hanger.
+  - id: S02
+    title: Bond the hardpoint strips and rout the L-track recesses
+    action: Rout two 34.5 mm wide, 13.7 mm deep channels in the floor and bond hardpoint strips under them.
+    why: The floor skin and foam core cannot take a 20 kN anchor load. Each anchor must reach the steel rails under the floor through a solid hardpoint.
+    new: [C1]
+    parts:
+      - {part: G-04, qty: "1 set"}
+      - {part: F-03, qty: "as needed"}
+    tools: [Router with guide rail, Straightedge, Vacuum, Drill and 8.5 mm bit, Square]
+    consumables: [Masking tape, Solvent wipes]
+    drawings: [CT-402]
+    instructions:
+      - Mark the front row centreline at Y = -915 and the rear row at Y = +883 from the trailer centreline, along the full 1,800 mm.
+      - Rout each channel 34.5 mm wide and 13.7 mm deep, then remove the core under it for the hardpoint strip.
+      - Bond the hardpoint strip with Plexus MA310 and drill the M8 bolt holes at 150 mm pitch or less, through to the steel anchor rail.
+    checks:
+      - Before routing, measure both row centrelines from the datum and compare with CT-402. Tick.
+      - Confirm the steel anchor rails under the floor line up with both rows (chassis scope).
+    hold_points:
+      - Photograph the hardpoints, crush tubes and bolt holes before the track covers them.
+    attention:
+      - The rows are not symmetric about the centreline (-915 and +883).
+  - id: S03
+    title: Fit the L-track rows and the chock adapters
+    action: Bolt both L-track rows and both chock floor adapters through to the steel anchor rails.
+    why: The track carries every strap anchor. The chocks pin onto their adapters, so the adapters set each bike's position.
+    new: ["10", "11"]
+    parts:
+      - {part: G-02, qty: "2 rows of 1.8 m"}
+      - {part: G-01, qty: "2 (adapters now, chocks pinned on)"}
+      - {part: F-07, qty: "M8 A4-70 bolts with nylon isolators"}
+      - {part: F-09, qty: "Tef-Gel on every stainless thread"}
+    tools: [Torque wrench, Drop saw with a non-ferrous blade, Deburring tool, Drill]
+    consumables: [Tef-Gel, Duralac]
+    drawings: [CT-402, CT-401]
+    instructions:
+      - Cut each track to 1,800 mm and deburr the ends.
+      - Seat each track in its channel with its top flush with the floor and bolt it at 150 mm pitch or less.
+      - Bolt each chock adapter on its bike centreline (X = 560 and X = 1,320), nose against the road-side wall.
+      - Torque every bolt to the value the engineer sets and paint a torque stripe on it.
+    checks:
+      - Track tops flush with the floor along their whole length (CON-01 in the model).
+      - Chock centrelines 760 mm apart and 560 mm from partition A's face line.
+    hold_points:
+      - Tick the torque stripe on every bolt before moving on.
+    attention:
+      - The torque value is not set yet. It needs the engineer.
+  - id: S04
+    title: Coat the floor and the lower walls
+    action: Spray three coats of Raptor with traction additive on the floor and the lowest 400 mm of the walls.
+    why: The coating gives grip, resists fuel and abrasion, and is about eight times lighter than tread plate.
+    new: [C1]
+    parts:
+      - {part: G-08, qty: "1 kit"}
+    tools: [Schutz gun and compressor, Scuff pads, Respirator, Gloves]
+    consumables: [Masking tape, Solvent wipes]
+    drawings: []
+    instructions:
+      - Mask the track slots, the chock adapters and the door seal line.
+      - Scuff and clean the floor and the lowest 400 mm of the walls.
+      - Spray three coats of about 230 microns each.
+    checks:
+      - Before spraying, check every track slot and adapter hole is masked. Tick.
+    hold_points: []
+    attention:
+      - Unmasked track slots fill with coating and stop the fittings locking.
+  - id: S05
+    title: Fit partition A and its ledger
+    action: Bond and rivet partition A with its cleats, then fit its ledger with the shelf top at 1,460 mm.
+    why: Partition A is full height and carries one edge of the bed platform on its ledger.
+    new: ["1", 4.A-bottom, 4.A-top, 4.A-road, 4.A-kerb, 5.on-A]
+    parts:
+      - {part: P-01, qty: "Partition A, 2,330 x 1,800"}
+      - {part: P-02, qty: "4 cleats (8.26 m)"}
+      - {part: B-05, qty: "1 ledger, 2,330 mm"}
+      - {part: F-01, qty: "as needed"}
+      - {part: F-05, qty: "as needed"}
+    tools: [Laser level, Rivet tool with Monobolt nosepiece, Caulking gun, Clamps]
+    consumables: [Sikaflex-252, Primer and activator to Sika's data sheet]
+    drawings: [CT-401, CT-501]
+    instructions:
+      - Dry-fit partition A square to the floor and walls.
+      - Bond and rivet the cleats on the bathroom-side face.
+      - Mark the ledger shelf top at 1,460 mm from the garage floor with the laser level, then bond and rivet the ledger.
+    checks:
+      - Before bonding the ledger, check its shelf top is at 1,460 mm across the full width, within 1 mm of level. Tick.
+    hold_points:
+      - Inspect and photograph the bond lines before the next panel goes in.
+    attention:
+      - The ledger shelf top sets the beam underside, which sets CLR-01.
+  - id: S06
+    title: Fit partition B, its ledger and the door
+    action: Bond and rivet partition B with its doorway frame and ledger, then hang the door leaf on its hinge and seal.
+    why: Partition B carries the other bed edge and separates the garage from the living area. Only a sealed door keeps fuel smell out (FAIL-05, GAR-02).
+    new: ["2", "3", 4.B-bottom, 4.B-top, 4.B-road, 4.B-kerb, 4.D-sill, 4.D-head, 4.D-road, 4.D-kerb, 5.on-B]
+    parts:
+      - {part: P-01, qty: "Partition B 2,330 x 1,510 and its door leaf"}
+      - {part: P-02, qty: "8 cleats (7.68 m perimeter and 4.0 m doorway)"}
+      - {part: B-05, qty: "1 ledger, 2,330 mm"}
+      - {part: P-03, qty: "1 set"}
+    tools: [Laser level, Rivet tool, Caulking gun, Jigsaw with a fine blade, Clamps]
+    consumables: [Sikaflex-252, Sikaflex-221]
+    drawings: [CT-401, CT-501]
+    instructions:
+      - Cut the 700 x 1,300 mm doorway and keep the offcut for the door leaf.
+      - Set partition B with its garage face 1,800 mm from partition A's garage face at the floor and at the top.
+      - Bond and rivet the cleats and the doorway frame on the living-area face, and the ledger on the garage face with its shelf top at 1,460 mm.
+      - Hang the leaf on the piano hinge, fit the EPDM seal round the frame and the two latches.
+    checks:
+      - Before bonding, measure 1,800 mm between the partition faces at both ends and in the middle. Tick.
+    hold_points:
+      - Inspect the door seal all round with the door closed (a strip of paper should drag everywhere).
+    attention:
+      - The doorway's position across the trailer is not decided. The model puts it on the centreline as a placeholder.
+  - id: S07
+    title: Fit the side-wall ledgers and the five beams
+    action: Bond and rivet the side-wall ledgers, then set the five beams on the partition ledgers.
+    why: The beams span 1,800 mm between the partitions and carry the deck. The side-wall ledgers carry the deck edges.
+    new: [5.road-wall, 5.kerb-wall, "6"]
+    parts:
+      - {part: B-05, qty: "2 ledgers, 1,800 mm"}
+      - {part: B-04, qty: "5 beams, 1,800 mm"}
+      - {part: F-01, qty: "as needed"}
+      - {part: F-05, qty: "as needed"}
+    tools: [Laser level, Rivet tool, Square, Tape measure]
+    consumables: [Sikaflex-252]
+    drawings: [CT-501]
+    instructions:
+      - Fit each side-wall ledger with its shelf top at 1,510 mm.
+      - Set the beams on edge at Y = -932, -466, 0, 466 and 932 and rivet each end through the ledger shelf.
+    checks:
+      - Before riveting, check the beam underside is at 1,460 mm at both ends and mid-span, and the beam centres are within 2 mm of the drawing. Tick.
+    hold_points: []
+    attention:
+      - The beams are on edge (50 mm high, 25 mm wide).
+  - id: S08
+    title: Bond, rivet and seal the deck
+    action: Bond the deck to the beams and ledgers, rivet it, and seal every edge to the partitions and walls.
+    why: The deck is the bed platform and the sealed garage ceiling. A gap here lets fuel vapour into the bed space.
+    new: ["7"]
+    parts:
+      - {part: B-03, qty: "1 panel 1,845 x 2,330 x 20"}
+      - {part: F-01, qty: "as needed"}
+      - {part: F-02, qty: "as needed"}
+      - {part: F-05, qty: "as needed"}
+      - {part: F-06, qty: "as needed"}
+    tools: [Caulking gun, Rivet tool, Notched trowel, Weights or clamps]
+    consumables: [Sikaflex-252, Sikaflex-221, Primer and activator]
+    drawings: [CT-501]
+    instructions:
+      - Trial-fit the deck dry. It runs from partition A's face past the living-area face of partition B, so it laps over the top edge of partition B and the cleat on its living-area face.
+      - Bond it with Sikaflex-252 on every beam, every ledger, the top edge of partition B and that cleat.
+      - Rivet at the beam and ledger lines and fit rivet nuts where the deck must come off.
+      - Run a Sikaflex-221 seal along every edge on the garage side.
+    checks:
+      - Before bonding, check the deck lies flat on all five beams, both side ledgers and the top edge of partition B with no rock, and its end is flush with partition B's living-area face. Tick.
+    hold_points:
+      - HOLD. Inspect and photograph every beam end, rivet, bond line and the full edge seal before anything covers the deck. Record it in the build log (STEP-06, REG-01).
+    attention:
+      - The deck is 1,845 mm long, 45 mm longer than the garage, because it laps over partition B and its top cleat (revision B, CT-501 detail G).
+  - id: S09
+    title: Fit the vents, fume sensors, extinguisher and winch plates
+    action: Fit two low vents, one high vent, two fume sensors, the extinguisher and the two winch plates.
+    why: Petrol vapour is heavier than air, so the garage needs low vents and low sensors (GAR-01, GAR-05). The extinguisher must be within 610 mm of the garage door (GAR-04).
+    new: ["15", "16", "17", "14", 14P]
+    parts:
+      - {part: G-12, qty: "3"}
+      - {part: G-13, qty: "1 (2 sensors and the display)"}
+      - {part: G-14, qty: "1"}
+      - {part: G-11, qty: "2 plates"}
+    tools: [Hole saw, Drill, Rivet nut tool, Multimeter]
+    consumables: [Sikaflex-221 for the vent flanges]
+    drawings: [CT-401]
+    instructions:
+      - Cut and seal the vent openings. Fit the sensors low in the garage and the display in the bed space.
+      - Fit the extinguisher bracket beside the garage door and the winch plates above each chock.
+    checks:
+      - Before cutting any vent, check its position against the drawing and the wall frame. Tick.
+      - No switch, relay or charger in the lowest 500 mm of the garage (GAR-03).
+    hold_points:
+      - Test the fume detector alarm before closing the wiring.
+    attention:
+      - Vent, sensor and extinguisher positions in the model are placeholders until the body design fixes them.
+  - id: S10
+    title: Make and fit the ladder, then the Froli base, mattress and net
+    action: Make the ladder, lay the Froli base and the mattress, hook the ladder on the deck edge and fit the net studs.
+    why: The Froli base ventilates under the mattress. The ladder and net give access and a fall guard from the living area. The owner-built ladder (revision B) reaches the living-area floor, which the bought 1,500 mm ladders did not.
+    new: ["8", "9", "18", "19", C7]
+    parts:
+      - {part: A-01, qty: "1 (2 stiles of SHS 25x1.6, 5 rungs, 2 hooks)"}
+      - {part: B-02, qty: "2 packs"}
+      - {part: B-01, qty: "1"}
+      - {part: A-02, qty: "1"}
+      - {part: F-08, qty: "about 10"}
+    tools: [Tape measure, Drop saw with a non-ferrous blade, Bevel gauge set to 15 degrees, Drill, Deburring tool]
+    consumables: [Plexus MA310 for the bonded studs]
+    drawings: [CT-401, CT-501]
+    instructions:
+      - Measure the drop from the deck top to the living-area floor before cutting. The ladder length in the model (1,580 mm) assumes 1,530 mm, and its rubber feet take up the last few millimetres.
+      - Cut two stiles from SHS 25x1.6 with both ends cut level for a 15 degree lean, fit five 25 mm rungs and fit a hook on the top of each stile.
+      - Clip the Froli elements on their base crosses, with the firm zone under the hips.
+      - Lay the mattress against partition A, centred across the trailer.
+      - Bond the net studs along the platform edge and hook the ladder on the deck edge from the living area.
+    checks:
+      - Before cutting the stiles, check the measured drop and the length you will cut against CT-401. Tick.
+      - The ladder foot sits flat on the living-area floor with the hooks on the deck (CLR-07).
+      - Mattress top plus 50 mm of bedding at or below 1,800 mm (CLR-05).
+    hold_points: []
+    attention:
+      - The ladder's load rating is not set yet. Design it to the heavier sleeper with the engineer.
+      - The ladder length depends on the living-area floor height, which the body design has not fixed yet. See check CLR-07 on the Garage and bed page.
+  - id: S11
+    title: Load and strap the bikes
+    action: Winch each bike in nose first, pin it in its chock and strap it with five straps.
+    why: The bikes stand across the trailer, so braking pushes them sideways. The high straps stop them rolling over (research/03).
+    new: [TU, ST, "12", "13", "20", C6]
+    hide: [C4]
+    door: open
+    parts:
+      - {part: G-03, qty: "12 fittings"}
+      - {part: G-05, qty: "10 straps"}
+      - {part: G-06, qty: "10 soft loops"}
+      - {part: G-07, qty: "1 (Street Triple)"}
+      - {part: G-10, qty: "1"}
+      - {part: G-11, qty: "1 winch"}
+    tools: [Winch remote]
+    consumables: []
+    drawings: [CT-402]
+    instructions:
+      - Hook the ramp on the door sill and strap it to its tie points under the trailer.
+      - Fit the winch on the plate in front of the bay. Winch the bike in while steadying it from the ramp.
+      - Pin the front wheel in the chock. Fit the soft loops and the four main straps, then the rear-wheel strap.
+      - Pull the front straps down until the forks compress about a third of their travel, never to the stops.
+    checks:
+      - Each strap on its anchor position from CT-402 (front pair at centreline +/-450 Tuareg and +/-400 Street Triple, rear-wheel strap at +/-250).
+      - Close the garage door and check the Tuareg's tail clears it (CLR-06).
+    hold_points:
+      - Re-check every strap after the first 10 to 20 km and after any rough section.
+    attention:
+      - Never hook a strap round the exhaust, bodywork or cables.

@@ -1,0 +1,44 @@
+# Builds the model, checks, drawings and site in the project Docker image. On main it then publishes site/dist to
+# GitHub Pages. Pull requests get the build only, and nothing deploys while the repository is private.
+name: Build and publish the site
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build the model, checks, drawings and site
+        env:
+          SITE_URL: https://leonardalq.github.io
+          SITE_BASE: /camper-trailer
+        run: make
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site/dist
+
+  deploy:
+    if: ${{ github.ref == 'refs/heads/main' && !github.event.repository.private }}
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

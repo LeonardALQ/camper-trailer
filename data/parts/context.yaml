@@ -1,0 +1,60 @@
+# Context parts: the body around the module. They carry no BOM mass. Their design belongs to the
+# body work that comes later, so their thicknesses are assumptions for display and checks.
+group: context
+parts:
+  CTX-FLOOR:
+    name: Garage floor (body)
+    product: Foam-core floor panel with two routed L-track recesses
+    kind: context
+    notes: Thickness 30 mm assumed for display. The recesses are 34.5 x 13.7 to take the flush L-track.
+    geometry: {generator: floor, params: {thickness: 30}}
+    color: "#8c8c8c"
+    alpha: 0.55
+  CTX-WALL-R:
+    name: Road-side wall (body)
+    product: Side wall, 35 mm foam-core panel
+    kind: context
+    notes: Inner face at Y = -1,165.
+    geometry: {generator: wall, params: {thickness: 35}}
+    color: "#dfe6e9"
+    alpha: 0.3
+  CTX-WALL-K:
+    name: Kerb-side wall with garage door opening (body)
+    product: Side wall, 35 mm foam-core panel, 1,720 x 1,440 opening
+    kind: context
+    notes: Inner face at Y = +1,165. Opening X 40 to 1,760, Z 0 to 1,440.
+    geometry: {generator: wall, params: {thickness: 35, opening: true}}
+    color: "#dfe6e9"
+    alpha: 0.3
+  CTX-DOOR:
+    name: Garage door, closed (body)
+    product: Top-hinged door, product and structure to come with the body design
+    kind: context
+    notes: Modelled as a 35 mm panel filling the opening, inner face flush with the wall's inner face (Y = +1,165).
+    geometry: {generator: box, params: {dx: "door_x1 - door_x0", dy: 35, dz: door_h}}
+    color: "#b2bec3"
+    alpha: 0.35
+  CTX-CEIL:
+    name: Ceiling with the roof collapsed (body)
+    product: Ceiling plane at Z = 1,800
+    kind: context
+    notes: Target 1,800 mm, hard limit 2,000 mm (DESIGN.md).
+    geometry: {generator: box, params: {dx: "garage_length + 2 * partition_t", dy: interior_width, dz: 5}}
+    color: "#ffffff"
+    alpha: 0.15
+  CTX-GROUND:
+    name: Assumed ground for loading
+    product: Ground plane 900 mm below the garage floor (DESIGN.md assumes 800 to 1,000)
+    kind: context
+    notes: Shown in the loading step only.
+    geometry: {generator: box, params: {dx: 1500, dy: 3100, dz: 10}}
+    color: "#a3b18a"
+    alpha: 0.5
+  CTX-FLOOR-LIV:
+    name: Living-area floor (body)
+    product: Floor of the living area beyond partition B, assumed level with the garage floor (Z 0)
+    kind: context
+    notes: DESIGN.md revision B has the ladder reach the living-area floor from the deck top (1,530 mm), so the floor is taken at Z 0. Thickness 30 mm for display. The ladder check CLR-07 lands on it.
+    geometry: {generator: box, params: {dx: "living_floor_x1 - body_x1", dy: "interior_width + 2 * wall_t", dz: 30}}
+    color: "#8c8c8c"
+    alpha: 0.55

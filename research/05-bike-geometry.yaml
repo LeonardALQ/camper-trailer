@@ -1,0 +1,165 @@
+# 05-bike-geometry.yaml  (machine-readable companion to 05-bike-geometry.md)
+# Every value: v = value, u = units, src = source URL, conf = high|medium|low. TODO = not yet measured.
+schema_version: 2
+generated: 2026-11-16
+frame:
+  origin: ground directly below the front axle
+  x: positive towards the rear of the bike
+  y: positive to the bike's left
+  z: up
+  state: upright, level ground, unladen, no rider, ride height as in maker studio image
+  units: mm
+sources:
+  aprilia_manual: &aprilia_manual https://www.scribd.com/document/884477164/Aprilia-tuareg-660-Rally-e5-en
+  aprilia_rally_spec: &aprilia_rally_spec https://library.rvusa.com/brochure/2026-Aprilia-Tuareg-Rally-660-brochure.pdf
+  aprilia_2024_spec: &aprilia_2024_spec https://wlassets.aprilia.com/wlassets/aprilia/rs/tech_spec/2024/Tuareg660/original/Tuareg660.pdf
+  aprilia_rally_image: &tu_img https://www.apriliaoficial.com.ar/2025/wp-content/uploads/2025/10/ficha_tuareg_rally_comprimida.pdf
+  ps1000_rally: &ps1000 https://www.1000ps.com/de-at/modell/12747/aprilia-tuareg-660-rally/2025
+  advpulse_rally: &advpulse https://www.advpulse.com/adv-news/aprilia-tuareg-660-rally-review/
+  triumph_au_spec: &tri_au https://www.triumphmotorcycles.com.au/motorcycles/roadsters/street-triple-765/specification
+  triumph_us_spec: &tri_us https://www.triumphmotorcycles.com/motorcycles/roadsters/street-triple-765/specification
+  motoit_2023_rs: &motoit23 https://www.moto.it/listino/triumph/street-triple/street-triple-765-rs-2023-26/p7frAe
+  motoit_2017_rs: &motoit17 https://www.moto.it/listino/triumph/street-triple/street-triple-rs-2017-19/GdkJpQ
+  bikesocial_2020_rs: &bs20 https://www.bennetts.co.uk/bikesocial/reviews/bikes/triumph/triumph-street-triple-rs-2020-review-price-spec
+  triumph_handbook_2020_22: &tri_hb https://static-cdn.cars24.com/prod/new-bike-cms/Triumph/Street-Triple-R/2025/01/01/9247318d-e61e-41be-8606-e1fd232af342-Triumph_Street-Triple-R_Brochure.pdf
+  philharmonic_2020_rs: &ph20 https://philharmonicmoto.com/product/triumph-street-triple-rs-2020-2022/
+  triumph_rs_rhs_image: &st_img https://media.triumphmotorcycles.co.uk/image/upload/sitecoremedialibrary/media-library/images/motorcycles/roadsters-supersports/my25/my25%20colours/street%20triple%20765%20rs/web/1080/street%20triple%20rs_my25_phantom%20black_rhs_1080px.jpeg
+  triumph_rs_lhs_image: &st_img_l https://media.triumphmotorcycles.co.uk/image/upload/sitecoremedialibrary/media-library/images/motorcycles/roadsters-supersports/my25/my25%20colours/street%20triple%20765%20rs/web/1080/street%20triple%20rs_my25_phantom%20black_lhs_1080px.jpeg
+  calc: &calc "calculated from tyre size code: rim inches x 25.4 + 2 x aspect x width"
+  owner: &owner "BRIEF.md owner figures (override published)"
+  estimate: &est "engineering estimate, no fetched source"
+
+bikes:
+  tuareg_660_rally:
+    basis: "2025-on Aprilia Tuareg Rally (Euro 5+); manual covers Tuareg 660 and Tuareg 660 Rally"
+    owner_overall:
+      length: {v: 2220, u: mm, src: *owner, conf: high, flag: "image shows plate hanger to x >= 1915, i.e. length >= 2263; measure"}
+      width: {v: 965, u: mm, src: *owner, conf: high, flag: "manual: 935 Rally, 965 standard"}
+      height: {v: 1370, u: mm, src: *owner, conf: high, flag: "manual max 1445 (mirrors); screen top about 1390 in image"}
+      mass_fuelled: {v: 206, u: kg, src: *owner, conf: high}
+    published:
+      wheelbase: {v: 1525, u: mm, src: *aprilia_manual, conf: high}
+      length: {v: 2220, u: mm, src: *aprilia_manual, conf: high}
+      width_handlebar_rally: {v: 935, u: mm, src: *aprilia_manual, conf: high}
+      width_handlebar_standard: {v: 965, u: mm, src: *aprilia_manual, conf: high}
+      height_max_rally: {v: 1445, u: mm, src: *aprilia_manual, conf: high, note: "manual says at top fairing; image shows mirrors are highest"}
+      height_max_standard: {v: 1425, u: mm, src: *aprilia_manual, conf: high}
+      seat_height_rally: {v: 913, u: mm, src: *aprilia_rally_spec, conf: medium, note: "1000PS lists 880; image shows 860-885"}
+      seat_height_rally_alt: {v: 880, u: mm, src: *ps1000, conf: medium}
+      rake: {v: 26.7, u: deg, src: *aprilia_manual, conf: high}
+      trail: {v: 113.3, u: mm, src: *aprilia_2024_spec, conf: high}
+      travel_front: {v: 240, u: mm, src: *aprilia_rally_spec, conf: high, note: "along fork axis; vertical about 214"}
+      travel_rear: {v: 240, u: mm, src: *aprilia_rally_spec, conf: high}
+      shock_stroke: {v: 106.5, u: mm, src: *aprilia_manual, conf: high}
+      kerb_mass_rally: {v: 199, u: kg, src: *aprilia_manual, conf: high}
+    tyres:
+      front: {size: "90/90-21 M/C 54V", src: *aprilia_manual, diameter: {v: 695, u: mm, src: *calc, conf: medium}, width: {v: 90, u: mm, src: *calc, conf: medium}, rim: "1.85x21 tube type (spec sheet); manual says 2.15x21", stock: {v: "Pirelli Scorpion Rally STR", src: *advpulse, conf: medium}}
+      rear: {size: "150/70 R18 M/C 70V", src: *aprilia_manual, diameter: {v: 667, u: mm, src: *calc, conf: medium}, width: {v: 150, u: mm, src: *calc, conf: medium}, rim: "4.00x18 tube type"}
+    image_scale: {v: 1.661, u: mm/px, src: *tu_img, conf: medium, method: "page 4 image 1372x860 px; RANSAC + least-squares fits to gold rims; axle spacing 917.9 px = 1525 mm; rim flange diameters 550/474 mm check; ground from tyre radii, front/rear agree within 3 mm", uncertainty: "+/-2% +/-8 mm centre plane, +/-20 mm off-plane; image cropped at z 1440 and at the rear"}
+    points:
+      front_axle: {x: 0, y: 0, z: 348, u: mm, src: *calc, conf: medium}
+      rear_axle: {x: 1525, y: 0, z: 334, u: mm, src: *calc, conf: medium}
+      front_tyre_leading_edge: {x: -348, y: 0, z: 348, u: mm, src: *calc, conf: medium}
+      front_mudguard_tip: {x: -156, y: 0, z: 775, u: mm, src: *tu_img, conf: medium}
+      headlight_fairing_front: {x: 85, y: 0, z: [950, 1010], u: mm, src: *tu_img, conf: medium}
+      lower_triple_clamp: {x: 270, z: 860, u: mm, src: *tu_img, conf: low, tol: 30}
+      screen_top: {x: 250, y: 0, z: 1390, u: mm, src: *tu_img, conf: medium, tol: 15}
+      handguard_front_tip: {x: 385, z: 1215, u: mm, src: *tu_img, conf: low, tol: 20}
+      bar_ends_handguards: {x: 585, y: [-483, 483], z: 1190, u: mm, src: *tu_img, conf: medium, tol: 20, note: "y from owner 965; manual Rally 935 gives +/-468"}
+      mirror_heads: {x: [533, 616], y: TODO, z: [1290, 1445], u: mm, src: *tu_img, conf: medium, note: "image cropped at 1440; top taken as manual max 1445"}
+      tank_top: {x: 640, y: 0, z: 1095, u: mm, src: *tu_img, conf: medium}
+      seat_low_point: {x: [1000, 1065], y: 0, z: [860, 885], u: mm, src: *tu_img, conf: medium}
+      rider_footpegs: {x: 955, y: TODO, z: 360, u: mm, src: *tu_img, conf: low, tol: 35}
+      pillion_peg_hanger: {x: 1205, z: 505, u: mm, src: *tu_img, conf: low}
+      tail_rack_top: {x: [1450, 1800], y: 0, z: [920, 940], u: mm, src: *tu_img, conf: medium}
+      tail_light_tip: {x: 1854, y: 0, z: 895, u: mm, src: *tu_img, conf: medium}
+      rear_tyre_trailing_edge: {x: 1859, y: 0, z: 334, u: mm, src: *calc, conf: medium, measured_x: 1851}
+      number_plate_hanger_rear: {x_min: 1915, y: 0, z: 645, u: mm, src: *tu_img, conf: low, note: "image cropped; true rear-most may be further back"}
+      lowest_point_skid_plate: {x: [600, 800], y: 0, z: 244, u: mm, src: *tu_img, conf: medium, tol: 10}
+      silencer_right: {x: [1380, 1780], y: TODO, z: [510, 800], u: mm, src: *tu_img, conf: medium}
+      side_stand: {side: left, x: TODO, z: TODO, u: mm, src: *aprilia_rally_spec, conf: low, note: "Rally sidestand, larger foot"}
+    derived:
+      ground_clearance: {v: 244, u: mm, src: *tu_img, conf: medium}
+      front_overhang: {v: 348, u: mm, src: *calc, conf: medium}
+      rear_overhang_min: {v: 390, u: mm, src: *tu_img, conf: low}
+      height_screen: {v: 1390, u: mm, src: *tu_img, conf: medium}
+      height_mirrors: {v: 1445, u: mm, src: *aprilia_manual, conf: medium}
+      peg_width: {v: TODO, u: mm, src: TODO, conf: low}
+    tie_downs:
+      fork_below_bottom_yoke: {x: 270, z: [780, 850], u: mm, src: *tu_img, conf: low}
+      handlebar_inboard: {x: [450, 520], z: 1150, u: mm, src: *tu_img, conf: low}
+      pillion_peg_hangers: {x: 1205, z: 505, u: mm, src: *tu_img, conf: low}
+      rear_frame_or_rack: {x: [1450, 1700], z: [880, 920], u: mm, src: *tu_img, conf: low}
+      swingarm_near_axle: {x: [1350, 1450], z: [330, 380], u: mm, src: *tu_img, conf: low}
+    centre_of_mass: {x: {v: 760, tol: 60}, z: {v: 600, tol: 70}, u: mm, src: *est, conf: low}
+    transport_rule: {v: "upright, securely anchored, first gear, tank emptied (manual p.109)", src: *aprilia_manual, conf: high}
+
+  street_triple_765:
+    basis: "2023-on Street Triple 765 RS (owner figures match RS); image is MY25 RS"
+    owner_overall:
+      length: {v: 2055, u: mm, src: *owner, conf: high}
+      width: {v: 792, u: mm, src: *owner, conf: high}
+      height: {v: 1064, u: mm, src: *owner, conf: high}
+      mass_fuelled: {v: 175, u: kg, src: *owner, conf: high}
+    published_2023_on:
+      wheelbase_rs: {v: 1399, u: mm, src: *tri_au, conf: high}
+      wheelbase_r: {v: 1402, u: mm, src: *tri_us, conf: high}
+      rake_rs: {v: 23.2, u: deg, src: *tri_au, conf: high}
+      rake_r: {v: 23.7, u: deg, src: *tri_us, conf: high}
+      trail_rs: {v: 96.9, u: mm, src: *tri_au, conf: high}
+      trail_r: {v: 97.8, u: mm, src: *tri_us, conf: high}
+      seat_height_rs: {v: 836, u: mm, src: *tri_au, conf: high}
+      seat_height_r: {v: 826, u: mm, src: *tri_us, conf: high}
+      width_handlebars: {v: 792, u: mm, src: *tri_au, conf: high}
+      height_without_mirror_rs: {v: 1064, u: mm, src: *tri_au, conf: high}
+      height_without_mirror_r: {v: 1047, u: mm, src: *tri_us, conf: high}
+      length_rs: {v: 2052, u: mm, src: *motoit23, conf: medium}
+      travel_front: {v: 115, u: mm, src: *tri_au, conf: high}
+      travel_rear_rs: {v: 131.2, u: mm, src: *tri_au, conf: high}
+      travel_rear_r: {v: 133.5, u: mm, src: *tri_us, conf: high}
+      wet_mass_rs: {v: 188, u: kg, src: *tri_au, conf: high}
+    year_differences:
+      rs_2020_2022: {wheelbase: {v: 1405, u: mm, src: *bs20, conf: high}, rake: {v: 23.9, u: deg, src: *tri_hb, conf: high}, trail: {v: 100, u: mm, src: *tri_hb, conf: high}, seat: {v: 825, u: mm, src: *bs20, conf: high}, width_bars: {v: 775, u: mm, src: *ph20, conf: medium}, height_no_mirror: {v: 1085, u: mm, src: *ph20, conf: medium}}
+      rs_2017_2019: {wheelbase: {v: 1410, u: mm, src: *motoit17, conf: medium}, length: {v: 2065, u: mm, src: *motoit17, conf: medium}, width: {v: 735, u: mm, src: *motoit17, conf: low}, height: {v: 1085, u: mm, src: *motoit17, conf: medium}, seat: {v: 825, u: mm, src: *motoit17, conf: medium}}
+    tyres:
+      front: {size: "120/70 ZR17", src: *tri_au, diameter: {v: 600, u: mm, src: *calc, conf: high}, measured_diameter: {v: 601, u: mm, src: *st_img, conf: medium}, width: {v: 120, u: mm, src: *calc, conf: medium}, rim: "17x3.5"}
+      rear: {size: "180/55 ZR17", src: *tri_au, diameter: {v: 630, u: mm, src: *calc, conf: high}, measured_diameter: {v: 638, u: mm, src: *st_img, conf: medium}, width: {v: 180, u: mm, src: *calc, conf: medium}, rim: "17x5.5"}
+    image_scale: {v: 1.862, u: mm/px, src: *st_img, conf: medium, method: "circle fits to tyres, axle spacing 751.4 px = 1399 mm; checks: length 2056 vs 2052-2055, height 1067 vs 1064, seat 830 vs 836", uncertainty: "+/-1.5% +/-4 mm centre plane; +/-15 mm bar ends and mirrors"}
+    points:
+      front_axle: {x: 0, y: 0, z: 300, u: mm, src: *st_img, conf: high}
+      rear_axle: {x: 1399, y: 0, z: 320, u: mm, src: *st_img, conf: high}
+      front_tyre_leading_edge: {x: -300, y: 0, z: 300, u: mm, src: *st_img, conf: high}
+      headlight_front: {x: -31, y: 0, z: 802, u: mm, src: *st_img, conf: medium}
+      lower_triple_clamp: {x: 157, z: 690, u: mm, src: *st_img, conf: medium, tol: 15}
+      top_yoke: {x: 255, z: 942, u: mm, src: *st_img, conf: medium, tol: 15}
+      handlebar_clamp: {x: 292, z: 979, u: mm, src: *st_img, conf: medium}
+      bar_ends: {x: 428, y: [-396, 396], z: 1013, u: mm, src: *st_img, conf: medium, tol: 15}
+      mirror_heads: {x: [292, 376], y: TODO, z: [1078, 1178], u: mm, src: *st_img, conf: medium}
+      top_without_mirrors: {x: 300, y: -60, z: 1067, u: mm, src: *st_img, conf: medium, note: "front brake reservoir, right side; y approximate"}
+      tank_top: {x: 656, y: 0, z: 1007, u: mm, src: *st_img, conf: medium}
+      seat_low_point: {x: [880, 950], y: 0, z: 830, u: mm, src: *st_img, conf: medium}
+      swingarm_pivot: {x: 819, z: 408, u: mm, src: *st_img_l, conf: medium}
+      rider_footpegs: {x: 970, y: TODO, z: 350, u: mm, src: *st_img, conf: low, tol: 35}
+      pillion_peg_pivot: {x: 1233, z: 564, u: mm, src: *st_img, conf: medium}
+      tail_top: {x: [1290, 1330], y: 0, z: 975, u: mm, src: *st_img, conf: medium}
+      tail_light_tip: {x: 1564, y: 0, z: 960, u: mm, src: *st_img, conf: medium}
+      rear_tyre_trailing_edge: {x: 1718, y: 0, z: 320, u: mm, src: *st_img, conf: high}
+      number_plate_hanger_rear: {x: 1756, y: 0, z: [585, 635], u: mm, src: *st_img, conf: medium}
+      lowest_point_belly_pan: {x: [320, 640], y: 0, z: 144, u: mm, src: *st_img, conf: medium, tol: 6}
+      silencer_underside: {x: [750, 920], z: 156, u: mm, src: *st_img, conf: medium}
+      side_stand_pivot_left: {x: 764, y: TODO, z: 272, u: mm, src: *st_img_l, conf: medium}
+      side_stand_foot_folded: {x: 1027, z: 253, u: mm, src: *st_img_l, conf: medium}
+    derived:
+      length_with_hanger: {v: 2056, u: mm, src: *st_img, conf: medium}
+      length_without_hanger: {v: 2018, u: mm, src: *st_img, conf: medium}
+      height_with_mirrors: {v: 1178, u: mm, src: *st_img, conf: medium}
+      front_overhang: {v: 300, u: mm, src: *st_img, conf: high}
+      rear_overhang_hanger: {v: 357, u: mm, src: *st_img, conf: medium}
+      ground_clearance: {v: 144, u: mm, src: *st_img, conf: medium}
+      peg_width: {v: TODO, u: mm, src: TODO, conf: low}
+    tie_downs:
+      fork_below_bottom_yoke: {x: 157, z: [650, 690], u: mm, src: *st_img, conf: medium}
+      handlebar_beside_risers: {x: [290, 330], z: [980, 1000], u: mm, src: *st_img, conf: medium}
+      pillion_peg_hangers: {x: 1233, z: 564, u: mm, src: *st_img, conf: medium}
+      swingarm_near_axle: {x: [1250, 1350], z: [330, 360], u: mm, src: *st_img, conf: low}
+    centre_of_mass: {x: {v: 690, tol: 50}, z: {v: 520, tol: 60}, u: mm, src: *est, conf: low}

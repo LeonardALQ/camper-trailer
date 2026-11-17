@@ -1,0 +1,20 @@
+# Generated outputs
+build/
+site/dist/
+site/.astro/
+site/public/models/
+site/public/downloads/
+site/public/drawings/
+site/src/data/generated/
+site/src/content/docs/steps/
+site/src/content/docs/research/
+
+# Dependencies and caches
+node_modules/
+.home/
+.cache/
+__pycache__/
+*.pyc
+.pytest_cache/
+shot/node_modules/
+shot/*.png

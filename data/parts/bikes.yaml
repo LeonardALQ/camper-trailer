@@ -1,0 +1,96 @@
+# The two bikes (payload). Masses and overall sizes are the owner's figures, which govern.
+# Points come from research/05-bike-geometry.yaml (key in `source_key`). Every value below that is not
+# in 05 is an estimate and says so. Bike frame: x to the bike's rear, y to its left, z up, origin on the
+# ground under the front axle (05). In the module, bike x -> +Y, bike y -> +X, bike z -> Z (DESIGN.md).
+group: bikes
+parts:
+  BIKE-TU:
+    name: Aprilia Tuareg 660 Rally
+    product: Envelope model of the owner's bike, mirrors folded
+    maker: Aprilia
+    part_no: null
+    qty: 1
+    unit: each
+    mass: {basis: declared, unit_kg: 206, maturity: spec, source: "Owner's figure, fully fuelled (research/BRIEF.md)"}
+    size: 2,220 x 965 x 1,370 (owner)
+    rating: null
+    links:
+      manual: https://www.scribd.com/document/884477164/Aprilia-tuareg-660-Rally-e5-en
+    stockist_au: null
+    notes: Owner's 1,370 mm height is the screen top with the mirrors folded. Aprilia's image gives about 1,390 mm and the manual 1,445 mm with mirrors up.
+    payload: true
+    color: "#b03a2e"
+    geometry:
+      generator: bike
+      params:
+        source_key: tuareg_660_rally
+        owner: {length: 2220, width: 965, height: 1370}
+        front_overhang: 348
+        # Values used from 05 (copied here so the model is traceable; the generator also reads 05 directly)
+        screen_top: {x: 250, z: 1370, src: "x from 05; z set to the owner's 1,370 overall height (05 image gives 1,390)"}
+        estimates:
+          fairing_half_width: {v: 300, z: [900, 1100], src: "design estimate, to be measured (DESIGN.md range 280 to 350)"}
+          fairing_front_half_width: {v: 180, src: estimate}
+          peg_tip_y: {v: 320, src: "design estimate, to be measured"}
+          peg_root_y: {v: 220, src: estimate}
+          screen_half_width: {v: 160, src: estimate}
+          mirror_folded: {x: [533, 616], y: [230, 330], z: [1290, 1365], src: "x from 05; y and folded z are estimates, top kept below the screen"}
+          handguard: {x: [385, 590], y: [330, 483], z: [1150, 1222], src: "tip and outer end from 05; inner edge and depth estimated"}
+          bar_clamp: {x: 470, z: 1140, src: estimate}
+          bar_end_y: {v: 483, src: "owner width 965 / 2 (05 bar_ends_handguards)"}
+          fork: {half_spacing: 105, diameter: 48, top_z: 1080, src: estimate}
+          tank_half_width: {v: 190, src: estimate}
+          seat_half_width: {v: 160, src: estimate}
+          tail_half_width: {v: 130, src: estimate}
+          engine_half_width: {v: 200, src: estimate}
+          mudguard_half_width: {v: 65, src: estimate}
+          swingarm_pivot: {x: 930, z: 420, src: estimate}
+          silencer: {start: [1380, -175, 560], end: [1780, -175, 750], diameter: 110, src: "x and z range from 05; y centre -175 and diameter are estimates"}
+          side_stand: {pivot: [850, 110, 330], foot: [1100, 140, 290], src: "estimate (05 says TODO)"}
+          plate: {half_width: 115, z: [590, 742], src: "estimate; 05 puts the rear-most hanger point at z 645"}
+          rim_width: {front: 40, rear: 60, src: estimate}
+        tie_down_y:
+          handlebar_inboard: {v: 300, src: "research/03 section 3 (estimate)"}
+          pillion_peg_hangers: {v: 150, src: "research/03 section 3 (estimate)"}
+        centre_of_mass: {x: 760, z: 600, src: "05 centre_of_mass (low-confidence estimate)"}
+  BIKE-ST:
+    name: Triumph Street Triple 765 (track)
+    product: Envelope model of the owner's bike, no mirrors
+    maker: Triumph
+    part_no: null
+    qty: 1
+    unit: each
+    mass: {basis: declared, unit_kg: 175, maturity: spec, source: "Owner's figure, fully fuelled (research/BRIEF.md)"}
+    size: 2,055 x 792 x 1,064 (owner)
+    rating: null
+    links:
+      spec: https://www.triumphmotorcycles.com.au/motorcycles/roadsters/street-triple-765/specification
+    stockist_au: null
+    notes: Matches the 2023-on RS without mirrors. The track bike carries no mirrors.
+    payload: true
+    color: "#1f3a5f"
+    geometry:
+      generator: bike
+      params:
+        source_key: street_triple_765
+        owner: {length: 2055, width: 792, height: 1064}
+        front_overhang: 300
+        estimates:
+          peg_tip_y: {v: 220, src: "design estimate, to be measured"}
+          peg_root_y: {v: 140, src: estimate}
+          bar_clamp_y: {v: 40, src: estimate}
+          fork: {half_spacing: 100, diameter: 43, src: estimate}
+          headlight_half_width: {v: 110, src: estimate}
+          tank_half_width: {v: 170, src: estimate}
+          seat_half_width: {v: 140, src: estimate}
+          tail_half_width: {v: 110, src: estimate}
+          engine_half_width: {v: 200, src: estimate}
+          mudguard_half_width: {v: 70, src: estimate}
+          reservoir: {x: [280, 320], y: [-80, -40], src: "top point from 05; size estimated"}
+          side_stand_y: {pivot: 100, foot: 120, src: "estimate (05 says TODO)"}
+          plate: {half_width: 110, z: [560, 680], src: "estimate; 05 puts the hanger rear at z 585 to 635"}
+          rim_width: {front: 70, rear: 100, src: estimate}
+        tie_down_y:
+          handlebar_beside_risers: {v: 120, src: "estimate: beside the risers, where 05 puts the tie-down"}
+          pillion_peg_hangers: {v: 120, src: "research/03 section 3 (estimate)"}
+        centre_of_mass: {x: 690, z: 520, src: "05 centre_of_mass (low-confidence estimate)"}

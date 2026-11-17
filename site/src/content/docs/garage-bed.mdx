@@ -1,0 +1,183 @@
+---
+title: Garage and bed module
+description: Two motorcycles in a garage under a queen bed, with the reasons for the layout, the 3D model, the checks and the full parts list.
+tableOfContents: false
+---
+
+import CadViewer from '../../components/CadViewer.astro';
+import KeyDims from '../../components/KeyDims.astro';
+import MassTable from '../../components/MassTable.astro';
+import ChecksTable from '../../components/ChecksTable.astro';
+import BomTable from '../../components/BomTable.astro';
+import Summary from '../../components/Summary.astro';
+import { withBase } from '../../lib/url';
+
+This module is the garage for two motorcycles with a queen bed above them. It is the first part of the trailer to
+be designed, because it sets the trailer's width, its height with the roof down and much of its weight.
+
+This page shows revision B of the design. It came from the first model run: the deck now laps over partition B,
+the ladder is owner-built so it reaches the floor, and the note on converting to the trailer datum is corrected.
+
+<Summary />
+
+## The design and why
+
+### The bikes stand across the trailer
+
+The two bikes are an Aprilia Tuareg 660 Rally (206 kg fuelled, 2,220 mm long) and a Triumph Street Triple 765
+set up for the track (175 kg, 2,055 mm long). They stand across the trailer, so their length runs along the
+2,330 mm interior width. This keeps the garage short, which matters because every millimetre of length adds
+weight.
+
+Both bikes go in nose first through one wide door in the kerb-side wall, and they face the same way. A bike
+cannot be moved sideways once it is inside, so the door has to span both bikes' paths. It is 1,720 mm wide and
+1,440 mm high.
+
+The front tyres stop 50 mm short of the road-side wall. That gap is for the nose of the wheel chock, and it
+must be measured on a real chock.
+
+### Why 760 mm between the bikes works
+
+The Tuareg sits next to partition A, with its centreline 560 mm from it. The Street Triple sits next to
+partition B, 760 mm further along. Their handlebars overlap when seen from above, but they are at different
+heights. The Tuareg's bars and hand guards are at about 1,190 to 1,215 mm, which is above the Street Triple's
+tank and bars at about 1,010 mm.
+
+The tight spot is the Street Triple's right bar end against the Tuareg's fairing and radiator shrouds at the
+same height. The shroud width is not published. The model uses an estimate of 300 mm either side of the
+Tuareg's centreline, from a range of 280 to 350 mm. At 300 mm the gap is 64 mm. At 350 mm it would be about
+14 mm, which is less than the 30 mm the design asks for. A full-size mock-up must confirm the real width before
+any panels are ordered.
+
+### How the bikes are held
+
+Each bike's front wheel sits in a Condor SC-2000 chock, which holds the bike upright on its own. The chock pins
+onto an adapter bolted to the floor, so it comes out when the bikes stay home.
+
+Two rows of flush aluminium tie-down track run the full length of the garage, one in front of the bikes and one
+behind. Each bike has two straps at the front, two at the rear and one through the rear wheel, all 35 mm
+ratchet straps rated to 1,000 kg on soft loops. The Street Triple's front straps go on a bar harness.
+
+With the bikes across the trailer, hard braking pushes each bike sideways. That is the direction in which a
+motorcycle is least stable, so the high straps must stop it rolling over. Research report 03 sizes the straps
+for this. Every anchor and its floor fixing is designed for 20 kN, the breaking load of the strap.
+
+### The bed is the garage ceiling
+
+The bed platform covers the whole garage and it is sealed all round, so it is also the garage ceiling. That keeps
+fuel smell and dust out of the bed. Five aluminium beams on edge span the 1,800 mm between ledgers on the two
+partitions. A 20 mm honeycomb deck sits on them. Since revision B the deck is 1,845 by 2,330 mm. It runs on over
+the top edge of partition B and the cleat on its living-area face, so that joint is a lap that can be bonded and
+sealed, where before the deck only met the partition along a corner line.
+
+The beam underside is at 1,460 mm. That clears the Tuareg's screen with its mirrors folded and its front wheel
+lifted by the chock. On the deck sits a Froli sprung base, which also lets air under the mattress, then a 150 mm
+mattress. Allowing 50 mm for bedding leaves 27 mm under the 1,800 mm ceiling.
+
+The mattress sits against partition A and is centred across the trailer. That leaves a 270 mm landing strip on
+the partition B side for climbing in. The ladder stands in the living area and hooks onto the deck edge. Since
+revision B it is owner-built from aluminium square tube, about 1,580 mm long with rubber feet, so that at a 15
+degree lean it reaches from the deck top at 1,530 mm down to the living-area floor. The bought 1,500 mm ladders
+stopped about 80 mm short of the floor and are rated to only 100 kg. The living-area floor is taken level with
+the garage floor until the body design fixes it.
+
+### Two partitions
+
+Partition A is full height. Partition B goes up to the deck underside and has a 700 by 1,300 mm doorway into the
+living area, closed by a sealed door cut from the same panel. Both are 20 mm honeycomb panels.
+
+### Garage safety
+
+Petrol vapour is heavier than air. The garage has two low vents and one high vent, two fume sensors low down
+with the alarm display in the bed, and a 2.5 kg extinguisher by the garage door. No switches, relays or chargers
+go in the lowest 500 mm. The positions in the model are placeholders until the body design fixes them.
+
+### Loading is still open
+
+With a fixed bed at 1,460 mm, you would walk a bike in stooped. The baseline is a 12 V winch on a quick-release
+plate at the road-side wall in front of each chock. It pulls the bike in while you steady it from the ramp. The
+alternative is a powered bed lift used with the roof raised. That weighs 9 to 45 kg more, and the garage then
+shares air with the bed.
+
+## 3D model
+
+The whole module, with the bikes in place and the garage door closed. The part tree on the left is grouped into
+bikes, restraint, bed, partitions, garage safety and context. Context parts (walls, floor, door and ceiling)
+belong to the body design and carry no mass. The ramp and the ground only show in the loading step.
+
+<CadViewer height={560} />
+
+## Key dimensions
+
+The module frame starts on the garage floor at the inner face of partition A, on the trailer centreline. X runs
+along the trailer towards partition B. Y runs across the trailer, positive towards the kerb side where the
+garage door is. Z is up from the garage floor. All sizes are in millimetres. Once the chassis exists, an offset
+converts this frame to the trailer's own datum, which measures X rearward from the towball. If partition B ends
+up nearer the front of the trailer than partition A, X also changes sign.
+
+<KeyDims kind="dims" />
+
+### Height stack-up with the roof collapsed
+
+<KeyDims kind="stack" />
+
+### Bike envelopes
+
+The bikes are envelope models built from the measured points in research report 05. Their overall length,
+width and height match the owner's figures within 10 mm. Values that were never measured, such as the peg and
+fairing widths, are labelled as estimates in the data. In the garage each bike is pitched nose-up a little,
+because the chock lifts its front wheel by about 25 mm.
+
+<KeyDims kind="bikes" />
+
+## Mass and centre of gravity
+
+Masses come from the bill of materials. Extrusions, track and panels are weighed from the model's own lengths
+and areas, so the totals change when a dimension changes. Bought items keep their published or estimated mass.
+The centre of gravity is in the module frame above.
+
+<MassTable kind="cases" />
+
+The towball load cannot be worked out yet. It needs the positions of the coupling and the axle, and the chassis
+has not been designed. The ramp has no travel position yet either, so its 34 kg is placed at the centre of the
+garage floor as a placeholder.
+
+### Mass schedule
+
+Every line has its source and its maturity. A spec mass comes from a maker or retailer, a calculated mass from
+the model and a supplier's kg per metre or square metre, and an estimate from the research reports.
+
+The growth column is the allowance proposed in the design practice report (MASS-06) until each part is weighed:
+20 % on an estimate and 7 % on a calculated mass. A spec mass is taken at 0 % here. The engineer agrees the final
+allowances. The "With growth" column in the load cases above adds them up.
+
+<MassTable kind="schedule" />
+
+## Checks
+
+These are the checks the design must pass, measured on the 3D model. A failed check shows in red with the
+measured gap. CLR-01b and CLR-06b are reported cases and never fail the build. CLR-07, the ladder foot, was added
+in revision B.
+
+<ChecksTable />
+
+## Bill of materials
+
+Generated from the parts data. It is also a <a href={withBase('/downloads/garage-bed-bom.csv')}>CSV download</a>.
+
+<BomTable />
+
+## Open decisions and findings
+
+These need the owner's decision or a measurement. The model does not make design decisions.
+
+- Loading method: a winch with a fixed bed, or a powered bed lift used with the roof raised.
+- Sleeping with fuelled bikes inside: the answer changes the garage ventilation and the fuel-smell sealing.
+- Bike measurements: the Tuareg's screen height with mirrors folded, its length with the plate hanger (2,220 or about 2,263 mm), its fairing width, both bikes' peg widths, and the chock's nose depth and cradle rise.
+- With the photo-measured 2,263 mm length the Tuareg's plate is 10.8 mm from the closed door, against 15 mm wanted. Moving both bikes 10 mm towards the road-side wall gives 20.8 mm but leaves 40 mm for the chock nose.
+- The ladder length depends on the living-area floor height, which is taken level with the garage floor until the body design fixes it.
+- The positions of the doorway in partition B, the vents, the sensors, the extinguisher and the ladder across the trailer are placeholders.
+
+Resolved in revision B: the deck now laps over partition B and the cleat on its living-area face, the 1,580 mm
+ladder's rubber feet reach the floor at a 15 degree lean, and the datum note says the conversion may need a change
+of sign as well as an offset.
