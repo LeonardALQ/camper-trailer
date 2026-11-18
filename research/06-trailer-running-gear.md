@@ -6,6 +6,8 @@ Note added after reports 07 and 08. Porsche Australia rated its factory towbar a
 
 Note added on 18 Nov 2026, Cruisemaster's answers to the open questions. Question 1: yes. Cruisemaster will custom-machine the studs to the thickness of the wheel's mounting pad, and the 5 x 130 pattern clears the tone ring and wheel speed sensor. It will also check the C/F against the ET53 offset. Question 2: the 33SC-950 coil with the 33SC-107 bump stop suits these masses. Its ratings do not include VSB1's 120% rule, but it will design to the rule. The rule needs 1,968 kg per axle and the 3,700 kg build is rated 1,665 kg, so its 3,330 kg GTM covers the axle load but not the rule (see TRAILER.md). Question 5: the owner may do the physical installation. Lead time is 6 to 8 weeks after a design session in which Cruisemaster measures the wheel.
 
+Decision, 18 Nov 2026: the owner chose XT Air, the 4,500 kg build (4,050 kg GTM, 2,025 kg per axle), because it meets the 120% rule at the plated ATM and the 3,700 kg coil build does not. The rest of the package is unchanged. Section 2 covers what air means for the ride, the upkeep and field repair.
+
 ## Recommendation
 
 Fit a Cruisemaster XT Freestyle coil tandem with standard (straight) arms, 12 inch ABS-enabled electric drum brakes and Bosch Trailer Safety Control (TSC) for ABS and sway control. Order the hub drums drilled 5 x 130 with M14 x 1.5 studs and a 71.5 mm spigot, and run the Cayenne's own wheels on R14 ball-seat nuts.

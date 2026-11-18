@@ -16,6 +16,7 @@ drawings:
     structural: true
     revisions:
       - {rev: A, date: 2026-11-18, description: First draft of the whole-trailer block layout (TRAILER.md), drawn: Kiro, checked: "", approved: ""}
+      - {rev: B, date: 2026-11-18, description: "XT Air in place of the coil, air supply and spare bag", drawn: Kiro, checked: "", approved: ""}
   - number: CT-401
     title: Garage and bed general arrangement
     subtitle: Plan, kerb-side elevation and section looking at partition A

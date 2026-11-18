@@ -154,7 +154,7 @@ trailer_checks:
     inputs: [TW-01, TW-02, TW-03]
     why: The car's braked towing limit and the planned ATM (report 07). MASS-03 margin against ATM.
   - id: MAS-02
-    title: Axle group load with growth within the kit's GTM, times 1.2 unless Cruisemaster's rating includes VSB1's 120 % rule
+    title: Axle group load with growth, times 1.2 for VSB1's 120 % rule, within the kit's GTM
     type: mass
     quantity: axle_vsb1
     limit: kit_gtm
@@ -162,7 +162,7 @@ trailer_checks:
     cases: all
     severity: fail
     inputs: [SUP-01, SUP-02, TW-01, TW-02, TW-03]
-    why: Cruisemaster rates the 3,700 kg XT tandem build at 3,330 kg GTM (report 06, input SUP-01). VSB1 asks each axle of a non-load-sharing group to carry 120 % of its load. Whether the kit's rating already includes that is input SUP-02.
+    why: Cruisemaster rates the 4,500 kg XT Air tandem build at 4,050 kg GTM (report 06, input SUP-01). VSB1 asks each axle of a non-load-sharing group to carry 120 % of its load, and Cruisemaster's ratings do not include that (input SUP-02).
   - id: MAS-03
     title: Towball load never above 280 kg (design target)
     type: mass

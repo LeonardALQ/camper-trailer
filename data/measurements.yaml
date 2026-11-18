@@ -95,10 +95,10 @@ inputs:
       - {rule: "The requirement is VSB1's 120 % rule on the axle load at ATM: 1.2 x (ATM less the towball target) / 4, worked out from the current values. At or above it the plan keeps the Porsche wheel. Below it the plan changes to a rated 5 x 130 aftermarket wheel and flags the hub spigot and offset that follow. Unknown keeps the Porsche wheel and flags it as not confirmed", src: "VSB1 Rev 6 axles and suspension, report 06 section 3"}
   - id: SUP-01
     group: Wheel and suppliers
-    title: Cruisemaster's GTM for the chosen XT build
+    title: Cruisemaster's GTM for the XT Air build
     how: Cruisemaster sets it in the design session. It has said it will design to VSB1's 120 % rule (18 Nov).
     unit: kg
-    estimate: {v: 3330, src: "Cruisemaster coil guide sheet 6: 3,700 kg ATM tandem build, 3,330 kg GTM"}
+    estimate: {v: 4050, src: "Cruisemaster air guide: 4,500 kg ATM XT Air tandem, 4,050 kg GTM (report 06)"}
     measured: {v: null, date: null}
     affects: [MAS-02]
     thresholds:
@@ -113,16 +113,6 @@ inputs:
     affects: [MAS-02]
     thresholds:
       - {at: 0, rule: "No: MAS-02 checks 1.2 times the axle group load against the kit's GTM. Yes: it checks the axle group load itself", src: "VSB1 Rev 6 axles and suspension, report 06"}
-  - id: SUP-03
-    group: Wheel and suppliers
-    title: Cruisemaster's coil choice for the real masses (part number)
-    how: Cruisemaster's written answer to report 06 open question 2.
-    unit: part number
-    estimate: {v: 33SC-950, src: "Coil guide: 33SC-950 with the 33SC-107 bump stop for the 3,700 kg tandem build"}
-    measured: {v: 33SC-950, date: 2026-11-18, note: "Cruisemaster confirmed the 33SC-950 coil with the 33SC-107 bump stop for these masses"}
-    affects: [suspension type]
-    thresholds:
-      - {at: 33SC-1250-1400, rule: "If Cruisemaster can only meet the plate with the 4,500 kg coils, change to XT Air (report 06 section 2). The plan flags it", src: "Report 06"}
   - id: SUP-04
     group: Wheel and suppliers
     title: Cruisemaster's C/F for the ET53 wheel, from the rail's outside face to the hub face

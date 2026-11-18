@@ -12,7 +12,7 @@
 # changes a limit or a block size. Items marked PLACEHOLDER have no position from the design yet.
 id: ASM-TR
 name: Whole trailer, block layout
-revision: A
+revision: B
 
 lengths_compared: [5000, 5500, 6000]   # body lengths compared by the build (owner: 6,000 at most, 5,500 accepted)
 
@@ -34,7 +34,7 @@ params:
   tyre_d: rim_in * 25.4 + 2 * tyre_aspect * tyre_section     # 737.7 mm, calculated
   slr_deflection: 20         # static loaded radius = free radius less 20 mm (estimate, report 06 section 7)
   hub_z: tyre_d / 2 - slr_deflection
-  hub_below_rail: 215        # Cruisemaster coil, standard arm, at rated load (spec, +/- 60)
+  hub_below_rail: 215        # Cruisemaster XT standard arm at ride height: air 205 to 230 (coil 215 +/- 60), spec
   bump_travel: 60            # XT bump travel (spec)
   tyre_clearance: 50         # tyre at full bump to the floor underside (estimate, report 06 open question 9)
   axle_spacing: 830          # tyres up to 760 mm (spec)
@@ -58,7 +58,7 @@ params:
   hub_y: rail_outer_w / 2 + cf - wheel_offset   # tyre centre plane
   xm_w: 50                   # crossmember width along X
   xm_max_pitch: 700          # PLACEHOLDER rule for the intermediate crossmembers and outriggers, the engineer sets it
-  # XT positions about the axle group centre, 830 mm spacing (report 06 section 8, from drawing 33XT COIL)
+  # XT positions about the axle group centre, 830 mm spacing (report 06 section 8, from drawing 33XT COIL; XT Air shares the arm, confirm on 33XT AIR)
   xt_front_hinge_rear: -834
   xt_centre_front: -54
   xt_rear_shock_front: 776
@@ -117,7 +117,7 @@ params:
   water_highway_l: 50        # owner's highway figure
   tank_z0: rail_underside_z
   tank_h: floor_underside_z - 10 - rail_underside_z
-  tank_w: 2 * rail_in - 100  # 50 mm each side for the coil and shock mounts (estimate until the kit drawing)
+  tank_w: 2 * rail_in - 100  # 50 mm each side for the airbag and shock mounts (estimate until the kit drawing)
 
 # The wheel the trailer shares with the car. WHL-01 in measurements.yaml decides which one the plan uses
 # (cad/inputs.py): the Porsche wheel if its rating meets VSB1's 120 % rule, the fallback if not.
@@ -141,7 +141,7 @@ crossmembers:
     - {id: rear, x: body_x1 - xm_w, section: body}
   keep_out: [[battery-bay, XT front hinge], [XT front hinge, XT centre], [XT centre, XT rear shock], [XT rear shock, battery-bay]]
   sections:
-    xt: {name: "RHS 150 x 50 x 3, full rail height (Cruisemaster TB 070 for a 3,700 kg tandem)", kg_per_m: 8.96, maturity: estimate,
+    xt: {name: "RHS 150 x 50 x 3, full rail height (Cruisemaster TB 070, tandem trailer up to 3,700 kg ATM)", kg_per_m: 8.96, maturity: estimate,
          source: "Cruisemaster section from report 06 section 8, mass per metre for 150 x 50 x 3 C350L0 RHS (estimate until sized)"}
     body: {name: "RHS 100 x 50 x 3 (block size, the engineer sizes it)", kg_per_m: 6.6, maturity: estimate,
            source: "Block size chosen for this layout, mass per metre for 100 x 50 x 3 RHS (estimate)"}
@@ -266,12 +266,12 @@ items:
 
   # ================================================================ running gear (report 06)
   - id: RG-01
-    name: Cruisemaster XT Freestyle coil, arm, hub drum and 12 inch electric brake
+    name: Cruisemaster XT Freestyle Air (4,500 kg build), arm, Firestone style 26 airbag, hub drum and 12 inch electric brake
     system: running_gear
     for: {h: [front_hub_dx, rear_hub_dx], s: [-1, 1]}
     box: [axle_x + h - 419, s * (rail_outer_w / 2 + (hub_y - rail_outer_w / 2) / 2) - (hub_y - rail_outer_w / 2) / 2, hub_z - 60, 480, hub_y - rail_outer_w / 2, rail_underside_z - hub_z + 60]
     cog: [axle_x + h - 150, s * (rail_outer_w / 2 + 60), hub_z + 40]
-    mass: {basis: declared, unit_kg: 45, maturity: spec, source: "https://www.diycaravans.com.au/shop/cruisemaster-xt-freestyle-coil-suspension-kit-tandem/", note: "180 kg per tandem kit (retailer listing), a quarter per wheel"}
+    mass: {basis: declared, unit_kg: 45, maturity: estimate, source: "https://www.diycaravans.com.au/shop/cruisemaster-xt-freestyle-coil-suspension-kit-tandem/", note: "180 kg per tandem kit for the coil version (retailer listing), a quarter per wheel. The air kit's weight is not published"}
   - id: RG-02
     name: Wheel and tyre, Porsche 8J x 18 ET53 with 255/55 R18 109H
     system: running_gear
@@ -285,6 +285,20 @@ items:
     system: running_gear
     box: [axle_x + xt_centre_front, -100, rail_underside_z - 45, xm_w, 200, 45]
     mass: {basis: declared, total_kg: 4.2, maturity: estimate, source: "Report 06: TSC 2 to 3 kg and nuts 1.2 kg (estimates)"}
+  - id: RG-04
+    name: XT Air supply, 12 V compressor, 11 litre tank, gauges, pressure switch, height valves and air lines
+    note: Low in the front zone against partition A on the road side, where it stays dry and out of the garage. The lines run along the rails to the four bags.
+    system: running_gear
+    zone: front
+    box: [part_a_x - 400, -half_in, floor_z, 400, 300, 300]
+    mass: {basis: declared, total_kg: 10, maturity: estimate, source: "Report 06 section 2: 8 to 12 kg for the compressor, tank, panel and lines (estimate, not published)"}
+  - id: RG-05
+    name: Spare Firestone style 26 airbag with fittings, tube and Loctite 567
+    note: A punctured bag cannot be repaired (Cruisemaster CIS-006), so the spare travels with the trailer.
+    system: running_gear
+    zone: front
+    box: [part_a_x - 400, -half_in + 320, floor_z, 400, 300, 150]
+    mass: {basis: declared, total_kg: 3, maturity: estimate, source: "Report 06 section 2: 2.4 kg bag (Firestone style 26 sheet) plus fittings (estimate)"}
 
   # ================================================================ body shell (masses per area from the older block model)
   - id: BD-01
