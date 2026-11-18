@@ -15,8 +15,10 @@ import { withBase } from '../../lib/url';
 This module is the garage for two motorcycles with a queen bed above them. It is the first part of the trailer to
 be designed, because it sets the trailer's width, its height with the roof down and much of its weight.
 
-This page shows revision B of the design. It came from the first model run: the deck now laps over partition B,
-the ladder is owner-built so it reaches the floor, and the note on converting to the trailer datum is corrected.
+This page shows revision C of the design. Revision B came from the first model run: the deck now laps over
+partition B and the ladder is owner-built so it reaches the floor. Revision C came from the
+<a href={withBase('/trailer/')}>whole-trailer layout</a>. It fixes the garage floor at 858 mm above the ground,
+places the module in the trailer, and adds the Mosko Moto panniers that stay on the Tuareg in the garage.
 
 <Summary />
 
@@ -111,9 +113,9 @@ belong to the body design and carry no mass. The ramp and the ground only show i
 
 The module frame starts on the garage floor at the inner face of partition A, on the trailer centreline. X runs
 along the trailer towards partition B. Y runs across the trailer, positive towards the kerb side where the
-garage door is. Z is up from the garage floor. All sizes are in millimetres. Once the chassis exists, an offset
-converts this frame to the trailer's own datum, which measures X rearward from the towball. If partition B ends
-up nearer the front of the trailer than partition A, X also changes sign.
+garage door is. Z is up from the garage floor. All sizes are in millimetres. In the whole trailer partition A faces the
+front, so the axes point the same way as the trailer's own datum, which measures X rearward from the towball.
+Module X 0 sits 3,765 mm behind the ball and the garage floor 858 mm above the ground.
 
 <KeyDims kind="dims" />
 
@@ -138,9 +140,9 @@ The centre of gravity is in the module frame above.
 
 <MassTable kind="cases" />
 
-The towball load cannot be worked out yet. It needs the positions of the coupling and the axle, and the chassis
-has not been designed. The ramp has no travel position yet either, so its 34 kg is placed at the centre of the
-garage floor as a placeholder.
+The towball load is worked out for the whole trailer, on the <a href={withBase('/trailer/')}>Whole trailer</a>
+page. The ramp has no travel position yet, so its 34 kg is placed at the centre of the garage floor as a
+placeholder.
 
 ### Mass schedule
 
@@ -156,8 +158,9 @@ allowances. The "With growth" column in the load cases above adds them up.
 ## Checks
 
 These are the checks the design must pass, measured on the 3D model. A failed check shows in red with the
-measured gap. CLR-01b and CLR-06b are reported cases and never fail the build. CLR-07, the ladder foot, was added
-in revision B.
+measured gap. CLR-01b, CLR-06b and CLR-08 are reported cases and never fail the build. CLR-07, the ladder foot,
+was added in revision B. In revision C the Tuareg's panniers became part of its envelope, so every Tuareg check
+includes them, and CLR-08 reports their gap to the straps.
 
 <ChecksTable />
 
@@ -175,9 +178,10 @@ These need the owner's decision or a measurement. The model does not make design
 - Sleeping with fuelled bikes inside: the answer changes the garage ventilation and the fuel-smell sealing.
 - Bike measurements: the Tuareg's screen height with mirrors folded, its length with the plate hanger (2,220 or about 2,263 mm), its fairing width, both bikes' peg widths, and the chock's nose depth and cradle rise.
 - With the photo-measured 2,263 mm length the Tuareg's plate is 10.8 mm from the closed door, against 15 mm wanted. Moving both bikes 10 mm towards the road-side wall gives 20.8 mm but leaves 40 mm for the chock nose.
-- The ladder length depends on the living-area floor height, which is taken level with the garage floor until the body design fixes it.
+- The ladder length depends on the living-area floor height. The whole-trailer layout keeps the floor flat and level with the garage floor.
+- The panniers' position along the Tuareg and their height are estimates. Measure them on the bike.
 - The positions of the doorway in partition B, the vents, the sensors, the extinguisher and the ladder across the trailer are placeholders.
 
-Resolved in revision B: the deck now laps over partition B and the cleat on its living-area face, the 1,580 mm
-ladder's rubber feet reach the floor at a 15 degree lean, and the datum note says the conversion may need a change
-of sign as well as an offset.
+Resolved in revision B: the deck now laps over partition B and the cleat on its living-area face, and the 1,580 mm
+ladder's rubber feet reach the floor at a 15 degree lean. Resolved in revision C: the garage floor height (858 mm,
+so the ramp sits at 16.4 degrees) and the module's place in the trailer datum.

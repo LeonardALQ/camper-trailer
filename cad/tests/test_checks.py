@@ -22,6 +22,7 @@ MODEL = Model(PRJ)
 RESULTS = evaluate(PRJ, MODEL)
 for r in RESULTS:
     r["fix"] = None if r["ok"] else search(PRJ, r)
+    r["inputs"] = next(c.inputs for c in PRJ.checks if c.id == r["id"])
 OUT = BUILD / "checks"
 OUT.mkdir(parents=True, exist_ok=True)
 (OUT / "checks.json").write_text(json.dumps(dict(results=RESULTS, git=git_hash(), seconds=round(time.time() - T0, 1)), indent=1))

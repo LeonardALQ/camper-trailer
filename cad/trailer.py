@@ -22,7 +22,8 @@ import yaml
 from .partsdb import DATA, Mass, Params, Project
 
 TRAILER_YAML = DATA / "assemblies" / "trailer.yaml"
-GROWTH = {"estimate": 0.20, "calculated": 0.07, "spec": 0.0}
+GROWTH = {"estimate": 0.20, "calculated": 0.07, "spec": 0.0, "weighed": 0.0}
+STAGE_IDS = {"drawbar_structure": ("DB-01", "DB-02", "DB-03", "DB-04"), "drawbar_contents": ("DB-05", "DB-06", "DB-07")}
 SYSTEM_LABELS = {
     "drawbar": "Drawbar and coupling", "chassis": "Chassis", "running_gear": "Running gear", "body": "Body",
     "roof": "Roof", "underfloor": "Under the floor", "front": "Front utility zone", "module": "Garage and bed module",
@@ -60,7 +61,7 @@ class ModuleInfo:
         return dict(mod_bikes_cog_x=x, mod_ladder_x1=self.ladder_box[3], mod_ladder_y=P["ladder_y"],
                     mod_ladder_w=self.ladder_box[4] - self.ladder_box[1], mod_doorway_y=P["doorway_y"],
                     mod_doorway_w=P["doorway_w"], mod_garage_length=P["garage_length"],
-                    mod_partition_t=P["partition_t"])
+                    mod_partition_t=P["partition_t"], mod_door_x0=P["door_x0"], mod_door_x1=P["door_x1"], mod_door_h=P["door_h"])
 
 
 # ------------------------------------------------------------------ blocks
@@ -303,6 +304,19 @@ class Layout:
                               dz + P["ceiling_z"]), hollow=True))
         return out
 
+    def apply_weighed(self, stages: list[dict]) -> list[dict]:
+        """Scale the built parts of each weighed stage to its weighbridge figure (report 02 MASS-07)."""
+        out = []
+        for st in stages:
+            lines = [b for b in self.blocks if b.load in ("tare", "module") and b.mass_kg > 0 and _stage_of(b) in st["stage"]]
+            model = sum(b.mass_kg for b in lines)
+            f = st["mass_kg"] / model if model else 1.0
+            for b in lines:
+                b.mass_kg *= f
+                b.maturity = "weighed"
+            out.append(dict(id=st["id"], model_kg=model, weighed_kg=st["mass_kg"], difference_pct=100 * (f - 1)))
+        return out
+
     # -- views of the layout ---------------------------------------------
     def find(self, iid) -> Block:
         return next(b for b in self.blocks if b.iid == iid)
@@ -332,7 +346,7 @@ class Layout:
         water = self.P.eval(case.water_l, {})
         out = []
         for b in self.blocks:
-            if b.load == "none":
+            if b.load == "none" or b.keep_clear:
                 continue
             if b.load == "tare":
                 out.append((b, b.mass_kg))
@@ -471,6 +485,13 @@ class Layout:
         return res
 
 
+def _stage_of(b: Block) -> str:
+    for k, ids in STAGE_IDS.items():
+        if b.id in ids:
+            return k
+    return b.system
+
+
 def _rot(poly, deg):
     t = math.radians(deg)
     return [(x * math.cos(t) - y * math.sin(t), x * math.sin(t) + y * math.cos(t)) for x, y in poly]
@@ -541,12 +562,30 @@ class Trailer:
         self.td = yaml.safe_load(TRAILER_YAML.read_text())
         self.base = dict(overrides or {})
         self.cases = prj.load.trailer_cases
-        self.target = prj.load.towball_target_kg
-        self.car = prj.load.car
+        self.reg = prj.load.registration
+        inp = self.inputs = prj.inputs
+        self.car = inp.car(prj.load.car)
+        self.target, self.target_why = inp.towball_target(self.car, self.car["towball_rating_kg"]["v"])
+        self.supplier = inp.supplier()
+        atm = self.car["braked_towing_kg"]["v"]
+        self.wheel = inp.wheel(atm, self.target, self.td["wheels"])
+        self.base.setdefault("coupling_z", inp.coupling_z())
+        if self.wheel.get("switched"):
+            self.base.setdefault("wheel_offset", self.wheel["offset_mm"])
+        self.weighed = inp.weighed()
+        self.weighed_rows: list[dict] = []
         self.target_case = next(c for c in self.cases if c.towball_target)
 
     def layout(self, **over) -> Layout:
-        return Layout(self.td, self.mod, self.prj, {**self.base, **over})
+        lay = Layout(self.td, self.mod, self.prj, {**self.base, **over})
+        self.weighed_rows = lay.apply_weighed(self.weighed)
+        return lay
+
+    def caps(self) -> dict:
+        r = {k: v["v"] for k, v in self.reg["ratings"].items()}
+        gtm = min(r["tyre_kg"] * 4, r["coupling_kg"], r["chains_kg"], r["brakes_kg"])
+        atm = min(r["coupling_kg"], r["chains_kg"])
+        return dict(gtm=gtm, atm=atm, ratings=r)
 
     def _towball(self, **over) -> float:
         lay = self.layout(**over)
@@ -574,7 +613,7 @@ class Trailer:
             if zone == "front":
                 x0 = V["in_x0"] + L + pt
             else:
-                x0 = V["in_x1"] - L - g - 2 * pt
+                x0 = V["in_x1"] - L - g - pt
             if self.layout(module_x0=x0).fit(zone, skip)["ok"]:
                 return float(L)
         return math.inf
@@ -640,7 +679,7 @@ class Trailer:
         f_min, r_min = self.zone_minimum("front"), self.zone_minimum("rear")
         g, pt = V["mod_garage_length"], V["mod_partition_t"]
         lo_x0 = V["in_x0"] + f_min + pt                      # module_x0 with the front zone at its minimum
-        hi_x0 = V["in_x1"] - r_min - g - 2 * pt              # module_x0 with the rear zone at its minimum
+        hi_x0 = V["in_x1"] - r_min - g - pt                  # module_x0 with the rear zone at its minimum
         out = dict(front_min_mm=f_min, rear_min_mm=r_min, module_x0_range=[lo_x0, hi_x0], fits=lo_x0 <= hi_x0 + 1e-6)
         if xa is None:
             out.update(method="no solution", axle_x=None, overrides={})
@@ -682,13 +721,25 @@ class Trailer:
             if c.type == "mass":
                 ids = [x["id"] for x in cases] if c.cases == "all" else c.cases
                 bases = ["nominal", "growth"] if c.basis == "both" else [c.basis]
-                key = {"mass": "mass_kg", "axle": "axle_kg", "towball": "towball_kg", "towball_pct": "towball_pct",
-                       "tyre_load": "tyre_load_kg"}[c.quantity]
+                key = {"mass": "mass_kg", "axle": "axle_kg", "axle_vsb1": "axle_kg", "towball": "towball_kg",
+                       "towball_pct": "towball_pct", "tyre_load": "tyre_load_kg"}[c.quantity]
+                factor = 1.2 if c.quantity == "axle_vsb1" and not self.supplier["includes_120"] else 1.0
                 unit = "%" if c.quantity == "towball_pct" else "kg"
+                cmin, cmax = c.min, c.max
+                caps = self.caps()
+                if c.limit == "kit_gtm":
+                    cmax = self.supplier["kit_gtm"]
+                elif c.limit == "nsw_gtm_cap":
+                    cmax = caps["gtm"]
+                elif c.limit == "nsw_atm_cap":
+                    cmax = caps["atm"]
+                elif c.limit == "target":
+                    cmin, cmax = self.target - c.tolerance, self.target + c.tolerance
+                c = c.model_copy(update=dict(min=cmin, max=cmax))
                 worst = None
                 for cid in ids:
                     for bs in bases:
-                        v = by_id[cid][bs][key]
+                        v = by_id[cid][bs][key] * factor
                         margins = []
                         if c.min is not None:
                             margins.append(v - c.min)
@@ -700,6 +751,8 @@ class Trailer:
                 m, cid, bs, v = worst
                 lim = " to ".join(f"{x:g}" for x in (c.min, c.max) if x is not None) if c.min is not None and c.max is not None else \
                     (f"<= {c.max:g}" if c.max is not None else f">= {c.min:g}")
+                if factor != 1.0:
+                    lim += " (1.2 x the axle load)"
                 row.update(limit=f"{lim} {unit}", measured=round(v, 1), unit=unit, margin=round(m, 1), ok=m >= -1e-6,
                            governing=f"{cid} {by_id[cid]['name']} ({'with growth' if bs == 'growth' else 'no growth'})",
                            detail=f"worst case {cid} {by_id[cid]['name']}, {'with growth' if bs == 'growth' else 'no growth'}: {v:.1f} {unit}, margin {m:.1f} {unit}")
@@ -716,6 +769,23 @@ class Trailer:
                                    f"{ax['gear_budget_kg']:.0f} kg ({ax['binds']} binds). Ball 1.06 to 1.23 m behind the axle gives a rear axle of "
                                    f"{lo['rear_kg']:.0f} to {hi['rear_kg']:.0f} kg"),
                            car=dict(nominal=ax, short=lo, long=hi))
+            elif c.type == "wheel":
+                w = self.wheel
+                r = self.inputs.v("WHL-01")
+                ok = r is not None and r >= w["need_kg"]
+                row.update(limit=f">= {w['need_kg']:.0f} kg per wheel", measured=r, unit="kg", margin=None if r is None else round(r - w["need_kg"], 1),
+                           ok=ok, governing=w["name"],
+                           detail=self.inputs.outcomes.get("WHL-01", ""))
+            elif c.type == "towball_scale":
+                m = self.inputs.v("CAR-07")
+                model = by_id[self.target_case.id]["nominal"]["towball_kg"]
+                if m is None:
+                    row.update(limit=f"within {100 * c.tolerance:.0f} % of the model", measured=None, unit="kg", margin=None, ok=False,
+                               governing="not measured yet", detail=f"model {model:.0f} kg fully loaded. Not measured yet")
+                else:
+                    d = (m - model) / model
+                    row.update(limit=f"within {100 * c.tolerance:.0f} % of the model", measured=m, unit="kg", margin=round(100 * (c.tolerance - abs(d)), 1),
+                               ok=abs(d) <= c.tolerance, governing=f"model {model:.0f} kg", detail=f"scale {m:.0f} kg, model {model:.0f} kg ({100 * d:+.1f} %)")
             elif c.type == "fit":
                 f = lay.fit(c.zone)
                 row.update(limit="inside the zone, no overlap", measured=f["smallest_gap_mm"], unit="mm", margin=f["smallest_gap_mm"],
@@ -760,13 +830,17 @@ class Trailer:
                                detail=f"{p} {v:.0f} mm from the car's side at 90 degrees. Body corners "
                                       f"{min(r['parts']['body']['clearance_90_mm'] for r in jk.values()):.0f} mm", jackknife=jk)
                 else:
-                    firsts = [(r["parts"]["drawbar members"]["first_contact_deg"] or 999, a) for a, r in jk.items()]
-                    v, a = min(firsts)
+                    firsts = [(r["parts"][p]["first_contact_deg"] or 999, a, p) for a, r in jk.items() for p in ("drawbar members", "stone guard")]
+                    v, a, p = min(firsts)
+                    each = ", ".join(f"{p2} {min(r['parts'][p2]['first_contact_deg'] or 999 for r in jk.values()):.1f} to "
+                                     f"{max(r['parts'][p2]['first_contact_deg'] or 999 for r in jk.values()):.1f} degrees"
+                                     for p2 in ("drawbar members", "stone guard"))
                     row.update(limit="reported", measured=None if v == 999 else v, unit="deg", margin=None, ok=v == 999,
-                               governing=f"ball {a} mm behind the car's rear axle",
+                               governing=f"{p}, ball {a} mm behind the car's rear axle",
                                detail=("no contact in plan up to 90 degrees" if v == 999 else
-                                       f"in plan the drawbar member reaches the car's rear corner at {v:.1f} degrees "
-                                       f"(ball {a} mm behind the axle). Heights decide whether they touch"), jackknife=jk)
+                                       f"in plan the car's rear corner is first over the {each}, for the ball 1,230 to 1,060 mm "
+                                       f"behind the car's axle. The heights decide whether they touch"), jackknife=jk)
+            row["inputs"] = c.inputs
             row["status"] = ("PASS" if row["ok"] else "FAIL") if c.severity == "fail" else ("MEETS LIMIT" if row["ok"] else "REPORTED")
             out.append(row)
         return out
@@ -922,4 +996,8 @@ def report(tr: Trailer) -> dict:
         least_certain=tr.least_certain(ev), chassis=chassis_inputs(tr, ev), schedule=schedule(lay, tr),
         tare_by_group=sys_tot, car=car_axles(tr.car, next(c for c in ev["cases"] if c["id"] == tr.target_case.id)["nominal"]["towball_kg"]),
         car_limits={k: v["v"] for k, v in tr.car.items() if isinstance(v, dict) and "v" in v},
+        target_why=tr.target_why, wheel=tr.wheel, supplier=tr.supplier, caps=tr.caps(), registration=tr.reg,
+        weighed=tr.weighed_rows, spacing=dict(rule=tr.inputs.rule_spacing, solved=tr.inputs.solved,
+                                              in_use=tr.prj.P.values["bike_spacing"], garage=tr.prj.P.values["garage_length"]),
+        measurements=tr.inputs.report(),
     ))

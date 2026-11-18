@@ -15,6 +15,7 @@ export default defineConfig({
       customCss: ['./src/styles/site.css'],
       sidebar: [
         { label: 'Home', link: '/' },
+        { label: 'Whole trailer', link: '/trailer/' },
         { label: 'Garage and bed', link: '/garage-bed/' },
         { label: 'Drawings', link: '/drawings/' },
         { label: 'Build steps (draft)', items: [{ autogenerate: { directory: 'steps' } }] },

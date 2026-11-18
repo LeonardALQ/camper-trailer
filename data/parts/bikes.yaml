@@ -54,6 +54,10 @@ parts:
           # publishes the Backcountry 30L pannier as 508 mm top to bottom (roll top closed), 381 mm long (457 mm
           # with the rear pocket) and 203 mm thick. Their position along the bike and their height are estimates:
           # the top level with the tail rack (05 z 920 to 940) and the front just behind the pillion peg hanger.
+          # Crash bars (protection bars), estimate. 965 mm wide like the bars, about 180 to 600 mm behind the front
+          # axle and 550 to 1,080 mm off the floor, wrapping the white side panels in Aprilia's side image. The
+          # width and top come from measurements.yaml (TU-01 and TU-09).
+          crash_bars: {half_width: 482.5, x: [180, 600], z: [550, 1080], src: "owner's report (as wide as the bars) and Aprilia's side image, estimate"}
           panniers: {outer_y: 490, thickness: 203, x: [1300, 1757], z: [425, 933],
                      src: "outer width owner's measurement (980 mm with bags); size Mosko Moto Backcountry 30L spec; position estimate"}
         tie_down_y:

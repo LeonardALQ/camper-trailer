@@ -82,7 +82,18 @@ trailer_cases:
     water_l: water_full_l
     load: [gas, fuel, gear]
 
-towball_target_kg: 220   # report 07: about 220 kg fully loaded, set by the car's rear axle and GVM
+towball_target_kg: 220   # report 07's figure. The build derives the target from the measured inputs (CAR-01 to CAR-06)
+
+# Registration (report 02 section 2.1). NSW, with Victoria as the fallback. The NSW examiner caps GTM at the
+# lowest of the tyre, coupling, chain and brake ratings and ATM at the lower of the coupling and chain ratings.
+registration:
+  state: NSW
+  fallback: Victoria
+  ratings:
+    tyre_kg: {v: 1030, src: "255/55 R18 109 load index, per tyre, four tyres (report 07)"}
+    coupling_kg: {v: 3500, src: "Cruisemaster DO35 V3Plus, ADR rated 3,500 kg (report 08)"}
+    chains_kg: {v: 3500, src: "Two safety chains marked 4177-35 (report 08)"}
+    brakes_kg: {v: 4500, src: "Cruisemaster A/T 12 inch electric drums, 4.5 t tandem capacity (report 06)"}
 
 # The tow vehicle, 2013 Porsche Cayenne GTS (report 07). Values the car's rear axle check needs, with their basis.
 car:

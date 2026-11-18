@@ -170,6 +170,11 @@ def tuareg(g, prm) -> BikeModel:
     fx, fy, fz = ss["foot"]
     solids["side stand foot"] = box_span(fy - 10, fy + 40, fx - 35, fx + 35, fz - 8, fz + 8)
 
+    # Crash bars as a box envelope (estimate, widths and top from measurements.yaml)
+    cb = est.get("crash_bars")
+    if cb:
+        solids["crash bars (envelope)"] = box_span(-cb["half_width"], cb["half_width"], cb["x"][0], cb["x"][1], cb["z"][0], cb["z"][1])
+
     # Mosko Moto panniers, left on in the garage (outer width owner's measurement, size Mosko Moto's, position estimated)
     pn = est.get("panniers")
     if pn:

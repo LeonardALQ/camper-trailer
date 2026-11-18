@@ -96,6 +96,9 @@ params:
   mod_doorway_w: 700
   mod_garage_length: 1800
   mod_partition_t: 20
+  mod_door_x0: 40
+  mod_door_x1: 1760
+  mod_door_h: 1440
   module_x0: axle_x - axle_offset - mod_bikes_cog_x
   part_a_x: module_x0 - mod_partition_t                          # front face of partition A
   part_b_x: module_x0 + mod_garage_length + mod_partition_t      # living-area face of partition B
@@ -115,6 +118,15 @@ params:
   tank_z0: rail_underside_z
   tank_h: floor_underside_z - 10 - rail_underside_z
   tank_w: 2 * rail_in - 100  # 50 mm each side for the coil and shock mounts (estimate until the kit drawing)
+
+# The wheel the trailer shares with the car. WHL-01 in measurements.yaml decides which one the plan uses
+# (cad/inputs.py): the Porsche wheel if its rating meets VSB1's 120 % rule, the fallback if not.
+wheels:
+  porsche: {name: "Porsche 8J x 18 ET53, the Cayenne's own wheel", offset_mm: 53, spigot_mm: 71.5, centre_bore_mm: 71.6,
+            src: "Reports 06 and 07. Hub drums special order, 5 x 130, M14 x 1.5 studs, 71.5 mm spigot"}
+  fallback: {name: "a rated 5 x 130 aftermarket wheel, for example the OZ Rally Raid (up to 1,200 kg)", offset_mm: 53, spigot_mm: 84.1,
+             centre_bore_mm: 84.1, rating_kg: 1200,
+             src: "Report 06 section 3. The 84.1 mm bore is a retailer figure. The offset is taken as ET53 until a wheel is chosen, and its fit over the GTS brakes needs checking"}
 
 # Crossmembers that the layout fixes (front face X). The build adds intermediate crossmembers so that no gap
 # between two of them exceeds xm_max_pitch, and outriggers at the same stations wherever the tyres are not.
@@ -300,7 +312,7 @@ items:
   - id: BD-05
     name: Garage door, kerb side, top-hinged
     system: body
-    box: [module_x0 + 40, half_in, floor_z, 1720, wall_t, 1440]
+    box: [module_x0 + mod_door_x0, half_in, floor_z, mod_door_x1 - mod_door_x0, wall_t, mod_door_h]
     mass: {basis: declared, total_kg: 45, maturity: estimate, source: "Older block model (garage door)"}
     note: Opening as DESIGN.md. Product and structure come with the body design.
   - id: BD-06

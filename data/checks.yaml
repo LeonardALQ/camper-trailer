@@ -10,6 +10,7 @@ checks:
     b: ["6"]
     min_gap_mm: 40
     severity: fail
+    inputs: [TU-03, TU-04]
     why: The beam underside at Z 1,460 must clear the Tuareg's screen (mirrors folded, front wheel in the chock).
   - id: CLR-01b
     title: Tuareg to bed beams with the photo-measured 1,390 mm screen
@@ -19,6 +20,7 @@ checks:
     min_gap_mm: 40
     severity: report
     added_by_build: true
+    inputs: [TU-03, TU-04]
     why: Sensitivity added by this build. The model uses the owner's 1,370 mm height. DESIGN.md set the beam height from Aprilia's image (1,390 mm), so this row shows the margin on that basis.
   - id: CLR-02
     title: Street Triple to bed beams
@@ -27,6 +29,7 @@ checks:
     b: ["6"]
     min_gap_mm: 40
     severity: fail
+    inputs: [TU-03, TU-04]
     why: The beam underside must clear the Street Triple.
   - id: CLR-03
     title: Tuareg to Street Triple, anywhere
@@ -35,6 +38,7 @@ checks:
     b: [ST]
     min_gap_mm: 30
     severity: fail
+    inputs: [TU-01, TU-05, TU-07, ST-01]
     why: The governing pair is expected to be the Street Triple's right bar end against the Tuareg's fairing and radiator shrouds (half-width estimate 300 mm).
   - id: CLR-04
     title: Each bike to partitions and side walls, door closed
@@ -43,6 +47,7 @@ checks:
     b: ["1", "2", "3", C2, C3, C4]
     min_gap_mm: 15
     severity: fail
+    inputs: [TU-05, TU-07, ST-01, CHK-01]
     why: Bars, pegs and tyres must not touch the partitions, the walls or the closed garage door.
   - id: CLR-05
     title: Mattress top plus 50 mm bedding
@@ -51,6 +56,7 @@ checks:
     add_mm: bedding_allowance
     max_z: ceiling_z
     severity: fail
+    inputs: [TU-03, TU-04]
     why: With the roof collapsed the bedding must fit under the 1,800 mm ceiling.
   - id: CLR-06
     title: Tuareg rear-most point to the closed door's inner face (owner's 2,220 mm length)
@@ -59,6 +65,7 @@ checks:
     b: [C4]
     min_gap_mm: 15
     severity: fail
+    inputs: [TU-02, CHK-01]
     why: The bike's tail and plate hanger must clear the closed kerb-side door.
   - id: CLR-06b
     title: Tuareg rear-most point to the closed door with the photo-measured 2,263 mm length
@@ -67,6 +74,7 @@ checks:
     b: [C4]
     min_gap_mm: 15
     severity: report
+    inputs: [CHK-01]
     why: Reported, not a build failure (DESIGN.md). Aprilia's image shows the plate hanger at least 1,915 mm behind the front axle.
   - id: CLR-08
     title: Tuareg's panniers to the straps and track fittings
@@ -76,6 +84,7 @@ checks:
     min_gap_mm: 0
     severity: report
     added_by_build: true
+    inputs: [TU-05, TU-06]
     why: Added with the panniers, which stay on the Tuareg in the garage. A strap must not pass through a bag. DESIGN.md sets no limit for this, so the gap is reported. CLR-03, CLR-04 and CLR-06 already include the panniers, because they are part of the Tuareg's envelope.
   - id: CLR-07
     title: Ladder foot to the living-area floor
@@ -85,7 +94,18 @@ checks:
     min_gap_mm: 0
     max_gap_mm: 10
     severity: fail
+    inputs: [TU-03, TU-04]
     why: Added in revision B. The owner-built ladder hooks on the deck edge and must reach the living-area floor, taken level with the garage floor. A foot more than 10 mm up leaves the ladder hanging, and a foot below the floor means the ladder cannot stand at the 15 degree lean.
+  - id: BED-01
+    title: Bed beam sag at the garage's span, two sleepers spread over the bed
+    type: beam
+    a: ["6.3"]
+    beam: {load_kg: 255, beams: 5, e_gpa: 69, i_cm4: 10.85, depth_mm: 50, baseline_span_mm: 1800}
+    span_ratio: 300
+    severity: report
+    added_by_build: true
+    inputs: [TU-01, TU-07, ST-01]
+    why: Added with revision C, because the beams were sized for 1,800 mm (research/04, about 5 mm under 255 kg spread over the bed) and the span now follows the bike spacing. RHS 50x25x2.5 6106-T6, I 10.85 cm4 (Capral), E 69 GPa. Span / 300 is a common floor deflection guide, used here for reporting. The engineer sets the real limit and the load cases.
   - id: CON-01
     title: Chock bases, L-track and floor touch without overlap, beams sit on ledgers and the deck sits on beams and on partition B
     type: contact
@@ -114,6 +134,7 @@ checks:
       - ["7", "2"]
     tolerance_mm: 0.01
     severity: fail
+    inputs: [TU-03, TU-04]
     why: Parts that carry load must touch their supports, and no two solids may overlap.
 
 # Whole-trailer checks (TRAILER.md), measured on the block layout in assemblies/trailer.yaml by cad/trailer.py.
@@ -130,16 +151,18 @@ trailer_checks:
     cases: all
     max: 3500
     severity: fail
+    inputs: [TW-01, TW-02, TW-03]
     why: The car's braked towing limit and the planned ATM (report 07). MASS-03 margin against ATM.
   - id: MAS-02
-    title: Axle group load with growth within the kit's 3,330 kg GTM
+    title: Axle group load with growth within the kit's GTM, times 1.2 unless Cruisemaster's rating includes VSB1's 120 % rule
     type: mass
-    quantity: axle
+    quantity: axle_vsb1
+    limit: kit_gtm
     basis: growth
     cases: all
-    max: 3330
     severity: fail
-    why: Cruisemaster rates the 3,700 kg XT tandem build at 3,330 kg GTM (report 06).
+    inputs: [SUP-01, SUP-02, TW-01, TW-02, TW-03]
+    why: Cruisemaster rates the 3,700 kg XT tandem build at 3,330 kg GTM (report 06, input SUP-01). VSB1 asks each axle of a non-load-sharing group to carry 120 % of its load. Whether the kit's rating already includes that is input SUP-02.
   - id: MAS-03
     title: Towball load never above 280 kg (design target)
     type: mass
@@ -148,6 +171,7 @@ trailer_checks:
     cases: all
     max: 280
     severity: fail
+    inputs: [CAR-01, CAR-02, CAR-05, CAR-06, TU-01, TU-07, ST-01, TW-01, TW-02, TW-03]
     why: Design target from report 07. 280 kg is the car's and the planned towbar's rating, so the design keeps every case under it, with and without growth.
   - id: MAS-04
     title: Towball load at least 6 % of the trailer's mass in every travel case (design target)
@@ -157,17 +181,52 @@ trailer_checks:
     cases: all
     min: 6
     severity: fail
+    inputs: [CAR-01, CAR-02, CAR-05, CAR-06, TU-01, TU-07, ST-01, TW-01, TW-02, TW-03]
     why: Design target from report 07, not a legal limit. A light nose makes a trailer prone to sway. Every case in load_cases.yaml can be towed.
   - id: MAS-05
-    title: Towball load near 220 kg fully loaded (design target)
+    title: Towball load within 10 kg of the target fully loaded (design target)
     type: mass
     quantity: towball
+    limit: target
+    tolerance: 10
     basis: nominal
     cases: [TC2]
-    min: 210
-    max: 230
     severity: fail
-    why: Report 07 sets about 220 kg fully loaded, where the car's 1,600 kg rear axle starts to bind. The axle solve aims at 220 kg, so this row shows the solve worked.
+    inputs: [CAR-01, CAR-02, CAR-05, CAR-06]
+    why: The target is the highest towball load that keeps the car's 1,600 kg rear axle within its limit with the planned gear in the car, capped at 280 kg (report 07, inputs CAR-01 to CAR-06). The axle solve aims at it, so this row shows the solve worked.
+  - id: MAS-07
+    title: Axle group load with growth within the NSW examiner's GTM cap
+    type: mass
+    quantity: axle
+    limit: nsw_gtm_cap
+    basis: growth
+    cases: all
+    severity: fail
+    inputs: [TW-01, TW-02, TW-03]
+    why: TfNSW VIB 78 (report 02 section 2.1). The examiner caps GTM at the lowest of the four tyres' load capacities, the coupling, the safety chains and the brakes (registration ratings in load_cases.yaml).
+  - id: MAS-08
+    title: Trailer mass with growth within the NSW examiner's ATM cap
+    type: mass
+    quantity: mass
+    limit: nsw_atm_cap
+    basis: growth
+    cases: all
+    severity: fail
+    inputs: [TW-01, TW-02, TW-03]
+    why: TfNSW VIB 78 (report 02 section 2.1). The examiner caps ATM at the lower of the coupling and safety chain ratings.
+  - id: MAS-09
+    title: Wheel load rating meets VSB1's 120 % rule (reported until Porsche confirms it)
+    type: wheel
+    severity: report
+    inputs: [WHL-01]
+    why: Each wheel needs 1.2 x (ATM less the towball target) / 4. The plan keeps the Porsche wheel when its rating meets it and changes to a rated 5 x 130 wheel when it does not (measurements.yaml WHL-01).
+  - id: CAR-07
+    title: Towball scale reading within 10 % of the model, fully loaded (reported)
+    type: towball_scale
+    tolerance: 0.10
+    severity: report
+    inputs: [CAR-07]
+    why: Checks the centre of gravity estimates once the trailer exists (measurements.yaml CAR-07).
   - id: MAS-06
     title: Tyre load with VSB1's 120 % rule within the tyre's 1,030 kg rating
     type: mass
@@ -176,6 +235,7 @@ trailer_checks:
     cases: all
     max: 1030
     severity: fail
+    inputs: [TW-01, TW-02, TW-03]
     why: VSB1 asks each axle of a non-load-sharing group and its tyres to carry 120 % of their load. 109 load index is 1,030 kg (report 07). The wheel's own rating is not published yet, so it is reported in TRAILER.md, not checked.
   - id: CAR-01
     title: Car's rear axle with two adults, the towbar and the fully loaded towball, before any gear
@@ -183,47 +243,55 @@ trailer_checks:
     cases: [TC2]
     max: 1600
     severity: report
+    inputs: [CAR-01, CAR-02, CAR-05, CAR-06]
     why: Report 07 load budget method. The row also gives how much gear the car can then carry before its rear axle or GVM binds.
   - id: FIT-01
     title: Front utility zone holds its items and keeps its door landing and walkway clear
     type: fit
     zone: front
     severity: fail
+    inputs: [TU-01, TU-07, ST-01]
     why: Every item must sit inside the zone with no overlap. Keep-clear spaces are floor space to stand in.
   - id: FIT-02
     title: Rear living zone holds its items and keeps its landings clear
     type: fit
     zone: rear
     severity: fail
+    inputs: [TU-01, TU-07, ST-01]
     why: The ladder's landing, the partition B doorway and the entry and bathroom doors need clear floor.
   - id: FIT-03
     title: Tanks and battery fit between the rails and the crossmembers
     type: fit
     zone: underfloor
     severity: fail
+    inputs: []
     why: The tanks and battery sit between the rails, clear of every crossmember.
   - id: FIT-04
     title: Drawbar box holds the generator, gas bottles and fuel
     type: fit
     zone: drawbar_box
     severity: fail
+    inputs: []
     why: Contents inside the box with no overlap.
   - id: FIT-05
     title: Tyres at full bump clear the chassis and body
     type: tyre
     min_gap_mm: 0
     severity: fail
+    inputs: []
     why: No crossmember, outrigger, tank or panel may enter the tyre's space at full bump. The floor underside clearance (50 mm) is set by the floor height.
   - id: DIM-01
     title: Overall width with the awning within VSB1's 2,500 mm
     type: width
     max: 2500
     severity: fail
+    inputs: []
     why: VSB1 measures width across the body including awnings and side racks (report 02 section 2.2).
   - id: DIM-02
     title: Front load space not shorter than the rear overhang (VSB1 5.1.1)
     type: overhang
     severity: fail
+    inputs: [CAR-01, CAR-02, CAR-05, CAR-06, TU-01]
     why: VSB1 5.1.1 for this kind of trailer (report 08 section 5.1). The axle group centre must sit at or behind the middle of the body.
   - id: DIM-03
     title: Coupling height inside VSB1's 350 to 460 mm towball range, with its tolerance
@@ -231,21 +299,25 @@ trailer_checks:
     min: 350
     max: 460
     severity: fail
+    inputs: [CAR-04]
     why: VSB1 9.3.2 and report 08 (440 mm plus or minus 20 mm).
   - id: DIM-04
     title: Running clearance at least 100 mm, unladen (VSB1 5.4)
     type: clearance_ground
     min: 100
     severity: fail
+    inputs: [CAR-04]
     why: Every part carried by the suspension needs 100 mm of running clearance. The arms, hubs and wheels are not carried by it.
   - id: JK-01
     title: Body front corners and drawbar box clear the Cayenne at a 90 degree jack-knife
     type: jackknife
     min_gap_mm: 100
     severity: fail
+    inputs: [CAR-05]
     why: Plan view at 90 degrees about the ball. 100 mm is this layout's allowance for the unmeasured ball position and the car's rounded corners. The drawbar length is set to meet it.
   - id: JK-02
-    title: Drawbar member to the car's rear corner, plan view (reported)
+    title: Drawbar members and stone guard to the car's rear corner, plan view (reported)
     type: jackknife_aframe
     severity: report
-    why: Reported only. In plan the A-frame meets the car's rear corner before 90 degrees. Whether it touches depends on the bumper height against the drawbar, which nobody has measured yet.
+    inputs: [CAR-05]
+    why: Reported only. In plan the A-frame and the stone guard on it pass under the car's rear corner before 90 degrees. Whether they touch depends on the bumper height against the drawbar, which nobody has measured yet.

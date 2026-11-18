@@ -1,0 +1,127 @@
+---
+title: Whole trailer
+description: The block layout of the whole trailer, with the axle position, the towball load in every load case, the checks, the body length comparison and the inputs for the chassis design.
+tableOfContents: false
+---
+
+import CadViewer from '../../components/CadViewer.astro';
+import Trailer from '../../components/Trailer.astro';
+import t from '../../data/generated/trailer.json';
+import { withBase } from '../../lib/url';
+
+export const n = (v) => Math.round(v).toLocaleString('en-AU');
+export const P = t.params;
+export const ch = t.chassis;
+export const tc = (id) => t.cases.find((c) => c.id === id);
+
+This is the first layout of the whole trailer. It places the <a href={withBase('/garage-bed/')}>garage and bed
+module</a> over the axles and puts every other zone and system around it as blocks. Each block is an envelope with
+a mass, not a design. The point is to find where the axles go, what the car carries on its towball, and what the
+chassis has to be. The design notes are in `TRAILER.md` in the repository, and drawing CT-001 is the general
+arrangement.
+
+<Trailer kind="summary" />
+
+## 3D model
+
+The tree on the left runs by zone, from the drawbar to the living zone. The garage and bed module keeps its own
+groups inside it. Each block's name starts with its line in the mass schedule below.
+
+<CadViewer src={withBase('/models/trailer.json')} height={560} />
+
+The project datum in research report 02 measures X rearward from the ball, Y towards the kerb side and Z up. That
+is a left-handed frame, and CAD programs are right-handed, so this model is the mirror image of the real trailer:
+the garage door shows on the right when you look from behind. Every number is unaffected. Drawing CT-001 mirrors
+the model back, so its views show the trailer as it will be seen.
+
+## The layout and why
+
+From front to back there are the drawbar box with the generator, gas and fuel, then the front utility zone, the
+garage with the bed above it, and the living zone. The front zone holds the kitchen slide-out with the wardrobe
+over it, the washer-dryer, the chest freezer, the diesel heater and hot water unit, and the inverter and
+chargers. It has its own door in the road-side wall. The living zone holds the fridge, the 1 x 1 m wet bathroom
+with its recirculating shower, the desk, the air-conditioner under the desk, and the entry door in the kerb-side
+wall. The water tanks sit between the rails over the axles, so the towball barely changes as the water is used,
+and the 12 kWh battery sits just behind them.
+
+The floor height comes from the running gear in report 06. The tyre is 737.7 mm across, the hubs sit at
+{n(ch.hub_z)} mm, and the XT suspension rises 60 mm at full bump. With 50 mm of clearance above the tyre, the floor
+underside is at {n(ch.floor_underside_z)} mm and the garage floor surface at {n(ch.floor_z)} mm. The rails are
+215 mm above the hubs, at {n(ch.rail_underside_z)} mm, so a {n(ch.raiser_h)} mm raiser fills the gap from the rail
+top to the floor.
+
+The axle group centre is {n(P.axle_x)} mm behind the ball. The build solved it for {n(t.target_kg)} kg on the ball
+fully loaded, the target from report 07, and moved the module, the tanks, the battery and the suspension with it.
+The living zone stopped the garage {n(P.axle_x - P.module_x0 - P.mod_bikes_cog_x)} mm short of sitting exactly
+over the axles, so taking both bikes and their kit out changes the towball by only
+{n(tc('TC2').nominal.towball_kg - tc('TC4').nominal.towball_kg)} kg.
+
+The drawbar is {n(ch.drawbar_length)} mm long from the ball to the body. At a 90 degree jack-knife the drawbar box
+then clears the Cayenne's side by {n(ch.jackknife_box_mm)} mm and the body corners by {n(ch.jackknife_body_mm)} mm.
+
+## Load cases
+
+Mass in kg and the centre of gravity in mm, in the project datum. The towball load comes from moments about the
+axle group centre (MASS-04). The last three columns add the growth allowance from report 02 (MASS-06): 20 % on an
+estimate, 7 % on a calculated mass and nothing on a maker's figure.
+
+<Trailer kind="cases" />
+
+The car's rear axle, by report 07's method with two adults, the rear seats out, a 30 kg towbar and the fully
+loaded towball, carries {n(t.car.rear_kg)} kg before any gear, against its 1,600 kg limit. The car can then carry
+{n(t.car.gear_budget_kg)} kg of gear before its {t.car.binds} binds.
+
+## Checks
+
+The towball limits are design targets from report 07, not legal limits. 280 kg is the car's rating, used as a
+ceiling, and 6 % of the trailer's mass is the floor set for stability. A failed check shows in red. The mass
+checks fail with the growth allowance: the trailer is at its ATM fully loaded before any allowance is added. The
+levers are set out in `TRAILER.md`, and none of them is taken here.
+
+<Trailer kind="checks" />
+
+## Body length
+
+The build lays out all three body lengths from the same blocks and solves the axle for each. Room for both is
+the inside length less the 1,840 mm module.
+
+<Trailer kind="lengths" />
+
+The 5,500 mm body is the shortest that holds every zone. The 5,000 mm body is short, and nothing has been dropped
+to make it fit. These options would shorten the zones. Each is the owner's decision.
+
+<Trailer kind="options" />
+
+## Chassis inputs
+
+The figures the chassis design starts from. Sections are block sizes until the engineer sizes them.
+
+<Trailer kind="chassis" />
+
+### Crossmembers
+
+<Trailer kind="crossmembers" />
+
+No outrigger can pass over the tyres, because the floor is only 50 mm above them at full bump. So outboard of the
+rails nothing supports the floor under the garage. It has to span from the rails to the side walls, or hang from
+the walls, while it carries the bikes' wheels and the chocks.
+
+## Mass schedule
+
+### Tare by group
+
+<Trailer kind="groups" />
+
+### The least certain masses
+
+The estimate lines with the largest growth allowance, and how far each moves the fully loaded towball if it
+comes out 20 % heavier.
+
+<Trailer kind="uncertain" />
+
+### Every line
+
+Each line has its source, its maturity and the load cases it is aboard in (MASS-01 and MASS-02). The garage and
+bed module's lines come from its own bill of materials.
+
+<Trailer kind="schedule" />

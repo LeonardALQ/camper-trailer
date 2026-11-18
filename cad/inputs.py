@@ -1,0 +1,237 @@
+"""Measured inputs (data/measurements.yaml) and the design rules that turn them into parameters.
+
+Each input has an estimate and a measured slot. The value in use is the measured one when present. The rules
+below are the `thresholds` in the data, written out as arithmetic. They re-solve parameters (the bike spacing,
+the garage length, the bed beam height, the towball target, the wheel choice) rather than only flag them, and
+each rule records what it did so the site can show it.
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
+
+import yaml
+
+# Constants of the rules, with their source (DESIGN.md unless stated)
+BASE_SPACING = 760          # bike spacing
+ST_BAR_REACH = 396          # Street Triple bar end from its centreline (owner's 792 mm width / 2)
+CLR03_GAP = 30              # CLR-03 limit
+BASE_GARAGE = 1800
+BASE_BEAM = 1460
+CHOCK_RISE = 25
+BEAM_MARGIN = 45            # 1,460 = 1,390 + 25 + 45
+WALL_Y = -1165              # road-side wall face
+DRIVER_KG = 75              # weighbridge driver (estimate)
+DRIVER_X = 1150             # behind the front axle (report 07 occupant position)
+
+
+@dataclass
+class Input:
+    id: str
+    group: str
+    title: str
+    how: str
+    unit: str
+    estimate: Any
+    estimate_src: str
+    measured: Any
+    measured_date: Any
+    affects: list[str]
+    thresholds: list[dict]
+    extra: dict = field(default_factory=dict)
+
+    @property
+    def status(self) -> str:
+        return "measured" if self.measured is not None else ("estimate" if self.estimate is not None else "unknown")
+
+    @property
+    def value(self):
+        return self.measured if self.measured is not None else self.estimate
+
+
+class Inputs:
+    def __init__(self, root: Path):
+        raw = yaml.safe_load((root / "data" / "measurements.yaml").read_text())
+        self.items: dict[str, Input] = {}
+        for d in raw["inputs"]:
+            known = {"id", "group", "title", "how", "unit", "estimate", "measured", "affects", "thresholds", "order", "stage"}
+            extra = set(d) - known
+            if extra:
+                raise ValueError(f"measurement {d.get('id')}: unknown keys {sorted(extra)}")
+            m = d.get("measured") or {}
+            self.items[d["id"]] = Input(
+                id=d["id"], group=d["group"], title=d["title"], how=d["how"], unit=d["unit"],
+                estimate=d["estimate"].get("v"), estimate_src=d["estimate"].get("src", ""), measured=m.get("v"),
+                measured_date=m.get("date"), affects=d.get("affects", []), thresholds=d.get("thresholds", []),
+                extra={k: d[k] for k in ("order", "stage") if k in d} | ({"note": m["note"]} if m.get("note") else {}))
+        self.outcomes: dict[str, str] = {}
+
+    def v(self, iid):
+        return self.items[iid].value
+
+    def note(self, iid, text):
+        self.outcomes[iid] = text
+
+    # -- the garage and bed module ----------------------------------------------
+    def module_overrides(self, use_solved: bool = True) -> dict[str, float]:
+        """Module parameters that follow from the bike, chock and pannier measurements."""
+        w = self.v("TU-01")
+        half = w / 2
+        limit_half = BASE_SPACING - ST_BAR_REACH - CLR03_GAP
+        fairing_excess = max(0.0, half - limit_half)
+        pegs = (self.v("TU-07") + self.v("ST-01")) / 2
+        peg_excess = max(0.0, pegs - (BASE_SPACING - CLR03_GAP))
+        grow = max(fairing_excess, peg_excess)
+        spacing = BASE_SPACING + grow
+        self.rule_spacing = spacing
+        self.solved = None
+        if grow and use_solved:
+            from .solve import cached
+            self.solved = cached()
+            if self.solved:
+                spacing = self.solved["bike_spacing"]
+        garage = BASE_GARAGE + spacing - BASE_SPACING
+        if fairing_excess:
+            txt = f"{w:.0f} mm is over 668 mm, so the rule grows the spacing by {fairing_excess:.0f} mm to {self.rule_spacing:.0f} mm"
+        else:
+            txt = f"{w:.0f} mm is within 668 mm, so the width keeps the 760 mm spacing"
+        if self.solved:
+            txt += (f". The geometry sets it at {spacing:.0f} mm, where CLR-03 measures {self.solved['clr03_gap']:.1f} mm "
+                    f"({self.solved['governing']}), so the garage is {garage:.0f} mm long")
+        elif grow:
+            txt += f". The geometric solve has not run yet, so the rule's {spacing:.0f} mm is in use"
+        self.note("TU-01", txt)
+        self.note("TU-09", f"crash bar envelope up to {self.v('TU-09'):.0f} mm. CLR-03 and the spacing solve use it")
+        self.note("TU-10", f"widest point at {self.v('TU-10'):.0f} mm, recorded. The envelope is full width over its height")
+        self.note("TU-08", "not known yet")
+        self.note("TU-07", f"half the two peg widths add to {pegs:.0f} mm, {'over' if peg_excess else 'within'} 730 mm")
+        self.note("ST-01", self.outcomes["TU-07"])
+        top = max(self.v("TU-03"), self.v("TU-04"))
+        beam = max(BASE_BEAM, top + CHOCK_RISE + BEAM_MARGIN)
+        gov = "screen" if self.v("TU-03") >= self.v("TU-04") else "folded mirrors"
+        self.note("TU-03", f"the {gov} at {top:.0f} mm need the beam underside at {top + CHOCK_RISE + BEAM_MARGIN:.0f} mm, so it stays at "
+                           f"{beam:.0f} mm" if beam == BASE_BEAM else f"the {gov} at {top:.0f} mm raise the beam underside to {beam:.0f} mm")
+        self.note("TU-04", "below the screen, so the screen sets the beam height" if self.v("TU-04") <= self.v("TU-03")
+                  else "above the screen, so the mirrors set the beam height")
+        nose = self.v("CHK-01")
+        self.note("CHK-01", f"front tyre leading edge at Y {WALL_Y + nose:.0f}")
+        self.note("TU-02", f"Tuareg modelled {self.v('TU-02'):.0f} mm long. CLR-06 measures the gap to the door")
+        self.note("TU-05", f"pannier outer faces {self.v('TU-05') / 2:.0f} mm either side of the bike's centreline")
+        self.note("TU-06", "pannier envelope {:.0f} long and {:.0f} high, front edge {:.0f} behind the front axle, bottom {:.0f} off the floor".format(*self.v("TU-06")))
+        return dict(bike_spacing=spacing, garage_length=garage, beam_underside_z=beam, front_tyre_y=WALL_Y + nose)
+
+    def patch_parts(self, parts: dict):
+        """Bike envelope values that come straight from measurements."""
+        tu = parts["BIKE-TU"].geometry.params
+        est = tu["estimates"]
+        cb = est["crash_bars"]
+        cb["half_width"] = self.v("TU-01") / 2
+        cb["z"] = [cb["z"][0], self.v("TU-09")]
+        est["peg_tip_y"]["v"] = self.v("TU-07") / 2
+        tu["owner"]["width_with_bags"] = self.v("TU-05")
+        L, H, x0, z0 = self.v("TU-06")
+        pn = est["panniers"]
+        pn["outer_y"] = self.v("TU-05") / 2
+        pn["x"] = [x0, x0 + L]
+        pn["z"] = [z0, z0 + H]
+        mz = est["mirror_folded"]["z"]
+        est["mirror_folded"]["z"] = [min(mz[0], self.v("TU-04") - 10), self.v("TU-04")]
+        tu["length"] = self.v("TU-02")
+        tu["owner"]["length"] = self.v("TU-02")
+        tu["screen_top"]["z"] = self.v("TU-03")
+        tu["owner"]["height"] = self.v("TU-03")
+        parts["BIKE-ST"].geometry.params["estimates"]["peg_tip_y"]["v"] = self.v("ST-01") / 2
+
+    # -- the car -------------------------------------------------------------------
+    def car(self, car: dict) -> dict:
+        """The car data with the weighbridge, pin and gear inputs applied."""
+        import copy
+        c = copy.deepcopy(car)
+        F, R = self.v("CAR-01"), self.v("CAR-02")
+        L = c["wheelbase_mm"]["v"]
+        kerb = F + R - DRIVER_KG
+        front = (F - DRIVER_KG * (L - DRIVER_X) / L) / kerb
+        st = "measured" if self.items["CAR-01"].status == "measured" and self.items["CAR-02"].status == "measured" else "estimate"
+        c["kerb_kg"] = {"v": kerb, "src": f"CAR-01 + CAR-02 less a {DRIVER_KG} kg driver ({st})"}
+        c["budget"]["front_share_of_kerb"] = {"v": front, "src": f"From CAR-01 and CAR-02 ({st})"}
+        a = self.v("CAR-05")
+        c["budget"]["ball_behind_axle_mm"] = {"v": a, "src": "CAR-05"}
+        if self.items["CAR-05"].status == "measured":
+            c["ball_behind_axle_mm"] = {"v": [a, a], "src": "CAR-05, measured"}
+        c["budget"]["planned_gear_kg"] = {"v": self.v("CAR-06"), "src": "CAR-06"}
+        self.note("CAR-01", f"kerb mass {kerb:.0f} kg with {100 * front:.1f} % on the front axle")
+        self.note("CAR-02", self.outcomes["CAR-01"])
+        self.note("CAR-05", f"lever arm {a:.0f} mm in the load budget, bumper {a - c['rear_overhang_mm']['v']:.0f} mm ahead of the ball")
+        return c
+
+    def towball_target(self, car: dict, rating: float) -> tuple[float, str]:
+        """Highest towball load keeping the rear axle within its limit with the planned gear, capped at the rating."""
+        from .trailer import car_axles
+        g = car["budget"]["planned_gear_kg"]["v"]
+        lo, hi = 0.0, 600.0
+        for _ in range(60):
+            mid = (lo + hi) / 2
+            ax = car_axles(car, mid)
+            rear = ax["rear_kg"] + g * car["budget"]["gear_behind_front_axle_mm"]["v"] / car["wheelbase_mm"]["v"]
+            if rear <= car["rear_axle_limit_kg"]["v"]:
+                lo = mid
+            else:
+                hi = mid
+        target = min(lo, rating)
+        why = f"{lo:.0f} kg keeps the rear axle at 1,600 kg with {g:.0f} kg of gear" + (f", capped at the {rating:.0f} kg rating" if lo > rating else "")
+        self.note("CAR-06", f"towball target {target:.0f} kg: {why}")
+        return target, why
+
+    # -- the trailer -----------------------------------------------------------------
+    def coupling_z(self) -> float:
+        z = self.v("CAR-04")
+        ok = 370 <= z <= 440
+        self.note("CAR-04", f"coupling point at Z {z:.0f}" + ("" if ok else ", outside 370 to 440 mm: choose a different tongue"))
+        self.note("CAR-03", f"unladen {self.v('CAR-03'):.0f} mm against {z:.0f} mm laden")
+        return z
+
+    def wheel(self, atm: float, towball: float, wheels: dict) -> dict:
+        need = 1.2 * (atm - towball) / 4
+        r = self.v("WHL-01")
+        if r is None:
+            w = dict(wheels["porsche"], confirmed=False)
+            self.note("WHL-01", f"needs {need:.0f} kg per wheel. Porsche's rating is not known, so the plan keeps the Porsche wheel, not confirmed")
+        elif r >= need:
+            w = dict(wheels["porsche"], confirmed=True, rating_kg=r)
+            self.note("WHL-01", f"{r:.0f} kg against {need:.0f} kg needed, so the plan keeps the Porsche wheel")
+        else:
+            w = dict(wheels["fallback"], confirmed=False, switched=True)
+            self.note("WHL-01", f"{r:.0f} kg is below the {need:.0f} kg needed, so the plan changes to {w['name']}: hub spigot "
+                                f"{w['spigot_mm']} mm, offset ET{w['offset_mm']:.0f}. Re-check the brakes and the rail width")
+        w["need_kg"] = need
+        return w
+
+    def supplier(self) -> dict:
+        gtm, incl, coil = self.v("SUP-01"), bool(self.v("SUP-02")), str(self.v("SUP-03"))
+        self.note("SUP-01", f"MAS-02 limit {gtm:.0f} kg")
+        self.note("SUP-02", "ratings include the 120 % rule, so MAS-02 checks the axle load itself" if incl else
+                  "not known to include the 120 % rule, so MAS-02 checks 1.2 times the axle load")
+        air = coil.startswith("33SC-1250")
+        self.note("SUP-03", "the 4,500 kg coils: change to XT Air (report 06)" if air else f"{coil}, the coil build in this layout")
+        return dict(kit_gtm=gtm, includes_120=incl, coil=coil, change_to_air=air)
+
+    def weighed(self) -> list[dict]:
+        """Weighbridge stages, cumulative: the stage's own mass is its reading less the stage before."""
+        out, prev = [], 0.0
+        for iid in ("TW-01", "TW-02", "TW-03"):
+            it = self.items[iid]
+            if it.measured is None:
+                break
+            out.append(dict(id=iid, stage=it.extra["stage"], mass_kg=it.measured - prev))
+            prev = it.measured
+        return out
+
+    def report(self) -> list[dict]:
+        rows = []
+        for it in self.items.values():
+            rows.append(dict(id=it.id, group=it.group, title=it.title, how=it.how, unit=it.unit, estimate=it.estimate,
+                             estimate_src=it.estimate_src, measured=it.measured, measured_date=str(it.measured_date) if it.measured_date else None,
+                             status=it.status, value=it.value, affects=it.affects, thresholds=it.thresholds,
+                             outcome=self.outcomes.get(it.id, ""), **it.extra))
+        return rows

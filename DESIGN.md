@@ -1,17 +1,17 @@
 # Garage and bed module: design v1 (baseline)
 
-Status: concept, revision B, 16 Nov 2026. Revision B came from the first model run: the deck now laps over partition B, the ladder is owner-built to reach the floor, and the note on converting to the trailer datum is corrected. This is the baseline for the 3D model, drawings and website. Items marked OPEN need the owner's decision. Sources are the research reports in `research/` (01 tech stack, 02 design practice, 03 bike restraint and garage, 04 bed and materials, 05 bike geometry).
+Status: concept, revision C, 18 Nov 2026. Revision B came from the first model run: the deck now laps over partition B, the ladder is owner-built to reach the floor, and the note on converting to the trailer datum is corrected. Revision C came from the whole-trailer layout in TRAILER.md: the garage floor height is fixed, the module has its place in the trailer datum, and the Tuareg keeps its panniers on in the garage. This is the baseline for the 3D model, drawings and website. Items marked OPEN need the owner's decision. Sources are the research reports in `research/` (01 tech stack, 02 design practice, 03 bike restraint and garage, 04 bed and materials, 05 bike geometry).
 
 ## Module frame
 
-Until the chassis and coupling are placed, the module uses its own frame. The origin is on the garage floor surface, at the inner face of partition A, on the trailer centreline. X runs along the trailer towards partition B (the living-area side). Y runs across the trailer, positive towards the kerb (left) side, where the garage door is. Z is up from the garage floor. Units are mm. Once the chassis exists, an offset converts this frame to the project datum in 02-design-practice (DIM-01: X from the ball centre, positive rearward). If partition B ends up nearer the front of the trailer than partition A, X also changes sign.
+The module uses its own frame. The origin is on the garage floor surface, at the inner face of partition A, on the trailer centreline. X runs along the trailer towards partition B (the living-area side). Y runs across the trailer, positive towards the kerb (left) side, where the garage door is. Z is up from the garage floor. Units are mm. In the whole trailer (revision C, TRAILER.md) partition A faces the front utility zone and partition B the living zone at the rear, so the axes point the same way as the project datum in 02-design-practice (DIM-01: X from the ball centre, positive rearward). Module X 0 sits at datum X 3,765 and module Z 0 at datum Z 858.
 
 ## Envelope
 
 - Interior width 2,330 mm, so Y runs from -1,165 to +1,165 (2,400 mm body with 35 mm walls).
 - Garage interior length 1,800 mm, X from 0 to 1,800, between partition A (full height) and partition B (up to the deck underside).
 - Ceiling with the roof collapsed at Z = 1,800 (target). The hard limit is 2,000.
-- The garage floor is flat with no wheel arches. Its height above the ground is not fixed yet. Assume 800 to 1,000 mm when sizing the ramp.
+- The garage floor is flat with no wheel arches. Its surface is 858 mm above the ground at design ride height (revision C). The whole-trailer model works it out from the running gear: hubs at 349 mm on the 737.7 mm tyre, 60 mm of bump travel, 50 mm clearance from the tyre at full bump to the floor underside, and a 30 mm floor panel (TRAILER.md). The 3,048 mm ramp then sits at 16.4 degrees, inside the 15 to 19 degrees the 800 to 1,000 mm range gave.
 
 ## Bikes
 
@@ -21,6 +21,7 @@ Until the chassis and coupling are placed, the module uses its own frame. The or
 - Why 760 mm works: the Tuareg's bar ends and handguards sit at about 1,190 to 1,215 mm, which is above the Street Triple's tank (1,007 mm) and bars (1,013 mm). The bars can overlap in plan without touching. The limit is the Street Triple's bar end (396 mm from its centreline, at 1,013 mm) against the Tuareg's fairing and radiator shrouds at the same height. That half-width is estimated at 280 to 350 mm. A full-size mock-up must confirm it before panels are ordered.
 - The Tuareg's mirrors fold down or come off for transport (with mirrors up it is 1,445 mm tall). Its top is then the screen, about 1,390 mm in Aprilia's image (the owner's figure is 1,370 mm). The chock cradle may lift the front wheel by up to 25 mm.
 - Bike geometry comes from `research/05-bike-geometry.yaml`. The owner's overall figures govern where they differ.
+- The Tuareg keeps its Mosko Moto panniers on in the garage (revision C). The owner measured it at about 970 to 980 mm wide with them. Each pannier is modelled as a 457 x 203 x 508 mm envelope from Mosko Moto's Backcountry 30L figures, outer faces 490 mm from the bike's centreline. Their position along the bike and their height are estimates. They weigh about 9 kg with their frames (estimate), carried in the trailer's mass.
 - In the bike frame, x points to the bike's rear, y to the bike's left and z up, with the origin on the ground under the front axle. Placed in the module, bike x becomes module +Y, bike y becomes module +X, and bike z becomes module Z. The front axle sits at Y = -1,115 plus the front overhang (348 mm Tuareg, 300 mm Street Triple).
 
 ## Restraint (research/03)
@@ -70,8 +71,11 @@ Under a fixed bed at 1,460 mm, you would have to walk a bike in stooped. The bas
 | CLR-05 | Mattress top plus 50 mm bedding | at or below Z = 1,800 |
 | CLR-06 | Tuareg rear-most point to the closed door's inner face, owner's 2,220 mm length | gap at least 15 mm |
 | CLR-06b | The same with the photo-measured 2,263 mm length (reported, not a build failure) | report the gap |
+| CLR-08 | Tuareg's panniers to the straps and track fittings (revision C, reported) | report the gap |
 | CON-01 | Chock bases, L-track and floor touch without overlap; beams sit on ledgers; deck sits on beams | touching, no overlap |
 
 ## Mass
 
-Masses come from `garage-bed/BOM.md`. Load cases: module with removable kit fitted and no bikes; both bikes in; bikes out with the removable kit taken out; Tuareg only; Street Triple only.
+Masses come from `garage-bed/BOM.md`. Load cases: module with removable kit fitted and no bikes; both bikes in; bikes out with the removable kit taken out; Tuareg only; Street Triple only. The towball load for each is worked out for the whole trailer in TRAILER.md.
+
+The panniers are part of the Tuareg's envelope, so CLR-03, CLR-04 and CLR-06 cover them.

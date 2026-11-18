@@ -59,7 +59,7 @@ params:
   door_leaf_gap: 3
   cleat_leg: 25
   door_x0: 40
-  door_x1: 1760
+  door_x1: garage_length - 40     # follows the garage length (revision C)
   door_h: 1440
   # Placeholders for items DESIGN.md does not place
   vent_x: 940
@@ -67,7 +67,7 @@ params:
   ladder_y: 800
   ladder_length: 1580      # A-01 rev B: foot about 4 mm above the floor at 15 deg, closed by the rubber feet
   ladder_lean_deg: 15      # A-01 rev B: lean from vertical, into the living area
-  living_floor_x1: 2420    # end of the living-area floor shown under the ladder (display only)
+  living_floor_x1: garage_length + 620    # end of the living-area floor shown under the ladder (display only)
   net_y0: -900
   ground_drop: 858         # garage floor height at design ride height, from the trailer model (TRAILER.md, 857.7 mm). Rev C
 
