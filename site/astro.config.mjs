@@ -17,6 +17,7 @@ export default defineConfig({
         { label: 'Home', link: '/' },
         { label: 'Whole trailer', link: '/trailer/' },
         { label: 'Garage and bed', link: '/garage-bed/' },
+        { label: 'Measurements', link: '/measurements/' },
         { label: 'Drawings', link: '/drawings/' },
         { label: 'Build steps (draft)', items: [{ autogenerate: { directory: 'steps' } }] },
         { label: 'Research', items: [{ autogenerate: { directory: 'research' } }] },

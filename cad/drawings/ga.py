@@ -186,7 +186,9 @@ def ct001(prj, model, bom, checks, reg, dwg):
         "BLOCK LAYOUT. EVERY ITEM IS AN ENVELOPE WITH A MASS. POSITIONS MARKED PLACEHOLDER IN assemblies/trailer.yaml ARE NOT DESIGNED YET.",
         f"AXLE POSITION SOLVED FOR {rep['target_kg']:.0f} kg ON THE BALL FULLY LOADED. CHASSIS SECTIONS ARE BLOCK SIZES FOR THE ENGINEER TO SET.",
         "PHANTOM OUTLINES ON THE PLAN ARE FLOOR SPACE KEPT CLEAR (DOOR LANDINGS, WALKWAY, LADDER LANDING).",
-        "MASS CHECKS MAS-01, MAS-02 AND MAS-06 FAIL WITH THE GROWTH ALLOWANCE. SEE TRAILER.md BEFORE ANY ENGINEER REVIEW.",
+        ("MASS CHECKS " + ", ".join(c["id"] for c in rep["checks"] if c["type"] == "mass" and c["severity"] == "fail" and not c["ok"])
+         + " FAIL WITH THE GROWTH ALLOWANCE. SEE TRAILER.md BEFORE ANY ENGINEER REVIEW.") if any(
+            c["type"] == "mass" and c["severity"] == "fail" and not c["ok"] for c in rep["checks"]) else "EVERY MASS CHECK PASSES.",
     ], width_chars=118, size=1.7)
     S.revision_table(sh, [dict(rev=r["rev"], date=str(r["date"]), description=r["description"], drawn=r["drawn"],
                                checked=r["checked"], approved=r["approved"]) for r in dwg["revisions"]])

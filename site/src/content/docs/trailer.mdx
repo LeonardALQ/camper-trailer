@@ -50,10 +50,15 @@ underside is at {n(ch.floor_underside_z)} mm and the garage floor surface at {n(
 215 mm above the hubs, at {n(ch.rail_underside_z)} mm, so a {n(ch.raiser_h)} mm raiser fills the gap from the rail
 top to the floor.
 
+The garage is {n(t.spacing.garage)} mm long. The owner measured the Tuareg at 585 mm wide across its side panels
+where the Street Triple's bar end sits. That is inside the 668 mm the 760 mm spacing allows, so the bikes stay
+{n(t.spacing.in_use)} mm apart (CLR-03). The <a href={withBase('/measurements/')}>Measurements</a> page
+shows every input like this one and what it drives.
+
 The axle group centre is {n(P.axle_x)} mm behind the ball. The build solved it for {n(t.target_kg)} kg on the ball
 fully loaded, the target from report 07, and moved the module, the tanks, the battery and the suspension with it.
-The living zone stopped the garage {n(P.axle_x - P.module_x0 - P.mod_bikes_cog_x)} mm short of sitting exactly
-over the axles, so taking both bikes and their kit out changes the towball by only
+The living zone stops the garage {n(P.axle_x - P.module_x0 - P.mod_bikes_cog_x)} mm short of sitting exactly
+over the axles, so taking both bikes and their kit out changes the towball by
 {n(tc('TC2').nominal.towball_kg - tc('TC4').nominal.towball_kg)} kg.
 
 The drawbar is {n(ch.drawbar_length)} mm long from the ball to the body. At a 90 degree jack-knife the drawbar box
@@ -73,7 +78,10 @@ loaded towball, carries {n(t.car.rear_kg)} kg before any gear, against its 1,600
 
 ## Checks
 
-The towball limits are design targets from report 07, not legal limits. 280 kg is the car's rating, used as a
+The trailer is to be registered in NSW. The NSW examiner caps GTM at the lowest of the tyre, coupling, chain and
+brake ratings ({n(t.caps.gtm)} kg here) and ATM at the lower of the coupling and chain ratings ({n(t.caps.atm)} kg),
+and MAS-07 and MAS-08 check against those caps. The towball limits are design targets from report 07, not legal
+limits. 280 kg is the car's rating, used as a
 ceiling, and 6 % of the trailer's mass is the floor set for stability. A failed check shows in red. The mass
 checks fail with the growth allowance: the trailer is at its ATM fully loaded before any allowance is added. The
 levers are set out in `TRAILER.md`, and none of them is taken here.
@@ -83,12 +91,12 @@ levers are set out in `TRAILER.md`, and none of them is taken here.
 ## Body length
 
 The build lays out all three body lengths from the same blocks and solves the axle for each. Room for both is
-the inside length less the 1,840 mm module.
+the inside length less the {n(t.zones.garage)} mm module.
 
 <Trailer kind="lengths" />
 
-The 5,500 mm body is the shortest that holds every zone. The 5,000 mm body is short, and nothing has been dropped
-to make it fit. These options would shorten the zones. Each is the owner's decision.
+The {n(t.recommended.body_length)} mm body is the shortest that holds every zone. The 5,000 mm body is short, and
+nothing has been dropped to make it fit. These options would shorten the zones. Each is the owner's decision.
 
 <Trailer kind="options" />
 

@@ -102,9 +102,9 @@ class Inputs:
         elif grow:
             txt += f". The geometric solve has not run yet, so the rule's {spacing:.0f} mm is in use"
         self.note("TU-01", txt)
-        self.note("TU-09", f"crash bar envelope up to {self.v('TU-09'):.0f} mm. CLR-03 and the spacing solve use it")
-        self.note("TU-10", f"widest point at {self.v('TU-10'):.0f} mm, recorded. The envelope is full width over its height")
-        self.note("TU-08", "not known yet")
+        cb_top = self.v("TU-09")
+        self.note("TU-09", f"crash bar envelope up to {cb_top:.0f} mm, " + ("below 970 mm, so the Street Triple's bar end passes over it"
+                  if cb_top <= 970 else "above 970 mm, so the bars may meet the Street Triple's bar end. The spacing solve re-measures it"))
         self.note("TU-07", f"half the two peg widths add to {pegs:.0f} mm, {'over' if peg_excess else 'within'} 730 mm")
         self.note("ST-01", self.outcomes["TU-07"])
         top = max(self.v("TU-03"), self.v("TU-04"))
@@ -125,8 +125,8 @@ class Inputs:
         """Bike envelope values that come straight from measurements."""
         tu = parts["BIKE-TU"].geometry.params
         est = tu["estimates"]
+        est["fairing_half_width"]["v"] = self.v("TU-01") / 2
         cb = est["crash_bars"]
-        cb["half_width"] = self.v("TU-01") / 2
         cb["z"] = [cb["z"][0], self.v("TU-09")]
         est["peg_tip_y"]["v"] = self.v("TU-07") / 2
         tu["owner"]["width_with_bags"] = self.v("TU-05")

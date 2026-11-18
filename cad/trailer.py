@@ -749,8 +749,9 @@ class Trailer:
                         if worst is None or m < worst[0]:
                             worst = (m, cid, bs, v)
                 m, cid, bs, v = worst
-                lim = " to ".join(f"{x:g}" for x in (c.min, c.max) if x is not None) if c.min is not None and c.max is not None else \
-                    (f"<= {c.max:g}" if c.max is not None else f">= {c.min:g}")
+                g = lambda x: f"{round(x):,}" if abs(x) >= 100 else f"{x:g}"  # noqa: E731
+                lim = " to ".join(g(x) for x in (c.min, c.max) if x is not None) if c.min is not None and c.max is not None else \
+                    (f"<= {g(c.max)}" if c.max is not None else f">= {g(c.min)}")
                 if factor != 1.0:
                     lim += " (1.2 x the axle load)"
                 row.update(limit=f"{lim} {unit}", measured=round(v, 1), unit=unit, margin=round(m, 1), ok=m >= -1e-6,

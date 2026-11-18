@@ -14,6 +14,7 @@ const pages = [
   { path: '/garage-bed/', viewer: true, theme: 'dark' },
   { path: '/trailer/', viewer: true },
   { path: '/trailer/', viewer: true, theme: 'dark' },
+  { path: '/measurements/', viewer: false },
   { path: `/steps/${steps.find((s) => s.startsWith('03'))}/`, viewer: true },
   { path: '/drawings/', viewer: false },
   { path: '/research/03-bike-restraint-garage/', viewer: false },

@@ -39,7 +39,7 @@ checks:
     min_gap_mm: 30
     severity: fail
     inputs: [TU-01, TU-05, TU-07, ST-01]
-    why: The governing pair is expected to be the Street Triple's right bar end against the Tuareg's fairing and radiator shrouds (half-width estimate 300 mm).
+    why: The governing pair is expected to be the Street Triple's right bar end against the Tuareg's side panels. The owner measured the Tuareg 585 mm wide at that spot (measurements.yaml TU-01), so the half-width is 292.5 mm.
   - id: CLR-04
     title: Each bike to partitions and side walls, door closed
     type: clearance

@@ -1,6 +1,7 @@
 ---
 // Whole-trailer tables, from build/trailer/trailer.json (cad/trailer.py).
 import t from '../data/generated/trailer.json';
+import { withBase } from '../lib/url';
 
 interface Props {
   kind: 'summary' | 'cases' | 'checks' | 'lengths' | 'options' | 'chassis' | 'crossmembers' | 'groups' | 'uncertain' | 'schedule';
@@ -63,12 +64,13 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
 {kind === 'checks' && (
   <div class="data-table">
     <table>
-      <thead><tr><th>ID</th><th>Check</th><th>Limit</th><th>Measured</th><th>Result</th><th>Detail</th></tr></thead>
+      <thead><tr><th>ID</th><th>Check</th><th>Limit</th><th>Measured</th><th>Result</th><th>Detail</th><th>Inputs</th></tr></thead>
       <tbody>
         {r.checks.map((c: any) => (
           <tr class={rowClass(c)}>
             <td>{c.id}</td><td>{c.title}</td><td>{c.limit}</td><td>{measured(c)}</td>
             <td class={statusClass(c)}>{c.status}{c.severity === 'report' ? ' (reported only)' : ''}</td><td>{c.detail}</td>
+            <td>{(c.inputs ?? []).map((i: string, k: number) => (<>{k ? ', ' : ''}<a href={withBase(`/measurements/#${i.toLowerCase()}`)}>{i}</a></>))}</td>
           </tr>
         ))}
       </tbody>

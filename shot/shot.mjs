@@ -14,6 +14,8 @@ const jobs = [
   { path: '/', name: 'home', full: true },
   { path: '/garage-bed/', name: 'garage-bed', viewer: true, sections: ['checks', 'mass-and-centre-of-gravity', 'bill-of-materials'] },
   { path: '/trailer/', name: 'trailer', viewer: true, full: true, sections: ['load-cases', 'checks', 'body-length', 'chassis-inputs'] },
+  { path: '/measurements/', name: 'measurements', full: true },
+  { path: '/measurements/', name: 'measurements-dark', full: true, theme: 'dark' },
   { path: '/trailer/', name: 'trailer-dark', viewer: true, full: true, theme: 'dark', sections: ['load-cases', 'checks'] },
   { path: `/steps/${pick('03')}/`, name: 'step-03', viewer: true, full: true },
   { path: `/steps/${pick('10')}/`, name: 'step-10', viewer: true },
