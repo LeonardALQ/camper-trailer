@@ -22,6 +22,9 @@ RESEARCH = [
     ("03-bike-restraint-garage.md", "Bike restraint and garage fit-out", 3),
     ("04-bed-and-materials.md", "Bed above the bikes, and build materials", 4),
     ("05-bike-geometry.md", "Bike geometry for envelope models", 5),
+    ("06-trailer-running-gear.md", "Trailer running gear: suspension, hubs, brakes and sway control", 6),
+    ("07-tow-vehicle.md", "Tow vehicle: the 2013 Porsche Cayenne GTS (958)", 7),
+    ("08-coupling-and-hitch.md", "Coupling and hitch", 8),
 ]
 
 
