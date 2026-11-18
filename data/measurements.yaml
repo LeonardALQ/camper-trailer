@@ -95,21 +95,21 @@ inputs:
       - {rule: "The requirement is VSB1's 120 % rule on the axle load at ATM: 1.2 x (ATM less the towball target) / 4, worked out from the current values. At or above it the plan keeps the Porsche wheel. Below it the plan changes to a rated 5 x 130 aftermarket wheel and flags the hub spigot and offset that follow. Unknown keeps the Porsche wheel and flags it as not confirmed", src: "VSB1 Rev 6 axles and suspension, report 06 section 3"}
   - id: SUP-01
     group: Wheel and suppliers
-    title: Cruisemaster's GTM for the chosen XT coil build
-    how: Cruisemaster's written answer to report 06 open question 2, for the real masses.
+    title: Cruisemaster's GTM for the chosen XT build
+    how: Cruisemaster sets it in the design session. It has said it will design to VSB1's 120 % rule (18 Nov).
     unit: kg
     estimate: {v: 3330, src: "Cruisemaster coil guide sheet 6: 3,700 kg ATM tandem build, 3,330 kg GTM"}
     measured: {v: null, date: null}
     affects: [MAS-02]
     thresholds:
-      - {rule: "The axle group load in MAS-02 is checked against this rating", src: "Report 06"}
+      - {rule: "The axle group load in MAS-02 is checked against this rating. VSB1's 120 % rule at the ATM needs 1.2 x (ATM less the towball target), worked out from the current values", src: "Report 06, VSB1 Rev 6 axles and suspension"}
   - id: SUP-02
     group: Wheel and suppliers
     title: Do Cruisemaster's ratings already include VSB1's 120 % rule? (1 for yes, 0 for no)
     how: Cruisemaster's written answer to report 06 open question 2.
     unit: yes or no
     estimate: {v: 0, src: "Not known. Taken as no, which is the safe side (report 06)"}
-    measured: {v: null, date: null}
+    measured: {v: 0, date: 2026-11-18, note: "Cruisemaster: it does not usually apply VSB1's rules, but will follow them in the design with the owner"}
     affects: [MAS-02]
     thresholds:
       - {at: 0, rule: "No: MAS-02 checks 1.2 times the axle group load against the kit's GTM. Yes: it checks the axle group load itself", src: "VSB1 Rev 6 axles and suspension, report 06"}
@@ -119,10 +119,20 @@ inputs:
     how: Cruisemaster's written answer to report 06 open question 2.
     unit: part number
     estimate: {v: 33SC-950, src: "Coil guide: 33SC-950 with the 33SC-107 bump stop for the 3,700 kg tandem build"}
-    measured: {v: null, date: null}
+    measured: {v: 33SC-950, date: 2026-11-18, note: "Cruisemaster confirmed the 33SC-950 coil with the 33SC-107 bump stop for these masses"}
     affects: [suspension type]
     thresholds:
       - {at: 33SC-1250-1400, rule: "If Cruisemaster can only meet the plate with the 4,500 kg coils, change to XT Air (report 06 section 2). The plan flags it", src: "Report 06"}
+  - id: SUP-04
+    group: Wheel and suppliers
+    title: Cruisemaster's C/F for the ET53 wheel, from the rail's outside face to the hub face
+    how: Cruisemaster sets it in the design session from the wheel's offset and the track.
+    unit: mm
+    estimate: {v: 240, src: "Report 06: Cruisemaster allows 175 to 260 mm with 12 inch brakes. 240 mm used until Cruisemaster sets it"}
+    measured: {v: null, date: null}
+    affects: [rail width, chassis inputs]
+    thresholds:
+      - {rule: "The rail outer width follows from it: track - 2 x (C/F - ET). The tyre's inner sidewall then sits C/F - ET - half the tyre width outside the rail, and report 06 asks for about 40 mm", src: "Report 06 sections 3 and 8"}
 
   # ================================================================ the bikes and the chock (DESIGN.md, report 05)
   - id: TU-01

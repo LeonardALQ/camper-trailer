@@ -36,6 +36,10 @@ On the roof are four 400 W panels in two rows. The awning runs along the kerb si
 
 The running gear is report 06's package: a Cruisemaster XT Freestyle coil tandem with standard arms, 12 inch ABS-enabled electric drums and Bosch TSC. The kit weighs about 180 kg (retailer figure). The axles are 830 mm apart, which suits tyres up to 760 mm. The hubs sit 215 mm below the rail underside at rated load, so the rail underside is at Z 564. The Porsche 8J x 18 ET53 wheel stays a parameter because its load rating is not published yet (report 07).
 
+Cruisemaster answered the supplier questions on 18 Nov. It will make the 5 x 130 hubs with custom-machined studs, cut to the thickness of the wheel's mounting pad so the nuts get full thread engagement, and the pattern clears the ABS tone ring and wheel speed sensor. It will check the C/F against the wheel's ET53 offset (input SUP-04). It confirmed the 33SC-950 coil with the 33SC-107 bump stop for these masses. Its ratings do not include VSB1's 120 % rule, but it will design to the rule. The owner may do the physical installation of the Bosch TSC. Lead time is 6 to 8 weeks after a design session in which Cruisemaster measures the wheel, so the wheel has to be chosen and on hand before that session.
+
+The coil answer and the 120 % answer pull against each other. At the 3,500 kg ATM with 221 kg on the ball, the rule needs 3,935 kg on the axle group, 1,968 kg per axle. The 3,700 kg coil build is rated 3,330 kg (1,665 kg per axle), 605 kg short. On Cruisemaster's published ratings only the 4,500 kg build meets the rule (4,050 kg, 2,025 kg per axle), and report 06 found its coils too stiff for this trailer, so it changes to XT Air in that case. The figure is set by the plated ATM, so lighter mass estimates do not change it. The design session settles it.
+
 The coupling is a Cruisemaster DO35 V3Plus with its coupling point at 440 mm, plus or minus 20 mm, at the car's Normal level (report 08). The drawbar members run under the main rails, so the coupling end starts 150 mm below the rail underside. The coupling point is only 124 mm below the rail underside, so no cranked drawbar is needed. The DO35's under-mount offset, measured on a real coupling, decides the packer.
 
 The drawbar is 1,820 mm from the ball to the body front. At a 90 degree jack-knife in plan, the body's front corners then stand 850 mm clear of the Cayenne's side, and the drawbar box 100 mm clear. The box sets the length: its front face has to be outside the car's 970 mm half-width. The 100 mm is this layout's allowance for the unmeasured ball position and the car's rounded corners. Two things limit the jack-knife sooner. In plan, the car's rear corner passes over the drawbar members from 75 degrees and over the stone guard from 49 degrees, depending on how far the ball sits behind the car's axle. Whether they touch depends on the bumper height against the drawbar, which nobody has measured. Cruisemaster also quotes the DO35 at "at least 70 degrees" in yaw, so the coupling may stop the turn before 90 degrees.
@@ -70,7 +74,7 @@ The car's rear axle, by report 07's load budget method: the car's DIN kerb mass 
 
 The tare is 2,530 kg: drawbar and coupling 199, chassis 380, running gear 288, body 670, roof 90, under the floor 170, front zone 300, living zone 247 and the module 186.
 
-The trailer fails its mass checks. Fully loaded with 400 L of water it weighs 3,504 kg, 4 kg over the 3,500 kg ATM before any growth allowance. With the allowance it weighs 3,991 kg, 491 kg over. The axle group then carries 3,729 kg, which is 229 kg over the NSW examiner's 3,500 kg GTM cap and 399 kg over the kit's 3,330 kg GTM. Until Cruisemaster says its rating already includes VSB1's 120 % rule, MAS-02 checks 1.2 times that load, 4,475 kg. Each tyre would need 1,119 kg under the 120 % rule against the tyre's 1,030 kg. Even the highway case with 50 L of water is 141 kg over the ATM with growth. No body length passes, because the 5,000 mm body saves only 44 kg.
+The trailer fails its mass checks. Fully loaded with 400 L of water it weighs 3,504 kg, 4 kg over the 3,500 kg ATM before any growth allowance. With the allowance it weighs 3,991 kg, 491 kg over. The axle group then carries 3,729 kg, which is 229 kg over the NSW examiner's 3,500 kg GTM cap and 399 kg over the kit's 3,330 kg GTM. Cruisemaster's ratings do not include VSB1's 120 % rule, so MAS-02 checks 1.2 times that load, 4,475 kg. Each tyre would need 1,119 kg under the 120 % rule against the tyre's 1,030 kg. Even the highway case with 50 L of water is 141 kg over the ATM with growth. No body length passes, because the 5,000 mm body saves only 44 kg.
 
 The water is the largest single variable, at 1 kg per litre. The fully loaded case meets the ATM without growth at 396 L. With growth it cannot be met by water alone, because the allowance (487 kg) is larger than the water. The allowance shrinks as estimates become maker figures and weighed parts (0 %), so the real question is how much of the 2,410 kg of estimated mass in the fully loaded trailer turns out lighter or heavier. These five lines carry the largest allowances. The towball change is for the line coming out 20 % heavier, fully loaded.
 
@@ -119,7 +123,7 @@ These are the figures the chassis design starts from. Sections are block sizes u
 
 | Input | Value |
 |---|---|
-| Rail outer width at the XT hinges | 1,286 mm, which gives the Cayenne's 1,660 mm track with C/F 240 and ET53. A 2,000 mm track needs 1,626 mm. Cruisemaster's minimum is 1,150 mm |
+| Rail outer width at the XT hinges | 1,286 mm, which gives the Cayenne's 1,660 mm track with C/F 240 (input SUP-04) and ET53. A 2,000 mm track needs 1,626 mm. Cruisemaster's minimum is 1,150 mm |
 | Rails | Two 150 x 50 mm rails (block size, report 08), 5,500 mm long from X 1,820 to 7,320. 1,186 mm inside, centres 1,236 mm apart |
 | Rail underside and top | Z 564 and Z 714 |
 | Raiser height | 114 mm, rail top to the floor underside at Z 828 |
@@ -148,7 +152,7 @@ The whole-trailer checks are in `data/checks.yaml` under `trailer_checks`. The t
 | ID | Check | Result |
 |---|---|---|
 | MAS-01 | Mass with growth within the 3,500 kg ATM | FAIL, 3,991 kg fully loaded |
-| MAS-02 | Axle group with growth, times 1.2 unless Cruisemaster's rating includes the 120 % rule, within the kit's 3,330 kg GTM | FAIL, 4,475 kg fully loaded |
+| MAS-02 | Axle group with growth, times 1.2 because Cruisemaster's ratings do not include the 120 % rule, within the kit's 3,330 kg GTM | FAIL, 4,475 kg fully loaded |
 | MAS-03 | Towball never above 280 kg, with and without growth | PASS, 276 kg Tuareg only with growth |
 | MAS-04 | Towball at least 6 % in every case | PASS, 6.2 % Street Triple only |
 | MAS-05 | Towball within 10 kg of the 221 kg target fully loaded | PASS, 221 kg |
@@ -183,7 +187,7 @@ Every value the owner will measure later is an input in `data/measurements.yaml`
 
 The rules re-solve the plan rather than raise flags. The towball target follows the car's weighbridge figures, the ball position and the planned gear. The Tuareg's width at the Street Triple's bar end sets the bike spacing: at or below 668 mm the 760 mm spacing holds, and above it the spacing grows by the excess, the build finds the smallest spacing at which CLR-03 measures 30 mm, and the garage, the module and the axle position follow. Porsche's wheel rating decides between the Porsche wheel and a rated 5 x 130 aftermarket wheel. Cruisemaster's answers set the kit GTM and whether MAS-02 applies the 120 % rule. Weighbridge figures at each build stage replace the estimates for the parts already built.
 
-Two inputs are measured so far. The Tuareg is 585 mm wide across its side panels at the Street Triple's bar end (owner, 18 Nov), inside the 668 mm threshold, so the spacing stays at 760 mm and the garage at 1,800 mm. CLR-03 measures 71.5 mm, governed by the Street Triple's right bar end against the Tuareg's side panels. The Tuareg is 980 mm wide over its panniers (owner). The crash bars are modelled as a 965 mm wide box up to 900 mm (estimate), because the owner says they sit much lower than the Street Triple's bar end at about 1,010 mm. If their measured top comes out above 970 mm, the spacing solve re-measures them.
+Four inputs have answers so far. The Tuareg is 585 mm wide across its side panels at the Street Triple's bar end (owner, 18 Nov), inside the 668 mm threshold, so the spacing stays at 760 mm and the garage at 1,800 mm. CLR-03 measures 71.5 mm, governed by the Street Triple's right bar end against the Tuareg's side panels. The Tuareg is 980 mm wide over its panniers (owner). Cruisemaster confirmed the 33SC-950 coil (SUP-03) and said its ratings do not include the 120 % rule (SUP-02). The crash bars are modelled as a 965 mm wide box up to 900 mm (estimate), because the owner says they sit much lower than the Street Triple's bar end at about 1,010 mm. If their measured top comes out above 970 mm, the spacing solve re-measures them.
 
 The bed beams were sized for the 1,800 mm span. BED-01 reports their sag under 255 kg spread over the bed: 5.1 mm at 1,800 mm, with a bending stress of 26 MPa. It follows the span if the spacing ever grows.
 
@@ -201,5 +205,5 @@ The older model assumed a 6,000 mm body, 140 kg on the ball, a garage floor at 1
 6. The real space between the rails around the XT coils and shocks, from Cruisemaster's kit drawing, for the tanks and the battery.
 7. The car's rear bumper height and corner shape, and the ball position, for the jack-knife.
 8. A spare wheel. The trailer shares the Cayenne's wheel, so one spare could serve both. None is in the mass.
-9. The Porsche 8J x 18 wheel's load rating (reports 06 and 07). Each wheel needs about 984 kg under the 120 % rule at the ATM.
-10. Cruisemaster's GTM for the real masses, its coil choice and whether its ratings include VSB1's 120 % rule (inputs SUP-01 to SUP-03).
+9. The Porsche 8J x 18 wheel's load rating (reports 06 and 07). Each wheel needs about 984 kg under the 120 % rule at the ATM. It now comes before the Cruisemaster design session, because Cruisemaster measures the chosen wheel there.
+10. The axle rating. Cruisemaster will design to the 120 % rule, which needs 1,968 kg per axle. The design session decides whether the 33SC-950 coil build can be rated to that or the kit changes to the 4,500 kg build, which report 06 would take as XT Air (inputs SUP-01 and SUP-03). The C/F for the ET53 wheel comes from the same session (SUP-04).

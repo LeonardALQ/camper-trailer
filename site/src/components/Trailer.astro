@@ -126,7 +126,7 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
     <table>
       <thead><tr><th>Input</th><th class="num">Value</th><th>Basis</th></tr></thead>
       <tbody>
-        <tr><td>Rail outer width at the XT hinges</td><td class="num">{n(ch.rail_outer_width)} mm</td><td>Matches the car's {n(ch.track)} mm track with C/F 240 and ET53. A {n(ch.wide_track)} mm track needs {n(ch.rail_outer_width_wide_track)} mm (OPEN). Cruisemaster's minimum is 1,150 mm</td></tr>
+        <tr><td>Rail outer width at the XT hinges</td><td class="num">{n(ch.rail_outer_width)} mm</td><td>Matches the car's {n(ch.track)} mm track with C/F {n(ch.cf)} (SUP-04) and ET{n(ch.wheel_offset)}. A {n(ch.wide_track)} mm track needs {n(ch.rail_outer_width_wide_track)} mm (OPEN). Cruisemaster's minimum is 1,150 mm</td></tr>
         <tr><td>Rail inside width and centres</td><td class="num">{n(ch.rail_inner_width)} / {n(ch.rail_centres)} mm</td><td>50 mm wide rails</td></tr>
         <tr><td>Main rails</td><td class="num">{n(ch.rail_length)} mm</td><td>X {n(ch.rail_x0)} to {n(ch.rail_x1)}, the full body length. Section {ch.rail_section}</td></tr>
         <tr><td>Rail underside and top</td><td class="num">Z {n(ch.rail_underside_z)} / {n(ch.rail_top_z)}</td><td>Hub 215 mm below the rail underside at rated load (Cruisemaster), static loaded radius 349 mm (estimate)</td></tr>

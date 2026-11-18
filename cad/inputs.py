@@ -207,14 +207,24 @@ class Inputs:
         w["need_kg"] = need
         return w
 
-    def supplier(self) -> dict:
+    def supplier(self, atm: float, towball: float) -> dict:
         gtm, incl, coil = self.v("SUP-01"), bool(self.v("SUP-02")), str(self.v("SUP-03"))
-        self.note("SUP-01", f"MAS-02 limit {gtm:.0f} kg")
+        need = 1.2 * (atm - towball)
+        short = f", {need - gtm:.0f} kg short" if gtm < need else ""
+        self.note("SUP-01", f"MAS-02 limit {gtm:.0f} kg. The 120 % rule at the ATM needs {need:.0f} kg, {need / 2:.0f} kg per axle{short}")
+        answered = self.items["SUP-02"].status == "measured"
         self.note("SUP-02", "ratings include the 120 % rule, so MAS-02 checks the axle load itself" if incl else
-                  "not known to include the 120 % rule, so MAS-02 checks 1.2 times the axle load")
+                  f"{'ratings do not' if answered else 'not known to'} include the 120 % rule, so MAS-02 checks 1.2 times the axle load")
         air = coil.startswith("33SC-1250")
         self.note("SUP-03", "the 4,500 kg coils: change to XT Air (report 06)" if air else f"{coil}, the coil build in this layout")
-        return dict(kit_gtm=gtm, includes_120=incl, coil=coil, change_to_air=air)
+        return dict(kit_gtm=gtm, includes_120=incl, coil=coil, change_to_air=air, need_kg=need)
+
+    def cf(self, offset: float, tyre_section: float) -> float:
+        cf = self.v("SUP-04")
+        side = cf - offset - tyre_section / 2
+        self.note("SUP-04", f"C/F {cf:.0f} mm with ET{offset:.0f}: the tyre's inner sidewall sits {side:.0f} mm outside the rail"
+                            + (", under the 40 mm report 06 asks for" if side < 40 else ""))
+        return cf
 
     def weighed(self) -> list[dict]:
         """Weighbridge stages, cumulative: the stage's own mass is its reading less the stage before."""

@@ -566,12 +566,14 @@ class Trailer:
         inp = self.inputs = prj.inputs
         self.car = inp.car(prj.load.car)
         self.target, self.target_why = inp.towball_target(self.car, self.car["towball_rating_kg"]["v"])
-        self.supplier = inp.supplier()
         atm = self.car["braked_towing_kg"]["v"]
+        self.supplier = inp.supplier(atm, self.target)
         self.wheel = inp.wheel(atm, self.target, self.td["wheels"])
         self.base.setdefault("coupling_z", inp.coupling_z())
         if self.wheel.get("switched"):
             self.base.setdefault("wheel_offset", self.wheel["offset_mm"])
+        offset = self.base.get("wheel_offset", self.td["params"]["wheel_offset"])
+        self.base.setdefault("cf", inp.cf(offset, self.td["params"]["tyre_section"]))
         self.weighed = inp.weighed()
         self.weighed_rows: list[dict] = []
         self.target_case = next(c for c in self.cases if c.towball_target)
@@ -930,6 +932,7 @@ def chassis_inputs(tr: Trailer, ev: dict) -> dict:
         datum="X from the ball centre, positive rearward. Y from the centreline, positive to the kerb side. Z up from the ground at design ride height.",
         rail_outer_width=V["rail_outer_w"], rail_inner_width=2 * V["rail_in"], rail_centres=2 * V["rail_c"],
         rail_outer_width_wide_track=alt_track - 2 * (V["cf"] - V["wheel_offset"]), track=V["track"], wide_track=alt_track,
+        cf=V["cf"], wheel_offset=V["wheel_offset"],
         rail_section=f"{V['rail_h']:.0f} x {V['rail_w']:.0f} mm block size (the engineer sizes it)",
         rail_x0=V["body_x0"], rail_x1=V["body_x1"], rail_length=V["body_length"],
         rail_underside_z=V["rail_underside_z"], rail_top_z=V["rail_top_z"], raiser_h=V["raiser_h"],
