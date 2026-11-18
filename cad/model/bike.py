@@ -170,6 +170,13 @@ def tuareg(g, prm) -> BikeModel:
     fx, fy, fz = ss["foot"]
     solids["side stand foot"] = box_span(fy - 10, fy + 40, fx - 35, fx + 35, fz - 8, fz + 8)
 
+    # Mosko Moto panniers, left on in the garage (outer width owner's measurement, size Mosko Moto's, position estimated)
+    pn = est.get("panniers")
+    if pn:
+        for s, nm in ((1, "left"), (-1, "right")):
+            y0, y1 = sorted((s * (pn["outer_y"] - pn["thickness"]), s * pn["outer_y"]))
+            solids[f"pannier {nm} (Mosko Moto)"] = box_span(y0, y1, pn["x"][0], pn["x"][1], pn["z"][0], pn["z"][1])
+
     tyd = prm["tie_down_y"]
     td = g["tie_downs"]
     tie = {

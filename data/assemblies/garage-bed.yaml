@@ -82,6 +82,8 @@ items:
      bike: {centre_x: tuareg_x, front_tyre_y: front_tyre_y, front_rise: chock_rise, length: 2263}}
   - {ref: TU-1390, part: BIKE-TU, group: bikes, label: "Tuareg with the photo-measured 1,390 mm screen", check_only: true,
      bike: {centre_x: tuareg_x, front_tyre_y: front_tyre_y, front_rise: chock_rise, screen_top_z: 1390}}
+  - {ref: TU-BAGS, part: BIKE-TU, group: bikes, label: "Tuareg's Mosko Moto panniers on their own", check_only: true,
+     bike: {centre_x: tuareg_x, front_tyre_y: front_tyre_y, front_rise: chock_rise, luggage_only: true}}
 
   # ---------------------------------------------------------------- partitions
   - {ref: "1", part: P-01, group: partitions, label: Partition A (full height), step: S05,

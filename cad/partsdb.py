@@ -144,8 +144,26 @@ class Check(Strict):
     why: str
 
 
+class TrailerCheck(Strict):
+    """A whole-trailer check, measured on the block layout (cad/trailer.py)."""
+    id: str
+    title: str
+    type: Literal["mass", "car_axle", "fit", "tyre", "width", "overhang", "coupling", "clearance_ground",
+                  "jackknife", "jackknife_aframe"]
+    quantity: Literal["mass", "axle", "towball", "towball_pct", "tyre_load"] | None = None
+    basis: Literal["nominal", "growth", "both"] = "nominal"
+    cases: Literal["all"] | list[str] = "all"
+    zone: str | None = None
+    min: float | None = None
+    max: float | None = None
+    min_gap_mm: float | None = None
+    severity: Literal["fail", "report"]
+    why: str
+
+
 class ChecksFile(Strict):
     checks: list[Check]
+    trailer_checks: list[TrailerCheck] = []
 
 
 class LoadCase(Strict):
@@ -160,9 +178,23 @@ class Towball(Strict):
     note: str
 
 
+class TrailerCase(Strict):
+    id: str
+    name: str
+    aboard: str
+    module: Literal["all", "fixed_only"]
+    bikes: list[str]
+    water_l: Any
+    load: list[Literal["gas", "fuel", "gear", "luggage"]]
+    towball_target: bool = False
+
+
 class LoadCasesFile(Strict):
     load_cases: list[LoadCase]
     towball: Towball
+    trailer_cases: list[TrailerCase] = []
+    towball_target_kg: float | None = None
+    car: dict[str, Any] = {}
 
 
 class Revision(Strict):
@@ -320,7 +352,9 @@ class Project:
                 p.id, p.group = pid, pf.group
                 self.parts[pid] = p
         self.assembly = AssemblyDef.model_validate(yaml.safe_load((data / "assemblies" / "garage-bed.yaml").read_text()))
-        self.checks = ChecksFile.model_validate(yaml.safe_load((data / "checks.yaml").read_text())).checks
+        cf = ChecksFile.model_validate(yaml.safe_load((data / "checks.yaml").read_text()))
+        self.checks = cf.checks
+        self.trailer_checks = cf.trailer_checks
         self.load = LoadCasesFile.model_validate(yaml.safe_load((data / "load_cases.yaml").read_text()))
         self.drawings = DrawingsFile.model_validate(yaml.safe_load((data / "drawings.yaml").read_text()))
         self.steps = StepsFile.model_validate(yaml.safe_load((data / "steps.yaml").read_text())).steps

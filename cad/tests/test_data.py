@@ -47,6 +47,12 @@ def test_tuareg_mirrors_not_above_screen():
         assert s[f"mirror {side} (folded)"].bounding_box().max.Z <= screen
 
 
+def test_tuareg_width_with_bags_matches_owner():
+    b = MODEL.built["TU"]
+    got, want = b.info["width_with_bags"], b.info["owner"]["width_with_bags"]
+    assert abs(got - want) <= 10, f"Tuareg with panniers: model {got:.1f} mm wide, owner {want} mm"
+
+
 @pytest.mark.parametrize("key", list(BOM_MD))
 def test_mass_matches_bom_md(key):
     """Each line rounded to 0.1 kg (as BOM.md rounds them) must sum to the BOM.md total, and the

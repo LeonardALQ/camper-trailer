@@ -66,13 +66,21 @@ class Model:
                 prm[k] = sp[k]
         model = build_bike(geo05, prm)
         pb = place_bike(model, sp["centre_x"], sp["front_tyre_y"], prm["front_overhang"], sp["front_rise"])
+        if sp.get("luggage_only"):
+            # check-only copy that holds just the luggage, for checks that must not see the bike itself
+            model.solids = {k: v for k, v in model.solids.items() if k.startswith("pannier")}
         comp = bike_compound(pb, f"{inst.iid} {inst.part}")
         cx, cy, cz = model.com
         c = pb.point(cx, cy, cz)
-        bb = Compound(children=list(model.solids.values())).bounding_box()
+        own = [v for k, v in model.solids.items() if not k.startswith("pannier")] or list(model.solids.values())
+        bb = Compound(children=own).bounding_box()
         info = {"pitch_deg": pb.pitch_deg,
                 "local_size": {"length": bb.max.Y - bb.min.Y, "width": bb.max.X - bb.min.X, "height": bb.max.Z},
                 "owner": prm["owner"], "length_param": prm.get("length", prm["owner"]["length"])}
+        bags = [v for k, v in model.solids.items() if k.startswith("pannier")]
+        if bags:
+            bbb = Compound(children=bags).bounding_box()
+            info["width_with_bags"] = max(bb.max.X, bbb.max.X) - min(bb.min.X, bbb.min.X)
         return Built(inst, comp, info, bike=pb, cog_override=(c.X, c.Y, c.Z))
 
     def _one(self, inst: Instance) -> Built:
