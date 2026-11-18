@@ -129,7 +129,7 @@ class AssemblyDef(Strict):
 class Check(Strict):
     id: str
     title: str
-    type: Literal["clearance", "height", "contact", "landing"]
+    type: Literal["clearance", "height", "contact", "landing", "beam"]
     a: list[str] | None = None
     b: list[str] | None = None
     each: list[str] | None = None
@@ -139,13 +139,37 @@ class Check(Strict):
     add_mm: Any = None
     max_z: Any = None
     tolerance_mm: float = 0.01
+    beam: dict[str, Any] | None = None
+    span_ratio: float | None = None
     severity: Literal["fail", "report"]
     added_by_build: bool = False
+    inputs: list[str] = []
+    why: str
+
+
+class TrailerCheck(Strict):
+    """A whole-trailer check, measured on the block layout (cad/trailer.py)."""
+    id: str
+    title: str
+    type: Literal["mass", "car_axle", "fit", "tyre", "width", "overhang", "coupling", "clearance_ground",
+                  "jackknife", "jackknife_aframe", "wheel", "towball_scale"]
+    quantity: Literal["mass", "axle", "axle_vsb1", "towball", "towball_pct", "tyre_load"] | None = None
+    limit: Literal["kit_gtm", "nsw_gtm_cap", "nsw_atm_cap", "target"] | None = None
+    tolerance: float | None = None
+    inputs: list[str] = []
+    basis: Literal["nominal", "growth", "both"] = "nominal"
+    cases: Literal["all"] | list[str] = "all"
+    zone: str | None = None
+    min: float | None = None
+    max: float | None = None
+    min_gap_mm: float | None = None
+    severity: Literal["fail", "report"]
     why: str
 
 
 class ChecksFile(Strict):
     checks: list[Check]
+    trailer_checks: list[TrailerCheck] = []
 
 
 class LoadCase(Strict):
@@ -160,9 +184,24 @@ class Towball(Strict):
     note: str
 
 
+class TrailerCase(Strict):
+    id: str
+    name: str
+    aboard: str
+    module: Literal["all", "fixed_only"]
+    bikes: list[str]
+    water_l: Any
+    load: list[Literal["gas", "fuel", "gear", "luggage"]]
+    towball_target: bool = False
+
+
 class LoadCasesFile(Strict):
     load_cases: list[LoadCase]
     towball: Towball
+    trailer_cases: list[TrailerCase] = []
+    towball_target_kg: float | None = None
+    car: dict[str, Any] = {}
+    registration: dict[str, Any] = {}
 
 
 class Revision(Strict):
@@ -178,6 +217,7 @@ class DrawingDef(Strict):
     number: str
     title: str
     subtitle: str
+    project: str | None = None
     sheet: int
     size: Literal["A3"]
     scale: float
@@ -307,7 +347,7 @@ class Instance(BaseModel):
 
 
 class Project:
-    def __init__(self, root: Path = ROOT, overrides: dict[str, Any] | None = None):
+    def __init__(self, root: Path = ROOT, overrides: dict[str, Any] | None = None, use_solved: bool = True):
         self.root = root
         self.overrides = dict(overrides or {})
         data = root / "data"
@@ -320,12 +360,21 @@ class Project:
                 p.id, p.group = pid, pf.group
                 self.parts[pid] = p
         self.assembly = AssemblyDef.model_validate(yaml.safe_load((data / "assemblies" / "garage-bed.yaml").read_text()))
-        self.checks = ChecksFile.model_validate(yaml.safe_load((data / "checks.yaml").read_text())).checks
+        cf = ChecksFile.model_validate(yaml.safe_load((data / "checks.yaml").read_text()))
+        self.checks = cf.checks
+        self.trailer_checks = cf.trailer_checks
         self.load = LoadCasesFile.model_validate(yaml.safe_load((data / "load_cases.yaml").read_text()))
         self.drawings = DrawingsFile.model_validate(yaml.safe_load((data / "drawings.yaml").read_text()))
         self.steps = StepsFile.model_validate(yaml.safe_load((data / "steps.yaml").read_text())).steps
         self.bike_geometry = yaml.safe_load(BIKE_GEOMETRY.read_text())
+        from .inputs import Inputs
+        self.inputs = Inputs(root)
+        self.inputs.patch_parts(self.parts)
         raw = dict(self.assembly.params)
+        for k, v in self.inputs.module_overrides(use_solved).items():
+            if k not in raw:
+                raise KeyError(f"measurement rule sets unknown parameter {k}")
+            raw[k] = v
         for k, v in self.overrides.items():
             if k not in raw:
                 raise KeyError(f"override of unknown parameter {k}")
@@ -387,6 +436,10 @@ class Project:
             for n in names:
                 if n not in refs:
                     raise ValueError(f"check {c.id}: unknown item '{n}'")
+        for c in list(self.checks) + list(self.trailer_checks):
+            for iid in c.inputs:
+                if iid not in self.inputs.items:
+                    raise ValueError(f"check {c.id}: unknown measurement {iid}")
         step_ids = {s.id for s in self.steps}
         for i in self.instances:
             if i.step and i.step not in step_ids:

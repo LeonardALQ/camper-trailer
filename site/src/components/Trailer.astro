@@ -1,0 +1,205 @@
+---
+// Whole-trailer tables, from build/trailer/trailer.json (cad/trailer.py).
+import t from '../data/generated/trailer.json';
+import { withBase } from '../lib/url';
+
+interface Props {
+  kind: 'summary' | 'cases' | 'checks' | 'lengths' | 'options' | 'chassis' | 'crossmembers' | 'groups' | 'uncertain' | 'schedule';
+}
+const { kind } = Astro.props;
+const r: any = t;
+const n = (v: number | null | undefined, d = 0) =>
+  v == null ? '' : (Math.abs(v) < 0.5 * 10 ** -d ? 0 : v).toLocaleString('en-AU', { minimumFractionDigits: d, maximumFractionDigits: d });
+const signed = (v: number) => (v > 0 ? '+' : '') + n(v);
+const ch = r.chassis;
+const P = r.params;
+const tc = (id: string) => r.cases.find((c: any) => c.id === id);
+const full = tc('TC2');
+const fails = r.checks.filter((c: any) => c.severity === 'fail' && !c.ok);
+const rowClass = (c: any) => (c.ok ? '' : c.severity === 'fail' ? 'row-fail' : 'row-report');
+const statusClass = (c: any) => (c.ok ? 'status-pass' : c.severity === 'fail' ? 'status-fail' : 'status-report');
+const measured = (c: any) => (c.measured == null ? '' : `${n(c.measured, c.unit === '%' ? 1 : 0)} ${c.unit}`);
+const groupRows = Object.entries(r.tare_by_group) as [string, any][];
+const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
+---
+
+{kind === 'summary' && (
+  <p>
+    The recommended body is {n(r.recommended.body_length)} mm long, the shortest of the three that holds every zone. With the
+    axle group centre {n(P.axle_x)} mm behind the ball, the trailer carries {n(full.nominal.towball_kg)} kg on the ball fully
+    loaded, {n(full.nominal.towball_pct, 1)} % of its {n(full.nominal.mass_kg)} kg. It weighs {n(tc('TC1').nominal.mass_kg)} kg as
+    built, or {n(tc('TC1').growth.mass_kg)} kg with the growth allowance. {fails.length === 0
+      ? 'Every whole-trailer check passes.'
+      : `${fails.length} whole-trailer checks fail: ${fails.map((c: any) => `${c.id} (${c.title.toLowerCase()}, ${measured(c)})`).join(', ')}.`}
+  </p>
+)}
+
+{kind === 'cases' && (
+  <div class="data-table">
+    <table>
+      <thead>
+        <tr><th>Case</th><th>What is aboard</th><th class="num">Mass kg</th><th class="num">CoG X</th><th class="num">CoG Z</th>
+          <th class="num">Towball kg</th><th class="num">Towball %</th><th class="num">Axle group kg</th>
+          <th class="num">ATM margin kg</th><th class="num">GTM margin kg</th>
+          <th class="num">With growth kg</th><th class="num">Towball kg</th><th class="num">ATM margin kg</th></tr>
+      </thead>
+      <tbody>
+        {r.cases.map((c: any) => (
+          <tr>
+            <td>{c.id}</td><td>{c.name}. {c.aboard}{c.water_l ? ` (${n(c.water_l)} L)` : ''}</td>
+            <td class="num">{n(c.nominal.mass_kg)}</td><td class="num">{n(c.nominal.cog[0])}</td><td class="num">{n(c.nominal.cog[2])}</td>
+            <td class="num">{n(c.nominal.towball_kg)}</td><td class="num">{n(c.nominal.towball_pct, 1)}</td>
+            <td class="num">{n(c.nominal.axle_kg)}</td>
+            <td class={`num ${3500 - c.nominal.mass_kg < 0 ? 'status-fail' : ''}`}>{signed(3500 - c.nominal.mass_kg)}</td>
+            <td class={`num ${3330 - c.nominal.axle_kg < 0 ? 'status-fail' : ''}`}>{signed(3330 - c.nominal.axle_kg)}</td>
+            <td class="num">{n(c.growth.mass_kg)}</td><td class="num">{n(c.growth.towball_kg)}</td>
+            <td class={`num ${3500 - c.growth.mass_kg < 0 ? 'status-fail' : ''}`}>{signed(3500 - c.growth.mass_kg)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'checks' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>ID</th><th>Check</th><th>Limit</th><th>Measured</th><th>Result</th><th>Detail</th><th>Inputs</th></tr></thead>
+      <tbody>
+        {r.checks.map((c: any) => (
+          <tr class={rowClass(c)}>
+            <td>{c.id}</td><td>{c.title}</td><td>{c.limit}</td><td>{measured(c)}</td>
+            <td class={statusClass(c)}>{c.status}{c.severity === 'report' ? ' (reported only)' : ''}</td><td>{c.detail}</td>
+            <td>{(c.inputs ?? []).map((i: string, k: number) => (<>{k ? ', ' : ''}<a href={withBase(`/measurements/#${i.toLowerCase()}`)}>{i}</a></>))}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'lengths' && (
+  <div class="data-table">
+    <table>
+      <thead>
+        <tr><th>Body</th><th class="num">Front zone needs</th><th class="num">Living zone needs</th><th class="num">Room for both</th>
+          <th class="num">Spare</th><th class="num">Axle from ball</th><th class="num">Tare kg</th><th class="num">Fully loaded kg</th>
+          <th class="num">With growth kg</th><th class="num">Towball range kg</th><th>Fails</th></tr>
+      </thead>
+      <tbody>
+        {r.lengths.map((l: any) => (
+          <tr class={l.fit_ok ? '' : 'row-fail'}>
+            <td>{n(l.body_length)} mm{l.body_length === r.recommended.body_length ? ' (recommended)' : ''}</td>
+            <td class="num">{n(l.front_min)}</td><td class="num">{n(l.rear_min)}</td><td class="num">{n(l.zones_available)}</td>
+            <td class="num">{signed(l.slack)}</td><td class="num">{n(l.axle_x)}</td><td class="num">{n(l.tare)}</td>
+            <td class="num">{n(l.loaded)}</td><td class="num">{n(l.loaded_growth)}</td>
+            <td class="num">{n(l.towball_min)} to {n(l.towball_max)}</td><td>{l.failed.join(', ') || 'none'}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'options' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Option</th><th class="num">Front zone needs</th><th class="num">Living zone needs</th><th class="num">Length saved</th>
+        <th class="num">Mass change kg</th><th class="num">Spare at 5,000 mm</th><th class="num">Spare at 5,500 mm</th></tr></thead>
+      <tbody>
+        {r.fit_options.map((o: any) => (
+          <tr>
+            <td>{o.id === 'BASE' ? '' : `${o.id}: `}{o.title}{o.mass_note ? `. ${o.mass_note}` : ''}</td>
+            <td class="num">{n(o.front_min_mm)}</td><td class="num">{n(o.rear_min_mm)}</td><td class="num">{n(o.saved_mm)}</td>
+            <td class="num">{signed(o.mass_change_kg)}</td>
+            <td class={`num ${o.slack_mm['5000'] < 0 ? 'status-fail' : 'status-pass'}`}>{signed(o.slack_mm['5000'])}</td>
+            <td class="num">{signed(o.slack_mm['5500'])}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'chassis' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Input</th><th class="num">Value</th><th>Basis</th></tr></thead>
+      <tbody>
+        <tr><td>Rail outer width at the XT hinges</td><td class="num">{n(ch.rail_outer_width)} mm</td><td>Matches the car's {n(ch.track)} mm track with C/F 240 and ET53. A {n(ch.wide_track)} mm track needs {n(ch.rail_outer_width_wide_track)} mm (OPEN). Cruisemaster's minimum is 1,150 mm</td></tr>
+        <tr><td>Rail inside width and centres</td><td class="num">{n(ch.rail_inner_width)} / {n(ch.rail_centres)} mm</td><td>50 mm wide rails</td></tr>
+        <tr><td>Main rails</td><td class="num">{n(ch.rail_length)} mm</td><td>X {n(ch.rail_x0)} to {n(ch.rail_x1)}, the full body length. Section {ch.rail_section}</td></tr>
+        <tr><td>Rail underside and top</td><td class="num">Z {n(ch.rail_underside_z)} / {n(ch.rail_top_z)}</td><td>Hub 215 mm below the rail underside at rated load (Cruisemaster), static loaded radius 349 mm (estimate)</td></tr>
+        <tr><td>Raiser height</td><td class="num">{n(ch.raiser_h)} mm</td><td>Rail top to the floor underside at Z {n(ch.floor_underside_z)}, which clears the tyre at full bump by {n(ch.tyre_floor_clearance)} mm</td></tr>
+        <tr><td>Garage floor surface</td><td class="num">Z {n(ch.floor_z)}</td><td>Floor underside plus a 30 mm floor panel</td></tr>
+        <tr><td>Drawbar, ball to body front</td><td class="num">{n(ch.drawbar_length)} mm</td><td>Set by the 90 degree jack-knife: body corners {n(ch.jackknife_body_mm)} mm and drawbar box {n(ch.jackknife_box_mm)} mm clear of the car's side</td></tr>
+        <tr><td>Drawbar members</td><td class="num">{n(ch.drawbar_member_length)} mm</td><td>Each, from the coupling head to the body front, then {n(ch.drawbar_tail)} mm on under the rails (PLACEHOLDER)</td></tr>
+        <tr><td>Coupling point and drop</td><td class="num">Z {n(ch.coupling_z)}</td><td>{n(ch.drop_rail_to_coupling)} mm below the rail underside, inside a 150 mm drawbar run under the rails with the DO35 under its head</td></tr>
+        <tr><td>Axle group centre</td><td class="num">X {n(ch.axle_x)}</td><td>Hubs at X {n(ch.hubs_x[0])} and {n(ch.hubs_x[1])}, {n(ch.axle_spacing)} mm apart. XT front hinge crossmember rear face X {n(ch.xt_front_hinge_rear_x)}, rear shock crossmember front face X {n(ch.xt_rear_shock_front_x)}</td></tr>
+        <tr><td>Overall length</td><td class="num">{n(ch.overall_length)} mm</td><td>Coupling head front (X {n(ch.overall_x0)}) to the body rear</td></tr>
+        <tr><td>Overall width</td><td class="num">{n(ch.overall_width)} mm</td><td>2,400 mm body plus the awning</td></tr>
+        <tr><td>Travel height</td><td class="num">{n(ch.travel_height)} mm</td><td>Top of the solar panels, roof down</td></tr>
+        <tr><td>CoG, fully loaded</td><td class="num">X {n(ch.cog_loaded[0])}, Z {n(ch.cog_loaded[2])}</td><td>Z {n(ch.cog_loaded_growth[2])} with growth. {n(ch.cog_height_above_hub)} mm above the hub centres, for the roll and track check</td></tr>
+        <tr><td>Water tanks</td><td class="num">{n(ch.tank_capacity_l)} L</td><td>Gross volume of two blocks between the rails in the suspension bays (PLACEHOLDER)</td></tr>
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'crossmembers' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Crossmember</th><th class="num">X front face</th><th>Under</th><th>Section</th></tr></thead>
+      <tbody>
+        {ch.crossmembers.map((x: any) => (
+          <tr><td>{x.station}</td><td class="num">{n(x.x_front)}</td><td>{x.under}</td><td>{x.section}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'groups' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Group</th><th class="num">Tare kg</th><th class="num">With growth kg</th></tr></thead>
+      <tbody>
+        {groupRows.map(([g, v]) => (<tr><td>{g}</td><td class="num">{n(v.mass_kg)}</td><td class="num">{n(v.growth_kg)}</td></tr>))}
+        <tr><td>Tare</td><td class="num">{n(tareGroups)}</td><td class="num">{n(groupRows.reduce((s, [, g]) => s + g.growth_kg, 0))}</td></tr>
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'uncertain' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Line</th><th class="num">Mass kg</th><th class="num">Growth allowance kg</th><th class="num">CoG X</th><th class="num">Towball change for +20 %</th></tr></thead>
+      <tbody>
+        {r.least_certain.map((u: any) => (
+          <tr><td>{u.id} {u.name}{u.count > 1 ? ` (${u.count})` : ''}</td><td class="num">{n(u.mass_kg)}</td><td class="num">{n(u.growth_kg)}</td>
+            <td class="num">{n(u.cog_x)}</td><td class="num">{signed(Math.round(u.towball_per_20pct_kg * 10) / 10)} kg</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'schedule' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Line</th><th>Item</th><th>Group</th><th class="num">kg</th><th>Maturity</th><th class="num">Growth</th><th class="num">CoG X</th><th class="num">CoG Y</th><th class="num">CoG Z</th><th>Aboard in</th><th>Source</th></tr></thead>
+      <tbody>
+        {r.schedule.map((s: any) => (
+          <tr>
+            <td>{s.iid}</td><td>{s.item}{s.note && s.note.includes('PLACEHOLDER') ? ' (placeholder)' : ''}</td><td>{s.group}</td>
+            <td class="num">{n(s.mass_kg, 1)}</td><td>{s.maturity}</td><td class="num">{s.growth_pct} %</td>
+            <td class="num">{n(s.cog?.[0])}</td><td class="num">{n(s.cog?.[1])}</td><td class="num">{n(s.cog?.[2])}</td>
+            <td>{s.cases.length === r.cases.length ? 'all' : s.cases.join(', ')}</td>
+            <td>{s.source.startsWith('http') ? <a href={s.source}>{new URL(s.source).hostname.replace('www.', '')}</a> : s.source}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}

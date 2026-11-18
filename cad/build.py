@@ -2,6 +2,7 @@
 
     python -m cad.build data      validate data/, write the JSON Schema and the resolved project
     python -m cad.build model     build the model; STEP, GLB, viewer JSON, step states, BOM, mass schedule
+    python -m cad.build trailer   whole-trailer layout: axle solve, load cases, checks, length comparison, 3D model
     python -m cad.build drawings  drawing sheets to SVG, PDF and PNG
 """
 from __future__ import annotations
@@ -50,6 +51,12 @@ def cmd_data():
 
 
 def cmd_model():
+    from . import solve as SV
+    if SV.cached() is None:
+        t = time.time()
+        s = SV.solve()
+        print(f"bike spacing solved from the geometry: {s['bike_spacing']:.0f} mm, garage {s['garage_length']:.0f} mm, "
+              f"CLR-03 {s['clr03_gap']:.1f} mm ({time.time() - t:.1f} s)")
     from . import export as X
     from . import massprops as MP
     from .model.assembly import Model
@@ -108,6 +115,31 @@ def cmd_model():
                           bikes=bike_sizes, glb_nodes_tagged=tagged), indent=1))
 
 
+def cmd_trailer():
+    from . import trailer as T
+    from .model.assembly import Model
+    from .trailer_model import TrailerModel, write_outputs
+    t0 = time.time()
+    prj = Project()
+    model = Model(prj)
+    tr = T.Trailer(prj, T.ModuleInfo.from_model(prj, model))
+    rep = T.report(tr)
+    rep["git"] = git_hash()
+    out = BUILD / "trailer"
+    _write(out / "trailer.json", rep)
+    t1 = time.time()
+    lay = tr.layout(**rep["solved"]["overrides"])
+    write_outputs(TrailerModel(lay, model), out)
+    fails = [c["id"] for c in rep["checks"] if c["severity"] == "fail" and not c["ok"]]
+    print(json.dumps(dict(
+        axle_x=rep["solved"]["axle_x"], method=rep["solved"]["method"], recommended=rep["recommended"],
+        cases=[(c["id"], round(c["nominal"]["mass_kg"]), round(c["nominal"]["towball_kg"]), round(c["growth"]["mass_kg"]),
+                round(c["growth"]["towball_kg"])) for c in rep["cases"]],
+        failed_checks=fails, layout_s=round(t1 - t0, 1), model_s=round(time.time() - t1, 1)), indent=1))
+    if not rep["recommended"]["matches_data"]:
+        print(f"NOTE: the recommended body length {rep['recommended']['body_length']} differs from the data ({rep['body_length']})")
+
+
 def cmd_drawings():
     from .drawings import sheets
     sheets.main()
@@ -115,4 +147,4 @@ def cmd_drawings():
 
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "model"
-    {"data": cmd_data, "model": cmd_model, "drawings": cmd_drawings}[cmd]()
+    {"data": cmd_data, "model": cmd_model, "trailer": cmd_trailer, "drawings": cmd_drawings}[cmd]()

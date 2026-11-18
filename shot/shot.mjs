@@ -13,6 +13,10 @@ const pick = (n) => steps.find((s) => s.startsWith(n));
 const jobs = [
   { path: '/', name: 'home', full: true },
   { path: '/garage-bed/', name: 'garage-bed', viewer: true, sections: ['checks', 'mass-and-centre-of-gravity', 'bill-of-materials'] },
+  { path: '/trailer/', name: 'trailer', viewer: true, full: true, sections: ['load-cases', 'checks', 'body-length', 'chassis-inputs'] },
+  { path: '/measurements/', name: 'measurements', full: true },
+  { path: '/measurements/', name: 'measurements-dark', full: true, theme: 'dark' },
+  { path: '/trailer/', name: 'trailer-dark', viewer: true, full: true, theme: 'dark', sections: ['load-cases', 'checks'] },
   { path: `/steps/${pick('03')}/`, name: 'step-03', viewer: true, full: true },
   { path: `/steps/${pick('10')}/`, name: 'step-10', viewer: true },
   { path: `/steps/${pick('11')}/`, name: 'step-11', viewer: true },
@@ -26,6 +30,7 @@ const browser = await chromium.launch({
 const report = [];
 for (const j of jobs) {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
+  if (j.theme) await page.addInitScript((t) => localStorage.setItem('starlight-theme', t), j.theme);
   const logs = [];
   page.on('console', (m) => logs.push(`${m.type()}: ${m.text()}`.slice(0, 300)));
   page.on('pageerror', (e) => logs.push(`pageerror: ${e.message}`.slice(0, 300)));
@@ -78,7 +83,7 @@ for (const j of jobs) {
       title: document.title,
     };
   });
-  report.push({ path: j.path, status: resp ? resp.status() : null, ready, ...info, files, logs: logs.slice(0, 12) });
+  report.push({ path: j.path + (j.theme ? ` (${j.theme})` : ''), status: resp ? resp.status() : null, ready, ...info, files, logs: logs.slice(0, 12) });
   await page.close();
 }
 await browser.close();

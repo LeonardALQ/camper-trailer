@@ -42,6 +42,7 @@ def main():
     _copy(BUILD / "checks" / "checks.json", GEN / "checks.json")
     _copy(BUILD / "drawings" / "register.json", GEN / "register.json")
     _copy(BUILD / "model" / "instances.json", GEN / "instances.json")
+    _copy(BUILD / "trailer" / "trailer.json", GEN / "trailer.json")
     steps = yaml.safe_load((ROOT / "data" / "steps.yaml").read_text())
     (GEN / "steps_data.json").write_text(json.dumps(steps, indent=1, default=str))
     # model and downloads
@@ -51,6 +52,9 @@ def main():
     _copy(BUILD / "model" / "garage-bed.step", SITE / "public" / "downloads" / "garage-bed.step")
     _copy(BUILD / "model" / "garage-bed.glb", SITE / "public" / "downloads" / "garage-bed.glb")
     _copy(BUILD / "bom" / "garage-bed-bom.csv", SITE / "public" / "downloads" / "garage-bed-bom.csv")
+    _copy(BUILD / "trailer" / "trailer.viewer.json", SITE / "public" / "models" / "trailer.json")
+    _copy(BUILD / "trailer" / "trailer.step", SITE / "public" / "downloads" / "trailer.step")
+    _copy(BUILD / "trailer" / "trailer.glb", SITE / "public" / "downloads" / "trailer.glb")
     import cairosvg
     reg = json.loads((BUILD / "drawings" / "register.json").read_text())
     for d in reg["drawings"]:

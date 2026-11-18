@@ -24,7 +24,7 @@ parts:
       generator: bike
       params:
         source_key: tuareg_660_rally
-        owner: {length: 2220, width: 965, height: 1370}
+        owner: {length: 2220, width: 965, height: 1370, width_with_bags: 980}
         front_overhang: 348
         # Values used from 05 (copied here so the model is traceable; the generator also reads 05 directly)
         screen_top: {x: 250, z: 1370, src: "x from 05; z set to the owner's 1,370 overall height (05 image gives 1,390)"}
@@ -49,6 +49,17 @@ parts:
           side_stand: {pivot: [850, 110, 330], foot: [1100, 140, 290], src: "estimate (05 says TODO)"}
           plate: {half_width: 115, z: [590, 742], src: "estimate; 05 puts the rear-most hanger point at z 645"}
           rim_width: {front: 40, rear: 60, src: estimate}
+          # Mosko Moto soft panniers, left on the bike in the garage. The owner measured the bike at about 970 to
+          # 980 mm wide with them on, so the outer faces sit 490 mm either side of the centreline. Mosko Moto
+          # publishes the Backcountry 30L pannier as 508 mm top to bottom (roll top closed), 381 mm long (457 mm
+          # with the rear pocket) and 203 mm thick. Their position along the bike and their height are estimates:
+          # the top level with the tail rack (05 z 920 to 940) and the front just behind the pillion peg hanger.
+          # Crash bars (protection bars), estimate. 965 mm wide, the bike's overall width at the handlebars and so the
+          # most the bars can be. About 180 to 600 mm behind the front axle from 550 mm off the floor. The owner says
+          # they sit much lower than the Street Triple's bar end. Their top comes from measurements.yaml (TU-09).
+          crash_bars: {half_width: 482.5, x: [180, 600], z: [550, 900], src: "width the bike's 965 mm at the handlebars (most the bars can be), top owner's report (much lower than the Street Triple's bar end), estimate"}
+          panniers: {outer_y: 490, thickness: 203, x: [1300, 1757], z: [425, 933],
+                     src: "outer width owner's measurement (980 mm with bags); size Mosko Moto Backcountry 30L spec; position estimate"}
         tie_down_y:
           handlebar_inboard: {v: 300, src: "research/03 section 3 (estimate)"}
           pillion_peg_hangers: {v: 150, src: "research/03 section 3 (estimate)"}

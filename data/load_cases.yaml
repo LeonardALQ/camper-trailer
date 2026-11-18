@@ -23,4 +23,99 @@ load_cases:
     bikes: [ST]
 towball:
   computable: false
-  note: The towball load cannot be computed until the chassis exists, because it needs the coupling and axle positions in the module frame (MASS-04).
+  note: The module's towball load needs the coupling and axle positions, so it is worked out for the whole trailer (TC cases below and TRAILER.md, MASS-04).
+
+# Whole-trailer load cases (TRAILER.md). The module rows follow the module cases above. `water_l` is an
+# expression over the trailer parameters. `load` lists the payload tags carried (assemblies/trailer.yaml):
+# gas (LPG in the bottles), fuel (jerry cans), gear (food, clothes, other gear) and luggage (the Tuareg's
+# panniers, carried only when the Tuareg is). The removable kit is fitted in the tare case, as built.
+# Every case here is one the trailer may be towed in, so every one is a travel case for the towball checks.
+trailer_cases:
+  - id: TC1
+    name: Tare as built
+    aboard: Trailer as built with the removable kit fitted, empty tanks and bottles, no bikes or gear
+    module: all
+    bikes: []
+    water_l: 0
+    load: []
+  - id: TC2
+    name: Travel fully loaded
+    aboard: Both bikes with their kit, water tanks full, gas, fuel and gear
+    module: all
+    bikes: [TU, ST]
+    water_l: water_full_l
+    load: [gas, fuel, gear, luggage]
+    towball_target: true
+  - id: TC3
+    name: Highway travel
+    aboard: As fully loaded, with 50 L of water
+    module: all
+    bikes: [TU, ST]
+    water_l: water_highway_l
+    load: [gas, fuel, gear, luggage]
+  - id: TC4
+    name: Bikes and kit out, water full
+    aboard: No bikes and no removable kit, water tanks full, gas, fuel and gear
+    module: fixed_only
+    bikes: []
+    water_l: water_full_l
+    load: [gas, fuel, gear]
+  - id: TC5
+    name: Bikes out, tanks empty
+    aboard: No bikes and no removable kit, water tanks empty, gas, fuel and gear aboard
+    module: fixed_only
+    bikes: []
+    water_l: 0
+    load: [gas, fuel, gear]
+  - id: TC6
+    name: Tuareg only
+    aboard: Tuareg with its panniers, all the kit, water full, gas, fuel and gear
+    module: all
+    bikes: [TU]
+    water_l: water_full_l
+    load: [gas, fuel, gear, luggage]
+  - id: TC7
+    name: Street Triple only
+    aboard: Street Triple, all the kit, water full, gas, fuel and gear
+    module: all
+    bikes: [ST]
+    water_l: water_full_l
+    load: [gas, fuel, gear]
+
+towball_target_kg: 220   # report 07's figure. The build derives the target from the measured inputs (CAR-01 to CAR-06)
+
+# Registration (report 02 section 2.1). NSW, with Victoria as the fallback. The NSW examiner caps GTM at the
+# lowest of the tyre, coupling, chain and brake ratings and ATM at the lower of the coupling and chain ratings.
+registration:
+  state: NSW
+  fallback: Victoria
+  ratings:
+    tyre_kg: {v: 1030, src: "255/55 R18 109 load index, per tyre, four tyres (report 07)"}
+    coupling_kg: {v: 3500, src: "Cruisemaster DO35 V3Plus, ADR rated 3,500 kg (report 08)"}
+    chains_kg: {v: 3500, src: "Two safety chains marked 4177-35 (report 08)"}
+    brakes_kg: {v: 4500, src: "Cruisemaster A/T 12 inch electric drums, 4.5 t tandem capacity (report 06)"}
+
+# The tow vehicle, 2013 Porsche Cayenne GTS (report 07). Values the car's rear axle check needs, with their basis.
+car:
+  name: 2013 Porsche Cayenne GTS (958)
+  towball_rating_kg: {v: 280, src: "Porsche Australia, confirmed by the owner (report 07)"}
+  braked_towing_kg: {v: 3500, src: "Porsche (report 07)"}
+  gvm_kg: {v: 2840, src: "Porsche Australia (report 07)"}
+  gcm_kg: {v: 6340, src: "Read from the car by the owner (report 07)"}
+  front_axle_limit_kg: {v: 1520, src: "Read from the car by the owner (report 07)"}
+  rear_axle_limit_kg: {v: 1600, src: "Read from the car by the owner (report 07)"}
+  kerb_kg: {v: 2085, src: "Porsche DIN kerb mass, standard car (report 07)"}
+  payload_kg: {v: 755, src: "GVM less DIN kerb mass (report 07)"}
+  wheelbase_mm: {v: 2895, src: "Porsche Australia (report 07)"}
+  body_width_mm: {v: 1939, src: "Report 07"}
+  rear_overhang_mm: {v: 980, src: "Rear axle to bumper, Transport Canada data (report 08 section 1.4)"}
+  ball_behind_axle_mm: {v: [1060, 1230], src: "Estimate until the towbar is fitted (report 08 section 1.4)"}
+  # Report 07 load budget assumptions, replaced by weighbridge figures later
+  budget:
+    front_share_of_kerb: {v: 0.54, src: "Report 07 assumption, no published figure"}
+    occupants_kg: {v: 160, src: "Two adults (report 07)"}
+    occupants_behind_front_axle_mm: {v: 1150, src: "Report 07 assumption"}
+    towbar_kg: {v: 30, src: "Report 07 estimate"}
+    rear_seats_out_kg: {v: 50, src: "Rear seats removed (report 07 estimate)"}
+    gear_behind_front_axle_mm: {v: 2000, src: "Gear on the floor where the rear seats were (report 07 assumption)"}
+    ball_behind_axle_mm: {v: 1100, src: "Report 07 load budget assumption"}

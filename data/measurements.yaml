@@ -1,0 +1,264 @@
+# Measured inputs. The owner fills these in as he measures (GitHub's web editor is fine). A push to main rebuilds
+# the site, and the plan re-solves from the new values.
+#
+# How to record a measurement: under the input's `measured`, set `v` to the value and `date` to the day you
+# measured it, for example   measured: {v: 1182, date: 2026-12-02}
+# Leave `v: null` until then. The build uses the measured value when there is one and the estimate otherwise.
+#
+# `thresholds` are the design rules that change the plan, with their source. The build applies them in
+# cad/inputs.py, and the Measurements page shows what each one does with the value in use. A threshold is a
+# design rule, not a check limit. Check limits stay in checks.yaml.
+inputs:
+  # ================================================================ the car (report 07)
+  - id: CAR-01
+    group: Car
+    title: Car's front axle load, full tank and driver
+    how: Drive the front wheels alone onto a public weighbridge with a full tank and only the driver aboard, and read the figure. Keep the towbar fitted.
+    unit: kg
+    estimate: {v: 1171, src: "Report 07: 54 % of the 2,085 kg DIN kerb mass on the front axle (assumption), plus a 75 kg driver 1.15 m behind it (estimate)"}
+    measured: {v: null, date: null}
+    affects: [car kerb mass, car front axle share, towball target, CAR-01 check]
+    thresholds:
+      - {rule: "With CAR-02 it replaces report 07's kerb mass and 54 % front share in the car's load budget, so the towball target re-solves", src: "Report 07 load budget method"}
+  - id: CAR-02
+    group: Car
+    title: Car's rear axle load, full tank and driver
+    how: Straight after CAR-01, drive on until only the rear wheels are on the weighbridge and read the figure.
+    unit: kg
+    estimate: {v: 989, src: "Report 07: 46 % of the 2,085 kg DIN kerb mass, plus the 75 kg driver's share (estimate)"}
+    measured: {v: null, date: null}
+    affects: [car kerb mass, car front axle share, towball target, CAR-01 check]
+    thresholds:
+      - {rule: "Kerb mass = CAR-01 + CAR-02 less the 75 kg driver. It feeds the towball target and the car's rear axle check", src: "Report 07 load budget method"}
+  - id: CAR-03
+    group: Car
+    title: Towball pin height at the car's Normal level, unladen
+    how: Car at Normal level, engine running, on level ground. Measure from the ground to the centre of the DO35 pin hole in the tongue.
+    unit: mm
+    estimate: {v: 455, src: "Estimate: the 440 mm laden target plus about 15 mm of squat before the car levels (report 08 section 1.2)"}
+    measured: {v: null, date: null}
+    affects: [record only, CAR-04 cross-check]
+    thresholds:
+      - {rule: "Recorded with CAR-04. The trailer is designed to the laden height, so this value only checks the levelling", src: "Report 08 section 1.2"}
+  - id: CAR-04
+    group: Car
+    title: Towball pin height at Normal level with about 220 kg on the ball
+    how: As CAR-03, with about 220 kg on the tongue (a towball scale under a stand, or the loaded trailer coupled). Wait a minute for the car to level, then measure again.
+    unit: mm
+    estimate: {v: 440, src: "Report 08 design target, plus or minus 20 mm"}
+    measured: {v: null, date: null}
+    affects: [coupling height, drawbar drop, DIM-03]
+    thresholds:
+      - {at: 440, rule: "The trailer is designed level at this height: the coupling point Z follows the value and the drawbar drop below the rails re-solves", src: "VSB1 9.3.2: trailers should be designed to be level within the towball range"}
+      - {at: [370, 440], rule: "Outside 370 to 440 mm the 20 mm tolerance no longer stays inside VSB1's 350 to 460 mm, so choose a tongue with more or less drop", src: "VSB1 9.3.2 and report 08 section 5.3"}
+  - id: CAR-05
+    group: Car
+    title: Car's rear axle centre to the towball pin
+    how: Hang a plumb line from the centre of a rear wheel hub and another from the pin's centre, mark both on the ground and measure between the marks.
+    unit: mm
+    estimate: {v: 1100, src: "Report 07 load budget assumption. Report 08 gives 1,060 to 1,230 mm"}
+    measured: {v: null, date: null}
+    affects: [towball target, car's rear axle, jack-knife]
+    thresholds:
+      - {rule: "Sets the lever arm in the car's rear axle load, so the towball target re-solves. It also sets how far the car's bumper is from the ball at a jack-knife (the bumper is 980 mm behind the axle)", src: "Report 07 section 1, report 08 section 1.4"}
+  - id: CAR-06
+    group: Car
+    title: Gear planned in the car while towing
+    how: Not a measurement. Weigh the gear that will ride in the car, or set what the owner plans to carry. It sits on the floor where the rear seats were.
+    unit: kg
+    estimate: {v: 385, src: "Report 07 load budget: the gear the 2,085 kg car carries on the floor at about 220 kg on the ball"}
+    measured: {v: null, date: null}
+    affects: [towball target, axle solve]
+    thresholds:
+      - {rule: "The towball target is the highest towball load that keeps the car's rear axle within its 1,600 kg limit with this gear aboard, capped at the 280 kg towball rating. The axle position re-solves for it", src: "Report 07 section 1"}
+  - id: CAR-07
+    group: Car
+    title: Towball load the trailer puts on the car, from a towball scale
+    how: Later, with the trailer built and fully loaded, level on firm ground. Put a towball scale under the coupling at the design height and read it.
+    unit: kg
+    estimate: {v: null, src: "Not measured until the trailer exists. The model's fully loaded towball is shown beside it"}
+    measured: {v: null, date: null}
+    affects: [CAR-07 check against the model]
+    thresholds:
+      - {at: 0.10, rule: "More than 10 % away from the model's fully loaded towball means the centre of gravity estimates are wrong: weigh the parts again before relying on the axle position", src: "Report 02 MASS-07 asks for differences over 2 % in mass to be explained. 10 % on the towball is this layout's rule"}
+
+  # ================================================================ wheel and supplier answers (report 06)
+  - id: WHL-01
+    group: Wheel and suppliers
+    title: Porsche's rated load for the 8J x 18 ET53 wheel
+    how: Ask Porsche Cars Australia for the wheel's load rating by part number, or read it if it is cast or stamped inside the wheel.
+    unit: kg
+    estimate: {v: null, src: "Not published (reports 06 and 07)"}
+    measured: {v: null, date: null}
+    affects: [wheel choice, hub spigot, rail width, MAS-09]
+    thresholds:
+      - {rule: "The requirement is VSB1's 120 % rule on the axle load at ATM: 1.2 x (ATM less the towball target) / 4, worked out from the current values. At or above it the plan keeps the Porsche wheel. Below it the plan changes to a rated 5 x 130 aftermarket wheel and flags the hub spigot and offset that follow. Unknown keeps the Porsche wheel and flags it as not confirmed", src: "VSB1 Rev 6 axles and suspension, report 06 section 3"}
+  - id: SUP-01
+    group: Wheel and suppliers
+    title: Cruisemaster's GTM for the chosen XT coil build
+    how: Cruisemaster's written answer to report 06 open question 2, for the real masses.
+    unit: kg
+    estimate: {v: 3330, src: "Cruisemaster coil guide sheet 6: 3,700 kg ATM tandem build, 3,330 kg GTM"}
+    measured: {v: null, date: null}
+    affects: [MAS-02]
+    thresholds:
+      - {rule: "The axle group load in MAS-02 is checked against this rating", src: "Report 06"}
+  - id: SUP-02
+    group: Wheel and suppliers
+    title: Do Cruisemaster's ratings already include VSB1's 120 % rule? (1 for yes, 0 for no)
+    how: Cruisemaster's written answer to report 06 open question 2.
+    unit: yes or no
+    estimate: {v: 0, src: "Not known. Taken as no, which is the safe side (report 06)"}
+    measured: {v: null, date: null}
+    affects: [MAS-02]
+    thresholds:
+      - {at: 0, rule: "No: MAS-02 checks 1.2 times the axle group load against the kit's GTM. Yes: it checks the axle group load itself", src: "VSB1 Rev 6 axles and suspension, report 06"}
+  - id: SUP-03
+    group: Wheel and suppliers
+    title: Cruisemaster's coil choice for the real masses (part number)
+    how: Cruisemaster's written answer to report 06 open question 2.
+    unit: part number
+    estimate: {v: 33SC-950, src: "Coil guide: 33SC-950 with the 33SC-107 bump stop for the 3,700 kg tandem build"}
+    measured: {v: null, date: null}
+    affects: [suspension type]
+    thresholds:
+      - {at: 33SC-1250-1400, rule: "If Cruisemaster can only meet the plate with the 4,500 kg coils, change to XT Air (report 06 section 2). The plan flags it", src: "Report 06"}
+
+  # ================================================================ the bikes and the chock (DESIGN.md, report 05)
+  - id: TU-01
+    group: Bikes
+    title: Tuareg width across the fairing side panels, about 1,010 mm off the floor and 380 mm behind the front axle
+    how: Bike upright on its stand. Hold a straight board flat against each side panel at that height and spot, keep both boards parallel to the bike, and measure between them.
+    unit: mm
+    estimate: {v: 600, src: "DESIGN.md design estimate, 300 mm either side (range 280 to 350)"}
+    measured: {v: 585, date: 2026-11-18, note: "Owner. Nothing else is at this spot, the crash bars sit much lower"}
+    affects: [side panel envelope, bike spacing, garage length, door opening, bed platform, body length, axle solve, CLR-03]
+    thresholds:
+      - {at: 668, rule: "At or below 668 mm the 760 mm spacing holds: half-width 334 = 760 spacing - 396 Street Triple bar reach - 30 mm gap (CLR-03). Above it the spacing grows by about the excess half-width, and the build then sets the final spacing from the geometry: the smallest spacing at which CLR-03 measures 30 mm. The garage grows by the same, and the partitions, door opening, bed platform, body layout and axle position re-solve", src: "DESIGN.md (760 mm spacing, 30 mm limit), owner's 792 mm Street Triple width, addendum 1"}
+  - id: TU-09
+    group: Bikes
+    title: Tuareg crash bars, top height
+    how: Bike upright on level floor. Lay a straight board level across the highest point of the bars, front to back, and measure from the floor to its underside.
+    unit: mm
+    estimate: {v: 900, src: "Owner, 2026-11-18: much lower than the Street Triple's bar end at about 1,010 mm. 900 mm used until measured"}
+    measured: {v: null, date: null}
+    affects: [crash bar envelope, CLR-03]
+    thresholds:
+      - {at: 970, rule: "The Street Triple's right bar end sits at about 1,000 to 1,030 mm. If the bars top out at about 970 mm or lower (30 mm under it), the bar end passes over them and the side panels govern. Above it the bars may meet the bar end, and the build re-solves the spacing from the geometry", src: "Report 05 (Street Triple bars at 1,013 mm), DESIGN.md CLR-03"}
+  - id: TU-02
+    group: Bikes
+    title: Tuareg overall length with the number plate hanger
+    how: Bike upright. Stand a board square to the floor against the front tyre and another against the rear-most point of the plate or hanger, and measure between them.
+    unit: mm
+    estimate: {v: 2220, src: "Owner's figure. Aprilia's image suggests 2,263 mm or more (report 05)"}
+    measured: {v: null, date: null}
+    affects: [CLR-06]
+    thresholds:
+      - {at: 2259, rule: "Above about 2,259 mm the plate comes within 15 mm of the closed door (CLR-06). The interior width cannot grow, so the bikes move towards the road-side wall only if the chock nose (CHK-01) measures shorter", src: "DESIGN.md CLR-06"}
+  - id: TU-03
+    group: Bikes
+    title: Tuareg screen top height, mirrors folded
+    how: Bike upright on level floor. Lay a straight board across the top of the screen, level it, and measure from the floor to its underside.
+    unit: mm
+    estimate: {v: 1370, src: "Owner's figure. Aprilia's image gives about 1,390 mm"}
+    measured: {v: null, date: null}
+    affects: [bed beam height, CLR-01, CLR-05]
+    thresholds:
+      - {at: 1390, rule: "The bed beam underside is at least the higher of the screen and the folded mirrors, plus the 25 mm chock rise and 45 mm, and never below 1,460 mm. Above 1,390 mm the beams rise and the bedding allowance under the ceiling shrinks (CLR-05)", src: "DESIGN.md (1,460 mm from 1,390 + 25 + 45)"}
+  - id: TU-04
+    group: Bikes
+    title: Tuareg folded mirror top height
+    how: Fold the mirrors as for transport. Measure from the floor to the highest point of either mirror.
+    unit: mm
+    estimate: {v: 1365, src: "bikes.yaml estimate, kept below the screen"}
+    measured: {v: null, date: null}
+    affects: [bed beam height, CLR-01]
+    thresholds:
+      - {rule: "If the mirrors stand above the screen they set the bed beam height instead (TU-03 rule)", src: "DESIGN.md"}
+  - id: TU-05
+    group: Bikes
+    title: Tuareg width over the panniers
+    how: Bags on and packed as for the trip. Hold a board against the outside of each bag, parallel to the bike, and measure between the boards.
+    unit: mm
+    estimate: {v: 980, src: "Owner's measurement of about 970 to 980 mm"}
+    measured: {v: 980, date: 2026-11-18, note: "Owner's measurement, 970 to 980 mm, reported on 18 Nov"}
+    affects: [pannier envelope, CLR-04, CLR-08]
+    thresholds:
+      - {at: 1090, rule: "Above 1,090 mm a bag comes within 15 mm of partition A (CLR-04), and the Tuareg would have to move away from it", src: "DESIGN.md CLR-04"}
+  - id: TU-06
+    group: Bikes
+    title: Tuareg pannier length, height and position
+    how: Measure one bag's length along the bike and its height, and how far its front edge is behind the front axle and its bottom above the floor.
+    unit: mm
+    estimate: {v: [457, 508, 1300, 425], src: "Length and height from Mosko Moto's Backcountry 30L figures. Front edge 1,300 behind the front axle and bottom 425 off the floor are estimates"}
+    measured: {v: null, date: null}
+    order: [length, height, front edge behind the front axle, bottom above the floor]
+    affects: [pannier envelope, CLR-08]
+    thresholds:
+      - {rule: "The envelope follows the values and CLR-08 re-measures the gap to the straps", src: "This layout"}
+  - id: TU-07
+    group: Bikes
+    title: Tuareg footpeg width, tip to tip
+    how: Pegs down. Hold a board against the tip of each peg, parallel to the bike, and measure between them.
+    unit: mm
+    estimate: {v: 640, src: "bikes.yaml design estimate (320 mm each side)"}
+    measured: {v: null, date: null}
+    affects: [bike spacing, CLR-03, CLR-04]
+    thresholds:
+      - {at: 730, rule: "The two bikes' facing pegs must stay 30 mm apart: half the Tuareg's width plus half the Street Triple's at most 730 mm (760 - 30). Above it the spacing grows by the excess, as in TU-01", src: "DESIGN.md CLR-03"}
+  - id: ST-01
+    group: Bikes
+    title: Street Triple footpeg width, tip to tip
+    how: As TU-07, on the Street Triple.
+    unit: mm
+    estimate: {v: 440, src: "bikes.yaml design estimate (220 mm each side)"}
+    measured: {v: null, date: null}
+    affects: [bike spacing, CLR-03]
+    thresholds:
+      - {at: 730, rule: "With TU-07: half of each peg width added together at most 730 mm, or the spacing grows by the excess", src: "DESIGN.md CLR-03"}
+  - id: CHK-01
+    group: Bikes
+    title: Condor chock nose depth, wall to the front tyre's leading edge
+    how: Bolt a chock to a board against a wall, roll a front wheel into it, and measure from the wall to the front of the tyre.
+    unit: mm
+    estimate: {v: 50, src: "DESIGN.md allowance, to be measured on a real chock"}
+    measured: {v: null, date: null}
+    affects: [bike position across the trailer, CLR-04, CLR-06]
+    thresholds:
+      - {rule: "The front tyre's leading edge sits at the road-side wall face plus this depth, so both bikes move with it", src: "DESIGN.md"}
+
+  # ================================================================ the trailer, later (report 02 MASS-07)
+  - id: TW-01
+    group: Trailer weighbridge
+    title: Weighed mass, chassis with running gear, drawbar and coupling
+    how: Weigh the rolling chassis on a weighbridge before the body goes on. Record the whole mass.
+    unit: kg
+    estimate: {v: null, src: "The model's sum for these lines is shown beside it"}
+    measured: {v: null, date: null}
+    stage: [chassis, running_gear, drawbar_structure]
+    affects: [every mass check]
+    thresholds:
+      - {rule: "The weighed figure replaces the estimates for the parts already built: their masses scale to it and their growth allowance becomes 0 %", src: "Report 02 MASS-06 and MASS-07"}
+      - {at: 0.02, rule: "A difference over 2 % from the model is explained before work continues", src: "Report 02 MASS-07"}
+  - id: TW-02
+    group: Trailer weighbridge
+    title: Weighed mass, with the body shell on
+    how: Weigh again once the floor, walls, roof and doors are on. Record the whole mass.
+    unit: kg
+    estimate: {v: null, src: "The model's sum is shown beside it"}
+    measured: {v: null, date: null}
+    stage: [body, roof]
+    affects: [every mass check]
+    thresholds:
+      - {rule: "The rise from TW-01 replaces the shell's estimates, as for TW-01", src: "Report 02 MASS-06 and MASS-07"}
+  - id: TW-03
+    group: Trailer weighbridge
+    title: Weighed mass, fitted out, tanks empty and no payload
+    how: Weigh the finished trailer as built, with the removable kit fitted and the tanks and bottles empty. This is the tare on the plate.
+    unit: kg
+    estimate: {v: null, src: "The model's tare is shown beside it"}
+    measured: {v: null, date: null}
+    stage: [front, rear, module, underfloor, drawbar_contents]
+    affects: [every mass check, the plated tare]
+    thresholds:
+      - {rule: "The rise from TW-02 replaces the fit-out's estimates. The ticket goes in the NSW identity approval package (report 02, VIB 78)", src: "Report 02 MASS-07 and MASS-08"}

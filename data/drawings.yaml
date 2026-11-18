@@ -3,12 +3,23 @@
 owner: Camper trailer project (owner-builder)
 project: Off-road camper trailer, garage and bed module
 drawn_by: Kiro (AI agent)
-sheets_total: 3
+sheets_total: 4
 drawings:
+  - number: CT-001
+    title: General arrangement, whole trailer
+    subtitle: Block layout. Plan section and kerb-side elevation, mass and CoG by load case
+    project: Off-road camper trailer, whole trailer block layout
+    sheet: 1
+    size: A3
+    scale: 50
+    status: DRAFT
+    structural: true
+    revisions:
+      - {rev: A, date: 2026-11-18, description: First draft of the whole-trailer block layout (TRAILER.md), drawn: Kiro, checked: "", approved: ""}
   - number: CT-401
     title: Garage and bed general arrangement
     subtitle: Plan, kerb-side elevation and section looking at partition A
-    sheet: 1
+    sheet: 2
     size: A3
     scale: 25
     status: DRAFT
@@ -16,20 +27,22 @@ drawings:
     revisions:
       - {rev: A, date: 2026-11-16, description: First draft from design v1 baseline, drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-17, description: "Notice: deck laps over partition B and its top cleat, owner-built 1580 ladder, datum note", drawn: Kiro, checked: "", approved: ""}
+      - {rev: C, date: 2026-11-18, description: "Notice: Tuareg panniers in the bike envelope, module placed in the trailer datum", drawn: Kiro, checked: "", approved: ""}
   - number: CT-402
     title: Garage floor, tie-down anchor layout
     subtitle: Track rows and anchor positions from the module datum
-    sheet: 2
+    sheet: 3
     size: A3
     scale: 20
     status: DRAFT
     structural: true
     revisions:
       - {rev: A, date: 2026-11-16, description: First draft from design v1 baseline, drawn: Kiro, checked: "", approved: ""}
+      - {rev: C, date: 2026-11-18, description: "Notice: Tuareg panniers shown in the bike outline (no revision B on this sheet)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-501
     title: Bed platform
     subtitle: Beam layout, section through the bed stack, ledger detail and deck lap detail
-    sheet: 3
+    sheet: 4
     size: A3
     scale: 20
     status: DRAFT

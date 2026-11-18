@@ -104,6 +104,27 @@ def _title(sh, dwg, reg, mass_note, scale, model_rev="A"):
                                checked=r["checked"], approved=r["approved"]) for r in dwg["revisions"]])
 
 
+def _bags_box(model, margin=30.0):
+    """Plan extent of the Tuareg's panniers (module frame), for the revision C clouds."""
+    bb = model.built["TU-BAGS"].shape.bounding_box()
+    return bb.min.X - margin, bb.min.Y - margin, bb.max.X + margin, bb.max.Y + margin
+
+
+def _placement():
+    """Where the module sits in the project datum, from the trailer layout (build/trailer/trailer.json)."""
+    ch = json.loads((BUILD / "trailer" / "trailer.json").read_text())["chassis"]
+    return ch["module_x0"], ch["floor_z"]
+
+
+def _bed_sag(checks):
+    r = next((c for c in checks if c["id"] == "BED-01"), None)
+    return f"{r['measured_mm']:.1f} mm" if r else "NOT CHECKED"
+
+
+def _q(bom, pid):
+    return next(r["qty"] for r in bom["lines"] if r["id"] == pid)
+
+
 def _bom_rows(bom, items):
     lines = {r["id"]: r for r in bom["lines"]}
     bikes = {b["id"]: b for b in bom["bikes"]}
@@ -145,15 +166,15 @@ def ct401(prj, model, bom, checks, reg, dwg):
     S.view_label(sh, 166, 21, "SECTION A-A, FROM THE KERB SIDE", sc)
     d0, d1 = vE.p(P["door_x0"], ycut, 0), vE.p(P["door_x1"], ycut, P["door_h"])
     sh.rect(d1[0], d0[1], d0[0], d1[1], "phantom")
-    S.hdim(sh, d0[0], d1[1], d1[0], d1[1], 129.0, "1720 DOOR OPENING (X 40 TO 1760)")
+    S.hdim(sh, d0[0], d1[1], d1[0], d1[1], 129.0, f"{P['door_x1'] - P['door_x0']:.0f} DOOR OPENING (X {P['door_x0']:.0f} TO {P['door_x1']:.0f})")
     a0, b0 = vE.p(0, ycut, 0), vE.p(gl, ycut, 0)
-    S.hdim(sh, a0[0], a0[1] - 1.5, b0[0], b0[1] - 1.5, 45.0, "1800 GARAGE")
+    S.hdim(sh, a0[0], a0[1] - 1.5, b0[0], b0[1] - 1.5, 45.0, f"{gl:.0f} GARAGE")
     pt, ps = vE.p(P["tuareg_x"], ycut, 0), vE.p(P["st_x"], ycut, 0)
     for xc in (P["tuareg_x"], P["st_x"]):
         p0, p1 = vE.p(xc, ycut, -40), vE.p(xc, ycut, 1430)
         sh.line(p0[0], p0[1], p1[0], p1[1], "centre")
     S.hdim(sh, a0[0], a0[1] - 1.5, pt[0], pt[1] - 1.5, 38.5, "560", ext=True)
-    S.hdim(sh, pt[0], pt[1] - 1.5, ps[0], ps[1] - 1.5, 38.5, "760", ext=True)
+    S.hdim(sh, pt[0], pt[1] - 1.5, ps[0], ps[1] - 1.5, 38.5, f"{P['bike_spacing']:.0f}", ext=True)
     # heights on the partition A side (right of the view)
     zr = vE.p(-20, ycut, 0)[0]
     for z, lab, xd in ((P["door_h"], "1440", zr + 6), (P["beam_underside_z"], "1460", zr + 12), (P["ceiling_z"], "1800", zr + 18)):
@@ -172,7 +193,7 @@ def ct401(prj, model, bom, checks, reg, dwg):
     w0, w1 = vP.p(0, -hw, zcut), vP.p(0, hw, zcut)
     S.vdim(sh, w0[0], w0[1], w1[0], w1[1], w0[0] + 8, "2330")
     l0, l1 = vP.p(0, -hw, 0), vP.p(gl, -hw, 0)
-    S.hdim(sh, l0[0], l0[1] + 1.4, l1[0], l1[1] + 1.4, l0[1] + 7.0, "1800")
+    S.hdim(sh, l0[0], l0[1] + 1.4, l1[0], l1[1] + 1.4, l0[1] + 7.0, f"{gl:.0f}")
     for yrow, lab in ((P["front_row_y"], "TRACK Y -915"), (P["rear_row_y"], "TRACK Y +883"), (0.0, "CL Y 0")):
         p0, p1 = vP.p(-80, yrow, 0), vP.p(gl + 60, yrow, 0)
         sh.line(p0[0], p0[1], p1[0], p1[1], "centre")
@@ -199,8 +220,8 @@ def ct401(prj, model, bom, checks, reg, dwg):
     vA = S.View(sh, (1, 0, 0), (0, 0, 1), sc, ox=294.0, oy=170.0)
     vA.draw(cut)
     _shade(sh, vA, _cut_faces(cut, "X", xcut))
-    S.view_label(sh, 294, 262, "SECTION B-B, LOOKING AT PARTITION A", sc)
-    sh.text(294, 254.5, "STREET TRIPLE NOT SHOWN. CUT FACES SHADED.", 1.8, "middle")
+    S.view_label(sh, 294, 257.0, "SECTION B-B, LOOKING AT PARTITION A", sc)
+    sh.text(294, 249.0, "STREET TRIPLE NOT SHOWN. CUT FACES SHADED.", 1.8, "middle")
     yl, yr = vA.p(0, -hw, 0), vA.p(0, hw, 0)
     S.hdim(sh, yl[0], yl[1] - 1.5, yr[0], yr[1] - 1.5, 163.0, "2330 INTERIOR")
     c0 = vA.p(0, 0, 0)
@@ -229,7 +250,7 @@ def ct401(prj, model, bom, checks, reg, dwg):
     _balloons(sh, [
         ("1", vP.p(-10, -300, 0), (224.0, 226.0)), ("TU", vP.p(560, 120, 0), (224.0, 212.0)),
         ("16", vP.p(15, 0, 0), (224.0, 199.0)), ("17", vP.p(70, 1080, 0), (224.0, 151.0)),
-        ("ST", vP.p(1320, 140, 0), (124.0, 186.0)), ("2", vP.p(1810, -300, 0), (124.0, 214.0)),
+        ("ST", vP.p(P["st_x"], 140, 0), (124.0, 186.0)), ("2", vP.p(gl + 10, -300, 0), (124.0, 214.0)),
         ("11", vP.p(1650, P["front_row_y"], 0), (124.0, 233.0)), ("18", vP.p(2030, 800, 0), (124.0, 169.0)),
         ("12", vP.p(1035, P["rear_row_y"], 0), (150.0, 148.5)),
         ("13", vP.p(1027, -800, 300), (154.0, 251.0)), ("15", vP.p(940, -1150, 0), (167.0, 251.0)),
@@ -253,25 +274,31 @@ def ct401(prj, model, bom, checks, reg, dwg):
                      (val, color), (r["status"], color)])
     S.table(sh, 22.0, 150.0, [("CHECK", 18), ("LIMIT", 26), ("MODEL", 16), ("RESULT", 22)], rows, size=1.7, row_h=3.2,
             title="MODEL CHECKS (mm)")
+    mx0, mz0 = _placement()
     _, starts = S.notes(sh, 22, 284, [
         "MODULE FRAME: X FROM PARTITION A'S INNER FACE TOWARDS PARTITION B, Y FROM THE CENTRELINE (+ TO THE KERB SIDE), Z FROM THE GARAGE FLOOR. "
-        "THE PROJECT DATUM (DIM-01) NEEDS AN OFFSET, AND X CHANGES SIGN IF PARTITION B ENDS UP NEARER THE FRONT OF THE TRAILER.",
+        f"IN THE PROJECT DATUM (DIM-01, CT-001) MODULE X 0 IS AT X {mx0:.0f} AND Z 0 AT Z {mz0:.0f}, AXES PARALLEL. PARTITION A FACES THE FRONT.",
         "BIKES ARE ENVELOPES FROM research/05 SCALED TO THE OWNER'S FIGURES, MIRRORS FOLDED, FRONT WHEEL 25 UP IN THE CHOCK CRADLE (ESTIMATE).",
         "MEASURE BOTH BIKES IN A FULL-SIZE MOCK-UP BEFORE ORDERING PANELS (BUILD STEP S01).",
         "DOORWAY POSITION IN PARTITION B, VENTS, SENSORS, EXTINGUISHER AND THE LADDER'S POSITION ACROSS THE TRAILER ARE PLACEHOLDERS.",
     ], width_chars=62, size=1.8)
     S.rev_tag(sh, 98.0, starts[0] + 0.6, "B")
+    S.rev_tag(sh, 104.0, starts[0] + 0.6, "C")
+    # ---- revision C: the Tuareg's panniers are part of its envelope
+    bx0, by0, bx1, by1 = _bags_box(model)
+    c0, c1 = vP.p(bx1, by1, 0), vP.p(bx0, by0, 0)
+    S.revision_cloud(sh, c0[0], c0[1], c1[0], c1[1], "C", tag_at="tr")
     # ---- revision B: the deck laps over partition B, and the owner-built ladder reaches the living-area floor
     tip = vE.p(2061, ycut, 760)
     S.leader(sh, tip, (104.0, 92.0), "A-01 OWNER-BUILT LADDER, 1580 LONG AT 15° (REV B).",
              ["RUBBER FEET ON THE LIVING-AREA FLOOR, TAKEN AT Z 0 (CLR-07)."], size=1.9)
     S.revision_cloud(sh, 108.0, 48.0, 137.5, 117.0, "B", tag_at="bl")
     items = [("TU", "TU", "Aprilia Tuareg 660 Rally (envelope)", "1"), ("ST", "ST", "Triumph Street Triple 765 (envelope)", "1"),
-             ("1", "P-01", "Partition A, 20 honeycomb 2330x1800", "1"), ("2", "P-01", "Partition B, 700x1300 doorway", "1"),
-             ("3", "P-01", "Door leaf, cut from partition B", "1"), ("5", "B-05", "Ledger, angle 40x40x3 6060-T5", "4 (8.26 m)"),
-             ("6", "B-04", "Beam, RHS 50x25x2.5 6106-T6", "5 x 1800"), ("7", "B-03", "Deck, 20 honeycomb 1845x2330, laps B", "1"),
+             ("1", "P-01", f"Partition A, 20 honeycomb 2330x{P['ceiling_z']:.0f}", "1"), ("2", "P-01", "Partition B, 700x1300 doorway", "1"),
+             ("3", "P-01", "Door leaf, cut from partition B", "1"), ("5", "B-05", "Ledger, angle 40x40x3 6060-T5", f"4 ({_q(bom, 'B-05'):.2f} m)"),
+             ("6", "B-04", "Beam, RHS 50x25x2.5 6106-T6", f"5 x {gl:.0f}"), ("7", "B-03", f"Deck, 20 honeycomb {P['deck_length']:.0f}x2330, laps B", "1"),
              ("8", "B-02", "Froli Star Mobil pack", "2"), ("9", "B-01", "Mattress 1530x2030x150", "1"),
-             ("10", "G-01", "Condor SC-2000 chock", "2"), ("11", "G-02", "L-track row, recessed", "2 x 1800"),
+             ("10", "G-01", "Condor SC-2000 chock", "2"), ("11", "G-02", "L-track row, recessed", f"2 x {gl:.0f}"),
              ("12", "G-03", "Double-stud track fitting", "12 + 2"), ("13", "G-05", "Ratchet strap 35 mm LC 1000 kg", "10"),
              ("14", "G-11", "Winch on quick-release plate", "1 + 2 plates"), ("15", "G-12", "Vent, 2 low and 1 high", "3"),
              ("16", "G-13", "Fume detector, 2 sensors", "1"), ("17", "G-14", "Extinguisher 2.5 kg ABE", "1"),
@@ -298,6 +325,9 @@ def ct402(prj, model, bom, checks, reg, dwg):
     for ref in ("TU", "ST"):
         v.draw(_leaves([model.built[ref].shape]), sty="grey")
     v.draw(cut)
+    bx0, by0, bx1, by1 = _bags_box(model)
+    c0, c1 = v.p(bx1, by1, 0), v.p(bx0, by0, 0)
+    S.revision_cloud(sh, c0[0], c0[1], c1[0], c1[1], "C", tag_at="tr")
     _shade(sh, v, _cut_faces(cut, "Z", 400.0))
     S.view_label(sh, 148, 268, "PLAN OF THE GARAGE FLOOR, ANCHOR LAYOUT", sc)
     sh.text(148, 260.5, "SECTION AT Z 400 LOOKING DOWN. BIKES SHOWN AS THIN GREY OUTLINES.", 1.8, "middle")
@@ -370,16 +400,16 @@ def ct402(prj, model, bom, checks, reg, dwg):
              ["TO THE STEEL ANCHOR RAIL BELOW", "(CHASSIS SCOPE)"])
     S.leader(sh, (dx0 + 20 - tw / k + 2, dy0 - 13), (dx0 - 4, dy0 - 24), "BONDED HARDPOINT STRIP", ["IN PLACE OF THE CORE (G-04)"])
     S.leader(sh, (dx0 - 10, dy0 - 1), (dx0 - 14, dy0 + 10), "FLOOR SKIN, COATED (G-08)")
-    items = [("10", "G-01", "Condor SC-2000 chock with trailer adapter", "2"), ("11", "G-02", "L-track row, recessed, 1800 long", "2"),
+    items = [("10", "G-01", "Condor SC-2000 chock with trailer adapter", "2"), ("11", "G-02", f"L-track row, recessed, {gl:.0f} long", "2"),
              ("12", "G-03", "Double-stud L-track fitting", "12 + 2 spare"), ("-", "G-04", "M8 through-bolts, crush tubes, hardpoints", "1 set"),
              ("-", "F-07", "A4-70 bolts, nylon washers and sleeves", "1 lot"), ("-", "F-03", "Plexus MA310 for the hardpoints", "1 lot")]
     S.parts_list(sh, _bom_rows(bom, items), ybase=66.0, row_h=4.2)
     S.notes(sh, 22, 64, [
-        "TRACK: KINEDYNE SERIES L MEDIUM DUTY WITH FLANGES (G-02), RECESSED WITH ITS TOP FLUSH WITH THE FLOOR. TWO ROWS ALONG X, EACH 1800 LONG.",
+        f"TRACK: KINEDYNE SERIES L MEDIUM DUTY WITH FLANGES (G-02), RECESSED WITH ITS TOP FLUSH WITH THE FLOOR. TWO ROWS ALONG X, EACH {gl:.0f} LONG.",
         "BOLT PITCH: M8 A4-70 THROUGH-BOLTS AT 150 mm PITCH OR LESS, WITH CRUSH TUBES, THROUGH A BONDED HARDPOINT STRIP TO THE STEEL RAIL BELOW.",
         "DESIGN LOAD: EVERY ANCHOR AND ITS FLOOR FIXING IS DESIGNED FOR 20 kN, THE BREAKING LOAD OF AN LC 1,000 kg STRAP (NTC GUIDE p. 201).",
         "FITTINGS: DOUBLE-STUD FITTINGS (G-03), BREAK 22.2 kN. HOLD EACH X WITHIN 50 mm. Y MAY GROW BUT NOT SHRINK (research/03 SECTION 4).",
-        "CHOCKS: EACH ADAPTER BOLTS THROUGH TO STEEL ON ITS BIKE CENTRELINE (TUAREG X 560, STREET TRIPLE X 1320), NOSE AT THE ROAD-SIDE WALL. TORQUE VALUES ARE NOT SET YET.",
+        f"CHOCKS: EACH ADAPTER BOLTS THROUGH TO STEEL ON ITS BIKE CENTRELINE (TUAREG X {P['tuareg_x']:.0f}, STREET TRIPLE X {P['st_x']:.0f}), NOSE AT THE ROAD-SIDE WALL. TORQUE VALUES ARE NOT SET YET.",
     ], width_chars=125, size=1.8)
     _title(sh, dwg, reg, "ANCHOR DESIGN LOAD 20 kN EACH, 12 ANCHORS IN USE.", sc, prj.assembly.revision)
     S.write(sh, OUT / f"{dwg['number']}.svg")
@@ -405,7 +435,7 @@ def ct501(prj, model, bom, checks, reg, dwg):
         sh.line(p1[0], p1[1], xl, p1[1], "thin")
         sh.text(xl - 0.8, p1[1] - 0.7, f"Y {yb:+.0f}", 2.0, "end")
     a, b = v.p(0, -hw, 0), v.p(gl, -hw, 0)
-    S.hdim(sh, a[0], a[1], b[0], b[1], a[1] + 8, "1800 BEAM LENGTH, BETWEEN PARTITION FACES")
+    S.hdim(sh, a[0], a[1], b[0], b[1], a[1] + 8, f"{gl:.0f} BEAM LENGTH, BETWEEN PARTITION FACES")
     w0, w1 = v.p(0, -hw, 0), v.p(0, hw, 0)
     S.vdim(sh, w0[0], w0[1], w1[0], w1[1], w0[0] + 10, "2330")
     for yb0, yb1 in zip(P["beam_y"], P["beam_y"][1:]):
@@ -494,19 +524,19 @@ def ct501(prj, model, bom, checks, reg, dwg):
                    ("5", vG.p(xb - 1.5, 0, 1435), (30.0, 146.0))])
     S.revision_cloud(sh, 23.0, 122.0, 86.5, 227.0, "B", tag_at="tr")
 
-    items = [("1", "P-01", "Partition A, 20 honeycomb 2330x1800", "1"), ("2", "P-01", "Partition B, 700x1300 doorway", "1"),
-             ("4", "P-02", "Cleat, angle 25x25x1.6 (detail G)", "19.9 m in all"),
-             ("5", "B-05", "Ledger, angle 40x40x3 6060-T5", "4 (8.26 m)"), ("6", "B-04", "Beam, RHS 50x25x2.5 6106-T6", "5 x 1800"),
-             ("7", "B-03", "Deck, 20 honeycomb 1845x2330, laps B", "1 (4.30 m2)"), ("8", "B-02", "Froli Star Mobil pack", "2"),
+    items = [("1", "P-01", f"Partition A, 20 honeycomb 2330x{P['ceiling_z']:.0f}", "1"), ("2", "P-01", "Partition B, 700x1300 doorway", "1"),
+             ("4", "P-02", "Cleat, angle 25x25x1.6 (detail G)", f"{_q(bom, 'P-02'):.1f} m in all"),
+             ("5", "B-05", "Ledger, angle 40x40x3 6060-T5", f"4 ({_q(bom, 'B-05'):.2f} m)"), ("6", "B-04", "Beam, RHS 50x25x2.5 6106-T6", f"5 x {gl:.0f}"),
+             ("7", "B-03", f"Deck, 20 honeycomb {P['deck_length']:.0f}x2330, laps B", f"1 ({_q(bom, 'B-03'):.2f} m2)"), ("8", "B-02", "Froli Star Mobil pack", "2"),
              ("9", "B-01", "Mattress 1530x2030x150", "1"), ("-", "F-01", "Sikaflex-252 structural adhesive", "1.4 l"),
              ("-", "F-02", "Sikaflex-221 seam sealant", "0.3 l"), ("-", "F-05", "Monobolt rivets BAPV-06-04, -08-06", "about 60")]
     S.parts_list(sh, _bom_rows(bom, items), ybase=66.0, row_h=4.2, tags={"4": "B", "7": "B"})
     _, starts = S.notes(sh, 232, 260, [
         "BEAMS ON EDGE AT Y -932, -466, 0, 466 AND 932. EACH END SITS ON A PARTITION LEDGER SHELF AND ABUTS THE PARTITION FACE.",
         "THE SIDE-WALL LEDGERS CARRY THE DECK EDGES WITH THEIR SHELF TOP AT Z 1510.",
-        "DECK: 1845 x 2330 FROM X 0, LAPPING OVER THE TOP EDGE OF PARTITION B AND ITS TOP CLEAT (DETAIL G). BONDED (SIKAFLEX-252) TO THE BEAMS, LEDGERS AND "
+        f"DECK: {P['deck_length']:.0f} x 2330 FROM X 0, LAPPING OVER THE TOP EDGE OF PARTITION B AND ITS TOP CLEAT (DETAIL G). BONDED (SIKAFLEX-252) TO THE BEAMS, LEDGERS AND "
         "PARTITION B, RIVETED, AND SEALED ALL ROUND (SIKAFLEX-221) AS THE FUEL-SMELL BARRIER (GAR-02). HOLD POINT BEFORE CLOSING.",
-        "research/04 ESTIMATES ABOUT 5 mm DEFLECTION UNDER 255 kg SPREAD OVER THE BED. THE ENGINEER CONFIRMS THE BEAM SIZE AND LOAD CASES.",
+        f"research/04 ESTIMATES ABOUT 5 mm DEFLECTION UNDER 255 kg SPREAD OVER THE BED AT 1800. AT THE {gl:.0f} SPAN THE MODEL GIVES {_bed_sag(checks)} (BED-01). THE ENGINEER CONFIRMS THE BEAM SIZE AND LOAD CASES.",
     ], width_chars=108, size=1.8)
     S.rev_tag(sh, 227.5, starts[2] + 0.6, "B")
     bed = sum(r["mass_kg"] for r in bom["lines"] if r["group"] == "bed")
@@ -520,7 +550,7 @@ def main(only: list[str] | None = None):
     import yaml
     t0 = time.time()
     prj = Project()
-    model = Model(prj, include_check_only=False)
+    model = Model(prj)
     bom = json.loads((BUILD / "bom" / "bom.json").read_text())
     bom["with_bikes_kg"] = bom["totals"]["module_empty"] + sum(b["mass_kg"] for b in bom["bikes"])
     cp = BUILD / "checks" / "checks.json"
@@ -529,7 +559,8 @@ def main(only: list[str] | None = None):
     OUT.mkdir(parents=True, exist_ok=True)
     only = only or [a for a in sys.argv[2:] if a.startswith("CT-")]
     tm = {}
-    fns = {"CT-401": ct401, "CT-402": ct402, "CT-501": ct501}
+    from .ga import ct001
+    fns = {"CT-001": ct001, "CT-401": ct401, "CT-402": ct402, "CT-501": ct501}
     for dwg in reg["drawings"]:
         if only and dwg["number"] not in only:
             continue

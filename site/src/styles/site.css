@@ -50,6 +50,11 @@ html body {
 }
 .row-report td {
   background: #fff4e0;
+  color: #5a3200;
+}
+.row-fail td a,
+.row-report td a {
+  color: #0645ad;
 }
 .muted {
   color: var(--sl-color-gray-3);
@@ -77,4 +82,16 @@ html body {
   border: 1px solid var(--sl-color-gray-5);
   width: 100%;
   height: auto;
+}
+.measure-card {
+  border-left: 3px solid var(--sl-color-gray-5);
+  padding: 0.2rem 0 0.2rem 0.9rem;
+  margin: 1rem 0;
+}
+.measure-card h3 {
+  font-size: 1.05rem;
+}
+.measure-card p,
+.measure-card ul {
+  margin-top: 0.3rem;
 }

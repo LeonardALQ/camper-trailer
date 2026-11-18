@@ -1,6 +1,7 @@
 ---
 // Check results measured on the model (build/checks/checks.json). Failures show in red with the measured gap.
 import checks from '../data/generated/checks.json';
+import { withBase } from '../lib/url';
 
 const short: Record<string, string> = { 'Aprilia Tuareg 660 Rally': 'Tuareg', 'Triumph Street Triple 765': 'Street Triple' };
 const rowClass = (r: any) => (r.ok ? '' : r.severity === 'fail' ? 'row-fail' : 'row-report');
@@ -22,7 +23,7 @@ const gives = (r: any) =>
 <div class="data-table">
   <table>
     <thead>
-      <tr><th>ID</th><th>Check</th><th>Limit</th><th>Measured</th><th>Result</th><th>Closest parts</th></tr>
+      <tr><th>ID</th><th>Check</th><th>Limit</th><th>Measured</th><th>Result</th><th>Closest parts</th><th>Inputs</th></tr>
     </thead>
     <tbody>
       {checks.results.map((r: any) => (
@@ -38,6 +39,7 @@ const gives = (r: any) =>
               <><br /><em>Smallest change that passes: {r.fix.words}, {r.fix.param} from {r.fix.baseline} to {r.fix.value} ({r.fix.change_mm > 0 ? '+' : ''}{r.fix.change_mm} mm), which gives {gives(r)}.</em></>
             )}
           </td>
+          <td>{(r.inputs ?? []).map((i: string, k: number) => (<>{k ? ', ' : ''}<a href={withBase(`/measurements/#${i.toLowerCase()}`)}>{i}</a></>))}</td>
         </tr>
       ))}
     </tbody>
@@ -45,5 +47,6 @@ const gives = (r: any) =>
 </div>
 <p class="muted">
   Measured on the B-rep model with OCCT's exact shape-to-shape distance (pytest, data revision {checks.git}). Limits are
-  DESIGN.md's, plus CLR-07 added in revision B, and they are never changed to make a check pass.
+  DESIGN.md's, plus CLR-07 added in revision B and CLR-08 and BED-01 in revision C, and they are never changed to
+  make a check pass. The inputs column names the measurements each check uses.
 </p>

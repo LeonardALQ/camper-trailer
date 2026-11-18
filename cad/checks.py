@@ -142,6 +142,24 @@ def evaluate(prj: Project, model, checks: list[Check] | None = None) -> list[dic
                 status="PASS" if ok else "FAIL", governing=f"ladder foot to {who}", points=[],
                 detail=f"foot {where} (needs a gap of {lo:g} to {hi:g} mm)" + (f", overlap {ov:.0f} mm3" if ov >= 1 else ""),
                 why=c.why, seconds=round(time.time() - t0, 2)))
+        elif c.type == "beam":
+            # Simply supported beam under a uniform load: deflection 5 W L^3 / (384 E I), stress W L / (8 Z)
+            bm = c.beam
+            span = model.built[prj.select(c.a)[0].iid].info["length_m"] * 1000
+            W = bm["load_kg"] * 9.81 / bm["beams"]
+            E, I = bm["e_gpa"] * 1e3, bm["i_cm4"] * 1e4          # N/mm2, mm4
+            d = 5 * W * span ** 3 / (384 * E * I)
+            sigma = W * span / 8 / (I / (bm["depth_mm"] / 2))
+            lim = span / c.span_ratio
+            d0 = 5 * W * bm["baseline_span_mm"] ** 3 / (384 * E * I)
+            ok = d <= lim + 1e-9
+            out.append(dict(
+                id=c.id, sub="", title=c.title, type=c.type, severity=c.severity, added_by_build=c.added_by_build,
+                a=c.a, b=[], limit=f"sag <= span / {c.span_ratio:g} ({lim:.1f} mm)", measured_mm=round(d, 1), margin_mm=round(lim - d, 1),
+                overlap_mm3=0.0, ok=ok, status=("PASS" if ok else "FAIL") if c.severity == "fail" else ("MEETS LIMIT" if ok else "BELOW LIMIT"),
+                governing=f"span {span:.0f} mm, {W:.0f} N per beam, stress {sigma:.0f} MPa", points=[],
+                detail=f"sag {d:.1f} mm at a {span:.0f} mm span ({d0:.1f} mm at {bm['baseline_span_mm']:.0f} mm), bending stress {sigma:.0f} MPa",
+                why=c.why, seconds=round(time.time() - t0, 2)))
         else:  # contact
             rows = []
             all_ok = True

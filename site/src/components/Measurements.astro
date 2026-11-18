@@ -1,0 +1,47 @@
+---
+// Measured inputs (data/measurements.yaml), their status, the value in use and what each rule did, with the checks
+// that use each input. From build/trailer/trailer.json and build/checks/checks.json.
+import t from '../data/generated/trailer.json';
+import checks from '../data/generated/checks.json';
+
+const r: any = t;
+const rows: any[] = r.measurements;
+const users = (id: string) => [
+  ...(checks as any).results.filter((c: any) => (c.inputs ?? []).includes(id)).map((c: any) => c.id),
+  ...r.checks.filter((c: any) => (c.inputs ?? []).includes(id)).map((c: any) => c.id),
+].filter((v, i, a) => a.indexOf(v) === i);
+const fmt = (v: any, unit: string) =>
+  v == null ? 'none yet' : Array.isArray(v) ? v.join(', ') + ` ${unit}` : typeof v === 'number' ? `${v.toLocaleString('en-AU')} ${unit}` : `${v}`;
+const groups = [...new Set(rows.map((m) => m.group))];
+const measured = rows.filter((m) => m.status === 'measured').length;
+---
+
+<p>
+  {rows.length} inputs, {measured} measured so far. The value in use is the measured one when there is one, and the estimate
+  otherwise. Bike spacing in use: {r.spacing.in_use} mm, garage {r.spacing.garage} mm. Towball target in use: {Math.round(r.target_kg)} kg
+  ({r.target_why}).
+</p>
+
+{groups.map((g) => (
+  <>
+    <h2 id={g.toLowerCase().replace(/[^a-z0-9]+/g, '-')}>{g}</h2>
+    {rows.filter((m) => m.group === g).map((m) => (
+      <section class="measure-card" id={m.id.toLowerCase()}>
+        <h3>{m.id}: {m.title}</h3>
+        <p class={m.status === 'measured' ? 'status-pass' : 'muted'}>
+          {m.status === 'measured' ? `Measured ${m.measured_date ?? ''}` : m.status === 'estimate' ? 'Estimate in use' : 'Not known yet'}.
+          In use: {fmt(m.value, m.unit)}.{m.note ? ` ${m.note}.` : ''}
+        </p>
+        <p>How to measure it: {m.how}</p>
+        <p>Estimate: {fmt(m.estimate, m.unit)}. {m.estimate_src}.{m.order ? ` Order: ${m.order.join(', ')}.` : ''}</p>
+        <p>Depends on it: {m.affects.join(', ')}. Checks that use it: {users(m.id).join(', ') || 'none'}.</p>
+        <ul>
+          {m.thresholds.map((th: any) => (
+            <li>{th.at != null ? `At ${Array.isArray(th.at) ? th.at.join(' to ') : th.at}: ` : ''}{th.rule}. Source: {th.src}.</li>
+          ))}
+        </ul>
+        {m.outcome && <p>Now: {m.outcome}.</p>}
+      </section>
+    ))}
+  </>
+))}
