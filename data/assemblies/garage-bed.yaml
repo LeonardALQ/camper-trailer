@@ -6,7 +6,7 @@
 # Any number may be an expression over `params` (+ - * / and parentheses, min, max, abs, sqrt).
 id: ASM-GB
 name: Garage and bed module
-revision: B
+revision: C
 
 params:
   # Envelope
@@ -69,7 +69,7 @@ params:
   ladder_lean_deg: 15      # A-01 rev B: lean from vertical, into the living area
   living_floor_x1: 2420    # end of the living-area floor shown under the ladder (display only)
   net_y0: -900
-  ground_drop: 900         # assumed ground below the floor for the loading step (DESIGN.md: 800 to 1,000)
+  ground_drop: 858         # garage floor height at design ride height, from the trailer model (TRAILER.md, 857.7 mm). Rev C
 
 items:
   # ---------------------------------------------------------------- bikes

@@ -17,3 +17,10 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
             f = r["fix"]
             tr.write_line(f"           smallest passing change: {f['param']} {f['baseline']:g} -> {f['value']:g} "
                           f"({f['change_mm']:+g} mm, {f['words']}), gives {f['measured_mm']} mm")
+    try:
+        from cad.tests.test_trailer import RESULTS as TRAILER_RESULTS
+    except Exception:
+        return
+    tr.section("whole-trailer checks (data/checks.yaml, trailer_checks)")
+    for r in TRAILER_RESULTS:
+        tr.write_line(f"{r['id']:8s} {r['status']:12s} {r['detail']}")

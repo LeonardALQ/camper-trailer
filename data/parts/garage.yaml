@@ -167,7 +167,7 @@ parts:
       maker: https://www.blackwidowpro.com/motorcycle/ramps/full-width/p/mf-12038/
       spec: https://rippingitoutdoors.com/products/black-widow-3-piece-arched-folding-motorcycle-ramp-models-mf-10838-mf-12038-size-38-wide-capacity-1-500-lb-for-street-cruiser-touring-motorcycles
     stockist_au: null
-    notes: 15 deg at an 800 mm floor height, 19 deg at 1,000 mm. No Australian stockist found. Its travel stowage is not decided.
+    notes: 16.4 deg at the 858 mm floor height from the trailer model (BOM.md gave 15 deg at 800 mm and 19 deg at 1,000 mm). No Australian stockist found. Its travel stowage is not decided.
     removable: true
     geometry: {generator: ramp, params: {length: 3048, width: 965, thickness: 60}}
     cog: {at: ["garage_length / 2", 0, 76], basis: "PLACEHOLDER. Travel stowage is not decided, so the folded ramp is put at the garage plan centre, 76 mm up"}

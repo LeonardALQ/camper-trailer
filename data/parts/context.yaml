@@ -44,7 +44,7 @@ parts:
     alpha: 0.15
   CTX-GROUND:
     name: Assumed ground for loading
-    product: Ground plane 900 mm below the garage floor (DESIGN.md assumes 800 to 1,000)
+    product: Ground plane 858 mm below the garage floor, the floor height from the trailer model (DESIGN.md revision C)
     kind: context
     notes: Shown in the loading step only.
     geometry: {generator: box, params: {dx: 1500, dy: 3100, dz: 10}}

@@ -210,6 +210,7 @@ class DrawingDef(Strict):
     number: str
     title: str
     subtitle: str
+    project: str | None = None
     sheet: int
     size: Literal["A3"]
     scale: float

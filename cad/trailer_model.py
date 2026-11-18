@@ -55,6 +55,18 @@ def block_shape(b):
     return box(x0, y0, z0, x1 - x0, y1 - y0, z1 - z0)
 
 
+def _moved(shape, loc):
+    """Move a shape, compounds leaf by leaf, so that the children carry the move too."""
+    if isinstance(shape, Compound) and shape.children:
+        kids = [_moved(k, loc) for k in shape.children]
+        out = Compound(label=shape.label, children=kids)
+        out.color = shape.color
+        return out
+    s = loc * copy.copy(shape)
+    s.label, s.color = shape.label, shape.color
+    return s
+
+
 class TrailerModel:
     """Shapes for every solid block plus the module's bodies moved into the datum."""
 
@@ -79,7 +91,7 @@ class TrailerModel:
             i = mb.inst
             if i.check_only or i.display == "loading_only" or i.group == "context":
                 continue
-            s = Pos(dx, 0, dz) * copy.copy(mb.shape)
+            s = _moved(mb.shape, Pos(dx, 0, dz))
             s.label = f"{i.iid} {i.label}".replace("/", "-")
             part = prj.parts[i.part]
             s.color = rgba(part.color, part.alpha)

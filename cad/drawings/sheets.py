@@ -104,6 +104,18 @@ def _title(sh, dwg, reg, mass_note, scale, model_rev="A"):
                                checked=r["checked"], approved=r["approved"]) for r in dwg["revisions"]])
 
 
+def _bags_box(model, margin=30.0):
+    """Plan extent of the Tuareg's panniers (module frame), for the revision C clouds."""
+    bb = model.built["TU-BAGS"].shape.bounding_box()
+    return bb.min.X - margin, bb.min.Y - margin, bb.max.X + margin, bb.max.Y + margin
+
+
+def _placement():
+    """Where the module sits in the project datum, from the trailer layout (build/trailer/trailer.json)."""
+    ch = json.loads((BUILD / "trailer" / "trailer.json").read_text())["chassis"]
+    return ch["module_x0"], ch["floor_z"]
+
+
 def _bom_rows(bom, items):
     lines = {r["id"]: r for r in bom["lines"]}
     bikes = {b["id"]: b for b in bom["bikes"]}
@@ -199,8 +211,8 @@ def ct401(prj, model, bom, checks, reg, dwg):
     vA = S.View(sh, (1, 0, 0), (0, 0, 1), sc, ox=294.0, oy=170.0)
     vA.draw(cut)
     _shade(sh, vA, _cut_faces(cut, "X", xcut))
-    S.view_label(sh, 294, 262, "SECTION B-B, LOOKING AT PARTITION A", sc)
-    sh.text(294, 254.5, "STREET TRIPLE NOT SHOWN. CUT FACES SHADED.", 1.8, "middle")
+    S.view_label(sh, 294, 257.0, "SECTION B-B, LOOKING AT PARTITION A", sc)
+    sh.text(294, 249.0, "STREET TRIPLE NOT SHOWN. CUT FACES SHADED.", 1.8, "middle")
     yl, yr = vA.p(0, -hw, 0), vA.p(0, hw, 0)
     S.hdim(sh, yl[0], yl[1] - 1.5, yr[0], yr[1] - 1.5, 163.0, "2330 INTERIOR")
     c0 = vA.p(0, 0, 0)
@@ -253,14 +265,20 @@ def ct401(prj, model, bom, checks, reg, dwg):
                      (val, color), (r["status"], color)])
     S.table(sh, 22.0, 150.0, [("CHECK", 18), ("LIMIT", 26), ("MODEL", 16), ("RESULT", 22)], rows, size=1.7, row_h=3.2,
             title="MODEL CHECKS (mm)")
+    mx0, mz0 = _placement()
     _, starts = S.notes(sh, 22, 284, [
         "MODULE FRAME: X FROM PARTITION A'S INNER FACE TOWARDS PARTITION B, Y FROM THE CENTRELINE (+ TO THE KERB SIDE), Z FROM THE GARAGE FLOOR. "
-        "THE PROJECT DATUM (DIM-01) NEEDS AN OFFSET, AND X CHANGES SIGN IF PARTITION B ENDS UP NEARER THE FRONT OF THE TRAILER.",
+        f"IN THE PROJECT DATUM (DIM-01, CT-001) MODULE X 0 IS AT X {mx0:.0f} AND Z 0 AT Z {mz0:.0f}, AXES PARALLEL. PARTITION A FACES THE FRONT.",
         "BIKES ARE ENVELOPES FROM research/05 SCALED TO THE OWNER'S FIGURES, MIRRORS FOLDED, FRONT WHEEL 25 UP IN THE CHOCK CRADLE (ESTIMATE).",
         "MEASURE BOTH BIKES IN A FULL-SIZE MOCK-UP BEFORE ORDERING PANELS (BUILD STEP S01).",
         "DOORWAY POSITION IN PARTITION B, VENTS, SENSORS, EXTINGUISHER AND THE LADDER'S POSITION ACROSS THE TRAILER ARE PLACEHOLDERS.",
     ], width_chars=62, size=1.8)
     S.rev_tag(sh, 98.0, starts[0] + 0.6, "B")
+    S.rev_tag(sh, 104.0, starts[0] + 0.6, "C")
+    # ---- revision C: the Tuareg's panniers are part of its envelope
+    bx0, by0, bx1, by1 = _bags_box(model)
+    c0, c1 = vP.p(bx1, by1, 0), vP.p(bx0, by0, 0)
+    S.revision_cloud(sh, c0[0], c0[1], c1[0], c1[1], "C", tag_at="tr")
     # ---- revision B: the deck laps over partition B, and the owner-built ladder reaches the living-area floor
     tip = vE.p(2061, ycut, 760)
     S.leader(sh, tip, (104.0, 92.0), "A-01 OWNER-BUILT LADDER, 1580 LONG AT 15° (REV B).",
@@ -298,6 +316,9 @@ def ct402(prj, model, bom, checks, reg, dwg):
     for ref in ("TU", "ST"):
         v.draw(_leaves([model.built[ref].shape]), sty="grey")
     v.draw(cut)
+    bx0, by0, bx1, by1 = _bags_box(model)
+    c0, c1 = v.p(bx1, by1, 0), v.p(bx0, by0, 0)
+    S.revision_cloud(sh, c0[0], c0[1], c1[0], c1[1], "C", tag_at="tr")
     _shade(sh, v, _cut_faces(cut, "Z", 400.0))
     S.view_label(sh, 148, 268, "PLAN OF THE GARAGE FLOOR, ANCHOR LAYOUT", sc)
     sh.text(148, 260.5, "SECTION AT Z 400 LOOKING DOWN. BIKES SHOWN AS THIN GREY OUTLINES.", 1.8, "middle")
@@ -520,7 +541,7 @@ def main(only: list[str] | None = None):
     import yaml
     t0 = time.time()
     prj = Project()
-    model = Model(prj, include_check_only=False)
+    model = Model(prj)
     bom = json.loads((BUILD / "bom" / "bom.json").read_text())
     bom["with_bikes_kg"] = bom["totals"]["module_empty"] + sum(b["mass_kg"] for b in bom["bikes"])
     cp = BUILD / "checks" / "checks.json"
@@ -529,7 +550,8 @@ def main(only: list[str] | None = None):
     OUT.mkdir(parents=True, exist_ok=True)
     only = only or [a for a in sys.argv[2:] if a.startswith("CT-")]
     tm = {}
-    fns = {"CT-401": ct401, "CT-402": ct402, "CT-501": ct501}
+    from .ga import ct001
+    fns = {"CT-001": ct001, "CT-401": ct401, "CT-402": ct402, "CT-501": ct501}
     for dwg in reg["drawings"]:
         if only and dwg["number"] not in only:
             continue
