@@ -10,9 +10,10 @@ interface Props {
   height?: number;
 }
 const { src = withBase('/models/garage-bed.json'), states = withBase('/models/steps.json'), step = '', height = 520 } = Astro.props;
+const rev = process.env.GIT_REV ?? 'dev';
 ---
 
-<cad-viewer class="not-content" data-src={src} data-states={states} data-step={step} data-height={height}>
+<cad-viewer class="not-content" data-src={`${src}?v=${rev}`} data-states={`${states}?v=${rev}`} data-rev={rev} data-step={step} data-height={height}>
   <p class="cad-loading">Loading the 3D model (about 3 MB)...</p>
 </cad-viewer>
 <p class="cad-help">
@@ -80,7 +81,7 @@ const { src = withBase('/models/garage-bed.json'), states = withBase('/models/st
       const st = await fetch(this.dataset.states!).then((r) => r.json());
       const stepId = this.dataset.step || '';
       const step = st.steps.find((s: any) => s.id === stepId);
-      const src = step ? withBase(`/models/${step.model}`) : this.dataset.src!;
+      const src = step ? withBase(`/models/${step.model}?v=${this.dataset.rev}`) : this.dataset.src!;
       const shapes = await fetch(src).then((r) => r.json());
       this.innerHTML = '';
       const treeWidth = 250;
