@@ -17,9 +17,10 @@ drawings:
     revisions:
       - {rev: A, date: 2026-11-18, description: First draft of the whole-trailer block layout (TRAILER.md), drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-18, description: "XT Air in place of the coil, air supply and spare bag", drawn: Kiro, checked: "", approved: ""}
+      - {rev: C, date: 2026-11-19, description: "Notice: rear garage and door, one living area, no drawbar box, ballast", drawn: Kiro, checked: "", approved: ""}
   - number: CT-401
     title: Garage and bed general arrangement
-    subtitle: Plan, kerb-side elevation and section looking at partition A
+    subtitle: Plan, kerb-side section and section looking forward at partition A
     sheet: 2
     size: A3
     scale: 25
@@ -29,6 +30,7 @@ drawings:
       - {rev: A, date: 2026-11-16, description: First draft from design v1 baseline, drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-17, description: "Notice: deck laps over partition B and its top cleat, owner-built 1580 ladder, datum note", drawn: Kiro, checked: "", approved: ""}
       - {rev: C, date: 2026-11-18, description: "Notice: Tuareg panniers in the bike envelope, module placed in the trailer datum", drawn: Kiro, checked: "", approved: ""}
+      - {rev: D, date: 2026-11-19, description: "Notice: rear garage, bikes along, rear door, gas locker. Redrawn", drawn: Kiro, checked: "", approved: ""}
   - number: CT-402
     title: Garage floor, tie-down anchor layout
     subtitle: Track rows and anchor positions from the module datum
@@ -40,9 +42,10 @@ drawings:
     revisions:
       - {rev: A, date: 2026-11-16, description: First draft from design v1 baseline, drawn: Kiro, checked: "", approved: ""}
       - {rev: C, date: 2026-11-18, description: "Notice: Tuareg panniers shown in the bike outline (no revision B on this sheet)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: D, date: 2026-11-19, description: "Notice: rows across the trailer, kerb-strip row, strap loads. Redrawn", drawn: Kiro, checked: "", approved: ""}
   - number: CT-501
     title: Bed platform
-    subtitle: Beam layout, section through the bed stack, ledger detail and deck lap detail
+    subtitle: Beam layout, section through the bed stack, beam-end detail and deck lap detail
     sheet: 4
     size: A3
     scale: 20
@@ -51,3 +54,4 @@ drawings:
     revisions:
       - {rev: A, date: 2026-11-16, description: First draft from design v1 baseline, drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-17, description: "Notice: deck 1845 long, laps over partition B and its top cleat (detail G)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: D, date: 2026-11-19, description: "Notice: SHS 50x50x3 beams across, deck 2375 laps partition A. Redrawn", drawn: Kiro, checked: "", approved: ""}

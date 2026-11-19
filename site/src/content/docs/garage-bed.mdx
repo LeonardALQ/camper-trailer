@@ -1,6 +1,6 @@
 ---
 title: Garage and bed module
-description: Two motorcycles in a garage under a queen bed, with the reasons for the layout, the 3D model, the checks and the full parts list.
+description: Two motorcycles in a garage at the back of the trailer under a queen bed, with the reasons for the layout, the 3D model, the checks and the full parts list.
 tableOfContents: false
 ---
 
@@ -12,110 +12,127 @@ import BomTable from '../../components/BomTable.astro';
 import Summary from '../../components/Summary.astro';
 import { withBase } from '../../lib/url';
 
-This module is the garage for two motorcycles with a queen bed above them. It is the first part of the trailer to
-be designed, because it sets the trailer's width, its height with the roof down and much of its weight.
+This module is the garage for two motorcycles with a queen bed above them. It sets the trailer's width, its height
+with the roof down and much of its weight.
 
-This page shows revision C of the design. Revision B came from the first model run: the deck now laps over
-partition B and the ladder is owner-built so it reaches the floor. Revision C came from the
-<a href={withBase('/trailer/')}>whole-trailer layout</a>. It fixes the garage floor at 858 mm above the ground,
-places the module in the trailer, and adds the Mosko Moto panniers that stay on the Tuareg in the garage.
+This page shows revision D of the design. The owner did not want the bikes in the middle of the trailer, because
+there the garage split the living space into two rooms. So revision D puts the garage at the back with a rear
+door, and the <a href={withBase('/trailer/')}>whole-trailer layout</a> moves every heavy item towards the back to
+keep the towball inside the car's limits.
 
 <Summary />
 
 ## The design and why
 
-### The bikes stand across the trailer
+### The bikes stand along the trailer
 
 The two bikes are an Aprilia Tuareg 660 Rally (206 kg fuelled, 2,220 mm long) and a Triumph Street Triple 765
-set up for the track (175 kg, 2,055 mm long). They stand across the trailer, so their length runs along the
-2,330 mm interior width. This keeps the garage short, which matters because every millimetre of length adds
-weight.
+set up for the track (175 kg, 2,055 mm long). They stand side by side along the trailer, noses forward, in a
+garage 2,330 mm long and 2,330 mm wide. Each loads nose first through the rear door and unloads backwards.
 
-Both bikes go in nose first through one wide door in the kerb-side wall, and they face the same way. A bike
-cannot be moved sideways once it is inside, so the door has to span both bikes' paths. It is 1,720 mm wide and
-1,440 mm high.
+The front tyres stop 50 mm short of partition A, the garage's front wall. That gap is for the nose of the wheel
+chock, and it must be measured on a real chock.
 
-The front tyres stop 50 mm short of the road-side wall. That gap is for the nose of the wheel chock, and it
-must be measured on a real chock.
+The Tuareg stands towards the road-side wall, 565 mm from it, and the Street Triple 760 mm to its left. That
+leaves the spare width on the kerb side. The Tuareg's panniers sit at its back and the Street Triple's tail is
+narrow, so the gas locker goes in the kerb-side rear corner, beside the Street Triple's tail.
 
 ### Why 760 mm between the bikes works
 
-The Tuareg sits next to partition A, with its centreline 560 mm from it. The Street Triple sits next to
-partition B, 760 mm further along. Their handlebars overlap when seen from above, but they are at different
-heights. The Tuareg's bars and hand guards are at about 1,190 to 1,215 mm, which is above the Street Triple's
-tank and bars at about 1,010 mm.
+The bikes' handlebars overlap when seen from above, but they are at different heights. The Tuareg's bars and
+hand guards are at about 1,190 to 1,215 mm, which is above the Street Triple's tank and bars at about 1,010 mm.
 
 The tight spot is the Street Triple's right bar end against the Tuareg's side panels at the same height. The
-owner measured the Tuareg 585 mm wide there in revision C, so the side panels stand 292.5 mm either side of its
-centreline and the gap is about 71 mm against the 30 mm the design asks for. The Tuareg's crash bars sit much
-lower, so the bar end passes over them. If a later measurement goes over 668 mm, the
-<a href={withBase('/measurements/')}>Measurements</a> page's rule grows the spacing and the garage.
+owner measured the Tuareg 585 mm wide there, so the gap is about 71 mm against the 30 mm the design asks for. The
+garage width is fixed, so a larger spacing pushes the Street Triple towards the kerb-side stowage. Spacings up
+to 780 mm fit. Above that, check CLR-10 fails and the layout has to change (see the
+<a href={withBase('/measurements/')}>Measurements</a> page).
+
+### The rear door
+
+The door is in the body's rear wall and is hinged at the top. Its opening is 1,910 mm wide and 1,440 mm high,
+from 40 mm inside the road-side wall to the gas locker's inner face, with its header at the bed beams. Check
+CLR-09 rolls each bike straight back: it measures each bike against the door frame extended forward over the whole
+garage. The Tuareg's pannier clears the road-side jamb by 35 mm. The 3,048 mm ramp hooks on the sill at 16.4
+degrees, or about 15.2 degrees with the air bags vented.
+
+### Gas locker, generator, fuel and ramp
+
+The two 9 kg gas cylinders and their regulator sit in a sealed aluminium locker, 760 by 380 by 690 mm, in the
+kerb-side rear corner. It is reached only through a hatch in the kerb-side wall and has a 25 mm drain whose outlet
+is 500 mm below the floor, which keeps it away from the door and vents. That follows the Australian rules for LPG
+compartments in research report 02.
+
+The generator and the jerry cans are petrol, like the bikes, so they ride in the garage, strapped against the
+kerb-side wall in front of the gas locker. The ramp travels folded on its edge in a slot beside the locker, so it
+slides out of the rear door first. The generator and the jerry cans go in first and come out last, through the
+Street Triple's empty bay.
 
 ### How the bikes are held
 
-Each bike's front wheel sits in a Condor SC-2000 chock, which holds the bike upright on its own. The chock pins
-onto an adapter bolted to the floor, so it comes out when the bikes stay home.
+Each bike's front wheel sits in a Condor SC-2000 chock, which holds the bike upright on its own. Two rows of
+flush tie-down track run across the trailer, one in front of the bikes and one behind them, on the positions
+research report 03 gives from each bike's axles. Each bike has two straps at the front, two at the rear and one
+through the rear wheel, all 35 mm ratchet straps rated to 1,000 kg on soft loops.
 
-Two rows of flush aluminium tie-down track run the full length of the garage, one in front of the bikes and one
-behind. Each bike has two straps at the front, two at the rear and one through the rear wheel, all 35 mm
-ratchet straps rated to 1,000 kg on soft loops. The Street Triple's front straps go on a bar harness.
+Braking now pushes each bike forward into its chock, and cornering pushes it sideways. Check RES-01 works out
+every strap's load with report 03's off-road load cases. The worst is the Tuareg's rear pair at 277 kgf, against
+395 kgf when the bikes stood across the trailer. Every anchor and its floor fixing is still designed for 20 kN.
 
-With the bikes across the trailer, hard braking pushes each bike sideways. That is the direction in which a
-motorcycle is least stable, so the high straps must stop it rolling over. Research report 03 sizes the straps
-for this. Every anchor and its floor fixing is designed for 20 kN, the breaking load of the strap.
+Every strap is reached from a place where a person can kneel. The Tuareg goes in first and is strapped from the
+empty Street Triple bay, its road-side straps hooked on their anchors before it goes in and clipped to the bike by
+reaching across it. The Street Triple is strapped from the front kerb corner and from inside the rear door beside
+the gas locker. DESIGN.md has the reach distances.
 
 ### The bed is the garage ceiling
 
-The bed platform covers the whole garage and it is sealed all round, so it is also the garage ceiling. That keeps
-fuel smell and dust out of the bed. Five aluminium beams on edge span the 1,800 mm between ledgers on the two
-partitions. A 20 mm honeycomb deck sits on them. Since revision B the deck is 1,845 by 2,330 mm. It runs on over
-the top edge of partition B and the cleat on its living-area face, so that joint is a lap that can be bonded and
-sealed, where before the deck only met the partition along a corner line.
+The bed platform covers the whole garage and is sealed all round, so it is also the garage ceiling. Five
+aluminium beams run across the trailer between ledgers on the two side walls, a span of 2,330 mm. The longer span
+needed a stiffer beam, so they are now 50 by 50 by 3 mm square tube, which sags about 5.7 mm under two sleepers
+and keeps the 50 mm depth. A 20 mm honeycomb deck, 2,375 by 2,330 mm, sits on them and laps over the top of
+partition A.
 
-The beam underside is at 1,460 mm. That clears the Tuareg's screen with its mirrors folded and its front wheel
-lifted by the chock. On the deck sits a Froli sprung base, which also lets air under the mattress, then a 150 mm
-mattress. Allowing 50 mm for bedding leaves 27 mm under the 1,800 mm ceiling.
+The beam underside is at 1,460 mm, which clears the Tuareg's screen with its mirrors folded by 70 mm. On the deck
+sits a Froli sprung base, then a 150 mm queen mattress, which lies across the trailer at the back of the deck.
+That leaves an 845 mm landing along partition A for climbing in. Allowing 50 mm for bedding leaves 27 mm under
+the 1,800 mm ceiling.
 
-The mattress sits against partition A and is centred across the trailer. That leaves a 270 mm landing strip on
-the partition B side for climbing in. The ladder stands in the living area and hooks onto the deck edge. Since
-revision B it is owner-built from aluminium square tube, about 1,580 mm long with rubber feet, so that at a 15
-degree lean it reaches from the deck top at 1,530 mm down to the living-area floor. The bought 1,500 mm ladders
-stopped about 80 mm short of the floor and are rated to only 100 kg. The living-area floor is taken level with
-the garage floor until the body design fixes it.
+The ladder stands in the living area on the kerb side and hooks onto the deck edge at partition A. It is
+owner-built from aluminium square tube, about 1,580 mm long with rubber feet, so that at a 15 degree lean it
+reaches the living-area floor.
 
-### Two partitions
+### One partition
 
-Partition A is full height. Partition B goes up to the deck underside and has a 700 by 1,300 mm doorway into the
-living area, closed by a sealed door cut from the same panel. Both are 20 mm honeycomb panels.
+Partition A is a 20 mm honeycomb panel up to the deck underside, sealed to the floor, the walls and the deck. It
+has no doorway, so the garage is reached only through the rear door.
 
 ### Garage safety
 
 Petrol vapour is heavier than air. The garage has two low vents and one high vent, two fume sensors low down
-with the alarm display in the bed, and a 2.5 kg extinguisher by the garage door. No switches, relays or chargers
-go in the lowest 500 mm. The positions in the model are placeholders until the body design fixes them.
+with the alarm display beside the bed, and a 2.5 kg extinguisher on the gas locker by the rear door. No
+switches, relays or chargers go in the lowest 500 mm, so the inverter and chargers are on the living side of
+partition A. The positions in the model are placeholders until the body design fixes them.
 
-### Loading is still open
+### Loading
 
-With a fixed bed at 1,460 mm, you would walk a bike in stooped. The baseline is a 12 V winch on a quick-release
-plate at the road-side wall in front of each chock. It pulls the bike in while you steady it from the ramp. The
-alternative is a powered bed lift used with the roof raised. That weighs 9 to 45 kg more, and the garage then
-shares air with the bed.
+With a fixed bed at 1,460 mm, you walk a bike in stooped. A 12 V winch on a quick-release plate on partition A,
+in front of each chock, pulls the bike up the ramp and into its chock while you steady it.
 
 ## 3D model
 
-The whole module, with the bikes in place and the garage door closed. The part tree on the left is grouped into
-bikes, restraint, bed, partitions, garage safety and context. Context parts (walls, floor, door and ceiling)
-belong to the body design and carry no mass. The ramp and the ground only show in the loading step.
+The whole module, with the bikes in place and the rear door closed. The part tree on the left is grouped into
+bikes, restraint, bed, partitions, garage safety and context. Context parts (walls, floor, door, ceiling, the gas
+cylinders, generator, jerry cans and the folded ramp) carry no mass here. The trailer layout carries the stowed
+items' masses. The deployed ramp and the ground only show in the loading step.
 
 <CadViewer height={560} />
 
 ## Key dimensions
 
-The module frame starts on the garage floor at the inner face of partition A, on the trailer centreline. X runs
-along the trailer towards partition B. Y runs across the trailer, positive towards the kerb side where the
-garage door is. Z is up from the garage floor. All sizes are in millimetres. In the whole trailer partition A faces the
-front, so the axes point the same way as the trailer's own datum, which measures X rearward from the towball.
-Module X 0 sits 3,765 mm behind the ball and the garage floor 858 mm above the ground.
+The module frame starts on the garage floor at the rear face of partition A, on the trailer centreline. X runs
+rearward towards the rear door. Y runs across the trailer, positive towards the kerb side. Z is up from the garage
+floor. All sizes are in millimetres. The axes are those of the trailer's own datum, which measures X rearward from
+the towball, and module X 0 sits 4,955 mm behind the ball with the garage floor 858 mm above the ground.
 
 <KeyDims kind="dims" />
 
@@ -141,8 +158,7 @@ The centre of gravity is in the module frame above.
 <MassTable kind="cases" />
 
 The towball load is worked out for the whole trailer, on the <a href={withBase('/trailer/')}>Whole trailer</a>
-page. The ramp has no travel position yet, so its 34 kg is placed at the centre of the garage floor as a
-placeholder.
+page. The folded ramp's 34 kg sits in its stowed slot.
 
 ### Mass schedule
 
@@ -158,9 +174,9 @@ allowances. The "With growth" column in the load cases above adds them up.
 ## Checks
 
 These are the checks the design must pass, measured on the 3D model. A failed check shows in red with the
-measured gap. CLR-01b, CLR-06b and CLR-08 are reported cases and never fail the build. CLR-07, the ladder foot,
-was added in revision B. In revision C the Tuareg's panniers became part of its envelope, so every Tuareg check
-includes them, and CLR-08 reports their gap to the straps.
+measured gap. CLR-01b, CLR-06b, CLR-08 and BED-01 are reported and never fail the build. Revision D added CLR-09
+(each bike rolls out through the rear door), CLR-10 (the Street Triple's straps clear the kerb-side stowage) and
+RES-01 (strap loads along the trailer).
 
 <ChecksTable />
 
@@ -174,14 +190,11 @@ Generated from the parts data. It is also a <a href={withBase('/downloads/garage
 
 These need the owner's decision or a measurement. The model does not make design decisions.
 
-- Loading method: a winch with a fixed bed, or a powered bed lift used with the roof raised.
+- Getting the generator out with the bikes aboard needs a hatch into the kerb strip. Without one it comes out after the Street Triple.
+- The way to the Street Triple's front kerb-side straps is a floor-level corridor about 425 mm wide under the bed. Try it in the mock-up.
 - Sleeping with fuelled bikes inside: the answer changes the garage ventilation and the fuel-smell sealing.
-- Bike measurements: the Tuareg's screen height with mirrors folded, its length with the plate hanger (2,220 or about 2,263 mm), its fairing width, both bikes' peg widths, and the chock's nose depth and cradle rise.
-- With the photo-measured 2,263 mm length the Tuareg's plate is 10.8 mm from the closed door, against 15 mm wanted. Moving both bikes 10 mm towards the road-side wall gives 20.8 mm but leaves 40 mm for the chock nose.
-- The ladder length depends on the living-area floor height. The whole-trailer layout keeps the floor flat and level with the garage floor.
+- Bike measurements: the Tuareg's screen height with mirrors folded, its length with the plate hanger (2,220 or about 2,263 mm), both bikes' peg widths, and the chock's nose depth and cradle rise.
+- With the photo-measured 2,263 mm length the Tuareg's plate is 10.8 mm from the closed rear door, against 15 mm wanted. Moving both bikes 10 mm towards partition A gives 20.8 mm but leaves 40 mm for the chock nose.
+- The chock takes the braking push, about 330 kgf for the Tuareg. The engineer confirms the chock and its bolts for it.
 - The panniers' position along the Tuareg and their height are estimates. Measure them on the bike.
-- The positions of the doorway in partition B, the vents, the sensors, the extinguisher and the ladder across the trailer are placeholders.
-
-Resolved in revision B: the deck now laps over partition B and the cleat on its living-area face, and the 1,580 mm
-ladder's rubber feet reach the floor at a 15 degree lean. Resolved in revision C: the garage floor height (858 mm,
-so the ramp sits at 16.4 degrees) and the module's place in the trailer datum.
+- The positions of the vents, the sensors and the extinguisher are placeholders.

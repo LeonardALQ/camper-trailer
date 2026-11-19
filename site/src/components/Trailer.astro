@@ -4,7 +4,7 @@ import t from '../data/generated/trailer.json';
 import { withBase } from '../lib/url';
 
 interface Props {
-  kind: 'summary' | 'cases' | 'checks' | 'lengths' | 'options' | 'chassis' | 'crossmembers' | 'groups' | 'uncertain' | 'schedule';
+  kind: 'summary' | 'cases' | 'checks' | 'lengths' | 'options' | 'chassis' | 'crossmembers' | 'groups' | 'uncertain' | 'schedule' | 'ballast';
 }
 const { kind } = Astro.props;
 const r: any = t;
@@ -25,10 +25,11 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
 
 {kind === 'summary' && (
   <p>
-    The recommended body is {n(r.recommended.body_length)} mm long, the shortest of the three that holds every zone. With the
+    The recommended body is {n(r.recommended.body_length)} mm long, the shortest of the three that holds the living area. With the
     axle group centre {n(P.axle_x)} mm behind the ball, the trailer carries {n(full.nominal.towball_kg)} kg on the ball fully
-    loaded, {n(full.nominal.towball_pct, 1)} % of its {n(full.nominal.mass_kg)} kg. It weighs {n(tc('TC1').nominal.mass_kg)} kg as
-    built, or {n(tc('TC1').growth.mass_kg)} kg with the growth allowance. {fails.length === 0
+    loaded, {n(full.nominal.towball_pct, 1)} % of its {n(full.nominal.mass_kg)} kg. Its tare is {n(r.tare_kg)} kg, or
+    {n(tc('TC1').growth.mass_kg - r.ballast.kg)} kg with the growth allowance. Towing with no bikes aboard needs {n(r.ballast.kg)} kg of
+    ballast at the back of the garage, or {n(r.ballast.growth_kg)} kg with growth. {fails.length === 0
       ? 'Every whole-trailer check passes.'
       : `${fails.length} whole-trailer checks fail: ${fails.map((c: any) => `${c.id} (${c.title.toLowerCase()}, ${measured(c)})`).join(', ')}.`}
   </p>
@@ -51,7 +52,7 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
             <td class="num">{n(c.nominal.towball_kg)}</td><td class="num">{n(c.nominal.towball_pct, 1)}</td>
             <td class="num">{n(c.nominal.axle_kg)}</td>
             <td class={`num ${3500 - c.nominal.mass_kg < 0 ? 'status-fail' : ''}`}>{signed(3500 - c.nominal.mass_kg)}</td>
-            <td class={`num ${3330 - c.nominal.axle_kg < 0 ? 'status-fail' : ''}`}>{signed(3330 - c.nominal.axle_kg)}</td>
+            <td class={`num ${r.supplier.kit_gtm - c.nominal.axle_kg < 0 ? 'status-fail' : ''}`}>{signed(r.supplier.kit_gtm - c.nominal.axle_kg)}</td>
             <td class="num">{n(c.growth.mass_kg)}</td><td class="num">{n(c.growth.towball_kg)}</td>
             <td class={`num ${3500 - c.growth.mass_kg < 0 ? 'status-fail' : ''}`}>{signed(3500 - c.growth.mass_kg)}</td>
           </tr>
@@ -82,18 +83,19 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
   <div class="data-table">
     <table>
       <thead>
-        <tr><th>Body</th><th class="num">Front zone needs</th><th class="num">Living zone needs</th><th class="num">Room for both</th>
-          <th class="num">Spare</th><th class="num">Axle from ball</th><th class="num">Tare kg</th><th class="num">Fully loaded kg</th>
-          <th class="num">With growth kg</th><th class="num">Towball range kg</th><th>Fails</th></tr>
+        <tr><th>Body</th><th class="num">Living area</th><th class="num">Living area needs</th><th class="num">Spare</th>
+          <th class="num">Axle from ball</th><th class="num">Bikes behind the axle</th><th class="num">Tare kg</th><th class="num">Fully loaded kg</th>
+          <th class="num">With growth kg</th><th class="num">Towball TC1 / TC4 / TC6 / TC7 kg</th><th class="num">Ballast kg (with growth)</th><th>Fails</th></tr>
       </thead>
       <tbody>
         {r.lengths.map((l: any) => (
           <tr class={l.fit_ok ? '' : 'row-fail'}>
             <td>{n(l.body_length)} mm{l.body_length === r.recommended.body_length ? ' (recommended)' : ''}</td>
-            <td class="num">{n(l.front_min)}</td><td class="num">{n(l.rear_min)}</td><td class="num">{n(l.zones_available)}</td>
-            <td class="num">{signed(l.slack)}</td><td class="num">{n(l.axle_x)}</td><td class="num">{n(l.tare)}</td>
+            <td class="num">{n(l.living)}</td><td class="num">{n(l.living_min)}</td><td class="num">{signed(l.slack)}</td>
+            <td class="num">{n(l.axle_x)}</td><td class="num">{n(l.bikes_behind_axle)}</td><td class="num">{n(l.tare)}</td>
             <td class="num">{n(l.loaded)}</td><td class="num">{n(l.loaded_growth)}</td>
-            <td class="num">{n(l.towball_min)} to {n(l.towball_max)}</td><td>{l.failed.join(', ') || 'none'}</td>
+            <td class="num">{['TC1', 'TC4', 'TC6', 'TC7'].map((k) => n(l.towball[k])).join(' / ')}</td>
+            <td class="num">{n(l.ballast_kg)} ({n(l.ballast_growth_kg)})</td><td>{l.failed.join(', ') || 'none'}</td>
           </tr>
         ))}
       </tbody>
@@ -104,18 +106,25 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
 {kind === 'options' && (
   <div class="data-table">
     <table>
-      <thead><tr><th>Option</th><th class="num">Front zone needs</th><th class="num">Living zone needs</th><th class="num">Length saved</th>
-        <th class="num">Mass change kg</th><th class="num">Spare at 5,000 mm</th><th class="num">Spare at 5,500 mm</th></tr></thead>
+      <thead><tr><th>Item in the living area</th><th class="num">Mass kg</th><th class="num">Length saved without it</th></tr></thead>
       <tbody>
-        {r.fit_options.map((o: any) => (
-          <tr>
-            <td>{o.id === 'BASE' ? '' : `${o.id}: `}{o.title}{o.mass_note ? `. ${o.mass_note}` : ''}</td>
-            <td class="num">{n(o.front_min_mm)}</td><td class="num">{n(o.rear_min_mm)}</td><td class="num">{n(o.saved_mm)}</td>
-            <td class="num">{signed(o.mass_change_kg)}</td>
-            <td class={`num ${o.slack_mm['5000'] < 0 ? 'status-fail' : 'status-pass'}`}>{signed(o.slack_mm['5000'])}</td>
-            <td class="num">{signed(o.slack_mm['5500'])}</td>
-          </tr>
+        {r.zone_costs.filter((z: any) => !z.keep_clear).map((z: any) => (
+          <tr><td>{z.id} {z.name}</td><td class="num">{n(z.mass_kg)}</td><td class="num">{n(z.saved_mm)}</td></tr>
         ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'ballast' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Case without bikes</th><th class="num">Ballast needed, base weights kg</th><th class="num">With growth kg</th></tr></thead>
+      <tbody>
+        {Object.entries(r.ballast.per_case).map(([k, v]: any) => (
+          <tr><td>{k} {tc(k).name}</td><td class="num">{n(v.nominal)}</td><td class="num">{n(v.growth)}</td></tr>
+        ))}
+        <tr><td>Carried in TC1, TC4 and TC5 (the largest base figure), at X {n(r.ballast.x)}</td><td class="num">{n(r.ballast.kg)}</td><td class="num">{n(r.ballast.growth_kg)} (BAL-01)</td></tr>
       </tbody>
     </table>
   </div>
@@ -132,7 +141,7 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
         <tr><td>Rail underside and top</td><td class="num">Z {n(ch.rail_underside_z)} / {n(ch.rail_top_z)}</td><td>Hub 215 mm below the rail underside at rated load (Cruisemaster), static loaded radius 349 mm (estimate)</td></tr>
         <tr><td>Raiser height</td><td class="num">{n(ch.raiser_h)} mm</td><td>Rail top to the floor underside at Z {n(ch.floor_underside_z)}, which clears the tyre at full bump by {n(ch.tyre_floor_clearance)} mm</td></tr>
         <tr><td>Garage floor surface</td><td class="num">Z {n(ch.floor_z)}</td><td>Floor underside plus a 30 mm floor panel</td></tr>
-        <tr><td>Drawbar, ball to body front</td><td class="num">{n(ch.drawbar_length)} mm</td><td>Set by the 90 degree jack-knife: body corners {n(ch.jackknife_body_mm)} mm and drawbar box {n(ch.jackknife_box_mm)} mm clear of the car's side</td></tr>
+        <tr><td>Drawbar, ball to body front</td><td class="num">{n(ch.drawbar_length)} mm</td><td>Kept from revision B, where the drawbar box set it. With no box the body corners stand {n(ch.jackknife_body_mm)} mm clear of the car's side at a 90 degree jack-knife</td></tr>
         <tr><td>Drawbar members</td><td class="num">{n(ch.drawbar_member_length)} mm</td><td>Each, from the coupling head to the body front, then {n(ch.drawbar_tail)} mm on under the rails (PLACEHOLDER)</td></tr>
         <tr><td>Coupling point and drop</td><td class="num">Z {n(ch.coupling_z)}</td><td>{n(ch.drop_rail_to_coupling)} mm below the rail underside, inside a 150 mm drawbar run under the rails with the DO35 under its head</td></tr>
         <tr><td>Axle group centre</td><td class="num">X {n(ch.axle_x)}</td><td>Hubs at X {n(ch.hubs_x[0])} and {n(ch.hubs_x[1])}, {n(ch.axle_spacing)} mm apart. XT front hinge crossmember rear face X {n(ch.xt_front_hinge_rear_x)}, rear shock crossmember front face X {n(ch.xt_rear_shock_front_x)}</td></tr>
@@ -165,7 +174,7 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
       <thead><tr><th>Group</th><th class="num">Tare kg</th><th class="num">With growth kg</th></tr></thead>
       <tbody>
         {groupRows.map(([g, v]) => (<tr><td>{g}</td><td class="num">{n(v.mass_kg)}</td><td class="num">{n(v.growth_kg)}</td></tr>))}
-        <tr><td>Tare</td><td class="num">{n(tareGroups)}</td><td class="num">{n(groupRows.reduce((s, [, g]) => s + g.growth_kg, 0))}</td></tr>
+        <tr><td>Tare, without the ballast</td><td class="num">{n(tareGroups)}</td><td class="num">{n(groupRows.reduce((s, [, g]) => s + g.growth_kg, 0))}</td></tr>
       </tbody>
     </table>
   </div>

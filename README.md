@@ -2,7 +2,7 @@
 
 Design data, parametric model, checks, drawings and a static website for a one-off off-road camper trailer.
 Version 1 covers the garage and bed module: two motorcycles in a garage under a queen bed. The whole-trailer block
-layout places that module over the axles and lays out every other zone and system around it.
+layout places that module at the back of the body with a rear door and lays out every other system around it.
 
 The site is published at https://leonardalq.github.io/camper-trailer/ and rebuilds from this repository on every
 push to `main`.
@@ -17,7 +17,7 @@ data/                 the single source of truth
   parts/*.yaml        one entry per BOM line (G-01 to A-02), the bikes, and context parts (no mass)
   assemblies/         garage-bed.yaml: named parameters and every placement from DESIGN.md
                       trailer.yaml: the whole-trailer block layout in the project datum (TRAILER.md)
-  checks.yaml         module checks CLR-01 to CLR-08 and CON-01, and the whole-trailer checks
+  checks.yaml         module checks CLR-01 to CLR-10, BED-01, RES-01 and CON-01, and the whole-trailer checks
   load_cases.yaml     the five module load cases, the seven trailer load cases and the car's limits
   steps.yaml          eleven draft build steps (STEP-01 to STEP-08)
   drawings.yaml       drawing register, revisions and status
@@ -27,7 +27,8 @@ cad/
   massprops.py        mass schedule (MASS-01), growth allowance (MASS-06), CoG per load case
   checks.py           clearance, height and contact checks on the B-rep model
   fixsearch.py        smallest passing change for a failing check, in 10 mm steps (report only)
-  trailer.py          whole-trailer layout: axle solve, load cases, towball, fit and mass checks, length comparison
+  trailer.py          whole-trailer layout: axle solve, ballast, load cases, towball, fit and mass checks, length comparison
+  restraint.py        strap loads along the trailer by research/03's method (RES-01)
   trailer_model.py    the trailer's 3D block model with the module placed in it
   export.py           STEP, GLB, three-cad-viewer JSON, per-step viewer states, BOM CSV
   drawings/           A3 sheet module and the sheets CT-001 (ga.py), CT-401, CT-402, CT-501
@@ -63,13 +64,13 @@ show it in red. Use `make strict` where a failure must stop the build.
 Outputs: `build/model/garage-bed.step` and `.glb`, `build/bom/garage-bed-bom.csv`, `build/trailer/trailer.json`,
 `.step` and `.glb`, `build/drawings/CT-*.pdf|svg|png`, `build/checks/checks.json`, and the site in `site/dist`.
 
-`make check` also runs the whole-trailer checks. Three of them, the mass checks with the growth allowance, fail
-on the current estimates, so `make strict` fails until the trailer's mass comes down (TRAILER.md).
+`make check` also runs the whole-trailer checks. Six of them, the mass and towball checks with the growth allowance,
+fail on the current estimates, so `make strict` fails until the trailer's mass comes down (TRAILER.md).
 
 ## Conventions
 
-- Module frame (DESIGN.md): origin on the garage floor at partition A's inner face on the centreline. X towards
-  partition B, Y towards the kerb side, Z up, millimetres.
+- Module frame (DESIGN.md): origin on the garage floor at partition A's rear face on the centreline. X rearward
+  towards the rear door, Y towards the kerb side, Z up, millimetres.
 - Project datum (DIM-01, research/02): X rearward from the ball centre, Y towards the kerb side, Z up from the
   ground. The trailer layout uses it. It is a left-handed frame, so the CAD model is a mirror image (TRAILER.md).
 - Masses that depend on size are computed from the model: kg/m for extrusions and track, kg/m2 for panels.

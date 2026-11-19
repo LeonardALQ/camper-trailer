@@ -13,7 +13,11 @@ const measured = (r: any) =>
       ? `top at ${r.measured_mm} mm (${r.margin_mm} mm spare)`
       : r.type === 'landing'
         ? `foot ${Math.abs(r.measured_mm).toFixed(1)} mm ${r.measured_mm < 0 ? 'below' : 'above'} the floor`
-        : `${r.measured_mm} mm`;
+        : r.type === 'restraint'
+          ? `${r.measured_mm} kgf`
+          : r.type === 'beam'
+            ? `${r.measured_mm} mm sag`
+            : `${r.measured_mm} mm`;
 const gives = (r: any) =>
   r.type === 'landing'
     ? `a foot ${Math.abs(r.fix.measured_mm).toFixed(1)} mm ${r.fix.measured_mm < 0 ? 'below' : 'above'} the floor`
@@ -47,6 +51,6 @@ const gives = (r: any) =>
 </div>
 <p class="muted">
   Measured on the B-rep model with OCCT's exact shape-to-shape distance (pytest, data revision {checks.git}). Limits are
-  DESIGN.md's, plus CLR-07 added in revision B and CLR-08 and BED-01 in revision C, and they are never changed to
-  make a check pass. The inputs column names the measurements each check uses.
+  DESIGN.md's, plus CLR-07 added in revision B, CLR-08 and BED-01 in revision C, and CLR-09, CLR-10 and RES-01 in
+  revision D, and they are never changed to make a check pass. The inputs column names the measurements each check uses.
 </p>

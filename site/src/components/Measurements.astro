@@ -18,7 +18,7 @@ const measured = rows.filter((m) => m.status === 'measured').length;
 
 <p>
   {rows.length} inputs, {measured} measured so far. The value in use is the measured one when there is one, and the estimate
-  otherwise. Bike spacing in use: {r.spacing.in_use} mm, garage {r.spacing.garage} mm. Towball target in use: {Math.round(r.target_kg)} kg
+  otherwise. Bike spacing in use: {r.spacing.in_use} mm, which {r.spacing.fits ? 'fits' : 'does not fit'} beside the kerb-side stowage in the fixed {r.spacing.garage} mm garage. Towball target in use: {Math.round(r.target_kg)} kg
   ({r.target_why}).
 </p>
 

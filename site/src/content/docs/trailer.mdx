@@ -1,6 +1,6 @@
 ---
 title: Whole trailer
-description: The block layout of the whole trailer, with the axle position, the towball load in every load case, the checks, the body length comparison and the inputs for the chassis design.
+description: The block layout of the whole trailer, with the garage at the back, the axle position, the towball load in every load case, the ballast to tow with no bikes, the checks, the body length comparison and the inputs for the chassis design.
 tableOfContents: false
 ---
 
@@ -14,61 +14,69 @@ export const P = t.params;
 export const ch = t.chassis;
 export const tc = (id) => t.cases.find((c) => c.id === id);
 
-This is the first layout of the whole trailer. It places the <a href={withBase('/garage-bed/')}>garage and bed
-module</a> over the axles and puts every other zone and system around it as blocks. Each block is an envelope with
-a mass, not a design. The point is to find where the axles go, what the car carries on its towball, and what the
-chassis has to be. The design notes are in `TRAILER.md` in the repository, and drawing CT-001 is the general
-arrangement.
+This is the block layout of the whole trailer, revision C. The <a href={withBase('/garage-bed/')}>garage and bed
+module</a> sits at the back of the body with a rear door, and one living area runs from the front wall to the
+garage. Every other system is a block with a mass, not a design. The point is to find where the axles go, what the
+car carries on its towball, and what the chassis has to be. The design notes are in `TRAILER.md` in the
+repository, and drawing CT-001 is the general arrangement.
 
 <Trailer kind="summary" />
 
 ## 3D model
 
-The tree on the left runs by zone, from the drawbar to the living zone. The garage and bed module keeps its own
-groups inside it. Each block's name starts with its line in the mass schedule below.
+The tree on the left runs by system, from the drawbar to the living area and the garage stowage. The garage and
+bed module keeps its own groups inside it. Each block's name starts with its line in the mass schedule below.
 
 <CadViewer src={withBase('/models/trailer.json')} height={560} />
 
 The project datum in research report 02 measures X rearward from the ball, Y towards the kerb side and Z up. That
 is a left-handed frame, and CAD programs are right-handed, so this model is the mirror image of the real trailer:
-the garage door shows on the right when you look from behind. Every number is unaffected. Drawing CT-001 mirrors
+the gas locker shows on the right when you look from behind. Every number is unaffected. Drawing CT-001 mirrors
 the model back, so its views show the trailer as it will be seen.
 
 ## The layout and why
 
-From front to back there are the drawbar box with the generator, gas and fuel, then the front utility zone, the
-garage with the bed above it, and the living zone. The front zone holds the kitchen slide-out with the wardrobe
-over it, the washer-dryer, the chest freezer, the diesel heater and hot water unit, and the inverter and
-chargers. It has its own door in the road-side wall. The living zone holds the fridge, the 1 x 1 m wet bathroom
-with its recirculating shower, the desk, the air-conditioner under the desk, and the entry door in the kerb-side
-wall. The water tanks sit between the rails over the axles, so the towball barely changes as the water is used,
-and the 12 kWh battery sits just behind them.
+The owner did not want the bikes in the middle of the trailer, because there the garage split the living space
+into two rooms. With the garage at the back, the bikes sit {n(t.solved.bikes_behind_axle_mm)} mm behind the
+axles, so taking them out raises the towball. To keep that inside the car's limits, every heavy item moves to the
+back.
+
+From front to back there are the drawbar with the coupling, stone guard and jockey wheel (no drawbar box now),
+then the living area, {n(t.zones.living)} mm long, then the {n(t.zones.garage)} mm garage. In the living area the
+heavy items stand against partition A: the wet bathroom, the washer-dryer, the diesel heater with the air supply
+on it, and the inverter and chargers on the partition. The fridge and the chest freezer stand along the road side
+in front of the bathroom. The light items are at the front: the desk with the air-conditioner under it, the seat,
+and the wardrobe over the kitchen slide-out, which stays on the kerb side under the awning. The entry door is in
+the kerb-side wall behind the kitchen. Floor space is kept clear at the entry door, the ladder foot, the bathroom
+door, the seat and a walkway between them.
+
+The gas cylinders, the generator and the jerry cans moved from the drawbar box into the garage: the cylinders into
+a sealed locker in the kerb-side rear corner, and the generator and cans along the kerb-side wall in front of it.
+The 12 kWh battery moved to the back, under the garage floor between the rails, 400 mm in front of the rear wall.
+The water tanks stay over the axles, so the towball barely changes as the water is used.
 
 The floor height comes from the running gear in report 06. The tyre is 737.7 mm across, the hubs sit at
 {n(ch.hub_z)} mm, and the XT suspension rises 60 mm at full bump. With 50 mm of clearance above the tyre, the floor
-underside is at {n(ch.floor_underside_z)} mm and the garage floor surface at {n(ch.floor_z)} mm. The rails are
-215 mm above the hubs, at {n(ch.rail_underside_z)} mm, so a {n(ch.raiser_h)} mm raiser fills the gap from the rail
-top to the floor.
-
-The garage is {n(t.spacing.garage)} mm long. The owner measured the Tuareg at 585 mm wide across its side panels
-where the Street Triple's bar end sits. That is inside the 668 mm the 760 mm spacing allows, so the bikes stay
-{n(t.spacing.in_use)} mm apart (CLR-03). The <a href={withBase('/measurements/')}>Measurements</a> page
-shows every input like this one and what it drives.
+underside is at {n(ch.floor_underside_z)} mm and the garage floor surface at {n(ch.floor_z)} mm.
 
 The axle group centre is {n(P.axle_x)} mm behind the ball. The build solved it for {n(t.target_kg)} kg on the ball
-fully loaded, the target from report 07, and moved the module, the tanks, the battery and the suspension with it.
-The living zone stops the garage {n(P.axle_x - P.module_x0 - P.mod_bikes_cog_x)} mm short of sitting exactly
-over the axles, so taking both bikes and their kit out changes the towball by
-{n(tc('TC2').nominal.towball_kg - tc('TC4').nominal.towball_kg)} kg.
+fully loaded, the target from report 07, and moved the tanks and the suspension with it. The garage stays at the
+back.
 
-The drawbar is {n(ch.drawbar_length)} mm long from the ball to the body. At a 90 degree jack-knife the drawbar box
-then clears the Cayenne's side by {n(ch.jackknife_box_mm)} mm and the body corners by {n(ch.jackknife_body_mm)} mm.
+## Ballast to tow with no bikes
+
+With the bikes out, the towball rises above the car's 280 kg rating in the cases with water and gear aboard. The
+build therefore works out the least ballast that brings those cases to 280 kg on base weights, placed at the back
+of the garage, and carries it in the three cases without bikes (TC1, TC4 and TC5). The registration tare does not
+include it. With the growth allowance far more is needed, which check BAL-01 reports.
+
+<Trailer kind="ballast" />
 
 ## Load cases
 
-Mass in kg and the centre of gravity in mm, in the project datum. The towball load comes from moments about the
-axle group centre (MASS-04). The last three columns add the growth allowance from report 02 (MASS-06): 20 % on an
-estimate, 7 % on a calculated mass and nothing on a maker's figure.
+Mass in kg and the centre of gravity in mm, in the project datum. The loading kit stays aboard in every case. The
+towball load comes from moments about the axle group centre (MASS-04). The last three columns add the growth
+allowance from report 02 (MASS-06): 20 % on an estimate, 7 % on a calculated mass and nothing on a maker's figure.
 
 <Trailer kind="cases" />
 
@@ -81,22 +89,22 @@ loaded towball, carries {n(t.car.rear_kg)} kg before any gear, against its 1,600
 The trailer is to be registered in NSW. The NSW examiner caps GTM at the lowest of the tyre, coupling, chain and
 brake ratings ({n(t.caps.gtm)} kg here) and ATM at the lower of the coupling and chain ratings ({n(t.caps.atm)} kg),
 and MAS-07 and MAS-08 check against those caps. The towball limits are design targets from report 07, not legal
-limits. 280 kg is the car's rating, used as a
-ceiling, and 6 % of the trailer's mass is the floor set for stability. A failed check shows in red. The mass
-checks fail with the growth allowance: the trailer is at its ATM fully loaded before any allowance is added. The
-levers are set out in `TRAILER.md`, and none of them is taken here.
+limits. 280 kg is the car's rating, used as a ceiling, and 6 % of the trailer's mass is the floor set for
+stability. A failed check shows in red. The checks that fail do so only with the growth allowance, which is the
+design's real state, and the limits stay as they are. The levers are set out in `TRAILER.md`.
 
 <Trailer kind="checks" />
 
 ## Body length
 
-The build lays out all three body lengths from the same blocks and solves the axle for each. Room for both is
-the inside length less the {n(t.zones.garage)} mm module.
+The build lays out all three body lengths from the same blocks and solves the axle and the ballast for each. The
+garage is the same in each, so only the living area changes.
 
 <Trailer kind="lengths" />
 
-The {n(t.recommended.body_length)} mm body is the shortest that holds every zone. The 5,000 mm body is short, and
-nothing has been dropped to make it fit. These options would shorten the zones. Each is the owner's decision.
+The {n(t.recommended.body_length)} mm body is the shortest that holds the living area. The living area needs
+{n(t.solved.living_min_mm)} mm, so the 5,000 mm body is {n(t.solved.living_min_mm - t.lengths[0].living)} mm short. How much
+each item in the living area costs in length:
 
 <Trailer kind="options" />
 
@@ -111,8 +119,8 @@ The figures the chassis design starts from. Sections are block sizes until the e
 <Trailer kind="crossmembers" />
 
 No outrigger can pass over the tyres, because the floor is only 50 mm above them at full bump. So outboard of the
-rails nothing supports the floor under the garage. It has to span from the rails to the side walls, or hang from
-the walls, while it carries the bikes' wheels and the chocks.
+rails nothing supports the floor over the axles, which is now under the front of the garage and the back of the
+living area. It has to span from the rails to the side walls, or hang from the walls.
 
 ## Mass schedule
 
