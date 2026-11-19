@@ -42,15 +42,15 @@ trailer_cases:
     ballast: true
   - id: TC2
     name: Travel fully loaded
-    aboard: Both bikes with their kit, water tanks full, gas, fuel and gear
+    aboard: Both bikes with their kit, 200 L of water in the trailer's tanks (the other 200 L rides in the car), gas, fuel and gear
     module: all
     bikes: [TU, ST]
-    water_l: water_full_l
+    water_l: water_travel_l
     load: [gas, fuel, gear, luggage]
     towball_target: true
   - id: TC3
     name: Highway travel
-    aboard: As fully loaded, with 50 L of water
+    aboard: As fully loaded, with 50 L of water in the trailer's tanks
     module: all
     bikes: [TU, ST]
     water_l: water_highway_l
@@ -125,6 +125,16 @@ car:
     ball_behind_axle_mm: {v: 1100, src: "Report 07 load budget assumption"}
     spare_kg: {v: 30, src: "The car's own full-size 20 inch spare, about 15 kg wheel (estimate) and 15.3 kg tyre (report 10)"}
     spare_behind_rear_axle_mm: {v: 100, src: "Lying flat on the boot floor, about 0.1 m behind the rear axle (report 10, estimate)"}
+  # The car's gear (CAR-06, 340 kg) includes a water tank of about 215 kg on the floor where the rear seats were:
+  # 200 L of water, about 12 kg of tank and 3 kg of pump and hose (estimates). It tops up the trailer's tanks at camp.
+  water_tank:
+    water_l: 200
+    tank_kg: 12
+    pump_hose_kg: 3
+    total_kg: 215
+    other_gear_kg: 125
+    restraint: "Bolted to the rear-seat anchors or strapped to the boot tie-downs, sized to report 03's load cases (0.8 g forward, 0.5 g rearward and sideways, times 2 off road): about 3.4 kN forward on 215 kg (estimate)"
+    src: "Owner's plan, 19 Nov 2026. Masses are estimates"
   # The car keeps its own wheels and tyres (report 10). It is registered in NSW.
   wheels:
     fitted: "Porsche 20 inch RS Spyder 9.5J x 20 ET47 (958.362.151.00) with Michelin Pilot Sport 4 SUV 275/45 R20 110Y XL, 1,060 kg per tyre"

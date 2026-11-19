@@ -166,7 +166,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
         rows.append([c["id"], c["name"][:30], f"{n['mass_kg']:.0f}", f"{g['mass_kg']:.0f}", f"{n['cog'][0]:.0f}", f"{n['cog'][2]:.0f}",
                      f"{n['towball_kg']:.0f}", f"{n['towball_pct']:.1f}", f"{n['axle_kg']:.0f}",
                      (f"{3500 - g['mass_kg']:+.0f}", "#000" if g["mass_kg"] <= 3500 else "#c00")])
-    yt = S.table(sh, 230.0, 248.0, [("CASE", 10), ("WHAT IS ABOARD", 47), ("kg", 11), ("kg +GR", 13), ("CoG X", 13), ("CoG Z", 12),
+    yt = S.table(sh, 230.0, 243.0, [("CASE", 10), ("WHAT IS ABOARD", 47), ("kg", 11), ("kg +GR", 13), ("CoG X", 13), ("CoG Z", 12),
                                     ("BALL kg", 14), ("BALL %", 13), ("AXLE kg", 14), ("ATM +GR", 33)], rows, size=1.6, row_h=3.2,
                  title="MASS AND CoG BY LOAD CASE (MASS-03). +GR = WITH MASS-06 GROWTH")
     # ---- whole-trailer checks
@@ -198,6 +198,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
         f"(TC1, TC4, TC5). THE REGISTRATION TARE EXCLUDES IT.",
         "REVISION D: THE TRAILER'S OWN WHEELS AND TYRES (ROH TRAK 2 16x7 +7, YOKOHAMA G015 LT245/70R16 118/115R, CRUISEMASTER LC6 HUBS, report 09) "
         "AND A FULL-SIZE SPARE ON THE FRONT WALL. GARAGE FLOOR Z 869.",
+        "REVISION E: FULLY LOADED (TC2) THE TRAILER'S TANKS CARRY 200 L. THE OTHER 200 L RIDES IN A TANK IN THE CAR AND TOPS UP THE TRAILER AT CAMP.",
         "PHANTOM OUTLINES ON THE PLAN ARE FLOOR SPACE KEPT CLEAR (DOOR LANDINGS, WALKWAY, LADDER LANDING).",
         ("MASS CHECKS " + ", ".join(c["id"] for c in rep["checks"] if c["type"] == "mass" and c["severity"] == "fail" and not c["ok"])
          + " FAIL WITH THE GROWTH ALLOWANCE. SEE TRAILER.md BEFORE ANY ENGINEER REVIEW.") if any(

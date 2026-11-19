@@ -103,6 +103,7 @@ params:
   # ---------------------------------------------------------------- water
   water_full_l: 400          # owner's wanted capacity
   water_highway_l: 50        # owner's highway figure
+  water_travel_l: 200        # fully loaded travel: the other 200 L rides in the car's tank and tops up the trailer at camp (owner, 19 Nov)
   tank_z0: rail_underside_z
   tank_h: floor_underside_z - 10 - rail_underside_z
   tank_w: 2 * rail_in - 100  # 50 mm each side for the airbag and shock mounts (estimate until the kit drawing)

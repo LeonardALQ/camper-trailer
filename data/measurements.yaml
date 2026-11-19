@@ -67,7 +67,7 @@ inputs:
     title: Gear planned in the car while towing
     how: Not a measurement. Weigh the gear that will ride in the car, or set what the owner plans to carry. It sits on the floor where the rear seats were.
     unit: kg
-    estimate: {v: 340, src: "Report 07's 385 kg less the 45 kg of gear the car's own 30 kg spare on the boot floor costs (report 10)"}
+    estimate: {v: 340, src: "Report 07's 385 kg less the 45 kg of gear the car's own 30 kg spare on the boot floor costs (report 10). It includes a water tank of about 215 kg (200 L of water, 12 kg tank, 3 kg pump and hose, estimates), which leaves about 125 kg for other gear"}
     measured: {v: null, date: null}
     affects: [towball target, axle solve]
     thresholds:
