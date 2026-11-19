@@ -55,7 +55,7 @@ def cmd_model():
     if SV.cached() is None:
         t = time.time()
         s = SV.solve()
-        print(f"bike spacing solved from the geometry: {s['bike_spacing']:.0f} mm, garage {s['garage_length']:.0f} mm, "
+        print(f"bike spacing solved from the geometry: {s['bike_spacing']:.0f} mm, "
               f"CLR-03 {s['clr03_gap']:.1f} mm ({time.time() - t:.1f} s)")
     from . import export as X
     from . import massprops as MP

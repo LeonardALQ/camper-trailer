@@ -1,8 +1,9 @@
 """Bike spacing from the geometry (measurements.yaml TU-01, addendum 1).
 
 The rule in cad/inputs.py gives a first spacing from the measured width. This sets the final one: the smallest
-whole-millimetre spacing at which CLR-03 (Tuareg to Street Triple) meets its limit on the B-rep bikes, with the
-garage growing by the same amount. The result is cached in build/solved/module.json, keyed by a hash of the data
+whole-millimetre spacing at which CLR-03 (Tuareg to Street Triple) meets its limit on the B-rep bikes. The garage
+width is fixed (revision D), so the Street Triple moves towards the kerb-side stowage and CLR-10 flags a spacing
+that no longer fits. The result is cached in build/solved/module.json, keyed by a hash of the data
 it depends on, and Project reads it back. It never changes the CLR-03 limit.
 """
 from __future__ import annotations
@@ -36,13 +37,13 @@ def solve() -> dict:
     from .checks import evaluate
     from .model.assembly import Model
     from .partsdb import Project
-    from .inputs import BASE_GARAGE, BASE_SPACING
+    from .inputs import BASE_SPACING
     base = Project(use_solved=False)
     rule = base.P.values["bike_spacing"]
     chk = next(c for c in base.checks if c.id == "CLR-03")
 
     def gap(s):
-        prj = Project(overrides={"bike_spacing": s, "garage_length": BASE_GARAGE + s - BASE_SPACING}, use_solved=False)
+        prj = Project(overrides={"bike_spacing": s}, use_solved=False)
         res = evaluate(prj, Model(prj, only={"TU", "ST"}), [chk])[0]
         return res["measured_mm"], res["governing"]
 
@@ -61,7 +62,7 @@ def solve() -> dict:
                 lo = mid
         s = float(math.ceil(hi))
         g, gov = gap(s)
-    out = dict(key=key(), rule_spacing=rule, bike_spacing=s, garage_length=BASE_GARAGE + s - BASE_SPACING, clr03_gap=g,
+    out = dict(key=key(), rule_spacing=rule, bike_spacing=s, clr03_gap=g,
                governing=gov)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(out, indent=1))

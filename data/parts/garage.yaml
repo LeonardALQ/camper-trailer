@@ -27,7 +27,7 @@ parts:
     product: Kinedyne Series L medium-duty aluminium track with flanges, recess-mounted
     maker: Kinedyne
     part_no: Series L medium duty, flanged
-    qty: 3.6
+    qty: 5.14
     unit: m
     mass: {basis: per_length, kg_per_m: 1.10, maturity: calculated, source: "https://kinedyne.com/100-in-series-l-medium-duty-track-flanges", note: "Supplier 2.8 kg per 100 in length"}
     size: 34.5 W x 13.7 H
@@ -36,7 +36,7 @@ parts:
       maker: https://kinedyne.com/100-in-series-l-medium-duty-track-flanges
       recess_kit: https://kinedyne.com/recess-mount-l-track-kit
     stockist_au: null
-    notes: Two rows along X for the full garage length, top flush with the floor.
+    notes: Two rows across the trailer (revision D), the front one 2,330 mm long and the rear one 1,950 mm long up to the gas locker, and a 860 mm row along the kerb strip for the generator and jerry cans. Tops flush with the floor.
     geometry: {generator: l_track, params: {width: 34.5, height: 13.7, slot_w: 10, slot_d: 6}}
     color: "#9aa5ab"
   G-03:
@@ -44,7 +44,7 @@ parts:
     product: US Cargo Control double-stud L-track fitting, or an equal rated fitting
     maker: US Cargo Control
     part_no: Double-stud L-track fitting (4-pack)
-    qty: 14
+    qty: 18
     unit: each
     mass: {basis: declared, unit_kg: 0.14, maturity: spec, source: "https://www.uscargocontrol.com/products/double-stud-l-track-fitting-5-000-lb-break-strength-4-pack", note: "1.2 lb per 4-pack"}
     size: Takes two track slots
@@ -52,7 +52,7 @@ parts:
     links:
       maker: https://www.uscargocontrol.com/products/double-stud-l-track-fitting-5-000-lb-break-strength-4-pack
     stockist_au: null
-    notes: 12 in use plus 2 spares. The spares have no fixed place, so the mass schedule puts them at the mean position of the fitted ones.
+    notes: 12 for the bikes and 4 for the generator and jerry cans, plus 2 spares. The spares have no fixed place, so the mass schedule puts them at the mean position of the fitted ones.
     geometry: {generator: track_fitting, params: {length: 50, width: 30, height: 22}}
     color: "#566573"
   G-04:
@@ -63,19 +63,19 @@ parts:
     qty: 1
     unit: set
     mass: {basis: declared, unit_kg: 2.0, maturity: estimate, source: "research/03-bike-restraint-garage.md section 13"}
-    size: Hardpoint strips under both track rows
+    size: Hardpoint strips under the three track rows
     rating: Designed for 20 kN per anchor
     links: {}
     stockist_au: null
     notes: The steel anchor rails under the floor are chassis scope.
     geometry: null
-    cog: {at: ["garage_length / 2", "(front_row_y + rear_row_y) / 2", -15], basis: "Midway between the two track rows, in the floor"}
+    cog: {at: ["(front_row_x + rear_row_x) / 2", 0, -15], basis: "Midway between the two cross rows, in the floor"}
   G-05:
     name: Ratchet straps
     product: SpanSet Australia Tradesman 35 mm, LC 1,000 kg configuration, closed hooks
     maker: SpanSet Australia
     part_no: Tradesman 35 mm light-duty ratchet strap
-    qty: 10
+    qty: 12
     unit: each
     mass: {basis: declared, unit_kg: 0.8, maturity: estimate, source: "research/03-bike-restraint-garage.md section 13", note: "Ratchet about 0.35 kg, two hooks 0.15 kg, 2 to 3 m of webbing 0.15 kg"}
     size: 35 mm webbing, about 2 m
@@ -83,7 +83,7 @@ parts:
     links:
       maker: https://www.spanset.com/au-en/category/light-duty-ratchet-straps-13040
     stockist_au: https://www.spanset.com/au-en/category/light-duty-ratchet-straps-13040
-    notes: Made and sold in Australia. Four primary straps and one rear-wheel strap per bike.
+    notes: Made and sold in Australia. Four primary straps and one rear-wheel strap per bike, and two for the generator and jerry cans (revision D). The mass schedule spreads the line over the ten modelled bike straps. On the straps a person reaches across a bike, the ratchet sits at the top end (DESIGN.md, Restraint).
     removable: true
     geometry: {generator: strap, params: {width: 35, thickness: 3}}
     color: "#f1c40f"
@@ -120,7 +120,7 @@ parts:
     notes: Front attachment on the Street Triple's bars.
     removable: true
     geometry: null
-    cog: {at: ["st_x", "front_tyre_y + 300 + 310", 990], basis: "Street Triple handlebar beside the risers (05 tie-down point), in the module frame"}
+    cog: {at: ["front_tyre_x + 300 + 310", "st_y", 990], basis: "Street Triple handlebar beside the risers (05 tie-down point), in the module frame"}
   G-08:
     name: Floor and lower-wall coating
     product: U-POL Raptor black, 3 coats with traction additive
@@ -167,10 +167,10 @@ parts:
       maker: https://www.blackwidowpro.com/motorcycle/ramps/full-width/p/mf-12038/
       spec: https://rippingitoutdoors.com/products/black-widow-3-piece-arched-folding-motorcycle-ramp-models-mf-10838-mf-12038-size-38-wide-capacity-1-500-lb-for-street-cruiser-touring-motorcycles
     stockist_au: null
-    notes: 16.4 deg at the 858 mm floor height from the trailer model (BOM.md gave 15 deg at 800 mm and 19 deg at 1,000 mm). No Australian stockist found. Its travel stowage is not decided.
+    notes: 16.4 deg at the 858 mm floor height from the trailer model, about 15.2 deg with the air bags vented. No Australian stockist found. It travels folded on its edge in the kerb strip and slides out of the rear door first (revision D).
     removable: true
     geometry: {generator: ramp, params: {length: 3048, width: 965, thickness: 60}}
-    cog: {at: ["garage_length / 2", 0, 76], basis: "PLACEHOLDER. Travel stowage is not decided, so the folded ramp is put at the garage plan centre, 76 mm up"}
+    cog: {at: ["ramp_x0 + ramp_fold_l / 2", "ramp_y0 + ramp_fold_t / 2", "ramp_fold_w / 2"], basis: "Centre of the folded ramp in its stowed slot (context item C10)"}
     color: "#2d3436"
   G-11:
     name: Loading winch
@@ -184,7 +184,7 @@ parts:
     rating: null
     links: {}
     stockist_au: null
-    notes: Only needed if the bed stays fixed (DESIGN.md, Loading). One winch moves between a quick-release plate above each chock.
+    notes: The bed stays fixed, so the winch pulls each bike up the ramp and forward into its chock (DESIGN.md, Loading). One winch moves between a quick-release plate on partition A in front of each chock, 650 mm up, above the 500 mm ignition-free zone (GAR-03).
     removable: true
     geometry: {generator: winch, params: {length: 300, depth: 120, height: 130, plate_l: 340, plate_h: 160, plate_t: 6}}
     color: "#34495e"
@@ -233,7 +233,7 @@ parts:
     links:
       maker: https://shop.firewize.com.au/products/dry-chemical-powder-2-5kg-abe
     stockist_au: https://shop.firewize.com.au/products/dry-chemical-powder-2-5kg-abe
-    notes: Mounted by the garage door (GAR-04, within 610 mm of the exterior door). Position is a placeholder.
+    notes: Mounted on the gas locker's lid by the rear door (GAR-04, within 610 mm of the exterior door). Position is a placeholder.
     geometry: {generator: extinguisher, params: {diameter: 130, height: 383}}
     color: "#e74c3c"
   G-11-PLATE:
@@ -245,3 +245,20 @@ parts:
     notes: The winch moves between this plate and the plate in the Tuareg bay. Mass is in G-11.
     geometry: {generator: winch, params: {length: 300, depth: 120, height: 130, plate_l: 340, plate_h: 160, plate_t: 6, plate_only: true}}
     color: "#34495e"
+  G-15:
+    name: Gas locker
+    product: Sealed aluminium box for two 9 kg cylinders and their regulator, 25 mm drain, cylinder clamps
+    maker: Owner made or to choose
+    part_no: null
+    qty: 1
+    unit: each
+    mass: {basis: declared, unit_kg: 7.0, maturity: estimate, source: "Estimate: about 2 m2 of 1.6 mm aluminium sheet (4.3 kg/m2) plus clamps and the regulator bracket", note: "The hatch is in the body (trailer layout)"}
+    size: 760 x 380 x 690 outside
+    rating: Cylinder clamps for 4 times the filled weight, about 0.7 kN each way per cylinder
+    links:
+      rules: https://www.energymining.sa.gov.au/__data/assets/pdf_file/0005/922964/Gas-Bulletin-26-Conversion-of-buses-and-trucks-to-motor-homes.pdf
+    stockist_au: null
+    notes: Report 02 section 5.2. Holds only the cylinders and their equipment, is reached only through its hatch in the kerb-side wall, and is sealed to the garage floor, walls and rear wall. Its 25 mm drain runs down to an outlet 500 mm below the floor, offset vertically from the rear door sill and the garage's low vents. The battery box's vent is on the road side, about 2 m away.
+    geometry: {generator: box, params: {}}
+    color: "#95a5a6"
+    alpha: 0.45

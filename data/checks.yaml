@@ -41,14 +41,14 @@ checks:
     inputs: [TU-01, TU-05, TU-07, ST-01]
     why: The governing pair is expected to be the Street Triple's right bar end against the Tuareg's side panels. The owner measured the Tuareg 585 mm wide at that spot (measurements.yaml TU-01), so the half-width is 292.5 mm.
   - id: CLR-04
-    title: Each bike to partitions and side walls, door closed
+    title: Each bike to partition A, the walls, the closed rear door and everything stowed in the garage
     type: clearance
     each: [TU, ST]
-    b: ["1", "2", "3", C2, C3, C4]
+    b: ["1", C2, C3, C8, C4, "21", "14", 14P, "17", C10, C11, C12]
     min_gap_mm: 15
     severity: fail
     inputs: [TU-05, TU-07, ST-01, CHK-01]
-    why: Bars, pegs and tyres must not touch the partitions, the walls or the closed garage door.
+    why: Bars, pegs, panniers and tyres must not touch partition A, the walls, the closed rear door, the winch, the gas locker, the extinguisher or the stowed ramp, generator and jerry cans.
   - id: CLR-05
     title: Mattress top plus 50 mm bedding
     type: height
@@ -59,16 +59,16 @@ checks:
     inputs: [TU-03, TU-04]
     why: With the roof collapsed the bedding must fit under the 1,800 mm ceiling.
   - id: CLR-06
-    title: Tuareg rear-most point to the closed door's inner face (owner's 2,220 mm length)
+    title: Tuareg rear-most point to the closed rear door's inner face (owner's 2,220 mm length)
     type: clearance
     a: [TU]
     b: [C4]
     min_gap_mm: 15
     severity: fail
     inputs: [TU-02, CHK-01]
-    why: The bike's tail and plate hanger must clear the closed kerb-side door.
+    why: The bike's tail and plate hanger must clear the closed rear door.
   - id: CLR-06b
-    title: Tuareg rear-most point to the closed door with the photo-measured 2,263 mm length
+    title: Tuareg rear-most point to the closed rear door with the photo-measured 2,263 mm length
     type: clearance
     a: [TU-2263]
     b: [C4]
@@ -86,6 +86,26 @@ checks:
     added_by_build: true
     inputs: [TU-05, TU-06]
     why: Added with the panniers, which stay on the Tuareg in the garage. A strap must not pass through a bag. DESIGN.md sets no limit for this, so the gap is reported. CLR-03, CLR-04 and CLR-06 already include the panniers, because they are part of the Tuareg's envelope.
+  - id: CLR-09
+    title: Each bike rolled straight back clears the rear door frame
+    type: clearance
+    each: [TU, ST]
+    b: [C14]
+    min_gap_mm: 15
+    severity: fail
+    added_by_build: true
+    inputs: [TU-01, TU-03, TU-05, ST-01]
+    why: Revision D. The bikes unload backwards through the rear door, so each must pass the frame round the opening. The check measures each bike, as parked with its front wheel up in the chock, against the frame extended forward over the whole garage, which is what a bike rolled straight back meets. Going down the ramp the bike pitches nose-up about its front tyre, which only lowers the parts behind the front axle.
+  - id: CLR-10
+    title: Street Triple's kerb-side straps and fittings to the kerb-side stowage
+    type: clearance
+    a: [13.ST-F+, 13.ST-R+, 13.ST-W, 12.ST-FL, 12.ST-RL, 12.ST-WL]
+    b: ["21", C10, C11, C12]
+    min_gap_mm: 15
+    severity: fail
+    added_by_build: true
+    inputs: [TU-01, TU-07, ST-01]
+    why: Revision D. The garage width is fixed, so if the bike spacing grows the Street Triple and its straps move towards the stowed ramp, generator and gas locker. This check is where a spacing that no longer fits the width shows up (measurements.yaml TU-01).
   - id: CLR-07
     title: Ladder foot to the living-area floor
     type: landing
@@ -95,43 +115,55 @@ checks:
     max_gap_mm: 10
     severity: fail
     inputs: [TU-03, TU-04]
-    why: Added in revision B. The owner-built ladder hooks on the deck edge and must reach the living-area floor, taken level with the garage floor. A foot more than 10 mm up leaves the ladder hanging, and a foot below the floor means the ladder cannot stand at the 15 degree lean.
+    why: Added in revision B. The owner-built ladder hooks on the deck edge at partition A and must reach the living-area floor, taken level with the garage floor. A foot more than 10 mm up leaves the ladder hanging, and a foot below the floor means the ladder cannot stand at the 15 degree lean.
   - id: BED-01
     title: Bed beam sag at the garage's span, two sleepers spread over the bed
     type: beam
     a: ["6.3"]
-    beam: {load_kg: 255, beams: 5, e_gpa: 69, i_cm4: 10.85, depth_mm: 50, baseline_span_mm: 1800}
+    beam: {load_kg: 255, beams: 5, e_gpa: 69, i_cm4: 20.8, depth_mm: 50, baseline_span_mm: 2330}
     span_ratio: 300
     severity: report
     added_by_build: true
-    inputs: [TU-01, TU-07, ST-01]
-    why: Added with revision C, because the beams were sized for 1,800 mm (research/04, about 5 mm under 255 kg spread over the bed) and the span now follows the bike spacing. RHS 50x25x2.5 6106-T6, I 10.85 cm4 (Capral), E 69 GPa. Span / 300 is a common floor deflection guide, used here for reporting. The engineer sets the real limit and the load cases.
+    inputs: []
+    why: Revision D. The beams span the 2,330 mm interior width, so the revision C RHS 50x25x2.5 (about 11 mm sag here) became SHS 50x50x3, 6060-T5, I 20.8 cm4 (calculated), E 69 GPa. Span / 300 is a common floor deflection guide, used here for reporting. The engineer sets the real limit and the load cases.
+  - id: RES-01
+    title: Worst strap load within the strap's 1,000 kg lashing capacity, report 03's load cases along the trailer
+    type: restraint
+    restraint: {factor: 2.0, share: 0.6, lc_kg: 1000, cases: {forward_g: 0.8, rearward_g: 0.5, lateral_g: 0.5, up_g: 1.0},
+                cg_z: {TU: 700, ST: 600}}
+    severity: fail
+    added_by_build: true
+    inputs: []
+    why: Revision D. With the bikes along the trailer, braking pushes each bike into its chock and cornering pushes it sideways. Report 03's method with its off-road factor of 2, one strap taking 60 % of the sideways moment, and its design centre of gravity heights (700 mm Tuareg, 600 mm Street Triple, above the 05 estimates). Every anchor stays designed for 20 kN.
   - id: CON-01
-    title: Chock bases, L-track and floor touch without overlap, beams sit on ledgers and the deck sits on beams and on partition B
+    title: Chock bases, L-track and floor touch without overlap, beams sit on ledgers and the deck sits on beams, ledgers and partition A
     type: contact
     pairs:
       - [10.TU, C1]
       - [10.ST, C1]
       - [11.front, C1]
       - [11.rear, C1]
+      - [11.stow, C1]
       - [10.TU, 11.front]
       - [10.ST, 11.front]
-      - ["6.1", 5.on-A]
-      - ["6.1", 5.on-B]
-      - ["6.2", 5.on-A]
-      - ["6.2", 5.on-B]
-      - ["6.3", 5.on-A]
-      - ["6.3", 5.on-B]
-      - ["6.4", 5.on-A]
-      - ["6.4", 5.on-B]
-      - ["6.5", 5.on-A]
-      - ["6.5", 5.on-B]
+      - ["6.1", 5.road-wall]
+      - ["6.1", 5.kerb-wall]
+      - ["6.2", 5.road-wall]
+      - ["6.2", 5.kerb-wall]
+      - ["6.3", 5.road-wall]
+      - ["6.3", 5.kerb-wall]
+      - ["6.4", 5.road-wall]
+      - ["6.4", 5.kerb-wall]
+      - ["6.5", 5.road-wall]
+      - ["6.5", 5.kerb-wall]
       - ["7", "6.1"]
       - ["7", "6.2"]
       - ["7", "6.3"]
       - ["7", "6.4"]
       - ["7", "6.5"]
-      - ["7", "2"]
+      - ["7", 5.on-A]
+      - ["7", 5.rear-wall]
+      - ["7", "1"]
     tolerance_mm: 0.01
     severity: fail
     inputs: [TU-03, TU-04]

@@ -1,17 +1,18 @@
 """Bike envelope models built from research/05-bike-geometry.yaml.
 
-Shapes are built in a local frame that is already aligned with the module frame:
-local X = bike y (bike's left), local Y = bike x (towards the bike's rear), local Z = z (up),
-origin on the ground under the front axle. `place_bike` then pitches the bike nose-up by the chock
-cradle rise (rotation about the rear axle, so the rear tyre stays on the floor) and moves it to its
-bay. Values not in 05 come from data/parts/bikes.yaml, where each is labelled as an estimate.
+Shapes are built in a local frame: local X = bike y (bike's left), local Y = bike x (towards the bike's rear),
+local Z = z (up), origin on the ground under the front axle. `place_bike` pitches the bike nose-up by the
+chock cradle rise (rotation about the rear axle, so the rear tyre stays on the floor), then swaps local X and
+Y so that bike x runs along module X and bike y along module Y (DESIGN.md revision D: the bikes stand along
+the trailer, noses towards partition A), and moves it to its bay. Values not in 05 come from
+data/parts/bikes.yaml, where each is labelled as an estimate.
 """
 from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
 
-from build123d import Compound, Pos, Rot, Vector, Vertex
+from build123d import Compound, Plane, Pos, Rot, Vector, Vertex
 
 from .prims import cyl, disc_x_axis, prism_xy, prism_yz, tyre_x_axis, box_span
 
@@ -284,20 +285,30 @@ def xform(loc, p) -> Vector:
     return (loc * Vertex(*p)).center()
 
 
+# Mirror plane X = Y: swaps local X (bike y) and local Y (bike x), so bike x runs along module X
+SWAP = Plane(origin=(0, 0, 0), x_dir=(1, 1, 0), z_dir=(1, -1, 0))
+
+
 @dataclass
 class PlacedBike:
     model: BikeModel
-    loc: object          # build123d Location (local frame -> module frame)
+    rot: object          # build123d Location: the chock pitch in the local frame
+    move: object         # build123d Location: from the swapped frame to the bike's bay
     pitch_deg: float
 
     def point(self, x, y, z) -> Vector:
         """Bike-frame point to the module frame."""
-        return xform(self.loc, P(x, y, z))
+        p = xform(self.rot, P(x, y, z))
+        return xform(self.move, (p.Y, p.X, p.Z))
+
+    def place(self, shape):
+        """Local-frame solid to the module frame."""
+        return self.move * (self.rot * shape).mirror(SWAP)
 
 
-def place_bike(model: BikeModel, centre_x: float, front_tyre_y: float, front_overhang: float, front_rise: float) -> PlacedBike:
+def place_bike(model: BikeModel, centre_y: float, front_tyre_x: float, front_overhang: float, front_rise: float) -> PlacedBike:
     """Pitch nose-up about the rear axle so the front tyre's lowest point rises by `front_rise`, then put the
-    front axle at Y = front_tyre_y + front_overhang (DESIGN.md) on the bike centreline X = centre_x."""
+    front axle at X = front_tyre_x + front_overhang (DESIGN.md) on the bike centreline Y = centre_y."""
     xf, zf = model.front_axle
     xr, zr = model.rear_axle
     L = xr - xf
@@ -305,15 +316,14 @@ def place_bike(model: BikeModel, centre_x: float, front_tyre_y: float, front_ove
     # rotation about the local X axis through the rear axle; negative angle lifts points with smaller Y (the front)
     rot = Pos(0, xr, zr) * Rot(-theta, 0, 0) * Pos(0, -xr, -zr)
     fa = xform(rot, (0, xf, zf))
-    target = Vector(centre_x, front_tyre_y + front_overhang, fa.Z)
-    loc = Pos(target.X - fa.X, target.Y - fa.Y, 0) * rot
-    return PlacedBike(model, loc, theta)
+    move = Pos(front_tyre_x + front_overhang - fa.Y, centre_y - fa.X, 0)
+    return PlacedBike(model, rot, move, theta)
 
 
 def bike_compound(pb: PlacedBike, label: str):
     children = []
     for name, s in pb.model.solids.items():
-        m = pb.loc * s
+        m = pb.place(s)
         m.label = name
         children.append(m)
     return Compound(label=label, children=children)

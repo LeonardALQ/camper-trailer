@@ -2,7 +2,7 @@
 
 Each input has an estimate and a measured slot. The value in use is the measured one when present. The rules
 below are the `thresholds` in the data, written out as arithmetic. They re-solve parameters (the bike spacing,
-the garage length, the bed beam height, the towball target, the wheel choice) rather than only flag them, and
+the bed beam height, the towball target, the wheel choice) rather than only flag them, and
 each rule records what it did so the site can show it.
 """
 from __future__ import annotations
@@ -17,11 +17,11 @@ import yaml
 BASE_SPACING = 760          # bike spacing
 ST_BAR_REACH = 396          # Street Triple bar end from its centreline (owner's 792 mm width / 2)
 CLR03_GAP = 30              # CLR-03 limit
-BASE_GARAGE = 1800
+BASE_GARAGE = 2330          # revision D: garage length and width are fixed by the body
+MAX_SPACING = 780           # revision D: largest spacing at which the Street Triple's kerb-side straps keep 15 mm from the stowed ramp (CLR-10)
 BASE_BEAM = 1460
 CHOCK_RISE = 25
 BEAM_MARGIN = 45            # 1,460 = 1,390 + 25 + 45
-WALL_Y = -1165              # road-side wall face
 DRIVER_KG = 75              # weighbridge driver (estimate)
 DRIVER_X = 1150             # behind the front axle (report 07 occupant position)
 
@@ -91,16 +91,22 @@ class Inputs:
             self.solved = cached()
             if self.solved:
                 spacing = self.solved["bike_spacing"]
-        garage = BASE_GARAGE + spacing - BASE_SPACING
+        max_spacing = MAX_SPACING
         if fairing_excess:
             txt = f"{w:.0f} mm is over 668 mm, so the rule grows the spacing by {fairing_excess:.0f} mm to {self.rule_spacing:.0f} mm"
         else:
             txt = f"{w:.0f} mm is within 668 mm, so the width keeps the 760 mm spacing"
         if self.solved:
             txt += (f". The geometry sets it at {spacing:.0f} mm, where CLR-03 measures {self.solved['clr03_gap']:.1f} mm "
-                    f"({self.solved['governing']}), so the garage is {garage:.0f} mm long")
+                    f"({self.solved['governing']})")
         elif grow:
             txt += f". The geometric solve has not run yet, so the rule's {spacing:.0f} mm is in use"
+        if spacing > max_spacing:
+            txt += (f". The garage width is fixed and {spacing:.0f} mm is over the {max_spacing:.0f} mm that fits beside the kerb-side "
+                    "stowage, so CLR-10 fails and the layout needs redesigning")
+        else:
+            txt += f". The garage width is fixed, and spacings up to {max_spacing:.0f} mm fit beside the kerb-side stowage"
+        self.spacing_fits = spacing <= max_spacing
         self.note("TU-01", txt)
         cb_top = self.v("TU-09")
         self.note("TU-09", f"crash bar envelope up to {cb_top:.0f} mm, " + ("below 970 mm, so the Street Triple's bar end passes over it"
@@ -115,11 +121,12 @@ class Inputs:
         self.note("TU-04", "below the screen, so the screen sets the beam height" if self.v("TU-04") <= self.v("TU-03")
                   else "above the screen, so the mirrors set the beam height")
         nose = self.v("CHK-01")
-        self.note("CHK-01", f"front tyre leading edge at Y {WALL_Y + nose:.0f}")
-        self.note("TU-02", f"Tuareg modelled {self.v('TU-02'):.0f} mm long. CLR-06 measures the gap to the door")
-        self.note("TU-05", f"pannier outer faces {self.v('TU-05') / 2:.0f} mm either side of the bike's centreline")
+        self.note("CHK-01", f"front tyres' leading edges at X {nose:.0f}, that far behind partition A")
+        self.note("TU-02", f"Tuareg modelled {self.v('TU-02'):.0f} mm long. CLR-06 measures the gap to the rear door")
+        self.note("TU-05", f"pannier outer faces {self.v('TU-05') / 2:.0f} mm either side of the bike's centreline. CLR-04 measures them "
+                           "against the road-side wall and CLR-09 against the rear door's road-side jamb")
         self.note("TU-06", "pannier envelope {:.0f} long and {:.0f} high, front edge {:.0f} behind the front axle, bottom {:.0f} off the floor".format(*self.v("TU-06")))
-        return dict(bike_spacing=spacing, garage_length=garage, beam_underside_z=beam, front_tyre_y=WALL_Y + nose)
+        return dict(bike_spacing=spacing, beam_underside_z=beam, front_tyre_x=nose)
 
     def patch_parts(self, parts: dict):
         """Bike envelope values that come straight from measurements."""

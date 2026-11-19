@@ -4,9 +4,9 @@ import pytest
 from cad import massprops as MP
 from cad.tests.test_checks import MODEL, PRJ
 
-# garage-bed/BOM.md revision B totals (kg)
-BOM_MD = {"garage": 95.6, "bed": 54.2, "partitions": 30.2, "fixings": 3.1, "access": 2.6,
-          "module_empty": 185.7, "removable": 75.7, "with_bikes": 566.7}
+# garage-bed/BOM.md revision D totals (kg)
+BOM_MD = {"garage": 106.4, "bed": 68.1, "partitions": 13.2, "fixings": 3.1, "access": 2.6,
+          "module_empty": 193.4, "removable": 77.3, "with_bikes": 574.4}
 LINES = MP.line_masses(PRJ, MODEL)
 BIKES = sum(b["mass_kg"] for b in MP.bike_rows(PRJ, MODEL))
 
@@ -57,10 +57,10 @@ def test_tuareg_width_with_bags_matches_owner():
 def test_mass_matches_bom_md(key):
     """Each line rounded to 0.1 kg (as BOM.md rounds them) must sum to the BOM.md total, and the
     unrounded total may differ only by that rounding (at most 0.05 kg per line)."""
-    gl = PRJ.P.values["garage_length"]
-    if gl != 1800 and key not in ("fixings", "access", "removable"):
-        pytest.xfail(f"garage-bed/BOM.md is for the 1,800 mm garage. The measurements re-solved it to {gl:.0f} mm, "
-                     "so BOM.md needs its revision C quantities")
+    sp = PRJ.P.values["bike_spacing"]
+    if sp != 760 and key in ("garage", "module_empty", "with_bikes"):
+        pytest.xfail(f"garage-bed/BOM.md is for the 760 mm bike spacing. The measurements re-solved it to {sp:.0f} mm, "
+                     "which moves the strap and track lines")
     rounded, exact = _total(key, True), _total(key, False)
     assert abs(rounded - BOM_MD[key]) < 0.051, f"{key}: lines rounded to 0.1 kg sum to {rounded:.2f}, BOM.md {BOM_MD[key]}"
     assert abs(exact - BOM_MD[key]) <= 0.05 * _lines_in(key) + 1e-9, f"{key}: model {exact:.2f} kg, BOM.md {BOM_MD[key]}"

@@ -129,7 +129,7 @@ class AssemblyDef(Strict):
 class Check(Strict):
     id: str
     title: str
-    type: Literal["clearance", "height", "contact", "landing", "beam"]
+    type: Literal["clearance", "height", "contact", "landing", "beam", "restraint"]
     a: list[str] | None = None
     b: list[str] | None = None
     each: list[str] | None = None
@@ -140,6 +140,7 @@ class Check(Strict):
     max_z: Any = None
     tolerance_mm: float = 0.01
     beam: dict[str, Any] | None = None
+    restraint: dict[str, Any] | None = None
     span_ratio: float | None = None
     severity: Literal["fail", "report"]
     added_by_build: bool = False

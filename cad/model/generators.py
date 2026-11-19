@@ -22,6 +22,15 @@ def _fuse(shapes):
     return out
 
 
+def _face_x(shape, prm, at):
+    """Generators that model an item against a wall facing +Y can turn it to face +X (a partition or end
+    wall across the trailer): rotate -90 degrees about Z through `at`, so +Y becomes +X."""
+    if prm.get("face") != "x":
+        return shape
+    x, y, z = at
+    return Pos(x, y, z) * Rot(0, 0, -90) * Pos(-x, -y, -z) * shape
+
+
 # ------------------------------------------------------------------ made parts
 def gen_box(prm, at, P):
     dx, dy, dz = prm["dx"], prm["dy"], prm["dz"]
@@ -51,11 +60,16 @@ def gen_panel(prm, at, P):
 
 
 def gen_rhs(prm, at, P):
+    """Hollow section from `at` (its underside centre line start). It runs along X, or along Y with axis: y."""
     L, H, W, t, r = prm["length"], prm["height"], prm["width"], prm["wall"], prm.get("outer_radius", 0)
     outer = RectangleRounded(W, H, r) if r > 0 else Rectangle(W, H)
     inner = RectangleRounded(W - 2 * t, H - 2 * t, r - t) if r - t > 0.2 else Rectangle(W - 2 * t, H - 2 * t)
     prof = outer - inner
-    s = Pos(at[0], at[1], at[2] + H / 2) * extrude(Plane.YZ * prof, amount=L)
+    if prm.get("axis") == "y":
+        pl = Plane(origin=(0, 0, 0), x_dir=(1, 0, 0), z_dir=(0, 1, 0))
+        s = Pos(at[0], at[1], at[2] + H / 2) * extrude(pl * prof, amount=L)
+    else:
+        s = Pos(at[0], at[1], at[2] + H / 2) * extrude(Plane.YZ * prof, amount=L)
     return s, {"length_m": L / 1000}
 
 
@@ -116,15 +130,15 @@ def gen_cleat(prm, spec, P):
 
 
 def gen_ledger(prm, spec, P):
-    """40x40x3 ledger. On a partition the vertical leg hangs below a shelf whose top is `top_z`.
-    On a side wall the vertical leg hangs below the shelf that carries the deck edge."""
+    """40x40x3 ledger with its vertical leg hanging below a shelf whose top is `top_z`. On partition A or the
+    rear wall it runs across the trailer, on a side wall along it."""
     leg, t = prm["leg"], prm["thickness"]
     top = spec["top_z"]
     L = spec["length"]
     hw = P.get("half_width")
     gl = P.get("garage_length")
     w = spec["wall"]
-    if w in ("partition_a", "partition_b"):
+    if w in ("partition_a", "rear"):
         x0, s = (0.0, 1) if w == "partition_a" else (gl, -1)
         prof = [(x0, top - leg), (x0 + s * t, top - leg), (x0 + s * t, top - t), (x0 + s * leg, top - t), (x0 + s * leg, top), (x0, top)]
         if s < 0:
@@ -164,25 +178,35 @@ def gen_condor_chock(prm, at, P):
         parts.append(cyl((x + s * 90, yh, z + 30), (x + s * 90, yh, z + H - 12.5), 12.5))
         parts.append(cyl((x + s * 90, yh, z + 300), (x + s * (W / 2 - 12.5), y + 330, z + 30), 10))
     parts.append(cyl((x - 102.5, yh, z + H - 12.5), (x + 102.5, yh, z + H - 12.5), 12.5))
-    return _fuse(parts), {}
+    return _face_x(_fuse(parts), prm, at), {}
 
 
 def gen_l_track(prm, at, P):
+    """Track from `at` along X, or along Y with axis: y (a row across the trailer)."""
     L = prm["length"]
     W, H = prm["width"], prm["height"]
     x, y, z = at
-    s = box_span(x, x + L, y - W / 2, y + W / 2, z, z + H)
-    s = s - box_span(x - 1, x + L + 1, y - prm["slot_w"] / 2, y + prm["slot_w"] / 2, z + H - prm["slot_d"], z + H + 1)
+    sw = prm["slot_w"] / 2
+    if prm.get("axis") == "y":
+        s = box_span(x - W / 2, x + W / 2, y, y + L, z, z + H)
+        s = s - box_span(x - sw, x + sw, y - 1, y + L + 1, z + H - prm["slot_d"], z + H + 1)
+    else:
+        s = box_span(x, x + L, y - W / 2, y + W / 2, z, z + H)
+        s = s - box_span(x - 1, x + L + 1, y - sw, y + sw, z + H - prm["slot_d"], z + H + 1)
     return s, {"length_m": L / 1000}
 
 
 def gen_track_fitting(prm, at, P):
+    """Double-stud fitting, its length along the track (X, or Y with axis: y)."""
     x, y, z = at
     l, w, h = prm["length"], prm["width"], prm["height"]
     base = box_span(x - l / 2, x + l / 2, y - w / 2, y + w / 2, z, z + h * 0.45)
     ring = Pos(x, y, z + h * 0.45) * Rot(0, 90, 0) * (Cylinder(h * 0.55, 8) - Cylinder(h * 0.3, 10))
     ring = ring - box_span(x - 20, x + 20, y - 20, y + 20, z - 30, z + h * 0.45)
-    return base + ring, {}
+    s = base + ring
+    if prm.get("axis") == "y":
+        s = Pos(x, y, z) * Rot(0, 0, 90) * Pos(-x, -y, -z) * s
+    return s, {}
 
 
 def gen_winch(prm, at, P):
@@ -195,7 +219,7 @@ def gen_winch(prm, at, P):
         parts.append(box_span(x - L / 2, x - L / 2 + 70, y + pt, y + pt + D, zc - H / 2, zc + H / 2))
         parts.append(box_span(x + L / 2 - 70, x + L / 2, y + pt, y + pt + D, zc - H / 2, zc + H / 2))
         parts.append(cyl((x - L / 2 + 70, y + pt + D / 2, zc), (x + L / 2 - 70, y + pt + D / 2, zc), H / 2 - 10))
-    return _fuse(parts), {}
+    return _face_x(_fuse(parts), prm, at), {}
 
 
 def gen_vent(prm, at, P):
@@ -226,20 +250,22 @@ def gen_ladder(prm, at, P):
     """Owner-built ladder hooked on the deck edge (revision B).
 
     `at` is (X of the deck end, Y of the ladder centreline, Z of the deck top). Two square stiles
-    (`stile` mm, the SHS 25x1.6 envelope) lean `lean_deg` from vertical into the living area. Each
-    stile is `length` mm along its axis between level-cut ends, with its top end at the deck-top level.
-    A hook bar on each stile lies on the deck top from `hook_reach` mm inboard of the deck end. The stiles
-    hang `clear` mm outboard of the outer edge of the cleat on top of partition B. Rungs are evenly spaced.
+    (`stile` mm, the SHS 25x1.6 envelope) lean `lean_deg` from vertical into the living area, which lies
+    towards `dir` (-1 is towards -X, in front of partition A in revision D). Each stile is `length` mm along
+    its axis between level-cut ends, with its top end at the deck-top level. A hook bar on each stile lies on
+    the deck top from `hook_reach` mm inboard of the deck end. The stiles hang `clear` mm outboard of the outer
+    edge of the cleat on top of the partition. Rungs are evenly spaced.
     """
     x_end, y, z_top = at
+    sx = prm.get("dir", 1)
     L, W, s = prm["length"], prm["width"], prm["stile"]
     lean = math.radians(prm["lean_deg"])
     w = s / math.cos(lean)                      # horizontal width of a leaning square stile
-    cleat_out = x_end + P.get("cleat_leg")      # outer edge of the cleat on partition B's top edge
-    z_cleat = P.get("partition_b_h")            # top of that cleat
+    cleat_out = x_end + sx * P.get("cleat_leg")  # outer edge of the cleat on the partition's top edge
+    z_cleat = P.get("partition_a_h")            # top of that cleat
     # the stile's inner face clears the cleat edge by `clear` at the cleat's top level
-    x_c = cleat_out + prm["clear"] + w / 2 - (z_top - z_cleat) * math.tan(lean)
-    dx, dz = L * math.sin(lean), L * math.cos(lean)
+    x_c = cleat_out + sx * (prm["clear"] + w / 2 - (z_top - z_cleat) * math.tan(lean))
+    dx, dz = sx * L * math.sin(lean), L * math.cos(lean)
     z_foot = z_top - dz
     parts = []
     for side in (1, -1):
@@ -247,7 +273,7 @@ def gen_ladder(prm, at, P):
         side_view = [(x_c - w / 2, z_top), (x_c + w / 2, z_top), (x_c + dx + w / 2, z_foot), (x_c + dx - w / 2, z_foot)]
         parts.append(prism_xz(side_view, yc - s / 2, yc + s / 2))
         hw = prm["hook_w"] / 2
-        parts.append(box_span(x_end - prm["hook_reach"], x_c + w / 2, yc - hw, yc + hw, z_top, z_top + prm["hook_t"]))
+        parts.append(box_span(x_end - sx * prm["hook_reach"], x_c + sx * w / 2, yc - hw, yc + hw, z_top, z_top + prm["hook_t"]))
     n = int(prm["rungs"])
     for k in range(1, n + 1):
         f = k / (n + 1)
@@ -264,10 +290,12 @@ def gen_net(prm, at, P):
 
 
 def gen_ramp(prm, spec, P):
+    """Ramp deployed from the sill, running down along +X from `sill_x` (the rear door, revision D) on the
+    line Y `centre_y`."""
     L, W, T = prm["length"], prm["width"], prm["thickness"]
     drop = spec["drop"]
     a = math.degrees(math.asin(drop / L))
-    s = Pos(spec["centre_x"], spec["sill_y"], 0) * Rot(-a, 0, 0) * box_span(-W / 2, W / 2, 0, L, -T, 0)
+    s = Pos(spec["sill_x"], spec["centre_y"], 0) * Rot(0, a, 0) * box_span(0, L, -W / 2, W / 2, -T, 0)
     return s, {"angle_deg": a, "run_mm": L * math.cos(math.radians(a))}
 
 
@@ -279,27 +307,47 @@ def gen_strap(prm, pts, P):
 
 # ------------------------------------------------------------------ context
 def gen_floor(prm, at, P):
+    """Garage floor with a recess under each track row: the rows across the trailer at front_row_x and
+    rear_row_x, and the stowage row along the kerb strip."""
     t = prm["thickness"]
     hw, wt = P.get("half_width"), P.get("wall_t")
-    x0, x1 = P.get("body_x0"), P.get("body_x1")
+    x0, x1 = P.get("body_x0"), P.get("garage_length")
     s = box_span(x0, x1, -hw - wt, hw + wt, -t, 0)
-    gl, tw, th = P.get("garage_length"), P.get("track_w"), P.get("track_h")
-    for yr in (P.get("front_row_y"), P.get("rear_row_y")):
-        s = s - box_span(0, gl, yr - tw / 2, yr + tw / 2, -th, 1)
+    tw, th = P.get("track_w"), P.get("track_h")
+    for xr, y1 in ((P.get("front_row_x"), hw), (P.get("rear_row_x"), P.get("rear_row_y1"))):
+        s = s - box_span(xr - tw / 2, xr + tw / 2, -hw, y1, -th, 1)
+    ys = P.get("stow_row_y")
+    s = s - box_span(P.get("stow_row_x0"), P.get("stow_row_x1"), ys - tw / 2, ys + tw / 2, -th, 1)
     return s, {}
 
 
 def gen_wall(prm, at, P):
+    """Body walls round the garage: the side walls (the kerb one with the gas locker hatch opening) and the
+    rear wall with the garage door opening."""
     t = prm["thickness"]
     hw = P.get("half_width")
-    x0, x1 = P.get("body_x0"), P.get("body_x1")
+    x0, x1 = P.get("body_x0"), P.get("garage_length")
     zc = P.get("ceiling_z")
-    if prm.get("side") == "road":
+    side = prm.get("side")
+    if side == "road":
         s = box_span(x0, x1, -hw - t, -hw, 0, zc)
-    else:
+    elif side == "kerb":
         s = box_span(x0, x1, hw, hw + t, 0, zc)
         if prm.get("opening"):
-            s = s - box_span(P.get("door_x0"), P.get("door_x1"), hw - 1, hw + t + 1, -1, P.get("door_h"))
+            s = s - box_span(P.get("hatch_x0"), P.get("hatch_x1"), hw - 1, hw + t + 1, P.get("hatch_z0"), P.get("hatch_z1"))
+    else:
+        s = box_span(x1, x1 + t, -hw - t, hw + t, 0, zc)
+        s = s - box_span(x1 - 1, x1 + t + 1, P.get("door_y0"), P.get("door_y1"), -1, P.get("door_h"))
+    return s, {}
+
+
+def gen_sweep(prm, at, P):
+    """The rear wall's frame round the door opening, extended forward over the whole garage length. A bike
+    rolled straight back along X passes the frame if it clears this solid (check only)."""
+    hw = P.get("half_width")
+    x1 = P.get("garage_length") + P.get("wall_t")
+    s = box_span(0, x1, -hw, hw, 0, P.get("ceiling_z"))
+    s = s - box_span(-1, x1 + 1, P.get("door_y0"), P.get("door_y1"), -1, P.get("door_h"))
     return s, {}
 
 
@@ -307,5 +355,5 @@ GENERATORS = {
     "box": gen_box, "panel": gen_panel, "rhs": gen_rhs, "froli": gen_froli,
     "condor_chock": gen_condor_chock, "l_track": gen_l_track, "track_fitting": gen_track_fitting,
     "winch": gen_winch, "vent": gen_vent, "fume_sensor": gen_fume_sensor, "extinguisher": gen_extinguisher,
-    "ladder": gen_ladder, "net": gen_net, "floor": gen_floor, "wall": gen_wall,
+    "ladder": gen_ladder, "net": gen_net, "floor": gen_floor, "wall": gen_wall, "sweep": gen_sweep,
 }

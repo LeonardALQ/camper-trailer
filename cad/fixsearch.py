@@ -20,21 +20,27 @@ def candidates(row: dict) -> list[tuple[str, int, str]]:
     if cid == "CLR-03":
         return [("bike_spacing", +1, "increase the bike spacing")]
     if cid in ("CLR-06", "CLR-06b"):
-        return [("front_tyre_y", -1, "move both bikes towards the road-side wall (front tyre Y), which shrinks the chock nose allowance")]
+        return [("front_tyre_x", -1, "move both bikes towards partition A (front tyre X), which shrinks the chock nose allowance")]
     if cid == "CLR-05":
         return [("mattress_t", -1, "use a thinner mattress")]
     if cid == "CLR-07":
         if row["measured_mm"] < 0:
             return [("ladder_length", -1, "shorten the ladder")]
         return [("ladder_length", +1, "lengthen the ladder")]
+    if cid == "CLR-09":
+        if "Street Triple" in row.get("sub", ""):
+            return [("door_y1", +1, "widen the door opening on the kerb side")]
+        return [("door_y0", -1, "widen the door opening on the road side")]
+    if cid == "CLR-10":
+        return [("ramp_y0", +1, "move the stowed ramp towards the kerb wall")]
     if cid == "CLR-04":
         if "(C2)" in gov:
-            return [("front_tyre_y", +1, "move both bikes away from the road-side wall")]
-        if "(C3)" in gov or "(C4)" in gov:
-            return [("front_tyre_y", -1, "move both bikes towards the road-side wall")]
+            return [("tuareg_y", +1, "move both bikes away from the road-side wall")]
+        if "(C4)" in gov or "(C8)" in gov:
+            return [("front_tyre_x", -1, "move both bikes towards partition A")]
         if "(1)" in gov:
-            return [("tuareg_x", +1, "move the Tuareg away from partition A")]
-        if "(2)" in gov or "(3)" in gov:
+            return [("front_tyre_x", +1, "move both bikes away from partition A")]
+        if "(C3)" in gov or "(21)" in gov or "(C10)" in gov or "(C11)" in gov or "(C12)" in gov:
             return [("bike_spacing", -1, "reduce the bike spacing")]
     return []
 

@@ -65,7 +65,7 @@ class Model:
             if k in sp:
                 prm[k] = sp[k]
         model = build_bike(geo05, prm)
-        pb = place_bike(model, sp["centre_x"], sp["front_tyre_y"], prm["front_overhang"], sp["front_rise"])
+        pb = place_bike(model, sp["centre_y"], sp["front_tyre_x"], prm["front_overhang"], sp["front_rise"])
         if sp.get("luggage_only"):
             # check-only copy that holds just the luggage, for checks that must not see the bike itself
             model.solids = {k: v for k, v in model.solids.items() if k.startswith("pannier")}

@@ -51,7 +51,7 @@ parts:
     stockist_au: null
     notes: null
     geometry: null
-    cog: {at: ["garage_length / 2", "(front_row_y + rear_row_y) / 2", 0], basis: "Hardpoint strips in the floor, estimate"}
+    cog: {at: ["(front_row_x + rear_row_x) / 2", 0, 0], basis: "Hardpoint strips in the floor, estimate"}
   F-04:
     name: Foam tape
     product: 3M VHB 5952
@@ -135,7 +135,7 @@ parts:
     stockist_au: https://www.bossard.com/au-en/
     notes: About 10.
     geometry: null
-    cog: {at: ["garage_length", 0, 1530], basis: "Platform edge at partition B, estimate"}
+    cog: {at: [0, 0, 1530], basis: "Deck edge at partition A, estimate"}
   F-09:
     name: Isolation compounds
     product: Duralac and Tef-Gel

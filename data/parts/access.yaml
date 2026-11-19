@@ -14,10 +14,10 @@ parts:
     links:
       stile_section: https://shop.capral.com.au/808512/
     stockist_au: https://shop.capral.com.au/808512/
-    notes: Revision B. Hooks on the deck edge at partition B and stands in the living area. It replaces the Fiamma Deluxe 4B (1,500 mm, 2.4 kg, 100 kg max), which stopped about 80 mm above the floor. Its Y position in the model is a placeholder.
+    notes: Revision B. Hooks on the deck edge at partition A (revision D) and stands in the living area. It replaces the Fiamma Deluxe 4B (1,500 mm, 2.4 kg, 100 kg max), which stopped about 80 mm above the floor. Its Y position in the model is a placeholder.
     # Length and lean come from the assembly (ladder_length, ladder_lean_deg). The stile tops sit at the
     # deck-top level under the hooks, the ends are cut level, and the stiles hang `clear` mm outboard of
-    # the cleat on top of partition B. Width, rung count and hook sizes are estimates (research/04: five
+    # the cleat on top of partition A. Width, rung count and hook sizes are estimates (research/04: five
     # rungs of 0.33 m).
     geometry: {generator: ladder, params: {width: 330, stile: 25, rung_d: 25, rungs: 5, hook_w: 30, hook_t: 4, hook_reach: 30, clear: 2}}
     color: "#aab7b8"
