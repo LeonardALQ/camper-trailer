@@ -18,8 +18,9 @@ parts:
     # Length and lean come from the assembly (ladder_length, ladder_lean_deg). The stile tops sit at the
     # deck-top level under the hooks, the ends are cut level, and the stiles hang `clear` mm outboard of
     # the cleat on top of partition A. Width, rung count and hook sizes are estimates (research/04: five
-    # rungs of 0.33 m).
-    geometry: {generator: ladder, params: {width: 330, stile: 25, rung_d: 25, rungs: 5, hook_w: 30, hook_t: 4, hook_reach: 30, clear: 2}}
+    # rungs of 0.33 m). Revision D makes the hooks as wide as the stiles (25 mm), so the ladder is 330 mm wide overall
+    # and fits beside the heater against partition A.
+    geometry: {generator: ladder, params: {width: 330, stile: 25, rung_d: 25, rungs: 5, hook_w: 25, hook_t: 4, hook_reach: 30, clear: 2}}
     color: "#aab7b8"
   A-02:
     name: Safety net

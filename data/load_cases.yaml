@@ -27,17 +27,19 @@ towball:
 
 # Whole-trailer load cases (TRAILER.md). The module rows follow the module cases above. `water_l` is an
 # expression over the trailer parameters. `load` lists the payload tags carried (assemblies/trailer.yaml):
-# gas (LPG in the bottles), fuel (jerry cans), gear (food, clothes, other gear) and luggage (the Tuareg's
-# panniers, carried only when the Tuareg is). The removable kit is fitted in the tare case, as built.
+# gas (LPG in the cylinders), fuel (jerry cans), gear (food, clothes, other gear) and luggage (the Tuareg's
+# panniers, carried only when the Tuareg is). Revision C keeps the loading kit aboard in every case. The cases
+# without bikes carry the ballast the build solves (`ballast: true`), which the registration tare excludes.
 # Every case here is one the trailer may be towed in, so every one is a travel case for the towball checks.
 trailer_cases:
   - id: TC1
     name: Tare as built
-    aboard: Trailer as built with the removable kit fitted, empty tanks and bottles, no bikes or gear
+    aboard: Trailer as built with the loading kit aboard, empty tanks and cylinders, no bikes or gear, ballast in the garage
     module: all
     bikes: []
     water_l: 0
     load: []
+    ballast: true
   - id: TC2
     name: Travel fully loaded
     aboard: Both bikes with their kit, water tanks full, gas, fuel and gear
@@ -54,19 +56,21 @@ trailer_cases:
     water_l: water_highway_l
     load: [gas, fuel, gear, luggage]
   - id: TC4
-    name: Bikes and kit out, water full
-    aboard: No bikes and no removable kit, water tanks full, gas, fuel and gear
-    module: fixed_only
+    name: Bikes out, water full
+    aboard: No bikes, the loading kit aboard, water tanks full, gas, fuel, gear and ballast in the garage
+    module: all
     bikes: []
     water_l: water_full_l
     load: [gas, fuel, gear]
+    ballast: true
   - id: TC5
     name: Bikes out, tanks empty
-    aboard: No bikes and no removable kit, water tanks empty, gas, fuel and gear aboard
-    module: fixed_only
+    aboard: No bikes, the loading kit aboard, water tanks empty, gas, fuel, gear and ballast in the garage
+    module: all
     bikes: []
     water_l: 0
     load: [gas, fuel, gear]
+    ballast: true
   - id: TC6
     name: Tuareg only
     aboard: Tuareg with its panniers, all the kit, water full, gas, fuel and gear

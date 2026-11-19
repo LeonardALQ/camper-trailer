@@ -153,7 +153,7 @@ class TrailerCheck(Strict):
     id: str
     title: str
     type: Literal["mass", "car_axle", "fit", "tyre", "width", "overhang", "coupling", "clearance_ground",
-                  "jackknife", "jackknife_aframe", "wheel", "towball_scale"]
+                  "jackknife", "jackknife_aframe", "wheel", "towball_scale", "ballast"]
     quantity: Literal["mass", "axle", "axle_vsb1", "towball", "towball_pct", "tyre_load"] | None = None
     limit: Literal["kit_gtm", "nsw_gtm_cap", "nsw_atm_cap", "target"] | None = None
     tolerance: float | None = None
@@ -194,6 +194,7 @@ class TrailerCase(Strict):
     water_l: Any
     load: list[Literal["gas", "fuel", "gear", "luggage"]]
     towball_target: bool = False
+    ballast: bool = False
 
 
 class LoadCasesFile(Strict):

@@ -71,9 +71,11 @@ def ct001(prj, model, bom, checks, reg, dwg):
     sh.text(P(300, 0)[0], P(0, -hb)[1] - 2.5, "ROAD SIDE (Y -)", 1.9)
     # zone lengths along the road side
     yd = P(0, -hb)[1] + 9
-    xs = [V["body_x0"], V["part_a_x"], V["part_b_x"], V["body_x1"]]
-    labs = [f"{V['part_a_x'] - V['body_x0']:.0f} FRONT ZONE", f"{V['part_b_x'] - V['part_a_x']:.0f} GARAGE", f"{V['body_x1'] - V['part_b_x']:.0f} LIVING ZONE"]
+    xs = [V["in_x0"], V["part_a_x"], V["module_x0"], V["in_x1"]]
+    labs = [f"{V['part_a_x'] - V['in_x0']:.0f} LIVING AREA", "", f"{V['in_x1'] - V['module_x0']:.0f} GARAGE"]
     for (x0, x1), lab in zip(zip(xs, xs[1:]), labs):
+        if not lab:
+            continue
         S.hdim(sh, P(x0, -hb)[0], P(0, -hb)[1], P(x1, -hb)[0], P(0, -hb)[1], yd, lab, size=1.9)
     S.hdim(sh, P(V["body_x0"], -hb)[0], P(0, -hb)[1], P(V["body_x1"], -hb)[0], P(0, -hb)[1], yd + 6, f"{V['body_length']:.0f} BODY", size=1.9)
     # widths at the rear
@@ -88,21 +90,26 @@ def ct001(prj, model, bom, checks, reg, dwg):
         p0, p1 = P(x, -hb - 60), P(x, hb + 60)
         sh.line(p0[0], p0[1], p1[0], p1[1], "centre")
     # zone and item labels
-    for x, y, t in ((V["box_x0"] + 350, 0, "DRAWBAR BOX"), ((V["body_x0"] + V["part_a_x"]) / 2, 0, "FRONT UTILITY ZONE"),
-                    ((V["part_b_x"] + V["body_x1"]) / 2, 150, "LIVING ZONE")):
+    for x, y, t in (((V["in_x0"] + V["part_a_x"]) / 2, 0, "LIVING AREA"), ((V["module_x0"] + V["in_x1"]) / 2, -1060, "GARAGE"),
+                    (V["module_x0"] + V["mod_locker_x0"] + 380, 900, "GAS LOCKER")):
         p = P(x, y)
         sh.text(p[0], p[1] - 0.8, t, 1.8, "middle")
     # keep-clear spaces as phantom outlines
-    for k in (b for b in lay.blocks if b.keep_clear and b.zone in ("front", "rear")):
+    for k in (b for b in lay.blocks if b.keep_clear and b.zone == "living"):
         x0, y0, _, x1, y1, _ = k.box
         p0, p1 = P(x0, y0), P(x1, y1)
         sh.rect(p0[0], p0[1], p1[0], p1[1], "phantom")
     # doors
-    for iid, side, t in (("BD-06", -1, "UTILITY DOOR"), ("BD-05", 1, "GARAGE DOOR"), ("BD-07", 1, "ENTRY DOOR")):
+    for iid, side, t in (("BD-06", 1, "GAS HATCH"), ("BD-07", 1, "ENTRY DOOR")):
         b = lay.find(iid)
         p0, p1 = P(b.box[0], side * (hb + 25)), P(b.box[3], side * (hb + 25))
         sh.line(p0[0], p0[1], p1[0], p1[1], "thick")
         sh.text((p0[0] + p1[0]) / 2, p0[1] + (2.4 if side < 0 else -3.4), f"{t} {b.box[3] - b.box[0]:.0f}", 1.6, "middle")
+    b = lay.find("BD-05")
+    xg = V["body_x1"] + 25
+    p0, p1 = P(xg, b.box[1]), P(xg, b.box[4])
+    sh.line(p0[0], p0[1], p1[0], p1[1], "thick")
+    sh.text(p0[0] + 1.5, (p0[1] + p1[1]) / 2 - 0.6, f"REAR DOOR {b.box[4] - b.box[1]:.0f}", 1.6, rot=-90)
 
     # ---- elevation from the kerb side, ball on the left (third angle: the plan sits above it)
     elev_src = [s for s in shapes if not s.label.startswith(("BD-01",))]
@@ -176,7 +183,8 @@ def ct001(prj, model, bom, checks, reg, dwg):
         ["Raiser, rail top to floor underside", f"{ch['raiser_h']:.0f}", f"rails {ch['rail_section'].split(' block')[0]}"],
         ["Axle group centre from the ball", f"{V['axle_x']:.0f}", f"hubs {hx[0]:.0f} and {hx[1]:.0f}"],
         ["CoG height, fully loaded", f"{ch['cog_loaded'][2]:.0f}", f"{ch['cog_loaded_growth'][2]:.0f} with growth"],
-        ["Jack-knife at 90 deg, body / box", f"{ch['jackknife_body_mm']:.0f} / {ch['jackknife_box_mm']:.0f}", "plan clearance to the car"],
+        ["Jack-knife at 90 deg, body corners", f"{ch['jackknife_body_mm']:.0f}", "plan clearance to the car"],
+        ["Ballast to tow with no bikes", f"{rep['ballast']['kg']:.0f} kg", f"{rep['ballast']['growth_kg']:.0f} kg with growth, at X {rep['ballast']['x']:.0f}"],
     ]
     S.table(sh, 230.0, yt - 5.5, [("KEY FIGURE (mm)", 70), ("VALUE", 30), ("NOTE", 80)], rows, size=1.6, row_h=3.0, title="CHASSIS INPUTS")
     # ---- notes
@@ -185,6 +193,8 @@ def ct001(prj, model, bom, checks, reg, dwg):
         "TRAILER LEVEL AT DESIGN RIDE HEIGHT. VIEWS SHOW THE TRAILER AS SEEN (DIM-01 IS LEFT-HANDED, SO THE 3D MODEL IS ITS MIRROR, SEE TRAILER.md).",
         "BLOCK LAYOUT. EVERY ITEM IS AN ENVELOPE WITH A MASS. POSITIONS MARKED PLACEHOLDER IN assemblies/trailer.yaml ARE NOT DESIGNED YET.",
         f"AXLE POSITION SOLVED FOR {rep['target_kg']:.0f} kg ON THE BALL FULLY LOADED. CHASSIS SECTIONS ARE BLOCK SIZES FOR THE ENGINEER TO SET.",
+        f"REVISION C: GARAGE AT THE BACK WITH A REAR DOOR, HEAVY ITEMS AFT. WITH NO BIKES ABOARD CARRY {rep['ballast']['kg']:.0f} kg OF BALLAST AT THE BACK OF THE GARAGE "
+        f"(TC1, TC4, TC5). THE REGISTRATION TARE EXCLUDES IT.",
         "PHANTOM OUTLINES ON THE PLAN ARE FLOOR SPACE KEPT CLEAR (DOOR LANDINGS, WALKWAY, LADDER LANDING).",
         ("MASS CHECKS " + ", ".join(c["id"] for c in rep["checks"] if c["type"] == "mass" and c["severity"] == "fail" and not c["ok"])
          + " FAIL WITH THE GROWTH ALLOWANCE. SEE TRAILER.md BEFORE ANY ENGINEER REVIEW.") if any(
@@ -194,12 +204,13 @@ def ct001(prj, model, bom, checks, reg, dwg):
                                checked=r["checked"], approved=r["approved"]) for r in dwg["revisions"]])
     rev = dwg["revisions"][-1]
     tare = cases["TC1"]
+    tare_kg = rep["tare_kg"]
     S.title_block(
         sh, owner=reg["owner"], project=dwg.get("project") or reg["project"], number=dwg["number"], title=dwg["title"],
         subtitle=dwg["subtitle"], rev=rev["rev"], status=dwg["status"], date=str(rev["date"]), drawn=reg["drawn_by"],
         checked=rev["checked"], approved=rev["approved"], engineer="NOT REVIEWED", sheet_no=dwg["sheet"], sheets=reg["sheets_total"],
         size=dwg["size"], scale=sc, material="BLOCK LAYOUT, NONE CALLED UP",
-        mass_note=f"TARE {tare['nominal']['mass_kg']:.0f} kg, {tare['growth']['mass_kg']:.0f} kg WITH GROWTH (TB-11).",
+        mass_note=f"TARE {tare_kg:.0f} kg WITHOUT BALLAST, {tare['growth']['mass_kg'] - rep['ballast']['kg']:.0f} kg WITH GROWTH (TB-11).",
         model_ref=f"trailer.step (ASM-TR rev {rep['assembly']['revision']})", git=git_hash())
     S.write(sh, BUILD / "drawings" / f"{dwg['number']}.svg")
     return time.time() - t0

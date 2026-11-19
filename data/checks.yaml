@@ -93,7 +93,6 @@ checks:
     b: [C14]
     min_gap_mm: 15
     severity: fail
-    added_by_build: true
     inputs: [TU-01, TU-03, TU-05, ST-01]
     why: Revision D. The bikes unload backwards through the rear door, so each must pass the frame round the opening. The check measures each bike, as parked with its front wheel up in the chock, against the frame extended forward over the whole garage, which is what a bike rolled straight back meets. Going down the ramp the bike pitches nose-up about its front tyre, which only lowers the parts behind the front axle.
   - id: CLR-10
@@ -103,7 +102,6 @@ checks:
     b: ["21", C10, C11, C12]
     min_gap_mm: 15
     severity: fail
-    added_by_build: true
     inputs: [TU-01, TU-07, ST-01]
     why: Revision D. The garage width is fixed, so if the bike spacing grows the Street Triple and its straps move towards the stowed ramp, generator and gas locker. This check is where a spacing that no longer fits the width shows up (measurements.yaml TU-01).
   - id: CLR-07
@@ -132,7 +130,6 @@ checks:
     restraint: {factor: 2.0, share: 0.6, lc_kg: 1000, cases: {forward_g: 0.8, rearward_g: 0.5, lateral_g: 0.5, up_g: 1.0},
                 cg_z: {TU: 700, ST: 600}}
     severity: fail
-    added_by_build: true
     inputs: []
     why: Revision D. With the bikes along the trailer, braking pushes each bike into its chock and cornering pushes it sideways. Report 03's method with its off-road factor of 2, one strap taking 60 % of the sideways moment, and its design centre of gravity heights (700 mm Tuareg, 600 mm Street Triple, above the 05 estimates). Every anchor stays designed for 20 kN.
   - id: CON-01
@@ -252,6 +249,12 @@ trailer_checks:
     severity: report
     inputs: [WHL-01]
     why: Each wheel needs 1.2 x (ATM less the towball target) / 4. The plan keeps the Porsche wheel when its rating meets it and changes to a rated 5 x 130 wheel when it does not (measurements.yaml WHL-01).
+  - id: BAL-01
+    title: Ballast at the back of the garage to tow with no bikes aboard, with growth (reported)
+    type: ballast
+    severity: report
+    inputs: [CAR-01, CAR-02, CAR-05, CAR-06]
+    why: Revision C. With every heavy item at the back, the towball rises when the bikes come out. The build solves the least ballast at the back of the garage that keeps TC1, TC4 and TC5 at or under 280 kg on base weights and carries it in those cases. This row reports how much is needed with the growth allowance as well.
   - id: CAR-07
     title: Towball scale reading within 10 % of the model, fully loaded (reported)
     type: towball_scale
@@ -278,19 +281,19 @@ trailer_checks:
     inputs: [CAR-01, CAR-02, CAR-05, CAR-06]
     why: Report 07 load budget method. The row also gives how much gear the car can then carry before its rear axle or GVM binds.
   - id: FIT-01
-    title: Front utility zone holds its items and keeps its door landing and walkway clear
+    title: Living area holds its items and keeps the entry door, ladder foot, bathroom door, walkway and seat clear
     type: fit
-    zone: front
+    zone: living
     severity: fail
-    inputs: [TU-01, TU-07, ST-01]
-    why: Every item must sit inside the zone with no overlap. Keep-clear spaces are floor space to stand in.
+    inputs: []
+    why: Revision C. One living area from the front wall to partition A. Every item must sit inside it with no overlap, and the keep-clear spaces are floor space to stand in.
   - id: FIT-02
-    title: Rear living zone holds its items and keeps its landings clear
+    title: Gas locker holds the two 9 kg cylinders and the regulator
     type: fit
-    zone: rear
+    zone: gas_locker
     severity: fail
-    inputs: [TU-01, TU-07, ST-01]
-    why: The ladder's landing, the partition B doorway and the entry and bathroom doors need clear floor.
+    inputs: []
+    why: Revision C. Report 02 section 5.2 asks for a compartment that holds only the cylinders and their equipment.
   - id: FIT-03
     title: Tanks and battery fit between the rails and the crossmembers
     type: fit
@@ -299,12 +302,12 @@ trailer_checks:
     inputs: []
     why: The tanks and battery sit between the rails, clear of every crossmember.
   - id: FIT-04
-    title: Drawbar box holds the generator, gas bottles and fuel
+    title: Kerb-strip stowage holds the generator and the jerry cans
     type: fit
-    zone: drawbar_box
+    zone: kerb_strip
     severity: fail
     inputs: []
-    why: Contents inside the box with no overlap.
+    why: Revision C. They sit in the garage against the kerb-side wall in front of the gas locker, inside the strip and clear of each other. The module checks CLR-04 and CLR-10 keep them clear of the bikes and straps.
   - id: FIT-05
     title: Tyres at full bump clear the chassis and body
     type: tyre
@@ -341,12 +344,12 @@ trailer_checks:
     inputs: [CAR-04]
     why: Every part carried by the suspension needs 100 mm of running clearance. The arms, hubs and wheels are not carried by it.
   - id: JK-01
-    title: Body front corners and drawbar box clear the Cayenne at a 90 degree jack-knife
+    title: Body front corners clear the Cayenne at a 90 degree jack-knife
     type: jackknife
     min_gap_mm: 100
     severity: fail
     inputs: [CAR-05]
-    why: Plan view at 90 degrees about the ball. 100 mm is this layout's allowance for the unmeasured ball position and the car's rounded corners. The drawbar length is set to meet it.
+    why: Plan view at 90 degrees about the ball. 100 mm is this layout's allowance for the unmeasured ball position and the car's rounded corners. Revision B set the drawbar length for the drawbar box, which revision C does not have.
   - id: JK-02
     title: Drawbar members and stone guard to the car's rear corner, plan view (reported)
     type: jackknife_aframe

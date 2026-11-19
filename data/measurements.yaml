@@ -132,9 +132,10 @@ inputs:
     unit: mm
     estimate: {v: 600, src: "DESIGN.md design estimate, 300 mm either side (range 280 to 350)"}
     measured: {v: 585, date: 2026-11-18, note: "Owner. Nothing else is at this spot, the crash bars sit much lower"}
-    affects: [side panel envelope, bike spacing, garage length, door opening, bed platform, body length, axle solve, CLR-03]
+    affects: [side panel envelope, bike spacing, Street Triple position, CLR-03, CLR-10]
     thresholds:
-      - {at: 668, rule: "At or below 668 mm the 760 mm spacing holds: half-width 334 = 760 spacing - 396 Street Triple bar reach - 30 mm gap (CLR-03). Above it the spacing grows by about the excess half-width, and the build then sets the final spacing from the geometry: the smallest spacing at which CLR-03 measures 30 mm. The garage grows by the same, and the partitions, door opening, bed platform, body layout and axle position re-solve", src: "DESIGN.md (760 mm spacing, 30 mm limit), owner's 792 mm Street Triple width, addendum 1"}
+      - {at: 668, rule: "At or below 668 mm the 760 mm spacing holds: half-width 334 = 760 spacing - 396 Street Triple bar reach - 30 mm gap (CLR-03). Above it the spacing grows by about the excess half-width, and the build then sets the final spacing from the geometry: the smallest spacing at which CLR-03 measures 30 mm. The Street Triple moves towards the kerb side by the same", src: "DESIGN.md (760 mm spacing, 30 mm limit), owner's 792 mm Street Triple width, addendum 1"}
+      - {at: 780, rule: "Revision D: the garage width is fixed, so the garage does not grow. Above a 780 mm spacing (about 708 mm across the side panels) the Street Triple's kerb-side strap fittings come within 15 mm of the stowed ramp, CLR-10 fails and the layout has to be redesigned", src: "DESIGN.md revision D, check CLR-10"}
   - id: TU-09
     group: Bikes
     title: Tuareg crash bars, top height
@@ -154,7 +155,7 @@ inputs:
     measured: {v: null, date: null}
     affects: [CLR-06]
     thresholds:
-      - {at: 2259, rule: "Above about 2,259 mm the plate comes within 15 mm of the closed door (CLR-06). The interior width cannot grow, so the bikes move towards the road-side wall only if the chock nose (CHK-01) measures shorter", src: "DESIGN.md CLR-06"}
+      - {at: 2259, rule: "Above about 2,259 mm the plate comes within 15 mm of the closed rear door (CLR-06). The garage length is fixed by the body, so the bikes move towards partition A only if the chock nose (CHK-01) measures shorter", src: "DESIGN.md CLR-06"}
   - id: TU-03
     group: Bikes
     title: Tuareg screen top height, mirrors folded
@@ -182,9 +183,9 @@ inputs:
     unit: mm
     estimate: {v: 980, src: "Owner's measurement of about 970 to 980 mm"}
     measured: {v: 980, date: 2026-11-18, note: "Owner's measurement, 970 to 980 mm, reported on 18 Nov"}
-    affects: [pannier envelope, CLR-04, CLR-08]
+    affects: [pannier envelope, CLR-04, CLR-08, CLR-09]
     thresholds:
-      - {at: 1090, rule: "Above 1,090 mm a bag comes within 15 mm of partition A (CLR-04), and the Tuareg would have to move away from it", src: "DESIGN.md CLR-04"}
+      - {at: 1020, rule: "Above 1,020 mm the road-side bag comes within 15 mm of the rear door's road-side jamb as the Tuareg rolls out (CLR-09), and above 1,100 mm within 15 mm of the road-side wall (CLR-04). The Tuareg would have to move towards the kerb side", src: "DESIGN.md revision D, CLR-04 and CLR-09"}
   - id: TU-06
     group: Bikes
     title: Tuareg pannier length, height and position
@@ -218,14 +219,14 @@ inputs:
       - {at: 730, rule: "With TU-07: half of each peg width added together at most 730 mm, or the spacing grows by the excess", src: "DESIGN.md CLR-03"}
   - id: CHK-01
     group: Bikes
-    title: Condor chock nose depth, wall to the front tyre's leading edge
+    title: Condor chock nose depth, partition A to the front tyre's leading edge
     how: Bolt a chock to a board against a wall, roll a front wheel into it, and measure from the wall to the front of the tyre.
     unit: mm
     estimate: {v: 50, src: "DESIGN.md allowance, to be measured on a real chock"}
     measured: {v: null, date: null}
-    affects: [bike position across the trailer, CLR-04, CLR-06]
+    affects: [bike position along the trailer, CLR-04, CLR-06]
     thresholds:
-      - {rule: "The front tyre's leading edge sits at the road-side wall face plus this depth, so both bikes move with it", src: "DESIGN.md"}
+      - {rule: "The front tyre's leading edge sits this far behind partition A's rear face, so both bikes move with it", src: "DESIGN.md revision D"}
 
   # ================================================================ the trailer, later (report 02 MASS-07)
   - id: TW-01
@@ -258,7 +259,7 @@ inputs:
     unit: kg
     estimate: {v: null, src: "The model's tare is shown beside it"}
     measured: {v: null, date: null}
-    stage: [front, rear, module, underfloor, drawbar_contents]
+    stage: [living, module, underfloor, stowage]
     affects: [every mass check, the plated tare]
     thresholds:
       - {rule: "The rise from TW-02 replaces the fit-out's estimates. The ticket goes in the NSW identity approval package (report 02, VIB 78)", src: "Report 02 MASS-07 and MASS-08"}

@@ -13,15 +13,15 @@ from .model.assembly import GROUP_LABELS
 from .model.prims import box, rgba
 from .trailer import SYSTEM_LABELS, Layout
 
-SYSTEM_ORDER = ["drawbar", "chassis", "running_gear", "underfloor", "body", "roof", "front", "module", "rear"]
+SYSTEM_ORDER = ["drawbar", "chassis", "running_gear", "underfloor", "body", "roof", "living", "module", "stowage", "payload"]
 COLOURS = {
     "drawbar": ("#5d6d7e", 1.0), "chassis": ("#566573", 1.0), "running_gear": ("#1c2833", 1.0),
     "underfloor": ("#2e86c1", 0.9), "body": ("#d6dbdf", 0.18), "roof": ("#f4d03f", 0.9),
-    "front": ("#a9cce3", 0.9), "rear": ("#d2b4de", 0.9),
+    "living": ("#d2b4de", 0.9), "stowage": ("#e59866", 1.0), "payload": ("#f7dc6f", 1.0),
 }
-OVERRIDE = {"BD-01": ("#8c8c8c", 0.6), "DB-05": ("#7f8c8d", 0.35), "RG-01": ("#7b7d7d", 1.0), "FZ-03": ("#58d68d", 0.9),
-            "RZ-02": ("#76d7c4", 0.9), "UF-04": ("#f5b041", 1.0), "BD-13": ("#27ae60", 0.8), "DB-06": ("#c0392b", 1.0),
-            "DB-07": ("#ecf0f1", 1.0), "DB-09": ("#e74c3c", 1.0), "BD-05": ("#b2bec3", 0.35), "BD-06": ("#b2bec3", 0.5),
+OVERRIDE = {"BD-01": ("#8c8c8c", 0.6), "RG-01": ("#7b7d7d", 1.0), "LA-07": ("#58d68d", 0.9),
+            "LA-01": ("#76d7c4", 0.9), "UF-04": ("#f5b041", 1.0), "BD-13": ("#27ae60", 0.8), "GS-01": ("#c0392b", 1.0),
+            "GS-02": ("#ecf0f1", 1.0), "GS-04": ("#e74c3c", 1.0), "BD-05": ("#b2bec3", 0.35), "BD-06": ("#b2bec3", 0.5),
             "BD-07": ("#b2bec3", 0.5)}
 
 
