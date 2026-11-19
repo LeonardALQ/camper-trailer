@@ -28,7 +28,7 @@ STAGE_IDS = {"drawbar_structure": ("DB-01", "DB-02", "DB-03", "DB-04"), "stowage
 SYSTEM_LABELS = {
     "drawbar": "Drawbar and coupling", "chassis": "Chassis", "running_gear": "Running gear", "body": "Body",
     "roof": "Roof", "underfloor": "Under the floor", "living": "Living area", "module": "Garage and bed module",
-    "stowage": "Garage stowage", "payload": "Payload",
+    "stowage": "Garage stowage", "spare": "Spare wheel", "payload": "Payload",
 }
 TOL = 0.5  # mm: boxes that only touch do not overlap
 
@@ -463,6 +463,9 @@ class Layout:
         out["drawbar members"] = mem
         sg = self.find("DB-04").box
         out["stone guard"] = [[(sg[0], sg[1]), (sg[3], sg[1]), (sg[3], sg[4]), (sg[0], sg[4])]]
+        sp = [b.box for b in self.blocks if b.system == "spare" and b.box is not None]
+        out["spare wheel"] = [[(min(b[0] for b in sp), min(b[1] for b in sp)), (max(b[3] for b in sp), min(b[1] for b in sp)),
+                               (max(b[3] for b in sp), max(b[4] for b in sp)), (min(b[0] for b in sp), max(b[4] for b in sp))]]
         return out
 
     def jackknife(self, car: dict) -> dict:
@@ -542,11 +545,12 @@ def car_axles(car: dict, towball_kg: float, ball_behind_axle_mm: float | None = 
     kerb = v("kerb_kg")
     rear = kerb * (1 - bu["front_share_of_kerb"])
     front = kerb * bu["front_share_of_kerb"]
+    spare = bu.get("spare_kg", 0.0)
     for m, x in ((bu["occupants_kg"], bu["occupants_behind_front_axle_mm"]), (-bu["rear_seats_out_kg"], bu["gear_behind_front_axle_mm"]),
-                 (bu["towbar_kg"], L + a), (towball_kg, L + a)):
+                 (bu["towbar_kg"], L + a), (towball_kg, L + a), (spare, L + bu.get("spare_behind_rear_axle_mm", 0.0))):
         rear += m * x / L
         front += m * (L - x) / L
-    total = kerb + bu["occupants_kg"] - bu["rear_seats_out_kg"] + bu["towbar_kg"] + towball_kg
+    total = kerb + bu["occupants_kg"] - bu["rear_seats_out_kg"] + bu["towbar_kg"] + towball_kg + spare
     per_kg = bu["gear_behind_front_axle_mm"] / L
     by_axle = (v("rear_axle_limit_kg") - rear) / per_kg
     by_gvm = v("gvm_kg") - total
@@ -568,12 +572,10 @@ class Trailer:
         self.target, self.target_why = inp.towball_target(self.car, self.car["towball_rating_kg"]["v"])
         atm = self.car["braked_towing_kg"]["v"]
         self.supplier = inp.supplier(atm, self.target)
-        self.wheel = inp.wheel(atm, self.target, self.td["wheels"])
+        self.wheel = inp.wheel(self.td["wheel"])
         self.base.setdefault("coupling_z", inp.coupling_z())
-        if self.wheel.get("switched"):
-            self.base.setdefault("wheel_offset", self.wheel["offset_mm"])
         offset = self.base.get("wheel_offset", self.td["params"]["wheel_offset"])
-        self.base.setdefault("cf", inp.cf(offset, self.td["params"]["tyre_section"]))
+        self.base.setdefault("cf", inp.cf(offset, self.td["params"]["tyre_w"]))
         self.weighed = inp.weighed()
         self.weighed_rows: list[dict] = []
         self.target_case = next(c for c in self.cases if c.towball_target)
@@ -735,6 +737,10 @@ class Trailer:
                     cmax = caps["gtm"]
                 elif c.limit == "nsw_atm_cap":
                     cmax = caps["atm"]
+                elif c.limit == "tyre_rating":
+                    cmax = caps["ratings"]["tyre_kg"]
+                elif c.limit == "wheel_rating":
+                    cmax = self.inputs.v("WHL-01")
                 elif c.limit == "target":
                     cmin, cmax = self.target - c.tolerance, self.target + c.tolerance
                 c = c.model_copy(update=dict(min=cmin, max=cmax))
@@ -772,13 +778,6 @@ class Trailer:
                                    f"{ax['gear_budget_kg']:.0f} kg ({ax['binds']} binds). Ball 1.06 to 1.23 m behind the axle gives a rear axle of "
                                    f"{lo['rear_kg']:.0f} to {hi['rear_kg']:.0f} kg"),
                            car=dict(nominal=ax, short=lo, long=hi))
-            elif c.type == "wheel":
-                w = self.wheel
-                r = self.inputs.v("WHL-01")
-                ok = r is not None and r >= w["need_kg"]
-                row.update(limit=f">= {w['need_kg']:.0f} kg per wheel", measured=r, unit="kg", margin=None if r is None else round(r - w["need_kg"], 1),
-                           ok=ok, governing=w["name"],
-                           detail=self.inputs.outcomes.get("WHL-01", ""))
             elif c.type == "ballast":
                 bal = self.ballast_result
                 ok = bal["growth_kg"] <= bal["kg"] + 1e-6
@@ -834,11 +833,12 @@ class Trailer:
             elif c.type in ("jackknife", "jackknife_aframe"):
                 jk = lay.jackknife(self.car)
                 if c.type == "jackknife":
-                    vals = [(r["parts"][p]["clearance_90_mm"], a, p) for a, r in jk.items() for p in ("body",)]
+                    vals = [(r["parts"][p]["clearance_90_mm"], a, p) for a, r in jk.items() for p in ("body", "spare wheel")]
                     v, a, p = min(vals)
+                    each = ", ".join(f"{p2} {min(r['parts'][p2]['clearance_90_mm'] for r in jk.values()):.0f} mm" for p2 in ("body", "spare wheel"))
                     row.update(limit=f">= {c.min_gap_mm:g} mm at 90 degrees", measured=round(v, 1), unit="mm", margin=round(v - c.min_gap_mm, 1),
                                ok=v >= c.min_gap_mm - 1e-6, governing=f"{p}, ball {a} mm behind the car's rear axle",
-                               detail=f"body front corners {v:.0f} mm from the car's side at 90 degrees. Revision C has no drawbar box", jackknife=jk)
+                               detail=f"{p} {v:.0f} mm from the car's side at 90 degrees ({each})", jackknife=jk)
                 else:
                     firsts = [(r["parts"][p]["first_contact_deg"] or 999, a, p) for a, r in jk.items() for p in ("drawbar members", "stone guard")]
                     v, a, p = min(firsts)
@@ -961,6 +961,10 @@ def chassis_inputs(tr: Trailer, ev: dict) -> dict:
         cog_height_above_hub=tc2["nominal"]["cog"][2] - V["hub_z"],
         cog_by_case={c["id"]: dict(nominal=c["nominal"]["cog"], growth=c["growth"]["cog"]) for c in ev["cases"]},
         jackknife_body_mm=min(r["parts"]["body"]["clearance_90_mm"] for r in jk["jackknife"].values()),
+        jackknife_spare_mm=min(r["parts"]["spare wheel"]["clearance_90_mm"] for r in jk["jackknife"].values()),
+        spare_box=[min(b.box[i] for b in lay.blocks if b.system == "spare" and b.box) if i < 3 else
+                   max(b.box[i] for b in lay.blocks if b.system == "spare" and b.box) for i in range(6)],
+        tyre_d=V["tyre_d"],
         tyre_floor_clearance=V["tyre_clearance"], tank_capacity_l=lay.tank_capacity_l(),
         module_x0=V["module_x0"], part_a_x=V["part_a_x"], garage_x1=V["in_x1"],
         battery_box=lay.find("UF-04").box, tanks=[t.box for t in lay.tanks()],

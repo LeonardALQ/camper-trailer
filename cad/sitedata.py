@@ -25,6 +25,8 @@ RESEARCH = [
     ("06-trailer-running-gear.md", "Trailer running gear: suspension, hubs, brakes and sway control", 6),
     ("07-tow-vehicle.md", "Tow vehicle: the 2013 Porsche Cayenne GTS (958)", 7),
     ("08-coupling-and-hitch.md", "Coupling and hitch", 8),
+    ("09-trailer-wheels-and-tyres.md", "Trailer wheels, tyres and stud pattern", 9),
+    ("10-car-wheels-and-tyres.md", "The car’s own wheels and tyres for towing", 10),
 ]
 
 
@@ -95,6 +97,8 @@ def main():
     for fname, title, order in RESEARCH:
         text = (ROOT / "research" / fname).read_text(encoding="utf-8")
         text = re.sub(r"\A#\s+[^\n]*\n", "", text, count=1)
+        # links between reports point at the .md files in the repository; on the site they go to the report's page
+        text = re.sub(r"\]\((\d\d-[a-z0-9-]+)\.md\)", r"](../\1/)", text)
         body = (f"---\ntitle: '{title}'\nsidebar:\n  order: {order}\n---\n\n"
                 f"This is research report {fname[:2]}, copied unchanged from `research/{fname}` apart from its first heading.\n\n"
                 + text)

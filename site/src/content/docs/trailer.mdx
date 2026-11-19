@@ -55,9 +55,26 @@ a sealed locker in the kerb-side rear corner, and the generator and cans along t
 The 12 kWh battery moved to the back, under the garage floor between the rails, 400 mm in front of the rear wall.
 The water tanks stay over the axles, so the towball barely changes as the water is used.
 
-The floor height comes from the running gear in report 06. The tyre is 737.7 mm across, the hubs sit at
-{n(ch.hub_z)} mm, and the XT suspension rises 60 mm at full bump. With 50 mm of clearance above the tyre, the floor
-underside is at {n(ch.floor_underside_z)} mm and the garage floor surface at {n(ch.floor_z)} mm.
+The floor height comes from the running gear in report 06 and the trailer's own tyre from report 09. The tyre is
+{(ch.tyre_d).toFixed(1)} mm across, the hubs sit at {n(ch.hub_z)} mm, and the XT suspension rises 60 mm at full bump. With
+50 mm of clearance above the tyre, the floor underside is at {n(ch.floor_underside_z)} mm and the garage floor surface
+at {n(ch.floor_z)} mm. The 3,048 mm ramp then sits at {(Math.asin(ch.floor_z / 3048) * 180 / Math.PI).toFixed(1)} degrees,
+and the travel height with the roof down is {n(ch.travel_height)} mm.
+
+## Wheels, tyres and spares
+
+The trailer no longer shares the car's wheel. Porsche confirmed that none of its 18-inch wheels is rated for the
+trailer's load, so each vehicle has its own wheels, tyres and spare.
+
+- Trailer wheel: ROH Trak 2 16x7 +7 steel, 6 x 139.7, rated 1,250 kg. Its 13.5 kg is an estimate, because ROH does not publish it.
+- Trailer tyre: Yokohama Geolandar A/T G015 LT245/70R16 118/115R, load range E, rated 1,320 kg, 19.3 kg.
+- Hubs: Cruisemaster's standard LC6 pattern, 1/2 inch UNF x 41 mm studs and a 93 mm spigot, on the 12 inch ABS-enabled drums.
+- Offset and track: C/F {n(ch.cf)} mm with ET +{n(ch.wheel_offset)} puts each wheel {n(ch.cf - ch.wheel_offset)} mm outside its rail, inside Cruisemaster's 200 mm limit, for a {n(ch.track)} mm track on the {n(ch.rail_outer_width)} mm rails.
+- Trailer spare: a sixth wheel and tyre on the body's front wall above the drawbar, centred across the trailer, so the rear door and the ramp stay clear. It sits {n(ch.jackknife_spare_mm)} mm from the car's side at a 90 degree jack-knife.
+- The car keeps its 20-inch RS Spyder 9.5J x 20 ET47 wheels with Michelin Pilot Sport 4 SUV 275/45 R20 110Y tyres, legal in NSW. Its own 30 kg spare lies on the boot floor, which costs about 45 kg of the gear the car can carry. An 18-inch dirt set is documented in report 10 for a Victorian registration only.
+
+The research is in <a href={withBase('/research/09-trailer-wheels-and-tyres/')}>report 09</a> for the trailer and
+<a href={withBase('/research/10-car-wheels-and-tyres/')}>report 10</a> for the car.
 
 The axle group centre is {n(P.axle_x)} mm behind the ball. The build solved it for {n(t.target_kg)} kg on the ball
 fully loaded, the target from report 07, and moved the tanks and the suspension with it. The garage stays at the

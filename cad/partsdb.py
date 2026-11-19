@@ -155,7 +155,7 @@ class TrailerCheck(Strict):
     type: Literal["mass", "car_axle", "fit", "tyre", "width", "overhang", "coupling", "clearance_ground",
                   "jackknife", "jackknife_aframe", "wheel", "towball_scale", "ballast"]
     quantity: Literal["mass", "axle", "axle_vsb1", "towball", "towball_pct", "tyre_load"] | None = None
-    limit: Literal["kit_gtm", "nsw_gtm_cap", "nsw_atm_cap", "target"] | None = None
+    limit: Literal["kit_gtm", "nsw_gtm_cap", "nsw_atm_cap", "target", "tyre_rating", "wheel_rating"] | None = None
     tolerance: float | None = None
     inputs: list[str] = []
     basis: Literal["nominal", "growth", "both"] = "nominal"

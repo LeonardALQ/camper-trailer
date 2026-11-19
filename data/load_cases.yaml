@@ -94,7 +94,7 @@ registration:
   state: NSW
   fallback: Victoria
   ratings:
-    tyre_kg: {v: 1030, src: "255/55 R18 109 load index, per tyre, four tyres (report 07)"}
+    tyre_kg: {v: 1320, src: "Yokohama Geolandar A/T G015 LT245/70R16 118/115R, load index 118, per tyre, four tyres (report 09)"}
     coupling_kg: {v: 3500, src: "Cruisemaster DO35 V3Plus, ADR rated 3,500 kg (report 08)"}
     chains_kg: {v: 3500, src: "Two safety chains marked 4177-35 (report 08)"}
     brakes_kg: {v: 4500, src: "Cruisemaster A/T 12 inch electric drums, 4.5 t tandem capacity (report 06)"}
@@ -123,3 +123,12 @@ car:
     rear_seats_out_kg: {v: 50, src: "Rear seats removed (report 07 estimate)"}
     gear_behind_front_axle_mm: {v: 2000, src: "Gear on the floor where the rear seats were (report 07 assumption)"}
     ball_behind_axle_mm: {v: 1100, src: "Report 07 load budget assumption"}
+    spare_kg: {v: 30, src: "The car's own full-size 20 inch spare, about 15 kg wheel (estimate) and 15.3 kg tyre (report 10)"}
+    spare_behind_rear_axle_mm: {v: 100, src: "Lying flat on the boot floor, about 0.1 m behind the rear axle (report 10, estimate)"}
+  # The car keeps its own wheels and tyres (report 10). It is registered in NSW.
+  wheels:
+    fitted: "Porsche 20 inch RS Spyder 9.5J x 20 ET47 (958.362.151.00) with Michelin Pilot Sport 4 SUV 275/45 R20 110Y XL, 1,060 kg per tyre"
+    spare: "A sixth 20 inch RS Spyder wheel with the same tyre, about 30 kg, flat on the boot floor"
+    alternative: "Documented only, for registration in Victoria: an 18 inch dirt set, Porsche 8J x 18 ET53 with BFGoodrich KO3 LT255/55R18 109/105S and its own 18 inch spare. Not legal in NSW (S rating below the car's 261 km/h top speed)"
+    coupling: "The trailer's coupling height is set for the 20 inch tyre"
+    src: "Report 10"

@@ -1,5 +1,7 @@
 # 07: Tow vehicle, 2013 Porsche Cayenne GTS (958)
 
+Note added 19 Nov 2026. The trailer no longer shares the Cayenne's wheel. Porsche confirmed that none of its 18-inch wheels is rated for the 984 kg the trailer needs, so the owner chose the best wheel and tyre for each vehicle separately, with a spare for each. The trailer's wheels, tyres and stud pattern are in [report 09](09-trailer-wheels-and-tyres.md), and the car's in [report 10](10-car-wheels-and-tyres.md). Where this report discusses the shared 8J x 18 wheel, the 5 x 130 hubs or the 255/55 R18 tyre on the trailer, those reports replace it.
+
 ## Recommendation
 
 Leave the suspension alone. The owner's car has the optional air suspension with PASM. It already levels itself under towball load and offers two raised levels for rough ground, so a lift adds nothing for towing. Tow at Normal level. Use High Level I (selectable up to 80 km/h) or High Level II (up to 30 km/h) on fire trails, desert tracks and creek crossings. A permanent lift, lift links or a lift module would raise the centre of gravity and the towball, and none of them makes the combination more stable. Above 50 mm the national code requires certification for a car with stability control.

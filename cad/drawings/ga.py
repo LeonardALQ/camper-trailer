@@ -91,7 +91,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
         sh.line(p0[0], p0[1], p1[0], p1[1], "centre")
     # zone and item labels
     for x, y, t in (((V["in_x0"] + V["part_a_x"]) / 2, 0, "LIVING AREA"), ((V["module_x0"] + V["in_x1"]) / 2, -1060, "GARAGE"),
-                    (V["module_x0"] + V["mod_locker_x0"] + 380, 900, "GAS LOCKER")):
+                    (V["module_x0"] + V["mod_locker_x0"] + 380, 900, "GAS LOCKER"), ((ch["spare_box"][0] + ch["spare_box"][3]) / 2, -470, "SPARE WHEEL")):
         p = P(x, y)
         sh.text(p[0], p[1] - 0.8, t, 1.8, "middle")
     # keep-clear spaces as phantom outlines
@@ -166,7 +166,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
         rows.append([c["id"], c["name"][:30], f"{n['mass_kg']:.0f}", f"{g['mass_kg']:.0f}", f"{n['cog'][0]:.0f}", f"{n['cog'][2]:.0f}",
                      f"{n['towball_kg']:.0f}", f"{n['towball_pct']:.1f}", f"{n['axle_kg']:.0f}",
                      (f"{3500 - g['mass_kg']:+.0f}", "#000" if g["mass_kg"] <= 3500 else "#c00")])
-    yt = S.table(sh, 230.0, 254.0, [("CASE", 10), ("WHAT IS ABOARD", 47), ("kg", 11), ("kg +GR", 13), ("CoG X", 13), ("CoG Z", 12),
+    yt = S.table(sh, 230.0, 248.0, [("CASE", 10), ("WHAT IS ABOARD", 47), ("kg", 11), ("kg +GR", 13), ("CoG X", 13), ("CoG Z", 12),
                                     ("BALL kg", 14), ("BALL %", 13), ("AXLE kg", 14), ("ATM +GR", 33)], rows, size=1.6, row_h=3.2,
                  title="MASS AND CoG BY LOAD CASE (MASS-03). +GR = WITH MASS-06 GROWTH")
     # ---- whole-trailer checks
@@ -183,7 +183,8 @@ def ct001(prj, model, bom, checks, reg, dwg):
         ["Raiser, rail top to floor underside", f"{ch['raiser_h']:.0f}", f"rails {ch['rail_section'].split(' block')[0]}"],
         ["Axle group centre from the ball", f"{V['axle_x']:.0f}", f"hubs {hx[0]:.0f} and {hx[1]:.0f}"],
         ["CoG height, fully loaded", f"{ch['cog_loaded'][2]:.0f}", f"{ch['cog_loaded_growth'][2]:.0f} with growth"],
-        ["Jack-knife at 90 deg, body corners", f"{ch['jackknife_body_mm']:.0f}", "plan clearance to the car"],
+        ["Jack-knife at 90 deg, spare / body corners", f"{ch['jackknife_spare_mm']:.0f} / {ch['jackknife_body_mm']:.0f}", "plan clearance to the car"],
+        ["Wheel and tyre, track", f"{ch['tyre_d']:.0f} / {ch['track']:.0f}", f"ROH 16x7 +7, LT245/70R16, C/F {ch['cf']:.0f}"],
         ["Ballast to tow with no bikes", f"{rep['ballast']['kg']:.0f} kg", f"{rep['ballast']['growth_kg']:.0f} kg with growth, at X {rep['ballast']['x']:.0f}"],
     ]
     S.table(sh, 230.0, yt - 5.5, [("KEY FIGURE (mm)", 70), ("VALUE", 30), ("NOTE", 80)], rows, size=1.6, row_h=3.0, title="CHASSIS INPUTS")
@@ -195,6 +196,8 @@ def ct001(prj, model, bom, checks, reg, dwg):
         f"AXLE POSITION SOLVED FOR {rep['target_kg']:.0f} kg ON THE BALL FULLY LOADED. CHASSIS SECTIONS ARE BLOCK SIZES FOR THE ENGINEER TO SET.",
         f"REVISION C: GARAGE AT THE BACK WITH A REAR DOOR, HEAVY ITEMS AFT. WITH NO BIKES ABOARD CARRY {rep['ballast']['kg']:.0f} kg OF BALLAST AT THE BACK OF THE GARAGE "
         f"(TC1, TC4, TC5). THE REGISTRATION TARE EXCLUDES IT.",
+        "REVISION D: THE TRAILER'S OWN WHEELS AND TYRES (ROH TRAK 2 16x7 +7, YOKOHAMA G015 LT245/70R16 118/115R, CRUISEMASTER LC6 HUBS, report 09) "
+        "AND A FULL-SIZE SPARE ON THE FRONT WALL. GARAGE FLOOR Z 869.",
         "PHANTOM OUTLINES ON THE PLAN ARE FLOOR SPACE KEPT CLEAR (DOOR LANDINGS, WALKWAY, LADDER LANDING).",
         ("MASS CHECKS " + ", ".join(c["id"] for c in rep["checks"] if c["type"] == "mass" and c["severity"] == "fail" and not c["ok"])
          + " FAIL WITH THE GROWTH ALLOWANCE. SEE TRAILER.md BEFORE ANY ENGINEER REVIEW.") if any(

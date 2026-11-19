@@ -23,6 +23,7 @@ BASE_BEAM = 1460
 CHOCK_RISE = 25
 BEAM_MARGIN = 45            # 1,460 = 1,390 + 25 + 45
 DRIVER_KG = 75              # weighbridge driver (estimate)
+CF_EFF_MAX = 200            # Cruisemaster's C/F chart limit on C/F - ET for the 4,500 kg XT Air tandem (report 09)
 DRIVER_X = 1150             # behind the front axle (report 07 occupant position)
 
 
@@ -198,21 +199,13 @@ class Inputs:
         self.note("CAR-03", f"unladen {self.v('CAR-03'):.0f} mm against {z:.0f} mm laden")
         return z
 
-    def wheel(self, atm: float, towball: float, wheels: dict) -> dict:
-        need = 1.2 * (atm - towball) / 4
+    def wheel(self, wheel: dict) -> dict:
+        """The trailer's own wheel (report 09). WHL-01 is its load rating, which MAS-09 checks against the per-wheel
+        load that MAS-06 uses with the growth allowance."""
         r = self.v("WHL-01")
-        if r is None:
-            w = dict(wheels["porsche"], confirmed=False)
-            self.note("WHL-01", f"needs {need:.0f} kg per wheel. Porsche's rating is not known, so the plan keeps the Porsche wheel, not confirmed")
-        elif r >= need:
-            w = dict(wheels["porsche"], confirmed=True, rating_kg=r)
-            self.note("WHL-01", f"{r:.0f} kg against {need:.0f} kg needed, so the plan keeps the Porsche wheel")
-        else:
-            w = dict(wheels["fallback"], confirmed=False, switched=True)
-            self.note("WHL-01", f"{r:.0f} kg is below the {need:.0f} kg needed, so the plan changes to {w['name']}: hub spigot "
-                                f"{w['spigot_mm']} mm, offset ET{w['offset_mm']:.0f}. Re-check the brakes and the rail width")
-        w["need_kg"] = need
-        return w
+        st = self.items["WHL-01"].status
+        self.note("WHL-01", f"{r:.0f} kg per wheel ({st}). MAS-09 checks it against 1.2 times the axle group load with growth, over four wheels")
+        return dict(wheel, rating_kg=r, rating_status=st)
 
     def supplier(self, atm: float, towball: float) -> dict:
         gtm, incl = self.v("SUP-01"), bool(self.v("SUP-02"))
@@ -224,11 +217,14 @@ class Inputs:
                   f"{'ratings do not' if answered else 'not known to'} include the 120 % rule, so MAS-02 checks 1.2 times the axle load")
         return dict(kit_gtm=gtm, includes_120=incl, need_kg=need)
 
-    def cf(self, offset: float, tyre_section: float) -> float:
+    def cf(self, offset: float, tyre_w: float) -> float:
         cf = self.v("SUP-04")
-        side = cf - offset - tyre_section / 2
-        self.note("SUP-04", f"C/F {cf:.0f} mm with ET{offset:.0f}: the tyre's inner sidewall sits {side:.0f} mm outside the rail"
-                            + (", under the 40 mm report 06 asks for" if side < 40 else ""))
+        eff = cf - offset
+        side = eff - tyre_w / 2
+        txt = (f"C/F {cf:.0f} mm with ET{offset:+.0f}: effective C/F {eff:.0f} mm, "
+               + ("within" if eff <= CF_EFF_MAX else "OVER") + f" Cruisemaster's {CF_EFF_MAX:.0f} mm limit for the 4,500 kg XT Air tandem. "
+               f"The tyre's inner sidewall sits {side:.0f} mm outside the rail" + (", under the 40 mm report 06 asks for" if side < 40 else ""))
+        self.note("SUP-04", txt)
         return cf
 
     def weighed(self) -> list[dict]:

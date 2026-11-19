@@ -1,17 +1,17 @@
 # Garage and bed module: design (baseline)
 
-Status: concept, revision D, 19 Nov 2026. Revision D moves the garage to the back of the trailer with a rear door, so the living space is one room (owner's decision). The bikes now stand along the trailer, side by side, noses forward. Partition B goes, partition A becomes the garage's front wall, and the bed covers the whole garage. Revision C placed the module in the trailer and kept the Tuareg's panniers on. Revision B lapped the deck over the partition and made the ladder owner-built. This is the baseline for the 3D model, drawings and website. Items marked OPEN need the owner's decision. Sources are the research reports in `research/` (01 tech stack, 02 design practice, 03 bike restraint and garage, 04 bed and materials, 05 bike geometry).
+Status: concept, revision D, 19 Nov 2026, with the floor height updated the same day for the trailer's own wheels and tyres (TRAILER.md revision D): 869 mm in place of 858 mm. Revision D moves the garage to the back of the trailer with a rear door, so the living space is one room (owner's decision). The bikes now stand along the trailer, side by side, noses forward. Partition B goes, partition A becomes the garage's front wall, and the bed covers the whole garage. Revision C placed the module in the trailer and kept the Tuareg's panniers on. Revision B lapped the deck over the partition and made the ladder owner-built. This is the baseline for the 3D model, drawings and website. Items marked OPEN need the owner's decision. Sources are the research reports in `research/` (01 tech stack, 02 design practice, 03 bike restraint and garage, 04 bed and materials, 05 bike geometry).
 
 ## Module frame
 
-The module uses its own frame. The origin is on the garage floor surface, at the rear face of partition A, on the trailer centreline. X runs rearward along the trailer towards the rear door. Y runs across the trailer, positive towards the kerb (left) side. Z is up from the garage floor. Units are mm. These are the axes of the project datum in report 02 (DIM-01), so the module only moves when it is placed in the trailer. Module X 0 sits at datum X 4,955 in the 5,500 mm body and module Z 0 at datum Z 858 (TRAILER.md).
+The module uses its own frame. The origin is on the garage floor surface, at the rear face of partition A, on the trailer centreline. X runs rearward along the trailer towards the rear door. Y runs across the trailer, positive towards the kerb (left) side. Z is up from the garage floor. Units are mm. These are the axes of the project datum in report 02 (DIM-01), so the module only moves when it is placed in the trailer. Module X 0 sits at datum X 4,955 in the 5,500 mm body and module Z 0 at datum Z 869 (TRAILER.md).
 
 ## Envelope
 
 - Interior width 2,330 mm, so Y runs from -1,165 to +1,165 (2,400 mm body with 35 mm walls).
 - Garage interior length 2,330 mm, X from 0 to 2,330, between partition A and the body's rear wall. The garage is square in plan.
 - Ceiling with the roof collapsed at Z = 1,800 (target). The hard limit is 2,000.
-- The garage floor is flat with no wheel arches. Its surface is 858 mm above the ground at design ride height, set by the running gear (TRAILER.md). The 3,048 mm ramp then sits at 16.4 degrees, or about 15.2 degrees with the air bags vented.
+- The garage floor is flat with no wheel arches. Its surface is 869 mm above the ground at design ride height, set by the running gear and the trailer's own LT245/70R16 tyres (TRAILER.md revision D, 869.4 mm). The 3,048 mm ramp then sits at 16.6 degrees, or about 15.4 degrees with the air bags vented.
 
 ## Bikes
 

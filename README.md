@@ -64,7 +64,7 @@ show it in red. Use `make strict` where a failure must stop the build.
 Outputs: `build/model/garage-bed.step` and `.glb`, `build/bom/garage-bed-bom.csv`, `build/trailer/trailer.json`,
 `.step` and `.glb`, `build/drawings/CT-*.pdf|svg|png`, `build/checks/checks.json`, and the site in `site/dist`.
 
-`make check` also runs the whole-trailer checks. Six of them, the mass and towball checks with the growth allowance,
+`make check` also runs the whole-trailer checks. Five of them, the mass and towball checks with the growth allowance,
 fail on the current estimates, so `make strict` fails until the trailer's mass comes down (TRAILER.md).
 
 ## Conventions

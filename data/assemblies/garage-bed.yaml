@@ -95,7 +95,7 @@ params:
   ladder_lean_deg: 15        # A-01 rev B: lean from vertical, into the living area
   living_floor_x0: -720      # start of the living-area floor shown under the ladder (display only)
   net_y0: -1100
-  ground_drop: 858           # garage floor height at design ride height, from the trailer model (TRAILER.md, 857.7 mm)
+  ground_drop: 869           # garage floor height at design ride height, from the trailer model (TRAILER.md revision D, 869.4 mm)
 
 items:
   # ---------------------------------------------------------------- bikes

@@ -244,11 +244,15 @@ trailer_checks:
     inputs: [TW-01, TW-02, TW-03]
     why: TfNSW VIB 78 (report 02 section 2.1). The examiner caps ATM at the lower of the coupling and safety chain ratings.
   - id: MAS-09
-    title: Wheel load rating meets VSB1's 120 % rule (reported until Porsche confirms it)
-    type: wheel
-    severity: report
-    inputs: [WHL-01]
-    why: Each wheel needs 1.2 x (ATM less the towball target) / 4. The plan keeps the Porsche wheel when its rating meets it and changes to a rated 5 x 130 wheel when it does not (measurements.yaml WHL-01).
+    title: Wheel load rating covers VSB1's 120 % rule with growth
+    type: mass
+    quantity: tyre_load
+    limit: wheel_rating
+    basis: growth
+    cases: all
+    severity: fail
+    inputs: [WHL-01, TW-01, TW-02, TW-03]
+    why: Each wheel must carry the same per-wheel load MAS-06 checks on the tyre, 1.2 times the axle group load with the growth allowance over four wheels. The ROH Trak 2 16x7 +7 is rated 1,250 kg (measurements.yaml WHL-01, report 09).
   - id: BAL-01
     title: Ballast at the back of the garage to tow with no bikes aboard, with growth (reported)
     type: ballast
@@ -263,23 +267,23 @@ trailer_checks:
     inputs: [CAR-07]
     why: Checks the centre of gravity estimates once the trailer exists (measurements.yaml CAR-07).
   - id: MAS-06
-    title: Tyre load with VSB1's 120 % rule within the tyre's 1,030 kg rating
+    title: Tyre load with VSB1's 120 % rule within the tyre's rating
     type: mass
     quantity: tyre_load
+    limit: tyre_rating
     basis: growth
     cases: all
-    max: 1030
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: VSB1 asks each axle of a non-load-sharing group and its tyres to carry 120 % of their load. 109 load index is 1,030 kg (report 07). The wheel's own rating is not published yet, so it is reported in TRAILER.md, not checked.
+    why: VSB1 asks each axle of a non-load-sharing group and its tyres to carry 120 % of their load. The Yokohama Geolandar A/T G015 LT245/70R16 118/115R is rated 1,320 kg (load index 118, report 09), from the registration ratings in load_cases.yaml.
   - id: CAR-01
-    title: Car's rear axle with two adults, the towbar and the fully loaded towball, before any gear
+    title: Car's rear axle with two adults, the towbar, its own spare wheel and the fully loaded towball, before any gear
     type: car_axle
     cases: [TC2]
     max: 1600
     severity: report
     inputs: [CAR-01, CAR-02, CAR-05, CAR-06]
-    why: Report 07 load budget method. The row also gives how much gear the car can then carry before its rear axle or GVM binds.
+    why: Report 07 load budget method, with the car's 30 kg spare flat on the boot floor about 100 mm behind the rear axle (report 10). The row also gives how much gear the car can then carry before its rear axle or GVM binds.
   - id: FIT-01
     title: Living area holds its items and keeps the entry door, ladder foot, bathroom door, walkway and seat clear
     type: fit
@@ -344,12 +348,12 @@ trailer_checks:
     inputs: [CAR-04]
     why: Every part carried by the suspension needs 100 mm of running clearance. The arms, hubs and wheels are not carried by it.
   - id: JK-01
-    title: Body front corners clear the Cayenne at a 90 degree jack-knife
+    title: Body front corners and the spare wheel clear the Cayenne at a 90 degree jack-knife
     type: jackknife
     min_gap_mm: 100
     severity: fail
     inputs: [CAR-05]
-    why: Plan view at 90 degrees about the ball. 100 mm is this layout's allowance for the unmeasured ball position and the car's rounded corners. Revision B set the drawbar length for the drawbar box, which revision C does not have.
+    why: Plan view at 90 degrees about the ball. 100 mm is this layout's allowance for the unmeasured ball position and the car's rounded corners. Revision B set the drawbar length for the drawbar box, which revision C does not have. Revision D adds the spare wheel on the body's front wall.
   - id: JK-02
     title: Drawbar members and stone guard to the car's rear corner, plan view (reported)
     type: jackknife_aframe

@@ -289,6 +289,7 @@ def ct401(prj, model, bom, checks, reg, dwg):
         "MEASURE BOTH BIKES IN A FULL-SIZE MOCK-UP BEFORE ORDERING PANELS (BUILD STEP S01). VENTS, SENSORS AND THE EXTINGUISHER ARE PLACEHOLDERS.",
     ], width_chars=64, size=1.8)
     S.rev_tag(sh, 98.0, starts[1] + 0.6, "D")
+    S.rev_tag(sh, 104.0, starts[0] + 0.6, "E")
     items = [("TU", "TU", "Aprilia Tuareg 660 Rally (envelope)", "1"), ("ST", "ST", "Triumph Street Triple 765 (envelope)", "1"),
              ("1", "P-01", f"Partition A, 20 honeycomb 2330x{P['partition_a_h']:.0f}", "1"),
              ("5", "B-05", "Ledger, angle 40x40x3 6060-T5", f"4 ({_q(bom, 'B-05'):.2f} m)"),

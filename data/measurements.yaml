@@ -43,7 +43,7 @@ inputs:
   - id: CAR-04
     group: Car
     title: Towball pin height at Normal level with about 220 kg on the ball
-    how: As CAR-03, with about 220 kg on the tongue (a towball scale under a stand, or the loaded trailer coupled). Wait a minute for the car to level, then measure again.
+    how: As CAR-03, with about 220 kg on the tongue (a towball scale under a stand, or the loaded trailer coupled), on the car's 20 inch wheels and tyres. Wait a minute for the car to level, then measure again.
     unit: mm
     estimate: {v: 440, src: "Report 08 design target, plus or minus 20 mm"}
     measured: {v: null, date: null}
@@ -51,6 +51,7 @@ inputs:
     thresholds:
       - {at: 440, rule: "The trailer is designed level at this height: the coupling point Z follows the value and the drawbar drop below the rails re-solves", src: "VSB1 9.3.2: trailers should be designed to be level within the towball range"}
       - {at: [370, 440], rule: "Outside 370 to 440 mm the 20 mm tolerance no longer stays inside VSB1's 350 to 460 mm, so choose a tongue with more or less drop", src: "VSB1 9.3.2 and report 08 section 5.3"}
+      - {rule: "The coupling height is set for the car's 20 inch 275/45 R20 tyres. On the 18 inch set that report 10 documents for Victoria the car sits about 9 mm lower", src: "Report 10, Height"}
   - id: CAR-05
     group: Car
     title: Car's rear axle centre to the towball pin
@@ -66,7 +67,7 @@ inputs:
     title: Gear planned in the car while towing
     how: Not a measurement. Weigh the gear that will ride in the car, or set what the owner plans to carry. It sits on the floor where the rear seats were.
     unit: kg
-    estimate: {v: 385, src: "Report 07 load budget: the gear the 2,085 kg car carries on the floor at about 220 kg on the ball"}
+    estimate: {v: 340, src: "Report 07's 385 kg less the 45 kg of gear the car's own 30 kg spare on the boot floor costs (report 10)"}
     measured: {v: null, date: null}
     affects: [towball target, axle solve]
     thresholds:
@@ -85,14 +86,14 @@ inputs:
   # ================================================================ wheel and supplier answers (report 06)
   - id: WHL-01
     group: Wheel and suppliers
-    title: Porsche's rated load for the 8J x 18 ET53 wheel
-    how: Ask Porsche Cars Australia for the wheel's load rating by part number, or read it if it is cast or stamped inside the wheel.
+    title: Load rating of the trailer's wheel, ROH Trak 2 16x7 +7 (part 4116776)
+    how: Read it from ROH's current table or the stamp on the wheel, and ask ROH whether it holds at the 80 psi of a load range E tyre.
     unit: kg
-    estimate: {v: null, src: "Not published (reports 06 and 07)"}
+    estimate: {v: 1250, src: "ROH's published table for the Trak 2 16x7 +7 6 x 139.7 (https://roh.com.au/wheels/trak-2, report 09 section 3)"}
     measured: {v: null, date: null}
-    affects: [wheel choice, hub spigot, rail width, MAS-09]
+    affects: [MAS-09]
     thresholds:
-      - {rule: "The requirement is VSB1's 120 % rule on the axle load at ATM: 1.2 x (ATM less the towball target) / 4, worked out from the current values. At or above it the plan keeps the Porsche wheel. Below it the plan changes to a rated 5 x 130 aftermarket wheel and flags the hub spigot and offset that follow. Unknown keeps the Porsche wheel and flags it as not confirmed", src: "VSB1 Rev 6 axles and suspension, report 06 section 3"}
+      - {rule: "MAS-09 checks the rating against the per-wheel load MAS-06 uses: 1.2 times the axle group load with the growth allowance, over four wheels. Below it, choose a higher-rated wheel (report 09 section 3 lists them)", src: "VSB1 Rev 6 axles and suspension, report 09"}
   - id: SUP-01
     group: Wheel and suppliers
     title: Cruisemaster's GTM for the XT Air build
@@ -115,14 +116,15 @@ inputs:
       - {at: 0, rule: "No: MAS-02 checks 1.2 times the axle group load against the kit's GTM. Yes: it checks the axle group load itself", src: "VSB1 Rev 6 axles and suspension, report 06"}
   - id: SUP-04
     group: Wheel and suppliers
-    title: Cruisemaster's C/F for the ET53 wheel, from the rail's outside face to the hub face
+    title: Cruisemaster's C/F for the ROH Trak 2 16x7 +7 wheel, from the rail's outside face to the hub face
     how: Cruisemaster sets it in the design session from the wheel's offset and the track.
     unit: mm
-    estimate: {v: 240, src: "Report 06: Cruisemaster allows 175 to 260 mm with 12 inch brakes. 240 mm used until Cruisemaster sets it"}
+    estimate: {v: 195, src: "Report 09 section 3: C/F 195 with ET +7 gives an effective C/F of 188 mm and a 1,662 mm track on the 1,286 mm rail"}
     measured: {v: null, date: null}
-    affects: [rail width, chassis inputs]
+    affects: [track, chassis inputs]
     thresholds:
-      - {rule: "The rail outer width follows from it: track - 2 x (C/F - ET). The tyre's inner sidewall then sits C/F - ET - half the tyre width outside the rail, and report 06 asks for about 40 mm", src: "Report 06 sections 3 and 8"}
+      - {rule: "The rail outer width stays 1,286 mm, so the track follows: rail width + 2 x (C/F - ET). The tyre's inner sidewall sits C/F - ET - half the tyre width outside the rail, and report 06 asks for about 40 mm", src: "Report 06 sections 3 and 8, report 09 section 3"}
+      - {at: 200, rule: "Cruisemaster's C/F chart marks every effective C/F (C/F - ET) above 200 mm as unacceptable for the 4,500 kg XT Air tandem. Above it the note flags the C/F, and a wider track needs a wider rail instead", src: "Cruisemaster C/F sheet, as read in report 09"}
 
   # ================================================================ the bikes and the chock (DESIGN.md, report 05)
   - id: TU-01
@@ -259,7 +261,7 @@ inputs:
     unit: kg
     estimate: {v: null, src: "The model's tare is shown beside it"}
     measured: {v: null, date: null}
-    stage: [living, module, underfloor, stowage]
+    stage: [living, module, underfloor, stowage, spare]
     affects: [every mass check, the plated tare]
     thresholds:
       - {rule: "The rise from TW-02 replaces the fit-out's estimates. The ticket goes in the NSW identity approval package (report 02, VIB 78)", src: "Report 02 MASS-07 and MASS-08"}
