@@ -4,6 +4,7 @@ module's bodies are moved into the ute frame instead. Exports the three-cad-view
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 
 from build123d import Compound, Cylinder, Pos, Rot, export_step
@@ -89,3 +90,26 @@ def write_outputs(ute, out: Path, garage_model=None):
         js = _viewer_js("UTE-79", comp)
         (out / "ute-loading.viewer.json").write_text(js[js.index("{"): js.rindex("}") + 1])
     return comp
+
+
+def bike_box_sweep(ute, garage_model) -> dict:
+    """What the trailer's jack-knife checks need from the bike box (TRAILER.md JK-01 and JK-02): the radius its parts
+    behind the ball sweep about the ball in plan, and the lowest point of those parts above the ground. Every body of the
+    garage module as it travels counts, so the cam bar, the hasp and the subframe are in it."""
+    V = ute.V
+    bx = V["ball_x"]
+    r, under, who = 0.0, None, ""
+    for i, s in garage_solids(ute, garage_model):
+        if i.group == "context":
+            continue
+        bb = s.bounding_box()
+        if bb.max.X <= bx:
+            continue
+        d = math.hypot(bb.max.X - bx, max(abs(bb.min.Y), abs(bb.max.Y)))
+        if d > r:
+            r, who = d, f"{i.iid} {i.label}"
+        under = bb.min.Z if under is None else min(under, bb.min.Z)
+    ext = ute.box_extent()
+    return dict(radius_mm=round(r, 1), governing=who, underside_z=round(under, 1), ball_x=bx, ball_z=V["coupling_z"],
+                overhang_mm=round(ext["x1"] - bx, 1), body_overhang_mm=round(ute.garage["module_x0"] + garage_model.prj.P.values["x_end"] - bx, 1),
+                half_width_mm=round(max(abs(ext["y0"]), abs(ext["y1"])), 1))

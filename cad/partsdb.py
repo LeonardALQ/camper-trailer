@@ -155,15 +155,15 @@ class TrailerCheck(Strict):
     """A whole-trailer check, measured on the block layout (cad/trailer.py)."""
     id: str
     title: str
-    type: Literal["mass", "car_axle", "fit", "tyre", "width", "overhang", "coupling", "clearance_ground",
-                  "jackknife", "jackknife_aframe", "wheel", "towball_scale", "ballast",
+    type: Literal["mass", "gcm", "fit", "tyre", "width", "overhang", "coupling", "clearance_ground",
+                  "jackknife", "jackknife_height", "wheel", "towball_scale",
                   "chassis_stress", "chassis_local", "chassis_deflection", "chassis_twist", "chassis_fatigue",
-                  "body_panel", "body_deflection", "body_insert", "body_roof", "body_twist", "body_joint", "body_portal",
-                  "body_mount", "body_hardpoint", "body_openings"]
+                  "body_panel", "body_deflection", "body_insert", "body_roof", "body_twist", "body_joint",
+                  "body_mount", "body_end_wall", "body_openings"]
     load_case: str | None = None          # chassis_stress: report 11's load case (data/chassis/chassis.yaml)
     item: str | None = None               # chassis_local, chassis_deflection and chassis_fatigue: what is checked
     quantity: Literal["mass", "axle", "axle_vsb1", "towball", "towball_pct", "tyre_load"] | None = None
-    limit: Literal["kit_gtm", "nsw_gtm_cap", "nsw_atm_cap", "target", "tyre_rating", "wheel_rating"] | None = None
+    limit: Literal["kit_gtm", "nsw_gtm_cap", "nsw_atm_cap", "plated_atm", "target", "tyre_rating", "wheel_rating"] | None = None
     tolerance: float | None = None
     inputs: list[str] = []
     basis: Literal["nominal", "growth", "both"] = "nominal"
@@ -199,21 +199,16 @@ class TrailerCase(Strict):
     id: str
     name: str
     aboard: str
-    module: Literal["all", "fixed_only"]
-    bikes: list[str]
     water_l: Any
-    load: list[Literal["gas", "fuel", "gear", "luggage"]]
+    load: list[Literal["fuel", "gear"]]
     towball_target: bool = False
-    ballast: bool = False
 
 
 class LoadCasesFile(Strict):
-    load_cases: list[LoadCase]
-    towball: Towball
     trailer_cases: list[TrailerCase] = []
-    towball_target_kg: float | None = None
-    car: dict[str, Any] = {}
+    towball_target_kg: float
     registration: dict[str, Any] = {}
+    tow_vehicle: dict[str, Any] = {}
 
 
 class Revision(Strict):
@@ -233,8 +228,9 @@ class DrawingDef(Strict):
     sheet: int
     size: Literal["A3"]
     scale: float
-    status: Literal["DRAFT", "FOR REVIEW", "FOR CONSTRUCTION", "AS BUILT"]
+    status: Literal["DRAFT", "FOR REVIEW", "FOR CONSTRUCTION", "AS BUILT", "RETIRED"]
     structural: bool = False
+    retired: str | None = None      # why the sheet is no longer drawn, and what replaces it
     revisions: list[Revision]
 
 
@@ -361,15 +357,17 @@ class Instance(BaseModel):
 
 # Assemblies other than the trailer's garage and bed module. Each names its part files, its checks file and the
 # module parameters the measurement rules may set. The ute garage (UTE-GARAGE.md) shares the bikes with the trailer.
+# The trailer (TRAILER.md) has no placed module of its own since the bikes moved to the ute (UTE-GARAGE.md): its
+# Project carries the trailer checks, load cases, drawings and measurements only.
 ASSEMBLIES = {
-    "garage-bed": dict(parts=["parts/*.yaml"], checks="checks.yaml", steps=True),
-    "ute-garage": dict(parts=["parts/bikes.yaml", "ute/parts/*.yaml"], checks="ute/garage-checks.yaml", steps=False),
+    "trailer": dict(parts=[], checks="checks.yaml", assembly=False),
+    "ute-garage": dict(parts=["parts/bikes.yaml", "ute/parts/*.yaml"], checks="ute/garage-checks.yaml", assembly=True),
 }
 
 
 class Project:
     def __init__(self, root: Path = ROOT, overrides: dict[str, Any] | None = None, use_solved: bool = True,
-                 assembly: str = "garage-bed"):
+                 assembly: str = "trailer"):
         self.root = root
         self.overrides = dict(overrides or {})
         self.assembly_name = assembly
@@ -384,24 +382,25 @@ class Project:
                     raise ValueError(f"duplicate part id {pid} in {f.name}")
                 p.id, p.group = pid, pf.group
                 self.parts[pid] = p
-        self.assembly = AssemblyDef.model_validate(yaml.safe_load((data / "assemblies" / f"{assembly}.yaml").read_text()))
+        self.assembly = (AssemblyDef.model_validate(yaml.safe_load((data / "assemblies" / f"{assembly}.yaml").read_text()))
+                         if spec["assembly"] else AssemblyDef(id="ASM-TR", name="Whole trailer (no placed module)", revision="-",
+                                                              params={}, items=[]))
         cf = ChecksFile.model_validate(yaml.safe_load((data / spec["checks"]).read_text()))
         self.checks = cf.checks
         self.trailer_checks = cf.trailer_checks
         self.load = LoadCasesFile.model_validate(yaml.safe_load((data / "load_cases.yaml").read_text()))
         self.drawings = DrawingsFile.model_validate(yaml.safe_load((data / "drawings.yaml").read_text()))
-        self.steps = StepsFile.model_validate(yaml.safe_load((data / "steps.yaml").read_text())).steps if spec["steps"] else []
+        self.steps: list[Step] = []
         self.bike_geometry = yaml.safe_load(BIKE_GEOMETRY.read_text())
         from .inputs import Inputs
         self.inputs = Inputs(root)
-        self.inputs.patch_parts(self.parts)
+        if spec["assembly"]:
+            self.inputs.patch_parts(self.parts)
         raw = dict(self.assembly.params)
-        for k, v in self.inputs.module_overrides(use_solved).items():
-            if k not in raw and assembly != "garage-bed":
-                continue   # the rule sets a parameter this assembly does not have (the bed beams, in the ute)
-            if k not in raw:
-                raise KeyError(f"measurement rule sets unknown parameter {k}")
-            raw[k] = v
+        if spec["assembly"]:
+            for k, v in self.inputs.module_overrides(use_solved).items():
+                if k in raw:
+                    raw[k] = v
         for k, v in self.overrides.items():
             if k not in raw:
                 raise KeyError(f"override of unknown parameter {k}")
@@ -517,9 +516,8 @@ class Project:
         return out
 
     def bom_lines(self) -> list[Part]:
-        order = {"garage": 0, "bed": 1, "partitions": 2, "fixings": 3, "access": 4}
-        lines = [p for p in self.parts.values() if p.kind == "bom" and p.group in order]
-        return sorted(lines, key=lambda p: (order[p.group], p.id))
+        lines = [p for p in self.parts.values() if p.kind == "bom"]
+        return sorted(lines, key=lambda p: (p.group, p.id))
 
 
 def schema() -> dict:
@@ -529,6 +527,6 @@ def schema() -> dict:
 
 if __name__ == "__main__":
     import json
-    prj = Project()
+    prj = Project(assembly="ute-garage")
     print(json.dumps(dict(parts=len(prj.parts), instances=len(prj.instances),
-                          params={k: prj.P.values[k] for k in ("st_x", "deck_z", "mattress_z", "partition_b_h")}), indent=1))
+                          params={k: prj.P.values[k] for k in ("deck_z", "tuareg_y", "st_y", "bike_spacing")}), indent=1))

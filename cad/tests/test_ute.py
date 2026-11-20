@@ -1,8 +1,11 @@
 """Ute checks from data/ute/ute.yaml (cad/ute.py) and the bike garage checks (cad/ute_garage.py,
 data/ute/garage-checks.yaml). A `fail` check that misses its limit fails the test, and a `report` check is marked
 xfail when it misses. Every mass line carries a source and a maturity."""
+import json
+
 import pytest
 
+from cad.build import BUILD, git_hash
 from cad.ute import Ute
 
 try:
@@ -14,6 +17,12 @@ except ImportError:
 UTE = Ute(GARAGE)
 RESULTS = UTE.checks()
 GARAGE_RESULTS = GARAGE["checks"] if GARAGE else []
+
+# the bike box's measured checks for the site (the old garage module's build/checks/checks.json)
+_out = BUILD / "checks"
+_out.mkdir(parents=True, exist_ok=True)
+(_out / "checks.json").write_text(json.dumps(dict(results=[{k: v for k, v in r.items() if k not in ("restraint", "mounts")}
+                                                        for r in GARAGE_RESULTS], ute=RESULTS, git=git_hash()), indent=1, default=str))
 
 
 def _check(row, msg):

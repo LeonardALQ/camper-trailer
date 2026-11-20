@@ -27,7 +27,13 @@ def load_data() -> dict:
 class Ute:
     def __init__(self, garage: dict | None = None, data: dict | None = None):
         self.d = data or load_data()
-        self.P = Params(dict(self.d["params"]))
+        from .inputs import Inputs
+        from .partsdb import ROOT
+        raw = dict(self.d["params"])
+        inp = Inputs(ROOT)
+        raw["coupling_z"] = inp.coupling_z()           # measurements.yaml UTE-01
+        raw["ball_behind_axle"] = inp.ball_behind_axle()   # UTE-02
+        self.P = Params(raw)
         self.V = self.P.values
         self.limits = {k: v["v"] for k, v in self.d["limits"].items()}
         self.garage = garage

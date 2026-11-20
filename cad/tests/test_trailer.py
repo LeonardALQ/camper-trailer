@@ -1,14 +1,13 @@
 """Whole-trailer checks from data/checks.yaml (trailer_checks), measured on the block layout (cad/trailer.py).
 
-A `fail` check that misses its limit fails the test. A `report` check is marked xfail when it misses, as for
-the module checks. The module's ramp drop must match the trailer's garage floor height.
+A `fail` check that misses its limit fails the test. A `report` check is marked xfail when it misses. The trailer is
+the LandCruiser 79's (layout-79, layout 1): it reads the ute's model from build/ute/ute.json, so the ute builds first.
 """
 import pytest
 
-from cad.tests.test_checks import MODEL, PRJ
-from cad.trailer import ModuleInfo, Trailer
+from cad.trailer import Trailer
 
-TRAILER = Trailer(PRJ, ModuleInfo.from_model(PRJ, MODEL))
+TRAILER = Trailer()
 EV = TRAILER.evaluate()
 RESULTS = EV["checks"]
 
@@ -23,13 +22,22 @@ def test_trailer_check(row):
     assert row["ok"], msg
 
 
-def test_ramp_drop_matches_floor_height():
-    floor = EV["layout"].V["floor_z"]
-    drop = PRJ.P.values["ground_drop"]
-    assert abs(floor - drop) <= 1.0, f"garage-bed ground_drop {drop} mm, trailer garage floor {floor:.1f} mm"
-
-
 def test_every_aboard_line_has_a_source():
     for case in TRAILER.cases:
         for b, m in EV["layout"].case_lines(case):
             assert b.source and b.maturity in ("spec", "calculated", "estimate"), f"{b.iid} has no mass source"
+
+
+def test_no_petrol_inside_the_body():
+    """Decision log 12:45: the generator and the jerry cans ride in the drawbar box, outside the body."""
+    lay = EV["layout"]
+    V = lay.V
+    for iid in ("GS-01", "GS-04"):
+        b = lay.find(iid)
+        assert b.box[3] < V["body_x0"], f"{iid} is inside the body"
+
+
+def test_the_coupling_matches_the_ute():
+    """The trailer's coupling point and the ute's ball are the same measurement (measurements.yaml UTE-01)."""
+    from cad.ute import Ute
+    assert EV["layout"].V["coupling_z"] == Ute().V["coupling_z"]

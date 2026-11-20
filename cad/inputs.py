@@ -13,18 +13,14 @@ from typing import Any
 
 import yaml
 
-# Constants of the rules, with their source (DESIGN.md unless stated)
+# Constants of the rules, with their source (UTE-GARAGE.md unless stated). The bikes ride in the ute's box.
 BASE_SPACING = 760          # bike spacing
 ST_BAR_REACH = 396          # Street Triple bar end from its centreline (owner's 792 mm width / 2)
-CLR03_GAP = 30              # CLR-03 limit
-BASE_GARAGE = 2330          # revision D: garage length and width are fixed by the body
-MAX_SPACING = 780           # revision D: largest spacing at which the Street Triple's kerb-side straps keep 15 mm from the stowed ramp (CLR-10)
-BASE_BEAM = 1460
+CLR03_GAP = 30              # UGC-01 limit (the trailer garage's CLR-03)
+MAX_SPACING = 780           # largest spacing at which the Street Triple's belly pan keeps 15 mm from the kerb tool chest (UGC-02)
+BOX_HEIGHT = 1460           # inside height of the ute's bike box to the roof bows
 CHOCK_RISE = 25
-BEAM_MARGIN = 45            # 1,460 = 1,390 + 25 + 45
-DRIVER_KG = 75              # weighbridge driver (estimate)
 CF_EFF_MAX = 200            # Cruisemaster's C/F chart limit on C/F - ET for the 4,500 kg XT Air tandem (report 09)
-DRIVER_X = 1150             # behind the front axle (report 07 occupant position)
 
 
 @dataclass
@@ -103,31 +99,31 @@ class Inputs:
         elif grow:
             txt += f". The geometric solve has not run yet, so the rule's {spacing:.0f} mm is in use"
         if spacing > max_spacing:
-            txt += (f". The garage width is fixed and {spacing:.0f} mm is over the {max_spacing:.0f} mm that fits beside the kerb-side "
-                    "stowage, so CLR-10 fails and the layout needs redesigning")
+            txt += (f". The box width is fixed and {spacing:.0f} mm is over the {max_spacing:.0f} mm that fits beside the kerb "
+                    "tool chest, so UGC-02 fails and the box layout needs redesigning")
         else:
-            txt += f". The garage width is fixed, and spacings up to {max_spacing:.0f} mm fit beside the kerb-side stowage"
+            txt += f". The box width is fixed, and spacings up to {max_spacing:.0f} mm fit beside the kerb tool chest"
         self.spacing_fits = spacing <= max_spacing
         self.note("TU-01", txt)
         cb_top = self.v("TU-09")
         self.note("TU-09", f"crash bar envelope up to {cb_top:.0f} mm, " + ("below 970 mm, so the Street Triple's bar end passes over it"
                   if cb_top <= 970 else "above 970 mm, so the bars may meet the Street Triple's bar end. The spacing solve re-measures it"))
+        top = max(self.v("TU-03"), self.v("TU-04"))
+        gov = "screen" if self.v("TU-03") >= self.v("TU-04") else "folded mirrors"
+        room = BOX_HEIGHT - CHOCK_RISE - top
+        self.note("TU-03", f"the {gov} at {top:.0f} mm stand {room:.0f} mm under the box's {BOX_HEIGHT} mm roof bows with the front wheel "
+                           f"{CHOCK_RISE} mm up in the chock" + ("" if room >= 15 else ", under the 15 mm UGC-02 asks for: the walls must grow"))
+        self.note("TU-04", "below the screen, so the screen sets the height" if self.v("TU-04") <= self.v("TU-03")
+                  else "above the screen, so the mirrors set the height")
         self.note("TU-07", f"half the two peg widths add to {pegs:.0f} mm, {'over' if peg_excess else 'within'} 730 mm")
         self.note("ST-01", self.outcomes["TU-07"])
-        top = max(self.v("TU-03"), self.v("TU-04"))
-        beam = max(BASE_BEAM, top + CHOCK_RISE + BEAM_MARGIN)
-        gov = "screen" if self.v("TU-03") >= self.v("TU-04") else "folded mirrors"
-        self.note("TU-03", f"the {gov} at {top:.0f} mm need the beam underside at {top + CHOCK_RISE + BEAM_MARGIN:.0f} mm, so it stays at "
-                           f"{beam:.0f} mm" if beam == BASE_BEAM else f"the {gov} at {top:.0f} mm raise the beam underside to {beam:.0f} mm")
-        self.note("TU-04", "below the screen, so the screen sets the beam height" if self.v("TU-04") <= self.v("TU-03")
-                  else "above the screen, so the mirrors set the beam height")
         nose = self.v("CHK-01")
-        self.note("CHK-01", f"front tyres' leading edges at X {nose:.0f}, that far behind partition A")
-        self.note("TU-02", f"Tuareg modelled {self.v('TU-02'):.0f} mm long. CLR-06 measures the gap to the rear door")
-        self.note("TU-05", f"pannier outer faces {self.v('TU-05') / 2:.0f} mm either side of the bike's centreline. CLR-04 measures them "
-                           "against the road-side wall and CLR-09 against the rear door's road-side jamb")
+        self.note("CHK-01", f"front tyres' leading edges at module X {nose:.0f}, that far behind the box's front wall")
+        self.note("TU-02", f"Tuareg modelled {self.v('TU-02'):.0f} mm long. UGC-02 measures the gap to the stowed ramp")
+        self.note("TU-05", f"pannier outer faces {self.v('TU-05') / 2:.0f} mm either side of the bike's centreline. UGC-02 measures them "
+                           "against the road-side wall and UGC-03 against the barn door portal")
         self.note("TU-06", "pannier envelope {:.0f} long and {:.0f} high, front edge {:.0f} behind the front axle, bottom {:.0f} off the floor".format(*self.v("TU-06")))
-        return dict(bike_spacing=spacing, beam_underside_z=beam, front_tyre_x=nose)
+        return dict(bike_spacing=spacing, front_tyre_x=nose)
 
     def patch_parts(self, parts: dict):
         """Bike envelope values that come straight from measurements."""
@@ -151,53 +147,17 @@ class Inputs:
         tu["owner"]["height"] = self.v("TU-03")
         parts["BIKE-ST"].geometry.params["estimates"]["peg_tip_y"]["v"] = self.v("ST-01") / 2
 
-    # -- the car -------------------------------------------------------------------
-    def car(self, car: dict) -> dict:
-        """The car data with the weighbridge, pin and gear inputs applied."""
-        import copy
-        c = copy.deepcopy(car)
-        F, R = self.v("CAR-01"), self.v("CAR-02")
-        L = c["wheelbase_mm"]["v"]
-        kerb = F + R - DRIVER_KG
-        front = (F - DRIVER_KG * (L - DRIVER_X) / L) / kerb
-        st = "measured" if self.items["CAR-01"].status == "measured" and self.items["CAR-02"].status == "measured" else "estimate"
-        c["kerb_kg"] = {"v": kerb, "src": f"CAR-01 + CAR-02 less a {DRIVER_KG} kg driver ({st})"}
-        c["budget"]["front_share_of_kerb"] = {"v": front, "src": f"From CAR-01 and CAR-02 ({st})"}
-        a = self.v("CAR-05")
-        c["budget"]["ball_behind_axle_mm"] = {"v": a, "src": "CAR-05"}
-        if self.items["CAR-05"].status == "measured":
-            c["ball_behind_axle_mm"] = {"v": [a, a], "src": "CAR-05, measured"}
-        c["budget"]["planned_gear_kg"] = {"v": self.v("CAR-06"), "src": "CAR-06"}
-        self.note("CAR-01", f"kerb mass {kerb:.0f} kg with {100 * front:.1f} % on the front axle")
-        self.note("CAR-02", self.outcomes["CAR-01"])
-        self.note("CAR-05", f"lever arm {a:.0f} mm in the load budget, bumper {a - c['rear_overhang_mm']['v']:.0f} mm ahead of the ball")
-        return c
-
-    def towball_target(self, car: dict, rating: float) -> tuple[float, str]:
-        """Highest towball load keeping the rear axle within its limit with the planned gear, capped at the rating."""
-        from .trailer import car_axles
-        g = car["budget"]["planned_gear_kg"]["v"]
-        lo, hi = 0.0, 600.0
-        for _ in range(60):
-            mid = (lo + hi) / 2
-            ax = car_axles(car, mid)
-            rear = ax["rear_kg"] + g * car["budget"]["gear_behind_front_axle_mm"]["v"] / car["wheelbase_mm"]["v"]
-            if rear <= car["rear_axle_limit_kg"]["v"]:
-                lo = mid
-            else:
-                hi = mid
-        target = min(lo, rating)
-        why = f"{lo:.0f} kg keeps the rear axle at 1,600 kg with {g:.0f} kg of gear" + (f", capped at the {rating:.0f} kg rating" if lo > rating else "")
-        self.note("CAR-06", f"towball target {target:.0f} kg: {why}")
-        return target, why
-
     # -- the trailer -----------------------------------------------------------------
     def coupling_z(self) -> float:
-        z = self.v("CAR-04")
+        z = self.v("UTE-01")
         ok = 370 <= z <= 440
-        self.note("CAR-04", f"coupling point at Z {z:.0f}" + ("" if ok else ", outside 370 to 440 mm: choose a different tongue"))
-        self.note("CAR-03", f"unladen {self.v('CAR-03'):.0f} mm against {z:.0f} mm laden")
+        self.note("UTE-01", f"coupling point at Z {z:.0f}" + ("" if ok else ", outside 370 to 440 mm: choose a different tongue"))
         return z
+
+    def ball_behind_axle(self) -> float:
+        a = self.v("UTE-02")
+        self.note("UTE-02", f"ball {a:.0f} mm behind the ute's rear axle in the ute's axle loads and the bike box's sweep")
+        return a
 
     def wheel(self, wheel: dict) -> dict:
         """The trailer's own wheel (report 09). WHL-01 is its load rating, which MAS-09 checks against the per-wheel

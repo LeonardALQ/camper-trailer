@@ -13,7 +13,7 @@ T       := timeout
 
 .PHONY: all image data model trailer ute check strict drawings site serve shots clean
 
-all: image data model trailer ute check drawings site
+all: image data model ute trailer check drawings site
 	@cat build/checks/summary.txt
 
 image:
@@ -25,11 +25,12 @@ data: image
 model: data
 	$(T) 1200 $(DOCKER) python -m cad.build model
 
-trailer: model
-	$(T) 1200 $(DOCKER) python -m cad.build trailer
-
+# the trailer's jack-knife and GCM checks read the ute's model (build/ute/ute.json), so the ute builds first
 ute: model
 	$(T) 1200 $(DOCKER) python -m cad.build ute
+
+trailer: ute
+	$(T) 1200 $(DOCKER) python -m cad.build trailer
 
 # pytest measures every check on the B-rep model and writes build/checks/checks.json.
 # Its exit code is recorded, not propagated, so a failing check shows on the site instead of hiding it.

@@ -1,10 +1,9 @@
-"""Body design to planning level (BODY.md): sandwich panel, insert, joint, mount, hardpoint, rear portal, raising roof
-and twist sharing checks, from research report 12 and data/body/body.yaml.
+"""Body design to planning level (BODY.md): sandwich panel, insert, joint, mount, end wall, roof joint and twist
+checks for the body in the trailer layout (cad/trailer.py), from data/body/body.yaml and research report 12.
 
-Positions are in the project datum DIM-01 (mm). Panel checks follow report 12 section 3: each panel is a one-way span
-with an effective width of the load patch plus half the span. D = E t1 t2 d^2 / (t1 + t2) per unit width and
-S = Gc d^2 / c, with d the distance between the skin centres and c the core thickness. The twist sharing puts the body
-into the chassis frame model as a torsion box (cad/chassis.py FrameModel `body`).
+Revision B (20 Nov 2026) is the body for the LandCruiser 79: 4,420 mm long with a fixed roof bonded to the walls, a
+full rear wall and no garage. The bike wheel, chock, L-track and generator loads left the body with the garage, so a
+person's foot governs the floor. The rear wall replaces the garage portal as the box's rear diaphragm.
 """
 from __future__ import annotations
 
@@ -18,7 +17,7 @@ from .partsdb import DATA
 
 BODY_YAML = DATA / "body" / "body.yaml"
 G = 9.81
-MOUNTED = ("body", "roof", "living", "module", "stowage", "payload")   # systems that stand on the floor
+MOUNTED = ("body", "roof", "bed", "living", "payload")   # systems that stand on the floor (the drawbar box is on the drawbar)
 
 
 def load_data() -> dict:
@@ -114,13 +113,13 @@ class Body:
             z = sum(mm * b.cog[2] for b, mm in lines) / m
             tot = sum(mm for _, mm in self.lay.case_lines(c))
             rows[c.id] = dict(kg=m, cog_z=z, total_kg=tot)
-        k = max(1.0, self.tr.caps()["atm"] / max(r["total_kg"] for r in rows.values()))
+        k = max(1.0, self.tr.caps()["plated"] / max(r["total_kg"] for r in rows.values()))
         worst = max(rows, key=lambda c: rows[c]["kg"])
         return dict(cases=rows, scale=k, worst=worst, kg=rows[worst]["kg"] * k, cog_z=rows[worst]["cog_z"])
 
     # ------------------------------------------------------------------ panels (report 12 section 3)
     def panel_checks(self) -> list[dict]:
-        L, cr, f, w, lid = self.d["loads"], self.crit, self.p["floor"], self.p["wall"], self.p["lid"]
+        L, cr, f, w, rf = self.d["loads"], self.crit, self.p["floor"], self.p["wall"], self.p["roof"]
         V = self.V
         out = []
 
@@ -130,70 +129,57 @@ class Body:
                             util=u["util"], governing=u["governing"], extra=extra, defl_mm=r.get("defl_mm")))
 
         span = self.raiser_span
-        wh = L["bike_wheel"]
-        r = f.one_way(3 * wh["kg"] * G, min(wh["patch"]), span)
-        row("BDY-01", "Floor under the bike wheel in the chock, midway between the raisers", f, r, "LC2, 3 g")
-        ch = L["chock_base"]
-        r = f.one_way(3 * ch["kg"] * G, min(ch["patch"]), span)
-        row("BDY-02", "Floor under the chock base with the braking push on its rear edge", f, r, "LC2, 3 g")
         ft = L["foot"]
         r = f.one_way(3 * ft["kg"] * G, min(ft["patch"]), span)
         bearing = 3 * ft["kg"] * G / (ft["patch"][0] * ft["patch"][1])
         r["core_mpa"] = max(r["core_mpa"], bearing * cr["core_factor"] / cr["bearing_factor"] *
                             f.core["shear"] / f.core["compression"])
-        row("BDY-03", "Living-area floor under a foot, with bearing on the core", f, r, "LC2, 3 g",
+        row("BDY-03", "Floor under a foot midway between the raisers, with bearing on the core", f, r, "LC2, 3 g",
             extra=f"bearing {bearing:.2f} MPa against {cr['bearing_factor'] * f.core['compression']:.2f} MPa")
         pitch = max(b - a for a, b in zip(self.stations, self.stations[1:]))
         r = f.uniform(3 * L["floor_edge_kg_m2"] * G / 1e6, pitch)
         row("BDY-04", f"Floor edge beside the raisers between outriggers {pitch:.0f} mm apart", f, r, "LC2, 3 g")
-        g = L["generator"]
-        r = f.one_way(3 * g["kg"] * G, min(g["patch"]), pitch)
-        row("BDY-05", "Floor edge under the generator and jerry cans between outriggers", f, r, "LC2, 3 g")
-        # side wall in wind, spanning from the floor to the pop-top ring
+        # side wall in wind, spanning from the floor to the roof-to-wall joiner
         r = w.uniform(L["wind_kpa"] / 1000, V["interior_h"])
-        row("BDY-06", "Side wall in a 0.5 kPa wind, floor to the pop-top ring", w, r, "Wind")
-        # lid with the bonded solar array and its own weight, spanning between the walls
+        row("BDY-06", f"Side wall in a 0.5 kPa wind, floor to the roof joiner ({V['interior_h']:.0f} mm)", w, r, "Wind")
+        # the fixed roof with the bonded solar array and its own weight, spanning between the walls
         sol = sum(b.mass_kg for b in self.lay.blocks if b.system == "roof")
-        q = 3 * (lid.d["kg_m2"] + sol / (V["body_length"] * V["body_width"] / 1e6)) * G / 1e6
-        r = lid.uniform(q, V["body_width"] - V["wall_t"])
-        row("BDY-07", f"Lid with the {sol:.0f} kg solar array, spanning between the walls", lid, r, "LC2, 3 g")
-        self.lid_defl = lid.uniform(q / 3, V["body_width"] - V["wall_t"])["defl_mm"]
-        self.floor_defl = f.one_way(wh["kg"] * G, min(wh["patch"]), span)["defl_mm"]
+        q = 3 * (rf.d["kg_m2"] + sol / (V["body_length"] * V["body_width"] / 1e6)) * G / 1e6
+        r = rf.uniform(q, V["body_width"] - V["wall_t"])
+        row("BDY-07", f"Fixed roof with the {sol:.0f} kg solar array, spanning between the walls", rf, r, "LC2, 3 g")
+        self.roof_defl = rf.uniform(q / 3, V["body_width"] - V["wall_t"])["defl_mm"]
+        self.floor_defl = f.one_way(ft["kg"] * G, min(ft["patch"]), span)["defl_mm"]
         self.wall_defl = w.uniform(L["wind_kpa"] / 1000, V["interior_h"])["defl_mm"]
         return out
 
     def deflections(self) -> list[dict]:
         cr, V = self.crit, self.V
-        self.panel_checks() if not hasattr(self, "lid_defl") else None
-        return [dict(id="DEF-B1", what="Floor under the bike wheel at 1 g", mm=self.floor_defl, limit_mm=self.raiser_span / cr["floor_span_ratio"]),
-                dict(id="DEF-B2", what="Lid with the solar array at 1 g", mm=self.lid_defl, limit_mm=(V["body_width"] - V["wall_t"]) / cr["lid_span_ratio"]),
+        self.panel_checks() if not hasattr(self, "roof_defl") else None
+        return [dict(id="DEF-B1", what="Floor under a foot at 1 g", mm=self.floor_defl, limit_mm=self.raiser_span / cr["floor_span_ratio"]),
+                dict(id="DEF-B2", what="Fixed roof with the solar array at 1 g", mm=self.roof_defl, limit_mm=(V["body_width"] - V["wall_t"]) / cr["roof_span_ratio"]),
                 dict(id="DEF-B3", what="Side wall in a 0.5 kPa wind", mm=self.wall_defl, limit_mm=V["interior_h"] / cr["wall_span_ratio"])]
 
-    # ------------------------------------------------------------------ inserts, ledgers and the raising roof
+    # ------------------------------------------------------------------ inserts and the roof joint
     def roof(self) -> dict:
-        """Lid mass, the lifted mass for the actuators and the latch load (report 12 section 6)."""
-        d, V, lid = self.d["roof"], self.V, self.p["lid"]
-        area = V["body_length"] * V["body_width"] / 1e6
-        cut = sum(h["cut"][0] * h["cut"][1] for h in d["hatches"]) / 1e6
-        lid_kg = (area - cut) * lid.d["kg_m2"] + d["insert_strips_kg"]
-        solar = sum(b.mass_kg for b in self.lay.blocks if b.system == "roof")
-        hatches = sum(h["kg"] for h in d["hatches"])
-        lifted = lid_kg + solar + d["top_ring_kg"] + hatches + d["canvas_kg"] / 2
-        per_act = lifted * G / d["actuators"]
-        latch = d["uplift_40ms_n"] / d["latches"]
-        return dict(area_m2=area, cut_m2=cut, lid_kg=lid_kg, solar_kg=solar, hatches_kg=hatches, lifted_kg=lifted,
-                    actuator_n=per_act, actuator_util=per_act / d["actuator_n"], latch_n=latch,
-                    latch_util=latch / d["latch_rating_n"])
+        """The fixed roof bonded into the roof-to-wall joiner, in report 12's 40 m/s uplift (roof down at 110 km/h into a
+        36 km/h headwind), against the bond's tensile strength over the joiner leg, with half of it allowed."""
+        V, tw, L = self.V, self.d["twist"], self.d["loads"]
+        perim = 2 * (V["body_length"] + V["body_width"])
+        roof_kg = V["body_length"] * V["body_width"] / 1e6 * self.p["roof"].d["kg_m2"] + sum(b.mass_kg for b in self.lay.blocks if b.system == "roof")
+        net = max(0.0, L["uplift_40ms_n"] - roof_kg * G)
+        q = L["uplift_40ms_n"] / perim
+        allow = 0.5 * tw["bond_tension_strength"] * tw["bond_width"]
+        return dict(uplift_n=L["uplift_40ms_n"], roof_kg=roof_kg, net_n=net, perimeter_mm=perim, q_n_mm=q, allow_n_mm=allow, util=q / allow)
 
     def inserts(self) -> list[dict]:
         """Working loads on the panel fixings against half their rated load (report 12 section 3, MAT-05)."""
         L, cr = self.d["loads"], self.crit
-        perm = 3 * L["bed_kg"] * G / 2 / (2 * self.V["half_in"])   # N/mm per ledger
+        perm = 3 * L["bed_kg"] * G / L["bed_ledger_mm"]            # N/mm along the deck's ledgers, all of the bed on them
         f_ledger = perm * L["ledger_pitch"]
         awning = next((b for b in self.lay.blocks if b.id == "BD-13"), None)
         aw_kg = awning.mass_kg if awning else 41.0
         f_awning = math.hypot(3 * aw_kg * G / 6, 3 * aw_kg * G / 6 * 100 / 60)   # six brackets, 100 mm offset, 60 mm bolt pitch
-        rows = [dict(id="INS-01", what="Bed ledger fixing in the side wall, Deform-Nut M6 in a pultruded strip, shear", n=f_ledger, rated_n=1700,
+        rows = [dict(id="INS-01", what="Bed deck ledger fixing in the front and kerb walls, Deform-Nut M6 in a pultruded strip, shear", n=f_ledger, rated_n=1700,
                      case="LC2, 3 g on the 255 kg bed"),
                 dict(id="INS-02", what="Awning bracket bolt, Panelock APLB-1020 through the wall's top insert strip, tension", n=f_awning, rated_n=20000,
                      case="LC2, 3 g on the awning")]
@@ -203,35 +189,23 @@ class Body:
 
     # ------------------------------------------------------------------ the body as a torsion box (report 12 section 4)
     def box_gj(self, lid_structural: bool) -> dict:
-        """GJ of the body box per region, N mm2. The garage is a closed cell of the floor, the walls and the bed deck.
-        The living area is closed only if the latched lid carries shear (report 12's assumption), otherwise it is an
-        open U of the floor and the walls."""
+        """GJ of the body box, N mm2. With the roof bonded into its joiner the body is one closed cell of the floor, the walls
+        and the roof (`lid_structural`, the upper bound). The lower bound neglects the roof joint: an open U of the floor
+        and the walls, as report 12 took for the latched lid."""
         V, p, tw = self.V, self.p, self.d["twist"]
         b = V["body_width"] - V["wall_t"]
         zf = V["floor_z"] - p["floor"].d["t"] / 2
-        h_g = V["floor_z"] + self.lay.mod.params["deck_z"] + p["deck"].d["t"] / 2 - zf if "deck_z" in self.lay.mod.params else 1535.0
-        h_l = V["ceiling_z"] + p["lid"].d["t"] / 2 - zf
+        h = V["ceiling_z"] + p["roof"].d["t"] / 2 - zf
         walls, floor = p["wall"].Gt, p["floor"].Gt
-
-        def closed(h, top_gt):
-            A = b * h
-            return 4 * A ** 2 / (2 * h / walls + b / floor + b / top_gt), A
-        gj_g, A_g = closed(h_g, p["deck"].Gt * tw["deck_joint_factor"])
-        gj_lc, A_l = closed(h_l, p["lid"].Gt * tw["lid_joint_factor"])
-        gj_lo = p["floor"].plate_gj(b) + 2 * p["wall"].plate_gj(h_l)
-        return dict(garage=gj_g, living=gj_lc if lid_structural else gj_lo, living_closed=gj_lc, living_open=gj_lo,
-                    A_garage=A_g, A_living=A_l, h_garage=h_g, h_living=h_l, b=b)
+        A = b * h
+        gj_c = 4 * A ** 2 / (2 * h / walls + b / floor + b / (p["roof"].Gt * tw["roof_joint_factor"]))
+        gj_o = p["floor"].plate_gj(b) + 2 * p["wall"].plate_gj(h)
+        return dict(body=gj_c if lid_structural else gj_o, closed=gj_c, open=gj_o, A=A, h=h, b=b)
 
     def segments(self, lid_structural: bool) -> list[tuple[float, float, float]]:
-        """(x0, x1, GJ) per bay between stations, the garage and living stiffnesses in series by length."""
-        gj = self.box_gj(lid_structural)
-        xa = self.V["part_a_x"]
-        out = []
-        for x0, x1 in zip(self.stations, self.stations[1:]):
-            l_liv = max(0.0, min(x1, xa) - x0)
-            l_gar = (x1 - x0) - l_liv
-            out.append((x0, x1, (x1 - x0) / (l_liv / gj["living"] + l_gar / gj["garage"])))
-        return out
+        """(x0, x1, GJ) per bay between stations: the body box is the same cell all along."""
+        gj = self.box_gj(lid_structural)["body"]
+        return [(x0, x1, gj) for x0, x1 in zip(self.stations, self.stations[1:])]
 
     def _run(self, an, items, acc, **kw) -> dict:
         res, _ = an.run_static(items, acc, **kw)
@@ -244,14 +218,13 @@ class Body:
         gm = max(an.stresses(res).items(), key=lambda kv: kv[1]["eq"])
         worst = max(posts, key=lambda p: abs(p[2]))
         return dict(chassis_deg=an.twist(res), max_body_torque_knm=max(t for *_, t in tor) / 1e6,
-                    garage_torque_knm=max((t for x0, x1, t in tor if x0 >= self.V["part_a_x"] - 1), default=0.0) / 1e6,
                     station_torque_knm=per_station, segments=[dict(x0=x0, x1=x1, torque_knm=t / 1e6) for x0, x1, t in tor],
                     mount_force_n=abs(worst[2]), mount_worst=[worst[0], worst[1], worst[3]], mount_pulled=worst[2] > 0,
                     chassis_mpa=gm[1]["eq"], chassis_member=gm[0])
 
     def twist(self) -> dict:
         """LC5a (one wheel in a hole, travelling) and LC5b (one corner steady wound to 875 kg at tare, parked) with the
-        body tied to the chassis at every station, for both bounds on the lid. LC5a takes the case and diagonal with the
+        body tied to the chassis at every station, for both bounds on the roof. LC5a takes the case and diagonal with the
         most chassis twist in the bare-frame analysis. The body's share is the part of the bare chassis twist it
         removes: 1 - (twist with the body) / (bare twist)."""
         from .chassis_fea import Analysis
@@ -281,19 +254,8 @@ class Body:
         # the body checks take the bound that loads the body most, per quantity
         both = [out["open"], out["closed"]]
         out["design"] = dict(max_body_torque_knm=max(r["max_body_torque_knm"] for r in both),
-                             garage_torque_knm=max(r["garage_torque_knm"] for r in both),
                              mount_force_n=max(r["mount_force_n"] for r in both),
                              mount_force_lc5b_n=max(out[k]["mount_force_n"] for k in ("open_lc5b", "closed_lc5b")))
-        # parked with the door open the garage cell has no rear diaphragm, so it sheds the twist to the chassis and the
-        # rear wall only follows the chassis: its racking is the bare chassis twist between partition A and the rear
-        an0 = Analysis(self.lay, self.tr, ch)
-        res, _ = an0.run_static(an0.items(tc1), lb["accel"][0], steady_n=lb["steady_kg"] * G)
-        rc = ch.V["rail_c"]
-
-        def theta(x):
-            return (res.u[6 * an0.fm.rail_node(1, x) + 2] - res.u[6 * an0.fm.rail_node(-1, x) + 2]) / (2 * rc)
-        xa = min(x for x in self.stations if x >= self.V["part_a_x"])
-        out["design"]["lc5b_garage_twist_rad"] = abs(theta(self.stations[-1]) - theta(xa))
         return out
 
     # ------------------------------------------------------------------ joints, portal and mounts under the body's share
@@ -303,13 +265,13 @@ class Body:
 
     def joints(self) -> list[dict]:
         """Shear flow q = T / 2A from the body's share of LC5a in the skins and the bonded joints, with the larger body
-        torque of the two bounds on the lid and the smaller cell area."""
+        torque of the two bounds on the roof."""
         gj, cr, p = self.box_gj(True), self.crit, self.p
         T = self.tw["design"]["max_body_torque_knm"] * 1e6
-        q = T / (2 * min(gj["A_garage"], gj["A_living"]))
+        q = T / (2 * gj["A"])
         bond = self.d["twist"]["bond_shear_strength"] * self.d["twist"]["bond_width"]
         rows = []
-        for key, what in (("wall", "Side wall skins in shear"), ("floor", "Floor skins in shear"), ("lid", "Lid skins in shear")):
+        for key, what in (("wall", "Side wall skins in shear"), ("floor", "Floor skins in shear"), ("roof", "Roof skins in shear")):
             pn = p[key]
             tau = q / (pn.t1 + pn.t2)
             allow = cr["skin_factor"] * pn.ult / math.sqrt(3)
@@ -318,54 +280,28 @@ class Body:
                          limit=0.5 * bond, util=q / (0.5 * bond)))
         return rows
 
-    def portal(self) -> dict:
-        """The rear wall as the garage cell's end diaphragm (report 12 section 5). The torque the floor bolts put into the
-        garage cell at the stations in its rear half has to be held in shape at the rear wall, so the wall racks under
-        F = T / 2h, h the cell height. The door is taken open (the portal and the 380 mm pier alone), for LC5a and LC5b
-        and both bounds on the lid. The portal is solved as a frame with its feet fixed to the rear outriggers.
-        Redesign: report 12's aluminium SHS portal on pinned feet racked about 50 mm and reached 94 MPa against
-        73 MPa, so the portal is hot-dip galvanised steel with moment base plates (BODY.md)."""
-        from .frame import Frame, Section, end_actions
-        d, V = self.d["portal"], self.V
+    def end_wall(self) -> dict:
+        """The rear wall as the box's rear diaphragm (report 12 section 5). The torque the floor bolts put into the box at the
+        stations in its rear half has to be held in shape at the rear wall, so the wall racks under F = T / 2h, h the
+        cell height, for LC5a and LC5b and both bounds on the roof. The full 2,330 mm panel less its 600 mm window takes
+        F in shear in its skins, and its bonded joiners take F along their length."""
+        V, cr, tw = self.V, self.crit, self.d["twist"]
         gj = self.box_gj(True)
-        h = d["height"]
-        mp = self.lay.mod.params
-        x_mid = (self.V["part_a_x"] + self.V["body_x1"]) / 2
+        x_mid = (V["body_x0"] + V["body_x1"]) / 2
         runs = {k: self.tw[k] for k in ("open", "closed", "open_lc5b", "closed_lc5b")}
         T_by = {k: sum(v for x, v in r["station_torque_knm"].items() if x >= x_mid) for k, r in runs.items()}
         gov = max(T_by, key=T_by.get)
         T = T_by[gov] * 1e6
-        F = T / (2 * gj["h_garage"])
-        yk, yr = mp["door_y0"] - 25, mp["door_y1"] + 20
-        f = Frame()
-        a, b = f.node((0, yk, 0)), f.node((0, yr, 0))
-        c, e = f.node((0, yk, h)), f.node((0, yr, h))
-        secs = {}
-        for key, n0, n1 in (("kerb_post", a, c), ("road_jamb", b, e), ("header", c, e)):
-            s = d[key]
-            el = f.add(n0, n1, Section(key, s["A"], s["I"], s["I"], s["J"]), (1, 0, 0), key)
-            el.E, el.G = d["E"], d["E"] / 2.6
-            secs[key] = s
-        feet = [(n, k) for n in (a, b) for k in range(6)] if d["feet"] == "fixed" else [(n, k) for n in (a, b) for k in (0, 1, 2)]
-        sup = feet + [(n, k) for n in (c, e) for k in (0, 4, 5)]
-        w, wl = d["pier"]["w"], self.p["wall"]
-        I_p = (wl.t1 + wl.t2) * w ** 3 / 12
-        k_pier = 1 / (V["interior_h"] ** 3 / (3 * wl.E * I_p) + V["interior_h"] / (wl.G * (wl.t1 + wl.t2) * w))
-        q = np.zeros(6 * len(f.nodes))
-        q[6 * c + 1] = 1000.0
-        res = f.solve(q, sup)
-        k_portal = 1000.0 / abs(res.u[6 * c + 1])
-        Fp = F * k_portal / (k_portal + k_pier)
-        rows = []
-        for el, fl in zip(f.elements, res.forces):
-            m = max(abs(v) for act in end_actions(fl) for v in (act["Mz"], act["My"])) * Fp / 1000
-            sig = m / secs[el.member]["Z"]
-            rows.append(dict(member=el.member, name=secs[el.member]["name"], moment_knm=m / 1e6, stress_mpa=sig))
-        worst = max(rows, key=lambda r: r["stress_mpa"])
-        lim = d["fy"] / 1.5
-        return dict(case=gov, torque_knm=T / 1e6, force_n=F, portal_n=Fp, k_portal=k_portal, k_pier=k_pier,
-                    rack_mm=F / (k_portal + k_pier), members=rows, stress_mpa=worst["stress_mpa"], governing=worst["name"],
-                    limit_mpa=lim, util=worst["stress_mpa"] / lim, mass_kg=d["mass_kg"])
+        F = T / (2 * gj["h"])
+        wl = self.p["wall"]
+        w = 2 * V["half_in"] - self.d["end_wall"]["window_w"]
+        tau = F / (w * (wl.t1 + wl.t2))
+        allow = cr["skin_factor"] * wl.ult / math.sqrt(3)
+        q = F / (2 * V["half_in"])
+        bond = 0.5 * tw["bond_shear_strength"] * tw["bond_width"]
+        util = max(tau / allow, q / bond)
+        return dict(case=gov, torque_knm=T / 1e6, force_n=F, width_mm=w, tau_mpa=tau, allow_mpa=allow, q_n_mm=q, bond_n_mm=bond,
+                    util=util, governing="skins in shear" if tau / allow >= q / bond else "bonded joiner")
 
     def face_capacity(self) -> float:
         """Yield-line capacity of the 3 mm raiser or outrigger top face under the Hollo-Bolt's flared sleeve (CIDECT
@@ -399,11 +335,11 @@ class Body:
         f5b = self.tw["design"]["mount_force_lc5b_n"]
         cases["LC5b"] = dict(shear=0.0, tension=max(0.0, f5b - W1t),
                              note=(f"a corner steady wound to 875 kg at tare: the largest bolt force {f5b / 1000:.2f} kN, either bound "
-                                   f"on the lid, less its 1 g share of the tare body's weight"))
+                                   f"on the roof, less its 1 g share of the tare body's weight"))
         f5 = self.tw["design"]["mount_force_n"]
         cases["LC5a"] = dict(shear=0.0, tension=max(0.0, f5 - W1),
                              note=(f"the largest raiser bolt force in the frame model with the body, {f5 / 1000:.2f} kN, either bound "
-                                   f"on the lid, less its 1 g share of weight"))
+                                   f"on the roof, less its 1 g share of weight"))
         face = self.face_capacity()
         worst_t = max(c["tension"] for c in cases.values())
         worst_s = max(c["shear"] for c in cases.values())
@@ -430,46 +366,10 @@ class Body:
                     util=hb["util"] if use == "HB10" else fbu[gov],
                     governing=("HB10" if use == "HB10" else f"M12 8.8 nut plate fallback, {gov.replace('_', ' ')}"))
 
-    def hardpoints(self) -> list[dict]:
-        """Every L-track anchor at the 20 kN strap breaking load (RES-01). The floor spans across the trailer between
-        the raisers, or from a raiser to the wall foot for the anchors outboard of the raisers. The hardpoint strip
-        under the row carries the shear into an HB10 at each raiser and into the floor joiner at the wall. Each part
-        needs a factor of at least 1.5 on its ultimate (report 12 section 3)."""
-        hp, L, V, f = self.d["hardpoint"], self.d["loads"], self.V, self.p["floor"]
-        P = L["anchor_n"]
-        prj = self.tr.prj
-        face = self.face_capacity()
-        hb_ult = 5 * self.d["mounts"]["swl_tension_n"]
-        strip = hp["w"] * hp["h"] * hp["shear_strength"]
-        joiner = hp["joiner_length"] * self.d["twist"]["bond_width"] * hp["joiner_tension"]
-        rf = V["rail_c"] + V["rail_w"] / 2
-        rows = []
-        for i in prj.instances:
-            if i.part != "G-03" or i.at[1] is None:
-                continue
-            x, y = i.at[0] + V["module_x0"], i.at[1]
-            if abs(y) <= rf:
-                span, a = self.raiser_span, abs(y + V["rail_c"])
-                r = f.one_way(P, 300, span, min(a, span - a))
-                r_raiser, r_wall = P * max(a, span - a) / span, 0.0
-            else:
-                span, a = self.edge_span, abs(y) - rf
-                r = f.one_way(P, 300, span, min(a, span - a))
-                r_raiser, r_wall = P * (span - a) / span, P * a / span
-            factors = dict(skin=f.ult / r["skin_mpa"], strip=strip / max(r_raiser, r_wall),
-                           bolt=min(hb_ult, face) / r_raiser if r_raiser else None,
-                           joiner=joiner / r_wall if r_wall else None)
-            factors = {k: v for k, v in factors.items() if v is not None}
-            gov = min(factors, key=factors.get)
-            rows.append(dict(id=i.iid, x=x, y=y, span=span, factors=factors, factor=factors[gov], governing=gov,
-                             util=self.crit["ultimate_factor"] / factors[gov]))
-        return rows
-
-
     # ------------------------------------------------------------------ openings (report 12 sections 5 and 7)
     def openings(self) -> list[dict]:
         """Every opening as a rectangle on its wall, in the wall's own (u, z) coordinates: u along the trailer from the
-        body front for the side walls, Y for the end walls. The kitchen, entry door and garage door follow their blocks."""
+        body front for the side walls, Y for the end walls. The kitchen and the entry door follow their blocks."""
         V, out = self.V, []
         for o in self.d["openings"]:
             r = dict(o)
@@ -487,9 +387,8 @@ class Body:
         return out
 
     def openings_check(self) -> dict:
-        """Report 12's rules: 300 mm of full wall between neighbouring openings, 150 mm to a panel edge, nothing within
-        300 mm of the rear corners or in the 380 mm pier. The garage door is framed by the portal, so it may come
-        within 40 mm of the road-side wall."""
+        """Report 12's rules: 300 mm of full wall between neighbouring openings, 150 mm to a panel edge and nothing within
+        300 mm of the rear corners."""
         V, ru = self.V, self.d["rules"]
         ops = self.openings()
         probs, worst = [], math.inf
@@ -498,8 +397,6 @@ class Body:
             w = sorted((o for o in ops if o["wall"] == wall), key=lambda o: o["u0"])
             lo, hi = (0.0, L) if wall in ("kerb", "road") else (-V["half_in"], V["half_in"])
             for o in w:
-                if o["id"] == "OP-12":
-                    continue
                 e = min(o["u0"] - lo, hi - o["u1"], Hh - o["z1"])
                 if wall in ("kerb", "road"):
                     e = min(e, (hi - ru["rear_corner_mm"]) - o["u1"] + ru["edge_mm"])
@@ -515,19 +412,15 @@ class Body:
                     worst = min(worst, gap - ru["between_mm"])
                     if gap < ru["between_mm"] - 1e-6:
                         probs.append(f"{a['id']} and {b['id']} on the {wall} wall are {gap:.0f} mm apart")
-        pier = [o for o in ops if o["wall"] == "rear" and o["id"] != "OP-12" and o["u0"] < -V["half_in"] + ru["pier_mm"]]
-        probs += [f"{o['id']} is in the rear wall's kerb-side pier" for o in pier]
         return dict(ok=not probs, problems=probs, margin_mm=worst, count=len(ops))
 
     # ------------------------------------------------------------------ everything, for the build and the checks
     def results(self) -> dict:
         panels = self.panel_checks()
-        hp = self.hardpoints()
-        worst_hp = min(hp, key=lambda r: r["factor"]) if hp else None
         return dict(panels=panels, deflections=self.deflections(), roof=self.roof(), inserts=self.inserts(),
                     openings=self.openings(), openings_check=self.openings_check(),
-                    twist=self.tw, gj=self.box_gj(True) | dict(living_open=self.box_gj(False)["living"]),
-                    joints=self.joints(), portal=self.portal(), mounts=self.mounts(), hardpoints=hp, hardpoint_worst=worst_hp,
+                    twist=self.tw, gj=self.box_gj(True),
+                    joints=self.joints(), end_wall=self.end_wall(), mounts=self.mounts(),
                     mounted=self.mounted, panel_data={k: dict(name=p.name, D_knm2_per_m=p.D / 1e6, S_kn_per_m=p.S,
                                                              wrinkling_mpa=p.wrinkling, kg_m2=p.d["kg_m2"], t=p.d["t"])
                                                       for k, p in self.p.items()})
@@ -553,34 +446,31 @@ def check_row(c, res: dict) -> dict:
                     detail="; ".join(f"{i['what']}: {i['n'] / 1000:.2f} kN against {i['rated_n'] / 2000:.2f} kN ({i['case']})" for i in res["inserts"]))
     if c.type == "body_roof":
         r = res["roof"]
-        u = max(r["actuator_util"], r["latch_util"])
-        return dict(limit="<= 1.00 utilisation", measured=round(u, 3), unit="", margin=round(1 - u, 3), ok=u <= 1.0,
-                    governing="latch" if r["latch_util"] >= r["actuator_util"] else "actuator",
-                    detail=(f"lifted mass {r['lifted_kg']:.1f} kg (lid {r['lid_kg']:.1f}, solar {r['solar_kg']:.1f}), "
-                            f"{r['actuator_n']:.0f} N per actuator against {r['actuator_n'] / r['actuator_util']:.0f} N; "
-                            f"{r['latch_n']:.0f} N per latch in the 40 m/s uplift against {r['latch_n'] / r['latch_util']:.0f} N"))
+        return dict(limit="<= 1.00 utilisation", measured=round(r["util"], 3), unit="", margin=round(1 - r["util"], 3), ok=r["util"] <= 1.0,
+                    governing="roof-to-wall joiner bond in tension",
+                    detail=(f"{r['uplift_n'] / 1000:.2f} kN of uplift on the roof ({r['roof_kg']:.0f} kg with the solar array) over "
+                            f"{r['perimeter_mm'] / 1000:.1f} m of joiner, {r['q_n_mm']:.2f} N/mm against {r['allow_n_mm']:.0f} N/mm, "
+                            "taking none of the roof's weight off"))
     if c.type == "body_twist":
         t = res["twist"]
         o, cl = t["open"], t["closed"]
         return dict(limit="reported", measured=round(o["share"] * 100, 1), unit="%", margin=None, ok=True,
                     governing=t["case"],
-                    detail=(f"LC5a {t['torque_knm']:.1f} kNm, {t['case']}. Bare chassis {t['bare_deg']:.3f} degree. Lid not structural: "
-                            f"the body takes {100 * o['share']:.0f} % in the twist zone, chassis {o['chassis_deg']:.3f} degree. Lid structural "
-                            f"(report 12): {100 * cl['share']:.0f} %, chassis {cl['chassis_deg']:.3f} degree"))
+                    detail=(f"LC5a {t['torque_knm']:.1f} kNm, {t['case']}. Bare chassis {t['bare_deg']:.3f} degree. Roof joint neglected: "
+                            f"the body takes {100 * o['share']:.0f} % in the twist zone, chassis {o['chassis_deg']:.3f} degree. Roof bonded "
+                            f"(the design): {100 * cl['share']:.0f} %, chassis {cl['chassis_deg']:.3f} degree"))
     if c.type == "body_joint":
         r = max(res["joints"], key=lambda r: r["util"])
         return dict(limit="<= 1.00 utilisation", measured=round(r["util"], 3), unit="", margin=round(1 - r["util"], 3),
                     ok=r["util"] <= 1.0, governing=r["what"],
                     detail="; ".join(f"{j['what']} {j['value']:.2f} {j['unit']} against {j['limit']:.2f}" for j in res["joints"]))
-    if c.type == "body_portal":
-        p = res["portal"]
-        return dict(limit=f"<= {p['limit_mpa']:.0f} MPa", measured=round(p["stress_mpa"], 1), unit="MPa",
-                    margin=round(p["limit_mpa"] - p["stress_mpa"], 1), ok=p["util"] <= 1.0, governing=p["governing"],
-                    detail=(f"{p['torque_knm']:.1f} kNm put into the rear half of the garage cell ({p['case']}), racking "
-                            f"{p['force_n'] / 1000:.2f} kN with the door open. The steel portal ({p['k_portal']:.0f} N/mm, fixed feet) "
-                            f"takes {p['portal_n'] / 1000:.2f} kN and the pier ({p['k_pier']:.0f} N/mm) the rest, "
-                            f"{p['rack_mm']:.1f} mm of racking. " + ", ".join(f"{m['name']} {m['stress_mpa']:.0f} MPa" for m in p["members"])
-                            + f" against {p['limit_mpa']:.0f} MPa"))
+    if c.type == "body_end_wall":
+        e = res["end_wall"]
+        return dict(limit="<= 1.00 utilisation", measured=round(e["util"], 3), unit="", margin=round(1 - e["util"], 3), ok=e["util"] <= 1.0,
+                    governing=e["governing"],
+                    detail=(f"{e['torque_knm']:.1f} kNm into the rear half of the box ({e['case']}), racking {e['force_n'] / 1000:.2f} kN. Rear wall "
+                            f"skins {e['tau_mpa']:.2f} MPa in shear against {e['allow_mpa']:.1f} MPa over {e['width_mm']:.0f} mm of full panel, "
+                            f"joiner {e['q_n_mm']:.2f} N/mm against {e['bond_n_mm']:.1f} N/mm"))
     if c.type == "body_mount":
         m = res["mounts"]
         hb, fb = m["hb10"], m["fallback"]
@@ -592,12 +482,6 @@ def check_row(c, res: dict) -> dict:
                             f"{fb['bolt_n'] / 1000:.1f} kN, plate {fb['plate_n'] / 1000:.1f} kN, weld {fb['weld_n'] / 1000:.1f} kN, floor pull-through "
                             f"{fb['pull_through_n'] / 1000:.1f} kN, governing {fb['governing'].replace('_', ' ')} at {fb['util']:.2f}. "
                             + " ".join(f"{k}: {v['note']}." for k, v in m["cases"].items())))
-    if c.type == "body_hardpoint":
-        w = res["hardpoint_worst"]
-        return dict(limit=">= 1.5 on ultimate", measured=round(w["factor"], 2), unit="", margin=round(w["factor"] - 1.5, 2),
-                    ok=w["factor"] >= 1.5, governing=f"anchor {w['id']} at X {w['x']:.0f}, Y {w['y']:+.0f}, {w['governing']}",
-                    detail=(f"{len(res['hardpoints'])} anchors at 20 kN. Worst {w['id']}: factor {w['factor']:.2f} on the "
-                            f"{w['governing']} (" + ", ".join(f"{k} {v:.2f}" for k, v in w["factors"].items()) + ")"))
     if c.type == "body_openings":
         o = res["openings_check"]
         return dict(limit=">= 300 mm between, 150 mm to an edge", measured=round(o["margin_mm"], 0), unit="mm", margin=round(o["margin_mm"], 0),

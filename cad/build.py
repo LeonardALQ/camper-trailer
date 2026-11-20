@@ -1,8 +1,9 @@
 """Pipeline entry point. Run inside the project image from the repo root:
 
-    python -m cad.build data      validate data/, write the JSON Schema and the resolved project
-    python -m cad.build model     build the model; STEP, GLB, viewer JSON, step states, BOM, mass schedule
-    python -m cad.build trailer   whole-trailer layout: axle solve, load cases, checks, length comparison, 3D model
+    python -m cad.build data      validate data/, write the JSON Schema and the resolved projects
+    python -m cad.build model     the bike spacing from the geometry (the ute's bike box)
+    python -m cad.build ute       the LandCruiser 79 and its bike box: checks, the 3D model, STEP, the bike box's sweep
+    python -m cad.build trailer   whole-trailer layout: axle solve, load cases, checks, chassis and body, 3D model
     python -m cad.build drawings  drawing sheets to SVG, PDF and PNG
 """
 from __future__ import annotations
@@ -37,92 +38,31 @@ def _write(path: Path, obj):
 def cmd_data():
     t0 = time.time()
     prj = Project()
+    ute = Project(assembly="ute-garage")
     _write(BUILD / "data" / "parts.schema.json", schema())
     _write(BUILD / "data" / "project.json", dict(
-        assembly=dict(id=prj.assembly.id, name=prj.assembly.name, revision=prj.assembly.revision),
-        params=prj.P.values,
-        instances=[i.model_dump() for i in prj.instances],
-        parts={k: v.model_dump() for k, v in prj.parts.items()},
+        trailer=dict(checks=len(prj.trailer_checks), cases=[c.id for c in prj.load.trailer_cases]),
+        ute_garage=dict(assembly=dict(id=ute.assembly.id, name=ute.assembly.name, revision=ute.assembly.revision),
+                        params=ute.P.values, instances=[i.model_dump() for i in ute.instances],
+                        parts={k: v.model_dump() for k, v in ute.parts.items()}),
     ))
-    lines = prj.bom_lines()
-    print(f"data OK: {len(prj.parts)} parts ({len(lines)} BOM lines), {len(prj.instances)} placed instances, "
-          f"{len(prj.checks)} checks, {len(prj.load.load_cases)} load cases, {len(prj.steps)} steps "
-          f"({time.time() - t0:.2f} s)")
+    print(f"data OK: trailer {len(prj.trailer_checks)} checks and {len(prj.load.trailer_cases)} load cases, ute garage "
+          f"{len(ute.parts)} parts, {len(ute.instances)} placed instances and {len(ute.checks)} checks ({time.time() - t0:.2f} s)")
 
 
 def cmd_model():
+    """The bike spacing in the ute's bike box from the geometry (cad/solve.py), cached for the later stages."""
     from . import solve as SV
-    if SV.cached() is None:
-        t = time.time()
-        s = SV.solve()
-        print(f"bike spacing solved from the geometry: {s['bike_spacing']:.0f} mm, "
-              f"CLR-03 {s['clr03_gap']:.1f} mm ({time.time() - t:.1f} s)")
-    from . import export as X
-    from . import massprops as MP
-    from .model.assembly import Model
-    tm = {}
     t = time.time()
-    prj = Project()
-    model = Model(prj)
-    tm["build_model_s"] = round(time.time() - t, 2)
-    out = BUILD / "model"
-    out.mkdir(parents=True, exist_ok=True)
-
-    t = time.time()
-    lines = MP.line_masses(prj, model)
-    bikes = MP.bike_rows(prj, model)
-    cases = MP.load_cases(prj, lines, bikes)
-    totals = MP.group_totals(lines)
-    tm["mass_s"] = round(time.time() - t, 2)
-    body_mass = dict(MP.BODY_MASS)
-    for b in bikes:
-        body_mass[b["id"]] = dict(part_id=b["part"], mass_kg=b["mass_kg"], cog_mm=b["cog"], maturity=b["maturity"])
-
-    t = time.time()
-    X.write_step(model, out / "garage-bed.step")
-    tm["step_s"] = round(time.time() - t, 2)
-    t = time.time()
-    tagged = X.write_glb(model, out / "garage-bed.glb", body_mass)
-    tm["glb_s"] = round(time.time() - t, 2)
-    t = time.time()
-    paths = X.write_viewer(model, out / "garage-bed.viewer.json")
-    paths.update(X.write_viewer(model, out / "garage-bed-loading.viewer.json", loading=True))
-    _write(out / "steps.json", X.step_states(model, paths))
-    tm["viewer_s"] = round(time.time() - t, 2)
-
-    # bike envelope sizes against the owner's figures
-    bike_sizes = {}
-    for ref in ("TU", "ST", "TU-2263", "TU-1390"):
-        b = model.built[ref]
-        bike_sizes[ref] = dict(label=b.inst.label, model=b.info["local_size"], owner=b.info["owner"],
-                               pitch_deg=round(b.info["pitch_deg"], 3))
-    instances = {}
-    for b in model.built.values():
-        bb = b.shape.bounding_box()
-        instances[b.inst.iid] = dict(
-            part=b.inst.part, label=b.inst.label, group=b.inst.group, step=b.inst.step, display=b.inst.display,
-            check_only=b.inst.check_only, bbox=[round(v, 1) for v in (bb.min.X, bb.min.Y, bb.min.Z, bb.max.X, bb.max.Y, bb.max.Z)],
-            info={k: v for k, v in b.info.items() if k not in ("points",)}, points=b.info.get("points"))
-    bom_dir = BUILD / "bom"
-    _write(bom_dir / "bom.json", dict(lines=lines, bikes=bikes, totals=totals, load_cases=cases,
-                                      towball=prj.load.towball.model_dump(), git=git_hash()))
-    X.write_bom_csv(lines, bom_dir / "garage-bed-bom.csv")
-    _write(out / "instances.json", dict(instances=instances, bike_sizes=bike_sizes, params=prj.P.values,
-                                        glb_nodes_tagged=tagged, timings=tm))
-    print(json.dumps(dict(timings=tm, module_empty_kg=round(totals["module_empty"], 2),
-                          with_bikes_kg=round(totals["module_empty"] + sum(b["mass_kg"] for b in bikes), 2),
-                          load_cases=[(c["id"], round(c["mass_kg"], 1), c["cog"]) for c in cases],
-                          bikes=bike_sizes, glb_nodes_tagged=tagged), indent=1))
+    s = SV.cached() or SV.solve()
+    print(f"bike spacing from the geometry: {s['bike_spacing']:.0f} mm, UGC-01 {s['clr03_gap']:.1f} mm ({time.time() - t:.1f} s)")
 
 
 def cmd_trailer():
     from . import trailer as T
-    from .model.assembly import Model
     from .trailer_model import TrailerModel, write_outputs
     t0 = time.time()
-    prj = Project()
-    model = Model(prj)
-    tr = T.Trailer(prj, T.ModuleInfo.from_model(prj, model))
+    tr = T.Trailer(Project())
     rep = T.report(tr)
     rep["git"] = git_hash()
     out = BUILD / "trailer"
@@ -137,17 +77,15 @@ def cmd_trailer():
     _write(BUILD / "body" / "body.json", body)
     t1 = time.time()
     lay = tr.layout(**rep["solved"]["overrides"])
-    write_outputs(TrailerModel(lay, model, body=True), out)
+    write_outputs(TrailerModel(lay, body=True), out)
     from .trailer_model import write_body_outputs
     write_body_outputs(lay, out)
     fails = [c["id"] for c in rep["checks"] if c["severity"] == "fail" and not c["ok"]]
     print(json.dumps(dict(
-        axle_x=rep["solved"]["axle_x"], method=rep["solved"]["method"], recommended=rep["recommended"],
+        axle_x=rep["solved"]["axle_x"], method=rep["solved"]["method"], tare_kg=rep["tare_kg"],
         cases=[(c["id"], round(c["nominal"]["mass_kg"]), round(c["nominal"]["towball_kg"]), round(c["growth"]["mass_kg"]),
                 round(c["growth"]["towball_kg"])) for c in rep["cases"]],
         failed_checks=fails, layout_s=round(t1 - t0, 1), model_s=round(time.time() - t1, 1)), indent=1))
-    if not rep["recommended"]["matches_data"]:
-        print(f"NOTE: the recommended body length {rep['recommended']['body_length']} differs from the data ({rep['body_length']})")
 
 
 def _cut_list(chs: dict, path: Path):
@@ -182,6 +120,8 @@ def cmd_ute():
     rep["git"] = git_hash()
     if garage:
         rep["garage"] = {k: v for k, v in garage.items() if k != "lines"}
+        from .ute_model import bike_box_sweep
+        rep["bike_box_sweep"] = bike_box_sweep(ute, gmodel)
     _write(BUILD / "ute" / "ute.json", rep)
     write_outputs(ute, BUILD / "ute", gmodel)
     fails = [c["id"] for c in rep["checks"] if c["severity"] == "fail" and not c["ok"]]

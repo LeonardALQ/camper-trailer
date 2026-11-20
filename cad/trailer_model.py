@@ -1,5 +1,5 @@
-"""3D block model of the whole trailer from the layout (cad/trailer.py), with the garage and bed module placed
-as a sub-assembly. Exports the three-cad-viewer JSON (part tree by zone), STEP and GLB."""
+"""3D block model of the whole trailer from the layout (cad/trailer.py), with the designed chassis and body. Exports the
+three-cad-viewer JSON (part tree by system), STEP and GLB. The bikes ride in the ute's bike box (cad/ute_model.py)."""
 from __future__ import annotations
 
 import copy
@@ -9,19 +9,18 @@ from pathlib import Path
 
 from build123d import Box, Compound, Cylinder, Plane, Pos, Rot, export_gltf, export_step
 
-from .model.assembly import GROUP_LABELS
 from .model.prims import box, rgba
 from .trailer import SYSTEM_LABELS, Layout
 
-SYSTEM_ORDER = ["drawbar", "chassis", "running_gear", "spare", "underfloor", "body", "roof", "living", "module", "stowage", "payload"]
+SYSTEM_ORDER = ["drawbar", "stowage", "chassis", "running_gear", "spare", "underfloor", "body", "roof", "bed", "living", "payload"]
 COLOURS = {
     "drawbar": ("#5d6d7e", 1.0), "chassis": ("#7f8c8d", 1.0), "running_gear": ("#1c2833", 1.0),
     "underfloor": ("#2e86c1", 0.9), "body": ("#d6dbdf", 0.18), "roof": ("#f4d03f", 0.9),
-    "living": ("#d2b4de", 0.9), "stowage": ("#e59866", 1.0), "payload": ("#f7dc6f", 1.0), "spare": ("#1c2833", 1.0),
+    "living": ("#d2b4de", 0.9), "bed": ("#aed6f1", 0.9), "stowage": ("#e59866", 1.0), "payload": ("#f7dc6f", 1.0), "spare": ("#1c2833", 1.0),
 }
 OVERRIDE = {"BD-01": ("#8c8c8c", 0.6), "RG-01": ("#7b7d7d", 1.0), "LA-07": ("#58d68d", 0.9),
             "LA-01": ("#76d7c4", 0.9), "UF-04": ("#f5b041", 1.0), "BD-13": ("#27ae60", 0.8), "GS-01": ("#c0392b", 1.0),
-            "GS-02": ("#ecf0f1", 1.0), "GS-04": ("#e74c3c", 1.0), "BD-05": ("#b2bec3", 0.35), "BD-06": ("#b2bec3", 0.5),
+            "GS-04": ("#e74c3c", 1.0), "DX-01": ("#aab7b8", 0.45), "LB-04": ("#d4e6f1", 0.25), "LB-01": ("#f8f9f9", 1.0),
             "BD-07": ("#b2bec3", 0.5), "DB-03": ("#2c3e50", 1.0), "DB-04": ("#aab7b8", 0.8)}
 ROLE_COLOURS = {"rail": "#566573", "raiser": "#7b8a8b", "drawbar": "#34495e", "brace": "#34495e", "outrigger": "#95a5a6",
                 "cm_xt": "#5d6d7e", "cm_end": "#5d6d7e", "cm_floor": "#839192", "plan_brace": "#a04000", "spare_post": "#5d6d7e"}
@@ -70,16 +69,13 @@ def _moved(shape, loc):
 
 
 class TrailerModel:
-    """Shapes for every solid block plus the module's bodies moved into the datum."""
+    """Shapes for every solid block, with the designed chassis members and fittings."""
 
-    def __init__(self, lay: Layout, module_model, body: bool = False, raised: bool = False):
-        """`body` replaces the body's envelope blocks by the designed body (cad/body_model.py), with the roof raised if
-        `raised`."""
+    def __init__(self, lay: Layout, body: bool = False):
+        """`body` replaces the body's envelope blocks by the designed body (cad/body_model.py)."""
         self.lay = lay
         from .body_model import BODY_IDS, body_solids
-        lift = lay.V["roof_lift"] if raised else 0.0
         self.groups: dict[str, list] = {}
-        self.module_groups: dict[str, list] = {}
         self.names: dict[str, str] = {}
         from .chassis import fitting_solids, member_solid
         for b in lay.blocks:
@@ -98,50 +94,29 @@ class TrailerModel:
                 s.color = rgba(col, a)
                 self.groups.setdefault(b.system, []).append(s)
                 continue
-            if b.system == "module" or b.keep_clear or b.box is None and b.cyl is None and b.bar is None:
+            if b.keep_clear or b.box is None and b.cyl is None and b.bar is None:
                 continue
             if body and b.id in BODY_IDS:
                 continue
             s = block_shape(b)
             if s is None:
                 continue
-            if b.system == "roof" and lift:
-                s = Pos(0, 0, lift) * s
             col, a = OVERRIDE.get(b.id, COLOURS[b.system])
             s.label = f"{b.iid} {b.name}".replace("/", "-")
             s.color = rgba(col, a)
             self.groups.setdefault(b.system, []).append(s)
         if body:
-            for label, shp, (col, a) in body_solids(lay, raised):
+            for label, shp, (col, a) in body_solids(lay):
                 shp.label = label.replace("/", "-")
                 shp.color = rgba(col, a)
                 self.groups.setdefault("body", []).append(shp)
-        dx, dz = lay.V["module_x0"], lay.V["floor_z"]
-        prj = module_model.prj
-        for mb in module_model.built.values():
-            i = mb.inst
-            if i.check_only or i.display == "loading_only" or i.group == "context":
-                continue
-            s = _moved(mb.shape, Pos(dx, 0, dz))
-            s.label = f"{i.iid} {i.label}".replace("/", "-")
-            part = prj.parts[i.part]
-            s.color = rgba(part.color, part.alpha)
-            self.module_groups.setdefault(i.group, []).append(s)
 
     def compound(self, label="ASM-TR"):
-        kids = []
-        for g in SYSTEM_ORDER:
-            if g == "module":
-                sub = [Compound(label=GROUP_LABELS[k], children=v) for k, v in self.module_groups.items()]
-                kids.append(Compound(label=SYSTEM_LABELS["module"], children=sub))
-            elif g in self.groups:
-                kids.append(Compound(label=SYSTEM_LABELS[g], children=self.groups[g]))
+        kids = [Compound(label=SYSTEM_LABELS[g], children=self.groups[g]) for g in SYSTEM_ORDER if g in self.groups]
         return Compound(label=label, children=kids)
 
     def all_shapes(self):
-        out = [s for v in self.groups.values() for s in v]
-        out += [s for v in self.module_groups.values() for s in v]
-        return out
+        return [s for v in self.groups.values() for s in v]
 
 
 def write_outputs(tm: TrailerModel, out: Path):
@@ -162,26 +137,34 @@ def write_outputs(tm: TrailerModel, out: Path):
 
 
 def write_body_outputs(lay: Layout, out: Path):
-    """The body on its own with the roof down and raised, for the Body page (BODY.md), and its STEP file."""
+    """The body on its own with its fixed roof, and the body with the bed and the living area fitted, for the Body page
+    (BODY.md), and the body's STEP file."""
     from .body_model import body_solids
     from .export import _viewer_js
-    lift = lay.V["roof_lift"]
-    for raised, name in ((False, "body"), (True, "body-raised")):
-        kids = []
-        for label, shp, (col, a) in body_solids(lay, raised):
-            shp.label, shp.color = label.replace("/", "-"), rgba(col, a)
-            kids.append(shp)
-        roof = []
-        for b in lay.blocks:
-            if b.system == "roof" and b.box is not None:
-                s = block_shape(b)
-                if raised:
-                    s = Pos(0, 0, lift) * s
-                s.label, s.color = f"{b.iid} {b.name}".replace("/", "-"), rgba(*COLOURS["roof"])
-                roof.append(s)
-        comp = Compound(label=f"ASM-BD Body, roof {'raised' if raised else 'down'}",
-                        children=[Compound(label="Body", children=kids), Compound(label="Solar panels", children=roof)])
-        js = _viewer_js("ASM-BD", comp)
-        (out / f"{name}.viewer.json").write_text(js[js.index("{"): js.rindex("}") + 1])
-        if not raised:
-            export_step(comp, str(out / "body.step"), timestamp="2026-11-20T00:00:00")
+    kids = []
+    for label, shp, (col, a) in body_solids(lay):
+        shp.label, shp.color = label.replace("/", "-"), rgba(col, a)
+        kids.append(shp)
+    roof = []
+    for b in lay.blocks:
+        if b.system == "roof" and b.box is not None:
+            s = block_shape(b)
+            s.label, s.color = f"{b.iid} {b.name}".replace("/", "-"), rgba(*COLOURS["roof"])
+            roof.append(s)
+    comp = Compound(label="ASM-BD Body, fixed roof",
+                    children=[Compound(label="Body", children=kids), Compound(label="Solar panels", children=roof)])
+    js = _viewer_js("ASM-BD", comp)
+    (out / "body.viewer.json").write_text(js[js.index("{"): js.rindex("}") + 1])
+    export_step(comp, str(out / "body.step"), timestamp="2026-11-20T00:00:00")
+    # the fit-out inside the body: bed, kitchen, living area and the bathroom, with the walls see-through
+    fit = []
+    for b in lay.blocks:
+        if b.system in ("bed", "living", "running_gear") and b.box is not None and not b.keep_clear and b.zone == "inside":
+            s = block_shape(b)
+            col, a = OVERRIDE.get(b.id, COLOURS[b.system])
+            s.label, s.color = f"{b.iid} {b.name}".replace("/", "-"), rgba(col, a)
+            fit.append(s)
+    comp = Compound(label="ASM-BD Body with the bed and the living area",
+                    children=[Compound(label="Body", children=[copy.copy(k) for k in kids]), Compound(label="Bed and living area", children=fit)])
+    js = _viewer_js("ASM-BD", comp)
+    (out / "body-inside.viewer.json").write_text(js[js.index("{"): js.rindex("}") + 1])

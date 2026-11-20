@@ -1,187 +1,25 @@
-# Clearance and contact checks from DESIGN.md ("Checks the model must pass").
-# Each check measures real B-rep distances between placed items (refs or groups from the assembly).
+# Checks for the trailer. The bike garage's clearance, restraint and contact checks moved to the ute's bike box with
+# the bikes (data/ute/garage-checks.yaml, UTE-GARAGE.md), so the trailer has no placed module and no module checks.
 # severity: fail (a failure is a design failure) or report (the value is reported, never a failure).
-# Limits are DESIGN.md's. Do not change them to make a check pass.
-checks:
-  - id: CLR-01
-    title: Tuareg to bed beams
-    type: clearance
-    a: [TU]
-    b: ["6"]
-    min_gap_mm: 40
-    severity: fail
-    inputs: [TU-03, TU-04]
-    why: The beam underside at Z 1,460 must clear the Tuareg's screen (mirrors folded, front wheel in the chock).
-  - id: CLR-01b
-    title: Tuareg to bed beams with the photo-measured 1,390 mm screen
-    type: clearance
-    a: [TU-1390]
-    b: ["6"]
-    min_gap_mm: 40
-    severity: report
-    added_by_build: true
-    inputs: [TU-03, TU-04]
-    why: Sensitivity added by this build. The model uses the owner's 1,370 mm height. DESIGN.md set the beam height from Aprilia's image (1,390 mm), so this row shows the margin on that basis.
-  - id: CLR-02
-    title: Street Triple to bed beams
-    type: clearance
-    a: [ST]
-    b: ["6"]
-    min_gap_mm: 40
-    severity: fail
-    inputs: [TU-03, TU-04]
-    why: The beam underside must clear the Street Triple.
-  - id: CLR-03
-    title: Tuareg to Street Triple, anywhere
-    type: clearance
-    a: [TU]
-    b: [ST]
-    min_gap_mm: 30
-    severity: fail
-    inputs: [TU-01, TU-05, TU-07, ST-01]
-    why: The governing pair is expected to be the Street Triple's right bar end against the Tuareg's side panels. The owner measured the Tuareg 585 mm wide at that spot (measurements.yaml TU-01), so the half-width is 292.5 mm.
-  - id: CLR-04
-    title: Each bike to partition A, the walls, the closed rear door and everything stowed in the garage
-    type: clearance
-    each: [TU, ST]
-    b: ["1", C2, C3, C8, C4, "21", "14", 14P, "17", C10, C11, C12]
-    min_gap_mm: 15
-    severity: fail
-    inputs: [TU-05, TU-07, ST-01, CHK-01]
-    why: Bars, pegs, panniers and tyres must not touch partition A, the walls, the closed rear door, the winch, the gas locker, the extinguisher or the stowed ramp, generator and jerry cans.
-  - id: CLR-05
-    title: Mattress top plus 50 mm bedding
-    type: height
-    a: ["9"]
-    add_mm: bedding_allowance
-    max_z: ceiling_z
-    severity: fail
-    inputs: [TU-03, TU-04]
-    why: With the roof collapsed the bedding must fit under the 1,800 mm ceiling.
-  - id: CLR-06
-    title: Tuareg rear-most point to the closed rear door's inner face (owner's 2,220 mm length)
-    type: clearance
-    a: [TU]
-    b: [C4]
-    min_gap_mm: 15
-    severity: fail
-    inputs: [TU-02, CHK-01]
-    why: The bike's tail and plate hanger must clear the closed rear door.
-  - id: CLR-06b
-    title: Tuareg rear-most point to the closed rear door with the photo-measured 2,263 mm length
-    type: clearance
-    a: [TU-2263]
-    b: [C4]
-    min_gap_mm: 15
-    severity: report
-    inputs: [CHK-01]
-    why: Reported, not a build failure (DESIGN.md). Aprilia's image shows the plate hanger at least 1,915 mm behind the front axle.
-  - id: CLR-08
-    title: Tuareg's panniers to the straps and track fittings
-    type: clearance
-    a: [TU-BAGS]
-    b: ["12", "13"]
-    min_gap_mm: 0
-    severity: report
-    added_by_build: true
-    inputs: [TU-05, TU-06]
-    why: Added with the panniers, which stay on the Tuareg in the garage. A strap must not pass through a bag. DESIGN.md sets no limit for this, so the gap is reported. CLR-03, CLR-04 and CLR-06 already include the panniers, because they are part of the Tuareg's envelope.
-  - id: CLR-09
-    title: Each bike rolled straight back clears the rear door frame
-    type: clearance
-    each: [TU, ST]
-    b: [C14]
-    min_gap_mm: 15
-    severity: fail
-    inputs: [TU-01, TU-03, TU-05, ST-01]
-    why: Revision D. The bikes unload backwards through the rear door, so each must pass the frame round the opening. The check measures each bike, as parked with its front wheel up in the chock, against the frame extended forward over the whole garage, which is what a bike rolled straight back meets. Going down the ramp the bike pitches nose-up about its front tyre, which only lowers the parts behind the front axle.
-  - id: CLR-10
-    title: Street Triple's kerb-side straps and fittings to the kerb-side stowage
-    type: clearance
-    a: [13.ST-F+, 13.ST-R+, 13.ST-W, 12.ST-FL, 12.ST-RL, 12.ST-WL]
-    b: ["21", C10, C11, C12]
-    min_gap_mm: 15
-    severity: fail
-    inputs: [TU-01, TU-07, ST-01]
-    why: Revision D. The garage width is fixed, so if the bike spacing grows the Street Triple and its straps move towards the stowed ramp, generator and gas locker. This check is where a spacing that no longer fits the width shows up (measurements.yaml TU-01).
-  - id: CLR-07
-    title: Ladder foot to the living-area floor
-    type: landing
-    a: ["18"]
-    b: [C1, C7]
-    min_gap_mm: 0
-    max_gap_mm: 10
-    severity: fail
-    inputs: [TU-03, TU-04]
-    why: Added in revision B. The owner-built ladder hooks on the deck edge at partition A and must reach the living-area floor, taken level with the garage floor. A foot more than 10 mm up leaves the ladder hanging, and a foot below the floor means the ladder cannot stand at the 15 degree lean.
-  - id: BED-01
-    title: Bed beam sag at the garage's span, two sleepers spread over the bed
-    type: beam
-    a: ["6.3"]
-    beam: {load_kg: 255, beams: 5, e_gpa: 69, i_cm4: 20.8, depth_mm: 50, baseline_span_mm: 2330}
-    span_ratio: 300
-    severity: report
-    added_by_build: true
-    inputs: []
-    why: Revision D. The beams span the 2,330 mm interior width, so the revision C RHS 50x25x2.5 (about 11 mm sag here) became SHS 50x50x3, 6060-T5, I 20.8 cm4 (calculated), E 69 GPa. Span / 300 is a common floor deflection guide, used here for reporting. The engineer sets the real limit and the load cases.
-  - id: RES-01
-    title: Worst strap load within the strap's 1,000 kg lashing capacity, report 03's load cases along the trailer
-    type: restraint
-    restraint: {factor: 2.0, share: 0.6, lc_kg: 1000, cases: {forward_g: 0.8, rearward_g: 0.5, lateral_g: 0.5, up_g: 1.0},
-                cg_z: {TU: 700, ST: 600}}
-    severity: fail
-    inputs: []
-    why: Revision D. With the bikes along the trailer, braking pushes each bike into its chock and cornering pushes it sideways. Report 03's method with its off-road factor of 2, one strap taking 60 % of the sideways moment, and its design centre of gravity heights (700 mm Tuareg, 600 mm Street Triple, above the 05 estimates). Every anchor stays designed for 20 kN.
-  - id: CON-01
-    title: Chock bases, L-track and floor touch without overlap, beams sit on ledgers and the deck sits on beams, ledgers and partition A
-    type: contact
-    pairs:
-      - [10.TU, C1]
-      - [10.ST, C1]
-      - [11.front, C1]
-      - [11.rear, C1]
-      - [11.stow, C1]
-      - [10.TU, 11.front]
-      - [10.ST, 11.front]
-      - ["6.1", 5.road-wall]
-      - ["6.1", 5.kerb-wall]
-      - ["6.2", 5.road-wall]
-      - ["6.2", 5.kerb-wall]
-      - ["6.3", 5.road-wall]
-      - ["6.3", 5.kerb-wall]
-      - ["6.4", 5.road-wall]
-      - ["6.4", 5.kerb-wall]
-      - ["6.5", 5.road-wall]
-      - ["6.5", 5.kerb-wall]
-      - ["7", "6.1"]
-      - ["7", "6.2"]
-      - ["7", "6.3"]
-      - ["7", "6.4"]
-      - ["7", "6.5"]
-      - ["7", 5.on-A]
-      - ["7", 5.rear-wall]
-      - ["7", "1"]
-    tolerance_mm: 0.01
-    severity: fail
-    inputs: [TU-03, TU-04]
-    why: Parts that carry load must touch their supports, and no two solids may overlap.
+# Limits are never changed to make a check pass.
+checks: []
 
 # Whole-trailer checks (TRAILER.md), measured on the block layout in assemblies/trailer.yaml by cad/trailer.py.
 # Masses with growth carry the MASS-06 allowance (estimate +20 %, calculated +7 %, spec 0 %).
-# The towball limits are design targets from report 07, not legal limits: 280 kg is the car's and the towbar's
-# rating, used here as a ceiling, and 6 % of the trailer's mass is the floor report 07 sets for stability.
-# VSB1 sets no towball share. Limits here are never changed to make a check pass.
+# The tow vehicle is the LandCruiser 79 (data/ute/ute.yaml, research report 16). Its towbar is rated 350 kg, and the
+# plan caps the towball at 250 kg because the ute's rear axle binds. 6 % of the trailer's mass is the floor report 07
+# sets for stability. VSB1 sets no towball share. Limits here are never changed to make a check pass.
 trailer_checks:
   - id: MAS-01
-    title: Trailer mass with growth within the 3,500 kg ATM
+    title: Trailer mass with growth within the 3,100 kg plated ATM
     type: mass
     quantity: mass
+    limit: plated_atm
     basis: growth
     cases: all
-    max: 3500
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: The car's braked towing limit and the planned ATM (report 07). MASS-03 margin against ATM.
+    why: The decision log plates the ATM at 3,100 kg, so it covers the heaviest case with the growth allowance. A 3,000 kg plate is the target once the estimates come in lighter (TRAILER.md open questions).
   - id: MAS-02
     title: Axle group load with growth, times 1.2 for VSB1's 120 % rule, within the kit's GTM
     type: mass
@@ -191,17 +29,17 @@ trailer_checks:
     cases: all
     severity: fail
     inputs: [SUP-01, SUP-02, TW-01, TW-02, TW-03]
-    why: Cruisemaster rates the 4,500 kg XT Air tandem build at 4,050 kg GTM (report 06, input SUP-01). VSB1 asks each axle of a non-load-sharing group to carry 120 % of its load, and Cruisemaster's ratings do not include that (input SUP-02).
+    why: VSB1 asks the axles to carry 120 % of their share where they do not share load, as the XT's do not (report 06). The kit's GTM is Cruisemaster's figure for the 4,500 kg XT Air build.
   - id: MAS-03
-    title: Towball load never above 280 kg (design target)
+    title: Towball load never above 250 kg, the ute's plan cap
     type: mass
     quantity: towball
     basis: both
     cases: all
-    max: 280
+    max: 250
     severity: fail
-    inputs: [CAR-01, CAR-02, CAR-05, CAR-06, TU-01, TU-07, ST-01, TW-01, TW-02, TW-03]
-    why: Design target from report 07. 280 kg is the car's and the planned towbar's rating, so the design keeps every case under it, with and without growth.
+    inputs: [UTE-02, TW-01, TW-02, TW-03]
+    why: The towbar is rated 350 kg, but the plan caps the ball at 250 kg so the ute's rear axle keeps its 2,550 kg rating (data/ute/ute.yaml UTE-05, report 16 section 2.3).
   - id: MAS-04
     title: Towball load at least 6 % of the trailer's mass in every travel case (design target)
     type: mass
@@ -210,8 +48,8 @@ trailer_checks:
     cases: all
     min: 6
     severity: fail
-    inputs: [CAR-01, CAR-02, CAR-05, CAR-06, TU-01, TU-07, ST-01, TW-01, TW-02, TW-03]
-    why: Design target from report 07, not a legal limit. A light nose makes a trailer prone to sway. Every case in load_cases.yaml can be towed.
+    inputs: [TW-01, TW-02, TW-03]
+    why: Report 07 sets 6 % as the floor for a stable trailer. Every case here is one the trailer may be towed in.
   - id: MAS-05
     title: Towball load within 10 kg of the target fully loaded (design target)
     type: mass
@@ -221,51 +59,8 @@ trailer_checks:
     basis: nominal
     cases: [TC2]
     severity: fail
-    inputs: [CAR-01, CAR-02, CAR-05, CAR-06]
-    why: The target is the highest towball load that keeps the car's 1,600 kg rear axle within its limit with the planned gear in the car, capped at 280 kg (report 07, inputs CAR-01 to CAR-06). The axle solve aims at it, so this row shows the solve worked.
-  - id: MAS-07
-    title: Axle group load with growth within the NSW examiner's GTM cap
-    type: mass
-    quantity: axle
-    limit: nsw_gtm_cap
-    basis: growth
-    cases: all
-    severity: fail
-    inputs: [TW-01, TW-02, TW-03]
-    why: TfNSW VIB 78 (report 02 section 2.1). The examiner caps GTM at the lowest of the four tyres' load capacities, the coupling, the safety chains and the brakes (registration ratings in load_cases.yaml).
-  - id: MAS-08
-    title: Trailer mass with growth within the NSW examiner's ATM cap
-    type: mass
-    quantity: mass
-    limit: nsw_atm_cap
-    basis: growth
-    cases: all
-    severity: fail
-    inputs: [TW-01, TW-02, TW-03]
-    why: TfNSW VIB 78 (report 02 section 2.1). The examiner caps ATM at the lower of the coupling and safety chain ratings.
-  - id: MAS-09
-    title: Wheel load rating covers VSB1's 120 % rule with growth
-    type: mass
-    quantity: tyre_load
-    limit: wheel_rating
-    basis: growth
-    cases: all
-    severity: fail
-    inputs: [WHL-01, TW-01, TW-02, TW-03]
-    why: Each wheel must carry the same per-wheel load MAS-06 checks on the tyre, 1.2 times the axle group load with the growth allowance over four wheels. The ROH Trak 2 16x7 +7 is rated 1,250 kg (measurements.yaml WHL-01, report 09).
-  - id: BAL-01
-    title: Ballast at the back of the garage to tow with no bikes aboard, with growth (reported)
-    type: ballast
-    severity: report
-    inputs: [CAR-01, CAR-02, CAR-05, CAR-06]
-    why: Revision C. With every heavy item at the back, the towball rises when the bikes come out. The build solves the least ballast at the back of the garage that keeps TC1, TC4 and TC5 at or under 280 kg on base weights and carries it in those cases. This row reports how much is needed with the growth allowance as well.
-  - id: CAR-07
-    title: Towball scale reading within 10 % of the model, fully loaded (reported)
-    type: towball_scale
-    tolerance: 0.10
-    severity: report
-    inputs: [CAR-07]
-    why: Checks the centre of gravity estimates once the trailer exists (measurements.yaml CAR-07).
+    inputs: []
+    why: The axle solve sets the towball fully loaded on base weights to the target, the middle of the decision log's 200 to 250 kg band less what the growth allowance can add.
   - id: MAS-06
     title: Tyre load with VSB1's 120 % rule within the tyre's rating
     type: mass
@@ -275,51 +70,78 @@ trailer_checks:
     cases: all
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: VSB1 asks each axle of a non-load-sharing group and its tyres to carry 120 % of their load. The Yokohama Geolandar A/T G015 LT245/70R16 118/115R is rated 1,320 kg (load index 118, report 09), from the registration ratings in load_cases.yaml.
-  - id: CAR-01
-    title: Car's rear axle with two adults, the towbar, its own spare wheel and the fully loaded towball, before any gear
-    type: car_axle
-    cases: [TC2]
-    max: 1600
+    why: LT265/75R16 123/120, 1,550 kg per tyre (report 16, the ute's tyre). 1.2 times the axle group load over four tyres.
+  - id: MAS-07
+    title: Axle group load with growth within the NSW examiner's GTM cap
+    type: mass
+    quantity: axle
+    limit: nsw_gtm_cap
+    basis: growth
+    cases: all
+    severity: fail
+    inputs: [TW-01, TW-02, TW-03]
+    why: The NSW examiner caps GTM at the lowest of the tyre, coupling, chain and brake ratings (report 02 section 2.1).
+  - id: MAS-08
+    title: Trailer mass with growth within the NSW examiner's ATM cap
+    type: mass
+    quantity: mass
+    limit: nsw_atm_cap
+    basis: growth
+    cases: all
+    severity: fail
+    inputs: [TW-01, TW-02, TW-03]
+    why: The examiner caps ATM at the lower of the coupling and chain ratings (report 02 section 2.1).
+  - id: MAS-09
+    title: Wheel load rating covers VSB1's 120 % rule with growth
+    type: mass
+    quantity: tyre_load
+    limit: wheel_rating
+    basis: growth
+    cases: all
+    severity: fail
+    inputs: [WHL-01, TW-01, TW-02, TW-03]
+    why: The ROH Trak 2 16 x 7 ET 0 is rated 1,400 kg (measurements.yaml WHL-01), the ute's wheel.
+  - id: GCM-01
+    title: Ute and trailer within the ute's 6,900 kg GCM
+    type: gcm
+    severity: fail
+    inputs: [TW-01, TW-02, TW-03]
+    why: GCM is the ute's mass plus the trailer's (report 16 section 2.4). The check takes the larger of two sums. The plan's sum is the ute at its 3,850 kg weighed limit, which includes the ball load, plus the trailer at its plated ATM less the 250 kg on the ball. The model's sum is the ute with the bikes aboard (U1 case UC2, with growth) plus the heaviest trailer case with growth.
+  - id: TBS-01
+    title: Towball scale reading within 10 % of the model, fully loaded (reported)
+    type: towball_scale
+    tolerance: 0.10
     severity: report
-    inputs: [CAR-01, CAR-02, CAR-05, CAR-06]
-    why: Report 07 load budget method, with the car's 30 kg spare flat on the boot floor about 100 mm behind the rear axle (report 10). The row also gives how much gear the car can then carry before its rear axle or GVM binds.
+    inputs: [UTE-03]
+    why: Reported until the trailer exists. A reading more than 10 % off the model means a mass line or its position is wrong.
   - id: FIT-01
-    title: Living area holds its items and keeps the entry door, ladder foot, bathroom door, walkway and seat clear
+    title: The body holds its items and keeps the entry door, desk seats, bathroom door and aisle clear
     type: fit
-    zone: living
+    zone: inside
     severity: fail
     inputs: []
-    why: Revision C. One living area from the front wall to partition A. Every item must sit inside it with no overlap, and the keep-clear spaces are floor space to stand in.
-  - id: FIT-02
-    title: Gas locker holds the two 9 kg cylinders and the regulator
-    type: fit
-    zone: gas_locker
-    when: mod_lpg
-    severity: fail
-    inputs: []
-    why: Revision C. Report 02 section 5.2 asks for a compartment that holds only the cylinders and their equipment.
+    why: Every block inside the body must sit inside it without overlapping another, and no solid item may stand in a keep-clear space (layout-79 section 1.2).
   - id: FIT-03
     title: Tanks and battery fit between the rails and the crossmembers
     type: fit
     zone: underfloor
     severity: fail
     inputs: []
-    why: The tanks and battery sit between the rails, clear of every crossmember.
+    why: The tanks sit in the two suspension bays and the battery box in its own bay, clear of every crossmember.
   - id: FIT-04
-    title: Kerb-strip stowage holds the generator and the jerry cans
+    title: The sealed drawbar box holds the generator and the jerry cans
     type: fit
-    zone: kerb_strip
+    zone: drawbar_box
     severity: fail
     inputs: []
-    why: Revision C. They sit in the garage against the kerb-side wall in front of the gas locker, inside the strip and clear of each other. The module checks CLR-04 and CLR-10 keep them clear of the bikes and straps.
+    why: The petrol rides outside the body in a sealed, vented box behind the stone guard (decision log 12:45, independent review S6), so no petrol vapour can reach the living area or the air-conditioner under the bed.
   - id: FIT-05
     title: Tyres swung through their full travel keep 50 mm from every chassis member
     type: tyre
     min_gap_mm: 50
     severity: fail
     inputs: []
-    why: Report 11 section 5. Each tyre swings on its arm about the hinge pivot (23 mm ahead of the hinge crossmember's rear face, 99 mm below the rail underside) through 60 mm up and down. The tyre is Yokohama's published 752 mm diameter. 50 mm is the plan's allowance between the tyre and the floor.
+    why: Report 06 open question 9 and report 11 section 5. The arc follows the XT arm about its pivot.
   # ---------------------------------------------------------------- chassis and drawbar (CHASSIS.md, report 11)
   - id: CHS-01
     title: Chassis stress, LC1 static at ATM, within fy / 3
@@ -327,7 +149,7 @@ trailer_checks:
     load_case: LC1
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: Report 11 LC1. The ARTSA factor of safety of 3 on yield (report 02 section 2.4). Every member, every trailer case scaled so the heaviest sits at the 3,500 kg ATM.
+    why: Report 11 LC1. The ARTSA factor of safety of 3 on yield (report 02 section 2.4). Every member, every trailer case scaled so the heaviest sits at the 3,100 kg plated ATM.
   - id: CHS-02
     title: Chassis stress, LC2 vertical bump 3 g, below yield
     type: chassis_stress
@@ -577,7 +399,7 @@ trailer_checks:
     title: Front load space not shorter than the rear overhang (VSB1 5.1.1)
     type: overhang
     severity: fail
-    inputs: [CAR-01, CAR-02, CAR-05, CAR-06, TU-01]
+    inputs: []
     why: VSB1 5.1.1 for this kind of trailer (report 08 section 5.1). The axle group centre must sit at or behind the middle of the body.
   - id: DIM-03
     title: Coupling height inside VSB1's 350 to 460 mm towball range, with its tolerance
@@ -585,63 +407,57 @@ trailer_checks:
     min: 350
     max: 460
     severity: fail
-    inputs: [CAR-04]
-    why: VSB1 9.3.2 and report 08 (440 mm plus or minus 20 mm).
+    inputs: [UTE-01]
+    why: VSB1 9.3.2. The decision log sets the ute's ball at 440 mm laden, plus or minus 20 mm, so the coupling stays under 460 mm.
   - id: DIM-04
     title: Running clearance at least 100 mm, unladen (VSB1 5.4)
     type: clearance_ground
     min: 100
     severity: fail
-    inputs: [CAR-04]
+    inputs: [UTE-01]
     why: Every part carried by the suspension needs 100 mm of running clearance. The arms, hubs and wheels are not carried by it.
   - id: JK-01
-    title: Body front corners and the spare wheel clear the Cayenne at a 90 degree jack-knife
+    title: Everything that stands above the bike box's underside clears its sweep by 100 mm at any jack-knife angle
     type: jackknife
     min_gap_mm: 100
     severity: fail
-    inputs: [CAR-05]
-    why: Plan view at 90 degrees about the ball. 100 mm is this layout's allowance for the unmeasured ball position and the car's rounded corners. Revision B set the drawbar length for the drawbar box, which revision C does not have. Revision D adds the spare wheel on the body's front wall.
+    inputs: [UTE-02]
+    why: The ute's bike box overhangs the ball, so its rear corners sweep a circle about the ball as the trailer swings (build/ute/ute.json, from the U2 model). Any trailer part higher than the box's underside must stay outside that circle. 100 mm is the allowance kept from the Cayenne check for the unmeasured ball position.
   - id: JK-02
-    title: Drawbar members and stone guard to the car's rear corner, plan view (reported)
-    type: jackknife_aframe
-    severity: report
-    inputs: [CAR-05]
-    why: Reported only. In plan the A-frame and the stone guard on it pass under the car's rear corner before 90 degrees. Whether they touch depends on the bumper height against the drawbar, which nobody has measured yet.
+    title: Everything inside the bike box's sweep stays 50 mm below its underside
+    type: jackknife_height
+    min_gap_mm: 50
+    severity: fail
+    inputs: [UTE-01, UTE-02]
+    why: The coupling, chains, drawbar members and stone guard sit inside the box's sweep, so they must pass under it. 50 mm allows for the ute's pitch as it squats on the ball (assumption, TRAILER.md).
 
   # ---------------------------------------------------------------- body (BODY.md, cad/body.py, research report 12)
-  - {id: BDY-01, title: "Floor under the bike wheel in the chock, LC2 3 g, skin and core within half their strength", type: body_panel, body: {item: BDY-01}, severity: fail,
-     why: "Report 12 section 3. The 30 mm woven-roving floor spans between the raisers. One-way span with an effective width of the patch plus half the span"}
-  - {id: BDY-02, title: "Floor under the chock base with the braking push, LC2 3 g", type: body_panel, body: {item: BDY-02}, severity: fail,
-     why: "Report 12 section 3. About 330 kgf of braking push from the Tuareg, taken as 130 kg on the chock base's rear edge (estimate)"}
-  - {id: BDY-03, title: "Living-area floor under a foot, LC2 3 g, with bearing on the core", type: body_panel, body: {item: BDY-03}, severity: fail,
-     why: "Report 12 section 3. 100 kg on 100 x 150 mm. Bearing at most half the core's compressive strength"}
+  # Revision B: the bike wheel, chock and L-track checks (BDY-01, BDY-02, BDY-08, BDY-17) and the generator floor check
+  # (BDY-05) left with the garage. The raising roof (BDY-12) and the rear portal (BDY-15) are gone with the fixed roof
+  # and the full rear wall. BDY-19 and BDY-20 replace them.
+  - {id: BDY-03, title: "Floor under a foot, LC2 3 g, with bearing on the core", type: body_panel, body: {item: BDY-03}, severity: fail,
+     why: "Report 12 section 3. 100 kg on 100 x 150 mm. Bearing at most half the core's compressive strength. With the bikes gone this governs the floor (layout-79 open question 13)"}
   - {id: BDY-04, title: "Floor edge beside the raisers between outriggers, LC2 3 g", type: body_panel, body: {item: BDY-04}, severity: fail,
      why: "Report 12 section 3 and report 11 section 5.3: 160 kg/m2 of floor and contents spanning between outriggers, no edge member"}
-  - {id: BDY-05, title: "Floor edge under the generator and jerry cans, LC2 3 g", type: body_panel, body: {item: BDY-05}, severity: fail,
-     why: "Report 12 section 3. 90 kg on the kerb-side floor edge midway between outriggers"}
   - {id: BDY-06, title: "Side wall in a 0.5 kPa wind", type: body_panel, body: {item: BDY-06}, severity: fail,
-     why: "Report 12 section 3. The wall spans from the floor joiner to the pop-top bottom ring"}
-  - {id: BDY-07, title: "Lid with the bonded solar array, LC2 3 g, spanning between the walls", type: body_panel, body: {item: BDY-07}, severity: fail,
-     why: "Report 12 section 3 with report 13's 31 kg Sunman array in place of 90 kg of glass panels"}
-  - {id: BDY-08, title: "Floor deflection under the bike wheel at 1 g within span/200 (reported)", type: body_deflection, body: {item: DEF-B1}, severity: report,
-     why: "Report 12 section 3. A deflection guide the engineer sets"}
-  - {id: BDY-09, title: "Lid deflection with the solar array at 1 g within span/150 (reported)", type: body_deflection, body: {item: DEF-B2}, severity: report,
-     why: "Report 12 section 3. Bonded panels flex with the lid"}
+     why: "Report 12 section 3. The wall spans from the floor joiner to the roof-to-wall joiner, 1,950 mm"}
+  - {id: BDY-07, title: "Fixed roof with the bonded solar array, LC2 3 g, spanning between the walls", type: body_panel, body: {item: BDY-07}, severity: fail,
+     why: "Report 12 section 3 with report 13's 29 kg Sunman array"}
+  - {id: BDY-09, title: "Roof deflection with the solar array at 1 g within span/150 (reported)", type: body_deflection, body: {item: DEF-B2}, severity: report,
+     why: "Report 12 section 3. Bonded panels flex with the roof"}
   - {id: BDY-10, title: "Wall deflection in a 0.5 kPa wind within span/100 (reported)", type: body_deflection, body: {item: DEF-B3}, severity: report,
      why: "Report 12 section 3"}
-  - {id: BDY-11, title: "Panel inserts: bed ledgers and awning brackets within half their rated load", type: body_insert, severity: fail,
+  - {id: BDY-11, title: "Panel inserts: bed deck ledgers and awning brackets within half their rated load", type: body_insert, severity: fail,
      why: "Report 12 section 3 and report 02 MAT-05. A pull test in the real panel confirms each insert (LR-09)"}
-  - {id: BDY-12, title: "Raising roof: actuators lift the lid and the latches hold it in a 40 m/s uplift", type: body_roof, severity: fail,
-     why: "Report 12 section 6. Four LINAK LA36 actuators of 4,500 N and six over-centre latches taken at 2.1 kN each (assumption)"}
   - {id: BDY-13, title: "Body share of the LC5a twist, with the body tied to the chassis at the mounts (reported)", type: body_twist, severity: report,
-     why: "Report 12 section 4 claims about 80 %. The frame model checks it with the body as a torsion box, for the lid carrying shear or not"}
+     why: "Report 12 section 4 claims about 80 %. The frame model checks it with the body as a torsion box, for the roof joint carrying shear or not"}
   - {id: BDY-14, title: "Skins and bonded joints under the body's share of LC5a", type: body_joint, severity: fail,
-     why: "Shear flow T / 2A round the body box, with the lid carrying shear (the bound that loads the body most)"}
-  - {id: BDY-15, title: "Rear portal and the 380 mm pier racking under the garage's share of LC5a", type: body_portal, severity: fail,
-     why: "Report 12 section 5. Aluminium SHS and RHS 6060-T5 at fy / 1.5"}
-  - {id: BDY-16, title: "Body mounts: 36 Hollo-Bolt HB10 under LC2 to LC5a, and the 3 mm raiser face", type: body_mount, severity: fail,
-     why: "Report 12 section 4. Lindapter's safe working loads, and a yield-line check of the 3 mm C450 face under the sleeve"}
-  - {id: BDY-17, title: "L-track hardpoints at the 20 kN anchor load, a factor of 1.5 on ultimate", type: body_hardpoint, severity: fail,
-     why: "Report 12 section 3 and open question 3. The rows sit between chassis stations, so a hardpoint strip carries each anchor into the raisers and the wall foot"}
+     why: "Shear flow T / 2A round the body box, with the roof carrying shear (the bound that loads the body most)"}
+  - {id: BDY-16, title: "Body mounts: 32 bolts under LC2 to LC5a, and the 3 mm raiser face", type: body_mount, severity: fail,
+     why: "Report 12 section 4. Lindapter's safe working loads, and a yield-line check of the 3 mm C450 face under the sleeve. The M12 nut-plate fallback is used where the HB10 does not pass"}
   - {id: BDY-18, title: "Openings keep 300 mm of full wall between them and 150 mm to a panel edge", type: body_openings, severity: fail,
-     why: "Report 12 section 5's layout rules for the sandwich walls, and no opening in the rear wall's 380 mm pier"}
+     why: "Report 12 section 5's layout rules for the sandwich walls, and no opening within 300 mm of the rear corners"}
+  - {id: BDY-19, title: "Roof-to-wall joint holds the fixed roof in a 40 m/s uplift", type: body_roof, severity: fail,
+     why: "Report 12 section 3's uplift at 110 km/h into a 36 km/h headwind, on the bonded joiner round the roof edge with half the bond's tensile strength allowed"}
+  - {id: BDY-20, title: "Rear wall as the box's rear diaphragm under the body's share of LC5a and LC5b", type: body_end_wall, severity: fail,
+     why: "Report 12 section 5. With the garage door gone the full rear wall holds the box's rear end in shape, as the portal did. Skin shear at half the ultimate over root 3, and the bonded joiner at half the bond strength"}

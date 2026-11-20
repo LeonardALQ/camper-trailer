@@ -5,7 +5,7 @@
 # cad/chassis_fea.py analyses them. Sections come from data/chassis/sections.yaml (report 11's table).
 id: ASM-CH
 name: Chassis and drawbar
-revision: A
+revision: B     # B, 20 Nov 2026: the LandCruiser 79 layout (layout-79 section 4.3). 4,420 mm rails, 1,175 mm wide, RHS 125 raisers
 
 material:
   tube: "AS/NZS 1163 C450L0 RHS and SHS, Austube Mills C450PLUS bought black (fy 450 MPa, fu 500 MPa)"
@@ -29,19 +29,21 @@ galvanising:
 
 params:
   rail_y: rail_c                              # rail centreline from the trailer centreline
-  raiser_top_z: rail_top_z + 100              # 100 x 50 x 3 raiser on the rail
-  strip_t: floor_underside_z - raiser_top_z   # floor bearer strip up to the floor underside (21 mm)
+  raiser_top_z: rail_top_z + 125              # 125 x 50 x 3 raiser on the rail (revision B: the 805 mm tyre lifts the floor)
+  strip_t: floor_underside_z - raiser_top_z   # floor bearer strip up to the floor underside (22.5 mm)
   outrigger_root_y: rail_c + rail_w / 2       # the raiser's outer face
   outrigger_tip_y: half_bw                    # the body edge
   db_z: rail_underside_z - db_depth / 2       # drawbar member centroid, the members run under the rails
   db_end_x: body_x0 + db_tail                 # end of the drawbar overlap under the rails (X 2,820)
+  db_box_x0: 1150                             # sealed drawbar box for the generator and the jerry cans, behind the stone guard
+  db_box_l: 320                               # clear of the jockey bracket ahead and the spare wheel behind (TRAILER.md)
   brace_x: 900                                # drawbar cross brace
   plate_x: db_apex_x                          # coupling plate at the apex
   chain_lug_x: db_apex_x + 150                # chain lugs 150 mm behind the coupling plate
-  jockey_x: 500                               # jockey wheel bracket on the kerb-side member
+  jockey_x: 1000                              # jockey wheel bracket on the kerb-side member, outside the bike box's sweep (JK-01)
   front_recovery_x: body_x0 + 330             # front recovery lugs, outside the 300 mm root zone
-  steady_front_x: 3000
-  steady_rear_x: 7150
+  steady_front_x: 2220                        # corner steadies about 400 mm inside the body ends (layout-79 section 4.3)
+  steady_rear_x: 6070
   spare_post_y: 120                           # spare carrier posts 240 mm apart
   spare_post_top_z: 1500
   pivot_ahead: 23                             # report 11 section 5.1: hinge pivot 23 mm ahead of the hinge
@@ -53,11 +55,11 @@ params:
 
 roles:
   rail: {section: RHS_150x50x3, name: "Main rail"}
-  raiser: {section: RHS_100x50x3, name: "Raiser on the rail, continuous fillet welds to the rail"}
+  raiser: {section: RHS_125x50x3, name: "Raiser on the rail, continuous fillet welds to the rail"}
   cm_xt: {section: RHS_150x50x3, name: "XT suspension crossmember, full rail height"}
   cm_end: {section: RHS_150x50x3, name: "Body end crossmember, full rail height"}
-  cm_floor: {section: RHS_100x50x3, name: "Floor crossmember at raiser height, top flush with the raisers"}
-  outrigger: {section: RHS_100x50x3, name: "Outrigger at raiser height, top flush with the raiser, bottom at the rail top"}
+  cm_floor: {section: RHS_125x50x3, name: "Floor crossmember at raiser height, top flush with the raisers"}
+  outrigger: {section: RHS_100x50x3, name: "Outrigger at raiser height, top flush with the raiser, bottom 25 mm above the rail top"}
   drawbar: {section: RHS_150x50x5, name: "Drawbar member, A-frame"}
   brace: {section: RHS_75x50x3, name: "Drawbar cross brace"}
   spare_post: {section: SHS_50x50x2p5, name: "Spare wheel carrier post"}
@@ -76,8 +78,8 @@ station_roles:
 # Plan bracing: an X of two diagonals at rail height in free bays between the rails, so the ladder frame carries
 # sideways loads (LC8a recovery at 30 degrees) by truss action. The tanks and the battery fill the other bays.
 plan_braces:
-  - {between: ["between front and XT front hinge (2)", "between front and XT front hinge (3)"], section: SHS_40x40x2p5}
-  - {between: ["between front and XT front hinge (3)", XT front hinge], section: SHS_40x40x2p5}
+  - {between: ["between front and XT front hinge (1)", "between front and XT front hinge (2)"], section: SHS_40x40x2p5}
+  - {between: ["between front and XT front hinge (2)", XT front hinge], section: SHS_40x40x2p5}
   - {between: [XT rear shock, battery-bay], section: SHS_40x40x2p5}
 
 # Welded and bolted fittings. Plates: length x width x thickness in mm, with a count. Bought parts carry a mass and its
@@ -106,11 +108,11 @@ fittings:
   - {id: CH-P10, plane: xz, name: "Corner steady brackets, 6 mm, bolted to the rail with crush tubes", kind: plate, l: 200, w: 150, t: 6, qty: 4,
      at: [steady_front_x, 0, rail_underside_z - 20], side_y: rail_c, rear_x: steady_rear_x}
   - {id: CH-P14, name: "Body mount nut plate, 10 mm, M12 tapped, welded inside the raiser or outrigger tip under each body bolt (BODY.md)", kind: plate,
-     l: 80, w: 44, t: 10, qty: 36, at: ["body_x0 + body_length / 2", 0, raiser_top_z - 13]}
+     l: 80, w: 44, t: 10, qty: 32, at: ["body_x0 + body_length / 2", 0, raiser_top_z - 13]}
   - {id: CH-P11, plane: xz, name: "Jockey wheel bracket plate, 8 mm, bolted to the kerb-side member", kind: plate, l: 200, w: 160, t: 8, qty: 1,
      at: [jockey_x, "-(db_apex_y + (rail_c - db_apex_y) * (jockey_x - db_apex_x) / (body_x0 - db_apex_x)) - 90", db_z]}
-  - {id: CH-S01, name: "Floor bearer strip on the raisers, outriggers and floor crossmembers, 50 x 21 mm EPDM-faced HDPE", kind: strip, kg_per_m: 1.0,
-     maturity: estimate, source: "Estimate: HDPE at 960 kg/m3 for 50 x 21 mm, with the EPDM face and fixings"}
+  - {id: CH-S01, name: "Floor bearer strip on the raisers, outriggers and floor crossmembers, 50 x 22.5 mm EPDM-faced HDPE", kind: strip, kg_per_m: 1.07,
+     maturity: estimate, source: "Estimate: HDPE at 960 kg/m3 for 50 x 22.5 mm, with the EPDM face and fixings"}
   # bought parts on the drawbar (they replace the DB-03 block)
   - {id: DB-03, name: "Cruisemaster DO35 V3Plus coupling, with the integrated handbrake", kind: bought, mass_kg: 9.5, maturity: estimate,
      source: "Estimate: Cruisemaster does not publish the mass. Retailers list the DO35 V3 at about 8 to 10 kg", at: [80, 0, "coupling_z + 40"],
@@ -128,8 +130,9 @@ fittings:
      source: "Retailer: 38.9 lb (17.6 kg) for a set of two with the winding handle (report 13 section 6)", at: [steady_front_x, 0, rail_underside_z - 150], side_y: rail_c, rear_x: steady_rear_x}
 
 # Load cases, report 11 section 3.2. Accelerations in g along X (+ rearward), Y (+ road side) and Z (+ up). Every case
-# runs on each trailer case TC1 to TC7 with its masses scaled up to the plated ATM (water included), except LC5b, which
-# is at tare. `factor` divides fy for the stress criterion.
+# runs on each trailer case TC1 to TC6 with its masses scaled up to the 3,100 kg plated ATM (water included), except
+# LC5b, which is at tare. `factor` divides fy for the stress criterion. Revision B: the VSB1 drawbar and chain forces
+# follow the 3,100 kg plate (1.5, 0.5 and 1.0 times the ATM's weight), 11 % below the 3,500 kg design.
 load_cases:
   - {id: LC1, name: "Static at ATM", kind: static, accel: [[0, 0, -1]], factor: 3, source: "ARTSA factor of safety of 3 (report 02 section 2.4)"}
   - {id: LC2, name: "Vertical bump, 3 g on the structure", kind: static, accel: [[0, 0, -3]], factor: 1, source: "Report 11 LC2, ARTSA"}
@@ -139,10 +142,10 @@ load_cases:
      source: "Report 11 LC5a: 820 kg x 9.81 x 0.831 m = 6.7 kNm, times 2 for dynamics"}
   - {id: LC5b, name: "Twist on the corner steadies at tare, one wound to 875 kg", kind: twist_steady, accel: [[0, 0, -1]], steady_kg: 875, factor: 1.5,
      source: "Report 11 LC5b, ARK catalogue 2024 p. 67"}
-  - {id: LC6, name: "Drawbar, VSB1 9.1: 51.5 kN longitudinal, 17.2 kN transverse, 17.2 kN vertical, each way, separately", kind: drawbar,
-     forces_n: [[51500, 0, 0], [-51500, 0, 0], [0, 17200, 0], [0, -17200, 0], [0, 0, 17200], [0, 0, -17200]], factor: 1, source: "VSB1 9.1 and 14.2.1, ADR 62/02 14.2"}
-  - {id: LC6b, name: "Chain points, VSB1 9.2.2: 34.3 kN longitudinal, 17.2 kN vertical, each point separately", kind: chain,
-     forces_n: [[-34300, 0, 0], [0, 0, -17200], [0, 0, 17200]], factor: 1, source: "VSB1 9.2.2 and 14.2.2, ADR 62/02 14.4.2"}
+  - {id: LC6, name: "Drawbar, VSB1 9.1 at the 3,100 kg plate: 45.6 kN longitudinal, 15.2 kN transverse, 15.2 kN vertical, each way, separately", kind: drawbar,
+     forces_n: [[45600, 0, 0], [-45600, 0, 0], [0, 15200, 0], [0, -15200, 0], [0, 0, 15200], [0, 0, -15200]], factor: 1, source: "VSB1 9.1 and 14.2.1, ADR 62/02 14.2, at 3,100 kg"}
+  - {id: LC6b, name: "Chain points, VSB1 9.2.2 at the 3,100 kg plate: 30.4 kN longitudinal, 15.2 kN vertical, each point separately", kind: chain,
+     forces_n: [[-30400, 0, 0], [0, 0, -15200], [0, 0, 15200]], factor: 1, source: "VSB1 9.2.2 and 14.2.2, ADR 62/02 14.4.2, at 3,100 kg"}
   - {id: LC7, name: "Cargo and heavy item fixings: 0.8 g forward, 0.5 g rearward, 0.5 g sideways, 0.2 g up, times 2 off road", kind: fixings,
      accel: [[-1.6, 0, 0], [1.0, 0, 0], [0, 1.0, 0], [0, 0, 0.4]], factor: 1.5, source: "NTC Load Restraint Guide via report 02, factor 2 from report 03"}
   - {id: LC8a, name: "Recovery points: 51.5 kN within 30 degrees sideways and 15 degrees up or down of the rail axis", kind: recovery,

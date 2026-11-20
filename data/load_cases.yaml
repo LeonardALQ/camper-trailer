@@ -1,144 +1,62 @@
-# Load cases from DESIGN.md (Mass). `include` selects BOM groups or tags. Bikes are payload items.
-# removable = the kit that can stay home with the bikes: chocks, straps, loops, harness, ramp, winch (BOM.md).
-load_cases:
-  - id: LC1
-    name: Module with the removable kit fitted, no bikes
-    module: all
-    bikes: []
-  - id: LC2
-    name: Both bikes in
-    module: all
-    bikes: [TU, ST]
-  - id: LC3
-    name: Bikes out, removable kit taken out
-    module: fixed_only
-    bikes: []
-  - id: LC4
-    name: Tuareg only
-    module: all
-    bikes: [TU]
-  - id: LC5
-    name: Street Triple only
-    module: all
-    bikes: [ST]
-towball:
-  computable: false
-  note: The module's towball load needs the coupling and axle positions, so it is worked out for the whole trailer (TC cases below and TRAILER.md, MASS-04).
-
-# Whole-trailer load cases (TRAILER.md). The module rows follow the module cases above. `water_l` is an
-# expression over the trailer parameters. `load` lists the payload tags carried (assemblies/trailer.yaml):
-# gas (LPG in the cylinders, only with the lpg option), fuel (jerry cans and the heater's diesel), gear (food, clothes, other gear) and luggage (the Tuareg's
-# panniers, carried only when the Tuareg is). Revision C keeps the loading kit aboard in every case. The cases
-# without bikes carry the ballast the build solves (`ballast: true`), which the registration tare excludes.
-# Every case here is one the trailer may be towed in, so every one is a travel case for the towball checks.
+# Whole-trailer load cases (TRAILER.md, layout-79 section 3.2). The bikes ride in the ute's box (UTE-GARAGE.md), so
+# no case carries a bike or ballast. `water_l` is an expression over the trailer parameters. `load` lists the payload
+# tags carried (assemblies/trailer.yaml): fuel (the heater's diesel and the jerry cans in the drawbar box) and gear
+# (food, clothes and other gear). All 400 L of water ride in the trailer. Every case here is one the trailer may be
+# towed in, so every one is a travel case for the towball checks.
 trailer_cases:
   - id: TC1
     name: Tare as built
-    aboard: Trailer as built with the loading kit aboard, empty tanks and cylinders, no bikes or gear, ballast in the garage
-    module: all
-    bikes: []
+    aboard: Trailer as built, empty tanks, no fuel or gear
     water_l: 0
     load: []
-    ballast: true
   - id: TC2
     name: Travel fully loaded
-    aboard: Both bikes with their kit, 200 L of water in the trailer's tanks (the other 200 L rides in the car), fuel and gear (and gas with LPG)
-    module: all
-    bikes: [TU, ST]
-    water_l: water_travel_l
-    load: [gas, fuel, gear, luggage]
+    aboard: 400 L of water, fuel and gear
+    water_l: water_full_l
+    load: [fuel, gear]
     towball_target: true
   - id: TC3
     name: Highway travel
-    aboard: As fully loaded, with 50 L of water in the trailer's tanks
-    module: all
-    bikes: [TU, ST]
+    aboard: 50 L of water, fuel and gear
     water_l: water_highway_l
-    load: [gas, fuel, gear, luggage]
+    load: [fuel, gear]
   - id: TC4
-    name: Bikes out, water full
-    aboard: No bikes, the loading kit aboard, water tanks full, fuel, gear (and gas with LPG) and ballast in the garage
-    module: all
-    bikes: []
+    name: Water full, no gear
+    aboard: 400 L of water and fuel, no gear
     water_l: water_full_l
-    load: [gas, fuel, gear]
-    ballast: true
+    load: [fuel]
   - id: TC5
-    name: Bikes out, tanks empty
-    aboard: No bikes, the loading kit aboard, water tanks empty, fuel, gear (and gas with LPG) and ballast in the garage
-    module: all
-    bikes: []
+    name: Tanks empty, gear aboard
+    aboard: No water, fuel and gear
     water_l: 0
-    load: [gas, fuel, gear]
-    ballast: true
+    load: [fuel, gear]
   - id: TC6
-    name: Tuareg only
-    aboard: Tuareg with its panniers, all the kit, water full, fuel and gear (and gas with LPG)
-    module: all
-    bikes: [TU]
-    water_l: water_full_l
-    load: [gas, fuel, gear, luggage]
-  - id: TC7
-    name: Street Triple only
-    aboard: Street Triple, all the kit, water full, fuel and gear (and gas with LPG)
-    module: all
-    bikes: [ST]
-    water_l: water_full_l
-    load: [gas, fuel, gear]
+    name: Tanks empty, no gear
+    aboard: No water, fuel only
+    water_l: 0
+    load: [fuel]
 
-towball_target_kg: 220   # report 07's figure. The build derives the target from the measured inputs (CAR-01 to CAR-06)
+# The axle solve puts this much on the ball fully loaded (TC2) on base weights: 220 kg, the middle of the decision
+# log's 200 to 250 kg band, so the growth allowance can add up to about 30 kg before MAS-03's 250 kg cap.
+towball_target_kg: 220
 
 # Registration (report 02 section 2.1). NSW, with Victoria as the fallback. The NSW examiner caps GTM at the
 # lowest of the tyre, coupling, chain and brake ratings and ATM at the lower of the coupling and chain ratings.
 registration:
   state: NSW
   fallback: Victoria
+  plated_atm_kg: {v: 3100, src: "Decision log 12:10 UTC: it holds the heaviest case with growth, and the GCM stays inside 6,900 kg with the ute at 3,850 kg"}
   ratings:
-    tyre_kg: {v: 1320, src: "Yokohama Geolandar A/T G015 LT245/70R16 118/115R, load index 118, per tyre, four tyres (report 09)"}
+    tyre_kg: {v: 1550, src: "LT265/75R16 123/120 load range E, load index 123, per tyre, four tyres (report 16, the ute's tyre)"}
     coupling_kg: {v: 3500, src: "Cruisemaster DO35 V3Plus, ADR rated 3,500 kg (report 08)"}
     chains_kg: {v: 3500, src: "Two safety chains marked 4177-35 (report 08)"}
     brakes_kg: {v: 4500, src: "Cruisemaster A/T 12 inch electric drums, 4.5 t tandem capacity (report 06)"}
 
-# The tow vehicle, 2013 Porsche Cayenne GTS (report 07). Values the car's rear axle check needs, with their basis.
-car:
-  name: 2013 Porsche Cayenne GTS (958)
-  towball_rating_kg: {v: 280, src: "Porsche Australia, confirmed by the owner (report 07)"}
-  braked_towing_kg: {v: 3500, src: "Porsche (report 07)"}
-  gvm_kg: {v: 2840, src: "Porsche Australia (report 07)"}
-  gcm_kg: {v: 6340, src: "Read from the car by the owner (report 07)"}
-  front_axle_limit_kg: {v: 1520, src: "Read from the car by the owner (report 07)"}
-  rear_axle_limit_kg: {v: 1600, src: "Read from the car by the owner (report 07)"}
-  kerb_kg: {v: 2085, src: "Porsche DIN kerb mass, standard car (report 07)"}
-  payload_kg: {v: 755, src: "GVM less DIN kerb mass (report 07)"}
-  wheelbase_mm: {v: 2895, src: "Porsche Australia (report 07)"}
-  body_width_mm: {v: 1939, src: "Report 07"}
-  rear_overhang_mm: {v: 980, src: "Rear axle to bumper, Transport Canada data (report 08 section 1.4)"}
-  ball_behind_axle_mm: {v: [1060, 1230], src: "Estimate until the towbar is fitted (report 08 section 1.4)"}
-  # Report 07 load budget assumptions, replaced by weighbridge figures later
-  budget:
-    front_share_of_kerb: {v: 0.54, src: "Report 07 assumption, no published figure"}
-    occupants_kg: {v: 160, src: "Two adults (report 07)"}
-    occupants_behind_front_axle_mm: {v: 1150, src: "Report 07 assumption"}
-    towbar_kg: {v: 30, src: "Report 07 estimate"}
-    rear_seats_out_kg: {v: 50, src: "Rear seats removed (report 07 estimate)"}
-    gear_behind_front_axle_mm: {v: 2000, src: "Gear on the floor where the rear seats were (report 07 assumption)"}
-    ball_behind_axle_mm: {v: 1100, src: "Report 07 load budget assumption"}
-    spare_kg: {v: 30, src: "The car's own full-size 20 inch spare, about 15 kg wheel (estimate) and 15.3 kg tyre (report 10)"}
-    spare_behind_rear_axle_mm: {v: 100, src: "Lying flat on the boot floor, about 0.1 m behind the rear axle (report 10, estimate)"}
-  # The car's gear (CAR-06, 340 kg) includes a water tank of about 215 kg on the floor where the rear seats were:
-  # 200 L of water, about 12 kg of tank and 3 kg of pump and hose (estimates). It tops up the trailer's tanks at camp.
-  water_tank:
-    water_l: 200
-    tank_kg: 12
-    pump_hose_kg: 3
-    total_kg: 215
-    other_gear_kg: 125
-    restraint: "Bolted to the rear-seat anchors or strapped to the boot tie-downs, sized to report 03's load cases (0.8 g forward, 0.5 g rearward and sideways, times 2 off road): about 3.4 kN forward on 215 kg (estimate)"
-    src: "Owner's plan, 19 Nov 2026. Masses are estimates"
-  # The car keeps its own wheels and tyres (report 10). It is registered in NSW.
-  wheels:
-    fitted: "Porsche 20 inch RS Spyder 9.5J x 20 ET47 (958.362.151.00) with Michelin Pilot Sport 4 SUV 275/45 R20 110Y XL, 1,060 kg per tyre"
-    spare: "A sixth 20 inch RS Spyder wheel with the same tyre, about 30 kg, flat on the boot floor"
-    alternative: "Documented only, for registration in Victoria: an 18 inch dirt set, Porsche 8J x 18 ET53 with BFGoodrich KO3 LT255/55R18 109/105S and its own 18 inch spare. Not legal in NSW (S rating below the car's 261 km/h top speed)"
-    coupling: "The trailer's coupling height is set for the 20 inch tyre"
-    src: "Report 10"
+# The tow vehicle: the LandCruiser 79 single cab V8 with the Lovells 4,200 kg GVM kit and its bike box. Its limits are
+# in data/ute/ute.yaml and its masses and the bike box's sweep come from the ute model (build/ute/ute.json, cad/ute.py
+# and cad/ute_garage.py). The Cayenne of report 07 is no longer the tow vehicle (reports 14 to 16 replace 07 and 10).
+tow_vehicle:
+  name: Toyota LandCruiser VDJ79 GXL single cab V8, Lovells 4,200 kg GVM kit, with the bike box
+  data: data/ute/ute.yaml
+  model: build/ute/ute.json
+  gcm_case: UC2          # the ute with the bikes aboard and no towball, added to the trailer's own mass

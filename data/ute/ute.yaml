@@ -32,9 +32,9 @@ params:
   # deck-mount stations from the rear axle, negative ahead (BBGJ1007)
   mount_dx: [-879, -490, 123, 490, 755, 1025]
   # ---------------------------------------------------------------- the towbar and the coupling (report 16 section 5)
-  ball_behind_axle: 1350       # ball centre behind the rear axle (estimate, report 17 open question 6)
+  ball_behind_axle: 1300       # ball centre behind the rear axle (report 16, decision log 12:45). measurements.yaml UTE-02 sets it
   ball_x: wheelbase + ball_behind_axle
-  coupling_z: 450              # laden, the decision log's figure, +/- 20 mm
+  coupling_z: 440              # laden, +/- 20 mm (decision log 12:10, in place of 450 mm). measurements.yaml UTE-01 sets it
   coupling_tol: 20
   # ---------------------------------------------------------------- the bike box, until phase U2 designs it
   box_gap_cab: 40              # body front wall to the back of the cab (Toyota: at least 39 mm at the roof)
@@ -227,8 +227,8 @@ checks:
      why: "Half the mean track over the centre of gravity height (NHTSA). Report 17 found 1.02 with the bikes in the trailer and about 0.80 to 0.82 on the ute"}
   - {id: UTE-12, title: "Each rear wheel and tyre within its rating", type: wheel, basis: both, cases: [UC3], severity: fail,
      why: "Half the rear axle load on each rear wheel. ROH rates the Trak 2 at 1,400 kg and the tyre carries 1,550 kg"}
-  - {id: UTE-13, title: "Coupling point window laden inside VSB1's 350 to 460 mm (reported)", type: coupling, severity: report,
-     why: "The decision log sets 450 mm, plus or minus 20 mm, laden. VSB1 asks for 350 to 460 mm with the vehicle fully loaded"}
+  - {id: UTE-13, title: "Coupling point window laden inside VSB1's 350 to 460 mm", type: coupling, severity: fail,
+     why: "The decision log sets 440 mm, plus or minus 20 mm, laden (12:10 UTC, in place of 450 mm, which reached 470 mm). VSB1 asks for 350 to 460 mm with the vehicle fully loaded"}
   - {id: UTE-14, title: "Trailer within the 3,500 kg braked towing capacity", type: towing, severity: fail,
      why: "Toyota's braked towing capacity, and the towbar's rating"}
   - {id: UTE-15, title: "Box front wall at least 39 mm behind the cab", type: cab, limit: cab_gap_min_mm, severity: fail,

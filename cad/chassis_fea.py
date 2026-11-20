@@ -32,7 +32,7 @@ G = 9.81
 SKIP_SYSTEMS = {"chassis", "drawbar"}           # replaced by the designed members and fittings
 SKIP_IDS = {"SP-03"}                            # the spare wheel bracket estimate, replaced by the carrier posts
 UNSPRUNG = {"RG-01", "RG-02", "RG-06"}
-ROOF = {"BD-02", "BD-08", "BD-09", "BD-12", "RF-01"}
+ROOF = {"BD-02", "BD-08", "BD-09", "RF-01"}
 RAILS = {"BD-10", "RG-03"}
 CELL = 200.0
 
@@ -54,7 +54,7 @@ class Analysis:
         self.f = self.fm.f
         self.n = 6 * len(self.f.nodes)
         V = ch.V
-        self.atm = tr.caps()["atm"]
+        self.atm = tr.caps()["plated"]       # the frame model runs at the plated ATM
         ball = self.fm.ball
         rear = [w for w in ch.suspension if w["axle"] == "rear"]
         rk = self.fm.rail_node(-1, rear[0]["airbag"][0])
@@ -115,7 +115,9 @@ class Analysis:
                     share = m * (t.box[3] - t.box[0]) * (t.box[4] - t.box[1]) / area
                     out += self._sliced(b.iid, b.name, share, t.box, b.cog[2], "rails")
                 continue
-            if b.system == "underfloor" or b.id in RAILS:
+            if b.cog[0] < V["body_x0"] - 100:
+                rule = "drawbar"          # the drawbar box and its contents
+            elif b.system == "underfloor" or b.id in RAILS:
                 rule = "rails"
             elif b.id in ROOF:
                 rule = "roof"
