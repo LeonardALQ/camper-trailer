@@ -59,7 +59,7 @@ roles:
   cm_xt: {section: RHS_150x50x3, name: "XT suspension crossmember, full rail height"}
   cm_end: {section: RHS_150x50x3, name: "Body end crossmember, full rail height"}
   cm_floor: {section: RHS_125x50x3, name: "Floor crossmember at raiser height, top flush with the raisers"}
-  outrigger: {section: RHS_100x50x3, name: "Outrigger at raiser height, top flush with the raiser, bottom 25 mm above the rail top"}
+  outrigger: {section: RHS_125x50x3, name: "Outrigger at raiser height, the raiser's section, top flush with the raiser, bottom at the rail top"}
   drawbar: {section: RHS_150x50x5, name: "Drawbar member, A-frame"}
   brace: {section: RHS_75x50x3, name: "Drawbar cross brace"}
   spare_post: {section: SHS_50x50x2p5, name: "Spare wheel carrier post"}
@@ -68,6 +68,7 @@ roles:
 # the XT kit and the battery bay, and the pitch rule adds the intermediate ones. Each fixed station's role:
 station_roles:
   front: cm_end
+  diesel bay: cm_floor
   XT front hinge: cm_xt
   XT centre: cm_xt
   XT rear shock: cm_xt
@@ -78,8 +79,8 @@ station_roles:
 # Plan bracing: an X of two diagonals at rail height in free bays between the rails, so the ladder frame carries
 # sideways loads (LC8a recovery at 30 degrees) by truss action. The tanks and the battery fill the other bays.
 plan_braces:
-  - {between: ["between front and XT front hinge (1)", "between front and XT front hinge (2)"], section: SHS_40x40x2p5}
-  - {between: ["between front and XT front hinge (2)", XT front hinge], section: SHS_40x40x2p5}
+  - {between: ["between front and diesel bay (1)", diesel bay], section: SHS_40x40x2p5}
+  - {between: [diesel bay, XT front hinge], section: SHS_40x40x2p5}
   - {between: [XT rear shock, battery-bay], section: SHS_40x40x2p5}
 
 # Welded and bolted fittings. Plates: length x width x thickness in mm, with a count. Bought parts carry a mass and its

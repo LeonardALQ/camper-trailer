@@ -694,7 +694,7 @@ class Analysis:
                          at=g[1]["at"], case=g[1]["case"]))
         vert = [lc6[k] for k in lc6 if "Z" in k]
         sig = max(max(self.normal_at(r, f"DB-{s}A", V["body_x0"]), self.normal_at(r, f"DB-{s}B", V["body_x0"])) for r in vert for s in "KR")
-        rows.append(dict(id="drawbar-LC6", what="Drawbar member at the body front, LC6 vertical 17.2 kN", hand_mpa=264.0, model_mpa=sig))
+        rows.append(dict(id="drawbar-LC6", what="Drawbar member at the body front, LC6 vertical (report 11 hand figure at 17.2 kN, the model at the plate)", hand_mpa=264.0, model_mpa=sig))
         o = max(((m, r) for m, r in out["envelope"]["LC2"].items() if m.startswith("OR-")), key=lambda kv: kv[1]["sigma"])
         L = V["outrigger_tip_y"] - V["outrigger_root_y"]
         tip = abs(o[1]["M_strong"]) / (3 * G * L)

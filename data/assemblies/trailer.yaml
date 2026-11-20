@@ -101,7 +101,7 @@ params:
   mattress_z: deck_z + deck_t + froli_h       # mattress underside, its top at floor + 750
   lz_kitchen_x: body_x0 + 150   # kitchen slide-out opening 150 mm from the front corner (report 12 section 5)
   lz_kitchen_l: 1500
-  lz_door_x: 3770            # entry door, kerb side, u 1,915 (layout-79 section 4.1)
+  lz_door_x: 3775            # entry door, kerb side, 300 mm of full wall behind the kitchen opening's 625 mm cut-out (BDY-18)
   lz_door_w: 622             # Aussie Traveller DC door (report 12 section 7)
   lz_door_h: 1623
   # ---------------------------------------------------------------- axle (solved)
@@ -142,12 +142,13 @@ wheel:
 crossmembers:
   fixed:
     - {id: front, x: body_x0}
+    - {id: diesel bay, x: diesel_tank_x0 - 10 - xm_w}
     - {id: XT front hinge, x: axle_x + xt_front_hinge_rear - xm_w}
     - {id: XT centre, x: axle_x + xt_centre_front}
     - {id: XT rear shock, x: axle_x + xt_rear_shock_front}
     - {id: battery-bay, x: battery_x0 - 10 - xm_w}
     - {id: rear, x: body_x1 - xm_w}
-  keep_out: [[XT front hinge, XT centre], [XT centre, XT rear shock], [battery-bay, rear]]
+  keep_out: [[diesel bay, XT front hinge], [XT front hinge, XT centre], [XT centre, XT rear shock], [battery-bay, rear]]
 
 # Zones for the fit checks: box [x0, y0, z0, dx, dy, dz]. Items name their zone. A `keep_clear` item is floor
 # space that must stay free (door landings, walkways). Keep-clear spaces may overlap one another, but no solid
@@ -482,7 +483,7 @@ items:
     name: Fridge, Dometic NRX 130C, 126 L compressor, just inside the door
     system: living
     zone: inside
-    box: [lz_door_x + 645, -half_in, floor_z, 600, 600, 1400]
+    box: [lz_door_x + 640, -half_in, floor_z, 600, 600, 1400]
     parts:
       - {item: Dometic NRX 130C, kg: 28.0, basis: maker, source: "Dometic Australia"}
       - {item: Frame and door latch, kg: 1.0, basis: estimate}
@@ -491,7 +492,7 @@ items:
     name: Freezer, Dometic CFX3 55IM, 53 L, turned along the wall under a lift-up bench
     system: living
     zone: inside
-    box: [lz_door_x + 1245, -half_in, floor_z, 800, 550, 850]
+    box: [lz_door_x + 1240, -half_in, floor_z, 800, 550, 850]
     parts:
       - {item: Dometic CFX3 55IM, kg: 21.3, basis: retailer, source: "Overland Garage, OK4WD"}
       - {item: Tie-down kit, kg: 0.5, basis: estimate}
@@ -500,12 +501,12 @@ items:
     name: Cupboard over the fridge and the freezer bench
     system: living
     zone: inside
-    box: [lz_door_x + 645, -half_in, ceiling_z - 550, 1400, 550, 550]
+    box: [lz_door_x + 640, -half_in, ceiling_z - 550, 1400, 550, 550]
     mass: {basis: declared, total_kg: 8, maturity: estimate, source: "Layout-79 open question 12 (estimate)"}
   - id: LA-12
     name: Fire extinguisher 1A:20B:(E) and fire blanket inside the entry door
     system: living
-    point: [lz_door_x + 625, -half_in + 65, floor_z + 900]
+    point: [lz_door_x + 620, -half_in + 65, floor_z + 900]
     parts:
       - {item: "Fire extinguisher, 1 kg dry powder 1A:20B:(E), with bracket", kg: 2.3, basis: estimate}
       - {item: Fire blanket 1.2 x 1.2 m, kg: 0.7, basis: estimate}
@@ -607,7 +608,7 @@ items:
     name: Food and drink
     system: payload
     load: gear
-    point: [lz_door_x + 1345, -half_in + 300, floor_z + 700]
+    point: [lz_door_x + 1340, -half_in + 300, floor_z + 700]
     mass: {basis: declared, total_kg: 50, maturity: estimate, source: "Older block model"}
     note: In the fridge and the freezer.
   - id: PL-02

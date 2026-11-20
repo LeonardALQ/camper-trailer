@@ -115,7 +115,7 @@ end_wall:
 # entry door follow the layout's blocks (LA-07, BD-07); the build checks they match.
 openings:
   - {id: OP-01, wall: kerb, name: "Kitchen slide-out opening under the bed, framed, bulb seal, two Southco E3 latches", x: 150, z: 50, w: 1500, h: 450, from: LA-07}
-  - {id: OP-02, wall: kerb, name: "Entry door, Aussie Traveller DC, 90 mm top radius", x: 1950, z: 0, w: 625, h: 1626, from: BD-07}
+  - {id: OP-02, wall: kerb, name: "Entry door, Aussie Traveller DC, 90 mm top radius", x: 1955, z: 0, w: 625, h: 1626, from: BD-07}
   - {id: OP-03, wall: kerb, name: "Window, Dometic S4 500 x 450, over the bed, opening from inside: the second way out", x: 535, z: 800, w: 500, h: 450}
   - {id: OP-04, wall: kerb, name: "Window, Dometic S4 500 x 450, over the freezer bench", x: 3335, z: 900, w: 500, h: 450}
   - {id: OP-05, wall: road, name: "Window, Dometic S4 900 x 500, over the desk", x: 1785, z: 900, w: 900, h: 500}
