@@ -598,7 +598,7 @@ def tyre_clearance(ch: Chassis, boxes: list[tuple[str, tuple]], tyre_w: float, s
     cylinder of the published diameter in its own vertical plane. A box that overlaps the tyre's width gives the
     in-plane distance, one beside it gives the combined distance."""
     V = ch.V
-    R = V["tyre_d_published"] / 2
+    R = V["tyre_d"] / 2
     best = dict(gap_mm=math.inf)
     for w in ch.suspension:
         px, py, pz = w["pivot"]

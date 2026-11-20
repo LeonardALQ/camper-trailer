@@ -191,7 +191,7 @@ def ct101(prj, model, bom, checks, reg, dwg):
             sh.circle(p[0], p[1], 0.8, "medium")
             h = vE.p(w["hub"][0], 0, w["hub"][2])
             sh.line(p[0], p[1], h[0], h[1], "centre")
-            sh.circle(h[0], h[1], V["tyre_d_published"] / 2 / sc, "phantom")
+            sh.circle(h[0], h[1], V["tyre_d"] / 2 / sc, "phantom")
     sh.text(vE.p(V["axle_x"], 0, 0)[0], vE.p(0, 0, -150)[1], "TYRES AND ARMS PHANTOM, AT RIDE HEIGHT", 1.6, "middle")
     # ---- end views at 1:40
     sc2 = 40.0
@@ -230,7 +230,7 @@ def ct101(prj, model, bom, checks, reg, dwg):
     ], width_chars=96, size=1.7, title="MASS AND CUT LIST")
     S.notes(sh, 22, 46, [
         "DATUM DIM-01: X FROM THE BALL CENTRE, POSITIVE REARWARD. Y FROM THE CENTRELINE, POSITIVE TO THE ROAD SIDE. Z UP FROM THE GROUND AT DESIGN RIDE HEIGHT.",
-        "RAILS RHS 150x50x3 WITH A CONTINUOUS RHS 100x50x3 RAISER (ONE COMPOSITE SECTION), 20 mm FLOOR BEARER STRIP. NO WELD ACROSS THE WIDTH OF A RAIL (TB 070).",
+        "RAILS RHS 150x50x3 WITH A CONTINUOUS RHS 100x50x3 RAISER (ONE COMPOSITE SECTION), 21 mm FLOOR BEARER STRIP. NO WELD ACROSS THE WIDTH OF A RAIL (TB 070).",
         "XT CROSSMEMBERS AND BODY END CROSSMEMBERS FULL RAIL HEIGHT, NO HOLES. OTHER CROSSMEMBERS AND ALL OUTRIGGERS AT RAISER HEIGHT, TOPS FLUSH WITH THE RAISER.",
         "BURR-GRIND THE WELD TOES ON THE RAIL AT EVERY FULL-HEIGHT CROSSMEMBER (FAT-01). HOT-DIP GALVANISE THE WHOLE FRAME AFTER WELDING, VENTED TO report 02 WLD-05.",
         "SEE CHASSIS.md FOR THE LOAD CASES, THE RESULTS AND WHAT THE ENGINEER MUST CHECK.",

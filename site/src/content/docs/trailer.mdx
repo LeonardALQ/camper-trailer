@@ -55,7 +55,7 @@ The 12 kWh battery moved to the back, under the garage floor between the rails, 
 The water tanks stay over the axles, so the towball barely changes as the water is used.
 
 The floor height comes from the running gear in report 06 and the trailer's own tyre from report 09. The tyre is
-{(ch.tyre_d).toFixed(1)} mm across, the hubs sit at {n(ch.hub_z)} mm, and the XT suspension rises 60 mm at full bump. With
+{n(ch.tyre_d)} mm across (Yokohama's published figure), the hubs sit at {n(ch.hub_z)} mm, and the XT suspension rises 60 mm at full bump. With
 50 mm of clearance above the tyre, the floor underside is at {n(ch.floor_underside_z)} mm and the garage floor surface
 at {n(ch.floor_z)} mm. The 3,048 mm ramp then sits at {(Math.asin(ch.floor_z / 3048) * 180 / Math.PI).toFixed(1)} degrees,
 and the travel height with the roof down is {n(ch.travel_height)} mm.

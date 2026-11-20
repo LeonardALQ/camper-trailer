@@ -1,12 +1,12 @@
 # Whole trailer: block layout (baseline)
 
-Status: concept, revision E, 20 Nov 2026. Revision E replaces the block chassis with the designed chassis and drawbar (CHASSIS.md, report 11), which is 73 kg heavier, and the axle re-solves from X 5,036 to 5,013. Revision D, updated on 19 Nov for the car's water tank, carries 200 L in the trailer's tanks fully loaded and the other 200 L in the car. Revision D gives the trailer its own wheels and tyres (report 09), because Porsche confirmed that none of its 18-inch wheels is rated for the trailer's load, and adds a full-size spare on the body's front wall. The car keeps its own 20-inch wheels and carries its own spare (report 10). Revision C moved the garage and bed module to the back of the body with a rear door (DESIGN.md revision D), so the living space is one room, and moved every heavy item towards the back so the towball stays inside the Cayenne's limits. Revision B put Cruisemaster's XT Air in place of the coil. Each block is an envelope with a mass, not a design. Items marked OPEN need the owner's decision. Positions marked PLACEHOLDER in the data are not designed yet. The data is `data/assemblies/trailer.yaml`, the load cases are in `data/load_cases.yaml`, the checks in `data/checks.yaml`, and the arithmetic is in `cad/trailer.py`. Drawing CT-001 is the general arrangement. Sources are research reports 02 and 06 to 11, and the owner's older block model for the item list and most masses. The chassis and drawbar are designed in CHASSIS.md.
+Status: concept, revision F, 20 Nov 2026. Revision F takes the tyre at Yokohama's published 752 mm diameter in place of the calculated 749.4 mm, which raises the floor 2.6 mm to Z 872 and restores the 50 mm clearance over the tyre. It also counts the corner steadies once: BD-10 is now the mud flaps only, because the chassis design carries the four corner steadies (CH-B01). The tare falls 17 kg to 2,634 kg and the axle re-solves from X 5,013 to 5,021. Revision E replaces the block chassis with the designed chassis and drawbar (CHASSIS.md, report 11), which is 73 kg heavier, and the axle re-solves from X 5,036 to 5,013. Revision D, updated on 19 Nov for the car's water tank, carries 200 L in the trailer's tanks fully loaded and the other 200 L in the car. Revision D gives the trailer its own wheels and tyres (report 09), because Porsche confirmed that none of its 18-inch wheels is rated for the trailer's load, and adds a full-size spare on the body's front wall. The car keeps its own 20-inch wheels and carries its own spare (report 10). Revision C moved the garage and bed module to the back of the body with a rear door (DESIGN.md revision D), so the living space is one room, and moved every heavy item towards the back so the towball stays inside the Cayenne's limits. Revision B put Cruisemaster's XT Air in place of the coil. Each block is an envelope with a mass, not a design. Items marked OPEN need the owner's decision. Positions marked PLACEHOLDER in the data are not designed yet. The data is `data/assemblies/trailer.yaml`, the load cases are in `data/load_cases.yaml`, the checks in `data/checks.yaml`, and the arithmetic is in `cad/trailer.py`. Drawing CT-001 is the general arrangement. Sources are research reports 02 and 06 to 11, and the owner's older block model for the item list and most masses. The chassis and drawbar are designed in CHASSIS.md.
 
 ## Datum
 
 Every position here is in the project datum from report 02 (DIM-01). X runs along the trailer from the coupling ball centre, positive rearward. Y runs across from the centreline, positive to the road (right) side. Z is up from the ground with the trailer level at design ride height. Units are mm and kg. This is a right-handed frame, so the 3D model, the STEP files and the drawings show the trailer as it is. DIM-01 changed to it on 20 Nov 2026 (report 02 note): before that, Y was positive to the kerb side and the model was a mirror image.
 
-The garage and bed module keeps its own frame, and its axes are the datum's. Module X 0, the rear face of partition A, sits at X 4,955 in the 5,500 mm body, and the garage floor (module Z 0) at Z 869. The module ends at the rear wall's inner face, X 7,285.
+The garage and bed module keeps its own frame, and its axes are the datum's. Module X 0, the rear face of partition A, sits at X 4,955 in the 5,500 mm body, and the garage floor (module Z 0) at Z 872. The module ends at the rear wall's inner face, X 7,285.
 
 ## Body
 
@@ -14,7 +14,7 @@ The body is 2,400 mm wide with 35 mm walls, so the inside is 2,330 mm. The inter
 
 The recommended body length is 5,500 mm. It is the shortest of the three compared that holds the living area, and the 5,000 mm body is 470 mm short (see Body length). The floor is flat for the whole length, level with the garage floor, because the ladder lands on the living-area floor at that level.
 
-The floor height follows from the running gear. The tyre is 749.4 mm across (LT245/70R16, calculated; Yokohama publishes 752 mm) and its static loaded radius is taken as 20 mm less than its free radius (estimate), which puts the hubs at Z 355. At full bump the XT rises 60 mm, so the tyre top reaches Z 789. With 50 mm clearance (estimate) the floor underside is at Z 839, and a 30 mm floor panel puts the floor surface at Z 869, 12 mm higher than with the shared 18-inch wheel. The 3,048 mm ramp then sits at 16.6 degrees, or 15.4 degrees with the air bags vented. Travel height to the top of the solar panels is 2,759 mm, roof down.
+The floor height follows from the running gear. The tyre is 752 mm across (LT245/70R16, Yokohama's published diameter) and its static loaded radius is taken as 20 mm less than its free radius (estimate), which puts the hubs at Z 356. At full bump the XT rises 60 mm, so the tyre top reaches Z 792. With 50 mm clearance (estimate) the floor underside is at Z 842, and a 30 mm floor panel puts the floor surface at Z 872, 14 mm higher than with the shared 18-inch wheel. The 3,048 mm ramp then sits at 16.6 degrees, or 15.5 degrees with the air bags vented. Travel height to the top of the solar panels is 2,762 mm, roof down.
 
 ## Zones, front to back
 
@@ -30,13 +30,13 @@ On the roof are four 400 W panels in two rows. The awning runs along the kerb si
 
 ## Running gear, coupling and drawbar
 
-The running gear is report 06's package with XT Air in place of the coil: a Cruisemaster XT Freestyle Air tandem, the 4,500 kg build, with standard arms, Firestone style 26 airbags, 12 inch ABS-enabled electric drums and Bosch TSC. The air kit's weight is not published, so the layout carries the coil kit's 180 kg (retailer figure) as an estimate, plus 10 kg for the air supply and 3 kg for a spare bag. The hubs sit 215 mm below the rail underside at ride height (Cruisemaster gives 205 to 230 mm for air), so the rail underside is at Z 570.
+The running gear is report 06's package with XT Air in place of the coil: a Cruisemaster XT Freestyle Air tandem, the 4,500 kg build, with standard arms, Firestone style 26 airbags, 12 inch ABS-enabled electric drums and Bosch TSC. The air kit's weight is not published, so the layout carries the coil kit's 180 kg (retailer figure) as an estimate, plus 10 kg for the air supply and 3 kg for a spare bag. The hubs sit 215 mm below the rail underside at ride height (Cruisemaster gives 205 to 230 mm for air), so the rail underside is at Z 571.
 
 The wheels, tyres and hubs are the trailer's own (report 09):
 
 - Hubs: Cruisemaster's LC6 pattern, 6 x 139.7 with 1/2 inch UNF x 41 mm knurled studs and a 93 mm spigot, on the 12 inch ABS-enabled A/T electric drum. It is one of Cruisemaster's standard patterns on 12 inch drums. Six-stud 6 x 139.7 is the pattern of most Australian utes and 4WDs, so a wheel can be found in a remote town.
 - Wheel: ROH Trak 2 16x7 +7 steel, 6 x 139.7, part 4116776, rated 1,250 kg in ROH's published table, 13.5 kg (estimate). A steel rim bent on a rock can usually be hammered back far enough to get home.
-- Tyre: Yokohama Geolandar A/T G015 LT245/70R16 118/115R, load range E, rated 1,320 kg at 80 psi, 19.3 kg (maker's figure). It is the tallest LT size that keeps the 830 mm axle spacing, with 80 mm between the tyres.
+- Tyre: Yokohama Geolandar A/T G015 LT245/70R16 118/115R, load range E, rated 1,320 kg at 80 psi, 19.3 kg (maker's figure). It is the tallest LT size that keeps the 830 mm axle spacing, with 78 mm between the tyres.
 - Offset and track: ET +7 with C/F 195 mm gives an effective C/F (C/F less ET) of 188 mm. Cruisemaster's C/F chart allows at most 200 mm for the 4,500 kg XT Air tandem. With the rails kept at 1,286 mm outer width, the track is 1,662 mm, and each tyre's inner sidewall sits 62 mm outside its rail.
 - Spare: a sixth wheel and tyre on the front wall, 32.8 kg, on two carrier posts from the body front crossmember (CHASSIS.md). The car carries its own 20-inch spare (report 10), so there are two spares.
 
@@ -46,7 +46,7 @@ Cruisemaster answered the supplier questions on 18 Nov: its ratings do not inclu
 
 At the 3,500 kg ATM with 221 kg on the ball, the 120 % rule needs 3,935 kg on the axle group, 1,968 kg per axle. The 4,500 kg XT Air build is rated 4,050 kg (2,025 kg per axle), 115 kg over what the rule needs. The figure is set by the plated ATM, so lighter mass estimates do not change it.
 
-What air changes, from report 06 section 2: the bags keep the bounce near 1.9 Hz at every load and the ride height the same as the load changes. Venting the bags at camp drops the floor about 60 mm for loading the bikes, which takes the ramp from 16.6 to 15.4 degrees. Do it only when parked. A loss of 3 to 4 psi a week is normal, the compressor filter wants checking every 3 months or 5,000 km, and the valves a rebuild every 2 years. A punctured bag cannot be repaired, so a spare bag travels with the trailer (RG-05). The air supply (RG-04) sits in the living area against partition A, on the heater, where it stays dry and out of the garage. The system wants its supply above 12.0 V, which the 12 kWh battery covers.
+What air changes, from report 06 section 2: the bags keep the bounce near 1.9 Hz at every load and the ride height the same as the load changes. Venting the bags at camp drops the floor about 60 mm for loading the bikes, which takes the ramp from 16.6 to 15.5 degrees. Do it only when parked. A loss of 3 to 4 psi a week is normal, the compressor filter wants checking every 3 months or 5,000 km, and the valves a rebuild every 2 years. A punctured bag cannot be repaired, so a spare bag travels with the trailer (RG-05). The air supply (RG-04) sits in the living area against partition A, on the heater, where it stays dry and out of the garage. The system wants its supply above 12.0 V, which the 12 kWh battery covers.
 
 The coupling is a Cruisemaster DO35 V3Plus with its coupling point at 440 mm, plus or minus 20 mm, at the car's Normal level (report 08). That height is set for the car's 20-inch tyres. The drawbar members run under the main rails, so the coupling end starts 150 mm below the rail underside. The DO35 hangs under a flat plate at the members' underside, and with its coupling point taken as 130 mm below that plate (assumption) it sits at Z 440 with no cranked drawbar. CHASSIS.md designs the drawbar.
 
@@ -54,19 +54,19 @@ The drawbar stays 1,820 mm from the ball to the body front. Revision B set that 
 
 ## Axle position
 
-The axle group centre is at X 5,013, solved so that the towball load is 221 kg fully loaded. That target is the highest towball load that keeps the car's rear axle within 1,600 kg with the planned 340 kg of gear in the car, capped at the 280 kg towball rating, and it re-solves when the car is weighed (see Measured inputs). The solve moves the axle group and everything tied to it, the tanks, their guards and the XT crossmembers, along X until the target is met. The garage stays at the back, because the rear wall fixes it. The solve never changes a block size or a limit.
+The axle group centre is at X 5,021, solved so that the towball load is 221 kg fully loaded. That target is the highest towball load that keeps the car's rear axle within 1,600 kg with the planned 340 kg of gear in the car, capped at the 280 kg towball rating, and it re-solves when the car is weighed (see Measured inputs). The solve moves the axle group and everything tied to it, the tanks, their guards and the XT crossmembers, along X until the target is met. The garage stays at the back, because the rear wall fixes it. The solve never changes a block size or a limit.
 
-The designed chassis (revision E) moved the axle forward from X 5,036 by 23 mm. It is 73 kg heavier than the block chassis, and on balance the added mass sits ahead of the axles: the 5 mm drawbar members, the outriggers under the living area, two bays of plan bracing ahead of the front tank and the front corner steadies. More weight ahead of the axles raises the towball, so the axle moves forward to bring it back to the target. The spare wheel on the front wall had moved the axle forward from X 5,088 in revision C.
+Revision F moved the axle back 7 mm from X 5,013. It replaced the 25 kg BD-10 line at the middle of the body, ahead of the axles, with 8 kg of mud flaps behind the rear wheels, so the towball fell and the axle moved aft to bring it back to the target. The designed chassis (revision E) had moved the axle forward from X 5,036 by 23 mm. It is 73 kg heavier than the block chassis, and on balance the added mass sits ahead of the axles: the 5 mm drawbar members, the outriggers under the living area, two bays of plan bracing ahead of the front tank and the front corner steadies. More weight ahead of the axles raises the towball, so the axle moves forward to bring it back to the target. The spare wheel on the front wall had moved the axle forward from X 5,088 in revision C.
 
-The bikes' combined centre of gravity is now 1,049 mm behind the axle centre. Taking them out removes their weight from behind the axles, so the towball rises: with the bikes out and the water full it would be 305 kg without ballast (TC4, see Ballast). That is why every heavy item moved aft.
+The bikes' combined centre of gravity is now 1,042 mm behind the axle centre. Taking them out removes their weight from behind the axles, so the towball rises: with the bikes out and the water full it would be 304 kg without ballast (TC4, see Ballast). That is why every heavy item moved aft.
 
-VSB1 5.1.1 asks for the front load space to be at least as long as the rear overhang (report 08). Here the axle sits 3,194 mm behind the body front and the overhang behind it is 2,307 mm, so the rule holds.
+VSB1 5.1.1 asks for the front load space to be at least as long as the rear overhang (report 08). Here the axle sits 3,201 mm behind the body front and the overhang behind it is 2,299 mm, so the rule holds.
 
 ## Ballast
 
-With the garage at the back, the cases without bikes carry more on the ball than the car allows. So the build carries a ballast line in the three cases without bikes (TC1, TC4 and TC5): the least mass, at the back of the garage (X 6,985, 300 mm in front of the rear wall, for example water containers or sandbags strapped to the rear track row), that keeps the towball at or under 280 kg on base weights. That is 63 kg, set by TC4, up from 59 kg in revision D because the axle moved forward. TC1, the tare case, needs none. The registration tare excludes the ballast.
+With the garage at the back, the cases without bikes carry more on the ball than the car allows. So the build carries a ballast line in the three cases without bikes (TC1, TC4 and TC5): the least mass, at the back of the garage (X 6,985, 300 mm in front of the rear wall, for example water containers or sandbags strapped to the rear track row), that keeps the towball at or under 280 kg on base weights. That is 62 kg, set by TC4. It was 59 kg in revision D and 63 kg in revision E. TC5 needs 56 kg. TC1, the tare case, needs none. The registration tare excludes the ballast.
 
-With the growth allowance the same cases need 183 kg (TC4), 177 kg (TC5) and 96 kg (TC1), which check BAL-01 reports. That is less than revision D's 218 kg, because the designed chassis is calculated (7 % growth allowance) where the block chassis was estimated (20 %). The towball with growth is still over 280 kg in those cases with the 63 kg aboard, and MAS-03 fails there. Carrying less water with the bikes out, or less gear at the front, cuts it.
+With the growth allowance the same cases need 181 kg (TC4), 175 kg (TC5) and 93 kg (TC1), which check BAL-01 reports. That is less than revision D's 218 kg, because the designed chassis is calculated (7 % growth allowance) where the block chassis was estimated (20 %). The towball with growth is still over 280 kg in those cases with the 62 kg aboard, and MAS-03 fails there. Carrying less water with the bikes out, or less gear at the front, cuts it.
 
 ## Load cases
 
@@ -74,17 +74,17 @@ Masses are in kg and CoG positions in mm. The loading kit (chocks, straps, ramp,
 
 | Case | What is aboard | Mass | CoG X | CoG Z | Towball | Towball % | Axle group | ATM margin | GTM margin | With growth | Towball with growth |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| TC1 | Tare as built, ballast 63 kg | 2,714 | 4,550 | 1,236 | 251 | 9.3 | 2,463 | +786 | +1,587 | 3,138 | 293 |
-| TC2 | Fully loaded: bikes, 200 L of water (the other 200 L in the car), gas, fuel and gear | 3,424 | 4,690 | 1,246 | 221 | 6.4 | 3,204 | +76 | +846 | 3,887 | 267 |
-| TC3 | Highway: as TC2 with 50 L of water | 3,274 | 4,677 | 1,274 | 220 | 6.7 | 3,055 | +226 | +995 | 3,737 | 266 |
-| TC4 | Bikes out, water full, ballast 63 kg | 3,298 | 4,588 | 1,188 | 280 | 8.5 | 3,018 | +202 | +1,032 | 3,758 | 327 |
-| TC5 | Bikes out, tanks empty, ballast 63 kg | 2,898 | 4,533 | 1,256 | 278 | 9.6 | 2,620 | +602 | +1,430 | 3,358 | 325 |
-| TC6 | Tuareg only, water full | 3,450 | 4,641 | 1,210 | 256 | 7.4 | 3,193 | +50 | +857 | 3,912 | 302 |
-| TC7 | Street Triple only, water full | 3,410 | 4,616 | 1,202 | 270 | 7.9 | 3,139 | +90 | +911 | 3,870 | 317 |
+| TC1 | Tare as built, ballast 62 kg | 2,695 | 4,553 | 1,242 | 251 | 9.3 | 2,444 | +805 | +1,606 | 3,116 | 292 |
+| TC2 | Fully loaded: bikes, 200 L of water (the other 200 L in the car), gas, fuel and gear | 3,408 | 4,696 | 1,251 | 221 | 6.5 | 3,187 | +92 | +863 | 3,866 | 267 |
+| TC3 | Highway: as TC2 with 50 L of water | 3,258 | 4,682 | 1,279 | 220 | 6.7 | 3,038 | +242 | +1,012 | 3,716 | 266 |
+| TC4 | Bikes out, water full, ballast 62 kg | 3,279 | 4,592 | 1,193 | 280 | 8.5 | 2,999 | +221 | +1,051 | 3,737 | 327 |
+| TC5 | Bikes out, tanks empty, ballast 62 kg | 2,879 | 4,536 | 1,262 | 278 | 9.6 | 2,602 | +621 | +1,448 | 3,337 | 324 |
+| TC6 | Tuareg only, water full | 3,432 | 4,646 | 1,214 | 256 | 7.5 | 3,177 | +68 | +873 | 3,892 | 302 |
+| TC7 | Street Triple only, water full | 3,392 | 4,621 | 1,207 | 270 | 8.0 | 3,122 | +108 | +928 | 3,850 | 317 |
 
-On base weights the towball stays between 220 and 280 kg in every case, inside the band from 6 % of the trailer's mass (205 kg fully loaded) to 280 kg from report 07. With growth it runs from 266 to 327 kg. Carrying one bike puts 256 or 270 kg on the ball, because the other bike's weight behind the axles is missing.
+On base weights the towball stays between 220 and 280 kg in every case, inside the band from 6 % of the trailer's mass (204 kg fully loaded) to 280 kg from report 07. With growth it runs from 266 to 327 kg. Carrying one bike puts 256 or 270 kg on the ball, because the other bike's weight behind the axles is missing.
 
-Fully loaded, the trailer's tanks carry 200 L of the owner's 400 L. The other 200 L rides in a tank in the car and tops up the trailer's tanks at camp, which keep their full capacity. That brings the fully loaded case to 3,424 kg, 76 kg under the 3,500 kg ATM on base weights. Every other case is under the ATM on base weights too, the heaviest being the Tuareg alone with 400 L at 3,450 kg, so they keep their water. The tanks sit just ahead of the axle centre, so the move barely changes the towball.
+Fully loaded, the trailer's tanks carry 200 L of the owner's 400 L. The other 200 L rides in a tank in the car and tops up the trailer's tanks at camp, which keep their full capacity. That brings the fully loaded case to 3,408 kg, 92 kg under the 3,500 kg ATM on base weights. Every other case is under the ATM on base weights too, the heaviest being the Tuareg alone with 400 L at 3,432 kg, so they keep their water. The tanks sit just ahead of the axle centre, so the move barely changes the towball.
 
 The car's rear axle, by report 07's load budget method: the car's DIN kerb mass of 2,085 kg with 54 % on the front axle (assumption), two adults of 160 kg 1.15 m behind the front axle, the rear seats out (50 kg), a 30 kg towbar, the car's own 30 kg spare flat on the boot floor 100 mm behind the rear axle (report 10), and the 221 kg towball 1.1 m behind the rear axle. That puts 1,365 kg on the rear axle before any gear, against its 1,600 kg limit, and 1,111 kg on the front. The car can then carry 340 kg of gear on the floor where the rear seats were before the rear axle binds (the GVM would bind at 364 kg). That is report 07's 385 kg less the 45 kg the spare costs. The 340 kg includes the car's water tank, about 215 kg: 200 L of water, about 12 kg of tank and 3 kg of pump and hose (estimates). It stands on the floor where the rear seats were, which leaves about 125 kg for other gear. It must be restrained properly, bolted to the rear-seat anchors or strapped to the boot tie-downs, and sized to report 03's load cases: 0.8 g forward, 0.5 g rearward and sideways, times 2 off road, so about 3.4 kN forward (estimate). With the ball 1.06 to 1.23 m behind the axle the rear axle carries 1,362 to 1,376 kg. With 280 kg on the ball (the bikes-out cases) the car can carry about 120 kg less gear, because each extra kilogram on the ball adds about 1.4 kg to the rear axle and each kilogram of gear adds about 0.7 kg. Weighbridge figures replace all of these assumptions.
 
@@ -92,15 +92,15 @@ The car itself stays on its 20-inch RS Spyder 9.5J x 20 ET47 wheels with Micheli
 
 ## Mass
 
-The tare is 2,650 kg without the ballast: chassis and drawbar 541, coupling and drawbar fittings 35, running gear 328, spare wheel 33, body 654, roof 90, under the floor 170, garage stowage 58 (generator, empty cylinders, regulator), living area 547 and the module 193. The chassis and drawbar lines are CHASSIS.md's designed members, plates, galvanising and bought parts.
+The tare is 2,634 kg without the ballast: chassis and drawbar 541, coupling and drawbar fittings 35, running gear 328, spare wheel 33, body 637, roof 90, under the floor 170, garage stowage 58 (generator, empty cylinders, regulator), living area 547 and the module 193. The chassis and drawbar lines are CHASSIS.md's designed members, plates, galvanising and bought parts, including the four corner steadies. The body's BD-10 line is the two mud flaps behind the rear wheels, 4 kg each (estimate: a 600 x 450 x 6 mm rubber flap at 1,500 kg/m3 is 2.4 kg, plus about 1.6 kg for its hanger bracket and bolts), until the body research names a product.
 
-The trailer fails its mass checks with the growth allowance, but on base weights every case is under the ATM. Fully loaded with 200 L in the trailer's tanks it weighs 3,424 kg, 76 kg under the 3,500 kg ATM before any allowance. With the allowance it weighs 3,887 kg, 387 kg over, and the heaviest case with growth is the Tuareg alone with 400 L, 3,912 kg (MAS-01 and MAS-08). The fully loaded axle group carries 3,620 kg with growth, which is 120 kg over the NSW examiner's 3,500 kg GTM cap. MAS-02 checks 1.2 times that load, 4,344 kg, which is 294 kg over the kit's 4,050 kg GTM. Each tyre and wheel then has to carry 1,086 kg under the 120 % rule, which the 1,320 kg tyre and the 1,250 kg wheel both cover. No body length passes with growth.
+The trailer fails its mass checks with the growth allowance, but on base weights every case is under the ATM. Fully loaded with 200 L in the trailer's tanks it weighs 3,408 kg, 92 kg under the 3,500 kg ATM before any allowance. With the allowance it weighs 3,866 kg, 366 kg over, and the heaviest case with growth is the Tuareg alone with 400 L, 3,892 kg (MAS-01 and MAS-08). The fully loaded axle group carries 3,600 kg with growth, which is 100 kg over the NSW examiner's 3,500 kg GTM cap. MAS-02 checks 1.2 times that load, 4,320 kg, which is 270 kg over the kit's 4,050 kg GTM. Each tyre and wheel then has to carry 1,080 kg under the 120 % rule, which the 1,320 kg tyre and the 1,250 kg wheel both cover. No body length passes with growth.
 
-The water is the largest single variable, at 1 kg per litre. With growth it cannot be met by water alone, because the allowance (463 kg) is larger than the 200 L left in the trailer's tanks. The allowance shrinks as estimates become maker figures and weighed parts (0 %). These five lines carry the largest allowances. The towball change is for the line coming out 20 % heavier, fully loaded.
+The water is the largest single variable, at 1 kg per litre. With growth it cannot be met by water alone, because the allowance (458 kg) is larger than the 200 L left in the trailer's tanks. The allowance shrinks as estimates become maker figures and weighed parts (0 %). These five lines carry the largest allowances. The towball change is for the line coming out 20 % heavier, fully loaded.
 
 | Line | Mass | Growth allowance | CoG X | Towball change at +20 % |
 |---|---|---|---|---|
-| RG-01 XT Air kit (4 arms with bags, hubs and brakes), the air kit's weight not published | 180 | 36 | 4,864 | +1 kg |
+| RG-01 XT Air kit (4 arms with bags, hubs and brakes), the air kit's weight not published | 180 | 36 | 4,871 | +1 kg |
 | UF-04 lithium battery, 12 kWh | 110 | 22 | 6,885 | -8 kg |
 | BD-01 floor panel, 8.0 kg/m2 from the older model | 106 | 21 | 4,570 | +2 kg |
 | LA-01 wet bathroom, 1 x 1 m | 100 | 20 | 4,435 | +2 kg |
@@ -120,13 +120,13 @@ OPEN, the mass. These are the levers, with their size. The first is taken for th
 
 | Body | Living area | Living area needs | Spare | Axle from ball | Bikes behind the axle | Tare | Fully loaded | With growth | Ballast (with growth) |
 |---|---|---|---|---|---|---|---|---|---|
-| 5,000 | 2,580 | 3,050 | -470 | 4,694 | 869 | 2,574 | 3,348 | 3,802 | 41 (163) |
-| 5,500 (recommended) | 3,080 | 3,050 | +30 | 5,014 | 1,049 | 2,650 | 3,424 | 3,887 | 63 (183) |
-| 6,000 | 3,580 | 3,050 | +530 | 5,357 | 1,206 | 2,712 | 3,486 | 3,956 | 78 (199) |
+| 5,000 | 2,580 | 3,050 | -470 | 4,701 | 862 | 2,557 | 3,331 | 3,782 | 39 (162) |
+| 5,500 (recommended) | 3,080 | 3,050 | +30 | 5,021 | 1,042 | 2,634 | 3,408 | 3,866 | 62 (181) |
+| 6,000 | 3,580 | 3,050 | +530 | 5,365 | 1,198 | 2,695 | 3,469 | 3,936 | 76 (197) |
 
 The garage is the same in each body, so only the living area changes. It needs 3,050 mm for every item and keep-clear space. Only the 5,500 and 6,000 mm bodies hold it. The 5,000 mm body is 470 mm short, and nothing is dropped to make it fit. Leaving the chest freezer out saves 360 mm, which still leaves it 110 mm short.
 
-What each length does to the towball: the solve puts 221 kg on the ball fully loaded in every body. A longer body puts the garage further behind the axles (869, 1,049 and 1,206 mm), so the cases with fewer bikes rise more: one bike gives 252 to 266 kg in the 5,000 mm body, 256 to 270 kg in the 5,500 mm body and 259 to 274 kg in the 6,000 mm body, and the ballast for the cases without bikes grows from 41 to 63 to 78 kg. The 6,000 mm body also adds 62 kg of tare. With 200 L in the trailer every body meets the ATM fully loaded on base weights.
+What each length does to the towball: the solve puts 221 kg on the ball fully loaded in every body. A longer body puts the garage further behind the axles (862, 1,042 and 1,198 mm), so the cases with fewer bikes rise more: one bike gives 252 to 265 kg in the 5,000 mm body, 256 to 270 kg in the 5,500 mm body and 259 to 273 kg in the 6,000 mm body, and the ballast for the cases without bikes grows from 39 to 62 to 76 kg. The 6,000 mm body also adds 61 kg of tare. With 200 L in the trailer every body meets the ATM fully loaded on base weights.
 
 ## Chassis inputs
 
@@ -135,13 +135,13 @@ The chassis and drawbar are designed in CHASSIS.md from research report 11, with
 | Input | Value |
 |---|---|
 | Rail outer width at the XT hinges | 1,286 mm. With C/F 195 (input SUP-04) and ET +7 it gives a 1,662 mm track. Cruisemaster's minimum is 1,150 mm |
-| Rail underside, rail top, raiser top, floor underside | Z 570, 720, 820 and 839 (a 20 mm bearer strip on the raiser) |
-| Axle group centre | X 5,013. Hubs at X 4,598 and 5,428. XT front hinge crossmember rear face X 4,180, rear shock crossmember front face X 5,790 |
+| Rail underside, rail top, raiser top, floor underside | Z 571, 721, 821 and 842 (a 21 mm bearer strip on the raiser) |
+| Axle group centre | X 5,021. Hubs at X 4,606 and 5,436. XT front hinge crossmember rear face X 4,187, rear shock crossmember front face X 5,797 |
 | Coupling | DO35 V3Plus under-mounted, coupling point at Z 440 |
 | Overall length | 7,380 mm, coupling head to body rear |
 | Overall width | 2,500 mm with the awning |
-| Travel height | 2,759 mm, roof down |
-| CoG for the roll and track check | Fully loaded X 4,690, Z 1,246 (1,260 with growth), 891 mm above the hub centres. Every case is in the load case table |
+| Travel height | 2,762 mm, roof down |
+| CoG for the roll and track check | Fully loaded X 4,696, Z 1,251 (1,265 with growth), 895 mm above the hub centres. Every case is in the load case table |
 
 The floor over the axles is supported at every station by the outriggers at the XT centre and rear shock crossmembers, which the tyre clears by 88.6 mm through its full travel. So the floor spans 557 mm from the raiser to the body edge between supports at most 830 mm apart. The chocks take the bikes' braking push, about 330 kgf for the Tuareg (RES-01).
 
@@ -155,16 +155,16 @@ The whole-trailer checks are in `data/checks.yaml` under `trailer_checks`. The t
 
 | ID | Check | Result |
 |---|---|---|
-| MAS-01 | Mass with growth within the 3,500 kg ATM | FAIL, 3,912 kg Tuareg only (3,887 kg fully loaded) |
-| MAS-02 | Axle group with growth, times 1.2 because Cruisemaster's ratings do not include the 120 % rule, within the kit's 4,050 kg GTM | FAIL, 4,344 kg fully loaded |
+| MAS-01 | Mass with growth within the 3,500 kg ATM | FAIL, 3,892 kg Tuareg only (3,866 kg fully loaded) |
+| MAS-02 | Axle group with growth, times 1.2 because Cruisemaster's ratings do not include the 120 % rule, within the kit's 4,050 kg GTM | FAIL, 4,320 kg fully loaded |
 | MAS-03 | Towball never above 280 kg, with and without growth | FAIL with growth, 327 kg bikes out with water full (280 kg on base weights) |
-| MAS-04 | Towball at least 6 % in every case | PASS, 6.4 % fully loaded |
+| MAS-04 | Towball at least 6 % in every case | PASS, 6.5 % fully loaded |
 | MAS-05 | Towball within 10 kg of the 221 kg target fully loaded | PASS, 221 kg |
-| MAS-06 | Tyre load with VSB1's 120 % rule within the tyre's 1,320 kg | PASS, 1,086 kg with growth fully loaded |
-| MAS-07 | Axle group with growth within the NSW GTM cap (3,500 kg) | FAIL, 3,620 kg fully loaded |
-| MAS-08 | Mass with growth within the NSW ATM cap (3,500 kg) | FAIL, 3,912 kg Tuareg only |
-| MAS-09 | Wheel rating covers the same per-wheel load with growth | PASS, 1,086 kg against 1,250 kg |
-| BAL-01 | Ballast at the back of the garage to tow with no bikes, with growth (reported) | 183 kg (63 kg on base weights, carried) |
+| MAS-06 | Tyre load with VSB1's 120 % rule within the tyre's 1,320 kg | PASS, 1,080 kg with growth fully loaded |
+| MAS-07 | Axle group with growth within the NSW GTM cap (3,500 kg) | FAIL, 3,600 kg fully loaded |
+| MAS-08 | Mass with growth within the NSW ATM cap (3,500 kg) | FAIL, 3,892 kg Tuareg only |
+| MAS-09 | Wheel rating covers the same per-wheel load with growth | PASS, 1,080 kg against 1,250 kg |
+| BAL-01 | Ballast at the back of the garage to tow with no bikes, with growth (reported) | 181 kg (62 kg on base weights, carried) |
 | CAR-01 | Car's rear axle before gear, with its own spare (reported) | 1,365 kg against 1,600 kg |
 | CAR-07 | Towball scale against the model (reported) | Not measured yet |
 | FIT-01 | Living area holds its items and keeps its landings and walkway clear | PASS |
@@ -173,7 +173,7 @@ The whole-trailer checks are in `data/checks.yaml` under `trailer_checks`. The t
 | FIT-04 | Kerb-strip stowage holds the generator and the jerry cans | PASS |
 | FIT-05 | Tyres swung through their full travel keep 50 mm from every chassis member | PASS, 62.5 mm to the kerb-side rail |
 | DIM-01 | Width with the awning within 2,500 mm | PASS, 2,500 mm |
-| DIM-02 | Front load space not shorter than the rear overhang | PASS, 3,194 against 2,307 mm |
+| DIM-02 | Front load space not shorter than the rear overhang | PASS, 3,201 against 2,299 mm |
 | DIM-03 | Coupling height inside 350 to 460 mm with its tolerance | PASS, 420 to 460 mm |
 | DIM-04 | Running clearance at least 100 mm | PASS, 380 mm at the coupling head |
 | JK-01 | Body corners and the spare wheel at a 90 degree jack-knife | PASS, 540 mm at the spare wheel |
@@ -199,7 +199,9 @@ The Tuareg measured 585 mm across its side panels at the Street Triple's bar end
 
 The bed beams span the 2,330 mm interior width as SHS 50x50x3 (DESIGN.md). BED-01 reports 5.7 mm of sag under 255 kg spread over the bed, at a bending stress of 18 MPa.
 
-## What changed from revisions C and D
+## What changed from revisions C to E
+
+Revision F, 20 Nov 2026, makes two fixes. The tyre is now Yokohama's published 752 mm diameter everywhere, in place of the calculated 749.4 mm. The hubs rose from Z 355 to Z 356 and the floor from Z 869 to Z 872, so the floor is again 50 mm above the tyre at full bump (it was 48.7 mm against the published diameter). The rails and the raisers rose with the hubs, so the floor bearer strip grew from 20 to 21 mm (50 x 21 mm). The ramp is now 15.5 degrees with the bags vented. BD-10 is now the two mud flaps only, 8 kg (estimate). Its old 25 kg also covered corner legs, which the chassis design already carries as the four corner steadies (CH-B01), so they were counted twice. The tare fell from 2,650 to 2,634 kg, the axle moved from X 5,013 to 5,021, and the ballast fell from 63 to 62 kg on base weights and from 183 to 181 kg with growth. Fully loaded, the trailer is 92 kg under the ATM on base weights. No check changed state.
 
 Revision E replaces the block chassis and drawbar with the designed ones from CHASSIS.md. They weigh 576 kg against the blocks' 503 kg, but their steel is calculated rather than estimated, so they carry less growth allowance. The tare grew from 2,577 to 2,650 kg, the axle moved from X 5,036 to 5,013, and the ballast for the cases without bikes grew from 59 to 63 kg on base weights and fell from 218 to 183 kg with growth. Fully loaded, the trailer is 76 kg under the ATM on base weights. FIT-05 now swings each tyre through its travel against every chassis member.
 
@@ -220,7 +222,7 @@ The plan uses these values now. Each comes from the source named, and each is re
 | Wheel weight | 13.5 kg (RG-06, SP-02) | Estimated from ROH's 14.3 to 14.4 kg for the 16x8 Trak D (report 09 section 6) |
 | Wheel centre bore | 93 mm or more, so the wheel goes over the 93 mm spigot | Report 09 section 3 |
 | Wheel rating | 1,250 kg (WHL-01), holding at the 80 psi of a load range E tyre | ROH's published table |
-| Tyre | 1,320 kg, 19.3 kg, 749.4 mm diameter | Yokohama Australia and its size table (report 09 section 2) |
+| Tyre | 1,320 kg, 19.3 kg, 752 mm diameter | Yokohama Australia's published figures (report 09 section 2) |
 | Spare carrier | Two SHS 50 x 50 x 2.5 posts bolted to the body front crossmember and tied to the wall, designed in CHASSIS.md | Report 11 section 6.4 |
 | Air kit mass | 180 kg for the four XT Air arms with bags, hubs and brakes | The coil kit's retailer figure (report 06) |
 | Kit GTM | 4,050 kg (SUP-01), and the ratings exclude the 120 % rule (SUP-02) | Cruisemaster's published table and its answer of 18 Nov |
@@ -233,7 +235,7 @@ The plan uses these values now. Each comes from the source named, and each is re
 | Bumper and ball | The car's rear corner is 980 mm behind its rear axle and the ball 1,060 to 1,230 mm behind it (CAR-05) | Reports 07 and 08 |
 | Bike measurements | Peg widths, screen and mirror heights, Tuareg length and pannier position as in `data/measurements.yaml` | Owner's figures and report 05 |
 | Growth allowance | Estimate +20 %, calculated +7 %, spec 0 % | Report 02 MASS-06 |
-| Arm pivot | 23 mm ahead of the hinge crossmember's rear face and 99 mm below the rail underside (X 4,156 and 4,986, Z 471), ±10 mm. The tyre swings about it through ±60 mm | Scaled from Cruisemaster's drawing 33XT AIR sheet 2 (report 11 section 5.1) |
+| Arm pivot | 23 mm ahead of the hinge crossmember's rear face and 99 mm below the rail underside (X 4,164 and 4,994, Z 472), ±10 mm. The tyre swings about it through ±60 mm | Scaled from Cruisemaster's drawing 33XT AIR sheet 2 (report 11 section 5.1) |
 | Raiser-level outriggers | Outriggers at raiser height at the XT centre and rear shock crossmembers are acceptable to Cruisemaster, whose note asks for full rail height | Report 11 section 5 and open question 2, read as aimed at members that carry suspension loads |
 | XT crossmembers | RHS 150 x 50 x 3 suits the 4,500 kg XT Air build, although TB 070's table stops at 4,450 kg | TB 070 (report 11 section 1.3). Fallback 150 x 50 x 4 |
 | DO35 coupling offset | The coupling point sits 130 mm below the plate the DO35 is under-mounted on, so it is at Z 440 | Report 11 section 6.4, report 08 open question 4. Measure a DO35 |
@@ -247,7 +249,7 @@ The plan uses these values now. Each comes from the source named, and each is re
 
 These are design decisions for the owner.
 
-1. The mass with growth: which of the remaining levers in Mass to use. On base weights it is answered for the fully loaded case, which carries 200 L in the trailer and 200 L in the car, 76 kg under the ATM.
+1. The mass with growth: which of the remaining levers in Mass to use. On base weights it is answered for the fully loaded case, which carries 200 L in the trailer and 200 L in the car, 92 kg under the ATM.
 2. The ballast with the bikes out: what it is (water, sand, tools) and where it is strapped, or whether less water and gear make it unnecessary.
 3. Steel or alloy trailer wheels, and LT245/70R16 or LT225/75R16 tyres (report 09 open questions 1 and 2).
 4. The track: 1,662 mm on the present rails, or wider for roll stability with a wider rail, since the effective C/F cannot pass 200 mm.

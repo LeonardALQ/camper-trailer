@@ -30,17 +30,14 @@ params:
   floor_t: 30                # floor panel, as the module's floor (assumption until the body design)
   roof_t: 40                 # roof panel (older block model)
   # ---------------------------------------------------------------- running gear (report 06, wheels and tyres report 09)
-  tyre_section: 245          # Yokohama Geolandar A/T G015 LT245/70R16 118/115R, load range E (report 09)
-  tyre_aspect: 0.70
-  rim_in: 16                 # ROH Trak 2 16x7 +7 steel wheel (report 09)
-  tyre_d: rim_in * 25.4 + 2 * tyre_aspect * tyre_section     # 749.4 mm, calculated (752 mm published for the G015)
+  tyre_d: 752                # Yokohama Geolandar A/T G015 LT245/70R16 118/115R on the ROH Trak 2 16x7, Yokohama's published diameter (report 09 section 2)
   tyre_w: 251                # tyre envelope width, the widest published figure for the size (report 09)
   slr_deflection: 20         # static loaded radius = free radius less 20 mm (estimate, report 06 section 7)
   hub_z: tyre_d / 2 - slr_deflection
   hub_below_rail: 215        # Cruisemaster XT standard arm at ride height: air 205 to 230 (coil 215 +/- 60), spec
   bump_travel: 60            # XT bump travel (spec)
   tyre_clearance: 50         # tyre at full bump to the floor underside (estimate, report 06 open question 9)
-  axle_spacing: 830          # tyres up to 760 mm (spec). 80 mm between the 749 mm tyres
+  axle_spacing: 830          # tyres up to 760 mm (spec). 78 mm between the 752 mm tyres
   wheel_offset: 7            # ET +7 on the ROH Trak 2 16x7 (spec, report 09)
   cf: 195                    # hub face from the rail outside face, C/F (measurements.yaml SUP-04). Effective C/F (C/F - ET) at most 200 mm
   car_track: 1660            # Cayenne track used in report 06 (estimate), for comparison only
@@ -257,10 +254,12 @@ items:
     point: [body_x0 + body_length / 2, 0, floor_z + 1300]
     mass: {basis: declared, total_kg: 50, maturity: estimate, source: "Older block model (6.0 m body)"}
   - id: BD-10
-    name: Corner legs and mud flaps
+    name: Mud flap behind the rear wheel
     system: body
-    point: [body_x0 + body_length / 2, 0, rail_underside_z]
-    mass: {basis: declared, total_kg: 25, maturity: estimate, source: "Older block model: stone guard, legs and mud flaps 40 kg, split 15 in DB-04 and 25 here"}
+    for: {s: [1, -1]}
+    point: [axle_x + rear_hub_dx + tyre_d / 2 + 60, s * hub_y, 400]
+    mass: {basis: declared, unit_kg: 4, maturity: estimate, source: "Estimate: a 600 x 450 x 6 mm rubber flap at 1,500 kg/m3 is 2.4 kg, plus about 1.6 kg for its hanger bracket and bolts. The body research supplies a product later"}
+    note: The corner legs are the four ARK DDS650 corner steadies in the chassis design (CH-B01, CHASSIS.md).
   - id: BD-11
     name: Wiring, plumbing, lighting and hardware
     system: body

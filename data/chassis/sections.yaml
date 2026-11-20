@@ -183,7 +183,7 @@ sections:
       C_e3mm3: 37.2
       mass_kg_per_m: 9.07
       result: match to published rounding
-    use: "Raiser alternative: 127 mm tall puts the raiser top 7 mm above today's floor underside (Z 839), so the floor would rise about 7 mm."
+    use: "Raiser alternative: 127 mm tall puts the raiser top 6 mm above today's floor underside (Z 842), so the floor would rise about 6 mm."
   - id: RHS_125x50x3
     designation: "RHS 125x50x3"
     shape: RHS
@@ -239,7 +239,7 @@ sections:
     alt_fy_mpa: 350
     source: "Computed from AS/NZS 1163 geometry (not checked against a published table)"
     published_check: null
-    use: "Raiser on each main rail (recommended start), continuously welded, plus a 20 mm floor bearer or isolation strip to reach Z 839. Intermediate crossmembers under the living area (model block size)."
+    use: "Raiser on each main rail (recommended start), continuously welded, plus a 21 mm floor bearer or isolation strip to reach Z 842. Intermediate crossmembers under the living area (model block size)."
   - id: RHS_100x50x4
     designation: "RHS 100x50x4"
     shape: RHS

@@ -30,7 +30,7 @@ galvanising:
 params:
   rail_y: rail_c                              # rail centreline from the trailer centreline
   raiser_top_z: rail_top_z + 100              # 100 x 50 x 3 raiser on the rail
-  strip_t: floor_underside_z - raiser_top_z   # floor bearer strip up to the floor underside (about 20 mm)
+  strip_t: floor_underside_z - raiser_top_z   # floor bearer strip up to the floor underside (21 mm)
   outrigger_root_y: rail_c + rail_w / 2       # the raiser's outer face
   outrigger_tip_y: half_bw                    # the body edge
   db_z: rail_underside_z - db_depth / 2       # drawbar member centroid, the members run under the rails
@@ -48,7 +48,6 @@ params:
   pivot_below: 99                             # crossmember's rear face and 99 mm below the rail underside
   arm_r: 456                                  # pivot to hub at ride: 441 mm along X, 116 mm down
   arm_drop: 116
-  tyre_d_published: 752                       # Yokohama's published diameter for the swept-arc check
   travel: 60
   max_element: 250                            # longest frame element
 
@@ -108,8 +107,8 @@ fittings:
      at: [steady_front_x, 0, rail_underside_z - 20], side_y: rail_c, rear_x: steady_rear_x}
   - {id: CH-P11, plane: xz, name: "Jockey wheel bracket plate, 8 mm, bolted to the kerb-side member", kind: plate, l: 200, w: 160, t: 8, qty: 1,
      at: [jockey_x, "-(db_apex_y + (rail_c - db_apex_y) * (jockey_x - db_apex_x) / (body_x0 - db_apex_x)) - 90", db_z]}
-  - {id: CH-S01, name: "Floor bearer strip on the raisers, outriggers and floor crossmembers, 50 x 20 mm EPDM-faced HDPE", kind: strip, kg_per_m: 1.0,
-     maturity: estimate, source: "Estimate: HDPE at 960 kg/m3 for 50 x 20 mm, rounded up for the EPDM face and fixings"}
+  - {id: CH-S01, name: "Floor bearer strip on the raisers, outriggers and floor crossmembers, 50 x 21 mm EPDM-faced HDPE", kind: strip, kg_per_m: 1.0,
+     maturity: estimate, source: "Estimate: HDPE at 960 kg/m3 for 50 x 21 mm, with the EPDM face and fixings"}
   # bought parts on the drawbar (they replace the DB-03 block)
   - {id: DB-03, name: "Cruisemaster DO35 V3Plus coupling, with the integrated handbrake", kind: bought, mass_kg: 9.5, maturity: estimate,
      source: "Estimate: Cruisemaster does not publish the mass. Retailers list the DO35 V3 at about 8 to 10 kg", at: [80, 0, "coupling_z + 40"],

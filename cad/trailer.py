@@ -588,9 +588,8 @@ class Trailer:
         o = tyre_clearance(ch, others, w)
         who = f"tyre {t['tyre']} at {t['travel_mm']:+.0f} mm travel to {t['member']}"
         return dict(gap_mm=t["gap_mm"], governing=who, body_gap_mm=o["gap_mm"], body_governing=o["member"],
-                    detail=(f"{t['gap_mm']:.1f} mm, {who}. The {lay.V['tyre_d']:.0f} mm calculated tyre set the floor height; with "
-                            f"Yokohama's published {ch.V['tyre_d_published']:.0f} mm the tyre comes {o['gap_mm']:.1f} mm from the "
-                            f"{o['member']} at {o['travel_mm']:+.0f} mm travel"))
+                    detail=(f"{t['gap_mm']:.1f} mm, {who}. With Yokohama's published {lay.V['tyre_d']:.0f} mm diameter the "
+                            f"tyre comes {o['gap_mm']:.1f} mm from the {o['member']} at {o['travel_mm']:+.0f} mm travel"))
     def layout(self, **over) -> Layout:
         lay = Layout(self.td, self.mod, self.prj, {**self.base, **over})
         self.weighed_rows = lay.apply_weighed(self.weighed)
