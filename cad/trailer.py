@@ -209,7 +209,7 @@ class Layout:
             if mass is not None:
                 self._mass(b, mass, it, dims, local)
             if "parts" in it:
-                self._parts(b, it["parts"])
+                self._parts(b, [dict(p, kg=self.P.eval(p["kg"], local)) for p in it["parts"]])
             out.append(b)
         return out
 
@@ -218,7 +218,7 @@ class Layout:
         """A line made of bought and made parts, each with its own mass basis (report 13): maker and retailer figures
         are spec (0 % growth), calculated 7 % and estimates 20 % (MASS-06)."""
         mat = {"maker": "spec", "retailer": "spec", "spec": "spec", "calculated": "calculated", "estimate": "estimate"}
-        rows = [dict(item=p["item"], kg=float(p["kg"]), maturity=mat[p["basis"]], source=p.get("source", "")) for p in parts]
+        rows = [dict(item=p["item"], kg=float(p["kg"]), maturity=mat[p["basis"]], source=p.get("source", "")) for p in parts if float(p["kg"]) > 0]
         b.mass_kg = sum(r["kg"] for r in rows)
         b.basis, b.qty, b.unit_mass = "declared", 1, b.mass_kg
         b.growth_frac = sum(r["kg"] * GROWTH[r["maturity"]] for r in rows) / b.mass_kg if b.mass_kg else 0.0
@@ -591,6 +591,7 @@ class Trailer:
         self.target_case = next(c for c in self.cases if c.towball_target)
         self.analyse_chassis = True
         self._chassis = None
+        self._body = None
 
     def chassis_model(self, lay):
         return lay.chassis
@@ -602,6 +603,13 @@ class Trailer:
             ch = self.chassis_model(lay)
             self._chassis = (lay, ch, Analysis(lay, self, ch).run())
         return self._chassis[2]
+
+    def body_results(self, lay) -> dict:
+        """The body checks for this layout (cad/body.py, BODY.md), run once."""
+        if self._body is None or self._body[0] is not lay:
+            from .body import Body
+            self._body = (lay, Body(lay, self).results())
+        return self._body[1]
 
     def tyre_arc(self, lay) -> dict:
         """FIT-05: each tyre swung about its arm pivot through its travel (report 11 section 5), against every chassis
@@ -848,6 +856,11 @@ class Trailer:
                 row.update(limit=f">= {c.min_gap_mm:g} mm to every chassis member", measured=round(t["gap_mm"], 1), unit="mm",
                            margin=round(t["gap_mm"] - c.min_gap_mm, 1), ok=t["gap_mm"] >= c.min_gap_mm - 1e-6, governing=t["governing"],
                            detail=t["detail"], tyre=t)
+            elif c.type.startswith("body_"):
+                if not self.analyse_chassis:
+                    continue
+                from .body import check_row
+                row.update(check_row(c, self.body_results(lay)))
             elif c.type.startswith("chassis_"):
                 if not self.analyse_chassis:
                     continue

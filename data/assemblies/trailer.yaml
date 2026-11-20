@@ -97,9 +97,10 @@ params:
   part_a_x: module_x0 - mod_partition_t                          # front face of partition A
   ladder_x0: module_x0 + mod_ladder_x0
   # ---------------------------------------------------------------- living area layout
-  lz_door_x: in_x0 + 1500    # entry door opening, kerb-side wall, behind the kitchen (PLACEHOLDER)
-  lz_door_w: 700
-  lz_door_h: 1700
+  lz_kitchen_x: body_x0 + 150   # kitchen slide-out opening 150 mm from the front corner (report 12 section 5)
+  lz_door_x: lz_kitchen_x + lz_kitchen_l + 305   # entry door, 300 mm of full wall behind the kitchen opening (report 12 section 5)
+  lz_door_w: 622             # Aussie Traveller DC door (report 12 section 7)
+  lz_door_h: 1623
   lz_kitchen_l: 1500         # kitchen slide-out and the wardrobe over it (older block model)
   # ---------------------------------------------------------------- water
   water_full_l: 400          # owner's wanted capacity
@@ -214,81 +215,109 @@ items:
     point: [body_x0 - spare_bracket_d - tyre_w / 2, 0, spare_z]
     mass: {basis: declared, total_kg: 13.5, maturity: estimate, source: "As RG-06 (report 09 section 6)"}
 
-  # ================================================================ body shell (masses per area from the older block model)
+  # ================================================================ body shell (BODY.md, research report 12 section 10)
   - id: BD-01
-    name: Floor panel
+    name: Floor, 30 mm woven roving and Divinycell H80 sandwich, one piece, with hardpoint strips and vinyl
     system: body
     box: [body_x0, -half_bw, floor_underside_z, body_length, body_width, floor_t]
-    mass: {basis: per_area, kg_per_m2: 8.0, measure: dx * dy, maturity: estimate, source: "Older block model: 115 kg for a 6.0 x 2.4 m floor"}
+    parts:
+      - {item: "Floor panel, 13.2 m2 at 8.92 kg/m2 (two 3.22 kg/m2 woven roving skins, 2.08 kg/m2 of H80, 0.4 kg/m2 of adhesive)", kg: 117.7, basis: calculated, source: "Report 12 sections 2 and 10"}
+      - {item: "Hardpoint strips, pultruded GRP 50 x 26 mm solid, 4.3 m under the two L-track rows at 2.5 kg/m", kg: 10.6, basis: calculated, source: "BODY.md, density 1,900 kg/m3"}
+      - {item: "Vinyl over the 7.2 m2 living area at 1.5 kg/m2", kg: 10.8, basis: estimate}
   - id: BD-02
-    name: Roof panel (pop-top roof designed later)
+    name: Raising roof lid, 40 mm GRP and XPS sandwich, flat top skin under the solar array
     system: body
     box: [body_x0, -half_bw, ceiling_z, body_length, body_width, roof_t]
-    mass: {basis: per_area, kg_per_m2: 5.56, measure: dx * dy, maturity: estimate, source: "Older block model: 80 kg for a 6.0 x 2.4 m roof"}
+    parts:
+      - {item: "Lid panel, 13.2 m2 less 0.51 m2 for the Midi Heki and Mini Heki at the lid's ends, at 7.0 kg/m2", kg: 88.8, basis: calculated, source: "Report 12 section 10, report 13 section 4"}
+      - {item: Insert strips for the latches, lifters and hatches, kg: 2.0, basis: estimate}
   - id: BD-03
-    name: Side wall
+    name: Side walls, 35 mm GRP and XPS sandwich, one piece each
     system: body
     for: {s: [1, -1]}
     box: [body_x0, s * (half_bw - wall_t / 2) - wall_t / 2, floor_z, body_length, wall_t, interior_h]
-    mass: {basis: per_area, kg_per_m2: 5.0, measure: dx * dz, maturity: estimate, source: "Older block model: 69 kg for a 6.0 x 2.3 m wall. Door openings are not taken off"}
+    parts:
+      - {item: "Half of 19.8 m2 less 2.58 m2 of openings (no gas hatch), at 6.0 kg/m2", kg: 51.7, basis: calculated, source: "Report 12 section 10, less the 0.42 m2 gas hatch, plus the 0.08 m2 bathroom vent"}
+      - {item: Insert strips (half of 6 kg), kg: 3.0, basis: estimate}
   - id: BD-04
-    name: End wall
+    name: End walls and the rear portal
     system: body
     for: {e: [0, 1]}
     box: [body_x0 + e * (body_length - end_wall_t), -half_in, floor_z, end_wall_t, 2 * half_in, interior_h]
-    mass: {basis: per_area, kg_per_m2: 5.0, measure: dy * dz, maturity: estimate, source: "Older block model wall panel rate"}
+    parts:
+      - {item: "Front wall 3.87 m2 at 6.7 kg/m2 (2.0 mm outer skin) or rear wall 1.44 m2 at 6.0 kg/m2, by end", kg: "25.9 * (1 - e) + 8.7 * e", basis: calculated, source: "Report 12 section 10"}
+      - {item: "Rear portal, hot-dip galvanised C350L0 SHS 50 x 50 x 5 and 40 x 40 x 5 with fixed feet (BODY.md redesign), rear end only", kg: "33.1 * e", basis: calculated, source: "data/body/body.yaml portal"}
+      - {item: Brackets, kg: 0.5, basis: estimate}
   - id: BD-05
-    name: Garage door, rear wall, top-hinged
+    name: Garage door, the rear wall cut-out on a piano hinge, two gas struts, four Southco E3 latches
     system: body
     box: [in_x1, mod_door_y0, floor_z, end_wall_t, mod_door_y1 - mod_door_y0, mod_door_h]
-    mass: {basis: declared, total_kg: 45, maturity: estimate, source: "Older block model (garage door)"}
-    note: Revision C. Opening 1,910 x 1,440 mm as DESIGN.md revision D, header at the bed beams. Product and structure come with the body design.
+    parts:
+      - {item: "Leaf 16.4, 2 mm door profiles 6.4, hinge 3.0, struts 1.1, latches 1.4, seals 1.0, drip rail 1.0", kg: 30.3, basis: calculated, source: "Report 12 section 7"}
+    note: Opening 1,910 x 1,440 mm, header at the bed beams. Gas struts of about 750 N carry the 230 Nm hinge moment.
   - id: BD-06
-    name: Gas locker hatch, kerb side
+    name: Gas locker hatch, Aussie Traveller service door 650 x 650, kerb side
     system: body
     when: mod_lpg
     box: [module_x0 + mod_hatch_x0, -half_in - wall_t, floor_z + mod_hatch_z0, mod_hatch_x1 - mod_hatch_x0, wall_t, mod_hatch_z1 - mod_hatch_z0]
-    mass: {basis: declared, total_kg: 4, maturity: estimate, source: "Estimate: 0.44 m2 hatch with frame, vents, hinge and lock"}
-    note: Revision C. The gas locker's only access (report 02 section 5.2).
+    mass: {basis: declared, total_kg: 5, maturity: estimate, source: "Report 12 section 7: retailer listing, possibly a shipping mass"}
+    note: Only with LPG (the module parameter lpg). The gas locker's only access (report 02 section 5.2).
   - id: BD-07
-    name: Entry door, kerb side
+    name: Entry door, Aussie Traveller DC 1,623 x 622, kerb side, hinged on its front edge
     system: body
     box: [lz_door_x, -half_in - wall_t, floor_z, lz_door_w, wall_t, lz_door_h]
-    mass: {basis: declared, total_kg: 20, maturity: estimate, source: "Older block model"}
-    note: PLACEHOLDER position, 1,500 mm behind the front wall, behind the kitchen. VSB1 13.2.1 wants one door on the left side or the rear.
+    mass: {basis: declared, total_kg: 25, maturity: estimate, source: "Report 12 section 7: retailer listing, possibly a shipping mass"}
+    note: VSB1 13.2.1 wants one door on the left side or the rear. The cut-out is 1,626 x 625 mm with a 90 mm top radius.
   - id: BD-08
-    name: Corner extrusions, adhesive and sealant
+    name: Extrusions, adhesive, sealant and the body mount fixings
     system: body
     point: [body_x0 + body_length / 2, 0, floor_z + interior_h / 2]
-    mass: {basis: declared, total_kg: 50, maturity: estimate, source: "Older block model (6.0 m body)"}
+    parts:
+      - {item: "Floor joiners 15.7 m at 1.4 kg/m, corner joiners 7.2 m at 2.0 kg/m, pop-top bottom ring 15.8 m at 1.65 kg/m", kg: 62.4, basis: estimate, source: "Scaled from DIY Caravans' extrusion masses to 35 mm panels (report 12 section 10)"}
+      - {item: Adhesive and sealant, kg: 8.0, basis: estimate}
+      - {item: "36 M12 8.8 mount bolts, GRP crush tubes and 100 x 100 x 3 aluminium spreaders", kg: 6.0, basis: estimate}
   - id: BD-09
-    name: Windows and hatches
+    name: Windows, roof hatches, vents and the dust fan
     system: body
     point: [body_x0 + body_length / 2, 0, floor_z + 1300]
-    mass: {basis: declared, total_kg: 50, maturity: estimate, source: "Older block model (6.0 m body)"}
+    parts:
+      - {item: "Dometic S4 windows 900 x 500 road side and 800 x 400 front (scaled by area)", kg: 14.8, basis: estimate}
+      - {item: Dometic S4 window 500 x 450 kerb side, kg: 5.0, basis: maker}
+      - {item: Dometic Midi Heki at the lid's front end, kg: 7.5, basis: estimate}
+      - {item: Dometic Mini Heki Style at the lid's rear end, kg: 3.3, basis: maker}
+      - {item: "Bathroom vent in the road-side wall, Carafan Sahara CP700 with ducts, kitchen opening frame, garage vents, cassette door", kg: 19.0, basis: estimate}
   - id: BD-10
-    name: Mud flap behind the rear wheel
+    name: Mud flap behind the rear wheel, 610 x 455 mm rubber, on a galvanised hanger from the XT rear shock outrigger
     system: body
     for: {s: [1, -1]}
-    point: [axle_x + rear_hub_dx + tyre_d / 2 + 60, s * hub_y, 400]
-    mass: {basis: declared, unit_kg: 4, maturity: estimate, source: "Estimate: a 600 x 450 x 6 mm rubber flap at 1,500 kg/m3 is 2.4 kg, plus about 1.6 kg for its hanger bracket and bolts. The body research supplies a product later"}
-    note: The corner legs are the four ARK DDS650 corner steadies in the chassis design (CH-B01, CHASSIS.md).
+    point: [axle_x + rear_hub_dx + tyre_d / 2 + 60, s * hub_y, 530]
+    parts:
+      - {item: "Flap 24X18B, 610 x 455 x 6 mm at 1,500 kg/m3", kg: 2.5, basis: calculated, source: "https://www.thebossshop.com.au/mudflap-rubber-610mmw-x-455mml-black"}
+      - {item: Hanger and bolts, kg: 2.1, basis: estimate}
+    note: The bottom edge hangs at Z 300 or lower (VSB1 10.2.2, approach 2 for off-road). The corner steadies are CH-B01 (CHASSIS.md).
   - id: BD-11
     name: Wiring, plumbing, lighting and hardware
     system: body
     point: [body_x0 + body_length / 2, 0, floor_z + 400]
-    mass: {basis: declared, total_kg: 60, maturity: estimate, source: "Older block model (6.0 m body)"}
+    mass: {basis: declared, total_kg: 60, maturity: estimate, source: "Older block model, kept until the systems design (report 12 section 10)"}
   - id: BD-12
-    name: Pop-top lift mechanism and skirt (allowance)
+    name: Pop-top lift and skirt, four LINAK LA36 actuators with guide posts, top ring, canvas, latches and seals
     system: body
-    point: [body_x0 + body_length / 2, 0, roof_top_z]
-    mass: {basis: declared, total_kg: 45, maturity: estimate, source: "Older block model allowance. The roof is designed later"}
+    point: [body_x0 + body_length / 2, 0, ceiling_z]
+    parts:
+      - {item: "Top ring 15.8 m at 1.65 kg/m", kg: 26.1, basis: calculated, source: "DIY Caravans' pop-top extrusion masses (report 12 section 6)"}
+      - {item: "Canvas skirt with zip windows and the quilted liner", kg: 9.4, basis: estimate}
+      - {item: "Four LA36 actuators (36120 series, gear G), telescopic guide posts and IC Parallel control", kg: 30.0, basis: estimate}
+      - {item: Six over-centre latches with secondary catches, kg: 2.4, basis: estimate}
+      - {item: Bulb seal and drip lip, kg: 3.2, basis: estimate}
   - id: BD-13
-    name: Awning, kerb side
+    name: Awning, Fiamma F45L 500 Polar White (06530A01R), kerb side, below the pop-top ring
     system: body
-    box: [body_x0 + 300, -half_bw - 100, ceiling_z - 160, body_length - 600, 100, 120]
-    mass: {basis: declared, total_kg: 35, maturity: estimate, source: "Older block model"}
-    note: PLACEHOLDER product. It may stand at most 100 mm proud of the 2,400 mm body to stay inside VSB1's 2,500 mm width.
+    box: [body_x0 + 240, -half_bw - 100, ceiling_z - 160, 5020, 100, 120]
+    parts:
+      - {item: Fiamma F45L 500, kg: 39.0, basis: maker, source: "https://www.fiammausa.com/en/f45s-en.html"}
+      - {item: Wall brackets and bolts, kg: 2.0, basis: estimate}
+    note: Case 5,020 mm, 2,500 mm extension. It may stand at most 100 mm proud of the 2,400 mm body (VSB1 5.2).
 
   # ================================================================ roof
   - id: RF-01
@@ -474,7 +503,7 @@ items:
     name: Outdoor kitchen slide-out, kerb side, fabricated sleeve, drawer with its outer wall panel, bench top, trays and locks
     system: living
     zone: living
-    box: [in_x0, -half_in, floor_z + 50, lz_kitchen_l, 600, 450]
+    box: [lz_kitchen_x, -half_in, floor_z + 50, lz_kitchen_l, 600, 450]
     parts:
       - {item: "Fixed sleeve, 1.6 mm aluminium with an angle frame", kg: 12.0, basis: estimate}
       - {item: "Slide-out drawer with the 35 mm sandwich outer panel, seal, latches and frame", kg: 14.1, basis: estimate}
@@ -486,34 +515,34 @@ items:
     name: Induction hob, Dometic CVI1525, two zones, 2,300 W
     system: living
     when: 1 - mod_lpg
-    point: [in_x0 + 400, -half_in + 300, floor_z + 470]
+    point: [lz_kitchen_x + 400, -half_in + 300, floor_z + 470]
     mass: {basis: declared, total_kg: 7.0, maturity: spec, source: "https://www.dometic.com/fr-fr/produit/dometic-cvi1525-9600050571", note: "Dometic, 7.0 kg (report 13)"}
   - id: LA-07A
     name: Gas hob, Dometic slimline (owner option lpg)
     system: living
     when: mod_lpg
-    point: [in_x0 + 400, -half_in + 300, floor_z + 470]
+    point: [lz_kitchen_x + 400, -half_in + 300, floor_z + 470]
     mass: {basis: declared, total_kg: 4.5, maturity: spec, source: "https://www.thecampervanshop.com/dometic-slimline-piezo-hob-lh/", note: "About 4.5 kg (report 13 section 3)"}
   - id: LA-07B
     name: Sink, Dometic CVS1350G with glass lid
     system: living
-    point: [in_x0 + 1100, -half_in + 300, floor_z + 420]
+    point: [lz_kitchen_x + 1100, -half_in + 300, floor_z + 420]
     mass: {basis: declared, total_kg: 2.5, maturity: spec, source: "https://www.dometic.com/fr-fr/produit/dometic-cvs1350g-9600051161", note: "Dometic, 2.5 kg (report 13)"}
   - id: LA-07C
     name: Slides, Accuride 9301 full extension, 610 mm, one pair
     system: living
-    point: [in_x0 + 750, -half_in + 300, floor_z + 90]
+    point: [lz_kitchen_x + 750, -half_in + 300, floor_z + 90]
     mass: {basis: declared, total_kg: 6.0, maturity: estimate, source: "Report 13: three steel members of about 2.3 mm on a 76 mm height, about 3 kg a slide (estimate, not published)"}
   - id: LA-07D
     name: Kitchen mixer tap
     system: living
-    point: [in_x0 + 1100, -half_in + 450, floor_z + 520]
+    point: [lz_kitchen_x + 1100, -half_in + 450, floor_z + 520]
     mass: {basis: declared, total_kg: 0.8, maturity: estimate, source: "Report 13 (estimate)"}
   - id: LA-08
     name: Wardrobe over the kitchen
     system: living
     zone: living
-    box: [in_x0, -half_in, floor_z + 520, lz_kitchen_l, 550, interior_h - 520]
+    box: [lz_kitchen_x, -half_in, floor_z + 520, lz_kitchen_l, 550, interior_h - 520]
     mass: {basis: declared, total_kg: 35, maturity: estimate, source: "Older block model"}
   - id: LA-09
     name: Desk, 1,000 x 400, against the front wall
@@ -579,7 +608,7 @@ items:
     name: Clothes, bedding and personal gear
     system: payload
     load: gear
-    point: [in_x0 + 750, -half_in + 275, floor_z + 1160]
+    point: [lz_kitchen_x + 750, -half_in + 275, floor_z + 1160]
     mass: {basis: declared, total_kg: 60, maturity: estimate, source: "Older block model"}
     note: In the wardrobe.
   - id: PL-03

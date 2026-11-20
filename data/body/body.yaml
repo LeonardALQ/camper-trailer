@@ -1,0 +1,177 @@
+# Body design data (BODY.md), from research report 12 (research/12-body-design.md) and the panel and product tables
+# beside it (research/12-body-panels.yaml, research/12-body-products.yaml). Units: mm, MPa, N, kg.
+# cad/body.py reads this file for the planning-level panel, joint, mount, hardpoint, portal and twist checks.
+
+# ---------------------------------------------------------------- panels (report 12 section 2)
+# E and G are the skin's in-plane tensile and shear moduli. The core's shear modulus Gc and strengths are the
+# maker's. ult is the skin's ultimate tensile strength used for the stress criterion (half of it is allowed).
+panels:
+  floor:
+    name: "Floor, 30 mm: two 2.0 mm woven roving polyester skins (48 % glass) on 26 mm Divinycell H80 PVC"
+    t: 30
+    skins: [2.0, 2.0]
+    E: 14000          # assumption, below AZoM's 16 GPa (report 12 section 2)
+    G: 3000           # woven roving in-plane shear modulus (assumption, about E / 4.7 for a 0/90 laminate)
+    ult: 200          # assumption, below AZoM's 280 MPa
+    core: {name: Divinycell H80, c: 26, Gc: 27, shear: 1.15, compression: 1.4}
+    kg_m2: 8.92
+  wall:
+    name: "Side and rear walls, 35 mm: two 1.5 mm gelcoat GRP skins (Optiplan Polydet) on 32 mm XPS"
+    t: 35
+    skins: [1.5, 1.5]
+    E: 6500           # Polydet data sheet
+    G: 2500           # E / 2(1 + 0.3), chopped-strand GRP taken as isotropic (assumption)
+    ult: 77           # Polydet data sheet
+    core: {name: XPS, c: 32, Gc: 8, shear: 0.25, compression: 0.30}
+    kg_m2: 6.0
+  front_wall:
+    name: "Front wall, 35 mm: 2.0 mm outer and 1.5 mm inner Polydet skins on 31.5 mm XPS, against stones"
+    t: 35
+    skins: [2.0, 1.5]
+    E: 6000
+    G: 2300
+    ult: 77
+    core: {name: XPS, c: 31.5, Gc: 8, shear: 0.25, compression: 0.30}
+    kg_m2: 6.7
+  lid:
+    name: "Raising roof lid, 40 mm: 2.0 mm top and 1.5 mm bottom Polydet skins on 36.5 mm XPS of about 36 kg/m3"
+    t: 40
+    skins: [2.0, 1.5]
+    E: 6000
+    G: 2300
+    ult: 77
+    core: {name: XPS 36, c: 36.5, Gc: 8, shear: 0.25, compression: 0.40}
+    kg_m2: 7.0
+  deck:
+    name: "Bed deck, 20 mm aluminium honeycomb, 0.5 mm skins (garage-bed/BOM.md B-03)"
+    t: 20
+    skins: [0.5, 0.5]
+    E: 70000
+    G: 26000
+    ult: 200
+    core: {name: aluminium honeycomb, c: 19, Gc: 100, shear: 0.9, compression: 1.5}
+    kg_m2: 5.5
+
+# ---------------------------------------------------------------- criteria (report 12 section 3)
+criteria:
+  skin_factor: 0.5             # skin stress at most half the ultimate (ISO 12215-5)
+  core_factor: 0.5             # core shear at most half its strength (assumption)
+  wrinkling_factor: 0.5        # compressive skin stress at most half the wrinkling stress (assumption)
+  bearing_factor: 0.5          # bearing at most half the core's compressive strength (assumption)
+  insert_factor: 0.5           # working load at most half the rated load
+  ultimate_factor: 1.5         # breaking-load cases: a factor of at least 1.5 on ultimate (assumption)
+  floor_span_ratio: 200        # floor deflection at 1 g under a point load (assumption, the engineer sets it)
+  lid_span_ratio: 150
+  wall_span_ratio: 100         # under 0.5 kPa of wind
+
+# ---------------------------------------------------------------- point and patch loads (report 12 section 3)
+loads:
+  bike_wheel: {kg: 100, patch: [229, 635], note: "Heavier Tuareg wheel at the chock, report 12 (Condor SC-2000 cradle footprint)"}
+  chock_base: {kg: 130, patch: [300, 500], note: "Condor SC-2000 base under the Tuareg's braking push of about 330 kgf, half on the rear edge (estimate)"}
+  foot: {kg: 100, patch: [100, 150], note: "A person on one foot in the living area"}
+  generator: {kg: 90, patch: [500, 300], note: "Generator and jerry cans between outriggers"}
+  floor_edge_kg_m2: 160        # floor and its contents beside the raisers, between outriggers
+  wind_kpa: 0.5                # parked wind on a wall (report 12)
+  anchor_n: 20000              # strap breaking load at an L-track anchor (RES-01, DESIGN.md)
+  bed_kg: 255                  # bed load on the two side ledgers (BED-01)
+  ledger_pitch: 150            # ledger fixings along the wall
+
+# ---------------------------------------------------------------- the body box for the twist (report 12 section 4)
+twist:
+  deck_joint_factor: 0.5       # the deck's shear path through its bonded and riveted angles (assumption)
+  lid_joint_factor: 1.0        # report 12's assumption: the latched lid acts with the walls (upper bound)
+  bond_shear_strength: 1.5     # MS polymer in shear, MPa (Sikaflex-552 class, assumption)
+  bond_width: 30               # bond width in each joiner leg
+
+# ---------------------------------------------------------------- body mounts (report 12 section 4)
+mounts:
+  fastener: "Lindapter Hollo-Bolt HB10-3, hot-dip galvanised, grip 41 to 60 mm"
+  swl_tension_n: 8500          # Lindapter safe working load, factor 5 on ultimate, S275 hollow section
+  swl_shear_n: 10000
+  hole: 18                     # clearance hole for HB10
+  collar: 28                   # bearing diameter of the flared sleeve on the inside of the wall (estimate)
+  face_b: 50                   # raiser and outrigger top face width (RHS 100 x 50 x 3 standing on edge)
+  face_t: 3
+  fy: 450
+  per_station: 4               # one into each raiser, one into each outrigger tip
+  outrigger_tip_y: 1140
+  source: "https://www.abbots-uk.com/files/ww/lindapter-type-hb-datasheet.pdf"
+  # Fallback (report 12 open question 5), used because the HB10 does not pass under LC5a and LC5b: an M12 8.8 hot-dip
+  # galvanised bolt into a 10 mm nut plate welded inside the raiser or the outrigger tip before galvanising (CH-P14),
+  # with a bonded 100 x 100 x 3 mm aluminium spreader on the floor and a GRP crush tube through it.
+  fallback:
+    name: "M12 8.8 HDG bolt into a 10 mm nut plate welded inside the raiser or outrigger tip (CH-P14)"
+    As: 84.3
+    fu: 830
+    bolt_factor: 3.0            # working load at most a third of the bolt's ultimate tension (ARTSA's static factor)
+    plate: {l: 80, w: 44, t: 10, fy: 350, span: 44}   # spans between the RHS webs inside the 50 mm face
+    weld: {leg: 4, length: 160, fuw: 490}             # two 80 mm fillets
+    spreader: {side: 100, skin_shear: 60, insert_shear: 6}   # punching round the spreader: floor top skin and the HD PVC insert (assumptions)
+
+# ---------------------------------------------------------------- L-track hardpoint strip (report 12 open question 3)
+hardpoint:
+  name: "Pultruded GRP strip 50 x 26 mm, solid, bonded into the floor core under each L-track row, the full row length"
+  w: 50
+  h: 26
+  shear_strength: 25           # interlaminar shear of pultruded GRP, MPa (assumption, makers give 25 to 30)
+  bolts: "One HB10 through the strip into each raiser where the row crosses it"
+  joiner_tension: 2.0          # MS polymer tensile strength at the floor joiner, MPa (assumption)
+  joiner_length: 400           # length of floor joiner that takes the anchor's edge reaction (assumption)
+
+# ---------------------------------------------------------------- rear portal (report 12 section 5, redesigned)
+# Report 12's aluminium SHS 50 x 50 x 3 portal on pinned feet is too flexible to hold the garage cell's end in shape
+# (about 50 mm of racking and 94 MPa against 73 MPa under LC5b). The portal is hot-dip galvanised C350L0 steel instead,
+# with 8 mm base plates bolted to the rear outriggers so its feet are fixed. With 3 mm walls the steel posts reached
+# 293 MPa against 233 MPa, so the walls are 5 mm. The depths in the wall's plane stay
+# 50 mm (kerb post, header) and 40 mm (road jamb, in the 40 mm strip), so the door opening does not change.
+portal:
+  E: 200000
+  fy: 350
+  feet: fixed
+  header: {name: "Header SHS 50 x 50 x 5 C350L0", A: 840, I: 280000, J: 450000, Z: 11200}
+  kerb_post: {name: "Kerb-side post SHS 50 x 50 x 5 C350L0", A: 840, I: 280000, J: 450000, Z: 11200}
+  road_jamb: {name: "Road-side jamb SHS 40 x 40 x 5 C350L0", A: 560, I: 133000, J: 210000, Z: 6650}
+  height: 1490                 # floor to the header top, module Z
+  span: 1910
+  pier: {w: 380, note: "The 380 mm wall beside the kerb-side jamb, in shear and bending as a cantilever from the floor"}
+  mass_kg: 33.1                # header 12.9 and kerb post 9.8 at 6.6 kg/m, road jamb 6.6 at 4.4 kg/m, base plates and gussets 2.5, zinc 1.3 (calculated)
+
+# ---------------------------------------------------------------- the raising roof (report 12 section 6)
+roof:
+  lift: 825
+  actuators: 4
+  actuator_n: 4500             # LINAK LA36 36120 series, gear G
+  latches: 6
+  latch_rating_n: 2100         # assumption, a factor of 2 on 1.04 kN
+  top_ring_kg: 26.1
+  canvas_kg: 9.4
+  hatches:
+    # Both at the lid's ends, outside the 4,108 x 2,168 mm solar array (report 13 open question 12). X is the cut-out's
+    # centre from the lid's front edge or rear edge, Y from the centreline. The bathroom vent moves to the road-side wall.
+    - {id: Midi Heki 700 x 500, cut: [500, 700], kg: 7.5, end: front, x: 390, y: 0, outer: [617, 858]}
+    - {id: Mini Heki Style 400 x 400, cut: [400, 400], kg: 3.3, end: rear, x: 300, y: 300, outer: [520, 520]}
+  insert_strips_kg: 2.0
+  uplift_40ms_n: 6300          # roof down at 110 km/h into a 36 km/h headwind (report 12 section 3)
+
+# ---------------------------------------------------------------- openings (report 12 sections 5 and 7)
+# Side walls: x is measured along the trailer from the body front (X = body_x0 + x), z from the floor surface. The front
+# and rear walls: y across from the centreline (positive to the road side). Sizes are the cut-outs. The kitchen,
+# entry door and garage door follow the layout's blocks (LA-07, BD-07, BD-05); the build checks they match.
+openings:
+  - {id: OP-01, wall: kerb, name: "Kitchen slide-out opening, framed, bulb seal, two Southco E3 latches", x: 35, z: 50, w: 1500, h: 450, from: LA-07}
+  - {id: OP-02, wall: kerb, name: "Entry door, Aussie Traveller DC, 90 mm top radius", x: 1835, z: 0, w: 625, h: 1626, from: BD-07}
+  - {id: OP-03, wall: kerb, name: "Window, Dometic S4 500 x 450, over the kitchen", x: 650, z: 1000, w: 500, h: 448}
+  - {id: OP-04, wall: road, name: "Window, Dometic S4 900 x 500, over the freezer and the seat", x: 600, z: 900, w: 900, h: 500}
+  - {id: OP-05, wall: road, name: "Thetford cassette service door, 450 x 290", x: 2600, z: 150, w: 450, h: 290}
+  - {id: OP-06, wall: road, name: "Bathroom vent", x: 2300, z: 1350, w: 280, h: 280}
+  - {id: OP-07, wall: kerb, name: "Garage low vent, 6,500 mm2 free area doubled for the mesh", x: 3400, z: 40, w: 200, h: 100}
+  - {id: OP-08, wall: road, name: "Garage low vent, 6,500 mm2 free area doubled for the mesh", x: 3400, z: 40, w: 200, h: 100}
+  - {id: OP-09, wall: road, name: "Garage high vent under the deck, 13,000 mm2 doubled for the mesh", x: 4800, z: 1340, w: 260, h: 100}
+  - {id: OP-10, wall: front, name: "Window, Dometic S4 800 x 400, above the spare wheel", y: 0, z: 1000, w: 800, h: 400}
+  - {id: OP-11, wall: front, name: "Carafan Sahara CP700 intake, high beside the spare wheel", y: 850, z: 1300, w: 200, h: 200}
+  - {id: OP-12, wall: rear, name: "Garage door opening, 2 mm aluminium door profile, 1,910 x 1,440", y: 170, z: 0, w: 1910, h: 1440, from: BD-05}
+rules:
+  between_mm: 300              # full-height wall between neighbouring openings (assumption, report 12 section 5)
+  edge_mm: 150                 # from an opening to a panel edge or corner
+  rear_corner_mm: 300          # no opening within 300 mm of the rear corners
+  pier_mm: 380                 # the kerb-side pier beside the garage door stays whole

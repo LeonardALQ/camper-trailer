@@ -132,6 +132,9 @@ def cmd_trailer():
     chs["git"] = rep["git"]
     _write(BUILD / "chassis" / "chassis.json", chs)
     _cut_list(chs, BUILD / "chassis" / "chassis-cut-list.csv")
+    body = tr.body_results(tr.last_layout)
+    body["git"] = rep["git"]
+    _write(BUILD / "body" / "body.json", body)
     t1 = time.time()
     lay = tr.layout(**rep["solved"]["overrides"])
     write_outputs(TrailerModel(lay, model), out)

@@ -105,6 +105,8 @@ fittings:
      at: ["body_x0 - 40", 0, spare_z], fat: null}
   - {id: CH-P10, plane: xz, name: "Corner steady brackets, 6 mm, bolted to the rail with crush tubes", kind: plate, l: 200, w: 150, t: 6, qty: 4,
      at: [steady_front_x, 0, rail_underside_z - 20], side_y: rail_c, rear_x: steady_rear_x}
+  - {id: CH-P14, name: "Body mount nut plate, 10 mm, M12 tapped, welded inside the raiser or outrigger tip under each body bolt (BODY.md)", kind: plate,
+     l: 80, w: 44, t: 10, qty: 36, at: ["body_x0 + body_length / 2", 0, raiser_top_z - 13]}
   - {id: CH-P11, plane: xz, name: "Jockey wheel bracket plate, 8 mm, bolted to the kerb-side member", kind: plate, l: 200, w: 160, t: 8, qty: 1,
      at: [jockey_x, "-(db_apex_y + (rail_c - db_apex_y) * (jockey_x - db_apex_x) / (body_x0 - db_apex_x)) - 90", db_z]}
   - {id: CH-S01, name: "Floor bearer strip on the raisers, outriggers and floor crossmembers, 50 x 21 mm EPDM-faced HDPE", kind: strip, kg_per_m: 1.0,

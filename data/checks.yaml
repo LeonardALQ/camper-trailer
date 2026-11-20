@@ -607,3 +607,41 @@ trailer_checks:
     severity: report
     inputs: [CAR-05]
     why: Reported only. In plan the A-frame and the stone guard on it pass under the car's rear corner before 90 degrees. Whether they touch depends on the bumper height against the drawbar, which nobody has measured yet.
+
+  # ---------------------------------------------------------------- body (BODY.md, cad/body.py, research report 12)
+  - {id: BDY-01, title: "Floor under the bike wheel in the chock, LC2 3 g, skin and core within half their strength", type: body_panel, body: {item: BDY-01}, severity: fail,
+     why: "Report 12 section 3. The 30 mm woven-roving floor spans between the raisers. One-way span with an effective width of the patch plus half the span"}
+  - {id: BDY-02, title: "Floor under the chock base with the braking push, LC2 3 g", type: body_panel, body: {item: BDY-02}, severity: fail,
+     why: "Report 12 section 3. About 330 kgf of braking push from the Tuareg, taken as 130 kg on the chock base's rear edge (estimate)"}
+  - {id: BDY-03, title: "Living-area floor under a foot, LC2 3 g, with bearing on the core", type: body_panel, body: {item: BDY-03}, severity: fail,
+     why: "Report 12 section 3. 100 kg on 100 x 150 mm. Bearing at most half the core's compressive strength"}
+  - {id: BDY-04, title: "Floor edge beside the raisers between outriggers, LC2 3 g", type: body_panel, body: {item: BDY-04}, severity: fail,
+     why: "Report 12 section 3 and report 11 section 5.3: 160 kg/m2 of floor and contents spanning between outriggers, no edge member"}
+  - {id: BDY-05, title: "Floor edge under the generator and jerry cans, LC2 3 g", type: body_panel, body: {item: BDY-05}, severity: fail,
+     why: "Report 12 section 3. 90 kg on the kerb-side floor edge midway between outriggers"}
+  - {id: BDY-06, title: "Side wall in a 0.5 kPa wind", type: body_panel, body: {item: BDY-06}, severity: fail,
+     why: "Report 12 section 3. The wall spans from the floor joiner to the pop-top bottom ring"}
+  - {id: BDY-07, title: "Lid with the bonded solar array, LC2 3 g, spanning between the walls", type: body_panel, body: {item: BDY-07}, severity: fail,
+     why: "Report 12 section 3 with report 13's 31 kg Sunman array in place of 90 kg of glass panels"}
+  - {id: BDY-08, title: "Floor deflection under the bike wheel at 1 g within span/200 (reported)", type: body_deflection, body: {item: DEF-B1}, severity: report,
+     why: "Report 12 section 3. A deflection guide the engineer sets"}
+  - {id: BDY-09, title: "Lid deflection with the solar array at 1 g within span/150 (reported)", type: body_deflection, body: {item: DEF-B2}, severity: report,
+     why: "Report 12 section 3. Bonded panels flex with the lid"}
+  - {id: BDY-10, title: "Wall deflection in a 0.5 kPa wind within span/100 (reported)", type: body_deflection, body: {item: DEF-B3}, severity: report,
+     why: "Report 12 section 3"}
+  - {id: BDY-11, title: "Panel inserts: bed ledgers and awning brackets within half their rated load", type: body_insert, severity: fail,
+     why: "Report 12 section 3 and report 02 MAT-05. A pull test in the real panel confirms each insert (LR-09)"}
+  - {id: BDY-12, title: "Raising roof: actuators lift the lid and the latches hold it in a 40 m/s uplift", type: body_roof, severity: fail,
+     why: "Report 12 section 6. Four LINAK LA36 actuators of 4,500 N and six over-centre latches taken at 2.1 kN each (assumption)"}
+  - {id: BDY-13, title: "Body share of the LC5a twist, with the body tied to the chassis at the mounts (reported)", type: body_twist, severity: report,
+     why: "Report 12 section 4 claims about 80 %. The frame model checks it with the body as a torsion box, for the lid carrying shear or not"}
+  - {id: BDY-14, title: "Skins and bonded joints under the body's share of LC5a", type: body_joint, severity: fail,
+     why: "Shear flow T / 2A round the body box, with the lid carrying shear (the bound that loads the body most)"}
+  - {id: BDY-15, title: "Rear portal and the 380 mm pier racking under the garage's share of LC5a", type: body_portal, severity: fail,
+     why: "Report 12 section 5. Aluminium SHS and RHS 6060-T5 at fy / 1.5"}
+  - {id: BDY-16, title: "Body mounts: 36 Hollo-Bolt HB10 under LC2 to LC5a, and the 3 mm raiser face", type: body_mount, severity: fail,
+     why: "Report 12 section 4. Lindapter's safe working loads, and a yield-line check of the 3 mm C450 face under the sleeve"}
+  - {id: BDY-17, title: "L-track hardpoints at the 20 kN anchor load, a factor of 1.5 on ultimate", type: body_hardpoint, severity: fail,
+     why: "Report 12 section 3 and open question 3. The rows sit between chassis stations, so a hardpoint strip carries each anchor into the raisers and the wall foot"}
+  - {id: BDY-18, title: "Openings keep 300 mm of full wall between them and 150 mm to a panel edge", type: body_openings, severity: fail,
+     why: "Report 12 section 5's layout rules for the sandwich walls, and no opening in the rear wall's 380 mm pier"}

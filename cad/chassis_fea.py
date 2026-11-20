@@ -48,9 +48,9 @@ class Item:
 
 
 class Analysis:
-    def __init__(self, lay, tr, ch: Chassis):
+    def __init__(self, lay, tr, ch: Chassis, body=None):
         self.lay, self.tr, self.ch = lay, tr, ch
-        self.fm = ch.frame()
+        self.fm = ch.frame(body)
         self.f = self.fm.f
         self.n = 6 * len(self.f.nodes)
         V = ch.V
@@ -328,7 +328,7 @@ class Analysis:
         out = {}
         nodes = self.f.nodes
         for el, fl in zip(self.f.elements, res.forces):
-            if el.sec.rigid:
+            if el.sec.rigid or el.member in ("BODY", "BODY-MOUNT"):
                 continue
             sp = self.fm.sec_props[el.member]
             for end, act in zip((el.i, el.j), end_actions(fl)):

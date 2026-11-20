@@ -15,7 +15,7 @@ from typing import Any
 
 import yaml
 
-from .frame import RIGID, Frame, Section
+from .frame import G_STEEL, RIGID, Frame, Section
 from .partsdb import DATA, Params
 
 CHASSIS_YAML = DATA / "chassis" / "chassis.yaml"
@@ -412,14 +412,16 @@ class Chassis:
                     rear_tongue_x=V["body_x1"] - 70, front_recovery_x=V["front_recovery_x"])
 
     # -- the frame model ----------------------------------------------
-    def frame(self) -> "FrameModel":
-        return FrameModel(self)
+    def frame(self, body: list[tuple[float, float, float]] | None = None) -> "FrameModel":
+        """The frame model. `body` adds the body as a torsion box (cad/body.py): (x0, x1, GJ in N mm2) per bay between
+        stations, tied rigidly to both rails at each station, as the floor's bolts tie it (BODY.md)."""
+        return FrameModel(self, body)
 
 
 class FrameModel:
     """Nodes and elements of the chassis and drawbar, with the lookups the load mapping needs."""
 
-    def __init__(self, ch: Chassis):
+    def __init__(self, ch: Chassis, body: list[tuple[float, float, float]] | None = None):
         self.ch = ch
         V = ch.V
         f = self.f = Frame()
@@ -506,6 +508,35 @@ class FrameModel:
             nd = f.node(w["pivot"])
             self._link(nd, self.rail_node(w["side"], w["station_x"]), f"hinge {w['id']}")
             self.pivot_nodes[w["id"]] = nd
+        # the body as a torsion box: a chain on the centreline at the floor's mid-plane with torsion stiffness only
+        # At each station the body's section is rigid in its plane (a centre node and a node over each raiser) and
+        # stands on the raisers through a mount post that carries force along Z only, as the floor bolts do.
+        self.body_elements: list[tuple[int, float, float]] = []    # (element index, x0, x1)
+        self.body_nodes: dict[float, int] = {}
+        self.mount_posts: list[tuple[int, float, int, str]] = []   # (element index, x, side, raiser or outrigger tip)
+        if body:
+            zb = V["floor_underside_z"] + 15.0
+            post = Section("body mount post", A=1.0e5, I_strong=1.0e4, I_weak=1.0e4, J=1.0e4)
+            for x0, x1, gj in body:
+                for x in (x0, x1):
+                    if x not in self.body_nodes:
+                        nd = f.node((x, 0.0, zb))
+                        self.body_nodes[x] = nd
+                        sid = next((k for k, v in self.station_nodes.items() if abs(v - x) < 1.0), None)
+                        for s in (-1, 1):
+                            side = f.node((x, s * V["rail_c"], zb))
+                            self._link(nd, side, "body section")
+                            f.add(self.rail_node(s, x), side, post, (1, 0, 0), "BODY-MOUNT")
+                            self.mount_posts.append((len(f.elements) - 1, x, s, "raiser"))
+                            if (sid, s) in self.out_nodes:
+                                tip_y, tip = self.out_nodes[(sid, s)][-1]
+                                tb = f.node((x, s * tip_y, zb))
+                                self._link(nd, tb, "body section")
+                                f.add(tip, tb, post, (1, 0, 0), "BODY-MOUNT")
+                                self.mount_posts.append((len(f.elements) - 1, x, s, "outrigger tip"))
+                sec = Section("body torsion box", A=1.0, I_strong=1.0, I_weak=1.0, J=gj / G_STEEL)
+                f.add(self.body_nodes[x0], self.body_nodes[x1], sec, (0, 0, 1), "BODY")
+                self.body_elements.append((len(f.elements) - 1, x0, x1))
         self.member_of_el = [el.member for el in f.elements]
 
     def _link(self, a: int, b: int, name: str):
