@@ -162,8 +162,9 @@ class Sheet {
     this.nums.set(r, this.cols.get(r)!.map((c) => (c ? parseNumber(cellText(c)) : null)));
   }
 
-  // A column is numeric when at least half of its filled cells hold one number. The footer formats its result like
-  // the column: the most decimals used, and the unit when every cell shares it.
+  // A column is numeric when at least half of its filled cells hold one number, unless its header says
+  // data-sheet-type="text". The footer formats its result like the column: the most decimals used, and the unit when
+  // every cell shares it.
   detect() {
     this.numeric = [];
     this.fmt = [];
@@ -175,7 +176,7 @@ class Sheet {
         const p = this.nums.get(r)![c];
         if (p) got.push(p);
       }
-      this.numeric.push(got.length > 0 && got.length * 2 >= filled);
+      this.numeric.push(got.length > 0 && got.length * 2 >= filled && this.heads[c]?.dataset.sheetType !== 'text');
       const same = (k: 'pre' | 'suf') => (got.every((p) => p[k] === got[0]?.[k]) ? got[0]?.[k] ?? '' : '');
       this.fmt.push({ dec: Math.max(0, ...got.map((p) => p.dec)), pre: same('pre'), suf: same('suf') });
     }

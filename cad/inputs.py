@@ -7,6 +7,7 @@ each rule records what it did so the site can show it.
 """
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -36,6 +37,8 @@ class Input:
     measured_date: Any
     affects: list[str]
     thresholds: list[dict]
+    stage: str = ""
+    range: dict = field(default_factory=dict)
     extra: dict = field(default_factory=dict)
 
     @property
@@ -44,6 +47,10 @@ class Input:
 
     @property
     def value(self):
+        """The measured value when there is one, else the estimate. An input with several values may be measured in
+        part: a value not measured yet (null in the list) keeps its estimate."""
+        if isinstance(self.measured, list) and isinstance(self.estimate, list):
+            return [e if m is None else m for m, e in zip(self.measured, self.estimate)]
         return self.measured if self.measured is not None else self.estimate
 
 
@@ -52,7 +59,8 @@ class Inputs:
         raw = yaml.safe_load((root / "data" / "measurements.yaml").read_text())
         self.items: dict[str, Input] = {}
         for d in raw["inputs"]:
-            known = {"id", "group", "title", "how", "unit", "estimate", "measured", "affects", "thresholds", "order", "stage"}
+            known = {"id", "group", "title", "how", "unit", "estimate", "measured", "affects", "thresholds", "order", "stage",
+                     "range", "covers"}
             extra = set(d) - known
             if extra:
                 raise ValueError(f"measurement {d.get('id')}: unknown keys {sorted(extra)}")
@@ -61,8 +69,10 @@ class Inputs:
                 id=d["id"], group=d["group"], title=d["title"], how=d["how"], unit=d["unit"],
                 estimate=d["estimate"].get("v"), estimate_src=d["estimate"].get("src", ""), measured=m.get("v"),
                 measured_date=m.get("date"), affects=d.get("affects", []), thresholds=d.get("thresholds", []),
-                extra={k: d[k] for k in ("order", "stage") if k in d} | ({"note": m["note"]} if m.get("note") else {}))
+                stage=d.get("stage", ""), range=d.get("range") or {},
+                extra={k: d[k] for k in ("order", "covers") if k in d} | ({"note": m["note"]} if m.get("note") else {}))
         self.outcomes: dict[str, str] = {}
+        self.ranges: dict[str, dict] = {}
 
     def v(self, iid):
         return self.items[iid].value
@@ -194,15 +204,49 @@ class Inputs:
             it = self.items[iid]
             if it.measured is None:
                 break
-            out.append(dict(id=iid, stage=it.extra["stage"], mass_kg=it.measured - prev))
+            out.append(dict(id=iid, stage=it.extra["covers"], mass_kg=it.measured - prev))
             prev = it.measured
         return out
 
+    # -- the acceptable ranges ---------------------------------------------------
+    def resolve_ranges(self, refs: dict):
+        """Each input's `range` as numbers. A side given as {ref: name} takes the model's figure from `refs`, and
+        {ref, rel} spans that figure plus and minus `rel`. A side worked out from the model is rounded inwards to a
+        whole number, so a value on the boundary is inside. A reference the model does not give leaves the side open."""
+        def inward(v, up: bool):
+            return None if v is None else (math.ceil(v - 1e-9) if up else math.floor(v + 1e-9))
+
+        def side(v, up: bool):
+            return inward(refs.get(v["ref"]), up) if isinstance(v, dict) else v
+        self.ranges = {}
+        for it in self.items.values():
+            r = it.range
+            if "rel" in r:
+                ref = refs.get(r["ref"])
+                lo, hi = (None, None) if ref is None else (inward(ref * (1 - r["rel"]), True), inward(ref * (1 + r["rel"]), False))
+                self.ranges[it.id] = dict(min=lo, max=hi, src=r.get("src", ""), reference=None if ref is None else round(ref, 1))
+            else:
+                self.ranges[it.id] = dict(min=side(r.get("min"), True), max=side(r.get("max"), False), src=r.get("src", ""),
+                                          reference=None)
+        return self.ranges
+
+    @staticmethod
+    def outside(value, rng: dict) -> list[str]:
+        """Which values break the range: 'low' or 'high' for each one (one per value for a list input), or ''."""
+        vals = value if isinstance(value, list) else [value]
+        out = []
+        for k, v in enumerate(vals):
+            lo, hi = (b[k] if isinstance(b, list) else b for b in (rng.get("min"), rng.get("max")))
+            out.append("" if v is None else "low" if lo is not None and v < lo else "high" if hi is not None and v > hi else "")
+        return out
+
     def report(self) -> list[dict]:
+        if not self.ranges:
+            self.resolve_ranges({})
         rows = []
         for it in self.items.values():
             rows.append(dict(id=it.id, group=it.group, title=it.title, how=it.how, unit=it.unit, estimate=it.estimate,
                              estimate_src=it.estimate_src, measured=it.measured, measured_date=str(it.measured_date) if it.measured_date else None,
                              status=it.status, value=it.value, affects=it.affects, thresholds=it.thresholds,
-                             outcome=self.outcomes.get(it.id, ""), **it.extra))
+                             outcome=self.outcomes.get(it.id, ""), stage=it.stage, range=self.ranges[it.id], **it.extra))
         return rows

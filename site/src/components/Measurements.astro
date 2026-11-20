@@ -1,6 +1,8 @@
 ---
-// Measured inputs (data/measurements.yaml), their status, the value in use and what each rule did, with the checks
-// that use each input. From build/trailer/trailer.json and build/checks/checks.json.
+// The measurement sheet (S-04): every input in data/measurements.yaml, with how to measure it, the value the design
+// assumes, the range it accepts (cad/inputs.py resolves the ranges the model sets), an input box and the result.
+// From build/trailer/trailer.json and build/checks/checks.json. The page's tables script makes it a spreadsheet, and
+// the script below keeps what is typed in the browser's localStorage, with export and import.
 import t from '../data/generated/trailer.json';
 import checks from '../data/generated/checks.json';
 
@@ -10,38 +12,413 @@ const users = (id: string) => [
   ...(checks as any).results.filter((c: any) => (c.inputs ?? []).includes(id)).map((c: any) => c.id),
   ...r.checks.filter((c: any) => (c.inputs ?? []).includes(id)).map((c: any) => c.id),
 ].filter((v, i, a) => a.indexOf(v) === i);
-const fmt = (v: any, unit: string) =>
-  v == null ? 'none yet' : Array.isArray(v) ? v.join(', ') + ` ${unit}` : typeof v === 'number' ? `${v.toLocaleString('en-AU')} ${unit}` : `${v}`;
-const groups = [...new Set(rows.map((m) => m.group))];
+const yesNo = (m: any) => m.unit === 'yes or no';
+const num = (v: any) => (typeof v === 'number' ? v.toLocaleString('en-AU', { maximumFractionDigits: 2 }) : `${v}`);
+const fmt = (m: any, v: any) =>
+  v == null ? '' : yesNo(m) ? (v ? 'yes (1)' : 'no (0)') : Array.isArray(v) ? v.map(num).join(', ') : num(v);
+const names = (m: any): string[] => m.order ?? (Array.isArray(m.estimate) ? m.estimate.map((_: any, k: number) => `value ${k + 1}`) : ['']);
+const count = (m: any) => (Array.isArray(m.estimate) ? m.estimate.length : 1);
+const at = (b: any, k: number) => (Array.isArray(b) ? b[k] : b);
+const span = (lo: any, hi: any) =>
+  lo != null && hi != null ? `${num(lo)} to ${num(hi)}` : lo != null ? `at least ${num(lo)}` : hi != null ? `at most ${num(hi)}` : 'any';
+const rangeText = (m: any) => {
+  const g = m.range;
+  if (yesNo(m)) return 'either';
+  const unit = m.unit ? ` ${m.unit}` : '';
+  if (count(m) === 1) return span(g.min, g.max) + unit;
+  return names(m).map((n, k) => `${n} ${span(at(g.min, k), at(g.max, k))}`).join(', ') + unit;
+};
+const design = (m: any) =>
+  m.status === 'measured' ? `${fmt(m, m.value)} (measured ${m.measured_date ?? ''})`.replace(' )', ')')
+    : m.estimate != null ? `${fmt(m, m.estimate)} (estimate)`
+      : m.range.reference != null ? `model ${num(m.range.reference)}` : 'none yet';
+// The rule shown when a value is out of range: the threshold set at that bound (a range threshold first), or the
+// range's own source.
+const rule = (m: any, bound: any) => {
+  if (bound == null) return m.range.src;
+  const th = m.thresholds.find((x: any) => Array.isArray(x.at) && x.at.includes(bound))
+    ?? m.thresholds.find((x: any) => x.at === bound);
+  return th ? th.rule : m.range.src;
+};
+const spec = (m: any) => JSON.stringify({
+  id: m.id, title: m.title, unit: m.unit, n: count(m), names: names(m), min: m.range.min, max: m.range.max,
+  low: Array.from({ length: count(m) }, (_, k) => rule(m, at(m.range.min, k))),
+  high: Array.from({ length: count(m) }, (_, k) => rule(m, at(m.range.max, k))),
+  committed: m.measured, date: m.measured_date,
+});
 const measured = rows.filter((m) => m.status === 'measured').length;
 ---
 
 <p>
-  {rows.length} inputs, {measured} measured so far. The value in use is the measured one when there is one, and the estimate
-  otherwise. The bike inputs now feed the ute's bike box. Bike spacing in use there: {r.spacing.in_use} mm, which {r.spacing.fits ? 'fits' : 'does not fit'} the box. Towball target in use: {Math.round(r.target_kg)} kg
-  ({r.target_why}).
+  {rows.length} inputs, {measured} measured so far. The value the design assumes is the measured one when there is
+  one, and the estimate otherwise. Bike spacing in the ute's bike box: {r.spacing.in_use} mm, which {r.spacing.fits
+    ? 'fits' : 'does not fit'} the box. Towball target: {Math.round(r.target_kg)} kg ({r.target_why}).
 </p>
 
-{groups.map((g) => (
-  <>
-    <h2 id={g.toLowerCase().replace(/[^a-z0-9]+/g, '-')}>{g}</h2>
-    {rows.filter((m) => m.group === g).map((m) => (
-      <section class="measure-card" id={m.id.toLowerCase()}>
-        <h3>{m.id}: {m.title}</h3>
-        <p class={m.status === 'measured' ? 'status-pass' : 'muted'}>
-          {m.status === 'measured' ? `Measured ${m.measured_date ?? ''}` : m.status === 'estimate' ? 'Estimate in use' : 'Not known yet'}.
-          In use: {fmt(m.value, m.unit)}.{m.note ? ` ${m.note}.` : ''}
-        </p>
-        <p>How to measure it: {m.how}</p>
-        <p>Estimate: {fmt(m.estimate, m.unit)}. {m.estimate_src}.{m.order ? ` Order: ${m.order.join(', ')}.` : ''}</p>
-        <p>Depends on it: {m.affects.join(', ')}. Checks that use it: {users(m.id).join(', ') || 'none'}.</p>
-        <ul>
-          {m.thresholds.map((th: any) => (
-            <li>{th.at != null ? `At ${Array.isArray(th.at) ? th.at.join(' to ') : th.at}: ` : ''}{th.rule}. Source: {th.src}.</li>
-          ))}
-        </ul>
-        {m.outcome && <p>Now: {m.outcome}.</p>}
-      </section>
-    ))}
-  </>
-))}
+<div class="measure-tools not-content">
+  <button type="button" data-act="csv">Export CSV</button>
+  <button type="button" data-act="yaml">Export YAML</button>
+  <label class="measure-import">Import CSV <input type="file" accept=".csv,text/csv" data-act="import" /></label>
+  <button type="button" data-act="clear">Clear</button>
+  <span class="measure-msg" role="status"></span>
+</div>
+
+<div class="data-table measure-sheet">
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th><th>What to measure</th><th>How</th><th>Unit</th>
+        <th data-sheet-type="text">Design value</th><th data-sheet-type="text">Acceptable range</th>
+        <th data-sheet-type="text">Measured</th><th data-sheet-type="text">Status</th><th>Group</th><th>When</th><th>Affects</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map((m) => (
+        <tr id={m.id.toLowerCase()} data-measure={spec(m)}>
+          <td>{m.id}</td>
+          <td>{m.title}</td>
+          <td class="not-content">
+            <details>
+              <summary>How</summary>
+              <p>{m.how}</p>
+              <p>Design value: {m.estimate != null ? `${fmt(m, m.estimate)} ${m.unit}, ` : ''}{m.estimate_src}.</p>
+              <p>Range: {m.range.src}.</p>
+              <ul>
+                {m.thresholds.map((th: any) => (
+                  <li>{th.at != null ? `At ${Array.isArray(th.at) ? th.at.join(' to ') : th.at}: ` : ''}{th.rule}. Source: {th.src}.</li>
+                ))}
+              </ul>
+              {m.outcome && <p>Now: {m.outcome}.</p>}
+              {m.covers && <p>The reading includes: {m.covers.join(', ').replace(/_/g, ' ')}.</p>}
+              <p>Checks that use it: {users(m.id).join(', ') || 'none'}.</p>
+            </details>
+          </td>
+          <td>{m.unit}</td>
+          <td>{design(m)}</td>
+          <td title={m.range.src}>{rangeText(m)}</td>
+          <td class="measure-cell">
+            {yesNo(m) ? (
+              <select data-k="0" aria-label={`Measured: ${m.id}`}><option value=""></option><option value="1">yes</option><option value="0">no</option></select>
+            ) : names(m).map((n, k) => (
+              <label title={count(m) > 1 ? n : undefined}>{count(m) > 1 && <span>{n.split(' ')[0]}</span>}<input type="text" inputmode="decimal" size="6" data-k={k}
+                aria-label={`Measured: ${m.id}${count(m) > 1 ? ` ${n}` : ''}`} /></label>
+            ))}
+          </td>
+          <td class="measure-status"><div></div></td>
+          <td>{m.group}</td>
+          <td>{m.stage}</td>
+          <td>{m.affects.join(', ')}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .measure-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 1rem 0 0.5rem 0;
+    font-size: 0.85rem;
+  }
+  .measure-tools button,
+  .measure-import {
+    font: inherit;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.25rem;
+    background: var(--sl-color-bg-nav);
+    color: var(--sl-color-white);
+    cursor: pointer;
+  }
+  .measure-import input {
+    display: none;
+  }
+  .measure-msg {
+    color: var(--sl-color-text-accent);
+  }
+  .measure-sheet :global(.measure-cell label) {
+    display: grid;
+    grid-template-columns: 3.6rem 6.5rem;
+    align-items: center;
+    gap: 0.15rem 0.4rem;
+    margin: 0.1rem 0;
+  }
+  .measure-sheet :global(.measure-cell label:only-child) {
+    grid-template-columns: 6.5rem;
+  }
+  .measure-sheet :global(.measure-cell span) {
+    color: var(--sl-color-gray-3);
+    font-size: 0.75rem;
+    line-height: 1.2;
+  }
+  .measure-sheet :global(.measure-cell :is(input, select)) {
+    font: inherit;
+    width: 6.5rem;
+    padding: 0.1rem 0.3rem;
+    border: 1px solid var(--sl-color-gray-4);
+    border-radius: 0.2rem;
+    background: var(--sl-color-bg);
+    color: var(--sl-color-white);
+  }
+  .measure-sheet :global(.measure-cell .committed) {
+    border-style: dashed;
+  }
+  .measure-sheet :global(td.measure-status) {
+    min-width: 24rem;
+  }
+  .measure-sheet :global(.m-in) {
+    color: #1a7f37;
+    font-weight: 600;
+  }
+  .measure-sheet :global(.m-out) {
+    color: #c00000;
+    font-weight: 600;
+  }
+  .measure-sheet :global(tr.row-out td) {
+    background: #ffe5e5;
+  }
+  .measure-sheet :global(tr.row-in td) {
+    background: #e6f4ea;
+  }
+  .measure-sheet :global(tr:target td) {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: -2px;
+  }
+  .measure-sheet :global(details > summary) {
+    cursor: pointer;
+    white-space: nowrap;
+    color: var(--sl-color-text-accent);
+  }
+  .measure-sheet :global(details[open]) {
+    min-width: 20rem;
+  }
+  .measure-sheet :global(details p),
+  .measure-sheet :global(details ul) {
+    margin: 0.3rem 0 0 0;
+  }
+  .measure-sheet :global(details ul) {
+    padding-left: 1.1rem;
+  }
+  :global([data-theme='dark']) .measure-sheet :global(tr.row-out td) {
+    background: #4a1f1f;
+  }
+  :global([data-theme='dark']) .measure-sheet :global(tr.row-in td) {
+    background: #1d3a26;
+  }
+  :global([data-theme='dark']) .measure-sheet :global(.m-in) {
+    color: #6fdc8c;
+  }
+  :global([data-theme='dark']) .measure-sheet :global(.m-out) {
+    color: #ff8a8a;
+  }
+</style>
+
+<script>
+  // What is typed stays in this browser (localStorage, one key per input) until it is exported and committed to
+  // data/measurements.yaml. A value already in the data shows in a dashed box until something else is typed.
+  interface Spec {
+    id: string; title: string; unit: string; n: number; names: string[];
+    min: number | (number | null)[] | null; max: number | (number | null)[] | null;
+    low: string[]; high: string[]; committed: number | number[] | null; date: string | null;
+  }
+  interface Saved { v: (number | null)[]; date: string }
+  const KEY = 'ct-measure:';
+  const today = () => new Date().toISOString().slice(0, 10);
+  const parse = (s: string): number | null => {
+    const t = s.replace(/[\s,]/g, '');
+    return t === '' || !/^[-+]?\d*\.?\d+$/.test(t) ? null : Number(t);
+  };
+  const at = (b: Spec['min'], k: number) => (Array.isArray(b) ? b[k] : b);
+  const rows = Array.from(document.querySelectorAll('tr[data-measure]')) as HTMLTableRowElement[];
+  const specs = new Map(rows.map((r) => [r, JSON.parse(r.dataset.measure!) as Spec]));
+  const fields = (r: HTMLTableRowElement) => Array.from(r.querySelectorAll('[data-k]')) as (HTMLInputElement | HTMLSelectElement)[];
+  const msg = document.querySelector('.measure-msg') as HTMLElement | null;
+  const say = (text: string) => {
+    if (msg) msg.textContent = text;
+  };
+
+  function load(id: string): Saved | null {
+    try {
+      return JSON.parse(localStorage.getItem(KEY + id) ?? 'null');
+    } catch {
+      return null;
+    }
+  }
+
+  function save(id: string, v: (number | null)[] | null) {
+    if (!v || v.every((x) => x === null)) localStorage.removeItem(KEY + id);
+    else localStorage.setItem(KEY + id, JSON.stringify({ v, date: today() }));
+  }
+
+  // The values in a row's boxes, or null when they are empty.
+  function values(r: HTMLTableRowElement): (number | null)[] | null {
+    const v = fields(r).map((f) => parse(f.value));
+    return v.every((x) => x === null) ? null : v;
+  }
+
+  function status(r: HTMLTableRowElement) {
+    const s = specs.get(r)!;
+    const cell = r.querySelector('.measure-status div') as HTMLElement;
+    const v = values(r);
+    r.classList.remove('row-in', 'row-out');
+    if (!v) {
+      cell.textContent = '';
+      return;
+    }
+    const bad: string[] = [];
+    v.forEach((x, k) => {
+      if (x === null) return;
+      const lo = at(s.min, k);
+      const hi = at(s.max, k);
+      const name = s.n > 1 ? `${s.names[k]}: ` : '';
+      if (lo != null && x < lo) bad.push(`${name}below ${lo.toLocaleString('en-AU')} ${s.unit}. ${s.low[k]}`);
+      else if (hi != null && x > hi) bad.push(`${name}above ${hi.toLocaleString('en-AU')} ${s.unit}. ${s.high[k]}`);
+    });
+    const done = v.every((x) => x !== null);
+    cell.innerHTML = '';
+    const tag = document.createElement('span');
+    tag.className = bad.length ? 'm-out' : 'm-in';
+    tag.textContent = bad.length ? 'Out of range' : done ? 'In range' : 'In range so far';
+    cell.append(tag);
+    if (bad.length) cell.append(document.createTextNode(`: ${bad.join(' ')}`));
+    r.classList.add(bad.length ? 'row-out' : 'row-in');
+  }
+
+  function fill(r: HTMLTableRowElement) {
+    const s = specs.get(r)!;
+    const saved = load(s.id);
+    const committed = s.committed == null ? null : Array.isArray(s.committed) ? s.committed : [s.committed];
+    const v = saved?.v ?? committed;
+    fields(r).forEach((f, k) => {
+      f.value = v?.[k] == null ? '' : String(v[k]);
+      f.classList.toggle('committed', !saved && committed !== null);
+      f.title = !saved && committed !== null ? `In data/measurements.yaml${s.date ? `, measured ${s.date}` : ''}` : '';
+    });
+    status(r);
+  }
+
+  for (const r of rows) {
+    fill(r);
+    const edited = () => {
+      save(specs.get(r)!.id, values(r));
+      fields(r).forEach((f) => f.classList.remove('committed'));
+      status(r);
+    };
+    fields(r).forEach((f) => {
+      f.addEventListener('input', edited);
+      f.addEventListener('change', edited);
+    });
+  }
+
+  // ---------------------------------------------------------------- export, import and clear
+  function download(name: string, type: string, text: string) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type }));
+    a.download = name;
+    document.body.append(a);
+    a.click();
+    a.remove();
+    window.setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+
+  const one = (v: (number | null)[]) => (v.length === 1 ? String(v[0] ?? '') : v.map((x) => x ?? '').join('; '));
+
+  function exportCsv() {
+    const q = (s: string) => (/[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s);
+    const lines = [['id', 'value', 'date', 'unit', 'status', 'what'].join(',')];
+    for (const r of rows) {
+      const s = specs.get(r)!;
+      const v = values(r);
+      if (!v) continue;
+      const date = load(s.id)?.date ?? s.date ?? '';
+      const st = (r.querySelector('.measure-status') as HTMLElement).textContent ?? '';
+      lines.push([s.id, one(v), date, s.unit, st, s.title].map(q).join(','));
+    }
+    if (lines.length === 1) return say('Nothing to export yet');
+    download('measurements.csv', 'text/csv;charset=utf-8', '\uFEFF' + lines.join('\r\n') + '\r\n');
+    say(`Exported ${lines.length - 1} values`);
+  }
+
+  // One `measured:` line per input typed in this browser, ready to paste over the input's line in the data.
+  function exportYaml() {
+    const out = [`# Measurements typed on the site, exported ${today()}.`,
+      '# In data/measurements.yaml, replace each input\'s measured line with the one below its id.'];
+    let n = 0;
+    for (const r of rows) {
+      const s = specs.get(r)!;
+      const saved = load(s.id);
+      if (!saved) continue;
+      const v = saved.v.length === 1 ? String(saved.v[0] ?? 'null') : `[${saved.v.map((x) => x ?? 'null').join(', ')}]`;
+      out.push(`# ${s.id}: ${s.title}`, `    measured: {v: ${v}, date: ${saved.date}}`);
+      n += 1;
+    }
+    if (!n) return say('Nothing typed in this browser yet');
+    download('measurements.yaml', 'text/yaml;charset=utf-8', out.join('\n') + '\n');
+    say(`Exported ${n} measured lines`);
+  }
+
+  // A CSV with an id column and a value column (the export's own format works). Several values go in one cell,
+  // separated by semicolons. A date column is used when there is one.
+  function importCsv(text: string) {
+    const split = (line: string) => {
+      const cells: string[] = [];
+      let cur = '';
+      let quoted = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (quoted) {
+          if (ch === '"' && line[i + 1] === '"') { cur += '"'; i += 1; }
+          else if (ch === '"') quoted = false;
+          else cur += ch;
+        } else if (ch === '"') quoted = true;
+        else if (ch === ',') { cells.push(cur); cur = ''; }
+        else cur += ch;
+      }
+      cells.push(cur);
+      return cells.map((c) => c.trim());
+    };
+    const lines = text.replace(/^\uFEFF/, '').split(/\r?\n/).filter((l) => l.trim());
+    const head = split(lines[0] ?? '').map((h) => h.toLowerCase());
+    const has = head.includes('id');
+    const col = (name: string, fallback: number) => (has && head.includes(name) ? head.indexOf(name) : fallback);
+    const [ci, cv, cd] = [col('id', 0), col('value', 1), col('date', -1)];
+    let n = 0;
+    for (const line of has ? lines.slice(1) : lines) {
+      const c = split(line);
+      const r = rows.find((x) => specs.get(x)!.id === c[ci]);
+      if (!r) continue;
+      const v = (c[cv] ?? '').split(';').map((x) => parse(x));
+      if (v.every((x) => x === null)) continue;
+      const date = cd >= 0 && /^\d{4}-\d{2}-\d{2}$/.test(c[cd] ?? '') ? c[cd] : today();
+      localStorage.setItem(KEY + c[ci], JSON.stringify({ v, date }));
+      fill(r);
+      n += 1;
+    }
+    say(n ? `Imported ${n} values` : 'No rows with a known id and a value');
+  }
+
+  function clearAll() {
+    if (!window.confirm('Clear every value typed in this browser? Values in data/measurements.yaml stay.')) return;
+    for (const r of rows) {
+      localStorage.removeItem(KEY + specs.get(r)!.id);
+      fill(r);
+    }
+    say('Cleared');
+  }
+
+  const tools = document.querySelector('.measure-tools');
+  tools?.addEventListener('click', (e) => {
+    const act = (e.target as HTMLElement).closest('button')?.dataset.act;
+    if (act === 'csv') exportCsv();
+    else if (act === 'yaml') exportYaml();
+    else if (act === 'clear') clearAll();
+  });
+  tools?.querySelector('input[type=file]')?.addEventListener('change', async (e) => {
+    const f = (e.target as HTMLInputElement).files?.[0];
+    if (f) importCsv(await f.text());
+    (e.target as HTMLInputElement).value = '';
+  });
+</script>

@@ -9,6 +9,15 @@
 # cad/inputs.py, and the Measurements page shows what each one does with the value in use. A threshold is a
 # design rule, not a check limit. Check limits stay in checks.yaml, data/ute/ute.yaml and data/ute/garage-checks.yaml.
 #
+# `range` is what the design accepts without a redesign, with its source in `src`. `min` or `max` is a number, null
+# for no limit on that side (`src` says why), a list with one entry per value for an input with several values (in
+# the order of `order`), or {ref: name} for a figure the build works out from the model (cad/trailer.py,
+# measurement_refs). {ref: name, rel: 0.02} means within 2 % of that figure. The Measurements page shows the range
+# beside an input box and colours what is typed in or out of it. A range is a guide for measuring, not a check limit.
+# `stage` says when it is measured: buy (an answer from the seller or the maker), build (on the ute, the bikes or the
+# parts, before or while building), weigh (at a weighbridge during the build) or trailer built. `covers` lists the
+# build stages a weighbridge reading includes.
+#
 # Revision of 20 Nov 2026: the tow vehicle is the LandCruiser 79 (research report 16), so the Cayenne's inputs
 # (CAR-01 to CAR-07) are gone. The bike, chock and pannier inputs now set the ute's bike box (UTE-GARAGE.md).
 inputs:
@@ -20,6 +29,8 @@ inputs:
     unit: mm
     estimate: {v: 440, src: "Decision log 12:10 UTC: the ute's tongue is set for 440 mm laden, plus or minus 20 mm, so the coupling stays inside VSB1's 460 mm (report 18 section 3.5)"}
     measured: {v: null, date: null}
+    stage: build
+    range: {min: 370, max: 440, src: "VSB1 9.3.2 and report 08 section 5.3: with its 20 mm tolerance the coupling stays inside VSB1's 350 to 460 mm only between 370 and 440 mm. Outside it, a tongue with more or less drop"}
     affects: [coupling height, drawbar drop, DIM-03, UTE-13, JK-02]
     thresholds:
       - {at: 440, rule: "The trailer is designed level at this height: the coupling point Z follows the value and the drawbar drop below the rails re-solves", src: "VSB1 9.3.2: trailers should be designed to be level within the towball range"}
@@ -31,6 +42,8 @@ inputs:
     unit: mm
     estimate: {v: 1300, src: "Report 16 and the decision log 12:45 UTC: 1,300 mm for the Hayman Reese 03186RW with its tongue (estimate)"}
     measured: {v: null, date: null}
+    stage: build
+    range: {min: {ref: ball_reach_min}, max: null, src: "JK-01 keeps the trailer's front parts 100 mm outside the bike box's sweep, and each 10 mm less reach adds about 10 mm to the box's overhang, so the minimum is the reach less JK-01's margin. No maximum: a longer reach only adds sweep clearance, and the rear axle check UTE-03 moves by about 8 kg per 100 mm at 250 kg on the ball"}
     affects: [ute rear axle load, bike box overhang behind the ball, JK-01, JK-02]
     thresholds:
       - {rule: "Sets the lever arm of the towball on the ute's axles (UTE-03, UTE-12) and how far the bike box overhangs the ball, so the jack-knife sweep re-solves. Each 10 mm less adds about 10 mm to the box's overhang", src: "Report 16 section 5, U2 model"}
@@ -41,6 +54,8 @@ inputs:
     unit: kg
     estimate: {v: null, src: "Not measured until the trailer exists. The model's fully loaded towball is shown beside it"}
     measured: {v: null, date: null}
+    stage: trailer built
+    range: {ref: towball_model, rel: 0.10, src: "Within 10 % of the model's fully loaded towball (TBS-01, the threshold below). Outside it the centre of gravity estimates are wrong"}
     affects: [TBS-01 check against the model]
     thresholds:
       - {at: 0.10, rule: "More than 10 % away from the model's fully loaded towball means the centre of gravity estimates are wrong: weigh the parts again before relying on the axle position", src: "Report 02 MASS-07 asks for differences over 2 % in mass to be explained. 10 % on the towball is this layout's rule"}
@@ -53,6 +68,8 @@ inputs:
     unit: kg
     estimate: {v: 1400, src: "ROH's fitment table for the Trak 2 16 x 7 ET 0 5 x 150 (report 16 section 4), the wheel the ute and the trailer share"}
     measured: {v: null, date: null}
+    stage: buy
+    range: {min: {ref: wheel_need}, max: null, src: "At least the larger of the trailer's per-wheel load in MAS-09 and the ute's rear wheel load in UTE-12, both with the growth allowance. No maximum: a higher rating only adds margin"}
     affects: [MAS-09, UTE-12]
     thresholds:
       - {rule: "MAS-09 checks the rating against the per-wheel load MAS-06 uses: 1.2 times the axle group load with the growth allowance, over four wheels. Below it, choose a higher-rated wheel", src: "VSB1 Rev 6 axles and suspension, report 16"}
@@ -63,6 +80,8 @@ inputs:
     unit: kg
     estimate: {v: 4050, src: "Cruisemaster air guide: 4,500 kg ATM XT Air tandem, 4,050 kg GTM (report 06)"}
     measured: {v: null, date: null}
+    stage: buy
+    range: {min: {ref: gtm_need}, max: null, src: "At least the larger of MAS-02's 1.2 times the axle group load with growth and VSB1's 120 % rule at the plated ATM (report 06). No maximum: a higher rating only adds margin"}
     affects: [MAS-02]
     thresholds:
       - {rule: "The axle group load in MAS-02 is checked against this rating. VSB1's 120 % rule at the ATM needs 1.2 x (ATM less the towball target), worked out from the current values", src: "Report 06, VSB1 Rev 6 axles and suspension"}
@@ -73,6 +92,8 @@ inputs:
     unit: yes or no
     estimate: {v: 0, src: "Not known. Taken as no, which is the safe side (report 06)"}
     measured: {v: 0, date: 2026-11-18, note: "Cruisemaster: it does not usually apply VSB1's rules, but will follow them in the design with the owner"}
+    stage: buy
+    range: {min: 0, max: 1, src: "Either answer works: MAS-02 checks 1.2 times the axle group load for no (0) and the axle group load itself for yes (1)"}
     affects: [MAS-02]
     thresholds:
       - {at: 0, rule: "No: MAS-02 checks 1.2 times the axle group load against the kit's GTM. Yes: it checks the axle group load itself", src: "VSB1 Rev 6 axles and suspension, report 06"}
@@ -83,6 +104,8 @@ inputs:
     unit: mm
     estimate: {v: 190, src: "Report 18 section 3.4: C/F 190 with ET 0 gives a 1,555 mm track on the 1,175 mm rail, the ute's front track"}
     measured: {v: null, date: null}
+    stage: buy
+    range: {min: {ref: cf_min}, max: 200, src: "Maximum: Cruisemaster's chart limits the effective C/F (C/F less ET 0) to 200 mm for the 4,500 kg XT Air tandem. Minimum: a smaller C/F moves the tyre towards the rail by the same amount, and FIT-05 keeps the tyre 50 mm from every chassis member, so the minimum is the C/F in use less FIT-05's margin"}
     affects: [track, chassis inputs]
     thresholds:
       - {rule: "The rail outer width stays 1,175 mm, so the track follows: rail width + 2 x (C/F - ET). The tyre's inner sidewall sits C/F - ET - half the tyre width outside the rail, and report 06 asks for about 40 mm", src: "Report 06 sections 3 and 8, report 09 section 3"}
@@ -96,6 +119,8 @@ inputs:
     unit: mm
     estimate: {v: 600, src: "Design estimate (DESIGN.md), 300 mm either side (range 280 to 350)"}
     measured: {v: 585, date: 2026-11-18, note: "Owner. Nothing else is at this spot, the crash bars sit much lower"}
+    stage: build
+    range: {min: null, max: 708, src: "Above 668 mm the build widens the bike spacing by the excess, and at 708 mm it reaches 780 mm, where the Street Triple's belly pan comes within 15 mm of the kerb-side tool chest (UGC-02) and the box layout needs redesigning. No minimum: a narrower bike only adds clearance"}
     affects: [side panel envelope, bike spacing, bike positions in the box, UGC-01, UGC-02]
     thresholds:
       - {at: 668, rule: "At or below 668 mm the 760 mm spacing holds: half-width 334 = 760 spacing - 396 Street Triple bar reach - 30 mm gap (UGC-01). Above it the spacing grows by about the excess half-width, and the build then sets the final spacing from the geometry: the smallest spacing at which UGC-01 measures 30 mm. Each bike moves out towards its wall by half the growth", src: "UTE-GARAGE.md (760 mm spacing, 30 mm limit), owner's 792 mm Street Triple width, addendum 1"}
@@ -107,6 +132,8 @@ inputs:
     unit: mm
     estimate: {v: 900, src: "Owner, 2026-11-18: much lower than the Street Triple's bar end at about 1,010 mm. 900 mm used until measured"}
     measured: {v: null, date: null}
+    stage: build
+    range: {min: null, max: 970, src: "Up to 970 mm the Street Triple's bar end at about 1,000 mm passes over the crash bars. Above it the bars may meet the bar end (UGC-01). No minimum: lower bars only add clearance"}
     affects: [crash bar envelope, UGC-01]
     thresholds:
       - {at: 970, rule: "The Street Triple's right bar end sits at about 1,000 to 1,030 mm. If the bars top out at about 970 mm or lower (30 mm under it), the bar end passes over them and the side panels govern. Above it the bars may meet the bar end, and the build re-solves the spacing from the geometry", src: "Report 05 (Street Triple bars at 1,013 mm), UTE-GARAGE.md UGC-01"}
@@ -117,6 +144,8 @@ inputs:
     unit: mm
     estimate: {v: 2220, src: "Owner's figure. Aprilia's image suggests 2,263 mm or more (report 05)"}
     measured: {v: null, date: null}
+    stage: build
+    range: {min: null, max: 2288, src: "Above 2,288 mm the number plate comes within 15 mm of the ramp stowed across the back of the box (UGC-04). No minimum: a shorter bike only adds clearance"}
     affects: [UGC-02, UGC-04]
     thresholds:
       - {at: 2288, rule: "Above about 2,288 mm the plate comes within 15 mm of the ramp stowed across the back of the box (UGC-04 measures 40.8 mm at 2,263 mm). The box length is set by the ute's rear overhang, so the bikes move forward only if the chock nose (CHK-01) measures shorter", src: "UTE-GARAGE.md UGC-02 and UGC-04"}
@@ -127,6 +156,8 @@ inputs:
     unit: mm
     estimate: {v: 1370, src: "Owner's figure. Aprilia's image gives about 1,390 mm"}
     measured: {v: null, date: null}
+    stage: build
+    range: {min: null, max: 1420, src: "Above 1,420 mm the screen comes within 15 mm of the 1,460 mm roof bows and door header with the front wheel 25 mm up in the chock (UGC-02, UGC-05), and the walls must grow. No minimum"}
     affects: [UGC-02, UGC-05]
     thresholds:
       - {at: 1420, rule: "The box is 1,460 mm high inside to the roof bows and the door header. With the front wheel 25 mm up in the chock, a screen or folded mirror above about 1,420 mm comes within 15 mm of them (UGC-02), and the walls must grow", src: "UTE-GARAGE.md"}
@@ -137,6 +168,8 @@ inputs:
     unit: mm
     estimate: {v: 1365, src: "bikes.yaml estimate, kept below the screen"}
     measured: {v: null, date: null}
+    stage: build
+    range: {min: null, max: 1420, src: "The folded mirrors follow the screen's rule: above 1,420 mm they come within 15 mm of the roof bows (UGC-02). No minimum"}
     affects: [UGC-02]
     thresholds:
       - {rule: "If the mirrors stand above the screen they set the height instead (TU-03 rule)", src: "UTE-GARAGE.md"}
@@ -147,6 +180,8 @@ inputs:
     unit: mm
     estimate: {v: 980, src: "Owner's measurement of about 970 to 980 mm"}
     measured: {v: 980, date: 2026-11-18, note: "Owner's measurement, 970 to 980 mm, reported on 18 Nov"}
+    stage: build
+    range: {min: null, max: 1049, src: "Above 1,049 mm the road-side bag comes within 15 mm of the barn door portal as the Tuareg rolls out (UGC-03). No minimum: narrower bags only add clearance"}
     affects: [pannier envelope, UGC-02, UGC-03, UGC-06]
     thresholds:
       - {at: 1049, rule: "Above about 1,049 mm the road-side bag comes within 15 mm of the barn door portal as the Tuareg rolls out (UGC-03 measures 49.5 mm at 980 mm). The Tuareg would have to move towards the kerb side", src: "UTE-GARAGE.md UGC-03"}
@@ -157,6 +192,8 @@ inputs:
     unit: mm
     estimate: {v: [457, 508, 1300, 425], src: "Length and height from Mosko Moto's Backcountry 30L figures. Front edge 1,300 behind the front axle and bottom 425 off the floor are estimates"}
     measured: {v: null, date: null}
+    stage: build
+    range: {min: [null, null, 1260, 385], max: [497, 548, 1340, 465], src: "Estimate: UGC-05 measures 59.5 mm from the road-side bag to the nearest frame post (needs 15) and UGC-06 55.7 mm to the nearest strap (needs 0), so each figure may change by about 40 mm before a check fails (est.). Smaller bags only add clearance, so length and height have no minimum"}
     order: [length, height, front edge behind the front axle, bottom above the floor]
     affects: [pannier envelope, UGC-06]
     thresholds:
@@ -168,6 +205,8 @@ inputs:
     unit: mm
     estimate: {v: 640, src: "bikes.yaml design estimate (320 mm each side)"}
     measured: {v: null, date: null}
+    stage: build
+    range: {min: null, max: 689, src: "Estimate: UGC-02 measures 39.5 mm from the Tuareg to the road-side tool chest (needs 15), so each peg tip may reach about 24 mm further out (est.). The 730 mm rule for the two facing pegs allows more. No minimum"}
     affects: [bike spacing, UGC-01, UGC-02]
     thresholds:
       - {at: 730, rule: "The two bikes' facing pegs must stay 30 mm apart: half the Tuareg's width plus half the Street Triple's at most 730 mm (760 - 30). Above it the spacing grows by the excess, as in TU-01", src: "UTE-GARAGE.md UGC-01"}
@@ -178,6 +217,8 @@ inputs:
     unit: mm
     estimate: {v: 440, src: "bikes.yaml design estimate (220 mm each side)"}
     measured: {v: null, date: null}
+    stage: build
+    range: {min: null, max: 461, src: "Estimate: UGC-02 measures 25.5 mm from the Street Triple to the kerb-side tool chest (needs 15), so each peg tip may reach about 10 mm further out (est.). The 730 mm rule for the two facing pegs allows more. No minimum"}
     affects: [bike spacing, UGC-01]
     thresholds:
       - {at: 730, rule: "With TU-07: half of each peg width added together at most 730 mm, or the spacing grows by the excess", src: "UTE-GARAGE.md UGC-01"}
@@ -188,6 +229,8 @@ inputs:
     unit: mm
     estimate: {v: 50, src: "Design allowance (DESIGN.md), to be measured on a real chock"}
     measured: {v: null, date: null}
+    stage: build
+    range: {min: null, max: 75, src: "Both bikes move back by the chock's depth, and UGC-04 measures 40.8 mm from the Tuareg's plate to the stowed ramp (needs 15), so the chock may be about 25 mm deeper than 50 mm. No minimum: a shallower chock moves the bikes away from the ramp"}
     affects: [bike position along the box, UGC-02, UGC-04]
     thresholds:
       - {rule: "The front tyre's leading edge sits this far behind the box's front wall, so both bikes move with it", src: "UTE-GARAGE.md"}
@@ -200,7 +243,9 @@ inputs:
     unit: kg
     estimate: {v: null, src: "The model's sum for these lines is shown beside it"}
     measured: {v: null, date: null}
-    stage: [chassis, running_gear, drawbar_structure]
+    stage: weigh
+    range: {ref: model_TW-01, rel: 0.02, src: "Within 2 % of the model's mass for the parts on the scale by then (report 02 MASS-07). A bigger difference is explained before work continues"}
+    covers: [chassis, running_gear, drawbar_structure]
     affects: [every mass check]
     thresholds:
       - {rule: "The weighed figure replaces the estimates for the parts already built: their masses scale to it and their growth allowance becomes 0 %", src: "Report 02 MASS-06 and MASS-07"}
@@ -212,7 +257,9 @@ inputs:
     unit: kg
     estimate: {v: null, src: "The model's sum is shown beside it"}
     measured: {v: null, date: null}
-    stage: [body, roof]
+    stage: weigh
+    range: {ref: model_TW-02, rel: 0.02, src: "Within 2 % of the model's mass for the parts on the scale by then (report 02 MASS-07). A bigger difference is explained before work continues"}
+    covers: [body, roof]
     affects: [every mass check]
     thresholds:
       - {rule: "The rise from TW-01 replaces the shell's estimates, as for TW-01", src: "Report 02 MASS-06 and MASS-07"}
@@ -223,7 +270,9 @@ inputs:
     unit: kg
     estimate: {v: null, src: "The model's tare is shown beside it"}
     measured: {v: null, date: null}
-    stage: [living, bed, underfloor, stowage, spare]
+    stage: weigh
+    range: {ref: model_TW-03, rel: 0.02, src: "Within 2 % of the model's tare, the whole trailer as built (report 02 MASS-07). A bigger difference is explained before the plate is stamped"}
+    covers: [living, bed, underfloor, stowage, spare]
     affects: [every mass check, the plated tare]
     thresholds:
       - {rule: "The rise from TW-02 replaces the fit-out's estimates. The ticket goes in the NSW identity approval package (report 02, VIB 78)", src: "Report 02 MASS-07 and MASS-08"}

@@ -25,7 +25,7 @@ def test_trailer_check(row):
 def test_every_aboard_line_has_a_source():
     for case in TRAILER.cases:
         for b, m in EV["layout"].case_lines(case):
-            assert b.source and b.maturity in ("spec", "calculated", "estimate"), f"{b.iid} has no mass source"
+            assert b.source and b.maturity in ("spec", "calculated", "estimate", "weighed"), f"{b.iid} has no mass source"
 
 
 def test_no_petrol_inside_the_body():

@@ -213,4 +213,10 @@
     line-clamp: none;
     overflow: visible;
   }
+  .sheet-frame .sheet-short {
+    white-space: normal;
+  }
+  .sheet-text {
+    min-width: 0;
+  }
 }

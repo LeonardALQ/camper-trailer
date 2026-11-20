@@ -49,7 +49,8 @@ def tow_vehicle(prj: Project) -> dict:
     case = next(c for c in rep["cases"] if c["id"] == tv["gcm_case"])
     return dict(name=tv["name"], limits=lim, limit_src=src, gcm_case=tv["gcm_case"], case_name=case["name"],
                 ute_kg=case["nominal"]["mass_kg"], ute_kg_growth=case["growth"]["mass_kg"], sweep=rep["bike_box_sweep"],
-                ute_checks=[dict(id=c["id"], title=c["title"], status=c["status"], detail=c["detail"]) for c in rep["checks"]])
+                ute_checks=[dict(id=c["id"], title=c["title"], status=c["status"], detail=c["detail"], measured=c.get("measured"))
+                            for c in rep["checks"]])
 
 
 # ------------------------------------------------------------------ blocks
@@ -886,11 +887,37 @@ def schedule(lay: Layout, tr: Trailer) -> list[dict]:
     return rows
 
 
+def measurement_refs(tr: Trailer, ev: dict) -> dict:
+    """The model's figures that the measured inputs' ranges refer to ({ref: name} in data/measurements.yaml): the fully
+    loaded towball, the model's mass at each weighbridge stage, the wheel and kit ratings the checks need, and the
+    shortest ball reach and smallest C/F the clearance checks allow."""
+    lay = ev["layout"]
+    chk = {c["id"]: c for c in ev["checks"]}
+    ute = {c["id"]: c for c in tr.tv["ute_checks"]}
+    case = next(c for c in ev["cases"] if c["id"] == tr.target_case.id)
+    refs = dict(
+        towball_model=case["nominal"]["towball_kg"],
+        wheel_need=max(chk["MAS-09"]["measured"], ute["UTE-12"]["measured"] or 0),
+        gtm_need=max(chk["MAS-02"]["measured"], tr.supplier["need_kg"]),
+        ball_reach_min=tr.inputs.v("UTE-02") - chk["JK-01"]["margin"],
+        cf_min=tr.inputs.v("SUP-04") - chk["FIT-05"]["margin"],
+    )
+    # a weighbridge reading includes every stage built by then, so each stage's model figure adds the ones before. The
+    # last one weighs the finished trailer, so its figure is the whole tare
+    covered: set[str] = set()
+    for iid in ("TW-01", "TW-02"):
+        covered |= set(tr.inputs.items[iid].extra["covers"])
+        refs[f"model_{iid}"] = sum(b.mass_kg for b in lay.blocks if b.load == "tare" and _stage_of(b) in covered)
+    refs["model_TW-03"] = sum(b.mass_kg for b in lay.blocks if b.load == "tare")
+    return refs
+
+
 def report(tr: Trailer) -> dict:
     ev = tr.evaluate()
     lay = ev["layout"]
     V = lay.V
     zl = lay.zone_lengths()
+    tr.inputs.resolve_ranges(measurement_refs(tr, ev))
     sys_tot: dict[str, dict] = {}
     for b, m in lay.case_lines(next(c for c in tr.cases if c.id == "TC1")):
         g = sys_tot.setdefault(SYSTEM_LABELS[b.system], dict(mass_kg=0.0, growth_kg=0.0))

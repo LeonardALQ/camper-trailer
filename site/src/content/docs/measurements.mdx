@@ -1,19 +1,23 @@
 ---
 title: Measurements
-description: Every value the owner will measure, with how to measure it, the value in use, what depends on it and the rule that changes the plan.
+description: Every value the owner will measure, when and how to measure it, the range the design accepts, and a sheet to type the results into.
 tableOfContents: false
 ---
 
 import Measurements from '../../components/Measurements.astro';
 
 The plan is worked out from estimates until the owner measures the real thing. Each input below lives in
-`data/measurements.yaml`, which can be edited in GitHub's web editor. Put the measured value and the date in its
-`measured` slot, and the push to main rebuilds this site with the plan re-solved from it.
+`data/measurements.yaml` with how to measure it, when (buy, build, weigh or trailer built) and the range the design
+accepts without a redesign. Type a value in the Measured column and the sheet says whether it is in range, and which
+rule it breaks if it is not.
 
-Each input has rules that change the plan, not only a warning. For example, the Tuareg's measured width across its
-side panels sets the bike spacing in the ute's bike box. The box is 1,850 mm wide at most, so a spacing that no
-longer fits is flagged by check UGC-02 rather than growing the box. The ute's laden ball height (UTE-01) sets the
-trailer's coupling height and the drawbar drop. These rules are design rules with their source. They never change a
-check's limit.
+Values typed here stay in this browser until you export them. Export YAML gives one `measured` line per input, ready
+to paste into `data/measurements.yaml`, and a push to main then rebuilds the site with the plan re-solved from them.
+Export CSV and Import CSV move the values to another browser or a spreadsheet.
+
+Each input also has rules that change the plan, not only a warning. The Tuareg's width across its side panels sets
+the bike spacing in the ute's bike box, and the ute's laden ball height (UTE-01) sets the trailer's coupling height
+and the drawbar drop. These are design rules with their source, and a range is a guide for measuring. Neither changes
+a check's limit.
 
 <Measurements />
