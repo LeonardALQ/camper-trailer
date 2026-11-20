@@ -66,6 +66,10 @@ def main():
     _copy(BUILD / "trailer" / "trailer.glb", SITE / "public" / "downloads" / "trailer.glb")
     _copy(BUILD / "trailer" / "chassis.viewer.json", SITE / "public" / "models" / "chassis.json")
     _copy(BUILD / "trailer" / "chassis.step", SITE / "public" / "downloads" / "chassis.step")
+    _copy(BUILD / "trailer" / "body.viewer.json", SITE / "public" / "models" / "body.json")
+    _copy(BUILD / "trailer" / "body-raised.viewer.json", SITE / "public" / "models" / "body-raised.json")
+    _copy(BUILD / "trailer" / "body.step", SITE / "public" / "downloads" / "body.step")
+    _copy(BUILD / "body" / "body.json", GEN / "body.json")
     _copy(BUILD / "chassis" / "chassis.json", GEN / "chassis.json")
     _copy(BUILD / "chassis" / "chassis-cut-list.csv", SITE / "public" / "downloads" / "chassis-cut-list.csv")
     import cairosvg

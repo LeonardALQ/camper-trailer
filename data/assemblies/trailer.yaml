@@ -52,6 +52,8 @@ params:
   floor_z: floor_underside_z + floor_t        # garage floor surface, module Z 0
   ceiling_z: floor_z + interior_h
   roof_top_z: ceiling_z + roof_t
+  roof_lift: 825             # raising roof lift, four LINAK LA36 actuators (report 12 section 6). Parked only
+  raised_height: roof_top_z + roof_lift + 2   # top of the solar panels with the roof raised
   # ---------------------------------------------------------------- chassis (block sizes until the engineer sizes them)
   rail_h: 150                # report 08 assumption, the engineer sizes it
   rail_w: 50                 # Cruisemaster: 50 mm wide sections

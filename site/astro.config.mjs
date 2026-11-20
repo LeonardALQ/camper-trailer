@@ -17,6 +17,7 @@ export default defineConfig({
         { label: 'Home', link: '/' },
         { label: 'Whole trailer', link: '/trailer/' },
         { label: 'Chassis', link: '/chassis/' },
+        { label: 'Body', link: '/body/' },
         { label: 'Garage and bed', link: '/garage-bed/' },
         { label: 'Measurements', link: '/measurements/' },
         { label: 'Drawings', link: '/drawings/' },

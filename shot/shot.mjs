@@ -20,6 +20,8 @@ const jobs = [
   { path: `/steps/${pick('03')}/`, name: 'step-03', viewer: true, full: true },
   { path: `/steps/${pick('10')}/`, name: 'step-10', viewer: true },
   { path: `/steps/${pick('11')}/`, name: 'step-11', viewer: true },
+  { path: '/body/', name: 'body', viewer: true, full: true, sections: ['checks', 'panels', 'mass'] },
+  { path: '/body/', name: 'body-raised', viewer: true, nth: 1 },
   { path: '/drawings/', name: 'drawings', full: true },
   { path: '/research/03-bike-restraint-garage/', name: 'research-03' },
   { path: '/downloads/', name: 'downloads', full: true },
@@ -53,7 +55,7 @@ for (const j of jobs) {
   };
   await shoot(`${j.name}.png`, { fullPage: !!j.full });
   if (j.viewer) {
-    const el = await page.$('cad-viewer');
+    const el = (await page.$$('cad-viewer'))[j.nth || 0];
     if (el) {
       const r = await el.evaluate((e) => { const b = e.getBoundingClientRect(); return { y: b.top + window.scrollY, h: b.height }; });
       // the viewer plus the text that follows it, to check nothing overlaps

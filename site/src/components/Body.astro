@@ -1,0 +1,135 @@
+---
+// Body tables, from build/body/body.json (cad/body.py) and the body checks and mass lines in build/trailer/trailer.json.
+import b from '../data/generated/body.json';
+import t from '../data/generated/trailer.json';
+
+interface Props {
+  kind: 'summary' | 'panels' | 'mass' | 'checks' | 'twist' | 'mounts' | 'openings' | 'hardpoints';
+}
+const { kind } = Astro.props;
+const r: any = b;
+const tr: any = t;
+const n = (v: number | null | undefined, d = 0) =>
+  v == null ? '' : (Math.abs(v) < 0.5 * 10 ** -d ? 0 : v).toLocaleString('en-AU', { minimumFractionDigits: d, maximumFractionDigits: d });
+const checks = tr.checks.filter((x: any) => x.type.startsWith('body'));
+const statusClass = (x: any) => (x.ok ? 'status-pass' : x.severity === 'fail' ? 'status-fail' : 'status-report');
+const lines = tr.schedule.filter((x: any) => x.system === 'body');
+const bodyKg = lines.reduce((s: number, x: any) => s + x.mass_kg, 0);
+const bodyGr = lines.reduce((s: number, x: any) => s + x.mass_with_growth_kg, 0);
+const fails = checks.filter((x: any) => x.severity === 'fail' && !x.ok);
+const tw = r.twist;
+const m = r.mounts;
+---
+
+{kind === 'summary' && (
+  <p>
+    The body weighs {n(bodyKg)} kg, {n(bodyGr)} kg with the growth allowance, against the 654 kg estimate of the block
+    layout. With the body tied to the chassis at every station, the chassis twists {n(tw.open.chassis_deg, 3)} degree under
+    the LC5a twist case in place of {n(tw.bare_deg, 3)} degree, so the body takes {n(100 * tw.open.share)} % of it with the
+    lid carrying no shear ({n(100 * tw.closed.share)} % if the latched lid carries shear). {fails.length === 0
+      ? 'Every body strength, insert and spacing check passes.'
+      : `${fails.length} body checks fail: ${fails.map((x: any) => x.id).join(', ')}.`}
+  </p>
+)}
+
+{kind === 'panels' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Panel</th><th class="num">mm</th><th class="num">kg/m²</th><th class="num">D kNm²/m</th><th class="num">S kN/m</th><th class="num">Wrinkling MPa</th></tr></thead>
+      <tbody>
+        {Object.values(r.panel_data).map((p: any) => (
+          <tr><td>{p.name}</td><td class="num">{n(p.t)}</td><td class="num">{n(p.kg_m2, 2)}</td><td class="num">{n(p.D_knm2_per_m, 1)}</td>
+            <td class="num">{n(p.S_kn_per_m)}</td><td class="num">{n(p.wrinkling_mpa)}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'mass' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Line</th><th>Item</th><th class="num">kg</th><th>Basis</th><th class="num">Growth %</th><th class="num">With growth</th><th>Parts and source</th></tr></thead>
+      <tbody>
+        {lines.map((x: any) => (
+          <tr><td>{x.iid}</td><td>{x.item}</td><td class="num">{n(x.mass_kg, 1)}</td><td>{x.maturity}</td><td class="num">{n(x.growth_pct)}</td>
+            <td class="num">{n(x.mass_with_growth_kg, 1)}</td><td>{x.source}</td></tr>
+        ))}
+        <tr><td></td><td><strong>Body</strong></td><td class="num"><strong>{n(bodyKg, 1)}</strong></td><td></td><td></td>
+          <td class="num"><strong>{n(bodyGr, 1)}</strong></td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'checks' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>ID</th><th>Check</th><th class="num">Model</th><th>Limit</th><th>Result</th><th>Detail</th></tr></thead>
+      <tbody>
+        {checks.map((x: any) => (
+          <tr class={x.ok ? '' : x.severity === 'fail' ? 'row-fail' : 'row-report'}>
+            <td>{x.id}</td><td>{x.title}</td><td class="num">{x.measured == null ? '' : `${n(x.measured, 2)} ${x.unit}`}</td>
+            <td>{x.limit}</td><td class={statusClass(x)}>{x.status}</td><td>{x.detail}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'twist' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Model</th><th class="num">Chassis twist, degree</th><th class="num">Body share %</th><th class="num">Largest body torque kNm</th>
+        <th class="num">Largest mount force kN</th><th class="num">Chassis peak MPa</th></tr></thead>
+      <tbody>
+        <tr><td>Bare chassis (the chassis checks)</td><td class="num">{n(tw.bare_deg, 3)}</td><td class="num">0</td><td class="num"></td><td class="num"></td><td class="num">{n(tw.bare_lc5a_mpa)}</td></tr>
+        <tr><td>With the body, lid carrying no shear</td><td class="num">{n(tw.open.chassis_deg, 3)}</td><td class="num">{n(100 * tw.open.share)}</td>
+          <td class="num">{n(tw.open.max_body_torque_knm, 1)}</td><td class="num">{n(tw.open.mount_force_n / 1000, 1)}</td><td class="num">{n(tw.open.chassis_mpa)}</td></tr>
+        <tr><td>With the body, latched lid carrying shear (report 12)</td><td class="num">{n(tw.closed.chassis_deg, 3)}</td><td class="num">{n(100 * tw.closed.share)}</td>
+          <td class="num">{n(tw.closed.max_body_torque_knm, 1)}</td><td class="num">{n(tw.closed.mount_force_n / 1000, 1)}</td><td class="num">{n(tw.closed.chassis_mpa)}</td></tr>
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'mounts' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Case</th><th class="num">Shear per bolt kN</th><th class="num">Tension per bolt kN</th><th>Note</th></tr></thead>
+      <tbody>
+        {Object.entries(m.cases).map(([k, v]: any) => (
+          <tr><td>{k}</td><td class="num">{n(v.shear / 1000, 2)}</td><td class="num">{n(v.tension / 1000, 2)}</td><td>{v.note}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'openings' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>ID</th><th>Wall</th><th>Opening</th><th class="num">Along the wall mm</th><th class="num">Above the floor mm</th><th class="num">Cut-out mm</th></tr></thead>
+      <tbody>
+        {r.openings.map((o: any) => (
+          <tr><td>{o.id}</td><td>{o.wall}</td><td>{o.name}</td><td class="num">{n(o.u0)} to {n(o.u1)}</td><td class="num">{n(o.z0)} to {n(o.z1)}</td>
+            <td class="num">{n(o.w)} x {n(o.h)}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'hardpoints' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Anchor</th><th class="num">X</th><th class="num">Y</th><th class="num">Span mm</th><th class="num">Factor on ultimate</th><th>Governing</th></tr></thead>
+      <tbody>
+        {[...r.hardpoints].sort((a: any, c: any) => a.factor - c.factor).map((h: any) => (
+          <tr><td>{h.id}</td><td class="num">{n(h.x)}</td><td class="num">{n(h.y)}</td><td class="num">{n(h.span)}</td><td class="num">{n(h.factor, 2)}</td><td>{h.governing}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}

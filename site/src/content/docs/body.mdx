@@ -1,0 +1,75 @@
+---
+title: Body
+description: The body to planning level, with its 3D model roof down and raised, checks, panel schedule, mass lines and drawings.
+---
+
+import CadViewer from '../../components/CadViewer.astro';
+import Body from '../../components/Body.astro';
+import { withBase } from '../../lib/url';
+
+The body is a box of bonded sandwich panels on the chassis. A sandwich panel is two thin glass-fibre skins bonded to a
+light foam core. The floor is a 30 mm panel with woven-roving skins on a PVC foam core, the walls are 35 mm panels with
+gelcoat skins on XPS foam, and the raising roof is a 40 mm lid on canvas walls, lifted 825 mm by four electric
+actuators. Aluminium extrusions join every panel edge. The body bolts to the chassis at every station through the floor
+bearer strip, and it is not bonded to the steel. The design starts from research report 12 and is set out in `BODY.md`.
+
+This is a planning-level proposal for the engineer to check.
+
+<Body kind="summary" />
+
+## 3D model
+
+The body roof down, as it travels, with the four bonded solar panels on the lid. The tree on the left lists every
+panel, opening and fitting.
+
+<CadViewer src={withBase('/models/body.json')} height={520} />
+
+### Roof raised
+
+Parked, the lid rises 825 mm on its four actuators, with the canvas skirt and the guide posts showing. Inside, the
+raised ceiling is 2,625 mm above the floor, which gives 900 mm of sitting room over the mattress.
+
+<CadViewer src={withBase('/models/body-raised.json')} height={520} />
+
+The whole trailer, with the body in place, is on the <a href={withBase('/trailer/')}>Whole trailer</a> page.
+
+## Panels
+
+D is the panel's bending stiffness and S its shear stiffness, per metre width. Wrinkling is the stress at which a
+compressed skin buckles into the core.
+
+<Body kind="panels" />
+
+## Mass
+
+Each line lists its parts with their basis. A maker's figure carries no growth allowance, a calculated mass 7 % and an
+estimate 20 %.
+
+<Body kind="mass" />
+
+## Checks
+
+Strength, insert and spacing checks fail the build if they miss. Deflections and the twist share are reported.
+
+<Body kind="checks" />
+
+### Twist sharing
+
+The frame model takes the body as a torsion box tied to the chassis at every station. The chassis checks stay on the
+bare frame, so they hold if the body mounts loosen.
+
+<Body kind="twist" />
+
+### Body mounts
+
+<Body kind="mounts" />
+
+### L-track hardpoints at the 20 kN anchor load
+
+<Body kind="hardpoints" />
+
+## Openings
+
+Along the wall is measured from the body front for the side walls, and across from the centreline for the end walls.
+
+<Body kind="openings" />

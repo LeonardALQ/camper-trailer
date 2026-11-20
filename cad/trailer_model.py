@@ -72,8 +72,12 @@ def _moved(shape, loc):
 class TrailerModel:
     """Shapes for every solid block plus the module's bodies moved into the datum."""
 
-    def __init__(self, lay: Layout, module_model):
+    def __init__(self, lay: Layout, module_model, body: bool = False, raised: bool = False):
+        """`body` replaces the body's envelope blocks by the designed body (cad/body_model.py), with the roof raised if
+        `raised`."""
         self.lay = lay
+        from .body_model import BODY_IDS, body_solids
+        lift = lay.V["roof_lift"] if raised else 0.0
         self.groups: dict[str, list] = {}
         self.module_groups: dict[str, list] = {}
         self.names: dict[str, str] = {}
@@ -96,13 +100,22 @@ class TrailerModel:
                 continue
             if b.system == "module" or b.keep_clear or b.box is None and b.cyl is None and b.bar is None:
                 continue
+            if body and b.id in BODY_IDS:
+                continue
             s = block_shape(b)
             if s is None:
                 continue
+            if b.system == "roof" and lift:
+                s = Pos(0, 0, lift) * s
             col, a = OVERRIDE.get(b.id, COLOURS[b.system])
             s.label = f"{b.iid} {b.name}".replace("/", "-")
             s.color = rgba(col, a)
             self.groups.setdefault(b.system, []).append(s)
+        if body:
+            for label, shp, (col, a) in body_solids(lay, raised):
+                shp.label = label.replace("/", "-")
+                shp.color = rgba(col, a)
+                self.groups.setdefault("body", []).append(shp)
         dx, dz = lay.V["module_x0"], lay.V["floor_z"]
         prj = module_model.prj
         for mb in module_model.built.values():
@@ -146,3 +159,29 @@ def write_outputs(tm: TrailerModel, out: Path):
     js = _viewer_js("ASM-CH", ch)
     (out / "chassis.viewer.json").write_text(js[js.index("{"): js.rindex("}") + 1])
     export_step(ch, str(out / "chassis.step"), timestamp="2026-11-20T00:00:00")
+
+
+def write_body_outputs(lay: Layout, out: Path):
+    """The body on its own with the roof down and raised, for the Body page (BODY.md), and its STEP file."""
+    from .body_model import body_solids
+    from .export import _viewer_js
+    lift = lay.V["roof_lift"]
+    for raised, name in ((False, "body"), (True, "body-raised")):
+        kids = []
+        for label, shp, (col, a) in body_solids(lay, raised):
+            shp.label, shp.color = label.replace("/", "-"), rgba(col, a)
+            kids.append(shp)
+        roof = []
+        for b in lay.blocks:
+            if b.system == "roof" and b.box is not None:
+                s = block_shape(b)
+                if raised:
+                    s = Pos(0, 0, lift) * s
+                s.label, s.color = f"{b.iid} {b.name}".replace("/", "-"), rgba(*COLOURS["roof"])
+                roof.append(s)
+        comp = Compound(label=f"ASM-BD Body, roof {'raised' if raised else 'down'}",
+                        children=[Compound(label="Body", children=kids), Compound(label="Solar panels", children=roof)])
+        js = _viewer_js("ASM-BD", comp)
+        (out / f"{name}.viewer.json").write_text(js[js.index("{"): js.rindex("}") + 1])
+        if not raised:
+            export_step(comp, str(out / "body.step"), timestamp="2026-11-20T00:00:00")

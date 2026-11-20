@@ -137,7 +137,9 @@ def cmd_trailer():
     _write(BUILD / "body" / "body.json", body)
     t1 = time.time()
     lay = tr.layout(**rep["solved"]["overrides"])
-    write_outputs(TrailerModel(lay, model), out)
+    write_outputs(TrailerModel(lay, model, body=True), out)
+    from .trailer_model import write_body_outputs
+    write_body_outputs(lay, out)
     fails = [c["id"] for c in rep["checks"] if c["severity"] == "fail" and not c["ok"]]
     print(json.dumps(dict(
         axle_x=rep["solved"]["axle_x"], method=rep["solved"]["method"], recommended=rep["recommended"],
