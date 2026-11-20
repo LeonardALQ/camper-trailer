@@ -1,13 +1,14 @@
-# Drawing register for the garage and bed module (numbering per 02-design-practice 1.7).
+# Drawing register for the trailer, its chassis and body, and the ute's bike box (numbering per 02-design-practice 1.7).
+# Retired sheets stay in the register with `retired` saying why and what replaces them. They are no longer drawn.
 # Revision changes are classed per REV-04: memo, notice (configuration change) or rework bulletin.
 owner: Camper trailer project (owner-builder)
-project: Off-road camper trailer, garage and bed module
+project: Off-road camper trailer for the LandCruiser 79
 drawn_by: Kiro (AI agent)
-sheets_total: 11
+sheets_total: 12
 drawings:
   - number: CT-001
     title: General arrangement, whole trailer
-    subtitle: Block layout. Plan section and kerb-side elevation, mass and CoG by load case
+    subtitle: Block layout for the 79. Plan, kerb-side elevation, bike box sweep, mass and CoG by case
     project: Off-road camper trailer, whole trailer block layout
     sheet: 1
     size: A3
@@ -24,11 +25,12 @@ drawings:
       - {rev: G, date: 2026-11-20, description: "Notice: designed chassis and drawbar (CT-101), axle at X 5,013, masses and checks", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-20, description: "Notice: tyre at its published 752 mm, floor Z 872, BD-10 mud flaps only, axle at X 5,021", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-20, description: "Notice: report 13 equipment, no LPG, bonded solar, travel 2,714 mm, axle and masses", drawn: Kiro, checked: "", approved: ""}
+      - {rev: J, date: 2026-11-20, description: "Notice: trailer for the 79, layout 1, no garage, fixed roof, drawbar box. Redrawn", drawn: Kiro, checked: "", approved: ""}
   - number: CT-101
     title: Chassis general arrangement
     subtitle: Plan, kerb-side elevation, end views, member schedule and frame analysis summary
     project: Off-road camper trailer, chassis and drawbar
-    sheet: 5
+    sheet: 2
     size: A3
     scale: 50
     status: DRAFT
@@ -37,11 +39,12 @@ drawings:
       - {rev: A, date: 2026-11-20, description: "First draft of the chassis design (CHASSIS.md, report 11)", drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-20, description: "Notice: 752 mm tyre, frame 1.3 mm higher, 21 mm strip, axle X 5,021", drawn: Kiro, checked: "", approved: ""}
       - {rev: C, date: 2026-11-20, description: "Notice: report 13 masses, corner steadies 8.8 kg, axle re-solved", drawn: Kiro, checked: "", approved: ""}
+      - {rev: D, date: 2026-11-20, description: "Notice: 79 layout, 4,420 rails 1,175 wide, RHS 125 raisers, plate 3,100 kg", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
     project: Off-road camper trailer, chassis and drawbar
-    sheet: 6
+    sheet: 3
     size: A3
     scale: 20
     status: DRAFT
@@ -50,11 +53,12 @@ drawings:
       - {rev: A, date: 2026-11-20, description: "First draft of the drawbar and coupling (CHASSIS.md, report 11)", drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-20, description: "Notice: rail underside Z 571 for the 752 mm tyre", drawn: Kiro, checked: "", approved: ""}
       - {rev: C, date: 2026-11-20, description: "Notice: ARK XO750 jockey wheel 20 kg (report 13)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: D, date: 2026-11-20, description: "Notice: jockey at X 1,000, drawbar box brackets, VSB1 forces at 3,100 kg", drawn: Kiro, checked: "", approved: ""}
   - number: CT-103
     title: Chassis details
     subtitle: Composite rail, outrigger root, crossmember to rail, overlap end, jacking pad, recovery tongue, spare posts
     project: Off-road camper trailer, chassis and drawbar
-    sheet: 7
+    sheet: 4
     size: A3
     scale: 5
     status: DRAFT
@@ -62,13 +66,59 @@ drawings:
     revisions:
       - {rev: A, date: 2026-11-20, description: "First draft of the chassis details and the fatigue table (CHASSIS.md)", drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-20, description: "Notice: 50 x 21 mm bearer strip, fatigue table from the re-solved axle", drawn: Kiro, checked: "", approved: ""}
+      - {rev: C, date: 2026-11-20, description: "Notice: RHS 125 raiser and outrigger details, fatigue table re-solved", drawn: Kiro, checked: "", approved: ""}
+  - number: CT-201
+    title: Body shell
+    subtitle: Kerb, road, front and rear walls, the fixed roof plan, the panels and every opening with its size
+    project: Off-road camper trailer for the LandCruiser 79, body
+    sheet: 5
+    size: A3
+    scale: 50
+    status: DRAFT
+    structural: true
+    revisions:
+      - {rev: A, date: 2026-11-20, description: "First draft of the fixed-roof body for the 79 (BODY.md, report 12)", drawn: Kiro, checked: "", approved: ""}
+  - number: CT-202
+    title: Body joint details
+    subtitle: Floor joiner, corner joiner, roof-to-wall joiner, bed deck ledger and a floor insert with its crush tube
+    project: Off-road camper trailer for the LandCruiser 79, body
+    sheet: 6
+    size: A3
+    scale: 2
+    status: DRAFT
+    structural: true
+    revisions:
+      - {rev: A, date: 2026-11-20, description: "First draft of the fixed-roof body for the 79 (BODY.md, report 12)", drawn: Kiro, checked: "", approved: ""}
+  - number: CT-203
+    title: Body insert map
+    subtitle: Every fixing line in the floor, the walls and the roof, the mount inserts and the furniture fixings
+    project: Off-road camper trailer for the LandCruiser 79, body
+    sheet: 7
+    size: A3
+    scale: 50
+    status: DRAFT
+    structural: true
+    revisions:
+      - {rev: A, date: 2026-11-20, description: "First draft of the fixed-roof body for the 79 (BODY.md, report 12)", drawn: Kiro, checked: "", approved: ""}
+  - number: CT-301
+    title: Body to chassis
+    subtitle: Mount positions, the bolt and nut-plate detail, isolation and sealing, the twist sharing
+    project: Off-road camper trailer for the LandCruiser 79, body
+    sheet: 8
+    size: A3
+    scale: 50
+    status: DRAFT
+    structural: true
+    revisions:
+      - {rev: A, date: 2026-11-20, description: "First draft of the fixed-roof body for the 79 (BODY.md, report 12)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-401
     title: Garage and bed general arrangement
     subtitle: Plan, kerb-side section and section looking forward at partition A
-    sheet: 2
+    sheet: 0
     size: A3
     scale: 25
-    status: DRAFT
+    status: RETIRED
+    retired: "The bikes ride in the ute's bike box: the bike restraint moved to the ute's CT-701 to CT-704 (UTE-GARAGE.md) and the bed to the body (CT-201, BODY.md)"
     structural: true
     revisions:
       - {rev: A, date: 2026-11-16, description: First draft from design v1 baseline, drawn: Kiro, checked: "", approved: ""}
@@ -79,37 +129,42 @@ drawings:
       - {rev: F, date: 2026-11-20, description: "Notice: DIM-01 made right-handed. Plan and section A-A redrawn as seen", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-20, description: "Notice: module Z 0 at datum Z 872 (tyre at its published 752 mm)", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-20, description: "Notice: no LPG, the gas locker goes, the corner is stowage, WARN winch", drawn: Kiro, checked: "", approved: ""}
+      - {rev: I, date: 2026-11-20, description: "Retired: the garage and bed module left the trailer for the 79", drawn: Kiro, checked: "", approved: ""}
   - number: CT-402
     title: Garage floor, tie-down anchor layout
     subtitle: Track rows and anchor positions from the module datum
-    sheet: 3
+    sheet: 0
     size: A3
     scale: 20
-    status: DRAFT
+    status: RETIRED
+    retired: "The bikes ride in the ute's bike box: the bike restraint moved to the ute's CT-701 to CT-704 (UTE-GARAGE.md) and the bed to the body (CT-201, BODY.md)"
     structural: true
     revisions:
       - {rev: A, date: 2026-11-16, description: First draft from design v1 baseline, drawn: Kiro, checked: "", approved: ""}
       - {rev: C, date: 2026-11-18, description: "Notice: Tuareg panniers shown in the bike outline (no revision B on this sheet)", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-19, description: "Notice: rows across the trailer, kerb-strip row, strap loads. Redrawn", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-20, description: "Notice: DIM-01 made right-handed. Plan redrawn as seen, anchor Y values negated", drawn: Kiro, checked: "", approved: ""}
+      - {rev: F, date: 2026-11-20, description: "Retired: the garage and bed module left the trailer for the 79", drawn: Kiro, checked: "", approved: ""}
   - number: CT-501
     title: Bed platform
     subtitle: Beam layout, section through the bed stack, beam-end detail and deck lap detail
-    sheet: 4
+    sheet: 0
     size: A3
     scale: 20
-    status: DRAFT
+    status: RETIRED
+    retired: "The bikes ride in the ute's bike box: the bike restraint moved to the ute's CT-701 to CT-704 (UTE-GARAGE.md) and the bed to the body (CT-201, BODY.md)"
     structural: true
     revisions:
       - {rev: A, date: 2026-11-16, description: First draft from design v1 baseline, drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-17, description: "Notice: deck 1845 long, laps over partition B and its top cleat (detail G)", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-19, description: "Notice: SHS 50x50x3 beams across, deck 2375 laps partition A. Redrawn", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-20, description: "Notice: DIM-01 made right-handed. Plan and detail F redrawn as seen", drawn: Kiro, checked: "", approved: ""}
+      - {rev: F, date: 2026-11-20, description: "Retired: the garage and bed module left the trailer for the 79", drawn: Kiro, checked: "", approved: ""}
   - number: CT-701
     title: Ute with the bike garage, general arrangement
     subtitle: Kerb-side elevations travelling and loading, plan, rear view, mass by case and the ute checks
     project: LandCruiser 79 bike garage (UTE-GARAGE.md)
-    sheet: 8
+    sheet: 9
     size: A3
     scale: 50
     status: DRAFT
@@ -120,7 +175,7 @@ drawings:
     title: Ute garage box frame and panels
     subtitle: Kerb-side frame elevation, subframe plan on Toyota's deck mounts, section at the rear axle, member schedule
     project: LandCruiser 79 bike garage (UTE-GARAGE.md)
-    sheet: 9
+    sheet: 10
     size: A3
     scale: 20
     status: DRAFT
@@ -131,7 +186,7 @@ drawings:
     title: Ute garage doors and security
     subtitle: Rear view, kerb-side door, plan section through the barn doors, security layers
     project: LandCruiser 79 bike garage (UTE-GARAGE.md)
-    sheet: 10
+    sheet: 11
     size: A3
     scale: 20
     status: DRAFT
@@ -142,7 +197,7 @@ drawings:
     title: Ute garage restraint layout
     subtitle: Plan with the roof off, section at the rear L-track row, strap loads and anchors
     project: LandCruiser 79 bike garage (UTE-GARAGE.md)
-    sheet: 11
+    sheet: 12
     size: A3
     scale: 20
     status: DRAFT

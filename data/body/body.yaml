@@ -89,6 +89,7 @@ mounts:
   face_t: 3
   fy: 450
   per_station: 4               # one into each raiser, one into each outrigger tip
+  design: nut_plate            # the M12 nut-plate fixing below is the design (CH-P14 is in the chassis). The HB10 is reported for comparison
   outrigger_tip_y: 1140
   source: "https://www.abbots-uk.com/files/ww/lindapter-type-hb-datasheet.pdf"
   # Fallback (report 12 open question 5), used because the HB10 does not pass under LC5a and LC5b: an M12 8.8 hot-dip

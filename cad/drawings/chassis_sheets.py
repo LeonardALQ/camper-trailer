@@ -17,7 +17,7 @@ import time
 
 from ..build import BUILD, git_hash
 from ..chassis import fitting_solids, member_solid
-from ..trailer import ModuleInfo, Trailer
+from ..trailer import Trailer
 from . import sheet as S
 
 OUT = BUILD / "drawings"
@@ -36,7 +36,7 @@ def _chassis():
 
 def _layout(prj, model):
     rep = json.loads((BUILD / "trailer" / "trailer.json").read_text())
-    tr = Trailer(prj, ModuleInfo.from_model(prj, model))
+    tr = Trailer(prj)
     tr.analyse_chassis = False
     lay = tr.layout(**rep["solved"]["overrides"])
     return lay, rep
@@ -230,7 +230,8 @@ def ct101(prj, model, bom, checks, reg, dwg):
     ], width_chars=96, size=1.7, title="MASS AND CUT LIST")
     S.notes(sh, 22, 46, [
         "DATUM DIM-01: X FROM THE BALL CENTRE, POSITIVE REARWARD. Y FROM THE CENTRELINE, POSITIVE TO THE ROAD SIDE. Z UP FROM THE GROUND AT DESIGN RIDE HEIGHT.",
-        "RAILS RHS 150x50x3 WITH A CONTINUOUS RHS 100x50x3 RAISER (ONE COMPOSITE SECTION), 21 mm FLOOR BEARER STRIP. NO WELD ACROSS THE WIDTH OF A RAIL (TB 070).",
+        "RAILS RHS 150x50x3 WITH A CONTINUOUS RHS 125x50x3 RAISER (ONE COMPOSITE SECTION), 22.5 mm FLOOR BEARER STRIP. NO WELD ACROSS THE WIDTH OF A RAIL (TB 070).",
+        "REVISION D: THE LANDCRUISER 79 LAYOUT. 4420 mm RAILS 1175 mm WIDE FOR THE 1555 mm TRACK, OUTRIGGERS RHS 125x50x3, EVERY CASE AT THE 3100 kg PLATE.",
         "XT CROSSMEMBERS AND BODY END CROSSMEMBERS FULL RAIL HEIGHT, NO HOLES. OTHER CROSSMEMBERS AND ALL OUTRIGGERS AT RAISER HEIGHT, TOPS FLUSH WITH THE RAISER.",
         "BURR-GRIND THE WELD TOES ON THE RAIL AT EVERY FULL-HEIGHT CROSSMEMBER (FAT-01). HOT-DIP GALVANISE THE WHOLE FRAME AFTER WELDING, VENTED TO report 02 WLD-05.",
         "SEE CHASSIS.md FOR THE LOAD CASES, THE RESULTS AND WHAT THE ENGINEER MUST CHECK.",
@@ -364,7 +365,7 @@ def ct102(prj, model, bom, checks, reg, dwg):
     S.notes(sh, 22, 64, [
         "DRAWBAR MEMBERS RHS 150x50x5 C450L0 FROM THE APEX (X 250, Y +/-60) TO THE RAIL CENTRES AT THE BODY FRONT, THEN 1000 UNDER EACH RAIL. CONTINUOUS 5 mm FILLETS ON BOTH EDGES TO THE RAIL UNDERSIDE, SNIPED TAPER END WITH THE TOE GROUND (CT-103 DETAIL D).",
         "NO WELD ON THE MEMBERS' TOP OR BOTTOM FACES WITHIN 300 OF THE BODY FRONT EXCEPT THE ROOT GUSSET. THE CROSS BRACE SITS AT MID-DEPTH.",
-        "VSB1 9.1: 51.5 kN ALONG, 17.2 kN ACROSS AND 17.2 kN UP AND DOWN AT THE COUPLING. VSB1 9.2.2: 34.3 kN ALONG AND 17.2 kN VERTICAL AT EACH CHAIN LUG. EVIDENCE BY TEST OR APPROVED CALCULATION, FOR THE ENGINEER.",
+        "VSB1 9.1 AT THE 3100 kg PLATE: 45.6 kN ALONG, 15.2 kN ACROSS AND 15.2 kN UP AND DOWN AT THE COUPLING. VSB1 9.2.2: 30.4 kN ALONG AND 15.2 kN VERTICAL AT EACH CHAIN LUG (THE LUG ITSELF IS SIZED FOR THE 3500 kg CHAINS). EVIDENCE BY TEST OR APPROVED CALCULATION, FOR THE ENGINEER.",
         "NEVER USE THE COUPLING OR THE TOW PIN FOR RECOVERY. USE THE RECOVERY LUGS (10) AND THE REAR TONGUES ONLY.",
     ], width_chars=118, size=1.7)
     _draft_stamp(sh, 125, 82)
@@ -394,16 +395,16 @@ def ct103(prj, model, bom, checks, reg, dwg):
     _detail_title(sh, cx, top1, "C: COMPOSITE RAIL", k)
     zb = 205.0
     rhs(sh, cx, zb + 75 / k, 50, 150, 3, 6, k)
-    rhs(sh, cx, zb + 200 / k, 50, 100, 3, 6, k)
-    sh.rect(cx - 25 / k, zb + 250 / k, cx + 25 / k, zb + (250 + P["strip_t"]) / k, "medium")
+    rhs(sh, cx, zb + 212.5 / k, 50, 125, 3, 6, k)
+    sh.rect(cx - 25 / k, zb + 275 / k, cx + 25 / k, zb + (275 + P["strip_t"]) / k, "medium")
     zc = zb + (comp["z_centroid"] - comp["z_bottom"]) / k
     sh.line(cx - 9, zc, cx + 9, zc, "centre")
     sh.text(cx + 9.5, zc - 0.6, "CENTROID", 1.5)
     S.vdim(sh, cx - 6, zb, cx - 6, zb + 150 / k, cx - 9, "150", size=1.6)
-    S.vdim(sh, cx - 6, zb + 150 / k, cx - 6, zb + 250 / k, cx - 9, "100", size=1.6)
-    S.leader(sh, (cx + 25 / k, zb + (250 + P["strip_t"] / 2) / k), (cx + 9, zb + 62), f"{P['strip_t']:.0f} BEARER STRIP", size=1.5)
+    S.vdim(sh, cx - 6, zb + 150 / k, cx - 6, zb + 275 / k, cx - 9, "125", size=1.6)
+    S.leader(sh, (cx + 25 / k, zb + (275 + P["strip_t"] / 2) / k), (cx + 9, zb + 66), f"{P['strip_t']:.1f} BEARER STRIP", size=1.5)
     weld_symbol(sh, (cx + 25 / k, zb + 150 / k), (cx + 7, zb + 45), "4", both=True, note="CONTINUOUS")
-    for i, t in enumerate((f"RAIL 150x50x3 + RAISER 100x50x3, C450L0", f"I {comp['I'] / 1e6:.1f} x 10^6 mm4",
+    for i, t in enumerate((f"RAIL 150x50x3 + RAISER 125x50x3, C450L0", f"I {comp['I'] / 1e6:.1f} x 10^6 mm4",
                            f"Z {comp['Z_bottom'] / 1e3:.1f} (BOTTOM), {comp['Z_top'] / 1e3:.1f} (TOP) x 10^3 mm3", "VENT EACH END OF EACH BAY")):
         sh.text(cx - 26, zb - 6 - 3 * i, t, 1.5)
     # ---- E: outrigger root, section along the outrigger, 1:10
@@ -412,12 +413,12 @@ def ct103(prj, model, bom, checks, reg, dwg):
     _detail_title(sh, cx, top1, "E: OUTRIGGER ROOT", k)
     x0, zb = cx - 30.0, 205.0
     rhs(sh, x0, zb + 75 / k, 50, 150, 3, 6, k, sty="medium")
-    rhs(sh, x0, zb + 200 / k, 50, 100, 3, 6, k)
+    rhs(sh, x0, zb + 212.5 / k, 50, 125, 3, 6, k)
     L = (P["outrigger_tip_y"] - P["outrigger_root_y"]) / k
-    sh.rect(x0 + 2.5, zb + 150 / k, x0 + 2.5 + L, zb + 250 / k, "medium")
-    S.hdim(sh, x0 + 2.5, zb + 250 / k, x0 + 2.5 + L, zb + 250 / k, zb + 250 / k + 5, f"{P['outrigger_tip_y'] - P['outrigger_root_y']:.0f} TO THE BODY EDGE", size=1.6)
+    sh.rect(x0 + 2.5, zb + 150 / k, x0 + 2.5 + L, zb + 275 / k, "medium")
+    S.hdim(sh, x0 + 2.5, zb + 275 / k, x0 + 2.5 + L, zb + 275 / k, zb + 275 / k + 5, f"{P['outrigger_tip_y'] - P['outrigger_root_y']:.0f} TO THE BODY EDGE", size=1.6)
     weld_symbol(sh, (x0 + 2.5, zb + 150 / k), (x0 + 10, zb - 6), "6", all_round=True, note="ALL ROUND")
-    for i, t in enumerate(("OUTRIGGER RHS 100x50x3 AT RAISER HEIGHT,", "TOP FLUSH WITH THE RAISER, BOTTOM AT THE", "RAIL TOP. THE ROOT CLASS (FAT 36) GOVERNS (FAT-05).")):
+    for i, t in enumerate(("OUTRIGGER RHS 125x50x3, THE RAISER'S SECTION,", "TOP FLUSH WITH THE RAISER, BOTTOM AT THE", "RAIL TOP. THE ROOT CLASS (FAT 36) GOVERNS (FAT-05).")):
         sh.text(cx - 32, zb - 14 - 3 * i, t, 1.5)
     # ---- F: crossmember to rail, elevation on the rail's inner face, 1:5
     k = 5.0

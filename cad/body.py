@@ -359,7 +359,7 @@ class Body:
         punch = 4 * sp["side"] * (self.p["floor"].t1 * sp["skin_shear"] + self.p["floor"].c * sp["insert_shear"]) / 2
         fbu = dict(bolt=worst_t / bolt, plate=worst_t / plate, weld=worst_t / weld, pull_through=worst_t / punch, shear=worst_s / (0.62 * fb["As"] * fb["fu"] / 3))
         gov = max(fbu, key=fbu.get)
-        use = "HB10" if hb["passes"] else "fallback"
+        use = "fallback" if md.get("design") == "nut_plate" or not hb["passes"] else "HB10"
         return dict(bolts=n, mass_kg=m, cog_z=zc, case=mt["worst"], scale=mt["scale"], cases=cases, face_n=face,
                     tension_n=worst_t, shear_n=worst_s, hb10=hb, flat_mm=flat, fallback=dict(utils=fbu, governing=gov, util=fbu[gov],
                     bolt_n=bolt, plate_n=plate, weld_n=weld, pull_through_n=punch), uses=use,
@@ -478,7 +478,7 @@ def check_row(c, res: dict) -> dict:
                     ok=m["util"] <= 1.0, governing=m["governing"],
                     detail=(f"{m['bolts']} mounts on {m['mass_kg']:.0f} kg ({m['case']} at the ATM): worst tension {m['tension_n'] / 1000:.2f} kN, "
                             f"shear {m['shear_n'] / 1000:.2f} kN. HB10: {hb['util']:.2f} of its 8.5 kN safe working load"
-                            f"{', so the fallback is used' if m['uses'] == 'fallback' else ''}. M12 8.8 into a welded nut plate: bolt "
+                            f"{'. The design uses the M12 8.8 bolt into a welded nut plate (CH-P14)' if m['uses'] == 'fallback' else ''}: bolt "
                             f"{fb['bolt_n'] / 1000:.1f} kN, plate {fb['plate_n'] / 1000:.1f} kN, weld {fb['weld_n'] / 1000:.1f} kN, floor pull-through "
                             f"{fb['pull_through_n'] / 1000:.1f} kN, governing {fb['governing'].replace('_', ' ')} at {fb['util']:.2f}. "
                             + " ".join(f"{k}: {v['note']}." for k, v in m["cases"].items())))
