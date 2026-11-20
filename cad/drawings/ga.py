@@ -76,7 +76,8 @@ def ct001(prj, model, bom, checks, reg, dwg):
         sh.line(p0[0], p0[1], p1[0], p1[1], "centre")
     # zone and item labels
     for x, y, t in (((V["in_x0"] + V["part_a_x"]) / 2, 0, "LIVING AREA"), ((V["module_x0"] + V["in_x1"]) / 2, 1060, "GARAGE"),
-                    (V["module_x0"] + V["mod_locker_x0"] + 380, -900, "GAS LOCKER"), ((ch["spare_box"][0] + ch["spare_box"][3]) / 2, 470, "SPARE WHEEL")):
+                    (V["module_x0"] + V["mod_locker_x0"] + 380, -900, "GAS LOCKER" if V["mod_lpg"] else "STOWAGE"),
+                    ((ch["spare_box"][0] + ch["spare_box"][3]) / 2, 470, "SPARE WHEEL")):
         p = P(x, y)
         sh.text(p[0], p[1] - 0.8, t, 1.8, "middle")
     # keep-clear spaces as phantom outlines
@@ -85,7 +86,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
         p0, p1 = P(x0, y1), P(x1, y0)
         sh.rect(p0[0], p0[1], p1[0], p1[1], "phantom")
     # doors
-    for iid, side, t in (("BD-06", -1, "GAS HATCH"), ("BD-07", -1, "ENTRY DOOR")):
+    for iid, side, t in [("BD-06", -1, "GAS HATCH")] * bool(V["mod_lpg"]) + [("BD-07", -1, "ENTRY DOOR")]:
         b = lay.find(iid)
         p0, p1 = P(b.box[0], side * (hb + 25)), P(b.box[3], side * (hb + 25))
         sh.line(p0[0], p0[1], p1[0], p1[1], "thick")
@@ -178,7 +179,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
     ]
     S.table(sh, 230.0, yt - 5.5, [("KEY FIGURE (mm)", 70), ("VALUE", 30), ("NOTE", 80)], rows, size=1.6, row_h=3.0, title="CHASSIS INPUTS")
     # ---- notes
-    S.notes(sh, 22, 66, [
+    S.notes(sh, 22, 76, [
         "DATUM DIM-01: X FROM THE BALL CENTRE, POSITIVE REARWARD. Y FROM THE CENTRELINE, POSITIVE TO THE ROAD SIDE. Z UP FROM THE GROUND, "
         "TRAILER LEVEL AT DESIGN RIDE HEIGHT. A RIGHT-HANDED FRAME, SO THE 3D MODEL AND THESE VIEWS SHOW THE TRAILER AS IT IS.",
         "BLOCK LAYOUT. EVERY ITEM EXCEPT THE CHASSIS IS AN ENVELOPE WITH A MASS. POSITIONS MARKED PLACEHOLDER IN assemblies/trailer.yaml ARE NOT DESIGNED YET.",
@@ -190,13 +191,15 @@ def ct001(prj, model, bom, checks, reg, dwg):
         "REVISION E: FULLY LOADED (TC2) THE TRAILER'S TANKS CARRY 200 L. THE OTHER 200 L RIDES IN A TANK IN THE CAR AND TOPS UP THE TRAILER AT CAMP.",
         f"REVISION H: TYRE AT YOKOHAMA'S PUBLISHED {V['tyre_d']:.0f} mm DIAMETER, GARAGE FLOOR Z {fz:.0f}, {V['tyre_clearance']:.0f} mm OVER THE TYRE AT FULL BUMP. "
         "BD-10 IS THE MUD FLAPS ONLY: THE CORNER STEADIES ARE CH-B01 (CT-101).",
+        "REVISION I: REPORT 13 EQUIPMENT. " + ("" if V["mod_lpg"] else "NO LPG, INDUCTION COOKING, DIESEL HEATER WITH ITS 15 L TANK UNDER THE FLOOR. ")
+        + f"{V['opt_batteries'] * 5.12:.2f} kWh OF 24 V BATTERY. FOUR SUNMAN 430 W PANELS BONDED TO THE LID.",
         "PHANTOM OUTLINES ON THE PLAN ARE FLOOR SPACE KEPT CLEAR (DOOR LANDINGS, WALKWAY, LADDER LANDING).",
         ("MASS CHECKS " + ", ".join(c["id"] for c in rep["checks"] if c["type"] == "mass" and c["severity"] == "fail" and not c["ok"])
          + " FAIL WITH THE GROWTH ALLOWANCE. SEE TRAILER.md BEFORE ANY ENGINEER REVIEW.") if any(
             c["type"] == "mass" and c["severity"] == "fail" and not c["ok"] for c in rep["checks"]) else "EVERY MASS CHECK PASSES.",
     ], width_chars=118, size=1.7)
     S.revision_table(sh, [dict(rev=r["rev"], date=str(r["date"]), description=r["description"], drawn=r["drawn"],
-                               checked=r["checked"], approved=r["approved"]) for r in dwg["revisions"]])
+                               checked=r["checked"], approved=r["approved"]) for r in dwg["revisions"]], max_rows=8)
     rev = dwg["revisions"][-1]
     tare = cases["TC1"]
     tare_kg = rep["tare_kg"]

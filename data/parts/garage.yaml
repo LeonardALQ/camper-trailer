@@ -174,19 +174,20 @@ parts:
     color: "#2d3436"
   G-11:
     name: Loading winch
-    product: 12 V compact winch with synthetic rope, remote and quick-release plates
-    maker: Product to choose
-    part_no: null
+    product: WARN VRX 25-S 12 V winch with 15 m of 4.8 mm synthetic rope, remote and two quick-release plates
+    maker: WARN
+    part_no: "101020"
     qty: 1
     unit: each
-    mass: {basis: declared, unit_kg: 9.0, maturity: estimate, source: "DESIGN.md, Loading"}
-    size: Envelope assumed 300 x 120 x 130 on a 340 x 160 plate
-    rating: null
-    links: {}
+    mass: {basis: declared, unit_kg: 10.5, maturity: estimate, source: "Report 13 G-11: winch 8.0 kg (estimate from the 10.6 kg shipping weight), two 340 x 160 x 6 mm aluminium plates 1.8 kg (calculated), cable and remote 0.7 kg (estimate)", note: "The calculated 1.8 kg of plates is carried as an estimate with the rest"}
+    size: 333 x 119 x 119 mm (13.1 x 4.7 x 4.7 in) on a 340 x 160 plate
+    rating: 2,500 lb (1,134 kg). The Tuareg up the ramp needs about 616 N (report 13)
+    links:
+      maker: https://www.warn.com/products/vrx-25-s-winch-101020
     stockist_au: null
     notes: The bed stays fixed, so the winch pulls each bike up the ramp and forward into its chock (DESIGN.md, Loading). One winch moves between a quick-release plate on partition A in front of each chock, 650 mm up, above the 500 mm ignition-free zone (GAR-03).
     removable: true
-    geometry: {generator: winch, params: {length: 300, depth: 120, height: 130, plate_l: 340, plate_h: 160, plate_t: 6}}
+    geometry: {generator: winch, params: {length: 335, depth: 120, height: 130, plate_l: 340, plate_h: 160, plate_t: 6}}
     color: "#34495e"
   G-12:
     name: Vents
@@ -233,7 +234,7 @@ parts:
     links:
       maker: https://shop.firewize.com.au/products/dry-chemical-powder-2-5kg-abe
     stockist_au: https://shop.firewize.com.au/products/dry-chemical-powder-2-5kg-abe
-    notes: Mounted on the gas locker's lid by the rear door (GAR-04, within 610 mm of the exterior door). Position is a placeholder.
+    notes: On a bracket on the rear wall's kerb-side pier, 690 mm up, by the rear door (GAR-04, within 610 mm of the exterior door). With LPG it sits on the gas locker's lid. Position is a placeholder.
     geometry: {generator: extinguisher, params: {diameter: 130, height: 383}}
     color: "#e74c3c"
   G-11-PLATE:
@@ -243,9 +244,10 @@ parts:
     kind: sub_part
     included_in: G-11
     notes: The winch moves between this plate and the plate in the Tuareg bay. Mass is in G-11.
-    geometry: {generator: winch, params: {length: 300, depth: 120, height: 130, plate_l: 340, plate_h: 160, plate_t: 6, plate_only: true}}
+    geometry: {generator: winch, params: {length: 335, depth: 120, height: 130, plate_l: 340, plate_h: 160, plate_t: 6, plate_only: true}}
     color: "#34495e"
   G-15:
+    when: lpg
     name: Gas locker
     product: Sealed aluminium box for two 9 kg cylinders and their regulator, 25 mm drain, cylinder clamps
     maker: Owner made or to choose

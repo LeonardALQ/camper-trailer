@@ -28,6 +28,7 @@ RESEARCH = [
     ("09-trailer-wheels-and-tyres.md", "Trailer wheels, tyres and stud pattern", 9),
     ("10-car-wheels-and-tyres.md", "The car’s own wheels and tyres for towing", 10),
     ("11-chassis-design.md", "Chassis and drawbar design basis", 11),
+    ("13-equipment.md", "Appliances, equipment and the energy system", 13),
 ]
 
 
@@ -47,6 +48,11 @@ def main():
     _copy(BUILD / "model" / "instances.json", GEN / "instances.json")
     _copy(BUILD / "trailer" / "trailer.json", GEN / "trailer.json")
     steps = yaml.safe_load((ROOT / "data" / "steps.yaml").read_text())
+    from .partsdb import Project
+    live = {s.id: s for s in Project().steps}   # owner options leave some steps out (`when`)
+    steps["steps"] = [dict(s, new=live[s["id"]].new, hide=live[s["id"]].hide,
+                           parts=[p for p in s.get("parts", []) if p["part"] in {q.part for q in live[s["id"]].parts}])
+                      for s in steps["steps"] if s["id"] in live]
     (GEN / "steps_data.json").write_text(json.dumps(steps, indent=1, default=str))
     # model and downloads
     _copy(BUILD / "model" / "garage-bed.viewer.json", SITE / "public" / "models" / "garage-bed.json")

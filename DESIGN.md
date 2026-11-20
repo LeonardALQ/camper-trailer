@@ -1,6 +1,6 @@
 # Garage and bed module: design (baseline)
 
-Status: concept, revision D, 19 Nov 2026, with the floor height updated the same day for the trailer's own wheels and tyres (TRAILER.md revision D): 869 mm in place of 858 mm. On 20 Nov 2026 it became 872 mm, with the tyre at Yokohama's published 752 mm diameter (TRAILER.md revision F). Revision D moves the garage to the back of the trailer with a rear door, so the living space is one room (owner's decision). The bikes now stand along the trailer, side by side, noses forward. Partition B goes, partition A becomes the garage's front wall, and the bed covers the whole garage. Revision C placed the module in the trailer and kept the Tuareg's panniers on. Revision B lapped the deck over the partition and made the ladder owner-built. This is the baseline for the 3D model, drawings and website. Items marked OPEN need the owner's decision. Sources are the research reports in `research/` (01 tech stack, 02 design practice, 03 bike restraint and garage, 04 bed and materials, 05 bike geometry).
+Status: concept, revision E, 20 Nov 2026. Revision E takes report 13's products: no LPG, so the gas locker goes and the kerb-side rear corner is stowage, and the WARN VRX 25-S winch. Revision D, 19 Nov 2026, with the floor height updated the same day for the trailer's own wheels and tyres (TRAILER.md revision D): 869 mm in place of 858 mm. On 20 Nov 2026 it became 872 mm, with the tyre at Yokohama's published 752 mm diameter (TRAILER.md revision F). Revision D moves the garage to the back of the trailer with a rear door, so the living space is one room (owner's decision). The bikes now stand along the trailer, side by side, noses forward. Partition B goes, partition A becomes the garage's front wall, and the bed covers the whole garage. Revision C placed the module in the trailer and kept the Tuareg's panniers on. Revision B lapped the deck over the partition and made the ladder owner-built. This is the baseline for the 3D model, drawings and website. Items marked OPEN need the owner's decision. Sources are the research reports in `research/` (01 tech stack, 02 design practice, 03 bike restraint and garage, 04 bed and materials, 05 bike geometry).
 
 ## Module frame
 
@@ -27,15 +27,15 @@ The module uses its own frame. The origin is on the garage floor surface, at the
 
 ## Rear door
 
-- The garage door is in the body's rear wall and is top-hinged. Its opening runs from Y = -785 to +1,125, 1,910 mm wide, and from the floor to Z = 1,440. The header above it sits at the bed beams, and the rear wall's frame keeps 40 mm on the road side. The kerb-side jamb is the gas locker's inner face.
+- The garage door is in the body's rear wall and is top-hinged. Its opening runs from Y = -785 to +1,125, 1,910 mm wide, and from the floor to Z = 1,440. The header above it sits at the bed beams, and the rear wall's frame keeps 40 mm on the road side. The kerb-side jamb is at Y = -785, the inner face of the kerb-side corner.
 - Each bike has to roll straight back through it. CLR-09 measures each bike, as parked, against the door frame extended forward over the whole garage, which is what a bike rolled straight back meets. The Tuareg's road-side pannier clears the road-side jamb by 35 mm and the Street Triple's bar end clears the kerb-side jamb by 229 mm. Going down the ramp a bike pitches nose-up about its front tyre, which only lowers the parts behind the front axle, so the parked position governs.
 - The door product and its structure belong to the body design. The header carries the deck's rear edge.
 
-## Gas locker and stowage
+## Kerb-side corner and stowage
 
-- The gas locker sits in the kerb-side rear corner, X 1,570 to 2,330 and Y -1,165 to -785, 690 mm high outside. It holds two 9 kg cylinders and their regulator (envelope 320 x 320 x 500 mm per cylinder). It follows report 02 section 5.2: it holds only the cylinders and their equipment, it is reached only through a 700 x 630 mm hatch in the kerb-side wall, and it is sealed from the garage. A 25 mm drain at its base runs down to an outlet 500 mm below the floor, which offsets it vertically from the rear door sill and the garage's low vents. The battery box's vent is on the road side, about 2 m away, and the garage's kerb-side low vent is at the front of the garage. Each cylinder is clamped for 4 times its filled weight, about 0.7 kN in any direction.
-- The generator (520 x 320 x 460 mm envelope) and the jerry cans (300 x 360 x 450 mm) are petrol, like the bikes, so they ride in the garage. They are strapped against the kerb-side wall in front of the gas locker, to a short track row at Y = -985.
-- The ramp travels folded (1,524 x 152 x 965 mm) on its edge in a slot from Y = -772 to -620, beside the gas locker and inside the door opening, so it slides out of the rear door first.
+- No LPG (revision E, report 13, an owner option until the owner answers). Cooking is induction and the heater and hot water run on diesel, so there is no gas locker. The kerb-side rear corner, X 1,570 to 2,330 and Y -1,165 to -785, is stowage, 690 mm high for the layout. The rear door's kerb-side jamb stays at Y -785 and the 380 mm of rear wall beside it stays, because the body's rear portal relies on that wall (report 12 section 5). With LPG (module parameter `lpg`) the corner is the gas locker again: the gas locker sits in the kerb-side rear corner, X 1,570 to 2,330 and Y -1,165 to -785, 690 mm high outside. It holds two 9 kg cylinders and their regulator (envelope 320 x 320 x 500 mm per cylinder). It follows report 02 section 5.2: it holds only the cylinders and their equipment, it is reached only through a 700 x 630 mm hatch in the kerb-side wall, and it is sealed from the garage. A 25 mm drain at its base runs down to an outlet 500 mm below the floor, which offsets it vertically from the rear door sill and the garage's low vents. The battery box's vent is on the road side, about 2 m away, and the garage's kerb-side low vent is at the front of the garage. Each cylinder is clamped for 4 times its filled weight, about 0.7 kN in any direction.
+- The generator (520 x 320 x 460 mm envelope) and the jerry cans (300 x 360 x 450 mm) are petrol, like the bikes, so they ride in the garage. They are strapped against the kerb-side wall in front of the kerb-side rear corner, to a short track row at Y = -985.
+- The ramp travels folded (1,524 x 152 x 965 mm) on its edge in a slot from Y = -772 to -620, beside the kerb-side rear corner and inside the door opening, so it slides out of the rear door first.
 - Loading order: generator and jerry cans first, with the garage empty, then the Tuareg, then the Street Triple, then the ramp. Unloading is the reverse, so the generator and jerry cans come out through the Street Triple's empty bay. OPEN: whether the owner wants the generator out without unloading the bikes. That needs a hatch into the kerb strip.
 
 ## Restraint (research/03)
@@ -79,19 +79,19 @@ Every strap is reached from a place where a person can kneel, and nobody has to 
 
 ## Partition A
 
-Partition A is 2,330 x 1,510 mm of 20 mm honeycomb, occupying X = -20 to 0, up to the deck underside. It has no doorway: the garage is reached only through the rear door, and the gas locker only from outside. It is sealed to the floor, both walls and the deck, so the garage is sealed from the living area and the bed (GAR-02). Its 25 mm cleats are on its living-area face. The winch plates on its garage face need hardpoints.
+Partition A is 2,330 x 1,510 mm of 20 mm honeycomb, occupying X = -20 to 0, up to the deck underside. It has no doorway: the garage is reached only through the rear door. It is sealed to the floor, both walls and the deck, so the garage is sealed from the living area and the bed (GAR-02). Its 25 mm cleats are on its living-area face. The winch plates on its garage face need hardpoints.
 
 ## Loading
 
-Under a fixed bed at 1,460 mm, you walk a bike in stooped. The baseline is a 12 V winch (product to choose, 9 kg allowance) on a quick-release plate on partition A in front of each chock, 650 mm up. It pulls the bike up the ramp and forward into its chock while you steady it, and you kneel to strap it. The bikes unload backwards down the same ramp. The alternative is a powered bed lift used with the raised roof. That costs 9 to 45 kg, and the garage then shares air with the bed.
+Under a fixed bed at 1,460 mm, you walk a bike in stooped. The baseline is a WARN VRX 25-S 12 V winch (10.5 kg with its plates, report 13) on a quick-release plate on partition A in front of each chock, 650 mm up. It pulls the bike up the ramp and forward into its chock while you steady it, and you kneel to strap it. The bikes unload backwards down the same ramp. The alternative is a powered bed lift used with the raised roof. That costs 9 to 45 kg, and the garage then shares air with the bed.
 
 ## Garage safety (research/02, rules GAR-01 to GAR-07)
 
 - Two low vents, one in each side wall near the front of the garage, and one high vent. Petrol vapour is heavier than air (GAR-01).
 - No switches, relays, chargers, heaters or inverters in the lowest 500 mm (GAR-03). The inverter and chargers are on the living side of partition A. The winch plates are at 650 mm.
 - Fireboy-Xintex fume detector sensors low in the garage, one on partition A and one by the rear door, with the display beside the bed (GAR-05).
-- A 2.5 kg ABE extinguisher on the gas locker's lid, within 610 mm of the rear door (GAR-04).
-- Partition A, the deck and the gas locker are sealed to the garage (GAR-02).
+- A 2.5 kg ABE extinguisher on a bracket on the rear wall's kerb-side pier, 690 mm up, within 610 mm of the rear door (GAR-04). With LPG it goes on the gas locker's lid.
+- Partition A and the deck are sealed to the garage (GAR-02). With no LPG there is no LPG detector (GAR-05) and no gas locker rule (report 02 section 5.2).
 - No engine running inside the garage, fuel taps off and caps closed, on a placard inside the rear door (GAR-06). GAR-07 (whether people sleep with fuelled bikes aboard) stays with the operating manual.
 
 ## Checks the model must pass
@@ -115,6 +115,6 @@ Under a fixed bed at 1,460 mm, you walk a bike in stooped. The baseline is a 12 
 
 ## Mass
 
-Masses come from `garage-bed/BOM.md`: 193.4 kg empty and 574.4 kg with both bikes. The module load cases are: module with the loading kit fitted and no bikes; both bikes in; bikes out with the loading kit taken out; Tuareg only; Street Triple only. In the whole trailer the loading kit stays aboard in every case, and the towball for each case is worked out in TRAILER.md.
+Masses come from `garage-bed/BOM.md`: 187.9 kg empty and 568.9 kg with both bikes. The module load cases are: module with the loading kit fitted and no bikes; both bikes in; bikes out with the loading kit taken out; Tuareg only; Street Triple only. In the whole trailer the loading kit stays aboard in every case, and the towball for each case is worked out in TRAILER.md.
 
 The panniers are part of the Tuareg's envelope, so CLR-03, CLR-04, CLR-06 and CLR-09 cover them.

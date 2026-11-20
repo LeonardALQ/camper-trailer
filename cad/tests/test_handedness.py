@@ -17,6 +17,9 @@ def _block_centre_y(iid):
 
 
 def test_gas_locker_and_its_hatch_are_on_the_kerb_side():
+    if "21" not in MODEL.built:   # no LPG (owner option): the corner is stowage, which the kerb-strip zone covers
+        assert LAYOUT.zones["kerb_strip"]["box"][4] < 0
+        return
     assert _centre_y(MODEL.built["21"].shape) < 0
     assert _centre_y(MODEL.built["C9"].shape) < 0
     assert _block_centre_y("BD-06") < 0

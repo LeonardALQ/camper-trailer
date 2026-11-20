@@ -295,6 +295,7 @@ trailer_checks:
     title: Gas locker holds the two 9 kg cylinders and the regulator
     type: fit
     zone: gas_locker
+    when: mod_lpg
     severity: fail
     inputs: []
     why: Revision C. Report 02 section 5.2 asks for a compartment that holds only the cylinders and their equipment.

@@ -89,9 +89,12 @@ class Block:
     removable: bool = False                     # module lines
     generated: bool = False
     extra: dict = field(default_factory=dict)
+    growth_frac: float | None = None            # set when the line is made of parts with their own maturity
 
     @property
     def growth(self) -> float:
+        if self.growth_frac is not None and self.maturity != "weighed":
+            return self.growth_frac
         return GROWTH[self.maturity]
 
     @property
@@ -154,10 +157,12 @@ class Layout:
     # -- expansion -------------------------------------------------------
     def _expand(self, it: dict) -> list[Block]:
         known = {"id", "name", "system", "zone", "for", "box", "cyl", "bar", "point", "cog", "mass", "note",
-                 "load", "keep_clear", "hollow", "tank", "water", "module_cog"}
+                 "load", "keep_clear", "hollow", "tank", "water", "module_cog", "when", "parts"}
         extra = set(it) - known
         if extra:
             raise ValueError(f"trailer item {it.get('id')}: unknown keys {sorted(extra)}")
+        if "mass" in it and "parts" in it:
+            raise ValueError(f"trailer item {it['id']}: give `mass` or `parts`, not both")
         mass = Mass.model_validate({k: v for k, v in it["mass"].items() if k != "measure"}) if "mass" in it else None
         loops = it.get("for") or {}
         names = list(loops)
@@ -166,6 +171,8 @@ class Layout:
         out = []
         for k, combo in enumerate(combos, 1):
             local = dict(zip(names, combo))
+            if "when" in it and not self.P.eval(it["when"], local):
+                continue   # an owner option that is off (TRAILER.md, open questions)
             iid = f"{it['id']}.{k}" if len(combos) > 1 else it["id"]
             b = Block(iid=iid, id=it["id"], name=it["name"], system=it["system"], zone=it.get("zone"),
                       load=it.get("load", "tare"), keep_clear=bool(it.get("keep_clear")), hollow=bool(it.get("hollow")),
@@ -201,8 +208,28 @@ class Layout:
                 b.load = "water"
             if mass is not None:
                 self._mass(b, mass, it, dims, local)
+            if "parts" in it:
+                self._parts(b, it["parts"])
             out.append(b)
         return out
+
+    @staticmethod
+    def _parts(b: Block, parts: list[dict]):
+        """A line made of bought and made parts, each with its own mass basis (report 13): maker and retailer figures
+        are spec (0 % growth), calculated 7 % and estimates 20 % (MASS-06)."""
+        mat = {"maker": "spec", "retailer": "spec", "spec": "spec", "calculated": "calculated", "estimate": "estimate"}
+        rows = [dict(item=p["item"], kg=float(p["kg"]), maturity=mat[p["basis"]], source=p.get("source", "")) for p in parts]
+        b.mass_kg = sum(r["kg"] for r in rows)
+        b.basis, b.qty, b.unit_mass = "declared", 1, b.mass_kg
+        b.growth_frac = sum(r["kg"] * GROWTH[r["maturity"]] for r in rows) / b.mass_kg if b.mass_kg else 0.0
+        by = {}
+        for r in rows:
+            by[r["maturity"]] = by.get(r["maturity"], 0.0) + r["kg"]
+        b.maturity = max(by, key=by.get)
+        b.extra["parts"] = rows
+        b.source = "; ".join(f"{r['item']} {r['kg']:g} kg ({'maker or retailer' if r['maturity'] == 'spec' else r['maturity']}"
+                             f"{', ' + r['source'] if r['source'] else ''})" for r in rows)
+        b.mass_note = ", ".join(f"{v:.1f} kg {'maker or retailer' if k == 'spec' else k}" for k, v in by.items())
 
     def _mass(self, b: Block, m: Mass, it: dict, dims: dict, local: dict):
         b.maturity, b.source, b.mass_note, b.basis = m.maturity, m.source, m.note, m.basis
@@ -733,6 +760,8 @@ class Trailer:
         out = []
         by_id = {c["id"]: c for c in cases}
         for c in self.prj.trailer_checks:
+            if c.when is not None and not lay.P.eval(c.when, {}):
+                continue   # an owner option that is off (FIT-02 without LPG, for example)
             row = dict(id=c.id, title=c.title, type=c.type, severity=c.severity, why=c.why, sub="")
             if c.type == "mass":
                 ids = [x["id"] for x in cases] if c.cases == "all" else c.cases

@@ -78,6 +78,7 @@ class Part(Strict):
     cog: Cog | None = None
     color: str = Field(default="#999999", pattern=r"^#[0-9a-fA-F]{6}$")
     alpha: float = Field(default=1.0, ge=0, le=1)
+    when: str | None = None    # an expression over the module parameters: the part exists only when it is not 0 (owner options)
 
     @model_validator(mode="after")
     def _rules(self):
@@ -113,6 +114,7 @@ class Item(Strict):
     ramp: dict[str, Any] | None = None
     display: Literal["always", "loading_only", "closed_only"] = "always"
     check_only: bool = False
+    when: str | None = None    # an expression over the module parameters: the item exists only when it is not 0
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
@@ -167,6 +169,8 @@ class TrailerCheck(Strict):
     min: float | None = None
     max: float | None = None
     min_gap_mm: float | None = None
+    when: str | None = None               # an expression over the trailer parameters: checked only when it is not 0
+    body: dict[str, Any] | None = None    # body_* checks (cad/body.py): what is checked
     severity: Literal["fail", "report"]
     why: str
 
@@ -260,6 +264,7 @@ class Step(Strict):
     attention: list[str] = []
     instructions: list[str] = []
     door: Literal["open", "closed"] = "closed"
+    when: str | None = None    # an expression over the module parameters: the step exists only when it is not 0
 
 
 class StepsFile(Strict):
@@ -385,8 +390,31 @@ class Project:
                 raise KeyError(f"override of unknown parameter {k}")
             raw[k] = v
         self.P = Params(raw)
+        self._apply_options()
         self.instances = self._expand()
         self._validate_refs()
+
+    def _on(self, when: str | None) -> bool:
+        return when is None or bool(self.P.eval(when, {}))
+
+    def _apply_options(self):
+        """Owner options (the module parameter `lpg`, for example): parts, items and steps with a `when` expression
+        that evaluates to 0 are left out, and the checks and steps forget the items they named."""
+        self.disabled_refs = {it.ref for it in self.assembly.items if not self._on(it.when)}
+        self.parts = {k: p for k, p in self.parts.items() if self._on(p.when)}
+        self.assembly.items = [it for it in self.assembly.items if it.ref not in self.disabled_refs]
+        self.steps = [s for s in self.steps if self._on(s.when)]
+        drop = self.disabled_refs
+
+        def keep(names):
+            return None if names is None else [n for n in names if n not in drop]
+        for c in self.checks:
+            c.a, c.b, c.each = keep(c.a), keep(c.b), keep(c.each)
+            if c.pairs is not None:
+                c.pairs = [p for p in c.pairs if not set(p) & drop]
+        for s in self.steps:
+            s.new, s.hide = keep(s.new), keep(s.hide)
+            s.parts = [sp for sp in s.parts if sp.part in self.parts]
 
     # -- expansion -------------------------------------------------------
     def _expand(self) -> list[Instance]:

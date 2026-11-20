@@ -14,11 +14,15 @@
 # PLACEHOLDER have no position from the design yet.
 id: ASM-TR
 name: Whole trailer, block layout
-revision: D
+revision: G
 
 lengths_compared: [5000, 5500, 6000]   # body lengths compared by the build (owner: 6,000 at most, 5,500 accepted)
 
 params:
+  # ---------------------------------------------------------------- owner options (report 13), defaults until the owner answers
+  # (TRAILER.md open questions). LPG is the module parameter `lpg` (garage-bed.yaml), read here as mod_lpg.
+  opt_dryer: 0               # 0: Camec 3.5 kg washer only (report 13 default). 1: Whirlpool WWPB8502IW washer-dryer, 66 kg
+  opt_batteries: 2           # Victron Lithium NG 25.6 V 200 Ah modules of 5.12 kWh: 2 gives 10.24 kWh (report 13 default), 3 gives 15.36 kWh
   # ---------------------------------------------------------------- body (settled inputs)
   body_length: 5500
   body_width: 2400
@@ -64,7 +68,7 @@ params:
   xt_rear_shock_front: 776
   front_hub_dx: -415
   rear_hub_dx: 415
-  battery_l: 600             # battery box, between the rails under the back of the garage (revision C)
+  battery_l: max(600, 130 + 235 * opt_batteries)   # sealed battery box, the modules on their sides 235 mm each along X (report 13 section 2)
   battery_from_rear: 400     # battery centre from the rear wall's inner face (owner's brief)
   battery_x0: in_x1 - battery_from_rear - battery_l / 2
   # ---------------------------------------------------------------- coupling and drawbar (report 08)
@@ -104,6 +108,14 @@ params:
   tank_z0: rail_underside_z
   tank_h: floor_underside_z - 10 - rail_underside_z
   tank_w: 2 * rail_in - 100  # 50 mm each side for the airbag and shock mounts (estimate until the kit drawing)
+  # ---------------------------------------------------------------- equipment (report 13)
+  diesel_l: 15               # heater fuel tank (report 13 open question 6)
+  diesel_kg_per_l: 0.84
+  diesel_tank_l: 440         # 440 x 400 x 100 mm HDPE tank, 17.6 L gross (estimate)
+  diesel_tank_x0: axle_x + xt_front_hinge_rear - xm_w - 60 - diesel_tank_l   # ahead of the XT front hinge crossmember, in the braced bay
+  solar_l: 2054              # Sunman eArc SMF430F-12X12UW, 2,054 x 1,084 x 2 mm, bonded to the lid (report 13 section 4)
+  solar_w: 1084
+  solar_x0: body_x0 + 780    # array 4,108 x 2,168 mm, 780 mm from the front edge so the Midi Heki fits ahead of it (layout choice)
 
 # The trailer's own wheel and hub (report 09). WHL-01 in measurements.yaml is the wheel's load rating, and MAS-09
 # checks it against the per-wheel load MAS-06 uses. The car keeps its own wheels (report 10).
@@ -141,7 +153,7 @@ fit_options: []
 zones:
   living: {name: Living area, box: [in_x0, -half_in, floor_z, part_a_x - in_x0, 2 * half_in, interior_h]}
   gas_locker: {name: Gas locker (inside), box: [module_x0 + mod_locker_x0 + 20, mod_locker_y0, floor_z + 20, mod_locker_l - 40, mod_locker_w - 20, mod_locker_h - 40]}
-  kerb_strip: {name: Kerb-strip stowage in the garage, box: [module_x0 + mod_stow_row_x0, mod_locker_y0, floor_z, mod_locker_x0 - mod_stow_row_x0, mod_locker_w, mod_locker_h]}
+  kerb_strip: {name: Kerb-strip stowage in the garage, box: [module_x0 + mod_stow_row_x0, mod_locker_y0, floor_z, mod_locker_x0 + (1 - mod_lpg) * mod_locker_l - mod_stow_row_x0, mod_locker_w, mod_locker_h]}
   underfloor: {name: Under the floor between the rails, box: [body_x0, -rail_in, rail_underside_z - 10, body_length, 2 * rail_in, floor_underside_z - rail_underside_z + 10]}
 
 items:
@@ -179,14 +191,14 @@ items:
     note: In the living area against partition A, on top of the diesel heater, where it stays dry and out of the garage. The lines run along the rails to the four bags.
     system: running_gear
     zone: living
-    box: [part_a_x - 400, half_in - 1650 - 300, floor_z + 300, 400, 300, 300]
+    box: [part_a_x - 400, half_in - 1650 - 300, floor_z + 350, 400, 300, 300]
     mass: {basis: declared, total_kg: 10, maturity: estimate, source: "Report 06 section 2: 8 to 12 kg for the compressor, tank, panel and lines (estimate, not published)"}
   - id: RG-05
     name: Spare Firestone style 26 airbag with fittings, tube and Loctite 567
     note: A punctured bag cannot be repaired (Cruisemaster CIS-006), so the spare travels with the trailer. It sits on the air supply.
     system: running_gear
     zone: living
-    box: [part_a_x - 400, half_in - 1650 - 300, floor_z + 600, 400, 300, 150]
+    box: [part_a_x - 400, half_in - 1650 - 300, floor_z + 650, 400, 300, 150]
     mass: {basis: declared, total_kg: 3, maturity: estimate, source: "Report 06 section 2: 2.4 kg bag (Firestone style 26 sheet) plus fittings (estimate)"}
 
   # ================================================================ spare wheel (revision D, report 09 section 7)
@@ -234,6 +246,7 @@ items:
   - id: BD-06
     name: Gas locker hatch, kerb side
     system: body
+    when: mod_lpg
     box: [module_x0 + mod_hatch_x0, -half_in - wall_t, floor_z + mod_hatch_z0, mod_hatch_x1 - mod_hatch_x0, wall_t, mod_hatch_z1 - mod_hatch_z0]
     mass: {basis: declared, total_kg: 4, maturity: estimate, source: "Estimate: 0.44 m2 hatch with frame, vents, hinge and lock"}
     note: Revision C. The gas locker's only access (report 02 section 5.2).
@@ -279,11 +292,17 @@ items:
 
   # ================================================================ roof
   - id: RF-01
-    name: Solar panel, 400 W
+    name: Solar panel, Sunman eArc SMF430F-12X12UW, 430 W, glass-free and frameless, bonded to the lid
     system: roof
     for: {k: [0, 1], s: [1, -1]}
-    box: [body_x0 + (body_length - 2 * 1722) / 2 + k * 1722, "min(0, s * 1134)", roof_top_z + 20, 1722, 1134, 30]
-    mass: {basis: declared, unit_kg: 22.5, maturity: estimate, source: "Older block model (1,722 x 1,134 x 30 mm panel)"}
+    box: [solar_x0 + k * solar_l, "min(0, s * solar_w)", roof_top_z, solar_l, solar_w, 2]
+    mass: {basis: declared, unit_kg: 7.3, maturity: spec, source: "https://www.master-instruments.com.au/files/battery_information/e_arc_doing_more_web.pdf", note: "Sunman brochure, 7.3 kg each (report 13 section 4)"}
+    note: Four panels in two pairs, each pair in series to its own MPPT. The lid's top skin stays flat and clear of hatches over the 4,108 x 2,168 mm array.
+  - id: RF-02
+    name: Panel adhesive and cable
+    system: roof
+    point: [solar_x0 + solar_l, 0, roof_top_z]
+    mass: {basis: declared, total_kg: 2.0, maturity: estimate, source: "Report 13 section 4: adhesive and cable as Sunman specifies, about 2 kg (estimate)"}
 
   # ================================================================ under the floor (positions are PLACEHOLDERS until the XT kit drawing and the engineer)
   - id: UF-01
@@ -293,8 +312,8 @@ items:
     for: {b: [0, 1]}
     box: [axle_x + xt_front_hinge_rear + 10 + b * (xt_rear_shock_front - xt_front_hinge_rear - 780), -tank_w / 2, tank_z0, 760, tank_w, tank_h]
     tank: true
-    mass: {basis: declared, unit_kg: 20, maturity: estimate, source: "Older block model rate, 12 kg per 125 L poly tank, scaled to about 200 L"}
-    note: One tank in each suspension bay, between the XT crossmembers, over the axles.
+    mass: {basis: declared, unit_kg: 18.8, maturity: calculated, source: "Report 13 section 5: custom welded HDPE, 6 mm walls, two cross baffles and one lengthwise. 2.61 m2 of 6 mm HDPE at 0.95 g/cm3 is 14.9 kg, baffles with 20 % flow holes 3.5 kg, fittings 0.5 kg"}
+    note: One tank in each suspension bay, between the XT crossmembers, over the axles. About 195 L net each, 390 L for two (report 13 section 5). Each sits on two aluminium angle bearers bolted to the XT crossmembers on 10 mm rubber, held by two padded stainless straps, never hung from the floor.
   - id: UF-02
     name: Water in the tanks
     system: underfloor
@@ -307,12 +326,33 @@ items:
     box: [axle_x + xt_front_hinge_rear, -rail_in, rail_underside_z - 6, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 6]
     mass: {basis: declared, total_kg: 20, maturity: estimate, source: "Older block model"}
   - id: UF-04
-    name: Lithium battery, 12 kWh
+    name: Battery box, sealed 2 mm aluminium with lid gasket, cable glands, a vent to the road side and a fuse per battery
     system: underfloor
     zone: underfloor
     box: [battery_x0, -400, floor_underside_z - 10 - 250, battery_l, 800, 250]
-    mass: {basis: declared, total_kg: 110, maturity: estimate, source: "Older block model"}
+    mass: {basis: declared, total_kg: 12, maturity: estimate, source: "Report 13 section 2: 1.66 m2 of 2 mm aluminium at 5.4 kg/m2 plus about 3 kg of brackets and fittings (estimate)"}
     note: Revision C. Under the back of the garage floor between the rails, its centre 400 mm in front of the rear wall's inner face, in a sealed, guarded box vented outside on the road side. Nothing electrical sits in the garage's lowest 500 mm (GAR-03).
+  - id: UF-05
+    name: Battery, Victron Lithium NG 25.6 V 200 Ah (BAT524120620), 5.12 kWh
+    system: underfloor
+    for: {k: [1, 2, 3]}
+    when: opt_batteries - k + 1
+    point: [battery_x0 + 65 + 235 * (k - 0.5), 0, floor_underside_z - 10 - 250 + 81]
+    mass: {basis: declared, unit_kg: 37, maturity: spec, source: "https://cdn.shopify.com/s/files/1/0497/4749/3026/files/Datasheet-Lithium-NG-batteries-12_8V-25_6V-51_2V-EN.pdf?v=1739576641", note: "Victron datasheet, 37 kg each, which Victron marks as an estimate (report 13 open question 16)"}
+    note: Lying on its side in the battery box (UF-04), terminals sideways, 235 x 648 x 162 mm. Two modules give 10.24 kWh (opt_batteries).
+  - id: UF-06
+    name: Heater fuel tank, 15 L HDPE, with line and filter
+    system: underfloor
+    zone: underfloor
+    box: [diesel_tank_x0, -200, floor_underside_z - 10 - 100, diesel_tank_l, 400, 100]
+    mass: {basis: declared, total_kg: 2.3, maturity: estimate, source: "Report 13 LA-03: 15 L HDPE fuel tank 2.0 kg, fuel line and filter 0.3 kg (estimates)"}
+    note: Between the rails in the braced bay ahead of the XT front hinge crossmember, above the plan bracing (report 13 open question 6).
+  - id: UF-07
+    name: Diesel for the heater, 15 L
+    system: underfloor
+    load: fuel
+    point: [diesel_tank_x0 + diesel_tank_l / 2, 0, floor_underside_z - 10 - 50]
+    mass: {basis: declared, total_kg: 12.6, maturity: spec, source: "Report 13: 15 L at 0.84 kg/L"}
 
   # ================================================================ garage stowage (revision C: gas, generator and fuel move from the drawbar box into the garage)
   - id: GS-01
@@ -320,12 +360,13 @@ items:
     system: stowage
     zone: kerb_strip
     box: [module_x0 + mod_gen_x0, -half_in, floor_z, mod_gen_l, mod_gen_w, mod_gen_h]
-    mass: {basis: declared, total_kg: 40, maturity: estimate, source: "Older block model"}
-    note: Strapped to the kerb-strip track row in front of the gas locker (DESIGN.md).
+    mass: {basis: declared, total_kg: 21.1, maturity: spec, source: "https://powerequipment.honda.com.au/models/generators/eu22/specifications", note: "Honda EU22i, 21.1 kg dry (Honda Australia)"}
+    note: Honda EU22i, 509 x 290 x 425 mm, in the 520 x 320 x 460 mm envelope. Strapped to the kerb-strip track row (DESIGN.md).
   - id: GS-02
     name: Gas cylinder, 9 kg, empty
     system: stowage
     zone: gas_locker
+    when: mod_lpg
     for: {k: [0, 1]}
     box: [module_x0 + mod_locker_x0 + 30 + k * (mod_cyl_d + 50), mod_locker_y1 - 40 - mod_cyl_d, floor_z + 20, mod_cyl_d, mod_cyl_d, mod_cyl_h]
     mass: {basis: declared, unit_kg: 8.5, maturity: estimate, source: "Older block model: two full bottles 34 kg, split into bottle and gas"}
@@ -334,6 +375,7 @@ items:
     system: stowage
     load: gas
     zone: gas_locker
+    when: mod_lpg
     for: {k: [0, 1]}
     point: [module_x0 + mod_locker_x0 + 30 + k * (mod_cyl_d + 50) + mod_cyl_d / 2, mod_locker_y1 - 40 - mod_cyl_d / 2, floor_z + 20 + 200]
     mass: {basis: declared, unit_kg: 8.5, maturity: estimate, source: "Older block model: two full bottles 34 kg, split into bottle and gas"}
@@ -348,52 +390,125 @@ items:
     name: Regulator, changeover valve and pigtails
     system: stowage
     zone: gas_locker
+    when: mod_lpg
     box: [module_x0 + mod_locker_x0 + 230, mod_locker_y1 - 40 - 120, floor_z + 20 + mod_cyl_h + 10, 300, 120, 100]
     mass: {basis: declared, total_kg: 1.5, maturity: estimate, source: "Estimate: two-stage auto changeover regulator with two pigtails"}
 
   # ================================================================ living area (zone `living`, heavy items against partition A)
   - id: LA-01
-    name: Wet bathroom, 1 x 1 m, recirculating shower and toilet
+    name: Wet bathroom, 1 x 1 m, fabricated walls, door, wet lining, floor pan, mixer, basin and trims
     system: living
     zone: living
     box: [part_a_x - 1000, half_in - 1000, floor_z, 1000, 1000, interior_h]
-    mass: {basis: declared, total_kg: 100, maturity: estimate, source: "Older block model (wet bathroom 1 x 1)"}
+    parts:
+      - {item: "Floor pan, GRP, 1,000 x 1,000 mm with 60 mm upstands and a drain", kg: 7.5, basis: estimate, source: "1.24 m2 of 3 to 4 mm GRP at 1.8 g/cm3"}
+      - {item: Bypass mixer and hand shower, kg: 1.5, basis: estimate}
+      - {item: "Walls, door, wet lining, trims, basin, cassette service door, shelf, rails, mirror, fittings and sealant", kg: 30.9, basis: estimate, source: "20 mm honeycomb at 3.3 kg/m2 (garage-bed/BOM.md), 1.5 mm GRP lining at 1.5 kg/m2"}
+    note: Report 13 LA-01. The cassette leaves through a Thetford service door in the road-side wall. Grey water drains through a hose to a portable container outside (report 13 open question 10).
+  - id: LA-01A
+    name: Cassette toilet, Thetford C223-CS, swivel bowl, electric flush
+    system: living
+    point: [part_a_x - 300, half_in - 250, floor_z + 270]
+    mass: {basis: declared, total_kg: 7.2, maturity: spec, source: "https://www.thetford.com/au/products-and-support/c223cs/", note: "Thetford Australia, 7.2 kg (report 13)"}
+  - id: LA-01B
+    name: Recirculating shower unit, DauerShower 2.0
+    system: living
+    point: [part_a_x - 700, half_in - 150, floor_z + 210]
+    mass: {basis: declared, total_kg: 10.0, maturity: spec, source: "https://dauershower.com/", note: "Maker: under 10 kg (earlier page version, report 13). Imported, no Australian stockist"}
   - id: LA-02
-    name: Washer-dryer
+    name: Washing machine, Camec 3.5 kg top loader, part 051879 (washer only)
     system: living
     zone: living
+    when: 1 - opt_dryer
+    box: [part_a_x - 600, half_in - 1000 - 470, floor_z, 600, 470, 850]
+    mass: {basis: declared, total_kg: 16.0, maturity: spec, source: "https://www.mygenerator.com.au/assets/files/Camec_053344_Product_Brochure.pdf", note: "Camec brochure, 16 kg, 445 x 460 x 730 mm (report 13)"}
+    note: "Turned with its 445 mm width along X in a 470 mm wide box, so the larger heater clears the ladder. Its back stands 155 mm off partition A, so the MultiPlus goes at the top of the inverter board where the open lid (about 1,190 mm) clears it (report 13 LA-02). Drying on a line or in the bathroom."
+  - id: LA-02
+    name: Washer-dryer, Whirlpool WWPB8502IW (owner option opt_dryer)
+    system: living
+    zone: living
+    when: opt_dryer
     box: [part_a_x - 600, half_in - 1000 - 600, floor_z, 600, 600, 850]
-    mass: {basis: declared, total_kg: 65, maturity: estimate, source: "Older block model"}
+    mass: {basis: declared, total_kg: 66.0, maturity: spec, source: "https://hndgwww2.blob.core.windows.net/hnau/Whirlpool_WWPB8502IW_Spec-Sheet.pdf", note: "Whirlpool sheet, 66 kg, 595 x 475 x 820 mm (report 13)"}
   - id: LA-03
-    name: Diesel heater and hot water unit
+    name: Diesel heater and hot water, Truma Combi D 6 (Australian version), with ducts and flue kit
     system: living
     zone: living
-    box: [part_a_x - 400, half_in - 1600 - 400, floor_z, 400, 400, 300]
-    mass: {basis: declared, total_kg: 30, maturity: estimate, source: "Older block model"}
+    box: [part_a_x - 450, half_in - 1000 - 470 - 525, floor_z, 450, 525, 300]
+    parts:
+      - {item: Truma Combi D 6 with peripheral devices, kg: 17.2, basis: maker, source: "Truma Australia manual"}
+      - {item: "Four 65 mm warm-air ducts and outlets 1.2 kg, flue and intake kit 1.0 kg", kg: 2.2, basis: estimate}
+    note: Report 13 LA-03. 525 x 450 x 300 mm with 450 along X, so it clears the ladder landing by 10 mm and the ladder by 5 mm. Water and drain connections on the walkway side. Its fuel tank is UF-06.
   - id: LA-04
-    name: Inverter and chargers on partition A
+    name: Inverter and chargers on partition A, Victron 24 V board
     system: living
     zone: living
-    box: [part_a_x - 135, half_in - 1000 - 800, floor_z + 1100, 135, 800, 700]
-    mass: {basis: declared, total_kg: 60, maturity: estimate, source: "Older block model"}
+    box: [part_a_x - 160, half_in - 1000 - 800, floor_z + 1100, 160, 800, 700]
+    parts:
+      - {item: Victron MultiPlus-II 24/5000/120-50 inverter-charger, kg: 30.0, basis: maker, source: "Victron datasheet"}
+      - {item: Two Victron SmartSolar MPPT 150/45, kg: 2.5, basis: maker, source: "Victron datasheet"}
+      - {item: Victron Orion-Tr Smart 12/24-15 isolated DC-DC charger, kg: 1.8, basis: maker, source: "Victron datasheet"}
+      - {item: Victron Orion 24/12-70 converter, kg: 1.5, basis: retailer, source: "Current Connected"}
+      - {item: Victron Lynx Smart BMS NG 500 A, kg: 1.9, basis: maker, source: "Victron datasheet"}
+      - {item: "Lynx Distributor 1.5, Cerbo GX and GX Touch 50 0.6, fuses 0.8, board 2.5, wiring 2.5", kg: 7.9, basis: estimate}
+    note: Report 13 LA-04 and section 2. 24 V system, above the garage's 500 mm ignition-free zone and on the living side of partition A (GAR-03).
   - id: LA-05
-    name: Fridge
+    name: Fridge, Dometic NRX 130C, 126 L compressor
     system: living
     zone: living
     box: [part_a_x - 1600, half_in - 600, floor_z, 600, 600, 1400]
-    mass: {basis: declared, total_kg: 35, maturity: estimate, source: "Older block model"}
+    parts:
+      - {item: Dometic NRX 130C, kg: 28.0, basis: maker, source: "Dometic Australia"}
+      - {item: Frame and door latch, kg: 1.0, basis: estimate}
+    note: 525 x 812 x 568 mm, with a cupboard over it in the box.
   - id: LA-06
-    name: Chest freezer
+    name: Freezer, Dometic CFX3 55IM, 53 L
     system: living
     zone: living
     box: [part_a_x - 2150, half_in - 800, floor_z, 550, 800, 850]
-    mass: {basis: declared, total_kg: 30, maturity: estimate, source: "Older block model"}
+    parts:
+      - {item: Dometic CFX3 55IM, kg: 21.3, basis: retailer, source: "Overland Garage, OK4WD"}
+      - {item: Tie-down kit, kg: 0.5, basis: estimate}
+    note: 720 x 455 x 480 mm. Its lid needs about 455 mm clear above it, so the bench over it lifts (report 13 LA-06).
   - id: LA-07
-    name: Outdoor kitchen slide-out, kerb side, under the awning
+    name: Outdoor kitchen slide-out, kerb side, fabricated sleeve, drawer with its outer wall panel, bench top, trays and locks
     system: living
     zone: living
     box: [in_x0, -half_in, floor_z + 50, lz_kitchen_l, 600, 450]
-    mass: {basis: declared, total_kg: 80, maturity: estimate, source: "Older block model"}
+    parts:
+      - {item: "Fixed sleeve, 1.6 mm aluminium with an angle frame", kg: 12.0, basis: estimate}
+      - {item: "Slide-out drawer with the 35 mm sandwich outer panel, seal, latches and frame", kg: 14.1, basis: estimate}
+      - {item: "Bench top 0.9 m2 at 5 kg/m2", kg: 4.5, basis: estimate}
+      - {item: Internal drawers and utensil trays, kg: 3.0, basis: estimate}
+      - {item: Stops and a positive lock in both positions, kg: 1.0, basis: estimate}
+    note: Report 13 LA-07. The bench sits about 1,372 mm above the ground (floor 872 + 50 + 450 mm), so a drop-down step goes with it (report 13 open question 13).
+  - id: LA-07A
+    name: Induction hob, Dometic CVI1525, two zones, 2,300 W
+    system: living
+    when: 1 - mod_lpg
+    point: [in_x0 + 400, -half_in + 300, floor_z + 470]
+    mass: {basis: declared, total_kg: 7.0, maturity: spec, source: "https://www.dometic.com/fr-fr/produit/dometic-cvi1525-9600050571", note: "Dometic, 7.0 kg (report 13)"}
+  - id: LA-07A
+    name: Gas hob, Dometic slimline (owner option lpg)
+    system: living
+    when: mod_lpg
+    point: [in_x0 + 400, -half_in + 300, floor_z + 470]
+    mass: {basis: declared, total_kg: 4.5, maturity: spec, source: "https://www.thecampervanshop.com/dometic-slimline-piezo-hob-lh/", note: "About 4.5 kg (report 13 section 3)"}
+  - id: LA-07B
+    name: Sink, Dometic CVS1350G with glass lid
+    system: living
+    point: [in_x0 + 1100, -half_in + 300, floor_z + 420]
+    mass: {basis: declared, total_kg: 2.5, maturity: spec, source: "https://www.dometic.com/fr-fr/produit/dometic-cvs1350g-9600051161", note: "Dometic, 2.5 kg (report 13)"}
+  - id: LA-07C
+    name: Slides, Accuride 9301 full extension, 610 mm, one pair
+    system: living
+    point: [in_x0 + 750, -half_in + 300, floor_z + 90]
+    mass: {basis: declared, total_kg: 6.0, maturity: estimate, source: "Report 13: three steel members of about 2.3 mm on a 76 mm height, about 3 kg a slide (estimate, not published)"}
+  - id: LA-07D
+    name: Kitchen mixer tap
+    system: living
+    point: [in_x0 + 1100, -half_in + 450, floor_z + 520]
+    mass: {basis: declared, total_kg: 0.8, maturity: estimate, source: "Report 13 (estimate)"}
   - id: LA-08
     name: Wardrobe over the kitchen
     system: living
@@ -407,11 +522,14 @@ items:
     box: [in_x0, half_in - 1000, floor_z + 720, 400, 1000, 30]
     mass: {basis: declared, total_kg: 12, maturity: estimate, source: "Older block model"}
   - id: LA-10
-    name: Air-conditioner, under the desk
+    name: Air-conditioner, Truma Saphir Comfort RC, under the desk
     system: living
     zone: living
-    box: [in_x0, half_in - 600, floor_z, 400, 600, 300]
-    mass: {basis: declared, total_kg: 30, maturity: estimate, source: "Older block model"}
+    box: [in_x0, half_in - 630, floor_z, 400, 630, 300]
+    parts:
+      - {item: Truma Saphir Comfort RC, kg: 23.5, basis: maker, source: "Truma Australia"}
+      - {item: Ducts and vents, kg: 1.5, basis: estimate}
+    note: 628 x 400 x 290 mm (report 13 LA-10).
   - id: LA-11
     name: Cabinetry and seat
     system: living

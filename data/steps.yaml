@@ -121,6 +121,7 @@ steps:
     attention:
       - Partition A has no doorway in revision D. Every cable or pipe through it is drawn and sealed (GAR-02).
   - id: S06
+    when: lpg
     title: Fit the gas locker and its hatch
     action: Fit the gas locker in the kerb-side rear corner, seal it to the garage, and fit its drain, clamps and hatch.
     why: The two 9 kg cylinders must sit in a compartment that holds only them and their equipment, is reached only from outside and keeps gas out of the garage (report 02 section 5.2).

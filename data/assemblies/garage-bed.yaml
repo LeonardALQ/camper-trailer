@@ -6,7 +6,7 @@
 # Any number may be an expression over `params` (+ - * / and parentheses, min, max, abs, sqrt).
 id: ASM-GB
 name: Garage and bed module
-revision: D
+revision: E
 
 params:
   # Envelope
@@ -62,7 +62,12 @@ params:
   door_y0: locker_y1         # rear door opening: kerb-side jamb at the gas locker's inner face
   door_y1: 1125              # road-side jamb 40 mm in from the wall
   door_h: 1440               # header at the bed beams (1,460 mm), less a 20 mm frame
-  # Gas locker in the kerb-side rear corner (report 02 section 5.2), two 9 kg cylinders
+  # Owner option (report 13 open question 2): 0 is no LPG, induction cooking (the default until the owner answers).
+  # 1 puts back the gas locker, its hatch, the two 9 kg cylinders, the regulator, FIT-02 and build step S06.
+  lpg: 0
+  # The kerb-side rear corner (report 02 section 5.2). With LPG it is the gas locker for two 9 kg cylinders. Without
+  # it the corner is stowage. Either way the rear door's kerb-side jamb and the 380 mm wall beside it stay, because the
+  # body's rear portal relies on that wall (report 12 section 5).
   locker_l: 760
   locker_w: 380
   locker_h: 690
@@ -128,7 +133,7 @@ items:
       - {id: A-kerb, step: S05, cleat: {face_x: -partition_t, dir_x: -1, axis: z, at_u: -half_width, length: partition_a_h, at_z: 0, corner: wall_neg}}
 
   # ---------------------------------------------------------------- gas locker
-  - {ref: "21", part: G-15, group: safety, label: Gas locker (outside access only), step: S06,
+  - {ref: "21", part: G-15, group: safety, label: Gas locker (outside access only), step: S06, when: lpg,
      at: [locker_x0, locker_y0, 0], params: {dx: locker_l, dy: locker_w, dz: locker_h}}
 
   # ---------------------------------------------------------------- bed
@@ -268,7 +273,7 @@ items:
   - {ref: C3, part: CTX-WALL-K, group: context, label: Kerb-side wall with the gas locker hatch, step: S02, at: [body_x0, -half_width - wall_t, 0], params: {side: kerb}}
   - {ref: C8, part: CTX-WALL-B, group: context, label: Rear wall with the door opening, step: S02, at: [garage_length, -half_width - wall_t, 0], params: {side: rear}}
   - {ref: C4, part: CTX-DOOR, group: context, label: Rear garage door (closed), step: S11, display: closed_only, at: [garage_length, door_y0, 0]}
-  - {ref: C9, part: CTX-HATCH, group: context, label: Gas locker hatch (closed), step: S11, at: [hatch_x0, -half_width - wall_t, hatch_z0]}
+  - {ref: C9, part: CTX-HATCH, group: context, label: Gas locker hatch (closed), step: S11, when: lpg, at: [hatch_x0, -half_width - wall_t, hatch_z0]}
   - {ref: C5, part: CTX-CEIL, group: context, label: Ceiling plane (roof collapsed), step: S02, at: [-partition_t, -half_width, ceiling_z]}
   - {ref: C6, part: CTX-GROUND, group: context, label: Assumed ground, step: S11, display: loading_only,
      at: [garage_length + wall_t - 100, tuareg_y - 750, -ground_drop - 10]}
@@ -285,6 +290,7 @@ items:
     group: context
     label: 9 kg gas cylinder in the locker
     step: S11
+    when: lpg
     copies:
       - {id: "1", at: [locker_x0 + 30, locker_y1 - 40 - cyl_d, 20]}
       - {id: "2", at: [locker_x0 + 30 + cyl_d + 50, locker_y1 - 40 - cyl_d, 20]}

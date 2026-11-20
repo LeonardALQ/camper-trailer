@@ -5,8 +5,8 @@ from cad import massprops as MP
 from cad.tests.test_checks import MODEL, PRJ
 
 # garage-bed/BOM.md revision D totals (kg)
-BOM_MD = {"garage": 106.4, "bed": 68.1, "partitions": 13.2, "fixings": 3.1, "access": 2.6,
-          "module_empty": 193.4, "removable": 77.3, "with_bikes": 574.4}
+BOM_MD = {"garage": 100.9, "bed": 68.1, "partitions": 13.2, "fixings": 3.1, "access": 2.6,
+          "module_empty": 187.9, "removable": 78.8, "with_bikes": 568.9}
 LINES = MP.line_masses(PRJ, MODEL)
 BIKES = sum(b["mass_kg"] for b in MP.bike_rows(PRJ, MODEL))
 

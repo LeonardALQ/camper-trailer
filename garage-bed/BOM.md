@@ -1,6 +1,6 @@
-# Garage and bed module: bill of materials, revision D
+# Garage and bed module: bill of materials, revision E
 
-19 Nov 2026. Revision D moves the garage to the back of the trailer with a rear door. The bikes stand along the trailer, so the track rows run across it (G-02), the beams span the full 2,330 mm width and change to SHS 50x50x3 (B-04), the deck covers the whole garage (B-03), partition B and its door go (P-01, P-02, the old P-03), and a gas locker joins the garage (G-15). Layout and geometry are in `DESIGN.md`. Each product was chosen for reliability first, then parts availability, then serviceability, and then weight. Price was ignored. A weight marked "est." is an estimate, and its basis is in the research report named in the Source column. Every other weight comes from the maker's or a retailer's spec, or is calculated from the modelled size. Sizes assume the 2,330 x 2,330 mm garage.
+20 Nov 2026. Revision E takes report 13's products: the WARN VRX 25-S winch (G-11, 10.5 kg in place of 9 kg) and no LPG, so the gas locker (G-15, 7 kg) is not fitted and the kerb-side rear corner is stowage. LPG is an owner option (module parameter `lpg`), and with it the gas locker comes back as listed below the garage table. 19 Nov 2026: revision D moves the garage to the back of the trailer with a rear door. The bikes stand along the trailer, so the track rows run across it (G-02), the beams span the full 2,330 mm width and change to SHS 50x50x3 (B-04), the deck covers the whole garage (B-03), partition B and its door go (P-01, P-02, the old P-03), and a gas locker joins the garage (G-15). Layout and geometry are in `DESIGN.md`. Each product was chosen for reliability first, then parts availability, then serviceability, and then weight. Price was ignored. A weight marked "est." is an estimate, and its basis is in the research report named in the Source column. Every other weight comes from the maker's or a retailer's spec, or is calculated from the modelled size. Sizes assume the 2,330 x 2,330 mm garage.
 
 ## Payload (for reference)
 
@@ -23,12 +23,17 @@
 | G-08 | Floor and lower-wall coating | U-POL Raptor black, 3 coats with traction additive | 1 kit | | 5.1 est. | 230 microns per coat, fuel resistant | [U-POL](https://u-pol.com/en-us/product/bed-liner-protective-coating/raptor-bed-liner-en-us/1-us-gallon-raptor-kit/), [TDS](https://www.raptorliner.com/uploads/6/9/6/5/6965393/u-pol_raptor_liner_black_technical_data.pdf) | 8 times lighter than tread plate. One kit covers about 11.6 m2, and the floor and lower walls are about 9.2 m2 |
 | G-09 | Wall pads and door-edge trim | Closed-cell foam pads, aluminium or EPDM edge trim | 1 set | | 1.3 est. | | Product to choose | |
 | G-10 | Loading ramp | Black Widow MF-12038 arched folding full-width ramp | 1 | 34 | 34.0 | 3,048 x 965 mm, folds to 1,524 x 152; 680 kg | [maker](https://www.blackwidowpro.com/motorcycle/ramps/full-width/p/mf-12038/), [spec](https://rippingitoutdoors.com/products/black-widow-3-piece-arched-folding-motorcycle-ramp-models-mf-10838-mf-12038-size-38-wide-capacity-1-500-lb-for-street-cruiser-touring-motorcycles) | Retailer spec. 16.6 deg at the 872 mm floor, 15.5 deg with the air bags vented. Travels folded on its edge beside the gas locker. No Australian stockist found |
-| G-11 | Loading winch | 12 V compact winch with synthetic rope, remote and quick-release plates | 1 | 9 est. | 9.0 | | Product to choose | A plate on partition A in front of each chock, 650 mm up |
+| G-11 | Loading winch | WARN VRX 25-S (101020), 15 m of 4.8 mm synthetic rope, remote, two quick-release plates 340 x 160 x 6 mm | 1 | 10.5 est. | 10.5 | 333 x 119 x 119 mm, 2,500 lb | [WARN](https://www.warn.com/products/vrx-25-s-winch-101020) | Winch 8.0 kg (estimate from the 10.6 kg shipping weight), plates 1.8 kg (calculated), cable and remote 0.7 kg (estimate), report 13. A plate on partition A in front of each chock, 650 mm up |
 | G-12 | Vents | 2 low and 1 high | 3 | | 0.6 est. | | [Camec range](https://camec.com.au/) | Product to choose |
 | G-13 | Petrol fume detector | Fireboy-Xintex gasoline fume detector, 2-sensor | 1 | 0.6 est. | 0.6 | Alarms at 20% of the lower explosive limit; 9-18 or 18-30 V DC | [brochure](https://productimageserver.com/literature/brochure/63875BR.pdf) | Marine standard, plug-in sensors |
 | G-14 | Fire extinguisher | Firewize 2.5 kg ABE dry powder with vehicle bracket | 1 | 4.3 | 4.3 | 130 x 383 mm; 4A:40B:E | [Firewize](https://shop.firewize.com.au/products/dry-chemical-powder-2-5kg-abe) | Spec. On the gas locker's lid by the rear door |
+| | **Garage subtotal** | | | | **100.9** | | | |
+
+With LPG (owner option) the garage also has the gas locker, 7.0 kg (estimate):
+
+| ID | Item | Product (maker, part) | Qty | Unit kg | Total kg | Size / rating | Links | Source and notes |
+|---|---|---|---|---|---|---|---|---|
 | G-15 | Gas locker | Sealed aluminium box for two 9 kg cylinders and the regulator, 25 mm drain, cylinder clamps | 1 | 7.0 est. | 7.0 | 760 x 380 x 690; clamps for 4 times the filled weight | [SA Gas Bulletin 26](https://www.energymining.sa.gov.au/__data/assets/pdf_file/0005/922964/Gas-Bulletin-26-Conversion-of-buses-and-trucks-to-motor-homes.pdf) | About 2 m2 of 1.6 mm sheet plus clamps (estimate). Its hatch is in the body |
-| | **Garage subtotal** | | | | **106.4** | | | |
 
 ## Bed (research/04)
 
@@ -78,17 +83,17 @@ The adhesive and rivet quantities are revision B's. The deck and the ledgers gre
 
 | Group | kg |
 |---|---|
-| Garage | 106.4 |
+| Garage | 100.9 |
 | Bed | 68.1 |
 | Partition A | 13.2 |
 | Fixings and adhesives | 3.1 |
 | Access and safety | 2.6 |
-| **Module, empty** | **193.4** |
-| Of which the loading kit (chocks, straps, loops, harness, ramp, winch), which revision D keeps aboard in every case | 77.3 |
+| **Module, empty** | **187.9** |
+| Of which the loading kit (chocks, straps, loops, harness, ramp, winch), which revision D keeps aboard in every case | 78.8 |
 | Both bikes | 381.0 |
-| **Module with both bikes** | **574.4** |
+| **Module with both bikes** | **568.9** |
 
-Not included: the rear door, the gas locker hatch and the steel anchor rails under the floor (body or chassis scope), the gas cylinders, generator and jerry cans (payload and tare lines in the trailer layout), and bedding (payload).
+Not included: the rear door and the steel anchor rails under the floor (body or chassis scope), the generator and jerry cans (payload and tare lines in the trailer layout), and bedding (payload).
 
 ## Height stack-up, roof collapsed, from the garage floor
 

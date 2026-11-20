@@ -1,0 +1,567 @@
+# Chosen products for the appliance and equipment lines (research report 13, 20 Nov 2026).
+# One entry per chosen product, plus an entry for each line's fabricated or minor parts.
+# basis: maker (maker's published figure), retailer (stockist's published figure), calculated (from size
+# and density), estimate (judgement, basis in the note). The mass schedule treats maker and retailer
+# figures as spec (0 % growth), calculated as 7 % and estimate as 20 % (report 02, MASS-06).
+# dims_mm is [L, W, H] as published, with the orientation in dims_note where it matters.
+# Masses in kg. Power at the device's own voltage unless stated.
+
+system:
+  voltage: "24 V nominal (25.6 V LFP). 12 V loads on an Orion 24/12-70 bus"
+  basis: "Planning basis for the later power design (report 13 section 2)"
+  daily_load_kwh: {hot_day: 10.4, cold_day: 5.1}
+  solar_yield_kwh: {hot_day: 9.3, clear_cold_day: 3.4, overcast_cold_day: 1.4}
+
+lines:
+  LA-01: {now_kg: 100, new_kg: 57.1, maker_kg: 17.2, calculated_kg: 0, estimate_kg: 39.9}
+  LA-02: {now_kg: 65, new_kg: 16.0, maker_kg: 16.0, calculated_kg: 0, estimate_kg: 0}
+  LA-03: {now_kg: 30, new_kg: 21.7, maker_kg: 17.2, calculated_kg: 0, estimate_kg: 4.5}
+  LA-04: {now_kg: 60, new_kg: 45.6, maker_kg: 37.7, calculated_kg: 0, estimate_kg: 7.9}
+  LA-05: {now_kg: 35, new_kg: 29.0, maker_kg: 28.0, calculated_kg: 0, estimate_kg: 1.0}
+  LA-06: {now_kg: 30, new_kg: 21.8, maker_kg: 21.3, calculated_kg: 0, estimate_kg: 0.5}
+  LA-07: {now_kg: 80, new_kg: 50.9, maker_kg: 9.5, calculated_kg: 0, estimate_kg: 41.4}
+  LA-10: {now_kg: 30, new_kg: 25.0, maker_kg: 23.5, calculated_kg: 0, estimate_kg: 1.5}
+  UF-01: {now_kg: 40, new_kg: 37.6, maker_kg: 0, calculated_kg: 37.6, estimate_kg: 0}
+  UF-04: {now_kg: 110, new_kg: 86.0, maker_kg: 74.0, calculated_kg: 0, estimate_kg: 12.0}
+  GS-01: {now_kg: 40, new_kg: 21.1, maker_kg: 21.1, calculated_kg: 0, estimate_kg: 0}
+  GS-02+GS-05: {now_kg: 18.5, new_kg: 0, maker_kg: 0, calculated_kg: 0, estimate_kg: 0, note: "Deleted: induction cooking, no LPG. GS-03 (17 kg of LPG payload), G-15 gas locker (7 kg) and BD-06 hatch (4 kg) go too"}
+  RF-01: {now_kg: 90, new_kg: 31.2, maker_kg: 29.2, calculated_kg: 0, estimate_kg: 2.0}
+  G-11: {now_kg: 9, new_kg: 10.5, maker_kg: 0, calculated_kg: 1.8, estimate_kg: 8.7}
+  total: {now_kg: 737.5, new_kg: 453.5, maker_kg: 294.7, calculated_kg: 39.4, estimate_kg: 119.4, growth_now_kg: 147.5, growth_new_kg: 26.6}
+
+products:
+  # ---------------------------------------------------------------- LA-01 wet bathroom
+  - line: LA-01
+    item: Cassette toilet, swivel bowl, electric flush
+    maker: Thetford
+    part_no: C223-CS
+    qty: 1
+    mass_kg: 7.2
+    basis: maker
+    mass_source: https://www.thetford.com/au/products-and-support/c223cs/
+    dims_mm: [580, 394, 534]
+    dims_note: "Published as H 534 x W 394 x D 580. L here is the depth"
+    power: "12 V flush pump. 18 L waste cassette"
+    links:
+      maker_au: https://www.thetford.com/au/products-and-support/c223cs/
+      overview: https://www.thetford.com/app/uploads/Overview-and-technical-specifications-cassette-toilets.pdf
+    stockist_au: "Thetford Australia and its dealers"
+    notes: "Needs Thetford service door 2680584 (white) in the road-side wall. Its mass is in the fabricated entry"
+  - line: LA-01
+    item: Recirculating shower unit
+    maker: DauerShower (Germany)
+    part_no: DauerShower 2.0
+    qty: 1
+    mass_kg: 10.0
+    basis: maker
+    mass_source: "https://dauershower.com/ (earlier page version: under 10 kg, space at most 45 x 20 x 42 cm)"
+    dims_mm: [450, 200, 420]
+    dims_note: "Space needed, W x D x H"
+    power: "About 0.15 kWh and 5 L of fresh water per shower (maker). English FAQ: about 25 Ah at 12 V for a 10-minute hot shower"
+    links:
+      maker: https://dauershower.com/
+      stockist: https://womo-parts.de/product/dauershower-2-0-endlos-duschen-mit-minimalem-wasserverbrauch/
+      price: https://campertobi.de/produkt/dauershower-die-unendliche-dusche-sparsam-duschen-im-camper/
+    stockist_au: null
+    notes: "No Australian stockist. Fit a normal mixer as a bypass, as the maker recommends. Stainless self-backflushing filter and UV-C LED"
+  - line: LA-01
+    item: Wet-room floor pan with 60 mm upstands and drain
+    maker: Custom GRP
+    part_no: null
+    qty: 1
+    mass_kg: 7.5
+    basis: estimate
+    mass_source: "1.24 m2 of 3 to 4 mm glass-reinforced plastic at 1.8 g/cm3"
+    dims_mm: [1000, 1000, 60]
+    power: null
+    links: {}
+    stockist_au: null
+  - line: LA-01
+    item: Bypass shower mixer and hand shower
+    maker: To choose (Reich range or similar)
+    part_no: null
+    qty: 1
+    mass_kg: 1.5
+    basis: estimate
+    mass_source: estimate
+    dims_mm: null
+    power: null
+    links:
+      example: https://www.jacksonsleisure.com/caravan-campervan-motorhome/reich-linnea-33mm-mixer-tap-for-campervan-caravan-motorhome-marine/
+    stockist_au: null
+  - line: LA-01
+    item: Fabricated walls, door, wet lining, trims, basin, service door, fittings and sealant
+    maker: Owner-built
+    part_no: null
+    qty: 1
+    mass_kg: 30.9
+    basis: estimate
+    mass_source: "Walls 2.58 m2 and door 1.02 m2 of 20 mm honeycomb at 3.3 kg/m2 (garage-bed/BOM.md B-03), hinges and latch 1.0, 4.6 m2 of 1.5 mm GRP lining at 1.5 kg/m2, 15 m of 25 x 25 x 1.6 angle at 0.209 kg/m, basin and tap 2.5, service door 1.5, shelf, rails, mirror, drain fittings, hoses and sealant 4.0"
+    dims_mm: [1000, 1000, 1800]
+    power: null
+    links: {}
+    stockist_au: null
+
+  # ---------------------------------------------------------------- LA-02 washer
+  - line: LA-02
+    item: Top-load washing machine, 3.5 kg, washer only
+    maker: Camec
+    part_no: "051879"
+    qty: 1
+    mass_kg: 16.0
+    basis: maker
+    mass_source: https://www.mygenerator.com.au/assets/files/Camec_053344_Product_Brochure.pdf
+    dims_mm: [460, 445, 730]
+    dims_note: "Published as W 445 x D 460 x H 730"
+    power: "280 W, 220 to 240 V. 44 L per standard wash. 800 rpm"
+    links:
+      brochure: https://www.mygenerator.com.au/assets/files/Camec_053344_Product_Brochure.pdf
+      maker: https://camec.com.au/
+    stockist_au: "Camec, branches in VIC, NSW, QLD and WA"
+    notes: "Replaces a washer-dryer (owner to confirm). Keep its back at least 160 mm off partition A so the open lid clears the inverter board"
+
+  # ---------------------------------------------------------------- LA-03 heater
+  - line: LA-03
+    item: Diesel air heater with 10 L hot water boiler
+    maker: Truma
+    part_no: Combi D 6 (Australian version)
+    qty: 1
+    mass_kg: 17.2
+    basis: maker
+    mass_source: "https://cdn.shopify.com/s/files/1/0093/4877/6032/files/Combi-D-Operating-Instructions.pdf?1165 (17.2 kg with peripheral devices). Truma Australia gives about 15.8 kg for the unit"
+    dims_mm: [525, 450, 300]
+    dims_note: "Installation space 540 x 500 x 350. Place 450 along X and 525 along Y"
+    power: "1.8 to 4 A at 12 V running, boiler alone at most 1.8 A, standby about 1 mA"
+    fuel: "Diesel. 2,000, 4,000 or 6,000 W. 220 to 630 ml/h, 110 ml/h at an average 1,000 W"
+    links:
+      maker_au: https://www.truma.com/au/products/heating-systems-au/combi-heaters-au/combi-d-6/
+      manual_au: https://cdn.shopify.com/s/files/1/0093/4877/6032/files/Combi-D-Operating-Instructions.pdf?1165
+    stockist_au: "Truma Australia dealers"
+  - line: LA-03
+    item: Warm-air ducts and outlets, flue and intake kit, 15 L fuel tank, fuel line and filter
+    maker: Truma accessories and a fuel tank to choose
+    part_no: null
+    qty: 1
+    mass_kg: 4.5
+    basis: estimate
+    mass_source: "Ducts and outlets 1.2, flue kit 1.0, 15 L HDPE tank 2.0, line and filter 0.3"
+    dims_mm: null
+    power: null
+    links: {}
+    stockist_au: null
+    notes: "The 15 L of diesel (12.6 kg) is payload, not in this line"
+
+  # ---------------------------------------------------------------- LA-04 inverter and chargers
+  - line: LA-04
+    item: Inverter-charger, 24 V, 5 kVA
+    maker: Victron Energy
+    part_no: MultiPlus-II 24/5000/120-50
+    qty: 1
+    mass_kg: 30.0
+    basis: maker
+    mass_source: https://www.victronenergy.com/upload/documents/Datasheet-MultiPlus-II-inverter-charger-EN.pdf
+    dims_mm: [330, 149, 607]
+    dims_note: "Published as H 607 x W 330 x D 149"
+    power: "4,000 W continuous at 25 °C, 3,700 W at 40 °C, 9,000 W peak. Charger 120 A. No-load 18 W, AES mode 12 W, search mode 3 W"
+    links:
+      datasheet: https://www.victronenergy.com/upload/documents/Datasheet-MultiPlus-II-inverter-charger-EN.pdf
+    stockist_au: "Victron distributors in Australia, for example Master Instruments"
+  - line: LA-04
+    item: Solar charge controller
+    maker: Victron Energy
+    part_no: SmartSolar MPPT 150/45
+    qty: 2
+    mass_kg: 2.5
+    unit_kg: 1.25
+    basis: maker
+    mass_source: https://www.victronenergy.com/upload/documents/Datasheet-SmartSolar-charge-controller-MPPT-150-35-%26-150-45-EN.pdf
+    dims_mm: [186, 70, 130]
+    dims_note: "Published as H 130 x W 186 x D 70"
+    power: "45 A charge. 1,300 W of panels at 24 V. 150 V absolute maximum PV voltage"
+    links:
+      datasheet: https://www.victronenergy.com/upload/documents/Datasheet-SmartSolar-charge-controller-MPPT-150-35-%26-150-45-EN.pdf
+    stockist_au: "Victron distributors"
+    notes: "One per pair of panels, each pair in series"
+  - line: LA-04
+    item: DC-DC charger from the car, isolated
+    maker: Victron Energy
+    part_no: Orion-Tr Smart 12/24-15
+    qty: 1
+    mass_kg: 1.8
+    basis: maker
+    mass_source: https://www.victronenergy.com/upload/documents/Datasheet-Orion-Tr-Smart-DC-DC-chargers-isolated-250-400W-EN.pdf
+    dims_mm: [187, 86, 131]
+    dims_note: "Published as H 131 x W 187 x D 86"
+    power: "430 W at 25 °C, 360 W at 40 °C. Input 8 to 17 V. About 35 A from the car"
+    links:
+      datasheet: https://www.victronenergy.com/upload/documents/Datasheet-Orion-Tr-Smart-DC-DC-chargers-isolated-250-400W-EN.pdf
+    stockist_au: "Victron distributors"
+    notes: "A second unit in parallel needs a 2 B&S feed from the car"
+  - line: LA-04
+    item: 24 V to 12 V converter for the 12 V loads
+    maker: Victron Energy
+    part_no: Orion 24/12-70 (ORI241270020)
+    qty: 1
+    mass_kg: 1.5
+    basis: retailer
+    mass_source: https://www.currentconnected.com/product/orion-ip20-24-12-70a-converter
+    dims_mm: [195, 88, 65]
+    power: "70 A, 840 W"
+    links:
+      retailer: https://www.currentconnected.com/product/orion-ip20-24-12-70a-converter
+    stockist_au: "Victron distributors"
+    notes: "Feeds the heater, XT Air compressor, water pump and winch"
+  - line: LA-04
+    item: Battery management system with main contactor
+    maker: Victron Energy
+    part_no: Lynx Smart BMS NG 500 A
+    qty: 1
+    mass_kg: 1.9
+    basis: maker
+    mass_source: https://www.victronenergy.com/upload/documents/Datasheet-Lynx-Smart-BMS-NG-EN.pdf
+    dims_mm: [180, 80, 190]
+    dims_note: "Published as H 190 x W 180 x D 80"
+    power: null
+    links:
+      datasheet: https://www.victronenergy.com/upload/documents/Datasheet-Lynx-Smart-BMS-NG-EN.pdf
+    stockist_au: "Victron distributors"
+    notes: "Required by the Lithium NG batteries. Stops charging below +5 °C"
+  - line: LA-04
+    item: Lynx Distributor, Cerbo GX with GX Touch 50, fuses, mounting board and board wiring
+    maker: Victron Energy and others
+    part_no: null
+    qty: 1
+    mass_kg: 7.9
+    basis: estimate
+    mass_source: "Lynx Distributor 1.5, Cerbo GX and GX Touch 0.6, fuses and holders 0.8, board 2.5, wiring 2.5"
+    dims_mm: [800, 160, 700]
+    dims_note: "Whole board: 800 wide, 160 deep, 700 high on partition A"
+    power: "GX and BMS standby a few watts"
+    links:
+      cerbo: https://www.victronenergy.com/upload/documents/Datasheet-Cerbo-GX-GX-Touch-EN-.pdf
+    stockist_au: "Victron distributors"
+
+  # ---------------------------------------------------------------- LA-05 fridge
+  - line: LA-05
+    item: Compressor fridge, 126 L
+    maker: Dometic
+    part_no: NRX 130C (9620001867)
+    qty: 1
+    mass_kg: 28.0
+    basis: maker
+    mass_source: https://www.dometic.com/en-au/product/dometic-nrx-130c-9620001867
+    dims_mm: [568, 525, 812]
+    dims_note: "Published as W 525 x H 812 x D 568"
+    power: "12/24 V DC, or 100 to 240 V AC at 70 W. Climate class T. Energy not published, planned at 0.55 kWh a day at 25 °C (assumption)"
+    links:
+      maker_au: https://www.dometic.com/en-au/product/dometic-nrx-130c-9620001867
+      range_au: https://www.dometic.com/en-au/lp/nrx-refrigerators
+    stockist_au: "Dometic Australia"
+  - line: LA-05
+    item: Frame and door latch
+    maker: Dometic accessories
+    part_no: null
+    qty: 1
+    mass_kg: 1.0
+    basis: estimate
+    mass_source: estimate
+    dims_mm: null
+    power: null
+    links:
+      frames_au: https://www.dometic.com/en-au/lp/nrx-refrigerators
+    stockist_au: "Dometic Australia"
+
+  # ---------------------------------------------------------------- LA-06 freezer
+  - line: LA-06
+    item: Chest fridge-freezer, 53 L, run as a freezer
+    maker: Dometic
+    part_no: CFX3 55IM
+    qty: 1
+    mass_kg: 21.3
+    basis: retailer
+    mass_source: https://overlandgarage.ca/products/dometic-cfx3-55im-cooler-freezer-with-rapid-freeze-plate
+    dims_mm: [720, 455, 480]
+    dims_note: "Place 720 along Y. The lid needs about 455 mm clear above, so the bench over it must lift"
+    power: "12/24 V DC and mains. Cools to -22 °C (Dometic, CFX3 range). Planned at 0.8 kWh on a hot day and 0.3 kWh on a cold one (assumption)"
+    links:
+      retailer: https://overlandgarage.ca/products/dometic-cfx3-55im-cooler-freezer-with-rapid-freeze-plate
+      retailer_2: https://ok4wd.com/dometic-cfx3-55im-cooler-freezer-w-rapid-freeze-plate/
+      maker_range: https://www.dometic.com/en-us/product/dometic-cfx3-25-9600028370
+    stockist_au: "Dometic Australia sells the CFX3 range (55IM listing not checked)"
+  - line: LA-06
+    item: Tie-down kit
+    maker: Dometic accessories
+    part_no: null
+    qty: 1
+    mass_kg: 0.5
+    basis: estimate
+    mass_source: estimate
+    dims_mm: null
+    power: null
+    links: {}
+    stockist_au: "Dometic Australia"
+
+  # ---------------------------------------------------------------- LA-07 kitchen
+  - line: LA-07
+    item: Two-zone induction hob
+    maker: Dometic
+    part_no: CVI1525 (9600050571)
+    qty: 1
+    mass_kg: 7.0
+    basis: maker
+    mass_source: https://www.dometic.com/fr-fr/produit/dometic-cvi1525-9600050571
+    dims_mm: [525, 350, 55]
+    dims_note: "Cut-out 505 x 330 mm, 100 mm deep"
+    power: "1,000 W and 1,300 W zones, 2,300 W and 10 A in all, 220 to 240 V, 50 Hz"
+    links:
+      maker: https://www.dometic.com/fr-fr/produit/dometic-cvi1525-9600050571
+      manual_apac: https://media.dometic.com/externalassets/cvi1525_9620008712_125117.pdf?ref=-588583111
+      fitted_au: https://helpcentre.marscampers.com.au/portal/en/kb/articles/dometic-cvi1525-induction-cooktop-how-to-use-safety-cleaning-troubleshooting
+    stockist_au: "Dometic APAC. Fitted by Mars Campers in Australia"
+  - line: LA-07
+    item: Square stainless sink with glass lid
+    maker: Dometic
+    part_no: CVS1350G (9600051161)
+    qty: 1
+    mass_kg: 2.5
+    basis: maker
+    mass_source: https://www.dometic.com/fr-fr/produit/dometic-cvs1350g-9600051161
+    dims_mm: [350, 350, 170]
+    power: null
+    links:
+      maker: https://www.dometic.com/fr-fr/produit/dometic-cvs1350g-9600051161
+    stockist_au: "Not checked"
+  - line: LA-07
+    item: Full-extension heavy-duty slides, 610 mm, one pair
+    maker: Accuride
+    part_no: 9301 (24 inch)
+    qty: 2
+    mass_kg: 6.0
+    basis: estimate
+    mass_source: "Three steel members of about 2.3 mm on a 76 mm height, about 3 kg a slide. Not published"
+    dims_mm: [610, 19, 76]
+    power: null
+    rating: "272 kg a pair moderate use, 217 kg frequent use, 360 lb (163 kg) mobile"
+    links:
+      sheet: https://stage.dbroberts.com/cms/wp-content/uploads/sites/2/2022/06/Accuride_9301_Technical_Sheet.pdf
+      maker: https://www.accuride.com/en-us/products/drawer-slides/heavy-duty-slides/9300-drawer-slide-series
+    stockist_au: "Not checked"
+    notes: "Add a separate positive lock in and out"
+  - line: LA-07
+    item: Kitchen mixer tap
+    maker: To choose (for example Reich Linnea K)
+    part_no: null
+    qty: 1
+    mass_kg: 0.8
+    basis: estimate
+    mass_source: estimate
+    dims_mm: null
+    power: null
+    links:
+      example: https://www.jacksonsleisure.com/caravan-campervan-motorhome/reich-linnea-33mm-mixer-tap-for-campervan-caravan-motorhome-marine/
+    stockist_au: null
+  - line: LA-07
+    item: Fabricated sleeve, slide-out drawer with outer wall panel, bench top, internal drawers, stops and lock
+    maker: Owner-built
+    part_no: null
+    qty: 1
+    mass_kg: 34.6
+    basis: estimate
+    mass_source: "Sleeve 12.0 (2.1 m2 of 1.6 mm aluminium at 4.3 kg/m2 and an angle frame), drawer 14.1, bench top 4.5, internal drawers 3.0, stops and lock 1.0"
+    dims_mm: [1500, 600, 450]
+    power: null
+    links: {}
+    stockist_au: null
+
+  # ---------------------------------------------------------------- LA-10 air-conditioner
+  - line: LA-10
+    item: Under-bench air-conditioner
+    maker: Truma
+    part_no: Saphir Comfort RC
+    qty: 1
+    mass_kg: 23.5
+    basis: maker
+    mass_source: https://www.truma.com/au/products/air-conditioning-systems-au/saphir-box/saphir-comfort-rc/
+    dims_mm: [628, 400, 290]
+    dims_note: "Place 628 along Y, so the box grows from 600 to 630 mm in Y"
+    power: "230 to 240 V, 50 Hz. Cooling 4.2 A (about 970 W) for 2,400 W of cooling. Heating 3.7 A for 1,700 W. 20 A for 150 ms at start. +4 to +43 °C"
+    links:
+      maker_au: https://www.truma.com/au/products/air-conditioning-systems-au/saphir-box/saphir-comfort-rc/
+    stockist_au: "Truma Australia dealers"
+  - line: LA-10
+    item: Ducts and vents
+    maker: Truma accessories
+    part_no: null
+    qty: 1
+    mass_kg: 1.5
+    basis: estimate
+    mass_source: estimate
+    dims_mm: null
+    power: null
+    links: {}
+    stockist_au: "Truma Australia dealers"
+
+  # ---------------------------------------------------------------- UF-01 water tanks
+  - line: UF-01
+    item: Water tank, welded HDPE, 6 mm walls, two cross baffles and one lengthwise baffle
+    maker: Custom (for example Plastic Online)
+    part_no: null
+    qty: 2
+    unit_kg: 18.8
+    mass_kg: 37.6
+    basis: calculated
+    mass_source: "Per tank: 2.61 m2 of 6 mm HDPE at 0.95 g/cm3 = 14.9 kg, baffles with 20 % flow holes 3.5 kg, fittings 0.5 kg"
+    dims_mm: [760, 1086, 259]
+    capacity: "About 195 L net each, 390 L for two"
+    power: null
+    links:
+      fabricator: https://www.plasticonline.com.au/services/plastic-tank-fabrication/
+    stockist_au: "Plastic Online and other Australian plastic fabricators"
+    notes: "Use food-grade sheet. Seat on two aluminium cross-bearers on rubber, two padded stainless straps per tank. Guarded by UF-03"
+
+  # ---------------------------------------------------------------- UF-04 battery
+  - line: UF-04
+    item: LFP battery, 25.6 V 200 Ah, 5.12 kWh
+    maker: Victron Energy
+    part_no: Lithium NG 25.6 V 200 Ah (BAT524120620)
+    qty: 2
+    unit_kg: 37.0
+    mass_kg: 74.0
+    basis: maker
+    mass_source: "https://cdn.shopify.com/s/files/1/0497/4749/3026/files/Datasheet-Lithium-NG-batteries-12_8V-25_6V-51_2V-EN.pdf?v=1739576641 (Victron marks it est.)"
+    dims_mm: [648, 162, 235]
+    dims_note: "Published as H 235 x W 648 x D 162. Lie both on their sides, 648 along Y, 2 x 235 along X, terminals sideways"
+    power: "10.24 kWh for two. 200 A continuous, 400 A for 10 s each. Charge +5 to +50 °C, discharge -20 to +50 °C. 2,500 cycles at 80 % depth of discharge. IP65"
+    standards: "EN IEC 62619:2022 and ECE R10 Rev 06 in Victron's declaration of conformity, 14 Oct 2025"
+    links:
+      datasheet: https://cdn.shopify.com/s/files/1/0497/4749/3026/files/Datasheet-Lithium-NG-batteries-12_8V-25_6V-51_2V-EN.pdf?v=1739576641
+      declaration: https://www.victronenergy.com/upload/documents/Declaration-of-Conformity-Lithium-NG-Batteries.pdf
+    stockist_au: "Victron distributors"
+    notes: "A third battery (15.36 kWh, +37 kg) only if the air-conditioner runs all night"
+  - line: UF-04
+    item: Sealed battery box with lid gasket, cable glands, vent to the road side and brackets
+    maker: Owner-built, 2 mm aluminium
+    part_no: null
+    qty: 1
+    mass_kg: 12.0
+    basis: estimate
+    mass_source: "1.66 m2 of 2 mm aluminium at 5.4 kg/m2 plus about 3 kg of brackets and fittings"
+    dims_mm: [600, 800, 250]
+    power: "Planned 30 W pad heater below +5 °C (open question 9)"
+    links: {}
+    stockist_au: null
+
+  # ---------------------------------------------------------------- GS-01 generator
+  - line: GS-01
+    item: Inverter generator, 2.2 kVA
+    maker: Honda
+    part_no: EU22i
+    qty: 1
+    mass_kg: 21.1
+    basis: maker
+    mass_source: https://powerequipment.honda.com.au/models/generators/eu22/specifications
+    dims_mm: [509, 290, 425]
+    power: "2,200 VA maximum, 1,800 W rated. DC 8.3 A"
+    fuel: "Petrol, 3.6 L tank, about 1.09 L/h at rated load"
+    links:
+      maker_au: https://powerequipment.honda.com.au/models/generators/eu22/specifications
+      spec_sheet: https://anythingmarketplace.com.au/wp-content/uploads/2026/09/Honda-EU22i-Spec-Sheet.pdf
+      fuel_use: https://peterhillpower.com.au/product/honda-power-equipment-generators-2/
+    stockist_au: "Honda Power Equipment dealers"
+    notes: "Set the MultiPlus AC input limit to 7.5 A on generator"
+
+  # ---------------------------------------------------------------- GS-02, GS-05 LPG (deleted)
+  - line: GS-02+GS-05
+    item: None. No LPG cylinders or regulator
+    maker: null
+    part_no: null
+    qty: 0
+    mass_kg: 0
+    basis: maker
+    mass_source: "Induction cooking (LA-07). If gas is kept, one 9 kg steel cylinder is enough: about 9 kg tare (7.8 to 10.4 kg) and 8.5 kg of LPG, https://www.elgas.com.au/swapngo/9kg-gas-bottle-4kg-gas-bottle-dimensions-size/"
+    dims_mm: null
+    power: "Induction adds 1.4 kWh a day hot and 1.8 kWh a day cold to the battery"
+    links:
+      elgas: https://www.elgas.com.au/swapngo/9kg-gas-bottle-4kg-gas-bottle-dimensions-size/
+    stockist_au: null
+
+  # ---------------------------------------------------------------- RF-01 solar
+  - line: RF-01
+    item: Glass-free frameless solar panel, 430 W, bonded
+    maker: Sunman
+    part_no: eArc SMF430F-12X12UW
+    qty: 4
+    unit_kg: 7.3
+    mass_kg: 29.2
+    basis: maker
+    mass_source: https://www.master-instruments.com.au/files/battery_information/e_arc_doing_more_web.pdf
+    dims_mm: [2054, 1084, 2]
+    dims_note: "Brochure gives 2,054 x 1,080, the Australian retailer 2,054 x 1,084. Array 4,108 x 2,168 mm"
+    power: "430 W. Vmp 42.0 V, Imp 10.24 A, Voc 49.8 V, Isc 10.74 A. Two in series per MPPT"
+    links:
+      brochure: https://www.master-instruments.com.au/files/battery_information/e_arc_doing_more_web.pdf
+      retailer_au: https://batteryspecialists.com.au/products/sunman-430-watt-earc-frameless-flexible-mono-solar-panel-featuring-mono-perc-cells-smf430f-12x12uw
+      retailer_au_2: https://www.solar4rvs.com.au/products/sunman-earc-430w-flexible-solar-panel-1
+    stockist_au: "Master Instruments (distributor), Battery Specialists, Solar4RVs"
+  - line: RF-01
+    item: Adhesive and cable
+    maker: As Sunman specifies
+    part_no: null
+    qty: 1
+    mass_kg: 2.0
+    basis: estimate
+    mass_source: estimate
+    dims_mm: null
+    power: null
+    links: {}
+    stockist_au: null
+
+  # ---------------------------------------------------------------- G-11 winch (module, garage-bed)
+  - line: G-11
+    item: 12 V winch with synthetic rope
+    maker: WARN
+    part_no: VRX 25-S (101020)
+    qty: 1
+    mass_kg: 8.0
+    basis: estimate
+    mass_source: "Not published. Shipping weight 23.46 lb (10.6 kg), https://www.jegs.com/i/warn-940-101020-101020-vrx-25-s-powersports-winch-with-synthetic-rope"
+    dims_mm: [333, 119, 119]
+    dims_note: "13.1 x 4.7 x 4.7 in (WARN). G-11 envelope grows from 300 to 335 mm long"
+    power: "12 V. 20 A with no load, 45 A at 227 kg. About 27 A for the 63 kgf pull"
+    rating: "2,500 lb (1,134 kg) single line. IP68. 15 m x 4.8 mm synthetic rope"
+    links:
+      maker: https://www.warn.com/products/vrx-25-s-winch-101020
+      sell_sheet: https://alltracks.eu/wp-content/uploads/2023/03/VRX-25-SellSheet.pdf
+    stockist_au: "Not checked"
+  - line: G-11
+    item: Quick-release plates, 340 x 160 x 6 mm aluminium
+    maker: Owner-built
+    part_no: null
+    qty: 2
+    mass_kg: 1.8
+    basis: calculated
+    mass_source: "2 x 0.0544 m2 x 6 mm at 2.70 g/cm3"
+    dims_mm: [340, 160, 6]
+    power: null
+    links: {}
+    stockist_au: null
+  - line: G-11
+    item: Winch cable and remote
+    maker: WARN and others
+    part_no: null
+    qty: 1
+    mass_kg: 0.7
+    basis: estimate
+    mass_source: estimate
+    dims_mm: null
+    power: null
+    links: {}
+    stockist_au: null
+
+# Masses found outside these lines (report 13 section 6 and open question 6). Not part of the totals above.
+other_findings:
+  - {line: DB-05, item: "ARK XO750 jockey wheel", model_kg: 9.0, published_kg: 19.8, basis: retailer, source: "https://www.crofttrailer.com/xo750-swivel-sidewind-trailer-jack-with-dual-wheels-1-650-lb/", note: "ARK FAQ gives 20 kg, https://www.arkcorp.com.au/faq/"}
+  - {line: CH-B01, item: "ARK XO DDS650 corner steady, four", model_kg: 22.0, published_kg: 35.2, basis: retailer, source: "https://www.amazon.com/ARK-XODDS650BUS-Corner-Steadies-650mm/dp/B0CLBPBNTB", note: "38.9 lb for a set of two with the winding handle"}
+  - {line: DB-03, item: "Cruisemaster DO35 V3Plus", model_kg: 9.5, published_kg: 5.0, basis: retailer, source: "https://www.diycaravans.com.au/shop/cruisemaster-do35-v3plus/", note: "Looks like a shipping entry. Keep 9.5 kg"}
+  - {line: RG-01, item: "Cruisemaster XT Freestyle Air tandem kit", model_kg: 180, published_kg: 180, basis: retailer, source: "https://www.diycaravans.com.au/shop/cruisemaster-xt-freestyle-air-suspension-kit-tandem/", note: "Same figure listed for the coil kit, so a shipping entry. Keep as an estimate"}
+  - {line: new, item: "Diesel for the heater, 15 L", model_kg: 0, published_kg: 12.6, basis: calculated, source: "0.84 kg per litre", note: "Payload line with load fuel"}

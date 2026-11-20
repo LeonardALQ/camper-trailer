@@ -23,8 +23,8 @@ parts:
     name: Kerb-side wall with the gas locker hatch opening (body)
     product: Side wall, 35 mm foam-core panel, 700 x 630 hatch opening
     kind: context
-    notes: Inner face at Y = -1,165. The opening is the gas locker's hatch, the locker's only access.
-    geometry: {generator: wall, params: {thickness: 35, opening: true}}
+    notes: Inner face at Y = -1,165. With LPG (module parameter lpg) the wall has the gas locker's hatch opening, the locker's only access.
+    geometry: {generator: wall, params: {thickness: 35, opening: lpg}}
     color: "#dfe6e9"
     alpha: 0.3
   CTX-WALL-B:

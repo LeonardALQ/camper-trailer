@@ -408,8 +408,10 @@ def title_block(sh, *, owner, project, number, title, subtitle, rev, status, dat
     sh.text(232, 12.4, f"MODEL: {model_ref}  DATA REV {git}  (TB-12)", 1.75)
 
 
-def revision_table(sh, revisions, x0=230.0, x1=410.0, ytop=287.0):
-    """REV-01: revision, date, description, drawn, checked, approved. Header row, then one 5 mm row each."""
+def revision_table(sh, revisions, x0=230.0, x1=410.0, ytop=287.0, max_rows=7):
+    """REV-01: revision, date, description, drawn, checked, approved. Header row, then one 5 mm row each. Only the
+    latest `max_rows` revisions are listed; the drawing register (site Drawings page) keeps every one."""
+    revisions = list(revisions)[-max_rows:]
     n = max(1, len(revisions))
     yb = ytop - 10 - 5 * n
     sh.fillrect(x0, yb, x1, ytop)

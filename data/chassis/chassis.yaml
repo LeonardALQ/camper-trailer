@@ -113,8 +113,8 @@ fittings:
   - {id: DB-03, name: "Cruisemaster DO35 V3Plus coupling, with the integrated handbrake", kind: bought, mass_kg: 9.5, maturity: estimate,
      source: "Estimate: Cruisemaster does not publish the mass. Retailers list the DO35 V3 at about 8 to 10 kg", at: [80, 0, "coupling_z + 40"],
      box: [-60, -90, "coupling_z - 60", "db_apex_x + 60", 180, "rail_underside_z - db_depth - coupling_z + 60"]}
-  - {id: DB-05, size: [80, 80, 700], name: "ARK XO750 jockey wheel, 750 kg, with its clamp", kind: bought, mass_kg: 9.0, maturity: estimate,
-     source: "Estimate (report 11: jockey wheel mass not found)", at: [jockey_x, "-(db_apex_y + (rail_c - db_apex_y) * (jockey_x - db_apex_x) / (body_x0 - db_apex_x)) - 140", db_z]}
+  - {id: DB-05, size: [80, 80, 700], name: "ARK XO750 jockey wheel, 750 kg, with its clamp", kind: bought, mass_kg: 20.0, maturity: spec,
+     source: "ARK FAQ gives 20 kg, Croft Trailer lists 43.6 lb (19.8 kg) for the XO750 with dual wheels (report 13 section 6)", at: [jockey_x, "-(db_apex_y + (rail_c - db_apex_y) * (jockey_x - db_apex_x) / (body_x0 - db_apex_x)) - 140", db_z]}
   - {id: DB-06, size: [60, 400, 30], name: "Safety chains to AS 4177.4 (4177-35), two of about 0.9 m, with ARK HLS13 shackles", kind: bought, mass_kg: 4.5, maturity: estimate,
      source: "Estimate: 3,500 kg grade chain about 2 kg/m, shackles 0.25 kg each", at: [chain_lug_x, 0, db_z - 80]}
   - {id: DB-07, size: [250, 150, 150], name: "Breakaway kit (battery box, switch, controller) and plugs and cables", kind: bought, mass_kg: 5.0, maturity: estimate,
@@ -122,8 +122,8 @@ fittings:
   - {id: DB-04, name: "Stone guard: 25 x 25 x 2 SHS frame with 2 mm aluminium checker plate on rubber mounts, on the cross brace", kind: bought, mass_kg: 7.0, maturity: calculated,
      source: "Calculated: 2.4 m of 25 x 25 x 2 SHS at 1.36 kg/m, 0.34 m2 of 2 mm aluminium at 5.4 kg/m2, 1.9 kg of mounts and bolts", at: [735, 0, rail_underside_z + 10],
      box: ["db_apex_x + 200", -500, rail_underside_z, sg_l, 1000, 10]}
-  - {id: CH-B01, size: [120, 80, 300], name: "ARK XO DDS650 drop-down corner steady, 875 kg rating", kind: bought, mass_kg: 5.5, qty: 4, maturity: estimate,
-     source: "Estimate (report 11: corner steady mass not found)", at: [steady_front_x, 0, rail_underside_z - 150], side_y: rail_c, rear_x: steady_rear_x}
+  - {id: CH-B01, size: [120, 80, 300], name: "ARK XO DDS650 drop-down corner steady, 875 kg rating", kind: bought, mass_kg: 8.8, qty: 4, maturity: spec,
+     source: "Retailer: 38.9 lb (17.6 kg) for a set of two with the winding handle (report 13 section 6)", at: [steady_front_x, 0, rail_underside_z - 150], side_y: rail_c, rear_x: steady_rear_x}
 
 # Load cases, report 11 section 3.2. Accelerations in g along X (+ rearward), Y (+ road side) and Z (+ up). Every case
 # runs on each trailer case TC1 to TC7 with its masses scaled up to the plated ATM (water included), except LC5b, which

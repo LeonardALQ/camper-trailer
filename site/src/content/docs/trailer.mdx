@@ -30,7 +30,7 @@ bed module keeps its own groups inside it. Each block's name starts with its lin
 <CadViewer src={withBase('/models/trailer.json')} height={560} />
 
 The project datum in research report 02 measures X rearward from the ball, Y towards the road side and Z up. That
-is a right-handed frame, so the model shows the real trailer: the gas locker is on the left when you look from
+is a right-handed frame, so the model shows the real trailer: the entry door is on the left when you look from
 behind.
 
 ## The layout and why
@@ -42,16 +42,17 @@ back.
 
 From front to back there are the drawbar with the coupling, stone guard and jockey wheel (no drawbar box now),
 then the living area, {n(t.zones.living)} mm long, then the {n(t.zones.garage)} mm garage. In the living area the
-heavy items stand against partition A: the wet bathroom, the washer-dryer, the diesel heater with the air supply
-on it, and the inverter and chargers on the partition. The fridge and the chest freezer stand along the road side
+heavy items stand against partition A: the wet bathroom, the washer, the diesel heater with the air supply
+on it, and the 24 V inverter and chargers on the partition. The fridge and the chest freezer stand along the road side
 in front of the bathroom. The light items are at the front: the desk with the air-conditioner under it, the seat,
 and the wardrobe over the kitchen slide-out, which stays on the kerb side under the awning. The entry door is in
 the kerb-side wall behind the kitchen. Floor space is kept clear at the entry door, the ladder foot, the bathroom
 door, the seat and a walkway between them.
 
-The gas cylinders, the generator and the jerry cans moved from the drawbar box into the garage: the cylinders into
-a sealed locker in the kerb-side rear corner, and the generator and cans along the kerb-side wall in front of it.
-The 12 kWh battery moved to the back, under the garage floor between the rails, 400 mm in front of the rear wall.
+The generator and the jerry cans moved from the drawbar box into the garage, along the kerb-side wall. There is no
+LPG (an owner option, report 13): the cooking is induction and the heater runs on diesel from a 15 L tank under
+the floor, so the kerb-side rear corner of the garage is stowage. The two batteries (10.24 kWh) sit at the back,
+under the garage floor between the rails, 400 mm in front of the rear wall.
 The water tanks stay over the axles, so the towball barely changes as the water is used.
 
 The floor height comes from the running gear in report 06 and the trailer's own tyre from report 09. The tyre is
@@ -59,6 +60,23 @@ The floor height comes from the running gear in report 06 and the trailer's own 
 50 mm of clearance above the tyre, the floor underside is at {n(ch.floor_underside_z)} mm and the garage floor surface
 at {n(ch.floor_z)} mm. The 3,048 mm ramp then sits at {(Math.asin(ch.floor_z / 3048) * 180 / Math.PI).toFixed(1)} degrees,
 and the travel height with the roof down is {n(ch.travel_height)} mm.
+
+## Appliances and equipment
+
+Research report 13 chose the products. Three owner choices are defaults until the owner answers, and each can be
+reversed in the data: a washer with no dryer, no LPG, and two batteries. TRAILER.md lists what reversing each one
+costs.
+
+- Bathroom: Thetford C223-CS cassette toilet and a DauerShower 2.0 recirculating shower, imported.
+- Washer: Camec 3.5 kg top loader. Fridge: Dometic NRX 130C, 126 L. Freezer: Dometic CFX3 55IM, 53 L.
+- Heater and hot water: Truma Combi D 6 on diesel. Air-conditioner: Truma Saphir Comfort RC under the desk.
+- Kitchen: Dometic CVI1525 induction hob and CVS1350G sink on Accuride 9301 slides.
+- Power at 24 V: a Victron MultiPlus-II 24/5000, two SmartSolar MPPT 150/45, an Orion-Tr charger from the car and two Lithium NG 25.6 V 200 Ah batteries.
+- Solar: four Sunman eArc 430 W glass-free panels bonded to the lid, 31 kg in place of 90 kg of glass panels.
+- Generator: Honda EU22i. Loading winch: WARN VRX 25-S.
+
+The daily load is about 10.4 kWh on a hot day and 5.1 kWh on a cold one. The batteries carry about 4 hot days or
+1.5 overcast winter days before the generator has to run.
 
 ## Wheels, tyres and spares
 

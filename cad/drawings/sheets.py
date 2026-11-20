@@ -187,7 +187,7 @@ def ct401(prj, model, bom, checks, reg, dwg):
     a0, b0 = vE.p(0, ycut, 0), vE.p(gl, ycut, 0)
     S.hdim(sh, a0[0], a0[1] - 1.5, b0[0], b0[1] - 1.5, 45.0, f"{gl:.0f} GARAGE, PARTITION A TO THE REAR WALL")
     lx0, lx1 = vE.p(P["locker_x0"], ycut, 0), vE.p(gl, ycut, 0)
-    S.hdim(sh, lx0[0], lx0[1], lx1[0], lx1[1], 39.0, f"{P['locker_l']:.0f} GAS LOCKER", ext=False)
+    S.hdim(sh, lx0[0], lx0[1], lx1[0], lx1[1], 39.0, f"{P['locker_l']:.0f} {'GAS LOCKER' if P['lpg'] else 'STOWAGE'}", ext=False)
     gx0, gx1 = vE.p(P["fuel_x0"], ycut, 0), vE.p(P["gen_x0"] + P["gen_l"], ycut, 0)
     S.hdim(sh, gx0[0], gx0[1], gx1[0], gx1[1], 39.0, "FUEL, GENERATOR", ext=False)
     # heights at partition A (left of the view) and at the rear wall (right)
@@ -268,7 +268,8 @@ def ct401(prj, model, bom, checks, reg, dwg):
     # ---- balloons
     _balloons(sh, [
         ("TU", vP.p(1158, ty, 0), (190.8, 236.0)), ("ST", vP.p(1040, sy, 0), (190.8, 146.0)),
-        ("1", vP.p(-10, 900, 0), (104.8, 238.0)), ("21", vP.p(P["locker_x0"] + 300, -hw + 150, 0), (214.8, 150.0)),
+        ("1", vP.p(-10, 900, 0), (104.8, 238.0)),
+    ] + [("21", vP.p(P["locker_x0"] + 300, -hw + 150, 0), (214.8, 150.0))] * bool(P["lpg"]) + [
         ("17", vP.p(P["garage_length"] - 110, -hw + 160, 0), (214.8, 162.0)),
         ("13", vP.p(1603, ty + 150, 0), (168.8, 246.0)), ("12", vP.p(P["front_row_x"], ty + 450, 0), (128.8, 246.0)),
         ("10", vP.p(300, ty, 0), (142.8, 246.0)), ("14", vP.p(60, sy, 0), (98.0, 166.0)),
@@ -287,7 +288,8 @@ def ct401(prj, model, bom, checks, reg, dwg):
         f"IN THE PROJECT DATUM (DIM-01, CT-001) MODULE X 0 IS AT X {mx0:.0f} AND Z 0 AT Z {mz0:.0f}, AXES PARALLEL.",
         "REVISION D: GARAGE AT THE BACK WITH A TOP-HINGED REAR DOOR. BIKES ALONG THE TRAILER, NOSES IN CHOCKS AGAINST PARTITION A. WHOLE SHEET REDRAWN.",
         "BIKES ARE ENVELOPES FROM research/05 SCALED TO THE OWNER'S FIGURES, MIRRORS FOLDED, FRONT WHEEL 25 UP IN THE CHOCK CRADLE (ESTIMATE). TUAREG PANNIERS ON.",
-        "GAS LOCKER: TWO 9 kg CYLINDERS, OUTSIDE ACCESS ONLY BY THE KERB HATCH, SEALED TO THE GARAGE, 25 mm DRAIN TO 500 BELOW THE FLOOR (report 02 5.2).",
+        ("GAS LOCKER: TWO 9 kg CYLINDERS, OUTSIDE ACCESS ONLY BY THE KERB HATCH, SEALED TO THE GARAGE, 25 mm DRAIN TO 500 BELOW THE FLOOR (report 02 5.2)."
+         if P["lpg"] else "NO LPG (OWNER OPTION, report 13): INDUCTION COOKING. THE KERB-SIDE REAR CORNER IS STOWAGE, THE 380 mm WALL BESIDE THE DOOR STAYS."),
         "MEASURE BOTH BIKES IN A FULL-SIZE MOCK-UP BEFORE ORDERING PANELS (BUILD STEP S01). VENTS, SENSORS AND THE EXTINGUISHER ARE PLACEHOLDERS.",
     ], width_chars=64, size=1.8)
     S.rev_tag(sh, 98.0, starts[1] + 0.6, "D")
@@ -302,7 +304,7 @@ def ct401(prj, model, bom, checks, reg, dwg):
              ("12", "G-03", "Double-stud track fitting", "16 + 2"), ("13", "G-05", "Ratchet strap 35 mm LC 1000 kg", "12"),
              ("14", "G-11", "Winch on quick-release plate", "1 + 2 plates"), ("15", "G-12", "Vent, 2 low and 1 high", "3"),
              ("16", "G-13", "Fume detector, 2 sensors", "1"), ("17", "G-14", "Extinguisher 2.5 kg ABE", "1"),
-             ("18", "A-01", "Ladder, owner-built, SHS 25x1.6", "1 (1580 long)"), ("21", "G-15", "Gas locker 760x380x690", "1")]
+             ("18", "A-01", "Ladder, owner-built, SHS 25x1.6", "1 (1580 long)")] + [("21", "G-15", "Gas locker 760x380x690", "1")] * bool(P["lpg"])
     S.parts_list(sh, _bom_rows(bom, items), ybase=66.0, row_h=3.9, tags={"1": "D", "6": "D", "7": "D", "11": "D", "21": "D"})
     _title(sh, dwg, reg, f"MODULE {bom['totals']['module_empty']:.1f} kg EMPTY, {bom['with_bikes_kg']:.1f} kg WITH BIKES (TB-11).", sc,
            prj.assembly.revision)
