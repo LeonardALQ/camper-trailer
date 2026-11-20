@@ -211,7 +211,7 @@ Ask ROH: the Trak 2 16x7 +7's weight, centre bore, nut seat and stud hole diamet
 
 ## Inputs this changes for the design (not edited here)
 
-- Tyre diameter 749.4 mm (calculated; 752 mm published for the G015), so floor Z 869, hubs Z 355 (static loaded radius 20 mm under 374.7), rail underside Z 570.
+- Tyre diameter 749.4 mm (calculated, 752 mm published for the G015), so floor Z 869, hubs Z 355 (static loaded radius 20 mm under 374.7), rail underside Z 570.
 - Axle spacing stays 830 mm.
 - C/F 195 mm, ET +7, effective 188 mm. Rail outer width 1,286 mm, track 1,662 mm.
 - MAS-06: tyre capacity 1,320 kg. MAS-09: wheel rating 1,250 kg. The registration sum of tyre capacities becomes 5,280 kg, so the coupling and chains still set the 3,500 kg GTM cap.

@@ -24,8 +24,11 @@ def git_hash() -> str:
     if os.environ.get("GIT_REV"):
         return os.environ["GIT_REV"]
     try:
-        return subprocess.run(["git", "-C", str(ROOT), "rev-parse", "--short", "HEAD"], capture_output=True, text=True,
-                              timeout=10).stdout.strip() or "uncommitted"
+        rev = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "--short", "HEAD"], capture_output=True, text=True,
+                             timeout=10).stdout.strip() or "uncommitted"
+        dirty = subprocess.run(["git", "-C", str(ROOT), "status", "--porcelain", "--untracked-files=no"], capture_output=True,
+                               text=True, timeout=10).stdout.strip()
+        return rev + ("-dirty" if dirty else "")
     except Exception:
         return "unknown"
 

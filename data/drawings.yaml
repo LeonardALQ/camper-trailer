@@ -26,6 +26,7 @@ drawings:
       - {rev: H, date: 2026-11-20, description: "Notice: tyre at its published 752 mm, floor Z 872, BD-10 mud flaps only, axle at X 5,021", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-20, description: "Notice: report 13 equipment, no LPG, bonded solar, travel 2,714 mm, axle and masses", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-20, description: "Notice: trailer for the 79, layout 1, no garage, fixed roof, drawbar box. Redrawn", drawn: Kiro, checked: "", approved: ""}
+      - {rev: K, date: 2026-11-20, description: "Notice: jockey wheel swung up for travel, axle X 4,197, sweep R 948.5", drawn: Kiro, checked: "", approved: ""}
   - number: CT-101
     title: Chassis general arrangement
     subtitle: Plan, kerb-side elevation, end views, member schedule and frame analysis summary
@@ -54,6 +55,7 @@ drawings:
       - {rev: B, date: 2026-11-20, description: "Notice: rail underside Z 571 for the 752 mm tyre", drawn: Kiro, checked: "", approved: ""}
       - {rev: C, date: 2026-11-20, description: "Notice: ARK XO750 jockey wheel 20 kg (report 13)", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-20, description: "Notice: jockey at X 1,000, drawbar box brackets, VSB1 forces at 3,100 kg", drawn: Kiro, checked: "", approved: ""}
+      - {rev: E, date: 2026-11-20, description: "Notice: jockey wheel swung up for travel, stone guard trimmed (kerb side)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-103
     title: Chassis details
     subtitle: Composite rail, outrigger root, crossmember to rail, overlap end, jacking pad, recovery tongue, spare posts
@@ -170,7 +172,8 @@ drawings:
     status: DRAFT
     structural: false
     revisions:
-      - {rev: A, date: 2026-11-20, description: "First draft, phase U2 of the ute garage brief", drawn: Kiro, checked: "", approved: ""}
+      - {rev: A, date: 2026-11-20, description: "First draft", drawn: Kiro, checked: "", approved: ""}
+      - {rev: B, date: 2026-11-20, description: "Notice: ball 1300 behind axle, 440 laden, trailer 3100 kg, re-solved", drawn: Kiro, checked: "", approved: ""}
   - number: CT-702
     title: Ute garage box frame and panels
     subtitle: Kerb-side frame elevation, subframe plan on Toyota's deck mounts, section at the rear axle, member schedule
@@ -181,7 +184,8 @@ drawings:
     status: DRAFT
     structural: true
     revisions:
-      - {rev: A, date: 2026-11-20, description: "First draft, phase U2 of the ute garage brief", drawn: Kiro, checked: "", approved: ""}
+      - {rev: A, date: 2026-11-20, description: "First draft", drawn: Kiro, checked: "", approved: ""}
+      - {rev: B, date: 2026-11-20, description: "Notice: title block wording only", drawn: Kiro, checked: "", approved: ""}
   - number: CT-703
     title: Ute garage doors and security
     subtitle: Rear view, kerb-side door, plan section through the barn doors, security layers
@@ -192,7 +196,8 @@ drawings:
     status: DRAFT
     structural: false
     revisions:
-      - {rev: A, date: 2026-11-20, description: "First draft, phase U2 of the ute garage brief", drawn: Kiro, checked: "", approved: ""}
+      - {rev: A, date: 2026-11-20, description: "First draft", drawn: Kiro, checked: "", approved: ""}
+      - {rev: B, date: 2026-11-20, description: "Notice: title block wording only", drawn: Kiro, checked: "", approved: ""}
   - number: CT-704
     title: Ute garage restraint layout
     subtitle: Plan with the roof off, section at the rear L-track row, strap loads and anchors
@@ -203,4 +208,5 @@ drawings:
     status: DRAFT
     structural: true
     revisions:
-      - {rev: A, date: 2026-11-20, description: "First draft, phase U2 of the ute garage brief", drawn: Kiro, checked: "", approved: ""}
+      - {rev: A, date: 2026-11-20, description: "First draft", drawn: Kiro, checked: "", approved: ""}
+      - {rev: B, date: 2026-11-20, description: "Notice: title block wording only", drawn: Kiro, checked: "", approved: ""}

@@ -1,0 +1,211 @@
+# Layout 79: the recommended layout (layout 1, the bed across the front, fixed roof), (research report 18).
+# Study file of research report 18, 20 Nov 2026. The build's data is data/assemblies/trailer.yaml.
+# Datum DIM-01 (report 02): X rearward from the ball centre, Y positive to the road side, Z up from the ground
+# at design ride height. Units mm and kg.
+# box: [x0, y0, z0, dx, dy, dz]. cog: [x, y, z]. growth: the MASS-06 fraction for the line (estimate 0.2,
+# calculated 0.07, maker 0). cat: tare, water, fuel or gear, the load-case tags. tied: the line moves with the
+# axle group in the axle solve. Masses are scaled from build c38f797 (report 18 section 3.1).
+id: ASM-TR-79
+name: Whole trailer for the LandCruiser 79, layout 1
+basis: report 18
+
+params:
+  body_length: 4420
+  body_width: 2400
+  wall_t: 35
+  end_wall_t: 35
+  interior_h: 1950            # fixed roof, standing room (report 18 section 2)
+  roof: fixed
+  roof_t: 40
+  floor_t: 30
+  floor_z: 925                # tyre_d + 120
+  floor_underside_z: 895
+  ceiling_z: 2875
+  roof_top_z: 2915
+  travel_height: 2917         # top of the bonded solar panels
+  body_x0: 1820
+  body_x1: 6240
+  in_x0: 1855
+  in_x1: 6205
+  drawbar_length: 1820        # unchanged (section 3.6)
+  coupling_z: 440             # DIM-03, 420 to 460 with the tolerance
+  drop_rail_to_coupling: 157.5   # was 131, a 26.5 mm drop block at the apex
+  tyre: "LT265/75R16 123/120 load range E, Yokohama Geolandar A/T G015, 1,550 kg"
+  wheel: "ROH Trak 2 16 x 7 ET 0, 5 x 150, 1,400 kg"
+  hub: "Cruisemaster LC5 M14 (5 x 150), 110 mm spigot, 12 inch ABS-enabled A/T drum"
+  tyre_d: 805
+  tyre_w: 272                 # envelope, estimate
+  slr_deflection: 20
+  hub_z: 382.5
+  hub_below_rail: 215         # XT Air standard arm
+  bump_travel: 60
+  tyre_clearance: 50
+  rail_underside_z: 597.5
+  rail_h: 150
+  rail_top_z: 747.5
+  raiser: "RHS 125 x 50 x 3 C450L0, top Z 872.5"
+  bearer_strip_t: 22.5
+  rail_outer_w: 1175
+  axle_spacing: 900
+  wheel_offset: 0
+  cf: 190                     # effective C/F 190 at ET 0, under Cruisemaster's 200 mm
+  track: 1555                 # the ute's front track
+  xt: {front_hinge_rear: -869, centre_front: -19, rear_shock_front: 811, front_hub_dx: -450, rear_hub_dx: 450}
+  suspension: "Cruisemaster XT Freestyle Air tandem, 4,500 kg build (GTM 4,050 kg), Firestone style 26 bags, Bosch TSC"
+  plated_atm: 3100            # open question 1 in report 18
+  water_l: 400
+  water_highway_l: 50
+  tank_net_l: 420
+  solar: "Four Sunman eArc 430 W in a 4,108 x 2,168 mm array from X 1,976, no roof hatches"
+  awning: "Fiamma F45s 450, case 4,230 mm, kerb side"
+
+solved:
+  axle_x: 4247                # 220 kg on the ball fully loaded, base weights
+  hubs_x: [3797, 4697]
+  station_front_faces_x: [1820, 2323, 2825, 3328, 4228, 5058, 5445, 6190]   # front, two floor, XT front hinge, XT centre, XT rear shock, battery bay, rear
+  front_load_space: 2427
+  rear_overhang: 1993
+  tare_kg: 2183
+  tare_growth_kg: 2409
+  cases:        # mass, CoG X and Z, towball, base then with growth
+    TC1: {aboard: "Tare", kg: 2183, cog_x: 3887, cog_z: 1178, towball: 185, kg_g: 2409, towball_g: 205}
+    TC2: {aboard: "400 L, fuel, gear", kg: 2763, cog_x: 3909, cog_z: 1132, towball: 220, kg_g: 3022, towball_g: 246}
+    TC3: {aboard: "50 L, fuel, gear", kg: 2413, cog_x: 3864, cog_z: 1186, towball: 217, kg_g: 2672, towball_g: 243}
+    TC4: {aboard: "400 L, fuel, no gear", kg: 2613, cog_x: 3929, cog_z: 1109, towball: 195, kg_g: 2842, towball_g: 216}
+    TC5: {aboard: "No water, fuel, gear", kg: 2363, cog_x: 3857, cog_z: 1198, towball: 217, kg_g: 2622, towball_g: 243}
+    TC6: {aboard: "No water, fuel, no gear", kg: 2213, cog_x: 3877, cog_z: 1176, towball: 193, kg_g: 2442, towball_g: 214}
+
+items:
+  # ---------------- chassis and drawbar (report 11 practice, CHASSIS.md members, scaled to the 4,420 mm frame)
+  - {id: CH-RL-K, name: "Main rail RHS 150x50x3 with RHS 125x50x3 raiser, kerb side", kg: 73.8, growth: 0.07, cat: tare, box: [1820, -587.5, 597.5, 4420, 50, 275]}
+  - {id: CH-RL-R, name: "Main rail RHS 150x50x3 with RHS 125x50x3 raiser, road side", kg: 73.8, growth: 0.07, cat: tare, box: [1820, 537.5, 597.5, 4420, 50, 275]}
+  - {id: CM-01, name: "Body front crossmember RHS 150x50x3, full rail height", kg: 9.6, growth: 0.07, cat: tare, box: [1820, -537.5, 597.5, 50, 1075, 150]}
+  - {id: CM-02, name: "Floor crossmember RHS 125x50x3 at raiser height", kg: 8.3, growth: 0.07, cat: tare, box: [2323, -537.5, 747.5, 50, 1075, 125]}
+  - {id: CM-03, name: "Floor crossmember RHS 125x50x3 at raiser height", kg: 8.3, growth: 0.07, cat: tare, box: [2825, -537.5, 747.5, 50, 1075, 125]}
+  - {id: CM-04, name: "XT front hinge crossmember RHS 150x50x3", kg: 9.6, growth: 0.07, cat: tare, tied: true, box: [3328, -537.5, 597.5, 50, 1075, 150]}
+  - {id: CM-05, name: "XT centre crossmember RHS 150x50x3", kg: 9.6, growth: 0.07, cat: tare, tied: true, box: [4228, -537.5, 597.5, 50, 1075, 150]}
+  - {id: CM-06, name: "XT rear shock crossmember RHS 150x50x3 with 5 mm shock plate", kg: 9.6, growth: 0.07, cat: tare, tied: true, box: [5058, -537.5, 597.5, 50, 1075, 150]}
+  - {id: CM-07, name: "Battery bay crossmember RHS 125x50x3 at raiser height", kg: 8.3, growth: 0.07, cat: tare, box: [5445, -537.5, 747.5, 50, 1075, 125]}
+  - {id: CM-08, name: "Body rear crossmember RHS 150x50x3, full rail height", kg: 9.6, growth: 0.07, cat: tare, box: [6190, -537.5, 597.5, 50, 1075, 150]}
+  - {id: OR, name: "Outriggers RHS 100x50x3, 612.5 mm, one each side at every station (16)", kg: 65.1, growth: 0.07, cat: tare, cog: [3932, 0, 822.5], note: "Boxes [x, -1200, 772.5, 50, 612.5, 100] and [x, 587.5, 772.5, 50, 612.5, 100] at each station front face"}
+  - {id: DB-M, name: "Drawbar members RHS 150x50x5, apex X 250 at Y +/-60 to the rails at X 1,820, then 1,000 mm under the rails, and the cross brace", kg: 78.7, growth: 0.07, cat: tare, cog: [1300, 0, 522.5]}
+  - {id: PB, name: "Plan bracing SHS 40x40x2.5 at rail height, bays X 2,373 to 2,825, 2,875 to 3,328 and 5,108 to 5,445", kg: 20.3, growth: 0.07, cat: tare, cog: [3492, 0, 672.5]}
+  - {id: SP-P, name: "Spare carrier posts, cleats and hub plate on the front crossmember", kg: 10.8, growth: 0.07, cat: tare, cog: [1790, 0, 1150]}
+  - {id: CH-P01, name: "Coupling plate with a 26 mm drop block, chain lugs, drawbar root gussets", kg: 15.1, growth: 0.07, cat: tare, cog: [400, 0, 440]}
+  - {id: CH-P04, name: "Front recovery lugs on the drawbar members", kg: 7.5, growth: 0.07, cat: tare, cog: [2150, 0, 492.5]}
+  - {id: CH-P05, name: "Rear recovery tongues through the rear crossmember", kg: 9.8, growth: 0.07, cat: tare, cog: [6170, 0, 672.5]}
+  - {id: CH-PX, name: "Jacking pads, shock support plate, hinge gussets", kg: 8.5, growth: 0.07, cat: tare, tied: true, cog: [4347, 0, 597.5]}
+  - {id: CH-P10, name: "Corner steady brackets and jockey bracket plate", kg: 7.7, growth: 0.07, cat: tare, cog: [4030, 0, 597.5]}
+  - {id: CH-P14, name: "Body mount nut plates, 32 bolts at 8 stations", kg: 7.9, growth: 0.07, cat: tare, cog: [3932, 0, 847.5]}
+  - {id: CH-S01, name: "Floor bearer strip 50 x 22.5 mm HDPE, EPDM faced", kg: 24.2, growth: 0.2, cat: tare, cog: [4030, 0, 884]}
+  - {id: CH-B01F, name: "ARK XO DDS650 corner steadies, front pair", kg: 17.6, growth: 0.0, cat: tare, cog: [2220, 0, 450]}
+  - {id: CH-B01R, name: "ARK XO DDS650 corner steadies, rear pair", kg: 17.6, growth: 0.0, cat: tare, cog: [6070, 0, 450]}
+  - {id: CH-G01, name: "Hot-dip galvanising to AS/NZS 4680", kg: 13.3, growth: 0.07, cat: tare, cog: [3730, 0, 650]}
+  # ---------------- coupling and drawbar fittings (unchanged products)
+  - {id: DB-03, name: "Cruisemaster DO35 V3Plus, coupling point Z 440", kg: 9.5, growth: 0.2, cat: tare, cog: [80, 0, 480]}
+  - {id: DB-05, name: "ARK XO750 jockey wheel on the kerb-side member, moved to X 1,100 (outside the bike box sweep)", kg: 20, growth: 0.0, cat: tare, cog: [1100, -400, 520]}
+  - {id: DB-06, name: "Safety chains 4177-35 and ARK HLS13 shackles", kg: 4.5, growth: 0.2, cat: tare, cog: [400, 0, 416]}
+  - {id: DB-07, name: "Breakaway kit, plugs and cables", kg: 5, growth: 0.2, cat: tare, cog: [700, 0, 597.5]}
+  - {id: DB-04, name: "Stone guard on the cross brace and member tops", kg: 7, growth: 0.07, cat: tare, cog: [735, 0, 626.5]}
+  # ---------------- running gear (tied to the axle group, hubs X 3,797 and 4,697, Y +/-777.5)
+  - {id: RG-01, name: "XT Freestyle Air arm, Firestone style 26 bag, LC5 M14 hub, 12 inch ABS-enabled drum, per wheel (4)", kg: 180, growth: 0.2, cat: tare, tied: true, cog: [4097, 0, 422.5], note: "45 kg per wheel at [hub_x - 150, +/-647.5, 422.5]"}
+  - {id: RG-02, name: "Tyre LT265/75R16 123/120 (4), 22.6 kg each", kg: 90.4, growth: 0.0, cat: tare, tied: true, cog: [4247, 0, 382.5], note: "Cylinders centred [3797 or 4697, +/-777.5, 382.5], radius 402.5, width 272"}
+  - {id: RG-06, name: "Wheel ROH Trak 2 16 x 7 ET 0 (4), 14.5 kg each (estimate)", kg: 58, growth: 0.2, cat: tare, tied: true, cog: [4247, 0, 382.5]}
+  - {id: RG-03, name: "Bosch TSC and wheel nuts", kg: 4.2, growth: 0.2, cat: tare, tied: true, box: [4228, -100, 552.5, 50, 200, 45]}
+  - {id: BD-10, name: "Mud flaps 610 x 455 behind the rear tyres, with hangers (2)", kg: 9.2, growth: 0.13, cat: tare, tied: true, cog: [5160, 0, 560], note: "Bottom edge at Z 300 or lower, Y +/-777.5"}
+  # ---------------- spare wheel on the front wall (one of the two spares, the other under the ute's tray)
+  - {id: SP-01, name: "Spare tyre LT265/75R16 123/120", kg: 22.6, growth: 0.0, cat: tare, box: [1488, -402.5, 922.5, 272, 805, 805]}
+  - {id: SP-02, name: "Spare wheel ROH Trak 2 16 x 7 ET 0", kg: 14.5, growth: 0.2, cat: tare, cog: [1624, 0, 1325]}
+  # ---------------- body shell (report 12 panels, fixed roof, no garage door or rear portal)
+  - {id: BD-01, name: "Floor 30 mm woven roving and H80, 8.92 kg/m2, crush tubes, vinyl", kg: 112.8, growth: 0.08, cat: tare, box: [1820, -1200, 895, 4420, 2400, 30]}
+  - {id: BD-02, name: "Fixed roof panel 40 mm GRP and XPS, 7.0 kg/m2, bonded to the walls", kg: 75.6, growth: 0.07, cat: tare, box: [1820, -1200, 2875, 4420, 2400, 40]}
+  - {id: BD-03K, name: "Side wall 35 mm GRP and XPS, 6.0 kg/m2, kerb side", kg: 46, growth: 0.08, cat: tare, box: [1820, -1200, 925, 4420, 35, 1950]}
+  - {id: BD-03R, name: "Side wall 35 mm GRP and XPS, 6.0 kg/m2, road side", kg: 46, growth: 0.08, cat: tare, box: [1820, 1165, 925, 4420, 35, 1950]}
+  - {id: BD-04F, name: "Front wall, 2.0 mm outer skin, 6.7 kg/m2", kg: 28.8, growth: 0.07, cat: tare, box: [1820, -1165, 925, 35, 2330, 1950]}
+  - {id: BD-04R, name: "Rear wall, full, 6.0 kg/m2, no portal", kg: 26.1, growth: 0.07, cat: tare, box: [6205, -1165, 925, 35, 2330, 1950]}
+  - {id: BD-07, name: "Entry door Aussie Traveller DC 1,623 x 622, kerb side, hinged on its front edge", kg: 25, growth: 0.2, cat: tare, box: [3770, -1200, 925, 622, 35, 1623]}
+  - {id: BD-08, name: "Floor and corner joiners, roof-to-wall joiner in place of the pop-top ring, adhesive, mount bolts", kg: 68.5, growth: 0.2, cat: tare, cog: [4030, 0, 1998]}
+  - {id: BD-09, name: "Five S4 windows, bathroom vent, Carafan CP700, kitchen opening frame, cassette door, locker hatch", kg: 51.2, growth: 0.17, cat: tare, cog: [4030, 0, 2095]}
+  - {id: BD-11, name: "Wiring, plumbing, lighting and hardware", kg: 60, growth: 0.2, cat: tare, cog: [4030, 0, 1325]}
+  - {id: BD-13, name: "Awning Fiamma F45s 450 with brackets, kerb side", kg: 31.5, growth: 0.01, cat: tare, box: [1915, -1300, 2715, 4230, 100, 120]}
+  # ---------------- roof
+  - {id: RF-01, name: "Four Sunman eArc 430 W panels bonded to the roof, 2 x 2 array", kg: 29.2, growth: 0.0, cat: tare, box: [1976, -1084, 2915, 4108, 2168, 2]}
+  - {id: RF-02, name: "Panel adhesive and cable", kg: 2, growth: 0.2, cat: tare, cog: [4030, 0, 2916]}
+  # ---------------- under the floor (tanks, water, guards and diesel tank are tied to the axle group)
+  - {id: UF-01F, name: "Front water tank, welded HDPE, about 220 L net", kg: 19.3, growth: 0.07, cat: tare, tied: true, box: [3388, -487.5, 597.5, 830, 975, 287.5]}
+  - {id: UF-01R, name: "Rear water tank, welded HDPE, about 200 L net", kg: 18.3, growth: 0.07, cat: tare, tied: true, box: [4288, -487.5, 597.5, 760, 975, 287.5]}
+  - {id: UF-02F, name: "Water, front tank, 52 % of the load", kg: 208.8, growth: 0.0, cat: water, tied: true, cog: [3803, 0, 741], note: "At 400 L. Scale with the case's litres"}
+  - {id: UF-02R, name: "Water, rear tank, 48 % of the load", kg: 191.2, growth: 0.0, cat: water, tied: true, cog: [4668, 0, 741]}
+  - {id: UF-03, name: "Tank guards", kg: 20, growth: 0.2, cat: tare, tied: true, box: [3378, -537.5, 591.5, 1680, 1075, 6]}
+  - {id: UF-04, name: "Battery box, sealed 2 mm aluminium, vented to the road side", kg: 12, growth: 0.2, cat: tare, box: [5505, -400, 635, 600, 800, 250]}
+  - {id: UF-05A, name: "Victron Lithium NG 25.6 V 200 Ah", kg: 37, growth: 0.0, cat: tare, cog: [5688, 0, 716]}
+  - {id: UF-05B, name: "Victron Lithium NG 25.6 V 200 Ah", kg: 37, growth: 0.0, cat: tare, cog: [5923, 0, 716]}
+  - {id: UF-06, name: "Heater fuel tank 15 L HDPE, line and filter", kg: 2.3, growth: 0.2, cat: tare, tied: true, box: [2828, -200, 785, 440, 400, 100]}
+  - {id: UF-07, name: "Diesel for the heater, 15 L", kg: 12.6, growth: 0.0, cat: fuel, tied: true, cog: [3048, 0, 835]}
+  # ---------------- bed, under-bed contents and the generator locker (bed zone X 1,855 to 3,505)
+  - {id: LB-01, name: "Queen mattress 1,530 x 2,030 x 150, across the trailer", kg: 19, growth: 0.2, cat: tare, box: [1915, -1165, 1525, 1530, 2030, 150]}
+  - {id: LB-02, name: "Froli Star Mobil base", kg: 7.3, growth: 0.07, cat: tare, box: [1915, -1165, 1482, 1530, 2030, 43]}
+  - {id: LB-03, name: "Bed deck, 20 mm aluminium honeycomb", kg: 11.3, growth: 0.07, cat: tare, box: [1855, -1165, 1462, 1650, 2030, 20]}
+  - {id: LB-04, name: "Bed base: honeycomb dividers, lift-up stays, drawer front", kg: 20, growth: 0.2, cat: tare, box: [1855, -1165, 925, 1650, 2030, 537]}
+  - {id: LA-08a, name: "Bedside column above the deck, shelves and pull-out hanging rail", kg: 15, growth: 0.2, cat: tare, box: [1855, 865, 1462, 1650, 300, 1413]}
+  - {id: LA-07, name: "Kitchen slide-out (sleeve, drawer, bench, trays, lock), under the bed", kg: 34.6, growth: 0.2, cat: tare, box: [1970, -1165, 975, 1500, 600, 450]}
+  - {id: LA-07A, name: "Induction hob Dometic CVI1525", kg: 7, growth: 0.0, cat: tare, cog: [2270, -865, 1395]}
+  - {id: LA-07B, name: "Sink Dometic CVS1350G", kg: 2.5, growth: 0.0, cat: tare, cog: [2970, -865, 1345]}
+  - {id: LA-07C, name: "Slides Accuride 9301", kg: 6, growth: 0.2, cat: tare, cog: [2620, -865, 1015]}
+  - {id: LA-07D, name: "Kitchen mixer tap", kg: 0.8, growth: 0.2, cat: tare, cog: [2970, -715, 1445]}
+  - {id: LA-10, name: "Air-conditioner Truma Saphir Comfort RC under the bed, ducted", kg: 25, growth: 0.01, cat: tare, box: [1915, -500, 925, 400, 630, 300]}
+  - {id: GL-01, name: "Generator and fuel locker, sealed from the living area, low vent, road-side hatch", kg: 7.1, growth: 0.2, cat: tare, box: [2455, 765, 925, 900, 400, 520]}
+  - {id: GS-01, name: "Honda EU22i generator", kg: 21.1, growth: 0.0, cat: tare, box: [2505, 805, 945, 520, 320, 460]}
+  - {id: GS-04, name: "Petrol and diesel in jerry cans", kg: 17, growth: 0.2, cat: fuel, box: [3045, 785, 945, 300, 360, 450]}
+  # ---------------- living zone X 3,505 to 5,205 and rear zone X 5,205 to 6,205
+  - {id: LA-09, name: "Desk 1,100 x 550, road side", kg: 12, growth: 0.2, cat: tare, box: [3505, 615, 1645, 1100, 550, 30]}
+  - {id: LA-11, name: "Cabinetry, two seats at the desk, freezer bench, trims (allowance)", kg: 70, growth: 0.2, cat: tare, cog: [4055, 640, 1375]}
+  - {id: LA-05, name: "Fridge Dometic NRX 130C", kg: 29, growth: 0.03, cat: tare, box: [4415, -1165, 925, 600, 600, 1400]}
+  - {id: LA-06, name: "Freezer Dometic CFX3 55IM, turned along the wall, under a lift-up bench", kg: 21.8, growth: 0.0, cat: tare, box: [5015, -1165, 925, 800, 550, 850]}
+  - {id: LA-08c, name: "Cupboard over the fridge and the freezer bench", kg: 8, growth: 0.2, cat: tare, box: [4415, -1165, 2325, 1400, 550, 550]}
+  - {id: LA-12, name: "Fire extinguisher 1A:20B:(E) and fire blanket inside the door", kg: 4.8, growth: 0.1, cat: tare, cog: [4395, -1100, 1825]}
+  - {id: LA-02, name: "Washer Camec 3.5 kg top loader, lid opens to about Z 2,115", kg: 16, growth: 0.0, cat: tare, box: [4605, 695, 925, 600, 470, 850]}
+  - {id: LA-03, name: "Diesel heater and hot water Truma Combi D 6, ducts and flue", kg: 19.4, growth: 0.02, cat: tare, box: [4755, 170, 925, 450, 525, 300]}
+  - {id: RG-04, name: "XT Air supply on the heater", kg: 10, growth: 0.2, cat: tare, box: [4780, 282, 1275, 400, 300, 300]}
+  - {id: RG-05, name: "Spare airbag and fittings", kg: 3, growth: 0.2, cat: tare, box: [4780, 282, 1575, 400, 300, 150]}
+  - {id: LA-04, name: "Victron 24 V board on the bathroom's front wall, above the washer lid", kg: 45.6, growth: 0.04, cat: tare, box: [5045, 250, 2125, 160, 800, 700]}
+  - {id: LA-01, name: "Wet bathroom 1 x 1 m, walls, door on the kerb-side face, pan, basin", kg: 39.9, growth: 0.2, cat: tare, box: [5205, 165, 925, 1000, 1000, 1950]}
+  - {id: LA-01A, name: "Thetford C223-CS cassette toilet", kg: 7.2, growth: 0.0, cat: tare, cog: [5905, 915, 1195]}
+  - {id: LA-01B, name: "DauerShower 2.0", kg: 10, growth: 0.0, cat: tare, cog: [5505, 1015, 1135]}
+  - {id: LA-08b, name: "Tall cupboard, kerb rear corner", kg: 12, growth: 0.2, cat: tare, box: [5815, -1165, 925, 390, 600, 1950]}
+  # ---------------- payload (load-case lines)
+  - {id: PL-01, name: "Food and drink, in the fridge and the freezer", kg: 50, growth: 0.2, cat: gear, cog: [5115, -865, 1625]}
+  - {id: PL-02, name: "Clothes, bedding and personal gear, in the column and the bed drawers", kg: 60, growth: 0.2, cat: gear, cog: [2680, 733, 1675]}
+  - {id: PL-03, name: "Other gear under the bed", kg: 40, growth: 0.2, cat: gear, cog: [2905, 100, 1175]}
+
+openings:     # cut-outs in the walls, no mass of their own (report 12 rules: 300 mm of wall between openings, 150 mm to a corner)
+  - {id: OP-01, name: "Kitchen slide-out opening, kerb", box: [1970, -1200, 975, 1500, 35, 450]}
+  - {id: OP-02, name: "Entry door, kerb", box: [3770, -1200, 925, 622, 35, 1623]}
+  - {id: OP-03, name: "Window S4 500 x 450 over the bed, kerb, the second way out", box: [2355, -1200, 1725, 500, 35, 450]}
+  - {id: OP-04, name: "Window S4 500 x 450 over the freezer bench, kerb", box: [5155, -1200, 1825, 500, 35, 450]}
+  - {id: OP-05, name: "Window S4 900 x 500 over the desk, road", box: [3605, 1165, 1825, 900, 35, 500]}
+  - {id: OP-06, name: "Window S4 800 x 400 in the front wall over the bed head", box: [1820, -400, 1775, 35, 800, 400]}
+  - {id: OP-07, name: "Window S4 600 x 450 in the rear wall at the end of the aisle", box: [6205, -500, 1925, 35, 600, 450]}
+  - {id: OP-08, name: "Generator locker hatch 800 x 450, road", box: [2500, 1165, 945, 800, 35, 450]}
+  - {id: OP-09, name: "Toilet cassette service door 450 x 290, road", box: [5630, 1165, 1075, 450, 35, 290]}
+  - {id: OP-10, name: "Bathroom vent, road, high", box: [5300, 1165, 2475, 200, 35, 200]}
+  - {id: OP-11, name: "Carafan CP700 intake, front wall, high, beside the spare", box: [1820, 450, 2300, 35, 200, 200]}
+
+keep_clear:   # floor space no solid item may enter (FIT-01)
+  - {id: LK-1, name: "Entry door landing", box: [3770, -1165, 925, 622, 600, 1950]}
+  - {id: LK-2, name: "Seat space at the desk", box: [3505, 115, 925, 1100, 500, 1950]}
+  - {id: LK-3, name: "Bathroom door landing", box: [5455, -435, 925, 600, 600, 1950]}
+  - {id: LK-4, name: "Aisle from the door to the bathroom and the rear window, at least 730 mm wide", box: [3505, -435, 925, 2700, 550, 1950]}
+
+checks_expected:   # what the repo's checks should show for this layout (report 18 sections 3 and 4)
+  MAS-01: "3,022 kg with growth against the 3,100 kg plate"
+  MAS-02: "1.2 x 2,776 = 3,331 kg against the 4,050 kg GTM (at the plate: 3,456 kg)"
+  MAS-03: "246 kg with growth against 250 kg"
+  MAS-04: "7.5 % at least"
+  MAS-06: "864 kg per tyre at the plate against 1,550 kg"
+  DIM-02: "front load space 2,427 against a rear overhang of 1,993 mm"
+  DIM-03: "coupling 420 to 460 mm"
+  FIT-05: "54 mm from the tyre's inner wall to the rail"
+  JK-01: "525 mm at the spare wheel against the bike box's 963 mm sweep"
+
+removed_from_the_trailer: [ASM-GB garage and bed module, BD-05 garage door, rear portal, BD-06, BD-12 pop-top lift, G-01 to G-14 garage kit, B-01 to B-05 bed stack, P-01 and P-02 partition A, A-01 ladder, A-02 safety net, BL-01 ballast, PL-04 panniers, the car's water tank, garage vents, Heki roof hatches]

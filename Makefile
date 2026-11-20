@@ -7,7 +7,8 @@
 IMAGE   ?= camper-trailer:0.1
 PORT    ?= 8791
 UIDGID  := $(shell id -u):$(shell id -g)
-GIT_REV := $(shell git rev-parse --short HEAD 2>/dev/null || echo uncommitted)
+# the data stamp on every output: the commit, with -dirty when tracked files differ from it
+GIT_REV := $(shell git rev-parse --short HEAD 2>/dev/null || echo uncommitted)$(shell test -z "$$(git status --porcelain --untracked-files=no 2>/dev/null)" || echo -dirty)
 DOCKER  := docker run --rm --user $(UIDGID) -e HOME=/work/.home -e ASTRO_TELEMETRY_DISABLED=1 -e npm_config_cache=/work/.home/.npm -e GIT_REV=$(GIT_REV) -e SITE_URL -e SITE_BASE -v $(CURDIR):/work -w /work $(IMAGE)
 T       := timeout
 

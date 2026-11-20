@@ -443,7 +443,7 @@ def check_row(c, res: dict) -> dict:
         r = max(res["inserts"], key=lambda r: r["util"])
         return dict(limit="<= half the rated load", measured=round(r["n"] / 1000, 2), unit="kN", margin=round(1 - r["util"], 3),
                     ok=r["util"] <= 1.0, governing=r["what"],
-                    detail="; ".join(f"{i['what']}: {i['n'] / 1000:.2f} kN against {i['rated_n'] / 2000:.2f} kN ({i['case']})" for i in res["inserts"]))
+                    detail=". ".join(f"{i['what']}: {i['n'] / 1000:.2f} kN against {i['rated_n'] / 2000:.2f} kN ({i['case']})" for i in res["inserts"]))
     if c.type == "body_roof":
         r = res["roof"]
         return dict(limit="<= 1.00 utilisation", measured=round(r["util"], 3), unit="", margin=round(1 - r["util"], 3), ok=r["util"] <= 1.0,
@@ -454,16 +454,16 @@ def check_row(c, res: dict) -> dict:
     if c.type == "body_twist":
         t = res["twist"]
         o, cl = t["open"], t["closed"]
-        return dict(limit="reported", measured=round(o["share"] * 100, 1), unit="%", margin=None, ok=True,
+        return dict(limit="reported", measured=round(cl["share"] * 100, 1), unit="%", margin=None, ok=True,
                     governing=t["case"],
-                    detail=(f"LC5a {t['torque_knm']:.1f} kNm, {t['case']}. Bare chassis {t['bare_deg']:.3f} degree. Roof joint neglected: "
-                            f"the body takes {100 * o['share']:.0f} % in the twist zone, chassis {o['chassis_deg']:.3f} degree. Roof bonded "
-                            f"(the design): {100 * cl['share']:.0f} %, chassis {cl['chassis_deg']:.3f} degree"))
+                    detail=(f"LC5a {t['torque_knm']:.1f} kNm, {t['case']}. Bare chassis {t['bare_deg']:.3f} degree. Roof bonded "
+                            f"(the design): the body takes {100 * cl['share']:.0f} %, chassis {cl['chassis_deg']:.3f} degree. Lower bound, "
+                            f"roof joint neglected: {100 * o['share']:.0f} %, chassis {o['chassis_deg']:.3f} degree"))
     if c.type == "body_joint":
         r = max(res["joints"], key=lambda r: r["util"])
         return dict(limit="<= 1.00 utilisation", measured=round(r["util"], 3), unit="", margin=round(1 - r["util"], 3),
                     ok=r["util"] <= 1.0, governing=r["what"],
-                    detail="; ".join(f"{j['what']} {j['value']:.2f} {j['unit']} against {j['limit']:.2f}" for j in res["joints"]))
+                    detail=". ".join(f"{j['what']} {j['value']:.2f} {j['unit']} against {j['limit']:.2f}" for j in res["joints"]))
     if c.type == "body_end_wall":
         e = res["end_wall"]
         return dict(limit="<= 1.00 utilisation", measured=round(e["util"], 3), unit="", margin=round(1 - e["util"], 3), ok=e["util"] <= 1.0,
@@ -485,7 +485,7 @@ def check_row(c, res: dict) -> dict:
     if c.type == "body_openings":
         o = res["openings_check"]
         return dict(limit=">= 300 mm between, 150 mm to an edge", measured=round(o["margin_mm"], 0), unit="mm", margin=round(o["margin_mm"], 0),
-                    ok=o["ok"], governing="; ".join(o["problems"][:2]) or "every rule met",
-                    detail=(f"{o['count']} openings. " + ("; ".join(o["problems"]) if o["problems"] else
+                    ok=o["ok"], governing=". ".join(o["problems"][:2]) or "every rule met",
+                    detail=(f"{o['count']} openings. " + (". ".join(o["problems"]) if o["problems"] else
                             f"Every opening keeps the spacing rules, the tightest by {o['margin_mm']:.0f} mm")))
     raise ValueError(f"unknown body check type {c.type}")

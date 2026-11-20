@@ -15,7 +15,8 @@ The design documents:
 - `BODY.md`: the body and its fixed roof.
 - `UTE-GARAGE.md`: the LandCruiser 79 and its bike box.
 - `VEHICLE.md`: the vehicle plan (engine, driveline, GVM kit, brakes, wheels, towing, legal path, budget and order of work), with its parts list in `data/vehicle/vehicle-parts.yaml`.
-- `research/`: the research reports behind them.
+- `docs/decisions.md`: the decision record the documents cite as the decision log, by time.
+- `research/`: the research reports behind them. Report 18 is the trailer's layout study for the 79.
 - `DESIGN.md` and `garage-bed/BOM.md` are the retired garage and bed module, kept for the record.
 
 The build reads those files and never edits them.
@@ -27,9 +28,9 @@ data/                   the single source of truth
   assemblies/           trailer.yaml: the whole trailer in the project datum (TRAILER.md)
                         ute-garage.yaml: the bike box on the ute (UTE-GARAGE.md)
   parts/bikes.yaml      the two bikes, for the ute's bike box
-  chassis/              chassis.yaml: members, fittings, load cases and fatigue details (CHASSIS.md); sections.yaml
+  chassis/              chassis.yaml: members, fittings, load cases and fatigue details (CHASSIS.md), and sections.yaml
   body/body.yaml        panels, loads, joints, mounts and openings (BODY.md)
-  ute/                  ute.yaml: the LandCruiser 79, its limits and checks; garage-checks.yaml; parts/*.yaml for the box
+  ute/                  ute.yaml: the LandCruiser 79, its limits and checks, garage-checks.yaml, and parts/*.yaml for the box
   vehicle/              vehicle-parts.yaml: every part and job in VEHICLE.md, with the totals
   checks.yaml           the whole-trailer checks
   load_cases.yaml       the six trailer load cases, the towball target and the registration ratings

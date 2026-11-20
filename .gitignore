@@ -8,6 +8,7 @@ site/public/drawings/
 site/src/data/generated/
 site/src/content/docs/research/
 site/src/content/docs/tow-vehicle.md
+site/src/content/docs/decisions.md
 
 # Dependencies and caches
 node_modules/

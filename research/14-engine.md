@@ -10,7 +10,7 @@ Research report 14, 20 Nov 2026. It covers the engine side of the VDJ79 single c
 
 Why this level:
 
-- It is the most power NSW allows without a certificate. Transport for NSW (TfNSW) requires certification when power rises more than 20 % or when emissions rise ([TfNSW VSI 06](https://www.rms.nsw.gov.au/documents/roads/safety-rules/standards/vsi-06-light-vehicle-modifications.pdf), items 2 and 5).
+- It is the most power NSW allows without a certificate. *Superseded 20 Nov 2026: VSI 06 Rev 4 item 6 needs a VSCCS certificate for this tune, the LA4 certificate at about AUD 2,000 (estimate). See the note above.* Transport for NSW (TfNSW) requires certification when power rises more than 20 % or when emissions rise ([TfNSW VSI 06](https://www.rms.nsw.gov.au/documents/roads/safety-rules/standards/vsi-06-light-vehicle-modifications.pdf), items 2 and 5).
 - It holds about 88 km/h on a 6 % grade at 6.6 t, against about 76 km/h stock (estimate, section 3.8). Level B would hold about 105 km/h, but needs an LA4 certificate (the national code's approval for a modified engine, section 4.1) and a driveline built for about 850 Nm.
 - A bigger turbo and a front-mount intercooler lower exhaust and intake temperatures at the same power ([GTurbo booklet](https://cdn.shopify.com/s/files/1/0823/4241/2531/files/1VD-FTV-VDJ70-Booklet-v1_4c.pdf), pages 18 and 28). That margin matters more than peak power for hours of towing in heat.
 - The factory clutch slips above about 500 Nm ([GTurbo booklet](https://cdn.shopify.com/s/files/1/0823/4241/2531/files/1VD-FTV-VDJ70-Booklet-v1_4c.pdf), page 23), so even level A needs the clutch from report 15.
@@ -26,9 +26,11 @@ The build (full list in section 5):
 
 **Legal path: no VSCCS certificate** (the NSW modification certificate, section 4.3). Keep the catalytic converters or DPF, the EGR and a quiet muffler. Keep before-and-after dyno sheets from the same dyno. Book the free TfNSW emissions test that VSI 06 names, and tell the insurer about every change. Cost about AUD 0 (estimate).
 
+*Superseded 20 Nov 2026: VSI 06 Rev 4 item 6 needs a VSCCS certificate for this tune, the LA4 certificate at about AUD 2,000 (estimate). See the note above.*
+
 **Total: about AUD 32,200** for parts, machining and tune, with estimates included. That is about twice the AUD 15,000 share of the budget. The cheapest reliable version (rebuilt standard turbo, no front mount, aluminised exhaust) is about AUD 27,000. Reusing the injectors, supply pump, radiator and oil pump after they pass tests saves up to about AUD 6,600 more, at some risk. So the AUD 30,000 total budget needs to rise, by at least the AUD 12,000 to 17,000 that the engine side runs over its share.
 
-**Model years.** For the engine alone, prefer a pre-DPF truck built from 2010 to October 2016. Its injectors cost about half as much as the later piezo injectors, and its exhaust has no DPF to keep. A DPF truck (October 2016 to 2024) costs about AUD 3,600 more at this level. Its single cab has a stronger chassis and stability control, so reports 15 and 16 may favour it anyway.
+**Model years.** For the engine alone, prefer a pre-DPF truck built from 2010 to October 2016. Its injectors cost about half as much as the later piezo injectors, and its exhaust has no DPF to keep. A DPF truck (October 2016 to 2024) costs about AUD 3,600 more at this level. Its single cab has a stronger chassis and stability control, so reports 15 and 16 may favour it anyway. *Superseded 20 Nov 2026: the GVM kit needs a truck built from 01/2017, so the plan buys a DPF truck and takes this report's DPF variant (decision log 11:25).*
 
 **Levels B and C.** Level B (220 to 250 kW, about 850 Nm) needs an LA4 certificate (about AUD 2,000, estimate), emissions evidence and a driveline the certifier accepts for the torque. Its engine side costs about AUD 34,700. Level C (about 300 kW, about 1,050 Nm) costs about AUD 38,700 before certification and is not realistic to certify for this use (section 4.5).
 
@@ -320,11 +322,13 @@ Crank figures are estimates converted from wheel figures at 74 % (section 3.1). 
 | Driveline the engine demands (report 15) | Clutch for about 650 Nm. The factory clutch slips beyond about 500 Nm | Clutch and gearbox for about 850 Nm | Clutch for over 1,000 Nm (for example the 1,600 Nm [NPC kit](https://gturbo.com.au/products/vdj79-extra-heavy-duty-clutch-kit-billet-flywheel-1300nm), AUD 2,178) and a gearbox well beyond factory torque |
 | Injectors | Factory type, new | Factory type, new, near their limit | High-flow |
 | Sustained towing | Good margin. Holds about 88 km/h on 6 % at 6.6 t | Acceptable with the EGT limit and new radiator | Low margin for hours at full load |
-| Legal path in NSW | No certificate | LA4 certificate | LA4 certificate, not realistic for this use |
+| Legal path in NSW | No certificate. Superseded: LA4 certificate under VSI 06 Rev 4 item 6, about AUD 2,000 | LA4 certificate | LA4 certificate, not realistic for this use |
 
 The level A hardware is the level B hardware. Moving from A to B later costs a retune and the certificate, plus the driveline work. That is why level A uses the VD-G333 and the front mount rather than the cheapest parts.
 
 ## 4. Legality in NSW
+
+*Superseded in part, 20 Nov 2026: this section reads the 2013 revision of VSI 06. Rev 4, in force since 1 July 2026, adds item 6, so every tune that alters emissions output needs a VSCCS certificate, level A included. Each passage below that says level A needs none is marked. VEHICLE.md's legal section is current.*
 
 ### 4.1 Which rules apply
 
@@ -342,7 +346,7 @@ The national code, VSB 14 Section LA, sets how a certifier assesses the work ([V
 
 So a VDJ79 with a bigger turbo and a tune over 20 % is an **LA4** job, not LA2 or LA3. The VDJ79 came with a turbo, so LA3 does not apply.
 
-VSB 14 is stricter in wording than VSI 06. It says that if an engine is modified it must be certified under an LA code. Assumption: NSW registration follows its own Order (VSI 06), so a level A build that stays under 20 % and does not raise emissions needs no certificate.
+VSB 14 is stricter in wording than VSI 06. It says that if an engine is modified it must be certified under an LA code. Assumption: NSW registration follows its own Order (VSI 06), so a level A build that stays under 20 % and does not raise emissions needs no certificate. *Superseded 20 Nov 2026: VSI 06 Rev 4 item 6 needs a VSCCS certificate for this tune, the LA4 certificate at about AUD 2,000 (estimate). See the note above.*
 
 ### 4.2 What LA4 certification involves for a modified diesel
 
@@ -381,7 +385,7 @@ No public record was found of a NSW LA4 certificate for a tuned VDJ79 at any pow
 
 | Level | Certificate | Evidence to hold | Cost |
 |---|---|---|---|
-| A, up to 181 kW | None (VSI 06 items 2 and 5) | Same-dyno stock and tuned sheets showing at most 1.20 times stock power. TfNSW emissions test result. Catalysts or DPF, EGR and crankcase ventilation all working. Quiet exhaust. Insurer told | AUD 0 (estimate) |
+| A, up to 181 kW | VSCCS LA4 from an LC4 certifier (VSI 06 Rev 4 item 6, superseding this report's "none" under items 2 and 5) | Same-dyno stock and tuned sheets showing at most 1.20 times stock power. TfNSW emissions test or the Interim NSW procedure result. Catalysts or DPF, EGR and crankcase ventilation all working. Quiet exhaust. Insurer told | About AUD 2,000 (estimate) |
 | B, 220 to 250 kW | VSCCS LA4 from an LC4 certifier | As A, plus LT4 noise test, brake and driveline evidence, and the emissions evidence the certifier asks for | About AUD 2,000. About AUD 12,000 or more if a laboratory test is needed (estimates) |
 | C, about 300 kW | VSCCS LA4, unlikely to be granted | As B, with laboratory emissions evidence expected | About AUD 12,000 or more, before any brake or driveline changes the certifier asks for (estimate) |
 
@@ -405,6 +409,8 @@ Level A, pre-DPF truck. Every line is in `14-engine-parts.yaml` with its link.
 | Gauges | Autometer boost, EGT and water combo, plus oil temperature (estimate) | 1,210 |
 | Legal | TfNSW emissions test | 0 |
 | **Total** | | **32,208** |
+
+*Superseded 20 Nov 2026: the LA4 certificate for the reflash adds about AUD 2,000 (estimate) under VSI 06 Rev 4 item 6, so this total becomes about AUD 34,208. VEHICLE.md carries it as line TL05.*
 
 About a third of the total (about AUD 11,000) is estimates: the machine shop, the Toyota dealer parts without a published price, the pre-filter, the intake pipe, the tune and one gauge.
 
@@ -433,8 +439,8 @@ Upgrade path to level B: the same parts, a retune to 220 to 250 kW, the LA4 cert
 
 Each ends with the assumption this report uses.
 
-1. Pre-DPF or DPF truck? Reports 15 and 16 may favour the 2016 single cab chassis and stability control. Assumption: pre-DPF, built 2010 to October 2016. A DPF truck adds about AUD 3,600 to the engine side.
-2. Does NSW need a certificate for a different turbo on an engine that came turbocharged, when power stays within 20 % and emissions do not rise? Assumption: no, because VSI 06 items 2 and 5 are the only engine triggers.
+1. Pre-DPF or DPF truck? Reports 15 and 16 may favour the 2016 single cab chassis and stability control. Assumption: pre-DPF, built 2010 to October 2016. A DPF truck adds about AUD 3,600 to the engine side. *Superseded 20 Nov 2026: a DPF truck built from 01/2017 (decision log 11:25).*
+2. Does NSW need a certificate for a different turbo on an engine that came turbocharged, when power stays within 20 % and emissions do not rise? Assumption: no, because VSI 06 items 2 and 5 are the only engine triggers. *Superseded 20 Nov 2026: Rev 4 item 6 adds the reflash as a trigger, so the tune needs a certificate whatever the turbo. A turbo, intercooler or exhaust that keeps the emission controls still needs none of its own (item 5).*
 3. Will an LC4 certifier accept the free TfNSW emissions test for an LA4 certificate at level B? Assumption: unknown until asked with the built truck. Plan for level A, and treat level B as a later option.
 4. Is the free TfNSW emissions test at Botany and Penrith still offered? Assumption: yes, as VSI 06 states. If not, a 4 or 5 gas analyser test at a repairer, about AUD 200 (estimate).
 5. What is the VDJ79's ADR 83/00 stationary noise signature level? Assumption: the Manta "quiet" system stays within signature plus 5 dB(A). Test it before the first registration inspection.

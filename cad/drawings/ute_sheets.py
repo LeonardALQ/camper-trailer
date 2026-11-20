@@ -86,7 +86,7 @@ def _title(sh, dwg, reg, mass_note, scale, c, weld_note=None):
 
 
 def _stamp(sh, x, y):
-    sh.text(x, y, "DRAFT - NOT FOR CONSTRUCTION UNTIL THE ENGINEER REVIEWS UTE-GARAGE.md", 2.4, bold=True, color="#b00")
+    sh.text(x, y, "DRAFT, NOT FOR CONSTRUCTION UNTIL THE ENGINEER REVIEWS UTE-GARAGE.md", 2.4, bold=True, color="#b00")
 
 
 def _mass_note(c):

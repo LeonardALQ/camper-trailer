@@ -1,7 +1,7 @@
 # Body design data (BODY.md), from research report 12 (research/12-body-design.md) and the panel and product tables
 # beside it (research/12-body-panels.yaml, research/12-body-products.yaml). Units: mm, MPa, N, kg.
 # cad/body.py reads this file for the planning-level panel, insert, joint, mount, end wall and twist checks.
-# Revision B, 20 Nov 2026: the body for the LandCruiser 79 (layout-79, layout 1). 4,420 mm long with a fixed roof 1,950 mm
+# Revision B, 20 Nov 2026: the body for the LandCruiser 79 (report 18, layout 1). 4,420 mm long with a fixed roof 1,950 mm
 # inside, a full rear wall and no garage, so the raising roof, the rear portal and the L-track hardpoints are gone.
 
 # ---------------------------------------------------------------- panels (report 12 section 2)
@@ -59,7 +59,7 @@ criteria:
 
 # ---------------------------------------------------------------- point and patch loads (report 12 section 3)
 # The bike wheels, the chock bases, the L-track anchors and the generator left the body with the garage (UTE-GARAGE.md
-# and the drawbar box), so a person's foot governs the floor now (layout-79 open question 13).
+# and the drawbar box), so a person's foot governs the floor now (report 18 open question 13).
 loads:
   foot: {kg: 100, patch: [100, 150], note: "A person on one foot in the living area"}
   floor_edge_kg_m2: 160        # floor and its contents beside the raisers, between outriggers
@@ -70,7 +70,7 @@ loads:
   uplift_40ms_n: 5060          # report 12's 6,300 N on 13.2 m2 at 110 km/h into a 36 km/h headwind, scaled to the 10.6 m2 roof
 
 # ---------------------------------------------------------------- the body box for the twist (report 12 section 4)
-# The fixed roof is bonded into a roof-to-wall joiner, so the body is one closed cell (layout-79 section 2). The lower
+# The fixed roof is bonded into a roof-to-wall joiner, so the body is one closed cell (report 18 section 2). The lower
 # bound neglects the roof joint, as report 12 did for the latched lid.
 twist:
   roof_joint_factor: 1.0       # the bonded roof acts with the walls (upper bound)
@@ -110,7 +110,7 @@ mounts:
 end_wall:
   window_w: 600
 
-# ---------------------------------------------------------------- openings (report 12 sections 5 and 7, layout-79 section 4.1)
+# ---------------------------------------------------------------- openings (report 12 sections 5 and 7, report 18 section 4.1)
 # Side walls: x is measured along the trailer from the body front (X = body_x0 + x), z from the floor surface. The front
 # and rear walls: y across from the centreline (positive to the road side). Sizes are the cut-outs. The kitchen and the
 # entry door follow the layout's blocks (LA-07, BD-07); the build checks they match.
@@ -122,7 +122,7 @@ openings:
   - {id: OP-05, wall: road, name: "Window, Dometic S4 900 x 500, over the desk", x: 1785, z: 900, w: 900, h: 500}
   - {id: OP-06, wall: road, name: "Thetford cassette service door, 450 x 290", x: 3670, z: 150, w: 450, h: 290}
   - {id: OP-07, wall: road, name: "Bathroom vent", x: 3480, z: 1550, w: 200, h: 200}
-  - {id: OP-08, wall: front, name: "Window, Dometic S4 800 x 400, over the bed head, above the spare wheel", y: 0, z: 850, w: 800, h: 400}
+  - {id: OP-08, wall: front, name: "Window, Dometic S4 800 x 400, over the bed, above the spare wheel", y: 0, z: 850, w: 800, h: 400}
   - {id: OP-09, wall: front, name: "Carafan Sahara CP700 intake, high beside the spare wheel", y: 850, z: 1375, w: 200, h: 200}
   - {id: OP-10, wall: rear, name: "Window, Dometic S4 600 x 450, at the end of the aisle", y: -200, z: 1000, w: 600, h: 450}
 rules:

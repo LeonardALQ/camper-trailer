@@ -27,7 +27,7 @@ Positions are in the project datum DIM-01: X rearward from the ball centre, Y po
 | Front wall, 35 mm | 2.0 mm outer and 1.5 mm inner Polydet skins on 31.5 mm XPS, against stones | 6.7 kg/m² (calculated) | 5.7 kNm²/m | 49 MPa |
 | Fixed roof, 40 mm | 2.0 mm top and 1.5 mm bottom Polydet skins on 36.5 mm XPS of about 36 kg/m³, bonded to the walls | 7.0 kg/m² (calculated) | 7.5 kNm²/m | 49 MPa |
 
-The floor, both side walls and the roof are one piece each. Report 12 section 2 has the sheet sizes and the makers. The skins and cores use report 12's data, with the woven roving at 14 GPa and 200 MPa, below the published figures (assumption). The wrinkling stresses take the core's compressive modulus as 2.5 times its shear modulus (assumption). Report 12 sized the floor for the bike wheels. A person's foot now governs it, and the panel is kept (layout-79 open question 13).
+The floor, both side walls and the roof are one piece each. Report 12 section 2 has the sheet sizes and the makers. The skins and cores use report 12's data, with the woven roving at 14 GPa and 200 MPa, below the published figures (assumption). The wrinkling stresses take the core's compressive modulus as 2.5 times its shear modulus (assumption). Report 12 sized the floor for the bike wheels. A person's foot now governs it, and the panel is kept (report 18 open question 13).
 
 ## Load cases and criteria
 
@@ -63,7 +63,7 @@ Under the body's share of LC5a the shear flow round the box is about 1.0 N/mm in
 The body bolts to the chassis through the EPDM-faced HDPE bearer strip at every station: one bolt into each raiser at Y ±562.5 and one into each outrigger tip at Y ±1,140, 32 mounts at the 8 stations. The body is not bonded to the steel (report 12 option B).
 
 - An M12 8.8 hot-dip galvanised bolt into a 10 mm nut plate, 80 x 44 mm, welded inside the raiser or the outrigger tip before galvanising (CH-P14 in the chassis, 32 plates, 8.8 kg).
-- The worst bolt carries 7.38 kN of tension under LC5a, at the plate with TC2's 1,344 kg of body and contents scaled by 1.117. The bolt works at 0.32 of a third of its ultimate tension. The plate spans between the RHS webs at 0.17 in bending, its two 4 mm fillets 80 mm long at 0.10, and the floor's pull-through under the spreader at 0.13 (BDY-16).
+- The worst bolt carries 7.37 kN of tension under LC5a, at the plate with TC2's 1,344 kg of body and contents scaled by 1.117. The bolt works at 0.32 of a third of its ultimate tension. The plate spans between the RHS webs at 0.17 in bending, its two 4 mm fillets 80 mm long at 0.10, and the floor's pull-through under the spreader at 0.13 (BDY-16).
 - On the floor, a bonded 100 x 100 x 3 mm aluminium spreader over a high-density PVC insert and a GRP crush tube.
 - Shear is small: 0.33 kN per bolt in LC3 braking.
 
@@ -81,7 +81,7 @@ The frame model takes the body as a torsion box: a chain of elements on the cent
 |---|---|---|---|---|---|
 | Bare chassis (the chassis checks) | 0.439 degree | 0 | | | 78 MPa |
 | Body, roof joint neglected | 0.419 degree | 5 % | 0.1 kNm | 2.5 kN | 81 MPa |
-| Body, bonded roof (the design) | 0.009 degree | 98 % | 9.5 kNm | 7.8 kN | 52 MPa |
+| Body, bonded roof (the design) | 0.009 degree | 98 % | 9.5 kNm | 7.8 kN (7.37 kN after its 1 g share of weight, the BDY-16 figure) | 52 MPa |
 
 So report 12's claim holds for the fixed roof: the bonded body takes almost all the twist, and the chassis twists less than 0.01 degree. The closed box is the bound that loads the mounts and the joints most, and the body checks use it. The chassis results do not change, because the chassis checks keep the bare frame. With the body tied on, the chassis stress in LC5b falls from 117 to 25 MPa.
 
@@ -95,8 +95,8 @@ The worst case is LC5a with the bonded roof: 12.4 kNm into the rear half, 3.12 k
 
 The roof is one 40 mm sandwich panel, 10.6 m², bonded into the roof-to-wall joiner. The inside is 1,950 mm high. The travel height to the top of the solar panels is 2,917 mm.
 
-- The four Sunman panels are bonded to the flat top skin, with no hatch under them. There are no roof hatches (layout-79 open question 5). Five opening windows, the Carafan CP700 intake and the bathroom vent ventilate the body.
-- The roof weighs 75.6 kg (BD-02), and 105 kg with the solar array and its adhesive.
+- The four Sunman panels are bonded to the flat top skin, with no hatch under them. There are no roof hatches (report 18 open question 5). Five opening windows, the Carafan CP700 intake and the bathroom vent ventilate the body.
+- The roof weighs 75.6 kg (BD-02), and 107 kg with the 31.2 kg solar array and its adhesive. The uplift check takes 105.5 kg, the roof panel without its insert strips and the array, as the weight it ignores.
 - In a 40 m/s uplift the roof takes 5.06 kN, report 12's 6.3 kN on the 13.2 m² lid scaled to this roof's area (assumption). Over 13.6 m of joiner that is 0.37 N/mm against 30 N/mm, half the bond's assumed 2.0 MPa tension strength over its 30 mm leg. The check takes none of the roof's weight off the uplift (BDY-19, 0.01).
 
 ## Openings
@@ -105,7 +105,7 @@ Ten openings, listed on CT-201 with their sizes and positions. Report 12's rules
 
 - Kerb wall: the kitchen slide-out opening under the bed (from 150 mm behind the front corner), the entry door, an Aussie Traveller DC 1,623 x 622, from 1,953.5 to 2,578.5 mm along the wall, a Dometic S4 500 x 450 window over the bed, the second way out, and a second over the freezer bench.
 - Road wall: a Dometic S4 900 x 500 window over the desk, the Thetford cassette service door, 450 x 290, and the bathroom vent.
-- Front wall: a Dometic S4 800 x 400 window over the bed head, above the spare wheel, and the Carafan CP700 intake beside the spare wheel.
+- Front wall: a Dometic S4 800 x 400 window over the bed, above the spare wheel, and the Carafan CP700 intake beside the spare wheel.
 - Rear wall: a Dometic S4 600 x 450 window at the end of the aisle.
 
 Where an opening crosses a chassis station its outrigger-tip mount moves inboard of the frame and the floor joiner runs unbroken.
@@ -141,7 +141,7 @@ The solar panels (31.2 kg) are in the roof group, not the body. BD-05 (the garag
 | BDY-11 | Inserts: bed ledgers, awning brackets | 0.31 kN of 0.85 kN | 0.36 |
 | BDY-13 | Body share of LC5a (reported) | 98 % with the bonded roof, 5 % with the roof joint neglected | |
 | BDY-14 | Skins and bonded joints in twist | 1.0 N/mm of 22.5 N/mm | 0.04 |
-| BDY-16 | Body mounts, M12 into nut plates | 7.38 kN of 23.3 kN | 0.32 |
+| BDY-16 | Body mounts, M12 into nut plates | 7.37 kN of 23.3 kN | 0.32 |
 | BDY-18 | Opening spacing | Every rule met, the tightest by 0 mm | |
 | BDY-19 | Roof-to-wall joint in a 40 m/s uplift | 0.37 N/mm of 30 N/mm | 0.01 |
 | BDY-20 | Rear wall as the rear diaphragm | 1.34 N/mm of 22.5 N/mm | 0.06 |
@@ -152,7 +152,7 @@ The floor under a foot also deflects 4.5 mm against 5.6 mm (span/200, reported i
 
 1. The load cases, the planning method (one-way spans with an effective width), and the deflection limits.
 2. The twist sharing. The bonded roof puts 98 % of LC5a in the body. A finite element model of the body and frame, or a twist test of the finished trailer, settles it. The mount forces depend on it.
-3. The M12 nut-plate mounts: the 7.38 kN worst bolt, the nut plate's welds inside the 3 mm raiser, and the floor's pull-through under the spreader.
+3. The M12 nut-plate mounts: the 7.37 kN worst bolt, the nut plate's welds inside the 3 mm raiser, and the floor's pull-through under the spreader.
 4. The roof-to-wall joiner: the bond in tension in uplift, and its shear in twist.
 5. The inserts, by pull tests, above all the bed ledger fixings.
 6. The skin data (woven roving at 14 GPa and 200 MPa, XPS shear strength 0.25 MPa), which no maker publishes for these panels.

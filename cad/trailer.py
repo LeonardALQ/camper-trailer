@@ -4,7 +4,7 @@ Everything is in the project datum DIM-01 (research/02): X from the coupling bal
 Y from the centreline, positive to the road side, Z up from the ground at design ride height. Blocks are
 axis-aligned boxes, wheels are cylinders and the drawbar members are bars between two points.
 
-Revision H (20 Nov 2026) is the trailer for the LandCruiser 79 (layout-79, layout 1): the bikes ride in the ute's bike
+Revision H (20 Nov 2026) is the trailer for the LandCruiser 79 (report 18, layout 1): the bikes ride in the ute's bike
 box (UTE-GARAGE.md), so the trailer has no garage module. The axle solve moves the axle group and everything tied to it
 (the tanks, their guards and the suspension) along X until the towball load meets the target. It never changes a limit
 or a block size. The tow vehicle's limits come from data/ute/ute.yaml and its masses and the bike box's sweep from the
@@ -210,7 +210,7 @@ class Layout:
             by[r["maturity"]] = by.get(r["maturity"], 0.0) + r["kg"]
         b.maturity = max(by, key=by.get)
         b.extra["parts"] = rows
-        b.source = "; ".join(f"{r['item']} {r['kg']:g} kg ({'maker or retailer' if r['maturity'] == 'spec' else r['maturity']}"
+        b.source = ". ".join(f"{r['item']} {r['kg']:g} kg ({'maker or retailer' if r['maturity'] == 'spec' else r['maturity']}"
                              f"{', ' + r['source'] if r['source'] else ''})" for r in rows)
         b.mass_note = ", ".join(f"{v:.1f} kg {'maker or retailer' if k == 'spec' else k}" for k, v in by.items())
 
@@ -427,6 +427,11 @@ class Layout:
                 continue
             out.append(dict(iid=b.iid, name=b.name, system=b.system, dist=_origin_dist(poly), top=top))
         return out
+
+
+def _lc(name: str) -> str:
+    """Lower-case a name's first letter to run it into a sentence, unless it starts an acronym (ARK, XT)."""
+    return name if name[1:2].isupper() else name[:1].lower() + name[1:]
 
 
 def _stage_of(b: Block) -> str:
@@ -697,7 +702,7 @@ class Trailer:
                 f = lay.fit(c.zone)
                 row.update(limit="inside the zone, no overlap", measured=f["smallest_gap_mm"], unit="mm", margin=f["smallest_gap_mm"],
                            ok=f["ok"], governing=f["governing"], problems=f["problems"],
-                           detail=("all fit" if f["ok"] else "; ".join(f["problems"][:4])) + f", {f['items']} items, {f['keep_clear']} keep-clear spaces",
+                           detail=("all fit" if f["ok"] else ". ".join(f["problems"][:4])) + f", {f['items']} items, {f['keep_clear']} keep-clear spaces",
                            sub=lay.zones[c.zone]["name"])
             elif c.type == "tyre":
                 t = self.tyre_arc(lay)
@@ -749,8 +754,8 @@ class Trailer:
                     v = w["dist"] - R
                     row.update(limit=f">= {c.min_gap_mm:g} mm outside the sweep", measured=round(v, 1), unit="mm", margin=round(v - c.min_gap_mm, 1),
                                ok=v >= c.min_gap_mm - 1e-6, governing=f"{w['name']} ({w['iid']})",
-                               detail=(f"the bike box's rear corners sweep {R:.0f} mm about the ball ({sw['governing']}). Of the parts higher than "
-                                       f"Z {under - jk2:.0f}, the nearest is {w['name'][0].lower() + w['name'][1:]}, {w['dist']:.0f} mm from the ball in plan, "
+                               detail=(f"the bike box's rear corners sweep {R:.1f} mm about the ball ({sw['governing']}). Of the parts higher than "
+                                       f"Z {under - jk2:.0f}, the nearest is {_lc(w['name'])}, {w['dist']:.0f} mm from the ball in plan, "
                                        f"{v:.0f} mm outside the sweep"), sweep=sw)
                 else:
                     low = [f for f in fps if f["dist"] < R + jk1]
@@ -758,7 +763,7 @@ class Trailer:
                     v = under - w["top"]
                     row.update(limit=f">= {c.min_gap_mm:g} mm below the box", measured=round(v, 1), unit="mm", margin=round(v - c.min_gap_mm, 1),
                                ok=v >= c.min_gap_mm - 1e-6, governing=f"{w['name']} ({w['iid']})",
-                               detail=(f"{len(low)} parts lie within {R + jk1:.0f} mm of the ball. The highest is {w['name'][0].lower() + w['name'][1:]}, "
+                               detail=(f"{len(low)} parts lie within {R + jk1:.0f} mm of the ball. The highest is {_lc(w['name'])}, "
                                        f"its top at Z {w['top']:.0f}, {v:.0f} mm under the bike box's underside at Z {under:.0f}"), sweep=sw)
             row["inputs"] = c.inputs
             row["status"] = ("PASS" if row["ok"] else "FAIL") if c.severity == "fail" else ("MEETS LIMIT" if row["ok"] else "REPORTED")
@@ -783,7 +788,7 @@ def _r(v, n=1):
     if isinstance(v, (list, tuple)):
         return [_r(x, n) for x in v]
     if isinstance(v, dict):
-        return {k: _r(x, 3 if k == "util" else n) for k, x in v.items()}
+        return {k: _r(x, 3 if k in ("util", "measured", "margin") else n) for k, x in v.items()}
     return v
 
 

@@ -43,8 +43,9 @@ From front to back there are the drawbar with its box, the bed zone ({n(t.zones.
 
 - **Drawbar box.** A sealed 2 mm aluminium box, {n(P.dbx_w)} mm wide and {n(P.dbx_h)} mm high, sits on the drawbar
   members ahead of the spare wheel. It holds the Honda EU22i generator and the petrol and diesel jerry cans, so no
-  fuel rides inside the body. The jockey wheel moves forward of it, to X 1,000 mm.
-- **Bed zone.** A queen bed lies across the front, east to west, on a honeycomb base. The kitchen slides out under
+  fuel rides inside the body. The jockey wheel clamps to the drawbar ahead of it at X 1,000 mm and swings up for
+  travel to lie along the drawbar, below the bike box's sweep.
+- **Bed zone.** A queen bed lies across the front, from side to side, on a honeycomb base. The kitchen slides out under
   it on the kerb side, under the awning. The air-conditioner sits under the middle of the bed, and a column of
   shelves stands at the bed's road-side end.
 - **Living area.** The entry door is in the kerb-side wall. The desk with two seats is on the road side opposite.
@@ -81,7 +82,7 @@ reversed in the data: a washer with no dryer, no LPG, and two batteries.
 
 The trailer and the ute share one wheel and tyre, from report 16, so each spare fits both.
 
-- Wheel: {t.wheel.name}. Its {n(t.wheel.rating_kg)} kg rating is an estimate.
+- Wheel: {t.wheel.name}, rated {n(t.wheel.rating_kg)} kg in ROH's fitment table (WHL-01), until ROH confirms it in writing.
 - Tyre: {t.wheel.tyre}.
 - Hubs: {t.wheel.hub}.
 - Offset and track: C/F {n(ch.cf)} mm with ET {n(ch.wheel_offset)} puts each wheel {n(ch.cf - ch.wheel_offset)} mm outside its rail, inside Cruisemaster's 200 mm limit, for a {n(ch.track)} mm track on the {n(ch.rail_outer_width)} mm rails.
@@ -109,7 +110,7 @@ them here:
 - Towball: at most {n(tv.limits.towball_plan_kg)} kg (the decision log's cap, inside the towbar's {n(tv.limits.towball_rating_kg)} kg). The worst case with growth carries {n(chk('MAS-03').measured)} kg (MAS-03).
 - GCM: the larger of two sums against Toyota's {n(tv.limits.gcm_kg)} kg. The plan's sum is the ute at its {n(tv.limits.weighed_max_kg)} kg limit plus the {n(t.caps.plated)} kg plate less the 250 kg the ball carries. The model's sum is the ute's {tv.gcm_case} case with growth ({n(tv.ute_kg_growth)} kg) plus the heaviest trailer case with growth. GCM-01 measures {n(chk('GCM-01').measured)} kg.
 - Coupling height: the ute's ball is {n(ch.coupling_z)} mm high laden (UTE-01), and the drawbar drop is solved from it.
-- Jack-knife: the ute's bike box overhangs the ball by {n(ch.sweep.body_overhang_mm)} mm. At 90 degrees it sweeps a radius of {n(ch.sweep.radius_mm)} mm from the ball. JK-01 keeps the trailer's front parts at least 100 mm outside that sweep, and JK-02 keeps the parts inside it at least 50 mm below the box's underside at Z {n(ch.sweep.underside_z)}.
+- Jack-knife: the ute's bike box overhangs the ball by {n(ch.sweep.body_overhang_mm)} mm. At 90 degrees it sweeps a radius of {ch.sweep.radius_mm.toLocaleString("en-AU", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} mm from the ball. JK-01 keeps the trailer's front parts at least 100 mm outside that sweep, and JK-02 keeps the parts inside it at least 50 mm below the box's underside at Z {n(ch.sweep.underside_z)}.
 
 ## Checks
 

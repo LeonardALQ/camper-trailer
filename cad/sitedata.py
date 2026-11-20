@@ -19,8 +19,8 @@ DOCS = SITE / "src" / "content" / "docs"
 RESEARCH = [
     ("01-tech-stack.md", "Tech stack for the design site", 1),
     ("02-design-practice.md", "Design, drawing and documentation practice", 2),
-    ("03-bike-restraint-garage.md", "Bike restraint and garage fit-out", 3),
-    ("04-bed-and-materials.md", "Bed above the bikes, and build materials", 4),
+    ("03-bike-restraint-garage.md", "Bike restraint and garage fit-out (now in the ute’s bike box)", 3),
+    ("04-bed-and-materials.md", "Bed above the bikes, and build materials (trailer garage, retired)", 4),
     ("05-bike-geometry.md", "Bike geometry for envelope models", 5),
     ("06-trailer-running-gear.md", "Trailer running gear: suspension, hubs, brakes and sway control", 6),
     ("07-tow-vehicle.md", "Tow vehicle: the 2013 Porsche Cayenne GTS (958), superseded", 7),
@@ -34,6 +34,7 @@ RESEARCH = [
     ("15-driveline.md", "LandCruiser 79 V8 driveline and reliability refresh", 15),
     ("16-ute-limits.md", "LandCruiser 79 limits, GVM, GCM, brakes, wheels and towing", 16),
     ("17-ute-garage.md", "The enclosed motorbike garage on the LandCruiser 79", 17),
+    ("18-trailer-layout-79.md", "The trailer’s layout for the LandCruiser 79", 18),
 ]
 # sections of VEHICLE.md shown on the Tow vehicle page, in order
 VEHICLE_SECTIONS = ("Summary", "Decisions", "Budget", "Order of work")
@@ -78,7 +79,7 @@ def tow_vehicle_page():
            "and it carries both motorbikes in an enclosed box on its tray (see the Ute garage page). This page "
            "shows four sections of the vehicle plan, `VEHICLE.md`, and then every part and job in "
            "`data/vehicle/vehicle-parts.yaml`. The engine, driveline, suspension, brakes, wheels, towing, legal "
-           "and limits sections are in `VEHICLE.md` itself. The basis is research reports 14, 15 and 16.\n\n"]
+           "and limits sections are in `VEHICLE.md` itself. The basis is research reports 14, 15 and 16, and the decision log cited by time is on the Decisions page.\n\n"]
     for s in _sections(plan, VEHICLE_SECTIONS):
         out.append(s.replace("`vehicle-parts.yaml`", "the parts list below") + "\n")
     out.append("## Parts list\n\nRendered from `data/vehicle/vehicle-parts.yaml`. Prices are AUD including GST, the line "
@@ -143,6 +144,12 @@ def main():
         _copy(BUILD / "drawings" / f"{n}.png", SITE / "public" / "drawings" / f"{n}.png")
         cairosvg.svg2png(url=str(BUILD / "drawings" / f"{n}.svg"),
                          write_to=str(SITE / "public" / "drawings" / f"{n}-preview.png"), output_width=1754)
+
+    # the decision record, from docs/decisions.md, with its first heading moved into the title
+    text = (ROOT / "docs" / "decisions.md").read_text(encoding="utf-8")
+    text = re.sub(r"\A#\s+[^\n]*\n", "", text, count=1)
+    (DOCS / "decisions.md").write_text("---\ntitle: 'Decisions for the LandCruiser 79 plan'\n---\n\n"
+                                       "Copied from `docs/decisions.md` in the repository.\n" + text, encoding="utf-8")
 
     # the tow vehicle page
     n_parts = tow_vehicle_page()

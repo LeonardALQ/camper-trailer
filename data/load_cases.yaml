@@ -1,4 +1,4 @@
-# Whole-trailer load cases (TRAILER.md, layout-79 section 3.2). The bikes ride in the ute's box (UTE-GARAGE.md), so
+# Whole-trailer load cases (TRAILER.md, report 18 section 3.2). The bikes ride in the ute's box (UTE-GARAGE.md), so
 # no case carries a bike or ballast. `water_l` is an expression over the trailer parameters. `load` lists the payload
 # tags carried (assemblies/trailer.yaml): fuel (the heater's diesel and the jerry cans in the drawbar box) and gear
 # (food, clothes and other gear). All 400 L of water ride in the trailer. Every case here is one the trailer may be

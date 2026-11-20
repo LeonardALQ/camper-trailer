@@ -1,5 +1,5 @@
 # The tow vehicle: a Toyota LandCruiser 79 single cab chassis, V8 (VDJ79R, GXL, built 01/2017 to 08/2022), with the
-# Lovells 4,200 kg GVM kit (UTE-GARAGE.md, research report 16, PLAN-79.md decision log).
+# Lovells 4,200 kg GVM kit (UTE-GARAGE.md, research report 16, `docs/decisions.md` decision log).
 # Ute frame (DIM-U1): X along the ute from the front axle centre, positive rearward. Y from the centreline, positive to
 # the road (right) side. Z up from the ground, ute level at its laden ride height. mm and kg.
 # Any number may be an expression over `params`. Masses carry a maturity as in report 02 MASS-06: spec (a maker's

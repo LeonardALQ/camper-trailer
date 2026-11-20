@@ -22,7 +22,12 @@ const heaviest = r.cases.reduce((a: any, c: any) => (c.growth.mass_kg > a.growth
 const fails = r.checks.filter((c: any) => c.severity === 'fail' && !c.ok);
 const rowClass = (c: any) => (c.ok ? '' : c.severity === 'fail' ? 'row-fail' : 'row-report');
 const statusClass = (c: any) => (c.ok ? 'status-pass' : c.severity === 'fail' ? 'status-fail' : 'status-report');
-const measured = (c: any) => (c.measured == null ? '' : `${n(c.measured, c.unit === '%' ? 1 : 0)} ${c.unit}`);
+const measured = (c: any) => {
+  if (c.measured == null) return '';
+  const v = Math.abs(c.measured);
+  const d = c.unit === '%' ? 1 : c.unit === '' || c.unit === 'deg' || v < 1 ? 3 : v < 10 ? 2 : v < 1000 ? 1 : 0;
+  return `${n(c.measured, d)} ${c.unit}`.trim();
+};
 const groupRows = Object.entries(r.tare_by_group) as [string, any][];
 const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
 ---
@@ -97,7 +102,7 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
         <tr><td>Rail underside and top</td><td class="num">Z {n(ch.rail_underside_z)} / {n(ch.rail_top_z)}</td><td>Hub {n(P.hub_below_rail)} mm below the rail underside at rated load (Cruisemaster), static loaded radius {n(ch.hub_z)} mm (estimate)</td></tr>
         <tr><td>Raiser height</td><td class="num">{n(ch.raiser_h)} mm</td><td>Rail top to the floor underside at Z {n(ch.floor_underside_z)}: an RHS 125 x 50 x 3 raiser and a {n(ch.floor_underside_z - ch.rail_top_z - 125)} mm bearer strip. The floor clears the tyre at full bump by {n(ch.tyre_floor_clearance)} mm</td></tr>
         <tr><td>Floor surface</td><td class="num">Z {n(ch.floor_z)}</td><td>Floor underside plus a 30 mm floor panel</td></tr>
-        <tr><td>Drawbar, ball to body front</td><td class="num">{n(ch.drawbar_length)} mm</td><td>At a 90 degree jack-knife the nearest part, the {ch.jackknife_governing.split(',')[0].toLowerCase()}, stands {n(ch.jackknife_mm)} mm clear of the sweep of the ute's bike box (radius {n(ch.sweep.radius_mm)} mm, JK-01)</td></tr>
+        <tr><td>Drawbar, ball to body front</td><td class="num">{n(ch.drawbar_length)} mm</td><td>At a 90 degree jack-knife the nearest part, the {ch.jackknife_governing.split(',')[0].toLowerCase()}, stands {n(ch.jackknife_mm)} mm clear of the sweep of the ute's bike box (radius {n(ch.sweep.radius_mm, 1)} mm, JK-01)</td></tr>
         <tr><td>Drawbar box</td><td class="num">X {n(ch.drawbar_box[0])} to {n(ch.drawbar_box[3])}</td><td>{n(P.dbx_w)} mm wide and {n(P.dbx_h)} mm high on the drawbar members, holding the generator and the fuel cans (DX-01)</td></tr>
         <tr><td>Spare wheel</td><td class="num">X {n(ch.spare_box[0])} to {n(ch.spare_box[3])}</td><td>On the body's front wall above the drawbar, centred on Y, its centre at Z {n((ch.spare_box[2] + ch.spare_box[5]) / 2)}</td></tr>
         <tr><td>Drawbar members</td><td class="num">{n(ch.drawbar_member_length)} mm</td><td>Each, from the coupling head to the body front, then {n(ch.drawbar_tail)} mm on under the rails (PLACEHOLDER)</td></tr>

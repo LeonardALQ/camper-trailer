@@ -49,7 +49,7 @@ trailer_checks:
     min: 6
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: Report 07 sets 6 % as the floor for a stable trailer. Every case here is one the trailer may be towed in.
+    why: The decision log (11:25) keeps 6 % as the floor for a stable trailer. Every case here is one the trailer may be towed in.
   - id: MAS-05
     title: Towball load within 10 kg of the target fully loaded (design target)
     type: mass
@@ -120,7 +120,7 @@ trailer_checks:
     zone: inside
     severity: fail
     inputs: []
-    why: Every block inside the body must sit inside it without overlapping another, and no solid item may stand in a keep-clear space (layout-79 section 1.2).
+    why: Every block inside the body must sit inside it without overlapping another, and no solid item may stand in a keep-clear space (report 18 section 1.2).
   - id: FIT-03
     title: Tanks and battery fit between the rails and the crossmembers
     type: fit
@@ -134,7 +134,7 @@ trailer_checks:
     zone: drawbar_box
     severity: fail
     inputs: []
-    why: The petrol rides outside the body in a sealed, vented box behind the stone guard (decision log 12:45, independent review S6), so no petrol vapour can reach the living area or the air-conditioner under the bed.
+    why: The petrol rides outside the body in a sealed, vented box behind the stone guard (decision log 12:45), so no petrol vapour can reach the living area or the air-conditioner under the bed.
   - id: FIT-05
     title: Tyres swung through their full travel keep 50 mm from every chassis member
     type: tyre
@@ -422,7 +422,7 @@ trailer_checks:
     min_gap_mm: 100
     severity: fail
     inputs: [UTE-02]
-    why: The ute's bike box overhangs the ball, so its rear corners sweep a circle about the ball as the trailer swings (build/ute/ute.json, from the U2 model). Any trailer part higher than the box's underside must stay outside that circle. 100 mm is the allowance kept from the Cayenne check for the unmeasured ball position.
+    why: The ute's bike box overhangs the ball, so its rear corners sweep a circle about the ball as the trailer swings (build/ute/ute.json, from the U2 model). Any trailer part higher than the box's underside must stay outside that circle. 100 mm allows for the ball position, which is not yet measured (UTE-02).
   - id: JK-02
     title: Everything inside the bike box's sweep stays 50 mm below its underside
     type: jackknife_height
@@ -436,7 +436,7 @@ trailer_checks:
   # (BDY-05) left with the garage. The raising roof (BDY-12) and the rear portal (BDY-15) are gone with the fixed roof
   # and the full rear wall. BDY-19 and BDY-20 replace them.
   - {id: BDY-03, title: "Floor under a foot, LC2 3 g, with bearing on the core", type: body_panel, body: {item: BDY-03}, severity: fail,
-     why: "Report 12 section 3. 100 kg on 100 x 150 mm. Bearing at most half the core's compressive strength. With the bikes gone this governs the floor (layout-79 open question 13)"}
+     why: "Report 12 section 3. 100 kg on 100 x 150 mm. Bearing at most half the core's compressive strength. With the bikes gone this governs the floor (report 18 open question 13)"}
   - {id: BDY-04, title: "Floor edge beside the raisers between outriggers, LC2 3 g", type: body_panel, body: {item: BDY-04}, severity: fail,
      why: "Report 12 section 3 and report 11 section 5.3: 160 kg/m2 of floor and contents spanning between outriggers, no edge member"}
   - {id: BDY-06, title: "Side wall in a 0.5 kPa wind", type: body_panel, body: {item: BDY-06}, severity: fail,

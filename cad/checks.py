@@ -194,6 +194,6 @@ def evaluate(prj: Project, model, checks: list[Check] | None = None) -> list[dic
                 a=[], b=[], limit="touching, no overlap", measured_mm=worst_gap, margin_mm=None, overlap_mm3=worst_ov,
                 ok=all_ok, status="PASS" if all_ok else "FAIL", governing=", ".join(bad) if bad else f"{len(rows)} pairs touch",
                 points=[], pairs=rows,
-                detail=f"{sum(r['ok'] for r in rows)} of {len(rows)} pairs touch without overlap; largest gap {worst_gap:.3f} mm, largest overlap {worst_ov:.4f} mm3",
+                detail=f"{sum(r['ok'] for r in rows)} of {len(rows)} pairs touch without overlap. Largest gap {worst_gap:.3f} mm, largest overlap {worst_ov:.4f} mm3",
                 why=c.why, seconds=round(time.time() - t0, 2)))
     return out

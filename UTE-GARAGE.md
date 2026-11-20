@@ -3,7 +3,8 @@
 Revision B, 20 Nov 2026. Design basis for the tow vehicle and the enclosed bike box on its tray. It is a
 planning-level proposal for the engineer and the GVM certifier to check. The data is `data/ute/ute.yaml`,
 `data/assemblies/ute-garage.yaml`, `data/ute/parts/*.yaml` and `data/ute/garage-checks.yaml`. The code is
-`cad/ute.py` and `cad/ute_garage.py`. The drawings are CT-701 to CT-704, and the site page is "Ute garage".
+`cad/ute.py` and `cad/ute_garage.py`. The drawings are CT-701 to CT-704, and the site page is "Ute garage". The decision
+log cited by its time is `docs/decisions.md`.
 
 Leonard asked: "Instead of a porsche cayenne, I'll get a land cruiser single cab 79 V8 ... I'll put an enclosed box at
 the back to fit the two bikes and some tools. That way, we can make the trailer smaller and lighter." Then: "Let's
@@ -13,12 +14,12 @@ and not prone to theft."
 What changed in revision B, 20 Nov 2026: the trailer was redesigned without its garage (TRAILER.md revision H), and
 its ATM is plated at 3,100 kg (decision log 12:10). The towball now sits 1,300 mm behind the rear axle (report 16,
 decision log 12:45) in place of report 17's 1,350 mm, and the coupling point is set for 440 mm laden, plus or minus
-20 mm (layout-79.md section 3.5). Section 9 is re-solved for both. The rear axle with growth fell 4 kg to 2,436 kg.
+20 mm (report 18 section 3.5). Section 9 is re-solved for both. The rear axle with growth fell 4 kg to 2,436 kg.
 No check limit changed.
 
 ## 1. The ute
 
-- Toyota LandCruiser VDJ79R GXL single cab chassis, V8, built 01/2017 to 08/2022 (`PLAN-79.md` decision log, research
+- Toyota LandCruiser VDJ79R GXL single cab chassis, V8, built 01/2017 to 08/2022 (decision log 11:25, research
   report 16).
 - Lovells 4,200 kg GVM kit TOYKIT080-GVM: front axle 1,650 kg, rear axle 2,550 kg. GVM (gross vehicle mass) is the most
   the loaded ute may weigh. The weighed ute stays at or under 3,850 kg.
@@ -197,9 +198,9 @@ The ute, from `build/ute/ute.json`:
 - Rear axle 2,436 kg with growth against 2,550 kg, a margin of 114 kg. It is the binding limit. Front axle at most
   1,462 kg with growth against 1,650 kg.
 - Towball 250 kg against the plan's 250 kg and the towbar's 350 kg.
-- With the 3,100 kg plated trailer the combination is 6,528 kg, 6,646 kg with growth, against the 6,900 kg GCM.
+- The combination is 6,700 kg against the 6,900 kg GCM, the plan's figure with the ute at its 3,850 kg limit and the trailer at its 3,100 kg plate (GCM-01). On the model with the 3,100 kg trailer it is 6,528 kg, 6,646 kg with growth (UTE-06).
 - Front axle share at least 35.8 % against Toyota's 20 %.
-- SSF 0.858 with the bikes aboard against 1.02 with them in the trailer (report 17), reported and not a failure.
+- SSF 0.858 with the bikes aboard against 1.054 with them in the trailer (case UCB), reported and not a failure. Report 17 found 1.02 and 0.82.
   Report 17 found 0.82 on a flat deck at about 1,050 mm.
 - Unladen centre of gravity 785 mm against Toyota's 1,000 mm. Each rear wheel carries 1,218 kg with growth against its
   1,400 kg rating. Rear overhang 1,555 mm at the cam bar against 1,908 mm. The box is 40 mm behind the cab.
@@ -217,7 +218,7 @@ The box:
   20 kN. The chocks take 330 kgf (Tuareg) and 280 kgf (Street Triple) in braking.
 - Deck mounts: 933 kg with growth on the subframe, its centre of gravity 593 mm above the brackets. Each firm bolt takes
   1.8 kN of shear in braking. The largest uplift on one bracket is 0.8 kN and the largest downward load 2.5 kN. The worst
-  bolt interaction is 0.003 of capacity, so the bolts are not the question. Toyota's brackets are.
+  bolt uses about 6 % of its shear capacity, so the bolts are not the question. Toyota's brackets are.
 - Ramp 16.5 degrees with the bikes out, 15.9 degrees at the laden floor height, against report 03's 20 degrees.
 - The 23 load-path contacts touch without overlap: track on packer on steel crossmember on mount on Toyota's bracket.
 
@@ -268,7 +269,9 @@ Phase U2, the box:
 15. The rear lamps and the number plate move from the cab chassis's lamp bracket to the box, which ends 1,510 mm
     behind the rear axle (1,555 mm at the cam bar).
 16. A body on Toyota's deck mounts, inside these limits and the upgraded GVM, needs no separate VSB 14 certificate. The
-    GVM certifier inspects it with the vehicle (report 17 section 1.4).
+    GVM certifier inspects it and its winch with the vehicle in one LC5 inspection, under VSI 06 items 27 (the body), 34
+    (body mountings the maker did not design) and 35 (the winch as a powered goods loading device) (report 17 section
+    1.4, decision log 12:45).
 
 ## 11. What the engineer checks
 

@@ -1,6 +1,6 @@
 """CT-001 general arrangement of the whole trailer (A3, third angle): plan section and kerb-side elevation in the
 project datum, key dimensions, the bike box's jack-knife sweep, the mass and CoG schedule by load case and the
-whole-trailer checks. Revision J: the trailer for the LandCruiser 79 (layout-79, layout 1).
+whole-trailer checks. Revision J: the trailer for the LandCruiser 79 (report 18, layout 1).
 """
 from __future__ import annotations
 
@@ -58,7 +58,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
     # the bike box's sweep about the ball (JK-01): the arc on the trailer's side of the ball
     r = sw["radius_mm"] / sc
     sh.el.append(f'<path d="M{o[0]:.2f},{sh._y(o[1] + r):.2f} A{r:.2f},{r:.2f} 0 0,1 {o[0]:.2f},{sh._y(o[1] - r):.2f}" {sh.STY["phantom"]}/>')
-    sh.text(o[0] + r * 0.72 + 1.0, o[1] + r * 0.72, f"BIKE BOX SWEEP R {sw['radius_mm']:.0f}", 1.6)
+    sh.text(o[0] + r * 0.72 + 1.0, o[1] + r * 0.72, f"BIKE BOX SWEEP R {sw['radius_mm']:.1f}", 1.6)
     # zone lengths along the road side
     yd = P(0, hb)[1] + 9
     xs = [V["in_x0"], V["bed_x1"], V["rear_x0"], V["in_x1"]]
@@ -173,7 +173,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
         ["Raiser and strip, rail top to floor underside", f"{ch['raiser_h']:.0f}", "RHS 150x50x3 RAIL, RHS 125x50x3 RAISER (CT-101)"],
         ["Axle group centre from the ball", f"{V['axle_x']:.0f}", f"hubs {hx[0]:.0f} and {hx[1]:.0f}"],
         ["CoG height, fully loaded", f"{ch['cog_loaded'][2]:.0f}", f"{ch['cog_loaded_growth'][2]:.0f} with growth"],
-        ["Bike box sweep and underside", f"{sw['radius_mm']:.0f} / {sw['underside_z']:.0f}", f"box {sw['body_overhang_mm']:.0f} behind the ball (U2 model)"],
+        ["Bike box sweep and underside", f"{sw['radius_mm']:.1f} / {sw['underside_z']:.0f}", f"box {sw['body_overhang_mm']:.0f} behind the ball (U2 model)"],
         ["Wheel and tyre", f"{ch['tyre_d']:.0f}", "ROH TRAK 2 16x7 ET 0, LT265/75R16, LC5 HUBS"],
         ["Combination (GCM-01)", f"{gcm['measured']:,.0f} kg", f"against {rep['tow_vehicle']['limits']['gcm_kg']:,.0f} kg with the ute"],
     ]
@@ -183,7 +183,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
         "TRAILER LEVEL AT DESIGN RIDE HEIGHT. A RIGHT-HANDED FRAME, SO THE 3D MODEL AND THESE VIEWS SHOW THE TRAILER AS IT IS.",
         "BLOCK LAYOUT. EVERY ITEM EXCEPT THE CHASSIS IS AN ENVELOPE WITH A MASS. POSITIONS MARKED PLACEHOLDER IN assemblies/trailer.yaml ARE NOT DESIGNED YET.",
         f"AXLE POSITION SOLVED FOR {rep['target_kg']:.0f} kg ON THE BALL FULLY LOADED, BASE WEIGHTS. NO BALLAST IN ANY CASE.",
-        "REVISION J: THE TRAILER FOR THE LANDCRUISER 79 (layout-79, LAYOUT 1). THE BIKES RIDE IN THE UTE'S BIKE BOX (CT-701 TO CT-704). "
+        "REVISION J: THE TRAILER FOR THE LANDCRUISER 79 (REPORT 18, LAYOUT 1). THE BIKES RIDE IN THE UTE'S BIKE BOX (CT-701 TO CT-704). "
         "QUEEN BED ACROSS THE FRONT, FIXED ROOF 1950 INSIDE, 4420 BODY, ALL 400 L OF WATER IN THE TRAILER.",
         "THE GENERATOR AND THE JERRY CANS RIDE IN A SEALED, VENTED DRAWBAR BOX BEHIND THE STONE GUARD, OUTSIDE THE BIKE BOX'S SWEEP. NO PETROL IN THE BODY.",
         "XT AIR 4500 kg BUILD ON LC5 M14 HUBS AT 900 mm, ROH TRAK 2 16x7 ET 0 WITH LT265/75R16, THE UTE'S WHEEL. ONE SPARE HERE, ONE UNDER THE UTE'S TRAY.",
@@ -201,7 +201,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
         subtitle=dwg["subtitle"], rev=rev["rev"], status=dwg["status"], date=str(rev["date"]), drawn=reg["drawn_by"],
         checked=rev["checked"], approved=rev["approved"], engineer="NOT REVIEWED", sheet_no=dwg["sheet"], sheets=reg["sheets_total"],
         size=dwg["size"], scale=sc, material="BLOCK LAYOUT, NONE CALLED UP",
-        mass_note=f"TARE {rep['tare_kg']:.0f} kg, {tare['growth']['mass_kg']:.0f} kg WITH GROWTH, ATM PLATE {plate:,.0f} kg (TB-11).",
+        mass_note=f"TARE {int(rep['tare_kg'] + 0.5)} kg, {tare['growth']['mass_kg']:.0f} kg WITH GROWTH, ATM PLATE {plate:,.0f} kg (TB-11).",
         model_ref=f"trailer.step (ASM-TR rev {rep['assembly']['revision']})", git=git_hash())
     S.write(sh, BUILD / "drawings" / f"{dwg['number']}.svg")
     return time.time() - t0

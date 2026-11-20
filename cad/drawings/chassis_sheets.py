@@ -248,7 +248,7 @@ FIT_ITEMS = [("1", "DB-03", "Cruisemaster DO35 V3Plus, under-mounted, 4 x M12 8.
              ("3", "CH-P02", "Chain lug 10 mm, 18 mm hole, each side (detail B)"),
              ("4", "DB-06", "Safety chains AS 4177.4 (4177-35), ARK HLS13 shackles"),
              ("5", "CH-P11", "Jockey wheel bracket 8 mm, bolted to the kerb-side member"),
-             ("6", "DB-05", "ARK XO750 jockey wheel, 750 kg"),
+             ("6", "DB-05", "ARK XO750 jockey wheel, 750 kg, swung up in travel"),
              ("7", "DB-04", "Stone guard on the cross brace and member tops, on rubber"),
              ("8", "DB-BR", "Cross brace RHS 75 x 50 x 3 at mid-depth"),
              ("9", "CH-P03", "Root gusset 10 mm, 160 mm ground radius (FAT 90)"),
@@ -308,7 +308,7 @@ def ct102(prj, model, bom, checks, reg, dwg):
     # ---- balloons to the fittings on the plan
     ch_f = {f.id: f for f in ch.fittings}
     spots = {"DB-03": (-40, 0), "CH-P01": (V["plate_x"] - 40, 60), "CH-P02": (V["chain_lug_x"], -ch.db_y(V["chain_lug_x"]) - 30),
-             "DB-06": (V["chain_lug_x"], 0), "CH-P11": (V["jockey_x"], -ch.db_y(V["jockey_x"]) - 90), "DB-05": (V["jockey_x"], -ch.db_y(V["jockey_x"]) - 140),
+             "DB-06": (V["chain_lug_x"], 0), "CH-P11": (V["jockey_x"], -ch.db_y(V["jockey_x"]) - 90), "DB-05": (V["jockey_x"] - 320, -ch.db_y(V["jockey_x"]) - 160),
              "DB-04": (600, 250), "DB-BR": (V["brace_x"], 120), "CH-P03": (V["body_x0"] - 120, V["rail_c"]),
              "CH-P04": (V["front_recovery_x"], -V["rail_c"] - 35), "DB-07": (700, -60), "DB-KA": (1300, -ch.db_y(1300))}
     up = {"DB-03": 1, "CH-P01": 1, "CH-P02": -1, "DB-06": 1, "CH-P11": -1, "DB-05": -1, "DB-04": 1, "DB-BR": 1, "CH-P03": 1, "CH-P04": -1,

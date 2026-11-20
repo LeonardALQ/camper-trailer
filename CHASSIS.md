@@ -11,8 +11,8 @@ The frame now carries the LandCruiser 79 trailer of TRAILER.md revision H: a 4,4
 - The outriggers grew from RHS 100 x 50 x 3 to 125 x 50 x 3, the raiser's section. With the 100 mm section the outrigger root's weld (FAT-05) saw a frequent range of 23.5 MPa against its CAFL of 21.1 MPa. With 125 mm it sees 16.8 MPa.
 - Eight stations in place of nine. A fixed station now closes the heater's diesel tank bay, because the generated station spacing put a crossmember 50 mm into the tank (FIT-03).
 - The XT Air axles are 900 mm apart, on Cruisemaster LC5 hubs.
-- VSB1's drawbar and chain forces follow the 3,100 kg plate: 45.6 kN and 15.2 kN at the coupling (LC6), and 30.4 kN and 15.2 kN at each chain point (LC6b). Every case is scaled to the plate in place of 3,500 kg.
-- The drawbar carries the sealed drawbar box with the generator and the jerry cans. The jockey wheel moves to X 1,000 mm.
+- VSB1's drawbar and chain forces follow the 3,100 kg plate: 45.6 kN and 15.2 kN at the coupling (LC6), and 30.4 kN and 15.2 kN at each chain point (LC6b). Every case is scaled to the plate in place of 3,500 kg, with two exceptions on the safe side: LC5a keeps report 11's 13.4 kNm of twist, from the old trailer's 831 mm half track where the new one is 778 mm, and the chain lug check (LOC-01) keeps the 3,500 kg forces of 34.3 kN and 17.2 kN.
+- The drawbar carries the sealed drawbar box with the generator and the jerry cans. The jockey wheel's clamp moves to X 1,000 mm, and the wheel swings up for travel to lie along the drawbar below the bike box's sweep. The stone guard is trimmed on its kerb side round it.
 - The corner steadies sit at X 2,220 and 6,070 mm, about 400 mm inside the body ends.
 - The body bolts to the raisers with 32 M12 bolts into welded 10 mm nut plates (CH-P14), BODY.md revision B.
 - No check limit changed, and no estimate changed to pass a check.
@@ -39,10 +39,10 @@ The frame is a ladder of two composite rails with crossmembers at eight stations
 | Main rails | RHS 150 x 50 x 3 | X 1,820 to 6,240, centres 562.5 mm from the centreline (1,175 mm outer width), Z 597.5 to 747.5 | 2 | 79.1 kg |
 | Raisers | RHS 125 x 50 x 3, continuous fillets to the rail | On each rail, Z 747.5 to 872.5, with a 22.5 mm bearer strip up to the floor underside at Z 895 | 2 | 68.8 kg |
 | Body end crossmembers | RHS 150 x 50 x 3, full rail height | Body front (centre X 1,845) and rear (X 6,215) | 2 | 19.2 kg |
-| XT crossmembers | RHS 150 x 50 x 3, full rail height, no holes | Front hinge (X 3,306), centre (X 4,206), rear shock (X 5,036, with a 5 mm shock plate) | 3 | 28.9 kg |
-| Floor crossmembers | RHS 125 x 50 x 3 at raiser height, top flush with the raisers | X 2,295, the diesel bay at X 2,746, and the battery bay at X 5,470 | 3 | 25.1 kg |
+| XT crossmembers | RHS 150 x 50 x 3, full rail height, no holes | Front hinge (X 3,303), centre (X 4,203), rear shock (X 5,033, with a 5 mm shock plate) | 3 | 28.9 kg |
+| Floor crossmembers | RHS 125 x 50 x 3 at raiser height, top flush with the raisers | X 2,294, the diesel bay at X 2,743, and the battery bay at X 5,470 | 3 | 25.1 kg |
 | Outriggers | RHS 125 x 50 x 3 at raiser height, top flush, 612.5 mm to the body edge | At all eight stations, each side | 16 | 76.2 kg |
-| Plan bracing | SHS 40 x 40 x 2.5, an X of two diagonals at rail height | Bays X 2,295 to 2,746, 2,746 to 3,306, and 5,036 to 5,470 | 6 | 19.6 kg |
+| Plan bracing | SHS 40 x 40 x 2.5, an X of two diagonals at rail height | Bays X 2,294 to 2,743, 2,743 to 3,303, and 5,033 to 5,470 | 6 | 19.6 kg |
 | Drawbar members | RHS 150 x 50 x 5 | Apex X 250 at Y ±60, to the rail centres at X 1,820, then 1,000 mm on under the rails to X 2,820 | 2 (4 lengths) | 75.2 kg |
 | Drawbar cross brace | RHS 75 x 50 x 3 at the members' mid-depth | X 900 | 1 | 2.6 kg |
 | Spare carrier posts | SHS 50 x 50 x 2.5, bolted to cleats on the front crossmember | X 1,795, Y ±120, up to Z 1,500 | 2 | 6.5 kg |
@@ -54,7 +54,7 @@ The member schedule and the plate list with sizes are on CT-101 and CT-102, and 
 1. Outriggers RHS 125 x 50 x 3 in place of 75 x 50 x 3, with 6 mm fillets all round. With 75 x 50 x 3 the frequent fatigue range at the root weld was 34.7 MPa against the FAT 36 root's CAFL of 21.1 MPa (IIW 414). Revision A went to 100 x 50 x 3. On the 79 trailer that section reached 23.5 MPa, so revision D uses the raiser's 125 x 50 x 3, at 16.8 MPa. The 16 outriggers weigh 76 kg.
 2. Plan bracing in three bays. With no bracing, a recovery pull 30 degrees off the rail axis (LC8a) bent the ladder frame sideways in a Vierendeel shape (revision A: 597 MPa, a utilisation of 1.33). One X of SHS 40 x 40 x 2.5 in each of the two bays ahead of the front tank and one behind the rear tank bring the worst LC8a stress to 349 MPa (0.78). The tanks and the battery fill the other bays.
 3. Jacking pads on the XT centre crossmember's underside beside the rail, not on the rail's bottom face. Welded to the rail flange, the pad's weld end (IIW 513, FAT 71) would see the rail's full range. On the crossmember it sees 16.8 MPa against a CAFL of 41.5 MPa (FAT-11).
-4. The weld toes on the rail at the full-height crossmembers are burr-ground (IIW 512, 1.3 x FAT 80, a CAFL of 60.8 MPa). They now see 23.4 MPa, so the grinding has a wide margin. It stays in the design because it costs little.
+4. The weld toes on the rail at the full-height crossmembers are burr-ground (IIW 512, 1.3 x FAT 80, a CAFL of 60.8 MPa). They now see 23.5 MPa, so the grinding has a wide margin. It stays in the design because it costs little.
 5. 6 mm fillets all round the ends of the three XT crossmembers in place of 5 mm. The weld root (IIW 414, FAT 36) now sees 14.5 MPa against its CAFL of 21.1 MPa.
 6. Raisers RHS 125 x 50 x 3 in place of report 11's 100 x 50 x 3, to lift the floor above the 805 mm tyre with 50 mm in hand at full bump.
 7. A fixed station at the diesel bay, so the heater's tank sits between two crossmembers.
@@ -83,8 +83,8 @@ The member schedule and the plate list with sizes are on CT-101 and CT-102, and 
 | Cruisemaster DO35 V3Plus, under-mounted on a 12 mm plate at the apex, four M12 8.8 bolts at 90 Nm, with the integrated handbrake | DO35 guide p. 3 | 9.5 kg (estimate) |
 | Chain lugs, 10 mm plate, 18 mm hole, at X 400 on the members' outer faces | VSB1 9.2.2 | 1.9 kg |
 | Safety chains to AS 4177.4 (4177-35) with ARK HLS13 shackles | VSB1 9.2.1 | 4.5 kg (estimate) |
-| ARK XO750 jockey wheel on a bolted 8 mm bracket on the kerb-side member at X 1,000, ahead of the drawbar box | Report 11 section 6.4 | 20.0 kg (ARK, report 13 section 6) |
-| Stone guard on the cross brace and member tops, on rubber, its top at Z 608 | Report 11 section 6.4 | 7.0 kg (calculated) |
+| ARK XO750 jockey wheel on a bolted 8 mm bracket on the kerb-side member at X 1,000, ahead of the drawbar box. In travel it swings up to lie along the drawbar, wheel forward, from X 300 to 1,060 with its top at Z 622.5 | Report 11 section 6.4 | 20.0 kg (ARK, report 13 section 6) |
+| Stone guard on the cross brace and member tops, on rubber, its top at Z 607.5, trimmed on the kerb side to Y -370, 30 mm clear of the swung-up jockey wheel | Report 11 section 6.4 | 6.5 kg (calculated) |
 | Breakaway kit, switch near the coupling | VSB1 8 | 5.0 kg (estimate) |
 | Front recovery lugs, 20 mm, on the drawbar members' outer faces at X 2,150, outside the 300 mm root zone | LC8a | 7.5 kg |
 | Rear recovery tongues, 20 mm, through slots in the rear crossmember at X 6,170, welded to the rail webs | LC8a | 9.8 kg |
@@ -97,7 +97,7 @@ The member schedule and the plate list with sizes are on CT-101 and CT-102, and 
 
 ## Mass
 
-The chassis and drawbar weigh 459.9 kg of steel and 13.8 kg of zinc, 474 kg galvanised, plus 104.6 kg of bought parts and fittings: 578 kg in all. The steel and zinc are calculated (7 % growth allowance). In revision C, for the 5,500 mm trailer with its garage, the steel was 479 kg. The shorter rails save more than the deeper raisers and outriggers add.
+The chassis and drawbar weigh 459.9 kg of steel and 13.8 kg of zinc, 474 kg galvanised, plus 104.1 kg of bought parts and fittings: 578 kg in all. The steel and zinc are calculated (7 % growth allowance). In revision C, for the 5,500 mm trailer with its garage, the steel was 479 kg. The shorter rails save more than the deeper raisers and outriggers add.
 
 ## Design basis (report 02 LOAD-01)
 
@@ -129,12 +129,12 @@ The frame model is a 3D beam model on the members' centroid axes, solved by the 
 
 Load mapping. Each mass goes onto the frame by its load path, with its exact resultant and the moment of its offset kept:
 
-- the floor spans across the trailer onto the raisers, so a load between the rails is shared by the two rails by the lever rule, and one outside them by the two nearest outriggers on that side;
-- the roof and its panels go to the two side walls by the lever rule, then down to the outriggers;
-- tanks, water, battery, guards and the TSC hang between the rails;
-- the spare wheel goes to its posts on the front crossmember;
-- the drawbar box, the generator, the jerry cans and the coupling and drawbar fittings go onto the drawbar members;
-- the arms, hubs, wheels and tyres go through the arm free body;
+- the floor spans across the trailer onto the raisers, so a load between the rails is shared by the two rails by the lever rule, and one outside them by the two nearest outriggers on that side
+- the roof and its panels go to the two side walls by the lever rule, then down to the outriggers
+- tanks, water, battery, guards and the TSC hang between the rails
+- the spare wheel goes to its posts on the front crossmember
+- the drawbar box, the generator, the jerry cans and the coupling and drawbar fittings go onto the drawbar members
+- the arms, hubs, wheels and tyres go through the arm free body
 - the designed members carry their own weight with their galvanising.
 
 Block items with a box are cut into 200 mm cells, so the floor, walls, tanks and furniture spread as they do in the body. The ball and the four wheels react each case by statics, with equal vertical loads on the two axles of a side (the XT arms do not share load). The frame is then held by six supports that only stop rigid-body motion. Their reactions come out below 1 N in every case, so the loads and the reactions balance. In LC6, LC6b and LC8a the frame is held at its four hinge pivots and airbag brackets, as VSB1 14 holds the body during the test.
@@ -153,12 +153,12 @@ Stress. At each element end the normal stress is the axial stress plus the stron
 | LC5b | Road-side drawbar member | Under the rail just behind the body front, TC1, one steady wound to 875 kg | 117 MPa | 300 MPa | 0.39 |
 | LC6 | Road-side drawbar member | At the body front, 15.2 kN up | 244 MPa | 450 MPa | 0.54 |
 | LC6b | Kerb-side rail | At the XT front hinge crossmember, kerb-side lug 15.2 kN down | 225 MPa | 450 MPa | 0.50 |
-| LC8a | Kerb-side rail | At the XT rear shock crossmember, rear kerb-side point pulled 30 degrees sideways and 15 degrees up | 349 MPa | 450 MPa | 0.78 |
+| LC8a | Road-side rail | At the XT rear shock crossmember, rear road-side point pulled 30 degrees sideways and 15 degrees up | 349 MPa | 450 MPa | 0.78 |
 | LC8b | Kerb-side rail | At the XT centre crossmember, kerb side jacked, TC2 | 113 MPa | 450 MPa | 0.25 |
 
-The recovery case governs, then the VSB1 cases. The shorter body brings the front hinge crossmember to X 3,306 mm, 1,486 mm behind the body front, so the rail no longer carries VSB1's vertical force as a long cantilever. The travel cases stay below 0.43.
+The recovery case governs, then the VSB1 cases. The shorter body brings the front hinge crossmember to X 3,303 mm, 1,483 mm behind the body front, so the rail no longer carries VSB1's vertical force as a long cantilever. The travel cases stay below 0.43.
 
-Deflection and twist (LC1, at the plate): the rail between the drawbar root and the front hub deflects 0.11 mm against the chord (limit 3.9 mm), the rear overhang tip 1.37 mm against the line through the hubs (limit 6.8 mm), and the worst outrigger tip 0.69 mm relative to its rail (limit 2.0 mm). Under LC5a the frame twists 0.439 degree between the front hinge and rear shock crossmembers against the 0.5 degree limit. The twist limit still has the least margin of any static check (12 %).
+Deflection and twist (LC1, at the plate): the rail between the drawbar root and the front hub deflects 0.11 mm against the chord (limit 3.9 mm), the rear overhang tip 1.38 mm against the line through the hubs (limit 6.8 mm), and the worst outrigger tip 0.69 mm relative to its rail (limit 2.0 mm). Under LC5a the frame twists 0.439 degree between the front hinge and rear shock crossmembers against the 0.5 degree limit. The twist limit still has the least margin of any static check (12 %).
 
 Fittings: the chain lugs reach 41 % of their limit (bearing), the front recovery lugs 73 % (plate bending at 78.5 kN, 30 degrees sideways), the rear tongues 62 %, the jacking pads 36 % under the frame's 34.6 kN, and the spare carrier posts 10 %.
 
@@ -174,7 +174,9 @@ The hollow-section T-joints are marked HS: the crossmember-to-rail joints, the o
 
 ### Against report 11's hand numbers
 
-| Member and case | Report 11 | Frame model | Why they differ |
+The frame model's figures here are the normal stress, to compare with report 11's bending stress. The results table above gives the combined stress, so LC2's rail is 95 MPa there and LC6's drawbar member 244 MPa.
+
+| Member and case | Report 11 | Frame model, normal stress | Why they differ |
 |---|---|---|---|
 | Composite rail, LC2 | 130 MPa | 92 MPa | Report 11 took 13.5 kNm per side on Z = 104 x 10³ mm³. The frame gives 9.7 kNm on the kerb rail over the rear hub, because the trailer is lighter and shorter, and the deeper composite section has Z = 107.1 x 10³ mm³. 130 x (104 / 107.1) x (9.7 / 13.5) = 91 MPa |
 | Drawbar member at the body front, LC6 vertical | 264 MPa | 242 MPa | Report 11 used VSB1's 17.2 kN for 3,500 kg. At the 3,100 kg plate the force is 15.2 kN, which alone gives 233 MPa. The member runs at an angle to X, so its lever is about 5 % longer than the 1.82 m report 11 took |
@@ -184,7 +186,7 @@ The hollow-section T-joints are marked HS: the crossmember-to-rail joints, the o
 
 1. The load cases, the factor of 2 on twist, the ±0.5 g frequent fatigue case and the deflection and twist limits (report 11 open question 6).
 2. The hot-spot stresses at every HS detail, above all the outrigger roots (FAT-04 and FAT-05), the XT crossmember weld roots (FAT-03) and the full-height crossmember toes on the rail (FAT-01).
-3. VSB1 9.1 and 9.2.2 evidence at the 3,100 kg plate: test, or calculation approved by the department (report 11 open question 7). The recovery case reaches 0.78 of yield in the kerb-side rail.
+3. VSB1 9.1 and 9.2.2 evidence at the 3,100 kg plate: test, or calculation approved by the department (report 11 open question 7). The recovery case reaches 0.78 of yield in the road-side rail.
 4. The local stability of the 3 mm rail walls at the jacking pad and under the hinge brackets, which a beam model does not see.
 5. The plan bracing's gusset plates and their welds, which the model treats as rigid.
 6. SP to AS/NZS 1554.1 for every weld, or AS/NZS 1554.5 for the most fatigue-loaded joints (report 11 open question 8).
@@ -204,6 +206,6 @@ Each is in TRAILER.md's assumptions list with its source.
 - The engineer accepts report 11's load cases and its planning fatigue method.
 - Grade 350 plate at 350 MPa for every thickness up to 20 mm.
 - The recovery points keep report 11's 51.5 kN, the 3,500 kg figure, though the plate is 3,100 kg.
-- The corner steadies at X 2,220 and 6,070 mm, about 400 mm inside the body ends (layout-79 section 4.3).
-- The jockey wheel at X 1,000 mm, ahead of the drawbar box.
+- The corner steadies at X 2,220 and 6,070 mm, about 400 mm inside the body ends (report 18 section 4.3).
+- The jockey wheel's clamp at X 1,000 mm, ahead of the drawbar box, and its travel envelope along the drawbar, 760 x 120 x 200 mm (estimate).
 - Bought part masses where not published: DO35 9.5 kg, chains 4.5 kg, breakaway kit 5 kg, floor bearer strip about 0.9 kg/m. The jockey wheel (20 kg) and the corner steadies (8.8 kg each) use published figures (report 13 section 6).

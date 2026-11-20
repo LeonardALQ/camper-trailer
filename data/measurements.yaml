@@ -18,7 +18,7 @@ inputs:
     title: Ute's towball pin height, laden, with about 250 kg on the ball and the bikes aboard
     how: Ute loaded as for the trip with both bikes in the box. Put about 250 kg on the tongue (a towball scale under a stand, or the loaded trailer coupled) on level ground, and measure from the ground to the centre of the DO35 pin hole.
     unit: mm
-    estimate: {v: 440, src: "Decision log 12:10 UTC: the ute's tongue is set for 440 mm laden, plus or minus 20 mm, so the coupling stays inside VSB1's 460 mm (layout-79 section 3.5)"}
+    estimate: {v: 440, src: "Decision log 12:10 UTC: the ute's tongue is set for 440 mm laden, plus or minus 20 mm, so the coupling stays inside VSB1's 460 mm (report 18 section 3.5)"}
     measured: {v: null, date: null}
     affects: [coupling height, drawbar drop, DIM-03, UTE-13, JK-02]
     thresholds:
@@ -81,7 +81,7 @@ inputs:
     title: Cruisemaster's C/F for the ROH Trak 2 16 x 7 ET 0 wheel, from the rail's outside face to the hub face
     how: Cruisemaster sets it in the design session from the wheel's offset and the track.
     unit: mm
-    estimate: {v: 190, src: "Layout-79 section 3.4: C/F 190 with ET 0 gives a 1,555 mm track on the 1,175 mm rail, the ute's front track"}
+    estimate: {v: 190, src: "Report 18 section 3.4: C/F 190 with ET 0 gives a 1,555 mm track on the 1,175 mm rail, the ute's front track"}
     measured: {v: null, date: null}
     affects: [track, chassis inputs]
     thresholds:

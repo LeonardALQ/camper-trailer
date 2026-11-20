@@ -37,9 +37,10 @@ const drawings = ['CT-701', 'CT-702', 'CT-703', 'CT-704'];
 {kind === 'summary' && (
   <p>
     Towing with both bikes aboard (case UC3), the ute weighs {n(cs.UC3.nominal.mass_kg)} kg, {n(cs.UC3.growth.mass_kg)} kg with the
-    growth allowance. Its rear axle carries {n(cs.UC3.growth.rear_kg)} kg of its {n(r.limits.rear_axle_kg)} kg rating, and the
-    combination with a {n(r.params.trailer_atm)} kg trailer is {n(cs.UC3.growth.mass_kg + r.params.trailer_atm - cs.UC3.growth.towball_kg)} kg
-    against the {n(r.limits.gcm_kg)} kg GCM. The box is {n(d.outside_l_body)} x {n(d.outside_w)} mm outside and weighs {n(g.box_kg, 1)} kg
+    growth allowance. Its rear axle carries {n(cs.UC3.growth.rear_kg)} kg of its {n(r.limits.rear_axle_kg)} kg rating. The combination is{' '}
+    {n(r.limits.weighed_max_kg + r.params.trailer_atm - r.limits.towball_plan_kg)} kg against the {n(r.limits.gcm_kg)} kg GCM, with the ute at its{' '}
+    {n(r.limits.weighed_max_kg)} kg limit and the trailer at its {n(r.params.trailer_atm)} kg plate ({n(cs.UC3.growth.mass_kg + r.params.trailer_atm - cs.UC3.growth.towball_kg)} kg
+    on the model with growth). The box is {n(d.outside_l_body)} x {n(d.outside_w)} mm outside and weighs {n(g.box_kg, 1)} kg
     empty ({n(g.box_kg_growth, 1)} kg with growth) against report 17's 440 kg. {fails.length === 0
       ? 'Every fail check passes.' : `${fails.length} checks fail: ${fails.map((x: any) => x.id).join(', ')}.`}
   </p>

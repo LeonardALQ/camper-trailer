@@ -22,6 +22,7 @@ export default defineConfig({
         { label: 'Ute garage', link: '/ute-garage/' },
         { label: 'Measurements', link: '/measurements/' },
         { label: 'Drawings', link: '/drawings/' },
+        { label: 'Decisions', link: '/decisions/' },
         { label: 'Research', items: [{ autogenerate: { directory: 'research' } }] },
         { label: 'Downloads', link: '/downloads/' },
       ],
