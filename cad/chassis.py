@@ -7,6 +7,8 @@ are welded continuously, and joins members that meet off-axis with rigid links.
 """
 from __future__ import annotations
 
+import copy
+import functools
 import math
 from dataclasses import dataclass, field
 from typing import Any
@@ -54,6 +56,13 @@ def _perimeter(d, b, r):
     return 2 * (d + b) - (8 - 2 * math.pi) * r
 
 
+@functools.lru_cache(maxsize=1)
+def load_data() -> dict:
+    """data/chassis/chassis.yaml, read once per process (the trailer layout builds the chassis for every axle trial)."""
+    return yaml.safe_load(CHASSIS_YAML.read_text())
+
+
+@functools.lru_cache(maxsize=1)
 def load_sections() -> dict[str, Props]:
     raw = yaml.safe_load(SECTIONS_YAML.read_text())
     out = {}
@@ -189,7 +198,7 @@ class Joint:
 # ------------------------------------------------------------------ the chassis
 class Chassis:
     def __init__(self, values: dict[str, Any], stations: list[dict], data: dict | None = None):
-        self.data = data or yaml.safe_load(CHASSIS_YAML.read_text())
+        self.data = data or copy.deepcopy(load_data())
         raw = {k: v for k, v in values.items() if isinstance(v, (int, float))}
         raw.update(self.data["params"])
         self.P = Params(raw)
@@ -287,8 +296,9 @@ class Chassis:
         J = self.joints.append
         for m in self.members:
             if m.role in ("cm_xt", "cm_end", "cm_floor"):
+                leg = 6 if m.role == "cm_xt" else 5
                 J(Joint(f"J-{m.id}", f"{m.name} to both rails", (m.id, "RL-K", "RL-R"),
-                        "5 mm fillet all round each end, SP. No weld across the rail's width beyond the crossmember's own end", "FAT-01, FAT-02, FAT-03"))
+                        f"{leg} mm fillet all round each end, SP. No weld across the rail's width beyond the crossmember's own end", "FAT-01, FAT-02, FAT-03"))
             if m.role == "outrigger":
                 J(Joint(f"J-{m.id}", f"{m.name} to the raiser's outer face", (m.id, f"RS-{m.id[-1]}"),
                         "5 mm fillet all round, SP", "FAT-04, FAT-05"))
@@ -349,11 +359,12 @@ class Chassis:
         return L
 
     # -- galvanising --------------------------------------------------
-    def galvanising(self) -> dict:
-        table = self.data["galvanising"]
+    def galv_rate(self, t: float) -> float:
+        """Coating mass in kg/m2 for steel of thickness t (AS/NZS 4680 minimum average)."""
+        return next(r["g_per_m2"] for r in self.data["galvanising"] if t <= r["t_max"]) / 1000
 
-        def rate(t):
-            return next(r["g_per_m2"] for r in table if t <= r["t_max"]) / 1000
+    def galvanising(self) -> dict:
+        rate = self.galv_rate
         rows = {}
         for m in self.members:
             r = rows.setdefault(m.sec.t, dict(t=m.sec.t, area_m2=0.0, kg_per_m2=rate(m.sec.t)))
@@ -422,6 +433,7 @@ class FrameModel:
         xs |= {ch.station_x(st) for st in ch.stations}
         xs |= {w["hub"][0] for w in ch.suspension}
         xs = sorted(xs)
+        xs = [x for k, x in enumerate(xs) if k == 0 or x - xs[k - 1] > 5.0]   # points within 5 mm share a node
         mesh = [xs[0]]
         for a, b in zip(xs, xs[1:]):
             n = max(1, math.ceil((b - a) / V["max_element"]))
@@ -463,6 +475,7 @@ class FrameModel:
             xa = [V["db_apex_x"], V["chain_lug_x"], V["jockey_x"], V["brace_x"]]
             n = math.ceil((V["body_x0"] - V["db_apex_x"]) / V["max_element"])
             xa = sorted(set(xa) | {V["db_apex_x"] + (V["body_x0"] - V["db_apex_x"]) * k / n for k in range(n + 1)})
+            xa = [x for k, x in enumerate(xa) if k == 0 or x - xa[k - 1] > 5.0]
             pts = [(x, s * ch.db_y(x), V["db_z"]) for x in xa]
             ia = f.chain(pts, dsec.frame_section(), (0, 0, 1), f"DB-{SIDES[s]}A")
             xb = [x for x in mesh if V["body_x0"] <= x <= V["db_end_x"] + 1e-6]
@@ -608,3 +621,43 @@ def tyre_clearance(ch: Chassis, boxes: list[tuple[str, tuple]], tyre_w: float, s
                 if g < best["gap_mm"]:
                     best = dict(gap_mm=g, tyre=w["id"], travel_mm=s, member=name, hub=(hx, hz))
     return best
+
+
+# ------------------------------------------------------------------ solids for the 3D model
+def member_solid(m: Member):
+    """The member as a hollow tube with its true outer size and corner radii, on its centroid axis."""
+    from build123d import Plane, RectangleRounded, Vector, extrude
+    p0, p1 = Vector(*m.p0), Vector(*m.p1)
+    ax = (p1 - p0).normalized()
+    dz = Vector(*m.depth_dir)
+    dz = (dz - ax * dz.dot(ax)).normalized()
+    s = m.sec
+    pl = Plane(origin=p0, x_dir=dz.cross(ax), z_dir=ax)
+    prof = RectangleRounded(s.b, s.d, s.ro) - RectangleRounded(s.b - 2 * s.t, s.d - 2 * s.t, max(s.ro - s.t, 0.2))
+    return extrude(pl * prof, amount=m.length)
+
+
+PLANES = {"xy": (0, 1, 2), "xz": (0, 2, 1), "yz": (1, 2, 0)}   # which axes the plate's length, width and thickness run along
+
+
+def fitting_solids(ch: Chassis, f: Fitting) -> list:
+    """Plates as boxes in their plane at each position, bought parts as their envelope box or a small block."""
+    from .model.prims import box
+    spec = next(d for d in ch.data["fittings"] if d["id"] == f.id)
+    out = []
+    if "box" in spec:
+        x0, y0, z0, dx, dy, dz = ch.P.eval(spec["box"], {})
+        return [box(x0, y0, z0, dx, dy, dz)]
+    if f.kind == "strip":
+        return []
+    if f.kind == "plate":
+        size = [0.0, 0.0, 0.0]
+        for v, axis in zip(f.dims, PLANES[spec.get("plane", "xy")]):
+            size[axis] = v
+    elif f.kind == "tube":
+        size = [spec["length"], 50.0, 50.0]
+    else:
+        size = list(spec.get("size", (120, 120, 120)))
+    for p in f.at:
+        out.append(box(p[0] - size[0] / 2, p[1] - size[1] / 2, p[2] - size[2] / 2, *size))
+    return out

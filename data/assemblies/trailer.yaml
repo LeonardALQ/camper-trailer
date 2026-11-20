@@ -119,26 +119,19 @@ wheel:
   tyre: "Yokohama Geolandar A/T G015 LT245/70R16 118/115R, load range E, 1,320 kg"
   src: "Report 09 sections 1 to 3. ROH publishes the 1,250 kg rating but not the weight, centre bore or nut seat"
 
-# Crossmembers that the layout fixes (front face X). The build adds intermediate crossmembers so that no gap
-# between two of them exceeds xm_max_pitch, and outriggers at the same stations wherever the tyres are not.
-# `keep_out` gaps are bays for tanks and the battery, where no intermediate crossmember goes.
+# Crossmember stations that the layout fixes (front face X). The build adds intermediate stations so that no gap
+# between two of them exceeds xm_max_pitch. `keep_out` gaps are bays for tanks and the battery, where no
+# intermediate station goes. The chassis design (data/chassis/chassis.yaml, CHASSIS.md) gives each station its
+# crossmember section and an outrigger each side, and adds the rails, raisers, drawbar and fittings.
 crossmembers:
   fixed:
-    - {id: front, x: body_x0, section: body}
-    - {id: XT front hinge, x: axle_x + xt_front_hinge_rear - xm_w, section: xt}
-    - {id: XT centre, x: axle_x + xt_centre_front, section: xt}
-    - {id: XT rear shock, x: axle_x + xt_rear_shock_front, section: xt}
-    - {id: battery-bay, x: battery_x0 - 10 - xm_w, section: body}
-    - {id: rear, x: body_x1 - xm_w, section: body}
+    - {id: front, x: body_x0}
+    - {id: XT front hinge, x: axle_x + xt_front_hinge_rear - xm_w}
+    - {id: XT centre, x: axle_x + xt_centre_front}
+    - {id: XT rear shock, x: axle_x + xt_rear_shock_front}
+    - {id: battery-bay, x: battery_x0 - 10 - xm_w}
+    - {id: rear, x: body_x1 - xm_w}
   keep_out: [[XT front hinge, XT centre], [XT centre, XT rear shock], [battery-bay, rear]]
-  sections:
-    xt: {name: "RHS 150 x 50 x 3, full rail height (Cruisemaster TB 070, tandem trailer up to 3,700 kg ATM)", kg_per_m: 8.96, maturity: estimate,
-         source: "Cruisemaster section from report 06 section 8, mass per metre for 150 x 50 x 3 C350L0 RHS (estimate until sized)"}
-    body: {name: "RHS 100 x 50 x 3 (block size, the engineer sizes it)", kg_per_m: 6.6, maturity: estimate,
-           source: "Block size chosen for this layout, mass per metre for 100 x 50 x 3 RHS (estimate)"}
-  outrigger: {name: "RHS outrigger to the body edge, raiser height (block size)", kg_per_m: 6.6, maturity: estimate,
-              source: "Block size chosen for this layout, mass per metre for 100 x 50 x 3 RHS (estimate)",
-              tyre_keep_out: 30}
 
 # Ways to shorten the living area, worked out by the build for the length comparison (TRAILER.md). None is
 # proposed in revision C, because the 5,500 mm body holds the living area and the 5,000 mm body cannot without
@@ -155,53 +148,6 @@ zones:
   underfloor: {name: Under the floor between the rails, box: [body_x0, -rail_in, rail_underside_z - 10, body_length, 2 * rail_in, floor_underside_z - rail_underside_z + 10]}
 
 items:
-  # ================================================================ drawbar and coupling (no drawbar box in revision C)
-  - id: DB-01
-    name: Drawbar member
-    system: drawbar
-    for: {s: [1, -1]}
-    bar: {p0: [db_apex_x, s * db_apex_y, rail_underside_z - db_depth / 2], p1: [body_x0, s * rail_c, rail_underside_z - db_depth / 2], w: rail_w, h: db_depth}
-    mass: {basis: per_length, kg_per_m: 11.6, maturity: estimate, source: "Older block model section, RHS 150 x 50 x 4 at 11.6 kg/m (the engineer sizes it)"}
-    note: Runs under the main rails (report 08 option 1), so the coupling end starts one rail depth lower.
-  - id: DB-02
-    name: Drawbar member under the rail
-    system: drawbar
-    for: {s: [1, -1]}
-    box: [body_x0, s * rail_c - rail_w / 2, rail_underside_z - db_depth, db_tail, rail_w, db_depth]
-    mass: {basis: per_length, kg_per_m: 11.6, measure: dx, maturity: estimate, source: "As DB-01"}
-    note: PLACEHOLDER length. It runs back to a crossmember (report 02 FAIL-01). The engineer sets where it ends.
-  - id: DB-03
-    name: Coupling head, Cruisemaster DO35 V3Plus, chains, breakaway kit, plugs and jockey wheel
-    system: drawbar
-    box: [-60, -90, coupling_z - 60, db_apex_x + 60, 180, rail_underside_z - coupling_z + 60]
-    cog: [80, 0, coupling_z + 40]
-    mass: {basis: declared, total_kg: 40, maturity: estimate, source: "Older block model: coupling, sway control and jockey wheel 45 kg, less the sway control now in RG-03"}
-  - id: DB-04
-    name: Stone guard
-    system: drawbar
-    box: [db_apex_x + 200, -500, rail_underside_z, sg_l, 1000, 10]
-    mass: {basis: declared, total_kg: 15, maturity: estimate, source: "Older block model: stone guard, legs and mud flaps 40 kg, split 15 here and 25 in BD-10"}
-
-  # ================================================================ chassis
-  - id: CH-01
-    name: Main rail
-    system: chassis
-    for: {s: [1, -1]}
-    box: [body_x0, s * rail_c - rail_w / 2, rail_underside_z, body_length, rail_w, rail_h]
-    mass: {basis: per_length, kg_per_m: 11.6, measure: dx, maturity: estimate, source: "Older block model section, RHS 150 x 50 x 4 at 11.6 kg/m (the engineer sizes it)"}
-  - id: CH-02
-    name: Raiser on the rail
-    system: chassis
-    for: {s: [1, -1]}
-    box: [body_x0, s * rail_c - rail_w / 2, rail_top_z, body_length, rail_w, raiser_h]
-    mass: {basis: per_length, kg_per_m: 6.6, measure: dx, maturity: estimate, source: "Block size for this layout, 100 x 50 x 3 RHS at 6.6 kg/m on packers (estimate)"}
-    note: Fills the gap from the rail top to the floor underside (report 06 section 8). Deeper rails would do the same job.
-  - id: CH-03
-    name: Suspension mounts, gussets and shock plates
-    system: chassis
-    point: [axle_x, 0, rail_underside_z + rail_h / 2]
-    mass: {basis: declared, total_kg: 50, maturity: estimate, source: "Older block model"}
-
   # ================================================================ running gear (report 06)
   - id: RG-01
     name: Cruisemaster XT Freestyle Air (4,500 kg build), arm, Firestone style 26 airbag, LC6 hub drum and 12 inch ABS-enabled electric brake
@@ -258,11 +204,6 @@ items:
     system: spare
     point: [body_x0 - spare_bracket_d - tyre_w / 2, 0, spare_z]
     mass: {basis: declared, total_kg: 13.5, maturity: estimate, source: "As RG-06 (report 09 section 6)"}
-  - id: SP-03
-    name: Spare wheel bracket on the front wall
-    system: spare
-    box: [body_x0 - spare_bracket_d, -150, spare_z - 150, spare_bracket_d, 300, 300]
-    mass: {basis: declared, total_kg: 6, maturity: estimate, source: "Estimate: a bolt-on 6-stud carrier plate on a frame through the front wall to the chassis (report 09 section 7 gives 4 to 8 kg for a drawbar bracket)"}
 
   # ================================================================ body shell (masses per area from the older block model)
   - id: BD-01

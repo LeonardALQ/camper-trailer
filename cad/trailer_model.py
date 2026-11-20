@@ -15,14 +15,16 @@ from .trailer import SYSTEM_LABELS, Layout
 
 SYSTEM_ORDER = ["drawbar", "chassis", "running_gear", "spare", "underfloor", "body", "roof", "living", "module", "stowage", "payload"]
 COLOURS = {
-    "drawbar": ("#5d6d7e", 1.0), "chassis": ("#566573", 1.0), "running_gear": ("#1c2833", 1.0),
+    "drawbar": ("#5d6d7e", 1.0), "chassis": ("#7f8c8d", 1.0), "running_gear": ("#1c2833", 1.0),
     "underfloor": ("#2e86c1", 0.9), "body": ("#d6dbdf", 0.18), "roof": ("#f4d03f", 0.9),
     "living": ("#d2b4de", 0.9), "stowage": ("#e59866", 1.0), "payload": ("#f7dc6f", 1.0), "spare": ("#1c2833", 1.0),
 }
 OVERRIDE = {"BD-01": ("#8c8c8c", 0.6), "RG-01": ("#7b7d7d", 1.0), "LA-07": ("#58d68d", 0.9),
             "LA-01": ("#76d7c4", 0.9), "UF-04": ("#f5b041", 1.0), "BD-13": ("#27ae60", 0.8), "GS-01": ("#c0392b", 1.0),
             "GS-02": ("#ecf0f1", 1.0), "GS-04": ("#e74c3c", 1.0), "BD-05": ("#b2bec3", 0.35), "BD-06": ("#b2bec3", 0.5),
-            "BD-07": ("#b2bec3", 0.5), "SP-03": ("#7b7d7d", 1.0)}
+            "BD-07": ("#b2bec3", 0.5), "DB-03": ("#2c3e50", 1.0), "DB-04": ("#aab7b8", 0.8)}
+ROLE_COLOURS = {"rail": "#566573", "raiser": "#7b8a8b", "drawbar": "#34495e", "brace": "#34495e", "outrigger": "#95a5a6",
+                "cm_xt": "#5d6d7e", "cm_end": "#5d6d7e", "cm_floor": "#839192", "plan_brace": "#a04000", "spare_post": "#5d6d7e"}
 
 
 def _bar(b):
@@ -75,7 +77,23 @@ class TrailerModel:
         self.groups: dict[str, list] = {}
         self.module_groups: dict[str, list] = {}
         self.names: dict[str, str] = {}
+        from .chassis import fitting_solids, member_solid
         for b in lay.blocks:
+            if "member" in b.extra or "fitting" in b.extra:
+                if "member" in b.extra:
+                    s = member_solid(b.extra["member"])
+                    col = ROLE_COLOURS.get(b.extra["role"], COLOURS["chassis"][0])
+                    a = 1.0
+                else:
+                    kids = fitting_solids(lay.chassis, b.extra["fitting"])
+                    if not kids:
+                        continue
+                    s = kids[0] if len(kids) == 1 else Compound(children=kids)
+                    col, a = OVERRIDE.get(b.id, ("#d35400", 1.0) if b.system == "chassis" else COLOURS["drawbar"])
+                s.label = f"{b.iid} {b.name}".replace("/", "-")
+                s.color = rgba(col, a)
+                self.groups.setdefault(b.system, []).append(s)
+                continue
             if b.system == "module" or b.keep_clear or b.box is None and b.cyl is None and b.bar is None:
                 continue
             s = block_shape(b)
@@ -122,3 +140,9 @@ def write_outputs(tm: TrailerModel, out: Path):
     (out / "trailer.viewer.json").write_text(json.dumps(shapes, separators=(",", ":")))
     export_step(comp, str(out / "trailer.step"), timestamp="2026-11-18T00:00:00")
     export_gltf(comp, str(out / "trailer.glb"), binary=True, linear_deflection=0.8, angular_deflection=0.5)
+    # the chassis and drawbar on their own, for the chassis page and the engineer
+    ch = Compound(label="ASM-CH Chassis and drawbar",
+                  children=[Compound(label=SYSTEM_LABELS[g], children=tm.groups[g]) for g in ("chassis", "drawbar") if g in tm.groups])
+    js = _viewer_js("ASM-CH", ch)
+    (out / "chassis.viewer.json").write_text(js[js.index("{"): js.rindex("}") + 1])
+    export_step(ch, str(out / "chassis.step"), timestamp="2026-11-20T00:00:00")

@@ -27,7 +27,6 @@ def test_every_load_case_is_analysed():
         assert lc in RES["governing"], lc
 
 
-@pytest.mark.xfail(reason="phase 1: the layout still carries the block chassis, the frame the designed one", strict=False)
 def test_ball_load_matches_the_layout():
     """The frame statics give the same towball as the trailer layout for the fully loaded case, before ATM scaling."""
     tc2 = next(c for c in EV["cases"] if c["id"] == "TC2")["nominal"]["towball_kg"]

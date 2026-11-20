@@ -106,7 +106,7 @@ class Analysis:
                 continue
             if b.id in UNSPRUNG:
                 w = min(self.ch.suspension, key=lambda w: abs(w["hub"][0] - b.cog[0]) + abs(w["hub"][1] - b.cog[1]))
-                out.append(Item(b.iid, b.name, m, w["hub"], "unsprung", w["id"]))
+                out.append(Item(b.iid, b.name, m, tuple(b.cog), "unsprung", w["id"]))
                 continue
             if b.load == "water":
                 tanks = lay.tanks()
@@ -267,16 +267,17 @@ class Analysis:
         out = {}
         for w in self.ch.suspension:
             P = np.asarray(w["pivot"], float)
-            Wu = sum((it.m * a for it in items if it.rule == "unsprung" and it.wheel == w["id"]), np.zeros(3))
+            un = [(it.m * a, np.asarray(it.p, float) - P) for it in items if it.rule == "unsprung" and it.wheel == w["id"]]
+            Wu = sum((F for F, _ in un), np.zeros(3))
+            Mu = sum((np.cross(r, F) for F, r in un), np.zeros(3))
             C = contact[w["id"]]
             rC = np.asarray(w["contact"]) - P
-            rH = np.asarray(w["hub"]) - P
             rB = np.asarray(w["airbag"]) - P
-            m_y = np.cross(rC, C)[1] + np.cross(rH, Wu)[1]
+            m_y = np.cross(rC, C)[1] + Mu[1]
             Fb = -m_y / rB[0]                         # airbag force on the chassis, + up
             Fbag_arm = np.array([0.0, 0.0, -Fb])
             H_arm = -(C + Wu + Fbag_arm)
-            M_arm = -(np.cross(rC, C) + np.cross(rH, Wu) + np.cross(rB, Fbag_arm))
+            M_arm = -(np.cross(rC, C) + Mu + np.cross(rB, Fbag_arm))
             M_arm[1] = 0.0
             self._apply(-H_arm, P, [(self.fm.pivot_nodes[w["id"]], 1.0)], q, M=-M_arm)
             self._apply(np.array([0.0, 0.0, Fb]), w["airbag"], self.fm.rail_fractions(w["side"], w["airbag"][0]), q)

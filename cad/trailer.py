@@ -24,9 +24,9 @@ from .partsdb import DATA, Mass, Params, Project
 
 TRAILER_YAML = DATA / "assemblies" / "trailer.yaml"
 GROWTH = {"estimate": 0.20, "calculated": 0.07, "spec": 0.0, "weighed": 0.0}
-STAGE_IDS = {"drawbar_structure": ("DB-01", "DB-02", "DB-03", "DB-04"), "stowage": ("GS-01", "GS-02", "GS-05")}
+STAGE_IDS = {"drawbar_structure": ("DB-KA", "DB-KB", "DB-RA", "DB-RB", "DB-BR", "DB-03", "DB-04"), "stowage": ("GS-01", "GS-02", "GS-05")}
 SYSTEM_LABELS = {
-    "drawbar": "Drawbar and coupling", "chassis": "Chassis", "running_gear": "Running gear", "body": "Body",
+    "drawbar": "Coupling and drawbar fittings", "chassis": "Chassis and drawbar", "running_gear": "Running gear", "body": "Body",
     "roof": "Roof", "underfloor": "Under the floor", "living": "Living area", "module": "Garage and bed module",
     "stowage": "Garage stowage", "spare": "Spare wheel", "payload": "Payload",
 }
@@ -223,13 +223,13 @@ class Layout:
                 b.qty, b.unit_mass = v / 1e6, m.kg_per_m2
             b.mass_kg = b.qty * b.unit_mass
 
-    def _crossmembers(self) -> list[Block]:
-        """Fixed crossmembers, intermediate ones at no more than xm_max_pitch, and outriggers at the same
-        stations wherever the tyres are not."""
+    def _stations(self) -> list[dict]:
+        """Crossmember stations: the fixed ones (body ends, XT kit, battery bay) and intermediate ones at no more than
+        xm_max_pitch, except in the tank and battery bays. Each gives the station's front face X."""
         cm = self.td["crossmembers"]
         V = self.V
         w = V["xm_w"]
-        fixed = [dict(id=f["id"], x=self.P.eval(f["x"], {}), section=f["section"]) for f in cm["fixed"]]
+        fixed = [dict(id=f["id"], x=self.P.eval(f["x"], {})) for f in cm["fixed"]]
         fixed.sort(key=lambda f: f["x"])
         keep_out = {tuple(k) for k in cm["keep_out"]}
         stations = []
@@ -241,42 +241,46 @@ class Layout:
             n = math.ceil(span / V["xm_max_pitch"]) - 1 if span > V["xm_max_pitch"] else 0
             for k in range(1, n + 1):
                 stations.append(dict(id=f"between {a['id']} and {b['id']} ({k})", x=a["x"] + w + span * k / (n + 1) - w / 2,
-                                     section="body", generated=True))
+                                     generated=True))
         stations.append(fixed[-1])
-        self.stations = stations
+        return stations
+
+    def _crossmembers(self) -> list[Block]:
+        """The designed chassis and drawbar (cad/chassis.py, CHASSIS.md) as mass lines and envelopes: every member,
+        fitting and the galvanising."""
+        from .chassis import Chassis
+        self.stations = self._stations()
+        ch = self.chassis = Chassis(self.V, self.stations)
         out = []
-        rin, rail_out = V["rail_in"], V["rail_outer_w"] / 2
-        z0, z1 = V["rail_underside_z"], V["rail_top_z"]
-        tyres = [b for b in self.blocks if b.id == "RG-02"]
-        ok = cm["outrigger"]["tyre_keep_out"]
-        for k, s in enumerate(stations, 1):
-            sec = cm["sections"][s["section"]]
-            b = Block(iid=f"CM-{k:02d}", id="CM", name=f"Crossmember, {s['id']}", system="chassis",
-                      box=(s["x"], -rin, z0, s["x"] + w, rin, z1), generated=s.get("generated", False),
-                      note=sec["name"] + (". PLACEHOLDER station from the pitch rule" if s.get("generated") else ""))
-            b.cog = _centre(b.box)
-            b.maturity, b.source, b.basis = sec["maturity"], sec["source"], "per_length"
-            b.qty, b.unit_mass = 2 * rin / 1000, sec["kg_per_m"]
-            b.mass_kg = b.qty * b.unit_mass
-            b.extra["station"] = s["id"]
+        for m in ch.members:
+            b = Block(iid=m.id, id=m.id, name=m.name, system="chassis", cog=m.cog, mass_kg=m.mass_kg, maturity="calculated",
+                      source=f"Calculated: {m.length:.0f} mm of {m.sec.name} at {m.sec.kg_m} kg/m (report 11 section table, Austube Mills DCT)",
+                      basis="per_length", unit_mass=m.sec.kg_m, qty=m.length / 1000, note=m.note or None,
+                      extra=dict(member=m, role=m.role, station=m.station))
+            if m.role == "drawbar" and m.p0[1] != m.p1[1]:
+                b.bar = dict(p0=m.p0, p1=m.p1, w=m.sec.b, h=m.sec.d)
+            else:
+                b.box = m.box()
             out.append(b)
-            # outriggers, both sides, at the raiser level, unless a tyre's swept space is there
-            if s["x"] + w < V["body_x0"] or s["x"] > V["body_x1"]:
-                continue
-            clash = any(s["x"] - ok < t.box[3] and s["x"] + w + ok > t.box[0] for t in tyres)
-            if clash:
-                continue
-            osec = cm["outrigger"]
-            for side in (1, -1):
-                ys = sorted((side * rail_out, side * V["half_bw"]))
-                o = Block(iid=f"OR-{k:02d}{'R' if side > 0 else 'K'}", id="OR", name=f"Outrigger, {s['id']}, {'road' if side > 0 else 'kerb'} side",
-                          system="chassis", box=(s["x"], ys[0], z1, s["x"] + w, ys[1], V["floor_underside_z"]),
-                          generated=True, note=osec["name"])
-                o.cog = _centre(o.box)
-                o.maturity, o.source, o.basis = osec["maturity"], osec["source"], "per_length"
-                o.qty, o.unit_mass = (ys[1] - ys[0]) / 1000, osec["kg_per_m"]
-                o.mass_kg = o.qty * o.unit_mass
-                out.append(o)
+        for f in ch.fittings:
+            n = len(f.at)
+            cog = tuple(sum(p[i] for p in f.at) / n for i in range(3))
+            system = "drawbar" if f.id.startswith("DB-") else "chassis"
+            b = Block(iid=f.id, id=f.id, name=f.name, system=system, cog=cog, mass_kg=f.mass_kg, maturity=f.maturity, source=f.source,
+                      unit_mass=f.mass_each, qty=f.qty, extra=dict(fitting=f))
+            spec = next(d for d in ch.data["fittings"] if d["id"] == f.id)
+            if "box" in spec:
+                b.box = _box(*ch.P.eval(spec["box"], {}))
+            out.append(b)
+        g = ch.galvanising()
+        zinc = [(m.area_m2 * ch.galv_rate(m.sec.t), m.cog) for m in ch.members] + \
+            [(f.area_m2_each * ch.galv_rate(f.t) / len(f.at) * f.qty, p) for f in ch.fittings if f.kind in ("plate", "tube") for p in f.at]
+        tot = sum(m for m, _ in zinc)
+        cog = tuple(sum(m * c[i] for m, c in zinc) / tot for i in range(3))
+        out.append(Block(iid="CH-G01", id="CH-G01", name="Hot-dip galvanising to AS/NZS 4680 after fabrication, inside and out",
+                         system="chassis", cog=cog, mass_kg=g["mass_kg"], maturity="calculated",
+                         source=(f"Calculated: {g['area_m2']:.1f} m2 inside and out at the AS/NZS 4680 minimum average coating masses "
+                                 "(report 11 section 1.4)")))
         return out
 
     def _module_blocks(self) -> list[Block]:
@@ -412,28 +416,6 @@ class Layout:
                     problems.append(f"{b.name} ({b.iid}) stands in the {k.name.lower()} ({k.iid}) by {-gap(k.box, b.box):.0f} mm")
         return dict(ok=not problems, problems=problems, smallest_gap_mm=None if worst == math.inf else round(worst, 1),
                     governing=worst_pair, items=len(solids), keep_clear=len(keep))
-
-    def tyre_envelopes(self) -> list[tuple[Block, tuple]]:
-        V = self.V
-        out = []
-        for t in self.blocks:
-            if t.id != "RG-02":
-                continue
-            cx, cy, cz = t.cyl["c"]
-            r, w = t.cyl["r"], t.cyl["w"]
-            out.append((t, (cx - r, cy - w / 2, 0.0, cx + r, cy + w / 2, cz + V["bump_travel"] + r)))
-        return out
-
-    def tyre_check(self) -> dict:
-        worst, who = math.inf, ""
-        for t, env in self.tyre_envelopes():
-            for b in self.blocks:
-                if not b.solid or b.system in ("running_gear",) or b.hollow:
-                    continue
-                g = gap(env, b.box)
-                if g < worst:
-                    worst, who = g, f"{t.name} ({t.iid}) at full bump to {b.name} ({b.iid})"
-        return dict(gap_mm=worst, governing=who)
 
     def width(self) -> dict:
         ys = [(b.box[1], b.box[4], b) for b in self.blocks if b.solid]
@@ -584,8 +566,7 @@ class Trailer:
         self._chassis = None
 
     def chassis_model(self, lay):
-        from .chassis import Chassis
-        return Chassis(lay.V, lay.stations)
+        return lay.chassis
 
     def chassis_results(self, lay) -> dict:
         """The frame analysis of the chassis for this layout (cad/chassis_fea.py), run once."""
@@ -956,7 +937,7 @@ def chassis_inputs(tr: Trailer, ev: dict) -> dict:
     mod0, mod1 = V["part_a_x"], V["in_x1"]
     xms = []
     for b in lay.blocks:
-        if b.id != "CM":
+        if not b.extra.get("role", "").startswith("cm"):
             continue
         x = b.box[0]
         under = []
@@ -974,7 +955,7 @@ def chassis_inputs(tr: Trailer, ev: dict) -> dict:
             under.append("rear wall")
         xms.append(dict(x_front=x, x_rear=b.box[3], station=b.extra.get("station"), section=b.note,
                         under=", ".join(dict.fromkeys(under)), generated=b.generated, mass_kg=b.mass_kg))
-    outriggers = sorted({o.box[0] for o in lay.blocks if o.id == "OR"})
+    outriggers = sorted({o.box[0] for o in lay.blocks if o.extra.get("role") == "outrigger"})
     bars = [b for b in lay.blocks if b.bar]
     ov = lay.overall()
     alt_track = 2000
@@ -983,7 +964,7 @@ def chassis_inputs(tr: Trailer, ev: dict) -> dict:
         rail_outer_width=V["rail_outer_w"], rail_inner_width=2 * V["rail_in"], rail_centres=2 * V["rail_c"],
         rail_outer_width_wide_track=alt_track - 2 * (V["cf"] - V["wheel_offset"]), track=V["track"], wide_track=alt_track,
         cf=V["cf"], wheel_offset=V["wheel_offset"],
-        rail_section=f"{V['rail_h']:.0f} x {V['rail_w']:.0f} mm block size (the engineer sizes it)",
+        rail_section="RHS 150 x 50 x 3 C450L0 with a continuous RHS 100 x 50 x 3 raiser (CHASSIS.md)",
         rail_x0=V["body_x0"], rail_x1=V["body_x1"], rail_length=V["body_length"],
         rail_underside_z=V["rail_underside_z"], rail_top_z=V["rail_top_z"], raiser_h=V["raiser_h"],
         floor_underside_z=V["floor_underside_z"], floor_z=V["floor_z"], ceiling_z=V["ceiling_z"],

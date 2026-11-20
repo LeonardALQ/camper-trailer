@@ -131,6 +131,7 @@ def cmd_trailer():
     chs = chassis_report(tr, tr.last_layout)
     chs["git"] = rep["git"]
     _write(BUILD / "chassis" / "chassis.json", chs)
+    _cut_list(chs, BUILD / "chassis" / "chassis-cut-list.csv")
     t1 = time.time()
     lay = tr.layout(**rep["solved"]["overrides"])
     write_outputs(TrailerModel(lay, model), out)
@@ -142,6 +143,22 @@ def cmd_trailer():
         failed_checks=fails, layout_s=round(t1 - t0, 1), model_s=round(time.time() - t1, 1)), indent=1))
     if not rep["recommended"]["matches_data"]:
         print(f"NOTE: the recommended body length {rep['recommended']['body_length']} differs from the data ({rep['body_length']})")
+
+
+def _cut_list(chs: dict, path: Path):
+    """One row per member and plate, for the fabricator (DRAFT until the engineer reviews CHASSIS.md)."""
+    import csv
+    with path.open("w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(["Mark", "Item", "Section or plate", "Length mm", "Qty", "kg each", "kg", "Note"])
+        for m in chs["members"]:
+            w.writerow([m["id"], m["name"], m["section"], round(m["length_mm"]), 1, round(m["mass_kg"], 2), round(m["mass_kg"], 2),
+                        m["note"] or ""])
+        for f in chs["fittings"]:
+            if f["kind"] in ("plate", "tube"):
+                size = " x ".join(f"{v:g}" for v in f["dims"]) + " plate" if f["dims"] else f["name"].split(",")[1].strip()
+                w.writerow([f["id"], f["name"], size, "", f["qty"], round(f["mass_each_kg"], 2), round(f["mass_kg"], 2), f["source"]])
+        w.writerow(["", "DRAFT, NOT FOR CONSTRUCTION until the engineer reviews CHASSIS.md", "", "", "", "", "", ""])
 
 
 def cmd_drawings():

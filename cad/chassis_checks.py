@@ -73,6 +73,6 @@ def report(tr, lay) -> dict:
         results={k: v for k, v in res.items() if k != "envelope"},
         envelope={lc: sorted(({"member": m, **r} for m, r in rows.items()), key=lambda r: -r["util"])
                   for lc, rows in res["envelope"].items()},
-        tyre=tr.tyre_arc(lay), params={k: ch.V[k] for k in ch.data["params"]},
+        tyre=tr.tyre_arc(lay), params=dict({k: ch.V[k] for k in ch.data["params"]}, spare_z=ch.V["spare_z"]),
     )
     return _r(out)
