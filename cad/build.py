@@ -166,6 +166,31 @@ def _cut_list(chs: dict, path: Path):
         w.writerow(["", "DRAFT, NOT FOR CONSTRUCTION until the engineer reviews CHASSIS.md", "", "", "", "", "", ""])
 
 
+def cmd_ute():
+    """The tow vehicle and its bike garage (UTE-GARAGE.md): mass budget, axle loads, checks, the 3D model and STEP."""
+    from .ute import Ute
+    from .ute_model import write_outputs
+    t0 = time.time()
+    garage, gmodel = None, None
+    try:
+        from .ute_garage import build_garage
+        garage, gmodel = build_garage()
+    except ImportError:
+        pass
+    ute = Ute(garage)
+    rep = ute.report()
+    rep["git"] = git_hash()
+    if garage:
+        rep["garage"] = {k: v for k, v in garage.items() if k != "lines"}
+    _write(BUILD / "ute" / "ute.json", rep)
+    write_outputs(ute, BUILD / "ute", gmodel)
+    fails = [c["id"] for c in rep["checks"] if c["severity"] == "fail" and not c["ok"]]
+    print(json.dumps(dict(cases=[(c["id"], round(c["nominal"]["mass_kg"]), round(c["nominal"]["front_kg"]), round(c["nominal"]["rear_kg"]),
+                                  round(c["nominal"]["ssf"], 3), round(c["growth"]["mass_kg"]), round(c["growth"]["rear_kg"]))
+                                 for c in rep["cases"]],
+                          failed_checks=fails, seconds=round(time.time() - t0, 1)), indent=1))
+
+
 def cmd_drawings():
     from .drawings import sheets
     sheets.main()
@@ -173,4 +198,4 @@ def cmd_drawings():
 
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "model"
-    {"data": cmd_data, "model": cmd_model, "trailer": cmd_trailer, "drawings": cmd_drawings}[cmd]()
+    {"data": cmd_data, "model": cmd_model, "trailer": cmd_trailer, "ute": cmd_ute, "drawings": cmd_drawings}[cmd]()

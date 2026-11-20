@@ -11,9 +11,9 @@ GIT_REV := $(shell git rev-parse --short HEAD 2>/dev/null || echo uncommitted)
 DOCKER  := docker run --rm --user $(UIDGID) -e HOME=/work/.home -e ASTRO_TELEMETRY_DISABLED=1 -e npm_config_cache=/work/.home/.npm -e GIT_REV=$(GIT_REV) -e SITE_URL -e SITE_BASE -v $(CURDIR):/work -w /work $(IMAGE)
 T       := timeout
 
-.PHONY: all image data model trailer check strict drawings site serve shots clean
+.PHONY: all image data model trailer ute check strict drawings site serve shots clean
 
-all: image data model trailer check drawings site
+all: image data model trailer ute check drawings site
 	@cat build/checks/summary.txt
 
 image:
@@ -28,9 +28,12 @@ model: data
 trailer: model
 	$(T) 1200 $(DOCKER) python -m cad.build trailer
 
+ute: model
+	$(T) 1200 $(DOCKER) python -m cad.build ute
+
 # pytest measures every check on the B-rep model and writes build/checks/checks.json.
 # Its exit code is recorded, not propagated, so a failing check shows on the site instead of hiding it.
-check: trailer
+check: trailer ute
 	@mkdir -p build/checks
 	-$(T) 1200 $(DOCKER) sh -c 'python -m pytest cad/tests -p no:cacheprovider -rxXf --junitxml=build/checks/junit.xml > build/checks/pytest.log 2>&1; echo $$? > build/checks/pytest.exit'
 	@tail -n 40 build/checks/pytest.log

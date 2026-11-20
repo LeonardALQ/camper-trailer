@@ -1,0 +1,231 @@
+# The tow vehicle: a Toyota LandCruiser 79 single cab chassis, V8 (VDJ79R, GXL, built 01/2017 to 08/2022), with the
+# Lovells 4,200 kg GVM kit (UTE-GARAGE.md, research report 16, PLAN-79.md decision log).
+# Ute frame (DIM-U1): X along the ute from the front axle centre, positive rearward. Y from the centreline, positive to
+# the road (right) side. Z up from the ground, ute level at its laden ride height. mm and kg.
+# Any number may be an expression over `params`. Masses carry a maturity as in report 02 MASS-06: spec (a maker's
+# figure, 0 % growth), calculated (7 %) and estimate (20 %).
+id: UTE-79
+name: Toyota LandCruiser 79 single cab V8, GXL, with the bike garage
+revision: A
+
+params:
+  # ---------------------------------------------------------------- the cab chassis (Toyota BBGJ1007, report 16)
+  wheelbase: 3180
+  front_overhang: 860          # bumper to the front axle, GXL
+  rear_overhang_cc: 1190       # cab chassis as delivered, to the lamp bracket
+  cab_back_x: 2060             # back of the cab behind the front axle
+  cab_width: 1790              # cab, mirrors excluded (WorkMate overall width)
+  cab_height: 1955             # roof, with 265 tyres
+  frame_x0: -625               # frame front ahead of the front axle
+  frame_x1: wheelbase + 1075   # frame end behind the rear axle
+  frame_w: 1046                # over the rails at the rear (assumption: 1,046 over the rails, 1,090 over the brackets)
+  rail_w: 60                   # rail flange width (estimate)
+  rail_h: 160                  # rail depth at the rear (estimate)
+  frame_top_z: 774             # rear frame top: about 724 mm on the factory springs (BBGJ1007 pp. 55 and 62) plus the
+                               # Lovells kit's lift of about 50 mm (estimate). The 805 mm tyre matches the 7.50R16's diameter
+  track_front: 1555            # with 265/70R16 tyres (BBGJ1007 p. 76). ET 0 wheels keep it
+  track_rear: 1460
+  tyre_d: 805                  # LT265/75R16 123/120, Yokohama G015 (report 09) or Toyo AT III (804)
+  tyre_w: 268                  # section width (estimate)
+  tyre_slr: 380                # static loaded radius (estimate, about 22 mm of deflection)
+  rear_bump: 110               # rear wheel travel to the bump stops (estimate, report 17 section 3.3). Measure on the vehicle
+  # deck-mount stations from the rear axle, negative ahead (BBGJ1007)
+  mount_dx: [-879, -490, 123, 490, 755, 1025]
+  # ---------------------------------------------------------------- the towbar and the coupling (report 16 section 5)
+  ball_behind_axle: 1350       # ball centre behind the rear axle (estimate, report 17 open question 6)
+  ball_x: wheelbase + ball_behind_axle
+  coupling_z: 450              # laden, the decision log's figure, +/- 20 mm
+  coupling_tol: 20
+  # ---------------------------------------------------------------- the bike box, until phase U2 designs it
+  box_gap_cab: 40              # body front wall to the back of the cab (Toyota: at least 39 mm at the roof)
+  box_x0: cab_back_x + box_gap_cab
+  box_l: 2590                  # outside length (report 17 section 6.2)
+  box_w: 1850                  # outside width: the decision log's limit (cab 1,790 mm plus 60 mm)
+  box_x1: box_x0 + box_l
+  deck_z: 909                  # box floor top (UTE-GARAGE.md: frame top + 6 mm pad + 50 mm runner + 75 mm crossmember + 4 mm floor)
+  box_h: 1502                  # floor top to the roof top: 1,460 inside, 40 mm roof bows, 2 mm roof skin
+  # ---------------------------------------------------------------- the trailer behind it (decision log targets)
+  trailer_atm: 3000            # the redesigned trailer's ATM target (PLAN-79.md, 11:25 UTC)
+  towball_design: 250          # the plan's own cap on the towball (decision log, GVM and GCM)
+  # ---------------------------------------------------------------- people and tools
+  people_x: 1660               # two adults, 400 mm ahead of the cab back (report 16)
+  people_z: 1000               # (estimate, report 17)
+
+# Limits. `src` is the source and `basis` its kind.
+limits:
+  gvm_kg: {v: 4200, src: "Lovells 4,200 kg Platinum kit TOYKIT080-GVM (report 16 section 2.3, decision log)", basis: installer}
+  front_axle_kg: {v: 1650, src: "Lovells TOYKIT080-GVM front axle rating", basis: installer}
+  rear_axle_kg: {v: 2550, src: "Lovells TOYKIT080-GVM rear axle rating", basis: installer}
+  weighed_max_kg: {v: 3850, src: "Decision log: hold the weighed ute to 3,850 kg with no more than 250 kg on the ball", basis: plan}
+  gcm_kg: {v: 6900, src: "Toyota 6,900 kg GCM kept (decision log, report 16 section 2.4)", basis: maker}
+  braked_towing_kg: {v: 3500, src: "Toyota LC70 spec data, June 2021", basis: maker}
+  towball_rating_kg: {v: 350, src: "Hayman Reese 03186RW, 3,500 kg and 350 kg (ARB)", basis: maker}
+  towball_plan_kg: {v: 250, src: "Decision log: no more than 250 kg on the ball", basis: plan}
+  front_share_min_pct: {v: 20, src: "Toyota BBGJ1007 section 1-2 (extracted text)", basis: maker}
+  cog_unladen_max_mm: {v: 1000, src: "Toyota BBGJ1007 section 1-2: unladen centre of gravity after body building", basis: maker}
+  box_width_max_mm: {v: 1850, src: "Decision log: cab 1,790 mm plus Toyota's 60 mm (BBGJ1007 section 1-2)", basis: maker}
+  rear_overhang_max_mm: {v: 1908, src: "ADR 43/04 clause 6.1.2.1: 60 % of the 3,180 mm wheelbase", basis: law}
+  wheel_rating_kg: {v: 1400, src: "ROH Trak 2 16 x 7 ET 0 5 x 150 (ROH fitment table)", basis: maker}
+  tyre_rating_kg: {v: 1550, src: "LT265/75R16 123/120 load range E at 80 psi (report 09)", basis: maker}
+  coupling_window_mm: {v: [350, 460], src: "VSB1 towball height, vehicle fully loaded (report 08)", basis: law}
+  ssf_reference: {v: 1.02, src: "Report 17 section 5.2, case B: the bikes in the trailer, a plain tray and the tools", basis: calculated}
+
+# The mass budget. `x`, `y`, `z` place each line's centre of gravity in the ute frame. `cases` lists the cases that
+# carry it (UC1 as built unladen, UC2 bikes aboard, UC3 towing with the bikes, UC4 towing with the bikes out,
+# UCB the report 17 reference with the bikes in the trailer). `box: true` lines are replaced by the designed bike
+# garage when phase U2's module is built.
+lines:
+  - id: UT-01
+    item: "Cab chassis, VDJ79R GXL (TJMNYQ3), kerb with a full 130 L fuel tank, no tray"
+    kg: 2202.5
+    x: wheelbase * 922.5 / 2202.5
+    z: 700
+    maturity: spec
+    source: "Toyota BBGJ1007: kerb 2,175 to 2,230 kg, rear axle 910 to 935 kg (GXL), centre of gravity 700 mm up. Mid-range figures"
+    cases: [UC1, UC2, UC3, UC4, UCB]
+  - id: UT-02
+    item: "Fuel, 130 L of diesel"
+    kg: 0
+    x: wheelbase + 500
+    z: 500
+    maturity: spec
+    source: "In Toyota's kerb mass (full tank). 130 L at 0.835 kg/L is 108.6 kg"
+    cases: [UC1, UC2, UC3, UC4, UCB]
+  - id: UT-03
+    item: "Bull bar and winch"
+    kg: 110
+    x: -800
+    z: 600
+    maturity: estimate
+    source: "Report 16 section 2.3 (estimate)"
+    cases: [UC1, UC2, UC3, UC4, UCB]
+  - id: UT-04
+    item: "Towbar, Hayman Reese 03186RW, with the tongue and the DO35 coupling's ute half"
+    kg: 35
+    x: wheelbase + 1200
+    z: 450
+    maturity: estimate
+    source: "Report 16 section 2.3 (estimate)"
+    cases: [UC1, UC2, UC3, UC4, UCB]
+  - id: UT-05
+    item: "Spare wheel and tyre, ROH Trak 2 with LT265/75R16, under the tray"
+    kg: 37.1
+    x: wheelbase + 700
+    z: 420
+    maturity: estimate
+    source: "Report 16 section 4: wheel 14.5 kg (estimate) and tyre 22.6 kg (G015, report 09). One spare on the ute (decision log)"
+    cases: [UC1, UC2, UC3, UC4, UCB]
+  - id: UT-06
+    item: "Two people"
+    kg: 160
+    x: people_x
+    z: people_z
+    maturity: estimate
+    source: "Report 16 (two adults of 80 kg, estimate)"
+    cases: [UC2, UC3, UC4, UCB]
+  - id: UT-07
+    item: "Tools, low and forward"
+    kg: 60
+    x: box_x0 + 350
+    z: frame_top_z - 150
+    maturity: estimate
+    source: "Report 17 open question 5: 60 kg in about 0.3 m3 (estimate)"
+    cases: [UC2, UC3, UC4, UCB]
+  - id: UT-08
+    item: "Bike box, empty, with the restraint kit, ramp, winch and security (report 17, until U2 designs it)"
+    kg: 440
+    x: box_x0 + box_l / 2
+    z: deck_z + 544
+    maturity: estimate
+    source: "Report 17 section 6.7: body 330, restraint 52, ramp and winch 45, security 13 kg. Centre of gravity 544 mm above the deck (section 5.1)"
+    cases: [UC1, UC2, UC3, UC4]
+    box: true
+  - id: UT-09
+    item: "Aprilia Tuareg 660 Rally with its panniers"
+    kg: 215
+    x: wheelbase + 123
+    y: 335
+    z: deck_z + 700
+    maturity: spec
+    source: "206 kg fuelled (owner) and 9 kg of panniers (estimate). Report 17 section 5.1 position, report 03's design CoG height"
+    cases: [UC2, UC3]
+    box: true
+  - id: UT-10
+    item: "Triumph Street Triple 765"
+    kg: 175
+    x: wheelbase + 5
+    y: -425
+    z: deck_z + 600
+    maturity: spec
+    source: "175 kg fuelled (owner). Report 17 section 5.1 position, report 03's design CoG height"
+    cases: [UC2, UC3]
+    box: true
+  - id: UT-11
+    item: "Towball load from the trailer"
+    kg: towball_design
+    x: ball_x
+    z: coupling_z
+    maturity: spec
+    source: "The plan's 250 kg cap (decision log). Carries no growth: it is set by the trailer's balance"
+    cases: [UC3, UC4]
+  - id: UT-12
+    item: "Plain tray, for the reference case with the bikes in the trailer"
+    kg: 200
+    x: box_x0 + 1200
+    z: 850
+    maturity: estimate
+    source: "Report 17 section 5.2 case B (estimate)"
+    cases: [UCB]
+
+cases:
+  - {id: UC1, name: "As built, unladen", note: "Kerb, accessories and the empty bike box. Toyota's 1,000 mm centre of gravity rule applies here"}
+  - {id: UC2, name: "Bikes aboard, no trailer", note: "Two people, tools and both bikes"}
+  - {id: UC3, name: "Towing with the bikes aboard", note: "As UC2 with 250 kg on the ball. The heaviest case"}
+  - {id: UC4, name: "Towing with the bikes out", note: "As UC3 without the bikes"}
+  - {id: UCB, name: "Reference: bikes in the trailer", note: "Report 17 case B: a plain tray and the tools, no towball"}
+
+# Checks. basis `both` checks the base masses and the masses with the growth allowance.
+checks:
+  - {id: UTE-01, title: "Ute mass within the 4,200 kg GVM", type: mass, quantity: mass, limit: gvm_kg, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
+     why: "The Lovells kit's GVM, once the NSW certifier has inspected it (report 16)"}
+  - {id: UTE-02, title: "Front axle within its 1,650 kg rating", type: mass, quantity: front, limit: front_axle_kg, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
+     why: "Lovells TOYKIT080-GVM front axle rating"}
+  - {id: UTE-03, title: "Rear axle within its 2,550 kg rating", type: mass, quantity: rear, limit: rear_axle_kg, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
+     why: "The binding limit of the plan (report 16 section 2.3). The bikes, the box and the towball all sit over or behind the rear axle"}
+  - {id: UTE-04, title: "Ute mass within the plan's 3,850 kg weighed limit", type: mass, quantity: mass, limit: weighed_max_kg, basis: nominal, cases: [UC1, UC2, UC3, UC4], severity: fail,
+     why: "Decision log: the weighed ute stays at or under 3,850 kg, so the rear axle keeps its margin"}
+  - {id: UTE-05, title: "Towball within the plan's 250 kg and the towbar's 350 kg", type: towball, severity: fail,
+     why: "The towbar is rated 350 kg. The plan caps the ball at 250 kg because each kilogram there adds about 1.4 kg to the rear axle"}
+  - {id: UTE-06, title: "Combination with a 3,000 kg trailer within the 6,900 kg GCM", type: gcm, basis: both, cases: [UC3, UC4], severity: fail,
+     why: "GCM is the ute's mass plus the trailer's less the towball, which the ute already carries (report 16 section 2.4)"}
+  - {id: UTE-07, title: "Front axle carries at least 20 % of the ute's mass", type: mass, quantity: front_share, limit: front_share_min_pct, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
+     why: "Toyota's minimum front axle share, so the ute steers and brakes"}
+  - {id: UTE-08, title: "Unladen centre of gravity under 1,000 mm with the body fitted", type: mass, quantity: cog_z, limit: cog_unladen_max_mm, basis: nominal, cases: [UC1], severity: fail,
+     why: "Toyota BBGJ1007 section 1-2"}
+  - {id: UTE-09, title: "Bike box no wider than 1,850 mm", type: width, limit: box_width_max_mm, severity: fail,
+     why: "Toyota allows a body 60 mm beyond the cab's outermost point. The decision log takes the cab at 1,790 mm"}
+  - {id: UTE-10, title: "Rear overhang no more than 1,908 mm behind the rear axle", type: overhang, limit: rear_overhang_max_mm, severity: fail,
+     why: "ADR 43/04, including any equipment. The towbar and its tongue count too"}
+  - {id: UTE-11, title: "Static stability factor with the bikes aboard (reported against 1.02 with the bikes in the trailer)", type: ssf, cases: [UC2, UC3], severity: report,
+     why: "Half the mean track over the centre of gravity height (NHTSA). Report 17 found 1.02 with the bikes in the trailer and about 0.80 to 0.82 on the ute"}
+  - {id: UTE-12, title: "Each rear wheel and tyre within its rating", type: wheel, basis: both, cases: [UC3], severity: fail,
+     why: "Half the rear axle load on each rear wheel. ROH rates the Trak 2 at 1,400 kg and the tyre carries 1,550 kg"}
+  - {id: UTE-13, title: "Coupling point window laden inside VSB1's 350 to 460 mm (reported)", type: coupling, severity: report,
+     why: "The decision log sets 450 mm, plus or minus 20 mm, laden. VSB1 asks for 350 to 460 mm with the vehicle fully loaded"}
+  - {id: UTE-14, title: "Trailer within the 3,500 kg braked towing capacity", type: towing, severity: fail,
+     why: "Toyota's braked towing capacity, and the towbar's rating"}
+
+# Simple solids for the 3D model: [x0, y0, z0, dx, dy, dz] in the ute frame, a colour and an opacity.
+solids:
+  - {id: CAB, name: "Cab", box: [-front_overhang + 700, -cab_width / 2, 900, cab_back_x + front_overhang - 700, cab_width, cab_height - 900], color: "#e8e8e8", alpha: 0.9}
+  - {id: BONNET, name: "Bonnet and front guards", box: [-front_overhang, -cab_width / 2, 700, 700, cab_width, 600], color: "#e8e8e8", alpha: 0.9}
+  - {id: BAR, name: "Bull bar (UT-03)", box: [-front_overhang - 80, -cab_width / 2 - 20, 380, 120, cab_width + 40, 650], color: "#2c3e50", alpha: 1.0}
+  - {id: RAIL-R, name: "Frame rail, road side", box: [frame_x0, frame_w / 2 - rail_w, frame_top_z - rail_h, frame_x1 - frame_x0, rail_w, rail_h], color: "#1c2833", alpha: 1.0}
+  - {id: RAIL-K, name: "Frame rail, kerb side", box: [frame_x0, -frame_w / 2, frame_top_z - rail_h, frame_x1 - frame_x0, rail_w, rail_h], color: "#1c2833", alpha: 1.0}
+  - {id: TOWBAR, name: "Towbar and tongue (UT-04)", box: [frame_x1 - 150, -150, coupling_z - 60, ball_x - frame_x1 + 200, 300, 140], color: "#34495e", alpha: 1.0}
+  - {id: SPARE, name: "Spare wheel under the tray (UT-05)", cyl: {c: [wheelbase + 700, 0, 420], r: tyre_d / 2, w: tyre_w, axis: z}, color: "#1c2833", alpha: 1.0}
+wheels:
+  - {id: FR, x: 0, y: track_front / 2}
+  - {id: FK, x: 0, y: -track_front / 2}
+  - {id: RR, x: wheelbase, y: track_rear / 2}
+  - {id: RK, x: wheelbase, y: -track_rear / 2}
