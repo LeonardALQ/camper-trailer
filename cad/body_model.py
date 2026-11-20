@@ -15,8 +15,19 @@ def _cut(shape, holes):
     return shape
 
 
+def _iid(lay, item, pick) -> str:
+    """The instance id of the layout item `item` that `pick` chooses, so each body solid is named by its own mass line."""
+    blocks = [b for b in lay.blocks if b.id == item]
+    chosen = [b for b in blocks if pick(b)] if len(blocks) > 1 else blocks
+    return chosen[0].iid if chosen else item
+
+
+def _at(b, axis: int) -> float:
+    return b.cog[axis] if b.cog else 0.0
+
+
 def body_solids(lay) -> list[tuple[str, object, tuple[str, float]]]:
-    """(label, shape, (colour, alpha)) for every body solid."""
+    """(label, shape, (colour, alpha)) for every body solid. A label starts with the solid's line in the mass schedule."""
     V = lay.V
     b = Body(lay, None)
     x0, x1, hw, wt, fz, H = V["body_x0"], V["body_x1"], V["half_bw"], V["wall_t"], V["floor_z"], V["interior_h"]
@@ -40,7 +51,8 @@ def body_solids(lay) -> list[tuple[str, object, tuple[str, float]]]:
     out.append(("BD-01 Floor, 30 mm woven roving and H80", box(x0, -hw, V["floor_underside_z"], L, 2 * hw, V["floor_t"]), ("#8c8c8c", 0.7)))
     for wall, y0 in (("kerb", -hw), ("road", hw - wt)):
         holes = [side_hole(o, y0, wt) for o in ops if o["wall"] == wall]
-        out.append((f"BD-03 {wall.capitalize()}-side wall, 35 mm GRP and XPS", _cut(box(x0, y0, fz, L, wt, H), holes), PANEL))
+        iid = _iid(lay, "BD-03", lambda b, w=wall: (_at(b, 1) < 0) == (w == "kerb"))
+        out.append((f"{iid} {wall.capitalize()}-side wall, 35 mm GRP and XPS", _cut(box(x0, y0, fz, L, wt, H), holes), PANEL))
         for o in ops:
             if o["wall"] != wall:
                 continue
@@ -49,7 +61,8 @@ def body_solids(lay) -> list[tuple[str, object, tuple[str, float]]]:
             out.append((label, box(x0 + o["u0"], yy, fz + o["z0"], o["w"], 10 if glass else wt, o["h"]), col))
     for wall, x in (("front", x0), ("rear", x1 - wt)):
         holes = [end_hole(o, x, wt) for o in ops if o["wall"] == wall]
-        out.append((f"BD-04 {wall.capitalize()} wall, 35 mm GRP and XPS", _cut(box(x, -hw + wt, fz, wt, 2 * (hw - wt), H), holes), PANEL))
+        iid = _iid(lay, "BD-04", lambda b, w=wall: (_at(b, 0) < x0 + L / 2) == (w == "front"))
+        out.append((f"{iid} {wall.capitalize()} wall, 35 mm GRP and XPS", _cut(box(x, -hw + wt, fz, wt, 2 * (hw - wt), H), holes), PANEL))
         for o in ops:
             if o["wall"] != wall:
                 continue
@@ -64,7 +77,9 @@ def body_solids(lay) -> list[tuple[str, object, tuple[str, float]]]:
     # mud flaps behind the rear tyres (BD-10)
     xf = V["axle_x"] + V["rear_hub_dx"] + V["tyre_d"] / 2 + 60
     for s in (1, -1):
-        out.append(("BD-10 Mud flap, 610 x 455 rubber", box(xf - 3, s * V["hub_y"] - 305, 300, 6, 610, 455), ("#1c2833", 1.0)))
+        iid = _iid(lay, "BD-10", lambda b, s=s: (_at(b, 1) > 0) == (s > 0))
+        side = "road" if s > 0 else "kerb"
+        out.append((f"{iid} Mud flap, {side} side, 610 x 455 rubber", box(xf - 3, s * V["hub_y"] - 305, 300, 6, 610, 455), ("#1c2833", 1.0)))
     return out
 
 

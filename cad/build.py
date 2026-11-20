@@ -83,6 +83,10 @@ def cmd_trailer():
     write_outputs(TrailerModel(lay, body=True), out)
     from .trailer_model import write_body_outputs
     write_body_outputs(lay, out)
+    from .partsmeta import trailer_lookup, write as write_parts
+    look = trailer_lookup(lay, body)
+    for name in ("trailer", "chassis", "body", "body-inside"):
+        write_parts(out / f"{name}.viewer.json", look)
     fails = [c["id"] for c in rep["checks"] if c["severity"] == "fail" and not c["ok"]]
     print(json.dumps(dict(
         axle_x=rep["solved"]["axle_x"], method=rep["solved"]["method"], tare_kg=rep["tare_kg"],
@@ -127,6 +131,11 @@ def cmd_ute():
         rep["bike_box_sweep"] = bike_box_sweep(ute, gmodel)
     _write(BUILD / "ute" / "ute.json", rep)
     write_outputs(ute, BUILD / "ute", gmodel)
+    from .partsmeta import ute_lookup, write as write_parts
+    look = ute_lookup(ute, gmodel)
+    for name in ("ute", "ute-loading"):
+        if (BUILD / "ute" / f"{name}.viewer.json").exists():
+            write_parts(BUILD / "ute" / f"{name}.viewer.json", look)
     fails = [c["id"] for c in rep["checks"] if c["severity"] == "fail" and not c["ok"]]
     print(json.dumps(dict(cases=[(c["id"], round(c["nominal"]["mass_kg"]), round(c["nominal"]["front_kg"]), round(c["nominal"]["rear_kg"]),
                                   round(c["nominal"]["ssf"], 3), round(c["growth"]["mass_kg"]), round(c["growth"]["rear_kg"]))

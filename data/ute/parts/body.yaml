@@ -5,6 +5,7 @@ group: ute-body
 parts:
   U-FLOOR:
     name: Floor plate
+    material: "5052-H32 aluminium sheet, 4.0 mm, with the U-POL Raptor coating on top"
     product: 5052-H32 marine sheet, 4.0 mm, with cut-outs for the wheel tubs and the two L-track rows
     maker: All Aluminium (stock)
     part_no: Marine sheet 5052-H32 4.0 mm (MAT-03)
@@ -17,6 +18,7 @@ parts:
     color: "#9aa5ab"
   U-TUB:
     name: Wheel tubs
+    material: "5052-H32 aluminium sheet, 3.0 mm"
     product: 5052-H32 sheet, 3.0 mm, folded and welded into the floor
     maker: Owner made
     qty: 0.9
@@ -29,6 +31,7 @@ parts:
     color: "#7f8c8d"
   U-SKIN:
     name: Wall and front skins
+    material: "5052-H32 aluminium sheet, 2.5 mm"
     product: 5052-H32 marine sheet, 2.5 mm
     maker: All Aluminium (stock)
     part_no: Marine sheet 5052-H32 2.5 mm (MAT-02)
@@ -42,6 +45,7 @@ parts:
     alpha: 0.35
   U-ROOF:
     name: Roof skin
+    material: "5052-H32 aluminium sheet, 2.0 mm"
     product: 5052-H32 marine sheet, 2.0 mm
     maker: All Aluminium (stock)
     part_no: Marine sheet 5052-H32 2.0 mm (MAT-01)
@@ -55,6 +59,7 @@ parts:
     alpha: 0.25
   U-FRAME:
     name: Body frame
+    material: "6061-T6 aluminium square tube, 40 x 40 x 3"
     product: 6061-T6 square tube 40 x 40 x 3
     maker: All Aluminium (stock)
     part_no: Square tube 40 x 40 x 3 (MAT-04)

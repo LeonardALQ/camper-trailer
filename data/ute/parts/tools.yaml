@@ -4,6 +4,7 @@ group: ute-tools
 parts:
   U-TOOLBOX:
     name: Tool chests
+    material: "Aluminium sheet, 1.6 mm"
     product: 1.6 mm aluminium chest with a lid, bolted to the wheel tub, 780 mm long and 200 mm high
     maker: Owner made or to choose
     qty: 2

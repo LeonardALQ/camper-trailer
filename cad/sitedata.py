@@ -134,6 +134,10 @@ def main():
     _copy(BUILD / "ute" / "ute.step", SITE / "public" / "downloads" / "ute.step")
     _copy(BUILD / "chassis" / "chassis.json", GEN / "chassis.json")
     _copy(BUILD / "chassis" / "chassis-cut-list.csv", SITE / "public" / "downloads" / "chassis-cut-list.csv")
+    # the part metadata beside each model, for the viewer's tooltip and part card (cad/partsmeta.py)
+    for folder, names in (("trailer", ("trailer", "chassis", "body", "body-inside")), ("ute", ("ute", "ute-loading"))):
+        for name in names:
+            _copy(BUILD / folder / f"{name}.parts.json", SITE / "public" / "models" / f"{name}.parts.json")
     import cairosvg
     reg = json.loads((BUILD / "drawings" / "register.json").read_text())
     live = [d for d in reg["drawings"] if d.get("status") != "RETIRED"]

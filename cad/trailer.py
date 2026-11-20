@@ -75,6 +75,7 @@ class Block:
     keep_clear: bool = False
     hollow: bool = False
     note: str | None = None
+    material: str | None = None                # what it is made of (the item's `material`, or the chassis section and grade)
     generated: bool = False
     extra: dict = field(default_factory=dict)
     growth_frac: float | None = None            # set when the line is made of parts with their own maturity
@@ -143,7 +144,7 @@ class Layout:
     # -- expansion -------------------------------------------------------
     def _expand(self, it: dict) -> list[Block]:
         known = {"id", "name", "system", "zone", "for", "box", "cyl", "bar", "point", "cog", "mass", "note",
-                 "load", "keep_clear", "hollow", "tank", "water", "when", "parts"}
+                 "load", "keep_clear", "hollow", "tank", "water", "when", "parts", "material"}
         extra = set(it) - known
         if extra:
             raise ValueError(f"trailer item {it.get('id')}: unknown keys {sorted(extra)}")
@@ -162,7 +163,7 @@ class Layout:
             iid = f"{it['id']}.{k}" if len(combos) > 1 else it["id"]
             b = Block(iid=iid, id=it["id"], name=it["name"], system=it["system"], zone=it.get("zone"),
                       load=it.get("load", "tare"), keep_clear=bool(it.get("keep_clear")), hollow=bool(it.get("hollow")),
-                      note=it.get("note"))
+                      note=it.get("note"), material=it.get("material"))
             dims = {}
             if "box" in it:
                 x0, y0, z0, dx, dy, dz = self.P.eval(it["box"], local)
@@ -261,11 +262,14 @@ class Layout:
         from .chassis import Chassis
         self.stations = self._stations()
         ch = self.chassis = Chassis(self.V, self.stations)
+        galv = "hot-dip galvanised after fabrication"
+        plate = ch.data["material"]["plate"].split(" (")[0]
         out = []
         for m in ch.members:
             b = Block(iid=m.id, id=m.id, name=m.name, system="chassis", cog=m.cog, mass_kg=m.mass_kg, maturity="calculated",
                       source=f"Calculated: {m.length:.0f} mm of {m.sec.name} at {m.sec.kg_m} kg/m (report 11 section table, Austube Mills DCT)",
                       basis="per_length", unit_mass=m.sec.kg_m, qty=m.length / 1000, note=m.note or None,
+                      material=f"{m.sec.name}, {m.sec.grade} steel (AS/NZS 1163), {galv}",
                       extra=dict(member=m, role=m.role, station=m.station))
             if m.role == "drawbar" and m.p0[1] != m.p1[1]:
                 b.bar = dict(p0=m.p0, p1=m.p1, w=m.sec.b, h=m.sec.d)
@@ -276,9 +280,16 @@ class Layout:
             n = len(f.at)
             cog = tuple(sum(p[i] for p in f.at) / n for i in range(3))
             system = "drawbar" if f.id.startswith("DB-") else "chassis"
-            b = Block(iid=f.id, id=f.id, name=f.name, system=system, cog=cog, mass_kg=f.mass_kg, maturity=f.maturity, source=f.source,
-                      unit_mass=f.mass_each, qty=f.qty, extra=dict(fitting=f))
             spec = next(d for d in ch.data["fittings"] if d["id"] == f.id)
+            if f.kind == "plate":
+                material = f"{f.t:g} mm plate, {plate}, {galv}"
+            elif f.kind == "tube":
+                sec = ch.sections[spec["section"]]
+                material = f"{sec.name}, {sec.grade} steel (AS/NZS 1163), {galv}"
+            else:
+                material = spec.get("material")
+            b = Block(iid=f.id, id=f.id, name=f.name, system=system, cog=cog, mass_kg=f.mass_kg, maturity=f.maturity, source=f.source,
+                      unit_mass=f.mass_each, qty=f.qty, material=material, extra=dict(fitting=f))
             if "box" in spec:
                 b.box = _box(*ch.P.eval(spec["box"], {}))
             out.append(b)
@@ -288,7 +299,7 @@ class Layout:
         tot = sum(m for m, _ in zinc)
         cog = tuple(sum(m * c[i] for m, c in zinc) / tot for i in range(3))
         out.append(Block(iid="CH-G01", id="CH-G01", name="Hot-dip galvanising to AS/NZS 4680 after fabrication, inside and out",
-                         system="chassis", cog=cog, mass_kg=g["mass_kg"], maturity="calculated",
+                         system="chassis", cog=cog, mass_kg=g["mass_kg"], maturity="calculated", material="Zinc",
                          source=(f"Calculated: {g['area_m2']:.1f} m2 inside and out at the AS/NZS 4680 minimum average coating masses "
                                  "(report 11 section 1.4)")))
         return out
@@ -869,7 +880,7 @@ def schedule(lay: Layout, tr: Trailer) -> list[dict]:
             iid=b.iid, id=b.id, item=b.name, system=b.system, group=SYSTEM_LABELS[b.system], drawing="CT-001",
             qty=b.qty, unit_mass=b.unit_mass, basis=b.basis, mass_kg=m, maturity=b.maturity,
             growth_pct=round(b.growth * 100), mass_with_growth_kg=m * (1 + b.growth),
-            source=b.source, note=b.note, mass_note=b.mass_note, load=b.load,
+            source=b.source, note=b.note, mass_note=b.mass_note, load=b.load, material=b.material,
             cog=list(b.cog) if b.cog else None, box=list(b.box) if b.box else None, generated=b.generated,
             cases=sorted(flags.get(b.iid, [])))))
     return rows

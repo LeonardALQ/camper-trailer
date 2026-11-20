@@ -10,7 +10,8 @@
 # body, u is the distance from the front wall's inner face (X = in_x0 + u).
 #
 # Any number may be an expression over `params`. axle_x is set by the axle solve (cad/trailer.py), which never changes
-# a limit or a block size.
+# a limit or a block size. An item's optional `material` says what it is made of. The 3D viewer on the site shows it on
+# the part's card (cad/partsmeta.py), and the chassis members and plates take theirs from the chassis data.
 id: ASM-TR
 name: Whole trailer, block layout
 revision: H
@@ -162,6 +163,7 @@ items:
   # ================================================================ running gear (reports 06 and 16)
   - id: RG-01
     name: Cruisemaster XT Freestyle Air (4,500 kg build), arm, Firestone style 26 airbag, LC5 M14 hub drum and 12 inch ABS-enabled electric brake
+    material: "Steel arm, galvanised (est.), rubber airbag, cast iron brake drum (est.)"
     note: "Hub: Cruisemaster LC5, 5 x 150 with M14 studs and a 110 mm spigot, the ute's pattern, on the 12 inch ABS-enabled A/T electric drum (decision log 11:25)."
     system: running_gear
     for: {h: [front_hub_dx, rear_hub_dx], s: [1, -1]}
@@ -170,6 +172,7 @@ items:
     mass: {basis: declared, unit_kg: 45, maturity: estimate, source: "https://www.diycaravans.com.au/shop/cruisemaster-xt-freestyle-coil-suspension-kit-tandem/", note: "180 kg per tandem kit for the coil version (retailer listing), a quarter per wheel. The air kit's weight is not published"}
   - id: RG-02
     name: Tyre, LT265/75R16 123/120 load range E, Yokohama Geolandar A/T G015
+    material: "Radial light-truck tyre, rubber on steel belts (est.)"
     system: running_gear
     for: {h: [front_hub_dx, rear_hub_dx], s: [1, -1]}
     cyl: {c: [axle_x + h, s * hub_y, hub_z], r: tyre_d / 2, w: tyre_w}
@@ -177,6 +180,7 @@ items:
     note: Rated 1,550 kg (load index 123), 80 psi maximum. The ute's tyre. The cylinder is the wheel and tyre envelope.
   - id: RG-06
     name: Wheel, ROH Trak 2 16 x 7 ET 0 steel, 5 x 150
+    material: "Steel wheel"
     system: running_gear
     for: {h: [front_hub_dx, rear_hub_dx], s: [1, -1]}
     point: [axle_x + h, s * hub_y, hub_z]
@@ -184,12 +188,14 @@ items:
     note: Rated 1,400 kg (measurements.yaml WHL-01). Its mass sits at the hub centre, inside the tyre envelope (RG-02).
   - id: RG-03
     name: Bosch TSC kit (ABS and sway control) and wheel nuts
+    material: "Electronic control unit and wheel speed sensors (est.), steel wheel nuts"
     note: The ECU sits under the centre crossmember, within 300 mm of the centreline (Bosch, report 06).
     system: running_gear
     box: [axle_x + xt_centre_front, -100, rail_underside_z - 45, xm_w, 200, 45]
     mass: {basis: declared, total_kg: 4.2, maturity: estimate, source: "Report 06: TSC 2 to 3 kg and nuts 1.2 kg (estimates)"}
   - id: RG-04
     name: XT Air supply, 12 V compressor, 11 litre tank, gauges, pressure switch, height valves and air lines
+    material: "Compressor, steel air tank (est.) and nylon air lines (est.)"
     note: On a shelf over the diesel heater, against the bathroom's front wall. The lines run along the rails to the four bags.
     system: running_gear
     zone: inside
@@ -197,6 +203,7 @@ items:
     mass: {basis: declared, total_kg: 10, maturity: estimate, source: "Report 06 section 2: 8 to 12 kg for the compressor, tank, panel and lines (estimate, not published)"}
   - id: RG-05
     name: Spare Firestone style 26 airbag with fittings, tube and Loctite 567
+    material: "Rubber airbag with its fittings"
     note: A punctured bag cannot be repaired (Cruisemaster CIS-006), so the spare travels with the trailer. It sits on the air supply.
     system: running_gear
     zone: inside
@@ -206,12 +213,14 @@ items:
   # ================================================================ spare wheel on the front wall (one of the plan's two, the other under the ute's tray)
   - id: SP-01
     name: Spare tyre, LT265/75R16 123/120
+    material: "Radial light-truck tyre, rubber on steel belts (est.)"
     system: spare
     box: [body_x0 - spare_bracket_d - tyre_w, -tyre_d / 2, spare_z - tyre_d / 2, tyre_w, tyre_d, tyre_d]
     mass: {basis: declared, total_kg: 22.6, maturity: spec, source: "As RG-02"}
     note: On the body's front wall above the drawbar, centred on Y. It fits the ute too. The box is the wheel and tyre envelope.
   - id: SP-02
     name: Spare wheel, ROH Trak 2 16 x 7 ET 0
+    material: "Steel wheel"
     system: spare
     point: [body_x0 - spare_bracket_d - tyre_w / 2, 0, spare_z]
     mass: {basis: declared, total_kg: 14.5, maturity: estimate, source: "As RG-06 (report 16 section 4)"}
@@ -219,6 +228,7 @@ items:
   # ================================================================ body shell (BODY.md, report 12, fixed roof, report 18 section 3.1)
   - id: BD-01
     name: Floor, 30 mm woven roving and Divinycell H80 sandwich, one piece, with vinyl
+    material: "Two 2.0 mm woven roving polyester skins (48 % glass) on 26 mm Divinycell H80 PVC foam, vinyl on top"
     system: body
     box: [body_x0, -half_bw, floor_underside_z, body_length, body_width, floor_t]
     parts:
@@ -227,6 +237,7 @@ items:
       - {item: "Vinyl over the 10.1 m2 inside at 1.5 kg/m2", kg: 15.2, basis: estimate}
   - id: BD-02
     name: Fixed roof, 40 mm GRP and XPS sandwich, bonded to the walls, flat top skin under the solar array
+    material: "2.0 mm top and 1.5 mm bottom Polydet GRP skins on 36.5 mm XPS foam of about 36 kg/m3"
     system: body
     box: [body_x0, -half_bw, ceiling_z, body_length, body_width, roof_t]
     parts:
@@ -234,6 +245,7 @@ items:
       - {item: Insert strips for the awning rail and the cable glands, kg: 1.3, basis: estimate}
   - id: BD-03
     name: Side walls, 35 mm GRP and XPS sandwich, one piece each, 1,950 mm tall
+    material: "Two 1.5 mm gelcoat GRP skins (Optiplan Polydet) on 32 mm XPS foam"
     system: body
     for: {s: [1, -1]}
     box: [body_x0, s * (half_bw - wall_t / 2) - wall_t / 2, floor_z, body_length, wall_t, interior_h]
@@ -242,6 +254,7 @@ items:
       - {item: Insert strips, kg: 3.0, basis: estimate}
   - id: BD-04
     name: End walls, full height, no rear portal
+    material: "Front: 2.0 mm outer and 1.5 mm inner Polydet GRP skins on 31.5 mm XPS. Rear: two 1.5 mm Polydet skins on 32 mm XPS"
     system: body
     for: {e: [0, 1]}
     box: [body_x0 + e * (body_length - end_wall_t), -half_in, floor_z, end_wall_t, 2 * half_in, interior_h]
@@ -250,12 +263,14 @@ items:
       - {item: Brackets, kg: 0.5, basis: estimate}
   - id: BD-07
     name: Entry door, Aussie Traveller DC 1,623 x 622, kerb side, hinged on its front edge
+    material: "Aluminium frame with a composite panel (est.)"
     system: body
     box: [lz_door_x, -half_in - wall_t, floor_z, lz_door_w, wall_t, lz_door_h]
     mass: {basis: declared, total_kg: 25, maturity: estimate, source: "Report 12 section 7: retailer listing, possibly a shipping mass"}
     note: VSB1 13.2.1 wants one door on the left side or the rear. The cut-out is 1,626 x 625 mm with a 90 mm top radius.
   - id: BD-08
     name: Extrusions, adhesive, sealant and the body mount fixings
+    material: "Aluminium extrusions, MS polymer adhesive and sealant, galvanised fixings (est.)"
     system: body
     point: [body_x0 + body_length / 2, 0, floor_z + interior_h / 2]
     parts:
@@ -272,6 +287,7 @@ items:
       - {item: "Bathroom vent in the road-side wall, Carafan Sahara CP700 with ducts, kitchen opening frame, cassette door", kg: 17.4, basis: estimate}
   - id: BD-10
     name: Mud flap behind the rear wheel, 610 x 455 mm rubber, on a galvanised hanger from the XT rear shock outrigger
+    material: "6 mm rubber flap on a galvanised steel hanger"
     system: body
     for: {s: [1, -1]}
     point: [axle_x + rear_hub_dx + tyre_d / 2 + 60, s * hub_y, 530]
@@ -286,6 +302,7 @@ items:
     mass: {basis: declared, total_kg: 60, maturity: estimate, source: "Older block model, kept until the systems design (report 12 section 10)"}
   - id: BD-13
     name: Awning, Fiamma F45s 450, kerb side, below the roof line
+    material: "Aluminium case and arms, vinyl fabric (est.)"
     system: body
     box: [body_x0 + 95, -half_bw - 100, ceiling_z - 160, 4230, 100, 120]
     parts:
@@ -296,6 +313,7 @@ items:
   # ================================================================ roof
   - id: RF-01
     name: Solar panel, Sunman eArc SMF430F-12X12UW, 430 W, glass-free and frameless, bonded to the roof
+    material: "Glass-free, frameless polymer laminate over silicon cells"
     system: roof
     for: {k: [0, 1], s: [1, -1]}
     box: [solar_x0 + k * solar_l, "min(0, s * solar_w)", roof_top_z, solar_l, solar_w, 2]
@@ -337,6 +355,7 @@ items:
     mass: {basis: declared, total_kg: 20, maturity: estimate, source: "Older block model"}
   - id: UF-04
     name: Battery box, sealed 2 mm aluminium with lid gasket, cable glands, a vent to the road side and a fuse per battery
+    material: "2 mm aluminium sheet, sealed"
     system: underfloor
     zone: underfloor
     box: [battery_x0, -400, floor_underside_z - 10 - 250, battery_l, 800, 250]
@@ -352,6 +371,7 @@ items:
     note: Lying on its side in the battery box (UF-04), terminals sideways, 235 x 648 x 162 mm. Two modules give 10.24 kWh (opt_batteries).
   - id: UF-06
     name: Heater fuel tank, 15 L HDPE, with line and filter
+    material: "HDPE"
     system: underfloor
     zone: underfloor
     box: [diesel_tank_x0, -200, floor_underside_z - 10 - 100, diesel_tank_l, 400, 100]
@@ -367,6 +387,7 @@ items:
   # ================================================================ the sealed drawbar box (decision log 12:45)
   - id: DX-01
     name: Drawbar box, sealed 2 mm aluminium with a lockable lid, low vent and drain to outside, on brackets across the drawbar members
+    material: "2 mm aluminium sheet, sealed"
     system: stowage
     hollow: true
     box: [dbx_x0, -dbx_w / 2, dbx_z0, dbx_l, dbx_w, dbx_h]

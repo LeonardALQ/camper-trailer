@@ -67,6 +67,7 @@ class Part(Strict):
     mass: Mass | None = None
     size: str | None = None
     rating: str | None = None
+    material: str | None = None    # what it is made of, shown in the 3D viewer's part card (S-01)
     use: str | None = None
     links: dict[str, str] = {}
     stockist_au: str | None = None

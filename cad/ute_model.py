@@ -37,7 +37,8 @@ def vehicle_solids(ute) -> list:
     for w in ute.d["wheels"]:
         x, y = ute.P.eval(w["x"], {}), ute.P.eval(w["y"], {})
         shp = Pos(x, y, V["tyre_slr"]) * Rot(90, 0, 0) * Cylinder(V["tyre_d"] / 2, V["tyre_w"])
-        shp.label, shp.color = f"Wheel {w['id']}, ROH Trak 2 with LT265/75R16", rgba("#1c2833")
+        side = ("front" if w["id"][0] == "F" else "rear") + (", kerb side" if w["id"][1] == "K" else ", road side")
+        shp.label, shp.color = f"WH-{w['id']} Wheel and tyre, {side}, ROH Trak 2 with LT265-75R16", rgba("#1c2833")
         vehicle.append(shp)
     return vehicle
 

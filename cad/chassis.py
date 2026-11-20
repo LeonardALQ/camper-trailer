@@ -47,6 +47,7 @@ class Props:
     Aw_depth: float
     Aw_width: float
     area_m2_per_m: float
+    grade: str = ""
 
     def frame_section(self) -> Section:
         return Section(self.name, self.A, self.I_strong, self.I_weak, self.J)
@@ -77,7 +78,7 @@ def load_sections() -> dict[str, Props]:
             id=s["id"], name=s["designation"].replace("x", " x "), d=d, b=b, t=t, ro=ro, kg_m=s["mass_kg_per_m"],
             A=s["A_mm2"], I_strong=s["Ix_e6mm4"] * 1e6, I_weak=s["Iy_e6mm4"] * 1e6, J=s["J_e6mm4"] * 1e6,
             Z_strong=zx, Z_weak=min(zy, zey * 1e3) if zey else zy, C=s["C_e3mm3"] * 1e3, fy=s["fy_mpa"],
-            Aw_depth=2 * (d - 2 * t) * t, Aw_width=2 * (b - 2 * t) * t, area_m2_per_m=area)
+            Aw_depth=2 * (d - 2 * t) * t, Aw_width=2 * (b - 2 * t) * t, area_m2_per_m=area, grade=s.get("grade", ""))
     return out
 
 

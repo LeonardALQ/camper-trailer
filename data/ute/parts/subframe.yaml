@@ -6,6 +6,7 @@ group: ute-subframe
 parts:
   U-RUNNER:
     name: Subframe runners
+    material: "6061-T6 aluminium RHS 75 x 50 x 3, on a 6 mm rubber strip"
     product: 6061-T6 RHS 75 x 50 x 3, laid flat on each rail over a 6 mm rubber strip
     maker: All Aluminium (stock)
     part_no: RHS 75 x 50 x 3 (MAT-07)
@@ -18,6 +19,7 @@ parts:
     color: "#636e72"
   U-STEEL-CM:
     name: Steel anchor crossmembers
+    material: "C350L0 steel RHS 76 x 38 x 3, galvanised"
     product: Galvanised C350L0 RHS 76 x 38 x 3, laid flat, one under each L-track row, full width
     maker: Orrcon or equal (stock)
     qty: 3.7
@@ -30,6 +32,7 @@ parts:
     color: "#2c3e50"
   U-PACKER:
     name: Track packers
+    material: "Galvanised steel flat bar, 76 x 2"
     product: Galvanised steel flat bar 76 x 2 mm on top of each steel crossmember
     maker: Owner made
     qty: 0.28
@@ -40,6 +43,7 @@ parts:
     color: "#2c3e50"
   U-STRIP:
     name: Floor strips beside each track
+    material: "6060 aluminium flat bar, 20 x 10"
     product: 6060 aluminium flat bar 20 x 10 mm, two each side of each track, on isolating tape
     maker: Stock
     qty: 0.15
@@ -50,6 +54,7 @@ parts:
     color: "#636e72"
   U-CM:
     name: Crossmembers and outriggers
+    material: "6061-T6 aluminium SHS 50 x 50 x 3"
     product: 6061-T6 SHS 50 x 50 x 3
     maker: All Aluminium (stock)
     qty: 11
@@ -61,6 +66,7 @@ parts:
     color: "#636e72"
   U-MOUNT-FIRM:
     name: Firm mounts, front two pairs
+    material: "Steel angle or spacer, M12 property class 8.8 bolts"
     product: Mount angle or spacer with two M12 property class 8.8 bolts, hardened washers and nyloc nuts through Toyota's bracket
     maker: Owner made
     qty: 4
@@ -72,6 +78,7 @@ parts:
     color: "#e17055"
   U-MOUNT-SPRING:
     name: Compliant mounts, rear four pairs
+    material: "Steel angle or spacer, M12 8.8 bolt, rubber body-mount cushions"
     product: Mount angle or spacer with one M12 8.8 bolt through a stack of two rubber body-mount cushions, a steel sleeve that sets the preload, and an oversize safety washer
     maker: Product to choose (body-mount cushions)
     qty: 8
@@ -83,6 +90,7 @@ parts:
     color: "#fdcb6e"
   U-SUB-FIX:
     name: Floor bolts, isolators and sealant
+    material: "Steel M8 bolts (est.), nylon sleeves, polyurethane sealant"
     product: M8 bolts through the floor into the crossmembers, nylon isolating sleeves, polyurethane sealant
     maker: Product to choose
     qty: 1

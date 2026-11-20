@@ -4,6 +4,7 @@ group: ute-doors
 parts:
   U-LEAF:
     name: Barn door leaves
+    material: "5052 aluminium sheet, 2.5 mm, on an aluminium SHS 25 x 25 x 3 frame (est.), EPDM seal"
     product: Two leaves, 2.5 mm 5052 skin on an SHS 25 x 25 x 3 frame with a mid rail, EPDM bulb seal
     maker: Owner made
     qty: 2
@@ -16,6 +17,7 @@ parts:
     alpha: 0.6
   U-CAMBAR:
     name: Cam bar locking gear
+    material: "Steel cam bar, keepers and handle, zinc plated (est.)"
     product: Full-height truck-van cam bar with top and bottom keepers and a handle that takes the padlock hasp
     maker: Product to choose
     qty: 1
@@ -27,6 +29,7 @@ parts:
     color: "#2d3436"
   U-KDOOR:
     name: Kerb-side lift-up door
+    material: "5052 aluminium sheet, 2.5 mm, on an aluminium SHS 25 x 25 x 3 frame (est.)"
     product: 2.5 mm 5052 skin on an SHS 25 x 25 x 3 frame, top-hinged, on two gas struts, with a keyed latch and a hasp
     maker: Owner made
     qty: 1
@@ -39,6 +42,7 @@ parts:
     alpha: 0.6
   U-HINGES:
     name: Continuous hinges and hinge-side dog bolts
+    material: "Stainless steel"
     product: Stainless continuous (piano) hinges, pins peened, with dog bolts on each leaf's hinge edge
     maker: Product to choose
     qty: 4.1
@@ -48,6 +52,7 @@ parts:
     cog: {at: [1980, -270, 900], basis: "Length-weighted centre of the three hinges, estimate"}
   U-LATCHES:
     name: Shoot bolts, everyday latches, gas struts and seals
+    material: "Stainless steel latches and shoot bolts (est.), steel gas struts, EPDM seal"
     product: Two shoot bolts in the kerb-side leaf (LCK-04), three keyed T-handle latches (LCK-02), two gas struts for the kerb door, about 10 m of EPDM bulb seal
     maker: Product to choose
     qty: 1

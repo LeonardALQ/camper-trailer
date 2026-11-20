@@ -4,6 +4,7 @@ group: ute-security
 parts:
   U-HASP:
     name: Padlocks and shrouded hasps
+    material: "Boron steel shackles (ABLOY PL362), hardened steel hasps (est.)"
     product: Two ABLOY PL362 padlocks (15 mm boron steel shackle, grade 6 to EN 12320), one on a shrouded hasp over the cam handle, one on the kerb door's hasp
     maker: ABLOY
     part_no: PL362
@@ -16,6 +17,7 @@ parts:
     color: "#d63031"
   U-ANCHOR:
     name: Ground anchors and chains
+    material: "Hardened steel chain and anchor"
     product: Ground anchor and 1.5 m hardened chain per bike, the anchor bolted through the floor into a crossmember
     maker: Product to choose
     qty: 2

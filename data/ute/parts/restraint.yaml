@@ -4,6 +4,7 @@ group: ute-restraint
 parts:
   U-CHOCK:
     name: Front wheel chocks
+    material: "Steel, powder coated (est.)"
     product: Condor SC-2000 Trailer-Only Chock, trailer adapter included
     maker: Condor
     part_no: 4101-0137
@@ -18,6 +19,7 @@ parts:
     color: "#e67e22"
   U-TRACK:
     name: Flush L-track rows
+    material: "Aluminium extrusion"
     product: Kinedyne Series L medium-duty aluminium track with flanges, recess-mounted
     maker: Kinedyne
     qty: 3.53
@@ -29,6 +31,7 @@ parts:
     color: "#9aa5ab"
   U-FITTING:
     name: Track fittings
+    material: "Steel, zinc plated (est.)"
     product: US Cargo Control double-stud L-track fitting, or an equal rated fitting
     maker: US Cargo Control
     qty: 14
@@ -40,6 +43,7 @@ parts:
     color: "#566573"
   U-STRAP:
     name: Ratchet straps
+    material: "Polyester webbing, steel ratchet and hooks"
     product: SpanSet Australia Tradesman 35 mm, LC 1,000 kg configuration, closed hooks
     maker: SpanSet Australia
     qty: 10
@@ -52,6 +56,7 @@ parts:
     color: "#f1c40f"
   U-LOOPS:
     name: Soft loops and the Street Triple's bar harness
+    material: "Polyester webbing (est.)"
     product: Custom Tie-Downs 1.5 in soft loops (11) and a Canyon Dancer Bar Harness II
     maker: Custom Tie-Downs, Canyon Dancer
     qty: 1
@@ -61,6 +66,7 @@ parts:
     cog: {at: [900, "(tuareg_y + st_y) / 2", 900], basis: "At the bikes' tie-down points, estimate"}
   U-COAT:
     name: Floor and lower-wall coating, anchor fixings
+    material: "Two-part polyurethane bedliner (U-POL Raptor), A4 stainless steel bolts"
     product: U-POL Raptor black, 3 coats with traction additive. M8 A4 bolts and crush tubes for the track
     maker: U-POL, product to choose
     qty: 1
@@ -69,6 +75,7 @@ parts:
     cog: {at: [1260, 0, 60], basis: "Floor and the lowest 400 mm of the walls, estimate"}
   U-WINCH:
     name: Loading winch
+    material: "Steel and aluminium winch (est.), synthetic rope"
     product: WARN VRX 25-S 12 V winch with 15 m of 4.8 mm synthetic rope, remote and two quick-release plates
     maker: WARN
     part_no: "101020"
@@ -88,6 +95,7 @@ parts:
     color: "#34495e"
   U-RAMP:
     name: Loading ramp
+    material: "Aluminium"
     product: Black Widow MF-12038 arched folding full-width ramp, folded on its edge in the slot across the back
     maker: Black Widow
     part_no: MF-12038
@@ -108,6 +116,7 @@ parts:
     color: "#2d3436"
   U-VENT:
     name: Low vents with flap valves
+    material: "Plastic vents with flap valves (est.)"
     product: Two low vents in the rear corners
     maker: Product to choose (Camec range)
     qty: 2
