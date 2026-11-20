@@ -1,0 +1,11 @@
+---
+// Starlight's footer, plus the spreadsheet tools for every table on the page (src/scripts/sheet.ts). Starlight renders
+// the footer on every page, so this is how the script reaches them all.
+import Default from '@astrojs/starlight/components/Footer.astro';
+---
+
+<Default />
+
+<script>
+  import '../scripts/sheet.ts';
+</script>

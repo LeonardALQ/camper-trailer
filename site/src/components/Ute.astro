@@ -110,7 +110,7 @@ const drawings = ['CT-701', 'CT-702', 'CT-703', 'CT-704'];
             <tr><td>{x.id}</td><td>{x.item}</td><td class="num">{n(x.kg, 1)}</td><td>{x.maturity}</td><td class="num">{n(x.kg_growth, 1)}</td><td>{x.source}</td></tr>
           )),
         ])}
-        <tr><td></td><td><strong>Box, empty</strong></td><td class="num"><strong>{n(g.box_kg, 1)}</strong></td><td></td>
+        <tr class="row-total"><td></td><td><strong>Box, empty</strong></td><td class="num"><strong>{n(g.box_kg, 1)}</strong></td><td></td>
           <td class="num"><strong>{n(g.box_kg_growth, 1)}</strong></td><td>Report 17: 440 kg</td></tr>
         {r.lines.filter((x: any) => x.group === 'ute' || x.group === 'bikes' || x.id === 'U-TOOLS').map((x: any) => (
           <tr><td>{x.id}</td><td>{x.item}</td><td class="num">{n(x.kg, 1)}</td><td>{x.maturity}</td><td class="num">{n(x.kg_growth, 1)}</td>

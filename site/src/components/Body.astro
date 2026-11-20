@@ -55,7 +55,7 @@ const m = r.mounts;
           <tr><td>{x.iid}</td><td>{x.item}</td><td class="num">{n(x.mass_kg, 1)}</td><td>{x.maturity}</td><td class="num">{n(x.growth_pct)}</td>
             <td class="num">{n(x.mass_with_growth_kg, 1)}</td><td>{x.source}</td></tr>
         ))}
-        <tr><td></td><td><strong>Body</strong></td><td class="num"><strong>{n(bodyKg, 1)}</strong></td><td></td><td></td>
+        <tr class="row-total"><td></td><td><strong>Body</strong></td><td class="num"><strong>{n(bodyKg, 1)}</strong></td><td></td><td></td>
           <td class="num"><strong>{n(bodyGr, 1)}</strong></td><td></td></tr>
       </tbody>
     </table>

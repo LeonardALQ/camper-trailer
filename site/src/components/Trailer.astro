@@ -137,7 +137,7 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
       <thead><tr><th>Group</th><th class="num">Tare kg</th><th class="num">With growth kg</th></tr></thead>
       <tbody>
         {groupRows.map(([g, v]) => (<tr><td>{g}</td><td class="num">{n(v.mass_kg)}</td><td class="num">{n(v.growth_kg)}</td></tr>))}
-        <tr><td>Tare</td><td class="num">{n(tareGroups)}</td><td class="num">{n(groupRows.reduce((s, [, g]) => s + g.growth_kg, 0))}</td></tr>
+        <tr class="row-total"><td>Tare</td><td class="num">{n(tareGroups)}</td><td class="num">{n(groupRows.reduce((s, [, g]) => s + g.growth_kg, 0))}</td></tr>
       </tbody>
     </table>
   </div>

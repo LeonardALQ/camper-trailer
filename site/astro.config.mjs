@@ -12,7 +12,8 @@ export default defineConfig({
     starlight({
       title: 'Camper trailer design',
       description: 'Design, model and drawings for a one-off off-road camper trailer and its tow vehicle, a LandCruiser 79.',
-      customCss: ['./src/styles/site.css'],
+      customCss: ['./src/styles/site.css', './src/styles/sheet.css'],
+      components: { Footer: './src/components/Footer.astro' },
       sidebar: [
         { label: 'Home', link: '/' },
         { label: 'Whole trailer', link: '/trailer/' },
