@@ -16,6 +16,7 @@ export default defineConfig({
       sidebar: [
         { label: 'Home', link: '/' },
         { label: 'Whole trailer', link: '/trailer/' },
+        { label: 'Chassis', link: '/chassis/' },
         { label: 'Garage and bed', link: '/garage-bed/' },
         { label: 'Measurements', link: '/measurements/' },
         { label: 'Drawings', link: '/drawings/' },

@@ -27,6 +27,7 @@ RESEARCH = [
     ("08-coupling-and-hitch.md", "Coupling and hitch", 8),
     ("09-trailer-wheels-and-tyres.md", "Trailer wheels, tyres and stud pattern", 9),
     ("10-car-wheels-and-tyres.md", "The car’s own wheels and tyres for towing", 10),
+    ("11-chassis-design.md", "Chassis and drawbar design basis", 11),
 ]
 
 
@@ -57,6 +58,10 @@ def main():
     _copy(BUILD / "trailer" / "trailer.viewer.json", SITE / "public" / "models" / "trailer.json")
     _copy(BUILD / "trailer" / "trailer.step", SITE / "public" / "downloads" / "trailer.step")
     _copy(BUILD / "trailer" / "trailer.glb", SITE / "public" / "downloads" / "trailer.glb")
+    _copy(BUILD / "trailer" / "chassis.viewer.json", SITE / "public" / "models" / "chassis.json")
+    _copy(BUILD / "trailer" / "chassis.step", SITE / "public" / "downloads" / "chassis.step")
+    _copy(BUILD / "chassis" / "chassis.json", GEN / "chassis.json")
+    _copy(BUILD / "chassis" / "chassis-cut-list.csv", SITE / "public" / "downloads" / "chassis-cut-list.csv")
     import cairosvg
     reg = json.loads((BUILD / "drawings" / "register.json").read_text())
     for d in reg["drawings"]:

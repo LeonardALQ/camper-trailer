@@ -8,7 +8,7 @@ The site is published at https://leonardalq.github.io/camper-trailer/ and rebuil
 push to `main`.
 
 The design baseline is `DESIGN.md`, its parts list is `garage-bed/BOM.md`, the whole-trailer layout is
-`TRAILER.md`, and the research behind them is in `research/`. The build reads those files and never edits them.
+`TRAILER.md`, the chassis and drawbar design is `CHASSIS.md`, and the research behind them is in `research/`. The build reads those files and never edits them.
 
 ## Layout
 
@@ -17,6 +17,7 @@ data/                 the single source of truth
   parts/*.yaml        one entry per BOM line (G-01 to A-02), the bikes, and context parts (no mass)
   assemblies/         garage-bed.yaml: named parameters and every placement from DESIGN.md
                       trailer.yaml: the whole-trailer block layout in the project datum (TRAILER.md)
+  chassis/            chassis.yaml: members, fittings, load cases and fatigue details (CHASSIS.md); sections.yaml: report 11's section table
   checks.yaml         module checks CLR-01 to CLR-10, BED-01, RES-01 and CON-01, and the whole-trailer checks
   load_cases.yaml     the five module load cases, the seven trailer load cases and the car's limits
   steps.yaml          eleven draft build steps (STEP-01 to STEP-08)
@@ -30,8 +31,11 @@ cad/
   trailer.py          whole-trailer layout: axle solve, ballast, load cases, towball, fit and mass checks, length comparison
   restraint.py        strap loads along the trailer by research/03's method (RES-01)
   trailer_model.py    the trailer's 3D block model with the module placed in it
+  chassis.py          the chassis and drawbar: members, joints, fittings, galvanising, the frame model, the tyre swept arc
+  chassis_fea.py      load mapping and the frame analysis of every chassis load case, fatigue and fitting checks
+  frame.py            direct-stiffness 3D frame solver (numpy), checked in tests/test_frame.py
   export.py           STEP, GLB, three-cad-viewer JSON, per-step viewer states, BOM CSV
-  drawings/           A3 sheet module and the sheets CT-001 (ga.py), CT-401, CT-402, CT-501
+  drawings/           A3 sheet module and the sheets CT-001 (ga.py), CT-101 to CT-103 (chassis_sheets.py), CT-401, CT-402, CT-501
   sitedata.py         copies build outputs into the site and generates the step and research pages
   tests/              pytest: design checks and data rules
 site/                 Astro 7 + Starlight 0.43 static site, three-cad-viewer 5.1.3

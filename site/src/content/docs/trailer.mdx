@@ -14,10 +14,10 @@ export const P = t.params;
 export const ch = t.chassis;
 export const tc = (id) => t.cases.find((c) => c.id === id);
 
-This is the block layout of the whole trailer, revision C. The <a href={withBase('/garage-bed/')}>garage and bed
+This is the block layout of the whole trailer, revision E. The <a href={withBase('/garage-bed/')}>garage and bed
 module</a> sits at the back of the body with a rear door, and one living area runs from the front wall to the
-garage. Every other system is a block with a mass, not a design. The point is to find where the axles go, what the
-car carries on its towball, and what the chassis has to be. The design notes are in `TRAILER.md` in the
+garage. The <a href={withBase('/chassis/')}>chassis and drawbar</a> are designed. Every other system is a block with a
+mass, not a design. The point is to find where the axles go and what the car carries on its towball. The design notes are in `TRAILER.md` in the
 repository, and drawing CT-001 is the general arrangement.
 
 <Trailer kind="summary" />
@@ -135,7 +135,8 @@ each item in the living area costs in length:
 
 ## Chassis inputs
 
-The figures the chassis design starts from. Sections are block sizes until the engineer sizes them.
+The chassis is designed on the <a href={withBase('/chassis/')}>Chassis</a> page, with its members, frame analysis, checks and
+drawings. These are the main figures the layout gives it and takes from it.
 
 <Trailer kind="chassis" />
 
@@ -143,9 +144,9 @@ The figures the chassis design starts from. Sections are block sizes until the e
 
 <Trailer kind="crossmembers" />
 
-No outrigger can pass over the tyres, because the floor is only 50 mm above them at full bump. So outboard of the
-rails nothing supports the floor over the axles, which is now under the front of the garage and the back of the
-living area. It has to span from the rails to the side walls, or hang from the walls.
+Every station has an outrigger each side at raiser height, including the XT centre and rear shock stations over
+the axles. The tyre swings beside the rails and below those outriggers, and FIT-05 checks the gap through the full
+travel.
 
 ## Mass schedule
 

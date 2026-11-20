@@ -151,21 +151,25 @@ def ct001(prj, model, bom, checks, reg, dwg):
         rows.append([c["id"], c["name"][:30], f"{n['mass_kg']:.0f}", f"{g['mass_kg']:.0f}", f"{n['cog'][0]:.0f}", f"{n['cog'][2]:.0f}",
                      f"{n['towball_kg']:.0f}", f"{n['towball_pct']:.1f}", f"{n['axle_kg']:.0f}",
                      (f"{3500 - g['mass_kg']:+.0f}", "#000" if g["mass_kg"] <= 3500 else "#c00")])
-    yt = S.table(sh, 230.0, 241.0, [("CASE", 10), ("WHAT IS ABOARD", 47), ("kg", 11), ("kg +GR", 13), ("CoG X", 13), ("CoG Z", 12),
+    yt = S.table(sh, 230.0, 236.0, [("CASE", 10), ("WHAT IS ABOARD", 47), ("kg", 11), ("kg +GR", 13), ("CoG X", 13), ("CoG Z", 12),
                                     ("BALL kg", 14), ("BALL %", 13), ("AXLE kg", 14), ("ATM +GR", 33)], rows, size=1.6, row_h=3.2,
                  title="MASS AND CoG BY LOAD CASE (MASS-03). +GR = WITH MASS-06 GROWTH")
     # ---- whole-trailer checks
     rows = []
-    for r in rep["checks"]:
+    for r in (r for r in rep["checks"] if not r["type"].startswith("chassis_")):
         col = "#000" if r["ok"] else ("#c00" if r["severity"] == "fail" else "#b06000")
         val = "" if r["measured"] is None else f"{r['measured']:.1f} {r['unit']}"
         rows.append([r["id"], r["title"][:95], (val, col), (r["status"], col)])
+    chs = [r for r in rep["checks"] if r["type"].startswith("chassis_")]
+    bad = [r["id"] for r in chs if not r["ok"] and r["severity"] == "fail"]
+    rows.append(["CHS", f"Chassis: {len(chs)} stress, fitting, deflection, twist and fatigue checks (CT-101, CT-103, CHASSIS.md)"[:95],
+                 f"{len(chs) - len(bad)} of {len(chs)} ok", ("FAIL " + ", ".join(bad), "#c00") if bad else "PASS"])
     yt = S.table(sh, 230.0, yt - 5.5, [("CHECK", 13), ("TITLE", 119), ("MODEL", 25), ("RESULT", 23)], rows, size=1.6, row_h=3.0,
                  title="WHOLE-TRAILER CHECKS (data/checks.yaml)")
     # ---- key figures for the chassis and the engineer
     rows = [
         ["Rail outer width at the XT hinges", f"{ch['rail_outer_width']:.0f}", f"{ch['rail_outer_width_wide_track']:.0f} for a {ch['wide_track']:.0f} track"],
-        ["Raiser, rail top to floor underside", f"{ch['raiser_h']:.0f}", f"rails {ch['rail_section'].split(' block')[0]}"],
+        ["Raiser and strip, rail top to floor underside", f"{ch['raiser_h']:.0f}", "RHS 150x50x3 RAIL, RHS 100x50x3 RAISER (CT-101)"],
         ["Axle group centre from the ball", f"{V['axle_x']:.0f}", f"hubs {hx[0]:.0f} and {hx[1]:.0f}"],
         ["CoG height, fully loaded", f"{ch['cog_loaded'][2]:.0f}", f"{ch['cog_loaded_growth'][2]:.0f} with growth"],
         ["Jack-knife at 90 deg, spare / body corners", f"{ch['jackknife_spare_mm']:.0f} / {ch['jackknife_body_mm']:.0f}", "plan clearance to the car"],
@@ -177,8 +181,8 @@ def ct001(prj, model, bom, checks, reg, dwg):
     S.notes(sh, 22, 66, [
         "DATUM DIM-01: X FROM THE BALL CENTRE, POSITIVE REARWARD. Y FROM THE CENTRELINE, POSITIVE TO THE ROAD SIDE. Z UP FROM THE GROUND, "
         "TRAILER LEVEL AT DESIGN RIDE HEIGHT. A RIGHT-HANDED FRAME, SO THE 3D MODEL AND THESE VIEWS SHOW THE TRAILER AS IT IS.",
-        "BLOCK LAYOUT. EVERY ITEM IS AN ENVELOPE WITH A MASS. POSITIONS MARKED PLACEHOLDER IN assemblies/trailer.yaml ARE NOT DESIGNED YET.",
-        f"AXLE POSITION SOLVED FOR {rep['target_kg']:.0f} kg ON THE BALL FULLY LOADED. CHASSIS SECTIONS ARE BLOCK SIZES FOR THE ENGINEER TO SET.",
+        "BLOCK LAYOUT. EVERY ITEM EXCEPT THE CHASSIS IS AN ENVELOPE WITH A MASS. POSITIONS MARKED PLACEHOLDER IN assemblies/trailer.yaml ARE NOT DESIGNED YET.",
+        f"AXLE POSITION SOLVED FOR {rep['target_kg']:.0f} kg ON THE BALL FULLY LOADED. REVISION G: THE DESIGNED CHASSIS AND DRAWBAR (CT-101 TO CT-103, CHASSIS.md).",
         f"REVISION C: GARAGE AT THE BACK WITH A REAR DOOR, HEAVY ITEMS AFT. WITH NO BIKES ABOARD CARRY {rep['ballast']['kg']:.0f} kg OF BALLAST AT THE BACK OF THE GARAGE "
         f"(TC1, TC4, TC5). THE REGISTRATION TARE EXCLUDES IT.",
         "REVISION D: THE TRAILER'S OWN WHEELS AND TYRES (ROH TRAK 2 16x7 +7, YOKOHAMA G015 LT245/70R16 118/115R, CRUISEMASTER LC6 HUBS, report 09) "

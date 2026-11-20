@@ -350,7 +350,7 @@ def frame(sh):
 
 
 def title_block(sh, *, owner, project, number, title, subtitle, rev, status, date, drawn, checked, approved,
-                engineer, sheet_no, sheets, size, scale, material, mass_note, model_ref, git):
+                engineer, sheet_no, sheets, size, scale, material, mass_note, model_ref, git, weld_note=None):
     """180 x 56 title block, bottom right (ISO 7200 width), fields TB-01 to TB-13."""
     x0, x1, y0, y1 = 230.0, 410.0, 10.0, 66.0
     sh.fillrect(x0, y0, x1, y1)
@@ -404,7 +404,7 @@ def title_block(sh, *, owner, project, number, title, subtitle, rev, status, dat
     sh.text(322, 25.0, material, 2.2)
     # row 5: notes
     sh.text(232, 18.6, "ALL DIMENSIONS IN mm. DO NOT SCALE. GENERAL TOLERANCE ISO 2768-c UNLESS STATED (TO BE CONFIRMED).", 1.75)
-    sh.text(232, 15.6, "NO WELDS ON THIS SHEET (WELD SYMBOLS WOULD BE TO AS 1101.3). " + mass_note, 1.75)
+    sh.text(232, 15.6, (weld_note or "NO WELDS ON THIS SHEET (WELD SYMBOLS WOULD BE TO AS 1101.3). ") + mass_note, 1.75)
     sh.text(232, 12.4, f"MODEL: {model_ref}  DATA REV {git}  (TB-12)", 1.75)
 
 

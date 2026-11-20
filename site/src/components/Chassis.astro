@@ -1,0 +1,153 @@
+---
+// Chassis tables, from build/chassis/chassis.json (cad/chassis.py, cad/chassis_fea.py) and the chassis checks in
+// build/trailer/trailer.json.
+import c from '../data/generated/chassis.json';
+import t from '../data/generated/trailer.json';
+
+interface Props {
+  kind: 'summary' | 'schedule' | 'cases' | 'checks' | 'governing' | 'fatigue' | 'crosscheck' | 'fittings' | 'stations';
+}
+const { kind } = Astro.props;
+const r: any = c;
+const tr: any = t;
+const n = (v: number | null | undefined, d = 0) =>
+  v == null ? '' : (Math.abs(v) < 0.5 * 10 ** -d ? 0 : v).toLocaleString('en-AU', { minimumFractionDigits: d, maximumFractionDigits: d });
+const checks = tr.checks.filter((x: any) => x.type.startsWith('chassis') || x.id === 'FIT-05');
+const statusClass = (x: any) => (x.ok ? 'status-pass' : x.severity === 'fail' ? 'status-fail' : 'status-report');
+const g = r.results.governing;
+const lcs = ['LC1', 'LC2', 'LC3', 'LC4', 'LC5a', 'LC5b', 'LC6', 'LC6b', 'LC8a', 'LC8b'];
+const lcName = Object.fromEntries(r.load_cases.map((l: any) => [l.id, l.name]));
+const plates = r.fittings.filter((f: any) => f.kind === 'plate' || f.kind === 'tube');
+const bought = r.fittings.filter((f: any) => !(f.kind === 'plate' || f.kind === 'tube'));
+const fails = checks.filter((x: any) => x.severity === 'fail' && !x.ok);
+const worst = lcs.map((l) => g[l]).reduce((a: any, b: any) => (b.util > a.util ? b : a));
+---
+
+{kind === 'summary' && (
+  <p>
+    The chassis and drawbar weigh {n(r.steel_kg)} kg of steel, plus {n(r.galvanising.mass_kg)} kg of zinc on
+    {' '}{n(r.galvanising.area_m2, 1)} m² inside and out, plus {n(r.bought_kg)} kg of bought parts (coupling, jockey wheel, chains,
+    breakaway kit, stone guard, corner steadies and the floor bearer strip). The frame model has {r.results.frame.nodes} nodes and
+    {' '}{r.results.frame.elements} beam elements. The highest utilisation in any case is {n(worst.util, 2)}, in {worst.member} under
+    {' '}{worst.case}. {fails.length === 0 ? 'Every chassis stress, deflection, twist, fitting and clearance check passes.'
+      : `${fails.length} chassis checks fail: ${fails.map((x: any) => x.id).join(', ')}.`}
+  </p>
+)}
+
+{kind === 'schedule' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Section</th><th>Members</th><th class="num">Qty</th><th class="num">Lengths mm</th><th class="num">Total m</th><th class="num">kg</th></tr></thead>
+      <tbody>
+        {r.schedule.map((s: any) => (
+          <tr><td>{s.section}</td><td>{s.name}</td><td class="num">{s.qty}</td><td class="num">{[...new Set(s.lengths)].map((v: any) => n(v)).join(', ')}</td>
+            <td class="num">{n(s.length_mm / 1000, 2)}</td><td class="num">{n(s.mass_kg, 1)}</td></tr>
+        ))}
+        <tr><td>Plate</td><td>{plates.length} plate and gusset marks (CT-102, CT-103)</td><td class="num">{plates.reduce((a: number, f: any) => a + f.qty, 0)}</td>
+          <td></td><td></td><td class="num">{n(plates.reduce((a: number, f: any) => a + f.mass_kg, 0), 1)}</td></tr>
+        <tr><td>Zinc</td><td>Hot-dip galvanising, inside and out</td><td></td><td></td><td class="num">{n(r.galvanising.area_m2, 1)} m²</td>
+          <td class="num">{n(r.galvanising.mass_kg, 1)}</td></tr>
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'fittings' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Mark</th><th>Item</th><th class="num">Qty</th><th class="num">kg</th><th>Maturity</th><th>Source</th></tr></thead>
+      <tbody>
+        {[...plates, ...bought].map((f: any) => (
+          <tr><td>{f.id}</td><td>{f.name}</td><td class="num">{f.qty}</td><td class="num">{n(f.mass_kg, 1)}</td><td>{f.maturity}</td><td>{f.source}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'stations' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Station</th><th class="num">Centre X</th><th>Crossmember</th></tr></thead>
+      <tbody>
+        {r.stations.map((s: any) => (
+          <tr><td>{s.id}</td><td class="num">{n(s.x_centre)}</td>
+            <td>{s.role === 'cm_floor' ? 'RHS 100 x 50 x 3 at raiser height' : 'RHS 150 x 50 x 3, full rail height'}, outrigger RHS 100 x 50 x 3 each side</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'cases' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Case</th><th>Load</th><th class="num">Limit</th><th>Source</th></tr></thead>
+      <tbody>
+        {r.load_cases.map((l: any) => (
+          <tr><td>{l.id}</td><td>{l.name}</td><td class="num">{l.kind === 'fatigue' ? 'CAFL' : `fy / ${l.factor}`}</td><td>{l.source}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'governing' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Case</th><th>Governing member</th><th>Where and when</th><th class="num">Combined MPa</th><th class="num">Limit MPa</th><th class="num">Utilisation</th></tr></thead>
+      <tbody>
+        {lcs.map((l) => (
+          <tr><td>{l}</td><td>{g[l].member}</td><td>X {n(g[l].at[0])}, Y {n(g[l].at[1])}, {g[l].case}</td>
+            <td class="num">{n(g[l].eq)}</td><td class="num">{n(g[l].limit)}</td>
+            <td class={`num ${g[l].util > 1 ? 'status-fail' : ''}`}>{n(g[l].util, 2)}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'checks' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>ID</th><th>Check</th><th class="num">Model</th><th>Limit</th><th>Result</th><th>Detail</th></tr></thead>
+      <tbody>
+        {checks.map((x: any) => (
+          <tr class={x.ok ? '' : x.severity === 'fail' ? 'row-fail' : 'row-report'}>
+            <td>{x.id}</td><td>{x.title}</td><td class="num">{x.measured == null ? '' : `${n(x.measured, x.unit === 'deg' ? 2 : 1)} ${x.unit}`}</td>
+            <td>{x.limit}</td><td class={statusClass(x)}>{x.status}</td><td>{x.detail}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'fatigue' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Detail</th><th>Joint</th><th>IIW</th><th class="num">FAT</th><th class="num">Range MPa</th><th class="num">CAFL MPa</th>
+        <th class="num">Miner damage</th><th>Hot-spot check</th></tr></thead>
+      <tbody>
+        {r.results.fatigue.map((f: any) => (
+          <tr class={f.ok ? '' : 'row-report'}><td>{f.id}</td><td>{f.name}</td><td>{f.iiw}</td><td class="num">{n(f.fat)}</td>
+            <td class="num">{n(f.range_mpa, 1)}</td><td class="num">{n(f.cafl, 1)}</td><td class="num">{n(f.damage, 2)}</td>
+            <td>{f.hot_spot ? 'Yes, by the engineer' : ''}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'crosscheck' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Member and case</th><th class="num">Report 11 MPa</th><th class="num">Frame model MPa</th></tr></thead>
+      <tbody>
+        {r.results.cross_checks.map((x: any) => (
+          <tr><td>{x.what}</td><td class="num">{n(x.hand_mpa)}</td><td class="num">{n(x.model_mpa)}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}

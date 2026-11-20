@@ -571,8 +571,9 @@ def main(only: list[str] | None = None):
     OUT.mkdir(parents=True, exist_ok=True)
     only = only or [a for a in sys.argv[2:] if a.startswith("CT-")]
     tm = {}
+    from .chassis_sheets import ct101, ct102, ct103
     from .ga import ct001
-    fns = {"CT-001": ct001, "CT-401": ct401, "CT-402": ct402, "CT-501": ct501}
+    fns = {"CT-001": ct001, "CT-101": ct101, "CT-102": ct102, "CT-103": ct103, "CT-401": ct401, "CT-402": ct402, "CT-501": ct501}
     for dwg in reg["drawings"]:
         if only and dwg["number"] not in only:
             continue
