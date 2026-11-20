@@ -1,6 +1,7 @@
 # Merged parts and jobs list for the LandCruiser 79 vehicle plan (VEHICLE.md), 20 Nov 2026.
-# Truck: VDJ79 single cab built 01/2017 to 08/2022 (DPF engine). Power level A on level B hardware.
-# Merges engine-parts.yaml (report 14, level A, DPF variant), driveline-parts.yaml (report 15)
+# Truck: VDJ79 single cab built 01/2017 to 08/2022 (DPF engine). Power level B: about 230 to 250 kW
+# at the crank, at least 224 kW (300 hp), from the start (decision log 20:15).
+# Merges engine-parts.yaml (report 14, DPF variant), driveline-parts.yaml (report 15)
 # and ute-parts.yaml (report 16). The "removed" list shows what the merge dropped or moved.
 # Revised 20 Nov 2026 after an independent review of the plan and the decision
 # log entries of 12:10 and 12:45. Lines this plan adds: TL05, ID02, ID03, FR01, CK01, BW01, BW02.
@@ -26,7 +27,7 @@ items:
   - {id: EN11, name: "Machine shop: conrods checked, big ends resized, new small-end bushes", part_number: null, supplier: "Local machine shop", price_aud: 400, price_basis: estimate, link: null, status: required, system: engine, source: "report 14"}
   - {id: EN12, name: "Machine shop: two cylinder heads, crack and pressure test, resurface, seats, valves", part_number: null, supplier: "Local machine shop", price_aud: 1400, price_basis: estimate, link: "https://dieselworks.com.au/services/", status: required, system: engine, source: "report 14"}
   - {id: EN13, name: "Machine shop: allowance for worn valve guides, valves and seals", part_number: null, supplier: "Local machine shop", price_aud: 400, price_basis: estimate, link: null, status: required, system: engine, source: "report 14"}
-  - {id: EN14, name: "Radiator, Toyota LandCruiser VDJ 2007 to 2025", part_number: "Natrad listing", supplier: Natrad, price_aud: 1756, price_basis: listing, link: "https://natrad.com.au/product/toyota-landcruiser-2007-2025-vdj-radiator-3/", status: required, system: engine, source: "report 14", note: "Price read from a search extract. Cut CUT3 reuses the old one after a flow test"}
+  - {id: EN14, name: "Radiator, Toyota LandCruiser VDJ 2007 to 2025", part_number: "Natrad listing", supplier: Natrad, price_aud: 1756, price_basis: listing, link: "https://natrad.com.au/product/toyota-landcruiser-2007-2025-vdj-radiator-3/", status: required, system: engine, source: "report 14", note: "Price read from a search extract. Level B needs a new radiator (report 14 section 3.9), so the radiator cut is gone"}
   - {id: EN15, name: "Water pump, genuine", part_number: "by VIN", supplier: "Toyota dealer", price_aud: 450, price_basis: estimate, link: null, status: required, system: engine, source: "report 14"}
   - {id: EN16, name: "Thermostat and gasket, genuine", part_number: "by VIN", supplier: "Toyota dealer", price_aud: 90, price_basis: estimate, link: null, status: required, system: engine, source: "report 14"}
   - {id: EN17, name: "Fan clutch (viscous coupling), genuine", part_number: "by VIN", supplier: "Toyota dealer", price_aud: 450, price_basis: estimate, link: null, status: required, system: engine, source: "report 14"}
@@ -58,11 +59,11 @@ items:
   - {id: TX05, name: "Manta 3 inch DPF-back exhaust, stainless, quiet, single cab", part_number: "SSMKTY0123", supplier: "GTurbo (Manta)", price_aud: 1480, price_basis: listing, link: "https://gturbo.com.au/products/vdj79-v8-4-5l-td-dpf-single-cab-ute-oct-2016-to-current-turbo-back-dpf-back-exhaust", status: required, system: turbo_exhaust, source: "report 14", note: "Keeps the DPF. Keep the factory rear crossover pipe"}
 
   # Tune, gauges and engine paperwork (system tune_legal)
-  - {id: TL01, name: "Custom ECU tune, level A, with the stock and tuned dyno runs", part_number: null, supplier: "GTurbo, HP-F or a local tuner", price_aud: 2000, price_basis: estimate, link: "https://www.4x4australia.com.au/gear/stage-1-hp-f-upgrade-landcruiser-79-build", status: required, system: tune_legal, source: "report 14", note: "Peak power at most 1.20 x the stock run on the same dyno, towing map, EGT fuel limit, 450 to 500 Nm cap in low range, first and reverse, EGR and DPF functions untouched"}
+  - {id: TL01, name: "Custom ECU tune, level B, with the stock and tuned dyno runs", part_number: null, supplier: "GTurbo, HP-F or a local tuner", price_aud: 2500, price_basis: estimate, link: "https://cdn.shopify.com/s/files/1/0823/4241/2531/files/1VD-FTV-VDJ70-Booklet-v1_4c.pdf", status: required, system: tune_legal, source: "report 14", note: "Peak power about 230 to 250 kW at the crank and at least 224 kW (300 hp), about 850 Nm, towing map, EGT fuel limit, 450 to 500 Nm cap in low range, first and reverse, EGR and DPF functions untouched. Report 14's level B tune price"}
   - {id: TL02, name: "Autometer boost, EGT and water temperature gauge kit", part_number: "Autometer combo kit", supplier: GTurbo, price_aud: 990, price_basis: listing, link: "https://gturbo.com.au/products/autometer-boost-egt-water-temp-combo-kit", status: required, system: tune_legal, source: "report 14", note: "EGT probe in the manifold before the turbo"}
   - {id: TL03, name: "Autometer oil temperature gauge", part_number: null, supplier: "Autometer dealer", price_aud: 220, price_basis: estimate, link: "https://gturbo.com.au/products/autometer-water-temp-gauge-40-120c", status: required, system: tune_legal, source: "report 14", note: "Assumed equal to the water temperature gauge"}
   - {id: TL04, name: "TfNSW emissions test", part_number: null, supplier: "Transport for NSW", price_aud: 0, price_basis: estimate, link: "https://www.rms.nsw.gov.au/documents/roads/safety-rules/standards/vsi-06-light-vehicle-modifications.pdf", status: required, system: tune_legal, source: "report 14", note: "Assumed free. VSI 06 Rev 3 (linked) said free at Botany or Penrith. Rev 4 still names TfNSW testing but gives no fee. Book it only with a clean DPF (ID02) and no stored fault codes"}
-  - {id: TL05, name: "VSCCS certificate for the ECU reflash, category LC4 certifier, including the noise test", part_number: null, supplier: "VSCCS licensed certifier (Bulletin 1)", price_aud: 2000, price_basis: estimate, link: "https://www.nsw.gov.au/sites/default/files/noindex/2026-03/vsi-06-light-vehicle-modification-july-2026.pdf", status: required, system: tune_legal, source: "plan (VSI 06 Rev 4 item 6), price from report 14", note: "Item 6's example that needs a certificate is flashing the engine management system, altering vehicle emissions output unless approved by the vehicle manufacturer. A tune that adds 20 % power changes emissions. Report 14 read Rev 3 and found no certificate needed at level A"}
+  - {id: TL05, name: "VSCCS certificate for the ECU reflash, category LC4 certifier, including the noise test", part_number: null, supplier: "VSCCS licensed certifier (Bulletin 1)", price_aud: 2000, price_basis: estimate, link: "https://www.nsw.gov.au/sites/default/files/noindex/2026-03/vsi-06-light-vehicle-modification-july-2026.pdf", status: required, system: tune_legal, source: "plan (VSI 06 Rev 4 item 6), price from report 14", note: "Item 6's example that needs a certificate is flashing the engine management system, altering vehicle emissions output unless approved by the vehicle manufacturer. The level B tune changes emissions. The certifier may also ask for evidence that the driveline takes about 850 Nm"}
   - {id: TL06, name: "4 or 5 gas emissions test at a repairer, if the TfNSW test is not available", part_number: null, supplier: "Repairer with a gas analyser", price_aud: 200, price_basis: estimate, link: null, status: contingency, system: tune_legal, source: "report 14"}
 
   # Clutch and gearbox (system clutch_gearbox)
@@ -160,10 +161,7 @@ items:
   - {id: BW01, name: "ARB Deluxe bull bar, LandCruiser 79 with flares, airbag compatible, self-fitted, only if the truck has no bar", part_number: "3412710", supplier: ARB, price_aud: 2733, price_basis: listing, link: "https://www.arb.com.au/product/3412710-arb-deluxe-bull-bar-landcruiser-79-series-suits-flared-vehicles", status: optional, system: bar_winch, source: "plan, for a truck bought without a bar or winch", note: "Read 20 Nov 2026. ARB fitting AUD 240 and paint AUD 469 extra. Confirm fitment to the build date"}
   - {id: BW02, name: "12 V recovery winch, about 4,300 kg (9,500 lb), synthetic rope, with the bar's winch mount, only if the truck has none", part_number: null, supplier: "4WD store", price_aud: 1500, price_basis: estimate, link: null, status: optional, system: bar_winch, source: "plan, for a truck bought without a bar or winch"}
 
-  # Level B later (system level_b), not in this plan's totals
-  - {id: LB01, name: "Level B retune to 220 to 250 kW, with dyno runs", part_number: null, supplier: "GTurbo or a local tuner", price_aud: 2500, price_basis: estimate, link: "https://cdn.shopify.com/s/files/1/0823/4241/2531/files/1VD-FTV-VDJ70-Booklet-v1_4c.pdf", status: optional, system: level_b, source: "report 14"}
-  - {id: LB02, name: "VSCCS LA4 certificate for level B, LC4 certifier, including the noise test", part_number: null, supplier: "VSCCS licensed certifier (Bulletin 1)", price_aud: 2000, price_basis: estimate, link: "https://www.transport.nsw.gov.au/system/files/media/documents/2025/VSFC01-VSCCS-Bulletin-1.pdf", status: optional, system: level_b, source: "report 14"}
-  - {id: LB03, name: "Laboratory ADR 79 emissions test, only if the certifier asks for one", part_number: null, supplier: "Accredited emissions laboratory", price_aud: 10000, price_basis: estimate, link: null, status: optional, system: level_b, source: "report 14", note: "AUD 10,000 or more. No Australian price found"}
+  - {id: TL07, name: "Laboratory ADR 79 emissions test, only if the certifier asks for one", part_number: null, supplier: "Accredited emissions laboratory", price_aud: 10000, price_basis: estimate, link: null, status: contingency, system: tune_legal, source: "report 14", note: "AUD 10,000 or more. No Australian price found. Outside the contingency allowance, like the new DPF. Was LB03"}
 
 # Lines removed or moved in the merge (not counted anywhere)
 removed:
@@ -173,14 +171,16 @@ removed:
   - {name: "Gearbox input shaft seal (was CG07)", price_aud: 16.50, source: "report 15", reason: "A new H152F comes with it fitted. Moved into cut CUT5's job, the only case where the seal is bought"}
   - {name: "Steering fluid in RF11", price_aud: 30, source: "report 15", reason: "Also bought in SS04, so it was counted twice"}
   - {name: "LSPV re-check with the bike box fitted (was CK02)", price_aud: 100, source: "plan", reason: "The box is now fitted before the one LSPV reset (GV04)"}
+  - {name: "Level B retune later (was LB01)", price_aud: 2500, source: "report 14", reason: "Level B is the plan from the start, so TL01 is the level B tune"}
+  - {name: "Second LA4 certificate for level B (was LB02)", price_aud: 2000, source: "report 14", reason: "One certificate (TL05) covers the level B tune"}
+  - {name: "Cut CUT3, flow-test and reuse the radiator", price_aud: 1756, source: "report 14", reason: "Level B is acceptable for towing only with a new radiator (report 14 section 3.9), so EN14 stays required"}
 
 # Cuts that keep it reliable. Each applies only if the old part passes its test.
 cuts:
-  - {id: CUT1, name: "Test and reuse the eight piezo injectors", replaces: FS01, job: {name: "Injector test and service by a Denso diesel specialist, eight", supplier: "Denso diesel specialist", price_aud: 1600, price_basis: estimate, source: "report 14"}, saving_aud: 7656, risk: "A worn injector can fail early on the fresh engine. If any fails the test, buy the new set. Report 14's price is for the earlier solenoid injectors"}
+  - {id: CUT1, name: "Test and reuse the eight piezo injectors", replaces: FS01, job: {name: "Injector test and service by a Denso diesel specialist, eight", supplier: "Denso diesel specialist", price_aud: 1600, price_basis: estimate, source: "report 14"}, saving_aud: 7656, risk: "A worn injector can fail early on the fresh engine. If any fails the test, buy the new set. At level B the factory injectors run near their flow limit, so a tested set has less margin than a new one. Report 14's price is for the earlier solenoid injectors"}
   - {id: CUT2, name: "Bench-test and reuse the supply pump", replaces: FS03, saving_aud: 1480, risk: "A worn pump sheds metal through the injectors and back to the tank. Test assumed in CUT1's job", source: "report 14"}
-  - {id: CUT3, name: "Flow-test and reuse the radiator", replaces: EN14, saving_aud: 1756, risk: "A part-blocked core runs hot on long grades at more power", source: "report 14"}
   - {id: CUT4, name: "Measure and reuse the oil pump", replaces: EN03, saving_aud: 700, risk: "Low, if it measures within spec", source: "report 14"}
-  - {id: CUT5, name: "Rebuild the truck's own H152F gearbox", replaces: CG09, job: {name: "Marks 4WD gearbox rebuild kit GBK9 (AUD 840.88) and a genuine input shaft seal, HD Automotive R000028 (AUD 16.50)", part_number: "GBK9, R000028", supplier: "Marks 4WD, HD Automotive", price_aud: 857.38, price_basis: listing, link: "https://www.marks4wd.com/driveline/gearbox/", source: "report 15"}, saving_aud: 2982.62, risk: "The best case. Fit of GBK9 to the H152F is not confirmed, as its title names the LandCruiser 70, 75, 100 and 105 Series five-speed from 1998. Worn second-to-third synchros can need hubs, sleeves or gears beyond the kit. Reuses 400,000 km shafts and gears under 650 Nm"}
+  - {id: CUT5, name: "Rebuild the truck's own H152F gearbox", replaces: CG09, job: {name: "Marks 4WD gearbox rebuild kit GBK9 (AUD 840.88) and a genuine input shaft seal, HD Automotive R000028 (AUD 16.50)", part_number: "GBK9, R000028", supplier: "Marks 4WD, HD Automotive", price_aud: 857.38, price_basis: listing, link: "https://www.marks4wd.com/driveline/gearbox/", source: "report 15"}, saving_aud: 2982.62, risk: "The best case. Fit of GBK9 to the H152F is not confirmed, as its title names the LandCruiser 70, 75, 100 and 105 Series five-speed from 1998. Worn second-to-third synchros can need hubs, sleeves or gears beyond the kit. Reuses 400,000 km shafts and gears under about 850 Nm"}
   - {id: CUT6, name: "Keep a factory towbar rated 3,500 kg and 350 kg, if fitted", replaces: TW01, saving_aud: 1160, risk: "Low, if the rating plate reads 3,500 kg and 350 kg and the mounts and receiver show no cracks", source: "decision log, report 16"}
 
 # Outside the vehicle work
@@ -189,19 +189,18 @@ bike_box: {name: "Enclosed welded aluminium bike box (report 17)", price_aud: 13
 # Totals, AUD rounded to the dollar. They match VEHICLE.md.
 totals_aud:
   target: 30000
-  required_by_system: {engine: 12717, fuel_system: 11398, intake_dpf: 2095, turbo_exhaust: 8519, tune_legal: 5210, clutch_gearbox: 6744, driveline: 3073, steering_suspension: 2350, refresh: 3230, gvm: 8870, brakes: 1540, wheels_tyres: 4110, towing: 2234, freight_weighing: 1060}
-  required: 73150                     # every status: required line (73,149.74)
+  required_by_system: {engine: 12717, fuel_system: 11398, intake_dpf: 2095, turbo_exhaust: 8519, tune_legal: 5710, clutch_gearbox: 6744, driveline: 3073, steering_suspension: 2350, refresh: 3230, gvm: 8870, brakes: 1540, wheels_tyres: 4110, towing: 2234, freight_weighing: 1060}
+  required: 73650                     # every status: required line (73,649.74)
   required_listed: 33647              # of which read from a current listing (33,646.74)
-  required_estimated: 39503           # of which estimates, 54 %
-  contingency_lines_by_system: {engine: 1500, intake_dpf: 5000, tune_legal: 200, driveline: 6697, steering_suspension: 300, refresh: 2400}
-  contingency_lines_if_all_happen: 16097
-  contingency_allowance: 4010         # EN21, EN22, EN23 and TL06 in full (1,700) plus 15 % of report 15's required lines as merged (15 % of 15,396.69 = 2,310). The new DPF (ID03) is not in it
-  required_plus_contingency: 77160
+  required_estimated: 40003           # of which estimates, 54 %
+  contingency_lines_by_system: {engine: 1500, intake_dpf: 5000, tune_legal: 10200, driveline: 6697, steering_suspension: 300, refresh: 2400}
+  contingency_lines_if_all_happen: 26097
+  contingency_allowance: 4010         # EN21, EN22, EN23 and TL06 in full (1,700) plus 15 % of report 15's required lines as merged (15 % of 15,396.69 = 2,310). The new DPF (ID03) and the laboratory emissions test (TL07) are not in it
+  required_plus_contingency: 77660
   optional_by_system: {engine: 400, clutch_gearbox: 300, driveline: 7325, steering_suspension: 1200, refresh: 687, gvm: 12855, towing: 639, fuel_tank: 1557, bar_winch: 4233}
-  optional_excluding_level_b: 29196
-  level_b_later: 14500                # 4,500 without the laboratory test (LB03)
-  cuts: 15735                         # CUT1 to CUT6 (15,734.62)
-  with_cuts: 57415                    # required less cuts
-  with_cuts_plus_contingency: 61425
-  over_target: {required: 43150, required_plus_contingency: 47160, with_cuts_plus_contingency: 31425}
+  optional: 29196
+  cuts: 13979                         # CUT1, CUT2, CUT4, CUT5 and CUT6 (13,978.62). CUT3 is gone at level B
+  with_cuts: 59671                    # required less cuts
+  with_cuts_plus_contingency: 63681
+  over_target: {required: 43650, required_plus_contingency: 47660, with_cuts_plus_contingency: 33681}
   bike_box_separate: 13900
