@@ -924,7 +924,7 @@ def _r(v, n=1):
     if isinstance(v, (list, tuple)):
         return [_r(x, n) for x in v]
     if isinstance(v, dict):
-        return {k: _r(x, n) for k, x in v.items()}
+        return {k: _r(x, 3 if k == "util" else n) for k, x in v.items()}
     return v
 
 
