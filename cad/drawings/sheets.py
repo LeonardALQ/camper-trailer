@@ -1,7 +1,8 @@
 """Drawing sheets CT-401, CT-402 and CT-501 for the garage and bed module (A3, third angle).
 
 Every plan uses the same orientation as CT-401, where the kerb-side section is the front view:
-X (rearward, towards the rear door) runs to the left, and the kerb side is at the bottom of the plan.
+X (rearward, towards the rear door) runs to the right, and the kerb side is at the bottom of the plan.
+Every view shows the module as seen, because DIM-01 is right-handed (Y positive to the road side).
 """
 from __future__ import annotations
 
@@ -162,7 +163,7 @@ def _checks_table(sh, checks, x, y):
         color = "#000" if r["ok"] else ("#c00" if r["severity"] == "fail" else "#b06000")
         rows.append([r["id"] + sub, r["limit"].replace(">= ", ">=").replace("<= ", "<=").replace("touching, no overlap", "touching"),
                      (val, color), (r["status"], color)])
-    return S.table(sh, x, y, [("CHECK", 18), ("LIMIT", 28), ("MODEL", 16), ("RESULT", 22)], rows, size=1.7, row_h=3.1,
+    return S.table(sh, x, y, [("CHECK", 15), ("LIMIT", 26), ("MODEL", 14), ("RESULT", 16)], rows, size=1.7, row_h=3.1,
                    title="MODEL CHECKS (mm UNLESS STATED)")
 
 
@@ -174,11 +175,12 @@ def ct401(prj, model, bom, checks, reg, dwg):
     t0 = time.time()
     hw, gl, wt = P["half_width"], P["garage_length"], P["wall_t"]
     ty, sy = P["tuareg_y"], P["st_y"]
+    x0 = 206.0 - gl / sc                       # sheet x of partition A's rear face on the plan and section A-A
 
-    # ---- front view: section A-A just inside the kerb wall, looking towards the road side. X runs to the left.
-    ycut = hw - 5
-    cut2 = S.section(_leaves(_module_shapes(model, exclude_refs=("C3", "C9"))), Plane.XZ.offset(-ycut), keep=Keep.TOP)
-    vE = S.View(sh, (0, 1, 0), (0, 0, 1), sc, ox=206.0, oy=52.0)
+    # ---- front view: section A-A just inside the kerb wall, looking towards the road side. X runs to the right.
+    ycut = -(hw - 5)
+    cut2 = S.section(_leaves(_module_shapes(model, exclude_refs=("C3", "C9"))), Plane.XZ.offset(-ycut), keep=Keep.BOTTOM)
+    vE = S.View(sh, (0, -1, 0), (0, 0, 1), sc, ox=x0, oy=52.0)
     vE.draw(cut2)
     _shade(sh, vE, _cut_faces(cut2, "Y", ycut))
     S.view_label(sh, 160, 21, "SECTION A-A, FROM THE KERB SIDE", sc)
@@ -188,65 +190,65 @@ def ct401(prj, model, bom, checks, reg, dwg):
     S.hdim(sh, lx0[0], lx0[1], lx1[0], lx1[1], 39.0, f"{P['locker_l']:.0f} GAS LOCKER", ext=False)
     gx0, gx1 = vE.p(P["fuel_x0"], ycut, 0), vE.p(P["gen_x0"] + P["gen_l"], ycut, 0)
     S.hdim(sh, gx0[0], gx0[1], gx1[0], gx1[1], 39.0, "FUEL, GENERATOR", ext=False)
-    # heights at partition A (right of the view) and at the rear wall (left)
+    # heights at partition A (left of the view) and at the rear wall (right)
     zr = vE.p(-20, ycut, 0)[0]
-    for z, lab, xd in ((P["partition_a_h"], f"{P['partition_a_h']:.0f}", zr + 6), (P["ceiling_z"], f"{P['ceiling_z']:.0f}", zr + 12)):
+    for z, lab, xd in ((P["partition_a_h"], f"{P['partition_a_h']:.0f}", zr - 6), (P["ceiling_z"], f"{P['ceiling_z']:.0f}", zr - 12)):
         S.vdim(sh, zr, vE.p(0, ycut, 0)[1], zr, vE.p(0, ycut, z)[1], xd, lab)
     zl = vE.p(gl + wt, ycut, 0)[0]
-    for z, lab, xd in ((P["door_h"], f"{P['door_h']:.0f} DOOR", zl - 7), (P["beam_underside_z"], f"{P['beam_underside_z']:.0f} BEAMS", zl - 15)):
+    for z, lab, xd in ((P["door_h"], f"{P['door_h']:.0f} DOOR", zl + 9), (P["beam_underside_z"], f"{P['beam_underside_z']:.0f} BEAMS", zl + 17)):
         S.vdim(sh, zl, vE.p(0, ycut, 0)[1], zl, vE.p(0, ycut, z)[1], xd, lab)
     # cutting plane C-C on the elevation
     c0, c1 = vE.p(-140, ycut, 1000), vE.p(gl + 50, ycut, 1000)
     S.cut_marker(sh, c1, c0, (0, -1), "C")
 
-    # ---- plan: section C-C at Z 1000 looking down (above the front view). X to the left, kerb side at the bottom
+    # ---- plan: section C-C at Z 1000 looking down (above the front view). X to the right, kerb side at the bottom
     zcut = 1000.0
     cut3 = S.section(_leaves(_module_shapes(model, exclude_refs=("C5", "C4", "C7"))), Plane.XY.offset(zcut), keep=Keep.BOTTOM)
-    vP = S.View(sh, (0, 0, 1), (0, -1, 0), sc, ox=206.0, oy=190.0)
+    vP = S.View(sh, (0, 0, 1), (0, 1, 0), sc, ox=x0, oy=190.0)
     vP.draw(cut3)
     _shade(sh, vP, _cut_faces(cut3, "Z", zcut))
     S.view_label(sh, 160, 264, "SECTION C-C, PLAN AT Z 1000", sc)
-    w0, w1 = vP.p(0, -hw, zcut), vP.p(0, hw, zcut)
-    S.vdim(sh, w0[0], w0[1], w1[0], w1[1], w0[0] + 8, f"{P['interior_width']:.0f}")
-    l0, l1 = vP.p(0, -hw, 0), vP.p(gl, -hw, 0)
+    w0, w1 = vP.p(0, hw, zcut), vP.p(0, -hw, zcut)
+    S.vdim(sh, w0[0], w0[1], w1[0], w1[1], w0[0] - 8, f"{P['interior_width']:.0f}")
+    l0, l1 = vP.p(0, hw, 0), vP.p(gl, hw, 0)
     S.hdim(sh, l0[0], l0[1] + 1.4, l1[0], l1[1] + 1.4, l0[1] + 7.0, f"{gl:.0f}")
-    # rear door opening on the rear wall (left end)
+    # rear door opening on the rear wall (right end)
     d0, d1 = vP.p(gl + wt, P["door_y0"], 0), vP.p(gl + wt, P["door_y1"], 0)
-    S.vdim(sh, d0[0], d0[1], d1[0], d1[1], d0[0] - 6, f"{P['door_y1'] - P['door_y0']:.0f} REAR DOOR")
-    for yc, lab in ((ty, f"TU CL Y {ty:.0f}"), (sy, f"ST CL Y +{sy:.0f}")):
+    S.vdim(sh, d0[0], d0[1], d1[0], d1[1], d0[0] + 6, f"{P['door_y1'] - P['door_y0']:.0f} REAR DOOR")
+    for yc, lab in ((ty, f"TU CL Y {ty:+.0f}"), (sy, f"ST CL Y {sy:+.0f}")):
         p0, p1 = vP.p(-80, yc, 0), vP.p(gl + 60, yc, 0)
         sh.line(p0[0], p0[1], p1[0], p1[1], "centre")
-        sh.text(p0[0] + 1, p0[1] + 0.6, lab, 1.7)
+        sh.text(p0[0] - 1, p0[1] + 0.6, lab, 1.7, "end")
     for xr, lab in ((P["front_row_x"], f"TRACK X {P['front_row_x']:.0f}"), (P["rear_row_x"], f"TRACK X {P['rear_row_x']:.0f}")):
-        p0, p1 = vP.p(xr, -hw - 40, 0), vP.p(xr, hw + 40, 0)
+        p0, p1 = vP.p(xr, hw + 40, 0), vP.p(xr, -hw - 40, 0)
         sh.line(p0[0], p0[1], p1[0], p1[1], "centre")
         sh.text(p0[0], p0[1] + 1.2, lab, 1.7, "middle")
-    sh.text(vP.p(gl + 60, 0, 0)[0], vP.p(0, -hw, 0)[1] + 0.8, "ROAD SIDE", 1.8, "end")
-    sh.text(vP.p(gl + 60, 0, 0)[0], vP.p(0, hw, 0)[1] - 2.4, "KERB SIDE", 1.8, "end")
+    sh.text(vP.p(gl + 60, 0, 0)[0], vP.p(0, hw, 0)[1] + 0.8, "ROAD SIDE", 1.8)
+    sh.text(vP.p(gl + 60, 0, 0)[0], vP.p(0, -hw, 0)[1] - 2.4, "KERB SIDE", 1.8)
     o = vP.p(0, 0, 0)
     sh.circle(o[0], o[1], 1.3, "medium")
     sh.line(o[0] - 2.2, o[1], o[0] + 2.2, o[1], "thin")
     sh.line(o[0], o[1] - 2.2, o[0], o[1] + 2.2, "thin")
-    S.leader(sh, (o[0] + 0.9, o[1] - 0.9), (o[0] + 6, o[1] - 12), "DATUM")
-    S.cut_marker(sh, vP.p(1100, -hw - 30, 0), vP.p(1100, hw + 30, 0), (-1, 0), "B")
+    S.leader(sh, (o[0] - 0.9, o[1] - 0.9), (o[0] - 6, o[1] - 12), "DATUM")
+    S.cut_marker(sh, vP.p(1100, hw + 30, 0), vP.p(1100, -hw - 30, 0), (-1, 0), "B")
     S.cut_marker(sh, vP.p(gl + 90, ycut, 0), vP.p(-110, ycut, 0), (0, 1), "A")
 
     # ---- section B-B looking forward at partition A (right column, above the parts list)
     xcut = 1100.0
     excl = ("C4", "C8", "18", "19", "C10")
     cut = S.section(_leaves(_module_shapes(model, exclude_refs=excl)), Plane.YZ.offset(xcut), keep=Keep.BOTTOM)
-    vA = S.View(sh, (1, 0, 0), (0, 0, 1), sc, ox=294.0, oy=163.0)
+    vA = S.View(sh, (1, 0, 0), (0, 0, 1), sc, ox=294.0, oy=161.0)
     vA.draw(cut)
     _shade(sh, vA, _cut_faces(cut, "X", xcut))
-    S.view_label(sh, 294, 250.0, "SECTION B-B, LOOKING FORWARD AT PARTITION A", sc)
-    sh.text(294, 242.5, "CUT FACES SHADED.", 1.8, "middle")
+    S.view_label(sh, 294, 243.5, "SECTION B-B, LOOKING FORWARD AT PARTITION A", sc)
+    sh.text(294, 236.3, "CUT FACES SHADED.", 1.8, "middle")
     yl, yr = vA.p(0, -hw, 0), vA.p(0, hw, 0)
-    S.hdim(sh, yl[0], yl[1] - 1.5, yr[0], yr[1] - 1.5, 156.0, "2330 INTERIOR")
+    S.hdim(sh, yl[0], yl[1] - 1.5, yr[0], yr[1] - 1.5, 154.0, "2330 INTERIOR")
     pt_, ps_ = vA.p(0, ty, 0), vA.p(0, sy, 0)
     for pp in (pt_, ps_):
-        sh.line(pp[0], pp[1] - 1, pp[0], 149.5, "centre")
-    S.hdim(sh, yl[0], 151, pt_[0], 151, 151.0, f"{ty + hw:.0f}", ext=False)
-    S.hdim(sh, pt_[0], 151, ps_[0], 151, 151.0, f"{P['bike_spacing']:.0f}", ext=False)
+        sh.line(pp[0], pp[1] - 1, pp[0], 147.5, "centre")
+    S.hdim(sh, ps_[0], 149, pt_[0], 149, 149.0, f"{P['bike_spacing']:.0f}", ext=False)
+    S.hdim(sh, pt_[0], 149, yr[0], 149, 149.0, f"{hw - ty:.0f}", ext=False)
     levels = [(0, "0 FLOOR"), (P["beam_underside_z"], f"{P['beam_underside_z']:.0f} BEAM UNDERSIDE"), (P["deck_z"], f"{P['deck_z']:.0f} DECK UNDERSIDE"),
               (P["froli_z"], f"{P['froli_z']:.0f} DECK TOP"), (P["mattress_z"], f"{P['mattress_z']:.0f} FROLI TOP"),
               (P["mattress_z"] + P["mattress_t"], f"{P['mattress_z'] + P['mattress_t']:.0f} MATTRESS TOP"),
@@ -265,23 +267,23 @@ def ct401(prj, model, bom, checks, reg, dwg):
 
     # ---- balloons
     _balloons(sh, [
-        ("TU", vP.p(1158, ty, 0), (128.0, 236.0)), ("ST", vP.p(1040, sy, 0), (128.0, 146.0)),
-        ("1", vP.p(-10, -900, 0), (214.0, 238.0)), ("21", vP.p(P["locker_x0"] + 300, hw - 150, 0), (104.0, 150.0)),
-        ("17", vP.p(P["garage_length"] - 110, hw - 160, 0), (104.0, 162.0)),
-        ("13", vP.p(1603, ty - 150, 0), (150.0, 246.0)), ("12", vP.p(P["front_row_x"], ty - 450, 0), (190.0, 246.0)),
-        ("10", vP.p(300, ty, 0), (176.0, 246.0)), ("14", vP.p(60, sy, 0), (214.0, 156.0)),
-        ("15", vP.p(400, hw, 0), (190.0, 136.0)), ("16", vP.p(0, (ty + sy) / 2, 0), (214.0, 200.0)),
-        ("18", vP.p(-300, P["ladder_y"], 0), (214.0, 142.0)),
+        ("TU", vP.p(1158, ty, 0), (190.8, 236.0)), ("ST", vP.p(1040, sy, 0), (190.8, 146.0)),
+        ("1", vP.p(-10, 900, 0), (104.8, 238.0)), ("21", vP.p(P["locker_x0"] + 300, -hw + 150, 0), (214.8, 150.0)),
+        ("17", vP.p(P["garage_length"] - 110, -hw + 160, 0), (214.8, 162.0)),
+        ("13", vP.p(1603, ty + 150, 0), (168.8, 246.0)), ("12", vP.p(P["front_row_x"], ty + 450, 0), (128.8, 246.0)),
+        ("10", vP.p(300, ty, 0), (142.8, 246.0)), ("14", vP.p(60, sy, 0), (98.0, 166.0)),
+        ("15", vP.p(400, -hw, 0), (128.8, 136.0)), ("16", vP.p(0, (ty + sy) / 2, 0), (104.8, 200.0)),
+        ("18", vP.p(-300, P["ladder_y"], 0), (86.0, 161.0)),
         ("9", vA.p(0, -800, 1650), (238.0, 233.0)), ("8", vA.p(0, -600, 1551), (238.0, 225.0)),
         ("7", vA.p(0, -1100, 1520), (238.0, 217.0)), ("5", vA.p(0, -1150, 1440), (238.0, 201.0)),
     ])
     # beams are not cut by B-B (they run across the trailer), so the beam balloon goes on the elevation
-    _balloons(sh, [("6", vE.p(P["beam_x"][2], ycut, 1485), (150.0, 100.0))])
+    _balloons(sh, [("6", vE.p(P["beam_x"][2], ycut, 1485), (168.8, 100.0))])
 
     _checks_table(sh, checks, 22.0, 150.0)
     mx0, mz0 = _placement()
     _, starts = S.notes(sh, 22, 284, [
-        "MODULE FRAME: X FROM PARTITION A'S REAR FACE TOWARDS THE REAR DOOR, Y FROM THE CENTRELINE (+ TO THE KERB SIDE), Z FROM THE GARAGE FLOOR. "
+        "MODULE FRAME: X FROM PARTITION A'S REAR FACE TOWARDS THE REAR DOOR, Y FROM THE CENTRELINE (+ TO THE ROAD SIDE), Z FROM THE GARAGE FLOOR. "
         f"IN THE PROJECT DATUM (DIM-01, CT-001) MODULE X 0 IS AT X {mx0:.0f} AND Z 0 AT Z {mz0:.0f}, AXES PARALLEL.",
         "REVISION D: GARAGE AT THE BACK WITH A TOP-HINGED REAR DOOR. BIKES ALONG THE TRAILER, NOSES IN CHOCKS AGAINST PARTITION A. WHOLE SHEET REDRAWN.",
         "BIKES ARE ENVELOPES FROM research/05 SCALED TO THE OWNER'S FIGURES, MIRRORS FOLDED, FRONT WHEEL 25 UP IN THE CHOCK CRADLE (ESTIMATE). TUAREG PANNIERS ON.",
@@ -289,7 +291,7 @@ def ct401(prj, model, bom, checks, reg, dwg):
         "MEASURE BOTH BIKES IN A FULL-SIZE MOCK-UP BEFORE ORDERING PANELS (BUILD STEP S01). VENTS, SENSORS AND THE EXTINGUISHER ARE PLACEHOLDERS.",
     ], width_chars=64, size=1.8)
     S.rev_tag(sh, 98.0, starts[1] + 0.6, "D")
-    S.rev_tag(sh, 104.0, starts[0] + 0.6, "E")
+    S.rev_tag(sh, 104.0, starts[0] + 0.6, "F")
     items = [("TU", "TU", "Aprilia Tuareg 660 Rally (envelope)", "1"), ("ST", "ST", "Triumph Street Triple 765 (envelope)", "1"),
              ("1", "P-01", f"Partition A, 20 honeycomb 2330x{P['partition_a_h']:.0f}", "1"),
              ("5", "B-05", "Ledger, angle 40x40x3 6060-T5", f"4 ({_q(bom, 'B-05'):.2f} m)"),
@@ -318,7 +320,7 @@ def ct402(prj, model, bom, checks, reg, dwg):
     hw, gl = P["half_width"], P["garage_length"]
     cut = S.section(_leaves(_module_shapes(model, only_refs=("C1", "C2", "C3", "C8", "1", "10", "11", "12", "21"))),
                     Plane.XY.offset(400.0), keep=Keep.BOTTOM)
-    v = S.View(sh, (0, 0, 1), (0, -1, 0), sc, ox=200.0, oy=170.0)
+    v = S.View(sh, (0, 0, 1), (0, 1, 0), sc, ox=200.0 - gl / sc, oy=170.0)
     for ref in ("TU", "ST", "C11", "C12", "C10"):
         v.draw(_leaves([model.built[ref].shape]), sty="grey")
     v.draw(cut)
@@ -326,10 +328,10 @@ def ct402(prj, model, bom, checks, reg, dwg):
     S.view_label(sh, 140, 272, "PLAN OF THE GARAGE FLOOR, ANCHOR LAYOUT", sc)
     sh.text(140, 264.5, "SECTION AT Z 400 LOOKING DOWN. BIKES AND STOWAGE SHOWN AS THIN GREY OUTLINES.", 1.8, "middle")
     anchors = [(b.inst.iid.split(".", 1)[1], b.inst.at[0], b.inst.at[1]) for b in model.built.values() if b.inst.part == "G-03"]
-    # each cross row: Y values of its fittings as ordinates, front row to the right of the plan, rear row to the left
-    for row_x, side in ((P["front_row_x"], 1), (P["rear_row_x"], -1)):
+    # each cross row: Y values of its fittings as ordinates, front row to the left of the plan, rear row to the right
+    for row_x, side in ((P["front_row_x"], -1), (P["rear_row_x"], 1)):
         row = sorted([a for a in anchors if abs(a[1] - row_x) < 1], key=lambda a: -v.p(a[1], a[2], 0)[1])
-        xt = (v.p(-60, 0, 0)[0] + 6) if side > 0 else (v.p(gl + 60, 0, 0)[0] - 6)
+        xt = (v.p(gl + 60, 0, 0)[0] + 6) if side > 0 else (v.p(-60, 0, 0)[0] - 6)
         last = 1e9
         for name, x, y in row:
             p = v.p(x, y, 0)
@@ -340,24 +342,24 @@ def ct402(prj, model, bom, checks, reg, dwg):
             sh.text(xt, ty_ - 0.7, f"{name} Y {y:+.0f}", 1.8, "start" if side > 0 else "end")
             last = ty_
     for xr in (P["front_row_x"], P["rear_row_x"]):
-        p0, p1 = v.p(xr, -hw - 40, 0), v.p(xr, hw + 40, 0)
+        p0, p1 = v.p(xr, hw + 40, 0), v.p(xr, -hw - 40, 0)
         sh.line(p0[0], p0[1], p1[0], p1[1], "centre")
         sh.text(p0[0], p0[1] + 1.4, f"X {xr:.0f}", 2.0, "middle")
     ys = P["stow_row_y"]
     p0, p1 = v.p(P["stow_row_x0"] - 40, ys, 0), v.p(P["stow_row_x1"] + 40, ys, 0)
     sh.line(p0[0], p0[1], p1[0], p1[1], "centre")
-    sh.text(p0[0] + 1.5, p0[1] + 1.2, f"STOWAGE ROW Y +{ys:.0f}", 1.8)
-    sh.text(p0[0] + 1.5, p0[1] - 1.8, f"X {P['stow_row_x0']:.0f} TO {P['stow_row_x1']:.0f}", 1.8)
+    sh.text(p0[0] + 1.5, p0[1] - 3.3, f"STOWAGE ROW Y {ys:+.0f}", 1.8)
+    sh.text(p0[0] + 1.5, p0[1] - 6.1, f"X {P['stow_row_x0']:.0f} TO {P['stow_row_x1']:.0f}", 1.8)
     for yc in (P["tuareg_y"], P["st_y"]):
         p0, p1 = v.p(-40, yc, 0), v.p(gl + 40, yc, 0)
         sh.line(p0[0], p0[1], p1[0], p1[1], "centre")
     o = v.p(0, 0, 0)
     sh.circle(o[0], o[1], 1.3, "medium")
-    S.leader(sh, (o[0] + 0.9, o[1] - 0.9), (o[0] + 7, o[1] - 6), "DATUM X0 Y0")
-    sh.text(v.p(gl, 0, 0)[0], v.p(0, -hw, 0)[1] + 4.5, "ROAD SIDE", 1.9, "middle")
-    sh.text(v.p(gl / 2, 0, 0)[0], v.p(0, hw, 0)[1] - 5.5, "KERB SIDE", 1.9, "middle")
-    sh.text(v.p(gl, 0, 0)[0], v.p(0, hw, 0)[1] - 5.5, "REAR DOOR END", 1.9, "middle")
-    sh.text(v.p(0, 0, 0)[0], v.p(0, hw, 0)[1] - 5.5, "PARTITION A", 1.9, "middle")
+    S.leader(sh, (o[0] - 0.9, o[1] - 0.9), (o[0] - 7, o[1] - 6), "DATUM X0 Y0")
+    sh.text(v.p(gl, 0, 0)[0], v.p(0, hw, 0)[1] + 4.5, "ROAD SIDE", 1.9, "middle")
+    sh.text(v.p(gl / 2, 0, 0)[0], v.p(0, -hw, 0)[1] - 5.5, "KERB SIDE", 1.9, "middle")
+    sh.text(v.p(gl, 0, 0)[0], v.p(0, -hw, 0)[1] - 5.5, "REAR DOOR END", 1.9, "middle")
+    sh.text(v.p(0, 0, 0)[0], v.p(0, -hw, 0)[1] - 5.5, "PARTITION A", 1.9, "middle")
 
     # anchor table (right column)
     use = {"F": "front pair", "R": "rear pair", "W": "rear-wheel strap"}
@@ -406,7 +408,7 @@ def ct402(prj, model, bom, checks, reg, dwg):
     S.leader(sh, (dx0 + 20 - tw / k + 2, dy0 - 13), (dx0 - 4, dy0 - 24), "BONDED HARDPOINT STRIP", ["IN PLACE OF THE CORE (G-04)"])
     S.leader(sh, (dx0 - 10, dy0 - 1), (dx0 - 14, dy0 + 10), "FLOOR SKIN, COATED (G-08)")
     items = [("10", "G-01", "Condor SC-2000 chock with trailer adapter", "2"),
-             ("11", "G-02", f"L-track rows: {P['interior_width']:.0f}, {P['rear_row_y1'] + hw:.0f} and {P['stow_row_x1'] - P['stow_row_x0']:.0f} long", "3"),
+             ("11", "G-02", f"L-track rows: {P['interior_width']:.0f}, {hw - P['rear_row_y0']:.0f} and {P['stow_row_x1'] - P['stow_row_x0']:.0f} long", "3"),
              ("12", "G-03", "Double-stud L-track fitting", "16 + 2 spare"), ("-", "G-04", "M8 through-bolts, crush tubes, hardpoints", "1 set"),
              ("-", "F-07", "A4-70 bolts, nylon washers and sleeves", "1 lot"), ("-", "F-03", "Plexus MA310 for the hardpoints", "1 lot")]
     S.parts_list(sh, _bom_rows(bom, items), ybase=66.0, row_h=3.8, tags={"11": "D", "12": "D"})
@@ -417,7 +419,7 @@ def ct402(prj, model, bom, checks, reg, dwg):
         "WITH CRUSH TUBES, THROUGH A BONDED HARDPOINT STRIP TO THE STEEL RAIL BELOW.",
         "DESIGN LOAD: EVERY ANCHOR AND ITS FLOOR FIXING IS DESIGNED FOR 20 kN, THE BREAKING LOAD OF AN LC 1,000 kg STRAP (NTC GUIDE p. 201). "
         f"WORST STRAP {res['worst']['worst_kgf']:.0f} kgf (RES-01)." if res else "DESIGN LOAD 20 kN PER ANCHOR.",
-        f"CHOCKS: EACH ADAPTER BOLTS THROUGH TO STEEL ON ITS BIKE CENTRELINE (TUAREG Y {P['tuareg_y']:.0f}, STREET TRIPLE Y +{P['st_y']:.0f}), NOSE AGAINST PARTITION A. "
+        f"CHOCKS: EACH ADAPTER BOLTS THROUGH TO STEEL ON ITS BIKE CENTRELINE (TUAREG Y {P['tuareg_y']:+.0f}, STREET TRIPLE Y {P['st_y']:+.0f}), NOSE AGAINST PARTITION A. "
         "THEY TAKE THE BRAKING PUSH (TUAREG ABOUT 330 kgf). TORQUE VALUES ARE NOT SET YET.",
     ], width_chars=125, size=1.8)
     _title(sh, dwg, reg, "ANCHOR DESIGN LOAD 20 kN EACH, 16 ANCHORS IN USE.", sc, prj.assembly.revision)
@@ -432,30 +434,31 @@ def ct501(prj, model, bom, checks, reg, dwg):
     P = prj.P.values
     t0 = time.time()
     hw, gl = P["half_width"], P["garage_length"]
-    # ---- beam layout plan, deck and bedding removed. X to the left, kerb side at the bottom
+    # ---- beam layout plan, deck and bedding removed. X to the right, kerb side at the bottom
     sc = 20.0
-    v = S.View(sh, (0, 0, 1), (0, -1, 0), sc, ox=205.0, oy=200.0)
+    x0 = 205.0 - gl / sc
+    v = S.View(sh, (0, 0, 1), (0, 1, 0), sc, ox=x0, oy=200.0)
     v.draw(_leaves(_module_shapes(model, only_refs=("1", "5", "6", "C8"))))
     S.view_label(sh, 140, 272, "BEAM LAYOUT PLAN, DECK AND BEDDING REMOVED", sc)
-    yl = v.p(0, -hw - 20, 0)[1] + 3
+    yl = v.p(0, hw + 20, 0)[1] + 3
     for xb in P["beam_x"]:
-        p0, p1 = v.p(xb, -hw - 20, 0), v.p(xb, hw + 20, 0)
+        p0, p1 = v.p(xb, hw + 20, 0), v.p(xb, -hw - 20, 0)
         sh.line(p0[0], p0[1], p1[0], p1[1], "centre")
         sh.text(p0[0], yl, f"X {xb:.0f}", 2.0, "middle")
-    a, b = v.p(0, hw, 0), v.p(gl, hw, 0)
-    S.hdim(sh, a[0], a[1], b[0], b[1], a[1] - 8, f"{gl:.0f} PARTITION A TO THE REAR WALL")
-    w0, w1 = v.p(0, -hw, 0), v.p(0, hw, 0)
-    S.vdim(sh, w0[0], w0[1], w1[0], w1[1], w0[0] + 10, f"{P['interior_width']:.0f} BEAM SPAN, BETWEEN SIDE-WALL FACES")
+    a, b = v.p(0, -hw, 0), v.p(gl, -hw, 0)
+    S.hdim(sh, a[0], a[1], b[0], b[1], a[1] - 11, f"{gl:.0f} PARTITION A TO THE REAR WALL")
+    w0, w1 = v.p(0, hw, 0), v.p(0, -hw, 0)
+    S.vdim(sh, w0[0], w0[1], w1[0], w1[1], w0[0] - 10, f"{P['interior_width']:.0f} BEAM SPAN, BETWEEN SIDE-WALL FACES")
     for xb0, xb1 in zip(P["beam_x"], P["beam_x"][1:]):
-        p0, p1 = v.p(xb0, -hw * 0.55, 0), v.p(xb1, -hw * 0.55, 0)
+        p0, p1 = v.p(xb0, hw * 0.55, 0), v.p(xb1, hw * 0.55, 0)
         S.hdim(sh, p0[0], p0[1], p1[0], p1[1], p0[1], f"{xb1 - xb0:.0f}", ext=False)
     S.cut_marker(sh, v.p(gl + 50, 0, 0), v.p(-50, 0, 0), (0, 1), "E")
     S.cut_marker(sh, v.p(P["beam_x"][2], -hw - 50, 0), v.p(P["beam_x"][2], -hw + 300, 0), (-1, 0), "F")
-    sh.text(v.p(gl + 60, 0, 0)[0] - 2, v.p(0, -hw, 0)[1] - 1, "ROAD SIDE", 1.9, "end")
-    sh.text(v.p(gl + 60, 0, 0)[0] - 2, v.p(0, hw, 0)[1] + 0.5, "KERB SIDE", 1.9, "end")
-    sh.text(v.p(gl + 60, 0, 0)[0] - 1, v.p(0, 0, 0)[1] - 6, "REAR WALL", 1.9, "end")
-    _balloons(sh, [("6", v.p(P["beam_x"][4], 300, 0), (75.0, 212.0)), ("5", v.p(1400, -hw + 20, 0), (75.0, 238.0)),
-                   ("5", v.p(gl - 20, 600, 0), (75.0, 186.0)), ("1", v.p(-10, 500, 0), (217.0, 180.0))])
+    sh.text(v.p(gl + 60, 0, 0)[0] + 2, v.p(0, hw, 0)[1] - 1, "ROAD SIDE", 1.9)
+    sh.text(v.p(gl + 60, 0, 0)[0] + 2, v.p(0, -hw, 0)[1] + 0.5, "KERB SIDE", 1.9)
+    sh.text(v.p(gl + 60, 0, 0)[0] + 1, v.p(0, 0, 0)[1] - 6, "REAR WALL", 1.9)
+    _balloons(sh, [("6", v.p(P["beam_x"][4], -300, 0), (218.5, 212.0)), ("5", v.p(1400, hw - 20, 0), (218.5, 238.0)),
+                   ("5", v.p(gl - 20, -600, 0), (218.5, 186.0)), ("1", v.p(-10, -500, 0), (68.5, 180.0))])
 
     # ---- section E-E: bed stack at the rear wall, section at Y 0, 1:5
     sc2 = 5.0
@@ -466,8 +469,8 @@ def ct501(prj, model, bom, checks, reg, dwg):
     vS = S.View(sh, (0, -1, 0), (0, 0, 1), sc2, ox=262.0, oy=160.0, anchor=(gl - 420, 0, 1600))
     vS.draw(det)
     _shade(sh, vS, _cut_faces(det, "Y", 0.0))
-    S.view_label(sh, 300, 222, "SECTION E-E, BED STACK AT THE REAR WALL, Y 0", sc2)
-    sh.text(300, 214.5, "LIVING AREA TO THE LEFT, REAR WALL RIGHT. CUT FACES SHADED.", 1.8, "middle")
+    S.view_label(sh, 300, 216.5, "SECTION E-E, BED STACK AT THE REAR WALL, Y 0", sc2)
+    sh.text(300, 209.5, "LIVING AREA TO THE LEFT, REAR WALL RIGHT. CUT FACES SHADED.", 1.8, "middle")
     xr = vS.p(x1, 0, 0)[0] + 3
     levels = [(P["beam_underside_z"], f"{P['beam_underside_z']:.0f} BEAM UNDERSIDE"), (P["deck_z"], f"{P['deck_z']:.0f} DECK UNDERSIDE"),
               (P["froli_z"], f"{P['froli_z']:.0f} DECK TOP"), (P["mattress_z"], f"{P['mattress_z']:.0f} FROLI TOP"),
@@ -497,20 +500,20 @@ def ct501(prj, model, bom, checks, reg, dwg):
     xb = P["beam_x"][2]
     shapes = _leaves(_module_shapes(model, only_refs=("5", "6", "7", "C3")))
     cutF = S.section(shapes, Plane.YZ.offset(xb), keep=Keep.BOTTOM)
-    detF = _clip(cutF, xb - 30, xb + 0.5, hw - 150, hw + 36, 1405, 1545)
+    detF = _clip(cutF, xb - 30, xb + 0.5, -hw - 36, -hw + 150, 1405, 1545)
     sc3 = 3.0
-    vD = S.View(sh, (1, 0, 0), (0, 0, 1), sc3, ox=150.0, oy=82.0, anchor=(xb, hw, 1460))
+    vD = S.View(sh, (1, 0, 0), (0, 0, 1), sc3, ox=112.0, oy=82.0, anchor=(xb, -hw, 1460))
     vD.draw(detF)
     _shade(sh, vD, _cut_faces(detF, "X", xb))
     S.view_label(sh, 140, 124, "DETAIL F: BEAM END AT THE KERB WALL", sc3)
     sh.text(140, 117.5, f"SECTION AT X {xb:.0f}, LOOKING FORWARD", 1.8, "middle")
-    S.leader(sh, vD.p(xb, hw - 25, 1458.5), (168.0, 62.0), "LEDGER 40x40x3 (B-05), SHELF AT Z 1460,",
+    S.leader(sh, vD.p(xb, -hw + 25, 1458.5), (168.0, 62.0), "LEDGER 40x40x3 (B-05), SHELF AT Z 1460,",
              ["BONDED (F-01) AND RIVETED (F-05)", "TO THE SIDE WALL."])
-    S.leader(sh, vD.p(xb, hw - 100, 1490), (168.0, 80.0), "BEAM SHS 50x50x3 (B-04),",
+    S.leader(sh, vD.p(xb, -hw + 100, 1490), (168.0, 80.0), "BEAM SHS 50x50x3 (B-04),",
              ["END ABUTS THE WALL, RIVETED", "DOWN THROUGH THE SHELF."])
-    S.leader(sh, vD.p(xb, hw - 120, 1525), (168.0, 98.0), "DECK 20 HONEYCOMB (B-03),", ["BONDED AND RIVETED"])
-    S.leader(sh, vD.p(xb, hw + 15, 1415), (168.0, 50.0), "KERB-SIDE WALL (BODY)")
-    s0, s1 = vD.p(xb, hw - 40, 1460), vD.p(xb, hw, 1460)
+    S.leader(sh, vD.p(xb, -hw + 120, 1525), (168.0, 98.0), "DECK 20 HONEYCOMB (B-03),", ["BONDED AND RIVETED"])
+    S.leader(sh, vD.p(xb, -hw - 15, 1415), (168.0, 50.0), "KERB-SIDE WALL (BODY)")
+    s0, s1 = vD.p(xb, -hw, 1460), vD.p(xb, -hw + 40, 1460)
     S.hdim(sh, s0[0], vD.p(xb, 0, 1420)[1], s1[0], vD.p(xb, 0, 1420)[1], vD.p(xb, 0, 1405)[1] - 2, "40")
 
     # ---- detail G: the deck laps over the top edge of partition A, section at Y 0, 1:2
@@ -539,7 +542,7 @@ def ct501(prj, model, bom, checks, reg, dwg):
              ("-", "F-05", "Monobolt rivets BAPV-06-04, -08-06", "about 60")]
     S.parts_list(sh, _bom_rows(bom, items), ybase=66.0, row_h=4.2, tags={"5": "D", "6": "D", "7": "D"})
     xs = ", ".join(f"{x:.0f}" for x in P["beam_x"])
-    _, starts = S.notes(sh, 232, 260, [
+    _, starts = S.notes(sh, 232, 252, [
         f"REVISION D, WHOLE SHEET REDRAWN. FIVE BEAMS ACROSS THE TRAILER AT X {xs}. EACH END SITS ON A SIDE-WALL LEDGER SHELF AT Z {P['beam_underside_z']:.0f} AND ABUTS THE WALL.",
         f"THE LEDGERS ON PARTITION A AND ON THE REAR WALL'S DOOR HEADER CARRY THE DECK EDGES WITH THEIR SHELF TOP AT Z {P['deck_z']:.0f}.",
         f"DECK: {P['deck_length']:.0f} x 2330 FROM X {P['deck_x0']:.0f}, LAPPING OVER THE TOP EDGE OF PARTITION A AND ITS TOP CLEAT (DETAIL G). BONDED (SIKAFLEX-252) TO THE BEAMS, "

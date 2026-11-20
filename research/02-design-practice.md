@@ -1,5 +1,7 @@
 # 02: Design, drawing and documentation practice
 
+Note added 20 Nov 2026. DIM-01 now has Y positive to the right (road) side, not the left (kerb) side. With X rearward and Z up, the old definition was a left-handed frame, so the right-handed CAD model was the mirror image of the trailer. The project datum is now X along the trailer from the coupling ball centre, positive rearward, Y across from the centreline, positive to the road side, and Z up from the ground with the trailer level at design ride height. Read rule DIM-01 below with that change.
+
 Status: draft 2. Items marked TODO still need a source or a check. Links were checked on 16 Nov 2026 with one batch request each; links marked "bot check" returned a Cloudflare challenge to automated requests and were taken from search results.
 
 This report sets out how to draw, document and sequence the camper trailer build so that (a) the reviewing engineer can check and sign it off quickly and (b) the builder can follow it step by step without mistakes. It is written as rules the project website can enforce. Each rule has an ID. "Must" rules block a sheet, calculation or build step from being marked as issued. "Should" rules raise a warning.

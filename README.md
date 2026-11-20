@@ -70,9 +70,9 @@ fail on the current estimates, so `make strict` fails until the trailer's mass c
 ## Conventions
 
 - Module frame (DESIGN.md): origin on the garage floor at partition A's rear face on the centreline. X rearward
-  towards the rear door, Y towards the kerb side, Z up, millimetres.
-- Project datum (DIM-01, research/02): X rearward from the ball centre, Y towards the kerb side, Z up from the
-  ground. The trailer layout uses it. It is a left-handed frame, so the CAD model is a mirror image (TRAILER.md).
+  towards the rear door, Y towards the road side, Z up, millimetres.
+- Project datum (DIM-01, research/02): X rearward from the ball centre, Y towards the road side, Z up from the
+  ground. The trailer layout uses it. It is a right-handed frame, so the CAD model shows the real trailer.
 - Masses that depend on size are computed from the model: kg/m for extrusions and track, kg/m2 for panels.
   Bought items keep their declared mass. Each line records its source and maturity (spec, calculated, estimate).
 - Limits in `checks.yaml` are DESIGN.md's. Never change geometry or limits to make a check pass.

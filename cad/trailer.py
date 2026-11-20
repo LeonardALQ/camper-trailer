@@ -2,7 +2,7 @@
 comparison (TRAILER.md).
 
 Everything is in the project datum DIM-01 (research/02): X from the coupling ball centre, positive rearward,
-Y from the centreline, positive to the kerb side, Z up from the ground at design ride height. Blocks are
+Y from the centreline, positive to the road side, Z up from the ground at design ride height. Blocks are
 axis-aligned boxes, wheels are cylinders and the drawbar members are bars between two points.
 
 The garage and bed module is a sub-assembly at the back of the body (revision C). Its mass lines, the bikes and
@@ -266,9 +266,9 @@ class Layout:
             if clash:
                 continue
             osec = cm["outrigger"]
-            for side in (-1, 1):
+            for side in (1, -1):
                 ys = sorted((side * rail_out, side * V["half_bw"]))
-                o = Block(iid=f"OR-{k:02d}{'R' if side < 0 else 'K'}", id="OR", name=f"Outrigger, {s['id']}, {'road' if side < 0 else 'kerb'} side",
+                o = Block(iid=f"OR-{k:02d}{'R' if side > 0 else 'K'}", id="OR", name=f"Outrigger, {s['id']}, {'road' if side > 0 else 'kerb'} side",
                           system="chassis", box=(s["x"], ys[0], z1, s["x"] + w, ys[1], V["floor_underside_z"]),
                           generated=True, note=osec["name"])
                 o.cog = _centre(o.box)
@@ -438,7 +438,7 @@ class Layout:
         ys = [(b.box[1], b.box[4], b) for b in self.blocks if b.solid]
         lo = min(ys, key=lambda t: t[0])
         hi = max(ys, key=lambda t: t[1])
-        return dict(width_mm=hi[1] - lo[0], road=lo[2].name, kerb=hi[2].name)
+        return dict(width_mm=hi[1] - lo[0], road=hi[2].name, kerb=lo[2].name)
 
     def ground_clearance(self) -> dict:
         cand = [b for b in self.blocks if b.solid and b.system in ("drawbar", "chassis", "underfloor", "body")]
@@ -941,7 +941,7 @@ def chassis_inputs(tr: Trailer, ev: dict) -> dict:
     ov = lay.overall()
     alt_track = 2000
     return _r(dict(
-        datum="X from the ball centre, positive rearward. Y from the centreline, positive to the kerb side. Z up from the ground at design ride height.",
+        datum="X from the ball centre, positive rearward. Y from the centreline, positive to the road side. Z up from the ground at design ride height.",
         rail_outer_width=V["rail_outer_w"], rail_inner_width=2 * V["rail_in"], rail_centres=2 * V["rail_c"],
         rail_outer_width_wide_track=alt_track - 2 * (V["cf"] - V["wheel_offset"]), track=V["track"], wide_track=alt_track,
         cf=V["cf"], wheel_offset=V["wheel_offset"],

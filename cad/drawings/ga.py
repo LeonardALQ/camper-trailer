@@ -1,33 +1,18 @@
 """CT-001 general arrangement of the whole trailer (A3, third angle): plan section and kerb-side elevation in the
 project datum, key dimensions, the mass and CoG schedule by load case and the whole-trailer checks.
-
-DIM-01 as written in research/02 (X rearward, Y to the kerb, Z up) is a left-handed frame, while the CAD kernel is
-right-handed, so the 3D model is the mirror image of the real trailer. This sheet mirrors the shapes about the
-centreline before projecting, so both views show the trailer as it will be seen. Labels give DIM-01 values.
 """
 from __future__ import annotations
 
 import json
 import time
 
-from build123d import Compound, Keep, Plane
+from build123d import Keep, Plane
 
 from ..build import BUILD, git_hash
 from ..trailer import ModuleInfo, Trailer
 from ..trailer_model import TrailerModel
 from . import sheet as S
-
-
-def _mirror(shapes):
-    out = []
-    for s in shapes:
-        kids = list(s.children) if isinstance(s, Compound) and s.children else [s]
-        for k in kids:
-            if isinstance(k, Compound) and k.children:
-                out.extend(_mirror([k]))
-            else:
-                out.append(k.mirror(Plane.XZ))
-    return out
+from .sheets import _leaves
 
 
 def _cog(sh, x, y, label, r=1.6):
@@ -56,55 +41,55 @@ def ct001(prj, model, bom, checks, reg, dwg):
     # ---- plan: section at 1,000 above the garage floor, looking down. Ball on the left, kerb side at the bottom
     zc = fz + 1000
     plan_src = [s for s in shapes if not s.label.startswith(("RF-", "BD-02", "BD-12", "BD-13"))]
-    cut = S.section(_mirror(plan_src), Plane.XY.offset(zc), keep=Keep.BOTTOM)
+    cut = S.section(_leaves(plan_src), Plane.XY.offset(zc), keep=Keep.BOTTOM)
     vP = S.View(sh, (0, 0, 1), (0, 1, 0), sc, ox=30.0, oy=226.0)
     vP.draw(cut, sty="medium")
     S.view_label(sh, 110, 281, f"PLAN, SECTION 1000 ABOVE THE GARAGE FLOOR (Z {zc:.0f})", sc)
-    P = lambda x, y: vP.p(x, -y, 0)  # noqa: E731  DIM-01 point (x, y) to the sheet, on the mirrored plan
+    P = lambda x, y: vP.p(x, y, 0)  # noqa: E731  DIM-01 point (x, y) to the sheet
     # centreline, datum and side labels
     a, b = P(-200, 0), P(V["body_x1"] + 200, 0)
     sh.line(a[0], a[1], b[0], b[1], "centre")
     o = P(0, 0)
     sh.circle(o[0], o[1], 1.3, "medium")
     sh.text(o[0] - 1.8, o[1] + 2.0, "DATUM", 1.7, "end")
-    sh.text(P(300, 0)[0], P(0, hb)[1] + 0.5, "KERB SIDE (Y +)", 1.9)
-    sh.text(P(300, 0)[0], P(0, -hb)[1] - 2.5, "ROAD SIDE (Y -)", 1.9)
+    sh.text(P(300, 0)[0], P(0, -hb)[1] + 0.5, "KERB SIDE (Y -)", 1.9)
+    sh.text(P(300, 0)[0], P(0, hb)[1] - 2.5, "ROAD SIDE (Y +)", 1.9)
     # zone lengths along the road side
-    yd = P(0, -hb)[1] + 9
+    yd = P(0, hb)[1] + 9
     xs = [V["in_x0"], V["part_a_x"], V["module_x0"], V["in_x1"]]
     labs = [f"{V['part_a_x'] - V['in_x0']:.0f} LIVING AREA", "", f"{V['in_x1'] - V['module_x0']:.0f} GARAGE"]
     for (x0, x1), lab in zip(zip(xs, xs[1:]), labs):
         if not lab:
             continue
-        S.hdim(sh, P(x0, -hb)[0], P(0, -hb)[1], P(x1, -hb)[0], P(0, -hb)[1], yd, lab, size=1.9)
-    S.hdim(sh, P(V["body_x0"], -hb)[0], P(0, -hb)[1], P(V["body_x1"], -hb)[0], P(0, -hb)[1], yd + 6, f"{V['body_length']:.0f} BODY", size=1.9)
+        S.hdim(sh, P(x0, hb)[0], P(0, hb)[1], P(x1, hb)[0], P(0, hb)[1], yd, lab, size=1.9)
+    S.hdim(sh, P(V["body_x0"], hb)[0], P(0, hb)[1], P(V["body_x1"], hb)[0], P(0, hb)[1], yd + 6, f"{V['body_length']:.0f} BODY", size=1.9)
     # widths at the rear
     xr = P(V["body_x1"], 0)[0]
-    S.vdim(sh, xr, P(0, -hb)[1], xr, P(0, hb)[1], xr + 6, f"{V['body_width']:.0f} BODY", size=1.9)
-    S.vdim(sh, xr, P(0, -hb)[1], xr, P(0, hb + 100)[1], xr + 12, f"{ch['overall_width']:.0f} WITH AWNING", size=1.9)
+    S.vdim(sh, xr, P(0, hb)[1], xr, P(0, -hb)[1], xr + 6, f"{V['body_width']:.0f} BODY", size=1.9)
+    S.vdim(sh, xr, P(0, hb)[1], xr, P(0, -hb - 100)[1], xr + 12, f"{ch['overall_width']:.0f} WITH AWNING", size=1.9)
     # track, at the hubs
     xh = V["axle_x"] + V["rear_hub_dx"]
-    S.vdim(sh, P(xh, -V["hub_y"])[0], P(0, -V["hub_y"])[1], P(xh, V["hub_y"])[0], P(0, V["hub_y"])[1], P(xh + 420, 0)[0],
+    S.vdim(sh, P(xh, V["hub_y"])[0], P(0, V["hub_y"])[1], P(xh, -V["hub_y"])[0], P(0, -V["hub_y"])[1], P(xh + 420, 0)[0],
            f"{V['track']:.0f} TRACK", size=1.8, ext=False)
     for x in (V["axle_x"] + V["front_hub_dx"], xh):
-        p0, p1 = P(x, -hb - 60), P(x, hb + 60)
+        p0, p1 = P(x, hb + 60), P(x, -hb - 60)
         sh.line(p0[0], p0[1], p1[0], p1[1], "centre")
     # zone and item labels
-    for x, y, t in (((V["in_x0"] + V["part_a_x"]) / 2, 0, "LIVING AREA"), ((V["module_x0"] + V["in_x1"]) / 2, -1060, "GARAGE"),
-                    (V["module_x0"] + V["mod_locker_x0"] + 380, 900, "GAS LOCKER"), ((ch["spare_box"][0] + ch["spare_box"][3]) / 2, -470, "SPARE WHEEL")):
+    for x, y, t in (((V["in_x0"] + V["part_a_x"]) / 2, 0, "LIVING AREA"), ((V["module_x0"] + V["in_x1"]) / 2, 1060, "GARAGE"),
+                    (V["module_x0"] + V["mod_locker_x0"] + 380, -900, "GAS LOCKER"), ((ch["spare_box"][0] + ch["spare_box"][3]) / 2, 470, "SPARE WHEEL")):
         p = P(x, y)
         sh.text(p[0], p[1] - 0.8, t, 1.8, "middle")
     # keep-clear spaces as phantom outlines
     for k in (b for b in lay.blocks if b.keep_clear and b.zone == "living"):
         x0, y0, _, x1, y1, _ = k.box
-        p0, p1 = P(x0, y0), P(x1, y1)
+        p0, p1 = P(x0, y1), P(x1, y0)
         sh.rect(p0[0], p0[1], p1[0], p1[1], "phantom")
     # doors
-    for iid, side, t in (("BD-06", 1, "GAS HATCH"), ("BD-07", 1, "ENTRY DOOR")):
+    for iid, side, t in (("BD-06", -1, "GAS HATCH"), ("BD-07", -1, "ENTRY DOOR")):
         b = lay.find(iid)
         p0, p1 = P(b.box[0], side * (hb + 25)), P(b.box[3], side * (hb + 25))
         sh.line(p0[0], p0[1], p1[0], p1[1], "thick")
-        sh.text((p0[0] + p1[0]) / 2, p0[1] + (2.4 if side < 0 else -3.4), f"{t} {b.box[3] - b.box[0]:.0f}", 1.6, "middle")
+        sh.text((p0[0] + p1[0]) / 2, p0[1] + (2.4 if side > 0 else -3.4), f"{t} {b.box[3] - b.box[0]:.0f}", 1.6, "middle")
     b = lay.find("BD-05")
     xg = V["body_x1"] + 25
     p0, p1 = P(xg, b.box[1]), P(xg, b.box[4])
@@ -114,7 +99,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
     # ---- elevation from the kerb side, ball on the left (third angle: the plan sits above it)
     elev_src = [s for s in shapes if not s.label.startswith(("BD-01",))]
     vE = S.View(sh, (0, -1, 0), (0, 0, 1), sc, ox=30.0, oy=104.0)
-    vE.draw(_mirror(elev_src), sty="medium")
+    vE.draw(_leaves(elev_src), sty="medium")
     S.view_label(sh, 110, 176, "ELEVATION FROM THE KERB SIDE, ROOF DOWN", sc)
     E = lambda x, z: vE.p(x, 0, z)  # noqa: E731
     g0, g1 = E(-300, 0), E(V["body_x1"] + 300, 0)
@@ -166,7 +151,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
         rows.append([c["id"], c["name"][:30], f"{n['mass_kg']:.0f}", f"{g['mass_kg']:.0f}", f"{n['cog'][0]:.0f}", f"{n['cog'][2]:.0f}",
                      f"{n['towball_kg']:.0f}", f"{n['towball_pct']:.1f}", f"{n['axle_kg']:.0f}",
                      (f"{3500 - g['mass_kg']:+.0f}", "#000" if g["mass_kg"] <= 3500 else "#c00")])
-    yt = S.table(sh, 230.0, 243.0, [("CASE", 10), ("WHAT IS ABOARD", 47), ("kg", 11), ("kg +GR", 13), ("CoG X", 13), ("CoG Z", 12),
+    yt = S.table(sh, 230.0, 241.0, [("CASE", 10), ("WHAT IS ABOARD", 47), ("kg", 11), ("kg +GR", 13), ("CoG X", 13), ("CoG Z", 12),
                                     ("BALL kg", 14), ("BALL %", 13), ("AXLE kg", 14), ("ATM +GR", 33)], rows, size=1.6, row_h=3.2,
                  title="MASS AND CoG BY LOAD CASE (MASS-03). +GR = WITH MASS-06 GROWTH")
     # ---- whole-trailer checks
@@ -190,8 +175,8 @@ def ct001(prj, model, bom, checks, reg, dwg):
     S.table(sh, 230.0, yt - 5.5, [("KEY FIGURE (mm)", 70), ("VALUE", 30), ("NOTE", 80)], rows, size=1.6, row_h=3.0, title="CHASSIS INPUTS")
     # ---- notes
     S.notes(sh, 22, 66, [
-        "DATUM DIM-01: X FROM THE BALL CENTRE, POSITIVE REARWARD. Y FROM THE CENTRELINE, POSITIVE TO THE KERB SIDE. Z UP FROM THE GROUND, "
-        "TRAILER LEVEL AT DESIGN RIDE HEIGHT. VIEWS SHOW THE TRAILER AS SEEN (DIM-01 IS LEFT-HANDED, SO THE 3D MODEL IS ITS MIRROR, SEE TRAILER.md).",
+        "DATUM DIM-01: X FROM THE BALL CENTRE, POSITIVE REARWARD. Y FROM THE CENTRELINE, POSITIVE TO THE ROAD SIDE. Z UP FROM THE GROUND, "
+        "TRAILER LEVEL AT DESIGN RIDE HEIGHT. A RIGHT-HANDED FRAME, SO THE 3D MODEL AND THESE VIEWS SHOW THE TRAILER AS IT IS.",
         "BLOCK LAYOUT. EVERY ITEM IS AN ENVELOPE WITH A MASS. POSITIONS MARKED PLACEHOLDER IN assemblies/trailer.yaml ARE NOT DESIGNED YET.",
         f"AXLE POSITION SOLVED FOR {rep['target_kg']:.0f} kg ON THE BALL FULLY LOADED. CHASSIS SECTIONS ARE BLOCK SIZES FOR THE ENGINEER TO SET.",
         f"REVISION C: GARAGE AT THE BACK WITH A REAR DOOR, HEAVY ITEMS AFT. WITH NO BIKES ABOARD CARRY {rep['ballast']['kg']:.0f} kg OF BALLAST AT THE BACK OF THE GARAGE "

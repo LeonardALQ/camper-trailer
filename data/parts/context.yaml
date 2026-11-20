@@ -15,7 +15,7 @@ parts:
     name: Road-side wall (body)
     product: Side wall, 35 mm foam-core panel
     kind: context
-    notes: Inner face at Y = -1,165.
+    notes: Inner face at Y = +1,165.
     geometry: {generator: wall, params: {thickness: 35}}
     color: "#dfe6e9"
     alpha: 0.3
@@ -23,7 +23,7 @@ parts:
     name: Kerb-side wall with the gas locker hatch opening (body)
     product: Side wall, 35 mm foam-core panel, 700 x 630 hatch opening
     kind: context
-    notes: Inner face at Y = +1,165. The opening is the gas locker's hatch, the locker's only access.
+    notes: Inner face at Y = -1,165. The opening is the gas locker's hatch, the locker's only access.
     geometry: {generator: wall, params: {thickness: 35, opening: true}}
     color: "#dfe6e9"
     alpha: 0.3
@@ -31,7 +31,7 @@ parts:
     name: Rear wall with the garage door opening (body)
     product: Rear wall, 35 mm foam-core panel, 1,910 x 1,440 door opening
     kind: context
-    notes: Inner face at X = 2,330. Opening Y -1,125 to +785, Z 0 to 1,440. The header above the opening carries the deck's rear edge.
+    notes: Inner face at X = 2,330. Opening Y -785 to +1,125, Z 0 to 1,440. The header above the opening carries the deck's rear edge.
     geometry: {generator: wall, params: {thickness: 35}}
     color: "#dfe6e9"
     alpha: 0.3

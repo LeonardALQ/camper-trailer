@@ -1,6 +1,6 @@
 # Whole-trailer block layout (TRAILER.md). Every block is an envelope with a mass, placed in the project datum
 # DIM-01 (research/02): X along the trailer from the coupling ball centre, positive rearward. Y across from the
-# centreline, positive to the kerb (left) side. Z up from the ground with the trailer level at design ride height.
+# centreline, positive to the road (right) side. Z up from the ground with the trailer level at design ride height.
 # Units are mm and kg.
 #
 # Revision C: the garage and bed module (ASM-GB, garage-bed.yaml, revision D) sits at the back of the body with
@@ -150,7 +150,7 @@ fit_options: []
 # item may enter one.
 zones:
   living: {name: Living area, box: [in_x0, -half_in, floor_z, part_a_x - in_x0, 2 * half_in, interior_h]}
-  gas_locker: {name: Gas locker (inside), box: [module_x0 + mod_locker_x0 + 20, mod_locker_y0 + 20, floor_z + 20, mod_locker_l - 40, mod_locker_w - 20, mod_locker_h - 40]}
+  gas_locker: {name: Gas locker (inside), box: [module_x0 + mod_locker_x0 + 20, mod_locker_y0, floor_z + 20, mod_locker_l - 40, mod_locker_w - 20, mod_locker_h - 40]}
   kerb_strip: {name: Kerb-strip stowage in the garage, box: [module_x0 + mod_stow_row_x0, mod_locker_y0, floor_z, mod_locker_x0 - mod_stow_row_x0, mod_locker_w, mod_locker_h]}
   underfloor: {name: Under the floor between the rails, box: [body_x0, -rail_in, rail_underside_z - 10, body_length, 2 * rail_in, floor_underside_z - rail_underside_z + 10]}
 
@@ -159,14 +159,14 @@ items:
   - id: DB-01
     name: Drawbar member
     system: drawbar
-    for: {s: [-1, 1]}
+    for: {s: [1, -1]}
     bar: {p0: [db_apex_x, s * db_apex_y, rail_underside_z - db_depth / 2], p1: [body_x0, s * rail_c, rail_underside_z - db_depth / 2], w: rail_w, h: db_depth}
     mass: {basis: per_length, kg_per_m: 11.6, maturity: estimate, source: "Older block model section, RHS 150 x 50 x 4 at 11.6 kg/m (the engineer sizes it)"}
     note: Runs under the main rails (report 08 option 1), so the coupling end starts one rail depth lower.
   - id: DB-02
     name: Drawbar member under the rail
     system: drawbar
-    for: {s: [-1, 1]}
+    for: {s: [1, -1]}
     box: [body_x0, s * rail_c - rail_w / 2, rail_underside_z - db_depth, db_tail, rail_w, db_depth]
     mass: {basis: per_length, kg_per_m: 11.6, measure: dx, maturity: estimate, source: "As DB-01"}
     note: PLACEHOLDER length. It runs back to a crossmember (report 02 FAIL-01). The engineer sets where it ends.
@@ -186,13 +186,13 @@ items:
   - id: CH-01
     name: Main rail
     system: chassis
-    for: {s: [-1, 1]}
+    for: {s: [1, -1]}
     box: [body_x0, s * rail_c - rail_w / 2, rail_underside_z, body_length, rail_w, rail_h]
     mass: {basis: per_length, kg_per_m: 11.6, measure: dx, maturity: estimate, source: "Older block model section, RHS 150 x 50 x 4 at 11.6 kg/m (the engineer sizes it)"}
   - id: CH-02
     name: Raiser on the rail
     system: chassis
-    for: {s: [-1, 1]}
+    for: {s: [1, -1]}
     box: [body_x0, s * rail_c - rail_w / 2, rail_top_z, body_length, rail_w, raiser_h]
     mass: {basis: per_length, kg_per_m: 6.6, measure: dx, maturity: estimate, source: "Block size for this layout, 100 x 50 x 3 RHS at 6.6 kg/m on packers (estimate)"}
     note: Fills the gap from the rail top to the floor underside (report 06 section 8). Deeper rails would do the same job.
@@ -207,21 +207,21 @@ items:
     name: Cruisemaster XT Freestyle Air (4,500 kg build), arm, Firestone style 26 airbag, LC6 hub drum and 12 inch ABS-enabled electric brake
     note: "Hub: Cruisemaster LC6 pattern, 6 x 139.7 with 1/2 inch UNF x 41 mm knurled studs and a 93 mm spigot, on the 12 inch ABS-enabled A/T electric drum (VT hub). A Cruisemaster standard pattern on 12 inch drums, to be confirmed as an off-the-shelf ABS-enabled part (report 09 sections 1 and 8)."
     system: running_gear
-    for: {h: [front_hub_dx, rear_hub_dx], s: [-1, 1]}
+    for: {h: [front_hub_dx, rear_hub_dx], s: [1, -1]}
     box: [axle_x + h - 419, s * (rail_outer_w / 2 + (hub_y - rail_outer_w / 2) / 2) - (hub_y - rail_outer_w / 2) / 2, hub_z - 60, 480, hub_y - rail_outer_w / 2, rail_underside_z - hub_z + 60]
     cog: [axle_x + h - 150, s * (rail_outer_w / 2 + 60), hub_z + 40]
     mass: {basis: declared, unit_kg: 45, maturity: estimate, source: "https://www.diycaravans.com.au/shop/cruisemaster-xt-freestyle-coil-suspension-kit-tandem/", note: "180 kg per tandem kit for the coil version (retailer listing), a quarter per wheel. The air kit's weight is not published"}
   - id: RG-02
     name: Tyre, Yokohama Geolandar A/T G015 LT245/70R16 118/115R, load range E
     system: running_gear
-    for: {h: [front_hub_dx, rear_hub_dx], s: [-1, 1]}
+    for: {h: [front_hub_dx, rear_hub_dx], s: [1, -1]}
     cyl: {c: [axle_x + h, s * hub_y, hub_z], r: tyre_d / 2, w: tyre_w}
     mass: {basis: declared, unit_kg: 19.3, maturity: spec, source: "https://tiresize.com/tires/Yokohama/Geolandar-AT-G015.htm", note: "Maker's size table, 42.6 lb (report 09 section 2)"}
     note: Rated 1,320 kg (load index 118), 80 psi maximum. The cylinder is the wheel and tyre envelope.
   - id: RG-06
     name: Wheel, ROH Trak 2 16x7 +7 steel, 6 x 139.7, part 4116776
     system: running_gear
-    for: {h: [front_hub_dx, rear_hub_dx], s: [-1, 1]}
+    for: {h: [front_hub_dx, rear_hub_dx], s: [1, -1]}
     point: [axle_x + h, s * hub_y, hub_z]
     mass: {basis: declared, unit_kg: 13.5, maturity: estimate, source: "Report 09 section 6: ROH does not publish it. Estimated from ROH's 14.3 to 14.4 kg for the wider 16x8 Trak D"}
     note: Rated 1,250 kg (ROH's published table, measurements.yaml WHL-01). Its mass sits at the hub centre, inside the tyre envelope (RG-02), so it has no geometry of its own.
@@ -236,14 +236,14 @@ items:
     note: In the living area against partition A, on top of the diesel heater, where it stays dry and out of the garage. The lines run along the rails to the four bags.
     system: running_gear
     zone: living
-    box: [part_a_x - 400, -half_in + 1650, floor_z + 300, 400, 300, 300]
+    box: [part_a_x - 400, half_in - 1650 - 300, floor_z + 300, 400, 300, 300]
     mass: {basis: declared, total_kg: 10, maturity: estimate, source: "Report 06 section 2: 8 to 12 kg for the compressor, tank, panel and lines (estimate, not published)"}
   - id: RG-05
     name: Spare Firestone style 26 airbag with fittings, tube and Loctite 567
     note: A punctured bag cannot be repaired (Cruisemaster CIS-006), so the spare travels with the trailer. It sits on the air supply.
     system: running_gear
     zone: living
-    box: [part_a_x - 400, -half_in + 1650, floor_z + 600, 400, 300, 150]
+    box: [part_a_x - 400, half_in - 1650 - 300, floor_z + 600, 400, 300, 150]
     mass: {basis: declared, total_kg: 3, maturity: estimate, source: "Report 06 section 2: 2.4 kg bag (Firestone style 26 sheet) plus fittings (estimate)"}
 
   # ================================================================ spare wheel (revision D, report 09 section 7)
@@ -278,7 +278,7 @@ items:
   - id: BD-03
     name: Side wall
     system: body
-    for: {s: [-1, 1]}
+    for: {s: [1, -1]}
     box: [body_x0, s * (half_bw - wall_t / 2) - wall_t / 2, floor_z, body_length, wall_t, interior_h]
     mass: {basis: per_area, kg_per_m2: 5.0, measure: dx * dz, maturity: estimate, source: "Older block model: 69 kg for a 6.0 x 2.3 m wall. Door openings are not taken off"}
   - id: BD-04
@@ -296,13 +296,13 @@ items:
   - id: BD-06
     name: Gas locker hatch, kerb side
     system: body
-    box: [module_x0 + mod_hatch_x0, half_in, floor_z + mod_hatch_z0, mod_hatch_x1 - mod_hatch_x0, wall_t, mod_hatch_z1 - mod_hatch_z0]
+    box: [module_x0 + mod_hatch_x0, -half_in - wall_t, floor_z + mod_hatch_z0, mod_hatch_x1 - mod_hatch_x0, wall_t, mod_hatch_z1 - mod_hatch_z0]
     mass: {basis: declared, total_kg: 4, maturity: estimate, source: "Estimate: 0.44 m2 hatch with frame, vents, hinge and lock"}
     note: Revision C. The gas locker's only access (report 02 section 5.2).
   - id: BD-07
     name: Entry door, kerb side
     system: body
-    box: [lz_door_x, half_in, floor_z, lz_door_w, wall_t, lz_door_h]
+    box: [lz_door_x, -half_in - wall_t, floor_z, lz_door_w, wall_t, lz_door_h]
     mass: {basis: declared, total_kg: 20, maturity: estimate, source: "Older block model"}
     note: PLACEHOLDER position, 1,500 mm behind the front wall, behind the kitchen. VSB1 13.2.1 wants one door on the left side or the rear.
   - id: BD-08
@@ -333,7 +333,7 @@ items:
   - id: BD-13
     name: Awning, kerb side
     system: body
-    box: [body_x0 + 300, half_bw, ceiling_z - 160, body_length - 600, 100, 120]
+    box: [body_x0 + 300, -half_bw - 100, ceiling_z - 160, body_length - 600, 100, 120]
     mass: {basis: declared, total_kg: 35, maturity: estimate, source: "Older block model"}
     note: PLACEHOLDER product. It may stand at most 100 mm proud of the 2,400 mm body to stay inside VSB1's 2,500 mm width.
 
@@ -341,7 +341,7 @@ items:
   - id: RF-01
     name: Solar panel, 400 W
     system: roof
-    for: {k: [0, 1], s: [-1, 1]}
+    for: {k: [0, 1], s: [1, -1]}
     box: [body_x0 + (body_length - 2 * 1722) / 2 + k * 1722, "min(0, s * 1134)", roof_top_z + 20, 1722, 1134, 30]
     mass: {basis: declared, unit_kg: 22.5, maturity: estimate, source: "Older block model (1,722 x 1,134 x 30 mm panel)"}
 
@@ -379,7 +379,7 @@ items:
     name: Generator
     system: stowage
     zone: kerb_strip
-    box: [module_x0 + mod_gen_x0, half_in - mod_gen_w, floor_z, mod_gen_l, mod_gen_w, mod_gen_h]
+    box: [module_x0 + mod_gen_x0, -half_in, floor_z, mod_gen_l, mod_gen_w, mod_gen_h]
     mass: {basis: declared, total_kg: 40, maturity: estimate, source: "Older block model"}
     note: Strapped to the kerb-strip track row in front of the gas locker (DESIGN.md).
   - id: GS-02
@@ -387,7 +387,7 @@ items:
     system: stowage
     zone: gas_locker
     for: {k: [0, 1]}
-    box: [module_x0 + mod_locker_x0 + 30 + k * (mod_cyl_d + 50), mod_locker_y0 + 40, floor_z + 20, mod_cyl_d, mod_cyl_d, mod_cyl_h]
+    box: [module_x0 + mod_locker_x0 + 30 + k * (mod_cyl_d + 50), mod_locker_y1 - 40 - mod_cyl_d, floor_z + 20, mod_cyl_d, mod_cyl_d, mod_cyl_h]
     mass: {basis: declared, unit_kg: 8.5, maturity: estimate, source: "Older block model: two full bottles 34 kg, split into bottle and gas"}
   - id: GS-03
     name: LPG in the cylinders
@@ -395,20 +395,20 @@ items:
     load: gas
     zone: gas_locker
     for: {k: [0, 1]}
-    point: [module_x0 + mod_locker_x0 + 30 + k * (mod_cyl_d + 50) + mod_cyl_d / 2, mod_locker_y0 + 40 + mod_cyl_d / 2, floor_z + 20 + 200]
+    point: [module_x0 + mod_locker_x0 + 30 + k * (mod_cyl_d + 50) + mod_cyl_d / 2, mod_locker_y1 - 40 - mod_cyl_d / 2, floor_z + 20 + 200]
     mass: {basis: declared, unit_kg: 8.5, maturity: estimate, source: "Older block model: two full bottles 34 kg, split into bottle and gas"}
   - id: GS-04
     name: Petrol and diesel in jerry cans
     system: stowage
     load: fuel
     zone: kerb_strip
-    box: [module_x0 + mod_fuel_x0, half_in - mod_fuel_w, floor_z, mod_fuel_l, mod_fuel_w, mod_fuel_h]
+    box: [module_x0 + mod_fuel_x0, -half_in, floor_z, mod_fuel_l, mod_fuel_w, mod_fuel_h]
     mass: {basis: declared, total_kg: 17, maturity: estimate, source: "Older block model"}
   - id: GS-05
     name: Regulator, changeover valve and pigtails
     system: stowage
     zone: gas_locker
-    box: [module_x0 + mod_locker_x0 + 230, mod_locker_y0 + 40, floor_z + 20 + mod_cyl_h + 10, 300, 120, 100]
+    box: [module_x0 + mod_locker_x0 + 230, mod_locker_y1 - 40 - 120, floor_z + 20 + mod_cyl_h + 10, 300, 120, 100]
     mass: {basis: declared, total_kg: 1.5, maturity: estimate, source: "Estimate: two-stage auto changeover regulator with two pigtails"}
 
   # ================================================================ living area (zone `living`, heavy items against partition A)
@@ -416,66 +416,66 @@ items:
     name: Wet bathroom, 1 x 1 m, recirculating shower and toilet
     system: living
     zone: living
-    box: [part_a_x - 1000, -half_in, floor_z, 1000, 1000, interior_h]
+    box: [part_a_x - 1000, half_in - 1000, floor_z, 1000, 1000, interior_h]
     mass: {basis: declared, total_kg: 100, maturity: estimate, source: "Older block model (wet bathroom 1 x 1)"}
   - id: LA-02
     name: Washer-dryer
     system: living
     zone: living
-    box: [part_a_x - 600, -half_in + 1000, floor_z, 600, 600, 850]
+    box: [part_a_x - 600, half_in - 1000 - 600, floor_z, 600, 600, 850]
     mass: {basis: declared, total_kg: 65, maturity: estimate, source: "Older block model"}
   - id: LA-03
     name: Diesel heater and hot water unit
     system: living
     zone: living
-    box: [part_a_x - 400, -half_in + 1600, floor_z, 400, 400, 300]
+    box: [part_a_x - 400, half_in - 1600 - 400, floor_z, 400, 400, 300]
     mass: {basis: declared, total_kg: 30, maturity: estimate, source: "Older block model"}
   - id: LA-04
     name: Inverter and chargers on partition A
     system: living
     zone: living
-    box: [part_a_x - 135, -half_in + 1000, floor_z + 1100, 135, 800, 700]
+    box: [part_a_x - 135, half_in - 1000 - 800, floor_z + 1100, 135, 800, 700]
     mass: {basis: declared, total_kg: 60, maturity: estimate, source: "Older block model"}
   - id: LA-05
     name: Fridge
     system: living
     zone: living
-    box: [part_a_x - 1600, -half_in, floor_z, 600, 600, 1400]
+    box: [part_a_x - 1600, half_in - 600, floor_z, 600, 600, 1400]
     mass: {basis: declared, total_kg: 35, maturity: estimate, source: "Older block model"}
   - id: LA-06
     name: Chest freezer
     system: living
     zone: living
-    box: [part_a_x - 2150, -half_in, floor_z, 550, 800, 850]
+    box: [part_a_x - 2150, half_in - 800, floor_z, 550, 800, 850]
     mass: {basis: declared, total_kg: 30, maturity: estimate, source: "Older block model"}
   - id: LA-07
     name: Outdoor kitchen slide-out, kerb side, under the awning
     system: living
     zone: living
-    box: [in_x0, half_in - 600, floor_z + 50, lz_kitchen_l, 600, 450]
+    box: [in_x0, -half_in, floor_z + 50, lz_kitchen_l, 600, 450]
     mass: {basis: declared, total_kg: 80, maturity: estimate, source: "Older block model"}
   - id: LA-08
     name: Wardrobe over the kitchen
     system: living
     zone: living
-    box: [in_x0, half_in - 550, floor_z + 520, lz_kitchen_l, 550, interior_h - 520]
+    box: [in_x0, -half_in, floor_z + 520, lz_kitchen_l, 550, interior_h - 520]
     mass: {basis: declared, total_kg: 35, maturity: estimate, source: "Older block model"}
   - id: LA-09
     name: Desk, 1,000 x 400, against the front wall
     system: living
     zone: living
-    box: [in_x0, -half_in, floor_z + 720, 400, 1000, 30]
+    box: [in_x0, half_in - 1000, floor_z + 720, 400, 1000, 30]
     mass: {basis: declared, total_kg: 12, maturity: estimate, source: "Older block model"}
   - id: LA-10
     name: Air-conditioner, under the desk
     system: living
     zone: living
-    box: [in_x0, -half_in, floor_z, 400, 600, 300]
+    box: [in_x0, half_in - 600, floor_z, 400, 600, 300]
     mass: {basis: declared, total_kg: 30, maturity: estimate, source: "Older block model"}
   - id: LA-11
     name: Cabinetry and seat
     system: living
-    point: [in_x0 + 650, -half_in + 500, floor_z + 450]
+    point: [in_x0 + 650, half_in - 500, floor_z + 450]
     mass: {basis: declared, total_kg: 70, maturity: estimate, source: "Older block model (cabinetry and chair)"}
     note: PLACEHOLDER. Placed at the seat by the desk, at the front, until the furniture is designed.
   - id: LA-K1
@@ -483,45 +483,45 @@ items:
     system: living
     zone: living
     keep_clear: true
-    box: [lz_door_x, half_in - 600, floor_z, lz_door_w, 600, interior_h]
+    box: [lz_door_x, -half_in, floor_z, lz_door_w, 600, interior_h]
   - id: LA-K2
     name: Ladder landing (stand here to climb)
     system: living
     zone: living
     keep_clear: true
-    box: [ladder_x0 - 600, half_in - 600, floor_z, 600, 600, interior_h]
+    box: [ladder_x0 - 600, -half_in, floor_z, 600, 600, interior_h]
   - id: LA-K3
     name: Bathroom door landing
     system: living
     zone: living
     keep_clear: true
-    box: [part_a_x - 1200, -half_in + 1000, floor_z, 600, 600, interior_h]
+    box: [part_a_x - 1200, half_in - 1000 - 600, floor_z, 600, 600, interior_h]
   - id: LA-K4
     name: Walkway from the entry door to the desk, fridge and bathroom
     system: living
     zone: living
     keep_clear: true
-    box: [in_x0 + 400, -half_in + 800, floor_z, part_a_x - 1200 - in_x0 - 400, 930, interior_h]
+    box: [in_x0 + 400, half_in - 800 - 930, floor_z, part_a_x - 1200 - in_x0 - 400, 930, interior_h]
   - id: LA-K5
     name: Seat space at the desk
     system: living
     zone: living
     keep_clear: true
-    box: [in_x0 + 400, -half_in, floor_z, 500, 1000, 1200]
+    box: [in_x0 + 400, half_in - 1000, floor_z, 500, 1000, 1200]
 
   # ================================================================ payload carried in the body
   - id: PL-01
     name: Food and drink
     system: payload
     load: gear
-    point: [part_a_x - 1500, -half_in + 600, floor_z + 700]
+    point: [part_a_x - 1500, half_in - 600, floor_z + 700]
     mass: {basis: declared, total_kg: 50, maturity: estimate, source: "Older block model"}
     note: In the fridge, the freezer and the kitchen.
   - id: PL-02
     name: Clothes, bedding and personal gear
     system: payload
     load: gear
-    point: [in_x0 + 750, half_in - 275, floor_z + 1160]
+    point: [in_x0 + 750, -half_in + 275, floor_z + 1160]
     mass: {basis: declared, total_kg: 60, maturity: estimate, source: "Older block model"}
     note: In the wardrobe.
   - id: PL-03

@@ -145,7 +145,7 @@ def gen_ledger(prm, spec, P):
             prof = prof[::-1]
         shape = prism_xz(prof, -hw, -hw + L)
     else:
-        y0, s = (-hw, 1) if w == "road" else (hw, -1)
+        y0, s = (hw, -1) if w == "road" else (-hw, 1)
         prof = [(y0, top - leg), (y0 + s * t, top - leg), (y0 + s * t, top - t), (y0 + s * leg, top - t), (y0 + s * leg, top), (y0, top)]
         if s < 0:
             prof = prof[::-1]
@@ -314,8 +314,8 @@ def gen_floor(prm, at, P):
     x0, x1 = P.get("body_x0"), P.get("garage_length")
     s = box_span(x0, x1, -hw - wt, hw + wt, -t, 0)
     tw, th = P.get("track_w"), P.get("track_h")
-    for xr, y1 in ((P.get("front_row_x"), hw), (P.get("rear_row_x"), P.get("rear_row_y1"))):
-        s = s - box_span(xr - tw / 2, xr + tw / 2, -hw, y1, -th, 1)
+    for xr, y0 in ((P.get("front_row_x"), -hw), (P.get("rear_row_x"), P.get("rear_row_y0"))):
+        s = s - box_span(xr - tw / 2, xr + tw / 2, y0, hw, -th, 1)
     ys = P.get("stow_row_y")
     s = s - box_span(P.get("stow_row_x0"), P.get("stow_row_x1"), ys - tw / 2, ys + tw / 2, -th, 1)
     return s, {}
@@ -330,11 +330,11 @@ def gen_wall(prm, at, P):
     zc = P.get("ceiling_z")
     side = prm.get("side")
     if side == "road":
-        s = box_span(x0, x1, -hw - t, -hw, 0, zc)
-    elif side == "kerb":
         s = box_span(x0, x1, hw, hw + t, 0, zc)
+    elif side == "kerb":
+        s = box_span(x0, x1, -hw - t, -hw, 0, zc)
         if prm.get("opening"):
-            s = s - box_span(P.get("hatch_x0"), P.get("hatch_x1"), hw - 1, hw + t + 1, P.get("hatch_z0"), P.get("hatch_z1"))
+            s = s - box_span(P.get("hatch_x0"), P.get("hatch_x1"), -hw - t - 1, -hw + 1, P.get("hatch_z0"), P.get("hatch_z1"))
     else:
         s = box_span(x1, x1 + t, -hw - t, hw + t, 0, zc)
         s = s - box_span(x1 - 1, x1 + t + 1, P.get("door_y0"), P.get("door_y1"), -1, P.get("door_h"))

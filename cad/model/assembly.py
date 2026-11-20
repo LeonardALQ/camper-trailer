@@ -118,8 +118,8 @@ class Model:
             yw = m.rear_tyre_width / 2 + 12
             zw = zr - 0.55 * m.rear_rim_radius
             a, b = s["anchors"]
-            pl, pr = pb.point(xr, -yw, zw), pb.point(xr, yw, zw)
-            return [tuple(a), (pl.X, pl.Y, pl.Z), (pr.X, pr.Y, pr.Z), tuple(b)]
+            pr, pl = pb.point(xr, yw, zw), pb.point(xr, -yw, zw)
+            return [tuple(a), (pr.X, pr.Y, pr.Z), (pl.X, pl.Y, pl.Z), tuple(b)]
         x, y, z = m.tie_downs[s["point"]]
         top = pb.point(x, s["side"] * y, z)
         return [(top.X, top.Y, top.Z), tuple(s["anchor"])]

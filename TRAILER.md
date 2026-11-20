@@ -4,11 +4,9 @@ Status: concept, revision D, 19 Nov 2026, updated the same day for the car's wat
 
 ## Datum
 
-Every position here is in the project datum from report 02 (DIM-01). X runs along the trailer from the coupling ball centre, positive rearward. Y runs across from the centreline, positive to the kerb (left) side. Z is up from the ground with the trailer level at design ride height. Units are mm and kg.
+Every position here is in the project datum from report 02 (DIM-01). X runs along the trailer from the coupling ball centre, positive rearward. Y runs across from the centreline, positive to the road (right) side. Z is up from the ground with the trailer level at design ride height. Units are mm and kg. This is a right-handed frame, so the 3D model, the STEP files and the drawings show the trailer as it is. DIM-01 changed to it on 20 Nov 2026 (report 02 note): before that, Y was positive to the kerb side and the model was a mirror image.
 
 The garage and bed module keeps its own frame, and its axes are the datum's. Module X 0, the rear face of partition A, sits at X 4,955 in the 5,500 mm body, and the garage floor (module Z 0) at Z 869. The module ends at the rear wall's inner face, X 7,285.
-
-OPEN: DIM-01 as written is a left-handed frame. With X rearward and Z up, a right-handed frame has Y positive to the right. CAD programs are right-handed, so the 3D model is the mirror image of the real trailer, and in the 3D viewer the gas locker appears on the right when you look from behind. Numbers, masses, clearances and checks are not affected, because a mirror changes none of them. Drawing CT-001 mirrors the model before projecting, so its views show the trailer as it will be seen. The module sheets CT-401 to CT-501 show the model as it is. The fix is to change DIM-01 to Y positive to the road side, or to keep it and mirror every view. Either way it is a decision for the owner and the engineer before any sheet goes FOR CONSTRUCTION.
 
 ## Body
 
@@ -247,11 +245,10 @@ The plan uses these values now. Each comes from the source named, and each is re
 
 These are design decisions for the owner.
 
-1. DIM-01's handedness (see Datum).
-2. The mass with growth: which of the remaining levers in Mass to use. On base weights it is answered for the fully loaded case, which carries 200 L in the trailer and 200 L in the car, 149 kg under the ATM.
-3. The ballast with the bikes out: what it is (water, sand, tools) and where it is strapped, or whether less water and gear make it unnecessary.
-4. Steel or alloy trailer wheels, and LT245/70R16 or LT225/75R16 tyres (report 09 open questions 1 and 2).
-5. The track: 1,662 mm on the present rails, or wider for roll stability with a wider rail, since the effective C/F cannot pass 200 mm.
-6. The entry door position and whether the generator needs its own hatch into the garage's kerb strip.
-7. Whether a shorter drawbar is wanted now the box is gone. The spare wheel then sets the jack-knife clearance.
-8. Where the car's spare rides when the trailer is coupled: on the car's boot floor, as planned, or in the trailer over its axles, which frees about 45 kg of the car's gear allowance (report 10).
+1. The mass with growth: which of the remaining levers in Mass to use. On base weights it is answered for the fully loaded case, which carries 200 L in the trailer and 200 L in the car, 149 kg under the ATM.
+2. The ballast with the bikes out: what it is (water, sand, tools) and where it is strapped, or whether less water and gear make it unnecessary.
+3. Steel or alloy trailer wheels, and LT245/70R16 or LT225/75R16 tyres (report 09 open questions 1 and 2).
+4. The track: 1,662 mm on the present rails, or wider for roll stability with a wider rail, since the effective C/F cannot pass 200 mm.
+5. The entry door position and whether the generator needs its own hatch into the garage's kerb strip.
+6. Whether a shorter drawbar is wanted now the box is gone. The spare wheel then sets the jack-knife clearance.
+7. Where the car's spare rides when the trailer is coupled: on the car's boot floor, as planned, or in the trailer over its axles, which frees about 45 kg of the car's gear allowance (report 10).

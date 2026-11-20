@@ -29,13 +29,13 @@ def candidates(row: dict) -> list[tuple[str, int, str]]:
         return [("ladder_length", +1, "lengthen the ladder")]
     if cid == "CLR-09":
         if "Street Triple" in row.get("sub", ""):
-            return [("door_y1", +1, "widen the door opening on the kerb side")]
-        return [("door_y0", -1, "widen the door opening on the road side")]
+            return [("door_y0", -1, "widen the door opening on the kerb side")]
+        return [("door_y1", +1, "widen the door opening on the road side")]
     if cid == "CLR-10":
-        return [("ramp_y0", +1, "move the stowed ramp towards the kerb wall")]
+        return [("ramp_y0", -1, "move the stowed ramp towards the kerb wall")]
     if cid == "CLR-04":
         if "(C2)" in gov:
-            return [("tuareg_y", +1, "move both bikes away from the road-side wall")]
+            return [("tuareg_y", -1, "move both bikes away from the road-side wall")]
         if "(C4)" in gov or "(C8)" in gov:
             return [("front_tyre_x", -1, "move both bikes towards partition A")]
         if "(1)" in gov:

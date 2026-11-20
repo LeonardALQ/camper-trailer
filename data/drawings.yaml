@@ -20,6 +20,7 @@ drawings:
       - {rev: C, date: 2026-11-19, description: "Notice: rear garage and door, one living area, no drawbar box, ballast", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-19, description: "Notice: trailer's own wheels and tyres, spare on the front wall, floor Z 869", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-19, description: "Notice: fully loaded case carries 200 L, the other 200 L in the car", drawn: Kiro, checked: "", approved: ""}
+      - {rev: F, date: 2026-11-20, description: "Memo: DIM-01 made right-handed, Y positive to the road side. Views unchanged", drawn: Kiro, checked: "", approved: ""}
   - number: CT-401
     title: Garage and bed general arrangement
     subtitle: Plan, kerb-side section and section looking forward at partition A
@@ -34,6 +35,7 @@ drawings:
       - {rev: C, date: 2026-11-18, description: "Notice: Tuareg panniers in the bike envelope, module placed in the trailer datum", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-19, description: "Notice: rear garage, bikes along, rear door, gas locker. Redrawn", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-19, description: "Notice: module Z 0 at datum Z 869 (trailer's own tyres)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: F, date: 2026-11-20, description: "Notice: DIM-01 made right-handed. Plan and section A-A redrawn as seen", drawn: Kiro, checked: "", approved: ""}
   - number: CT-402
     title: Garage floor, tie-down anchor layout
     subtitle: Track rows and anchor positions from the module datum
@@ -46,6 +48,7 @@ drawings:
       - {rev: A, date: 2026-11-16, description: First draft from design v1 baseline, drawn: Kiro, checked: "", approved: ""}
       - {rev: C, date: 2026-11-18, description: "Notice: Tuareg panniers shown in the bike outline (no revision B on this sheet)", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-19, description: "Notice: rows across the trailer, kerb-strip row, strap loads. Redrawn", drawn: Kiro, checked: "", approved: ""}
+      - {rev: E, date: 2026-11-20, description: "Notice: DIM-01 made right-handed. Plan redrawn as seen, anchor Y values negated", drawn: Kiro, checked: "", approved: ""}
   - number: CT-501
     title: Bed platform
     subtitle: Beam layout, section through the bed stack, beam-end detail and deck lap detail
@@ -58,3 +61,4 @@ drawings:
       - {rev: A, date: 2026-11-16, description: First draft from design v1 baseline, drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-17, description: "Notice: deck 1845 long, laps over partition B and its top cleat (detail G)", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-19, description: "Notice: SHS 50x50x3 beams across, deck 2375 laps partition A. Redrawn", drawn: Kiro, checked: "", approved: ""}
+      - {rev: E, date: 2026-11-20, description: "Notice: DIM-01 made right-handed. Plan and detail F redrawn as seen", drawn: Kiro, checked: "", approved: ""}

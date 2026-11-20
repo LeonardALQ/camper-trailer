@@ -41,8 +41,8 @@ steps:
     drawings: [CT-402]
     instructions:
       - Mark the front row centreline across the trailer at X = 250 from partition A's rear face, for the full 2,330 mm width.
-      - Mark the rear row at X = 2,048, from the road-side wall to the gas locker's inner face at Y = +785 (1,950 mm).
-      - Mark the stowage row along the kerb strip at Y = +985, from X = 700 to 1,560.
+      - Mark the rear row at X = 2,048, from the road-side wall to the gas locker's inner face at Y = -785 (1,950 mm).
+      - Mark the stowage row along the kerb strip at Y = -985, from X = 700 to 1,560.
       - Rout each channel 34.5 mm wide and 13.7 mm deep, then remove the core under it for the hardpoint strip.
       - Bond the hardpoint strip with Plexus MA310 and drill the M8 bolt holes at 150 mm pitch or less, through to the steel anchor rail.
     checks:
@@ -68,7 +68,7 @@ steps:
     instructions:
       - Cut the tracks to length and deburr the ends.
       - Seat each track in its channel with its top flush with the floor and bolt it at 150 mm pitch or less.
-      - Bolt each chock adapter on its bike centreline (Tuareg Y = -600, Street Triple Y = +160), nose against partition A.
+      - Bolt each chock adapter on its bike centreline (Tuareg Y = +600, Street Triple Y = -160), nose against partition A.
       - Torque every bolt to the value the engineer sets and paint a torque stripe on it.
     checks:
       - Track tops flush with the floor along their whole length (CON-01 in the model).
@@ -133,7 +133,7 @@ steps:
     drawings: [CT-401]
     instructions:
       - Cut the 700 x 630 mm hatch opening in the kerb-side wall, 30 mm from the rear wall and 30 mm above the floor.
-      - Set the locker in the corner (X 1,570 to 2,330, Y 785 to 1,165) and seal its inner wall and lid to the garage floor, the rear wall and the kerb wall all round.
+      - Set the locker in the corner (X 1,570 to 2,330, Y -1,165 to -785) and seal its inner wall and lid to the garage floor, the rear wall and the kerb wall all round.
       - Drill the 25 mm drain at the locker's lowest corner and run its tube down to an outlet 500 mm below the floor.
       - Fit the two cylinder clamps and the regulator bracket, then hang the hatch.
     checks:

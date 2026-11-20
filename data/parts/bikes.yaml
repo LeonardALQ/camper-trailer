@@ -1,7 +1,8 @@
 # The two bikes (payload). Masses and overall sizes are the owner's figures, which govern.
 # Points come from research/05-bike-geometry.yaml (key in `source_key`). Every value below that is not
-# in 05 is an estimate and says so. Bike frame: x to the bike's rear, y to its left, z up, origin on the
-# ground under the front axle (05). In the module, bike x -> +Y, bike y -> +X, bike z -> Z (DESIGN.md).
+# in 05 is an estimate and says so. Bike frame: x to the bike's rear, y to its right, z up, origin on the
+# ground under the front axle. 05 has y to the bike's left, so cad/model/bike.py negates 05's lateral values.
+# In the module, bike x -> X, bike y -> Y, bike z -> Z (DESIGN.md).
 group: bikes
 parts:
   BIKE-TU:
@@ -45,8 +46,8 @@ parts:
           engine_half_width: {v: 200, src: estimate}
           mudguard_half_width: {v: 65, src: estimate}
           swingarm_pivot: {x: 930, z: 420, src: estimate}
-          silencer: {start: [1380, -175, 560], end: [1780, -175, 750], diameter: 110, src: "x and z range from 05; y centre -175 and diameter are estimates"}
-          side_stand: {pivot: [850, 110, 330], foot: [1100, 140, 290], src: "estimate (05 says TODO)"}
+          silencer: {start: [1380, 175, 560], end: [1780, 175, 750], diameter: 110, src: "x and z range from 05; y centre +175 and diameter are estimates"}
+          side_stand: {pivot: [850, -110, 330], foot: [1100, -140, 290], src: "estimate (05 says TODO)"}
           plate: {half_width: 115, z: [590, 742], src: "estimate; 05 puts the rear-most hanger point at z 645"}
           rim_width: {front: 40, rear: 60, src: estimate}
           # Mosko Moto soft panniers, left on the bike in the garage. The owner measured the bike at about 970 to
@@ -97,8 +98,8 @@ parts:
           tail_half_width: {v: 110, src: estimate}
           engine_half_width: {v: 200, src: estimate}
           mudguard_half_width: {v: 70, src: estimate}
-          reservoir: {x: [280, 320], y: [-80, -40], src: "top point from 05; size estimated"}
-          side_stand_y: {pivot: 100, foot: 120, src: "estimate (05 says TODO)"}
+          reservoir: {x: [280, 320], y: [40, 80], src: "top point from 05; size estimated"}
+          side_stand_y: {pivot: -100, foot: -120, src: "estimate (05 says TODO)"}
           plate: {half_width: 110, z: [560, 680], src: "estimate; 05 puts the hanger rear at z 585 to 635"}
           rim_width: {front: 70, rear: 100, src: estimate}
         tie_down_y:

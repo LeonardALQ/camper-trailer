@@ -1,11 +1,12 @@
 """Bike envelope models built from research/05-bike-geometry.yaml.
 
-Shapes are built in a local frame: local X = bike y (bike's left), local Y = bike x (towards the bike's rear),
+Shapes are built in a local frame: local X = bike y (bike's right), local Y = bike x (towards the bike's rear),
 local Z = z (up), origin on the ground under the front axle. `place_bike` pitches the bike nose-up by the
 chock cradle rise (rotation about the rear axle, so the rear tyre stays on the floor), then swaps local X and
 Y so that bike x runs along module X and bike y along module Y (DESIGN.md revision D: the bikes stand along
 the trailer, noses towards partition A), and moves it to its bay. Values not in 05 come from
-data/parts/bikes.yaml, where each is labelled as an estimate.
+data/parts/bikes.yaml, where each is labelled as an estimate. 05 records y to the bike's left, so the model
+negates every lateral value it reads from 05 (_y05).
 """
 from __future__ import annotations
 
@@ -26,8 +27,13 @@ def _mid(v):
     return (v[0] + v[1]) / 2 if isinstance(v, (list, tuple)) else v
 
 
+def _y05(y):
+    """05 lateral value (y to the bike's left) in the model's bike frame (y to the bike's right)."""
+    return -y
+
+
 def P(x, y, z):
-    """Bike frame (x rear, y left, z up) to the local module-aligned frame."""
+    """Bike frame (x rear, y right, z up) to the local module-aligned frame."""
     return (y, x, z)
 
 
@@ -71,7 +77,7 @@ def _fork(solids, axle, rake_deg, top_z, half, dia):
     t = math.tan(math.radians(rake_deg))
     top = (xf + (top_z - zf) * t, top_z)
     for s in (1, -1):
-        solids[f"fork leg {'left' if s > 0 else 'right'}"] = cyl(P(xf, s * half, zf), P(top[0], s * half, top[1]), dia / 2)
+        solids[f"fork leg {'right' if s > 0 else 'left'}"] = cyl(P(xf, s * half, zf), P(top[0], s * half, top[1]), dia / 2)
     return top
 
 
@@ -134,13 +140,13 @@ def tuareg(g, prm) -> BikeModel:
     sp = est["swingarm_pivot"]
     for s in (1, -1):
         y = s * (wr / 2 + 25)
-        solids[f"swingarm {'left' if s > 0 else 'right'}"] = cyl(P(sp["x"], y, sp["z"]), P(xr, y, zr), 22)
+        solids[f"swingarm {'right' if s > 0 else 'left'}"] = cyl(P(sp["x"], y, sp["z"]), P(xr, y, zr), 22)
 
     # Bars, bar ends and handguards
     bc = est["bar_clamp"]
     be = pts["bar_ends_handguards"]
     by = est["bar_end_y"]["v"]
-    for s, nm in ((1, "left"), (-1, "right")):
+    for s, nm in ((1, "right"), (-1, "left")):
         solids[f"handlebar {nm}"] = cyl(P(bc["x"], s * 40, bc["z"]), P(be["x"], s * (by - 15), be["z"]), 14)
         solids[f"bar end {nm}"] = cyl(P(be["x"], s * (by - 15), be["z"]), P(be["x"], s * by, be["z"]), 16)
         hg = est["handguard"]
@@ -169,7 +175,7 @@ def tuareg(g, prm) -> BikeModel:
     ss = est["side_stand"]
     solids["side stand (folded)"] = cyl(P(*ss["pivot"]), P(*ss["foot"]), 13)
     fx, fy, fz = ss["foot"]
-    solids["side stand foot"] = box_span(fy - 10, fy + 40, fx - 35, fx + 35, fz - 8, fz + 8)
+    solids["side stand foot"] = box_span(fy - 40, fy + 10, fx - 35, fx + 35, fz - 8, fz + 8)
 
     # Crash bars as a box envelope (estimate, widths and top from measurements.yaml)
     cb = est.get("crash_bars")
@@ -179,7 +185,7 @@ def tuareg(g, prm) -> BikeModel:
     # Mosko Moto panniers, left on in the garage (outer width owner's measurement, size Mosko Moto's, position estimated)
     pn = est.get("panniers")
     if pn:
-        for s, nm in ((1, "left"), (-1, "right")):
+        for s, nm in ((1, "right"), (-1, "left")):
             y0, y1 = sorted((s * (pn["outer_y"] - pn["thickness"]), s * pn["outer_y"]))
             solids[f"pannier {nm} (Mosko Moto)"] = box_span(y0, y1, pn["x"][0], pn["x"][1], pn["z"][0], pn["z"][1])
 
@@ -235,13 +241,13 @@ def street_triple(g, prm) -> BikeModel:
 
     for s in (1, -1):
         y = s * (wr / 2 + 25)
-        solids[f"swingarm {'left' if s > 0 else 'right'}"] = cyl(P(sp["x"], y, sp["z"]), P(xr, y, zr), 25)
+        solids[f"swingarm {'right' if s > 0 else 'left'}"] = cyl(P(sp["x"], y, sp["z"]), P(xr, y, zr), 25)
 
     hc = pts["handlebar_clamp"]
     be = pts["bar_ends"]
-    by = be["y"][1]
+    by = max(_y05(y) for y in be["y"])
     cy = est["bar_clamp_y"]["v"]
-    for s, nm in ((1, "left"), (-1, "right")):
+    for s, nm in ((1, "right"), (-1, "left")):
         solids[f"handlebar {nm}"] = cyl(P(hc["x"], s * cy, hc["z"]), P(be["x"], s * (by - 15), be["z"]), 11)
         solids[f"bar end {nm}"] = cyl(P(be["x"], s * (by - 15), be["z"]), P(be["x"], s * by, be["z"]), 13)
         fp = pts["rider_footpegs"]
@@ -259,7 +265,7 @@ def street_triple(g, prm) -> BikeModel:
     ssf = pts["side_stand_foot_folded"]
     sy = est["side_stand_y"]
     solids["side stand (folded)"] = cyl(P(ssp["x"], sy["pivot"], ssp["z"]), P(ssf["x"], sy["foot"], ssf["z"]), 12)
-    solids["side stand foot"] = box_span(sy["foot"] - 10, sy["foot"] + 35, ssf["x"] - 30, ssf["x"] + 30, ssf["z"] - 7, ssf["z"] + 7)
+    solids["side stand foot"] = box_span(sy["foot"] - 35, sy["foot"] + 10, ssf["x"] - 30, ssf["x"] + 30, ssf["z"] - 7, ssf["z"] + 7)
 
     tyd = prm["tie_down_y"]
     td = g["tie_downs"]
