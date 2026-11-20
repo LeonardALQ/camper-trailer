@@ -1,6 +1,6 @@
 ---
 title: Chassis
-description: The chassis and drawbar to planning level, with its frame analysis, checks, member schedule and drawings.
+description: The chassis and drawbar for the LandCruiser 79 trailer to planning level, with its frame analysis, checks, member schedule and drawings.
 ---
 
 import CadViewer from '../../components/CadViewer.astro';
@@ -8,11 +8,13 @@ import Chassis from '../../components/Chassis.astro';
 import { withBase } from '../../lib/url';
 
 The chassis is a ladder frame of two composite rails. Each composite rail is an RHS 150 x 50 x 3 main rail with an
-RHS 100 x 50 x 3 raiser welded on top along its whole length, so the two bend as one 250 mm deep section and lift
-the floor above the tyres. Crossmembers join the rails at nine stations, an outrigger runs out to the body edge at
+RHS 125 x 50 x 3 raiser welded on top along its whole length, so the two bend as one 275 mm deep section and lift
+the floor above the tyres. The rails run the full 4,420 mm of the body. Crossmembers join the rails at eight stations, an outrigger runs out to the body edge at
 every station, and an A-frame drawbar of RHS 150 x 50 x 5 runs from the coupling to the body front and on under the
-rails for 1,000 mm. All the tube is C450L0 steel, every structural weld is SP to AS/NZS 1554.1, and the whole frame
+rails for 1,000 mm. The drawbar carries the drawbar box with the generator and the fuel cans. All the tube is C450L0 steel, every structural weld is SP to AS/NZS 1554.1, and the whole frame
 is hot-dip galvanised after welding. The design starts from research report 11 and is set out in `CHASSIS.md`.
+The current revision (CHASSIS.md revision D) is the frame for the LandCruiser 79 trailer: a shorter body, the 3,100 kg plate, a diesel bay and
+RHS 125 raisers and outriggers.
 
 This is a planning-level proposal for the engineer to check. The drawings are drafts and are not for construction.
 
@@ -41,8 +43,8 @@ Lengths are on each member's centroid axis. The masses are calculated from the l
 
 ## Load cases
 
-The frame analysis runs every case on all seven trailer cases, water included, with the masses scaled so the
-heaviest case sits at the 3,500 kg ATM. LC5b runs at tare. The limit is the yield stress of 450 MPa divided by the
+The frame analysis runs every case on all six trailer cases, water included, with the masses scaled so the
+heaviest case sits at the 3,100 kg plated ATM. LC5b runs at tare. The limit is the yield stress of 450 MPa divided by the
 factor shown.
 
 <Chassis kind="cases" />

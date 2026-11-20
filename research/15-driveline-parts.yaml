@@ -1,0 +1,88 @@
+# Report 15 parts list: LandCruiser 79 V8 (VDJ79) driveline and reliability refresh.
+# Companion to research-15-driveline.md. Prices AUD including GST, read 20 Nov 2026.
+# price_basis: web = read from the linked supplier page. estimate = not read from a supplier page.
+# status: required = in the recommended build. optional = not in the total.
+#         conditional = required only in the stated case. contingency = only if the inspection finds wear.
+# system: clutch, gearbox, transfer, tailshaft, diffs, front_axle, rear_axle, steering, suspension,
+#         chassis, body, electrical, fuel, hvac, cooling, fluids, labour.
+# part_number "by VIN" means the Toyota number depends on the build date and was not looked up.
+items:
+  # Clutch
+  - {name: "NPC Super Heavy Duty Organic 1300 clutch and matched billet flywheel kit", part_number: "NPC7751-1D", supplier: "GTurbo (maker NPC Performance Clutches)", price_aud: 1818.50, price_basis: web, link: "https://gturbo.com.au/products/npc-super-heavy-duty-organic-1300-clutch-flywheel-kit-toyota-landcruiser-2007-current-npc7751-1d", status: required, system: clutch}
+  - {name: "Clutch master cylinder", part_number: "MCTY161", supplier: "Xtreme Outback", price_aud: 131.38, price_basis: web, link: "https://www.xtremeoutback.com.au/products/mcty161-clutch-master-cylinder", status: required, system: clutch, note: "Listed in Xtreme Outback's VDJ 70 Series guide"}
+  - {name: "Clutch slave cylinder", part_number: "by VIN", supplier: "Toyota dealer", price_aud: 150, price_basis: estimate, link: null, status: required, system: clutch}
+  - {name: "Braided clutch line, VDJ", part_number: "B-LINE-VDJ", supplier: "GTurbo (maker NPC)", price_aud: 154.00, price_basis: web, link: "https://gturbo.com.au/products/npc-braided-line-vdj-toyota-landcruiser-2007-current-b-line-vdj", status: required, system: clutch}
+  - {name: "Clutch fork and pivot ball kit", part_number: "ATFKTY28-08", supplier: "Xtreme Outback", price_aud: 319.81, price_basis: web, link: "https://www.xtremeoutback.com.au/products/atfkty28-08-clutch-fork-kit", status: required, system: clutch}
+  - {name: "Release and spigot bearings, if not in the kit", part_number: "by VIN", supplier: "Toyota dealer", price_aud: 120, price_basis: estimate, link: null, status: required, system: clutch}
+  - {name: "Gearbox input shaft seal, genuine", part_number: "R000028 (HD Automotive SKU)", supplier: "HD Automotive", price_aud: 16.50, price_basis: web, link: "https://hdautomotive.com.au/product/genuine-h151-h152-gearbox-input-shaft-seal-suitable-for-toyota-landcruiser-70-80-100-series/", status: required, system: clutch}
+  - {name: "Flywheel bolts, genuine", part_number: "by VIN", supplier: "Toyota dealer", price_aud: 60, price_basis: estimate, link: null, status: required, system: clutch}
+  - {name: "PDI Powerdrive clutch, 1,315 Nm peak, 1,120 Nm rated (alternative)", part_number: "PDI-PD-CLUTCH-1VD-1315", supplier: "GTurbo (maker Performance Diesel Intercoolers)", price_aud: 1800.00, price_basis: web, link: "https://gturbo.com.au/products/pdi-powerdrive-1300nm-clutch-landcruiser", status: optional, system: clutch, note: "Needs a sound or new factory flywheel"}
+  - {name: "New factory-type flywheel for the PDI kit", part_number: "by VIN", supplier: "Toyota dealer", price_aud: 390, price_basis: estimate, link: null, status: optional, system: clutch, note: "Price gap between Xtreme Outback kits with and without a flywheel"}
+  - {name: "Xtreme Outback X-Series organic clutch with S45 flywheel (alternative up to about 800 Nm)", part_number: "KTY29590-1TX", supplier: "Xtreme Outback", price_aud: 2211.45, price_basis: web, link: "https://www.xtremeoutback.com.au/products/kty29590-1tx-xtreme-outback-x-series-organic", status: optional, system: clutch}
+  # Gearbox
+  - {name: "Genuine Aisin H152F five-speed manual gearbox, new", part_number: "GT-H152-VDJ (GTurbo SKU)", supplier: "GTurbo", price_aud: 3840.00, price_basis: web, link: "https://gturbo.com.au/products/genuine-aisin-h152-5-speed-manual-gearbox-toyota-landcruiser-vdj76-vdj78-vdj79-v8-2007-2024", status: required, system: gearbox, note: "HD Automotive lists it from 3,829"}
+  - {name: "Rear gearbox mount", part_number: "by VIN", supplier: "Toyota dealer", price_aud: 150, price_basis: estimate, link: null, status: required, system: gearbox}
+  - {name: "Gearbox rebuild kit, LandCruiser 70 Series 5-speed 1998 on (budget alternative to a new box)", part_number: "GBK9", supplier: "Marks 4WD", price_aud: 840.88, price_basis: web, link: "https://www.marks4wd.com/driveline/gearbox/", status: optional, system: gearbox, note: "Fit to the H150F and H152F assumed"}
+  - {name: "Toyota AB60 six-speed automatic conversion, fitted", part_number: null, supplier: "Wholesale Automatics or Drop Bear Engineering", price_aud: 25000, price_basis: estimate, link: "https://automatictransmission.com.au/toyota-76-78-and-79-series-manual-to-automatic-conversion/", status: optional, system: gearbox, note: "Range 20,000 to 30,000. Rated 900 Nm. No published price"}
+  - {name: "ZF 8HP eight-speed automatic conversion, complete, 900 Nm", part_number: "VDJSEQ", supplier: "8speed.au", price_aud: 33950.00, price_basis: web, link: "https://www.8speed.au/products/lc79-toyota-landcruiser-8-speed-auto-conversion", status: optional, system: gearbox, note: "1,200 Nm version 37,950"}
+  - {name: "Gearbox and rear diff temperature senders and gauge", part_number: null, supplier: "Any gauge maker", price_aud: 300, price_basis: estimate, link: null, status: optional, system: cooling}
+  # Transfer case
+  - {name: "HF1A part-time transfer case rebuild kit with Koyo bearings", part_number: "P004651", supplier: "HD Automotive", price_aud: 653.00, price_basis: web, link: "https://hdautomotive.com.au/product/hf1a-part-time-transfer-case-rebuild-kit-with-koyo-bearings-suitable-for-toyota-landcruiser-70-series-80-series/", status: required, system: transfer}
+  - {name: "HF1A transfer case, brand new, from a late VDJ70", part_number: "P002915", supplier: "HD Automotive", price_aud: 2950.00, price_basis: web, link: "https://hdautomotive.com.au/product/brand-new-h152-transfer-case-suitable-for-toyota-landcruiser-part-time-4wd/", status: contingency, system: transfer, note: "Only if gears or case are damaged"}
+  # Tailshafts
+  - {name: "Rebuild front and rear tailshafts: all uni joints, centre bearing, splines checked, balanced", part_number: null, supplier: "Local driveline shop (outsourced)", price_aud: 900, price_basis: estimate, link: null, status: required, system: tailshaft}
+  - {name: "Heavy-duty tailshaft with larger joints, per shaft", part_number: null, supplier: "Local driveline shop", price_aud: 2000, price_basis: estimate, link: null, status: optional, system: tailshaft, note: "Range 1,500 to 2,500. Only if the tune cannot cap low-range torque"}
+  # Diffs
+  - {name: "Front and rear pinion seals, diff checks", part_number: "by VIN", supplier: "Toyota dealer", price_aud: 200, price_basis: estimate, link: null, status: required, system: diffs}
+  - {name: "Breather extension kit for both diffs, gearbox and transfer case", part_number: null, supplier: "Any 4WD store", price_aud: 120, price_basis: estimate, link: null, status: required, system: diffs}
+  - {name: "Diff rebuild with bearings and set-up, per diff", part_number: null, supplier: "Diff specialist (outsourced)", price_aud: 1300, price_basis: estimate, link: null, status: contingency, system: diffs}
+  - {name: "ARB Air Locker, rear 9.5 inch, 32 spline (only without factory locks)", part_number: "RD253", supplier: "ARB", price_aud: 1450.00, price_basis: web, link: "https://www.arb.com.au/product/rd253-arb-air-locker-rear-32-spline-toyota-landcruiser-70-series-9-5-inch-axle", status: optional, system: diffs, note: "ARB fitting estimate 1,280 extra"}
+  # Front axle and hubs
+  - {name: "Swivel hub rebuild kits, both sides (trunnion bearings, seals, gaskets, shims)", part_number: "by VIN", supplier: "Toyota dealer or Terrain Tamer stockist", price_aud: 450, price_basis: estimate, link: null, status: required, system: front_axle}
+  - {name: "Front wheel bearing and seal kits, both sides", part_number: "by VIN", supplier: "Toyota dealer or bearing supplier", price_aud: 300, price_basis: estimate, link: null, status: required, system: front_axle}
+  - {name: "Manual free-wheel hub service seals", part_number: "by VIN", supplier: "Toyota dealer", price_aud: 100, price_basis: estimate, link: null, status: required, system: front_axle}
+  - {name: "Auto to manual hub conversion, genuine Aisin free-wheeling hubs", part_number: "MFK41290", supplier: "Marks 4WD", price_aud: 595.00, price_basis: web, link: "https://www.marks4wd.com/free-wheeling-hubs-70-series-landcruiser-auto-to-manual.html", status: optional, system: front_axle, note: "For trucks built after the late-2016 update"}
+  - {name: "Heavy-duty front CV joints (Birfields), pair", part_number: null, supplier: "4WD driveline specialist", price_aud: 1800, price_basis: estimate, link: null, status: contingency, system: front_axle}
+  # Rear axle
+  - {name: "Rear wheel bearings and seals, both sides", part_number: "by VIN", supplier: "Toyota dealer or bearing supplier", price_aud: 350, price_basis: estimate, link: null, status: required, system: rear_axle}
+  - {name: "Multidrive rear track correction, strengthened wide-track housing rated to 3,950 kg GVM, installed", part_number: "MDT0039-ESC", supplier: "Multidrive Technology, Geelong", price_aud: 6570.00, price_basis: web, link: "https://www.4x4australia.com.au/gear/2024-toyota-landcruiser-79-gxl-multidrive-rear-track-correction", status: conditional, system: rear_axle, note: "Required if report 16's GVM kit keeps the factory housing. 5,850 plus freight uninstalled. Certified with the GVM upgrade"}
+  # Steering
+  - {name: "Tie-rod ends and drag-link ends, full set, genuine", part_number: "by VIN", supplier: "Toyota dealer", price_aud: 500, price_basis: estimate, link: null, status: required, system: steering, note: "Parts differ before and after the late-2016 update"}
+  - {name: "Steering damper, heavy-duty", part_number: null, supplier: "Old Man Emu or Tough Dog stockist", price_aud: 150, price_basis: estimate, link: null, status: required, system: steering}
+  - {name: "Power steering box, reconditioned exchange", part_number: null, supplier: "Steering specialist (outsourced)", price_aud: 1100, price_basis: estimate, link: null, status: required, system: steering, note: "Keep the old box if it has no free play or leaks"}
+  - {name: "Power steering hoses and fluid", part_number: "by VIN", supplier: "Toyota dealer", price_aud: 150, price_basis: estimate, link: null, status: required, system: steering}
+  - {name: "Heavy-duty tie rod and drag link", part_number: null, supplier: "4WD steering specialist", price_aud: 1200, price_basis: estimate, link: null, status: optional, system: steering}
+  - {name: "Wheel alignment after steering and suspension work", part_number: null, supplier: "Local alignment shop (outsourced)", price_aud: 150, price_basis: estimate, link: null, status: required, system: labour}
+  # Suspension
+  - {name: "Front leading-arm, panhard rod and anti-roll bar bushes and links", part_number: null, supplier: "Toyota dealer, Nolathane or SuperPro stockist", price_aud: 450, price_basis: estimate, link: null, status: required, system: suspension, note: "Caster-correction bushes if the GVM kit raises the front"}
+  - {name: "Greasable rear shackles and pins (unless in the GVM kit)", part_number: null, supplier: "Ironman 4x4 or similar", price_aud: 250, price_basis: estimate, link: "https://www.ironman4x4.com.au/products/greasable-shackles-7973", status: required, system: suspension, note: "Ironman lists greasable shackles at 61 to 80 each. 79 fitment not confirmed"}
+  - {name: "Rear spring hanger replacement, plus welding", part_number: "by VIN", supplier: "Toyota dealer and a welder", price_aud: 300, price_basis: estimate, link: null, status: contingency, system: suspension}
+  # Chassis and body
+  - {name: "Dye penetrant crack test kit", part_number: null, supplier: "Any welding supplier", price_aud: 60, price_basis: estimate, link: null, status: required, system: chassis}
+  - {name: "Rust treatment and cavity wax for the chassis rails and cab", part_number: null, supplier: "Any automotive store", price_aud: 250, price_basis: estimate, link: null, status: required, system: chassis}
+  - {name: "Chassis crack repair and bracing", part_number: null, supplier: "Chassis or 4WD fabrication shop (outsourced)", price_aud: 1500, price_basis: estimate, link: null, status: contingency, system: chassis}
+  - {name: "Cab mount rubbers, full set", part_number: "by VIN", supplier: "Toyota dealer", price_aud: 400, price_basis: estimate, link: null, status: required, system: body}
+  - {name: "Soundproofing door seal kit", part_number: null, supplier: "70 Series Store", price_aud: 59.00, price_basis: web, link: "https://70seriesstore.com/products/70-series-landcruiser-soundproofing-door-seal-kit", status: optional, system: body}
+  # Electrical
+  - {name: "Alternator, new or reconditioned, factory type", part_number: "by VIN", supplier: "Toyota dealer or auto electrician", price_aud: 700, price_basis: estimate, link: null, status: required, system: electrical}
+  - {name: "High-output 240 A alternator instead of the factory type", part_number: null, supplier: "Jaylec stockist", price_aud: 1000, price_basis: estimate, link: null, status: optional, system: electrical, note: "Net extra about 300 over the factory type"}
+  - {name: "Starter motor, reconditioned or new", part_number: "by VIN", supplier: "Auto electrician", price_aud: 450, price_basis: estimate, link: null, status: required, system: electrical}
+  - {name: "Starting batteries, two", part_number: null, supplier: "Any battery store", price_aud: 600, price_basis: estimate, link: null, status: required, system: electrical, note: "Assumes two batteries in parallel"}
+  - {name: "Earth straps and battery cables", part_number: null, supplier: "Auto electrical supplier", price_aud: 150, price_basis: estimate, link: null, status: required, system: electrical}
+  - {name: "Wiring repairs allowance", part_number: null, supplier: "Auto electrical supplier", price_aud: 200, price_basis: estimate, link: null, status: required, system: electrical}
+  # Fuel
+  - {name: "Rubber fuel hoses and clamps, tank strap and sender checks", part_number: "by VIN", supplier: "Toyota dealer", price_aud: 150, price_basis: estimate, link: null, status: required, system: fuel}
+  # Air conditioning
+  - {name: "Air conditioning service: condenser clean or replace, receiver-drier, regas", part_number: null, supplier: "Air conditioning specialist (outsourced)", price_aud: 350, price_basis: estimate, link: null, status: required, system: hvac}
+  - {name: "Freezebrain air conditioning amplifier, VDJ 70 Series", part_number: "replaces 88650-60G20", supplier: "GTurbo", price_aud: 328.00, price_basis: web, link: "https://gturbo.com.au/products/landcruiser-freezebrain-vdj-70", status: optional, system: hvac}
+  - {name: "Air conditioning compressor", part_number: "by VIN", supplier: "Air conditioning specialist", price_aud: 900, price_basis: estimate, link: null, status: contingency, system: hvac}
+  # Fluids
+  - {name: "Fluids: GL-4 75W-90 gearbox oil, GL-5 diff oil, transfer oil, swivel hub grease, power steering fluid", part_number: null, supplier: "Toyota dealer or any automotive store", price_aud: 250, price_basis: estimate, link: null, status: required, system: fluids}
+
+totals_aud:
+  required: 16143
+  contingency_allowance: 2400
+  required_with_contingency: 18543
+  conditional_rear_housing: 6570
+  required_with_contingency_and_rear_housing: 25113
+  note: "Required total sums every status: required line above. The contingency allowance is 15% of it, sized for the contingency lines."

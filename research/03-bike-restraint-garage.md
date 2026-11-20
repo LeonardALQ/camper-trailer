@@ -1,5 +1,7 @@
 # 03: Bike restraint and garage fit-out
 
+Note added 20 Nov 2026, for the LandCruiser 79: the trailer no longer has a garage. The bikes ride in an enclosed box on the LandCruiser 79 (UTE-GARAGE.md, report 17), which reuses this report's chocks, L-track, straps, winch and load cases. Where this report says the trailer's garage, read the ute's bike box.
+
 ## Summary
 
 - Secure each bike with a removable Condor SC-2000 front wheel chock, four AS/NZS 4380 rated 35 mm ratchet straps on soft loops, and a fifth strap through the rear wheel. Anchor everything to two rows of flush-mount aluminium L-track that are through-bolted to steel rails under the floor.

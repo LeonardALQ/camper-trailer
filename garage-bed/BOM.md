@@ -1,5 +1,7 @@
 # Garage and bed module: bill of materials, revision E
 
+> **Retired, 20 Nov 2026.** The garage and bed module is retired with `DESIGN.md`. The bike restraint parts moved to the ute's bike box (`UTE-GARAGE.md`, `data/ute/parts/`), and the trailer's bed is in `TRAILER.md` revision H. Some trailer and body mass lines still cite the rates in this list (honeycomb, extrusions), so it is kept unchanged below for the record.
+
 20 Nov 2026. Revision E takes report 13's products: the WARN VRX 25-S winch (G-11, 10.5 kg in place of 9 kg) and no LPG, so the gas locker (G-15, 7 kg) is not fitted and the kerb-side rear corner is stowage. LPG is an owner option (module parameter `lpg`), and with it the gas locker comes back as listed below the garage table. 19 Nov 2026: revision D moves the garage to the back of the trailer with a rear door. The bikes stand along the trailer, so the track rows run across it (G-02), the beams span the full 2,330 mm width and change to SHS 50x50x3 (B-04), the deck covers the whole garage (B-03), partition B and its door go (P-01, P-02, the old P-03), and a gas locker joins the garage (G-15). Layout and geometry are in `DESIGN.md`. Each product was chosen for reliability first, then parts availability, then serviceability, and then weight. Price was ignored. A weight marked "est." is an estimate, and its basis is in the research report named in the Source column. Every other weight comes from the maker's or a retailer's spec, or is calculated from the modelled size. Sizes assume the 2,330 x 2,330 mm garage.
 
 ## Payload (for reference)

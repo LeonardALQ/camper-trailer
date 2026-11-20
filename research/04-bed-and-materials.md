@@ -1,5 +1,7 @@
 # 04 Bed above the bikes, and build materials for the bed and garage
 
+Note added 20 Nov 2026, for the LandCruiser 79: the bed above the bikes is superseded. The bikes ride in the ute's bike box (UTE-GARAGE.md), and the trailer has a queen bed across its front on a honeycomb base (TRAILER.md revision H, BODY.md). The materials data in this report still feeds some mass lines.
+
 Status: complete research draft. Weights marked "estimate" or "calculated" show their basis; everything else comes from the cited page. Links that blocked automated checking are listed under "Could not verify". The owner's bike figures from BRIEF.md are used throughout (Tuareg 660 top at 1,370 mm).
 
 ## 1. Geometry and orientation

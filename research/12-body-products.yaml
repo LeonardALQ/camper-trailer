@@ -1,0 +1,307 @@
+# Doors, hatches, windows, roof lift, awning, mud flaps and mount fasteners for the body.
+# Research report 12, 20 Nov 2026. research-12-body.md sections 4, 6, 7, 8 and 9 explain the choices.
+# Units: mm and kg. mass_basis: maker (published), retailer (a retailer's listing, may be a shipping mass),
+# calculated (from maker data) or estimate. recommended: true marks the product the report chooses.
+
+products:
+  - id: garage-door-leaf
+    line: BD-05
+    recommended: true
+    maker: Body builder, from the rear wall cut-out
+    part_number: none
+    size: "Leaf 1,905 x 1,435 x 35 mm in an opening of 1,910 x 1,440 mm"
+    mass_kg: 30.2
+    mass_basis: calculated
+    parts: "Leaf 16.4, profiles 6.4, piano hinge 3.0, two gas struts 1.1, four latches 1.4, seals 1.0, drip rail 1.0"
+    note: "Hinge moment about 230 Nm, so two struts of about 750 N at a 150 mm lever, with a stay to hold it open"
+    source: "research-12-body.md section 7"
+  - id: diy-door-profile
+    line: [BD-05, BD-09]
+    recommended: true
+    maker: DIY Caravans
+    part_number: "DIY Door Profile Kit, parts A and B"
+    size: "2 mm aluminium profile A, profile B a 25 x 12 x 1.6 mm angle. Made for 28.5 to 29.5 mm panels, 35 mm assumed made to order"
+    mass_kg: "15 for the kit listing (retailer). The design uses 0.75 kg/m per face (estimate)"
+    mass_basis: retailer
+    dust_seal: "5 mm rubber strip under the piano hinge, 10 mm D seals on the other three sides"
+    source: "https://www.diycaravans.com.au/shop/diy-door-profile-kit-parts-a-b/"
+  - id: southco-e3
+    line: [BD-05, BD-09]
+    recommended: true
+    maker: Southco
+    part_number: "E3-55-32 (VISE ACTION compression latch, small, tubular key, stainless, electropolished)"
+    quantity: "4 on the garage door, 2 on the kitchen opening"
+    size: "Small size. 6.4 mm pull-up"
+    mass_kg: 0.35
+    mass_basis: estimate
+    dust_seal: "Draws the door straight onto its gasket with 6.4 mm of pull-up and stops rattle"
+    source: "https://southco.com/en_au_int/e3-55-32"
+  - id: atrv-dc-door-1623
+    line: BD-07
+    recommended: true
+    maker: Aussie Traveller
+    part_number: "1,623 x 622 mm round corners. Right hinge white 71416230622021, right hinge black 71416230622081, left hinge white 71416230622020, left hinge black 71416230622080"
+    size: "1,623 x 622 mm (H x W). Cut-out 1,626 x 625 mm with a 90 mm top radius. Frame about 36 mm deep"
+    wall_range_mm: "Standard seal 29 to 35. Other seals for 25 to 28 and 36 to 40"
+    mass_kg: 25
+    mass_basis: retailer
+    dust_seal: "Triple compression lock system, water and dust resistant seal, midge-proof flyscreen"
+    note: "Hinge on the door's front edge, so airflow closes it. Which ATRV hand that is must be confirmed with Aussie Traveller's convention"
+    source: ["https://cdn.shopify.com/s/files/1/0542/4939/0251/files/5_Caravan_Doors.pdf?v=1723079234", "https://www.diycaravans.com.au/shop/atrv-dc-caravan-door/"]
+  - id: dometic-carad-1750
+    line: BD-07
+    recommended: false
+    maker: Dometic
+    part_number: "Carad 1,750 x 622"
+    size: "1,750 x 622 mm"
+    wall_range_mm: "27 to 28 or 35 to 36"
+    mass_kg: 25
+    mass_basis: retailer
+    source: "https://www.diycaravans.com.au/shop/caravan-door-dometic-carad-1750/"
+  - id: atrv-service-door-650
+    line: BD-06
+    recommended: true
+    maker: Aussie Traveller
+    part_number: "650 x 650 mm, bottom hinge, 2 locks. White 73106500650020, black 73106500650080"
+    size: "650 x 650 mm frame, 600 x 600 mm clear opening. Cut-out 653 x 653 mm, 68 mm corner radius"
+    wall_range_mm: "30 to 45"
+    mass_kg: 5
+    mass_basis: retailer
+    dust_seal: "Seals matched to the wall thickness, self-tightening key-locked handles"
+    note: "Gas locker hatch. Goes if the trailer drops LPG (report 13)"
+    source: ["https://cdn.shopify.com/s/files/1/0542/4939/0251/files/5_Caravan_Doors.pdf?v=1723079234", "https://www.diycaravans.com.au/shop/atrv-service-doors/"]
+  - id: kitchen-opening-frame
+    line: BD-09
+    recommended: true
+    maker: Body builder
+    part_number: none
+    size: "Opening 1,500 x 450 mm, 50 mm above the floor. The LA-07 drawer's 35 mm outer panel closes it"
+    mass_kg: 6.0
+    mass_basis: estimate
+    dust_seal: "Bulb seal in the DIY door profile, two Southco E3 latches"
+    source: "research-13-equipment.md LA-07, research-12-body.md section 7"
+  - id: dometic-s4-500x450
+    line: BD-09
+    recommended: true
+    maker: Dometic
+    part_number: "S4 window 500 x 450, sliding or projecting (hinged)"
+    size: "Product 544 x 480 mm. Cut-out 500 x 448 mm"
+    wall_range_mm: "27 to 41 (standard 26)"
+    mass_kg: 5.0
+    mass_basis: maker
+    glazing: ECE R43
+    position: Kerb side
+    source: "https://www.dometic.com/fr-fr/produit/dometic-s4-1"
+  - id: dometic-s4-900x500
+    line: BD-09
+    recommended: true
+    maker: Dometic
+    part_number: "S4 window 900 x 500"
+    size: "Cut-out about 902 x 499 mm"
+    wall_range_mm: "27 to 41"
+    mass_kg: 8.2
+    mass_basis: "estimate, scaled by area from the 500 x 450"
+    glazing: ECE R43
+    position: Road side, at the desk and seat
+    source: "https://www.dometic.com/fr-fr/produit/dometic-s4-1"
+  - id: dometic-s4-800x400
+    line: BD-09
+    recommended: true
+    maker: Dometic
+    part_number: "S4 window 800 x 400"
+    size: "800 x 400 mm ordered size"
+    wall_range_mm: "27 to 41"
+    mass_kg: 6.6
+    mass_basis: "estimate, scaled by area"
+    glazing: ECE R43
+    position: Front wall, above the spare wheel
+    source: "https://www.dometic.com/fr-fr/produit/dometic-s4-1"
+  - id: dometic-midi-heki
+    line: BD-09
+    recommended: true
+    maker: Dometic
+    part_number: "Midi Heki FL 700 x 500, crank, 9620008632 (confirm the variant)"
+    size: "Roof opening 700 x 500 mm, outer size 858 x 617 mm"
+    wall_range_mm: "Roof 25 to 42"
+    mass_kg: 7.5
+    mass_basis: estimate
+    position: Lid, front end, over the living area, outside the solar array
+    source: ["https://www.dometic.com/nl-nl/product/dometic-midi-heki-fl-9620008632", "https://www.dometic.com/fr-be/categorie/vehicules-de-loisirs-et-fourgons-amenages/baies-pour-vehicules-de-loisirs/domes-de-toit"]
+  - id: dometic-mini-heki-style
+    line: BD-09
+    recommended: true
+    maker: Dometic
+    part_number: "Mini Heki Style 400 x 400, roof 25 to 42 mm version"
+    size: "400 x 400 mm"
+    wall_range_mm: "Roof 25 to 42 (43 to 60 version also sold)"
+    mass_kg: 3.3
+    mass_basis: maker
+    position: Lid, rear end, over the bed
+    source: "https://www.dometic.com/fr-be/categorie/vehicules-de-loisirs-et-fourgons-amenages/baies-pour-vehicules-de-loisirs/domes-de-toit"
+  - id: bathroom-roof-vent
+    line: BD-09
+    recommended: true
+    maker: To choose
+    part_number: none
+    size: "About 280 x 280 mm"
+    mass_kg: 1.5
+    mass_basis: estimate
+    source: "research-12-body.md section 7"
+  - id: garage-vents
+    line: BD-09
+    recommended: true
+    maker: To choose
+    part_number: none
+    size: "Two low vents of at least 6,500 mm2 free area, one high vent of 13,000 mm2. Double the opening behind mesh"
+    mass_kg: 3.0
+    mass_basis: "estimate, for the three"
+    source: "https://www.ecfr.gov/current/title-33/chapter-I/subchapter-S/part-183/subpart-K/section-183.630"
+  - id: cassette-door
+    line: BD-09
+    recommended: true
+    maker: To choose
+    part_number: none
+    size: "About 450 x 290 mm, road side, for the toilet cassette"
+    mass_kg: 1.5
+    mass_basis: estimate
+    source: "research-13-equipment.md bathroom"
+  - id: carafan-cp700
+    line: BD-09
+    recommended: true
+    maker: Carafan, Kewdale WA
+    part_number: "CaraFan Sahara CP700 Pressuriser"
+    size: Not published
+    mass_kg: "7.0 with ducts"
+    mass_basis: estimate
+    power: "About 5.8 A at 12 V (an owner's reading)"
+    dust_seal: "Filtered fan keeps the living area above outside pressure, moving or parked"
+    source: ["https://carafan.com.au/", "https://community.victronenergy.com/t/mppt-75-15-settings-and-carafan-dust-extraction-instal/27393"]
+  - id: gusto-drs
+    line: BD-09
+    recommended: false
+    maker: Gusto Global Industries
+    part_number: "Gusto DRS (DRS Pro also sold)"
+    size: "Wall cut-out 310 x 310 mm, cabinet vent 260 x 260 mm"
+    mass_kg: Not published
+    power: "18 A at most, 30 A fused supply"
+    source: ["https://www.coastrv.com.au/cdn/shop/files/Gusto_DRS_Manual.pdf?v=6428087926919287103", "https://atlref.websitedevserver.com/wp-content/uploads/2024/06/Gusto_DRS-_Flyer_2023.pdf"]
+  - id: dometic-drs2
+    line: BD-09
+    recommended: false
+    maker: Dometic
+    part_number: "DRS2 Dust Reduction System, 9620008568"
+    size: "Roof unit for roofs 30 to 65 mm thick"
+    mass_kg: 5
+    mass_basis: estimate
+    power: None, works only while moving
+    source: "https://www.caravansplus.com.au/pdf/Dometic-DRS2-Manual.pdf"
+  - id: linak-la36-4500
+    line: BD-12
+    recommended: true
+    maker: LINAK
+    part_number: "LA36, 12 V, 4,500 N, 12 mm spindle pitch, order code 36120xxxxxxAxxxxGxxxxxxxxxxx, with Hall feedback and IC Parallel"
+    quantity: 4, one in each corner
+    size: "825 mm stroke. Fitted length 250 mm plus stroke, 1,075 mm retracted"
+    force: "4,500 N push and pull, self-lock 5,800 N. 23.1 mm/s no load, 17.8 mm/s full load. 4.5 A no load, 20.7 A full load at 12 V. IP66 in use, IP69K static. 20 % duty at full load"
+    load_here: "0.55 kN per actuator with glass solar panels, 0.40 kN with glass-free panels"
+    mass_kg: 3.5
+    mass_basis: estimate
+    source: "https://www.linak.com/products/linear-actuators/la36/"
+  - id: diy-actuator-kit-4
+    line: BD-12
+    recommended: false
+    maker: DIY Caravans, assembled in Australia
+    part_number: "In-Line Linear Actuators Kit (4)"
+    size: "Stroke 600 to 1,000 mm"
+    force: "300 kg per actuator. IP66. 12 V with a synchronised remote"
+    mass_kg: Not published
+    note: The Australian-supplied alternative to the LA36
+    source: "https://www.diycaravans.com.au/shop/in-line-linear-actuators-kits-4/"
+  - id: lift-guide-posts-and-controls
+    line: BD-12
+    recommended: true
+    maker: Body builder
+    part_number: none
+    size: "Four telescopic aluminium guide posts beside the actuators, controller, wiring, limit and latch interlock switches"
+    mass_kg: 16.0
+    mass_basis: "estimate (4 x 3.0 kg posts plus 4.0 kg of controls)"
+    source: "research-12-body.md section 6.4"
+  - id: diy-pop-top-extrusions
+    line: [BD-08, BD-12]
+    recommended: true
+    maker: DIY Caravans
+    part_number: "Pop-top extrusion top and bottom, corner joiner kits (one per corner), weather seal M"
+    size: "Kit 2 is for up to 4.8 x 2.4 m, so the 5.5 x 2.4 m body needs custom lengths. Allow 25 mm for each corner joiner"
+    mass_kg: "3.3 per metre for top and bottom together. Corner joiner kit 2 kg. Seal listing 0.3 kg"
+    mass_basis: maker
+    note: "Made for 29 mm walls. A 35 mm wall needs the profile made to suit (assumption). Bonded with Fixtech MSP15"
+    source: ["https://www.diycaravans.com.au/shop/pop-top-extrusion-kit-2-up-to-4-8m-x-2-4m/", "https://www.diycaravans.com.au/shop/pop-top-corner-joiner-kit/", "https://www.diycaravans.com.au/shop/pop-top-weather-seal-m/"]
+  - id: pop-top-latch
+    line: BD-12
+    recommended: true
+    maker: UNISEG
+    part_number: "Snap-Flat over-centre latch, 304 stainless, caravan version"
+    quantity: 6
+    size: Not published
+    rating: "Not published. Specify at least 2.1 kN working, twice the 1.04 kN each sees at 40 m/s (assumption)"
+    mass_kg: 0.4
+    mass_basis: estimate
+    source: ["https://rvdaily.com.au/how-secure-are-the-latches-on-your-pop-top-roof/", "https://www.snapflatlatch.com/applications/"]
+  - id: pop-top-canvas
+    line: BD-12
+    recommended: true
+    maker: Canvas maker, to choose
+    part_number: none
+    size: "Perimeter 15.8 m, 850 mm drop, zip windows with flyscreens, a 500 x 450 mm escape zip panel each side by the bed"
+    mass_kg: 9.4
+    mass_basis: "estimate, at 0.55 kg/m2 plus 2 kg of zips and edging"
+    source: "research-12-body.md section 6"
+  - id: fiamma-f45l-500
+    line: BD-13
+    recommended: true
+    maker: Fiamma
+    part_number: "F45L 500, Polar White, 06530A01R"
+    size: "Case 5,020 mm, canopy 4,350 mm, extension 2,500 mm, 10.9 m2 of shade"
+    mass_kg: 39.0
+    mass_basis: maker
+    note: "Plus wall brackets, 2 kg (estimate). Case depth not found, check the 100 mm limit when brackets are chosen"
+    source: "https://www.fiammausa.com/en/f45s-en.html"
+  - id: fiamma-f45s-450
+    line: BD-13
+    recommended: false
+    maker: Fiamma
+    part_number: "F45s 450, Polar White, 06280G01R"
+    size: "Case 4,230 mm, extension 2,500 mm, 10.8 m2"
+    mass_kg: 29.5
+    mass_basis: "maker (65 lb)"
+    source: "https://www.fiammausa.com/en/f45s-en.html"
+  - id: thule-4200
+    line: BD-13
+    recommended: false
+    maker: Thule
+    part_number: "4200 cassette awning"
+    size: "3,500 to 4,500 mm"
+    mass_kg: "21.7 for 3.5 m"
+    mass_basis: retailer
+    source: "https://www.diycaravans.com.au/shop/thule-4200-cassette-awning/"
+  - id: mudflap-24x18
+    line: BD-10
+    recommended: true
+    maker: The Boss Shop (rubber mud flap)
+    part_number: 24X18B
+    quantity: 2, behind the rear tyres at Y ±831
+    size: "610 mm wide x 455 mm long, black rubber, hung from Z 755 so the bottom edge is at about Z 300"
+    mass_kg: "2.5 each, plus 2.1 kg of galvanised hanger and bolts each"
+    mass_basis: "calculated for 6 mm rubber at 1,500 kg/m3 (thickness assumed), hanger estimate"
+    source: "https://www.thebossshop.com.au/mudflap-rubber-610mmw-x-455mml-black"
+  - id: hollo-bolt-hb10-3
+    line: BD-08
+    recommended: true
+    maker: Lindapter
+    part_number: "Hollo-Bolt HB10-3, hexagonal head, hot-dip galvanised"
+    quantity: 36, one per raiser and outrigger tip at nine stations
+    size: "M10, clamping thickness 41 to 60 mm, tightening torque 45 Nm"
+    rating: "Safe working load 8.5 kN tension and 10.0 kN single shear, factor of safety 5, in S275 hollow section"
+    mass_kg: 0.1
+    mass_basis: estimate
+    source: "https://www.abbots-uk.com/files/ww/lindapter-type-hb-datasheet.pdf"

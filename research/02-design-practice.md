@@ -1,5 +1,7 @@
 # 02: Design, drawing and documentation practice
 
+Note added 20 Nov 2026, for the LandCruiser 79: the tow vehicle is now a Toyota LandCruiser 79 single cab V8 in place of the Porsche Cayenne, and it carries both bikes in an enclosed box on its tray (UTE-GARAGE.md). Reports 14 to 16 and VEHICLE.md cover the vehicle, and TRAILER.md revision H is the smaller trailer without a garage, plated at 3,100 kg ATM. Where this report names the Cayenne, read the LandCruiser 79. The practice itself is unchanged.
+
 Note added 20 Nov 2026. DIM-01 now has Y positive to the right (road) side, not the left (kerb) side. With X rearward and Z up, the old definition was a left-handed frame, so the right-handed CAD model was the mirror image of the trailer. The project datum is now X along the trailer from the coupling ball centre, positive rearward, Y across from the centreline, positive to the road side, and Z up from the ground with the trailer level at design ride height. Read rule DIM-01 below with that change.
 
 Status: draft 2. Items marked TODO still need a source or a check. Links were checked on 16 Nov 2026 with one batch request each; links marked "bot check" returned a Cloudflare challenge to automated requests and were taken from search results.

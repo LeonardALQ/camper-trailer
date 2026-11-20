@@ -7,15 +7,15 @@ import fs from 'node:fs';
 
 const port = process.argv[2] || '8791';
 const base = `http://127.0.0.1:${port}${(process.argv[3] || '').replace(/\/$/, '')}`;
-const steps = fs.readdirSync('../site/dist/steps').filter((d) => /^\d\d-/.test(d)).sort();
 const pages = [
   { path: '/', viewer: false },
-  { path: '/garage-bed/', viewer: true },
-  { path: '/garage-bed/', viewer: true, theme: 'dark' },
+  { path: '/ute-garage/', viewer: true },
+  { path: '/ute-garage/', viewer: true, theme: 'dark' },
   { path: '/trailer/', viewer: true },
   { path: '/trailer/', viewer: true, theme: 'dark' },
   { path: '/measurements/', viewer: false },
-  { path: `/steps/${steps.find((s) => s.startsWith('03'))}/`, viewer: true },
+  { path: '/body/', viewer: true },
+  { path: '/tow-vehicle/', viewer: false },
   { path: '/drawings/', viewer: false },
   { path: '/research/03-bike-restraint-garage/', viewer: false },
 ];

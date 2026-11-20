@@ -10,11 +10,10 @@ The plan is worked out from estimates until the owner measures the real thing. E
 `data/measurements.yaml`, which can be edited in GitHub's web editor. Put the measured value and the date in its
 `measured` slot, and the push to main rebuilds this site with the plan re-solved from it.
 
-Each input has rules that change the plan, not only a warning. For example, the Tuareg's measured width at the
-Street Triple's bar end sets the bike spacing. The garage width is fixed, so a spacing that no longer fits beside the
-kerb-side stowage is flagged by check CLR-10 rather than growing the garage. The
-towball target is the highest load that keeps the car's rear axle within 1,600 kg with the planned gear in the car,
-capped at the 280 kg towball rating. These rules are design rules with their source. They never change a check's
-limit.
+Each input has rules that change the plan, not only a warning. For example, the Tuareg's measured width across its
+side panels sets the bike spacing in the ute's bike box. The box is 1,850 mm wide at most, so a spacing that no
+longer fits is flagged by check UGC-02 rather than growing the box. The ute's laden ball height (UTE-01) sets the
+trailer's coupling height and the drawbar drop. These rules are design rules with their source. They never change a
+check's limit.
 
 <Measurements />

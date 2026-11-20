@@ -46,7 +46,7 @@ params:
                                # (data/assemblies/ute-garage.yaml) sets it. This copy places the U1 block when no module is built
   box_h: 1502                  # floor top to the roof top: 1,460 inside, 40 mm roof bows, 2 mm roof skin
   # ---------------------------------------------------------------- the trailer behind it (decision log targets)
-  trailer_atm: 3000            # the redesigned trailer's ATM target (PLAN-79.md, 11:25 UTC)
+  trailer_atm: 3100            # the redesigned trailer's plated ATM (decision log 12:10 UTC, TRAILER.md revision H)
   towball_design: 250          # the plan's own cap on the towball (decision log, GVM and GCM)
   # ---------------------------------------------------------------- people and tools
   people_x: 1660               # two adults, 400 mm ahead of the cab back (report 16)
@@ -213,7 +213,7 @@ checks:
      why: "Decision log: the weighed ute stays at or under 3,850 kg, so the rear axle keeps its margin"}
   - {id: UTE-05, title: "Towball within the plan's 250 kg and the towbar's 350 kg", type: towball, severity: fail,
      why: "The towbar is rated 350 kg. The plan caps the ball at 250 kg because each kilogram there adds about 1.4 kg to the rear axle"}
-  - {id: UTE-06, title: "Combination with a 3,000 kg trailer within the 6,900 kg GCM", type: gcm, basis: both, cases: [UC3, UC4], severity: fail,
+  - {id: UTE-06, title: "Combination with the 3,100 kg plated trailer within the 6,900 kg GCM", type: gcm, basis: both, cases: [UC3, UC4], severity: fail,
      why: "GCM is the ute's mass plus the trailer's less the towball, which the ute already carries (report 16 section 2.4)"}
   - {id: UTE-07, title: "Front axle carries at least 20 % of the ute's mass", type: mass, quantity: front_share, limit: front_share_min_pct, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
      why: "Toyota's minimum front axle share, so the ute steers and brakes"}

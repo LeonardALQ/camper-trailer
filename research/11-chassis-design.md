@@ -1,5 +1,7 @@
 # 11: Chassis and drawbar design basis
 
+Note added 20 Nov 2026, for the LandCruiser 79: the tow vehicle is now a Toyota LandCruiser 79 single cab V8 in place of the Porsche Cayenne, and it carries both bikes in an enclosed box on its tray (UTE-GARAGE.md). Reports 14 to 16 and VEHICLE.md cover the vehicle, and TRAILER.md revision H is the smaller trailer without a garage, plated at 3,100 kg ATM. CHASSIS.md revision D re-solves the frame for it. The method and load cases of this report still hold, with VSB1's drawbar forces at the 3,100 kg plate.
+
 Note added 20 Nov 2026, after the chassis design (CHASSIS.md). Two of this report's numbers are wrong, and the design uses the corrected ones. The composite rail's second moment is 11.6 x 10⁶ mm⁴, not 14.2 x 10⁶, so its section modulus is 90.7 x 10³ mm³ at the bottom, not 104 x 10³. The moment diagram in section 3.1 placed 3,151 kg for TC2, not the 3,351 kg the model then held: the missing 200 kg was the water, which the model adds through the tank positions. The frame analysis takes every load from the full case data. CHASSIS.md compares its results with this report's hand numbers. The section table is `data/chassis/sections.yaml` in the repository.
 
 Research report, 20 Nov 2026. It gives the chassis designer the requirements, section data, load cases and acceptance criteria for the camper trailer chassis (drawing group CT-1xx), and recommends a solution for the floor beside and over the axles and for the drawbar. The section table is in `chassis-sections.yaml`, published as `data/chassis/sections.yaml`.

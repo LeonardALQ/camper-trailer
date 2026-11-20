@@ -4,7 +4,7 @@ import t from '../data/generated/trailer.json';
 import { withBase } from '../lib/url';
 
 interface Props {
-  kind: 'summary' | 'cases' | 'checks' | 'lengths' | 'options' | 'chassis' | 'crossmembers' | 'groups' | 'uncertain' | 'schedule' | 'ballast';
+  kind: 'summary' | 'cases' | 'checks' | 'chassis' | 'crossmembers' | 'groups' | 'uncertain' | 'schedule';
 }
 const { kind } = Astro.props;
 const r: any = t;
@@ -13,8 +13,12 @@ const n = (v: number | null | undefined, d = 0) =>
 const signed = (v: number) => (v > 0 ? '+' : '') + n(v);
 const ch = r.chassis;
 const P = r.params;
+const plate = r.caps.plated;
+const tv = r.tow_vehicle;
 const tc = (id: string) => r.cases.find((c: any) => c.id === id);
 const full = tc('TC2');
+const chk = (id: string) => r.checks.find((c: any) => c.id === id);
+const heaviest = r.cases.reduce((a: any, c: any) => (c.growth.mass_kg > a.growth.mass_kg ? c : a));
 const fails = r.checks.filter((c: any) => c.severity === 'fail' && !c.ok);
 const rowClass = (c: any) => (c.ok ? '' : c.severity === 'fail' ? 'row-fail' : 'row-report');
 const statusClass = (c: any) => (c.ok ? 'status-pass' : c.severity === 'fail' ? 'status-fail' : 'status-report');
@@ -25,11 +29,13 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
 
 {kind === 'summary' && (
   <p>
-    The recommended body is {n(r.recommended.body_length)} mm long, the shortest of the three that holds the living area. With the
-    axle group centre {n(P.axle_x)} mm behind the ball, the trailer carries {n(full.nominal.towball_kg)} kg on the ball fully
-    loaded, {n(full.nominal.towball_pct, 1)} % of its {n(full.nominal.mass_kg)} kg. Its tare is {n(r.tare_kg)} kg, or
-    {n(tc('TC1').growth.mass_kg - r.ballast.kg)} kg with the growth allowance. Towing with no bikes aboard needs {n(r.ballast.kg)} kg of
-    ballast at the back of the garage, or {n(r.ballast.growth_kg)} kg with growth. {fails.length === 0
+    The body is {n(r.body_length)} mm long and {n(P.body_width)} mm wide, with a queen bed across the front and a fixed roof. The
+    tow vehicle is the {tv.name}. With the axle group centre {n(P.axle_x)} mm behind the ball, the trailer carries{' '}
+    {n(full.nominal.towball_kg)} kg on the ball fully loaded, {n(full.nominal.towball_pct, 1)} % of its {n(full.nominal.mass_kg)} kg.
+    Its tare is {n(r.tare_kg)} kg, or {n(tc('TC1').growth.mass_kg)} kg with the growth allowance. The heaviest case with growth,{' '}
+    {heaviest.id}, is {n(heaviest.growth.mass_kg)} kg against the {n(plate)} kg plated ATM, with {n(heaviest.growth.towball_kg)} kg
+    on the ball against the ute's {n(tv.limits.towball_plan_kg)} kg. The combination is {n(chk('GCM-01').measured)} kg against the
+    ute's {n(tv.limits.gcm_kg)} kg GCM. No ballast is needed. {fails.length === 0
       ? 'Every whole-trailer check passes.'
       : `${fails.length} whole-trailer checks fail: ${fails.map((c: any) => `${c.id} (${c.title.toLowerCase()}, ${measured(c)})`).join(', ')}.`}
   </p>
@@ -41,8 +47,8 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
       <thead>
         <tr><th>Case</th><th>What is aboard</th><th class="num">Mass kg</th><th class="num">CoG X</th><th class="num">CoG Z</th>
           <th class="num">Towball kg</th><th class="num">Towball %</th><th class="num">Axle group kg</th>
-          <th class="num">ATM margin kg</th><th class="num">GTM margin kg</th>
-          <th class="num">With growth kg</th><th class="num">Towball kg</th><th class="num">ATM margin kg</th></tr>
+          <th class="num">Plate margin kg</th><th class="num">GTM margin kg</th>
+          <th class="num">With growth kg</th><th class="num">Towball kg</th><th class="num">Plate margin kg</th></tr>
       </thead>
       <tbody>
         {r.cases.map((c: any) => (
@@ -51,10 +57,10 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
             <td class="num">{n(c.nominal.mass_kg)}</td><td class="num">{n(c.nominal.cog[0])}</td><td class="num">{n(c.nominal.cog[2])}</td>
             <td class="num">{n(c.nominal.towball_kg)}</td><td class="num">{n(c.nominal.towball_pct, 1)}</td>
             <td class="num">{n(c.nominal.axle_kg)}</td>
-            <td class={`num ${3500 - c.nominal.mass_kg < 0 ? 'status-fail' : ''}`}>{signed(3500 - c.nominal.mass_kg)}</td>
+            <td class={`num ${plate - c.nominal.mass_kg < 0 ? 'status-fail' : ''}`}>{signed(plate - c.nominal.mass_kg)}</td>
             <td class={`num ${r.supplier.kit_gtm - c.nominal.axle_kg < 0 ? 'status-fail' : ''}`}>{signed(r.supplier.kit_gtm - c.nominal.axle_kg)}</td>
             <td class="num">{n(c.growth.mass_kg)}</td><td class="num">{n(c.growth.towball_kg)}</td>
-            <td class={`num ${3500 - c.growth.mass_kg < 0 ? 'status-fail' : ''}`}>{signed(3500 - c.growth.mass_kg)}</td>
+            <td class={`num ${plate - c.growth.mass_kg < 0 ? 'status-fail' : ''}`}>{signed(plate - c.growth.mass_kg)}</td>
           </tr>
         ))}
       </tbody>
@@ -79,77 +85,27 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
   </div>
 )}
 
-{kind === 'lengths' && (
-  <div class="data-table">
-    <table>
-      <thead>
-        <tr><th>Body</th><th class="num">Living area</th><th class="num">Living area needs</th><th class="num">Spare</th>
-          <th class="num">Axle from ball</th><th class="num">Bikes behind the axle</th><th class="num">Tare kg</th><th class="num">Fully loaded kg</th>
-          <th class="num">With growth kg</th><th class="num">Towball TC1 / TC4 / TC6 / TC7 kg</th><th class="num">Ballast kg (with growth)</th><th>Fails</th></tr>
-      </thead>
-      <tbody>
-        {r.lengths.map((l: any) => (
-          <tr class={l.fit_ok ? '' : 'row-fail'}>
-            <td>{n(l.body_length)} mm{l.body_length === r.recommended.body_length ? ' (recommended)' : ''}</td>
-            <td class="num">{n(l.living)}</td><td class="num">{n(l.living_min)}</td><td class="num">{signed(l.slack)}</td>
-            <td class="num">{n(l.axle_x)}</td><td class="num">{n(l.bikes_behind_axle)}</td><td class="num">{n(l.tare)}</td>
-            <td class="num">{n(l.loaded)}</td><td class="num">{n(l.loaded_growth)}</td>
-            <td class="num">{['TC1', 'TC4', 'TC6', 'TC7'].map((k) => n(l.towball[k])).join(' / ')}</td>
-            <td class="num">{n(l.ballast_kg)} ({n(l.ballast_growth_kg)})</td><td>{l.failed.join(', ') || 'none'}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-)}
-
-{kind === 'options' && (
-  <div class="data-table">
-    <table>
-      <thead><tr><th>Item in the living area</th><th class="num">Mass kg</th><th class="num">Length saved without it</th></tr></thead>
-      <tbody>
-        {r.zone_costs.filter((z: any) => !z.keep_clear).map((z: any) => (
-          <tr><td>{z.id} {z.name}</td><td class="num">{n(z.mass_kg)}</td><td class="num">{n(z.saved_mm)}</td></tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-)}
-
-{kind === 'ballast' && (
-  <div class="data-table">
-    <table>
-      <thead><tr><th>Case without bikes</th><th class="num">Ballast needed, base weights kg</th><th class="num">With growth kg</th></tr></thead>
-      <tbody>
-        {Object.entries(r.ballast.per_case).map(([k, v]: any) => (
-          <tr><td>{k} {tc(k).name}</td><td class="num">{n(v.nominal)}</td><td class="num">{n(v.growth)}</td></tr>
-        ))}
-        <tr><td>Carried in TC1, TC4 and TC5 (the largest base figure), at X {n(r.ballast.x)}</td><td class="num">{n(r.ballast.kg)}</td><td class="num">{n(r.ballast.growth_kg)} (BAL-01)</td></tr>
-      </tbody>
-    </table>
-  </div>
-)}
-
 {kind === 'chassis' && (
   <div class="data-table">
     <table>
       <thead><tr><th>Input</th><th class="num">Value</th><th>Basis</th></tr></thead>
       <tbody>
-        <tr><td>Rail outer width at the XT hinges</td><td class="num">{n(ch.rail_outer_width)} mm</td><td>Kept from revision C. With C/F {n(ch.cf)} (SUP-04) and ET +{n(ch.wheel_offset)} it gives a {n(ch.track)} mm track, effective C/F {n(ch.cf - ch.wheel_offset)} mm against Cruisemaster's 200 mm limit. A {n(ch.wide_track)} mm track needs {n(ch.rail_outer_width_wide_track)} mm (OPEN). Cruisemaster's minimum is 1,150 mm</td></tr>
-        <tr><td>Wheels and tyres</td><td class="num">{n(ch.tyre_d)} mm</td><td>ROH Trak 2 16x7 +7 steel (1,250 kg) with Yokohama G015 LT245/70R16 118/115R (1,320 kg, Yokohama's published diameter), on Cruisemaster LC6 6 x 139.7 hubs with a 93 mm spigot (report 09)</td></tr>
+        <tr><td>Rail outer width at the XT hinges</td><td class="num">{n(ch.rail_outer_width)} mm</td><td>With C/F {n(ch.cf)} (SUP-04) and ET {n(ch.wheel_offset)} it gives a {n(ch.track)} mm track, effective C/F {n(ch.cf - ch.wheel_offset)} mm against Cruisemaster's 200 mm limit. Cruisemaster's minimum is 1,150 mm</td></tr>
+        <tr><td>Wheels and tyres</td><td class="num">{n(ch.tyre_d)} mm</td><td>{r.wheel.name} with {r.wheel.tyre}, on {r.wheel.hub}. {r.wheel.src}</td></tr>
         <tr><td>Rail inside width and centres</td><td class="num">{n(ch.rail_inner_width)} / {n(ch.rail_centres)} mm</td><td>50 mm wide rails</td></tr>
         <tr><td>Main rails</td><td class="num">{n(ch.rail_length)} mm</td><td>X {n(ch.rail_x0)} to {n(ch.rail_x1)}, the full body length. Section {ch.rail_section}</td></tr>
-        <tr><td>Rail underside and top</td><td class="num">Z {n(ch.rail_underside_z)} / {n(ch.rail_top_z)}</td><td>Hub 215 mm below the rail underside at rated load (Cruisemaster), static loaded radius {n(ch.hub_z)} mm (estimate)</td></tr>
-        <tr><td>Raiser height</td><td class="num">{n(ch.raiser_h)} mm</td><td>Rail top to the floor underside at Z {n(ch.floor_underside_z)}: an RHS 100 x 50 x 3 raiser and a {n(ch.floor_underside_z - ch.rail_top_z - 100)} mm bearer strip. The floor clears the tyre at full bump by {n(ch.tyre_floor_clearance)} mm</td></tr>
-        <tr><td>Garage floor surface</td><td class="num">Z {n(ch.floor_z)}</td><td>Floor underside plus a 30 mm floor panel</td></tr>
-        <tr><td>Drawbar, ball to body front</td><td class="num">{n(ch.drawbar_length)} mm</td><td>Kept from revision B, where the drawbar box set it. At a 90 degree jack-knife the spare wheel on the front wall stands {n(ch.jackknife_spare_mm)} mm and the body corners {n(ch.jackknife_body_mm)} mm clear of the car's side</td></tr>
+        <tr><td>Rail underside and top</td><td class="num">Z {n(ch.rail_underside_z)} / {n(ch.rail_top_z)}</td><td>Hub {n(P.hub_below_rail)} mm below the rail underside at rated load (Cruisemaster), static loaded radius {n(ch.hub_z)} mm (estimate)</td></tr>
+        <tr><td>Raiser height</td><td class="num">{n(ch.raiser_h)} mm</td><td>Rail top to the floor underside at Z {n(ch.floor_underside_z)}: an RHS 125 x 50 x 3 raiser and a {n(ch.floor_underside_z - ch.rail_top_z - 125)} mm bearer strip. The floor clears the tyre at full bump by {n(ch.tyre_floor_clearance)} mm</td></tr>
+        <tr><td>Floor surface</td><td class="num">Z {n(ch.floor_z)}</td><td>Floor underside plus a 30 mm floor panel</td></tr>
+        <tr><td>Drawbar, ball to body front</td><td class="num">{n(ch.drawbar_length)} mm</td><td>At a 90 degree jack-knife the nearest part, the {ch.jackknife_governing.split(',')[0].toLowerCase()}, stands {n(ch.jackknife_mm)} mm clear of the sweep of the ute's bike box (radius {n(ch.sweep.radius_mm)} mm, JK-01)</td></tr>
+        <tr><td>Drawbar box</td><td class="num">X {n(ch.drawbar_box[0])} to {n(ch.drawbar_box[3])}</td><td>{n(P.dbx_w)} mm wide and {n(P.dbx_h)} mm high on the drawbar members, holding the generator and the fuel cans (DX-01)</td></tr>
         <tr><td>Spare wheel</td><td class="num">X {n(ch.spare_box[0])} to {n(ch.spare_box[3])}</td><td>On the body's front wall above the drawbar, centred on Y, its centre at Z {n((ch.spare_box[2] + ch.spare_box[5]) / 2)}</td></tr>
         <tr><td>Drawbar members</td><td class="num">{n(ch.drawbar_member_length)} mm</td><td>Each, from the coupling head to the body front, then {n(ch.drawbar_tail)} mm on under the rails (PLACEHOLDER)</td></tr>
-        <tr><td>Coupling point and drop</td><td class="num">Z {n(ch.coupling_z)}</td><td>{n(ch.drop_rail_to_coupling)} mm below the rail underside, inside a 150 mm drawbar run under the rails with the DO35 under its head</td></tr>
+        <tr><td>Coupling point and drop</td><td class="num">Z {n(ch.coupling_z)}</td><td>The ute's laden ball height (UTE-01), {n(ch.drop_rail_to_coupling)} mm below the rail underside, with the DO35 under the coupling head</td></tr>
         <tr><td>Axle group centre</td><td class="num">X {n(ch.axle_x)}</td><td>Hubs at X {n(ch.hubs_x[0])} and {n(ch.hubs_x[1])}, {n(ch.axle_spacing)} mm apart. XT front hinge crossmember rear face X {n(ch.xt_front_hinge_rear_x)}, rear shock crossmember front face X {n(ch.xt_rear_shock_front_x)}</td></tr>
         <tr><td>Overall length</td><td class="num">{n(ch.overall_length)} mm</td><td>Coupling head front (X {n(ch.overall_x0)}) to the body rear</td></tr>
         <tr><td>Overall width</td><td class="num">{n(ch.overall_width)} mm</td><td>2,400 mm body plus the awning</td></tr>
-        <tr><td>Travel height</td><td class="num">{n(ch.travel_height)} mm</td><td>Top of the solar panels, roof down</td></tr>
+        <tr><td>Travel height</td><td class="num">{n(ch.travel_height)} mm</td><td>Top of the solar panels on the fixed roof</td></tr>
         <tr><td>CoG, fully loaded</td><td class="num">X {n(ch.cog_loaded[0])}, Z {n(ch.cog_loaded[2])}</td><td>Z {n(ch.cog_loaded_growth[2])} with growth. {n(ch.cog_height_above_hub)} mm above the hub centres, for the roll and track check</td></tr>
         <tr><td>Water tanks</td><td class="num">{n(ch.tank_capacity_l)} L</td><td>Gross volume of two blocks between the rails in the suspension bays (PLACEHOLDER)</td></tr>
       </tbody>
@@ -176,7 +132,7 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
       <thead><tr><th>Group</th><th class="num">Tare kg</th><th class="num">With growth kg</th></tr></thead>
       <tbody>
         {groupRows.map(([g, v]) => (<tr><td>{g}</td><td class="num">{n(v.mass_kg)}</td><td class="num">{n(v.growth_kg)}</td></tr>))}
-        <tr><td>Tare, without the ballast</td><td class="num">{n(tareGroups)}</td><td class="num">{n(groupRows.reduce((s, [, g]) => s + g.growth_kg, 0))}</td></tr>
+        <tr><td>Tare</td><td class="num">{n(tareGroups)}</td><td class="num">{n(groupRows.reduce((s, [, g]) => s + g.growth_kg, 0))}</td></tr>
       </tbody>
     </table>
   </div>

@@ -1,0 +1,180 @@
+# Limits and dimensions of the LandCruiser 79 single cab V8 (VDJ79), research report 16, 20 Nov 2026.
+# Units: mm, kg, L, kPa, degrees. basis: maker, installer, press, forum, calculated or estimate.
+# Positions along the ute (x) are measured from the front axle centre, positive rearward.
+
+sources:
+  toyota_2011: {title: "Toyota LandCruiser 70 brochure, 2011", url: "https://xr793.org/wp-content/uploads/2023/10/2011-Toyota-Land-Cruiser-70-Saver-AUS.pdf"}
+  toyota_2014: {title: "Toyota LandCruiser 70 brochure, 2014", url: "https://xr793.com/wp-content/uploads/2023/10/2014-Toyota-Land-Cruiser-70-Saver-AUS.pdf"}
+  toyota_2021: {title: "Toyota LC70 spec data, June 2021", url: "https://toyotamedia.b-cdn.net/files/2021/11/LC70_Spec_Data_Jun2021.pdf"}
+  toyota_2023: {title: "Toyota LC70 spec sheet, September 2023", url: "https://brookshire.com.au/BrooksHire/media/Media/Spec%20Sheets/LandCruiser-70-Spec-Sheet.pdf"}
+  toyota_2025: {title: "Toyota LC70 brochure, December 2025", url: "https://cruiserarchive.com/wp-content/uploads/2025/12/70SeriesCurrentBrochure.pdf"}
+  toyota_bbg: {title: "Toyota Body Builder's Guide BBGJ1007, Land Cruiser 70, 2017 (VDJ79R-TJMRYQ3, TJMNYQ3)", url: "https://jdmfsm.info/Auto/Japan/Toyota/Land%20Cruiser/70%20Series%20%281984-2007%29/2017%207x%20series%20Body%20Builder%27s%20Manual.pdf"}
+  toyota_acc_2016: {title: "Toyota Industry accessories brochure, 2016", url: "https://xr793.com/wp-content/uploads/2023/10/2016-Toyota-Accessories-AUS.pdf"}
+  lovells_ho: {title: "Lovells 79 Series sheet, 03/2007 to 08/2022", url: "https://lovells.com.au/wp-content/uploads/2025/04/Lovells_Toyota_79-Series_03-2007-08-2022.pdf"}
+  lovells_store_old: {title: "Lovells Campbellfield sheet, 79 Series 03/2007 to 08/2022", url: "https://www.lovellscampbellfield.com.au/_files/ugd/a7ab81_cd324b9c9e354c4da0d3ab9103620a6d.pdf"}
+  lovells_store_j7: {title: "Lovells Campbellfield sheet, J7 79 Series 09/2022 on", url: "https://www.lovellscampbellfield.com.au/_files/ugd/a7ab81_eb6ad9c53f034149b69cc08e5072833e.pdf"}
+  powercurve: {title: "Powercurve, Lovells LC79 GVM kits", url: "https://www.powercurve.com.au/lovells-gvm-upgrade-sunshine-coast/toyota-landcruiser-lc79-series-gvm/"}
+  unsealed_elite: {title: "Unsealed 4x4, Lovells Elite Series", url: "https://unsealed4x4.com.au/lovells-elite-series-79-series-gvm-upgrade/"}
+  drive_2022: {title: "Drive, 2023 LandCruiser 70 price and specs, Dec 2022", url: "https://www.drive.com.au/news/2023-toyota-landcruiser-70-series-price-and-specs/"}
+  practical_2017: {title: "Practical Motoring, 2017 79 Series review", url: "https://practicalmotoring.com.au/4x4/2017-toyota-landcruiser-79-series-offroad-review/"}
+  toyota_gambia: {title: "Toyota Gambia, LC79 2.8 single cab", url: "https://www.toyota.gm/en/range/toyota-gambia-cfao-motors/land-cruiser-79"}
+  store70_gcm: {title: "70 Series Store, 79 Series GCM", url: "https://70seriesstore.com/blogs/information/what-is-the-79-series-towing-gcm"}
+  store70_torque: {title: "70 Series Store, wheel nut torque", url: "https://70seriesstore.com/blogs/information/recommended-79-series-wheel-nut-torque"}
+  arb_03186: {title: "ARB, Hayman Reese 03186RW", url: "https://www.arb.com.au/product/t03186rw-hayman-reese-class-4-tow-bar-3500-350kg-rating-landcruiser-79-series"}
+  roh_trak2: {title: "ROH Trak 2 fitment table", url: "https://roh.com.au/wheels/trak-2"}
+  cm_studs: {title: "Cruisemaster stud pattern sheet", url: "https://cruisemaster.com.au/content/cis/StudPatterns.Infosheet.Rev.1.April23.pdf"}
+  cm_spigot: {title: "Cruisemaster spigot sheet", url: "https://www.diycaravans.com.au/wp-content/uploads/Spigotsize.Infosheet.Rev_.1.April23.pdf"}
+  cm_abs: {title: "Cruisemaster ABS Enabled", url: "https://cruisemaster.com.au/absenabled"}
+  vsi06: {title: "TfNSW VSI 06, light vehicle modifications, July 2026", url: "https://www.nsw.gov.au/sites/default/files/noindex/2026-03/vsi-06-light-vehicle-modification-july-2026.pdf"}
+  vsi09: {title: "TfNSW VSI 09, alternative wheels and tyres", url: "https://www.nsw.gov.au/sites/default/files/2021-02/RMS-Guideline-for-alternative-wheels-and-tyres-Vehicle-Standards-Information-No-9-November-2003.pdf"}
+  adr43: {title: "ADR 43/04 Vehicle Configuration and Dimensions, compilation 2025", url: "https://www.legislation.gov.au/F2006L01430/2025-01-30/2025-01-30/text/original/pdf"}
+  report06: {title: "Report 06, trailer running gear", url: "research/06-trailer-running-gear.md"}
+  report08: {title: "Report 08, coupling and hitch", url: "research/08-coupling-and-hitch.md"}
+  report09: {title: "Report 09, trailer wheels and tyres", url: "research/09-trailer-wheels-and-tyres.md"}
+  report13: {title: "Report 13, equipment", url: "research/13-equipment.md"}
+
+ratings_by_build:
+  - {id: gvm_2007_2016, value: 3300, unit: kg, applies_to: "single cab 03/2007 to 12/2016", source: toyota_2014, basis: maker, note: "toyota_2011 prints 3,330 kg. The lower figure is used"}
+  - {id: gcm_2007_2016, value: 6800, unit: kg, applies_to: "single cab 03/2007 to 12/2016", source: lovells_ho, basis: installer}
+  - {id: front_axle_2007_2016, value: 1460, unit: kg, applies_to: "03/2007 to 12/2016", source: lovells_store_old, basis: installer, note: "lovells_ho gives 1,480 kg. The lower figure is used"}
+  - {id: rear_axle_2007_2016, value: 2300, unit: kg, applies_to: "03/2007 to 12/2016", source: lovells_ho, basis: installer}
+  - {id: kerb_2007_2016, value: [2055, 2075], unit: kg, applies_to: "single cab chassis 2011 to 2014", source: toyota_2011, basis: maker, note: "toyota_2014 gives 2,065 to 2,075 kg"}
+  - {id: fuel_2007_2016, value: 180, unit: L, applies_to: "single cab 2007 to 2016", source: toyota_2014, basis: maker}
+  - {id: gvm_2017_2022, value: 3400, unit: kg, applies_to: "single cab 01/2017 to 08/2022", source: toyota_2021, basis: maker}
+  - {id: gcm_2017_2022, value: 6900, unit: kg, applies_to: "single cab 01/2017 to 08/2022", source: toyota_2021, basis: maker}
+  - {id: front_axle_2017_on, value: 1500, unit: kg, applies_to: "single cab 2017 on", source: toyota_bbg, basis: maker, note: "lovells_store_j7 also gives 1,500 kg for 09/2022 on"}
+  - {id: rear_axle_2017_on, value: 2300, unit: kg, applies_to: "single cab 2017 on", source: toyota_bbg, basis: maker}
+  - {id: kerb_2017_2022_workmate, value: [2165, 2220], unit: kg, applies_to: "VDJ79R-TJMRYQ3", source: toyota_bbg, basis: maker, note: "full fuel tank, cab chassis without tray"}
+  - {id: kerb_2017_2022_gxl, value: [2175, 2230], unit: kg, applies_to: "VDJ79R-TJMNYQ3", source: toyota_bbg, basis: maker}
+  - {id: kerb_front_axle_2017, value: [1265, 1295], unit: kg, applies_to: "single cab chassis 2017", source: toyota_bbg, basis: maker}
+  - {id: kerb_rear_axle_2017, value: [900, 935], unit: kg, applies_to: "single cab chassis 2017, 900 to 925 WorkMate, 910 to 935 GXL", source: toyota_bbg, basis: maker}
+  - {id: gvw_split_2017, value: {front: 1470, rear: 1930}, unit: kg, applies_to: "at the 3,400 kg GVM", source: toyota_bbg, basis: maker}
+  - {id: unsprung_per_axle, value: 250, unit: kg, applies_to: "front and rear axle each", source: toyota_bbg, basis: maker}
+  - {id: fuel_2017_on, value: 130, unit: L, applies_to: "single cab 2017 on", source: toyota_2021, basis: maker}
+  - {id: gvm_2022_on, value: 3510, unit: kg, applies_to: "09/2022 on", source: drive_2022, basis: press, note: "makes the 79 an NB1 medium goods vehicle"}
+  - {id: gcm_2022_2023, value: 6900, unit: kg, applies_to: "single cab 09/2022 to 08/2023", source: lovells_store_j7, basis: installer}
+  - {id: gcm_2023_on, value: 7010, unit: kg, applies_to: "09/2023 on", source: toyota_2023, basis: maker}
+  - {id: kerb_2023_on, value: [2185, 2200], unit: kg, applies_to: "single cab 2023 on, 2,200 WorkMate", source: toyota_2023, basis: maker}
+  - {id: braked_towing, value: 3500, unit: kg, applies_to: "all", source: toyota_2021, basis: maker}
+  - {id: unbraked_towing, value: 750, unit: kg, applies_to: "all", source: toyota_2021, basis: maker}
+  - {id: towball_download, value: 350, unit: kg, applies_to: "all, with a 350 kg rated towbar", source: practical_2017, basis: press, note: "matches arb_03186"}
+  - {id: cg_height_cab_chassis, value: 700, unit: mm, applies_to: "single cab chassis", source: toyota_bbg, basis: maker}
+  - {id: cg_height_limit_built, value: 1000, unit: mm, applies_to: "unladen, after body building", source: toyota_bbg, basis: maker}
+
+gvm_kits:
+  - {id: lovells_3900_comfort, gvm: 3900, front_axle: 1540, rear_axle: 2360, gcm: "factory", tyre_min: "LI 114, speed L", fits: "03/2007 to 08/2022", source: lovells_ho, basis: installer}
+  - {id: lovells_3900_touring, gvm: 3900, front_axle: 1540, rear_axle: 2360, gcm: 7400, fits: "03/2007 to 08/2022", source: lovells_store_old, basis: installer}
+  - {id: lovells_4200_platinum, part: TOYKIT080-GVM, gvm: 4200, front_axle: 1650, rear_axle: 2550, gcm: 7400, tyre_min: "LI 117, speed M", fits: "single cab 01/2017 on (powercurve says 10/2016), and J7", source: lovells_ho, basis: installer, note: "recommended"}
+  - {id: lovells_4495_elite, gvm: 4495, front_axle: 1650, rear_axle: 2850, gcm: 7400, fits: "single cab 01/2017 on, and J7", source: lovells_store_j7, basis: installer}
+  - {id: dobinsons, gvm: [3900, 3999], gcm: "no upgrade", fits: "78 and 79 Series", source_url: "https://chicken-cornet-9bdj.squarespace.com/gvm-upgrades/landcruiser-79-series", basis: installer}
+  - {id: terrain_tamer, gvm: [3950, 4150], fits: "J7 from 3,510 kg", source_url: "https://www.4x4australia.com.au/gear/2024-toyota-landcruiser-vdj79-build-begins", basis: press}
+  - {id: outback_armour, gvm: 3800, fits: "J7 single cab", source_url: "https://oppositelockgoldcoast.com.au/docs/kits/outback-armour-vehicles-207-a4-brochure-toyota-landcruiser-70-j7-79-single-cab-gvm-upgrade-3800kg.pdf", basis: installer, note: "brochure title only"}
+
+planned_build:   # section 2.3 of the report, 2017 to 2022 cab chassis with the 4,200 kg kit
+  items:
+    - {name: "cab chassis kerb", mass: 2193, front: 1280, rear: 913, basis: "toyota_bbg mid-range"}
+    - {name: "two people", mass: 160, x: 1660, basis: estimate}
+    - {name: "bull bar and winch", mass: 110, x: -800, basis: estimate}
+    - {name: "tray 150, box 300, bikes 381, tools 100", mass: 931, x: 3310, basis: "brief plus estimates"}
+    - {name: "two spare wheels", mass: 74, x: 3900, basis: estimate}
+    - {name: towbar, mass: 35, x: 4380, basis: estimate}
+    - {name: "towball download", mass: 250, x: 4480, basis: "brief, ball 1,300 mm behind the rear axle (estimate)"}
+  total: {mass: 3753, front: 1324, rear: 2429, front_share_pct: 35.3, basis: calculated}
+  rear_axle_margin_4200_kit: {value: 121, unit: kg, basis: calculated}
+  total_at_rear_axle_limit: {value: 3870, unit: kg, basis: calculated, note: "extra load at the tray centre adds 1.041 kg to the rear axle per kg"}
+  rear_axle_per_kg_towball: {value: 1.41, basis: calculated}
+  combination_planned: {value: 6503, unit: kg, basis: calculated, note: "3,753 + 3,000 trailer - 250 towball, against the 6,900 kg factory GCM"}
+  max_ute_at_factory_gcm_with_3t_trailer: {value: 4150, unit: kg, basis: calculated}
+
+dimensions:   # 2017 single cab chassis, from toyota_bbg unless stated
+  - {id: wheelbase, value: 3180, unit: mm, source: toyota_bbg}
+  - {id: overall_length, value: {workmate: 5220, gxl: 5230}, unit: mm, source: toyota_bbg}
+  - {id: front_overhang, value: {workmate: 850, gxl: 860}, unit: mm, source: toyota_bbg, note: "bumper to front axle, from the cab-and-chassis drawing"}
+  - {id: rear_overhang_cab_chassis, value: 1190, unit: mm, source: toyota_bbg}
+  - {id: frame_length, value: 4880, unit: mm, source: toyota_bbg}
+  - {id: frame_front_ahead_of_front_axle, value: 625, unit: mm, source: toyota_bbg}
+  - {id: frame_end_behind_rear_axle, value: 1075, unit: mm, source: toyota_bbg}
+  - {id: front_axle_to_back_of_cab, value: 2060, unit: mm, source: toyota_bbg, note: "my scaled check of the side view gives about 2,045 mm"}
+  - {id: back_of_cab_to_rear_axle, value: 1120, unit: mm, basis: calculated}
+  - {id: frame_behind_cab, value: 2195, unit: mm, basis: calculated}
+  - {id: rear_frame_width, value: [1046, 1090], unit: mm, source: toyota_bbg, note: "assumption: 1,046 over the rails, 1,090 over the brackets. Measure"}
+  - {id: rear_spring_hanger_spacing, value: 1000, unit: mm, source: toyota_bbg}
+  - {id: rear_spring_front_hanger_ahead_of_rear_axle, value: 689, unit: mm, source: toyota_bbg}
+  - {id: deck_mount_stations_from_rear_axle, value: [-879, -490, 123, 490, 755, 1025], unit: mm, source: toyota_bbg, note: "negative is ahead of the rear axle"}
+  - {id: rear_cab_mount_behind_front_axle, value: 1952, unit: mm, source: toyota_bbg}
+  - {id: overall_width, value: {narrow_tyres: 1790, with_265_70R16: 1870}, unit: mm, source: toyota_bbg}
+  - {id: overall_height, value: {narrow_tyres: 1970, with_265_70R16: 1955}, unit: mm, source: toyota_bbg}
+  - {id: front_track, value: {narrow_tyres: 1515, with_265_70R16: 1555}, unit: mm, source: toyota_bbg}
+  - {id: rear_track, value: {narrow_tyres: 1420, with_265_70R16: 1460}, unit: mm, source: toyota_bbg, note: "95 mm narrower than the front, 2011 to 2023"}
+  - {id: running_clearance, value: 235, unit: mm, source: toyota_2021, note: "toyota_2023 lists 330 (WorkMate) and 316 (GX, GXL)"}
+  - {id: approach_angle, value: 33, unit: degrees, source: practical_2017, note: "toyota_gambia lists 35 for a 2.8 L single cab"}
+  - {id: departure_angle, value: 27, unit: degrees, source: practical_2017, note: "toyota_gambia lists 29, and it depends on the tray"}
+  - {id: wading_depth, value: 700, unit: mm, source: practical_2017}
+  - {id: turning_circle_kerb, value: 14.4, unit: m, source: toyota_2021}
+  - {id: tray_size_assumed, value: {length: 2400, width_max: 1850}, unit: mm, basis: estimate, source_url: "https://forum.ih8mud.com/threads/what-make-of-ute-tray-is-this.1051531/"}
+
+body_limits:
+  - {id: rear_overhang_max, value: 1908, unit: mm, rule: "60 % of wheelbase or 3.7 m, whichever is less, including equipment", source: adr43, basis: calculated}
+  - {id: overall_width_max_adr, value: 2500, unit: mm, rule: "NA and NB1 vehicles", source: adr43}
+  - {id: body_width_beyond_cab_max, value: 60, unit: mm, rule: "beyond the cab's outermost point, mirrors excluded", source: toyota_bbg}
+  - {id: box_width_max_assumed, value: 1850, unit: mm, basis: "estimate, cab 1,790 mm plus 60 mm"}
+  - {id: front_axle_share_min, value: 20, unit: "%", source: toyota_bbg, basis: "maker, extracted text"}
+  - {id: wheel_arch_clearance, value: {vertical_over_bump: 25, outside_tyre: 30, inside_tyre: 40}, unit: mm, source: toyota_bbg}
+  - {id: exhaust_clearance_body, value: {pipe: 50, muffler: 150}, unit: mm, source: toyota_bbg}
+  - {id: fuel_tank_clearance, value: {pipe: 100, muffler: 200}, unit: mm, source: toyota_bbg}
+
+wheels_and_tyres:
+  - {id: factory_tyres_2017, value: "225/95R16C standard, 7.50R16LT and 265/70R16LT options", source: toyota_bbg}
+  - {id: placard_pressure_front, value: 250, unit: kPa, source: toyota_bbg}
+  - {id: placard_pressure_rear, value: {225_95R16C_and_7_50R16: 475, 265_70R16: 350}, unit: kPa, source: toyota_bbg}
+  - {id: factory_alloy, value: "16 x 7, ET 0, 5 x 150", source_url: "https://www.ebay.com.au/itm/155533183032", basis: listing}
+  - {id: wheel_nut, value: "M14 x 1.5, 21 mm hex", source: store70_torque}
+  - {id: wheel_nut_torque, value: {steel: 209, alloy: 131}, unit: Nm, source: store70_torque}
+  - {id: factory_tyre_load_index, value: 115, source: lovells_store_old}
+  - {id: kit_4200_min_load_index, value: 117, note: "1,285 kg", source: powercurve}
+  - {id: kit_4200_min_speed, value: "M (130 km/h)", source: powercurve}
+  - {id: rec_wheel_rating, value: 1400, unit: kg, item: "ROH Trak 2 16 x 7 ET 0 5 x 150", source: roh_trak2}
+  - {id: rec_tyre_rating, value: 1550, unit: kg, item: "LT265/75R16 123/120 E at 80 psi", source: report09}
+  - {id: rec_tyre_diameter, value: [804, 805], unit: mm, source: report09, note: "Toyo 804, Yokohama 805"}
+  - {id: tyre_diameter_225_95R16, value: 834, unit: mm, basis: calculated}
+  - {id: need_per_rear_wheel_4200_kit, value: 1275, unit: kg, basis: calculated}
+  - {id: rear_tyre_pressure_planned, value: 53, unit: psi, basis: "estimate, report 09 power law"}
+  - {id: nsw_diameter_change_max, value: 7, unit: "% of the largest placard diameter", source: vsi06}
+  - {id: nsw_width_increase_max, value: 25.4, unit: mm, source: vsi06}
+  - {id: nsw_track_increase_max, value: 50, unit: mm, rule: "beyond the factory maximum, MC, NA and NB", source: vsi09}
+  - {id: spare_wheel_and_tyre_mass, value: 37, unit: kg, basis: "estimate, 14.5 kg wheel plus 22.6 kg tyre"}
+
+shared_trailer_wheel:
+  - {id: cruisemaster_pattern, value: "LC5 M14, 5 x 150, M14 x 1.5 x 40 mm studs (52 mm on discs), 12-inch drums and discs", source: cm_studs}
+  - {id: cruisemaster_abs, value: "ABS Enabled on 10 and 12-inch electric drums. All electric drums ABS Compatible", source: cm_abs}
+  - {id: spigot, value: 110, unit: mm, source: cm_spigot}
+  - {id: max_effective_cf, value: 200, unit: mm, source: report09}
+  - {id: need_per_wheel_3000_atm, value: 825, unit: kg, basis: "calculated, (3,000 - 250) x 1.2 / 4"}
+  - {id: need_per_wheel_3500_atm, value: 975, unit: kg, basis: calculated}
+  - {id: xt_tyre_limit_at_880, value: 804, unit: mm, source: report06}
+  - {id: xt_min_tyre_gap, value: 75, unit: mm, source: report06}
+  - {id: trailer_axle_spacing_recommended, value: 900, unit: mm, basis: "estimate, gap about 95 mm"}
+  - {id: tandem_spacing_max_vsb1, value: 1000, unit: mm, source: report06}
+  - {id: trailer_tyre_pressure_highway, value: [26, 30], unit: psi, basis: estimate}
+
+towing_and_electrical:
+  - {id: towbar_rating, value: {braked: 3500, ball: 350}, unit: kg, item: "Hayman Reese 03186RW", source: arb_03186}
+  - {id: towball_height_window, value: [350, 460], unit: mm, rule: "vehicle fully loaded, VSB1", source: report08}
+  - {id: coupling_point_target, value: 450, tolerance: 20, unit: mm, basis: "report 08 target, ute laden"}
+  - {id: ball_drop_from_250kg, value: [20, 30], unit: mm, basis: "estimate from toyota_bbg spring rates"}
+  - {id: front_coil_rate_factory, value: 42.2, unit: N/mm, source: toyota_bbg}
+  - {id: rear_leaf_rate_factory, value: [47.9, 104.2], unit: N/mm, source: toyota_bbg}
+  - {id: system_voltage, value: 12, unit: V, source: toyota_bbg}
+  - {id: battery, value: "12 V, 64 Ah (20 h)", source: toyota_bbg}
+  - {id: alternator, value: 1560, unit: W, source: toyota_bbg, note: "about 110 A at 14 V, calculated"}
+  - {id: dc_dc_draw, value: 35, unit: A, item: "Victron Orion-Tr Smart 12/24-15", source: report13}
+  - {id: feed_cable, value: "6 B&S, 13.5 mm2", source: report13}
+  - {id: feed_fuse, value: 50, unit: A, basis: "Toyota rule of 1.4 x load (toyota_bbg)"}
+  - {id: feed_voltage_drop, value: 0.6, unit: V, basis: "calculated, 13 m loop at 35 A"}
+  - {id: brake_controller_max_current_12v, value: 25, unit: A, source_url: "https://www.redarcelectronics.com/au/tow-pro-elite"}
+  - {id: lspv_check, value: {front_5_9_MPa: "rear 4.9 +/- 0.5 MPa", front_7_8_MPa: "rear 5.4 +/- 0.7 MPa"}, source: toyota_bbg}
+
+fuel:
+  - {id: diesel_density, value: 0.835, unit: kg/L, basis: estimate}
+  - {id: range_130L_towing, value: [650, 700], unit: km, basis: "estimate, 18 to 20 L/100 km"}
+  - {id: toyota_fuel_figure, value: 10.7, unit: L/100km, source: toyota_2021}

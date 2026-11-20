@@ -1,5 +1,7 @@
 # 09: Trailer wheels, tyres and stud pattern
 
+Note added 20 Nov 2026, for the LandCruiser 79: the tow vehicle is now a Toyota LandCruiser 79 single cab V8 in place of the Porsche Cayenne, and it carries both bikes in an enclosed box on its tray (UTE-GARAGE.md). Reports 14 to 16 and VEHICLE.md cover the vehicle, and TRAILER.md revision H is the smaller trailer without a garage, plated at 3,100 kg ATM. The trailer now shares the ute's wheel and tyre, ROH Trak 2 16 x 7 ET 0 5 x 150 with LT265/75R16 123/120 (report 16 section 4), so this report's 6 x 139.7 wheel and LT245/70R16 tyre are superseded.
+
 Research report, 19 Nov 2026. The trailer no longer shares the Cayenne's wheel (owner's decision after Porsche confirmed that none of its 18-inch wheels is rated for 984 kg or more). This report chooses the trailer's own wheel, tyre and hub stud pattern for the Cruisemaster XT Freestyle Air 4,500 kg tandem with 12-inch ABS-enabled electric drums and Bosch TSC. Report 10 covers the car.
 
 Terms used throughout:

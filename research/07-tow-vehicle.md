@@ -1,5 +1,7 @@
 # 07: Tow vehicle, 2013 Porsche Cayenne GTS (958)
 
+Note added 20 Nov 2026. The Porsche Cayenne GTS is no longer the tow vehicle. Leonard is buying a Toyota LandCruiser 79 single cab V8 that carries both bikes in an enclosed box on its tray. Reports 14 (engine), 15 (driveline) and 16 (limits, GVM, towing, wheels) replace this report, and VEHICLE.md is the vehicle plan. This report stays as the record of the Cayenne study. Its 280 kg towball and 1,600 kg rear axle limits no longer apply: the trailer's checks use the 79's 250 kg towball cap and 6,900 kg GCM (TRAILER.md).
+
 Note added 19 Nov 2026. The trailer no longer shares the Cayenne's wheel. Porsche confirmed that none of its 18-inch wheels is rated for the 984 kg the trailer needs, so the owner chose the best wheel and tyre for each vehicle separately, with a spare for each. The trailer's wheels, tyres and stud pattern are in [report 09](09-trailer-wheels-and-tyres.md), and the car's in [report 10](10-car-wheels-and-tyres.md). Where this report discusses the shared 8J x 18 wheel, the 5 x 130 hubs or the 255/55 R18 tyre on the trailer, those reports replace it.
 
 ## Recommendation

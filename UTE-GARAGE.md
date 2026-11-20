@@ -1,6 +1,6 @@
 # UTE-GARAGE: the LandCruiser 79 and its bike garage
 
-Revision A, 20 Nov 2026. Design basis for the tow vehicle and the enclosed bike box on its tray. It is a
+Revision B, 20 Nov 2026. Design basis for the tow vehicle and the enclosed bike box on its tray. It is a
 planning-level proposal for the engineer and the GVM certifier to check. The data is `data/ute/ute.yaml`,
 `data/assemblies/ute-garage.yaml`, `data/ute/parts/*.yaml` and `data/ute/garage-checks.yaml`. The code is
 `cad/ute.py` and `cad/ute_garage.py`. The drawings are CT-701 to CT-704, and the site page is "Ute garage".
@@ -10,7 +10,11 @@ the back to fit the two bikes and some tools. That way, we can make the trailer 
 design the motorbike garage on the land cruiser. We want to make sure it's enclosed to make sure the bikes are safer
 and not prone to theft."
 
-The trailer's own garage stays in the model until the trailer is redesigned smaller.
+What changed in revision B, 20 Nov 2026: the trailer was redesigned without its garage (TRAILER.md revision H), and
+its ATM is plated at 3,100 kg (decision log 12:10). The towball now sits 1,300 mm behind the rear axle (report 16,
+decision log 12:45) in place of report 17's 1,350 mm, and the coupling point is set for 440 mm laden, plus or minus
+20 mm (layout-79.md section 3.5). Section 9 is re-solved for both. The rear axle with growth fell 4 kg to 2,436 kg.
+No check limit changed.
 
 ## 1. The ute
 
@@ -21,7 +25,7 @@ The trailer's own garage stays in the model until the trailer is redesigned smal
 - GCM (gross combination mass, the ute and trailer together) 6,900 kg. Braked towing 3,500 kg.
 - Hayman Reese 03186RW towbar, rated 3,500 kg and 350 kg. The plan caps the towball at 250 kg.
 - ROH Trak 2 16 x 7 ET0 wheels rated 1,400 kg, LT265/75R16 tyres rated 1,550 kg and 805 mm in diameter.
-- The trailer's target is an ATM of 3,000 kg. ATM (aggregate trailer mass) is the most the loaded trailer may weigh.
+- The trailer is plated at 3,100 kg ATM. ATM (aggregate trailer mass) is the most the loaded trailer may weigh.
 
 Ute frame DIM-U1: X from the front axle centre, positive rearward. Y from the centreline, positive to the road
 (right) side. Z up from the ground, laden ride height. Module frame of the box: X from the front wall's inner face,
@@ -35,7 +39,7 @@ From the brief, the decision log and report 17:
 - At most 1,850 mm wide outside (the cab's 1,790 mm plus Toyota's 60 mm). Lighter than report 17's 440 kg.
 - The lowest floor that works with the kit's bump travel. Report 17 offers a lower floor at about 850 mm if the wheel
   tubs stand no more than 100 mm above it, or a flat deck at about 1,080 mm.
-- Bikes side by side, noses forward, at the 760 mm spacing of the trailer garage (`DESIGN.md`).
+- Bikes side by side, noses forward, at the 760 mm spacing of the retired trailer garage (`DESIGN.md`).
 - Rear barn doors with shoot bolts, a cam bar and an ABLOY padlock. A kerb-side lift-up door to reach the second
   bike's straps. Inset hinges, dust seals, low and high vents for petrol vapour, interior lights.
 - Report 17's ramp stowed inside, the WARN winch moved from the trailer, Condor chocks, flush L-track, straps and
@@ -63,7 +67,7 @@ From the brief, the decision log and report 17:
   carry all the horizontal load. Each bolt is checked against AS 4100 design capacities for an M12 property class
   8.8 bolt: 56.0 kN in tension and 31.4 kN in shear with the threads in the shear plane.
 - **Clearances.** Bike to bike 30 mm, bike to walls, doors and stowed items 15 mm, bike to the door portal as it rolls
-  out 15 mm (the trailer garage's CLR-03, CLR-04 and CLR-09). Tyre clearances are Toyota's, measured on a solid the
+  out 15 mm (the retired trailer garage's CLR-03, CLR-04 and CLR-09). Tyre clearances are Toyota's, measured on a solid the
   tyre sweeps from static up to full bump.
 - **Ramp.** Report 03 limits a ramp to 20 degrees for walking a bike up beside it. The angle is reported.
 
@@ -142,13 +146,12 @@ the alarm and the trackers (report 17 section 4).
 
 ## 7. Restraint, loading and tools
 
-- As the trailer's garage: a Condor SC-2000 chock on each bike's centreline at the front wall, two flush L-track rows
+- As in the retired trailer garage: a Condor SC-2000 chock on each bike's centreline at the front wall, two flush L-track rows
   across the floor, 35 mm SpanSet straps of LC 1,000 kg, a Canyon Dancer harness on the Street Triple and a rear-wheel
   strap on each bike. The Tuareg sits 333 mm road side of the centreline and the Street Triple 427 mm kerb side, 760 mm
   apart, which leaves 59.5 mm from each bike's widest point to its wall.
-- The WARN VRX 25-S moves from the trailer's module. It clips to a quick-release plate on the front wall in front of
-  each chock, 650 mm up, above the 500 mm ignition-free zone. The trailer's module keeps its winch line until its garage
-  goes.
+- The WARN VRX 25-S moves from the retired trailer garage. It clips to a quick-release plate on the front wall in
+  front of each chock, 650 mm up, above the 500 mm ignition-free zone.
 - The Black Widow MF-12038 ramp (3,048 mm, 34 kg) stands folded on its edge across the back, 8 mm inside the closed
   leaves, so it comes out first. With the bikes out the sill is about 864 mm up and the ramp sits at 16.5 degrees.
 - The Tuareg loads first to the road side and is strapped from the empty Street Triple bay.
@@ -186,21 +189,22 @@ The ute, from `build/ute/ute.json`:
 |---|---|---|---|---|---|---|---|
 | UC1 unladen | 2,818 | 1,361 | 1,457 | 1,509 | 48.3 % | 785 | 0.961 |
 | UC2 bikes aboard | 3,428 | 1,427 | 2,001 | 2,084 | 41.6 % | 879 | 0.858 |
-| UC3 towing with the bikes | 3,678 | 1,321 | 2,357 | 2,440 | 35.9 % | 850 | 0.887 |
-| UC4 towing, bikes out | 3,288 | 1,332 | 1,956 | 2,037 | 40.5 % | 774 | 0.974 |
+| UC3 towing with the bikes | 3,678 | 1,324 | 2,353 | 2,436 | 36.0 % | 849 | 0.888 |
+| UC4 towing, bikes out | 3,288 | 1,335 | 1,952 | 2,033 | 40.6 % | 773 | 0.975 |
 | UCB bikes in the trailer | 2,805 | 1,479 | 1,326 | 1,406 | 52.7 % | 715 | 1.054 |
 
 - Weighed mass in UC3 3,678 kg against the plan's 3,850 kg, 3,796 kg with growth against the 4,200 kg GVM.
-- Rear axle 2,440 kg with growth against 2,550 kg, a margin of 110 kg. It is the binding limit. Front axle at most
+- Rear axle 2,436 kg with growth against 2,550 kg, a margin of 114 kg. It is the binding limit. Front axle at most
   1,462 kg with growth against 1,650 kg.
 - Towball 250 kg against the plan's 250 kg and the towbar's 350 kg.
-- With a 3,000 kg trailer the combination is 6,428 kg, 6,546 kg with growth, against the 6,900 kg GCM.
-- Front axle share at least 35.7 % against Toyota's 20 %.
+- With the 3,100 kg plated trailer the combination is 6,528 kg, 6,646 kg with growth, against the 6,900 kg GCM.
+- Front axle share at least 35.8 % against Toyota's 20 %.
 - SSF 0.858 with the bikes aboard against 1.02 with them in the trailer (report 17), reported and not a failure.
   Report 17 found 0.82 on a flat deck at about 1,050 mm.
-- Unladen centre of gravity 785 mm against Toyota's 1,000 mm. Each rear wheel carries 1,220 kg with growth against its
+- Unladen centre of gravity 785 mm against Toyota's 1,000 mm. Each rear wheel carries 1,218 kg with growth against its
   1,400 kg rating. Rear overhang 1,555 mm at the cam bar against 1,908 mm. The box is 40 mm behind the cab.
-- The coupling window of 430 to 470 mm runs past VSB1's 460 mm, so set the tongue for 450 mm, minus 20 or plus 10 mm.
+- The coupling point is set for 440 mm laden, plus or minus 20 mm, which gives 420 to 460 mm inside VSB1's 350 to
+  460 mm (UTE-13). The box overhangs the ball by 210 mm, and the trailer's JK-01 and JK-02 check its sweep.
 
 The box:
 
@@ -238,7 +242,8 @@ Phase U1, the ute:
 1. Kerb mass 2,202.5 kg with 922.5 kg on the rear axle and the centre of gravity 700 mm up: the middle of Toyota's
    ranges for the GXL (BBGJ1007). The full 130 L fuel tank is in it.
 2. Bull bar and winch 110 kg, towbar 35 kg, spare wheel 37.1 kg, two people 160 kg (report 16, estimates).
-3. Towball 1,350 mm behind the rear axle (report 17 open question 6, estimate).
+3. Towball 1,300 mm behind the rear axle (report 16 and the decision log 12:45, estimate). Revision A used report
+   17's 1,350 mm.
 4. Rails 1,046 mm over their outsides, with 60 mm flanges (estimate from the frame drawing).
 5. Tyre static loaded radius 380 mm, about 22 mm of deflection (estimate).
 
@@ -279,5 +284,5 @@ Phase U2, the box:
 6. The L-track bolting into the steel crossmembers for 20 kN per anchor.
 7. The door portal, the hinges and the cam bar keepers under the load restraint cases.
 8. The LSPV (load sensing proportioning valve) reset after the body is fitted (report 16).
-9. The coupling height, set for 450 mm, minus 20 or plus 10 mm, against VSB1's 460 mm.
+9. The coupling height, set for 440 mm laden, plus or minus 20 mm, against VSB1's 460 mm.
 10. Whether the 0.858 static stability factor is acceptable for the planned driving.

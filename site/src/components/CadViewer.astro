@@ -1,19 +1,16 @@
 ---
-// three-cad-viewer island. Without `step` it shows the whole module (loading-only items hidden).
-// With `step` it shows that step's new parts in their own colours against the earlier work in grey.
+// three-cad-viewer island for one model (a viewer.json under /models/).
 import { withBase } from '../lib/url';
 
 interface Props {
   src?: string;
-  states?: string;
-  step?: string;
   height?: number;
 }
-const { src = withBase('/models/garage-bed.json'), states = withBase('/models/steps.json'), step = '', height = 520 } = Astro.props;
+const { src = withBase('/models/trailer.json'), height = 520 } = Astro.props;
 const rev = process.env.GIT_REV ?? 'dev';
 ---
 
-<cad-viewer class="not-content" data-src={`${src}?v=${rev}`} data-states={`${states}?v=${rev}`} data-rev={rev} data-step={step} data-height={height}>
+<cad-viewer class="not-content" data-src={`${src}?v=${rev}`} data-height={height}>
   <p class="cad-loading">Loading the 3D model (about 3 MB)...</p>
 </cad-viewer>
 <p class="cad-help">
@@ -64,25 +61,10 @@ const rev = process.env.GIT_REV ?? 'dev';
 <script>
   import { Display, Viewer } from 'three-cad-viewer';
   import 'three-cad-viewer/css';
-  import { withBase } from '../lib/url';
-
-  type Node = { id: string; name: string; parts?: Node[] };
-  const leaves = (n: Node, acc: Node[] = []): Node[] => {
-    for (const p of n.parts ?? []) {
-      if (p.parts) leaves(p, acc);
-      else acc.push(p);
-    }
-    return acc;
-  };
-  const under = (id: string, prefixes: string[]) => prefixes.some((p) => id === p || id.startsWith(p + '/'));
 
   class CadViewerElement extends HTMLElement {
     async connectedCallback() {
-      const st = await fetch(this.dataset.states!).then((r) => r.json());
-      const stepId = this.dataset.step || '';
-      const step = st.steps.find((s: any) => s.id === stepId);
-      const src = step ? withBase(`/models/${step.model}?v=${this.dataset.rev}`) : this.dataset.src!;
-      const shapes = await fetch(src).then((r) => r.json());
+      const shapes = await fetch(this.dataset.src!).then((r) => r.json());
       this.innerHTML = '';
       const treeWidth = 250;
       const cadWidth = Math.max(420, this.clientWidth - treeWidth - 4);
@@ -124,38 +106,6 @@ const rev = process.env.GIT_REV ?? 'dev';
         { capture: true, passive: true },
       );
 
-      const all = leaves(shapes);
-      const states: Record<string, [number, number]> = {};
-      if (step) {
-        for (const leaf of all) {
-          const on = under(leaf.id, step.new) || under(leaf.id, step.earlier);
-          states[leaf.id] = on ? [1, 1] : [0, 0];
-        }
-        viewer.setStates(states as any);
-      }
-      if (step) {
-        // grey out the earlier work so the new parts stand out (STEP-03)
-        const groups = (viewer as any).nestedGroup.groups as Record<string, any>;
-        for (const [path, g] of Object.entries(groups)) {
-          if (!under(path, step.earlier) || under(path, step.new)) continue;
-          g.traverse?.((o: any) => {
-            const ms = Array.isArray(o.material) ? o.material : o.material ? [o.material] : [];
-            for (const m of ms) {
-              if (m.type === 'LineBasicMaterial' || m.type === 'LineMaterial') {
-                m.opacity = 0.35;
-                m.transparent = true;
-              } else if (m.color) {
-                m.color.set(0xb9bec4);
-                m.transparent = true;
-                m.opacity = 0.35;
-                m.depthWrite = false;
-              }
-              m.needsUpdate = true;
-            }
-          });
-        }
-        (viewer as any).update?.(true);
-      }
       // Reserve the full height of the viewer (canvas, tree and info panel) so nothing overlaps the text below.
       const reserve = () => {
         const top = this.getBoundingClientRect().top;

@@ -1,5 +1,7 @@
 # 10: The car's own wheels and tyres for towing (2013 Cayenne GTS, 958)
 
+Note added 20 Nov 2026. The Porsche Cayenne GTS is no longer the tow vehicle, so its own wheels and tyres no longer matter to the plan. The LandCruiser 79 and the trailer now share one wheel and tyre, the ROH Trak 2 16 x 7 ET 0 with LT265/75R16 123/120 (report 16 section 4), with one spare on each. Reports 14 to 16 and VEHICLE.md replace this report, which stays as the record of the Cayenne study.
+
 This report builds on [report 07](07-tow-vehicle.md), section 4. The car no longer shares a wheel with the trailer, so this report picks the car's setup on its own merits. The trailer's wheels are in report 09.
 
 ## Recommendation

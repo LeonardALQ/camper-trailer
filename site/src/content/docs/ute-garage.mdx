@@ -12,8 +12,9 @@ enclosed, lockable box on the back, so the trailer can be made smaller and light
 4,200 kg GVM kit. GVM (gross vehicle mass) is the most the loaded ute may weigh. The box is a one-piece welded
 aluminium body on its own subframe, from research report 17. The design basis is in `UTE-GARAGE.md`.
 
-This is a planning-level proposal for the engineer to check. The trailer's own garage stays in the model until the
-trailer is redesigned.
+This is a planning-level proposal for the engineer to check. The trailer no longer has a garage. It is now the
+smaller layout on the <a href={withBase('/trailer/')}>Whole trailer</a> page, and the vehicle work is on the
+<a href={withBase('/tow-vehicle/')}>Tow vehicle</a> page.
 
 <Ute kind="summary" />
 
@@ -54,14 +55,14 @@ The 3D model is also a <a href={withBase('/downloads/ute.step')}>STEP file</a>.
   locks the cam handle. A lift-up door on the kerb side reaches the Street Triple's straps.
 - **Security.** A Teltonika FMC130 tracker with door switches and a siren, a Monimoto 9 tracker in each bike, a disc
   lock on each front disc, and a chain from each bike to a ground anchor.
-- **Restraint.** As in the trailer's garage: a Condor chock for each front wheel, two flush L-track rows, LC 1,000 kg
+- **Restraint.** As in the retired trailer garage: a Condor chock for each front wheel, two flush L-track rows, LC 1,000 kg
   straps and the WARN winch. LC (lashing capacity) is a strap's rated working load.
 - **Tools.** Two chests ride on the wheel tubs, low in the box and ahead of the ramp. The outer front straps run
   through the box's front corners, so the chests cannot go there.
 
 ## The ute
 
-Case UC3 is the heaviest: towing a 3,000 kg trailer with both bikes in the box and 250 kg on the towball. The static
+Case UC3 is the heaviest: towing the trailer with both bikes in the box and 250 kg on the towball. The static
 stability factor (SSF) is half the track divided by the centre of gravity height. A lower SSF means a higher risk of
 rolling over.
 
@@ -71,8 +72,8 @@ rolling over.
 
 ## Checks
 
-The clearance and contact checks are measured on the 3D model. Clearance limits are the trailer garage's, and the
-tyre clearances are Toyota's. A fail check that misses its limit fails the build. A reported check is shown and
+The clearance and contact checks are measured on the 3D model. Clearance limits come from the retired trailer garage's design, and
+the tyre clearances are Toyota's. A fail check that misses its limit fails the build. A reported check is shown and
 never fails it.
 
 <Ute kind="garage-checks" />

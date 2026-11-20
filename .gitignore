@@ -6,8 +6,8 @@ site/public/models/
 site/public/downloads/
 site/public/drawings/
 site/src/data/generated/
-site/src/content/docs/steps/
 site/src/content/docs/research/
+site/src/content/docs/tow-vehicle.md
 
 # Dependencies and caches
 node_modules/

@@ -11,18 +11,17 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'Camper trailer design',
-      description: 'Design, model, drawings and build steps for a one-off off-road camper trailer.',
+      description: 'Design, model and drawings for a one-off off-road camper trailer and its tow vehicle, a LandCruiser 79.',
       customCss: ['./src/styles/site.css'],
       sidebar: [
         { label: 'Home', link: '/' },
         { label: 'Whole trailer', link: '/trailer/' },
         { label: 'Chassis', link: '/chassis/' },
         { label: 'Body', link: '/body/' },
-        { label: 'Garage and bed', link: '/garage-bed/' },
+        { label: 'Tow vehicle', link: '/tow-vehicle/' },
         { label: 'Ute garage', link: '/ute-garage/' },
         { label: 'Measurements', link: '/measurements/' },
         { label: 'Drawings', link: '/drawings/' },
-        { label: 'Build steps (draft)', items: [{ autogenerate: { directory: 'steps' } }] },
         { label: 'Research', items: [{ autogenerate: { directory: 'research' } }] },
         { label: 'Downloads', link: '/downloads/' },
       ],

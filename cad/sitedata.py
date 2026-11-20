@@ -1,4 +1,4 @@
-"""Copy build outputs into the site and generate the data-driven pages (build steps, research).
+"""Copy build outputs into the site and generate the data-driven pages (research, tow vehicle).
 
 Run inside the project image from the repo root:  python -m cad.sitedata
 """
@@ -23,14 +23,30 @@ RESEARCH = [
     ("04-bed-and-materials.md", "Bed above the bikes, and build materials", 4),
     ("05-bike-geometry.md", "Bike geometry for envelope models", 5),
     ("06-trailer-running-gear.md", "Trailer running gear: suspension, hubs, brakes and sway control", 6),
-    ("07-tow-vehicle.md", "Tow vehicle: the 2013 Porsche Cayenne GTS (958)", 7),
+    ("07-tow-vehicle.md", "Tow vehicle: the 2013 Porsche Cayenne GTS (958), superseded", 7),
     ("08-coupling-and-hitch.md", "Coupling and hitch", 8),
     ("09-trailer-wheels-and-tyres.md", "Trailer wheels, tyres and stud pattern", 9),
-    ("10-car-wheels-and-tyres.md", "The car’s own wheels and tyres for towing", 10),
+    ("10-car-wheels-and-tyres.md", "The Cayenne’s wheels and tyres for towing, superseded", 10),
     ("11-chassis-design.md", "Chassis and drawbar design basis", 11),
+    ("12-body-design.md", "Body design basis", 12),
     ("13-equipment.md", "Appliances, equipment and the energy system", 13),
+    ("14-engine.md", "LandCruiser 79 V8 engine, rebuild, turbo, exhaust and tune", 14),
+    ("15-driveline.md", "LandCruiser 79 V8 driveline and reliability refresh", 15),
+    ("16-ute-limits.md", "LandCruiser 79 limits, GVM, GCM, brakes, wheels and towing", 16),
     ("17-ute-garage.md", "The enclosed motorbike garage on the LandCruiser 79", 17),
 ]
+# sections of VEHICLE.md shown on the Tow vehicle page, in order
+VEHICLE_SECTIONS = ("Summary", "Decisions", "Budget", "Order of work")
+SYSTEMS = {
+    "engine": "Engine rebuild and cooling", "fuel_system": "Fuel system", "intake_dpf": "Sealed airbox and DPF service",
+    "turbo_exhaust": "Turbo, intercooler and exhaust", "tune_legal": "Tune, gauges and engine certificate",
+    "clutch_gearbox": "Clutch and gearbox", "driveline": "Transfer case, tailshafts, diffs and hubs",
+    "steering_suspension": "Steering and front suspension",
+    "refresh": "Chassis, cab, electrical, fuel lines, air conditioning, fluids",
+    "gvm": "GVM kit, fitting and certificate", "brakes": "Brakes", "wheels_tyres": "Wheels and tyres",
+    "towing": "Towing", "freight_weighing": "Freight and weighing", "fuel_tank": "Long-range fuel tank",
+    "bar_winch": "Bull bar and winch, only if the truck has none", "level_b": "Power level B, later",
+}
 
 
 def _copy(src, dst):
@@ -38,37 +54,77 @@ def _copy(src, dst):
     shutil.copy2(src, dst)
 
 
+def _cell(v):
+    return "" if v is None else str(v).replace("|", "/").replace("\n", " ")
+
+
+def _sections(text, names):
+    """The level-2 sections of a markdown file with these names, each with its level-3 subsections."""
+    parts = re.split(r"(?m)^(?=## )", text)
+    keep = {p.split("\n", 1)[0][3:].strip(): p for p in parts[1:]}
+    return [keep[n].rstrip() + "\n" for n in names]
+
+
+def tow_vehicle_page():
+    """The Tow vehicle page: VEHICLE.md's summary, decisions, budget and order of work, then the parts list
+    rendered from data/vehicle/vehicle-parts.yaml."""
+    plan = (ROOT / "VEHICLE.md").read_text(encoding="utf-8")
+    data = yaml.safe_load((ROOT / "data" / "vehicle" / "vehicle-parts.yaml").read_text(encoding="utf-8"))
+    (GEN / "vehicle.json").write_text(json.dumps(data, indent=1, default=str))
+    tot = data["totals_aud"]
+    out = ["---\ntitle: Tow vehicle\ndescription: 'The LandCruiser 79 vehicle plan: summary, decisions, budget, "
+           "order of work and the parts list.'\n---\n\n",
+           "The tow vehicle is a Toyota LandCruiser 79 single cab V8 (VDJ79). It replaces the Porsche Cayenne, "
+           "and it carries both motorbikes in an enclosed box on its tray (see the Ute garage page). This page "
+           "shows four sections of the vehicle plan, `VEHICLE.md`, and then every part and job in "
+           "`data/vehicle/vehicle-parts.yaml`. The engine, driveline, suspension, brakes, wheels, towing, legal "
+           "and limits sections are in `VEHICLE.md` itself. The basis is research reports 14, 15 and 16.\n\n"]
+    for s in _sections(plan, VEHICLE_SECTIONS):
+        out.append(s.replace("`vehicle-parts.yaml`", "the parts list below") + "\n")
+    out.append("## Parts list\n\nRendered from `data/vehicle/vehicle-parts.yaml`. Prices are AUD including GST, the line "
+               "total. Basis is listing (read from a supplier or regulator page) or estimate. Status is required, "
+               "contingency (only if an inspection or test calls for it) or optional.\n\n")
+    groups = {}
+    for it in data["items"]:
+        groups.setdefault(it.get("system"), []).append(it)
+    for key, rows in groups.items():
+        out.append(f"### {SYSTEMS.get(key, key)}\n\n| ID | Item | Supplier | AUD | Basis | Status |\n|---|---|---|---|---|---|\n")
+        for it in rows:
+            name = _cell(it["name"])
+            if it.get("link"):
+                name = f"[{name}]({it['link']})"
+            if it.get("note"):
+                name += f". {_cell(it['note'])}"
+            out.append(f"| {it['id']} | {name} | {_cell(it.get('supplier'))} | {it['price_aud']:,.0f} | "
+                       f"{it.get('price_basis', '')} | {it.get('status', '')} |\n")
+        out.append("\n")
+    out.append("### Lines the merge removed\n\n| Item | AUD | Why |\n|---|---|---|\n")
+    for it in data.get("removed", []):
+        out.append(f"| {_cell(it['name'])} | {it['price_aud']:,.2f} | {_cell(it['reason'])} |\n")
+    out.append(f"\n### Totals\n\n| Total | AUD |\n|---|---|\n| Required | {tot['required']:,} |\n"
+               f"| Required with the contingency allowance | {tot['required_plus_contingency']:,} |\n"
+               f"| With every cut and the contingency allowance | {tot['with_cuts_plus_contingency']:,} |\n"
+               f"| Target | {tot['target']:,} |\n| Bike box, separate | {tot['bike_box_separate']:,} |\n")
+    (DOCS / "tow-vehicle.md").write_text("".join(out), encoding="utf-8")
+    return len(data["items"])
+
+
 def main():
     for d in (GEN, SITE / "public" / "models", SITE / "public" / "downloads" / "drawings", SITE / "public" / "drawings",
-              DOCS / "steps", DOCS / "research"):
+              DOCS / "research"):
         d.mkdir(parents=True, exist_ok=True)
     # data for the components
-    _copy(BUILD / "bom" / "bom.json", GEN / "bom.json")
     _copy(BUILD / "checks" / "checks.json", GEN / "checks.json")
     _copy(BUILD / "drawings" / "register.json", GEN / "register.json")
-    _copy(BUILD / "model" / "instances.json", GEN / "instances.json")
     _copy(BUILD / "trailer" / "trailer.json", GEN / "trailer.json")
-    steps = yaml.safe_load((ROOT / "data" / "steps.yaml").read_text())
-    from .partsdb import Project
-    live = {s.id: s for s in Project().steps}   # owner options leave some steps out (`when`)
-    steps["steps"] = [dict(s, new=live[s["id"]].new, hide=live[s["id"]].hide,
-                           parts=[p for p in s.get("parts", []) if p["part"] in {q.part for q in live[s["id"]].parts}])
-                      for s in steps["steps"] if s["id"] in live]
-    (GEN / "steps_data.json").write_text(json.dumps(steps, indent=1, default=str))
-    # model and downloads
-    _copy(BUILD / "model" / "garage-bed.viewer.json", SITE / "public" / "models" / "garage-bed.json")
-    _copy(BUILD / "model" / "garage-bed-loading.viewer.json", SITE / "public" / "models" / "garage-bed-loading.json")
-    _copy(BUILD / "model" / "steps.json", SITE / "public" / "models" / "steps.json")
-    _copy(BUILD / "model" / "garage-bed.step", SITE / "public" / "downloads" / "garage-bed.step")
-    _copy(BUILD / "model" / "garage-bed.glb", SITE / "public" / "downloads" / "garage-bed.glb")
-    _copy(BUILD / "bom" / "garage-bed-bom.csv", SITE / "public" / "downloads" / "garage-bed-bom.csv")
+    # models and downloads
     _copy(BUILD / "trailer" / "trailer.viewer.json", SITE / "public" / "models" / "trailer.json")
     _copy(BUILD / "trailer" / "trailer.step", SITE / "public" / "downloads" / "trailer.step")
     _copy(BUILD / "trailer" / "trailer.glb", SITE / "public" / "downloads" / "trailer.glb")
     _copy(BUILD / "trailer" / "chassis.viewer.json", SITE / "public" / "models" / "chassis.json")
     _copy(BUILD / "trailer" / "chassis.step", SITE / "public" / "downloads" / "chassis.step")
     _copy(BUILD / "trailer" / "body.viewer.json", SITE / "public" / "models" / "body.json")
-    _copy(BUILD / "trailer" / "body-raised.viewer.json", SITE / "public" / "models" / "body-raised.json")
+    _copy(BUILD / "trailer" / "body-inside.viewer.json", SITE / "public" / "models" / "body-inside.json")
     _copy(BUILD / "trailer" / "body.step", SITE / "public" / "downloads" / "body.step")
     _copy(BUILD / "body" / "body.json", GEN / "body.json")
     _copy(BUILD / "ute" / "ute.json", GEN / "ute.json")
@@ -79,7 +135,8 @@ def main():
     _copy(BUILD / "chassis" / "chassis-cut-list.csv", SITE / "public" / "downloads" / "chassis-cut-list.csv")
     import cairosvg
     reg = json.loads((BUILD / "drawings" / "register.json").read_text())
-    for d in reg["drawings"]:
+    live = [d for d in reg["drawings"] if d.get("status") != "RETIRED"]
+    for d in live:
         n = d["number"]
         for ext in ("pdf", "svg"):
             _copy(BUILD / "drawings" / f"{n}.{ext}", SITE / "public" / "downloads" / "drawings" / f"{n}.{ext}")
@@ -87,29 +144,8 @@ def main():
         cairosvg.svg2png(url=str(BUILD / "drawings" / f"{n}.svg"),
                          write_to=str(SITE / "public" / "drawings" / f"{n}-preview.png"), output_width=1754)
 
-    # one page per build step
-    for old in (DOCS / "steps").glob("*.mdx"):
-        old.unlink()
-    for k, s in enumerate(steps["steps"], 1):
-        words, slug = re.sub(r"[^a-z0-9]+", " ", s["title"].lower()).split(), ""
-        for w in words:
-            if len(slug) + len(w) + 1 > 36:
-                break
-            slug = f"{slug}-{w}" if slug else w
-        parts = slug.split("-")
-        while parts and parts[-1] in ("and", "the", "a", "its", "of", "to", "then", "with", "for", "on", "in"):
-            parts.pop()
-        slug = "-".join(parts)
-        title = f"Step {k}: {s['title']}".replace("'", "’")
-        (DOCS / "steps" / f"{k:02d}-{slug}.mdx").write_text(
-            "---\n"
-            f"title: '{title}'\n"
-            f"description: '{s['action'].replace(chr(39), '’')}'\n"
-            f"sidebar:\n  order: {k}\n"
-            "tableOfContents: false\n"
-            "---\n\n"
-            "import StepDetail from '../../../components/StepDetail.astro';\n\n"
-            f"<StepDetail id=\"{s['id']}\" />\n", encoding="utf-8")
+    # the tow vehicle page
+    n_parts = tow_vehicle_page()
 
     # research reports as pages (copied, with the first heading moved into the title)
     for old in (DOCS / "research").glob("*.md"):
@@ -119,12 +155,14 @@ def main():
         text = re.sub(r"\A#\s+[^\n]*\n", "", text, count=1)
         # links between reports point at the .md files in the repository; on the site they go to the report's page
         text = re.sub(r"\]\((\d\d-[a-z0-9-]+)\.md\)", r"](../\1/)", text)
+        # the YAML files beside a report are in the repository only, so name them instead of linking
+        text = re.sub(r"\[[^\]]+\]\((\d\d-[a-z0-9-]+\.yaml)\)", r"`research/\1`", text)
         body = (f"---\ntitle: '{title}'\nsidebar:\n  order: {order}\n---\n\n"
                 f"This is research report {fname[:2]}, copied unchanged from `research/{fname}` apart from its first heading.\n\n"
                 + text)
         (DOCS / "research" / fname).write_text(body, encoding="utf-8")
-    print(f"site data written: {len(steps['steps'])} step pages, {len(RESEARCH)} research pages, "
-          f"{len(reg['drawings'])} drawings")
+    print(f"site data written: {len(RESEARCH)} research pages, {len(live)} live drawings "
+          f"({len(reg['drawings']) - len(live)} retired), tow vehicle page with {n_parts} parts")
 
 
 if __name__ == "__main__":

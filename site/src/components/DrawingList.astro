@@ -1,7 +1,10 @@
 ---
-// Drawing register with previews and downloads, from build/drawings/register.json.
+// Drawing register with previews and downloads, from build/drawings/register.json. Retired sheets stay in the
+// register with their note, but have no preview or download.
 import reg from '../data/generated/register.json';
 import { withBase } from '../lib/url';
+
+const live = reg.drawings.filter((d: any) => d.status !== 'RETIRED');
 ---
 
 <div class="data-table">
@@ -9,17 +12,24 @@ import { withBase } from '../lib/url';
     <thead><tr><th>Number</th><th>Title</th><th>Revision</th><th>Status</th><th>Date</th><th>Sheet</th><th>Downloads</th></tr></thead>
     <tbody>
       {reg.drawings.map((d: any) => (
-        <tr>
-          <td>{d.number}</td><td>{d.title}</td><td>{d.revision}</td><td>{d.status}</td><td>{d.date}</td>
-          <td>{d.size}, 1:{d.scale}</td>
-          <td><a href={withBase(`/downloads/drawings/${d.number}.pdf`)}>PDF</a>, <a href={withBase(`/downloads/drawings/${d.number}.svg`)}>SVG</a>, <a href={withBase(`/drawings/${d.number}.png`)}>PNG</a></td>
-        </tr>
+        d.status === 'RETIRED' ? (
+          <tr class="row-report">
+            <td>{d.number}</td><td>{d.title}</td><td>{d.revision}</td><td>RETIRED</td><td>{d.date}</td>
+            <td colspan="2">{d.retired}</td>
+          </tr>
+        ) : (
+          <tr>
+            <td>{d.number}</td><td>{d.title}</td><td>{d.revision}</td><td>{d.status}</td><td>{d.date}</td>
+            <td>{d.size}, 1:{d.scale}</td>
+            <td><a href={withBase(`/downloads/drawings/${d.number}.pdf`)}>PDF</a>, <a href={withBase(`/downloads/drawings/${d.number}.svg`)}>SVG</a>, <a href={withBase(`/drawings/${d.number}.png`)}>PNG</a></td>
+          </tr>
+        )
       ))}
     </tbody>
   </table>
 </div>
 
-{reg.drawings.map((d: any) => (
+{live.map((d: any) => (
   <section class="drawing-card">
     <h2 id={d.number.toLowerCase()}>{d.number} {d.title}</h2>
     <p>{d.subtitle}. Revision {d.revision}, status {d.status}, issued {d.date}. A3, main scale 1:{d.scale}.</p>

@@ -1,0 +1,262 @@
+# Sandwich panels sold in Australia for the body: floor, walls and raising roof.
+# Research report 12, 20 Nov 2026. research-12-body.md section 2 explains the method.
+# Units: mm, kg/m2, MPa. D is bending stiffness in kNm2 per metre width, S shear stiffness in kN per metre width.
+# R is the core's thermal resistance in m2K/W. Basis: maker (published), calculated (from maker data), estimate.
+# Stiffness: D = E t d^2 / 2 and S = G d^2 / c, with t skin thickness, d skin centre spacing, c core thickness.
+# Wrinkling: 0.5 (E Ec G)^(1/3) (HexWeb sandwich design guide).
+
+inserts:
+  - id: bighead-sm1-b38a
+    product: bigHead SM1-B38A, 316 stainless M6 or M8 stud on a 38 mm perforated head, bonded to a skin
+    rated_tension_kN: "0.25 to 3.75, depending on the bigHead and the adhesive"
+    rated_shear_kN: "0.1 to 5, depending on the bigHead and the adhesive"
+    source: "https://fileserver.mates.it/Prodotti/6_Inserti/TDS/BigHead/bigHead_SM1_B38A_TDS.pdf"
+  - id: deform-nut-m6
+    product: Deform-Nut TC/DM M6, blind insert potted in structural adhesive
+    rated_tension_kN: 2.2
+    rated_shear_kN: 1.7
+    note: "500 lb and 377 lb, depending on core density and panel thickness"
+    source: "https://www.chemical-concepts.com/product/deform-nut-tc-dm-honeycomb-anchoring-system-metric-thread-m6-10x/"
+  - id: panelock-aplb-1020
+    product: Panelock APLB-1020 bolt with APLN-1010 nut, through-fixing for a 30.8 to 37.7 mm grip
+    rated_tension_kN: 20.0
+    rated_shear_kN: 14.0
+    source: "https://lavenderpanels.com.au/wp-content/uploads/2020/10/Panelock.pdf"
+  - id: hd-pvc-strip
+    product: High-density PVC insert strip built into the core (Liner Supply grey 500 to 550 kg/m3, 15 to 50 mm thick, 25 to 128 mm wide, up to 6 m. DIY Caravans 70 x 25 mm)
+    rated_tension_kN: not published
+    rated_shear_kN: not published
+    note: Rating set by a pull test in a sample of the real panel (report 02 LR-09)
+    source: "https://www.diycaravans.com.au/shop/panel-insertion-hi-density-pvc-70-x-25-mm/"
+  - id: pultrusion-strip
+    product: Pultruded GRP insert, 50 x 25 or 38 x 25 mm hollow section built into the core
+    rated_tension_kN: not published
+    rated_shear_kN: not published
+    note: DIY Caravans uses it under roof air-conditioners. Rating by pull test
+    source: "https://www.diycaravans.com.au/shop/panel-insertion-pultrusion-50-x-25-mm/"
+  - id: aluminium-strip
+    product: Aluminium 40 x 25 mm insert built into the core
+    rated_tension_kN: not published
+    rated_shear_kN: not published
+    note: DIY Caravans warns of condensation at the cold bridge
+    source: "https://www.diycaravans.com.au/shop/panel-insertion-aluminium-40x25-mm/"
+panels:
+  - id: creative-composites-xps-29
+    maker: Creative Composites, Epping VIC
+    product: One-piece caravan panel, XPS core, standard thickness
+    use: [wall, roof]
+    thickness_mm: 29
+    skins: {material: "Gloss gelcoat fibreglass, mostly German made", thickness_mm: [1.5, 1.5], options_mm: [1.5, 2.0, 2.3]}
+    core: {material: XPS, density_kg_m3: 32, density_basis: estimate}
+    mass_kg_m2: {value: 5.8, basis: maker}
+    D_kNm2_per_m: {value: 3.69, basis: calculated, skin_E_MPa: 6500}
+    S_kN_per_m: {value: 233, basis: calculated, core_G_MPa: 8}
+    core_shear_strength_MPa: {value: 0.25, basis: "XPS data, not confirmed for this core"}
+    wrinkling_MPa: {value: 46, basis: calculated}
+    largest_sheet: "One piece up to 12.5 m long. Thickness 21 to 100 mm"
+    inserts: [hd-pvc-strip, pultrusion-strip]
+    R_m2K_W: {value: 0.81, basis: calculated, core_conductivity_W_mK: 0.032}
+    source: "https://www.creativecomposites.com.au/about-our-panels"
+  - id: creative-composites-xps-35
+    maker: Creative Composites, Epping VIC
+    product: One-piece caravan panel, XPS core, made to 35 mm
+    use: [wall]
+    thickness_mm: 35
+    skins: {material: Gloss gelcoat fibreglass, thickness_mm: [1.5, 1.5]}
+    core: {material: XPS, density_kg_m3: 33, density_basis: estimate}
+    mass_kg_m2: {value: 6.0, basis: "estimate, scaled from the maker's 5.8 kg/m2 at 29 mm plus 6 mm of XPS"}
+    D_kNm2_per_m: {value: 5.47, basis: calculated}
+    S_kN_per_m: {value: 281, basis: calculated}
+    core_shear_strength_MPa: {value: 0.25, basis: assumed}
+    wrinkling_MPa: {value: 46, basis: calculated}
+    largest_sheet: "One piece up to 12.5 m long"
+    inserts: [hd-pvc-strip, pultrusion-strip]
+    R_m2K_W: {value: 1.0, basis: calculated}
+    source: "https://www.creativecomposites.com.au/about-our-panels"
+  - id: creative-composites-pet-35
+    maker: Creative Composites, Epping VIC
+    product: One-piece caravan panel, recycled PET core, made to 35 mm
+    use: [wall, floor]
+    thickness_mm: 35
+    skins: {material: Gloss gelcoat fibreglass, thickness_mm: [1.5, 1.5]}
+    core: {material: "Recycled PET, Kerdyn Green 80 data used", density_kg_m3: 80, density_basis: assumed}
+    mass_kg_m2: {value: 7.1, basis: calculated}
+    D_kNm2_per_m: {value: 5.47, basis: calculated}
+    S_kN_per_m: {value: 631, basis: calculated, core_G_MPa: 18}
+    core_shear_strength_MPa: {value: 0.59, basis: "maker of the core (Gurit Kerdyn Green 80)"}
+    wrinkling_MPa: {value: 103, basis: calculated}
+    largest_sheet: "One piece up to 12.5 m long"
+    inserts: [hd-pvc-strip, pultrusion-strip]
+    R_m2K_W: {value: 1.0, basis: calculated, core_conductivity_W_mK: 0.032}
+    source: ["https://www.creativecomposites.com.au/about-our-panels", "https://pdf.nauticexpo.com/pdf/gurit/gurit-kerdyn-green/27794-106816.html"]
+  - id: styromax-xps-35
+    maker: StyroMAX, Darra QLD
+    product: Fibreglass composite insulated panel, Styrofoam XPS core
+    use: [wall, roof]
+    thickness_mm: 35
+    skins: {material: "European continuous high-gloss fibreglass sheet", thickness_mm: [1.5, 1.5], thickness_basis: assumed}
+    core: {material: XPS, density_kg_m3: 33, density_basis: estimate}
+    mass_kg_m2: {value: 5.6, basis: calculated}
+    D_kNm2_per_m: {value: 5.47, basis: calculated}
+    S_kN_per_m: {value: 281, basis: calculated}
+    core_shear_strength_MPa: {value: 0.25, basis: assumed}
+    wrinkling_MPa: {value: 46, basis: calculated}
+    largest_sheet: "Standard widths 2.0, 2.5, 3.0 and 3.2 m, CNC cut to size, up to 25 mm lost from the width in manufacture"
+    inserts: not published
+    R_m2K_W: {value: 1.03, basis: calculated, core_conductivity_W_mK: 0.031}
+    source: "https://styromax.com.au/about-styromax/"
+  - id: diy-caravans-panel-b-29
+    maker: DIY Caravans, Melbourne VIC
+    product: Composite Panel B, XPS core 29 mm
+    use: [wall, roof]
+    thickness_mm: 29
+    skins: {material: Brianza gelcoat GRP, thickness_mm: [1.6, 1.6], options_mm: "2.0 both sides, or 1.6 inside and 2.0 outside"}
+    core: {material: "Jackodur XPS, 300 kPa for walls, 400 kPa for roofs", density_kg_m3: 33, density_basis: estimate}
+    mass_kg_m2: {value: 6.5, basis: maker}
+    D_kNm2_per_m: {value: 3.90, basis: calculated}
+    S_kN_per_m: {value: 233, basis: calculated}
+    core_shear_strength_MPa: {value: 0.25, basis: assumed}
+    wrinkling_MPa: {value: 46, basis: calculated}
+    largest_sheet: Custom made per order, priced per m2
+    inserts: [hd-pvc-strip, pultrusion-strip, aluminium-strip]
+    R_m2K_W: {value: 0.76, basis: calculated, core_conductivity_W_mK: 0.034}
+    source: "https://www.diycaravans.com.au/shop/composite-panel-wall-b-xps-core-29mm-m2/"
+  - id: diy-caravans-panel-a-29
+    maker: DIY Caravans, made in SE Queensland
+    product: Composite Panel A, perforated PVC core 29 mm, for off-road caravans and expedition vehicles
+    use: [wall, roof]
+    thickness_mm: 29
+    skins: {material: Hand-laid marine-grade gelcoat GRP, thickness_mm: [2.0, 2.0], thickness_basis: "maker says about 2 mm"}
+    core: {material: "Perforated fire-retardant PVC", density_kg_m3: 60, density_basis: assumed}
+    mass_kg_m2: {value: "7 to 7.5", basis: maker}
+    D_kNm2_per_m: {value: 3.97, basis: "calculated with 1.5 mm skins at 7,000 MPa (assumed)"}
+    S_kN_per_m: {value: 582, basis: calculated}
+    core_shear_strength_MPa: {value: not published}
+    wrinkling_MPa: {value: 107, basis: calculated}
+    largest_sheet: "3.0 m wide and 10.0 m long. 39 and 59 mm versions for walls and roofs"
+    inserts: [pultrusion-strip, hd-pvc-strip]
+    R_m2K_W: {value: 0.93, basis: calculated, core_conductivity_W_mK: 0.028}
+    source: ["https://www.diycaravans.com.au/shop/composite-panel-a-pvc-core-29mm/", "https://www.diycaravans.com.au/shop/composite-panel-wall-roof-pvc-core-39mm-59mm/"]
+  - id: diy-caravans-floor-panel-d
+    maker: DIY Caravans, made to order in SE Queensland
+    product: Floor Panel D, H60 PVC core, vacuum infused, 20 or 32 mm
+    use: [floor]
+    thickness_mm: [20, 32]
+    skins: {material: "Structural laminate, black both sides", thickness_mm: [1.5, 1.5], thickness_basis: assumed}
+    core: {material: "Grooved and perforated H60 PVC", density_kg_m3: 60, density_basis: maker grade}
+    mass_kg_m2: {value: 7, basis: "maker, approximate"}
+    D_kNm2_per_m: {value: 11.16, basis: "calculated for 32 mm with assumed 1.5 mm skins at 16,000 MPa"}
+    S_kN_per_m: {value: 642, basis: calculated}
+    core_shear_strength_MPa: {value: 0.76, basis: "Divinycell H60 nominal"}
+    wrinkling_MPa: {value: 141, basis: calculated}
+    largest_sheet: "Up to 2,400 mm wide, any length. The maker rates 20 mm for supports up to 500 mm and 32 mm for wider supports"
+    inserts: not published
+    R_m2K_W: {value: 1.0, basis: calculated, core_conductivity_W_mK: 0.029}
+    source: "https://www.diycaravans.com.au/shop/floor-panel-d-pvc-core-20mm-32mm/"
+  - id: lavender-holypan-hp30
+    maker: Lavender Composites, Wacol QLD (also sold by DIY Caravans)
+    product: Holypan HP30, thermofused PP honeycomb with E-glass/PP skins
+    use: [floor, wall]
+    thickness_mm: 30
+    skins: {material: E-glass/PP, thickness_mm: [0.7, 0.7]}
+    core: {material: PP honeycomb, density_kg_m3: 80}
+    mass_kg_m2: {value: 4.8, basis: "maker, natural finish (5.0 painted one side)"}
+    D_kNm2_per_m: {value: 3.61, basis: "calculated with a skin modulus of 12,000 MPa (assumed)"}
+    S_kN_per_m: {value: 750, basis: calculated, core_G_MPa: 25}
+    core_shear_strength_MPa: {value: 0.47, basis: maker}
+    compressive_strength_MPa: {value: 1.83, basis: maker}
+    wrinkling_MPa: {value: 127, basis: calculated}
+    largest_sheet: Full sheets only, sizes on request
+    inserts: not published
+    R_m2K_W: {value: 0.29, basis: calculated}
+    note: "Deflects 13 mm under a 100 kg bike wheel on the 1,236 mm raiser span (calculated), so it is too soft for this floor"
+    source: ["https://lavenderpanels.com.au/wp-content/uploads/2020/10/Holypan-TDS.pdf", "https://www.diycaravans.com.au/shop/floor-panel-holypan-hp30w-panel-30mm/"]
+  - id: lavender-thermotec
+    maker: Lavender Composites, Wacol QLD
+    product: ThermoTec, polyester/E-glass gelcoat skins on XPS, EPS, PU or PET foam
+    use: [wall, roof]
+    thickness_mm: made to order
+    mass_kg_m2: not published
+    core: {material: "XPS40 option: 40 kg/m3, 400 kPa, 0.025 to 0.030 W/mK", density_kg_m3: 40}
+    largest_sheet: "XPS40 core boards 2,550 x 600 mm. Lamilux skins up to 3.2 m wide"
+    inserts: [panelock-aplb-1020]
+    source: ["https://lavenderpanels.com.au/products/panels/thermotec/", "https://lavenderpanels.com.au/wp-content/uploads/2020/10/XPS40-TDS.pdf"]
+  - id: panelmate-venturelite-30
+    maker: PanelMate, Bayswater WA (part of Ayres Composite Panels)
+    product: VentureLite aluminium honeycomb panel. Data from Ayres' AYRLITE 2022
+    use: [floor, partition]
+    thickness_mm: 30
+    skins: {material: 5052/5251 aluminium, thickness_mm: [0.5, 0.5]}
+    core: {material: "Aluminium honeycomb, 6 mm cell", density_kg_m3: 54, density_basis: estimate}
+    mass_kg_m2: {value: 4.4, basis: "maker (AYRLITE 2022, 0.5 mm skins. Subtract 1 kg/m2 for 0.3 mm skins)"}
+    D_kNm2_per_m: {value: 20.8, basis: "calculated for 35 mm, about 17 for 30 mm"}
+    long_beam_test: "2,776 N at 9 mm deflection (maker, MIL-STD-401)"
+    face_compression_MPa: {value: 2.6, basis: maker}
+    largest_sheet: "2,400 x 1,200 mm standard, other sizes on request"
+    inserts: not published
+    R_m2K_W: {value: 0.01, basis: calculated}
+    note: The aluminium core conducts heat, so it suits partitions and decks, not an insulated floor
+    source: ["https://panelmate.com.au/", "http://www.meury.com.au/wp-content/uploads/2016/04/752636413024.pdf"]
+
+# Panels this report recommends, to be built by one of the makers above (Creative Composites, StyroMAX or Lavender).
+recommended:
+  - id: rec-floor-h80-30
+    line: BD-01
+    product: Floor, 30 mm, woven roving skins on Divinycell H80
+    thickness_mm: 30
+    skins: {material: "Woven roving polyester, 48 % glass (Lamilux Woven Roving 48 % Plus type)", thickness_mm: [2.0, 2.0], mass_kg_m2_each: 3.22, E_MPa_used: 14000, strength_MPa_used: 200}
+    core: {material: Divinycell H80 PVC, density_kg_m3: 80, thickness_mm: 26, shear_strength_MPa: 1.15, shear_modulus_MPa: 27, compressive_strength_MPa: 1.4}
+    mass_kg_m2: {value: 8.92, basis: "calculated, including 0.4 kg/m2 of adhesive"}
+    D_kNm2_per_m: {value: 10.98, basis: calculated}
+    S_kN_per_m: {value: 814, basis: calculated}
+    wrinkling_MPa: {value: 162, basis: calculated}
+    checks: "1 g bike wheel 4.6 mm (span/269). 3 g skin 14 MPa, core 0.06 MPa. 20 kN anchor midway between raisers: skin 116 MPa, core 0.39 MPa"
+    inserts: [hd-pvc-strip, pultrusion-strip]
+    R_m2K_W: {value: 0.84, basis: calculated, core_conductivity_W_mK: 0.031}
+    source: ["https://diab-media.azureedge.net/clwjnze4/diab-divinycell-h-may-2026-rev26-imp.pdf", "https://www.lamilux.com/composites/products/gewebe.html", "https://www.azom.com/article.aspx?ArticleID=715"]
+  - id: alt-floor-pet100-30
+    line: BD-01
+    product: Floor, 30 mm, woven roving skins on recycled PET 100
+    thickness_mm: 30
+    skins: {material: Woven roving polyester, thickness_mm: [2.0, 2.0]}
+    core: {material: Kerdyn Green 100 PET, density_kg_m3: 100, thickness_mm: 26, shear_strength_MPa: 0.80, shear_modulus_MPa: 25, compressive_strength_MPa: 1.30}
+    mass_kg_m2: {value: 9.44, basis: calculated}
+    D_kNm2_per_m: {value: 10.98, basis: calculated}
+    S_kN_per_m: {value: 754, basis: calculated}
+    wrinkling_MPa: {value: 158, basis: calculated}
+    R_m2K_W: {value: 0.79, basis: calculated, core_conductivity_W_mK: 0.033}
+    source: "https://pdf.nauticexpo.com/pdf/gurit/gurit-kerdyn-green/27794-106816.html"
+  - id: rec-wall-xps-35
+    line: [BD-03, BD-04, BD-05]
+    product: Side and rear walls, 35 mm
+    thickness_mm: 35
+    skins: {material: Optiplan Polydet gelcoat GRP, thickness_mm: [1.5, 1.5], mass_kg_m2_each: 2.07, tensile_MPa: 77, tensile_modulus_MPa: 6500}
+    core: {material: XPS, density_kg_m3: 33, thickness_mm: 32, compressive_strength_kPa: 300, conductivity_W_mK: 0.031}
+    mass_kg_m2: {value: 6.0, basis: "estimate, scaled from Creative Composites' 29 mm panel (5.6 calculated from the layers)"}
+    D_kNm2_per_m: {value: 5.47, basis: calculated}
+    S_kN_per_m: {value: 281, basis: calculated}
+    wrinkling_MPa: {value: 46, basis: calculated}
+    checks: "0.5 kPa over the 1.8 m height: skin 4 MPa, 13 mm (span/136)"
+    inserts: [hd-pvc-strip, pultrusion-strip, bighead-sm1-b38a, panelock-aplb-1020]
+    R_m2K_W: {value: 1.03, basis: calculated}
+    source: ["https://www.nptab.se/content/files/pdf/optiplan/polydet_performance_datasheet.pdf", "https://ravagobuildingsolutions.com/uk/wp-content/uploads/sites/30/2025/12/ravatherm-xps-x-300-sl-tds-version-11-20251212.pdf"]
+  - id: rec-front-wall-35
+    line: BD-04
+    product: Front wall, 35 mm, 2.0 mm outer skin against stones from the tow car
+    skins: {material: Polydet, thickness_mm: [2.0, 1.5]}
+    mass_kg_m2: {value: 6.69, basis: calculated}
+    source: "https://www.nptab.se/content/files/pdf/optiplan/polydet_performance_datasheet.pdf"
+  - id: rec-lid-xps-40
+    line: BD-02
+    product: Raising roof lid, 40 mm
+    thickness_mm: 40
+    skins: {material: Polydet, thickness_mm: [2.0, 1.5]}
+    core: {material: XPS, density_kg_m3: 36.5, density_basis: estimate}
+    mass_kg_m2: {value: 6.98, basis: "estimate, scaled from the maker's 29 mm panel"}
+    D_kNm2_per_m: {value: 8.0, basis: calculated}
+    S_kN_per_m: {value: 321, basis: calculated}
+    wrinkling_MPa: {value: 45, basis: calculated}
+    checks: "1 g with 90 kg of solar: 6.9 mm over 2,365 mm. 1 kN kneeling load: skin 6 MPa, bearing 0.07 MPa"
+    inserts: [pultrusion-strip, bighead-sm1-b38a]
+    R_m2K_W: {value: 1.3, basis: calculated}
+    note: Roof hatches suit 25 to 42 mm roofs, so the lid stays at 40 mm

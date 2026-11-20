@@ -4,7 +4,7 @@ import b from '../data/generated/body.json';
 import t from '../data/generated/trailer.json';
 
 interface Props {
-  kind: 'summary' | 'panels' | 'mass' | 'checks' | 'twist' | 'mounts' | 'openings' | 'hardpoints';
+  kind: 'summary' | 'panels' | 'mass' | 'checks' | 'twist' | 'mounts' | 'openings';
 }
 const { kind } = Astro.props;
 const r: any = b;
@@ -23,10 +23,10 @@ const m = r.mounts;
 
 {kind === 'summary' && (
   <p>
-    The body weighs {n(bodyKg)} kg, {n(bodyGr)} kg with the growth allowance, against the 654 kg estimate of the block
-    layout. With the body tied to the chassis at every station, the chassis twists {n(tw.open.chassis_deg, 3)} degree under
-    the LC5a twist case in place of {n(tw.bare_deg, 3)} degree, so the body takes {n(100 * tw.open.share)} % of it with the
-    lid carrying no shear ({n(100 * tw.closed.share)} % if the latched lid carries shear). {fails.length === 0
+    The body weighs {n(bodyKg)} kg, {n(bodyGr)} kg with the growth allowance, on {n(m.bolts)} mounts. With the body bonded
+    together and tied to the chassis at every station, the chassis twists {n(tw.closed.chassis_deg, 3)} degree under the LC5a
+    twist case in place of {n(tw.bare_deg, 3)} degree, so the body takes {n(100 * tw.closed.share)} % of it. If the roof joint
+    carried no shear, the body would take only {n(100 * tw.open.share)} %. {fails.length === 0
       ? 'Every body strength, insert and spacing check passes.'
       : `${fails.length} body checks fail: ${fails.map((x: any) => x.id).join(', ')}.`}
   </p>
@@ -85,9 +85,9 @@ const m = r.mounts;
         <th class="num">Largest mount force kN</th><th class="num">Chassis peak MPa</th></tr></thead>
       <tbody>
         <tr><td>Bare chassis (the chassis checks)</td><td class="num">{n(tw.bare_deg, 3)}</td><td class="num">0</td><td class="num"></td><td class="num"></td><td class="num">{n(tw.bare_lc5a_mpa)}</td></tr>
-        <tr><td>With the body, lid carrying no shear</td><td class="num">{n(tw.open.chassis_deg, 3)}</td><td class="num">{n(100 * tw.open.share)}</td>
+        <tr><td>With the body, roof joint neglected</td><td class="num">{n(tw.open.chassis_deg, 3)}</td><td class="num">{n(100 * tw.open.share)}</td>
           <td class="num">{n(tw.open.max_body_torque_knm, 1)}</td><td class="num">{n(tw.open.mount_force_n / 1000, 1)}</td><td class="num">{n(tw.open.chassis_mpa)}</td></tr>
-        <tr><td>With the body, latched lid carrying shear (report 12)</td><td class="num">{n(tw.closed.chassis_deg, 3)}</td><td class="num">{n(100 * tw.closed.share)}</td>
+        <tr><td>With the body, bonded fixed roof (the design)</td><td class="num">{n(tw.closed.chassis_deg, 3)}</td><td class="num">{n(100 * tw.closed.share)}</td>
           <td class="num">{n(tw.closed.max_body_torque_knm, 1)}</td><td class="num">{n(tw.closed.mount_force_n / 1000, 1)}</td><td class="num">{n(tw.closed.chassis_mpa)}</td></tr>
       </tbody>
     </table>
@@ -115,19 +115,6 @@ const m = r.mounts;
         {r.openings.map((o: any) => (
           <tr><td>{o.id}</td><td>{o.wall}</td><td>{o.name}</td><td class="num">{n(o.u0)} to {n(o.u1)}</td><td class="num">{n(o.z0)} to {n(o.z1)}</td>
             <td class="num">{n(o.w)} x {n(o.h)}</td></tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-)}
-
-{kind === 'hardpoints' && (
-  <div class="data-table">
-    <table>
-      <thead><tr><th>Anchor</th><th class="num">X</th><th class="num">Y</th><th class="num">Span mm</th><th class="num">Factor on ultimate</th><th>Governing</th></tr></thead>
-      <tbody>
-        {[...r.hardpoints].sort((a: any, c: any) => a.factor - c.factor).map((h: any) => (
-          <tr><td>{h.id}</td><td class="num">{n(h.x)}</td><td class="num">{n(h.y)}</td><td class="num">{n(h.span)}</td><td class="num">{n(h.factor, 2)}</td><td>{h.governing}</td></tr>
         ))}
       </tbody>
     </table>

@@ -1,6 +1,6 @@
 ---
 title: Whole trailer
-description: The block layout of the whole trailer, with the garage at the back, the axle position, the towball load in every load case, the ballast to tow with no bikes, the checks, the body length comparison and the inputs for the chassis design.
+description: The whole trailer for the LandCruiser 79, with a queen bed across the front, a fixed roof and a 4,420 mm body, the axle position, the towball load in every load case, the checks and the inputs for the chassis design.
 tableOfContents: false
 ---
 
@@ -12,20 +12,23 @@ import { withBase } from '../../lib/url';
 export const n = (v) => Math.round(v).toLocaleString('en-AU');
 export const P = t.params;
 export const ch = t.chassis;
+export const tv = t.tow_vehicle;
 export const tc = (id) => t.cases.find((c) => c.id === id);
+export const chk = (id) => t.checks.find((c) => c.id === id);
 
-This is the block layout of the whole trailer, revision E. The <a href={withBase('/garage-bed/')}>garage and bed
-module</a> sits at the back of the body with a rear door, and one living area runs from the front wall to the
-garage. The <a href={withBase('/chassis/')}>chassis and drawbar</a> are designed. Every other system is a block with a
-mass, not a design. The point is to find where the axles go and what the car carries on its towball. The design notes are in `TRAILER.md` in the
-repository, and drawing CT-001 is the general arrangement.
+This is the whole trailer, revision H. The motorbikes now ride in an enclosed box on the
+<a href={withBase('/tow-vehicle/')}>LandCruiser 79</a> (see the <a href={withBase('/ute-garage/')}>Ute garage</a> page),
+so the trailer has no garage. It is layout 1 of the layout study: a queen bed across the front, a fixed roof and a
+{n(t.body_length)} mm body. The <a href={withBase('/chassis/')}>chassis</a> and the <a href={withBase('/body/')}>body</a>
+are designed to planning level. The other systems are blocks with a mass. The design notes are in `TRAILER.md` in
+the repository, and drawing CT-001 is the general arrangement.
 
 <Trailer kind="summary" />
 
 ## 3D model
 
-The tree on the left runs by system, from the drawbar to the living area and the garage stowage. The garage and
-bed module keeps its own groups inside it. Each block's name starts with its line in the mass schedule below.
+The tree on the left runs by system, from the drawbar and its box to the bed, the living area and the rear of the
+body. Each block's name starts with its line in the mass schedule below.
 
 <CadViewer src={withBase('/models/trailer.json')} height={560} />
 
@@ -35,126 +38,92 @@ behind.
 
 ## The layout and why
 
-The owner did not want the bikes in the middle of the trailer, because there the garage split the living space
-into two rooms. With the garage at the back, the bikes sit {n(t.solved.bikes_behind_axle_mm)} mm behind the
-axles, so taking them out raises the towball. To keep that inside the car's limits, every heavy item moves to the
-back.
+From front to back there are the drawbar with its box, the bed zone ({n(t.zones.bed)} mm), the living area
+({n(t.zones.living)} mm) and the rear zone ({n(t.zones.rear)} mm). The inside of the body is {n(t.zones.interior)} mm long.
 
-From front to back there are the drawbar with the coupling, stone guard and jockey wheel (no drawbar box now),
-then the living area, {n(t.zones.living)} mm long, then the {n(t.zones.garage)} mm garage. In the living area the
-heavy items stand against partition A: the wet bathroom, the washer, the diesel heater with the air supply
-on it, and the 24 V inverter and chargers on the partition. The fridge and the chest freezer stand along the road side
-in front of the bathroom. The light items are at the front: the desk with the air-conditioner under it, the seat,
-and the wardrobe over the kitchen slide-out, which stays on the kerb side under the awning. The entry door is in
-the kerb-side wall behind the kitchen. Floor space is kept clear at the entry door, the ladder foot, the bathroom
-door, the seat and a walkway between them.
+- **Drawbar box.** A sealed 2 mm aluminium box, {n(P.dbx_w)} mm wide and {n(P.dbx_h)} mm high, sits on the drawbar
+  members ahead of the spare wheel. It holds the Honda EU22i generator and the petrol and diesel jerry cans, so no
+  fuel rides inside the body. The jockey wheel moves forward of it, to X 1,000 mm.
+- **Bed zone.** A queen bed lies across the front, east to west, on a honeycomb base. The kitchen slides out under
+  it on the kerb side, under the awning. The air-conditioner sits under the middle of the bed, and a column of
+  shelves stands at the bed's road-side end.
+- **Living area.** The entry door is in the kerb-side wall. The desk with two seats is on the road side opposite.
+  The fridge and the freezer stand on the kerb side behind the door.
+- **Rear zone.** The wet bathroom is in the road-side rear corner. The washer, the diesel heater and the Victron
+  board stand in front of it, and a tall cupboard fills the kerb-side rear corner.
+- **Under the floor.** Two water tanks sit between the rails over the axles, so the towball barely changes as the
+  water is used. The batteries sit in a sealed box near the back, and the heater's 15 L diesel tank sits in its own
+  bay under the bed.
 
-The generator and the jerry cans moved from the drawbar box into the garage, along the kerb-side wall. There is no
-LPG (an owner option, report 13): the cooking is induction and the heater runs on diesel from a 15 L tank under
-the floor, so the kerb-side rear corner of the garage is stowage. The two batteries (10.24 kWh) sit at the back,
-under the garage floor between the rails, 400 mm in front of the rear wall.
-The water tanks stay over the axles, so the towball barely changes as the water is used.
+The fixed roof carries the solar panels. With no raising roof, the inside is {n(P.interior_h)} mm high. The floor
+height comes from the running gear in report 06 and the ute's tyre from report 16. The tyre is {n(ch.tyre_d)} mm
+across, the hubs sit at {n(ch.hub_z)} mm, and the XT suspension rises 60 mm at full bump. With 50 mm of clearance
+above the tyre, the floor underside is at {n(ch.floor_underside_z)} mm and the floor surface at {n(ch.floor_z)} mm. The
+travel height is {n(ch.travel_height)} mm.
 
-The floor height comes from the running gear in report 06 and the trailer's own tyre from report 09. The tyre is
-{n(ch.tyre_d)} mm across (Yokohama's published figure), the hubs sit at {n(ch.hub_z)} mm, and the XT suspension rises 60 mm at full bump. With
-50 mm of clearance above the tyre, the floor underside is at {n(ch.floor_underside_z)} mm and the garage floor surface
-at {n(ch.floor_z)} mm. The 3,048 mm ramp then sits at {(Math.asin(ch.floor_z / 3048) * 180 / Math.PI).toFixed(1)} degrees,
-and the travel height with the roof down is {n(ch.travel_height)} mm.
+Layout 2, with the queen bed along the trailer at the back so each sleeper gets out on their own side, is the fallback. It is 830 mm longer and 137 kg heavier (estimate), and
+`TRAILER.md` lists it under the open questions.
 
 ## Appliances and equipment
 
 Research report 13 chose the products. Three owner choices are defaults until the owner answers, and each can be
-reversed in the data: a washer with no dryer, no LPG, and two batteries. TRAILER.md lists what reversing each one
-costs.
+reversed in the data: a washer with no dryer, no LPG, and two batteries.
 
 - Bathroom: Thetford C223-CS cassette toilet and a DauerShower 2.0 recirculating shower, imported.
 - Washer: Camec 3.5 kg top loader. Fridge: Dometic NRX 130C, 126 L. Freezer: Dometic CFX3 55IM, 53 L.
-- Heater and hot water: Truma Combi D 6 on diesel. Air-conditioner: Truma Saphir Comfort RC under the desk.
+- Heater and hot water: Truma Combi D 6 on diesel. Air-conditioner: Truma Saphir Comfort RC under the bed.
 - Kitchen: Dometic CVI1525 induction hob and CVS1350G sink on Accuride 9301 slides.
-- Power at 24 V: a Victron MultiPlus-II 24/5000, two SmartSolar MPPT 150/45, an Orion-Tr charger from the car and two Lithium NG 25.6 V 200 Ah batteries.
-- Solar: four Sunman eArc 430 W glass-free panels bonded to the lid, 31 kg in place of 90 kg of glass panels.
-- Generator: Honda EU22i. Loading winch: WARN VRX 25-S.
-
-The daily load is about 10.4 kWh on a hot day and 5.1 kWh on a cold one. The batteries carry about 4 hot days or
-1.5 overcast winter days before the generator has to run.
+- Power at 24 V: a Victron MultiPlus-II 24/5000, two SmartSolar MPPT 150/45, an Orion-Tr charger from the ute and two Lithium NG 25.6 V 200 Ah batteries.
+- Solar: four Sunman eArc 430 W glass-free panels bonded to the fixed roof.
+- Generator: Honda EU22i, in the drawbar box.
 
 ## Wheels, tyres and spares
 
-The trailer no longer shares the car's wheel. Porsche confirmed that none of its 18-inch wheels is rated for the
-trailer's load, so each vehicle has its own wheels, tyres and spare.
+The trailer and the ute share one wheel and tyre, from report 16, so each spare fits both.
 
-- Trailer wheel: ROH Trak 2 16x7 +7 steel, 6 x 139.7, rated 1,250 kg. Its 13.5 kg is an estimate, because ROH does not publish it.
-- Trailer tyre: Yokohama Geolandar A/T G015 LT245/70R16 118/115R, load range E, rated 1,320 kg, 19.3 kg.
-- Hubs: Cruisemaster's standard LC6 pattern, 1/2 inch UNF x 41 mm studs and a 93 mm spigot, on the 12 inch ABS-enabled drums.
-- Offset and track: C/F {n(ch.cf)} mm with ET +{n(ch.wheel_offset)} puts each wheel {n(ch.cf - ch.wheel_offset)} mm outside its rail, inside Cruisemaster's 200 mm limit, for a {n(ch.track)} mm track on the {n(ch.rail_outer_width)} mm rails.
-- Trailer spare: a sixth wheel and tyre on the body's front wall above the drawbar, centred across the trailer, so the rear door and the ramp stay clear. It sits {n(ch.jackknife_spare_mm)} mm from the car's side at a 90 degree jack-knife.
-- The car keeps its 20-inch RS Spyder 9.5J x 20 ET47 wheels with Michelin Pilot Sport 4 SUV 275/45 R20 110Y tyres, legal in NSW. Its own 30 kg spare lies on the boot floor, which costs about 45 kg of the gear the car can carry. An 18-inch dirt set is documented in report 10 for a Victorian registration only.
+- Wheel: {t.wheel.name}. Its {n(t.wheel.rating_kg)} kg rating is an estimate.
+- Tyre: {t.wheel.tyre}.
+- Hubs: {t.wheel.hub}.
+- Offset and track: C/F {n(ch.cf)} mm with ET {n(ch.wheel_offset)} puts each wheel {n(ch.cf - ch.wheel_offset)} mm outside its rail, inside Cruisemaster's 200 mm limit, for a {n(ch.track)} mm track on the {n(ch.rail_outer_width)} mm rails.
+- Trailer spare: a fifth wheel and tyre on the body's front wall above the drawbar, centred across the trailer. The ute carries its own spare under its tray.
 
-## Water in the car
+## Water and the towball
 
-Fully loaded, the trailer's tanks carry 200 L of the owner's 400 L. The other 200 L rides in a tank in the car, on
-the floor where the rear seats were, and tops up the trailer's tanks at camp. That puts the fully loaded trailer at
-{n(tc('TC2').nominal.mass_kg)} kg, {n(3500 - tc('TC2').nominal.mass_kg)} kg under the ATM on base weights. The car's
-tank is about 215 kg with its water, tank, pump and hose (estimates). It is part of the {n(t.car.gear_budget_kg)} kg
-of gear the car can carry, which leaves about 125 kg for everything else. It has to be bolted to the rear-seat
-anchors or strapped to the boot tie-downs, sized to report 03's load cases, about 3.4 kN forward (estimate).
-
-The research is in <a href={withBase('/research/09-trailer-wheels-and-tyres/')}>report 09</a> for the trailer and
-<a href={withBase('/research/10-car-wheels-and-tyres/')}>report 10</a> for the car.
-
-The axle group centre is {n(P.axle_x)} mm behind the ball. The build solved it for {n(t.target_kg)} kg on the ball
-fully loaded, the target from report 07, and moved the tanks and the suspension with it. The garage stays at the
-back.
-
-## Ballast to tow with no bikes
-
-With the bikes out, the towball rises above the car's 280 kg rating in the cases with water and gear aboard. The
-build therefore works out the least ballast that brings those cases to 280 kg on base weights, placed at the back
-of the garage, and carries it in the three cases without bikes (TC1, TC4 and TC5). The registration tare does not
-include it. With the growth allowance far more is needed, which check BAL-01 reports.
-
-<Trailer kind="ballast" />
+All 400 L of water ride in the trailer's tanks. There is no tank in the ute and no ballast. The axle group centre is
+{n(P.axle_x)} mm behind the ball. The build solved it for {n(t.target_kg)} kg on the ball fully loaded: {t.target_why}.
 
 ## Load cases
 
-Mass in kg and the centre of gravity in mm, in the project datum. The loading kit stays aboard in every case. The
-towball load comes from moments about the axle group centre (MASS-04). The last three columns add the growth
-allowance from report 02 (MASS-06): 20 % on an estimate, 7 % on a calculated mass and nothing on a maker's figure.
+Mass in kg and the centre of gravity in mm, in the project datum. The towball load comes from moments about the axle
+group centre (MASS-04). The plate margin is against the {n(t.caps.plated)} kg plated ATM. The last three columns add
+the growth allowance from report 02 (MASS-06): 20 % on an estimate, 7 % on a calculated mass and nothing on a maker's
+figure.
 
 <Trailer kind="cases" />
 
-The car's rear axle, by report 07's method with two adults, the rear seats out, a 30 kg towbar and the fully
-loaded towball, carries {n(t.car.rear_kg)} kg before any gear, against its 1,600 kg limit. The car can then carry
-{n(t.car.gear_budget_kg)} kg of gear before its {t.car.binds} binds.
+## The ute and the combination
+
+The ute is the {tv.name}. Its limits come from the ute model on the Ute garage page. The trailer is checked against
+them here:
+
+- Towball: at most {n(tv.limits.towball_plan_kg)} kg (the decision log's cap, inside the towbar's {n(tv.limits.towball_rating_kg)} kg). The worst case with growth carries {n(chk('MAS-03').measured)} kg (MAS-03).
+- GCM: the larger of two sums against Toyota's {n(tv.limits.gcm_kg)} kg. The plan's sum is the ute at its {n(tv.limits.weighed_max_kg)} kg limit plus the {n(t.caps.plated)} kg plate less the 250 kg the ball carries. The model's sum is the ute's {tv.gcm_case} case with growth ({n(tv.ute_kg_growth)} kg) plus the heaviest trailer case with growth. GCM-01 measures {n(chk('GCM-01').measured)} kg.
+- Coupling height: the ute's ball is {n(ch.coupling_z)} mm high laden (UTE-01), and the drawbar drop is solved from it.
+- Jack-knife: the ute's bike box overhangs the ball by {n(ch.sweep.body_overhang_mm)} mm. At 90 degrees it sweeps a radius of {n(ch.sweep.radius_mm)} mm from the ball. JK-01 keeps the trailer's front parts at least 100 mm outside that sweep, and JK-02 keeps the parts inside it at least 50 mm below the box's underside at Z {n(ch.sweep.underside_z)}.
 
 ## Checks
 
-The trailer is to be registered in NSW. The NSW examiner caps GTM at the lowest of the tyre, coupling, chain and
-brake ratings ({n(t.caps.gtm)} kg here) and ATM at the lower of the coupling and chain ratings ({n(t.caps.atm)} kg),
-and MAS-07 and MAS-08 check against those caps. The towball limits are design targets from report 07, not legal
-limits. 280 kg is the car's rating, used as a ceiling, and 6 % of the trailer's mass is the floor set for
-stability. A failed check shows in red. The checks that fail do so only with the growth allowance, which is the
-design's real state, and the limits stay as they are. The levers are set out in `TRAILER.md`.
+The trailer is to be registered in NSW. The examiner caps GTM at the lowest of the tyre, coupling, chain and brake
+ratings ({n(t.caps.gtm)} kg here) and ATM at the lower of the coupling and chain ratings ({n(t.caps.atm)} kg). The design
+plates it lower, at {n(t.caps.plated)} kg, so the combination stays inside the ute's GCM. A failed check shows in red.
+The limits stay as they are, and a part that fails is resized.
 
 <Trailer kind="checks" />
 
-## Body length
-
-The build lays out all three body lengths from the same blocks and solves the axle and the ballast for each. The
-garage is the same in each, so only the living area changes.
-
-<Trailer kind="lengths" />
-
-The {n(t.recommended.body_length)} mm body is the shortest that holds the living area. The living area needs
-{n(t.solved.living_min_mm)} mm, so the 5,000 mm body is {n(t.solved.living_min_mm - t.lengths[0].living)} mm short. How much
-each item in the living area costs in length:
-
-<Trailer kind="options" />
-
 ## Chassis inputs
 
-The chassis is designed on the <a href={withBase('/chassis/')}>Chassis</a> page, with its members, frame analysis, checks and
-drawings. These are the main figures the layout gives it and takes from it.
+The chassis is designed on the <a href={withBase('/chassis/')}>Chassis</a> page, with its members, frame analysis, checks
+and drawings. These are the main figures the layout gives it and takes from it.
 
 <Trailer kind="chassis" />
 
@@ -174,14 +143,13 @@ travel.
 
 ### The least certain masses
 
-The estimate lines with the largest growth allowance, and how far each moves the fully loaded towball if it
-comes out 20 % heavier.
+The estimate lines with the largest growth allowance, and how far each moves the fully loaded towball if it comes
+out 20 % heavier.
 
 <Trailer kind="uncertain" />
 
 ### Every line
 
-Each line has its source, its maturity and the load cases it is aboard in (MASS-01 and MASS-02). The garage and
-bed module's lines come from its own bill of materials.
+Each line has its source, its maturity and the load cases it is aboard in (MASS-01 and MASS-02).
 
 <Trailer kind="schedule" />

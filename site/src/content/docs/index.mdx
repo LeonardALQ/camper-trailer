@@ -1,64 +1,72 @@
 ---
 title: Camper trailer design
-description: The design of a one-off off-road camper trailer that carries two motorcycles under a queen bed.
+description: The design of a one-off off-road camper trailer and its tow vehicle, a LandCruiser 79 that carries two motorcycles in an enclosed box.
 ---
 
-import Summary from '../../components/Summary.astro';
+import Trailer from '../../components/Trailer.astro';
+import Ute from '../../components/Ute.astro';
 import { withBase } from '../../lib/url';
 
-This site holds the design of a one-off off-road camper trailer. The owner is designing it and will build it
-himself in Australia. It will be built to VSB1, the Australian guide for light trailers, then inspected for
-registration and reviewed by an engineer.
+This site holds the design of a one-off off-road camper trailer and the vehicle that tows it. The owner is designing
+both and will build them himself in Australia. The trailer will be built to VSB1, the Australian guide for light
+trailers, then inspected for registration and reviewed by an engineer.
 
-The trailer carries two motorcycles in a garage at its back, with a queen bed above them and a rear door. It is towed by a Porsche Cayenne
-GTS. Most of its life is highway towing, plus grass, desert tracks, fire trails, light mud and shallow river
-crossings.
+The tow vehicle is a Toyota LandCruiser 79 single cab V8. It carries the two motorcycles and the tools in an enclosed,
+lockable box on its tray. The trailer then needs no garage, so it is smaller and lighter: a 4,420 mm body with a queen
+bed across the front, a fixed roof, and the generator and fuel in a box on the drawbar. Most of its life is highway
+towing, plus grass, desert tracks, fire trails, light mud and shallow river crossings.
 
-Everything on this site comes from one set of data files. The 3D model, the clearance checks, the mass schedule,
-the drawings and the parts lists are generated from them, so they always agree. When a number changes in the
-data, the whole site is rebuilt.
+Everything on this site comes from one set of data files. The 3D models, the checks, the mass schedules, the
+drawings and the parts lists are generated from them, so they always agree. When a number changes in the data, the
+whole site is rebuilt.
+
+## The LandCruiser 79 and its bike box
+
+<a href={withBase('/ute-garage/')}><img src={withBase('/drawings/CT-701-preview.png')} alt="Drawing CT-701: the LandCruiser 79 with the bike box, kerb-side elevations, plan and rear view" loading="lazy" /></a>
+
+<Ute kind="summary" />
+
+The <a href={withBase('/ute-garage/')}>Ute garage</a> page has the box, and the <a href={withBase('/tow-vehicle/')}>Tow
+vehicle</a> page has the vehicle plan: the engine, driveline, GVM kit, brakes, wheels and towing, the budget, the
+order of work and every part.
+
+## The trailer
+
+<a href={withBase('/trailer/')}><img src={withBase('/drawings/CT-001-preview.png')} alt="Drawing CT-001: the general arrangement of the whole trailer, plan and kerb-side elevation" loading="lazy" /></a>
+
+<Trailer kind="summary" />
+
+The <a href={withBase('/trailer/')}>Whole trailer</a>, <a href={withBase('/chassis/')}>Chassis</a> and
+<a href={withBase('/body/')}>Body</a> pages have the details.
 
 ## The constraints
 
-- The body is 2,400 mm wide at most. That is a hard limit. With 35 mm walls it leaves 2,330 mm inside.
-- The body is 6,000 mm long at most. The target is about 5,000 mm to save weight, so every part of the layout should be as short as it can be.
-- With the roof collapsed, the inside is 1,800 mm high measured from the garage floor. That is the target, and 2,000 mm is the hard limit. A raising roof adds headroom at camp.
-- The Cayenne can tow 3,500 kg with trailer brakes, and its towball rating is 280 kg. The design aims for about 220 kg fully loaded, where the car's rear axle limit starts to bind (research report 07).
-- The garage floor is flat, with no wheel arches inside the garage.
+- The trailer body is 2,400 mm wide at most. That is a hard limit. With 35 mm walls it leaves 2,330 mm inside.
+- The trailer is plated at 3,100 kg ATM, so the combination stays inside the ute's 6,900 kg GCM with the ute at its 3,850 kg limit.
+- The towball carries at most 250 kg, the decision log's cap for the ute's rear axle. The design aims for 220 kg fully loaded on base weights, so the growth allowance stays inside the cap.
+- The ute's ball sits 440 mm above the ground laden, plus or minus 20 mm, so the coupling stays inside VSB1's 460 mm.
+- The bike box is 1,850 mm wide outside at most and weighs less than 440 kg empty.
+
+## What is done
+
+- Research reports 01 to 17, under Research in the menu. Reports 07 and 10 studied the Porsche Cayenne and are superseded by reports 14 to 16 on the LandCruiser 79.
+- The garage and bed module, its bill of materials and drawings CT-401, CT-402 and CT-501. It is now retired: its restraint, chocks, straps, winch and ramp moved to the ute's bike box.
+- The chassis and drawbar to planning level (research report 11, `CHASSIS.md`): every member, joint and fitting, a 3D frame analysis of every load case, fatigue at each welded detail, and drawings CT-101 to CT-103.
+- The appliances, equipment and energy system (research report 13), built into the trailer.
+- The LandCruiser 79 and its enclosed bike box (research report 17, `UTE-GARAGE.md`): the ute's axle loads, towball, GCM and stability, the box's 3D model and checks, and drawings CT-701 to CT-704.
+- The vehicle plan (`VEHICLE.md`): engine, driveline, GVM kit, brakes, wheels, towing, the legal path, the budget, the order of work and every part, on the <a href={withBase('/tow-vehicle/')}>Tow vehicle</a> page.
+- The trailer redesigned for the 79 (`TRAILER.md` revision H): layout 1 with the queen bed across the front, a fixed roof and a 4,420 mm body, the generator and fuel in a drawbar box, checked at the 3,100 kg plate against the ute's limits and the bike box's jack-knife sweep. The chassis (revision D) and the body (`BODY.md` revision B, research report 12) are re-solved for it, and CT-001, CT-101 to CT-103 and CT-201 to CT-301 are drawn for it. Every fail check passes.
+
+## What is next
+
+- Buy the truck and weigh it, then build and weigh the bike box body before choosing the GVM kit (`VEHICLE.md`, steps 1 to 7).
+- Confirm the climb over the bed. Layout 2, with the bed along the trailer at the back, is the fallback (`TRAILER.md` open question 2).
+- Have the engineer check the chassis, the body and the bike box, starting with the lists at the end of `CHASSIS.md`, `BODY.md` and `UTE-GARAGE.md`.
 
 ## How products are chosen
 
 Each product is chosen in this order. First comes reliability and a record of hard use, for example in race
 trailers, toy haulers, boats or overland caravans. Next comes parts and service, in Australia if possible. Then
 comes serviceability, so a part can be repaired or swapped, ideally in the field. Only then does weight decide,
-and the lightest product that passes the first three wins. Price is ignored.
-
-## What is done
-
-- Five research reports: the tech stack for this site, design and drawing practice, bike restraint, the bed and its materials, and the bike geometry. They are under Research in the menu.
-- The design baseline for the garage and bed module, with its bill of materials.
-- This first version of the site: a parametric 3D model of the module, the design checks measured on that model, a mass schedule, three draft drawings and eleven draft build steps.
-- Revision B of the design, from the first model run: the deck laps over partition B, an owner-built ladder reaches the living-area floor, and the note on converting to the trailer datum is corrected. Drawings CT-401 and CT-501 are at revision B.
-- Three more research reports: the trailer's running gear, the tow vehicle, and the coupling and hitch.
-- The <a href={withBase('/trailer/')}>whole-trailer block layout</a>: every zone and system as a block with a mass, the axle position solved for the towball target, seven load cases, the whole-trailer checks, a comparison of 5,000, 5,500 and 6,000 mm bodies, the chassis inputs and the general arrangement CT-001. It fixes the garage floor at 858 mm, which is revision C of the garage and bed module, together with the Tuareg's panniers.
-- The rear garage (garage and bed revision D, whole trailer revision C): the garage moves to the back with a rear door so the living space is one room. The bikes stand along the trailer, the gas, generator and fuel ride in the garage, every heavy item sits towards the back, and the build works out the ballast needed to tow with no bikes aboard. Every drawing is redrawn for it.
-- Two research reports on wheels and tyres, one for the trailer and one for the car, and their result in the design (whole trailer revision D). The trailer runs its own 16-inch steel wheels with LT all-terrain tyres and carries a full-size spare on its front wall. The car keeps its 20-inch wheels and carries its own spare. The garage floor rose 12 mm to 869 mm.
-- Fully loaded, half the 400 L of water rides in a tank in the car and tops up the trailer at camp, so the trailer is under its 3,500 kg ATM on base weights.
-- Research report 11 on the chassis and drawbar, and the <a href={withBase('/chassis/')}>chassis design</a> from it, to planning level: every member, joint and fitting, a 3D frame analysis of every load case, fatigue at each welded detail, calculated masses, the 3D model, and draft drawings CT-101 to CT-103 for the engineer to check. The datum is now right-handed, so the 3D model shows the real trailer.
-- Two fixes (whole trailer revision F). The tyre is now Yokohama's published 752 mm diameter everywhere, so the garage floor is at 872 mm and again 50 mm above the tyre at full bump. The body's corner legs are gone from its mass, because the chassis already carries the four corner steadies, so the tare fell 17 kg to 2,634 kg.
-- Research report 13 on the appliances, equipment and power, and its result in the design (whole trailer revision G). Real products replace 14 estimated lines and the tare falls 271 kg. There is no LPG, the solar panels are bonded to the roof, and every case is now under the 3,500 kg ATM with the growth allowance.
-- The tow vehicle is now a LandCruiser 79 single cab V8 on a 4,200 kg GVM kit, and the <a href={withBase('/ute-garage/')}>ute garage</a> carries both bikes in an enclosed, lockable box on it (research report 17). The ute's mass budget, axle loads, towball, GCM and stability are checked, and the box has its 3D model, checks and draft drawings CT-701 to CT-704. The trailer's own garage stays in the model until the trailer is redesigned smaller.
-
-<Summary />
-
-The <a href={withBase('/garage-bed/')}>Garage and bed</a> page has the details.
-
-## What is next
-
-- Build a full-size mock-up of the garage and measure both bikes in it. Several bike dimensions on this site are estimates, and the chock's nose and cradle rise are not published. Build step 1 lists what to measure.
-- Try the rear-door loading and the strapping positions in the mock-up, and decide whether the generator needs its own hatch.
-- Decide whether anyone will sleep in the trailer with fuelled bikes inside, because that changes the garage ventilation.
-- Bring the trailer's mass under its 3,500 kg ATM with the growth allowance. On base weights it is now under: fully loaded, the trailer's tanks carry 200 L and the other 200 L rides in a tank in the car (the Whole trailer page has the levers).
-- Have the engineer check the chassis proposal, starting with the list at the end of `CHASSIS.md`.
-- Design the body, the rear door and its header and the raising roof.
-- Ask the engineer to review the drawings, the restraint design and the bed structure.
+and the lightest product that passes the first three wins. Price is ignored for the trailer. The vehicle plan has a
+budget.

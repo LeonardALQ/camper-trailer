@@ -1,0 +1,308 @@
+# Parts for the LandCruiser 79 single cab (VDJ79, 01/2017 to 08/2022), research report 16, 20 Nov 2026.
+# price_aud is each, including GST unless price_basis says otherwise. Estimates are marked.
+# status: required or optional. total_aud = qty x price_aud.
+
+parts:
+  - id: GVM-01
+    system: gvm
+    name: "Lovells 4,200 kg Platinum GVM upgrade kit, single cab 2017 to 2022"
+    part_number: TOYKIT080-GVM
+    supplier: "Lovells, through an authorised Lovells fitter (for example Fulcrum Suspensions)"
+    qty: 1
+    price_aud: 5620
+    price_basis: "Fulcrum Suspensions listing, 2024, seen in a search result"
+    link: "https://fulcrumsuspensions.com.au/search/product/gvm-btc-upgrade-kits/lovells-gvm-btc-upgrade-kits-for-2017-toyota-land-cruiser-79-series/brand-LOVELLS"
+    spec_link: "https://www.powercurve.com.au/lovells-gvm-upgrade-sunshine-coast/toyota-landcruiser-lc79-series-gvm/"
+    status: required
+    notes: "GVM 4,200 kg, axles 1,650 and 2,550 kg, GCM 7,400 kg where a state accepts it. Needs tyres of LI 117 and speed M. Front coils, rear leaf packs, remote-reservoir shocks, urethane bushes, U-bolts, greasable shackles and pins, mudflaps, category 6 indicators, tyre placard"
+    total_aud: 5620
+
+  - id: GVM-02
+    system: gvm
+    name: "Fitting by a Lovells authorised fitter"
+    supplier: "Lovells authorised fitter"
+    qty: 1
+    price_aud: 1500
+    price_basis: estimate
+    link: "https://www.powercurve.com.au/lovells-gvm-upgrade-sunshine-coast/toyota-landcruiser-lc79-series-gvm/"
+    status: required
+    notes: "Lovells allows only its authorised fitters to fit the kit for state compliance"
+    total_aud: 1500
+
+  - id: GVM-03
+    system: gvm
+    name: "NSW VSCCS certification of the GVM (and GCM and fuel tank if fitted), post-registration"
+    supplier: "VSCCS licensed certifier, Lovells-endorsed signatory"
+    qty: 1
+    price_aud: 1500
+    price_basis: "estimate, within 70 Series Store's AUD 1,000 to 2,500"
+    link: "https://70seriesstore.com/blogs/information/what-is-the-79-series-towing-gcm"
+    status: required
+    total_aud: 1500
+
+  - id: GVM-04
+    system: gvm
+    name: "Wheel alignment and LSPV reset after the kit"
+    supplier: "Alignment or brake shop"
+    qty: 1
+    price_aud: 250
+    price_basis: estimate
+    link: "https://jdmfsm.info/Auto/Japan/Toyota/Land%20Cruiser/70%20Series%20%281984-2007%29/2017%207x%20series%20Body%20Builder%27s%20Manual.pdf"
+    status: required
+    notes: "Toyota BBGJ1007 section 2-5, gauge set SST 09709-29018"
+    total_aud: 250
+
+  - id: GVM-05
+    system: gvm
+    name: "Lovells 4,495 kg Elite GVM upgrade, fitted, in place of GVM-01 and GVM-02"
+    supplier: Lovells
+    qty: 1
+    price_aud: 19975
+    price_basis: "Unsealed 4x4, fitted, excluding compliance, 2017 to 2022 single cab"
+    link: "https://unsealed4x4.com.au/lovells-elite-series-79-series-gvm-upgrade/"
+    status: optional
+    notes: "Rear axle 2,850 kg, rear housing widened to the front track, Cr-Mo full-floating axles, exchange diff, brake upgrades with a new booster. Net extra over GVM-01 and GVM-02: AUD 12,855"
+    total_aud: 19975
+
+  - id: BRK-01
+    system: brakes
+    name: "Bendix Ultimate 4WD rear brake upgrade kit, two slotted rotors and pads, VDJ79 2007 to 2024"
+    part_number: U4WD-BUK34
+    supplier: "Marks 4WD"
+    qty: 1
+    price_aud: 555.01
+    price_basis: "listing AUD 504.55 ex GST"
+    link: "https://www.marks4wd.com/rear-brake-upgrade-landcruiser-70-series.html"
+    status: required
+    total_aud: 555.01
+
+  - id: BRK-02
+    system: brakes
+    name: "Delios slotted front brake rotors, LandCruiser 70 and 100"
+    part_number: DLS0790
+    supplier: "Marks 4WD"
+    qty: 1
+    price_aud: 280.01
+    price_basis: "listing AUD 254.55 ex GST"
+    link: "https://www.marks4wd.com/rear-brake-upgrade-landcruiser-70-series.html"
+    status: required
+    total_aud: 280.01
+
+  - id: BRK-03
+    system: brakes
+    name: "Bendix Ultimate 4WD front brake pads, VDJ79"
+    supplier: "Bendix stockist"
+    qty: 1
+    price_aud: 150
+    price_basis: "estimate, price not found"
+    link: "https://www.marks4wd.com/brand/bendix/"
+    status: required
+    total_aud: 150
+
+  - id: BRK-04
+    system: brakes
+    name: "Braided brake lines, complete set, LandCruiser 70"
+    part_number: BQTL70S
+    supplier: "Marks 4WD"
+    qty: 1
+    price_aud: 515
+    price_basis: "listing range AUD 435 to 595, midpoint"
+    link: "https://www.marks4wd.com/rear-brake-upgrade-landcruiser-70-series.html"
+    status: required
+    total_aud: 515
+
+  - id: BRK-05
+    system: brakes
+    name: "DOT 4 brake fluid flush"
+    qty: 1
+    price_aud: 40
+    price_basis: estimate
+    status: required
+    total_aud: 40
+
+  - id: BRK-06
+    system: brakes
+    name: "Bendix Ultimate 4WD 6-piston front big brake kit, 340 mm (not recommended)"
+    part_number: U4WD-BBUK216F
+    supplier: "Marks 4WD"
+    qty: 1
+    price_aud: 4086.36
+    price_basis: "sale listing, AUD 5,450 list"
+    link: "https://www.marks4wd.com/big-brake-upgrade-landcruiser-70-series.html/"
+    status: optional
+    notes: "Needs 17-inch wheels and an engineering inspection in NSW. Listed for VDJ79 2007 to 08/2014 without ABS. Rejected"
+    total_aud: 4086.36
+
+  - id: WHL-01
+    system: wheels
+    name: "ROH Trak 2 steel wheel 16 x 7, ET 0, 5 x 150, rated 1,400 kg (four plus two spares)"
+    supplier: "ROH stockists"
+    qty: 6
+    price_aud: 230
+    price_basis: "estimate, ROH publishes no price"
+    mass_kg: 14.5
+    mass_basis: estimate
+    link: "https://roh.com.au/wheels/trak-2"
+    status: required
+    notes: "Same size and offset as Toyota's alloy. The trailer's four come from the trailer budget"
+    total_aud: 1380
+
+  - id: TYR-01
+    system: tyres
+    name: "LT265/75R16 123/120R load range E all-terrain, Yokohama Geolandar A/T G015 or Toyo Open Country A/T III"
+    supplier: "Tyre retailers"
+    qty: 6
+    price_aud: 420
+    price_basis: "estimate. A BFGoodrich KO3 265/75R16 119/116S lists at about AUD 385"
+    mass_kg: 22.6
+    mass_basis: "G015 figure, report 09"
+    link: "https://www.yokohama.com.au/our-range/tyres/geolandar-a-t-g015"
+    price_link: "https://www.ebay.com.au/itm/176555722266"
+    status: required
+    notes: "1,550 kg at 80 psi, 804 to 805 mm"
+    total_aud: 2520
+
+  - id: TYR-02
+    system: tyres
+    name: "Tyre fitting and balancing"
+    qty: 6
+    price_aud: 35
+    price_basis: estimate
+    status: required
+    total_aud: 210
+
+  - id: TOW-01
+    system: towing
+    name: "Hayman Reese Class 4 towbar, LandCruiser 79, 3,500 kg and 350 kg, 50 mm receiver"
+    part_number: 03186RW
+    supplier: ARB
+    qty: 1
+    price_aud: 1160
+    price_basis: "listing. ARB fitting AUD 160 extra, self-fitted here"
+    link: "https://www.arb.com.au/product/t03186rw-hayman-reese-class-4-tow-bar-3500-350kg-rating-landcruiser-79-series"
+    status: required
+    total_aud: 1160
+
+  - id: TOW-02
+    system: towing
+    name: "Hayman Reese X-Bar towbar with rated recovery points, LandCruiser 79"
+    part_number: 03237RW
+    supplier: ARB
+    qty: 1
+    price_aud: 1799
+    price_basis: "listing. ARB fitting AUD 400 extra"
+    link: "https://www.arb.com.au/product/t03237rw-x-bar-3500-350kg-tow-and-ball-rating-toyota-landcruiser-79-series"
+    status: optional
+    notes: "In place of TOW-01"
+    total_aud: 1799
+
+  - id: TOW-03
+    system: towing
+    name: "REDARC Tow-Pro Elite V3 electric brake controller"
+    part_number: EBRH-ACCV3
+    supplier: REDARC
+    qty: 1
+    price_aud: 469.04
+    price_basis: listing
+    link: "https://www.redarcelectronics.com/au/tow-pro-elite"
+    status: required
+    total_aud: 469.04
+
+  - id: TOW-04
+    system: towing
+    name: "REDARC Universal Tow-Pro Wiring Kit"
+    part_number: TPWKIT-013
+    supplier: REDARC
+    qty: 1
+    price_aud: 255.99
+    price_basis: "listing, from"
+    link: "https://www.redarcelectronics.com/au/tow-pro-elite"
+    status: required
+    total_aud: 255.99
+
+  - id: TOW-05
+    system: towing
+    name: "REDARC Tow-Pro Universal Mount"
+    part_number: TPSI-001
+    supplier: REDARC
+    qty: 1
+    price_aud: 19
+    price_basis: listing
+    link: "https://www.redarcelectronics.com/au/tow-pro-elite"
+    status: required
+    total_aud: 19
+
+  - id: TOW-06
+    system: towing
+    name: "12-pin flat trailer socket to AS 4177.5 with wiring"
+    qty: 1
+    price_aud: 80
+    price_basis: estimate
+    status: required
+    notes: "Wired to VSB1's pin table, brake output on pin 5 (report 08)"
+    total_aud: 80
+
+  - id: TOW-07
+    system: towing
+    name: "Charging feed: Anderson SB50 at the towbar, about 8 m of 6 B&S twin cable, 50 A fuse at the battery, rubber-lined clips"
+    qty: 1
+    price_aud: 250
+    price_basis: estimate
+    status: required
+    notes: "Feeds one Victron Orion-Tr Smart 12/24-15 (about 35 A) in the trailer (report 13)"
+    total_aud: 250
+
+  - id: FUEL-01
+    system: fuel
+    name: "ARB Frontier 180 L long-range polymer fuel tank, LandCruiser 79"
+    part_number: TAD106
+    supplier: ARB
+    qty: 1
+    price_aud: 1557
+    price_basis: "listing. ARB fitting AUD 200 extra, self-fitted here"
+    mass_kg: 15
+    mass_basis: "estimate, ARB says less than half a comparable steel tank"
+    link: "https://www.arb.com.au/product/tad106-arb-frontier-long-range-fuel-tank-180l-toyota-landcruiser-79-series"
+    status: optional
+    notes: "Needs NSW certification (VSI 06 item 50), in the same inspection as the GVM"
+    total_aud: 1557
+
+  - id: FUEL-02
+    system: fuel
+    name: "The Long Ranger 180 L heavy-duty replacement fuel tank, 2 mm aluminised steel, 79 single and dual cab"
+    part_number: TR58WDCHD
+    supplier: ARB
+    qty: 1
+    price_aud: 2272
+    price_basis: "listing. ARB fitting AUD 480 extra"
+    mass_kg: 35
+    mass_basis: estimate
+    link: "https://www.arb.com.au/product/tr58wdchd-the-long-ranger-180l-heavy-duty-fuel-tank-landcruiser-76-79-series"
+    status: optional
+    total_aud: 2272
+
+  - id: FUEL-03
+    system: fuel
+    name: "The Long Ranger 110 L auxiliary diesel tank, LandCruiser 79"
+    part_number: TA87
+    supplier: ARB
+    qty: 1
+    price_aud: 2853
+    price_basis: listing
+    link: "https://www.arb.com.au/product/ta87-the-long-ranger-110l-auxiliary-diesel-fuel-tank-toyota-landcruiser-79-series"
+    status: optional
+    total_aud: 2853
+
+trailer_side:   # no cost to this budget, recorded for the trailer design
+  - id: TRL-01
+    name: "Cruisemaster XT Freestyle Air hubs in LC5 M14 (5 x 150, M14 x 1.5 x 40 mm studs) on 12-inch ABS-enabled A/T electric drums, 110 mm spigot"
+    supplier: Cruisemaster
+    link: "https://cruisemaster.com.au/content/cis/StudPatterns.Infosheet.Rev.1.April23.pdf"
+    notes: "Standard pattern on 12-inch drums. Axle spacing 900 mm for the 804 to 805 mm tyre"
+
+totals:
+  required_aud: 16754
+  required_items: [GVM-01, GVM-02, GVM-03, GVM-04, BRK-01, BRK-02, BRK-03, BRK-04, BRK-05, WHL-01, TYR-01, TYR-02, TOW-01, TOW-03, TOW-04, TOW-05, TOW-06, TOW-07]
+  optional_fuel_tank_aud: 1557
+  optional_elite_net_extra_aud: 12855
+  budget_left_for_reports_14_and_15_aud: 13246
