@@ -243,6 +243,7 @@ class Layout:
                 stations.append(dict(id=f"between {a['id']} and {b['id']} ({k})", x=a["x"] + w + span * k / (n + 1) - w / 2,
                                      section="body", generated=True))
         stations.append(fixed[-1])
+        self.stations = stations
         out = []
         rin, rail_out = V["rail_in"], V["rail_outer_w"] / 2
         z0, z1 = V["rail_underside_z"], V["rail_top_z"]
@@ -579,7 +580,36 @@ class Trailer:
         self.weighed = inp.weighed()
         self.weighed_rows: list[dict] = []
         self.target_case = next(c for c in self.cases if c.towball_target)
+        self.analyse_chassis = True
+        self._chassis = None
 
+    def chassis_model(self, lay):
+        from .chassis import Chassis
+        return Chassis(lay.V, lay.stations)
+
+    def chassis_results(self, lay) -> dict:
+        """The frame analysis of the chassis for this layout (cad/chassis_fea.py), run once."""
+        if self._chassis is None or self._chassis[0] is not lay:
+            from .chassis_fea import Analysis
+            ch = self.chassis_model(lay)
+            self._chassis = (lay, ch, Analysis(lay, self, ch).run())
+        return self._chassis[2]
+
+    def tyre_arc(self, lay) -> dict:
+        """FIT-05: each tyre swung about its arm pivot through its travel (report 11 section 5), against every chassis
+        member at its true outer size. The gap to the floor underside and the rest of the body is reported too."""
+        from .chassis import tyre_clearance
+        ch = self.chassis_model(lay)
+        w = lay.V["tyre_w"]
+        t = tyre_clearance(ch, [(m.id + " " + m.name, m.box()) for m in ch.members], w)
+        others = [(f"{b.name} ({b.iid})", b.box) for b in lay.blocks
+                  if b.solid and not b.hollow and b.system not in ("running_gear", "chassis", "drawbar")]
+        o = tyre_clearance(ch, others, w)
+        who = f"tyre {t['tyre']} at {t['travel_mm']:+.0f} mm travel to {t['member']}"
+        return dict(gap_mm=t["gap_mm"], governing=who, body_gap_mm=o["gap_mm"], body_governing=o["member"],
+                    detail=(f"{t['gap_mm']:.1f} mm, {who}. The {lay.V['tyre_d']:.0f} mm calculated tyre set the floor height; with "
+                            f"Yokohama's published {ch.V['tyre_d_published']:.0f} mm the tyre comes {o['gap_mm']:.1f} mm from the "
+                            f"{o['member']} at {o['travel_mm']:+.0f} mm travel"))
     def layout(self, **over) -> Layout:
         lay = Layout(self.td, self.mod, self.prj, {**self.base, **over})
         self.weighed_rows = lay.apply_weighed(self.weighed)
@@ -629,6 +659,7 @@ class Trailer:
         base = self.zone_minimum()
         for o in [dict(id="BASE", title="The layout as modelled", skip=[], overrides={}, mass_change_kg=0)] + (self.td.get("fit_options") or []):
             t = Trailer(self.prj, self.mod, {**self.base, **o.get("overrides", {})})
+            t.analyse_chassis = False
             m = t.zone_minimum("living", tuple(o.get("skip", [])))
             rows.append(dict(id=o["id"], title=o["title"], living_min_mm=m, saved_mm=base - m,
                              mass_change_kg=o.get("mass_change_kg", 0), mass_note=o.get("mass_note"),
@@ -713,6 +744,7 @@ class Trailer:
         lay = self.layout(**solved["overrides"], ballast_kg=bal["kg"])
         cases = [lay.evaluate_case(c) for c in self.cases]
         self.ballast_result = bal
+        self.last_layout = lay
         checks = self.checks(lay, cases)
         return dict(layout=lay, solved=solved, cases=cases, checks=checks, ballast=bal)
 
@@ -803,10 +835,15 @@ class Trailer:
                            detail=("all fit" if f["ok"] else "; ".join(f["problems"][:4])) + f", {f['items']} items, {f['keep_clear']} keep-clear spaces",
                            sub=lay.zones[c.zone]["name"])
             elif c.type == "tyre":
-                t = lay.tyre_check()
-                row.update(limit=f">= {c.min_gap_mm:g} mm", measured=round(t["gap_mm"], 1), unit="mm",
+                t = self.tyre_arc(lay)
+                row.update(limit=f">= {c.min_gap_mm:g} mm to every chassis member", measured=round(t["gap_mm"], 1), unit="mm",
                            margin=round(t["gap_mm"] - c.min_gap_mm, 1), ok=t["gap_mm"] >= c.min_gap_mm - 1e-6, governing=t["governing"],
-                           detail=f"smallest gap {t['gap_mm']:.1f} mm, {t['governing']}")
+                           detail=t["detail"], tyre=t)
+            elif c.type.startswith("chassis_"):
+                if not self.analyse_chassis:
+                    continue
+                from .chassis_checks import chassis_row
+                row.update(chassis_row(c, self.chassis_results(lay)))
             elif c.type == "width":
                 w = lay.width()
                 row.update(limit=f"<= {c.max:g} mm", measured=round(w["width_mm"], 1), unit="mm", margin=round(c.max - w["width_mm"], 1),
@@ -860,6 +897,7 @@ class Trailer:
         rows = []
         for L in self.td["lengths_compared"]:
             t = Trailer(self.prj, self.mod, {**self.base, "body_length": L})
+            t.analyse_chassis = False
             ev = t.evaluate()
             lay = ev["layout"]
             s = ev["solved"]

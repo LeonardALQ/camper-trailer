@@ -313,12 +313,258 @@ trailer_checks:
     inputs: []
     why: Revision C. They sit in the garage against the kerb-side wall in front of the gas locker, inside the strip and clear of each other. The module checks CLR-04 and CLR-10 keep them clear of the bikes and straps.
   - id: FIT-05
-    title: Tyres at full bump clear the chassis and body
+    title: Tyres swung through their full travel keep 50 mm from every chassis member
     type: tyre
-    min_gap_mm: 0
+    min_gap_mm: 50
     severity: fail
     inputs: []
-    why: No crossmember, outrigger, tank or panel may enter the tyre's space at full bump. The floor underside clearance (50 mm) is set by the floor height.
+    why: Report 11 section 5. Each tyre swings on its arm about the hinge pivot (23 mm ahead of the hinge crossmember's rear face, 99 mm below the rail underside) through 60 mm up and down. The tyre is Yokohama's published 752 mm diameter. 50 mm is the plan's allowance between the tyre and the floor.
+  # ---------------------------------------------------------------- chassis and drawbar (CHASSIS.md, report 11)
+  - id: CHS-01
+    title: Chassis stress, LC1 static at ATM, within fy / 3
+    type: chassis_stress
+    load_case: LC1
+    severity: fail
+    inputs: [TW-01, TW-02, TW-03]
+    why: Report 11 LC1. The ARTSA factor of safety of 3 on yield (report 02 section 2.4). Every member, every trailer case scaled so the heaviest sits at the 3,500 kg ATM.
+  - id: CHS-02
+    title: Chassis stress, LC2 vertical bump 3 g, below yield
+    type: chassis_stress
+    load_case: LC2
+    severity: fail
+    inputs: [TW-01, TW-02, TW-03]
+    why: Report 11 LC2. A 3 g bump on the structure must not yield any member.
+  - id: CHS-03
+    title: Chassis stress, LC3 braking 0.8 g plus 1 g, within fy / 1.5
+    type: chassis_stress
+    load_case: LC3
+    severity: fail
+    inputs: [TW-01, TW-02, TW-03]
+    why: Report 02 and report 11 LC3, with the trailer's own brakes taking the braking force at the tyres.
+  - id: CHS-04
+    title: Chassis stress, LC4 cornering 0.5 g either way plus 1 g, within fy / 1.5
+    type: chassis_stress
+    load_case: LC4
+    severity: fail
+    inputs: [TW-01, TW-02, TW-03]
+    why: Report 02 and report 11 LC4. Governs the hinge crossmembers and the outriggers.
+  - id: CHS-05A
+    title: Chassis stress, LC5a twist with one wheel in a hole, within fy / 1.5
+    type: chassis_stress
+    load_case: LC5a
+    severity: fail
+    inputs: [TW-01, TW-02, TW-03]
+    why: Report 11 LC5a, 13.4 kNm between the axles on top of the static load.
+  - id: CHS-05B
+    title: Chassis stress, LC5b twist on the corner steadies at tare, within fy / 1.5
+    type: chassis_stress
+    load_case: LC5b
+    severity: fail
+    inputs: []
+    why: Report 11 LC5b. One ARK DDS650 steady wound to its 875 kg rating with the other three touching.
+  - id: CHS-06
+    title: Chassis and drawbar stress, LC6 VSB1 9.1 drawbar forces, below yield
+    type: chassis_stress
+    load_case: LC6
+    severity: fail
+    inputs: []
+    why: VSB1 9.1 and 14. 51.5 kN along, 17.2 kN across and 17.2 kN up and down at the coupling, each way, with the body held at its suspension mounts. No residual deformation, so the check is elastic.
+  - id: CHS-06B
+    title: Drawbar stress, LC6b VSB1 9.2.2 chain point forces, below yield
+    type: chassis_stress
+    load_case: LC6b
+    severity: fail
+    inputs: []
+    why: VSB1 9.2.2. 34.3 kN along and 17.2 kN up and down at each chain lug, separately.
+  - id: CHS-08A
+    title: Chassis stress, LC8a recovery at 51.5 kN within 30 degrees sideways and 15 degrees up or down, below yield
+    type: chassis_stress
+    load_case: LC8a
+    severity: fail
+    inputs: []
+    why: Report 11 LC8a, at each front and rear recovery point, with the body held at its suspension mounts.
+  - id: CHS-08B
+    title: Chassis stress, LC8b one side jacked at its pad with gravity times 2, below yield
+    type: chassis_stress
+    load_case: LC8b
+    severity: fail
+    inputs: []
+    why: Report 11 LC8b. The jack lifts one side at the pad on the XT centre crossmember.
+  - id: LOC-01
+    title: Chain lugs hold the VSB1 9.2.2 forces (net tension, bearing, tear-out, weld)
+    type: chassis_local
+    item: chain_lug
+    severity: fail
+    inputs: []
+    why: VSB1 9.2.2. Plate limits are fy (bearing 1.5 fy, tear-out shear 0.6 fy) so the lug does not deform. The weld limit is the SP fillet capacity, 0.8 x 0.6 x 490 MPa.
+  - id: LOC-02
+    title: Front recovery lugs hold 51.5 kN without yield and 78.5 kN without fracture
+    type: chassis_local
+    item: front_recovery
+    severity: fail
+    inputs: []
+    why: Report 11 LC8a. A 30 degree sideways pull bends the lug out of its plane.
+  - id: LOC-03
+    title: Rear recovery tongues hold 51.5 kN without yield and 78.5 kN without fracture
+    type: chassis_local
+    item: rear_recovery
+    severity: fail
+    inputs: []
+    why: Report 11 LC8a. A 30 degree sideways pull bends the tongue out of its plane.
+  - id: LOC-04
+    title: Jacking pads carry the jack without yield or crushing the wall
+    type: chassis_local
+    item: jacking_pad
+    severity: fail
+    inputs: []
+    why: Report 11 LC8b, 38.6 kN on one pad, or the larger force the frame analysis gives.
+  - id: LOC-05
+    title: Spare carrier posts carry the spare wheel at 4 g down and 1.6 g forward
+    type: chassis_local
+    item: spare_posts
+    severity: fail
+    inputs: []
+    why: Report 11 LC2 (4 g on fixings) and LC7 (0.8 g forward times 2 off road, fy / 1.5).
+  - id: DEF-01
+    title: Rail deflection between the drawbar root and the front hub within span / 500, LC1
+    type: chassis_deflection
+    item: span
+    severity: fail
+    inputs: []
+    why: Report 11 LC1 proposal, so the body panels and their joints see little imposed movement (estimate, for the engineer to accept).
+  - id: DEF-02
+    title: Rear overhang tip deflection within overhang / 300, LC1
+    type: chassis_deflection
+    item: tip
+    severity: fail
+    inputs: []
+    why: Report 11 LC1 proposal. The overhang is measured from the axle group centre to the body rear.
+  - id: DEF-03
+    title: Outrigger tip deflection within 2 mm of the rail, LC1
+    type: chassis_deflection
+    item: outrigger
+    severity: fail
+    inputs: []
+    why: Report 11 LC1 proposal. Includes the rail's twist at the outrigger's station.
+  - id: TWS-01
+    title: Twist between the XT front hinge and rear shock crossmembers within 0.5 degree, LC5a
+    type: chassis_twist
+    max: 0.5
+    severity: fail
+    inputs: []
+    why: Report 11 LC5a proposal (estimate, for the engineer to accept).
+  - id: FAT-01
+    title: "Fatigue, Full-height crossmember to rail, toe in the rail just above its bottom corner, toe burr-ground (IIW 6.2, 1.3 x FAT 80)"
+    type: chassis_fatigue
+    item: FAT-01
+    severity: report
+    inputs: []
+    why: "Report 11 LC10 and section 3.4. IIW 512, ground, FAT 104. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+  - id: FAT-01b
+    title: "Fatigue, Raiser-height crossmember to the raiser, toe in the raiser near its top corner, as welded"
+    type: chassis_fatigue
+    item: FAT-01b
+    severity: report
+    inputs: []
+    why: "Report 11 LC10 and section 3.4. IIW 512, FAT 80. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+  - id: FAT-02
+    title: "Fatigue, Crossmember to rail, toe in the crossmember"
+    type: chassis_fatigue
+    item: FAT-02
+    severity: report
+    inputs: []
+    why: "Report 11 LC10 and section 3.4. IIW 413, FAT 63. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+  - id: FAT-03
+    title: "Fatigue, Crossmember to rail, weld root"
+    type: chassis_fatigue
+    item: FAT-03
+    severity: report
+    inputs: []
+    why: "Report 11 LC10 and section 3.4. IIW 414, FAT 36. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+  - id: FAT-04
+    title: "Fatigue, Outrigger to raiser, toe in the outrigger"
+    type: chassis_fatigue
+    item: FAT-04
+    severity: report
+    inputs: []
+    why: "Report 11 LC10 and section 3.4. IIW 413, FAT 63. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+  - id: FAT-05
+    title: "Fatigue, Outrigger to raiser, weld root (6 mm fillets)"
+    type: chassis_fatigue
+    item: FAT-05
+    severity: report
+    inputs: []
+    why: "Report 11 LC10 and section 3.4. IIW 414, FAT 36. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+  - id: FAT-06
+    title: "Fatigue, Rail to raiser, continuous manual fillets along the seam"
+    type: chassis_fatigue
+    item: FAT-06
+    severity: report
+    inputs: []
+    why: "Report 11 LC10 and section 3.4. IIW 323, FAT 90. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+  - id: FAT-07
+    title: "Fatigue, Drawbar root at the body front, profiled gusset with a ground radius"
+    type: chassis_fatigue
+    item: FAT-07
+    severity: report
+    inputs: []
+    why: "Report 11 LC10 and section 3.4. IIW 526, FAT 90. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+  - id: FAT-08
+    title: "Fatigue, End of the drawbar overlap under the rail, sniped taper, toe ground"
+    type: chassis_fatigue
+    item: FAT-08
+    severity: report
+    inputs: []
+    why: "Report 11 LC10 and section 3.4. IIW 712, FAT 56. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+  - id: FAT-09
+    title: "Fatigue, Cross brace to drawbar member, toe in the brace"
+    type: chassis_fatigue
+    item: FAT-09
+    severity: report
+    inputs: []
+    why: "Report 11 LC10 and section 3.4. IIW 413, FAT 63. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+  - id: FAT-10
+    title: "Fatigue, Chain lug on the drawbar member (pad, L 120 mm)"
+    type: chassis_fatigue
+    item: FAT-10
+    severity: report
+    inputs: []
+    why: "Report 11 LC10 and section 3.4. IIW 513, FAT 71. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+  - id: FAT-11
+    title: "Fatigue, Jacking pad on the XT centre crossmember's underside beside the rail, edges welded along the crossmember (L 100 mm)"
+    type: chassis_fatigue
+    item: FAT-11
+    severity: report
+    inputs: []
+    why: "Report 11 LC10 and section 3.4. IIW 513, FAT 71. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+  - id: FAT-12
+    title: "Fatigue, Airbag top bracket on the rail's inner face, welded along the rail's top edge"
+    type: chassis_fatigue
+    item: FAT-12
+    severity: report
+    inputs: []
+    why: "Report 11 LC10 and section 3.4. IIW Table 3.3-1 no. 3, FAT 100. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+  - id: FAT-13
+    title: "Fatigue, Suspension hinge to the hinge crossmembers, load-carrying fillets"
+    type: chassis_fatigue
+    item: FAT-13
+    severity: report
+    inputs: []
+    why: "Report 11 LC10 and section 3.4. IIW Table 3.3-1 no. 6, FAT 90. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+  - id: FAT-14
+    title: "Fatigue, Rear recovery tongue, longitudinal welds to the rail web (L 260 mm)"
+    type: chassis_fatigue
+    item: FAT-14
+    severity: report
+    inputs: []
+    why: "Report 11 LC10 and section 3.4. IIW 513, FAT 63. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+  - id: FAT-15
+    title: "Fatigue, Front recovery lug on the drawbar member (L 200 mm)"
+    type: chassis_fatigue
+    item: FAT-15
+    severity: report
+    inputs: []
+    why: "Report 11 LC10 and section 3.4. IIW 513, FAT 63. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
   - id: DIM-01
     title: Overall width with the awning within VSB1's 2,500 mm
     type: width

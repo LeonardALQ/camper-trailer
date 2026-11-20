@@ -153,7 +153,10 @@ class TrailerCheck(Strict):
     id: str
     title: str
     type: Literal["mass", "car_axle", "fit", "tyre", "width", "overhang", "coupling", "clearance_ground",
-                  "jackknife", "jackknife_aframe", "wheel", "towball_scale", "ballast"]
+                  "jackknife", "jackknife_aframe", "wheel", "towball_scale", "ballast",
+                  "chassis_stress", "chassis_local", "chassis_deflection", "chassis_twist", "chassis_fatigue"]
+    load_case: str | None = None          # chassis_stress: report 11's load case (data/chassis/chassis.yaml)
+    item: str | None = None               # chassis_local, chassis_deflection and chassis_fatigue: what is checked
     quantity: Literal["mass", "axle", "axle_vsb1", "towball", "towball_pct", "tyre_load"] | None = None
     limit: Literal["kit_gtm", "nsw_gtm_cap", "nsw_atm_cap", "target", "tyre_rating", "wheel_rating"] | None = None
     tolerance: float | None = None

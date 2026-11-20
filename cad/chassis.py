@@ -1,0 +1,610 @@
+"""Chassis and drawbar geometry (CHASSIS.md), built from data/chassis/chassis.yaml and the trailer layout.
+
+The members sit on their centroid axes in the project datum. Each member has a section from report 11's table
+(data/chassis/sections.yaml), a mass from its length and kg/m, and a galvanised area inside and out. The frame
+model for cad/chassis_fea.py treats the main rail and its raiser as one composite section, because their seams
+are welded continuously, and joins members that meet off-axis with rigid links.
+"""
+from __future__ import annotations
+
+import math
+from dataclasses import dataclass, field
+from typing import Any
+
+import yaml
+
+from .frame import RIGID, Frame, Section
+from .partsdb import DATA, Params
+
+CHASSIS_YAML = DATA / "chassis" / "chassis.yaml"
+SECTIONS_YAML = DATA / "chassis" / "sections.yaml"
+SIDES = {-1: "K", 1: "R"}            # kerb side is negative Y, road side positive Y (DIM-01)
+SIDE_WORDS = {-1: "kerb side", 1: "road side"}
+
+
+# ------------------------------------------------------------------ sections
+@dataclass(frozen=True)
+class Props:
+    """Section properties in mm. Z_strong and Z_weak are the moduli used for stress (the AS 4100 effective modulus
+    where it is smaller than the elastic one), C is the torsion modulus, Aw_* the shear areas of the walls."""
+    id: str
+    name: str
+    d: float
+    b: float
+    t: float
+    ro: float
+    kg_m: float
+    A: float
+    I_strong: float
+    I_weak: float
+    J: float
+    Z_strong: float
+    Z_weak: float
+    C: float
+    fy: float
+    Aw_depth: float
+    Aw_width: float
+    area_m2_per_m: float
+
+    def frame_section(self) -> Section:
+        return Section(self.name, self.A, self.I_strong, self.I_weak, self.J)
+
+
+def _perimeter(d, b, r):
+    return 2 * (d + b) - (8 - 2 * math.pi) * r
+
+
+def load_sections() -> dict[str, Props]:
+    raw = yaml.safe_load(SECTIONS_YAML.read_text())
+    out = {}
+    for s in raw["sections"]:
+        if s["shape"] not in ("RHS", "SHS"):
+            continue
+        d, b, t, ro = s["d"], s["b"], s["t"], s["ro"]
+        zx, zy = s["Zx_e3mm3"] * 1e3, s["Zy_e3mm3"] * 1e3
+        zey = s.get("Ze_y_e3mm3_C450")
+        area = (_perimeter(d, b, ro) + _perimeter(d - 2 * t, b - 2 * t, max(ro - t, 0))) / 1000
+        out[s["id"]] = Props(
+            id=s["id"], name=s["designation"].replace("x", " x "), d=d, b=b, t=t, ro=ro, kg_m=s["mass_kg_per_m"],
+            A=s["A_mm2"], I_strong=s["Ix_e6mm4"] * 1e6, I_weak=s["Iy_e6mm4"] * 1e6, J=s["J_e6mm4"] * 1e6,
+            Z_strong=zx, Z_weak=min(zy, zey * 1e3) if zey else zy, C=s["C_e3mm3"] * 1e3, fy=s["fy_mpa"],
+            Aw_depth=2 * (d - 2 * t) * t, Aw_width=2 * (b - 2 * t) * t, area_m2_per_m=area)
+    return out
+
+
+@dataclass(frozen=True)
+class Composite:
+    """The main rail and its raiser welded together continuously, as one section about its own centroid."""
+    rail: Props
+    raiser: Props
+    z_bottom: float
+    z_centroid: float
+    z_top: float
+    A: float
+    I_strong: float
+    I_weak: float
+    J: float
+    Z_bottom: float
+    Z_top: float
+    Z_weak: float
+    C: float
+    Aw: float
+
+    @classmethod
+    def of(cls, rail: Props, raiser: Props, z_bottom: float) -> "Composite":
+        z1, z2 = z_bottom + rail.d / 2, z_bottom + rail.d + raiser.d / 2
+        A = rail.A + raiser.A
+        zc = (rail.A * z1 + raiser.A * z2) / A
+        I = rail.I_strong + rail.A * (z1 - zc) ** 2 + raiser.I_strong + raiser.A * (z2 - zc) ** 2
+        top = z_bottom + rail.d + raiser.d
+        return cls(rail, raiser, z_bottom, zc, top, A, I, rail.I_weak + raiser.I_weak, rail.J + raiser.J,
+                   I / (zc - z_bottom), I / (top - zc), rail.Z_weak + raiser.Z_weak, rail.C + raiser.C,
+                   rail.Aw_depth + raiser.Aw_depth)
+
+    def frame_section(self) -> Section:
+        return Section("Composite rail", self.A, self.I_strong, self.I_weak, self.J)
+
+    @property
+    def Z_strong(self):
+        return min(self.Z_bottom, self.Z_top)
+
+
+# ------------------------------------------------------------------ members and fittings
+@dataclass
+class Member:
+    id: str
+    role: str
+    name: str
+    sec: Props
+    p0: tuple[float, float, float]
+    p1: tuple[float, float, float]
+    depth_dir: tuple[float, float, float] = (0.0, 0.0, 1.0)
+    side: int = 0
+    station: str | None = None
+    note: str = ""
+    in_frame: bool = True
+
+    @property
+    def length(self) -> float:
+        return math.dist(self.p0, self.p1)
+
+    @property
+    def mass_kg(self) -> float:
+        return self.sec.kg_m * self.length / 1000
+
+    @property
+    def cog(self):
+        return tuple((a + b) / 2 for a, b in zip(self.p0, self.p1))
+
+    @property
+    def area_m2(self) -> float:
+        return self.sec.area_m2_per_m * self.length / 1000
+
+    def box(self):
+        """Axis-aligned bounding box of the tube with its true outer sizes."""
+        ax = [b - a for a, b in zip(self.p0, self.p1)]
+        L = math.hypot(*ax)
+        ex = [v / L for v in ax]
+        dz = list(self.depth_dir)
+        k = sum(a * b for a, b in zip(dz, ex))
+        ez = [a - k * b for a, b in zip(dz, ex)]
+        n = math.hypot(*ez)
+        ez = [v / n for v in ez]
+        ey = [ez[1] * ex[2] - ez[2] * ex[1], ez[2] * ex[0] - ez[0] * ex[2], ez[0] * ex[1] - ez[1] * ex[0]]
+        h = [abs(ez[i]) * self.sec.d / 2 + abs(ey[i]) * self.sec.b / 2 for i in range(3)]
+        lo = [min(self.p0[i], self.p1[i]) - h[i] for i in range(3)]
+        hi = [max(self.p0[i], self.p1[i]) + h[i] for i in range(3)]
+        return (*lo, *hi)
+
+
+@dataclass
+class Fitting:
+    id: str
+    name: str
+    kind: str
+    qty: int
+    at: list[tuple[float, float, float]]
+    mass_each: float
+    maturity: str
+    source: str
+    t: float | None = None
+    dims: tuple[float, float, float] | None = None
+    area_m2_each: float = 0.0
+
+    @property
+    def mass_kg(self) -> float:
+        return self.mass_each * self.qty
+
+
+@dataclass
+class Joint:
+    id: str
+    name: str
+    members: tuple[str, ...]
+    weld: str
+    detail: str | None = None
+    at: tuple[float, float, float] | None = None
+
+
+# ------------------------------------------------------------------ the chassis
+class Chassis:
+    def __init__(self, values: dict[str, Any], stations: list[dict], data: dict | None = None):
+        self.data = data or yaml.safe_load(CHASSIS_YAML.read_text())
+        raw = {k: v for k, v in values.items() if isinstance(v, (int, float))}
+        raw.update(self.data["params"])
+        self.P = Params(raw)
+        self.V = self.P.values
+        self.sections = load_sections()
+        self.stations = stations
+        roles = self.data["roles"]
+        self.role_sec = {r: self.sections[d["section"]] for r, d in roles.items()}
+        self.role_name = {r: d["name"] for r, d in roles.items()}
+        V = self.V
+        self.comp = Composite.of(self.role_sec["rail"], self.role_sec["raiser"], V["rail_underside_z"])
+        self.fy = self.role_sec["rail"].fy
+        self.members: list[Member] = []
+        self.joints: list[Joint] = []
+        self._build_members()
+        self.fittings = self._build_fittings()
+        self.suspension = self._suspension()
+
+    # -- helpers ------------------------------------------------------
+    def ev(self, v):
+        return self.P.eval(v, {})
+
+    def role_of(self, st: dict) -> str:
+        return self.data["station_roles"]["generated" if st.get("generated") else st["id"]]
+
+    def station_x(self, st: dict) -> float:
+        """Centre X of a crossmember station (stations give the front face)."""
+        return st["x"] + self.V["xm_w"] / 2
+
+    def db_y(self, x: float) -> float:
+        """Centreline Y magnitude of a drawbar member at X (the A-frame part, then along the rail)."""
+        V = self.V
+        if x >= V["body_x0"]:
+            return V["rail_c"]
+        return V["db_apex_y"] + (V["rail_c"] - V["db_apex_y"]) * (x - V["db_apex_x"]) / (V["body_x0"] - V["db_apex_x"])
+
+    # -- members ------------------------------------------------------
+    def _build_members(self):
+        V, rs = self.V, self.role_sec
+        x0, x1 = V["body_x0"], V["body_x1"]
+        zr = V["rail_underside_z"] + rs["rail"].d / 2
+        zs = V["rail_top_z"] + rs["raiser"].d / 2
+        add = self.members.append
+        for s in (-1, 1):
+            y = s * V["rail_c"]
+            add(Member(f"RL-{SIDES[s]}", "rail", f"{self.role_name['rail']}, {SIDE_WORDS[s]}", rs["rail"], (x0, y, zr), (x1, y, zr),
+                       side=s))
+            add(Member(f"RS-{SIDES[s]}", "raiser", f"{self.role_name['raiser']}, {SIDE_WORDS[s]}", rs["raiser"], (x0, y, zs), (x1, y, zs),
+                       side=s, in_frame=False, note="Acts with the rail as one composite section in the frame model"))
+        y_in = V["rail_c"] - rs["rail"].b / 2
+        for k, st in enumerate(self.stations, 1):
+            role = self.role_of(st)
+            sec = rs[role]
+            xc = self.station_x(st)
+            z = V["rail_underside_z"] + sec.d / 2 if role in ("cm_xt", "cm_end") else V["raiser_top_z"] - sec.d / 2
+            name = f"Crossmember, {st['id']}" if not st.get("generated") else f"Crossmember at X {st['x']:.0f}"
+            add(Member(f"CM-{k:02d}", role, name, sec, (xc, -y_in, z), (xc, y_in, z), depth_dir=(0, 0, 1), station=st["id"],
+                       note=self.role_name[role]))
+            osec = rs["outrigger"]
+            zo = V["raiser_top_z"] - osec.d / 2
+            for s in (-1, 1):
+                add(Member(f"OR-{k:02d}{SIDES[s]}", "outrigger", f"Outrigger at X {st['x']:.0f}, {SIDE_WORDS[s]}", osec,
+                           (xc, s * V["outrigger_root_y"], zo), (xc, s * V["outrigger_tip_y"], zo), station=st["id"], side=s))
+        dsec = rs["drawbar"]
+        for s in (-1, 1):
+            add(Member(f"DB-{SIDES[s]}A", "drawbar", f"Drawbar member, {SIDE_WORDS[s]}, apex to the body front", dsec,
+                       (V["db_apex_x"], s * V["db_apex_y"], V["db_z"]), (x0, s * V["rail_c"], V["db_z"]), side=s))
+            add(Member(f"DB-{SIDES[s]}B", "drawbar", f"Drawbar member, {SIDE_WORDS[s]}, under the rail to X {V['db_end_x']:.0f}", dsec,
+                       (x0, s * V["rail_c"], V["db_z"]), (V["db_end_x"], s * V["rail_c"], V["db_z"]), side=s,
+                       note="Continuous longitudinal fillets to the rail underside, sniped taper end, no transverse weld"))
+        yb = self.db_y(V["brace_x"]) - dsec.b / 2
+        add(Member("DB-BR", "brace", self.role_name["brace"], rs["brace"], (V["brace_x"], -yb, V["db_z"]), (V["brace_x"], yb, V["db_z"]),
+                   note="Welded at the drawbar members' mid-depth"))
+        for k, pb in enumerate(self.data.get("plan_braces", []), 1):
+            ids = {st["id"]: st for st in self.stations}
+            if not all(i in ids for i in pb["between"]):
+                continue  # a body length compared in TRAILER.md with fewer stations
+            sa, sb = (ids[i] for i in pb["between"])
+            xa, xb = sa["x"] + V["xm_w"], sb["x"]
+            z = V["rail_underside_z"] + rs["rail"].d / 2
+            sec = self.sections[pb["section"]]
+            for s in (-1, 1):
+                add(Member(f"PB-{k}{SIDES[s]}", "plan_brace", f"Plan brace between the {pb['between'][0]} and {pb['between'][1]} crossmembers, "
+                           f"from the {SIDE_WORDS[s]} rail", sec, (xa, s * y_in, z), (xb, -s * y_in, z), depth_dir=(0, 0, 1),
+                           note="Diagonal at rail height, ends on 6 mm gusset plates welded to the crossmember and the rail web"))
+        psec = rs["spare_post"]
+        xp = x0 - psec.b / 2
+        for s in (-1, 1):
+            add(Member(f"SP-P{SIDES[s]}", "spare_post", f"{self.role_name['spare_post']}, {SIDE_WORDS[s]}", psec,
+                       (xp, s * V["spare_post_y"], V["rail_underside_z"]), (xp, s * V["spare_post_y"], V["spare_post_top_z"]),
+                       depth_dir=(1, 0, 0), side=s, in_frame=False, note="Bolted to cleats on the body front crossmember, tied to the wall at the top"))
+        self._joints()
+
+    def _joints(self):
+        J = self.joints.append
+        for m in self.members:
+            if m.role in ("cm_xt", "cm_end", "cm_floor"):
+                J(Joint(f"J-{m.id}", f"{m.name} to both rails", (m.id, "RL-K", "RL-R"),
+                        "5 mm fillet all round each end, SP. No weld across the rail's width beyond the crossmember's own end", "FAT-01, FAT-02, FAT-03"))
+            if m.role == "outrigger":
+                J(Joint(f"J-{m.id}", f"{m.name} to the raiser's outer face", (m.id, f"RS-{m.id[-1]}"),
+                        "5 mm fillet all round, SP", "FAT-04, FAT-05"))
+        for s in "KR":
+            J(Joint(f"J-RS-{s}", f"Raiser to main rail, {SIDE_WORDS[-1 if s == 'K' else 1]}", (f"RS-{s}", f"RL-{s}"),
+                    "Continuous 4 mm fillets along both edges, SP, vented at each end of each bay", "FAT-06"))
+            J(Joint(f"J-DB-{s}", f"Drawbar member under the rail, {SIDE_WORDS[-1 if s == 'K' else 1]}", (f"DB-{s}B", f"RL-{s}"),
+                    "Continuous 5 mm fillets along both edges, profiled root gusset at the body front, sniped taper end, toe ground",
+                    "FAT-07, FAT-08"))
+            J(Joint(f"J-DB-{s}A", f"Drawbar member, A-frame part to its overlap part, {SIDE_WORDS[-1 if s == 'K' else 1]}",
+                    (f"DB-{s}A", f"DB-{s}B"), "Mitred full penetration butt weld at the body front, ground flush, SP", "FAT-07"))
+        J(Joint("J-BR", "Cross brace to both drawbar members", ("DB-BR", "DB-KA", "DB-RA"), "5 mm fillet all round at mid-depth, SP", "FAT-09"))
+        J(Joint("J-APEX", "Drawbar members to the coupling plate", ("DB-KA", "DB-RA", "CH-P01"), "6 mm fillets all round, SP, plate faces cleaned after galvanising"))
+
+    # -- fittings -----------------------------------------------------
+    def _build_fittings(self) -> list[Fitting]:
+        out = []
+        dens = self.data["material"]["density"]
+        for f in self.data["fittings"]:
+            qty = int(f.get("qty", 1))
+            base = self.ev(f["at"]) if "at" in f else [0.0, 0.0, 0.0]
+            at = []
+            if "side_y" in f:
+                sy = self.ev(f["side_y"])
+                xs = [base[0]] if "rear_x" not in f else [base[0], self.ev(f["rear_x"])]
+                for x in xs:
+                    for s in (-1, 1):
+                        at.append((x, s * sy, base[2]))
+            else:
+                at = [tuple(base)]
+            kind = f["kind"]
+            if kind == "plate":
+                af = f.get("area_factor", 1.0)
+                m = f["l"] * f["w"] * f["t"] * af * dens / 1e9
+                out.append(Fitting(f["id"], f["name"], kind, qty, at, m, "calculated",
+                                   f"Calculated: {f['l']} x {f['w']} x {f['t']} mm plate" + (f", {af:.0%} of the rectangle" if af != 1 else "")
+                                   + f" at {dens} kg/m3", t=f["t"], dims=(f["l"], f["w"], f["t"]),
+                                   area_m2_each=2 * f["l"] * f["w"] * af / 1e6))
+            elif kind == "tube":
+                sec = self.sections[f["section"]]
+                m = sec.kg_m * f["length"] / 1000
+                out.append(Fitting(f["id"], f["name"], kind, qty, at, m, "calculated",
+                                   f"Calculated: {f['length']} mm of {sec.name} at {sec.kg_m} kg/m", t=sec.t,
+                                   area_m2_each=sec.area_m2_per_m * f["length"] / 1000))
+            elif kind == "strip":
+                L = self.strip_length()
+                out.append(Fitting(f["id"], f["name"], kind, 1, [(self.V["body_x0"] + self.V["body_length"] / 2, 0.0, self.V["floor_underside_z"] - 10)],
+                                   f["kg_per_m"] * L / 1000, f["maturity"], f"{f['source']}, {L / 1000:.1f} m"))
+            else:
+                if len(at) < qty:
+                    at = (at * qty)[:qty]
+                out.append(Fitting(f["id"], f["name"], kind, qty, at, f["mass_kg"], f["maturity"], f["source"]))
+        return out
+
+    def strip_length(self) -> float:
+        """Floor bearer strip on every member top that carries the floor: raisers, outriggers and floor crossmembers."""
+        L = sum(m.length for m in self.members if m.role in ("raiser", "outrigger", "cm_floor"))
+        return L
+
+    # -- galvanising --------------------------------------------------
+    def galvanising(self) -> dict:
+        table = self.data["galvanising"]
+
+        def rate(t):
+            return next(r["g_per_m2"] for r in table if t <= r["t_max"]) / 1000
+        rows = {}
+        for m in self.members:
+            r = rows.setdefault(m.sec.t, dict(t=m.sec.t, area_m2=0.0, kg_per_m2=rate(m.sec.t)))
+            r["area_m2"] += m.area_m2
+        for f in self.fittings:
+            if f.kind in ("plate", "tube"):
+                r = rows.setdefault(f.t, dict(t=f.t, area_m2=0.0, kg_per_m2=rate(f.t)))
+                r["area_m2"] += f.area_m2_each * f.qty
+        for r in rows.values():
+            r["mass_kg"] = r["area_m2"] * r["kg_per_m2"]
+        tot_a = sum(r["area_m2"] for r in rows.values())
+        tot_m = sum(r["mass_kg"] for r in rows.values())
+        return dict(rows=sorted(rows.values(), key=lambda r: r["t"]), area_m2=tot_a, mass_kg=tot_m)
+
+    def steel_mass(self) -> float:
+        return sum(m.mass_kg for m in self.members) + sum(f.mass_kg for f in self.fittings if f.kind in ("plate", "tube"))
+
+    # -- suspension geometry (report 11 section 5.1) -------------------
+    def _suspension(self) -> list[dict]:
+        V = self.V
+        stations = {st["id"]: st for st in self.stations}
+        out = []
+        for axle, st_id in (("front", "XT front hinge"), ("rear", "XT centre")):
+            st = stations[st_id]
+            rear_face = st["x"] + V["xm_w"]
+            px = rear_face - V["pivot_ahead"]
+            pz = V["rail_underside_z"] - V["pivot_below"]
+            dx = math.sqrt(V["arm_r"] ** 2 - V["arm_drop"] ** 2)
+            for s in (-1, 1):
+                out.append(dict(id=f"{axle[0].upper()}{SIDES[s]}", axle=axle, side=s, station=st_id, pivot=(px, s * V["rail_c"], pz),
+                                hub=(px + dx, s * V["hub_y"], pz - V["arm_drop"]), contact=(px + dx, s * V["hub_y"], 0.0),
+                                airbag=(px + dx, s * (V["rail_c"] - self.role_sec["rail"].b / 2), V["rail_underside_z"]),
+                                station_x=self.station_x(st)))
+        return out
+
+    def hub_x(self, axle: str) -> float:
+        return next(w["hub"][0] for w in self.suspension if w["axle"] == axle)
+
+    # -- named positions for the checks -------------------------------
+    def positions(self) -> dict[str, Any]:
+        V = self.V
+        jack = next(st for st in self.stations if st["id"] == "XT centre")
+        return dict(crossmember_stations=[self.station_x(st) for st in self.stations], body_x0=V["body_x0"], db_end_x=V["db_end_x"],
+                    chain_lug_x=V["chain_lug_x"], jack_x=self.station_x(jack), hub_front_x=self.hub_x("front"), hub_rear_x=self.hub_x("rear"),
+                    rear_tongue_x=V["body_x1"] - 70, front_recovery_x=V["front_recovery_x"])
+
+    # -- the frame model ----------------------------------------------
+    def frame(self) -> "FrameModel":
+        return FrameModel(self)
+
+
+class FrameModel:
+    """Nodes and elements of the chassis and drawbar, with the lookups the load mapping needs."""
+
+    def __init__(self, ch: Chassis):
+        self.ch = ch
+        V = ch.V
+        f = self.f = Frame()
+        self.sec_props: dict[str, Any] = {}      # member id -> Props or Composite, for stress recovery
+        self.member_of_el: list[str] = []
+        comp = ch.comp
+        zc = comp.z_centroid
+        self.zc = zc
+        # rail node positions: every station, hub, pivot station, the overlap end, fittings and a mesh limit
+        xs = {V["body_x0"], V["body_x1"], V["db_end_x"], V["front_recovery_x"], V["steady_front_x"], V["steady_rear_x"]}
+        xs |= {ch.station_x(st) for st in ch.stations}
+        xs |= {w["hub"][0] for w in ch.suspension}
+        xs = sorted(xs)
+        mesh = [xs[0]]
+        for a, b in zip(xs, xs[1:]):
+            n = max(1, math.ceil((b - a) / V["max_element"]))
+            mesh += [a + (b - a) * k / n for k in range(1, n + 1)]
+        self.rail_x = mesh
+        self.rail_nodes = {}
+        csec = comp.frame_section()
+        for s in (-1, 1):
+            pts = [(x, s * V["rail_c"], zc) for x in mesh]
+            idx = f.chain(pts, csec, (0, 0, 1), f"RL-{SIDES[s]}")
+            self.rail_nodes[s] = idx
+            self.sec_props[f"RL-{SIDES[s]}"] = comp
+        # crossmembers and outriggers
+        self.out_nodes: dict[tuple[str, int], list[tuple[float, int]]] = {}
+        self.cm_nodes: dict[str, list[tuple[float, int]]] = {}
+        self.station_nodes: dict[str, float] = {}
+        for m in ch.members:
+            if m.role in ("cm_xt", "cm_end", "cm_floor"):
+                x, z = m.p0[0], m.p0[2]
+                ys = sorted({-V["rail_c"], V["rail_c"], 0.0, -V["spare_post_y"], V["spare_post_y"],
+                             *[V["rail_c"] * k / 3 for k in (-2, -1, 1, 2)]})
+                idx = f.chain([(x, y, z) for y in ys], m.sec.frame_section(), (0, 0, 1), m.id)
+                self.cm_nodes[m.id] = list(zip(ys, idx))
+                self.sec_props[m.id] = m.sec
+                for s, nd in ((-1, idx[0]), (1, idx[-1])):
+                    self._link(nd, self.rail_node(s, x), f"link {m.id}")
+                self.station_nodes[m.station] = x
+            elif m.role == "outrigger":
+                x, z, s = m.p0[0], m.p0[2], m.side
+                ys = [s * (V["outrigger_root_y"] + (V["outrigger_tip_y"] - V["outrigger_root_y"]) * k / 3) for k in range(4)]
+                idx = f.chain([(x, y, z) for y in ys], m.sec.frame_section(), (0, 0, 1), m.id)
+                self.out_nodes[(m.station, s)] = list(zip([abs(y) for y in ys], idx))
+                self.sec_props[m.id] = m.sec
+                self._link(idx[0], self.rail_node(s, x), f"link {m.id}")
+        # drawbar
+        dsec = ch.role_sec["drawbar"]
+        self.db_nodes = {}
+        for s in (-1, 1):
+            xa = [V["db_apex_x"], V["chain_lug_x"], V["jockey_x"], V["brace_x"]]
+            n = math.ceil((V["body_x0"] - V["db_apex_x"]) / V["max_element"])
+            xa = sorted(set(xa) | {V["db_apex_x"] + (V["body_x0"] - V["db_apex_x"]) * k / n for k in range(n + 1)})
+            pts = [(x, s * ch.db_y(x), V["db_z"]) for x in xa]
+            ia = f.chain(pts, dsec.frame_section(), (0, 0, 1), f"DB-{SIDES[s]}A")
+            xb = [x for x in mesh if V["body_x0"] <= x <= V["db_end_x"] + 1e-6]
+            ib = f.chain([(x, s * V["rail_c"], V["db_z"]) for x in xb], dsec.frame_section(), (0, 0, 1), f"DB-{SIDES[s]}B")
+            for x, nd in zip(xb, ib):
+                self._link(nd, self.rail_node(s, x), f"weld DB-{SIDES[s]}B")
+            self.db_nodes[s] = list(zip(xa, ia)) + list(zip(xb, ib))[1:]
+            self.sec_props[f"DB-{SIDES[s]}A"] = dsec
+            self.sec_props[f"DB-{SIDES[s]}B"] = dsec
+        braces = [m for m in ch.members if m.role == "plan_brace"]
+        for m in braces:
+            pa, pb = m.p0, m.p1
+            mid = tuple((a + b) / 2 for a, b in zip(pa, pb))
+            idx = f.chain([pa, mid, pb], m.sec.frame_section(), (0, 0, 1), m.id)
+            self.sec_props[m.id] = m.sec
+            for nd, p in ((idx[0], pa), (idx[-1], pb)):
+                s = 1 if p[1] > 0 else -1
+                self._link(nd, self.rail_node(s, p[0]), f"link {m.id}")
+        bsec = ch.role_sec["brace"]
+        f.add(self.db_node(-1, V["brace_x"]), self.db_node(1, V["brace_x"]), bsec.frame_section(), (0, 0, 1), "DB-BR")
+        self.sec_props["DB-BR"] = bsec
+        self.ball = f.node((0.0, 0.0, V["coupling_z"]), "ball")
+        for s in (-1, 1):
+            self._link(self.ball, self.db_node(s, V["db_apex_x"]), "coupling")
+        # suspension pivots, rigidly tied to the rail at their hinge crossmember
+        self.pivot_nodes = {}
+        for w in ch.suspension:
+            nd = f.node(w["pivot"])
+            self._link(nd, self.rail_node(w["side"], w["station_x"]), f"hinge {w['id']}")
+            self.pivot_nodes[w["id"]] = nd
+        self.member_of_el = [el.member for el in f.elements]
+
+    def _link(self, a: int, b: int, name: str):
+        xyz = [self.f.nodes[a], self.f.nodes[b]]
+        d = [q - p for p, q in zip(*xyz)]
+        ref = (0, 0, 1) if abs(d[2]) < 0.9 * math.hypot(*d) else (1, 0, 0)
+        self.f.add(a, b, RIGID, ref, name)
+
+    def rail_node(self, s: int, x: float) -> int:
+        k = min(range(len(self.rail_x)), key=lambda i: abs(self.rail_x[i] - x))
+        return self.rail_nodes[s][k]
+
+    def db_node(self, s: int, x: float) -> int:
+        return min(self.db_nodes[s], key=lambda p: abs(p[0] - x))[1] if s in self.db_nodes else \
+            self.f.node((x, s * self.ch.db_y(x), self.ch.V["db_z"]))
+
+    # -- fractions for the load mapping -------------------------------
+    def rail_fractions(self, s: int, x: float) -> list[tuple[int, float]]:
+        xs = self.rail_x
+        x = min(max(x, xs[0]), xs[-1])
+        for k in range(len(xs) - 1):
+            if xs[k] <= x <= xs[k + 1]:
+                t = (x - xs[k]) / (xs[k + 1] - xs[k])
+                return [(self.rail_nodes[s][k], 1 - t), (self.rail_nodes[s][k + 1], t)]
+        return [(self.rail_nodes[s][-1], 1.0)]
+
+    def between_rails(self, x: float, y: float) -> list[tuple[int, float]]:
+        c = self.ch.V["rail_c"]
+        t = (min(max(y, -c), c) + c) / (2 * c)
+        return [(n, w * (1 - t)) for n, w in self.rail_fractions(-1, x)] + [(n, w * t) for n, w in self.rail_fractions(1, x)]
+
+    def outrigger_fractions(self, x: float, y: float) -> list[tuple[int, float]]:
+        s = 1 if y > 0 else -1
+        st = sorted((xc, sid) for sid, xc in self.station_nodes.items() if (sid, s) in self.out_nodes)
+        out = []
+        if x <= st[0][0]:
+            pairs = [(st[0][1], 1.0)]
+        elif x >= st[-1][0]:
+            pairs = [(st[-1][1], 1.0)]
+        else:
+            k = next(i for i in range(len(st) - 1) if st[i][0] <= x <= st[i + 1][0])
+            t = (x - st[k][0]) / (st[k + 1][0] - st[k][0])
+            pairs = [(st[k][1], 1 - t), (st[k + 1][1], t)]
+        ay = abs(y)
+        for sid, w in pairs:
+            nodes = self.out_nodes[(sid, s)]
+            ay_c = min(max(ay, nodes[0][0]), nodes[-1][0])
+            for (y0, n0), (y1, n1) in zip(nodes, nodes[1:]):
+                if y0 <= ay_c <= y1:
+                    t = (ay_c - y0) / (y1 - y0)
+                    out += [(n0, w * (1 - t)), (n1, w * t)]
+                    break
+        return out
+
+    def floor_fractions(self, x: float, y: float) -> list[tuple[int, float]]:
+        """The floor spans across the trailer onto the raisers (one-way), and the outriggers carry it outside them."""
+        if abs(y) <= self.ch.V["rail_c"]:
+            return self.between_rails(x, y)
+        return self.outrigger_fractions(x, y)
+
+    def crossmember_fractions(self, member_id: str, y: float) -> list[tuple[int, float]]:
+        nodes = self.cm_nodes[member_id]
+        for (y0, n0), (y1, n1) in zip(nodes, nodes[1:]):
+            if y0 <= y <= y1:
+                t = (y - y0) / (y1 - y0)
+                return [(n0, 1 - t), (n1, t)]
+        return [(nodes[-1][1], 1.0)]
+
+    def drawbar_fractions(self, x: float, y: float) -> list[tuple[int, float]]:
+        """Items on the drawbar: shared between the two members by lever rule at X, or on one member if far out."""
+        out = []
+        yy = self.ch.db_y(x)
+        t = (min(max(y, -yy), yy) + yy) / (2 * yy)
+        for s, w in ((-1, 1 - t), (1, t)):
+            if w > 0:
+                nodes = self.db_nodes[s]
+                xs = [p[0] for p in nodes]
+                xq = min(max(x, xs[0]), xs[-1])
+                for (x0, n0), (x1, n1) in zip(nodes, nodes[1:]):
+                    if x0 <= xq <= x1:
+                        u = (xq - x0) / (x1 - x0) if x1 > x0 else 0.0
+                        out += [(n0, w * (1 - u)), (n1, w * u)]
+                        break
+        return out
+
+
+# ------------------------------------------------------------------ tyre swept arc (FIT-05)
+def tyre_clearance(ch: Chassis, boxes: list[tuple[str, tuple]], tyre_w: float, steps: int = 25) -> dict:
+    """Least distance from each tyre, swung about its arm pivot through +/- travel, to each box. The tyre is a
+    cylinder of the published diameter in its own vertical plane. A box that overlaps the tyre's width gives the
+    in-plane distance, one beside it gives the combined distance."""
+    V = ch.V
+    R = V["tyre_d_published"] / 2
+    best = dict(gap_mm=math.inf)
+    for w in ch.suspension:
+        px, py, pz = w["pivot"]
+        yc = w["hub"][1]
+        for k in range(steps + 1):
+            s = -V["travel"] + 2 * V["travel"] * k / steps
+            dz = V["arm_drop"] - s
+            hx, hz = px + math.sqrt(V["arm_r"] ** 2 - dz ** 2), pz - dz
+            for name, b in boxes:
+                dx = max(b[0] - hx, 0.0, hx - b[3])
+                dzz = max(b[2] - hz, 0.0, hz - b[5])
+                d_plane = math.hypot(dx, dzz) - R
+                dy = max(b[1] - (yc + tyre_w / 2), 0.0, (yc - tyre_w / 2) - b[4])
+                if dy <= 0:
+                    g = d_plane
+                elif d_plane <= 0:
+                    g = dy
+                else:
+                    g = math.hypot(d_plane, dy)
+                if g < best["gap_mm"]:
+                    best = dict(gap_mm=g, tyre=w["id"], travel_mm=s, member=name, hub=(hx, hz))
+    return best

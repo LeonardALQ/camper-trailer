@@ -1,0 +1,731 @@
+# Section table from research report 11 (research/11-chassis-design.md), copied unchanged from its companion file
+# chassis-sections.yaml. cad/chassis.py reads it.
+# Candidate steel sections for the camper trailer chassis (research report 11).
+# Units: mm, kg/m, mm2, and the multipliers shown in each key name (e6 = 10^6, e3 = 10^3).
+# Axes: x is the strong axis (bending in the plane of d), y the weak axis (bending in the plane of b).
+# d = depth, b = width, t = wall, ro = outside corner radius used in the calculation.
+# Zx, Zy = elastic section moduli. Sx, Sy = plastic section moduli. J = torsion constant. C = torsion modulus (J / (t + k/t)).
+# Ze_x, Ze_y = AS 4100 effective section moduli for C450L0 from the published table (null where not read).
+# compact_x, compact_y = AS 4100 class for C450L0 from the published table: C compact, N non-compact, S slender.
+#
+# Method. Hollow sections are computed from the AS/NZS 1163 nominal geometry with Australian Tube Mills' corner radii
+# (ro = 2.0 t for t <= 3 mm and 2.5 t for t > 3 mm, inner radius ro - t), density 7,850 kg/m3, and the thin-wall torsion
+# formulas Austube publishes (J = t^3 h / 3 + 2 k Ah, C = J / (t + k / t), k = 2 Ah t / h, h and Ah taken on the wall midline).
+# Script: sect.py in the research worker's scratch area, reproduced in report 11 appendix A.
+# Check. Every hollow section marked published_check was compared with the Austube Mills Design Capacity Tables for
+# Structural Steel Hollow Sections (August 2013). The computed values match the published ones to the published
+# rounding (3 significant figures) in every case checked, so the computed figures can be used for the sections that
+# were not checked as well. The comparison is in each entry.
+# Grades. RHS and SHS: AS/NZS 1163 C450L0 (fy 450 MPa, fu 500 MPa) is the recommendation, supplied as Austube Mills
+# C450PLUS (black) or DuraGal C450PLUS (in-line galvanised to AS/NZS 4792, 100 g/m2 minimum average inside and outside).
+# C350L0 (fy 350 MPa, fu 430 MPa) is Cruisemaster's minimum at the suspension (TB 070). Angles: see each entry.
+#
+source_tables: https://www.austubemills.com.au/wp-content/uploads/sites/9/2022/02/atm_dct_sshs_aug13_new-1.pdf
+source_grades_c450plus: https://www.infrabuild.com/steel/products/duragal/duragal-galvanized-steel-rhs-and-shs-structur/
+source_cruisemaster_tb070: https://cruisemaster.com.au/content/cis/TB%20070%20-%20Chassis%20Design%20Recommendations.pdf
+grades:
+  C450L0: {standard: AS/NZS 1163, fy_mpa: 450, fu_mpa: 500, note: "Austube C450PLUS is designed as C450L0 with the elongation of C350L0 (Austube DCT 2013, table notes)"}
+  C350L0: {standard: AS/NZS 1163, fy_mpa: 350, fu_mpa: 430, note: "Cruisemaster TB 070 minimum for suspension areas"}
+  300PLUS_hot_rolled_angle: {standard: AS/NZS 3679.1, fy_mpa: 320, fu_mpa: 440, note: "fy 320 MPa for thin flanges is from memory of InfraBuild's 300PLUS data, not checked in this research"}
+sections:
+  - id: RHS_150x50x3
+    designation: "RHS 150x50x3"
+    shape: RHS
+    d: 150
+    b: 50
+    t: 3
+    ro: 6
+    mass_kg_per_m: 8.95
+    A_mm2: 1140.0
+    Ix_e6mm4: 2.99
+    Zx_e3mm3: 39.8
+    Sx_e3mm3: 51.4
+    Iy_e6mm4: 0.526
+    Zy_e3mm3: 21.1
+    Sy_e3mm3: 23.5
+    J_e6mm4: 1.5
+    C_e3mm3: 38.3
+    Ze_x_e3mm3_C450: 51.4
+    Ze_y_e3mm3_C450: 14.5
+    compact_x_C450: C
+    compact_y_C450: S
+    grade: C450L0
+    fy_mpa: 450
+    alt_grade: C350L0
+    alt_fy_mpa: 350
+    source: "Computed from AS/NZS 1163 geometry; checked against Austube Mills DCT Aug 2013, page 3-12"
+    published_check:
+      A_mm2: 1140
+      Ix_e6mm4: 2.99
+      Zx_e3mm3: 39.8
+      Sx_e3mm3: 51.4
+      Iy_e6mm4: 0.526
+      Zy_e3mm3: 21.1
+      Sy_e3mm3: 23.5
+      J_e6mm4: 1.5
+      C_e3mm3: 38.3
+      mass_kg_per_m: 8.96
+      result: match to published rounding
+    use: "Main rails (recommended start). XT front hinge, centre and rear shock crossmembers per TB 070 (150x50x3 or 100x50x5 for an XT tandem to 4,450 kg ATM). Body front and rear crossmembers at full rail height."
+  - id: RHS_150x50x4
+    designation: "RHS 150x50x4"
+    shape: RHS
+    d: 150
+    b: 50
+    t: 4
+    ro: 10
+    mass_kg_per_m: 11.6
+    A_mm2: 1480.0
+    Ix_e6mm4: 3.74
+    Zx_e3mm3: 49.8
+    Sx_e3mm3: 65.5
+    Iy_e6mm4: 0.653
+    Zy_e3mm3: 26.1
+    Sy_e3mm3: 29.8
+    J_e6mm4: 1.93
+    C_e3mm3: 48.2
+    Ze_x_e3mm3_C450: 65.4
+    Ze_y_e3mm3_C450: 22.7
+    compact_x_C450: C
+    compact_y_C450: S
+    grade: C450L0
+    fy_mpa: 450
+    alt_grade: C350L0
+    alt_fy_mpa: 350
+    source: "Computed from AS/NZS 1163 geometry; checked against Austube Mills DCT Aug 2013, page 3-12"
+    published_check:
+      A_mm2: 1480
+      Ix_e6mm4: 3.74
+      Zx_e3mm3: 49.8
+      Sx_e3mm3: 65.4
+      Iy_e6mm4: 0.653
+      Zy_e3mm3: 26.1
+      Sy_e3mm3: 29.8
+      J_e6mm4: 1.93
+      C_e3mm3: 48.2
+      mass_kg_per_m: 11.6
+      result: match to published rounding
+    use: "XT hinge crossmembers if Cruisemaster does not confirm 3 mm for the 4,500 kg build. Fallback main rail if the engineer's analysis needs it."
+  - id: RHS_150x50x5
+    designation: "RHS 150x50x5"
+    shape: RHS
+    d: 150
+    b: 50
+    t: 5
+    ro: 12.5
+    mass_kg_per_m: 14.2
+    A_mm2: 1810.0
+    Ix_e6mm4: 4.44
+    Zx_e3mm3: 59.2
+    Sx_e3mm3: 78.8
+    Iy_e6mm4: 0.765
+    Zy_e3mm3: 30.6
+    Sy_e3mm3: 35.7
+    J_e6mm4: 2.3
+    C_e3mm3: 56.8
+    Ze_x_e3mm3_C450: 78.9
+    Ze_y_e3mm3_C450: 31.8
+    compact_x_C450: C
+    compact_y_C450: N
+    grade: C450L0
+    fy_mpa: 450
+    alt_grade: C350L0
+    alt_fy_mpa: 350
+    source: "Computed from AS/NZS 1163 geometry; checked against Austube Mills DCT Aug 2013, page 3-12"
+    published_check:
+      A_mm2: 1810
+      Ix_e6mm4: 4.44
+      Zx_e3mm3: 59.2
+      Sx_e3mm3: 78.9
+      Iy_e6mm4: 0.765
+      Zy_e3mm3: 30.6
+      Sy_e3mm3: 35.7
+      J_e6mm4: 2.3
+      C_e3mm3: 56.8
+      mass_kg_per_m: 14.2
+      result: match to published rounding
+    use: "Drawbar members (recommended start), coupling head to 1,000 mm under the rails."
+  - id: RHS_127x51x3p5
+    designation: "RHS 127x51x3.5"
+    shape: RHS
+    d: 127
+    b: 51
+    t: 3.5
+    ro: 8.75
+    mass_kg_per_m: 9.07
+    A_mm2: 1150.0
+    Ix_e6mm4: 2.2
+    Zx_e3mm3: 34.7
+    Sx_e3mm3: 44.6
+    Iy_e6mm4: 0.526
+    Zy_e3mm3: 20.6
+    Sy_e3mm3: 23.5
+    J_e6mm4: 1.44
+    C_e3mm3: 37.2
+    Ze_x_e3mm3_C450: 44.6
+    Ze_y_e3mm3_C450: 18.5
+    compact_x_C450: C
+    compact_y_C450: S
+    grade: C450L0
+    fy_mpa: 450
+    alt_grade: C350L0
+    alt_fy_mpa: 350
+    source: "Computed from AS/NZS 1163 geometry; checked against Austube Mills DCT Aug 2013, page 3-12"
+    published_check:
+      A_mm2: 1150
+      Ix_e6mm4: 2.2
+      Zx_e3mm3: 34.7
+      Sx_e3mm3: 44.6
+      Iy_e6mm4: 0.526
+      Zy_e3mm3: 20.6
+      Sy_e3mm3: 23.4
+      J_e6mm4: 1.44
+      C_e3mm3: 37.2
+      mass_kg_per_m: 9.07
+      result: match to published rounding
+    use: "Raiser alternative: 127 mm tall puts the raiser top 7 mm above today's floor underside (Z 839), so the floor would rise about 7 mm."
+  - id: RHS_125x50x3
+    designation: "RHS 125x50x3"
+    shape: RHS
+    d: 125
+    b: 50
+    t: 3
+    ro: 6
+    mass_kg_per_m: 7.78
+    A_mm2: 991.0
+    Ix_e6mm4: 1.87
+    Zx_e3mm3: 29.9
+    Sx_e3mm3: 38.1
+    Iy_e6mm4: 0.443
+    Zy_e3mm3: 17.7
+    Sy_e3mm3: 20.0
+    J_e6mm4: 1.19
+    C_e3mm3: 31.6
+    Ze_x_e3mm3_C450: null
+    Ze_y_e3mm3_C450: null
+    compact_x_C450: null
+    compact_y_C450: null
+    grade: C450L0
+    fy_mpa: 450
+    alt_grade: C350L0
+    alt_fy_mpa: 350
+    source: "Computed from AS/NZS 1163 geometry (not checked against a published table)"
+    published_check: null
+    use: "Not found in the Austube Mills C450PLUS range read (125 x 75 is listed, 125 x 50 is not). Computed only. Check Orrcon or InfraBuild before using it."
+  - id: RHS_100x50x3
+    designation: "RHS 100x50x3"
+    shape: RHS
+    d: 100
+    b: 50
+    t: 3
+    ro: 6
+    mass_kg_per_m: 6.6
+    A_mm2: 841.0
+    Ix_e6mm4: 1.06
+    Zx_e3mm3: 21.3
+    Sx_e3mm3: 26.7
+    Iy_e6mm4: 0.361
+    Zy_e3mm3: 14.4
+    Sy_e3mm3: 16.4
+    J_e6mm4: 0.886
+    C_e3mm3: 25.0
+    Ze_x_e3mm3_C450: null
+    Ze_y_e3mm3_C450: null
+    compact_x_C450: null
+    compact_y_C450: null
+    grade: C450L0
+    fy_mpa: 450
+    alt_grade: C350L0
+    alt_fy_mpa: 350
+    source: "Computed from AS/NZS 1163 geometry (not checked against a published table)"
+    published_check: null
+    use: "Raiser on each main rail (recommended start), continuously welded, plus a 20 mm floor bearer or isolation strip to reach Z 839. Intermediate crossmembers under the living area (model block size)."
+  - id: RHS_100x50x4
+    designation: "RHS 100x50x4"
+    shape: RHS
+    d: 100
+    b: 50
+    t: 4
+    ro: 10
+    mass_kg_per_m: 8.49
+    A_mm2: 1080.0
+    Ix_e6mm4: 1.31
+    Zx_e3mm3: 26.1
+    Sx_e3mm3: 33.4
+    Iy_e6mm4: 0.441
+    Zy_e3mm3: 17.6
+    Sy_e3mm3: 20.6
+    J_e6mm4: 1.13
+    C_e3mm3: 31.2
+    Ze_x_e3mm3_C450: 33.4
+    Ze_y_e3mm3_C450: 20.3
+    compact_x_C450: C
+    compact_y_C450: N
+    grade: C450L0
+    fy_mpa: 450
+    alt_grade: C350L0
+    alt_fy_mpa: 350
+    source: "Computed from AS/NZS 1163 geometry; checked against Austube Mills DCT Aug 2013, page 3-13"
+    published_check:
+      A_mm2: 1080
+      Ix_e6mm4: 1.31
+      Zx_e3mm3: 26.1
+      Sx_e3mm3: 33.4
+      Iy_e6mm4: 0.441
+      Zy_e3mm3: 17.6
+      Sy_e3mm3: 20.6
+      J_e6mm4: 1.13
+      C_e3mm3: 31.2
+      mass_kg_per_m: 8.49
+      result: match to published rounding
+    use: "TB 070 alternative hinge crossmember for an XT tandem to 3,700 kg ATM."
+  - id: RHS_100x50x2p5
+    designation: "RHS 100x50x2.5"
+    shape: RHS
+    d: 100
+    b: 50
+    t: 2.5
+    ro: 5
+    mass_kg_per_m: 5.56
+    A_mm2: 709.0
+    Ix_e6mm4: 0.912
+    Zx_e3mm3: 18.2
+    Sx_e3mm3: 22.7
+    Iy_e6mm4: 0.311
+    Zy_e3mm3: 12.4
+    Sy_e3mm3: 14.0
+    J_e6mm4: 0.754
+    C_e3mm3: 21.5
+    Ze_x_e3mm3_C450: 22.7
+    Ze_y_e3mm3_C450: 10.4
+    compact_x_C450: C
+    compact_y_C450: S
+    grade: C450L0
+    fy_mpa: 450
+    alt_grade: C350L0
+    alt_fy_mpa: 350
+    source: "Computed from AS/NZS 1163 geometry; checked against Austube Mills DCT Aug 2013, page 3-13"
+    published_check:
+      A_mm2: 709
+      Ix_e6mm4: 0.912
+      Zx_e3mm3: 18.2
+      Sx_e3mm3: 22.7
+      Iy_e6mm4: 0.311
+      Zy_e3mm3: 12.4
+      Sy_e3mm3: 14.0
+      J_e6mm4: 0.754
+      C_e3mm3: 21.5
+      mass_kg_per_m: 5.56
+      result: match to published rounding
+    use: "Light intermediate crossmembers where the engineer accepts it."
+  - id: RHS_75x50x3
+    designation: "RHS 75x50x3"
+    shape: RHS
+    d: 75
+    b: 50
+    t: 3
+    ro: 6
+    mass_kg_per_m: 5.42
+    A_mm2: 691.0
+    Ix_e6mm4: 0.522
+    Zx_e3mm3: 13.9
+    Sx_e3mm3: 17.1
+    Iy_e6mm4: 0.278
+    Zy_e3mm3: 11.1
+    Sy_e3mm3: 12.9
+    J_e6mm4: 0.593
+    C_e3mm3: 18.4
+    Ze_x_e3mm3_C450: 17.1
+    Ze_y_e3mm3_C450: 12.8
+    compact_x_C450: C
+    compact_y_C450: N
+    grade: C450L0
+    fy_mpa: 450
+    alt_grade: C350L0
+    alt_fy_mpa: 350
+    source: "Computed from AS/NZS 1163 geometry; checked against Austube Mills DCT Aug 2013, page 3-13"
+    published_check:
+      A_mm2: 691
+      Ix_e6mm4: 0.522
+      Zx_e3mm3: 13.9
+      Sx_e3mm3: 17.1
+      Iy_e6mm4: 0.278
+      Zy_e3mm3: 11.1
+      Sy_e3mm3: 12.9
+      J_e6mm4: 0.593
+      C_e3mm3: 18.4
+      mass_kg_per_m: 5.42
+      result: match to published rounding
+    use: "Outriggers at every station, 75 mm vertical, top flush with the raiser top (recommended start). Drawbar cross brace."
+  - id: RHS_75x50x2p5
+    designation: "RHS 75x50x2.5"
+    shape: RHS
+    d: 75
+    b: 50
+    t: 2.5
+    ro: 5
+    mass_kg_per_m: 4.58
+    A_mm2: 584.0
+    Ix_e6mm4: 0.449
+    Zx_e3mm3: 12.0
+    Sx_e3mm3: 14.6
+    Iy_e6mm4: 0.24
+    Zy_e3mm3: 9.6
+    Sy_e3mm3: 11.0
+    J_e6mm4: 0.505
+    C_e3mm3: 15.9
+    Ze_x_e3mm3_C450: 14.6
+    Ze_y_e3mm3_C450: 9.95
+    compact_x_C450: C
+    compact_y_C450: N
+    grade: C450L0
+    fy_mpa: 450
+    alt_grade: C350L0
+    alt_fy_mpa: 350
+    source: "Computed from AS/NZS 1163 geometry; checked against Austube Mills DCT Aug 2013, page 3-13"
+    published_check:
+      A_mm2: 584
+      Ix_e6mm4: 0.45
+      Zx_e3mm3: 12.0
+      Sx_e3mm3: 14.6
+      Iy_e6mm4: 0.24
+      Zy_e3mm3: 9.6
+      Sy_e3mm3: 11.0
+      J_e6mm4: 0.505
+      C_e3mm3: 15.9
+      mass_kg_per_m: 4.58
+      result: match to published rounding
+    use: "Lighter outriggers if the engineer's fatigue check allows it."
+  - id: RHS_65x35x3
+    designation: "RHS 65x35x3"
+    shape: RHS
+    d: 65
+    b: 35
+    t: 3
+    ro: 6
+    mass_kg_per_m: 4.24
+    A_mm2: 541.0
+    Ix_e6mm4: 0.281
+    Zx_e3mm3: 8.65
+    Sx_e3mm3: 11.0
+    Iy_e6mm4: 0.106
+    Zy_e3mm3: 6.04
+    Sy_e3mm3: 7.11
+    J_e6mm4: 0.259
+    C_e3mm3: 10.4
+    Ze_x_e3mm3_C450: 11.0
+    Ze_y_e3mm3_C450: 7.11
+    compact_x_C450: C
+    compact_y_C450: C
+    grade: C450L0
+    fy_mpa: 450
+    alt_grade: C350L0
+    alt_fy_mpa: 350
+    source: "Computed from AS/NZS 1163 geometry; checked against Austube Mills DCT Aug 2013, page 3-13"
+    published_check:
+      A_mm2: 541
+      Ix_e6mm4: 0.281
+      Zx_e3mm3: 8.65
+      Sx_e3mm3: 11.0
+      Iy_e6mm4: 0.106
+      Zy_e3mm3: 6.04
+      Sy_e3mm3: 7.11
+      J_e6mm4: 0.259
+      C_e3mm3: 10.4
+      mass_kg_per_m: 4.25
+      result: match to published rounding
+    use: "Stone guard frame, battery box frame, tank guard frame."
+  - id: RHS_50x25x2p5
+    designation: "RHS 50x25x2.5"
+    shape: RHS
+    d: 50
+    b: 25
+    t: 2.5
+    ro: 5
+    mass_kg_per_m: 2.62
+    A_mm2: 334.0
+    Ix_e6mm4: 0.0988
+    Zx_e3mm3: 3.95
+    Sx_e3mm3: 5.11
+    Iy_e6mm4: 0.0328
+    Zy_e3mm3: 2.62
+    Sy_e3mm3: 3.12
+    J_e6mm4: 0.0843
+    C_e3mm3: 4.6
+    Ze_x_e3mm3_C450: 5.11
+    Ze_y_e3mm3_C450: 3.12
+    compact_x_C450: C
+    compact_y_C450: C
+    grade: C450L0
+    fy_mpa: 450
+    alt_grade: C350L0
+    alt_fy_mpa: 350
+    source: "Computed from AS/NZS 1163 geometry; checked against Austube Mills DCT Aug 2013, page 3-13"
+    published_check:
+      A_mm2: 334
+      Ix_e6mm4: 0.0989
+      Zx_e3mm3: 3.95
+      Sx_e3mm3: 5.11
+      Iy_e6mm4: 0.0328
+      Zy_e3mm3: 2.62
+      Sy_e3mm3: 3.12
+      J_e6mm4: 0.0843
+      C_e3mm3: 4.6
+      mass_kg_per_m: 2.62
+      result: match to published rounding
+    use: "Light edge member tying outrigger tips (optional, floor panel maker to decide), mudguard supports."
+  - id: SHS_100x100x4
+    designation: "SHS 100x100x4"
+    shape: SHS
+    d: 100
+    b: 100
+    t: 4
+    ro: 10
+    mass_kg_per_m: 11.6
+    A_mm2: 1480.0
+    Ix_e6mm4: 2.23
+    Zx_e3mm3: 44.6
+    Sx_e3mm3: 52.6
+    Iy_e6mm4: 2.23
+    Zy_e3mm3: 44.6
+    Sy_e3mm3: 52.6
+    J_e6mm4: 3.63
+    C_e3mm3: 68.0
+    Ze_x_e3mm3_C450: 51.9
+    Ze_y_e3mm3_C450: 51.9
+    compact_x_C450: N
+    compact_y_C450: N
+    grade: C450L0
+    fy_mpa: 450
+    alt_grade: C350L0
+    alt_fy_mpa: 350
+    source: "Computed from AS/NZS 1163 geometry; checked against Austube Mills DCT Aug 2013, page 3-16"
+    published_check:
+      A_mm2: 1480
+      Ix_e6mm4: 2.23
+      Zx_e3mm3: 44.6
+      Sx_e3mm3: 52.6
+      Iy_e6mm4: 2.23
+      Zy_e3mm3: 44.6
+      Sy_e3mm3: 52.6
+      J_e6mm4: 3.63
+      C_e3mm3: 68.0
+      mass_kg_per_m: 11.6
+      result: match to published rounding
+    use: "Not recommended for this chassis: TB 070 asks for 50 mm wide sections at the suspension. Listed for comparison."
+  - id: SHS_75x75x3
+    designation: "SHS 75x75x3"
+    shape: SHS
+    d: 75
+    b: 75
+    t: 3
+    ro: 6
+    mass_kg_per_m: 6.6
+    A_mm2: 841.0
+    Ix_e6mm4: 0.716
+    Zx_e3mm3: 19.1
+    Sx_e3mm3: 22.5
+    Iy_e6mm4: 0.716
+    Zy_e3mm3: 19.1
+    Sy_e3mm3: 22.5
+    J_e6mm4: 1.15
+    C_e3mm3: 28.7
+    Ze_x_e3mm3_C450: 22.2
+    Ze_y_e3mm3_C450: 22.2
+    compact_x_C450: N
+    compact_y_C450: N
+    grade: C450L0
+    fy_mpa: 450
+    alt_grade: C350L0
+    alt_fy_mpa: 350
+    source: "Computed from AS/NZS 1163 geometry; checked against Austube Mills DCT Aug 2013, page 3-16"
+    published_check:
+      A_mm2: 841
+      Ix_e6mm4: 0.716
+      Zx_e3mm3: 19.1
+      Sx_e3mm3: 22.5
+      Iy_e6mm4: 0.716
+      Zy_e3mm3: 19.1
+      Sy_e3mm3: 22.5
+      J_e6mm4: 1.15
+      C_e3mm3: 28.7
+      mass_kg_per_m: 6.6
+      result: match to published rounding
+    use: "Not recommended at the suspension (50 mm width rule). Possible spare wheel carrier posts."
+  - id: SHS_50x50x3
+    designation: "SHS 50x50x3"
+    shape: SHS
+    d: 50
+    b: 50
+    t: 3
+    ro: 6
+    mass_kg_per_m: 4.24
+    A_mm2: 541.0
+    Ix_e6mm4: 0.195
+    Zx_e3mm3: 7.79
+    Sx_e3mm3: 9.39
+    Iy_e6mm4: 0.195
+    Zy_e3mm3: 7.79
+    Sy_e3mm3: 9.39
+    J_e6mm4: 0.321
+    C_e3mm3: 11.8
+    Ze_x_e3mm3_C450: null
+    Ze_y_e3mm3_C450: null
+    Ze_e3mm3_C350_published: 9.39
+    compact_C350_published: C
+    grade: C450L0
+    fy_mpa: 450
+    alt_grade: C350L0
+    alt_fy_mpa: 350
+    source: "Computed from AS/NZS 1163 geometry; checked against Austube Mills DCT Aug 2013, page 3-14 (the C350L0 SHS table; the C450 row was not legible in the text extraction, so Ze and the class are the C350L0 values)"
+    published_check:
+      A_mm2: 541
+      Ix_e6mm4: 0.195
+      Zx_e3mm3: 7.79
+      Sx_e3mm3: 9.39
+      Iy_e6mm4: 0.195
+      Zy_e3mm3: 7.79
+      Sy_e3mm3: 9.39
+      J_e6mm4: 0.321
+      C_e3mm3: 11.8
+      mass_kg_per_m: 4.25
+      result: match to published rounding
+    use: "TB 070 minimum hinge gusset (50 x 50 x 3 RHS at 45 degrees). Spare wheel carrier posts."
+  - id: SHS_50x50x2p5
+    designation: "SHS 50x50x2.5"
+    shape: SHS
+    d: 50
+    b: 50
+    t: 2.5
+    ro: 5
+    mass_kg_per_m: 3.6
+    A_mm2: 459.0
+    Ix_e6mm4: 0.169
+    Zx_e3mm3: 6.78
+    Sx_e3mm3: 8.07
+    Iy_e6mm4: 0.169
+    Zy_e3mm3: 6.78
+    Sy_e3mm3: 8.07
+    J_e6mm4: 0.275
+    C_e3mm3: 10.2
+    Ze_x_e3mm3_C450: 8.07
+    Ze_y_e3mm3_C450: 8.07
+    compact_x_C450: C
+    compact_y_C450: C
+    grade: C450L0
+    fy_mpa: 450
+    alt_grade: C350L0
+    alt_fy_mpa: 350
+    source: "Computed from AS/NZS 1163 geometry; checked against Austube Mills DCT Aug 2013, page 3-17"
+    published_check:
+      A_mm2: 459
+      Ix_e6mm4: 0.169
+      Zx_e3mm3: 6.78
+      Sx_e3mm3: 8.07
+      Iy_e6mm4: 0.169
+      Zy_e3mm3: 6.78
+      Sy_e3mm3: 8.07
+      J_e6mm4: 0.275
+      C_e3mm3: 10.2
+      mass_kg_per_m: 3.6
+      result: match to published rounding
+    use: "Spare wheel carrier posts, jockey wheel bracket stiffener."
+  - id: SHS_40x40x2p5
+    designation: "SHS 40x40x2.5"
+    shape: SHS
+    d: 40
+    b: 40
+    t: 2.5
+    ro: 5
+    mass_kg_per_m: 2.82
+    A_mm2: 359.0
+    Ix_e6mm4: 0.0821
+    Zx_e3mm3: 4.11
+    Sx_e3mm3: 4.97
+    Iy_e6mm4: 0.0821
+    Zy_e3mm3: 4.11
+    Sy_e3mm3: 4.97
+    J_e6mm4: 0.136
+    C_e3mm3: 6.21
+    Ze_x_e3mm3_C450: 4.97
+    Ze_y_e3mm3_C450: 4.97
+    compact_x_C450: C
+    compact_y_C450: C
+    grade: C450L0
+    fy_mpa: 450
+    alt_grade: C350L0
+    alt_fy_mpa: 350
+    source: "Computed from AS/NZS 1163 geometry; checked against Austube Mills DCT Aug 2013, page 3-17"
+    published_check:
+      A_mm2: 359
+      Ix_e6mm4: 0.0822
+      Zx_e3mm3: 4.11
+      Sx_e3mm3: 4.97
+      Iy_e6mm4: 0.0822
+      Zy_e3mm3: 4.11
+      Sy_e3mm3: 4.97
+      J_e6mm4: 0.136
+      C_e3mm3: 6.21
+      mass_kg_per_m: 2.82
+      result: match to published rounding
+    use: "Stone guard frame, light brackets."
+  - id: EA_50x50x5
+    designation: "EA 50x50x5"
+    shape: equal angle
+    d: 50
+    b: 50
+    t: 5
+    ro: 0
+    mass_kg_per_m: 3.729
+    A_mm2: 475
+    Ix_e6mm4: 0.1125
+    Zx_e3mm3: 3.155
+    Sx_e3mm3: 5.684
+    Iy_e6mm4: 0.1125
+    Zy_e3mm3: 3.155
+    Sy_e3mm3: 5.684
+    Iu_e6mm4_major_principal: 0.1791
+    Iv_e6mm4_minor_principal: 0.0459
+    J_e6mm4: 0.00396
+    C_e3mm3: 0.792
+    Ze_x_e3mm3_C450: null
+    Ze_y_e3mm3_C450: null
+    compact_x_C450: null
+    compact_y_C450: null
+    grade: 300PLUS (hot rolled) or C450L0 (cold-formed DuraGal angle)
+    fy_mpa: 320
+    alt_grade: C450L0 cold-formed angle
+    alt_fy_mpa: 450
+    source: "Computed with square corners and no root fillet (x and y are the axes parallel to the legs through the centroid; Zx to the leg tip; J = sum of b t^3 / 3). A hot-rolled angle has a root radius that adds about 1 to 3 percent to A and I. Not checked against a published table."
+    published_check: null
+    use: "Floor edge trim, mudguard and stone guard brackets, cable trays. Not for primary members: an open section has almost no torsional stiffness (J 0.00396 e6 mm4 against 1.50 e6 for RHS 150x50x3)."
+  - id: EA_40x40x4
+    designation: "EA 40x40x4"
+    shape: equal angle
+    d: 40
+    b: 40
+    t: 4
+    ro: 0
+    mass_kg_per_m: 2.386
+    A_mm2: 304
+    Ix_e6mm4: 0.0461
+    Zx_e3mm3: 1.615
+    Sx_e3mm3: 2.91
+    Iy_e6mm4: 0.0461
+    Zy_e3mm3: 1.615
+    Sy_e3mm3: 2.91
+    Iu_e6mm4_major_principal: 0.0734
+    Iv_e6mm4_minor_principal: 0.0188
+    J_e6mm4: 0.00162
+    C_e3mm3: 0.405
+    Ze_x_e3mm3_C450: null
+    Ze_y_e3mm3_C450: null
+    compact_x_C450: null
+    compact_y_C450: null
+    grade: 300PLUS (hot rolled) or C450L0 (cold-formed DuraGal angle)
+    fy_mpa: 320
+    alt_grade: C450L0 cold-formed angle
+    alt_fy_mpa: 450
+    source: "Computed with square corners and no root fillet (x and y are the axes parallel to the legs through the centroid; Zx to the leg tip; J = sum of b t^3 / 3). A hot-rolled angle has a root radius that adds about 1 to 3 percent to A and I. Not checked against a published table."
+    published_check: null
+    use: "Floor edge trim, mudguard and stone guard brackets, cable trays. Not for primary members: an open section has almost no torsional stiffness (J 0.00162 e6 mm4 against 1.50 e6 for RHS 150x50x3)."

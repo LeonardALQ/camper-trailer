@@ -127,6 +127,10 @@ def cmd_trailer():
     rep["git"] = git_hash()
     out = BUILD / "trailer"
     _write(out / "trailer.json", rep)
+    from .chassis_checks import report as chassis_report
+    chs = chassis_report(tr, tr.last_layout)
+    chs["git"] = rep["git"]
+    _write(BUILD / "chassis" / "chassis.json", chs)
     t1 = time.time()
     lay = tr.layout(**rep["solved"]["overrides"])
     write_outputs(TrailerModel(lay, model), out)
