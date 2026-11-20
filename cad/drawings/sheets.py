@@ -575,7 +575,9 @@ def main(only: list[str] | None = None):
     tm = {}
     from .chassis_sheets import ct101, ct102, ct103
     from .ga import ct001
-    fns = {"CT-001": ct001, "CT-101": ct101, "CT-102": ct102, "CT-103": ct103, "CT-401": ct401, "CT-402": ct402, "CT-501": ct501}
+    from .ute_sheets import ct701, ct702, ct703, ct704
+    fns = {"CT-001": ct001, "CT-101": ct101, "CT-102": ct102, "CT-103": ct103, "CT-401": ct401, "CT-402": ct402, "CT-501": ct501,
+           "CT-701": ct701, "CT-702": ct702, "CT-703": ct703, "CT-704": ct704}
     for dwg in reg["drawings"]:
         if only and dwg["number"] not in only:
             continue

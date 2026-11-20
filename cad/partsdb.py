@@ -102,7 +102,8 @@ class PartsFile(Strict):
 class Item(Strict):
     ref: str
     part: str
-    group: Literal["bikes", "restraint", "bed", "partitions", "safety", "context"]
+    group: Literal["bikes", "restraint", "bed", "partitions", "safety", "context",
+                   "body", "subframe", "doors", "security", "tools"]
     label: str
     step: str | None = None
     at: list[Any] | None = None
@@ -358,32 +359,46 @@ class Instance(BaseModel):
     check_only: bool = False
 
 
+# Assemblies other than the trailer's garage and bed module. Each names its part files, its checks file and the
+# module parameters the measurement rules may set. The ute garage (UTE-GARAGE.md) shares the bikes with the trailer.
+ASSEMBLIES = {
+    "garage-bed": dict(parts=["parts/*.yaml"], checks="checks.yaml", steps=True),
+    "ute-garage": dict(parts=["parts/bikes.yaml", "ute/parts/*.yaml"], checks="ute/garage-checks.yaml", steps=False),
+}
+
+
 class Project:
-    def __init__(self, root: Path = ROOT, overrides: dict[str, Any] | None = None, use_solved: bool = True):
+    def __init__(self, root: Path = ROOT, overrides: dict[str, Any] | None = None, use_solved: bool = True,
+                 assembly: str = "garage-bed"):
         self.root = root
         self.overrides = dict(overrides or {})
+        self.assembly_name = assembly
+        spec = ASSEMBLIES[assembly]
         data = root / "data"
         self.parts: dict[str, Part] = {}
-        for f in sorted((data / "parts").glob("*.yaml")):
+        files = [f for pat in spec["parts"] for f in sorted(data.glob(pat))]
+        for f in files:
             pf = PartsFile.model_validate(yaml.safe_load(f.read_text()))
             for pid, p in pf.parts.items():
                 if pid in self.parts:
                     raise ValueError(f"duplicate part id {pid} in {f.name}")
                 p.id, p.group = pid, pf.group
                 self.parts[pid] = p
-        self.assembly = AssemblyDef.model_validate(yaml.safe_load((data / "assemblies" / "garage-bed.yaml").read_text()))
-        cf = ChecksFile.model_validate(yaml.safe_load((data / "checks.yaml").read_text()))
+        self.assembly = AssemblyDef.model_validate(yaml.safe_load((data / "assemblies" / f"{assembly}.yaml").read_text()))
+        cf = ChecksFile.model_validate(yaml.safe_load((data / spec["checks"]).read_text()))
         self.checks = cf.checks
         self.trailer_checks = cf.trailer_checks
         self.load = LoadCasesFile.model_validate(yaml.safe_load((data / "load_cases.yaml").read_text()))
         self.drawings = DrawingsFile.model_validate(yaml.safe_load((data / "drawings.yaml").read_text()))
-        self.steps = StepsFile.model_validate(yaml.safe_load((data / "steps.yaml").read_text())).steps
+        self.steps = StepsFile.model_validate(yaml.safe_load((data / "steps.yaml").read_text())).steps if spec["steps"] else []
         self.bike_geometry = yaml.safe_load(BIKE_GEOMETRY.read_text())
         from .inputs import Inputs
         self.inputs = Inputs(root)
         self.inputs.patch_parts(self.parts)
         raw = dict(self.assembly.params)
         for k, v in self.inputs.module_overrides(use_solved).items():
+            if k not in raw and assembly != "garage-bed":
+                continue   # the rule sets a parameter this assembly does not have (the bed beams, in the ute)
             if k not in raw:
                 raise KeyError(f"measurement rule sets unknown parameter {k}")
             raw[k] = v

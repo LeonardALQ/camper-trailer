@@ -29,6 +29,7 @@ RESEARCH = [
     ("10-car-wheels-and-tyres.md", "The car’s own wheels and tyres for towing", 10),
     ("11-chassis-design.md", "Chassis and drawbar design basis", 11),
     ("13-equipment.md", "Appliances, equipment and the energy system", 13),
+    ("17-ute-garage.md", "The enclosed motorbike garage on the LandCruiser 79", 17),
 ]
 
 
@@ -70,6 +71,10 @@ def main():
     _copy(BUILD / "trailer" / "body-raised.viewer.json", SITE / "public" / "models" / "body-raised.json")
     _copy(BUILD / "trailer" / "body.step", SITE / "public" / "downloads" / "body.step")
     _copy(BUILD / "body" / "body.json", GEN / "body.json")
+    _copy(BUILD / "ute" / "ute.json", GEN / "ute.json")
+    _copy(BUILD / "ute" / "ute.viewer.json", SITE / "public" / "models" / "ute.json")
+    _copy(BUILD / "ute" / "ute-loading.viewer.json", SITE / "public" / "models" / "ute-loading.json")
+    _copy(BUILD / "ute" / "ute.step", SITE / "public" / "downloads" / "ute.step")
     _copy(BUILD / "chassis" / "chassis.json", GEN / "chassis.json")
     _copy(BUILD / "chassis" / "chassis-cut-list.csv", SITE / "public" / "downloads" / "chassis-cut-list.csv")
     import cairosvg

@@ -1,0 +1,125 @@
+# Checks for the ute's bike garage (UTE-GARAGE.md), measured on the B-rep model of data/assemblies/ute-garage.yaml.
+# The clearance limits are DESIGN.md's (the trailer garage's CLR-03, CLR-04 and CLR-09) and Toyota's wheel house
+# clearances (BBGJ1007 p. 28). Limits are never changed to make a check pass. cad/ute_garage.py adds the deck mount
+# loads and the ramp angle, which are computed rather than measured.
+checks:
+  - id: UGC-01
+    title: Tuareg to Street Triple, anywhere
+    type: clearance
+    a: [TU]
+    b: [ST]
+    min_gap_mm: 30
+    severity: fail
+    inputs: [TU-01, TU-05, TU-07, ST-01]
+    why: The trailer's CLR-03. The bikes stand side by side at the trailer's spacing, so the same pairs govern.
+  - id: UGC-02
+    title: Each bike to the walls, roof, wheel tubs, closed doors and everything stowed in the box
+    type: clearance
+    each: [TU, ST]
+    b: [B2, B3, B5, B6, D1, D3, D4, "14", 14P, R1, V2, V3, V5, K2, K3, T1]
+    min_gap_mm: 15
+    severity: fail
+    inputs: [TU-05, TU-07, ST-01, CHK-01]
+    why: The trailer's CLR-04. Bars, pegs, panniers, belly pans and tyres must not touch the walls, the roof bows, the tubs, the closed barn doors and kerb door, the winch, the stowed ramp, the extinguisher, the tool chests or the chain anchors.
+  - id: UGC-03
+    title: Each bike rolled straight back clears the barn door opening
+    type: clearance
+    each: [TU, ST]
+    b: [C5]
+    min_gap_mm: 15
+    severity: fail
+    inputs: [TU-01, TU-03, TU-05, ST-01]
+    why: The trailer's CLR-09. Each bike unloads backwards through the barn doors, so it must pass the portal round the opening. Going down the ramp the bike pitches nose-up about its front tyre, which only lowers the parts behind the front axle.
+  - id: UGC-04
+    title: Tuareg with the photo-measured 2,263 mm length to the stowed ramp and the closed leaves
+    type: clearance
+    a: [TU-2263]
+    b: [R1, D1]
+    min_gap_mm: 15
+    severity: report
+    inputs: [CHK-01]
+    why: Reported, as the trailer's CLR-06b. Aprilia's image shows the plate hanger further back than the owner's 2,220 mm.
+  - id: UGC-05
+    title: Tuareg with the photo-measured 1,390 mm screen to the roof bows and the header
+    type: clearance
+    a: [TU-1390]
+    b: [B5, B6]
+    min_gap_mm: 15
+    severity: report
+    inputs: [TU-03, TU-04]
+    why: Reported. The model uses the owner's 1,370 mm height.
+  - id: UGC-06
+    title: Tuareg's panniers to the straps and track fittings
+    type: clearance
+    a: [TU-BAGS]
+    b: ["12", "13"]
+    min_gap_mm: 0
+    severity: report
+    inputs: [TU-05, TU-06]
+    why: As the trailer's CLR-08. A strap must not pass through a bag. No limit is set, so the gap is reported.
+  - id: UGW-01
+    title: Rear tyres at full bump to the wheel tubs and the floor structure
+    type: clearance
+    each: [C4R, C4K]
+    b: [B1, B2, B5, S1, S2, S4, S5, S6]
+    min_gap_mm: 25
+    severity: fail
+    inputs: []
+    why: Toyota BBGJ1007 p. 28 asks for 25 mm above the tyre at full bump. The tyre sweep runs from static up 110 mm of bump travel (estimate), so this also covers the tub ends and the outriggers either side.
+  - id: UGW-02
+    title: Rear tyres to the inboard wall of each tub, the runners and the mounts
+    type: clearance
+    each: [C4R, C4K]
+    b: [B2.R-in, B2.K-in, S1, S7, S8]
+    min_gap_mm: 40
+    severity: fail
+    inputs: []
+    why: Toyota BBGJ1007 p. 28 asks for 40 mm inside the tyre.
+  - id: UGW-03
+    title: Rear tyres to the side wall skins
+    type: clearance
+    each: [C4R, C4K]
+    b: [B3.road, B3.kerb]
+    min_gap_mm: 30
+    severity: fail
+    inputs: []
+    why: Toyota BBGJ1007 p. 28 asks for 30 mm outside the tyre.
+  - id: UGR-01
+    title: Worst strap load within the strap's 1,000 kg lashing capacity, report 03's load cases
+    type: restraint
+    restraint: {factor: 2.0, share: 0.6, lc_kg: 1000, cases: {forward_g: 0.8, rearward_g: 0.5, lateral_g: 0.5, up_g: 1.0},
+                cg_z: {TU: 700, ST: 600}}
+    severity: fail
+    inputs: []
+    why: The trailer's RES-01 method, which report 17 keeps for the ute. The NHVR's 2025 Load Restraint Guide keeps the 2018 performance standards, multiplied here by report 03's off-road factor of 2, with 1.0 g upward. Every anchor is designed for 20 kN.
+  - id: UGK-01
+    title: The load path from the track to Toyota's brackets touches without overlap, and the box sits on the subframe
+    type: contact
+    pairs:
+      - [10.TU, B1]
+      - [10.ST, B1]
+      - [11.front, S3.front]
+      - [11.rear, S3.rear]
+      - [S3.front, S2.front]
+      - [S3.rear, S2.rear]
+      - [S2.front, S7.1R]
+      - [S2.front, S7.1K]
+      - [S2.rear, S8.6R]
+      - [S2.rear, S8.6K]
+      - [S7.1R, C1.1R]
+      - [S8.6K, C1.6K]
+      - [S1.R-mid, S7.2R]
+      - [S1.K-mid, S8.5K]
+      - [B1, S4.1]
+      - [B1, S9.front-a]
+      - [B1, S9.rear-b]
+      - [S9.front-a, S3.front]
+      - [S9.rear-b, S3.rear]
+      - [T1.road, B2.R-top]
+      - [T1.kerb, B2.K-top]
+      - [S1.R-mid, C2.R]
+      - [S2.front, C2.K]
+    tolerance_mm: 0.01
+    severity: fail
+    inputs: []
+    why: The anchors must reach steel (UTE-GARAGE.md). Each L-track row sits on its packer on a steel crossmember, which bolts through its mounts to Toyota's brackets, and parts that carry load must touch their supports with no overlap.

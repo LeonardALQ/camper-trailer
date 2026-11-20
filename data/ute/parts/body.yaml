@@ -1,0 +1,67 @@
+# Ute garage body (UTE-GARAGE.md, report 17 sections 2.5 and 6): a one-piece welded aluminium box, TIG-welded 5052-H32
+# skins on a 6061-T6 SHS frame. Masses at 2.68 g/cm3 for 5052 sheet and 2.70 g/cm3 for 6061 tube, so the per-area and
+# per-length figures are calculated and the model measures the area and length of every body.
+group: ute-body
+parts:
+  U-FLOOR:
+    name: Floor plate
+    product: 5052-H32 marine sheet, 4.0 mm, with cut-outs for the wheel tubs and the two L-track rows
+    maker: All Aluminium (stock)
+    part_no: Marine sheet 5052-H32 4.0 mm (MAT-03)
+    qty: 4.0
+    unit: m2
+    mass: {basis: per_area, kg_per_m2: 10.72, maturity: calculated, source: "4.0 mm at 2.68 g/cm3. All Aluminium lists 30.9 kg per 2,400 x 1,200 mm sheet (report 17, MAT-03)"}
+    size: 2,587.5 x 1,845 mm less the cut-outs
+    notes: Welded to the wall frames and the tubs, and bolted down to the subframe through sealed holes. Coated with U-POL Raptor.
+    geometry: {generator: panel, params: {}}
+    color: "#9aa5ab"
+  U-TUB:
+    name: Wheel tubs
+    product: 5052-H32 sheet, 3.0 mm, folded and welded into the floor
+    maker: Owner made
+    qty: 0.9
+    unit: m2
+    mass: {basis: per_area, kg_per_m2: 8.04, maturity: calculated, source: "3.0 mm at 2.68 g/cm3"}
+    size: 871 x 370 mm each, top 86.5 mm above the floor
+    rating: 25 mm over the tyre at full bump, 40 mm inside it and 30 mm fore and aft (Toyota BBGJ1007 p. 28)
+    notes: The tub top carries the side wall's bottom rail and the post at 1,200 mm.
+    geometry: {generator: panel, params: {}}
+    color: "#7f8c8d"
+  U-SKIN:
+    name: Wall and front skins
+    product: 5052-H32 marine sheet, 2.5 mm
+    maker: All Aluminium (stock)
+    part_no: Marine sheet 5052-H32 2.5 mm (MAT-02)
+    qty: 9.6
+    unit: m2
+    mass: {basis: per_area, kg_per_m2: 6.70, maturity: calculated, source: "2.5 mm at 2.68 g/cm3. All Aluminium lists 19.3 kg per sheet (MAT-02)"}
+    size: Sides 2,590 x 1,504 mm, front 1,845 x 1,504 mm
+    notes: TIG-welded to the frame. The kerb-side skin has the 1,200 x 1,000 mm opening for the lift-up door.
+    geometry: {generator: panel, params: {}}
+    color: "#dfe6e9"
+    alpha: 0.35
+  U-ROOF:
+    name: Roof skin
+    product: 5052-H32 marine sheet, 2.0 mm
+    maker: All Aluminium (stock)
+    part_no: Marine sheet 5052-H32 2.0 mm (MAT-01)
+    qty: 4.8
+    unit: m2
+    mass: {basis: per_area, kg_per_m2: 5.36, maturity: calculated, source: "2.0 mm at 2.68 g/cm3. All Aluminium lists 15.4 kg per sheet (MAT-01)"}
+    size: 2,590 x 1,850 mm
+    notes: Not a load-carrying roof. Nothing is carried on it.
+    geometry: {generator: panel, params: {}}
+    color: "#dfe6e9"
+    alpha: 0.25
+  U-FRAME:
+    name: Body frame
+    product: 6061-T6 square tube 40 x 40 x 3
+    maker: All Aluminium (stock)
+    part_no: Square tube 40 x 40 x 3 (MAT-04)
+    qty: 40
+    unit: m
+    mass: {basis: per_length, kg_per_m: 1.20, maturity: calculated, source: "444 mm2 at 2.70 g/cm3. All Aluminium lists 7.8 kg per 6.5 m (MAT-04)"}
+    size: Posts, rails, roof bows and the rear portal
+    notes: The engineer designs the welds to the softened strength next to each weld (report 17 section 2.5).
+    geometry: {generator: tube, params: {wall: 3}}
+    color: "#b2bec3"

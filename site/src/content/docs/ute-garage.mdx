@@ -1,0 +1,98 @@
+---
+title: Ute garage
+description: The LandCruiser 79 and the enclosed bike garage on its tray, with the 3D model, the ute and box checks, the mass lines and the drawings.
+---
+
+import CadViewer from '../../components/CadViewer.astro';
+import Ute from '../../components/Ute.astro';
+import { withBase } from '../../lib/url';
+
+Leonard has replaced the Porsche Cayenne with a Toyota LandCruiser 79 single cab V8. It carries both bikes in an
+enclosed, lockable box on the back, so the trailer can be made smaller and lighter later. The ute runs a Lovells
+4,200 kg GVM kit. GVM (gross vehicle mass) is the most the loaded ute may weigh. The box is a one-piece welded
+aluminium body on its own subframe, from research report 17. The design basis is in `UTE-GARAGE.md`.
+
+This is a planning-level proposal for the engineer to check. The trailer's own garage stays in the model until the
+trailer is redesigned.
+
+<Ute kind="summary" />
+
+## 3D model
+
+The ute as it travels, with the box closed. The tree on the left lists every panel, tube, door, mount and fitting.
+Hide the body group to see the bikes, the straps and the tool chests inside.
+
+<CadViewer src={withBase('/models/ute.json')} height={520} />
+
+### Loading
+
+Parked for loading, the barn doors fold flat against the side walls and the ramp hooks on the sill. The winch on the
+front wall pulls each bike up the ramp into its chock.
+
+<CadViewer src={withBase('/models/ute-loading.json')} height={520} />
+
+The 3D model is also a <a href={withBase('/downloads/ute.step')}>STEP file</a>.
+
+## Sizes
+
+<Ute kind="sizes" />
+
+## How it is built
+
+- **Body.** The walls and front are 2.5 mm 5052 aluminium sheet and the roof is 2.0 mm, TIG-welded to a frame of
+  40 x 40 x 3 mm square tube. The floor is a 4 mm plate. Two wheel tubs stand 86.5 mm above it, so the floor can sit
+  low on the frame rails. The tubs keep Toyota's clearances round the tyre at full bump (estimate).
+- **Subframe.** Two aluminium runners lie on the frame rails on rubber strips, with crossmembers and outriggers
+  between and outside them. Under each L-track row a galvanised steel crossmember bolts straight to a pair of
+  Toyota's deck mount brackets, so the strap anchors reach the frame through steel. Nothing is drilled or welded on
+  the frame.
+- **Mounting.** The box bolts to Toyota's six pairs of deck mount brackets. The front two pairs are firm, with two
+  M12 bolts each. The rear four pairs are compliant, with one M12 bolt through rubber cushions, so the frame can twist
+  under the box.
+- **Doors.** Two barn-door leaves close the back. The kerb-side leaf shoots bolts into the header and the sill from
+  inside. The road-side leaf closes over it on a full-height cam bar, and an ABLOY PL362 padlock on a shrouded hasp
+  locks the cam handle. A lift-up door on the kerb side reaches the Street Triple's straps.
+- **Security.** A Teltonika FMC130 tracker with door switches and a siren, a Monimoto 9 tracker in each bike, a disc
+  lock on each front disc, and a chain from each bike to a ground anchor.
+- **Restraint.** As in the trailer's garage: a Condor chock for each front wheel, two flush L-track rows, LC 1,000 kg
+  straps and the WARN winch. LC (lashing capacity) is a strap's rated working load.
+- **Tools.** Two chests ride on the wheel tubs, low in the box and ahead of the ramp. The outer front straps run
+  through the box's front corners, so the chests cannot go there.
+
+## The ute
+
+Case UC3 is the heaviest: towing a 3,000 kg trailer with both bikes in the box and 250 kg on the towball. The static
+stability factor (SSF) is half the track divided by the centre of gravity height. A lower SSF means a higher risk of
+rolling over.
+
+<Ute kind="cases" />
+
+<Ute kind="checks" />
+
+## Checks
+
+The clearance and contact checks are measured on the 3D model. Clearance limits are the trailer garage's, and the
+tyre clearances are Toyota's. A fail check that misses its limit fails the build. A reported check is shown and
+never fails it.
+
+<Ute kind="garage-checks" />
+
+### Deck mount loads
+
+Report 03's load cases with its off-road factor of 2: braking at 1.6 g, cornering at 1.0 g and a net 1.0 g upward, on
+the box and everything in it with the growth allowance. Toyota publishes no capacity for its brackets, so the
+engineer confirms them.
+
+<Ute kind="mounts" />
+
+## Mass
+
+Each line gives its basis. A maker's figure carries no growth allowance, a calculated mass 7 % and an estimate 20 %.
+
+<Ute kind="mass" />
+
+## Drawings
+
+All four drawings are DRAFT. The <a href={withBase('/drawings/')}>Drawings</a> page has the previews.
+
+<Ute kind="drawings" />

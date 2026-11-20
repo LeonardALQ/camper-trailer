@@ -1,0 +1,91 @@
+# Ute garage subframe and mounts (report 17 section 2.3). The box sits on its own ladder subframe on the frame rails:
+# aluminium runners and crossmembers, and a galvanised steel crossmember under each L-track row so the strap anchors
+# reach steel. It bolts to Toyota's six pairs of deck mount brackets, firm at the front two pairs and compliant at
+# the rear four, with no drilling or welding of the frame.
+group: ute-subframe
+parts:
+  U-RUNNER:
+    name: Subframe runners
+    product: 6061-T6 RHS 75 x 50 x 3, laid flat on each rail over a 6 mm rubber strip
+    maker: All Aluminium (stock)
+    part_no: RHS 75 x 50 x 3 (MAT-07)
+    qty: 5.0
+    unit: m
+    mass: {basis: per_length, kg_per_m: 1.93, maturity: calculated, source: "All Aluminium lists 12.5 kg per 6.5 m (MAT-07)"}
+    size: Three lengths each side, cut at the two steel crossmembers
+    notes: Bolted to the steel crossmembers through steel angle cleats with nylon isolating sleeves and washers, so the aluminium and the galvanised steel do not touch.
+    geometry: {generator: tube, params: {wall: 3}}
+    color: "#636e72"
+  U-STEEL-CM:
+    name: Steel anchor crossmembers
+    product: Galvanised C350L0 RHS 76 x 38 x 3, laid flat, one under each L-track row, full width
+    maker: Orrcon or equal (stock)
+    qty: 3.7
+    unit: m
+    mass: {basis: per_length, kg_per_m: 5.2, maturity: calculated, source: "648 mm2 at 7.85 g/cm3 (5.09 kg/m) plus about 2 % for the zinc"}
+    size: 76 x 38 mm, 1,845 mm long
+    rating: Each sits on the rails and bolts straight to a pair of Toyota's brackets, so a strap's load reaches the frame through steel only
+    notes: The L-track bolts down through the floor plate and the packer into the crossmember's top wall with M8 bolts and crush tubes at 150 mm pitch or less.
+    geometry: {generator: tube, params: {wall: 3}}
+    color: "#2c3e50"
+  U-PACKER:
+    name: Track packers
+    product: Galvanised steel flat bar 76 x 2 mm on top of each steel crossmember
+    maker: Owner made
+    qty: 0.28
+    unit: m2
+    mass: {basis: per_area, kg_per_m2: 15.7, maturity: calculated, source: "2.0 mm at 7.85 g/cm3"}
+    notes: The track sits on it, so the 13.7 mm track ends 0.3 mm below the floor top on the 38 mm crossmember.
+    geometry: {generator: box, params: {}}
+    color: "#2c3e50"
+  U-STRIP:
+    name: Floor strips beside each track
+    product: 6060 aluminium flat bar 20 x 10 mm, two each side of each track, on isolating tape
+    maker: Stock
+    qty: 0.15
+    unit: m2
+    mass: {basis: per_area, kg_per_m2: 27.0, maturity: calculated, source: "10 mm at 2.70 g/cm3"}
+    notes: Carry the floor plate's edges either side of the track's slot.
+    geometry: {generator: box, params: {}}
+    color: "#636e72"
+  U-CM:
+    name: Crossmembers and outriggers
+    product: 6061-T6 SHS 50 x 50 x 3
+    maker: All Aluminium (stock)
+    qty: 11
+    unit: m
+    mass: {basis: per_length, kg_per_m: 1.52, maturity: calculated, source: "564 mm2 at 2.70 g/cm3"}
+    size: Eight crossmembers between the runners and six outriggers each side, none over the wheels
+    notes: Welded to the runners. The floor plate sits on them and on the steel crossmembers.
+    geometry: {generator: tube, params: {wall: 3}}
+    color: "#636e72"
+  U-MOUNT-FIRM:
+    name: Firm mounts, front two pairs
+    product: Mount angle or spacer with two M12 property class 8.8 bolts, hardened washers and nyloc nuts through Toyota's bracket
+    maker: Owner made
+    qty: 4
+    unit: each
+    mass: {basis: declared, unit_kg: 1.2, maturity: estimate, source: "6 mm angle, 80 mm long, and two M12 bolt sets (estimate)"}
+    rating: Two M12 8.8 bolts, AS 4100 design capacity 56.0 kN in tension and 31.4 kN in shear each
+    notes: These carry the box's fore and aft load and hold it to the frame at the front.
+    geometry: {generator: box, params: {}}
+    color: "#e17055"
+  U-MOUNT-SPRING:
+    name: Compliant mounts, rear four pairs
+    product: Mount angle or spacer with one M12 8.8 bolt through a stack of two rubber body-mount cushions, a steel sleeve that sets the preload, and an oversize safety washer
+    maker: Product to choose (body-mount cushions)
+    qty: 8
+    unit: each
+    mass: {basis: declared, unit_kg: 1.0, maturity: estimate, source: "Estimate"}
+    rating: One M12 8.8 bolt. The safety washer holds the box if a cushion fails
+    notes: The cushions let the frame twist under the box, so the walls and door frames do not take the frame's twist (report 17 section 2.3).
+    geometry: {generator: box, params: {}}
+    color: "#fdcb6e"
+  U-SUB-FIX:
+    name: Floor bolts, isolators and sealant
+    product: M8 bolts through the floor into the crossmembers, nylon isolating sleeves, polyurethane sealant
+    maker: Product to choose
+    qty: 1
+    unit: set
+    mass: {basis: declared, total_kg: 2.5, maturity: estimate, source: "Estimate"}
+    cog: {at: [1250, 0, -30], basis: "Spread over the subframe, estimate"}

@@ -19,6 +19,7 @@ export default defineConfig({
         { label: 'Chassis', link: '/chassis/' },
         { label: 'Body', link: '/body/' },
         { label: 'Garage and bed', link: '/garage-bed/' },
+        { label: 'Ute garage', link: '/ute-garage/' },
         { label: 'Measurements', link: '/measurements/' },
         { label: 'Drawings', link: '/drawings/' },
         { label: 'Build steps (draft)', items: [{ autogenerate: { directory: 'steps' } }] },

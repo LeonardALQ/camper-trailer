@@ -25,7 +25,8 @@ def _solid(ute, s):
     return Pos(cx, cy, cz) * Rot(90, 0, 0) * Cylinder(c["r"], c["w"])
 
 
-def ute_compound(ute, garage_model=None, label="UTE-79", loading=False):
+def vehicle_solids(ute) -> list:
+    """The cab chassis, wheels and accessories as labelled envelope solids in the ute frame."""
     V = ute.V
     vehicle = []
     for s in ute.d["solids"]:
@@ -37,6 +38,26 @@ def ute_compound(ute, garage_model=None, label="UTE-79", loading=False):
         shp = Pos(x, y, V["tyre_slr"]) * Rot(90, 0, 0) * Cylinder(V["tyre_d"] / 2, V["tyre_w"])
         shp.label, shp.color = f"Wheel {w['id']}, ROH Trak 2 with LT265/75R16", rgba("#1c2833")
         vehicle.append(shp)
+    return vehicle
+
+
+def garage_solids(ute, garage_model, loading=False, groups=None, exclude=()):
+    """The garage module's bodies moved into the ute frame, as (instance, shape) pairs."""
+    dx, dz = ute.garage["module_x0"], ute.garage["deck_z"]
+    out = []
+    for mb in garage_model.built.values():
+        i = mb.inst
+        if i.check_only or (i.display == "loading_only" and not loading) or (i.display == "closed_only" and loading):
+            continue
+        if (groups and i.group not in groups) or i.ref in exclude or i.iid in exclude:
+            continue
+        out.append((i, _moved(mb.shape, Pos(dx, 0, dz))))
+    return out
+
+
+def ute_compound(ute, garage_model=None, label="UTE-79", loading=False):
+    V = ute.V
+    vehicle = vehicle_solids(ute)
     kids = [Compound(label="Cab chassis and accessories", children=vehicle)]
     if garage_model is None:
         b = ute.box_extent()
@@ -46,13 +67,8 @@ def ute_compound(ute, garage_model=None, label="UTE-79", loading=False):
         s.label, s.color = "UT-08 Bike box envelope (report 17, until U2)", rgba("#b2bec3", 0.35)
         kids.append(Compound(label="Bike box", children=[s]))
     else:
-        dx, dz = ute.garage["module_x0"], V["deck_z"]
         groups: dict[str, list] = {}
-        for mb in garage_model.built.values():
-            i = mb.inst
-            if i.check_only or (i.display == "loading_only" and not loading) or (i.display == "closed_only" and loading):
-                continue
-            s = _moved(mb.shape, Pos(dx, 0, dz))
+        for i, s in garage_solids(ute, garage_model, loading=loading):
             part = garage_model.prj.parts[i.part]
             s.label, s.color = f"{i.iid} {i.label}".replace("/", "-"), rgba(part.color, part.alpha)
             groups.setdefault(i.group, []).append(s)

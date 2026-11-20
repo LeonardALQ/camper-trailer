@@ -1,0 +1,26 @@
+# Tools, stowed low in the box: a chest on each wheel tub, beside each bike's middle and ahead of the bikes' rear
+# straps. The outer front straps run through the box's front corners, so the chests cannot go there.
+group: ute-tools
+parts:
+  U-TOOLBOX:
+    name: Tool chests
+    product: 1.6 mm aluminium chest with a lid, bolted to the wheel tub, 780 mm long and 200 mm high
+    maker: Owner made or to choose
+    qty: 2
+    unit: each
+    mass: {basis: declared, unit_kg: 5.0, maturity: estimate, source: "About 0.9 m2 of 1.6 mm aluminium at 4.3 kg/m2 plus hinges and a latch (estimate)"}
+    size: 780 x 300 x 200 mm on the road side (47 L) and 780 x 220 x 200 mm on the kerb side (34 L)
+    notes: The kerb-side chest sits under the kerb door's sill, so it is reached through that door with the bikes in. The road-side chest is reached with the Tuareg out.
+    geometry: {generator: box, params: {}}
+    color: "#6c5ce7"
+  U-TOOLS:
+    name: Tools and recovery gear
+    product: The owner's tools, spares and recovery gear
+    maker: Owner
+    qty: 1
+    unit: set
+    mass: {basis: declared, total_kg: 60, maturity: estimate, source: "Report 17 open question 5: 60 kg (estimate)"}
+    payload: true
+    notes: Carried in the two chests. 60 kg in 81 L is dense, so bulky recovery gear may need the space beside the ramp. Weigh and measure the real kit.
+    cog: {at: ["tool_x0 + tool_l / 2", "((half_width - 10 - tool_w / 2) * tool_w - (half_width - 10 - tool_wk / 2) * tool_wk) / (tool_w + tool_wk)", "tool_z0 + tool_h / 2"],
+          basis: "Volume-weighted centre of the two chests"}

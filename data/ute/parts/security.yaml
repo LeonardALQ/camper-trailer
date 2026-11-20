@@ -1,0 +1,46 @@
+# Ute garage security (report 17 section 4). The box hides the bikes and makes the quick ways in fail. The alarm
+# and the trackers buy time. Masses and prices are report 17's estimates unless marked.
+group: ute-security
+parts:
+  U-HASP:
+    name: Padlocks and shrouded hasps
+    product: Two ABLOY PL362 padlocks (15 mm boron steel shackle, grade 6 to EN 12320), one on a shrouded hasp over the cam handle, one on the kerb door's hasp
+    maker: ABLOY
+    part_no: PL362
+    qty: 2
+    unit: each
+    mass: {basis: declared, unit_kg: 1.4, maturity: estimate, source: "Report 17 LCK-01: padlock 1.0 kg (estimate), hasp and shroud 0.4 kg (estimate)"}
+    links: {maker: "https://www.abloy.com/au/en/products/padlocks/abloy-pl362"}
+    notes: The model shows the barn door's padlock. The kerb door's sits on its hasp at the door's rear edge.
+    geometry: {generator: box, params: {}}
+    color: "#d63031"
+  U-ANCHOR:
+    name: Ground anchors and chains
+    product: Ground anchor and 1.5 m hardened chain per bike, the anchor bolted through the floor into a crossmember
+    maker: Product to choose
+    qty: 2
+    unit: each
+    mass: {basis: declared, unit_kg: 4.0, maturity: estimate, source: "Report 17 SEC-02 (estimate)"}
+    notes: NSW Police advise locking bikes to anchor points even inside a garage. The chains are stowed on the anchors.
+    geometry: {generator: box, params: {}}
+    color: "#2d3436"
+  U-TRACKER:
+    name: Box tracker and alarm
+    product: Teltonika FMC130 hard-wired 4G tracker with backup battery, reed switches on the three doors, 12 V siren on its output
+    maker: Teltonika
+    part_no: FMC130
+    qty: 1
+    unit: set
+    mass: {basis: declared, unit_kg: 0.8, maturity: estimate, source: "Report 17 TRK-01 0.2 kg and TRK-03 0.6 kg (estimates)"}
+    links: {stockist: "https://wisp.net.au/teltonika-fmc130.html"}
+    geometry: {generator: box, params: {}}
+    color: "#0984e3"
+  U-BIKE-SEC:
+    name: Bike trackers and disc locks
+    product: A Monimoto 9 hidden in each bike and an alarmed disc lock on each front disc
+    maker: Monimoto, disc lock to choose
+    qty: 1
+    unit: set
+    mass: {basis: declared, total_kg: 1.8, maturity: estimate, source: "Report 17 TRK-02 0.1 kg each and SEC-01 0.8 kg each (estimates)"}
+    removable: true
+    cog: {at: ["front_tyre_x + 400", "(tuareg_y + st_y) / 2", 450], basis: "At the bikes' front wheels, estimate"}

@@ -1,0 +1,143 @@
+---
+// Ute and bike garage tables, from build/ute/ute.json (cad/ute.py and cad/ute_garage.py).
+import u from '../data/generated/ute.json';
+import { withBase } from '../lib/url';
+
+interface Props {
+  kind: 'summary' | 'sizes' | 'cases' | 'checks' | 'garage-checks' | 'mass' | 'mounts' | 'drawings';
+}
+const { kind } = Astro.props;
+const r: any = u;
+const g: any = r.garage;
+const n = (v: number | null | undefined, d = 0) =>
+  v == null ? '' : (Math.abs(v) < 0.5 * 10 ** -d ? 0 : v).toLocaleString('en-AU', { minimumFractionDigits: d, maximumFractionDigits: d });
+const statusClass = (x: any) => (x.ok ? 'status-pass' : x.severity === 'fail' ? 'status-fail' : 'status-report');
+const rowClass = (x: any) => (x.ok ? '' : x.severity === 'fail' ? 'row-fail' : 'row-report');
+const cs = Object.fromEntries(r.cases.map((c: any) => [c.id, c]));
+const allChecks = [...r.checks, ...g.checks];
+const fails = allChecks.filter((x: any) => x.severity === 'fail' && !x.ok);
+const d = g.dims;
+const boxLines = r.lines.filter((x: any) => x.group !== 'ute' && x.group !== 'bikes' && x.id !== 'U-TOOLS');
+const groups = ['body', 'subframe', 'doors', 'restraint', 'security', 'tools'];
+const groupName: any = { body: 'Body', subframe: 'Subframe and mounts', doors: 'Doors', restraint: 'Restraint, loading and safety', security: 'Security', tools: 'Tool chests' };
+const sub = (x: any) => {
+  if (!x.sub) return '';
+  const w = x.sub.split(' ');
+  return ` (${w[0] === 'Road-side' ? 'road' : w[0] === 'Kerb-side' ? 'kerb' : w[1]})`;
+};
+const val = (x: any) => {
+  if (x.type === 'contact') return `${x.pairs.filter((p: any) => p.ok).length} of ${x.pairs.length} touch`;
+  if (x.type === 'restraint') return `${n(x.measured_mm)} kgf`;
+  const m = x.measured ?? x.measured_mm;
+  return `${n(m, x.unit === '' ? 3 : 1)} ${x.unit ?? 'mm'}`;
+};
+const drawings = ['CT-701', 'CT-702', 'CT-703', 'CT-704'];
+---
+
+{kind === 'summary' && (
+  <p>
+    Towing with both bikes aboard (case UC3), the ute weighs {n(cs.UC3.nominal.mass_kg)} kg, {n(cs.UC3.growth.mass_kg)} kg with the
+    growth allowance. Its rear axle carries {n(cs.UC3.growth.rear_kg)} kg of its {n(r.limits.rear_axle_kg)} kg rating, and the
+    combination with a {n(r.params.trailer_atm)} kg trailer is {n(cs.UC3.growth.mass_kg + r.params.trailer_atm - cs.UC3.growth.towball_kg)} kg
+    against the {n(r.limits.gcm_kg)} kg GCM. The box is {n(d.outside_l_body)} x {n(d.outside_w)} mm outside and weighs {n(g.box_kg, 1)} kg
+    empty ({n(g.box_kg_growth, 1)} kg with growth) against report 17's 440 kg. {fails.length === 0
+      ? 'Every fail check passes.' : `${fails.length} checks fail: ${fails.map((x: any) => x.id).join(', ')}.`}
+  </p>
+)}
+
+{kind === 'sizes' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Size</th><th class="num">mm</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Outside length, body</td><td class="num">{n(d.outside_l_body)}</td><td>{n(d.outside_l)} mm with the cam bar and hasp</td></tr>
+        <tr><td>Outside width</td><td class="num">{n(d.outside_w)}</td><td>The decision log's limit is 1,850 mm</td></tr>
+        <tr><td>Outside height above the floor</td><td class="num">{n(d.outside_h)}</td><td>Roof top {n(d.top_z)} mm above the ground</td></tr>
+        <tr><td>Inside length</td><td class="num">{n(d.inside_l)}</td><td>Front wall to the closed barn doors</td></tr>
+        <tr><td>Inside width</td><td class="num">{n(d.inside_w)}</td><td>Between the wall frames</td></tr>
+        <tr><td>Inside height</td><td class="num">{n(d.inside_h)}</td><td>To the roof bows and the door header</td></tr>
+        <tr><td>Rear opening</td><td class="num">{n(d.opening_w)} x {n(d.opening_h)}</td><td>Clear, between the hinge gaps</td></tr>
+        <tr><td>Floor above the ground</td><td class="num">{n(d.deck_z)}</td><td>Laden, estimate. {n(d.deck_z + 30)} mm with the bikes out</td></tr>
+        <tr><td>Wheel tubs above the floor</td><td class="num">{n(d.tub_h, 1)}</td><td>25 mm over the tyre at full bump (estimate)</td></tr>
+        <tr><td>Bike centrelines</td><td class="num">{n(d.tuareg_y, 0)} / {n(d.st_y, 0)}</td><td>Tuareg road side, Street Triple kerb side, {n(d.bike_spacing)} mm apart</td></tr>
+        <tr><td>Ramp angle</td><td class="num">{n(d.ramp_deg, 1)} deg</td><td>Bikes out. {n(d.ramp_deg_laden, 1)} degrees at the laden floor height</td></tr>
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'cases' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Case</th><th class="num">Mass kg</th><th class="num">Front kg</th><th class="num">Rear kg</th><th class="num">Rear with growth</th>
+        <th class="num">Towball kg</th><th class="num">Front share</th><th class="num">CoG height mm</th><th class="num">SSF</th></tr></thead>
+      <tbody>
+        {r.cases.map((c: any) => (
+          <tr><td>{c.id} {c.name}</td><td class="num">{n(c.nominal.mass_kg)}</td><td class="num">{n(c.nominal.front_kg)}</td>
+            <td class="num">{n(c.nominal.rear_kg)}</td><td class="num">{n(c.growth.rear_kg)}</td><td class="num">{n(c.nominal.towball_kg)}</td>
+            <td class="num">{n(c.nominal.front_share_pct, 1)} %</td><td class="num">{n(c.nominal.cog[2])}</td><td class="num">{n(c.nominal.ssf, 3)}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{(kind === 'checks' || kind === 'garage-checks') && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>ID</th><th>Check</th><th class="num">Model</th><th>Limit</th><th>Result</th><th>Detail</th></tr></thead>
+      <tbody>
+        {(kind === 'checks' ? r.checks : g.checks).map((x: any) => (
+          <tr class={rowClass(x)}>
+            <td>{x.id}{sub(x)}</td><td>{x.title}</td><td class="num">{val(x)}</td><td>{x.limit}</td>
+            <td class={statusClass(x)}>{x.status}</td><td>{x.detail}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'mass' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Line</th><th>Item</th><th class="num">kg</th><th>Basis</th><th class="num">With growth</th><th>Source</th></tr></thead>
+      <tbody>
+        {groups.map((gr) => [
+          <tr><td colspan="6"><strong>{groupName[gr]}</strong>, {n(g.by_group[gr] ?? 0, 1)} kg</td></tr>,
+          ...boxLines.filter((x: any) => x.group === gr).map((x: any) => (
+            <tr><td>{x.id}</td><td>{x.item}</td><td class="num">{n(x.kg, 1)}</td><td>{x.maturity}</td><td class="num">{n(x.kg_growth, 1)}</td><td>{x.source}</td></tr>
+          )),
+        ])}
+        <tr><td></td><td><strong>Box, empty</strong></td><td class="num"><strong>{n(g.box_kg, 1)}</strong></td><td></td>
+          <td class="num"><strong>{n(g.box_kg_growth, 1)}</strong></td><td>Report 17: 440 kg</td></tr>
+        {r.lines.filter((x: any) => x.group === 'ute' || x.group === 'bikes' || x.id === 'U-TOOLS').map((x: any) => (
+          <tr><td>{x.id}</td><td>{x.item}</td><td class="num">{n(x.kg, 1)}</td><td>{x.maturity}</td><td class="num">{n(x.kg_growth, 1)}</td>
+            <td>{x.cases.join(', ')}. {x.source}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'mounts' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Case</th><th class="num">Station</th><th>Mount</th><th>Side</th><th class="num">Bracket kN (+ down)</th><th class="num">Bolt tension kN</th><th class="num">Bolt shear kN</th><th class="num">Interaction</th></tr></thead>
+      <tbody>
+        {g.mounts.rows.map((x: any) => (
+          <tr><td>{x.case}</td><td class="num">{x.station} ({x.dx_axle > 0 ? '+' : ''}{n(x.dx_axle)})</td><td>{x.mount}</td><td>{x.side}</td>
+            <td class="num">{n(x.bracket_kn, 2)}</td><td class="num">{n(x.bolt_tension_kn, 2)}</td><td class="num">{n(x.bolt_shear_kn, 2)}</td><td class="num">{n(x.interaction, 3)}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'drawings' && (
+  <ul>
+    {drawings.map((num) => (
+      <li><a href={withBase(`/drawings/#${num.toLowerCase()}`)}>{num}</a>: <a href={withBase(`/downloads/drawings/${num}.pdf`)}>PDF</a>, <a href={withBase(`/drawings/${num}.png`)}>PNG</a></li>
+    ))}
+  </ul>
+)}

@@ -22,6 +22,8 @@ const jobs = [
   { path: `/steps/${pick('11')}/`, name: 'step-11', viewer: true },
   { path: '/body/', name: 'body', viewer: true, full: true, sections: ['checks', 'panels', 'mass'] },
   { path: '/body/', name: 'body-raised', viewer: true, nth: 1 },
+  { path: '/ute-garage/', name: 'ute-garage', viewer: true, full: true, sections: ['checks', 'mass'] },
+  { path: '/ute-garage/', name: 'ute-garage-loading', viewer: true, nth: 1 },
   { path: '/drawings/', name: 'drawings', full: true },
   { path: '/research/03-bike-restraint-garage/', name: 'research-03' },
   { path: '/downloads/', name: 'downloads', full: true },

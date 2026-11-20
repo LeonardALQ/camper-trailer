@@ -14,6 +14,7 @@ from .prims import rgba
 GROUP_LABELS = {
     "bikes": "Bikes", "restraint": "Restraint", "bed": "Bed", "partitions": "Partitions",
     "safety": "Garage safety", "context": "Context",
+    "body": "Body", "subframe": "Subframe and mounts", "doors": "Doors", "security": "Security", "tools": "Tools",
 }
 
 

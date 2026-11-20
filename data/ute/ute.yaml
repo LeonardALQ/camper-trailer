@@ -42,7 +42,8 @@ params:
   box_l: 2590                  # outside length (report 17 section 6.2)
   box_w: 1850                  # outside width: the decision log's limit (cab 1,790 mm plus 60 mm)
   box_x1: box_x0 + box_l
-  deck_z: 909                  # box floor top (UTE-GARAGE.md: frame top + 6 mm pad + 50 mm runner + 75 mm crossmember + 4 mm floor)
+  deck_z: 834                  # box floor top: frame top + 6 mm pad + 50 mm subframe + 4 mm floor. The garage module
+                               # (data/assemblies/ute-garage.yaml) sets it. This copy places the U1 block when no module is built
   box_h: 1502                  # floor top to the roof top: 1,460 inside, 40 mm roof bows, 2 mm roof skin
   # ---------------------------------------------------------------- the trailer behind it (decision log targets)
   trailer_atm: 3000            # the redesigned trailer's ATM target (PLAN-79.md, 11:25 UTC)
@@ -69,6 +70,13 @@ limits:
   tyre_rating_kg: {v: 1550, src: "LT265/75R16 123/120 load range E at 80 psi (report 09)", basis: maker}
   coupling_window_mm: {v: [350, 460], src: "VSB1 towball height, vehicle fully loaded (report 08)", basis: law}
   ssf_reference: {v: 1.02, src: "Report 17 section 5.2, case B: the bikes in the trailer, a plain tray and the tools", basis: calculated}
+  cab_gap_min_mm: {v: 39, src: "Toyota BBGJ1007 p. 26: the body's front wall at least 39 mm off the cab at the roof", basis: maker}
+  box_mass_max_kg: {v: 440, src: "Report 17 section 6.7 total, empty. The decision log asks for a lighter box", basis: plan}
+  tub_height_max_mm: {v: 100, src: "Report 17 section 6.4: the lower floor works if the tubs stand no more than 100 mm above it", basis: plan}
+  ramp_angle_max_deg: {v: 20, src: "Report 03 section 10: the steepest ramp for walking a bike up beside it", basis: plan}
+  anchor_design_kn: {v: 20, src: "DESIGN.md and report 03: every strap anchor designed for 20 kN", basis: plan}
+  m12_tension_kn: {v: 56.0, src: "AS 4100 clause 9.3.2.2: 0.8 x 84.3 mm2 x 830 MPa for an M12 property class 8.8 bolt", basis: law}
+  m12_shear_kn: {v: 31.4, src: "AS 4100 clause 9.3.2.1: 0.8 x 0.62 x 830 MPa x 76.2 mm2, threads in the shear plane", basis: law}
 
 # The mass budget. `x`, `y`, `z` place each line's centre of gravity in the ute frame. `cases` lists the cases that
 # carry it (UC1 as built unladen, UC2 bikes aboard, UC3 towing with the bikes, UC4 towing with the bikes out,
@@ -130,7 +138,8 @@ lines:
     z: frame_top_z - 150
     maturity: estimate
     source: "Report 17 open question 5: 60 kg in about 0.3 m3 (estimate)"
-    cases: [UC2, UC3, UC4, UCB]
+    cases: [UC2, UC3, UC4]
+    box: true
   - id: UT-08
     item: "Bike box, empty, with the restraint kit, ramp, winch and security (report 17, until U2 designs it)"
     kg: 440
@@ -168,6 +177,14 @@ lines:
     maturity: spec
     source: "The plan's 250 kg cap (decision log). Carries no growth: it is set by the trailer's balance"
     cases: [UC3, UC4]
+  - id: UT-13
+    item: "Tools on the plain tray, for the reference case"
+    kg: 60
+    x: box_x0 + 350
+    z: frame_top_z - 150
+    maturity: estimate
+    source: "Report 17 section 5.1: 60 kg in under-tray boxes ahead of the rear wheels (estimate)"
+    cases: [UCB]
   - id: UT-12
     item: "Plain tray, for the reference case with the bikes in the trailer"
     kg: 200
@@ -214,6 +231,8 @@ checks:
      why: "The decision log sets 450 mm, plus or minus 20 mm, laden. VSB1 asks for 350 to 460 mm with the vehicle fully loaded"}
   - {id: UTE-14, title: "Trailer within the 3,500 kg braked towing capacity", type: towing, severity: fail,
      why: "Toyota's braked towing capacity, and the towbar's rating"}
+  - {id: UTE-15, title: "Box front wall at least 39 mm behind the cab", type: cab, limit: cab_gap_min_mm, severity: fail,
+     why: "Toyota BBGJ1007 p. 26, so the cab can move on its mounts without touching the body"}
 
 # Simple solids for the 3D model: [x0, y0, z0, dx, dy, dz] in the ute frame, a colour and an opacity.
 solids:

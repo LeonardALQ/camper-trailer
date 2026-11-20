@@ -1,0 +1,57 @@
+# Ute garage doors (report 17 sections 2.2, 4 and 6.3). Leaf masses are calculated from their skins and frames:
+# 2.5 mm 5052 at 6.70 kg/m2 and SHS 25 x 25 x 3 at 0.71 kg/m (MAT-05). Hardware is estimated.
+group: ute-doors
+parts:
+  U-LEAF:
+    name: Barn door leaves
+    product: Two leaves, 2.5 mm 5052 skin on an SHS 25 x 25 x 3 frame with a mid rail, EPDM bulb seal
+    maker: Owner made
+    qty: 2
+    unit: each
+    mass: {basis: declared, unit_kg: 12.4, maturity: calculated, source: "Skin 870 x 1,455 mm, 1.27 m2 at 6.70 kg/m2 (8.5 kg), frame 5.5 m at 0.71 kg/m (3.9 kg)"}
+    size: 870 x 1,455 x 27.5 mm each, inset in the rear portal and flush with its rear face
+    notes: The kerb-side leaf shuts first and shoots bolts into the header and the sill from inside. The road-side leaf closes over it on the cam bar. Each leaf folds 270 degrees flat against its side wall for loading.
+    geometry: {generator: box, params: {}}
+    color: "#c8d6e5"
+    alpha: 0.6
+  U-CAMBAR:
+    name: Cam bar locking gear
+    product: Full-height truck-van cam bar with top and bottom keepers and a handle that takes the padlock hasp
+    maker: Product to choose
+    qty: 1
+    unit: set
+    mass: {basis: declared, unit_kg: 4.0, maturity: estimate, source: "Report 17 LCK-03 (estimate)"}
+    size: About 1,380 mm long
+    notes: Locks the road-side leaf at the header and the sill, so a pry bar at the middle of the door gets nothing.
+    geometry: {generator: box, params: {}}
+    color: "#2d3436"
+  U-KDOOR:
+    name: Kerb-side lift-up door
+    product: 2.5 mm 5052 skin on an SHS 25 x 25 x 3 frame, top-hinged, on two gas struts, with a keyed latch and a hasp
+    maker: Owner made
+    qty: 1
+    unit: each
+    mass: {basis: declared, unit_kg: 12.0, maturity: calculated, source: "Skin 1,200 x 1,000 mm, 1.2 m2 at 6.70 kg/m2 (8.0 kg), frame 5.6 m at 0.71 kg/m (4.0 kg)"}
+    size: 1,200 x 1,000 x 27.5 mm, 300 to 1,300 mm above the floor
+    notes: Reaches the Street Triple's kerb-side front strap, which no one can reach past the bike (report 17 section 6.3).
+    geometry: {generator: box, params: {}}
+    color: "#c8d6e5"
+    alpha: 0.6
+  U-HINGES:
+    name: Continuous hinges and hinge-side dog bolts
+    product: Stainless continuous (piano) hinges, pins peened, with dog bolts on each leaf's hinge edge
+    maker: Product to choose
+    qty: 4.1
+    unit: m
+    mass: {basis: declared, total_kg: 3.7, maturity: estimate, source: "4.1 m at about 0.9 kg/m (estimate): two 1,455 mm leaf hinges and the kerb door's 1,200 mm"}
+    notes: The dog bolts engage the corner posts when the leaves shut, so a cut hinge does not free a leaf.
+    cog: {at: [1980, -270, 900], basis: "Length-weighted centre of the three hinges, estimate"}
+  U-LATCHES:
+    name: Shoot bolts, everyday latches, gas struts and seals
+    product: Two shoot bolts in the kerb-side leaf (LCK-04), three keyed T-handle latches (LCK-02), two gas struts for the kerb door, about 10 m of EPDM bulb seal
+    maker: Product to choose
+    qty: 1
+    unit: set
+    mass: {basis: declared, total_kg: 3.5, maturity: estimate, source: "Report 17: shoot bolts 0.8 kg, latches 0.3 kg each (0.9 kg), struts 0.35 kg each (0.7 kg), seal 10 m at 0.11 kg/m (1.1 kg)"}
+    notes: The latches are for short stops only. The padlocks are the security.
+    cog: {at: [2000, -300, 800], basis: "Spread over the barn doors and the kerb door, estimate"}

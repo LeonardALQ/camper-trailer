@@ -1,0 +1,42 @@
+# Ute garage context parts: what the box sits on and the solids the checks measure against. No BOM mass.
+group: ute-context
+parts:
+  U-LEAF-OPEN:
+    name: Barn door leaf, folded open against the side wall
+    kind: context
+    notes: Loading view only. The leaf's mass is U-LEAF.
+    geometry: {generator: box, params: {}}
+    color: "#c8d6e5"
+    alpha: 0.6
+  U-BRACKET:
+    name: Toyota deck mount bracket (envelope)
+    kind: context
+    notes: Part of the cab chassis. Taken as a flange 60 mm out from the rail's outer face, its top level with the rail top (assumption).
+    geometry: {generator: box, params: {}}
+    color: "#1c2833"
+  U-PAD:
+    name: Rubber strip on the rail
+    kind: context
+    notes: 6 mm under the runners and the steel crossmembers. Its mass is in U-SUB-FIX.
+    geometry: {generator: box, params: {}}
+    color: "#000000"
+  U-GROUND:
+    name: Assumed ground for loading
+    kind: context
+    geometry: {generator: box, params: {dx: 3600, dy: 1500, dz: 10}}
+    color: "#a3b18a"
+    alpha: 0.5
+  U-TYRE-SWEEP:
+    name: Rear tyre from static to full bump (check only)
+    kind: context
+    notes: The LT265/75R16 tyre's 805 x 268 mm envelope from its static position up 110 mm of bump travel (estimate).
+    geometry: {generator: tyre_sweep, params: {radius: 402.5, width: 268, rise: 110}}
+    color: "#ff0000"
+    alpha: 0.2
+  U-SWEEP:
+    name: Barn door opening swept along the box (check only)
+    kind: context
+    notes: A bike rolled straight back clears the portal if it clears this solid.
+    geometry: {generator: sweep, params: {}}
+    color: "#ff0000"
+    alpha: 0.2

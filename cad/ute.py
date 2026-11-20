@@ -38,7 +38,7 @@ class Ute:
             self.lines.append(dict(
                 id=ln["id"], item=ln["item"], kg=float(self.P.eval(ln["kg"], {})),
                 x=float(self.P.eval(ln["x"], {})), y=float(self.P.eval(ln.get("y", 0), {})), z=float(self.P.eval(ln["z"], {})),
-                maturity=ln["maturity"], source=ln["source"], cases=list(ln["cases"]), group="ute"))
+                maturity=ln["maturity"], source=ln["source"], cases=list(ln["cases"]), group="ute", box=bool(ln.get("box"))))
         if garage:
             self.lines.extend(garage["lines"])
         for ln in self.lines:
@@ -148,6 +148,11 @@ class Ute:
                                f"{V['coupling_z']:.0f} mm plus or minus {V['coupling_tol']:.0f} mm gives {a:.0f} to {b:.0f} mm against "
                                f"{lo:.0f} to {hi:.0f} mm" + (f", so set the tongue for {V['coupling_z']:.0f} mm, minus {V['coupling_tol']:.0f} "
                                                               f"or plus {hi - V['coupling_z']:.0f} mm" if b > hi else "")))
+            elif t == "cab":
+                gap = self.box_extent()["x0"] - V["cab_back_x"]
+                lim = L[c["limit"]]
+                row.update(limit=f">= {lim:.0f} mm", measured=round(gap, 1), unit="mm", margin=round(gap - lim, 1), ok=gap >= lim - 1e-6,
+                           governing="box front wall to the back of the cab", detail=f"{gap:.0f} mm from the cab's back to the box's front wall")
             elif t == "towing":
                 v, lim = V["trailer_atm"], L["braked_towing_kg"]
                 row.update(limit=f"<= {lim:.0f} kg", measured=v, unit="kg", margin=lim - v, ok=v <= lim, governing="trailer ATM target",

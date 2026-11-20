@@ -351,9 +351,46 @@ def gen_sweep(prm, at, P):
     return s, {}
 
 
+# ------------------------------------------------------------------ the ute garage (UTE-GARAGE.md)
+def gen_tube(prm, at, P):
+    """Hollow section given by its outside extent: `at` is the low corner, dx, dy, dz the outside sizes. It runs
+    along its longest side, open at both ends, with walls `wall` thick. Per-length mass uses that length."""
+    dx, dy, dz, t = prm["dx"], prm["dy"], prm["dz"], prm["wall"]
+    x, y, z = at
+    s = box(x, y, z, dx, dy, dz)
+    L = max(dx, dy, dz)
+    if L == dx:
+        inner = box(x - 1, y + t, z + t, dx + 2, dy - 2 * t, dz - 2 * t)
+    elif L == dy:
+        inner = box(x + t, y - 1, z + t, dx - 2 * t, dy + 2, dz - 2 * t)
+    else:
+        inner = box(x + t, y + t, z - 1, dx - 2 * t, dy - 2 * t, dz + 2)
+    return s - inner, {"length_m": L / 1000}
+
+
+def gen_tyre_sweep(prm, at, P):
+    """The space a rear tyre sweeps from its static position up to full bump (check only): a cylinder across the
+    ute at each end and the box between. `at` is the wheel centre at static."""
+    x, y, z = at
+    r, w, rise = prm["radius"], prm["width"], prm["rise"]
+    a = cyl((x, y - w / 2, z), (x, y + w / 2, z), r)
+    b = cyl((x, y - w / 2, z + rise), (x, y + w / 2, z + rise), r)
+    return a + b + box_span(x - r, x + r, y - w / 2, y + w / 2, z, z + rise), {}
+
+
+def gen_disc(prm, at, P):
+    """A round item on a wall (the fan): a short cylinder whose axis is X, Y or Z."""
+    x, y, z = at
+    r, d = prm["diameter"] / 2, prm["depth"]
+    ax = prm.get("axis", "x")
+    e = {"x": (x + d, y, z), "y": (x, y + d, z), "z": (x, y, z + d)}[ax]
+    return cyl((x, y, z), e, r), {}
+
+
 GENERATORS = {
     "box": gen_box, "panel": gen_panel, "rhs": gen_rhs, "froli": gen_froli,
     "condor_chock": gen_condor_chock, "l_track": gen_l_track, "track_fitting": gen_track_fitting,
     "winch": gen_winch, "vent": gen_vent, "fume_sensor": gen_fume_sensor, "extinguisher": gen_extinguisher,
     "ladder": gen_ladder, "net": gen_net, "floor": gen_floor, "wall": gen_wall, "sweep": gen_sweep,
+    "tube": gen_tube, "tyre_sweep": gen_tyre_sweep, "disc": gen_disc,
 }

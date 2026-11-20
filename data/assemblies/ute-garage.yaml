@@ -1,0 +1,468 @@
+# Ute bike garage: the enclosed box on the LandCruiser 79 (UTE-GARAGE.md, research report 17).
+# Module frame: origin on the floor top at the front wall's inner face, on the ute's centreline. X rearward towards
+# the barn doors, Y to the road side, Z up. mm. The axes are the ute frame's (DIM-U1), so the module only moves:
+# module X 0 sits at ute X module_x0 and Z 0 at the deck height deck_z (data/ute/ute.yaml reads both from here).
+# The bikes stand side by side, noses against the front wall, and load through the barn doors at the back, as in the
+# trailer's garage. Any number may be an expression over `params`.
+id: ASM-UG
+name: Ute bike garage
+revision: A
+
+params:
+  # ---------------------------------------------------------------- placement on the ute (data/ute/ute.yaml)
+  cab_back_x: 2060          # back of the cab behind the front axle (Toyota BBGJ1007)
+  cab_gap: 40               # Toyota: at least 39 mm between the body and the cab at the roof
+  box_x0: cab_back_x + cab_gap      # outside front face of the box, ute X
+  module_x0: box_x0 + front_t       # ute X of module X 0
+  rear_axle_x: 3180         # ute X of the rear axle (the wheelbase)
+  axle_m: rear_axle_x - module_x0   # module X of the rear axle
+  frame_top_z: 774          # rear frame top, laden: 724 mm on factory springs plus about 50 mm of Lovells lift (estimate)
+  pad_t: 6                  # rubber strip between the rails and the subframe
+  sub_h: 50                 # subframe depth: the runners and crossmembers stand 50 mm
+  floor_t: 4                # 5052-H32 floor plate
+  deck_z: frame_top_z + pad_t + sub_h + floor_t   # floor top above the ground: 834 mm (estimate)
+  sub_z0: -(floor_t + sub_h)        # subframe underside, module Z
+  rail_y: 493               # frame rail centreline, either side (1,046 mm over the rails, 60 mm flanges, estimate)
+  rail_w: 60
+  # ---------------------------------------------------------------- the wheels under the box (data/ute/ute.yaml)
+  tyre_d: 805
+  tyre_w: 268
+  tyre_slr: 380             # static loaded radius (estimate)
+  rear_bump: 110            # rear wheel travel to the bump stops (estimate, report 17 section 3.3)
+  wheel_y: 730              # half the 1,460 mm rear track
+  wheel_z: tyre_slr - deck_z        # module Z of the wheel centre at static
+  tub_top_gap: 25           # Toyota: 25 mm over the tyre at full bump, 40 mm inside it, 30 mm outside it
+  tub_in_gap: 40
+  tub_end_gap: 30           # fore and aft of the tyre (assumption: Toyota's outside figure)
+  tub_t: 3
+  tub_x0: axle_m - tyre_d / 2 - tub_end_gap   # inner faces of the tub's front and rear walls
+  tub_x1: axle_m + tyre_d / 2 + tub_end_gap
+  tub_y0: wheel_y - tyre_w / 2 - tub_in_gap  # inner face of the tub's inboard wall
+  tub_top: wheel_z + rear_bump + tyre_d / 2 + tub_top_gap + tub_t   # tub top surface above the floor
+  # ---------------------------------------------------------------- the box
+  outside_w: 1850           # the decision log's limit
+  outside_l: 2590           # report 17 section 6.2
+  skin_t: 2.5               # 5052-H32 walls, front and doors
+  roof_t: 2.0
+  frame_s: 40               # SHS 40 x 40 x 3 frame
+  frame_t: 3
+  wall_t: skin_t + frame_s  # side and front walls: 42.5 mm
+  front_t: wall_t
+  half_width: outside_w / 2 - wall_t   # inner face of each side wall's frame: 882.5 mm
+  interior_width: 2 * half_width
+  leaf_s: 25                # door leaf frame, SHS 25 x 25 x 3
+  leaf_t: leaf_s + skin_t   # 27.5 mm
+  garage_length: outside_l - front_t - leaf_t   # front wall to the closed leaves' inner faces: 2,520 mm
+  x_end: garage_length + leaf_t                 # outside rear face, module X
+  ceiling_z: 1460           # underside of the roof bows and the door header (report 17)
+  roof_z: ceiling_z + frame_s       # roof skin underside
+  top_z: roof_z + roof_t            # roof top above the floor: 1,502 mm
+  # posts along each side wall (X of each post's front face) and roof bows across
+  post1_x: 560
+  post2_x: 1200             # the kerb door's rear jamb, standing on the tub
+  post3_x: tub_x1 + 10
+  post4_x: 2000
+  bow_x: [post1_x, post2_x, post3_x, post4_x]
+  # ---------------------------------------------------------------- doors
+  hinge_gap: 10             # between each leaf and its corner post, for the continuous hinge
+  door_y0: -half_width + hinge_gap  # clear opening
+  door_y1: half_width - hinge_gap
+  door_h: ceiling_z
+  leaf_gap: 5               # between the two leaves
+  kd_x0: 0                  # kerb-side lift-up door: the front 1,200 mm of the wall, 300 to 1,300 mm up (report 17)
+  kd_x1: 1200
+  kd_z0: 300
+  kd_z1: 1300
+  # ---------------------------------------------------------------- bikes, side by side, noses forward
+  bike_spacing: 760
+  tu_reach: 490             # road-side reach of the Tuareg's panniers from its centreline (report 17 section 6.2)
+  st_reach: 396             # kerb-side reach of the Street Triple from its centreline (report 17 section 6.2)
+  tuareg_y: (bike_spacing + st_reach - tu_reach) / 2   # equal gaps to the two walls
+  st_y: tuareg_y - bike_spacing
+  front_tyre_x: 50          # chock nose allowance (measurements.yaml CHK-01)
+  chock_rise: 25
+  # ---------------------------------------------------------------- restraint
+  front_row_x: mount1_x    # the front L-track row sits on the steel crossmember at Toyota's first deck mount
+  rear_row_x: mount6_x     # and the rear row on the one at the last deck mount, 1,025 mm behind the axle
+  tu_strap_dy: 450
+  st_strap_dy: 400
+  wheel_strap_dy: 250
+  track_w: 34.5
+  track_h: 13.7
+  fitting_h: 22
+  winch_z0: 650
+  # ---------------------------------------------------------------- subframe
+  runner_w: 75              # aluminium RHS 75 x 50 x 3, laid flat on each rail
+  runner_y0: rail_y - runner_w / 2
+  runner_y1: rail_y + runner_w / 2
+  steel_w: 76               # galvanised steel RHS 76 x 38 x 3, laid flat, under each L-track row
+  steel_h: 38
+  packer_t: 2.0             # galvanised steel packer on the steel crossmember, under the track
+  track_z: sub_z0 + steel_h + packer_t   # track underside: the 13.7 mm track's top ends 0.3 mm below the floor top
+  strip_t: -floor_t - track_z            # aluminium strips either side of the track carry the floor plate: 10 mm
+  strip_w: 20
+  cm_w: 50                  # aluminium SHS 50 x 50 x 3 crossmembers and outriggers
+  cm_x: [-15, 450, 800, 1150, 1500, 1800, 2300, x_end - 25]       # inner crossmembers (centres)
+  out_x: [-15, 450, 1500, 1800, 2300, x_end - 25]                  # outriggers, none over the wheels
+  # Toyota's deck mount brackets on the rails, 879 and 490 mm ahead of the rear axle and 123, 490, 755 and 1,025 mm
+  # behind it (BBGJ1007, report 17 section 1.4). Firm at the front two, compliant at the rear four.
+  mount1_x: rear_axle_x - 879 - module_x0
+  mount2_x: rear_axle_x - 490 - module_x0
+  mount3_x: rear_axle_x + 123 - module_x0
+  mount4_x: rear_axle_x + 490 - module_x0
+  mount5_x: rear_axle_x + 755 - module_x0
+  mount6_x: rear_axle_x + 1025 - module_x0
+  bracket_z1: sub_z0 - pad_t        # top of Toyota's bracket flange, level with the rail top
+  # ---------------------------------------------------------------- stowage
+  ramp_fold_l: 1524         # Black Widow MF-12038 folded, standing on its edge across the back
+  ramp_fold_t: 152
+  ramp_fold_w: 965
+  ramp_x0: garage_length - 8 - ramp_fold_t
+  # Tool chests on the wheel tubs, beside each bike's middle. The outer front straps run through the front corners and
+  # the rear straps through the back, so the tubs are the lowest free floor that is forward of the ramp.
+  tool_x0: tub_x0 + 45
+  tool_l: tub_x1 - tub_x0 - 90
+  tool_w: 300               # road side, beside the Tuareg
+  tool_wk: 220              # kerb side, narrower: the Street Triple's belly pan reaches 200 mm out from its centreline
+  tool_h: 200
+  tool_z0: tub_top
+  ground_drop: deck_z + 30  # floor height above the ground while loading, bikes out (report 17: about 30 mm higher empty)
+
+items:
+  # ---------------------------------------------------------------- bikes (the trailer's bike models)
+  - {ref: TU, part: BIKE-TU, group: bikes, label: Aprilia Tuareg 660 Rally,
+     bike: {centre_y: tuareg_y, front_tyre_x: front_tyre_x, front_rise: chock_rise}}
+  - {ref: ST, part: BIKE-ST, group: bikes, label: Triumph Street Triple 765,
+     bike: {centre_y: st_y, front_tyre_x: front_tyre_x, front_rise: chock_rise}}
+  - {ref: TU-2263, part: BIKE-TU, group: bikes, label: "Tuareg with the photo-measured 2,263 mm length", check_only: true,
+     bike: {centre_y: tuareg_y, front_tyre_x: front_tyre_x, front_rise: chock_rise, length: 2263}}
+  - {ref: TU-1390, part: BIKE-TU, group: bikes, label: "Tuareg with the photo-measured 1,390 mm screen", check_only: true,
+     bike: {centre_y: tuareg_y, front_tyre_x: front_tyre_x, front_rise: chock_rise, screen_top_z: 1390}}
+  - {ref: TU-BAGS, part: BIKE-TU, group: bikes, label: "Tuareg's Mosko Moto panniers on their own", check_only: true,
+     bike: {centre_y: tuareg_y, front_tyre_x: front_tyre_x, front_rise: chock_rise, luggage_only: true}}
+
+  # ---------------------------------------------------------------- floor and wheel tubs
+  - {ref: B1, part: U-FLOOR, group: body, label: "Floor plate, 4 mm",
+     at: [-front_t + skin_t, -half_width - frame_s, -floor_t],
+     params: {dx: outside_l - skin_t, dy: interior_width + 2 * frame_s, dz: floor_t, normal: z,
+              cutouts: [[tub_x0 - tub_t + front_t - skin_t, tub_y0 - tub_t + half_width + frame_s, tub_x1 - tub_x0 + 2 * tub_t, half_width + frame_s - tub_y0 + tub_t],
+                        [tub_x0 - tub_t + front_t - skin_t, 0, tub_x1 - tub_x0 + 2 * tub_t, half_width + frame_s - tub_y0 + tub_t],
+                        [front_row_x - track_w / 2 + front_t - skin_t, frame_s, track_w, interior_width],
+                        [rear_row_x - track_w / 2 + front_t - skin_t, frame_s, track_w, interior_width]]}}
+  - ref: B2
+    part: U-TUB
+    group: body
+    label: Wheel tub
+    copies:
+      - {id: R-top, at: [tub_x0 - tub_t, tub_y0 - tub_t, tub_top - tub_t], params: {dx: tub_x1 - tub_x0 + 2 * tub_t, dy: half_width + frame_s - tub_y0 + tub_t, dz: tub_t, normal: z}}
+      - {id: R-in, at: [tub_x0 - tub_t, tub_y0 - tub_t, -floor_t], params: {dx: tub_x1 - tub_x0 + 2 * tub_t, dy: tub_t, dz: tub_top - tub_t + floor_t, normal: y}}
+      - {id: R-front, at: [tub_x0 - tub_t, tub_y0, -floor_t], params: {dx: tub_t, dy: half_width + frame_s - tub_y0, dz: tub_top - tub_t + floor_t, normal: x}}
+      - {id: R-rear, at: [tub_x1, tub_y0, -floor_t], params: {dx: tub_t, dy: half_width + frame_s - tub_y0, dz: tub_top - tub_t + floor_t, normal: x}}
+      - {id: K-top, at: [tub_x0 - tub_t, -half_width - frame_s, tub_top - tub_t], params: {dx: tub_x1 - tub_x0 + 2 * tub_t, dy: half_width + frame_s - tub_y0 + tub_t, dz: tub_t, normal: z}}
+      - {id: K-in, at: [tub_x0 - tub_t, -tub_y0, -floor_t], params: {dx: tub_x1 - tub_x0 + 2 * tub_t, dy: tub_t, dz: tub_top - tub_t + floor_t, normal: y}}
+      - {id: K-front, at: [tub_x0 - tub_t, -half_width - frame_s, -floor_t], params: {dx: tub_t, dy: half_width + frame_s - tub_y0, dz: tub_top - tub_t + floor_t, normal: x}}
+      - {id: K-rear, at: [tub_x1, -half_width - frame_s, -floor_t], params: {dx: tub_t, dy: half_width + frame_s - tub_y0, dz: tub_top - tub_t + floor_t, normal: x}}
+
+  # ---------------------------------------------------------------- skins
+  - ref: B3
+    part: U-SKIN
+    group: body
+    label: Wall skin, 2.5 mm
+    copies:
+      - {id: road, at: [-front_t, half_width + frame_s, -floor_t], params: {dx: outside_l, dy: skin_t, dz: roof_z + floor_t, normal: y}}
+      - {id: kerb, at: [-front_t, -half_width - wall_t, -floor_t], params: {dx: outside_l, dy: skin_t, dz: roof_z + floor_t, normal: y,
+                                                                         cutouts: [[kd_x0 + front_t, kd_z0 + floor_t, kd_x1 - kd_x0, kd_z1 - kd_z0]]}}
+      - {id: front, at: [-front_t, -half_width - frame_s, -floor_t], params: {dx: skin_t, dy: interior_width + 2 * frame_s, dz: roof_z + floor_t, normal: x}}
+  - {ref: B4, part: U-ROOF, group: body, label: "Roof skin, 2.0 mm",
+     at: [-front_t, -outside_w / 2, roof_z], params: {dx: outside_l, dy: outside_w, dz: roof_t, normal: z}}
+
+  # ---------------------------------------------------------------- frame, SHS 40 x 40 x 3 (`at` is each tube's low corner)
+  - ref: B5
+    part: U-FRAME
+    group: body
+    label: Frame tube
+    copies:
+      # bottom rails along each side wall, raised over the wheel tubs
+      - {id: R-bot-front, at: [-frame_s, half_width, 0], params: {dx: tub_x0 - tub_t + frame_s, dy: frame_s, dz: frame_s}}
+      - {id: R-bot-tub, at: [tub_x0 - tub_t, half_width, tub_top], params: {dx: tub_x1 - tub_x0 + 2 * tub_t, dy: frame_s, dz: frame_s}}
+      - {id: R-bot-rear, at: [tub_x1 + tub_t, half_width, 0], params: {dx: x_end - tub_x1 - tub_t, dy: frame_s, dz: frame_s}}
+      - {id: K-bot-front, at: [-frame_s, -half_width - frame_s, 0], params: {dx: tub_x0 - tub_t + frame_s, dy: frame_s, dz: frame_s}}
+      - {id: K-bot-tub, at: [tub_x0 - tub_t, -half_width - frame_s, tub_top], params: {dx: tub_x1 - tub_x0 + 2 * tub_t, dy: frame_s, dz: frame_s}}
+      - {id: K-bot-rear, at: [tub_x1 + tub_t, -half_width - frame_s, 0], params: {dx: x_end - tub_x1 - tub_t, dy: frame_s, dz: frame_s}}
+      # top rails along each side wall, under the roof skin
+      - {id: R-top, at: [-frame_s, half_width, ceiling_z], params: {dx: x_end + frame_s, dy: frame_s, dz: frame_s}}
+      - {id: K-top, at: [-frame_s, -half_width - frame_s, ceiling_z], params: {dx: x_end + frame_s, dy: frame_s, dz: frame_s}}
+      # corner posts and the rear portal
+      - {id: R-post-front, at: [-frame_s, half_width, frame_s], params: {dx: frame_s, dy: frame_s, dz: ceiling_z - frame_s}}
+      - {id: K-post-front, at: [-frame_s, -half_width - frame_s, frame_s], params: {dx: frame_s, dy: frame_s, dz: ceiling_z - frame_s}}
+      - {id: R-post-rear, at: [x_end - frame_s, half_width, frame_s], params: {dx: frame_s, dy: frame_s, dz: ceiling_z - frame_s}}
+      - {id: K-post-rear, at: [x_end - frame_s, -half_width - frame_s, frame_s], params: {dx: frame_s, dy: frame_s, dz: ceiling_z - frame_s}}
+      - {id: header, at: [x_end - frame_s, -half_width, ceiling_z], params: {dx: frame_s, dy: interior_width, dz: frame_s}}
+      # side wall posts. The one at 1,200 mm is the kerb door's rear jamb and stands on the tub
+      - {id: R-post-1, at: [post1_x, half_width, frame_s], params: {dx: frame_s, dy: frame_s, dz: ceiling_z - frame_s}}
+      - {id: R-post-2, at: [post2_x, half_width, tub_top + frame_s], params: {dx: frame_s, dy: frame_s, dz: ceiling_z - tub_top - frame_s}}
+      - {id: R-post-3, at: [post3_x, half_width, frame_s], params: {dx: frame_s, dy: frame_s, dz: ceiling_z - frame_s}}
+      - {id: R-post-4, at: [post4_x, half_width, frame_s], params: {dx: frame_s, dy: frame_s, dz: ceiling_z - frame_s}}
+      - {id: K-post-1, at: [post1_x, -half_width - frame_s, frame_s], params: {dx: frame_s, dy: frame_s, dz: kd_z0 - 2 * frame_s}}
+      - {id: K-post-1-up, at: [post1_x, -half_width - frame_s, kd_z1 + frame_s], params: {dx: frame_s, dy: frame_s, dz: ceiling_z - kd_z1 - frame_s}}
+      - {id: K-post-2, at: [post2_x, -half_width - frame_s, tub_top + frame_s], params: {dx: frame_s, dy: frame_s, dz: ceiling_z - tub_top - frame_s}}
+      - {id: K-post-3, at: [post3_x, -half_width - frame_s, frame_s], params: {dx: frame_s, dy: frame_s, dz: ceiling_z - frame_s}}
+      - {id: K-post-4, at: [post4_x, -half_width - frame_s, frame_s], params: {dx: frame_s, dy: frame_s, dz: ceiling_z - frame_s}}
+      # kerb door frame: sill rail under the opening and head rail over it, front corner post to the jamb
+      - {id: K-door-sill, at: [0, -half_width - frame_s, kd_z0 - frame_s], params: {dx: kd_x1, dy: frame_s, dz: frame_s}}
+      - {id: K-door-head, at: [0, -half_width - frame_s, kd_z1], params: {dx: kd_x1, dy: frame_s, dz: frame_s}}
+      # front wall: bottom rail, the two rails the winch plates bolt to, and the front roof bow
+      - {id: F-bot, at: [-frame_s, -half_width, 0], params: {dx: frame_s, dy: interior_width, dz: frame_s}}
+      - {id: F-winch-low, at: [-frame_s, -half_width, winch_z0 - 20], params: {dx: frame_s, dy: interior_width, dz: frame_s}}
+      - {id: F-winch-high, at: [-frame_s, -half_width, winch_z0 + 140], params: {dx: frame_s, dy: interior_width, dz: frame_s}}
+      - {id: F-top, at: [-frame_s, -half_width, ceiling_z], params: {dx: frame_s, dy: interior_width, dz: frame_s}}
+  - ref: B6
+    part: U-FRAME
+    group: body
+    label: Roof bow
+    for: {x: bow_x}
+    at: [x, -half_width, ceiling_z]
+    params: {dx: frame_s, dy: interior_width, dz: frame_s}
+
+  # ---------------------------------------------------------------- doors
+  # Barn doors: two leaves inset in the rear portal, flush with its rear face, on continuous hinges in the gap at
+  # each corner post. Closed in the travel view, folded flat against the side walls in the loading view.
+  - ref: D1
+    part: U-LEAF
+    group: doors
+    label: Barn door leaf
+    display: closed_only
+    copies:
+      - {id: road, at: [garage_length, leaf_gap / 2, 0], params: {dx: leaf_t, dy: door_y1 - leaf_gap / 2, dz: door_h - 5}}
+      - {id: kerb, at: [garage_length, door_y0, 0], params: {dx: leaf_t, dy: -door_y0 - leaf_gap / 2, dz: door_h - 5}}
+  - ref: D2
+    part: U-LEAF-OPEN
+    group: doors
+    label: Barn door leaf, open against the side wall
+    display: loading_only
+    copies:
+      - {id: road, at: [x_end - door_y1, outside_w / 2 + 5, 0], params: {dx: door_y1 - leaf_gap / 2, dy: leaf_t, dz: door_h - 5}}
+      - {id: kerb, at: [x_end - door_y1, -outside_w / 2 - 5 - leaf_t, 0], params: {dx: door_y1 - leaf_gap / 2, dy: leaf_t, dz: door_h - 5}}
+  - {ref: D3, part: U-CAMBAR, group: doors, label: "Cam bar on the road-side leaf, top and bottom keepers", display: closed_only,
+     at: [x_end, door_y1 - 120, 40], params: {dx: 30, dy: 30, dz: door_h - 80}}
+  - {ref: D4, part: U-KDOOR, group: doors, label: "Kerb-side lift-up door, closed",
+     at: [kd_x0, -outside_w / 2, kd_z0], params: {dx: kd_x1 - kd_x0, dy: leaf_t, dz: kd_z1 - kd_z0}}
+
+  # ---------------------------------------------------------------- subframe and mounts
+  - ref: S1
+    part: U-RUNNER
+    group: subframe
+    label: Runner on the frame rail
+    copies:
+      - {id: R-front, at: [-frame_s, runner_y0, sub_z0], params: {dx: front_row_x - steel_w / 2 + frame_s, dy: runner_w, dz: sub_h}}
+      - {id: R-mid, at: [front_row_x + steel_w / 2, runner_y0, sub_z0], params: {dx: rear_row_x - front_row_x - steel_w, dy: runner_w, dz: sub_h}}
+      - {id: R-rear, at: [rear_row_x + steel_w / 2, runner_y0, sub_z0], params: {dx: x_end - rear_row_x - steel_w / 2, dy: runner_w, dz: sub_h}}
+      - {id: K-front, at: [-frame_s, -runner_y1, sub_z0], params: {dx: front_row_x - steel_w / 2 + frame_s, dy: runner_w, dz: sub_h}}
+      - {id: K-mid, at: [front_row_x + steel_w / 2, -runner_y1, sub_z0], params: {dx: rear_row_x - front_row_x - steel_w, dy: runner_w, dz: sub_h}}
+      - {id: K-rear, at: [rear_row_x + steel_w / 2, -runner_y1, sub_z0], params: {dx: x_end - rear_row_x - steel_w / 2, dy: runner_w, dz: sub_h}}
+  - ref: S2
+    part: U-STEEL-CM
+    group: subframe
+    label: Steel anchor crossmember under an L-track row
+    copies:
+      - {id: front, at: [front_row_x - steel_w / 2, -half_width - frame_s, sub_z0], params: {dx: steel_w, dy: interior_width + 2 * frame_s, dz: steel_h}}
+      - {id: rear, at: [rear_row_x - steel_w / 2, -half_width - frame_s, sub_z0], params: {dx: steel_w, dy: interior_width + 2 * frame_s, dz: steel_h}}
+  - ref: S3
+    part: U-PACKER
+    group: subframe
+    label: Steel packer under the track
+    copies:
+      - {id: front, at: [front_row_x - steel_w / 2, -half_width - frame_s, sub_z0 + steel_h], params: {dx: steel_w, dy: interior_width + 2 * frame_s, dz: packer_t}}
+      - {id: rear, at: [rear_row_x - steel_w / 2, -half_width - frame_s, sub_z0 + steel_h], params: {dx: steel_w, dy: interior_width + 2 * frame_s, dz: packer_t}}
+  - ref: S9
+    part: U-STRIP
+    group: subframe
+    label: Floor strip beside the track
+    copies:
+      - {id: front-a, at: [front_row_x - steel_w / 2, -half_width - frame_s, track_z], params: {dx: strip_w, dy: interior_width + 2 * frame_s, dz: strip_t}}
+      - {id: front-b, at: [front_row_x + steel_w / 2 - strip_w, -half_width - frame_s, track_z], params: {dx: strip_w, dy: interior_width + 2 * frame_s, dz: strip_t}}
+      - {id: rear-a, at: [rear_row_x - steel_w / 2, -half_width - frame_s, track_z], params: {dx: strip_w, dy: interior_width + 2 * frame_s, dz: strip_t}}
+      - {id: rear-b, at: [rear_row_x + steel_w / 2 - strip_w, -half_width - frame_s, track_z], params: {dx: strip_w, dy: interior_width + 2 * frame_s, dz: strip_t}}
+  - ref: S4
+    part: U-CM
+    group: subframe
+    label: Crossmember between the runners
+    for: {x: cm_x}
+    at: [x - cm_w / 2, -runner_y0, sub_z0]
+    params: {dx: cm_w, dy: 2 * runner_y0, dz: sub_h}
+  - ref: S5
+    part: U-CM
+    group: subframe
+    label: Outrigger, road side
+    for: {x: out_x}
+    at: [x - cm_w / 2, runner_y1, sub_z0]
+    params: {dx: cm_w, dy: half_width + frame_s - runner_y1, dz: sub_h}
+  - ref: S6
+    part: U-CM
+    group: subframe
+    label: Outrigger, kerb side
+    for: {x: out_x}
+    at: [x - cm_w / 2, -half_width - frame_s, sub_z0]
+    params: {dx: cm_w, dy: half_width + frame_s - runner_y1, dz: sub_h}
+  # Mount angles: each hangs off the runner's outer face and bolts down onto Toyota's deck mount bracket.
+  - ref: S7
+    part: U-MOUNT-FIRM
+    group: subframe
+    label: Firm mount, two M12 bolts
+    copies:
+      - {id: 1R, at: [mount1_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t}}
+      - {id: 1K, at: [mount1_x - 40, -tub_y0 + tub_t + 5, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t}}
+      - {id: 2R, at: [mount2_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t + 30}}
+      - {id: 2K, at: [mount2_x - 40, -tub_y0 + tub_t + 5, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t + 30}}
+  - ref: S8
+    part: U-MOUNT-SPRING
+    group: subframe
+    label: Compliant mount, one M12 bolt through rubber
+    copies:
+      - {id: 3R, at: [mount3_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t + 30}}
+      - {id: 3K, at: [mount3_x - 40, -tub_y0 + tub_t + 5, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t + 30}}
+      - {id: 4R, at: [mount4_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t + 30}}
+      - {id: 4K, at: [mount4_x - 40, -tub_y0 + tub_t + 5, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t + 30}}
+      - {id: 5R, at: [mount5_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t + 30}}
+      - {id: 5K, at: [mount5_x - 40, -tub_y0 + tub_t + 5, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t + 30}}
+      - {id: 6R, at: [mount6_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t}}
+      - {id: 6K, at: [mount6_x - 40, -tub_y0 + tub_t + 5, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t}}
+
+  # ---------------------------------------------------------------- restraint (the trailer's layout, refs 10 to 14 as there)
+  - ref: "10"
+    part: U-CHOCK
+    group: restraint
+    label: Condor chock
+    copies:
+      - {id: TU, at: [0, tuareg_y, 0], params: {face: x}}
+      - {id: ST, at: [0, st_y, 0], params: {face: x}}
+  - ref: "11"
+    part: U-TRACK
+    group: restraint
+    label: L-track row
+    copies:
+      - {id: front, at: [front_row_x, -half_width, track_z], params: {length: interior_width, axis: y}}
+      - {id: rear, at: [rear_row_x, -half_width, track_z], params: {length: interior_width, axis: y}}
+  - ref: "12"
+    part: U-FITTING
+    group: restraint
+    label: Track fitting
+    copies:
+      - {id: TU-FR, at: [front_row_x, tuareg_y + tu_strap_dy, 0], params: {axis: y}}
+      - {id: TU-FL, at: [front_row_x, tuareg_y - tu_strap_dy, 0], params: {axis: y}}
+      - {id: TU-RR, at: [rear_row_x, tuareg_y + tu_strap_dy, 0], params: {axis: y}}
+      - {id: TU-RL, at: [rear_row_x, tuareg_y - tu_strap_dy, 0], params: {axis: y}}
+      - {id: TU-WR, at: [rear_row_x, tuareg_y + wheel_strap_dy, 0], params: {axis: y}}
+      - {id: TU-WL, at: [rear_row_x, tuareg_y - wheel_strap_dy, 0], params: {axis: y}}
+      - {id: ST-FR, at: [front_row_x, st_y + st_strap_dy, 0], params: {axis: y}}
+      - {id: ST-FL, at: [front_row_x, st_y - st_strap_dy, 0], params: {axis: y}}
+      - {id: ST-RR, at: [rear_row_x, st_y + st_strap_dy, 0], params: {axis: y}}
+      - {id: ST-RL, at: [rear_row_x, st_y - st_strap_dy, 0], params: {axis: y}}
+      - {id: ST-WR, at: [rear_row_x, st_y + wheel_strap_dy, 0], params: {axis: y}}
+      - {id: ST-WL, at: [rear_row_x, st_y - wheel_strap_dy, 0], params: {axis: y}}
+  - ref: "13"
+    part: U-STRAP
+    group: restraint
+    label: Ratchet strap
+    copies:
+      - {id: TU-F+, strap: {bike: TU, point: handlebar_inboard, side: 1, anchor: [front_row_x, tuareg_y + tu_strap_dy, fitting_h]}}
+      - {id: TU-F-, strap: {bike: TU, point: handlebar_inboard, side: -1, anchor: [front_row_x, tuareg_y - tu_strap_dy, fitting_h]}}
+      - {id: TU-R+, strap: {bike: TU, point: pillion_peg_hangers, side: 1, anchor: [rear_row_x, tuareg_y + tu_strap_dy, fitting_h]}}
+      - {id: TU-R-, strap: {bike: TU, point: pillion_peg_hangers, side: -1, anchor: [rear_row_x, tuareg_y - tu_strap_dy, fitting_h]}}
+      - {id: TU-W, strap: {bike: TU, point: rear_wheel, anchors: [[rear_row_x, tuareg_y + wheel_strap_dy, fitting_h], [rear_row_x, tuareg_y - wheel_strap_dy, fitting_h]]}}
+      - {id: ST-F+, strap: {bike: ST, point: handlebar_beside_risers, side: 1, anchor: [front_row_x, st_y + st_strap_dy, fitting_h]}}
+      - {id: ST-F-, strap: {bike: ST, point: handlebar_beside_risers, side: -1, anchor: [front_row_x, st_y - st_strap_dy, fitting_h]}}
+      - {id: ST-R+, strap: {bike: ST, point: pillion_peg_hangers, side: 1, anchor: [rear_row_x, st_y + st_strap_dy, fitting_h]}}
+      - {id: ST-R-, strap: {bike: ST, point: pillion_peg_hangers, side: -1, anchor: [rear_row_x, st_y - st_strap_dy, fitting_h]}}
+      - {id: ST-W, strap: {bike: ST, point: rear_wheel, anchors: [[rear_row_x, st_y + wheel_strap_dy, fitting_h], [rear_row_x, st_y - wheel_strap_dy, fitting_h]]}}
+  - {ref: "14", part: U-WINCH, group: restraint, label: "WARN winch on its quick-release plate (Tuareg bay)",
+     at: [0, tuareg_y, winch_z0], params: {face: x}}
+  - {ref: 14P, part: U-WINCH-PLATE, group: restraint, label: "Spare winch plate (Street Triple bay)",
+     at: [0, st_y, winch_z0], params: {face: x}}
+  - {ref: R1, part: U-RAMP, group: restraint, label: "Ramp, folded on its edge across the back", display: closed_only,
+     at: [ramp_x0, -ramp_fold_l / 2, 0], params: {dx: ramp_fold_t, dy: ramp_fold_l, dz: ramp_fold_w}}
+  - {ref: R2, part: U-RAMP-OPEN, group: restraint, label: "Ramp hooked on the sill (loading)", display: loading_only,
+     ramp: {centre_y: tuareg_y, sill_x: x_end, drop: ground_drop}}
+
+  # ---------------------------------------------------------------- vents, light and safety
+  - ref: V1
+    part: U-VENT
+    group: safety
+    label: Low vent with a flap valve
+    copies:
+      - {id: road, at: [garage_length - 300, half_width, 30], params: {facing: -1}}
+      - {id: kerb, at: [garage_length - 300, -half_width, 30], params: {facing: 1}}
+  - {ref: V2, part: U-FAN, group: safety, label: "Filtered fan, high in the front wall above the cab roof",
+     at: [0, (tuareg_y + st_y) / 2, 1250], params: {axis: x}}
+  - ref: V3
+    part: U-LIGHT
+    group: safety
+    label: LED strip light under the roof
+    copies:
+      - {id: road, at: [300, tuareg_y - 20, ceiling_z - 12], params: {dx: 1800, dy: 40, dz: 12}}
+      - {id: kerb, at: [300, st_y - 20, ceiling_z - 12], params: {dx: 1800, dy: 40, dz: 12}}
+  - ref: V4
+    part: U-FUME
+    group: safety
+    label: Fume detector sensor
+    copies:
+      - {id: front, at: [0, (tuareg_y + st_y) / 2, 100], params: {facing_x: 1}}
+      - {id: rear, at: [garage_length - 500, half_width, 100], params: {facing_y: -1}}
+  - {ref: V5, part: U-EXT, group: safety, label: "Extinguisher on the kerb-side wall by the barn doors",
+     at: [garage_length - 330, -half_width + 70, 600]}
+
+  # ---------------------------------------------------------------- security
+  - {ref: K1, part: U-HASP, group: security, label: "Shrouded hasp and ABLOY PL362 over the cam handle", display: closed_only,
+     at: [x_end, door_y1 - 200, 700], params: {dx: 45, dy: 70, dz: 110}}
+  - ref: K2
+    part: U-ANCHOR
+    group: security
+    label: Ground anchor for a bike's chain
+    copies:
+      - {id: TU, at: [1800 - 60, (tuareg_y + st_y) / 2 + 40, 0], params: {dx: 120, dy: 80, dz: 40}}
+      - {id: ST, at: [1800 - 60, (tuareg_y + st_y) / 2 - 120, 0], params: {dx: 120, dy: 80, dz: 40}}
+  - {ref: K3, part: U-TRACKER, group: security, label: "Teltonika FMC130 tracker and siren, behind a panel high on the front wall",
+     at: [0, -half_width + 100, 1250], params: {dx: 60, dy: 160, dz: 110}}
+
+  # ---------------------------------------------------------------- tools, low on the wheel tubs
+  - ref: T1
+    part: U-TOOLBOX
+    group: tools
+    label: Tool chest
+    copies:
+      - {id: road, at: [tool_x0, half_width - 10 - tool_w, tool_z0], params: {dx: tool_l, dy: tool_w, dz: tool_h}}
+      - {id: kerb, at: [tool_x0, -half_width + 10, tool_z0], params: {dx: tool_l, dy: tool_wk, dz: tool_h}}
+
+  # ---------------------------------------------------------------- context (no mass)
+  - ref: C1
+    part: U-BRACKET
+    group: context
+    label: Toyota deck mount bracket on the rail
+    copies:
+      - {id: 1R, at: [mount1_x - 40, rail_y + rail_w / 2, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
+      - {id: 1K, at: [mount1_x - 40, -rail_y - rail_w / 2 - 60, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
+      - {id: 2R, at: [mount2_x - 40, rail_y + rail_w / 2, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
+      - {id: 2K, at: [mount2_x - 40, -rail_y - rail_w / 2 - 60, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
+      - {id: 3R, at: [mount3_x - 40, rail_y + rail_w / 2, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
+      - {id: 3K, at: [mount3_x - 40, -rail_y - rail_w / 2 - 60, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
+      - {id: 4R, at: [mount4_x - 40, rail_y + rail_w / 2, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
+      - {id: 4K, at: [mount4_x - 40, -rail_y - rail_w / 2 - 60, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
+      - {id: 5R, at: [mount5_x - 40, rail_y + rail_w / 2, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
+      - {id: 5K, at: [mount5_x - 40, -rail_y - rail_w / 2 - 60, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
+      - {id: 6R, at: [mount6_x - 40, rail_y + rail_w / 2, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
+      - {id: 6K, at: [mount6_x - 40, -rail_y - rail_w / 2 - 60, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
+  - ref: C2
+    part: U-PAD
+    group: context
+    label: Rubber strip on the rail under the subframe
+    copies:
+      - {id: R, at: [-frame_s, rail_y - rail_w / 2, bracket_z1], params: {dx: x_end + frame_s, dy: rail_w, dz: pad_t}}
+      - {id: K, at: [-frame_s, -rail_y - rail_w / 2, bracket_z1], params: {dx: x_end + frame_s, dy: rail_w, dz: pad_t}}
+  - {ref: C3, part: U-GROUND, group: context, label: Assumed ground, display: loading_only,
+     at: [x_end - 100, tuareg_y - 750, -ground_drop - 10]}
+  # Check-only solids
+  - {ref: C4R, part: U-TYRE-SWEEP, group: context, label: "Road-side rear tyre, static to full bump", check_only: true,
+     at: [axle_m, wheel_y, wheel_z]}
+  - {ref: C4K, part: U-TYRE-SWEEP, group: context, label: "Kerb-side rear tyre, static to full bump", check_only: true,
+     at: [axle_m, -wheel_y, wheel_z]}
+  - {ref: C5, part: U-SWEEP, group: context, label: Barn door opening swept along the box, check_only: true, at: [0, -half_width, 0]}

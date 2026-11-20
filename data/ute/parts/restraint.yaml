@@ -1,0 +1,164 @@
+# Ute garage restraint, loading and safety. The products are the trailer garage's (data/parts/garage.yaml, report 03),
+# with the quantities for two bikes in the ute's box. The trailer keeps its own lines while its garage stays.
+group: ute-restraint
+parts:
+  U-CHOCK:
+    name: Front wheel chocks
+    product: Condor SC-2000 Trailer-Only Chock, trailer adapter included
+    maker: Condor
+    part_no: 4101-0137
+    qty: 2
+    unit: each
+    mass: {basis: declared, unit_kg: 11.8, maturity: spec, source: "https://loadall.com/products/condor-chock-sc-2000-trailer-only"}
+    size: 229 W x 635 L x 381 H
+    rating: Bikes to 3,000 lb
+    links: {spec: "https://loadall.com/products/condor-chock-sc-2000-trailer-only"}
+    removable: true
+    geometry: {generator: condor_chock, params: {base_w: 229, base_l: 635, height: 381, cradle_rise: 25, nose_depth: 50}}
+    color: "#e67e22"
+  U-TRACK:
+    name: Flush L-track rows
+    product: Kinedyne Series L medium-duty aluminium track with flanges, recess-mounted
+    maker: Kinedyne
+    qty: 3.53
+    unit: m
+    mass: {basis: per_length, kg_per_m: 1.10, maturity: calculated, source: "https://kinedyne.com/100-in-series-l-medium-duty-track-flanges (2.8 kg per 100 in)"}
+    size: 34.5 W x 13.7 H, two rows of 1,765 mm across the floor
+    notes: Each row sits on a steel crossmember (U-STEEL-CM), tops flush with the floor.
+    geometry: {generator: l_track, params: {width: 34.5, height: 13.7, slot_w: 10, slot_d: 6}}
+    color: "#9aa5ab"
+  U-FITTING:
+    name: Track fittings
+    product: US Cargo Control double-stud L-track fitting, or an equal rated fitting
+    maker: US Cargo Control
+    qty: 14
+    unit: each
+    mass: {basis: declared, unit_kg: 0.14, maturity: spec, source: "https://www.uscargocontrol.com/products/double-stud-l-track-fitting-5-000-lb-break-strength-4-pack"}
+    rating: Break 22.2 kN (5,000 lb)
+    notes: 12 for the bikes and 2 spares.
+    geometry: {generator: track_fitting, params: {length: 50, width: 30, height: 22}}
+    color: "#566573"
+  U-STRAP:
+    name: Ratchet straps
+    product: SpanSet Australia Tradesman 35 mm, LC 1,000 kg configuration, closed hooks
+    maker: SpanSet Australia
+    qty: 10
+    unit: each
+    mass: {basis: declared, unit_kg: 0.8, maturity: estimate, source: "research/03-bike-restraint-garage.md section 13"}
+    rating: LC 1,000 kg to AS/NZS 4380
+    notes: Four primary straps and one rear-wheel strap per bike.
+    removable: true
+    geometry: {generator: strap, params: {width: 35, thickness: 3}}
+    color: "#f1c40f"
+  U-LOOPS:
+    name: Soft loops and the Street Triple's bar harness
+    product: Custom Tie-Downs 1.5 in soft loops (11) and a Canyon Dancer Bar Harness II
+    maker: Custom Tie-Downs, Canyon Dancer
+    qty: 1
+    unit: set
+    mass: {basis: declared, total_kg: 1.2, maturity: estimate, source: "Loops 0.06 kg each (spec, 0.66 kg) and the harness 0.5 kg (estimate, report 03)"}
+    removable: true
+    cog: {at: [900, "(tuareg_y + st_y) / 2", 900], basis: "At the bikes' tie-down points, estimate"}
+  U-COAT:
+    name: Floor and lower-wall coating, anchor fixings
+    product: U-POL Raptor black, 3 coats with traction additive. M8 A4 bolts and crush tubes for the track
+    maker: U-POL, product to choose
+    qty: 1
+    unit: set
+    mass: {basis: declared, total_kg: 5.5, maturity: estimate, source: "Raptor 4.0 kg, scaled by area from the trailer's 5.1 kg (about 6.5 m2 against 8.2 m2), and 1.5 kg of anchor fixings"}
+    cog: {at: [1260, 0, 60], basis: "Floor and the lowest 400 mm of the walls, estimate"}
+  U-WINCH:
+    name: Loading winch
+    product: WARN VRX 25-S 12 V winch with 15 m of 4.8 mm synthetic rope, remote and two quick-release plates
+    maker: WARN
+    part_no: "101020"
+    qty: 1
+    unit: each
+    mass: {basis: declared, unit_kg: 10.5, maturity: estimate, source: "Report 13 G-11 (estimate)"}
+    rating: 2,500 lb (1,134 kg)
+    notes: Moves from the trailer's garage. One winch, a quick-release plate on the front wall in front of each chock, 650 mm up, above the 500 mm ignition-free zone (GAR-03).
+    removable: true
+    geometry: {generator: winch, params: {length: 335, depth: 120, height: 130, plate_l: 340, plate_h: 160, plate_t: 6}}
+    color: "#34495e"
+  U-WINCH-PLATE:
+    name: Winch quick-release plate (second bay)
+    kind: sub_part
+    included_in: U-WINCH
+    geometry: {generator: winch, params: {length: 335, depth: 120, height: 130, plate_l: 340, plate_h: 160, plate_t: 6, plate_only: true}}
+    color: "#34495e"
+  U-RAMP:
+    name: Loading ramp
+    product: Black Widow MF-12038 arched folding full-width ramp, folded on its edge in the slot across the back
+    maker: Black Widow
+    part_no: MF-12038
+    qty: 1
+    unit: each
+    mass: {basis: declared, unit_kg: 34.0, maturity: spec, source: "Retailer spec, 75 lb (report 03)"}
+    size: 3,048 x 965 mm, folds to 1,524 x 965 x 152 mm
+    rating: 680 kg (1,500 lb)
+    notes: Comes out of the barn doors first and hooks on the sill.
+    removable: true
+    geometry: {generator: box, params: {}}
+    color: "#2d3436"
+  U-RAMP-OPEN:
+    name: Loading ramp, deployed
+    kind: context
+    notes: Shown in the loading view. Its mass is U-RAMP.
+    geometry: {generator: ramp, params: {length: 3048, width: 965, thickness: 60}}
+    color: "#2d3436"
+  U-VENT:
+    name: Low vents with flap valves
+    product: Two low vents in the rear corners
+    maker: Product to choose (Camec range)
+    qty: 2
+    unit: each
+    mass: {basis: declared, unit_kg: 0.2, maturity: estimate, source: "As the trailer's vents (garage-bed/BOM.md)"}
+    notes: The fan keeps the box above outside pressure, so air leaves here at floor level and carries petrol vapour out (report 17 section 2.4).
+    geometry: {generator: vent, params: {width: 150, height: 100, depth: 20}}
+    color: "#636e72"
+  U-FAN:
+    name: Filtered inlet fan
+    product: 12 V ignition-protected fan with a dust filter, high in the front wall above the cab roof
+    maker: Product to choose
+    qty: 1
+    unit: each
+    mass: {basis: declared, unit_kg: 1.5, maturity: estimate, source: "Estimate"}
+    notes: Outside the lowest 500 mm (GAR-03). Product not chosen (report 17).
+    geometry: {generator: disc, params: {diameter: 150, depth: 60}}
+    color: "#636e72"
+  U-LIGHT:
+    name: Interior lights
+    product: 12 V LED strip lights under the roof, door-switched
+    maker: Product to choose
+    qty: 2
+    unit: each
+    mass: {basis: declared, unit_kg: 0.3, maturity: estimate, source: "Estimate"}
+    geometry: {generator: box, params: {}}
+    color: "#ffeaa7"
+  U-FUME:
+    name: Petrol fume detector
+    product: Fireboy-Xintex gasoline fume detector, 2-sensor, display in the cab
+    maker: Fireboy-Xintex
+    qty: 1
+    unit: each
+    mass: {basis: declared, unit_kg: 0.6, maturity: estimate, source: "research/03-bike-restraint-garage.md section 1"}
+    geometry: {generator: fume_sensor, params: {width: 60, height: 40, depth: 30}}
+    color: "#27ae60"
+  U-EXT:
+    name: Fire extinguisher
+    product: Firewize 2.5 kg ABE dry powder with vehicle bracket
+    maker: Firewize
+    qty: 1
+    unit: each
+    mass: {basis: declared, unit_kg: 4.3, maturity: spec, source: "https://shop.firewize.com.au/products/dry-chemical-powder-2-5kg-abe"}
+    geometry: {generator: extinguisher, params: {diameter: 130, height: 383}}
+    color: "#e74c3c"
+  U-LAMPS:
+    name: Rear lamps, plate lamp and wiring
+    product: LED stop, tail and indicator lamps on the box's rear corners, number plate lamp, loom from the cab chassis plug
+    maker: Product to choose
+    qty: 1
+    unit: set
+    mass: {basis: declared, total_kg: 3.0, maturity: estimate, source: "Estimate"}
+    notes: The box ends 1,510 mm behind the rear axle, so the rear lamps move from the cab chassis's lamp bracket to the box.
+    cog: {at: [2400, 0, 200], basis: "Rear of the box, estimate"}
