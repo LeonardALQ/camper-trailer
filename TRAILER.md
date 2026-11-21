@@ -16,7 +16,7 @@ Leonard asked for a home for long stays off-grid: a lifted bed over a 1.2 m desk
 | Ute | Rear axle 2,586 kg with growth against its 2,800 kg plate. Combination 7,100 kg against 7,400 kg |
 | Battery | 25.6 kWh. A design hot day runs 25.1 h when new and 17.2 h at end of life |
 | Water | 420 L fresh, at most 350 L in travel, about 41 L a day. 130 L grey |
-| Cost | AUD 229,650 with contingency, AUD 181,698 owner-built |
+| Cost | AUD 230,736 with contingency, AUD 182,784 owner-built |
 
 Every fail check passes. The tightest are the towball share with the grey tank full (MAS-12, 8.1 % against 8.0 %), the heaviest towball (MAS-13, 316.8 kg against 320 kg) and the recovery pull in the road-side rail (CHS-08A, 0.91 of yield).
 
@@ -108,6 +108,7 @@ Research report 19's load calculation gives a design hot day of 37.1 kWh of heat
 - Charging: four Sunman 430 W panels give about 9.3 kWh on the design hot day, the ute's chargers 3.6 kWh on a 5 h drive, and the two EU22i put a hot day back in 8.4 h while the household runs. Shore power uses a 15 A inlet.
 - Autonomy (H3): the design hot day, all electric with the air-conditioning, two showers, cooking, a wash and dry, desk work and Starlink, takes 19.6 kWh. With 90 % usable, the battery alone runs it for 25.1 h when new and 17.2 h at end of life. The cold night takes 4.7 kWh on diesel heat or 11.2 kWh on the heat pump.
 - Shedding: the shower heater drops out first when the hob or the oven runs, and the shower stays warm on boiler water. The Combi element, washer and dryer follow. The split never sheds. The worst managed load is 89 % of the inverter's 40 °C rating.
+- Lamps: the ute drives them at 12 V through the 12-pin plug. The rear lamps and red triangles sit on the rear outriggers, three amber side markers go on each side, and end-outline lamps sit high at both ends. The plate sits on the rear wall's kerb half, its top at 1,224 mm. All 22 checks to ADR 13/00 and VSB1 3.1 pass (CT-003, CT-011).
 
 ## Plumbing and water
 
@@ -146,7 +147,7 @@ The insert map CT-203 must be final before the panels are ordered, because the m
 
 ## Cost and where to save
 
-The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 147 lines in AUD including GST, each with its source and the date checked. Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 198,436 subtotal carries AUD 31,214 (15.7 %), for AUD 229,650. Without hired labour it is AUD 181,698.
+The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 148 lines in AUD including GST, each with its source and the date checked. Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 199,341 subtotal carries AUD 31,395 (15.7 %), for AUD 230,736. Without hired labour it is AUD 182,784.
 
 | Group | AUD | Group | AUD |
 |---|---|---|---|
@@ -156,9 +157,10 @@ The parts list is `data/trailer-parts.yaml` with the priced lines of the mass sc
 | Living area | 21,100 | Under the floor | 3,162 |
 | Running gear | 14,181 | Roof | 2,926 |
 | HVAC and ventilation | 12,517 | Coupling and drawbar | 1,695 |
-| Wet room | 11,627 | Spare wheel | 736 |
-| Bed | 8,098 | Compliance | 5,976 |
-| Freight and consumables | 5,310 | Subtotal | 198,436 |
+| Wet room | 11,627 | Lamps, reflectors and the number plate | 905 |
+| Bed | 8,098 | Spare wheel | 736 |
+| Compliance | 5,976 | Freight and consumables | 5,310 |
+| Subtotal | 199,341 | | |
 
 The ten largest savings, with their contingency and what each costs the requirements. The site's parts list works out all fifteen from the lines. Some share lines, so they do not add up.
 
@@ -196,5 +198,5 @@ Each is in full in `docs/decisions.md`.
 2. 55 % of the tare is estimates. Assumption: the growth allowance covers them until TW-01 to TW-03 replace them. A towball reading more than 10 % off the model means the centre of gravity estimates are wrong (UTE-03).
 3. Assumption: Lovells' 7,400 kg GCM is certified in the ute's LC5 inspection. If not, tow with at most 233 L and plate at 3,300 kg.
 4. Assumption: the isolators and the line set keep the split working on corrugations, without a maker's warranty. The fallback is a rooftop unit with a sixth battery module.
-5. The Dometic fridge, freezer, hob and sink carry European prices, converted. The oven, washer, panels and labour are estimates.
+5. The Dometic fridge, freezer, hob and sink carry European prices, converted. The oven, washer, panels, lamps and labour are estimates.
 6. Assumption: the engineer accepts calculation as VSB1's evidence for the drawbar and chain tests at 3,500 kg (CHASSIS.md).

@@ -128,3 +128,36 @@ hvac:
     - {line: "VE-06", unit: "Pressure relief valve, 30 cm2, and a 0 to 125 Pa gauge", does: "Lets the excess air out through the wet room. The gauge shows a blocked filter or a failed seal", where: "Low in the rear wall"}
     - {line: "VE-07", unit: "Sphere TCR-001 range hood", does: "Kitchen extract, ducted outside through a cowl with a backdraft flap", where: "Over the hob"}
     - {line: "VE-08", unit: "Three RuuviTags and an NDIR CO2 sensor on the Cerbo GX", does: "Boosts the e2 pairs above 900 ppm CO2 and the extract on humidity", where: "Bed, living zone and wet room"}
+
+# Lamps, reflectors and the number plate, to ADR 13/00 (UNECE R48/03 as its Appendix A) and VSB1 section 3.1. The ute
+# drives them at 12 V through the 12-pin plug (DB-07). Positions are DIM-01: X from the ball, rearward, Y from the
+# centreline, road side positive, Z up from the ground at design ride height. `y` and `z` are a device's centre and
+# `size` its width and height in mm (est.). A device with `y` above 0 is a pair, mirrored to the kerb side. Side devices
+# take X from the chassis stations they sit on. The extreme outer edges come from the model: the awning case on the
+# kerb side and the road wall on the road side. cad/lamps.py resolves the positions and checks every rule.
+lamps:
+  clearance_mm: 25            # to a wall opening or the outdoor unit's cradle (est.)
+  between_mm: 15              # between two devices on one face (est.)
+  rear_door_stay_deg: 150     # BD-15's stay
+  plate_lamp_depth_mm: 35     # how far the hooded plate lamp stands off the wall (est.)
+  plate:
+    w: 372
+    h: 134
+    y: -614
+    z: 1157
+    top_max: 1300
+    mount: "Rear wall, kerb half, on rivnuts in a bonded insert strip"
+    why: >-
+      The road half has the rinse box and the outdoor unit, and the centre has the rear door and its step. A plate low on
+      the outriggers would sit over the recovery tongues and their shackles.
+    src: "https://www.nsw.gov.au/driving-boating-and-transport/vehicle-registration/vehicle-number-plates/displaying-number-plates"
+  devices:
+    - {id: LP-01, name: "Rear combination lamp: stop, tail and indicator", does: [stop, rear_position, rear_indicator], colour: "red and amber", face: rear, mount: "Rear outrigger's rear face", y: 1115, z: 811, size: [150, 80]}
+    - {id: RR-01, name: "Rear reflector, red triangle with 150 mm sides, apex up", does: [rear_reflector], colour: red, face: rear, mount: "Rear outrigger's rear face, on a 2 mm aluminium backing plate", y: 940, z: 814, size: [150, 130]}
+    - {id: LP-02, name: "Reversing lamp", does: [reversing], colour: white, face: rear, mount: "Rear outrigger's rear face", y: 805, z: 811, size: [80, 50]}
+    - {id: LP-03, name: "Rear end-outline lamp", does: [rear_end_outline], colour: red, face: rear, mount: "Rear wall's upper corners, below the outdoor unit's cradle", y: 1160, z: 2240, size: [70, 50]}
+    - {id: LP-04, name: "Number plate lamp, hooded so no white light shows to the rear", does: [plate_lamp], colour: white, face: rear, mount: "Rear wall, over the plate", y: -614, z: 1250, size: [100, 30], single: true}
+    - {id: LP-05, name: "Front position lamp", does: [front_position], colour: white, face: front, mount: "Front outrigger's front face", y: 1165, z: 845, size: [60, 45]}
+    - {id: FR-01, name: "Front reflector", does: [front_reflector], colour: white, face: front, mount: "Front outrigger's front face, below the position lamp", y: 1165, z: 780, size: [60, 45]}
+    - {id: LP-06, name: "Front end-outline lamp", does: [front_end_outline], colour: white, face: front, mount: "Front wall's flat panel, high, inboard of the corner pieces", y: 900, z: 2760, size: [70, 50]}
+    - {id: SM-01, name: "Side marker lamp with an integral reflector", does: [side_marker, side_reflector], colour: amber, face: side, mount: "Outrigger end caps, upright", stations: ["between front and diesel bay (1)", "XT centre", "rear"], z: 811, size: [40, 80]}

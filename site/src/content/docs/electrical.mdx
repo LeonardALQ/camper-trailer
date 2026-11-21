@@ -1,6 +1,6 @@
 ---
 title: Electrical
-description: The home trailer's 48 V system, its energy budget on the design days, the battery's autonomy against decision H3, the recharge sources, the circuits and the load-shedding order.
+description: The home trailer's 48 V system, its energy budget on the design days, the battery's autonomy against decision H3, the recharge sources, the circuits, the load-shedding order, and the lamps, reflectors and number plate.
 ---
 
 import Services from '../../components/Services.astro';
@@ -68,8 +68,35 @@ first, so cooking keeps priority, and the split never sheds.
 
 <Services kind="outlets" />
 
-The 12 V bus feeds {s.buses.v12.toLowerCase()}. The 24 V bus feeds {s.buses.v24.toLowerCase()}.
+Loads on the 12 V bus: {s.buses.v12}. Loads on the 24 V bus: {s.buses.v24}.
 
 ## Main cables
 
 <Services kind="cables" />
+
+## Lamps, reflectors and the number plate
+
+The trailer is over 6 m long and 2.1 m wide, so <a href={s.lamps.src}>ADR 13/00</a> asks for two reversing lamps,
+end-outline lamps front and rear, and side marker lamps as well as the usual set. It carries {s.lamps.n_lamps} lamps
+and {s.lamps.n_reflectors} reflecting devices. The ute drives them at 12 V through the 12-pin plug.
+
+- The stop, tail and indicator lamps, the reversing lamps and the red triangles sit on the rear outriggers' faces,
+  below the floor, where every height rule holds.
+- The rear end-outline lamps sit under the outdoor unit's cradle. That is the highest place both sides can share.
+- The front position lamps and the white reflectors sit on the front outriggers, within 150 mm of the widest point.
+  The awning case sets that point on the kerb side.
+- Three amber side markers with built-in reflectors go on each side, on the outrigger end caps.
+- The number plate sits on the rear wall's kerb half, with its top at {n(s.lamps.plate.z1)} mm against the
+  <a href={s.lamps.plate_src}>1,300 mm limit</a>. That keeps it clear of the rinse box, the rear door and the
+  recovery tongues.
+
+The marks L1 to L9 match drawing CT-011. All prices are in the trailer's parts list, line LGT-01.
+
+<Services kind="lamps" />
+
+<Services kind="drawing" number="CT-011" title="Elevations and openings, with the lamps" />
+
+Every check below comes from `cad/lamps.py`, which places each device on the model and tests it against the rule.
+Drawing CT-003 lists the same checks.
+
+<Services kind="lamp-checks" />

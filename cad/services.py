@@ -86,4 +86,11 @@ def services() -> dict:
         circuits=data["electrical"]["circuits"], shedding=data["electrical"]["shedding"],
         outlets=data["electrical"]["outlets"], cables=data["electrical"]["cables"],
         buses=dict(v12=data["electrical"]["bus_12v"], v24=data["electrical"]["bus_24v"]),
-        modes=data["ventilation_modes"], hvac=data["hvac"])
+        modes=data["ventilation_modes"], hvac=data["hvac"], lamps=_lamps())
+
+
+def _lamps() -> dict:
+    """The lamp schedule and its checks for the Electrical page, from cad/lamps.py."""
+    from .lamps import resolve
+    r = resolve()
+    return {k: r[k] for k in ("table", "checks", "plate", "n_lamps", "n_reflectors", "ok", "src", "plate_src", "outer_edge")}

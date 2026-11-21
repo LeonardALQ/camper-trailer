@@ -51,6 +51,7 @@ drawings:
     structural: false
     revisions:
       - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: B, date: 2026-11-21, description: "Lamps, reflectors and number plate designed, open rows closed", drawn: Kiro, checked: "", approved: ""}
   - number: CT-010
     title: Floor plan, bed up and bed down
     subtitle: Day and night plans, walkways, door swings, spaces kept clear and the bed positions
@@ -64,7 +65,7 @@ drawings:
       - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-011
     title: Elevations and openings
-    subtitle: Kerb, road, front and rear walls with the 17 openings, their positions and margins
+    subtitle: Kerb, road, front and rear walls with the 17 openings, their positions and margins, and the lamps
     project: Off-road camper trailer for the LandCruiser 79, home trailer
     sheet: 5
     size: A3
@@ -73,6 +74,7 @@ drawings:
     structural: false
     revisions:
       - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: B, date: 2026-11-21, description: "Lamps, reflectors and the number plate added to the walls with their schedule", drawn: Kiro, checked: "", approved: ""}
   - number: CT-012
     title: Sections
     subtitle: Through the bed by day and night, the plinth and bench, the wet room, well and grey tank

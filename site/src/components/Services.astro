@@ -7,7 +7,7 @@ import { withBase } from '../lib/url';
 
 interface Props {
   kind: 'drawing' | 'energy' | 'autonomy' | 'recharge' | 'circuits' | 'shedding' | 'outlets' | 'cables' | 'water' | 'water-days'
-    | 'modes' | 'design-days' | 'units';
+    | 'modes' | 'design-days' | 'units' | 'lamps' | 'lamp-checks';
   number?: string;
   title?: string;
 }
@@ -61,7 +61,7 @@ const cases = d.energy.cases;
 )}
 
 {kind === 'circuits' && (
-  <div class="data-table">
+  <div class="data-table" data-sheet="off">
     <table>
       <thead><tr><th>Circuit</th><th>Load</th><th class="num">A</th><th class="num">RCBO A</th><th>Control</th><th>Line</th></tr></thead>
       <tbody>{d.circuits.map((c: any) => (<tr><td>{c.id}</td><td>{c.load}</td><td class="num">{n(c.amps, 1)}</td><td class="num">{c.rcbo}</td><td>{c.control}</td><td>{c.at}</td></tr>))}</tbody>
@@ -88,10 +88,31 @@ const cases = d.energy.cases;
 )}
 
 {kind === 'cables' && (
-  <div class="data-table">
+  <div class="data-table" data-sheet="off">
     <table>
       <thead><tr><th>Run</th><th>Current</th><th>Fuse</th><th>Cable</th><th>Length</th></tr></thead>
       <tbody>{d.cables.map((r: any) => (<tr><td>{r.run}</td><td>{r.current}</td><td>{r.fuse}</td><td>{r.cable}</td><td>{r.length}</td></tr>))}</tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'lamps' && (
+  <div class="data-table" data-sheet="off">
+    <table>
+      <thead><tr><th>Mark</th><th>Device</th><th>Colour</th><th>Where</th><th class="num">Fitted</th><th>Across, mm</th><th>Height, mm</th><th>Along, mm</th><th>ADR 13/00</th></tr></thead>
+      <tbody>
+        {d.lamps.table.map((r: any) => (<tr><td>{r.mark} {r.id}</td><td>{r.name}</td><td>{r.colour}</td><td>{r.mount}</td><td class="num">{r.n}</td><td>{r.across}</td><td>{r.height}</td><td>{r.along}</td><td>{r.clauses.join(', ')}</td></tr>))}
+        <tr><td>Plate</td><td>Number plate, {d.lamps.plate.w} x {d.lamps.plate.h} mm, upright</td><td></td><td>{d.lamps.plate.mount}</td><td class="num">1</td><td>{n(Math.abs(d.lamps.plate.y))} {d.lamps.plate.y < 0 ? 'kerb' : 'road'} side</td><td>{n(d.lamps.plate.z0)} to {n(d.lamps.plate.z1)}</td><td></td><td>VSB1 3.1</td></tr>
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'lamp-checks' && (
+  <div class="data-table" data-sheet="off">
+    <table>
+      <thead><tr><th>ID</th><th>Check</th><th>Clause</th><th>The design, mm</th><th>The limit, mm</th><th>Result</th></tr></thead>
+      <tbody>{d.lamps.checks.map((c: any) => (<tr><td>{c.id}</td><td>{c.what}</td><td>{c.clause}</td><td>{c.measured}</td><td>{c.limit}</td><td>{c.ok ? 'Pass' : 'Fail'}</td></tr>))}</tbody>
     </table>
   </div>
 )}

@@ -13,6 +13,7 @@ import time
 
 import yaml
 
+from ..lamps import resolve as resolve_lamps
 from ..partsdb import ROOT
 from . import sheet as S
 from .home_common import MARK, Proj, ctx, label_in, opening_margins, short, textblock, title, wrap, write
@@ -49,9 +50,10 @@ def _op_key(line):
 
 
 # ------------------------------------------------------------------ CT-011 elevations
-def _wall_view(sh, V, res, wall, k, ox, oy, lay, title_txt, marks=True, dims=True, small=False):
+def _wall_view(sh, V, res, wall, k, ox, oy, lay, title_txt, marks=True, dims=True, small=False, dims_y=2.0):
     """One wall from outside at 1:k. (ox, oy) is the sheet point of the wall's left end at the floor underside.
-    Side walls run along the trailer (u from the body front), end walls across it (u is Y). Returns the u to sheet x map."""
+    Side walls run along the trailer (u from the body front), end walls across it (u is Y). `dims_y` is how far below
+    the wall the opening figures sit. Returns the u to sheet x map and the height to sheet y map."""
     L = V["body_length"] if wall in ("kerb", "road") else V["body_width"]
     zb, zt = -V["floor_t"], V["interior_h"] + V["roof_t"]
     if wall == "kerb":
@@ -112,7 +114,7 @@ def _wall_view(sh, V, res, wall, k, ox, oy, lay, title_txt, marks=True, dims=Tru
                 sh.text((x0 + x1) / 2, y1 + 0.8, m, 1.3 if not small else 1.1, "middle", bold=True)
     if dims and ops:
         us = sorted({round(v) for o in ops for v in (o["u0"], o["u1"])})
-        yd = Z(zb) - 2.0
+        yd = Z(zb) - dims_y
         last = -1e9
         for u in us:
             x = X(u)
@@ -127,6 +129,41 @@ def _wall_view(sh, V, res, wall, k, ox, oy, lay, title_txt, marks=True, dims=Tru
     return X, Z
 
 
+LAMP_MARK_AT = {"LP-03": "inboard", "LP-05": "inboard", "FR-01": "inboard", "LP-04": "above", "LP-06": "below"}
+
+
+def _lamps_on_walls(sh, V, views, LM):
+    """The lamps, reflectors and the plate on the four wall views, true to position and marked L1 to L9 as scheduled.
+    Those below the floor sit on the outriggers' end faces, so they are drawn under the wall's lower edge."""
+    fz = V["floor_z"]
+    mark = {r["id"]: r["mark"] for r in LM["table"]}
+    low_z = min(i["z0"] for i in LM["devices"])
+    for i in LM["devices"]:
+        X, Z = views[i["side"] if i["face"] == "side" else i["face"]]
+        u0, u1 = (i["x0"] - V["body_x0"], i["x1"] - V["body_x0"]) if i["face"] == "side" else (i["y0"], i["y1"])
+        x0, x1 = sorted((X(u0), X(u1)))
+        y0, y1 = Z(i["z0"] - fz), Z(i["z1"] - fz)
+        if "rear_reflector" in i["does"]:
+            sh.path([(x0, y0), (x1, y0), ((x0 + x1) / 2, y1)], "medium", closed=True)
+        else:
+            sh.rect(x0, y0, x1, y1, "medium")
+        m, at = mark[i["dev"]], LAMP_MARK_AT.get(i["dev"], "row")
+        if at == "inboard":
+            left = (x0 + x1) / 2 < X(0)
+            sh.text(x1 + 0.4 if left else x0 - 0.4, (y0 + y1) / 2 - 0.33, m, 0.95, "start" if left else "end")
+        elif at == "above":
+            sh.text((x0 + x1) / 2, y1 + 0.45, m, 0.95, "middle")
+        elif at == "below":
+            sh.text((x0 + x1) / 2, y0 - 1.3, m, 0.95, "middle")
+        else:
+            sh.text((x0 + x1) / 2, Z(low_z - fz) - 1.6, m, 0.95, "middle")
+    p = LM["plate"]
+    X, Z = views["rear"]
+    x0, x1 = sorted((X(p["y0"]), X(p["y1"])))
+    sh.rect(x0, Z(p["z0"] - fz), x1, Z(p["z1"] - fz), "medium")
+    sh.text((x0 + x1) / 2, (Z(p["z0"] - fz) + Z(p["z1"] - fz)) / 2 - 0.4, "PLATE", 1.1, "middle")
+
+
 def ct011(prj, model, bom, checks, reg, dwg):
     t0 = time.time()
     C = ctx(prj)
@@ -134,10 +171,15 @@ def ct011(prj, model, bom, checks, reg, dwg):
     sh = S.Sheet()
     S.frame(sh)
     k = dwg["scale"]
-    _wall_view(sh, V, res, "kerb", k, 26, 214, lay, "KERB-SIDE WALL FROM OUTSIDE, FRONT LEFT. FIGURES: mm FROM THE BODY FRONT")
-    _wall_view(sh, V, res, "front", k, 160, 214, lay, "FRONT WALL, KERB SIDE RIGHT. mm FROM THE CENTRELINE")
-    _wall_view(sh, V, res, "road", k, 26, 146, lay, "ROAD-SIDE WALL FROM OUTSIDE, FRONT RIGHT. FIGURES: mm FROM THE BODY FRONT")
-    X, Z = _wall_view(sh, V, res, "rear", k, 160, 146, lay, "REAR WALL, ROAD SIDE RIGHT. mm FROM THE CENTRELINE")
+    views = {}
+    for wall, ox, oy, txt in (("kerb", 26, 214, "KERB-SIDE WALL FROM OUTSIDE, FRONT LEFT. FIGURES: mm FROM THE BODY FRONT"),
+                              ("front", 160, 214, "FRONT WALL, KERB SIDE RIGHT. mm FROM THE CENTRELINE"),
+                              ("road", 26, 143, "ROAD-SIDE WALL FROM OUTSIDE, FRONT RIGHT. FIGURES: mm FROM THE BODY FRONT"),
+                              ("rear", 160, 143, "REAR WALL, ROAD SIDE RIGHT. mm FROM THE CENTRELINE")):
+        views[wall] = _wall_view(sh, V, res, wall, k, ox, oy, lay, txt, dims_y=6.6)
+    X, Z = views["rear"]
+    LM = resolve_lamps(lay)
+    _lamps_on_walls(sh, V, views, LM)
     # the split's outdoor unit and its cradle on the rear wall (phantom), and the awning on the kerb wall
     for iid in ("AC-03",):
         b = lay.find(iid).box
@@ -165,7 +207,7 @@ def ct011(prj, model, bom, checks, reg, dwg):
                                    ("TIGHTEST TO", 33), ("GAP", 14), ("RULE", 14), ("MARGIN", 20)], rows, size=1.38, row_h=3.15,
                 title="EACH OPENING'S TIGHTEST GAP UNDER THE SPACING RULES (BDY-18)")
     oc = res["openings_check"]
-    S.notes(sh, 230, y - 6, [
+    yn, _ = S.notes(sh, 230, y - 6, [
         f"RULES (report 12 section 5, data/body/body.yaml): {RULES['between_mm']} mm OF FULL WALL BETWEEN NEIGHBOURING OPENINGS, OR "
         f"{RULES['between_mm']} mm APART IN HEIGHT WHERE THEY SHARE NO HEIGHT BAND. {RULES['edge_mm']} mm TO A PANEL EDGE AND TO THE ROOF. "
         f"NOTHING WITHIN {RULES['rear_corner_mm']} mm OF THE REAR CORNERS.",
@@ -175,6 +217,26 @@ def ct011(prj, model, bom, checks, reg, dwg):
         f"SURFACE AT Z {V['floor_z']:.0f}.",
         "GLANDS OF 60 mm OR LESS (FILL, PV, SPLIT LINES, THE OUTLET BOXES, THE BATTERY VENTS) ARE NOT OPENINGS. THEY ARE ON CT-602 AND CT-612.",
     ], size=1.38, width_chars=150)
+    p = LM["plate"]
+    rows = [[r["mark"], r["id"], r["name"].upper(), r["colour"].upper(), r["face"].upper(), r["across"].upper(), r["height"].upper(),
+             r["along"]] for r in LM["table"]]
+    rows.append(["", "PLATE", f"NUMBER PLATE, {p['w']} x {p['h']}, UPRIGHT", "", "REAR",
+                 f"{abs(p['y']):,.0f} {'KERB' if p['y'] < 0 else 'ROAD'} SIDE",
+                 f"{p['z0']:,.0f} TO {p['z1']:,.0f}", f"{V['body_x1']:,.0f}"])
+    y = S.table(sh, 230, yn - 5, [("MARK", 10), ("ID", 12), ("DEVICE", 62), ("COLOUR", 17), ("FACE", 11), ("ACROSS (Y)", 24),
+                                   ("HEIGHT (Z)", 23), ("ALONG (X)", 21)], rows, size=1.38, row_h=3.15,
+                title="LAMPS, REFLECTORS AND THE NUMBER PLATE, mm IN DIM-01 (ADR 13/00, VSB1 3.1)")
+    n_ok = sum(c["ok"] for c in LM["checks"])
+    oe = LM["outer_edge"]
+    S.notes(sh, 230, y - 6, [
+        "THE LAMPS RUN ON THE UTE'S 12 V LAMP CIRCUITS THROUGH THE 12-PIN PLUG (DB-07), ON A LOOM SUPPORTED EVERY 600 mm (VSB1 7.1). "
+        "ALL ARE MULTIVOLT LED. Z IS THE HEIGHT ABOVE THE GROUND AT RIDE HEIGHT, OF THE LIT OR REFLECTING AREA.",
+        f"ADR 13/00 (UNECE R48/03 APPENDIX A): {LM['n_lamps']} LAMPS AND {LM['n_reflectors']} REFLECTING DEVICES. {n_ok} OF "
+        f"{len(LM['checks'])} CHECKS PASS (LMP-01 TO LMP-{len(LM['checks']):02d} ON CT-003). EXTREME OUTER EDGES: Y {oe['kerb']:,.0f} AT "
+        f"THE AWNING CASE AND {oe['road']:,.0f} AT THE ROAD WALL.",
+        "THE REAR END-OUTLINE LAMPS SIT UNDER THE OUTDOOR UNIT'S CRADLE, THE HIGHEST PLACE BOTH SIDES CAN SHARE (6.13.4). THE PLATE "
+        "SITS ON THE KERB HALF, CLEAR OF THE RINSE BOX, THE DOOR, ITS STEP AND THE RECOVERY TONGUES.",
+    ], size=1.38, width_chars=150)
     S.notes(sh, 22, 116, [
         "DATUM DIM-01. EVERY WALL IS DRAWN AS SEEN FROM OUTSIDE. HEIGHTS ABOVE THE FLOOR SURFACE, THE FLOOR AND ROOF THICKNESSES SHOWN.",
         "PHANTOM LINES ACROSS EACH WALL: THE FLOOR SURFACE AND THE CEILING. THE THIN LINES NEAR THE FRONT ARE THE EDGES OF THE "
@@ -183,6 +245,8 @@ def ct011(prj, model, bom, checks, reg, dwg):
         "THE FIGURES UNDER EACH WALL ARE THE OPENINGS' EDGES ALONG IT. THE SCHEDULE OF PRODUCTS IS CT-013, THE CUT-OUT SIZES ARE THE MAKERS'.",
         "CUT-OUT CORNERS RADIUSED, 68 mm FOR SERVICE DOORS AND 90 mm AT THE TOP OF THE DOOR FRAMES (report 12). EVERY CUT EDGE IS SEALED.",
         "WHERE AN OPENING CROSSES A CHASSIS STATION THE OUTRIGGER-TIP MOUNT MOVES INBOARD OF ITS FRAME AND THE FLOOR JOINER RUNS UNBROKEN.",
+        "L1 TO L9 ARE THE LAMPS AND REFLECTORS SCHEDULED AT RIGHT. THOSE DRAWN UNDER A WALL SIT ON THE OUTRIGGERS' END FACES AND END CAPS, "
+        "TRUE TO HEIGHT. THE TRIANGLES ARE THE REAR REFLECTORS, APEX UP.",
     ], size=1.5, width_chars=185)
     write(sh, dwg)
     return time.time() - t0

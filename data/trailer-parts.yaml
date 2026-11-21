@@ -27,6 +27,7 @@ sources: [data/assemblies/trailer.yaml, data/chassis/chassis.yaml]
 groups:
   labour: Hired fabrication and fitting labour at AUD 120 an hour
   installation: Licensed electrical work
+  lamps: Lamps, reflectors and the number plate (ADR 13/00, VSB1 3.1)
   compliance: Engineering review, inspection and the first year's registration in NSW
   freight: Freight and consumables
 totals:
@@ -165,6 +166,22 @@ lines:
     qty: 120
     unit: h
     price: {aud_each: 120, basis: estimate, date: 2026-11-21, note: "Research report 22's allowance (open point 6). The research gave no hours for these systems. The licensed electrical work is ELI-01 and the split's refrigeration fitting is in AC-03"}
+  # ================================================================ lamps, reflectors and the number plate (data/services.yaml lamps, CT-011)
+  - id: LGT-01
+    group: lamps
+    name: Lamps, reflectors, the number plate's bracket and the lamp loom, to ADR 13/00 and VSB1 3.1
+    qty: 1
+    unit: set
+    price:
+      - {item: "Two rear combination lamps, stop, tail and indicator, multivolt LED, LED Autolamps 150 series class", aud: 180, basis: estimate, url: "https://www.ebay.com.au/b/LED-Autolamps-Car-Truck-Rear-Light-Assemblies/33716/bn_95542291", date: 2026-11-21, note: "LED Autolamps rear lamps were listed at AUD 44 to 139 each"}
+      - {item: "Two reversing lamps, multivolt LED", aud: 90, basis: estimate, date: 2026-11-21}
+      - {item: "Two red triangular reflectors with 150 mm sides, and their aluminium backing plates", aud: 50, basis: estimate, date: 2026-11-21}
+      - {item: "Four end-outline lamps, two white and two red, multivolt LED", aud: 120, basis: estimate, date: 2026-11-21}
+      - {item: "Two white front position lamps and two white front reflectors", aud: 80, basis: estimate, date: 2026-11-21}
+      - {item: "Six amber side marker lamps with built-in reflectors", aud: 150, basis: estimate, date: 2026-11-21}
+      - {item: "Hooded number plate lamp, and the plate's bracket and rivnuts", aud: 65, basis: estimate, date: 2026-11-21}
+      - {item: "Lamp loom: 25 m of 7-core trailer cable, a junction box at the front, glands, grommets and heat shrink", aud: 170, basis: estimate, date: 2026-11-21}
+    note: About 4 kg (est.), inside BD-11's 60 kg allowance for wiring, lighting and hardware. The fitting is in LAB-08's services hours.
   # ================================================================ licensed trades
   - id: ELI-01
     group: installation

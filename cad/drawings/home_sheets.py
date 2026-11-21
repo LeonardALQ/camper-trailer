@@ -14,6 +14,7 @@ import time
 
 from build123d import Keep, Plane  # noqa: F401  (kept for the views that cut the model)
 
+from ..lamps import resolve as resolve_lamps
 from ..trailer_model import TrailerModel
 from . import sheet as S
 from .home_common import MARK, Proj, body_plan, cog_symbol, ctx, label_in, stamp, textblock, title, tw, wrap, write
@@ -240,6 +241,26 @@ def ct003(prj, model, bom, checks, reg, dwg):
     S.hdim(sh, Rr(-V["half_bw"] - 100, 0)[0], yt - 4, Rr(V["half_bw"], 0)[0], yt - 4, yt + 2, f"{ch['overall_width']:.0f} WITH THE AWNING", size=1.4)
     S.hdim(sh, Rr(-V["half_bw"], 0)[0], Rr(0, 0)[1], Rr(V["half_bw"], 0)[0], Rr(0, 0)[1], Rr(0, 0)[1] - 6, f"{V['body_width']:.0f} BODY", size=1.4)
     sh.text(Rr(0, 0)[0], yt + 6.5, "REAR VIEW", 2.2, "middle", bold=True)
+    # the lamps, reflectors and the plate (CT-011): on the rear view with three heights, the side markers on the elevation
+    LM = resolve_lamps(lay)
+    pl = LM["plate"]
+
+    def box(pa, pb, sty):
+        sh.rect(min(pa[0], pb[0]), min(pa[1], pb[1]), max(pa[0], pb[0]), max(pa[1], pb[1]), sty)
+    for i in LM["devices"]:
+        if i["face"] == "rear":
+            box(Rr(i["y0"], i["z0"]), Rr(i["y1"], i["z1"]), "thin")
+        elif i["face"] == "side" and i["side"] == "kerb":
+            box(E(i["x0"], i["z0"]), E(i["x1"], i["z1"]), "thin")
+    box(Rr(pl["y0"], pl["z0"]), Rr(pl["y1"], pl["z1"]), "medium")
+    xs = (Rr(-V["half_bw"], 0)[0], Rr(V["half_bw"], 0)[0])
+    kerb = lambda f: next(i for i in LM["devices"] if f in i["does"] and i["side"] == "kerb")  # noqa: E731
+    eo, rf = kerb("rear_end_outline"), kerb("rear_reflector")
+    for n, (yv, zv, txt) in enumerate(((pl["y"], pl["z1"], f"{pl['z1']:,.0f} PLATE TOP"), (rf["y"], rf["z1"], f"{rf['z1']:,.0f}"),
+                                       (eo["y"], eo["z1"], f"{eo['z1']:,.0f}"))):
+        x = Rr(yv, zv)[0]
+        xd = min(xs) - 3 - 3.5 * n if x < Rr(0, 0)[0] else max(xs) + 3 + 3.5 * n
+        S.vdim(sh, x, Rr(0, 0)[1], x, Rr(yv, zv)[1], xd, txt, size=1.2)
 
     # ---- the compliance table, item by item (report 02 section 2, VSB1 Rev 6)
     def st(cid):
@@ -253,6 +274,9 @@ def ct003(prj, model, bom, checks, reg, dwg):
         return fmt.format(c["measured"]) + (f" {c['unit']}" if c.get("unit") else "")
 
     gcm = chk["GCM-01"]["gcm"]
+    n_ok = sum(c["ok"] for c in LM["checks"])
+    lc = {c["id"]: c for c in LM["checks"]}
+    lst = lambda cid: (f"{'PASS' if lc[cid]['ok'] else 'FAIL'} ({cid})", "#000" if lc[cid]["ok"] else "#c00")  # noqa: E731
     uc = {c["id"]: c for c in C["ute"]["checks"]}
     rows = [
         ["ATM", "Builder's rating from the chassis, axles, tyres and stability (VSB1 p. 9). Plate H2", f"{rep['caps']['plated']:,.0f} kg plate. Heaviest case with growth {mv('MAS-01')}", st("MAS-01")],
@@ -281,14 +305,18 @@ def ct003(prj, model, bom, checks, reg, dwg):
         ["Extinguisher", "1A:5B, one a compartment, smoke alarm (VSB1 13.2.2)", "1A:20B:(E) and fire blanket at D1, smoke and CO alarms (LA-12, LA-15)", ("ASK THE INSPECTOR", "#b06000")],
         ["LPG", "Caravan LPG code and AS/NZS 5601 (VSB1 13.2.4)", "None fitted. Cooking, hot water and heat are electric or diesel", ("NONE", "#000")],
         ["Mud flaps", "Behind the rear wheels", "610 x 455 mm rubber on the XT rear shock outriggers (BD-10)", ("BD-10", "#000")],
-        ["Number plate", "No part above 1,300 mm, lit (VSB1 3.1)", "Not designed yet", ("OPEN", "#b06000")],
-        ["Lamps, reflectors", "ADR positions and heights (report 02 CT-003)", "Not designed yet", ("OPEN", "#b06000")],
+        ["Number plate", "Upright, no part above 1,300 mm, lit white, legible from 20 m (VSB1 3.1)",
+         f"{pl['w']} x {pl['h']} mm on the rear wall's kerb half, top at {pl['z1']:,.0f} mm, its lamp over it", lst("LMP-14")],
+        ["Lamps, reflectors", "ADR 13/00 positions, heights and spacings (UNECE R48/03 Appendix A)",
+         f"{LM['n_lamps']} lamps and {LM['n_reflectors']} reflecting devices on CT-011, {n_ok} of {len(LM['checks'])} checks pass",
+         (f"PASS (LMP-01 TO {len(LM['checks']):02d})" if LM["ok"] else "FAIL", "#000" if LM["ok"] else "#c00")],
     ]
     y = S.table(sh, 22, 186, [("ITEM", 25), ("THE RULE AND ITS SOURCE", 84), ("THE DESIGN", 72), ("RESULT", 25)], rows, size=1.32,
                 row_h=2.95, title="VSB1 AND THE STANDARDS, ITEM BY ITEM (report 02 section 2, VSB1 REV 6)")
     S.notes(sh, 22, y - 5, [
         "WIDTH, HEIGHT AND LENGTHS ARE MEASURED ON THE 3D MODEL AT DESIGN RIDE HEIGHT. THE BODY IS 2,400 mm, THE AWNING TAKES IT TO 2,500 mm.",
-        "LAMPS, REFLECTORS AND THE NUMBER PLATE ARE NOT DESIGNED YET. THEY GO ON THIS SHEET WITH THEIR HEIGHTS WHEN THE LAMPS ARE CHOSEN.",
+        "LAMPS, REFLECTORS AND THE NUMBER PLATE ARE SCHEDULED ON CT-011 AND DRAWN ON EACH WALL THERE. THE REAR VIEW SHOWS THEM WITH THEIR "
+        "HEIGHTS, AND THE TABLE AT RIGHT GIVES EVERY CHECK (cad/lamps.py, data/services.yaml).",
         "THE WET ROOM HAS ITS OWN OUTSIDE DOOR. ASK THE INSPECTOR WHETHER IT COUNTS AS A SECOND COMPARTMENT FOR VSB1 13.2.2 (A SECOND EXTINGUISHER).",
     ], width_chars=185, size=1.45)
 
@@ -330,12 +358,21 @@ def ct003(prj, model, bom, checks, reg, dwg):
         "MATCHING THE RAV ENTRY. NSW ALSO LOOKS FOR THE MODEL AND THE DATE OF MANUFACTURE (VIB 78). THE GTM TO PLATE IS SET WITH THE "
         f"ENGINEER, AT MOST THE NSW CAP OF {rep['caps']['gtm']:,.0f} kg. THE PLATE AND VIN POSITIONS ARE NOT DESIGNED YET. PHOTOGRAPH "
         "THE VIN STAMPING BEFORE AND AFTER GALVANISING (REG-02).", 150), size=1.4, gap=0.85)
-    S.notes(sh, 232, yq - 4, [
+    yn, _ = S.notes(sh, 232, yq - 4, [
         "EVERY FIGURE ON THIS SHEET COMES FROM THE MODEL'S CHECKS (data/checks.yaml, data/ute/ute.yaml) AT THE SOLVED AXLE.",
-        "A RESULT IN AMBER IS A QUESTION FOR THE INSPECTOR OR AN ITEM NOT DESIGNED YET. NO CHECK FAILS.",
+        "A RESULT IN AMBER IS A QUESTION FOR THE INSPECTOR. NO CHECK FAILS.",
     ], size=1.4, width_chars=150)
+    _lamp_checks(sh, LM, yn - 5)
     write(sh, dwg)
     return time.time() - t0
+
+
+def _lamp_checks(sh, LM, y):
+    """CT-003's table of the lamp, reflector and plate checks from cad/lamps.py, in the right column."""
+    rows = [[c["id"], c["what"], c["clause"], c["measured"], c["limit"],
+             ("PASS" if c["ok"] else "FAIL", "#000" if c["ok"] else "#c00")] for c in LM["checks"]]
+    S.table(sh, 230, y, [("ID", 13), ("CHECK", 45), ("CLAUSE", 14), ("THE DESIGN, mm", 58), ("THE LIMIT, mm", 36), ("RESULT", 14)],
+            rows, size=1.2, row_h=2.7, title="LAMPS, REFLECTORS AND THE NUMBER PLATE (ADR 13/00 APPENDIX A, VSB1 3.1)")
 
 
 # ------------------------------------------------------------------ CT-010 floor plan
