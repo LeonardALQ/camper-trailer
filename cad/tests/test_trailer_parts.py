@@ -7,10 +7,10 @@ from collections import defaultdict
 
 import yaml
 
-from cad.partsdb import DATA
+from cad.partsdb import DATA, ROOT
 from cad.sitedata import project_costs
 from cad.tests.test_trailer import EV
-from cad.trailer_costs import BASES, block_prices, instances, parts_list
+from cad.trailer_costs import BASES, block_prices, instances, parts_list, savings
 
 LIST = parts_list()
 LINES = LIST["lines"]
@@ -130,3 +130,32 @@ def test_the_cost_table_quotes_the_list():
     assert abs(row["contingency"] - TOT["contingency_aud"]) < 0.011
     assert abs(row["total"] - TOT["total_aud"]) < 0.011
     assert abs(row["owner_built"] - TOT["owner_built_total_aud"]) < 0.011
+
+
+def test_savings_are_worked_out_from_the_lines():
+    """Every option names lines that exist, the labour option is the gap to the owner-built total, and the list is
+    largest first."""
+    S = savings(LIST)
+    ids = {ln["id"] for ln in LINES}
+    assert len({s["id"] for s in S}) == len(S)
+    for s in S:
+        rm = s["removes"]
+        assert rm, f"{s['id']} removes nothing"
+        for i in rm.get("lines", []) + [p["line"] for p in rm.get("parts", [])]:
+            assert i in ids, f"{s['id']}: unknown line {i}"
+        assert s["costs"] and not PUBLIC_WORDS.search(s["costs"] + s["name"]), s["id"]
+        assert abs(s["removed_aud"] - s["added_aud"] - s["saving_aud"]) < 0.011, s["id"]
+    labour = next(s for s in S if s["removes"].get("groups") == ["labour"])
+    assert abs(labour["saving_aud"] - (TOT["total_aud"] - TOT["owner_built_total_aud"])) < 0.011
+    assert [s["saving_aud"] for s in S] == sorted((s["saving_aud"] for s in S), reverse=True)
+
+
+def test_trailer_md_quotes_the_costs():
+    """TRAILER.md's cost section quotes the list's totals, every group and the ten largest savings."""
+    text = (ROOT / "TRAILER.md").read_text()
+    for v in (TOT["subtotal_aud"], TOT["contingency_aud"], TOT["total_aud"], TOT["owner_built_total_aud"]):
+        assert f"AUD {round(v):,}" in text, f"TRAILER.md does not quote AUD {round(v):,}"
+    for g, v in TOT["by_group"].items():
+        assert f"| {round(v):,} |" in text, f"TRAILER.md's cost table has no {g} row of {round(v):,}"
+    for s in savings(LIST)[:10]:
+        assert f"AUD {round(s['saving_aud']):,}" in text, f"TRAILER.md does not quote {s['id']}'s AUD {round(s['saving_aud']):,}"

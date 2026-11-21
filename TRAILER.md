@@ -1,200 +1,200 @@
-# Whole trailer: layout for the LandCruiser 79
+# Home trailer
 
-Status: concept, revision H, 20 Nov 2026. This is layout 1 of the layout study, research report 18 (`research/18-trailer-layout-79.md`): a queen bed across the front, a fixed roof and a 4,420 mm body, towed by the LandCruiser 79. The data is `data/assemblies/trailer.yaml`, `data/load_cases.yaml`, `data/checks.yaml` and `data/measurements.yaml`. The code is `cad/trailer.py`, and drawing CT-001 is the general arrangement. The site's Whole trailer page shows the current build. The decision log cited by its time is `docs/decisions.md`, and the layout study is research report 18.
+Status: concept, revision J, 21 Nov 2026. DRAFT, not for construction until the engineer reviews it. The data is `data/assemblies/trailer.yaml`, `data/load_cases.yaml`, `data/checks.yaml`, `data/services.yaml`, `data/measurements.yaml` and the parts list `data/trailer-parts.yaml`. The code is `cad/trailer.py`. CHASSIS.md and BODY.md design the frame and the shell, `docs/decisions.md` records the decisions, and research reports 19 to 22 and 25 hold the research. Positions are in the project datum DIM-01: X rearward from the ball, Y positive to the road side, Z up from the ground, in mm.
 
-Leonard asked: "Then, I'll put an enclosed box at the back to fit the two bikes and some tools. That way, we can make the trailer smaller and lighter." And: "Then, let's redesign our whole plan to to this new vehicle."
+Leonard asked for a home for long stays off-grid: a lifted bed over a 1.2 m desk, a wet bathroom entered from a rear door, a recirculating shower for two 20 min showers a day, an electric kitchen with an oven, a washer and a dryer, filtered fresh air with the windows shut, blackout blinds, and power for a hot day of air-conditioning for at least 12 h, 24 h if possible.
 
-## What changed in revision H, 20 Nov 2026
+## Summary
 
-- The bikes ride in the ute's bike box (UTE-GARAGE.md), so the trailer's garage and bed module is gone. Its parts, its checks and drawings CT-401, CT-402 and CT-501 are retired. `DESIGN.md` carries a retired note.
-- The body is 4,420 mm long in place of 5,500 mm, with a fixed roof and 1,950 mm inside. The queen bed lies across the front. There is no rear door, no ramp and no raising roof.
-- The tow vehicle is the LandCruiser 79 single cab V8 on a Lovells 4,200 kg GVM kit, in place of the Porsche Cayenne. Its limits come from `data/ute/ute.yaml` and the built ute model.
-- The ATM is plated at 3,100 kg (decision log 12:10). The towball target is 220 kg fully loaded, and the cap is 250 kg.
-- All 400 L of water ride in the trailer. The car's water tank and the ballast are gone.
-- The generator and the jerry cans ride in a sealed drawbar box, DX-01. The jockey wheel's clamp moves forward to X 1,000 mm, and the wheel swings up for travel to lie along the drawbar below the bike box's sweep.
-- The trailer runs the ute's wheel and tyre: ROH Trak 2 16 x 7 ET 0 with LT265/75R16 123/120 on Cruisemaster LC5 hubs. The XT Air axles are 900 mm apart, and the track is 1,555 mm, the ute's front track.
-- The coupling point is at Z 440 mm, the ute's laden ball height (UTE-01).
-- New checks: GCM-01 for the combination, and JK-01 and JK-02 for the jack-knife sweep of the bike box.
-- The first build failed three checks, and each part was resized. The outriggers grew from RHS 100 x 50 x 3 to RHS 125 x 50 x 3 (FAT-05 was 23.5 MPa against a 21.1 MPa limit, now 16.8 MPa). The heater's diesel tank got its own bay between two crossmembers (FIT-03 found a 50 mm overlap). The entry door moved 5 mm rearward (BDY-18 was 298 mm against 300 mm). The cassette toilet and its service door moved forward to keep 300 mm from the rear corner.
-- No check limit changed, and no estimate changed to pass a check.
+| Measure | Value |
+|---|---|
+| Body | 4,420 x 2,400 mm outside, X 1,820 to 6,240. Inside 4,350 x 2,330 x 2,000 mm, floor at Z 925 |
+| Overall | 6,700 mm long, 2,500 mm wide over the awning, 2,967 mm high |
+| Tare | 2,581 kg, 2,834 kg with the growth allowance |
+| Fully loaded with 350 L of water (TC2) | 3,111 kg, 3,397 kg with growth, against the 3,500 kg plate |
+| Towball | 250 to 292 kg, 8.1 to 10.5 % of the trailer, at most 317 kg with growth |
+| Ute | Rear axle 2,586 kg with growth against its 2,800 kg plate. Combination 7,100 kg against 7,400 kg |
+| Battery | 25.6 kWh. A design hot day runs 25.1 h when new and 17.2 h at end of life |
+| Water | 420 L fresh, at most 350 L in travel, about 41 L a day. 130 L grey |
+| Cost | AUD 229,650 with contingency, AUD 181,698 owner-built |
 
-The earlier revisions are in the git history. Revisions C to G placed the garage at the back, gave the trailer its own wheels, added the designed chassis and built in report 13's equipment.
+Every fail check passes. The tightest are the towball share with the grey tank full (MAS-12, 8.1 % against 8.0 %), the heaviest towball (MAS-13, 316.8 kg against 320 kg) and the recovery pull in the road-side rail (CHS-08A, 0.91 of yield).
 
-## Datum
+## Layout
 
-The project datum DIM-01 (research report 02): X rearward from the coupling ball centre, Y positive to the road side, Z up from the ground at design ride height, all in mm. It is right-handed, so the model shows the real trailer, with the entry door on the left when you look from behind.
+From the front: the drawbar with its sealed box, the bed and desk zone, the living zone, a partition and the wet room across the rear (CT-010).
 
-## Body
+| Zone | Inside X | Kerb side | Middle | Road side |
+|---|---|---|---|---|
+| Bed and desk | 1,855 to 3,445 | Window W1, the second way out | Lift bed over the desk, nothing else (H1) | Window W2 |
+| Living | 3,445 to 5,185 | Entry door D1, the battery plinth with the washer and dryer on it | Aisle, 905 mm wide at full height | Tower with the Combi, fridge and oven, bench with the hob over the freezer, sink, W4 |
+| Partition | 5,185 to 5,205 | 48 V board | Inner door | Inverter, split indoor unit |
+| Wet room | 5,205 to 6,205 | Toilet, basin, cassette door | Rear door D2 | Shower over its floor well, W6 |
 
-- 4,420 mm long and 2,400 mm wide outside, from X 1,820 to 6,240 mm. The inside is 4,350 mm long and 2,330 mm wide.
-- Floor surface at Z 925 mm. Inside height 1,950 mm, for people up to about 1.88 m tall (assumption, report 18 open question 3).
-- Fixed 40 mm roof bonded to the walls, with the four Sunman solar panels on it. Travel height 2,917 mm to the top of the panels.
-- Overall length 6,300 mm, from the coupling head to the body rear. Overall width 2,500 mm with the awning.
+Under the floor, between the rails, are the fresh tanks over the axles, the grey tank in the rear bay, the heater's diesel tank and the air supply box. The drawbar carries the box with two Honda EU22i and the jerry cans, the jockey wheel, and the spare wheel on the front wall above them. Walkways and landings keep at least 550 mm clear (FIT-01). The air-conditioner's outdoor unit stands high on the rear wall's road half.
 
-BODY.md revision B has the panels, joints, mounts and checks.
+Storage is 0.38 m³ inside and 0.09 m³ in the drawbar box, about 0.2 m³ short of a long-stay home (est.), because the bed's footprint stays empty (H16).
 
-## Zones, front to back
+## Mass and limits
 
-| Zone | Inside X (mm) | Kerb side | Middle and road side |
+Masses in kg. The towball comes from moments about the axle group centre at X 4,381 mm. "With growth" adds 20 % to an estimate, 7 % to a calculated mass and nothing to a maker's figure (report 02, MASS-06). CT-002 shows each case's centre of gravity.
+
+| Case | Aboard | Mass | Towball | Share | With growth | Towball with growth |
+|---|---|---|---|---|---|---|
+| TC1 Tare | Nothing | 2,581 | 254.5 | 9.9 % | 2,834 | 273.3 |
+| TC2 Fully loaded | 350 L fresh, fuel, 150 kg of gear | 3,111 | 291.8 | 9.4 % | 3,397 | 316.8 |
+| TC3 Highway | 50 L, fuel, gear | 2,811 | 289.7 | 10.3 % | 3,097 | 314.7 |
+| TC4 Water, no gear | 350 L, fuel | 2,961 | 272.3 | 9.2 % | 3,217 | 293.5 |
+| TC5 Gear, no water | Fuel, gear | 2,761 | 289.3 | 10.5 % | 3,047 | 314.4 |
+| TC6 Fuel only | Fuel | 2,611 | 269.9 | 10.3 % | 2,867 | 291.1 |
+| TC7 Grey full | 220 L fresh, 130 L grey, fuel, gear | 3,111 | 251.8 | 8.1 % | 3,397 | 276.9 |
+| TC8 Grey full, fresh empty | 130 L grey, fuel, gear | 2,891 | 250.3 | 8.7 % | 3,177 | 275.3 |
+
+- Plate: ATM 3,500 kg, the ute's braked towing rating and the limit of the DO35 and the chains (H2). The heaviest case with growth is 3,397 kg, inside H2's 3,400 kg target. The examiner's caps from the tyres, coupling, chains and brakes are 3,500 kg (MAS-07, MAS-08).
+- Water: at most 350 L of fresh and grey water while towing. The tanks hold 420 L and are filled at camp (H13).
+- Towball: at least 7.5 % in every case and at most 350 kg, the 79's, the towbar's and the DO35's rating (MAS-04, H14). While the masses are estimates the axle sits in the middle of a 13.3 mm window between 8.0 % in the lightest case and 320 kg with growth in the heaviest (MAS-12, MAS-13, H17).
+- Ute: the heaviest towball puts the ute's rear axle at 2,586 kg with growth against the Elite kit's 2,800 kg plate (MAS-03, H18). MAS-14 reports the Platinum kit for the car build's cut CUT7.
+- GCM: the ute at its 3,850 kg weighed limit plus the plate less the lightest towball is 7,100 kg against Lovells' 7,400 kg (GCM-01). If the revision is refused, Toyota's 6,900 kg allows 233 L of water in travel and a 3,300 kg plate.
+- Balance: the centre of gravity sits at most 32.8 mm to the kerb side against a 50 mm rule (MAS-11), at Z 1,215 to 1,308 mm with growth. The static stability factor is 0.58 to 0.62.
+- Axles: the XT build carries 3,744 kg with VSB1's 120 % rule against its 4,050 kg, and each wheel 950 kg against its 1,400 kg (MAS-02, MAS-09).
+
+## Structure
+
+The chassis is a galvanised ladder frame (CHASSIS.md revision E, CT-101 to CT-104). Two RHS 150 x 50 x 3 C450L0 rails each carry a continuous RHS 127 x 51 x 3.5 C350L0 raiser, so the floor clears the 805 mm tyres. Eight stations carry crossmembers and outriggers, and the drawbar is RHS 150 x 50 x 5. Steel and zinc weigh 503 kg. Checked at the plate, the recovery pull governs at 0.91 of yield, VSB1's drawbar tests reach 0.76 and the travel cases 0.52. The frame twists 0.400 degree against 0.5, and every fatigue detail stays below its endurance limit. Heavy items bolt through the floor into the raisers and outriggers (CT-104).
+
+## Body and roof
+
+The shell is bonded sandwich panels in aluminium joiners (BODY.md revision C, CT-201 to CT-203): a 30 mm GRP and PVC foam floor, 35 mm GRP and XPS walls 2,000 mm tall, and a fixed 40 mm roof that carries the solar panels. It bolts to the frame at 32 points and takes 98 % of the twist.
+
+The roof is fixed, with rounded front edges, 150 mm at the roof edge and 250 mm on the front verticals (H12). Research report 25 puts towing fuel at 21.3 L/100 km at 90 km/h, against 25.0 with a square front and 20.6 with a hard raising roof, which would add 117 kg and about AUD 32,900 and rule out the S4 windows, the stock doors, the lift bed and a full-height wet room.
+
+Four Dometic S4 windows (W1 and W2 at the bed, W4 in the kitchen, W6 frosted in the wet room) and the glass in both doors have integrated blackout blinds (H8, H15, CT-011, CT-013). W1's 804 x 454 mm opening is the second way out. All 17 openings keep 300 mm of wall between them (BDY-18).
+
+## Lift bed and desk
+
+A Lippert HappiJac four-rail lift carries a 1,550 x 2,290 mm honeycomb platform and a 180 mm queen mattress across the trailer (H1). By day and in travel the platform's underside is 1,600 mm up, so a seated adult clears it. At night it stops at 805 mm, with the mattress top at 1,044 mm, 956 mm clear above it and 75 mm over the desk (BED-01). Index plungers lock it, a safety edge stops it on an obstruction, and a socket at the rail tops lowers it by hand. The desk is 1,200 x 600 mm at 730 mm against the front wall, and nothing else stands under the bed.
+
+## Kitchen
+
+All electric, with no LPG (H5). The road-side tower holds the Truma Combi D 6 E, the Dometic NRX 130C fridge and the Camec 28 L convection microwave as the oven. The bench carries the Dometic CVI1525 induction hob over the CFX3 55IM freezer on a slide, and the sink with the pump and filters below. The hood is ducted outside.
+
+## Wet room and rear door
+
+The rear door D2, hinged on its kerb edge, opens straight into a 1,000 mm deep wet room across the full width (H4). An outdoor shower box beside the door rinses off sand and mud first, and a grate with a sand basket sits just inside. A folding step stows upright in each doorway.
+
+- Floor: one moulded GRP tray with 100 mm upstands and lips at both doors, falling 1:60 to its drains. The walls are the body's gelcoat skins, so the room can be hosed down.
+- Shower: a DauerShower 2.0 cleans and reheats the same 5 L, so two 20 min showers use about 10 L and 1.3 kWh. Its switching unit sits in an insulated well 120 mm below the shower floor (H4a).
+- Toilet and basin: a Thetford C223-CS cassette toilet with two spare cassettes, and a basin with a mirror cabinet on the partition. An inner door leads forward.
+
+## Laundry
+
+A Camec 3.5 kg washer and a Haier 7 kg heat-pump dryer stand on the battery plinth near the axle (H6). The dryer needs no vent. A wash and dry takes 44 L and about 1.6 kWh.
+
+## HVAC and fresh air
+
+Research report 19's load calculation gives a design hot day of 37.1 kWh of heat to remove, peaking at 3.29 kW, and a design cold night of 17.6 kWh over 14 h (CT-621).
+
+- Cooling and heating: a Mitsubishi Electric 2.5 kW inverter split (H7). The indoor unit sits high on the partition, the outdoor unit high on the rear wall on wire-rope isolators. It uses 9.0 kWh of battery on the hot day, 5.1 kWh less than the best rooftop unit.
+- Backup: the Truma Combi D 6 E heats air and water on diesel or on its elements.
+- Fresh air: two LUNOS e2 60 pairs exchange 60 m³/h by day and 45 m³/h at night through 83 % heat recovery, holding CO₂ near 900 ppm for two. A filtered top-up fan adds 15 m³/h, so the cabin sits about 3 Pa above outside, and a relief valve lets the excess out through the wet room. A wet room extract and the ducted hood remove moisture at the source.
+- Dust: while towing, a Sy-Klone RESPA-CF2 with a powered precleaner and MERV 16 and carbon filters holds about 20 Pa, and the other fans stop. No window needs to open.
+
+## Electrical
+
+48 V throughout (research report 20, CT-601, CT-602).
+
+- Battery: five Victron Lithium NG 51.2 V 100 Ah modules, 25.6 kWh and 185 kg, in a sealed, vented and lined aluminium box that forms the plinth, with a heat detector (AS/NZS 3001.2).
+- Conversion: a MultiPlus-II 48/6k5 inverter-charger feeds ten 230 V circuits on 30 mA RCBOs. Orion-Tr converters feed the 12 V and 24 V buses, and a Cerbo GX runs the load rules.
+- Charging: four Sunman 430 W panels give about 9.3 kWh on the design hot day, the ute's chargers 3.6 kWh on a 5 h drive, and the two EU22i put a hot day back in 8.4 h while the household runs. Shore power uses a 15 A inlet.
+- Autonomy (H3): the design hot day, all electric with the air-conditioning, two showers, cooking, a wash and dry, desk work and Starlink, takes 19.6 kWh. With 90 % usable, the battery alone runs it for 25.1 h when new and 17.2 h at end of life. The cold night takes 4.7 kWh on diesel heat or 11.2 kWh on the heat pump.
+- Shedding: the shower heater drops out first when the hob or the oven runs, and the shower stays warm on boiler water. The Combi element, washer and dryer follow. The split never sheds. The worst managed load is 89 % of the inverter's 40 °C rating.
+
+## Plumbing and water
+
+- Fresh: two welded HDPE tanks over the axles hold 420 L, filled at camp through a Puretec CR45 filter by hose or the creek transfer pump, with a chlorine dose. A Shurflo Trail King 7 at 2.1 bar feeds every outlet, the drinking tap through a CR-Z2 filter and a UV purifier. The Combi's 10 L boiler gives hot water through a 50 °C mixing valve (CT-611, CT-612).
+- Grey: every drain falls by gravity to a 130 L tank in the rear bay, with a valve and a camlock on the kerb side. It travels empty except in TC7 and TC8, and a 40 L tote serves longer stays.
+- Budget for two a day: showers 10 L, dishes 8, drinking 6, basin 6, outdoor rinse 4, cooking 3, flush 2 and cleaning 2, so 41 L, 27 L of it to grey. A wash adds 44 L. The 350 L aboard lasts about 8 days without laundry, and the full tanks 7 days with three washes. The grey tank holds 72 h with one wash.
+
+## Running gear and coupling
+
+- Cruisemaster XT Freestyle Air, the 4,500 kg build, axles 900 mm apart on LC5 hubs with 12 inch ABS-enabled electric drums, a Bosch TSC for ABS and sway control, and the Level 3 manual air kit, set from its panel. A spare airbag travels with it.
+- The ute's ROH Trak 2 16 x 7 ET 0 steel wheel, rated 1,400 kg, with LT265/75R16 123/120 tyres, so each vehicle's spare fits both. The 1,555 mm track follows the ute's ruts.
+- A Cruisemaster DO35 V3Plus at the ute's 440 mm laden ball height, chains to AS 4177.4, a breakaway kit, a 12-pin plug and a grey Anderson SB50 for the 48 V charging feed. The jockey wheel swings up along the drawbar, 157.5 mm under the bike box at a jack-knife (JK-02). Four corner steadies.
+
+## Drawings
+
+CT-001 general arrangement, CT-002 mass and centre of gravity, CT-003 compliance, CT-010 floor plan with the bed up and down, CT-011 elevations, CT-012 sections, CT-013 window, door and hatch schedule, CT-101 to CT-104 chassis, drawbar, details and load paths, CT-201 to CT-203 body, CT-301 body to chassis, CT-601 and CT-602 electrical, CT-611 and CT-612 plumbing, and CT-621 HVAC. `make` draws them from the model.
+
+## Build order
+
+Each stage needs the ones before it. The weighings TW-01 to TW-03 and the other inputs to measure are on the Measurements page with the range the design accepts.
+
+| Stage | Work | Needs first | Check before moving on |
 |---|---|---|---|
-| Bed | 1,855 to 3,505 | Kitchen slide-out under the bed (hob and sink), under the awning | Queen mattress 1,530 x 2,030 mm across the trailer, its top 750 mm above the floor. Truma Saphir air-conditioner under it. Bedside column of shelves at the road-side end |
-| Living area | 3,505 to 5,205 | Entry door (Aussie Traveller DC, 622 mm wide), then the fridge (Dometic NRX 130C) | Desk 1,100 x 550 mm with two seats and its cabinetry, then the washer, the Truma Combi D 6 and the Victron board |
-| Rear | 5,205 to 6,205 | Freezer (Dometic CFX3 55IM) on its bench, then the tall cupboard in the rear corner | The 1 x 1 m wet bathroom in the rear corner |
+| B0 Approvals | Engineer's review, RAV entry and VIN, orders for the XT kit, panels, tray, windows, doors and imports | The documents and drawings | Review closed, VIN issued |
+| B1 Chassis | Cut, jig, weld, stamp the VIN | B0, steel and plate parts | Weld inspection (report 02 WLD-03) |
+| B2 Galvanising | Hot-dip to AS/NZS 4680, touch up | B1, vent and drain holes | Frame flat and square |
+| B3 Rolling chassis | Suspension, brakes, TSC, wheels, coupling, chains, jockey, steadies, alignment | B2, the XT kit | TW-01 within 2 % of the model |
+| B4 Floor | Bearer strips, tanks, guards, diesel tank, air box, the floor on its 32 mounts, the shower well and the tray | B3, the floor panel with its inserts | Tray fill test, 24 h |
+| B5 Shell | Walls, rounded corners and roof bonded into the joiners, doors and windows | B4, panels with their hardpoints laid in | Hose test, TW-02 within 2 % |
+| B6 First fix | Cables, the 230 V bulkhead, glands, water pipes, drains at 1:50, ducts and fan sleeves | B5 closed and dry | Water lines pressure tested |
+| B7 Fit-out | Battery box, board, partition, cabinetry, appliances, lift bed, split, wet room, awning, drawbar box, solar | B6 | Bed locks and safety edge |
+| B8 Commissioning | Electrical test, battery capacity, airflow and pressure, tanks filled and dosed | B7 | AS/NZS 3001.2 certificate, TW-03 |
+| B9 Registration | Permit to move it, HVAIS inspection with the identity approval, plate, NSW registration | B8, the weighbridge tickets | Plate at 3,500 kg ATM |
 
-- Under the floor, between the rails: two water tanks over the axles (about 420 L net, estimate), the heater's 15 L diesel tank in its own bay under the bed, and the sealed battery box near the rear wall.
-- Floor space stays clear at the entry door, the bathroom door, the desk seats and a walkway between them (FIT-01).
-- One sleeper climbs over the other to get out of the bed (report 18 open question 4). Layout 2 is the fallback, in the open questions.
-- The rear-corner rule keeps every opening 300 mm from the rear corners, so the cassette toilet and its service door moved forward. The service door now ends exactly 300 mm from the corner (BDY-18).
+The insert map CT-203 must be final before the panels are ordered, because the maker lays the bed hardpoints, stiffeners and insert strips into the cores.
 
-## Running gear, coupling and drawbar
+## Cost and where to save
 
-- Suspension: Cruisemaster XT Freestyle Air, the 4,500 kg build, with the axles 900 mm apart. The axle group centre is at X 4,196.9 mm. The kit's GTM is 4,050 kg (Cruisemaster), and MAS-02 applies VSB1's 120 % rule to it.
-- Hubs and brakes: Cruisemaster LC5 M14 (5 x 150), 110 mm spigot, on the 12 inch ABS-enabled drums, with the Bosch TSC (ABS and sway control).
-- Wheels and tyres: ROH Trak 2 16 x 7 ET 0 steel with Yokohama Geolandar A/T G015 LT265/75R16 123/120, load range E, 1,550 kg per tyre. The wheel's 1,400 kg rating is ROH's fitment table (WHL-01). The trailer and the ute share the wheel, so one spare on each fits both. The trailer's spare rides on the body's front wall above the drawbar.
-- Track 1,555 mm, the ute's front track, so the trailer runs in the ute's ruts. With C/F 190 mm (SUP-04) and ET 0, each wheel sits 190 mm outside its rail, inside Cruisemaster's 200 mm limit.
-- Coupling: Cruisemaster DO35 at Z 440 mm, the ute's laden ball height. The drawbar drop below the rail underside is solved from it.
-- Drawbar: an A-frame of RHS 150 x 50 x 5, 1,820 mm from the ball to the body front, as in revision G. The chains and the breakaway kit are as before. The stone guard is trimmed on its kerb side to clear the swung-up jockey wheel.
-- Drawbar box DX-01: sealed 2 mm aluminium, X 1,150 to 1,470 mm, 960 mm wide and 520 mm high, 15 kg (estimate), on brackets across the drawbar members. A lockable lid, a low vent and a drain to outside. It holds the Honda EU22i generator and the petrol and diesel jerry cans, so no fuel rides inside the body (FIT-04 checks the fit, with 20 mm in hand). The generator runs outside the box.
-- Jockey wheel: the ARK XO750's swivel clamp is on the kerb-side drawbar member at X 1,000 mm, ahead of the box. For travel it swings up to lie along the drawbar, wheel forward, from X 300 to 1,060 mm with its top at Z 622.5 mm, 157.5 mm under the bike box's underside (JK-02).
+The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 147 lines in AUD including GST, each with its source and the date checked. Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 198,436 subtotal carries AUD 31,214 (15.7 %), for AUD 229,650. Without hired labour it is AUD 181,698.
 
-## Axle position and the towball
+| Group | AUD | Group | AUD |
+|---|---|---|---|
+| Hired labour, 333 h | 39,960 | Chassis | 5,116 |
+| Body | 33,584 | Licensed electrician | 4,600 |
+| Electrical | 23,458 | Drawbar box | 4,388 |
+| Living area | 21,100 | Under the floor | 3,162 |
+| Running gear | 14,181 | Roof | 2,926 |
+| HVAC and ventilation | 12,517 | Coupling and drawbar | 1,695 |
+| Wet room | 11,627 | Spare wheel | 736 |
+| Bed | 8,098 | Compliance | 5,976 |
+| Freight and consumables | 5,310 | Subtotal | 198,436 |
 
-The build moves the axle group until the fully loaded case (TC2) carries 220 kg on the ball on base weights. That is the middle of the decision log's 200 to 250 kg band, so the growth allowance stays inside the 250 kg cap. The solve put the axle group centre at X 4,196.9 mm, 167 mm behind the middle of the body. No ballast is needed in any case, because the trailer has no bikes to take out. The water tanks sit over the axles, so the towball barely changes as the water is used.
+The ten largest savings, with their contingency and what each costs the requirements. The site's parts list works out all fifteen from the lines. Some share lines, so they do not add up.
 
-## Load cases
+1. No hired labour: AUD 47,952. About 333 h of Leonard's time, and the chassis welds still need a qualified welder and the engineer's inspection.
+2. Only the fit-out done yourself: AUD 25,488, part of the first. About 177 h.
+3. Two self-built EVE MB31 packs in place of the Victron modules: AUD 6,113. More capacity, but no AS IEC 62619 test, so the electrician may refuse the certificate, and the cell terminals loosen on corrugations.
+4. A plain low-flow shower: AUD 5,779. Two 20 min showers then use about 240 L a day.
+5. A fixed bed at night height: AUD 5,534. The desk loses its place under the bed, so H1 fails.
+6. A 230 V water heater and the heat pump in place of the Combi: AUD 5,308. No heat or hot water without the battery.
+7. No engineer's review: AUD 5,280. Not required in NSW, but the designs stay unchecked.
+8. Square front edges: AUD 4,200. About 3.7 L/100 km more towing, about AUD 1,550 a year.
+9. No generators: AUD 4,085. Cloud with no drive then needs shore power.
+10. No freezer: AUD 2,455. Frozen food fits only the fridge's 8.2 L compartment.
 
-Mass in kg. The towball comes from moments about the axle group centre (MASS-04). "With growth" adds report 02's growth allowance (MASS-06): 20 % on an estimate, 7 % on a calculated mass and none on a maker's figure.
+Smaller ones: a Carafan fan for the RESPA (AUD 1,521), one generator (AUD 1,336, 24.7 h to put a hot day back), no UV purifier (AUD 1,207) and no dryer (AUD 1,099). A rooftop air-conditioner costs AUD 3,443 more than the split, because its extra 5.1 kWh a day needs a sixth battery module.
 
-| Case | What is aboard | Mass | Towball | Share | Axle group | With growth | Towball with growth |
-|---|---|---|---|---|---|---|---|
-| TC1 Tare as built | Empty tanks, no fuel or gear | 2,196 | 178.7 | 8.1 % | 2,017 | 2,423 | 197.6 |
-| TC2 Travel fully loaded | 400 L of water, fuel and gear | 2,776 | 220.0 | 7.9 % | 2,556 | 3,036 | 245.8 |
-| TC3 Highway travel | 50 L of water, fuel and gear | 2,426 | 217.5 | 9.0 % | 2,208 | 2,686 | 243.3 |
-| TC4 Water full, no gear | 400 L of water and fuel | 2,626 | 196.9 | 7.5 % | 2,429 | 2,856 | 218.1 |
-| TC5 Tanks empty, gear aboard | Fuel and gear | 2,376 | 217.1 | 9.1 % | 2,158 | 2,636 | 242.9 |
-| TC6 Tanks empty, no gear | Fuel only | 2,226 | 194.0 | 8.7 % | 2,032 | 2,456 | 215.2 |
+## Decisions
 
-- The heaviest case with growth is TC2 at 3,036 kg, 64 kg under the 3,100 kg plate (MAS-01).
-- The towball runs from 178.7 to 220.0 kg on base weights and from 197.6 to 245.8 kg with growth, inside the 250 kg cap (MAS-03). The lowest share is 7.5 %, above the 6 % floor (MAS-04).
-- Fully loaded, the axle group carries 2,790 kg with growth, or 3,348 kg with VSB1's 120 % rule, against the XT build's 4,050 kg GTM (MAS-02). Each tyre carries 837 kg with the rule against 1,550 kg (MAS-06) and 1,400 kg for the wheel (MAS-09).
+Each is in full in `docs/decisions.md`.
 
-## Mass
+- H1, H1a: a lift bed over a 1.2 m desk with the rest of its footprint empty, 2,000 mm inside. Leonard's ask, and a fixed loft leaves too little room over the mattress.
+- H2: a 3,500 kg plate, Lovells' 7,400 kg GCM and at most 3,400 kg fully loaded with growth, so the home fits the 79's ratings.
+- H3: 24 h of a design hot day on the battery alone when new and 12 h at end of life. Leonard's power ask.
+- H4, H4a: a wet room across the rear with its own door, the shower's unit in a floor well. Rinse before entering, with full headroom.
+- H5, H6: an electric kitchen with a convection microwave as the oven, a washer and a heat-pump dryer. No LPG and no vent.
+- H7, H8, H15: an inverter split with diesel backup, filtered heat-recovery fresh air, four windows and two door glasses with blackout blinds.
+- H12: a fixed roof with rounded front edges. Most of a raising roof's fuel saving without its mass, cost and losses.
+- H13: at most 350 L of water in travel with both generators. It holds the 3,400 kg target.
+- H14, H17: towball limits from the ute's rear axle and the 350 kg ratings, the axle centred in an 8.0 % to 320 kg window. Margin while the masses are estimates.
+- H16: the bed's footprint stays empty, as Leonard asked.
 
-The tare is 2,196 kg, or 2,423 kg with growth. That is 167 kg lighter than revision G's 2,363 kg tare with its garage.
+## Open points and the assumption used
 
-| Group | Tare kg | With growth kg |
-|---|---|---|
-| Chassis and drawbar | 532.3 | 570.2 |
-| Body | 578.3 | 645.2 |
-| Living area | 371.6 | 411.8 |
-| Running gear | 345.6 | 396.6 |
-| Under the floor | 145.9 | 155.4 |
-| Bed | 72.4 | 84.5 |
-| Coupling and drawbar fittings | 45.5 | 49.8 |
-| Spare wheel | 37.1 | 40.0 |
-| Drawbar box | 36.1 | 37.7 |
-| Roof (solar panels) | 31.2 | 31.6 |
-
-The least certain lines are the XT Air kit (180 kg, 36 kg of growth), the cabinetry (70 kg), the body extrusions and fixings (68.5 kg), the wiring and plumbing (60 kg) and the clothes and bedding (60 kg). If the clothes and bedding came out 20 % heavier, the fully loaded towball would rise 4.3 kg, because they sit in the bed zone at the front.
-
-## The ute and the combination
-
-The ute is the Toyota LandCruiser VDJ79 GXL single cab V8 on the Lovells 4,200 kg GVM kit, with the bike box (UTE-GARAGE.md and VEHICLE.md). The trailer build reads its limits from `data/ute/ute.yaml` and its masses from the built ute model, so the ute is built first.
-
-- Towball: the plan caps it at 250 kg, inside the Hayman Reese 03186RW's 350 kg. Each kilogram on the ball adds about 1.4 kg to the ute's rear axle, which is the ute's binding limit (UTE-GARAGE.md section 9).
-- Braked towing: the 3,100 kg plate is inside Toyota's 3,500 kg.
-- GCM-01 takes the larger of two sums against Toyota's 6,900 kg GCM. The plan's sum is the ute at its 3,850 kg weighed limit, plus the 3,100 kg plate, less the 250 kg the ute already carries on its ball: 6,700 kg. The model's sum is the ute's UC2 case with growth (3,546 kg) plus the heaviest trailer case with growth (3,036 kg): 6,583 kg. GCM-01 measures 6,700 kg, 200 kg in hand.
-- Coupling height: the ute's tongue is set so the ball sits at 440 mm laden, plus or minus 20 mm (UTE-01), so the coupling stays inside VSB1's 350 to 460 mm (DIM-03 and the ute's UTE-13).
-- Ball position: 1,300 mm behind the ute's rear axle (UTE-02, report 16 and the decision log 12:45, estimate).
-- Jack-knife: the bike box overhangs the ball by 210 mm at its body and 255 mm at its door hardware. At 90 degrees it sweeps a radius of 948.5 mm from the ball, set by the road-side wall skin. Its underside sits at Z 780 mm. JK-01 measures from the ball to the nearest trailer part that stands higher than the box's underside less 50 mm, less the sweep radius, and needs 100 mm. It is the drawbar box, 201.5 mm clear. JK-02 takes the highest trailer part inside the sweep radius plus 100 mm, and needs it 50 mm below the box's underside, an allowance for the ute's pitch (assumption). It is the swung-up jockey wheel, its top at Z 622.5 mm, 157.5 mm below.
-
-## Chassis inputs
-
-CHASSIS.md revision D designs the frame for this layout. The main figures it takes from the layout:
-
-- Rails: RHS 150 x 50 x 3 with an RHS 125 x 50 x 3 raiser on top, 4,420 mm long, 1,175 mm over their outsides. Rail top at Z 747.5 mm, floor underside at Z 895 mm.
-- Eight stations, each with an outrigger at raiser height on both sides. The outriggers are now RHS 125 x 50 x 3, the raiser's section. A fixed station closes the diesel bay.
-- Fully loaded centre of gravity at X 3,864 mm and Z 1,124 mm, or Z 1,131 mm with growth, 741 mm above the hub centres.
-- The frame analysis scales every case so the heaviest sits at the 3,100 kg plate. The highest utilisation is 0.78, in the road-side rail under the rear recovery point (LC8a). The travel cases run from 0.21 (LC1, LC2) to 0.42 (LC3 braking, in the drawbar). The chassis weighs 474 kg galvanised.
-- The tyre clears every chassis member by 54 mm through its full travel, against 50 mm (FIT-05).
-
-## Checks
-
-Every fail check passes. The figures that matter most:
-
-| Check | Model | Limit |
-|---|---|---|
-| MAS-01 heaviest case with growth | 3,036 kg | 3,100 kg plate |
-| MAS-03 towball with growth | 245.8 kg | 250 kg |
-| MAS-04 lowest towball share | 7.5 % | at least 6 % |
-| MAS-05 towball fully loaded | 220.0 kg | 210 to 230 kg |
-| GCM-01 combination | 6,700 kg | 6,900 kg |
-| DIM-02 front load space against the rear overhang | 2,377 mm | at least 2,043 mm, the rear overhang |
-| DIM-03 coupling height | 440 mm | 350 to 460 mm |
-| DIM-04 running clearance, unladen | 380 mm | at least 100 mm |
-| JK-01 sweep clearance | 201.5 mm | at least 100 mm |
-| JK-02 below the box | 157.5 mm | at least 50 mm |
-| FIT-04 drawbar box fit | 20 mm in hand | no overlap |
-| TWS-01 chassis twist | 0.439 degree | 0.5 degree |
-| FAT-05 outrigger weld root | 16.8 MPa | 21.1 MPa |
-| BDY-16 body mounts | 0.32 | 1.00 |
-
-The NSW examiner caps GTM at the lowest of the tyre, coupling, chain and brake ratings and ATM at the lower of the coupling and chain ratings. With four 1,550 kg tyres, the 3,500 kg DO35 and chains and the 4,500 kg drums, both caps are 3,500 kg (MAS-07 and MAS-08). The design plates the trailer lower, at 3,100 kg.
-
-## Power
-
-The power system is report 13's, at 24 V, unchanged from revision G except where it rides:
-
-- Batteries: two Victron Lithium NG 25.6 V 200 Ah (10.24 kWh), 37 kg each, in a sealed aluminium box under the floor near the rear wall, with a Lynx Smart BMS NG.
-- Inverter-charger: Victron MultiPlus-II 24/5000, on the board on the road side of the living area.
-- Solar: four Sunman eArc 430 W panels (1,720 W) bonded to the fixed roof, in two pairs, each to its own SmartSolar MPPT 150/45.
-- From the ute: one Orion-Tr Smart 12/24-15 isolated charger on the ute's Anderson SB50 feed with a 50 A fuse (VEHICLE.md, towing).
-- Generator: Honda EU22i in the drawbar box, run outside it.
-
-The daily load is about 10.4 kWh on a hot day and 5.1 kWh on a cold one. The batteries carry about 4 hot days or 1.5 overcast winter days before the generator has to run (report 13).
-
-## Registration
-
-The trailer will be registered in NSW, with Victoria as the fallback, by report 02's path for a concessional trailer. First comes a Concessional RAV entry: since 1 July 2023 every new trailer needs an entry on the federal Register of Approved Vehicles, and a small-volume builder applies through the ROVER portal and gets the VIN with it. Then comes the TfNSW identity approval with form 5703, photos, a weighbridge ticket with the tare and the VIN, and receipts for the materials. The examiner checks the design against VSB1 and sets the plate figures. The plate asked for is 3,100 kg ATM. The tyre placard shows LT265/75R16 123/120 and the cold pressure for the weighed load.
-
-## Measured inputs
-
-Every value the owner will measure is an input in `data/measurements.yaml`, with how to measure it, the estimate and its source, an empty measured slot, and the rules that change the plan. The build uses the measured value when there is one.
-
-- UTE-01, the ute's laden ball height (440 mm, estimate), sets the coupling point and the drawbar drop.
-- UTE-02, the ball's distance behind the ute's rear axle (1,300 mm, estimate), sets the ute's axle loads and the bike box's sweep.
-- UTE-03, the towball scale reading once the trailer exists, is compared with the model (TBS-01, reported).
-- WHL-01 and SUP-01 to SUP-04 are the wheel's rating and Cruisemaster's answers.
-- The bike and chock inputs (TU-01 to TU-09, ST-01, CHK-01) now set the ute's bike box, not the trailer.
-
-## Assumptions
-
-Where something is unknown, the design takes the best assumption, records it here with its source, and carries on.
-
-1. The drawbar box DX-01: 960 x 320 x 520 mm, 15 kg (estimate), sized round the Honda EU22i and the jerry cans with 20 mm in hand (FIT-04). It follows report 02's garage rules for fuel: sealed from the body, reached only from outside, vented low and drained.
-2. The diesel jerry cans ride in the drawbar box with the petrol, not under the bed. The heater keeps its own 15 L tank under the floor.
-3. The jockey wheel's clamp at X 1,000 mm, ahead of the box, and the ARK XO750's travel position along the drawbar, wheel forward, as an envelope 760 x 120 x 200 mm (estimate from its 700 mm post and wheel). Its swivel clamp is assumed to hold it there, clear of the stone guard's trimmed kerb edge.
-4. JK-02's 50 mm allowance for the ute's pitch between the ball and the box's underside. Report 16 gives no figure.
-5. The ball 1,300 mm behind the ute's rear axle (report 16 and the decision log 12:45). Report 17 used 1,350 mm.
-6. A tyre envelope 272 mm wide (estimate) and a loaded radius 20 mm under the free radius (the repo's estimate). Both set the floor height, the tyre's gap to the rail and the hub height (report 18 open question 9).
-7. The bed ledgers, 2,030 mm on the front wall and 1,650 mm on the kerb wall (3,680 mm in all), carry the whole 255 kg bed at 3 g (BDY-11).
-8. The roof uplift scaled to the fixed roof's area: 5,060 N at 40 m/s (BDY-19), from report 12's 6.3 kN on the raising lid.
-9. The bond in the roof-to-wall joiner at 2 MPa in tension (MS polymer, estimate), so the joint holds 30 N/mm.
-10. The new estimated lines from report 18 open question 12, each at 20 % growth: the bed base 20 kg, the bedside column 15 kg, the tall cupboard 12 kg, the cupboards over the fridge 8 kg.
-11. The fire extinguisher and blanket at 4.8 kg (estimate), by the entry door.
-12. The body mount is the M12 8.8 bolt into a welded nut plate on the raiser (CH-P14), at 0.32 of its capacity. The HB10 blind bolt would work at 0.87, but with less margin, so it is not used.
-13. The corner steadies at X 2,220 mm and 6,070 mm, bolted to the rails about 400 mm inside the body ends (report 18 section 4.3).
-14. The inside height of 1,950 mm suits both people, up to about 1.88 m tall (report 18 open question 3).
-15. The tanks: two blocks 975 mm wide and 288 mm high over the axles hold about 420 L net (report 18 open question 8).
-16. No roof hatches. Five opening windows, the Carafan CP700 intake and the bathroom vent ventilate the body (report 18 open question 5).
-17. The awning is the Fiamma F45s 450 on brackets within 100 mm of the body.
-
-## Open questions
-
-These are design decisions for the owner. Each carries the assumption the plan uses until it is answered.
-
-1. The ATM plate. Assumption: 3,100 kg. A 3,000 kg plate holds every case on base weights (224 kg in hand) but not TC2 with growth (3,036 kg). Plate 3,000 kg if the largest estimates (the XT Air kit 180 kg, the cabinetry 70 kg, the extrusions 68.5 kg) weigh in about 30 kg lighter on base weights, which takes 36 kg off TC2 with growth.
-2. The climb over the bed. Assumption: one sleeper climbing over the other is accepted. The fallback is layout 2 of the layout study: the queen bed along the trailer at the back, with a 400 mm strip on each side, so each sleeper gets out on their own side. It also has a fixed roof and 1,950 mm inside. It costs a body 830 mm longer (5,250 mm) and 137 kg heavier (estimate). Choosing it re-runs every check in this document.
-3. The kitchen bench height. With the floor at Z 925 mm the slide-out's bench is about 1,425 mm above the ground. Assumption: report 13's folding step goes with the kitchen.
-4. A dryer, LPG or a third battery (report 13 open questions 1 to 3). The defaults are a washer with no dryer, no LPG and two batteries. Each reversal adds tare: about 50 kg for the washer-dryer, 27 kg for LPG and 37 kg for a third battery. With the 64 kg in hand under the plate, only one of them fits without a heavier plate.
-5. The drawbar members at the 3,100 kg plate. VSB1's drawbar forces fall 11 % from the 3,500 kg design. Assumption: keep RHS 150 x 50 x 5. The engineer may lighten them to RHS 150 x 50 x 4, about 14 kg.
+1. Storage is about 0.2 m³ short (est.). Assumption: the footprint stays empty (H16). Question for Leonard: two 500 x 600 x 700 mm cabinets under the bed beside the desk would add 0.42 m³ and about 20 kg, and break his rule that the rest of that area stays empty.
+2. 55 % of the tare is estimates. Assumption: the growth allowance covers them until TW-01 to TW-03 replace them. A towball reading more than 10 % off the model means the centre of gravity estimates are wrong (UTE-03).
+3. Assumption: Lovells' 7,400 kg GCM is certified in the ute's LC5 inspection. If not, tow with at most 233 L and plate at 3,300 kg.
+4. Assumption: the isolators and the line set keep the split working on corrugations, without a maker's warranty. The fallback is a rooftop unit with a sixth battery module.
+5. The Dometic fridge, freezer, hob and sink carry European prices, converted. The oven, washer, panels and labour are estimates.
+6. Assumption: the engineer accepts calculation as VSB1's evidence for the drawbar and chain tests at 3,500 kg (CHASSIS.md).

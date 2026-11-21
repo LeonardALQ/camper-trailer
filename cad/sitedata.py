@@ -253,8 +253,9 @@ def box_parts() -> dict:
 def trailer_parts() -> dict:
     """The trailer's priced parts list (cad/trailer_costs.py) for the site, with each line's tare mass from the built
     mass schedule: its own blocks, or the blocks a stock line covers."""
-    from .trailer_costs import parts_list
+    from .trailer_costs import parts_list, savings
     lst = parts_list()
+    lst["savings"] = savings(lst)
     kg: dict[str, float] = {}
     for s in json.loads((BUILD / "trailer" / "trailer.json").read_text())["schedule"]:
         if s["load"] == "tare":

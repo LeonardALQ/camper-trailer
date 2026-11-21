@@ -294,3 +294,93 @@ lines:
       - {item: "Four Dometic S4 windows from Germany", aud: 450, basis: estimate, date: 2026-11-21}
       - {item: "DauerShower 2.0, Truma Combi D 6 E with its water set, the Shurflo pump and the odour traps from Germany", aud: 450, basis: estimate, date: 2026-11-21}
       - {item: "Thetford cassettes and the basin from the UK", aud: 150, basis: estimate, date: 2026-11-21}
+# ================================================================ where to save
+# Each option is worked out from the lines it removes, with their contingency, less what replaces it, at its own
+# contingency (cad/trailer_costs.py, savings). `removes` names whole groups, whole lines, or parts of a line: the bought
+# parts whose item starts with `item`, or a `share` of the line. Options that remove the same lines overlap, so they do
+# not add up. `mass_kg` is the change in tare, an estimate, and `costs` is what the option costs the requirements.
+savings:
+  - id: SV-01
+    name: Build the whole trailer yourself, with no hired labour
+    removes: {groups: [labour]}
+    mass_kg: 0
+    costs: "About 333 h of Leonard's time (est.). The chassis welds still need a welder qualified to AS/NZS 1554.1 and the engineer's inspection"
+  - id: SV-02
+    name: Do the fit-out yourself, and hire only the chassis, running gear and body shell work
+    removes: {lines: [LAB-05, LAB-06, LAB-07, LAB-08]}
+    mass_kg: 0
+    costs: "About 177 h of Leonard's time (est.). It is part of SV-01"
+  - id: SV-03
+    name: Two self-built 16S EVE MB31 314 Ah packs, 32.1 kWh, in place of the five Victron NG modules
+    removes: {lines: [EL-01]}
+    adds: [{item: "Two 16S EVE MB31 314 Ah packs with a JK BMS, at AUD 4,499", aud: 8998, basis: listing, url: "https://lifepo4.com.au/shop/lifepo4-battery/48v/15kwh/51-2v-314ah-16kwh-eve-8000-cycles-lifepo4-battery-copy/", date: 2026-11-20}]
+    mass_kg: 20
+    costs: "A home-built pack is not tested to AS IEC 62619 as AS/NZS 3001.2 clause 5.4.12.3.1 asks, so the electrician may refuse to certify it, and its bolted cell terminals loosen on corrugations (research report 20). It holds more"
+  - id: SV-04
+    name: A plain low-flow shower in place of the DauerShower 2.0
+    removes: {lines: [WR-09, WR-10]}
+    mass_kg: -9
+    costs: "Two 20 min showers at 6 L/min use about 240 L a day in place of about 10 L, so the 350 L aboard lasts about a day and a half. The shower requirement (two hot 20 min showers a day) fails"
+  - id: SV-05
+    name: A fixed bed at the night height in place of the lift bed
+    removes: {lines: [LB-04, LB-04M, LB-05, LB-06], parts: [{line: CON-09, item: "Lippert HappiJac kit"}]}
+    adds: [{item: "Fixed aluminium frame for the platform", aud: 400, basis: estimate, date: 2026-11-21}]
+    mass_kg: -30
+    costs: "The desk can no longer sit under the bed, so the 1,590 mm bed zone is bed all day. H1 fails"
+  - id: SV-06
+    name: A 230 V marine water heater and the heat pump for all heating, in place of the Truma Combi D 6 E
+    removes: {lines: [LA-03, UF-06]}
+    adds: [{item: "Isotherm stainless water heater, 230 V, made to Australian standards", aud: 2309, basis: listing, url: "https://www.bluebottlemarine.com/products/isotherm-stainless-steel-water-heaters-australian-standards-approved.html", date: 2026-11-21, note: "The lowest of the listed sizes"}]
+    mass_kg: -10
+    costs: "No heat or hot water without the battery, so H7's backup goes. The design cold night takes 11.2 kWh on the heat pump in place of 4.7 kWh on diesel"
+  - id: SV-07
+    name: No engineer's review
+    removes: {lines: [CMP-03]}
+    mass_kg: 0
+    costs: "NSW does not need one for a VSB1 trailer of 4.5 t ATM or less, but the chassis and body designs stay unchecked drafts"
+  - id: SV-08
+    name: Square front edges in place of the rounded ones
+    removes: {lines: [BD-14]}
+    mass_kg: -6
+    costs: "About 3.7 L/100 km more when towing at 90 km/h (research report 25), about AUD 1,550 a year at 20,000 km and AUD 2.10/L, so the rounded edges pay back in under three years"
+  - id: SV-09
+    name: No generators
+    removes: {lines: [GS-01, GS-02]}
+    mass_kg: -43
+    costs: "Only the sun and the drive recharge the battery. After a day of cloud with no drive, the trailer needs shore power"
+  - id: SV-10
+    name: No freezer
+    removes: {lines: [LA-06]}
+    mass_kg: -27
+    costs: "Frozen food fits only the fridge's 8.2 L compartment. It saves 0.8 kWh a day"
+  - id: SV-12
+    name: One Honda EU22i in place of two
+    removes: {lines: [GS-01, GS-02]}
+    adds: [{item: "One Honda EU22i", aud: 2499, basis: listing, url: "https://generatorstore.com.au/products/honda-eu22i-2200-watt-inverter-generator", date: 2026-11-21}]
+    mass_kg: -22
+    costs: "A design hot day takes 24.7 h of running to put back while the household runs, in place of 8.4 h"
+  - id: SV-11
+    name: A Carafan Sahara CP700 in place of the Sy-Klone RESPA-CF2
+    removes: {lines: [VE-04]}
+    adds: [{item: "Carafan Sahara CP700", aud: 1890, basis: listing, url: "https://carafan.com.au/product/carafan-sahara-white/", date: 2026-11-20}]
+    mass_kg: 0
+    costs: "No powered precleaner, so the filter loads up faster in dust (research report 19)"
+  - id: SV-13
+    name: No UV purifier on the drinking water
+    removes: {parts: [{line: WS-01, item: "Acuva ArrowMAX"}]}
+    mass_kg: -1.5
+    costs: "Drinking water relies on the CR-Z2 filter and the chlorine dose at each fill"
+  - id: SV-14
+    name: A washer and no dryer
+    removes: {lines: [LA-14]}
+    mass_kg: -40
+    costs: "The laundry dries on a line, and H6's dryer goes. It saves 1.4 kWh on a laundry day"
+  - id: SV-15
+    name: A Dometic FreshJet FJZ7 Pro rooftop air-conditioner in place of the split
+    removes: {lines: [AC-01, AC-03]}
+    adds:
+      - {item: "Dometic FreshJet FJZ7 Pro", aud: 2500, basis: listing, url: "https://www.dometic.com/en-au/product/dometic-freshjet-fjz7-pro-9630000083", date: 2026-11-20}
+      - {item: "Fitting the rooftop unit", aud: 600, basis: estimate, date: 2026-11-21}
+      - {item: "A sixth Victron NG module for its 5.1 kWh a day more", aud: 2911, basis: listing, url: "https://energyconnections.net.au/products/victron-lifepo4-battery-51-2v-100ah-ng-next-gen", date: 2026-11-20}
+    mass_kg: 16
+    costs: "It costs more, not less. It also takes one roof panel's place and gives no heat below -2 C (research report 19)"

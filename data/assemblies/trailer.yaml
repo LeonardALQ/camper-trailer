@@ -560,7 +560,7 @@ items:
     zone: underfloor
     box: [grey_x0, -510, grey_z0 - 6, grey_l, 1020, 6]
     mass: {basis: declared, total_kg: 5.3, maturity: estimate, source: "0.91 m2 of 2 mm aluminium at 5.4 kg/m2 with rubber and bolts (est., saving 1f, H13)"}
-    note: Bolted across the rails, it also stands in for the PB-3 plan braces this bay had (the frame analysis confirms it, LC8a).
+    note: Bolted across the rails. It is not counted as a shear plate, because it would buckle at about 4 kN (est.). The RHS 150 x 50 x 4 XT rear shock crossmember carries the rear recovery pull in place of the plan braces this bay had (CHS-08A).
 
   # ================================================================ the sealed drawbar box (decision log 12:45, research report 20)
   - id: DX-01

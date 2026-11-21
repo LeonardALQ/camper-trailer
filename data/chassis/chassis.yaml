@@ -85,7 +85,8 @@ station_sections:
 
 # Plan bracing: an X of two diagonals at rail height in free bays between the rails, so the ladder frame carries
 # sideways loads (LC8a recovery at 30 degrees) by truss action. The tanks fill the other bays. The rear bay's braces (PB-3)
-# went with the battery bay: the grey tank fills it, and its bolted guard (UF-09) is the shear plate there (to confirm, LC8a).
+# went with the battery bay: the grey tank fills it. Its 2 mm guard (UF-09) is not counted as a shear plate, so the XT rear shock
+# crossmember is RHS 150 x 50 x 4 (station_sections) and carries the rear recovery pull (CHS-08A).
 plan_braces:
   - {between: ["between front and diesel bay (1)", diesel bay], section: SHS_40x40x2p5}
   - {between: [diesel bay, XT front hinge], section: SHS_40x40x2p5}

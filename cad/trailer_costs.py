@@ -87,7 +87,7 @@ def parts_list(path: Path = PARTS_YAML) -> dict:
     for ln in head["lines"]:
         lines.append(_line(ln["id"], ln["name"], ln["group"], ln["qty"], ln["unit"], ln["price"], pct, source=rel,
                            covers=ln.get("covers") or [], note=ln.get("note")))
-    return dict({k: v for k, v in head.items() if k not in ("lines", "totals")}, group_labels=labels, lines=lines,
+    return dict({k: v for k, v in head.items() if k not in ("lines", "totals", "savings")}, group_labels=labels, lines=lines,
                 totals=totals(lines, head["totals"]))
 
 
@@ -112,6 +112,39 @@ def totals(lines: list[dict], rule: dict) -> dict:
         subtotal_aud=round(sub, 2), contingency_aud=round(contingency, 2), total_aud=round(sub + contingency, 2),
         owner_built_left_out_aud=round(hired, 2), owner_built_total_aud=round(sub + contingency - hired, 2),
         lines=len(lines))
+
+
+def _with_contingency(parts: list[dict], pct: dict) -> float:
+    return sum(p["aud"] * (1 + pct[p["basis"]] / 100) for p in parts)
+
+
+def savings(lst: dict | None = None, path: Path = PARTS_YAML) -> list[dict]:
+    """The options in data/trailer-parts.yaml's `savings`, each worked out from the lines it removes, with their
+    contingency, less what replaces it at its own contingency. Largest first. A negative saving costs more."""
+    head = _load(path)
+    lst = lst or parts_list(path)
+    pct = head["totals"]["contingency_pct"]
+    by_id = {ln["id"]: ln for ln in lst["lines"]}
+
+    def whole(ln):
+        return ln["price"]["aud"] + ln["contingency_aud"]
+
+    out = []
+    for sv in head.get("savings") or []:
+        rm = sv["removes"]
+        removed = sum(whole(ln) for ln in lst["lines"] if ln["group"] in rm.get("groups", []))
+        removed += sum(whole(by_id[i]) for i in rm.get("lines", []))
+        for p in rm.get("parts", []):
+            ln = by_id[p["line"]]
+            if "share" in p:
+                removed += p["share"] * whole(ln)
+            else:
+                hit = [x for x in ln["parts"] if x["item"].startswith(p["item"])]
+                assert len(hit) == 1, f"{sv['id']}: {p['item']!r} matches {len(hit)} parts of {p['line']}"
+                removed += _with_contingency(hit, pct)
+        added = _with_contingency(price_parts(sv["adds"], 1), pct) if sv.get("adds") else 0.0
+        out.append(dict(sv, removed_aud=round(removed, 2), added_aud=round(added, 2), saving_aud=round(removed - added, 2)))
+    return sorted(out, key=lambda s: -s["saving_aud"])
 
 
 def block_prices(blocks, lst: dict | None = None) -> dict[str, dict]:
