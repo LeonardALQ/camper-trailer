@@ -230,8 +230,8 @@ def ct202(prj, model, bom, checks, reg, dwg):
     for i, t in enumerate(("ROOF-TO-WALL JOINER 1.65 kg/m, BONDED MS POLYMER ALL ROUND, THE WALL'S TOP INSERT STRIP UNDER IT",
                            f"40 m/s UPLIFT {rf['q_n_mm']:.2f} N/mm ON THE BOND, AGAINST {rf['allow_n_mm']:.0f} N/mm (BDY-19)",
                            "ROOF EDGE CAPPED, DRIP EDGE OUTSIDE THE WALL SKIN",
-                           f"AWNING BRACKETS: {b.d['awning']['bolts_per_bracket']} {b.d['awning']['bolt'].upper()} EACH THROUGH THE KERB-EDGE "
-                           "INSERT STRIP (BDY-11)")):
+                           f"AWNING BRACKETS: {b.d['awning']['bolts_per_bracket']} {b.d['awning']['bolt'].upper().replace(' MM ', ' mm ')} EACH,",
+                           "THROUGH THE KERB-EDGE INSERT STRIP, NYLON WASHERS AND DURALAC ON THE STEEL (BDY-11)")):
         sh.text(22, 106 - 3 * i, t, 1.5)
     # ---- D: lift bed rail on its hardpoint in the side wall, plan section, 1:2
     cx, top = 150.0, 186.0
@@ -251,7 +251,7 @@ def ct202(prj, model, bom, checks, reg, dwg):
     for yy in (ry0 + 12 / k, ry1 - 12 / k):
         sh.line(hx0 + (dd - tt - 2) / k, yy, rx + 4 / k, yy, "medium")                # 1/4 in screws through the inner skin into the member
     sh.line(hx0 - 8, hy0 + ww / 2 / k, rx + 30 / k, hy0 + ww / 2 / k, "centre")
-    sh.text(125 + 1.5 / k + 0.3, hy0 - 2.2, f"{st['break']:g} mm XPS", 1.2)
+    sh.text(125 + 1.5 / k + 0.3, dy - 2.6, f"{st['break']:g} mm XPS", 1.2)
     ins = next(i for i in res["inserts"] if i["id"] == "INS-01")
     for i, t in enumerate((f"HARDPOINT {_member(b)} 6060-T5 ON THE INNER SKIN, FULL WALL HEIGHT, BONDED INTO A {dd:g} mm CHANNEL IN THE XPS",
                            f"AS THE PANEL IS MADE. {st['break']:g} mm OF XPS STAYS BEHIND IT, SO NO METAL CROSSES THE CORE (LB-06, BDY-22)",
