@@ -23,7 +23,7 @@ parts:
   U-MUDFLAP:
     name: Lovells ADR 42/04 mudflap on its bracket, behind each rear tyre (envelope)
     kind: context
-    notes: "Supplied in the Lovells Elite kit (car build line GV05), so its mass is in the kit's extra mass, ute line UT-16. Centred on the rear tyre, so it sits 47.5 mm further out than on the factory track (R26). It hangs on its bracket under the box's rear outrigger at module X 1,500 mm. About 300 mm wide with its bottom edge about 230 mm above the ground (assumption)"
+    notes: "Supplied in the Lovells Elite kit (car build line GV05), so its mass is in the kit's extra mass, ute line UT-16. Centred on the rear tyre, so it sits 47.5 mm further out than on the factory track (report 26). It hangs on its bracket under the box's rear outrigger at module X 1,500 mm. About 300 mm wide with its bottom edge about 230 mm above the ground (assumption)"
     geometry: {generator: box, params: {}}
     color: "#1c2833"
   U-GROUND:

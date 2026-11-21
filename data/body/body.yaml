@@ -1,7 +1,7 @@
 # Body design data (BODY.md), from research report 12 (research/12-body-design.md) and the panel and product tables
 # beside it (research/12-body-panels.yaml, research/12-body-products.yaml). Units: mm, MPa, N, kg.
 # cad/body.py reads this file for the planning-level panel, insert, joint, mount, end wall and twist checks.
-# Revision C, 21 Nov 2026: the home trailer (home/layout-home.md). 4,420 mm long with a fixed roof 2,000 mm inside and
+# Revision C, 21 Nov 2026: the home trailer (TRAILER.md). 4,420 mm long with a fixed roof 2,000 mm inside and
 # rounded front edges (H1a, H12), a wet room door in the rear wall (H4), the lift bed's rails on the side walls (H1)
 # and four windows (H15). Revision B was the LandCruiser 79 body (report 18, layout 1).
 

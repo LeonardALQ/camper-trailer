@@ -1,0 +1,282 @@
+# report 25 roof study: the options side by side, then one entry per product or option element.
+# Units: mm, kg, kWh per design day, L/100 km, AUD including GST. Report: research/25-roof.md.
+# Mass and price basis: maker, listing, calculated, converted, estimate. Dimensions are L x W x H.
+# Masses and costs are against option A (fixed roof, 2,000 mm inside, square front edges).
+# Fuel from research/models/25/aero.py at 6,946 kg, still air. AC energy from research/models/25/loads.py (report 19's model), battery side, MSZ-AP25
+# unless noted. Battery at 8.8 kg per kWh a day (report 20).
+checked: 2026-11-20
+recommended: A+
+options:
+  - id: A
+    name: Fixed roof, 2,000 mm inside, square front edges
+    roof_top_z_mm: 2967
+    camp_interior_mm: 2000
+    lowered_interior_mm: null
+    cda_m2: 5.82
+    fuel_l_100km: {kmh_90: 25.0, kmh_100: 28.7}
+    range_km_90: {tank_130_l: 468, tank_180_l: 648}
+    fuel_year: {litres: 4999, aud: 10498}
+    mass_change_kg: 0
+    ac_hot_day_battery_kwh: 9.10
+    cold_night_battery_kwh_heat_pump: 6.68
+    battery_change_kg: 0
+    cost_change_aud: 0
+    setup_min: 0
+  - id: A+
+    name: Fixed roof, 2,000 mm inside, radiused front edges (150 mm top, 250 mm vertical)
+    roof_top_z_mm: 2967
+    camp_interior_mm: 2000
+    lowered_interior_mm: null
+    cda_m2: 4.55
+    fuel_l_100km: {kmh_90: 21.3, kmh_100: 24.1}
+    range_km_90: {tank_130_l: 549, tank_180_l: 760}
+    fuel_year: {litres: 4262, aud: 8950}
+    mass_change_kg: 6
+    mass_basis: estimate
+    ac_hot_day_battery_kwh: 9.10
+    cold_night_battery_kwh_heat_pump: 6.68
+    battery_change_kg: 0
+    cost_change_aud: 3500
+    cost_basis: estimate
+    setup_min: 0
+    notes: "Saving 3.7 L/100 km at 90 km/h, range 1.6 to 5.8 with the coefficient spread (research/models/25/aero.out)"
+  - id: B
+    name: Hard lid on a 650 mm canvas skirt, four LINAK LA36, roof down at the box top
+    roof_top_z_mm: 2345
+    camp_interior_mm: 2000
+    lowered_interior_mm: 1350
+    cda_m2: 4.31
+    fuel_l_100km: {kmh_90: 20.6, kmh_100: 23.2}
+    range_km_90: {tank_130_l: 568, tank_180_l: 786}
+    fuel_year: {litres: 4122, aud: 8656}
+    mass_change_kg: 46
+    mass_basis: estimate
+    ac_hot_day_battery_kwh: {bare_ap35: 16.56, bare_ap35_unmet: 0.64, lined_ap35: 12.68}
+    cold_night_battery_kwh_heat_pump: {bare: 14.50, lined: 10.68}
+    battery_change_kg: {bare: 66, lined: 32}
+    cost_change_aud: {low: 19600, high: 22500}
+    cost_basis: estimate
+    setup_min: {up: [3, 5], down: [5, 10]}
+    notes: "Fails H3 (24 h) and H7 (positive pressure) in camp mode. Lower in gusts over about 60 km/h (report 12)"
+  - id: C
+    name: Telescoping hard shell outside the lower walls, four LINAK LA36, roof down at the box top
+    roof_top_z_mm: 2345
+    camp_interior_mm: 2000
+    lowered_interior_mm: 1350
+    cda_m2: 4.31
+    fuel_l_100km: {kmh_90: 20.6, kmh_100: 23.2, kmh_90_with_radiused_front: 19.3, kmh_100_with_radiused_front: 21.6}
+    range_km_90: {tank_130_l: 568, tank_180_l: 786, tank_130_l_with_radiused_front: 606}
+    fuel_year: {litres: 4122, aud: 8656, aud_with_radiused_front: 8110}
+    mass_change_kg: 117
+    mass_basis: estimate
+    ac_hot_day_battery_kwh: 9.42
+    cold_night_battery_kwh_heat_pump: 7.23
+    battery_change_kg: 3
+    cost_change_aud: 32900
+    cost_basis: estimate
+    setup_min: {up: 3, down: 3}
+    notes: "Lowered to 1,600 mm inside instead (C'), the saving falls from 4.4 to 2.6 L/100 km at 90 km/h"
+elements:
+  - id: R25-01
+    option: A+
+    function: Radiused front edges, moulded GRP corner pieces over XPS, bonded and riveted in place of the corner joiners
+    maker: Custom (any GRP moulder)
+    model: Two vertical pieces r 250 mm x 2,072 mm, one top piece r 150 mm x 2,400 mm, two spherical top corners
+    qty: 1 set
+    mass_kg_change: 6
+    mass_basis: estimate
+    mass_source: "Curved GRP sandwich 0.39 m of arc in place of 0.50 m of flat 6.0 to 6.7 kg/m2 panel and the 2.0 kg/m joiner (report 12), plus flanges"
+    dims_mm: [2400, 250, 2072]
+    price_aud: 3500
+    price_basis: estimate
+    price_url: ""
+    notes: "One-off mould, parts and about 8 h of fitting. Fallback: rolled aluminium radius cover with foam infill"
+  - id: R25-10
+    option: B
+    function: Lower walls 650 mm shorter (B and C)
+    maker: Body panel, report 12 build-up
+    model: 35 mm wall panel, 8.9 m2 less
+    qty: 1
+    mass_kg_change: -53.2
+    mass_basis: calculated
+    mass_source: "8.9 m2 at report 12's 6.0 kg/m2"
+    price_aud: -1300
+    price_basis: estimate
+    price_url: ""
+  - id: R25-11
+    option: B
+    function: Lid top ring, bulb seal and drip lip, six over-centre latches with secondary catch
+    maker: DIY Caravans (rings and seals), UNISEG Snap-Flat type latches (report 12)
+    model: Pop-top extrusion 1.65 kg/m, pop-top weather seal M
+    qty: 1 set
+    mass_kg_change: 31.7
+    mass_basis: calculated
+    mass_source: "Report 12 BD-12: top ring 26.1, latches 2.4, seals 3.2"
+    price_aud: 800
+    price_basis: estimate
+    price_url: https://www.diycaravans.com.au/product-category/pop-top-roof-kits/
+    notes: "Each latch rated at least 2.0 kN (section 11). Interlock stops the lift while any latch is closed"
+  - id: R25-12
+    option: B
+    function: Canvas skirt 650 mm with zip windows and fly screens, plus a quilted inner liner
+    maker: Any caravan canvas maker
+    model: Polycotton canvas 10.2 m2, liner 8.9 m2
+    qty: 1
+    mass_kg_change: 10.3
+    mass_basis: estimate
+    mass_source: "Report 12: canvas 9.4 kg for 13.2 m2, liner 3 kg"
+    price_aud: 2800
+    price_basis: estimate
+    price_url: https://cuttingedgecanvas.com.au/
+    notes: "Report 18 put a custom skirt at AUD 1,500 to 2,500. U 5.5 W/m2K bare, 2.3 lined (est.)"
+  - id: R25-13
+    option: B and C
+    function: Roof lift, four electric linear actuators with Hall feedback and parallel control, telescopic guide posts
+    maker: LINAK
+    model: LA36 IC Parallel, 4,500 N, 12 mm pitch, 650 mm stroke, 24 V
+    qty: 4
+    mass_kg_change: 30.0
+    mass_basis: estimate
+    mass_source: "Report 12 BD-12: 30 kg for four actuators with guide posts and controls. C uses 34 kg for longer guides"
+    power: "IP66 dynamic, IP69K static, -30 to +65 C, integrated brake, hand crank, 20 % duty at full load to 600 mm stroke, 15 % above"
+    price_aud: 5000
+    price_basis: estimate
+    price_url: https://www.linak.com.au/
+    source: https://docs.rs-online.com/0f7b/A700000011321379.pdf
+    notes: "LINAK Australia Pty Ltd, 84 Bazalgette Crescent, Dandenong South VIC, +61 3 8796 9777. C: AUD 5,500 with longer guides"
+  - id: R25-14
+    option: B and C
+    function: Lid stiffening frame for the raised span between four posts
+    maker: Custom aluminium
+    model: Perimeter and cross members under the lid
+    qty: 1
+    mass_kg_change: 10.0
+    mass_basis: estimate
+    mass_source: "Estimate. C: 6 kg, the shell walls stiffen the lid"
+    price_aud: 600
+    price_basis: estimate
+    price_url: ""
+  - id: R25-15
+    option: B and C
+    function: Split custom entry and rear doors in place of the two Aussie Traveller DC doors
+    maker: Custom
+    model: Lower leaf to 1,330 mm, upper leaf in the shell (C) or a canvas flap (B)
+    qty: 2
+    mass_kg_change: 8.0
+    mass_basis: estimate
+    mass_source: "Estimate against 2 x 21 kg (report 19). C: +10 kg"
+    price_aud: 2000
+    price_basis: estimate
+    price_url: ""
+    notes: "Net of report 19's two doors at AUD 1,549.99 each. C: AUD 2,900. No pleated blind"
+  - id: R25-16
+    option: B and C
+    function: Upper wet room partition hung from the lid
+    maker: Custom
+    model: B zip fabric wall, C sandwich panel with a sliding seal
+    qty: 1
+    mass_kg_change: 3.0
+    mass_basis: estimate
+    mass_source: "Estimate. C: 8 kg"
+    price_aud: 300
+    price_basis: estimate
+    price_url: ""
+    notes: "C: AUD 800"
+  - id: R25-17
+    option: B and C
+    function: Lid-hung bed lift, four straps on a lid-mounted drive, guide channels on the lower walls
+    maker: Custom
+    model: Replaces report 21's Lippert HappiJac 42 in kit
+    qty: 1
+    mass_kg_change: 5.0
+    mass_basis: estimate
+    mass_source: "Estimate against the HappiJac's 35 kg (report 21)"
+    price_aud: 500
+    price_basis: estimate
+    price_url: ""
+    notes: "Net of the HappiJac at AUD 4,049 (report 21). Interlocked with the roof lift"
+  - id: R25-18
+    option: B and C
+    function: Cable and duct loops to the moving lid (PV strings, lights, range hood)
+    maker: Commodity
+    model: Cable chain or loop with strain relief at one corner
+    qty: 1
+    mass_kg_change: 1.5
+    mass_basis: estimate
+    price_aud: 0
+    price_basis: estimate
+    price_url: ""
+    notes: "Meets ADR 42/05 clause 21. Cost in labour"
+  - id: R25-19
+    option: B
+    function: Extra house battery for the canvas walls' cooling load
+    maker: Victron Energy
+    model: Lithium NG LiFePO4 51.2 V 100 Ah, BAT548110620
+    qty: 1 to 2
+    mass_kg_each: 37.0
+    mass_basis: maker
+    price_aud_each: 2911
+    price_basis: listing
+    price_url: https://energyconnections.net.au/products/victron-lifepo4-battery-51-2v-100ah-ng-next-gen
+    notes: "From research/20-electrical.yaml. One module lined (+3.6 kWh a day), two bare (+7.5 kWh a day)"
+  - id: R25-30
+    option: C
+    function: Upper shell walls, 35 mm sandwich, 800 mm tall (650 mm lift, 150 mm overlap)
+    maker: Body panel, report 12 build-up
+    model: 11.1 m2 of wall panel
+    qty: 1
+    mass_kg_change: 66.7
+    mass_basis: calculated
+    mass_source: "11.1 m2 at report 12's 6.0 kg/m2"
+    price_aud: 2000
+    price_basis: estimate
+    price_url: ""
+  - id: R25-31
+    option: C
+    function: Two sliding rails with seal tracks, compression seal and a brush strip at the shell's lower edge
+    maker: Custom extrusion
+    model: Lower body top rail 13.6 m, shell bottom rail 13.9 m
+    qty: 1 set
+    mass_kg_change: 33.0
+    mass_basis: estimate
+    mass_source: "27.5 m at about 1.2 kg/m, scaled from DIY Caravans' 1.65 kg/m pop-top ring (report 12)"
+    price_aud: 1900
+    price_basis: estimate
+    price_url: ""
+  - id: R25-32
+    option: C
+    function: Flush-bonded windows with integrated blinds in the lower walls, in place of the Dometic S4s
+    maker: Polyplastic (Polyvision type)
+    model: Sizes to suit, heads at most 1,330 mm above the floor
+    qty: 6
+    mass_kg_change: 0
+    mass_basis: estimate
+    price_aud: 1500
+    price_basis: estimate
+    price_url: ""
+    notes: "report 19 found no Australian stock. The escape window fails report 19's 0.33 m2 rule at this height"
+  - id: R25-40
+    option: alternative, not chosen
+    function: Four-actuator 12 V pop-top lift kit
+    maker: Linear Actuators Australia (ShopLAA), Brisbane
+    model: DIY electric pop-top lift kit, prebuilt sizes to 450 mm lift
+    qty: 1
+    mass_kg: 10
+    mass_basis: listing
+    mass_source: "Just under 10 kg with brackets and loom (listing)"
+    price_aud: 1694
+    price_basis: listing
+    price_url: https://shoplaa.com.au/
+    notes: "Including GST and shipping. Stroke too short for 650 mm without a custom build"
+  - id: R25-41
+    option: alternative, not chosen
+    function: Hydraulic lift, 12 V DC power pack with multi-stage rams
+    maker: Various tipper-kit sellers
+    model: 800 mm stroke 4-stage ram
+    qty: 4
+    mass_kg: null
+    mass_basis: estimate
+    price_aud: 778.80
+    price_basis: listing
+    price_url: https://www.ebay.com.au/shop/tipper-ram?_nkw=tipper%20ram
+    notes: "Each ram. Needs a flow divider, hoses to a moving roof and oil inside a dusty body (section 9)"

@@ -13,7 +13,7 @@ glands:
   - {id: G2, what: "15 A appliance inlet and the 12 V Anderson SB50 outlet in one IP56 surface box", at: kerb, x: 4700, z: 1150, d: 60, src: "layout study section 4.1"}
   - {id: G3, what: "Outdoor 230 V double outlet (C10), IP56 surface box under the awning", at: kerb, x: 4300, z: 1150, d: 60, src: "report 20 section 7", est: "position"}
   - {id: G4, what: "Two 6 mm2 PV strings into a conduit down the partition's kerb end", at: roof, x: 5100, y: -900, d: 25, src: "layout study section 4.1"}
-  - {id: G5, what: "Split line set and the outdoor unit's 230 V feed (C8), behind the cradle", at: rear, y: 760, z: 2800, d: 60, src: "AC-02, AC-03", est: "position, moved to the road half with the outdoor unit in phase 1"}
+  - {id: G5, what: "Split line set and the outdoor unit's 230 V feed (C8), behind the cradle", at: rear, y: 760, z: 2800, d: 60, src: "AC-02, AC-03", est: "position, moved to the road half with the outdoor unit"}
   - {id: G6, what: "Battery box vent from the bottom of the box, 20 mm bore with insect mesh", at: floor, x: 4300, y: -800, d: 20, src: "report 20 section 2, AS/NZS 3001.2 clause 5.4.12.2", est: "position"}
   - {id: G7, what: "Battery box vent ducted from the top of the box, 20 mm bore with insect mesh", at: floor, x: 4900, y: -800, d: 20, src: "report 20 section 2", est: "position"}
   - {id: G8, what: "Ute charging feed, 8 B&S twin from the drawbar Anderson SB50 along the kerb rail", at: floor, x: 5100, y: -700, d: 25, src: "layout study section 4.1"}

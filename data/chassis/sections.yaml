@@ -11,7 +11,7 @@
 # Method. Hollow sections are computed from the AS/NZS 1163 nominal geometry with Australian Tube Mills' corner radii
 # (ro = 2.0 t for t <= 3 mm and 2.5 t for t > 3 mm, inner radius ro - t), density 7,850 kg/m3, and the thin-wall torsion
 # formulas Austube publishes (J = t^3 h / 3 + 2 k Ah, C = J / (t + k / t), k = 2 Ah t / h, h and Ah taken on the wall midline).
-# Script: sect.py in the research worker's scratch area, reproduced in report 11 appendix A.
+# Script: sect.py, reproduced in report 11 appendix A.
 # Check. Every hollow section marked published_check was compared with the Austube Mills Design Capacity Tables for
 # Structural Steel Hollow Sections (August 2013). The computed values match the published ones to the published
 # rounding (3 significant figures) in every case checked, so the computed figures can be used for the sections that

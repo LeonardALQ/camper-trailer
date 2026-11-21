@@ -16,7 +16,7 @@ The design documents:
 - `UTE-GARAGE.md`: the LandCruiser 79 and its bike box.
 - `VEHICLE.md`: the vehicle plan (engine, driveline, GVM kit, brakes, wheels, towing, legal path, budget and order of work), with its parts list in `data/vehicle/vehicle-parts.yaml`.
 - `docs/decisions.md`: the decision record the documents cite as the decision log, by time.
-- `research/`: the research reports behind them. Report 18 is the trailer's layout study for the 79.
+- `research/`: the research reports behind them, 01 to 22, 25 and 26, with their data files, and the models of reports 19, 20 and 25 in `research/models/`. Report 18 is the trailer's layout study for the 79. Reports 23 and 24 are `VEHICLE.md` and `UTE-GARAGE.md`.
 - `DESIGN.md` and `garage-bed/BOM.md` are the retired garage and bed module, kept for the record.
 
 The build reads those files and never edits them.

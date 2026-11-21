@@ -57,7 +57,7 @@ parts:
     maker: Product to choose
     qty: 1
     unit: set
-    mass: {basis: declared, total_kg: 3.8, maturity: estimate, source: "R24 (BX-D04 to BX-D07): shoot bolts 0.8 kg, latches 0.9 kg, struts 0.7 kg, Trim-Lok seal 1.4 kg (estimates)"}
+    mass: {basis: declared, total_kg: 3.8, maturity: estimate, source: "Report 24 (BX-D04 to BX-D07): shoot bolts 0.8 kg, latches 0.9 kg, struts 0.7 kg, Trim-Lok seal 1.4 kg (estimates)"}
     notes: The latches are for short stops only. The padlocks are the security.
     cog: {at: [2000, -300, 800], basis: "Spread over the barn doors and the kerb door, estimate"}
   U-RIVETS:
@@ -67,5 +67,5 @@ parts:
     maker: Product to choose
     qty: 1
     unit: set
-    mass: {basis: declared, total_kg: 0.2, maturity: estimate, source: "R24 (BX-F06), estimate"}
+    mass: {basis: declared, total_kg: 0.2, maturity: estimate, source: "Report 24 (BX-F06), estimate"}
     cog: {at: [garage_length, 0, 730], basis: "Along the hinges, estimate"}

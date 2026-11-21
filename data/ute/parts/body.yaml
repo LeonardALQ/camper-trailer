@@ -54,7 +54,7 @@ parts:
     mass: {basis: per_area, kg_per_m2: 6.70, maturity: calculated, source: "2.5 mm at 2.68 g/cm3, as U-SKIN"}
     size: 925 mm long, 20 mm out from the skin, 130.5 mm high from the floor's underside, each side
     rating: "Toyota BBGJ1007 p. 28: 30 mm outside the tyre (UGW-03). The box is 1,890 mm over the flares against UTE-09's 1,910 mm (decision H19)"
-    notes: "The Elite's 1,555 mm rear track puts each rear tyre's outer face 911.5 mm out, 11 mm from the 1,850 mm body's skin. Over each tub the skin is cut away up to the top of the side wall's bottom rail, and the flare closes the opening 20 mm further out, so the tyre keeps 31 mm (R26 fix A)"
+    notes: "The Elite's 1,555 mm rear track puts each rear tyre's outer face 911.5 mm out, 11 mm from the 1,850 mm body's skin. Over each tub the skin is cut away up to the top of the side wall's bottom rail, and the flare closes the opening 20 mm further out, so the tyre keeps 31 mm (report 26 fix A)"
     geometry: {generator: panel, params: {}}
     color: "#dfe6e9"
     alpha: 0.35
@@ -92,7 +92,7 @@ parts:
     maker: Sika
     qty: 1
     unit: set
-    mass: {basis: declared, total_kg: 1.5, maturity: estimate, source: "R24 (data/ute/box-parts.yaml BX-F09), estimate"}
+    mass: {basis: declared, total_kg: 1.5, maturity: estimate, source: "Report 24 (data/ute/box-parts.yaml BX-F09), estimate"}
     cog: {at: [1260, 0, 730], basis: "Spread over the seams, estimate"}
   U-ROOF-COAT:
     name: Roof top coating
@@ -101,5 +101,5 @@ parts:
     maker: Product to choose
     qty: 1
     unit: set
-    mass: {basis: declared, total_kg: 0.5, maturity: estimate, source: "R24 (BX-C02), estimate"}
+    mass: {basis: declared, total_kg: 0.5, maturity: estimate, source: "Report 24 (BX-C02), estimate"}
     cog: {at: [1260, 0, top_z], basis: "On the roof, estimate"}

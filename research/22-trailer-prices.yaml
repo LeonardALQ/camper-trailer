@@ -1,0 +1,1146 @@
+# report 22 trailer prices: every line outside the new interior (research/22-trailer-prices.md).
+# AUD including GST. unit_aud is per unit. total_aud = qty x unit_aud.
+# basis: listing (a public price), quote (a published quote or price list), rate (a published rate applied to a
+# quantity), estimate (judgement, reasoning in note). Converted prices say so in note
+# (1 USD = 1.55 AUD, 1 EUR = 1.68 AUD, 1 GBP = 1.98 AUD).
+# id: the schedule id in build/trailer/trailer.json where one exists. New ids: STL (steel), GLV (galvanising),
+# LAB (labour), CMP (compliance), CON (consumables and freight), CTG (contingency).
+date_checked: 2026-11-20
+currency: AUD incl GST
+lines:
+
+  # ---------------------------------------------------------------- running gear, wheels and tyres
+  - id: RG-01
+    group: Running gear
+    item: "Cruisemaster XT Freestyle Air tandem kit, 4,500 kg, 12 in ABS-enabled A/T electric drums, LC5 M14 studs, 110 mm spigot, Level 1 base kit"
+    covers: [RG-01.1, RG-01.2, RG-01.3, RG-01.4]
+    qty: 1
+    unit: tandem kit
+    unit_aud: 7442.04
+    total_aud: 7442.04
+    basis: listing
+    url: "https://www.diycaravans.com.au/shop/cruisemaster-xt-freestyle-air-suspension-kit-tandem/"
+    date: 2026-11-20
+    note: "Variant 'Tandem 4500 Kgs, Drum 12in CM ABS Enabled A/T Electric Brakes, Level 1', SKU 8015 ABS. The AUD 5,425 'from' price is the 2,800 kg kit with plain drums. Raw arms. Premium powder coat and BCS are priced on request. Lead time 3 to 4 weeks, shipped on a pallet."
+  - id: RG-04
+    group: Running gear
+    item: "Cruisemaster Level 3 manual air control kit: 12 V compressor, 11 L aluminium tank, panel with digital gauge and a kerb-side and a road-side switch, tyre line out"
+    qty: 1
+    unit: kit
+    unit_aud: 1285.00
+    total_aud: 1285.00
+    basis: listing
+    url: "https://www.diycaravans.com.au/shop/cruisemaster-xt-freestyle-air-suspension-kit-tandem/"
+    date: 2026-11-20
+    note: "Difference between the Level 3 Manual variant (AUD 8,727.04) and Level 1 (AUD 7,442.04) of the same kit. Contents from https://cruisemaster.com.au/lvl3-air/. It has no automatic height valves. Level 2 omits the tank and Cruisemaster does not recommend it for heavy builds."
+  - id: RG-03
+    group: Running gear
+    item: "Bosch Trailer Safety Control (TSC), ABS-enabled, tandem axle kit"
+    qty: 1
+    unit: kit
+    unit_aud: 1558.70
+    total_aud: 1558.70
+    basis: listing
+    url: "https://www.diycaravans.com.au/shop/bosch-trailer-safety-control-tsc-abs-enabled/"
+    date: 2026-11-20
+    note: "SKU 8037.1. Give the tyre size at checkout so the unit is programmed for LT265/75R16."
+  - id: RG-03N
+    group: Running gear
+    item: "Wheel nuts, M14 x 1.5, to suit the ROH steel wheel seat"
+    covers: [RG-03]
+    qty: 24
+    unit: nut
+    unit_aud: 4.00
+    total_aud: 96.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "20 on the hubs and 4 spare. The kit's 'wheel nuts required' option shows no price. AUD 4 each (est.) for zinc-plated nuts of the wheel's seat type."
+  - id: RG-05
+    group: Running gear
+    item: "Spare airbag, Cruisemaster XT replacement airbag"
+    qty: 1
+    unit: each
+    unit_aud: 380.00
+    total_aud: 380.00
+    basis: listing
+    url: "https://cruisemaster.com.au/search.php?search_query=airbag"
+    date: 2026-11-20
+    note: "Cruisemaster shop, 'XT - Replacement Airbag'."
+  - id: RG-05K
+    group: Running gear
+    item: "Cruisemaster air system emergency repair kit (fittings and line for RG-05)"
+    covers: [RG-05]
+    qty: 1
+    unit: kit
+    unit_aud: 125.00
+    total_aud: 125.00
+    basis: listing
+    url: "https://cruisemaster.com.au/search.php?search_query=airbag"
+    date: 2026-11-20
+    note: "Loctite 567 is in CON-02."
+  - id: RG-02
+    group: Running gear
+    item: "Tyre, LT265/75R16 123/120R load range E, Yokohama Geolandar A/T G015 (four on the axles and the spare SP-01)"
+    covers: [RG-02.1, RG-02.2, RG-02.3, RG-02.4, SP-01]
+    qty: 5
+    unit: tyre
+    unit_aud: 471.18
+    total_aud: 2355.90
+    basis: listing
+    url: "https://www.tiremart.com/yokohama-geolandar-a-t-g015-lt-265-75r16-123-120r-e-10-ply-at-all-terrain-tire-dc"
+    date: 2026-11-20
+    note: "Converted: USD 303.99 x 1.55. No Australian listing for this size was readable (Tyroola, Bob Jane, Tyrepower and JAX blocked or had no page). R16 estimated AUD 420 for the same tyre on the ute."
+  - id: RG-02F
+    group: Running gear
+    item: "Tyre fitting and balancing"
+    qty: 5
+    unit: wheel
+    unit_aud: 35.00
+    total_aud: 175.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Same estimate as R16 TYR-02 for the ute."
+  - id: RG-06
+    group: Running gear
+    item: "Wheel, ROH Trak 2 16 x 7 ET 0 steel, 5 x 150, rated 1,400 kg (four on the axles and the spare SP-02)"
+    covers: [RG-06.1, RG-06.2, RG-06.3, RG-06.4, SP-02]
+    qty: 5
+    unit: wheel
+    unit_aud: 230.00
+    total_aud: 1150.00
+    basis: estimate
+    url: "https://roh.com.au/wheels/trak-2"
+    date: 2026-11-20
+    note: "ROH publishes no price and no retailer listing was found. R16 WHL-01 used the same AUD 230 (est.). The 2025 ROH Trak2 recall covers only the 17 x 7 rim sold in Europe from 2015 to 2020 (https://delta4x4.com/fr/rappel-de-la-jante-en-acier-roh-trak2/), not the 16 x 7."
+
+  # ---------------------------------------------------------------- coupling, drawbar fittings and corner steadies
+  - id: DB-03
+    group: Coupling and drawbar fittings
+    item: "Cruisemaster DO35 V3Plus coupling with handbrake"
+    qty: 1
+    unit: each
+    unit_aud: 515.00
+    total_aud: 515.00
+    basis: listing
+    url: "https://cruisemaster.com.au/shop/"
+    date: 2026-11-20
+    note: "Cruisemaster's own shop. The no-handbrake version is AUD 465."
+  - id: DB-05
+    group: Coupling and drawbar fittings
+    item: "ARK XO750 jockey wheel, 750 kg, zinc, swivel clamp"
+    qty: 1
+    unit: each
+    unit_aud: 449.00
+    total_aud: 449.00
+    basis: listing
+    url: "https://www.arkcorp.com.au/product/xo750-jockey-wheel/"
+    date: 2026-11-20
+    note: "ARK RRP, SKU ORJW750d. Blue Bottle Marine listed an XO jockey wheel at AUD 363.90 (https://www.bluebottlemarine.com/products/ark-jockey-wheel-extreme-offroad-series.html)."
+  - id: DB-06
+    group: Coupling and drawbar fittings
+    item: "Safety chain, 13 mm, rated 3,500 kg, zinc, two lengths of about 0.9 m"
+    qty: 2
+    unit: m
+    unit_aud: 38.92
+    total_aud: 77.84
+    basis: rate
+    url: "https://www.arkcorp.com.au/product/trailer-safety-chain/"
+    date: 2026-11-20
+    note: "ARK sells this chain (CHR13Z) as a 7 m bag for AUD 272.42, which is AUD 38.92/m. Buy it cut and tagged to AS 4177.4 from a trailer parts store at about this rate."
+  - id: DB-06S
+    group: Coupling and drawbar fittings
+    item: "ARK HLS13 hammerlock shackle, 13 mm, 5.3 t"
+    covers: [DB-06]
+    qty: 2
+    unit: each
+    unit_aud: 43.44
+    total_aud: 86.88
+    basis: listing
+    url: "https://www.arkcorp.com.au/product/hammerlock-shackles/"
+    date: 2026-11-20
+    note: ""
+  - id: CH-B01
+    group: Coupling and drawbar fittings
+    item: "ARK XO DDS650 drop-down corner steadies, zinc, pair with winding handle"
+    qty: 2
+    unit: pair
+    unit_aud: 149.95
+    total_aud: 299.90
+    basis: listing
+    url: "https://www.arkcorp.com.au/product/xo-corner-steadies/"
+    date: 2026-11-20
+    note: "SKU XODDS650. Sold as a pair (report 13's 17.6 kg 'set of two'). Two pairs for the four corners."
+  - id: DB-07
+    group: Coupling and drawbar fittings
+    item: "Breakaway kit: 12 V sealed battery in a box, breakaway switch with lanyard, charge controller with test indicator"
+    qty: 1
+    unit: kit
+    unit_aud: 250.00
+    total_aud: 250.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "No Australian listing was readable. AUD 250 (est.) for a branded kit that holds the brakes on for 15 min as VSB1 asks. Report 11 found no mass either."
+  - id: DB-07P
+    group: Coupling and drawbar fittings
+    item: "12-pin flat plug for the trailer cable"
+    covers: [DB-07]
+    qty: 1
+    unit: each
+    unit_aud: 52.62
+    total_aud: 52.62
+    basis: listing
+    url: "https://www.arkcorp.com.au/product/12-pin-flat/"
+    date: 2026-11-20
+    note: "Upper end of ARK's AUD 50.47 to 52.62 range."
+  - id: DB-07C
+    group: Coupling and drawbar fittings
+    item: "Drawbar cables: 12-core trailer cable, Anderson 50 A plug and charge cable, glands and loom"
+    covers: [DB-07]
+    qty: 1
+    unit: lot
+    unit_aud: 180.00
+    total_aud: 180.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Allowance (est.). Report 20 may replace the charge cable when it sizes the ute-to-trailer charging."
+  - id: DB-04
+    group: Coupling and drawbar fittings
+    item: "Stone guard materials: SHS 25 x 25 x 2 frame, 2 mm aluminium checker plate, rubber mounts and bolts"
+    qty: 1
+    unit: lot
+    unit_aud: 84.01
+    total_aud: 84.01
+    basis: rate
+    url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/15-shs-mild-steel-square.html"
+    date: 2026-11-20
+    note: "SHS 25 x 25 x 2 x 6.5 m AUD 25.80 (listing). 0.30 m2 of 2 mm checker plate at AUD 60.71/m2 (AUD 174.85 per 1200 x 2400 sheet, listing) AUD 18.21. Mounts and bolts AUD 40 (est.). Labour is in LAB-05. The frame is galvanised with the chassis."
+
+  # ---------------------------------------------------------------- chassis steel (RHS Steel Supplies, Revesby NSW, 8 m lengths, black)
+  - id: STL-01
+    group: Chassis steel
+    item: "RHS 150 x 50 x 3.0, 8 m length (14.21 m needed)"
+    covers: [RL-K, RL-R, CM-01, CM-04, CM-05, CM-06, CM-08]
+    qty: 2
+    unit: 8 m length
+    unit_aud: 205.65
+    total_aud: 411.30
+    basis: listing
+    url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html"
+    date: 2026-11-20
+    note: "SKU RHS36, AUD 25.71/m, about AUD 2.87/kg. Rails 4.42 m each, five crossmembers 1.075 m each. Ask for C450L0 (Austube C450PLUS) on the mill certificate. The listing does not state the grade."
+  - id: STL-02
+    group: Chassis steel
+    item: "RHS 127 x 51 x 3.5, 8 m length, in place of RHS 125 x 50 x 3.0, which is not a stocked size (21.86 m needed)"
+    covers: [RS-K, RS-R, CM-02, CM-03, CM-07, OR-01K, OR-01R, OR-02K, OR-02R, OR-03K, OR-03R, OR-04K, OR-04R, OR-05K, OR-05R, OR-06K, OR-06R, OR-07K, OR-07R, OR-08K, OR-08R]
+    qty: 3
+    unit: 8 m length
+    unit_aud: 294.75
+    total_aud: 884.25
+    basis: listing
+    url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html"
+    date: 2026-11-20
+    note: "SKU RHS1275135, AUD 36.84/m, about 9.3 kg/m (calculated, est.). Neither this stockist nor Austube's C450PLUS range lists 125 x 50 x 3 (report 11). 125 x 75 x 3.0 and 150 x 50 x 3.0 are AUD 205.65 per 8 m. Cutting plan: two lengths of one raiser and five outriggers, one of six outriggers and three crossmembers. See open point 1."
+  - id: STL-03
+    group: Chassis steel
+    item: "RHS 150 x 50 x 5.0, 8 m length (5.30 m needed)"
+    covers: [DB-KA, DB-KB, DB-RA, DB-RB]
+    qty: 1
+    unit: 8 m length
+    unit_aud: 326.65
+    total_aud: 326.65
+    basis: listing
+    url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html"
+    date: 2026-11-20
+    note: "SKU RHS40. The Metal Warehouse lists the galvanised version at AUD 421.74 (https://www.themetalwarehouse.com.au/about/150-x-50-x-5-0-gal-rectangular-rhs-8-metres.html)."
+  - id: STL-04
+    group: Chassis steel
+    item: "RHS 75 x 50 x 3.0, 8 m length (0.49 m needed)"
+    covers: [DB-BR]
+    qty: 1
+    unit: 8 m length
+    unit_aud: 122.05
+    total_aud: 122.05
+    basis: listing
+    url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html"
+    date: 2026-11-20
+    note: "SKU RHS13. A fabricator's offcut would do. Priced as a full length so the total does not depend on one."
+  - id: STL-05
+    group: Chassis steel
+    item: "SHS 40 x 40 x 2.5, 8 m length (6.96 m needed)"
+    covers: [PB-1K, PB-1R, PB-2K, PB-2R, PB-3K, PB-3R]
+    qty: 1
+    unit: 8 m length
+    unit_aud: 63.75
+    total_aud: 63.75
+    basis: listing
+    url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/15-shs-mild-steel-square.html"
+    date: 2026-11-20
+    note: "SKU SHS19."
+  - id: STL-06
+    group: Chassis steel
+    item: "SHS 50 x 50 x 2.5, 8 m length (1.80 m needed)"
+    covers: [SP-PK, SP-PR]
+    qty: 1
+    unit: 8 m length
+    unit_aud: 80.25
+    total_aud: 80.25
+    basis: listing
+    url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/15-shs-mild-steel-square.html"
+    date: 2026-11-20
+    note: "SKU SHS24."
+  - id: STL-07
+    group: Chassis steel
+    item: "SHS 50 x 50 x 3.0, 8 m length (0.80 m needed for the four hinge gussets)"
+    covers: [CH-P08]
+    qty: 1
+    unit: 8 m length
+    unit_aud: 95.65
+    total_aud: 95.65
+    basis: listing
+    url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/15-shs-mild-steel-square.html"
+    date: 2026-11-20
+    note: "SKU SHS25. An offcut would do."
+  - id: STL-08
+    group: Chassis steel
+    item: "Profile-cut plate parts, 250 grade: coupling plate, chain and recovery lugs, gussets, pads, cleats, bracket plates, 32 body-mount nut plates, 12 plan-brace gusset plates"
+    covers: [CH-P01, CH-P02, CH-P03, CH-P04, CH-P05, CH-P06, CH-P07, CH-P09, CH-P10, CH-P11, CH-P14]
+    qty: 68
+    unit: kg
+    unit_aud: 12.00
+    total_aud: 816.00
+    basis: estimate
+    url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/374-mild-steel-sheet-plates-250gr-as-nzs-3678.html"
+    date: 2026-11-20
+    note: "55.3 kg in the schedule (5 mm 3.5 kg, 6 mm 9.9, 8 mm 2.0, 10 mm 16.3, 12 mm 6.2, 20 mm 17.3) plus 12 plan-brace gussets of 150 x 150 x 6 mm, 12.7 kg (est.). Plate costs about AUD 3.05 to 3.44/kg as 1200 x 2400 sheets (listing). AUD 12/kg (est.) covers nesting scrap, laser or plasma cutting and drilling of small thick parts. Instant DXF quotes: https://www.lasercorp.com.au/ (to 12 mm), https://mhub.au/."
+  - id: CH-S01
+    group: Chassis steel
+    item: "Floor bearer strip, HDPE 50 x 22.5 mm with a bonded EPDM face, on the raisers, outriggers and floor crossmembers"
+    qty: 21.9
+    unit: m
+    unit_aud: 18.00
+    total_aud: 394.20
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "HDPE strip about AUD 14/m and 50 mm EPDM tape about AUD 4/m (est.). No listing checked."
+  - id: CH-G01
+    group: Galvanising
+    item: "Hot-dip galvanising to AS/NZS 4680 of the welded chassis, drawbar, stone-guard frame and mud-flap hangers"
+    qty: 508
+    unit: kg galvanised
+    unit_aud: 2.75
+    total_aud: 1397.00
+    basis: estimate
+    url: "https://www.steel.org.au/getattachment/2f694ebb-98a7-4273-be94-e0f61bd74328/Cost-factors-for-hot-dip-galvanised-coatings_INGALSM3.pdf"
+    date: 2026-11-20
+    note: "Galvanisers charge per kg of galvanised weight (https://www.galserv.com.au/faqs). Industrial Galvanizers' specifier manual gives AUD 1.20/kg for light 3 mm fabrications, an older figure. AUD 2.75/kg incl GST (est.) allows for price rises since and for a one-off frame. 508 kg is CHASSIS.md's 459.9 kg of steel and 13.8 kg of zinc plus about 34 kg (est.) for the heavier 127 x 51 x 3.5 section in STL-02. The bath must take a 6.3 x 2.4 m frame."
+
+  # ---------------------------------------------------------------- labour (hired trade rate AUD 120/h incl GST, est.)
+  - id: LAB-01
+    group: Labour
+    item: "Chassis and drawbar fabrication: cut, fit, weld, grind, inspect, prepare for galvanising"
+    qty: 70
+    unit: h
+    unit_aud: 120.00
+    total_aud: 8400.00
+    basis: estimate
+    url: "https://mobilewelders.com.au/"
+    date: 2026-11-20
+    note: "Hours (est.): cut, cope and drill 45 members and about 70 plate parts with vent and drain holes 12 h. Jig, fit and tack square to 2 mm 14 h. Weld about 18 m of raiser fillets, 6 m of drawbar fillets, about 50 member ends, 32 nut plates and the XT hinge brackets 28 h. Burr-grind toes, dress, inspect and record 10 h. Handling and the post-dip check 6 h. Rate: mobile welders from AUD 110/h. Sydney welder wages AUD 41 to 86/h (https://au.indeed.com/career/welder/salaries/Sydney-NSW)."
+  - id: LAB-02
+    group: Labour
+    item: "Running gear and chassis assembly after galvanising: XT arms, airbags, shocks, brakes, Bosch TSC, air system, hubs and wheels, coupling, jockey wheel, steadies, chains"
+    qty: 16
+    unit: h
+    unit_aud: 120.00
+    total_aud: 1920.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Hours (est.)."
+  - id: LAB-03
+    group: Labour
+    item: "Wheel alignment, camber and toe, at a trailer alignment shop"
+    qty: 1
+    unit: job
+    unit_aud: 200.00
+    total_aud: 200.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "The XT arms have camber and toe adjustment (DIY Caravans listing)."
+  - id: LAB-04
+    group: Labour
+    item: "Body shell assembly: floor on the chassis and 32 mounts, walls and roof bonded into the joiners, openings framed and sealed, water test, vinyl laid"
+    qty: 70
+    unit: h
+    unit_aud: 120.00
+    total_aud: 8400.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Hours (est.), two people: floor, bearer strips and mounts 10 h. Joiners, walls and roof, with a crew of four for the roof lift 24 h. Ten openings framed and edge-sealed 16 h, with cut-outs CNC-cut by the panel maker. Sealing inside and out and a hose test 12 h. Vinyl 6 h. Panel makers sell kits for owner assembly (https://outbacktravelaustralia.com.au/4wd-mods-diy-workshop/styromax-diy-motorhome-bodies/). None publishes an assembly price."
+  - id: LAB-05
+    group: Labour
+    item: "Small fabrications: drawbar box, stone guard, tank guards and tank bearers, mud-flap hangers"
+    qty: 19
+    unit: h
+    unit_aud: 120.00
+    total_aud: 2280.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Hours (est.): drawbar box 8 h, stone guard 3 h, tank guards and bearers 6 h, hangers 2 h."
+  - id: LAB-06
+    group: Labour
+    item: "Cabinetry: assemble and fix the flat-pack cupboards, build the desk seats and the freezer bench, fit trims"
+    qty: 26
+    unit: h
+    unit_aud: 120.00
+    total_aud: 3120.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Hours (est.): flat packs 6 h, seats and bench 16 h, trims 4 h. Covers LA-08B, LA-08C and LA-11 only."
+  - id: LAB-07
+    group: Labour
+    item: "Fit the report 22 bought parts: water tanks and guards, heater fuel tank, awning, mud flaps, drawbar box, fire safety items"
+    qty: 12
+    unit: h
+    unit_aud: 120.00
+    total_aud: 1440.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Hours (est.). Systems labour for wiring, plumbing and HVAC is not here (open point 6)."
+
+  # ---------------------------------------------------------------- body shell (panels bought as made-to-size sheets, cut-outs are waste)
+  - id: BD-01
+    group: Body shell
+    item: "Floor panel, 30 mm, woven roving skins on Divinycell H80, one piece 4,420 x 2,400 mm"
+    qty: 10.61
+    unit: m2
+    unit_aud: 277.05
+    total_aud: 2939.50
+    basis: estimate
+    url: "https://www.diycaravans.com.au/shop/floor-panel-d-pvc-core-20mm-32mm/"
+    date: 2026-11-20
+    note: "DIY Caravans Floor Panel D, 32 mm, H60 PVC core, infused structural skins, made to order to 2,400 mm wide, AUD 251.86/m2 (listing). Plus 10 % (est.) for the denser H80 core. The panel maker CNC-cuts it to the drawing."
+  - id: BD-01V
+    group: Body shell
+    item: "Vinyl floor covering and adhesive over the floor inside"
+    covers: [BD-01]
+    qty: 10.1
+    unit: m2
+    unit_aud: 75.00
+    total_aud: 757.50
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Heavy-duty vehicle vinyl at about AUD 60/m2 plus adhesive and seam weld (est.). No listing checked."
+  - id: BD-02
+    group: Body shell
+    item: "Fixed roof panel, 40 mm, 2.0 mm top and 1.5 mm bottom gelcoat GRP skins on XPS, one piece"
+    qty: 10.61
+    unit: m2
+    unit_aud: 240.00
+    total_aud: 2546.40
+    basis: estimate
+    url: "https://www.diycaravans.com.au/shop/composite-panel-wall-b-xps-core-29mm-m2/"
+    date: 2026-11-20
+    note: "DIY Caravans Composite Panel B, 29 mm XPS with 1.6 mm skins, AUD 216.88/m2 (listing). Plus about 10 % (est.) for the 2.0 mm top skin and the 40 mm core. For scale, Panel A with a PVC core is AUD 406.99/m2 at 39 mm."
+  - id: BD-03
+    group: Body shell
+    item: "Side walls, 35 mm, two 1.5 mm gelcoat GRP skins on XPS, one piece each, 4,420 x 1,950 mm"
+    covers: [BD-03.1, BD-03.2]
+    qty: 17.24
+    unit: m2
+    unit_aud: 225.00
+    total_aud: 3879.00
+    basis: estimate
+    url: "https://www.diycaravans.com.au/shop/composite-panel-wall-b-xps-core-29mm-m2/"
+    date: 2026-11-20
+    note: "Panel B at AUD 216.88/m2 (listing) plus about 4 % (est.) for the thicker core. Priced on the full 8.62 m2 sheet of each wall."
+  - id: BD-04
+    group: Body shell
+    item: "End walls, 35 mm: front with a 2.0 mm outer skin (4.18 m2), rear (4.27 m2)"
+    covers: [BD-04.1, BD-04.2]
+    qty: 8.45
+    unit: m2
+    unit_aud: 232.42
+    total_aud: 1963.95
+    basis: estimate
+    url: "https://www.diycaravans.com.au/shop/composite-panel-wall-b-xps-core-29mm-m2/"
+    date: 2026-11-20
+    note: "Front 4.18 m2 at AUD 240 plus rear 4.27 m2 at AUD 225 (est., as BD-02 and BD-03)."
+  - id: BD-08I
+    group: Body shell
+    item: "Panel inserts: high-density PVC 70 x 25 mm strips at fixing lines, door and window surrounds and the 32 mounts"
+    covers: [BD-01, BD-03, BD-04, BD-08]
+    qty: 30
+    unit: m
+    unit_aud: 30.36
+    total_aud: 910.80
+    basis: rate
+    url: "https://www.diycaravans.com.au/shop/panel-insertion-hi-density-pvc-70-x-25-mm/"
+    date: 2026-11-20
+    note: "Listing price AUD 30.36, taken as per metre (the page does not state the unit). 30 m (est.) for the door, kitchen opening, windows, awning rail, bed ledgers and mounts."
+  - id: BD-08P
+    group: Body shell
+    item: "Panel inserts: pultruded GRP 50 x 25 mm across the roof and at cable entries"
+    covers: [BD-02, BD-08]
+    qty: 10
+    unit: m
+    unit_aud: 34.57
+    total_aud: 345.70
+    basis: rate
+    url: "https://www.diycaravans.com.au/shop/panel-insertion-pultrusion-50-x-25-mm/"
+    date: 2026-11-20
+    note: "Listing price taken as per metre. 10 m (est.)."
+  - id: BD-08F
+    group: Body shell
+    item: "Floor joiner extrusion round the floor edge, 13.6 m: two 6.5 m and two 2.5 m lengths"
+    covers: [BD-08]
+    qty: 1
+    unit: lot
+    unit_aud: 505.00
+    total_aud: 505.00
+    basis: listing
+    url: "https://www.diycaravans.com.au/shop/panel-joiner-diy-floor-29/"
+    date: 2026-11-20
+    note: "Panel Joiner DIY Floor 29: 6.5 m AUD 182.36, 2.5 m AUD 70.14 (listing), about AUD 28/m. It suits 29 mm panels. See open point 2 for the 30 and 35 mm panels."
+  - id: BD-08C
+    group: Body shell
+    item: "Corner joiner extrusion at the four vertical corners, 7.8 m: two 4.0 m lengths"
+    covers: [BD-08]
+    qty: 2
+    unit: 4.0 m length
+    unit_aud: 113.04
+    total_aud: 226.08
+    basis: listing
+    url: "https://www.diycaravans.com.au/shop/panel-joiner-diy-wall-29-29/"
+    date: 2026-11-20
+    note: "Panel Joiner DIY Wall 29-29, 1.8 kg/m. Each 4.0 m length gives two 1.95 m corners."
+  - id: BD-08R
+    group: Body shell
+    item: "Roof-to-wall joiner round the wall tops, 13.6 m: two 6.5 m and two 2.5 m lengths"
+    covers: [BD-08]
+    qty: 1
+    unit: lot
+    unit_aud: 508.68
+    total_aud: 508.68
+    basis: rate
+    url: "https://www.diycaravans.com.au/shop/panel-joiner-diy-roof-40-29/"
+    date: 2026-11-20
+    note: "Priced at the DIY Wall 29-29 rate, 6.5 m AUD 183.69 and 2.5 m AUD 70.65. DIY's Roof 40-29 joiner (40 mm roof to 29 mm wall) shows AUD 135.89 but is sold by the pallet with an unclear unit."
+  - id: BD-08A
+    group: Body shell
+    item: "Structural MS polymer adhesive, FixTech Fix 190, 600 ml sausage"
+    covers: [BD-08]
+    qty: 14
+    unit: sausage
+    unit_aud: 33.47
+    total_aud: 468.58
+    basis: listing
+    url: "https://www.diycaravans.com.au/shop/fix-msp-190-white-black-slow/"
+    date: 2026-11-20
+    note: "40 min skin time. Quantity (est.): 35 m of joiner, two legs, both faces is 140 m of bead at about 50 ml/m, 7 L, plus bed ledgers and waste, 8.4 L. That is 12 to 13 kg, more than the 6.5 kg in BD-08's mass (open point 3)."
+  - id: BD-08S
+    group: Body shell
+    item: "MS polymer sealant, 290 ml cartridge, for holes, spreaders, fittings and openings"
+    covers: [BD-08]
+    qty: 10
+    unit: cartridge
+    unit_aud: 19.98
+    total_aud: 199.80
+    basis: listing
+    url: "https://www.diycaravans.com.au/shop/fix-msp-190-white-black-slow/"
+    date: 2026-11-20
+    note: "Quantity (est.)."
+  - id: BD-08M
+    group: Body shell
+    item: "Body mount hardware: 32 M12 8.8 HDG bolts with washers and nylon sleeves, 32 aluminium spreaders 100 x 100 x 3, 32 GRP crush tubes, Duralac"
+    covers: [BD-08]
+    qty: 32
+    unit: mount
+    unit_aud: 16.00
+    total_aud: 512.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Per mount (est.): bolt, washers and sleeve AUD 5, spreader cut from 3 mm sheet AUD 5, crush tube AUD 5, Duralac and sealant share AUD 1."
+  - id: BD-10
+    group: Body fittings
+    item: "Mud flap, rubber, 610 x 455 mm, black"
+    covers: [BD-10.1, BD-10.2]
+    qty: 2
+    unit: each
+    unit_aud: 37.26
+    total_aud: 74.52
+    basis: listing
+    url: "https://www.thebossshop.com.au/mudflap-rubber-610mmw-x-455mml-black"
+    date: 2026-11-20
+    note: "On backorder at the listing. The white 24 x 18 flap is AUD 24.46 and in stock."
+  - id: BD-10H
+    group: Body fittings
+    item: "Mud flap hanger, galvanised steel bracket from the XT rear shock outrigger, with a 24 in mount strap and bolts"
+    covers: [BD-10]
+    qty: 2
+    unit: each
+    unit_aud: 35.84
+    total_aud: 71.68
+    basis: estimate
+    url: "https://www.thebossshop.com.au/mudflap-rubber-610mmw-x-455mml-black"
+    date: 2026-11-20
+    note: "Strap MS24 AUD 5.84 (listing) plus steel and bolts AUD 30 (est.). Galvanised with the chassis, made in LAB-05."
+  - id: BD-13
+    group: Body fittings
+    item: "Awning, Fiamma F45 S 450, Polar White cassette, Royal Grey fabric, wall mount"
+    qty: 1
+    unit: each
+    unit_aud: 1790.00
+    total_aud: 1790.00
+    basis: listing
+    url: "https://www.caravanrvcamping.com.au/awnings-screens-mats-covers/caravan-rv-awnings/box-awnings/fiamma-box-awning/fiamma-f45-wall-mount/"
+    date: 2026-11-20
+    note: "Sale price, AUD 1,875 before the sale. Caravan RV Camping, Australian stockist."
+  - id: BD-13B
+    group: Body fittings
+    item: "Awning wall brackets, leg wall brackets and bolts into the insert strip"
+    covers: [BD-13]
+    qty: 1
+    unit: set
+    unit_aud: 150.00
+    total_aud: 150.00
+    basis: estimate
+    url: "https://parts.jayco.com.au/products/fiamma-awning-leg-wall-bracket-kit-for-f45-awning"
+    date: 2026-11-20
+    note: "Allowance (est.). JayParts stocks the Fiamma F45 leg wall bracket kit."
+
+  # ---------------------------------------------------------------- BD-11 wiring, plumbing, lighting and hardware: placeholder until reports 20 and 21 replace it
+  - id: BD-11a
+    group: Wiring and plumbing allowance
+    item: "12 and 24 V DC wiring, tinned twin-core 2.5 to 6 mm2"
+    covers: [BD-11]
+    qty: 150
+    unit: m
+    unit_aud: 4.50
+    total_aud: 675.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Allowance (est.). Battery, inverter and solar cabling are report 20's."
+  - id: BD-11b
+    group: Wiring and plumbing allowance
+    item: "240 V wiring: 40 m of 2.5 mm2 TPS at AUD 3/m, six outlets at AUD 25, one 15 A inlet at AUD 60"
+    covers: [BD-11]
+    qty: 1
+    unit: lot
+    unit_aud: 330.00
+    total_aud: 330.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Allowance (est.)."
+  - id: BD-11c
+    group: Wiring and plumbing allowance
+    item: "LED lights: ten ceiling, two reading, two exterior"
+    covers: [BD-11]
+    qty: 14
+    unit: light
+    unit_aud: 40.00
+    total_aud: 560.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Allowance (est.)."
+  - id: BD-11d
+    group: Wiring and plumbing allowance
+    item: "Switches, fuse blocks, fuses, terminals, lugs, heat shrink, conduit, glands, ties"
+    covers: [BD-11]
+    qty: 1
+    unit: lot
+    unit_aud: 650.00
+    total_aud: 650.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Allowance (est.)."
+  - id: BD-11e
+    group: Wiring and plumbing allowance
+    item: "Plumbing: 30 m of 12 mm PEX at AUD 4/m, 40 push-fit fittings at AUD 9, tank fittings, breathers and drains AUD 150, two filler inlets at AUD 40"
+    covers: [BD-11]
+    qty: 1
+    unit: lot
+    unit_aud: 710.00
+    total_aud: 710.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Allowance (est.). The pump, filters and hot water are report 21's."
+  - id: BD-11f
+    group: Wiring and plumbing allowance
+    item: "General hardware: rivnuts, screws, brackets, P-clips"
+    covers: [BD-11]
+    qty: 1
+    unit: lot
+    unit_aud: 400.00
+    total_aud: 400.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Allowance (est.)."
+
+  # ---------------------------------------------------------------- under the floor
+  - id: UF-01
+    group: Tanks and guards
+    item: "Fresh water tank, front suspension bay, about 220 L net, welded with cross and lengthwise baffles, made to size"
+    qty: 1
+    unit: each
+    unit_aud: 650.00
+    total_aud: 650.00
+    basis: estimate
+    url: "https://www.diycaravans.com.au/shop/custom-made-caravan-rv-tanks/"
+    date: 2026-11-20
+    note: "DIY Caravans' made-to-size tanks start at AUD 397, priced on dimensions and fittings. Their standard 250 L tank is AUD 549 and the 180 L AUD 499 (https://www.diycaravans.com.au/shop/standard-caravan-rv-water-tanks/). AUD 650 (est.) for a custom 220 L tank. They weld 10 mm polypropylene, not the 6 mm HDPE in the mass model (open point 4)."
+  - id: UF-01R
+    group: Tanks and guards
+    item: "Fresh water tank, rear suspension bay, about 200 L net, as UF-01"
+    qty: 1
+    unit: each
+    unit_aud: 620.00
+    total_aud: 620.00
+    basis: estimate
+    url: "https://www.diycaravans.com.au/shop/custom-made-caravan-rv-tanks/"
+    date: 2026-11-20
+    note: "As UF-01, scaled to 200 L (est.)."
+  - id: UF-01B
+    group: Tanks and guards
+    item: "Tank mounting: aluminium angle bearers, 10 mm rubber strip, padded stainless straps, bolts"
+    covers: [UF-01, UF-01R]
+    qty: 2
+    unit: tank
+    unit_aud: 90.00
+    total_aud: 180.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Allowance per tank (est.)."
+  - id: UF-03
+    group: Tanks and guards
+    item: "Tank guards, 3 mm aluminium checker plate, one 1200 x 2400 sheet, with angle and fixings"
+    qty: 1
+    unit: lot
+    unit_aud: 341.75
+    total_aud: 341.75
+    basis: rate
+    url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/107-aluminium-5-bar-checker-plate-tread.html"
+    date: 2026-11-20
+    note: "Sheet AUD 261.75 (listing) plus angle and fixings AUD 80 (est.). One sheet, about 24 kg, against the 20 kg block mass."
+  - id: UF-06
+    group: Tanks and guards
+    item: "Heater fuel tank, 15 L HDPE, with pickup, fuel line, filter and mounting"
+    qty: 1
+    unit: lot
+    unit_aud: 220.00
+    total_aud: 220.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Allowance (est.). Drop it if report 19 removes the diesel combi heater."
+
+  # ---------------------------------------------------------------- drawbar box and fuel cans
+  - id: DX-01
+    group: Drawbar box
+    item: "Drawbar box, fabricated: one 1200 x 2400 sheet of 2 mm aluminium checker plate, stainless hinge, gas strut, keyed compression latch, padlock hasp, EPDM seal, rubber mounts and bolts"
+    qty: 1
+    unit: lot
+    unit_aud: 369.85
+    total_aud: 369.85
+    basis: rate
+    url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/107-aluminium-5-bar-checker-plate-tread.html"
+    date: 2026-11-20
+    note: "Sheet AUD 174.85 (listing). Its 2.88 m2 covers the box's 1.94 m2 and the stone guard's 0.30 m2. Hardware and mounts AUD 195 (est.). Labour is in LAB-05."
+  - id: GS-04
+    group: Drawbar box
+    item: "Fuel cans, 10 L, one petrol (AS/NZS 2906) and one diesel, with a tie-down strap"
+    qty: 2
+    unit: can
+    unit_aud: 60.00
+    total_aud: 120.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "AUD 45 a can plus a strap share AUD 15 (est.). The fuel itself carries no price."
+
+  # ---------------------------------------------------------------- cabinetry outside report 21's scope
+  - id: LA-08B
+    group: Cabinetry
+    item: "Tall cupboard, kerb-side rear corner, flat pack, lightweight board, single door, adjustable shelves"
+    qty: 1
+    unit: each
+    unit_aud: 584.11
+    total_aud: 584.11
+    basis: listing
+    url: "https://www.diycaravans.com.au/shop/flat-pack-caravan-tall-cabinet-example-price-guide/"
+    date: 2026-11-20
+    note: "DIY Caravans example price for an 1,800 x 450 x 580 mm tall cabinet in white gloss lightweight board. The final quote follows the drawing."
+  - id: LA-08C
+    group: Cabinetry
+    item: "Cupboard over the fridge and the freezer bench, flat pack, lightweight board, two doors"
+    qty: 1
+    unit: each
+    unit_aud: 420.00
+    total_aud: 420.00
+    basis: estimate
+    url: "https://www.diycaravans.com.au/shop/custom-flat-pack-caravan-cabinets/"
+    date: 2026-11-20
+    note: "About 70 % of the tall cabinet's price for a smaller wall unit (est.). DIY's guide: small setups AUD 1,500 to 2,500."
+  - id: LA-11P
+    group: Cabinetry
+    item: "Lightweight poplar plywood, HPL white both faces, 12 mm, 2440 x 1220 sheet (carcasses, bench, trims)"
+    covers: [LA-11]
+    qty: 4
+    unit: sheet
+    unit_aud: 137.00
+    total_aud: 548.00
+    basis: listing
+    url: "https://www.plyonline.com.au/products/poplar-ply-lightweight-hpl-white"
+    date: 2026-11-20
+    note: "AUD 46.02/m2 and 6.7 kg/m2 (20 kg a sheet). Ply Online's Ultralight Poplar XPS sandwich panel is AUD 161 to 190 a sheet, AUD 54 to 64/m2 (https://www.plyonline.com.au/collections/lightweight-panels-walls-and-ceilings)."
+  - id: LA-11Q
+    group: Cabinetry
+    item: "Lightweight poplar plywood, HPL white, 16 mm, 2440 x 1220 sheet (seat bases, freezer bench lid)"
+    covers: [LA-11]
+    qty: 2
+    unit: sheet
+    unit_aud: 155.00
+    total_aud: 310.00
+    basis: listing
+    url: "https://www.plyonline.com.au/products/poplar-ply-lightweight-hpl-white"
+    date: 2026-11-20
+    note: "AUD 52.07/m2, 9.1 kg/m2."
+  - id: LA-11H
+    group: Cabinetry
+    item: "Cabinet hardware: 12 concealed hinges at AUD 12, 6 push-button latches at AUD 20, 2 lift-up stays at AUD 25, fixings AUD 60"
+    covers: [LA-11]
+    qty: 1
+    unit: lot
+    unit_aud: 374.00
+    total_aud: 374.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Unit prices (est.)."
+  - id: LA-11T
+    group: Cabinetry
+    item: "Internal angle trim, 6.5 m, pearl white"
+    covers: [LA-11]
+    qty: 6
+    unit: 6.5 m length
+    unit_aud: 29.70
+    total_aud: 178.20
+    basis: listing
+    url: "https://www.diycaravans.com.au/shop/internal-angle-trim-6-5m-pearl-white/"
+    date: 2026-11-20
+    note: ""
+  - id: LA-11S
+    group: Cabinetry
+    item: "Seat cushions for the two desk seats, foam and vinyl"
+    covers: [LA-11]
+    qty: 2
+    unit: seat
+    unit_aud: 150.00
+    total_aud: 300.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Allowance (est.). Drop it if report 21 specifies chairs."
+
+  # ---------------------------------------------------------------- fire safety
+  - id: LA-12
+    group: Fire safety
+    item: "Fire extinguisher, 1 kg ABE dry powder, with metal vehicle bracket"
+    qty: 1
+    unit: each
+    unit_aud: 43.57
+    total_aud: 43.57
+    basis: listing
+    url: "https://www.jaybro.com.au/fire-safety/abe-fire-extinguisher-with-metal-vehicle-bracket-and-hose-1kg/"
+    date: 2026-11-20
+    note: "Check the label shows 1A:20B:(E) to AS/NZS 1841.5."
+  - id: LA-12B
+    group: Fire safety
+    item: "Fire blanket 1.2 x 1.2 m and photoelectric smoke alarm to AS 3786 with hush button and 10-year battery"
+    covers: [LA-12]
+    qty: 1
+    unit: lot
+    unit_aud: 75.00
+    total_aud: 75.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Blanket AUD 30, alarm AUD 45 (est.)."
+
+  # ---------------------------------------------------------------- compliance and registration, NSW, home-built 3,500 kg ATM caravan (ADR category TB)
+  - id: CMP-01
+    group: Compliance and registration
+    item: "Concessional RAV entry approval for a low-ATM trailer, applied for on ROVER, with the VIN issued by the Commonwealth"
+    qty: 1
+    unit: application
+    unit_aud: 100.00
+    total_aud: 100.00
+    basis: estimate
+    url: "https://freight.transport.nsw.gov.au/system/files/media/documents/2024/AIS-Notice-41-Inspecting-Concessional-Trailers.pdf"
+    date: 2026-11-20
+    note: "Since 1 July 2023 a new trailer needs a RAV entry to be registered, and TfNSW no longer issues VINs to home-built trailers (AIS Notice 41). The RAV entry charge is AUD 0.75 for a trailer of 4.5 t ATM or less (https://www.legislation.gov.au/F2021L00141/asmade/2021-02-22/text/original/pdf, s 7). Allowance AUD 100 (est.) because the application fee was not confirmed."
+  - id: CMP-02
+    group: Compliance and registration
+    item: "VIN stamped into the drawbar and a trailer plate (VIN, ATM, GTM, tyre size and pressure)"
+    qty: 1
+    unit: lot
+    unit_aud: 80.00
+    total_aud: 80.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Stamp set and an engraved stainless plate (est.)."
+  - id: CMP-03
+    group: Compliance and registration
+    item: "Engineer's review of the chassis, drawbar, coupling, body mounts and the VSB1 and ADR compliance checklist"
+    qty: 20
+    unit: h
+    unit_aud: 220.00
+    total_aud: 4400.00
+    basis: estimate
+    url: "https://employmenthero.com/career-advice/structural-engineer/salary/"
+    date: 2026-11-20
+    note: "NSW does not require an engineer for a VSB1 trailer of 4.5 t ATM or less, but CHASSIS.md and BODY.md are drafts until an engineer reviews them. 20 h (est.). Rate AUD 220/h incl GST (est.): a median structural engineer salary of AUD 108,000 is about AUD 52/h, and consultancies charge out at about 3 times salary. Freelance registered engineers list from AUD 75/h (https://www.upwork.com/hire/structural-engineers/au/)."
+  - id: CMP-04
+    group: Compliance and registration
+    item: "Heavy Vehicle Authorised Inspection Station (HVAIS) inspection for first registration, including the TfNSW Identity Approval (form 5703)"
+    qty: 1
+    unit: inspection
+    unit_aud: 250.00
+    total_aud: 250.00
+    basis: estimate
+    url: "https://nsw.gov.au/sites/default/files/2021-02/RMS-14.354-Certification-of-new-trailers-Vehicle-Standards-Information-No-52-November-2008.pdf"
+    date: 2026-11-20
+    note: "Trailers over 2 t GTM, and any trailer with breakaway brakes, go to an HVAIS, not an AUVIS (VSI 52). The examiner must get an Identity Approval for a concessional low-ATM trailer before issuing the report (AIS Notice 41, form https://tfnswforms.transport.nsw.gov.au/45065830-apply-for-identity-approval-concessional-trailer-low-atm.pdf). The fee is set in AIS Notice 18 (July 2026), which could not be downloaded. AUD 250 (est.)."
+  - id: CMP-05
+    group: Compliance and registration
+    item: "Unregistered vehicle permit, to tow the trailer to the inspection and the weighbridge"
+    qty: 1
+    unit: permit
+    unit_aud: 28.00
+    total_aud: 28.00
+    basis: listing
+    url: "https://www.nsw.gov.au/topics/vehicle-registration/fees-concessions-forms/fees"
+    date: 2026-11-20
+    note: ""
+  - id: CMP-06
+    group: Compliance and registration
+    item: "Public weighbridge certificates: tare, and the axle group and ball load"
+    qty: 2
+    unit: weigh
+    unit_aud: 30.00
+    total_aud: 60.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "AUD 30 a weigh (est.)."
+  - id: CMP-07
+    group: Compliance and registration
+    item: "NSW registration fee, first year"
+    qty: 1
+    unit: year
+    unit_aud: 84.00
+    total_aud: 84.00
+    basis: listing
+    url: "https://www.nsw.gov.au/topics/vehicle-registration/fees-concessions-forms/fees"
+    date: 2026-11-20
+    note: "All vehicles, annual."
+  - id: CMP-08
+    group: Compliance and registration
+    item: "NSW vehicle tax, private caravan, tare 1,501 to 2,500 kg, with the 40 % caravan discount"
+    qty: 1
+    unit: year
+    unit_aud: 330.00
+    total_aud: 330.00
+    basis: listing
+    url: "https://www.nsw.gov.au/topics/vehicle-registration/fees-concessions-forms/fees"
+    date: 2026-11-20
+    note: "At today's 2,196 kg tare. 2,501 to 2,790 kg is AUD 516 and 2,791 to 3,050 kg AUD 586 with the discount. The undiscounted trailer rate is AUD 550."
+  - id: CMP-09
+    group: Compliance and registration
+    item: "Number plate, standard"
+    qty: 1
+    unit: plate
+    unit_aud: 58.00
+    total_aud: 58.00
+    basis: listing
+    url: "https://www.nsw.gov.au/topics/vehicle-registration/fees-concessions-forms/fees"
+    date: 2026-11-20
+    note: ""
+  - id: CMP-10
+    group: Compliance and registration
+    item: "CTP insurance (green slip): not required for trailers and caravans"
+    qty: 1
+    unit: year
+    unit_aud: 0.00
+    total_aud: 0.00
+    basis: listing
+    url: "https://www.nsw.gov.au/driving-boating-and-transport/vehicle-registration/how-to-register/registering-a-brand-new-vehicle"
+    date: 2026-11-20
+    note: ""
+  - id: CMP-11
+    group: Compliance and registration
+    item: "Motor vehicle duty: none for a caravan or camper trailer"
+    qty: 1
+    unit: registration
+    unit_aud: 0.00
+    total_aud: 0.00
+    basis: listing
+    url: "https://data.nsw.gov.au/data/dataset/47595e94-6031-4649-bcdf-50e036efba49/resource/b2bd7c4d-c940-46fb-aa5a-3d66c11568df/download/20090829_axing_stamp_duty_on_caravans_drives_nsw_economic_and_tourism_growth_33_per_cent_jump_20.pdf"
+    date: 2026-11-20
+    note: "NSW abolished duty on registering caravans and camper trailers from 1 July 2009. Service NSW: 'some trailers are exempt' (https://www.service.nsw.gov.au/guide/buying-a-vehicle). Register it as a caravan (open point 7)."
+  - id: CMP-12
+    group: Compliance and registration
+    item: "Comprehensive caravan insurance, first year, agreed value AUD 130,000 (est.)"
+    qty: 1
+    unit: year
+    unit_aud: 1560.00
+    total_aud: 1560.00
+    basis: estimate
+    url: "https://www.canstar.com.au/car-insurance/caravan-insurance/"
+    date: 2026-11-20
+    note: "1.2 % of agreed value (est.). Optional by law. A home-built van needs a valuation and its compliance papers to get agreed-value cover."
+  - id: CMP-13
+    group: Compliance and registration
+    item: "240 V installation inspection and certificate of compliance to AS/NZS 3001.2 by a licensed electrician"
+    qty: 1
+    unit: certificate
+    unit_aud: 400.00
+    total_aud: 400.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Allowance (est.). Remove it if report 20 prices it. No gas certificate is needed because there is no LPG."
+
+  # ---------------------------------------------------------------- consumables, coating and freight
+  - id: CON-01
+    group: Consumables and freight
+    item: "Welding and grinding consumables: MIG wire, shielding gas, cutting and flap discs, burrs, drill bits"
+    qty: 1
+    unit: lot
+    unit_aud: 450.00
+    total_aud: 450.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Allowance (est.). A hired shop usually includes these in its rate. Drop it if LAB-01 is a fixed-price job."
+  - id: CON-02
+    group: Consumables and freight
+    item: "Zinc-rich touch-up paint for bolt holes and the coupling faces after dipping, Loctite 567 thread sealant"
+    qty: 1
+    unit: lot
+    unit_aud: 100.00
+    total_aud: 100.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "The frame is galvanised and the body gelcoated, so no paint system is needed."
+  - id: CON-03
+    group: Consumables and freight
+    item: "Freight, Cruisemaster kit on a pallet to Sydney"
+    qty: 1
+    unit: consignment
+    unit_aud: 250.00
+    total_aud: 250.00
+    basis: estimate
+    url: "https://www.diycaravans.com.au/shop/cruisemaster-xt-freestyle-air-suspension-kit-tandem/"
+    date: 2026-11-20
+    note: "The listing quotes freight at checkout (est.)."
+  - id: CON-04
+    group: Consumables and freight
+    item: "Freight, one-piece body panels up to 4.42 m long, crated, from the panel maker to Sydney"
+    qty: 1
+    unit: consignment
+    unit_aud: 1200.00
+    total_aud: 1200.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Oversize crate on a semi from SE Queensland or Melbourne (est.)."
+  - id: CON-05
+    group: Consumables and freight
+    item: "Steel delivery, Sydney metro"
+    qty: 1
+    unit: delivery
+    unit_aud: 110.00
+    total_aud: 110.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "8 m lengths need a truck (est.)."
+  - id: CON-06
+    group: Consumables and freight
+    item: "Transport of the welded frame to the galvaniser and back"
+    qty: 1
+    unit: return trip
+    unit_aud: 400.00
+    total_aud: 400.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "6.3 x 2.4 m frame on a car-carrier or tilt tray (est.)."
+  - id: CON-07
+    group: Consumables and freight
+    item: "Parcel freight for the smaller bought parts"
+    qty: 15
+    unit: parcel
+    unit_aud: 20.00
+    total_aud: 300.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Allowance (est.)."
+  - id: CON-08
+    group: Consumables and freight
+    item: "Freight, flat-pack cupboards"
+    qty: 1
+    unit: consignment
+    unit_aud: 150.00
+    total_aud: 150.00
+    basis: estimate
+    url: ""
+    date: 2026-11-20
+    note: "Allowance (est.)."
+
+  # ---------------------------------------------------------------- contingency (not part of the subtotal)
+  - id: CTG-01
+    group: Contingency
+    item: "Contingency: 10 % of listing and quote lines, 20 % of rate and estimate lines"
+    qty: 1
+    unit: lot
+    unit_aud: 14550.35
+    total_aud: 14550.35
+    basis: rate
+    url: "https://riverhillsbuilder.com/how-do-custom-home-builders-charge/"
+    date: 2026-11-20
+    note: "No Australian trailer builder publishes its contingency. Guidance found: 10 to 15 % for DIY camper trailers (https://parkingday.org/how-to-build-a-camper-trailer/), 10 to 20 % for one-off construction, 20 % when the owner manages the build (lenders, per the URL above), 15 to 25 % for early-stage estimates (https://blazeestimating.com/contingency-in-estimates-how-much-buffer-is-enough/). The rule gives 17.4 % overall. Recompute it whenever a line changes."
+
+totals:
+  priced_lines: 95
+  subtotal_aud: 83732.66
+  contingency_aud: 14550.35
+  total_aud: 98283.01
+  hired_labour_aud: 25760.00
+  total_without_hired_labour_aud: 67371.01
+  one_off_compliance_aud: 5318.00
+  first_year_registration_and_insurance_aud: 2032.00
+  share_by_basis: {listing: "26.2 %", rate: "3.2 %", estimate: "70.6 %"}

@@ -24,10 +24,10 @@ parts:
     maker: Steel merchant (stock size)
     qty: 3.7
     unit: m
-    mass: {basis: per_length, kg_per_m: 5.45, maturity: calculated, source: "5.35 kg/m (Southern Steel table, R24 BX-U01) plus about 2 % for the zinc"}
-    size: 65 x 35 x 4.0 mm, 1,845 mm long. RHS 76 x 38 x 3 is not an Australian stock size (R24)
+    mass: {basis: per_length, kg_per_m: 5.45, maturity: calculated, source: "5.35 kg/m (Southern Steel table, report 24 BX-U01) plus about 2 % for the zinc"}
+    size: 65 x 35 x 4.0 mm, 1,845 mm long. RHS 76 x 38 x 3 is not an Australian stock size (report 24)
     rating: Each sits on the rails and bolts straight to a pair of Toyota's brackets, so a strap's load reaches the frame through steel only
-    notes: The L-track bolts down through the floor plate and the packer into the crossmember's top wall with M6 A4-70 bolts and crush tubes at 150 mm pitch or less (R24 BX-F02).
+    notes: The L-track bolts down through the floor plate and the packer into the crossmember's top wall with M6 A4-70 bolts and crush tubes at 150 mm pitch or less (report 24 BX-F02).
     geometry: {generator: tube, params: {wall: 4}}
     color: "#2c3e50"
   U-PACKER:
@@ -37,7 +37,7 @@ parts:
     maker: Owner made
     qty: 0.28
     unit: m2
-    mass: {basis: per_area, kg_per_m2: 13.4, maturity: calculated, source: "5.0 mm at 2.68 g/cm3 (R24 BX-M05)"}
+    mass: {basis: per_area, kg_per_m2: 13.4, maturity: calculated, source: "5.0 mm at 2.68 g/cm3 (report 24 BX-M05)"}
     notes: The track sits on it, so the 13.7 mm track ends 0.3 mm below the floor top on the 35 mm crossmember.
     geometry: {generator: box, params: {}}
     color: "#2c3e50"

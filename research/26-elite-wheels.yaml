@@ -1,0 +1,137 @@
+# report 26: wheels, tyres and brake parts for the Lovells Elite kit on the VDJ79 single cab (2017 to 2022) and the
+# trailer's Cruisemaster LC5 hubs. One entry per product. Prices AUD including GST. date is when the source was read.
+# price basis: listing, quote, estimate or converted. mass basis: maker or estimate.
+# Report: research/26-elite-wheels.md. Required wheel rating 1,425 kg (half the Elite's 2,850 kg rear axle).
+checked: 2026-11-21
+requirement:
+  rear_axle_kg: {v: 2850, src: "https://lovells.com.au/vehicle/toyota-landcruiser-79-series-03-2007-08-2022/"}
+  wheel_rating_min_kg: {v: 1425, basis: estimate, src: "Rear axle / 2, TSA in https://www.4x4australia.com.au/sponsored/loaded-load-rated-wheels"}
+  tyre_load_index_min: {v: 121, kg: 1450, basis: estimate, src: "Lovells rule for its 3,900 and 4,200 kg kits (Campbellfield sheet), applied to 2,850 kg"}
+  tyre_speed_min: {v: M, kmh: 130, basis: estimate, src: "https://www.powercurve.com.au/lovells-gvm-upgrade-sunshine-coast/toyota-landcruiser-lc79-series-gvm/ (M for 4,200 kg)"}
+  derate_if_trak2: {rear_axle_kg: 2800, gvm_kg: 4450, basis: estimate, src: "2 x the ROH Trak 2's 1,400 kg. Lovells offers derates on its 4,200 kg kit"}
+products:
+  - id: R26-01
+    name: Lovells 4,495 kg Elite GVM upgrade, single cab 01/2017 to 08/2022
+    part_number: TOYKIT084-GVM-ELITE
+    use: Ute, car build line GV05 (unchanged)
+    rating: {gvm_kg: 4495, gcm_kg: 7400, front_axle_kg: 1650, rear_axle_kg: 2850, braked_towing_kg: 3500,
+             src: "https://lovells.com.au/wp-content/uploads/2025/04/Lovells_4495kg_79_Series_GVM_Upgrade.pdf"}
+    contents_src: "https://lovells.com.au/vehicle/toyota-landcruiser-79-series-03-2007-08-2022/"
+    track_rear_mm: {v: 1555, basis: estimate, src: "Rear brought in line with the front, https://lovells.com.au/elite-landcruiser-track-correction/4495-elite-gvm-upgrade-single-cab/"}
+    mass: {kg: null, basis: estimate, src: "Lovells publishes none. Keep the model's estimate"}
+    price: {aud: 19975, url: "https://unsealed4x4.com.au/lovells-elite-series-79-series-gvm-upgrade/", date: 2026-11-21, basis: listing,
+            note: "Fitted, compliance extra. Article dated 17 Oct 2025"}
+  - id: R26-02
+    name: ROH Trak 2 steel wheel 16 x 7 ET 0, 5 x 150 (recommended, both vehicles)
+    use: Ute 4 + spare, trailer 4 + spare
+    size: {dia_in: 16, width_in: 7, et_mm: 0, pcd: "5x150"}
+    rating: {kg: 1400, src: "https://roh.com.au/wheels/trak-2"}
+    mass: {kg: 14.5, basis: estimate, src: "Report 16. ROH publishes no mass for the Trak 2"}
+    price: {aud: 230, url: "https://roh.com.au/wheels/trak-2", date: 2026-11-21, basis: estimate, note: "ROH publishes no price"}
+    record: "Sold by ROH as a mine-site approved rim. A 2025 German recall covers only the 17 x 7 sold in Europe 2015 to 2020 (https://delta4x4.com/fr/rappel-de-la-jante-en-acier-roh-trak2/)"
+    stockist: ROH dealer network (tyre shops, Australia wide)
+    fits_trailer: true
+  - id: R26-03
+    name: Toyota genuine 16 x 7 ET 0 alloy wheel, LandCruiser 70 GXL (fallback, both vehicles)
+    use: Fallback for R26-02 if the 2,800 kg derate is refused or the Elite caliper fouls the steel wheel
+    size: {dia_in: 16, width_in: 7, et_mm: 0, pcd: "5x150", bore_mm: 110.1}
+    rating: {kg: null, src: "Not published. Lovells rates its kits on O.E. wheels (https://www.lovellscampbellfield.com.au/_files/ugd/a7ab81_cd324b9c9e354c4da0d3ab9103620a6d.pdf)"}
+    mass: {kg: 15.0, basis: estimate, src: "https://www.wheel-size.com/size/toyota/land-cruiser/70-series-2007-now/"}
+    price: {aud: 550, url: null, date: 2026-11-21, basis: estimate, note: "New from a Toyota dealer (est.). Used sets list at AUD 1,580 for five, AUD 316 each, https://www.ebay.com.au/b/Toyota-Car-and-Truck-Wheels-16-Wheel-Diameter/179679/bn_7116944418"}
+    nut_torque_nm: {v: 131, src: "https://70seriesstore.com/blogs/information/recommended-79-series-wheel-nut-torque"}
+    stockist: Toyota dealers
+    fits_trailer: true
+  - id: R26-04
+    name: Dynamic Steel Wheels Sunraysia-style steel wheel 16 x 8, 5 x 150
+    use: Considered, no gain over R26-02
+    size: {dia_in: 16, width_in: 8, et_mm: "0 or negative", pcd: "5x150"}
+    rating: {kg: 1400, src: "https://www.4x4australia.com.au/gear/wheels-tyres/dynamic-wheel-product-test"}
+    mass: {kg: null, basis: estimate, src: "Not published"}
+    price: {aud: 110, url: "https://www.4x4australia.com.au/gear/wheels-tyres/dynamic-wheel-product-test", date: 2026-11-21, basis: listing, note: "RRP from AUD 110, article of 2021"}
+    stockist: Dynamic Wheel Co. dealers
+    fits_trailer: true
+  - id: R26-05
+    name: ROH Hammer alloy wheel 16 x 9 ET -12, 5 x 150
+    use: Rejected. Negative offset (Cruisemaster allows none), 9-inch rim needs a certificate, tyre 12 mm closer to the box skin
+    size: {dia_in: 16, width_in: 9, et_mm: -12, pcd: "5x150"}
+    rating: {kg: 1500, src: "https://roh.com.au/wheels/hammer"}
+    mass: {kg: 12.0, basis: maker, src: "https://roh.com.au/wheels/hammer"}
+    price: {aud: null, url: "https://roh.com.au/wheels/hammer", date: 2026-11-21, basis: estimate, note: "Not published"}
+    fits_trailer: false
+  - id: R26-06
+    name: ROH Assault alloy wheel 16 x 9 ET -12, 5 x 150
+    use: Rejected, as R26-05
+    size: {dia_in: 16, width_in: 9, et_mm: -12, pcd: "5x150"}
+    rating: {kg: 1500, src: "https://roh.com.au/wheels/assault"}
+    mass: {kg: null, basis: estimate, src: "Not published"}
+    price: {aud: null, url: "https://roh.com.au/wheels/assault", date: 2026-11-21, basis: estimate, note: "Not published"}
+    fits_trailer: false
+  - id: R26-07
+    name: Loaded Gibb 1675 flow-formed alloy wheel 17 x 9 ET -12, 5 x 150, 110.2 mm bore
+    use: Rejected. Negative offset only (-12, -25, -59), and 17-inch tyres
+    size: {dia_in: 17, width_in: 9, et_mm: -12, pcd: "5x150", bore_mm: 110.2}
+    rating: {kg: 1675, src: "https://www.marks4wd.com/vehicles/toyota/landcruiser/70-series"}
+    mass: {kg: 12.3, basis: maker, src: "Loaded store product data, https://shoploadedwheels.com.au/collections/gibb-1675"}
+    price: {aud: 394, url: "https://shoploadedwheels.com.au/collections/gibb-1675", date: 2026-11-21, basis: listing}
+    fits_trailer: false
+  - id: R26-08
+    name: Lenso M-79 alloy wheel 17 x 9 ET -12, 5 x 150
+    use: Rejected. Negative offset only, and 17-inch tyres
+    size: {dia_in: 17, width_in: 9, et_mm: -12, pcd: "5x150"}
+    rating: {kg: 1500, src: "https://lensowheels.com.au/pages/landcruiser-wheels"}
+    mass: {kg: null, basis: estimate, src: "Not published"}
+    price: {aud: 300, url: "https://lensowheels.com.au/pages/landcruiser-wheels", date: 2026-11-21, basis: listing, note: "From AUD 300 a wheel"}
+    fits_trailer: false
+  - id: R26-09
+    name: Black Rock Duty alloy wheel 16 x 7, 5 x 150, ET +35 to +55
+    use: Rejected. A van wheel. ET +35 or more narrows the ute's track by 70 to 110 mm
+    size: {dia_in: 16, width_in: 7, et_mm: "+35 to +55", pcd: "5x150"}
+    rating: {kg: 1500, src: "https://cncwheels.com.au/shop/4x4-rims/black-rock-duty-satin-black-16x7-5x150-wheel/"}
+    mass: {kg: null, basis: estimate, src: "Not published"}
+    price: {aud: 399, url: "https://cncwheels.com.au/shop/4x4-rims/black-rock-duty-satin-black-16x7-5x150-wheel/", date: 2026-11-21, basis: listing}
+    fits_trailer: true
+  - id: R26-10
+    name: Toyo Open Country A/T III LT265/75R16 123R (plan tyre, both vehicles, unchanged)
+    use: Ute 4 + spare, trailer 4 + spare. Car build line WT02
+    size: {diameter_mm: 804, section_width_mm: 267, measuring_rim_in: 7.5, approved_rim_in: "7.0 to 9.0"}
+    rating: {kg: 1550, load_index: 123, speed: R, max_kpa: 550,
+             src: "https://toyotires.s3-ap-southeast-2.amazonaws.com/public/brochures/Toyo%20Tires-Open%20Country%20AT_Three-Product%20Specifications.pdf"}
+    mass: {kg: 22.6, basis: estimate, src: "Report 16 (Yokohama G015 figure), kept"}
+    price: {aud: 420, url: null, date: 2026-11-21, basis: estimate, note: "Plan figure, not re-checked here"}
+  - id: R26-11
+    name: Toyo Open Country A/T III LT265/70R17 121S (17-inch route only, not recommended)
+    use: Would replace R26-10 if both vehicles moved to 17-inch wheels. No 17-inch ET 0 or positive wheel at 1,450 kg was found
+    size: {diameter_mm: 804, section_width_mm: 272, measuring_rim_in: 8.0, approved_rim_in: "7.0 to 9.0"}
+    rating: {kg: 1450, load_index: 121, speed: S,
+             src: "https://toyotires.s3-ap-southeast-2.amazonaws.com/public/brochures/Toyo%20Tires-Open%20Country%20AT_Three-Product%20Specifications.pdf"}
+    mass: {kg: null, basis: estimate, src: "Not published"}
+    price: {aud: null, url: null, date: 2026-11-21, basis: estimate, note: "Not priced"}
+  - id: R26-12
+    name: Spare Elite brake pads, one front and one rear set, carried (new line BR06)
+    use: Ute. Required, stage S4
+    rating: {note: "Lovells Elite front and rear brake kits, sizes not published"}
+    mass: {kg: 3.0, basis: estimate, src: "Two 4WD pad sets"}
+    price: {aud: 350, url: null, date: 2026-11-21, basis: estimate, note: "No Lovells price found"}
+  - id: R26-13
+    name: Bendix Ultimate 4WD rear kit U4WD-BUK34 (BR01, dropped)
+    use: Dropped. The Elite replaces the rear brakes
+    price: {aud: -555.01, url: "https://www.marks4wd.com/rear-brake-upgrade-landcruiser-70-series.html", date: 2026-11-21, basis: listing}
+  - id: R26-14
+    name: Delios DLS0790 slotted front rotors (BR02, dropped)
+    use: Dropped. The Elite's front kit has larger rotors
+    price: {aud: -280.01, url: "https://www.marks4wd.com/rear-brake-upgrade-landcruiser-70-series.html", date: 2026-11-21, basis: listing}
+  - id: R26-15
+    name: Bendix Ultimate 4WD front pads (BR03, dropped)
+    use: Dropped. The Elite has heavy-duty pads
+    price: {aud: -150.00, url: "https://www.marks4wd.com/brand/bendix/", date: 2026-11-21, basis: estimate}
+  - id: R26-16
+    name: BQTL70S braided brake line set (BR04, dropped)
+    use: Dropped. Made for the factory caliper positions, which the Elite changes
+    price: {aud: -515.00, url: "https://www.marks4wd.com/rear-brake-upgrade-landcruiser-70-series.html", date: 2026-11-21, basis: listing}
+  - id: R26-17
+    name: DOT 4 brake fluid flush (BR05, kept)
+    use: Kept. Done by the Elite fitter when the new system is bled
+    price: {aud: 40, url: null, date: 2026-11-21, basis: estimate}
+totals:
+  car_build_change_aud: {v: -1150.02, basis: estimate, note: "BR01 to BR04 dropped (-1,500.02), BR06 added (+350). Derate inside GV03 at no cost"}
+  fallback_wheels_extra_aud: {v: 3200, basis: estimate, note: "Ten Toyota alloys at AUD 550 (est.) against ten Trak 2 at AUD 230 (est.)"}

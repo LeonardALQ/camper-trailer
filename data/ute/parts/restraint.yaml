@@ -27,7 +27,7 @@ parts:
     unit: m
     mass: {basis: per_length, kg_per_m: 0.91, maturity: spec, source: "https://kinedyne.com/100-in-series-l-medium-duty-aluminum-track (2.3 kg per 100 in)"}
     size: 34.5 W x 13.7 H, two rows of 1,765 mm across the floor
-    notes: Each row sits on a steel crossmember (U-STEEL-CM), tops flush with the floor. The flanged FE751 is 49.8 mm wide and does not fit the slot (R24).
+    notes: Each row sits on a steel crossmember (U-STEEL-CM), tops flush with the floor. The flanged FE751 is 49.8 mm wide and does not fit the slot (report 24).
     geometry: {generator: l_track, params: {width: 34.5, height: 13.7, slot_w: 10, slot_d: 6}}
     color: "#9aa5ab"
   U-FITTING:
@@ -50,7 +50,7 @@ parts:
     qty: 10
     unit: each
     mass: {basis: declared, unit_kg: 0.8, maturity: estimate, source: "research/03-bike-restraint-garage.md section 13"}
-    rating: "LC 500 kg to AS/NZS 4380, breaking force about 9.8 kN. An anchor must withstand its strap's breaking load (R24), which a 35 mm steel crossmember cannot do for LC 1,000 kg"
+    rating: "LC 500 kg to AS/NZS 4380, breaking force about 9.8 kN. An anchor must withstand its strap's breaking load (report 24), which a 35 mm steel crossmember cannot do for LC 1,000 kg"
     notes: Four primary straps and one rear-wheel strap per bike.
     removable: true
     geometry: {generator: strap, params: {width: 35, thickness: 3}}
@@ -179,7 +179,7 @@ parts:
     maker: Owner made
     qty: 1
     unit: set
-    mass: {basis: declared, total_kg: 0.6, maturity: estimate, source: "R24 (BX-F05), estimate"}
+    mass: {basis: declared, total_kg: 0.6, maturity: estimate, source: "Report 24 (BX-F05), estimate"}
     cog: {at: [150, "(tuareg_y + st_y) / 2", -10], basis: "Under the chocks, estimate"}
   U-PADS:
     name: Wall pads and door edge trim
@@ -188,7 +188,7 @@ parts:
     maker: Product to choose
     qty: 1
     unit: set
-    mass: {basis: declared, total_kg: 0.8, maturity: estimate, source: "R24 (BX-R07), estimate"}
+    mass: {basis: declared, total_kg: 0.8, maturity: estimate, source: "Report 24 (BX-R07), estimate"}
     cog: {at: [1260, 0, 900], basis: "Spread over the walls, estimate"}
   U-WINCH-FEED:
     name: Winch power feed
@@ -197,7 +197,7 @@ parts:
     maker: Auto electrical supplier
     qty: 1
     unit: set
-    mass: {basis: declared, total_kg: 1.7, maturity: estimate, source: "R24 (BX-L03), the share inside the box, estimate"}
+    mass: {basis: declared, total_kg: 1.7, maturity: estimate, source: "Report 24 (BX-L03), the share inside the box, estimate"}
     cog: {at: [30, 0, 600], basis: "On the front wall, estimate"}
   U-DRAINS:
     name: Floor drains
@@ -206,7 +206,7 @@ parts:
     maker: Product to choose
     qty: 2
     unit: each
-    mass: {basis: declared, unit_kg: 0.05, maturity: estimate, source: "R24 (BX-V04), estimate"}
+    mass: {basis: declared, unit_kg: 0.05, maturity: estimate, source: "Report 24 (BX-V04), estimate"}
     cog: {at: [garage_length - 50, 0, -5], basis: "Rear floor corners, estimate"}
   U-OUTLET:
     name: 12 V and USB outlet
@@ -215,7 +215,7 @@ parts:
     maker: Product to choose
     qty: 1
     unit: each
-    mass: {basis: declared, total_kg: 0.2, maturity: estimate, source: "R24 (BX-V07), estimate"}
+    mass: {basis: declared, total_kg: 0.2, maturity: estimate, source: "Report 24 (BX-V07), estimate"}
     cog: {at: [20, -600, 1000], basis: "On the front wall, estimate"}
   U-WIRING:
     name: Box wiring
@@ -224,5 +224,5 @@ parts:
     maker: Auto electrical supplier
     qty: 1
     unit: set
-    mass: {basis: declared, total_kg: 1.5, maturity: estimate, source: "R24 (BX-V08), estimate"}
+    mass: {basis: declared, total_kg: 1.5, maturity: estimate, source: "Report 24 (BX-V08), estimate"}
     cog: {at: [1260, 0, 1300], basis: "Under the roof and down the front wall, estimate"}

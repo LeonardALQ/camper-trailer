@@ -1,0 +1,593 @@
+# Chosen products for the lift bed, desk, kitchen, laundry, shower, bathroom and water system
+# (research report 21, 20 Nov 2026, research/21-interior.md).
+# One entry per chosen product. mass_basis: maker (maker's published figure), retailer (stockist's
+# published figure), calculated (from size and density), estimate (judgement, basis in the note).
+# dims_mm is [L, W, H] as published, with the orientation in dims_note where it matters.
+# mass_kg is per unit. Power at the device's own supply. energy_per_use_kwh is at the appliance,
+# before inverter loss. price.aud is per unit, AUD including GST. price.basis is listing, quote or
+# estimate. price.converted is true when converted at 1 USD = 1.55 AUD, 1 EUR = 1.68 AUD,
+# 1 GBP = 1.98 AUD. Foreign listings that exclude VAT have 10 % Australian GST added.
+
+checked: "2026-11-20"
+
+design_day:
+  energy_kwh: {showers: 1.3, hot_water_electric: 0.7, hob: 1.2, oven: 0.6, washer: 0.2, dryer: 1.4, bed_lift: 0.003, pump_and_uv: 0.03, total: 5.43}
+  hot_water_diesel_alternative_l: 0.08
+  water_l: {without_laundry: 41, one_wash: 44, seven_days_three_washes: 419}
+  grey_l: {without_laundry: 27, one_wash: 44, hours_72_one_wash: 125, seven_days_three_washes: 321}
+  peaks_w: {shower_heater: 2400, hob: 2300, oven: 1440, dryer: 1000, washer: 280}
+
+products:
+  # ---------------------------------------------------------------- bed
+  - function: Lift bed mechanism, four-rail chain lift
+    line: new, replaces LB-04
+    maker: Lippert (HappiJac)
+    model: HappiJac power bed lift, 42 in kit
+    part_no: "42 in kit (rail frame 42 x 62 in)"
+    qty: 1
+    mass_kg: 35.0
+    mass_basis: estimate
+    mass_source: "Report 04 range 30 to 45 kg from part shipping weights. Lippert does not publish a kit mass"
+    dims_mm: [1067, 2330, 1575]
+    dims_note: "Rails 1,067 mm apart along each side wall, fits 2,184 to 2,794 mm wall to wall, rail frame 1,575 mm high"
+    power: "12 V DC, 8 to 10 A raising one bed"
+    energy_per_use_kwh: 0.0015
+    water_per_use_l: 0
+    price: {aud: 4049, basis: listing, converted: true, url: "https://www.rvsurplusparts.net/complete-happijac-electric-bed.html", date: "2026-11-20", note: "USD 2,374.99 excl. tax, plus 10 % GST. Freight extra"}
+    notes: "204 kg moving, 272 kg static per platform. Motor brake, limit switches, manual crank. Spare motor 420326 USD 489.99 (https://pantherrvproducts.com/420326/)"
+  - function: Bed travel locks, four stainless spring index plungers with interlock microswitches
+    line: new
+    maker: Kipp or Elesa (commodity)
+    model: Index plunger with locking pin, M12 (est.)
+    part_no: ""
+    qty: 4
+    mass_kg: 0.15
+    mass_basis: estimate
+    mass_source: "Estimate"
+    dims_mm: [60, 25, 25]
+    power: "Interlock switches in the HappiJac motor circuit"
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 62.5, basis: estimate, converted: false, url: "", date: "2026-11-20"}
+    notes: "Engage holes in the C-channels at the day and night stops"
+  - function: Bed obstruction stop, pressure-sensitive safety edge with relay
+    line: new
+    maker: Commodity
+    model: Safety edge, rubber profile with switching strip
+    part_no: ""
+    qty: 1
+    mass_kg: 0.8
+    mass_basis: estimate
+    mass_source: "Estimate"
+    dims_mm: [7600, 20, 25]
+    dims_note: "Along the platform's lower perimeter"
+    power: "12 V signal, breaks the down circuit"
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 300, basis: estimate, converted: false, url: "", date: "2026-11-20"}
+  - function: Wall hardpoints behind the lift rails
+    line: new
+    maker: Capral (commodity)
+    model: Aluminium RHS 40 x 20 x 3 mm, laid flat in the wall core
+    part_no: ""
+    qty: 4
+    mass_kg: 1.4
+    mass_basis: calculated
+    mass_source: "1.6 m at 0.875 kg/m"
+    dims_mm: [1600, 40, 20]
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 37.5, basis: estimate, converted: false, url: "", date: "2026-11-20"}
+    notes: "Meets Lippert's rule of 1/8 in aluminium tube or timber backing"
+  - function: Bed platform
+    line: LB-03
+    maker: CEL Components (reference) or PanelMate (WA)
+    model: Aluminium honeycomb sandwich panel, 40 mm, 0.8 mm top and 0.5 mm bottom aluminium skins, 40 kg/m3 core
+    part_no: "Compocel AL, custom build"
+    qty: 1
+    mass_kg: 20.9
+    mass_basis: calculated
+    mass_source: "5.46 kg/m2 x 3.55 m2 = 19.4 kg, plus 1.5 kg edge trim (est.). Skins 2.7 kg/m2 per mm, adhesive 0.4 kg/m2. Reference https://www.chemical-concepts.com/wp-content/uploads/2023/09/Compocel-AL-TDS.pdf"
+    dims_mm: [1550, 2290, 40]
+    dims_note: "Spans 2,290 mm wall to wall on the HappiJac support rails. EI 3.3e10 N mm2 per m, 7.5 mm deflection (L/307) with two people"
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 1200, basis: estimate, converted: false, url: "", date: "2026-11-20"}
+  - function: Ventilated underlay under the mattress
+    line: LB-02
+    maker: HyperVent
+    model: HyperVent mattress pad, 19 mm
+    part_no: ""
+    qty: 1
+    mass_kg: 0.45
+    mass_basis: calculated
+    mass_source: "Report 04, 0.146 kg/m2"
+    dims_mm: [2030, 1530, 19]
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 150, basis: estimate, converted: false, url: "https://www.fisheriessupply.com/hypervent-hypervent-mattress-pad/39-50", date: "2026-11-20"}
+  - function: Mattress
+    line: LB-01
+    maker: Pure Sleep (Brisbane)
+    model: Orion Caravan Deluxe, queen, zoned pocket springs, flip design
+    part_no: "Queen 1,530 x 2,030"
+    qty: 1
+    mass_kg: 25.5
+    mass_basis: maker
+    mass_source: "https://puresleep.com.au/product/orion-caravan-deluxe-mattress/ (25.5 kg, size not stated, taken as queen)"
+    dims_mm: [2030, 1530, 180]
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 1999, basis: listing, converted: false, url: "https://puresleep.com.au/product/orion-caravan-deluxe-mattress/", date: "2026-11-20"}
+    notes: "Fallback Octasmart Plus, 180 mm, 20 kg, AUD 1,099 RRP (https://bedbuyer.com.au/octasmart-plus-mattress/)"
+  # ---------------------------------------------------------------- desk
+  - function: Desk under the bed, top at 730 mm
+    line: LA-09
+    maker: Fabricated
+    model: 25 mm aluminium honeycomb top (1.0 + 1.0 mm skins) with HPL facing, 40 x 40 x 3 angle cleat, two 40 x 40 x 2 legs
+    part_no: ""
+    qty: 1
+    mass_kg: 8.7
+    mass_basis: calculated
+    mass_source: "Top 0.72 m2 at 7.6 kg/m2 (CEL) 5.5 kg, HPL 0.8 kg (est.), cleat 0.75 kg, legs 1.15 kg, fixings 0.5 kg (est.)"
+    dims_mm: [600, 1200, 730]
+    dims_note: "600 mm deep against the front wall, 1,200 mm across, centred"
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 560, basis: estimate, converted: false, url: "", date: "2026-11-20"}
+  - function: Monitor stand that lies flat under the lowered bed
+    line: new
+    maker: Wearson
+    model: WS-03A lay-flat VESA stand, 75 and 100 mm VESA, up to 6.5 kg
+    part_no: WS-03A
+    qty: 1
+    mass_kg: 1.2
+    mass_basis: estimate
+    mass_source: "Estimate"
+    dims_mm: [250, 200, 20]
+    dims_note: "Folded. About 60 mm high with a 24 in monitor lying on it (est.)"
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 57, basis: listing, converted: true, url: "https://www.amazon.com/wearson-ws-03a-adjustable-folding-100x100mm/dp/b00xuf2gbi/ref=sr_1_13", date: "2026-11-20", note: "USD 36.99"}
+  - function: Desk seat that stows for travel
+    line: LA-11 (seats)
+    maker: Helinox
+    model: Café Chair
+    part_no: ""
+    qty: 2
+    mass_kg: 1.3
+    mass_basis: maker
+    mass_source: "https://www.rei.com/product/C02759/helinox-cafe-chair (2 lb 13 oz unpacked), https://helinox.eu/products/cafe-chair (1.4 kg packed, 145 kg rating)"
+    dims_mm: [620, 190, 120]
+    dims_note: "Packed"
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 302, basis: listing, converted: true, url: "https://helinox.eu/products/cafe-chair", date: "2026-11-20", note: "EUR 179.95 each"}
+  # ---------------------------------------------------------------- kitchen
+  - function: Oven (convection microwave combination)
+    line: new
+    maker: Camec
+    model: 28 L multi-function microwave, air fryer, convection oven and grill
+    part_no: "053632"
+    qty: 1
+    mass_kg: 17.0
+    mass_basis: maker
+    mass_source: "https://cdn.shopify.com/s/files/1/0822/5774/0089/files/Camec_Multi_Fuction_Microwave_NPI_Trade_NZ.pdf?v=1773959367"
+    dims_mm: [510, 418, 318]
+    power: "230 to 240 V, 1,440 W rated input"
+    energy_per_use_kwh: 0.6
+    energy_note: "45 min bake at 180 C, estimate against Bosch CBG7341B1's 0.61 kWh EN 60350-1 fan cycle"
+    water_per_use_l: 0
+    price: {aud: 449, basis: estimate, converted: false, url: "https://www.woolworths.com.au/shop/productdetails/1133925065", date: "2026-11-20", note: "NZD 408 RRP in New Zealand. Australian price not read"}
+  - function: Oven travel cradle and strap
+    line: new
+    maker: Fabricated
+    model: Aluminium cradle bolted through the base feet, 25 mm strap
+    part_no: ""
+    qty: 1
+    mass_kg: 1.5
+    mass_basis: estimate
+    mass_source: "Estimate"
+    dims_mm: [530, 440, 50]
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 150, basis: estimate, converted: false, url: "", date: "2026-11-20"}
+  - function: Induction hob (kept)
+    line: LA-07A
+    maker: Dometic
+    model: CVI1525, two zones
+    part_no: "9600050571"
+    qty: 1
+    mass_kg: 7.0
+    mass_basis: maker
+    mass_source: "Report 13"
+    dims_mm: [525, 350, 55]
+    power: "220 to 240 V, 1,000 W left, 1,300 W right (1,700 W boost 5 min), 2,300 W total"
+    energy_per_use_kwh: 1.2
+    energy_note: "Per day, estimate. 0.11 kWh per litre boiled in a kettle on the hob"
+    water_per_use_l: 0
+    price: {aud: 0, basis: listing, converted: false, url: "https://media.dometic.com/externalassets/cvi1525_9620008712_125117.pdf?ref=-588583111", date: "2026-11-20", note: "Existing line, priced by report 22"}
+  - function: Kitchen sink (kept)
+    line: LA-07B
+    maker: Dometic
+    model: CVS1350G with glass lid
+    part_no: "9600051161"
+    qty: 1
+    mass_kg: 2.5
+    mass_basis: maker
+    mass_source: "Report 13"
+    dims_mm: [350, 350, 170]
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 4
+    price: {aud: 0, basis: listing, converted: false, url: "https://www.dometic.com/fr-fr/produit/dometic-cvs1350g-9600051161", date: "2026-11-20", note: "Existing line, priced by report 22"}
+  # ---------------------------------------------------------------- laundry
+  - function: Washing machine
+    line: LA-02
+    maker: Camec
+    model: Compact RV II 3.5 kg top loader
+    part_no: "051879"
+    qty: 1
+    mass_kg: 16.0
+    mass_basis: maker
+    mass_source: "https://cdn.shopify.com/s/files/1/0578/8326/3042/files/051879_Manual.pdf?v=1718605142"
+    dims_mm: [460, 445, 730]
+    dims_note: "Published as 445 W x 460 D x 730 H"
+    power: "220 to 240 V, 280 W. Cold wash only. Water pressure 0.1 to 0.6 MPa"
+    energy_per_use_kwh: 0.2
+    energy_note: "Estimate, report 13"
+    water_per_use_l: 44
+    price: {aud: 749, basis: estimate, converted: false, url: "", date: "2026-11-20", note: "Price not found"}
+    notes: "12-month warranty. Keep out of the wet room. Strap to a rubber-isolated base, travel empty"
+  - function: Clothes dryer, heat pump, no venting
+    line: new, replaces the Whirlpool washer-dryer option
+    maker: Haier
+    model: 7 kg 300 Series slimline heat-pump dryer
+    part_no: HDHPS70LW1
+    qty: 1
+    mass_kg: 40.0
+    mass_basis: estimate
+    mass_source: "Not published. Typical 7 to 8 kg heat-pump dryers weigh 38 to 48 kg (est.)"
+    dims_mm: [590, 595, 850]
+    dims_note: "Published as 595 W x 590 D x 850 H"
+    power: "230 V, about 1,000 W (est.)"
+    energy_per_use_kwh: 1.4
+    energy_note: "130 kWh a year over 52 full 7 kg loads is 2.5 kWh a load. A 3.5 kg load takes half plus 10 % (est.)"
+    water_per_use_l: 0
+    price: {aud: 999, basis: listing, converted: false, url: "https://www.haier.com.au/laundry/dryers/7kg-300-series-heat-pump-dryer-hdhps70lw1-61444.html", date: "2026-11-20", note: "RRP. Marked outgoing by Haier"}
+    notes: "7-star. Condensate drains by hose, about 2 L a load (est.). 2-year warranty"
+  # ---------------------------------------------------------------- bathroom
+  - function: Recirculating shower
+    line: LA-01B
+    maker: DauerShower (WC3D GmbH, Dresden)
+    model: DauerShower 2.0 with integrated 2.4 kW flow heater
+    part_no: "DauerShower 2.0"
+    qty: 1
+    mass_kg: 6.0
+    mass_basis: estimate
+    mass_source: "Technical unit 3.5 kg (maker manual https://dauershower.com/wp-content/uploads/2026/07/DauerShower-Anleitung_DLE.pdf), plus switching unit, panel and hoses (est.)"
+    dims_mm: [320, 100, 230]
+    dims_note: "Technical unit W x D x H, needs 20 mm clear all round in a dry ventilated compartment"
+    power: "11 to 15 V DC at 10 A, plus 230 V at up to 2,400 W (11 A) for the heater"
+    energy_per_use_kwh: 0.6
+    energy_note: "20 min from a hot start, scaled from the maker's 0.3 kWh (25 Ah at 12 V) per 10 min. 0.7 kWh from a cold start (est.)"
+    water_per_use_l: 5
+    price: {aud: 4872, basis: listing, converted: true, url: "https://dauershower.com/produkt/dauershower-2-0/", date: "2026-11-20", note: "EUR 2,900 incl. 19 % German VAT"}
+    notes: "Loop 2 to 3 L. UV-C LED, self-backwashing stainless filter, self-emptying. Run in 230 V mode, which holds about 5 L a shower"
+  - function: Shower bypass mixer and hand shower
+    line: LA-01
+    maker: Commodity
+    model: Caravan shower mixer with hand shower and rail
+    part_no: ""
+    qty: 1
+    mass_kg: 1.5
+    mass_basis: estimate
+    mass_source: "Report 13"
+    dims_mm: [150, 80, 700]
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 150, basis: estimate, converted: false, url: "", date: "2026-11-20"}
+  - function: Hot water and backup heat, diesel with 230 V elements
+    line: LA-03
+    maker: Truma
+    model: Combi D 6 E with CP plus or iNet X panel
+    part_no: "Combi D 6 E"
+    qty: 1
+    mass_kg: 18.3
+    mass_basis: maker
+    mass_source: "With peripherals. Heater alone 16.9 kg. https://cdn.shopify.com/s/files/1/1889/8263/files/Operating_Manual_Combi_D_6_E_Heaters.pdf?v=1695544816"
+    dims_mm: [525, 450, 300]
+    dims_note: "As the Combi D 6 (report 13)"
+    power: "Diesel 2, 4 or 6 kW, 220 to 630 ml/h. 230 V elements 900 W or 1,800 W. 12 V at 1.8 to 4 A"
+    energy_per_use_kwh: 0.52
+    energy_note: "Per 10 L boiler heat from 15 to 60 C: 17 min at 1,800 W, 35 min at 900 W, about 20 min on diesel. Daily hot water 0.7 kWh by element or 0.08 L of diesel (est.)"
+    water_per_use_l: 0
+    price: {aud: 6382, basis: listing, converted: true, url: "https://www.reimo.com/camping-shop/heizung-kuehlschraenke-kuehlboxen-klimaanlagen/truma-heizung/65871/truma-combi-d6e-diesel-und-elektroheizung-mit-inet-x-panel-neue-generation-2023", date: "2026-11-20", note: "EUR 3,799 incl. German VAT. Not listed by Truma Australia"}
+    notes: "Pump pressure max 2.8 bar, system max 4.5 bar. Fallback: Combi D 6 (Truma Australia)"
+  - function: Truma water connection set with FrostControl drain valve
+    line: LA-03
+    maker: Truma
+    model: Wasserset FC for Combi heaters
+    part_no: "721913"
+    qty: 1
+    mass_kg: 0.6
+    mass_basis: estimate
+    mass_source: "Estimate"
+    dims_mm: [150, 100, 80]
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 294, basis: listing, converted: true, url: "https://www.reimo.com/camping-shop/heizung-kuehlschraenke-kuehlboxen-klimaanlagen/truma-heizung/65871/truma-combi-d6e-diesel-und-elektroheizung-mit-inet-x-panel-neue-generation-2023", date: "2026-11-20", note: "EUR 175"}
+  - function: Cassette toilet (kept)
+    line: LA-01A
+    maker: Thetford
+    model: C223-CS, swivel bowl, electric flush
+    part_no: "200859SP (Thetford Australia SKU)"
+    qty: 1
+    mass_kg: 7.2
+    mass_basis: maker
+    mass_source: "https://www.thetford.com/app/uploads/Overview-and-technical-specifications-cassette-toilets.pdf"
+    dims_mm: [580, 394, 534]
+    dims_note: "Published as H 534 x W 394 x D 580"
+    power: "12 V flush pump"
+    energy_per_use_kwh: 0
+    water_per_use_l: 0.25
+    price: {aud: 725, basis: listing, converted: false, url: "https://www.thetford.com/au/toilets/cassette-toilets/", date: "2026-11-20", note: "RRP"}
+    notes: "18 L cassette lasts about 3 days for two people (est.). Service door 2680584"
+  - function: Spare toilet cassettes
+    line: LA-01A
+    maker: Thetford
+    model: C220 series waste holding tank (fits C223-S, C223-CS, C224-CW)
+    part_no: "50046 (was 20097706)"
+    qty: 2
+    mass_kg: 2.5
+    mass_basis: estimate
+    mass_source: "Estimate. Full about 20 kg"
+    dims_mm: [450, 400, 300]
+    dims_note: "Estimate"
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 218, basis: listing, converted: true, url: "https://www.jacksonsleisure.com/caravan/motorhome/cassette/toilets/thetford/c220/fresh/up/kit/", date: "2026-11-20", note: "C220 Fresh-Up kit GBP 99.96 ex VAT, plus 10 % GST"}
+  - function: Bathroom basin
+    line: LA-01
+    maker: Jacksons Leisure (stockist)
+    model: Rectangular caravan basin, white
+    part_no: "310221"
+    qty: 1
+    mass_kg: 1.0
+    mass_basis: estimate
+    mass_source: "Estimate"
+    dims_mm: [385, 285, 115]
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 3
+    price: {aud: 91, basis: listing, converted: true, url: "https://www.jacksonsleisure.com/caravan-basin-rectangular-385mm-x-285mm-campervan-basin/", date: "2026-11-20", note: "GBP 41.62 ex VAT plus 10 % GST"}
+  - function: Basin and sink mixers, low flow
+    line: LA-01, LA-07D
+    maker: Reich
+    model: Single-lever caravan mixer with a 4 L/min flow regulator
+    part_no: ""
+    qty: 2
+    mass_kg: 0.6
+    mass_basis: estimate
+    mass_source: "Estimate"
+    dims_mm: [150, 50, 180]
+    power: "Micro-switch or pressure pump, no wiring if pressure-switched"
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 150, basis: estimate, converted: false, url: "https://www.jacksonsleisure.com/caravan-campervan-motorhome/reich-linnea-33mm-mixer-tap-for-campervan-caravan-motorhome-marine/", date: "2026-11-20"}
+  - function: Mirror cabinet
+    line: LA-01
+    maker: Fabricated
+    model: Aluminium-framed cabinet with an acrylic mirror door
+    part_no: ""
+    qty: 1
+    mass_kg: 2.5
+    mass_basis: estimate
+    mass_source: "Estimate"
+    dims_mm: [450, 120, 600]
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 250, basis: estimate, converted: false, url: "", date: "2026-11-20"}
+  - function: Towel rail, unheated
+    line: LA-01
+    maker: Commodity
+    model: Stainless double towel rail, 600 mm
+    part_no: ""
+    qty: 1
+    mass_kg: 0.6
+    mass_basis: estimate
+    mass_source: "Estimate"
+    dims_mm: [600, 120, 60]
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 80, basis: estimate, converted: false, url: "", date: "2026-11-20"}
+  - function: Shower-zone drain with hair strainer (to the DauerShower)
+    line: LA-01
+    maker: Commodity
+    model: Shower drain passing no particle over 6 mm, 12 mm hose outlet
+    part_no: ""
+    qty: 1
+    mass_kg: 0.4
+    mass_basis: estimate
+    mass_source: "Estimate"
+    dims_mm: [120, 120, 60]
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 60, basis: estimate, converted: false, url: "", date: "2026-11-20"}
+  - function: Wet-room floor waste
+    line: LA-01
+    maker: Commodity
+    model: Floor drain at the low point of the main wet-room floor
+    part_no: ""
+    qty: 1
+    mass_kg: 0.3
+    mass_basis: estimate
+    mass_source: "Estimate"
+    dims_mm: [120, 120, 60]
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 40, basis: estimate, converted: false, url: "", date: "2026-11-20"}
+  - function: Membrane odour traps (after the DauerShower switching unit and on the floor waste)
+    line: LA-01
+    maker: DauerShower (stockist)
+    model: Membrane odor trap
+    part_no: ""
+    qty: 2
+    mass_kg: 0.2
+    mass_basis: estimate
+    mass_source: "Estimate"
+    dims_mm: [150, 50, 50]
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 32, basis: listing, converted: true, url: "https://dauershower.com/store/", date: "2026-11-20", note: "EUR 18.90"}
+  # ---------------------------------------------------------------- water system
+  - function: Grey water tank, 130 L net
+    line: new
+    maker: Custom (plastic fabricator, as UF-01)
+    model: Welded 6 mm food-grade HDPE, one baffle
+    part_no: ""
+    qty: 1
+    mass_kg: 13.2
+    mass_basis: calculated
+    mass_source: "1.96 m2 of 6 mm HDPE at 950 kg/m3 = 11.2 kg, baffle 1.5 kg, fittings 0.5 kg"
+    dims_mm: [600, 975, 250]
+    dims_note: "146 L gross, about 135 L net. Top below every drain outlet"
+    power: "Level sender"
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 900, basis: estimate, converted: false, url: "https://www.plasticonline.com.au/services/plastic-tank-fabrication/", date: "2026-11-20"}
+    notes: "40 mm inlet, vent to the road side, 40 mm outlet with lever valve and camlock"
+  - function: Grey water tote
+    line: new
+    maker: Commodity
+    model: 40 L wheeled grey water tote with hose and camlock
+    part_no: ""
+    qty: 1
+    mass_kg: 3.0
+    mass_basis: estimate
+    mass_source: "Estimate"
+    dims_mm: [600, 400, 300]
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 150, basis: estimate, converted: false, url: "https://roustaboutsrvclub.com.au/wp-content/uploads/2022/03/Grey_Water_Tote-article_1.pdf", date: "2026-11-20", note: "CMCA quotes AUD 50 to 150 for totes"}
+  - function: Fresh water pump, 2.1 bar switch (inside Truma's 2.8 bar limit)
+    line: new
+    maker: Shurflo
+    model: Trail King 7, 12 V, 7 L/min, 30 psi
+    part_no: ""
+    qty: 1
+    mass_kg: 1.5
+    mass_basis: estimate
+    mass_source: "Estimate"
+    dims_mm: [220, 110, 110]
+    power: "12 V DC"
+    energy_per_use_kwh: 0.02
+    energy_note: "Per day (report 13)"
+    water_per_use_l: 0
+    price: {aud: 186, basis: listing, converted: true, url: "https://www.testberichte.de/heimwerkerbedarf/shurflo-trail-king-wasserpumpe-7-liter-12v-30-psi.html", date: "2026-11-20", note: "EUR 110.81"}
+  - function: Accumulator and pump strainer
+    line: new
+    maker: Commodity
+    model: About 0.75 L accumulator pre-charged 0.2 bar below cut-in, 40-mesh strainer
+    part_no: ""
+    qty: 1
+    mass_kg: 1.1
+    mass_basis: estimate
+    mass_source: "Estimate"
+    dims_mm: [200, 100, 100]
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 145, basis: estimate, converted: false, url: "", date: "2026-11-20"}
+  - function: Tank fill filter
+    line: new
+    maker: Puretec (Australia)
+    model: CR45 twin-stage caravan filter, 1 micron nominal
+    part_no: CR45
+    qty: 1
+    mass_kg: 2.5
+    mass_basis: estimate
+    mass_source: "Estimate"
+    dims_mm: [290, 100, 335]
+    dims_note: "Published W 290 x H 335 mm"
+    power: "None. Needs 200 to 875 kPa inlet, 0 to 20 L/min"
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 250, basis: estimate, converted: false, url: "https://cdn.shopify.com/s/files/1/1845/4805/files/Puretec_Caravan_Brochure.pdf?v=1612752432", date: "2026-11-20"}
+  - function: Drinking water filter, under sink
+    line: new
+    maker: Puretec (Australia)
+    model: CR-Z2 caravan under-sink filter
+    part_no: CR-Z2-LF
+    qty: 1
+    mass_kg: 2.0
+    mass_basis: estimate
+    mass_source: "Estimate"
+    dims_mm: [300, 120, 350]
+    dims_note: "Estimate"
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 323.85, basis: listing, converted: false, url: "https://www.puretec.com.au/CR-Z2", date: "2026-11-20"}
+  - function: Drinking water UV-LED purifier
+    line: new
+    maker: Acuva
+    model: ArrowMAX 2.0, 12 V
+    part_no: ""
+    qty: 1
+    mass_kg: 1.5
+    mass_basis: estimate
+    mass_source: "Estimate"
+    dims_mm: [300, 100, 100]
+    dims_note: "Estimate"
+    power: "12 V DC, about 14 W while water flows, 0.1 W standby"
+    energy_per_use_kwh: 0.002
+    energy_note: "Per day at 10 L of drinking water (est.)"
+    water_per_use_l: 0
+    price: {aud: 1006, basis: estimate, converted: true, url: "https://www.campingworld.com/acuva-arrowmax-2.0-uv-led-water-purifier-with-advanced-pre-filter-and-smart-faucet-12v-dc-127787.html", date: "2026-11-20", note: "USD 649 (est.), price not read"}
+    notes: "LED life 1,000 h or 120,000 L (https://www.thewaterguy.ca/catalog/view/watersprint-acuva-arrowmax-2.0-uv-led-purification-system-3048.htm)"
+  - function: Thermostatic mixing valve for the basin and sink hot feed
+    line: new
+    maker: Commodity
+    model: Thermostatic mixing valve set to 50 C
+    part_no: ""
+    qty: 1
+    mass_kg: 0.5
+    mass_basis: estimate
+    mass_source: "Estimate"
+    dims_mm: [120, 60, 60]
+    power: ""
+    energy_per_use_kwh: 0
+    water_per_use_l: 0
+    price: {aud: 150, basis: estimate, converted: false, url: "", date: "2026-11-20"}
+  - function: Creek water transfer pump and hose
+    line: new
+    maker: Commodity
+    model: 12 V transfer pump delivering at least 2 bar, strainer and 10 m hose
+    part_no: ""
+    qty: 1
+    mass_kg: 2.0
+    mass_basis: estimate
+    mass_source: "Estimate"
+    dims_mm: [250, 150, 150]
+    power: "12 V DC"
+    energy_per_use_kwh: 0.01
+    water_per_use_l: 0
+    price: {aud: 200, basis: estimate, converted: false, url: "", date: "2026-11-20"}

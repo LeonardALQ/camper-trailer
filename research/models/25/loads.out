@@ -1,0 +1,18 @@
+
+====================================================================================================
+Report 25 roof options in camp mode: design hot day (worst heading) and design cold night (-5 C, 14 h)
+====================================================================================================
+B: canvas U 5.5 W/m2K bare or 2.3 with a quilted liner (est.), absorptance 0.55, 50 m3/h of extra unrecovered air through zips and fabric (est.).
+C: two sliding-seal rails at 2.0 W/K and 7 m3/h of extra air through the seal (est.).
+
+option                                   heat kWh  peak W  canvas night kWh | unit hot AC hot bat unmet cold bat unmet d bat kWh d bat kg
+A0 fixed, 1,950 mm (report 19 run)           37.1    3292     0.0      17.6 | AP25   8.40    9.03  0.00     6.60  0.00     -0.07     -0.6
+A0 fixed, 1,950 mm (report 19 run)           37.1    3292     0.0      17.6 | AP35   8.81    9.47  0.00     6.84  0.00     +0.37     +3.3
+A  fixed, 2,000 mm                           37.3    3303     0.0      17.9 | AP25   8.46    9.10  0.00     6.68  0.00     +0.00     +0.0
+A  fixed, 2,000 mm                           37.3    3303     0.0      17.9 | AP35   8.87    9.54  0.00     6.92  0.00     +0.44     +3.9
+B  canvas skirt 650 mm, no liner             57.2    4252    18.6      37.7 | AP25  13.87   14.92  4.09    14.00  0.00     +5.82    +51.2
+B  canvas skirt 650 mm, no liner             57.2    4252    18.6      37.7 | AP35  15.40   16.56  0.64    14.50  0.00     +7.47    +65.7
+B  canvas skirt 650 mm, quilted liner        46.9    3772     8.3      27.8 | AP25  11.51   12.37  0.32    10.31  0.00     +3.28    +28.8
+B  canvas skirt 650 mm, quilted liner        46.9    3772     8.3      27.8 | AP35  11.80   12.68  0.00    10.68  0.00     +3.59    +31.6
+C  telescoping hard shell, 2,000 mm          38.4    3369     0.0      19.4 | AP25   8.76    9.42  0.00     7.23  0.00     +0.32     +2.8
+C  telescoping hard shell, 2,000 mm          38.4    3369     0.0      19.4 | AP35   9.17    9.86  0.00     7.48  0.00     +0.76     +6.7

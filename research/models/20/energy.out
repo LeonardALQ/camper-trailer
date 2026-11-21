@@ -1,0 +1,239 @@
+Report 20 energy model. Inputs: loads.yaml. Battery location: inside
+Inverter: Victron MultiPlus-II 48/6k5/100-50, zero load 28 W, search mode 8 W, max efficiency 0.96
+Provisional loads (no figure in report 19 or report 21): none
+Provisional in part: AC-01, HE-01
+
+=== Design hot day, all electric: hot water from the Combi D 6 E's 230 V element (hot) ===
+Load                                                            side     kWh
+AC-01 Mitsubishi MSZ-AP25VGKD2 and MUZ-AP25VGD2 invert            ac    8.40
+VE-01 LUNOS e2 60 short, two pairs, with the 5/UNI-FT           dc12    0.13
+VE-02 LUNOS RA 15-60 wet room extract, 12 V                     dc12    0.03
+VE-03 Filtered top-up fan, 24 V EC, ePM1 and carbon fi          dc24    0.12
+RH-01 Sphere TCR-001 range hood, two 12 V fans, ducted          dc12    0.06
+SN-01 CO2 sensor and Bluetooth adapter for the Cerbo G          dc12    0.05
+SN-02 Cabin pressure display                                    dc12    0.02
+FR-01 Fridge, Dometic NRX 130C, 24 V compressor                 dc24    0.75
+FZ-01 Freezer, Dometic CFX3 55IM at -18 C, 24 V compre          dc24    0.80
+KI-01 Dometic CVI1525 induction hob, 1,000 W and 1,300            ac    1.21
+KI-02 Camec 053632 convection microwave, one 45 min ba            ac    0.62
+KI-03 Camec 053632 in microwave mode, lunch reheat                ac    0.12
+SH-01 DauerShower 2.0 heater, 230 V, 2 x 20 min                   ac    1.25
+SH-02 DauerShower 2.0 pump, UV-C and controls, 12 V             dc12    0.05
+HW-01 Truma Combi D 6 E 230 V element for hot water, s            ac    0.70
+LA-01 Camec 051879 3.5 kg top-load washer, cold wash              ac    0.21
+LA-02 Haier HDHPS70LW1 7 kg heat-pump dryer, one 3.5 k            ac    1.41
+LI-01 LED lighting, 24 V                                        dc24    0.11
+DE-01 Laptop 1 on a USB-C PD 100 W outlet at the desk           dc24    0.35
+DE-02 27 inch monitor                                             ac    0.23
+DE-03 Laptop 2, phones and tablet on USB-C PD outlets           dc24    0.22
+NE-01 Starlink Mini with its built-in router, 24 V              dc24    0.58
+WP-01 Shurflo Trail King 7 water pump, 12 V, 2.1 bar            dc12    0.02
+WP-02 Acuva ArrowMAX 2.0 UV-LED on the drinking tap, 1          dc12    0.00
+WP-03 Transfer pump for filling from a creek or bore,           dc12    0.01
+BE-01 Lippert HappiJac lift bed, 12 V                           dc12    0.00
+SB-01 Cerbo GX MK2 and GX Touch 50                                dc    0.08
+SB-02 Lynx Smart BMS NG and battery self-discharge                dc    0.09
+SB-03 Smoke and CO alarms, GPS tracker, security alarm          dc12    0.07
+SB-04 MPPT and charger standby on the 48 V bus                    dc    0.02
+SB-05 Breakaway kit battery charger, 12 V                       dc12    0.01
+Inverter conversion loss, idle and search                               0.99
+DC-DC converter loss and idle                                           0.82
+Daily total at the battery bus                                         19.55
+AC-side energy 14.16 kWh, mean inverter efficiency 0.935
+Worst 12 h window: 14.33 kWh, starting 07:00
+Hourly bus energy (kWh), 00 to 23:
+  00:0.27 01:0.26 02:0.26 03:0.26 04:0.26 05:0.30 06:0.41 07:1.93 08:0.60 09:0.93 10:1.49 11:1.54
+  12:1.46 13:0.88 14:0.85 15:0.88 16:0.78 17:0.60 18:2.41 19:0.80 20:1.22 21:0.45 22:0.40 23:0.33
+Scheduled peak: 3059 W AC at the inverter output, 3407 W at the battery
+Managed worst coincident AC load: 5055 W = HVAC 990 W + KI-01, KI-02 + 325 W of small loads and user outlets. Unmanaged: 10535 W
+Inverter Victron MultiPlus-II 48/6k5/100-50: 6000 W at 25 C, 5700 W at 40 C, 11000 W for 1 min. Managed load is 89% of the 40 C rating and 84% of the 25 C rating
+12 V bus, worst living case (shower pump, water pump, UV, hood, Combi starting, fans, alarms, flush): 408 W, 33.4 A on the 12.2 V bus, against 60 A continuous (56%) and 80 A for 10 s. 
+12 V bus, the same with the XT Air compressor levelling: 708 W, 58.0 A on the 12.2 V bus, against 60 A continuous (97%) and 80 A for 10 s. 
+12 V bus, the same plus the external 12 V outlet at its 10 A fuse: 828 W, 67.9 A on the 12.2 V bus, against 60 A continuous (113%) and 80 A for 10 s. Over for longer than 10 s only if the compressor, a shower and the outlet all run together.
+24 V bus, worst parked case (fridge, freezer, lights, two laptops, phones, Starlink, top-up fan): 453 W, 18.7 A on the 24.2 V bus, against 32 A continuous (58%) and 50 A for 10 s. 
+24 V bus, the same in a parked dust storm with the RESPA-CF2 starting: 741 W, 30.6 A on the 24.2 V bus, against 32 A continuous (96%) and 50 A for 10 s. 
+24 V bus, towing (fridge, freezer, Starlink, RESPA-CF2 starting, low lights): 488 W, 20.2 A on the 24.2 V bus, against 32 A continuous (63%) and 50 A for 10 s. 
+
+=== Design hot day, hot water from the Combi D 6 E on diesel (hot_diesel) ===
+Load                                                            side     kWh
+AC-01 Mitsubishi MSZ-AP25VGKD2 and MUZ-AP25VGD2 invert            ac    8.40
+VE-01 LUNOS e2 60 short, two pairs, with the 5/UNI-FT           dc12    0.13
+VE-02 LUNOS RA 15-60 wet room extract, 12 V                     dc12    0.03
+VE-03 Filtered top-up fan, 24 V EC, ePM1 and carbon fi          dc24    0.12
+RH-01 Sphere TCR-001 range hood, two 12 V fans, ducted          dc12    0.06
+SN-01 CO2 sensor and Bluetooth adapter for the Cerbo G          dc12    0.05
+SN-02 Cabin pressure display                                    dc12    0.02
+FR-01 Fridge, Dometic NRX 130C, 24 V compressor                 dc24    0.75
+FZ-01 Freezer, Dometic CFX3 55IM at -18 C, 24 V compre          dc24    0.80
+KI-01 Dometic CVI1525 induction hob, 1,000 W and 1,300            ac    1.21
+KI-02 Camec 053632 convection microwave, one 45 min ba            ac    0.62
+KI-03 Camec 053632 in microwave mode, lunch reheat                ac    0.12
+SH-01 DauerShower 2.0 heater, 230 V, 2 x 20 min                   ac    1.25
+SH-02 DauerShower 2.0 pump, UV-C and controls, 12 V             dc12    0.05
+HE-01 Truma Combi D 6 E on diesel, 12 V fan, pump, glo          dc12    0.03
+LA-01 Camec 051879 3.5 kg top-load washer, cold wash              ac    0.21
+LA-02 Haier HDHPS70LW1 7 kg heat-pump dryer, one 3.5 k            ac    1.41
+LI-01 LED lighting, 24 V                                        dc24    0.11
+DE-01 Laptop 1 on a USB-C PD 100 W outlet at the desk           dc24    0.35
+DE-02 27 inch monitor                                             ac    0.23
+DE-03 Laptop 2, phones and tablet on USB-C PD outlets           dc24    0.22
+NE-01 Starlink Mini with its built-in router, 24 V              dc24    0.58
+WP-01 Shurflo Trail King 7 water pump, 12 V, 2.1 bar            dc12    0.02
+WP-02 Acuva ArrowMAX 2.0 UV-LED on the drinking tap, 1          dc12    0.00
+WP-03 Transfer pump for filling from a creek or bore,           dc12    0.01
+BE-01 Lippert HappiJac lift bed, 12 V                           dc12    0.00
+SB-01 Cerbo GX MK2 and GX Touch 50                                dc    0.08
+SB-02 Lynx Smart BMS NG and battery self-discharge                dc    0.09
+SB-03 Smoke and CO alarms, GPS tracker, security alarm          dc12    0.07
+SB-04 MPPT and charger standby on the 48 V bus                    dc    0.02
+SB-05 Breakaway kit battery charger, 12 V                       dc12    0.01
+Inverter conversion loss, idle and search                               0.97
+DC-DC converter loss and idle                                           0.83
+Daily total at the battery bus                                         18.87
+AC-side energy 13.46 kWh, mean inverter efficiency 0.933
+Worst 12 h window: 13.99 kWh, starting 07:00
+Hourly bus energy (kWh), 00 to 23:
+  00:0.26 01:0.25 02:0.25 03:0.25 04:0.25 05:0.29 06:0.40 07:1.73 08:0.59 09:0.92 10:1.48 11:1.53
+  12:1.45 13:0.83 14:0.84 15:0.87 16:0.77 17:0.59 18:2.40 19:0.69 20:1.09 21:0.44 22:0.39 23:0.32
+Scheduled peak: 2850 W AC at the inverter output, 3271 W at the battery
+Managed worst coincident AC load: 5055 W = HVAC 990 W + KI-01, KI-02 + 325 W of small loads and user outlets. Unmanaged: 8735 W
+Inverter Victron MultiPlus-II 48/6k5/100-50: 6000 W at 25 C, 5700 W at 40 C, 11000 W for 1 min. Managed load is 89% of the 40 C rating and 84% of the 25 C rating
+
+=== Design cold day, Combi D 6 E heats the cabin and the water on diesel (as designed, H7) (cold_diesel) ===
+Load                                                            side     kWh
+AC-01 Mitsubishi MSZ-AP25VGKD2 and MUZ-AP25VGD2 invert            ac    0.05
+VE-01 LUNOS e2 60 short, two pairs, with the 5/UNI-FT           dc12    0.12
+VE-02 LUNOS RA 15-60 wet room extract, 12 V                     dc12    0.03
+VE-03 Filtered top-up fan, 24 V EC, ePM1 and carbon fi          dc24    0.12
+RH-01 Sphere TCR-001 range hood, two 12 V fans, ducted          dc12    0.06
+SN-01 CO2 sensor and Bluetooth adapter for the Cerbo G          dc12    0.05
+SN-02 Cabin pressure display                                    dc12    0.02
+FR-01 Fridge, Dometic NRX 130C, 24 V compressor                 dc24    0.45
+FZ-01 Freezer, Dometic CFX3 55IM at -18 C, 24 V compre          dc24    0.45
+KI-01 Dometic CVI1525 induction hob, 1,000 W and 1,300            ac    1.41
+KI-02 Camec 053632 convection microwave, one 45 min ba            ac    0.62
+KI-03 Camec 053632 in microwave mode, lunch reheat                ac    0.12
+SH-01 DauerShower 2.0 heater, 230 V, 2 x 20 min                   ac    1.35
+SH-02 DauerShower 2.0 pump, UV-C and controls, 12 V             dc12    0.05
+HE-01 Truma Combi D 6 E on diesel, 12 V fan, pump, glo (prov.)  dc12    0.52
+LA-01 Camec 051879 3.5 kg top-load washer, cold wash              ac    0.21
+LA-02 Haier HDHPS70LW1 7 kg heat-pump dryer, one 3.5 k            ac    1.41
+LI-01 LED lighting, 24 V                                        dc24    0.19
+DE-01 Laptop 1 on a USB-C PD 100 W outlet at the desk           dc24    0.35
+DE-02 27 inch monitor                                             ac    0.23
+DE-03 Laptop 2, phones and tablet on USB-C PD outlets           dc24    0.22
+NE-01 Starlink Mini with its built-in router, 24 V              dc24    0.58
+WP-01 Shurflo Trail King 7 water pump, 12 V, 2.1 bar            dc12    0.02
+WP-02 Acuva ArrowMAX 2.0 UV-LED on the drinking tap, 1          dc12    0.00
+WP-03 Transfer pump for filling from a creek or bore,           dc12    0.01
+BE-01 Lippert HappiJac lift bed, 12 V                           dc12    0.00
+SB-01 Cerbo GX MK2 and GX Touch 50                                dc    0.08
+SB-02 Lynx Smart BMS NG and battery self-discharge                dc    0.09
+SB-03 Smoke and CO alarms, GPS tracker, security alarm          dc12    0.07
+SB-04 MPPT and charger standby on the 48 V bus                    dc    0.02
+SB-05 Breakaway kit battery charger, 12 V                       dc12    0.01
+Inverter conversion loss, idle and search                               0.47
+DC-DC converter loss and idle                                           0.83
+Daily total at the battery bus                                         10.23
+AC-side energy 5.41 kWh, mean inverter efficiency 0.920
+Worst 12 h window: 7.23 kWh, starting 07:00
+Cold night 17:00 to 07:00 (14 h): 4.68 kWh at the battery bus
+Hourly bus energy (kWh), 00 to 23:
+  00:0.13 01:0.13 02:0.13 03:0.13 04:0.13 05:0.13 06:0.18 07:1.26 08:0.24 09:0.48 10:0.95 11:0.83
+  12:0.76 13:0.23 14:0.23 15:0.30 16:0.26 17:0.20 18:1.49 19:0.37 20:0.97 21:0.32 22:0.21 23:0.16
+Scheduled peak: 2405 W AC at the inverter output, 2878 W at the battery
+Managed worst coincident AC load: 4065 W = HVAC 0 W + KI-01, KI-02 + 325 W of small loads and user outlets. Unmanaged: 7745 W
+Inverter Victron MultiPlus-II 48/6k5/100-50: 6000 W at 25 C, 5700 W at 40 C, 11000 W for 1 min. Managed load is 71% of the 40 C rating and 68% of the 25 C rating
+
+=== Design cold day, all electric: heat pump heating, hot water from the element (cold_hp) ===
+Load                                                            side     kWh
+AC-01 Mitsubishi MSZ-AP25VGKD2 and MUZ-AP25VGD2 invert (prov.)    ac    7.29
+VE-01 LUNOS e2 60 short, two pairs, with the 5/UNI-FT           dc12    0.12
+VE-02 LUNOS RA 15-60 wet room extract, 12 V                     dc12    0.03
+VE-03 Filtered top-up fan, 24 V EC, ePM1 and carbon fi          dc24    0.12
+RH-01 Sphere TCR-001 range hood, two 12 V fans, ducted          dc12    0.06
+SN-01 CO2 sensor and Bluetooth adapter for the Cerbo G          dc12    0.05
+SN-02 Cabin pressure display                                    dc12    0.02
+FR-01 Fridge, Dometic NRX 130C, 24 V compressor                 dc24    0.45
+FZ-01 Freezer, Dometic CFX3 55IM at -18 C, 24 V compre          dc24    0.45
+KI-01 Dometic CVI1525 induction hob, 1,000 W and 1,300            ac    1.41
+KI-02 Camec 053632 convection microwave, one 45 min ba            ac    0.62
+KI-03 Camec 053632 in microwave mode, lunch reheat                ac    0.12
+SH-01 DauerShower 2.0 heater, 230 V, 2 x 20 min                   ac    1.35
+SH-02 DauerShower 2.0 pump, UV-C and controls, 12 V             dc12    0.05
+HW-01 Truma Combi D 6 E 230 V element for hot water, s            ac    0.83
+LA-01 Camec 051879 3.5 kg top-load washer, cold wash              ac    0.21
+LA-02 Haier HDHPS70LW1 7 kg heat-pump dryer, one 3.5 k            ac    1.41
+LI-01 LED lighting, 24 V                                        dc24    0.19
+DE-01 Laptop 1 on a USB-C PD 100 W outlet at the desk           dc24    0.35
+DE-02 27 inch monitor                                             ac    0.23
+DE-03 Laptop 2, phones and tablet on USB-C PD outlets           dc24    0.22
+NE-01 Starlink Mini with its built-in router, 24 V              dc24    0.58
+WP-01 Shurflo Trail King 7 water pump, 12 V, 2.1 bar            dc12    0.02
+WP-02 Acuva ArrowMAX 2.0 UV-LED on the drinking tap, 1          dc12    0.00
+WP-03 Transfer pump for filling from a creek or bore,           dc12    0.01
+BE-01 Lippert HappiJac lift bed, 12 V                           dc12    0.00
+SB-01 Cerbo GX MK2 and GX Touch 50                                dc    0.08
+SB-02 Lynx Smart BMS NG and battery self-discharge                dc    0.09
+SB-03 Smoke and CO alarms, GPS tracker, security alarm          dc12    0.07
+SB-04 MPPT and charger standby on the 48 V bus                    dc    0.02
+SB-05 Breakaway kit battery charger, 12 V                       dc12    0.01
+Inverter conversion loss, idle and search                               0.96
+DC-DC converter loss and idle                                           0.75
+Daily total at the battery bus                                         18.19
+AC-side energy 13.48 kWh, mean inverter efficiency 0.934
+Worst 12 h window: 9.97 kWh, starting 16:46
+Cold night 17:00 to 07:00 (14 h): 11.18 kWh at the battery bus
+Hourly bus energy (kWh), 00 to 23:
+  00:0.60 01:0.60 02:0.60 03:0.60 04:0.60 05:0.60 06:0.62 07:1.84 08:0.40 09:0.55 10:0.98 11:0.84
+  12:0.76 13:0.32 14:0.31 15:0.46 16:0.56 17:0.63 18:1.74 19:0.98 20:1.54 21:0.77 22:0.68 23:0.63
+Scheduled peak: 3042 W AC at the inverter output, 3368 W at the battery
+Managed worst coincident AC load: 5465 W = HVAC 1400 W + KI-01, KI-02 + 325 W of small loads and user outlets. Unmanaged: 10945 W
+Inverter Victron MultiPlus-II 48/6k5/100-50: 6000 W at 25 C, 5700 W at 40 C, 11000 W for 1 min. Managed load is 96% of the 40 C rating and 91% of the 25 C rating
+
+=== H3: capacity needed (nominal kWh) ===
+Hot day all electric, 24 h, new                       22.6 kWh nominal,  20.4 kWh usable
+Hot day all electric, worst 12 h, end of life         20.7 kWh nominal,  18.7 kWh usable
+Hot day, diesel hot water, 24 h, new                  21.8 kWh nominal,  19.7 kWh usable
+Cold night 14 h, diesel heating, end of life           6.8 kWh nominal,   6.1 kWh usable
+Cold night 14 h, heat pump, end of life               16.2 kWh nominal,  14.6 kWh usable
+
+=== Candidate battery banks against H3 ===
+Ratios are installed nominal over required nominal (1.00 or more passes). Headroom is the extra load a day
+at the battery bus the bank could carry and still pass the governing H3 check. Autonomy is from full on the
+all-electric hot day, worst starting hour. 24 V banks use the 48 V model's losses, so they read about 2 % low.
+Bank                                             kWh    kg    AUD    hot24 hot12EOL   hotD24   nightD  nightHP headroom  new h  EOL h
+Victron Lithium NG 51.2 V 100 Ah x 4 (48 V)     20.5   148  11644     0.91     0.99     0.94     3.02     1.27     -1.9   17.2   11.8
+Victron Lithium NG 51.2 V 100 Ah x 5 (48 V)     25.6   185  14555     1.13     1.23     1.17     3.78     1.58      2.6   25.1   17.2
+Victron Lithium NG 51.2 V 100 Ah x 6 (48 V)     30.7   222  17466     1.36     1.48     1.41     4.54     1.90      7.0   29.4   24.6
+Victron SuperPack NG 51.2 V 100 Ah x 5 (48 V)   25.6   205  16250     1.13     1.23     1.17     3.78     1.58      2.6   25.1   17.2
+Revolution Power 48 V 100 Ah CAN x 5 (48 V)     25.6   200  27990     1.13     1.23     1.17     3.78     1.58      2.6   25.1   17.2
+DIY 16S EVE MB31 314 Ah, JK BMS (48 V)          16.1   105   4499     0.71     0.78     0.74     2.37     0.99     -5.7   11.7    9.2
+DIY 16S2P EVE MB31 314 Ah, JK BMS (48 V)        32.1   205   9000     1.42     1.55     1.47     4.75     1.99      8.2   30.3   25.2
+Victron Lithium NG 25.6 V 300 Ah x 3 (24 V)     23.0   156  11025     1.02     1.11     1.05     3.40     1.43      0.4   24.1   13.7
+Victron Lithium NG 25.6 V 300 Ah x 4 (24 V)     30.7   208  14700     1.36     1.48     1.41     4.54     1.90      7.0   29.4   24.6
+Enerdrive B-TEC 24 V 150 Ah x 7 (24 V)          26.9   267  32256     1.19     1.30     1.23     3.97     1.66      3.7   26.4   20.2
+The governing check needs 22.6 kWh nominal.
+
+=== Recharge of one all-electric design hot day ===
+Energy to put back into the cells: 21.2 kWh. Mean household load 815 W
+Honda EU22i, 1,800 W rated                             1674 W into the battery: 12.7 h with nothing else on, 24.7 h while the household runs, about 29.6 L of fuel
+Honda EU32i, 2,600 W rated                             2418 W into the battery:  8.8 h with nothing else on, 13.2 h while the household runs, about 18.8 L of fuel
+Two Honda EU22i in parallel, 3,600 W                   3348 W into the battery:  6.3 h with nothing else on,  8.4 h while the household runs, about 20.1 L of fuel
+Shore power, 10 A outlet                               2139 W into the battery:  9.9 h with nothing else on, 16.0 h while the household runs
+Shore power, 15 A outlet                               3208 W into the battery:  6.6 h with nothing else on,  8.9 h while the household runs
+Ute, 2 x Orion-Tr Smart 12/48-8, stock alternator (TC01)    720 W into the battery: 29.5 h with nothing else on, less than the mean household load, 3.6 kWh on a 5 h drive
+Ute, 4 x Orion-Tr Smart 12/48-8, Jaylec 240 A alternator   1440 W into the battery: 14.7 h with nothing else on, 33.9 h while the household runs, 7.2 kWh on a 5 h drive
+
+=== Solar yield on the flat roof (PVGIS, kWh a day) against the loads ===
+Design hot day  report 19 sun          5.38 kWh/kWp  100 %:   9.3  85 %:   7.9  70 %:   6.5
+Alice Springs   January mean           5.16 kWh/kWp  100 %:   8.9  85 %:   7.5  70 %:   6.2
+Alice Springs   July mean              3.24 kWh/kWp  100 %:   5.6  85 %:   4.7  70 %:   3.9
+Broome          January mean           4.39 kWh/kWp  100 %:   7.6  85 %:   6.4  70 %:   5.3
+Broome          July mean              3.64 kWh/kWp  100 %:   6.3  85 %:   5.3  70 %:   4.4
+Hobart          January mean           4.86 kWh/kWp  100 %:   8.4  85 %:   7.1  70 %:   5.8
+Hobart          June mean              1.04 kWh/kWp  100 %:   1.8  85 %:   1.5  70 %:   1.2
+Daily totals at the battery bus: hot 19.6 kWh, hot_diesel 18.9 kWh, cold_diesel 10.2 kWh, cold_hp 18.2 kWh
+
+=== Battery mass per kWh a day of load (H3, new, 24 h) ===
+Victron Lithium NG 51.2 V 100 Ah x 4 (48 V): 7.23 kg per nominal kWh, so 8.4 kg per kWh a day at the bus and 8.8 kg per kWh a day of an 800 W AC load

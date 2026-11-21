@@ -29,7 +29,7 @@ params:
   tyre_w: 268
   tyre_slr: 380             # static loaded radius (estimate)
   rear_bump: 110            # rear wheel travel to the bump stops (estimate, report 17 section 3.3)
-  wheel_y: 777.5            # half the Elite's 1,555 mm rear track (R26, estimate, decision H18). 730 on the factory 1,460 mm
+  wheel_y: 777.5            # half the Elite's 1,555 mm rear track (report 26, estimate, decision H18). 730 on the factory 1,460 mm
   wheel_z: tyre_slr - deck_z        # module Z of the wheel centre at static
   tub_top_gap: 25           # Toyota: 25 mm over the tyre at full bump, 40 mm inside it, 30 mm outside it
   tub_in_gap: 40
@@ -39,7 +39,7 @@ params:
   tub_x1: axle_m + tyre_d / 2 + tub_end_gap
   tub_y0: wheel_y - tyre_w / 2 - tub_in_gap  # inner face of the tub's inboard wall
   tub_top: wheel_z + rear_bump + tyre_d / 2 + tub_top_gap + tub_t   # tub top surface above the floor
-  # Rear tub flares (decision H19, R26 fix A). On the Elite's track the tyre's outer face is 911.5 mm out, 11 mm from the
+  # Rear tub flares (decision H19, report 26 fix A). On the Elite's track the tyre's outer face is 911.5 mm out, 11 mm from the
   # 1,850 mm body's skin against Toyota's 30 mm. Over each rear tub the skin is cut away up to the top of the side wall's
   # bottom rail, and a folded 2.5 mm flare closes the opening 20 mm further out, 30 mm past each end of the tub.
   flare_out: 20             # outer face 20 mm outside the skin: 31 mm outside the tyre
@@ -55,7 +55,7 @@ params:
   outside_w: 1850           # body outside width, UTE-09's body limit (decision H19). The flares reach flare_w
   outside_l: 2590           # report 17 section 6.2
   skin_t: 2.5               # 5052-H32 walls, front and doors
-  roof_t: 1.6               # 5052-H32 1.6 mm roof skin (R24's 2.0 mm, thinned 0.4 mm to keep the box under 440 kg)
+  roof_t: 1.6               # 5052-H32 1.6 mm roof skin (report 24's 2.0 mm, thinned 0.4 mm to keep the box under 440 kg)
   frame_s: 40               # SHS 40 x 40 x 3 frame
   frame_t: 3
   wall_t: skin_t + frame_s  # side and front walls: 42.5 mm
@@ -109,7 +109,7 @@ params:
   runner_y1: rail_y + runner_w / 2
   mount_dy: 17.5            # each mount angle's reach beyond the runner, over Toyota's bracket on the rail. The brackets
                             # stay with the frame, so the angles do not follow the tubs out
-  steel_w: 65               # galvanised C350L0 RHS 65 x 35 x 4.0, laid flat, under each L-track row (R24)
+  steel_w: 65               # galvanised C350L0 RHS 65 x 35 x 4.0, laid flat, under each L-track row (report 24)
   steel_h: 35
   steel_t: 4.0
   steel_fy: 350             # C350L0 yield, MPa (AS/NZS 1163), for the crossmember check UGR-03

@@ -26,7 +26,7 @@ params:
   frame_top_z: 774             # rear frame top: about 724 mm on the factory springs (BBGJ1007 pp. 55 and 62) plus the
                                # Lovells kit's lift of about 50 mm (estimate). The 805 mm tyre matches the 7.50R16's diameter
   track_front: 1555            # with 265/70R16 tyres (BBGJ1007 p. 76). ET 0 wheels keep it
-  track_rear: 1555             # the Elite's wide-track housing brings the rear in line with the front (R26, estimate).
+  track_rear: 1555             # the Elite's wide-track housing brings the rear in line with the front (report 26, estimate).
                                # Toyota's factory rear track is 1,460 mm. measurements.yaml VEH-28 checks it
   tyre_d: 805                  # LT265/75R16 123/120, Yokohama G015 (report 09) or Toyo AT III (804)
   tyre_w: 268                  # section width (estimate)
@@ -57,9 +57,9 @@ params:
 
 # Limits. `src` is the source and `basis` its kind.
 limits:
-  gvm_kg: {v: 4450, src: "Decision H18: the Lovells 4,495 kg Elite kit (report 16 section 2.3, decision H17, car build line GV05) plated at the sum of its axle plates, 1,650 + 2,800 kg, in the LC5 inspection (GV03). Lovells offers the same derate on its 4,200 kg kit (R26)", basis: plan}
+  gvm_kg: {v: 4450, src: "Decision H18: the Lovells 4,495 kg Elite kit (report 16 section 2.3, decision H17, car build line GV05) plated at the sum of its axle plates, 1,650 + 2,800 kg, in the LC5 inspection (GV03). Lovells offers the same derate on its 4,200 kg kit (report 26)", basis: plan}
   front_axle_kg: {v: 1650, src: "Lovells Elite front axle rating, as the Platinum's (report 16)", basis: installer}
-  rear_axle_kg: {v: 2800, src: "Decision H18: the Elite's 2,850 kg rear axle (wide-track housing and chrome-moly axles, report 16, decision H17) plated at 2,800 kg, twice the ROH Trak 2's 1,400 kg rating, because no 16 inch wheel that fits the ute and the trailer is rated 1,425 kg (R26)", basis: plan}
+  rear_axle_kg: {v: 2800, src: "Decision H18: the Elite's 2,850 kg rear axle (wide-track housing and chrome-moly axles, report 16, decision H17) plated at 2,800 kg, twice the ROH Trak 2's 1,400 kg rating, because no 16 inch wheel that fits the ute and the trailer is rated 1,425 kg (report 26)", basis: plan}
   platinum_rear_axle_kg: {v: 2550, src: "Lovells TOYKIT080-GVM rear axle rating, the kit cut CUT7 returns to", basis: installer}
   platinum_return_margin_kg: {v: 30, src: "Decision H17: CUT7 applies only if the S3 weighing leaves at least 30 kg under the Platinum's rear axle at the trailer's weighed towball", basis: plan}
   weighed_max_kg: {v: 3850, src: "Decision log: hold the weighed ute to 3,850 kg, towball included", basis: plan}
@@ -79,7 +79,7 @@ limits:
   box_mass_max_kg: {v: 440, src: "Report 17 section 6.7 total, empty. The decision log asks for a lighter box", basis: plan}
   tub_height_max_mm: {v: 100, src: "Report 17 section 6.4: the lower floor works if the tubs stand no more than 100 mm above it", basis: plan}
   ramp_angle_max_deg: {v: 20, src: "Report 03 section 10: the steepest ramp for walking a bike up beside it", basis: plan}
-  anchor_design_kn: {v: 9.8, src: "R24 (UTE-GARAGE.md revision C section 6): an anchor withstands its strap's breaking load (NTC Load Restraint Guide 2018 p. 201, report 03), about 9.8 kN for the LC 500 kg straps. Was 20 kN with LC 1,000 kg straps", basis: plan}
+  anchor_design_kn: {v: 9.8, src: "Report 24 (UTE-GARAGE.md revision C section 6): an anchor withstands its strap's breaking load (NTC Load Restraint Guide 2018 p. 201, report 03), about 9.8 kN for the LC 500 kg straps. Was 20 kN with LC 1,000 kg straps", basis: plan}
   m12_tension_kn: {v: 56.0, src: "AS 4100 clause 9.3.2.2: 0.8 x 84.3 mm2 x 830 MPa for an M12 property class 8.8 bolt", basis: law}
   m12_shear_kn: {v: 31.4, src: "AS 4100 clause 9.3.2.1: 0.8 x 0.62 x 830 MPa x 76.2 mm2, threads in the shear plane", basis: law}
 
@@ -143,7 +143,7 @@ lines:
     x: box_x0 + 100
     z: deck_z + 300
     maturity: estimate
-    source: "R20, the trailer's electrical research of 20 Nov 2026 (VEHICLE.md stage S5). The position low on the box's front wall is an assumption"
+    source: "Report 20, the trailer's electrical research of 20 Nov 2026 (VEHICLE.md stage S5). The position low on the box's front wall is an assumption"
     cases: [UC1, UC2, UC3, UC4, UCB]
   - id: UT-15
     item: "48 V feed to the towbar (TW06): 7 m of 8 B&S twin cable and a grey Anderson SB50"
@@ -151,7 +151,7 @@ lines:
     x: (box_x0 + ball_x) / 2
     z: frame_top_z - 100
     maturity: estimate
-    source: "R20 (VEHICLE.md stage S5). The cable's centre is taken halfway from the box front to the ball (assumption)"
+    source: "Report 20 (VEHICLE.md stage S5). The cable's centre is taken halfway from the box front to the ball (assumption)"
     cases: [UC1, UC2, UC3, UC4, UCB]
   - id: UT-06
     item: "Two people"
@@ -254,7 +254,7 @@ checks:
   - {id: UTE-10, title: "Rear overhang no more than 1,908 mm behind the rear axle", type: overhang, limit: rear_overhang_max_mm, severity: fail,
      why: "ADR 43/04, including any equipment. The towbar and its tongue count too"}
   - {id: UTE-11, title: "Static stability factor with the bikes aboard (reported against 1.02 with the bikes in the trailer)", type: ssf, cases: [UC2, UC3], severity: report,
-     why: "Half the mean track over the centre of gravity height (NHTSA), with the Elite's 1,555 mm rear track (R26). Report 17 found 1.02 with the bikes in the trailer and about 0.80 to 0.82 on the ute, both on the factory 1,460 mm rear track"}
+     why: "Half the mean track over the centre of gravity height (NHTSA), with the Elite's 1,555 mm rear track (report 26). Report 17 found 1.02 with the bikes in the trailer and about 0.80 to 0.82 on the ute, both on the factory 1,460 mm rear track"}
   - {id: UTE-12, title: "Each rear wheel and tyre within its rating", type: wheel, basis: both, cases: [UC3], severity: fail,
      why: "Half the rear axle load on each rear wheel. ROH rates the Trak 2 at 1,400 kg, which sets the Elite's 2,800 kg plate (decision H18), and the tyre carries 1,550 kg"}
   - {id: UTE-13, title: "Coupling point window laden inside VSB1's 350 to 460 mm", type: coupling, severity: fail,

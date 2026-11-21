@@ -1,0 +1,483 @@
+# report 20 energy model inputs. Read by research/models/20/energy.py. Revision 2, 20 Nov 2026: reports 19 and 21 figures in.
+# Units: W, minutes, hours, kWh, V. Times are hours after midnight (18.25 = 18:15).
+# side: ac = 230 V through the inverter-charger. dc = straight off the 48 V battery bus.
+#       dc24 or dc12 = on the 24 V or 12 V bus, through its DC-DC converters.
+# Cases: hot, hot_diesel, cold_diesel, cold_hp. A load gives "hot" and "cold". hot_diesel falls back to hot,
+# cold_diesel and cold_hp fall back to cold, unless the load overrides them. An empty spec {} means off.
+# A spec holds one or more of:
+#   events: [[start_h, minutes, W], ...]   timed use
+#   runs: [[start_h, end_h, W], ...]        steady draw over a period (end may pass 24, it wraps)
+#   hourly_w: [24 values]                   average W in each hour, 00:00 to 23:00
+#   kwh + profile (+ profile_window, scale) a daily energy shaped by a named profile, or kwh: auto
+#   peak_w                                  this case's peak, for the coincident-load check
+# standby_w applies whenever the load is not drawing. bus_peak_w is the peak used for the DC bus checks.
+# provisional: true = neither report 19 nor report 21 gives a figure. The reason is in the note.
+# basis: maker, retailer, calculated or estimate. (est.) marks a judgement.
+
+meta:
+  date: 2026-11-20
+  author: report 20
+  sources: "report 19 research/19-hvac-windows-doors.md, research/19-hvac-windows-doors.yaml, research/models/19/loads.out. Report 21 research/21-interior.md, research/21-interior.yaml. Report 13 for the fridge and freezer"
+  hot_day: "report 19: 42 C peak at 15:00, 27 C at 05:00, clear sky, 1,000 W/m2 at noon, inside 24 C"
+  cold_day: "report 19: cold night -5 C from 17:00 to 07:00, inside 20 C. The day 07:00 to 17:00 rises to 13 C at noon (report 20 est.)"
+
+system:
+  bus: 48                    # 16S LiFePO4, 51.2 V nominal
+  battery_location: inside   # inside (conditioned space) or underfloor
+  usable_fraction: 0.90      # H3
+  eol_capacity_fraction: 0.80          # Victron counts NG cycle life to 80 % of nominal (datasheet)
+  battery_discharge_efficiency: 0.96   # NG round trip 92 % (datasheet), split evenly
+  battery_charge_efficiency: 0.96
+  temperature_derating: {inside: 1.00, underfloor_hot: 1.00, underfloor_cold: 0.92}   # est.
+  # Daytime heating on the cold day only (07:00 to 17:00). Report 19 gives the night. All est. from report 19's figures.
+  thermal:
+    ua_w_per_k: 63               # report 19: 1,572 W loss at 25 K with no gains, fabric and ventilation
+    solar_gain_w_per_w_m2: 0.35  # est.
+    internal_gain_day_w: 350     # report 19 uses 233 to 368 W
+    internal_gain_night_w: 250
+    inside_cold_c: 20
+    cop_heat_at_minus5c: 2.9     # report 19 open point 1
+    cop_heat_rise_per_k: 0.114   # report 19: COP 3.7 at 2 C
+    cop_heat_max: 4.8            # Mitsubishi: COP 4.8 at 7 C rated heating
+  converters:
+    dc24: {efficiency: 0.89, idle_w: 8.2, volts: 24.2, continuous_a: 32, ten_second_a: 50,
+           note: "Two Victron Orion-Tr 48/24-16 in parallel: 16 A each at 40 C, 25 A for 10 s, 89 %, under 80 mA no-load at 51.2 V (Orion-Tr datasheet)"}
+    dc12: {efficiency: 0.87, idle_w: 8.2, volts: 12.2, continuous_a: 60, ten_second_a: 80,
+           note: "Two Victron Orion-Tr 48/12-30 in parallel: 30 A each at 40 C, 40 A for 10 s, 87 %, under 80 mA no-load (datasheet). Victron allows any number in parallel"}
+  inverter:
+    model: Victron MultiPlus-II 48/6k5/100-50
+    no_load_w: 28          # datasheet zero-load power (AES 18 W)
+    search_w: 8            # datasheet search mode
+    max_efficiency: 0.96
+    p_at_max_efficiency_w: 2000    # est., about a third of rated output
+    continuous_w_25c: 6000
+    continuous_w_40c: 5700
+    peak_w: 11000                  # for 1 min (datasheet)
+    always_on: {hot: true, hot_diesel: true, cold_hp: true, cold_diesel: false}   # false = search mode when no AC load
+
+# Load management. Tier 1 is cooking and the shower heater. Tier 2 (contactor S1) is background heat.
+interlocks:
+  groups:
+    tier1: [KI-01, KI-02, KI-03, SH-01]
+    tier2: [HW-01, LA-01, LA-02]
+  never_together:
+    - [KI-02, KI-03]     # oven and microwave are one appliance
+    - [SH-01, KI-02]     # the shower heater and the oven-microwave lock each other out (K2, K4)
+    - [SH-01, KI-03]
+    - [tier1, tier2]     # S1 opens while any tier 1 load draws
+  caps:
+    - {when: [SH-01], cap: {KI-01: 1000}}   # above 1 kW on the hob, K4 drops the shower heater
+  user_outlets_w: 300      # allowance for small appliances on the bench and living outlets (est.)
+  node_red_total_limit_w: 5500
+  dc_checks:
+    - {name: "12 V bus, worst living case (shower pump, water pump, UV, hood, Combi starting, fans, alarms, flush)", bus: dc12,
+       loads: [SH-02, WP-01, WP-02, RH-01, HE-01, VE-01, VE-02, SB-03, SN-01, SN-02, SB-05, TO-01]}
+    - {name: "12 V bus, the same with the XT Air compressor levelling", bus: dc12,
+       loads: [SH-02, WP-01, WP-02, RH-01, HE-01, VE-01, VE-02, SB-03, SN-01, SN-02, SB-05, TO-01, RG-04]}
+    - {name: "12 V bus, the same plus the external 12 V outlet at its 10 A fuse", bus: dc12,
+       loads: [SH-02, WP-01, WP-02, RH-01, HE-01, VE-01, VE-02, SB-03, SN-01, SN-02, SB-05, TO-01, RG-04, EX-12],
+       note: "Over for longer than 10 s only if the compressor, a shower and the outlet all run together."}
+    - {name: "24 V bus, worst parked case (fridge, freezer, lights, two laptops, phones, Starlink, top-up fan)", bus: dc24,
+       loads: [FR-01, FZ-01, LI-01, DE-01, DE-03, NE-01, VE-03]}
+    - {name: "24 V bus, the same in a parked dust storm with the RESPA-CF2 starting", bus: dc24,
+       loads: [FR-01, FZ-01, LI-01, DE-01, DE-03, NE-01, VE-03, VE-04]}
+    - {name: "24 V bus, towing (fridge, freezer, Starlink, RESPA-CF2 starting, low lights)", bus: dc24,
+       loads: [FR-01, FZ-01, NE-01, VE-04], allowance_w: 10}
+
+loads:
+  # ---------- HVAC (report 19) ----------
+  - id: AC-01
+    name: Mitsubishi MSZ-AP25VGKD2 and MUZ-AP25VGD2 inverter split, cooling and heating
+    side: ac
+    heavy: true
+    group: hvac
+    peak_w: 990            # maximum cooling input (report 19 table)
+    standby_w: 2           # est.
+    basis: maker
+    source: "report 19 research/models/19/loads.out: hourly AC-side input. Hot day 8.40 kWh AC, peak 912 W at 18:00. Cold night 6.14 kWh AC. Maximum input 0.99 kW cooling, 1.40 kW heating"
+    hot:
+      hourly_w: [114, 102, 96, 96, 102, 136, 206, 447, 327, 414, 600, 649, 646, 556, 574, 552, 501, 397, 912, 297, 204, 182, 158, 131]
+    cold_hp:
+      hourly_w: [462, 462, 462, 462, 462, 462, 427, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 430, 262, 469, 430, 430, 462, 462]
+      kwh: auto
+      profile: heating
+      profile_window: [7, 17]
+      peak_w: 1400
+      provisional: true
+      note: "report 19 gives 17:00 to 07:00 only. 07:00 to 17:00 is report 20's estimate from report 19's envelope and COP"
+    cold_diesel: {}
+  - id: VE-01
+    name: LUNOS e2 60 short, two pairs, with the 5/UNI-FT controller, 12 V
+    side: dc12
+    peak_w: 19
+    basis: maker
+    source: "report 19: 0.4 to 3.3 W a fan, about 6 W for 60 m3/h. 0.13 kWh on the hot day, 0.07 kWh over the 14 h cold night"
+    hot: {runs: [[0, 24, 5.4]]}
+    cold: {runs: [[7, 17, 5.4], [17, 31, 5.0]]}
+  - id: VE-02
+    name: LUNOS RA 15-60 wet room extract, 12 V
+    side: dc12
+    peak_w: 5
+    basis: maker
+    source: "report 19: 1.6 W at 30 m3/h, 5 W at 60 m3/h. 15 m3/h base, 60 m3/h for 50 min after each shower. 0.03 kWh a day"
+    hot: {runs: [[0, 24, 0.9]], events: [[7.0, 50, 4.1], [20.5, 50, 4.1]]}
+    cold: {runs: [[0, 24, 0.9]], events: [[7.0, 50, 4.1], [20.5, 50, 4.1]]}
+  - id: VE-03
+    name: Filtered top-up fan, 24 V EC, ePM1 and carbon filters
+    side: dc24
+    peak_w: 8
+    basis: estimate
+    source: "report 19: 3 to 8 W, 0.12 kWh on the hot day, 0.07 kWh over the cold night (est.)"
+    hot: {runs: [[0, 24, 5.0]]}
+    cold: {runs: [[0, 24, 5.0]]}
+  - id: VE-04
+    name: Sy-Klone RESPA-CF2 dust and smoke pressuriser, 24 V, towing and dust storms only
+    side: dc24
+    peak_w: 144
+    bus_peak_w: 288
+    basis: maker
+    source: "report 19: 144 W running, 288 W at start. Off on a parked design day"
+    hot: {}
+    cold: {}
+  - id: RH-01
+    name: Sphere TCR-001 range hood, two 12 V fans, ducted outside
+    side: dc12
+    peak_w: 50
+    basis: estimate
+    source: "report 19: 25 to 50 W, on low (about 34 W) for 1.75 h of cooking a day, 0.06 kWh"
+    hot: {runs: [[7.42, 7.83, 34], [12.5, 12.67, 34], [18.0, 19.17, 34]]}
+    cold: {runs: [[7.42, 7.83, 34], [12.5, 12.67, 34], [18.0, 19.17, 34]]}
+  - id: SN-01
+    name: CO2 sensor and Bluetooth adapter for the Cerbo GX
+    side: dc12
+    peak_w: 2
+    basis: estimate
+    source: "report 19: about 2 W, 0.05 kWh a day"
+    hot: {runs: [[0, 24, 2.0]]}
+    cold: {runs: [[0, 24, 2.0]]}
+  - id: SN-02
+    name: Cabin pressure display
+    side: dc12
+    peak_w: 1
+    basis: estimate
+    source: "report 19: under 1 W, 0.02 kWh a day"
+    hot: {runs: [[0, 24, 0.8]]}
+    cold: {runs: [[0, 24, 0.8]]}
+
+  # ---------- Refrigeration (report 13) ----------
+  - id: FR-01
+    name: Fridge, Dometic NRX 130C, 24 V compressor
+    side: dc24
+    peak_w: 65
+    basis: estimate
+    source: "Report 13 open point 7 basis, adjusted to a 24 C cabin on the hot day and 20 C on the cold day (est.)"
+    hot: {kwh: 0.75, profile: flat}
+    cold: {kwh: 0.45, profile: flat}
+  - id: FZ-01
+    name: Freezer, Dometic CFX3 55IM at -18 C, 24 V compressor
+    side: dc24
+    peak_w: 65
+    basis: estimate
+    source: "Report 13 open point 8 basis (est.)"
+    hot: {kwh: 0.80, profile: flat}
+    cold: {kwh: 0.45, profile: flat}
+
+  # ---------- Kitchen (report 21, H5). Hot drinks are boiled in a kettle on the hob (report 21) ----------
+  - id: KI-01
+    name: Dometic CVI1525 induction hob, 1,000 W and 1,300 W zones (1,700 W boost)
+    side: ac
+    heavy: true
+    group: kitchen
+    peak_w: 2300
+    standby_w: 0.5
+    basis: estimate
+    source: "report 21: 2,300 W total, no user setting caps it. 1.2 kWh a day including hot drinks at 0.11 kWh a litre (est.). Cold day adds 0.2 kWh of drinks (est.)"
+    hot: {events: [[7.5, 6, 1700], [7.6, 9, 1000], [12.5, 4, 1700], [15.5, 2, 1700], [18.25, 30, 1200], [19.0, 4, 1700]]}
+    cold: {events: [[7.5, 6, 1700], [7.6, 9, 1000], [10.5, 4, 1700], [12.5, 4, 1700], [15.5, 2, 1700], [18.25, 30, 1200], [19.0, 4, 1700], [21.0, 3, 1700]]}
+  - id: KI-02
+    name: Camec 053632 convection microwave, one 45 min bake at 180 C
+    side: ac
+    heavy: true
+    group: kitchen
+    peak_w: 1440
+    standby_w: 1
+    basis: estimate
+    source: "report 21: 1,440 W rated input, 0.6 kWh a bake: full power for 8 min of preheat, then the element cycles (est.)"
+    hot: {events: [[18.0, 8, 1440], [18.133, 37, 662]]}
+    cold: {events: [[18.0, 8, 1440], [18.133, 37, 662]]}
+  - id: KI-03
+    name: Camec 053632 in microwave mode, lunch reheat
+    side: ac
+    heavy: true
+    group: kitchen
+    duplicate_of: KI-02
+    peak_w: 1440
+    basis: estimate
+    source: "report 21 rated input. Use: 5 min a day (report 20 est.). Not in report 21's 5.4 kWh"
+    hot: {events: [[12.583, 5, 1440]]}
+    cold: {events: [[12.583, 5, 1440]]}
+
+  # ---------- Shower and hot water (report 21) ----------
+  - id: SH-01
+    name: DauerShower 2.0 heater, 230 V, 2 x 20 min
+    side: ac
+    heavy: true
+    group: water
+    peak_w: 2400
+    basis: estimate
+    source: "report 21: 2,400 W heater, 0.7 kWh from a cold start and 0.6 kWh from a hot start, less 0.024 kWh a shower on the 12 V side (SH-02). Cold day: two cold starts (est.)"
+    hot: {events: [[7.0, 6, 2400], [7.1, 14, 1870], [20.5, 3, 2400], [20.55, 17, 1610]]}
+    cold: {events: [[7.0, 6, 2400], [7.1, 14, 1870], [20.5, 6, 2400], [20.6, 14, 1870]]}
+  - id: SH-02
+    name: DauerShower 2.0 pump, UV-C and controls, 12 V
+    side: dc12
+    peak_w: 73
+    bus_peak_w: 122
+    basis: estimate
+    source: "report 21: 11 to 15 V at up to 10 A. 6 A average while running (est.)"
+    hot: {events: [[7.0, 20, 73], [20.5, 20, 73]]}
+    cold: {events: [[7.0, 20, 73], [20.5, 20, 73]]}
+  - id: HW-01
+    name: Truma Combi D 6 E 230 V element for hot water, set to 900 W
+    side: ac
+    heavy: true
+    group: water
+    peak_w: 1800           # the higher setting, in case it is chosen
+    basis: calculated
+    source: "report 21: 0.47 kWh of heat for 10 L of 60 C water plus 0.23 kWh of boiler loss, 0.7 kWh a day. Cold day: inlet 8 C (est.), so 1.3 times the heat, 0.84 kWh"
+    hot: {runs: [[0, 24, 9.6]], events: [[7.33, 13.3, 900], [13.0, 3.3, 900], [19.5, 6.7, 900], [20.85, 8, 900]]}
+    hot_diesel: {}
+    cold_hp: {runs: [[0, 24, 9.6]], events: [[7.33, 17.3, 900], [13.0, 4.3, 900], [19.5, 8.7, 900], [20.85, 10.4, 900]]}
+    cold_diesel: {}
+  - id: HE-01
+    name: Truma Combi D 6 E on diesel, 12 V fan, pump, glow plug and electronics
+    side: dc12
+    peak_w: 48
+    bus_peak_w: 100
+    basis: maker
+    source: "Truma manual: heater and boiler 1.8 to 4 A at 12 V, boiler only at most 1.8 A, burner fuse 20 A. Start current not published, 8 A for 2 min (est.). Hot water on diesel: 0.03 kWh a day (report 21). Cold night: 0.42 kWh at 12 V over 14 h (report 19)"
+    hot: {}
+    hot_diesel: {events: [[7.33, 2, 100], [7.367, 18, 22], [13.0, 2, 100], [13.033, 5, 22], [19.5, 2, 100], [19.533, 8, 22], [20.85, 2, 100], [20.883, 12, 22]]}
+    cold_diesel:
+      runs: [[17, 31, 30]]
+      kwh: auto
+      profile: heat_need
+      profile_window: [7, 17]
+      scale: 0.0239       # report 19: 0.42 kWh of 12 V per 17.6 kWh of heat
+      provisional: true
+      note: "report 19 gives the night. The 07:00 to 17:00 share is report 20's estimate at report 19's 12 V per kWh of heat"
+    cold_hp: {}
+
+  # ---------- Laundry (report 21, H6) ----------
+  - id: LA-01
+    name: Camec 051879 3.5 kg top-load washer, cold wash
+    side: ac
+    heavy: true
+    group: laundry
+    peak_w: 280
+    standby_w: 0.5
+    basis: estimate
+    source: "report 21: 280 W, cold wash only, 0.2 kWh and 44 L a load"
+    hot: {events: [[9.0, 45, 267]]}
+    cold: {events: [[9.0, 45, 267]]}
+  - id: LA-02
+    name: Haier HDHPS70LW1 7 kg heat-pump dryer, one 3.5 kg load
+    side: ac
+    heavy: true
+    group: laundry
+    peak_w: 1000
+    standby_w: 0.5
+    basis: estimate
+    source: "report 21: about 1,000 W (est.), 1.4 kWh a dry. Spread over 150 min at 560 W average (est.)"
+    hot: {events: [[10.0, 150, 560]]}
+    cold: {events: [[10.0, 150, 560]]}
+
+  # ---------- Living ----------
+  - id: LI-01
+    name: LED lighting, 24 V
+    side: dc24
+    peak_w: 40
+    basis: estimate
+    source: "30 W in the evening, 10 to 15 W in the morning (est.)"
+    hot: {runs: [[5.75, 6.5, 10], [19.0, 22.5, 30]]}
+    cold: {runs: [[6.0, 7.75, 15], [17.0, 22.5, 30]]}
+  - id: DE-01
+    name: Laptop 1 on a USB-C PD 100 W outlet at the desk
+    side: dc24
+    peak_w: 100
+    basis: estimate
+    source: "35 W average for 9 h of desk work, 90 % adapter loss folded in (est.)"
+    hot: {runs: [[8.0, 17.0, 39]]}
+    cold: {runs: [[8.0, 17.0, 39]]}
+  - id: DE-02
+    name: 27 inch monitor
+    side: ac
+    peak_w: 35
+    standby_w: 0.3
+    basis: estimate
+    source: "25 W typical for a 27 inch QHD monitor (est.)"
+    hot: {runs: [[8.0, 17.0, 25]]}
+    cold: {runs: [[8.0, 17.0, 25]]}
+  - id: DE-03
+    name: Laptop 2, phones and tablet on USB-C PD outlets
+    side: dc24
+    peak_w: 115
+    basis: estimate
+    source: "Laptop 30 W for 5 h, phones and tablet 50 Wh, 90 % adapter loss folded in (est.)"
+    hot: {runs: [[9.0, 12.0, 33], [19.0, 21.0, 33], [21.0, 23.0, 28]]}
+    cold: {runs: [[9.0, 12.0, 33], [19.0, 21.0, 33], [21.0, 23.0, 28]]}
+  - id: NE-01
+    name: Starlink Mini with its built-in router, 24 V
+    side: dc24
+    peak_w: 60
+    basis: maker
+    source: "Starlink: 20 to 40 W average, 12 to 48 V DC at 60 W. 32 W for 18 h, asleep 00:00 to 06:00"
+    hot: {runs: [[6.0, 24.0, 32]]}
+    cold: {runs: [[6.0, 24.0, 32]]}
+
+  # ---------- Water (report 21) ----------
+  - id: WP-01
+    name: Shurflo Trail King 7 water pump, 12 V, 2.1 bar
+    side: dc12
+    peak_w: 48
+    bus_peak_w: 60
+    basis: estimate
+    source: "report 21: 0.02 kWh a day. About 4 A running (est.), 5 A fuse (Shurflo data sheets)"
+    hot: {events: [[7.0, 2, 48], [7.75, 4, 48], [9.0, 6, 48], [13.0, 3, 48], [19.5, 6, 48], [20.5, 2, 48], [22.0, 2, 48]]}
+    cold: {events: [[7.0, 2, 48], [7.75, 4, 48], [9.0, 6, 48], [13.0, 3, 48], [19.5, 6, 48], [20.5, 2, 48], [22.0, 2, 48]]}
+  - id: WP-02
+    name: Acuva ArrowMAX 2.0 UV-LED on the drinking tap, 12 V
+    side: dc12
+    peak_w: 14
+    standby_w: 0.1
+    basis: maker
+    source: "report 21: about 14 W while water flows, 0.1 W standby, 0.002 kWh a day"
+    hot: {events: [[7.5, 2, 14], [12.5, 1, 14], [15.5, 1, 14], [19.0, 1, 14]]}
+    cold: {events: [[7.5, 2, 14], [12.5, 1, 14], [15.5, 1, 14], [19.0, 1, 14]]}
+  - id: WP-03
+    name: Transfer pump for filling from a creek or bore, 12 V
+    side: dc12
+    peak_w: 100
+    basis: estimate
+    source: "report 21: 0.01 kWh a day"
+    hot: {events: [[16.0, 6, 100]]}
+    cold: {events: [[16.0, 6, 100]]}
+  - id: TO-01
+    name: Thetford C223-CS electric flush, 12 V
+    side: dc12
+    peak_w: 25
+    basis: estimate
+    source: "report 21: 12 V flush pump. About 2 A for a few seconds, negligible energy (est.)"
+    hot: {}
+    cold: {}
+
+  # ---------- Bed (report 21) ----------
+  - id: BE-01
+    name: Lippert HappiJac lift bed, 12 V
+    side: dc12
+    peak_w: 122
+    basis: maker
+    source: "report 21: 12 V, 8 to 10 A while moving, 0.003 kWh a day"
+    hot: {events: [[6.5, 1, 110], [21.75, 1, 110]]}
+    cold: {events: [[6.5, 1, 110], [21.75, 1, 110]]}
+
+  # ---------- Chassis, outlets, standby ----------
+  - id: RG-04
+    name: Cruisemaster XT Air compressor, 12 V, levelling when parked
+    side: dc12
+    peak_w: 300
+    basis: estimate
+    source: "Not published. 25 A for a few minutes when levelling (est.). Not run on a design day"
+    hot: {}
+    cold: {}
+  - id: EX-12
+    name: External 12 V Anderson outlet, kerb side, 10 A fuse
+    side: dc12
+    peak_w: 120
+    basis: estimate
+    source: "User outlet. Not used on a design day"
+    hot: {}
+    cold: {}
+  - id: BH-01
+    name: Battery pad heater, only if the battery goes under the floor
+    side: dc
+    peak_w: 60
+    when_location: underfloor
+    basis: estimate
+    source: "Report 13 open point 9: about 0.2 kWh on a cold morning (est.)"
+    hot: {}
+    cold: {runs: [[3.0, 8.0, 40]]}
+  - id: SB-01
+    name: Cerbo GX MK2 and GX Touch 50
+    side: dc
+    peak_w: 5
+    basis: estimate
+    source: "Victron publishes no figure. About 3.5 W for both (est.)"
+    hot: {runs: [[0, 24, 3.5]]}
+    cold: {runs: [[0, 24, 3.5]]}
+  - id: SB-02
+    name: Lynx Smart BMS NG and battery self-discharge
+    side: dc
+    peak_w: 5
+    basis: maker
+    source: "BMS 2.6 W in ON mode (datasheet). NG self-discharge up to 3 % a month, about 1 W for 25.6 kWh"
+    hot: {runs: [[0, 24, 3.6]]}
+    cold: {runs: [[0, 24, 3.6]]}
+  - id: SB-03
+    name: Smoke and CO alarms, GPS tracker, security alarm, tank gauges, 12 V
+    side: dc12
+    peak_w: 5
+    basis: estimate
+    source: "About 3 W in all (est.)"
+    hot: {runs: [[0, 24, 3.0]]}
+    cold: {runs: [[0, 24, 3.0]]}
+  - id: SB-04
+    name: MPPT and charger standby on the 48 V bus
+    side: dc
+    peak_w: 2
+    basis: maker
+    source: "SmartSolar 10 mA at 48 V each (datasheet), about 1 W in all"
+    hot: {runs: [[0, 24, 1.0]]}
+    cold: {runs: [[0, 24, 1.0]]}
+  - id: SB-05
+    name: Breakaway kit battery charger, 12 V
+    side: dc12
+    peak_w: 5
+    basis: estimate
+    source: "Float charge of the breakaway kit's own battery, about 0.5 W (est.)"
+    hot: {runs: [[0, 24, 0.5]]}
+    cold: {runs: [[0, 24, 0.5]]}
+
+# Candidate battery banks. kwh_each is nominal. kg_each and price_each_aud are per module (research/20-electrical.yaml has the sources).
+# The first entry is the basis for the battery-mass sensitivity.
+battery_candidates:
+  - {name: "Victron Lithium NG 51.2 V 100 Ah x 4 (48 V)", modules: 4, kwh_each: 5.12, kg_each: 37, price_each_aud: 2911}
+  - {name: "Victron Lithium NG 51.2 V 100 Ah x 5 (48 V)", modules: 5, kwh_each: 5.12, kg_each: 37, price_each_aud: 2911}
+  - {name: "Victron Lithium NG 51.2 V 100 Ah x 6 (48 V)", modules: 6, kwh_each: 5.12, kg_each: 37, price_each_aud: 2911}
+  - {name: "Victron SuperPack NG 51.2 V 100 Ah x 5 (48 V)", modules: 5, kwh_each: 5.12, kg_each: 41, price_each_aud: 3250}
+  - {name: "Revolution Power 48 V 100 Ah CAN x 5 (48 V)", modules: 5, kwh_each: 5.12, kg_each: 40, price_each_aud: 5598}
+  - {name: "DIY 16S EVE MB31 314 Ah, JK BMS (48 V)", modules: 1, kwh_each: 16.08, kg_each: 105, price_each_aud: 4499}
+  - {name: "DIY 16S2P EVE MB31 314 Ah, JK BMS (48 V)", modules: 1, kwh_each: 32.15, kg_each: 205, price_each_aud: 9000}
+  - {name: "Victron Lithium NG 25.6 V 300 Ah x 3 (24 V)", modules: 3, kwh_each: 7.68, kg_each: 52, price_each_aud: 3675}
+  - {name: "Victron Lithium NG 25.6 V 300 Ah x 4 (24 V)", modules: 4, kwh_each: 7.68, kg_each: 52, price_each_aud: 3675}
+  - {name: "Enerdrive B-TEC 24 V 150 Ah x 7 (24 V)", modules: 7, kwh_each: 3.84, kg_each: 38.2, price_each_aud: 4608}
+
+# Recharge sources for one design hot day. ac_w is the continuous AC rating, dc_w a DC charge rate.
+recharge_sources:
+  - {name: "Honda EU22i, 1,800 W rated", ac_w: 1800, fuel_l_per_h: 1.2}
+  - {name: "Honda EU32i, 2,600 W rated", ac_w: 2600, fuel_l_per_h: 1.42}
+  - {name: "Two Honda EU22i in parallel, 3,600 W", ac_w: 3600, fuel_l_per_h: 2.4}
+  - {name: "Shore power, 10 A outlet", ac_w: 2300}
+  - {name: "Shore power, 15 A outlet", ac_w: 3450}
+  - {name: "Ute, 2 x Orion-Tr Smart 12/48-8, stock alternator (TC01)", dc_w: 720}
+  - {name: "Ute, 4 x Orion-Tr Smart 12/48-8, Jaylec 240 A alternator", dc_w: 1440}
+
+# Solar on the flat roof. kWh a day per kWp from PVGIS 5.3 (ERA5, horizontal, building-mounted, 14 % loss).
+# The design hot day uses report 19's sun (1,000 W/m2 noon, 12 h sine, 7.64 kWh/m2) at Alice Springs' January ratio 0.704.
+solar:
+  arrays_kwp: {"100 %": 1.72, "85 %": 1.46, "70 %": 1.20}
+  sites:
+    Design hot day: {"report 19 sun": 5.38}
+    Alice Springs: {"January mean": 5.16, "July mean": 3.24}
+    Broome: {"January mean": 4.39, "July mean": 3.64}
+    Hobart: {"January mean": 4.86, "June mean": 1.04}

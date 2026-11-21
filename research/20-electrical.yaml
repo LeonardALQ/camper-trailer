@@ -1,0 +1,295 @@
+# report 20 chosen products: the trailer's electrical system and the ute-side charger.
+# Units: mm, kg, W, V, Ah, kWh. Prices AUD including GST. Report: research/20-electrical.md.
+# Mass basis: maker, retailer, calculated, estimate. Price basis: listing, quote, estimate, converted.
+# side: trailer or ute. Dimensions are h x w x d unless noted. Prices checked 20 Nov 2026.
+products:
+  - id: E-01
+    function: House battery, 48 V bank, 25.6 kWh
+    maker: Victron Energy
+    model: Lithium NG LiFePO4 51.2 V 100 Ah
+    part_number: BAT548110620
+    side: trailer
+    qty: 5
+    mass_kg_each: 37.0
+    mass_basis: maker
+    mass_source: "https://cdn.shopify.com/s/files/1/0497/4749/3026/files/Datasheet-Lithium-NG-batteries-12_8V-25_6V-51_2V-EN.pdf?v=1739576641 (Victron marks it est.)"
+    dimensions_mm: [235, 648, 162]
+    power: "5.12 kWh each, 100 A (1C) continuous, 200 A for 10 s. Discharge -20 to +50 C, charge +5 to +50 C. IP65. 2,500 cycles at 80 % DoD to 80 % capacity. EN IEC 62619:2022 declared"
+    price_aud_each: 2911
+    price_url: "https://energyconnections.net.au/products/victron-lifepo4-battery-51-2v-100ah-ng-next-gen"
+    price_basis: listing
+    notes: "Stand upright or on a long side, never terminals down. Needs the Lynx Smart BMS NG (E-02). Conformity: https://www.victronenergy.com/upload/documents/Declaration-of-Conformity-Lithium-NG-Batteries.pdf"
+  - id: E-02
+    function: Battery management, main contactor and shunt
+    maker: Victron Energy
+    model: Lynx Smart BMS NG 500 A (M10)
+    part_number: LYN034160310
+    side: trailer
+    qty: 1
+    mass_kg_each: 1.9
+    mass_basis: maker
+    mass_source: "https://www.victronenergy.com/upload/documents/Datasheet-Lynx-Smart-BMS-NG-EN.pdf"
+    dimensions_mm: [190, 180, 80]
+    power: "2.6 W in ON mode. 500 A contactor. Up to 25 x 48 V batteries. Programmable relay, ATC and ATD outputs"
+    price_aud_each: 994
+    price_url: "https://energyconnections.net.au/products/victron-lynx-smart-bms-500-ng-m10"
+    price_basis: listing
+  - id: E-03
+    function: DC distribution busbar with fuses
+    maker: Victron Energy
+    model: Lynx Distributor (M10)
+    part_number: "not checked"
+    side: trailer
+    qty: 1
+    mass_kg_each: 1.5
+    mass_basis: estimate
+    mass_source: "Report 13 LA-04 estimate"
+    dimensions_mm: [190, 180, 80]
+    power: "Four MEGA fuse positions"
+    price_aud_each: 293
+    price_url: "https://energyconnections.net.au/products/victron-lynx-distributor-m10"
+    price_basis: listing
+  - id: E-04
+    function: Inverter-charger, 230 V 50 Hz
+    maker: Victron Energy
+    model: MultiPlus-II 48/6k5/100-50 230V
+    part_number: "not checked"
+    side: trailer
+    qty: 1
+    mass_kg_each: 29.0
+    mass_basis: maker
+    mass_source: "https://www.victronenergy.com/upload/documents/Datasheet-MultiPlus-II-inverter-charger-4k-4k5-6k5-10k-EN-.pdf"
+    dimensions_mm: [644, 320, 150]
+    power: "6.0 kW at 25 C, 5.7 kW at 40 C, 11 kW for 1 min. 96 % peak efficiency. Zero load 28 W, AES 18 W, search 8 W. Charger 100 A at 25 C, 95 A at 40 C. 50 A transfer switch"
+    price_aud_each: 1333
+    price_url: "https://energyconnections.net.au/products/victron-multiplus-ii-48-6k5-100-50-230v-inverter-charger"
+    price_basis: listing
+  - id: E-05
+    function: Solar charge controller, one per 2-panel string
+    maker: Victron Energy
+    model: SmartSolar MPPT 150/35
+    part_number: "not checked"
+    side: trailer
+    qty: 2
+    mass_kg_each: 1.25
+    mass_basis: maker
+    mass_source: "https://www.victronenergy.com/upload/documents/Datasheet-SmartSolar-charge-controller-MPPT-150-35-%26-150-45-EN.pdf"
+    dimensions_mm: [130, 186, 70]
+    power: "35 A charge, 2,000 W nominal PV at 48 V, 150 V PV limit, 98 % peak, 10 mA self-consumption at 48 V"
+    price_aud_each: 255
+    price_url: "https://www.solar4rvs.com.au/products/victron-smartsolar-mppt-150v-35a-12v-24v-48v-bluetooth-solar-charge-controller"
+    price_basis: listing
+  - id: E-06
+    function: 24 V house bus supply, two in parallel
+    maker: Victron Energy
+    model: Orion-Tr 48/24-16 isolated DC-DC converter
+    part_number: "not checked"
+    side: trailer
+    qty: 2
+    mass_kg_each: 1.6
+    mass_basis: maker
+    mass_source: "https://www.victronenergy.com/upload/documents/Datasheet-Orion-Tr-Smart-DC-DC-chargers-isolated-250-400W-EN.pdf (Smart version)"
+    dimensions_mm: [131, 187, 71]
+    power: "16 A at 24.2 V, 380 W each at 40 C, 89 %, no-load under 80 mA"
+    price_aud_each: 253
+    price_url: "https://www.solar4rvs.com.au/products/victron-orion-tr-48v-to-24v-16a-isolated-dc-dc-converter"
+    price_basis: listing
+  - id: E-07
+    function: 12 V bus supply, two in parallel (report 19 fans and hood, Truma Combi, DauerShower pump, water pump, UV, lift bed, flush, XT Air compressor, alarms)
+    maker: Victron Energy
+    model: Orion-Tr 48/12-30 isolated DC-DC converter
+    part_number: ORI481240110
+    side: trailer
+    qty: 2
+    mass_kg_each: 1.8
+    mass_basis: maker
+    mass_source: "Orion-Tr Smart datasheet, 12 V output models 1.8 kg"
+    dimensions_mm: [131, 187, 86]
+    power: "30 A each at 12.2 V and 40 C, 40 A for 10 s, 87 %, under 80 mA no-load. Any number may run in parallel (https://www.victronenergy.com/dc-dc-converters/orion-tr-dc-dc-converters-isolated)"
+    price_aud_each: 263
+    price_url: "https://www.solar4rvs.com.au/products/victron-orion-tr-48v-to-12v-30a-isolated-dc-dc-converter"
+    price_basis: listing
+    notes: "Worst living case on the 12 V bus 33 A, 58 A with the XT Air compressor (est. 25 A). One unit is not enough"
+  - id: E-08
+    function: System monitor, load-management logic and display
+    maker: Victron Energy
+    model: Cerbo GX MK2 with GX Touch 50
+    part_number: "not checked"
+    side: trailer
+    qty: 1
+    mass_kg_each: 0.6
+    mass_basis: estimate
+    mass_source: "Report 13 LA-04 estimate"
+    dimensions_mm: [78, 154, 48]
+    power: "About 3.5 W with the display (est.). Two relays (6 A to 30 V DC), four digital inputs"
+    price_aud_each: 616
+    price_url: "https://www.solar4rvs.com.au/products/victron-cerbo-gx-mk2-gx-touch-50-display-combo-1"
+    price_basis: listing
+  - id: E-09
+    function: Battery fuses, one 125 A MEGA per module, 6-way holder, bank busbars
+    maker: Victron Energy and generic
+    model: MEGA fuse 80 V range and 6-way MEGA fuse holder
+    part_number: "not checked"
+    side: trailer
+    qty: 1
+    mass_kg_each: 1.5
+    mass_basis: estimate
+    mass_source: "est."
+    dimensions_mm: [80, 300, 60]
+    power: "5 x 125 A MEGA"
+    price_aud_each: 360
+    price_url: "https://energyconnections.net.au/products/mega-fuse-80v-range-1pc (52 each), https://energyconnections.net.au/products/victron-fuse-holder-fully-assembled-6-way-for-mega-fuse (40)"
+    price_basis: "listing plus estimate for busbars"
+  - id: E-10
+    function: Battery compartment inside the cabin, sealed from it, vented outside
+    maker: fabricated
+    model: 2 mm 5052 aluminium box, gasketed lid, cable glands, 2 vents through the floor, 3 mm ceramic-fibre lining, heat detector, tray and straps
+    part_number: "-"
+    side: trailer
+    qty: 1
+    mass_kg_each: 18.0
+    mass_basis: estimate
+    mass_source: "2.3 m2 of 2 mm aluminium at 5.4 kg/m2 is 12.3 kg, lining 1.5 kg, tray and straps 4 kg (est.)"
+    dimensions_mm: [320, 900, 700]
+    power: "-"
+    price_aud_each: 1200
+    price_url: "-"
+    price_basis: estimate
+    notes: "Outside size h x X x Y. Five modules upright side by side, 5 x 162 mm plus 4 x 10 mm gaps along X"
+  - id: E-11
+    function: Main DC cables and lugs (bank 70 mm2, inverter 50 mm2, MPPT and converters 10 mm2)
+    maker: generic
+    model: Tinned flexible copper, double insulated
+    part_number: "-"
+    side: trailer
+    qty: 1
+    mass_kg_each: 6.0
+    mass_basis: estimate
+    mass_source: "70 mm2 at 0.7 kg/m x 3 m, 50 mm2 at 0.5 kg/m x 4 m, 10 mm2 x 12 m, lugs (est.)"
+    dimensions_mm: "-"
+    power: "-"
+    price_aud_each: 450
+    price_url: "-"
+    price_basis: estimate
+  - id: E-12
+    function: 230 V board, inlet and ute socket
+    maker: generic (Clipsal, Hager or ABB)
+    model: "Enclosure, 15 A appliance inlet with a 16 A RCBO, main switch, 10 RCBOs 30 mA (one per circuit, labelled inverter-supplied), 3 contactors with 24 V DC coils (K2 oven, K4 shower heater, S1 background loads), 3 current relays (hob, oven, shower heater), 300 A 60 V DC battery isolator, Anderson SB50 grey at the drawbar"
+    part_number: "-"
+    side: trailer
+    qty: 1
+    mass_kg_each: 4.7
+    mass_basis: estimate
+    mass_source: "est."
+    dimensions_mm: [300, 400, 120]
+    power: "-"
+    price_aud_each: 1480
+    price_url: "-"
+    price_basis: estimate
+  - id: E-13
+    function: Board panel and short wiring on it
+    maker: fabricated
+    model: "Board 800 x 700 mm, wiring on the board"
+    part_number: "-"
+    side: trailer
+    qty: 1
+    mass_kg_each: 5.0
+    mass_basis: estimate
+    mass_source: "Report 13 LA-04: board 2.5 kg, wiring 2.5 kg (est.)"
+    dimensions_mm: [700, 800, 20]
+    power: "-"
+    price_aud_each: 150
+    price_url: "-"
+    price_basis: estimate
+  - id: E-14
+    function: Roof solar array, 1,720 W in two strings of two
+    maker: Sunman
+    model: eArc SMF430F-12X12UW 430 W, glass-free, frameless, bonded
+    part_number: SMF430F-12X12UW
+    side: trailer
+    qty: 4
+    mass_kg_each: 7.3
+    mass_basis: maker
+    mass_source: "https://www.master-instruments.com.au/files/battery_information/e_arc_doing_more_web.pdf"
+    dimensions_mm: [2054, 1084, 2]
+    power: "430 W, Vmp 42.0 V, Imp 10.24 A, Voc 49.8 V, Isc 10.74 A"
+    price_aud_each: 669
+    price_url: "https://www.solar4rvs.com.au/products/sunman-earc-430w-flexible-solar-panel-1"
+    price_basis: listing
+    notes: "Dimensions L x W x thickness. Unchanged from report 13 (RF-01). Adhesive and cable stay in RF-02, 2 kg (est.)"
+  - id: E-15
+    function: Panel adhesive and PV cable
+    maker: as Sunman specifies
+    model: "Adhesive, 6 mm2 double-insulated PV cable, MC4, roof gland"
+    part_number: "-"
+    side: trailer
+    qty: 1
+    mass_kg_each: 2.0
+    mass_basis: estimate
+    mass_source: "RF-02, report 13 (est.)"
+    dimensions_mm: "-"
+    power: "-"
+    price_aud_each: 250
+    price_url: "-"
+    price_basis: estimate
+  - id: E-16
+    function: Generator pair, run in parallel. Puts a hot day back in 6.3 h, or 8.4 h while the household runs
+    maker: Honda
+    model: EU22i (2 units) with the Honda parallel cable
+    part_number: "EU22i"
+    side: trailer
+    qty: 2
+    mass_kg_each: 21.1
+    mass_basis: maker
+    mass_source: "https://powerequipment.honda.com.au/models/generators/eu22/specifications"
+    dimensions_mm: [425, 509, 290]
+    power: "1,800 W rated each, 3,600 W in parallel. 3.6 L tank, 3.0 h at rated load (about 1.2 L/h). LwA 89 dB(A)"
+    price_aud_each: 1850
+    price_url: "https://generatorstore.com.au/products/honda-eu22i-inverter-generator-twin-combo-pack (3,550 for two) plus about 150 for the parallel cable (est.)"
+    price_basis: "listing plus estimate"
+    notes: "Dimensions h x L x W. The current schedule carries one (GS-01). Fallback: one Honda EU32i, 26.5 kg, 2,600 W rated, AUD 3,799 (https://generatorstore.com.au/products/honda-eu32i-3200-watt-inverter-generator)"
+  - id: TC01
+    function: "Car build line TC01: trailer charging from the ute while driving. Two chargers in the bike box front, fed from the ute battery"
+    maker: Victron Energy and generic
+    model: "2 x Orion-Tr Smart 12/48-8 isolated DC-DC charger with their 12 V feed, fusing, engine-run signal, mounting and fitting"
+    part_number: "Orion-Tr Smart 12/48-8 (380 W)"
+    side: ute
+    qty: 1
+    mass_kg_each: 8.4
+    mass_basis: "maker 3.6, calculated 2.1, estimate 2.7"
+    mass_source: "Chargers 1.8 kg each (Orion-Tr Smart datasheet). 2 B&S cable 6 m at 0.35 kg/m (calculated). Fuses, tails, signal wire, plate and lugs 2.7 kg (est.)"
+    dimensions_mm: [131, 187, 86]
+    power: "360 W each at 40 C (430 W at 25 C), 8 A at 48.2 V, 89 %, input 8 to 17 V. Two draw about 62 A at 13 V. 720 W into the trailer, 3.6 kWh on a 5 h drive"
+    price_aud_each: 1612
+    price_url: "https://www.solar4rvs.com.au/products/victron-12v-to-48v-orion-tr-8a-380w-isolated-charger"
+    price_basis: "listing for the parts, estimate for the labour"
+    price_date: "2026-11-20"
+    parts:
+      - {item: "Victron Orion-Tr Smart 12/48-8 isolated charger", qty: 2, aud_each: 325.95, basis: listing, url: "https://www.solar4rvs.com.au/products/victron-12v-to-48v-orion-tr-8a-380w-isolated-charger", note: "AUD 356 at Energy Connections, https://energyconnections.net.au/products/victron-orion-tr-smart-12-48-8a-380w-isolated-dc-dc-charger"}
+      - {item: "ANL fuse holder and 100 A ANL fuse at the ute battery", qty: 1, aud_each: 17.80, basis: listing, url: "https://www.solar4rvs.com.au/products/exotronic-anl-fuse-holder (9.90), https://www.solar4rvs.com.au/products/exotronic-anl-fuse-100a (7.90)"}
+      - {item: "2 B&S (32 mm2) single-core cable, red 3 m and black 3 m, battery to the chargers", qty: 6, aud_each: 14.90, basis: listing, url: "https://www.solar4rvs.com.au/products/2bs-red-single-core-automotive-cable-per-metre"}
+      - {item: "4-way MIDI fuse holder with cover and two 50 A MIDI fuses, one per charger input", qty: 1, aud_each: 36.80, basis: listing, url: "https://www.solar4rvs.com.au/products/exotronic-4-way-midi-fuse-holder-with-cover (29.00), https://www.solar4rvs.com.au/products/exotronic-midi-ami-ans-fuse-50a (3.90)"}
+      - {item: "6 B&S twin cable, 2 m of tails to the charger inputs", qty: 2, aud_each: 14.90, basis: listing, url: "https://www.solar4rvs.com.au/products/6bs-twin-core-automotive-cable-per-metre"}
+      - {item: "3 mm twin cable, 5 m, ignition signal to both remote inputs", qty: 5, aud_each: 3.20, basis: listing, url: "https://www.solar4rvs.com.au/products/3mm-twin-core-automotive-cable-per-metre"}
+      - {item: "Mounting plate and vented cover in the bike box front", qty: 1, aud_each: 60, basis: estimate}
+      - {item: "Lugs, glue-lined heat shrink, grommets, rubber-lined clips", qty: 1, aud_each: 60, basis: estimate}
+      - {item: "Auto electrician, 5 h at AUD 130 an hour, includes TW06", qty: 1, aud_each: 650, basis: estimate}
+    notes: "Replaces report 23's AUD 3,500 placeholder. The 2 B&S feed and TW06's 8 B&S run are sized for the upgrade, so the upgrade adds only the alternator and two chargers"
+    upgrade: "Jaylec BKS-240LC Black Series 240 A alternator for the VDJ LandCruiser (240 A cold, 218 A hot), AUD 795 incl. GST (722.73 ex tax at Marks 4WD, https://www.marks4wd.com/engine/alternators/, 20 Nov 2026), in place of RF04. Add two more Orion-Tr Smart 12/48-8 (651.90), a 150 A ANL fuse (7.90), two 50 A MIDI fuses (7.80) and 2 h of fitting (260, est.). 1,440 W, 7.2 kWh on a 5 h drive, about 130 A from the alternator. +3.7 kg"
+  - id: TW06
+    function: "Car build line TW06, revised: the 48 V charging feed from the chargers to the towbar"
+    maker: generic
+    model: "Two inline MIDI holders with 23 A fuses on the chargers' outputs, 8 B&S twin cable 7 m, grey Anderson SB50 in a flush-mount panel at the towbar"
+    part_number: "-"
+    side: ute
+    qty: 1
+    mass_kg_each: 1.9
+    mass_basis: "calculated 1.5, estimate 0.4"
+    mass_source: "8 B&S twin 7 m at 0.21 kg/m (calculated). Fuses, panel, clips 0.4 kg (est.)"
+    dimensions_mm: "-"
+    power: "16 A at 48 V now, 32 A after the upgrade. 1.0 V drop at 32 A over the 14 m loop (calculated)"
+    price_aud_each: 123
+    price_url: "https://www.solar4rvs.com.au/products/8bs-twin-core-automotive-cable-per-metre (9.90 a metre), https://www.solar4rvs.com.au/products/exotronic-flush-mount-50a-anderson-plug-panel (12.00), https://www.solar4rvs.com.au/products/exotronic-midi-in-line-single-ami-ans-fuse-holder (6.90), https://www.solar4rvs.com.au/products/exotronic-midi-ami-ans-fuse-23a-m6 (3.90)"
+    price_basis: "listing plus 20 of clips (est.)"
+    price_date: "2026-11-20"
+    notes: "Replaces report 23's TW06 (6 B&S, 50 A fuse at the battery, AUD 250 est.). Grey SB50 housings do not mate with red 12 V ones. RF14 is the upgrade alternator above and stays optional"

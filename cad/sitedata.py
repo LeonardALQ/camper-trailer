@@ -36,7 +36,16 @@ RESEARCH = [
     ("16-ute-limits.md", "LandCruiser 79 limits, GVM, GCM, brakes, wheels and towing", 16),
     ("17-ute-garage.md", "The enclosed motorbike garage on the LandCruiser 79", 17),
     ("18-trailer-layout-79.md", "The trailer’s layout for the LandCruiser 79", 18),
+    ("19-hvac-windows-doors.md", "HVAC, fresh air, windows, doors and the wet room shell", 19),
+    ("20-electrical.md", "The trailer’s electrical system and energy model", 20),
+    ("21-interior.md", "Lift bed, desk, kitchen, laundry, shower and water system", 21),
+    ("22-trailer-prices.md", "Trailer prices outside the new interior", 22),
+    ("25-roof.md", "Roof study, fixed roof against a raising roof", 25),
+    ("26-elite-wheels.md", "What the Lovells Elite kit needs from the wheels, track and brakes", 26),
 ]
+# research reports 23 and 24 are the car build and bike box plans themselves, so the index points at their pages
+RESEARCH_PLANS = [("23", "The car build plan", "`VEHICLE.md`, the Car build page", "../tow-vehicle/"),
+                  ("24", "The bike box design", "`UTE-GARAGE.md`, the Bike box page", "../ute-garage/")]
 # sections of VEHICLE.md shown on the Car build page, in order. The stage table, the parts list and every total are
 # rendered from data/vehicle/vehicle-parts.yaml instead, so the page types no figure itself.
 VEHICLE_TOP = ("Summary", "Stage plan")
@@ -310,6 +319,40 @@ def project_costs(box_totals, proj=None) -> dict:
                 car=dict(budget=car["budget"], gap=car["gap"], closing=car["closing"], with_closing=car["with_closing"]))
 
 
+RESEARCH_STATUS = {
+    12: "Record. The body's design basis, behind `BODY.md`",
+    13: "Record. The appliances and equipment, partly replaced by reports 19 to 21",
+    14: "Record. The engine plan behind `VEHICLE.md`",
+    15: "Record. The driveline plan behind `VEHICLE.md`",
+    16: "Record. The ute's limits behind the ute model",
+    17: "Record. The bike box study behind `UTE-GARAGE.md`",
+    18: "Record. The trailer's layout study before the home trailer",
+    19: "Record, 20 Nov 2026. HVAC, fresh air, windows, doors and the wet room shell, for decisions H4, H7 and H8",
+    20: "Record, 20 Nov 2026. The 48 V system, which passes decision H3",
+    21: "Record, 20 Nov 2026. The bed, desk, kitchen, laundry, shower and water system, for decisions H1, H1a, H4a, H5 and H6",
+    22: "Record, 20 Nov 2026. The prices of the lines the interior left unchanged, the labour and the NSW compliance",
+    25: "Record, 20 Nov 2026. The fixed roof with rounded front edges, decision H12",
+    26: "Record, 21 Nov 2026. The Elite kit's wheels, rear track and brakes, decisions H18 and H19",
+}
+
+
+def research_index():
+    """The research index page: every report with its status, and reports 23 and 24, which are the car build and
+    bike box plans in the repository."""
+    rows = [(fname[:2], f"[{title}](./{fname[:-3]}/)", "Archived (decision H9)" if order <= 11 else RESEARCH_STATUS[order])
+            for fname, title, order in RESEARCH]
+    rows += [(n, f"[{title}]({url})", f"In the repository as {where}") for n, title, where, url in RESEARCH_PLANS]
+    rows.sort(key=lambda r: r[0])
+    out = ["---\ntitle: Research index\nsidebar:\n  order: 0\n---\n\n",
+           "The research behind the design, one report per question, with its sources. Reports 01 to 11 are the record "
+           "from the Porsche Cayenne plan and the trailer with its own garage, kept as written. Reports 23 and 24 are "
+           "the car build plan and the bike box design themselves, so they live in the repository as `VEHICLE.md` and "
+           "`UTE-GARAGE.md`. Each report's data files and models are in `research/` in the repository.\n\n",
+           "| Report | Title | Status |\n|---|---|---|\n"]
+    out += [f"| {n} | {title} | {status} |\n" for n, title, status in rows]
+    (DOCS / "research" / "index.md").write_text("".join(out), encoding="utf-8")
+
+
 def main():
     for d in (GEN, SITE / "public" / "models", SITE / "public" / "downloads" / "drawings", SITE / "public" / "drawings",
               DOCS / "research"):
@@ -373,13 +416,14 @@ def main():
         text = re.sub(r"\]\((\d\d-[a-z0-9-]+)\.md\)", r"](../\1/)", text)
         # the YAML files beside a report are in the repository only, so name them instead of linking
         text = re.sub(r"\[[^\]]+\]\((\d\d-[a-z0-9-]+\.yaml)\)", r"`research/\1`", text)
-        archived = ("**Archived** (decision H9): this report is the record from before the LandCruiser 79 plan, kept as written "
+        archived = ("Archived (decision H9). This report is the record from before the LandCruiser 79 plan, kept as written "
                     "and not updated. Where it differs from the Car build, Bike box and Trailer pages, they are current.\n\n"
                     if order <= 11 else "")
         body = (f"---\ntitle: '{title}'\nsidebar:\n  order: {order}\n---\n\n" + archived +
                 f"This is research report {fname[:2]}, copied unchanged from `research/{fname}` apart from its first heading.\n\n"
                 + text)
         (DOCS / "research" / fname).write_text(body, encoding="utf-8")
+    research_index()
     print(f"site data written: {len(RESEARCH)} research pages, {len(live)} live drawings "
           f"({len(reg['drawings']) - len(live)} retired), car build page with {n_parts} parts, box parts list with {len(box['lines'])} lines, "
           f"trailer parts list with {len(trailer['lines'])} lines")

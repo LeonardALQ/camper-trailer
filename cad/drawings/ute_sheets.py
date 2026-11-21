@@ -224,7 +224,7 @@ def ct701(prj, model, bom, checks, reg, dwg):
 
 def _detail_b(sh, x0, ytop, P, V, L):
     """Detail B, the road-side rear tub flare cut at the rear axle, looking forward (the kerb side is its mirror), at 1:2,
-    in the free space under the checks. Decision H19, R26 fix A."""
+    in the free space under the checks. Decision H19, report 26 fix A."""
     k = 0.5
     y_lo, y_hi, z_lo, z_hi = 868.0, 952.0, -16.0, 140.0
     yb = ytop - 12 - (z_hi - z_lo) * k
@@ -264,7 +264,7 @@ def _detail_b(sh, x0, ytop, P, V, L):
     S.leader(sh, (X(870), Z(tub - tub_t)), (x0 - 4, Z(40)), "TUB TOP 3.0 5052-H32", size=1.6)
     S.leader(sh, (X(tyre_y), Z(0)), (x0 - 4, Z(10)), "REAR TYRE, STATIC TO FULL BUMP", size=1.6)
     for i, t in enumerate((f"ON THE ELITE'S {V['track_rear']:.0f} REAR TRACK THE TYRE'S OUTER FACE IS",
-                           f"{tyre_y:.1f} FROM THE CENTRELINE, {skin_in - tyre_y:.0f} FROM THE BODY'S SKIN (R26).",
+                           f"{tyre_y:.1f} FROM THE CENTRELINE, {skin_in - tyre_y:.0f} FROM THE BODY'S SKIN (RESEARCH REPORT 26).",
                            "THE FLARE KEEPS TOYOTA'S 30 OUTSIDE THE TYRE (UGW-03).",
                            f"BOX {2 * fl_out:.0f} OVER THE FLARES, MAX {L['flare_width_max_mm']:.0f}, BODY {P['outside_w']:.0f} (UTE-09, H19).")):
         sh.text(tx + 4, Z(48) - 3 * i, t, 1.6)

@@ -24,8 +24,8 @@
 # `part` is the part of the project the input belongs to: car (the LandCruiser 79 car build, VEHICLE.md), box (the bike
 # box, UTE-GARAGE.md) or trailer. The Measurements page filters by it, for example /measurements/?part=car.
 #
-# Revision of 20 Nov 2026, later: R23's car build inputs (VEH-01 to VEH-27, group Car build) and R24's bike box
-# inputs (BOX-01 to BOX-19, group Bike box) are merged in, and R23's UTE-01 replaces the earlier one. Their design
+# Revision of 20 Nov 2026, later: report 23's car build inputs (VEH-01 to VEH-27, group Car build) and report 24's bike box
+# inputs (BOX-01 to BOX-19, group Bike box) are merged in, and report 23's UTE-01 replaces the earlier one. Their design
 # values come from the model with the 180 L tank, the trailer charging and the 1.6 mm box roof.
 inputs:
   # ================================================================ the ute (report 16, data/ute/ute.yaml)
@@ -70,7 +70,7 @@ inputs:
     thresholds:
       - {at: 0.10, rule: "More than 10 % away from the model's fully loaded towball means the centre of gravity estimates are wrong: weigh the parts again before relying on the axle position", src: "Report 02 MASS-07 asks for differences over 2 % in mass to be explained. 10 % on the towball is this layout's rule"}
 
-  # ================================================================ the car build (R23, VEHICLE.md), group Car build
+  # ================================================================ the car build (report 23, VEHICLE.md), group Car build
   # ================================================================ engine and driveline health, stage S0 (the branch switch)
   - id: VEH-01
     group: Car build
@@ -104,13 +104,13 @@ inputs:
     title: Blow-by at the oil filler, hot, 2,000 rpm, no load
     how: "Same visit. Blow-by flow meter on the oil filler with the breather outlet blocked, engine at working temperature. Hold 2,000 rpm for 30 s and read the flow. This is also the baseline for later checks."
     unit: L/min
-    estimate: {v: 50, src: "R23 estimate (est.): about 1 % of the intake flow at 2,000 rpm (4.5 L x 1,000 intake cycles a minute, 4,500 L/min). No Toyota figure was found"}
+    estimate: {v: 50, src: "Report 23 estimate (est.): about 1 % of the intake flow at 2,000 rpm (4.5 L x 1,000 intake cycles a minute, 4,500 L/min). No Toyota figure was found"}
     measured: {v: null, date: null}
     stage: buy
     affects: [branch A or B]
     thresholds:
       - {at: 100, rule: "Over 100 L/min, or the filler cap lifting off at idle, take branch A", src: "Twice the estimate (est.)"}
-    range: {min: 0, max: 100, src: "R23 estimate (est.)"}
+    range: {min: 0, max: 100, src: "Report 23 estimate (est.)"}
   - id: VEH-04
     group: Car build
     part: car
@@ -122,8 +122,8 @@ inputs:
     stage: buy
     affects: [branch A or B, FS01, cut CUT1]
     thresholds:
-      - {at: 25, rule: "Over 25 %, or a stored injector fault, take branch A, because worn injectors wash the bores. Cut CUT1 is then off", src: "R23 estimate (est.). No Denso or Toyota limit for this test was found, so a Denso specialist's bench test overrides it"}
-    range: {min: 0, max: 25, src: "R23 estimate (est.)"}
+      - {at: 25, rule: "Over 25 %, or a stored injector fault, take branch A, because worn injectors wash the bores. Cut CUT1 is then off", src: "Report 23 estimate (est.). No Denso or Toyota limit for this test was found, so a Denso specialist's bench test overrides it"}
+    range: {min: 0, max: 25, src: "Report 23 estimate (est.)"}
   - id: VEH-05
     group: Car build
     part: car
@@ -136,7 +136,7 @@ inputs:
     affects: [branch A or B, ID01]
     thresholds:
       - {at: 20, rule: "Over 20 ppm means dust got past the air filter seal. Inspect the intake. If iron and chromium are high too, take branch A", src: "Silicon should sit low, and any rise with iron and chromium points to an air filter seal failure (https://heavyvehicleinspection.com/blog/post/diesel-engine-oil-analysis-reading-results). The 20 ppm figure is an estimate (est.)"}
-    range: {min: 0, max: 20, src: "Heavy Vehicle Inspection guide (link above) and R23 estimate"}
+    range: {min: 0, max: 20, src: "Heavy Vehicle Inspection guide (link above) and report 23 estimate"}
   - id: VEH-06
     group: Car build
     part: car
@@ -188,8 +188,8 @@ inputs:
     stage: buy
     affects: [branch A or B, CG01, CG09]
     thresholds:
-      - {at: 0, rule: "Slip, crunch or whine: take branch A, because the clutch and gearbox come out with the engine in S2", src: "Plan rule (R23): the gearbox is removed only once"}
-    range: {min: 1, max: 1, src: "Plan rule (R23)"}
+      - {at: 0, rule: "Slip, crunch or whine: take branch A, because the clutch and gearbox come out with the engine in S2", src: "Plan rule (report 23): the gearbox is removed only once"}
+    range: {min: 1, max: 1, src: "Plan rule (report 23)"}
   # ================================================================ power, stage S6 (same dyno, same day)
   - id: VEH-10
     group: Car build
@@ -228,9 +228,9 @@ inputs:
     stage: build
     affects: [TL01, EGT]
     thresholds:
-      - {at: 18, rule: "Under 18 psi at full load: look for a boost leak or a vane fault before towing hard", src: "R23 estimate (est.)"}
+      - {at: 18, rule: "Under 18 psi at full load: look for a boost leak or a vane fault before towing hard", src: "Report 23 estimate (est.)"}
       - {at: 24, rule: "Over 24 psi steady: ask the tuner to hold the design target", src: "GTurbo design target"}
-    range: {min: 18, max: 24, src: "GTurbo booklet page 15 and R23 estimate"}
+    range: {min: 18, max: 24, src: "GTurbo booklet page 15 and report 23 estimate"}
   - id: VEH-13
     group: Car build
     part: car
@@ -277,26 +277,26 @@ inputs:
     title: Gearbox oil temperature, same tow
     how: Read the gearbox sender (CG11) at the same point as VEH-14. Repeat after the tune.
     unit: °C
-    estimate: {v: 95, src: "R23 estimate (est.)"}
+    estimate: {v: 95, src: "Report 23 estimate (est.)"}
     measured: {v: null, date: null}
     stage: trailer built
     affects: [gearbox cooler, CG09]
     thresholds:
-      - {at: 110, rule: "Over 110 °C sustained: fit a gearbox oil cooler before the next long tow", src: "R23 estimate (est.). No Toyota limit for the H152F was found, and report 15 plans no cooler until the senders show one is needed"}
-    range: {min: 0, max: 110, src: "R23 estimate (est.)"}
+      - {at: 110, rule: "Over 110 °C sustained: fit a gearbox oil cooler before the next long tow", src: "Report 23 estimate (est.). No Toyota limit for the H152F was found, and report 15 plans no cooler until the senders show one is needed"}
+    range: {min: 0, max: 110, src: "Report 23 estimate (est.)"}
   - id: VEH-17
     group: Car build
     part: car
     title: Rear diff oil temperature, same tow
     how: Read the rear diff sender (CG11) at the same point as VEH-14.
     unit: °C
-    estimate: {v: 100, src: "R23 estimate (est.)"}
+    estimate: {v: 100, src: "Report 23 estimate (est.)"}
     measured: {v: null, date: null}
     stage: trailer built
     affects: [rear diff, ball load]
     thresholds:
-      - {at: 120, rule: "Over 120 °C sustained: check the diff oil and backlash (DL10) and consider a diff cooler", src: "R23 estimate (est.). No Toyota limit was found"}
-    range: {min: 0, max: 120, src: "R23 estimate (est.)"}
+      - {at: 120, rule: "Over 120 °C sustained: check the diff oil and backlash (DL10) and consider a diff cooler", src: "Report 23 estimate (est.). No Toyota limit was found"}
+    range: {min: 0, max: 120, src: "Report 23 estimate (est.)"}
   # ================================================================ weights on a public weighbridge (stages S0 and S5)
   - id: VEH-18
     group: Car build
@@ -403,7 +403,7 @@ inputs:
     affects: [box floor height 834 mm, box subframe, coupling height]
     thresholds:
       - {rule: "The box subframe packing follows the measured value so the floor stays at 834 mm. Outside the range, re-check the floor and tub heights", src: "Report 17 section 6.4"}
-    range: {min: 750, max: 800, src: "R23 estimate (est.), the model value plus or minus about 25 mm"}
+    range: {min: 750, max: 800, src: "Report 23 estimate (est.), the model value plus or minus about 25 mm"}
   - id: VEH-26
     group: Car build
     part: car
@@ -436,13 +436,13 @@ inputs:
     title: Rear track on the Elite's housing, laden, tyre centre to tyre centre
     how: "Stage S4, the Elite fitted and the ute loaded to the trip mass (or 650 kg of ballast over the rear axle) on level ground. Mark the middle of each rear tyre's tread on the ground in front of and behind the tyre, measure across between the marks and average the two. Before the box's tubs and flares are finished."
     unit: mm
-    estimate: {v: 1555, src: "R26: Lovells' housing brings the rear in line with the front, Toyota's 1,555 mm on ET 0 wheels (estimate). Toyota's factory rear track is 1,460 mm"}
+    estimate: {v: 1555, src: "Report 26: Lovells' housing brings the rear in line with the front, Toyota's 1,555 mm on ET 0 wheels (estimate). Toyota's factory rear track is 1,460 mm"}
     measured: {v: null, date: null}
     stage: build
     affects: [wheel_y, wheel tubs, rear tub flares, UGW-02, UGW-03, UTE-09, UTE-11]
     thresholds:
       - {rule: "Build the tubs and flares to the measured track: wheel_y in data/assemblies/ute-garage.yaml is half of it, and UGW-02 and UGW-03 run again before the floor is finished", src: "Toyota BBGJ1007 p. 28, UGW-02, UGW-03"}
-      - {at: 1577, rule: "Above 1,577 mm the flares, with Toyota's 30 mm outside the tyre, pass UTE-09's 1,910 mm: a wheel with more positive offset, or a higher floor (R26 fix B)", src: "UTE-09, decision H19"}
+      - {at: 1577, rule: "Above 1,577 mm the flares, with Toyota's 30 mm outside the tyre, pass UTE-09's 1,910 mm: a wheel with more positive offset, or a higher floor (report 26 fix B)", src: "UTE-09, decision H19"}
     range: {min: 1460, max: 1577, src: "Max: the flares stay inside UTE-09's 1,910 mm with 30 mm outside the tyre (942.5 mm inner face at 1,555 mm, 11 mm more each side at 1,577 mm). Min: Toyota's factory 1,460 mm rear track (BBGJ1007). Inside the range the tubs and flares are built to the measured track"}
   # ================================================================ wheel and supplier answers (reports 06 and 16)
   - id: WHL-01
@@ -633,7 +633,7 @@ inputs:
     thresholds:
       - {rule: "The front tyre's leading edge sits this far behind the box's front wall, so both bikes move with it", src: "UTE-GARAGE.md"}
 
-  # ================================================================ the bike box (R24, UTE-GARAGE.md), group Bike box
+  # ================================================================ the bike box (report 24, UTE-GARAGE.md), group Bike box
   # ================================================================ before the build: the bought ute
   - id: BOX-01
     group: Bike box

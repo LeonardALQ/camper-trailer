@@ -1,0 +1,237 @@
+# report 19 chosen products: HVAC, fresh air, dust, extraction, controls, windows, doors, steps and the wet room.
+# Units: mm, kg, W, kWh per design day, AUD including GST. Report: research/19-hvac-windows-doors.md.
+# Mass and price basis: maker (published figure), listing (retailer or maker shop), converted (foreign price at
+# 1 USD = 1.55 AUD or 1 EUR = 1.68 AUD), estimate. Dimensions are L x W x H.
+# Design days are those of research/models/19/loads.py: hot day 42 C peak, 27 C night, inside 24 C. Cold night -5 C, inside 20 C, 14 h.
+# Energy: hot = design hot day, cold = design cold night. "ac" is the 230 V side, "dc" the 12 or 24 V side.
+checked: 2026-11-20
+products:
+  - id: R19-01
+    function: Cooling and heating, indoor unit
+    maker: Mitsubishi Electric
+    model: MSZ-AP25VGKD2 (kit MSZAP25VGKD2KIT with the outdoor unit)
+    part_number: MSZAP25VGKD2KIT
+    qty: 1
+    mass_kg: 10.5
+    mass_basis: maker
+    dims_mm: [798, 219, 299]
+    power_w: {cooling_min: 210, cooling_rated: 500, cooling_max: 990, heating_min: 350, heating_rated: 670, heating_max: 1400, max_current_a: 7.1}
+    energy_kwh: {hot_ac: 8.4, hot_battery: 9.0, cold_ac_heat_pump: 6.1, cold_battery_heat_pump: 6.6, worst_12h_hot_ac: 6.6, peak_hot_w: 912}
+    price_aud: 1299
+    price_basis: listing, kit with the outdoor unit
+    price_url: https://www.jbhifi.com.au/products/mitsubishi-mszap25vgkd2kit-2-5kw-hi-wall-split-system-reverse-cycle-air-conditioner
+    source: https://www.mitsubishielectric.com.au/product/msz-ap25-80vgd-split-system-air-conditioner/
+    notes: >-
+      2.5 kW cooling (1.10 to 3.60 kW), EER 5.12, 3.2 kW heating (1.3 to 5.0 kW). Cooling to 46 C and heating to -15 C
+      outside. R32, 0.7 kg, no extra charge to 10 m of pipe. High on the living side of the wet room partition, beside
+      the inner door, blowing forward. No ducts. Condensate through a trap to the wet room floor waste. Hourly profile
+      in research/models/19/loads.out. Assumed no maker's warranty in a trailer.
+  - id: R19-02
+    function: Cooling and heating, outdoor unit
+    maker: Mitsubishi Electric
+    model: MUZ-AP25VGD2
+    part_number: in kit MSZAP25VGKD2KIT
+    qty: 1
+    mass_kg: 35
+    mass_basis: maker
+    dims_mm: [800, 285, 550]
+    power_w: {included: R19-01}
+    energy_kwh: {included: R19-01}
+    price_aud: 0
+    price_basis: in the R19-01 kit price
+    price_url: https://www.jbhifi.com.au/products/mitsubishi-mszap25vgkd2kit-2-5kw-hi-wall-split-system-reverse-cycle-air-conditioner
+    notes: >-
+      46 dB(A) outside, 3 dB(A) lower in night mode. High on the rear wall on the side away from the rear door, or on the
+      front wall behind a stone guard after the jack-knife check. Not on a side wall: its 285 mm depth breaks the
+      2,500 mm width limit.
+  - id: R19-03
+    function: Vehicle mounting package for the split
+    maker: Installer, from stock parts
+    model: Aluminium cradle on four stainless wire-rope isolators, perforated guard with lift-off travel cover, braided vibration absorbers on both lines, press or brazed fittings, rubber-lined clamps at 300 mm, indoor backing plate with two safety straps, condensate trap
+    part_number: none
+    qty: 1
+    mass_kg: 11
+    mass_basis: estimate
+    dims_mm: [900, 400, 650]
+    power_w: 0
+    energy_kwh: 0
+    price_aud: 1500
+    price_basis: estimate, parts and licensed refrigeration install
+    price_url: none
+    notes: Isolators about 9 kg each at 6 to 8 Hz loaded (est.). ARC-licensed installer, nitrogen pressure test, vacuum to 500 microns.
+  - id: R19-04
+    function: Cold-weather and low-battery heating, hot water (kept, H7)
+    maker: Truma
+    model: Combi D 6, Australian version
+    part_number: see report 13 LA-03
+    qty: 1
+    mass_kg: 19.4
+    mass_basis: maker 17.2 kg plus ducts and flue kit 2.2 kg (estimate)
+    dims_mm: [525, 450, 300]
+    power_w: {dc_12v_min: 22, dc_12v_max: 48}
+    energy_kwh: {cold_dc: 0.42, cold_diesel_l: 1.9}
+    price_aud: 0
+    price_basis: unchanged line, priced in report 13
+    price_url: https://www.truma.com/au/products/heating-systems-au/combi-heaters-au/combi-d-6/
+    notes: On the design cold night it saves 6.2 kWh of battery against the heat pump. Report 21 adds the hot-water energy.
+  - id: R19-05
+    function: Fresh air with heat recovery
+    maker: LUNOS
+    model: e2 60 short, two pairs, MERV 13 Comfort Screen inner covers, sound-insulated stainless outer hoods
+    part_number: e2 kit as LUN-040268-2MS at 475 Supply (short fans). Australian distributor Ampvolt
+    qty: 4
+    mass_kg: 1.2
+    mass_basis: estimate, each fan with sleeve, cover and hood
+    dims_mm: [171, 154, 154]
+    power_w: {each_min: 0.4, each_max: 3.3, total_at_60_m3h: 6}
+    energy_kwh: {hot_dc: 0.13, cold_dc: 0.07}
+    price_aud: 1024.50
+    price_basis: converted, per fan (two kits of two at USD 1,322 each, MERV 13 and standard grill, 475 Supply), hoods extra
+    price_url: https://475.supply/products/lunos-e-kit
+    source: https://cdn.shopify.com/s/files/1/2642/2036/files/TechInfo_e260_E348-02.20.pdf?v=1621935013
+    notes: >-
+      5 to 60 m3/h a pair, 83 % recovery to 60 m3/h, 12 V DC, pressure stable to 20 Pa (EN 13141-8 class S1).
+      Settings: day 30 m3/h a pair, night 22.5, boost 60. Ø162 mm hole, 200 mm sleeve, 165 mm inside the 35 mm wall.
+      One pair in the bed and desk zone, one in the kitchen and living zone, one fan high on each side wall.
+  - id: R19-06
+    function: Fresh air and extract controller
+    maker: LUNOS
+    model: 5/UNI-FT universal control with humidity sensor, with power supply 5/NT18
+    part_number: 5/UNI-FT 040269
+    qty: 1
+    mass_kg: 0.5
+    mass_basis: estimate
+    dims_mm: [80, 80, 50]
+    power_w: 1
+    energy_kwh: {included: R19-05}
+    price_aud: 0
+    price_basis: one controller is in each e2 kit
+    price_url: https://cdn.shopify.com/s/files/1/0694/2117/0961/files/lunos-advanced-controller-settings-guide-June-2024.pdf
+    notes: Runs at 12 V DC. Supply it from the Orion 24/12-70 rather than the 230 V power supply, so ventilation needs no inverter.
+  - id: R19-07
+    function: Wet room extract
+    maker: LUNOS
+    model: RA 15-60 radial exhaust fan in a 9/R 160 sleeve, on the 5/UNI-FT
+    part_number: RA 15-60 039996
+    qty: 1
+    mass_kg: 1.2
+    mass_basis: estimate
+    dims_mm: [200, 154, 154]
+    power_w: {at_30_m3h: 1.6, at_60_m3h: 5}
+    energy_kwh: {hot_dc: 0.03, cold_dc: 0.02}
+    price_aud: 700
+    price_basis: estimate
+    price_url: https://cdn.shopify.com/s/files/1/2642/2036/files/Installation_Manual_RA_15-60_final.pdf?v=1634725895
+    notes: 15 m3/h base while the top-up fan runs, 60 m3/h during each shower and 30 min after. High in the wet room's road-side wall. A second unit reaches the NCC's 90 m3/h (owner option).
+  - id: R19-08
+    function: Towing and dust-storm pressurisation, smoke filtration
+    maker: Sy-Klone
+    model: RESPA-CF2, 24 V, brushless motor, RadialSHIELD MERV 16 (F9) filter, odour (carbon) filter
+    part_number: not chosen (the 24 V brushless CF2 with MERV 16 and odour filters)
+    qty: 1
+    mass_kg: 6
+    mass_basis: estimate, not published
+    dims_mm: [450, 300, 300]
+    power_w: {running: 144, start: 288}
+    energy_kwh: {hot_dc: 0, cold_dc: 0, towing_dc_per_h: 0.144}
+    price_aud: 3000
+    price_basis: estimate, not published (a 24 V motor alone is USD 490)
+    price_url: http://www.sy-klone.com/air-quality-systems/fresh-air-systems/
+    notes: >-
+      0 to 221 m3/h ideal, 425 m3/h at most. Powered precleaner removes at least 90 % of dust at 5 µm before the filter.
+      -40 to +85 C. Intake high on the front wall above the bike box line, behind a mesh stone guard. Runs from the ute
+      through the Orion-Tr while towing. Fallback: Carafan Sahara CP700, AUD 1,890, https://carafan.com.au/product/carafan-sahara-white/
+  - id: R19-09
+    function: Parked overpressure and smoke-mode fresh air
+    maker: Built from stock parts
+    model: 24 V EC radial fan with 0 to 10 V or PWM speed input in a sealed aluminium box, ISO coarse prefilter, ePM1 80 % panel filter, carbon cassette
+    part_number: none
+    qty: 1
+    mass_kg: 2.5
+    mass_basis: estimate
+    dims_mm: [350, 250, 200]
+    power_w: {min: 3, max: 8}
+    energy_kwh: {hot_dc: 0.12, cold_dc: 0.07}
+    price_aud: 350
+    price_basis: estimate
+    price_url: none
+    notes: 15 m3/h parked (about +3 Pa at an ELA of 30 cm2), 40 m3/h in wind or dust (about +20 Pa). Intake through the front wall.
+  - id: R19-10
+    function: Pressure relief
+    maker: Automotive part
+    model: Body pressure-relief valve with a rubber flap, about 30 cm2 free area, under a hood
+    part_number: none
+    qty: 1
+    mass_kg: 0.2
+    mass_basis: estimate
+    dims_mm: [120, 80, 30]
+    power_w: 0
+    energy_kwh: 0
+    price_aud: 40
+    price_basis: estimate
+    price_url: none
+    notes: Low in the rear wall of the wet room, so the excess air sweeps the wet room and leaves into the rear wake.
+  - id: R19-11
+    function: Cabin pressure display
+    maker: Dwyer class or Sy-Klone
+    model: 0 to 125 Pa differential gauge, or RESPA Advisor+ 2.0
+    part_number: none
+    qty: 1
+    mass_kg: 0.3
+    mass_basis: estimate
+    dims_mm: [120, 120, 60]
+    power_w: 1
+    energy_kwh: 0.02
+    price_aud: 300
+    price_basis: estimate
+    price_url: https://sy-klone.com/support/pressure-monitor-installation-guidelines/
+    notes: One port inside, one in a sheltered spot outside. A falling reading shows a blocked filter or a failed seal.
+  - id: R19-12
+    function: Kitchen range hood
+    maker: Sphere (Coast RV)
+    model: TCR-001 touch-control range hood, two 12 V fans, variable speed, aluminium mesh filter
+    part_number: 700-06200 (Coast RV)
+    qty: 1
+    mass_kg: 6
+    mass_basis: estimate, hood 5 kg plus 100 mm duct and wall cowl with backdraft flap 1 kg
+    dims_mm: [600, 300, 120]
+    power_w: {low: 25, high: 50}
+    energy_kwh: {hot_dc: 0.06, cold_dc: 0.04}
+    price_aud: 350
+    price_basis: estimate (trade price not published)
+    price_url: https://www.coastrv.com.au/products/sphere-range-hood-with-touch-control
+    notes: Flow not published. Assumed 100 m3/h on low, 150 m3/h at most. Vent through the side wall, not the solar roof.
+  - id: R19-13
+    function: Sensors for the Cerbo GX
+    maker: Ruuvi, Sensirion-based sensor, USB Bluetooth adapter
+    model: Three RuuviTag (bed, living, wet room), one SCD41-class NDIR CO2 sensor with Modbus or MQTT, one USB Bluetooth adapter
+    part_number: none
+    qty: 1
+    mass_kg: 0.4
+    mass_basis: estimate
+    dims_mm: [60, 60, 30]
+    power_w: 2
+    energy_kwh: 0.05
+    price_aud: 400
+    price_basis: estimate
+    price_url: https://www.victronenergy.com/blog/2022/1/31/venus-os-v2-80
+    notes: Venus OS reads RuuviTags natively. Venus OS Large Node-RED boosts the e2 pairs above 900 ppm CO2 through a Cerbo relay and runs the modes.
+  # Windows: Dometic S4 top-hinged, double acrylic grey tint, PU frame, ECE R43, aluminium-coated blackout roller blind and
+  # fly screen roller in the inner frame, 26 mm wall as delivered, 9 mm spacer strips for the 35 mm wall.
+  # Prices EUR incl. VAT at wohnwagen-fenster.com (20 Nov 2026) converted at 1.68 unless noted. Dims are the outer frame, depth est.
+  - {id: R19-14, function: "Window W1, bed, emergency exit", maker: Dometic, model: S4 top-hinged 900 x 600, part_number: "9104115572", qty: 1, mass_kg: 9.2, mass_basis: maker, dims_mm: [948, 70, 631], cutout_mm: [902, 599], clear_mm: [804, 454], power_w: 0, energy_kwh: 0, price_aud: 890, price_basis: "converted, EUR 530", price_url: "https://www.wohnwagen-fenster.com/produkt/ausstellfenster/dometic-s4-ausstellfenster-rahmenfenster-rollo-camping-wohnwagen-wohnmobil/", notes: "Sill about 960 mm above the floor, level with the night mattress. Clear opening 0.365 m2 meets the project escape rule."}
+  - {id: R19-15, function: "Window W2, bed", maker: Dometic, model: S4 top-hinged 900 x 450, part_number: "9104115569", qty: 1, mass_kg: 8.0, mass_basis: maker, dims_mm: [948, 70, 481], cutout_mm: [902, 448], clear_mm: [804, 304], power_w: 0, energy_kwh: 0, price_aud: 719, price_basis: "converted, EUR 428", price_url: "https://www.wohnwagen-fenster.com/produkt/ausstellfenster/dometic-s4-ausstellfenster-rahmenfenster-rollo-camping-wohnwagen-wohnmobil/", notes: "Outer frame head at most 1,600 mm above the floor."}
+  - {id: R19-16, function: "Window W3, desk", maker: Dometic, model: S4 top-hinged 900 x 450, part_number: "9104115569", qty: 1, mass_kg: 8.0, mass_basis: maker, dims_mm: [948, 70, 481], cutout_mm: [902, 448], clear_mm: [804, 304], power_w: 0, energy_kwh: 0, price_aud: 719, price_basis: "converted, EUR 428", price_url: "https://www.wohnwagen-fenster.com/produkt/ausstellfenster/dometic-s4-ausstellfenster-rahmenfenster-rollo-camping-wohnwagen-wohnmobil/", notes: "On a side wall. On the front wall only with a hinged aluminium stone shutter (about 3 kg, est.)."}
+  - {id: R19-17, function: "Window W4, kitchen", maker: Dometic, model: S4 top-hinged 700 x 450, part_number: "9104115558", qty: 1, mass_kg: 6.5, mass_basis: maker, dims_mm: [745, 70, 481], cutout_mm: [702, 448], clear_mm: [604, 304], power_w: 0, energy_kwh: 0, price_aud: 605, price_basis: "converted, EUR 360", price_url: "https://www.wohnwagen-fenster.com/produkt/ausstellfenster/dometic-s4-ausstellfenster-rahmenfenster-rollo-camping-wohnwagen-wohnmobil/"}
+  - {id: R19-18, function: "Window W5, living area", maker: Dometic, model: S4 top-hinged 900 x 550, part_number: "9104115571", qty: 1, mass_kg: 8.6, mass_basis: maker, dims_mm: [948, 70, 581], cutout_mm: [902, 549], clear_mm: [804, 404], power_w: 0, energy_kwh: 0, price_aud: 811, price_basis: "converted, EUR 482.79 at Camping Factory", price_url: "https://www.camping-factory.com/dometic-seitz-s4-ausstellfenster-900-x-550-mm"}
+  - {id: R19-19, function: "Window W6, wet room, obscured", maker: Dometic, model: S4 top-hinged 500 x 450 with frosted film on the inner pane, part_number: "9104115546", qty: 1, mass_kg: 5.1, mass_basis: "maker 5.0 plus film 0.1 (estimate)", dims_mm: [544, 70, 480], cutout_mm: [500, 448], clear_mm: [404, 304], power_w: 0, energy_kwh: 0, price_aud: 551, price_basis: "converted, EUR 310, plus film AUD 30 (estimate)", price_url: "https://www.wohnwagen-fenster.com/produkt/ausstellfenster/dometic-s4-ausstellfenster-rahmenfenster-rollo-camping-wohnwagen-wohnmobil/"}
+  - {id: R19-20, function: "Clip-in blackout covers for W1 and W2", maker: Made to fit, model: 3 mm black ABS panel clipped into the S4 inner frame, part_number: none, qty: 2, mass_kg: 0.6, mass_basis: estimate, dims_mm: [804, 3, 454], power_w: 0, energy_kwh: 0, price_aud: 30, price_basis: estimate each, price_url: none, notes: "Total darkness at night. Stows behind the blind cassette."}
+  # Doors
+  - {id: R19-21, function: "Entry door, kerb side", maker: Aussie Traveller, model: "DC Caravan Door with Pleated Blind, 1,750 x 622, no vent, black, round top corners, hinged on its front edge", part_number: "71917500622080 (LH) or 71917500622081 (RH)", qty: 1, mass_kg: 21, mass_basis: "listing (shipping mass)", dims_mm: [622, 60, 1750], power_w: 0, energy_kwh: 0, price_aud: 1549.99, price_basis: listing, price_url: "https://aussietraveller.com.au/products/caravan-dc-door-with-pleated-blind-left-hand-hinge", notes: "Triple compression lock, water and dust resistant seal, tinted acrylic window with tracked pleated block-out blind, security screen door, walls 25 to 40 mm. Replaces the 1,623 mm DC door of BD-07. Clear width about 570 mm (est.)."}
+  - {id: R19-22, function: "Rear door into the wet room", maker: Aussie Traveller, model: "DC Caravan Door with Pleated Blind, 1,750 x 622, no vent, black, round top corners", part_number: "71917500622080 (LH) or 71917500622081 (RH)", qty: 1, mass_kg: 21, mass_basis: "listing (shipping mass)", dims_mm: [622, 60, 1750], power_w: 0, energy_kwh: 0, price_aud: 1549.99, price_basis: listing, price_url: "https://aussietraveller.com.au/products/caravan-dc-door-with-pleated-blind-right-hand-hinge", notes: "Opens outward (VSB1 13.2.1). Wider option 1,750 x 675 (71417500675120, AUD 1,579.99) has a vent that would be sealed."}
+  # Steps
+  - {id: R19-23, function: "Fold-out steps, entry door and rear door", maker: Torklift, model: "GlowStep Revolution Uprising, doorway-mounted, four steps with landing gear", part_number: "not confirmed (four-step Uprising)", qty: 2, mass_kg: 15, mass_basis: estimate each, dims_mm: [700, 250, 1000], power_w: 0, energy_kwh: 0, price_aud: 1400, price_basis: "converted estimate each (about USD 900)", price_url: "https://www.torklift.com/products/steps-and-handrails/glowstep-revolution-uprising", notes: "Stows upright inside the door opening, so nothing hangs under the body. Take the five-step if four do not reach 925 mm. Keep a 250 mm zone clear inside the rear door."}
+  # Wet room
+  - {id: R19-24, function: "Wet room floor tray", maker: "Innovative Composites (VIC) or World Class Composites, one-off from a plug", model: "GRP tray 2,330 x 1,000 mm, 4 to 5 mm laminate with gelcoat, 100 mm upstands, falls 1:60 on an H80 wedge, 30 mm lips at both doors, linear channel at the rear door, 40 mm floor waste", part_number: none, qty: 1, mass_kg: 24, mass_basis: "estimate, tray 21 kg and cove trims and sealant 3 kg", dims_mm: [2330, 1000, 130], power_w: 0, energy_kwh: 0, price_aud: 1900, price_basis: "estimate, tray with plug 1,800 and trims 100", price_url: "https://innovativecomposites.com.au/", notes: "Walls and ceiling are the body's own gelcoat GRP skins. Fill test to the lip for 24 h before fit-out."}
+  - {id: R19-25, function: "Sand grate at the rear door", maker: Stainless linear drain, model: "Drop-in stainless linear grate about 600 x 100 mm over a lift-out sand basket", part_number: none, qty: 1, mass_kg: 2, mass_basis: estimate, dims_mm: [600, 100, 40], power_w: 0, energy_kwh: 0, price_aud: 150, price_basis: estimate, price_url: none}
+  - {id: R19-26, function: "Outdoor rinse at the rear door", maker: Watermarked (Campervan Builders), model: "External Shower Box, hot and cold mixer, hand shower, lockable", part_number: "external-shower-box-watermarked-white", qty: 1, mass_kg: 1.5, mass_basis: estimate, dims_mm: [250, 110, 200], power_w: 0, energy_kwh: 0, price_aud: 159, price_basis: listing, price_url: "https://campervanbuilders.com.au/products/external-shower-box-watermarked-white", notes: "On the rear wall beside the door's handle side, about 1,000 mm above the ground. Non-return valve on each line. Report 21 counts the water (2 rinses of 5 L a day assumed)."}

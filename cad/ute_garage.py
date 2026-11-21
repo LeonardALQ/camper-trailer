@@ -48,7 +48,7 @@ def rhs_plastic_modulus(b: float, d: float, t: float) -> float:
 
 
 def crossmember_check(prj, model, P) -> dict:
-    """UGR-03: a steel crossmember under a track row carries a strap's breaking load at any of its anchors (R24). The
+    """UGR-03: a steel crossmember under a track row carries a strap's breaking load at any of its anchors (report 24). The
     crossmember spans between Toyota's two brackets at its station and runs on outboard of them to the walls. The
     vertical part of the breaking load bends it: simply supported between the brackets, or as a cantilever outboard.
     The capacity is AS 4100's 0.9 fy Ze, with Ze the plastic modulus of the compact RHS laid flat."""
@@ -80,7 +80,7 @@ def crossmember_check(prj, model, P) -> dict:
                 round(u, 3), round(1 - u, 3), u <= 1.0, f"{worst['strap']} anchor at Y {worst['y']:.0f}, {where} the brackets",
                 f"{f_kn:.1f} kN breaking load x {worst['cz']:.2f} vertical x {worst['lever']:.0f} mm = {worst['m']:.2f} kN m, against "
                 f"0.9 x {fy:.0f} MPa x {s_mm3:,.0f} mm3 = {cap:.2f} kN m for the RHS {b:g} x {h:g} x {t:g} laid flat. Brackets at Y +/-{yb:.0f}",
-                "R24: an anchor withstands its strap's breaking load (NTC guide p. 201), so the crossmember under it must too. "
+                "Research report 24: an anchor withstands its strap's breaking load (NTC guide p. 201), so the crossmember under it must too. "
                 "AS 4100 clause 5.1: the section is compact, so Ze is the plastic modulus.", unit="")
 
 
@@ -237,7 +237,7 @@ def build_garage(prj: Project | None = None, limits: dict | None = None):
                        kn <= ad, f"{res['worst']['strap']} {res['worst']['worst_case']}",
                        f"{kn:.2f} kN at the worst strap's anchor, which reaches the frame through the steel crossmember",
                        "An anchor withstands its strap's breaking load (NTC Load Restraint Guide 2018 p. 201, report 03): "
-                       f"{ad:g} kN for the LC 500 kg straps (R24).", unit="kN"))
+                       f"{ad:g} kN for the LC 500 kg straps (report 24).", unit="kN"))
     checks.append(crossmember_check(prj, model, P))
     drop, L = P.get("ground_drop"), 3048.0
     ang = math.degrees(math.asin(drop / L))

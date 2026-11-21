@@ -3,7 +3,7 @@
 # centreline, positive to the road (right) side. Z up from the ground with the trailer level at design ride height.
 # Units are mm and kg.
 #
-# Revision J, 21 Nov 2026: the home trailer (layout study home/layout-home.md, decisions H1 to H17). The body stays
+# Revision J, 21 Nov 2026: the home trailer (TRAILER.md revision J, decisions H1 to H19). The body stays
 # 4,420 x 2,400 mm with a fixed roof 2,000 mm inside (H1a, H12) and rounded front edges. From the front: the lift bed
 # over the desk (H1), the kitchen on the road side and the battery plinth with the washer and dryer on the kerb side,
 # the partition with the 48 V board and the split's indoor unit, and the wet room across the rear with its own door
@@ -93,7 +93,7 @@ params:
   body_x1: drawbar_length + body_length
   in_x0: body_x0 + end_wall_t
   in_x1: body_x1 - end_wall_t
-  # ---------------------------------------------------------------- the zones inside the body (home/layout-home.md section 2)
+  # ---------------------------------------------------------------- the zones inside the body (TRAILER.md)
   bed_u1: 1590               # bed and desk zone u 0 to 1,590: the lift bed over the desk, nothing else under it (H1)
   living_u1: 3330            # living zone to u 3,330: the kitchen on the road side, the plinth with the laundry on the kerb side
   part_t: 20                 # partition between the living zone and the wet room
@@ -307,7 +307,7 @@ items:
     for: {s: [1, -1]}
     box: [body_x0, s * (half_bw - wall_t / 2) - wall_t / 2, floor_z, body_length, wall_t, interior_h]
     parts:
-      - {item: "8.84 m2 less the wall's openings at 6.0 kg/m2: road side less 0.94 m2 (W2, W4, W6, the RESPA intake, hood cowl, Combi cowl and e2 fan B), kerb side less 1.79 m2 (W1, entry door, e2 fan A, cassette door)", kg: "47.4 * (1 + s) / 2 + 42.3 * (1 - s) / 2", basis: calculated, source: "Report 12 section 10, home/layout-home.md section 5"}
+      - {item: "8.84 m2 less the wall's openings at 6.0 kg/m2: road side less 0.94 m2 (W2, W4, W6, the RESPA intake, hood cowl, Combi cowl and e2 fan B), kerb side less 1.79 m2 (W1, entry door, e2 fan A, cassette door)", kg: "47.4 * (1 + s) / 2 + 42.3 * (1 - s) / 2", basis: calculated, source: "Report 12 section 10, TRAILER.md"}
       - {item: "Insert strips, and four RHS 40 x 20 x 3 lift-bed hardpoints per pair of walls are in LB-06", kg: 3.0, basis: estimate}
   - id: BD-04
     name: End walls, full height, the rear wall with the wet room door
@@ -317,7 +317,7 @@ items:
     for: {e: [0, 1]}
     box: [body_x0 + e * (body_length - end_wall_t), -half_in, floor_z, end_wall_t, 2 * half_in, interior_h]
     parts:
-      - {item: "Front wall 4.61 m2 at 6.7 kg/m2 (2.0 mm outer skin against stones) less e2 fans C and D, or rear wall 3.48 m2 at 6.0 kg/m2 less the rear door, rinse box, relief valve and extract fan", kg: "30.9 * (1 - e) + 20.9 * e", basis: calculated, source: "Report 12 section 10, home/layout-home.md section 5"}
+      - {item: "Front wall 4.61 m2 at 6.7 kg/m2 (2.0 mm outer skin against stones) less e2 fans C and D, or rear wall 3.48 m2 at 6.0 kg/m2 less the rear door, rinse box, relief valve and extract fan", kg: "30.9 * (1 - e) + 20.9 * e", basis: calculated, source: "Report 12 section 10, TRAILER.md"}
       - {item: Brackets, kg: 0.5, basis: estimate}
   - id: BD-07
     name: Entry door, Aussie Traveller DC 1,750 x 622 with pleated blind, no vent, kerb side, hinged on its front edge
@@ -586,7 +586,7 @@ items:
     zone: drawbar_box
     box: [dbx_x0 + 15, -dbx_w / 2 + 20, dbx_z0 + dbx_t + 10, 290, 1038, 425]
     mass: {basis: declared, total_kg: 42.2, maturity: spec, source: "https://powerequipment.honda.com.au/models/generators/eu22/specifications", note: "Honda EU22i, 21.1 kg dry each (Honda Australia, report 20 E-16)"}
-    note: Each 509 x 290 x 425 mm, turned with its 290 mm width along the trailer. They run on the ground beside the trailer, never in the box. The pair puts a design hot day back in 6.3 h, or 8.4 h while the household runs (report 20, conductor ruling).
+    note: Each 509 x 290 x 425 mm, turned with its 290 mm width along the trailer. They run on the ground beside the trailer, never in the box. The pair puts a design hot day back in 6.3 h, or 8.4 h while the household runs (report 20).
   - id: GS-02
     name: Honda parallel cable
     system: stowage
@@ -1006,7 +1006,7 @@ items:
     zone: inside
     box: [in_x0, -800, floor_z + 100, 165, 162, 162]
     mass: {basis: declared, total_kg: 1.2, maturity: estimate, source: "Report 19 R19-05 (est.)"}
-    note: The bed zone's side walls have no room left, so the bed-zone fans sit low on the front wall in bulkhead boxes beside the desk ends (phase 0).
+    note: The bed zone's side walls have no room left, so the bed-zone fans sit low on the front wall in bulkhead boxes beside the desk ends (layout study).
   - id: VE-01D
     name: Fresh air with heat recovery, LUNOS e2 60 fan D (pair 2), low in the front wall beside the desk, road side
     material: "Fan with a ceramic regenerator in a 200 mm sleeve, MERV 13 inner cover, stainless outer hood"
@@ -1162,7 +1162,7 @@ items:
     zone: inside
     box: [rear_x0 - 100, 700, floor_z + 1325, 100, 320, 230]
     mass: {basis: declared, total_kg: 6.0, maturity: estimate, source: "https://dauershower.com/wp-content/uploads/2026/07/DauerShower-Anleitung_DLE.pdf", note: "Technical unit 3.5 kg (maker) plus the switching unit, panel and hoses (est., report 21)"}
-    note: 230 V mode, about 5 L a shower. Its heater sheds when the hob or the oven runs, and the 12 V mode then tops the loop up with boiler water (conductor ruling, report 21 section 6).
+    note: 230 V mode, about 5 L a shower. Its heater sheds when the hob or the oven runs, and the 12 V mode then tops the loop up with boiler water (report 21 section 6).
   - id: WR-10
     name: DauerShower well under the shower drain, sealed and insulated GRP, 300 x 400 x 120 mm below the shower floor, service panel from below
     material: "GRP shell with closed-cell foam insulation"

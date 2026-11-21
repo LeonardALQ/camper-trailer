@@ -150,7 +150,7 @@ trailer_checks:
     cases: all
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: The battery plinth, washer and dryer sit on the kerb side. 50 mm is the conductor's estimated rule (phase 0 ruling). MAS-06 and MAS-09 check each side's wheels.
+    why: The battery plinth, washer and dryer sit on the kerb side. 50 mm is an estimated rule from the layout study. MAS-06 and MAS-09 check each side's wheels.
   - id: GCM-01
     title: Ute and trailer within the 7,400 kg GCM with Lovells' revision
     type: gcm
@@ -170,7 +170,7 @@ trailer_checks:
     zone: inside
     severity: fail
     inputs: []
-    why: Every block inside the body must sit inside it without overlapping another, and no solid item may stand in a keep-clear space (home/layout-home.md section 2). The bed is up, as it travels.
+    why: Every block inside the body must sit inside it without overlapping another, and no solid item may stand in a keep-clear space (TRAILER.md). The bed is up, as it travels.
   - id: FIT-03
     title: Fresh, grey and diesel tanks and the XT Air box fit between the rails and the crossmembers
     type: fit

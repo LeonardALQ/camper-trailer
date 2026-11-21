@@ -4,7 +4,7 @@ Everything is in the project datum DIM-01 (research/02): X from the coupling bal
 Y from the centreline, positive to the road side, Z up from the ground at design ride height. Blocks are
 axis-aligned boxes, wheels are cylinders and the drawbar members are bars between two points.
 
-Revision J (21 Nov 2026) is the home trailer (home/layout-home.md): the bikes ride in the ute's bike box (UTE-GARAGE.md),
+Revision J (21 Nov 2026) is the home trailer (TRAILER.md): the bikes ride in the ute's bike box (UTE-GARAGE.md),
 so the trailer has no garage module. The axle solve moves the axle group and everything tied to it (the tanks, their
 guards and the suspension) along X to the middle of the towball window of decision H17: from the position where the
 lightest case keeps 8.0 % of its mass on the ball to the one where the heaviest towball with growth reaches 320 kg

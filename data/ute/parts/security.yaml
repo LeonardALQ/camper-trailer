@@ -22,8 +22,8 @@ parts:
     maker: ABUS
     qty: 2
     unit: each
-    mass: {basis: declared, unit_kg: 1.4, maturity: estimate, source: "R24 (BX-S03), estimate"}
-    notes: "NSW Police advise locking bikes to anchor points even inside a garage. Moved from X 1,800 to X 450 mm so the disc lock's 1.2 m chain reaches the front disc (R24)"
+    mass: {basis: declared, unit_kg: 1.4, maturity: estimate, source: "Report 24 (BX-S03), estimate"}
+    notes: "NSW Police advise locking bikes to anchor points even inside a garage. Moved from X 1,800 to X 450 mm so the disc lock's 1.2 m chain reaches the front disc (report 24)"
     geometry: {generator: box, params: {}}
     color: "#2d3436"
   U-TRACKER:
@@ -44,6 +44,6 @@ parts:
     maker: ABUS, Monimoto
     qty: 1
     unit: set
-    mass: {basis: declared, total_kg: 9.0, maturity: estimate, source: "R24 (BX-S02 and BX-S06): lock 0.9 kg and chain 3.5 kg per bike, trackers 0.1 kg each (estimates)"}
+    mass: {basis: declared, total_kg: 9.0, maturity: estimate, source: "Report 24 (BX-S02 and BX-S06): lock 0.9 kg and chain 3.5 kg per bike, trackers 0.1 kg each (estimates)"}
     removable: true
     cog: {at: ["front_tyre_x + 400", "(tuareg_y + st_y) / 2", 450], basis: "At the bikes' front wheels, estimate"}

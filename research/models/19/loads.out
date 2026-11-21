@@ -1,0 +1,180 @@
+
+====================================================================================================
+Envelope
+====================================================================================================
+Inside volume 19.8 m3, floor 10.1 m2
+U wall 0.825, roof 0.715 (heat down), floor 1.008 W/m2K, bridge factor 1.2
+Glass 2.82 m2, door leaves 2.31 m2
+UA W/K: kerb 6.6, road 7.7, front 4.4, rear 3.5, windows 7.9, doors 3.7, roof 9.1, floor 12.8
+UA total 55.7 W/K
+
+====================================================================================================
+Design hot day, PV roof, blinds down on sunlit glass, worst heading: front faces 180 deg (kerb faces 90)
+====================================================================================================
+hour      t_out       roof      floor      walls   win_cond  win_solar      doors  vent_sens people_sens  appl_sens   sensible     latent      total
+00         28.5          6         58        101         36          0         17         40        120        143        521        -71        521
+01         27.6         -3         46         79         28          0         13         31        120        143        458        -71        458
+02         27.1         -8         39         68         24          0         11         27        120        143        425        -71        425
+03         27.1         -8         39         68         24          0         11         27        120        143        425        -71        425
+04         27.6         -3         46         79         28          0         13         31        120        143        458        -71        458
+05         28.5         17         60        130         36         68         22         40        120        143        635        -71        635
+06         29.9         89         84        245         47        246         45         52        120        143       1070        -71       1070
+07         31.6        181        114        321         60        334         60        279        140        763       2252        -32       2252
+08         33.5        273        146        375         75        365         69         93        140        143       1679        -59       1679
+09         35.5        354        178        412         91        375         75        112        140        340       2076        -59       2076
+10         37.4        417        207        435        106        331         77        130        140        845       2689        -59       2689
+11         39.1        456        231        449        119        274         77        146        140        848       2741        -59       2741
+12         40.5        469        249        483        130        276         78        298        140        549       2672        -76       2672
+13         41.4        454        259        533        138        323         81        169        140        248       2346        -59       2346
+14         41.9        413        261        568        142        357         82        174        140        245       2382        -59       2382
+15         41.9        350        254        576        142        341         80        174        140        240       2297        -59       2297
+16         41.4        270        239        553        138        308         75        169        140        233       2127        -59       2127
+17         40.5        185        219        490        130        225         68        160        140        143       1759        -59       1759
+18         39.1        112        194        366        119         63         57        652        140       1588       3292       -162       3292
+19         37.4         86        172        297        106          0         49        264        140        308       1422         23       1445
+20         35.5         69        147        255         91          0         42        112        140        188       1044        -59       1044
+21         33.5         51        122        211         75          0         35         93        140        188        916        -59        916
+22         31.6         34         98        169         60          0         28         66        120        188        764        -71        764
+23         29.9         19         76        132         47          0         22         52        120        143        610        -71        610
+24 h heat to remove: sensible 37.1 kWh, latent 0.0 kWh, total 37.1 kWh
+Peak 3292 W at 39.1 C outside
+24 h by component kWh: roof 4.3, floor 3.5, walls 7.4, win_cond 2.0, win_solar 3.9, doors 1.2, vent_sens 3.4, people_sens 3.2, appl_sens 8.2
+
+====================================================================================================
+Hot day variants (24 h total heat to remove kWh, peak W)
+====================================================================================================
+design: PV roof, blinds down on sunlit glass            heading 180:  37.1 kWh (latent  0.0), peak  3292 W
+blinds up all day                                       heading 180:  39.1 kWh (latent  0.0), peak  3323 W
+blinds down all day                                     heading 180:  36.4 kWh (latent  0.0), peak  3280 W
+white roof, no PV (the roof first assumed)              heading 180:  35.9 kWh (latent  0.0), peak  3288 W
+vented dryer in place of a heat-pump dryer              heading 180:  35.9 kWh (latent  0.0), peak  3292 W
+tropical day: 35 C peak, 27 C low, dew point 25 C       heading 180:  46.9 kWh (latent 15.7), peak  4257 W
+heading   0:  37.1 kWh, peak  3293 W
+heading  90:  36.0 kWh, peak  3282 W
+heading 180:  37.1 kWh, peak  3292 W
+heading 270:  36.0 kWh, peak  3291 W
+
+====================================================================================================
+Design cold night, -5 C outside, 20 C inside, 14 h from 17:00, blinds closed
+====================================================================================================
+hour      roof     floor     walls   windows     doors      vent     gains       net
+17         278       288       555       141        92       243      -368      1229
+18         278       288       555       141        92      1081     -1768       667
+19         278       288       555       141        92       494      -488      1360
+20         278       288       555       141        92       243      -368      1229
+21         278       288       555       141        92       243      -368      1229
+22         278       288       555       141        92       218      -233      1339
+23         278       288       555       141        92       218      -233      1339
+00         278       288       555       141        92       218      -233      1339
+01         278       288       555       141        92       218      -233      1339
+02         278       288       555       141        92       218      -233      1339
+03         278       288       555       141        92       218      -233      1339
+04         278       288       555       141        92       218      -233      1339
+05         278       288       555       141        92       218      -233      1339
+06         278       288       555       141        92       218      -353      1219
+Heat loss with no internal gains 1572 W. Net heat to add over 14 h 17.6 kWh
+
+====================================================================================================
+Units on the design hot day and the design cold night
+====================================================================================================
+Mitsubishi MSZ-AP25VGKD2 split           hot day   8.4 kWh AC,   9.0 kWh battery, unmet  0.0 kWh | cold night  6.1 kWh AC,  6.6 kWh battery, unmet  0.0 kWh
+Mitsubishi MSZ-AP35VGKD2 split           hot day   8.8 kWh AC,   9.5 kWh battery, unmet  0.0 kWh | cold night  6.4 kWh AC,  6.8 kWh battery, unmet  0.0 kWh
+Cool-J iHider220 under-bench inverter    hot day  13.6 kWh AC,  14.6 kWh battery, unmet  0.5 kWh | cold night  7.7 kWh AC,  8.3 kWh battery, unmet  0.0 kWh
+Dometic FreshJet FJZ7 Pro rooftop        hot day  13.1 kWh AC,  14.1 kWh battery, unmet  0.0 kWh | cold night  0.0 kWh AC,  0.0 kWh battery, unmet 17.6 kWh
+Truma Saphir Comfort RC under-bench      hot day  16.3 kWh AC,  17.5 kWh battery, unmet  2.5 kWh | cold night  0.0 kWh AC,  0.0 kWh battery, unmet 17.6 kWh
+Dometic FreshWell 3000 under-bench       hot day  15.6 kWh AC,  16.7 kWh battery, unmet  1.0 kWh | cold night  0.0 kWh AC,  0.0 kWh battery, unmet 17.6 kWh
+Dometic CoolAir RTX 2000 24 V rooftop    hot day  11.1 kWh AC,  11.1 kWh battery, unmet  5.7 kWh | cold night  0.0 kWh AC,  0.0 kWh battery, unmet 17.6 kWh
+
+====================================================================================================
+Mitsubishi MSZ-AP25VGKD2 split: hourly input, AC side W (battery side = AC / 0.93)
+====================================================================================================
+hot day  00: 114 01: 102 02:  96 03:  96 04: 102 05: 136 06: 206 07: 447 08: 327 09: 414 10: 600 11: 649 12: 646 13: 556 14: 574 15: 552 16: 501 17: 397 18: 912 19: 297 20: 204 21: 182 22: 158 23: 131
+cold     17: 430 18: 262 19: 469 20: 430 21: 430 22: 462 23: 462 00: 462 01: 462 02: 462 03: 462 04: 462 05: 462 06: 427
+hot day 8.40 kWh AC, worst 12 h window 6.57 kWh AC, peak 912 W
+cold night 6.14 kWh AC with the heat pump. With the Combi D 6 instead: 1.9 L of diesel and 0.42 kWh at 12 V
+
+====================================================================================================
+Units on the tropical day (35 C peak, 27 C low, dew point 25 C)
+====================================================================================================
+Mitsubishi MSZ-AP25VGKD2 split             9.9 kWh AC,  10.7 kWh battery, unmet  0.7 kWh
+Mitsubishi MSZ-AP35VGKD2 split            10.4 kWh AC,  11.2 kWh battery, unmet  0.2 kWh
+Cool-J iHider220 under-bench inverter     15.2 kWh AC,  16.3 kWh battery, unmet  2.1 kWh
+Dometic FreshJet FJZ7 Pro rooftop         15.1 kWh AC,  16.3 kWh battery, unmet  0.6 kWh
+Truma Saphir Comfort RC under-bench       17.8 kWh AC,  19.1 kWh battery, unmet  5.1 kWh
+Dometic FreshWell 3000 under-bench        17.0 kWh AC,  18.3 kWh battery, unmet  3.3 kWh
+Dometic CoolAir RTX 2000 24 V rooftop     12.6 kWh AC,  12.6 kWh battery, unmet  9.1 kWh
+
+====================================================================================================
+Insulation trade-off: core added to walls, roof and floor (mm), chosen unit, 7 kg of battery per kWh a day
+====================================================================================================
+  walls/roof/floor +mm  hot kWh  saved  cold kWh  saved  panel kg  battery kg  net kg
+             (0, 0, 0)     9.03   0.00      6.60   0.00       0.0         0.0     0.0
+            (10, 0, 0)     8.58   0.45      6.09   0.51       9.5         3.1     6.4
+            (20, 0, 0)     8.30   0.73      5.77   0.83      19.1         5.1    13.9
+            (30, 0, 0)     8.10   0.93      5.54   1.06      28.6         6.5    22.1
+            (0, 10, 0)     8.78   0.25      6.35   0.25       5.6         1.8     3.8
+            (0, 20, 0)     8.61   0.42      6.20   0.40      11.2         2.9     8.3
+            (0, 30, 0)     8.49   0.54      6.09   0.51      16.8         3.8    13.0
+            (0, 0, 10)     8.78   0.25      6.30   0.30      10.6         1.8     8.8
+            (0, 0, 20)     8.63   0.40      6.13   0.48      21.2         2.8    18.3
+            (0, 0, 30)     8.53   0.51      6.01   0.59      31.8         3.5    28.2
+           (10, 10, 0)     8.34   0.69      5.86   0.74      13.0         4.8     8.2
+           (20, 20, 0)     7.93   1.10      5.38   1.23      26.1         7.7    18.4
+           (30, 30, 0)     7.65   1.38      5.01   1.59      39.1         9.7    29.4
+          (10, 10, 10)     8.11   0.92      5.58   1.02      21.5         6.5    15.1
+          (20, 20, 20)     7.58   1.46      4.88   1.72      43.1        10.2    32.9
+          (30, 30, 30)     7.20   1.83      4.37   2.24      64.6        12.8    51.8
+
+====================================================================================================
+CO2 at steady state, two adults, outdoor 425 ppm
+====================================================================================================
+ 20 m3/h: asleep, 1.0 met  1829, seated, 1.3 met  2225, light work, 2.0 met  3197 ppm
+ 30 m3/h: asleep, 1.0 met  1361, seated, 1.3 met  1625, light work, 2.0 met  2273 ppm
+ 40 m3/h: asleep, 1.0 met  1127, seated, 1.3 met  1325, light work, 2.0 met  1811 ppm
+ 50 m3/h: asleep, 1.0 met   987, seated, 1.3 met  1145, light work, 2.0 met  1534 ppm
+ 60 m3/h: asleep, 1.0 met   893, seated, 1.3 met  1025, light work, 2.0 met  1349 ppm
+ 80 m3/h: asleep, 1.0 met   776, seated, 1.3 met   875, light work, 2.0 met  1118 ppm
+flow for 1,000 ppm, asleep, 1.0 met: 49 m3/h
+flow for 1,000 ppm, seated, 1.3 met: 63 m3/h
+flow for 1,000 ppm, light work, 2.0 met: 96 m3/h
+
+====================================================================================================
+Cold night condensation: steady indoor humidity and the coldest surfaces, -5 C outside, 20 C inside
+====================================================================================================
+two asleep                             e2 pairs only    45 m3/h:  4.2 g/kg, RH  29 %, dew point   1.5 C
+two asleep                             e2 + top-up      60 m3/h:  3.6 g/kg, RH  25 %, dew point  -0.5 C
+two asleep                             e2 boost + top-up  115 m3/h:  3.0 g/kg, RH  21 %, dew point  -2.9 C
+two asleep + drying towels             e2 pairs only    45 m3/h:  5.3 g/kg, RH  36 %, dew point   4.9 C
+two asleep + drying towels             e2 + top-up      60 m3/h:  4.5 g/kg, RH  30 %, dew point   2.3 C
+two asleep + drying towels             e2 boost + top-up  115 m3/h:  3.5 g/kg, RH  24 %, dew point  -1.1 C
+evening hour: cooking and a shower     e2 pairs only    45 m3/h:  7.0 g/kg, RH  48 %, dew point   8.7 C
+evening hour: cooking and a shower     e2 + top-up      60 m3/h:  5.6 g/kg, RH  38 %, dew point   5.5 C
+evening hour: cooking and a shower     e2 boost + top-up  115 m3/h:  4.1 g/kg, RH  28 %, dew point   1.1 C
+inside surface temperature, wall panel:  17.3 C
+inside surface temperature, window, blind open:  10.9 C
+inside surface temperature, window, blind closed (glass face):  12.2 C
+inside surface temperature, aluminium corner joiner, f_Rsi 0.60 (est.):  10.0 C
+inside surface temperature, door leaf:  14.8 C
+
+====================================================================================================
+Body pressurisation: excess supply needed, sealed body ELA 30 to 60 cm2 (est.)
+====================================================================================================
+ELA 30 cm2,   5 Pa across the leaks:    19 m3/h
+ELA 30 cm2,  10 Pa across the leaks:    27 m3/h
+ELA 30 cm2,  20 Pa across the leaks:    38 m3/h
+ELA 30 cm2,  50 Pa across the leaks:    60 m3/h
+ELA 30 cm2, 100 Pa across the leaks:    85 m3/h
+ELA 45 cm2,   5 Pa across the leaks:    29 m3/h
+ELA 45 cm2,  10 Pa across the leaks:    40 m3/h
+ELA 45 cm2,  20 Pa across the leaks:    57 m3/h
+ELA 45 cm2,  50 Pa across the leaks:    90 m3/h
+ELA 45 cm2, 100 Pa across the leaks:   128 m3/h
+ELA 60 cm2,   5 Pa across the leaks:    38 m3/h
+ELA 60 cm2,  10 Pa across the leaks:    54 m3/h
+ELA 60 cm2,  20 Pa across the leaks:    76 m3/h
+ELA 60 cm2,  50 Pa across the leaks:   120 m3/h
+ELA 60 cm2, 100 Pa across the leaks:   170 m3/h
+ 40 km/h: dynamic pressure   74 Pa, rear wake at Cp -0.3:   -22 Pa, upper front at Cp +0.6:    44 Pa
+ 60 km/h: dynamic pressure  167 Pa, rear wake at Cp -0.3:   -50 Pa, upper front at Cp +0.6:   100 Pa
+ 80 km/h: dynamic pressure  296 Pa, rear wake at Cp -0.3:   -89 Pa, upper front at Cp +0.6:   178 Pa
+100 km/h: dynamic pressure  463 Pa, rear wake at Cp -0.3:  -139 Pa, upper front at Cp +0.6:   278 Pa

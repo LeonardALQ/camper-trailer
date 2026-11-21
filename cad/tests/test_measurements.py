@@ -47,7 +47,7 @@ def test_ids_are_unique():
 
 
 def test_every_input_belongs_to_a_part():
-    """car, box or trailer, for the Measurements page's filter. R23's car inputs are in group Car build and R24's box
+    """car, box or trailer, for the Measurements page's filter. Report 23's car inputs are in group Car build and report 24's box
     inputs in group Bike box."""
     for it in ITEMS:
         part = it.extra.get("part")
