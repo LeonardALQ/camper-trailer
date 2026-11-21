@@ -10,15 +10,15 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 |---|---|
 | Body | 4,420 x 2,400 mm outside, X 1,820 to 6,240. Inside 4,350 x 2,330 x 2,000 mm, floor at Z 925 |
 | Overall | 6,700 mm long, 2,470 mm wide over the entry door's handle, 3,078 mm high over the awning case |
-| Tare | 2,581 kg, 2,834 kg with the growth allowance |
-| Fully loaded with 320 L of water (TC2) | 3,111 kg, 3,397 kg with growth, against the 3,500 kg plate |
-| Towball | 250 to 292 kg, 8.1 to 10.5 % of the trailer, at most 317 kg with growth |
+| Tare | 2,608 kg, 2,864 kg with the growth allowance |
+| Fully loaded with 320 L of water (TC2) | 3,107 kg, 3,397 kg with growth, against the 3,500 kg plate |
+| Towball | 251 to 292 kg, 8.1 to 10.4 % of the trailer, at most 316.5 kg with growth |
 | Ute | Rear axle 2,586 kg with growth against its 2,800 kg plate. Combination 7,120 kg against 7,400 kg, the ute with growth plus the plate |
 | Battery | 25.6 kWh. A design hot day runs 25.1 h when new and 17.2 h at end of life |
 | Water | 420 L fresh, at most 320 L in travel, about 41 L a day. 130 L grey |
-| Cost | AUD 230,736 with contingency, AUD 182,784 owner-built |
+| Cost | AUD 232,396 with contingency, AUD 184,444 owner-built |
 
-Every fail check passes. The tightest are the towball share with the grey tank full (MAS-12, 8.1 % against 8.0 %), the heaviest towball (MAS-13, 316.8 kg against 320 kg) and the recovery pull in the road-side rail (CHS-08A, 0.91 of yield).
+Every fail check passes. The tightest are the fully loaded mass with growth (MAS-10, 3,396.8 kg against the 3,400 kg target), the towball share with the grey tank full (MAS-12, 8.1 % against 8.0 %), the heaviest towball (MAS-13, 316.5 kg against 320 kg) and the recovery pull in the road-side rail (CHS-08A, 0.91 of yield).
 
 ## Layout
 
@@ -37,32 +37,32 @@ Storage is 0.38 m³ inside and 0.09 m³ in the drawbar box, about 0.2 m³ short 
 
 ## Mass and limits
 
-Masses in kg. The towball comes from moments about the axle group centre at X 4,381 mm. "With growth" adds 20 % to an estimate, 7 % to a calculated mass and nothing to a maker's figure (report 02, MASS-06). CT-002 shows each case's centre of gravity.
+Masses in kg. The towball comes from moments about the axle group centre at X 4,384 mm. "With growth" adds 20 % to an estimate, 7 % to a calculated mass and nothing to a maker's figure (report 02, MASS-06). CT-002 shows each case's centre of gravity.
 
 | Case | Aboard | Mass | Towball | Share | With growth | Towball with growth |
 |---|---|---|---|---|---|---|
-| TC1 Tare | Nothing | 2,581 | 254.5 | 9.9 % | 2,834 | 273.3 |
-| TC2 Fully loaded | 320 L fresh, fuel, 150 kg of gear | 3,111 | 291.8 | 9.4 % | 3,397 | 316.8 |
-| TC3 Highway | 50 L, fuel, gear | 2,811 | 289.7 | 10.3 % | 3,097 | 314.7 |
-| TC4 Water, no gear | 320 L, fuel | 2,961 | 272.3 | 9.2 % | 3,217 | 293.5 |
-| TC5 Gear, no water | Fuel, gear | 2,761 | 289.3 | 10.5 % | 3,047 | 314.4 |
-| TC6 Fuel only | Fuel | 2,611 | 269.9 | 10.3 % | 2,867 | 291.1 |
-| TC7 Grey full | 190 L fresh, 130 L grey, fuel, gear | 3,111 | 251.8 | 8.1 % | 3,397 | 276.9 |
-| TC8 Grey full, fresh empty | 130 L grey, fuel, gear | 2,891 | 250.3 | 8.7 % | 3,177 | 275.3 |
+| TC1 Tare | Nothing | 2,608 | 254.6 | 9.8 % | 2,864 | 273.1 |
+| TC2 Fully loaded | 320 L fresh, fuel, 150 kg of gear | 3,107 | 291.7 | 9.4 % | 3,397 | 316.5 |
+| TC3 Highway | 50 L, fuel, gear | 2,837 | 289.9 | 10.2 % | 3,127 | 314.7 |
+| TC4 Water, no gear | 320 L, fuel | 2,957 | 272.2 | 9.2 % | 3,217 | 293.1 |
+| TC5 Gear, no water | Fuel, gear | 2,787 | 289.5 | 10.4 % | 3,077 | 314.3 |
+| TC6 Fuel only | Fuel | 2,637 | 270.0 | 10.2 % | 2,897 | 290.9 |
+| TC7 Grey full | 190 L fresh, 130 L grey, fuel, gear | 3,107 | 251.8 | 8.1 % | 3,397 | 276.6 |
+| TC8 Grey full, fresh empty | 130 L grey, fuel, gear | 2,917 | 250.5 | 8.6 % | 3,207 | 275.3 |
 
-- Plate: ATM 3,500 kg, the ute's braked towing rating and the limit of the DO35 and the chains (H2). The heaviest case with growth is 3,397 kg, inside H2's 3,400 kg target. The examiner's caps from the tyres, coupling, chains and brakes are 3,500 kg (MAS-07, MAS-08).
+- Plate: ATM 3,500 kg, the ute's braked towing rating and the limit of the DO35 and the chains (H2). The heaviest case with growth is 3,396.8 kg, 3.2 kg inside H2's 3,400 kg target (MAS-10). The examiner's caps from the tyres, coupling, chains and brakes are 3,500 kg (MAS-07, MAS-08).
 - Water: at most 320 L of fresh and grey water while towing, H13's 350 L less 30 L by H21. The tanks hold 420 L and are filled at camp (H13). The grey tank travels empty, and TC7 and TC8 check the trailer with it full.
-- Towball: at least 7.5 % in every case and at most 350 kg, the 79's, the towbar's and the DO35's rating (MAS-04, H14). While the masses are estimates the axle sits in the middle of a 13.3 mm window between 8.0 % in the lightest case and 320 kg with growth in the heaviest (MAS-12, MAS-13, H17).
+- Towball: at least 7.5 % in every case and at most 350 kg, the 79's, the towbar's and the DO35's rating (MAS-04, H14). While the masses are estimates the axle sits in the middle of a 14.4 mm window between 8.0 % in the lightest case and 320 kg with growth in the heaviest (MAS-12, MAS-13, H17).
 - Ute: the heaviest towball puts the ute's rear axle at 2,586 kg with growth against the Elite kit's 2,800 kg plate (MAS-03, H18). MAS-14 reports the Platinum kit for the car build's cut CUT7.
 - GCM: the ute with growth, 3,620 kg, plus the 3,500 kg plate is 7,120 kg against Lovells' 7,400 kg (GCM-01, UTE-06, H20). If the revision is refused, Toyota's 6,900 kg needs the trailer plated at or below 3,280 kg and at most 203 L of water in travel, so the fully loaded trailer with growth stays under that plate.
-- Balance: the centre of gravity sits at most 32.8 mm to the kerb side against a 50 mm rule (MAS-11), at Z 1,215 to 1,308 mm with growth. The static stability factor is 0.58 to 0.62.
+- Balance: the centre of gravity sits at most 34.5 mm to the kerb side against a 50 mm rule (MAS-11), at Z 1,226 to 1,315 mm with growth. The static stability factor is 0.62 to 0.65 on the 1,655 mm track.
 - Roll: with the body rolled onto its bump stops and tyres, the static rollover threshold is about 0.42 g (est., Gillespie's method), over the 0.35 g of PBS level 1 and the 0.40 g target (STB-01, STB-02). Decision H22 widened the track from 1,555 to 1,655 mm for it, through the rails. The ute with the bikes aboard has a static stability factor of 0.89 (UTE-11).
-- Sway: the yaw inertia is about 7,200 kg m² fully loaded with growth, and the towball never falls under 8.1 % of the trailer (STB-03). No snaking speed is estimated, because the published models need tyre and hitch data that are not known. The Bosch TSC brakes the trailer when it senses sway.
-- Axles: the XT build carries 3,744 kg with VSB1's 120 % rule against its 4,050 kg, and each wheel 950 kg against its 1,400 kg (MAS-02, MAS-09).
+- Sway: the yaw inertia is about 7,300 kg m² fully loaded with growth, and the towball never falls under 8.1 % of the trailer (STB-03). No snaking speed is estimated, because the published models need tyre and hitch data that are not known. The Bosch TSC brakes the trailer when it senses sway.
+- Axles: the XT build carries 3,744 kg with VSB1's 120 % rule against its 4,050 kg, and each wheel 952 kg against its 1,400 kg (MAS-02, MAS-09).
 
 ## Structure
 
-The chassis is a galvanised ladder frame (CHASSIS.md revision E, CT-101 to CT-104). Two RHS 150 x 50 x 3 C450L0 rails each carry a continuous RHS 127 x 51 x 3.5 C350L0 raiser, so the floor clears the 805 mm tyres. Eight stations carry crossmembers and outriggers, and the drawbar is RHS 150 x 50 x 5. Steel and zinc weigh 503 kg. Checked at the plate, the recovery pull governs at 0.91 of yield, VSB1's drawbar tests reach 0.76 and the travel cases 0.52. The frame twists 0.400 degree against 0.5, and every fatigue detail stays below its endurance limit. Heavy items bolt through the floor into the raisers and outriggers (CT-104).
+The chassis is a galvanised ladder frame (CHASSIS.md revision E, CT-101 to CT-104). Two RHS 150 x 50 x 3 C450L0 rails each carry a continuous RHS 127 x 51 x 3.5 C350L0 raiser, so the floor clears the 805 mm tyres. Eight stations carry crossmembers and outriggers, and the drawbar is RHS 150 x 50 x 5. The rails are 1,275 mm over their outsides for the 1,655 mm track (H22). Steel and zinc weigh 505 kg. Checked at the plate, the recovery pull governs at 0.91 of yield, VSB1's drawbar tests reach 0.77 and the travel cases 0.53. The frame twists 0.374 degree against 0.5, and every fatigue detail stays below its endurance limit. Heavy items bolt through the floor into the raisers and outriggers (CT-104).
 
 ## Body and roof
 
@@ -204,7 +204,7 @@ Each is in full in `docs/decisions.md`.
 ## Open points and the assumption used
 
 1. Storage is about 0.2 m³ short (est.). Assumption: the footprint stays empty (H16). Question for Leonard: two 500 x 600 x 700 mm cabinets under the bed beside the desk would add 0.42 m³ and about 20 kg, and break his rule that the rest of that area stays empty.
-2. Estimate lines carry 891 kg, 34.5 % of the tare, and estimates set 55.7 % of the price subtotal. Assumption: the growth allowance covers the masses until TW-01 to TW-03 replace them, and the 20 % contingency covers the prices. A towball reading more than 10 % off the model means the centre of gravity estimates are wrong (UTE-03).
+2. Estimate lines carry 902 kg, 34.6 % of the tare, and estimates set 55.3 % of the price subtotal. Assumption: the growth allowance covers the masses until TW-01 to TW-03 replace them, and the 20 % contingency covers the prices. A towball reading more than 10 % off the model means the centre of gravity estimates are wrong (UTE-03).
 3. Assumption: Lovells' 7,400 kg GCM is certified in the ute's LC5 inspection. If not, plate at or below 3,280 kg and tow with at most 203 L (H20).
 4. Assumption: the isolators and the line set keep the split working on corrugations, without a maker's warranty. The fallback is a rooftop unit with a sixth battery module.
 5. The Dometic fridge, freezer, hob and sink carry converted European prices, and the oven, washer, panels, lamps and labour are estimates. Assumption: these prices stand, with their contingency, until an Australian stockist or a quote replaces them.

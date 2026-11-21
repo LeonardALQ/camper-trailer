@@ -39,7 +39,7 @@ lines:
     mass: {kg: 20.56, basis: calculated, src: "Model U-ROOF, 4.79 m2 at 4.29 kg/m2"}
     price: {aud_each: 166.62, aud: 499.86, url: "https://store.allaluminium.com.au/collections/marine-sheet-aluminium", date: 2026-11-20, basis: listing}
     model_part: U-ROOF
-    note: "1.6 mm in place of 2.0 mm saves 5.1 kg and AUD 125, so the box stays under UGB-01's 440 kg (decision of 20 Nov 2026). The roof carries nothing, and the engineer confirms it with the bows at most 640 mm apart"
+    note: "1.6 mm in place of 2.0 mm saves 5.1 kg and AUD 125, so the box stays under UGB-01's 440 kg (decision of 20 Nov 2026). The roof carries no load, no step and no kneeling, crowned 1:50 on bows at most 640 mm apart, and UGF-01 checks it in highway suction. The engineer confirms it"
   - id: BX-M02
     group: materials
     name: Wall, front wall and door skin sheet

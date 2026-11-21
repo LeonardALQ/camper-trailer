@@ -15,7 +15,7 @@ The box carries the Aprilia Tuareg 660 Rally (206 kg) and the Triumph Street Tri
 
 A welded aluminium body bolts onto its own aluminium ladder subframe. The subframe sits on a 6 mm rubber strip on the rails and bolts to Toyota's six pairs of deck mount brackets, firm at the front two and compliant at the rear four, so the frame twists under the box without loading its walls.
 
-Outside 2,590 x 1,850 x 1,502 mm, and 1,890 mm wide over the rear tub flares. Inside 2,520 x 1,765 x 1,460 mm. Floor 834 mm up laden, wheel tubs 86.5 mm high and 1,201 mm apart on the Elite's 1,555 mm rear track. Rear barn doors open 1,745 x 1,460 mm. A 1,200 x 1,000 mm top-hinged kerb door reaches the Street Triple's kerb strap and the kerb tool chest.
+Outside 2,590 x 1,850 x 1,502 mm at the walls, 1,520 mm at the roof's 1:50 crown, and 1,890 mm wide over the rear tub flares. Inside 2,520 x 1,765 x 1,460 mm. Floor 834 mm up laden, wheel tubs 86.5 mm high and 1,201 mm apart on the Elite's 1,555 mm rear track. Rear barn doors open 1,745 x 1,460 mm. A 1,200 x 1,000 mm top-hinged kerb door reaches the Street Triple's kerb strap and the kerb tool chest.
 
 ## 3. Materials
 
@@ -104,7 +104,7 @@ The Black Widow MF-12038 ramp (3,048 x 965 mm, 680 kg rating, 34 kg) stands fold
 
 ## 9. Mass
 
-The parts list sums to 436.5 kg empty, 474.1 kg with growth, and the model carries every line, so UGB-01 and the list agree (`cad/tests/test_box_parts.py`). Revision D adds 0.4 kg: the flares 1.9 kg, less 1.6 kg of skin cut away for them, and the tubs and floor re-cut for the wider track (-0.8 and +0.9 kg). The list includes the wiring, the winch feed, sealant, pads, plates, the roof coat, the outlet and the drains. The roof is 1.6 mm sheet in place of 2.0 mm, which saves 5.1 kg and leaves 3.5 kg in hand under UGB-01's 440 kg. The roof carries nothing, and the bows and end frames under it are at most 640 mm apart. The engineer confirms the thinner sheet. If more margin is needed, a 10 mm chain in place of the 12 mm one saves about 2 kg (est.).
+The parts list sums to 436.5 kg empty, 474.1 kg with growth, and the model carries every line, so UGB-01 and the list agree (`cad/tests/test_box_parts.py`). Revision D adds 0.4 kg: the flares 1.9 kg, less 1.6 kg of skin cut away for them, and the tubs and floor re-cut for the wider track (-0.8 and +0.9 kg). The list includes the wiring, the winch feed, sealant, pads, plates, the roof coat, the outlet and the drains. The roof is 1.6 mm sheet in place of 2.0 mm, which saves 5.1 kg and leaves 3.5 kg in hand under UGB-01's 440 kg. The roof carries no load, no step and no kneeling, and the bows and end frames under it are at most 640 mm apart (UGF-01). The engineer confirms the thinner sheet. If more margin is needed, a 10 mm chain in place of the 12 mm one saves about 2 kg (est.).
 
 On the Elite, with the home trailer's heaviest towball (317 kg with growth), the ute's rear axle carries 2,586 kg with growth when towing with the bikes aboard (UC3), 214 kg under the 2,800 kg plate.
 
