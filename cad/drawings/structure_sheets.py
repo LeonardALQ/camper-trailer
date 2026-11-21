@@ -23,7 +23,7 @@ GROUPS = [
     ("Bench, freezer, hob, sink and pump", ("LA-11B", "LA-06", "LA-07A", "LA-07B", "LA-07D", "WS-01"),
      "Base on floor inserts over the road raiser. Back tied to the road wall's insert strip"),
     ("Lift bed at night, two people", ("LB-01", "LB-02", "LB-03", "LB-04", "LB-04M", "LB-05", "LB-06"),
-     "Four rails screwed into RHS 40 x 20 x 3 hardpoints in the side walls. The walls carry it to the floor joiners"),
+     "Four rails screwed into RHS 40 x 32 x 3 hardpoints, full height in the side walls. The walls carry it to the floor joiners"),
     ("Split outdoor unit and its cradle", ("AC-02", "AC-03"),
      "Cradle through the rear wall's insert strips and the roof joiner, two stays to the road-side rear corner"),
     ("Partition, board, inverter, indoor unit", ("WR-03", "LA-11E", "EL-04", "EL-05", "EL-06", "AC-01", "WR-09"),
@@ -180,8 +180,8 @@ def ct104(prj, model, bom, checks, reg, dwg):
         f"H4, OPEN POINT: THE PLINTH'S REAR OUTBOARD FOOT HAS NO MEMBER UNDER IT. THE MACHINE BASE ENDS AT X {lay.find('LA-14F').box[3]:,.0f} "
         f"AND THE XT REAR SHOCK OUTRIGGER STARTS AT X {next(s for s in lay.chassis.stations if s['id'] == 'XT rear shock')['x']:,.0f}. "
         "ADD A STUB CROSSMEMBER OR A BRACKET BEFORE THE FLOOR GOES ON.",
-        "THE LIFT BED'S RAILS (SOLID) SCREW INTO RHS 40 x 20 x 3 ALUMINIUM HARDPOINTS BONDED INTO THE SIDE WALL CORES AS THE PANELS ARE "
-        "LAID UP (LB-06), SO EACH SCREW BITES 3 mm OF ALUMINIUM. IN TRAVEL THE INDEX PLUNGERS HOLD THE BED AT THE RAIL TOPS.",
+        "THE LIFT BED'S RAILS (SOLID) SCREW INTO RHS 40 x 32 x 3 ALUMINIUM HARDPOINTS, FULL HEIGHT AND BONDED TO BOTH SKINS AS THE PANELS ARE "
+        "MADE (LB-06), SO EACH SCREW BITES 3 mm OF ALUMINIUM AND EACH HARDPOINT STIFFENS THE WALL. IN TRAVEL THE INDEX PLUNGERS HOLD THE BED AT THE RAIL TOPS.",
         "THE REAR WALL WITH THE 625 x 1753 DOOR CUT-OUT IS THE BOX'S REAR DIAPHRAGM (BDY-20). THE PARTITION ADDS A SECOND ONE AT X 5,195.",
         "THE TWO SIDE-WALL STIFFENERS (BD-18, SHS 20 x 20 x 1.6) HOLD THE WALL'S WIND DEFLECTION TO BDY-10'S LIMIT.",
     ], size=1.45, width_chars=185)

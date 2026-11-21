@@ -10,8 +10,9 @@ Revision C is the body of the home trailer, TRAILER.md revision J. Revision B, t
 - The rear wall has a door, D2, an Aussie Traveller DC in a 625 x 1,753 mm cut-out into the wet room (H4). The wall keeps 1,335 mm of full panel and still closes the box (BDY-20).
 - The front edges are rounded, 150 mm at the roof and 250 mm on the verticals, in bonded GRP corner pieces (H12).
 - 17 openings in place of 10: four Dometic S4 windows, the two doors, the cassette door, four fan sleeves, the extract, two cowls, the fresh-air intake hood, the rinse box and the relief valve (BDY-18).
-- The lift bed's four rails screw into RHS 40 x 20 x 3 aluminium hardpoints laid in the side wall cores, in place of ledgers (BDY-11).
-- An SHS 20 x 20 x 1.6 aluminium stiffener bonded upright in each side wall's living-zone bay keeps the wind deflection at 18.6 mm against 20.0 mm (BDY-10).
+- The lift bed's four rails screw into RHS 40 x 32 x 3 aluminium hardpoints, full wall height and bonded to both skins, in place of ledgers (BDY-11).
+- Full-depth SHS 32 x 32 x 3 aluminium stiffeners, bonded to both skins, stand in each side wall's living-zone bay and at both jambs of the entry door. With the hardpoints they hold the wall to 17.6 mm in AS/NZS 1170.2's 25-year wind, against 20.0 mm (BDY-10).
+- The split's outdoor unit stands on two stays to the chassis, so the rear wall's skin carries none of its weight (BDY-21).
 - A moulded GRP tray covers the wet room floor, and vinyl covers only the rest.
 - The mounts are checked at the 3,500 kg plate (H2).
 - The body weighs 618.3 kg, 689.7 kg with growth, with both doors and their steps.
@@ -38,12 +39,12 @@ The cases follow report 11 and CHASSIS.md. Each panel is checked as a one-way sp
 |---|---|---|---|
 | LC1, 1 g | A foot of 100 kg on 100 x 150 mm, the roof with the solar array | Deflection: floor span/200, roof span/150 (reported) | Report 12, the engineer sets the limits |
 | LC2, 3 g | A foot, the floor edge at 160 kg/m², the roof with the array | Skins at half their ultimate and half the wrinkling stress, cores at half their shear strength, bearing at half the core's compressive strength | ISO 12215-5 for the skins, report 12 for the rest |
-| Wind | 0.5 kPa on a side wall, floor to the roof joiner | As LC2, and deflection span/100 (reported) | Report 12 |
+| Wind, parked | A side wall, floor to the roof joiner. Region A, terrain category 2 at 3 m, Cp,e 0.7 and Cp,i -0.3: 0.96 kPa net at the ultimate 40 m/s, 0.68 kPa at the 25-year 37 m/s | Skins at half their ultimate and stiffeners at yield over 1.5 at 0.96 kPa. Deflection span/100 at 0.68 kPa (reported) | AS/NZS 1170.2 Tables 3.1, 4.1, 5.1(A), 5.2(A) |
 | Wind, 40 m/s | 5.06 kN of uplift on the roof | Half the bond's tension strength over the joiner's width | Report 12, scaled to the roof's 10.6 m² |
 | LC3, LC4 | 0.8 g braking, 0.5 g sideways, on the mounts | Mount bolt shear and tension | Report 11 |
 | LC5a | 13.4 kNm of twist between the axles, travelling | Mounts, skins, joints and the rear wall under the body's share | Report 11, report 12 section 4 |
 | LC5b | A corner steady wound to 875 kg at tare, parked | As LC5a | Report 11 |
-| Inserts | The lift bed's rail screws at 1.5 times the 264 kg bed at night, the awning's roof brackets at 3 g | Half the rated load, then a pull test (LR-09) | Report 02 MAT-05 |
+| Inserts | The lift bed's rail screws at 1.5 times the 264 kg bed at night, the awning's roof brackets at 3 g, the outdoor unit's cradle at 3 g down, 0.8 g along and 0.5 g sideways | Half the rated load, then a pull test (LR-09) | Report 02 MAT-05 |
 
 For LC5a and LC5b the checks take the larger of two bounds on the roof joint: the bonded roof carries shear and the body is a closed box, or the roof joint is neglected and the body is an open box. The chassis checks stay on the bare frame (CHASSIS.md), so they still hold if the mounts loosen.
 
@@ -86,6 +87,18 @@ The bonded body takes almost all the twist. The closed box loads the mounts and 
 ## The rear wall as a diaphragm
 
 The rear wall closes the box's rear end and racks in shear under the torque the floor bolts put into the box's rear half. The racking force is T / 2h, with T that torque and h the box's height. The rear door's cut-out leaves 1,335 mm of full panel. The worst case is LC5a with the bonded roof: 12.0 kNm into the rear half, 2.94 kN of racking. The skins carry 0.73 MPa against 22.2 MPa and the joiner 1.26 N/mm against 22.5 N/mm (BDY-20, 0.06), so the door needs no extra posts or header.
+
+## The side walls in wind
+
+Each side wall spans 2,000 mm from the floor joiner to the roof-to-wall joiner. The sandwich carries the wind together with full-depth aluminium members bonded to both skins, which bend with it about its mid-plane: the four lift-bed hardpoints (RHS 40 x 32 x 3), a stiffener in each wall's living-zone bay and one at each jamb of the entry door (SHS 32 x 32 x 3). With the tower's sides and the partition they bound every bay at no more than 1,067 mm, the gap between the bed's rail pairs.
+
+- The load is AS/NZS 1170.2's for a parked trailer in region A, terrain category 2 at 3 m, with Cp,e 0.7 on the windward wall and Cp,i -0.3 inside. The 25-year wind, 37 m/s times 0.91, gives 0.68 kPa net for the deflection. BDY-19's 40 m/s gives 0.96 kPa net for the strength.
+- The wall deflects 17.6 mm against 20.0 mm, and 27.1 mm without the members (BDY-10). The 20 mm is span/100, report 12's planning limit for the engineer to set.
+- The skins reach 9.6 MPa, a quarter of half their ultimate, and each stiffener 61 MPa against 73 MPa, 0.83 (BDY-06).
+
+## The outdoor unit's cradle
+
+The split's outdoor unit and its cradle, 46 kg, stand 194 mm behind the rear wall's road half, over the rear overhang. Two RHS 40 x 20 x 3 stays (AC-04) run from the cradle's wall-side corners down the wall to brackets on the rear crossmember and carry its weight, 0.68 kN each at 3 g, a third of their buckling load (BDY-21, 0.33). Four M8 bolts on backing pads in an insert strip hold it to the wall against its overturning moment, a pull away from the wall and the sideways load: at most 0.37 kN of tension and 0.06 kN of shear a bolt, 0.02 of half their rated loads.
 
 ## The roof
 
@@ -132,17 +145,18 @@ The solar panels are in the roof group, the wet room tray in the wet room group,
 |---|---|---|---|
 | BDY-03 | Floor under a foot, with bearing | Skin 22.3 MPa, bearing 0.20 of 0.70 MPa | 0.30 |
 | BDY-04 | Floor edge between outriggers 900 mm apart | Core 0.076 MPa | 0.13 |
-| BDY-06 | Side wall, 2,000 mm, in a 0.5 kPa wind | Skin 5.0 MPa | 0.20 |
+| BDY-06 | Side wall, 2,000 mm, in the ultimate wind, 0.96 kPa | Skin 9.6 MPa, stiffener 61 MPa of 73 MPa | 0.83 |
 | BDY-07 | Fixed roof with the solar array, 3 g | Skin 3.6 MPa | 0.14 |
 | BDY-09 | Roof deflection at 1 g (reported) | 5.5 mm of 15.8 mm | |
-| BDY-10 | Wall deflection in wind, with the stiffeners | 18.6 mm of 20.0 mm | |
-| BDY-11 | Lift-bed rail screws, awning bolts | 0.12 kN of 1.50 kN, 0.30 kN of 10.0 kN | 0.08 |
+| BDY-10 | Wall deflection in the 25-year wind, 0.68 kPa, with the stiffeners | 17.6 mm of 20.0 mm | |
+| BDY-11 | Lift-bed rail screws, awning bolts | 0.12 kN of 1.50 kN, 0.42 kN of 10.0 kN | 0.08 |
 | BDY-13 | Body share of LC5a (reported) | 98 % with the bonded roof, 6 % without | |
 | BDY-14 | Skins and bonded joints in twist | 0.87 N/mm of 22.5 N/mm | 0.04 |
 | BDY-16 | Body mounts, M12 into nut plates | 6.67 kN of 23.3 kN | 0.29 |
 | BDY-18 | Opening spacing, 17 openings | Every rule met, the tightest by 0 mm | |
 | BDY-19 | Roof-to-wall joint in a 40 m/s uplift | 0.37 N/mm of 30 N/mm | 0.01 |
 | BDY-20 | Rear wall with its door, as the rear diaphragm | 1.26 N/mm of 22.5 N/mm | 0.06 |
+| BDY-21 | Outdoor unit's cradle: stays to the chassis, wall bolts | 0.68 kN a stay of 2.0 kN, 0.37 kN a bolt of 22.6 kN | 0.33 |
 
 ## What the engineer must check
 
@@ -151,7 +165,7 @@ The solar panels are in the roof group, the wet room tray in the wet room group,
 3. The M12 nut-plate mounts: the worst bolt, the nut plate's welds inside the raiser, and the floor's pull-through under the spreader.
 4. The roof-to-wall joiner and the rounded corner pieces: the bond in uplift and in twist.
 5. The rear wall with its door cut-out as the rear diaphragm.
-6. The inserts and hardpoints, by pull tests, above all the lift-bed rail screws and the outdoor unit's cradle.
+6. The inserts and hardpoints, by pull tests, above all the lift-bed rail screws and the outdoor unit's cradle bolts, and the cradle's stays and their feet.
 7. The skin data (woven roving at 14 GPa and 200 MPa, XPS shear strength 0.25 MPa), which no maker publishes for these panels.
 
 ## Assumptions made for the design

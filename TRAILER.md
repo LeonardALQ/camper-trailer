@@ -64,7 +64,7 @@ The chassis is a galvanised ladder frame (CHASSIS.md revision E, CT-101 to CT-10
 
 ## Body and roof
 
-The shell is bonded sandwich panels in aluminium joiners (BODY.md revision C, CT-201 to CT-203): a 30 mm GRP and PVC foam floor, 35 mm GRP and XPS walls 2,000 mm tall, and a fixed 40 mm roof that carries the solar panels. It bolts to the frame at 32 points and takes 98 % of the twist.
+The shell is bonded sandwich panels in aluminium joiners (BODY.md revision C, CT-201 to CT-203): a 30 mm GRP and PVC foam floor, 35 mm GRP and XPS walls 2,000 mm tall, and a fixed 40 mm roof that carries the solar panels. It bolts to the frame at 32 points and takes 98 % of the twist. Full-depth aluminium stiffeners and the bed's hardpoints hold each side wall to 17.6 mm in AS/NZS 1170.2's 25-year wind, against 20 mm (BDY-10).
 
 The roof is fixed, with rounded front edges, 150 mm at the roof edge and 250 mm on the front verticals (H12). Towing at 90 km/h it uses 21.3 L/100 km, against 25.0 with a square front and 20.6 with a hard raising roof, which would add 117 kg and about AUD 32,900 and rule out the S4 windows, the stock doors, the lift bed and a full-height wet room (research report 25).
 
@@ -74,7 +74,7 @@ The awning is a Fiamma F80s 400 on the roof's kerb edge, its case 5 mm inside th
 
 ## Lift bed and desk
 
-A Lippert HappiJac four-rail lift carries a 1,550 x 2,290 mm honeycomb platform and a 180 mm queen mattress across the trailer (H1). By day and in travel the platform's underside is 1,600 mm up, so a seated adult clears it. At night it stops at 805 mm, with the mattress top at 1,044 mm, 956 mm clear above it and 75 mm over the desk (BED-01). Index plungers lock it, a safety edge stops it on an obstruction, and a socket at the rail tops lowers it by hand. The desk is 1,200 x 600 mm at 730 mm against the front wall, and nothing else stands under the bed.
+A Lippert HappiJac four-rail lift carries a 1,550 x 2,290 mm honeycomb platform and a 180 mm queen mattress across the trailer (H1). By day and in travel the platform's underside is 1,600 mm up, so a seated adult clears it. At night it stops at 805 mm, with the mattress top at 1,044 mm, 956 mm clear above it and 75 mm over the desk (BED-01). Index plungers lock it, a safety edge stops it on an obstruction, and a socket at the rail tops lowers it by hand. The lift is rated 272 kg standing and 204 kg moving (Lippert), so at night the bed takes two adults of up to about 208 kg together (BED-02). The desk is 1,200 x 600 mm at 730 mm against the front wall, and nothing else stands under the bed.
 
 ## Kitchen
 
@@ -96,7 +96,7 @@ A Camec 3.5 kg washer and a Haier 7 kg heat-pump dryer stand on the battery plin
 
 Research report 19's load calculation gives a design hot day of 37.1 kWh of heat to remove, peaking at 3.29 kW, and a design cold night of 17.6 kWh over 14 h (CT-621).
 
-- Cooling and heating: a Mitsubishi Electric 2.5 kW inverter split (H7). The indoor unit sits high on the partition, the outdoor unit high on the rear wall on wire-rope isolators. It uses 9.0 kWh of battery on the hot day, 5.1 kWh less than the best rooftop unit.
+- Cooling and heating: a Mitsubishi Electric 2.5 kW inverter split (H7). The indoor unit sits high on the partition, the outdoor unit high on the rear wall on wire-rope isolators, its cradle on two stays to the chassis (BDY-21). It uses 9.0 kWh of battery on the hot day, 5.1 kWh less than the best rooftop unit.
 - Backup: the Truma Combi D 6 E heats air and water on diesel or on its elements.
 - Fresh air: two LUNOS e2 60 pairs exchange 60 m³/h by day and 45 m³/h at night through 83 % heat recovery, holding CO₂ near 900 ppm for two. A filtered top-up fan adds 15 m³/h, so the cabin sits about 3 Pa above outside, and a relief valve lets the excess out through the wet room. A wet room extract and the ducted hood remove moisture at the source.
 - Dust: while towing, a Sy-Klone RESPA-CF2 with a powered precleaner and MERV 16 and carbon filters holds about 20 Pa, and the other fans stop. No window needs to open.

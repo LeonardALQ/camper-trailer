@@ -199,6 +199,12 @@ trailer_checks:
     severity: fail
     inputs: []
     why: H1. By day the platform's underside is at least 1,600 mm above the floor, so a seated 95th percentile adult clears it. By night the mattress top is 950 to 1,050 mm up with at least 900 mm clear above it, and the platform stops at least 40 mm above the desk top.
+  - id: BED-02
+    title: Lift bed at night within the HappiJac's 272 kg static rating, and the bed alone within its 204 kg moving rating
+    type: bed_load
+    severity: fail
+    inputs: []
+    why: "Lippert's manual ccd-0002668 rates the HappiJac at 272 kg static and 204 kg while it moves (research report 21). At night it holds the 64 kg moving bed and two sleepers taken at 100 kg each (data/body/body.yaml). It moves with nobody on it."
   - id: FIT-05
     title: Tyres swung through their full travel keep 50 mm from every chassis member
     type: tyre
@@ -510,16 +516,18 @@ trailer_checks:
      why: "Report 12 section 3. 100 kg on 100 x 150 mm. Bearing at most half the core's compressive strength. With the bikes gone this governs the floor (report 18 open question 13)"}
   - {id: BDY-04, title: "Floor edge beside the raisers between outriggers, LC2 3 g", type: body_panel, body: {item: BDY-04}, severity: fail,
      why: "Report 12 section 3 and report 11 section 5.3: 160 kg/m2 of floor and contents spanning between outriggers, no edge member"}
-  - {id: BDY-06, title: "Side wall in a 0.5 kPa wind", type: body_panel, body: {item: BDY-06}, severity: fail,
-     why: "Report 12 section 3. The wall spans from the floor joiner to the roof-to-wall joiner, 2,000 mm (H1a)"}
+  - {id: BDY-06, title: "Side wall and its stiffeners in the ultimate wind, 40 m/s", type: body_panel, body: {item: BDY-06}, severity: fail,
+     why: "AS/NZS 1170.2 for the parked trailer: BDY-19's 40 m/s (region A's 500-year wind at 3 m in terrain category 2 is 41 m/s), Cp,e 0.7 on the windward wall and Cp,i -0.3 inside (Tables 5.2(A) and 5.1(A)), 0.96 kPa net. The wall spans from the floor joiner to the roof-to-wall joiner, 2,000 mm (H1a). Skins at half their ultimate without the stiffeners, each stiffener at its yield over 1.5 for the share its stiffness draws"}
   - {id: BDY-07, title: "Fixed roof with the bonded solar array, LC2 3 g, spanning between the walls", type: body_panel, body: {item: BDY-07}, severity: fail,
      why: "Report 12 section 3 with report 13's 29 kg Sunman array"}
   - {id: BDY-09, title: "Roof deflection with the solar array at 1 g within span/150 (reported)", type: body_deflection, body: {item: DEF-B2}, severity: report,
      why: "Report 12 section 3. Bonded panels flex with the roof"}
-  - {id: BDY-10, title: "Wall deflection in a 0.5 kPa wind within span/100 (reported)", type: body_deflection, body: {item: DEF-B3}, severity: report,
-     why: "Report 12 section 3"}
+  - {id: BDY-10, title: "Wall deflection in the serviceability wind within span/100 (reported)", type: body_deflection, body: {item: DEF-B3}, severity: report,
+     why: "AS/NZS 1170.2: region A's 25-year wind, 37 m/s, times 0.91 for terrain category 2 at 3 m (Tables 3.1 and 4.1), with Cp,e 0.7 and Cp,i -0.3, 0.68 kPa net. Span/100, 20 mm on the 2,000 mm wall, is report 12's planning limit (section 3) for the engineer to set. The full-depth stiffeners and hardpoints carry the load with the sandwich (data/body/body.yaml)"}
   - {id: BDY-11, title: "Panel fixings: lift-bed rail screws in their hardpoints and awning brackets within half their rated load", type: body_insert, severity: fail,
      why: "Report 12 section 3 and report 02 MAT-05. A pull test in the real panel confirms each insert (LR-09)"}
+  - {id: BDY-21, title: "Outdoor unit's cradle: wall bolts within half their rated load, and the stays carry the vertical load to the chassis", type: body_cradle, severity: fail,
+     why: "The split's outdoor unit and cradle, 46 kg, stand off the rear wall over the rear overhang, where the bumps are largest. At the chassis cases (3 g down, 0.8 g braking taken both ways, 0.5 g sideways, all at once) the stays take the vertical load into the rear crossmember, so the skin carries none of it, and the wall's bolts hold the cradle to the wall. Half the rated load as for BDY-11 (report 02 MAT-05), stays at their buckling load over 3. A pull test confirms the bolts (LR-09)"}
   - {id: BDY-13, title: "Body share of the LC5a twist, with the body tied to the chassis at the mounts (reported)", type: body_twist, severity: report,
      why: "Report 12 section 4 claims about 80 %. The frame model checks it with the body as a torsion box, for the roof joint carrying shear or not"}
   - {id: BDY-14, title: "Skins and bonded joints under the body's share of LC5a", type: body_joint, severity: fail,

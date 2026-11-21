@@ -161,7 +161,7 @@ class TrailerCheck(Strict):
                   "towball_ute", "towball_ute_input", "axle_window", "lateral", "bed", "platinum_return",
                   "chassis_stress", "chassis_local", "chassis_deflection", "chassis_twist", "chassis_fatigue",
                   "body_panel", "body_deflection", "body_insert", "body_roof", "body_twist", "body_joint",
-                  "body_mount", "body_end_wall", "body_openings"]
+                  "body_mount", "body_end_wall", "body_openings", "body_cradle", "bed_load", "rollover", "yaw"]
     load_case: str | None = None          # chassis_stress: report 11's load case (data/chassis/chassis.yaml)
     item: str | None = None               # chassis_local, chassis_deflection and chassis_fatigue: what is checked
     quantity: Literal["mass", "axle", "axle_vsb1", "towball", "towball_pct", "tyre_load", "tyre_load_side"] | None = None

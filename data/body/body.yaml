@@ -27,11 +27,13 @@ panels:
     ult: 77           # Polydet data sheet
     core: {name: XPS, c: 32, Gc: 8, shear: 0.25, compression: 0.30}
     kg_m2: 6.0
-    # Vertical aluminium stiffeners bonded in the side-wall cores, floor joiner to roof joiner (line BD-18). With the
-    # lift-bed hardpoints, the door frame, the tower's sides and the partition they stiffen every side-wall bay at no
-    # more than `pitch`. The wind deflection (BDY-10) takes the weakest of them smeared over that pitch. The skin
-    # stress (BDY-06) leaves them out
-    stiffener: {name: "SHS 20 x 20 x 1.6 6060-T5 aluminium", E: 69000, I: 6600, pitch: 1067}
+    # Full-depth aluminium stiffeners laid upright in the side-wall cores, floor joiner to roof joiner, bonded to both
+    # skins (lines BD-18 and BD-19). With the lift-bed hardpoints (LB-06, RHS 40 x 32 x 3, full height and depth), the
+    # tower's sides and the partition they bound every side-wall bay at no more than `pitch`, the 1,067 mm between the
+    # bed's rail pairs. A member bonded to both skins bends about the panel's own mid-plane, so its stiffness adds to
+    # the sandwich's. The wind deflection (BDY-10) takes the weakest of them smeared over that pitch. The skin stress
+    # (BDY-06) leaves them out, and BDY-06 checks the stiffener's own share at the ultimate wind
+    stiffener: {name: "SHS 32 x 32 x 3 6060-T5 aluminium, full core depth", E: 69000, I: 49300, depth: 32, fy: 110, pitch: 1067}
   front_wall:
     name: "Front wall, 35 mm: 2.0 mm outer and 1.5 mm inner Polydet skins on 31.5 mm XPS, against stones"
     t: 35
@@ -61,7 +63,8 @@ criteria:
   ultimate_factor: 1.5         # breaking-load cases: a factor of at least 1.5 on ultimate (assumption)
   floor_span_ratio: 200        # floor deflection at 1 g under a point load (assumption, the engineer sets it)
   roof_span_ratio: 150
-  wall_span_ratio: 100         # under 0.5 kPa of wind
+  wall_span_ratio: 100         # under the serviceability wind: report 12's planning limit (section 3), the engineer sets it
+  metal_factor: 1.5            # an aluminium stiffener at its yield over 1.5 at the ultimate wind (assumption, as LC3)
 
 # ---------------------------------------------------------------- point and patch loads (report 12 section 3)
 # The bike wheels, the chock bases, the L-track anchors and the generator left the body with the garage (UTE-GARAGE.md
@@ -69,14 +72,45 @@ criteria:
 loads:
   foot: {kg: 100, patch: [100, 150], note: "A person on one foot in the living area"}
   floor_edge_kg_m2: 160        # floor and its contents beside the raisers, between outriggers
-  wind_kpa: 0.5                # parked wind on a wall (report 12)
   bed_kg: 264                  # the lift bed at night: 64 kg moving (report 21 section 1.4) and two sleepers of 100 kg
   bed_travel_kg: 64            # the moving bed alone, as it travels at the day stop
+  bed_static_rating_kg: 272    # Lippert HappiJac, static (manual ccd-0002668, research report 21)
+  bed_moving_rating_kg: 204    # Lippert HappiJac, while it moves (the same manual)
   bed_night_factor: 1.5        # sleepers moving on the bed at night (assumption, a person kneeling or sitting down)
   bed_rails: 4                 # HappiJac rails, two on each side wall
-  rail_screws: 8               # 1/4 in self-tapping screws per rail into its RHS 40 x 20 x 3 hardpoint (est., about 200 mm pitch)
+  rail_screws: 8               # 1/4 in self-tapping screws per rail into its RHS 40 x 32 x 3 hardpoint (est., about 200 mm pitch)
   rail_screw_rated_n: 3000     # shear on one screw in 3 mm 6060-T5 (est.: bearing about 2.5 fu d t = 7.6 kN characteristic)
   uplift_40ms_n: 5060          # report 12's 6,300 N on 13.2 m2 at 110 km/h into a 36 km/h headwind, scaled to the 10.6 m2 roof
+
+# ---------------------------------------------------------------- the split's outdoor unit on the rear wall (BDY-21)
+# The cradle (AC-03) hangs the outdoor unit (AC-02) high on the rear wall's road half. Two stays (AC-04) run from the
+# cradle's wall-side corners down the wall to brackets on the rear crossmember, so the chassis carries the vertical load
+# and the wall's skin none of it. The wall's bolts hold the cradle to the wall: in tension against the unit's
+# overturning moment (its centre of gravity stands off the wall) and any pull away from it, in shear against the
+# sideways load. The accelerations are the chassis cases' (CHASSIS.md): 3 g down, 0.8 g braking taken both ways, and
+# 0.5 g sideways, all at once.
+cradle:
+  lines: [AC-02, AC-03]
+  bolts: 4                       # M8 through-bolts, two rows of two, on 80 x 80 x 3 aluminium pads in the rear wall's HD PVC insert strip
+  row_lever_mm: 520              # top bolt row to the cradle's bottom bearing pad on the wall (est.)
+  column_spacing_mm: 700         # between the two bolt columns, across the trailer (est.)
+  pad_side_mm: 80                # backing pad side, for the pull-through (the mounts' spreader rule, skin 60 MPa, insert 6 MPa)
+  shear_rated_n: 6000            # one M8 bearing on the insert strip and the 1.5 mm skin (est.)
+  stays: {n: 2, name: "RHS 40 x 20 x 3 6060-T5 aluminium", E: 69000, I_min: 18892, A: 324, L: 1450, fy: 110, buckling_factor: 3.0}
+  accel: {down_g: 3.0, along_g: 0.8, side_g: 0.5}
+
+# ---------------------------------------------------------------- wind on the parked trailer (BDY-06, BDY-10)
+# AS/NZS 1170.2, in place of report 12's 0.5 kPa, which cited no standard. Region A, the non-cyclonic regions the trailer
+# camps in. Terrain category 2 (open country) at the wall's height, no shielding, flat ground, any direction
+# (M_d = M_s = M_t = 1). Net pressure 0.6 V^2 (Cp,e - Cp,i) Pa, with C_dyn and the K factors at 1.0: the side wall's
+# 8.8 m2 is under Table 5.4's 10 m2, and its 2 m span is far larger than the local pressure zones.
+wind:
+  V_s: 37            # m/s, serviceability: region A's 25-year regional wind V_25 (Table 3.1), for the wall's deflection
+  Mzcat: 0.91        # Table 4.1, terrain category 2 at 3 m or less, on V_s
+  V_u: 40            # m/s, ultimate for strength: BDY-19's 40 m/s. Region A's V_500, 45 m/s, times 0.91 is 41 m/s
+  cpe: 0.7           # Table 5.2(A), windward wall
+  cpi: -0.3          # Table 5.1(A), all walls equally permeable: -0.3 or 0.0, the more severe with the windward wall
+  src: "AS/NZS 1170.2 Table 3.1 regional wind speeds as reproduced at https://docs.hexagonppm.com/r/ja-JP/PV-Elite-Help/25/603588 (V_R = 67 - 41 R^-0.1 for region A)"
 
 # ---------------------------------------------------------------- the body box for the twist (report 12 section 4)
 # The fixed roof is bonded into a roof-to-wall joiner, so the body is one closed cell (report 18 section 2). The lower

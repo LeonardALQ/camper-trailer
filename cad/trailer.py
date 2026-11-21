@@ -825,6 +825,16 @@ class Trailer:
                            margin=round(gov[1], 1), ok=gov[1] >= -1e-6, governing=gov[0],
                            detail=(f"day underside {V['bed_day_h']:.0f} mm, night underside {V['bed_night_h']:.0f} mm, night mattress top {top:.0f} mm with "
                                    f"{V['interior_h'] - top:.0f} mm clear above it, {V['bed_night_h'] - V['desk_top_h']:.0f} mm over the {V['desk_top_h']:.0f} mm desk"))
+            elif c.type == "bed_load":
+                from .body import load_data
+                L = load_data()["loads"]
+                night, moving = L["bed_kg"], L["bed_travel_kg"]
+                m_s, m_m = L["bed_static_rating_kg"] - night, L["bed_moving_rating_kg"] - moving
+                row.update(limit=f"<= {L['bed_static_rating_kg']:.0f} kg static, <= {L['bed_moving_rating_kg']:.0f} kg moving", measured=night, unit="kg",
+                           margin=min(m_s, m_m), ok=min(m_s, m_m) >= 0, governing="the bed at night with two sleepers" if m_s <= m_m else "the bed moving",
+                           detail=(f"at night {night:.0f} kg, the {moving:.0f} kg moving bed and two sleepers, against the {L['bed_static_rating_kg']:.0f} kg static "
+                                   f"rating ({100 * night / L['bed_static_rating_kg']:.0f} %, so the two together at most about "
+                                   f"{L['bed_static_rating_kg'] - moving:.0f} kg). Moving, {moving:.0f} kg against {L['bed_moving_rating_kg']:.0f} kg"))
             elif c.type == "towball_scale":
                 m = self.inputs.v("UTE-03")
                 model = by_id[self.target_case.id]["nominal"]["towball_kg"]

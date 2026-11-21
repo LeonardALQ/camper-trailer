@@ -326,7 +326,7 @@ items:
     box: [body_x0, s * (half_bw - wall_t / 2) - wall_t / 2, floor_z, body_length, wall_t, interior_h]
     parts:
       - {item: "8.84 m2 less the wall's openings at 6.0 kg/m2: road side less 0.94 m2 (W2, W4, W6, the RESPA intake, hood cowl, Combi cowl and e2 fan B), kerb side less 1.79 m2 (W1, entry door, e2 fan A, cassette door)", kg: "47.4 * (1 + s) / 2 + 42.3 * (1 - s) / 2", basis: calculated, source: "Report 12 section 10, TRAILER.md"}
-      - {item: "Insert strips, and four RHS 40 x 20 x 3 lift-bed hardpoints per pair of walls are in LB-06", kg: 3.0, basis: estimate}
+      - {item: "Insert strips. The four RHS 40 x 32 x 3 lift-bed hardpoints are in LB-06 and the stiffeners in BD-18 and BD-19", kg: 3.0, basis: estimate}
   - id: BD-04
     name: End walls, full height, the rear wall with the wet room door
     material: "Front: 2.0 mm outer and 1.5 mm inner Polydet GRP skins on 31.5 mm XPS. Rear: two 1.5 mm Polydet skins on 32 mm XPS"
@@ -371,14 +371,23 @@ items:
     mass: {basis: declared, total_kg: 6, maturity: estimate, source: "Research report 25 section 2: about +6 kg (0 to +12 kg) net of the square corner joiners and panel strips they replace", note: "H12, option A+"}
     note: H12 keeps a fixed roof. Report 25 puts towing fuel at 21.3 L/100 km at 90 km/h against 25.0 with the square front, for about AUD 3,500 (est.).
   - id: BD-18
-    name: Side-wall stiffeners, SHS 20 x 20 x 1.6 aluminium bonded vertically in the wall cores, one in each wall's living-zone bay
-    material: "6060-T5 aluminium SHS 20 x 20 x 1.6, bonded in a routed slot in the XPS core"
+    name: Side-wall stiffeners, SHS 32 x 32 x 3 aluminium, full core depth, bonded to both skins, one in each wall's living-zone bay
+    material: "6060-T5 aluminium SHS 32 x 32 x 3, laid in the XPS core by the panel maker and bonded to both skins"
     system: body
-    price: {aud: 40, basis: estimate, date: 2026-11-21, note: "One 6.5 m length of 6060 SHS 20 x 20 x 1.6 cut in two (est.)"}
+    price: {aud: 90, basis: estimate, date: 2026-11-21, note: "4 m of 6060 SHS 32 x 32 x 3 at about AUD 22/m (est.)"}
     for: {s: [1, -1]}
     point: [body_x0 + 2795, s * (half_bw - wall_t / 2), floor_z + interior_h / 2]
-    mass: {basis: declared, unit_kg: 0.64, maturity: calculated, source: "2.0 m at 0.318 kg/m (117.8 mm2 of 6060 at 2,700 kg/m3)"}
-    note: "With the lift-bed hardpoints, the door frame, the tower's sides and the partition, no side-wall bay is wider than 1,067 mm unstiffened (data/body/body.yaml, BDY-10). Kerb side between the washer and the dryer, road side just ahead of W4. They also take cabinetry screws"
+    mass: {basis: declared, unit_kg: 1.88, maturity: calculated, source: "2.0 m at 0.940 kg/m (348 mm2 of 6060 at 2,700 kg/m3)"}
+    note: "With the lift-bed hardpoints (LB-06), the entry door's jamb stiffeners (BD-19), the tower's sides and the partition, no side-wall bay is wider than 1,067 mm (data/body/body.yaml, BDY-06, BDY-10). Kerb side between the washer and the dryer, road side just ahead of W4. Bonded to both skins, so each acts with the sandwich. They also take cabinetry screws"
+  - id: BD-19
+    name: Entry door jamb stiffeners, SHS 32 x 32 x 3 aluminium, full core depth, floor joiner to roof joiner on both sides of D1
+    material: "6060-T5 aluminium SHS 32 x 32 x 3, laid in the XPS core by the panel maker and bonded to both skins"
+    system: body
+    price: {aud: 90, basis: estimate, date: 2026-11-21, note: "4 m of 6060 SHS 32 x 32 x 3 at about AUD 22/m (est.)"}
+    for: {k: [0, 1]}
+    point: [lz_door_x - 20 + k * (lz_door_w + 40), -half_bw + wall_t / 2, floor_z + interior_h / 2]
+    mass: {basis: declared, unit_kg: 1.88, maturity: calculated, source: "2.0 m at 0.940 kg/m (348 mm2 of 6060 at 2,700 kg/m3)"}
+    note: "The door's cut-out breaks the wall's span, so a full-height stiffener at each jamb carries the door's share of the wind and bounds the bays on either side (BDY-10). The door's own frame screws into them"
   - id: BD-08
     name: Extrusions, adhesive, sealant and the body mount fixings
     material: "Aluminium extrusions, MS polymer adhesive and sealant, galvanised fixings (est.)"
@@ -659,13 +668,13 @@ items:
       - {item: "Four stainless spring index plungers, M12, with interlock microswitches, at the day and night stops", kg: 0.6, basis: estimate, source: "Report 21 section 1.2"}
       - {item: "Pressure-sensitive safety edge round the platform's lower perimeter, with its relay in the down circuit", kg: 0.8, basis: estimate, source: "Report 21 section 1.2"}
   - id: LB-06
-    name: Lift bed hardpoints, four RHS 40 x 20 x 3 aluminium tubes laid flat in the side wall cores behind the rails
-    material: "6060-T5 aluminium RHS 40 x 20 x 3 (est.)"
+    name: Lift bed hardpoints, four RHS 40 x 32 x 3 aluminium tubes, full wall height and core depth, behind the rails
+    material: "6060-T5 aluminium RHS 40 x 32 x 3 (est.), bonded to both skins"
     system: bed
-    price: {aud: 150, basis: estimate, date: 2026-11-20, note: "Four 1.6 m lengths of aluminium RHS 40 x 20 x 3 at AUD 37.50"}
-    point: [in_x0 + bed_rail_u + 533, 0, floor_z + 1175]
-    mass: {basis: declared, total_kg: 5.6, maturity: calculated, source: "Report 21 section 1.4: 4 x 1.6 m at 0.875 kg/m"}
-    note: Bonded into the wall cores as the panels are laid up, so the rail screws bite 3 mm aluminium (Lippert's backing rule).
+    price: {aud: 240, basis: estimate, date: 2026-11-21, note: "Four 2.0 m lengths of aluminium RHS 40 x 32 x 3 at about AUD 30/m (est.)"}
+    point: [in_x0 + bed_rail_u + 533, 0, floor_z + 1000]
+    mass: {basis: declared, total_kg: 8.55, maturity: calculated, source: "4 x 2.0 m at 1.069 kg/m (396 mm2 of 6060 at 2,700 kg/m3). Report 21 section 1.4 had four 1.6 m lengths of RHS 40 x 20 x 3, 5.6 kg"}
+    note: Laid into the wall cores as the panels are made, floor joiner to roof joiner and bonded to both skins, so the rail screws bite 3 mm aluminium (Lippert's backing rule) and each hardpoint also stiffens the wall against wind (BDY-10). The bed's rail pairs are 1,067 mm apart, the widest side-wall bay.
   - id: LB-03
     name: Bed platform, 40 mm aluminium honeycomb, 0.8 and 0.5 mm skins, 1,550 x 2,290 mm, on the lift's support rails
     material: "Aluminium honeycomb sandwich, 0.8 mm top and 0.5 mm bottom aluminium skins on a 40 kg/m3 core"
@@ -994,7 +1003,16 @@ items:
     hollow: true
     box: [body_x1, half_bw - 830, ceiling_z - 610, 400, 825, 650]
     mass: {basis: declared, total_kg: 11, maturity: estimate, source: "Report 19 R19-03 (est.)"}
-    note: The cradle bolts through insert strips into the rear wall and the roof-to-wall joiner, with two stays to the road-side rear corner. Its kerb edge stays 48 mm clear of the rear door's free edge.
+    note: The cradle bolts to the rear wall through four M8 bolts on backing pads in an insert strip, and stands on two stays to the chassis (AC-04), so the wall's skin carries none of its weight (BDY-21). Its kerb edge stays 48 mm clear of the rear door's free edge.
+  - id: AC-04
+    name: Cradle stays, two RHS 40 x 20 x 3 aluminium posts from the cradle's wall-side corners down the rear wall to brackets on the rear crossmember
+    material: "6060-T5 aluminium RHS 40 x 20 x 3 with 5 mm angle feet, stainless bolts and isolating washers"
+    system: hvac
+    price: {aud: 150, basis: estimate, date: 2026-11-21, note: "3 m of RHS 40 x 20 x 3, two angle feet and brackets, made with the small fabrications (LAB-05)"}
+    for: {k: [0, 1]}
+    point: [body_x1 + 20, "half_bw - 780 + k * 630", floor_z + 700]
+    mass: {basis: declared, unit_kg: 1.5, maturity: estimate, source: "1.45 m at 0.875 kg/m plus a foot and bolts (est.)"}
+    note: "At Y 420 and 1,050 mm they pass clear of the rear door, the rinse box and the end-outline lamp under the cradle, and their feet sit on the crossmember above the rear lamps. They carry the unit's weight at 3 g into the chassis (BDY-21)"
   - id: VE-01A
     name: Fresh air with heat recovery, LUNOS e2 60 fan A (pair 1), high in the kerb wall over the dryer, in the locker
     material: "Fan with a ceramic regenerator in a 200 mm sleeve, MERV 13 inner cover, stainless outer hood"

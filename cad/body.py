@@ -159,9 +159,20 @@ class Body:
         pitch = max(b - a for a, b in zip(self.stations, self.stations[1:]))
         r = f.uniform(3 * L["floor_edge_kg_m2"] * G / 1e6, pitch)
         row("BDY-04", f"Floor edge beside the raisers between outriggers {pitch:.0f} mm apart", f, r, "LC2, 3 g")
-        # side wall in wind, spanning from the floor to the roof-to-wall joiner
-        r = w.uniform(L["wind_kpa"] / 1000, V["interior_h"])
-        row("BDY-06", f"Side wall in a 0.5 kPa wind, floor to the roof joiner ({V['interior_h']:.0f} mm)", w, r, "Wind")
+        # side wall in the ultimate wind, spanning from the floor to the roof-to-wall joiner. The skins are checked without
+        # the stiffeners, and each stiffener for the share of the load its stiffness draws
+        wu, ws = self.wind()
+        r = w.uniform(wu["kpa"] / 1000, V["interior_h"])
+        st = w.d["stiffener"]
+        share = w.D_stiff / (w.D + w.D_stiff)
+        m_st = share * wu["kpa"] / 1000 * st["pitch"] * V["interior_h"] ** 2 / 8
+        s_st = m_st * st["depth"] / 2 / st["I"]
+        u_st = s_st / (st["fy"] / cr["metal_factor"])
+        row("BDY-06", f"Side wall in the ultimate wind, {wu['kpa']:.2f} kPa net at {wu['V']:.0f} m/s, floor to the roof joiner ({V['interior_h']:.0f} mm)",
+            w, r, "Wind, ultimate", extra=(f"the stiffener takes {100 * share:.0f} % of its bay's load, {s_st:.0f} MPa against {st['fy'] / cr['metal_factor']:.0f} MPa, "
+                                          f"utilisation {u_st:.2f}"))
+        if u_st > out[-1]["util"]:
+            out[-1].update(util=u_st, governing="stiffener")
         # the fixed roof with the bonded solar array and its own weight, spanning between the walls
         sol = sum(b.mass_kg for b in self.lay.blocks if b.system == "roof")
         q = 3 * (rf.d["kg_m2"] + sol / (V["body_length"] * V["body_width"] / 1e6)) * G / 1e6
@@ -169,15 +180,25 @@ class Body:
         row("BDY-07", f"Fixed roof with the {sol:.0f} kg solar array, spanning between the walls", rf, r, "LC2, 3 g")
         self.roof_defl = rf.uniform(q / 3, V["body_width"] - V["wall_t"])["defl_mm"]
         self.floor_defl = f.one_way(ft["kg"] * G, min(ft["patch"]), span)["defl_mm"]
-        self.wall_defl = w.uniform(L["wind_kpa"] / 1000, V["interior_h"])["defl_mm"]
+        self.wall_defl = w.uniform(ws["kpa"] / 1000, V["interior_h"])["defl_mm"]
+        self.wall_defl_bare = Panel("wall", {**w.d, "stiffener": None}).uniform(ws["kpa"] / 1000, V["interior_h"])["defl_mm"]
         return out
+
+    def wind(self) -> tuple[dict, dict]:
+        """The ultimate and serviceability net pressures on a side wall, kPa (data/body/body.yaml `wind`, AS/NZS 1170.2)."""
+        wd = self.d["wind"]
+        c = wd["cpe"] - wd["cpi"]
+        vs = wd["V_s"] * wd["Mzcat"]
+        return (dict(V=wd["V_u"], kpa=0.6 * wd["V_u"] ** 2 * c / 1000), dict(V=vs, kpa=0.6 * vs ** 2 * c / 1000))
 
     def deflections(self) -> list[dict]:
         cr, V = self.crit, self.V
         self.panel_checks() if not hasattr(self, "roof_defl") else None
         return [dict(id="DEF-B1", what="Floor under a foot at 1 g", mm=self.floor_defl, limit_mm=self.raiser_span / cr["floor_span_ratio"]),
                 dict(id="DEF-B2", what="Fixed roof with the solar array at 1 g", mm=self.roof_defl, limit_mm=(V["body_width"] - V["wall_t"]) / cr["roof_span_ratio"]),
-                dict(id="DEF-B3", what="Side wall in a 0.5 kPa wind, with its stiffeners", mm=self.wall_defl, limit_mm=V["interior_h"] / cr["wall_span_ratio"])]
+                dict(id="DEF-B3", what=(f"Side wall in the serviceability wind, {self.wind()[1]['kpa']:.2f} kPa net at {self.wind()[1]['V']:.1f} m/s, with its "
+                                        f"stiffeners ({self.wall_defl_bare:.1f} mm without them)"),
+                     mm=self.wall_defl, limit_mm=V["interior_h"] / cr["wall_span_ratio"])]
 
     # ------------------------------------------------------------------ inserts and the roof joint
     def roof(self) -> dict:
@@ -201,7 +222,7 @@ class Body:
         awning = next((b for b in self.lay.blocks if b.id == "BD-13"), None)
         aw_kg = awning.mass_kg if awning else 41.0
         f_awning = math.hypot(3 * aw_kg * G / 5, 3 * aw_kg * G / 5 * 100 / 60)   # five brackets, 100 mm offset, 60 mm bolt pitch
-        rows = [dict(id="INS-01", what="Lift-bed rail screw, 1/4 in self-tapping into the RHS 40 x 20 x 3 hardpoint in the side wall, shear", n=f_rail,
+        rows = [dict(id="INS-01", what="Lift-bed rail screw, 1/4 in self-tapping into the RHS 40 x 32 x 3 hardpoint in the side wall, shear", n=f_rail,
                      rated_n=L["rail_screw_rated_n"],
                      case=(f"{L['bed_night_factor']:g} x the {L['bed_kg']:.0f} kg bed at night" if f_night >= f_travel else
                            f"LC2, 3 g on the {L['bed_travel_kg']:.0f} kg moving bed") + f", over {screws} screws"),
@@ -210,6 +231,32 @@ class Body:
         for r in rows:
             r["util"] = r["n"] / (cr["insert_factor"] * r["rated_n"])
         return rows
+
+    def cradle(self) -> dict:
+        """The split's outdoor unit and its cradle on the rear wall (BDY-21): the stays carry the vertical load to the
+        chassis, and the wall's bolts the overturning moment, the pull away from the wall and the sideways load, against
+        half their rated loads. The pull-through rating uses the body mounts' spreader rule on the bolt's pad."""
+        cd, cr, V = self.d["cradle"], self.crit, self.V
+        sp = self.d["mounts"]["fallback"]["spreader"]
+        lines = [self.lay.find(i) for i in cd["lines"]]
+        m = sum(b.mass_kg for b in lines)
+        d = sum(b.mass_kg * b.cog[0] for b in lines) / m - V["body_x1"]      # centre of gravity behind the rear wall
+        a, n, W = cd["accel"], cd["bolts"], m * G
+        wl = self.p["wall"]
+        pull_rated = 4 * cd["pad_side_mm"] * (wl.t1 * sp["skin_shear"] + wl.c * sp["insert_shear"]) / 2
+        t_moment = a["down_g"] * W * d / cd["row_lever_mm"] / 2                # the top row's two bolts hold the overturning moment
+        t_pull = a["along_g"] * W / n                                           # the unit pulled away from the wall
+        t_side = a["side_g"] * W * d / cd["column_spacing_mm"] / 2              # the sideways load's twist on the bolt columns
+        tension = t_moment + t_pull + t_side
+        shear = a["side_g"] * W / n
+        st = cd["stays"]
+        stay_n = a["down_g"] * W / st["n"]
+        p_cr = math.pi ** 2 * st["E"] * st["I_min"] / st["L"] ** 2
+        u = dict(bolt_tension=tension / (cr["insert_factor"] * pull_rated), bolt_shear=shear / (cr["insert_factor"] * cd["shear_rated_n"]),
+                 stay_buckling=stay_n / (p_cr / st["buckling_factor"]), stay_yield=stay_n / (st["A"] * st["fy"] / cr["metal_factor"]))
+        gov = max(u, key=u.get)
+        return dict(mass_kg=m, offset_mm=d, tension_n=tension, shear_n=shear, pull_rated_n=pull_rated, shear_rated_n=cd["shear_rated_n"],
+                    stay_n=stay_n, stay_pcr_n=p_cr, stays=st, utils=u, governing=gov.replace("_", " "), util=u[gov])
 
     # ------------------------------------------------------------------ the body as a torsion box (report 12 section 4)
     def box_gj(self, lid_structural: bool) -> dict:
@@ -443,7 +490,7 @@ class Body:
     # ------------------------------------------------------------------ everything, for the build and the checks
     def results(self) -> dict:
         panels = self.panel_checks()
-        return dict(panels=panels, deflections=self.deflections(), roof=self.roof(), inserts=self.inserts(),
+        return dict(panels=panels, deflections=self.deflections(), roof=self.roof(), inserts=self.inserts(), cradle=self.cradle(),
                     openings=self.openings(), openings_check=self.openings_check(),
                     twist=self.tw, gj=self.box_gj(True),
                     joints=self.joints(), end_wall=self.end_wall(), mounts=self.mounts(),
@@ -470,6 +517,16 @@ def check_row(c, res: dict) -> dict:
         return dict(limit="<= half the rated load", measured=round(r["n"] / 1000, 2), unit="kN", margin=round(1 - r["util"], 3),
                     ok=r["util"] <= 1.0, governing=r["what"],
                     detail=". ".join(f"{i['what']}: {i['n'] / 1000:.2f} kN against {i['rated_n'] / 2000:.2f} kN ({i['case']})" for i in res["inserts"]))
+    if c.type == "body_cradle":
+        r = res["cradle"]
+        u = r["utils"]
+        return dict(limit="<= 1.00 utilisation", measured=round(r["util"], 3), unit="", margin=round(1 - r["util"], 3), ok=r["util"] <= 1.0,
+                    governing=r["governing"],
+                    detail=(f"{r['mass_kg']:.0f} kg, its centre of gravity {r['offset_mm']:.0f} mm behind the rear wall. Wall bolts: {r['tension_n'] / 1000:.2f} kN "
+                            f"of tension against half the {r['pull_rated_n'] / 1000:.0f} kN pull-through ({u['bolt_tension']:.2f}), {r['shear_n'] / 1000:.2f} kN of "
+                            f"shear against half of {r['shear_rated_n'] / 1000:.0f} kN ({u['bolt_shear']:.2f}). Each stay, {r['stays']['name']}, "
+                            f"{r['stay_n'] / 1000:.2f} kN at 3 g against {r['stay_pcr_n'] / 1000:.1f} kN to buckle over {r['stays']['L']:,.0f} mm "
+                            f"({u['stay_buckling']:.2f} with a factor of {r['stays']['buckling_factor']:g})"))
     if c.type == "body_roof":
         r = res["roof"]
         return dict(limit="<= 1.00 utilisation", measured=round(r["util"], 3), unit="", margin=round(1 - r["util"], 3), ok=r["util"] <= 1.0,

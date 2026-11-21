@@ -230,18 +230,18 @@ def ct202(prj, model, bom, checks, reg, dwg):
     _dt(sh, cx, top, "D: LIFT BED RAIL ON ITS HARDPOINT, PLAN", k)
     dy = 112.0
     _sandwich(sh, 125, dy, 125 + 35 / k, dy + 60, 1.5, k, vertical=True)            # side wall, plan section
-    hx0, hy0 = 125 + 3.5 / k, dy + 20
-    sh.rect(hx0, hy0, hx0 + 20 / k, hy0 + 40 / k, "shade")                            # RHS 40 x 20 x 3 laid flat in the core
-    sh.rect(hx0 + 3 / k, hy0 + 3 / k, hx0 + 17 / k, hy0 + 37 / k, "white")
-    sh.rect(hx0 + 3 / k, hy0 + 3 / k, hx0 + 17 / k, hy0 + 37 / k, "medium")
+    hx0, hy0 = 125 + 1.5 / k, dy + 20
+    sh.rect(hx0, hy0, hx0 + 32 / k, hy0 + 40 / k, "shade")                            # RHS 40 x 32 x 3, the core's full depth
+    sh.rect(hx0 + 3 / k, hy0 + 3 / k, hx0 + 29 / k, hy0 + 37 / k, "white")
+    sh.rect(hx0 + 3 / k, hy0 + 3 / k, hx0 + 29 / k, hy0 + 37 / k, "medium")
     rx = 125 + 35 / k
     sh.path([(rx, hy0 - 5 / k), (rx + 20 / k, hy0 - 5 / k), (rx + 20 / k, hy0 + 2), (rx + 4 / k, hy0 + 2), (rx + 4 / k, hy0 + 45 / k - 2),
              (rx + 20 / k, hy0 + 45 / k - 2), (rx + 20 / k, hy0 + 45 / k), (rx, hy0 + 45 / k)], "thick")         # the rail's C-channel
     for yy in (hy0 + 10 / k, hy0 + 30 / k):
-        sh.line(hx0 + 6 / k, yy, rx + 4 / k, yy, "medium")                             # 1/4 in screws into the tube's 3 mm wall
+        sh.line(hx0 + 26 / k, yy, rx + 4 / k, yy, "medium")                            # 1/4 in screws into the tube's 3 mm wall
     sh.line(hx0 - 8, hy0 + 20 / k, rx + 30 / k, hy0 + 20 / k, "centre")
     ins = next(i for i in res["inserts"] if i["id"] == "INS-01")
-    for i, t in enumerate(("HARDPOINT RHS 40 x 20 x 3 6060-T5 LAID FLAT IN THE XPS CORE AS THE PANEL IS LAID UP (LB-06)",
+    for i, t in enumerate(("HARDPOINT RHS 40 x 32 x 3 6060-T5, FULL CORE DEPTH AND WALL HEIGHT, BONDED TO BOTH SKINS AS THE PANEL IS MADE (LB-06)",
                            "HAPPIJAC C-CHANNEL RAIL ON THE INNER SKIN, 1/4 in SELF-TAPPING SCREWS INTO THE TUBE'S 3 mm WALL",
                            f"{ins['n']:.0f} N PER SCREW, {ins['case'].upper().replace(' KG', ' kg')}, {ins['util']:.2f} OF HALF ITS RATED SHEAR (BDY-11)",
                            "FOUR RAILS, TWO ON EACH SIDE WALL, 1,067 mm APART ALONG THE TRAILER (CT-203)")):
