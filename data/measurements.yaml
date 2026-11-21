@@ -330,7 +330,7 @@ inputs:
     title: Rear axle, laden ute towing the loaded trailer
     how: "Line CK03. Two people, both bikes, tools, full fuel, one spare, then the loaded trailer coupled. Weigh the ute's rear axle with the trailer's wheels off the plate."
     unit: kg
-    estimate: {v: 2586, src: "Ute model case UC3 with growth: the bikes aboard, the 180 L tank, the trailer charging and the trailer's heaviest towball with growth, 316.9 kg (decision H17)"}
+    estimate: {v: 2587, src: "Ute model case UC3 with growth: the bikes aboard, the 180 L tank, the trailer charging and the trailer's heaviest towball with growth, 316.6 kg (decision H17)"}
     measured: {v: null, date: null}
     stage: trailer built
     affects: [UTE-03 check, kit choice, ball load]
@@ -356,7 +356,7 @@ inputs:
     title: Front axle share of the ute's mass, towing
     how: From VEH-20's weighing, front axle divided by the ute's total.
     unit: "%"
-    estimate: {v: 34.3, src: "Ute model case UC3 with growth, 1,350 kg of 3,937 kg: the bikes aboard, the 180 L tank, the trailer charging and the trailer's heaviest towball with growth, 316.9 kg (decision H17)"}
+    estimate: {v: 34.3, src: "Ute model case UC3 with growth, 1,351 kg of 3,937 kg: the bikes aboard, the 180 L tank, the trailer charging and the trailer's heaviest towball with growth, 316.6 kg (decision H17)"}
     measured: {v: null, date: null}
     stage: trailer built
     affects: [UTE-07 check]
@@ -369,7 +369,7 @@ inputs:
     title: Laden ute mass towing, including the ball load (GVM check)
     how: From VEH-20's weighing, the ute's two axles added.
     unit: kg
-    estimate: {v: 3937, src: "Ute model case UC3 with growth: the bikes aboard, the 180 L tank, the trailer charging and the trailer's heaviest towball with growth, 316.9 kg (decision H17)"}
+    estimate: {v: 3937, src: "Ute model case UC3 with growth: the bikes aboard, the 180 L tank, the trailer charging and the trailer's heaviest towball with growth, 316.6 kg (decision H17)"}
     measured: {v: null, date: null}
     stage: trailer built
     affects: [UTE-01 check]
@@ -382,7 +382,7 @@ inputs:
     title: Combination mass, laden ute plus loaded trailer (GCM check)
     how: Line CK03. The ute's axles and the trailer's axles weighed coupled, added.
     unit: kg
-    estimate: {v: 7017, src: "Ute model case UC2 with growth (3,619.9 kg) plus the trailer fully loaded with growth (case TC2, MAS-10). The plan's limit sum is GCM-01's, the ute plus the 3,500 kg plate (decision H20)"}
+    estimate: {v: 7018, src: "Ute model case UC2 with growth (3,620.5 kg) plus the trailer fully loaded with growth (case TC2, MAS-10). The plan's limit sum is GCM-01's, the ute plus the 3,500 kg plate (decision H20)"}
     measured: {v: null, date: null}
     stage: trailer built
     affects: [GV06, decision H2 water limit]
@@ -721,7 +721,7 @@ inputs:
     title: Box mass empty, with its restraint, ramp, winch, security and tool chests, no tools
     how: Weigh the finished box on four platform scales under its mount points, or on a weighbridge on a trailer weighed empty first. Record the sum.
     unit: kg
-    estimate: {v: 436.1, src: "data/ute/box-parts.yaml line sum, equal to the model's box (build/ute/ute.json), with the 1.6 mm roof"}
+    estimate: {v: 437.0, src: "data/ute/box-parts.yaml line sum, equal to the model's box (build/ute/ute.json), with the 1.6 mm roof"}
     measured: {v: null, date: null}
     stage: weigh
     affects: [every ute mass check, UGB-01, UTE-06, the rear axle]

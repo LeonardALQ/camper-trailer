@@ -182,7 +182,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
         ["Tare", f"{rep['tare_kg']:,.0f} kg", f"{cases['TC1']['growth']['mass_kg']:,.0f} kg with growth"],
         ["Fully loaded, TC2", f"{tc2['nominal']['mass_kg']:,.0f} kg", f"{tc2['growth']['mass_kg']:,.0f} kg with growth, ATM plate {plate:,.0f} kg"],
         ["Towball", f"{lo_ball:.0f} to {hi_ball:.0f} kg", f"{chk['MAS-12']['measured']:.1f} % lowest (TC7), {_kg(chk['MAS-13']['measured'])} kg heaviest with growth"],
-        ["Ute rear axle", f"{chk['MAS-03']['measured']:,.0f} kg", f"Against the Elite kit's {rep['tow_vehicle']['limits']['rear_axle_kg']:,.0f} kg with growth (MAS-03)"],
+        ["Ute rear axle", f"{_kg(chk['MAS-03']['measured'])} kg", f"Against the Elite kit's {rep['tow_vehicle']['limits']['rear_axle_kg']:,.0f} kg with growth (MAS-03)"],
         ["Combination", f"{_kg(chk['GCM-01']['measured'])} kg", f"Against Lovells' {rep['tow_vehicle']['limits']['gcm_kg']:,.0f} kg GCM revision (GCM-01)"],
         ["CoG, fully loaded", f"Z {ch['cog_loaded'][2]:,.0f}", f"Z {ch['cog_loaded_growth'][2]:,.0f} with growth. Across: {chk['MAS-11']['measured']:.1f} mm at worst (MAS-11)"],
         ["Coupling", f"{V['coupling_z']:.0f} mm", "Laden, plus or minus 20 mm (UTE-01). DO35 V3Plus"],
