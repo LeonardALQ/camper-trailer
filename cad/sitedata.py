@@ -7,6 +7,7 @@ from __future__ import annotations
 import json
 import re
 import shutil
+from itertools import combinations
 
 import yaml
 
@@ -101,7 +102,8 @@ def project() -> dict:
 
 def car_totals(data, budget) -> dict:
     """Every total of the car build, worked out from its lines: by status, priority, stage and system, and the
-    figures against Leonard's build budget, with the cuts, in the list's order, that close the gap. The figures against
+    figures against Leonard's build budget, with the fewest cuts that close the gap (of those, the set that saves least,
+    named in the list's order). The figures against
     the budget add up whole dollars (the required total and the savings rounded first), so the Totals table adds up
     as shown and matches VEHICLE.md."""
     sums = {}
@@ -112,12 +114,15 @@ def car_totals(data, budget) -> dict:
     req = round(sums.get(("required",), 0.0))
     allow = data["totals_aud"]["contingency_allowance"]
     gap = req + allow - budget
-    closing, saved = [], 0.0
-    for c in data["cuts"]:
-        if saved >= gap:
+    closing, saved = [c["id"] for c in data["cuts"]], sum(c["saving_aud"] for c in data["cuts"])
+    if gap <= 0:
+        closing, saved = [], 0.0
+    for n in range(1, len(data["cuts"]) + 1):
+        fits = [s for s in combinations(data["cuts"], n) if sum(c["saving_aud"] for c in s) >= gap]
+        if gap > 0 and fits:
+            best = min(fits, key=lambda s: sum(c["saving_aud"] for c in s))
+            closing, saved = [c["id"] for c in best], sum(c["saving_aud"] for c in best)
             break
-        closing.append(c["id"])
-        saved += c["saving_aud"]
     saved, cuts = round(saved), round(sum(c["saving_aud"] for c in data["cuts"]))
     return dict(sums=sums, required=req, contingency_lines=round(sums.get(("contingency",), 0.0)),
                 optional=round(sums.get(("optional",), 0.0)), allowance=allow, with_contingency=req + allow, budget=budget,
