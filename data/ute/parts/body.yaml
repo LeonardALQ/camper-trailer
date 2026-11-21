@@ -45,15 +45,15 @@ parts:
     alpha: 0.35
   U-ROOF:
     name: Roof skin
-    material: "5052-H32 aluminium sheet, 2.0 mm"
-    product: 5052-H32 marine sheet, 2.0 mm
+    material: "5052-H32 aluminium sheet, 1.6 mm"
+    product: 5052-H32 marine sheet, 1.6 mm
     maker: All Aluminium (stock)
-    part_no: Marine sheet 5052-H32 2.0 mm (MAT-01)
+    part_no: Aluminium Marine Sheet 5052 H32 1.6mm 1200x2400
     qty: 4.8
     unit: m2
-    mass: {basis: per_area, kg_per_m2: 5.36, maturity: calculated, source: "2.0 mm at 2.68 g/cm3. All Aluminium lists 15.4 kg per sheet (MAT-01)"}
+    mass: {basis: per_area, kg_per_m2: 4.29, maturity: calculated, source: "1.6 mm at 2.68 g/cm3"}
     size: 2,590 x 1,850 mm
-    notes: Not a load-carrying roof. Nothing is carried on it.
+    notes: "Not a load-carrying roof. Nothing is carried on it. 1.6 mm in place of revision C's 2.0 mm saves 5.1 kg, so the box stays under UGB-01's 440 kg. The engineer confirms it, with the bows at most 640 mm apart"
     geometry: {generator: panel, params: {}}
     color: "#dfe6e9"
     alpha: 0.25
@@ -70,3 +70,21 @@ parts:
     notes: The engineer designs the welds to the softened strength next to each weld (report 17 section 2.5).
     geometry: {generator: tube, params: {wall: 3}}
     color: "#b2bec3"
+  U-SEALANT:
+    name: Seam and fastener sealant
+    material: "Sikaflex-291 polyurethane sealant"
+    product: Sikaflex-291 on stitched seams, floor penetrations and fasteners through the skin
+    maker: Sika
+    qty: 1
+    unit: set
+    mass: {basis: declared, total_kg: 1.5, maturity: estimate, source: "R24 (data/ute/box-parts.yaml BX-F09), estimate"}
+    cog: {at: [1260, 0, 730], basis: "Spread over the seams, estimate"}
+  U-ROOF-COAT:
+    name: Roof top coating
+    material: "White two-pack coating"
+    product: White two-pack topcoat on the roof's top face
+    maker: Product to choose
+    qty: 1
+    unit: set
+    mass: {basis: declared, total_kg: 0.5, maturity: estimate, source: "R24 (BX-C02), estimate"}
+    cog: {at: [1260, 0, top_z], basis: "On the roof, estimate"}

@@ -34,6 +34,56 @@ def _row(cid, title, severity, limit, measured, margin, ok, governing, detail, w
                 governing=governing, points=[], detail=detail, why=why, unit=unit, **extra)
 
 
+def rhs_plastic_modulus(b: float, d: float, t: float) -> float:
+    """Plastic section modulus (mm3) of an RHS b wide and d deep, bent about the axis along its width, with Australian
+    Tube Mills' corner radii (outer 2.0 t up to 3 mm wall and 2.5 t above, inner the outer less t), as
+    data/chassis/sections.yaml computes them."""
+    ro = (2.0 if t <= 3 else 2.5) * t
+    ri = ro - t
+    k = (10 - 3 * math.pi) / (12 - 3 * math.pi)      # a corner spandrel's centroid from the corner, as a fraction of r
+
+    def spandrels(r, half):
+        return 4 * (1 - math.pi / 4) * r * r * (half - k * r)
+    return b * d * d / 4 - (b - 2 * t) * (d - 2 * t) ** 2 / 4 - spandrels(ro, d / 2) + spandrels(ri, d / 2 - t)
+
+
+def crossmember_check(prj, model, P) -> dict:
+    """UGR-03: a steel crossmember under a track row carries a strap's breaking load at any of its anchors (R24). The
+    crossmember spans between Toyota's two brackets at its station and runs on outboard of them to the walls. The
+    vertical part of the breaking load bends it: simply supported between the brackets, or as a cantilever outboard.
+    The capacity is AS 4100's 0.9 fy Ze, with Ze the plastic modulus of the compact RHS laid flat."""
+    lc = next(c for c in prj.checks if c.id == "UGR-01").restraint["lc_kg"]
+    f_kn = 2 * lc * G / 1000                          # AS/NZS 4380: a strap's breaking force is at least twice its LC
+    brackets = [bb for bb in (b.shape.bounding_box() for i, b in model.built.items() if b.inst.ref == "C1" and i[3] in "16")]
+    yb = sum(abs(bb.center().Y) for bb in brackets) / len(brackets)
+    worst = None
+    for iid, s in model.built.items():
+        sp = s.inst.special.get("strap")
+        if not sp:
+            continue
+        pts = s.info["points"]
+        ends = [(pts[0], pts[1]), (pts[-1], pts[-2])] if sp["point"] == "rear_wheel" else [(pts[1], pts[0])]
+        for anchor, towards in ends:
+            d = [towards[i] - anchor[i] for i in range(3)]
+            cz = abs(d[2]) / math.sqrt(sum(v * v for v in d))
+            y = abs(anchor[1])
+            lever = y - yb if y > yb else (yb - anchor[1]) * (yb + anchor[1]) / (2 * yb)
+            m = f_kn * cz * lever / 1000                  # kN m
+            if worst is None or m > worst["m"]:
+                worst = dict(m=m, strap=iid, y=anchor[1], cz=cz, lever=lever, outboard=y > yb)
+    b, h, t, fy = P.get("steel_w"), P.get("steel_h"), P.get("steel_t"), P.get("steel_fy")
+    s_mm3 = rhs_plastic_modulus(b, h, t)
+    cap = 0.9 * fy * s_mm3 / 1e6                          # kN m
+    u = worst["m"] / cap
+    where = "outboard of" if worst["outboard"] else "between"
+    return _row("UGR-03", "Steel crossmember carries a strap's breaking load at its worst anchor", "fail", "<= 1.00",
+                round(u, 3), round(1 - u, 3), u <= 1.0, f"{worst['strap']} anchor at Y {worst['y']:.0f}, {where} the brackets",
+                f"{f_kn:.1f} kN breaking load x {worst['cz']:.2f} vertical x {worst['lever']:.0f} mm = {worst['m']:.2f} kN m, against "
+                f"0.9 x {fy:.0f} MPa x {s_mm3:,.0f} mm3 = {cap:.2f} kN m for the RHS {b:g} x {h:g} x {t:g} laid flat. Brackets at Y +/-{yb:.0f}",
+                "R24: an anchor withstands its strap's breaking load (NTC guide p. 201), so the crossmember under it must too. "
+                "AS 4100 clause 5.1: the section is compact, so Ze is the plastic modulus.", unit="")
+
+
 def _extent(model, P, x0, dz) -> dict:
     """Outside extent of the box in the ute frame, as it travels: everything but the loading view and the context."""
     shapes = [b.shape for b in model.built.values()
@@ -178,11 +228,14 @@ def build_garage(prj: Project | None = None, limits: dict | None = None):
                        "Toyota publishes no capacity for its deck mount brackets. The engineer confirms them.", unit="kN"))
     res = next(c for c in checks if c["id"] == "UGR-01")["restraint"]
     kn = res["worst"]["worst_kgf"] * G / 1000
-    checks.append(_row("UGR-02", "Worst anchor load within the 20 kN each anchor is designed for", "fail",
-                       f"<= {lim['anchor_design_kn']:.0f} kN", round(kn, 2), round(lim["anchor_design_kn"] - kn, 2),
-                       kn <= lim["anchor_design_kn"], f"{res['worst']['strap']} {res['worst']['worst_case']}",
+    ad = lim["anchor_design_kn"]
+    checks.append(_row("UGR-02", f"Worst anchor load within the {ad:g} kN each anchor is designed for", "fail",
+                       f"<= {ad:g} kN", round(kn, 2), round(ad - kn, 2),
+                       kn <= ad, f"{res['worst']['strap']} {res['worst']['worst_case']}",
                        f"{kn:.2f} kN at the worst strap's anchor, which reaches the frame through the steel crossmember",
-                       "DESIGN.md and report 03: every anchor is designed for 20 kN.", unit="kN"))
+                       "An anchor withstands its strap's breaking load (NTC Load Restraint Guide 2018 p. 201, report 03): "
+                       f"{ad:g} kN for the LC 500 kg straps (R24).", unit="kN"))
+    checks.append(crossmember_check(prj, model, P))
     drop, L = P.get("ground_drop"), 3048.0
     ang = math.degrees(math.asin(drop / L))
     ang_l = math.degrees(math.asin(dz / L))

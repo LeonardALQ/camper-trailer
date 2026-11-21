@@ -216,10 +216,10 @@ def ct701(prj, model, bom, checks, reg, dwg):
 
 # ------------------------------------------------------------------ CT-702 box frame and panels
 SCHEDULE = [
-    ("U-FRAME", "SHS 40x40x3 6061-T6"), ("U-SKIN", "SHEET 2.5 5052-H32"), ("U-ROOF", "SHEET 2.0 5052-H32"),
+    ("U-FRAME", "SHS 40x40x3 6061-T6"), ("U-SKIN", "SHEET 2.5 5052-H32"), ("U-ROOF", "SHEET 1.6 5052-H32"),
     ("U-FLOOR", "PLATE 4.0 5052-H32"), ("U-TUB", "SHEET 3.0 5052-H32"), ("U-RUNNER", "RHS 75x50x3 6061-T6"),
-    ("U-CM", "SHS 50x50x3 6061-T6"), ("U-STEEL-CM", "RHS 76x38x3 C350L0 GALV"), ("U-PACKER", "FLAT 76x2 STEEL GALV"),
-    ("U-STRIP", "FLAT 20x10 6060"), ("U-MOUNT-FIRM", "ANGLE + 2 M12 8.8"), ("U-MOUNT-SPRING", "ANGLE + M12 8.8 + RUBBER"),
+    ("U-CM", "SHS 50x50x3 6061-T6"), ("U-STEEL-CM", "RHS 65x35x4.0 C350L0 GALV"), ("U-PACKER", "PLATE 5.0x65 5052-H32"),
+    ("U-STRIP", "FLAT 15x10 6060"), ("U-MOUNT-FIRM", "ANGLE + 2 M12 8.8"), ("U-MOUNT-SPRING", "ANGLE + M12 8.8 + RUBBER"),
     ("U-SUB-FIX", "M8, ISOLATORS, SEALANT"),
 ]
 
@@ -318,12 +318,42 @@ def ct702(prj, model, bom, checks, reg, dwg):
         "STEEL CROSSMEMBERS ARE GALVANISED AND BOLTED, NEVER WELDED, TO THE ALUMINIUM, WITH NYLON SLEEVES AND WASHERS.",
         "FIRM MOUNTS F1 AND F2: TWO M12 8.8 PER BRACKET. COMPLIANT MOUNTS C3 TO C6: ONE M12 8.8 THROUGH TWO RUBBER CUSHIONS AND A SAFETY WASHER.",
         "TOYOTA'S BRACKETS ARE SHOWN AS ENVELOPES. CONFIRM ON THE VEHICLE WHICH ARE DECK MOUNTS AND WHICH ARE SPRING HANGERS.",
+        "BRACKET BOLTS GO IN HEAD UP FROM INSIDE THE SUBFRAME, NYLOC NUT BELOW TOYOTA'S BRACKET, SO THE BOX COMES OFF ONLY FROM INSIDE IT (DETAIL A).",
     ], width_chars=96, size=1.6)
+    _detail_a(sh, 332, 106)
     _stamp(sh, 22, 282)
     _title(sh, dwg, reg, _mass_note(c), sc, c, weld_note="WELDS TO AS/NZS 1665 (ALUMINIUM), DETAILS BY THE ENGINEER. ")
     from .sheets import OUT
     S.write(sh, OUT / f"{dwg['number']}.svg")
     return time.time() - t0
+
+
+def _detail_a(sh, x0, y0):
+    """Detail A, the bracket bolts at stations 1 and 6, looking from the kerb side, in the space right of the notes.
+    Schematic, about 1:5."""
+    k = 0.2                                     # sheet mm per real mm
+    cx, yb = x0 + 20, y0 - 28                   # crossmember centre, bottom of Toyota's bracket flange
+    w_cm, h_cm, w_pl, t_pl, w_br, t_br = 65 * k, 35 * k, 145 * k, 6 * k, 160 * k, 8 * k
+    sh.text(x0 + 38, y0 - 4, "DETAIL A: BRACKET BOLTS AT STATIONS 1 AND 6", 1.8, "middle", bold=True)
+    sh.text(x0 + 38, y0 - 7, "LOOKING FROM THE KERB SIDE, NOT TO SCALE", 1.4, "middle")
+    sh.text(x0 + 38, y0 - 9.5, "STATION 6: ONE BOLT THROUGH THE TWO CUSHIONS", 1.4, "middle")
+    sh.rect(cx - w_br / 2, yb, cx + w_br / 2, yb + t_br, "thick")                       # Toyota's bracket flange
+    sh.rect(cx - w_pl / 2, yb + t_br, cx + w_pl / 2, yb + t_br + t_pl, "thick")          # 145 x 80 x 6 plate
+    y_cm = yb + t_br + t_pl
+    sh.rect(cx - w_cm / 2, y_cm, cx + w_cm / 2, y_cm + h_cm, "thick")                    # RHS 65 x 35 x 4.0, end on
+    sh.rect(cx - w_cm / 2 + 4 * k, y_cm + 4 * k, cx + w_cm / 2 - 4 * k, y_cm + h_cm - 4 * k, "thin")
+    for side in (-1, 1):
+        bx = cx + side * (w_cm / 2 + 20 * k)
+        sh.rect(bx - 9 * k, y_cm, bx + 9 * k, y_cm + 8 * k, "thick")                     # hex head on the plate
+        sh.line(bx - 6 * k, yb - 14 * k, bx - 6 * k, y_cm, "thin")
+        sh.line(bx + 6 * k, yb - 14 * k, bx + 6 * k, y_cm, "thin")
+        sh.rect(bx - 12 * k, yb - 3 * k, bx + 12 * k, yb, "thin")                        # hardened washer
+        sh.rect(bx - 9 * k, yb - 13 * k, bx + 9 * k, yb - 3 * k, "thick")                # nyloc nut, below the bracket
+    ex = x0 + 40
+    S.leader(sh, (cx, y_cm + h_cm), (ex, y_cm + h_cm + 4), "RHS 65x35x4.0 C350L0 GALV", size=1.5)
+    S.leader(sh, (cx + w_pl / 2, yb + t_br + t_pl / 2), (ex, yb + 7), "PLATE 145x80x6 C350, WELDED", size=1.5)
+    S.leader(sh, (cx + w_br / 2, yb + t_br / 2), (ex, yb + 2), "TOYOTA DECK MOUNT BRACKET", size=1.5)
+    S.leader(sh, (cx + w_cm / 2 + 20 * k, yb - 8 * k), (ex, yb - 5), "M12 8.8 HEAD UP, NYLOC BELOW", size=1.5)
 
 
 # ------------------------------------------------------------------ CT-703 doors and security
@@ -334,8 +364,8 @@ SECURITY = [
     ("DOORS", "U-HINGES", "Continuous hinges, peened pins, hinge-side dog bolts"),
     ("DOORS", "U-KDOOR", "Kerb lift-up door, keyed latch and hasp"),
     ("LOCKS", "U-HASP", "ABLOY PL362 on shrouded hasps, rear and kerb doors"),
-    ("INSIDE", "U-ANCHOR", "Ground anchor and chain per bike, into a crossmember"),
-    ("INSIDE", "U-BIKE-SEC", "Disc lock on each front disc, Monimoto 9 in each bike"),
+    ("INSIDE", "U-ANCHOR", "ABUS WBA100 floor anchor per bike, crossmember at X 450"),
+    ("INSIDE", "U-BIKE-SEC", "ABUS 8008 disc lock, 12 mm chain to the anchor, Monimoto 9"),
     ("ALARM", "U-TRACKER", "Teltonika FMC130, reed switches on 3 doors, siren"),
 ]
 
@@ -413,7 +443,7 @@ def ct703(prj, model, bom, checks, reg, dwg):
     S.notes(sh, 22, 62, [
         "DOOR SEALS: EPDM BULB SEALS ON THE LEAVES AND THE KERB DOOR, PULLED IN BY THE CAM BAR AND LATCHES. DRAINS WITH ONE-WAY VALVES AT THE LOW CORNERS.",
         "A FILTERED FAN HIGH IN THE FRONT WALL KEEPS THE BOX ABOVE OUTSIDE PRESSURE. LOW VENTS WITH FLAP VALVES IN THE REAR CORNERS LET PETROL VAPOUR OUT.",
-        "PRODUCTS FOR THE CAM BAR, SHOOT BOLTS, HINGES, DISC LOCKS, ANCHORS AND SIREN ARE TO CHOOSE. MASSES ARE ESTIMATES.",
+        "PRODUCTS: POLAR 158 OR EQUAL CAM BAR, ABUS 8008 2.0 DISC LOCKS WITH 1.2 m 12KS120 CHAINS, ABUS WBA100 ANCHORS (UTE-GARAGE.md). MASSES ARE ESTIMATES.",
     ], width_chars=100, size=1.7)
     _stamp(sh, 22, 282)
     _title(sh, dwg, reg, _mass_note(c), sc, c)
@@ -477,14 +507,17 @@ def ct704(prj, model, bom, checks, reg, dwg):
     yb = S.table(sh, 230, 150, [("STRAP", 18), ("L mm", 16), ("SIDE", 18), ("BRAKE", 18), ("REAR", 18), ("UP", 16), ("WORST kgf", 30)], rows,
                  size=1.7, row_h=3.1, title="STRAP LOADS (kgf), REPORT 03 CASES x 2, 1.0 g UP")
     an = next(r for r in g["checks"] if r["id"] == "UGR-02")
-    sh.text(230, yb - 3.4, f"LC 1000 kg EACH. WORST {res['worst']['worst_kgf']:.0f} kgf = {an['measured_mm']:.2f} kN AT ITS ANCHOR, AGAINST 20 kN.", 1.7)
+    cm = next(r for r in g["checks"] if r["id"] == "UGR-03")
+    lc = next(k for k in c["prj"].checks if k.id == "UGR-01").restraint["lc_kg"]
+    sh.text(230, yb - 3.4, f"LC {lc:.0f} kg EACH. WORST {res['worst']['worst_kgf']:.0f} kgf = {an['measured_mm']:.2f} kN AT ITS ANCHOR, AGAINST {an['limit'][3:]}.", 1.7)
     sh.text(230, yb - 6.6, "CHOCK PUSH IN BRAKING: " + ", ".join(f"{b['bike']} {b['chock_push_kgf']:.0f} kgf" for b in res["bikes"]) + ".", 1.7)
+    sh.text(230, yb - 9.8, f"STRAP BREAKING LOAD AT THE WORST ANCHOR: STEEL CROSSMEMBER AT {cm['measured_mm']:.2f} OF ITS CAPACITY (UGR-03).", 1.7)
 
     S.notes(sh, 22, 128, [
         "AS THE TRAILER'S GARAGE (DESIGN.md): CONDOR SC-2000 CHOCK ON EACH BIKE'S CENTRELINE AT THE FRONT WALL, TWO FLUSH L-TRACK ROWS, "
-        "35 mm SPANSET STRAPS OF LC 1000 kg, A CANYON DANCER HARNESS ON THE STREET TRIPLE AND A REAR-WHEEL STRAP ON EACH BIKE.",
-        "EACH TRACK ROW SITS ON A 2 mm STEEL PACKER ON A GALVANISED STEEL CROSSMEMBER AT TOYOTA'S FIRST AND LAST DECK MOUNTS, SO THE ANCHOR LOAD REACHES THE FRAME THROUGH STEEL ONLY. "
-        "M8 A4 BOLTS WITH CRUSH TUBES AT 150 PITCH OR LESS. ANCHORS DESIGNED FOR 20 kN EACH.",
+        f"35 mm SPANSET STRAPS OF LC {lc:.0f} kg, A CANYON DANCER HARNESS ON THE STREET TRIPLE AND A REAR-WHEEL STRAP ON EACH BIKE.",
+        "EACH TRACK ROW (PLAIN KINEDYNE FE750) SITS ON A 5 mm 5052 PACKER ON A GALVANISED RHS 65x35x4.0 CROSSMEMBER AT TOYOTA'S FIRST AND LAST DECK MOUNTS, SO THE ANCHOR LOAD REACHES THE FRAME THROUGH STEEL. "
+        f"M6 A4 BOLTS WITH CRUSH TUBES AT 150 PITCH OR LESS. EACH ANCHOR WITHSTANDS ITS STRAP'S BREAKING LOAD, {an['limit'][3:].upper()} (UGR-02, UGR-03).",
         f"THE TUAREG LOADS FIRST TO THE ROAD SIDE AND IS STRAPPED FROM THE EMPTY STREET TRIPLE BAY. THE STREET TRIPLE'S KERB-SIDE FRONT STRAP IS REACHED THROUGH THE KERB DOOR.",
         "THE WINCH CLIPS ONTO THE PLATE IN FRONT OF THE BIKE BEING LOADED, 650 UP, ABOVE THE 500 mm IGNITION-FREE ZONE.",
         "TOOLS RIDE IN THE TWO CHESTS ON THE WHEEL TUBS. THE OUTER FRONT STRAPS RUN THROUGH THE FRONT CORNERS, SO THE CHESTS CANNOT GO THERE.",

@@ -85,13 +85,13 @@ checks:
     inputs: []
     why: Toyota BBGJ1007 p. 28 asks for 30 mm outside the tyre.
   - id: UGR-01
-    title: Worst strap load within the strap's 1,000 kg lashing capacity, report 03's load cases
+    title: Worst strap load within the strap's 500 kg lashing capacity, report 03's load cases
     type: restraint
-    restraint: {factor: 2.0, share: 0.6, lc_kg: 1000, cases: {forward_g: 0.8, rearward_g: 0.5, lateral_g: 0.5, up_g: 1.0},
+    restraint: {factor: 2.0, share: 0.6, lc_kg: 500, cases: {forward_g: 0.8, rearward_g: 0.5, lateral_g: 0.5, up_g: 1.0},
                 cg_z: {TU: 700, ST: 600}}
     severity: fail
     inputs: []
-    why: The trailer's RES-01 method, which report 17 keeps for the ute. The NHVR's 2025 Load Restraint Guide keeps the 2018 performance standards, multiplied here by report 03's off-road factor of 2, with 1.0 g upward. Every anchor is designed for 20 kN.
+    why: The trailer's RES-01 method, which report 17 keeps for the ute. The NHVR's 2025 Load Restraint Guide keeps the 2018 performance standards, multiplied here by report 03's off-road factor of 2, with 1.0 g upward. Each anchor withstands its strap's breaking load, about 9.8 kN for LC 500 kg (UGR-02, UGR-03).
   - id: UGK-01
     title: The load path from the track to Toyota's brackets touches without overlap, and the box sits on the subframe
     type: contact

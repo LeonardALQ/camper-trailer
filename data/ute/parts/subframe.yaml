@@ -19,32 +19,32 @@ parts:
     color: "#636e72"
   U-STEEL-CM:
     name: Steel anchor crossmembers
-    material: "C350L0 steel RHS 76 x 38 x 3, galvanised"
-    product: Galvanised C350L0 RHS 76 x 38 x 3, laid flat, one under each L-track row, full width
-    maker: Orrcon or equal (stock)
+    material: "C350L0 steel RHS 65 x 35 x 4.0, hot-dip galvanised after welding"
+    product: AS/NZS 1163 C350L0 RHS 65 x 35 x 4.0, laid flat, one under each L-track row, full width
+    maker: Steel merchant (stock size)
     qty: 3.7
     unit: m
-    mass: {basis: per_length, kg_per_m: 5.2, maturity: calculated, source: "648 mm2 at 7.85 g/cm3 (5.09 kg/m) plus about 2 % for the zinc"}
-    size: 76 x 38 mm, 1,845 mm long
+    mass: {basis: per_length, kg_per_m: 5.45, maturity: calculated, source: "5.35 kg/m (Southern Steel table, R24 BX-U01) plus about 2 % for the zinc"}
+    size: 65 x 35 x 4.0 mm, 1,845 mm long. RHS 76 x 38 x 3 is not an Australian stock size (R24)
     rating: Each sits on the rails and bolts straight to a pair of Toyota's brackets, so a strap's load reaches the frame through steel only
-    notes: The L-track bolts down through the floor plate and the packer into the crossmember's top wall with M8 bolts and crush tubes at 150 mm pitch or less.
-    geometry: {generator: tube, params: {wall: 3}}
+    notes: The L-track bolts down through the floor plate and the packer into the crossmember's top wall with M6 A4-70 bolts and crush tubes at 150 mm pitch or less (R24 BX-F02).
+    geometry: {generator: tube, params: {wall: 4}}
     color: "#2c3e50"
   U-PACKER:
     name: Track packers
-    material: "Galvanised steel flat bar, 76 x 2"
-    product: Galvanised steel flat bar 76 x 2 mm on top of each steel crossmember
+    material: "5052-H32 aluminium plate, 5.0 mm, 65 wide"
+    product: 5052-H32 plate 5.0 x 65 mm on top of each steel crossmember, isolated from the galvanised steel
     maker: Owner made
     qty: 0.28
     unit: m2
-    mass: {basis: per_area, kg_per_m2: 15.7, maturity: calculated, source: "2.0 mm at 7.85 g/cm3"}
-    notes: The track sits on it, so the 13.7 mm track ends 0.3 mm below the floor top on the 38 mm crossmember.
+    mass: {basis: per_area, kg_per_m2: 13.4, maturity: calculated, source: "5.0 mm at 2.68 g/cm3 (R24 BX-M05)"}
+    notes: The track sits on it, so the 13.7 mm track ends 0.3 mm below the floor top on the 35 mm crossmember.
     geometry: {generator: box, params: {}}
     color: "#2c3e50"
   U-STRIP:
     name: Floor strips beside each track
-    material: "6060 aluminium flat bar, 20 x 10"
-    product: 6060 aluminium flat bar 20 x 10 mm, two each side of each track, on isolating tape
+    material: "6060 aluminium flat bar, 15 x 10"
+    product: 6060 aluminium flat bar 15 x 10 mm, one each side of each track, on isolating tape
     maker: Stock
     qty: 0.15
     unit: m2

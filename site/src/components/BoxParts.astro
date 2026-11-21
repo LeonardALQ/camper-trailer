@@ -1,0 +1,76 @@
+---
+// The bike box's priced parts list (data/ute/box-parts.yaml), copied to src/data/generated/box-parts.json by
+// cad/sitedata.py with its totals worked out from the lines.
+import b from '../data/generated/box-parts.json';
+
+interface Props {
+  kind: 'lines' | 'groups' | 'totals';
+}
+const { kind } = Astro.props;
+const r: any = b;
+const t = r.totals;
+const n = (v: number | null | undefined, d = 0) =>
+  v == null ? '' : v.toLocaleString('en-AU', { minimumFractionDigits: d, maximumFractionDigits: d });
+const host = (u: string) => {
+  try {
+    return new URL(u).hostname.replace('www.', '');
+  } catch {
+    return u;
+  }
+};
+const LABEL: Record<string, string> = {
+  materials: 'Materials', subframe_mounts: 'Subframe and mounts', fasteners_sealants: 'Fasteners and sealants', doors: 'Doors',
+  security: 'Security', restraint: 'Restraint', loading: 'Loading', services: 'Services', finish: 'Finish', tools: 'Tool chests',
+  fabrication: 'Shop labour', compliance: 'Engineering review',
+};
+const label = (g: string) => LABEL[g] ?? g.replace(/_/g, ' ');
+---
+
+{kind === 'lines' && (
+  <div class="data-table">
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Item</th><th>Group</th><th class="num">kg</th><th class="num">AUD</th><th>Basis</th><th class="num">Qty</th>
+          <th>Unit</th><th>Part number</th><th>Spec and notes</th><th>Source</th></tr>
+      </thead>
+      <tbody>
+        {r.lines.map((x: any) => (
+          <tr>
+            <td>{x.id}</td><td>{x.name}</td><td>{label(x.group)}</td><td class="num">{n(x.mass.kg, 2)}</td>
+            <td class="num">{n(x.price.aud, 2)}</td><td>{x.price.basis}</td>
+            <td class="num">{n(x.qty, Number.isInteger(x.qty) ? 0 : 2)}</td><td>{x.unit}</td><td>{x.part_number ?? ''}</td>
+            <td>{[x.spec, x.note].filter(Boolean).join('. ')}</td>
+            <td>{x.price.url ? <a href={x.price.url}>{host(x.price.url)}</a> : ''}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'groups' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Group</th><th>What it covers</th><th class="num">AUD</th><th class="num">kg</th></tr></thead>
+      <tbody>
+        {Object.entries(t.by_group).map(([g, v]: any) => (
+          <tr><td>{label(g)}</td><td>{r.groups[g]}</td><td class="num">{n(v, 2)}</td><td class="num">{n(t.kg_by_group[g], 1)}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'totals' && (
+  <div class="data-table" data-sheet="off">
+    <table>
+      <thead><tr><th>Total</th><th>What it is</th><th class="num">AUD</th></tr></thead>
+      <tbody>
+        <tr><td>Subtotal</td><td>Every line above, {n(t.mass_kg_lines, 1)} kg</td><td class="num">{n(t.subtotal_aud, 0)}</td></tr>
+        <tr><td>Contingency</td><td>{t.contingency_pct} % of the subtotal (est.)</td><td class="num">{n(t.contingency_aud, 0)}</td></tr>
+        <tr><td><strong>Shop-built</strong></td><td>A fabricator builds and fits it</td><td class="num"><strong>{n(t.total_aud, 0)}</strong></td></tr>
+        <tr><td><strong>Owner-built</strong></td><td>Without the shop labour line and its contingency</td><td class="num"><strong>{n(t.owner_built_total_aud, 0)}</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+)}

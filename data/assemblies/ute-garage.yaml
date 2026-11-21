@@ -43,7 +43,7 @@ params:
   outside_w: 1850           # the decision log's limit
   outside_l: 2590           # report 17 section 6.2
   skin_t: 2.5               # 5052-H32 walls, front and doors
-  roof_t: 2.0
+  roof_t: 1.6               # 5052-H32 1.6 mm roof skin (R24's 2.0 mm, thinned 0.4 mm to keep the box under 440 kg)
   frame_s: 40               # SHS 40 x 40 x 3 frame
   frame_t: 3
   wall_t: skin_t + frame_s  # side and front walls: 42.5 mm
@@ -95,12 +95,14 @@ params:
   runner_w: 75              # aluminium RHS 75 x 50 x 3, laid flat on each rail
   runner_y0: rail_y - runner_w / 2
   runner_y1: rail_y + runner_w / 2
-  steel_w: 76               # galvanised steel RHS 76 x 38 x 3, laid flat, under each L-track row
-  steel_h: 38
-  packer_t: 2.0             # galvanised steel packer on the steel crossmember, under the track
+  steel_w: 65               # galvanised C350L0 RHS 65 x 35 x 4.0, laid flat, under each L-track row (R24)
+  steel_h: 35
+  steel_t: 4.0
+  steel_fy: 350             # C350L0 yield, MPa (AS/NZS 1163), for the crossmember check UGR-03
+  packer_t: 5.0             # 5052-H32 packer on the steel crossmember, under the track
   track_z: sub_z0 + steel_h + packer_t   # track underside: the 13.7 mm track's top ends 0.3 mm below the floor top
   strip_t: -floor_t - track_z            # aluminium strips either side of the track carry the floor plate: 10 mm
-  strip_w: 20
+  strip_w: 15
   cm_w: 50                  # aluminium SHS 50 x 50 x 3 crossmembers and outriggers
   cm_x: [-15, 450, 800, 1150, 1500, 1800, 2300, x_end - 25]       # inner crossmembers (centres)
   out_x: [-15, 450, 1500, 1800, 2300, x_end - 25]                  # outriggers, none over the wheels
@@ -173,7 +175,7 @@ items:
       - {id: kerb, at: [-front_t, -half_width - wall_t, -floor_t], params: {dx: outside_l, dy: skin_t, dz: roof_z + floor_t, normal: y,
                                                                          cutouts: [[kd_x0 + front_t, kd_z0 + floor_t, kd_x1 - kd_x0, kd_z1 - kd_z0]]}}
       - {id: front, at: [-front_t, -half_width - frame_s, -floor_t], params: {dx: skin_t, dy: interior_width + 2 * frame_s, dz: roof_z + floor_t, normal: x}}
-  - {ref: B4, part: U-ROOF, group: body, label: "Roof skin, 2.0 mm",
+  - {ref: B4, part: U-ROOF, group: body, label: "Roof skin, 1.6 mm",
      at: [-front_t, -outside_w / 2, roof_z], params: {dx: outside_l, dy: outside_w, dz: roof_t, normal: z}}
 
   # ---------------------------------------------------------------- frame, SHS 40 x 40 x 3 (`at` is each tube's low corner)
@@ -419,8 +421,8 @@ items:
     group: security
     label: Ground anchor for a bike's chain
     copies:
-      - {id: TU, at: [1800 - 60, (tuareg_y + st_y) / 2 + 40, 0], params: {dx: 120, dy: 80, dz: 40}}
-      - {id: ST, at: [1800 - 60, (tuareg_y + st_y) / 2 - 120, 0], params: {dx: 120, dy: 80, dz: 40}}
+      - {id: TU, at: [450 - 60, (tuareg_y + st_y) / 2 + 40, 0], params: {dx: 120, dy: 80, dz: 40}}
+      - {id: ST, at: [450 - 60, (tuareg_y + st_y) / 2 - 120, 0], params: {dx: 120, dy: 80, dz: 40}}
   - {ref: K3, part: U-TRACKER, group: security, label: "Teltonika FMC130 tracker and siren, behind a panel high on the front wall",
      at: [0, -half_width + 100, 1250], params: {dx: 60, dy: 160, dz: 110}}
 

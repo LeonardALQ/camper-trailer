@@ -4,8 +4,8 @@ group: ute-doors
 parts:
   U-LEAF:
     name: Barn door leaves
-    material: "5052 aluminium sheet, 2.5 mm, on an aluminium SHS 25 x 25 x 3 frame (est.), EPDM seal"
-    product: Two leaves, 2.5 mm 5052 skin on an SHS 25 x 25 x 3 frame with a mid rail, EPDM bulb seal
+    material: "5052-H32 aluminium sheet, 2.5 mm, on a 6061-T6 SHS 25 x 25 x 3 frame, EPDM seal"
+    product: Two leaves, 2.5 mm 5052-H32 skin on a 6061-T6 SHS 25 x 25 x 3 frame with a mid rail, EPDM bulb seal
     maker: Owner made
     qty: 2
     unit: each
@@ -29,8 +29,8 @@ parts:
     color: "#2d3436"
   U-KDOOR:
     name: Kerb-side lift-up door
-    material: "5052 aluminium sheet, 2.5 mm, on an aluminium SHS 25 x 25 x 3 frame (est.)"
-    product: 2.5 mm 5052 skin on an SHS 25 x 25 x 3 frame, top-hinged, on two gas struts, with a keyed latch and a hasp
+    material: "5052-H32 aluminium sheet, 2.5 mm, on a 6061-T6 SHS 25 x 25 x 3 frame"
+    product: 2.5 mm 5052-H32 skin on a 6061-T6 SHS 25 x 25 x 3 frame, top-hinged, on two gas struts, with a keyed latch and a hasp
     maker: Owner made
     qty: 1
     unit: each
@@ -57,6 +57,15 @@ parts:
     maker: Product to choose
     qty: 1
     unit: set
-    mass: {basis: declared, total_kg: 3.5, maturity: estimate, source: "Report 17: shoot bolts 0.8 kg, latches 0.3 kg each (0.9 kg), struts 0.35 kg each (0.7 kg), seal 10 m at 0.11 kg/m (1.1 kg)"}
+    mass: {basis: declared, total_kg: 3.8, maturity: estimate, source: "R24 (BX-D04 to BX-D07): shoot bolts 0.8 kg, latches 0.9 kg, struts 0.7 kg, Trim-Lok seal 1.4 kg (estimates)"}
     notes: The latches are for short stops only. The padlocks are the security.
     cog: {at: [2000, -300, 800], basis: "Spread over the barn doors and the kerb door, estimate"}
+  U-RIVETS:
+    name: Stainless structural blind rivets
+    material: "A4 stainless steel"
+    product: Stainless structural blind rivets for the continuous hinges
+    maker: Product to choose
+    qty: 1
+    unit: set
+    mass: {basis: declared, total_kg: 0.2, maturity: estimate, source: "R24 (BX-F06), estimate"}
+    cog: {at: [garage_length, 0, 730], basis: "Along the hinges, estimate"}

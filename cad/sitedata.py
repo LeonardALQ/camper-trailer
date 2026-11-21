@@ -110,6 +110,26 @@ def tow_vehicle_page():
     return len(data["items"])
 
 
+def box_parts() -> dict:
+    """The bike box's parts list (data/ute/box-parts.yaml) for the site, with the totals worked out from the lines.
+    cad/tests/test_box_parts.py checks that they equal the totals typed in the file."""
+    data = yaml.safe_load((ROOT / "data" / "ute" / "box-parts.yaml").read_text(encoding="utf-8"))
+    aud, kg = {}, {}
+    for ln in data["lines"]:
+        aud[ln["group"]] = aud.get(ln["group"], 0.0) + ln["price"]["aud"]
+        kg[ln["group"]] = kg.get(ln["group"], 0.0) + ln["mass"]["kg"]
+    pct = data["totals"]["contingency_pct"]
+    sub = sum(aud.values())
+    total = sub * (1 + pct / 100)
+    data["totals"] = dict(data["totals"], by_group={g: round(aud[g], 2) for g in data["groups"] if g in aud},
+                          kg_by_group={g: round(kg[g], 2) for g in data["groups"] if g in kg},
+                          subtotal_aud=round(sub, 2), contingency_aud=round(sub * pct / 100, 2), total_aud=round(total, 2),
+                          owner_built_total_aud=round(total - aud.get("fabrication", 0.0) * (1 + pct / 100), 2),
+                          mass_kg_lines=round(sum(kg.values()), 2))
+    (GEN / "box-parts.json").write_text(json.dumps(data, indent=1, default=str))
+    return data
+
+
 def main():
     for d in (GEN, SITE / "public" / "models", SITE / "public" / "downloads" / "drawings", SITE / "public" / "drawings",
               DOCS / "research"):
@@ -157,6 +177,7 @@ def main():
 
     # the tow vehicle page
     n_parts = tow_vehicle_page()
+    box = box_parts()
 
     # research reports as pages (copied, with the first heading moved into the title)
     for old in (DOCS / "research").glob("*.md"):
@@ -173,7 +194,7 @@ def main():
                 + text)
         (DOCS / "research" / fname).write_text(body, encoding="utf-8")
     print(f"site data written: {len(RESEARCH)} research pages, {len(live)} live drawings "
-          f"({len(reg['drawings']) - len(live)} retired), tow vehicle page with {n_parts} parts")
+          f"({len(reg['drawings']) - len(live)} retired), tow vehicle page with {n_parts} parts, box parts list with {len(box['lines'])} lines")
 
 
 if __name__ == "__main__":

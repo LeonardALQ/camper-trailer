@@ -1,0 +1,737 @@
+# Bike box parts list (R24, 20 Nov 2026, UTE-GARAGE.md revision C). The enclosed welded aluminium box on the
+# LandCruiser VDJ79's frame. The ute-garage page renders it (cad/sitedata.py), and cad/tests/test_box_parts.py checks that
+# the lines add up to the totals below and to the model's box mass (UGB-01).
+# One entry per line. mass.kg is the mass the line adds to the fitted box, not the mass of stock bought. model_part
+# names the part in data/ute/parts that carries that mass in the model. Lines whose mass sits in another line say so
+# in mass.src.
+# Prices: AUD including GST. Foreign prices converted at 1 USD = 1.55 AUD, 1 GBP = 1.98 AUD, plus 10 % GST on
+# import, and marked converted. UK prices are taken ex VAT (listing / 1.20) before conversion.
+# Basis: listing (a published price), estimate (est., basis in the note), converted (foreign listing).
+# 6061-T6 extrusion prices are estimates: All Aluminium (Melbourne) stocks the sizes only in 6060-T5, so its listing
+# is raised 25 % for the structural alloy (assumption, to be replaced by a Capral or Ullrich quote).
+schema_version: 1
+currency: AUD
+date_checked: 2026-11-20
+fx: {USD: 1.55, GBP: 1.98, EUR: 1.68, gst_on_imports: 0.10}
+groups:
+  materials: Sheet, plate and extrusions, cut and welded by the fabricator
+  subframe_mounts: Steel anchor crossmembers, mounts and their isolation
+  fasteners_sealants: Bolts, rivet nuts, isolation, sealant
+  doors: Hinges, locking gear, latches, struts, seals
+  security: Padlocks, disc locks, anchors, tracker and alarm
+  restraint: Chocks, track, fittings, straps, loops, pads
+  loading: Ramp, winch and its power, freight for imported items
+  services: Ventilation, fume detection, light, power, lamps, extinguisher
+  finish: Floor coating and roof coating
+  tools: Tool chests on the wheel tubs
+  fabrication: Shop labour
+  compliance: Engineering review. The LC5 inspection is counted once, in the car build's GV03 (data/vehicle/vehicle-parts.yaml)
+lines:
+  # ================================================================ materials
+  - id: BX-M01
+    group: materials
+    name: Roof skin sheet
+    part_number: "Aluminium Marine Sheet 5052 H32 1.6mm 1200x2400"
+    spec: 5052-H32, 1.6 mm, 2,400 x 1,200 mm. Three pieces 1,850 mm across the box, butt joints over the roof bows
+    qty: 3
+    unit: sheet
+    mass: {kg: 20.56, basis: calculated, src: "Model U-ROOF, 4.79 m2 at 4.29 kg/m2"}
+    price: {aud_each: 166.62, aud: 499.86, url: "https://store.allaluminium.com.au/collections/marine-sheet-aluminium", date: 2026-11-20, basis: listing}
+    model_part: U-ROOF
+    note: "1.6 mm in place of 2.0 mm saves 5.1 kg and AUD 125, so the box stays under UGB-01's 440 kg (conductor's ruling, 20 Nov 2026). The roof carries nothing, and the engineer confirms it with the bows at most 640 mm apart"
+  - id: BX-M02
+    group: materials
+    name: Wall, front wall and door skin sheet
+    part_number: "Aluminium Marine Sheet 5052 H32 2.5mm 1200x2400"
+    spec: 5052-H32, 2.5 mm, 2,400 x 1,200 mm. Sheets stand on end so every vertical joint lands on a post. 13.1 m2 fitted, 9 sheets with nesting losses (est.)
+    qty: 9
+    unit: sheet
+    mass: {kg: 87.8, basis: calculated, src: "Model U-SKIN 62.7 kg, the two leaf skins 17.0 kg and the kerb door skin 8.0 kg, at 6.70 kg/m2"}
+    price: {aud_each: 260.37, aud: 2343.33, url: "https://store.allaluminium.com.au/products/aluminium-marine-sheet-5052-h32-2-5mm-1200x2400", date: 2026-11-20, basis: listing}
+    model_part: [U-SKIN, U-LEAF, U-KDOOR]
+  - id: BX-M03
+    group: materials
+    name: Wheel tub sheet
+    part_number: "Aluminium Marine Sheet 5052 H32 3mm 1200x2400"
+    spec: 5052-H32, 3.0 mm. Both tubs, folded and welded
+    qty: 1
+    unit: sheet
+    mass: {kg: 7.4, basis: calculated, src: "Model U-TUB, 0.92 m2 at 8.04 kg/m2"}
+    price: {aud_each: 312.39, aud: 312.39, url: "https://store.allaluminium.com.au/collections/marine-sheet-aluminium", date: 2026-11-20, basis: listing}
+    model_part: U-TUB
+  - id: BX-M04
+    group: materials
+    name: Floor plate sheet
+    part_number: "Aluminium Marine Sheet 5052 H32 4mm 1200x2400"
+    spec: 5052-H32, 4.0 mm. Three pieces 1,845 mm across, butt welded over the crossmembers at module X 1,150 and 2,300 mm
+    qty: 3
+    unit: sheet
+    mass: {kg: 43.0, basis: calculated, src: "Model U-FLOOR, 4.01 m2 at 10.72 kg/m2"}
+    price: {aud_each: 416.59, aud: 1249.77, url: "https://store.allaluminium.com.au/collections/marine-sheet-aluminium", date: 2026-11-20, basis: listing}
+    model_part: U-FLOOR
+  - id: BX-M05
+    group: materials
+    name: Plate for track packers, winch plates, chock backing plates and hasp shrouds
+    part_number: "Aluminium Marine Sheet 5052 H32 5mm 1200x2400"
+    spec: 5052-H32, 5.0 mm. Two packers 1,845 x 65 mm under the L-track, two winch plates 340 x 160 mm, two chock backing plates 300 x 150 mm, two hasp shrouds
+    qty: 1
+    unit: sheet
+    mass: {kg: 3.2, basis: calculated, src: "Packers 2 x 1.845 x 0.065 m at 13.4 kg/m2 (5.0 mm at 2.68 g/cm3). Winch plates are in BX-L02, shrouds in BX-D08, backing plates in BX-F05"}
+    price: {aud_each: 520.73, aud: 520.73, url: "https://store.allaluminium.com.au/collections/marine-sheet-aluminium", date: 2026-11-20, basis: listing}
+    model_part: U-PACKER
+    note: Replaces the model's 2 mm galvanised steel packer. The 35 mm steel crossmember (BX-U01) needs 5 mm to bring the 13.7 mm track to 0.3 mm under the floor top
+  - id: BX-M06
+    group: materials
+    name: Mount angles, stations 2 to 6
+    part_number: "Angle 50 x 50 x 6, 3.25 m half length"
+    spec: 6061-T6 equal angle 50 x 50 x 6, welded to the runners' outer faces
+    qty: 1
+    unit: length
+    mass: {kg: 0.0, basis: estimate, src: "In BX-U02 and BX-U03 (model U-MOUNT-FIRM and U-MOUNT-SPRING)"}
+    price: {aud_each: 140.53, aud: 140.53, url: "https://store.allaluminium.com.au/products/aluminium-angle-50mm-x-50mm-x-6mm", date: 2026-11-20, basis: estimate}
+    note: "Estimate: the 6060-T5 listing (AUD 112.42) plus 25 % for 6061-T6"
+  - id: BX-M07
+    group: materials
+    name: Body frame tube
+    part_number: "SHS 40 x 40 x 3, 6.5 m"
+    spec: 6061-T6 square hollow section 40 x 40 x 3. 44.4 m fitted plus 15 % for cutting
+    qty: 8
+    unit: length
+    mass: {kg: 53.3, basis: calculated, src: "Model U-FRAME, 44.4 m at 1.20 kg/m"}
+    price: {aud_each: 185.33, aud: 1482.64, url: "https://store.allaluminium.com.au/products/aluminium-square-tube-40mm-x-40mm-x-3mm", date: 2026-11-20, basis: estimate}
+    model_part: U-FRAME
+    note: "Estimate: the 6060-T5 listing (AUD 148.26) plus 25 % for 6061-T6. Do not substitute 6060-T5: its welded strength is lower and the checks use 6061-T6"
+  - id: BX-M08
+    group: materials
+    name: Door leaf and kerb door frame tube
+    part_number: "SHS 25 x 25 x 3, 6.5 m"
+    spec: 6061-T6 SHS 25 x 25 x 3. 16.6 m fitted
+    qty: 3
+    unit: length
+    mass: {kg: 11.8, basis: calculated, src: "Model U-LEAF frames 2 x 3.9 kg and U-KDOOR frame 4.0 kg, at 0.71 kg/m"}
+    price: {aud_each: 108.23, aud: 324.69, url: "https://store.allaluminium.com.au/collections/square-tube", date: 2026-11-20, basis: estimate}
+    model_part: [U-LEAF, U-KDOOR]
+    note: "Estimate: 6060-T5 listing AUD 86.58 plus 25 %"
+  - id: BX-M09
+    group: materials
+    name: Subframe runners
+    part_number: "RHS 75 x 50 x 3, 6.5 m"
+    spec: 6061-T6 RHS 75 x 50 x 3, laid flat. Six pieces, 4.92 m fitted
+    qty: 1
+    unit: length
+    mass: {kg: 9.49, basis: calculated, src: "Model U-RUNNER, 4.92 m at 1.93 kg/m"}
+    price: {aud_each: 301.51, aud: 301.51, url: "https://store.allaluminium.com.au/collections/aluminium-rectangular-hollow", date: 2026-11-20, basis: estimate}
+    model_part: U-RUNNER
+    note: "Estimate: 6060-T5 listing AUD 241.21 plus 25 %"
+  - id: BX-M10
+    group: materials
+    name: Subframe crossmembers and outriggers
+    part_number: "SHS 50 x 50 x 3, 6.5 m"
+    spec: 6061-T6 SHS 50 x 50 x 3. Eight crossmembers of 911 mm and twelve outriggers of 392 mm, 12.0 m, cut from two lengths
+    qty: 2
+    unit: length
+    mass: {kg: 18.2, basis: calculated, src: "Model U-CM, 12.0 m at 1.52 kg/m"}
+    price: {aud_each: 228.33, aud: 456.66, url: "https://store.allaluminium.com.au/products/aluminium-square-tube-50mm-x-50mm-x-3mm", date: 2026-11-20, basis: estimate}
+    model_part: U-CM
+    note: "Estimate: 6060-T5 listing AUD 182.66 plus 25 %"
+  - id: BX-M11
+    group: materials
+    name: Floor strips beside each track
+    part_number: "Aluminium Flat Bar 10mm x 20mm, 4.0 m"
+    spec: 6060-T5 flat bar 20 x 10, ripped to 15 x 10 mm. Four strips of 1,845 mm on the packers' edges
+    qty: 2
+    unit: length
+    mass: {kg: 3.0, basis: calculated, src: "4 x 1.845 m x 0.015 x 0.010 m at 2.70 g/cm3"}
+    price: {aud_each: 41.57, aud: 83.14, url: "https://store.allaluminium.com.au/products/aluminium-flat-bar-10mm-x-20mm-mill-finish", date: 2026-11-20, basis: listing}
+    model_part: U-STRIP
+    note: The model's strips are 20 mm wide on a 76 mm crossmember. On the 65 mm crossmember they are 15 mm wide
+  # ================================================================ subframe and mounts
+  - id: BX-U01
+    group: subframe_mounts
+    name: Steel anchor crossmembers under the L-track rows
+    part_number: "RHS 65 x 35 x 4.0, C350L0, 8 m length"
+    spec: AS/NZS 1163 C350L0 RHS 65 x 35 x 4.0, laid flat, two pieces of 1,845 mm. Bought black and hot-dip galvanised after the mount plates and cleats are welded on (BX-U04)
+    qty: 1
+    unit: length
+    mass: {kg: 20.1, basis: calculated, src: "3.69 m at 5.35 kg/m (Southern Steel table) plus 2 % zinc"}
+    price: {aud_each: 180.00, aud: 180.00, url: "https://www.southernsteel.com.au/wp-content/uploads/2025/07/Southern-Steel-Supplies-Structural-Tube-Pipe-Reference-Guide-RHS-1.pdf", date: 2026-11-20, basis: estimate}
+    model_part: U-STEEL-CM
+    note: "Replaces RHS 76 x 38 x 3, which is not an Australian stock size (the AS/NZS 1163 range runs 65 x 35, 75 x 25, 75 x 50). Price est.: 42.8 kg at about AUD 4.20/kg for black RHS"
+  - id: BX-U02
+    group: subframe_mounts
+    name: Firm mount plates (stations 1 and 2) and runner cleats
+    part_number: Fabricated
+    spec: "Station 1: 6 mm C350 plate 145 x 80 mm welded under each front steel crossmember end, one M12 bolt ahead of and one behind the crossmember. Station 2: BX-M06 angle on the runner. Eight 50 x 50 x 5 steel angle cleats welded to the crossmembers for the runner joints"
+    qty: 1
+    unit: set
+    mass: {kg: 4.8, basis: estimate, src: "Model U-MOUNT-FIRM (4 x 1.2 kg, estimate), with their bolts"}
+    price: {aud_each: 80.00, aud: 80.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-MOUNT-FIRM
+    note: "Est.: about 6 kg of 6 mm plate and 5 mm angle offcuts from a steel merchant"
+  - id: BX-U03
+    group: subframe_mounts
+    name: Compliant mount cushions, stations 3 to 6
+    part_number: "Toyota 70 Series cab mounting cushion, upper and lower, by VIN"
+    spec: One M12 8.8 bolt per bracket through an upper and a lower rubber cushion, a steel sleeve that sets the preload and a 50 mm safety washer. Eight mounts. Station 6 sits under the rear steel crossmember on a 6 mm plate as station 1
+    qty: 8
+    unit: mount
+    mass: {kg: 8.0, basis: estimate, src: "Model U-MOUNT-SPRING (8 x 1.0 kg, estimate)"}
+    price: {aud_each: 60.00, aud: 480.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-MOUNT-SPRING
+    note: "Toyota's own cab cushions are made for the 70 Series frame's twist and are stocked by every Toyota dealer. Est. AUD 60 a pair. The engineer confirms stiffness and travel (open point 3)"
+  - id: BX-U04
+    group: subframe_mounts
+    name: Hot-dip galvanising of the steel parts
+    part_number: Job lot
+    spec: AS/NZS 4680 hot-dip galvanising of both crossmembers with their plates and cleats, after welding. Vent holes 10 mm at each end
+    qty: 1
+    unit: job
+    mass: {kg: 0.0, basis: estimate, src: "Zinc is in BX-U01"}
+    price: {aud_each: 250.00, aud: 250.00, url: null, date: 2026-11-20, basis: estimate}
+    note: "Est.: a galvaniser's minimum charge for a small job"
+  # ================================================================ fasteners, isolation, sealant
+  - id: BX-F01
+    group: fasteners_sealants
+    name: Bracket bolts
+    part_number: "M12 x 1.75, property class 8.8, hot-dip galvanised, hardened washers, nyloc nuts"
+    spec: "Sixteen sets: two per firm bracket (8), one per compliant bracket (8). Head up inside the subframe under the floor, nut below Toyota's bracket. Lengths to suit each stack"
+    qty: 16
+    unit: set
+    mass: {kg: 0.0, basis: estimate, src: "In BX-U02 and BX-U03"}
+    price: {aud_each: 6.00, aud: 96.00, url: null, date: 2026-11-20, basis: estimate}
+  - id: BX-F02
+    group: fasteners_sealants
+    name: L-track bolts
+    part_number: "M6 A4-70 countersunk socket screws, 50 mm, nyloc nuts, steel crush tubes 10 x 1.5 x 27 mm"
+    spec: One in every pre-drilled track hole (101.6 mm pitch) except over the frame rails, through the packer and both walls of the steel crossmember. About 30 sets
+    qty: 30
+    unit: set
+    mass: {kg: 1.5, basis: estimate, src: "Model U-COAT carries 1.5 kg of anchor fixings (estimate)"}
+    price: {aud_each: 3.00, aud: 90.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-COAT
+  - id: BX-F03
+    group: fasteners_sealants
+    name: Body-to-subframe and fit-out fasteners
+    part_number: "M8 A4-70 button head bolts with M8 stainless hex-body rivet nuts"
+    spec: The body's floor bolts down to the subframe from inside the box, about 40 places, plus fit-out fixings. Each hole sealed with Sikaflex-291
+    qty: 60
+    unit: set
+    mass: {kg: 0.0, basis: estimate, src: "In BX-F07 (model U-SUB-FIX)"}
+    price: {aud_each: 2.50, aud: 150.00, url: null, date: 2026-11-20, basis: estimate}
+  - id: BX-F04
+    group: fasteners_sealants
+    name: Runner-to-cleat bolts with isolation
+    part_number: "M10 A4-70 bolts, G10 (glass-epoxy) shoulder washers and sleeves"
+    spec: Two bolts at each of the eight runner joints to the steel cleats. G10 between aluminium and steel, Tef-Gel on the threads
+    qty: 16
+    unit: set
+    mass: {kg: 0.0, basis: estimate, src: "In BX-F07"}
+    price: {aud_each: 5.00, aud: 80.00, url: null, date: 2026-11-20, basis: estimate}
+  - id: BX-F05
+    group: fasteners_sealants
+    name: Chock adapter bolts and backing plates
+    part_number: "M10 property class 8.8, galvanised, nyloc nuts"
+    spec: Four bolts per Condor trailer adapter through the floor plate into a 5 mm aluminium backing plate (cut from BX-M05)
+    qty: 8
+    unit: set
+    mass: {kg: 0.6, basis: estimate, src: "Two backing plates 300 x 150 x 5 mm at 0.6 kg together, and bolts (estimate)"}
+    price: {aud_each: 3.00, aud: 24.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-CHOCK-FIX
+  - id: BX-F06
+    group: fasteners_sealants
+    name: Stainless structural blind rivets
+    part_number: "4.8 mm stainless structural rivets, box of 100"
+    spec: Hinge leaves, seal retainers, pads. Set from inside where the part allows
+    qty: 1
+    unit: box
+    mass: {kg: 0.2, basis: estimate, src: "Estimate"}
+    price: {aud_each: 60.00, aud: 60.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-RIVETS
+  - id: BX-F07
+    group: fasteners_sealants
+    name: Isolation materials and rail strip
+    part_number: "G10 sheet 3 mm, PVC isolating tape, EPDM strip 6 x 75 mm"
+    spec: "G10 pads at every steel to aluminium faying face, isolating tape under the packers and strips, 5.4 m of 6 mm EPDM strip under the runners and steel crossmembers on the rails"
+    qty: 1
+    unit: set
+    mass: {kg: 2.5, basis: estimate, src: "Model U-SUB-FIX (estimate)"}
+    price: {aud_each: 150.00, aud: 150.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-SUB-FIX
+  - id: BX-F08
+    group: fasteners_sealants
+    name: Anti-seize and isolating paste
+    part_number: "Tef-Gel, 1 oz"
+    spec: On every stainless or steel fastener that passes through aluminium
+    qty: 1
+    unit: tube
+    mass: {kg: 0.0, basis: estimate, src: "Negligible"}
+    price: {aud_each: 40.00, aud: 40.00, url: null, date: 2026-11-20, basis: estimate}
+  - id: BX-F09
+    group: fasteners_sealants
+    name: Seam and fastener sealant
+    part_number: "Sikaflex-291 White 310 ml"
+    spec: Inside seal on stitch-welded seams, every bolt through the floor, the vent, drain and lamp penetrations
+    qty: 6
+    unit: cartridge
+    mass: {kg: 1.5, basis: estimate, src: "About 1.1 L cured in the box (estimate)"}
+    price: {aud_each: 33.65, aud: 201.90, url: "https://www.bluebottlemarine.com/products/sikaflex-291-white-310ml.html", date: 2026-11-20, basis: listing}
+    model_part: U-SEALANT
+  # ================================================================ doors
+  - id: BX-D01
+    group: doors
+    name: Continuous hinges
+    part_number: "316 stainless continuous hinge, 3 mm leaves, 6 mm pin"
+    spec: Two of 1,455 mm (barn door leaves) and one of 1,200 mm (kerb door), 4.1 m. Pin ends welded over. Riveted to the leaves and posts with BX-F06, stainless isolated from aluminium with Tef-Gel
+    qty: 4.1
+    unit: m
+    mass: {kg: 3.7, basis: estimate, src: "Model U-HINGES (4.1 m at 0.9 kg/m, estimate)"}
+    price: {aud_each: 75.00, aud: 307.50, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-HINGES
+  - id: BX-D02
+    group: doors
+    name: Hinge-side dog bolts
+    part_number: Fabricated
+    spec: Three 12 mm 316 stainless pins on each leaf's hinge edge (top, middle, bottom), engaging welded sockets in the corner posts when shut
+    qty: 6
+    unit: each
+    mass: {kg: 0.0, basis: estimate, src: "In BX-D01"}
+    price: {aud_each: 10.00, aud: 60.00, url: null, date: 2026-11-20, basis: estimate}
+  - id: BX-D03
+    group: doors
+    name: Cam bar locking gear
+    part_number: "Polar Hardware 158 stainless cam lock kit, or equal"
+    spec: Full-height truck-door cam bar on the road-side leaf, keepers welded to the header and the sill, handle with a padlock eye for the PL362
+    qty: 1
+    unit: set
+    mass: {kg: 4.0, basis: estimate, src: "Model U-CAMBAR (report 17 LCK-03, estimate)"}
+    price: {aud_each: 250.00, aud: 250.00, url: "https://industrialhwe.com/cam-door-locks/polar-truck-and-trailer-cam-door-lock-stainless.asp", date: 2026-11-20, basis: estimate}
+    model_part: U-CAMBAR
+    note: "Price page not readable. Report 17's AUD 250 estimate kept"
+  - id: BX-D04
+    group: doors
+    name: Shoot bolts, kerb-side leaf
+    part_number: "Heavy-duty stainless surface shoot bolt, pair"
+    spec: Top bolt into the header, bottom bolt into the sill, worked from inside the box
+    qty: 1
+    unit: pair
+    mass: {kg: 0.8, basis: estimate, src: "Model U-LATCHES share (report 17 LCK-04)"}
+    price: {aud_each: 60.00, aud: 60.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-LATCHES
+  - id: BX-D05
+    group: doors
+    name: Keyed T-handle latches, keyed alike
+    part_number: "Canopy T-handle lock, stainless, keyed alike"
+    spec: One on each barn door leaf and one on the kerb door. Everyday latch for short stops only
+    qty: 3
+    unit: each
+    mass: {kg: 0.9, basis: estimate, src: "Model U-LATCHES share (0.3 kg each)"}
+    price: {aud_each: 15.00, aud: 45.00, url: "https://www.ebay.com.au/b/Canopy-Lock-Trailer-Parts/36632/bn_71615179", date: 2026-11-20, basis: listing}
+    model_part: U-LATCHES
+    note: Report 17 found AUD 13 to 15 each
+  - id: BX-D06
+    group: doors
+    name: Kerb door gas struts
+    part_number: "Gas strut, about 400 N, 10 mm ball ends, stainless brackets"
+    spec: Two struts lift the 12 kg top-hinged door. Force set by the supplier from the door's mass and hinge geometry
+    qty: 2
+    unit: each
+    mass: {kg: 0.7, basis: estimate, src: "Model U-LATCHES share (0.35 kg each)"}
+    price: {aud_each: 35.00, aud: 70.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-LATCHES
+  - id: BX-D07
+    group: doors
+    name: Door seals
+    part_number: "Trim-Lok trim seal with top bulb, fits 1/16 to 1/8 in edge, 25 ft roll"
+    spec: Push-on EPDM bulb on a PVC edge grip, clipped on the 2.5 mm skin edge of each leaf and of the kerb door, bearing on the portal frame. 13 m fitted from two rolls
+    qty: 15.24
+    unit: m
+    mass: {kg: 1.4, basis: estimate, src: "13 m at 0.11 kg/m (report 17)"}
+    price: {aud_each: 16.25, aud: 247.65, url: "https://www.amazon.com/dp/B00NL4660K", date: 2026-11-20, basis: converted}
+    model_part: U-LATCHES
+    note: "USD 9.53 per m converted, with GST"
+  - id: BX-D08
+    group: doors
+    name: Hasps, staples and shrouds
+    part_number: Fabricated
+    spec: 316 stainless hasp and staple for a 15 mm shackle with 25 mm clearance, inside a 5 mm aluminium shroud welded to the frame. One on the cam bar handle, one on the kerb door's rear edge
+    qty: 2
+    unit: each
+    mass: {kg: 0.8, basis: estimate, src: "Model U-HASP share (0.4 kg each)"}
+    price: {aud_each: 80.00, aud: 160.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-HASP
+  # ================================================================ security
+  - id: BX-S01
+    group: security
+    name: High-security padlocks, keyed alike
+    part_number: "ABLOY PL362 Protec2, keyed alike"
+    spec: Closed-shackle (raised shoulders) padlock, 15 mm boron steel shackle, 25 mm shackle height, EN 12320 grade 6
+    qty: 2
+    unit: each
+    mass: {kg: 2.0, basis: estimate, src: "Model U-HASP share (1.0 kg each, report 17 LCK-01)"}
+    price: {aud_each: 784.17, aud: 1568.34, url: "https://www.padlocks.co.uk/products/abloy-pl362-closed-shackle-padlock", date: 2026-11-20, basis: converted}
+    model_part: U-HASP
+    note: "GBP 432.05 incl. VAT, taken ex VAT and converted with GST. No Australian price found. ABLOY Australia sells through locksmiths (https://www.abloy.com/au/en/products/padlocks/abloy-pl362)"
+  - id: BX-S02
+    group: security
+    name: Alarmed disc lock with loop chain
+    part_number: "ABUS Granit Detecto XPlus 8008 2.0 + 12KS120 loop chain"
+    spec: 16 mm bolt, 100 dB movement alarm. The 1.2 m, 12 mm square-link chain runs from the floor anchor round the fork leg to the lock on the inboard front disc
+    qty: 2
+    unit: set
+    mass: {kg: 8.8, basis: estimate, src: "Lock 0.9 kg and chain 3.5 kg per bike (estimate)"}
+    price: {aud_each: 596.73, aud: 1193.46, url: "https://www.abususa.com/products/granit%E2%84%A2-detecto-xplus-8008-12ks120-black-loop-chain", date: 2026-11-20, basis: converted}
+    model_part: U-BIKE-SEC
+    note: USD 349.99 converted
+  - id: BX-S03
+    group: security
+    name: Floor anchors
+    part_number: "ABUS WBA100 Granit floor anchor"
+    spec: Bolted through the floor into the aluminium crossmember at module X 450 mm, between the front wheels, one per bike
+    qty: 2
+    unit: each
+    mass: {kg: 2.8, basis: estimate, src: "1.4 kg each (estimate)"}
+    price: {aud_each: 153.43, aud: 306.86, url: "https://www.abususa.com/products/wba100-granit-b-sb", date: 2026-11-20, basis: converted}
+    model_part: U-ANCHOR
+    note: "USD 89.99 converted. Moved from X 1,800 mm so the 1.2 m chain reaches the front disc"
+  - id: BX-S04
+    group: security
+    name: Box tracker and alarm controller
+    part_number: "Teltonika FMC130"
+    spec: Hard-wired 4G LTE tracker with backup battery, door switch inputs, siren output, movement and tilt alerts
+    qty: 1
+    unit: each
+    mass: {kg: 0.2, basis: estimate, src: "Report 17 TRK-01"}
+    price: {aud_each: 150.70, aud: 150.70, url: "https://www.teracomsolutions.com.au/store/product/nht-fmc130", date: 2026-11-20, basis: listing}
+    model_part: U-TRACKER
+    note: Platform subscription extra, about AUD 10 a month (est.), not in the total
+  - id: BX-S05
+    group: security
+    name: Door switches, siren and alarm wiring
+    part_number: "Heavy-duty alloy reed switches (3), 12 V 120 dB siren, relay, fuse"
+    spec: A switch on each barn door leaf and on the kerb door. Siren behind the front wall panel
+    qty: 1
+    unit: set
+    mass: {kg: 0.6, basis: estimate, src: "Report 17 TRK-03"}
+    price: {aud_each: 120.00, aud: 120.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-TRACKER
+  - id: BX-S06
+    group: security
+    name: Hidden bike trackers
+    part_number: "Monimoto 9"
+    spec: One hidden in each bike. Own battery, 12 to 24 months
+    qty: 2
+    unit: each
+    mass: {kg: 0.2, basis: estimate, src: "Report 17 TRK-02"}
+    price: {aud_each: 229.00, aud: 458.00, url: "https://adventureonstore.com/products/mm9", date: 2026-11-20, basis: listing}
+    model_part: U-BIKE-SEC
+    note: AUD 79 a year each after two free months (report 17), not in the total
+  # ================================================================ restraint
+  - id: BX-R01
+    group: restraint
+    name: Front wheel chocks
+    part_number: "Condor SC-2000 trailer-only chock, 4101-0137, trailer adapter included"
+    spec: All steel. Holds the bike upright alone, blocks the front wheel forward and sideways. Pins on and off its bolted floor adapter. Rated for bikes to 3,000 lb
+    qty: 2
+    unit: each
+    mass: {kg: 23.6, basis: maker, src: "https://loadall.com/products/condor-chock-sc-2000-trailer-only"}
+    price: {aud_each: 392.15, aud: 784.30, url: "https://loadall.com/products/condor-chock-sc-2000-trailer-only", date: 2026-11-20, basis: converted}
+    model_part: U-CHOCK
+    note: "USD 230.00 sale price converted. No Australian stockist. Australian alternative: Acebikes Steadystand Multi Fixed 1025 (Whites Moto), which bolts down and does not pin off"
+  - id: BX-R02
+    group: restraint
+    name: Flush L-track rows
+    part_number: "Kinedyne FE750-01-PD4, 100 in Series L medium-duty aluminium track"
+    spec: Plain track 34.5 wide x 13.7 high, pre-drilled at 101.6 mm. Two rows cut to 1,765 mm, recessed in the floor on the packers
+    qty: 2
+    unit: length
+    mass: {kg: 3.2, basis: maker, src: "Kinedyne: 2.3 kg per 100 in, 0.91 kg/m x 3.53 m (https://kinedyne.com/100-in-series-l-medium-duty-aluminum-track)"}
+    price: {aud_each: 107.31, aud: 214.62, url: "https://liftingequipmentstore.us/products/kinedyne-100-series-l-medium-duty-aluminum-track", date: 2026-11-20, basis: converted}
+    model_part: U-TRACK
+    note: "USD 62.94 each converted. The model's geometry is this plain track. Its product text names the flanged FE751, which is 49.8 x 15.7 mm and does not fit the slot"
+  - id: BX-R03
+    group: restraint
+    name: Track fittings
+    part_number: "US Cargo Control 1519-DSR-RR double-stud L-track fitting with O-ring"
+    spec: WLL 2,000 lb (907 kg), assembly break 6,000 lb (26.7 kN). 12 in use, 2 spares
+    qty: 14
+    unit: each
+    mass: {kg: 2.52, basis: maker, src: "0.4 lb, 0.18 kg each (https://www.uscargocontrol.com/products/Double-Stud-Fitting-w-O-Ring)"}
+    price: {aud_each: 17.03, aud: 238.42, url: "https://www.uscargocontrol.com/products/Double-Stud-Fitting-w-O-Ring", date: 2026-11-20, basis: converted}
+    model_part: U-FITTING
+    note: USD 9.99 each converted. Replaces the 5,000 lb fitting of report 03
+  - id: BX-R04
+    group: restraint
+    name: Ratchet straps
+    part_number: "SpanSet Tradesman 35 mm light-duty ratchet, 500 kg LC configuration, hook and keeper ends, about 3 m"
+    spec: AS/NZS 4380, LC 500 kg, breaking force about 1,000 kg. Four primary straps and one rear-wheel strap per bike (10), plus 2 spares carried with the tools
+    qty: 12
+    unit: each
+    mass: {kg: 8.0, basis: estimate, src: "10 in the box at 0.8 kg (report 03 section 13). The spares count in the 60 kg tool allowance"}
+    price: {aud_each: 35.00, aud: 420.00, url: "https://www.spanset.com/au-en/products/35mm-light-duty-ratchet-assemblies-33214", date: 2026-11-20, basis: estimate}
+    model_part: U-STRAP
+    note: "SpanSet lists the Tradesman range at price on request. LC 500 kg replaces LC 1,000 kg so the anchors can meet the straps' breaking load (UTE-GARAGE.md section 6)"
+  - id: BX-R05
+    group: restraint
+    name: Soft loops
+    part_number: "Custom Tie-Downs 3840-Y1.5, 1.5 in soft loop, 18 in"
+    spec: WLL 1,000 lb (454 kg), break 3,000 lb. Tuareg bars 2, both bikes' pillion peg hangers 4, rear rims 2, winch 1, spares 2
+    qty: 11
+    unit: each
+    mass: {kg: 0.7, basis: maker, src: "0.13 lb each (https://customtiedowns.com/1.5-inch-motorcycle-soft-loops)"}
+    price: {aud_each: 5.17, aud: 56.87, url: "https://customtiedowns.com/1.5-inch-motorcycle-soft-loops", date: 2026-11-20, basis: converted}
+    model_part: U-LOOPS
+    note: USD 3.03 each (10 or more) converted
+  - id: BX-R06
+    group: restraint
+    name: Street Triple bar harness
+    part_number: "Canyon Dancer Bar Harness II, Sport/Standard, 32505"
+    spec: For bars up to 32 in (813 mm). The Street Triple's are 792 mm
+    qty: 1
+    unit: each
+    mass: {kg: 0.5, basis: estimate, src: "Report 03 (estimate)"}
+    price: {aud_each: 57.88, aud: 57.88, url: "https://www.revzilla.com/motorcycle/canyon-dancer-bar-harness-ii", date: 2026-11-20, basis: converted}
+    model_part: U-LOOPS
+    note: USD 33.95 converted
+  - id: BX-R07
+    group: restraint
+    name: Wall pads and door edge trim
+    part_number: "Closed-cell EVA foam 10 mm, EPDM edge trim"
+    spec: Pads where bars, levers, mirrors and pegs can touch the walls, 300 to 1,200 mm up beside each bike. Edge trim on the door jambs and the sill (report 03 section 9)
+    qty: 1
+    unit: set
+    mass: {kg: 0.8, basis: estimate, src: "Report 03 gives 1.3 kg for the larger trailer garage, scaled"}
+    price: {aud_each: 80.00, aud: 80.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-PADS
+    note: New line. Not in the model
+  # ================================================================ loading
+  - id: BX-L01
+    group: loading
+    name: Loading ramp
+    part_number: "Black Widow MF-12038 arched folding motorcycle ramp"
+    spec: 3,048 x 965 mm, folds to 1,524 x 965 x 152 mm, 680 kg (1,500 lb) capacity, safety straps included. Stowed on edge across the back
+    qty: 1
+    unit: each
+    mass: {kg: 34.0, basis: maker, src: "Retailer spec 75 lb (report 03)"}
+    price: {aud_each: 1040.03, aud: 1040.03, url: "https://rippingitoutdoors.com/products/black-widow-3-piece-arched-folding-motorcycle-ramp-models-mf-10838-mf-12038-size-38-wide-capacity-1-500-lb-for-street-cruiser-touring-motorcycles", date: 2026-11-20, basis: converted}
+    model_part: U-RAMP
+    note: USD 609.99 converted. No Australian stockist found
+  - id: BX-L02
+    group: loading
+    name: Loading winch
+    part_number: "WARN VRX 25-S, 101020"
+    spec: 12 V, 2,500 lb (1,134 kg), 15 m of 4.8 mm synthetic rope, hawse fairlead, 12 ft corded remote. Clips onto either of two 5 mm aluminium quick-release plates on the front wall, 650 mm up
+    qty: 1
+    unit: each
+    mass: {kg: 10.5, basis: estimate, src: "Report 13 G-11 with two plates. WARN ships it at 9.5 kg"}
+    price: {aud_each: 782.58, aud: 782.58, url: "https://www.warn.com/products/vrx-25-s-winch-101020", date: 2026-11-20, basis: converted}
+    model_part: U-WINCH
+    note: USD 458.99 on warn.com converted
+  - id: BX-L03
+    group: loading
+    name: Winch power feed
+    part_number: "6 B&S twin cable, Anderson SB50 socket on the front wall, 100 A circuit breaker at the battery"
+    spec: About 5 m from the starting battery, in convoluted tube, through a sealed gland in the front wall. Engine running while winching
+    qty: 1
+    unit: set
+    mass: {kg: 1.7, basis: estimate, src: "5 m of twin cable at about 0.3 kg/m and fittings (estimate)"}
+    price: {aud_each: 250.00, aud: 250.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-WINCH-FEED
+    note: "New line. Est. as vehicle-parts TW06 (AUD 250 for a similar Anderson feed)"
+  - id: BX-L04
+    group: loading
+    name: Freight for items bought in the USA
+    part_number: Forwarder or retailer shipping
+    spec: Chocks, ramp, winch, track, fittings, loops, harness, ABUS locks and anchors. About 80 kg, longest box 1.6 m
+    qty: 1
+    unit: lot
+    mass: {kg: 0.0, basis: estimate, src: "Not a part"}
+    price: {aud_each: 900.00, aud: 900.00, url: null, date: 2026-11-20, basis: estimate}
+    note: "Est.: about AUD 11 per kg for consolidated shipping to NSW"
+  # ================================================================ services
+  - id: BX-V01
+    group: services
+    name: Pressurising fan
+    part_number: "Attwood Turbo 4000 Series II in-line blower, 1749-4"
+    spec: 12 V, 2.5 A, ignition protected for petrol vapour, 100 mm (4 in) hose, about 5.7 m3/min open flow. High in the front wall above the cab roof, runs with the ignition and on the fume detector's blower output
+    qty: 1
+    unit: each
+    mass: {kg: 1.2, basis: estimate, src: "Model U-FAN share (estimate)"}
+    price: {aud_each: 71.17, aud: 71.17, url: "https://www.amazon.com/Attwood-1749-4-Blower-Resistant-4-Inch/dp/B003EX02DA", date: 2026-11-20, basis: converted}
+    model_part: U-FAN
+    note: USD 41.74 converted. Also sold by Australian marine stores
+  - id: BX-V02
+    group: services
+    name: Fan inlet cowl and filter
+    part_number: "100 mm louvred inlet, oiled foam filter, 100 mm duct"
+    spec: Inlet faces forward above the cab roof, filter serviceable from inside the box
+    qty: 1
+    unit: set
+    mass: {kg: 0.3, basis: estimate, src: "Model U-FAN share (estimate)"}
+    price: {aud_each: 60.00, aud: 60.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-FAN
+  - id: BX-V03
+    group: services
+    name: Low vents with flap valves
+    part_number: "100 mm louvred vent with a one-way flap, UV-stable"
+    spec: One in each rear corner, 30 mm above the floor. Air and petrol vapour leave at floor level. The flap stops dust coming in when the fan is off
+    qty: 2
+    unit: each
+    mass: {kg: 0.4, basis: estimate, src: "Model U-VENT"}
+    price: {aud_each: 40.00, aud: 80.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-VENT
+  - id: BX-V04
+    group: services
+    name: Floor drains
+    part_number: "25 mm duckbill check valve drain"
+    spec: One at each rear corner of the floor, the low corners when the ute squats on the towball
+    qty: 2
+    unit: each
+    mass: {kg: 0.1, basis: estimate, src: "Estimate"}
+    price: {aud_each: 20.00, aud: 40.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-DRAINS
+    note: New line. Not in the model
+  - id: BX-V05
+    group: services
+    name: Petrol fume detector
+    part_number: "Fireboy-Xintex two-sensor gasoline fume detector with blower control"
+    spec: Alarms at 20 % of the lower explosive limit. Sensors low at the front wall and the road-side rear corner, display in the cab, blower output starts the fan, alarm output to the FMC130
+    qty: 1
+    unit: set
+    mass: {kg: 0.6, basis: estimate, src: "Model U-FUME (report 03)"}
+    price: {aud_each: 596.75, aud: 596.75, url: "https://www.opticsplanet.com/fireboy-xintex-gasoline-fume-detector-blower-control-w-2-plastic-sensors.html", date: 2026-11-20, basis: estimate}
+    model_part: U-FUME
+    note: "Est. USD 350 converted. US listings found range from USD 122 to 570"
+  - id: BX-V06
+    group: services
+    name: Interior lights
+    part_number: "12 V LED strip lamp, 1,000 mm, IP67, with three door switches"
+    spec: Two strips under the roof above the bikes. On when any door opens, off after 10 minutes
+    qty: 1
+    unit: set
+    mass: {kg: 0.6, basis: estimate, src: "Model U-LIGHT"}
+    price: {aud_each: 150.00, aud: 150.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-LIGHT
+  - id: BX-V07
+    group: services
+    name: 12 V and USB outlet
+    part_number: "Panel with a 12 V socket and a USB-A and USB-C charger, fused 15 A"
+    spec: On the front wall beside the kerb door, for a tyre inflator, a bike battery charger or a light
+    qty: 1
+    unit: each
+    mass: {kg: 0.2, basis: estimate, src: "Estimate"}
+    price: {aud_each: 80.00, aud: 80.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-OUTLET
+    note: New line. Not in the model
+  - id: BX-V08
+    group: services
+    name: Box wiring
+    part_number: "6-way blade fuse block, ignition relay, low-voltage disconnect, 4 mm2 feeds, loom, glands"
+    spec: "Two feeds from the ute: constant (tracker, siren, detector, through a low-voltage disconnect at 12.2 V) and ignition (fan, outlet). Loom in convoluted tube along the rail to a sealed connector at the front wall"
+    qty: 1
+    unit: set
+    mass: {kg: 1.5, basis: estimate, src: "Estimate"}
+    price: {aud_each: 300.00, aud: 300.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-WIRING
+    note: New line. Not in the model
+  - id: BX-V09
+    group: services
+    name: Rear lamps, plate lamp and reflectors
+    part_number: "LED combination stop, tail and indicator lamps (ADR approved), plate lamp, red reflectors, plug"
+    spec: On the box's rear corners, moved from the cab chassis lamp bracket
+    qty: 1
+    unit: set
+    mass: {kg: 3.0, basis: estimate, src: "Model U-LAMPS"}
+    price: {aud_each: 350.00, aud: 350.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-LAMPS
+  - id: BX-V10
+    group: services
+    name: Fire extinguisher
+    part_number: "Firewize FEABE25, 2.5 kg ABE dry powder"
+    spec: 4A:40B:E, bracket on the kerb-side wall inside the barn doors, 600 mm up
+    qty: 1
+    unit: each
+    mass: {kg: 4.3, basis: maker, src: "https://shop.firewize.com.au/products/dry-chemical-powder-2-5kg-abe"}
+    price: {aud_each: 43.50, aud: 43.50, url: "https://shop.firewize.com.au/products/dry-chemical-powder-2-5kg-abe", date: 2026-11-20, basis: listing}
+    model_part: U-EXT
+  # ================================================================ finish
+  - id: BX-C01
+    group: finish
+    name: Floor and lower wall coating
+    part_number: "U-POL Raptor black, 4 bottle kit with gun"
+    spec: Three coats with traction additive on the floor, the tubs, the sill and the lowest 400 mm of the walls, about 6.7 m2. U-POL rates a kit at about 12 m2
+    qty: 2
+    unit: kit
+    mass: {kg: 4.0, basis: estimate, src: "Model U-COAT share (estimate)"}
+    price: {aud_each: 247.21, aud: 494.42, url: "https://business.walmart.com/ip/U-POL-Raptor-Black-Urethane-Spray-On-Truck-Bed-Liner-Kit-w-FREE-Custom-Coat-Spray-Gun-with-Regulator-4-Liters/950111306", date: 2026-11-20, basis: converted}
+    model_part: U-COAT
+    note: "USD 144.99 converted. Coverage: https://u-pol.com/au/product/raptor-bed-liner-protective-coating/raptor-bed-liner-au/1-us-gallon-raptor-kit/"
+  - id: BX-C02
+    group: finish
+    name: Roof top coating
+    part_number: "White two-pack polyurethane with etch primer, 1 L kit"
+    spec: Roof top only. A white roof keeps the box and the fuel in the tanks cooler in sun. The rest of the outside stays mill finish 5052
+    qty: 1
+    unit: kit
+    mass: {kg: 0.5, basis: estimate, src: "About 0.1 kg/m2 on 4.8 m2 (estimate)"}
+    price: {aud_each: 150.00, aud: 150.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-ROOF-COAT
+    note: "New line. A full exterior powder coat is the option: Tong Metal lists powder coating from AUD 4,000 for its trays and canopies (https://tongmetal.com.au/), about 3 kg"
+  # ================================================================ tools
+  - id: BX-T01
+    group: tools
+    name: Tool chest sheet
+    part_number: "Aluminium Marine Sheet 5052 H32 1.6mm 1200x2400"
+    spec: Two chests, 780 x 300 x 200 mm and 780 x 220 x 200 mm, bolted to the wheel tubs
+    qty: 1
+    unit: sheet
+    mass: {kg: 9.0, basis: estimate, src: "Model U-TOOLBOX share"}
+    price: {aud_each: 166.62, aud: 166.62, url: "https://store.allaluminium.com.au/collections/marine-sheet-aluminium", date: 2026-11-20, basis: listing}
+    model_part: U-TOOLBOX
+  - id: BX-T02
+    group: tools
+    name: Tool chest hinges, latches and stays
+    part_number: "Stainless piano hinge, two lockable latches, lid stays"
+    spec: Lids open towards the bike bays
+    qty: 1
+    unit: set
+    mass: {kg: 1.0, basis: estimate, src: "Model U-TOOLBOX share"}
+    price: {aud_each: 80.00, aud: 80.00, url: null, date: 2026-11-20, basis: estimate}
+    model_part: U-TOOLBOX
+  # ================================================================ fabrication
+  - id: BX-X01
+    group: fabrication
+    name: Shop labour, cut, weld, fit out and fit to the ute
+    part_number: null
+    spec: "Hours (est.): cutting and nesting 12, subframe and mounts 30, body frame 36, floor, tubs and skins 44, doors and locking 28, fit-out and wiring 20, fitting to the ute 8, tests 6"
+    qty: 184
+    unit: h
+    mass: {kg: 0.0, basis: estimate, src: "Not a part"}
+    price: {aud_each: 121.00, aud: 22264.00, url: "https://mosesmech.com/", date: 2026-11-20, basis: listing}
+    note: "Sydney subcontract rate AUD 90 + GST an hour plus AUD 20 + GST an hour for aluminium consumables (filler, argon, tungsten). An aluminium body shop may charge up to about AUD 150 + GST (est.). The hours are an estimate. If Leonard builds it, this line drops out"
+  # ================================================================ compliance
+  - id: BX-E01
+    group: compliance
+    name: Engineer's review of the box, subframe, mounts and anchors
+    part_number: null
+    spec: Welded strength checks, the crossmember at the anchor load, Toyota's brackets, the compliant mounts, the door portal under the restraint cases
+    qty: 1
+    unit: job
+    mass: {kg: 0.0, basis: estimate, src: "Not a part"}
+    price: {aud_each: 2000.00, aud: 2000.00, url: null, date: 2026-11-20, basis: estimate}
+    note: Report 17 section 6.7 (estimate)
+# Totals from the lines, 20 Nov 2026 (cad/tests/test_box_parts.py checks them): every aud is qty x aud_each, and converted
+# prices match the stated rates. Contingency 10 % (est.). owner_built_total_aud drops the shop labour line and its
+# contingency. mass_kg_lines is the fitted box as listed, which is the model's box mass (UGB-01).
+totals:
+  by_group: {materials: 7715.25, subframe_mounts: 990.0, fasteners_sealants: 891.9, doors: 1200.15, security: 3797.36, restraint: 1852.09, loading: 2972.61, services: 1771.42, finish: 644.42, tools: 246.62, fabrication: 22264.0, compliance: 2000.0}
+  subtotal_aud: 46345.82
+  contingency_pct: 10
+  contingency_aud: 4634.58
+  total_aud: 50980.4
+  owner_built_total_aud: 26490.0
+  mass_kg_lines: 436.07
+  not_in_total:
+    - {name: "Monimoto 9 subscriptions", aud_per_year: 158, src: "AUD 79 a year each (report 17)"}
+    - {name: "FMC130 tracking platform", aud_per_year: 120, src: "Estimate"}
+    - {name: "Full exterior powder coat (option to BX-C02)", aud: 4000, src: "https://tongmetal.com.au/ (from AUD 4,000)"}
+    - {name: "LC5 inspection of the box, the winch and its mountings", aud: 0, src: "In the car build's GV03: one inspection covers the GVM kit, the GCM revision, the box and the winch (conductor's ruling, 20 Nov 2026)"}

@@ -174,6 +174,7 @@ drawings:
     revisions:
       - {rev: A, date: 2026-11-20, description: "First draft", drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-20, description: "Notice: ball 1300 behind axle, 440 laden, trailer 3100 kg, re-solved", drawn: Kiro, checked: "", approved: ""}
+      - {rev: C, date: 2026-11-20, description: "Notice: box rev C (R24), 436.1 kg with the 1.6 mm roof, anchors at X 450", drawn: Kiro, checked: "", approved: ""}
   - number: CT-702
     title: Ute garage box frame and panels
     subtitle: Kerb-side frame elevation, subframe plan on Toyota's deck mounts, section at the rear axle, member schedule
@@ -186,6 +187,7 @@ drawings:
     revisions:
       - {rev: A, date: 2026-11-20, description: "First draft", drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-20, description: "Notice: title block wording only", drawn: Kiro, checked: "", approved: ""}
+      - {rev: C, date: 2026-11-20, description: "Notice: RHS 65x35x4.0 crossmembers, 5 mm packers, 1.6 mm roof, detail A", drawn: Kiro, checked: "", approved: ""}
   - number: CT-703
     title: Ute garage doors and security
     subtitle: Rear view, kerb-side door, plan section through the barn doors, security layers
@@ -198,6 +200,7 @@ drawings:
     revisions:
       - {rev: A, date: 2026-11-20, description: "First draft", drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-20, description: "Notice: title block wording only", drawn: Kiro, checked: "", approved: ""}
+      - {rev: C, date: 2026-11-20, description: "Notice: ground anchors at X 450, so the disc lock chain reaches the disc", drawn: Kiro, checked: "", approved: ""}
   - number: CT-704
     title: Ute garage restraint layout
     subtitle: Plan with the roof off, section at the rear L-track row, strap loads and anchors
@@ -210,3 +213,4 @@ drawings:
     revisions:
       - {rev: A, date: 2026-11-20, description: "First draft", drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-20, description: "Notice: title block wording only", drawn: Kiro, checked: "", approved: ""}
+      - {rev: C, date: 2026-11-20, description: "Notice: LC 500 kg straps, plain FE750 track, 1519 fittings, check UGR-03", drawn: Kiro, checked: "", approved: ""}

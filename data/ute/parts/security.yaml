@@ -16,14 +16,14 @@ parts:
     geometry: {generator: box, params: {}}
     color: "#d63031"
   U-ANCHOR:
-    name: Ground anchors and chains
-    material: "Hardened steel chain and anchor"
-    product: Ground anchor and 1.5 m hardened chain per bike, the anchor bolted through the floor into a crossmember
-    maker: Product to choose
+    name: Floor anchors
+    material: "Hardened steel anchor"
+    product: ABUS WBA100 Granit floor anchor per bike, bolted through the floor into the aluminium crossmember at module X 450 mm
+    maker: ABUS
     qty: 2
     unit: each
-    mass: {basis: declared, unit_kg: 4.0, maturity: estimate, source: "Report 17 SEC-02 (estimate)"}
-    notes: NSW Police advise locking bikes to anchor points even inside a garage. The chains are stowed on the anchors.
+    mass: {basis: declared, unit_kg: 1.4, maturity: estimate, source: "R24 (BX-S03), estimate"}
+    notes: "NSW Police advise locking bikes to anchor points even inside a garage. Moved from X 1,800 to X 450 mm so the disc lock's 1.2 m chain reaches the front disc (R24)"
     geometry: {generator: box, params: {}}
     color: "#2d3436"
   U-TRACKER:
@@ -38,11 +38,12 @@ parts:
     geometry: {generator: box, params: {}}
     color: "#0984e3"
   U-BIKE-SEC:
-    name: Bike trackers and disc locks
-    product: A Monimoto 9 hidden in each bike and an alarmed disc lock on each front disc
-    maker: Monimoto, disc lock to choose
+    name: Bike trackers, disc locks and chains
+    material: "Hardened steel lock and 12 mm chain, tracker electronics"
+    product: An ABUS Granit Detecto XPlus 8008 2.0 alarmed disc lock with a 1.2 m 12KS120 loop chain to the floor anchor on each front disc, and a Monimoto 9 hidden in each bike
+    maker: ABUS, Monimoto
     qty: 1
     unit: set
-    mass: {basis: declared, total_kg: 1.8, maturity: estimate, source: "Report 17 TRK-02 0.1 kg each and SEC-01 0.8 kg each (estimates)"}
+    mass: {basis: declared, total_kg: 9.0, maturity: estimate, source: "R24 (BX-S02 and BX-S06): lock 0.9 kg and chain 3.5 kg per bike, trackers 0.1 kg each (estimates)"}
     removable: true
     cog: {at: ["front_tyre_x + 400", "(tuareg_y + st_y) / 2", 450], basis: "At the bikes' front wheels, estimate"}

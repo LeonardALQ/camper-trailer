@@ -74,7 +74,7 @@ limits:
   box_mass_max_kg: {v: 440, src: "Report 17 section 6.7 total, empty. The decision log asks for a lighter box", basis: plan}
   tub_height_max_mm: {v: 100, src: "Report 17 section 6.4: the lower floor works if the tubs stand no more than 100 mm above it", basis: plan}
   ramp_angle_max_deg: {v: 20, src: "Report 03 section 10: the steepest ramp for walking a bike up beside it", basis: plan}
-  anchor_design_kn: {v: 20, src: "DESIGN.md and report 03: every strap anchor designed for 20 kN", basis: plan}
+  anchor_design_kn: {v: 9.8, src: "R24 (UTE-GARAGE.md revision C section 6): an anchor withstands its strap's breaking load (NTC Load Restraint Guide 2018 p. 201, report 03), about 9.8 kN for the LC 500 kg straps. Was 20 kN with LC 1,000 kg straps", basis: plan}
   m12_tension_kn: {v: 56.0, src: "AS 4100 clause 9.3.2.2: 0.8 x 84.3 mm2 x 830 MPa for an M12 property class 8.8 bolt", basis: law}
   m12_shear_kn: {v: 31.4, src: "AS 4100 clause 9.3.2.1: 0.8 x 0.62 x 830 MPa x 76.2 mm2, threads in the shear plane", basis: law}
 
