@@ -180,7 +180,7 @@ def ct011(prj, model, bom, checks, reg, dwg):
     X, Z = views["rear"]
     LM = resolve_lamps(lay)
     _lamps_on_walls(sh, V, views, LM)
-    # the split's outdoor unit and its cradle on the rear wall (phantom), and the awning on the kerb wall
+    # the split's outdoor unit and its cradle on the rear wall (phantom), and the awning on the roof's kerb edge
     for iid in ("AC-03",):
         b = lay.find(iid).box
         fz = V["floor_z"]
@@ -190,7 +190,7 @@ def ct011(prj, model, bom, checks, reg, dwg):
     aw = lay.find("BD-13").box
     sh.rect(26 + (aw[0] - V["body_x0"]) / k, 214 + (aw[2] - V["floor_z"] + V["floor_t"]) / k,
             26 + (aw[3] - V["body_x0"]) / k, 214 + (aw[5] - V["floor_z"] + V["floor_t"]) / k, "phantom")
-    sh.text(26 + 2.0, 214 + (aw[2] - V["floor_z"] + V["floor_t"]) / k - 2.6, "AWNING CASSETTE, PHANTOM", 1.15)
+    sh.text(26 + (aw[0] - V["body_x0"]) / k, 214 + (aw[5] - V["floor_z"] + V["floor_t"]) / k + 0.8, "AWNING CASE ON THE ROOF, PHANTOM", 1.15)
     # ---- margins, right column
     yb = title(sh, dwg, reg, "OPENINGS WITH THEIR MASSES ON CT-013 (TB-11).", "GRP AND XPS SANDWICH, OPENINGS CUT AFTER LAY-UP")
     mg = opening_margins(lay, res, RULES)
@@ -232,8 +232,8 @@ def ct011(prj, model, bom, checks, reg, dwg):
         "THE LAMPS RUN ON THE UTE'S 12 V LAMP CIRCUITS THROUGH THE 12-PIN PLUG (DB-07), ON A LOOM SUPPORTED EVERY 600 mm (VSB1 7.1). "
         "ALL ARE MULTIVOLT LED. Z IS THE HEIGHT ABOVE THE GROUND AT RIDE HEIGHT, OF THE LIT OR REFLECTING AREA.",
         f"ADR 13/00 (UNECE R48/03 APPENDIX A): {LM['n_lamps']} LAMPS AND {LM['n_reflectors']} REFLECTING DEVICES. {n_ok} OF "
-        f"{len(LM['checks'])} CHECKS PASS (LMP-01 TO LMP-{len(LM['checks']):02d} ON CT-003). EXTREME OUTER EDGES: Y {oe['kerb']:,.0f} AT "
-        f"THE AWNING CASE AND {oe['road']:,.0f} AT THE ROAD WALL.",
+        f"{len(LM['checks'])} CHECKS PASS (LMP-01 TO LMP-{len(LM['checks']):02d} ON CT-003). EXTREME OUTER EDGES: Y {oe['kerb']:,.0f} AND "
+        f"{oe['road']:,.0f}, THE OVERALL WIDTH'S (DIM-01): THE ENTRY DOOR'S HANDLE AND THE ROAD-SIDE HOODS.",
         "THE REAR END-OUTLINE LAMPS SIT UNDER THE OUTDOOR UNIT'S CRADLE, THE HIGHEST PLACE BOTH SIDES CAN SHARE (6.13.4). THE PLATE "
         "SITS ON THE KERB HALF, CLEAR OF THE RINSE BOX, THE DOOR, ITS STEP AND THE RECOVERY TONGUES.",
     ], size=1.38, width_chars=150)

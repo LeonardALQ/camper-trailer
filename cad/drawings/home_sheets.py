@@ -237,7 +237,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
     Rr = lambda y, z: vR.p(0, y, z)  # noqa: E731
     sh.line(Rr(-1500, 0)[0], Rr(0, 0)[1], Rr(1500, 0)[0], Rr(0, 0)[1], "thick")
     yt = Rr(0, ch["travel_height"])[1] + 4
-    S.hdim(sh, Rr(-V["half_bw"] - 100, 0)[0], yt - 4, Rr(V["half_bw"], 0)[0], yt - 4, yt + 2, f"{ch['overall_width']:.0f} WITH THE AWNING", size=1.4)
+    S.hdim(sh, Rr(ch["width_kerb_y"], 0)[0], yt - 4, Rr(ch["width_road_y"], 0)[0], yt - 4, yt + 2, f"{ch['overall_width']:.0f} OVERALL", size=1.4)
     S.hdim(sh, Rr(-V["half_bw"], 0)[0], Rr(0, 0)[1], Rr(V["half_bw"], 0)[0], Rr(0, 0)[1], Rr(0, 0)[1] - 6, f"{V['body_width']:.0f} BODY", size=1.4)
     sh.text(Rr(0, 0)[0], yt + 6.5, "REAR VIEW", 2.2, "middle", bold=True)
     # the lamps, reflectors and the plate (CT-011): on the rear view with three heights, the side markers on the elevation
@@ -291,7 +291,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
         ["Towball height", "Ball 350 to 460 mm loaded, trailer level in it (VSB1 9.3.2)", f"{V['coupling_z']:.0f} mm, plus or minus 20 mm (UTE-01)", st("DIM-03")],
         ["Towball load", "Every case at least 7.5 % (H2), design at least 8.0 % and 320 kg (H17)", f"{chk['MAS-12']['measured']:.1f} % lowest, {chk['MAS-13']['measured']:.0f} kg heaviest with growth", st("MAS-12")],
         ["Running clearance", "At least 100 mm, unladen (VSB1 5.4)", f"{mv('DIM-04')}, the coupling's handbrake", st("DIM-04")],
-        ["Width", "Across the body, guards and awning, at most 2,500 mm (VSB1 2, 5.2)", f"{mv('DIM-01')} with the awning", st("DIM-01")],
+        ["Width", "Across the body and everything on its sides, at most 2,500 mm, side lamps left out (ADR 43/04 6.2.6.1, VSB1 5.2)", f"{mv('DIM-01')}, design at most 2,490 mm (DIM-05)", st("DIM-05")],
         ["Overhang", "Front load space at least the rear overhang (VSB1 5.1.1)", f"{V['axle_x'] - V['body_x0']:.0f} against {ch['overall_x1'] - V['axle_x']:.0f} mm", st("DIM-02")],
         ["Combination", "Ute and trailer within Lovells' 7,400 kg GCM revision (H2, GV06)", f"{gcm['plan']:,.0f} kg plan, {gcm['model']:,.0f} kg on the model", st("GCM-01")],
         ["Ute rear axle", f"Towball keeps the Elite kit's {tv['limits']['rear_axle_kg']:,.0f} kg rear axle plate with growth (H14, H17, H18)", f"{mv('MAS-03')} at the heaviest ball", st("MAS-03")],
@@ -313,7 +313,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
     y = S.table(sh, 22, 186, [("ITEM", 25), ("THE RULE AND ITS SOURCE", 84), ("THE DESIGN", 72), ("RESULT", 25)], rows, size=1.32,
                 row_h=2.95, title="VSB1 AND THE STANDARDS, ITEM BY ITEM (report 02 section 2, VSB1 REV 6)")
     S.notes(sh, 22, y - 5, [
-        "WIDTH, HEIGHT AND LENGTHS ARE MEASURED ON THE 3D MODEL AT DESIGN RIDE HEIGHT. THE BODY IS 2,400 mm, THE AWNING TAKES IT TO 2,500 mm.",
+        f"WIDTH, HEIGHT AND LENGTHS ARE MEASURED ON THE 3D MODEL AT DESIGN RIDE HEIGHT. THE BODY IS {V['body_width']:,.0f} mm. THE ENTRY DOOR'S HANDLE, THE WINDOW FRAMES AND THE HOODS TAKE IT TO {ch['overall_width']:,.0f} mm. THE AWNING SITS ON THE ROOF INSIDE THE BODY WIDTH.",
         "LAMPS, REFLECTORS AND THE NUMBER PLATE ARE SCHEDULED ON CT-011 AND DRAWN ON EACH WALL THERE. THE REAR VIEW SHOWS THEM WITH THEIR "
         "HEIGHTS, AND THE TABLE AT RIGHT GIVES EVERY CHECK (cad/lamps.py, data/services.yaml).",
         "THE WET ROOM HAS ITS OWN OUTSIDE DOOR. ASK THE INSPECTOR WHETHER IT COUNTS AS A SECOND COMPARTMENT FOR VSB1 13.2.2 (A SECOND EXTINGUISHER).",

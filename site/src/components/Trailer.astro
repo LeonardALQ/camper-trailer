@@ -114,7 +114,7 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
         <tr><td>Coupling point and drop</td><td class="num">Z {n(ch.coupling_z)}</td><td>The ute's laden ball height (UTE-01), {n(ch.drop_rail_to_coupling)} mm below the rail underside, with the DO35 under the coupling head</td></tr>
         <tr><td>Axle group centre</td><td class="num">X {n(ch.axle_x)}</td><td>Hubs at X {n(ch.hubs_x[0])} and {n(ch.hubs_x[1])}, {n(ch.axle_spacing)} mm apart. XT front hinge crossmember rear face X {n(ch.xt_front_hinge_rear_x)}, rear shock crossmember front face X {n(ch.xt_rear_shock_front_x)}</td></tr>
         <tr><td>Overall length</td><td class="num">{n(ch.overall_length)} mm</td><td>Coupling head front (X {n(ch.overall_x0)}) to the body rear</td></tr>
-        <tr><td>Overall width</td><td class="num">{n(ch.overall_width)} mm</td><td>{n(P.body_width)} mm body plus the awning</td></tr>
+        <tr><td>Overall width</td><td class="num">{n(ch.overall_width)} mm</td><td>{n(P.body_width)} mm body and what stands proud of its sides, the awning on the roof inside it (DIM-01)</td></tr>
         <tr><td>Travel height</td><td class="num">{n(ch.travel_height)} mm</td><td>Top of the solar panels on the fixed roof</td></tr>
         <tr><td>CoG, fully loaded</td><td class="num">X {n(ch.cog_loaded[0])}, Z {n(ch.cog_loaded[2])}</td><td>Z {n(ch.cog_loaded_growth[2])} with growth. {n(ch.cog_height_above_hub)} mm above the hub centres, for the roll and track check</td></tr>
         <tr><td>Water tanks</td><td class="num">{n(ch.tank_capacity_l)} L</td><td>Gross volume of the two fresh tanks between the rails in the suspension bays</td></tr>

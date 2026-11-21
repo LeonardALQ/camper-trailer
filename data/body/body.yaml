@@ -125,20 +125,22 @@ end_wall:
 # and rear walls: y across from the centreline (positive to the road side). Sizes are the cut-outs. The
 # two doors follow the layout's blocks (BD-07, BD-15). `line` names the mass schedule line that carries the part. Glands of 60 mm or less (fill, PV, refrigerant lines, the
 # 230 V inlet box, the battery vents through the floor) are not openings.
+# `proj` is how far a side-wall opening's frame, sash, hood or handle stands proud of the wall's outer skin, mm, for the
+# overall width (DIM-01, DIM-05, `width` below). The S4 figure is the maker's drawing. The others are estimates.
 openings:
   # kerb side, front to rear
-  - {id: OP-01, wall: kerb, line: WN-01, name: "Window W1, Dometic S4 900 x 600 over the bed, the second way out", x: 379, z: 960, w: 902, h: 599}
-  - {id: OP-02, wall: kerb, line: BD-07, name: "Entry door, Aussie Traveller DC 1,750 x 622, 90 mm top radius", x: 1640, z: 0, w: 625, h: 1753, from: BD-07}
-  - {id: OP-03, wall: kerb, line: VE-01A, name: "LUNOS e2 fan A, high over the dryer", x: 2880, z: 1500, w: 162, h: 162}
-  - {id: OP-04, wall: kerb, line: BD-17, name: "Thetford cassette service door 2680584", x: 3660, z: 150, w: 450, h: 290}
+  - {id: OP-01, wall: kerb, line: WN-01, name: "Window W1, Dometic S4 900 x 600 over the bed, the second way out", x: 379, z: 960, w: 902, h: 599, proj: 21}
+  - {id: OP-02, wall: kerb, line: BD-07, name: "Entry door, Aussie Traveller DC 1,750 x 622, 90 mm top radius", x: 1640, z: 0, w: 625, h: 1753, from: BD-07, proj: 40}
+  - {id: OP-03, wall: kerb, line: VE-01A, name: "LUNOS e2 fan A, high over the dryer", x: 2880, z: 1500, w: 162, h: 162, proj: 30}
+  - {id: OP-04, wall: kerb, line: BD-17, name: "Thetford cassette service door 2680584", x: 3660, z: 150, w: 450, h: 290, proj: 15}
   # road side, front to rear
-  - {id: OP-05, wall: road, line: WN-02, name: "Window W2, Dometic S4 900 x 450 over the bed", x: 379, z: 960, w: 902, h: 448}
-  - {id: OP-06, wall: road, line: VE-04, name: "RESPA-CF2 and top-up fan intake hood with a mesh stone guard", x: 1630, z: 1650, w: 200, h: 200}
-  - {id: OP-07, wall: road, line: LA-03, name: "Truma Combi D 6 E wall cowl, exhaust and combustion air", x: 1700, z: 150, w: 120, h: 120}
-  - {id: OP-08, wall: road, line: VE-07, name: "Range hood duct cowl with a backdraft flap", x: 2230, z: 1650, w: 100, h: 100}
-  - {id: OP-09, wall: road, line: WN-03, name: "Window W4, Dometic S4 500 x 450 over the bench", x: 2800, z: 1000, w: 500, h: 448}
-  - {id: OP-10, wall: road, line: VE-01B, name: "LUNOS e2 fan B, low in the sink cabinet", x: 3180, z: 150, w: 162, h: 162}
-  - {id: OP-11, wall: road, line: WN-04, name: "Window W6, Dometic S4 500 x 450, obscured, wet room", x: 3610, z: 1150, w: 500, h: 448}
+  - {id: OP-05, wall: road, line: WN-02, name: "Window W2, Dometic S4 900 x 450 over the bed", x: 379, z: 960, w: 902, h: 448, proj: 21}
+  - {id: OP-06, wall: road, line: VE-04, name: "RESPA-CF2 and top-up fan intake, a low louvred hood with the mesh stone guard behind its louvres", x: 1630, z: 1650, w: 200, h: 200, proj: 30}
+  - {id: OP-07, wall: road, line: LA-03, name: "Truma Combi D 6 E wall cowl, exhaust and combustion air", x: 1700, z: 150, w: 120, h: 120, proj: 30}
+  - {id: OP-08, wall: road, line: VE-07, name: "Range hood duct, a low cowl with a backdraft flap", x: 2230, z: 1650, w: 100, h: 100, proj: 30}
+  - {id: OP-09, wall: road, line: WN-03, name: "Window W4, Dometic S4 500 x 450 over the bench", x: 2800, z: 1000, w: 500, h: 448, proj: 21}
+  - {id: OP-10, wall: road, line: VE-01B, name: "LUNOS e2 fan B, low in the sink cabinet", x: 3180, z: 150, w: 162, h: 162, proj: 30}
+  - {id: OP-11, wall: road, line: WN-04, name: "Window W6, Dometic S4 500 x 450, obscured, wet room", x: 3610, z: 1150, w: 500, h: 448, proj: 21}
   # front wall
   - {id: OP-12, wall: front, line: VE-01C, name: "LUNOS e2 fan C, low beside the desk", y: -719, z: 100, w: 162, h: 162}
   - {id: OP-13, wall: front, line: VE-01D, name: "LUNOS e2 fan D, low beside the desk", y: 719, z: 100, w: 162, h: 162}
@@ -147,6 +149,28 @@ openings:
   - {id: OP-15, wall: rear, line: BD-15, name: "Rear door into the wet room, Aussie Traveller DC 1,750 x 622, 90 mm top radius", y: 12.5, z: 0, w: 625, h: 1753, from: BD-15}
   - {id: OP-16, wall: rear, line: VE-06, name: "Pressure relief valve under its hood", y: -935, z: 100, w: 120, h: 80}
   - {id: OP-17, wall: rear, line: VE-03, name: "LUNOS RA 15-60 wet room extract", y: -934, z: 1688, w: 162, h: 162}
+# ---------------------------------------------------------------- overall width (DIM-01, DIM-05)
+# ADR 43/04 clause 6.2.6.1 caps a trailer's overall width at 2,500 mm, and VSB1 section 5.2 says the same. The ADR
+# definition (Definitions and Vehicle Categories, amendment 7) measures across the body including wheel guards and
+# excludes rear vision mirrors, signalling devices and side-mounted lamps and reflectors. VSB1 5.2's note counts
+# mudguards, side-mounted spare wheels, racks and awnings and excludes lamps required for compliance. So the side
+# marker lamps and their reflectors (SM-01) are left out, and every frame, sash, hood, cowl, handle and box on a side
+# wall counts. The design stays at or under `design_max_mm`, so the build tolerance cannot take it over 2,500 mm.
+width:
+  design_max_mm: 2490
+  joiner_proj: 3               # the floor and roof-to-wall joiners wrap the panel edges, about 3 mm proud of the skin (est.)
+  excluded: "side marker lamps with their reflectors (SM-01)"
+  sources:
+    adr: "https://www.legislation.gov.au/F2006L01430/2025-01-30/2025-01-30/text/original/pdf"
+    definition: "https://www.legislation.gov.au/F2014L00032/asmade/2014-01-06/text/original/pdf"
+    vsb1: "https://vehiclecompliance.net/wp-content/uploads/2023/10/VSB1-Trailers-with-an-aggregate-trailer.pdf"
+  # where each opening's `proj` comes from
+  proj_src:
+    S4: "Dometic Seitz S4 technical drawing (DOK 1004/070101): the closed sash stands 11 to 21 mm proud of the wall, the larger figure taken. https://www.motorhomefun.co.uk/forum/attachments/02_s4-window-pdf.400320/"
+    door: "Estimate: the DC door's outer frame and handle, at most the 40 mm that UN R26 allows a door handle, the guide report 12 takes for ADR 92/00 clause 5.1"
+    hood: "Estimate: a low hood, cowl or louvre, 30 mm proud. Ask for that depth or less when buying"
+    service_door: "Estimate: the Thetford door's frame and lock"
+
 rules:
   between_mm: 300              # full-height wall between neighbouring openings (assumption, report 12 section 5)
   edge_mm: 150                 # from an opening to a panel edge or corner

@@ -428,10 +428,14 @@ class Layout:
                     governing=worst_pair, items=len(solids), keep_clear=len(keep))
 
     def width(self) -> dict:
-        ys = [(b.box[1], b.box[4], b) for b in self.blocks if b.solid]
+        """Overall width over the solid blocks and everything that stands proud of the side walls (cad/body.py
+        side_projections). Lamps and reflectors are left out, as ADR 43/04's definition and VSB1 5.2 leave them out."""
+        from .body import side_projections
+        ys = [(b.box[1], b.box[4], b.name, None) for b in self.blocks if b.solid and not b.extra.get("lamp")]
+        ys += [(p["y0"], p["y1"], p["name"], p["proj"]) for p in side_projections(self)]
         lo = min(ys, key=lambda t: t[0])
         hi = max(ys, key=lambda t: t[1])
-        return dict(width_mm=hi[1] - lo[0], road=hi[2].name, kerb=lo[2].name)
+        return dict(width_mm=hi[1] - lo[0], road=hi[2], kerb=lo[2], road_y=hi[1], kerb_y=lo[0], road_proj=hi[3], kerb_proj=lo[3])
 
     def ground_clearance(self) -> dict:
         cand = [b for b in self.blocks if b.solid and b.system in ("drawbar", "chassis", "underfloor", "body")]
@@ -856,9 +860,12 @@ class Trailer:
                 row.update(chassis_row(c, self.chassis_results(lay)))
             elif c.type == "width":
                 w = lay.width()
-                row.update(limit=f"<= {c.max:g} mm", measured=round(w["width_mm"], 1), unit="mm", margin=round(c.max - w["width_mm"], 1),
+                side = lambda s: (f"{_lc(w[s])}, {w[s + '_proj']:.0f} mm proud of the skin" if w[s + "_proj"] is not None  # noqa: E731
+                                  else _lc(w[s]))
+                row.update(limit=f"<= {c.max:,.0f} mm", measured=round(w["width_mm"], 1), unit="mm", margin=round(c.max - w["width_mm"], 1),
                            ok=w["width_mm"] <= c.max + 1e-6, governing=f"{w['road']} to {w['kerb']}",
-                           detail=f"{w['width_mm']:.0f} mm from the {w['road'].lower()} to the {w['kerb'].lower()}")
+                           detail=(f"{w['width_mm']:,.0f} mm over the {lay.V['body_width']:,.0f} mm body. Road side: {side('road')}. "
+                                   f"Kerb side: {side('kerb')}. The side marker lamps and reflectors are left out"))
             elif c.type == "overhang":
                 V = lay.V
                 front = V["axle_x"] - V["body_x0"]
@@ -977,7 +984,9 @@ def chassis_inputs(tr: Trailer, ev: dict) -> dict:
         hub_z=V["hub_z"], hub_y=V["hub_y"], axle_spacing=V["axle_spacing"],
         xt_front_hinge_rear_x=V["axle_x"] + V["xt_front_hinge_rear"], xt_rear_shock_front_x=V["axle_x"] + V["xt_rear_shock_front"],
         overall_length=ov["x1"] - ov["x0"], overall_x0=ov["x0"], overall_x1=ov["x1"], travel_height=ov["z1"],
-        overall_width=lay.width()["width_mm"], body_x0=V["body_x0"], body_x1=V["body_x1"],
+        overall_width=lay.width()["width_mm"], width_kerb_y=lay.width()["kerb_y"], width_road_y=lay.width()["road_y"],
+        travel_height_at=max((b for b in lay.blocks if b.solid), key=lambda b: b.box[5]).id,
+        body_x0=V["body_x0"], body_x1=V["body_x1"],
         cog_loaded=tc2["nominal"]["cog"], cog_loaded_growth=tc2["growth"]["cog"],
         cog_height_above_hub=tc2["nominal"]["cog"][2] - V["hub_z"],
         cog_by_case={c["id"]: dict(nominal=c["nominal"]["cog"], growth=c["growth"]["cog"]) for c in ev["cases"]},

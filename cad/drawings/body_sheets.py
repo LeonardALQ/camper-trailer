@@ -223,7 +223,7 @@ def ct202(prj, model, bom, checks, reg, dwg):
     rf = res["roof"]
     for i, t in enumerate(("ROOF-TO-WALL JOINER 1.65 kg/m, BONDED MS POLYMER ALL ROUND, THE WALL'S TOP INSERT STRIP UNDER IT",
                            f"40 m/s UPLIFT {rf['q_n_mm']:.2f} N/mm ON THE BOND, AGAINST {rf['allow_n_mm']:.0f} N/mm (BDY-19)",
-                           "ROOF EDGE CAPPED, DRIP EDGE OUTSIDE THE WALL SKIN, AWNING RAIL ON THE KERB-SIDE STRIP BELOW")):
+                           "ROOF EDGE CAPPED, DRIP EDGE OUTSIDE THE WALL SKIN. THE AWNING'S BRACKETS SCREW INTO THE ROOF'S KERB-EDGE INSERT STRIP")):
         sh.text(22, 106 - 3 * i, t, 1.5)
     # ---- D: lift bed rail on its hardpoint in the side wall, plan section, 1:2
     cx, top = 150.0, 186.0
@@ -332,7 +332,7 @@ def ct203(prj, model, bom, checks, reg, dwg):
     sh.line(ox + (L - us) / k, oy2, ox + (L - us) / k, oy2 + H / k, "phantom")
     sh.text(ox + (L - us) / k + 0.8, oy2 + 3.0, "STIFFENER BD-18", 1.3)
     sh.rect(ox, oy2 + (H - 25) / k, ox + L / k, oy2 + H / k, "fill")
-    sh.text(ox + 1, oy2 + H / k - 3, "TOP INSERT STRIP: ROOF JOINER AND THE AWNING BRACKETS", 1.4)
+    sh.text(ox + 1, oy2 + H / k - 3, "TOP INSERT STRIP: ROOF JOINER", 1.4)
     rows = []
     for i in res["inserts"]:
         rows.append((i["what"].split(",")[0].upper()[:38], i["what"].split(",")[1].strip().upper()[:46] if "," in i["what"] else "",

@@ -453,12 +453,19 @@ trailer_checks:
     inputs: []
     why: "Report 11 LC10 and section 3.4. IIW 513, FAT 63. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
   - id: DIM-01
-    title: Overall width with the awning within VSB1's 2,500 mm
+    title: Overall width within the 2,500 mm of ADR 43/04 and VSB1 5.2
     type: width
     max: 2500
     severity: fail
-    inputs: []
-    why: VSB1 measures width across the body including awnings and side racks (report 02 section 2.2).
+    inputs: [TR-11]
+    why: ADR 43/04 clause 6.2.6.1 and VSB1 section 5.2 cap a trailer at 2,500 mm. The width runs across the body, its guards, the awning and everything that stands proud of a side wall (data/body/body.yaml `width`). Side-mounted lamps and reflectors are left out.
+  - id: DIM-05
+    title: Overall width at most 2,490 mm (design target)
+    type: width
+    max: 2490
+    severity: fail
+    inputs: [TR-11]
+    why: The design keeps 10 mm under DIM-01's 2,500 mm so the build tolerance on the panels, frames and hoods cannot take the built trailer over it (TR-11 measures it).
   - id: DIM-02
     title: Front load space not shorter than the rear overhang to the rear-most point (VSB1 5.1.1)
     type: overhang

@@ -24,6 +24,23 @@ def load_data() -> dict:
     return yaml.safe_load(BODY_YAML.read_text())
 
 
+def side_projections(lay) -> list[dict]:
+    """What stands proud of the side walls' outer skins, as Y extents in DIM-01, for the overall width (DIM-01, DIM-05):
+    each side-wall opening's `proj` (data/body/body.yaml), each side-wall gland's (data/services.yaml) and the joiners
+    along both edges. The side marker lamps and reflectors are left out, as ADR 43/04's definition and VSB1 5.2 leave out
+    lamps and reflectors."""
+    d, V = load_data(), lay.V
+    hb = V["half_bw"]
+    glands = yaml.safe_load((DATA / "services.yaml").read_text())["glands"]
+    out = [dict(name="floor and roof-to-wall joiners", wall=s, proj=d["width"]["joiner_proj"]) for s in ("kerb", "road")]
+    out += [dict(name=o["name"], wall=o["wall"], proj=o["proj"], id=o["id"]) for o in d["openings"] if o.get("proj")]
+    out += [dict(name=g["what"], wall=g["at"], proj=g["proj"], id=g["id"]) for g in glands if g.get("proj")]
+    for p in out:
+        s = 1 if p["wall"] == "road" else -1
+        p["y0"], p["y1"] = sorted((s * hb, s * (hb + p["proj"])))
+    return out
+
+
 class Panel:
     def __init__(self, key: str, d: dict):
         self.key, self.d = key, d
@@ -183,13 +200,13 @@ class Body:
         f_rail = max(f_night, f_travel)
         awning = next((b for b in self.lay.blocks if b.id == "BD-13"), None)
         aw_kg = awning.mass_kg if awning else 41.0
-        f_awning = math.hypot(3 * aw_kg * G / 6, 3 * aw_kg * G / 6 * 100 / 60)   # six brackets, 100 mm offset, 60 mm bolt pitch
+        f_awning = math.hypot(3 * aw_kg * G / 5, 3 * aw_kg * G / 5 * 100 / 60)   # five brackets, 100 mm offset, 60 mm bolt pitch
         rows = [dict(id="INS-01", what="Lift-bed rail screw, 1/4 in self-tapping into the RHS 40 x 20 x 3 hardpoint in the side wall, shear", n=f_rail,
                      rated_n=L["rail_screw_rated_n"],
                      case=(f"{L['bed_night_factor']:g} x the {L['bed_kg']:.0f} kg bed at night" if f_night >= f_travel else
                            f"LC2, 3 g on the {L['bed_travel_kg']:.0f} kg moving bed") + f", over {screws} screws"),
-                dict(id="INS-02", what="Awning bracket bolt, Panelock APLB-1020 through the wall's top insert strip, tension", n=f_awning, rated_n=20000,
-                     case="LC2, 3 g on the awning")]
+                dict(id="INS-02", what="Awning bracket bolt, Panelock APLB-1020 into the roof's kerb-edge insert strip, tension", n=f_awning, rated_n=20000,
+                     case="LC2, 3 g on the awning, taken as a pull with prying")]
         for r in rows:
             r["util"] = r["n"] / (cr["insert_factor"] * r["rated_n"])
         return rows

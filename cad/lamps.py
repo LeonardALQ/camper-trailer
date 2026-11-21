@@ -92,8 +92,8 @@ def resolve(lay=None) -> dict:
     floor_under = V["floor_z"] - V["floor_t"]
     # the outriggers' end faces: devices on them may run up to the floor's edge on a backing plate
     face = dict(y0=abs(orr["p0"][1]), y1=abs(orr["p1"][1]), z0=orr["p0"][2] - oh / 2, z1=floor_under, cap_z1=orr["p0"][2] + oh / 2)
-    ek = min(-V["half_bw"], lay.find("BD-13").box[1])   # the awning case on the kerb wall
-    er = V["half_bw"]
+    wd = lay.width()   # the extreme outer edges (R48 2.8): the overall width's, which leaves out the lamps and reflectors
+    ek, er = wd["kerb_y"], wd["road_y"]
     I = _instances(data["devices"], V, stations)
     need = dict(reversing=2 if ch["overall_length"] > 6000 else 1, plate_lamp=1, side_marker=None, side_reflector=None)
     eo = 2 if V["body_width"] > 2100 else 0

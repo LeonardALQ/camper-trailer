@@ -9,7 +9,7 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 | Measure | Value |
 |---|---|
 | Body | 4,420 x 2,400 mm outside, X 1,820 to 6,240. Inside 4,350 x 2,330 x 2,000 mm, floor at Z 925 |
-| Overall | 6,700 mm long, 2,500 mm wide over the awning, 2,967 mm high |
+| Overall | 6,700 mm long, 2,470 mm wide over the entry door's handle, 3,078 mm high over the awning case |
 | Tare | 2,581 kg, 2,834 kg with the growth allowance |
 | Fully loaded with 350 L of water (TC2) | 3,111 kg, 3,397 kg with growth, against the 3,500 kg plate |
 | Towball | 250 to 292 kg, 8.1 to 10.5 % of the trailer, at most 317 kg with growth |
@@ -69,6 +69,8 @@ The shell is bonded sandwich panels in aluminium joiners (BODY.md revision C, CT
 The roof is fixed, with rounded front edges, 150 mm at the roof edge and 250 mm on the front verticals (H12). Towing at 90 km/h it uses 21.3 L/100 km, against 25.0 with a square front and 20.6 with a hard raising roof, which would add 117 kg and about AUD 32,900 and rule out the S4 windows, the stock doors, the lift bed and a full-height wet room (research report 25).
 
 Four Dometic S4 windows (W1 and W2 at the bed, W4 in the kitchen, W6 frosted in the wet room) and the glass in both doors have integrated blackout blinds (H8, H15, CT-011, CT-013). W1's 804 x 454 mm opening is the second way out. All 17 openings keep 300 mm of wall between them (BDY-18).
+
+The awning is a Fiamma F80s 400 on the roof's kerb edge, its case 5 mm inside the wall's skin and its legs on the ground. ADR 43/04 and VSB1 5.2 allow 2,500 mm and leave out only the lamps and reflectors, so every frame, hood, cowl, handle and box on a side wall counts. The S4 frames stand 21 mm proud, the hoods, cowls and flush-mounted inlet boxes at most 30 mm and the entry door's handle 40 mm (est.), so the trailer is 2,470 mm wide against a 2,490 mm design limit (DIM-01, DIM-05, TR-11).
 
 ## Lift bed and desk
 

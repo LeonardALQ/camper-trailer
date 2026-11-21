@@ -16,6 +16,8 @@ from . import sheet as S
 from .home_common import water_without_gcm_revision
 from .sheets import _leaves
 
+HEIGHT_AT = {"BD-13": "the awning case", "RF-01": "the solar panels"}   # what sets the travel height, by line
+
 
 def _cog(sh, x, y, label, r=1.6):
     """Centre of gravity symbol: a circle with two opposite quadrants filled."""
@@ -69,7 +71,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
     S.hdim(sh, P(V["body_x0"], hb)[0], P(0, hb)[1], P(V["body_x1"], hb)[0], P(0, hb)[1], yd + 6, f"{V['body_length']:.0f} BODY", size=1.9)
     xr = P(V["body_x1"], 0)[0]
     S.vdim(sh, xr, P(0, hb)[1], xr, P(0, -hb)[1], xr + 6, f"{V['body_width']:.0f} BODY", size=1.9)
-    S.vdim(sh, xr, P(0, hb)[1], xr, P(0, -hb - 100)[1], xr + 12, f"{ch['overall_width']:.0f} WITH AWNING", size=1.9)
+    S.vdim(sh, xr, P(0, ch["width_road_y"])[1], xr, P(0, ch["width_kerb_y"])[1], xr + 12, f"{ch['overall_width']:.0f} OVERALL", size=1.9)
     xh = V["axle_x"] + V["rear_hub_dx"]
     S.vdim(sh, P(xh, V["hub_y"])[0], P(0, V["hub_y"])[1], P(xh, -V["hub_y"])[0], P(0, -V["hub_y"])[1], P(xh + 420, 0)[0],
            f"{V['track']:.0f} TRACK", size=1.8, ext=False)
@@ -160,7 +162,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
         sh.text(vx, gz + ch["travel_height"] / sc + 2.4, f"SCALE 1:{sc:g}", 1.5, "middle")
         sh.text(vx - 29, gz - 3.0, left, 1.4)
         sh.text(vx + 29, gz - 3.0, right, 1.4, "end")
-    S.hdim(sh, 362.0 - (V["half_bw"] + 100) / sc, gz, 362.0 + V["half_bw"] / sc, gz, gz - 6.0, f"{ch['overall_width']:.0f} WITH THE AWNING", size=1.4)
+    S.hdim(sh, 362.0 + ch["width_kerb_y"] / sc, gz, 362.0 + ch["width_road_y"] / sc, gz, gz - 6.0, f"{ch['overall_width']:.0f} OVERALL", size=1.4)
     S.hdim(sh, 268.0 - V["half_bw"] / sc, gz, 268.0 + V["half_bw"] / sc, gz, gz - 6.0, f"{V['body_width']:.0f} BODY", size=1.4)
     xr2 = 362.0 + (V["half_bw"] + 30) / sc
     S.vdim(sh, xr2, gz, xr2, gz + ch["travel_height"] / sc, xr2 + 5, f"{ch['travel_height']:.0f}", size=1.4)
@@ -175,7 +177,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
     hi_ball = max(c["nominal"]["towball_kg"] for c in rep["cases"])
     rows = [
         ["Body", f"{V['body_length']:.0f} x {V['body_width']:.0f} mm", f"Fixed roof, {rep['params']['interior_h']:.0f} mm inside, rounded front edges (H12)"],
-        ["Overall", f"{ch['overall_length']:.0f} x {ch['overall_width']:.0f} mm", f"Travel height {ch['travel_height']:.0f} mm on the solar panels"],
+        ["Overall", f"{ch['overall_length']:.0f} x {ch['overall_width']:.0f} mm", f"Travel height {ch['travel_height']:.0f} mm at the top of {HEIGHT_AT.get(ch['travel_height_at'], ch['travel_height_at'])}"],
         ["Axle group centre", f"X {V['axle_x']:,.0f}", f"Window X {w['x_lo']:,.0f} to {w['x_hi']:,.0f} (H17, MAS-05)"],
         ["Tare", f"{rep['tare_kg']:,.0f} kg", f"{cases['TC1']['growth']['mass_kg']:,.0f} kg with growth"],
         ["Fully loaded, TC2", f"{tc2['nominal']['mass_kg']:,.0f} kg", f"{tc2['growth']['mass_kg']:,.0f} kg with growth, ATM plate {plate:,.0f} kg"],

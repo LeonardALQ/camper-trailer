@@ -43,7 +43,7 @@ The cases follow report 11 and CHASSIS.md. Each panel is checked as a one-way sp
 | LC3, LC4 | 0.8 g braking, 0.5 g sideways, on the mounts | Mount bolt shear and tension | Report 11 |
 | LC5a | 13.4 kNm of twist between the axles, travelling | Mounts, skins, joints and the rear wall under the body's share | Report 11, report 12 section 4 |
 | LC5b | A corner steady wound to 875 kg at tare, parked | As LC5a | Report 11 |
-| Inserts | The lift bed's rail screws at 1.5 times the 264 kg bed at night, the awning brackets at 3 g | Half the rated load, then a pull test (LR-09) | Report 02 MAT-05 |
+| Inserts | The lift bed's rail screws at 1.5 times the 264 kg bed at night, the awning's roof brackets at 3 g | Half the rated load, then a pull test (LR-09) | Report 02 MAT-05 |
 
 For LC5a and LC5b the checks take the larger of two bounds on the roof joint: the bonded roof carries shear and the body is a closed box, or the roof joint is neglected and the body is an open box. The chassis checks stay on the bare frame (CHASSIS.md), so they still hold if the mounts loosen.
 
@@ -89,7 +89,7 @@ The rear wall closes the box's rear end and racks in shear under the torque the 
 
 ## The roof
 
-The roof is one 40 mm sandwich panel, 10.6 m², bonded into the roof-to-wall joiner, with no hatches. The four Sunman panels are bonded to its flat top skin. The travel height to their top is 2,967 mm.
+The roof is one 40 mm sandwich panel, 10.6 m², bonded into the roof-to-wall joiner, with no hatches. The four Sunman panels are bonded to its flat top skin, 70 mm toward the road edge, and the Fiamma F80s 400 awning's case sits on its kerb edge on five angle brackets screwed into an insert strip. The case's top, 3,078 mm up, sets the travel height.
 
 - The roof weighs 75.6 kg (BD-02), and about 107 kg with the solar array.
 - In a 40 m/s uplift it takes 5.06 kN, report 12's 6.3 kN on the old lid scaled to this roof's area (assumption). Over 13.6 m of joiner that is 0.37 N/mm against 30 N/mm, half the bond's assumed 2.0 MPa tension strength over its 30 mm leg (BDY-19, 0.01).
@@ -121,7 +121,7 @@ Glands of 60 mm or less are not openings. Where an opening crosses a chassis sta
 | BD-14, BD-18 | Rounded front edges, wall stiffeners | 7.2 kg | Estimate, calculated | 8.6 kg |
 | BD-10, BD-17 | Mud flaps with hangers, cassette door | 10.7 kg | Mostly calculated | 12.2 kg |
 | BD-11 | Wiring, plumbing, lighting and hardware | 60.0 kg | Estimate, kept until the fit-out | 72.0 kg |
-| BD-13 | Fiamma F45s 450 awning and brackets | 31.5 kg | Maker | 31.9 kg |
+| BD-13 | Fiamma F80s 400 awning on the roof, and its brackets | 36.5 kg | Maker, brackets estimated | 37.0 kg |
 | | Body | 618.3 kg | | 689.7 kg |
 
 The solar panels are in the roof group, the wet room tray in the wet room group, and the 8.8 kg of nut plates in the chassis.
@@ -162,4 +162,4 @@ The solar panels are in the roof group, the wet room tray in the wet room group,
 - The roof uplift at 40 m/s is report 12's 6.3 kN scaled by area to 5.06 kN.
 - The lift bed's 32 rail screws carry 1.5 times the 264 kg bed at night, two people included.
 - The M12 8.8 mount works at up to a third of its ultimate tension. The floor's top skin punches through at 60 MPa and the PVC insert at 6 MPa.
-- The Fiamma F45s 450 awning stands within 100 mm of the wall.
+- Nothing on a side wall stands more than 40 mm proud of its skin: the S4 frames 21 mm (Dometic's drawing), the hoods, cowls and flush-mounted inlet boxes 30 mm and the entry door's handle 40 mm (est.). The awning's case sits on the roof 5 mm inside the kerb wall's skin.

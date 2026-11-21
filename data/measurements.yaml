@@ -1093,3 +1093,16 @@ inputs:
     stage: trailer built
     range: {min: 950, max: 1050, src: "Decision H1. The ceiling then leaves at least 900 mm above the mattress"}
     affects: [H1, getting into bed]
+  - id: TR-11
+    group: Trailer tests
+    part: trailer
+    title: Overall width across the body, the awning and the hoods, laden
+    how: "Load the trailer as for TW-04 and stand it level on flat ground. Drop a plumb line from the outermost point on each side, the entry door's handle on the kerb side and the hoods and window frames on the road side, mark the ground and measure between the marks. Leave out the side marker lamps."
+    unit: mm
+    estimate: {v: 2470, src: "DIM-01 in the model"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    range: {min: null, max: 2500, src: "ADR 43/04 clause 6.2.6.1 and VSB1 section 5.2: at most 2,500 mm, side-mounted lamps and reflectors left out"}
+    affects: [DIM-01, DIM-05, registration]
+    thresholds:
+      - {at: 2490, rule: "Over 2,490 mm, find the part that stands out and fit a lower one before the HVAIS inspection, because the design keeps 10 mm in hand (DIM-05)", src: "DIM-05"}

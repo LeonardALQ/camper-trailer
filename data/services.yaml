@@ -9,9 +9,10 @@ revision: A
 
 # Glands through the walls, roof and floor. Side walls give X and the height Z, end walls Y and Z, roof and floor X and Y.
 glands:
-  - {id: G1, what: "Fresh water fill with a lockable cap, filled through the CR45 filter on the hose", at: kerb, x: 3280, z: 1125, d: 50, src: "TRAILER.md, Plumbing and water", est: "height"}
-  - {id: G2, what: "15 A appliance inlet and the 12 V Anderson SB50 outlet in one IP56 surface box", at: kerb, x: 4700, z: 1150, d: 60, src: "TRAILER.md, Electrical"}
-  - {id: G3, what: "Outdoor 230 V double outlet (C10), IP56 surface box under the awning", at: kerb, x: 4300, z: 1150, d: 60, src: "report 20 section 7", est: "position"}
+  # `proj` on a side-wall gland is how far it stands proud of the skin, mm, for the overall width (data/body/body.yaml `width`)
+  - {id: G1, what: "Fresh water fill with a lockable cap, filled through the CR45 filter on the hose", at: kerb, x: 3280, z: 1125, d: 50, proj: 30, src: "TRAILER.md, Plumbing and water", est: "height, and the cap 30 mm proud"}
+  - {id: G2, what: "15 A appliance inlet and the 12 V Anderson SB50 outlet, flush-mounted IP56 with hinged covers", at: kerb, x: 4700, z: 1150, d: 60, proj: 30, src: "TRAILER.md, Electrical", est: "covers 30 mm proud. A surface box would stand about 60 mm and set the width"}
+  - {id: G3, what: "Outdoor 230 V double outlet (C10), flush-mounted IP56 with a hinged cover, under the awning", at: kerb, x: 4300, z: 1150, d: 60, proj: 30, src: "report 20 section 7", est: "position, and the cover 30 mm proud"}
   - {id: G4, what: "Two 6 mm2 PV strings into a conduit down the partition's kerb end", at: roof, x: 5100, y: -900, d: 25, src: "TRAILER.md, Electrical"}
   - {id: G5, what: "Split line set and the outdoor unit's 230 V feed (C8), behind the cradle", at: rear, y: 760, z: 2800, d: 60, src: "AC-02, AC-03", est: "position, moved to the road half with the outdoor unit"}
   - {id: G6, what: "Battery box vent from the bottom of the box, 20 mm bore with insect mesh", at: floor, x: 4300, y: -800, d: 20, src: "report 20 section 2, AS/NZS 3001.2 clause 5.4.12.2", est: "position"}
@@ -133,8 +134,8 @@ hvac:
 # drives them at 12 V through the 12-pin plug (DB-07). Positions are DIM-01: X from the ball, rearward, Y from the
 # centreline, road side positive, Z up from the ground at design ride height. `y` and `z` are a device's centre and
 # `size` its width and height in mm (est.). A device with `y` above 0 is a pair, mirrored to the kerb side. Side devices
-# take X from the chassis stations they sit on. The extreme outer edges come from the model: the awning case on the
-# kerb side and the road wall on the road side. cad/lamps.py resolves the positions and checks every rule.
+# take X from the chassis stations they sit on. The extreme outer edges are the overall width's (DIM-01): the entry
+# door's handle on the kerb side and the hoods on the road side. cad/lamps.py resolves the positions and checks every rule.
 lamps:
   clearance_mm: 25            # to a wall opening or the outdoor unit's cradle (est.)
   between_mm: 15              # between two devices on one face (est.)

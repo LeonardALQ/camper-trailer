@@ -152,6 +152,7 @@ params:
   solar_l: 2054              # Sunman eArc SMF430F-12X12UW, 2,054 x 1,084 x 2 mm, bonded to the roof (report 13 section 4)
   solar_w: 1084
   solar_x0: body_x0 + 156    # array 4,108 x 2,168 mm, centred on the 4,420 mm roof, no roof hatches (report 18 section 1.2)
+  solar_dy: 70               # the array sits 70 mm toward the road edge, 28 mm clear of the awning case on the kerb edge
 
 # The trailer's wheel and hub, shared with the ute (report 16). WHL-01 in measurements.yaml is the wheel's load rating,
 # and MAS-09 checks it against the per-wheel load MAS-06 uses.
@@ -452,17 +453,17 @@ items:
     point: [body_x0 + body_length / 2, 0, floor_z + 400]
     mass: {basis: declared, total_kg: 60, maturity: estimate, source: "Older block model, kept until the systems design (report 12 section 10). Reports 20 and 21 leave the house wiring and the fresh water pipework in it"}
   - id: BD-13
-    name: Awning, Fiamma F45s 450, kerb side, below the roof line
-    material: "Aluminium case and arms, vinyl fabric (est.)"
+    name: Awning, Fiamma F80s 400, on the roof's kerb edge, inside the body width
+    material: "Aluminium case, arms and lead bar, vinyl canopy, on aluminium angle brackets"
     system: body
     price:
-      - {item: "Fiamma F45 S 450 awning, wall mount", aud: 1790, basis: listing, url: "https://www.caravanrvcamping.com.au/awnings-screens-mats-covers/caravan-rv-awnings/box-awnings/fiamma-box-awning/fiamma-f45-wall-mount/", date: 2026-11-20}
-      - {item: "Awning wall brackets, leg wall brackets and bolts", aud: 150, basis: estimate, url: "https://parts.jayco.com.au/products/fiamma-awning-leg-wall-bracket-kit-for-f45-awning", date: 2026-11-20}
-    box: [body_x0 + 95, -half_bw - 100, ceiling_z - 160, 4230, 100, 120]
+      - {item: "Fiamma F80s 400 roof awning, manual", aud: 2687.70, basis: listing, converted_from: "USD 1,734", url: "https://www.campervan-hq.com/products/fiamma-f80s-400-rv-awning-132", date: 2026-11-21, note: "Polar White. JayParts (Jayco) stocks the F80s in Australia but its page could not be read"}
+      - {item: "Five 4 mm aluminium angle brackets and stainless screws into the roof's kerb-edge insert strip", aud: 250, basis: estimate, date: 2026-11-21}
+    box: [body_x0 + 320, -half_bw + 5, roof_top_z, 4000, 153, 113]
     parts:
-      - {item: "Fiamma F45s 450, 4,230 mm case", kg: 29.5, basis: maker, source: "https://www.fiammausa.com/en/f45s-en.html"}
-      - {item: Wall brackets and bolts, kg: 2.0, basis: estimate}
-    note: Case 4,230 mm, 2,500 mm extension. It may stand at most 100 mm proud of the 2,400 mm body (VSB1 5.2).
+      - {item: "Fiamma F80s 400, 4,000 mm case, 3,880 mm canopy, 2,500 mm extension", kg: 34.0, basis: maker, source: "https://www.jacksonsleisure.com/fiamma/f80s/wind/out/awning/"}
+      - {item: Roof brackets and screws, kg: 2.5, basis: estimate}
+    note: "The case is 153 mm across and 113 mm high on its bracket (Fiamma's F80s data sheet, https://files.ekmcdn.com/grasshopper/resources/other/f80s-ducato-information.pdf). Its outer face stands 5 mm inside the kerb wall's skin, so it adds nothing to the width (DIM-01). It starts 70 mm behind the front vertical edge's 250 mm radius. The legs rest on the ground, so nothing is fixed to the wall. The canopy covers 9.7 m2, 1.1 m2 less than the wall-mounted F45s 450 it replaces, which stood 100 mm off the wall"
 
   # ================================================================ roof
   - id: RF-01
@@ -471,7 +472,7 @@ items:
     system: roof
     price: {aud_each: 669, basis: listing, url: "https://www.solar4rvs.com.au/products/sunman-earc-430w-flexible-solar-panel-1", date: 2026-11-20}
     for: {k: [0, 1], s: [1, -1]}
-    box: [solar_x0 + k * solar_l, "min(0, s * solar_w)", roof_top_z, solar_l, solar_w, 2]
+    box: [solar_x0 + k * solar_l, "solar_dy + min(0, s * solar_w)", roof_top_z, solar_l, solar_w, 2]
     mass: {basis: declared, unit_kg: 7.3, maturity: spec, source: "https://www.master-instruments.com.au/files/battery_information/e_arc_doing_more_web.pdf", note: "Sunman brochure, 7.3 kg each (report 13 section 4)"}
     note: Four panels in two pairs, each pair in series to its own MPPT. The roof has no hatches, so the whole 4,108 x 2,168 mm array fits.
   - id: RF-02
