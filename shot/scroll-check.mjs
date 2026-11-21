@@ -11,13 +11,14 @@ const pages = [
   { path: '/', viewer: false },
   { path: '/ute-garage/', viewer: true },
   { path: '/ute-garage/', viewer: true, theme: 'dark' },
-  { path: '/trailer/', viewer: true },
+  { path: '/trailer/', viewer: true, cog: 4, off: 5 },
   { path: '/trailer/', viewer: true, theme: 'dark' },
   { path: '/measurements/', viewer: false },
   { path: '/body/', viewer: true },
   { path: '/tow-vehicle/', viewer: false },
   { path: '/drawings/', viewer: false },
   { path: '/research/03-bike-restraint-garage/', viewer: false },
+  { path: '/research/18-trailer-layout-79/', viewer: false, off: 1 },
 ];
 
 const browser = await chromium.launch({
@@ -52,6 +53,49 @@ for (const p of pages) {
       bg: b.backgroundColor, want, room: document.documentElement.scrollHeight - window.innerHeight };
   });
   check('page styles', css.html !== 'hidden' && css.body !== 'hidden' && css.select !== 'none' && css.bg === css.want, css);
+
+  // The tables' footer on Sum: blank where a sum means nothing, and the centre of gravity of the rows weighted by
+  // their mass in the CoG columns, worked out here from the cells.
+  const foot = await page.evaluate(() => {
+    const num = (s) => {
+      const m = (s || '').replace(/,/g, '').replace('−', '-').match(/[+-]?\d+(?:\.\d+)?/);
+      return m ? Number(m[0]) : null;
+    };
+    const out = { off: 0, cog: 0, bad: [] };
+    document.querySelectorAll('table.sheet-table').forEach((t, k) => {
+      const cells = [...(t.tFoot?.rows[0]?.cells ?? [])];
+      const rows = [...t.tBodies[0].rows].filter((r) => !r.classList.contains('row-total')
+        && !r.classList.contains('sheet-out') && ![...r.cells].some((c) => c.colSpan > 1));
+      const mass = cells.findIndex((c) => c.hasAttribute('data-mass'));
+      cells.forEach((td, c) => {
+        const text = td.textContent.trim();
+        if (td.dataset.sum === 'off') {
+          out.off += 1;
+          if (text) out.bad.push(`table ${k + 1} column ${c + 1} shows ${text}`);
+        } else if (td.dataset.sum === 'cog') {
+          out.cog += 1;
+          let m = 0;
+          let mx = 0;
+          for (const r of rows) {
+            const w = num(r.cells[mass]?.textContent);
+            const x = num(r.cells[c]?.textContent);
+            if (w !== null && x !== null) {
+              m += w;
+              mx += w * x;
+            }
+          }
+          const dec = (text.split(' ')[0].split('.')[1] ?? '').length;
+          const got = num(text);
+          if (got === null || Math.abs(got - mx / m) > 0.5 * 10 ** -dec + 1e-6) {
+            out.bad.push(`table ${k + 1} column ${c + 1} shows ${text}, the weighted centre is ${(mx / m).toFixed(2)}`);
+          }
+        }
+      });
+    });
+    return out;
+  });
+  check('footer Sum blank where a sum means nothing, CoG weighted by mass',
+    !foot.bad.length && foot.cog >= (p.cog ?? 0) && foot.off >= (p.off ?? 0), foot);
 
   // Wheel over a paragraph of text near the top of the page.
   await page.evaluate(() => window.scrollTo(0, 0));

@@ -1,7 +1,8 @@
 // Spreadsheet tools for every table in the page content (S-03): a frame of about 12 rows that scrolls inside itself
 // with a sticky header row, first column and footer, row selection, a footer with the sum, mean, min, max or count of
-// the selected rows, sorting, a filter, copy as tab-separated text and CSV download. The Footer override loads it on
-// every page. Without JavaScript the tables render as plain tables.
+// the selected rows (Sum leaves a column blank where a sum means nothing, see sumModes), sorting, a filter, copy as
+// tab-separated text and CSV download. The Footer override loads it on every page. Without JavaScript the tables
+// render as plain tables.
 //
 // Other scripts talk to it with events on `document`:
 //   ct:find-row     {ids, found}  the 3D viewer's "Find in table": scroll to the first row whose first cell is one of
@@ -21,6 +22,18 @@ const BLOCKS = 'div, p, ul, ol, table, details, pre, input, select, textarea';
 const STATS = ['Sum', 'Mean', 'Min', 'Max', 'Count'] as const;
 type Stat = (typeof STATS)[number];
 type Kind = 'group' | 'total';
+// What Sum shows in a column: the sum, nothing (where a sum means nothing), or the centre of gravity of the rows
+// weighted by the table's mass column.
+type SumMode = 'sum' | 'off' | 'cog';
+
+// The generated tables say what Sum does with data-sheet-sum="sum", "off" or "cog" on a header cell, or on the table
+// or an element around it for every column, and name their mass column with data-sheet-mass. A table with neither is
+// read by its header text: no sum for centre of gravity coordinates, positions and sizes, percentages and shares,
+// limits, ratings, ranges and values per unit, and none at all where the rows are alternatives (cases, options).
+const NO_SUM = /\bcog\b|centre of gravity|%|percent|\bshare\b|ratio|utilisation|factor|\bssf\b|\bcop\b|\bmm\b|^[xyz]$|position|height|station|limit|\bmax|\bmin\b|minimum|rating|rated|target|range|margin|\bmpa\b|\/|\bper\b|degree|°c|rpm|km\/h|\bpeak\b|^value$|clearance|\bgap\b/i;
+const ALTERNATIVES = /^(case|cases|limit|limits|rule|check|mode|option|options|variant|candidate|design day|input|dimension|size|reading|level|speed|gear|day|unit|model|product|panel|family|kit|build|tuner|turbo|deck|track|measure)\b/i;
+const COG = /\bcog\b|centre of gravity/i;
+const MASS = /^(mass|kg|mass kg|mass \(kg\)|tare kg)$/i;
 
 export interface Parsed {
   v: number;
@@ -92,6 +105,8 @@ class Sheet {
   readonly sel = new Set<HTMLTableRowElement>();
   readonly foot: HTMLTableCellElement[] = [];
   numeric: boolean[] = [];
+  sums: SumMode[] = [];
+  mass = -1;   // the mass column the centre of gravity columns are weighted by
   fmt: { dec: number; pre: string; suf: string }[] = [];
   stat: Stat = 'Sum';
   sortCol = -1;
@@ -182,6 +197,37 @@ class Sheet {
       const same = (k: 'pre' | 'suf') => (got.every((p) => p[k] === got[0]?.[k]) ? got[0]?.[k] ?? '' : '');
       this.fmt.push({ dec: Math.max(0, ...got.map((p) => p.dec)), pre: same('pre'), suf: same('suf') });
     }
+    this.sumModes();
+  }
+
+  sumModes() {
+    const text = (c: number) => norm(this.heads[c]?.textContent ?? '');
+    const whole = this.table.closest<HTMLElement>('[data-sheet-sum]')?.dataset.sheetSum;
+    const own = (c: number) => (this.heads[c]?.dataset.sheetSum ?? whole) as SumMode | undefined;
+    const marked = !!whole || this.heads.some((th) => th?.dataset.sheetSum || th?.hasAttribute('data-sheet-mass'));
+    this.mass = this.heads.findIndex((th, c) => this.numeric[c]
+      && (marked ? !!th?.hasAttribute('data-sheet-mass') : MASS.test(text(c))));
+    const alternatives = !marked && ALTERNATIVES.test(text(0));
+    this.sums = this.numeric.map((num, c) => {
+      const set = own(c);
+      const mode: SumMode = marked ? (set === 'off' || set === 'cog' ? set : 'sum')
+        : alternatives ? 'off' : COG.test(text(c)) ? 'cog' : NO_SUM.test(text(c)) ? 'off' : 'sum';
+      return !num || (mode === 'cog' && this.mass < 0) ? 'off' : mode;
+    });
+  }
+
+  // The centre of gravity of the rows in column c, weighted by the mass column, from the rows that have both.
+  weighted(rows: HTMLTableRowElement[], c: number): number | null {
+    let m = 0;
+    let mx = 0;
+    for (const r of rows) {
+      const w = this.nums.get(r)![this.mass]?.v;
+      const x = this.nums.get(r)![c]?.v;
+      if (w === undefined || x === undefined) continue;
+      m += w;
+      mx += w * x;
+    }
+    return m ? mx / m : null;
   }
 
   isData(r: Element | null): r is HTMLTableRowElement {
@@ -274,7 +320,12 @@ class Sheet {
       const tr = tf.insertRow();
       for (let c = 0; c < this.ncols; c++) {
         const td = document.createElement('td');
-        if (this.numeric[c]) td.className = 'num';
+        if (this.numeric[c]) {
+          td.className = 'num';
+          td.dataset.sum = this.sums[c];
+        }
+        if (c === this.mass) td.dataset.mass = '';
+        if (this.sums[c] === 'cog') td.title = 'Sum: the centre of gravity of these rows, weighted by their mass';
         tr.append(td);
         this.foot.push(td);
       }
@@ -529,12 +580,14 @@ class Sheet {
         }
         const vals = rows.map((r) => this.nums.get(r)![c]?.v).filter((v): v is number => v !== undefined);
         const sum = vals.reduce((a, b) => a + b, 0);
+        const total = this.sums[c] === 'off' ? null : this.sums[c] === 'cog' ? this.weighted(rows, c) : sum;
         const v = this.stat === 'Count' ? vals.length : !vals.length ? null
-          : this.stat === 'Sum' ? sum : this.stat === 'Mean' ? sum / vals.length
+          : this.stat === 'Sum' ? total : this.stat === 'Mean' ? sum / vals.length
             : this.stat === 'Min' ? Math.min(...vals) : Math.max(...vals);
         this.foot[c].textContent = v === null ? '' : this.format(c, v, this.stat);
       }
-      if (!this.numeric[0]) this.foot[0].textContent = `${this.stat} of ${picked ? `${picked} selected` : `${rows.length} rows`}`;
+      const cog = this.stat === 'Sum' && this.sums.includes('cog') ? ', CoG weighted by mass' : '';
+      if (!this.numeric[0]) this.foot[0].textContent = `${this.stat} of ${picked ? `${picked} selected` : `${rows.length} rows`}${cog}`;
     }
     this.update3d();
   }

@@ -8,7 +8,7 @@ const live = reg.drawings.filter((d: any) => d.status !== 'RETIRED');
 ---
 
 <div class="data-table">
-  <table>
+  <table data-sheet-sum="off">
     <thead><tr><th>Number</th><th>Title</th><th>Revision</th><th>Status</th><th>Date</th><th>Sheet</th><th>Downloads</th></tr></thead>
     <tbody>
       {reg.drawings.map((d: any) => (

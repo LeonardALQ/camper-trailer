@@ -52,7 +52,7 @@ const drawings = ['CT-701', 'CT-702', 'CT-703', 'CT-704'];
 
 {kind === 'sizes' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="off">
       <thead><tr><th>Size</th><th class="num">mm</th><th>Note</th></tr></thead>
       <tbody>
         <tr><td>Outside length, body</td><td class="num">{n(d.outside_l_body)}</td><td>{n(d.outside_l)} mm with the cam bar and hasp</td></tr>
@@ -74,7 +74,7 @@ const drawings = ['CT-701', 'CT-702', 'CT-703', 'CT-704'];
 
 {kind === 'cases' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="off">
       <thead><tr><th>Case</th><th class="num">Mass kg</th><th class="num">Front kg</th><th class="num">Rear kg</th><th class="num">Rear with growth</th>
         <th class="num">Towball kg</th><th class="num">Front share</th><th class="num">CoG height mm</th><th class="num">SSF</th></tr></thead>
       <tbody>
@@ -90,7 +90,7 @@ const drawings = ['CT-701', 'CT-702', 'CT-703', 'CT-704'];
 
 {(kind === 'checks' || kind === 'garage-checks') && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="off">
       <thead><tr><th>ID</th><th>Check</th><th class="num">Model</th><th>Limit</th><th>Result</th><th>Detail</th></tr></thead>
       <tbody>
         {(kind === 'checks' ? r.checks : g.checks).map((x: any) => (
@@ -106,7 +106,7 @@ const drawings = ['CT-701', 'CT-702', 'CT-703', 'CT-704'];
 
 {kind === 'mass' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="sum">
       <thead><tr><th>Line</th><th>Item</th><th class="num">kg</th><th>Basis</th><th class="num">With growth</th><th>Source</th></tr></thead>
       <tbody>
         {groups.map((gr) => [
@@ -128,7 +128,7 @@ const drawings = ['CT-701', 'CT-702', 'CT-703', 'CT-704'];
 
 {kind === 'mounts' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="off">
       <thead><tr><th>Case</th><th class="num">Station</th><th>Mount</th><th>Side</th><th class="num">Bracket kN (+ down)</th><th class="num">Bolt tension kN</th><th class="num">Bolt shear kN</th><th class="num">Interaction</th></tr></thead>
       <tbody>
         {g.mounts.rows.map((x: any) => (

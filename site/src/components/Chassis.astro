@@ -36,8 +36,8 @@ const worst = lcs.map((l) => g[l]).reduce((a: any, b: any) => (b.util > a.util ?
 
 {kind === 'schedule' && (
   <div class="data-table">
-    <table>
-      <thead><tr><th>Section</th><th>Members</th><th class="num">Qty</th><th class="num">Lengths mm</th><th class="num">Total m</th><th class="num">kg</th></tr></thead>
+    <table data-sheet-sum="sum">
+      <thead><tr><th>Section</th><th>Members</th><th class="num">Qty</th><th class="num" data-sheet-sum="off">Lengths mm</th><th class="num">Total m</th><th class="num">kg</th></tr></thead>
       <tbody>
         {r.schedule.map((s: any) => (
           <tr><td>{s.section}</td><td>{s.name}</td><td class="num">{s.qty}</td><td class="num">{[...new Set(s.lengths)].map((v: any) => n(v)).join(', ')}</td>
@@ -54,7 +54,7 @@ const worst = lcs.map((l) => g[l]).reduce((a: any, b: any) => (b.util > a.util ?
 
 {kind === 'fittings' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="sum">
       <thead><tr><th>Mark</th><th>Item</th><th class="num">Qty</th><th class="num">kg</th><th>Maturity</th><th>Source</th></tr></thead>
       <tbody>
         {[...plates, ...bought].map((f: any) => (
@@ -67,7 +67,7 @@ const worst = lcs.map((l) => g[l]).reduce((a: any, b: any) => (b.util > a.util ?
 
 {kind === 'stations' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="off">
       <thead><tr><th>Station</th><th class="num">Centre X</th><th>Crossmember</th></tr></thead>
       <tbody>
         {r.stations.map((s: any) => (
@@ -81,7 +81,7 @@ const worst = lcs.map((l) => g[l]).reduce((a: any, b: any) => (b.util > a.util ?
 
 {kind === 'cases' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="off">
       <thead><tr><th>Case</th><th>Load</th><th class="num">Limit</th><th>Source</th></tr></thead>
       <tbody>
         {r.load_cases.map((l: any) => (
@@ -94,7 +94,7 @@ const worst = lcs.map((l) => g[l]).reduce((a: any, b: any) => (b.util > a.util ?
 
 {kind === 'governing' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="off">
       <thead><tr><th>Case</th><th>Governing member</th><th>Where and when</th><th class="num">Combined MPa</th><th class="num">Limit MPa</th><th class="num">Utilisation</th></tr></thead>
       <tbody>
         {lcs.map((l) => (
@@ -109,7 +109,7 @@ const worst = lcs.map((l) => g[l]).reduce((a: any, b: any) => (b.util > a.util ?
 
 {kind === 'checks' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="off">
       <thead><tr><th>ID</th><th>Check</th><th class="num">Model</th><th>Limit</th><th>Result</th><th>Detail</th></tr></thead>
       <tbody>
         {checks.map((x: any) => (
@@ -125,7 +125,7 @@ const worst = lcs.map((l) => g[l]).reduce((a: any, b: any) => (b.util > a.util ?
 
 {kind === 'fatigue' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="off">
       <thead><tr><th>Detail</th><th>Joint</th><th>IIW</th><th class="num">FAT</th><th class="num">Range MPa</th><th class="num">CAFL MPa</th>
         <th class="num">Miner damage</th><th>Hot-spot check</th></tr></thead>
       <tbody>
@@ -141,7 +141,7 @@ const worst = lcs.map((l) => g[l]).reduce((a: any, b: any) => (b.util > a.util ?
 
 {kind === 'crosscheck' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="off">
       <thead><tr><th>Member and case</th><th class="num">Report 11 MPa</th><th class="num">Frame model MPa</th></tr></thead>
       <tbody>
         {r.results.cross_checks.map((x: any) => (

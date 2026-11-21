@@ -50,7 +50,7 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
 
 {kind === 'cases' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="off">
       <thead>
         <tr><th>Case</th><th>What is aboard</th><th class="num">Mass kg</th><th class="num">CoG X</th><th class="num">CoG Z</th>
           <th class="num">Towball kg</th><th class="num">Towball %</th><th class="num">Axle group kg</th>
@@ -77,7 +77,7 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
 
 {kind === 'checks' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="off">
       <thead><tr><th>ID</th><th>Check</th><th>Limit</th><th>Measured</th><th>Result</th><th>Detail</th><th>Inputs</th></tr></thead>
       <tbody>
         {r.checks.map((c: any) => (
@@ -94,7 +94,7 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
 
 {kind === 'chassis' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="off">
       <thead><tr><th>Input</th><th class="num">Value</th><th>Basis</th></tr></thead>
       <tbody>
         <tr><td>Rail outer width at the XT hinges</td><td class="num">{n(ch.rail_outer_width)} mm</td><td>With C/F {n(ch.cf)} (SUP-04) and ET {n(ch.wheel_offset)} it gives a {n(ch.track)} mm track, effective C/F {n(ch.cf - ch.wheel_offset)} mm against Cruisemaster's 200 mm limit. Cruisemaster's minimum is 1,150 mm</td></tr>
@@ -122,7 +122,7 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
 
 {kind === 'crossmembers' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="off">
       <thead><tr><th>Crossmember</th><th class="num">X front face</th><th>Under</th><th>Section</th></tr></thead>
       <tbody>
         {ch.crossmembers.map((x: any) => (
@@ -135,7 +135,7 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
 
 {kind === 'groups' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="sum">
       <thead><tr><th>Group</th><th class="num">Tare kg</th><th class="num">With growth kg</th></tr></thead>
       <tbody>
         {groupRows.map(([g, v]) => (<tr><td>{g}</td><td class="num">{n(v.mass_kg)}</td><td class="num">{n(v.growth_kg)}</td></tr>))}
@@ -148,7 +148,7 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
 {kind === 'uncertain' && (
   <div class="data-table">
     <table>
-      <thead><tr><th>Line</th><th class="num">Mass kg</th><th class="num">Growth allowance kg</th><th class="num">CoG X</th><th class="num">Towball change for +20 %</th></tr></thead>
+      <thead><tr><th>Line</th><th class="num" data-sheet-mass>Mass kg</th><th class="num">Growth allowance kg</th><th class="num" data-sheet-sum="cog">CoG X</th><th class="num">Towball change for +20 %</th></tr></thead>
       <tbody>
         {r.least_certain.map((u: any) => (
           <tr><td>{u.id} {u.name}{u.count > 1 ? ` (${u.count})` : ''}</td><td class="num">{n(u.mass_kg)}</td><td class="num">{n(u.growth_kg)}</td>
@@ -162,7 +162,7 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
 {kind === 'schedule' && (
   <div class="data-table">
     <table>
-      <thead><tr><th>Line</th><th>Item</th><th>Group</th><th class="num">kg</th><th>Maturity</th><th class="num">Growth</th><th class="num">CoG X</th><th class="num">CoG Y</th><th class="num">CoG Z</th><th>Aboard in</th><th>Source</th></tr></thead>
+      <thead><tr><th>Line</th><th>Item</th><th>Group</th><th class="num" data-sheet-mass>kg</th><th>Maturity</th><th class="num" data-sheet-sum="off">Growth</th><th class="num" data-sheet-sum="cog">CoG X</th><th class="num" data-sheet-sum="cog">CoG Y</th><th class="num" data-sheet-sum="cog">CoG Z</th><th>Aboard in</th><th>Source</th></tr></thead>
       <tbody>
         {r.schedule.map((s: any) => (
           <tr>

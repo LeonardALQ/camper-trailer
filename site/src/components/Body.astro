@@ -34,7 +34,7 @@ const m = r.mounts;
 
 {kind === 'panels' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="off">
       <thead><tr><th>Panel</th><th class="num">mm</th><th class="num">kg/m²</th><th class="num">D kNm²/m</th><th class="num">S kN/m</th><th class="num">Wrinkling MPa</th></tr></thead>
       <tbody>
         {Object.values(r.panel_data).map((p: any) => (
@@ -49,7 +49,7 @@ const m = r.mounts;
 {kind === 'mass' && (
   <div class="data-table">
     <table>
-      <thead><tr><th>Line</th><th>Item</th><th class="num">kg</th><th>Basis</th><th class="num">Growth %</th><th class="num">With growth</th><th>Parts and source</th></tr></thead>
+      <thead><tr><th>Line</th><th>Item</th><th class="num">kg</th><th>Basis</th><th class="num" data-sheet-sum="off">Growth %</th><th class="num">With growth</th><th>Parts and source</th></tr></thead>
       <tbody>
         {lines.map((x: any) => (
           <tr><td>{x.iid}</td><td>{x.item}</td><td class="num">{n(x.mass_kg, 1)}</td><td>{x.maturity}</td><td class="num">{n(x.growth_pct)}</td>
@@ -64,7 +64,7 @@ const m = r.mounts;
 
 {kind === 'checks' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="off">
       <thead><tr><th>ID</th><th>Check</th><th class="num">Model</th><th>Limit</th><th>Result</th><th>Detail</th></tr></thead>
       <tbody>
         {checks.map((x: any) => (
@@ -80,7 +80,7 @@ const m = r.mounts;
 
 {kind === 'twist' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="off">
       <thead><tr><th>Model</th><th class="num">Chassis twist, degree</th><th class="num">Body share %</th><th class="num">Largest body torque kNm</th>
         <th class="num">Largest mount force kN</th><th class="num">Chassis peak MPa</th></tr></thead>
       <tbody>
@@ -96,7 +96,7 @@ const m = r.mounts;
 
 {kind === 'mounts' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="off">
       <thead><tr><th>Case</th><th class="num">Shear per bolt kN</th><th class="num">Tension per bolt kN</th><th>Note</th></tr></thead>
       <tbody>
         {Object.entries(m.cases).map(([k, v]: any) => (
@@ -109,7 +109,7 @@ const m = r.mounts;
 
 {kind === 'openings' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="off">
       <thead><tr><th>ID</th><th>Wall</th><th>Opening</th><th class="num">Along the wall mm</th><th class="num">Above the floor mm</th><th class="num">Cut-out mm</th></tr></thead>
       <tbody>
         {r.openings.map((o: any) => (

@@ -64,6 +64,14 @@ STATUSES = ("required", "contingency", "optional")
 PRIORITIES = {"P1": "Safe, legal and reliable towing, or protecting the truck", "P2": "The 224 kW minimum",
               "P3": "Optional, comfort or a cost cut"}
 
+# the sheet's footer sums every number column of the tables wrapped in these (site/src/scripts/sheet.ts)
+SUMS_OPEN, SUMS_CLOSE = '<div data-sheet-sum="sum">\n\n', "\n</div>\n\n"
+
+
+def _sums(table):
+    return SUMS_OPEN + table + SUMS_CLOSE
+
+
 def _copy(src, dst):
     dst.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(src, dst)
@@ -168,14 +176,14 @@ def tow_vehicle_page():
                  f"{_cell(st['can_do'])} |\n")
     head, rest = secs["Stage plan"].split("\n", 1)
     out.append(head + "\n\nEach stage's lines added up by status, from the YAML. The sheet's footer gives the totals. Contingency "
-               "lines are bought only if a test calls for them.\n\n" + rows + _drop_first_table(rest) + "\n")
+               "lines are bought only if a test calls for them.\n\n" + _sums(rows) + _drop_first_table(rest) + "\n")
 
     # ---------------------------------------------------------------- the parts list, one spreadsheet
     out.append("## Parts list\n\nEvery line of `data/vehicle/vehicle-parts.yaml`, AUD including GST, the line total. Basis is "
                "listing (read from a supplier or regulator page) or estimate. Priority: " +
                ", ".join(f"{p} {d[0].lower() + d[1:]}" for p, d in PRIORITIES.items()) + ". Status is required, contingency (only "
                "if an inspection or test calls for it) or optional. Select rows to total them in the footer, or sort and filter by "
-               "stage, priority or status.\n\n"
+               "stage, priority or status.\n\n" + SUMS_OPEN +
                "| ID | Item | Part number | Supplier | AUD | Basis | Priority | Why | Stage | Depends on | Status | Note |\n"
                "|---|---|---|---|---|---|---|---|---|---|---|---|\n")
     for it in data["items"]:
@@ -185,6 +193,8 @@ def tow_vehicle_page():
         out.append(f"| {it['id']} | {name} | {_cell(it.get('part_number'))} | {_cell(it.get('supplier'))} | "
                    f"{it['price_aud']:,.2f} | {it.get('price_basis', '')} | {it['priority']} | {_cell(it.get('why'))} | "
                    f"{it['stage']} | {', '.join(it.get('depends_on') or [])} | {it['status']} | {_cell(it.get('note'))} |\n")
+
+    out.append(SUMS_CLOSE)
 
     # ---------------------------------------------------------------- totals
     over = "Over" if T["gap"] > 0 else "Under"
@@ -207,23 +217,23 @@ def tow_vehicle_page():
                "allows it (see the cuts below). The allowance is the plan's own figure (`VEHICLE.md`), not the sum of the contingency lines: those are "
                "bought only if a test calls for them, and a new DPF and a laboratory emissions test are outside it. The truck, the bike "
                "box, the trailer and Leonard's labour are outside these figures (see the cost table on the [home page](../)).\n\n")
-    out.append("#### By priority\n\n| Priority | What it is for | Required AUD | Contingency lines AUD | Optional AUD |\n|---|---|---|---|---|\n")
+    out.append("#### By priority\n\n" + SUMS_OPEN + "| Priority | What it is for | Required AUD | Contingency lines AUD | Optional AUD |\n|---|---|---|---|---|\n")
     for p, d in PRIORITIES.items():
         out.append(f"| {p} | {d} | " + " | ".join(_cents(get("priority", p, s)) for s in STATUSES) + " |\n")
-    out.append("\n#### By stage\n\n| Stage | Name | Required AUD | Contingency lines AUD | Optional AUD |\n|---|---|---|---|---|\n")
+    out.append(SUMS_CLOSE + "#### By stage\n\n" + SUMS_OPEN + "| Stage | Name | Required AUD | Contingency lines AUD | Optional AUD |\n|---|---|---|---|---|\n")
     for st in data["stages"]:
         out.append(f"| {st['id']} | {_cell(st['name'])} | " + " | ".join(_cents(get("stage", st["id"], s)) for s in STATUSES) + " |\n")
-    out.append("\n#### By system\n\n| System | Required AUD | Contingency lines AUD | Optional AUD |\n|---|---|---|---|\n")
+    out.append(SUMS_CLOSE + "#### By system\n\n" + SUMS_OPEN + "| System | Required AUD | Contingency lines AUD | Optional AUD |\n|---|---|---|---|\n")
     for key in dict.fromkeys(it["system"] for it in data["items"]):
         out.append(f"| {SYSTEMS.get(key, key)} | " + " | ".join(_cents(get("system", key, s)) for s in STATUSES) + " |\n")
-    out.append("\n### Cuts that keep it reliable\n\nEach cut applies only if the old part passes its test.\n\n"
-               "| Cut | What | Replaces | Saves AUD | Risk |\n|---|---|---|---|---|\n")
+    out.append(SUMS_CLOSE + "### Cuts that keep it reliable\n\nEach cut applies only if the old part passes its test.\n\n"
+               + SUMS_OPEN + "| Cut | What | Replaces | Saves AUD | Risk |\n|---|---|---|---|---|\n")
     for c in data["cuts"]:
         out.append(f"| {c['id']} | {_cell(c['name'])} | {c['replaces']} | {c['saving_aud']:,.0f} | {_cell(c.get('risk'))} |\n")
-    out.append("\n### Lines the merges removed\n\nNot counted anywhere.\n\n| Item | AUD | Why |\n|---|---|---|\n")
+    out.append(SUMS_CLOSE + "### Lines the merges removed\n\nNot counted anywhere.\n\n" + SUMS_OPEN + "| Item | AUD | Why |\n|---|---|---|\n")
     for it in data.get("removed", []):
         out.append(f"| {_cell(it['name'])} | {it['price_aud']:,.2f} | {_cell(it['reason'])} |\n")
-    out.append("\n")
+    out.append(SUMS_CLOSE)
     for name in VEHICLE_END:
         out.append(secs[name].replace("`vehicle-parts.yaml`", "the parts list above") + "\n")
     (DOCS / "tow-vehicle.md").write_text("".join(out), encoding="utf-8")

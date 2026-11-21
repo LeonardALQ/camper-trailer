@@ -28,7 +28,7 @@ const label = (g: string) => LABEL[g] ?? g.replace(/_/g, ' ');
 
 {kind === 'lines' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="sum">
       <thead>
         <tr><th>ID</th><th>Item</th><th>Group</th><th class="num">kg</th><th class="num">AUD</th><th>Basis</th><th class="num">Qty</th>
           <th>Unit</th><th>Part number</th><th>Spec and notes</th><th>Source</th></tr>
@@ -50,7 +50,7 @@ const label = (g: string) => LABEL[g] ?? g.replace(/_/g, ' ');
 
 {kind === 'groups' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-sum="sum">
       <thead><tr><th>Group</th><th>What it covers</th><th class="num">AUD</th><th class="num">kg</th></tr></thead>
       <tbody>
         {Object.entries(t.by_group).map(([g, v]: any) => (
