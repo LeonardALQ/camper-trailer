@@ -17,14 +17,18 @@ def _block_centre_y(iid):
     return (b[1] + b[4]) / 2
 
 
-def test_entry_door_kitchen_and_awning_are_on_the_kerb_side():
-    for iid in ("BD-07", "LA-07", "BD-13"):
+def test_entry_door_awning_battery_and_toilet_are_on_the_kerb_side():
+    for iid in ("BD-07", "BD-13", "EL-01", "WR-06"):
         assert _block_centre_y(iid) < 0, iid
 
 
-def test_bathroom_and_desk_are_on_the_road_side():
-    for iid in ("LA-01", "LA-09"):
+def test_kitchen_shower_tote_and_outdoor_unit_are_on_the_road_side():
+    for iid in ("LA-11T", "LA-11B", "LA-07A", "WR-11", "AC-02"):
         assert _block_centre_y(iid) > 0, iid
+
+
+def test_desk_is_centred_under_the_bed():
+    assert abs(_block_centre_y("LA-09")) < 1
 
 
 def test_tuareg_stands_on_the_road_side_of_the_bike_box():

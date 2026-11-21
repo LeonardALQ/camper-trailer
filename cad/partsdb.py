@@ -158,12 +158,13 @@ class TrailerCheck(Strict):
     title: str
     type: Literal["mass", "gcm", "fit", "tyre", "width", "overhang", "coupling", "clearance_ground",
                   "jackknife", "jackknife_height", "wheel", "towball_scale",
+                  "towball_ute", "towball_ute_input", "axle_window", "lateral", "bed", "platinum_return",
                   "chassis_stress", "chassis_local", "chassis_deflection", "chassis_twist", "chassis_fatigue",
                   "body_panel", "body_deflection", "body_insert", "body_roof", "body_twist", "body_joint",
                   "body_mount", "body_end_wall", "body_openings"]
     load_case: str | None = None          # chassis_stress: report 11's load case (data/chassis/chassis.yaml)
     item: str | None = None               # chassis_local, chassis_deflection and chassis_fatigue: what is checked
-    quantity: Literal["mass", "axle", "axle_vsb1", "towball", "towball_pct", "tyre_load"] | None = None
+    quantity: Literal["mass", "axle", "axle_vsb1", "towball", "towball_pct", "tyre_load", "tyre_load_side"] | None = None
     limit: Literal["kit_gtm", "nsw_gtm_cap", "nsw_atm_cap", "plated_atm", "target", "tyre_rating", "wheel_rating"] | None = None
     tolerance: float | None = None
     inputs: list[str] = []
@@ -175,6 +176,7 @@ class TrailerCheck(Strict):
     min_gap_mm: float | None = None
     when: str | None = None               # an expression over the trailer parameters: checked only when it is not 0
     body: dict[str, Any] | None = None    # body_* checks (cad/body.py): what is checked
+    state: dict[str, Any] | None = None   # fit: trailer parameters to override for this check (the bed lowered, bed_state 1)
     severity: Literal["fail", "report"]
     why: str
 
@@ -201,13 +203,14 @@ class TrailerCase(Strict):
     name: str
     aboard: str
     water_l: Any
-    load: list[Literal["fuel", "gear"]]
+    load: list[Literal["fuel", "gear", "grey"]]
     towball_target: bool = False
 
 
 class LoadCasesFile(Strict):
     trailer_cases: list[TrailerCase] = []
     towball_target_kg: float
+    axle_window: dict[str, Any] = {}     # the axle solve's design targets (decision H17, cad/trailer.py)
     registration: dict[str, Any] = {}
     tow_vehicle: dict[str, Any] = {}
 

@@ -1,6 +1,6 @@
 ---
 title: Whole trailer
-description: The whole trailer for the LandCruiser 79, with a queen bed across the front, a fixed roof and a 4,420 mm body, the axle position, the towball load in every load case, the checks and the inputs for the chassis design.
+description: The whole trailer for the LandCruiser 79, the home trailer with a lift bed across the front over the desk, a wet room at the rear, a fixed roof and a 4,420 mm body, the axle position, the towball load in every load case, the checks and the inputs for the chassis design.
 tableOfContents: false
 ---
 
@@ -16,10 +16,11 @@ export const tv = t.tow_vehicle;
 export const tc = (id) => t.cases.find((c) => c.id === id);
 export const chk = (id) => t.checks.find((c) => c.id === id);
 
-This is the whole trailer, revision H. The motorbikes now ride in an enclosed box on the
+This is the whole trailer, revision J, the home trailer. The motorbikes now ride in an enclosed box on the
 <a href={withBase('/tow-vehicle/')}>LandCruiser 79</a> (see the <a href={withBase('/ute-garage/')}>Bike box</a> page),
-so the trailer has no garage. It is layout 1 of the layout study: a queen bed across the front, a fixed roof and a
-{n(t.body_length)} mm body. The <a href={withBase('/chassis/')}>chassis</a> and the <a href={withBase('/body/')}>body</a>
+so the trailer has no garage. It follows the home layout study (decisions H1 to H17): a lift bed across the front over
+the desk, the kitchen on the road side and the battery plinth on the kerb side, a wet room across the rear, a fixed
+roof and a {n(t.body_length)} mm body. The <a href={withBase('/chassis/')}>chassis</a> and the <a href={withBase('/body/')}>body</a>
 are designed to planning level. The other systems are blocks with a mass. The design notes are in `TRAILER.md` in
 the repository, and drawing CT-001 is the general arrangement.
 
@@ -41,20 +42,21 @@ behind.
 From front to back there are the drawbar with its box, the bed zone ({n(t.zones.bed)} mm), the living area
 ({n(t.zones.living)} mm) and the rear zone ({n(t.zones.rear)} mm). The inside of the body is {n(t.zones.interior)} mm long.
 
-- **Drawbar box.** A sealed 2 mm aluminium box, {n(P.dbx_w)} mm wide and {n(P.dbx_h)} mm high, sits on the drawbar
-  members ahead of the spare wheel. It holds the Honda EU22i generator and the petrol and diesel jerry cans, so no
-  fuel rides inside the body. The jockey wheel clamps to the drawbar ahead of it at X 1,000 mm and swings up for
-  travel to lie along the drawbar, below the bike box's sweep.
-- **Bed zone.** A queen bed lies across the front, from side to side, on a honeycomb base. The kitchen slides out under
-  it on the kerb side, under the awning. The air-conditioner sits under the middle of the bed, and a column of
-  shelves stands at the bed's road-side end.
-- **Living area.** The entry door is in the kerb-side wall. The desk with two seats is on the road side opposite.
-  The fridge and the freezer stand on the kerb side behind the door.
-- **Rear zone.** The wet bathroom is in the road-side rear corner. The washer, the diesel heater and the Victron
-  board stand in front of it, and a tall cupboard fills the kerb-side rear corner.
-- **Under the floor.** Two water tanks sit between the rails over the axles, so the towball barely changes as the
-  water is used. The batteries sit in a sealed box near the back, and the heater's 15 L diesel tank sits in its own
-  bay under the bed.
+- **Drawbar box.** A sealed, vented 2 mm aluminium box, {n(P.dbx_w)} mm wide and {n(P.dbx_h)} mm high, sits on the drawbar
+  members. It holds the two Honda EU22i generators and the petrol and diesel jerry cans, so no fuel rides inside the
+  body. The spare wheel stands on the body's front wall above it, high enough to lift off over the box.
+- **Bed and desk.** The lift bed spans the front from side to side on rails on both side walls. By day it rises to
+  1,600 mm under its platform, over the desk and the chair space, and at night it comes down over the desk (BED-01).
+  The rest of its footprint stays empty (H1, H16).
+- **Living area.** The kitchen tower and bench run along the road side: the Combi, the fridge and the oven in the
+  tower, the hob over the freezer and the sink in the bench. On the kerb side the battery plinth stands 125 mm off the
+  wall with the washer and the dryer on it, and the entry door is in the kerb wall.
+- **Partition and wet room.** The partition carries the 48 V board on its kerb end and the inverter and the split's
+  indoor unit on its road end. The wet room spans the rear: the DauerShower over its floor well on the road side, the
+  cassette toilet against the kerb wall, and its own door in the rear wall, hinged on its kerb edge. The split's
+  outdoor unit sits high on the rear wall's road half.
+- **Under the floor.** The fresh tanks sit between the rails in the suspension bays and the grey tank in the rear
+  bay, so the towball changes little as the water is used.
 
 The fixed roof carries the solar panels. With no raising roof, the inside is {n(P.interior_h)} mm high. The floor
 height comes from the running gear in report 06 and the ute's tyre from report 16. The tyre is {n(ch.tyre_d)} mm
@@ -62,21 +64,20 @@ across, the hubs sit at {n(ch.hub_z)} mm, and the XT suspension rises 60 mm at f
 above the tyre, the floor underside is at {n(ch.floor_underside_z)} mm and the floor surface at {n(ch.floor_z)} mm. The
 travel height is {n(ch.travel_height)} mm.
 
-Layout 2, with the queen bed along the trailer at the back so each sleeper gets out on their own side, is the fallback. It is 830 mm longer and 137 kg heavier (estimate), and
-`TRAILER.md` lists it under the open questions.
+The <a href={withBase('/decisions/')}>decision record</a> gives the reasons for the layout's main choices.
 
 ## Appliances and equipment
 
-Research report 13 chose the products. Three owner choices are defaults until the owner answers, and each can be
-reversed in the data: a washer with no dryer, no LPG, and two batteries.
+Research reports 13 and 19 to 22 chose the products for the home trailer. Every line of the mass schedule below names
+its product and source.
 
-- Bathroom: Thetford C223-CS cassette toilet and a DauerShower 2.0 recirculating shower, imported.
-- Washer: Camec 3.5 kg top loader. Fridge: Dometic NRX 130C, 126 L. Freezer: Dometic CFX3 55IM, 53 L.
-- Heater and hot water: Truma Combi D 6 on diesel. Air-conditioner: Truma Saphir Comfort RC under the bed.
-- Kitchen: Dometic CVI1525 induction hob and CVS1350G sink on Accuride 9301 slides.
-- Power at 24 V: a Victron MultiPlus-II 24/5000, two SmartSolar MPPT 150/45, an Orion-Tr charger from the ute and two Lithium NG 25.6 V 200 Ah batteries.
+- Wet room: Thetford C223-CS cassette toilet and a DauerShower 2.0 recirculating shower over a sealed floor well.
+- Laundry: Camec Compact RV II 3.5 kg washer and a Haier 7 kg heat pump dryer on the battery plinth.
+- Kitchen: Dometic NRX 130C fridge, Dometic CFX3 55IM freezer, Dometic CVI1525 induction hob, CVS1350G sink and a Camec 28 L convection microwave.
+- Heat and hot water: Truma Combi D 6 E on diesel. Cooling: a Mitsubishi Electric 2.5 kW split system.
+- Power at 48 V: five Victron Lithium NG 51.2 V 100 Ah batteries (25.6 kWh), a MultiPlus-II 48/6k5, two SmartSolar MPPT 150/35, and Orion-Tr converters for the 12 V and 24 V buses.
 - Solar: four Sunman eArc 430 W glass-free panels bonded to the fixed roof.
-- Generator: Honda EU22i, in the drawbar box.
+- Generators: two Honda EU22i in parallel, in the drawbar box.
 
 ## Wheels, tyres and spares
 
@@ -90,8 +91,9 @@ The trailer and the ute share one wheel and tyre, from report 16, so each spare 
 
 ## Water and the towball
 
-All 400 L of water ride in the trailer's tanks. There is no tank in the ute and no ballast. The axle group centre is
-{n(P.axle_x)} mm behind the ball. The build solved it for {n(t.target_kg)} kg on the ball fully loaded: {t.target_why}.
+The trailer tows with at most {n(P.water_travel_l)} L of fresh and grey water aboard and fills its tanks at camp
+(decision H13). There is no tank in the ute and no ballast. The axle group centre is
+{n(P.axle_x)} mm behind the ball. The build solved it: {t.target_why}.
 
 ## Load cases
 
@@ -107,8 +109,8 @@ figure.
 The ute is the {tv.name}. Its limits come from the ute model on the <a href={withBase('/ute-garage/')}>Bike box</a> page. The trailer is checked against
 them here:
 
-- Towball: at most {n(tv.limits.towball_plan_kg)} kg (the decision log's cap, inside the towbar's {n(tv.limits.towball_rating_kg)} kg). The worst case with growth carries {n(chk('MAS-03').measured)} kg (MAS-03).
-- GCM: the larger of two sums against Toyota's {n(tv.limits.gcm_kg)} kg. The plan's sum is the ute at its {n(tv.limits.weighed_max_kg)} kg limit plus the {n(t.caps.plated)} kg plate less the 250 kg the ball carries. The model's sum is the ute's {tv.gcm_case} case with growth ({n(tv.ute_kg_growth)} kg) plus the heaviest trailer case with growth. GCM-01 measures {n(chk('GCM-01').measured)} kg.
+- Towball: decision H17 sets the design range. Every case keeps at least {chk('MAS-05').window.pct_min.toFixed(1)} % of its mass on the ball (MAS-12), and the heaviest towball with growth stays at or under {n(chk('MAS-05').window.ball_max.kg)} kg (MAS-13), inside the towbar's {n(tv.limits.towball_rating_kg)} kg. At that ball the ute's rear axle carries {n(chk('MAS-03').measured)} kg of the Elite kit's {n(tv.limits.rear_axle_kg)} kg (MAS-03). MAS-14 reports the Platinum kit's {n(tv.limits.platinum_rear_axle_kg)} kg rear axle for cut CUT7.
+- GCM: the larger of two sums against Lovells' {n(tv.limits.gcm_kg)} kg revision. The plan's sum is the ute at its {n(tv.limits.weighed_max_kg)} kg limit plus the {n(t.caps.plated)} kg plate less the lightest towball, {n(chk('GCM-01').gcm.plan)} kg. The model's sum is the ute's {tv.gcm_case} case with growth ({n(tv.ute_kg_growth)} kg) plus the heaviest trailer case with growth, {n(chk('GCM-01').gcm.model)} kg. GCM-01 measures {n(chk('GCM-01').measured)} kg.
 - Coupling height: the ute's ball is {n(ch.coupling_z)} mm high laden (UTE-01), and the drawbar drop is solved from it.
 - Jack-knife: the ute's bike box overhangs the ball by {n(ch.sweep.body_overhang_mm)} mm. At 90 degrees it sweeps a radius of {ch.sweep.radius_mm.toLocaleString("en-AU", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} mm from the ball. JK-01 keeps the trailer's front parts at least 100 mm outside that sweep, and JK-02 keeps the parts inside it at least 50 mm below the box's underside at Z {n(ch.sweep.underside_z)}.
 

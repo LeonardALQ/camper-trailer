@@ -252,7 +252,8 @@ class Chassis:
         y_in = V["rail_c"] - rs["rail"].b / 2
         for k, st in enumerate(self.stations, 1):
             role = self.role_of(st)
-            sec = rs[role]
+            own = self.data.get("station_sections", {}).get(st["id"])   # a station that needs more than its role's section
+            sec = self.sections[own] if own else rs[role]
             xc = self.station_x(st)
             z = V["rail_underside_z"] + sec.d / 2 if role in ("cm_xt", "cm_end") else V["raiser_top_z"] - sec.d / 2
             name = f"Crossmember, {st['id']}" if not st.get("generated") else f"Crossmember at X {st['x']:.0f}"

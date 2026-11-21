@@ -1,8 +1,10 @@
-# Whole-trailer load cases (TRAILER.md, report 18 section 3.2). The bikes ride in the ute's box (UTE-GARAGE.md), so
-# no case carries a bike or ballast. `water_l` is an expression over the trailer parameters. `load` lists the payload
-# tags carried (assemblies/trailer.yaml): fuel (the heater's diesel and the jerry cans in the drawbar box) and gear
-# (food, clothes and other gear). All 400 L of water ride in the trailer. Every case here is one the trailer may be
-# towed in, so every one is a travel case for the towball checks.
+# Whole-trailer load cases (TRAILER.md). The bikes ride in the ute's box (UTE-GARAGE.md), so no case carries a bike or
+# ballast. `water_l` is the fresh water in the tanks, an expression over the trailer parameters. `load` lists the
+# payload tags carried (assemblies/trailer.yaml): fuel (the heater's diesel and the jerry cans in the drawbar box),
+# gear (food, clothes and other gear, 150 kg) and grey (130 L in the grey tank). H13: at most 350 L of fresh and grey
+# water ride while towing, and the tanks are filled to their 420 L at camp. The grey tank is empty for travel except
+# in TC7 and TC8, which must still pass every limit. Every case here is one the trailer may be towed in, so every one
+# is a travel case for the towball checks.
 trailer_cases:
   - id: TC1
     name: Tare as built
@@ -11,8 +13,8 @@ trailer_cases:
     load: []
   - id: TC2
     name: Travel fully loaded
-    aboard: 400 L of water, fuel and gear
-    water_l: water_full_l
+    aboard: 350 L of fresh water (the H13 travel limit), fuel and gear
+    water_l: water_travel_l
     load: [fuel, gear]
     towball_target: true
   - id: TC3
@@ -21,9 +23,9 @@ trailer_cases:
     water_l: water_highway_l
     load: [fuel, gear]
   - id: TC4
-    name: Water full, no gear
-    aboard: 400 L of water and fuel, no gear
-    water_l: water_full_l
+    name: Water at the travel limit, no gear
+    aboard: 350 L of fresh water and fuel, no gear
+    water_l: water_travel_l
     load: [fuel]
   - id: TC5
     name: Tanks empty, gear aboard
@@ -35,17 +37,34 @@ trailer_cases:
     aboard: No water, fuel only
     water_l: 0
     load: [fuel]
+  - id: TC7
+    name: Grey tank full, at the travel limit
+    aboard: 130 L of grey water and 220 L of fresh water (350 L in all, H13), fuel and gear
+    water_l: water_travel_l - grey_full_l
+    load: [fuel, gear, grey]
+  - id: TC8
+    name: Grey tank full, fresh tanks empty
+    aboard: 130 L of grey water, fuel and gear
+    water_l: 0
+    load: [fuel, gear, grey]
 
-# The axle solve puts this much on the ball fully loaded (TC2) on base weights: 220 kg, the middle of the decision
-# log's 200 to 250 kg band, so the growth allowance can add up to about 30 kg before MAS-03's 250 kg cap.
-towball_target_kg: 220
+# The axle solve's design targets (decision H17, cad/trailer.py). The axle sits in the middle of the window between the
+# position where the lightest case has 8.0 % of its mass on the ball (both bases) and the one where the heaviest case
+# has 320 kg on it with growth. The hard limits sit outside: 7.5 % (MAS-04, H2) and 350 kg or the ute's rear axle
+# (MAS-03, H14).
+axle_window:
+  towball_pct_min: 8.0
+  towball_max_kg: 320
+
+# The towball used only for the supplier's 120 % note (cad/inputs.py): the 7.5 % floor at the 3,500 kg plate (H2).
+towball_target_kg: 262.5
 
 # Registration (report 02 section 2.1). NSW, with Victoria as the fallback. The NSW examiner caps GTM at the
 # lowest of the tyre, coupling, chain and brake ratings and ATM at the lower of the coupling and chain ratings.
 registration:
   state: NSW
   fallback: Victoria
-  plated_atm_kg: {v: 3100, src: "Decision log 12:10 UTC: it holds the heaviest case with growth, and the GCM stays inside 6,900 kg with the ute at 3,850 kg"}
+  plated_atm_kg: {v: 3500, src: "Decision H2 (20 Nov 2026): the ute's 3,500 kg towing rating and the DO35 and NSW caps. Target fully loaded with growth at most 3,400 kg (MAS-10)"}
   ratings:
     tyre_kg: {v: 1550, src: "LT265/75R16 123/120 load range E, load index 123, per tyre, four tyres (report 16, the ute's tyre)"}
     coupling_kg: {v: 3500, src: "Cruisemaster DO35 V3Plus, ADR rated 3,500 kg (report 08)"}
@@ -56,7 +75,7 @@ registration:
 # in data/ute/ute.yaml and its masses and the bike box's sweep come from the ute model (build/ute/ute.json, cad/ute.py
 # and cad/ute_garage.py). The Cayenne of report 07 is no longer the tow vehicle (reports 14 to 16 replace 07 and 10).
 tow_vehicle:
-  name: Toyota LandCruiser VDJ79 GXL single cab V8, Lovells 4,200 kg GVM kit, with the bike box
+  name: Toyota LandCruiser VDJ79 GXL single cab V8, Lovells 4,495 kg Elite GVM kit (decision H17), with the bike box
   data: data/ute/ute.yaml
   model: build/ute/ute.json
   gcm_case: UC2          # the ute with the bikes aboard and no towball, added to the trailer's own mass

@@ -173,7 +173,7 @@ def ct202(prj, model, bom, checks, reg, dwg):
     S.hatch_rect(sh, 40, fy0 - (2 + strip) / k, 75 + 35 / k + 2 / k, fy0 - 2 / k, 0.8)
     sh.rect(40, fy0 - (2 + strip + 30) / k, 75 + 35 / k + 2 / k, fy0 - (2 + strip) / k, "medium")
     for i, t in enumerate(("FLOOR JOINER, 2 mm ALUMINIUM, BONDED MS POLYMER BOTH LEGS", f"{strip:.1f} mm EPDM-FACED HDPE BEARER STRIP (CH-S01)",
-                           "OUTRIGGER RHS 125x50x3 TIP, M12 MOUNT INBOARD (CT-301)", "WALL 35 mm GRP/XPS, FLOOR 30 mm GRP/H80")):
+                           "OUTRIGGER RHS 127x51x3.5 TIP, M12 MOUNT INBOARD (CT-301)", "WALL 35 mm GRP/XPS, FLOOR 30 mm GRP/H80")):
         sh.text(22, 205 - 3 * i, t, 1.5)
     # ---- B: corner joiner, plan, 1:2
     cx, top = 150.0, 278.0
@@ -275,7 +275,7 @@ def ct203(prj, model, bom, checks, reg, dwg):
             sh.line(p[0] - 0.9, p[1] - 0.9, p[0] + 0.9, p[1] + 0.9, "medium")
             sh.line(p[0] - 0.9, p[1] + 0.9, p[0] + 0.9, p[1] - 0.9, "medium")
     # furniture footprints whose fixings go into the floor through inserts
-    for iid in ("LB-04", "LA-05", "LA-06", "LA-01", "LA-02", "LA-03", "LA-08B", "LA-09"):
+    for iid in ("LA-09", "LA-11T", "LA-11B", "EL-02", "LA-14F", "WR-01", "WR-06", "WR-07"):
         bb = lay.find(iid).box
         p0, p1 = P(bb[0], bb[1]), P(bb[3], bb[4])
         sh.rect(p0[0], p0[1], p1[0], p1[1], "thin")
@@ -339,9 +339,9 @@ def ct301(prj, model, bom, checks, reg, dwg):
     kk, cx, top = 3.0, 70.0, 188.0
     _dt(sh, cx, top, "A: BODY MOUNT, SECTION ACROSS THE RAISER", kk)
     zb = 112.0
-    rh = 125
-    rhs(sh, cx, zb + rh / 2 / kk, 50, rh, 3, 6, kk)                                  # raiser RHS 125 x 50 x 3
-    sh.rect(cx - 22 / kk, zb + (rh - 3 - 10) / kk, cx + 22 / kk, zb + (rh - 3) / kk, "shade")   # nut plate
+    rh = 127
+    rhs(sh, cx, zb + rh / 2 / kk, 51, rh, 3.5, 8.75, kk)                             # raiser RHS 127 x 51 x 3.5
+    sh.rect(cx - 22 / kk, zb + (rh - 3.5 - 10) / kk, cx + 22 / kk, zb + (rh - 3.5) / kk, "shade")   # nut plate
     st = V["floor_underside_z"] - (V["rail_top_z"] + rh)
     sh.rect(cx - 25 / kk, zb + rh / kk, cx + 25 / kk, zb + (rh + st) / kk, "medium")
     S.hatch_rect(sh, cx - 25 / kk, zb + rh / kk, cx + 25 / kk, zb + (rh + st) / kk, 0.8)

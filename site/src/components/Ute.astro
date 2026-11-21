@@ -1,6 +1,7 @@
 ---
 // Ute and bike garage tables, from build/ute/ute.json (cad/ute.py and cad/ute_garage.py).
 import u from '../data/generated/ute.json';
+import t from '../data/generated/trailer.json';
 import { withBase } from '../lib/url';
 
 interface Props {
@@ -14,6 +15,7 @@ const n = (v: number | null | undefined, d = 0) =>
 const statusClass = (x: any) => (x.ok ? 'status-pass' : x.severity === 'fail' ? 'status-fail' : 'status-report');
 const rowClass = (x: any) => (x.ok ? '' : x.severity === 'fail' ? 'row-fail' : 'row-report');
 const cs = Object.fromEntries(r.cases.map((c: any) => [c.id, c]));
+const gcm: any = (t as any).checks.find((c: any) => c.id === 'GCM-01');
 const allChecks = [...r.checks, ...g.checks];
 const fails = allChecks.filter((x: any) => x.severity === 'fail' && !x.ok);
 const d = g.dims;
@@ -37,10 +39,12 @@ const drawings = ['CT-701', 'CT-702', 'CT-703', 'CT-704'];
 {kind === 'summary' && (
   <p>
     Towing with both bikes aboard (case UC3), the ute weighs {n(cs.UC3.nominal.mass_kg)} kg, {n(cs.UC3.growth.mass_kg)} kg with the
-    growth allowance. Its rear axle carries {n(cs.UC3.growth.rear_kg)} kg of its {n(r.limits.rear_axle_kg)} kg rating. The combination is{' '}
-    {n(r.limits.weighed_max_kg + r.params.trailer_atm - r.limits.towball_plan_kg)} kg against the {n(r.limits.gcm_kg)} kg GCM, with the ute at its{' '}
-    {n(r.limits.weighed_max_kg)} kg limit and the trailer at its {n(r.params.trailer_atm)} kg plate ({n(cs.UC3.growth.mass_kg + r.params.trailer_atm - cs.UC3.growth.towball_kg)} kg
-    on the model with growth). The box is {n(d.outside_l_body)} x {n(d.outside_w)} mm outside and weighs {n(g.box_kg, 1)} kg
+    growth allowance. Its rear axle carries {n(cs.UC3.growth.rear_kg)} kg of its {n(r.limits.rear_axle_kg)} kg rating, with the trailer's
+    heaviest towball, {n(r.params.towball_design, 1)} kg, on the ball. The combination is{' '}
+    {n(gcm.gcm.plan)} kg against the {n(r.limits.gcm_kg)} kg GCM, with the ute at its{' '}
+    {n(r.limits.weighed_max_kg)} kg limit and the trailer at its {n(r.params.trailer_atm)} kg plate less its lightest towball (the trailer's GCM-01), and{' '}
+    {n(cs.UC3.growth.mass_kg + r.params.trailer_atm - cs.UC3.growth.towball_kg)} kg
+    on the model with growth (UTE-06). The box is {n(d.outside_l_body)} x {n(d.outside_w)} mm outside and weighs {n(g.box_kg, 1)} kg
     empty ({n(g.box_kg_growth, 1)} kg with growth) against report 17's 440 kg. {fails.length === 0
       ? 'Every fail check passes.' : `${fails.length} checks fail: ${fails.map((x: any) => x.id).join(', ')}.`}
   </p>

@@ -3,23 +3,26 @@
 # centreline, positive to the road (right) side. Z up from the ground with the trailer level at design ride height.
 # Units are mm and kg.
 #
-# Revision H, 20 Nov 2026: the trailer for the LandCruiser 79 (report 18, layout 1). The bikes ride in the ute's
-# bike box (UTE-GARAGE.md), so the garage and bed module is gone. The queen bed lies across the front of a 4,420 mm
-# body with the kitchen slide-out, the air-conditioner and storage under it. The roof is fixed, 1,950 mm inside. The
-# generator and the jerry cans ride in a sealed drawbar box behind the stone guard (decision log 12:45). Inside the
+# Revision J, 21 Nov 2026: the home trailer (layout study home/layout-home.md, decisions H1 to H17). The body stays
+# 4,420 x 2,400 mm with a fixed roof 2,000 mm inside (H1a, H12) and rounded front edges. From the front: the lift bed
+# over the desk (H1), the kitchen on the road side and the battery plinth with the washer and dryer on the kerb side,
+# the partition with the 48 V board and the split's indoor unit, and the wet room across the rear with its own door
+# (H4). The batteries moved inside (research report 20), the grey tank took the rear bay (report 21), and two Honda
+# EU22i ride in the drawbar box (report 20). Revision H was the LandCruiser 79 layout (report 18, layout 1). Inside the
 # body, u is the distance from the front wall's inner face (X = in_x0 + u).
 #
-# Any number may be an expression over `params`. axle_x is set by the axle solve (cad/trailer.py), which never changes
-# a limit or a block size. An item's optional `material` says what it is made of. The 3D viewer on the site shows it on
-# the part's card (cad/partsmeta.py), and the chassis members and plates take theirs from the chassis data.
+# Any number may be an expression over `params`. axle_x is set by the axle solve (cad/trailer.py): the middle of the
+# window in which every case keeps at least 8.0 % of its mass on the ball (MAS-12) and the heaviest towball with growth
+# stays at or under 320 kg (MAS-13), decision H17's design targets in data/load_cases.yaml. The hard limits sit outside
+# it: 7.5 % (MAS-04) and the ute's rear axle within the Elite kit's 2,850 kg and the 350 kg towbar (MAS-03, H14). The
+# solve never changes a limit or a block size. An item's optional `material` says what it is made of. The 3D
+# viewer on the site shows it on the part's card (cad/partsmeta.py), and the chassis members and plates take theirs
+# from the chassis data.
 id: ASM-TR
 name: Whole trailer, block layout
-revision: H
+revision: J
 
 params:
-  # ---------------------------------------------------------------- owner options (report 13), defaults until the owner answers
-  opt_dryer: 0               # 0: Camec 3.5 kg washer only (report 13 default). 1: Whirlpool WWPB8502IW washer-dryer, 66 kg
-  opt_batteries: 2           # Victron Lithium NG 25.6 V 200 Ah modules of 5.12 kWh: 2 gives 10.24 kWh (report 13 default), 3 gives 15.36 kWh
   # ---------------------------------------------------------------- body (report 18 section 4.1)
   body_length: 4420
   body_width: 2400
@@ -27,9 +30,11 @@ params:
   wall_t: 35                 # side walls, report 12's 35 mm panel (2,330 mm inside)
   end_wall_t: 35             # front and rear walls
   half_in: half_bw - wall_t
-  interior_h: 1950           # fixed roof, standing room (decision log 12:10, report 18 section 2)
+  interior_h: 2000           # fixed roof, 2,000 mm inside for the lift bed's day position (H1a, H12)
   floor_t: 30                # report 12's floor panel
   roof_t: 40                 # report 12's 40 mm roof panel, bonded to the walls
+  roof_front_r: 150          # rounded front edges (H12, report 25 option A+): roof to front wall
+  front_vert_r: 250          # and both front vertical edges, in bonded GRP corner pieces
   # ---------------------------------------------------------------- running gear (reports 06 and 16, report 18 section 3.4)
   tyre_d: 805                # LT265/75R16 123/120, the ute's tyre (report 16, Yokohama G015)
   tyre_w: 272                # tyre envelope width (estimate, report 18 open question 9)
@@ -64,9 +69,6 @@ params:
   xt_rear_shock_front: 811
   front_hub_dx: -axle_spacing / 2
   rear_hub_dx: axle_spacing / 2
-  battery_l: max(600, 130 + 235 * opt_batteries)   # sealed battery box, the modules on their sides 235 mm each along X (report 13 section 2)
-  battery_from_rear: 400     # battery centre from the rear wall's inner face (owner's brief)
-  battery_x0: in_x1 - battery_from_rear - battery_l / 2
   # ---------------------------------------------------------------- coupling and drawbar (report 08, report 18 sections 3.5 and 3.6)
   coupling_z: 440            # coupling point at the ute's laden ball height, +/- 20 (measurements.yaml UTE-01 sets it)
   drawbar_length: 1820       # ball centre to the body front, as designed (report 18 section 3.6)
@@ -76,40 +78,60 @@ params:
   db_tail: 1000              # drawbar members run on under the rails this far behind the body front
   sg_l: 570                  # stone guard length along X
   spare_bracket_d: 60        # spare wheel bracket depth off the front wall (estimate)
-  spare_z: floor_z + 400     # spare wheel centre height on the front wall (layout choice, clear of the drawbar)
-  # the sealed drawbar box for the generator and the jerry cans (decision log 12:45)
+  spare_z: floor_z + 815     # spare wheel centre on the front wall, high enough that the tyre lifts off over the drawbar box
+  # the sealed drawbar box for two Honda EU22i, the jerry cans and a shelf (decision log 12:45, report 20, H16)
   dbx_x0: 1150               # behind the jockey clamp at X 1,000 and the stone guard, outside the bike box's sweep (JK-01)
   dbx_l: 320                 # to X 1,470, 18 mm ahead of the spare tyre
-  dbx_w: 960
-  dbx_h: 520
-  dbx_t: 2                   # 2 mm aluminium walls and lid
+  dbx_w: 1480                # two EU22i side by side (2 x 509 mm) and the jerry cans (report 20 open point 10)
+  dbx_h: 720                 # the generators and cans below, a 0.1 m3 shelf above (H16)
+  dbx_t: 1.6                 # 1.6 mm aluminium walls and lid (saving 1e, H13)
   dbx_z0: rail_underside_z   # on brackets across the drawbar members' tops
   # ---------------------------------------------------------------- the body positions
   body_x0: drawbar_length
   body_x1: drawbar_length + body_length
   in_x0: body_x0 + end_wall_t
   in_x1: body_x1 - end_wall_t
-  # ---------------------------------------------------------------- the zones inside the body (report 18 section 1.2)
-  bed_u1: 1650               # bed zone u 0 to 1,650
-  living_u1: 3350            # living zone to u 3,350, the rear zone to the rear wall
+  # ---------------------------------------------------------------- the zones inside the body (home/layout-home.md section 2)
+  bed_u1: 1590               # bed and desk zone u 0 to 1,590: the lift bed over the desk, nothing else under it (H1)
+  living_u1: 3330            # living zone to u 3,330: the kitchen on the road side, the plinth with the laundry on the kerb side
+  part_t: 20                 # partition between the living zone and the wet room
   bed_x1: in_x0 + bed_u1
-  rear_x0: in_x0 + living_u1
-  deck_h: 537                # clear height under the bed deck
-  deck_t: 20
-  deck_z: floor_z + deck_h   # bed deck underside
-  mattress_t: 150
-  froli_h: 43
-  mattress_z: deck_z + deck_t + froli_h       # mattress underside, its top at floor + 750
-  lz_kitchen_x: body_x0 + 150   # kitchen slide-out opening 150 mm from the front corner (report 12 section 5)
-  lz_kitchen_l: 1500
-  lz_door_x: 3775            # entry door, kerb side, 300 mm of full wall behind the kitchen opening's 625 mm cut-out (BDY-18)
-  lz_door_w: 622             # Aussie Traveller DC door (report 12 section 7)
-  lz_door_h: 1623
+  rear_x0: in_x0 + living_u1 # partition front face. The wet room runs from wet_x0 to the rear wall (H4)
+  wet_x0: rear_x0 + part_t
+  # the lift bed (H1, research report 21 section 1): a Lippert HappiJac 42 in kit, its rails on both side walls
+  bed_state: 0               # 0: day and travel position (bed up), 1: night position. The cases and the checks use 0
+  bed_day_h: 1600            # platform underside above the floor by day and in travel (H1: at least 1,600 mm)
+  bed_night_h: 805           # platform underside at night: the 730 mm desk top plus 75 mm (report 21 section 2)
+  deck_t: 40                 # platform, 40 mm aluminium honeycomb
+  underlay_t: 19             # HyperVent underlay
+  mattress_t: 180            # Pure Sleep Orion Caravan Deluxe, queen, 180 mm
+  deck_z: floor_z + bed_day_h + bed_state * (bed_night_h - bed_day_h)   # platform underside
+  mattress_z: deck_z + deck_t + underlay_t                               # mattress underside
+  bed_rail_u: 262            # front pair of HappiJac rails from the front wall's inner face, the rear pair 1,067 mm behind
+  desk_top_h: 730            # desk top above the floor (H1)
+  # the kitchen on the road side and the battery plinth on the kerb side (reports 20 and 21)
+  kit_d: 600                 # kitchen depth from the road-side wall
+  tower_l: 585               # tall unit: Combi D 6 E, fridge, oven, RESPA-CF2 and the top-up fan
+  bench_top_h: 900           # bench top above the floor
+  lz_door_x: 3462            # entry door, kerb side, 300 mm of full wall behind W1 (BDY-18)
+  lz_door_w: 622             # Aussie Traveller DC door with pleated blind, 1,750 x 622 (report 19 section 8)
+  lz_door_h: 1750
+  plinth_x0: lz_door_x + lz_door_w + 21   # battery plinth, kerb side, behind the entry door's landing
+  plinth_l: 1075             # battery box 900 mm and a 175 mm slot for the fuses or a sixth module (report 20 open point 3)
+  plinth_d: 700              # battery box 700 mm across
+  plinth_y0: -half_in + 125  # 125 mm off the kerb wall, so the centre of gravity comes inboard (MAS-11). The aisle stays 905 mm
+  bat_box_h: 320             # battery box height outside (report 20)
+  plinth_h: bat_box_h + 40   # the 40 mm machine base for the washer and the dryer on top
+  rear_door_y0: -300         # rear door into the wet room, hinged on its kerb-side edge, away from the outdoor unit on the road half
+  rear_door_w: 625           # its cut-out, 625 x 1,753 mm
+  rear_door_h: 1753
   # ---------------------------------------------------------------- axle (solved)
-  axle_x: 4247               # axle group centre from the ball. The build solves it for the towball target
-  # ---------------------------------------------------------------- water
-  water_full_l: 400          # owner's wanted capacity, all of it in the trailer now
+  axle_x: 4381               # axle group centre from the ball. The build solves it: the middle of the towball window (H17)
+  # ---------------------------------------------------------------- water (H13)
+  water_full_l: 420          # the fresh tanks' net capacity, filled at camp with the transfer pump, CR45 filter and chlorine (H13)
+  water_travel_l: 350        # most fresh and grey water aboard while towing (H13). 233 L if the 7,400 kg GCM revision is refused (H17)
   water_highway_l: 50        # owner's highway figure
+  grey_full_l: 130           # grey tank's net capacity (report 21 section 10)
   tank_z0: rail_underside_z
   tank_h: floor_underside_z - 10 - rail_underside_z
   tank_w: 2 * rail_in - 100  # 50 mm each side for the airbag and shock mounts (estimate until the kit drawing)
@@ -117,6 +139,10 @@ params:
   tank_f_l: xt_centre_front - 10 - (xt_front_hinge_rear + 10)          # 830 mm
   tank_r_x0: axle_x + xt_centre_front + xm_w + 10
   tank_r_l: xt_rear_shock_front - 10 - (xt_centre_front + xm_w + 10)   # 760 mm
+  grey_x0: axle_x + xt_rear_shock_front + xm_w + 10   # grey tank in the rear bay, behind the XT rear shock crossmember
+  grey_l: 890                # to 50 mm ahead of the rear crossmember at the solved axle
+  grey_z0: rail_underside_z - 40   # 40 mm below the rails, so the grey-bay floor crossmember crosses its middle above it
+  grey_h: 190                # 878 x 963 x 178 mm inside, about 140 L net with its baffle (report 21 asks 130 L)
   # ---------------------------------------------------------------- equipment (report 13)
   diesel_l: 15               # heater fuel tank (report 13 open question 6)
   diesel_tank_l: 440         # 440 x 400 x 100 mm HDPE tank, 17.6 L gross (estimate)
@@ -137,9 +163,10 @@ wheel:
   src: "Report 16 section 4 and the decision log. One spare on the trailer and one under the ute's tray, each fitting both"
 
 # Crossmember stations that the layout fixes (front face X). The build adds intermediate stations so that no gap
-# between two of them exceeds xm_max_pitch. `keep_out` gaps are bays for tanks and the battery, where no
-# intermediate station goes. The chassis design (data/chassis/chassis.yaml, CHASSIS.md) gives each station its
-# crossmember section and an outrigger each side, and adds the rails, raisers, drawbar and fittings.
+# between two of them exceeds xm_max_pitch. `keep_out` gaps are bays for tanks, where no intermediate station goes.
+# The grey-bay floor crossmember crosses the middle of the grey tank, above it, so the floor keeps an outrigger pair
+# there. The chassis design (data/chassis/chassis.yaml, CHASSIS.md) gives each station its crossmember section and an
+# outrigger each side, and adds the rails, raisers, drawbar and fittings.
 crossmembers:
   fixed:
     - {id: front, x: body_x0}
@@ -147,17 +174,17 @@ crossmembers:
     - {id: XT front hinge, x: axle_x + xt_front_hinge_rear - xm_w}
     - {id: XT centre, x: axle_x + xt_centre_front}
     - {id: XT rear shock, x: axle_x + xt_rear_shock_front}
-    - {id: battery-bay, x: battery_x0 - 10 - xm_w}
+    - {id: grey-bay, x: grey_x0 + grey_l / 2 - xm_w / 2}
     - {id: rear, x: body_x1 - xm_w}
-  keep_out: [[diesel bay, XT front hinge], [XT front hinge, XT centre], [XT centre, XT rear shock], [battery-bay, rear]]
+  keep_out: [[diesel bay, XT front hinge], [XT front hinge, XT centre], [XT centre, XT rear shock], [XT rear shock, grey-bay], [grey-bay, rear]]
 
 # Zones for the fit checks: box [x0, y0, z0, dx, dy, dz]. Items name their zone. A `keep_clear` item is floor
 # space that must stay free (door landings, walkways). Keep-clear spaces may overlap one another, but no solid
-# item may enter one.
+# item may enter one. The underfloor zone reaches 50 mm below the rails for the grey tank and its guard.
 zones:
   inside: {name: Inside the body, box: [in_x0, -half_in, floor_z, in_x1 - in_x0, 2 * half_in, interior_h]}
   drawbar_box: {name: Drawbar box (inside), box: [dbx_x0 + dbx_t, -dbx_w / 2 + dbx_t, dbx_z0 + dbx_t, dbx_l - 2 * dbx_t, dbx_w - 2 * dbx_t, dbx_h - 2 * dbx_t]}
-  underfloor: {name: Under the floor between the rails, box: [body_x0, -rail_in, rail_underside_z - 10, body_length, 2 * rail_in, floor_underside_z - rail_underside_z + 10]}
+  underfloor: {name: Under the floor between the rails, box: [body_x0, -rail_in, rail_underside_z - 50, body_length, 2 * rail_in, floor_underside_z - rail_underside_z + 50]}
 
 items:
   # ================================================================ running gear (reports 06 and 16)
@@ -194,20 +221,21 @@ items:
     box: [axle_x + xt_centre_front, -100, rail_underside_z - 45, xm_w, 200, 45]
     mass: {basis: declared, total_kg: 4.2, maturity: estimate, source: "Report 06: TSC 2 to 3 kg and nuts 1.2 kg (estimates)"}
   - id: RG-04
-    name: XT Air supply, 12 V compressor, 11 litre tank, gauges, pressure switch, height valves and air lines
-    material: "Compressor, steel air tank (est.) and nylon air lines (est.)"
-    note: On a shelf over the diesel heater, against the bathroom's front wall. The lines run along the rails to the four bags.
+    name: XT Air supply, Cruisemaster Level 3 manual kit, 12 V compressor, 11 litre tank, gauges, pressure switch and air lines, in a sealed box under the floor's front bay
+    material: "Compressor, steel air tank (est.) and nylon air lines (est.), in a sealed 1.6 mm aluminium box"
+    note: "The Level 3 kit has no height valves, so the bags are set by hand from the panel (research report 22 finding 9). The box hangs between the rails ahead of the first floor crossmember, reached from below, out of the cabin. The lines run along the rails to the four bags."
     system: running_gear
-    zone: inside
-    box: [rear_x0 - 425, 282, floor_z + 350, 400, 300, 300]
-    mass: {basis: declared, total_kg: 10, maturity: estimate, source: "Report 06 section 2: 8 to 12 kg for the compressor, tank, panel and lines (estimate, not published)"}
+    zone: underfloor
+    box: [body_x0 + 60, -200, rail_underside_z + 37.5, 350, 400, 220]
+    parts:
+      - {item: "Compressor, 11 L tank, gauges, pressure switch, panel and air lines", kg: 10.0, basis: estimate, source: "Report 06 section 2: 8 to 12 kg (estimate, not published)"}
+      - {item: "Sealed 1.6 mm aluminium box with an access panel and brackets", kg: 3.0, basis: estimate, source: "0.6 m2 at 4.32 kg/m2 plus brackets (est.)"}
   - id: RG-05
     name: Spare Firestone style 26 airbag with fittings, tube and Loctite 567
     material: "Rubber airbag with its fittings"
-    note: A punctured bag cannot be repaired (Cruisemaster CIS-006), so the spare travels with the trailer. It sits on the air supply.
+    note: A punctured bag cannot be repaired (Cruisemaster CIS-006), so the spare travels with the trailer. It rides in the XT Air box.
     system: running_gear
-    zone: inside
-    box: [rear_x0 - 425, 282, floor_z + 650, 400, 300, 150]
+    point: [body_x0 + 235, 0, rail_underside_z + 147.5]
     mass: {basis: declared, total_kg: 3, maturity: estimate, source: "Report 06 section 2: 2.4 kg bag (Firestone style 26 sheet) plus fittings (estimate)"}
 
   # ================================================================ spare wheel on the front wall (one of the plan's two, the other under the ute's tray)
@@ -225,16 +253,16 @@ items:
     point: [body_x0 - spare_bracket_d - tyre_w / 2, 0, spare_z]
     mass: {basis: declared, total_kg: 14.5, maturity: estimate, source: "As RG-06 (report 16 section 4)"}
 
-  # ================================================================ body shell (BODY.md, report 12, fixed roof, report 18 section 3.1)
+  # ================================================================ body shell (BODY.md, report 12, fixed roof 2,000 mm inside, H1a and H12)
   - id: BD-01
-    name: Floor, 30 mm woven roving and Divinycell H80 sandwich, one piece, with vinyl
-    material: "Two 2.0 mm woven roving polyester skins (48 % glass) on 26 mm Divinycell H80 PVC foam, vinyl on top"
+    name: Floor, 30 mm woven roving and Divinycell H80 sandwich, one piece, with vinyl in the living zones
+    material: "Two 2.0 mm woven roving polyester skins (48 % glass) on 26 mm Divinycell H80 PVC foam, vinyl on top outside the wet room"
     system: body
     box: [body_x0, -half_bw, floor_underside_z, body_length, body_width, floor_t]
     parts:
       - {item: "Floor panel, 10.61 m2 at 8.92 kg/m2 (two 3.22 kg/m2 woven roving skins, 2.08 kg/m2 of H80, 0.4 kg/m2 of adhesive)", kg: 94.6, basis: calculated, source: "Report 12 sections 2 and 10"}
       - {item: "GRP crush tubes and HD PVC inserts at the 32 body mounts", kg: 3.0, basis: estimate}
-      - {item: "Vinyl over the 10.1 m2 inside at 1.5 kg/m2", kg: 15.2, basis: estimate}
+      - {item: "Vinyl over the 7.8 m2 inside the living zones at 1.5 kg/m2, none under the wet room tray (saving 1c, H13)", kg: 11.7, basis: estimate}
   - id: BD-02
     name: Fixed roof, 40 mm GRP and XPS sandwich, bonded to the walls, flat top skin under the solar array
     material: "2.0 mm top and 1.5 mm bottom Polydet GRP skins on 36.5 mm XPS foam of about 36 kg/m3"
@@ -244,47 +272,110 @@ items:
       - {item: "Roof panel, 10.61 m2 at 7.0 kg/m2, no hatches", kg: 74.3, basis: calculated, source: "Report 12 section 10, report 18 section 2"}
       - {item: Insert strips for the awning rail and the cable glands, kg: 1.3, basis: estimate}
   - id: BD-03
-    name: Side walls, 35 mm GRP and XPS sandwich, one piece each, 1,950 mm tall
+    name: Side walls, 35 mm GRP and XPS sandwich, one piece each, 2,000 mm tall
     material: "Two 1.5 mm gelcoat GRP skins (Optiplan Polydet) on 32 mm XPS foam"
     system: body
     for: {s: [1, -1]}
     box: [body_x0, s * (half_bw - wall_t / 2) - wall_t / 2, floor_z, body_length, wall_t, interior_h]
     parts:
-      - {item: "8.62 m2 less the wall's openings at 6.0 kg/m2: road side less 0.62 m2 (desk window, cassette door, bathroom vent), kerb side less 2.13 m2 (kitchen, entry door, two windows)", kg: "48.0 * (1 + s) / 2 + 38.9 * (1 - s) / 2", basis: calculated, source: "Report 12 section 10, report 18 section 1.2"}
-      - {item: Insert strips, kg: 3.0, basis: estimate}
+      - {item: "8.84 m2 less the wall's openings at 6.0 kg/m2: road side less 0.94 m2 (W2, W4, W6, the RESPA intake, hood cowl, Combi cowl and e2 fan B), kerb side less 1.79 m2 (W1, entry door, e2 fan A, cassette door)", kg: "47.4 * (1 + s) / 2 + 42.3 * (1 - s) / 2", basis: calculated, source: "Report 12 section 10, home/layout-home.md section 5"}
+      - {item: "Insert strips, and four RHS 40 x 20 x 3 lift-bed hardpoints per pair of walls are in LB-06", kg: 3.0, basis: estimate}
   - id: BD-04
-    name: End walls, full height, no rear portal
+    name: End walls, full height, the rear wall with the wet room door
     material: "Front: 2.0 mm outer and 1.5 mm inner Polydet GRP skins on 31.5 mm XPS. Rear: two 1.5 mm Polydet skins on 32 mm XPS"
     system: body
     for: {e: [0, 1]}
     box: [body_x0 + e * (body_length - end_wall_t), -half_in, floor_z, end_wall_t, 2 * half_in, interior_h]
     parts:
-      - {item: "Front wall 4.18 m2 at 6.7 kg/m2 (2.0 mm outer skin against stones) or rear wall 4.27 m2 at 6.0 kg/m2, less their windows", kg: "28.0 * (1 - e) + 25.6 * e", basis: calculated, source: "Report 12 section 10"}
+      - {item: "Front wall 4.61 m2 at 6.7 kg/m2 (2.0 mm outer skin against stones) less e2 fans C and D, or rear wall 3.48 m2 at 6.0 kg/m2 less the rear door, rinse box, relief valve and extract fan", kg: "30.9 * (1 - e) + 20.9 * e", basis: calculated, source: "Report 12 section 10, home/layout-home.md section 5"}
       - {item: Brackets, kg: 0.5, basis: estimate}
   - id: BD-07
-    name: Entry door, Aussie Traveller DC 1,623 x 622, kerb side, hinged on its front edge
-    material: "Aluminium frame with a composite panel (est.)"
+    name: Entry door, Aussie Traveller DC 1,750 x 622 with pleated blind, no vent, kerb side, hinged on its front edge
+    material: "Aluminium frame with a composite panel, tinted acrylic window with a pleated block-out blind, security screen door"
     system: body
     box: [lz_door_x, -half_in - wall_t, floor_z, lz_door_w, wall_t, lz_door_h]
-    mass: {basis: declared, total_kg: 25, maturity: estimate, source: "Report 12 section 7: retailer listing, possibly a shipping mass"}
-    note: VSB1 13.2.1 wants one door on the left side or the rear. The cut-out is 1,626 x 625 mm with a 90 mm top radius.
+    mass: {basis: declared, total_kg: 21, maturity: estimate, source: "https://aussietraveller.com.au/products/caravan-dc-door-with-pleated-blind-left-hand-hinge", note: "Listed shipping mass 21 kg (report 19 R19-21), taken as an estimate"}
+    note: VSB1 13.2.1 wants one door on the left side or the rear. The cut-out is 1,753 x 625 mm with a 90 mm top radius. Part 71917500622080 or 081 by hinge side.
+  - id: BD-15
+    name: Rear door into the wet room, Aussie Traveller DC 1,750 x 622 with pleated blind, no vent, hinged on its kerb-side edge
+    material: "Aluminium frame with a composite panel, tinted acrylic window with a pleated block-out blind, security screen door"
+    system: body
+    box: [body_x1 - end_wall_t, rear_door_y0, floor_z, end_wall_t, rear_door_w, rear_door_h]
+    mass: {basis: declared, total_kg: 21, maturity: estimate, source: "https://aussietraveller.com.au/products/caravan-dc-door-with-pleated-blind-right-hand-hinge", note: "Listed shipping mass 21 kg (report 19 R19-22), taken as an estimate"}
+    note: Opens outward (VSB1 13.2.1) straight into the wet room (H4). Hinged on its kerb-side edge so it swings away from the outdoor unit's cradle on the road half. A door stay at about 150 degrees keeps it off the extract fan's hood.
+  - id: BD-16
+    name: Fold-out steps, Torklift GlowStep Revolution Uprising, four steps with landing gear, one in each doorway
+    material: "Aluminium treads and frame, stainless fittings"
+    system: body
+    for: {k: [0, 1]}
+    point: ["(1 - k) * (lz_door_x + lz_door_w / 2) + k * (in_x1 - 125)", "(1 - k) * (-half_in + 100) + k * (rear_door_y0 + rear_door_w / 2)", floor_z + 500]
+    mass: {basis: declared, unit_kg: 15, maturity: estimate, source: "https://www.torklift.com/products/steps-and-handrails/glowstep-revolution-uprising", note: "About 15 kg each (report 19 R19-23, est.)"}
+    note: Each stows upright inside its door opening, so nothing hangs under the body. The wet room keeps 250 mm clear inside the rear door for it (LA-K6). Take the five-step version if four do not reach 925 mm.
+  - id: BD-14
+    name: Rounded front edges, curved GRP sandwich corner pieces bonded to the panels (150 mm at the roof edge, 250 mm on both front verticals)
+    material: "GRP sandwich corner pieces, gelcoat outside, bonded with MS polymer"
+    system: body
+    point: [body_x0 + 150, 0, floor_z + interior_h / 2 + 300]
+    mass: {basis: declared, total_kg: 6, maturity: estimate, source: "Research report 25 section 2: about +6 kg (0 to +12 kg) net of the square corner joiners and panel strips they replace", note: "H12, option A+"}
+    note: H12 keeps a fixed roof. Report 25 puts towing fuel at 21.3 L/100 km at 90 km/h against 25.0 with the square front, for about AUD 3,500 (est.).
+  - id: BD-18
+    name: Side-wall stiffeners, SHS 20 x 20 x 1.6 aluminium bonded vertically in the wall cores, one in each wall's living-zone bay
+    material: "6060-T5 aluminium SHS 20 x 20 x 1.6, bonded in a routed slot in the XPS core"
+    system: body
+    for: {s: [1, -1]}
+    point: [body_x0 + 2795, s * (half_bw - wall_t / 2), floor_z + interior_h / 2]
+    mass: {basis: declared, unit_kg: 0.64, maturity: calculated, source: "2.0 m at 0.318 kg/m (117.8 mm2 of 6060 at 2,700 kg/m3)"}
+    note: "With the lift-bed hardpoints, the door frame, the tower's sides and the partition, no side-wall bay is wider than 1,067 mm unstiffened (data/body/body.yaml, BDY-10). Kerb side between the washer and the dryer, road side just ahead of W4. They also take cabinetry screws"
   - id: BD-08
     name: Extrusions, adhesive, sealant and the body mount fixings
     material: "Aluminium extrusions, MS polymer adhesive and sealant, galvanised fixings (est.)"
     system: body
     point: [body_x0 + body_length / 2, 0, floor_z + interior_h / 2]
     parts:
-      - {item: "Floor joiners 13.6 m at 1.4 kg/m, corner joiners 7.8 m at 2.0 kg/m, roof-to-wall joiner 13.6 m at 1.65 kg/m in place of the pop-top ring", kg: 57.0, basis: estimate, source: "Scaled from DIY Caravans' extrusion masses to 35 mm panels (report 12 section 10)"}
-      - {item: Adhesive and sealant, kg: 6.5, basis: estimate}
+      - {item: "Floor joiners 13.6 m at 1.4 kg/m, corner joiners 8.0 m at 2.0 kg/m, roof-to-wall joiner 13.6 m at 1.65 kg/m", kg: 57.4, basis: estimate, source: "Scaled from DIY Caravans' extrusion masses to 35 mm panels (report 12 section 10)"}
+      - {item: "Adhesive and sealant, about 8.4 L of MS polymer at 1.5 kg/L", kg: 12.6, basis: estimate, source: "Research report 22 open point 3"}
       - {item: "32 M12 8.8 mount bolts and 100 x 100 x 3 aluminium spreaders", kg: 5.0, basis: estimate}
-  - id: BD-09
-    name: Windows, vents and the dust fan
+  - id: WN-01
+    name: Window W1, Dometic S4 top-hinged 900 x 600, bed, kerb side, the second way out, blackout and fly screen rollers
+    material: "Double acrylic, grey tint, polyurethane frame, ECE R43, aluminium-coated blackout roller blind"
     system: body
-    point: [body_x0 + body_length / 2, 0, floor_z + 1300]
+    box: [body_x0 + 379, -half_bw, floor_z + 960, 902, wall_t, 599]
+    mass: {basis: declared, total_kg: 9.2, maturity: spec, source: "https://www.wohnwagen-fenster.com/produkt/ausstellfenster/dometic-s4-ausstellfenster-rahmenfenster-rollo-camping-wohnwagen-wohnmobil/", note: "Part 9104115572 (report 19 R19-14)"}
+    note: Clear opening 804 x 454 mm, 0.365 m2, meets the project escape rule (0.33 m2, no side under 450 mm). Sill 960 mm above the floor, level with the night mattress top.
+  - id: WN-02
+    name: Window W2, Dometic S4 top-hinged 900 x 450, bed, road side, blackout and fly screen rollers
+    material: "Double acrylic, grey tint, polyurethane frame, ECE R43, aluminium-coated blackout roller blind"
+    system: body
+    box: [body_x0 + 379, half_bw - wall_t, floor_z + 960, 902, wall_t, 448]
+    mass: {basis: declared, total_kg: 8.0, maturity: spec, source: "https://www.wohnwagen-fenster.com/produkt/ausstellfenster/dometic-s4-ausstellfenster-rahmenfenster-rollo-camping-wohnwagen-wohnmobil/", note: "Part 9104115569 (report 19 R19-15)"}
+  - id: WN-03
+    name: Window W4, Dometic S4 top-hinged 500 x 450, kitchen, road side, blackout and fly screen rollers
+    material: "Double acrylic, grey tint, polyurethane frame, ECE R43, aluminium-coated blackout roller blind"
+    system: body
+    box: [body_x0 + 2800, half_bw - wall_t, floor_z + 1000, 500, wall_t, 448]
+    mass: {basis: declared, total_kg: 5.0, maturity: spec, source: "https://www.wohnwagen-fenster.com/produkt/ausstellfenster/dometic-s4-ausstellfenster-rahmenfenster-rollo-camping-wohnwagen-wohnmobil/", note: "Part 9104115546, 500 x 450 (H15)"}
+    note: Sill 100 mm above the bench top, so its blind cassette stays under the range hood.
+  - id: WN-04
+    name: Window W6, Dometic S4 top-hinged 500 x 450 with frosted film on the inner pane, wet room, road side
+    material: "Double acrylic with frosted film, polyurethane frame, ECE R43, aluminium-coated blackout roller blind"
+    system: body
+    box: [body_x0 + 3610, half_bw - wall_t, floor_z + 1150, 500, wall_t, 448]
     parts:
-      - {item: "Dometic S4 windows 900 x 500 road side, 800 x 400 front and 600 x 450 rear (scaled by area)", kg: 20.8, basis: estimate}
-      - {item: "Two Dometic S4 windows 500 x 450, kerb side, one of them the second way out over the bed", kg: 10.0, basis: maker}
-      - {item: "Bathroom vent in the road-side wall, Carafan Sahara CP700 with ducts, kitchen opening frame, cassette door", kg: 17.4, basis: estimate}
+      - {item: "Dometic S4 500 x 450, part 9104115546", kg: 5.0, basis: maker, source: "https://www.wohnwagen-fenster.com/produkt/ausstellfenster/dometic-s4-ausstellfenster-rahmenfenster-rollo-camping-wohnwagen-wohnmobil/"}
+      - {item: Frosted film on the inner pane, kg: 0.1, basis: estimate}
+  - id: WN-05
+    name: Clip-in blackout covers for W1 and W2, 3 mm black ABS in the S4 inner frame
+    material: "3 mm black ABS sheet"
+    system: body
+    point: [body_x0 + 830, 0, floor_z + 1200]
+    mass: {basis: declared, total_kg: 1.2, maturity: estimate, source: "Report 19 R19-20: 0.6 kg each (est.)"}
+  - id: BD-17
+    name: Thetford service door 2680584 for the cassette, kerb side of the wet room
+    material: "ABS door and frame with a gasket and lock"
+    system: body
+    box: [body_x0 + 3660, -half_bw, floor_z + 150, 450, wall_t, 290]
+    mass: {basis: declared, total_kg: 1.5, maturity: estimate, source: "Report 12 section 7 (estimate)"}
+    note: Behind the C223-CS. Its cut-out ends 310 mm ahead of the rear corner (report 12's 300 mm rule).
   - id: BD-10
     name: Mud flap behind the rear wheel, 610 x 455 mm rubber, on a galvanised hanger from the XT rear shock outrigger
     material: "6 mm rubber flap on a galvanised steel hanger"
@@ -299,7 +390,7 @@ items:
     name: Wiring, plumbing, lighting and hardware
     system: body
     point: [body_x0 + body_length / 2, 0, floor_z + 400]
-    mass: {basis: declared, total_kg: 60, maturity: estimate, source: "Older block model, kept until the systems design (report 12 section 10)"}
+    mass: {basis: declared, total_kg: 60, maturity: estimate, source: "Older block model, kept until the systems design (report 12 section 10). Reports 20 and 21 leave the house wiring and the fresh water pipework in it"}
   - id: BD-13
     name: Awning, Fiamma F45s 450, kerb side, below the roof line
     material: "Aluminium case and arms, vinyl fabric (est.)"
@@ -328,20 +419,22 @@ items:
   # ================================================================ under the floor (the tanks, guards and diesel tank move with the axle group)
   - id: UF-01
     name: Water tank, front suspension bay
+    material: "6 mm food-grade HDPE, welded, two cross baffles and one lengthwise"
     system: underfloor
     zone: underfloor
     box: [tank_f_x0, -tank_w / 2, tank_z0, tank_f_l, tank_w, tank_h]
     tank: true
-    mass: {basis: declared, unit_kg: 19.3, maturity: calculated, source: "Report 13 section 5's 18.8 kg tank (custom welded HDPE, 6 mm walls, two cross baffles and one lengthwise) scaled by area to 830 mm (report 18 section 1.1)"}
+    mass: {basis: declared, unit_kg: 19.3, maturity: calculated, source: "Report 13 section 5's 18.8 kg tank (custom welded HDPE, 6 mm walls, two cross baffles and one lengthwise) scaled by area to 830 mm (report 18 section 1.1)", note: "6 mm HDPE kept (saving 1b, H13). Report 22 open point 4 priced 10 mm polypropylene at about 31 kg"}
     note: Between the XT front hinge and centre crossmembers, over the front axle. About 220 L net (report 18 open question 8). It sits on two aluminium angle bearers bolted to the XT crossmembers on 10 mm rubber, held by two padded stainless straps, never hung from the floor.
   - id: UF-01R
     name: Water tank, rear suspension bay
+    material: "6 mm food-grade HDPE, welded, baffled"
     system: underfloor
     zone: underfloor
     box: [tank_r_x0, -tank_w / 2, tank_z0, tank_r_l, tank_w, tank_h]
     tank: true
-    mass: {basis: declared, unit_kg: 18.3, maturity: calculated, source: "As UF-01, scaled to 760 mm (report 18 section 1.1)"}
-    note: Between the XT centre and rear shock crossmembers, over the rear axle. About 200 L net.
+    mass: {basis: declared, unit_kg: 18.3, maturity: calculated, source: "As UF-01, scaled to 760 mm (report 18 section 1.1)", note: "6 mm HDPE kept (saving 1b, H13)"}
+    note: Between the XT centre and rear shock crossmembers, over the rear axle. About 200 L net. The two tanks hold 420 L net, filled at camp. At most 350 L of fresh and grey water ride in travel (H13).
   - id: UF-02
     name: Water in the tanks
     system: underfloor
@@ -353,22 +446,6 @@ items:
     system: underfloor
     box: [axle_x + xt_front_hinge_rear, -rail_in, rail_underside_z - 6, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 6]
     mass: {basis: declared, total_kg: 20, maturity: estimate, source: "Older block model"}
-  - id: UF-04
-    name: Battery box, sealed 2 mm aluminium with lid gasket, cable glands, a vent to the road side and a fuse per battery
-    material: "2 mm aluminium sheet, sealed"
-    system: underfloor
-    zone: underfloor
-    box: [battery_x0, -400, floor_underside_z - 10 - 250, battery_l, 800, 250]
-    mass: {basis: declared, total_kg: 12, maturity: estimate, source: "Report 13 section 2: 1.66 m2 of 2 mm aluminium at 5.4 kg/m2 plus about 3 kg of brackets and fittings (estimate)"}
-    note: Under the back of the floor between the rails, its centre 400 mm in front of the rear wall's inner face, in a sealed, guarded box vented outside on the road side.
-  - id: UF-05
-    name: Battery, Victron Lithium NG 25.6 V 200 Ah (BAT524120620), 5.12 kWh
-    system: underfloor
-    for: {k: [1, 2, 3]}
-    when: opt_batteries - k + 1
-    point: [battery_x0 + 65 + 235 * (k - 0.5), 0, floor_underside_z - 10 - 250 + 81]
-    mass: {basis: declared, unit_kg: 37, maturity: spec, source: "https://cdn.shopify.com/s/files/1/0497/4749/3026/files/Datasheet-Lithium-NG-batteries-12_8V-25_6V-51_2V-EN.pdf?v=1739576641", note: "Victron datasheet, 37 kg each, which Victron marks as an estimate (report 13 open question 16)"}
-    note: Lying on its side in the battery box (UF-04), terminals sideways, 235 x 648 x 162 mm. Two modules give 10.24 kWh (opt_batteries).
   - id: UF-06
     name: Heater fuel tank, 15 L HDPE, with line and filter
     material: "HDPE"
@@ -376,229 +453,562 @@ items:
     zone: underfloor
     box: [diesel_tank_x0, -200, floor_underside_z - 10 - 100, diesel_tank_l, 400, 100]
     mass: {basis: declared, total_kg: 2.3, maturity: estimate, source: "Report 13 LA-03: 15 L HDPE fuel tank 2.0 kg, fuel line and filter 0.3 kg (estimates)"}
-    note: Between the rails in the braced bay ahead of the XT front hinge crossmember, above the plan bracing (report 13 open question 6).
+    note: Between the rails in the braced bay ahead of the XT front hinge crossmember, above the plan bracing (report 13 open question 6). It feeds the Combi D 6 E in the kitchen tower.
   - id: UF-07
     name: Diesel for the heater, 15 L
     system: underfloor
     load: fuel
     point: [diesel_tank_x0 + diesel_tank_l / 2, 0, floor_underside_z - 10 - 50]
     mass: {basis: declared, total_kg: 12.6, maturity: spec, source: "Report 13: 15 L at 0.84 kg/L"}
+  - id: UF-08
+    name: Grey water tank, 130 L net, welded 6 mm HDPE, one baffle, in the rear bay behind the XT rear shock crossmember
+    material: "6 mm food-grade HDPE, welded"
+    system: underfloor
+    zone: underfloor
+    box: [grey_x0, -tank_w / 2, grey_z0, grey_l, tank_w, grey_h]
+    parts:
+      - {item: "Shell, 2.44 m2 of 6 mm HDPE at 950 kg/m3", kg: 13.9, basis: calculated, source: "Research report 21 section 10 build, resized to the bay"}
+      - {item: "Baffle, 0.19 m2 of 6 mm HDPE", kg: 1.0, basis: calculated}
+      - {item: "40 mm inlets, vent, level sender, 40 mm outlet with a lever valve and camlock", kg: 0.8, basis: estimate}
+    note: Every drain falls to it by gravity, so its top stays at the rails' top, under the shower well. It sits on two aluminium angle bearers between the XT rear shock and rear crossmembers on 10 mm rubber, strapped up to the grey-bay crossmember. Vent to the road side, outlet and camlock on the kerb side. Empty for travel except in TC7 and TC8.
+  - id: UF-08W
+    name: Grey water, 130 L, carried only in the grey-full cases TC7 and TC8
+    system: underfloor
+    load: grey
+    hollow: true
+    box: [grey_x0 + 6, -tank_w / 2 + 6, grey_z0 + 6, grey_l - 12, tank_w - 12, grey_full_l * 1e6 / ((grey_l - 12) * (tank_w - 12))]
+    mass: {basis: declared, total_kg: 130, maturity: spec, source: "grey_full_l at 1 kg per litre (research report 21 section 10)"}
+  - id: UF-09
+    name: Grey tank guard, 2 mm aluminium on rubber, bolted to the rails
+    material: "2 mm aluminium sheet on rubber strips"
+    system: underfloor
+    zone: underfloor
+    box: [grey_x0, -510, grey_z0 - 6, grey_l, 1020, 6]
+    mass: {basis: declared, total_kg: 5.3, maturity: estimate, source: "0.91 m2 of 2 mm aluminium at 5.4 kg/m2 with rubber and bolts (est., saving 1f, H13)"}
+    note: Bolted across the rails, it also stands in for the PB-3 plan braces this bay had (the frame analysis confirms it, LC8a).
 
-  # ================================================================ the sealed drawbar box (decision log 12:45)
+  # ================================================================ the sealed drawbar box (decision log 12:45, research report 20)
   - id: DX-01
-    name: Drawbar box, sealed 2 mm aluminium with a lockable lid, low vent and drain to outside, on brackets across the drawbar members
-    material: "2 mm aluminium sheet, sealed"
+    name: Drawbar box, sealed 1.6 mm aluminium with a lockable lid, a shelf, a low vent and a drain to outside, on brackets across the drawbar members
+    material: "1.6 mm aluminium sheet, sealed"
     system: stowage
     hollow: true
     box: [dbx_x0, -dbx_w / 2, dbx_z0, dbx_l, dbx_w, dbx_h]
     parts:
-      - {item: "Box and lid, 1.94 m2 of 2 mm aluminium at 5.4 kg/m2", kg: 10.5, basis: calculated}
-      - {item: "Lid hinge, gas strut, keyed latch, padlock hasp and seal", kg: 2.0, basis: estimate}
-      - {item: "Brackets to the drawbar members, rubber mounts and bolts", kg: 2.5, basis: estimate}
-    note: Behind the stone guard and ahead of the spare wheel, outside the bike box's sweep (JK-01). The petrol rides here, outside the body, so no vapour reaches the living area. It follows report 02's rules for petrol stowage (GAR-01 to GAR-06) as a locker reached only from outside.
+      - {item: "Box and lid, 3.54 m2 of 1.6 mm aluminium at 4.32 kg/m2", kg: 15.3, basis: calculated}
+      - {item: "Lid hinge, two gas struts, keyed latch, padlock hasp and seal", kg: 2.0, basis: estimate}
+      - {item: "Brackets to the drawbar members, rubber mounts and bolts", kg: 2.0, basis: estimate}
+      - {item: "Shelf over the generators and its straps", kg: 1.0, basis: estimate}
+    note: Behind the stone guard and ahead of the spare wheel, outside the bike box's sweep (JK-01). The petrol rides here, outside the body, so no vapour reaches the living area. It follows report 02's rules for petrol stowage (GAR-01 to GAR-06) as a locker reached only from outside. VSB1 5.1.1 asks for a drawbar that carries a box to be tested in that configuration (CT-003).
   - id: GS-01
-    name: Generator
+    name: Generators, two Honda EU22i side by side, run in parallel on the ground
     system: stowage
     zone: drawbar_box
-    box: [dbx_x0 + 15, -dbx_w / 2 + 30, dbx_z0 + dbx_t + 10, 290, 509, 425]
-    mass: {basis: declared, total_kg: 21.1, maturity: spec, source: "https://powerequipment.honda.com.au/models/generators/eu22/specifications", note: "Honda EU22i, 21.1 kg dry (Honda Australia)"}
-    note: Honda EU22i, 509 x 290 x 425 mm, turned with its 290 mm width along the trailer. It runs on the ground beside the trailer, never in the box.
+    box: [dbx_x0 + 15, -dbx_w / 2 + 20, dbx_z0 + dbx_t + 10, 290, 1038, 425]
+    mass: {basis: declared, total_kg: 42.2, maturity: spec, source: "https://powerequipment.honda.com.au/models/generators/eu22/specifications", note: "Honda EU22i, 21.1 kg dry each (Honda Australia, report 20 E-16)"}
+    note: Each 509 x 290 x 425 mm, turned with its 290 mm width along the trailer. They run on the ground beside the trailer, never in the box. The pair puts a design hot day back in 6.3 h, or 8.4 h while the household runs (report 20, conductor ruling).
+  - id: GS-02
+    name: Honda parallel cable
+    system: stowage
+    point: [dbx_x0 + dbx_l / 2, -200, dbx_z0 + 500]
+    mass: {basis: declared, total_kg: 1.0, maturity: estimate, source: "Report 20 E-16 (estimate)"}
   - id: GS-04
     name: Petrol and diesel in jerry cans
     system: stowage
     load: fuel
     zone: drawbar_box
-    box: [dbx_x0 + 10, -dbx_w / 2 + 30 + 509 + 20, dbx_z0 + dbx_t + 10, 300, 360, 450]
+    box: [dbx_x0 + 10, -dbx_w / 2 + 20 + 1038 + 20, dbx_z0 + dbx_t + 10, 300, 360, 450]
     mass: {basis: declared, total_kg: 17, maturity: estimate, source: "Older block model"}
-    note: Strapped down beside the generator. The diesel could ride under the bed (its flash point is at least 61.5 degrees C), but it stays here with the petrol so nothing fuelled sits under the sleepers.
+    note: Strapped down beside the generators. The diesel could ride inside, but it stays here with the petrol so nothing fuelled sits in the body.
+  - id: PL-03A
+    name: Other gear on the drawbar box shelf, tools, hoses and the creek pump's hose
+    system: payload
+    load: gear
+    zone: drawbar_box
+    box: [dbx_x0 + 10, -dbx_w / 2 + 20, dbx_z0 + dbx_t + 10 + 470, 300, dbx_w - 40, 200]
+    mass: {basis: declared, total_kg: 20, maturity: estimate, source: "Half of the older block model's 40 kg of other gear"}
 
-  # ================================================================ bed zone, u 0 to 1,650 (report 18 section 1.2)
-  - id: LB-01
-    name: Queen mattress 1,530 x 2,030 x 150, across the trailer, top 750 mm above the floor
-    system: bed
-    zone: inside
-    box: [in_x0 + 60, -half_in, mattress_z, 1530, 2030, mattress_t]
-    mass: {basis: declared, total_kg: 19, maturity: estimate, source: "Research report 04 section 2 (the module's B-01)"}
-  - id: LB-02
-    name: Froli Star Mobil sprung base, two packs
-    system: bed
-    zone: inside
-    box: [in_x0 + 60, -half_in, deck_z + deck_t, 1530, 2030, froli_h]
-    mass: {basis: declared, total_kg: 7.3, maturity: calculated, source: "https://www.froli.com/shop/schlafen-unterwegs/bettsysteme/168/froli-star-mobil", note: "60 springs per pack at 61 g each, two packs (the module's B-02)"}
-  - id: LB-03
-    name: Bed deck, 20 mm aluminium honeycomb, lift-up panels
-    system: bed
-    zone: inside
-    box: [in_x0, -half_in, deck_z, bed_u1, 2030, deck_t]
-    mass: {basis: declared, total_kg: 11.1, maturity: calculated, source: "https://pcsaluminium.com/wp-content/uploads/2025/06/PCS-ALUSTEP_500_uk_rev7.pdf", note: "3.3 kg/m2 (PCS figure, the module's B-03) over 1,650 x 2,030 mm"}
+  # ================================================================ bed and desk zone, u 0 to 1,590 (H1, research report 21 sections 1 and 2)
   - id: LB-04
-    name: Bed base, honeycomb dividers, lift-up stays and drawer fronts
+    name: Lift bed rail, Lippert HappiJac 42 in kit, C-channel with its trolley and support rail, on the side wall
+    material: "Steel C-channel rail, chain and trolley (est.)"
     system: bed
+    zone: inside
+    for: {k: [0, 1], s: [1, -1]}
+    box: [in_x0 + bed_rail_u - 25 + k * 1067, s * half_in, floor_z + 375, 50, -s * 20, interior_h - 375]
+    mass: {basis: declared, unit_kg: 7.0, maturity: estimate, source: "https://www.rvsurplusparts.net/complete-happijac-electric-bed.html", note: "Report 21 section 1.4: the kit 35 kg (est., report 04's 30 to 45 kg), 28 kg of it in the four rails, trolleys and support rails"}
+    note: Rails 1,067 mm apart along each side wall, screwed into the RHS hardpoints (LB-06). 204 kg moving and 272 kg static per platform (Lippert).
+  - id: LB-04M
+    name: Lift bed motor with its brake, connecting shaft, chains and controller, at the rail tops
+    material: "12 V DC gearmotor, steel shaft and chain (est.)"
+    system: bed
+    point: [in_x0 + bed_rail_u + 533, 0, ceiling_z - 30]
+    mass: {basis: declared, total_kg: 7.0, maturity: estimate, source: "Report 21 section 1.4: the rest of the 35 kg kit (est.)"}
+    note: 12 V at 8 to 10 A while moving. Manual lowering by the brake lever and a 1/2 in socket at the rail tops. Spare motor HappiJac 420326.
+  - id: LB-05
+    name: Lift bed travel locks and obstruction stop
+    material: "Stainless index plungers with interlock microswitches, rubber safety edge with a switching strip"
+    system: bed
+    point: [in_x0 + 795, 0, deck_z]
+    parts:
+      - {item: "Four stainless spring index plungers, M12, with interlock microswitches, at the day and night stops", kg: 0.6, basis: estimate, source: "Report 21 section 1.2"}
+      - {item: "Pressure-sensitive safety edge round the platform's lower perimeter, with its relay in the down circuit", kg: 0.8, basis: estimate, source: "Report 21 section 1.2"}
+  - id: LB-06
+    name: Lift bed hardpoints, four RHS 40 x 20 x 3 aluminium tubes laid flat in the side wall cores behind the rails
+    material: "6060-T5 aluminium RHS 40 x 20 x 3 (est.)"
+    system: bed
+    point: [in_x0 + bed_rail_u + 533, 0, floor_z + 1175]
+    mass: {basis: declared, total_kg: 5.6, maturity: calculated, source: "Report 21 section 1.4: 4 x 1.6 m at 0.875 kg/m"}
+    note: Bonded into the wall cores as the panels are laid up, so the rail screws bite 3 mm aluminium (Lippert's backing rule).
+  - id: LB-03
+    name: Bed platform, 40 mm aluminium honeycomb, 0.8 and 0.5 mm skins, 1,550 x 2,290 mm, on the lift's support rails
+    material: "Aluminium honeycomb sandwich, 0.8 mm top and 0.5 mm bottom aluminium skins on a 40 kg/m3 core"
+    system: bed
+    zone: inside
+    box: [in_x0 + 20, -half_in + 20, deck_z, 1550, 2 * half_in - 40, deck_t]
+    parts:
+      - {item: "Panel 3.55 m2 at 5.46 kg/m2 (CEL Compocel AL build, or PanelMate in WA)", kg: 19.4, basis: calculated, source: "https://www.chemical-concepts.com/wp-content/uploads/2023/09/Compocel-AL-TDS.pdf"}
+      - {item: Edge trim, kg: 1.5, basis: estimate}
+    note: Spans wall to wall on the support rails. 7.5 mm deflection (L/307) with two people (report 21 section 1.3).
+  - id: LB-02
+    name: Ventilated underlay, HyperVent 19 mm
+    material: "Polyester 3D spacer mat"
+    system: bed
+    zone: inside
+    box: [in_x0 + 30, -1015, deck_z + deck_t, 1530, 2030, underlay_t]
+    mass: {basis: declared, total_kg: 0.45, maturity: calculated, source: "Report 04: 0.146 kg/m2 (report 21)"}
+  - id: LB-01
+    name: Queen mattress, Pure Sleep Orion Caravan Deluxe, 1,530 x 2,030 x 180, across the trailer
+    material: "Zoned pocket springs with foam, flip design"
+    system: bed
+    zone: inside
+    box: [in_x0 + 30, -1015, mattress_z, 1530, 2030, mattress_t]
+    mass: {basis: declared, total_kg: 25.5, maturity: spec, source: "https://puresleep.com.au/product/orion-caravan-deluxe-mattress/", note: "25.5 kg, size not stated, taken as the queen (report 21 open point 6)"}
+    note: The model shows the bed up, as it travels. By day the platform's underside is 1,600 mm above the floor and by night 805 mm, so the mattress top is 1,044 mm up with 956 mm clear above it (H1, BED-01).
+  - id: LA-09
+    name: Desk 1,200 x 600 under the bed, top at 730 mm, against the front wall
+    material: "25 mm aluminium honeycomb top with HPL facing, aluminium angle cleat and two square legs"
+    system: living
+    zone: inside
+    box: [in_x0, -600, floor_z + desk_top_h - 25, 600, 1200, 25]
+    parts:
+      - {item: "Top, 25 mm aluminium honeycomb with 1.0 and 1.0 mm skins, 0.72 m2 at 7.6 kg/m2", kg: 5.5, basis: calculated, source: "https://www.chemical-concepts.com/wp-content/uploads/2023/09/Compocel-AL-TDS.pdf"}
+      - {item: "0.8 mm HPL facing", kg: 0.8, basis: estimate}
+      - {item: "40 x 40 x 3 aluminium angle cleat on the front wall, 1.2 m", kg: 0.75, basis: calculated}
+      - {item: "Two 40 x 40 x 2 aluminium legs into floor sockets", kg: 1.15, basis: calculated}
+      - {item: Fixings and edge trim, kg: 0.5, basis: estimate}
+    note: The only furniture under the bed (H1). The bed stops 75 mm above it at night.
+  - id: LA-09M
+    name: Lay-flat monitor stand, Wearson WS-03A
+    system: living
+    point: [in_x0 + 300, 0, floor_z + desk_top_h + 30]
+    mass: {basis: declared, total_kg: 1.2, maturity: estimate, source: "https://www.amazon.com/wearson-ws-03a-adjustable-folding-100x100mm/dp/b00xuf2gbi/ref=sr_1_13"}
+  - id: LA-09S
+    name: Two Helinox Cafe chairs at the desk, packed into a bench drawer for travel
+    material: "Aluminium frame, polyester seat"
+    system: living
+    point: [rear_x0 - 600, half_in - 300, floor_z + 600]
+    mass: {basis: declared, total_kg: 2.6, maturity: spec, source: "https://helinox.eu/products/cafe-chair", note: "1.3 kg each unpacked (REI)"}
+  # ================================================================ living zone, u 1,590 to 3,330: kitchen on the road side (reports 19 and 21)
+  - id: LA-11T
+    name: Kitchen tower carcass, 585 x 600 x 2,000, road side
+    material: "18 mm Garnica Ultralight poplar plywood with a laminate finish"
+    system: living
     zone: inside
     hollow: true
-    box: [in_x0, -half_in, floor_z, bed_u1, 2030, deck_h]
-    mass: {basis: declared, total_kg: 20, maturity: estimate, source: "Report 18 open question 12 (estimate)"}
-    note: 537 mm clear under the deck for the kitchen slide-out, the air-conditioner and about 1.2 m3 of storage behind drawers and lift-up panels. No petrol (decision log 12:45).
-  - id: LA-08A
-    name: Bedside column of shelves and a pull-out hanging rail, road-side end of the bed
-    system: bed
-    zone: inside
-    box: [in_x0, half_in - 300, deck_z, bed_u1, 300, interior_h - deck_h]
-    mass: {basis: declared, total_kg: 15, maturity: estimate, source: "Report 18 open question 12 (estimate)"}
-  - id: LA-07
-    name: Outdoor kitchen slide-out under the bed, kerb side, fabricated sleeve, drawer with its outer wall panel, bench top, trays and locks
+    box: [bed_x1, half_in - kit_d, floor_z, tower_l, kit_d, interior_h]
+    mass: {basis: declared, total_kg: 23.5, maturity: estimate, source: "https://www.garnica.one/en-uk/plywood-panels/range/ultralight/ultralight-poplar.html", note: "5.0 m2 at 4.7 kg/m2: 243 kg/m3 at 18 mm plus a 0.3 kg/m2 finish (saving 1a, H13)"}
+    note: The Combi D 6 E in the base, the fridge, the oven above it, and the RESPA-CF2 with the top-up fan in the top cupboard behind their intake hood.
+  - id: LA-03
+    name: Hot water and backup heat, Truma Combi D 6 E (diesel with 900 or 1,800 W elements), in the tower base
+    material: "Heater with a 10 L stainless boiler (maker)"
     system: living
     zone: inside
-    box: [lz_kitchen_x, -half_in, floor_z + 50, lz_kitchen_l, 600, 450]
+    box: [bed_x1 + 30, half_in - 550, floor_z, 525, 450, 300]
     parts:
-      - {item: "Fixed sleeve, 1.6 mm aluminium with an angle frame", kg: 12.0, basis: estimate}
-      - {item: "Slide-out drawer with the 35 mm sandwich outer panel, seal, latches and frame", kg: 14.1, basis: estimate}
-      - {item: "Bench top 0.9 m2 at 5 kg/m2", kg: 4.5, basis: estimate}
-      - {item: Internal drawers and utensil trays, kg: 3.0, basis: estimate}
-      - {item: Stops and a positive lock in both positions, kg: 1.0, basis: estimate}
-    note: Report 13 LA-07. The bench sits about 1,425 mm above the ground (floor 925 + 50 + 450 mm), so a drop-down step goes with it (report 18 open question 6).
-  - id: LA-07A
-    name: Induction hob, Dometic CVI1525, two zones, 2,300 W
+      - {item: "Truma Combi D 6 E with CP plus or iNet X panel and its peripherals", kg: 18.3, basis: maker, source: "https://cdn.shopify.com/s/files/1/1889/8263/files/Operating_Manual_Combi_D_6_E_Heaters.pdf?v=1695544816"}
+      - {item: "Four 65 mm warm-air ducts and outlets 1.2 kg, exhaust and intake ducts and the wall cowl 1.0 kg", kg: 2.2, basis: estimate, source: "Report 19 R19-04"}
+      - {item: "Truma water set FC with the FrostControl drain valve", kg: 0.6, basis: estimate, source: "Report 21"}
+    note: "Its wall cowl is directly behind it in the road wall (OP-07). It stands 100 mm off the wall so the shortest Truma duct set (60 cm, 34501-01) bends to the cowl at 8 cm radius or more. Truma allows 60 to 150 cm with the wall cowl and 10 mm round the heater (Combi D 6 (E) installation instructions). A 150 cm2 grille in the tower base feeds its circulated air. Fuel from UF-06, warm air to the bed zone, the living zone and the wet room on all four outlets."
+  - id: LA-05
+    name: Fridge, Dometic NRX 130C, 126 L compressor, in the tower, door 330 mm above the floor
     system: living
-    point: [lz_kitchen_x + 300, -half_in + 300, floor_z + 470]
+    zone: inside
+    box: [bed_x1 + 30, half_in - 568, floor_z + 330, 525, 568, 812]
+    parts:
+      - {item: Dometic NRX 130C, kg: 28.0, basis: maker, source: "Dometic Australia (report 13)"}
+      - {item: Frame and door latch, kg: 1.0, basis: estimate}
+  - id: LA-13
+    name: Oven, Camec 053632 28 L convection microwave with grill and air fry, in the tower above the fridge
+    system: living
+    zone: inside
+    box: [bed_x1 + 38, half_in - 418, floor_z + 1162, 510, 418, 318]
+    parts:
+      - {item: "Camec 053632", kg: 17.0, basis: maker, source: "https://cdn.shopify.com/s/files/1/0822/5774/0089/files/Camec_Multi_Fuction_Microwave_NPI_Trade_NZ.pdf?v=1773959367"}
+      - {item: "Travel cradle bolted through the base feet, 25 mm strap", kg: 1.5, basis: estimate, source: "Report 21 section 3"}
+    note: H5's oven. 1,440 W on its own 10 A circuit (C2). The turntable travels padded in a drawer.
+  - id: LA-11B
+    name: Kitchen bench carcass, 1,155 x 600, top 900 mm, two drawers, road side
+    material: "18 mm Garnica Ultralight poplar plywood with a laminate finish, laminated worktop"
+    system: living
+    zone: inside
+    hollow: true
+    box: [bed_x1 + tower_l, half_in - kit_d, floor_z, rear_x0 - bed_x1 - tower_l, kit_d, bench_top_h]
+    mass: {basis: declared, total_kg: 25.4, maturity: estimate, source: "https://www.garnica.one/en-uk/plywood-panels/range/ultralight/ultralight-poplar.html", note: "5.4 m2 at 4.7 kg/m2 with the drawers (saving 1a, H13)"}
+  - id: LA-06
+    name: Freezer, Dometic CFX3 55IM, 53 L, under the hob on a pull-out slide
+    system: living
+    zone: inside
+    box: [bed_x1 + tower_l + 10, half_in - 465, floor_z + 35, 720, 455, 480]
+    parts:
+      - {item: Dometic CFX3 55IM, kg: 21.3, basis: retailer, source: "Overland Garage, OK4WD (report 13)"}
+      - {item: "Aluminium pull-out slide with travel lock (saving 1d, H13)", kg: 5.0, basis: estimate}
+      - {item: Tie-down kit, kg: 0.5, basis: estimate}
+    note: 720 x 455 x 480 mm. It slides 455 mm into the aisle so its lid can open. Locked in for travel.
+  - id: LA-07A
+    name: Induction hob, Dometic CVI1525, two zones, 2,300 W, over the freezer
+    system: living
+    zone: inside
+    box: [bed_x1 + tower_l + 45, half_in - 350, floor_z + bench_top_h - 55, 525, 350, 60]
     mass: {basis: declared, total_kg: 7.0, maturity: spec, source: "https://www.dometic.com/fr-fr/produit/dometic-cvi1525-9600050571", note: "Dometic, 7.0 kg (report 13)"}
   - id: LA-07B
     name: Sink, Dometic CVS1350G with glass lid
     system: living
-    point: [lz_kitchen_x + 1000, -half_in + 300, floor_z + 420]
+    zone: inside
+    box: [rear_x0 - 405, half_in - 350, floor_z + bench_top_h - 170, 350, 350, 170]
     mass: {basis: declared, total_kg: 2.5, maturity: spec, source: "https://www.dometic.com/fr-fr/produit/dometic-cvs1350g-9600051161", note: "Dometic, 2.5 kg (report 13)"}
-  - id: LA-07C
-    name: Slides, Accuride 9301 full extension, 610 mm, one pair
-    system: living
-    point: [lz_kitchen_x + 650, -half_in + 300, floor_z + 90]
-    mass: {basis: declared, total_kg: 6.0, maturity: estimate, source: "Report 13: three steel members of about 2.3 mm on a 76 mm height, about 3 kg a slide (estimate, not published)"}
   - id: LA-07D
-    name: Kitchen mixer tap
+    name: Sink mixer, single lever, 4 L/min regulator
     system: living
-    point: [lz_kitchen_x + 1000, -half_in + 450, floor_z + 520]
-    mass: {basis: declared, total_kg: 0.8, maturity: estimate, source: "Report 13 (estimate)"}
-  - id: LA-10
-    name: Air-conditioner, Truma Saphir Comfort RC, under the bed, ducted
+    point: [rear_x0 - 230, half_in - 380, floor_z + bench_top_h + 90]
+    mass: {basis: declared, total_kg: 0.6, maturity: estimate, source: "Report 21 section 9 (estimate)"}
+  - id: WS-01
+    name: "Water supply in the sink cabinet: Shurflo Trail King 7 pump (2.1 bar), accumulator and strainer, Puretec CR-Z2, Acuva ArrowMAX 2.0 UV-LED, mixing valve at 50 C"
     system: living
-    zone: inside
-    box: [in_x0 + 60, -500, floor_z, 400, 630, 300]
+    point: [rear_x0 - 230, half_in - 300, floor_z + 300]
     parts:
-      - {item: Truma Saphir Comfort RC, kg: 23.5, basis: maker, source: "Truma Australia"}
-      - {item: Ducts and vents, kg: 1.5, basis: estimate}
-    note: 628 x 400 x 290 mm (report 13 LA-10). Nothing fuelled shares the space under the bed.
-
-  # ================================================================ living zone, u 1,650 to 3,350, and rear zone to the rear wall
-  - id: LA-09
-    name: Desk, 1,100 x 550, road side, two seats
+      - {item: "Shurflo Trail King 7, 12 V, 7 L/min, 30 psi", kg: 1.5, basis: estimate, source: "Report 21 section 10.2"}
+      - {item: "Accumulator 0.75 L and 40-mesh strainer", kg: 1.1, basis: estimate}
+      - {item: "Puretec CR-Z2 under-sink filter", kg: 2.0, basis: estimate, source: "https://www.puretec.com.au/CR-Z2"}
+      - {item: "Acuva ArrowMAX 2.0 UV-LED purifier", kg: 1.5, basis: estimate}
+      - {item: "Thermostatic mixing valve set to 50 C", kg: 0.5, basis: estimate}
+  - id: WS-02
+    name: Puretec CR45 fill filter, creek transfer pump and 10 m hose, stowed in a bench drawer
     system: living
-    zone: inside
-    box: [bed_x1, half_in - 550, floor_z + 720, 1100, 550, 30]
-    mass: {basis: declared, total_kg: 12, maturity: estimate, source: "Older block model"}
-  - id: LA-11
-    name: Cabinetry, two seats at the desk, the freezer bench and trims (allowance)
-    system: living
-    point: [bed_x1 + 550, half_in - 525, floor_z + 450]
-    mass: {basis: declared, total_kg: 70, maturity: estimate, source: "Older block model (cabinetry and chair)"}
-    note: PLACEHOLDER. Placed at the seats by the desk until the furniture is designed.
-  - id: LA-05
-    name: Fridge, Dometic NRX 130C, 126 L compressor, just inside the door
-    system: living
-    zone: inside
-    box: [lz_door_x + 640, -half_in, floor_z, 600, 600, 1400]
+    point: [bed_x1 + tower_l + 500, half_in - 300, floor_z + 700]
     parts:
-      - {item: Dometic NRX 130C, kg: 28.0, basis: maker, source: "Dometic Australia"}
-      - {item: Frame and door latch, kg: 1.0, basis: estimate}
-    note: 525 x 812 x 568 mm in its box.
-  - id: LA-06
-    name: Freezer, Dometic CFX3 55IM, 53 L, turned along the wall under a lift-up bench
+      - {item: "Puretec CR45 twin-stage filter, 1 micron", kg: 2.5, basis: estimate, source: "https://cdn.shopify.com/s/files/1/1845/4805/files/Puretec_Caravan_Brochure.pdf?v=1612752432"}
+      - {item: "12 V transfer pump of at least 2 bar, strainer and 10 m hose", kg: 2.0, basis: estimate}
+  # ================================================================ living zone, kerb side: the battery plinth with the washer and the dryer (reports 20 and 21)
+  - id: EL-02
+    name: Battery box, sealed 2 mm 5052 aluminium, gasketed front panel, cable glands, 3 mm ceramic-fibre lining, heat detector, tray and straps, two vents through the floor
+    material: "2 mm 5052 aluminium sheet, sealed, ceramic-fibre paper lining"
+    system: electrical
+    zone: inside
+    hollow: true
+    box: [plinth_x0, plinth_y0, floor_z, 900, plinth_d, bat_box_h]
+    mass: {basis: declared, total_kg: 18, maturity: estimate, source: "Report 20 E-10: 2.3 m2 of 2 mm aluminium at 5.4 kg/m2, lining 1.5 kg, tray and straps 4 kg (est.)"}
+    note: AS/NZS 3001.2 clause 5.4.12.2. Sealed from the cabin and vented outside through the floor, outboard of the kerb rail and away from the Combi's cowl. It stands 125 mm off the kerb wall to bring the centre of gravity inboard (MAS-11), with the hoses and cables behind it. The washer's hoses pass within 300 mm of its terminal face, so they run in a dielectric sleeve (clause 5.4.10.2).
+  - id: EL-01
+    name: House battery, 5 x Victron Lithium NG 51.2 V 100 Ah (BAT548110620), 25.6 kWh, upright in the plinth
+    system: electrical
+    zone: inside
+    box: [plinth_x0 + 25, plinth_y0 + 26, floor_z + 20, 850, 648, 235]
+    mass: {basis: declared, total_kg: 185, maturity: spec, source: "https://cdn.shopify.com/s/files/1/0497/4749/3026/files/Datasheet-Lithium-NG-batteries-12_8V-25_6V-51_2V-EN.pdf?v=1739576641", note: "37 kg each (Victron datasheet, marked est. by Victron, report 20 E-01)"}
+    note: Five modules of 235 x 648 x 162 mm, terminals up, side by side along X with 10 mm gaps. 25.1 h of the design hot day when new, 17.2 h at end of life (H3, report 20).
+  - id: EL-03
+    name: Battery fuses, one 125 A MEGA per module in a 6-way holder, and the bank busbars, in the plinth's end slot
+    system: electrical
+    point: [plinth_x0 + 987, plinth_y0 + plinth_d / 2, floor_z + 200]
+    mass: {basis: declared, total_kg: 1.5, maturity: estimate, source: "Report 20 E-09 (est.)"}
+  - id: LA-14F
+    name: Machine base over the battery box, aluminium frame with rubber-isolated bases and ratchet straps for the washer and the dryer
+    material: "Aluminium angle frame, rubber isolators, polyester ratchet straps"
     system: living
     zone: inside
-    box: [lz_door_x + 1240, -half_in, floor_z, 800, 550, 850]
+    box: [plinth_x0, plinth_y0, floor_z + bat_box_h, plinth_l, plinth_d, 40]
+    mass: {basis: declared, total_kg: 8, maturity: estimate, source: "Layout study (est.)"}
+  - id: LA-02
+    name: Washing machine, Camec Compact RV II 3.5 kg top loader, part 051879, on the plinth
+    system: living
+    zone: inside
+    box: [plinth_x0 + 10, plinth_y0, floor_z + plinth_h, 445, 460, 730]
+    mass: {basis: declared, total_kg: 16.0, maturity: spec, source: "https://cdn.shopify.com/s/files/1/0578/8326/3042/files/051879_Manual.pdf?v=1718605142", note: "Camec, 16 kg, 445 x 460 x 730 mm (report 21)"}
+    note: Cold wash, 280 W, 44 L a wash. Kept out of the wet room. Travels empty with the lid latched.
+  - id: LA-14
+    name: Clothes dryer, Haier HDHPS70LW1 7 kg heat pump, no vent, on the plinth
+    system: living
+    zone: inside
+    box: [plinth_x0 + 480, plinth_y0, floor_z + plinth_h, 595, 590, 850]
+    mass: {basis: declared, total_kg: 40, maturity: estimate, source: "https://www.haier.com.au/laundry/dryers/7kg-300-series-heat-pump-dryer-hdhps70lw1-61444.html", note: "Mass not published, 38 to 48 kg for its class (report 21 open point 8)"}
+    note: 1.4 kWh a 3.5 kg load. Its condensate drains to the grey tank. It stands an hour after a corrugated-road day before it runs.
+  - id: LA-11P
+    name: Plinth front panel and the end slot's cover
+    material: "18 mm Garnica Ultralight poplar plywood with a laminate finish"
+    system: living
+    point: [plinth_x0 + plinth_l / 2, plinth_y0 + plinth_d, floor_z + plinth_h / 2]
+    mass: {basis: declared, total_kg: 3.8, maturity: estimate, source: "0.8 m2 at 4.7 kg/m2 (saving 1a, H13)"}
+  - id: LA-11L
+    name: Lockers over the washer and dryer, 880 x 400 x 400
+    material: "18 mm Garnica Ultralight poplar plywood with a laminate finish"
+    system: living
+    zone: inside
+    hollow: true
+    box: [plinth_x0, -half_in, ceiling_z - 400, 880, 400, 400]
+    mass: {basis: declared, total_kg: 8.5, maturity: estimate, source: "1.8 m2 at 4.7 kg/m2 (saving 1a, H13)"}
+  # ================================================================ the partition's living face: the 48 V board and the split's indoor unit (reports 19 and 20)
+  - id: LA-11E
+    name: Electrical board cabinet on the partition's kerb end, 200 x 800 x 720, vented, its door labelled as inverter-supplied
+    material: "18 mm Garnica Ultralight poplar plywood with a laminate finish"
+    system: electrical
+    zone: inside
+    hollow: true
+    box: [rear_x0 - 200, -half_in + 25, ceiling_z - 770, 200, 800, 720]
+    mass: {basis: declared, total_kg: 5.6, maturity: estimate, source: "1.2 m2 at 4.7 kg/m2 (saving 1a, H13)"}
+  - id: EL-04
+    name: Inverter-charger, Victron MultiPlus-II 48/6k5/100-50 230 V, on the partition's road end under the split's indoor unit
+    system: electrical
+    zone: inside
+    box: [rear_x0 - 155, 345, floor_z + 920, 150, 320, 644]
+    mass: {basis: declared, total_kg: 29.0, maturity: spec, source: "https://www.victronenergy.com/upload/documents/Datasheet-MultiPlus-II-inverter-charger-4k-4k5-6k5-10k-EN-.pdf"}
+    note: 6.0 kW at 25 C, 5.7 kW at 40 C. On the road side to balance the plinth (MAS-11), 2 m of 50 mm2 from the Lynx Distributor across the door head. The shower heater sheds first when the hob or the oven runs (CT-601).
+  - id: EL-05
+    name: Lynx Smart BMS NG, two SmartSolar MPPT 150/35, two Orion-Tr 48/24-16 and two Orion-Tr 48/12-30 on the board
+    system: electrical
+    point: [rear_x0 - 100, -560, ceiling_z - 400]
     parts:
-      - {item: Dometic CFX3 55IM, kg: 21.3, basis: retailer, source: "Overland Garage, OK4WD"}
-      - {item: Tie-down kit, kg: 0.5, basis: estimate}
-    note: 720 x 455 x 480 mm. Its lid needs about 455 mm clear above it, so the bench over it lifts (report 13 LA-06).
-  - id: LA-08C
-    name: Cupboard over the fridge and the freezer bench
-    system: living
+      - {item: "Victron Lynx Smart BMS NG 500 A (M10)", kg: 1.9, basis: maker, source: "https://www.victronenergy.com/upload/documents/Datasheet-Lynx-Smart-BMS-NG-EN.pdf"}
+      - {item: "Two Victron SmartSolar MPPT 150/35", kg: 2.5, basis: maker, source: "https://www.victronenergy.com/upload/documents/Datasheet-SmartSolar-charge-controller-MPPT-150-35-%26-150-45-EN.pdf"}
+      - {item: "Two Victron Orion-Tr 48/24-16 isolated converters", kg: 3.2, basis: maker, source: "https://www.victronenergy.com/upload/documents/Datasheet-Orion-Tr-Smart-DC-DC-chargers-isolated-250-400W-EN.pdf"}
+      - {item: "Two Victron Orion-Tr 48/12-30 isolated converters", kg: 3.6, basis: maker, source: "Orion-Tr Smart datasheet, 1.8 kg each (report 20 E-07)"}
+  - id: EL-06
+    name: Lynx Distributor, Cerbo GX MK2 with GX Touch 50, the 230 V board, and the board panel with its wiring
+    system: electrical
+    point: [rear_x0 - 100, -560, ceiling_z - 500]
+    parts:
+      - {item: "Victron Lynx Distributor (M10)", kg: 1.5, basis: estimate, source: "Report 20 E-03"}
+      - {item: "Cerbo GX MK2 and GX Touch 50 (the display beside the entry door)", kg: 0.6, basis: estimate, source: "Report 20 E-08"}
+      - {item: "230 V board: 15 A inlet with a 16 A RCBO, main switch, ten 30 mA RCBOs, three contactors, three current relays, 300 A DC isolator, Anderson SB50", kg: 4.7, basis: estimate, source: "Report 20 E-12"}
+      - {item: "Board panel 800 x 700 mm and the wiring on it", kg: 5.0, basis: estimate, source: "Report 20 E-13"}
+  - id: EL-07
+    name: Main DC cables and lugs, bank 70 mm2, inverter 50 mm2, MPPT and converters 10 mm2
+    material: "Tinned flexible copper, double insulated"
+    system: electrical
+    point: [rear_x0 - 100, -800, floor_z + 900]
+    mass: {basis: declared, total_kg: 6.0, maturity: estimate, source: "Report 20 E-11 (est.)"}
+  - id: EL-08
+    name: Starlink Mini with its pole mount and 15 m cable, stowed in a bench drawer for travel
+    system: electrical
+    point: [rear_x0 - 450, half_in - 300, floor_z + 700]
+    parts:
+      - {item: "Starlink Mini with its kickstand", kg: 1.16, basis: maker, source: "https://www.starlink.com/specifications?spec=5"}
+      - {item: "Pole mount and 15 m cable", kg: 1.0, basis: estimate}
+    note: 12 to 48 V DC, about 60 W, on a fused 24 V circuit (report 20 section 7).
+  - id: AC-01
+    name: Split air-conditioner, indoor unit, Mitsubishi Electric MSZ-AP25VGKD2, high on the partition's road end, blowing forward
+    system: hvac
     zone: inside
-    box: [lz_door_x + 640, -half_in, ceiling_z - 550, 1400, 550, 550]
-    mass: {basis: declared, total_kg: 8, maturity: estimate, source: "Report 18 open question 12 (estimate)"}
+    box: [rear_x0 - 219, 342, ceiling_z - 349, 219, 798, 299]
+    mass: {basis: declared, total_kg: 10.5, maturity: spec, source: "https://www.mitsubishielectric.com.au/product/msz-ap25-80vgd-split-system-air-conditioner/"}
+    note: 2.5 kW cooling, 3.2 kW heating, never shed (C8). 9.0 kWh of battery on the design hot day (report 19). Condensate through a trap to the wet room floor waste.
+  - id: AC-02
+    name: Split air-conditioner, outdoor unit, Mitsubishi Electric MUZ-AP25VGD2, high on the rear wall's road half
+    system: hvac
+    box: [body_x1 + 50, half_bw - 817.5, ceiling_z - 560, 285, 800, 550]
+    mass: {basis: declared, total_kg: 35, maturity: spec, source: "https://www.mitsubishielectric.com.au/product/msz-ap25-80vgd-split-system-air-conditioner/", note: "In the kit MSZAP25VGKD2KIT (report 19 R19-02)"}
+    note: Out of the stone spray and the jack-knife sweep. On the road half to balance the kerb-side battery plinth (MAS-11), 1.0 m of pipe from the indoor unit. Its defrost water drains by hose clear of the rinse box below it. Not on a side wall, where its 285 mm depth would break the 2,500 mm width (VSB1 5.2).
+  - id: AC-03
+    name: Vehicle mounting package for the split, aluminium cradle on four wire-rope isolators, perforated guard with a lift-off travel cover, line set and backing plate
+    material: "Aluminium cradle and guard, stainless wire-rope isolators, copper line set with braided absorbers"
+    system: hvac
+    hollow: true
+    box: [body_x1, half_bw - 830, ceiling_z - 610, 400, 825, 650]
+    mass: {basis: declared, total_kg: 11, maturity: estimate, source: "Report 19 R19-03 (est.)"}
+    note: The cradle bolts through insert strips into the rear wall and the roof-to-wall joiner, with two stays to the road-side rear corner. Its kerb edge stays 48 mm clear of the rear door's free edge.
+  - id: VE-01A
+    name: Fresh air with heat recovery, LUNOS e2 60 fan A (pair 1), high in the kerb wall over the dryer, in the locker
+    material: "Fan with a ceramic regenerator in a 200 mm sleeve, MERV 13 inner cover, stainless outer hood"
+    system: hvac
+    box: [body_x0 + 2880, -half_in, floor_z + 1500, 162, 165, 162]
+    mass: {basis: declared, total_kg: 1.2, maturity: estimate, source: "https://cdn.shopify.com/s/files/1/2642/2036/files/TechInfo_e260_E348-02.20.pdf?v=1621935013", note: "Report 19 R19-05 (est.)"}
+  - id: VE-01B
+    name: Fresh air with heat recovery, LUNOS e2 60 fan B (pair 2), low in the road wall in the sink cabinet
+    material: "Fan with a ceramic regenerator in a 200 mm sleeve, MERV 13 inner cover, stainless outer hood"
+    system: hvac
+    zone: inside
+    box: [body_x0 + 3180, half_in - 165, floor_z + 150, 162, 165, 162]
+    mass: {basis: declared, total_kg: 1.2, maturity: estimate, source: "Report 19 R19-05 (est.)"}
+  - id: VE-01C
+    name: Fresh air with heat recovery, LUNOS e2 60 fan C (pair 1), low in the front wall beside the desk, kerb side
+    material: "Fan with a ceramic regenerator in a 200 mm sleeve, MERV 13 inner cover, stainless outer hood"
+    system: hvac
+    zone: inside
+    box: [in_x0, -800, floor_z + 100, 165, 162, 162]
+    mass: {basis: declared, total_kg: 1.2, maturity: estimate, source: "Report 19 R19-05 (est.)"}
+    note: The bed zone's side walls have no room left, so the bed-zone fans sit low on the front wall in bulkhead boxes beside the desk ends (phase 0).
+  - id: VE-01D
+    name: Fresh air with heat recovery, LUNOS e2 60 fan D (pair 2), low in the front wall beside the desk, road side
+    material: "Fan with a ceramic regenerator in a 200 mm sleeve, MERV 13 inner cover, stainless outer hood"
+    system: hvac
+    zone: inside
+    box: [in_x0, 638, floor_z + 100, 165, 162, 162]
+    mass: {basis: declared, total_kg: 1.2, maturity: estimate, source: "Report 19 R19-05 (est.)"}
+  - id: VE-02
+    name: LUNOS 5/UNI-FT controller with its humidity sensor, on the 12 V bus
+    system: hvac
+    point: [rear_x0 - 100, -560, ceiling_z - 300]
+    mass: {basis: declared, total_kg: 0.5, maturity: estimate, source: "Report 19 R19-06 (est.)"}
+  - id: VE-03
+    name: Wet room extract, LUNOS RA 15-60 in a 9/R 160 sleeve, high in the rear wall's kerb half, over the toilet
+    material: "Radial fan in a 160 mm sleeve with an outer hood"
+    system: hvac
+    zone: inside
+    box: [in_x1 - 165, -1015, floor_z + 1688, 165, 162, 162]
+    mass: {basis: declared, total_kg: 1.2, maturity: estimate, source: "https://cdn.shopify.com/s/files/1/2642/2036/files/Installation_Manual_RA_15-60_final.pdf?v=1634725895", note: "Report 19 R19-07 (est.)"}
+  - id: VE-04
+    name: Towing and dust-storm pressurisation, Sy-Klone RESPA-CF2 24 V with MERV 16 and carbon filters, in the tower's top cupboard
+    material: "Powered precleaner and filter housing (maker)"
+    system: hvac
+    zone: inside
+    box: [bed_x1 + 5, half_in - 450, ceiling_z - 325, 300, 450, 300]
+    mass: {basis: declared, total_kg: 6, maturity: estimate, source: "http://www.sy-klone.com/air-quality-systems/fresh-air-systems/", note: "Not published, report 19 R19-08 (est.)"}
+    note: Its intake hood with a mesh stone guard is high in the road wall beside it (V2), 1.6 m behind the front wall, because the bed's day position fills the front wall's upper part. It runs from the ute through the Orion-Tr while towing.
+  - id: VE-05
+    name: Parked overpressure fan, 24 V EC radial fan with an ISO coarse prefilter, ePM1 80 % panel and carbon cassette, beside the RESPA
+    material: "Sealed aluminium box (est.)"
+    system: hvac
+    zone: inside
+    box: [bed_x1 + 315, half_in - 350, ceiling_z - 235, 250, 350, 200]
+    mass: {basis: declared, total_kg: 2.5, maturity: estimate, source: "Report 19 R19-09 (est.)"}
+  - id: VE-06
+    name: Pressure relief valve (30 cm2 with a rubber flap, low in the rear wall) and a 0 to 125 Pa cabin pressure gauge
+    system: hvac
+    point: [in_x1 - 20, -935, floor_z + 140]
+    parts:
+      - {item: Body pressure-relief valve under a hood, kg: 0.2, basis: estimate, source: "Report 19 R19-10"}
+      - {item: 0 to 125 Pa differential gauge, kg: 0.3, basis: estimate, source: "Report 19 R19-11"}
+  - id: VE-07
+    name: Range hood, Sphere TCR-001, two 12 V fans, ducted to a cowl with a backdraft flap in the road wall
+    material: "Stainless hood with an aluminium mesh filter, 100 mm duct"
+    system: hvac
+    zone: inside
+    box: [bed_x1 + tower_l + 10, half_in - 300, ceiling_z - 450, 600, 300, 120]
+    mass: {basis: declared, total_kg: 6, maturity: estimate, source: "https://www.coastrv.com.au/products/sphere-range-hood-with-touch-control", note: "Hood 5 kg, duct and cowl 1 kg (report 19 R19-12, est.)"}
+  - id: VE-08
+    name: Sensors for the Cerbo GX, three RuuviTags, an NDIR CO2 sensor and a USB Bluetooth adapter
+    system: hvac
+    point: [rear_x0 - 700, 0, ceiling_z - 100]
+    mass: {basis: declared, total_kg: 0.4, maturity: estimate, source: "Report 19 R19-13 (est.)"}
+  # ================================================================ the wet room across the rear, 1,000 x 2,330 mm (H4, H4a, reports 19 and 21)
+  - id: WR-03
+    name: Partition between the living zone and the wet room, 20 mm aluminium honeycomb with an aluminium-skinned wet face, bonded to the tray, walls and ceiling
+    material: "20 mm aluminium honeycomb sandwich, aluminium skins, gelcoat wet face (est.)"
+    system: wet_room
+    zone: inside
+    box: [rear_x0, -half_in, floor_z, part_t, 2 * half_in, interior_h]
+    mass: {basis: declared, total_kg: 13.3, maturity: estimate, source: "3.51 m2 net of the door at 3.8 kg/m2 (saving 1g, H13)"}
+    note: It closes the body box at X 5,195 as a diaphragm. The inner door is 620 x 1,850 mm, hinged on its road-side edge, opening into the wet room.
+  - id: WR-04
+    name: Inner door, 620 x 1,850 leaf in the partition, frame, hinges, latch and seal
+    system: wet_room
+    point: [rear_x0 + 10, 10, floor_z + 925]
+    mass: {basis: declared, total_kg: 8.0, maturity: estimate, source: "Layout study (est.)"}
+  - id: WR-01
+    name: Wet room floor tray, moulded GRP 1,000 x 2,330 mm, falls 1:60 on an H80 wedge, 100 mm upstands, 30 mm lips at both doors, cove trims
+    material: "4 to 5 mm GRP laminate with gelcoat on an H80 foam wedge"
+    system: wet_room
+    zone: inside
+    hollow: true
+    box: [wet_x0, -half_in, floor_z, in_x1 - wet_x0, 2 * half_in, 130]
+    parts:
+      - {item: "GRP tray with upstands and lips, one-off from a plug", kg: 21, basis: estimate, source: "https://innovativecomposites.com.au/ (report 19 R19-24)"}
+      - {item: "GRP cove trims and MS polymer sealant", kg: 3, basis: estimate, source: "Report 19 R19-24"}
+    note: The whole floor drains (H4). The shower zone feeds the DauerShower through its own drain, the rest of the floor drains through a floor waste with a membrane trap to the grey tank. Fill test to the lip for 24 h before fit-out.
+  - id: WR-02
+    name: Sand grate at the rear door, stainless linear grate about 600 x 100 mm over a lift-out sand basket
+    system: wet_room
+    point: [in_x1 - 50, rear_door_y0 + rear_door_w / 2, floor_z + 15]
+    mass: {basis: declared, total_kg: 2, maturity: estimate, source: "Report 19 R19-25 (est.)"}
+  - id: WR-05
+    name: Outdoor rinse, Watermarked External Shower Box, hot and cold, on the rear wall beside the rear door's handle side
+    system: wet_room
+    point: [in_x1 - 30, 750, floor_z + 150]
+    mass: {basis: declared, total_kg: 1.5, maturity: estimate, source: "https://campervanbuilders.com.au/products/external-shower-box-watermarked-white"}
+    note: About 1,000 mm above the ground (H4). Non-return valve on each line.
+  - id: WR-06
+    name: Cassette toilet, Thetford C223-CS, swivel bowl, electric flush, against the kerb wall
+    system: wet_room
+    zone: inside
+    box: [wet_x0 + 300, -half_in, floor_z + 30, 394, 580, 534]
+    mass: {basis: declared, total_kg: 7.2, maturity: spec, source: "https://www.thetford.com/app/uploads/Overview-and-technical-specifications-cassette-toilets.pdf", note: "Thetford, 7.2 kg (report 21)"}
+    note: Its cassette leaves through the service door BD-17 behind it. 18 L, about 3 days for two people.
+  - id: WR-07
+    name: Two spare cassettes, Thetford 50046, in a sealed GRP bin under the basin
+    material: "GRP bin with a gasketed lid"
+    system: wet_room
+    zone: inside
+    box: [wet_x0, -half_in, floor_z + 30, 300, 450, 800]
+    parts:
+      - {item: "Two Thetford 50046 waste holding tanks, empty", kg: 5.0, basis: estimate, source: "Report 21 section 8 (2.5 kg each, est.)"}
+      - {item: "Sealed GRP bin", kg: 3.0, basis: estimate}
+    note: With two spares a 7-day stay needs no dump run (report 21 section 8). A full cassette weighs about 20 kg and does not travel full.
+  - id: WR-08
+    name: Bathroom fittings, basin on the partition with its mixer, mirror cabinet, towel rail, the shower's bypass mixer and hand shower, two drains and two membrane traps
+    system: wet_room
+    zone: inside
+    box: [wet_x0, -700, floor_z + 735, 285, 385, 115]
+    parts:
+      - {item: "Rectangular caravan basin 385 x 285 x 115, SKU 310221", kg: 1.0, basis: estimate, source: "https://www.jacksonsleisure.com/caravan-basin-rectangular-385mm-x-285mm-campervan-basin/"}
+      - {item: "Basin mixer with a 4 L/min regulator", kg: 0.6, basis: estimate}
+      - {item: "Caravan shower mixer with hand shower and rail, the DauerShower's bypass", kg: 1.5, basis: estimate}
+      - {item: "Aluminium-framed mirror cabinet 450 x 120 x 600", kg: 2.5, basis: estimate}
+      - {item: "Stainless double towel rail, 600 mm", kg: 0.6, basis: estimate}
+      - {item: "Shower drain with a 6 mm hair strainer, and the floor waste", kg: 0.7, basis: estimate}
+      - {item: "Two membrane odour traps", kg: 0.4, basis: estimate, source: "https://dauershower.com/store/"}
+  - id: WR-09
+    name: Recirculating shower, DauerShower 2.0 with its 2.4 kW heater, technical unit in a dry cabinet on the partition's living face, switching unit in the floor well
+    system: wet_room
+    zone: inside
+    box: [rear_x0 - 100, 700, floor_z + 1325, 100, 320, 230]
+    mass: {basis: declared, total_kg: 6.0, maturity: estimate, source: "https://dauershower.com/wp-content/uploads/2026/07/DauerShower-Anleitung_DLE.pdf", note: "Technical unit 3.5 kg (maker) plus the switching unit, panel and hoses (est., report 21)"}
+    note: 230 V mode, about 5 L a shower. Its heater sheds when the hob or the oven runs, and the 12 V mode then tops the loop up with boiler water (conductor ruling, report 21 section 6).
+  - id: WR-10
+    name: DauerShower well under the shower drain, sealed and insulated GRP, 300 x 400 x 120 mm below the shower floor, service panel from below
+    material: "GRP shell with closed-cell foam insulation"
+    system: wet_room
+    box: [wet_x0 + 145, rail_in - 400, floor_underside_z - 80, 300, 400, 110]
+    mass: {basis: declared, total_kg: 3, maturity: estimate, source: "Layout study (est., H4a)"}
+    note: Between the rails over the grey tank, 67 mm above its top, so the switching unit drains straight down. The wet room floor stays level with the living floor (H4a).
+  - id: WR-11
+    name: Grey water tote, 40 L wheeled, with hose and camlock, strapped in the shower zone's rear corner for travel
+    system: wet_room
+    zone: inside
+    box: [in_x1 - 310, 345, floor_z + 30, 300, 400, 600]
+    mass: {basis: declared, total_kg: 3.0, maturity: estimate, source: "https://roustaboutsrvclub.com.au/wp-content/uploads/2022/03/Grey_Water_Tote-article_1.pdf"}
+  # ================================================================ safety, cabinetry trims and the spaces kept clear
   - id: LA-12
-    name: Fire extinguisher 1A:20B:(E) and fire blanket inside the entry door
+    name: Fire extinguisher 1A:20B:(E), fire blanket and smoke alarm, on the tower's aisle-side end facing the entry door
     system: living
-    point: [lz_door_x + 620, -half_in + 65, floor_z + 900]
+    point: [bed_x1 + tower_l - 10, half_in - kit_d - 20, floor_z + 1000]
     parts:
       - {item: "Fire extinguisher, 1 kg dry powder 1A:20B:(E), with bracket", kg: 2.3, basis: estimate}
       - {item: Fire blanket 1.2 x 1.2 m, kg: 0.7, basis: estimate}
       - {item: Smoke alarm and its mount, kg: 0.3, basis: estimate}
       - {item: Mounting board, kg: 1.5, basis: estimate}
-    note: VSB1 13.2.2 for a body with one compartment (report 18 section 1.1). The garage's 2.5 kg extinguisher moved to the ute's bike box.
-  - id: LA-02
-    name: Washing machine, Camec 3.5 kg top loader, part 051879 (washer only)
+    note: VSB1 13.2.2. Beside the entry door and the hob.
+  - id: LA-15
+    name: Carbon monoxide alarm between the tower and the bed, a GPS tracker and door sensors on the Cerbo GX
     system: living
-    zone: inside
-    when: 1 - opt_dryer
-    box: [rear_x0 - 600, half_in - 470, floor_z, 600, 470, 850]
-    mass: {basis: declared, total_kg: 16.0, maturity: spec, source: "https://www.mygenerator.com.au/assets/files/Camec_053344_Product_Brochure.pdf", note: "Camec brochure, 16 kg, 445 x 460 x 730 mm (report 13)"}
-    note: Against the road-side wall, in front of the bathroom. Its lid opens to about Z 2,115, under the Victron board.
-  - id: LA-02
-    name: Washer-dryer, Whirlpool WWPB8502IW (owner option opt_dryer)
+    point: [bed_x1, 0, ceiling_z - 50]
+    mass: {basis: declared, total_kg: 0.8, maturity: estimate, source: "Layout study section 7 (est.)"}
+    note: The Combi burns diesel inside the tower, so a CO alarm sits in the bed zone. The Cerbo stops the e2 pair 2 while the Combi runs on diesel.
+  - id: LA-11X
+    name: Cabinetry trims, hinges, catches, drawer runners and small panels
     system: living
-    zone: inside
-    when: opt_dryer
-    box: [rear_x0 - 600, half_in - 600, floor_z, 600, 600, 850]
-    mass: {basis: declared, total_kg: 66.0, maturity: spec, source: "https://hndgwww2.blob.core.windows.net/hnau/Whirlpool_WWPB8502IW_Spec-Sheet.pdf", note: "Whirlpool sheet, 66 kg, 595 x 475 x 820 mm (report 13)"}
-    note: The owner option. Its 600 mm depth meets the heater, which would then move towards the aisle (TRAILER.md open questions).
-  - id: LA-03
-    name: Diesel heater and hot water, Truma Combi D 6 (Australian version), with ducts and flue kit
-    system: living
-    zone: inside
-    box: [rear_x0 - 450, half_in - 470 - 525, floor_z, 450, 525, 300]
+    point: [rear_x0 - 900, 200, floor_z + 1000]
     parts:
-      - {item: Truma Combi D 6 with peripheral devices, kg: 17.2, basis: maker, source: "Truma Australia manual"}
-      - {item: "Four 65 mm warm-air ducts and outlets 1.2 kg, flue and intake kit 1.0 kg", kg: 2.2, basis: estimate}
-    note: Report 13 LA-03. Beside the washer against the bathroom's front wall. Its fuel tank is UF-06.
-  - id: LA-04
-    name: Inverter and chargers, Victron 24 V board on the bathroom's front wall, above the washer lid
-    system: living
-    zone: inside
-    box: [rear_x0 - 160, half_in - 915, floor_z + 1200, 160, 800, 700]
-    parts:
-      - {item: Victron MultiPlus-II 24/5000/120-50 inverter-charger, kg: 30.0, basis: maker, source: "Victron datasheet"}
-      - {item: Two Victron SmartSolar MPPT 150/45, kg: 2.5, basis: maker, source: "Victron datasheet"}
-      - {item: Victron Orion-Tr Smart 12/24-15 isolated DC-DC charger, kg: 1.8, basis: maker, source: "Victron datasheet"}
-      - {item: Victron Orion 24/12-70 converter, kg: 1.5, basis: retailer, source: "Current Connected"}
-      - {item: Victron Lynx Smart BMS NG 500 A, kg: 1.9, basis: maker, source: "Victron datasheet"}
-      - {item: "Lynx Distributor 1.5, Cerbo GX and GX Touch 50 0.6, fuses 0.8, board 2.5, wiring 2.5", kg: 7.9, basis: estimate}
-    note: Report 13 LA-04 and section 2. 24 V system.
-  - id: LA-01
-    name: Wet bathroom, 1 x 1 m, fabricated walls, door on its kerb-side face, wet lining, floor pan, mixer, basin and trims
-    system: living
-    zone: inside
-    box: [rear_x0, half_in - 1000, floor_z, 1000, 1000, interior_h]
-    parts:
-      - {item: "Floor pan, GRP, 1,000 x 1,000 mm with 60 mm upstands and a drain", kg: 7.5, basis: estimate, source: "1.24 m2 of 3 to 4 mm GRP at 1.8 g/cm3"}
-      - {item: Bypass mixer and hand shower, kg: 1.5, basis: estimate}
-      - {item: "Walls, door, wet lining, trims, basin, cassette service door, shelf, rails, mirror, fittings and sealant", kg: 30.9, basis: estimate, source: "20 mm honeycomb at 3.3 kg/m2, 1.5 mm GRP lining at 1.5 kg/m2"}
-    note: Report 13 LA-01. The cassette leaves through a Thetford service door in the road-side wall. Grey water drains through a hose to a portable container outside (report 13 open question 10).
-  - id: LA-01A
-    name: Cassette toilet, Thetford C223-CS, swivel bowl, electric flush
-    system: living
-    point: [rear_x0 + 510, half_in - 250, floor_z + 270]
-    mass: {basis: declared, total_kg: 7.2, maturity: spec, source: "https://www.thetford.com/au/products-and-support/c223cs/", note: "Thetford Australia, 7.2 kg (report 13)"}
-    note: In the middle of the bathroom's road-side wall, so its cassette door keeps 300 mm from the body's rear corner (report 12's opening rule).
-  - id: LA-01B
-    name: Recirculating shower unit, DauerShower 2.0
-    system: living
-    point: [rear_x0 + 300, half_in - 150, floor_z + 210]
-    mass: {basis: declared, total_kg: 10.0, maturity: spec, source: "https://dauershower.com/", note: "Maker: under 10 kg (earlier page version, report 13). Imported, no Australian stockist"}
-  - id: LA-08B
-    name: Tall cupboard, kerb-side rear corner
-    system: living
-    zone: inside
-    box: [in_x1 - 390, -half_in, floor_z, 390, 600, interior_h]
-    mass: {basis: declared, total_kg: 12, maturity: estimate, source: "Report 18 open question 12 (estimate)"}
+      - {item: "Small panels, 1.2 m2 at 4.7 kg/m2", kg: 5.6, basis: estimate, source: "Saving 1a, H13"}
+      - {item: "Trims, hinges, push catches and drawer runners", kg: 8.0, basis: estimate}
   - id: LA-K1
     name: Entry door landing
     system: living
@@ -606,43 +1016,54 @@ items:
     keep_clear: true
     box: [lz_door_x, -half_in, floor_z, lz_door_w, 600, interior_h]
   - id: LA-K2
-    name: Seat space at the desk
+    name: Chair space at the desk, under the bed's night position
     system: living
     zone: inside
     keep_clear: true
-    box: [bed_x1, half_in - 1050, floor_z, 1100, 500, interior_h]
+    box: [in_x0 + 600, -600, floor_z, 900, 1200, bed_night_h - 5]
   - id: LA-K3
-    name: Bathroom door landing
+    name: Landing at the wet room's inner door, living side
     system: living
     zone: inside
     keep_clear: true
-    box: [rear_x0 + 250, half_in - 1600, floor_z, 600, 600, interior_h]
+    box: [rear_x0 - 600, -300, floor_z, 600, 620, interior_h]
   - id: LA-K4
-    name: Aisle from the bed to the bathroom and the rear window, at least 730 mm wide
+    name: Aisle from the bed to the inner door, 905 mm wide at full height, 1,030 mm at floor level
     system: living
     zone: inside
     keep_clear: true
-    box: [bed_x1, -half_in + 730, floor_z, in_x1 - bed_x1, 550, interior_h]
+    box: [bed_x1, -340, floor_z, rear_x0 - 225 - bed_x1, 905, interior_h]
+  - id: LA-K5
+    name: Wet room walk band from the rear door to the inner door, 620 mm wide
+    system: wet_room
+    zone: inside
+    keep_clear: true
+    box: [wet_x0, -300, floor_z, in_x1 - wet_x0, 620, interior_h]
+  - id: LA-K6
+    name: Zone inside the rear door for the stowed step
+    system: wet_room
+    zone: inside
+    keep_clear: true
+    box: [in_x1 - 250, rear_door_y0, floor_z, 250, rear_door_w, interior_h]
 
-  # ================================================================ payload carried in the body
+  # ================================================================ payload carried in the body (150 kg with the drawbar shelf's 20 kg, PL-03A)
   - id: PL-01
     name: Food and drink
     system: payload
     load: gear
-    point: [lz_door_x + 1340, -half_in + 300, floor_z + 700]
+    point: [bed_x1 + 300, half_in - 300, floor_z + 800]
     mass: {basis: declared, total_kg: 50, maturity: estimate, source: "Older block model"}
-    note: In the fridge and the freezer.
+    note: In the fridge, the freezer and the bench.
   - id: PL-02
     name: Clothes, bedding and personal gear
     system: payload
     load: gear
-    point: [in_x0 + 825, half_in - 432, floor_z + 750]
+    point: [4247, -189, 2279]
     mass: {basis: declared, total_kg: 60, maturity: estimate, source: "Older block model"}
-    note: In the bedside column and the bed drawers.
-  - id: PL-03
-    name: Other gear
+    note: 30 kg in the lockers over the laundry, 10 kg of bedding on the bed, 20 kg in the bench drawers.
+  - id: PL-03B
+    name: Other gear in the bench and the wet room
     system: payload
     load: gear
-    point: [in_x0 + 1050, 100, floor_z + 250]
-    mass: {basis: declared, total_kg: 40, maturity: estimate, source: "Older block model (misc gear)"}
-    note: Under the bed.
+    point: [rear_x0, 200, floor_z + 375]
+    mass: {basis: declared, total_kg: 20, maturity: estimate, source: "Half of the older block model's 40 kg of other gear"}

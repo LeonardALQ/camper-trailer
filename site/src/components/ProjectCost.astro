@@ -11,8 +11,9 @@ const aud = (v: number) => Math.round(v).toLocaleString('en-AU');
 const box = d.rows.find((r: any) => r.id === 'box');
 const left = d.pending.length ? `, without the ${d.pending.join(' and ').toLowerCase()}` : '';
 const car = d.car;
+const list = (a: string[]) => (a.length < 3 ? a.join(' and ') : `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}`);
 const closes = car.gap > 0 && car.closing.length
-  ? `, and ${car.closing.join(' and ')} bring it to AUD ${aud(car.with_closing)} if the old parts pass their tests` : '';
+  ? `, and ${list(car.closing)} bring it to AUD ${aud(car.with_closing)} if each one's test or weighing allows it` : '';
 const note = [
   "The truck is Leonard's planning figure.",
   `The car build is its required lines with the plan's contingency allowance, AUD ${aud(Math.abs(car.gap))} ${car.gap > 0 ? 'over' : 'under'} Leonard's AUD ${aud(car.budget)} for it${closes}.`,

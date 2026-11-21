@@ -7,7 +7,7 @@ Revision C, 20 Nov 2026. Build document for a fabricator to quote from and an en
 The box carries the Aprilia Tuareg 660 Rally (206 kg) and the Triumph Street Triple 765 (175 kg) side by side, noses forward, 760 mm apart, with about 60 kg of tools. It is locked, sealed against dust and vented for fuelled bikes.
 
 - At most 1,850 mm wide. Toyota BBGJ1007: 39 mm from the cab, 25 mm over the tyre at full bump, 40 mm inside it, 30 mm outside it, bodies on the deck mount brackets, no drilling or welding of the frame.
-- Rear axle at most 2,550 kg with growth. Box empty under report 17's 440 kg (UGB-01).
+- Rear axle at most 2,850 kg with growth on the Lovells Elite kit (decision H17, 21 Nov 2026), or 2,550 kg if cut CUT7 returns to the Platinum (`VEHICLE.md`). Box empty under report 17's 440 kg (UGB-01).
 - NTC Load Restraint Guide 2018: 0.8 g forward, 0.5 g rearward and sideways, 0.2 g up ([guide, p. 19](https://media.nrspp.org.au/wp-content/uploads/2021/11/06005924/Load-Restraint-Guide-for-light-vehicles-2018.pdf)).
 - Ramp at most 20 degrees (report 03).
 

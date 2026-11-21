@@ -17,7 +17,7 @@ from .partsdb import DATA
 
 BODY_YAML = DATA / "body" / "body.yaml"
 G = 9.81
-MOUNTED = ("body", "roof", "bed", "living", "payload")   # systems that stand on the floor (the drawbar box is on the drawbar)
+MOUNTED = ("body", "roof", "bed", "living", "payload", "electrical", "hvac", "wet_room")   # systems on the body (the drawbar box is on the drawbar)
 
 
 def load_data() -> dict:
@@ -33,6 +33,8 @@ class Panel:
         self.dd = self.c + (self.t1 + self.t2) / 2          # skin centre spacing
         self.E, self.G, self.ult = d["E"], d["G"], d["ult"]
         self.core = d["core"]
+        st = d.get("stiffener")
+        self.D_stiff = st["E"] * st["I"] / st["pitch"] if st else 0.0   # stiffeners smeared over their pitch, N mm2/mm
 
     @property
     def D(self) -> float:
@@ -71,11 +73,12 @@ class Panel:
         return dict(M=M, V=V, b_eff=b, skin_mpa=sig, core_mpa=tau, defl_mm=defl)
 
     def uniform(self, w_mpa: float, span: float) -> dict:
-        """Uniform pressure w (N/mm2) on a one-way strip, simply supported."""
+        """Uniform pressure w (N/mm2) on a one-way strip, simply supported. The deflection counts the panel's own
+        stiffeners, smeared over their pitch. The skin stress leaves them out."""
         M = w_mpa * span ** 2 / 8
         V = w_mpa * span / 2
         return dict(skin_mpa=M / (min(self.t1, self.t2) * self.dd), core_mpa=V / self.dd,
-                    defl_mm=5 * w_mpa * span ** 4 / (384 * self.D) + w_mpa * span ** 2 / (8 * self.S))
+                    defl_mm=5 * w_mpa * span ** 4 / (384 * (self.D + self.D_stiff)) + w_mpa * span ** 2 / (8 * self.S))
 
     def utils(self, r: dict, crit: dict, compression: bool = True) -> dict:
         """Utilisations against report 12's criteria: skin at half its ultimate (and half the wrinkling stress when
@@ -157,7 +160,7 @@ class Body:
         self.panel_checks() if not hasattr(self, "roof_defl") else None
         return [dict(id="DEF-B1", what="Floor under a foot at 1 g", mm=self.floor_defl, limit_mm=self.raiser_span / cr["floor_span_ratio"]),
                 dict(id="DEF-B2", what="Fixed roof with the solar array at 1 g", mm=self.roof_defl, limit_mm=(V["body_width"] - V["wall_t"]) / cr["roof_span_ratio"]),
-                dict(id="DEF-B3", what="Side wall in a 0.5 kPa wind", mm=self.wall_defl, limit_mm=V["interior_h"] / cr["wall_span_ratio"])]
+                dict(id="DEF-B3", what="Side wall in a 0.5 kPa wind, with its stiffeners", mm=self.wall_defl, limit_mm=V["interior_h"] / cr["wall_span_ratio"])]
 
     # ------------------------------------------------------------------ inserts and the roof joint
     def roof(self) -> dict:
@@ -174,13 +177,17 @@ class Body:
     def inserts(self) -> list[dict]:
         """Working loads on the panel fixings against half their rated load (report 12 section 3, MAT-05)."""
         L, cr = self.d["loads"], self.crit
-        perm = 3 * L["bed_kg"] * G / L["bed_ledger_mm"]            # N/mm along the deck's ledgers, all of the bed on them
-        f_ledger = perm * L["ledger_pitch"]
+        screws = L["bed_rails"] * L["rail_screws"]
+        f_night = L["bed_night_factor"] * L["bed_kg"] * G / screws    # the bed down with two sleepers moving on it
+        f_travel = 3 * L["bed_travel_kg"] * G / screws               # LC2, 3 g on the moving bed at its day stop
+        f_rail = max(f_night, f_travel)
         awning = next((b for b in self.lay.blocks if b.id == "BD-13"), None)
         aw_kg = awning.mass_kg if awning else 41.0
         f_awning = math.hypot(3 * aw_kg * G / 6, 3 * aw_kg * G / 6 * 100 / 60)   # six brackets, 100 mm offset, 60 mm bolt pitch
-        rows = [dict(id="INS-01", what="Bed deck ledger fixing in the front and kerb walls, Deform-Nut M6 in a pultruded strip, shear", n=f_ledger, rated_n=1700,
-                     case="LC2, 3 g on the 255 kg bed"),
+        rows = [dict(id="INS-01", what="Lift-bed rail screw, 1/4 in self-tapping into the RHS 40 x 20 x 3 hardpoint in the side wall, shear", n=f_rail,
+                     rated_n=L["rail_screw_rated_n"],
+                     case=(f"{L['bed_night_factor']:g} x the {L['bed_kg']:.0f} kg bed at night" if f_night >= f_travel else
+                           f"LC2, 3 g on the {L['bed_travel_kg']:.0f} kg moving bed") + f", over {screws} screws"),
                 dict(id="INS-02", what="Awning bracket bolt, Panelock APLB-1020 through the wall's top insert strip, tension", n=f_awning, rated_n=20000,
                      case="LC2, 3 g on the awning")]
         for r in rows:
@@ -283,8 +290,8 @@ class Body:
     def end_wall(self) -> dict:
         """The rear wall as the box's rear diaphragm (report 12 section 5). The torque the floor bolts put into the box at the
         stations in its rear half has to be held in shape at the rear wall, so the wall racks under F = T / 2h, h the
-        cell height, for LC5a and LC5b and both bounds on the roof. The full 2,330 mm panel less its 600 mm window takes
-        F in shear in its skins, and its bonded joiners take F along their length."""
+        cell height, for LC5a and LC5b and both bounds on the roof. The 2,330 mm panel less its openings at the worst
+        height takes F in shear in its skins, and its bonded joiners take F along their length."""
         V, cr, tw = self.V, self.crit, self.d["twist"]
         gj = self.box_gj(True)
         x_mid = (V["body_x0"] + V["body_x1"]) / 2
@@ -294,7 +301,9 @@ class Body:
         T = T_by[gov] * 1e6
         F = T / (2 * gj["h"])
         wl = self.p["wall"]
-        w = 2 * V["half_in"] - self.d["end_wall"]["window_w"]
+        rear = [o for o in self.openings() if o["wall"] == "rear"]
+        cut = max((sum(o["w"] for o in rear if o["z0"] <= z <= o["z1"]) for z in {q["z0"] for q in rear} | {q["z1"] for q in rear}), default=0.0)
+        w = 2 * V["half_in"] - cut
         tau = F / (w * (wl.t1 + wl.t2))
         allow = cr["skin_factor"] * wl.ult / math.sqrt(3)
         q = F / (2 * V["half_in"])

@@ -1,6 +1,6 @@
 """Body solids for the 3D model (BODY.md): floor, walls with their openings cut, the fixed roof, the roof-to-wall joiner,
 the entry door, windows, vents and the mud flaps. Every solid is an envelope at planning level, placed in the project
-datum DIM-01. Revision B: the fixed roof of the LandCruiser 79 layout, with no pop-top, garage door or rear portal."""
+datum DIM-01. Revision C: the home trailer's fixed roof 2,000 mm inside, the wet room door in the rear wall and four windows."""
 from __future__ import annotations
 
 from .body import Body
@@ -43,9 +43,10 @@ def body_solids(lay) -> list[tuple[str, object, tuple[str, float]]]:
 
     def filler(o):
         glass = "Window" in o["name"]
-        door = o["id"] == "OP-02"
+        door = o.get("from") in ("BD-07", "BD-15")
         col = GLASS if glass else ("#b2bec3", 0.5 if door else 0.6)
-        label = "BD-07 Entry door, closed" if door else f"{o['id']} {o['name'].split(',')[0]}"
+        name = o["name"].split(",")[0]
+        label = f"{o['from']} {name}, closed" if door else f"{o.get('line') or o['id']} {name}"
         return glass, col, label
 
     out.append(("BD-01 Floor, 30 mm woven roving and H80", box(x0, -hw, V["floor_underside_z"], L, 2 * hw, V["floor_t"]), ("#8c8c8c", 0.7)))
@@ -83,4 +84,4 @@ def body_solids(lay) -> list[tuple[str, object, tuple[str, float]]]:
     return out
 
 
-BODY_IDS = ("BD-01", "BD-02", "BD-03", "BD-04", "BD-07")   # blocks the body solids replace in the model
+BODY_IDS = ("BD-01", "BD-02", "BD-03", "BD-04", "BD-07", "BD-15", "BD-17", "WN-01", "WN-02", "WN-03", "WN-04")   # blocks the body solids replace

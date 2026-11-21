@@ -1,5 +1,6 @@
 # The tow vehicle: a Toyota LandCruiser 79 single cab chassis, V8 (VDJ79R, GXL, built 01/2017 to 08/2022), with the
-# Lovells 4,200 kg GVM kit (UTE-GARAGE.md, research report 16, `docs/decisions.md` decision log).
+# Lovells 4,495 kg Elite GVM kit (decision H17, VEHICLE.md, research report 16, `docs/decisions.md`). Cut CUT7 returns to
+# the 4,200 kg Platinum kit if the S3 weighing leaves at least 30 kg under its 2,550 kg rear axle.
 # Ute frame (DIM-U1): X along the ute from the front axle centre, positive rearward. Y from the centreline, positive to
 # the road (right) side. Z up from the ground, ute level at its laden ride height. mm and kg.
 # Any number may be an expression over `params`. Masses carry a maturity as in report 02 MASS-06: spec (a maker's
@@ -46,22 +47,23 @@ params:
                                # (data/assemblies/ute-garage.yaml) sets it. This copy places the U1 block when no module is built
   box_h: 1502                  # floor top to the roof top: 1,460 inside, 40 mm roof bows, 2 mm roof skin
   # ---------------------------------------------------------------- the trailer behind it (decision log targets)
-  trailer_atm: 3100            # the redesigned trailer's plated ATM (decision log 12:10 UTC, TRAILER.md revision H)
-  towball_design: 250          # the plan's own cap on the towball (decision log, GVM and GCM)
+  trailer_atm: 3500            # the home trailer's plated ATM (decision H2)
+  towball_design: null         # set by the build to the trailer's heaviest towball with growth (cad/towball.py). MAS-03B and a test check it
   # ---------------------------------------------------------------- people and tools
   people_x: 1660               # two adults, 400 mm ahead of the cab back (report 16)
   people_z: 1000               # (estimate, report 17)
 
 # Limits. `src` is the source and `basis` its kind.
 limits:
-  gvm_kg: {v: 4200, src: "Lovells 4,200 kg Platinum kit TOYKIT080-GVM (report 16 section 2.3, decision log)", basis: installer}
-  front_axle_kg: {v: 1650, src: "Lovells TOYKIT080-GVM front axle rating", basis: installer}
-  rear_axle_kg: {v: 2550, src: "Lovells TOYKIT080-GVM rear axle rating", basis: installer}
-  weighed_max_kg: {v: 3850, src: "Decision log: hold the weighed ute to 3,850 kg with no more than 250 kg on the ball", basis: plan}
-  gcm_kg: {v: 6900, src: "Toyota 6,900 kg GCM kept (decision log, report 16 section 2.4)", basis: maker}
+  gvm_kg: {v: 4495, src: "Lovells 4,495 kg Elite kit for the single cab from 01/2017 (report 16 section 2.3, decision H17, car build line GV05)", basis: installer}
+  front_axle_kg: {v: 1650, src: "Lovells Elite front axle rating, as the Platinum's (report 16)", basis: installer}
+  rear_axle_kg: {v: 2850, src: "Lovells Elite rear axle rating, wide-track housing and chrome-moly axles (report 16, decision H17)", basis: installer}
+  platinum_rear_axle_kg: {v: 2550, src: "Lovells TOYKIT080-GVM rear axle rating, the kit cut CUT7 returns to", basis: installer}
+  platinum_return_margin_kg: {v: 30, src: "Decision H17: CUT7 applies only if the S3 weighing leaves at least 30 kg under the Platinum's rear axle at the trailer's weighed towball", basis: plan}
+  weighed_max_kg: {v: 3850, src: "Decision log: hold the weighed ute to 3,850 kg, towball included", basis: plan}
+  gcm_kg: {v: 7400, src: "Lovells' 7,400 kg GCM revision, which Lovells rates for both the 4,200 kg and the 4,495 kg kits (report 16), certified in the same NSW inspection (decision H2, car build lines GV03 and GV06). Toyota's 6,900 kg applies if it is refused", basis: installer}
   braked_towing_kg: {v: 3500, src: "Toyota LC70 spec data, June 2021", basis: maker}
   towball_rating_kg: {v: 350, src: "Hayman Reese 03186RW, 3,500 kg and 350 kg (ARB)", basis: maker}
-  towball_plan_kg: {v: 250, src: "Decision log: no more than 250 kg on the ball", basis: plan}
   front_share_min_pct: {v: 20, src: "Toyota BBGJ1007 section 1-2 (extracted text)", basis: maker}
   cog_unladen_max_mm: {v: 1000, src: "Toyota BBGJ1007 section 1-2: unladen centre of gravity after body building", basis: maker}
   box_width_max_mm: {v: 1850, src: "Decision log: cab 1,790 mm plus Toyota's 60 mm (BBGJ1007 section 1-2)", basis: maker}
@@ -123,6 +125,15 @@ lines:
     maturity: estimate
     source: "Report 16 section 4: wheel 14.5 kg (estimate) and tyre 22.6 kg (G015, report 09). One spare on the ute (decision log)"
     cases: [UC1, UC2, UC3, UC4, UCB]
+  - id: UT-16
+    item: "Lovells Elite kit (GV05) over the Platinum: wide-track rear housing, chrome-moly axles, exchange diff and brake upgrade, net extra"
+    kg: 10
+    x: wheelbase
+    z: 400
+    maturity: estimate
+    elite: true
+    source: "Estimate: Lovells publishes no mass for the Elite. A housing about 95 mm wider and the larger brake parts, taken on the rear axle (decision H17). The factory 1,460 mm rear track is kept in this model until the kit's drawing gives the new one"
+    cases: [UC1, UC2, UC3, UC4]
   - id: UT-14
     item: "Trailer charging (TC01): two Victron Orion-Tr Smart 12/48-8 chargers in a vented cover low in the box front, with their 12 V cables and the 100 A fuse"
     kg: 8.4
@@ -191,7 +202,7 @@ lines:
     x: ball_x
     z: coupling_z
     maturity: spec
-    source: "The plan's 250 kg cap (decision log). Carries no growth: it is set by the trailer's balance"
+    source: "The trailer's heaviest towball with growth at its solved axle, rounded up to 0.1 kg (cad/towball.py). Carries no growth here: the trailer's figure has it"
     cases: [UC3, UC4]
   - id: UT-13
     item: "Tools on the plain tray, for the reference case"
@@ -213,23 +224,23 @@ lines:
 cases:
   - {id: UC1, name: "As built, unladen", note: "Kerb, accessories and the empty bike box. Toyota's 1,000 mm centre of gravity rule applies here"}
   - {id: UC2, name: "Bikes aboard, no trailer", note: "Two people, tools and both bikes"}
-  - {id: UC3, name: "Towing with the bikes aboard", note: "As UC2 with 250 kg on the ball. The heaviest case"}
+  - {id: UC3, name: "Towing with the bikes aboard", note: "As UC2 with the trailer's heaviest towball with growth on the ball. The heaviest case"}
   - {id: UC4, name: "Towing with the bikes out", note: "As UC3 without the bikes"}
   - {id: UCB, name: "Reference: bikes in the trailer", note: "Report 17 case B: a plain tray and the tools, no towball"}
 
 # Checks. basis `both` checks the base masses and the masses with the growth allowance.
 checks:
-  - {id: UTE-01, title: "Ute mass within the 4,200 kg GVM", type: mass, quantity: mass, limit: gvm_kg, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
-     why: "The Lovells kit's GVM, once the NSW certifier has inspected it (report 16)"}
+  - {id: UTE-01, title: "Ute mass within the 4,495 kg GVM", type: mass, quantity: mass, limit: gvm_kg, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
+     why: "The Lovells Elite kit's GVM, once the NSW certifier has inspected it (report 16, decision H17)"}
   - {id: UTE-02, title: "Front axle within its 1,650 kg rating", type: mass, quantity: front, limit: front_axle_kg, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
-     why: "Lovells TOYKIT080-GVM front axle rating"}
-  - {id: UTE-03, title: "Rear axle within its 2,550 kg rating", type: mass, quantity: rear, limit: rear_axle_kg, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
-     why: "The binding limit of the plan (report 16 section 2.3). The bikes, the box and the towball all sit over or behind the rear axle"}
+     why: "Lovells' front axle rating, the same for the Elite and the Platinum"}
+  - {id: UTE-03, title: "Rear axle within its 2,850 kg rating", type: mass, quantity: rear, limit: rear_axle_kg, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
+     why: "The Elite's rating (decision H17). The bikes, the box and the towball all sit over or behind the rear axle. The trailer's MAS-14 reports the Platinum's return (cut CUT7)"}
   - {id: UTE-04, title: "Ute mass within the plan's 3,850 kg weighed limit", type: mass, quantity: mass, limit: weighed_max_kg, basis: nominal, cases: [UC1, UC2, UC3, UC4], severity: fail,
      why: "Decision log: the weighed ute stays at or under 3,850 kg, so the rear axle keeps its margin"}
-  - {id: UTE-05, title: "Towball within the plan's 250 kg and the towbar's 350 kg", type: towball, severity: fail,
-     why: "The towbar is rated 350 kg. The plan caps the ball at 250 kg because each kilogram there adds about 1.4 kg to the rear axle"}
-  - {id: UTE-06, title: "Combination with the 3,100 kg plated trailer within the 6,900 kg GCM", type: gcm, basis: both, cases: [UC3, UC4], severity: fail,
+  - {id: UTE-05, title: "Design towball within the towbar's 350 kg", type: towball, severity: fail,
+     why: "The towbar is rated 350 kg. H14 replaced the plan's 250 kg cap with the rule it stood for, the rear axle (UTE-03 at this ball, and the trailer's MAS-03 in every case). Each kilogram on the ball adds about 1.4 kg to the rear axle"}
+  - {id: UTE-06, title: "Combination with the 3,500 kg plated trailer within the 7,400 kg GCM", type: gcm, basis: both, cases: [UC3, UC4], severity: fail,
      why: "GCM is the ute's mass plus the trailer's less the towball, which the ute already carries (report 16 section 2.4)"}
   - {id: UTE-07, title: "Front axle carries at least 20 % of the ute's mass", type: mass, quantity: front_share, limit: front_share_min_pct, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
      why: "Toyota's minimum front axle share, so the ute steers and brakes"}

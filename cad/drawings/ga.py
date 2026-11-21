@@ -62,7 +62,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
     # zone lengths along the road side
     yd = P(0, hb)[1] + 9
     xs = [V["in_x0"], V["bed_x1"], V["rear_x0"], V["in_x1"]]
-    labs = [f"{V['bed_x1'] - V['in_x0']:.0f} BED", f"{V['rear_x0'] - V['bed_x1']:.0f} LIVING", f"{V['in_x1'] - V['rear_x0']:.0f} BATHROOM"]
+    labs = [f"{V['bed_x1'] - V['in_x0']:.0f} BED", f"{V['rear_x0'] - V['bed_x1']:.0f} LIVING", f"{V['in_x1'] - V['rear_x0']:.0f} WET ROOM"]
     for (x0, x1), lab in zip(zip(xs, xs[1:]), labs):
         S.hdim(sh, P(x0, hb)[0], P(0, hb)[1], P(x1, hb)[0], P(0, hb)[1], yd, lab, size=1.9)
     S.hdim(sh, P(V["body_x0"], hb)[0], P(0, hb)[1], P(V["body_x1"], hb)[0], P(0, hb)[1], yd + 6, f"{V['body_length']:.0f} BODY", size=1.9)
@@ -76,8 +76,8 @@ def ct001(prj, model, bom, checks, reg, dwg):
         p0, p1 = P(x, hb + 60), P(x, -hb - 60)
         sh.line(p0[0], p0[1], p1[0], p1[1], "centre")
     db = ch["drawbar_box"]
-    for x, y, t in (((V["in_x0"] + V["bed_x1"]) / 2, 400, "QUEEN BED OVER"), ((V["in_x0"] + V["bed_x1"]) / 2, 250, "KITCHEN, AIR-CON, STORAGE"),
-                    ((V["bed_x1"] + V["rear_x0"]) / 2, -150, "LIVING"), ((V["rear_x0"] + V["in_x1"]) / 2, 640, "WET BATH"),
+    for x, y, t in (((V["in_x0"] + V["bed_x1"]) / 2, 400, "LIFT BED OVER"), ((V["in_x0"] + V["bed_x1"]) / 2, 250, "DESK UNDER IT"),
+                    ((V["bed_x1"] + V["rear_x0"]) / 2, -150, "LIVING"), ((V["rear_x0"] + V["in_x1"]) / 2, 640, "WET ROOM"),
                     ((db[0] + db[3]) / 2, -620, "DRAWBAR BOX"), ((ch["spare_box"][0] + ch["spare_box"][3]) / 2, 520, "SPARE")):
         p = P(x, y)
         sh.text(p[0], p[1] - 0.8, t, 1.6, "middle")
@@ -89,10 +89,10 @@ def ct001(prj, model, bom, checks, reg, dwg):
     p0, p1 = P(b.box[0], -(hb + 25)), P(b.box[3], -(hb + 25))
     sh.line(p0[0], p0[1], p1[0], p1[1], "thick")
     sh.text((p0[0] + p1[0]) / 2, p0[1] - 3.4, f"ENTRY DOOR {b.box[3] - b.box[0]:.0f}", 1.6, "middle")
-    k = lay.find("LA-07")
+    k = lay.find("EL-02")
     p0, p1 = P(k.box[0], -(hb + 25)), P(k.box[3], -(hb + 25))
     sh.line(p0[0], p0[1], p1[0], p1[1], "thick")
-    sh.text((p0[0] + p1[0]) / 2, p0[1] - 3.4, f"KITCHEN SLIDE-OUT {k.box[3] - k.box[0]:.0f}", 1.6, "middle")
+    sh.text((p0[0] + p1[0]) / 2, p0[1] - 3.4, f"BATTERY PLINTH {k.box[3] - k.box[0]:.0f}", 1.6, "middle")
 
     # ---- elevation from the kerb side, ball on the left (third angle: the plan sits above it)
     elev_src = [s for s in shapes if not s.label.startswith(("BD-01",))]
@@ -170,7 +170,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
     gcm = next(r for r in rep["checks"] if r["id"] == "GCM-01")
     rows = [
         ["Rail outer width at the XT hinges", f"{ch['rail_outer_width']:.0f}", f"C/F {ch['cf']:.0f} with ET {ch['wheel_offset']:.0f}, {ch['track']:.0f} track"],
-        ["Raiser and strip, rail top to floor underside", f"{ch['raiser_h']:.0f}", "RHS 150x50x3 RAIL, RHS 125x50x3 RAISER (CT-101)"],
+        ["Raiser and strip, rail top to floor underside", f"{ch['raiser_h']:.0f}", "RHS 150x50x3 RAIL, RHS 127x51x3.5 RAISER (CT-101)"],
         ["Axle group centre from the ball", f"{V['axle_x']:.0f}", f"hubs {hx[0]:.0f} and {hx[1]:.0f}"],
         ["CoG height, fully loaded", f"{ch['cog_loaded'][2]:.0f}", f"{ch['cog_loaded_growth'][2]:.0f} with growth"],
         ["Bike box sweep and underside", f"{sw['radius_mm']:.1f} / {sw['underside_z']:.0f}", f"box {sw['body_overhang_mm']:.0f} behind the ball (U2 model)"],
@@ -182,13 +182,18 @@ def ct001(prj, model, bom, checks, reg, dwg):
         "DATUM DIM-01: X FROM THE BALL CENTRE, POSITIVE REARWARD. Y FROM THE CENTRELINE, POSITIVE TO THE ROAD SIDE. Z UP FROM THE GROUND, "
         "TRAILER LEVEL AT DESIGN RIDE HEIGHT. A RIGHT-HANDED FRAME, SO THE 3D MODEL AND THESE VIEWS SHOW THE TRAILER AS IT IS.",
         "BLOCK LAYOUT. EVERY ITEM EXCEPT THE CHASSIS IS AN ENVELOPE WITH A MASS. POSITIONS MARKED PLACEHOLDER IN assemblies/trailer.yaml ARE NOT DESIGNED YET.",
-        f"AXLE POSITION SOLVED FOR {rep['target_kg']:.0f} kg ON THE BALL FULLY LOADED, BASE WEIGHTS. NO BALLAST IN ANY CASE.",
-        "REVISION J: THE TRAILER FOR THE LANDCRUISER 79 (REPORT 18, LAYOUT 1). THE BIKES RIDE IN THE UTE'S BIKE BOX (CT-701 TO CT-704). "
-        "QUEEN BED ACROSS THE FRONT, FIXED ROOF 1950 INSIDE, 4420 BODY, ALL 400 L OF WATER IN THE TRAILER.",
+        (f"AXLE IN THE MIDDLE OF THE TOWBALL WINDOW, X {rep['solved']['window']['x_lo']:,.0f} TO {rep['solved']['window']['x_hi']:,.0f}: EVERY CASE "
+         f"KEEPS {rep['solved']['window']['pct_min']:.1f} % ON THE BALL AND THE HEAVIEST TOWBALL WITH GROWTH STAYS AT OR UNDER "
+         f"{rep['solved']['window']['ball_max']['kg']:.0f} kg (H17, MAS-12, MAS-13). THE UTE'S REAR AXLE STAYS WITHIN THE ELITE KIT'S "
+         f"{rep['tow_vehicle']['limits']['rear_axle_kg']:.0f} kg (MAS-03). "
+         "NO BALLAST IN ANY CASE."),
+        "REVISION J: THE HOME TRAILER. THE BIKES RIDE IN THE UTE'S BIKE BOX (CT-701 TO CT-704). LIFT BED OVER THE DESK ACROSS THE FRONT, "
+        f"FIXED ROOF {rep['params']['interior_h']:.0f} INSIDE, {rep['params']['body_length']:.0f} BODY, WET ROOM AT THE REAR. AT MOST "
+        f"{rep['params']['water_travel_l']:.0f} L OF WATER IN TRAVEL. INTERIM SHEET: THE PHASE 2 SET REDRAWS IT.",
         "THE GENERATOR AND THE JERRY CANS RIDE IN A SEALED, VENTED DRAWBAR BOX BEHIND THE STONE GUARD, OUTSIDE THE BIKE BOX'S SWEEP. NO PETROL IN THE BODY.",
         "XT AIR 4500 kg BUILD ON LC5 M14 HUBS AT 900 mm, ROH TRAK 2 16x7 ET 0 WITH LT265/75R16, THE UTE'S WHEEL. ONE SPARE HERE, ONE UNDER THE UTE'S TRAY.",
         "THE UTE'S BALL SITS AT 440 mm LADEN, PLUS OR MINUS 20 mm, 1300 mm BEHIND ITS REAR AXLE (measurements.yaml UTE-01, UTE-02).",
-        "PHANTOM OUTLINES ON THE PLAN ARE FLOOR SPACE KEPT CLEAR (DOOR LANDING, DESK SEATS, AISLE, BATHROOM DOOR). THE ARC IS THE BIKE BOX'S SWEEP (JK-01).",
+        "PHANTOM OUTLINES ON THE PLAN ARE FLOOR SPACE KEPT CLEAR (DOOR LANDINGS, CHAIR SPACE, AISLE, WALK BAND, STEP ZONE). THE ARC IS THE BIKE BOX'S SWEEP (JK-01).",
         ("CHECKS " + ", ".join(c["id"] for c in rep["checks"] if c["severity"] == "fail" and not c["ok"]) + " FAIL. SEE TRAILER.md.")
         if any(c["severity"] == "fail" and not c["ok"] for c in rep["checks"]) else "EVERY FAIL CHECK PASSES.",
     ], width_chars=118, size=1.7)

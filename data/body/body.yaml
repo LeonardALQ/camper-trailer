@@ -1,8 +1,9 @@
 # Body design data (BODY.md), from research report 12 (research/12-body-design.md) and the panel and product tables
 # beside it (research/12-body-panels.yaml, research/12-body-products.yaml). Units: mm, MPa, N, kg.
 # cad/body.py reads this file for the planning-level panel, insert, joint, mount, end wall and twist checks.
-# Revision B, 20 Nov 2026: the body for the LandCruiser 79 (report 18, layout 1). 4,420 mm long with a fixed roof 1,950 mm
-# inside, a full rear wall and no garage, so the raising roof, the rear portal and the L-track hardpoints are gone.
+# Revision C, 21 Nov 2026: the home trailer (home/layout-home.md). 4,420 mm long with a fixed roof 2,000 mm inside and
+# rounded front edges (H1a, H12), a wet room door in the rear wall (H4), the lift bed's rails on the side walls (H1)
+# and four windows (H15). Revision B was the LandCruiser 79 body (report 18, layout 1).
 
 # ---------------------------------------------------------------- panels (report 12 section 2)
 # E and G are the skin's in-plane tensile and shear moduli. The core's shear modulus Gc and strengths are the
@@ -26,6 +27,11 @@ panels:
     ult: 77           # Polydet data sheet
     core: {name: XPS, c: 32, Gc: 8, shear: 0.25, compression: 0.30}
     kg_m2: 6.0
+    # Vertical aluminium stiffeners bonded in the side-wall cores, floor joiner to roof joiner (line BD-18). With the
+    # lift-bed hardpoints, the door frame, the tower's sides and the partition they stiffen every side-wall bay at no
+    # more than `pitch`. The wind deflection (BDY-10) takes the weakest of them smeared over that pitch. The skin
+    # stress (BDY-06) leaves them out
+    stiffener: {name: "SHS 20 x 20 x 1.6 6060-T5 aluminium", E: 69000, I: 6600, pitch: 1067}
   front_wall:
     name: "Front wall, 35 mm: 2.0 mm outer and 1.5 mm inner Polydet skins on 31.5 mm XPS, against stones"
     t: 35
@@ -64,9 +70,12 @@ loads:
   foot: {kg: 100, patch: [100, 150], note: "A person on one foot in the living area"}
   floor_edge_kg_m2: 160        # floor and its contents beside the raisers, between outriggers
   wind_kpa: 0.5                # parked wind on a wall (report 12)
-  bed_kg: 255                  # the bed with two sleepers and the bedding (the module's BED-01 load)
-  bed_ledger_mm: 3680          # ledgers under the deck's edges: 2,030 mm on the front wall and 1,650 mm on the kerb wall
-  ledger_pitch: 150            # ledger fixings along the wall
+  bed_kg: 264                  # the lift bed at night: 64 kg moving (report 21 section 1.4) and two sleepers of 100 kg
+  bed_travel_kg: 64            # the moving bed alone, as it travels at the day stop
+  bed_night_factor: 1.5        # sleepers moving on the bed at night (assumption, a person kneeling or sitting down)
+  bed_rails: 4                 # HappiJac rails, two on each side wall
+  rail_screws: 8               # 1/4 in self-tapping screws per rail into its RHS 40 x 20 x 3 hardpoint (est., about 200 mm pitch)
+  rail_screw_rated_n: 3000     # shear on one screw in 3 mm 6060-T5 (est.: bearing about 2.5 fu d t = 7.6 kN characteristic)
   uplift_40ms_n: 5060          # report 12's 6,300 N on 13.2 m2 at 110 km/h into a 36 km/h headwind, scaled to the 10.6 m2 roof
 
 # ---------------------------------------------------------------- the body box for the twist (report 12 section 4)
@@ -105,26 +114,39 @@ mounts:
     spreader: {side: 100, skin_shear: 60, insert_shear: 6}   # punching round the spreader: floor top skin and the HD PVC insert (assumptions)
 
 # ---------------------------------------------------------------- the end walls as the box's diaphragms (report 12 section 5)
-# With the garage gone the rear wall is a full panel with one 600 x 450 mm window, so it closes the box's rear end the
-# way the portal and pier did. It racks in shear under the twist the floor bolts put into the box's rear half.
+# The rear wall carries the wet room door, the rinse box, the relief valve and the extract fan. It closes the box's rear
+# end and racks in shear under the twist the floor bolts put into the box's rear half. cad/body.py takes its shear width
+# as the wall less the openings at the worst height (the door, the rinse box and the relief valve together).
 end_wall:
-  window_w: 600
+  from_openings: true
 
 # ---------------------------------------------------------------- openings (report 12 sections 5 and 7, report 18 section 4.1)
 # Side walls: x is measured along the trailer from the body front (X = body_x0 + x), z from the floor surface. The front
-# and rear walls: y across from the centreline (positive to the road side). Sizes are the cut-outs. The kitchen and the
-# entry door follow the layout's blocks (LA-07, BD-07); the build checks they match.
+# and rear walls: y across from the centreline (positive to the road side). Sizes are the cut-outs. The
+# two doors follow the layout's blocks (BD-07, BD-15). `line` names the mass schedule line that carries the part. Glands of 60 mm or less (fill, PV, refrigerant lines, the
+# 230 V inlet box, the battery vents through the floor) are not openings.
 openings:
-  - {id: OP-01, wall: kerb, name: "Kitchen slide-out opening under the bed, framed, bulb seal, two Southco E3 latches", x: 150, z: 50, w: 1500, h: 450, from: LA-07}
-  - {id: OP-02, wall: kerb, name: "Entry door, Aussie Traveller DC, 90 mm top radius", x: 1955, z: 0, w: 625, h: 1626, from: BD-07}
-  - {id: OP-03, wall: kerb, name: "Window, Dometic S4 500 x 450, over the bed, opening from inside: the second way out", x: 535, z: 800, w: 500, h: 450}
-  - {id: OP-04, wall: kerb, name: "Window, Dometic S4 500 x 450, over the freezer bench", x: 3335, z: 900, w: 500, h: 450}
-  - {id: OP-05, wall: road, name: "Window, Dometic S4 900 x 500, over the desk", x: 1785, z: 900, w: 900, h: 500}
-  - {id: OP-06, wall: road, name: "Thetford cassette service door, 450 x 290", x: 3670, z: 150, w: 450, h: 290}
-  - {id: OP-07, wall: road, name: "Bathroom vent", x: 3480, z: 1550, w: 200, h: 200}
-  - {id: OP-08, wall: front, name: "Window, Dometic S4 800 x 400, over the bed, above the spare wheel", y: 0, z: 850, w: 800, h: 400}
-  - {id: OP-09, wall: front, name: "Carafan Sahara CP700 intake, high beside the spare wheel", y: 850, z: 1375, w: 200, h: 200}
-  - {id: OP-10, wall: rear, name: "Window, Dometic S4 600 x 450, at the end of the aisle", y: -200, z: 1000, w: 600, h: 450}
+  # kerb side, front to rear
+  - {id: OP-01, wall: kerb, line: WN-01, name: "Window W1, Dometic S4 900 x 600 over the bed, the second way out", x: 379, z: 960, w: 902, h: 599}
+  - {id: OP-02, wall: kerb, line: BD-07, name: "Entry door, Aussie Traveller DC 1,750 x 622, 90 mm top radius", x: 1640, z: 0, w: 625, h: 1753, from: BD-07}
+  - {id: OP-03, wall: kerb, line: VE-01A, name: "LUNOS e2 fan A, high over the dryer", x: 2880, z: 1500, w: 162, h: 162}
+  - {id: OP-04, wall: kerb, line: BD-17, name: "Thetford cassette service door 2680584", x: 3660, z: 150, w: 450, h: 290}
+  # road side, front to rear
+  - {id: OP-05, wall: road, line: WN-02, name: "Window W2, Dometic S4 900 x 450 over the bed", x: 379, z: 960, w: 902, h: 448}
+  - {id: OP-06, wall: road, line: VE-04, name: "RESPA-CF2 and top-up fan intake hood with a mesh stone guard", x: 1630, z: 1650, w: 200, h: 200}
+  - {id: OP-07, wall: road, line: LA-03, name: "Truma Combi D 6 E wall cowl, exhaust and combustion air", x: 1700, z: 150, w: 120, h: 120}
+  - {id: OP-08, wall: road, line: VE-07, name: "Range hood duct cowl with a backdraft flap", x: 2230, z: 1650, w: 100, h: 100}
+  - {id: OP-09, wall: road, line: WN-03, name: "Window W4, Dometic S4 500 x 450 over the bench", x: 2800, z: 1000, w: 500, h: 448}
+  - {id: OP-10, wall: road, line: VE-01B, name: "LUNOS e2 fan B, low in the sink cabinet", x: 3180, z: 150, w: 162, h: 162}
+  - {id: OP-11, wall: road, line: WN-04, name: "Window W6, Dometic S4 500 x 450, obscured, wet room", x: 3610, z: 1150, w: 500, h: 448}
+  # front wall
+  - {id: OP-12, wall: front, line: VE-01C, name: "LUNOS e2 fan C, low beside the desk", y: -719, z: 100, w: 162, h: 162}
+  - {id: OP-13, wall: front, line: VE-01D, name: "LUNOS e2 fan D, low beside the desk", y: 719, z: 100, w: 162, h: 162}
+  # rear wall
+  - {id: OP-14, wall: rear, line: WR-05, name: "Outdoor rinse box, External Shower Box", y: 750, z: 50, w: 250, h: 200}
+  - {id: OP-15, wall: rear, line: BD-15, name: "Rear door into the wet room, Aussie Traveller DC 1,750 x 622, 90 mm top radius", y: 12.5, z: 0, w: 625, h: 1753, from: BD-15}
+  - {id: OP-16, wall: rear, line: VE-06, name: "Pressure relief valve under its hood", y: -935, z: 100, w: 120, h: 80}
+  - {id: OP-17, wall: rear, line: VE-03, name: "LUNOS RA 15-60 wet room extract", y: -934, z: 1688, w: 162, h: 162}
 rules:
   between_mm: 300              # full-height wall between neighbouring openings (assumption, report 12 section 5)
   edge_mm: 150                 # from an opening to a panel edge or corner

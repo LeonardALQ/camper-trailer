@@ -5,7 +5,8 @@
 # cad/chassis_fea.py analyses them. Sections come from data/chassis/sections.yaml (report 11's table).
 id: ASM-CH
 name: Chassis and drawbar
-revision: B     # B, 20 Nov 2026: the LandCruiser 79 layout (report 18 section 4.3). 4,420 mm rails, 1,175 mm wide, RHS 125 raisers
+revision: C     # C, 21 Nov 2026: the home trailer. RHS 127 x 51 x 3.5 C350L0 raisers, outriggers and floor crossmembers (report 22),
+                # the grey-bay floor crossmember over the grey tank in place of the battery bay, every case at the 3,500 kg plate (H2)
 
 material:
   tube: "AS/NZS 1163 C450L0 RHS and SHS, Austube Mills C450PLUS bought black (fy 450 MPa, fu 500 MPa)"
@@ -29,8 +30,8 @@ galvanising:
 
 params:
   rail_y: rail_c                              # rail centreline from the trailer centreline
-  raiser_top_z: rail_top_z + 125              # 125 x 50 x 3 raiser on the rail (revision B: the 805 mm tyre lifts the floor)
-  strip_t: floor_underside_z - raiser_top_z   # floor bearer strip up to the floor underside (22.5 mm)
+  raiser_top_z: rail_top_z + 127              # 127 x 51 x 3.5 raiser on the rail (revision C, report 22 open point 1)
+  strip_t: floor_underside_z - raiser_top_z   # floor bearer strip up to the floor underside (20.5 mm)
   outrigger_root_y: rail_c + rail_w / 2       # the raiser's outer face
   outrigger_tip_y: half_bw                    # the body edge
   db_z: rail_underside_z - db_depth / 2       # drawbar member centroid, the members run under the rails
@@ -46,7 +47,7 @@ params:
   steady_front_x: 2220                        # corner steadies about 400 mm inside the body ends (report 18 section 4.3)
   steady_rear_x: 6070
   spare_post_y: 120                           # spare carrier posts 240 mm apart
-  spare_post_top_z: 1500
+  spare_post_top_z: spare_z + 175             # the posts reach 175 mm above the spare's hub, as before
   pivot_ahead: 23                             # report 11 section 5.1: hinge pivot 23 mm ahead of the hinge
   pivot_below: 99                             # crossmember's rear face and 99 mm below the rail underside
   arm_r: 456                                  # pivot to hub at ride: 441 mm along X, 116 mm down
@@ -56,33 +57,38 @@ params:
 
 roles:
   rail: {section: RHS_150x50x3, name: "Main rail"}
-  raiser: {section: RHS_125x50x3, name: "Raiser on the rail, continuous fillet welds to the rail"}
+  raiser: {section: RHS_127x51x3p5, name: "Raiser on the rail, continuous fillet welds to the rail"}
   cm_xt: {section: RHS_150x50x3, name: "XT suspension crossmember, full rail height"}
   cm_end: {section: RHS_150x50x3, name: "Body end crossmember, full rail height"}
-  cm_floor: {section: RHS_125x50x3, name: "Floor crossmember at raiser height, top flush with the raisers"}
-  outrigger: {section: RHS_125x50x3, name: "Outrigger at raiser height, the raiser's section, top flush with the raiser, bottom at the rail top"}
+  cm_floor: {section: RHS_127x51x3p5, name: "Floor crossmember at raiser height, top flush with the raisers"}
+  outrigger: {section: RHS_127x51x3p5, name: "Outrigger at raiser height, the raiser's section, top flush with the raiser, bottom at the rail top"}
   drawbar: {section: RHS_150x50x5, name: "Drawbar member, A-frame"}
   brace: {section: RHS_75x50x3, name: "Drawbar cross brace"}
   spare_post: {section: SHS_50x50x2p5, name: "Spare wheel carrier post"}
 
 # Crossmember stations come from the trailer layout (cad/trailer.py): their front faces are fixed by the body ends,
-# the XT kit and the battery bay, and the pitch rule adds the intermediate ones. Each fixed station's role:
+# the XT kit and the grey tank bay, and the pitch rule adds the intermediate ones. Each fixed station's role:
 station_roles:
   front: cm_end
   diesel bay: cm_floor
   XT front hinge: cm_xt
   XT centre: cm_xt
   XT rear shock: cm_xt
-  battery-bay: cm_floor
+  grey-bay: cm_floor                          # crosses the middle of the grey tank, above it
   rear: cm_end
   generated: cm_floor
 
+# Stations whose crossmember needs more than its role's section. The XT rear shock crossmember carries the rear recovery
+# points' sideways load (LC8a at 30 degrees) without the PB-3 braces the grey tank's bay cannot hold (revision C).
+station_sections:
+  XT rear shock: RHS_150x50x4
+
 # Plan bracing: an X of two diagonals at rail height in free bays between the rails, so the ladder frame carries
-# sideways loads (LC8a recovery at 30 degrees) by truss action. The tanks and the battery fill the other bays.
+# sideways loads (LC8a recovery at 30 degrees) by truss action. The tanks fill the other bays. The rear bay's braces (PB-3)
+# went with the battery bay: the grey tank fills it, and its bolted guard (UF-09) is the shear plate there (to confirm, LC8a).
 plan_braces:
   - {between: ["between front and diesel bay (1)", diesel bay], section: SHS_40x40x2p5}
   - {between: [diesel bay, XT front hinge], section: SHS_40x40x2p5}
-  - {between: [XT rear shock, battery-bay], section: SHS_40x40x2p5}
 
 # Welded and bolted fittings. Plates: length x width x thickness in mm, with a count. Bought parts carry a mass and its
 # source. `at` is a position (X, Y, Z), `side_y` repeats the item on both sides at that Y magnitude, `rear_x` adds a
@@ -133,9 +139,9 @@ fittings:
      source: "Retailer: 38.9 lb (17.6 kg) for a set of two with the winding handle (report 13 section 6)", at: [steady_front_x, 0, rail_underside_z - 150], side_y: rail_c, rear_x: steady_rear_x}
 
 # Load cases, report 11 section 3.2. Accelerations in g along X (+ rearward), Y (+ road side) and Z (+ up). Every case
-# runs on each trailer case TC1 to TC6 with its masses scaled up to the 3,100 kg plated ATM (water included), except
-# LC5b, which is at tare. `factor` divides fy for the stress criterion. Revision B: the VSB1 drawbar and chain forces
-# follow the 3,100 kg plate (1.5, 0.5 and 1.0 times the ATM's weight), 11 % below the 3,500 kg design.
+# runs on each trailer case TC1 to TC8 with its masses scaled up to the 3,500 kg plated ATM (water included), except
+# LC5b, which is at tare. `factor` divides fy for the stress criterion. Revision C: the VSB1 drawbar and chain forces
+# follow the 3,500 kg plate (1.5, 0.5 and 1.0 times the ATM's weight, H2).
 load_cases:
   - {id: LC1, name: "Static at ATM", kind: static, accel: [[0, 0, -1]], factor: 3, source: "ARTSA factor of safety of 3 (report 02 section 2.4)"}
   - {id: LC2, name: "Vertical bump, 3 g on the structure", kind: static, accel: [[0, 0, -3]], factor: 1, source: "Report 11 LC2, ARTSA"}
@@ -145,10 +151,10 @@ load_cases:
      source: "Report 11 LC5a: 820 kg x 9.81 x 0.831 m = 6.7 kNm, times 2 for dynamics"}
   - {id: LC5b, name: "Twist on the corner steadies at tare, one wound to 875 kg", kind: twist_steady, accel: [[0, 0, -1]], steady_kg: 875, factor: 1.5,
      source: "Report 11 LC5b, ARK catalogue 2024 p. 67"}
-  - {id: LC6, name: "Drawbar, VSB1 9.1 at the 3,100 kg plate: 45.6 kN longitudinal, 15.2 kN transverse, 15.2 kN vertical, each way, separately", kind: drawbar,
-     forces_n: [[45600, 0, 0], [-45600, 0, 0], [0, 15200, 0], [0, -15200, 0], [0, 0, 15200], [0, 0, -15200]], factor: 1, source: "VSB1 9.1 and 14.2.1, ADR 62/02 14.2, at 3,100 kg"}
-  - {id: LC6b, name: "Chain points, VSB1 9.2.2 at the 3,100 kg plate: 30.4 kN longitudinal, 15.2 kN vertical, each point separately", kind: chain,
-     forces_n: [[-30400, 0, 0], [0, 0, -15200], [0, 0, 15200]], factor: 1, source: "VSB1 9.2.2 and 14.2.2, ADR 62/02 14.4.2, at 3,100 kg"}
+  - {id: LC6, name: "Drawbar, VSB1 9.1 at the 3,500 kg plate: 51.5 kN longitudinal, 17.2 kN transverse, 17.2 kN vertical, each way, separately", kind: drawbar,
+     forces_n: [[51500, 0, 0], [-51500, 0, 0], [0, 17200, 0], [0, -17200, 0], [0, 0, 17200], [0, 0, -17200]], factor: 1, source: "VSB1 9.1 and 14.2.1, ADR 62/02 14.2, at 3,500 kg"}
+  - {id: LC6b, name: "Chain points, VSB1 9.2.2 at the 3,500 kg plate: 34.3 kN longitudinal, 17.2 kN vertical, each point separately", kind: chain,
+     forces_n: [[-34300, 0, 0], [0, 0, -17200], [0, 0, 17200]], factor: 1, source: "VSB1 9.2.2 and 14.2.2, ADR 62/02 14.4.2, at 3,500 kg"}
   - {id: LC7, name: "Cargo and heavy item fixings: 0.8 g forward, 0.5 g rearward, 0.5 g sideways, 0.2 g up, times 2 off road", kind: fixings,
      accel: [[-1.6, 0, 0], [1.0, 0, 0], [0, 1.0, 0], [0, 0, 0.4]], factor: 1.5, source: "NTC Load Restraint Guide via report 02, factor 2 from report 03"}
   - {id: LC8a, name: "Recovery points: 51.5 kN within 30 degrees sideways and 15 degrees up or down of the rail axis", kind: recovery,

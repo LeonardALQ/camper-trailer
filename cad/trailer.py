@@ -4,11 +4,13 @@ Everything is in the project datum DIM-01 (research/02): X from the coupling bal
 Y from the centreline, positive to the road side, Z up from the ground at design ride height. Blocks are
 axis-aligned boxes, wheels are cylinders and the drawbar members are bars between two points.
 
-Revision H (20 Nov 2026) is the trailer for the LandCruiser 79 (report 18, layout 1): the bikes ride in the ute's bike
-box (UTE-GARAGE.md), so the trailer has no garage module. The axle solve moves the axle group and everything tied to it
-(the tanks, their guards and the suspension) along X until the towball load meets the target. It never changes a limit
-or a block size. The tow vehicle's limits come from data/ute/ute.yaml and its masses and the bike box's sweep from the
-ute model (build/ute/ute.json).
+Revision J (21 Nov 2026) is the home trailer (home/layout-home.md): the bikes ride in the ute's bike box (UTE-GARAGE.md),
+so the trailer has no garage module. The axle solve moves the axle group and everything tied to it (the tanks, their
+guards and the suspension) along X to the middle of the towball window of decision H17: from the position where the
+lightest case keeps 8.0 % of its mass on the ball to the one where the heaviest towball with growth reaches 320 kg
+(data/load_cases.yaml `axle_window`). The solve needs nothing from the ute model (cad/towball.py caches its result for
+the ute's towing cases). It never changes a limit or a block size. The tow vehicle's limits come from data/ute/ute.yaml
+and its masses and the bike box's sweep from the ute model (build/ute/ute.json), for the checks.
 """
 from __future__ import annotations
 
@@ -30,6 +32,7 @@ SYSTEM_LABELS = {
     "drawbar": "Coupling and drawbar fittings", "chassis": "Chassis and drawbar", "running_gear": "Running gear", "body": "Body",
     "roof": "Roof", "underfloor": "Under the floor", "bed": "Bed", "living": "Living area",
     "stowage": "Drawbar box", "spare": "Spare wheel", "payload": "Payload",
+    "electrical": "Electrical", "hvac": "HVAC and ventilation", "wet_room": "Wet room",
 }
 TOL = 0.5  # mm: boxes that only touch do not overlap
 
@@ -47,8 +50,18 @@ def tow_vehicle(prj: Project) -> dict:
         raise FileNotFoundError(f"{tv['model']} is missing: build the ute first (make ute)")
     rep = json.loads(path.read_text())
     case = next(c for c in rep["cases"] if c["id"] == tv["gcm_case"])
+    # the ute's rear axle at a ball load (H14): its value with the bikes aboard and no ball (UC2), plus what each kilogram
+    # on the ball adds, from the towing case (UC3) against UC2, both with growth. The lever is the ute model's own
+    tow = next(c for c in rep["cases"] if c["growth"].get("towball_kg"))
+    rear0 = case["growth"]["rear_kg"]
+    per_ball = (tow["growth"]["rear_kg"] - rear0) / tow["growth"]["towball_kg"]
+    # what the Elite kit adds over the Platinum on the rear axle, so the Platinum's return (cut CUT7) can be read off
+    wb = rep["params"]["wheelbase"]
+    elite = sum(ln["kg"] * ln["x"] / wb for ln in rep["lines"] if ln.get("elite") and tv["gcm_case"] in ln["cases"])
     return dict(name=tv["name"], limits=lim, limit_src=src, gcm_case=tv["gcm_case"], case_name=case["name"],
                 ute_kg=case["nominal"]["mass_kg"], ute_kg_growth=case["growth"]["mass_kg"], sweep=rep["bike_box_sweep"],
+                rear_kg_growth=rear0, rear_kg_nominal=case["nominal"]["rear_kg"], elite_rear_kg=elite, rear_per_ball=per_ball,
+                design_ball_kg=tow["growth"]["towball_kg"], tow_case=tow["id"],
                 ute_checks=[dict(id=c["id"], title=c["title"], status=c["status"], detail=c["detail"], measured=c.get("measured"))
                             for c in rep["checks"]])
 
@@ -368,8 +381,12 @@ class Layout:
             cog = [sum(m * c[i] for m, c in items) / M for i in range(3)]
             ball = sum(m * (xa - c[0]) for m, c in items) / xa
             axle = M - ball
+            # the ball sits on the centreline, so the axle group's two sides carry the whole lateral moment
+            side = M * cog[1] / self.V["track"]
+            road, kerb = axle / 2 + side, axle / 2 - side
             res[basis] = dict(mass_kg=M, cog=cog, towball_kg=ball, towball_pct=100 * ball / M, axle_kg=axle,
-                              tyre_load_kg=1.2 * axle / 4)
+                              tyre_load_kg=1.2 * axle / 4, side_kg=dict(road=road, kerb=kerb),
+                              tyre_load_side_kg=1.2 * max(road, kerb) / 2)
         water = self.P.eval(case.water_l, {})
         return dict(id=case.id, name=case.name, aboard=case.aboard, water_l=water, **res)
 
@@ -505,17 +522,22 @@ def _origin_dist(poly) -> float:
 
 # ------------------------------------------------------------------ the trailer: solve, cases, checks
 class Trailer:
-    def __init__(self, prj: Project | None = None, overrides: dict | None = None):
+    def __init__(self, prj: Project | None = None, overrides: dict | None = None, ute: bool = True):
+        """`ute` reads the ute model (build/ute/ute.json) for the checks against the tow vehicle. The axle solve needs
+        nothing from it, so the ute's own build can solve the trailer first (cad/towball.py)."""
         self.prj = prj = prj or Project()
         self.td = yaml.safe_load(TRAILER_YAML.read_text())
         self.base = dict(overrides or {})
         self.cases = prj.load.trailer_cases
         self.reg = prj.load.registration
         inp = self.inputs = prj.inputs
-        self.tv = tow_vehicle(prj)
+        self.tv = tow_vehicle(prj) if ute else None
         self.target = prj.load.towball_target_kg
-        self.target_why = (f"{self.target:.0f} kg fully loaded on base weights, the middle of the decision log's 200 to 250 kg band, "
-                           f"so the growth allowance stays inside the {self.tv['limits']['towball_plan_kg']:.0f} kg cap")
+        self.aw = prj.load.axle_window
+        self.target_why = (f"the axle sits in the middle of the window between {self.aw['towball_pct_min']:.1f} % on the ball in the "
+                           f"lightest case and {self.aw['towball_max_kg']:.0f} kg with growth in the heaviest (H17). The supplier's 120 % "
+                           f"note uses {self.target:.1f} kg, {100 * self.target / self.reg['plated_atm_kg']['v']:.1f} % of the "
+                           f"{self.reg['plated_atm_kg']['v']:,.0f} kg plate")
         self.supplier = inp.supplier(self.reg["plated_atm_kg"]["v"], self.target)
         self.wheel = inp.wheel(self.td["wheel"])
         self.base.setdefault("coupling_z", inp.coupling_z())
@@ -610,23 +632,53 @@ class Trailer:
         rows.sort(key=lambda r: -r["growth_kg"])
         return rows[:n]
 
-    def solve(self) -> dict:
-        """Axle position for the towball target. VSB1 5.1.1 keeps the axle at or behind the middle of the body."""
+    def ball_max(self) -> dict:
+        """The heaviest towball the ute takes (H14): its rear axle at its rating with growth, from the ute model, or the
+        towbar's 350 kg, whichever is lower."""
+        tv, lim = self.tv, self.tv["limits"]
+        axle = (lim["rear_axle_kg"] - tv["rear_kg_growth"]) / tv["rear_per_ball"]
+        rating = lim["towball_rating_kg"]
+        return dict(kg=min(axle, rating), axle_kg=axle, rating_kg=rating, governing="the ute's rear axle" if axle <= rating else "the towbar")
+
+    def _window_values(self, x: float) -> tuple[float, float]:
+        """At axle X: the lowest towball share over every case on both bases, and the heaviest towball with growth."""
+        lay = self.layout(axle_x=x)
+        ev = [lay.evaluate_case(c) for c in self.cases]
+        pct = min(min(e["nominal"]["towball_pct"], e["growth"]["towball_pct"]) for e in ev)
+        return pct, max(e["growth"]["towball_kg"] for e in ev)
+
+    def window(self) -> dict:
+        """The axle positions that meet decision H17's design targets together: the lightest case keeps the target share
+        of its mass on the ball (both bases) and the heaviest towball with growth stays under the target ceiling. The
+        hard limits, MAS-03 and MAS-04, sit outside it."""
         V = self.layout().V
-        f = lambda x: self._towball(axle_x=x) - self.target  # noqa: E731
-        xa = self._bisect(f, V["body_x0"] + 500, V["body_x1"] - 500)
-        if xa is None:
-            return dict(method="no solution", axle_x=None, overrides={}, notes=[])
+        pct_min, kg_max = self.aw["towball_pct_min"], self.aw["towball_max_kg"]
+        lo, hi = V["body_x0"] + 500, V["body_x1"] - 500
+        x_lo = self._bisect(lambda x: self._window_values(x)[0] - pct_min, lo, hi, it=40)
+        x_hi = self._bisect(lambda x: kg_max - self._window_values(x)[1], lo, hi, it=40)
+        return dict(x_lo=x_lo, x_hi=x_hi, width_mm=None if x_lo is None or x_hi is None else x_hi - x_lo, pct_min=pct_min,
+                    ball_max=dict(kg=kg_max, governing="H17's towball ceiling"))
+
+    def solve(self) -> dict:
+        """Axle position: the middle of the towball window (H14, H17). VSB1 5.1.1 keeps the axle at or behind the middle of the body."""
+        V = self.layout().V
+        w = self.window()
+        if w["x_lo"] is None or w["x_hi"] is None:
+            return dict(method="no solution", axle_x=None, overrides={}, notes=[], window=w)
+        xa = (w["x_lo"] + w["x_hi"]) / 2
         mid = V["body_x0"] + V["body_length"] / 2
         notes = []
+        if w["width_mm"] < 0:
+            notes.append(f"the window is shut by {-w['width_mm']:.0f} mm: no axle position meets H17's two towball targets together")
         if xa < mid:
-            notes.append(f"the towball target puts the axle {mid - xa:.0f} mm ahead of the middle of the body, so VSB1 5.1.1 holds it at the middle")
+            notes.append(f"the window puts the axle {mid - xa:.0f} mm ahead of the middle of the body, so VSB1 5.1.1 holds it at the middle")
             xa = mid
-        return dict(method="axle moved for the towball target", axle_x=xa, overrides=dict(axle_x=xa), notes=notes,
-                    behind_body_middle_mm=xa - mid)
+        return dict(method="axle in the middle of the towball window", axle_x=xa, overrides=dict(axle_x=xa), notes=notes,
+                    behind_body_middle_mm=xa - mid, window=w)
 
     def evaluate(self, solved: dict | None = None) -> dict:
         solved = solved or self.solve()
+        self.last_solved = solved
         lay = self.layout(**solved["overrides"])
         cases = [lay.evaluate_case(c) for c in self.cases]
         self.last_layout = lay
@@ -645,7 +697,7 @@ class Trailer:
                 ids = [x["id"] for x in cases] if c.cases == "all" else c.cases
                 bases = ["nominal", "growth"] if c.basis == "both" else [c.basis]
                 key = {"mass": "mass_kg", "axle": "axle_kg", "axle_vsb1": "axle_kg", "towball": "towball_kg",
-                       "towball_pct": "towball_pct", "tyre_load": "tyre_load_kg"}[c.quantity]
+                       "towball_pct": "towball_pct", "tyre_load": "tyre_load_kg", "tyre_load_side": "tyre_load_side_kg"}[c.quantity]
                 factor = 1.2 if c.quantity == "axle_vsb1" and not self.supplier["includes_120"] else 1.0
                 unit = "%" if c.quantity == "towball_pct" else "kg"
                 cmin, cmax = c.min, c.max
@@ -689,17 +741,80 @@ class Trailer:
             elif c.type == "gcm":
                 tv = self.tv
                 lim = tv["limits"]["gcm_kg"]
-                plan = tv["limits"]["weighed_max_kg"] + self.caps()["plated"] - tv["limits"]["towball_plan_kg"]
+                light = min(x["nominal"]["towball_kg"] for x in cases)   # the lightest ball leaves the most of the plate behind it
+                plan = tv["limits"]["weighed_max_kg"] + self.caps()["plated"] - light
                 heavy = max(cases, key=lambda x: x["growth"]["mass_kg"])
                 model = tv["ute_kg_growth"] + heavy["growth"]["mass_kg"]
                 v = max(plan, model)
                 row.update(limit=f"<= {lim:,.0f} kg", measured=round(v, 1), unit="kg", margin=round(lim - v, 1), ok=v <= lim + 1e-6,
                            governing="the plan's sum" if plan >= model else f"the model's sum ({heavy['id']})",
                            detail=(f"plan: the ute at its {tv['limits']['weighed_max_kg']:,.0f} kg weighed limit plus the {self.caps()['plated']:,.0f} kg "
-                                   f"plate less {tv['limits']['towball_plan_kg']:.0f} kg on the ball is {plan:,.0f} kg. Model: the ute with the bikes "
+                                   f"plate less the lightest towball, {light:.0f} kg, is {plan:,.0f} kg. Model: the ute with the bikes "
                                    f"aboard ({tv['gcm_case']}, {tv['ute_kg_growth']:,.0f} kg with growth) plus {heavy['id']} with growth "
                                    f"({heavy['growth']['mass_kg']:,.0f} kg) is {model:,.0f} kg"),
                            gcm=dict(plan=plan, model=model, ute_kg_growth=tv["ute_kg_growth"], trailer_case=heavy["id"]))
+            elif c.type in ("towball_ute", "towball_ute_input"):
+                tv, ids = self.tv, ([x["id"] for x in cases] if c.cases == "all" else c.cases)
+                bs = "growth" if c.basis != "nominal" else "nominal"
+                heavy = max(ids, key=lambda i: by_id[i][bs]["towball_kg"])
+                ball = by_id[heavy][bs]["towball_kg"]
+                if c.type == "towball_ute":
+                    bm = self.ball_max()
+                    rear = tv["rear_kg_growth"] + tv["rear_per_ball"] * ball
+                    m_axle, m_bar = tv["limits"]["rear_axle_kg"] - rear, bm["rating_kg"] - ball
+                    row.update(limit=f"rear axle <= {tv['limits']['rear_axle_kg']:,.0f} kg and ball <= {bm['rating_kg']:.0f} kg", measured=round(rear, 1),
+                               unit="kg", margin=round(min(m_axle, m_bar), 1), ok=min(m_axle, m_bar) >= -1e-6,
+                               governing=f"{heavy} {by_id[heavy]['name']} (with growth)",
+                               detail=(f"heaviest towball {ball:.1f} kg ({heavy}, with growth). The ute's rear axle: {tv['rear_kg_growth']:,.1f} kg with "
+                                       f"the bikes aboard ({tv['gcm_case']}, with growth) plus {tv['rear_per_ball']:.3f} kg per kg on the ball "
+                                       f"({tv['tow_case']} against {tv['gcm_case']}) is {rear:,.1f} kg, margin {m_axle:.1f} kg. Towbar margin {m_bar:.1f} kg"),
+                               ball_max=bm)
+                else:
+                    d = tv["design_ball_kg"]
+                    row.update(limit=f"<= {d:.1f} kg, the ute's design towball ({tv['tow_case']})", measured=round(ball, 1), unit="kg",
+                               margin=round(d - ball, 1), ok=ball <= d + 1e-6, governing=f"{heavy} {by_id[heavy]['name']} (with growth)",
+                               detail=f"heaviest towball {ball:.1f} kg against the {d:.1f} kg the ute model carries in {tv['tow_case']}")
+            elif c.type == "platinum_return":
+                tv, lim = self.tv, self.tv["limits"]
+                heavy = max((x["id"] for x in cases), key=lambda i: by_id[i]["nominal"]["towball_kg"])
+                ball = by_id[heavy]["nominal"]["towball_kg"]
+                plat = tv["rear_kg_nominal"] - tv["elite_rear_kg"]
+                rear = plat + tv["rear_per_ball"] * ball
+                cap = lim["platinum_rear_axle_kg"] - lim["platinum_return_margin_kg"]
+                row.update(limit=(f"<= {cap:,.0f} kg, the Platinum's {lim['platinum_rear_axle_kg']:,.0f} kg less "
+                                  f"{lim['platinum_return_margin_kg']:.0f} kg"), measured=round(rear, 1), unit="kg",
+                           margin=round(cap - rear, 1), ok=rear <= cap + 1e-6, governing=f"{heavy} {by_id[heavy]['name']} (no growth)",
+                           detail=(f"on the model without growth the ute's rear axle on the Platinum is {plat:,.1f} kg with the bikes aboard "
+                                   f"({tv['gcm_case']}), plus {tv['rear_per_ball']:.3f} kg per kg of the trailer's heaviest towball "
+                                   f"({ball:.1f} kg, {heavy}): {rear:,.1f} kg. The S3 weighing decides cut CUT7"))
+            elif c.type == "axle_window":
+                w = (getattr(self, "last_solved", None) or {}).get("window") or self.window()
+                width = w["width_mm"] if w["width_mm"] is not None else -1e9
+                row.update(limit=f">= {c.min:g} mm", measured=round(width, 1), unit="mm", margin=round(width - c.min, 1), ok=width >= c.min - 1e-6,
+                           governing=f"towball {w['pct_min']:.1f} % at X {w['x_lo'] or 0:,.0f}, {w['ball_max']['governing']} at X {w['x_hi'] or 0:,.0f}",
+                           detail=(f"axle from X {w['x_lo'] or 0:,.1f} (the lightest case at {w['pct_min']:.1f} %) to X {w['x_hi'] or 0:,.1f} (the heaviest towball "
+                                   f"at {w['ball_max']['kg']:.1f} kg, {w['ball_max']['governing']}), set at X {lay.V['axle_x']:,.1f}"), window=w)
+            elif c.type == "lateral":
+                ids = [x["id"] for x in cases] if c.cases == "all" else c.cases
+                bases = ["nominal", "growth"] if c.basis == "both" else [c.basis]
+                worst = max(((abs(by_id[i][b]["cog"][1]), i, b) for i in ids for b in bases))
+                v, cid, bs = worst
+                y = by_id[cid][bs]["cog"][1]
+                sides = by_id[cid][bs]["side_kg"]
+                row.update(limit=f"<= {c.max:g} mm from the centreline", measured=round(v, 1), unit="mm", margin=round(c.max - v, 1), ok=v <= c.max + 1e-6,
+                           governing=f"{cid} {by_id[cid]['name']} ({'with growth' if bs == 'growth' else 'no growth'})",
+                           detail=(f"centre of gravity {abs(y):.1f} mm to the {'road' if y > 0 else 'kerb'} side in {cid}. Axle group sides: road "
+                                   f"{sides['road']:,.0f} kg, kerb {sides['kerb']:,.0f} kg"))
+            elif c.type == "bed":
+                V = lay.V
+                top = V["bed_night_h"] + V["deck_t"] + V["underlay_t"] + V["mattress_t"]
+                parts = [("day underside", V["bed_day_h"] - 1600), ("night mattress top from 950", top - 950), ("night mattress top to 1,050", 1050 - top),
+                         ("clear over the night mattress", V["interior_h"] - top - 900), ("night stop over the desk", V["bed_night_h"] - V["desk_top_h"] - 40)]
+                gov = min(parts, key=lambda q: q[1])
+                row.update(limit="H1: day underside >= 1,600, night top 950 to 1,050 with 900 clear, 40 above the desk", measured=round(top, 1), unit="mm",
+                           margin=round(gov[1], 1), ok=gov[1] >= -1e-6, governing=gov[0],
+                           detail=(f"day underside {V['bed_day_h']:.0f} mm, night underside {V['bed_night_h']:.0f} mm, night mattress top {top:.0f} mm with "
+                                   f"{V['interior_h'] - top:.0f} mm clear above it, {V['bed_night_h'] - V['desk_top_h']:.0f} mm over the {V['desk_top_h']:.0f} mm desk"))
             elif c.type == "towball_scale":
                 m = self.inputs.v("UTE-03")
                 model = by_id[self.target_case.id]["nominal"]["towball_kg"]
@@ -711,7 +826,7 @@ class Trailer:
                     row.update(limit=f"within {100 * c.tolerance:.0f} % of the model", measured=m, unit="kg", margin=round(100 * (c.tolerance - abs(d)), 1),
                                ok=abs(d) <= c.tolerance, governing=f"model {model:.0f} kg", detail=f"scale {m:.0f} kg, model {model:.0f} kg ({100 * d:+.1f} %)")
             elif c.type == "fit":
-                f = lay.fit(c.zone)
+                f = (self.layout(**{**lay.overrides, **c.state}) if c.state else lay).fit(c.zone)
                 row.update(limit="inside the zone, no overlap", measured=f["smallest_gap_mm"], unit="mm", margin=f["smallest_gap_mm"],
                            ok=f["ok"], governing=f["governing"], problems=f["problems"],
                            detail=("all fit" if f["ok"] else ". ".join(f["problems"][:4])) + f", {f['items']} items, {f['keep_clear']} keep-clear spaces",
@@ -739,10 +854,11 @@ class Trailer:
             elif c.type == "overhang":
                 V = lay.V
                 front = V["axle_x"] - V["body_x0"]
-                rear = V["body_x1"] - V["axle_x"]
+                end = lay.overall()["x1"]   # the rear-most part, the split's outdoor unit on the rear wall
+                rear = end - V["axle_x"]
                 row.update(limit="front load space >= rear overhang", measured=round(front, 1), unit="mm", margin=round(front - rear, 1),
-                           ok=front >= rear - 1e-6, governing=f"axle at X {V['axle_x']:.0f}",
-                           detail=f"front load space {front:.0f} mm, rear overhang {rear:.0f} mm")
+                           ok=front >= rear - 1e-6, governing=f"axle at X {V['axle_x']:.0f}, rear-most part at X {end:.0f}",
+                           detail=f"front load space {front:.0f} mm, rear overhang {rear:.0f} mm to X {end:.0f} ({V['body_x1'] - V['axle_x']:.0f} mm to the rear wall)")
             elif c.type == "coupling":
                 z = lay.V["coupling_z"]
                 lo_z, hi_z = z - 20, z + 20
@@ -819,9 +935,9 @@ def chassis_inputs(tr: Trailer, ev: dict) -> dict:
         for t in lay.tanks():
             if t.box[0] - 60 <= x <= t.box[3] + 10:
                 under.append("water tank bay")
-        bat = lay.find("UF-04").box
-        if bat[0] - 60 <= x <= bat[3] + 10:
-            under.append("battery bay")
+        grey = lay.find("UF-08").box
+        if grey[0] - 60 <= x <= grey[3] + 10:
+            under.append("grey tank bay")
         if x < V["body_x0"] - 1:
             under.append("drawbar")
         elif x < V["bed_x1"]:
@@ -829,7 +945,7 @@ def chassis_inputs(tr: Trailer, ev: dict) -> dict:
         elif x < V["rear_x0"]:
             under.append("living area")
         elif x < V["body_x1"] - 60:
-            under.append("bathroom and cupboard")
+            under.append("wet room")
         else:
             under.append("rear wall")
         xms.append(dict(x_front=x, x_rear=b.box[3], station=b.extra.get("station"), section=b.note,
@@ -842,7 +958,7 @@ def chassis_inputs(tr: Trailer, ev: dict) -> dict:
         datum="X from the ball centre, positive rearward. Y from the centreline, positive to the road side. Z up from the ground at design ride height.",
         rail_outer_width=V["rail_outer_w"], rail_inner_width=2 * V["rail_in"], rail_centres=2 * V["rail_c"],
         track=V["track"], cf=V["cf"], wheel_offset=V["wheel_offset"],
-        rail_section="RHS 150 x 50 x 3 C450L0 with a continuous RHS 125 x 50 x 3 raiser (CHASSIS.md)",
+        rail_section="RHS 150 x 50 x 3 C450L0 with a continuous RHS 127 x 51 x 3.5 C350L0 raiser (CHASSIS.md)",
         rail_x0=V["body_x0"], rail_x1=V["body_x1"], rail_length=V["body_length"],
         rail_underside_z=V["rail_underside_z"], rail_top_z=V["rail_top_z"], raiser_h=V["raiser_h"],
         floor_underside_z=V["floor_underside_z"], floor_z=V["floor_z"], ceiling_z=V["ceiling_z"],
@@ -862,7 +978,7 @@ def chassis_inputs(tr: Trailer, ev: dict) -> dict:
         drawbar_box=list(lay.find("DX-01").box),
         tyre_d=V["tyre_d"], tyre_floor_clearance=V["tyre_clearance"], tank_capacity_l=lay.tank_capacity_l(),
         bed_x1=V["bed_x1"], rear_x0=V["rear_x0"],
-        battery_box=lay.find("UF-04").box, tanks=[t.box for t in lay.tanks()],
+        grey_tank_box=lay.find("UF-08").box, tanks=[t.box for t in lay.tanks()],
     ))
 
 

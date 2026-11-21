@@ -176,18 +176,21 @@ def tow_vehicle_page():
     over = "Over" if T["gap"] > 0 else "Under"
     names = " and ".join(T["closing"]) if len(T["closing"]) < 3 else ", ".join(T["closing"][:-1]) + " and " + T["closing"][-1]
     listed = ", ".join(T["closing"])
+    every = len(T["closing"]) == len(data["cuts"])     # when only every cut closes the gap, its two rows are the last two
+    closing_rows = "" if every else (f"| Less {names} | -{_aud(T['closing_saving'])} |\n"
+                                     f"| Required with {listed} and the allowance | {_aud(T['with_closing'])} |\n")
     out.append("\n### Totals\n\n<div data-sheet=\"off\">\n\n| Total | AUD |\n|---|---|\n"
                f"| Required | {_aud(T['required'])} |\n| Contingency allowance | {_aud(T['allowance'])} |\n"
                f"| Required with the contingency allowance | {_aud(T['with_contingency'])} |\n"
                f"| Leonard's figure for the car build | {_aud(T['budget'])} |\n"
                f"| {over} that figure, with the allowance | {_aud(abs(T['gap']))} |\n"
-               f"| Less {names} | -{_aud(T['closing_saving'])} |\n"
-               f"| Required with {listed} and the allowance | {_aud(T['with_closing'])} |\n"
+               + closing_rows +
                f"| Less every cut | -{_aud(T['cuts'])} |\n| Required with every cut and the allowance | {_aud(T['with_cuts'])} |\n"
                f"| Contingency lines, if every one happened | {_aud(T['contingency_lines'])} |\n| Optional lines | {_aud(T['optional'])} |\n\n"
                "</div>\n\n"
-               f"{names} close the gap to Leonard's AUD {_aud(T['budget'])}, each taken only if the old part passes its test (see the "
-               "cuts below). The allowance is the plan's own figure (`VEHICLE.md`), not the sum of the contingency lines: those are "
+               + ("Only every cut together closes" if every else f"{names} close")
+               + f" the gap to Leonard's AUD {_aud(T['budget'])}, each taken only if the old part passes its test or the weighing "
+               "allows it (see the cuts below). The allowance is the plan's own figure (`VEHICLE.md`), not the sum of the contingency lines: those are "
                "bought only if a test calls for them, and a new DPF and a laboratory emissions test are outside it. The truck, the bike "
                "box, the trailer and Leonard's labour are outside these figures (see the cost table on the [home page](../)).\n\n")
     out.append("#### By priority\n\n| Priority | What it is for | Required AUD | Contingency lines AUD | Optional AUD |\n|---|---|---|---|---|\n")
@@ -286,6 +289,7 @@ def main():
     _copy(BUILD / "trailer" / "chassis.step", SITE / "public" / "downloads" / "chassis.step")
     _copy(BUILD / "trailer" / "body.viewer.json", SITE / "public" / "models" / "body.json")
     _copy(BUILD / "trailer" / "body-inside.viewer.json", SITE / "public" / "models" / "body-inside.json")
+    _copy(BUILD / "trailer" / "body-inside-night.viewer.json", SITE / "public" / "models" / "body-inside-night.json")
     _copy(BUILD / "trailer" / "body.step", SITE / "public" / "downloads" / "body.step")
     _copy(BUILD / "body" / "body.json", GEN / "body.json")
     _copy(BUILD / "ute" / "ute.json", GEN / "ute.json")
@@ -295,7 +299,7 @@ def main():
     _copy(BUILD / "chassis" / "chassis.json", GEN / "chassis.json")
     _copy(BUILD / "chassis" / "chassis-cut-list.csv", SITE / "public" / "downloads" / "chassis-cut-list.csv")
     # the part metadata beside each model, for the viewer's tooltip and part card (cad/partsmeta.py)
-    for folder, names in (("trailer", ("trailer", "chassis", "body", "body-inside")), ("ute", ("ute", "ute-loading"))):
+    for folder, names in (("trailer", ("trailer", "chassis", "body", "body-inside", "body-inside-night")), ("ute", ("ute", "ute-loading"))):
         for name in names:
             _copy(BUILD / folder / f"{name}.parts.json", SITE / "public" / "models" / f"{name}.parts.json")
     import cairosvg

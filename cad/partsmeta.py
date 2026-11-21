@@ -62,7 +62,7 @@ def _trailer_drawing(b) -> str:
 
 def trailer_lookup(lay, body: dict):
     """Parts of the trailer's models: the layout's blocks by instance id, then by line id (a line with several
-    instances adds them up), and the body's openings, whose mass is in line BD-09."""
+    instances adds them up), and the body's openings, whose mass is in the line each one names (data/body/body.yaml)."""
     from .trailer import SYSTEM_LABELS
     by_iid = {b.iid: b for b in lay.blocks}
     lines: dict[str, list] = {}
@@ -82,7 +82,7 @@ def trailer_lookup(lay, body: dict):
         o = openings.get(key)
         if o:
             return dict(id=o["id"], iid=o["id"], name=f"{o['name']}, {o['wall']} wall, cut-out {o['w']:.0f} x {o['h']:.0f} mm",
-                        group="Body", system="body", source="Its mass is in line BD-09, the windows, vents and dust fan",
+                        group="Body", system="body", source=f"Its mass is in line {o['line']}" if o.get("line") else "A cut-out in the wall panel",
                         drawing="CT-201", load="tare")
         return None
     return meta

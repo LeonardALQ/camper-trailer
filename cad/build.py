@@ -54,11 +54,17 @@ def cmd_data():
 
 
 def cmd_model():
-    """The bike spacing in the ute's bike box from the geometry (cad/solve.py), cached for the later stages."""
+    """The bike spacing in the ute's bike box from the geometry (cad/solve.py), and the trailer's heaviest towball for the
+    ute's towing cases (cad/towball.py), both cached for the later stages."""
     from . import solve as SV
+    from . import towball as TB
     t = time.time()
     s = SV.cached() or SV.solve()
     print(f"bike spacing from the geometry: {s['bike_spacing']:.0f} mm, UGC-01 {s['clr03_gap']:.1f} mm ({time.time() - t:.1f} s)")
+    t = time.time()
+    b = TB.cached() or TB.solve()
+    print(f"trailer's heaviest towball with growth: {b['towball_kg']:.1f} kg ({b['case']}, axle X {b['axle_x']:.1f}), "
+          f"carried by the ute's towing cases ({time.time() - t:.1f} s)")
 
 
 def cmd_trailer():
@@ -82,10 +88,10 @@ def cmd_trailer():
     lay = tr.layout(**rep["solved"]["overrides"])
     write_outputs(TrailerModel(lay, body=True), out)
     from .trailer_model import write_body_outputs
-    write_body_outputs(lay, out)
+    write_body_outputs(lay, out, night=tr.layout(**{**rep["solved"]["overrides"], "bed_state": 1}))
     from .partsmeta import trailer_lookup, write as write_parts
     look = trailer_lookup(lay, body)
-    for name in ("trailer", "chassis", "body", "body-inside"):
+    for name in ("trailer", "chassis", "body", "body-inside", "body-inside-night"):
         write_parts(out / f"{name}.viewer.json", look)
     fails = [c["id"] for c in rep["checks"] if c["severity"] == "fail" and not c["ok"]]
     print(json.dumps(dict(

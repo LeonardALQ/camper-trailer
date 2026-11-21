@@ -6,12 +6,15 @@ checks: []
 
 # Whole-trailer checks (TRAILER.md), measured on the block layout in assemblies/trailer.yaml by cad/trailer.py.
 # Masses with growth carry the MASS-06 allowance (estimate +20 %, calculated +7 %, spec 0 %).
-# The tow vehicle is the LandCruiser 79 (data/ute/ute.yaml, research report 16). Its towbar is rated 350 kg, and the
-# plan caps the towball at 250 kg because the ute's rear axle binds. 6 % of the trailer's mass is the floor report 07
-# sets for stability. VSB1 sets no towball share. Limits here are never changed to make a check pass.
+# The tow vehicle is the LandCruiser 79 (data/ute/ute.yaml, research report 16). Its towbar is rated 350 kg. H14
+# (21 Nov 2026) replaced the plan's 250 kg towball cap with the rule it stood for: in every case the towball keeps the
+# ute's rear axle within its rating with growth, computed from the ute model at that ball load. H17 put the Lovells Elite
+# kit on the ute, so that rating is 2,850 kg, and set the design towball range the axle solve uses: at least 8.0 % in
+# every case and at most 320 kg with growth. H2 sets the 7.5 % floor and the 3,500 kg plate. VSB1 sets no towball
+# share. Limits here are never changed to make a check pass.
 trailer_checks:
   - id: MAS-01
-    title: Trailer mass with growth within the 3,100 kg plated ATM
+    title: Trailer mass with growth within the 3,500 kg plated ATM
     type: mass
     quantity: mass
     limit: plated_atm
@@ -19,7 +22,17 @@ trailer_checks:
     cases: all
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: The decision log plates the ATM at 3,100 kg, so it covers the heaviest case with the growth allowance. A 3,000 kg plate is the target once the estimates come in lighter (TRAILER.md open questions).
+    why: Decision H2 plates the ATM at 3,500 kg, the ute's towing rating and the DO35 and NSW caps, so it covers every case with the growth allowance.
+  - id: MAS-10
+    title: Trailer mass with growth at most 3,400 kg in every case (design target)
+    type: mass
+    quantity: mass
+    basis: growth
+    cases: all
+    max: 3400
+    severity: fail
+    inputs: [TW-01, TW-02, TW-03]
+    why: Decision H2 keeps 100 kg of the 3,500 kg plate in reserve for the estimates. H13 holds it with the 350 L travel limit on water.
   - id: MAS-02
     title: Axle group load with growth, times 1.2 for VSB1's 120 % rule, within the kit's GTM
     type: mass
@@ -31,46 +44,74 @@ trailer_checks:
     inputs: [SUP-01, SUP-02, TW-01, TW-02, TW-03]
     why: VSB1 asks the axles to carry 120 % of their share where they do not share load, as the XT's do not (report 06). The kit's GTM is Cruisemaster's figure for the 4,500 kg XT Air build.
   - id: MAS-03
-    title: Towball load never above 250 kg, the ute's plan cap
-    type: mass
-    quantity: towball
-    basis: both
+    title: Towball keeps the ute's rear axle within its 2,850 kg rating with growth and stays within the 350 kg towbar, in every case
+    type: towball_ute
+    basis: growth
     cases: all
-    max: 250
     severity: fail
     inputs: [UTE-02, TW-01, TW-02, TW-03]
-    why: The towbar is rated 350 kg, but the plan caps the ball at 250 kg so the ute's rear axle keeps its 2,550 kg rating (data/ute/ute.yaml UTE-05, report 16 section 2.3).
+    why: Decision H14, with the Elite kit's rear axle (H17). The ute model gives its rear axle load with the bikes aboard (UC2, with growth) and how much each kilogram on the ball adds to it (UC3 against UC2). The Hayman Reese bar, the 79's rating and the DO35 allow 350 kg.
+  - id: MAS-03B
+    title: The ute's towing cases carry at least the trailer's heaviest towball with growth
+    type: towball_ute_input
+    basis: growth
+    cases: all
+    severity: fail
+    inputs: []
+    why: The ute builds first and its towing cases (UC3, UC4) carry the trailer's heaviest towball as cad/towball.py solves it. The ute's own checks (UTE-01 to UTE-12) hold only if no trailer case puts more on the ball.
   - id: MAS-04
-    title: Towball load at least 6 % of the trailer's mass in every travel case (design target)
+    title: Towball load at least 7.5 % of the trailer's mass in every travel case (design target)
     type: mass
     quantity: towball_pct
     basis: both
     cases: all
-    min: 6
+    min: 7.5
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: The decision log (11:25) keeps 6 % as the floor for a stable trailer. Every case here is one the trailer may be towed in.
+    why: Decision H2 sets 7.5 % in every case for a stable trailer. Every case here is one the trailer may be towed in.
   - id: MAS-05
-    title: Towball load within 10 kg of the target fully loaded (design target)
-    type: mass
-    quantity: towball
-    limit: target
-    tolerance: 10
-    basis: nominal
-    cases: [TC2]
+    title: The towball window is open, so an axle position meets both of H17's towball targets (design rule)
+    type: axle_window
+    min: 0
     severity: fail
     inputs: []
-    why: The axle solve sets the towball fully loaded on base weights to the target, the middle of the decision log's 200 to 250 kg band less what the growth allowance can add.
-  - id: MAS-06
-    title: Tyre load with VSB1's 120 % rule within the tyre's rating
+    why: Decision H17. The axle solve sets the axle in the middle of the window between the position where the lightest case reaches 8.0 % on the ball and the one where the heaviest towball with growth reaches 320 kg (data/load_cases.yaml axle_window). A window under 0 mm means no axle position meets both.
+  - id: MAS-12
+    title: Towball load at least 8.0 % of the trailer's mass in every case (H17 design target)
     type: mass
-    quantity: tyre_load
+    quantity: towball_pct
+    basis: both
+    cases: all
+    min: 8.0
+    severity: fail
+    inputs: [TW-01, TW-02, TW-03]
+    why: Decision H17 asks for a towball well clear of H2's 7.5 % floor (MAS-04), because the masses are still estimates.
+  - id: MAS-13
+    title: Towball load at most 320 kg with growth in every case (H17 design target)
+    type: mass
+    quantity: towball
+    basis: growth
+    cases: all
+    max: 320
+    severity: fail
+    inputs: [TW-01, TW-02, TW-03]
+    why: Decision H17. The towbar, the ute's rating and the DO35 allow 350 kg, so 320 kg keeps 30 kg in hand.
+  - id: MAS-14
+    title: Platinum return, cut CUT7. The ute's rear axle without growth at the trailer's heaviest towball, on the Platinum, at least 30 kg under 2,550 kg (reported)
+    type: platinum_return
+    severity: report
+    inputs: [UTE-03]
+    why: Decision H17. The plan buys the Elite kit. Cut CUT7 takes the Platinum back if the S3 weighing leaves at least 30 kg under its 2,550 kg rear axle at the trailer's weighed towball. This row is the model's forecast of that weighing.
+  - id: MAS-06
+    title: Tyre load on the heavier side, with VSB1's 120 % rule, within the tyre's rating
+    type: mass
+    quantity: tyre_load_side
     limit: tyre_rating
     basis: growth
     cases: all
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: LT265/75R16 123/120, 1,550 kg per tyre (report 16, the ute's tyre). 1.2 times the axle group load over four tyres.
+    why: LT265/75R16 123/120, 1,550 kg per tyre (report 16, the ute's tyre). 1.2 times the heavier side's share of the axle group load over its two tyres, from the lateral centre of gravity.
   - id: MAS-07
     title: Axle group load with growth within the NSW examiner's GTM cap
     type: mass
@@ -92,21 +133,30 @@ trailer_checks:
     inputs: [TW-01, TW-02, TW-03]
     why: The examiner caps ATM at the lower of the coupling and chain ratings (report 02 section 2.1).
   - id: MAS-09
-    title: Wheel load rating covers VSB1's 120 % rule with growth
+    title: Wheel load rating covers VSB1's 120 % rule on the heavier side with growth
     type: mass
-    quantity: tyre_load
+    quantity: tyre_load_side
     limit: wheel_rating
     basis: growth
     cases: all
     severity: fail
     inputs: [WHL-01, TW-01, TW-02, TW-03]
     why: The ROH Trak 2 16 x 7 ET 0 is rated 1,400 kg (measurements.yaml WHL-01), the ute's wheel.
+  - id: MAS-11
+    title: Lateral centre of gravity within 50 mm of the centreline in every case
+    type: lateral
+    max: 50
+    basis: both
+    cases: all
+    severity: fail
+    inputs: [TW-01, TW-02, TW-03]
+    why: The battery plinth, washer and dryer sit on the kerb side. 50 mm is the conductor's estimated rule (phase 0 ruling). MAS-06 and MAS-09 check each side's wheels.
   - id: GCM-01
-    title: Ute and trailer within the ute's 6,900 kg GCM
+    title: Ute and trailer within the 7,400 kg GCM with Lovells' revision
     type: gcm
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: GCM is the ute's mass plus the trailer's (report 16 section 2.4). The check takes the larger of two sums. The plan's sum is the ute at its 3,850 kg weighed limit, which includes the ball load, plus the trailer at its plated ATM less the 250 kg on the ball. The model's sum is the ute with the bikes aboard (U1 case UC2, with growth) plus the heaviest trailer case with growth.
+    why: GCM is the ute's mass plus the trailer's (report 16 section 2.4). Decision H2 takes Lovells' 7,400 kg GCM revision, which Lovells rates for the 4,495 kg Elite kit of H17 too. The check takes the larger of two sums. The plan's sum is the ute at its 3,850 kg weighed limit, which includes the ball load, plus the trailer at its plated ATM less its lightest towball. The model's sum is the ute with the bikes aboard (UC2, with growth) plus the heaviest trailer case with growth. If the revision is refused, Toyota's 6,900 kg holds the model's sum only with at most 233 L of water in travel (H13, recomputed for H17), and the plan's sum then needs the plate at or below 3,300 kg.
   - id: TBS-01
     title: Towball scale reading within 10 % of the model, fully loaded (reported)
     type: towball_scale
@@ -115,26 +165,40 @@ trailer_checks:
     inputs: [UTE-03]
     why: Reported until the trailer exists. A reading more than 10 % off the model means a mass line or its position is wrong.
   - id: FIT-01
-    title: The body holds its items and keeps the entry door, desk seats, bathroom door and aisle clear
+    title: The body holds its items and keeps the door landings, the desk's chair space, the aisle and the wet room's walk band clear
     type: fit
     zone: inside
     severity: fail
     inputs: []
-    why: Every block inside the body must sit inside it without overlapping another, and no solid item may stand in a keep-clear space (report 18 section 1.2).
+    why: Every block inside the body must sit inside it without overlapping another, and no solid item may stand in a keep-clear space (home/layout-home.md section 2). The bed is up, as it travels.
   - id: FIT-03
-    title: Tanks and battery fit between the rails and the crossmembers
+    title: Fresh, grey and diesel tanks and the XT Air box fit between the rails and the crossmembers
     type: fit
     zone: underfloor
     severity: fail
     inputs: []
-    why: The tanks sit in the two suspension bays and the battery box in its own bay, clear of every crossmember.
+    why: The fresh tanks sit in the two suspension bays, the grey tank in the rear bay under the grey-bay crossmember and the diesel tank ahead of the XT front hinge, clear of every crossmember and fitting.
   - id: FIT-04
-    title: The sealed drawbar box holds the generator and the jerry cans
+    title: The sealed drawbar box holds the two generators, the jerry cans and the shelf
     type: fit
     zone: drawbar_box
     severity: fail
     inputs: []
     why: The petrol rides outside the body in a sealed, vented box behind the stone guard (decision log 12:45), so no petrol vapour can reach the living area or the air-conditioner under the bed.
+  - id: FIT-06
+    title: The bed in its night position clears the desk, the chair space and every other item
+    type: fit
+    zone: inside
+    state: {bed_state: 1}
+    severity: fail
+    inputs: []
+    why: H1. The layout is evaluated a second time with the bed lowered to its night stop (bed_state 1), 75 mm above the desk top.
+  - id: BED-01
+    title: Lift bed heights meet H1 by day and by night
+    type: bed
+    severity: fail
+    inputs: []
+    why: H1. By day the platform's underside is at least 1,600 mm above the floor, so a seated 95th percentile adult clears it. By night the mattress top is 950 to 1,050 mm up with at least 900 mm clear above it, and the platform stops at least 40 mm above the desk top.
   - id: FIT-05
     title: Tyres swung through their full travel keep 50 mm from every chassis member
     type: tyre
@@ -396,11 +460,11 @@ trailer_checks:
     inputs: []
     why: VSB1 measures width across the body including awnings and side racks (report 02 section 2.2).
   - id: DIM-02
-    title: Front load space not shorter than the rear overhang (VSB1 5.1.1)
+    title: Front load space not shorter than the rear overhang to the rear-most point (VSB1 5.1.1)
     type: overhang
     severity: fail
     inputs: []
-    why: VSB1 5.1.1 for this kind of trailer (report 08 section 5.1). The axle group centre must sit at or behind the middle of the body.
+    why: VSB1 5.1.1 for this kind of trailer (report 08 section 5.1). The rear overhang runs from the axle group centre to the rear-most part, the split's outdoor unit on the rear wall.
   - id: DIM-03
     title: Coupling height inside VSB1's 350 to 460 mm towball range, with its tolerance
     type: coupling
@@ -440,14 +504,14 @@ trailer_checks:
   - {id: BDY-04, title: "Floor edge beside the raisers between outriggers, LC2 3 g", type: body_panel, body: {item: BDY-04}, severity: fail,
      why: "Report 12 section 3 and report 11 section 5.3: 160 kg/m2 of floor and contents spanning between outriggers, no edge member"}
   - {id: BDY-06, title: "Side wall in a 0.5 kPa wind", type: body_panel, body: {item: BDY-06}, severity: fail,
-     why: "Report 12 section 3. The wall spans from the floor joiner to the roof-to-wall joiner, 1,950 mm"}
+     why: "Report 12 section 3. The wall spans from the floor joiner to the roof-to-wall joiner, 2,000 mm (H1a)"}
   - {id: BDY-07, title: "Fixed roof with the bonded solar array, LC2 3 g, spanning between the walls", type: body_panel, body: {item: BDY-07}, severity: fail,
      why: "Report 12 section 3 with report 13's 29 kg Sunman array"}
   - {id: BDY-09, title: "Roof deflection with the solar array at 1 g within span/150 (reported)", type: body_deflection, body: {item: DEF-B2}, severity: report,
      why: "Report 12 section 3. Bonded panels flex with the roof"}
   - {id: BDY-10, title: "Wall deflection in a 0.5 kPa wind within span/100 (reported)", type: body_deflection, body: {item: DEF-B3}, severity: report,
      why: "Report 12 section 3"}
-  - {id: BDY-11, title: "Panel inserts: bed deck ledgers and awning brackets within half their rated load", type: body_insert, severity: fail,
+  - {id: BDY-11, title: "Panel fixings: lift-bed rail screws in their hardpoints and awning brackets within half their rated load", type: body_insert, severity: fail,
      why: "Report 12 section 3 and report 02 MAT-05. A pull test in the real panel confirms each insert (LR-09)"}
   - {id: BDY-13, title: "Body share of the LC5a twist, with the body tied to the chassis at the mounts (reported)", type: body_twist, severity: report,
      why: "Report 12 section 4 claims about 80 %. The frame model checks it with the body as a torsion box, for the roof joint carrying shear or not"}
@@ -460,4 +524,4 @@ trailer_checks:
   - {id: BDY-19, title: "Roof-to-wall joint holds the fixed roof in a 40 m/s uplift", type: body_roof, severity: fail,
      why: "Report 12 section 3's uplift at 110 km/h into a 36 km/h headwind, on the bonded joiner round the roof edge with half the bond's tensile strength allowed"}
   - {id: BDY-20, title: "Rear wall as the box's rear diaphragm under the body's share of LC5a and LC5b", type: body_end_wall, severity: fail,
-     why: "Report 12 section 5. With the garage door gone the full rear wall holds the box's rear end in shape, as the portal did. Skin shear at half the ultimate over root 3, and the bonded joiner at half the bond strength"}
+     why: "Report 12 section 5. The rear wall holds the box's rear end in shape. Its shear width is the wall less the openings at its worst height, the wet room door, the rinse box and the relief valve. Skin shear at half the ultimate over root 3, and the bonded joiner at half the bond strength"}

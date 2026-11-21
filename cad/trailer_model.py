@@ -12,14 +12,17 @@ from build123d import Box, Compound, Cylinder, Plane, Pos, Rot, export_gltf, exp
 from .model.prims import box, rgba
 from .trailer import SYSTEM_LABELS, Layout
 
-SYSTEM_ORDER = ["drawbar", "stowage", "chassis", "running_gear", "spare", "underfloor", "body", "roof", "bed", "living", "payload"]
+SYSTEM_ORDER = ["drawbar", "stowage", "chassis", "running_gear", "spare", "underfloor", "body", "roof", "bed", "living", "electrical",
+                "hvac", "wet_room", "payload"]
 COLOURS = {
     "drawbar": ("#5d6d7e", 1.0), "chassis": ("#7f8c8d", 1.0), "running_gear": ("#1c2833", 1.0),
     "underfloor": ("#2e86c1", 0.9), "body": ("#d6dbdf", 0.18), "roof": ("#f4d03f", 0.9),
     "living": ("#d2b4de", 0.9), "bed": ("#aed6f1", 0.9), "stowage": ("#e59866", 1.0), "payload": ("#f7dc6f", 1.0), "spare": ("#1c2833", 1.0),
+    "electrical": ("#f5b041", 1.0), "hvac": ("#85c1e9", 0.9), "wet_room": ("#76d7c4", 0.9),
 }
-OVERRIDE = {"BD-01": ("#8c8c8c", 0.6), "RG-01": ("#7b7d7d", 1.0), "LA-07": ("#58d68d", 0.9),
-            "LA-01": ("#76d7c4", 0.9), "UF-04": ("#f5b041", 1.0), "BD-13": ("#27ae60", 0.8), "GS-01": ("#c0392b", 1.0),
+OVERRIDE = {"BD-01": ("#8c8c8c", 0.6), "RG-01": ("#7b7d7d", 1.0), "LA-11T": ("#58d68d", 0.35), "LA-11B": ("#58d68d", 0.35),
+            "WR-01": ("#76d7c4", 0.6), "EL-02": ("#f5b041", 0.4), "AC-03": ("#aab7b8", 0.35), "UF-08": ("#7f8c8d", 0.9),
+            "BD-15": ("#b2bec3", 0.5), "BD-13": ("#27ae60", 0.8), "GS-01": ("#c0392b", 1.0),
             "GS-04": ("#e74c3c", 1.0), "DX-01": ("#aab7b8", 0.45), "LB-04": ("#d4e6f1", 0.25), "LB-01": ("#f8f9f9", 1.0),
             "BD-07": ("#b2bec3", 0.5), "DB-03": ("#2c3e50", 1.0), "DB-04": ("#aab7b8", 0.8)}
 ROLE_COLOURS = {"rail": "#566573", "raiser": "#7b8a8b", "drawbar": "#34495e", "brace": "#34495e", "outrigger": "#95a5a6",
@@ -136,9 +139,10 @@ def write_outputs(tm: TrailerModel, out: Path):
     export_step(ch, str(out / "chassis.step"), timestamp="2026-11-20T00:00:00")
 
 
-def write_body_outputs(lay: Layout, out: Path):
+def write_body_outputs(lay: Layout, out: Path, night: Layout | None = None):
     """The body on its own with its fixed roof, and the body with the bed and the living area fitted, for the Body page
-    (BODY.md), and the body's STEP file."""
+    (BODY.md), and the body's STEP file. `night` is the same layout with the bed lowered (bed_state 1): it gives
+    body-inside-night.viewer.json beside the day model (H1)."""
     from .body_model import body_solids
     from .export import _viewer_js
     kids = []
@@ -156,15 +160,18 @@ def write_body_outputs(lay: Layout, out: Path):
     js = _viewer_js("ASM-BD", comp)
     (out / "body.viewer.json").write_text(js[js.index("{"): js.rindex("}") + 1])
     export_step(comp, str(out / "body.step"), timestamp="2026-11-20T00:00:00")
-    # the fit-out inside the body: bed, kitchen, living area and the bathroom, with the walls see-through
-    fit = []
-    for b in lay.blocks:
-        if b.system in ("bed", "living", "running_gear") and b.box is not None and not b.keep_clear and b.zone == "inside":
-            s = block_shape(b)
-            col, a = OVERRIDE.get(b.id, COLOURS[b.system])
-            s.label, s.color = f"{b.iid} {b.name}".replace("/", "-"), rgba(col, a)
-            fit.append(s)
-    comp = Compound(label="ASM-BD Body with the bed and the living area",
-                    children=[Compound(label="Body", children=[copy.copy(k) for k in kids]), Compound(label="Bed and living area", children=fit)])
-    js = _viewer_js("ASM-BD", comp)
-    (out / "body-inside.viewer.json").write_text(js[js.index("{"): js.rindex("}") + 1])
+    # the fit-out inside the body: bed, desk, kitchen, laundry, electrics, HVAC and the wet room, with the walls see-through
+    for name, ly, title in (("body-inside", lay, "bed up"), ("body-inside-night", night, "bed down")):
+        if ly is None:
+            continue
+        fit = []
+        for b in ly.blocks:
+            if b.system in ("bed", "living", "electrical", "hvac", "wet_room") and b.box is not None and not b.keep_clear and b.zone == "inside":
+                s = block_shape(b)
+                col, a = OVERRIDE.get(b.id, COLOURS[b.system])
+                s.label, s.color = f"{b.iid} {b.name}".replace("/", "-"), rgba(col, a)
+                fit.append(s)
+        comp = Compound(label=f"ASM-BD Body with the fit-out, {title}",
+                        children=[Compound(label="Body", children=[copy.copy(k) for k in kids]), Compound(label="Fit-out", children=fit)])
+        js = _viewer_js("ASM-BD", comp)
+        (out / f"{name}.viewer.json").write_text(js[js.index("{"): js.rindex("}") + 1])

@@ -32,8 +32,8 @@ G = 9.81
 SKIP_SYSTEMS = {"chassis", "drawbar"}           # replaced by the designed members and fittings
 SKIP_IDS = {"SP-03"}                            # the spare wheel bracket estimate, replaced by the carrier posts
 UNSPRUNG = {"RG-01", "RG-02", "RG-06"}
-ROOF = {"BD-02", "BD-08", "BD-09", "RF-01"}
-RAILS = {"BD-10", "RG-03"}
+ROOF = {"BD-02", "BD-08", "RF-01"}
+RAILS = {"BD-10", "RG-03", "RG-04", "RG-05"}   # hung from the rails: mud flaps, the TSC unit and the XT Air box under the floor
 CELL = 200.0
 
 
@@ -398,6 +398,8 @@ class Analysis:
         ch, V = self.ch, self.ch.V
         lcs = {lc["id"]: lc for lc in ch.data["load_cases"]}
         fy = ch.fy
+        # each member against its own grade. The rails act with their raisers as one section, so they take the lower fy
+        fy_of = {m.id: (min(m.sec.fy, ch.role_sec["raiser"].fy) if m.role == "rail" else m.sec.fy) for m in ch.members}
         cases = self.scaled_cases()
         env: dict[str, dict] = {}
         self.resid = 0.0
@@ -475,10 +477,10 @@ class Analysis:
                               rigid_links=sum(1 for e in self.f.elements if e.sec.rigid)))
         for lc_id, e in env.items():
             fac = lcs[lc_id]["factor"]
-            rows = {m: dict(r, util=r["eq"] / (fy / fac)) for m, r in e.items() if not m.startswith("_")}
+            rows = {m: dict(r, util=r["eq"] / (fy_of.get(m, fy) / fac), fy=fy_of.get(m, fy)) for m, r in e.items() if not m.startswith("_")}
             out["envelope"][lc_id] = rows
             g = max(rows.items(), key=lambda kv: kv[1]["util"])
-            out["governing"][lc_id] = dict(member=g[0], **g[1], limit=fy / fac, factor=fac)
+            out["governing"][lc_id] = dict(member=g[0], **g[1], limit=g[1]["fy"] / fac, factor=fac)
         out["pad_n"] = env["LC8b"]["_pad"]
         out["deflections"] = self._worst_deflections(defl)
         out["fatigue"] = self.fatigue(lc1)

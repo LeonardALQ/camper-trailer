@@ -212,6 +212,32 @@ sections:
     source: "Computed from AS/NZS 1163 geometry (not checked against a published table)"
     published_check: null
     use: "Not found in the Austube Mills C450PLUS range read (125 x 75 is listed, 125 x 50 is not). Computed only. Check Orrcon or InfraBuild before using it."
+  - id: RHS_127x51x3p5
+    designation: "RHS 127x51x3.5"
+    shape: RHS
+    d: 127
+    b: 51
+    t: 3.5
+    ro: 8.75
+    mass_kg_per_m: 9.07
+    A_mm2: 1154.9
+    Ix_e6mm4: 2.20
+    Zx_e3mm3: 34.7
+    Sx_e3mm3: 44.6
+    Iy_e6mm4: 0.526
+    Zy_e3mm3: 20.6
+    Sy_e3mm3: 23.4
+    J_e6mm4: 1.44
+    C_e3mm3: 37.2
+    Ze_x_e3mm3_C450: null
+    Ze_y_e3mm3_C450: null
+    compact_x_C450: null
+    compact_y_C450: null
+    grade: C350L0
+    fy_mpa: 350
+    source: "Computed from AS/NZS 1163 geometry by this table's method (home/phase1/src/rhs_section.py, which reproduces RHS 125x50x3 above). Not checked against a published table"
+    published_check: null
+    use: "The stocked size nearest the 125 x 50 x 3 design section (research report 22 open point 1), for the raisers, outriggers and floor crossmembers. The listing gives no grade, so C350L0 is used until the mill certificate shows more."
   - id: RHS_100x50x3
     designation: "RHS 100x50x3"
     shape: RHS

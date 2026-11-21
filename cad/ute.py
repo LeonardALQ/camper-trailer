@@ -1,4 +1,4 @@
-"""The tow vehicle: the LandCruiser 79 single cab with the Lovells 4,200 kg GVM kit (UTE-GARAGE.md, research report 16).
+"""The tow vehicle: the LandCruiser 79 single cab with the Lovells 4,495 kg Elite GVM kit (decision H17, VEHICLE.md).
 
 Its mass budget, axle loads, centre of gravity and static stability factor per case, and the ute checks, from
 data/ute/ute.yaml. Positions are in the ute frame DIM-U1: X from the front axle centre, positive rearward, Y positive
@@ -33,6 +33,9 @@ class Ute:
         inp = Inputs(ROOT)
         raw["coupling_z"] = inp.coupling_z()           # measurements.yaml UTE-01
         raw["ball_behind_axle"] = inp.ball_behind_axle()   # UTE-02
+        if raw.get("towball_design") is None:
+            from .towball import towball_kg
+            raw["towball_design"] = towball_kg()           # the trailer's heaviest towball with growth (cad/towball.py)
         self.P = Params(raw)
         self.V = self.P.values
         self.limits = {k: v["v"] for k, v in self.d["limits"].items()}
@@ -44,7 +47,8 @@ class Ute:
             self.lines.append(dict(
                 id=ln["id"], item=ln["item"], kg=float(self.P.eval(ln["kg"], {})),
                 x=float(self.P.eval(ln["x"], {})), y=float(self.P.eval(ln.get("y", 0), {})), z=float(self.P.eval(ln["z"], {})),
-                maturity=ln["maturity"], source=ln["source"], cases=list(ln["cases"]), group="ute", box=bool(ln.get("box"))))
+                maturity=ln["maturity"], source=ln["source"], cases=list(ln["cases"]), group="ute", box=bool(ln.get("box")),
+                elite=bool(ln.get("elite"))))
         if garage:
             self.lines.extend(garage["lines"])
         for ln in self.lines:
@@ -120,10 +124,11 @@ class Ute:
                                    + (f" with a {V['trailer_atm']:,.0f} kg trailer" if t == "gcm" else "")
                                    + f", margin {m:,.1f} {unit}"))
             elif t == "towball":
-                lim = min(L["towball_plan_kg"], L["towball_rating_kg"])
+                lim = L["towball_rating_kg"]
                 v = V["towball_design"]
-                row.update(limit=f"<= {lim:.0f} kg", measured=v, unit="kg", margin=lim - v, ok=v <= lim, governing="towball design load",
-                           detail=f"{v:.0f} kg on the ball against the plan's {L['towball_plan_kg']:.0f} kg and the towbar's {L['towball_rating_kg']:.0f} kg")
+                row.update(limit=f"<= {lim:.0f} kg", measured=v, unit="kg", margin=round(lim - v, 1), ok=v <= lim, governing="towball design load",
+                           detail=(f"{v:.1f} kg on the ball, the trailer's heaviest towball with growth, against the towbar's {lim:.0f} kg. "
+                                   "The rear axle at this ball is UTE-03 (H14)"))
             elif t == "width":
                 b = self.box_extent()
                 w = b["y1"] - b["y0"]
