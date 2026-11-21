@@ -13,6 +13,7 @@ from ..build import BUILD, git_hash
 from ..trailer import Trailer
 from ..trailer_model import TrailerModel
 from . import sheet as S
+from .home_common import water_without_gcm_revision
 from .sheets import _leaves
 
 
@@ -200,7 +201,8 @@ def ct001(prj, model, bom, checks, reg, dwg):
          f"WITHIN THE ELITE KIT'S {rep['tow_vehicle']['limits']['rear_axle_kg']:.0f} kg (MAS-03). NO BALLAST IN ANY CASE."),
         "REVISION " + dwg["revisions"][-1]["rev"] + ": THE HOME TRAILER. THE BIKES RIDE IN THE UTE'S BIKE BOX. THE LIFT BED OVER THE DESK ACROSS "
         f"THE FRONT, THE KITCHEN ON THE ROAD SIDE, THE BATTERY PLINTH ON THE KERB SIDE, THE WET ROOM ACROSS THE REAR. AT MOST "
-        f"{rep['params']['water_travel_l']:.0f} L OF WATER IN TRAVEL (H13), 233 L IF LOVELLS' GCM REVISION IS REFUSED (CT-003).",
+        f"{rep['params']['water_travel_l']:.0f} L OF WATER IN TRAVEL (H13), {water_without_gcm_revision(rep)} L IF LOVELLS' GCM REVISION IS "
+        "REFUSED (CT-003).",
         "ROOF (H12): FIXED, WITH ROUNDED FRONT EDGES (ABOUT +6 kg AND AUD 3,500, RESEARCH REPORT 25). TOWING FUEL IS ABOUT 21.3 L/100 km AT "
         "90 km/h AGAINST 25.0 FOR A SQUARE FRONT. A HARD-WALLED TELESCOPING ROOF GIVES 20.6 BUT COSTS +117 kg AND ABOUT AUD 32,900 MORE "
         "AND RULES OUT THE S4 WINDOWS, STOCK DOORS, THE HAPPIJAC BED AND A FULL-HEIGHT WET ROOM. A CANVAS POP-TOP FAILS H3 AND H7.",

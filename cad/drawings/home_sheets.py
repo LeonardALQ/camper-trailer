@@ -17,10 +17,9 @@ from build123d import Keep, Plane  # noqa: F401  (kept for the views that cut th
 from ..lamps import resolve as resolve_lamps
 from ..trailer_model import TrailerModel
 from . import sheet as S
-from .home_common import MARK, Proj, body_plan, cog_symbol, ctx, label_in, stamp, textblock, title, tw, wrap, write
+from .home_common import (MARK, TOYOTA_GCM, Proj, body_plan, cog_symbol, ctx, label_in, stamp, textblock, title, tw,
+                          water_without_gcm_revision, wrap, write)
 from .sheets import _leaves
-
-TOYOTA_GCM = 6900   # Toyota's GCM, which holds if Lovells' 7,400 kg revision is refused (data/ute/ute.yaml gcm_kg source)
 
 
 def _axes(sh, x0, y0, x1, y1, xr, yr, xt, yt, xl, yl, fmt_x="{:,.0f}", fmt_y="{:g}", right=None):
@@ -325,7 +324,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
                "AS NOTED, SEE THE SHEETS NAMED")
     lim = tv["limits"]
     model_over = gcm["model"] - TOYOTA_GCM
-    water_fb = int(V["water_travel_l"] - max(0.0, model_over))
+    water_fb = water_without_gcm_revision(rep)
     plate_fb = TOYOTA_GCM - (gcm["plan"] - rep["caps"]["plated"])
     lines = [
         ("WATER IN TRAVEL (H13)", f"AT MOST {V['water_travel_l']:.0f} L OF FRESH AND GREY WATER WHILE TOWING. FILL THE TANKS AT CAMP (420 L NET)."),
