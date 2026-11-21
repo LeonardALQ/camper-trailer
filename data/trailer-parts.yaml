@@ -1,0 +1,296 @@
+# The trailer's priced parts list, AUD including GST. The trailer page renders it (cad/sitedata.py), the home page's
+# cost table takes its trailer row from it, and cad/tests/test_trailer_parts.py checks it.
+#
+# Every line of the mass schedule carries its own price: the items of data/assemblies/trailer.yaml and the bought
+# fittings of data/chassis/chassis.yaml, each in a `price` field. This file holds the rest. The stock bought for the
+# chassis (steel by section, plate and galvanising) is shared by mass over the generated lines it `covers`. The other
+# lines have no line in the mass schedule: labour, installation, compliance, freight and consumables.
+# cad/trailer_costs.py puts the three files together.
+#
+# A price is one of these, AUD including GST:
+#   {aud: ...}        the line's total
+#   {aud_each: ...}   each one's price, times the line's instances in the layout (the four tyres) or its qty here
+#   a list of bought parts, each with an `item` and its own aud or aud_each
+#   {aud: 0, included_in: <line>} when another line's price includes it
+# Each gives its basis, url where there is one, the date it was checked, and converted_from for a foreign price.
+# Basis: listing (a published price), quote (a published quote or price list), rate (a published rate applied to a
+# quantity) or estimate (judgement, reasoning in the note). Foreign prices are converted at 1 USD = 1.55 AUD,
+# 1 EUR = 1.68 AUD and 1 GBP = 1.98 AUD. European prices include their VAT, which stands in for the GST and any duty
+# on import. US and UK prices before tax have 10 % GST added. The research behind the prices is in research reports
+# 19 to 22 and 25. Payload, water and fuel carry no price.
+schema_version: 1
+currency: AUD
+date_checked: 2026-11-21
+fx: {USD: 1.55, EUR: 1.68, GBP: 1.98}
+sources: [data/assemblies/trailer.yaml, data/chassis/chassis.yaml]
+# groups for the lines here that have no system in the mass schedule. The others take their schedule group.
+groups:
+  labour: Hired fabrication and fitting labour at AUD 120 an hour
+  installation: Licensed electrical work
+  compliance: Engineering review, inspection and the first year's registration in NSW
+  freight: Freight and consumables
+totals:
+  contingency_pct: {listing: 10, quote: 10, rate: 20, estimate: 20}
+  contingency_why: >-
+    No Australian trailer builder publishes the contingency it uses. Published guidance runs from 10 to 15 % for DIY
+    camper trailers to 20 % for a one-off build that the owner manages, and 15 to 25 % for early estimates (research
+    report 22 section 2.15). So a listed or quoted price carries 10 % and a rate or an estimate 20 %.
+  owner_built_leaves_out: [labour]
+  owner_built_why: >-
+    Owner-built leaves out the hired labour and its contingency. The licensed electrician, the refrigeration fitting
+    in AC-03, the wheel alignment and the engineer's review stay, because the law or the equipment needs them.
+not_in_total:
+  - {name: "Comprehensive caravan insurance, first year, agreed value AUD 130,000 (est.)", aud: 1560, basis: estimate, url: "https://www.canstar.com.au/car-insurance/caravan-insurance/", note: "About 1.2 % of the agreed value. Optional by law. A running cost, like the Starlink plan and the tracker's subscription"}
+  - {name: "CTP insurance (green slip)", aud: 0, basis: listing, url: "https://www.nsw.gov.au/driving-boating-and-transport/vehicle-registration/how-to-register/registering-a-brand-new-vehicle", note: "Not required for a trailer"}
+  - {name: "Motor vehicle duty", aud: 0, basis: listing, url: "https://www.service.nsw.gov.au/guide/buying-a-vehicle", note: "NSW charges no duty on registering a caravan or camper trailer"}
+lines:
+  # ================================================================ chassis stock, shared over the members and plates it covers
+  - id: STL-01
+    group: chassis
+    name: RHS 150 x 50 x 3.0, 8 m lengths, for the rails and the full-height crossmembers
+    qty: 2
+    unit: 8 m length
+    covers: [RL-K, RL-R, CM-01, CM-04, CM-05, CM-08]
+    price: {aud_each: 205.65, basis: listing, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-20, note: "SKU RHS36. 13.1 m needed. Ask for C450L0 (Austube C450PLUS) on the mill certificate"}
+  - id: STL-02
+    group: chassis
+    name: RHS 127 x 51 x 3.5, 8 m lengths, for the raisers, outriggers and floor crossmembers
+    qty: 3
+    unit: 8 m length
+    covers: [RS-K, RS-R, CM-02, CM-03, CM-07, OR-01K, OR-01R, OR-02K, OR-02R, OR-03K, OR-03R, OR-04K, OR-04R, OR-05K, OR-05R, OR-06K, OR-06R, OR-07K, OR-07R, OR-08K, OR-08R]
+    price: {aud_each: 294.75, basis: listing, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-20, note: "SKU RHS1275135. 21.9 m needed. RHS 125 x 50 x 3.0 is not a stocked size (research report 22)"}
+  - id: STL-09
+    group: chassis
+    name: RHS 150 x 50 x 4.0, one 8 m length, for the XT rear shock crossmember
+    qty: 1
+    unit: 8 m length
+    covers: [CM-06]
+    price: {aud_each: 267.84, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-21, note: "93.0 kg at AUD 2.88/kg, the rate of the listed 150 x 50 x 3.0 and 150 x 50 x 5.0 lengths. 1.1 m needed, so an offcut would do"}
+  - id: STL-03
+    group: chassis
+    name: RHS 150 x 50 x 5.0, one 8 m length, for the drawbar members
+    qty: 1
+    unit: 8 m length
+    covers: [DB-KA, DB-KB, DB-RA, DB-RB]
+    price: {aud_each: 326.65, basis: listing, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-20, note: "SKU RHS40. 5.3 m needed"}
+  - id: STL-04
+    group: chassis
+    name: RHS 75 x 50 x 3.0, one 8 m length, for the drawbar cross brace
+    qty: 1
+    unit: 8 m length
+    covers: [DB-BR]
+    price: {aud_each: 122.05, basis: listing, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-20, note: "SKU RHS13. 0.5 m needed. Priced as a full length so the total does not rely on an offcut"}
+  - id: STL-05
+    group: chassis
+    name: SHS 40 x 40 x 2.5, one 8 m length, for the plan braces
+    qty: 1
+    unit: 8 m length
+    covers: [PB-1K, PB-1R, PB-2K, PB-2R]
+    price: {aud_each: 63.75, basis: listing, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/15-shs-mild-steel-square.html", date: 2026-11-20, note: "SKU SHS19. 4.7 m needed"}
+  - id: STL-06
+    group: chassis
+    name: SHS 50 x 50 x 2.5, one 8 m length, for the spare wheel carrier posts
+    qty: 1
+    unit: 8 m length
+    covers: [SP-PK, SP-PR]
+    price: {aud_each: 80.25, basis: listing, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/15-shs-mild-steel-square.html", date: 2026-11-20, note: "SKU SHS24. 2.6 m needed"}
+  - id: STL-07
+    group: chassis
+    name: SHS 50 x 50 x 3.0, one 8 m length, for the four hinge crossmember gussets
+    qty: 1
+    unit: 8 m length
+    covers: [CH-P08]
+    price: {aud_each: 95.65, basis: listing, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/15-shs-mild-steel-square.html", date: 2026-11-20, note: "SKU SHS25. 0.8 m needed"}
+  - id: STL-08
+    group: chassis
+    name: Profile-cut plate parts, grade 350, cut and drilled, for the coupling plate, lugs, gussets, pads, cleats, brackets and the 32 body mount nut plates
+    qty: 64
+    unit: kg
+    covers: [CH-P01, CH-P02, CH-P03, CH-P04, CH-P05, CH-P06, CH-P07, CH-P09, CH-P10, CH-P11, CH-P14]
+    price: {aud_each: 12, basis: estimate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/374-mild-steel-sheet-plates-250gr-as-nzs-3678.html", date: 2026-11-21, note: "55.2 kg of plate in the schedule and eight 150 x 150 x 6 plan-brace gussets of 8.5 kg. Plate is listed at AUD 3.05 to 3.44/kg as sheet. AUD 12/kg covers nesting scrap and laser or plasma cutting and drilling of small thick parts"}
+  - id: GLV-01
+    group: chassis
+    name: Hot-dip galvanising to AS/NZS 4680 of the welded chassis and drawbar, the stone guard frame and the mud flap hangers
+    qty: 510
+    unit: kg galvanised
+    covers: [CH-G01]
+    price: {aud_each: 2.75, basis: estimate, url: "https://www.steel.org.au/getattachment/2f694ebb-98a7-4273-be94-e0f61bd74328/Cost-factors-for-hot-dip-galvanised-coatings_INGALSM3.pdf", date: 2026-11-21, note: "487.7 kg of steel, 15.3 kg of zinc and 7.2 kg of guard frame and hangers. Galvanisers charge by the galvanised mass. The industry's AUD 1.20/kg for light fabrications is an older figure, so AUD 2.75/kg allows for rises and a one-off frame (research report 22). The bath must take a 6.3 x 2.4 m frame"}
+  # ================================================================ running gear service
+  - id: ALN-01
+    group: running_gear
+    name: Wheel alignment, camber and toe, at a trailer alignment shop
+    qty: 1
+    unit: job
+    price: {aud: 200, basis: estimate, date: 2026-11-20, note: "The XT arms adjust for camber and toe"}
+  # ================================================================ hired labour, AUD 120 an hour (research report 22). Owner-built leaves these out
+  - id: LAB-01
+    group: labour
+    name: Chassis and drawbar fabrication, cut, fit, weld, grind, inspect and prepare for galvanising
+    qty: 70
+    unit: h
+    price: {aud_each: 120, basis: estimate, url: "https://mobilewelders.com.au/", date: 2026-11-20, note: "Cutting and drilling 12 h, jig and tack 14 h, welding 28 h, grinding and inspection 10 h, handling 6 h. Mobile welders charge from AUD 110/h"}
+  - id: LAB-02
+    group: labour
+    name: Running gear and chassis assembly after galvanising, arms, airbags, shocks, brakes, Bosch TSC, air system, hubs and wheels, coupling, jockey wheel, steadies and chains
+    qty: 16
+    unit: h
+    price: {aud_each: 120, basis: estimate, date: 2026-11-20}
+  - id: LAB-04
+    group: labour
+    name: Body shell assembly, floor on the chassis and its 32 mounts, walls and roof bonded into the joiners, openings framed and sealed, water test, vinyl laid
+    qty: 70
+    unit: h
+    price: {aud_each: 120, basis: estimate, url: "https://outbacktravelaustralia.com.au/4wd-mods-diy-workshop/styromax-diy-motorhome-bodies/", date: 2026-11-20, note: "Two people. Floor and mounts 10 h, walls and roof 24 h, openings 16 h, sealing and a hose test 12 h, vinyl 6 h. Panel makers sell kits for owner assembly but publish no assembly price"}
+  - id: LAB-05
+    group: labour
+    name: Small fabrications, the drawbar box, stone guard, tank guards and bearers, mud flap hangers and the air supply box
+    qty: 19
+    unit: h
+    price: {aud_each: 120, basis: estimate, date: 2026-11-20, note: "Drawbar box 8 h, stone guard 3 h, tank guards and bearers 6 h, hangers 2 h"}
+  - id: LAB-06
+    group: labour
+    name: Cabinetry, cut and assemble the kitchen tower, the bench, the lockers, the plinth panel and the board cabinet, and fit the trims
+    qty: 26
+    unit: h
+    price: {aud_each: 120, basis: estimate, date: 2026-11-20, note: "The hours research report 22 gave for the earlier layout's carcasses, benches and trims"}
+  - id: LAB-07
+    group: labour
+    name: Fitting the tanks and guards, the heater fuel tank, the awning, mud flaps, drawbar box and the fire safety items
+    qty: 12
+    unit: h
+    price: {aud_each: 120, basis: estimate, date: 2026-11-20}
+  - id: LAB-08
+    group: labour
+    name: Installing the services, plumbing and the water system, HVAC and ventilation, appliances, the lift bed, the wet room fittings and the low-voltage fittings
+    qty: 120
+    unit: h
+    price: {aud_each: 120, basis: estimate, date: 2026-11-21, note: "Research report 22's allowance (open point 6). The research gave no hours for these systems. The licensed electrical work is ELI-01 and the split's refrigeration fitting is in AC-03"}
+  # ================================================================ licensed trades
+  - id: ELI-01
+    group: installation
+    name: Licensed electrician, install and test the 48 V system, the 230 V board and circuits and the house wiring
+    qty: 1
+    unit: job
+    price: {aud: 4600, basis: estimate, date: 2026-11-21, note: "Research report 20's AUD 5,000 to install, test and certify, less the AS/NZS 3001.2 certificate in CMP-13"}
+  # ================================================================ compliance and the first year's registration in NSW (research report 22)
+  - id: CMP-01
+    group: compliance
+    name: Concessional RAV entry approval for a low-ATM trailer, applied for on ROVER, with the VIN issued by the Commonwealth
+    qty: 1
+    unit: application
+    price: {aud: 100, basis: estimate, url: "https://freight.transport.nsw.gov.au/system/files/media/documents/2024/AIS-Notice-41-Inspecting-Concessional-Trailers.pdf", date: 2026-11-20, note: "The RAV entry charge is AUD 0.75 for a trailer of 4.5 t ATM or less. The application fee was not confirmed"}
+  - id: CMP-02
+    group: compliance
+    name: VIN stamped into the drawbar and a trailer plate with the VIN, ATM, GTM, tyre size and pressure
+    qty: 1
+    unit: lot
+    price: {aud: 80, basis: estimate, date: 2026-11-20}
+  - id: CMP-03
+    group: compliance
+    name: Engineer's review of the chassis, drawbar, coupling, body mounts and the VSB1 and ADR checklist
+    qty: 20
+    unit: h
+    price: {aud_each: 220, basis: estimate, url: "https://employmenthero.com/career-advice/structural-engineer/salary/", date: 2026-11-20, note: "NSW does not require it for a VSB1 trailer of 4.5 t ATM or less, but CHASSIS.md and BODY.md stay drafts until an engineer reviews them. About three times a median engineer's hourly pay"}
+  - id: CMP-04
+    group: compliance
+    name: Heavy Vehicle Authorised Inspection Station inspection for first registration, with the TfNSW identity approval
+    qty: 1
+    unit: inspection
+    price: {aud: 250, basis: estimate, url: "https://nsw.gov.au/sites/default/files/2021-02/RMS-14.354-Certification-of-new-trailers-Vehicle-Standards-Information-No-52-November-2008.pdf", date: 2026-11-20, note: "A trailer over 2 t GTM goes to an HVAIS. The fee notice could not be read"}
+  - id: CMP-05
+    group: compliance
+    name: Unregistered vehicle permit, to tow the trailer to the inspection and the weighbridge
+    qty: 1
+    unit: permit
+    price: {aud: 28, basis: listing, url: "https://www.nsw.gov.au/topics/vehicle-registration/fees-concessions-forms/fees", date: 2026-11-20}
+  - id: CMP-06
+    group: compliance
+    name: Public weighbridge certificates, the tare and the axle group and ball loads
+    qty: 2
+    unit: weigh
+    price: {aud_each: 30, basis: estimate, date: 2026-11-20}
+  - id: CMP-07
+    group: compliance
+    name: NSW registration fee, first year
+    qty: 1
+    unit: year
+    price: {aud: 84, basis: listing, url: "https://www.nsw.gov.au/topics/vehicle-registration/fees-concessions-forms/fees", date: 2026-11-20}
+  - id: CMP-08
+    group: compliance
+    name: NSW vehicle tax, private caravan, tare 2,501 to 2,790 kg, with the 40 % caravan discount, first year
+    qty: 1
+    unit: year
+    price: {aud: 516, basis: listing, url: "https://www.nsw.gov.au/topics/vehicle-registration/fees-concessions-forms/fees", date: 2026-11-20, note: "At the model's 2,581 kg tare. With the growth allowance the tare falls in the 2,791 to 3,050 kg band, AUD 586"}
+  - id: CMP-09
+    group: compliance
+    name: Number plate, standard
+    qty: 1
+    unit: plate
+    price: {aud: 58, basis: listing, url: "https://www.nsw.gov.au/topics/vehicle-registration/fees-concessions-forms/fees", date: 2026-11-20}
+  - id: CMP-13
+    group: compliance
+    name: Certificate of compliance for the 230 V installation to AS/NZS 3001.2, by a licensed electrician
+    qty: 1
+    unit: certificate
+    price: {aud: 400, basis: estimate, date: 2026-11-20, note: "No gas certificate is needed, because there is no LPG"}
+  # ================================================================ freight and consumables
+  - id: CON-01
+    group: freight
+    name: Welding and grinding consumables, MIG wire, shielding gas, cutting and flap discs, burrs and drill bits
+    qty: 1
+    unit: lot
+    price: {aud: 450, basis: estimate, date: 2026-11-20, note: "A hired shop may include these in its rate"}
+  - id: CON-02
+    group: freight
+    name: Zinc-rich touch-up paint for the bolt holes and coupling faces after dipping, and Loctite 567 thread sealant
+    qty: 1
+    unit: lot
+    price: {aud: 100, basis: estimate, date: 2026-11-20, note: "The frame is galvanised and the body gelcoated, so no paint system is needed"}
+  - id: CON-03
+    group: freight
+    name: Freight, the Cruisemaster kit on a pallet to Sydney
+    qty: 1
+    unit: consignment
+    price: {aud: 250, basis: estimate, url: "https://www.diycaravans.com.au/shop/cruisemaster-xt-freestyle-air-suspension-kit-tandem/", date: 2026-11-20}
+  - id: CON-04
+    group: freight
+    name: Freight, the one-piece body panels up to 4.42 m long, crated, from the panel maker to Sydney
+    qty: 1
+    unit: consignment
+    price: {aud: 1200, basis: estimate, date: 2026-11-20}
+  - id: CON-05
+    group: freight
+    name: Steel delivery, Sydney metro, by truck for the 8 m lengths
+    qty: 1
+    unit: delivery
+    price: {aud: 110, basis: estimate, date: 2026-11-20}
+  - id: CON-06
+    group: freight
+    name: Transport of the welded frame to the galvaniser and back
+    qty: 1
+    unit: return trip
+    price: {aud: 400, basis: estimate, date: 2026-11-20}
+  - id: CON-07
+    group: freight
+    name: Parcel freight for the smaller parts bought in Australia
+    qty: 15
+    unit: parcel
+    price: {aud_each: 20, basis: estimate, date: 2026-11-20}
+  - id: CON-08
+    group: freight
+    name: Delivery of the cabinetry sheets
+    qty: 1
+    unit: consignment
+    price: {aud: 150, basis: estimate, date: 2026-11-20}
+  - id: CON-09
+    group: freight
+    name: Freight for the parts bought overseas
+    qty: 1
+    unit: lot
+    price:
+      - {item: "Lippert HappiJac kit from the US, rails about 2 m long, about 40 kg boxed", aud: 600, basis: estimate, date: 2026-11-21}
+      - {item: "Two Torklift GlowStep Uprising steps from the US", aud: 500, basis: estimate, date: 2026-11-21}
+      - {item: "LUNOS kits, the Acuva purifier and the monitor stand from the US", aud: 200, basis: estimate, date: 2026-11-21}
+      - {item: "Four Dometic S4 windows from Germany", aud: 450, basis: estimate, date: 2026-11-21}
+      - {item: "DauerShower 2.0, Truma Combi D 6 E with its water set, the Shurflo pump and the odour traps from Germany", aud: 450, basis: estimate, date: 2026-11-21}
+      - {item: "Thetford cassettes and the basin from the UK", aud: 150, basis: estimate, date: 2026-11-21}

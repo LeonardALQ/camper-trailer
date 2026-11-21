@@ -166,6 +166,8 @@ const parts = src.replace(/\.json$/, '.parts.json');
     source: string | null;
     drawing: string | null;
     price_aud: number | null;
+    price_basis: string | null;
+    price_note: string | null;
     load: string | null;
     paths: string[];
   }
@@ -397,7 +399,11 @@ const parts = src.replace(/\.json$/, '.parts.json');
         if (p.load && p.load !== 'tare') rows.push(['Load', `Carried as ${esc(p.load)}, so its mass is in the load cases`]);
         if (p.source) rows.push(['Source', /^https?:\/\//.test(p.source) ? `<a href="${esc(p.source)}">${esc(new URL(p.source).hostname)}</a>` : esc(p.source)]);
         if (p.drawing) rows.push(['Drawing', `<a href="${esc(base)}#${p.drawing.toLowerCase()}">${esc(p.drawing)}</a>`]);
-        rows.push(['Price', p.price_aud != null ? `AUD ${p.price_aud.toLocaleString('en-AU')}` : '<span class="dim">Not priced yet</span>']);
+        const cents = (v: number) => v.toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const priceNote = p.price_note ? `. ${esc(p.price_note)}` : '';
+        rows.push(['Price', p.price_aud != null
+          ? `AUD ${cents(p.price_aud)}${p.price_basis ? `, ${esc(p.price_basis)}` : ''}${priceNote}`
+          : p.price_note ? `<span class="dim">${esc(p.price_note)}</span>` : '<span class="dim">Not priced yet</span>']);
       }
       const shown = this.visible(h.node);
       const title = p && same(p.name) === same(h.label) ? p.name : h.label;

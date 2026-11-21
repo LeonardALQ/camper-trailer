@@ -1,6 +1,7 @@
 """The car build's parts list (data/vehicle/vehicle-parts.yaml): its lines are consistent, the totals typed in the file
 add up from the lines, the Car build page's figures are the same, and VEHICLE.md quotes them. The truck's price and the
-build budget come from data/project.yaml, the bike box's totals from data/ute/box-parts.yaml (test_box_parts.py)."""
+build budget come from data/project.yaml, the bike box's totals from data/ute/box-parts.yaml (test_box_parts.py) and
+the trailer's from its parts list (test_trailer_parts.py)."""
 import re
 from collections import defaultdict
 
@@ -8,10 +9,12 @@ import yaml
 
 from cad.partsdb import DATA, ROOT
 from cad.sitedata import car_totals, project_costs
+from cad.trailer_costs import parts_list
 
 CAR = yaml.safe_load((DATA / "vehicle" / "vehicle-parts.yaml").read_text())
 PROJECT = yaml.safe_load((DATA / "project.yaml").read_text())
 BOX = yaml.safe_load((DATA / "ute" / "box-parts.yaml").read_text())["totals"]
+TRAILER = parts_list()["totals"]
 PLAN = (ROOT / "VEHICLE.md").read_text()
 ITEMS = CAR["items"]
 TYPED = CAR["totals_aud"]
@@ -155,8 +158,8 @@ def test_vehicle_md_system_table():
 
 
 def test_project_cost_table():
-    """The home page's table: the truck, the car build with its allowance, the box shop-built with the owner-built
-    total beside it, and the trailer pending until it has prices. The total leaves out what is pending."""
+    """The home page's table: the truck, the car build with its allowance, and the box and the trailer, each with its
+    owner-built total beside it. The trailer's row is its parts list's totals (test_trailer_parts.py)."""
     t = project_costs(BOX)
     rows = {r["id"]: r for r in t["rows"]}
     assert [r["id"] for r in t["rows"]] == ["truck", "car", "box", "trailer"]
@@ -165,10 +168,13 @@ def test_project_cost_table():
     assert rows["car"]["before"] + rows["car"]["contingency"] == rows["car"]["total"]
     assert abs(rows["box"]["before"] + rows["box"]["contingency"] - rows["box"]["total"]) < 0.01
     assert rows["box"]["total"] == BOX["total_aud"] and rows["box"]["owner_built"] == BOX["owner_built_total_aud"]
-    assert rows["trailer"].get("pending") and t["pending"] == ["Trailer"]
-    known = PROJECT["truck"]["purchase_aud"] + TYPED["required_plus_contingency"] + BOX["total_aud"]
+    tr = rows["trailer"]
+    assert not tr.get("pending") and t["pending"] == []
+    assert abs(tr["total"] - TRAILER["total_aud"]) < 0.01 and tr["owner_built"] == TRAILER["owner_built_total_aud"]
+    known = PROJECT["truck"]["purchase_aud"] + TYPED["required_plus_contingency"] + BOX["total_aud"] + TRAILER["total_aud"]
     assert abs(t["total"] - known) < 0.01
-    assert abs(t["total_owner_built"] - (known - BOX["total_aud"] + BOX["owner_built_total_aud"])) < 0.01
+    owner = known - BOX["total_aud"] + BOX["owner_built_total_aud"] - TRAILER["total_aud"] + TRAILER["owner_built_total_aud"]
+    assert abs(t["total_owner_built"] - owner) < 0.01
     assert abs(t["before"] + t["contingency"] - t["total"]) < 0.01
 
 
@@ -182,4 +188,5 @@ def test_project_cost_table_prices_the_trailer_from_its_list(tmp_path):
     tr = t["rows"][-1]
     assert tr["id"] == "trailer" and not tr.get("pending") and t["pending"] == []
     assert abs(tr["before"] - 1500) < 0.01 and abs(tr["contingency"] - 150) < 0.01 and abs(tr["total"] - 1650) < 0.01
-    assert abs(t["total"] - project_costs(BOX)["total"] - 1650) < 0.01
+    others = PROJECT["truck"]["purchase_aud"] + TYPED["required_plus_contingency"] + BOX["total_aud"]
+    assert abs(t["total"] - others - 1650) < 0.01

@@ -158,7 +158,7 @@ class Layout:
     # -- expansion -------------------------------------------------------
     def _expand(self, it: dict) -> list[Block]:
         known = {"id", "name", "system", "zone", "for", "box", "cyl", "bar", "point", "cog", "mass", "note",
-                 "load", "keep_clear", "hollow", "tank", "water", "when", "parts", "material"}
+                 "load", "keep_clear", "hollow", "tank", "water", "when", "parts", "material", "price"}
         extra = set(it) - known
         if extra:
             raise ValueError(f"trailer item {it.get('id')}: unknown keys {sorted(extra)}")
@@ -916,7 +916,7 @@ def _r(v, n=1):
     if isinstance(v, (list, tuple)):
         return [_r(x, n) for x in v]
     if isinstance(v, dict):
-        return {k: _r(x, 3 if k in ("util", "measured", "margin") else n) for k, x in v.items()}
+        return {k: _r(x, 3 if k in ("util", "measured", "margin") else 2 if k == "price_aud" else n) for k, x in v.items()}
     return v
 
 
@@ -983,23 +983,27 @@ def chassis_inputs(tr: Trailer, ev: dict) -> dict:
 
 
 def schedule(lay: Layout, tr: Trailer) -> list[dict]:
-    """MASS-01 mass schedule with the MASS-02 load-case flags."""
+    """MASS-01 mass schedule with the MASS-02 load-case flags, and each block's price (cad/trailer_costs.py)."""
+    from .trailer_costs import block_prices
     flags = {}
     for c in tr.cases:
         for b, m in lay.case_lines(c):
             flags.setdefault(b.iid, set()).add(c.id)
+    prices = block_prices(lay.blocks)
     rows = []
     for b in lay.blocks:
         if b.load == "none" or b.keep_clear:
             continue
         m = b.mass_kg
+        price = prices.get(b.iid, {})
         rows.append(_r(dict(
             iid=b.iid, id=b.id, item=b.name, system=b.system, group=SYSTEM_LABELS[b.system], drawing="CT-001",
             qty=b.qty, unit_mass=b.unit_mass, basis=b.basis, mass_kg=m, maturity=b.maturity,
             growth_pct=round(b.growth * 100), mass_with_growth_kg=m * (1 + b.growth),
             source=b.source, note=b.note, mass_note=b.mass_note, load=b.load, material=b.material,
             cog=list(b.cog) if b.cog else None, box=list(b.box) if b.box else None, generated=b.generated,
-            cases=sorted(flags.get(b.iid, [])))))
+            cases=sorted(flags.get(b.iid, [])), price_aud=price.get("price_aud"), price_basis=price.get("price_basis"),
+            price_url=price.get("price_url"), price_date=price.get("price_date"), price_line=price.get("price_line"))))
     return rows
 
 

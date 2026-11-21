@@ -1,12 +1,14 @@
 ---
 title: Whole trailer
-description: The whole trailer for the LandCruiser 79, the home trailer with a lift bed across the front over the desk, a wet room at the rear, a fixed roof and a 4,420 mm body, the axle position, the towball load in every load case, the checks and the inputs for the chassis design.
+description: The whole trailer for the LandCruiser 79, the home trailer with a lift bed across the front over the desk, a wet room at the rear, a fixed roof and a 4,420 mm body, the axle position, the towball load in every load case, the checks, the inputs for the chassis design and the priced parts list.
 tableOfContents: false
 ---
 
 import CadViewer from '../../components/CadViewer.astro';
 import Trailer from '../../components/Trailer.astro';
+import TrailerParts from '../../components/TrailerParts.astro';
 import t from '../../data/generated/trailer.json';
+import parts from '../../data/generated/trailer-parts.json';
 import { withBase } from '../../lib/url';
 
 export const n = (v) => Math.round(v).toLocaleString('en-AU');
@@ -15,6 +17,7 @@ export const ch = t.chassis;
 export const tv = t.tow_vehicle;
 export const tc = (id) => t.cases.find((c) => c.id === id);
 export const chk = (id) => t.checks.find((c) => c.id === id);
+export const PT = parts.totals;
 
 This is the whole trailer, revision J, the home trailer. The motorbikes now ride in an enclosed box on the
 <a href={withBase('/tow-vehicle/')}>LandCruiser 79</a> (see the <a href={withBase('/ute-garage/')}>Bike box</a> page),
@@ -153,6 +156,37 @@ out 20 % heavier.
 
 ### Every line
 
-Each line has its source, its maturity and the load cases it is aboard in (MASS-01 and MASS-02).
+Each line has its source, its maturity and the load cases it is aboard in (MASS-01 and MASS-02). Its price is in the
+parts list below.
 
 <Trailer kind="schedule" />
+
+## Parts list
+
+Every part the trailer needs, in AUD including GST, with the labour, installation, compliance, freight and consumables
+to build it and register it in NSW. Each line of the mass schedule carries its own price. The chassis steel is bought
+in 8 m lengths and shared by mass over the members it covers. A basis is listing (a published price), quote, rate (a
+published rate applied to a quantity) or estimate, and each line gives the date it was checked and its source. Foreign
+prices are converted at 1 USD = 1.55 AUD, 1 EUR = 1.68 AUD and 1 GBP = 1.98 AUD. The part cards in the 3D model show
+each part's price.
+
+<TrailerParts kind="totals" />
+
+{PT.contingency_why} {PT.owner_built_why} Leonard's own labour is outside every figure.
+
+<TrailerParts kind="notin" />
+
+### Totals by group
+
+<TrailerParts kind="groups" />
+
+### The largest lines
+
+<TrailerParts kind="biggest" />
+
+### Every priced line
+
+Select rows to total them in the footer, or sort and filter by group or basis. A line made of several bought parts
+lists each part with its own price and basis.
+
+<TrailerParts kind="lines" />

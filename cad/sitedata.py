@@ -241,12 +241,39 @@ def box_parts() -> dict:
     return data
 
 
+def trailer_parts() -> dict:
+    """The trailer's priced parts list (cad/trailer_costs.py) for the site, with each line's tare mass from the built
+    mass schedule: its own blocks, or the blocks a stock line covers."""
+    from .trailer_costs import parts_list
+    lst = parts_list()
+    kg: dict[str, float] = {}
+    for s in json.loads((BUILD / "trailer" / "trailer.json").read_text())["schedule"]:
+        if s["load"] == "tare":
+            kg[s["id"]] = kg.get(s["id"], 0.0) + s["mass_kg"]
+    for ln in lst["lines"]:
+        ids = ln.get("covers") or ([ln["id"]] if ln["id"] in kg else [])
+        ln["mass_kg"] = round(sum(kg.get(i, 0.0) for i in ids), 2) if ids else None
+    (GEN / "trailer-parts.json").write_text(json.dumps(lst, indent=1, default=str))
+    return lst
+
+
+def _priced_list(path) -> dict:
+    """A parts list named in data/project.yaml. A list with `sources` (the trailer's) is put together from its source
+    files by cad/trailer_costs.py, the others are read as they are."""
+    lst = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if lst.get("sources"):
+        from .trailer_costs import parts_list
+        return parts_list(path)
+    return lst
+
+
 def project_costs(box_totals, proj=None) -> dict:
     """The whole project's cost for the home page (ProjectCost.astro): the truck, the car build, the bike box and the
     trailer, each with its figure before contingency, its contingency, its total and its parts list. From
     data/project.yaml (or proj), the car build's lines (car_totals) and the bike box's totals. The trailer is pending
     until data/project.yaml names its priced parts list, in the bike box list's format (lines with price.aud, and
-    totals.contingency_pct): then its row is worked out from that list's lines. The total leaves out what is pending."""
+    totals with contingency_pct, or contingency_aud and owner_built_total_aud when the list works them out): then its
+    row is worked out from that list's lines. The total leaves out what is pending."""
     p = proj or project()
     car = car_totals(yaml.safe_load((ROOT / "data" / "vehicle" / "vehicle-parts.yaml").read_text(encoding="utf-8")),
                      p["car_build"]["budget_aud"])
@@ -263,11 +290,16 @@ def project_costs(box_totals, proj=None) -> dict:
     ]
     tr = p["trailer"]
     if tr.get("parts_list"):
-        lst = yaml.safe_load((ROOT / tr["parts_list"]).read_text(encoding="utf-8"))
+        lst = _priced_list(ROOT / tr["parts_list"])
         sub = sum(ln["price"]["aud"] for ln in lst["lines"])
-        pct = lst["totals"]["contingency_pct"]
-        rows.append(dict(id="trailer", part="Trailer", basis=tr["basis"], before=sub, contingency=sub * pct / 100,
-                         total=sub * (1 + pct / 100), contingency_pct=pct, link=tr["link"], link_text="Trailer parts list"))
+        lt = lst["totals"]
+        pct = lt["contingency_pct"]
+        cont = lt["contingency_aud"] if "contingency_aud" in lt else sub * pct / 100
+        row = dict(id="trailer", part="Trailer", basis=tr["basis"], before=sub, contingency=cont, total=sub + cont,
+                   contingency_pct=pct, link=tr["link"], link_text="Trailer parts list")
+        if "owner_built_total_aud" in lt:
+            row["owner_built"] = lt["owner_built_total_aud"]
+        rows.append(row)
     else:
         rows.append(dict(id="trailer", part="Trailer", basis=tr["basis"], pending=True, link=tr["link"],
                          link_text="Mass schedule, no prices yet"))
@@ -327,7 +359,8 @@ def main():
     # the car build page (URL /tow-vehicle/) and the bike box's parts list
     n_parts = tow_vehicle_page()
     box = box_parts()
-    # the whole project's cost on the home page
+    # the trailer's priced parts list, and the whole project's cost on the home page
+    trailer = trailer_parts()
     (GEN / "project.json").write_text(json.dumps(project_costs(box["totals"]), indent=1))
 
     # research reports as pages (copied, with the first heading moved into the title)
@@ -348,7 +381,8 @@ def main():
                 + text)
         (DOCS / "research" / fname).write_text(body, encoding="utf-8")
     print(f"site data written: {len(RESEARCH)} research pages, {len(live)} live drawings "
-          f"({len(reg['drawings']) - len(live)} retired), car build page with {n_parts} parts, box parts list with {len(box['lines'])} lines")
+          f"({len(reg['drawings']) - len(live)} retired), car build page with {n_parts} parts, box parts list with {len(box['lines'])} lines, "
+          f"trailer parts list with {len(trailer['lines'])} lines")
 
 
 if __name__ == "__main__":

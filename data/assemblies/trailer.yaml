@@ -17,7 +17,9 @@
 # it: 7.5 % (MAS-04) and the ute's rear axle within the Elite kit's 2,800 kg plate (H18) and the 350 kg towbar (MAS-03, H14). The
 # solve never changes a limit or a block size. An item's optional `material` says what it is made of. The 3D
 # viewer on the site shows it on the part's card (cad/partsmeta.py), and the chassis members and plates take theirs
-# from the chassis data.
+# from the chassis data. Every tare item carries a `price`, AUD including GST, in the forms data/trailer-parts.yaml
+# describes. That file prices the chassis stock, the labour, compliance and freight, and the parts list adds them up
+# (cad/trailer_costs.py). Payload, water and fuel carry no price.
 id: ASM-TR
 name: Whole trailer, block layout
 revision: J
@@ -193,6 +195,7 @@ items:
     material: "Steel arm, galvanised (est.), rubber airbag, cast iron brake drum (est.)"
     note: "Hub: Cruisemaster LC5, 5 x 150 with M14 studs and a 110 mm spigot, the ute's pattern, on the 12 inch ABS-enabled A/T electric drum (decision log 11:25)."
     system: running_gear
+    price: {aud: 7442.04, basis: listing, url: "https://www.diycaravans.com.au/shop/cruisemaster-xt-freestyle-air-suspension-kit-tandem/", date: 2026-11-20, note: "One tandem kit for all four arms: 4,500 kg build, 12 in ABS-enabled A/T electric drums, LC5 M14 studs, Level 1 (SKU 8015 ABS). Research report 22"}
     for: {h: [front_hub_dx, rear_hub_dx], s: [1, -1]}
     box: [axle_x + h - 419, s * (rail_outer_w / 2 + (hub_y - rail_outer_w / 2) / 2) - (hub_y - rail_outer_w / 2) / 2, hub_z - 60, 480, hub_y - rail_outer_w / 2, rail_underside_z - hub_z + 60]
     cog: [axle_x + h - 150, s * (rail_outer_w / 2 + 60), hub_z + 40]
@@ -201,6 +204,9 @@ items:
     name: Tyre, LT265/75R16 123/120 load range E, Yokohama Geolandar A/T G015
     material: "Radial light-truck tyre, rubber on steel belts (est.)"
     system: running_gear
+    price:
+      - {item: "Yokohama Geolandar A/T G015 LT265/75R16 123/120R", aud_each: 471.18, basis: listing, converted_from: "USD 303.99", url: "https://www.tiremart.com/yokohama-geolandar-a-t-g015-lt-265-75r16-123-120r-e-10-ply-at-all-terrain-tire-dc", date: 2026-11-20, note: "No Australian listing for this size could be read (research report 22)"}
+      - {item: "Fitting and balancing", aud_each: 35, basis: estimate, date: 2026-11-20, note: "As the ute's tyre fitting"}
     for: {h: [front_hub_dx, rear_hub_dx], s: [1, -1]}
     cyl: {c: [axle_x + h, s * hub_y, hub_z], r: tyre_d / 2, w: tyre_w}
     mass: {basis: declared, unit_kg: 22.6, maturity: spec, source: "Yokohama's size table, 22.6 kg (report 16 section 4)"}
@@ -209,6 +215,7 @@ items:
     name: Wheel, ROH Trak 2 16 x 7 ET 0 steel, 5 x 150
     material: "Steel wheel"
     system: running_gear
+    price: {aud_each: 230, basis: estimate, url: "https://roh.com.au/wheels/trak-2", date: 2026-11-20, note: "ROH publishes no price and no retailer listing was found (research report 22)"}
     for: {h: [front_hub_dx, rear_hub_dx], s: [1, -1]}
     point: [axle_x + h, s * hub_y, hub_z]
     mass: {basis: declared, unit_kg: 14.5, maturity: estimate, source: "Report 16 section 4: ROH does not publish it (estimate)"}
@@ -218,6 +225,9 @@ items:
     material: "Electronic control unit and wheel speed sensors (est.), steel wheel nuts"
     note: The ECU sits under the centre crossmember, within 300 mm of the centreline (Bosch, report 06).
     system: running_gear
+    price:
+      - {item: "Bosch Trailer Safety Control, ABS-enabled, tandem kit", aud: 1558.70, basis: listing, url: "https://www.diycaravans.com.au/shop/bosch-trailer-safety-control-tsc-abs-enabled/", date: 2026-11-20, note: "SKU 8037.1, programmed for LT265/75R16 at checkout"}
+      - {item: "24 wheel nuts, M14 x 1.5, 20 on the hubs and 4 spare", aud: 96, basis: estimate, date: 2026-11-20}
     box: [axle_x + xt_centre_front, -100, rail_underside_z - 45, xm_w, 200, 45]
     mass: {basis: declared, total_kg: 4.2, maturity: estimate, source: "Report 06: TSC 2 to 3 kg and nuts 1.2 kg (estimates)"}
   - id: RG-04
@@ -225,6 +235,9 @@ items:
     material: "Compressor, steel air tank (est.) and nylon air lines (est.), in a sealed 1.6 mm aluminium box"
     note: "The Level 3 kit has no height valves, so the bags are set by hand from the panel (research report 22 finding 9). The box hangs between the rails ahead of the first floor crossmember, reached from below, out of the cabin. The lines run along the rails to the four bags."
     system: running_gear
+    price:
+      - {item: "Cruisemaster Level 3 manual air control kit", aud: 1285.00, basis: listing, url: "https://www.diycaravans.com.au/shop/cruisemaster-xt-freestyle-air-suspension-kit-tandem/", date: 2026-11-20, note: "The Level 3 manual variant less the Level 1 kit (AUD 8,727.04 less 7,442.04)"}
+      - {item: "Sealed 1.6 mm aluminium box, access panel and brackets", aud: 150, basis: estimate, date: 2026-11-21, note: "Offcut sheet, seal and fixings. Made with the small fabrications (LAB-05)"}
     zone: underfloor
     box: [body_x0 + 60, -200, rail_underside_z + 37.5, 350, 400, 220]
     parts:
@@ -235,6 +248,9 @@ items:
     material: "Rubber airbag with its fittings"
     note: A punctured bag cannot be repaired (Cruisemaster CIS-006), so the spare travels with the trailer. It rides in the XT Air box.
     system: running_gear
+    price:
+      - {item: "Cruisemaster XT replacement airbag", aud: 380, basis: listing, url: "https://cruisemaster.com.au/search.php?search_query=airbag", date: 2026-11-20}
+      - {item: "Cruisemaster air system emergency repair kit", aud: 125, basis: listing, url: "https://cruisemaster.com.au/search.php?search_query=airbag", date: 2026-11-20}
     point: [body_x0 + 235, 0, rail_underside_z + 147.5]
     mass: {basis: declared, total_kg: 3, maturity: estimate, source: "Report 06 section 2: 2.4 kg bag (Firestone style 26 sheet) plus fittings (estimate)"}
 
@@ -243,6 +259,9 @@ items:
     name: Spare tyre, LT265/75R16 123/120
     material: "Radial light-truck tyre, rubber on steel belts (est.)"
     system: spare
+    price:
+      - {item: "Yokohama Geolandar A/T G015 LT265/75R16 123/120R", aud: 471.18, basis: listing, converted_from: "USD 303.99", url: "https://www.tiremart.com/yokohama-geolandar-a-t-g015-lt-265-75r16-123-120r-e-10-ply-at-all-terrain-tire-dc", date: 2026-11-20}
+      - {item: "Fitting and balancing", aud: 35, basis: estimate, date: 2026-11-20}
     box: [body_x0 - spare_bracket_d - tyre_w, -tyre_d / 2, spare_z - tyre_d / 2, tyre_w, tyre_d, tyre_d]
     mass: {basis: declared, total_kg: 22.6, maturity: spec, source: "As RG-02"}
     note: On the body's front wall above the drawbar, centred on Y. It fits the ute too. The box is the wheel and tyre envelope.
@@ -250,6 +269,7 @@ items:
     name: Spare wheel, ROH Trak 2 16 x 7 ET 0
     material: "Steel wheel"
     system: spare
+    price: {aud: 230, basis: estimate, url: "https://roh.com.au/wheels/trak-2", date: 2026-11-20, note: "As RG-06"}
     point: [body_x0 - spare_bracket_d - tyre_w / 2, 0, spare_z]
     mass: {basis: declared, total_kg: 14.5, maturity: estimate, source: "As RG-06 (report 16 section 4)"}
 
@@ -258,6 +278,9 @@ items:
     name: Floor, 30 mm woven roving and Divinycell H80 sandwich, one piece, with vinyl in the living zones
     material: "Two 2.0 mm woven roving polyester skins (48 % glass) on 26 mm Divinycell H80 PVC foam, vinyl on top outside the wet room"
     system: body
+    price:
+      - {item: "Floor panel, 10.61 m2 at AUD 277.05/m2", aud: 2939.50, basis: estimate, url: "https://www.diycaravans.com.au/shop/floor-panel-d-pvc-core-20mm-32mm/", date: 2026-11-20, note: "DIY Caravans Floor Panel D at AUD 251.86/m2 (listing) plus 10 % for the denser H80 core"}
+      - {item: "Vinyl and adhesive over the 7.8 m2 outside the wet room, at AUD 75/m2", aud: 585, basis: estimate, date: 2026-11-21, note: "Heavy-duty vehicle vinyl about AUD 60/m2 with adhesive and seam weld (research report 22)"}
     box: [body_x0, -half_bw, floor_underside_z, body_length, body_width, floor_t]
     parts:
       - {item: "Floor panel, 10.61 m2 at 8.92 kg/m2 (two 3.22 kg/m2 woven roving skins, 2.08 kg/m2 of H80, 0.4 kg/m2 of adhesive)", kg: 94.6, basis: calculated, source: "Report 12 sections 2 and 10"}
@@ -267,6 +290,9 @@ items:
     name: Fixed roof, 40 mm GRP and XPS sandwich, bonded to the walls, flat top skin under the solar array
     material: "2.0 mm top and 1.5 mm bottom Polydet GRP skins on 36.5 mm XPS foam of about 36 kg/m3"
     system: body
+    price:
+      - {item: "Roof panel, 10.61 m2 at AUD 240/m2", aud: 2546.40, basis: estimate, url: "https://www.diycaravans.com.au/shop/composite-panel-wall-b-xps-core-29mm-m2/", date: 2026-11-20, note: "DIY Caravans Panel B at AUD 216.88/m2 (listing) plus about 10 % for the 2.0 mm top skin and the 40 mm core"}
+      - {item: "Pultruded GRP inserts 50 x 25 mm across the roof and at cable entries, 10 m", aud: 345.70, basis: rate, url: "https://www.diycaravans.com.au/shop/panel-insertion-pultrusion-50-x-25-mm/", date: 2026-11-20}
     box: [body_x0, -half_bw, ceiling_z, body_length, body_width, roof_t]
     parts:
       - {item: "Roof panel, 10.61 m2 at 7.0 kg/m2, no hatches", kg: 74.3, basis: calculated, source: "Report 12 section 10, report 18 section 2"}
@@ -275,6 +301,9 @@ items:
     name: Side walls, 35 mm GRP and XPS sandwich, one piece each, 2,000 mm tall
     material: "Two 1.5 mm gelcoat GRP skins (Optiplan Polydet) on 32 mm XPS foam"
     system: body
+    price:
+      - {item: "Side wall panel, 8.84 m2 each at AUD 225/m2", aud_each: 1989.00, basis: estimate, url: "https://www.diycaravans.com.au/shop/composite-panel-wall-b-xps-core-29mm-m2/", date: 2026-11-21, note: "Panel B at AUD 216.88/m2 (listing) plus about 4 % for the thicker core, priced on the whole 4,420 x 2,000 mm sheet"}
+      - {item: "High-density PVC inserts 70 x 25 mm at the fixing lines, door and window surrounds and the mounts, 30 m for both walls and the end walls", aud: 910.80, basis: rate, url: "https://www.diycaravans.com.au/shop/panel-insertion-hi-density-pvc-70-x-25-mm/", date: 2026-11-20}
     for: {s: [1, -1]}
     box: [body_x0, s * (half_bw - wall_t / 2) - wall_t / 2, floor_z, body_length, wall_t, interior_h]
     parts:
@@ -284,6 +313,7 @@ items:
     name: End walls, full height, the rear wall with the wet room door
     material: "Front: 2.0 mm outer and 1.5 mm inner Polydet GRP skins on 31.5 mm XPS. Rear: two 1.5 mm Polydet skins on 32 mm XPS"
     system: body
+    price: {aud: 2166.90, basis: estimate, url: "https://www.diycaravans.com.au/shop/composite-panel-wall-b-xps-core-29mm-m2/", date: 2026-11-21, note: "Both end walls on the whole 2,330 x 2,000 mm sheet: the front 4.66 m2 at AUD 240/m2 for its 2.0 mm outer skin, the rear 4.66 m2 at AUD 225/m2"}
     for: {e: [0, 1]}
     box: [body_x0 + e * (body_length - end_wall_t), -half_in, floor_z, end_wall_t, 2 * half_in, interior_h]
     parts:
@@ -293,6 +323,7 @@ items:
     name: Entry door, Aussie Traveller DC 1,750 x 622 with pleated blind, no vent, kerb side, hinged on its front edge
     material: "Aluminium frame with a composite panel, tinted acrylic window with a pleated block-out blind, security screen door"
     system: body
+    price: {aud: 1549.99, basis: listing, url: "https://aussietraveller.com.au/products/caravan-dc-door-with-pleated-blind-left-hand-hinge", date: 2026-11-20}
     box: [lz_door_x, -half_in - wall_t, floor_z, lz_door_w, wall_t, lz_door_h]
     mass: {basis: declared, total_kg: 21, maturity: estimate, source: "https://aussietraveller.com.au/products/caravan-dc-door-with-pleated-blind-left-hand-hinge", note: "Listed shipping mass 21 kg (report 19 R19-21), taken as an estimate"}
     note: VSB1 13.2.1 wants one door on the left side or the rear. The cut-out is 1,753 x 625 mm with a 90 mm top radius. Part 71917500622080 or 081 by hinge side.
@@ -300,6 +331,7 @@ items:
     name: Rear door into the wet room, Aussie Traveller DC 1,750 x 622 with pleated blind, no vent, hinged on its kerb-side edge
     material: "Aluminium frame with a composite panel, tinted acrylic window with a pleated block-out blind, security screen door"
     system: body
+    price: {aud: 1549.99, basis: listing, url: "https://aussietraveller.com.au/products/caravan-dc-door-with-pleated-blind-right-hand-hinge", date: 2026-11-20}
     box: [body_x1 - end_wall_t, rear_door_y0, floor_z, end_wall_t, rear_door_w, rear_door_h]
     mass: {basis: declared, total_kg: 21, maturity: estimate, source: "https://aussietraveller.com.au/products/caravan-dc-door-with-pleated-blind-right-hand-hinge", note: "Listed shipping mass 21 kg (report 19 R19-22), taken as an estimate"}
     note: Opens outward (VSB1 13.2.1) straight into the wet room (H4). Hinged on its kerb-side edge so it swings away from the outdoor unit's cradle on the road half. A door stay at about 150 degrees keeps it off the extract fan's hood.
@@ -307,6 +339,7 @@ items:
     name: Fold-out steps, Torklift GlowStep Revolution Uprising, four steps with landing gear, one in each doorway
     material: "Aluminium treads and frame, stainless fittings"
     system: body
+    price: {aud_each: 1400, basis: estimate, url: "https://www.torklift.com/products/steps-and-handrails/glowstep-revolution-uprising", date: 2026-11-20, note: "About USD 900 each, converted (research report 19)"}
     for: {k: [0, 1]}
     point: ["(1 - k) * (lz_door_x + lz_door_w / 2) + k * (in_x1 - 125)", "(1 - k) * (-half_in + 100) + k * (rear_door_y0 + rear_door_w / 2)", floor_z + 500]
     mass: {basis: declared, unit_kg: 15, maturity: estimate, source: "https://www.torklift.com/products/steps-and-handrails/glowstep-revolution-uprising", note: "About 15 kg each (report 19 R19-23, est.)"}
@@ -315,6 +348,7 @@ items:
     name: Rounded front edges, curved GRP sandwich corner pieces bonded to the panels (150 mm at the roof edge, 250 mm on both front verticals)
     material: "GRP sandwich corner pieces, gelcoat outside, bonded with MS polymer"
     system: body
+    price: {aud: 3500, basis: estimate, date: 2026-11-20, note: "A one-off mould, the corner pieces and their fitting (research report 25)"}
     point: [body_x0 + 150, 0, floor_z + interior_h / 2 + 300]
     mass: {basis: declared, total_kg: 6, maturity: estimate, source: "Research report 25 section 2: about +6 kg (0 to +12 kg) net of the square corner joiners and panel strips they replace", note: "H12, option A+"}
     note: H12 keeps a fixed roof. Report 25 puts towing fuel at 21.3 L/100 km at 90 km/h against 25.0 with the square front, for about AUD 3,500 (est.).
@@ -322,6 +356,7 @@ items:
     name: Side-wall stiffeners, SHS 20 x 20 x 1.6 aluminium bonded vertically in the wall cores, one in each wall's living-zone bay
     material: "6060-T5 aluminium SHS 20 x 20 x 1.6, bonded in a routed slot in the XPS core"
     system: body
+    price: {aud: 40, basis: estimate, date: 2026-11-21, note: "One 6.5 m length of 6060 SHS 20 x 20 x 1.6 cut in two (est.)"}
     for: {s: [1, -1]}
     point: [body_x0 + 2795, s * (half_bw - wall_t / 2), floor_z + interior_h / 2]
     mass: {basis: declared, unit_kg: 0.64, maturity: calculated, source: "2.0 m at 0.318 kg/m (117.8 mm2 of 6060 at 2,700 kg/m3)"}
@@ -330,6 +365,13 @@ items:
     name: Extrusions, adhesive, sealant and the body mount fixings
     material: "Aluminium extrusions, MS polymer adhesive and sealant, galvanised fixings (est.)"
     system: body
+    price:
+      - {item: "Floor joiner, 13.6 m: two 6.5 m and two 2.5 m lengths", aud: 505.00, basis: listing, url: "https://www.diycaravans.com.au/shop/panel-joiner-diy-floor-29/", date: 2026-11-20}
+      - {item: "Corner joiner at the rear vertical corners, two 4.0 m lengths", aud: 226.08, basis: listing, url: "https://www.diycaravans.com.au/shop/panel-joiner-diy-wall-29-29/", date: 2026-11-20}
+      - {item: "Roof-to-wall joiner, 13.6 m: two 6.5 m and two 2.5 m lengths", aud: 508.68, basis: rate, url: "https://www.diycaravans.com.au/shop/panel-joiner-diy-roof-40-29/", date: 2026-11-20, note: "Priced at the DIY Wall 29-29 rate"}
+      - {item: "Structural MS polymer adhesive, FixTech Fix 190, 14 sausages of 600 ml", aud: 468.58, basis: listing, url: "https://www.diycaravans.com.au/shop/fix-msp-190-white-black-slow/", date: 2026-11-20}
+      - {item: "MS polymer sealant, 10 cartridges of 290 ml", aud: 199.80, basis: listing, url: "https://www.diycaravans.com.au/shop/fix-msp-190-white-black-slow/", date: 2026-11-20}
+      - {item: "32 body mounts: M12 8.8 bolts, sleeves, spreaders, crush tubes and Duralac at AUD 16 each", aud: 512.00, basis: estimate, date: 2026-11-20}
     point: [body_x0 + body_length / 2, 0, floor_z + interior_h / 2]
     parts:
       - {item: "Floor joiners 13.6 m at 1.4 kg/m, corner joiners 8.0 m at 2.0 kg/m, roof-to-wall joiner 13.6 m at 1.65 kg/m", kg: 57.4, basis: estimate, source: "Scaled from DIY Caravans' extrusion masses to 35 mm panels (report 12 section 10)"}
@@ -339,6 +381,7 @@ items:
     name: Window W1, Dometic S4 top-hinged 900 x 600, bed, kerb side, the second way out, blackout and fly screen rollers
     material: "Double acrylic, grey tint, polyurethane frame, ECE R43, aluminium-coated blackout roller blind"
     system: body
+    price: {aud: 890, basis: listing, converted_from: "EUR 530", url: "https://www.wohnwagen-fenster.com/produkt/ausstellfenster/dometic-s4-ausstellfenster-rahmenfenster-rollo-camping-wohnwagen-wohnmobil/", date: 2026-11-20}
     box: [body_x0 + 379, -half_bw, floor_z + 960, 902, wall_t, 599]
     mass: {basis: declared, total_kg: 9.2, maturity: spec, source: "https://www.wohnwagen-fenster.com/produkt/ausstellfenster/dometic-s4-ausstellfenster-rahmenfenster-rollo-camping-wohnwagen-wohnmobil/", note: "Part 9104115572 (report 19 R19-14)"}
     note: Clear opening 804 x 454 mm, 0.365 m2, meets the project escape rule (0.33 m2, no side under 450 mm). Sill 960 mm above the floor, level with the night mattress top.
@@ -346,12 +389,14 @@ items:
     name: Window W2, Dometic S4 top-hinged 900 x 450, bed, road side, blackout and fly screen rollers
     material: "Double acrylic, grey tint, polyurethane frame, ECE R43, aluminium-coated blackout roller blind"
     system: body
+    price: {aud: 719, basis: listing, converted_from: "EUR 428", url: "https://www.wohnwagen-fenster.com/produkt/ausstellfenster/dometic-s4-ausstellfenster-rahmenfenster-rollo-camping-wohnwagen-wohnmobil/", date: 2026-11-20}
     box: [body_x0 + 379, half_bw - wall_t, floor_z + 960, 902, wall_t, 448]
     mass: {basis: declared, total_kg: 8.0, maturity: spec, source: "https://www.wohnwagen-fenster.com/produkt/ausstellfenster/dometic-s4-ausstellfenster-rahmenfenster-rollo-camping-wohnwagen-wohnmobil/", note: "Part 9104115569 (report 19 R19-15)"}
   - id: WN-03
     name: Window W4, Dometic S4 top-hinged 500 x 450, kitchen, road side, blackout and fly screen rollers
     material: "Double acrylic, grey tint, polyurethane frame, ECE R43, aluminium-coated blackout roller blind"
     system: body
+    price: {aud: 520.80, basis: listing, converted_from: "EUR 310", url: "https://www.wohnwagen-fenster.com/produkt/ausstellfenster/dometic-s4-ausstellfenster-rahmenfenster-rollo-camping-wohnwagen-wohnmobil/", date: 2026-11-20, note: "The 500 x 450 size of W6, without the film (H15)"}
     box: [body_x0 + 2800, half_bw - wall_t, floor_z + 1000, 500, wall_t, 448]
     mass: {basis: declared, total_kg: 5.0, maturity: spec, source: "https://www.wohnwagen-fenster.com/produkt/ausstellfenster/dometic-s4-ausstellfenster-rahmenfenster-rollo-camping-wohnwagen-wohnmobil/", note: "Part 9104115546, 500 x 450 (H15)"}
     note: Sill 100 mm above the bench top, so its blind cassette stays under the range hood.
@@ -359,6 +404,9 @@ items:
     name: Window W6, Dometic S4 top-hinged 500 x 450 with frosted film on the inner pane, wet room, road side
     material: "Double acrylic with frosted film, polyurethane frame, ECE R43, aluminium-coated blackout roller blind"
     system: body
+    price:
+      - {item: "Dometic S4 500 x 450", aud: 520.80, basis: listing, converted_from: "EUR 310", url: "https://www.wohnwagen-fenster.com/produkt/ausstellfenster/dometic-s4-ausstellfenster-rahmenfenster-rollo-camping-wohnwagen-wohnmobil/", date: 2026-11-20}
+      - {item: "Frosted film", aud: 30, basis: estimate, date: 2026-11-20}
     box: [body_x0 + 3610, half_bw - wall_t, floor_z + 1150, 500, wall_t, 448]
     parts:
       - {item: "Dometic S4 500 x 450, part 9104115546", kg: 5.0, basis: maker, source: "https://www.wohnwagen-fenster.com/produkt/ausstellfenster/dometic-s4-ausstellfenster-rahmenfenster-rollo-camping-wohnwagen-wohnmobil/"}
@@ -367,12 +415,14 @@ items:
     name: Clip-in blackout covers for W1 and W2, 3 mm black ABS in the S4 inner frame
     material: "3 mm black ABS sheet"
     system: body
+    price: {aud: 60, basis: estimate, date: 2026-11-20, note: "Two covers cut from 3 mm ABS at AUD 30 each"}
     point: [body_x0 + 830, 0, floor_z + 1200]
     mass: {basis: declared, total_kg: 1.2, maturity: estimate, source: "Report 19 R19-20: 0.6 kg each (est.)"}
   - id: BD-17
     name: Thetford service door 2680584 for the cassette, kerb side of the wet room
     material: "ABS door and frame with a gasket and lock"
     system: body
+    price: {aud: 100, basis: listing, url: "https://www.ebay.com.au/p/10035198262?iid=184312869023", date: 2026-11-21, note: "Thetford 26805-84, white"}
     box: [body_x0 + 3660, -half_bw, floor_z + 150, 450, wall_t, 290]
     mass: {basis: declared, total_kg: 1.5, maturity: estimate, source: "Report 12 section 7 (estimate)"}
     note: Behind the C223-CS. Its cut-out ends 310 mm ahead of the rear corner (report 12's 300 mm rule).
@@ -380,6 +430,9 @@ items:
     name: Mud flap behind the rear wheel, 610 x 455 mm rubber, on a galvanised hanger from the XT rear shock outrigger
     material: "6 mm rubber flap on a galvanised steel hanger"
     system: body
+    price:
+      - {item: "Rubber mud flap 610 x 455 mm", aud_each: 37.26, basis: listing, url: "https://www.thebossshop.com.au/mudflap-rubber-610mmw-x-455mml-black", date: 2026-11-20}
+      - {item: "Hanger, galvanised steel bracket with a strap and bolts", aud_each: 35.84, basis: estimate, date: 2026-11-20, note: "Strap AUD 5.84 (listing) plus steel and bolts. Made with the small fabrications (LAB-05)"}
     for: {s: [1, -1]}
     point: [axle_x + rear_hub_dx + tyre_d / 2 + 60, s * hub_y, 530]
     parts:
@@ -389,12 +442,22 @@ items:
   - id: BD-11
     name: Wiring, plumbing, lighting and hardware
     system: body
+    price:
+      - {item: "12 and 24 V DC wiring, tinned twin core 2.5 to 6 mm2, 150 m at AUD 4.50/m", aud: 675, basis: estimate, date: 2026-11-20}
+      - {item: "230 V wiring: 40 m of 2.5 mm2 TPS, six outlets and the inlet's tails", aud: 330, basis: estimate, date: 2026-11-20}
+      - {item: "LED lights: ten ceiling, two reading, two outside, at AUD 40", aud: 560, basis: estimate, date: 2026-11-20}
+      - {item: "Switches, fuse blocks, fuses, terminals, lugs, heat shrink, conduit, glands and ties", aud: 650, basis: estimate, date: 2026-11-20}
+      - {item: "Fresh water pipework: 30 m of 12 mm PEX, 40 push-fit fittings, tank fittings and breathers", aud: 710, basis: estimate, date: 2026-11-20}
+      - {item: "General hardware: rivnuts, screws, brackets and P-clips", aud: 400, basis: estimate, date: 2026-11-20}
     point: [body_x0 + body_length / 2, 0, floor_z + 400]
     mass: {basis: declared, total_kg: 60, maturity: estimate, source: "Older block model, kept until the systems design (report 12 section 10). Reports 20 and 21 leave the house wiring and the fresh water pipework in it"}
   - id: BD-13
     name: Awning, Fiamma F45s 450, kerb side, below the roof line
     material: "Aluminium case and arms, vinyl fabric (est.)"
     system: body
+    price:
+      - {item: "Fiamma F45 S 450 awning, wall mount", aud: 1790, basis: listing, url: "https://www.caravanrvcamping.com.au/awnings-screens-mats-covers/caravan-rv-awnings/box-awnings/fiamma-box-awning/fiamma-f45-wall-mount/", date: 2026-11-20}
+      - {item: "Awning wall brackets, leg wall brackets and bolts", aud: 150, basis: estimate, url: "https://parts.jayco.com.au/products/fiamma-awning-leg-wall-bracket-kit-for-f45-awning", date: 2026-11-20}
     box: [body_x0 + 95, -half_bw - 100, ceiling_z - 160, 4230, 100, 120]
     parts:
       - {item: "Fiamma F45s 450, 4,230 mm case", kg: 29.5, basis: maker, source: "https://www.fiammausa.com/en/f45s-en.html"}
@@ -406,6 +469,7 @@ items:
     name: Solar panel, Sunman eArc SMF430F-12X12UW, 430 W, glass-free and frameless, bonded to the roof
     material: "Glass-free, frameless polymer laminate over silicon cells"
     system: roof
+    price: {aud_each: 669, basis: listing, url: "https://www.solar4rvs.com.au/products/sunman-earc-430w-flexible-solar-panel-1", date: 2026-11-20}
     for: {k: [0, 1], s: [1, -1]}
     box: [solar_x0 + k * solar_l, "min(0, s * solar_w)", roof_top_z, solar_l, solar_w, 2]
     mass: {basis: declared, unit_kg: 7.3, maturity: spec, source: "https://www.master-instruments.com.au/files/battery_information/e_arc_doing_more_web.pdf", note: "Sunman brochure, 7.3 kg each (report 13 section 4)"}
@@ -413,6 +477,7 @@ items:
   - id: RF-02
     name: Panel adhesive and cable
     system: roof
+    price: {aud: 250, basis: estimate, date: 2026-11-20, note: "Adhesive, 6 mm2 PV cable, MC4 connectors and a roof gland (research report 20)"}
     point: [solar_x0 + solar_l, 0, roof_top_z]
     mass: {basis: declared, total_kg: 2.0, maturity: estimate, source: "Report 13 section 4: adhesive and cable as Sunman specifies, about 2 kg (estimate)"}
 
@@ -421,6 +486,9 @@ items:
     name: Water tank, front suspension bay
     material: "6 mm food-grade HDPE, welded, two cross baffles and one lengthwise"
     system: underfloor
+    price:
+      - {item: "Welded 6 mm HDPE tank, about 220 L net, cross and lengthwise baffles", aud: 650, basis: estimate, url: "https://www.diycaravans.com.au/shop/custom-made-caravan-rv-tanks/", date: 2026-11-20, note: "Made-to-size tanks start at AUD 397, the standard 250 L tank is AUD 549 (research report 22)"}
+      - {item: "Aluminium angle bearers, 10 mm rubber strip, padded stainless straps and bolts", aud: 90, basis: estimate, date: 2026-11-20}
     zone: underfloor
     box: [tank_f_x0, -tank_w / 2, tank_z0, tank_f_l, tank_w, tank_h]
     tank: true
@@ -430,6 +498,9 @@ items:
     name: Water tank, rear suspension bay
     material: "6 mm food-grade HDPE, welded, baffled"
     system: underfloor
+    price:
+      - {item: "Welded 6 mm HDPE tank, about 200 L net, baffled", aud: 620, basis: estimate, url: "https://www.diycaravans.com.au/shop/custom-made-caravan-rv-tanks/", date: 2026-11-20}
+      - {item: "Aluminium angle bearers, 10 mm rubber strip, padded stainless straps and bolts", aud: 90, basis: estimate, date: 2026-11-20}
     zone: underfloor
     box: [tank_r_x0, -tank_w / 2, tank_z0, tank_r_l, tank_w, tank_h]
     tank: true
@@ -444,12 +515,14 @@ items:
   - id: UF-03
     name: Tank guards
     system: underfloor
+    price: {aud: 341.75, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/107-aluminium-5-bar-checker-plate-tread.html", date: 2026-11-20, note: "One 1200 x 2400 sheet of 3 mm aluminium checker plate, AUD 261.75 (listing), plus angle and fixings AUD 80 (est.)"}
     box: [axle_x + xt_front_hinge_rear, -rail_in, rail_underside_z - 6, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 6]
     mass: {basis: declared, total_kg: 20, maturity: estimate, source: "Older block model"}
   - id: UF-06
     name: Heater fuel tank, 15 L HDPE, with line and filter
     material: "HDPE"
     system: underfloor
+    price: {aud: 220, basis: estimate, date: 2026-11-20, note: "15 L HDPE tank with pickup, fuel line, filter and mounting"}
     zone: underfloor
     box: [diesel_tank_x0, -200, floor_underside_z - 10 - 100, diesel_tank_l, 400, 100]
     mass: {basis: declared, total_kg: 2.3, maturity: estimate, source: "Report 13 LA-03: 15 L HDPE fuel tank 2.0 kg, fuel line and filter 0.3 kg (estimates)"}
@@ -464,6 +537,7 @@ items:
     name: Grey water tank, 130 L net, welded 6 mm HDPE, one baffle, in the rear bay behind the XT rear shock crossmember
     material: "6 mm food-grade HDPE, welded"
     system: underfloor
+    price: {aud: 900, basis: estimate, url: "https://www.plasticonline.com.au/services/plastic-tank-fabrication/", date: 2026-11-20, note: "Welded by a plastic fabricator to the bay's size, with its fittings (research report 21)"}
     zone: underfloor
     box: [grey_x0, -tank_w / 2, grey_z0, grey_l, tank_w, grey_h]
     parts:
@@ -482,6 +556,7 @@ items:
     name: Grey tank guard, 2 mm aluminium on rubber, bolted to the rails
     material: "2 mm aluminium sheet on rubber strips"
     system: underfloor
+    price: {aud: 250, basis: estimate, url: "https://store.allaluminium.com.au/collections/marine-sheet-aluminium", date: 2026-11-21, note: "One 1200 x 2400 sheet of 2 mm 5052, between the listed 1.6 and 2.5 mm sheets (AUD 166.62 and 260.37), plus rubber strip and bolts"}
     zone: underfloor
     box: [grey_x0, -510, grey_z0 - 6, grey_l, 1020, 6]
     mass: {basis: declared, total_kg: 5.3, maturity: estimate, source: "0.91 m2 of 2 mm aluminium at 5.4 kg/m2 with rubber and bolts (est., saving 1f, H13)"}
@@ -492,6 +567,10 @@ items:
     name: Drawbar box, sealed 1.6 mm aluminium with a lockable lid, a shelf, a low vent and a drain to outside, on brackets across the drawbar members
     material: "1.6 mm aluminium sheet, sealed"
     system: stowage
+    price:
+      - {item: "Two sheets of 5052 H32 1.6 mm, 1200 x 2400, for the box, lid and shelf", aud: 333.24, basis: listing, url: "https://store.allaluminium.com.au/collections/marine-sheet-aluminium", date: 2026-11-20, note: "AUD 166.62 a sheet, as the bike box's roof sheet"}
+      - {item: "Stainless hinge, two gas struts, keyed compression latch, padlock hasp, EPDM seal, rubber mounts and bolts", aud: 195, basis: estimate, date: 2026-11-20}
+      - {item: "Shelf straps and the drain and vent fittings", aud: 40, basis: estimate, date: 2026-11-21}
     hollow: true
     box: [dbx_x0, -dbx_w / 2, dbx_z0, dbx_l, dbx_w, dbx_h]
     parts:
@@ -503,6 +582,7 @@ items:
   - id: GS-01
     name: Generators, two Honda EU22i side by side, run in parallel on the ground
     system: stowage
+    price: {aud: 3550, basis: listing, url: "https://generatorstore.com.au/products/honda-eu22i-inverter-generator-twin-combo-pack", date: 2026-11-20, note: "Twin pack of two Honda EU22i"}
     zone: drawbar_box
     box: [dbx_x0 + 15, -dbx_w / 2 + 20, dbx_z0 + dbx_t + 10, 290, 1038, 425]
     mass: {basis: declared, total_kg: 42.2, maturity: spec, source: "https://powerequipment.honda.com.au/models/generators/eu22/specifications", note: "Honda EU22i, 21.1 kg dry each (Honda Australia, report 20 E-16)"}
@@ -510,11 +590,13 @@ items:
   - id: GS-02
     name: Honda parallel cable
     system: stowage
+    price: {aud: 150, basis: estimate, date: 2026-11-20, note: "Honda parallel cable kit (research report 20)"}
     point: [dbx_x0 + dbx_l / 2, -200, dbx_z0 + 500]
     mass: {basis: declared, total_kg: 1.0, maturity: estimate, source: "Report 20 E-16 (estimate)"}
   - id: GS-04
     name: Petrol and diesel in jerry cans
     system: stowage
+    price: {aud: 120, basis: estimate, date: 2026-11-20, note: "The two 10 L cans, one petrol to AS/NZS 2906 and one diesel, with a strap. The fuel is not priced"}
     load: fuel
     zone: drawbar_box
     box: [dbx_x0 + 10, -dbx_w / 2 + 20 + 1038 + 20, dbx_z0 + dbx_t + 10, 300, 360, 450]
@@ -533,6 +615,7 @@ items:
     name: Lift bed rail, Lippert HappiJac 42 in kit, C-channel with its trolley and support rail, on the side wall
     material: "Steel C-channel rail, chain and trolley (est.)"
     system: bed
+    price: {aud: 4049, basis: listing, converted_from: "USD 2,374.99 before tax, plus 10 % GST", url: "https://www.rvsurplusparts.net/complete-happijac-electric-bed.html", date: 2026-11-20, note: "The whole Lippert HappiJac 42 in kit: four rails, trolleys, support rails, motor, shaft, chains and controller. Freight is in the import freight line"}
     zone: inside
     for: {k: [0, 1], s: [1, -1]}
     box: [in_x0 + bed_rail_u - 25 + k * 1067, s * half_in, floor_z + 375, 50, -s * 20, interior_h - 375]
@@ -542,6 +625,7 @@ items:
     name: Lift bed motor with its brake, connecting shaft, chains and controller, at the rail tops
     material: "12 V DC gearmotor, steel shaft and chain (est.)"
     system: bed
+    price: {aud: 0, basis: listing, included_in: LB-04, date: 2026-11-20, note: "In the HappiJac kit"}
     point: [in_x0 + bed_rail_u + 533, 0, ceiling_z - 30]
     mass: {basis: declared, total_kg: 7.0, maturity: estimate, source: "Report 21 section 1.4: the rest of the 35 kg kit (est.)"}
     note: 12 V at 8 to 10 A while moving. Manual lowering by the brake lever and a 1/2 in socket at the rail tops. Spare motor HappiJac 420326.
@@ -549,6 +633,9 @@ items:
     name: Lift bed travel locks and obstruction stop
     material: "Stainless index plungers with interlock microswitches, rubber safety edge with a switching strip"
     system: bed
+    price:
+      - {item: "Four stainless spring index plungers, M12, with interlock microswitches", aud: 250, basis: estimate, date: 2026-11-20, note: "AUD 62.50 each"}
+      - {item: "Pressure-sensitive safety edge with its relay", aud: 300, basis: estimate, date: 2026-11-20}
     point: [in_x0 + 795, 0, deck_z]
     parts:
       - {item: "Four stainless spring index plungers, M12, with interlock microswitches, at the day and night stops", kg: 0.6, basis: estimate, source: "Report 21 section 1.2"}
@@ -557,6 +644,7 @@ items:
     name: Lift bed hardpoints, four RHS 40 x 20 x 3 aluminium tubes laid flat in the side wall cores behind the rails
     material: "6060-T5 aluminium RHS 40 x 20 x 3 (est.)"
     system: bed
+    price: {aud: 150, basis: estimate, date: 2026-11-20, note: "Four 1.6 m lengths of aluminium RHS 40 x 20 x 3 at AUD 37.50"}
     point: [in_x0 + bed_rail_u + 533, 0, floor_z + 1175]
     mass: {basis: declared, total_kg: 5.6, maturity: calculated, source: "Report 21 section 1.4: 4 x 1.6 m at 0.875 kg/m"}
     note: Bonded into the wall cores as the panels are laid up, so the rail screws bite 3 mm aluminium (Lippert's backing rule).
@@ -564,6 +652,7 @@ items:
     name: Bed platform, 40 mm aluminium honeycomb, 0.8 and 0.5 mm skins, 1,550 x 2,290 mm, on the lift's support rails
     material: "Aluminium honeycomb sandwich, 0.8 mm top and 0.5 mm bottom aluminium skins on a 40 kg/m3 core"
     system: bed
+    price: {aud: 1200, basis: estimate, url: "https://www.chemical-concepts.com/wp-content/uploads/2023/09/Compocel-AL-TDS.pdf", date: 2026-11-20, note: "One-off 40 mm aluminium honeycomb panel with edge trim (research report 21)"}
     zone: inside
     box: [in_x0 + 20, -half_in + 20, deck_z, 1550, 2 * half_in - 40, deck_t]
     parts:
@@ -574,6 +663,7 @@ items:
     name: Ventilated underlay, HyperVent 19 mm
     material: "Polyester 3D spacer mat"
     system: bed
+    price: {aud: 150, basis: estimate, url: "https://www.fisheriessupply.com/hypervent-hypervent-mattress-pad/39-50", date: 2026-11-20}
     zone: inside
     box: [in_x0 + 30, -1015, deck_z + deck_t, 1530, 2030, underlay_t]
     mass: {basis: declared, total_kg: 0.45, maturity: calculated, source: "Report 04: 0.146 kg/m2 (report 21)"}
@@ -581,6 +671,7 @@ items:
     name: Queen mattress, Pure Sleep Orion Caravan Deluxe, 1,530 x 2,030 x 180, across the trailer
     material: "Zoned pocket springs with foam, flip design"
     system: bed
+    price: {aud: 1999, basis: listing, url: "https://puresleep.com.au/product/orion-caravan-deluxe-mattress/", date: 2026-11-20}
     zone: inside
     box: [in_x0 + 30, -1015, mattress_z, 1530, 2030, mattress_t]
     mass: {basis: declared, total_kg: 25.5, maturity: spec, source: "https://puresleep.com.au/product/orion-caravan-deluxe-mattress/", note: "25.5 kg, size not stated, taken as the queen (report 21 open point 6)"}
@@ -589,6 +680,7 @@ items:
     name: Desk 1,200 x 600 under the bed, top at 730 mm, against the front wall
     material: "25 mm aluminium honeycomb top with HPL facing, aluminium angle cleat and two square legs"
     system: living
+    price: {aud: 560, basis: estimate, date: 2026-11-20, note: "Honeycomb top with HPL facing, cleat, legs and floor sockets (research report 21)"}
     zone: inside
     box: [in_x0, -600, floor_z + desk_top_h - 25, 600, 1200, 25]
     parts:
@@ -601,12 +693,14 @@ items:
   - id: LA-09M
     name: Lay-flat monitor stand, Wearson WS-03A
     system: living
+    price: {aud: 57, basis: listing, converted_from: "USD 36.99", url: "https://www.amazon.com/wearson-ws-03a-adjustable-folding-100x100mm/dp/b00xuf2gbi/ref=sr_1_13", date: 2026-11-20}
     point: [in_x0 + 300, 0, floor_z + desk_top_h + 30]
     mass: {basis: declared, total_kg: 1.2, maturity: estimate, source: "https://www.amazon.com/wearson-ws-03a-adjustable-folding-100x100mm/dp/b00xuf2gbi/ref=sr_1_13"}
   - id: LA-09S
     name: Two Helinox Cafe chairs at the desk, packed into a bench drawer for travel
     material: "Aluminium frame, polyester seat"
     system: living
+    price: {aud: 604, basis: listing, converted_from: "EUR 179.95 each", url: "https://helinox.eu/products/cafe-chair", date: 2026-11-20, note: "Two chairs at AUD 302"}
     point: [rear_x0 - 600, half_in - 300, floor_z + 600]
     mass: {basis: declared, total_kg: 2.6, maturity: spec, source: "https://helinox.eu/products/cafe-chair", note: "1.3 kg each unpacked (REI)"}
   # ================================================================ living zone, u 1,590 to 3,330: kitchen on the road side (reports 19 and 21)
@@ -614,6 +708,7 @@ items:
     name: Kitchen tower carcass, 585 x 600 x 2,000, road side
     material: "18 mm Garnica Ultralight poplar plywood with a laminate finish"
     system: living
+    price: {aud: 482.50, basis: rate, url: "https://www.plyonline.com.au/collections/garnica-plywood", date: 2026-11-21, note: "5.0 m2 at AUD 96.50/m2: 18 mm Ultralight HPL poplar at about AUD 250 a 2440 x 1220 sheet (the 15 mm sheet is listed from AUD 227) plus 15 % for nesting"}
     zone: inside
     hollow: true
     box: [bed_x1, half_in - kit_d, floor_z, tower_l, kit_d, interior_h]
@@ -623,6 +718,10 @@ items:
     name: Hot water and backup heat, Truma Combi D 6 E (diesel with 900 or 1,800 W elements), in the tower base
     material: "Heater with a 10 L stainless boiler (maker)"
     system: living
+    price:
+      - {item: "Truma Combi D 6 E with the iNet X panel", aud: 6382, basis: listing, converted_from: "EUR 3,799", url: "https://www.reimo.com/camping-shop/heizung-kuehlschraenke-kuehlboxen-klimaanlagen/truma-heizung/65871/truma-combi-d6e-diesel-und-elektroheizung-mit-inet-x-panel-neue-generation-2023", date: 2026-11-20, note: "Truma Australia does not list it (research report 21)"}
+      - {item: "Truma water set FC with the FrostControl drain valve", aud: 294, basis: listing, converted_from: "EUR 175", url: "https://www.reimo.com/camping-shop/heizung-kuehlschraenke-kuehlboxen-klimaanlagen/truma-heizung/65871/truma-combi-d6e-diesel-und-elektroheizung-mit-inet-x-panel-neue-generation-2023", date: 2026-11-20}
+      - {item: "Four 65 mm warm-air ducts and outlets", aud: 200, basis: estimate, date: 2026-11-21, note: "About 6 m of duct and four outlets. The exhaust and intake ducts and the cowl come with the heater"}
     zone: inside
     box: [bed_x1 + 30, half_in - 550, floor_z, 525, 450, 300]
     parts:
@@ -633,6 +732,9 @@ items:
   - id: LA-05
     name: Fridge, Dometic NRX 130C, 126 L compressor, in the tower, door 330 mm above the floor
     system: living
+    price:
+      - {item: "Dometic NRX 130C", aud: 2182.32, basis: listing, converted_from: "EUR 1,299", url: "https://www.dometic.com/it-it/outdoor/camper-e-furgoni/frigoriferi/frigoriferi-per-van/dometic-nrx-130c-333350", date: 2026-11-21, note: "Dometic's own European price. No Australian price was readable"}
+      - {item: "Frame and door latch", aud: 50, basis: estimate, date: 2026-11-21}
     zone: inside
     box: [bed_x1 + 30, half_in - 568, floor_z + 330, 525, 568, 812]
     parts:
@@ -641,6 +743,9 @@ items:
   - id: LA-13
     name: Oven, Camec 053632 28 L convection microwave with grill and air fry, in the tower above the fridge
     system: living
+    price:
+      - {item: "Camec 053632 28 L convection microwave", aud: 449, basis: estimate, url: "https://www.woolworths.com.au/shop/productdetails/1133925065", date: 2026-11-20, note: "Australian price not read. NZD 408 in New Zealand (research report 21)"}
+      - {item: "Travel cradle and strap", aud: 150, basis: estimate, date: 2026-11-20}
     zone: inside
     box: [bed_x1 + 38, half_in - 418, floor_z + 1162, 510, 418, 318]
     parts:
@@ -651,6 +756,7 @@ items:
     name: Kitchen bench carcass, 1,155 x 600, top 900 mm, two drawers, road side
     material: "18 mm Garnica Ultralight poplar plywood with a laminate finish, laminated worktop"
     system: living
+    price: {aud: 521.10, basis: rate, url: "https://www.plyonline.com.au/collections/garnica-plywood", date: 2026-11-21, note: "5.4 m2 at AUD 96.50/m2, as LA-11T"}
     zone: inside
     hollow: true
     box: [bed_x1 + tower_l, half_in - kit_d, floor_z, rear_x0 - bed_x1 - tower_l, kit_d, bench_top_h]
@@ -658,6 +764,10 @@ items:
   - id: LA-06
     name: Freezer, Dometic CFX3 55IM, 53 L, under the hob on a pull-out slide
     system: living
+    price:
+      - {item: "Dometic CFX3 55IM", aud: 1762.32, basis: listing, converted_from: "EUR 1,049", url: "https://www.dometic.com/de-de/outdoor/kuhlboxen/elektrische-kuhlboxen/dometic-cfx3-55im-332278", date: 2026-11-21, note: "Dometic's own German price with VAT. No Australian price was readable"}
+      - {item: "Aluminium pull-out slide with travel lock", aud: 350, basis: estimate, date: 2026-11-21}
+      - {item: "Tie-down kit", aud: 80, basis: estimate, date: 2026-11-21}
     zone: inside
     box: [bed_x1 + tower_l + 10, half_in - 465, floor_z + 35, 720, 455, 480]
     parts:
@@ -668,23 +778,32 @@ items:
   - id: LA-07A
     name: Induction hob, Dometic CVI1525, two zones, 2,300 W, over the freezer
     system: living
+    price: {aud: 697.20, basis: listing, converted_from: "EUR 415", url: "https://www.idealo.de/preisvergleich/Liste/123210822/dometic-cvi1525-2-zonen-induktionskochfeld.html", date: 2026-11-21, note: "Lowest German offer. No Australian price was readable"}
     zone: inside
     box: [bed_x1 + tower_l + 45, half_in - 350, floor_z + bench_top_h - 55, 525, 350, 60]
     mass: {basis: declared, total_kg: 7.0, maturity: spec, source: "https://www.dometic.com/fr-fr/produit/dometic-cvi1525-9600050571", note: "Dometic, 7.0 kg (report 13)"}
   - id: LA-07B
     name: Sink, Dometic CVS1350G with glass lid
     system: living
+    price: {aud: 412.69, basis: listing, converted_from: "EUR 245.65", url: "https://www.idealo.de/preisvergleich/OffersOfProduct/209598715_-dometic-spuelbecken-eckig-cvs1350g-mit-glasabdeckung-silber-mit-glasabdeckung-dometic-outdoor.html", date: 2026-11-21, note: "Lowest German offer. No Australian price was readable"}
     zone: inside
     box: [rear_x0 - 405, half_in - 350, floor_z + bench_top_h - 170, 350, 350, 170]
     mass: {basis: declared, total_kg: 2.5, maturity: spec, source: "https://www.dometic.com/fr-fr/produit/dometic-cvs1350g-9600051161", note: "Dometic, 2.5 kg (report 13)"}
   - id: LA-07D
     name: Sink mixer, single lever, 4 L/min regulator
     system: living
+    price: {aud: 150, basis: estimate, url: "https://www.jacksonsleisure.com/caravan-campervan-motorhome/reich-linnea-33mm-mixer-tap-for-campervan-caravan-motorhome-marine/", date: 2026-11-20, note: "Reich single-lever mixer with a 4 L/min regulator"}
     point: [rear_x0 - 230, half_in - 380, floor_z + bench_top_h + 90]
     mass: {basis: declared, total_kg: 0.6, maturity: estimate, source: "Report 21 section 9 (estimate)"}
   - id: WS-01
     name: "Water supply in the sink cabinet: Shurflo Trail King 7 pump (2.1 bar), accumulator and strainer, Puretec CR-Z2, Acuva ArrowMAX 2.0 UV-LED, mixing valve at 50 C"
     system: living
+    price:
+      - {item: "Shurflo Trail King 7, 12 V", aud: 186, basis: listing, converted_from: "EUR 110.81", url: "https://www.testberichte.de/heimwerkerbedarf/shurflo-trail-king-wasserpumpe-7-liter-12v-30-psi.html", date: 2026-11-20}
+      - {item: "Accumulator 0.75 L and 40-mesh strainer", aud: 145, basis: estimate, date: 2026-11-20}
+      - {item: "Puretec CR-Z2 under-sink filter", aud: 323.85, basis: listing, url: "https://www.puretec.com.au/CR-Z2", date: 2026-11-20}
+      - {item: "Acuva ArrowMAX 2.0 UV-LED purifier", aud: 1006, basis: estimate, converted_from: "USD 649 (est.)", url: "https://www.campingworld.com/acuva-arrowmax-2.0-uv-led-water-purifier-with-advanced-pre-filter-and-smart-faucet-12v-dc-127787.html", date: 2026-11-20, note: "Price not read (research report 21)"}
+      - {item: "Thermostatic mixing valve set to 50 C", aud: 150, basis: estimate, date: 2026-11-20}
     point: [rear_x0 - 230, half_in - 300, floor_z + 300]
     parts:
       - {item: "Shurflo Trail King 7, 12 V, 7 L/min, 30 psi", kg: 1.5, basis: estimate, source: "Report 21 section 10.2"}
@@ -695,6 +814,9 @@ items:
   - id: WS-02
     name: Puretec CR45 fill filter, creek transfer pump and 10 m hose, stowed in a bench drawer
     system: living
+    price:
+      - {item: "Puretec CR45 twin-stage fill filter", aud: 250, basis: estimate, url: "https://cdn.shopify.com/s/files/1/1845/4805/files/Puretec_Caravan_Brochure.pdf?v=1612752432", date: 2026-11-20}
+      - {item: "12 V transfer pump of at least 2 bar, strainer and 10 m hose", aud: 200, basis: estimate, date: 2026-11-20}
     point: [bed_x1 + tower_l + 500, half_in - 300, floor_z + 700]
     parts:
       - {item: "Puretec CR45 twin-stage filter, 1 micron", kg: 2.5, basis: estimate, source: "https://cdn.shopify.com/s/files/1/1845/4805/files/Puretec_Caravan_Brochure.pdf?v=1612752432"}
@@ -704,6 +826,7 @@ items:
     name: Battery box, sealed 2 mm 5052 aluminium, gasketed front panel, cable glands, 3 mm ceramic-fibre lining, heat detector, tray and straps, two vents through the floor
     material: "2 mm 5052 aluminium sheet, sealed, ceramic-fibre paper lining"
     system: electrical
+    price: {aud: 1200, basis: estimate, date: 2026-11-20, note: "Fabricated 2 mm 5052 box with its gasketed panel, glands, lining, heat detector, tray and straps (research report 20)"}
     zone: inside
     hollow: true
     box: [plinth_x0, plinth_y0, floor_z, 900, plinth_d, bat_box_h]
@@ -712,6 +835,7 @@ items:
   - id: EL-01
     name: House battery, 5 x Victron Lithium NG 51.2 V 100 Ah (BAT548110620), 25.6 kWh, upright in the plinth
     system: electrical
+    price: {aud: 14555, basis: listing, url: "https://energyconnections.net.au/products/victron-lifepo4-battery-51-2v-100ah-ng-next-gen", date: 2026-11-20, note: "Five modules at AUD 2,911"}
     zone: inside
     box: [plinth_x0 + 25, plinth_y0 + 26, floor_z + 20, 850, 648, 235]
     mass: {basis: declared, total_kg: 185, maturity: spec, source: "https://cdn.shopify.com/s/files/1/0497/4749/3026/files/Datasheet-Lithium-NG-batteries-12_8V-25_6V-51_2V-EN.pdf?v=1739576641", note: "37 kg each (Victron datasheet, marked est. by Victron, report 20 E-01)"}
@@ -719,18 +843,24 @@ items:
   - id: EL-03
     name: Battery fuses, one 125 A MEGA per module in a 6-way holder, and the bank busbars, in the plinth's end slot
     system: electrical
+    price:
+      - {item: "Five 125 A MEGA fuses, 80 V range, at AUD 52", aud: 260, basis: listing, url: "https://energyconnections.net.au/products/mega-fuse-80v-range-1pc", date: 2026-11-20}
+      - {item: "6-way MEGA fuse holder", aud: 40, basis: listing, url: "https://energyconnections.net.au/products/victron-fuse-holder-fully-assembled-6-way-for-mega-fuse", date: 2026-11-20}
+      - {item: "Bank busbars", aud: 60, basis: estimate, date: 2026-11-20}
     point: [plinth_x0 + 987, plinth_y0 + plinth_d / 2, floor_z + 200]
     mass: {basis: declared, total_kg: 1.5, maturity: estimate, source: "Report 20 E-09 (est.)"}
   - id: LA-14F
     name: Machine base over the battery box, aluminium frame with rubber-isolated bases and ratchet straps for the washer and the dryer
     material: "Aluminium angle frame, rubber isolators, polyester ratchet straps"
     system: living
+    price: {aud: 250, basis: estimate, date: 2026-11-21, note: "Aluminium angle frame, four rubber-isolated feet, two ratchet straps and bolts"}
     zone: inside
     box: [plinth_x0, plinth_y0, floor_z + bat_box_h, plinth_l, plinth_d, 40]
     mass: {basis: declared, total_kg: 8, maturity: estimate, source: "Layout study (est.)"}
   - id: LA-02
     name: Washing machine, Camec Compact RV II 3.5 kg top loader, part 051879, on the plinth
     system: living
+    price: {aud: 749, basis: estimate, url: "https://cdn.shopify.com/s/files/1/0578/8326/3042/files/051879_Manual.pdf?v=1718605142", date: 2026-11-20, note: "No price found (research report 21)"}
     zone: inside
     box: [plinth_x0 + 10, plinth_y0, floor_z + plinth_h, 445, 460, 730]
     mass: {basis: declared, total_kg: 16.0, maturity: spec, source: "https://cdn.shopify.com/s/files/1/0578/8326/3042/files/051879_Manual.pdf?v=1718605142", note: "Camec, 16 kg, 445 x 460 x 730 mm (report 21)"}
@@ -738,6 +868,7 @@ items:
   - id: LA-14
     name: Clothes dryer, Haier HDHPS70LW1 7 kg heat pump, no vent, on the plinth
     system: living
+    price: {aud: 999, basis: listing, url: "https://www.haier.com.au/laundry/dryers/7kg-300-series-heat-pump-dryer-hdhps70lw1-61444.html", date: 2026-11-20, note: "Haier's RRP"}
     zone: inside
     box: [plinth_x0 + 480, plinth_y0, floor_z + plinth_h, 595, 590, 850]
     mass: {basis: declared, total_kg: 40, maturity: estimate, source: "https://www.haier.com.au/laundry/dryers/7kg-300-series-heat-pump-dryer-hdhps70lw1-61444.html", note: "Mass not published, 38 to 48 kg for its class (report 21 open point 8)"}
@@ -746,12 +877,14 @@ items:
     name: Plinth front panel and the end slot's cover
     material: "18 mm Garnica Ultralight poplar plywood with a laminate finish"
     system: living
+    price: {aud: 77.20, basis: rate, url: "https://www.plyonline.com.au/collections/garnica-plywood", date: 2026-11-21, note: "0.8 m2 at AUD 96.50/m2, as LA-11T"}
     point: [plinth_x0 + plinth_l / 2, plinth_y0 + plinth_d, floor_z + plinth_h / 2]
     mass: {basis: declared, total_kg: 3.8, maturity: estimate, source: "0.8 m2 at 4.7 kg/m2 (saving 1a, H13)"}
   - id: LA-11L
     name: Lockers over the washer and dryer, 880 x 400 x 400
     material: "18 mm Garnica Ultralight poplar plywood with a laminate finish"
     system: living
+    price: {aud: 173.70, basis: rate, url: "https://www.plyonline.com.au/collections/garnica-plywood", date: 2026-11-21, note: "1.8 m2 at AUD 96.50/m2, as LA-11T"}
     zone: inside
     hollow: true
     box: [plinth_x0, -half_in, ceiling_z - 400, 880, 400, 400]
@@ -761,6 +894,7 @@ items:
     name: Electrical board cabinet on the partition's kerb end, 200 x 800 x 720, vented, its door labelled as inverter-supplied
     material: "18 mm Garnica Ultralight poplar plywood with a laminate finish"
     system: electrical
+    price: {aud: 115.80, basis: rate, url: "https://www.plyonline.com.au/collections/garnica-plywood", date: 2026-11-21, note: "1.2 m2 at AUD 96.50/m2, as LA-11T"}
     zone: inside
     hollow: true
     box: [rear_x0 - 200, -half_in + 25, ceiling_z - 770, 200, 800, 720]
@@ -768,6 +902,7 @@ items:
   - id: EL-04
     name: Inverter-charger, Victron MultiPlus-II 48/6k5/100-50 230 V, on the partition's road end under the split's indoor unit
     system: electrical
+    price: {aud: 1333, basis: listing, url: "https://energyconnections.net.au/products/victron-multiplus-ii-48-6k5-100-50-230v-inverter-charger", date: 2026-11-20}
     zone: inside
     box: [rear_x0 - 155, 345, floor_z + 920, 150, 320, 644]
     mass: {basis: declared, total_kg: 29.0, maturity: spec, source: "https://www.victronenergy.com/upload/documents/Datasheet-MultiPlus-II-inverter-charger-4k-4k5-6k5-10k-EN-.pdf"}
@@ -775,6 +910,11 @@ items:
   - id: EL-05
     name: Lynx Smart BMS NG, two SmartSolar MPPT 150/35, two Orion-Tr 48/24-16 and two Orion-Tr 48/12-30 on the board
     system: electrical
+    price:
+      - {item: "Victron Lynx Smart BMS NG 500 A (M10)", aud: 994, basis: listing, url: "https://energyconnections.net.au/products/victron-lynx-smart-bms-500-ng-m10", date: 2026-11-20}
+      - {item: "Two Victron SmartSolar MPPT 150/35 at AUD 255", aud: 510, basis: listing, url: "https://www.solar4rvs.com.au/products/victron-smartsolar-mppt-150v-35a-12v-24v-48v-bluetooth-solar-charge-controller", date: 2026-11-20}
+      - {item: "Two Victron Orion-Tr 48/24-16 at AUD 253", aud: 506, basis: listing, url: "https://www.solar4rvs.com.au/products/victron-orion-tr-48v-to-24v-16a-isolated-dc-dc-converter", date: 2026-11-20}
+      - {item: "Two Victron Orion-Tr 48/12-30 at AUD 263", aud: 526, basis: listing, url: "https://www.solar4rvs.com.au/products/victron-orion-tr-48v-to-12v-30a-isolated-dc-dc-converter", date: 2026-11-20}
     point: [rear_x0 - 100, -560, ceiling_z - 400]
     parts:
       - {item: "Victron Lynx Smart BMS NG 500 A (M10)", kg: 1.9, basis: maker, source: "https://www.victronenergy.com/upload/documents/Datasheet-Lynx-Smart-BMS-NG-EN.pdf"}
@@ -784,6 +924,11 @@ items:
   - id: EL-06
     name: Lynx Distributor, Cerbo GX MK2 with GX Touch 50, the 230 V board, and the board panel with its wiring
     system: electrical
+    price:
+      - {item: "Victron Lynx Distributor (M10)", aud: 293, basis: listing, url: "https://energyconnections.net.au/products/victron-lynx-distributor-m10", date: 2026-11-20}
+      - {item: "Victron Cerbo GX MK2 with GX Touch 50", aud: 616, basis: listing, url: "https://www.solar4rvs.com.au/products/victron-cerbo-gx-mk2-gx-touch-50-display-combo-1", date: 2026-11-20}
+      - {item: "230 V board: enclosure, inlet, main switch, eleven RCBOs, three contactors, three current relays, 300 A DC isolator, Anderson SB50", aud: 1480, basis: estimate, date: 2026-11-20}
+      - {item: "Board panel 800 x 700 mm and the wiring on it", aud: 150, basis: estimate, date: 2026-11-20}
     point: [rear_x0 - 100, -560, ceiling_z - 500]
     parts:
       - {item: "Victron Lynx Distributor (M10)", kg: 1.5, basis: estimate, source: "Report 20 E-03"}
@@ -794,11 +939,15 @@ items:
     name: Main DC cables and lugs, bank 70 mm2, inverter 50 mm2, MPPT and converters 10 mm2
     material: "Tinned flexible copper, double insulated"
     system: electrical
+    price: {aud: 450, basis: estimate, date: 2026-11-20, note: "Tinned double-insulated cable: 3 m of 70 mm2, 4 m of 50 mm2, 12 m of 10 mm2, and the lugs"}
     point: [rear_x0 - 100, -800, floor_z + 900]
     mass: {basis: declared, total_kg: 6.0, maturity: estimate, source: "Report 20 E-11 (est.)"}
   - id: EL-08
     name: Starlink Mini with its pole mount and 15 m cable, stowed in a bench drawer for travel
     system: electrical
+    price:
+      - {item: "Starlink Mini kit", aud: 289, basis: listing, url: "https://uplinkplans.com/", date: 2026-11-21, note: "Starlink's Australian price as quoted by Uplink Plans. The service plan is a running cost"}
+      - {item: "Pole mount and cable clips", aud: 80, basis: estimate, date: 2026-11-21}
     point: [rear_x0 - 450, half_in - 300, floor_z + 700]
     parts:
       - {item: "Starlink Mini with its kickstand", kg: 1.16, basis: maker, source: "https://www.starlink.com/specifications?spec=5"}
@@ -807,6 +956,7 @@ items:
   - id: AC-01
     name: Split air-conditioner, indoor unit, Mitsubishi Electric MSZ-AP25VGKD2, high on the partition's road end, blowing forward
     system: hvac
+    price: {aud: 1299, basis: listing, url: "https://www.jbhifi.com.au/products/mitsubishi-mszap25vgkd2kit-2-5kw-hi-wall-split-system-reverse-cycle-air-conditioner", date: 2026-11-20, note: "The kit with the outdoor unit AC-02"}
     zone: inside
     box: [rear_x0 - 219, 342, ceiling_z - 349, 219, 798, 299]
     mass: {basis: declared, total_kg: 10.5, maturity: spec, source: "https://www.mitsubishielectric.com.au/product/msz-ap25-80vgd-split-system-air-conditioner/"}
@@ -814,6 +964,7 @@ items:
   - id: AC-02
     name: Split air-conditioner, outdoor unit, Mitsubishi Electric MUZ-AP25VGD2, high on the rear wall's road half
     system: hvac
+    price: {aud: 0, basis: listing, included_in: AC-01, date: 2026-11-20, note: "In the MSZAP25VGKD2KIT price"}
     box: [body_x1 + 50, half_bw - 817.5, ceiling_z - 560, 285, 800, 550]
     mass: {basis: declared, total_kg: 35, maturity: spec, source: "https://www.mitsubishielectric.com.au/product/msz-ap25-80vgd-split-system-air-conditioner/", note: "In the kit MSZAP25VGKD2KIT (report 19 R19-02)"}
     note: Out of the stone spray and the jack-knife sweep. On the road half to balance the kerb-side battery plinth (MAS-11), 1.0 m of pipe from the indoor unit. Its defrost water drains by hose clear of the rinse box below it. Not on a side wall, where its 285 mm depth would break the 2,500 mm width (VSB1 5.2).
@@ -821,6 +972,7 @@ items:
     name: Vehicle mounting package for the split, aluminium cradle on four wire-rope isolators, perforated guard with a lift-off travel cover, line set and backing plate
     material: "Aluminium cradle and guard, stainless wire-rope isolators, copper line set with braided absorbers"
     system: hvac
+    price: {aud: 1500, basis: estimate, date: 2026-11-20, note: "Cradle, isolators, guard, vibration absorbers, fittings and clamps, and the licensed refrigeration fitting with a nitrogen test and evacuation (research report 19)"}
     hollow: true
     box: [body_x1, half_bw - 830, ceiling_z - 610, 400, 825, 650]
     mass: {basis: declared, total_kg: 11, maturity: estimate, source: "Report 19 R19-03 (est.)"}
@@ -829,12 +981,18 @@ items:
     name: Fresh air with heat recovery, LUNOS e2 60 fan A (pair 1), high in the kerb wall over the dryer, in the locker
     material: "Fan with a ceramic regenerator in a 200 mm sleeve, MERV 13 inner cover, stainless outer hood"
     system: hvac
+    price:
+      - {item: "LUNOS e2 60 short fan with MERV 13 Comfort Screen, a quarter of two kits", aud: 1024.50, basis: listing, converted_from: "USD 1,322 a kit of two", url: "https://475.supply/products/lunos-e-kit", date: 2026-11-20}
+      - {item: "Sound-insulated stainless outer hood", aud: 120, basis: estimate, date: 2026-11-21, note: "Not in the kit price, about USD 75 (est.)"}
     box: [body_x0 + 2880, -half_in, floor_z + 1500, 162, 165, 162]
     mass: {basis: declared, total_kg: 1.2, maturity: estimate, source: "https://cdn.shopify.com/s/files/1/2642/2036/files/TechInfo_e260_E348-02.20.pdf?v=1621935013", note: "Report 19 R19-05 (est.)"}
   - id: VE-01B
     name: Fresh air with heat recovery, LUNOS e2 60 fan B (pair 2), low in the road wall in the sink cabinet
     material: "Fan with a ceramic regenerator in a 200 mm sleeve, MERV 13 inner cover, stainless outer hood"
     system: hvac
+    price:
+      - {item: "LUNOS e2 60 short fan with MERV 13 Comfort Screen, a quarter of two kits", aud: 1024.50, basis: listing, converted_from: "USD 1,322 a kit of two", url: "https://475.supply/products/lunos-e-kit", date: 2026-11-20}
+      - {item: "Sound-insulated stainless outer hood", aud: 120, basis: estimate, date: 2026-11-21}
     zone: inside
     box: [body_x0 + 3180, half_in - 165, floor_z + 150, 162, 165, 162]
     mass: {basis: declared, total_kg: 1.2, maturity: estimate, source: "Report 19 R19-05 (est.)"}
@@ -842,6 +1000,9 @@ items:
     name: Fresh air with heat recovery, LUNOS e2 60 fan C (pair 1), low in the front wall beside the desk, kerb side
     material: "Fan with a ceramic regenerator in a 200 mm sleeve, MERV 13 inner cover, stainless outer hood"
     system: hvac
+    price:
+      - {item: "LUNOS e2 60 short fan with MERV 13 Comfort Screen, a quarter of two kits", aud: 1024.50, basis: listing, converted_from: "USD 1,322 a kit of two", url: "https://475.supply/products/lunos-e-kit", date: 2026-11-20}
+      - {item: "Sound-insulated stainless outer hood", aud: 120, basis: estimate, date: 2026-11-21}
     zone: inside
     box: [in_x0, -800, floor_z + 100, 165, 162, 162]
     mass: {basis: declared, total_kg: 1.2, maturity: estimate, source: "Report 19 R19-05 (est.)"}
@@ -850,18 +1011,23 @@ items:
     name: Fresh air with heat recovery, LUNOS e2 60 fan D (pair 2), low in the front wall beside the desk, road side
     material: "Fan with a ceramic regenerator in a 200 mm sleeve, MERV 13 inner cover, stainless outer hood"
     system: hvac
+    price:
+      - {item: "LUNOS e2 60 short fan with MERV 13 Comfort Screen, a quarter of two kits", aud: 1024.50, basis: listing, converted_from: "USD 1,322 a kit of two", url: "https://475.supply/products/lunos-e-kit", date: 2026-11-20}
+      - {item: "Sound-insulated stainless outer hood", aud: 120, basis: estimate, date: 2026-11-21}
     zone: inside
     box: [in_x0, 638, floor_z + 100, 165, 162, 162]
     mass: {basis: declared, total_kg: 1.2, maturity: estimate, source: "Report 19 R19-05 (est.)"}
   - id: VE-02
     name: LUNOS 5/UNI-FT controller with its humidity sensor, on the 12 V bus
     system: hvac
+    price: {aud: 0, basis: listing, included_in: VE-01A, date: 2026-11-20, note: "Each e2 kit includes a 5/UNI-FT controller. One is used"}
     point: [rear_x0 - 100, -560, ceiling_z - 300]
     mass: {basis: declared, total_kg: 0.5, maturity: estimate, source: "Report 19 R19-06 (est.)"}
   - id: VE-03
     name: Wet room extract, LUNOS RA 15-60 in a 9/R 160 sleeve, high in the rear wall's kerb half, over the toilet
     material: "Radial fan in a 160 mm sleeve with an outer hood"
     system: hvac
+    price: {aud: 700, basis: estimate, url: "https://cdn.shopify.com/s/files/1/2642/2036/files/Installation_Manual_RA_15-60_final.pdf?v=1634725895", date: 2026-11-20}
     zone: inside
     box: [in_x1 - 165, -1015, floor_z + 1688, 165, 162, 162]
     mass: {basis: declared, total_kg: 1.2, maturity: estimate, source: "https://cdn.shopify.com/s/files/1/2642/2036/files/Installation_Manual_RA_15-60_final.pdf?v=1634725895", note: "Report 19 R19-07 (est.)"}
@@ -869,6 +1035,7 @@ items:
     name: Towing and dust-storm pressurisation, Sy-Klone RESPA-CF2 24 V with MERV 16 and carbon filters, in the tower's top cupboard
     material: "Powered precleaner and filter housing (maker)"
     system: hvac
+    price: {aud: 3000, basis: estimate, url: "http://www.sy-klone.com/air-quality-systems/fresh-air-systems/", date: 2026-11-20, note: "Not published. A 24 V motor alone is USD 490 (research report 19)"}
     zone: inside
     box: [bed_x1 + 5, half_in - 450, ceiling_z - 325, 300, 450, 300]
     mass: {basis: declared, total_kg: 6, maturity: estimate, source: "http://www.sy-klone.com/air-quality-systems/fresh-air-systems/", note: "Not published, report 19 R19-08 (est.)"}
@@ -877,12 +1044,16 @@ items:
     name: Parked overpressure fan, 24 V EC radial fan with an ISO coarse prefilter, ePM1 80 % panel and carbon cassette, beside the RESPA
     material: "Sealed aluminium box (est.)"
     system: hvac
+    price: {aud: 350, basis: estimate, date: 2026-11-20, note: "24 V EC fan, sealed box and three filter stages"}
     zone: inside
     box: [bed_x1 + 315, half_in - 350, ceiling_z - 235, 250, 350, 200]
     mass: {basis: declared, total_kg: 2.5, maturity: estimate, source: "Report 19 R19-09 (est.)"}
   - id: VE-06
     name: Pressure relief valve (30 cm2 with a rubber flap, low in the rear wall) and a 0 to 125 Pa cabin pressure gauge
     system: hvac
+    price:
+      - {item: "Body pressure-relief valve under a hood", aud: 40, basis: estimate, date: 2026-11-20}
+      - {item: "0 to 125 Pa differential gauge", aud: 300, basis: estimate, url: "https://sy-klone.com/support/pressure-monitor-installation-guidelines/", date: 2026-11-20}
     point: [in_x1 - 20, -935, floor_z + 140]
     parts:
       - {item: Body pressure-relief valve under a hood, kg: 0.2, basis: estimate, source: "Report 19 R19-10"}
@@ -891,12 +1062,14 @@ items:
     name: Range hood, Sphere TCR-001, two 12 V fans, ducted to a cowl with a backdraft flap in the road wall
     material: "Stainless hood with an aluminium mesh filter, 100 mm duct"
     system: hvac
+    price: {aud: 350, basis: estimate, url: "https://www.coastrv.com.au/products/sphere-range-hood-with-touch-control", date: 2026-11-20, note: "Trade price not published. With its duct and cowl"}
     zone: inside
     box: [bed_x1 + tower_l + 10, half_in - 300, ceiling_z - 450, 600, 300, 120]
     mass: {basis: declared, total_kg: 6, maturity: estimate, source: "https://www.coastrv.com.au/products/sphere-range-hood-with-touch-control", note: "Hood 5 kg, duct and cowl 1 kg (report 19 R19-12, est.)"}
   - id: VE-08
     name: Sensors for the Cerbo GX, three RuuviTags, an NDIR CO2 sensor and a USB Bluetooth adapter
     system: hvac
+    price: {aud: 400, basis: estimate, url: "https://www.victronenergy.com/blog/2022/1/31/venus-os-v2-80", date: 2026-11-20}
     point: [rear_x0 - 700, 0, ceiling_z - 100]
     mass: {basis: declared, total_kg: 0.4, maturity: estimate, source: "Report 19 R19-13 (est.)"}
   # ================================================================ the wet room across the rear, 1,000 x 2,330 mm (H4, H4a, reports 19 and 21)
@@ -904,6 +1077,7 @@ items:
     name: Partition between the living zone and the wet room, 20 mm aluminium honeycomb with an aluminium-skinned wet face, bonded to the tray, walls and ceiling
     material: "20 mm aluminium honeycomb sandwich, aluminium skins, gelcoat wet face (est.)"
     system: wet_room
+    price: {aud: 1300, basis: estimate, url: "https://www.chemical-concepts.com/wp-content/uploads/2023/09/Compocel-AL-TDS.pdf", date: 2026-11-21, note: "4.7 m2 of 20 mm aluminium honeycomb before the door is cut, at about AUD 280/m2, scaled from the bed platform's AUD 338/m2 for 40 mm"}
     zone: inside
     box: [rear_x0, -half_in, floor_z, part_t, 2 * half_in, interior_h]
     mass: {basis: declared, total_kg: 13.3, maturity: estimate, source: "3.51 m2 net of the door at 3.8 kg/m2 (saving 1g, H13)"}
@@ -911,12 +1085,14 @@ items:
   - id: WR-04
     name: Inner door, 620 x 1,850 leaf in the partition, frame, hinges, latch and seal
     system: wet_room
+    price: {aud: 550, basis: estimate, date: 2026-11-21, note: "Leaf from 20 mm honeycomb (about AUD 320), an aluminium frame, hinges, a latch and a seal"}
     point: [rear_x0 + 10, 10, floor_z + 925]
     mass: {basis: declared, total_kg: 8.0, maturity: estimate, source: "Layout study (est.)"}
   - id: WR-01
     name: Wet room floor tray, moulded GRP 1,000 x 2,330 mm, falls 1:60 on an H80 wedge, 100 mm upstands, 30 mm lips at both doors, cove trims
     material: "4 to 5 mm GRP laminate with gelcoat on an H80 foam wedge"
     system: wet_room
+    price: {aud: 1900, basis: estimate, url: "https://innovativecomposites.com.au/", date: 2026-11-20, note: "One-off tray with its plug AUD 1,800 and trims AUD 100 (research report 19)"}
     zone: inside
     hollow: true
     box: [wet_x0, -half_in, floor_z, in_x1 - wet_x0, 2 * half_in, 130]
@@ -927,17 +1103,20 @@ items:
   - id: WR-02
     name: Sand grate at the rear door, stainless linear grate about 600 x 100 mm over a lift-out sand basket
     system: wet_room
+    price: {aud: 150, basis: estimate, date: 2026-11-20}
     point: [in_x1 - 50, rear_door_y0 + rear_door_w / 2, floor_z + 15]
     mass: {basis: declared, total_kg: 2, maturity: estimate, source: "Report 19 R19-25 (est.)"}
   - id: WR-05
     name: Outdoor rinse, Watermarked External Shower Box, hot and cold, on the rear wall beside the rear door's handle side
     system: wet_room
+    price: {aud: 159, basis: listing, url: "https://campervanbuilders.com.au/products/external-shower-box-watermarked-white", date: 2026-11-20}
     point: [in_x1 - 30, 750, floor_z + 150]
     mass: {basis: declared, total_kg: 1.5, maturity: estimate, source: "https://campervanbuilders.com.au/products/external-shower-box-watermarked-white"}
     note: About 1,000 mm above the ground (H4). Non-return valve on each line.
   - id: WR-06
     name: Cassette toilet, Thetford C223-CS, swivel bowl, electric flush, against the kerb wall
     system: wet_room
+    price: {aud: 725, basis: listing, url: "https://www.thetford.com/au/toilets/cassette-toilets/", date: 2026-11-20, note: "Thetford Australia RRP, SKU 200859SP"}
     zone: inside
     box: [wet_x0 + 300, -half_in, floor_z + 30, 394, 580, 534]
     mass: {basis: declared, total_kg: 7.2, maturity: spec, source: "https://www.thetford.com/app/uploads/Overview-and-technical-specifications-cassette-toilets.pdf", note: "Thetford, 7.2 kg (report 21)"}
@@ -946,6 +1125,9 @@ items:
     name: Two spare cassettes, Thetford 50046, in a sealed GRP bin under the basin
     material: "GRP bin with a gasketed lid"
     system: wet_room
+    price:
+      - {item: "Two Thetford 50046 waste holding tanks at AUD 218", aud: 436, basis: listing, converted_from: "GBP 99.96 each before VAT, plus 10 % GST", url: "https://www.jacksonsleisure.com/caravan/motorhome/cassette/toilets/thetford/c220/fresh/up/kit/", date: 2026-11-20}
+      - {item: "Sealed GRP bin", aud: 150, basis: estimate, date: 2026-11-21, note: "Made with the wet room tray"}
     zone: inside
     box: [wet_x0, -half_in, floor_z + 30, 300, 450, 800]
     parts:
@@ -955,6 +1137,14 @@ items:
   - id: WR-08
     name: Bathroom fittings, basin on the partition with its mixer, mirror cabinet, towel rail, the shower's bypass mixer and hand shower, two drains and two membrane traps
     system: wet_room
+    price:
+      - {item: "Rectangular caravan basin, SKU 310221", aud: 91, basis: listing, converted_from: "GBP 41.62 before VAT, plus 10 % GST", url: "https://www.jacksonsleisure.com/caravan-basin-rectangular-385mm-x-285mm-campervan-basin/", date: 2026-11-20}
+      - {item: "Reich basin mixer with a 4 L/min regulator", aud: 150, basis: estimate, url: "https://www.jacksonsleisure.com/caravan-campervan-motorhome/reich-linnea-33mm-mixer-tap-for-campervan-caravan-motorhome-marine/", date: 2026-11-20}
+      - {item: "Shower bypass mixer with hand shower and rail", aud: 150, basis: estimate, date: 2026-11-20}
+      - {item: "Aluminium-framed mirror cabinet", aud: 250, basis: estimate, date: 2026-11-20}
+      - {item: "Stainless double towel rail, 600 mm", aud: 80, basis: estimate, date: 2026-11-20}
+      - {item: "Shower drain with hair strainer AUD 60 and the floor waste AUD 40", aud: 100, basis: estimate, date: 2026-11-20}
+      - {item: "Two membrane odour traps at AUD 32", aud: 64, basis: listing, converted_from: "EUR 18.90 each", url: "https://dauershower.com/store/", date: 2026-11-20}
     zone: inside
     box: [wet_x0, -700, floor_z + 735, 285, 385, 115]
     parts:
@@ -968,6 +1158,7 @@ items:
   - id: WR-09
     name: Recirculating shower, DauerShower 2.0 with its 2.4 kW heater, technical unit in a dry cabinet on the partition's living face, switching unit in the floor well
     system: wet_room
+    price: {aud: 4872, basis: listing, converted_from: "EUR 2,900 with German VAT", url: "https://dauershower.com/produkt/dauershower-2-0/", date: 2026-11-20, note: "Ships from Dresden. Freight is in the import freight line"}
     zone: inside
     box: [rear_x0 - 100, 700, floor_z + 1325, 100, 320, 230]
     mass: {basis: declared, total_kg: 6.0, maturity: estimate, source: "https://dauershower.com/wp-content/uploads/2026/07/DauerShower-Anleitung_DLE.pdf", note: "Technical unit 3.5 kg (maker) plus the switching unit, panel and hoses (est., report 21)"}
@@ -976,12 +1167,14 @@ items:
     name: DauerShower well under the shower drain, sealed and insulated GRP, 300 x 400 x 120 mm below the shower floor, service panel from below
     material: "GRP shell with closed-cell foam insulation"
     system: wet_room
+    price: {aud: 350, basis: estimate, date: 2026-11-21, note: "One-off insulated GRP well with its service panel, made with the wet room tray"}
     box: [wet_x0 + 145, rail_in - 400, floor_underside_z - 80, 300, 400, 110]
     mass: {basis: declared, total_kg: 3, maturity: estimate, source: "Layout study (est., H4a)"}
     note: Between the rails over the grey tank, 67 mm above its top, so the switching unit drains straight down. The wet room floor stays level with the living floor (H4a).
   - id: WR-11
     name: Grey water tote, 40 L wheeled, with hose and camlock, strapped in the shower zone's rear corner for travel
     system: wet_room
+    price: {aud: 150, basis: estimate, url: "https://roustaboutsrvclub.com.au/wp-content/uploads/2022/03/Grey_Water_Tote-article_1.pdf", date: 2026-11-20, note: "Totes cost AUD 50 to 150"}
     zone: inside
     box: [in_x1 - 310, 345, floor_z + 30, 300, 400, 600]
     mass: {basis: declared, total_kg: 3.0, maturity: estimate, source: "https://roustaboutsrvclub.com.au/wp-content/uploads/2022/03/Grey_Water_Tote-article_1.pdf"}
@@ -989,6 +1182,10 @@ items:
   - id: LA-12
     name: Fire extinguisher 1A:20B:(E), fire blanket and smoke alarm, on the tower's aisle-side end facing the entry door
     system: living
+    price:
+      - {item: "Fire extinguisher, 1 kg ABE dry powder, with a metal vehicle bracket", aud: 43.57, basis: listing, url: "https://www.jaybro.com.au/fire-safety/abe-fire-extinguisher-with-metal-vehicle-bracket-and-hose-1kg/", date: 2026-11-20}
+      - {item: "Fire blanket 1.2 x 1.2 m AUD 30 and a photoelectric smoke alarm to AS 3786 AUD 45", aud: 75, basis: estimate, date: 2026-11-20}
+      - {item: "Mounting board", aud: 20, basis: estimate, date: 2026-11-21}
     point: [bed_x1 + tower_l - 10, half_in - kit_d - 20, floor_z + 1000]
     parts:
       - {item: "Fire extinguisher, 1 kg dry powder 1A:20B:(E), with bracket", kg: 2.3, basis: estimate}
@@ -999,12 +1196,21 @@ items:
   - id: LA-15
     name: Carbon monoxide alarm between the tower and the bed, a GPS tracker and door sensors on the Cerbo GX
     system: living
+    price:
+      - {item: "Carbon monoxide alarm to EN 50291", aud: 60, basis: estimate, date: 2026-11-21}
+      - {item: "4G GPS tracker with its own battery", aud: 150, basis: estimate, date: 2026-11-21, note: "The subscription is a running cost"}
+      - {item: "Two door contact sensors on the Cerbo GX inputs", aud: 30, basis: estimate, date: 2026-11-21}
     point: [bed_x1, 0, ceiling_z - 50]
     mass: {basis: declared, total_kg: 0.8, maturity: estimate, source: "Layout study section 7 (est.)"}
     note: The Combi burns diesel inside the tower, so a CO alarm sits in the bed zone. The Cerbo stops the e2 pair 2 while the Combi runs on diesel.
   - id: LA-11X
     name: Cabinetry trims, hinges, catches, drawer runners and small panels
     system: living
+    price:
+      - {item: "Small panels, 1.2 m2 at AUD 96.50/m2", aud: 115.80, basis: rate, url: "https://www.plyonline.com.au/collections/garnica-plywood", date: 2026-11-21}
+      - {item: "Hinges, push-button latches, lift-up stays and fixings", aud: 374, basis: estimate, date: 2026-11-20, note: "12 hinges at AUD 12, 6 latches at AUD 20, 2 stays at AUD 25, fixings AUD 60"}
+      - {item: "Internal angle trim, six 6.5 m lengths at AUD 29.70", aud: 178.20, basis: listing, url: "https://www.diycaravans.com.au/shop/internal-angle-trim-6-5m-pearl-white/", date: 2026-11-20}
+      - {item: "Four pairs of locking drawer runners at AUD 40", aud: 160, basis: estimate, date: 2026-11-21}
     point: [rear_x0 - 900, 200, floor_z + 1000]
     parts:
       - {item: "Small panels, 1.2 m2 at 4.7 kg/m2", kg: 5.6, basis: estimate, source: "Saving 1a, H13"}

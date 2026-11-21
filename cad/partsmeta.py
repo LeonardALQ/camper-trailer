@@ -13,7 +13,7 @@ import re
 from pathlib import Path
 
 FIELDS = ("id", "iid", "name", "group", "system", "material", "mass_kg", "mass_growth_kg", "maturity", "basis",
-          "source", "drawing", "price_aud", "load")
+          "source", "drawing", "price_aud", "price_basis", "price_note", "load")
 
 
 def _r(v):
@@ -60,10 +60,23 @@ def _trailer_drawing(b) -> str:
     return {"chassis": "CT-101", "body": "CT-201", "roof": "CT-201"}.get(b.system, "CT-001")
 
 
+def _price(bs: list, prices: dict) -> dict:
+    """The price of one block or of a whole line's blocks (cad/trailer_costs.py), with its basis and a note."""
+    got = [prices[b.iid] for b in bs if b.iid in prices]
+    if not got:
+        why = "Payload, water and fuel carry no price" if bs[0].load != "tare" else None
+        return dict(price_aud=None, price_basis=None, price_note=why)
+    note = got[0].get("price_note") if len(bs) == 1 else f"The {len(bs)} parts together"
+    return dict(price_aud=round(sum(p["price_aud"] for p in got), 2), price_basis=got[0]["price_basis"], price_note=note)
+
+
 def trailer_lookup(lay, body: dict):
     """Parts of the trailer's models: the layout's blocks by instance id, then by line id (a line with several
-    instances adds them up), and the body's openings, whose mass is in the line each one names (data/body/body.yaml)."""
+    instances adds them up), and the body's openings, whose mass is in the line each one names (data/body/body.yaml).
+    Each block carries its price from the trailer's parts list (cad/trailer_costs.py)."""
     from .trailer import SYSTEM_LABELS
+    from .trailer_costs import block_prices
+    prices = block_prices(lay.blocks)
     by_iid = {b.iid: b for b in lay.blocks}
     lines: dict[str, list] = {}
     for b in lay.blocks:
@@ -78,12 +91,14 @@ def trailer_lookup(lay, body: dict):
                 id=b.id, iid=key, name=b.name + (f" ({len(bs)} parts together)" if len(bs) > 1 else ""),
                 group=SYSTEM_LABELS[b.system], system=b.system, material=b.material,
                 mass_kg=_r(sum(x.mass_kg for x in bs)), mass_growth_kg=_r(sum(x.mass_kg * (1 + x.growth) for x in bs)),
-                maturity=b.maturity, basis=b.basis, source=b.source, drawing=_trailer_drawing(b), price_aud=None, load=b.load)
+                maturity=b.maturity, basis=b.basis, source=b.source, drawing=_trailer_drawing(b), load=b.load,
+                **_price(bs, prices))
         o = openings.get(key)
         if o:
             return dict(id=o["id"], iid=o["id"], name=f"{o['name']}, {o['wall']} wall, cut-out {o['w']:.0f} x {o['h']:.0f} mm",
                         group="Body", system="body", source=f"Its mass is in line {o['line']}" if o.get("line") else "A cut-out in the wall panel",
-                        drawing="CT-201", load="tare")
+                        drawing="CT-201", load="tare",
+                        price_note=f"A cut-out, priced with line {o['line']}" if o.get("line") else "A cut-out in the wall panel")
         return None
     return meta
 

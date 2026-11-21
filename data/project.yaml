@@ -1,4 +1,4 @@
-# Leonard's figures for the whole project, AUD including GST (conductor's rulings, 20 Nov 2026).
+# Leonard's figures for the whole project, AUD including GST (20 Nov 2026).
 # The car build page compares its totals with car_build.budget_aud, and the home page's cost table reads every part
 # from here and from the parts lists (cad/sitedata.py, project_costs). cad/tests/test_costs.py checks that
 # data/vehicle/vehicle-parts.yaml and VEHICLE.md quote the same figures and that the cost table adds up.
@@ -13,10 +13,9 @@ car_build:
 bike_box:
   parts_list: data/ute/box-parts.yaml
   basis: "Every line of the box's parts list with its contingency. Owner-built leaves out the shop's fabrication labour"
-# The trailer shows pending in the cost table while parts_list is null. To price it, name a list in the bike box list's
-# format (lines with price: {aud: ...} and totals: {contingency_pct: ...}), point link at the page that shows it, and
-# the row and the total work themselves out from its lines.
+# The trailer's row works itself out from its parts list: the lines of the mass schedule with their prices, and the
+# stock, labour, installation, compliance and freight lines in data/trailer-parts.yaml (cad/trailer_costs.py).
 trailer:
-  parts_list: null
-  link: /trailer/#every-line
-  basis: "No prices yet. The trailer's lines have masses only (the mass schedule) until the trailer worker adds prices"
+  parts_list: data/trailer-parts.yaml
+  link: /trailer/#parts-list
+  basis: "Every line of the trailer's parts list with its contingency, 10 % on listed prices and 20 % on rates and estimates. Owner-built leaves out the hired labour"

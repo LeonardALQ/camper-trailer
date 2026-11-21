@@ -1,0 +1,122 @@
+---
+// The trailer's priced parts list (data/trailer-parts.yaml with the priced lines of data/assemblies/trailer.yaml and
+// data/chassis/chassis.yaml), copied to src/data/generated/trailer-parts.json by cad/sitedata.py with its totals
+// worked out from the lines (cad/trailer_costs.py).
+import t from '../data/generated/trailer-parts.json';
+
+interface Props {
+  kind: 'lines' | 'groups' | 'totals' | 'biggest' | 'notin';
+}
+const { kind } = Astro.props;
+const r: any = t;
+const T = r.totals;
+const n = (v: number | null | undefined, d = 0) =>
+  v == null ? '' : v.toLocaleString('en-AU', { minimumFractionDigits: d, maximumFractionDigits: d });
+const host = (u: string) => {
+  try {
+    return new URL(u).hostname.replace('www.', '');
+  } catch {
+    return u;
+  }
+};
+const label = (g: string) => r.group_labels[g] ?? g.replace(/_/g, ' ');
+const pct = T.contingency_pct;
+const basis = (ln: any) => {
+  const p = ln.price;
+  if (ln.parts && new Set(ln.parts.map((x: any) => x.basis)).size > 1) return `mixed, mostly ${p.basis}`;
+  return p.converted_from ? `${p.basis}, converted from ${p.converted_from}` : p.basis;
+};
+const detail = (ln: any) => {
+  const bits: string[] = [];
+  if (ln.parts) {
+    bits.push(ln.parts.map((x: any) =>
+      `${x.item} ${n(x.aud, 2)} (${x.basis}${x.converted_from ? `, from ${x.converted_from}` : ''})`).join('. '));
+  }
+  if (ln.price.included_in) bits.push(`In the price of ${ln.price.included_in}`);
+  if (ln.price.note) bits.push(ln.price.note);
+  if (ln.covers?.length) bits.push(`Shared by mass over ${ln.covers.join(', ')}`);
+  if (ln.load && ln.load !== 'tare') bits.push('The load itself is not priced');
+  return bits.join('. ');
+};
+const urls = (ln: any) => {
+  const list = ln.parts ? ln.parts.map((x: any) => x.url).filter(Boolean) : ln.price.url ? [ln.price.url] : [];
+  return [...new Set(list)] as string[];
+};
+const groups = Object.keys(T.by_group);
+const biggest = [...r.lines].sort((a: any, b: any) => b.price.aud - a.price.aud).slice(0, 10);
+---
+
+{kind === 'lines' && (
+  <div class="data-table">
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Item</th><th>Group</th><th class="num">Qty</th><th>Unit</th><th class="num">kg</th>
+          <th class="num">AUD</th><th class="num">Contingency AUD</th><th>Basis</th><th>Checked</th><th>Parts and notes</th><th>Source</th></tr>
+      </thead>
+      <tbody>
+        {r.lines.map((x: any) => (
+          <tr>
+            <td>{x.id}</td><td>{x.name}</td><td>{label(x.group)}</td>
+            <td class="num">{n(x.qty, Number.isInteger(x.qty) ? 0 : 1)}</td><td>{x.unit}</td><td class="num">{n(x.mass_kg, 2)}</td>
+            <td class="num">{n(x.price.aud, 2)}</td><td class="num">{n(x.contingency_aud, 2)}</td><td>{basis(x)}</td>
+            <td>{x.price.date}</td><td>{detail(x)}</td>
+            <td>{urls(x).map((u, i) => (<>{i > 0 && ', '}<a href={u}>{host(u)}</a></>))}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'groups' && (
+  <div class="data-table">
+    <table>
+      <thead><tr><th>Group</th><th class="num">Lines</th><th class="num">AUD</th><th class="num">Contingency AUD</th><th class="num">With contingency AUD</th></tr></thead>
+      <tbody>
+        {groups.map((g) => (
+          <tr><td>{label(g)}</td><td class="num">{r.lines.filter((x: any) => x.group === g).length}</td>
+            <td class="num">{n(T.by_group[g], 2)}</td><td class="num">{n(T.contingency_by_group[g], 2)}</td>
+            <td class="num">{n(T.by_group[g] + T.contingency_by_group[g], 2)}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'totals' && (
+  <div class="data-table" data-sheet="off">
+    <table>
+      <thead><tr><th>Total</th><th>What it is</th><th class="num">AUD</th></tr></thead>
+      <tbody>
+        <tr><td>Subtotal</td><td>Every line below, {T.lines} lines</td><td class="num">{n(T.subtotal_aud, 0)}</td></tr>
+        <tr><td>Contingency</td><td>{pct.listing} % of listed and quoted prices and {pct.estimate} % of rates and estimates, {n(100 * T.contingency_aud / T.subtotal_aud, 1)} % overall</td><td class="num">{n(T.contingency_aud, 0)}</td></tr>
+        <tr class="row-total"><td>Total</td><td>Built with hired labour</td><td class="num">{n(T.total_aud, 0)}</td></tr>
+        <tr><td>Owner-built</td><td>Without the hired labour and its contingency, AUD {n(T.owner_built_left_out_aud, 0)}</td><td class="num">{n(T.owner_built_total_aud, 0)}</td></tr>
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'biggest' && (
+  <div class="data-table" data-sheet="off">
+    <table>
+      <thead><tr><th>ID</th><th>Item</th><th class="num">AUD</th><th>Basis</th></tr></thead>
+      <tbody>
+        {biggest.map((x: any) => (<tr><td>{x.id}</td><td>{x.name}</td><td class="num">{n(x.price.aud, 0)}</td><td>{basis(x)}</td></tr>))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'notin' && (
+  <div class="data-table" data-sheet="off">
+    <table>
+      <thead><tr><th>Not in the total</th><th class="num">AUD</th><th>Why</th><th>Source</th></tr></thead>
+      <tbody>
+        {r.not_in_total.map((x: any) => (
+          <tr><td>{x.name}</td><td class="num">{n(x.aud, 0)}</td><td>{x.note}</td><td>{x.url ? <a href={x.url}>{host(x.url)}</a> : ''}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
