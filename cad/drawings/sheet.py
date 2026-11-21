@@ -20,6 +20,10 @@ except ImportError:  # pragma: no cover
     from build123d.topology.utils import downcast
 
 GAP, EXT, TXT = 1.0, 2.0, 2.5  # projection-line gap and overshoot, dimension text height (mm)
+FONT, PNG_PX = "DejaVu Sans", 3508
+# REV-01's columns, their left edges from the table's left edge (mm), its text height and each cell's inset
+REV_COLS = (("REV", 0.0), ("DATE", 10.0), ("DESCRIPTION", 30.0), ("DRAWN", 120.0), ("CHECKED", 140.0), ("APPROVED", 160.0))
+REV_W, REV_TEXT, REV_PAD = 180.0, 1.9, 1.0
 
 
 # ------------------------------------------------------------------ hidden-line removal
@@ -155,6 +159,48 @@ class Sheet:
                 f'viewBox="0 0 {self.W:g} {self.H:g}">\n'
                 f'<rect x="0" y="0" width="{self.W:g}" height="{self.H:g}" fill="#fff"/>\n'
                 + "\n".join(self.el) + "\n</svg>\n")
+
+
+_METRICS: dict = {}
+
+
+def text_mm(s, size, bold=False) -> float:
+    """A text's advance on the sheet, mm, in the font CairoSVG draws it with: the wider of the PDF's unhinted metrics and
+    the PNG's at its pixel size."""
+    import cairocffi
+    out = 0.0
+    for png in (False, True):
+        c = _METRICS.get((png, bold))
+        if c is None:
+            if png:
+                c = cairocffi.Context(cairocffi.ImageSurface(cairocffi.FORMAT_ARGB32, 1, 1))
+                c.scale(PNG_PX / Sheet.W, PNG_PX / Sheet.W)
+            else:
+                c = cairocffi.Context(cairocffi.RecordingSurface(cairocffi.CONTENT_COLOR_ALPHA, None))
+            c.select_font_face(FONT, cairocffi.FONT_SLANT_NORMAL, cairocffi.FONT_WEIGHT_BOLD if bold else cairocffi.FONT_WEIGHT_NORMAL)
+            _METRICS[(png, bold)] = c
+        c.set_font_size(size if png else 100.0)
+        out = max(out, c.text_extents(str(s))[4] * (1.0 if png else size / 100.0))
+    return out
+
+
+def wrap_mm(s, width, size, bold=False) -> list[str]:
+    """Words into lines no wider than `width` mm at `size`."""
+    out, cur = [], ""
+    for w in str(s).split():
+        if cur and text_mm(cur + " " + w, size, bold) > width:
+            out.append(cur)
+            cur = w
+        else:
+            cur = (cur + " " + w).strip()
+    return out + ([cur] if cur else [])
+
+
+def rev_room(col: str) -> float:
+    """The width a REV-01 cell's text may take, mm: the column less its inset at both sides."""
+    edges = [x for _, x in REV_COLS] + [REV_W]
+    i = [c for c, _ in REV_COLS].index(col)
+    return edges[i + 1] - edges[i] - 2 * REV_PAD
 
 
 # ------------------------------------------------------------------ views
@@ -418,11 +464,11 @@ def revision_table(sh, revisions, x0=230.0, x1=410.0, ytop=287.0, max_rows=7):
     sh.rect(x0, yb, x1, ytop, "medium")
     sh.text(x0 + 2, ytop - 3.6, "REVISIONS (REV-01)", 2.2, bold=True)
     sh.line(x0, ytop - 5, x1, ytop - 5)
-    cols = [(x0, "REV"), (x0 + 10, "DATE"), (x0 + 30, "DESCRIPTION"), (x0 + 120, "DRAWN"), (x0 + 140, "CHECKED"), (x0 + 160, "APPROVED")]
+    cols = [(x0 + dx, labl) for labl, dx in REV_COLS]
     for cx, labl in cols:
         if cx != x0:
             sh.line(cx, yb, cx, ytop - 5)
-        sh.text(cx + 1, ytop - 8.6, labl, 1.7)
+        sh.text(cx + REV_PAD, ytop - 8.6, labl, 1.7)
     sh.line(x0, ytop - 10, x1, ytop - 10)
     for i, r in enumerate(revisions):
         y = ytop - 13.8 - i * 5
@@ -430,7 +476,7 @@ def revision_table(sh, revisions, x0=230.0, x1=410.0, ytop=287.0, max_rows=7):
             sh.line(x0, ytop - 10 - 5 * i, x1, ytop - 10 - 5 * i)
         vals = [r["rev"], r["date"], r["description"], r["drawn"], r["checked"] or "-", r["approved"] or "-"]
         for (cx, _), v in zip(cols, vals):
-            sh.text(cx + 1, y, v, 1.9)
+            sh.text(cx + REV_PAD, y, v, REV_TEXT)
     return yb
 
 

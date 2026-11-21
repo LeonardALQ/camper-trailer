@@ -1116,8 +1116,9 @@ def overturn(lay: Layout, ev: dict, st: dict, sil: dict, mzcat: float, basis: st
 
 
 def _anchor_txt(a: dict, td: dict) -> str:
-    """STB-05's sentences for the kit's anchor (F5-01): the product, the installation its listing tested, its listed loads
-    in HUD's soil classes, quoted term by term from 24 CFR 3285.202's table, and the probe value the soil must read."""
+    """STB-05's sentences for the kit's anchor (F5-01, F6-01): the product, the installation its listing tested, the plate
+    the kit takes for the listing's device, its listed loads in HUD's soil classes, quoted term by term from 24 CFR
+    3285.202's table, and the probe value the soil must read."""
     cl = td["hud_classes"]
 
     def q(c):
@@ -1126,10 +1127,14 @@ def _anchor_txt(a: dict, td: dict) -> str:
 
     lo, hi = cl[a["soil_class"]]["probe_inlb"]
     name, _, spec = a["name"].partition(", ")
-    return (f"Each anchor is a {name} ({spec}), installed as {a['listing']} tested it: wound in at a {a['back_angle_deg']:g} degree back "
-            f"angle to its full depth, its head at the ground and its helix about {a['helix_mm'] / 1000:.2f} m down, with {a['plate']} "
-            f"driven vertically on the trailer side of its rod, and pulled at no less than the listing's {a['min_angle_deg']:g} degree minimum "
-            f"angle. The listing rates it at {a['wll_lb']:,} lb ({a['wll_n'] / 1000:.1f} kN) working and {a['ultimate_lb']:,} lb "
+    model = spec.split(",")[0].split()[-1]
+    return (f"Each anchor is a {name} ({spec}), installed as {a['listing']} tested it: wound into undisturbed soil, never dug in and "
+            f"backfilled, at a {a['back_angle_deg']:g} degree back angle to its full depth, its head at the ground and its helix about "
+            f"{a['helix_mm'] / 1000:.2f} m down, with {a['plate']} driven vertically on the trailer side of its rod, and pulled at no less "
+            f"than the listing's {a['min_angle_deg']:g} degree minimum angle. The listing's Table 1 names stabilizer {a['listed_plate']} for "
+            f"the {model}. The kit takes the {a['plate_no']}, which Tie Down's anchor chart and plate sheet give for the {name.split()[-1]}, "
+            f"on the assumption that it is the listing's device under its catalogue number, and Tie Down confirms it in writing before the "
+            f"plates are bought (TRAILER.md, open points). The listing rates it at {a['wll_lb']:,} lb ({a['wll_n'] / 1000:.1f} kN) working and {a['ultimate_lb']:,} lb "
             f"({a['ultimate_n'] / 1000:.1f} kN) ultimate in HUD's class {a['soil_class']}, {q(a['soil_class'])}, {lo} to {hi} in-lb on the "
             f"torque probe, and in the firmer classes. It works at {a['util']:.2f} of its working load, a factor of {a['factor']:.2f} on its "
             f"ultimate. The soil is measured, not judged: {td['probe']}, driven to the helix depth, must read at least {a['min_probe_inlb']} "

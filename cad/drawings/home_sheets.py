@@ -19,7 +19,7 @@ from ..trailer import _kg
 from ..trailer_model import TrailerModel
 from . import sheet as S
 from .home_common import (MARK, Proj, body_plan, cog_symbol, ctx, label_in, stamp, textblock, title, tw,
-                          water_without_gcm_revision, wrap, write)
+                          water_without_gcm_revision, write)
 from .sheets import _leaves
 
 
@@ -331,9 +331,9 @@ def ct003(prj, model, bom, checks, reg, dwg):
     water_fb = water_without_gcm_revision(rep)
     aw = C["res"]["awning"]
     ot = chk["STB-04"]["overturn"]
-    ot_low = min(ot["cases"], key=lambda q: q["v"])
     td_case = chk["STB-05"]["tie_down"]["cases"][0]
     an = td_case["anchors"][0]
+    ang, sa, pg = td_case["angles"], an["set_above_mm"], an["plate_gap_mm"]
     lines = [
         ("WATER IN TRAVEL (H13)", f"AT MOST {V['water_travel_l']:.0f} L OF FRESH AND GREY WATER WHILE TOWING. FILL THE TANKS AT CAMP (420 L NET)."),
         ("WITHOUT THE GCM REVISION", f"IF LOVELLS' {lim['gcm_kg']:,.0f} kg GCM REVISION (GV06) IS REFUSED, TOYOTA'S {gcm['toyota_kg']:,.0f} kg HOLDS WITH THE "
@@ -350,35 +350,42 @@ def ct003(prj, model, bom, checks, reg, dwg):
         ("GREY WATER", f"EMPTY FOR TRAVEL. A FULL {V['grey_full_l']:.0f} L TANK IS CHECKED IN CASES TC7 AND TC8."),
         ("AWNING (BDY-11, BDY-23)", f"CLOSE THE AWNING IN WIND, LEGS PEGGED: PEG THE LEGS WHENEVER IT IS OUT, AND CLOSE IT BEFORE GUSTS REACH "
                                     f"{aw['close_kmh']:.0f} km/h AND WHENEVER THE TRAILER IS LEFT. SET THE LEGS FOR A {aw['pitch_deg']:.0f} DEGREE FALL."),
-        ("PARKED IN WIND (H23, STB-04, STB-05)", f"UNHITCHED ON ITS STEADIES THE TRAILER SLIDES ON WET GRASS IN A "
-                                         f"{min(q['v_slide'] for q in ot['cases']):.0f} m/s GUST AT TARE AND TIPS IN A {ot_low['v']:.0f} m/s GUST. AT A "
-                                         f"FORECAST GUST OF {ot['act_kmh']:.0f} km/h OR MORE (A BUREAU WARNING OF DAMAGING WINDS, {ot['warning_kmh']:.0f} km/h, "
-                                         "ALWAYS IS ONE), CLOSE THE AWNING, AND HITCH THE TRAILER TO THE UTE, STRAP IT DOWN AT ITS FOUR LASHING POINTS OR "
-                                         "MOVE IT. THE TIE-DOWN KIT RIDES IN THE UTE WHILE TOWING AND STAYS WITH THE TRAILER WHENEVER THE UTE IS UNHITCHED "
-                                         f"FOR MORE THAN A DAY: FOUR STRAPS, FOUR {an['name'].split(',')[0].upper()} ANCHORS WITH THEIR STABILIZER PLATES AND A "
-                                         f"SOIL TEST PROBE. SET EACH ANCHOR AS ITS LISTING TESTED IT: A {an['back_angle_deg']:g} DEGREE BACK ANGLE, FULL DEPTH, "
-                                         f"THE PLATE ON THE TRAILER SIDE, THE STRAP AT {min(td_case['angles']):g} TO {max(td_case['angles']):g} DEGREES. THE "
-                                         f"PROBE AT THE HELIX DEPTH, {an['helix_mm'] / 1000:.1f} m, MUST READ {an['min_probe_inlb']} in-lb OR MORE, OR HITCH IT "
-                                         "OR MOVE IT. NO STAYS IN CYCLONIC "
-                                         "REGIONS C AND D FROM NOVEMBER TO APRIL."),
+        ("PARKED IN WIND (H23, STB-04, STB-05)", f"AT A FORECAST GUST OF {ot['act_kmh']:.0f} km/h OR MORE (A BUREAU WARNING OF DAMAGING WINDS, "
+                                         f"{ot['warning_kmh']:.0f} km/h, ALWAYS IS ONE), CLOSE THE AWNING, AND HITCH THE TRAILER TO THE UTE, STRAP IT DOWN "
+                                         "AT ITS FOUR LASHING POINTS OR MOVE IT. NO STAYS IN CYCLONIC REGIONS C AND D FROM NOVEMBER TO APRIL. THE TIE-DOWN "
+                                         "KIT RIDES IN THE UTE WHILE TOWING AND STAYS WITH THE TRAILER WHENEVER THE UTE IS UNHITCHED FOR MORE THAN A DAY: "
+                                         f"FOUR STRAPS, FOUR {an['name'].split(',')[0].upper()} ANCHORS, FOUR {an['plate_no']} STABILIZER PLATES AND A SOIL "
+                                         "TEST PROBE."),
+        ("SETTING EACH ANCHOR (STB-05)", [
+            f"1. PROBE WHERE THE ANCHOR GOES, TO THE HELIX DEPTH, {an['helix_mm'] / 1000:.1f} m. LESS THAN {an['min_probe_inlb']} in-lb: "
+            "HITCH THE TRAILER OR MOVE IT.",
+            f"2. WIND THE ANCHOR INTO UNDISTURBED SOIL AT A {an['back_angle_deg']:g} DEGREE BACK ANGLE TO ABOUT 2/3 DEPTH, "
+            f"{sa[0]} TO {sa[1]} mm ({an['set_above_in'][0]} TO {an['set_above_in'][1]} in) LEFT ABOVE GROUND.",
+            f"3. DRIVE THE PLATE VERTICALLY ON THE TRAILER SIDE OF THE ROD, {pg[0]} TO {pg[1]} mm ({an['plate_gap_in'][0]} TO "
+            f"{an['plate_gap_in'][1]} in) FROM IT.",
+            "4. WIND THE ANCHOR TO FULL DEPTH, ITS HEAD AT THE GROUND.",
+            f"5. TENSION THE STRAP AT {min(ang):g} TO {max(ang):g} DEGREES, CHECKED ALONG IT WITH AN ANGLE FINDER, UNTIL THE ROD "
+            "BEARS ON THE PLATE.",
+            "NEVER DIG A HOLE AND BACKFILL IT: TIE DOWN PAIRS THAT WITH A LOAD TEST IN LOOSE SOIL. "
+            f"STEPS FROM TIE DOWN'S MANUAL, {an['steps_src'].upper()}."]),
     ]
     yy = yb - 13
     top = yb - 4
     sh.text(232, yb - 8.5, "OPERATING LIMITS (FOR THE PLATE, THE OWNER'S MANUAL AND THE INSPECTOR)", 2.2, bold=True)
     for head, body in lines:
         sh.text(232, yy, head, 1.4, bold=True)
-        wl = wrap(body, 112)
+        wl = [t for p in ([body] if isinstance(body, str) else body) for t in S.wrap_mm(p, 410 - 2 - 270, 1.4)]
         for i, t in enumerate(wl):
             sh.text(270, yy - i * 2.2, t, 1.4)
         yy -= 2.2 * max(1, len(wl)) + 1.2
     sh.rect(230, yy + 0.4, 410, top, "thick")
     yp = yy - 6
     sh.text(232, yp, "VEHICLE PLATE (VSB1 13.1.1)", 2.2, bold=True)
-    yq = textblock(sh, 232, yp - 4, wrap(
+    yq = textblock(sh, 232, yp - 4, S.wrap_mm(
         "MAKE (CONCESSIONAL TRAILER), VIN, ATM, GTM AND TARE, EMBOSSED, ETCHED OR ENGRAVED IN BLOCK LETTERS AT LEAST 2.5 mm HIGH, "
         "MATCHING THE RAV ENTRY. NSW ALSO LOOKS FOR THE MODEL AND THE DATE OF MANUFACTURE (VIB 78). THE GTM TO PLATE IS SET WITH THE "
         f"ENGINEER, AT MOST THE NSW CAP OF {rep['caps']['gtm']:,.0f} kg. THE PLATE AND VIN POSITIONS ARE NOT DESIGNED YET. PHOTOGRAPH "
-        "THE VIN STAMPING BEFORE AND AFTER GALVANISING (REG-02).", 150), size=1.4, gap=0.85)
+        "THE VIN STAMPING BEFORE AND AFTER GALVANISING (REG-02).", 410 - 2 - 232, 1.4), size=1.4, gap=0.85)
     yn, _ = S.notes(sh, 232, yq - 4, [
         "EVERY FIGURE ON THIS SHEET COMES FROM THE MODEL'S CHECKS (data/checks.yaml, data/ute/ute.yaml) AT THE SOLVED AXLE.",
         "A RESULT IN AMBER IS A QUESTION FOR THE INSPECTOR. NO CHECK FAILS.",

@@ -225,13 +225,14 @@ stability:
     friction: 0.35           # tyres and steadies on wet grass (est.), for sliding (F3-03)
     # STB-05 (F3-03, F4-03, F5-01): four lashing points under the outrigger ends (CH-B02) take ratchet straps down and out
     # to ground anchors installed as their listing tested them, by 24 CFR 3285.402(b)(8)(iii)'s stabilizer plate method:
-    # wound in at a back angle to full depth, the head at the ground, a stabilizer plate driven vertically on the trailer
-    # side of the rod, and the strap at no less than the listing's minimum angle of pull. The windward pair holds the
+    # wound into undisturbed soil, never dug in and backfilled (F6-01), at a back angle to full depth, the head at the
+    # ground, a stabilizer plate driven vertically on the trailer side of the rod, and the strap at no less than the
+    # listing's minimum angle of pull. The windward pair holds the
     # trailer against tipping and, with the friction, sliding. A torque probe at the helix depth measures the soil. Below
     # the anchor's minimum probe value, or where it will not wind in to full depth, the trailer is hitched or moved
     tie_down:
       v_r_ms: 57             # region B's 500-year regional wind (AS/NZS 1170.2 Table 3.1), times Mz,cat 0.91 at 3 m
-      angle_deg: [45, 50]    # the strap to the ground, never under the listing's 45 degrees: the head 610 to 710 mm out from the point under the lashing point on level ground, inside the 602 to 717 mm the angles give at 717 mm up
+      angle_deg: [48, 55]    # the strap to the ground, set and checked along the strap with an angle finder, 3 degrees clear of the listing's 45 degree minimum so that ground slope and the trailer's ride height cannot take a field setting under it (F6-02): the head 502 to 646 mm out from the point under the lashing point on level ground, at 717 mm up
       lug_y_mm: 1170         # the lashing point under the outrigger's end
       lug_z_mm: 717
       strap_lc_n: 24500      # 50 mm ratchet strap, lashing capacity 2,500 kg (AS/NZS 4380, est.)
@@ -242,12 +243,17 @@ stability:
       # RADCO listing #1349 for Tie Down Engineering (issued December 2013, renewed September 2019), Table 1, printed in
       # Tie Down's manufactured housing installation manual, pp. 20 and 21: working and ultimate loads at the listed
       # minimum angle of pull to the horizontal, in the listed soil class and the firmer ones, with the listed stabilizer.
-      # The back angle and the plate's place are Tie Down's instructions (pp. 6 and 9). The minimum probe value is the
-      # higher of HUD's floor for the class, 175 in-lb, and the Missouri Public Service Commission's list for the M607
+      # The back angle, the height left above ground before the plate goes in, the plate's place and the pretension are Tie
+      # Down's steps (pp. 4, 6 and 9). The minimum probe value is the higher of HUD's floor for the class, 175 in-lb, and the
+      # Missouri Public Service Commission's list for the M607. Table 1 names stabilizer No 59285 for the M607, and Tie
+      # Down's anchor chart (p. 5) and plate sheet (p. 9) give the 59286 for the 59099: taken as the same device, to be
+      # confirmed by Tie Down in writing before the plates are bought (F6-01)
       anchors:
         - {name: "Tie Down Engineering 59099, model M607, 3/4 in rod, 60 in, one 7 in helix, galvanized", per_strap: 1,
            wll_n: 17446, ultimate_n: 26169, wll_lb: 3922, ultimate_lb: 5883, min_angle_deg: 45, soil_class: "4B",
            rod_mm: 1524, back_angle_deg: 10, min_probe_inlb: 225, kg: 4.0,
+           set_above_mm: [355, 405], set_above_in: [14, 16], plate_gap_mm: [75, 100], plate_gap_in: [3, 4], listed_plate: "No 59285",
+           plate_no: "59286", steps_src: "pp. 4, 6 and 9",
            plate: "a Tie Down 59286 stabilizer plate (17-1/2 x 13-1/2 in, 12 gauge galvanized steel)",
            listing: "RADCO's listing #1349", src: "https://irp.cdn-website.com/871418b2/files/uploaded/Tie_Down_Anchor_Installation_Manual.pdf", probe_src: "https://psc.mo.gov/CMSInternetData/ManufacturedHousing/Anchoring%20Companies%20and%20Systems/Tie%20Down%20Engineering.pdf"}
       probe: "Tie Down's 59200 soil test probe"

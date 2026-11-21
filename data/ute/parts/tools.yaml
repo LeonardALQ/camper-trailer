@@ -38,12 +38,12 @@ parts:
           basis: "In the two chests, as U-TOOLS"}
   U-ANCHORS:
     name: Trailer ground anchors
-    product: "Four Tie Down Engineering 59099 ground anchors (model M607, 3/4 in rod, 60 in, one 7 in helix), four Tie Down 59286 stabilizer plates, 17-1/2 x 13-1/2 in, Tie Down's 59200 Soil Test Probe Kit (the probe, a torque wrench, its adapter and a case) and a 900 mm turning bar, in a bag with two 25 mm ratchet straps to lash it down"
+    product: "Four Tie Down Engineering 59099 ground anchors (model M607, 3/4 in rod, 60 in, one 7 in helix), four Tie Down 59286 stabilizer plates, 17-1/2 x 13-1/2 in, Tie Down's 59200 Soil Test Probe Kit (the probe, a torque wrench and its adapter, the kit's case left at home) and a 900 mm turning bar, in a bag with two 25 mm ratchet straps to lash it down"
     maker: Tie Down Engineering
     qty: 1
     unit: set
     mass: {basis: declared, total_kg: 38.6, maturity: estimate, source: "The 59099 about 4.0 kg each from its rod's steel and the 30 in model's 4.79 lb listed weight, the 59286 plate about 3.4 kg each from 12 gauge steel, the probe kit about 4.5 kg, the bar 3.5 kg and the bag with its straps 1.0 kg (estimates). Priced with the trailer's lashing points, CH-B02"}
     payload: true
-    notes: STB-05 checks them at their listed working load as installed with their plates (F5-01). Too long for the chests, so they ride in their bag on the box floor between the bikes, the plates flat in its base, lashed to the L-track either side with two 25 mm ratchet straps of LC 250 kg (est.) and loaded last through the rear doors (T2, F5-05). They stay with the trailer, with the straps, whenever the ute is unhitched for more than a day.
+    notes: STB-05 checks them at their listed working load as installed with their plates (F5-01). Too long for the chests, so they ride in their bag, about 1,760 x 345 x 230 mm (est.), on the box floor between the bikes, the anchors staggered along it so that no rod passes a neighbour's helix, the plates flat in its base and the probe and the torque wrench out of the kit's 65 in case, which stays home. Two 25 mm ratchet straps of LC 250 kg (est.) lash the bag to the L-track either side, and it is loaded last through the rear doors (T2, F5-05, F6-03). They stay with the trailer, with the straps, whenever the ute is unhitched for more than a day.
     geometry: {generator: box, params: {}}
     color: "#636e72"
