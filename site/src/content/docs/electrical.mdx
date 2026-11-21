@@ -1,0 +1,75 @@
+---
+title: Electrical
+description: The home trailer's 48 V system, its energy budget on the design days, the battery's autonomy against decision H3, the recharge sources, the circuits and the load-shedding order.
+---
+
+import Services from '../../components/Services.astro';
+import s from '../../data/generated/services.json';
+import { withBase } from '../../lib/url';
+
+export const A = s.autonomy;
+export const n = (v, d = 0) => v.toLocaleString('en-AU', { minimumFractionDigits: d, maximumFractionDigits: d });
+
+The trailer runs at 48 V. Research report 20 chose the parts and models every load minute by minute through four
+design days (`research/models/20/energy.py`). The tables on this page come from that model's output, so they follow
+it when it is rerun. The parts and their prices are in the <a href={withBase('/trailer/#parts-list')}>trailer's parts list</a>.
+
+- Battery: five Victron Lithium NG 51.2 V 100 Ah modules, 25.6 kWh, upright in a sealed, lined box that forms the
+  plinth under the washer and the dryer. It vents outside and has a heat detector, as AS/NZS 3001.2 asks for a
+  battery inside the body.
+- Board: a Lynx Smart BMS NG and a Lynx Distributor, a MultiPlus-II 48/6k5 inverter-charger for the 230 V circuits,
+  two Orion-Tr 48/12-30 for the 12 V bus, two Orion-Tr 48/24-16 for the 24 V bus, and a Cerbo GX MK2 that runs the
+  load rules and shows them on its touch screen beside the entry door.
+- Charging: four Sunman eArc 430 W panels on two SmartSolar MPPT 150/35, two Orion-Tr Smart 12/48-8 chargers in the
+  ute (car build line TC01), two Honda EU22i in parallel, and a 15 A shore inlet.
+
+## Drawings
+
+<Services kind="drawing" number="CT-601" title="Electrical single-line diagram" />
+
+<Services kind="drawing" number="CT-602" title="Electrical layout" />
+
+## Energy budget
+
+Each design day's energy by load group. A 230 V load counts at the inverter's output and a DC load at its own bus,
+and the conversion losses are a group of their own, so each column adds up to the energy taken from the battery.
+The hot day runs everything at once: the air-conditioning, two 20 min showers, the hob and a 45 min bake, a wash and
+dry, desk work and Starlink. The cold day heats on diesel as designed, or on the heat pump. The last row is the
+model's own total, and the rows are rounded.
+
+<Services kind="energy" />
+
+## Autonomy
+
+Decision H3 asks the battery alone, with no sun, generator or shore power, to run a design hot day for 24 h when new
+and for 12 h at end of life, with 90 % of the nominal capacity usable. The installed bank runs the all-electric hot
+day for {n(A.hours_new, 1)} h when new and {n(A.hours_end_of_life, 1)} h at end of life, from full and at the worst
+starting hour.
+
+<Services kind="autonomy" />
+
+## Recharge
+
+What each source puts back after one all-electric design hot day. The generators are the third source, after the sun
+and the drive.
+
+<Services kind="recharge" />
+
+## Circuits and load shedding
+
+Every 230 V circuit has its own 30 mA RCBO, and the board is labelled as inverter-supplied. The shower heater sheds
+first, so cooking keeps priority, and the split never sheds.
+
+<Services kind="circuits" />
+
+<Services kind="shedding" />
+
+## Outlets and buses
+
+<Services kind="outlets" />
+
+The 12 V bus feeds {s.buses.v12.toLowerCase()}. The 24 V bus feeds {s.buses.v24.toLowerCase()}.
+
+## Main cables
+
+<Services kind="cables" />

@@ -1,0 +1,41 @@
+---
+title: Plumbing and water
+description: The home trailer's water system, its daily water budget for two people, how long the water lasts, and the grey water.
+---
+
+import Services from '../../components/Services.astro';
+import s from '../../data/generated/services.json';
+import { withBase } from '../../lib/url';
+
+export const W = s.water;
+
+Research report 21 sized the water system for two people on long stays off-grid. The parts and their prices are in
+the <a href={withBase('/trailer/#parts-list')}>trailer's parts list</a>.
+
+- Fresh: two welded HDPE tanks between the rails over the axles hold 420 L. At most 350 L ride while towing
+  (decision H13), and the rest goes in at camp through the Puretec CR45 filter, by hose or the creek transfer pump,
+  with a chlorine dose.
+- Supply: a Shurflo Trail King 7 at 2.1 bar with an accumulator feeds every outlet. The drinking tap has its own
+  Puretec CR-Z2 filter and an Acuva UV purifier. Hot water comes from the Truma Combi D 6 E's 10 L boiler through a
+  50 °C mixing valve.
+- Shower: the DauerShower 2.0 cleans and reheats the same 5 L, so a 20 min shower uses about 5 L. Its switching unit
+  sits in a sealed, insulated well under the shower floor.
+- Grey: every drain falls by gravity to a {W.grey_tank_l} L tank in the rear bay, with a lever valve and a camlock on
+  the kerb side. It travels empty, and a 40 L wheeled tote serves longer stays.
+
+## Drawings
+
+<Services kind="drawing" number="CT-611" title="Plumbing schematic" />
+
+<Services kind="drawing" number="CT-612" title="Plumbing layout" />
+
+## Water budget
+
+<Services kind="water" />
+
+## How long the water lasts
+
+<Services kind="water-days" />
+
+The grey tank holds {W.grey_hours_one_wash} h with one wash. After that it empties at a dump point, into the tote, or
+where the site allows.

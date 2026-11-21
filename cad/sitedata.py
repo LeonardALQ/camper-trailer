@@ -403,8 +403,10 @@ def main():
     # the car build page (URL /tow-vehicle/) and the bike box's parts list
     n_parts = tow_vehicle_page()
     box = box_parts()
-    # the trailer's priced parts list, and the whole project's cost on the home page
+    # the trailer's priced parts list, the services' budgets, and the whole project's cost on the home page
     trailer = trailer_parts()
+    from .services import services
+    (GEN / "services.json").write_text(json.dumps(services(), indent=1, default=str))
     (GEN / "project.json").write_text(json.dumps(project_costs(box["totals"]), indent=1))
 
     # research reports as pages (copied, with the first heading moved into the title)

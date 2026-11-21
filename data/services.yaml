@@ -9,17 +9,17 @@ revision: A
 
 # Glands through the walls, roof and floor. Side walls give X and the height Z, end walls Y and Z, roof and floor X and Y.
 glands:
-  - {id: G1, what: "Fresh water fill with a lockable cap, filled through the CR45 filter on the hose", at: kerb, x: 3280, z: 1125, d: 50, src: "layout study section 4.2", est: "height"}
-  - {id: G2, what: "15 A appliance inlet and the 12 V Anderson SB50 outlet in one IP56 surface box", at: kerb, x: 4700, z: 1150, d: 60, src: "layout study section 4.1"}
+  - {id: G1, what: "Fresh water fill with a lockable cap, filled through the CR45 filter on the hose", at: kerb, x: 3280, z: 1125, d: 50, src: "TRAILER.md, Plumbing and water", est: "height"}
+  - {id: G2, what: "15 A appliance inlet and the 12 V Anderson SB50 outlet in one IP56 surface box", at: kerb, x: 4700, z: 1150, d: 60, src: "TRAILER.md, Electrical"}
   - {id: G3, what: "Outdoor 230 V double outlet (C10), IP56 surface box under the awning", at: kerb, x: 4300, z: 1150, d: 60, src: "report 20 section 7", est: "position"}
-  - {id: G4, what: "Two 6 mm2 PV strings into a conduit down the partition's kerb end", at: roof, x: 5100, y: -900, d: 25, src: "layout study section 4.1"}
+  - {id: G4, what: "Two 6 mm2 PV strings into a conduit down the partition's kerb end", at: roof, x: 5100, y: -900, d: 25, src: "TRAILER.md, Electrical"}
   - {id: G5, what: "Split line set and the outdoor unit's 230 V feed (C8), behind the cradle", at: rear, y: 760, z: 2800, d: 60, src: "AC-02, AC-03", est: "position, moved to the road half with the outdoor unit"}
   - {id: G6, what: "Battery box vent from the bottom of the box, 20 mm bore with insect mesh", at: floor, x: 4300, y: -800, d: 20, src: "report 20 section 2, AS/NZS 3001.2 clause 5.4.12.2", est: "position"}
   - {id: G7, what: "Battery box vent ducted from the top of the box, 20 mm bore with insect mesh", at: floor, x: 4900, y: -800, d: 20, src: "report 20 section 2", est: "position"}
-  - {id: G8, what: "Ute charging feed, 8 B&S twin from the drawbar Anderson SB50 along the kerb rail", at: floor, x: 5100, y: -700, d: 25, src: "layout study section 4.1"}
+  - {id: G8, what: "Ute charging feed, 8 B&S twin from the drawbar Anderson SB50 along the kerb rail", at: floor, x: 5100, y: -700, d: 25, src: "TRAILER.md, Electrical"}
   - {id: G9, what: "Combi diesel line from the heater fuel tank UF-06 into the tower base", at: floor, x: 3520, y: 720, d: 20, src: "LA-03, UF-06", est: "position"}
-  - {id: G10, what: "Sink, washer and dryer wastes through the wet room floor into the grey tank's top inlet", at: floor, x: 5260, y: 0, d: 50, src: "layout study section 4.2"}
-  - {id: G11, what: "Fresh tank feed to the pump in the sink cabinet", at: floor, x: 4960, y: 700, d: 25, src: "layout study section 4.2", est: "position"}
+  - {id: G10, what: "Sink, washer and dryer wastes through the wet room floor into the grey tank's top inlet", at: floor, x: 5260, y: 0, d: 50, src: "TRAILER.md, Plumbing and water"}
+  - {id: G11, what: "Fresh tank feed to the pump in the sink cabinet", at: floor, x: 4960, y: 700, d: 25, src: "TRAILER.md, Plumbing and water", est: "position"}
 
 electrical:
   # report 20 section 7, main cables and fuses. Lengths are along the routes on CT-602 (est.)
@@ -74,3 +74,57 @@ ventilation_modes:
   - {mode: "Parked, dust storm", e2: "Off", ra: "Off", topup: "40", respa: "On", split: "Thermostat"}
   - {mode: "Smoke", e2: "Off", ra: "Off", topup: "15 to 40 through the carbon", respa: "Off, or on with the odour filter", split: "Thermostat"}
   - {mode: "Low battery", e2: "22.5 a pair", ra: "15", topup: "15", respa: "Off", split: "Setpoint up 2 K, heat by diesel"}
+
+# The energy budget's groups for the site's Electrical page (cad/services.py). Each names load ids of research report
+# 20's model (research/models/20/loads.yaml), or their two-letter prefixes. INV and DCDC are the model's conversion losses.
+energy_groups:
+  - {name: "Split, and the Combi on diesel", ids: [AC, HE]}
+  - {name: "Fresh air, extract, hood, sensors", ids: [VE, RH, SN]}
+  - {name: "Fridge and freezer", ids: [FR, FZ]}
+  - {name: "Hob and oven", ids: [KI]}
+  - {name: "Showers and hot water", ids: [SH, HW]}
+  - {name: "Washer and dryer", ids: [LA]}
+  - {name: "Lights", ids: [LI]}
+  - {name: "Desk, screens, Starlink", ids: [DE, NE]}
+  - {name: "Pumps and the lift bed", ids: [WP, BE]}
+  - {name: "Monitoring and standby", ids: [SB]}
+  - {name: "Conversion losses", ids: [INV, DCDC]}
+# short names for the model's four design cases, for the table's columns
+energy_cases: {hot: "Hot, all electric", hot_diesel: "Hot, diesel water", cold_diesel: "Cold, diesel heat", cold_hp: "Cold, heat pump"}
+# the chosen bank's row in the model's comparison of banks against decision H3
+battery_bank: "Victron Lithium NG 51.2 V 100 Ah x 5 (48 V)"
+
+# report 21 section 10.1: two people, litres a day
+water_budget:
+  daily:
+    - {use: "Showers, 2 x 20 min", fresh_l: 10, grey_l: 10, basis: "DauerShower 2.0, 5 L each (maker)"}
+    - {use: "Dishes", fresh_l: 8, grey_l: 8, basis: "Two washes of 4 L in the 350 x 350 mm sink (est.)"}
+    - {use: "Drinking", fresh_l: 6, grey_l: 0, basis: "3 L a person in heat (est.)"}
+    - {use: "Basin", fresh_l: 6, grey_l: 6, basis: "3 L a person at 4 L/min (est.)"}
+    - {use: "Outdoor rinse at the rear door", fresh_l: 4, grey_l: 0, basis: "To the ground (est.)"}
+    - {use: "Cooking", fresh_l: 3, grey_l: 1, basis: "Estimate"}
+    - {use: "Toilet flush", fresh_l: 2, grey_l: 0, basis: "About 8 flushes of 0.25 L, into the cassette (est.)"}
+    - {use: "Cleaning", fresh_l: 2, grey_l: 2, basis: "Estimate"}
+  wash: {use: "One wash and dry", fresh_l: 44, grey_l: 44, basis: "Camec 3.5 kg washer, 44 L (WELS, maker). The dryer returns about 2 L as condensate (est.)"}
+  stores:
+    - {case: "In travel, at most 350 L (H13), no laundry", litres: 350, washes_a_week: 0}
+    - {case: "In travel, 350 L, three washes a week", litres: 350, washes_a_week: 3}
+    - {case: "Tanks full at camp, 420 L, three washes a week", litres: 420, washes_a_week: 3}
+  grey_tank_l: 130
+  grey_hours_one_wash: 72
+
+# report 19: the design days and the HVAC units, for the HVAC page
+hvac:
+  design_days:
+    - {case: "Design hot day: 42 C peak at 15:00, 27 C at 03:00, clear sky, inside 24 C", heat_kwh: 37.1, peak_kw: 3.29, battery_kwh: 9.0, src: "research/models/19/loads.out"}
+    - {case: "Design cold night: -5 C for 14 h, inside 20 C", heat_kwh: 17.6, peak_kw: null, battery_kwh: 6.6, src: "research/models/19/loads.out, on the heat pump"}
+  units:
+    - {line: "AC-01, AC-02", unit: "Mitsubishi Electric MSZ-AP25VGKD2 and MUZ-AP25VGD2 inverter split", does: "Cools 1.1 to 3.6 kW and heats 1.3 to 5.0 kW, down to -15 C outside", where: "Indoor unit high on the partition's road end, blowing forward. Outdoor unit high on the rear wall's road half, on wire-rope isolators behind a guard"}
+    - {line: "LA-03", unit: "Truma Combi D 6 E", does: "Backup heat and the hot water, on diesel or its 900 or 1,800 W elements, through four warm-air ducts", where: "Tower base, road side, its cowl low in the road wall"}
+    - {line: "VE-01A to VE-01D", unit: "Two LUNOS e2 60 pairs with MERV 13 covers", does: "Fresh air through heat recovery, 83 % at up to 60 m3/h a pair", where: "Fans A and B in the side walls, C and D low on the front wall"}
+    - {line: "VE-03", unit: "LUNOS RA 15-60", does: "Wet room extract, 15 to 60 m3/h, boosted on humidity", where: "High in the rear wall's kerb half"}
+    - {line: "VE-05", unit: "24 V EC fan with ISO coarse, ePM1 80 % and carbon filters", does: "Filtered top-up of 15 m3/h, 40 in wind or dust, so the cabin sits above outside", where: "Tower top, sharing the intake hood"}
+    - {line: "VE-04", unit: "Sy-Klone RESPA-CF2, MERV 16 and carbon filters", does: "Towing and dust storms: a powered precleaner and 150 to 200 m3/h, about 20 Pa inside", where: "Tower top, its hood high on the road wall"}
+    - {line: "VE-06", unit: "Pressure relief valve, 30 cm2, and a 0 to 125 Pa gauge", does: "Lets the excess air out through the wet room. The gauge shows a blocked filter or a failed seal", where: "Low in the rear wall"}
+    - {line: "VE-07", unit: "Sphere TCR-001 range hood", does: "Kitchen extract, ducted outside through a cowl with a backdraft flap", where: "Over the hob"}
+    - {line: "VE-08", unit: "Three RuuviTags and an NDIR CO2 sensor on the Cerbo GX", does: "Boosts the e2 pairs above 900 ppm CO2 and the extract on humidity", where: "Bed, living zone and wet room"}

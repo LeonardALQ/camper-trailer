@@ -122,7 +122,7 @@ const biggest = [...r.lines].sort((a: any, b: any) => b.price.aud - a.price.aud)
 )}
 
 {kind === 'savings' && (
-  <div class="data-table">
+  <div class="data-table" data-sheet="off">
     <table>
       <thead><tr><th>ID</th><th>Option</th><th class="num">Saves AUD</th><th class="num">Tare kg</th><th>What it costs</th><th>Lines it removes</th></tr></thead>
       <tbody>
@@ -130,7 +130,7 @@ const biggest = [...r.lines].sort((a: any, b: any) => b.price.aud - a.price.aud)
           <tr>
             <td>{s.id}</td><td>{s.name}</td><td class="num">{n(s.saving_aud, 0)}</td>
             <td class="num">{s.mass_kg > 0 ? '+' : ''}{n(s.mass_kg, Number.isInteger(s.mass_kg) ? 0 : 1)}</td><td>{s.costs}</td>
-            <td>{[...(s.removes.groups ?? []).map((g: string) => `all ${label(g).toLowerCase()}`), ...(s.removes.lines ?? []),
+            <td>{[...(s.removes.groups ?? []).map((g: string) => `every ${g} line`), ...(s.removes.lines ?? []),
                   ...(s.removes.parts ?? []).map((p: any) => `part of ${p.line}`)].join(', ')}{s.adds ? `, plus ${s.adds.map((a: any) => a.item).join(' and ')}` : ''}</td>
           </tr>
         ))}
