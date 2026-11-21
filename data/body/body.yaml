@@ -171,7 +171,11 @@ thermal:
   # filters. Report 19's moisture model (research/models/19/loads.py condensation_check: the evening hour's 200 g/h,
   # outside air at 90 % of saturation, the e2's 20 % moisture recovery on its share of the flow) gives that mode's
   # dew point, and BDY-22 holds against it as well as against the normal 6 C
-  generator_mode: {e2_m3h: 22.5, respa_m3h: 150, moisture_g_h: 200, w_out_factor: 0.9, eps_lat: 0.20}
+  # where the generators stand (F5-04): ahead of the drawbar or behind the trailer e2 fans A and B run on as a pair with
+  # the RESPA-CF2. Off the kerb side fans A and B stop and the RESPA-CF2 runs alone. Never off the road side, where the
+  # RESPA-CF2 and the top-up fan draw their air
+  generator_mode: {e2_m3h: 22.5, respa_m3h: 150, moisture_g_h: 200, w_out_factor: 0.9, eps_lat: 0.20,
+                   positions: {ahead: [e2, respa], behind: [e2, respa], kerb: [respa]}}
   src:
     iso13788: "ISO 13788:2012 clause 4.4.1, Rsi 0.25 m2K/W for surface condensation and mould on opaque elements: https://cdn.standards.iteh.ai/samples/51615/261e3f395b8a425983c1eb1a5f05d3ca/ISO-13788-2012.pdf"
     pvc: "Rigid PVC at about 0.16 W/mK (est.)"
@@ -350,6 +354,9 @@ members_rule:
   strip_mm: 70
   strip_lines: [WN-, BD-07, BD-15, BD-17]
   side_inserts: {openings: [OP-01, OP-05], min_mm: 20}
+  # F5-03: members closer than clear_mm share one routed channel with an H200 fill bonded between them, so no thin fin
+  # of XPS is left to rout. BD-20 stands 16.5 mm behind the bed's rear kerb-side hardpoint
+  shared_channels: [[BD-20, LB-04.4]]
   bounds: [LA-11T, WR-03]
   hardpoints_at: LB-04
   # horizontal fixing strips, each stopped clear_mm short of every member it meets: the lockers over the washer and

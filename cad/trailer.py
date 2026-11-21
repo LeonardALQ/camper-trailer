@@ -909,10 +909,11 @@ class Trailer:
                                                f"and {q['t_slide_n'] / 1000:.1f} kN against sliding on wet grass (friction {o['friction']:g}, est.)" for q in rs)
                                    + f". At {w['t_n'] / 1000:.1f} kN the strap works at {w['utils']['strap']:.2f} of its {td['strap_lc_n'] / 1000:.1f} kN "
                                    f"lashing capacity, the D-ring at {w['utils']['lug']:.2f} of its {td['lug_wll_n'] / 1000:.1f} kN working load limit and "
-                                   f"the outrigger at {w['outrigger_mpa']:.0f} MPa, {w['utils']['outrigger']:.2f} of its yield over 1.5. Each strap goes to an "
-                                   "anchor set in line with it, chosen for the soil. "
-                                   + ". ".join(_anchor_txt(a) for a in w["anchors"])
-                                   + ". In loose sand, HUD class 5, no anchor is rated: hitch the trailer or move it"),
+                                   f"the outrigger at {w['outrigger_mpa']:.0f} MPa, {w['utils']['outrigger']:.2f} of its yield over 1.5. Each strap runs at "
+                                   f"{min(w['angles']):g} to {max(w['angles']):g} degrees to the ground, each force taken at its worst angle there, with "
+                                   f"the anchor's head {w['head_mm'][0]:,.0f} to {w['head_mm'][1]:,.0f} mm out from the point under its lashing point on "
+                                   "level ground. "
+                                   + ". ".join(_anchor_txt(a, td) for a in w["anchors"])),
                            tie_down=dict(cases=rs, v=w["v"]))
             elif c.type == "towball_scale":
                 m = self.inputs.v("UTE-03")
@@ -1114,37 +1115,64 @@ def overturn(lay: Layout, ev: dict, st: dict, sil: dict, mzcat: float, basis: st
     return out
 
 
-def _anchor_txt(a: dict) -> str:
-    """STB-05's sentence for one soil's anchors: the product, its spec in brackets, and its working and failure loads."""
-    one = a["per_strap"] == 1
+def _anchor_txt(a: dict, td: dict) -> str:
+    """STB-05's sentences for the kit's anchor (F5-01): the product, the installation its listing tested, its listed loads
+    in HUD's soil classes, quoted term by term from 24 CFR 3285.202's table, and the probe value the soil must read."""
+    cl = td["hud_classes"]
+
+    def q(c):
+        t = [f'"{x}"' for x in cl[c]["terms"]]
+        return ", ".join(t[:-1]) + " and " + t[-1]
+
+    lo, hi = cl[a["soil_class"]]["probe_inlb"]
     name, _, spec = a["name"].partition(", ")
-    return (f"In {a['soil']}, {'a' if one else str(a['per_strap'])} {name}{f' ({spec})' if spec else ''}{' works' if one else ' side by side work'} "
-            f"at {a['util']:.2f} of {'its' if one else 'their'} {a['per_strap'] * a['wll_n'] / 1000:.1f} kN working load, a factor of "
-            f"{a['factor']:.2f} on {'its' if one else 'their'} {a['per_strap'] * a['ultimate_n'] / 1000:.1f} kN failure load")
+    return (f"Each anchor is a {name} ({spec}), installed as {a['listing']} tested it: wound in at a {a['back_angle_deg']:g} degree back "
+            f"angle to its full depth, its head at the ground and its helix about {a['helix_mm'] / 1000:.2f} m down, with {a['plate']} "
+            f"driven vertically on the trailer side of its rod, and pulled at no less than the listing's {a['min_angle_deg']:g} degree minimum "
+            f"angle. The listing rates it at {a['wll_lb']:,} lb ({a['wll_n'] / 1000:.1f} kN) working and {a['ultimate_lb']:,} lb "
+            f"({a['ultimate_n'] / 1000:.1f} kN) ultimate in HUD's class {a['soil_class']}, {q(a['soil_class'])}, {lo} to {hi} in-lb on the "
+            f"torque probe, and in the firmer classes. It works at {a['util']:.2f} of its working load, a factor of {a['factor']:.2f} on its "
+            f"ultimate. The soil is measured, not judged: {td['probe']}, driven to the helix depth, must read at least {a['min_probe_inlb']} "
+            f"in-lb ({a['probe_nm']:.1f} N m), the Missouri Public Service Commission's figure for this anchor, above HUD's {lo} in-lb for "
+            f"class {a['soil_class']}. Where it reads less, as in class 5, {q('5')}, under {cl['5']['probe_inlb'][1] + 1} in-lb, or where an "
+            f"anchor will not wind in to its full depth, no anchor in the kit is rated: hitch the trailer or move it")
 
 
 def tie_down(lay: Layout, ot: dict, st: dict, sil: dict, mzcat: float) -> dict:
-    """STB-05 (F3-03): the windward pair of straps from the lashing points under the outrigger ends, holding the parked
-    trailer against tipping and sliding in region B's 500-year gust at 3 m. Moments about the leeward wheels' line on the
-    ground, with STB-04's weight and lever, and the straps `angle_deg` down and out to windward."""
+    """STB-05 (F3-03, F5-01): the windward pair of straps from the lashing points under the outrigger ends, holding the
+    parked trailer against tipping and sliding in region B's 500-year gust at 3 m. Moments about the leeward wheels' line
+    on the ground, with STB-04's weight and lever. Each strap runs down and out to windward at any angle in `angle_deg`,
+    so each force is taken at its worst angle there: tipping at the shallowest, sliding and the outrigger at the steepest.
+    The anchor counts at its listed working load only if the shallowest angle is no less than its listed minimum."""
     V, o = lay.V, st["overturn"]
     td = o["tie_down"]
     v = td["v_r_ms"] * mzcat
-    a = math.radians(td["angle_deg"])
-    sa, ca = math.sin(a), math.cos(a)
     F = 0.6 * v ** 2 * o["cf"] * sil["area_m2"]
     W = ot["mass_kg"] * 9.81
-    arm = (V["track"] / 2 + td["lug_y_mm"]) * sa + td["lug_z_mm"] * ca       # mm, each strap's restoring lever
-    t_tip = max(0.0, (F * sil["z_mm"] - W * ot["lever_mm"]) / (2 * arm))
-    t_slide = max(0.0, (F - o["friction"] * W) / (2 * (o["friction"] * sa + ca)))
+    angles = list(td["angle_deg"]) if isinstance(td["angle_deg"], (list, tuple)) else [td["angle_deg"]]
+    t_tip = t_slide = s_out = 0.0
+    for deg in angles:
+        a = math.radians(deg)
+        sa, ca = math.sin(a), math.cos(a)
+        arm = (V["track"] / 2 + td["lug_y_mm"]) * sa + td["lug_z_mm"] * ca       # mm, each strap's restoring lever
+        tt = max(0.0, (F * sil["z_mm"] - W * ot["lever_mm"]) / (2 * arm))
+        ts = max(0.0, (F - o["friction"] * W) / (2 * (o["friction"] * sa + ca)))
+        t_tip, t_slide = max(t_tip, tt), max(t_slide, ts)
+        s_out = max(s_out, max(tt, ts) * sa * td["outrigger_l_mm"] / td["outrigger_z_mm3"])
     t = max(t_tip, t_slide)
-    s_out = t * sa * td["outrigger_l_mm"] / td["outrigger_z_mm3"]
     utils = dict(strap=t / td["strap_lc_n"], lug=t / td["lug_wll_n"], outrigger=s_out / (td["outrigger_fy"] / 1.5))
-    anchors = [dict(a, util=t / (a["per_strap"] * a["wll_n"]), factor=a["per_strap"] * a["ultimate_n"] / t) for a in td["anchors"]]
-    utils["anchor"] = max(a["util"] for a in anchors)
+    anchors = []
+    for an in td["anchors"]:
+        listed = min(angles) >= an["min_angle_deg"] - 1e-9
+        anchors.append(dict(an, listed=listed, util=t / (an["per_strap"] * an["wll_n"]) if listed else 99.0,
+                            factor=an["per_strap"] * an["ultimate_n"] / t if t else 99.0,
+                            helix_mm=an["rod_mm"] * math.cos(math.radians(an["back_angle_deg"])), probe_nm=an["min_probe_inlb"] * 0.1129848))
+    utils["anchor"] = max(an["util"] for an in anchors)
     gov = max(utils, key=utils.get)
+    head = [td["lug_z_mm"] / math.tan(math.radians(d)) for d in angles]
     return dict(case=ot["case"], mass_kg=ot["mass_kg"], v=v, push_n=F, t_tip_n=t_tip, t_slide_n=t_slide, t_n=t, anchors=anchors,
-                governs="sliding" if t_slide >= t_tip else "tipping", outrigger_mpa=s_out, utils=utils, governing=gov, util=utils[gov])
+                governs="sliding" if t_slide >= t_tip else "tipping", outrigger_mpa=s_out, utils=utils, governing=gov, util=utils[gov],
+                angles=angles, head_mm=(min(head), max(head)))
 
 
 def yaw_inertia(lay: Layout, case, basis: str = "growth") -> dict:

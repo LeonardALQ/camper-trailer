@@ -71,6 +71,28 @@ def _member(b) -> str:
     return b.d["panels"]["wall"]["stiffener"]["name"].split(" 6060")[0]
 
 
+def _members_note(b) -> str:
+    """CT-201's note on the side walls' members, from the members' data, FIT-07 and their ends (F5-06)."""
+    mc, e = b.members_clear(), b.member_ends()
+    walls = {}
+    for r in mc["rows"]:
+        walls.setdefault(r["wall"], []).append(r["member"])
+
+    def names(ids):
+        lb = [i for i in ids if i.startswith("LB-06")]
+        out = [i for i in ids if not i.startswith("LB-06")]
+        if lb:
+            out.append(f"{dict(enumerate(['NONE', 'ONE', 'TWO', 'THREE', 'FOUR'])).get(len(lb), len(lb))} OF THE BED'S HARDPOINTS LB-06")
+        return out[0] if len(out) == 1 else ", ".join(out[:-1]) + " AND " + out[-1]
+
+    return (f"WALL MEMBERS, {_member(b)} ON THE INNER SKIN: "
+            + ", ".join(f"ON THE {w.upper()} WALL {names(ids)}" for w, ids in walls.items())
+            + f". EACH STANDS ON A {e['foot']['block_w']:g} mm WIDE RIGID PVC BLOCK, ITS FOOT {e['foot']['at_mm']:g} mm ABOVE THE WALL'S "
+            f"BOTTOM EDGE, AND STOPS {e['head']['gap_mm']:g} mm UNDER THE TOP INSERT STRIP (BDY-10, BDY-22, BDY-24, FIT-07)"
+            + "".join(f". {p['members'][0].upper()} AND {p['members'][1].upper()} SHARE ONE ROUTED CHANNEL WITH AN H200 FILL BETWEEN THEM"
+                      for p in mc["shared"]))
+
+
 # ------------------------------------------------------------------ CT-201 body shell
 def ct201(prj, model, bom, checks, reg, dwg):
     t0 = time.time()
@@ -156,8 +178,7 @@ def ct201(prj, model, bom, checks, reg, dwg):
         f"{'PASS' if oc['ok'] else 'FAIL'}). CUT-OUT CORNERS RADIUSED, 68 mm FOR SERVICE DOORS, 90 mm AT THE TOP OF THE DC DOOR.",
         "W1 (OP-01) OVER THE BED IS THE SECOND WAY OUT, 804 x 454 mm CLEAR. D2 (OP-15) OPENS INTO THE WET ROOM. THE PRODUCTS ARE ON "
         "CT-013 AND EACH OPENING'S MARGIN ON CT-011. H12: GRP CORNER PIECES GIVE THE ROOF'S FRONT EDGE A 150 mm RADIUS AND THE FRONT "
-        f"VERTICALS 250 mm. BD-18: ONE {_member(b)} STIFFENER ON THE ROAD WALL'S INNER SKIN BEHIND THE TOWER, WITH THE DOOR'S REAR JAMB "
-        "MEMBER BD-19 AND THE BED'S FOUR HARDPOINTS LB-06, EACH 10 mm SHORT OF THE JOINERS (BDY-10, BDY-22, FIT-07). PHANTOM DAY AND NIGHT: THE MATTRESS TOP, "
+        f"VERTICALS 250 mm. {_members_note(b)}. PHANTOM DAY AND NIGHT: THE MATTRESS TOP, "
         f"{V['mattress_z'] + V['mattress_t'] - V['floor_z']:.0f} AND "
         f"{V['bed_night_h'] + V['deck_t'] + V['underlay_t'] + V['mattress_t']:.0f} mm ABOVE THE FLOOR (CT-010).",
         "WHERE AN OPENING CROSSES A CHASSIS STATION THE OUTRIGGER-TIP MOUNT MOVES INBOARD OF ITS FRAME AND THE FLOOR JOINER RUNS UNBROKEN.",

@@ -332,7 +332,8 @@ def ct003(prj, model, bom, checks, reg, dwg):
     aw = C["res"]["awning"]
     ot = chk["STB-04"]["overturn"]
     ot_low = min(ot["cases"], key=lambda q: q["v"])
-    td_anchors = chk["STB-05"]["tie_down"]["cases"][0]["anchors"]
+    td_case = chk["STB-05"]["tie_down"]["cases"][0]
+    an = td_case["anchors"][0]
     lines = [
         ("WATER IN TRAVEL (H13)", f"AT MOST {V['water_travel_l']:.0f} L OF FRESH AND GREY WATER WHILE TOWING. FILL THE TANKS AT CAMP (420 L NET)."),
         ("WITHOUT THE GCM REVISION", f"IF LOVELLS' {lim['gcm_kg']:,.0f} kg GCM REVISION (GV06) IS REFUSED, TOYOTA'S {gcm['toyota_kg']:,.0f} kg HOLDS WITH THE "
@@ -354,8 +355,11 @@ def ct003(prj, model, bom, checks, reg, dwg):
                                          f"FORECAST GUST OF {ot['act_kmh']:.0f} km/h OR MORE (A BUREAU WARNING OF DAMAGING WINDS, {ot['warning_kmh']:.0f} km/h, "
                                          "ALWAYS IS ONE), CLOSE THE AWNING, AND HITCH THE TRAILER TO THE UTE, STRAP IT DOWN AT ITS FOUR LASHING POINTS OR "
                                          "MOVE IT. THE TIE-DOWN KIT RIDES IN THE UTE WHILE TOWING AND STAYS WITH THE TRAILER WHENEVER THE UTE IS UNHITCHED "
-                                         f"FOR MORE THAN A DAY: FOUR STRAPS AND FOUR ANCHORS EACH FOR {' AND '.join(a['soil'].split(',')[0].upper() for a in td_anchors)}, "
-                                         "SET IN LINE WITH THE STRAPS, ONE PULL-TESTED ON SITE. IN LOOSE SAND, HITCH IT OR MOVE IT. NO STAYS IN CYCLONIC "
+                                         f"FOR MORE THAN A DAY: FOUR STRAPS, FOUR {an['name'].split(',')[0].upper()} ANCHORS WITH THEIR STABILIZER PLATES AND A "
+                                         f"SOIL TEST PROBE. SET EACH ANCHOR AS ITS LISTING TESTED IT: A {an['back_angle_deg']:g} DEGREE BACK ANGLE, FULL DEPTH, "
+                                         f"THE PLATE ON THE TRAILER SIDE, THE STRAP AT {min(td_case['angles']):g} TO {max(td_case['angles']):g} DEGREES. THE "
+                                         f"PROBE AT THE HELIX DEPTH, {an['helix_mm'] / 1000:.1f} m, MUST READ {an['min_probe_inlb']} in-lb OR MORE, OR HITCH IT "
+                                         "OR MOVE IT. NO STAYS IN CYCLONIC "
                                          "REGIONS C AND D FROM NOVEMBER TO APRIL."),
     ]
     yy = yb - 13

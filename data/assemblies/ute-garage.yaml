@@ -466,8 +466,11 @@ items:
     copies:
       - {id: road, at: [tool_x0, half_width - 10 - tool_w, tool_z0], params: {dx: tool_l, dy: tool_w, dz: tool_h}}
       - {id: kerb, at: [tool_x0, -half_width + 10, tool_z0], params: {dx: tool_l, dy: tool_wk, dz: tool_h}}
-  - {ref: T2, part: U-ANCHORS, group: tools, label: "The trailer's ground anchors in their bag, on the floor between the bikes, loaded last",
-     at: [600, (tuareg_y + st_y) / 2 - 95, 0], params: {dx: 1600, dy: 190, dz: 190}}
+  # F5-05: the bag at its packed size (est.): the four 59099s side by side, their 178 mm helixes at alternate ends, over the
+  # four 59286 plates, 445 x 343 mm, flat in its base, with the probe and the bar beside them. Its centre stands 10 mm
+  # toward the Tuareg, which leaves more room beside its frame than the Street Triple's belly pan does (UGC-02)
+  - {ref: T2, part: U-ANCHORS, group: tools, label: "The trailer's ground anchors, stabilizer plates and soil test probe in their bag, on the floor between the bikes, lashed to the L-track, loaded last",
+     at: [600, (tuareg_y + st_y) / 2 - 162.5, 0], params: {dx: 1600, dy: 345, dz: 230}}
 
   # ---------------------------------------------------------------- context (no mass)
   - ref: C1
