@@ -67,7 +67,8 @@ electrical:
     - {zone: "Electrical board", ac: "1 single service outlet", dc: "Starlink Mini on a 24 V fused circuit"}
     - {zone: "Outside, kerb side", ac: "1 weatherproof double, IP56 (G3)", dc: "1 Anderson SB50 12 V outlet with a 10 A fuse, 1 USB-C (G2)"}
 
-# report 19 section 6, the ventilation modes (one rotary switch or a Cerbo GX page), m3/h
+# report 19 section 6, the ventilation modes (one rotary switch or a Cerbo GX page), m3/h. The generator rule: run the
+# two EU22i on the ground at least 6 m from the trailer and downwind of it, exhausts pointing away, never in the drawbar box
 ventilation_modes:
   - {mode: "Normal day", e2: "30 a pair", ra: "15, boost on humidity", topup: "15", respa: "Off", split: "Thermostat"}
   - {mode: "Night", e2: "22.5 a pair", ra: "15", topup: "15", respa: "Off", split: "Quiet fan"}
@@ -75,6 +76,7 @@ ventilation_modes:
   - {mode: "Parked, dust storm", e2: "Off", ra: "Off", topup: "40", respa: "On", split: "Thermostat"}
   - {mode: "Smoke", e2: "Off", ra: "Off", topup: "15 to 40 through the carbon", respa: "Off, or on with the odour filter", split: "Thermostat"}
   - {mode: "Low battery", e2: "22.5 a pair", ra: "15", topup: "15", respa: "Off", split: "Setpoint up 2 K, heat by diesel"}
+  - {mode: "On the generators", e2: "Off: the Cerbo stops both pairs whenever the AC input is on the generators, because fans C and D sit low on the front wall", ra: "15", topup: "40 through the carbon, so the cabin stays above outside", respa: "Off", split: "Thermostat"}
 
 # The energy budget's groups for the site's Electrical page (cad/services.py). Each names load ids of research report
 # 20's model (research/models/20/loads.yaml), or their two-letter prefixes. INV and DCDC are the model's conversion losses.

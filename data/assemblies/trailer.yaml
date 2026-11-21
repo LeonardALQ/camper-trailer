@@ -626,7 +626,7 @@ items:
     zone: drawbar_box
     box: [dbx_x0 + 15, -dbx_w / 2 + 20, dbx_z0 + dbx_t + 10, 290, 1038, 425]
     mass: {basis: declared, total_kg: 42.2, maturity: spec, source: "https://powerequipment.honda.com.au/models/generators/eu22/specifications", note: "Honda EU22i, 21.1 kg dry each (Honda Australia, report 20 E-16)"}
-    note: Each 509 x 290 x 425 mm, turned with its 290 mm width along the trailer. They run on the ground beside the trailer, never in the box. The pair puts a design hot day back in 6.3 h, or 8.4 h while the household runs (report 20).
+    note: Each 509 x 290 x 425 mm, turned with its 290 mm width along the trailer. They run on the ground at least 6 m from the trailer and downwind of it, exhausts pointing away, never in the box, and the Cerbo stops the e2 pairs while the AC input is on them (data/services.yaml). The pair puts a design hot day back in 6.3 h, or 8.4 h while the household runs (report 20).
   - id: GS-02
     name: Honda parallel cable
     system: stowage
