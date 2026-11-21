@@ -15,6 +15,7 @@ import time
 from build123d import Keep, Plane  # noqa: F401  (kept for the views that cut the model)
 
 from ..lamps import resolve as resolve_lamps
+from ..trailer import _kg
 from ..trailer_model import TrailerModel
 from . import sheet as S
 from .home_common import (MARK, Proj, body_plan, cog_symbol, ctx, label_in, stamp, textblock, title, tw,
@@ -295,7 +296,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
         ["Running clearance", "At least 100 mm, unladen (VSB1 5.4)", f"{mv('DIM-04')}, the coupling's handbrake", st("DIM-04")],
         ["Width", "Across the body and everything on its sides, at most 2,500 mm, side lamps left out (ADR 43/04 6.2.6.1, VSB1 5.2)", f"{mv('DIM-01')}, design at most 2,490 mm (DIM-05)", st("DIM-05")],
         ["Overhang", "Front load space at least the rear overhang (VSB1 5.1.1)", f"{V['axle_x'] - V['body_x0']:.0f} against {ch['overall_x1'] - V['axle_x']:.0f} mm", st("DIM-02")],
-        ["Combination", "Ute and trailer within Lovells' 7,400 kg GCM revision (H2, GV06)", f"{gcm['sum']:,.0f} kg, the ute with growth plus the plate (H20)", st("GCM-01")],
+        ["Combination", "Ute and trailer within Lovells' 7,400 kg GCM revision (H2, GV06)", f"{_kg(gcm['sum'])} kg, the ute with growth plus the plate (H20)", st("GCM-01")],
         ["Ute rear axle", f"Towball keeps the Elite kit's {tv['limits']['rear_axle_kg']:,.0f} kg rear axle plate with growth (H14, H17, H18)", f"{mv('MAS-03')} at the heaviest ball", st("MAS-03")],
         ["Jack-knife", "Front parts 100 mm outside the bike box's sweep, 50 mm under it (JK-01, JK-02)", f"{chk['JK-01']['measured']:.0f} mm and {chk['JK-02']['measured']:.0f} mm", st("JK-01")],
         ["Plug", "7 or 12 pin to AS 4177.5 (VSB1 7.2)", "12-pin flat plug, and a grey Anderson SB50 for the 48 V charging feed", ("AS 4177.5", "#000")],
@@ -326,13 +327,16 @@ def ct003(prj, model, bom, checks, reg, dwg):
                "AS NOTED, SEE THE SHEETS NAMED")
     lim = tv["limits"]
     water_fb = water_without_gcm_revision(rep)
+    aw = C["res"]["awning"]
+    ot = chk["STB-04"]["overturn"]
+    ot_low = min(ot["cases"], key=lambda q: q["v"])
     lines = [
         ("WATER IN TRAVEL (H13)", f"AT MOST {V['water_travel_l']:.0f} L OF FRESH AND GREY WATER WHILE TOWING. FILL THE TANKS AT CAMP (420 L NET)."),
         ("WITHOUT THE GCM REVISION", f"IF LOVELLS' {lim['gcm_kg']:,.0f} kg GCM REVISION (GV06) IS REFUSED, TOYOTA'S {gcm['toyota_kg']:,.0f} kg HOLDS WITH THE "
                                      f"TRAILER PLATED AT OR BELOW {gcm['plate_without']:,.0f} kg, {gcm['toyota_kg']:,.0f} kg LESS THE UTE WITH GROWTH, AND AT "
                                      f"MOST {water_fb} L OF WATER IN TRAVEL, SO THE FULLY LOADED TRAILER WITH GROWTH STAYS UNDER THAT PLATE (H20)."),
-        ("GCM (GCM-01)", f"{lim['gcm_kg']:,.0f} kg WITH THE REVISION. THE UTE WITH GROWTH, {gcm['ute_kg_growth']:,.0f} kg, PLUS THE "
-                         f"{gcm['plate']:,.0f} kg PLATE IS {gcm['sum']:,.0f} kg (UTE-06, H20)."),
+        ("GCM (GCM-01)", f"{lim['gcm_kg']:,.0f} kg WITH THE REVISION. THE UTE WITH GROWTH, {_kg(gcm['ute_kg_growth'])} kg, PLUS THE "
+                         f"{gcm['plate']:,.0f} kg PLATE IS {_kg(gcm['sum'])} kg (UTE-06, H20)."),
         ("ATM AND DESIGN LIMIT", f"PLATE {rep['caps']['plated']:,.0f} kg. EVERY CASE WITH GROWTH AT MOST 3,400 kg (MAS-10)."),
         ("TOWBALL (H17)", f"AT LEAST {rep['solved']['window']['pct_min']:.1f} % OF THE TRAILER IN EVERY CASE AND AT MOST "
                           f"{rep['solved']['window']['ball_max']['kg']:.0f} kg WITH GROWTH. TOWBAR AND DO35 {lim['towball_rating_kg']:.0f} kg."),
@@ -340,6 +344,12 @@ def ct003(prj, model, bom, checks, reg, dwg):
                           f"TOWING WITH GROWTH). {lim['platinum_rear_axle_kg']:,.0f} kg IF CUT CUT7 RETURNS TO THE PLATINUM."),
         ("COUPLING HEIGHT", f"{V['coupling_z']:.0f} mm LADEN, PLUS OR MINUS 20 mm. SET THE TONGUE'S DROP AT THE FINAL WEIGHING (TW08)."),
         ("GREY WATER", f"EMPTY FOR TRAVEL. A FULL {V['grey_full_l']:.0f} L TANK IS CHECKED IN CASES TC7 AND TC8."),
+        ("AWNING (BDY-11, BDY-23)", f"CLOSE THE AWNING IN WIND, LEGS PEGGED: PEG THE LEGS WHENEVER IT IS OUT, AND CLOSE IT BEFORE GUSTS REACH "
+                                    f"{aw['close_kmh']:.0f} km/h AND WHENEVER THE TRAILER IS LEFT. SET THE LEGS FOR A {aw['pitch_deg']:.0f} DEGREE FALL."),
+        ("PARKED IN WIND (H23, STB-04)", f"UNHITCHED ON ITS STEADIES THE TRAILER TIPS IN A {ot_low['v']:.0f} m/s GUST AT TARE, A "
+                                         f"{ot_low['forecast_kmh']:.0f} km/h FORECAST GUST. AT A FORECAST OR A BUREAU WARNING OF GUSTS OF "
+                                         f"{ot['act_kmh']:.0f} km/h OR MORE, CLOSE THE AWNING, AND HITCH THE TRAILER TO THE UTE, STRAP IT TO GROUND "
+                                         "ANCHORS OR MOVE IT. NO STAYS IN CYCLONIC REGIONS C AND D FROM NOVEMBER TO APRIL."),
     ]
     yy = yb - 13
     top = yb - 4

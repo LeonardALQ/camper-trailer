@@ -10,19 +10,13 @@ import time
 from build123d import Keep, Plane
 
 from ..build import BUILD, git_hash
-from ..trailer import Trailer
+from ..trailer import Trailer, _kg
 from ..trailer_model import TrailerModel
 from . import sheet as S
 from .home_common import water_without_gcm_revision
 from .sheets import _leaves
 
 HEIGHT_AT = {"BD-13": "the awning case", "RF-01": "the solar panels"}   # what sets the travel height, by line
-
-
-def _kg(v: float) -> str:
-    """A mass to the whole kg, half up, as the site rounds it (Python's format rounds half to even: 316.5 kg to 316)."""
-    from decimal import ROUND_HALF_UP, Decimal
-    return f"{Decimal(str(v)).quantize(Decimal('1'), rounding=ROUND_HALF_UP):,}"
 
 
 def _cog(sh, x, y, label, r=1.6):
@@ -189,7 +183,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
         ["Fully loaded, TC2", f"{tc2['nominal']['mass_kg']:,.0f} kg", f"{tc2['growth']['mass_kg']:,.0f} kg with growth, ATM plate {plate:,.0f} kg"],
         ["Towball", f"{lo_ball:.0f} to {hi_ball:.0f} kg", f"{chk['MAS-12']['measured']:.1f} % lowest (TC7), {_kg(chk['MAS-13']['measured'])} kg heaviest with growth"],
         ["Ute rear axle", f"{chk['MAS-03']['measured']:,.0f} kg", f"Against the Elite kit's {rep['tow_vehicle']['limits']['rear_axle_kg']:,.0f} kg with growth (MAS-03)"],
-        ["Combination", f"{chk['GCM-01']['measured']:,.0f} kg", f"Against Lovells' {rep['tow_vehicle']['limits']['gcm_kg']:,.0f} kg GCM revision (GCM-01)"],
+        ["Combination", f"{_kg(chk['GCM-01']['measured'])} kg", f"Against Lovells' {rep['tow_vehicle']['limits']['gcm_kg']:,.0f} kg GCM revision (GCM-01)"],
         ["CoG, fully loaded", f"Z {ch['cog_loaded'][2]:,.0f}", f"Z {ch['cog_loaded_growth'][2]:,.0f} with growth. Across: {chk['MAS-11']['measured']:.1f} mm at worst (MAS-11)"],
         ["Coupling", f"{V['coupling_z']:.0f} mm", "Laden, plus or minus 20 mm (UTE-01). DO35 V3Plus"],
         ["Water", f"{rep['params']['water_full_l']:.0f} L net", f"At most {rep['params']['water_travel_l']:.0f} L in travel (H13), 130 L grey tank"],

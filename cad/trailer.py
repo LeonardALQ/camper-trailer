@@ -757,8 +757,8 @@ class Trailer:
                 water_fb = math.floor(lay.V["water_travel_l"] - max(0.0, heavy["growth"]["mass_kg"] - plate_fb))
                 row.update(limit=f"<= {lim['gcm_kg']:,.0f} kg", measured=round(total, 1), unit="kg", margin=round(lim["gcm_kg"] - total, 1),
                            ok=total <= lim["gcm_kg"] + 1e-6, governing="the ute with growth plus the trailer's plate (UTE-06)",
-                           detail=(f"the ute with the bikes aboard ({tv['gcm_case']}, {tv['ute_kg_growth']:,.0f} kg with growth) plus the "
-                                   f"{plate:,.0f} kg plate is {total:,.0f} kg. Without Lovells' revision, Toyota's {toyota:,.0f} kg needs the trailer "
+                           detail=(f"the ute with the bikes aboard ({tv['gcm_case']}, {_kg(tv['ute_kg_growth'])} kg with growth) plus the "
+                                   f"{plate:,.0f} kg plate is {_kg(total)} kg. Without Lovells' revision, Toyota's {toyota:,.0f} kg needs the trailer "
                                    f"plated at or below {plate_fb:,.0f} kg and at most {water_fb:.0f} L of water in travel: at {water_fb:.0f} L "
                                    f"{heavy['id']} with growth weighs "
                                    f"{heavy['growth']['mass_kg'] - (lay.V['water_travel_l'] - water_fb):,.0f} kg, under that plate, and at "
@@ -971,6 +971,13 @@ class Trailer:
             row["status"] = ("PASS" if row["ok"] else "FAIL") if c.severity == "fail" else ("MEETS LIMIT" if row["ok"] else "REPORTED")
             out.append(row)
         return out
+
+
+def _kg(v: float) -> str:
+    """A mass to the whole kg, rounded half up as the site rounds it, so a figure such as the combination's 7,120.5 kg
+    reads the same in every check, sheet and page (Python's format rounds half to even)."""
+    from decimal import ROUND_HALF_UP, Decimal
+    return f"{Decimal(str(round(v, 6))).quantize(Decimal('1'), rounding=ROUND_HALF_UP):,}"
 
 
 def rollover(lay: Layout, ev: dict, st: dict, basis: str = "growth", dtrack: float = 0.0) -> dict:
