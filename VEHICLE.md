@@ -1,431 +1,229 @@
-# The LandCruiser 79 vehicle plan
+# LandCruiser 79 car build
 
-Vehicle plan, 20 Nov 2026. It merges research reports 14 (engine), 15 (driveline and refresh) and 16 (limits, GVM, brakes, wheels, towing) with the decisions in the decision log, `docs/decisions.md` (the Decisions page on the site), cited by its time. Every part and outsourced job is in `vehicle-parts.yaml`, and its totals match this page.
-
-Terms used throughout:
-
-- GVM (gross vehicle mass): the most the loaded ute may weigh, including the towball load. GCM (gross combination mass): the most the ute and trailer may weigh together. ATM (aggregate trailer mass): the most the loaded trailer may weigh, as shown on its plate.
-- VSCCS: the NSW scheme of licensed certifiers who approve modifications. VSI 06 is Transport for NSW's (TfNSW's) guide to which modifications need a VSCCS certificate. ADRs are the national vehicle standards. VSB1 is the national code for building trailers.
-- LC4 and LC5: VSCCS certifier categories for light commercial vehicles. LC4 covers engine, fuel, intake and exhaust work. LC5 covers body, chassis, suspension, steering, driveline, wheels, tyres and axles.
-- DPF: the diesel particulate filter in the exhaust. EGR: exhaust gas recirculation. EGT: exhaust gas temperature.
-- LSPV: the load-sensing proportioning valve that sets rear brake pressure from the rear axle load.
-- rwkW: kilowatts at the wheels, as a chassis dyno reads them. Toyota's 151 kW is measured at the crank.
-- Growth allowance: mass added to figures not yet weighed, 20 % on an estimate, 7 % on a calculated figure and none on a maker's figure (report 02, MASS-06).
+Revised 20 Nov 2026 (R23, with the conductor's rulings of the same day). Every part and paid job is a line in `data/vehicle/vehicle-parts.yaml`, whose totals match this page (`cad/tests/test_costs.py` checks them). The site's Car build page renders every line from it. Measurements are VEH-01 to VEH-27 and UTE-01 in `data/measurements.yaml`.
 
 ## Summary
 
-The vehicle is a used Toyota LandCruiser 79 single cab chassis with the 4.5 L V8 turbo diesel (VDJ79), built from 01/2017 to 08/2022, a GXL by preference, with about 400,000 km. The GVM kit sets the build date: Lovells' 4,200 kg kit fits single cabs only from 01/2017.
-
-The engine is rebuilt to factory specification with new piezo injectors, a new supply pump, a sealed airbox that keeps dust out of the fresh engine, and a cleaned and flow-tested DPF. It then runs power level B: about 230 to 250 kW (310 to 335 hp) and about 850 Nm at the crank, and never less than 224 kW (300 hp), the least that justifies the build. Power rises about 50 to 65 % over stock (151 kW) and torque about 98 % (430 Nm), and torque is what the clutch and gearbox carry. The turbo (GTurbo VD-G333), the PDI front-mount intercooler and the Manta 3 inch DPF-back exhaust are sized for this level. A new Aisin H152F gearbox and an NPC 1,300 Nm organic clutch take the torque, and the tune caps torque at 450 to 500 Nm in low range, first and reverse. The transfer case, tailshafts, hubs, steering, bushes and electrics are rebuilt or renewed, and the air conditioning is serviced. Slotted rotors with braided lines, steel wheels and LT265/75R16 tyres shared with the trailer, a Lovells GVM kit and a Hayman Reese towbar with a REDARC brake controller complete it. The GVM kit, Lovells' 4,200 kg Platinum or 4,495 kg Elite, is chosen only once the bike box body is built and weighed.
-
-Cost. The required work is AUD 73,650. With a contingency allowance of AUD 4,010 it is AUD 77,660, about 2.6 times the AUD 30,000 target. Five cuts that keep it reliable, each only if the old part passes its test, save up to AUD 13,979 and bring it to AUD 63,681 with contingency. So the budget needs to rise to about AUD 64,000 with every cut, or about AUD 78,000 for the full plan. The driveline refresh, GVM kit, brakes, wheels, tyres, towing, freight and weighing alone come to AUD 33,211, more than the target. The engine takes the rest: the rebuild with its sealed airbox and DPF service (AUD 26,210, of which the injectors are AUD 9,256) and the power parts, tune and certificate (AUD 14,229). About 54 % of the required total is estimates. The bike box, about AUD 13,900, sits outside these figures.
-
-Legal path in NSW. VSI 06 Rev 4, in force since 1 July 2026, adds item 6. It needs a certificate for flashing the engine management system in a way that alters emissions output, unless the maker approves it. The level B tune does that, so it needs a VSCCS certificate, the LA4 certificate for the reflash from an LC4 certifier, about AUD 2,000 (estimate). If the certifier asks for a laboratory emissions test at this power, add about AUD 10,000 (a contingency line). The certifier may also ask for evidence that the driveline takes about 850 Nm. Report 14 read the 2013 revision, under which a tune within 20 % of stock needed no certificate, and that is why the plan first stopped at 181 kW. The GVM kit needs its own certificate after Lovells' fitter fits it (about AUD 1,500, estimate). The bike box and its winch go into that same inspection, because a no-certificate box is only an assumption and item 35 may treat the winch as a powered loading device. The gearbox, brakes, wheels and tyres, sealed airbox and towbar need none. LA4 is the national code's approval for a modified engine.
-
-## Decisions
-
-| Decision | Why | From |
-|---|---|---|
-| Buy a VDJ79 single cab built 01/2017 to 08/2022. GXL first, GX second | Lovells' 4,200 kg kit fits single cabs only from 01/2017, the 3,900 kg kits' 2,360 kg rear axle is too small, and the GXL has factory front and rear diff locks | Report 16, decision log 11:25 |
-| Power level B: about 230 to 250 kW (310 to 335 hp) and about 850 Nm at the crank, never less than 224 kW (300 hp) | Leonard's minimum is 300 hp to justify the build. The plan first stopped at 181 kW (243 hp) only because a tune within 20 % of stock needed no certificate under the 2013 rules, and VSI 06 Rev 4 needs a certificate for any tune that alters emissions, so that reason is gone. The parts are sized for this level: GTurbo quotes the VD-G333 at 190 to 220 kW at the wheels with a tune, above this plan's 170 to 185 kW, and the factory injectors only become the limit at about 200 to 230 kW at the wheels. It holds about 105 km/h on a 6 % grade at 6.6 t, against 88 km/h at 181 kW and 76 km/h stock. The price is shorter head gasket and ring life than at 181 kW, kept acceptable by the exhaust temperature limit and the new radiator. Higher, about 300 kW, needs high-flow injectors and a bigger turbo, puts the cast pistons, head gaskets and stretch bolts at their limit for hours of towing, and is unlikely to be certified | Report 14 section 3.9, decision log 20:15 |
-| Power parts: GTurbo VD-G333, PDI twin-throttle front mount, Manta 3 inch exhaust that keeps the DPF | They run inside their limits at level B, and the exhaust and intercooler keep the emission equipment, so they need no certificate of their own | Report 14, decision log 11:15 |
-| DPF engine variant: piezo injectors and a DPF-back exhaust | It follows from the build date. It costs AUD 3,636 more than the earlier engine | Report 14, decision log 11:25 |
-| A sealed GTurbo airbox and a DPF inspection and clean, both required | Dust past the factory airbox seal is a common 70 Series fault and would wear the new rings, bores and turbo. The tune's emissions evidence needs a working DPF, and a high-kilometre filter holds ash that regeneration cannot burn off | Decision log 12:45 |
-| New genuine Aisin H152F gearbox and NPC Super HD Organic 1300 clutch with billet flywheel | An all-new Toyota box costs about the same as a rebuild and needs no certificate. Toyota publishes no torque rating for it, but report 15 assumes a fresh H152F survives 650 to 1,000 Nm in high range with sensible driving, which covers about 850 Nm. The organic disc takes up a heavy trailer smoothly and is rated to 1,300 Nm. Automatic conversions cost AUD 20,000 to 34,000, and the ZF 8-speed rated 1,200 Nm (AUD 37,950) is the fallback if the certifier will not accept the H152F at this torque | Report 15, decision log 11:15 |
-| The tune caps torque at 450 to 500 Nm in low range, first and reverse | Low range multiplies torque 2.488 times, and the 8 inch front diff and the CV joints are the weak link | Report 15 |
-| No wide-track rear housing | Lovells rates the kit's 2,550 kg rear axle on the factory housing, Multidrive's housing is rated only to a 3,950 kg GVM, and a rear-only wheel offset would end the shared wheel. The Lovells Elite is the step up | Decision log 11:25, reports 15 and 16 |
-| Lovells 4,200 kg Platinum kit TOYKIT080-GVM, or the 4,495 kg Elite, chosen at a decision gate once the bike box body is weighed. Fitted by Lovells' authorised fitter, LSPV reset | On the built ute model (UTE-GARAGE.md), towing with both bikes the ute is 3,678 kg and its rear axle carries 2,436 kg with growth, 114 kg in hand. On report 16's heavier budget, the sensitivity case, only about 25 kg is left. The weighed truck and box replace both at the gate. It costs about AUD 8,620 with fitting and certificate, against about AUD 21,500 for the Elite. Choosing before either kit is bought avoids paying for both | Report 16, decision log 11:25 and 12:45 |
-| Keep Toyota's 6,900 kg GCM | The combination is 6,700 kg: the ute at its 3,850 kg limit plus the 3,100 kg plate, less the 250 kg on the ball. On the built ute model with growth it is 6,646 kg. The rear axle binds before the GCM does | Report 16, decision log 12:10 |
-| Factory disc brakes with slotted factory-size rotors, Bendix Ultimate 4WD pads, braided lines and DOT 4 | No certificate is needed. A big brake kit needs 17 inch wheels and would end the shared wheel | Report 16 |
-| ROH Trak 2 16 x 7 ET 0 5 x 150 steel wheels with LT265/75R16 123/120 tyres on the ute and the trailer | It is Toyota's own wheel size and offset, so no certificate. One spare under the ute's tray and one on the trailer each fit both | Report 16, decision log 11:25 |
-| Hayman Reese 03186RW towbar (or a factory bar rated 3,500 and 350 kg), REDARC Tow-Pro Elite V3, 12-pin flat plug, Anderson SB50 feed on 6 B&S cable with a 50 A fuse | A maker-certified bar on Toyota's mounts needs no certificate. One feed carries the trailer's 35 A charger | Report 16 |
-| Coupling point 440 mm laden, plus or minus 20 mm | 450 mm plus 20 mm would go over VSB1's 460 mm limit | Decision log 12:10, report 18 section 3.5 |
-| Keep the full reliable plan and list the cuts | Leonard asked for high reliability, and even every cut leaves the plan near AUD 64,000 | Decision log 11:25 |
-| Bike box in welded aluminium, at most 1,850 mm wide (the cautious reading of Toyota's width rule), on Toyota's deck mounts, lighter than 440 kg, on the lowest deck that works. Its body is built and weighed before the GVM kit is chosen | The rear axle load and the rollover margin are tight with the bikes on board | Decision log 11:15, 11:25 and 12:45, reports 16 and 17 |
-| One LC5 inspection for the GVM kit, the bike box and its winch | VSI 06 item 35 may treat the winch as a powered goods loading device, and the box replaces the tray on its own mounts | Decision log 12:45 |
-
-### Figures reconciled in the merge
-
-- **Engine certificate.** VSI 06 Rev 4 (issued 1 July 2026, the version report 16 cites) is used over Rev 3 (2013, read by report 14). Rev 4's item 6 gives, as a flash that needs a certificate, one "altering vehicle emissions output unless approved by the vehicle manufacturer and done in accordance with the vehicle manufacturer's instructions". A Toyota dealer's update is not caught, but the level B tune changes emissions, so it needs a certificate (line TL05, AUD 2,000, estimate).
-- **VSI 06 item numbers.** This plan cites Rev 4. Rev 4 renumbered the driveline items, so report 15's gearbox item 6 is now item 7, its final drive item 7 is now 8 and its diff lock item 8 is now 9. The rules themselves read the same.
-- **Rebuild kit.** GTurbo lists the NVP kit (AUD 2,470.68) for pre-DPF engines with the injectors inside the rocker cover only. This plan prices it as an estimate: the same parts and price, with the DPF engine's genuine gasket set ordered by VIN.
-- **Trailer plate.** 3,100 kg in every sum (decision log 12:10), in place of report 16's 3,000 kg.
-- **Starting batteries.** One battery, from Toyota's body builder's guide (via report 16), over report 15's assumption of two. That saves AUD 300.
-- **Alternator.** About 130 A. Report 16 converts Toyota's 1,560 W at 14 V to about 110 A, but at the 12 V nominal it is 130 A, which matches report 15's 130 to 150 A. Either size carries the trailer charger's 35 A.
-- **Duplicates.** Report 15's greasable shackles and pins (AUD 250) are in the Lovells kit, and its separate wheel alignment (AUD 150) is covered by the one after the kit. A new H152F comes with its input shaft seal (AUD 16.50) fitted, so the seal now sits in the gearbox cut. Steering fluid was bought twice, so AUD 30 comes out of the fluids line. The LSPV re-check this plan first added (AUD 100) is gone, because the box is now fitted before the one LSPV reset.
-- **Contingency allowance.** 15 % of report 15's required lines as merged (AUD 15,396.69, so AUD 2,310), in place of report 15's AUD 2,400, which was 15 % of its lines before the merge.
-- **Cuts.** AUD 13,979, not the decision log's AUD 10,000 to 11,000, because the DPF truck's injectors cost AUD 9,256 against AUD 4,290 for the earlier type. Reusing the radiator is no longer a cut, because report 14 accepts level B for towing only with a new radiator.
-- **Power level.** Level B from the start, in place of level A with B later. The tune is report 14's level B price (AUD 2,500), one LA4 certificate covers it, and the second certificate and the retune that level B later needed are gone. The laboratory emissions test (AUD 10,000) moves from optional to contingency.
-- **Towball position.** 1,300 mm behind the rear axle (report 16) over 1,350 mm (report 17), now one position for every document (decision log 12:45). Moving the ball 50 mm changes the rear axle load by 50 / 3,180 = 0.016 kg per kg on the ball, about 4 kg at 250 kg.
-- **Box and tools.** The limits quote the built ute model, with the designed 433.1 kg box and 60 kg of tools, as the current estimate. Report 16's 450 kg for tray and box plus 100 kg of tools is kept as the heavier sensitivity case.
-- **Lines this plan adds.** The reflash certificate (AUD 2,000), the DPF inspection and clean (AUD 600), a new DPF as contingency (AUD 5,000), freight (AUD 1,000) and two weighbridge visits (AUD 60), all estimates, and the optional bull bar and winch (AUD 4,233). The sealed airbox (AUD 1,495) is report 14's line, now required.
-
-## Budget
-
-AUD including GST. The budget covers parts, outsourced work and certificates. It excludes buying the truck, Leonard's own labour, insurance, the bike box and the trailer. Every line is in `vehicle-parts.yaml`.
-
-| System | Required | Contingency lines, if all of them happen | Optional |
-|---|---|---|---|
-| Engine rebuild and cooling | 12,717 | 1,500 | 400 |
-| Fuel system | 11,398 | 0 | 0 |
-| Sealed airbox and DPF service | 2,095 | 5,000 | 0 |
-| Turbo, intercooler and exhaust | 8,519 | 0 | 0 |
-| Tune, gauges and engine certificate | 5,710 | 10,200 | 0 |
-| Clutch and gearbox | 6,744 | 0 | 300 |
-| Transfer case, tailshafts, diffs and hubs | 3,073 | 6,697 | 7,325 |
-| Steering and front suspension | 2,350 | 300 | 1,200 |
-| Chassis, cab, electrical, fuel lines, air conditioning, fluids | 3,230 | 2,400 | 687 |
-| GVM kit, fitting and certificate | 8,870 | 0 | 12,855 |
-| Brakes | 1,540 | 0 | 0 |
-| Wheels and tyres | 4,110 | 0 | 0 |
-| Towing | 2,234 | 0 | 639 |
-| Freight and weighing | 1,060 | 0 | 0 |
-| Long-range fuel tank | 0 | 0 | 1,557 |
-| Bull bar and winch, only if the truck has none | 0 | 0 | 4,233 |
-| **Total** | **73,650** | **26,097** | **29,196** |
-
-Freight is an allowance of AUD 1,000 (estimate). GTurbo in Perth ships the H152F on a 100 kg pallet and the NPC kit at 36 kg, and calculates freight at checkout. The exhaust, intercooler, airbox, radiator and smaller parcels travel too.
-
-The contingency allowance is AUD 4,010. It carries the four small engine and tune lines in full (AUD 1,700) and 15 % of report 15's required lines as merged (AUD 2,310), which covers one or two of the driveline and refresh lines, such as a diff rebuild or a new transfer case. It leaves out a new DPF (AUD 5,000), because a DPF specialist replaces a filter only when it is cracked or melted, which the required clean and flow test shows. If the clean fails, add it. It also leaves out the laboratory emissions test (AUD 10,000), which is needed only if the certifier asks for one at level B. If every contingency line happened, the extra would be AUD 26,097.
-
-The optional column is a menu, not a plan. Its biggest line is the Lovells Elite in place of the Platinum (net AUD 12,855), which the decision gate chooses or rules out.
-
-| Total | AUD | Against AUD 30,000 |
-|---|---|---|
-| Required | 73,650 | 43,650 over |
-| Plus the contingency allowance | 4,010 | |
-| Required with contingency | 77,660 | 47,660 over |
-| Less every cut below | -13,979 | |
-| With the cuts and contingency | 63,681 | 33,681 over |
-| Bike box, outside the vehicle work | 13,900 | separate |
-
-Without contingency, the plan with every cut is AUD 59,671.
-
-### Cuts that keep it reliable
-
-Each cut applies only if the old part passes its test. If it fails, buy the new part and the saving is lost. Report 14 notes that a 2017 to 2022 truck at 400,000 km has averaged at least 40,000 km a year, so most for sale will show less, which makes a pass more likely.
-
-| Cut | Instead of | Saving | Risk |
-|---|---|---|---|
-| Test and reuse the eight piezo injectors (Denso specialist test and service, AUD 1,600, estimate) | New set, AUD 9,256 | 7,656 | A worn injector can fail early on the fresh engine. At level B the factory injectors run near their flow limit, so a tested set has less margin than a new one. The AUD 1,600 is report 14's price for the earlier injector type |
-| Bench-test and reuse the supply pump | New pump, AUD 1,480 | 1,480 | A worn pump sheds metal through the injectors and back to the tank |
-| Measure and reuse the oil pump | New pump, AUD 700 | 700 | Low, if it measures within specification |
-| Rebuild the truck's own H152F with the Marks 4WD GBK9 kit (AUD 840.88) and a new input shaft seal (AUD 16.50), Leonard's labour | New H152F, AUD 3,840 | up to 2,983 | The best case. The kit's fit to the H152F is not confirmed, as its title names the 70, 75, 100 and 105 Series five-speed from 1998. Worn second-to-third synchros can need hubs, sleeves or gears beyond the kit. It reuses 400,000 km shafts and gears under about 850 Nm |
-| Keep a factory towbar rated 3,500 kg and 350 kg, if fitted | Hayman Reese 03186RW, AUD 1,160 | 1,160 | Low, if the plate shows both ratings and the mounts and receiver show no cracks |
-| **Total** | | **up to 13,979** | |
-
-The radiator is not a cut at level B. Report 14 accepts this power for towing only with a new radiator, so a reused core that is part blocked would run hot on long grades.
-
-## Order of work
-
-Each step lists what it needs from the steps before it and who does the work when Leonard cannot. Step 6, the bike box body, can run alongside steps 3 to 5.
-
-1. **Buy the truck.** Check the compliance plate for a build date from 01/2017 to 08/2022. Run report 15's pre-purchase checklist: a PPSR search for finance, write-off and theft records, the service history, ex-mine signs (beacon and antenna holes, mine-spec bars) and heavy corrosion, the rear spring hangers and the rails behind the cab for cracks or plates, the A-pillars and floor for rust, both rear hub faces with a digital angle gauge for a bent housing, and 2H, 4H, 4L and both diff locks on the test drive. Add the engine checks: compression on all eight cylinders, DPF warning lights and any limp mode, and by scan tool the injector correction values, the regeneration history and the DPF pressure reading. Then blow-by, an oil sample, oil in the coolant or coolant in the oil, turbo shaft play, and dust on the clean side of the air filter and in the intake pipe. Check that the bull bar is an airbag-compatible bar made for the 79 (its maker's label or papers) and that the winch works. Walk away from a write-off record, heavy corrosion, rusty A-pillars, flood signs, a cracked or plated chassis, a bent rear housing, a cracked block or head, or uncertified major work. Note whether a factory towbar rated 3,500 kg and 350 kg is fitted. Needs: nothing. Leonard does it.
-2. **Baseline and certifiers.** Book the tuner who will write the tune and run the truck, as bought, on that dyno. This sheet is the stock baseline the tuner and the certifier compare the tuned run against. Weigh each axle with full fuel at a public weighbridge, so the decision gate in step 7 starts from real figures. Engage two VSCCS certifiers, or one licensed for both: LC4 for the tune, and a Lovells-endorsed LC5 certifier for the GVM kit, the bike box and its winch. Show the LC5 certifier the box design now. Certifiers may also ask for photos or inspections at stages. Needs: the truck unmodified. Outsourced: the dyno run, the weighbridge and the certifiers.
-3. **Strip and refresh.** Pull the engine and gearbox. While they are out, rebuild the transfer case with the Koyo kit, send both tailshafts for new joints, centre bearing and balancing, and renew the pinion seals, breathers, swivel hubs, wheel bearings and hub seals. Remove the DPF and send it to a DPF specialist for an off-car clean and flow test. Crack-test the rear spring hangers, the rails behind the cab and the steering box mount, treat the rust, and renew the cab mounts, alternator, starter, battery, earth straps and fuel hoses. Service the air conditioning. Contingency work shows up here: a noisy diff, pitted CV joints, a cracked hanger, a dead compressor, a cracked DPF. Leave the steering and front bushes for step 8. Needs: step 2's baseline on the truck as bought. Outsourced: the tailshafts, the DPF clean, the air conditioning (a licensed technician), and any diff rebuild or chassis repair.
-4. **Engine rebuild.** Strip the engine, take an oil sample, measure, and send the block, crank, rods and heads to the machine shop. Measure piston protrusion per bank, then order the NVP kit sizes, the DPF engine's genuine gasket set by VIN and the head gasket grades. Fit the timing set, oil and water pumps, cooling parts, glow plugs and mounts, clean the EGR and intake, and flush the tank and lines before the new pump and injectors see fuel. Pressure-test the oil cooler and check the vacuum pump for oil. Refit the engine with the NPC clutch, billet flywheel and new H152F, so the gearbox comes out only once. Refit the cleaned DPF, and fit the sealed airbox before the first start, so no dust reaches the new rings. Run the engine in on the factory calibration (assumption: about 1,000 km, report 14's distance for watching the oil level). Needs: the engine out from step 3, the cleaned DPF and the clutch kit, which takes 2 to 4 weeks to arrive. Outsourced: the machine shop, and a Denso specialist to test the old injectors and pump if Leonard takes those cuts.
-5. **Power parts, tune and engine certificate.** Fit the VD-G333 turbo with its gasket kit, the front-mount intercooler, the DPF-back exhaust (keep the factory rear crossover pipe) and the gauges with the EGT probe before the turbo. Route the turbo actuator breather up high. The tuner writes the tune on the same dyno to the settings in the engine section. Book the TfNSW emissions test only with the cleaned DPF fitted and no stored fault codes. Then get the LA4 certificate for the reflash from the LC4 certifier, with the driveline evidence the certifier asks for, have Service NSW endorse the registration record, and tell the insurer. Needs: the run-in engine, the new clutch, the cleaned DPF and step 2's sheet. Outsourced: the tune, the emissions test and the certificate.
-6. **Build and weigh the bike box body.** Have an engineer review report 17's design against the limits below. Build the walls, roof and doors in welded aluminium and weigh them. Only the floor and subframe wait for the GVM kit's ride height and bump travel, so take their masses from the design. Needs: the cab width, deck-mount stations and axle weights measured in step 2. Outsourced: the engineer's review. Cost: about AUD 13,900, outside the vehicle work.
-7. **Decision gate: Platinum or Elite.** Add up the rear axle load: step 2's weighed axles less any tray the box replaces, the weighed body, the design floor and subframe, the bikes, tools, people, one spare, the towbar and 250 kg on the ball, with growth on every figure that is still an estimate. Start from the model's sum in the limits section and replace each figure with its weighed one, so the weighed truck and box decide, not either estimate. If the rear axle stays at or under 2,550 kg, buy the Platinum. If not, take weight off the box, tray or ball first, then buy the Elite (rear axle 2,850 kg). Settle the front bushes from the chosen kit's contents and front lift: drop the AUD 450 bush line if the kit supplies them, and use caster-correction leading-arm bushes if it lifts the front. If the Elite is chosen, check what its brake upgrade includes before buying step 8's brake parts. Needs: steps 2 and 6, and the kit contents from Lovells' fitter. Leonard decides.
-8. **Brakes, wheels, tyres, steering and front bushes.** Fit the slotted rotors, Bendix pads and braided lines, flush with DOT 4 and bed the pads in. Fit the steering ends, damper, exchange steering box and hoses, and the front bushes settled in step 7. Check the ROH wheel's nut seat against Toyota's steel-wheel nuts, then the tyre shop fits the six LT265/75R16 tyres. Needs: a running truck from step 5 and step 7's choices. It comes before the kit because the kit's placard needs tyres of at least load index 117 and speed rating M, and the certifier inspects the brakes bedded in. Outsourced: tyre fitting and balancing.
-9. **GVM kit.** Lovells' authorised fitter fits the kit chosen in step 7. Until step 11's certificate the ute is still rated at Toyota's 3,400 kg GVM, so carry no bikes. Needs: step 7's choice, step 8's tyres, brakes, steering and bushes, and a sound chassis from step 3. Outsourced: all of it, because Lovells lets only its own fitters fit the kit for state compliance.
-10. **Finish and fit the box, the winch and the towing gear.** Build the box floor and subframe to the kit's ride height and bump travel, bolt the box to Toyota's deck-mount stations, and fit the winch, ramp and restraints. Fit the Hayman Reese 03186RW to Toyota's mounting points (or keep a rated factory bar), the REDARC controller with its wiring kit and mount, the 12-pin socket and the Anderson SB50 feed with a 50 A fuse at the battery. The box overhangs the ball by about 210 mm, so check the plugs and chains under it now. Needs: the kit from step 9. Leonard does it.
-11. **Alignment, LSPV reset and one LC5 inspection.** An alignment shop aligns the wheels, which also covers step 8's steering work, and resets the LSPV with the box on, as Toyota asks once a body is complete. The LC5 certifier inspects the kit, the box and the winch together, and a modification plate is fitted. Service NSW endorses the record, and the insurer is told. Needs: steps 8 to 10. Outsourced: all of it.
-12. **Final weighbridge check.** Load the ute as it will travel, with people, bikes, tools, full fuel and one spare, and weigh each axle. Weigh again with the trailer coupled. Check every figure in the limits section. Choose the tongue drop for a coupling point of 440 mm, plus or minus 20 mm, laden (report 18 section 3.5), and set tyre pressures from the tyre maker's load table at the weighed loads. Needs: everything above. Outsourced: the weighbridge.
-
-## Engine
-
-Level B on a DPF truck, from report 14 (section 3.9). Toyota dealer parts are ordered by VIN. GTurbo lists the NVP rebuild kit for pre-DPF engines only, so its price here is an estimate for the same parts with the DPF engine's genuine gasket set.
-
-| Part | Part number | Supplier | AUD |
-|---|---|---|---|
-| NVP engine rebuild kit (pistons, rings, bearings, head gaskets, head bolts) with the DPF engine's genuine gasket set | Sizes ordered after machining, gasket set by VIN | GTurbo (North Vic Parts) | 2,471 (estimate) |
-| Timing set, oil pump, glow plugs, engine mounts, genuine | Timing set 13506-51020 and others, rest by VIN | Toyota dealer | 2,350 (estimate) |
-| Machine shop: block, bores, decks, mains, crank, rods, two heads | | Local machine shop | 4,200 (estimate) |
-| Radiator | Natrad VDJ 2007 to 2025 | Natrad | 1,756 |
-| Water pump, thermostat, fan clutch, hoses, coolant, genuine | By VIN | Toyota dealer | 1,540 (estimate) |
-| Oil, filters, sealant, assembly lube | | Toyota dealer, parts store | 400 (estimate) |
-| Eight genuine new piezo injectors | GTurbo DPF piezo set | GTurbo | 9,256 |
-| Injector fitting kit, DPF engine | GTurbo DPF fitting kit | GTurbo | 190 |
-| Supply pump, Denso HP4, new | 294050-0560 | GTurbo | 1,480 |
-| Pre-filter and water separator, 30 micron | Direction Plus PL625DPK | Filters Plus | 432 (estimate) |
-| Fuel filter element, genuine | 23390-51070 | eBay listing | 40 |
-| High-flow airbox, sealed, takes the factory filter | A AB GT VDJ79 | GTurbo | 1,495 |
-| DPF inspection, off-car clean and flow test | | DPF cleaning specialist | 600 (estimate) |
-| VD-G333 Titan turbo, journal bearing | T T VD-G333T (web), T T 1VD-FTV S2.5B (booklet) | GTurbo | 4,290 |
-| Turbo gasket kit | GTurbo VDJ70 kit | GTurbo | 299 |
-| Turbo intake pipe, genuine | By VIN | Toyota dealer | 250 (estimate) |
-| PDI front-mount intercooler, twin throttle, no radar bracket | A IC AA T3F-2.1 | GTurbo (PDI) | 2,200 |
-| Manta 3 inch DPF-back exhaust, stainless, quiet | SSMKTY0123 | GTurbo (Manta) | 1,480 |
-| Custom level B tune with the stock and tuned dyno runs | | GTurbo, HP-F or a local tuner | 2,500 (estimate) |
-| Autometer boost, EGT and water temperature gauges | Autometer combo kit | GTurbo | 990 |
-| Autometer oil temperature gauge | | Autometer dealer | 220 (estimate) |
-| TfNSW emissions test | | Transport for NSW | 0 (assumed free) |
-| VSCCS certificate for the reflash | | LC4 certifier | 2,000 (estimate) |
-| **Engine total** | | | **40,439** |
-
-Contingency lines: other head gasket grades (AUD 400), the oil cooler if it fails a pressure test (AUD 500), the brake vacuum pump if oil passes it (AUD 600), a new DPF if the filter is cracked or melted (AUD 5,000), a gas analyser test if the TfNSW test is not available (AUD 200), and a laboratory ADR 79 emissions test if the certifier asks for one (AUD 10,000 or more).
-
-The sealed airbox matters because dust past the factory airbox seal is a common 70 Series fault, and it would wear the new rings, bores and turbo. The airbox keeps the emission controls, so it needs no certificate (VSI 06 item 5). The DPF clean comes first because the emissions test and the certificate need a working filter.
-
-Settings for the tuner:
-
-- Peak power about 230 to 250 kW at the crank, and never less than 224 kW (300 hp). At report 14's 74 % from crank to wheels that is about 170 to 185 kW on the dyno, and 224 kW is about 166 kW. The tuner sets the final figure on the dyno inside the exhaust temperature limit below.
-- Torque about 850 Nm at the crank in high range from about 1,800 rpm (estimate). At 250 kW, power peaks near 2,800 rpm. Above that the tune holds power, so torque falls to about 700 Nm at 3,400 rpm (calculated).
-- Torque capped at 450 to 500 Nm in low range, first and reverse.
-- A towing map with less torque below about 1,600 rpm, to stop lugging.
-- Fuel pulled from 650 °C EGT before the turbo, and never more than 700 °C.
-- Factory light-load maps, EGR, DPF and catalyst functions left as they are.
-
-Limits to drive to: coolant 90 to 104 °C when towing (over 107 °C for long means an airflow problem), oil 99 to 116 °C (over 121 °C sustained means a cooling review), and no full load below about 1,600 rpm. These are general diesel figures, not 1VD data.
-
-Build notes: refit the support pole in the oil filter housing at every oil change, run the turbo actuator breather hose up into the engine bay, and mount the gauges below the top of the steering wheel (an NSW owner report says higher pods are not allowed).
-
-## Driveline and refresh
-
-From report 15, required list.
-
-| Part | Part number | Supplier | AUD |
-|---|---|---|---|
-| NPC Super HD Organic 1300 clutch with matched billet flywheel | NPC7751-1D | GTurbo (NPC) | 1,818.50 |
-| Clutch master cylinder | MCTY161 | Xtreme Outback | 131.38 |
-| Braided clutch line | B-LINE-VDJ | GTurbo (NPC) | 154.00 |
-| Clutch fork and pivot ball kit | ATFKTY28-08 | Xtreme Outback | 319.81 |
-| Slave cylinder, release and spigot bearings, flywheel bolts, genuine | By VIN | Toyota dealer | 330 (estimate) |
-| Genuine Aisin H152F five-speed gearbox, new, input shaft seal fitted | GT-H152-VDJ | GTurbo | 3,840 |
-| Rear gearbox mount | By VIN | Toyota dealer | 150 (estimate) |
-| HF1A transfer case rebuild kit, Koyo bearings | P004651 | HD Automotive | 653 |
-| Both tailshafts: joints, centre bearing, balance | | Driveline shop | 900 (estimate) |
-| Pinion seals, diff checks, breather extensions | By VIN | Toyota dealer, 4WD store | 320 (estimate) |
-| Swivel hub kits, all wheel bearings, hub seals | By VIN | Toyota dealer | 1,200 (estimate) |
-| **Clutch, gearbox, transfer case, tailshafts, diffs and hubs** | | | **9,817** |
-
-The rest of the refresh is AUD 3,230, all estimates: dye penetrant kit 60, rust treatment 250, cab mounts 400, alternator 700, starter 450, one battery 300, earth straps and cables 150, wiring repairs 200, fuel hoses 150, air conditioning service 350, driveline fluids and swivel hub grease 220.
-
-Contingency lines: a new transfer case if the gears or case are damaged (net AUD 2,297), a diff rebuild (AUD 1,300 each), heavy-duty front CV joints (AUD 1,800 a pair), chassis crack repair and bracing (AUD 1,500), an air conditioning compressor (AUD 900).
-
-Settings and habits:
-
-- H152F ratios: 4.529, 2.294, 1.490, 1.000 and 0.750, reverse 4.313. Transfer case 1.000 high and 2.488 low. Final drive assumed 3.909.
-- At 100 km/h on the 804 mm tyre, fifth turns about 1,930 rpm and fourth about 2,580 rpm. Use fourth on long grades and into headwinds, so the engine does not lug in fifth.
-- First in low range is 44:1, about 7 km/h at 2,000 rpm. Use low range for hill starts and for reversing the trailer. It saves the clutch more than any part.
-- GL-4 75W-90 in the gearbox, because GL-5 additives attack the synchro brass. GL-5 in both diffs.
-- If the tune cannot cap torque at 450 to 500 Nm in low range, first and reverse, the heavy-duty CV joints and two heavy-duty tailshafts become required (about AUD 5,800), and low range with the locks in is driven gently.
-- Keep the factory diff ratio. A ratio change needs a certificate unless the speedometer is corrected.
-- No gearbox cooler is planned. Temperature senders for the gearbox and rear diff (AUD 300, optional) show whether one is needed.
-
-## Suspension and GVM
-
-From report 16, plus report 15's steering and front bushes, which go on just before the kit (step 8). The kit itself is chosen at the decision gate (step 7).
-
-| Part | Part number | Supplier | AUD |
-|---|---|---|---|
-| Lovells 4,200 kg Platinum GVM kit, single cab 2017 to 2022 | TOYKIT080-GVM | Lovells, through an authorised fitter such as Fulcrum Suspensions | 5,620 (estimate, a 2024 preorder listing) |
-| Fitting by Lovells' authorised fitter | | Lovells authorised fitter | 1,500 (estimate) |
-| VSCCS certification of the GVM kit, the bike box and its winch, one inspection | | Lovells-endorsed LC5 certifier | 1,500 (estimate) |
-| Wheel alignment and LSPV reset, with the box fitted | | Alignment or brake shop | 250 (estimate) |
-| Tie-rod and drag-link ends, genuine | By VIN | Toyota dealer | 500 (estimate) |
-| Steering damper, heavy-duty | | Old Man Emu or Tough Dog stockist | 150 (estimate) |
-| Power steering box, reconditioned exchange | | Steering specialist | 1,100 (estimate) |
-| Power steering hoses and fluid | By VIN | Toyota dealer | 150 (estimate) |
-| Front leading-arm, panhard rod and anti-roll bar bushes and links | | Toyota dealer, Nolathane or SuperPro stockist | 450 (estimate) |
-| **Total** | | | **11,220** |
-
-The kit holds front coils, rear leaf packs, remote-reservoir shocks, urethane bushes, U-bolts, greasable shackles and pins, mudflaps, side indicators and a new tyre placard. Contingency line: a cracked rear spring hanger (AUD 300 plus welding).
-
-Ratings and settings:
-
-- After the kit: GVM 4,200 kg, front axle 1,650 kg, rear axle 2,550 kg. The GCM stays at Toyota's 6,900 kg (decision log 11:25).
-- Tyres of at least load index 117 (1,285 kg) and speed rating M (130 km/h).
-- LSPV check with Toyota's gauge set 09709-29018 at Toyota's standard rear axle load: 5.9 MPa in the front circuit gives 4.9 MPa, plus or minus 0.5, at the rear, and 7.8 MPa gives 5.4 MPa, plus or minus 0.7.
-- Front bushes: settle them at the gate from the chosen kit's contents and front lift. Drop the AUD 450 bush line if the kit supplies them, and fit caster-correction leading-arm bushes if the kit lifts the front.
-- The step up is the Lovells 4,495 kg Elite: a 2,850 kg rear axle, a rear housing widened to the front track, chrome-moly axles, an exchange diff and a brake upgrade, for a net AUD 12,855 more. Choose it at the gate if the rear axle sum with growth tops 2,550 kg, or if the rear housing is found bent. Choosing it later costs more: an Elite after a fitted Platinum costs its full AUD 19,975 plus a second certificate, and the AUD 8,620 spent on the Platinum is lost.
-
-## Brakes
-
-From report 16. Every V8 79 has ventilated discs front and rear, so the factory calipers, master cylinder and booster stay. A different master cylinder or booster would need a certificate.
-
-| Part | Part number | Supplier | AUD |
-|---|---|---|---|
-| Bendix Ultimate 4WD rear kit, two slotted rotors and pads | U4WD-BUK34 | Marks 4WD | 555.01 |
-| Delios slotted front rotors | DLS0790 | Marks 4WD | 280.01 |
-| Bendix Ultimate 4WD front pads | | Bendix stockist | 150 (estimate) |
-| Braided brake lines, complete set | BQTL70S | Marks 4WD | 515 (midpoint of AUD 435 to 595) |
-| DOT 4 fluid flush | | Any automotive store | 40 (estimate) |
-| **Total** | | | **1,540** |
-
-Bed the pads in before the LC5 inspection. If the gate chooses the Elite, check what its brake upgrade includes before buying these parts. The trailer's own electric brakes, set through the Tow-Pro controller, stop the trailer, so the ute's brakes do not do its work.
-
-## Wheels and tyres
-
-From report 16. Six of each: four on the ute and two spares, one under the ute's tray and one on the trailer. The trailer's four come from the trailer budget.
-
-| Part | Part number | Supplier | AUD |
-|---|---|---|---|
-| ROH Trak 2 steel wheel 16 x 7, ET 0, 5 x 150, rated 1,400 kg, six at AUD 230 | | ROH stockists | 1,380 (estimate) |
-| LT265/75R16 123/120R load range E, Yokohama Geolandar A/T G015 or Toyo Open Country A/T III, six at AUD 420 | | Tyre retailers | 2,520 (estimate) |
-| Fitting and balancing, six at AUD 35 | | Tyre shop | 210 (estimate) |
-| **Total** | | | **4,110** |
-
-Settings:
-
-- The tyre is 804 to 805 mm tall and carries 1,550 kg at 80 psi. The kit's rear axle needs 1,275 kg a wheel. The trailer needs 864 kg a wheel at its 3,100 kg plate under VSB1's 120 % rule (report 18 section 3.3).
-- Pressures (estimates from report 16): rear about 53 psi at the planned 1,215 kg a tyre, front at least the placard's 250 kPa (36 psi), trailer about 26 to 30 psi on the highway. Use the tyre maker's load table at the weighed loads.
-- Wheel nuts: assumption, Toyota's M14 x 1.5 steel-wheel nuts with a 21 mm hex suit the ROH wheel's nut seat (report 16). Check the seat against the nut before the tyre shop fits the wheels (step 8), because a nut with the wrong seat can work loose. Torque 209 Nm on these steel wheels. On the trailer, use the lower of 209 Nm and Cruisemaster's stud rating.
-- The tyre is smaller than the placard's 225/95R16C, so the speedometer reads slightly high, which is legal.
-- Trailer side: Cruisemaster LC5 M14 hubs (5 x 150) on its 12 inch ABS-enabled drums, 110 mm spigot, 900 mm axle spacing.
-
-## Towing
-
-From report 16. The ute is 12 V.
-
-| Part | Part number | Supplier | AUD |
-|---|---|---|---|
-| Hayman Reese Class 4 towbar, 3,500 kg and 350 kg, 50 mm receiver, self-fitted | 03186RW | ARB | 1,160 |
-| REDARC Tow-Pro Elite V3 brake controller | EBRH-ACCV3 | REDARC | 469.04 |
-| Universal Tow-Pro wiring kit | TPWKIT-013 | REDARC | 255.99 |
-| Tow-Pro universal mount | TPSI-001 | REDARC | 19 |
-| 12-pin flat socket to AS 4177.5, with wiring | | Auto electrical supplier | 80 (estimate) |
-| Anderson SB50 feed, about 8 m of 6 B&S twin cable, 50 A fuse at the battery | | Auto electrical supplier | 250 (estimate) |
-| **Total** | | | **2,234** |
-
-Settings:
-
-- Coupling point 440 mm, plus or minus 20 mm, with the ute laden and the trailer level. The tongue drop sets it at step 12. VSB1 allows 350 to 460 mm laden, so 450 mm plus 20 mm would go over the limit (report 18 section 3.5).
-- At most 250 kg on the ball. The bar takes 350 kg, but the rear axle binds first. The redesigned trailer puts 179 to 220 kg on it, or 198 to 246 kg with growth (TRAILER.md).
-- The controller's output goes to pin 5 of the 12-pin socket.
-- The feed serves one Victron Orion-Tr Smart 12/24-15 in the trailer, which draws about 35 A and loses about 0.6 V over the 13 m loop. A second charger would draw about 70 A and need 2 B&S cable, so keep one.
-- Fuse every added circuit, clip the cable at about 200 mm intervals and fit a grommet wherever it passes through metal (Toyota's wiring rules).
-- No load distribution hitch. Toyota recommends one for a trailer over half the GVM, but none was found for the trailer's DO35 coupling, so the combination runs without one (report 16's assumption).
-- The Hayman Reese X-Bar 03237RW with rated recovery points is optional, net AUD 639 more.
-
-## Legal and paperwork
-
-NSW registration, Victoria as the fallback. Item numbers are from TfNSW's VSI 06 Rev 4, issued 1 July 2026.
-
-**The tune.** Report 14 found that a tune within 20 % of stock needs no certificate, under the 2013 revision, where only a power rise over 20 % (item 2) or higher emissions (item 5) triggered one. Rev 4 adds item 6, on re-programming or "flashing" the engine management system. Its example of a flash that needs a certificate is one "altering vehicle emissions output unless approved by the vehicle manufacturer and done in accordance with the vehicle manufacturer's instructions". A Toyota dealer's software update is not caught, but the level B tune changes the emissions, and at about 50 to 65 % over stock it also passes item 2's 20 %. So the custom tune needs a VSCCS certificate from an LC4 certifier. Assumption: the certifier assesses it under VSB 14 code LA4 for about AUD 2,000, including the noise test (report 14's estimate), and accepts the TfNSW emissions test or the Interim NSW Vehicle Emissions Test Procedure (May 2023), which Rev 4 names as the alternative to testing to the standards. If the certifier asks for a laboratory ADR 79 test, add about AUD 10,000 or more (report 14's estimate, the contingency line TL07). Report 14 rates the certificate at this power possible but not assured, so talk to the certifier before the power parts are bought.
-
-Evidence to keep, with the certificate:
-
-- The stock and tuned power and torque sheets from the same dyno.
-- The emissions test result, taken with the cleaned DPF fitted and no stored fault codes.
-- Proof that the DPF, EGR, catalyst and crankcase ventilation all work, including the DPF specialist's clean and flow-test record. DPF-delete pipes are sold for off-road use only, and none is used here.
-- Invoices showing the injectors and supply pump are genuine Toyota or Denso parts, so no non-original fuel equipment is fitted (items 5 and 49).
-- Photos of each stage, which certifiers may ask for.
-
-**GVM.** Re-rating the GVM needs a certificate (item 51). A registered ute cannot use the federal pre-registration path. Lovells lets only its authorised fitters fit the kit and only its endorsed signatories inspect it. A Lovells-endorsed LC5 certifier inspects the kit once the bike box and its winch are fitted too, so one inspection covers all three (decision log 12:45). A modification plate goes on and Service NSW endorses the record (about AUD 1,500, estimate, assumed to cover all three). The same certificate covers the kit's ride height change (item 13, assumption). At 4,200 or 4,495 kg the ute stays a light vehicle. Above 4,500 kg it would need a heavy vehicle examiner.
-
-**Bike box and winch.** That the box needs no certificate of its own is an assumption, so it goes into the LC5 inspection. Item 35 needs a certificate for "any powered goods loading device, both internal and external to the vehicle", and the WARN winch that pulls each bike into the box may count as one. Item 27's no-certificate example is a like-for-like body on a full chassis, and a tall closed body in place of a tray may not count as one. Item 34 covers body mountings the maker did not design, and the box's mounts are custom. Assumption: the certifier signs off the box and the winch with the kit, with the engineer's review of the design as evidence.
-
-**Noise and emissions.** The NSW in-service noise limit for a vehicle built to ADR 83/00 is its stationary noise "signature" plus 5 dB(A). The VDJ79's figure was not found. Assumption: the Manta "quiet" system passes, and the certifier's noise test confirms it. An exhaust and intercooler that keep the emission equipment need no certificate of their own (item 5).
-
-**No certificate needed:** the new H152F, which fits the tunnel and bolts to the engine (item 7), the unchanged final drive (item 8), factory-size brake parts (items 18 and 19), the LSPV reset to Toyota's figures (item 20), the wheels and tyres at Toyota's size and offset (items 15 to 17), the sealed airbox, which keeps the emission controls (item 5), and the maker-certified towbar on Toyota's mounts (item 31). The optional 180 L fuel tank needs one (item 50) and goes in the LC5 inspection.
-
-**Insurer.** TfNSW warns that cover can be void for undeclared modifications. Declare every change and both certificates, and keep the dyno sheets and emissions result with the policy. Get quotes before buying parts (assumption: cover is available with full disclosure).
-
-**Driveline evidence.** The certifier may ask for evidence that the driveline takes about 850 Nm and that the brakes suit the GVM. The clutch is rated 1,300 Nm, the H152F has no published rating, and the tune caps torque at 450 to 500 Nm in low range, first and reverse. If the certifier will not accept the H152F at this torque, the fallback is the ZF 8-speed automatic rated 1,200 Nm (AUD 37,950, report 15), about AUD 34,000 more than the new H152F.
-
-**Victoria.** VASS signatories apply VSB 14. Assumption: the LA4 path, as level B is more than 20 % over stock (report 14). Whether Victoria has a rule like NSW item 6 was not checked. Choose the state of registration before the first certificate, because NSW does not recognise light vehicle certificates issued under an interstate scheme (VSI 06 Rev 4, page 3).
+The truck is a used Toyota LandCruiser VDJ79 single cab V8 diesel, built 01/2017 to 08/2022, a GXL by preference, with about 400,000 km. It is built in seven stages over a year or more, and every stage leaves it registered and drivable. It ends at power level B, about 230 to 250 kW and 850 Nm at the crank and never below 224 kW (300 hp). It carries both bikes in the box on a Lovells 4,200 kg GVM kit and tows the trailer, plated at 3,500 kg, under Lovells' 7,400 kg GCM revision (decision H2). The required work is AUD 79,842, and AUD 83,897 with the AUD 4,055 contingency allowance. Leonard's planning figure for the build is AUD 75,000, so the plan is AUD 8,897 over it with the allowance and AUD 4,842 over without. Two cuts close the gap, each taken only if the old part passes its test: reusing the tested injectors (CUT1, AUD 7,656) and the bench-tested supply pump (CUT2, AUD 1,480) save AUD 9,136. With all five cuts the plan is AUD 69,918, AUD 5,082 under. Estimates are 56 % of the required total. The truck (Leonard's AUD 50,000 planning figure), the bike box (AUD 50,980 shop-built or AUD 26,490 owner-built, `data/ute/box-parts.yaml`), the trailer and Leonard's labour are outside these figures.
+
+## Stage plan
+
+| Stage | Work | Required AUD | Contingency lines AUD | Paid labour | Downtime (est.) | The ute can then |
+|---|---|---|---|---|---|---|
+| S0 | Buy, baseline tests, weigh, engage certifiers | 1,330 | 0 | Diesel workshop, weighbridge | 1 day | Drive as bought |
+| S1 | Driveline and chassis refresh, sealed airbox, DPF clean, new cooling, gauges | 14,037 | 12,597 | Tailshafts, DPF clean, air conditioning | 2 to 3 weeks | Daily driver at stock power, towing only within Toyota's 3,400 kg GVM and 6,900 kg GCM |
+| S2 | Factory-spec engine rebuild, new injectors and pump, NPC clutch, new H152F | 27,231 | 1,500 | Machine shop | 6 to 10 weeks, then a 1,000 km run-in | As after S1, rebuilt |
+| S3 | Gate: build and weigh the box body, choose the kit | 0 | 0 | Box engineer (box budget) | None | Unchanged |
+| S4 | Brakes, wheels, tyres, steering, GVM kit, 180 L tank, box, towing gear, one LC5 inspection with the GCM revision | 22,161 | 0 | Lovells fitter, tyre shop, alignment, certifier | 2 to 3 weeks | Carries the bikes and, once certified, tows up to 3,500 kg at stock power |
+| S5 | Trailer charging, tongue, final weighing | 1,965 | 0 | Weighbridge, auto electrician | 1 week | Tows the loaded trailer with charging |
+| S6 | Turbo, intercooler, exhaust, then the tune and its certificate | 13,119 | 12,000 | Tuner, emissions test, LC4 certifier | 2 to 4 weeks | Tows the trailer with the box at level B |
+| Total | | 79,842 | 26,097 | | | |
+
+The S0 tests decide when S2 happens.
+
+- Branch A, rebuild now, if any S0 test fails: compression spread over 10 % (VEH-01), leak-down over 20 % (VEH-02), blow-by over 100 L/min (VEH-03), an injector more than 25 % off the mean (VEH-04), silicon over 20 ppm with high iron and chromium (VEH-05), fuel dilution over 4 % (VEH-06), any glycol (VEH-07), or clutch slip or gearbox noise (VEH-09). Order S0, S1, S2, S3, S4, S5, S6. Do S1's cooling and intake work while the engine is out.
+- Branch B, rebuild later, if every test passes. Order S0, S1, S3, S4, S5, S2, S6. The ute tows at stock power on its own engine and gearbox with the new cooling, sealed airbox and clean DPF, and the engine comes out once, just before the power parts.
+
+The tune is last in both branches, so every earlier stage stays legal whatever the LC4 certifier decides.
+
+### S0 Buy and baseline
+
+Goal: buy the right truck and learn what the engine needs before spending.
+
+- Check the compliance plate for 01/2017 to 08/2022 and run a PPSR search. Walk away from a write-off record, a cracked or plated chassis, rusty A-pillars, flood signs, a bent rear housing or a cracked block or head. Test 2H, 4H, 4L and both diff locks.
+- A diesel workshop runs the baseline tests (BI01). The new glow plugs (EN04) go in, as the old ones come out for the compression test. Run the clutch and gearbox check.
+- Weigh each axle with full fuel (CK01). Measure the cab width and Toyota's deck-mount stations for the box design.
+- Engage the LC5 certifier (GVM kit, GCM revision, box and winch in one inspection) and the LC4 certifier (tune). Get each scope and evidence list in writing.
+- AUD 1,330. Measure VEH-01 to VEH-07, VEH-09, VEH-18 and VEH-19, and read the DPF data for VEH-08.
+- Done when the branch is chosen and both certifiers have confirmed their scope.
+
+### S1 Refresh and protect at stock power
+
+Goal: a reliable truck at stock power with the engine protected before any towing.
+
+- Driveline: transfer case kit, tailshafts rebuilt and balanced, pinion seals, breathers, swivel hubs, wheel bearings and hub seals (DL01 to DL08).
+- Chassis and cab: crack-test the spring hangers, the rails behind the cab and the steering box mount, treat rust, renew the cab mounts (RF01 to RF03).
+- Electrics and services: alternator, starter, battery, earths, wiring, fuel hoses, air conditioning service, driveline fluids (RF04 to RF11). GL-4 75W-90 in the gearbox, GL-5 in the diffs.
+- Engine protection: sealed airbox and turbo intake pipe (ID01, TX03), DPF clean and flow test (ID02), pre-filter (FS04), radiator, water pump, thermostat, fan clutch, hoses and coolant (EN14 to EN19).
+- Gauges: boost, EGT, water and oil (TL02, TL03), gearbox and rear diff senders (CG11). The EGT probe goes in when the manifold is off, in S2 or S6.
+- If the brakes or steering fail their check, bring BR01 to BR05 or SS01 to SS04 forward and add an alignment (AUD 150, est.).
+- AUD 14,037. Contingency lines AUD 12,597: diff rebuilds, a transfer case, a DPF, chassis repair, a spring hanger, a compressor. No certificate is needed.
+- Measure VEH-08 and the before-kit heights for VEH-27.
+- Done when nothing leaks, no faults are stored, the DPF passes and the coolant holds 85 to 104 °C on a long climb.
+
+### S2 Engine rebuild with the clutch and gearbox
+
+Goal: a factory-spec engine and a clutch and gearbox for level B, with one engine removal.
+
+- Pull the engine and gearbox. The machine shop crack-tests and machines the block, crank, rods and both heads (EN06 to EN13).
+- Measure piston protrusion per bank, then order the NVP kit sizes and head gasket grades (EN01, EN21). Fit the timing set, oil pump, mounts, oil and filters (EN02, EN03, EN05, EN20).
+- Flush the tank and lines before the new HP4 pump, eight piezo injectors, fitting kit and filter go in (FS01 to FS03, FS05). Pressure-test the oil cooler and check the vacuum pump for oil (EN22, EN23).
+- Refit with the NPC clutch, billet flywheel, clutch hydraulics and new H152F (CG01 to CG10).
+- Run in on the factory calibration for 1,000 km, watching the oil level. Refit the oil filter housing's support pole at every change.
+- Option: fit S6's turbo, intercooler and exhaust now to save labour. They need no certificate on the factory calibration.
+- AUD 27,231, of which the injectors are 9,256. Contingency lines AUD 1,500. No certificate: genuine fuel equipment and a factory-spec rebuild (item 5).
+- Measure VEH-03 and VEH-05 to VEH-07 again at 1,000 km as the new baseline.
+- Done when the run-in is complete and the oil sample is clean.
+
+### S3 Decision gate: Platinum or Elite
+
+Goal: choose the GVM kit on weighed figures.
+
+- Build and weigh the box walls, roof and doors (box budget). Take the floor and subframe masses from the design.
+- Add up the rear axle with growth on every estimate: VEH-19, bar and winch, two people, box, bikes, tools, spare, towbar and the trailer's fully loaded ball load.
+- Platinum if the rear axle stays at or under 2,550 kg. Otherwise take mass off the box, tray or ball first, then buy the Elite (2,850 kg, net AUD 12,855 more). An Elite bought after a fitted Platinum loses the Platinum's cost.
+- On the model with growth and the full 180 L tank the Platinum takes up to 300 kg on the ball. At 255 kg it leaves 63 kg in hand.
+- Settle the front bushes from the kit's contents and front lift (SS05). If the Elite is chosen, check its brake upgrade before buying BR01 to BR05.
+- Done when the kit is ordered.
+
+### S4 GVM kit, GCM revision, box and one LC5 inspection
+
+Goal: legal at 4,200 kg GVM and 7,400 kg GCM with the box and its winch.
+
+- Brakes: slotted rotors, pads, braided lines, DOT 4, pads bedded in (BR01 to BR05). Check the ROH wheel's nut seat against Toyota's steel-wheel nuts, then fit six wheels and tyres (WT01 to WT03). Steering ends, damper, exchange box, hoses and front bushes (SS01 to SS05).
+- Fit the ARB Frontier 180 L tank (FT01, TAD106) in place of the factory 130 L tank. The trailer's roof study (R25) puts towing fuel at about 21.3 L/100 km at 90 km/h with the fixed, radiused-front roof, so the factory tank gives about 550 km between fills and the 180 L tank about 760 km, with 10 % kept. At R25's cautious planning figure of 25 L/100 km they are about 470 and 650 km.
+- Lovells' authorised fitter fits the kit (GV01, GV02). Until the certificate the ute stays rated at 3,400 kg GVM and 6,900 kg GCM, so carry no bikes and tow nothing.
+- Finish the box floor and subframe to the kit's ride height and bump travel, then bolt the empty box to Toyota's deck-mount stations with the winch, ramp and restraints.
+- Fit the towbar, the REDARC controller, wiring kit and mount, and the 12-pin socket with the brake output on pin 5 (TW01 to TW05). Check the plugs and chains under the box's 210 mm overhang.
+- Align the wheels and reset the LSPV with the box on (GV04).
+- One LC5 inspection: the kit, the GCM revision, the box, the winch and the tank (GV03, GV06). The box's parts list has no inspection line, because GV03 covers it. A modification plate goes on, Service NSW endorses the record, and the insurer is told.
+- AUD 22,161: kit 5,620, fitting 1,500, inspection 1,500, GCM revision 1,750 (all est.) and the tank 1,557. Optional AUD 14,694, mostly the Elite.
+- Measure VEH-25 to VEH-27.
+- Done when the plate is on and the record is endorsed.
+
+### S5 Trailer integration
+
+Goal: tow the loaded trailer legally, level and charged.
+
+- Fit the trailer charging (TC01, AUD 1,612, 8.4 kg): two Victron Orion-Tr Smart 12/48-8 chargers in a vented cover in the box front, on the stock alternator, with a 100 A fuse at the battery. They put about 3.6 kWh into the trailer on a 5 h drive and draw about 62 A. The 48 V feed (TW06, AUD 123, 1.9 kg) runs 7 m of 8 B&S cable to a grey Anderson SB50 at the towbar (R20, the trailer's electrical research). Their 10.3 kg is in the ute model (UT-14, UT-15).
+- Log the ute's battery voltage on the first hot night tow with both chargers running. If it stays under 13.3 V, run one charger until the upgrade (TC02, optional, AUD 1,723): a Jaylec BKS-240LC 240 A alternator and two more chargers, 7.2 kWh on a 5 h drive.
+- Weigh the laden ute alone and coupled to the loaded trailer (CK03). Choose the DO35 tongue's drop from the laden coupling height (TW08). Set tyre pressures from the tyre maker's load table.
+- Make the first long tow at stock power and record the temperatures.
+- AUD 1,965. Measure UTE-01, UTE-03, VEH-14 to VEH-17 and VEH-20 to VEH-24.
+- Done when every weighed figure and towing temperature is inside its range.
+
+### S6 Power, then the tune and its certificate
+
+Goal: level B, certified straight away. Needs S2 done and S5's tow inside the temperature ranges.
+
+- Fit the VD-G333 and its gaskets, the front-mount intercooler and the Manta exhaust, keeping the factory rear crossover (TX01, TX02, TX04, TX05). Fit the EGT probe if it is not in, and route the actuator breather high.
+- Book the emissions test and the LC4 certifier first, so the uncertified tune is driven only to those appointments.
+- Tune day, one dyno: a run on the factory calibration, then the tune and the tuned run (TL01). Keep the factory file.
+- Settings: 230 to 250 kW at the crank (about 170 to 185 rwkW), never below 224 kW (166 rwkW). About 850 Nm from 1,800 rpm. 450 to 500 Nm in low range, first and reverse. Less torque below 1,600 rpm on the towing map. Fuel pulled from 650 °C EGT, never above 700 °C. EGR, DPF and catalyst untouched.
+- Emissions test with the clean DPF and no faults (TL04), then the LA4 certificate (TL05). If it is refused, flash the factory file back. Everything else stays legal.
+- AUD 13,119. Contingency lines AUD 12,000: laboratory test 10,000, gas test 200, CV joints 1,800. If the tune cannot cap low-range torque, the CV joints and two tailshafts (AUD 5,800) become required.
+- Measure VEH-10 to VEH-13, then VEH-14 to VEH-17 on the next long tow.
+- Done when the certificate is endorsed and the towing temperatures pass.
+
+## Parts list by system
+
+AUD including GST. Every line, with its priority, reason, stage and dependencies, is in `data/vehicle/vehicle-parts.yaml` and on the site's Car build page.
+
+| System | Required | Contingency lines | Optional | Largest lines |
+|---|---|---|---|---|
+| Engine rebuild, cooling, baseline tests | 13,618 | 1,500 | 400 | Machine shop 4,200, NVP kit 2,471, radiator 1,757 |
+| Fuel system | 11,398 | 0 | 0 | Piezo injectors 9,256, HP4 pump 1,480 |
+| Sealed airbox and DPF service | 2,095 | 5,000 | 0 | Airbox 1,495 |
+| Turbo, intercooler, exhaust | 8,519 | 0 | 0 | VD-G333 4,290, intercooler 2,200 |
+| Tune, gauges, engine certificate | 5,710 | 10,200 | 0 | Tune 2,500, certificate 2,000 |
+| Clutch and gearbox | 7,044 | 0 | 0 | H152F 3,840, NPC kit 1,819 |
+| Transfer case, tailshafts, diffs, hubs | 3,073 | 6,697 | 7,325 | Tailshafts 900 |
+| Steering and front suspension | 2,350 | 300 | 1,200 | Steering box 1,100 |
+| Chassis, cab, electrics, air conditioning, fluids | 3,230 | 2,400 | 387 | Alternator 700 |
+| GVM kit, GCM revision, certificate | 10,620 | 0 | 12,855 | Kit 5,620, GCM revision 1,750 |
+| Brakes | 1,540 | 0 | 0 | Rear kit 555 |
+| Wheels and tyres, six of each | 4,110 | 0 | 0 | Tyres 2,520 |
+| Towing and trailer charging | 3,919 | 0 | 2,362 | Charging 1,612, towbar 1,160 |
+| Freight and weighing | 1,060 | 0 | 0 | Freight 1,000 |
+| Long-range tank | 1,557 | 0 | 0 | ARB Frontier 180 L |
+| Bull bar and winch | 0 | 0 | 4,233 | Only if the truck has none |
+| Total | 79,842 | 26,097 | 28,762 | |
+
+Each figure is rounded to the dollar, so a column can differ from its total by AUD 1.
+
+| Total | AUD |
+|---|---|
+| Required | 79,842 |
+| Contingency allowance | 4,055 |
+| Required with contingency | 83,897 |
+| Leonard's build figure | 75,000 |
+| Over the build figure, with contingency | 8,897 |
+| Less CUT1 and CUT2 | -9,136 |
+| Less every cut | -13,979 |
+| Required with every cut and contingency | 69,918 |
+
+By priority: P1 (safe, legal and reliable towing, or protecting the truck) is AUD 66,723 required. P2 (the 224 kW minimum) is AUD 13,119. P3 lines are all optional, AUD 11,907.
+
+The allowance is EN21, EN22, EN23 and TL06 in full (AUD 1,700) plus 15 % of report 15's required lines (AUD 2,355). A new DPF (5,000) and the laboratory test (10,000) are outside it. The cuts are: test and reuse the injectors (saves 7,656) and the pump (1,480), reuse the oil pump (700), rebuild the truck's own gearbox (up to 2,983) and keep a rated factory towbar (1,160). At level B a tested injector set has less flow margin than a new one.
 
 ## Limits to build and drive to
 
-"Model" is the built ute in UTE-GARAGE.md (`build/ute/ute.json`), the current estimate: a GXL cab chassis at the middle of Toyota's ranges (2,202.5 kg, 922.5 kg on the rear axle), two people, bull bar and winch (assumed to come with the truck), the designed 433.1 kg bike box with 60 kg of tools, both bikes, one spare under the tray, the towbar and 250 kg on the ball (case UC3). The figures are without growth unless they say so. Report 16's heavier budget is kept below as a sensitivity case.
+The model is the built ute (`build/ute/ute.json`), case UC2 with growth: two people, both bikes, the 436 kg box, tools, one spare, bar and winch, the trailer charging and the full 180 L tank, 3,607 kg with 1,480 kg front and 2,128 kg rear. The checks add 255 kg on the ball, 7.5 % of the trailer's 3,400 kg design limit (H2).
 
-| Limit | Value | Model |
+| Limit | Value | Model with growth |
 |---|---|---|
-| Weighed ute, laden, including the ball load | At most 3,850 kg with the Platinum (GVM 4,200 kg) | 3,678 kg, 3,796 kg with growth |
-| Rear axle | At most 2,550 kg with the Platinum, 2,850 kg with the Elite | 2,353 kg, 2,436 kg with growth, 114 kg in hand |
-| Front axle | At most 1,650 kg | 1,324 kg (the largest, 1,462 kg with growth, is with the bikes aboard and no trailer) |
-| Towball download | At most 250 kg (the bar allows 350 kg) | 250 kg |
-| Front axle share of the total, loaded | At least 20 % (Toyota's manual, page 3) | 36 % |
-| The weighed ute plus the trailer, less the ball load, which both figures include | At most 6,900 kg (GCM) | 6,700 kg with the ute at its 3,850 kg limit and the trailer at its 3,100 kg plate (the plan's figure). 6,646 kg on the model with growth |
-| Trailer | ATM plate 3,100 kg, at most 250 kg on the ball and at least 6 % of the trailer's mass (TRAILER.md, MAS-03 and MAS-04) | 179 to 220 kg on the ball, 198 to 246 kg with growth, at least 7.5 % (TRAILER.md) |
-| Bike box width | At most 1,850 mm, the cautious reading of Toyota's width rule (below) | 1,850 mm outside, about 1,765 mm inside, against the 1,680 mm the bikes need |
-| Rear overhang, box and anything on it | At most 1,908 mm behind the rear axle (ADR 43/04). Toyota allows two thirds of the wheelbase (2,120 mm) when no cargo sticks out past the rear end (Toyota's manual, page 2) | 1,555 mm at the cam bar |
-| Rear overhang with the doors open and a load past the rear end | At most half the wheelbase, 1,590 mm (Toyota's manual, page 2) | 1,555 mm, if nothing sticks out past the box |
-| Centre of gravity, unladen, after building | Under 1,000 mm (Toyota) | 785 mm |
+| Ute, laden, ball load included | At most 4,200 kg | 3,862 kg |
+| Front axle | At most 1,650 kg | 1,480 kg, no trailer |
+| Rear axle | At most 2,550 kg (Platinum) or 2,850 kg (Elite) | 2,487 kg, 63 kg in hand |
+| Ball load | At most 350 kg (towbar), at most 300 kg on the Platinum, at least 7.5 % of the trailer | 255 kg |
+| Ute plus trailer | At most 7,400 kg with GV06, 6,900 kg without | 7,007 kg, or 7,107 kg at the 3,500 kg plate |
+| Trailer | At most 3,500 kg | 3,400 kg design limit |
+| Front axle share | At least 20 % (Toyota BBGJ1007) | 35.6 %, towing |
+| Coupling point, laden | 440 mm plus or minus 20 mm (VSB1: 350 to 460 mm) | 440 mm |
+| Rear wheel | At most 1,400 kg (ROH) | 1,275 kg at the full axle rating |
+| Tyres | Load index 117 and speed M or better | 123/120 R |
+| Box | At most 1,850 mm wide, overhang at most 1,908 mm, unladen centre of gravity under 1,000 mm | 1,850, 1,555 and 782 mm |
 
-Toyota's width rule says a mounted part may stand at most 60 mm beyond the outermost point of the cab, mirrors excluded. Read as 60 mm in all, as report 16 did, the box may be 1,850 mm wide. Read as 60 mm a side, as report 17 did, the same sentence allows 1,910 mm. This plan keeps 1,850 mm, the cautious reading.
+The rear axle binds first: each kg on the ball adds 1.41 kg to it, and each kg at the tray centre about 1.04 kg. The 7,400 kg GCM does not bind before the rear axle. Without the revision the 6,900 kg GCM is 107 kg short at the design figures, so the trailer carries about 110 L less water (H2).
 
-### The rear axle sum with growth
+Drive to: coolant 85 to 104 °C towing, oil 90 to 116 °C, EGT at most 700 °C, gearbox oil at most 110 °C sustained (est.), no full load below 1,600 rpm. Use fourth gear on long grades and low range for hill starts and reversing the trailer.
 
-The decision gate (step 7) starts from the model's sum and replaces it with the weighed truck and the weighed box body. The growth allowance is 20 % on an estimate, 7 % on a calculated mass and none on a maker's figure (report 02, MASS-06).
+## Legal path
 
-| Case | Ute | Front axle | Rear axle | Rear axle in hand |
-|---|---|---|---|---|
-| Model, towing with both bikes (UC3) | 3,678 kg | 1,324 kg | 2,353 kg | 197 kg |
-| The same with growth, the current estimate | 3,796 kg | 1,360 kg | 2,436 kg | 114 kg |
-| Sensitivity: report 16's budget (WorkMate kerb, 450 kg tray and box, 100 kg of tools, both spares on the ute) | 3,753 kg | 1,324 kg | 2,429 kg | 121 kg |
-| Sensitivity, with growth | 3,868 kg | 1,343 kg | 2,525 kg | 25 kg |
-| Sensitivity, with growth and one spare on the trailer, as decided | 3,823 kg | 1,353 kg | 2,471 kg | 79 kg |
+NSW registration, Victoria as the fallback. Items are from TfNSW's [VSI 06 Rev 4](https://www.nsw.gov.au/sites/default/files/noindex/2026-03/vsi-06-light-vehicle-modification-july-2026.pdf), issued 1 July 2026. Certifier categories are from [VSCCS Bulletin 01](https://nsw.gov.au/sites/default/files/2025-01/vsccs-bulletin-01-licensed-certifiers.pdf): LC4 covers engine, fuel, intake and exhaust, and LC5 covers body, chassis, suspension, steering, driveline, wheels, tyres and axles.
 
-Figures are rounded to the kilogram. The model is lighter than report 16's budget because the designed box is 433.1 kg in place of 450 kg, the tools are 60 kg in place of 100 kg, and one spare rides on the trailer. The sensitivity case shows what happens if the box, tools and accessories come in at report 16's budget: the Platinum's margin falls to 25 kg. So the gate does not buy a kit on either estimate. It weighs the truck (step 2) and the box body (step 6) first.
+GVM kit, GCM revision, box and winch (S4). Item 51 lists re-rating the GVM or the GCM as certifiable. Lovells rates the 4,200 kg kit at 7,400 kg GCM with 3,500 kg braked towing ([Lovells sheet, Oct 2026 ratings](https://www.lovellscampbellfield.com.au/_files/ugd/a7ab81_cd324b9c9e354c4da0d3ab9103620a6d.pdf)). Its conditions are tyres of load index 117 and speed M or better, a Lovells authorised fitter and a Lovells-endorsed signatory ([Powercurve](https://www.powercurve.com.au/lovells-gvm-upgrade-sunshine-coast/toyota-landcruiser-lc79-series-gvm/)). The plan adds a towbar rated 3,500 kg and 350 kg, and braked towing means the trailer's own brakes on every wheel with a breakaway system (VSB1, above 2,000 kg ATM), driven by the REDARC controller. The revision is assumed to add AUD 1,750 (est.), the midpoint of the AUD 1,000 to 2,500 that [70 Series Store](https://70seriesstore.com/blogs/information/what-is-the-79-series-towing-gcm) gives for post-registration GCM engineering. The certificate also covers the ride height (item 13), the box (items 27 and 34), the winch as a possible powered loading device (item 35) and the 180 L tank (item 50).
 
-What binds:
+If NSW refuses the GCM revision: Lovells warns it may not be available after registration in every state. Victoria needs a [VASS certificate](https://transport.vic.gov.au/registration-and-licensing/registration/standard-and-non-standard-vehicle-information/modified-and-non-standard-vehicles/vass-approval-certificate) to change the GVM and is stricter about post-registration GCM upgrades (70 Series Store), so assume Victoria refuses it too. The fallback is H2's water limit. NSW does not recognise interstate light vehicle certificates (VSI 06 Rev 4 page 3), so choose the state before the first certificate.
 
-- The rear axle binds first. Each kilogram at the tray centre adds about 1.04 kg to it, and each kilogram on the ball adds 1.41 kg. On the model it reaches 2,550 kg with growth when about 110 kg more sits at the tray centre.
-- Report 17's rear axle figure of about 2,260 kg leaves out the bull bar, spares and towbar. The model includes them.
-- The plan assumes the bought truck already has an airbag-compatible bull bar and winch, the 110 kg in these sums. If it has none, the optional ARB Deluxe bar and a winch add AUD 4,233.
-- The GCM never binds first. With the 3,100 kg trailer the ute could weigh 4,050 kg before reaching it (6,900 less 3,100 plus 250), which is more than the rear axle allows. The plan's figure is 6,700 kg, with the ute at its 3,850 kg limit.
-- If the gate's sum goes over 2,550 kg on the rear axle, take weight off the box, tray or ball first, then choose the Elite. If the final weighing (step 12) still finds the ute over 3,850 kg or the rear axle over its rating, take weight off before towing.
+The tune (S6). Item 6 needs a certificate for a reflash that alters emissions output. An LC4 certifier issues the LA4 certificate for about AUD 2,000 (est.) on the TfNSW test or the Interim NSW Vehicle Emissions Test Procedure (May 2023). Keep the same-dyno sheets, the emissions result, the DPF clean record and invoices for the genuine Denso injectors and pump. The certifier may ask for evidence that the driveline takes about 850 Nm.
 
-Rollover margin. The static stability factor (SSF) is half the average track divided by the height of the centre of gravity. A lower SSF means a higher risk of rolling over in a single-vehicle crash. On the model it is 0.858 with the bikes and tools aboard and no trailer, and 0.888 towing, against 1.054 with the bikes in a trailer (report 17 found 1.02 and about 0.80 on a flat deck at about 1,050 mm). The box's 834 mm floor is what keeps it near 0.86, so keep heavy tools low. The box stands about 380 mm above the 1,955 mm cab and adds about 0.8 m² of frontal area and the crosswind load on its sides, so corners and crosswinds with the bikes aboard are the case to drive carefully.
+No certificate: the rebuild with genuine fuel equipment, the airbox, intercooler and exhaust (item 5), the H152F (item 7), factory-size brakes, wheels and tyres at Toyota's size and offset, and the towbar (item 31). Declare every change to the insurer.
 
-## Open questions
+## Decisions
 
-Each carries the assumption this plan uses.
+| Decision | Reason |
+|---|---|
+| VDJ79 single cab built 01/2017 to 08/2022, GXL first | The 4,200 kg kit fits single cabs only from 01/2017, and the GXL has factory diff locks |
+| Level B from the start, never below 224 kW | 300 hp is Leonard's minimum, and any emissions-altering tune needs a certificate |
+| Factory-spec rebuild with new genuine injectors and HP4 pump | Restores a 400,000 km engine with no certificate |
+| Sealed airbox and DPF clean, both required | Dust wears the new engine, and the emissions evidence needs a working DPF |
+| VD-G333, PDI twin-throttle intercooler, Manta 3 inch DPF-back exhaust | They run inside their limits at level B and keep the emission controls |
+| New H152F and NPC 1300 organic clutch, ZF 8-speed as fallback | A new gearbox costs about the same as a rebuild |
+| 450 to 500 Nm in low range, first and reverse | Protects the 8 inch front diff and the CV joints |
+| Platinum kit, Elite only if the weighed gate needs it | The rear axle binds first |
+| Lovells 7,400 kg GCM revision in the same inspection | With growth the loaded ute and trailer reach 6,946 kg (H2) |
+| Tune last, certified at once, factory file kept | Every earlier stage stays legal |
+| Pre-tune dyno run on the finished hardware | The certifier compares like with like |
+| Gearbox and diff senders required (CG11) | The towing checks decide whether a cooler is needed |
+| Shared ROH 16 x 7 wheels and LT265/75R16 tyres | Toyota's size and offset, and one spare fits both vehicles |
+| 50 mm tongue for the DO35 pin (TW08) | The trailer's coupling kit has no tongue, and its drop sets the 440 mm height |
+| ARB Frontier 180 L tank, required (FT01) | Towing at about 21.3 L/100 km leaves the 130 L tank about 550 km between fills, the 180 L tank about 760 km (R25) |
+| Two Orion-Tr Smart 12/48-8 chargers on the stock alternator (TC01) | Nothing on the engine changes, both parts have Australian stock, and the 48 V run to the towbar loses little (R20) |
 
-1. Will an LC4 certifier certify the level B reflash on the TfNSW test or the Interim NSW procedure, without a laboratory test? Assumption: yes, for about AUD 2,000 (report 14's LA4 estimate). If not, the laboratory test (AUD 10,000 or more) is the contingency line TL07.
-2. Is the TfNSW emissions test still free? Assumption: yes, as Rev 3 said. Rev 4 names the test but gives no fee. The fallback, a gas analyser test at a repairer for about AUD 200, is in the contingency. Either test is taken with the cleaned DPF fitted.
-3. Can the tune cap torque at 450 to 500 Nm in low range, first and reverse? Assumption: yes (report 15). If not, AUD 5,800 of heavy-duty CV joints and tailshafts become required.
-4. What torque does the H152F take? Assumption: a new box survives about 850 Nm in high range with sensible driving, inside report 15's assumed 650 to 1,000 Nm. No rating is published.
-5. Will the worn engine's stock run read low? Assumption: it reads inside the published 96 to 120 rwkW. The tune's target is a power figure, not a ratio, so a low reading only flags a weak engine before the rebuild.
-6. Can the eight piezo injectors be tested and reused, and at what cost? Assumption: AUD 1,600, report 14's price for the earlier injector type.
-7. Which bushes does the chosen kit supply, and does it lift the front? Assumption: its three urethane bush kits cover the rear springs and the front keeps its height, so report 15's AUD 450 of front bushes stays. Settled at the gate (step 7).
-8. What do the bought ute's axles weigh? Assumption: the middle of Toyota's ranges for the GXL cab chassis, 2,202.5 kg with 922.5 kg on the rear axle (UTE-GARAGE.md, line UT-01), until step 2's weighing replaces them. Report 16 used the WorkMate's 2,193 kg with 913 kg rear.
-9. Where does the ball sit? Assumption: 1,300 mm behind the rear axle (report 16), one position for every document (decision log 12:45).
-10. What is the final drive ratio? Assumption: 3.909, which matches the reported 1,930 rpm at 100 km/h in fifth (report 15).
-11. Do the dealer parts and the machine shop cost what report 14 says? Assumption: yes, within 30 % and 25 %.
-12. What do Lovells' fitting and the LC5 inspection cost, and does the inspection cost more with the box and the winch? Assumption: AUD 1,500 each, with one inspection covering the kit, the box and the winch (report 16's range for the inspection is AUD 1,000 to 2,500).
-13. What do the ROH wheels and the tyres cost, and which nut seat does the wheel take? Assumption: AUD 230 and AUD 420 each, and Toyota's M14 x 1.5 steel-wheel nuts (report 16). Check the seat in step 8.
-14. Will the LC5 certifier sign off the box and the winch with the kit? Assumption: yes, in one inspection, with the engineer's review of the design as evidence (items 27, 34 and 35).
-15. Does the Manta quiet exhaust meet the noise limit? Assumption: yes, and the certifier's noise test confirms it.
-16. Does the front-mount intercooler starve the radiator when towing slowly in heat? Assumption: no. Watch the coolant gauge on the first long tow. The fallback is GTurbo's AUD 1,895 fan kit on the factory top mount (report 14).
-17. Does the combination need a load distribution hitch? Assumption: no, as none was found for the DO35 coupling (report 16).
-18. Will an insurer cover the tuned ute? Assumption: yes, with full disclosure.
-19. Does Victoria have a reflash rule like NSW item 6? Assumption: the LA4 path (report 14). Not checked.
-20. Does the NVP kit's parts set fit the DPF engine? Assumption: the same parts and price as the pre-DPF kit GTurbo lists, with the DPF engine's genuine gasket set ordered by VIN.
-21. Does the clean restore the DPF? Assumption: yes, for about AUD 600. A specialist replaces a filter only when it is cracked or melted, about AUD 5,000 (estimate), which is outside the contingency allowance.
-22. Does the bought truck have an airbag-compatible bull bar and winch? Assumption: yes, as report 16's 110 kg assumes. If not, the optional lines add AUD 4,233.
-23. What does freight cost? Assumption: AUD 1,000 in all.
+## Open points and the assumption used
 
-## Prices that are estimates
-
-Estimates make up AUD 40,003 of the AUD 73,650 required, or 54 %. Each is marked `estimate` in `vehicle-parts.yaml`.
-
-Required lines:
-
-- Engine rebuild and cooling, AUD 10,961: rebuild kit 2,471 (the pre-DPF kit's listed price, assumed for the DPF engine), timing set 900, oil pump 700, glow plugs 400, engine mounts 350, machine shop 4,200 (block clean and crack test 250, bore and hone 650, decks 300, line hone 400, crank 400, rods 400, heads 1,400, valve allowance 400), water pump 450, thermostat 90, fan clutch 450, hoses 400, coolant 150, oil and sundries 400.
-- Fuel system, AUD 432: the pre-filter, priced from a similar kit.
-- Sealed airbox and DPF service, AUD 600: the DPF inspection and clean.
-- Turbo, intercooler and exhaust, AUD 250: the turbo intake pipe.
-- Tune, gauges and engine certificate, AUD 4,720: level B tune 2,500, oil temperature gauge 220, VSCCS certificate for the reflash 2,000, and the emissions test assumed free.
-- Clutch and gearbox, AUD 480: slave cylinder 150, release and spigot bearings 120, flywheel bolts 60, rear gearbox mount 150.
-- Transfer case, tailshafts, diffs and hubs, AUD 2,420: tailshafts 900, pinion seals and checks 200, breathers 120, swivel hub kits 450, front wheel bearings 300, hub seals 100, rear wheel bearings 350.
-- Steering and front suspension, AUD 2,350: every line (ends 500, damper 150, steering box 1,100, hoses and fluid 150, front bushes 450).
-- Chassis, cab, electrical, fuel lines, air conditioning and fluids, AUD 3,230: every line (dye kit 60, rust treatment 250, cab mounts 400, alternator 700, starter 450, battery 300, earth straps 150, wiring 200, fuel hoses 150, air conditioning 350, driveline fluids 220).
-- GVM, AUD 8,870: every line (kit 5,620 from a 2024 preorder listing, fitting 1,500, certificate 1,500, alignment and LSPV reset 250).
-- Brakes, AUD 190: front pads 150, fluid flush 40.
-- Wheels and tyres, AUD 4,110: every line (wheels 1,380, tyres 2,520, fitting 210).
-- Towing, AUD 330: 12-pin socket 80, charging feed 250.
-- Freight and weighing, AUD 1,060: freight 1,000, weighbridge 60.
-
-Contingency lines, AUD 23,800 of AUD 26,097: head gasket grades 400, oil cooler 500, vacuum pump 600, new DPF 5,000, gas analyser test 200, laboratory emissions test 10,000, two diff rebuilds 2,600, CV joints 1,800, spring hanger 300, chassis repair 1,500, air conditioning compressor 900. Only the new transfer case (net 2,297) comes from a listing.
-
-Optional lines: balancing 400, temperature senders 300, heavy-duty tailshafts 4,000, Air Locker fitting 1,280, heavy-duty tie rod and drag link 1,200, 240 A alternator 300, and the winch 1,500.
-
-Cuts: the injector test and service, AUD 1,600.
-
-Bike box: about AUD 13,900 (report 17).
-
-Listed prices with a caveat: the Natrad radiator (read from a search extract) and the braided brake lines (the midpoint of a listed AUD 435 to 595).
+1. Will the LC5 certifier include the GCM revision after registration? Assumed yes, for AUD 1,750. If not, H2's water limit.
+2. Will the LC4 certifier accept the TfNSW test (assumed free) or the Interim NSW procedure at level B? Assumed yes. If not, a gas analyser test (TL06, AUD 200) or a laboratory test (TL07, AUD 10,000).
+3. Can the tune cap low-range torque? Assumed yes. If not, AUD 5,800 of CV joints and tailshafts.
+4. What torque does the H152F take? Assumed about 850 Nm in high range with sensible driving, inside report 15's 650 to 1,000 Nm. No rating is published.
+5. Does the NVP kit suit the DPF engine? Assumed the same parts and price with the DPF gasket set by VIN. GTurbo still lists it for pre-DPF engines only (20 Nov 2026).
+6. Does the clean restore the DPF? Assumed yes. If not, AUD 5,000 (ID03).
+7. Does the truck have a bar and winch? Assumed yes, 110 kg in the sums. If not, AUD 4,233.
+8. What does the kit lift, and which bushes come with it? Assumed 50 mm (est.) and rear bushes only, so the front bush line stays.
+9. Prices without a current listing: the kit AUD 5,620 (a 2024 listing), tyres AUD 420 each (a US listing converts to AUD 471), and the tongue AUD 200 (all est.).
+10. When does the gearbox need a cooler? Above 110 °C sustained (est.).
+11. Does the front-mount intercooler starve the radiator at low towing speed? Assumed no. Watch VEH-14. GTurbo's AUD 1,895 fan kit is the fallback.
+12. Does Victoria have a reflash rule like NSW item 6? Not checked. The LA4 path is assumed.
+13. Can the stock alternator carry both chargers? Assumed yes: about 50 to 60 A spare at cruise against their 62 A (R20). Log the voltage on the first hot night tow, and run one charger or fit TC02 if it stays under 13.3 V.
+14. Does the Jaylec BKS-240LC fit the 2017 VDJ79? Marks 4WD lists it for the VDJ LandCruiser without a model split. Assumed yes. Confirm against the VIN before buying TC02.

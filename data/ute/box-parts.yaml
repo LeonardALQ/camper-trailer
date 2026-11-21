@@ -536,7 +536,7 @@ lines:
     mass: {kg: 1.7, basis: estimate, src: "5 m of twin cable at about 0.3 kg/m and fittings (estimate)"}
     price: {aud_each: 250.00, aud: 250.00, url: null, date: 2026-11-20, basis: estimate}
     model_part: U-WINCH-FEED
-    note: "New line. Est. as vehicle-parts TW06 (AUD 250 for a similar Anderson feed)"
+    note: "New line. Estimate for 5 m of 6 B&S twin cable, an Anderson SB50 socket and a 100 A circuit breaker"
   - id: BX-L04
     group: loading
     name: Freight for items bought in the USA

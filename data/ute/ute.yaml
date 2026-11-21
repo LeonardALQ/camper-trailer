@@ -92,12 +92,12 @@ lines:
     source: "Toyota BBGJ1007: kerb 2,175 to 2,230 kg, rear axle 910 to 935 kg (GXL), centre of gravity 700 mm up. Mid-range figures"
     cases: [UC1, UC2, UC3, UC4, UCB]
   - id: UT-02
-    item: "Fuel, 130 L of diesel"
-    kg: 0
-    x: wheelbase + 500
+    item: "Fuel, 180 L of diesel in the ARB Frontier tank (FT01): 130 L is in Toyota's kerb mass, so this line carries the other 50 L"
+    kg: 50 * 0.835
+    x: 2500
     z: 500
-    maturity: spec
-    source: "In Toyota's kerb mass (full tank). 130 L at 0.835 kg/L is 108.6 kg"
+    maturity: calculated
+    source: "Report 16 section 7: diesel at 0.835 kg/L, the tank between the rails about 2,500 mm behind the front axle (assumption). FT01 is required from 20 Nov 2026 (VEHICLE.md). The polymer tank's own mass is taken as the factory tank's (est.)"
     cases: [UC1, UC2, UC3, UC4, UCB]
   - id: UT-03
     item: "Bull bar and winch"
@@ -122,6 +122,22 @@ lines:
     z: 420
     maturity: estimate
     source: "Report 16 section 4: wheel 14.5 kg (estimate) and tyre 22.6 kg (G015, report 09). One spare on the ute (decision log)"
+    cases: [UC1, UC2, UC3, UC4, UCB]
+  - id: UT-14
+    item: "Trailer charging (TC01): two Victron Orion-Tr Smart 12/48-8 chargers in a vented cover low in the box front, with their 12 V cables and the 100 A fuse"
+    kg: 8.4
+    x: box_x0 + 100
+    z: deck_z + 300
+    maturity: estimate
+    source: "R20, the trailer's electrical research of 20 Nov 2026 (VEHICLE.md stage S5). The position low on the box's front wall is an assumption"
+    cases: [UC1, UC2, UC3, UC4, UCB]
+  - id: UT-15
+    item: "48 V feed to the towbar (TW06): 7 m of 8 B&S twin cable and a grey Anderson SB50"
+    kg: 1.9
+    x: (box_x0 + ball_x) / 2
+    z: frame_top_z - 100
+    maturity: estimate
+    source: "R20 (VEHICLE.md stage S5). The cable's centre is taken halfway from the box front to the ball (assumption)"
     cases: [UC1, UC2, UC3, UC4, UCB]
   - id: UT-06
     item: "Two people"

@@ -55,7 +55,8 @@ cad/
   export.py             STEP, GLB and three-cad-viewer JSON
   drawings/             A3 sheets: CT-001 (ga.py), CT-101 to CT-103 (chassis_sheets.py), CT-201 to CT-301 (body_sheets.py),
                         CT-701 to CT-704 (ute_sheets.py)
-  sitedata.py           copies build outputs into the site and generates the research and Tow vehicle pages
+  sitedata.py           copies build outputs into the site and generates the research and Car build pages and the
+                        bike box's parts list
   tests/                pytest: design checks and data rules
 site/                   Astro 7 + Starlight 0.43 static site, three-cad-viewer 5.1.3
 shot/                   Playwright screenshot and scroll-check scripts
