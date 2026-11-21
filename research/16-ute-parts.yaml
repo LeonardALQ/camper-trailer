@@ -47,7 +47,7 @@ parts:
     qty: 1
     price_aud: 250
     price_basis: estimate
-    link: "https://jdmfsm.info/Auto/Japan/Toyota/Land%20Cruiser/70%20Series%20%281984-2007%29/2017%207x%20series%20Body%20Builder%27s%20Manual.pdf"
+    link: "https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf"
     status: required
     notes: "Toyota BBGJ1007 section 2-5, gauge set SST 09709-29018"
     total_aud: 250

@@ -2,6 +2,8 @@
 
 Status: research record, 21 Nov 2026. It checked what the Lovells Elite kit needs from the wheels, the rear track and the brakes, and fed decisions H18 and H19.
 
+Note added 21 Nov 2026: the links to Toyota's body builder's guide BBGJ1007 (September 2017) pointed at a copy that is no longer online. They now point to Toyota's own LC70 guide for trucks from January 2007, which has the same width, front axle share and centre of gravity rules. Its cab chassis centre of gravity is 740 mm, where BBGJ1007 gives 700 mm for the VDJ79R-TJMNYQ3, and the masses and page numbers quoted here are BBGJ1007's.
+
 Products and prices: `research/26-elite-wheels.yaml`. All sources were read on 21 Nov 2026.
 
 ## Recommendations
@@ -118,7 +120,7 @@ The tyre is the Toyo Open Country A/T III LT265/75R16 123R at 804 mm and 267 mm 
 | Side skin inner face (box 1,850 mm) | 922.5 mm | 922.5 mm |
 | Tyre outer face to side skin, Toyota needs 30 mm | 58.5 mm | 11 mm, fails by 19 mm |
 
-The tub's top height (86.5 mm above the floor) and length do not change if the Elite's springs give the same ride height as the model assumes. Toyota's rules are 25 mm over the tyre at full bump, 30 mm outside it and 40 mm inside it ([BBGJ1007, wheel house space](https://jdmfsm.info/Auto/Japan/Toyota/Land%20Cruiser/70%20Series%20(1984-2007)/2017%207x%20series%20Body%20Builder's%20Manual.pdf)). Checks UGW-01 and UGW-02 still pass, because the tub follows the tyre. UGW-03 fails. The tyre's real shoulder at the tub's height is a few millimetres narrower than the model's 268 mm cylinder, which is not enough to pass.
+The tub's top height (86.5 mm above the floor) and length do not change if the Elite's springs give the same ride height as the model assumes. Toyota's rules are 25 mm over the tyre at full bump, 30 mm outside it and 40 mm inside it ([BBGJ1007, wheel house space](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf)). Checks UGW-01 and UGW-02 still pass, because the tub follows the tyre. UGW-03 fails. The tyre's real shoulder at the tub's height is a few millimetres narrower than the model's 268 mm cylinder, which is not enough to pass.
 
 Ways to restore the 30 mm:
 
@@ -128,7 +130,7 @@ Ways to restore the 30 mm:
 | B. Raise the floor until the tyre clears it | Tyre top at full bump is 58.5 mm above today's floor. Floor up 87.5 mm, deck 921.5 mm laden (est.). The tubs go | Bikes and box centre of gravity 87.5 mm higher, or 87.5 mm less headroom |
 | C. A rear wheel offset of +19 mm or more | Pulls the tyre back in | No such wheel found, it undoes the track correction and ends the shared wheel |
 
-Fix A needs a decision on UTE-09 (since taken as H19), the 1,850 mm box limit. Toyota's text says "the width of a mounted part should be 60 mm maximum as measured from the outermost point of the cab of the base vehicle (not including the outside mirror)" ([BBGJ1007, section 1-2](https://jdmfsm.info/Auto/Japan/Toyota/Land%20Cruiser/70%20Series%20(1984-2007)/2017%207x%20series%20Body%20Builder's%20Manual.pdf)). The decision log read that as 60 mm in total on the 1,790 mm cab, which gives 1,850 mm. Measured from the cab's outermost point on each side, it allows 1,790 + 2 x 60 = 1,910 mm. The flared box at 1,890 mm stands 50 mm beyond the cab each side, inside that reading. ADR 43/04 allows 2,500 mm. The factory GXL is already 1,870 mm over its own flares (report 16). Assumption for the designer: rule that UTE-09 limits the box body to 1,850 mm and the rear tub flares to 1,910 mm, and model fix A.
+Fix A needs a decision on UTE-09 (since taken as H19), the 1,850 mm box limit. Toyota's text says "the width of a mounted part should be 60 mm maximum as measured from the outermost point of the cab of the base vehicle (not including the outside mirror)" ([BBGJ1007, section 1-2](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf)). The decision log read that as 60 mm in total on the 1,790 mm cab, which gives 1,850 mm. Measured from the cab's outermost point on each side, it allows 1,790 + 2 x 60 = 1,910 mm. The flared box at 1,890 mm stands 50 mm beyond the cab each side, inside that reading. ADR 43/04 allows 2,500 mm. The factory GXL is already 1,870 mm over its own flares (report 16). Assumption for the designer: rule that UTE-09 limits the box body to 1,850 mm and the rear tub flares to 1,910 mm, and model fix A.
 
 Other effects of the wider rear track:
 

@@ -1,5 +1,7 @@
 # 17: The enclosed motorbike garage on the LandCruiser 79
 
+Note added 21 Nov 2026: the links to Toyota's body builder's guide BBGJ1007 (September 2017) pointed at a copy that is no longer online. They now point to Toyota's own LC70 guide for trucks from January 2007, which has the same width, front axle share and centre of gravity rules. Its cab chassis centre of gravity is 740 mm, where BBGJ1007 gives 700 mm for the VDJ79R-TJMNYQ3, and the masses and page numbers quoted here are BBGJ1007's.
+
 Note added 20 Nov 2026, after the box was designed (UTE-GARAGE.md, drawings CT-701 to CT-704). The design follows this report with these changes. The box is 1,850 mm wide outside, not 1,900 mm, by the decision log's limit. With 2.5 mm skins on a 40 mm frame that leaves 1,765 mm inside and a 1,745 mm clear rear opening, and the bikes keep their 760 mm spacing with 59.5 mm from each bike to its wall. The door leaves are 27.5 mm thick, so the inside length is 2,520 mm. The design takes the lower floor: on the Lovells kit's estimated 110 mm of bump travel the tubs stand 86.5 mm above a floor 834 mm up, so the ramp sits at 16.5 degrees with the bikes out. The subframe is aluminium RHS 75 x 50 x 3 runners and SHS 50 x 50 x 3 crossmembers, with a galvanised steel crossmember under each L-track row at Toyota's first and last deck mounts, so the anchors reach steel. That moves the front track row to 240 mm ahead of the Tuareg's front axle, against 150 mm here. The tools ride in two chests on the wheel tubs, not in under-tray boxes, because the outer front straps fill the box's front corners. The box weighs 433.1 kg empty, 469.5 kg with the growth allowance, against 440 kg here. The product data for this report is published as `research/17-ute-garage-products.yaml`.
 
 Research report, 20 Nov 2026, for the enclosed bike garage on a used VDJ79 single cab. The designer of the box works from it. Sources are linked where they are used, and estimates are marked.
@@ -56,7 +58,7 @@ The box itself must also be restrained to the tray, for its own mass and the too
 
 ### 1.4 Rules for a body on the 79's cab chassis
 
-The 79's figures here come from Toyota's 2017 Body Builder's Manual for the 70 Series, which covers the Australian VDJ79R single cab (models TJMRYQ3 and TJMNYQ3) ([Toyota BBM, PDF](https://jdmfsm.info/Auto/Japan/Toyota/Land%20Cruiser/70%20Series%20(1984-2007)/2017%207x%20series%20Body%20Builder's%20Manual.pdf), pages 2 to 7, 26, 28, 55, 62 and 76). Report 16 covers the 79's limits in full. Later builds may differ in detail.
+The 79's figures here come from Toyota's 2017 Body Builder's Manual for the 70 Series, which covers the Australian VDJ79R single cab (models TJMRYQ3 and TJMNYQ3) ([Toyota BBM, PDF](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf), pages 2 to 7, 26, 28, 55, 62 and 76). Report 16 covers the 79's limits in full. Later builds may differ in detail.
 
 | Rule | Limit | Source |
 |---|---|---|

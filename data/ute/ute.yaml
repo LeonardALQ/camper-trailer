@@ -94,7 +94,7 @@ lines:
     x: wheelbase * 922.5 / 2202.5
     z: 700
     maturity: spec
-    source: "Toyota BBGJ1007: kerb 2,175 to 2,230 kg, rear axle 910 to 935 kg (GXL), centre of gravity 700 mm up. Mid-range figures"
+    source: "Toyota BBGJ1007 (September 2017, for trucks from then): kerb 2,175 to 2,230 kg, rear axle 910 to 935 kg (GXL), centre of gravity 700 mm up for the VDJ79R-TJMNYQ3 (p. 3). Mid-range figures. Toyota's LC70 guide for trucks from January 2007 (https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf) gives 740 mm for the older trucks, so the 2017 edition's 700 mm stays"
     cases: [UC1, UC2, UC3, UC4, UCB]
   - id: UT-02
     item: "Fuel, 180 L of diesel in the ARB Frontier tank (FT01): 130 L is in Toyota's kerb mass, so this line carries the other 50 L"
