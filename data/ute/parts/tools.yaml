@@ -25,3 +25,14 @@ parts:
     notes: Carried in the two chests. 60 kg in 76 L is dense, so bulky recovery gear may need the space beside the ramp. Weigh and measure the real kit.
     cog: {at: ["tool_x0 + tool_l / 2", "((half_width - 10 - tool_w / 2) * tool_w - (half_width - 10 - tool_wk / 2) * tool_wk) / (tool_w + tool_wk)", "tool_z0 + tool_h / 2"],
           basis: "Volume-weighted centre of the two chests"}
+  U-TIEDOWN:
+    name: Trailer tie-down kit
+    product: Four 50 mm ratchet straps, lashing capacity 2,500 kg, and four 760 mm screw-in ground anchors, in a bag
+    maker: To choose
+    qty: 1
+    unit: set
+    mass: {basis: declared, total_kg: 12, maturity: estimate, source: "Straps about 1.6 kg and anchors about 1.4 kg each, and the bag (estimate). Priced with the trailer's lashing points, CH-B02"}
+    payload: true
+    notes: For the parked trailer when the ute is away and strong gusts are forecast (STB-05). The anchors' 760 mm fits the 780 mm chests.
+    cog: {at: ["tool_x0 + tool_l / 2", "((half_width - 10 - tool_w / 2) * tool_w - (half_width - 10 - tool_wk / 2) * tool_wk) / (tool_w + tool_wk)", "tool_z0 + tool_h / 2"],
+          basis: "In the two chests, as U-TOOLS"}

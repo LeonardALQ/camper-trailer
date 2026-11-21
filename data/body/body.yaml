@@ -39,8 +39,9 @@ panels:
     # ISO 13788's Rsi of 0.25 the surface over a member needs 13 mm of XPS behind it, so the member is 19 mm deep, and
     # 110 mm wide so the hardpoints stand 27 mm off W1's and W2's cut-outs (FIT-07). No Australian stockist lists a
     # 6060-T5 RHS under 25 mm deep this stiff (InfraBuild's range goes from 40 x 20 x 2.0 to its 25 mm deep sections), so
-    # the section is made to order (LB-06's price). Each member stops `end_gap_mm` short of the floor and roof joiners:
-    # at its foot on a rigid PVC pad `foot_pad_mm` wide across its depth, the rest of the gap and its head in XPS
+    # the section is made to order (LB-06's price). Each member stops `end_gap_mm` short of the floor joiner at its foot,
+    # on a rigid PVC pad `foot_pad_mm` wide across its depth with XPS in the rest of the gap, and `end_gap_mm` under the
+    # wall's top insert strip at its head. BDY-22 takes both gaps as XPS to a joiner at the outside air, a bound
     stiffener: {name: "RHS 110 x 19 x 3.5 6060-T5 aluminium on the inner skin", E: 69000, I: 48042, depth: 19, width: 110, wall: 3.5,
                 break: 13, fy: 110, pitch: 1067, kg_m: 2.306, end_gap_mm: 10, foot_pad_mm: 20,
                 src: "https://www.infrabuild.com/steel/products/aluminium/aluminium-rhs-rectangular-box-section/"}
@@ -314,3 +315,7 @@ members_rule:
   no_side_strips: [OP-01, OP-05]
   bounds: [LA-11T, WR-03]
   hardpoints_at: LB-04
+  # the lockers over the washer and dryer hang on a horizontal strip, which stops clear_mm short of BD-19, the member
+  # taking the lockers' front screws. The members' heads stop end_gap_mm under the wall's top insert strip
+  strips:
+    - {block: LA-11L, name: "the lockers' insert strip"}

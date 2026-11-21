@@ -92,7 +92,7 @@ def ct201(prj, model, bom, checks, reg, dwg):
         sh.line(ox + V["end_wall_t"] / k, oy + z / k, ox + V["bed_u1"] / k, oy + z / k, "phantom")
         sh.text(ox + V["end_wall_t"] / k + 0.6, oy + z / k + 0.7, t, 1.25)
     # the side-wall stiffener in the living-zone bay (BD-18, BDY-10) and the H12 radius at the roof's front edge
-    for yy, flip, iid in ((oy, False, "BD-19.1"), (166.0, True, "BD-18.1")):   # the door's rear jamb member, the road wall's stiffener
+    for yy, flip, iid in ((oy, False, "BD-19"), (166.0, True, "BD-18")):   # the door's rear jamb member, the road wall's stiffener
         us = lay.find(iid).cog[0] - V["body_x0"]
         xs = ox + ((L - us) if flip else us) / k
         sh.line(xs, yy, xs, yy + H / k, "phantom")
@@ -356,11 +356,13 @@ def ct203(prj, model, bom, checks, reg, dwg):
     rb = lay.find("LB-04.2").box
     sh.text(ox + (L - (rb[3] - V["body_x0"])) / k - 1, oy2 + (rb[2] - fz) / k + 1.0, f"LIFT BED HARDPOINTS LB-06, {_member(b)} ON THE INNER SKIN", 1.4, "end")
     lk = lay.find("LA-11L").box                  # the lockers over the plinth hang on an insert strip
-    sh.rect(ox + (L - (lk[3] - V["body_x0"])) / k, oy2 + (lk[5] - fz - 60) / k, ox + (L - (lk[0] - V["body_x0"])) / k, oy2 + (lk[5] - fz - 25) / k, "fill")
+    for wall, a, c, _ in res["members"]["strips"]:   # the lockers' strip, stopped 25 mm short of the member it meets (FIT-07)
+        if wall == "kerb":
+            sh.rect(ox + (L - (c - V["body_x0"])) / k, oy2 + (lk[5] - fz - 60) / k, ox + (L - (a - V["body_x0"])) / k, oy2 + (lk[5] - fz - 25) / k, "fill")
     sh.text(ox + (L - (lk[3] - V["body_x0"])) / k, oy2 + (lk[2] - fz) / k - 2.6, "LOCKERS' INSERT STRIP", 1.3)
-    us = lay.find("BD-18.1").cog[0] - V["body_x0"]
+    us = lay.find("BD-19").cog[0] - V["body_x0"]
     sh.line(ox + (L - us) / k, oy2, ox + (L - us) / k, oy2 + H / k, "phantom")
-    sh.text(ox + (L - us) / k + 0.8, oy2 + 3.0, "STIFFENER BD-18", 1.3)
+    sh.text(ox + (L - us) / k + 0.8, oy2 + 3.0, "JAMB MEMBER BD-19", 1.3)
     sh.rect(ox, oy2 + (H - 25) / k, ox + L / k, oy2 + H / k, "fill")
     sh.text(ox + 1, oy2 + H / k - 3, "TOP INSERT STRIP: ROOF JOINER", 1.4)
     rows = []

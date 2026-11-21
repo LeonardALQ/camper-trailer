@@ -236,7 +236,7 @@ stability:
       outrigger_z_mm3: 37317 # RHS 127 x 51 x 3.5 about its strong axis
       outrigger_l_mm: 532    # from the raiser's face to the lashing point
       outrigger_fy: 350
-      kit_kg: 12             # four straps and four anchors, in the bike box's tool chest (UT-17, est.)
+      kit_kg: 12             # four straps and four anchors, in the bike box's tool chest (U-TIEDOWN, est.)
     src:
       cf: "https://www.mecaenterprises.com/wind-loads-on-freestanding-walls/"
       lug: "https://www.amazon.com/gp/product/B0B53NL2MB"
@@ -415,7 +415,7 @@ items:
     name: Road-side wall stiffener, RHS 110 x 19 x 3.5 aluminium on the inner skin, between the kitchen tower and the partition
     material: "6060-T5 aluminium RHS 110 x 19 x 3.5, made to order, bonded into a 19 mm channel the panel maker routs in the XPS from the inner face, 13 mm of XPS behind it, 10 mm short of the floor and roof joiners on a rigid PVC pad"
     system: body
-    price: {aud: 20, basis: estimate, date: 2026-11-21, note: "The routed channel, 2 m at about AUD 10/m (est.). The member is cut from the made-to-order run priced on LB-06"}
+    price: {aud: 3020, basis: estimate, date: 2026-11-21, note: "A made-to-order 6060-T5 die, about AUD 2,000, and its 100 kg minimum run at about AUD 10/kg, about 43 m, which covers all six wall members (11.9 m, 27.4 kg), and this member's routed channel, 2 m at about AUD 10/m (est.). InfraBuild stocks no 6060-T5 RHS under 25 mm deep this stiff: https://www.infrabuild.com/steel/products/aluminium/aluminium-rhs-rectangular-box-section/"}
     for: {s: [1]}
     point: [body_x0 + 2530, s * (half_bw - wall_t / 2), floor_z + interior_h / 2]
     mass: {basis: declared, unit_kg: 4.57, maturity: calculated, source: "1.98 m at 2.306 kg/m, 854 mm2 at 2.70 t/m3, with its 10 mm rigid PVC pad (calculated)"}
@@ -424,7 +424,7 @@ items:
     name: Entry door's rear jamb member, RHS 110 x 19 x 3.5 aluminium on the inner skin, floor joiner to roof joiner behind D1
     material: "6060-T5 aluminium RHS 110 x 19 x 3.5, made to order, bonded into a 19 mm channel the panel maker routs in the XPS from the inner face, 13 mm of XPS behind it, 10 mm short of the floor and roof joiners on a rigid PVC pad"
     system: body
-    price: {aud: 20, basis: estimate, date: 2026-11-21, note: "The routed channel, 2 m at about AUD 10/m (est.). The member is cut from the made-to-order run priced on LB-06"}
+    price: {aud: 20, basis: estimate, date: 2026-11-21, note: "The routed channel, 2 m at about AUD 10/m (est.). The member is cut from the made-to-order run priced on BD-18"}
     for: {k: [1]}
     point: [lz_door_x + lz_door_w + 156, -half_bw + wall_t / 2, floor_z + interior_h / 2]
     mass: {basis: declared, unit_kg: 4.57, maturity: calculated, source: "1.98 m at 2.306 kg/m, 854 mm2 at 2.70 t/m3, with its 10 mm rigid PVC pad (calculated)"}
@@ -733,7 +733,7 @@ items:
     name: Lift bed hardpoints, four RHS 110 x 19 x 3.5 aluminium members on the inner skin, full wall height, behind the rails
     material: "6060-T5 aluminium RHS 110 x 19 x 3.5, made to order, bonded into a 19 mm channel the panel maker routs in the XPS from the inner face, 13 mm of XPS behind it, 10 mm short of the floor and roof joiners on a rigid PVC pad"
     system: bed
-    price: {aud: 3080, basis: estimate, date: 2026-11-21, note: "A made-to-order 6060-T5 die, about AUD 2,000, and its 100 kg minimum run at about AUD 10/kg, about 43 m, which covers all six wall members (11.9 m, 27.4 kg), and the routed channels, 8 m at about AUD 10/m (est.). InfraBuild stocks no 6060-T5 RHS under 25 mm deep this stiff: https://www.infrabuild.com/steel/products/aluminium/aluminium-rhs-rectangular-box-section/"}
+    price: {aud: 80, basis: estimate, date: 2026-11-21, note: "The routed channels, 8 m at about AUD 10/m (est.). The members are cut from the made-to-order run priced on BD-18"}
     point: [in_x0 + bed_rail_u + 533, 0, floor_z + 1000]
     mass: {basis: declared, total_kg: 18.28, maturity: calculated, source: "4 x 1.98 m at 2.306 kg/m, 854 mm2 at 2.70 t/m3, with their rigid PVC pads (calculated). Report 21 section 1.4 had four 1.6 m lengths of RHS 40 x 20 x 3 laid flat, 5.6 kg"}
     note: Laid into the wall cores as the panels are made, floor joiner to roof joiner and bonded to the inner skin, so the rail screws pass through the inner skin and bite 3.5 mm aluminium (Lippert's 3 mm backing rule), and each hardpoint also stiffens the wall against wind (BDY-10). The 13 mm of XPS behind each keeps the surface over it 4 K above the cold night's dew point, to its ends (BDY-22). The bed's rail pairs are 1,067 mm apart, the widest side-wall bay, and W1 and W2 sit between them 27 mm clear of the hardpoints (FIT-07). The rear kerb-side hardpoint also bounds the entry door's bay at its front.

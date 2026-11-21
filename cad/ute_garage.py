@@ -266,6 +266,9 @@ def build_garage(prj: Project | None = None, limits: dict | None = None):
     tx, ty, tz = P.eval(tp.cog.at, {})
     lines.append(dict(id="U-TOOLS", item=tp.name, kg=tp.mass.total_kg, x=tx + x0, y=ty, z=tz + dz, maturity=tp.mass.maturity,
                       source=tp.mass.source + ". In the two chests on the wheel tubs", cases=list(TOOL_CASES), group="tools"))
+    kp = prj.parts["U-TIEDOWN"]                     # the trailer's tie-down kit, in the same chests (STB-05)
+    lines.append(dict(id="U-TIEDOWN", item=kp.name, kg=kp.mass.total_kg, x=tx + x0, y=ty, z=tz + dz, maturity=kp.mass.maturity,
+                      source=kp.mass.source + ". In the two chests on the wheel tubs", cases=list(TOOL_CASES), group="tools"))
     box_lines = [ln for ln in lines if ln["cases"] == BOX_CASES]
     box_kg = sum(ln["kg"] for ln in box_lines)
     box_kg_g = sum(ln["kg"] * (1 + GROWTH[ln["maturity"]]) for ln in box_lines)

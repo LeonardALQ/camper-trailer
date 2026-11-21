@@ -398,6 +398,19 @@ class Body:
             if g["at"] in ("kerb", "road"):
                 gw = g.get("w", g["d"])
                 obs.append((g["at"], g["x"] - gw / 2, g["x"] + gw / 2, f"gland {g['id']}"))
+        strips = []
+        for sp in ru.get("strips", []):            # a horizontal fixing strip stops clear_mm short of each member it meets
+            bb = lay.find(sp["block"]).box
+            wall = side((bb[1] + bb[4]) / 2)
+            pieces = [(bb[0], bb[3])]
+            for _, w2, x in mem:
+                if w2 != wall:
+                    continue
+                lo, hi = x - half - ru["clear_mm"], x + half + ru["clear_mm"]
+                pieces = [q for a, c in pieces for q in (((a, c),) if hi <= a or lo >= c else tuple(
+                    p for p in ((a, lo), (hi, c)) if p[1] - p[0] > 1e-6))]
+            strips += [(wall, a, c, sp["name"]) for a, c in pieces]
+        obs += strips
         rows = []
         for iid, wall, x in mem:
             gaps = [(max(o0 - (x + half), (x - half) - o1), what) for w2, o0, o1, what in obs if w2 == wall]
@@ -416,7 +429,7 @@ class Body:
         probs = [f"{r['member']} on the {r['wall']} side is {r['gap_mm']:.0f} mm from {r['to']}" for r in rows if r["gap_mm"] < ru["clear_mm"] - 1e-6]
         probs += [f"a {w2} side bay is {v:.0f} mm wide" for w2, v in bays.items() if v > st["pitch"] + 1e-6]
         return dict(ok=not probs, problems=probs, rows=rows, worst_mm=worst, bays=bays, pitch=st["pitch"], clear_mm=ru["clear_mm"],
-                    width=st["width"])
+                    width=st["width"], strips=strips)
 
     def cradle(self) -> dict:
         """The split's outdoor unit and its cradle on the rear wall (BDY-21): the stays carry the vertical load to the
