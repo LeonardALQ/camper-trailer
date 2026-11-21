@@ -4,13 +4,15 @@ import pytest
 import yaml
 
 from cad.inputs import Inputs
-from cad.partsdb import DATA
+from cad.partsdb import DATA, Project
 from cad.tests.test_trailer import EV, TRAILER
-from cad.trailer import measurement_refs
+from cad.trailer import WEIGHINGS, Trailer, _stage_of, measurement_refs
 
 STAGES = {"buy", "build", "weigh", "trailer built"}
 INPUTS = TRAILER.inputs
-RANGES = INPUTS.resolve_ranges(measurement_refs(TRAILER, EV))
+REFS = measurement_refs(TRAILER, EV)
+RANGES = INPUTS.resolve_ranges(REFS)
+MODEL_READINGS = {iid: REFS[f"model_{iid}"] for iid in WEIGHINGS}
 ITEMS = list(INPUTS.items.values())
 RAW = yaml.safe_load((DATA / "measurements.yaml").read_text())["inputs"]
 PARTS = {"car": "Car build", "box": "Bike box", "trailer": None}
@@ -55,3 +57,37 @@ def test_every_input_belongs_to_a_part():
         for prefix, p in (("VEH-", "car"), ("BOX-", "box")):
             if it.id.startswith(prefix):
                 assert part == p and it.group == PARTS[p], f"{it.id}: part {part}, group {it.group!r}"
+
+
+def _tare(lay):
+    return sum(b.mass_kg for b in lay.blocks if b.load == "tare")
+
+
+def _weighed(readings):
+    """The layout and the nominal load cases with these weighbridge readings entered, at the model's axle position."""
+    prj = Project()
+    for iid, kg in readings.items():
+        prj.inputs.items[iid].measured = kg
+    lay = Trailer(prj).layout(**EV["solved"]["overrides"])
+    return lay, [lay.evaluate_case(c)["nominal"] for c in TRAILER.cases]
+
+
+def test_every_tare_line_is_weighed_in_one_stage():
+    covers = {iid: set(INPUTS.items[iid].extra["covers"]) for iid in WEIGHINGS}
+    for b in EV["layout"].blocks:
+        if b.load == "tare":
+            stages = [iid for iid, c in covers.items() if _stage_of(b) in c]
+            assert len(stages) == 1, f"{b.iid} ({_stage_of(b)}) is in {stages or 'no weighbridge stage'}"
+    assert MODEL_READINGS["TW-03"] == pytest.approx(_tare(EV["layout"]), abs=0.1)
+
+
+def test_weighing_at_the_model_changes_nothing():
+    lay, cases = _weighed(MODEL_READINGS)
+    assert _tare(lay) == pytest.approx(_tare(EV["layout"]), abs=0.1)
+    for got, case in zip(cases, EV["cases"]):
+        assert got["towball_kg"] == pytest.approx(case["nominal"]["towball_kg"], abs=0.1), case["id"]
+
+
+def test_a_heavier_finished_trailer_raises_the_tare_by_the_difference():
+    lay, _ = _weighed(MODEL_READINGS | {"TW-03": MODEL_READINGS["TW-03"] + 50})
+    assert _tare(lay) == pytest.approx(_tare(EV["layout"]) + 50, abs=0.1)

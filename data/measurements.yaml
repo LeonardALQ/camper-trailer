@@ -908,13 +908,13 @@ inputs:
     group: Trailer weighbridge
     part: trailer
     title: Weighed mass, chassis with running gear, drawbar and coupling
-    how: Weigh the rolling chassis on a weighbridge before the body goes on. Record the whole mass.
+    how: Weigh the rolling chassis on a weighbridge before the body goes on, with the jockey wheel, safety chains and breakaway kit fitted. Record the whole mass.
     unit: kg
     estimate: {v: null, src: "The model's sum for these lines is shown beside it"}
     measured: {v: null, date: null}
     stage: weigh
     range: {ref: model_TW-01, rel: 0.02, src: "Within 2 % of the model's mass for the parts on the scale by then (report 02 MASS-07). A bigger difference is explained before work continues"}
-    covers: [chassis, running_gear, drawbar_structure]
+    covers: [chassis, running_gear, drawbar_structure, drawbar]
     affects: [every mass check]
     thresholds:
       - {rule: "The weighed figure replaces the estimates for the parts already built: their masses scale to it and their growth allowance becomes 0 %", src: "Report 02 MASS-06 and MASS-07"}
@@ -923,7 +923,7 @@ inputs:
     group: Trailer weighbridge
     part: trailer
     title: Weighed mass, with the body shell on
-    how: Weigh again once the floor, walls, roof and doors are on. Record the whole mass.
+    how: Weigh again once the floor, walls, roof, doors, windows and solar panels are on. Record the whole mass.
     unit: kg
     estimate: {v: null, src: "The model's sum is shown beside it"}
     measured: {v: null, date: null}
@@ -943,7 +943,7 @@ inputs:
     measured: {v: null, date: null}
     stage: weigh
     range: {ref: model_TW-03, rel: 0.02, src: "Within 2 % of the model's tare, the whole trailer as built (report 02 MASS-07). A bigger difference is explained before the plate is stamped"}
-    covers: [living, bed, underfloor, stowage, spare]
+    covers: [underfloor, electrical, hvac, wet_room, living, bed, stowage, spare]
     affects: [every mass check, the plated tare]
     thresholds:
       - {rule: "The rise from TW-02 replaces the fit-out's estimates. The ticket goes in the NSW identity approval package (report 02, VIB 78)", src: "Report 02 MASS-07 and MASS-08"}

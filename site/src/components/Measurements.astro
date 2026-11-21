@@ -102,7 +102,8 @@ const measured = rows.filter((m) => m.status === 'measured').length;
                 ))}
               </ul>
               {m.outcome && <p>Now: {m.outcome}.</p>}
-              {m.covers && <p>The reading includes: {m.covers.join(', ').replace(/_/g, ' ')}.</p>}
+              {m.adds && <p>New on the scale at this weighing, with the model's masses. The reading is the whole trailer, so the model's figure adds the weighings before it.</p>}
+              {m.adds && <ul>{m.adds.map((a: any) => <li>{a.part[0].toUpperCase() + a.part.slice(1)}, {num(a.kg)} kg</li>)}</ul>}
               <p>Checks that use it: {users(m.id).join(', ') || 'none'}.</p>
             </details>
           </td>

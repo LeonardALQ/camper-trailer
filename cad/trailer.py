@@ -28,6 +28,14 @@ from .partsdb import DATA, ROOT, Mass, Params, Project
 TRAILER_YAML = DATA / "assemblies" / "trailer.yaml"
 GROWTH = {"estimate": 0.20, "calculated": 0.07, "spec": 0.0, "weighed": 0.0}
 STAGE_IDS = {"drawbar_structure": ("DB-KA", "DB-KB", "DB-RA", "DB-RB", "DB-BR", "DB-03", "DB-04"), "stowage": ("DX-01", "GS-01")}
+WEIGHINGS = ("TW-01", "TW-02", "TW-03")
+WEIGH_LABELS = {
+    "chassis": "chassis", "running_gear": "running gear", "drawbar_structure": "drawbar, coupling and stone guard",
+    "drawbar": "jockey wheel, safety chains and breakaway kit", "body": "body shell", "roof": "solar panels",
+    "underfloor": "tanks and guards under the floor", "electrical": "electrical system", "hvac": "HVAC and ventilation",
+    "wet_room": "wet room", "living": "living area", "bed": "lift bed", "stowage": "drawbar box and generators",
+    "spare": "spare wheel",
+}
 SYSTEM_LABELS = {
     "drawbar": "Coupling and drawbar fittings", "chassis": "Chassis and drawbar", "running_gear": "Running gear", "body": "Body",
     "roof": "Roof", "underfloor": "Under the floor", "bed": "Bed", "living": "Living area",
@@ -1026,14 +1034,24 @@ def measurement_refs(tr: Trailer, ev: dict) -> dict:
         model_TC2=cases["TC2"]["nominal"]["mass_kg"], axle_TC2=cases["TC2"]["nominal"]["axle_kg"],
         cog_z_TC1=cases["TC1"]["nominal"]["cog"][2],
     )
-    # a weighbridge reading includes every stage built by then, so each stage's model figure adds the ones before. The
-    # last one weighs the finished trailer, so its figure is the whole tare
-    covered: set[str] = set()
-    for iid in ("TW-01", "TW-02"):
-        covered |= set(tr.inputs.items[iid].extra["covers"])
-        refs[f"model_{iid}"] = sum(b.mass_kg for b in lay.blocks if b.load == "tare" and _stage_of(b) in covered)
-    refs["model_TW-03"] = sum(b.mass_kg for b in lay.blocks if b.load == "tare")
+    for iid, st in weighbridge(tr, lay).items():
+        refs[f"model_{iid}"] = st["model_kg"]
     return refs
+
+
+def weighbridge(tr: Trailer, lay: Layout) -> dict:
+    """Each weighbridge stage: the parts it adds to the scale with their model mass, and the model's reading, which
+    includes every stage before it."""
+    kg: dict[str, float] = {}
+    for b in lay.blocks:
+        if b.load == "tare":
+            kg[_stage_of(b)] = kg.get(_stage_of(b), 0.0) + b.mass_kg
+    out, reading = {}, 0.0
+    for iid in WEIGHINGS:
+        covers = tr.inputs.items[iid].extra["covers"]
+        reading += sum(kg.get(k, 0.0) for k in covers)
+        out[iid] = dict(adds=[dict(part=WEIGH_LABELS[k], kg=kg.get(k, 0.0)) for k in covers], model_kg=reading)
+    return out
 
 
 def report(tr: Trailer) -> dict:
@@ -1056,6 +1074,11 @@ def report(tr: Trailer) -> dict:
     tr.inputs.solved = ute_prj.inputs.solved
     tr.inputs.spacing_fits = ute_prj.inputs.spacing_fits
     tv = {k: v for k, v in tr.tv.items() if k != "ute_checks"}
+    stages = weighbridge(tr, lay)
+    measurements = tr.inputs.report()
+    for row in measurements:
+        if row["id"] in stages:
+            row["adds"] = stages[row["id"]]["adds"]
     return _r(dict(
         assembly=dict(id=tr.td["id"], name=tr.td["name"], revision=tr.td["revision"]),
         body_length=V["body_length"], solved=ev["solved"], target_kg=tr.target,
@@ -1066,5 +1089,5 @@ def report(tr: Trailer) -> dict:
         target_why=tr.target_why, wheel=tr.wheel, supplier=tr.supplier, caps=tr.caps(), registration=tr.reg,
         weighed=tr.weighed_rows, spacing=dict(rule=ute_prj.inputs.rule_spacing, solved=ute_prj.inputs.solved,
                                               in_use=ute_prj.P.values["bike_spacing"], fits=ute_prj.inputs.spacing_fits),
-        measurements=tr.inputs.report(),
+        measurements=measurements,
     ))
