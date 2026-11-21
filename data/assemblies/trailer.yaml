@@ -231,7 +231,7 @@ stability:
     # the anchor's minimum probe value, or where it will not wind in to full depth, the trailer is hitched or moved
     tie_down:
       v_r_ms: 57             # region B's 500-year regional wind (AS/NZS 1170.2 Table 3.1), times Mz,cat 0.91 at 3 m
-      angle_deg: [45, 50]    # the strap to the ground, never under the listing's 45 degrees: the head 600 to 700 mm out from the point under the lashing point on level ground
+      angle_deg: [45, 50]    # the strap to the ground, never under the listing's 45 degrees: the head 610 to 710 mm out from the point under the lashing point on level ground, inside the 602 to 717 mm the angles give at 717 mm up
       lug_y_mm: 1170         # the lashing point under the outrigger's end
       lug_z_mm: 717
       strap_lc_n: 24500      # 50 mm ratchet strap, lashing capacity 2,500 kg (AS/NZS 4380, est.)
