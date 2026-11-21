@@ -34,9 +34,9 @@ A ladder of two composite rails with crossmembers at eight stations, outriggers 
 | Body end crossmembers | RHS 150 x 50 x 3, full height, 1,175 mm | X 1,820 and 6,190 | 2 | 21.0 kg |
 | XT crossmembers | RHS 150 x 50 x 3, full height, no holes | Front hinge X 3,465, centre X 4,365 | 2 | 21.0 kg |
 | XT rear shock crossmember | RHS 150 x 50 x 4, with a 5 mm shock plate | X 5,195 | 1 | 13.6 kg |
-| Floor crossmembers | RHS 127 x 51 x 3.5, top flush with the raisers | X 2,362, the diesel bay at X 2,905 and the grey bay at X 5,675 | 3 | 32.0 kg |
+| Floor crossmembers | RHS 127 x 51 x 3.5, top flush with the raisers | X 2,362, the diesel bay at X 2,904 and the grey bay at X 5,674 | 3 | 32.0 kg |
 | Outriggers | RHS 127 x 51 x 3.5, top flush, 562 mm out to the body edge | Every station, each side | 16 | 81.6 kg |
-| Plan bracing | SHS 40 x 40 x 2.5, an X at rail height | Bays X 2,362 to 2,905 and 2,905 to 3,465 | 4 | 14.4 kg |
+| Plan bracing | SHS 40 x 40 x 2.5, an X at rail height | Bays X 2,362 to 2,904 and 2,904 to 3,465 | 4 | 14.4 kg |
 | Drawbar members | RHS 150 x 50 x 5 | Apex X 250 at Y ±60, to the rails at X 1,820, then 1,000 mm on under them | 2 (4 lengths) | 75.7 kg |
 | Drawbar cross brace | RHS 75 x 50 x 3 | X 900 | 1 | 2.9 kg |
 | Spare carrier posts | SHS 50 x 50 x 2.5 | X 1,795, Y ±120, up to Z 1,915 | 2 | 9.5 kg |
