@@ -271,9 +271,11 @@ def ct003(prj, model, bom, checks, reg, dwg):
             return ("", "#000")
         return (f"{c['status']} ({cid})", "#000" if c["ok"] else ("#c00" if c["severity"] == "fail" else "#b06000"))
 
-    def mv(cid, fmt="{:,.0f}"):
+    def mv(cid, fmt=None):
+        # whole numbers round half up, as the site rounds them (F2-08)
         c = chk[cid]
-        return fmt.format(c["measured"]) + (f" {c['unit']}" if c.get("unit") else "")
+        v = _kg(c["measured"]) if fmt is None else fmt.format(c["measured"])
+        return v + (f" {c['unit']}" if c.get("unit") else "")
 
     gcm = chk["GCM-01"]["gcm"]
     n_ok = sum(c["ok"] for c in LM["checks"])
@@ -292,7 +294,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
         ["Safety chains", "Two above 2,500 kg ATM to AS 4177.4, 4177-35 (VSB1 9.2.1)", "Two chains DB-06. Lugs at 34.3 kN and 17.2 kN (VSB1 9.2.2)", st("LOC-02")],
         ["Drawbar", "9.81 x ATM along and 0.5 x 9.81 x ATM down (VSB1 9.1)", f"Peak {chk['CHS-06']['measured']:.0f} MPa at 17.2 kN up, {chk['CHS-06B']['measured']:.0f} MPa down", st("CHS-06")],
         ["Towball height", "Ball 350 to 460 mm loaded, trailer level in it (VSB1 9.3.2)", f"{V['coupling_z']:.0f} mm, plus or minus 20 mm (UTE-01)", st("DIM-03")],
-        ["Towball load", "Every case at least 7.5 % (H2), design at least 8.0 % and 320 kg (H17)", f"{chk['MAS-12']['measured']:.1f} % lowest, {chk['MAS-13']['measured']:.0f} kg heaviest with growth", st("MAS-12")],
+        ["Towball load", "Every case at least 7.5 % (H2), design at least 8.0 % and 320 kg (H17)", f"{chk['MAS-12']['measured']:.1f} % lowest, {_kg(chk['MAS-13']['measured'])} kg heaviest with growth", st("MAS-12")],
         ["Running clearance", "At least 100 mm, unladen (VSB1 5.4)", f"{mv('DIM-04')}, the coupling's handbrake", st("DIM-04")],
         ["Width", "Across the body and everything on its sides, at most 2,500 mm, side lamps left out (ADR 43/04 6.2.6.1, VSB1 5.2)", f"{mv('DIM-01')}, design at most 2,490 mm (DIM-05)", st("DIM-05")],
         ["Overhang", "Front load space at least the rear overhang (VSB1 5.1.1)", f"{V['axle_x'] - V['body_x0']:.0f} against {ch['overall_x1'] - V['axle_x']:.0f} mm", st("DIM-02")],
@@ -340,7 +342,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
         ("ATM AND DESIGN LIMIT", f"PLATE {rep['caps']['plated']:,.0f} kg. EVERY CASE WITH GROWTH AT MOST 3,400 kg (MAS-10)."),
         ("TOWBALL (H17)", f"AT LEAST {rep['solved']['window']['pct_min']:.1f} % OF THE TRAILER IN EVERY CASE AND AT MOST "
                           f"{rep['solved']['window']['ball_max']['kg']:.0f} kg WITH GROWTH. TOWBAR AND DO35 {lim['towball_rating_kg']:.0f} kg."),
-        ("THE UTE (H17, H18)", f"LOVELLS ELITE PLATED AT {lim['gvm_kg']:,.0f} kg GVM, REAR AXLE {lim['rear_axle_kg']:,.0f} kg ({uc['UTE-03']['measured']:,.0f} kg "
+        ("THE UTE (H17, H18)", f"LOVELLS ELITE PLATED AT {lim['gvm_kg']:,.0f} kg GVM, REAR AXLE {lim['rear_axle_kg']:,.0f} kg ({_kg(uc['UTE-03']['measured'])} kg "
                           f"TOWING WITH GROWTH). {lim['platinum_rear_axle_kg']:,.0f} kg IF CUT CUT7 RETURNS TO THE PLATINUM."),
         ("COUPLING HEIGHT", f"{V['coupling_z']:.0f} mm LADEN, PLUS OR MINUS 20 mm. SET THE TONGUE'S DROP AT THE FINAL WEIGHING (TW08)."),
         ("GREY WATER", f"EMPTY FOR TRAVEL. A FULL {V['grey_full_l']:.0f} L TANK IS CHECKED IN CASES TC7 AND TC8."),
