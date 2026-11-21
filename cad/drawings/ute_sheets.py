@@ -165,8 +165,12 @@ def ct701(prj, model, bom, checks, reg, dwg):
         for yy in (P["rail_y"], -P["rail_y"]):
             p = vP.p(x, yy, 0)
             sh.circle(p[0], p[1], 0.6, "medium")
-    w0, w1 = vP.p(ext["x1"], ext["y1"], 0), vP.p(ext["x1"], ext["y0"], 0)
-    S.vdim(sh, w0[0], w0[1], w1[0], w1[1], w0[0] + 6, f"{ext['y1'] - ext['y0']:.0f} (MAX 1850)", size=1.8)
+    L, body = ute.limits, g["body_extent"]
+    w0, w1 = vP.p(ext["x1"], body["y1"], 0), vP.p(ext["x1"], body["y0"], 0)
+    S.vdim(sh, w0[0], w0[1], w1[0], w1[1], w0[0] + 6, f"{body['y1'] - body['y0']:.0f} BODY (MAX {L['box_width_max_mm']:.0f})", size=1.8)
+    fl = vP.p(P["module_x0"] + (P["flare_x0"] + P["flare_x1"]) / 2, ext["y0"], 0)
+    S.leader(sh, fl, (fl[0] + 14, fl[1] - 8), f"REAR TUB FLARES, {ext['y1'] - ext['y0']:.0f} OVER THEM (MAX {L['flare_width_max_mm']:.0f}), DETAIL B",
+             size=1.8)
     c0, c1 = vP.p(V["cab_back_x"] - 400, V["cab_width"] / 2, 0), vP.p(V["cab_back_x"] - 400, -V["cab_width"] / 2, 0)
     S.vdim(sh, c0[0], c0[1], c1[0], c1[1], c0[0] - 22, f"{V['cab_width']:.0f} CAB", size=1.8)
     sh.text(vP.p(V["ball_x"] + 500, 0, 0)[0], vP.p(0, ext["y1"], 0)[1] + 1, "ROAD SIDE", 1.8)
@@ -178,8 +182,8 @@ def ct701(prj, model, bom, checks, reg, dwg):
     vR = S.View(sh, (1, 0, 0), (0, 0, 1), sc, ox=200.0, oy=222.0)
     vR.draw(outside)
     S.view_label(sh, 200, 209, "REAR VIEW", sc)
-    y0, y1 = vR.p(0, ext["y0"], ext["z1"]), vR.p(0, ext["y1"], ext["z1"])
-    S.hdim(sh, y0[0], y0[1], y1[0], y1[1], y0[1] + 5, f"{ext['y1'] - ext['y0']:.0f}", size=1.8)
+    y0, y1 = vR.p(0, body["y0"], ext["z1"]), vR.p(0, body["y1"], ext["z1"])
+    S.hdim(sh, y0[0], y0[1], y1[0], y1[1], y0[1] + 5, f"{body['y1'] - body['y0']:.0f} BODY", size=1.8)
     t0_, t1_ = vR.p(0, -V["track_rear"] / 2, 0), vR.p(0, V["track_rear"] / 2, 0)
     S.hdim(sh, t0_[0], t0_[1], t1_[0], t1_[1], t0_[1] - 5, f"{V['track_rear']:.0f} TRACK", size=1.8)
     sh.text(vR.p(0, ext["y0"], 0)[0] - 2, vR.p(0, 0, 200)[1], "KERB", 1.8, "end")
@@ -191,7 +195,7 @@ def ct701(prj, model, bom, checks, reg, dwg):
         n, gr = cs["nominal"], cs["growth"]
         rows.append([cs["id"], f"{n['mass_kg']:,.0f}", f"{n['front_kg']:,.0f}", f"{n['rear_kg']:,.0f}", f"{gr['rear_kg']:,.0f}",
                      f"{n['towball_kg']:.0f}", f"{n['front_share_pct']:.1f}", f"{n['cog'][2]:.0f}", f"{n['ssf']:.3f}"])
-    yb = S.table(sh, 230, 258, [("CASE", 12), ("kg", 18), ("FRONT", 18), ("REAR", 18), ("REAR+G", 20), ("BALL", 16),
+    yb = S.table(sh, 230, 252, [("CASE", 12), ("kg", 18), ("FRONT", 18), ("REAR", 18), ("REAR+G", 20), ("BALL", 16),
                                 ("FRONT %", 22), ("CoG Z", 18), ("SSF", 18)], rows, size=1.75, row_h=3.2,
                  title="MASS BY CASE (kg, mm; +G WITH GROWTH)")
     sh.text(230, yb - 3.2, "UC1 UNLADEN, UC2 BIKES ABOARD, UC3 TOWING WITH THE BIKES, UC4 TOWING, BIKES OUT, UCB BIKES IN THE TRAILER.", 1.6)
@@ -202,11 +206,15 @@ def ct701(prj, model, bom, checks, reg, dwg):
 
     _, _ = S.notes(sh, 22, 62, [
         "UTE FRAME DIM-U1: X FROM THE FRONT AXLE (+ REARWARD), Y FROM THE CENTRELINE (+ TO THE ROAD SIDE), Z FROM THE GROUND AT LADEN RIDE HEIGHT.",
-        f"TOYOTA LANDCRUISER VDJ79 GXL SINGLE CAB, LOVELLS 4200 kg GVM KIT (FRONT 1650, REAR 2550 kg). GCM 6900 kg, TOWBALL CAPPED AT 250 kg.",
+        f"TOYOTA LANDCRUISER VDJ79 GXL SINGLE CAB, LOVELLS ELITE GVM KIT PLATED AT {L['gvm_kg']:.0f} kg (FRONT {L['front_axle_kg']:.0f}, REAR "
+        f"{L['rear_axle_kg']:.0f} kg, TWICE THE ROH WHEEL'S {L['wheel_rating_kg']:.0f} kg, H18), REAR TRACK {V['track_rear']:.0f}. GCM {L['gcm_kg']:.0f} kg "
+        f"WITH THE REVISION. TOWBALL {V['towball_design']:.0f} kg WITH GROWTH, AT MOST {L['towball_rating_kg']:.0f} kg.",
         f"BOX FLOOR {g['deck_z']:.0f} ABOVE THE GROUND ON A 50 mm SUBFRAME ON THE RAILS, WITH WHEEL TUBS {g['dims']['tub_h']:.1f} HIGH (ESTIMATE: FRAME TOP 774, BUMP TRAVEL 110). MEASURE BOTH ON THE VEHICLE.",
-        "THE REAR-MOST POINT IS THE CAM BAR ON THE BARN DOORS. BOX OUTSIDE 2590 LONG, 1850 WIDE, 1502 HIGH ABOVE THE FLOOR.",
+        f"THE REAR-MOST POINT IS THE CAM BAR ON THE BARN DOORS. BOX OUTSIDE {P['outside_l']:.0f} LONG, {P['outside_w']:.0f} WIDE, "
+        f"{P['top_z']:.0f} HIGH ABOVE THE FLOOR, {P['flare_w']:.0f} WIDE OVER THE REAR TUB FLARES (DETAIL B).",
         "NO DRILLING OR WELDING OF THE FRAME. THE SUBFRAME BOLTS TO TOYOTA'S DECK MOUNT BRACKETS (CT-702).",
     ], width_chars=100, size=1.75)
+    _detail_b(sh, 240, 165, P, V, L)
     _stamp(sh, 22, 282)
     _title(sh, dwg, reg, _mass_note(c), sc, c)
     from .sheets import OUT
@@ -214,9 +222,58 @@ def ct701(prj, model, bom, checks, reg, dwg):
     return time.time() - t0
 
 
+def _detail_b(sh, x0, ytop, P, V, L):
+    """Detail B, the road-side rear tub flare cut at the rear axle, looking forward (the kerb side is its mirror), at 1:2,
+    in the free space under the checks. Decision H19, R26 fix A."""
+    k = 0.5
+    y_lo, y_hi, z_lo, z_hi = 868.0, 952.0, -16.0, 140.0
+    yb = ytop - 12 - (z_hi - z_lo) * k
+
+    def X(y):
+        return x0 + (y - y_lo) * k
+
+    def Z(z):
+        return yb + (z - z_lo) * k
+    hw, fs, ft, st = P["half_width"], P["frame_s"], P["frame_t"], P["skin_t"]
+    skin_in, skin_out = hw + fs, P["outside_w"] / 2
+    fl_out = skin_out + P["flare_out"]
+    fl_in = fl_out - st
+    tub, tub_t, fl_top, floor_t = P["tub_top"], P["tub_t"], P["flare_z1"], P["floor_t"]
+    tyre_y = P["wheel_y"] + P["tyre_w"] / 2
+    bump = P["wheel_z"] + P["rear_bump"] + P["tyre_d"] / 2
+    sh.text(x0 + 33, ytop, "DETAIL B: REAR TUB FLARE, ROAD SIDE (KERB SIDE MIRRORED)", 1.9, "middle", bold=True)
+    sh.text(x0 + 33, ytop - 3.4, "SECTION AT THE REAR AXLE, LOOKING FORWARD. SCALE 1:2", 1.5, "middle")
+    sh.rect(X(skin_in), Z(fl_top), X(skin_out), Z(z_hi), "thick")                    # side skin, cut away below the rail top
+    sh.rect(X(hw), Z(tub), X(skin_in), Z(tub + fs), "thick")                           # bottom rail SHS 40 x 40 x 3 on the tub
+    sh.rect(X(hw + ft), Z(tub + ft), X(skin_in - ft), Z(tub + fs - ft), "thin")
+    sh.rect(X(y_lo), Z(tub - tub_t), X(skin_in), Z(tub), "thick")                       # tub top, 3 mm
+    sh.rect(X(fl_in), Z(-floor_t), X(fl_out), Z(fl_top), "thick")                      # flare outer face
+    sh.rect(X(skin_in), Z(fl_top - st), X(fl_in), Z(fl_top), "thick")                  # flare top, back to the skin line
+    sh.line(X(tyre_y), Z(z_lo), X(tyre_y), Z(bump), "phantom")                          # tyre envelope, static to full bump
+    sh.line(X(y_lo), Z(bump), X(tyre_y), Z(bump), "phantom")
+    gap = fl_in - tyre_y
+    S.hdim(sh, X(tyre_y), Z(20), X(fl_in), Z(20), Z(20), f"{gap:.0f} (MIN 30)", size=1.6, ext=False)
+    S.hdim(sh, X(skin_out), Z(z_hi), X(fl_out), Z(fl_top), Z(z_hi) + 3, f"{P['flare_out']:.0f}", size=1.6)
+    S.vdim(sh, X(fl_out), Z(-floor_t), X(fl_out), Z(fl_top), X(fl_out) + 5, f"{fl_top + floor_t:.1f}", size=1.6)
+    S.vdim(sh, X(890), Z(bump), X(890), Z(tub - tub_t), X(890), f"{tub - tub_t - bump:.0f}", size=1.6, ext=False)
+    tx = X(y_hi) + 12
+    S.leader(sh, (X(skin_in + 1.2), Z(134)), (tx, Z(134)), "SIDE SKIN 2.5, CUT AWAY OVER THE TUB UP TO THE RAIL TOP", size=1.6)
+    S.leader(sh, (X(skin_in - 12), Z(tub + fs - 8)), (tx, Z(112)), "BOTTOM RAIL SHS 40x40x3 ON THE TUB", size=1.6)
+    S.leader(sh, (X(fl_out - 1.2), Z(70)), (tx, Z(80)), f"FLARE 2.5 5052-H32, {P['flare_x1'] - P['flare_x0']:.0f} LONG, ENDS WELDED, "
+             "TOP WELDED TO THE RAIL", size=1.6)
+    S.leader(sh, (X(870), Z(tub - tub_t)), (x0 - 4, Z(40)), "TUB TOP 3.0 5052-H32", size=1.6)
+    S.leader(sh, (X(tyre_y), Z(0)), (x0 - 4, Z(10)), "REAR TYRE, STATIC TO FULL BUMP", size=1.6)
+    for i, t in enumerate((f"ON THE ELITE'S {V['track_rear']:.0f} REAR TRACK THE TYRE'S OUTER FACE IS",
+                           f"{tyre_y:.1f} FROM THE CENTRELINE, {skin_in - tyre_y:.0f} FROM THE BODY'S SKIN (R26).",
+                           "THE FLARE KEEPS TOYOTA'S 30 OUTSIDE THE TYRE (UGW-03).",
+                           f"BOX {2 * fl_out:.0f} OVER THE FLARES, MAX {L['flare_width_max_mm']:.0f}, BODY {P['outside_w']:.0f} (UTE-09, H19).")):
+        sh.text(tx + 4, Z(48) - 3 * i, t, 1.6)
+
+
 # ------------------------------------------------------------------ CT-702 box frame and panels
 SCHEDULE = [
-    ("U-FRAME", "SHS 40x40x3 6061-T6"), ("U-SKIN", "SHEET 2.5 5052-H32"), ("U-ROOF", "SHEET 1.6 5052-H32"),
+    ("U-FRAME", "SHS 40x40x3 6061-T6"), ("U-SKIN", "SHEET 2.5 5052-H32"), ("U-FLARE", "SHEET 2.5 5052-H32, FOLDED"),
+    ("U-ROOF", "SHEET 1.6 5052-H32"),
     ("U-FLOOR", "PLATE 4.0 5052-H32"), ("U-TUB", "SHEET 3.0 5052-H32"), ("U-RUNNER", "RHS 75x50x3 6061-T6"),
     ("U-CM", "SHS 50x50x3 6061-T6"), ("U-STEEL-CM", "RHS 65x35x4.0 C350L0 GALV"), ("U-PACKER", "PLATE 5.0x65 5052-H32"),
     ("U-STRIP", "FLAT 15x10 6060"), ("U-MOUNT-FIRM", "ANGLE + 2 M12 8.8"), ("U-MOUNT-SPRING", "ANGLE + M12 8.8 + RUBBER"),
@@ -233,7 +290,7 @@ def ct702(prj, model, bom, checks, reg, dwg):
     S.frame(sh)
     sc = 20.0
     hw, fs = P["half_width"], P["frame_s"]
-    structure = _module(c, groups=("body", "subframe", "context"), exclude=("B3", "B4", "C3"))
+    structure = _module(c, groups=("body", "subframe", "context"), exclude=("B3", "B4", "C3", "C6"))
 
     # ---- kerb-side frame elevation: the kerb half only, skins off
     kerb = _clip(_leaves(structure + _module(c, only=("D4",))), -100, 2700, -1000, -400, -200, 1600)
@@ -249,6 +306,8 @@ def ct702(prj, model, bom, checks, reg, dwg):
     S.vdim(sh, k1[0], k0[1], k1[0], k1[1], k1[0] + 4, f"{P['kd_z1'] - P['kd_z0']:.0f}", size=1.7, ext=False)
     t0_, t1_ = vE.p(P["tub_x0"], 0, 0), vE.p(P["tub_x1"], 0, 0)
     S.hdim(sh, t0_[0], t0_[1], t1_[0], t1_[1], t0_[1] - 8, f"{P['tub_x1'] - P['tub_x0']:.0f} TUB, {P['tub_top']:.1f} HIGH", size=1.7)
+    fk = vE.p(P["flare_x1"] - 20, 0, 40)
+    S.leader(sh, fk, (fk[0] + 13, fk[1] - 13), "REAR TUB FLARE, DETAIL B ON CT-701", size=1.6)
     ax = vE.p(P["axle_m"], 0, 0)
     sh.line(ax[0], ax[1] - 12, ax[0], ax[1] + 10, "centre")
     sh.text(ax[0], ax[1] - 14.5, "REAR AXLE", 1.7, "middle")
@@ -284,19 +343,21 @@ def ct702(prj, model, bom, checks, reg, dwg):
     sec_shapes = _leaves(_module(c, groups=("body", "subframe", "context", "tools", "doors"), exclude=("C3",)) +
                          _clip([c["m"].built[i].shape for i in ("C4R", "C4K")], -100, 2700, -1000, 1000, -130, 200))
     cut = S.section(sec_shapes, Plane.YZ.offset(xcut), keep=Keep.BOTTOM)
-    vS = S.View(sh, (1, 0, 0), (0, 0, 1), sc, ox=318.0, oy=188.0)
+    vS = S.View(sh, (1, 0, 0), (0, 0, 1), sc, ox=318.0, oy=180.5)
     vS.draw(cut)
     _shade(sh, vS, cut, "X", xcut)
-    S.view_label(sh, 318, 171, "SECTION AT THE REAR AXLE, LOOKING FORWARD", sc)
-    sh.text(318, 166, "TYRE SWEPT FROM STATIC TO FULL BUMP SHOWN CUT", 1.6, "middle")
-    w0, w1 = vS.p(0, -P["outside_w"] / 2, P["top_z"]), vS.p(0, P["outside_w"] / 2, P["top_z"])
-    S.hdim(sh, w0[0], w0[1], w1[0], w1[1], w0[1] + 4, f"{P['outside_w']:.0f} OUTSIDE", size=1.7)
+    S.view_label(sh, 318, 165.5, "SECTION AT THE REAR AXLE, LOOKING FORWARD", sc)
+    sh.text(318, 158.5, "TYRE SWEPT FROM STATIC TO FULL BUMP SHOWN CUT", 1.6, "middle")
+    w0, w1 = vS.p(0, -P["outside_w"] / 2, 1150), vS.p(0, P["outside_w"] / 2, 1150)
+    S.hdim(sh, w0[0], w0[1], w1[0], w1[1], w0[1], f"{P['outside_w']:.0f} BODY OUTSIDE", size=1.7, ext=False)
+    fp = vS.p(0, P["outside_w"] / 2 + P["flare_out"], 60)
+    S.leader(sh, fp, (fp[0] + 5, fp[1] - 6), "FLARE, DETAIL B ON CT-701", size=1.6)
     i0, i1 = vS.p(0, -hw, 700), vS.p(0, hw, 700)
     S.hdim(sh, i0[0], i0[1], i1[0], i1[1], i0[1], f"{P['interior_width']:.0f} INSIDE", size=1.7, ext=False)
     tb = vS.p(0, P["tub_y0"], P["tub_top"])
     S.leader(sh, tb, (tb[0] + 8, tb[1] + 14), f"TUB TOP {P['tub_top']:.1f}, 25 OVER THE TYRE AT FULL BUMP", size=1.6)
     ti = vS.p(0, -P["tub_y0"], 20)
-    S.leader(sh, ti, (ti[0] + 6, ti[1] - 14), "40 INSIDE THE TYRE", size=1.6)
+    S.leader(sh, ti, (ti[0] + 6, ti[1] - 10), "40 INSIDE THE TYRE", size=1.6)
 
     # ---- member schedule
     lines = {ln["id"]: ln for ln in g["lines"]}
@@ -307,8 +368,8 @@ def ct702(prj, model, bom, checks, reg, dwg):
         unit = {"m": "m", "m2": "m2"}.get(ln.get("unit"), ln.get("unit") or "")
         rows.append([pid, sect, f"{q:.2f} {unit}" if isinstance(q, float) and unit in ("m", "m2") else f"{q:g} {unit}",
                      f"{ln['kg']:.1f}", ln["maturity"]])
-    yb = S.table(sh, 230, 160, [("PART", 26), ("SECTION / MATERIAL", 58), ("QTY (MODEL)", 34), ("kg", 26), ("BASIS", 36)], rows,
-                 size=1.7, row_h=3.1, title="MEMBER AND PANEL SCHEDULE")
+    yb = S.table(sh, 230, 155.5, [("PART", 26), ("SECTION / MATERIAL", 58), ("QTY (MODEL)", 34), ("kg", 26), ("BASIS", 36)], rows,
+                 size=1.6, row_h=2.85, title="MEMBER AND PANEL SCHEDULE")
     sh.text(230, yb - 3.2, f"BODY {g['by_group'].get('body', 0):.1f} kg, SUBFRAME AND MOUNTS {g['by_group'].get('subframe', 0):.1f} kg (NO GROWTH).", 1.7)
 
     S.notes(sh, 230, yb - 9, [
@@ -430,7 +491,7 @@ def ct703(prj, model, bom, checks, reg, dwg):
     # ---- security layers
     lines = {ln["id"]: ln for ln in g["lines"]}
     rows = [[lay, pid, txt, f"{lines[pid]['kg']:.1f}"] for lay, pid, txt in SECURITY]
-    yb = S.table(sh, 230, 258, [("LAYER", 16), ("PART", 22), ("WHAT IT DOES", 124), ("kg", 18)], rows, size=1.65, row_h=3.1,
+    yb = S.table(sh, 230, 252, [("LAYER", 16), ("PART", 22), ("WHAT IT DOES", 124), ("kg", 18)], rows, size=1.65, row_h=3.1,
                  title="SECURITY LAYERS (REPORT 17 SECTION 4)")
     S.notes(sh, 230, yb - 6, [
         "LOCKING: SHUT THE KERB LEAF AND THROW ITS SHOOT BOLTS. SHUT THE ROAD LEAF OVER IT AND TURN THE CAM BAR. PADLOCK THE HASP OVER THE CAM HANDLE.",

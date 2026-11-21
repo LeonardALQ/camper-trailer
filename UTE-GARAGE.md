@@ -1,13 +1,13 @@
 # UTE-GARAGE: the bike box on the LandCruiser 79
 
-Revision C, 20 Nov 2026. Build document for a fabricator to quote from and an engineer to check. Parts list `data/ute/box-parts.yaml`, measurements BOX-01 to BOX-19 in `data/measurements.yaml`, model `data/assemblies/ute-garage.yaml` and `data/ute/parts/`, drawings CT-701 to CT-704. The site's Bike box page shows the parts list and the checks.
+Revision D, 21 Nov 2026: revision C of 20 Nov with the wheel tubs moved out and a flare over each rear tub for the Lovells Elite kit's wider rear track (decisions H18 and H19). Build document for a fabricator to quote from and an engineer to check. Parts list `data/ute/box-parts.yaml`, measurements BOX-01 to BOX-20 and VEH-28 in `data/measurements.yaml`, model `data/assemblies/ute-garage.yaml` and `data/ute/parts/`, drawings CT-701 to CT-704. The site's Bike box page shows the parts list and the checks.
 
 ## 1. Purpose and limits
 
 The box carries the Aprilia Tuareg 660 Rally (206 kg) and the Triumph Street Triple 765 (175 kg) side by side, noses forward, 760 mm apart, with about 60 kg of tools. It is locked, sealed against dust and vented for fuelled bikes.
 
-- At most 1,850 mm wide. Toyota BBGJ1007: 39 mm from the cab, 25 mm over the tyre at full bump, 40 mm inside it, 30 mm outside it, bodies on the deck mount brackets, no drilling or welding of the frame.
-- Rear axle at most 2,850 kg with growth on the Lovells Elite kit (decision H17, 21 Nov 2026), or 2,550 kg if cut CUT7 returns to the Platinum (`VEHICLE.md`). Box empty under report 17's 440 kg (UGB-01).
+- Body at most 1,850 mm wide, and the rear tub flares at most 1,910 mm (UTE-09, decision H19). Toyota allows a mounted part 60 mm beyond the cab's outermost point, measured on each side (BBGJ1007 section 1-2), so 1,910 mm on the 1,790 mm cab. Toyota BBGJ1007 also asks for 39 mm from the cab, 25 mm over the tyre at full bump, 40 mm inside it, 30 mm outside it, bodies on the deck mount brackets, no drilling or welding of the frame.
+- Rear axle at most 2,800 kg with growth: the Lovells Elite kit (decision H17) plated at twice the ROH wheel's 1,400 kg (decision H18), or 2,550 kg if cut CUT7 returns to the Platinum (`VEHICLE.md`). Box empty under report 17's 440 kg (UGB-01).
 - NTC Load Restraint Guide 2018: 0.8 g forward, 0.5 g rearward and sideways, 0.2 g up ([guide, p. 19](https://media.nrspp.org.au/wp-content/uploads/2021/11/06005924/Load-Restraint-Guide-for-light-vehicles-2018.pdf)).
 - Ramp at most 20 degrees (report 03).
 
@@ -15,7 +15,7 @@ The box carries the Aprilia Tuareg 660 Rally (206 kg) and the Triumph Street Tri
 
 A welded aluminium body bolts onto its own aluminium ladder subframe. The subframe sits on a 6 mm rubber strip on the rails and bolts to Toyota's six pairs of deck mount brackets, firm at the front two and compliant at the rear four, so the frame twists under the box without loading its walls.
 
-Outside 2,590 x 1,850 x 1,502 mm, inside 2,520 x 1,765 x 1,460 mm. Floor 834 mm up laden, wheel tubs 86.5 mm high. Rear barn doors open 1,745 x 1,460 mm. A 1,200 x 1,000 mm top-hinged kerb door reaches the Street Triple's kerb strap and the kerb tool chest.
+Outside 2,590 x 1,850 x 1,502 mm, and 1,890 mm wide over the rear tub flares. Inside 2,520 x 1,765 x 1,460 mm. Floor 834 mm up laden, wheel tubs 86.5 mm high and 1,201 mm apart on the Elite's 1,555 mm rear track. Rear barn doors open 1,745 x 1,460 mm. A 1,200 x 1,000 mm top-hinged kerb door reaches the Street Triple's kerb strap and the kerb tool chest.
 
 ## 3. Materials
 
@@ -25,6 +25,7 @@ Outside 2,590 x 1,850 x 1,502 mm, inside 2,520 x 1,765 x 1,460 mm. Floor 834 mm 
 | Roof | 5052-H32 1.6 mm, joints on bows |
 | Floor | 5052-H32 4.0 mm, joints on crossmembers |
 | Wheel tubs | 5052-H32 3.0 mm |
+| Rear tub flares | 5052-H32 2.5 mm, folded |
 | Body frame | 6061-T6 SHS 40 x 40 x 3 |
 | Door frames | 6061-T6 SHS 25 x 25 x 3 |
 | Runners | 6061-T6 RHS 75 x 50 x 3 |
@@ -54,6 +55,8 @@ Laden rail tops sit about 774 mm up (est.), so the 6 mm strip, 50 mm subframe an
 
 The body bolts down to the subframe from inside, with about 40 sealed M8 bolts into rivet nuts.
 
+Wheel tubs and flares. The tubs follow the rear tyres, 25 mm over them at full bump and 40 mm inside them. The Elite's housing gives a 1,555 mm rear track (R26, est.), 95 mm wider than Toyota's 1,460 mm, so each tyre's outer face is 911.5 mm from the centreline, 11 mm from the 1,850 mm body's skin against Toyota's 30 mm. Over each tub the side skin is cut away up to the top of the bottom rail, 130.5 mm above the floor's underside, and a flare of 2.5 mm sheet, folded into a channel 925 mm long and 20 mm deep, closes the opening. Its top is welded to the rail and its ends to the skin. The tyre keeps 31 mm (UGW-03), and the box is 1,890 mm over the flares against UTE-09's 1,910 mm. The mount angles stay over Toyota's brackets, the road-side tool chest is 270 mm wide so it stays on its tub, and Lovells' two mudflaps hang behind the tyres from the rear outriggers, 47.5 mm further out than on the factory track. Measure the rear track (VEH-28) once the kit is fitted and build the tubs and flares to it.
+
 ## 5. Doors and security
 
 Aluminium 2.5 mm thick stops nobody with a grinder. The box hides the bikes, defeats quick entry and buys time for the alarm.
@@ -81,9 +84,9 @@ Loads, each case alone, use the model's strap geometry (UGR-01). Sideways, one s
 
 Sideways sliding is held by the chock at the front and by tyre friction under strap tension, about 180 kgf, at the rear.
 
-Anchors must withstand their strap's breaking load (NTC guide p. 201, report 03), about 9.8 kN for LC 500 kg. The worst anchor is 277 mm outboard of a bracket, so 9.8 kN x 0.85 vertical x 0.277 m = 2.31 kN m on the steel crossmember, against 0.9 x 350 MPa x 9,518 mm3 = 3.00 kN m for the compact RHS 65 x 35 x 4.0, a utilisation of 0.77. Revision B's LC 1,000 kg straps would need 4.62 kN m, beyond any 40 mm deep steel section, so the straps change.
+Anchors must withstand their strap's breaking load (NTC guide p. 201, report 03), about 9.8 kN for LC 500 kg. The worst anchor is 276 mm from a bracket, so 9.8 kN x 0.86 vertical x 0.276 m = 2.33 kN m on the steel crossmember, against 0.9 x 350 MPa x 8,583 mm3 = 2.70 kN m for the compact RHS 65 x 35 x 4.0 with Australian Tube Mills' corner radii, a utilisation of 0.86 (UGR-03). Revision B's LC 1,000 kg straps would need 4.62 kN m, beyond any 40 mm deep steel section, so the straps change.
 
-Clearances (model): bike to bike 71.5 mm (limit 30), bikes to the tool chests 39.5 and 25.5 mm and to the door portal 49.5 mm (limit 15), panniers to the nearest strap 55.7 mm.
+Clearances (model): bike to bike 71.5 mm (limit 30), the Tuareg to the roof light 57.2 mm and the Street Triple to the kerb tool chest 25.5 mm, both to the door portal 49.5 mm (limit 15), panniers to the nearest strap 55.7 mm.
 
 ## 7. Loading
 
@@ -99,15 +102,15 @@ The Black Widow MF-12038 ramp (3,048 x 965 mm, 680 kg rating, 34 kg) stands fold
 
 ## 9. Mass
 
-The parts list sums to 436.1 kg empty, 473.6 kg with growth, and the model carries every line, so UGB-01 and the list agree (`cad/tests/test_box_parts.py`). The first issue of this revision listed 441.1 kg, 1.1 kg over UGB-01's 440 kg, after 7.1 kg of parts the model had left out: wiring, the winch feed, sealant, pads, plates, the roof coat, the outlet and the drains. The roof in 1.6 mm sheet in place of 2.0 mm saves 5.1 kg, so UGB-01 passes with 3.9 kg in hand. The roof carries nothing, and the bows and end frames under it are at most 640 mm apart. The engineer confirms the thinner sheet. If the margin is needed later, a 10 mm chain in place of the 12 mm one saves about 2 kg more (est.).
+The parts list sums to 436.5 kg empty, 474.1 kg with growth, and the model carries every line, so UGB-01 and the list agree (`cad/tests/test_box_parts.py`). Revision D adds 0.4 kg: the flares 1.9 kg, less 1.6 kg of skin cut away for them, and the tubs and floor re-cut for the wider track (-0.8 and +0.9 kg). The first issue of this revision listed 441.1 kg, 1.1 kg over UGB-01's 440 kg, after 7.1 kg of parts the model had left out: wiring, the winch feed, sealant, pads, plates, the roof coat, the outlet and the drains. The roof in 1.6 mm sheet in place of 2.0 mm saves 5.1 kg, so UGB-01 passes, now with 3.5 kg in hand. The roof carries nothing, and the bows and end frames under it are at most 640 mm apart. The engineer confirms the thinner sheet. If the margin is needed later, a 10 mm chain in place of the 12 mm one saves about 2 kg more (est.).
 
-With the anchors moved forward and the chains carried with the disc locks at the front wheels, the box's changes leave the ute's rear axle within 1 kg of revision B: 2,435 kg with growth when towing with the bikes aboard (UC3).
+On the Elite, with the home trailer's heaviest towball (317 kg with growth), the ute's rear axle carries 2,586 kg with growth when towing with the bikes aboard (UC3), 214 kg under the 2,800 kg plate.
 
 ## 10. Parts list summary
 
 | Group | AUD |
 |---|---|
-| Materials | 7,715 |
+| Materials | 7,976 |
 | Subframe and mounts | 990 |
 | Fasteners and sealants | 892 |
 | Doors | 1,200 |
@@ -116,17 +119,17 @@ With the anchors moved forward and the chains carried with the disc locks at the
 | Loading, with freight | 2,973 |
 | Services | 1,771 |
 | Finish and tool chests | 891 |
-| Shop labour, 184 h at AUD 121 | 22,264 |
+| Shop labour, 188 h at AUD 121 | 22,748 |
 | Engineer's review | 2,000 |
-| Contingency 10 % | 4,635 |
-| Total, shop-built | 50,980 |
-| Total, owner-built (no shop labour) | 26,490 |
+| Contingency 10 % | 4,709 |
+| Total, shop-built | 51,799 |
+| Total, owner-built (no shop labour) | 26,776 |
 
 The LC5 inspection is counted once, in the car build's GV03, because one inspection covers the GVM kit, the GCM revision, the box and the winch. The box keeps only the engineer's review. Not in the total: the trackers' subscriptions (about AUD 278 a year) and a full exterior powder coat (from about AUD 4,000).
 
 ## 11. Build and test steps
 
-1. Measure the bought ute (BOX-01 to BOX-06) and update the drawings.
+1. Measure the bought ute (BOX-01 to BOX-06) and, once the Elite is fitted, its rear track (VEH-28), and update the drawings. The tubs and flares are built to the measured track.
 2. Weld, drill, vent and hot-dip galvanise the steel crossmembers. Weld the subframe flat within 2 mm (est.) and trial-fit it with the strip and G10 pads.
 3. Build the body on the subframe as its jig: floor, tubs, frame, skins. Portal and kerb opening diagonals within 2 mm.
 4. Build and hang the doors, set gaps (BOX-09, BOX-10), fit the locking gear.
@@ -136,7 +139,7 @@ The LC5 inspection is counted once, in the car build's GV03, because one inspect
 8. Hose every seam for 5 minutes, fan off then on. No water inside.
 9. Fit to the ute, firm mounts to the engineer's torque, compliant mounts to their sleeves.
 10. Test switches, siren, tracker, fan, detector (unlit butane at a sensor) and lights. Proof-load each outer fitting to 4.9 kN with no permanent set.
-11. Load both bikes, set fork compression and measure BOX-12 to BOX-19. Drive 20 km with rough road and re-tension.
+11. Load both bikes, set fork compression and measure BOX-12 to BOX-20. Drive 20 km with rough road and re-tension.
 12. Wheel alignment and LSPV reset, then the LC5 inspection.
 
 ## 12. Open points and the assumption used
@@ -146,5 +149,7 @@ The LC5 inspection is counted once, in the car build's GV03, because one inspect
 3. Compliant mounts: Toyota cab cushions, preload set by the engineer.
 4. Off-road factor 2 and 1.0 g up (report 03), for the engineer to confirm.
 5. Anchors withstand the strap's breaking load, so straps are LC 500 kg. LC 1,000 kg needs the outer anchors tied into the wall frame.
-6. Box mass 436.1 kg with the 1.6 mm roof against UGB-01's 440 kg. The engineer confirms the 1.6 mm roof on bows at most 640 mm apart.
+6. Box mass 436.5 kg with the 1.6 mm roof and the flares, against UGB-01's 440 kg. The engineer confirms the 1.6 mm roof on bows at most 640 mm apart.
 7. Prices: 6061-T6 at the 6060-T5 listing plus 25 %, ABLOY from a UK listing, detector and labour hours estimated.
+8. Rear track on the Elite: 1,555 mm (R26, est.). Lovells says only that the housing brings the rear in line with the front. The tubs and flares follow the measured track (VEH-28), and the tyre keeps 30 mm to the flare (BOX-20). Above 1,577 mm the flares would pass 1,910 mm.
+9. Lovells' mudflaps hang from the rear outriggers behind the tyres, about 300 mm wide with their bottom edge about 230 mm above the ground. Confirm the brackets with the kit.

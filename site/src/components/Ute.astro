@@ -44,7 +44,7 @@ const drawings = ['CT-701', 'CT-702', 'CT-703', 'CT-704'];
     {n(gcm.gcm.plan)} kg against the {n(r.limits.gcm_kg)} kg GCM, with the ute at its{' '}
     {n(r.limits.weighed_max_kg)} kg limit and the trailer at its {n(r.params.trailer_atm)} kg plate less its lightest towball (the trailer's GCM-01), and{' '}
     {n(cs.UC3.growth.mass_kg + r.params.trailer_atm - cs.UC3.growth.towball_kg)} kg
-    on the model with growth (UTE-06). The box is {n(d.outside_l_body)} x {n(d.outside_w)} mm outside and weighs {n(g.box_kg, 1)} kg
+    on the model with growth (UTE-06). The box is {n(d.outside_l_body)} x {n(d.outside_w)} mm outside, {n(d.outside_w_flares)} mm over its rear tub flares, and weighs {n(g.box_kg, 1)} kg
     empty ({n(g.box_kg_growth, 1)} kg with growth) against report 17's 440 kg. {fails.length === 0
       ? 'Every fail check passes.' : `${fails.length} checks fail: ${fails.map((x: any) => x.id).join(', ')}.`}
   </p>
@@ -56,7 +56,8 @@ const drawings = ['CT-701', 'CT-702', 'CT-703', 'CT-704'];
       <thead><tr><th>Size</th><th class="num">mm</th><th>Note</th></tr></thead>
       <tbody>
         <tr><td>Outside length, body</td><td class="num">{n(d.outside_l_body)}</td><td>{n(d.outside_l)} mm with the cam bar and hasp</td></tr>
-        <tr><td>Outside width</td><td class="num">{n(d.outside_w)}</td><td>The decision log's limit is 1,850 mm</td></tr>
+        <tr><td>Outside width, body</td><td class="num">{n(d.outside_w)}</td><td>UTE-09's body limit is 1,850 mm (decision H19)</td></tr>
+        <tr><td>Width over the rear tub flares</td><td class="num">{n(d.outside_w_flares)}</td><td>UTE-09's flare limit is 1,910 mm, Toyota's 60 mm beyond the cab on each side (decision H19). Each flare is {n(d.flare_l)} mm long and stands {n(d.flare_out)} mm out, so the Elite's rear tyres, {n(2 * d.wheel_y)} mm apart, keep 30 mm</td></tr>
         <tr><td>Outside height above the floor</td><td class="num">{n(d.outside_h)}</td><td>Roof top {n(d.top_z)} mm above the ground</td></tr>
         <tr><td>Inside length</td><td class="num">{n(d.inside_l)}</td><td>Front wall to the closed barn doors</td></tr>
         <tr><td>Inside width</td><td class="num">{n(d.inside_w)}</td><td>Between the wall frames</td></tr>
