@@ -197,7 +197,7 @@ def ct701(prj, model, bom, checks, reg, dwg):
                      f"{n['towball_kg']:.0f}", f"{n['front_share_pct']:.1f}", f"{n['cog'][2]:.0f}", f"{n['ssf']:.3f}"])
     yb = S.table(sh, 230, 252, [("CASE", 12), ("kg", 18), ("FRONT", 18), ("REAR", 18), ("REAR+G", 20), ("BALL", 16),
                                 ("FRONT %", 22), ("CoG Z", 18), ("SSF", 18)], rows, size=1.75, row_h=3.2,
-                 title="MASS BY CASE (kg, mm; +G WITH GROWTH)")
+                 title="MASS BY CASE (kg AND mm, +G WITH GROWTH)")
     sh.text(230, yb - 3.2, "UC1 UNLADEN, UC2 BIKES ABOARD, UC3 TOWING WITH THE BIKES, UC4 TOWING, BIKES OUT, UCB BIKES IN THE TRAILER.", 1.6)
     S.table(sh, 230, yb - 8, [("CHECK", 22), ("LIMIT", 50), ("MODEL", 44), ("RESULT", 24)],
             [[r["id"], r["limit"], ((f"{r['measured']:.3f}" if r["unit"] == "" else f"{r['measured']:,.1f} {r['unit']}"), "#000" if r["ok"] else ("#c00" if r["severity"] == "fail" else "#b06000")),
