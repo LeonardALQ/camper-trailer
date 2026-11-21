@@ -1245,19 +1245,28 @@ items:
     mass: {basis: declared, total_kg: 3.0, maturity: estimate, source: "https://roustaboutsrvclub.com.au/wp-content/uploads/2022/03/Grey_Water_Tote-article_1.pdf"}
   # ================================================================ safety, cabinetry trims and the spaces kept clear
   - id: LA-12
-    name: Fire extinguisher 1A:20B:(E), fire blanket and smoke alarm, on the tower's aisle-side end facing the entry door
+    name: Fire extinguisher 2.0 kg ABE, fire blanket and smoke alarm, on the tower's aisle-side end facing the entry door D1
     system: living
     price:
-      - {item: "Fire extinguisher, 1 kg ABE dry powder, with a metal vehicle bracket", aud: 43.57, basis: listing, url: "https://www.jaybro.com.au/fire-safety/abe-fire-extinguisher-with-metal-vehicle-bracket-and-hose-1kg/", date: 2026-11-20}
+      - {item: "Fire extinguisher, 2.0 kg ABE dry powder to AS/NZS 1841, with a vehicle bracket", aud: 52.00, basis: listing, url: "https://www.barwonsafety.com.au/product/megafire-2-0kg-abe-fire-extinguisher", date: 2026-11-21}
       - {item: "Fire blanket 1.2 x 1.2 m AUD 30 and a photoelectric smoke alarm to AS 3786 AUD 45", aud: 75, basis: estimate, date: 2026-11-20}
       - {item: "Mounting board", aud: 20, basis: estimate, date: 2026-11-21}
     point: [bed_x1 + tower_l - 10, half_in - kit_d - 20, floor_z + 1000]
     parts:
-      - {item: "Fire extinguisher, 1 kg dry powder 1A:20B:(E), with bracket", kg: 2.3, basis: estimate}
+      - {item: "Fire extinguisher, 2.0 kg ABE dry powder, with bracket", kg: 4.0, basis: estimate, source: "Interpolated from Dixon's ABE range, 1.8 kg full for 1.0 kg and 4.7 kg for 2.5 kg (https://australia.dixonvalve.com/sites/default/files/Dixon-Technical-Data-Sheet_ABE-Fire-Extinguisher.pdf), and 0.3 kg of bracket"}
       - {item: Fire blanket 1.2 x 1.2 m, kg: 0.7, basis: estimate}
       - {item: Smoke alarm and its mount, kg: 0.3, basis: estimate}
       - {item: Mounting board, kg: 1.5, basis: estimate}
-    note: VSB1 13.2.2. Beside the entry door and the hob.
+    note: VSB1 13.2.2. Beside the entry door and the hob. LA-16 is the second extinguisher, at the rear door.
+  - id: LA-16
+    name: Fire extinguisher 2.0 kg ABE by the rear door D2, on the partition's kerb end inside the wet room, in a splash cover
+    system: living
+    price:
+      - {item: "Fire extinguisher, 2.0 kg ABE dry powder to AS/NZS 1841, with a vehicle bracket", aud: 52.00, basis: listing, url: "https://www.barwonsafety.com.au/product/megafire-2-0kg-abe-fire-extinguisher", date: 2026-11-21}
+      - {item: "Splash cover", aud: 25, basis: estimate, date: 2026-11-21}
+    point: [rear_x0 + part_t + 60, -half_in + 260, floor_z + 900]
+    mass: {basis: declared, total_kg: 4.2, maturity: estimate, source: "As LA-12's extinguisher, 4.0 kg with its bracket, and a 0.2 kg cover (est.)"}
+    note: "One by each outside door, so the wet room is covered whether or not it counts as a second compartment (VSB1 13.2.2), and two 2 kg units suit the 25.6 kWh lithium battery and the diesel heater better than one 1 kg unit. Fire extinguisher, not water, on the battery box"
   - id: LA-15
     name: Carbon monoxide alarm between the tower and the bed, a GPS tracker and door sensors on the Cerbo GX
     system: living

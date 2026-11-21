@@ -303,7 +303,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
         ["230 V", "AS/NZS 3001.2:2022: RCD on the inverter's output, labelled (VSB1 7.3)", "30 mA RCBO on every circuit, board labelled, licensed electrician", ("CT-601", "#000")],
         ["Battery", "Sealed compartment vented outside, BMS, fuse within 1 m sleeved (AS/NZS 3001.2 5.4)", "Sealed 2 mm 5052 box, two 20 mm vents through the floor (G6, G7)", ("CT-602", "#000")],
         ["Doors", "Outward opening, one on the left (kerb) side or the rear (VSB1 13.2.1)", "D1 kerb side and D2 rear, both outward, triple locks", ("CT-010, CT-013", "#000")],
-        ["Extinguisher", "1A:5B, one a compartment, smoke alarm (VSB1 13.2.2)", "1A:20B:(E) and fire blanket at D1, smoke and CO alarms (LA-12, LA-15)", ("ASK THE INSPECTOR", "#b06000")],
+        ["Extinguisher", "1A:5B, one a compartment, smoke alarm (VSB1 13.2.2)", "A 2 kg ABE by each outside door, D1 and D2, fire blanket at D1, smoke and CO alarms (LA-12, LA-15, LA-16)", ("ONE AT EACH DOOR", "#000")],
         ["LPG", "Caravan LPG code and AS/NZS 5601 (VSB1 13.2.4)", "None fitted. Cooking, hot water and heat are electric or diesel", ("NONE", "#000")],
         ["Mud flaps", "Behind the rear wheels", "610 x 455 mm rubber on the XT rear shock outriggers (BD-10)", ("BD-10", "#000")],
         ["Number plate", "Upright, no part above 1,300 mm, lit white, legible from 20 m (VSB1 3.1)",
@@ -318,7 +318,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
         f"WIDTH, HEIGHT AND LENGTHS ARE MEASURED ON THE 3D MODEL AT DESIGN RIDE HEIGHT. THE BODY IS {V['body_width']:,.0f} mm. THE ENTRY DOOR'S HANDLE, THE WINDOW FRAMES AND THE HOODS TAKE IT TO {ch['overall_width']:,.0f} mm. THE AWNING SITS ON THE ROOF INSIDE THE BODY WIDTH.",
         "LAMPS, REFLECTORS AND THE NUMBER PLATE ARE SCHEDULED ON CT-011 AND DRAWN ON EACH WALL THERE. THE REAR VIEW SHOWS THEM WITH THEIR "
         "HEIGHTS, AND THE TABLE AT RIGHT GIVES EVERY CHECK (cad/lamps.py, data/services.yaml).",
-        "THE WET ROOM HAS ITS OWN OUTSIDE DOOR. ASK THE INSPECTOR WHETHER IT COUNTS AS A SECOND COMPARTMENT FOR VSB1 13.2.2 (A SECOND EXTINGUISHER).",
+        "THE WET ROOM HAS ITS OWN OUTSIDE DOOR, SO A 2 kg ABE EXTINGUISHER STANDS BY EACH OUTSIDE DOOR. THE WET ROOM IS COVERED WHETHER OR NOT IT COUNTS AS A SECOND COMPARTMENT FOR VSB1 13.2.2.",
     ], width_chars=185, size=1.45)
 
     # ---- right column: operating limits, the plate, notes
