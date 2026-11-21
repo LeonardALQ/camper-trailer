@@ -48,8 +48,8 @@ params:
   axle_spacing: 900          # LC5 M14 hubs at 900 mm (decision log 11:25), 95 mm between the 805 mm tyres
   wheel_offset: 0            # ET 0 on the ROH Trak 2 16 x 7, the ute's wheel (report 16)
   cf: 190                    # hub face from the rail outside face, C/F (measurements.yaml SUP-04). Effective C/F at most 200 mm
-  rail_outer_w: 1175         # rail outer width, set for the 1,555 mm track (report 18 section 3.4)
-  track: rail_outer_w + 2 * (cf - wheel_offset)   # 1,555 mm, the ute's front track, so the trailer runs in its ruts
+  rail_outer_w: 1275         # rail outer width, set for the 1,655 mm track (H22). Report 18 section 3.4 had 1,175 mm for 1,555 mm
+  track: rail_outer_w + 2 * (cf - wheel_offset)   # 1,655 mm (H22), 100 mm over the ute's 1,555 mm, so 215 of each tyre's 265 mm tread runs in its ruts
   rail_underside_z: hub_z + hub_below_rail
   floor_underside_z: hub_z + bump_travel + tyre_d / 2 + tyre_clearance
   floor_z: floor_underside_z + floor_t        # floor surface
@@ -131,12 +131,12 @@ params:
   axle_x: 4381               # axle group centre from the ball. The build solves it: the middle of the towball window (H17)
   # ---------------------------------------------------------------- water (H13)
   water_full_l: 420          # the fresh tanks' net capacity, filled at camp with the transfer pump, CR45 filter and chlorine (H13)
-  water_travel_l: 325        # most fresh and grey water aboard while towing: H13's 350 L less 25 L by H21. Less if the 7,400 kg GCM revision is refused (GCM-01, H20)
+  water_travel_l: 320        # most fresh and grey water aboard while towing: H13's 350 L less 30 L by H21. Less if the 7,400 kg GCM revision is refused (GCM-01, H20)
   water_highway_l: 50        # owner's highway figure
   grey_full_l: 130           # grey tank's net capacity (report 21 section 10)
   tank_z0: rail_underside_z
   tank_h: floor_underside_z - 10 - rail_underside_z
-  tank_w: 2 * rail_in - 100  # 50 mm each side for the airbag and shock mounts (estimate until the kit drawing)
+  tank_w: 975                # the tanks keep their size on the wider rails (H22): 100 mm each side to the rails for the airbag and shock mounts (est.)
   tank_f_x0: axle_x + xt_front_hinge_rear + 10
   tank_f_l: xt_centre_front - 10 - (xt_front_hinge_rear + 10)          # 830 mm
   tank_r_x0: axle_x + xt_centre_front + xm_w + 10
@@ -561,7 +561,7 @@ items:
     box: [tank_r_x0, -tank_w / 2, tank_z0, tank_r_l, tank_w, tank_h]
     tank: true
     mass: {basis: declared, unit_kg: 18.3, maturity: calculated, source: "As UF-01, scaled to 760 mm (report 18 section 1.1)", note: "6 mm HDPE kept (saving 1b, H13)"}
-    note: Between the XT centre and rear shock crossmembers, over the rear axle. About 200 L net. The two tanks hold 420 L net, filled at camp. At most 325 L of fresh and grey water ride in travel (H13, H21).
+    note: Between the XT centre and rear shock crossmembers, over the rear axle. About 200 L net. The two tanks hold 420 L net, filled at camp. At most 320 L of fresh and grey water ride in travel (H13, H21).
   - id: UF-02
     name: Water in the tanks
     system: underfloor
@@ -573,7 +573,10 @@ items:
     system: underfloor
     price: {aud: 341.75, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/107-aluminium-5-bar-checker-plate-tread.html", date: 2026-11-20, note: "One 1200 x 2400 sheet of 3 mm aluminium checker plate, AUD 261.75 (listing), plus angle and fixings AUD 80 (est.)"}
     box: [axle_x + xt_front_hinge_rear, -rail_in, rail_underside_z - 6, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 6]
-    mass: {basis: declared, total_kg: 20, maturity: estimate, source: "Older block model"}
+    parts:
+      - {item: "3 mm five-bar aluminium treadplate, the XT bays' length by the width between the rails", kg: "(xt_rear_shock_front - xt_front_hinge_rear) * 2 * rail_in * 9.375e-6", basis: estimate, source: "At about 9.4 kg/m2, Austral Wright's approximate 27 kg for a 3 x 1,200 x 2,400 mm five-bar sheet (https://www.australwright.com.au/wp-content/uploads/2012/07/AluminiumTreadplate1.pdf)"}
+      - {item: "Aluminium angle, rubber strip and fixings", kg: 3.1, basis: estimate, source: "The older block model's 20 kg less the plate at the 1,175 mm rails"}
+    note: One sheet under both fresh tanks, as wide as the space between the rails (H22's 1,275 mm rails make it 1,175 mm), so it still comes from one 1,200 x 2,400 mm sheet.
   - id: UF-06
     name: Heater fuel tank, 15 L HDPE, with line and filter
     material: "HDPE"
@@ -614,8 +617,10 @@ items:
     system: underfloor
     price: {aud: 250, basis: estimate, url: "https://store.allaluminium.com.au/collections/marine-sheet-aluminium", date: 2026-11-21, note: "One 1200 x 2400 sheet of 2 mm 5052, between the listed 1.6 and 2.5 mm sheets (AUD 166.62 and 260.37), plus rubber strip and bolts"}
     zone: underfloor
-    box: [grey_x0, -510, grey_z0 - 6, grey_l, 1020, 6]
-    mass: {basis: declared, total_kg: 5.3, maturity: estimate, source: "0.91 m2 of 2 mm aluminium at 5.4 kg/m2 with rubber and bolts (est., saving 1f, H13)"}
+    box: [grey_x0, -(rail_in - 27.5), grey_z0 - 6, grey_l, 2 * rail_in - 55, 6]
+    parts:
+      - {item: "2 mm 5052 aluminium sheet, the grey bay's length by the width between the rails less 55 mm", kg: "grey_l * (2 * rail_in - 55) * 5.4e-6", basis: estimate, source: "At 5.4 kg/m2 (2 mm at 2,680 kg/m3, saving 1f, H13)"}
+      - {item: "Rubber strips and bolts", kg: 0.4, basis: estimate}
     note: Bolted across the rails. It is not counted as a shear plate, because it would buckle at about 4 kN (est.). The RHS 150 x 50 x 4 XT rear shock crossmember carries the rear recovery pull in place of the plan braces this bay had (CHS-08A).
 
   # ================================================================ the sealed drawbar box (decision log 12:45, research report 20)

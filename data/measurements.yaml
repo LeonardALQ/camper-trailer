@@ -490,13 +490,13 @@ inputs:
     title: Cruisemaster's C/F for the ROH Trak 2 16 x 7 ET 0 wheel, from the rail's outside face to the hub face
     how: Cruisemaster sets it in the design session from the wheel's offset and the track.
     unit: mm
-    estimate: {v: 190, src: "Report 18 section 3.4: C/F 190 with ET 0 gives a 1,555 mm track on the 1,175 mm rail, the ute's front track"}
+    estimate: {v: 190, src: "Report 18 section 3.4's C/F 190 with ET 0 gives the 1,655 mm track on the 1,275 mm rails (H22), 100 mm over the ute's front track"}
     measured: {v: null, date: null}
     stage: buy
     range: {min: {ref: cf_min}, max: 200, src: "Maximum: Cruisemaster's chart limits the effective C/F (C/F less ET 0) to 200 mm for the 4,500 kg XT Air tandem. Minimum: a smaller C/F moves the tyre towards the rail by the same amount, and FIT-05 keeps the tyre 50 mm from every chassis member, so the minimum is the C/F in use less FIT-05's margin"}
     affects: [track, chassis inputs]
     thresholds:
-      - {rule: "The rail outer width stays 1,175 mm, so the track follows: rail width + 2 x (C/F - ET). The tyre's inner sidewall sits C/F - ET - half the tyre width outside the rail, and report 06 asks for about 40 mm", src: "Report 06 sections 3 and 8, report 09 section 3"}
+      - {rule: "The rail outer width stays 1,275 mm (H22), so the track follows: rail width + 2 x (C/F - ET). The tyre's inner sidewall sits C/F - ET - half the tyre width outside the rail, and report 06 asks for about 40 mm", src: "Report 06 sections 3 and 8, report 09 section 3"}
       - {at: 200, rule: "Cruisemaster's C/F chart marks every effective C/F (C/F - ET) above 200 mm as unacceptable for the 4,500 kg XT Air tandem. Above it the note flags the C/F, and a wider track needs a wider rail instead", src: "Cruisemaster C/F sheet, as read in report 09"}
 
   # ================================================================ the bikes and the chock, in the ute's bike box (UTE-GARAGE.md, report 05)
@@ -951,8 +951,8 @@ inputs:
   - id: TW-04
     group: Trailer weighbridge
     part: trailer
-    title: Weighed mass, fully loaded for travel with 325 L of water, the fuel and the gear
-    how: "Load the trailer as for a trip: 325 L of fresh water, the heater's diesel, the jerry cans, the gear and the food, with the grey tank empty. Weigh the whole trailer on a weighbridge, uncoupled on its jockey wheel, or coupled with only the trailer on the scale and the drawbar at its design height."
+    title: Weighed mass, fully loaded for travel with 320 L of water, the fuel and the gear
+    how: "Load the trailer as for a trip: 320 L of fresh water, the heater's diesel, the jerry cans, the gear and the food, with the grey tank empty. Weigh the whole trailer on a weighbridge, uncoupled on its jockey wheel, or coupled with only the trailer on the scale and the drawbar at its design height."
     unit: kg
     estimate: {v: null, src: "The model's TC2 mass without growth is shown beside it"}
     measured: {v: null, date: null}
@@ -1069,7 +1069,7 @@ inputs:
     estimate: {v: 5, src: "DauerShower 2.0, maker"}
     measured: {v: null, date: null}
     stage: trailer built
-    range: {min: null, max: 8, src: "Max: at 8 L the water budget rises to 47 L a day and 325 L lasts about 6.9 days (est.). No lower limit"}
+    range: {min: null, max: 8, src: "Max: at 8 L the water budget rises to 47 L a day and 320 L lasts about 6.8 days (est.). No lower limit"}
     affects: [the water budget]
   - id: TR-09
     group: Trailer tests

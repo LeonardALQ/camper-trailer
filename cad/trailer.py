@@ -841,13 +841,13 @@ class Trailer:
                 w = min(rs, key=lambda q: q["srt"])
                 ssf = min(q["ssf"] for q in rs)
                 ute = next((u for u in self.tv["ute_checks"] if u["id"] == "UTE-11"), None)
-                per100 = 50 / w["h"]
+                per100 = min(rollover(lay, by_id[x["id"]], st, bs, 100.0)["srt"] for x in cases for bs in ("nominal", "growth")) - w["srt"]
                 row.update(limit=f">= {c.min:.2f} g", measured=round(w["srt"], 3), unit="g", margin=round(w["srt"] - c.min, 3),
                            ok=w["srt"] >= c.min - 1e-9, governing=f"{w['case']}, centre of gravity {w['h']:,.0f} mm up and {w['y0']:.0f} mm off the centreline",
                            detail=(f"lowest {w['srt']:.2f} g ({w['case']}), against a static stability factor of {w['ssf']:.2f} there and {ssf:.2f} at the "
                                    f"lowest. At the threshold the body has rolled {w['roll_deg']:.1f} degrees, "
                                    f"{'onto its bump stops, ' if w['on_stops'] else ''}and the centre of gravity has moved {w['shift_mm']:.0f} mm toward the "
-                                   f"outer wheels. Each 100 mm of track adds about {per100:.2f} g"
+                                   f"outer wheels. Each 100 mm more track, through the rails, adds about {per100:.2f} g"
                                    + (f". The ute with the bikes aboard: static stability factor {ute['measured']:.2f} (UTE-11)" if ute and ute.get("measured") else "")),
                            rollover=w)
             elif c.type == "yaw":
@@ -950,16 +950,17 @@ class Trailer:
         return out
 
 
-def rollover(lay: Layout, ev: dict, st: dict, basis: str = "growth") -> dict:
+def rollover(lay: Layout, ev: dict, st: dict, basis: str = "growth", dtrack: float = 0.0) -> dict:
     """Static rollover threshold of one case (data/assemblies/trailer.yaml `stability`, Gillespie 1992 chapter 9): the
     steady lateral acceleration, in g, at which the inner wheels lift. The roll centre is at the ground under the XT's
     trailing arms. The body rolls on its air springs until the outer bump stops land and squash, and on its tyres, and
-    the centre of gravity moves out by its height times the roll plus the outer tyres' lateral give."""
+    the centre of gravity moves out by its height times the roll plus the outer tyres' lateral give. `dtrack` widens the
+    track through the rails, so the air springs move out by half of it too (H22)."""
     V = lay.V
     r = ev[basis]
     W, h, y0 = r["mass_kg"] * 9.81, r["cog"][2], abs(r["cog"][1])
-    half = V["track"] / 2
-    ys = V["rail_c"]                                   # the air springs and bump stops sit under the rails
+    half = (V["track"] + dtrack) / 2
+    ys = V["rail_c"] + dtrack / 2                      # the air springs and bump stops sit under the rails
     k_s = 4 * st["air_spring_rate"] * ys ** 2          # N mm/rad, four air springs
     k_t = 4 * st["tyre_rate"] * half ** 2              # N mm/rad, four tyres
     phi_stop = (st["bump_gap_mm"] + st["bump_squash_mm"]) / ys

@@ -28,7 +28,7 @@ A ladder of two composite rails with crossmembers at eight stations, outriggers 
 
 | Member | Section | Where | Qty | Mass |
 |---|---|---|---|---|
-| Main rails | RHS 150 x 50 x 3 C450L0 | X 1,820 to 6,240, 1,175 mm over their outsides, Z 597.5 to 747.5 | 2 | 79.2 kg |
+| Main rails | RHS 150 x 50 x 3 C450L0 | X 1,820 to 6,240, 1,275 mm over their outsides (H22), Z 597.5 to 747.5 | 2 | 79.2 kg |
 | Raisers | RHS 127 x 51 x 3.5 C350L0, continuous fillets | On each rail, Z 747.5 to 874.5, with a 20.5 mm bearer strip up to the floor at Z 895 | 2 | 80.2 kg |
 | Body end crossmembers | RHS 150 x 50 x 3, full height | X 1,820 and 6,190 | 2 | 19.2 kg |
 | XT crossmembers | RHS 150 x 50 x 3, full height, no holes | Front hinge X 3,462, centre X 4,362 | 2 | 19.2 kg |
