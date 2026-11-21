@@ -82,7 +82,7 @@ checks:
     b: [B3.road, B3.kerb, B7]
     min_gap_mm: 30
     severity: fail
-    inputs: []
+    inputs: [VEH-28, BOX-20]
     why: Toyota BBGJ1007 p. 28 asks for 30 mm outside the tyre. The Elite's 1,555 mm rear track puts the tyre 11 mm from the 1,850 mm body's skin, so the side wall over each rear tub is a flare 20 mm further out (decision H19).
   - id: UGR-01
     title: Worst strap load within the strap's 500 kg lashing capacity, report 03's load cases

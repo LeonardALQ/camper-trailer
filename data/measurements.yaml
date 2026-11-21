@@ -330,13 +330,13 @@ inputs:
     title: Rear axle, laden ute towing the loaded trailer
     how: "Line CK03. Two people, both bikes, tools, full fuel, one spare, then the loaded trailer coupled. Weigh the ute's rear axle with the trailer's wheels off the plate."
     unit: kg
-    estimate: {v: 2487, src: "Ute model case UC2 with growth, with the 180 L tank and the trailer charging (2,127.5 kg), plus 1.409 kg per kg of ball load, at 255 kg (7.5 % of 3,400 kg)"}
+    estimate: {v: 2586, src: "Ute model case UC3 with growth: the bikes aboard, the 180 L tank, the trailer charging and the trailer's heaviest towball with growth, 316.9 kg (decision H17)"}
     measured: {v: null, date: null}
     stage: trailer built
     affects: [UTE-03 check, kit choice, ball load]
     thresholds:
-      - {at: 2550, rule: "Over 2,550 kg on the Platinum: take mass off the box, tray or ball before towing. The Platinum carries a ball load of up to about 300 kg with growth", src: "Lovells TOYKIT080-GVM rear axle rating"}
-    range: {min: 0, max: 2550, src: "Lovells sheet, Oct 2026 (2,850 kg with the Elite)"}
+      - {at: 2800, rule: "Over 2,800 kg, the Elite's plate: take mass off the box, tray or ball before towing. If cut CUT7 put the Platinum on, the limit is its 2,550 kg", src: "Decision H18: the Elite plated at twice the ROH wheel's 1,400 kg"}
+    range: {min: 0, max: 2800, src: "Decision H18, the Elite's 2,800 kg plate (2,550 kg on the Platinum, cut CUT7)"}
   - id: VEH-21
     group: Car build
     part: car
@@ -356,7 +356,7 @@ inputs:
     title: Front axle share of the ute's mass, towing
     how: From VEH-20's weighing, front axle divided by the ute's total.
     unit: "%"
-    estimate: {v: 35.6, src: "Ute model case UC2 with growth, with the 180 L tank and the trailer charging, and a 255 kg ball: 1,376 kg of 3,862 kg"}
+    estimate: {v: 34.3, src: "Ute model case UC3 with growth, 1,350 kg of 3,937 kg: the bikes aboard, the 180 L tank, the trailer charging and the trailer's heaviest towball with growth, 316.9 kg (decision H17)"}
     measured: {v: null, date: null}
     stage: trailer built
     affects: [UTE-07 check]
@@ -369,25 +369,25 @@ inputs:
     title: Laden ute mass towing, including the ball load (GVM check)
     how: From VEH-20's weighing, the ute's two axles added.
     unit: kg
-    estimate: {v: 3862, src: "Ute model case UC2 with growth, with the 180 L tank and the trailer charging (3,607.5 kg), plus a 255 kg ball"}
+    estimate: {v: 3937, src: "Ute model case UC3 with growth: the bikes aboard, the 180 L tank, the trailer charging and the trailer's heaviest towball with growth, 316.9 kg (decision H17)"}
     measured: {v: null, date: null}
     stage: trailer built
     affects: [UTE-01 check]
     thresholds:
-      - {at: 4200, rule: "Over 4,200 kg: unload before driving", src: "Lovells TOYKIT080-GVM"}
-    range: {min: 0, max: 4200, src: "Lovells sheet, Oct 2026"}
+      - {at: 4450, rule: "Over 4,450 kg, the Elite's plated GVM: unload before driving. 4,200 kg if cut CUT7 put the Platinum on", src: "Decision H18: the Elite plated at 1,650 + 2,800 kg"}
+    range: {min: 0, max: 4450, src: "Decision H18, the Elite plated at 4,450 kg (4,200 kg on the Platinum, cut CUT7)"}
   - id: VEH-24
     group: Car build
     part: car
     title: Combination mass, laden ute plus loaded trailer (GCM check)
     how: Line CK03. The ute's axles and the trailer's axles weighed coupled, added.
     unit: kg
-    estimate: {v: 7007, src: "Ute model case UC2 with growth, with the 180 L tank and the trailer charging (3,607.5 kg), plus the trailer's 3,400 kg design limit with growth (decision H2)"}
+    estimate: {v: 7017, src: "Ute model case UC2 with growth (3,619.9 kg) plus the trailer fully loaded with growth (3,397.2 kg, case TC2, MAS-10)"}
     measured: {v: null, date: null}
     stage: trailer built
     affects: [GV06, decision H2 water limit]
     thresholds:
-      - {at: 6900, rule: "If the GCM revision was refused: over 6,900 kg, drain water (about 1 kg a litre) until under. About 110 L at the design figures", src: "Decision H2, Toyota's 6,900 kg GCM"}
+      - {at: 6900, rule: "If the GCM revision was refused: over 6,900 kg, drain water (about 1 kg a litre) until under. At the design figures the trailer then tows with at most 233 L", src: "Decisions H2 and H13 (recomputed for H17), Toyota's 6,900 kg GCM"}
       - {at: 7400, rule: "Over 7,400 kg: unload before driving", src: "Lovells GCM revision (GV06)"}
     range: {min: 0, max: 7400, src: "Lovells sheet, Oct 2026 (6,900 kg without GV06)"}
   # ================================================================ heights (stages S1, S4 and S5)
@@ -430,6 +430,20 @@ inputs:
     thresholds:
       - {at: 50, rule: "Over 50 mm needs certification (item 13). Ask the LC5 certifier to include it in GV03", src: "VSI 06 Rev 4 item 13"}
     range: {min: 0, max: 50, src: "VSI 06 Rev 4 item 13"}
+  - id: VEH-28
+    group: Car build
+    part: car
+    title: Rear track on the Elite's housing, laden, tyre centre to tyre centre
+    how: "Stage S4, the Elite fitted and the ute loaded to the trip mass (or 650 kg of ballast over the rear axle) on level ground. Mark the middle of each rear tyre's tread on the ground in front of and behind the tyre, measure across between the marks and average the two. Before the box's tubs and flares are finished."
+    unit: mm
+    estimate: {v: 1555, src: "R26: Lovells' housing brings the rear in line with the front, Toyota's 1,555 mm on ET 0 wheels (estimate). Toyota's factory rear track is 1,460 mm"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [wheel_y, wheel tubs, rear tub flares, UGW-02, UGW-03, UTE-09, UTE-11]
+    thresholds:
+      - {rule: "Build the tubs and flares to the measured track: wheel_y in data/assemblies/ute-garage.yaml is half of it, and UGW-02 and UGW-03 run again before the floor is finished", src: "Toyota BBGJ1007 p. 28, UGW-02, UGW-03"}
+      - {at: 1577, rule: "Above 1,577 mm the flares, with Toyota's 30 mm outside the tyre, pass UTE-09's 1,910 mm: a wheel with more positive offset, or a higher floor (R26 fix B)", src: "UTE-09, decision H19"}
+    range: {min: 1460, max: 1577, src: "Max: the flares stay inside UTE-09's 1,910 mm with 30 mm outside the tyre (942.5 mm inner face at 1,555 mm, 11 mm more each side at 1,577 mm). Min: Toyota's factory 1,460 mm rear track (BBGJ1007). Inside the range the tubs and flares are built to the measured track"}
   # ================================================================ wheel and supplier answers (reports 06 and 16)
   - id: WHL-01
     group: Wheel and suppliers
@@ -876,6 +890,19 @@ inputs:
     range: {min: [60, 30], max: [100, 50], src: "Tuareg 60 to 100 mm and Street Triple 30 to 50 mm, about a quarter to two fifths of the travel. Never bottomed (report 03 section 3)"}
     thresholds:
       - {rule: "Re-check after the first 10 to 20 km and after rough sections", src: "NTC light vehicle guide p. 8, report 03"}
+  - id: BOX-20
+    group: Bike box
+    part: box
+    title: Rear tyre's outer face to the flare's inner face, the smaller side
+    how: "Box fitted, ute laden as BOX-01. On each side, measure square from the rear tyre's outer sidewall at its widest point to the inner face of the flare beside it, then jack the axle up to the bump stop and measure again. Record the smaller of the readings."
+    unit: mm
+    estimate: {v: 31, src: "Model check UGW-03: the flare's inner face 942.5 mm from the centreline, the tyre's outer face 911.5 mm on the Elite's 1,555 mm rear track (decision H19)"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [UGW-03, rear tub flares, UTE-09]
+    thresholds:
+      - {at: 30, rule: "Under 30 mm the tyre can rub the flare at full bump: move the flare out, up to UTE-09's 1,910 mm, or fit wheels with more positive offset", src: "Toyota BBGJ1007 p. 28, UGW-03"}
+    range: {min: 30, max: null, src: "Min: Toyota BBGJ1007 p. 28, 30 mm outside the tyre (UGW-03). No upper limit here: a larger gap means a narrower track, which VEH-28 and the tubs' 40 mm inside the tyre (UGW-02) check"}
   # ================================================================ the trailer, later (report 02 MASS-07)
   - id: TW-01
     group: Trailer weighbridge

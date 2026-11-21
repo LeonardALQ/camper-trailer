@@ -142,7 +142,7 @@ def tow_vehicle_page():
            "motorbikes in the [bike box](../ute-garage/) on its tray. The plan is `VEHICLE.md`, and every part and paid job is a line in "
            "`data/vehicle/vehicle-parts.yaml`. This page shows the plan's summary and stages, then every line and total from the YAML. "
            "The 3D model of the ute with its box is on the [Bike box](../ute-garage/#3d-model) page and the general arrangement is "
-           "drawing [CT-701](../drawings/#ct-701). VEH-01 to VEH-27 are on the [Measurements](../measurements/?part=car) page.\n\n"]
+           "drawing [CT-701](../drawings/#ct-701). VEH-01 to VEH-28 are on the [Measurements](../measurements/?part=car) page.\n\n"]
     secs = dict(zip(VEHICLE_TOP + VEHICLE_END, _sections(plan, VEHICLE_TOP + VEHICLE_END)))
     out.append(secs["Summary"] + "\n")
     rows = ("| Stage | Work | Required AUD | Contingency lines AUD | Optional AUD | Paid labour | Downtime (est.) | "
