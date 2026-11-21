@@ -36,7 +36,7 @@ def test_input_has_a_stage_and_a_range(it):
 
 def test_model_references_resolve():
     """The inputs whose range is set by the model get a number for it."""
-    for iid in ("UTE-02", "UTE-03", "WHL-01", "SUP-01", "SUP-04", "TW-01", "TW-02", "TW-03"):
+    for iid in ("UTE-02", "UTE-03", "WHL-01", "SUP-01", "SUP-04", "TW-01", "TW-02", "TW-03", "TW-04", "TW-05", "TR-01"):
         r = RANGES[iid]
         assert r["min"] is not None, f"{iid}: the model gave no figure for its range"
 

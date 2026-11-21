@@ -1015,12 +1015,16 @@ def measurement_refs(tr: Trailer, ev: dict) -> dict:
     chk = {c["id"]: c for c in ev["checks"]}
     ute = {c["id"]: c for c in tr.tv["ute_checks"]}
     case = next(c for c in ev["cases"] if c["id"] == tr.target_case.id)
+    cases = {c["id"]: c for c in ev["cases"]}
     refs = dict(
         towball_model=case["nominal"]["towball_kg"],
         wheel_need=max(chk["MAS-09"]["measured"], ute["UTE-12"]["measured"] or 0),
         gtm_need=max(chk["MAS-02"]["measured"], tr.supplier["need_kg"]),
         ball_reach_min=tr.inputs.v("UTE-02") - chk["JK-01"]["margin"],
         cf_min=tr.inputs.v("SUP-04") - chk["FIT-05"]["margin"],
+        # the fully loaded weighing (TW-04, TW-05) and the tare centre of gravity height (TR-01), without growth
+        model_TC2=cases["TC2"]["nominal"]["mass_kg"], axle_TC2=cases["TC2"]["nominal"]["axle_kg"],
+        cog_z_TC1=cases["TC1"]["nominal"]["cog"][2],
     )
     # a weighbridge reading includes every stage built by then, so each stage's model figure adds the ones before. The
     # last one weighs the finished trailer, so its figure is the whole tare

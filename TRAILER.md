@@ -139,7 +139,7 @@ Each stage needs the ones before it. The weighings TW-01 to TW-03 and the other 
 | B5 Shell | Walls, rounded corners and roof bonded into the joiners, doors and windows | B4, panels with their hardpoints laid in | Hose test, TW-02 within 2 % |
 | B6 First fix | Cables, the 230 V bulkhead, glands, water pipes, drains at 1:50, ducts and fan sleeves | B5 closed and dry | Water lines pressure tested |
 | B7 Fit-out | Battery box, board, partition, cabinetry, appliances, lift bed, split, wet room, awning, drawbar box, solar | B6 | Bed locks and safety edge |
-| B8 Commissioning | Electrical test, battery capacity, airflow and pressure, tanks filled and dosed | B7 | AS/NZS 3001.2 certificate, TW-03 |
+| B8 Commissioning | Electrical test, battery capacity, airflow and pressure, tanks filled and dosed, bed heights | B7 | AS/NZS 3001.2 certificate, TW-03 to TW-05, TR-01 to TR-10 |
 | B9 Registration | Permit to move it, HVAIS inspection with the identity approval, plate, NSW registration | B8, the weighbridge tickets | Plate at 3,500 kg ATM |
 
 The insert map CT-203 must be final before the panels are ordered, because the maker lays the bed hardpoints, stiffeners and insert strips into the cores.

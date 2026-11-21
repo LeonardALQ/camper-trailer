@@ -947,3 +947,149 @@ inputs:
     affects: [every mass check, the plated tare]
     thresholds:
       - {rule: "The rise from TW-02 replaces the fit-out's estimates. The ticket goes in the NSW identity approval package (report 02, VIB 78)", src: "Report 02 MASS-07 and MASS-08"}
+  # ================================================================ the trailer, fully loaded and tested once built (TRAILER.md, build order B8)
+  - id: TW-04
+    group: Trailer weighbridge
+    part: trailer
+    title: Weighed mass, fully loaded for travel with 350 L of water, the fuel and the gear
+    how: "Load the trailer as for a trip: 350 L of fresh water, the heater's diesel, the jerry cans, the gear and the food, with the grey tank empty. Weigh the whole trailer on a weighbridge, uncoupled on its jockey wheel, or coupled with only the trailer on the scale and the drawbar at its design height."
+    unit: kg
+    estimate: {v: null, src: "The model's TC2 mass without growth is shown beside it"}
+    measured: {v: null, date: null}
+    stage: weigh
+    range: {ref: model_TC2, rel: 0.03, src: "Within 3 % of the model's TC2. A bigger difference means the estimates or the load are wrong, so weigh the parts again"}
+    affects: [MAS-01, the travel water limit, GCM-01]
+    thresholds:
+      - {at: 3400, rule: "Over 3,400 kg, tow with less water until it is under, because H2 keeps the fully loaded trailer 100 kg under the plate", src: "Decision H2, H13"}
+      - {at: 3500, rule: "Over 3,500 kg the trailer is over its plate: unload before it moves", src: "The plated ATM"}
+  - id: TW-05
+    group: Trailer weighbridge
+    part: trailer
+    title: Axle group load, fully loaded, coupled to the ute at the design ball height
+    how: "With TW-04's load, couple to the ute on level ground and stand only the trailer's four wheels on the weighbridge, with the ute off it. The reading is the axle group's load. TW-04 less this reading is the towball, which UTE-03 measures directly."
+    unit: kg
+    estimate: {v: null, src: "The model's TC2 axle group load without growth is shown beside it"}
+    measured: {v: null, date: null}
+    stage: weigh
+    range: {ref: axle_TC2, rel: 0.03, src: "Within 3 % of the model's TC2 axle group load"}
+    affects: [MAS-02, MAS-06, MAS-09, the towball]
+    thresholds:
+      - {at: 3375, rule: "Over 3,375 kg the axle group passes the XT build's 4,050 kg under VSB1's 120 % rule: take load off", src: "MAS-02, Cruisemaster's 4,050 kg build and VSB1"}
+  - id: TR-01
+    group: Trailer tests
+    part: trailer
+    title: Centre of gravity height at tare, by the axle-lift method
+    how: "Tanks empty, no gear. Weigh the axle group with the trailer level, then again with the drawbar raised a measured height, and work the height out from the change in load and the axle-to-ball distance. The engineer can run the test and the sum."
+    unit: mm
+    estimate: {v: null, src: "The model's tare centre of gravity height without growth is shown beside it"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    range: {ref: cog_z_TC1, rel: 0.05, src: "Within 5 % of the model's tare. 5 % higher lowers the static stability factor from 0.58 to about 0.55"}
+    affects: [the static stability factor, the frame and body loads]
+    thresholds:
+      - {rule: "A higher centre of gravity lowers the static stability factor, half the track less the lateral offset over the height: stow the heavy gear low and near the axle", src: "NHTSA's static stability factor, TRAILER.md"}
+  - id: TR-02
+    group: Trailer tests
+    part: trailer
+    title: Fresh water the tanks hold, from empty to full through a water meter
+    how: "Drain both fresh tanks through the pump until it runs dry, then fill through a garden water meter until the breather overflows. Record the meter's reading."
+    unit: L
+    estimate: {v: 420, src: "Report 21 section 10 and the model's two tanks (est.)"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    range: {min: 400, max: null, src: "Min: report 21 keeps 400 L, which covers 7 days with three washes. No upper limit: the travel limit (H13) caps what rides"}
+    affects: [the days of water off-grid]
+    thresholds:
+      - {at: 400, rule: "Under 400 L a week with three washes needs a refill on the sixth day: plan the fills, or add laundry days less often", src: "Report 21 section 10.1"}
+  - id: TR-03
+    group: Trailer tests
+    part: trailer
+    title: Grey water the grey tank holds, from empty to full
+    how: "With the outlet valve shut, run measured water into the shower drain until the tank's level sender reads full or the vent overflows."
+    unit: L
+    estimate: {v: 130, src: "Report 21 section 10, UF-08"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    range: {min: 125, max: null, src: "Min: 72 h with one wash makes 125 L (report 21 section 10.1). No upper limit"}
+    affects: [the hours between grey emptying, TC7, TC8]
+  - id: TR-04
+    group: Trailer tests
+    part: trailer
+    title: Battery capacity, from full to the BMS's cut-off
+    how: "Charge the bank to full and let it rest an hour. Turn off the sun and the chargers, run a steady load of about 1 kW through the inverter until the Lynx Smart BMS NG stops it, and read the energy taken from the Cerbo GX's battery monitor."
+    unit: kWh
+    estimate: {v: 25.6, src: "Five Victron Lithium NG 51.2 V 100 Ah modules, 5.12 kWh each (maker)"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    range: {min: 22.6, max: null, src: "Min: the 22.6 kWh nominal that H3's governing check needs, the all-electric hot day for 24 h (research/models/20/energy.out). No upper limit"}
+    affects: [H3, the autonomy on the design hot day]
+    thresholds:
+      - {at: 22.6, rule: "Under 22.6 kWh the bank no longer runs a design hot day for 24 h: claim the warranty, or add a sixth module", src: "Decision H3, report 20"}
+  - id: TR-05
+    group: Trailer tests
+    part: trailer
+    title: Cabin pressure, parked, with only the filtered top-up fan running at 15 m³/h
+    how: "Doors, windows and the hood shut, every other fan off, on a calm day. Read the 0 to 125 Pa gauge (VE-06) after 10 minutes."
+    unit: Pa
+    estimate: {v: 3, src: "Report 19 section 4: about +3 Pa at a leakage area of 30 cm² (est.)"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    range: {min: 1.5, max: null, src: "Min: 1.5 Pa means about 42 cm² of leakage, the pressure falling with the square of the leakage area (est.). Below it dust gets in when the wind blows"}
+    affects: [dust inside, the air leakage]
+    thresholds:
+      - {at: 1.5, rule: "Under 1.5 Pa, find and seal the leaks with a smoke pencil before the fit-out hides them", src: "Report 19 section 4 (est.)"}
+  - id: TR-06
+    group: Trailer tests
+    part: trailer
+    title: Cabin pressure in dust mode, with the RESPA-CF2 on and the other fans off
+    how: "As TR-05, with the RESPA-CF2 on and the top-up fan, the e2 pairs and the extract off. Read the gauge parked, then while towing on a dusty road."
+    unit: Pa
+    estimate: {v: 20, src: "Report 19 section 4"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    range: {min: 20, max: null, src: "Min: report 19 holds the cabin at least 20 Pa above the rear wake in dust, the band ISO 23875 uses for pressurised cabins"}
+    affects: [dust inside while towing]
+  - id: TR-07
+    group: Trailer tests
+    part: trailer
+    title: Fresh-air flow, both e2 pairs on the day setting
+    how: "Hold a flow hood over each fan's inner cover in turn while it blows in, and add the four readings, halved, because each fan blows in half the time."
+    unit: m³/h
+    estimate: {v: 60, src: "Report 19 section 3: 30 m³/h a pair by day"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    range: {min: 54, max: null, src: "Min: 90 % of the design flow (est.). The design holds CO2 near 900 ppm for two people with the top-up fan"}
+    affects: [CO2 and humidity inside]
+  - id: TR-08
+    group: Trailer tests
+    part: trailer
+    title: Fresh water used by one 20 min DauerShower shower
+    how: "Read the fresh tanks' gauge, or fit a water meter in the shower's feed, before and after a 20 min shower."
+    unit: L
+    estimate: {v: 5, src: "DauerShower 2.0, maker"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    range: {min: null, max: 8, src: "Max: at 8 L the water budget rises to 47 L a day and 350 L lasts about 7.4 days (est.). No lower limit"}
+    affects: [the water budget]
+  - id: TR-09
+    group: Trailer tests
+    part: trailer
+    title: Bed platform's underside above the floor, day position
+    how: "Raise the bed to its day stop with the travel locks in, and measure from the floor to the platform's underside at the desk's front edge."
+    unit: mm
+    estimate: {v: 1600, src: "BED-01 in the model"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    range: {min: 1600, max: null, src: "Min: decision H1, so a seated adult clears it"}
+    affects: [H1, the desk]
+  - id: TR-10
+    group: Trailer tests
+    part: trailer
+    title: Mattress top above the floor, night position
+    how: "Lower the bed to its night stop and measure from the floor to the top of the mattress at its middle."
+    unit: mm
+    estimate: {v: 1044, src: "BED-01 in the model"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    range: {min: 950, max: 1050, src: "Decision H1. The ceiling then leaves at least 900 mm above the mattress"}
+    affects: [H1, getting into bed]
