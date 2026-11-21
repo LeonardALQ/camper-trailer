@@ -835,6 +835,34 @@ class Trailer:
                            detail=(f"at night {night:.0f} kg, the {moving:.0f} kg moving bed and two sleepers, against the {L['bed_static_rating_kg']:.0f} kg static "
                                    f"rating ({100 * night / L['bed_static_rating_kg']:.0f} %, so the two together at most about "
                                    f"{L['bed_static_rating_kg'] - moving:.0f} kg). Moving, {moving:.0f} kg against {L['bed_moving_rating_kg']:.0f} kg"))
+            elif c.type == "rollover":
+                st = self.td["stability"]
+                rs = [rollover(lay, by_id[x["id"]], st, bs) for x in cases for bs in ("nominal", "growth")]
+                w = min(rs, key=lambda q: q["srt"])
+                ssf = min(q["ssf"] for q in rs)
+                ute = next((u for u in self.tv["ute_checks"] if u["id"] == "UTE-11"), None)
+                per100 = 50 / w["h"]
+                row.update(limit=f">= {c.min:.2f} g", measured=round(w["srt"], 3), unit="g", margin=round(w["srt"] - c.min, 3),
+                           ok=w["srt"] >= c.min - 1e-9, governing=f"{w['case']}, centre of gravity {w['h']:,.0f} mm up and {w['y0']:.0f} mm off the centreline",
+                           detail=(f"lowest {w['srt']:.2f} g ({w['case']}), against a static stability factor of {w['ssf']:.2f} there and {ssf:.2f} at the "
+                                   f"lowest. At the threshold the body has rolled {w['roll_deg']:.1f} degrees, "
+                                   f"{'onto its bump stops, ' if w['on_stops'] else ''}and the centre of gravity has moved {w['shift_mm']:.0f} mm toward the "
+                                   f"outer wheels. Each 100 mm of track adds about {per100:.2f} g"
+                                   + (f". The ute with the bikes aboard: static stability factor {ute['measured']:.2f} (UTE-11)" if ute and ute.get("measured") else "")),
+                           rollover=w)
+            elif c.type == "yaw":
+                low = min(cases, key=lambda x: min(x["nominal"]["towball_pct"], x["growth"]["towball_pct"]))
+                pct = min(low["nominal"]["towball_pct"], low["growth"]["towball_pct"])
+                heavy = max(cases, key=lambda x: x["growth"]["mass_kg"])
+                yi = yaw_inertia(lay, next(cc for cc in self.cases if cc.id == heavy["id"]))
+                yl = yaw_inertia(lay, next(cc for cc in self.cases if cc.id == low["id"]))
+                row.update(limit="reported", measured=round(yi["I_kgm2"], 0), unit="kg m2", margin=None, ok=True,
+                           governing=f"{low['id']}, the lowest towball share", yaw=dict(heavy=yi, low=yl, pct=pct),
+                           detail=(f"yaw inertia about the centre of gravity {yi['I_kgm2']:,.0f} kg m2 in {heavy['id']} with growth, radius of gyration "
+                                   f"{yi['k_m']:.2f} m against {lay.V['axle_x'] / 1000:.2f} m from the ball to the axles. In {low['id']}, the lowest towball "
+                                   f"share at {pct:.1f} %, {yl['I_kgm2']:,.0f} kg m2 with its centre of gravity {yl['x_cg'] - lay.V['axle_x']:+,.0f} mm "
+                                   f"from the axles. No snaking speed: the published car and trailer models need the ute's and the trailer's tyre cornering "
+                                   f"stiffnesses and the hitch's geometry, none of them known"))
             elif c.type == "towball_scale":
                 m = self.inputs.v("UTE-03")
                 model = by_id[self.target_case.id]["nominal"]["towball_kg"]
@@ -920,6 +948,49 @@ class Trailer:
             row["status"] = ("PASS" if row["ok"] else "FAIL") if c.severity == "fail" else ("MEETS LIMIT" if row["ok"] else "REPORTED")
             out.append(row)
         return out
+
+
+def rollover(lay: Layout, ev: dict, st: dict, basis: str = "growth") -> dict:
+    """Static rollover threshold of one case (data/assemblies/trailer.yaml `stability`, Gillespie 1992 chapter 9): the
+    steady lateral acceleration, in g, at which the inner wheels lift. The roll centre is at the ground under the XT's
+    trailing arms. The body rolls on its air springs until the outer bump stops land and squash, and on its tyres, and
+    the centre of gravity moves out by its height times the roll plus the outer tyres' lateral give."""
+    V = lay.V
+    r = ev[basis]
+    W, h, y0 = r["mass_kg"] * 9.81, r["cog"][2], abs(r["cog"][1])
+    half = V["track"] / 2
+    ys = V["rail_c"]                                   # the air springs and bump stops sit under the rails
+    k_s = 4 * st["air_spring_rate"] * ys ** 2          # N mm/rad, four air springs
+    k_t = 4 * st["tyre_rate"] * half ** 2              # N mm/rad, four tyres
+    phi_stop = (st["bump_gap_mm"] + st["bump_squash_mm"]) / ys
+    a = (half - y0) / h
+    phi = dy = 0.0
+    for _ in range(200):
+        for _ in range(100):                           # roll under the lateral load and the centre of gravity's own shift
+            m = W * h * (a + phi)
+            phi = min(m / k_s, phi_stop) + m / k_t
+        dy = h * phi + W * a / (2 * st["tyre_lateral_rate"])
+        a_new = (half - y0 - dy) / h
+        if abs(a_new - a) < 1e-6:
+            break
+        a = 0.5 * (a + a_new)
+    return dict(srt=a, ssf=(half - y0) / h, roll_deg=math.degrees(phi), shift_mm=dy, on_stops=W * h * (a + phi) / k_s >= phi_stop,
+                h=h, y0=y0, case=ev["id"])
+
+
+def yaw_inertia(lay: Layout, case, basis: str = "growth") -> dict:
+    """Yaw inertia about the vertical axis through the case's centre of gravity, kg m2: every line as a point mass at its
+    centre of gravity plus, for a block, its own inertia as a uniform box."""
+    rows = [(m * (1 + b.growth) if basis == "growth" else m, b) for b, m in lay.case_lines(case)]
+    M = sum(m for m, _ in rows)
+    xc = sum(m * b.cog[0] for m, b in rows) / M
+    yc = sum(m * b.cog[1] for m, b in rows) / M
+    I = 0.0
+    for m, b in rows:
+        I += m * ((b.cog[0] - xc) ** 2 + (b.cog[1] - yc) ** 2)
+        if b.box is not None and b.load == "tare":
+            I += m * ((b.box[3] - b.box[0]) ** 2 + (b.box[4] - b.box[1]) ** 2) / 12
+    return dict(I_kgm2=I / 1e6, mass_kg=M, x_cg=xc, k_m=math.sqrt(I / M) / 1000)
 
 
 def tare_mass(lay: Layout, tr: Trailer) -> float:

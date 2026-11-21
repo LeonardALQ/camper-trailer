@@ -191,8 +191,10 @@ def ct002(prj, model, bom, checks, reg, dwg):
         "FRESH WATER, SO IT HAS THE LOWEST TOWBALL SHARE. TC8 CARRIES ONLY GREY WATER.",
         f"H17 SETS THE AXLE IN THE MIDDLE OF THE WINDOW BETWEEN {w['pct_min']:.1f} % IN THE LOWEST CASE AND {w['ball_max']['kg']:.0f} kg WITH "
         "GROWTH IN THE HEAVIEST. THE HARD LIMITS SIT OUTSIDE IT: 7.5 % (MAS-04, H2), THE TOWBAR'S 350 kg AND THE UTE'S REAR AXLE (MAS-03).",
-        f"SSF IS HALF THE {track:.0f} mm TRACK LESS THE CoG'S OFFSET, OVER THE CoG HEIGHT, WITH GROWTH. NO RULE SETS A MINIMUM. "
-        f"THE LOWEST IS {min(_ssf(c['growth'], track) for c in rep['cases']):.3f}.",
+        f"SSF IS HALF THE {track:.0f} mm TRACK LESS THE CoG'S OFFSET, OVER THE CoG HEIGHT, WITH GROWTH. THE LOWEST IS "
+        f"{min(_ssf(c['growth'], track) for c in rep['cases']):.3f}. WITH THE BODY ROLLED ONTO ITS BUMP STOPS AND TYRES THE STATIC ROLLOVER "
+        f"THRESHOLD IS {next(c for c in rep['checks'] if c['id'] == 'STB-01')['measured']:.2f} g (EST.), AGAINST PBS LEVEL 1'S 0.35 g (STB-01) "
+        "AND A 0.40 g TARGET (STB-02).",
         f"WEIGH THE FINISHED TRAILER (TW-03) AND THE TOWBALL (TBS-01: WITHIN 10 % OF THE MODEL'S "
         f"{C['cases']['TC2']['nominal']['towball_kg']:.0f} kg FULLY LOADED) "
         "BEFORE THE FIRST TOW. A WEIGHED TOWBALL OUTSIDE THE WINDOW MOVES THE AXLE BEFORE THE CHASSIS IS WELDED.",

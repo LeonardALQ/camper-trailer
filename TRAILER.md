@@ -51,11 +51,13 @@ Masses in kg. The towball comes from moments about the axle group centre at X 4,
 | TC8 Grey full, fresh empty | 130 L grey, fuel, gear | 2,891 | 250.3 | 8.7 % | 3,177 | 275.3 |
 
 - Plate: ATM 3,500 kg, the ute's braked towing rating and the limit of the DO35 and the chains (H2). The heaviest case with growth is 3,397 kg, inside H2's 3,400 kg target. The examiner's caps from the tyres, coupling, chains and brakes are 3,500 kg (MAS-07, MAS-08).
-- Water: at most 350 L of fresh and grey water while towing. The tanks hold 420 L and are filled at camp (H13).
+- Water: at most 350 L of fresh and grey water while towing. The tanks hold 420 L and are filled at camp (H13). The grey tank travels empty, and TC7 and TC8 check the trailer with it full.
 - Towball: at least 7.5 % in every case and at most 350 kg, the 79's, the towbar's and the DO35's rating (MAS-04, H14). While the masses are estimates the axle sits in the middle of a 13.3 mm window between 8.0 % in the lightest case and 320 kg with growth in the heaviest (MAS-12, MAS-13, H17).
 - Ute: the heaviest towball puts the ute's rear axle at 2,586 kg with growth against the Elite kit's 2,800 kg plate (MAS-03, H18). MAS-14 reports the Platinum kit for the car build's cut CUT7.
 - GCM: the ute with growth, 3,620 kg, plus the 3,500 kg plate is 7,120 kg against Lovells' 7,400 kg (GCM-01, UTE-06, H20). If the revision is refused, Toyota's 6,900 kg needs the trailer plated at or below 3,280 kg and at most 232 L of water in travel, so the fully loaded trailer with growth stays under that plate.
 - Balance: the centre of gravity sits at most 32.8 mm to the kerb side against a 50 mm rule (MAS-11), at Z 1,215 to 1,308 mm with growth. The static stability factor is 0.58 to 0.62.
+- Roll: with the body rolled onto its bump stops and tyres, the static rollover threshold is about 0.37 g (est., Gillespie's method), over the 0.35 g of PBS level 1 and under the 0.40 g target (STB-01, STB-02). Each 100 mm of track would add about 0.04 g, but the 1,555 mm track keeps the trailer in the ute's ruts. The ute with the bikes aboard has a static stability factor of 0.89 (UTE-11).
+- Sway: the yaw inertia is about 7,200 kg m² fully loaded with growth, and the towball never falls under 8.1 % of the trailer (STB-03). No snaking speed is estimated, because the published models need tyre and hitch data that are not known. The Bosch TSC brakes the trailer when it senses sway.
 - Axles: the XT build carries 3,744 kg with VSB1's 120 % rule against its 4,050 kg, and each wheel 950 kg against its 1,400 kg (MAS-02, MAS-09).
 
 ## Structure
@@ -115,7 +117,7 @@ Research report 19's load calculation gives a design hot day of 37.1 kWh of heat
 ## Plumbing and water
 
 - Fresh: two welded HDPE tanks over the axles hold 420 L, filled at camp through a Puretec CR45 filter by hose or the creek transfer pump, with a chlorine dose. A Shurflo Trail King 7 at 2.1 bar feeds every outlet, the drinking tap through a CR-Z2 filter and a UV purifier. The Combi's 10 L boiler gives hot water through a 50 °C mixing valve (CT-611, CT-612).
-- Grey: every drain falls by gravity to a 130 L tank in the rear bay, with a valve and a camlock on the kerb side. It travels empty except in TC7 and TC8, and a 40 L tote serves longer stays.
+- Grey: every drain falls by gravity to a 130 L tank in the rear bay, with a valve and a camlock on the kerb side. It travels empty (CT-003's operating limits), TC7 and TC8 check the trailer with it full, and a 40 L tote serves longer stays.
 - Budget for two a day: showers 10 L, dishes 8, drinking 6, basin 6, outdoor rinse 4, cooking 3, flush 2 and cleaning 2, so 41 L, 27 L of it to grey. A wash adds 44 L. The 350 L aboard lasts about 8 days without laundry, and the full tanks 7 days with three washes. The grey tank holds 72 h with one wash.
 
 ## Running gear and coupling

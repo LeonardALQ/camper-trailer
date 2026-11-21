@@ -151,6 +151,26 @@ trailer_checks:
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
     why: The battery plinth, washer and dryer sit on the kerb side. 50 mm is an estimated rule from the layout study. MAS-06 and MAS-09 check each side's wheels.
+  - id: STB-01
+    title: Static rollover threshold at least 0.35 g in every case (PBS level 1, estimate)
+    type: rollover
+    min: 0.35
+    severity: fail
+    inputs: [TR-01]
+    why: The lateral acceleration at which the inner wheels lift, with the body rolled on its air springs, bump stops and tyres (Gillespie 1992 chapter 9, data/assemblies/trailer.yaml `stability`). 0.35 g is the National Transport Commission's Performance Based Standards level 1 for heavy vehicles, the nearest published rule. The air spring and tyre rates are estimates, the bump stop gap Cruisemaster's.
+  - id: STB-02
+    title: Static rollover threshold against a 0.40 g target (reported)
+    type: rollover
+    min: 0.40
+    severity: report
+    inputs: [TR-01]
+    why: A margin over PBS level 1 while the masses and the centre of gravity height are estimates. TR-01 measures the height.
+  - id: STB-03
+    title: Yaw inertia and the lowest towball share, for sway (reported)
+    type: yaw
+    severity: report
+    inputs: [TW-04, TW-05]
+    why: A heavy rear and a light towball make a trailer more prone to snaking. The model gives the yaw inertia and the share. The Bosch TSC brakes the trailer when it senses sway (TRAILER.md).
   - id: GCM-01
     title: Ute and trailer within the 7,400 kg GCM with Lovells' revision
     type: gcm

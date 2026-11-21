@@ -201,6 +201,19 @@ build_order:
      fits: {electrical: Battery box, hvac: split, living: appliances, bed: lift bed, wet_room: wet room, stowage: drawbar box, spare: spare wheel, roof: solar,
             DB-04: stone guard, BD-13: awning, BD-16: steps, WN-05: blackout covers}}
 
+# Roll and sway (STB-01 to STB-03, cad/trailer.py rollover). The static rollover threshold is the steady lateral
+# acceleration at which the inner wheels lift, with the body rolled on its suspension and its tyres so the centre of
+# gravity moves toward the outer wheels: Gillespie's quasi-static rollover of a suspended vehicle (Fundamentals of
+# Vehicle Dynamics, SAE 1992, chapter 9). The XT's trailing arms put the roll centre at the ground. The air springs let
+# the body roll until the outer bump stops land and squash, and the tyres add their own roll and their lateral give.
+stability:
+  bump_gap_mm: 85            # bump stop to the chassis at ride height with the style 26 air spring (Cruisemaster XT Air guide CIS-006 rev 25)
+  bump_squash_mm: 10         # the rubber stop's own give at the overturning load (est.)
+  air_spring_rate: 88        # N/mm, each air spring at its ride pressure, about 1.8 Hz on its wheel's load (est.)
+  tyre_rate: 300             # N/mm, the LT265/75R16 123/120's vertical rate at trailer pressure (est.)
+  tyre_lateral_rate: 300     # N/mm, its lateral rate (est.)
+  src: "https://roustaboutsrvclub.com.au/wp-content/uploads/2018/04/Cruisemaster-XT-AIR-Independent-Suspension.pdf"
+
 zones:
   inside: {name: Inside the body, box: [in_x0, -half_in, floor_z, in_x1 - in_x0, 2 * half_in, interior_h]}
   drawbar_box: {name: Drawbar box (inside), box: [dbx_x0 + dbx_t, -dbx_w / 2 + dbx_t, dbx_z0 + dbx_t, dbx_l - 2 * dbx_t, dbx_w - 2 * dbx_t, dbx_h - 2 * dbx_t]}
