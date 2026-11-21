@@ -156,7 +156,7 @@ trailer_checks:
     type: gcm
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: GCM is the ute's mass plus the trailer's (report 16 section 2.4). Decision H2 takes Lovells' 7,400 kg GCM revision, which Lovells rates for the 4,495 kg Elite kit of H17 too. The check takes the larger of two sums. The plan's sum is the ute at its 3,850 kg weighed limit, which includes the ball load, plus the trailer at its plated ATM less its lightest towball. The model's sum is the ute with the bikes aboard (UC2, with growth) plus the heaviest trailer case with growth. If the revision is refused, Toyota's 6,900 kg holds the model's sum only with at most 233 L of water in travel (H13, recomputed for H17), and the plan's sum then needs the plate at or below 3,300 kg.
+    why: GCM is the ute's mass plus the trailer's (report 16 section 2.4). Decision H2 takes Lovells' 7,400 kg GCM revision, which Lovells rates for the 4,495 kg Elite kit of H17 too. The check takes the larger of two sums. The plan's sum is the ute at its 3,850 kg weighed limit, which includes the ball load, plus the trailer at its plated ATM less its lightest towball. The model's sum is the ute with the bikes aboard (UC2, with growth) plus the heaviest trailer case with growth. If the revision is refused, Toyota's 6,900 kg holds the model's sum only with at most 232 L of water in travel (H13, recomputed for H17), and the plan's sum then needs the plate at or below 3,300 kg.
   - id: TBS-01
     title: Towball scale reading within 10 % of the model, fully loaded (reported)
     type: towball_scale
@@ -213,7 +213,7 @@ trailer_checks:
     load_case: LC1
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: Report 11 LC1. The ARTSA factor of safety of 3 on yield (report 02 section 2.4). Every member, every trailer case scaled so the heaviest sits at the 3,100 kg plated ATM.
+    why: Report 11 LC1. The ARTSA factor of safety of 3 on yield (report 02 section 2.4). Every member, every trailer case scaled so the heaviest sits at the 3,500 kg plated ATM.
   - id: CHS-02
     title: Chassis stress, LC2 vertical bump 3 g, below yield
     type: chassis_stress

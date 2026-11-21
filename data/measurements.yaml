@@ -1,5 +1,5 @@
-# Measured inputs. The owner fills these in as he measures (GitHub's web editor is fine). A push to main rebuilds
-# the site, and the plan re-solves from the new values.
+# Measured inputs. The owner fills these in as he measures (GitHub's web editor is fine). A commit on main is built
+# and checked, and the site, with the plan re-solved from the new values, updates once the live branch moves to it.
 #
 # How to record a measurement: under the input's `measured`, set `v` to the value and `date` to the day you
 # measured it, for example   measured: {v: 1182, date: 2026-12-02}
@@ -387,7 +387,7 @@ inputs:
     stage: trailer built
     affects: [GV06, decision H2 water limit]
     thresholds:
-      - {at: 6900, rule: "If the GCM revision was refused: over 6,900 kg, drain water (about 1 kg a litre) until under. At the design figures the trailer then tows with at most 233 L", src: "Decisions H2 and H13 (recomputed for H17), Toyota's 6,900 kg GCM"}
+      - {at: 6900, rule: "If the GCM revision was refused: over 6,900 kg, drain water (about 1 kg a litre) until under. At the design figures the trailer then tows with at most 232 L", src: "Decisions H2 and H13 (recomputed for H17), Toyota's 6,900 kg GCM"}
       - {at: 7400, rule: "Over 7,400 kg: unload before driving", src: "Lovells GCM revision (GV06)"}
     range: {min: 0, max: 7400, src: "Lovells sheet, Oct 2026 (6,900 kg without GV06)"}
   # ================================================================ heights (stages S1, S4 and S5)

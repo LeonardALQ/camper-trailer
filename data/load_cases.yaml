@@ -71,7 +71,8 @@ registration:
     chains_kg: {v: 3500, src: "Two safety chains marked 4177-35 (report 08)"}
     brakes_kg: {v: 4500, src: "Cruisemaster A/T 12 inch electric drums, 4.5 t tandem capacity (report 06)"}
 
-# The tow vehicle: the LandCruiser 79 single cab V8 with the Lovells 4,200 kg GVM kit and its bike box. Its limits are
+# The tow vehicle: the LandCruiser 79 single cab V8 with the Lovells Elite 4,495 kg GVM kit plated at 4,450 kg
+# (decisions H17 and H18) and its bike box. Its limits are
 # in data/ute/ute.yaml and its masses and the bike box's sweep come from the ute model (build/ute/ute.json, cad/ute.py
 # and cad/ute_garage.py). The Cayenne of report 07 is no longer the tow vehicle (reports 14 to 16 replace 07 and 10).
 tow_vehicle:
