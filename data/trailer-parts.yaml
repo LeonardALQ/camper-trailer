@@ -337,7 +337,7 @@ savings:
     name: A plain low-flow shower in place of the DauerShower 2.0
     removes: {lines: [WR-09, WR-10]}
     mass_kg: -9
-    costs: "Two 20 min showers at 6 L/min use about 240 L a day in place of about 10 L, so the 320 L aboard lasts about 1.2 days. The shower requirement (two hot 20 min showers a day) fails"
+    costs: "Two 20 min showers at 6 L/min use about 240 L a day in place of about 10 L, so the 310 L aboard lasts about 1.1 days. The shower requirement (two hot 20 min showers a day) fails"
   - id: SV-05
     name: A fixed bed at the night height in place of the lift bed
     removes: {lines: [LB-04, LB-04M, LB-05, LB-06], parts: [{line: CON-09, item: "Lippert HappiJac kit"}]}
