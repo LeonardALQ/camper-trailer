@@ -13,7 +13,7 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 | Tare | 2,581 kg, 2,834 kg with the growth allowance |
 | Fully loaded with 350 L of water (TC2) | 3,111 kg, 3,397 kg with growth, against the 3,500 kg plate |
 | Towball | 250 to 292 kg, 8.1 to 10.5 % of the trailer, at most 317 kg with growth |
-| Ute | Rear axle 2,586 kg with growth against its 2,800 kg plate. Combination 7,100 kg against 7,400 kg |
+| Ute | Rear axle 2,586 kg with growth against its 2,800 kg plate. Combination 7,120 kg against 7,400 kg, the ute with growth plus the plate |
 | Battery | 25.6 kWh. A design hot day runs 25.1 h when new and 17.2 h at end of life |
 | Water | 420 L fresh, at most 350 L in travel, about 41 L a day. 130 L grey |
 | Cost | AUD 230,736 with contingency, AUD 182,784 owner-built |
@@ -54,7 +54,7 @@ Masses in kg. The towball comes from moments about the axle group centre at X 4,
 - Water: at most 350 L of fresh and grey water while towing. The tanks hold 420 L and are filled at camp (H13).
 - Towball: at least 7.5 % in every case and at most 350 kg, the 79's, the towbar's and the DO35's rating (MAS-04, H14). While the masses are estimates the axle sits in the middle of a 13.3 mm window between 8.0 % in the lightest case and 320 kg with growth in the heaviest (MAS-12, MAS-13, H17).
 - Ute: the heaviest towball puts the ute's rear axle at 2,586 kg with growth against the Elite kit's 2,800 kg plate (MAS-03, H18). MAS-14 reports the Platinum kit for the car build's cut CUT7.
-- GCM: the ute at its 3,850 kg weighed limit plus the plate less the lightest towball is 7,100 kg against Lovells' 7,400 kg (GCM-01). If the revision is refused, Toyota's 6,900 kg allows 232 L of water in travel and a 3,300 kg plate.
+- GCM: the ute with growth, 3,620 kg, plus the 3,500 kg plate is 7,120 kg against Lovells' 7,400 kg (GCM-01, UTE-06, H20). If the revision is refused, Toyota's 6,900 kg needs the trailer plated at or below 3,280 kg and at most 232 L of water in travel, so the fully loaded trailer with growth stays under that plate.
 - Balance: the centre of gravity sits at most 32.8 mm to the kerb side against a 50 mm rule (MAS-11), at Z 1,215 to 1,308 mm with growth. The static stability factor is 0.58 to 0.62.
 - Axles: the XT build carries 3,744 kg with VSB1's 120 % rule against its 4,050 kg, and each wheel 950 kg against its 1,400 kg (MAS-02, MAS-09).
 
@@ -193,12 +193,14 @@ Each is in full in `docs/decisions.md`.
 - H13: at most 350 L of water in travel with both generators. It holds the 3,400 kg target.
 - H14, H17: towball limits from the ute's rear axle and the 350 kg ratings, the axle centred in an 8.0 % to 320 kg window. Margin while the masses are estimates.
 - H16: the bed's footprint stays empty, as Leonard asked.
+- H20: one combination figure, the ute with growth plus the plate, and UTE-04's weighed target retired. UTE-03 checks the rear axle itself.
+- H21: mass added after H13 comes off the travel water in 5 L steps, so the 3,400 kg target and the plate stay.
 
 ## Open points and the assumption used
 
 1. Storage is about 0.2 m³ short (est.). Assumption: the footprint stays empty (H16). Question for Leonard: two 500 x 600 x 700 mm cabinets under the bed beside the desk would add 0.42 m³ and about 20 kg, and break his rule that the rest of that area stays empty.
 2. Estimate lines carry 891 kg, 34.5 % of the tare, and estimates set 55.7 % of the price subtotal. Assumption: the growth allowance covers the masses until TW-01 to TW-03 replace them, and the 20 % contingency covers the prices. A towball reading more than 10 % off the model means the centre of gravity estimates are wrong (UTE-03).
-3. Assumption: Lovells' 7,400 kg GCM is certified in the ute's LC5 inspection. If not, tow with at most 232 L and plate at 3,300 kg.
+3. Assumption: Lovells' 7,400 kg GCM is certified in the ute's LC5 inspection. If not, plate at or below 3,280 kg and tow with at most 232 L (H20).
 4. Assumption: the isolators and the line set keep the split working on corrugations, without a maker's warranty. The fallback is a rooftop unit with a sixth battery module.
 5. The Dometic fridge, freezer, hob and sink carry converted European prices, and the oven, washer, panels, lamps and labour are estimates. Assumption: these prices stand, with their contingency, until an Australian stockist or a quote replaces them.
 6. Assumption: the engineer accepts calculation as VSB1's evidence for the drawbar and chain tests at 3,500 kg (CHASSIS.md).

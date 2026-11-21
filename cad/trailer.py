@@ -746,20 +746,23 @@ class Trailer:
                            governing=f"{cid} {by_id[cid]['name']} ({'with growth' if bs == 'growth' else 'no growth'})",
                            detail=f"worst case {cid} {by_id[cid]['name']}, {'with growth' if bs == 'growth' else 'no growth'}: {v:.1f} {unit}, margin {m:.1f} {unit}")
             elif c.type == "gcm":
-                tv = self.tv
-                lim = tv["limits"]["gcm_kg"]
-                light = min(x["nominal"]["towball_kg"] for x in cases)   # the lightest ball leaves the most of the plate behind it
-                plan = tv["limits"]["weighed_max_kg"] + self.caps()["plated"] - light
+                # H20: the ute with growth, ball off, plus the trailer's plate, UTE-06's sum. Without Lovells' revision,
+                # Toyota's GCM sets the plate and the travel water keeps the heaviest case with growth under that plate
+                tv, lim = self.tv, self.tv["limits"]
+                plate = self.caps()["plated"]
+                total = tv["ute_kg_growth"] + plate
                 heavy = max(cases, key=lambda x: x["growth"]["mass_kg"])
-                model = tv["ute_kg_growth"] + heavy["growth"]["mass_kg"]
-                v = max(plan, model)
-                row.update(limit=f"<= {lim:,.0f} kg", measured=round(v, 1), unit="kg", margin=round(lim - v, 1), ok=v <= lim + 1e-6,
-                           governing="the plan's sum" if plan >= model else f"the model's sum ({heavy['id']})",
-                           detail=(f"plan: the ute at its {tv['limits']['weighed_max_kg']:,.0f} kg weighed limit plus the {self.caps()['plated']:,.0f} kg "
-                                   f"plate less the lightest towball, {light:.0f} kg, is {plan:,.0f} kg. Model: the ute with the bikes "
-                                   f"aboard ({tv['gcm_case']}, {tv['ute_kg_growth']:,.0f} kg with growth) plus {heavy['id']} with growth "
-                                   f"({heavy['growth']['mass_kg']:,.0f} kg) is {model:,.0f} kg"),
-                           gcm=dict(plan=plan, model=model, ute_kg_growth=tv["ute_kg_growth"], trailer_case=heavy["id"]))
+                toyota = lim["toyota_gcm_kg"]
+                plate_fb = math.floor(toyota - tv["ute_kg_growth"])
+                water_fb = math.floor(lay.V["water_travel_l"] - max(0.0, heavy["growth"]["mass_kg"] - plate_fb))
+                row.update(limit=f"<= {lim['gcm_kg']:,.0f} kg", measured=round(total, 1), unit="kg", margin=round(lim["gcm_kg"] - total, 1),
+                           ok=total <= lim["gcm_kg"] + 1e-6, governing="the ute with growth plus the trailer's plate (UTE-06)",
+                           detail=(f"the ute with the bikes aboard ({tv['gcm_case']}, {tv['ute_kg_growth']:,.0f} kg with growth) plus the "
+                                   f"{plate:,.0f} kg plate is {total:,.0f} kg. Without Lovells' revision, Toyota's {toyota:,.0f} kg needs the trailer "
+                                   f"plated at or below {plate_fb:,.0f} kg and at most {water_fb:.0f} L of water in travel, so {heavy['id']} with growth "
+                                   f"({heavy['growth']['mass_kg']:,.0f} kg at {lay.V['water_travel_l']:.0f} L) stays under that plate"),
+                           gcm=dict(sum=total, ute_kg_growth=tv["ute_kg_growth"], plate=plate, toyota_kg=toyota, plate_without=plate_fb,
+                                    water_without=water_fb, trailer_case=heavy["id"], trailer_kg_growth=heavy["growth"]["mass_kg"]))
             elif c.type in ("towball_ute", "towball_ute_input"):
                 tv, ids = self.tv, ([x["id"] for x in cases] if c.cases == "all" else c.cases)
                 bs = "growth" if c.basis != "nominal" else "nominal"

@@ -131,7 +131,7 @@ params:
   axle_x: 4381               # axle group centre from the ball. The build solves it: the middle of the towball window (H17)
   # ---------------------------------------------------------------- water (H13)
   water_full_l: 420          # the fresh tanks' net capacity, filled at camp with the transfer pump, CR45 filter and chlorine (H13)
-  water_travel_l: 350        # most fresh and grey water aboard while towing (H13). 232 L if the 7,400 kg GCM revision is refused (H17)
+  water_travel_l: 350        # most fresh and grey water aboard while towing (H13). Less if the 7,400 kg GCM revision is refused (GCM-01, H20)
   water_highway_l: 50        # owner's highway figure
   grey_full_l: 130           # grey tank's net capacity (report 21 section 10)
   tank_z0: rail_underside_z

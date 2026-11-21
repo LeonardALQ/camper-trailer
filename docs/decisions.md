@@ -1,6 +1,6 @@
 # Decision record: the LandCruiser 79 plan
 
-The decisions from 20 Nov 2026 on, after Leonard replaced the Porsche Cayenne with a LandCruiser 79 that carries both bikes in an enclosed box and the trailer lost its garage. Each entry gives the time (UTC), the decision and the reason. The documents cite an entry as "decision log" with its time, for example "decision log 12:10", and a later entry overrides an earlier one where it says so. The home trailer's decisions are numbered H1 to H19, which TRAILER.md and the drawings cite.
+The decisions from 20 Nov 2026 on, after Leonard replaced the Porsche Cayenne with a LandCruiser 79 that carries both bikes in an enclosed box and the trailer lost its garage. Each entry gives the time (UTC), the decision and the reason. The documents cite an entry as "decision log" with its time, for example "decision log 12:10", and a later entry overrides an earlier one where it says so. The home trailer's decisions are numbered H1 to H21, which TRAILER.md and the drawings cite.
 
 Leonard's ask:
 
@@ -156,6 +156,11 @@ Decisions on research report 26 (the Elite kit's wheels, rear track and brakes, 
 ## 21 Nov, 08:20
 
 - Lamps, reflectors and the number plate (ADR 13/00, VSB1 3.1, CT-011): the stop, tail and indicator lamps, the reversing lamps and the red triangles go on the rear outriggers' faces, and the white front position lamps and reflectors on the front outriggers. Three amber side markers with built-in reflectors go on each side's outrigger end caps, end-outline lamps sit high on both end walls, and the plate goes on the rear wall's kerb half. Why: below the floor every height rule holds without brackets, and the outriggers reach the body's edge, so the front devices sit within the 150 mm a trailer allows from its widest point. The outdoor unit's cradle covers the rear wall's road corner from Z 2,315 mm, so both rear end-outline lamps sit just under it, the highest place the pair can share. The rear wall's road half has the rinse box and the cradle and its centre the door and step, so the plate goes on the kerb half, its top at 1,224 mm against the 1,300 mm limit. On the outriggers the plate would sit over the recovery tongues and their shackles. The lamps are about AUD 905 before contingency (LGT-01, est.) and about 4 kg (est.), inside BD-11's allowance.
+
+## 21 Nov, 09:25
+
+- One combination figure (H20): the ute with the bikes aboard and growth (UC2, 3,620 kg) plus the trailer's 3,500 kg plate, 7,120 kg against Lovells' 7,400 kg, UTE-06's sum. GCM-01 takes the same sum, in place of the 7,100 kg plan sum and the 7,017 kg model sum of 01:27, and UTE-04's 3,850 kg weighed target retires. Why: the target stood for the Platinum's rear axle margin (11:25), and UTE-03 now checks the rear axle itself, with growth, against the Elite's 2,800 kg plate, as H14 replaced the 250 kg towball cap with the rule it stood for. Without Lovells' revision, Toyota's 6,900 kg needs the trailer plated at or below 6,900 kg less the ute with growth, 3,280 kg, and the travel water cut, rounded down, so the fully loaded trailer with growth stays under that plate (CT-003). This replaces 01:27's 3,300 kg plate, which held only the plan's sum.
+- Mass margin (H21): MAS-10 held H2's 3,400 kg target by 2.8 kg. If later changes take the heaviest case with growth over 3,400 kg, H13's travel water falls by the excess, rounded up to the next 5 L, and the change is recorded here. The 3,400 kg target and the 3,500 kg plate stay. Why: the water is the one load the owner sets each trip, and the target is the margin for the estimates.
 
 ## 21 Nov, 10:30
 

@@ -156,7 +156,7 @@ trailer_checks:
     type: gcm
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: GCM is the ute's mass plus the trailer's (report 16 section 2.4). Decision H2 takes Lovells' 7,400 kg GCM revision, which Lovells rates for the 4,495 kg Elite kit of H17 too. The check takes the larger of two sums. The plan's sum is the ute at its 3,850 kg weighed limit, which includes the ball load, plus the trailer at its plated ATM less its lightest towball. The model's sum is the ute with the bikes aboard (UC2, with growth) plus the heaviest trailer case with growth. If the revision is refused, Toyota's 6,900 kg holds the model's sum only with at most 232 L of water in travel (H13, recomputed for H17), and the plan's sum then needs the plate at or below 3,300 kg.
+    why: GCM is the ute's mass plus the trailer's (report 16 section 2.4). Decision H2 takes Lovells' 7,400 kg GCM revision, which Lovells rates for the 4,495 kg Elite kit of H17 too. Decision H20 sets the one sum, UTE-06's, the ute with the bikes aboard and growth (UC2) plus the trailer's plate. If the revision is refused, Toyota's 6,900 kg less that ute sets the trailer's plate, and the travel water is cut so the heaviest case with growth stays under it.
   - id: TBS-01
     title: Towball scale reading within 10 % of the model, fully loaded (reported)
     type: towball_scale

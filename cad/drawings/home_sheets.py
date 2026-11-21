@@ -17,7 +17,7 @@ from build123d import Keep, Plane  # noqa: F401  (kept for the views that cut th
 from ..lamps import resolve as resolve_lamps
 from ..trailer_model import TrailerModel
 from . import sheet as S
-from .home_common import (MARK, TOYOTA_GCM, Proj, body_plan, cog_symbol, ctx, label_in, stamp, textblock, title, tw,
+from .home_common import (MARK, Proj, body_plan, cog_symbol, ctx, label_in, stamp, textblock, title, tw,
                           water_without_gcm_revision, wrap, write)
 from .sheets import _leaves
 
@@ -293,7 +293,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
         ["Running clearance", "At least 100 mm, unladen (VSB1 5.4)", f"{mv('DIM-04')}, the coupling's handbrake", st("DIM-04")],
         ["Width", "Across the body and everything on its sides, at most 2,500 mm, side lamps left out (ADR 43/04 6.2.6.1, VSB1 5.2)", f"{mv('DIM-01')}, design at most 2,490 mm (DIM-05)", st("DIM-05")],
         ["Overhang", "Front load space at least the rear overhang (VSB1 5.1.1)", f"{V['axle_x'] - V['body_x0']:.0f} against {ch['overall_x1'] - V['axle_x']:.0f} mm", st("DIM-02")],
-        ["Combination", "Ute and trailer within Lovells' 7,400 kg GCM revision (H2, GV06)", f"{gcm['plan']:,.0f} kg plan, {gcm['model']:,.0f} kg on the model", st("GCM-01")],
+        ["Combination", "Ute and trailer within Lovells' 7,400 kg GCM revision (H2, GV06)", f"{gcm['sum']:,.0f} kg, the ute with growth plus the plate (H20)", st("GCM-01")],
         ["Ute rear axle", f"Towball keeps the Elite kit's {tv['limits']['rear_axle_kg']:,.0f} kg rear axle plate with growth (H14, H17, H18)", f"{mv('MAS-03')} at the heaviest ball", st("MAS-03")],
         ["Jack-knife", "Front parts 100 mm outside the bike box's sweep, 50 mm under it (JK-01, JK-02)", f"{chk['JK-01']['measured']:.0f} mm and {chk['JK-02']['measured']:.0f} mm", st("JK-01")],
         ["Plug", "7 or 12 pin to AS 4177.5 (VSB1 7.2)", "12-pin flat plug, and a grey Anderson SB50 for the 48 V charging feed", ("AS 4177.5", "#000")],
@@ -323,15 +323,14 @@ def ct003(prj, model, bom, checks, reg, dwg):
     yb = title(sh, dwg, reg, f"ATM PLATE {rep['caps']['plated']:,.0f} kg. TARE ON THE PLATE FROM THE WEIGHBRIDGE (TW-03) (TB-11).",
                "AS NOTED, SEE THE SHEETS NAMED")
     lim = tv["limits"]
-    model_over = gcm["model"] - TOYOTA_GCM
     water_fb = water_without_gcm_revision(rep)
-    plate_fb = TOYOTA_GCM - (gcm["plan"] - rep["caps"]["plated"])
     lines = [
         ("WATER IN TRAVEL (H13)", f"AT MOST {V['water_travel_l']:.0f} L OF FRESH AND GREY WATER WHILE TOWING. FILL THE TANKS AT CAMP (420 L NET)."),
-        ("WITHOUT THE GCM REVISION", f"IF LOVELLS' {lim['gcm_kg']:,.0f} kg GCM REVISION (GV06) IS REFUSED, TOYOTA'S {TOYOTA_GCM:,} kg HOLDS: AT MOST "
-                                     f"{water_fb} L OF WATER IN TRAVEL ({model_over:.0f} kg LESS THAN THE MODEL'S {gcm['model']:,.0f} kg), AND THE "
-                                     f"TRAILER PLATED AT OR BELOW {plate_fb:,.0f} kg FOR THE PLAN'S SUM."),
-        ("GCM (GCM-01)", f"{lim['gcm_kg']:,.0f} kg WITH THE REVISION. THE UTE WEIGHED AT MOST {lim['weighed_max_kg']:,.0f} kg WITH THE BALL LOAD (UTE-04)."),
+        ("WITHOUT THE GCM REVISION", f"IF LOVELLS' {lim['gcm_kg']:,.0f} kg GCM REVISION (GV06) IS REFUSED, TOYOTA'S {gcm['toyota_kg']:,.0f} kg HOLDS WITH THE "
+                                     f"TRAILER PLATED AT OR BELOW {gcm['plate_without']:,.0f} kg, {gcm['toyota_kg']:,.0f} kg LESS THE UTE WITH GROWTH, AND AT "
+                                     f"MOST {water_fb} L OF WATER IN TRAVEL, SO THE FULLY LOADED TRAILER WITH GROWTH STAYS UNDER THAT PLATE (H20)."),
+        ("GCM (GCM-01)", f"{lim['gcm_kg']:,.0f} kg WITH THE REVISION. THE UTE WITH GROWTH, {gcm['ute_kg_growth']:,.0f} kg, PLUS THE "
+                         f"{gcm['plate']:,.0f} kg PLATE IS {gcm['sum']:,.0f} kg (UTE-06, H20)."),
         ("ATM AND DESIGN LIMIT", f"PLATE {rep['caps']['plated']:,.0f} kg. EVERY CASE WITH GROWTH AT MOST 3,400 kg (MAS-10)."),
         ("TOWBALL (H17)", f"AT LEAST {rep['solved']['window']['pct_min']:.1f} % OF THE TRAILER IN EVERY CASE AND AT MOST "
                           f"{rep['solved']['window']['ball_max']['kg']:.0f} kg WITH GROWTH. TOWBAR AND DO35 {lim['towball_rating_kg']:.0f} kg."),

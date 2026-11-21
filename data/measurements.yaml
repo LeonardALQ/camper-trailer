@@ -382,12 +382,12 @@ inputs:
     title: Combination mass, laden ute plus loaded trailer (GCM check)
     how: Line CK03. The ute's axles and the trailer's axles weighed coupled, added.
     unit: kg
-    estimate: {v: 7017, src: "Ute model case UC2 with growth (3,619.9 kg) plus the trailer fully loaded with growth (3,397.2 kg, case TC2, MAS-10)"}
+    estimate: {v: 7017, src: "Ute model case UC2 with growth (3,619.9 kg) plus the trailer fully loaded with growth (case TC2, MAS-10). The plan's limit sum is GCM-01's, the ute plus the 3,500 kg plate (decision H20)"}
     measured: {v: null, date: null}
     stage: trailer built
     affects: [GV06, decision H2 water limit]
     thresholds:
-      - {at: 6900, rule: "If the GCM revision was refused: over 6,900 kg, drain water (about 1 kg a litre) until under. At the design figures the trailer then tows with at most 232 L", src: "Decisions H2 and H13 (recomputed for H17), Toyota's 6,900 kg GCM"}
+      - {at: 6900, rule: "If the GCM revision was refused: over 6,900 kg, drain water (about 1 kg a litre) until under. The trailer is then plated and loaded as CT-003's operating limits give (decision H20)", src: "Decisions H2, H13 and H20, Toyota's 6,900 kg GCM"}
       - {at: 7400, rule: "Over 7,400 kg: unload before driving", src: "Lovells GCM revision (GV06)"}
     range: {min: 0, max: 7400, src: "Lovells sheet, Oct 2026 (6,900 kg without GV06)"}
   # ================================================================ heights (stages S1, S4 and S5)

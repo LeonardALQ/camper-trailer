@@ -62,7 +62,7 @@ limits:
   rear_axle_kg: {v: 2800, src: "Decision H18: the Elite's 2,850 kg rear axle (wide-track housing and chrome-moly axles, report 16, decision H17) plated at 2,800 kg, twice the ROH Trak 2's 1,400 kg rating, because no 16 inch wheel that fits the ute and the trailer is rated 1,425 kg (report 26)", basis: plan}
   platinum_rear_axle_kg: {v: 2550, src: "Lovells TOYKIT080-GVM rear axle rating, the kit cut CUT7 returns to", basis: installer}
   platinum_return_margin_kg: {v: 30, src: "Decision H17: CUT7 applies only if the S3 weighing leaves at least 30 kg under the Platinum's rear axle at the trailer's weighed towball", basis: plan}
-  weighed_max_kg: {v: 3850, src: "Decision log: hold the weighed ute to 3,850 kg, towball included", basis: plan}
+  toyota_gcm_kg: {v: 6900, src: "Toyota's GCM for a single cab from 01/2017 (Lovells Campbellfield sheet, https://www.lovellscampbellfield.com.au/_files/ugd/a7ab81_cd324b9c9e354c4da0d3ab9103620a6d.pdf). It holds if Lovells' revision is refused, and then sets the trailer's plate and travel water (decision H20, GCM-01)", basis: maker}
   gcm_kg: {v: 7400, src: "Lovells' 7,400 kg GCM revision, which Lovells rates for both the 4,200 kg and the 4,495 kg kits (report 16), certified in the same NSW inspection (decision H2, car build lines GV03 and GV06). Toyota's 6,900 kg applies if it is refused", basis: installer}
   braked_towing_kg: {v: 3500, src: "Toyota LC70 spec data, June 2021", basis: maker}
   towball_rating_kg: {v: 350, src: "Hayman Reese 03186RW, 3,500 kg and 350 kg (ARB)", basis: maker}
@@ -239,12 +239,13 @@ checks:
      why: "Lovells' front axle rating, the same for the Elite and the Platinum"}
   - {id: UTE-03, title: "Rear axle within its 2,800 kg plate", type: mass, quantity: rear, limit: rear_axle_kg, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
      why: "The Elite plated at twice the ROH wheel's 1,400 kg (decisions H17 and H18). The bikes, the box and the towball all sit over or behind the rear axle. The trailer's MAS-14 reports the Platinum's return (cut CUT7)"}
-  - {id: UTE-04, title: "Ute mass within the plan's 3,850 kg weighed limit", type: mass, quantity: mass, limit: weighed_max_kg, basis: nominal, cases: [UC1, UC2, UC3, UC4], severity: fail,
-     why: "Decision log: the weighed ute stays at or under 3,850 kg, so the rear axle keeps its margin"}
+  # UTE-04 retired (decision H20, 21 Nov 2026). The plan's 3,850 kg weighed target stood for the Platinum's rear axle
+  # margin (decision log 11:25). UTE-03 now checks the rear axle itself, with growth, against the Elite's 2,800 kg plate,
+  # as H14 replaced the 250 kg towball cap with the rule it stood for. The combination is UTE-06's sum.
   - {id: UTE-05, title: "Design towball within the towbar's 350 kg", type: towball, severity: fail,
      why: "The towbar is rated 350 kg. H14 replaced the plan's 250 kg cap with the rule it stood for, the rear axle (UTE-03 at this ball, and the trailer's MAS-03 in every case). Each kilogram on the ball adds about 1.4 kg to the rear axle"}
   - {id: UTE-06, title: "Combination with the 3,500 kg plated trailer within the 7,400 kg GCM", type: gcm, basis: both, cases: [UC3, UC4], severity: fail,
-     why: "GCM is the ute's mass plus the trailer's less the towball, which the ute already carries (report 16 section 2.4)"}
+     why: "GCM is the ute's mass plus the trailer's less the towball, which the ute already carries (report 16 section 2.4). Decision H20 makes this the plan's one combination figure, and the trailer's GCM-01 takes the same sum"}
   - {id: UTE-07, title: "Front axle carries at least 20 % of the ute's mass", type: mass, quantity: front_share, limit: front_share_min_pct, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
      why: "Toyota's minimum front axle share, so the ute steers and brakes"}
   - {id: UTE-08, title: "Unladen centre of gravity under 1,000 mm with the body fitted", type: mass, quantity: cog_z, limit: cog_unladen_max_mm, basis: nominal, cases: [UC1], severity: fail,

@@ -16,14 +16,10 @@ from ..partsdb import ROOT
 from ..trailer import Trailer
 from . import sheet as S
 
-TOYOTA_GCM = 6900   # Toyota's GCM, which holds if Lovells' 7,400 kg revision is refused (data/ute/ute.yaml gcm_kg source)
-
-
 def water_without_gcm_revision(rep) -> int:
-    """The most water in travel if Lovells' GCM revision is refused: the travel limit less the model's sum over
-    Toyota's GCM, at 1 kg a litre, rounded down."""
-    gcm = next(c for c in rep["checks"] if c["id"] == "GCM-01")["gcm"]
-    return int(rep["params"]["water_travel_l"] - max(0.0, gcm["model"] - TOYOTA_GCM))
+    """The most water in travel if Lovells' GCM revision is refused (decision H20, GCM-01): what keeps the heaviest case
+    with growth at or under the plate Toyota's GCM leaves, at 1 kg a litre, rounded down."""
+    return next(c for c in rep["checks"] if c["id"] == "GCM-01")["gcm"]["water_without"]
 
 OUT = BUILD / "drawings"
 

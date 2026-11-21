@@ -380,10 +380,9 @@ def ct611(prj, model, bom, checks, reg, dwg):
         rows.append([iid, what, f"X {c[0]:,.0f}, Y {c[1]:+,.0f}, Z {c[2]:,.0f}", f"{b.mass_kg:.1f}"])
     y = wtable(sh, 230, yb - 6, [("LINE", 16), ("WHAT", 80), ("CENTRE, mm", 62), ("kg", 22)], rows, size=1.22,
                title="THE PARTS ON THIS SHEET (data/assemblies/trailer.yaml)")
-    model_over = C["chk"]["GCM-01"]["gcm"]["model"] - 6900
     S.notes(sh, 230, y - 6, [
         f"TRAVEL LIMIT (H13): AT MOST {V['water_travel_l']:.0f} L OF FRESH AND GREY WATER WHILE TOWING. IF LOVELLS' GCM REVISION IS "
-        f"REFUSED, AT MOST {int(V['water_travel_l'] - max(0.0, model_over))} L (CT-003).",
+        f"REFUSED, AT MOST {C['chk']['GCM-01']['gcm']['water_without']} L (CT-003).",
         "THE WASHER'S HOSES ARE THE ONLY WATER LINES WITHIN 300 mm OF THE BATTERY'S TERMINAL FACE. THEY RUN IN A DIELECTRIC SLEEVE.",
         "FILL-TEST THE WET ROOM TRAY TO ITS LIP FOR 24 h BEFORE FIT-OUT (WR-01). EVERY LINE THROUGH THE FLOOR PASSES A SEALED GLAND.",
         "PRESSURE LIMITS: COMBI 2.8 bar FROM THE PUMP AND 4.5 bar IN THE SYSTEM, DAUERSHOWER UP TO 5 bar, WASHER 0.1 TO 0.6 MPa (report 21).",
