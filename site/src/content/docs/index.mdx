@@ -3,6 +3,7 @@ title: Camper trailer design
 description: The design of a one-off off-road camper trailer and its tow vehicle, a LandCruiser 79 that carries two motorcycles in an enclosed box.
 ---
 
+import ProjectCost from '../../components/ProjectCost.astro';
 import Trailer from '../../components/Trailer.astro';
 import Ute from '../../components/Ute.astro';
 import box from '../../data/generated/box-parts.json';
@@ -25,6 +26,10 @@ Each part has its plan, its parts list, its 3D model and drawings, and the measu
 the part's name. Everything comes from one set of data files: the models, the checks, the mass schedules, the
 drawings, the parts lists and the costs are generated from them, so they always agree. When a number changes in the
 data, the whole site is rebuilt.
+
+## Whole-project cost
+
+<ProjectCost />
 
 ## Car build (LandCruiser 79)
 

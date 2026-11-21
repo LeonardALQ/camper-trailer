@@ -94,7 +94,8 @@ def _drop_first_table(text):
 
 
 def project() -> dict:
-    """Leonard's whole-project figures (data/project.yaml): the truck's price and the car build's budget."""
+    """Leonard's whole-project figures (data/project.yaml): the truck's price, the car build's budget, and where the
+    bike box's and the trailer's prices come from."""
     return yaml.safe_load((ROOT / "data" / "project.yaml").read_text(encoding="utf-8"))
 
 
@@ -232,6 +233,43 @@ def box_parts() -> dict:
     return data
 
 
+def project_costs(box_totals, proj=None) -> dict:
+    """The whole project's cost for the home page (ProjectCost.astro): the truck, the car build, the bike box and the
+    trailer, each with its figure before contingency, its contingency, its total and its parts list. From
+    data/project.yaml (or proj), the car build's lines (car_totals) and the bike box's totals. The trailer is pending
+    until data/project.yaml names its priced parts list, in the bike box list's format (lines with price.aud, and
+    totals.contingency_pct): then its row is worked out from that list's lines. The total leaves out what is pending."""
+    p = proj or project()
+    car = car_totals(yaml.safe_load((ROOT / "data" / "vehicle" / "vehicle-parts.yaml").read_text(encoding="utf-8")),
+                     p["car_build"]["budget_aud"])
+    bt = box_totals
+    rows = [
+        dict(id="truck", part="Truck purchase", basis=p["truck"]["basis"], before=p["truck"]["purchase_aud"], contingency=0,
+             total=p["truck"]["purchase_aud"], link="/tow-vehicle/#s0-buy-and-baseline", link_text="Stage S0, buy and baseline"),
+        dict(id="car", part="Car build (LandCruiser 79)", basis="The required lines and the plan's contingency allowance",
+             before=car["required"], contingency=car["allowance"], total=car["with_contingency"], link="/tow-vehicle/#parts-list",
+             link_text="Car build parts list"),
+        dict(id="box", part="Bike box", basis=p["bike_box"]["basis"], before=bt["subtotal_aud"], contingency=bt["contingency_aud"],
+             total=bt["total_aud"], owner_built=bt["owner_built_total_aud"], contingency_pct=bt["contingency_pct"],
+             link="/ute-garage/#parts-list", link_text="Bike box parts list"),
+    ]
+    tr = p["trailer"]
+    if tr.get("parts_list"):
+        lst = yaml.safe_load((ROOT / tr["parts_list"]).read_text(encoding="utf-8"))
+        sub = sum(ln["price"]["aud"] for ln in lst["lines"])
+        pct = lst["totals"]["contingency_pct"]
+        rows.append(dict(id="trailer", part="Trailer", basis=tr["basis"], before=sub, contingency=sub * pct / 100,
+                         total=sub * (1 + pct / 100), contingency_pct=pct, link=tr["link"], link_text="Trailer parts list"))
+    else:
+        rows.append(dict(id="trailer", part="Trailer", basis=tr["basis"], pending=True, link=tr["link"],
+                         link_text="Mass schedule, no prices yet"))
+    known = [r for r in rows if not r.get("pending")]
+    return dict(rows=rows, pending=[r["part"] for r in rows if r.get("pending")],
+                before=sum(r["before"] for r in known), contingency=sum(r["contingency"] for r in known),
+                total=sum(r["total"] for r in known), total_owner_built=sum(r.get("owner_built", r["total"]) for r in known),
+                car=dict(budget=car["budget"], gap=car["gap"], closing=car["closing"], with_closing=car["with_closing"]))
+
+
 def main():
     for d in (GEN, SITE / "public" / "models", SITE / "public" / "downloads" / "drawings", SITE / "public" / "drawings",
               DOCS / "research"):
@@ -280,6 +318,8 @@ def main():
     # the car build page (URL /tow-vehicle/) and the bike box's parts list
     n_parts = tow_vehicle_page()
     box = box_parts()
+    # the whole project's cost on the home page
+    (GEN / "project.json").write_text(json.dumps(project_costs(box["totals"]), indent=1))
 
     # research reports as pages (copied, with the first heading moved into the title)
     for old in (DOCS / "research").glob("*.md"):

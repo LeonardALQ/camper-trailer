@@ -1,6 +1,7 @@
 # Leonard's figures for the whole project, AUD including GST (conductor's rulings, 20 Nov 2026).
-# The car build page compares its totals with car_build.budget_aud (cad/sitedata.py), and cad/tests/test_costs.py
-# checks that data/vehicle/vehicle-parts.yaml and VEHICLE.md quote the same figures.
+# The car build page compares its totals with car_build.budget_aud, and the home page's cost table reads every part
+# from here and from the parts lists (cad/sitedata.py, project_costs). cad/tests/test_costs.py checks that
+# data/vehicle/vehicle-parts.yaml and VEHICLE.md quote the same figures and that the cost table adds up.
 truck:
   name: "Used Toyota LandCruiser VDJ79 single cab V8, built 01/2017 to 08/2022, about 400,000 km"
   purchase_aud: 50000
@@ -9,3 +10,13 @@ car_build:
   budget_aud: 75000
   basis: "Leonard's planning figure for the car build, without the truck, the bike box, the trailer or his own labour"
   parts_list: data/vehicle/vehicle-parts.yaml
+bike_box:
+  parts_list: data/ute/box-parts.yaml
+  basis: "Every line of the box's parts list with its contingency. Owner-built leaves out the shop's fabrication labour"
+# The trailer shows pending in the cost table while parts_list is null. To price it, name a list in the bike box list's
+# format (lines with price: {aud: ...} and totals: {contingency_pct: ...}), point link at the page that shows it, and
+# the row and the total work themselves out from its lines.
+trailer:
+  parts_list: null
+  link: /trailer/#every-line
+  basis: "No prices yet. The trailer's lines have masses only (the mass schedule) until the trailer worker adds prices"

@@ -7,7 +7,7 @@ from collections import defaultdict
 import yaml
 
 from cad.partsdb import DATA, ROOT
-from cad.sitedata import car_totals
+from cad.sitedata import car_totals, project_costs
 
 CAR = yaml.safe_load((DATA / "vehicle" / "vehicle-parts.yaml").read_text())
 PROJECT = yaml.safe_load((DATA / "project.yaml").read_text())
@@ -152,3 +152,34 @@ def test_vehicle_md_system_table():
         hit = next((x for x in left if all(abs(a - b) <= 1 for a, b in zip(got, x))), None)
         assert hit, f"VEHICLE.md row {r[0]!r} {got} matches no system's sums"
         left.remove(hit)
+
+
+def test_project_cost_table():
+    """The home page's table: the truck, the car build with its allowance, the box shop-built with the owner-built
+    total beside it, and the trailer pending until it has prices. The total leaves out what is pending."""
+    t = project_costs(BOX)
+    rows = {r["id"]: r for r in t["rows"]}
+    assert [r["id"] for r in t["rows"]] == ["truck", "car", "box", "trailer"]
+    assert rows["truck"]["total"] == PROJECT["truck"]["purchase_aud"]
+    assert rows["car"]["total"] == TYPED["required_plus_contingency"]
+    assert rows["car"]["before"] + rows["car"]["contingency"] == rows["car"]["total"]
+    assert abs(rows["box"]["before"] + rows["box"]["contingency"] - rows["box"]["total"]) < 0.01
+    assert rows["box"]["total"] == BOX["total_aud"] and rows["box"]["owner_built"] == BOX["owner_built_total_aud"]
+    assert rows["trailer"].get("pending") and t["pending"] == ["Trailer"]
+    known = PROJECT["truck"]["purchase_aud"] + TYPED["required_plus_contingency"] + BOX["total_aud"]
+    assert abs(t["total"] - known) < 0.01
+    assert abs(t["total_owner_built"] - (known - BOX["total_aud"] + BOX["owner_built_total_aud"])) < 0.01
+    assert abs(t["before"] + t["contingency"] - t["total"]) < 0.01
+
+
+def test_project_cost_table_prices_the_trailer_from_its_list(tmp_path):
+    """Once data/project.yaml names a priced trailer list, its row and the total work themselves out from its lines."""
+    lst = tmp_path / "trailer-parts.yaml"
+    lst.write_text(yaml.safe_dump({"totals": {"contingency_pct": 10},
+                                   "lines": [{"id": "T1", "price": {"aud": 1000.0}}, {"id": "T2", "price": {"aud": 500.0}}]}))
+    proj = dict(PROJECT, trailer=dict(PROJECT["trailer"], parts_list=str(lst), link="/trailer/#parts-list"))
+    t = project_costs(BOX, proj)
+    tr = t["rows"][-1]
+    assert tr["id"] == "trailer" and not tr.get("pending") and t["pending"] == []
+    assert abs(tr["before"] - 1500) < 0.01 and abs(tr["contingency"] - 150) < 0.01 and abs(tr["total"] - 1650) < 0.01
+    assert abs(t["total"] - project_costs(BOX)["total"] - 1650) < 0.01

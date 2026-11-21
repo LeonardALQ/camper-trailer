@@ -1,0 +1,68 @@
+---
+// The whole project's cost on the home page: the truck, the car build, the bike box and the trailer, each with its
+// figure before contingency, its contingency, its total and its parts list. cad/sitedata.py (project_costs) writes
+// project.json from data/project.yaml and the parts lists, so the table follows the data. A part without prices
+// shows "pending" and the total leaves it out.
+import p from '../data/generated/project.json';
+import { withBase } from '../lib/url';
+
+const d: any = p;
+const aud = (v: number) => Math.round(v).toLocaleString('en-AU');
+const box = d.rows.find((r: any) => r.id === 'box');
+const left = d.pending.length ? `, without the ${d.pending.join(' and ').toLowerCase()}` : '';
+const car = d.car;
+const closes = car.gap > 0 && car.closing.length
+  ? `, and ${car.closing.join(' and ')} bring it to AUD ${aud(car.with_closing)} if the old parts pass their tests` : '';
+const note = [
+  "The truck is Leonard's planning figure.",
+  `The car build is its required lines with the plan's contingency allowance, AUD ${aud(Math.abs(car.gap))} ${car.gap > 0 ? 'over' : 'under'} Leonard's AUD ${aud(car.budget)} for it${closes}.`,
+  box ? `The bike box is every line of its parts list with ${box.contingency_pct} % contingency, and owner-built leaves out the shop's fabrication labour.` : '',
+  d.pending.length ? `The ${d.pending.join(' and ').toLowerCase()} has no prices yet.` : '',
+  "Leonard's own labour is outside every figure. Each figure is rounded to the dollar, so a row can differ from its parts by AUD 1.",
+].filter(Boolean).join(' ');
+---
+
+<div class="data-table project-cost" data-sheet="off">
+  <table>
+    <thead>
+      <tr>
+        <th>Part</th><th class="num">Before contingency AUD</th><th class="num">Contingency AUD</th><th class="num">Total AUD</th>
+        <th>Parts list</th>
+      </tr>
+    </thead>
+    <tbody>
+      {d.rows.map((r: any) => (
+        <tr>
+          <td>{r.part}</td>
+          {r.pending ? (
+            <>
+              <td class="num">pending</td><td class="num">pending</td><td class="num">pending</td>
+            </>
+          ) : (
+            <>
+              <td class="num">{aud(r.before)}</td>
+              <td class="num">{aud(r.contingency)}</td>
+              <td class="num">{aud(r.total)}{r.owner_built != null && <> shop-built,<br />{aud(r.owner_built)} owner-built</>}</td>
+            </>
+          )}
+          <td><a href={withBase(r.link)}>{r.link_text}</a></td>
+        </tr>
+      ))}
+      <tr class="row-total">
+        <td>Total so far{left}</td>
+        <td class="num">{aud(d.before)}</td>
+        <td class="num">{aud(d.contingency)}</td>
+        <td class="num">{aud(d.total)}{box && <>,<br />{aud(d.total_owner_built)} with the box owner-built</>}</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>{note}</p>
+
+<style>
+  .project-cost td:first-child {
+    white-space: nowrap;
+  }
+</style>
