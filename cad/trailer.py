@@ -863,6 +863,27 @@ class Trailer:
                                    f"share at {pct:.1f} %, {yl['I_kgm2']:,.0f} kg m2 with its centre of gravity {yl['x_cg'] - lay.V['axle_x']:+,.0f} mm "
                                    f"from the axles. No snaking speed: the published car and trailer models need the ute's and the trailer's tyre cornering "
                                    f"stiffnesses and the hitch's geometry, none of them known"))
+            elif c.type == "overturn":
+                from .body import load_data
+                st, wd = self.td["stability"], load_data()["wind"]
+                sil = side_silhouette(lay, st["overturn"]["cell_mm"])
+                ids = [x["id"] for x in cases] if c.cases == "all" else c.cases
+                rs = [overturn(lay, by_id[i], st, sil, wd["Mzcat"]) for i in ids]
+                w, hv = min(rs, key=lambda q: q["v"]), max(rs, key=lambda q: q["v"])
+                o = st["overturn"]
+                act = min(w["act_kmh"], o["warning_kmh"])
+                row.update(limit="reported", measured=round(w["v"], 1), unit="m/s", margin=None, ok=True,
+                           governing=f"{w['case']} {by_id[w['case']]['name']}, no growth",
+                           detail=(f"side silhouette {sil['area_m2']:.1f} m2, its centroid {sil['z_mm']:,.0f} mm up, Cf {o['cf']:g}. "
+                                   + ". ".join(f"{q['case']} at {q['mass_kg']:,.0f} kg tips at {q['v']:.1f} m/s at the trailer, a "
+                                               f"{q['forecast_kmh']:.0f} km/h forecast gust" for q in rs)
+                                   + f". With a box's Cf of {o['cf_box']:g} the heaviest would tip at {hv['v_box']:.1f} m/s. The operating rule "
+                                   f"acts at the overturning moment over {o['moment_factor']:g}, forecast gusts of {w['act_kmh']:.0f} km/h, or at a "
+                                   f"Bureau warning of damaging winds ({o['warning_kmh']:.0f} km/h gusts), so at {act:.0f} km/h. The highest "
+                                   f"overturning speed, {hv['v']:.1f} m/s, is under BDY-19's {wd['V_u']:g} m/s, so the walls' strength stays at "
+                                   f"{wd['V_u']:g} m/s (H23)"),
+                           overturn=dict(cases=rs, silhouette=sil, act_kmh=act, rule_kmh=w["act_kmh"], warning_kmh=o["warning_kmh"],
+                                         v_u=wd["V_u"], cf=o["cf"], cf_box=o["cf_box"], factor=o["moment_factor"]))
             elif c.type == "towball_scale":
                 m = self.inputs.v("UTE-03")
                 model = by_id[self.target_case.id]["nominal"]["towball_kg"]
@@ -977,6 +998,79 @@ def rollover(lay: Layout, ev: dict, st: dict, basis: str = "growth", dtrack: flo
         a = 0.5 * (a + a_new)
     return dict(srt=a, ssf=(half - y0) / h, roll_deg=math.degrees(phi), shift_mm=dy, on_stops=W * h * (a + phi) / k_s >= phi_stop,
                 h=h, y0=y0, case=ev["id"])
+
+
+def side_silhouette(lay: Layout, cell: float = 10.0) -> dict:
+    """The trailer seen from the side: every solid block, wheel and frame member projected on the X-Z plane on a `cell`
+    mm grid, lamps and keep-clear spaces left out. The area and its centroid height, for the wind on the parked trailer
+    (STB-04). Gaps between the frame members, the tanks and the wheels stay open."""
+    import numpy as np
+    shapes = []
+    for b in lay.blocks:
+        if b.keep_clear or b.load == "none" or b.extra.get("lamp"):
+            continue
+        if b.box is not None:
+            shapes.append(("box", b.box[0], b.box[2], b.box[3], b.box[5]))
+        elif b.cyl:
+            c, r = b.cyl["c"], b.cyl["r"]
+            shapes.append(("cyl", c[0], c[2], r, r))
+        elif b.bar:
+            (x0, _, z0), (x1, _, z1) = b.bar["p0"], b.bar["p1"]
+            shapes.append(("bar", x0, z0, x1, z1, b.bar["h"]))
+    def extent(s):     # x0, x1, z1 of a shape
+        if s[0] == "box":
+            return s[1], s[3], s[4]
+        if s[0] == "cyl":
+            return s[1] - s[3], s[1] + s[3], s[2] + s[3]
+        return min(s[1], s[3]), max(s[1], s[3]), max(s[2], s[4]) + s[5] / 2
+    ext = [extent(s) for s in shapes]
+    x_lo = min(e[0] for e in ext) - cell
+    x_hi = max(e[1] for e in ext) + cell
+    z_hi = max(e[2] for e in ext) + cell
+    gx = np.arange(x_lo, x_hi, cell) + cell / 2
+    gz = np.arange(0.0, z_hi, cell) + cell / 2
+    Z, X = np.meshgrid(gz, gx, indexing="ij")
+    on = np.zeros(X.shape, dtype=bool)
+    for s in shapes:
+        if s[0] == "box":
+            on |= (X >= s[1]) & (X <= s[3]) & (Z >= s[2]) & (Z <= s[4])
+        elif s[0] == "cyl":
+            on |= (X - s[1]) ** 2 + (Z - s[2]) ** 2 <= s[3] ** 2
+        else:
+            x0, z0, x1, z1, hh = s[1:]
+            L = math.hypot(x1 - x0, z1 - z0) or 1.0
+            t = ((X - x0) * (x1 - x0) + (Z - z0) * (z1 - z0)) / L ** 2
+            d = np.abs((X - x0) * (z1 - z0) - (Z - z0) * (x1 - x0)) / L
+            on |= (t >= 0) & (t <= 1) & (d <= hh / 2)
+    area = on.sum() * cell ** 2
+    return dict(area_m2=area / 1e6, z_mm=float((Z * on).sum() * cell ** 2 / area), x_mm=float((X * on).sum() * cell ** 2 / area),
+                x0=float(x_lo), x1=float(x_hi))
+
+
+def overturn(lay: Layout, ev: dict, st: dict, sil: dict, mzcat: float, basis: str = "nominal") -> dict:
+    """STB-04 (decision H23): the side wind at which the parked trailer, unhitched on its corner steadies, starts to tip
+    about its leeward wheels. The wind is taken toward the side the centre of gravity already leans to. The steadies stand
+    under the rails, inboard of the wheels, so they widen nothing, but wound down they hold the body on its springs. The
+    weight's lever is the half track less that lean,
+    less the roll on the tyres as the leeward pair takes the whole weight and their sideways give under the wind's push
+    (the `stability` rates). The push is 0.6 V^2 Cf on the side silhouette, at its centroid height. V is the gust at the
+    trailer's height in terrain category 2. The forecast gust, at 10 m in open country, is V over M_z,cat."""
+    V, o = lay.V, st["overturn"]
+    r = ev[basis]
+    W, h, y0 = r["mass_kg"] * 9.81, r["cog"][2], abs(r["cog"][1])
+    half = V["track"] / 2
+    roll = W / (2 * st["tyre_rate"] * V["track"])           # rad: the leeward tyres take W / 2 each, the windward ones lift
+    zc = sil["z_mm"]
+    lever = (half - y0 - h * roll) / (1 + W / (4 * st["tyre_lateral_rate"] * zc))
+    out = dict(case=ev["id"], basis=basis, mass_kg=r["mass_kg"], lever_mm=lever, h=h, y0=y0, area_m2=sil["area_m2"], z_cp=zc,
+               push_n=W * lever / zc)
+    for key, cf in (("v", o["cf"]), ("v_box", o["cf_box"])):
+        q = W * lever / (cf * sil["area_m2"] * zc)            # Pa: N mm over (m2 mm)
+        out[key] = math.sqrt(q / 0.6)
+    out["v_act"] = out["v"] / math.sqrt(o["moment_factor"])
+    out["forecast_kmh"] = out["v"] / mzcat * 3.6
+    out["act_kmh"] = 5 * math.floor(out["v_act"] / mzcat * 3.6 / 5)
+    return out
 
 
 def yaw_inertia(lay: Layout, case, basis: str = "growth") -> dict:

@@ -22,6 +22,28 @@ def test_trailer_check(row):
     assert row["ok"], msg
 
 
+def test_the_walls_strength_wind_covers_the_overturning_speed():
+    """Decision H23: the walls are checked for strength at BDY-19's 40 m/s, or at STB-04's overturning speed if that is
+    higher. If a change lets the parked trailer stand in a stronger wind than the walls are checked for, this fails."""
+    o = next(r for r in RESULTS if r["id"] == "STB-04")["overturn"]
+    for q in o["cases"]:
+        assert q["v"] <= o["v_u"] + 1e-9, f"{q['case']} overturns at {q['v']:.1f} m/s, above the {o['v_u']:g} m/s the walls are checked at"
+
+
+def test_the_wall_section_model_matches_a_plain_wall():
+    """BDY-22's two-dimensional model, with no member, gives the one-dimensional wall's inside surface and heat flow."""
+    from cad.body import _wall_section, load_data
+    d = load_data()
+    th, wl = d["thermal"], d["panels"]["wall"]
+    t_o, t_i = wl["skins"]
+    c = wl["core"]["c"]
+    r = th["rsi"] + (t_o + t_i) / 1000 / th["k"]["grp"] + c / 1000 / th["k"]["xps"] + th["rse"]
+    dT = th["t_in"] - th["t_out"]
+    res = _wall_section(th, t_o, c, t_i, None)
+    assert abs(res["tsi_min"] - (th["t_in"] - dT * th["rsi"] / r)) < 0.05
+    assert abs(res["q_w_m"] - th["strip_mm"] / 1000 * dT / r) < 0.01 * th["strip_mm"] / 1000 * dT / r
+
+
 def test_every_aboard_line_has_a_source():
     for case in TRAILER.cases:
         for b, m in EV["layout"].case_lines(case):

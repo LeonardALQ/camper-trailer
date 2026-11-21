@@ -27,13 +27,19 @@ panels:
     ult: 77           # Polydet data sheet
     core: {name: XPS, c: 32, Gc: 8, shear: 0.25, compression: 0.30}
     kg_m2: 6.0
-    # Full-depth aluminium stiffeners laid upright in the side-wall cores, floor joiner to roof joiner, bonded to both
-    # skins (lines BD-18 and BD-19). With the lift-bed hardpoints (LB-06, RHS 40 x 32 x 3, full height and depth), the
-    # tower's sides and the partition they bound every side-wall bay at no more than `pitch`, the 1,067 mm between the
-    # bed's rail pairs. A member bonded to both skins bends about the panel's own mid-plane, so its stiffness adds to
-    # the sandwich's. The wind deflection (BDY-10) takes the weakest of them smeared over that pitch. The skin stress
-    # (BDY-06) leaves them out, and BDY-06 checks the stiffener's own share at the ultimate wind
-    stiffener: {name: "SHS 32 x 32 x 3 6060-T5 aluminium, full core depth", E: 69000, I: 49300, depth: 32, fy: 110, pitch: 1067}
+    # Aluminium members laid upright in the side-wall cores, floor joiner to roof joiner, bonded to the inner skin only:
+    # the wall stiffeners (BD-18), the entry door's jamb members (BD-19) and the lift-bed hardpoints (LB-06). The panel
+    # maker routs a channel `depth` deep into the XPS from the inner face and bonds the member into it as the inner skin
+    # goes on, so `break` of XPS stays between the member and the outer skin and no metal crosses the core (BDY-22). With
+    # the tower's sides and the partition they bound every side-wall bay at no more than `pitch`, the 1,067 mm between
+    # the bed's rail pairs. A member on one skin bends about its own centroid, so only its own EI adds to the
+    # sandwich's (the composite term through the core is left out, conservative). The wind deflection (BDY-10) takes
+    # it smeared over that pitch. The skin stress (BDY-06) leaves it out, and BDY-06 checks the member's own share at
+    # the ultimate wind. I is about the axis along the wall, for the 25 mm depth through it (sharp corners). The section
+    # is stocked: InfraBuild EL8018, 6060-T5, 10.426 kg per 6.5 m length, so 1.604 kg/m
+    stiffener: {name: "RHS 80 x 25 x 3 6060-T5 aluminium on the inner skin", E: 69000, I: 61870, depth: 25, width: 80, wall: 3,
+                break: 7, fy: 110, pitch: 1067, kg_m: 1.604,
+                src: "https://www.infrabuild.com/steel/products/aluminium/aluminium-rhs-rectangular-box-section/"}
   front_wall:
     name: "Front wall, 35 mm: 2.0 mm outer and 1.5 mm inner Polydet skins on 31.5 mm XPS, against stones"
     t: 35
@@ -78,7 +84,7 @@ loads:
   bed_moving_rating_kg: 204    # Lippert HappiJac, while it moves (the same manual)
   bed_night_factor: 1.5        # sleepers moving on the bed at night (assumption, a person kneeling or sitting down)
   bed_rails: 4                 # HappiJac rails, two on each side wall
-  rail_screws: 8               # 1/4 in self-tapping screws per rail into its RHS 40 x 32 x 3 hardpoint (est., about 200 mm pitch)
+  rail_screws: 8               # 1/4 in self-tapping screws per rail through the inner skin into its hardpoint's 3 mm wall (est., about 200 mm pitch)
   rail_screw_rated_n: 3000     # shear on one screw in 3 mm 6060-T5 (est.: bearing about 2.5 fu d t = 7.6 kN characteristic)
   uplift_40ms_n: 5060          # report 12's 6,300 N on 13.2 m2 at 110 km/h into a 36 km/h headwind, scaled to the 10.6 m2 roof
 
@@ -99,18 +105,83 @@ cradle:
   stays: {n: 2, name: "RHS 40 x 20 x 3 6060-T5 aluminium", E: 69000, I_min: 18892, A: 324, L: 1450, fy: 110, buckling_factor: 3.0}
   accel: {down_g: 3.0, along_g: 0.8, side_g: 0.5}
 
-# ---------------------------------------------------------------- wind on the parked trailer (BDY-06, BDY-10)
-# AS/NZS 1170.2, in place of report 12's 0.5 kPa, which cited no standard. Region A, the non-cyclonic regions the trailer
-# camps in. Terrain category 2 (open country) at the wall's height, no shielding, flat ground, any direction
+# ---------------------------------------------------------------- wind on the parked trailer (BDY-06, BDY-10, STB-04)
+# AS/NZS 1170.2, in place of report 12's 0.5 kPa, which cited no standard. Decision H23: the walls are serviceable in
+# region B, the non-cyclonic Queensland coast (Brisbane included) where Leonard will camp, and so in region A too.
+# Terrain category 2 (open country) at the wall's height, no shielding, flat ground, any direction
 # (M_d = M_s = M_t = 1). Net pressure 0.6 V^2 (Cp,e - Cp,i) Pa, with C_dyn and the K factors at 1.0: the side wall's
-# 8.8 m2 is under Table 5.4's 10 m2, and its 2 m span is far larger than the local pressure zones.
+# 8.8 m2 is under Table 5.4's 10 m2, and its 2 m span is far larger than the local pressure zones. Strength stays at
+# BDY-19's 40 m/s, because the parked trailer overturns below it (STB-04) and above that speed the walls are not what
+# fails. The operating rule in TRAILER.md and on CT-003 keeps it out of winds near that speed and out of the cyclonic
+# regions C and D in the cyclone season.
 wind:
-  V_s: 37            # m/s, serviceability: region A's 25-year regional wind V_25 (Table 3.1), for the wall's deflection
-  Mzcat: 0.91        # Table 4.1, terrain category 2 at 3 m or less, on V_s
-  V_u: 40            # m/s, ultimate for strength: BDY-19's 40 m/s. Region A's V_500, 45 m/s, times 0.91 is 41 m/s
+  V_s: 39            # m/s, serviceability: region B's 25-year regional wind V_25 (Table 3.1), for the wall's deflection
+  Mzcat: 0.91        # Table 4.1, terrain category 2 at 3 m or less
+  V_u: 40            # m/s, ultimate for strength: BDY-19's 40 m/s, or STB-04's overturning speed if that is higher (H23)
   cpe: 0.7           # Table 5.2(A), windward wall
   cpi: -0.3          # Table 5.1(A), all walls equally permeable: -0.3 or 0.0, the more severe with the windward wall
-  src: "AS/NZS 1170.2 Table 3.1 regional wind speeds as reproduced at https://docs.hexagonppm.com/r/ja-JP/PV-Elite-Help/25/603588 (V_R = 67 - 41 R^-0.1 for region A)"
+  region: B
+  src: "AS/NZS 1170.2 Table 3.1 regional wind speeds as reproduced at https://docs.hexagonppm.com/r/ja-JP/PV-Elite-Help/25/603588 (V_R = 106 - 92 R^-0.1 for region B, 67 - 41 R^-0.1 for region A)"
+
+# ---------------------------------------------------------------- cold surfaces over the wall members (BDY-22)
+# Research report 19's design cold night: -5 C outside, 20 C inside, the e2 pairs' humidity boost holding the dew point at
+# 6 C or lower, and inside surfaces kept 4 K above it (the rule report 19 applies to the bare joiners). cad/body.py solves
+# the steady two-dimensional conduction through the wall at one member: outer skin, XPS, the member with still air in its
+# hollow, inner skin, with the surface resistances of ISO 6946 for horizontal heat flow, the basis report 19 uses for its
+# 17.3 C wall surface. Half the strip is modelled, from the member's centreline to `strip_mm` away, where the wall is
+# one-dimensional again.
+thermal:
+  t_out: -5
+  t_in: 20
+  dew_point: 6
+  margin_k: 4
+  rsi: 0.13          # m2K/W, inside surface, horizontal heat flow (ISO 6946 Table 7)
+  rse: 0.04          # m2K/W, outside surface
+  k: {grp: 0.30, xps: 0.035, aluminium: 200, air: 0.15}   # W/mK
+  strip_mm: 300
+  cell_mm: 0.5
+  bare_panels_w_k: 36.8   # report 19 section 1: the bare panels, before its 20 % for bridges
+  bridges_w_k: 7.3        # report 19 section 1: the joiners, the mount bolts and the insert strips
+  members: [BD-18, BD-19, LB-06]
+  src:
+    films: "ISO 6946 surface resistances for a wall, Rsi 0.13 and Rse 0.04 m2K/W, as BRE's BR 443 (2019) gives them: https://www.cibse.org/media/wzrjrf3l/conventions-for-u-value-calculations.pdf"
+    xps: "XPS 0.035 W/mK, a little above the 0.034 W/mK Kingspan gives its best XPS boards, for the thin layer behind the member (est., report 19 used 0.031): https://www.insulation.kingspan.com/gb/en/products/insulation-boards/roof-insulation-boards/kingspan-greenguard-gg500"
+    grp: "GRP skins 0.30 W/mK, report 19 section 1 (est.)"
+    aluminium: "6060-T5 200 W/mK, below the 209 W/mK in Aalco's 6060-T5 data sheet: https://www.aalco.co.uk/datasheets/Aluminium-Alloy6060-T5--Extrusions_144.ashx"
+    air: "Still air in the member's 19 mm hollow, 0.15 W/mK effective (est.). The aluminium round it carries nearly all the heat, so the figure barely matters"
+
+# ---------------------------------------------------------------- the awning on the roof's kerb edge (BDY-11, BDY-23)
+# The Fiamma F80s 400 (BD-13) sits on five 4 mm aluminium angle brackets along its case. Each bracket bolts through the
+# roof's kerb-edge insert strip with two Panelok APLB-1024 bolts and APLN-1010 T-nuts, the pair whose grip, 37.5 to
+# 44.4 mm, takes the 40 mm roof (the APLB-1020 grips 30.8 to 37.7 mm only). Rivtec rates every Panelok at 14 kN shear
+# and 20 kN tension, from tests in various panels, and Rivetlab sells them in Australia. BDY-11 allows half of it, then
+# a pull test in the real roof (LR-09). Fiamma tells owners to close the awning in wind and to peg its legs, but gives no
+# speed. The operating rule closes it before gusts reach `close_kmh`, Beaufort force 5, and the fixing is checked at
+# `check_kmh`, the top of force 7, for a gust that comes before it is closed.
+awning:
+  line: BD-13
+  bolt: "Panelok APLB-1024 with an APLN-1010 T-nut"
+  brackets: 5
+  bolts_per_bracket: 2
+  bolt_pitch_mm: 90            # the bracket's two bolts across the roof, inboard and outboard (est.)
+  canopy_lever_mm: 120         # where the canopy leaves the case, outboard of the inner bolt (est.)
+  cog_lever_mm: 75             # the case's centre of gravity outboard of the inner bolt (est.)
+  rated_tension_n: 20000
+  rated_shear_n: 14000
+  canopy_m2: 9.7               # 3,880 x 2,500 mm (BD-13)
+  cpn: 1.5                     # net pressure coefficient on the open canopy, up or down (est.)
+  close_kmh: 40                # the operating rule: closed before gusts reach 40 km/h
+  check_kmh: 60                # the fixing check: a 60 km/h gust with the canopy open and the legs pegged
+  extension_mm: 2500           # Fiamma's F80s 400 extension (BD-13)
+  canopy_drop_mm: 40           # the canopy leaves the case 40 mm above the roof's top skin (est.)
+  leg_max_mm: 2686             # the 370 to 450 leg 98667-04 at full reach (est., below)
+  leg_head_mm: 40              # the leg's top fitting to the lead bar's underside (est.)
+  pitch_deg: 10                # the canopy's fall from the case to the lead bar on level ground, set by the legs
+  src:
+    panelok: "https://rivtec.co.nz/content/AP-Panelok-Lockbolts-Steel.pdf"
+    supply: "https://rivetlab.com/collections/panelok"
+    beaufort: "Force 5, fresh breeze, 17 to 21 knots, and force 7, near gale, 28 to 33 knots: https://weather.metoffice.gov.uk/guides/coast-and-sea/beaufort-scale"
+    leg: "The F80s 370 to 450 leg is 98667-04 (https://nomadicsupply.com/fiamma-f65s-f80s-370-450-awning-right-side-support-leg-98667-04a/), the same part as on the F80L 450 to 600 for large motorhomes (https://www.fritz-berger.de/artikel/fiamma-stuetzfuss-rechts-fuer-f65s-f65l-f80s-f80l-fiamma-artikelnummer-98667-04a-285759). Its length is not published. It ships in the same 63 in carton as the 320's leg 98667-03, which extends to 105.75 in, 2,686 mm (https://nomadicsupply.com/fiamma-f80s-320-awning-replacement-right-side-support-leg-98667-03a/), so that figure is taken"
 
 # ---------------------------------------------------------------- the body box for the twist (report 12 section 4)
 # The fixed roof is bonded into a roof-to-wall joiner, so the body is one closed cell (report 18 section 2). The lower

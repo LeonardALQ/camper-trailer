@@ -41,6 +41,60 @@ def side_projections(lay) -> list[dict]:
     return out
 
 
+def _wall_section(th: dict, t_out: float, core: float, t_in: float, member: dict | None) -> dict:
+    """Steady conduction in a half strip of the side wall, `th["strip_mm"]` wide, at one member on the inner skin (or
+    none), per metre of member length. Cells of `th["cell_mm"]`: x along the wall from the member's centreline, y through
+    the wall from the outer face. The outer and inner faces lose heat through Rse and Rsi, the centreline is a symmetry
+    plane and the strip's far edge is adiabatic. Returns the coldest inside surface, the member's coldest cell and the
+    heat through the strip, W per metre of member."""
+    import scipy.sparse as sp
+    from scipy.sparse.linalg import spsolve
+    h, kk = th["cell_mm"], th["k"]
+    depth = t_out + core + t_in
+    nx, ny = round(th["strip_mm"] / h), round(depth / h)
+    y = (np.arange(ny) + 0.5) * h
+    x = (np.arange(nx) + 0.5) * h
+    Y, X = np.meshgrid(y, x, indexing="ij")
+    k = np.full((ny, nx), kk["xps"])
+    k[Y < t_out] = kk["grp"]
+    k[Y > depth - t_in] = kk["grp"]
+    al = np.zeros((ny, nx), dtype=bool)
+    if member:
+        y1 = depth - t_in
+        y0 = y1 - member["depth"]
+        half, t = member["width"] / 2, member["wall"]
+        al = (X < half) & (Y > y0) & (Y < y1)
+        k[al] = kk["aluminium"]
+        k[(X < half - t) & (Y > y0 + t) & (Y < y1 - t)] = kk["air"]
+        al &= k == kk["aluminium"]
+    idx = np.arange(nx * ny).reshape(ny, nx)
+    hm = h / 1000.0
+    rows, cols, vals = [], [], []
+    diag = np.zeros(nx * ny)
+    for a, b in ((k[:, :-1], k[:, 1:]), (k[:-1, :], k[1:, :])):
+        g = (2 * a * b / (a + b)).ravel()                         # W/K per metre of member between neighbouring cells
+        i, j = ((idx[:, :-1], idx[:, 1:]) if a.shape[1] == nx - 1 else (idx[:-1, :], idx[1:, :]))
+        i, j = i.ravel(), j.ravel()
+        rows += [i, j]
+        cols += [j, i]
+        vals += [-g, -g]
+        np.add.at(diag, i, g)
+        np.add.at(diag, j, g)
+    g_out = hm / (th["rse"] + hm / 2 / k[0, :])                   # outer face, per column
+    g_in = hm / (th["rsi"] + hm / 2 / k[-1, :])                   # inner face, per column
+    rhs = np.zeros(nx * ny)
+    np.add.at(diag, idx[0, :], g_out)
+    np.add.at(diag, idx[-1, :], g_in)
+    rhs[idx[0, :]] += g_out * th["t_out"]
+    rhs[idx[-1, :]] += g_in * th["t_in"]
+    A = sp.csr_matrix((np.concatenate(vals + [diag]), (np.concatenate(rows + [np.arange(nx * ny)]),
+                                                        np.concatenate(cols + [np.arange(nx * ny)]))), shape=(nx * ny, nx * ny))
+    T = spsolve(A.tocsc(), rhs).reshape(ny, nx)
+    q_in = g_in * (th["t_in"] - T[-1, :])                         # W per metre of member through each column's inner face
+    tsi = th["t_in"] - q_in / hm * th["rsi"]
+    return dict(tsi_min=float(tsi.min()), t_member=float(T[al].min()) if al.any() else None, q_w_m=float(q_in.sum()))
+
+
 class Panel:
     def __init__(self, key: str, d: dict):
         self.key, self.d = key, d
@@ -168,11 +222,15 @@ class Body:
         m_st = share * wu["kpa"] / 1000 * st["pitch"] * V["interior_h"] ** 2 / 8
         s_st = m_st * st["depth"] / 2 / st["I"]
         u_st = s_st / (st["fy"] / cr["metal_factor"])
+        # the member's share reaches it from the outer skin through the XPS behind it, in compression or, in suction, tension
+        s_xps = share * wu["kpa"] / 1000 * st["pitch"] / st["width"]
+        a_xps = cr["core_factor"] * w.core["compression"]
         row("BDY-06", f"Side wall in the ultimate wind, {wu['kpa']:.2f} kPa net at {wu['V']:.0f} m/s, floor to the roof joiner ({V['interior_h']:.0f} mm)",
-            w, r, "Wind, ultimate", extra=(f"the stiffener takes {100 * share:.0f} % of its bay's load, {s_st:.0f} MPa against {st['fy'] / cr['metal_factor']:.0f} MPa, "
-                                          f"utilisation {u_st:.2f}"))
-        if u_st > out[-1]["util"]:
-            out[-1].update(util=u_st, governing="stiffener")
+            w, r, "Wind, ultimate", extra=(f"the member takes {100 * share:.0f} % of its bay's load, {s_st:.0f} MPa against {st['fy'] / cr['metal_factor']:.0f} MPa, "
+                                          f"utilisation {u_st:.2f}. The {st['break']:g} mm of XPS behind it carries {s_xps:.3f} MPa against "
+                                          f"{a_xps:.2f} MPa"))
+        if max(u_st, s_xps / a_xps) > out[-1]["util"]:
+            out[-1].update(util=max(u_st, s_xps / a_xps), governing="member" if u_st >= s_xps / a_xps else "XPS behind the member")
         # the fixed roof with the bonded solar array and its own weight, spanning between the walls
         sol = sum(b.mass_kg for b in self.lay.blocks if b.system == "roof")
         q = 3 * (rf.d["kg_m2"] + sol / (V["body_length"] * V["body_width"] / 1e6)) * G / 1e6
@@ -196,8 +254,8 @@ class Body:
         self.panel_checks() if not hasattr(self, "roof_defl") else None
         return [dict(id="DEF-B1", what="Floor under a foot at 1 g", mm=self.floor_defl, limit_mm=self.raiser_span / cr["floor_span_ratio"]),
                 dict(id="DEF-B2", what="Fixed roof with the solar array at 1 g", mm=self.roof_defl, limit_mm=(V["body_width"] - V["wall_t"]) / cr["roof_span_ratio"]),
-                dict(id="DEF-B3", what=(f"Side wall in the serviceability wind, {self.wind()[1]['kpa']:.2f} kPa net at {self.wind()[1]['V']:.1f} m/s, with its "
-                                        f"stiffeners ({self.wall_defl_bare:.1f} mm without them)"),
+                dict(id="DEF-B3", what=(f"Side wall in region {self.d['wind']['region']}'s 25-year wind, {self.wind()[1]['kpa']:.2f} kPa net at "
+                                        f"{self.wind()[1]['V']:.1f} m/s, with its members on the inner skin ({self.wall_defl_bare:.1f} mm without them)"),
                      mm=self.wall_defl, limit_mm=V["interior_h"] / cr["wall_span_ratio"])]
 
     # ------------------------------------------------------------------ inserts and the roof joint
@@ -219,18 +277,62 @@ class Body:
         f_night = L["bed_night_factor"] * L["bed_kg"] * G / screws    # the bed down with two sleepers moving on it
         f_travel = 3 * L["bed_travel_kg"] * G / screws               # LC2, 3 g on the moving bed at its day stop
         f_rail = max(f_night, f_travel)
-        awning = next((b for b in self.lay.blocks if b.id == "BD-13"), None)
-        aw_kg = awning.mass_kg if awning else 41.0
-        f_awning = math.hypot(3 * aw_kg * G / 5, 3 * aw_kg * G / 5 * 100 / 60)   # five brackets, 100 mm offset, 60 mm bolt pitch
-        rows = [dict(id="INS-01", what="Lift-bed rail screw, 1/4 in self-tapping into the RHS 40 x 32 x 3 hardpoint in the side wall, shear", n=f_rail,
-                     rated_n=L["rail_screw_rated_n"],
+        st = self.p["wall"].d["stiffener"]
+        aw = self.awning()
+        rows = [dict(id="INS-01", what=(f"Lift-bed rail screw, 1/4 in self-tapping through the inner skin into the {st['name'].split(' 6060')[0]} "
+                                        f"hardpoint's {st['wall']:g} mm wall, shear"), n=f_rail, rated_n=L["rail_screw_rated_n"],
                      case=(f"{L['bed_night_factor']:g} x the {L['bed_kg']:.0f} kg bed at night" if f_night >= f_travel else
                            f"LC2, 3 g on the {L['bed_travel_kg']:.0f} kg moving bed") + f", over {screws} screws"),
-                dict(id="INS-02", what="Awning bracket bolt, Panelock APLB-1020 into the roof's kerb-edge insert strip, tension", n=f_awning, rated_n=20000,
-                     case="LC2, 3 g on the awning, taken as a pull with prying")]
+                dict(id="INS-02", what=f"Awning bracket bolt, {aw['bolt']} through the roof's kerb-edge insert strip, tension in travel",
+                     n=aw["travel_n"], rated_n=aw["rated_tension_n"],
+                     case=(f"LC2, 3 g on the {aw['kg']:.1f} kg awning taken as a pull, a bracket's share on its inner bolt with prying "
+                           f"{aw['cog_lever_mm']:.0f} over {aw['bolt_pitch_mm']:.0f} mm")),
+                dict(id="INS-03", what=f"Awning bracket bolt, {aw['bolt']}, tension with the canopy open in a {aw['check_kmh']:.0f} km/h gust",
+                     n=aw["open_n"], rated_n=aw["rated_tension_n"],
+                     case=(f"{aw['q_pa']:.0f} Pa, Cp,n {aw['cpn']:g} on the {aw['canopy_m2']:g} m2 canopy, half of it at the case "
+                           f"({aw['case_n'] / 1000:.2f} kN), the legs pegged, a bracket's share on its inner bolt with prying "
+                           f"{aw['canopy_lever_mm']:.0f} over {aw['bolt_pitch_mm']:.0f} mm"))]
         for r in rows:
             r["util"] = r["n"] / (cr["insert_factor"] * r["rated_n"])
         return rows
+
+    def awning(self) -> dict:
+        """The Fiamma F80s on the roof's kerb edge (data/body/body.yaml `awning`): its bracket bolts in travel (INS-02) and
+        with the canopy open in wind (INS-03), and where its legs put the lead bar (BDY-23)."""
+        a, V = self.d["awning"], self.V
+        b = self.lay.find(a["line"])
+        m = b.mass_kg
+        nb = a["brackets"]
+        travel = 3 * m * G / nb * max(1.0, a["cog_lever_mm"] / a["bolt_pitch_mm"])
+        v = a["check_kmh"] / 3.6
+        q = 0.6 * v ** 2
+        case_n = 0.5 * q * a["cpn"] * a["canopy_m2"]
+        open_n = case_n / nb * max(1.0, a["canopy_lever_mm"] / a["bolt_pitch_mm"])
+        z_case = b.box[2] + a["canopy_drop_mm"]                 # where the canopy leaves the case
+        z_bar_max = a["leg_max_mm"] + a["leg_head_mm"]          # the lead bar on fully extended legs, level ground
+        pitch_full = math.degrees(math.asin(max(0.0, z_case - z_bar_max) / a["extension_mm"]))
+        z_bar = z_case - a["extension_mm"] * math.sin(math.radians(a["pitch_deg"]))
+        leg = z_bar - a["leg_head_mm"]
+        return dict(a, kg=m, travel_n=travel, q_pa=q, case_n=case_n, open_n=open_n, z_case=z_case, z_bar_max=z_bar_max,
+                    pitch_full_deg=pitch_full, z_bar=z_bar, leg_mm=leg, reach_mm=a["leg_max_mm"] - leg)
+
+    def cold_bridge(self) -> dict:
+        """BDY-22: steady two-dimensional conduction through the side wall at one of its members on the inner skin, on the
+        design cold night (data/body/body.yaml `thermal`). Half the strip, from the member's centreline (symmetry) to
+        `strip_mm` (adiabatic), on a square grid. Returns the coldest inside surface over the member, the member's own
+        temperature (the HappiJac rails screwed to it run at about the same), the plain wall's surface and the extra heat
+        loss per metre of member, both ways from its centreline."""
+        th, wl = self.d["thermal"], self.p["wall"]
+        st = wl.d["stiffener"]
+        with_member = _wall_section(th, wl.t1, wl.c, wl.t2, st)
+        plain = _wall_section(th, wl.t1, wl.c, wl.t2, None)
+        dT = th["t_in"] - th["t_out"]
+        psi = 2 * (with_member["q_w_m"] - plain["q_w_m"]) / dT
+        length_m = sum(b.mass_kg for b in self.lay.blocks if b.id in th["members"]) / st["kg_m"]
+        need = th["dew_point"] + th["margin_k"]
+        return dict(tsi_min=with_member["tsi_min"], t_member=with_member["t_member"], tsi_plain=plain["tsi_min"], need=need,
+                    psi=psi, length_m=length_m, w_k=psi * length_m, members=th["members"], member=st["name"], brk=st["break"],
+                    t_out=th["t_out"], t_in=th["t_in"], dew=th["dew_point"], bare=th["bare_panels_w_k"], bridges=th["bridges_w_k"])
 
     def cradle(self) -> dict:
         """The split's outdoor unit and its cradle on the rear wall (BDY-21): the stays carry the vertical load to the
@@ -491,6 +593,7 @@ class Body:
     def results(self) -> dict:
         panels = self.panel_checks()
         return dict(panels=panels, deflections=self.deflections(), roof=self.roof(), inserts=self.inserts(), cradle=self.cradle(),
+                    thermal=self.cold_bridge(), awning=self.awning(),
                     openings=self.openings(), openings_check=self.openings_check(),
                     twist=self.tw, gj=self.box_gj(True),
                     joints=self.joints(), end_wall=self.end_wall(), mounts=self.mounts(),
@@ -527,6 +630,25 @@ def check_row(c, res: dict) -> dict:
                             f"shear against half of {r['shear_rated_n'] / 1000:.0f} kN ({u['bolt_shear']:.2f}). Each stay, {r['stays']['name']}, "
                             f"{r['stay_n'] / 1000:.2f} kN at 3 g against {r['stay_pcr_n'] / 1000:.1f} kN to buckle over {r['stays']['L']:,.0f} mm "
                             f"({u['stay_buckling']:.2f} with a factor of {r['stays']['buckling_factor']:g})"))
+    if c.type == "body_thermal":
+        t = res["thermal"]
+        m = t["tsi_min"] - t["need"]
+        return dict(limit=f">= {t['need']:.0f} C, the dew point {t['dew']:.0f} C plus 4 K", measured=round(t["tsi_min"], 1), unit="C",
+                    margin=round(m, 1), ok=m >= -1e-6, governing=f"inside surface over a member, {t['t_out']:.0f} C outside, {t['t_in']:.0f} C inside",
+                    detail=(f"{t['member']} with {t['brk']:g} mm of XPS behind it ({', '.join(t['members'])}, {t['length_m']:.1f} m in all). "
+                            f"On the design cold night the inside surface over it is {t['tsi_min']:.1f} C, the member and the rails screwed to it "
+                            f"{t['t_member']:.1f} C, against {t['need']:.0f} C, and the plain wall {t['tsi_plain']:.1f} C. Each metre of member adds "
+                            f"{t['psi']:.3f} W/K, {t['w_k']:.2f} W/K in all, {100 * t['w_k'] / t['bare']:.1f} % of the bare panels' {t['bare']:g} W/K "
+                            f"beside report 19's {t['bridges']:g} W/K for the joiners, mount bolts and inserts"))
+    if c.type == "body_awning":
+        a = res["awning"]
+        return dict(limit="reported", measured=round(a["reach_mm"], 0), unit="mm", margin=None, ok=a["reach_mm"] >= 0,
+                    governing=f"the legs at a {a['pitch_deg']:g} degree pitch on level ground",
+                    detail=(f"the canopy leaves the case at Z {a['z_case']:,.0f} and runs out {a['extension_mm']:,.0f} mm. With the legs at full reach, "
+                            f"{a['leg_max_mm']:,.0f} mm (est.), the lead bar stands at Z {a['z_bar_max']:,.0f} and the canopy falls "
+                            f"{a['pitch_full_deg']:.1f} degrees. Set for {a['pitch_deg']:g} degrees, the lead bar stands at Z {a['z_bar']:,.0f} on legs "
+                            f"of {a['leg_mm']:,.0f} mm, which keep {a['reach_mm']:,.0f} mm of reach for ground that falls away. Where it falls further, "
+                            f"the legs at full reach give a steeper pitch"))
     if c.type == "body_roof":
         r = res["roof"]
         return dict(limit="<= 1.00 utilisation", measured=round(r["util"], 3), unit="", margin=round(1 - r["util"], 3), ok=r["util"] <= 1.0,
