@@ -92,6 +92,9 @@ def ct201(prj, model, bom, checks, reg, dwg):
         sh.line(ox + V["end_wall_t"] / k, oy + z / k, ox + V["bed_u1"] / k, oy + z / k, "phantom")
         sh.text(ox + V["end_wall_t"] / k + 0.6, oy + z / k + 0.7, t, 1.25)
     # the side-wall stiffener in the living-zone bay (BD-18, BDY-10) and the H12 radius at the roof's front edge
+    us = lay.find("BD-20").cog[0] - V["body_x0"]                                     # the door's front jamb member (F4-04)
+    sh.line(ox + us / k, oy, ox + us / k, oy + H / k, "phantom")
+    sh.text(ox + us / k + 0.8, oy + H / k - 6.0, "BD-20", 1.3)
     for yy, flip, iid in ((oy, False, "BD-19"), (166.0, True, "BD-18")):   # the door's rear jamb member, the road wall's stiffener
         us = lay.find(iid).cog[0] - V["body_x0"]
         xs = ox + ((L - us) if flip else us) / k
@@ -255,26 +258,34 @@ def ct202(prj, model, bom, checks, reg, dwg):
     ins = next(i for i in res["inserts"] if i["id"] == "INS-01")
     for i, t in enumerate((f"HARDPOINT {_member(b)} 6060-T5 ON THE INNER SKIN, FULL WALL HEIGHT, BONDED INTO A {dd:g} mm CHANNEL IN THE XPS",
                            f"AS THE PANEL IS MADE. {st['break']:g} mm OF XPS STAYS BEHIND IT, SO NO METAL CROSSES THE CORE (LB-06, BDY-22)",
-                           f"HAPPIJAC C-CHANNEL RAIL ON THE INNER SKIN, 1/4 in SELF-TAPPING SCREWS THROUGH IT INTO THE MEMBER'S {tt:g} mm WALL",
+                           f"HAPPIJAC C-CHANNEL RAIL ON THE INNER SKIN, 1/4 in SELF-DRILLING SCREWS {b.d['loads']['rail_screw_mm']:g} mm UNDER THE HEAD INTO THE MEMBER'S {tt:g} mm WALL:",
+                           f"THE POINT STOPS IN ITS {dd - 2 * tt:g} mm HOLLOW. A SCREW OVER {b.rail_screw()['back_mm']:.0f} mm WOULD REACH THE BACK WALL, OVER {b.rail_screw()['skin_mm']:.0f} mm THE OUTER SKIN",
                            f"{ins['n']:.0f} N PER SCREW, {ins['case'].upper().replace(' KG', ' kg')}, {ins['util']:.2f} OF HALF ITS RATED SHEAR (BDY-11)",
                            "FOUR RAILS, TWO ON EACH SIDE WALL, 1,067 mm APART ALONG THE TRAILER (CT-203)")):
         sh.text(122, 99 - 3 * i, t, 1.4)
-    # ---- F: a wall member's foot at the floor joiner, section, 1:2 (BDY-22, F3-05)
-    gap, padw = st["end_gap_mm"], st["foot_pad_mm"]
+    # ---- F: a wall member's foot at the floor joiner, section, 1:2 (BDY-22, F4-01)
+    jn, fe = b.d["joiners"], b.member_ends()["foot"]
+    leg, at, clr, cov = fe["leg_mm"], fe["at_mm"], fe["clear_mm"], jn["cover"]["t_mm"]
     xo, yj = 190.0, 118.0
-    xi = xo + 35 / k
+    xi, yb = xo + 35 / k, yj + 1.0                                                  # the wall's inner face and bottom edge
     _dt(sh, 201.0, 186.0, "F: MEMBER FOOT", k)
-    _sandwich(sh, xo, yj + 1.0, xi, 172.0, 1.5, k, vertical=True)                   # the wall, section, outer face on the left
-    sh.path([(xo - 1.0, yj + 14.0), (xo - 1.0, yj), (xi + 1.0, yj), (xi + 1.0, yj + 14.0)], "thick")   # the floor joiner round the foot
+    _sandwich(sh, xo, yb, xi, 172.0, 1.5, k, vertical=True)                         # the wall, section, outer face on the left
+    sh.path([(xo - 1.0, yb + jn["floor"]["outer_leg_mm"] / k), (xo - 1.0, yj), (xi + 1.0, yj), (xi + 1.0, yb + leg / k),
+             (xi + 1.0 + 26 / k, yb + leg / k)], "thick")                         # the floor joiner: outer leg, base, inner leg and flange
+    sh.rect(xi + 1.0, yb + leg / k, xi + 1.0 + 26 / k, yb + (leg + cov) / k, "medium")   # the foam cover over the flange
     mx0, mx1 = xi - (1.5 + dd) / k, xi - 1.5 / k
-    sh.rect(mx0, yj + 1.0 + gap / k, mx1, 172.0, "shade")                         # the member, its foot 10 mm off the joiner
-    sh.rect(mx0 + tt / k, yj + 1.0 + gap / k + tt / k, mx1 - tt / k, 172.0, "white")
-    sh.rect(mx0, yj + 1.0, mx1, yj + 1.0 + gap / k, "medium")                     # the rigid PVC pad
-    sh.text(xi + 2.0, yj + 0.6, "FLOOR JOINER", 1.2)
-    sh.text(xi + 2.0, yj + 3.6, f"{gap:g} mm PVC PAD", 1.2)
-    for i, t in enumerate((f"{_member(b)}", "ON THE INNER SKIN,", f"{st['break']:g} mm OF XPS BEHIND IT.", f"IT STOPS {gap:g} mm SHORT OF",
-                           f"THE JOINER ON A {padw:g} mm WIDE", "RIGID PVC PAD, XPS IN THE", "REST OF THE GAP. AT ITS HEAD,",
-                           f"{gap:g} mm OF XPS (BDY-22)")):
+    sh.rect(mx0, yb + at / k, mx1, 172.0, "shade")                                 # the member, its foot clear of the inner leg
+    sh.rect(mx0 + tt / k, yb + at / k + tt / k, mx1 - tt / k, 172.0, "white")
+    sh.rect(mx0, yb, mx1, yb + at / k, "medium")                                   # the bearing block under it
+    sh.line(mx0, yb, mx1, yb + at / k, "thin")
+    sh.line(mx0, yb + at / k, mx1, yb, "thin")
+    S.vdim(sh, xi + 1.0, yb + leg / k, xi + 1.0, yb + at / k, xi + 9.0, f"{clr:g}", size=1.2)
+    sh.text(xi + 2.0, yj - 2.6, "FLOOR JOINER", 1.2)
+    sh.text(xi + 2.0, yb + (leg + cov) / k + 0.8, f"{cov:g} mm FOAM", 1.2)
+    for i, t in enumerate((f"{_member(b)}", "ON THE INNER SKIN,", f"{st['break']:g} mm OF XPS BEHIND IT,",
+                           "ON A RIGID PVC BEARING", f"BLOCK {st['block_mm']:g} mm WIDE THAT CARRIES",
+                           "THE BED'S LOAD TO THE JOINER.", f"ITS FOOT IS {at:g} mm UP, {clr:g} mm", f"CLEAR OF THE JOINER'S {leg:g} mm",
+                           "INNER LEG AND FLANGE. ITS", f"HEAD STOPS {st['end_gap_mm']:g} mm UNDER", "THE TOP INSERT STRIP (BDY-22)")):
         sh.text(187.0, 169.0 - 2.4 * i, t, 1.2, "end")
     # ---- E: insert with crush tube at a body mount, 1:2 (the bolt detail is on CT-301)
     k, cx, top = 2.0, 200.0, 278.0
@@ -360,9 +371,10 @@ def ct203(prj, model, bom, checks, reg, dwg):
         if wall == "kerb":
             sh.rect(ox + (L - (c - V["body_x0"])) / k, oy2 + (lk[5] - fz - 60) / k, ox + (L - (a - V["body_x0"])) / k, oy2 + (lk[5] - fz - 25) / k, "fill")
     sh.text(ox + (L - (lk[3] - V["body_x0"])) / k, oy2 + (lk[2] - fz) / k - 2.6, "LOCKERS' INSERT STRIP", 1.3)
-    us = lay.find("BD-19").cog[0] - V["body_x0"]
-    sh.line(ox + (L - us) / k, oy2, ox + (L - us) / k, oy2 + H / k, "phantom")
-    sh.text(ox + (L - us) / k + 0.8, oy2 + 3.0, "JAMB MEMBER BD-19", 1.3)
+    for iid, dy_t in (("BD-19", 3.0), ("BD-20", 7.0)):   # the entry door's jamb members
+        us = lay.find(iid).cog[0] - V["body_x0"]
+        sh.line(ox + (L - us) / k, oy2, ox + (L - us) / k, oy2 + H / k, "phantom")
+        sh.text(ox + (L - us) / k + 0.8, oy2 + dy_t, f"JAMB MEMBER {iid}", 1.3)
     sh.rect(ox, oy2 + (H - 25) / k, ox + L / k, oy2 + H / k, "fill")
     sh.text(ox + 1, oy2 + H / k - 3, "TOP INSERT STRIP: ROOF JOINER", 1.4)
     rows = []
@@ -381,10 +393,11 @@ def ct203(prj, model, bom, checks, reg, dwg):
     S.notes(sh, 22, 76, [
         "LEGEND: CROSS, BODY MOUNT (CT-301). THIN OUTLINE, A FURNITURE FOOTPRINT WITH ITS FLOOR INSERTS. PHANTOM, RAILS AND CHASSIS STATIONS.",
         "EVERY FIXING PASSES THROUGH AN INSERT STRIP AND, THROUGH THE FLOOR, A CRUSH TUBE. NO FIXING INTO BARE FOAM.",
-        "THE LIFT BED'S FOUR HARDPOINTS, THE LOCKERS' AND THE TOWER'S INSERT STRIPS AND THE STIFFENERS ARE LAID UP IN THE PANELS. THE PLINTH "
+        "THE LIFT BED'S FOUR HARDPOINTS, THE LOCKERS', THE BENCH'S AND THE TOWER'S INSERT STRIPS AND THE OTHER WALL MEMBERS ARE LAID UP IN THE PANELS. THE PLINTH "
         "AND THE TOWER ALSO BOLT THROUGH THE FLOOR TO THE CHASSIS (HARD POINTS, CT-104). THE SPLIT'S CRADLE (AC-03) BOLTS TO THE REAR WALL'S INSERT STRIP WITH "
-        f"{b.d['cradle']['bolts']} M8 AND STANDS ON {b.d['cradle']['stays']['n']} STAYS TO THE REAR CROSSMEMBER (AC-04). THE WALL MEMBERS STOP "
-        f"{b.d['panels']['wall']['stiffener']['end_gap_mm']:g} mm SHORT OF THE FLOOR AND ROOF JOINERS, ON A RIGID PVC PAD AT THE FOOT (CT-202 DETAIL F).",
+        f"{b.d['cradle']['bolts']} M8 AND STANDS ON {b.d['cradle']['stays']['n']} STAYS TO THE REAR CROSSMEMBER (AC-04). THE WALL MEMBERS STAND ON "
+        f"RIGID PVC BEARING BLOCKS {b.d['panels']['wall']['stiffener']['foot_clear_mm']:g} mm CLEAR OF THE FLOOR JOINER'S INNER LEG AND STOP "
+        f"{b.d['panels']['wall']['stiffener']['end_gap_mm']:g} mm UNDER THE TOP INSERT STRIP (CT-202 DETAIL F).",
         "PULL-TEST A SAMPLE OF EACH INSERT IN THE REAL PANEL BEFORE THE PANELS ARE ORDERED (report 02 LR-09).",
     ], width_chars=118, size=1.6)
     _stamp(sh, 320, 96)

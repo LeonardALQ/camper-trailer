@@ -66,7 +66,7 @@ def tow_vehicle(prj: Project) -> dict:
     return dict(name=tv["name"], limits=lim, limit_src=src, gcm_case=tv["gcm_case"], case_name=case["name"],
                 ute_kg=case["nominal"]["mass_kg"], ute_kg_growth=case["growth"]["mass_kg"], sweep=rep["bike_box_sweep"],
                 rear_kg_growth=rear0, rear_kg_nominal=case["nominal"]["rear_kg"], elite_rear_kg=elite, rear_per_ball=per_ball,
-                design_ball_kg=tow["growth"]["towball_kg"], tow_case=tow["id"],
+                design_ball_kg=tow["growth"]["towball_kg"], tow_case=tow["id"], box_kg=rep["garage"]["box_kg"],
                 ute_checks=[dict(id=c["id"], title=c["title"], status=c["status"], detail=c["detail"], measured=c.get("measured"))
                             for c in rep["checks"]])
 
@@ -871,26 +871,27 @@ class Trailer:
                 sil = side_silhouette(lay, st["overturn"]["cell_mm"])
                 ids = [x["id"] for x in cases] if c.cases == "all" else c.cases
                 rs = [overturn(lay, by_id[i], st, sil, wd["Mzcat"]) for i in ids]
-                w, hv = min(rs, key=lambda q: q["v"]), max(rs, key=lambda q: q["v"])
+                w, hv = min(rs, key=lambda q: q["v_low"]), max(rs, key=lambda q: q["v"])
                 o = st["overturn"]
-                act = min(w["act_kmh"], o["warning_kmh"])
-                slide_f = (min(q["v_slide"] for q in rs) / (act / 3.6 * wd["Mzcat"])) ** 2
-                row.update(limit="reported", measured=round(w["v"], 1), unit="m/s", margin=None, ok=True,
-                           governing=f"{w['case']} {by_id[w['case']]['name']}, no growth",
-                           detail=(f"side silhouette {sil['area_m2']:.1f} m2, its centroid {sil['z_mm']:,.0f} mm up, Cf {o['cf']:g}. "
-                                   + ". ".join(f"{q['case']} at {q['mass_kg']:,.0f} kg tips at {q['v']:.1f} m/s at the trailer, a "
-                                               f"{q['forecast_kmh']:.0f} km/h forecast gust" for q in rs)
-                                   + f". With a box's Cf of {o['cf_box']:g} the heaviest would tip at {hv['v_box']:.1f} m/s. "
-                                   + ". ".join(f"{q['case']} slides at {q['v_slide']:.1f} m/s on wet grass (friction {o['friction']:g}, est.), a "
-                                               f"{q['slide_forecast_kmh']:.0f} km/h forecast gust" for q in rs)
-                                   + f". The operating rule acts at the overturning moment over {o['moment_factor']:g}, forecast gusts of "
-                                   f"{w['act_kmh']:.0f} km/h, or at a Bureau warning of damaging winds ({o['warning_kmh']:.0f} km/h gusts), so at "
-                                   f"{act:.0f} km/h, where the lightest case's sliding force has a factor of {slide_f:.2f}. Strapped down it holds to "
-                                   f"region B's 500-year gust (STB-05). The walls' strength wind, {wd['V_u']:g} m/s, covers the highest overturning "
-                                   f"speed, {max(hv['v'], hv['v_box']):.1f} m/s with a box's Cf (H23)"),
-                           overturn=dict(cases=rs, silhouette=sil, act_kmh=act, rule_kmh=w["act_kmh"], warning_kmh=o["warning_kmh"],
-                                         v_u=wd["V_u"], cf=o["cf"], cf_box=o["cf_box"], factor=o["moment_factor"], friction=o["friction"],
-                                         slide_factor=slide_f))
+                act = min(q["act_kmh"] for q in rs)
+                v_act = act / 3.6 * wd["Mzcat"]
+                f_slide, f_tip = (w["v_slide"] / v_act) ** 2, (w["v"] / v_act) ** 2
+                how = "slides" if w["v_slide"] <= w["v"] else "tips"
+                row.update(limit="reported", measured=round(w["v_low"], 1), unit="m/s", margin=None, ok=True,
+                           governing=f"{w['case']} {by_id[w['case']]['name']}, no growth, {how} first",
+                           detail=(f"side silhouette {sil['area_m2']:.1f} m2, its centroid {sil['z_mm']:,.0f} mm up, Cf {o['cf']:g} for both. "
+                                   + ". ".join(f"{q['case']} at {q['mass_kg']:,.0f} kg slides at {q['v_slide']:.1f} m/s at the trailer on wet grass "
+                                               f"(friction {o['friction']:g}, est.), a {q['slide_forecast_kmh']:.0f} km/h forecast gust, and tips at "
+                                               f"{q['v']:.1f} m/s, a {q['forecast_kmh']:.0f} km/h forecast gust" for q in rs)
+                                   + f". With a box's Cf of {o['cf_box']:g} the heaviest would tip at {hv['v_box']:.1f} m/s. The operating rule acts "
+                                   f"at forecast gusts of {act:.0f} km/h, the lower speed over the square root of {o['moment_factor']:g}, rounded down to "
+                                   f"5 km/h, so in the lightest case the wind's force has a factor of {f_slide:.2f} against sliding and {f_tip:.2f} "
+                                   f"against tipping. The Bureau warns of damaging winds from {o['warning_kmh']:.0f} km/h gusts, so a warning always "
+                                   f"meets the rule. Strapped down it holds to region B's 500-year gust (STB-05). The walls' strength wind, "
+                                   f"{wd['V_u']:g} m/s, covers the highest overturning speed, {max(hv['v'], hv['v_box']):.1f} m/s with a box's Cf (H23)"),
+                           overturn=dict(cases=rs, silhouette=sil, act_kmh=act, warning_kmh=o["warning_kmh"], v_low=w["v_low"], low_case=w["case"],
+                                         how=how, v_u=wd["V_u"], cf=o["cf"], cf_box=o["cf_box"], factor=o["moment_factor"], friction=o["friction"],
+                                         slide_factor=f_slide, tip_factor=f_tip))
             elif c.type == "tie_down":
                 from .body import load_data
                 st, wd = self.td["stability"], load_data()["wind"]
@@ -907,9 +908,11 @@ class Trailer:
                                    + ". ".join(f"{q['case']} at {q['mass_kg']:,.0f} kg: each windward strap {q['t_tip_n'] / 1000:.1f} kN against tipping "
                                                f"and {q['t_slide_n'] / 1000:.1f} kN against sliding on wet grass (friction {o['friction']:g}, est.)" for q in rs)
                                    + f". At {w['t_n'] / 1000:.1f} kN the strap works at {w['utils']['strap']:.2f} of its {td['strap_lc_n'] / 1000:.1f} kN "
-                                   f"lashing capacity, the D-ring at {w['utils']['lug']:.2f} of its {td['lug_wll_n'] / 1000:.1f} kN working load limit, the "
-                                   f"anchor at {w['utils']['anchor']:.2f} of {td['anchor_n'] / 1000:.0f} kN in firm soil (est.), and the outrigger at "
-                                   f"{w['outrigger_mpa']:.0f} MPa, {w['utils']['outrigger']:.2f} of its yield over 1.5"),
+                                   f"lashing capacity, the D-ring at {w['utils']['lug']:.2f} of its {td['lug_wll_n'] / 1000:.1f} kN working load limit and "
+                                   f"the outrigger at {w['outrigger_mpa']:.0f} MPa, {w['utils']['outrigger']:.2f} of its yield over 1.5. Each strap goes to an "
+                                   "anchor set in line with it, chosen for the soil. "
+                                   + ". ".join(_anchor_txt(a) for a in w["anchors"])
+                                   + ". In loose sand, HUD class 5, no anchor is rated: hitch the trailer or move it"),
                            tie_down=dict(cases=rs, v=w["v"]))
             elif c.type == "towball_scale":
                 m = self.inputs.v("UTE-03")
@@ -1103,10 +1106,21 @@ def overturn(lay: Layout, ev: dict, st: dict, sil: dict, mzcat: float, basis: st
         out[key] = math.sqrt(q / 0.6)
     out["v_slide"] = math.sqrt(o["friction"] * W / (0.6 * o["cf"] * sil["area_m2"]))   # the push passes the friction on wet grass
     out["slide_forecast_kmh"] = out["v_slide"] / mzcat * 3.6
-    out["v_act"] = out["v"] / math.sqrt(o["moment_factor"])
     out["forecast_kmh"] = out["v"] / mzcat * 3.6
+    # the rule (H23, F4-06): the lower of the two speeds with the same Cf, over the square root of the factor on force
+    out["v_low"] = min(out["v"], out["v_slide"])
+    out["v_act"] = out["v_low"] / math.sqrt(o["moment_factor"])
     out["act_kmh"] = 5 * math.floor(out["v_act"] / mzcat * 3.6 / 5)
     return out
+
+
+def _anchor_txt(a: dict) -> str:
+    """STB-05's sentence for one soil's anchors: the product, its spec in brackets, and its working and failure loads."""
+    one = a["per_strap"] == 1
+    name, _, spec = a["name"].partition(", ")
+    return (f"In {a['soil']}, {'a' if one else str(a['per_strap'])} {name}{f' ({spec})' if spec else ''}{' works' if one else ' side by side work'} "
+            f"at {a['util']:.2f} of {'its' if one else 'their'} {a['per_strap'] * a['wll_n'] / 1000:.1f} kN working load, a factor of "
+            f"{a['factor']:.2f} on {'its' if one else 'their'} {a['per_strap'] * a['ultimate_n'] / 1000:.1f} kN failure load")
 
 
 def tie_down(lay: Layout, ot: dict, st: dict, sil: dict, mzcat: float) -> dict:
@@ -1125,9 +1139,11 @@ def tie_down(lay: Layout, ot: dict, st: dict, sil: dict, mzcat: float) -> dict:
     t_slide = max(0.0, (F - o["friction"] * W) / (2 * (o["friction"] * sa + ca)))
     t = max(t_tip, t_slide)
     s_out = t * sa * td["outrigger_l_mm"] / td["outrigger_z_mm3"]
-    utils = dict(strap=t / td["strap_lc_n"], lug=t / td["lug_wll_n"], anchor=t / td["anchor_n"], outrigger=s_out / (td["outrigger_fy"] / 1.5))
+    utils = dict(strap=t / td["strap_lc_n"], lug=t / td["lug_wll_n"], outrigger=s_out / (td["outrigger_fy"] / 1.5))
+    anchors = [dict(a, util=t / (a["per_strap"] * a["wll_n"]), factor=a["per_strap"] * a["ultimate_n"] / t) for a in td["anchors"]]
+    utils["anchor"] = max(a["util"] for a in anchors)
     gov = max(utils, key=utils.get)
-    return dict(case=ot["case"], mass_kg=ot["mass_kg"], v=v, push_n=F, t_tip_n=t_tip, t_slide_n=t_slide, t_n=t,
+    return dict(case=ot["case"], mass_kg=ot["mass_kg"], v=v, push_n=F, t_tip_n=t_tip, t_slide_n=t_slide, t_n=t, anchors=anchors,
                 governs="sliding" if t_slide >= t_tip else "tipping", outrigger_mpa=s_out, utils=utils, governing=gov, util=utils[gov])
 
 
@@ -1274,6 +1290,11 @@ def measurement_refs(tr: Trailer, ev: dict) -> dict:
         # the fully loaded weighing (TW-04, TW-05) and the tare centre of gravity height (TR-01), without growth
         model_TC2=cases["TC2"]["nominal"]["mass_kg"], axle_TC2=cases["TC2"]["nominal"]["axle_kg"],
         cog_z_TC1=cases["TC1"]["nominal"]["cog"][2],
+        # the car build's and the bike box's design values on the measurement sheet, from the ute's model (F4-06)
+        ute_rear_towing=ute["UTE-03"]["measured"], ute_front_bikes=ute["UTE-02"]["measured"],
+        ute_front_share_towing=ute["UTE-07"]["measured"], ute_gvm_towing=ute["UTE-01"]["measured"],
+        combination=tr.tv["ute_kg_growth"] + cases["TC2"]["growth"]["mass_kg"],
+        box_kg=tr.tv["box_kg"],
     )
     for iid, st in weighbridge(tr, lay).items():
         refs[f"model_{iid}"] = st["model_kg"]

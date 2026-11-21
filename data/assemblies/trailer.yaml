@@ -219,12 +219,15 @@ stability:
                              # trailer's proportions (clear height ratio s/h about 0.7, length ratio B/s about 2), est. A thin
                              # sign carries more force than a box of the same face, so this is the high side
     cf_box: 1.05             # a cube's drag coefficient, for the low side (est.)
-    moment_factor: 1.5       # the operating rule acts at the overturning moment over 1.5 (est.)
+    moment_factor: 1.5       # the operating rule keeps a factor of at least 1.5 on the wind's force against both tipping and sliding
     warning_kmh: 90          # the Bureau of Meteorology warns of damaging winds at gusts of 90 km/h or more
     cell_mm: 10
     friction: 0.35           # tyres and steadies on wet grass (est.), for sliding (F3-03)
-    # STB-05 (F3-03): four lashing points under the outrigger ends (CH-B02) take ratchet straps down and out at 45 degrees to
-    # screw-in ground anchors. The windward pair holds the trailer against tipping and, with the friction, sliding
+    # STB-05 (F3-03, F4-03): four lashing points under the outrigger ends (CH-B02) take ratchet straps down and out at 45
+    # degrees to ground anchors set in line with the straps. The windward pair holds the trailer against tipping and, with
+    # the friction, sliding. The kit carries anchors for two soils, each with a published working load (HUD 24 CFR 3280.306:
+    # 3,150 lb, with a 50 % overload to failure, in the soil class it is tested for). In loose sand, HUD class 5, no
+    # anchor is rated, so the trailer is hitched or moved
     tie_down:
       v_r_ms: 57             # region B's 500-year regional wind (AS/NZS 1170.2 Table 3.1), times Mz,cat 0.91 at 3 m
       angle_deg: 45
@@ -232,11 +235,14 @@ stability:
       lug_z_mm: 717
       strap_lc_n: 24500      # 50 mm ratchet strap, lashing capacity 2,500 kg (AS/NZS 4380, est.)
       lug_wll_n: 17800       # forged 1/2 in weld-on D-ring, working load limit 4,000 lb
-      anchor_n: 15000        # 760 mm screw-in auger anchor in firm soil (est.), pull-tested on site
       outrigger_z_mm3: 37317 # RHS 127 x 51 x 3.5 about its strong axis
       outrigger_l_mm: 532    # from the raiser's face to the lashing point
       outrigger_fy: 350
-      kit_kg: 12             # four straps and four anchors, in the bike box's tool chest (U-TIEDOWN, est.)
+      anchors:
+        - {soil: "firm soil, HUD class 4A (medium dense sands and sandy gravels, very stiff to hard silts and clays)", name: "Tie Down Engineering 59086, 3/4 in rod, 48 in, two 4 in helixes",
+           per_strap: 1, wll_n: 14012, ultimate_n: 21018, kg: 3.2, src: "https://mobilehomeoutfitters.com/building-materials/iron-root-double-head-double-helix-manufactured-home-earth-anchors/"}
+        - {soil: "sand, HUD class 4B (loose to medium dense sands, firm to stiff clays and silts)", name: "Tie Down Engineering 59099, 3/4 in rod, 60 in, 7 in helix",
+           per_strap: 1, wll_n: 14012, ultimate_n: 21018, kg: 4.0, src: "https://www.tiedown.com/manufactured-housing/earth-anchors/pid401/iron-root-double-head-manufactured-home-earth-anchors-c-model-m607-with-3-4-in-rod-60-in-long-7-in-helix-class-4b/"}
     src:
       cf: "https://www.mecaenterprises.com/wind-loads-on-freestanding-walls/"
       lug: "https://www.amazon.com/gp/product/B0B53NL2MB"
@@ -363,11 +369,13 @@ items:
     price:
       - {item: "Side wall panel, 8.84 m2 each at AUD 225/m2", aud_each: 1989.00, basis: estimate, url: "https://www.diycaravans.com.au/shop/composite-panel-wall-b-xps-core-29mm-m2/", date: 2026-11-21, note: "Panel B at AUD 216.88/m2 (listing) plus about 4 % for the thicker core, priced on the whole 4,420 x 2,000 mm sheet"}
       - {item: "High-density PVC inserts 70 x 25 mm at the fixing lines, door and window surrounds and the mounts, 30 m for both walls and the end walls", aud: 910.80, basis: rate, url: "https://www.diycaravans.com.au/shop/panel-insertion-hi-density-pvc-70-x-25-mm/", date: 2026-11-20}
+      - {item: "Divinycell H200 side inserts at W1's and W2's sides, 27 to 28 mm wide and 32 mm deep, bonded into the hardpoints' channels, about 0.06 m2 of sheet (F4-02)", aud: 60, basis: estimate, date: 2026-11-21}
     for: {s: [1, -1]}
     box: [body_x0, s * (half_bw - wall_t / 2) - wall_t / 2, floor_z, body_length, wall_t, interior_h]
     parts:
       - {item: "8.84 m2 less the wall's openings at 6.0 kg/m2: road side less 0.94 m2 (W2, W4, W6, the RESPA intake, hood cowl, Combi cowl and e2 fan B), kerb side less 1.79 m2 (W1, entry door, e2 fan A, cassette door)", kg: "47.4 * (1 + s) / 2 + 42.3 * (1 - s) / 2", basis: calculated, source: "Report 12 section 10, TRAILER.md"}
-      - {item: "Insert strips. The four lift-bed hardpoints are in LB-06 and the other wall members in BD-18 and BD-19", kg: 3.0, basis: estimate}
+      - {item: "Insert strips. The four lift-bed hardpoints are in LB-06 and the other wall members in BD-18, BD-19 and BD-20", kg: 3.0, basis: estimate}
+      - {item: "Divinycell H200 side inserts at W2 (road) or W1 (kerb), 200 kg/m3 net of the XPS they replace", kg: "0.13 * (1 + s) / 2 + 0.18 * (1 - s) / 2", basis: calculated, source: "Two strips of 27 to 28 mm by 32 mm, 448 mm tall at W2 and 599 mm at W1 (data/body/body.yaml members_rule)"}
   - id: BD-04
     name: End walls, full height, the rear wall with the wet room door
     material: "Front: 2.0 mm outer and 1.5 mm inner Polydet GRP skins on 31.5 mm XPS. Rear: two 1.5 mm Polydet skins on 32 mm XPS"
@@ -413,22 +421,31 @@ items:
     note: H12 keeps a fixed roof. Report 25 puts towing fuel at 21.3 L/100 km at 90 km/h against 25.0 with the square front, for about AUD 3,500 (est.).
   - id: BD-18
     name: Road-side wall stiffener, RHS 110 x 19 x 3.5 aluminium on the inner skin, between the kitchen tower and the partition
-    material: "6060-T5 aluminium RHS 110 x 19 x 3.5, made to order, bonded into a 19 mm channel the panel maker routs in the XPS from the inner face, 13 mm of XPS behind it, 10 mm short of the floor and roof joiners on a rigid PVC pad"
+    material: "6060-T5 aluminium RHS 110 x 19 x 3.5, made to order, bonded into a 19 mm channel the panel maker routs in the XPS from the inner face, 13 mm of XPS behind it, on a rigid PVC bearing block 20 mm above the floor joiner's inner leg and 10 mm under the top insert strip"
     system: body
-    price: {aud: 3020, basis: estimate, date: 2026-11-21, note: "A made-to-order 6060-T5 die, about AUD 2,000, and its 100 kg minimum run at about AUD 10/kg, about 43 m, which covers all six wall members (11.9 m, 27.4 kg), and this member's routed channel, 2 m at about AUD 10/m (est.). InfraBuild stocks no 6060-T5 RHS under 25 mm deep this stiff: https://www.infrabuild.com/steel/products/aluminium/aluminium-rhs-rectangular-box-section/"}
+    price: {aud: 3020, basis: estimate, date: 2026-11-21, note: "A made-to-order 6060-T5 die, about AUD 2,000, and its 100 kg minimum run at about AUD 10/kg, about 43 m, which covers all seven wall members (13.6 m, 31.3 kg), and this member's routed channel, 2 m at about AUD 10/m (est.). InfraBuild stocks no 6060-T5 RHS under 25 mm deep this stiff: https://www.infrabuild.com/steel/products/aluminium/aluminium-rhs-rectangular-box-section/. Before the wall panels are ordered, get an extruder's quote for the die, its minimum run and its lead time, and ask for an existing die near 110 x 19 x 3.5 first"}
     for: {s: [1]}
     point: [body_x0 + 2530, s * (half_bw - wall_t / 2), floor_z + interior_h / 2]
-    mass: {basis: declared, unit_kg: 4.57, maturity: calculated, source: "1.98 m at 2.306 kg/m, 854 mm2 at 2.70 t/m3, with its 10 mm rigid PVC pad (calculated)"}
-    note: "With the lift-bed hardpoints (LB-06), the entry door's jamb members (BD-19), the tower's sides and the partition, no side-wall bay is wider than 1,067 mm (data/body/body.yaml, BDY-06, BDY-10). On the road side behind the kitchen tower, 145 mm clear of W4's insert strip and of the range hood's duct (FIT-07). The kerb side needs none: its bays are 955 mm and less. Bonded to the inner skin only, so no metal crosses the core and the inside surface over them stays above the cold night's dew point (BDY-22). They also take cabinetry screws"
+    mass: {basis: declared, unit_kg: 4.50, maturity: calculated, source: "1.941 m at 2.306 kg/m, 854 mm2 at 2.70 t/m3, with its 54 x 20 x 19 mm rigid PVC bearing block (calculated)"}
+    note: "With the lift-bed hardpoints (LB-06), the entry door's jamb members (BD-19, BD-20), the tower's sides and the partition, no side-wall bay is wider than 1,067 mm (data/body/body.yaml, BDY-06, BDY-10). On the road side behind the kitchen bench, 145 mm clear of W4's insert strip and of the range hood's duct, and the bench's insert strip stops 25 mm short of it (FIT-07). The kerb side needs none: the hardpoints and the jamb members keep its bays within 1,067 mm. Bonded to the inner skin only, so no metal crosses the core and the inside surface over them stays above the cold night's dew point (BDY-22). They also take cabinetry screws"
   - id: BD-19
     name: Entry door's rear jamb member, RHS 110 x 19 x 3.5 aluminium on the inner skin, floor joiner to roof joiner behind D1
-    material: "6060-T5 aluminium RHS 110 x 19 x 3.5, made to order, bonded into a 19 mm channel the panel maker routs in the XPS from the inner face, 13 mm of XPS behind it, 10 mm short of the floor and roof joiners on a rigid PVC pad"
+    material: "6060-T5 aluminium RHS 110 x 19 x 3.5, made to order, bonded into a 19 mm channel the panel maker routs in the XPS from the inner face, 13 mm of XPS behind it, on a rigid PVC bearing block 20 mm above the floor joiner's inner leg and 10 mm under the top insert strip"
     system: body
     price: {aud: 20, basis: estimate, date: 2026-11-21, note: "The routed channel, 2 m at about AUD 10/m (est.). The member is cut from the made-to-order run priced on BD-18"}
     for: {k: [1]}
     point: [lz_door_x + lz_door_w + 156, -half_bw + wall_t / 2, floor_z + interior_h / 2]
-    mass: {basis: declared, unit_kg: 4.57, maturity: calculated, source: "1.98 m at 2.306 kg/m, 854 mm2 at 2.70 t/m3, with its 10 mm rigid PVC pad (calculated)"}
-    note: "The door's cut-out breaks the wall's span. The bed's rear kerb-side hardpoint (LB-06) bounds the door's bay at its front, 276 mm off the door's edge with the fresh water fill G1 between, and this member at its rear, 155 mm off the door's edge, 30 mm clear of the 70 mm insert strip round the cut-out and of the outlet G3 (FIT-07). The bay between them is 1,056 mm, inside the 1,067 mm pitch (BDY-10). The door frame's screws go into the strip, and the door's aluminium frame, which crosses the wall, never touches a member (BDY-22)"
+    mass: {basis: declared, unit_kg: 4.50, maturity: calculated, source: "1.941 m at 2.306 kg/m, 854 mm2 at 2.70 t/m3, with its 54 x 20 x 19 mm rigid PVC bearing block (calculated)"}
+    note: "The door's cut-out breaks the wall's span. BD-20 bounds the door's bay at its front and this member at its rear, 155 mm off the door's edge, 30 mm clear of the 70 mm insert strip round the cut-out and of the outlet G3 (FIT-07). The bay between them is 930 mm, inside the 1,067 mm pitch (BDY-10), and BDY-24 checks the wall with the door cut out. The door frame's screws go into the strip, and the door's aluminium frame, which crosses the wall, never touches a member (BDY-22)"
+  - id: BD-20
+    name: Entry door's front jamb member, RHS 110 x 19 x 3.5 aluminium on the inner skin, between the bed's rear kerb-side hardpoint and D1
+    material: "6060-T5 aluminium RHS 110 x 19 x 3.5, made to order, bonded into a 19 mm channel the panel maker routs in the XPS from the inner face, 13 mm of XPS behind it, on a rigid PVC bearing block 20 mm above the floor joiner's inner leg and 10 mm under the top insert strip"
+    system: body
+    price: {aud: 20, basis: estimate, date: 2026-11-21, note: "The routed channel, 2 m at about AUD 10/m (est.). The member is cut from the made-to-order run priced on BD-18"}
+    for: {k: [1]}
+    point: [lz_door_x - 151.5, -half_bw + wall_t / 2, floor_z + interior_h / 2]
+    mass: {basis: declared, unit_kg: 4.50, maturity: calculated, source: "1.941 m at 2.306 kg/m, 854 mm2 at 2.70 t/m3, with its 54 x 20 x 19 mm rigid PVC bearing block (calculated)"}
+    note: "F4-04. W1's and D1's cut-outs leave the wall between them to one line, and the bed's rear kerb-side hardpoint at X 3,184 cannot hold it alone: as a plate the wall deflected 29 mm at the door's front edge in BDY-10's wind. This member stands 25 mm clear of the door's 70 mm insert strip and 16.5 mm behind the hardpoint, where the fresh water fill G1 was, and the two hold the line to BDY-24's limit. The door frame's front screws go into the strip"
   - id: BD-08
     name: Extrusions, adhesive, sealant and the body mount fixings
     material: "Aluminium extrusions, MS polymer adhesive and sealant, galvanised fixings (est.)"
@@ -440,11 +457,13 @@ items:
       - {item: "Structural MS polymer adhesive, FixTech Fix 190, 14 sausages of 600 ml", aud: 468.58, basis: listing, url: "https://www.diycaravans.com.au/shop/fix-msp-190-white-black-slow/", date: 2026-11-20}
       - {item: "MS polymer sealant, 10 cartridges of 290 ml", aud: 199.80, basis: listing, url: "https://www.diycaravans.com.au/shop/fix-msp-190-white-black-slow/", date: 2026-11-20}
       - {item: "32 body mounts: M12 8.8 bolts, sleeves, spreaders, crush tubes and Duralac at AUD 16 each", aud: 512.00, basis: estimate, date: 2026-11-20}
+      - {item: "15 mm closed-cell foam covers over the inside face of every joiner, floor, corner and roof, under the lining and the skirting, about 32 m (F4-01, BDY-22)", aud: 90, basis: estimate, date: 2026-11-21}
     point: [body_x0 + body_length / 2, 0, floor_z + interior_h / 2]
     parts:
       - {item: "Floor joiners 13.6 m at 1.4 kg/m, corner joiners 8.0 m at 2.0 kg/m, roof-to-wall joiner 13.6 m at 1.65 kg/m", kg: 57.4, basis: estimate, source: "Scaled from DIY Caravans' extrusion masses to 35 mm panels (report 12 section 10)"}
       - {item: "Adhesive and sealant, about 8.4 L of MS polymer at 1.5 kg/L", kg: 12.6, basis: estimate, source: "Research report 22 open point 3"}
       - {item: "32 M12 8.8 mount bolts and 100 x 100 x 3 aluminium spreaders", kg: 5.0, basis: estimate}
+      - {item: "Joiner covers, 15 mm closed-cell foam on the inside faces, about 1.8 m2 at 30 kg/m3", kg: 0.8, basis: estimate}
   - id: WN-01
     name: Window W1, Dometic S4 top-hinged 900 x 600, bed, kerb side, the second way out, blackout and fly screen rollers
     material: "Double acrylic, grey tint, polyurethane frame, ECE R43, aluminium-coated blackout roller blind"
@@ -731,12 +750,12 @@ items:
       - {item: "Pressure-sensitive safety edge round the platform's lower perimeter, with its relay in the down circuit", kg: 0.8, basis: estimate, source: "Report 21 section 1.2"}
   - id: LB-06
     name: Lift bed hardpoints, four RHS 110 x 19 x 3.5 aluminium members on the inner skin, full wall height, behind the rails
-    material: "6060-T5 aluminium RHS 110 x 19 x 3.5, made to order, bonded into a 19 mm channel the panel maker routs in the XPS from the inner face, 13 mm of XPS behind it, 10 mm short of the floor and roof joiners on a rigid PVC pad"
+    material: "6060-T5 aluminium RHS 110 x 19 x 3.5, made to order, bonded into a 19 mm channel the panel maker routs in the XPS from the inner face, 13 mm of XPS behind it, on a rigid PVC bearing block 20 mm above the floor joiner's inner leg and 10 mm under the top insert strip"
     system: bed
     price: {aud: 80, basis: estimate, date: 2026-11-21, note: "The routed channels, 8 m at about AUD 10/m (est.). The members are cut from the made-to-order run priced on BD-18"}
     point: [in_x0 + bed_rail_u + 533, 0, floor_z + 1000]
-    mass: {basis: declared, total_kg: 18.28, maturity: calculated, source: "4 x 1.98 m at 2.306 kg/m, 854 mm2 at 2.70 t/m3, with their rigid PVC pads (calculated). Report 21 section 1.4 had four 1.6 m lengths of RHS 40 x 20 x 3 laid flat, 5.6 kg"}
-    note: Laid into the wall cores as the panels are made, floor joiner to roof joiner and bonded to the inner skin, so the rail screws pass through the inner skin and bite 3.5 mm aluminium (Lippert's 3 mm backing rule), and each hardpoint also stiffens the wall against wind (BDY-10). The 13 mm of XPS behind each keeps the surface over it 4 K above the cold night's dew point, to its ends (BDY-22). The bed's rail pairs are 1,067 mm apart, the widest side-wall bay, and W1 and W2 sit between them 27 mm clear of the hardpoints (FIT-07). The rear kerb-side hardpoint also bounds the entry door's bay at its front.
+    mass: {basis: declared, total_kg: 18.00, maturity: calculated, source: "4 x 1.941 m at 2.306 kg/m, 854 mm2 at 2.70 t/m3, with their rigid PVC bearing blocks (calculated). Report 21 section 1.4 had four 1.6 m lengths of RHS 40 x 20 x 3 laid flat, 5.6 kg"}
+    note: Laid into the wall cores as the panels are made, floor joiner to roof joiner and bonded to the inner skin, so the rail screws pass through the inner skin and bite 3.5 mm aluminium (Lippert's 3 mm backing rule), and each hardpoint also stiffens the wall against wind (BDY-10). The 13 mm of XPS behind each keeps the surface over it 4 K above the cold night's dew point, to its ends (BDY-22). Each stands on a rigid PVC bearing block that carries the bed's load to the floor joiner. The bed's rail pairs are 1,067 mm apart, the widest side-wall bay, and W1 and W2 sit between them, their side inserts filling the 27 to 28 mm to the hardpoints in the hardpoints' own channels (FIT-07). Behind the rear kerb-side hardpoint stands BD-20.
   - id: LB-03
     name: Bed platform, 40 mm aluminium honeycomb, 0.8 and 0.5 mm skins, 1,550 x 2,290 mm, on the lift's support rails
     material: "Aluminium honeycomb sandwich, 0.8 mm top and 0.5 mm bottom aluminium skins on a 40 kg/m3 core"

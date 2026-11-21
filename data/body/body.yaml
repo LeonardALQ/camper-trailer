@@ -39,11 +39,15 @@ panels:
     # ISO 13788's Rsi of 0.25 the surface over a member needs 13 mm of XPS behind it, so the member is 19 mm deep, and
     # 110 mm wide so the hardpoints stand 27 mm off W1's and W2's cut-outs (FIT-07). No Australian stockist lists a
     # 6060-T5 RHS under 25 mm deep this stiff (InfraBuild's range goes from 40 x 20 x 2.0 to its 25 mm deep sections), so
-    # the section is made to order (LB-06's price). Each member stops `end_gap_mm` short of the floor joiner at its foot,
-    # on a rigid PVC pad `foot_pad_mm` wide across its depth with XPS in the rest of the gap, and `end_gap_mm` under the
-    # wall's top insert strip at its head. BDY-22 takes both gaps as XPS to a joiner at the outside air, a bound
-    stiffener: {name: "RHS 110 x 19 x 3.5 6060-T5 aluminium on the inner skin", E: 69000, I: 48042, depth: 19, width: 110, wall: 3.5,
-                break: 13, fy: 110, pitch: 1067, kg_m: 2.306, end_gap_mm: 10, foot_pad_mm: 20,
+    # the section is made to order (BD-18's price). F4-01: each member stands on a rigid PVC bearing block `block_mm` wide
+    # across its depth, which carries the bed's load down to the floor joiner's base, with XPS in the rest of the channel.
+    # The block raises the member's foot `foot_clear_mm` above the floor joiner's inner leg (`joiners` below), so no leg
+    # overlaps the member. At its head the member stops `end_gap_mm` under the wall's top insert strip. BDY-22 takes both
+    # joiners at the outside air, a bound. A rigid PVC pad `head_pad_mm` wide fills the gap at the head. Block and pad each
+    # take the member's wind shear into its joiner through a spigot in the member's hollow end (BDY-25). G is 6060's shear
+    # modulus, for the plate model's member torsion (BDY-24)
+    stiffener: {name: "RHS 110 x 19 x 3.5 6060-T5 aluminium on the inner skin", E: 69000, G: 26000, I: 48042, depth: 19, width: 110, wall: 3.5,
+                break: 13, fy: 110, pitch: 1067, kg_m: 2.306, end_gap_mm: 10, block_mm: 20, head_pad_mm: 10, foot_clear_mm: 20,
                 src: "https://www.infrabuild.com/steel/products/aluminium/aluminium-rhs-rectangular-box-section/"}
   front_wall:
     name: "Front wall, 35 mm: 2.0 mm outer and 1.5 mm inner Polydet skins on 31.5 mm XPS, against stones"
@@ -91,6 +95,9 @@ loads:
   bed_rails: 4                 # HappiJac rails, two on each side wall
   rail_screws: 8               # 1/4 in self-tapping screws per rail through the inner skin into its hardpoint's 3 mm wall (est., about 200 mm pitch)
   rail_screw_rated_n: 3000     # shear on one screw in 3 mm 6060-T5 (est.: bearing about 2.5 fu d t = 7.6 kN characteristic)
+  rail_screw_mm: 16            # 1/4 in self-drilling screw, length under the head: the rail's web, the inner skin, the bond and the
+                               # member's front wall, 9 mm, and a drill point of about 6 mm, so the point stops in the member's hollow (F4-10)
+  rail_web_mm: 2.5             # the HappiJac rail's web under the screw head (est.)
   uplift_40ms_n: 5060          # report 12's 6,300 N on 13.2 m2 at 110 km/h into a 36 km/h headwind, scaled to the 10.6 m2 roof
 
 # ---------------------------------------------------------------- the split's outdoor unit on the rear wall (BDY-21)
@@ -118,14 +125,13 @@ cradle:
 # (M_d = M_s = M_t = 1). Net pressure 0.6 V^2 (Cp,e - Cp,i) Pa, with C_dyn and the K factors at 1.0: the side wall's
 # 8.8 m2 is under Table 5.4's 10 m2, and its 2 m span is far larger than the local pressure zones. Strength is checked at
 # 41 m/s: BDY-19's 40 m/s, raised by H23 to STB-04's highest overturning speed, 40.9 m/s with a box's Cf (F3-08).
-# Strapped down on its tie-downs (STB-05) the trailer stands in region B's 500-year gust, so BDY-06 also gives the walls
-# at the 250-year gust (`V_250`). The operating rule in TRAILER.md and on CT-003 keeps it out of winds near that speed and out of the cyclonic
-# regions C and D in the cyclone season.
+# Strapped down on its tie-downs (STB-05) the trailer stands in region B's 500-year gust, so BDY-06 and BDY-25 also give
+# the walls at that gust (F4-07). The operating rule in TRAILER.md and on CT-003 keeps it out of winds near that speed and
+# out of the cyclonic regions C and D in the cyclone season.
 wind:
   V_s: 39            # m/s, serviceability: region B's 25-year regional wind V_25 (Table 3.1), for the wall's deflection
   Mzcat: 0.91        # Table 4.1, terrain category 2 at 3 m or less
   V_u: 41            # m/s, ultimate for strength: BDY-19's 40 m/s, raised to STB-04's highest overturning speed (H23)
-  V_250: 53          # m/s, region B's 250-year regional wind (Table 3.1), for the walls when the trailer is held down
   cpe: 0.7           # Table 5.2(A), windward wall
   cpi: -0.3          # Table 5.1(A), all walls equally permeable: -0.3 or 0.0, the more severe with the windward wall
   region: B
@@ -138,8 +144,9 @@ wind:
 # hollow, inner skin. F3-01: the surfaces take ISO 13788's Rsi of 0.25 m2K/W for condensation and mould on opaque
 # elements, which allows for corners, furniture and curtains, and the heat loss figure ISO 6946's 0.13. Half the strip is
 # modelled, from the member's centreline to `strip_mm` away, where the wall is one-dimensional again. Along the member
-# its ends lose heat to the floor and roof joiners through the 10 mm gap (F3-05): the member is a fin, and the joiner is
-# taken at the outside air, a bound.
+# its ends lose heat to the floor and roof joiners (F3-05, F4-01): the member is a fin, and the joiner is taken at the
+# outside air, a bound. Beside W1 and W2 the side insert and the window stand next to the hardpoint (F4-02), and the
+# pair of members behind the bed stands 16.5 mm apart (F4-04), so both are modelled too.
 thermal:
   t_out: -5
   t_in: 20
@@ -148,12 +155,17 @@ thermal:
   rsi: 0.25          # m2K/W, inside surface for surface condensation and mould (ISO 13788:2012 clause 4.4.1)
   rsi_heat: 0.13     # m2K/W, inside surface for the heat loss figure, horizontal heat flow (ISO 6946 Table 7)
   rse: 0.04          # m2K/W, outside surface
-  k: {grp: 0.30, xps: 0.035, aluminium: 200, air: 0.15, pvc: 0.16}   # W/mK
+  k: {grp: 0.30, xps: 0.035, aluminium: 200, air: 0.15, pvc: 0.16, h200: 0.044, ms: 0.30, foam: 0.035}   # W/mK
+  insert: h200       # the side inserts at W1 and W2
+  strip_k: pvc       # the doors' and windows' 70 mm HD PVC insert strips, taken as rigid PVC, a bound
+  window_u: 2.8      # W/m2K, an S4's double acrylic with its frame (est., report 19 section 1)
+  door_u: 1.6        # W/m2K, a door leaf (est., report 19 section 1)
+  bond_mm: 1.5       # MS polymer between a joiner's leg and the inner skin, for a leg that overlaps a member (est.)
   strip_mm: 300
   cell_mm: 0.5
   bare_panels_w_k: 36.8   # report 19 section 1: the bare panels, before its 20 % for bridges
   bridges_w_k: 7.3        # report 19 section 1: the joiners, the mount bolts and the insert strips
-  members: [BD-18, BD-19, LB-06]
+  members: [BD-18, BD-19, BD-20, LB-06]
   # On the generators e2 fans C and D (low on the front wall, facing the generators) stop, and fans A and B on the side
   # walls run on as a pair with the RESPA-CF2, the RESPA holding the cabin above outside through its MERV 16 and carbon
   # filters. Report 19's moisture model (research/models/19/loads.py condensation_check: the evening hour's 200 g/h,
@@ -163,6 +175,9 @@ thermal:
   src:
     iso13788: "ISO 13788:2012 clause 4.4.1, Rsi 0.25 m2K/W for surface condensation and mould on opaque elements: https://cdn.standards.iteh.ai/samples/51615/261e3f395b8a425983c1eb1a5f05d3ca/ISO-13788-2012.pdf"
     pvc: "Rigid PVC at about 0.16 W/mK (est.)"
+    h200: "Divinycell H200 PVC foam, 0.305 Btu in/(ft2 h F), 0.044 W/mK (EN 12667), and 653 psi, 4.5 MPa, minimum compressive strength: https://diab-media.azureedge.net/clwjnze4/diab-divinycell-h-may-2026-rev26-imp.pdf"
+    ms: "MS polymer adhesive about 0.30 W/mK (est.)"
+    foam: "Closed-cell foam, polyethylene or EPDM, about 0.035 W/mK (est.)"
     films: "ISO 6946 surface resistances for a wall, Rsi 0.13 and Rse 0.04 m2K/W, as BRE's BR 443 (2019) gives them: https://www.cibse.org/media/wzrjrf3l/conventions-for-u-value-calculations.pdf"
     xps: "XPS 0.035 W/mK, a little above the 0.034 W/mK Kingspan gives its best XPS boards, for the thin layer behind the member (est., report 19 used 0.031): https://www.insulation.kingspan.com/gb/en/products/insulation-boards/roof-insulation-boards/kingspan-greenguard-gg500"
     grp: "GRP skins 0.30 W/mK, report 19 section 1 (est.)"
@@ -250,7 +265,8 @@ end_wall:
 # Side walls: x is measured along the trailer from the body front (X = body_x0 + x), z from the floor surface. The front
 # and rear walls: y across from the centreline (positive to the road side). Sizes are the cut-outs. The
 # two doors follow the layout's blocks (BD-07, BD-15). `line` names the mass schedule line that carries the part. Glands of 60 mm or less (fill, PV, refrigerant lines, the
-# 230 V inlet box, the battery vents through the floor) are not openings.
+# outlet box G3, the battery vents through the floor) are not openings. G2's 310 x 120 mm box of inlets is larger, so
+# cad/body.py counts it as an opening from data/services.yaml (F4-05).
 # `proj` is how far a side-wall opening's frame, sash, hood or handle stands proud of the wall's outer skin, mm, for the
 # overall width (DIM-01, DIM-05, `width` below). The S4 figure is the maker's drawing. The others are estimates.
 openings:
@@ -301,21 +317,45 @@ rules:
   between_mm: 300              # full-height wall between neighbouring openings (assumption, report 12 section 5)
   edge_mm: 150                 # from an opening to a panel edge or corner
   rear_corner_mm: 300          # no opening within 300 mm of the rear corners (report 12 section 5)
+  gland_mm: 60                 # a gland larger than this is an opening (G2's 310 x 120 mm box, F4-05)
+
+# ---------------------------------------------------------------- the joiners at the wall members' ends (BDY-22, F4-01)
+# The floor joiner wraps the wall's foot: its base under the bottom edge, its outer leg up the outer skin and its inner
+# leg up the inner skin with a flange over the floor, 32 mm up and 2 mm thick (CT-202 detail A, est.). The roof joiner's
+# inner leg runs down the inner skin over the wall's 25 mm top insert strip (detail C, est.). Every joiner's inside face
+# is covered with closed-cell foam under the lining and the skirting (report 19's rule for the corner and roof joiners,
+# extended to the floor joiner and taken at ISO 13788's Rsi, F4-01).
+joiners:
+  floor: {inner_leg_mm: 34, outer_leg_mm: 40, t_mm: 2}
+  roof: {inner_leg_mm: 16, t_mm: 2}
+  top_strip_mm: 25
+  cover: {t_mm: 15, k: foam}
+
+# ---------------------------------------------------------------- the side walls as plates (BDY-24, BDY-25, F4-04)
+plate: {step_mm: 20, corner_mm: 50}   # the core's shear is read 50 mm or more from a cut-out's corner, where a re-entrant corner concentrates it
+# the members' rigid PVC bearing blocks and head pads (est.): uPVC about 3 GPa, 1.1 GPa in shear and 35 MPa shear strength
+blocks: {E: 3000, G: 1100, shear_mpa: 35}
 
 # ---------------------------------------------------------------- wall members against the openings (FIT-07, F3-02)
 # Each member stands at least `clear_mm` from every cut-out, gland and insert strip on its wall, so the panel maker can
-# rout its channel with XPS between. The doors' and windows' cut-outs carry `strip_mm` insert strips round them. W1 and
-# W2 sit between the bed's hardpoints: a Dometic S4's outer and inner frames screw to each other through the cut-out and
-# clamp the panel, so their sides carry no strip and the hardpoints stand clear of the cut-outs themselves. The members,
-# the kitchen tower's sides, the partition and the end walls keep every side-wall bay within the members' pitch.
+# rout its channel with XPS between. The doors' and windows' cut-outs carry `strip_mm` insert strips round them. The
+# exception, F4-02: W1 and W2 sit between the bed's hardpoints, 27 to 28 mm from each, and a Dometic S4's outer and inner
+# frames screw to each other through the cut-out and clamp the panel. So each of their sides takes a bonded Divinycell
+# H200 insert that fills the core from the cut-out to the hardpoint, in the hardpoint's own routed channel: the clamp
+# bears on a solid edge, as at every other opening, and no thin fin of XPS is left to rout. The members, the kitchen
+# tower's sides, the partition and the end walls keep every side-wall bay within the members' pitch.
 members_rule:
+  members: [BD-18, BD-19, BD-20]
   clear_mm: 25
   strip_mm: 70
   strip_lines: [WN-, BD-07, BD-15, BD-17]
-  no_side_strips: [OP-01, OP-05]
+  side_inserts: {openings: [OP-01, OP-05], min_mm: 20}
   bounds: [LA-11T, WR-03]
   hardpoints_at: LB-04
-  # the lockers over the washer and dryer hang on a horizontal strip, which stops clear_mm short of BD-19, the member
-  # taking the lockers' front screws. The members' heads stop end_gap_mm under the wall's top insert strip
+  # horizontal fixing strips, each stopped clear_mm short of every member it meets: the lockers over the washer and
+  # dryer, and the bench's and the tower's backs on the road wall (CT-104). The members' heads stop end_gap_mm under the
+  # wall's top insert strip
   strips:
     - {block: LA-11L, name: "the lockers' insert strip"}
+    - {block: LA-11B, name: "the bench's insert strip"}
+    - {block: LA-11T, name: "the tower's insert strip"}

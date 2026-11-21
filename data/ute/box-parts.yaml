@@ -301,12 +301,12 @@ lines:
   - id: BX-F11
     group: fasteners_sealants
     name: Roof bow rivets and the bond's pre-treatment
-    part_number: "4.8 mm sealed blind rivets, aluminium and steel, and Sika Aktivator-100"
-    spec: "About 120 rivets at 75 mm through the bead on every bow behind the first, about 9 m, in place of the stitch welds there (UGF-01, F3-04), and Sika Aktivator-100 on the abraded 5052 under the bead (Sika's pre-treatment chart for 1-part polyurethanes)"
+    part_number: "JC Fasteners E8D35G 4.8 mm sealed domed blind rivets, AlMg5 body and A2 stainless mandrel, and Sika Aktivator-100"
+    spec: "About 120 rivets at 75 mm through the bead on every bow behind the first, about 9 m, in place of the stitch welds there (UGF-01, F3-04). The broken mandrel stays in the head on the roof's top face, so it is stainless, not steel, against the 5052 in coastal air (F4-08): 2,230 N shear and 3,070 N tensile (JC Fasteners). Sika Aktivator-100 on the abraded 5052 under the bead (Sika's pre-treatment chart for 1-part polyurethanes)"
     qty: 1
     unit: lot
     mass: {kg: 0.3, basis: estimate, src: "About 120 rivets at 2.5 g (estimate), carried in model part U-SEALANT"}
-    price: {aud_each: 105.00, aud: 105.00, url: "https://aus.sika.com/dam/dms/au01/2/Pre-treatment_Chart_1C_PU_2020.pdf", date: 2026-11-21, basis: estimate, note: "Rivets about AUD 60, the Aktivator about AUD 45 (est.)"}
+    price: {aud_each: 135.00, aud: 135.00, url: "https://www.jcfasteners.com/wp-content/uploads/Blind-Rivet-Closed-DH-E8D35G-AL-SS.pdf", date: 2026-11-21, basis: estimate, note: "Rivets with stainless mandrels about AUD 90, the Aktivator about AUD 45 (est.)"}
     model_part: U-SEALANT
   # ================================================================ doors
   - id: BX-D01
@@ -764,12 +764,12 @@ lines:
 # prices match the stated rates. Contingency 10 % (est.). owner_built_total_aud drops the shop labour line and its
 # contingency. mass_kg_lines is the fitted box as listed, which is the model's box mass (UGB-01).
 totals:
-  by_group: {materials: 7975.62, subframe_mounts: 990.0, fasteners_sealants: 1066.9, doors: 1200.15, security: 3797.36, restraint: 1852.09, loading: 2972.61, services: 1771.42, finish: 674.42, tools: 246.62, fabrication: 22748.0, compliance: 2000.0}
-  subtotal_aud: 47295.19
+  by_group: {materials: 7975.62, subframe_mounts: 990.0, fasteners_sealants: 1096.9, doors: 1200.15, security: 3797.36, restraint: 1852.09, loading: 2972.61, services: 1771.42, finish: 674.42, tools: 246.62, fabrication: 22748.0, compliance: 2000.0}
+  subtotal_aud: 47325.19
   contingency_pct: 10
-  contingency_aud: 4729.52
-  total_aud: 52024.71
-  owner_built_total_aud: 27001.91
+  contingency_aud: 4732.52
+  total_aud: 52057.71
+  owner_built_total_aud: 27034.91
   mass_kg_lines: 437.27
   not_in_total:
     - {name: "Monimoto 9 subscriptions", aud_per_year: 158, src: "AUD 79 a year each (report 17)"}

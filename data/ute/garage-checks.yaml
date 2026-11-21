@@ -21,12 +21,12 @@ checks:
       bond: {name: Sikaflex-252, lap_shear_mpa: 2.5, width_mm: 15, factor: 0.5,
              src: "Sika's product data sheet, tensile lap-shear strength 2.5 MPa (ISO 4587): https://industry.sika.com/content/dam/dms/us01/o/sikaflex-252.pdf",
              pretreat: "the 5052 abraded with a very fine pad, cleaned, then Sika Aktivator-100, Sika's pre-treatment for aluminium (AlMg3 and similar) under 1-part polyurethanes: https://aus.sika.com/dam/dms/au01/2/Pre-treatment_Chart_1C_PU_2020.pdf"}
-      rivets: {name: "4.8 mm sealed (closed-end) blind rivets, aluminium body and steel mandrel", pitch_mm: 75, tensile_n: 3070, shear_n: 2200,
+      rivets: {name: "4.8 mm sealed (closed-end) domed blind rivets, AlMg5 body and A2 stainless mandrel", pitch_mm: 75, tensile_n: 3070, shear_n: 2230,
                factor: 0.5, bearing_fu_mpa: 215,
-               src: "Tensile 3,070 N, Accu HRDS-4-8-21-AS: https://accu-components.com/fr/rivets-aveugles-scelles/646867-HRDS-4-8-21-AS. Shear 2,200 N (est.)"}
+               src: "JC Fasteners E8D35G, dome head closed end, Al-Mg 5 body, AISI 304 mandrel, 4.8 mm: shear 2,230 N, tensile 3,070 N: https://www.jcfasteners.com/wp-content/uploads/Blind-Rivet-Closed-DH-E8D35G-AL-SS.pdf"}
     severity: fail
     inputs: []
-    why: "The 1.6 mm roof skin is welded continuously along the front edge, the first bow and its butt joints, and rivet-bonded along every other bow: a Sikaflex-252 bead on 5052 pre-treated to Sika's chart, with sealed blind rivets through it at 75 mm and no welds there, so no heat reaches the bead (F3-04). Between the bows it works as a held strip: highway suction drums it and membrane tension carries most of the load to the bows, where the welded bow has softened the sheet and the bead takes the tension in shear. The bead is checked at half its lap-shear strength, as BDY-19 checks the trailer's bonded roof, and the rivets alone at half their rating as if it had let go. With the bows' 1:50 fall, water runs off before it can pond. A kneeling person, 1.1 kN on roof cladding in AS/NZS 1170.1, would dent the sheet, so the roof carries no step and no kneeling, on a label on the roof (BX-C03), on CT-701 and in UTE-GARAGE.md. Hail dents any gauge"
+    why: "The 1.6 mm roof skin is welded continuously along the front edge, the first bow and its butt joints, and rivet-bonded along every other bow: a Sikaflex-252 bead on 5052 pre-treated to Sika's chart, with sealed blind rivets (aluminium body, stainless mandrel) through it at 75 mm and no welds there, so no heat reaches the bead (F3-04). Between the bows it works as a held strip: highway suction drums it and membrane tension carries most of the load to the bows, where the welded bow has softened the sheet and the bead takes the tension in shear. The bead is checked at half its lap-shear strength, as BDY-19 checks the trailer's bonded roof, and the rivets alone at half their rating as if it had let go. With the bows' 1:50 fall, water runs off before it can pond. A kneeling person, 1.1 kN on roof cladding in AS/NZS 1170.1, would dent the sheet, so the roof carries no step and no kneeling, on a label on the roof (BX-C03), on CT-701 and in UTE-GARAGE.md. Hail dents any gauge"
   - id: UGC-01
     title: Tuareg to Street Triple, anywhere
     type: clearance
@@ -40,11 +40,11 @@ checks:
     title: Each bike to the walls, roof, wheel tubs, closed doors and everything stowed in the box
     type: clearance
     each: [TU, ST]
-    b: [B2, B3, B5, B6, D1, D3, D4, "14", 14P, R1, V2, V3, V5, K2, K3, T1]
+    b: [B2, B3, B5, B6, D1, D3, D4, "14", 14P, R1, V2, V3, V5, K2, K3, T1, T2]
     min_gap_mm: 15
     severity: fail
     inputs: [TU-05, TU-07, ST-01, CHK-01]
-    why: The trailer's CLR-04. Bars, pegs, panniers, belly pans and tyres must not touch the walls, the roof bows, the tubs, the closed barn doors and kerb door, the winch, the stowed ramp, the extinguisher, the tool chests or the chain anchors.
+    why: The trailer's CLR-04. Bars, pegs, panniers, belly pans and tyres must not touch the walls, the roof bows, the tubs, the closed barn doors and kerb door, the winch, the stowed ramp, the extinguisher, the tool chests, the trailer's ground anchors or the chain anchors.
   - id: UGC-03
     title: Each bike rolled straight back clears the barn door opening
     type: clearance

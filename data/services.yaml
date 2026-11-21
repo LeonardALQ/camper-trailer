@@ -10,8 +10,8 @@ revision: A
 # Glands through the walls, roof and floor. Side walls give X and the height Z, end walls Y and Z, roof and floor X and Y.
 glands:
   # `proj` on a side-wall gland is how far it stands proud of the skin, mm, for the overall width (data/body/body.yaml `width`)
-  - {id: G1, what: "Fresh water fill with a lockable cap, filled through the CR45 filter on the hose", at: kerb, x: 3310, z: 1125, d: 50, proj: 30, src: "TRAILER.md, Plumbing and water", est: "height, and the cap 30 mm proud"}
-  - {id: G2, what: "Two 15 A appliance inlets, SHORE and GENERATOR, and the 12 V Anderson SB50 outlet, three flush units side by side in a 310 x 120 mm cut-out, IP56 with hinged covers", at: kerb, x: 4700, z: 1150, d: 60, w: 310, h: 120, proj: 30, src: "TRAILER.md, Electrical", est: "covers 30 mm proud. A surface box would stand about 60 mm and set the width"}
+  - {id: G1, what: "Fresh water fill with a lockable cap, filled through the CR45 filter on the hose", at: kerb, x: 3040, z: 1125, d: 50, proj: 30, src: "TRAILER.md, Plumbing and water", est: "position under W1, moved from X 3,310 so BD-20 can stand between the bed's hardpoint and the door (F4-04), its hose through the floor beside it to the front tank, and the cap 30 mm proud"}
+  - {id: G2, what: "Two 15 A appliance inlets, SHORE and GENERATOR, and the 12 V Anderson SB50 outlet, three flush units side by side in a 310 x 120 mm cut-out, IP56 with hinged covers", at: kerb, x: 4700, z: 1150, d: 60, w: 310, h: 120, proj: 30, src: "TRAILER.md, Electrical", est: "covers 30 mm proud. A surface box would stand about 60 mm and set the width. Larger than 60 mm, so it is an opening for BDY-18 and the plates of BDY-24 (F4-05)"}
   - {id: G3, what: "Outdoor 230 V double outlet (C10), flush-mounted IP56 with a hinged cover, under the awning", at: kerb, x: 4355, z: 1150, d: 60, proj: 30, src: "report 20 section 7", est: "position, and the cover 30 mm proud"}
   - {id: G4, what: "Two 6 mm2 PV strings into a conduit down the partition's kerb end", at: roof, x: 5100, y: -900, d: 25, src: "TRAILER.md, Electrical"}
   - {id: G5, what: "Split line set and the outdoor unit's 230 V feed (C8), behind the cradle", at: rear, y: 760, z: 2800, d: 60, src: "AC-02, AC-03", est: "position, moved to the road half with the outdoor unit"}
@@ -68,7 +68,8 @@ electrical:
     - {zone: "Outside, kerb side", ac: "1 weatherproof double, IP56 (G3)", dc: "1 Anderson SB50 12 V outlet with a 10 A fuse, 1 USB-C (G2)"}
 
 # report 19 section 6, the ventilation modes (one rotary switch or a Cerbo GX page), m3/h. The generator rule: run the
-# two EU22i on the ground at least 6 m from the trailer and downwind of it, exhausts pointing away, never in the drawbar box
+# two EU22i on the ground ahead of the drawbar, at least 6 m from the trailer and downwind of it, exhausts pointing away,
+# never in the drawbar box, so the front wall faces them and the side walls' fans and the RESPA's intake do not (F4-09)
 ventilation_modes:
   - {mode: "Normal day", e2: "30 a pair", ra: "15, boost on humidity", topup: "15", respa: "Off", split: "Thermostat"}
   - {mode: "Night", e2: "22.5 a pair", ra: "15", topup: "15", respa: "Off", split: "Quiet fan"}

@@ -332,6 +332,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
     aw = C["res"]["awning"]
     ot = chk["STB-04"]["overturn"]
     ot_low = min(ot["cases"], key=lambda q: q["v"])
+    td_anchors = chk["STB-05"]["tie_down"]["cases"][0]["anchors"]
     lines = [
         ("WATER IN TRAVEL (H13)", f"AT MOST {V['water_travel_l']:.0f} L OF FRESH AND GREY WATER WHILE TOWING. FILL THE TANKS AT CAMP (420 L NET)."),
         ("WITHOUT THE GCM REVISION", f"IF LOVELLS' {lim['gcm_kg']:,.0f} kg GCM REVISION (GV06) IS REFUSED, TOYOTA'S {gcm['toyota_kg']:,.0f} kg HOLDS WITH THE "
@@ -350,9 +351,12 @@ def ct003(prj, model, bom, checks, reg, dwg):
                                     f"{aw['close_kmh']:.0f} km/h AND WHENEVER THE TRAILER IS LEFT. SET THE LEGS FOR A {aw['pitch_deg']:.0f} DEGREE FALL."),
         ("PARKED IN WIND (H23, STB-04, STB-05)", f"UNHITCHED ON ITS STEADIES THE TRAILER SLIDES ON WET GRASS IN A "
                                          f"{min(q['v_slide'] for q in ot['cases']):.0f} m/s GUST AT TARE AND TIPS IN A {ot_low['v']:.0f} m/s GUST. AT A "
-                                         f"FORECAST OR A BUREAU WARNING OF GUSTS OF {ot['act_kmh']:.0f} km/h OR MORE, CLOSE THE AWNING, AND HITCH THE "
-                                         "TRAILER TO THE UTE, STRAP IT DOWN AT ITS FOUR LASHING POINTS OR MOVE IT. WITH THE UTE AWAY, STRAP IT DOWN "
-                                         "WHENEVER SUCH GUSTS ARE FORECAST. NO STAYS IN CYCLONIC REGIONS C AND D FROM NOVEMBER TO APRIL."),
+                                         f"FORECAST GUST OF {ot['act_kmh']:.0f} km/h OR MORE (A BUREAU WARNING OF DAMAGING WINDS, {ot['warning_kmh']:.0f} km/h, "
+                                         "ALWAYS IS ONE), CLOSE THE AWNING, AND HITCH THE TRAILER TO THE UTE, STRAP IT DOWN AT ITS FOUR LASHING POINTS OR "
+                                         "MOVE IT. THE TIE-DOWN KIT RIDES IN THE UTE WHILE TOWING AND STAYS WITH THE TRAILER WHENEVER THE UTE IS UNHITCHED "
+                                         f"FOR MORE THAN A DAY: FOUR STRAPS AND FOUR ANCHORS EACH FOR {' AND '.join(a['soil'].split(',')[0].upper() for a in td_anchors)}, "
+                                         "SET IN LINE WITH THE STRAPS, ONE PULL-TESTED ON SITE. IN LOOSE SAND, HITCH IT OR MOVE IT. NO STAYS IN CYCLONIC "
+                                         "REGIONS C AND D FROM NOVEMBER TO APRIL."),
     ]
     yy = yb - 13
     top = yb - 4

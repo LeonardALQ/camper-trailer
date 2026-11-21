@@ -266,9 +266,14 @@ def build_garage(prj: Project | None = None, limits: dict | None = None):
     tx, ty, tz = P.eval(tp.cog.at, {})
     lines.append(dict(id="U-TOOLS", item=tp.name, kg=tp.mass.total_kg, x=tx + x0, y=ty, z=tz + dz, maturity=tp.mass.maturity,
                       source=tp.mass.source + ". In the two chests on the wheel tubs", cases=list(TOOL_CASES), group="tools"))
-    kp = prj.parts["U-TIEDOWN"]                     # the trailer's tie-down kit, in the same chests (STB-05)
+    kp = prj.parts["U-TIEDOWN"]                     # the trailer's tie-down straps, in the same chests (STB-05)
     lines.append(dict(id="U-TIEDOWN", item=kp.name, kg=kp.mass.total_kg, x=tx + x0, y=ty, z=tz + dz, maturity=kp.mass.maturity,
                       source=kp.mass.source + ". In the two chests on the wheel tubs", cases=list(TOOL_CASES), group="tools"))
+    ap = prj.parts["U-ANCHORS"]                     # and its ground anchors, in their bag between the bikes (F4-03)
+    bag = model.built["T2"].shape.bounding_box()
+    lines.append(dict(id="U-ANCHORS", item=ap.name, kg=ap.mass.total_kg, x=bag.center().X + x0, y=bag.center().Y, z=bag.center().Z + dz,
+                      maturity=ap.mass.maturity, source=ap.mass.source + ". In their bag on the box floor between the bikes",
+                      cases=list(TOOL_CASES), group="tools"))
     box_lines = [ln for ln in lines if ln["cases"] == BOX_CASES]
     box_kg = sum(ln["kg"] for ln in box_lines)
     box_kg_g = sum(ln["kg"] * (1 + GROWTH[ln["maturity"]]) for ln in box_lines)

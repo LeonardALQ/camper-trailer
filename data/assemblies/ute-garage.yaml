@@ -466,6 +466,8 @@ items:
     copies:
       - {id: road, at: [tool_x0, half_width - 10 - tool_w, tool_z0], params: {dx: tool_l, dy: tool_w, dz: tool_h}}
       - {id: kerb, at: [tool_x0, -half_width + 10, tool_z0], params: {dx: tool_l, dy: tool_wk, dz: tool_h}}
+  - {ref: T2, part: U-ANCHORS, group: tools, label: "The trailer's ground anchors in their bag, on the floor between the bikes, loaded last",
+     at: [600, (tuareg_y + st_y) / 2 - 95, 0], params: {dx: 1600, dy: 190, dz: 190}}
 
   # ---------------------------------------------------------------- context (no mass)
   - ref: C1

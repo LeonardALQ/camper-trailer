@@ -188,14 +188,15 @@ def ct011(prj, model, bom, checks, reg, dwg):
         x0, x1 = sorted((Xw(u - mc["width"] / 2), Xw(u + mc["width"] / 2)))
         sh.rect(x0, Zw(10), x1, Zw(V["interior_h"] - 10), "phantom")
         sh.text((x0 + x1) / 2, Zw(V["interior_h"] - 10) + 0.6, q["member"].split(" at ")[0].split(".")[0], 0.95, "middle")
+    as_openings = {o["id"] for o in res["openings"]}
     for g in yaml.safe_load((ROOT / "data" / "services.yaml").read_text())["glands"]:
-        if g["at"] in ("kerb", "road"):
+        if g["at"] in ("kerb", "road") and g["id"] not in as_openings:   # a gland's Z is DIM-01's, the wall view's height the floor's
             Xw, Zw = views[g["at"]]
             gw, gh = g.get("w", g["d"]), g.get("h", g["d"])
-            u = g["x"] - V["body_x0"]
+            u, z = g["x"] - V["body_x0"], g["z"] - V["floor_z"]
             x0, x1 = sorted((Xw(u - gw / 2), Xw(u + gw / 2)))
-            sh.rect(x0, Zw(g["z"] - gh / 2), x1, Zw(g["z"] + gh / 2), "medium")
-            sh.text((x0 + x1) / 2, Zw(g["z"] + gh / 2) + 0.5, g["id"], 0.95, "middle")
+            sh.rect(x0, Zw(z - gh / 2), x1, Zw(z + gh / 2), "medium")
+            sh.text((x0 + x1) / 2, Zw(z + gh / 2) + 0.5, g["id"], 0.95, "middle")
     # the split's outdoor unit and its cradle on the rear wall (phantom), and the awning on the roof's kerb edge
     for iid in ("AC-03",):
         b = lay.find(iid).box
@@ -231,7 +232,8 @@ def ct011(prj, model, bom, checks, reg, dwg):
         f"{oc['margin_mm']:.0f} mm. A MARGIN OF 0 MEANS THE OPENING SITS EXACTLY ON ITS LIMIT.",
         "ALONG: SIDE WALLS FROM THE BODY FRONT, END WALLS FROM THE CENTRELINE, POSITIVE TO THE ROAD SIDE. ABOVE FLOOR: FROM THE FLOOR "
         f"SURFACE AT Z {V['floor_z']:.0f}.",
-        "GLANDS OF 60 mm OR LESS (FILL, PV, SPLIT LINES, THE OUTLET BOXES, THE BATTERY VENTS) ARE NOT OPENINGS. THEY ARE ON CT-602 AND CT-612.",
+        "GLANDS OF 60 mm OR LESS (FILL, PV, SPLIT LINES, THE OUTLET BOX G3, THE BATTERY VENTS) ARE NOT OPENINGS. THEY ARE ON CT-602 AND CT-612. "
+        "G2'S 310 x 120 mm BOX OF INLETS IS LARGER, SO IT IS AN OPENING HERE.",
     ], size=1.38, width_chars=150)
     p = LM["plate"]
     rows = [[r["mark"], r["id"], r["name"].upper(), r["colour"].upper(), r["face"].upper(), r["across"].upper(), r["height"].upper(),

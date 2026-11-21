@@ -162,7 +162,7 @@ class TrailerCheck(Strict):
                   "towball_ute", "towball_ute_input", "axle_window", "lateral", "bed", "platinum_return",
                   "chassis_stress", "chassis_local", "chassis_deflection", "chassis_twist", "chassis_fatigue",
                   "body_panel", "body_deflection", "body_insert", "body_roof", "body_twist", "body_joint",
-                  "body_mount", "body_end_wall", "body_openings", "body_cradle", "body_thermal", "body_awning", "body_members", "bed_load",
+                  "body_mount", "body_end_wall", "body_openings", "body_cradle", "body_thermal", "body_awning", "body_members", "body_plate_defl", "body_plate_strength", "bed_load",
                   "rollover", "yaw", "overturn", "tie_down"]
     load_case: str | None = None          # chassis_stress: report 11's load case (data/chassis/chassis.yaml)
     item: str | None = None               # chassis_local, chassis_deflection and chassis_fatigue: what is checked

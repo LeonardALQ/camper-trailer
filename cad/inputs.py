@@ -41,6 +41,7 @@ class Input:
     range: dict = field(default_factory=dict)
     extra: dict = field(default_factory=dict)
     estimate_basis: str = ""
+    estimate_ref: dict | None = None
 
     @property
     def status(self) -> str:
@@ -74,6 +75,7 @@ class Inputs:
             self.items[d["id"]] = Input(
                 id=d["id"], group=d["group"], title=d["title"], how=d["how"], unit=d["unit"],
                 estimate=d["estimate"].get("v"), estimate_src=d["estimate"].get("src", ""), estimate_basis=d["estimate"].get("basis", ""), measured=m.get("v"),
+                estimate_ref={k: d["estimate"][k] for k in ("ref", "dp")} if "ref" in d["estimate"] else None,
                 measured_date=m.get("date"), affects=d.get("affects", []), thresholds=d.get("thresholds", []),
                 stage=d.get("stage", ""), range=d.get("range") or {},
                 extra={k: d[k] for k in ("order", "covers", "part") if k in d} | ({"note": m["note"]} if m.get("note") else {}))
@@ -216,7 +218,8 @@ class Inputs:
 
     # -- the acceptable ranges ---------------------------------------------------
     def resolve_ranges(self, refs: dict):
-        """Each input's `range` as numbers. A side given as {ref: name} takes the model's figure from `refs`, and
+        """Each input's `range` as numbers, and each design value given as {ref: name} the model's figure from `refs`. A side
+        given as {ref: name} takes the model's figure from `refs`, and
         {ref, rel} spans that figure plus and minus `rel`. A side worked out from the model is rounded inwards to a
         whole number, so a value on the boundary is inside. A reference the model does not give leaves the side open."""
         def inward(v, up: bool):
@@ -224,6 +227,9 @@ class Inputs:
 
         def side(v, up: bool):
             return inward(refs.get(v["ref"]), up) if isinstance(v, dict) else v
+        for it in self.items.values():                 # a design value given as {ref: name, dp} is the model's figure (F4-06)
+            if it.estimate_ref and it.estimate_ref["ref"] in refs:
+                it.estimate = round(refs[it.estimate_ref["ref"]], it.estimate_ref.get("dp", 0))
         self.ranges = {}
         for it in self.items.values():
             r = it.range

@@ -41,12 +41,16 @@ def side_projections(lay) -> list[dict]:
     return out
 
 
-def _wall_section(th: dict, t_out: float, core: float, t_in: float, member: dict | None) -> dict:
+def _wall_section(th: dict, t_out: float, core: float, t_in: float, member: dict | None, x_c: float = 0.0,
+                  insert: dict | None = None, window: dict | None = None) -> dict:
     """Steady conduction in a half strip of the side wall, `th["strip_mm"]` wide, at one member on the inner skin (or
-    none), per metre of member length. Cells of `th["cell_mm"]`: x along the wall from the member's centreline, y through
-    the wall from the outer face. The outer and inner faces lose heat through Rse and Rsi, the centreline is a symmetry
-    plane and the strip's far edge is adiabatic. Returns the coldest inside surface, the member's coldest cell and the
-    heat through the strip, W per metre of member."""
+    none), per metre of member length. Cells of `th["cell_mm"]`: x along the wall from a symmetry plane, y through the
+    wall from the outer face. The member's centre stands `x_c` from that plane, so x_c above zero models a pair of
+    members 2 x_c apart. An `insert` (w, k) fills the core beside the member's far edge, and a `window` (U) takes the
+    rest of the strip as one material through the wall's thickness with that U-value on ISO 6946's films. The outer and
+    inner faces lose heat through Rse and Rsi, and the strip's far edge is adiabatic. Returns the coldest inside surface
+    over the wall (the window's own surface left out), the member's coldest cell and the heat through the strip, W per
+    metre of member."""
     import scipy.sparse as sp
     from scipy.sparse.linalg import spsolve
     h, kk = th["cell_mm"], th["k"]
@@ -59,14 +63,22 @@ def _wall_section(th: dict, t_out: float, core: float, t_in: float, member: dict
     k[Y < t_out] = kk["grp"]
     k[Y > depth - t_in] = kk["grp"]
     al = np.zeros((ny, nx), dtype=bool)
+    wall_cols = np.ones(nx, dtype=bool)
     if member:
         y1 = depth - t_in
         y0 = y1 - member["depth"]
         half, t = member["width"] / 2, member["wall"]
-        al = (X < half) & (Y > y0) & (Y < y1)
+        al = (abs(X - x_c) < half) & (Y > y0) & (Y < y1)
         k[al] = kk["aluminium"]
-        k[(X < half - t) & (Y > y0 + t) & (Y < y1 - t)] = kk["air"]
+        k[(abs(X - x_c) < half - t) & (Y > y0 + t) & (Y < y1 - t)] = kk["air"]
         al &= k == kk["aluminium"]
+        edge = x_c + half
+        if insert:
+            k[(X > edge) & (X < edge + insert["w"]) & (Y > t_out) & (Y < depth - t_in)] = insert["k"]
+            edge += insert["w"]
+        if window:
+            k[:, x > edge] = depth / 1000 / (1 / window["U"] - th["rsi_heat"] - th["rse"])
+            wall_cols = x < edge
     idx = np.arange(nx * ny).reshape(ny, nx)
     hm = h / 1000.0
     rows, cols, vals = [], [], []
@@ -92,7 +104,222 @@ def _wall_section(th: dict, t_out: float, core: float, t_in: float, member: dict
     T = spsolve(A.tocsc(), rhs).reshape(ny, nx)
     q_in = g_in * (th["t_in"] - T[-1, :])                         # W per metre of member through each column's inner face
     tsi = th["t_in"] - q_in / hm * th["rsi"]
-    return dict(tsi_min=float(tsi.min()), t_member=float(T[al].min()) if al.any() else None, q_w_m=float(q_in.sum()))
+    return dict(tsi_min=float(tsi[wall_cols].min()), t_member=float(T[al].min()) if al.any() else None, q_w_m=float(q_in.sum()))
+
+
+def _wall_line(th: dict, t_out: float, core: float, t_in: float, member: dict, others: list, inserts: list, holes: list) -> dict:
+    """Steady conduction across the side wall, `th["strip_mm"]` each side of one member on the inner skin, as built
+    around it: the other members near it (their centres, mm from this one's), the insert strips (x0, x1, k) that fill
+    the core and the openings beyond them (x0, x1, U), each taken through the wall's thickness as one material with its
+    U-value on ISO 6946's films. Both ends adiabatic. Every neighbour is taken at the section's height, though a window
+    covers only part of the member's length, so this is a bound. Returns the coldest inside surface over the member."""
+    import scipy.sparse as sp
+    from scipy.sparse.linalg import spsolve
+    h, kk = th["cell_mm"], th["k"]
+    depth = t_out + core + t_in
+    L = th["strip_mm"]
+    nx, ny = round(2 * L / h), round(depth / h)
+    y = (np.arange(ny) + 0.5) * h
+    x = (np.arange(nx) + 0.5) * h - L
+    Y, X = np.meshgrid(y, x, indexing="ij")
+    k = np.full((ny, nx), kk["xps"])
+    k[Y < t_out] = kk["grp"]
+    k[Y > depth - t_in] = kk["grp"]
+    y1 = depth - t_in
+    y0 = y1 - member["depth"]
+    half, t = member["width"] / 2, member["wall"]
+    for xc in [0.0] + list(others):
+        box = (abs(X - xc) < half) & (Y > y0) & (Y < y1)
+        k[box] = kk["aluminium"]
+        k[(abs(X - xc) < half - t) & (Y > y0 + t) & (Y < y1 - t)] = kk["air"]
+    for a, c, kv in inserts:
+        k[(X > a) & (X < c) & (Y > t_out) & (Y < depth - t_in)] = kv
+    over = abs(x) < half
+    for a, c, U in holes:
+        k[:, (x > a) & (x < c)] = depth / 1000 / (1 / U - th["rsi_heat"] - th["rse"])
+    idx = np.arange(nx * ny).reshape(ny, nx)
+    hm = h / 1000.0
+    rows, cols, vals = [], [], []
+    diag = np.zeros(nx * ny)
+    for a, b in ((k[:, :-1], k[:, 1:]), (k[:-1, :], k[1:, :])):
+        g = (2 * a * b / (a + b)).ravel()
+        i, j = ((idx[:, :-1], idx[:, 1:]) if a.shape[1] == nx - 1 else (idx[:-1, :], idx[1:, :]))
+        i, j = i.ravel(), j.ravel()
+        rows += [i, j]
+        cols += [j, i]
+        vals += [-g, -g]
+        np.add.at(diag, i, g)
+        np.add.at(diag, j, g)
+    g_out = hm / (th["rse"] + hm / 2 / k[0, :])
+    g_in = hm / (th["rsi"] + hm / 2 / k[-1, :])
+    rhs = np.zeros(nx * ny)
+    np.add.at(diag, idx[0, :], g_out)
+    np.add.at(diag, idx[-1, :], g_in)
+    rhs[idx[0, :]] += g_out * th["t_out"]
+    rhs[idx[-1, :]] += g_in * th["t_in"]
+    A = sp.csr_matrix((np.concatenate(vals + [diag]), (np.concatenate(rows + [np.arange(nx * ny)]),
+                                                        np.concatenate(cols + [np.arange(nx * ny)]))), shape=(nx * ny, nx * ny))
+    T = spsolve(A.tocsc(), rhs).reshape(ny, nx)
+    tsi = th["t_in"] - g_in * (th["t_in"] - T[-1, :]) / hm * th["rsi"]
+    return dict(tsi=float(tsi[over].min()))
+
+
+def _plate_k(a: float, b: float, D: float, nu: float, S: float) -> np.ndarray:
+    """Stiffness of an a x b rectangle of a Mindlin plate, the MITC4 element of Bathe and Dvorkin (1985), whose transverse
+    shear is sampled at the edge midpoints so a thin plate does not lock. DOFs per node (w, rotation x, rotation y), the
+    nodes anticlockwise from (0, 0). Bending on 2 x 2 Gauss points with D (N mm), shear with S (N/mm)."""
+    Db = D * np.array([[1, nu, 0], [nu, 1, 0], [0, 0, (1 - nu) / 2]])
+    xi_n, et_n = np.array([-1, 1, 1, -1]), np.array([-1, -1, 1, 1])
+    K = np.zeros((12, 12))
+    g = 1 / math.sqrt(3)
+    for xi in (-g, g):
+        for et in (-g, g):
+            B = np.zeros((3, 12))
+            B[0, 1::3] = xi_n * (1 + et_n * et) / (2 * a)
+            B[1, 2::3] = et_n * (1 + xi_n * xi) / (2 * b)
+            B[2, 1::3], B[2, 2::3] = B[1, 2::3], B[0, 1::3]
+            K += B.T @ Db @ B * a * b / 4
+
+    def strain(n0, n1, length, rot):
+        r = np.zeros(12)
+        r[3 * n0], r[3 * n1] = -1 / length, 1 / length
+        r[3 * n0 + rot] = r[3 * n1 + rot] = 0.5
+        return r
+    for p, q in ((strain(0, 1, a, 1), strain(3, 2, a, 1)), (strain(0, 3, b, 2), strain(1, 2, b, 2))):
+        K += S * a * b / 3 * (np.outer(p, p) + np.outer(q, q) + 0.5 * (np.outer(p, q) + np.outer(q, p)))
+    return K
+
+
+def _grid(lines, step: float) -> np.ndarray:
+    """Grid coordinates through every line given, no wider apart than `step`."""
+    lines = sorted({round(v, 3) for v in lines})
+    out = [lines[0]]
+    for a, b in zip(lines, lines[1:]):
+        n = max(1, math.ceil((b - a) / step - 1e-9))
+        out += [a + (b - a) * (i + 1) / n for i in range(n)]
+    return np.array(out)
+
+
+def _wall_plate(x0: float, x1: float, H: float, cuts: list, members: list, supports: list, panel, p: float, step: float,
+                corner: float = 0.0) -> dict:
+    """A side wall as a Mindlin plate (MITC4) at a uniform net pressure p (MPa), simply supported along the floor and roof
+    joiners (z 0 and H) and the end walls (x0 and x1), and on each line in `supports` (x, z0, z1). `cuts` are the openings
+    (u0, u1, z0, z1): their panel is left out and their own wind load goes to their edges by 45 degree lines, as a window
+    or a door bears on its frame all round. `members` (x, z0, z1, EI, GA, GJ) are beams along their grid line with their
+    own bending, shear and St Venant torsion, and its `ends` (z0, z1, EI, GA) are the blocks that carry its shear to the
+    joiners. Returns the deflection field, each member's largest moment, line load and end shear, the plate's largest
+    principal moment, and its largest transverse shear per mm away from the cut-outs' corners (within `corner`), where a
+    re-entrant corner concentrates it."""
+    import scipy.sparse as sp
+    from scipy.sparse.linalg import spsolve
+    clip = lambda v, lo, hi: min(max(v, lo), hi)  # noqa: E731
+    X = _grid([x0, x1] + [clip(v, x0, x1) for c in cuts for v in c[:2]] + [m["x"] for m in members] + [s[0] for s in supports], step)
+    Z = _grid([0, H] + [clip(v, 0, H) for c in cuts for v in c[2:]] + [v for m in members for v in (m["z0"], m["z1"])], step)
+    nx, nz = len(X), len(Z)
+    N = 3 * nx * nz
+    node = lambda i, j: j * nx + i  # noqa: E731
+    xc, zc = (X[:-1] + X[1:]) / 2, (Z[:-1] + Z[1:]) / 2
+    rows, cols, vals, elems, cache = [], [], [], [], {}
+    f = np.zeros(N)
+    used = np.zeros(nx * nz, dtype=bool)
+    for j in range(nz - 1):
+        for i in range(nx - 1):
+            if any(c[0] < xc[i] < c[1] and c[2] < zc[j] < c[3] for c in cuts):
+                continue
+            a, b = X[i + 1] - X[i], Z[j + 1] - Z[j]
+            key = (round(a, 4), round(b, 4))
+            if key not in cache:
+                cache[key] = _plate_k(a, b, panel.D, panel.nu, panel.S)
+            ns = [node(i, j), node(i + 1, j), node(i + 1, j + 1), node(i, j + 1)]
+            dofs = np.array([3 * n + q for n in ns for q in range(3)])
+            rows.append(np.repeat(dofs, 12))
+            cols.append(np.tile(dofs, 12))
+            vals.append(cache[key].ravel())
+            f[3 * np.array(ns)] += p * a * b / 4
+            used[ns] = True
+            elems.append((a, b, dofs))
+    for u0, u1, z0, z1 in cuts:                       # each opening's load to the nearest point of its nearest edge
+        cu = np.linspace(u0, u1, max(2, int((u1 - u0) / 5)) + 1)
+        cz = np.linspace(z0, z1, max(2, int((z1 - z0) / 5)) + 1)
+        dA = (cu[1] - cu[0]) * (cz[1] - cz[0])
+        CU, CZ = np.meshgrid((cu[:-1] + cu[1:]) / 2, (cz[:-1] + cz[1:]) / 2, indexing="ij")
+        near = np.stack([CU - u0, u1 - CU, CZ - z0, z1 - CZ]).argmin(axis=0)
+        for e, (at, vertical) in enumerate(((u0, True), (u1, True), (z0, False), (z1, False))):
+            pos = (CZ if vertical else CU)[near == e]
+            line, fixed = (Z, int(np.argmin(abs(X - at)))) if vertical else (X, int(np.argmin(abs(Z - at))))
+            idx = np.clip(np.searchsorted(line, pos) - 1, 0, len(line) - 2)
+            t = (pos - line[idx]) / (line[idx + 1] - line[idx])
+            for sel, wgt in ((idx, 1 - t), (idx + 1, t)):
+                ns = node(fixed, sel) if vertical else node(sel, fixed)
+                np.add.at(f, 3 * ns, p * dA * wgt)
+    beams = []
+    for m in members:
+        i = int(np.argmin(abs(X - m["x"])))
+        for j in range(nz - 1):
+            inside = Z[j] >= m["z0"] - 1e-6 and Z[j + 1] <= m["z1"] + 1e-6
+            end = next((e for e in m.get("ends", []) if Z[j] >= e["z0"] - 1e-6 and Z[j + 1] <= e["z1"] + 1e-6), None)
+            if not inside and end is None:
+                continue
+            seg = m if inside else dict(m, EI=end["EI"], GA=end["GA"], GJ=0.0, end=True)   # a block or pad at the member's end
+            L = Z[j + 1] - Z[j]
+            dofs = np.array([3 * node(i, j), 3 * node(i, j) + 1, 3 * node(i, j) + 2, 3 * node(i, j + 1), 3 * node(i, j + 1) + 1, 3 * node(i, j + 1) + 2])
+            ke = np.zeros((6, 6))
+            gv = np.array([-1 / L, 0, 0.5, 1 / L, 0, 0.5])             # the beam's shear, sampled at mid-length
+            ke += seg["GA"] * L * np.outer(gv, gv)
+            for q, stiff in ((2, seg["EI"]), (1, seg["GJ"])):               # bending on the y rotation, torsion on the x rotation
+                ke[np.ix_([q, q + 3], [q, q + 3])] += stiff / L * np.array([[1, -1], [-1, 1]])
+            rows.append(np.repeat(dofs, 6))
+            cols.append(np.tile(dofs, 6))
+            vals.append(ke.ravel())
+            beams.append((seg, j, L, dofs))
+    K = sp.csr_matrix((np.concatenate(vals), (np.concatenate(rows), np.concatenate(cols))), shape=(N, N))
+    fixed = np.repeat(~used, 3)
+    w_dof = lambda i, j: 3 * node(i, j)  # noqa: E731
+    for i in range(nx):
+        fixed[w_dof(i, 0)] = fixed[w_dof(i, nz - 1)] = True
+    for j in range(nz):
+        fixed[w_dof(0, j)] = fixed[w_dof(nx - 1, j)] = True
+    for xs, za, zb in supports:
+        i = int(np.argmin(abs(X - xs)))
+        for j in np.nonzero((Z >= za - 1e-6) & (Z <= zb + 1e-6))[0]:
+            fixed[w_dof(i, j)] = True
+    free = ~fixed
+    u = np.zeros(N)
+    u[free] = spsolve(K[free][:, free].tocsc(), f[free])
+    w = np.where(used.reshape(nz, nx), u[0::3].reshape(nz, nx), 0.0)
+    mem = {}
+    for m, j, L, dofs in beams:
+        M = m["EI"] * (u[dofs[5]] - u[dofs[2]]) / L
+        V = m["GA"] * ((u[dofs[3]] - u[dofs[0]]) / L + (u[dofs[2]] + u[dofs[5]]) / 2)
+        r = mem.setdefault(m["name"], dict(M=0.0, z=0.0, V=[], V_end=0.0))
+        if m.get("end"):
+            r["V_end"] = max(r["V_end"], abs(V))
+            continue
+        r["V"].append(((Z[j] + Z[j + 1]) / 2, V))
+        if abs(M) > abs(r["M"]):
+            r.update(M=M, z=(Z[j] + Z[j + 1]) / 2)
+    for r in mem.values():                            # the member's line load: the change in its shear from one element to the next
+        r["q"] = max((abs(v1 - v0) / (z1 - z0) for (z0, v0), (z1, v1) in zip(r["V"], r["V"][1:])), default=0.0)
+        del r["V"]
+    Db = panel.D * np.array([[1, panel.nu, 0], [panel.nu, 1, 0], [0, 0, (1 - panel.nu) / 2]])
+    m_max = q_max = 0.0
+    q_at = (0.0, 0.0)
+    corners = [(cx, cz) for c in cuts for cx in c[:2] for cz in c[2:]]      # the core's shear left out next to a cut-out's corners
+    sgn = np.array([-1, 1, 1, -1])
+    for a, b, dofs in elems:
+        ue = u[dofs]
+        kx = ue[1::3] @ (sgn / (2 * a))
+        ky = ue[2::3] @ (np.array([-1, -1, 1, 1]) / (2 * b))
+        kxy = ue[1::3] @ (np.array([-1, -1, 1, 1]) / (2 * b)) + ue[2::3] @ (sgn / (2 * a))
+        mx, my, mxy = Db @ np.array([kx, ky, kxy])
+        m_max = max(m_max, abs((mx + my) / 2) + math.hypot((mx - my) / 2, mxy))
+        gx = (ue[3] - ue[0] + ue[6] - ue[9]) / (2 * a) + ue[1::3].mean()
+        gy = (ue[9] - ue[0] + ue[6] - ue[3]) / (2 * b) + ue[2::3].mean()
+        q = panel.S * math.hypot(gx, gy)
+        xe, ze = float(X[dofs[0] // 3 % nx]) + a / 2, float(Z[dofs[0] // 3 // nx]) + b / 2
+        if q > q_max and not any(abs(xe - cx) < corner and abs(ze - cz) < corner for cx, cz in corners):
+            q_max, q_at = q, (xe, ze)
+    return dict(X=X, Z=Z, w=w, members=mem, m_max=m_max, q_max=q_max, q_at=q_at)
 
 
 def _w_sat(t: float) -> float:
@@ -118,6 +345,7 @@ class Panel:
         self.c = d["core"]["c"]
         self.dd = self.c + (self.t1 + self.t2) / 2          # skin centre spacing
         self.E, self.G, self.ult = d["E"], d["G"], d["ult"]
+        self.nu = self.E / (2 * self.G) - 1                 # the skins taken as isotropic
         self.core = d["core"]
         st = d.get("stiffener")
         self.D_stiff = st["E"] * st["I"] / st["pitch"] if st else 0.0   # stiffeners smeared over their pitch, N mm2/mm
@@ -239,15 +467,16 @@ class Body:
         u_st = s_st / (st["fy"] / cr["metal_factor"])
         # the member's share reaches it from the outer skin through the XPS behind it, in compression or, in suction, tension
         s_xps = share * wu["kpa"] / 1000 * st["pitch"] / st["width"]
-        v250 = self.d["wind"]["V_250"] * self.d["wind"]["Mzcat"]
-        f250 = (v250 / wu["V"]) ** 2
+        v_r = self.tr.td["stability"]["overturn"]["tie_down"]["v_r_ms"]       # STB-05's gust, region B's 500-year wind
+        v500 = v_r * self.d["wind"]["Mzcat"]
+        f500 = (v500 / wu["V"]) ** 2
         a_xps = cr["core_factor"] * w.core["compression"]
         row("BDY-06", f"Side wall in the ultimate wind, {wu['kpa']:.2f} kPa net at {wu['V']:.0f} m/s, floor to the roof joiner ({V['interior_h']:.0f} mm)",
             w, r, "Wind, ultimate", extra=(f"the member takes {100 * share:.0f} % of its bay's load, {s_st:.0f} MPa against {st['fy'] / cr['metal_factor']:.0f} MPa, "
                                           f"utilisation {u_st:.2f}. The {st['break']:g} mm of XPS behind it carries {s_xps:.3f} MPa against "
-                                          f"{a_xps:.2f} MPa. Strapped down (STB-05), at region B's 250-year gust at 3 m, {self.d['wind']['V_250']:g} m/s "
-                                          f"times {self.d['wind']['Mzcat']:g}, {v250:.1f} m/s, the member works at {u_st * f250:.2f} and the skins at "
-                                          f"{w.utils(r, cr)['util'] * f250:.2f}"))
+                                          f"{a_xps:.2f} MPa. Strapped down, at STB-05's gust, region B's 500-year wind at 3 m, {v_r:g} m/s "
+                                          f"times {self.d['wind']['Mzcat']:g}, {v500:.1f} m/s, the member works at {u_st * f500:.2f} and the skins at "
+                                          f"{w.utils(r, cr)['util'] * f500:.2f}. BDY-25 checks the walls with their openings"))
         if max(u_st, s_xps / a_xps) > out[-1]["util"]:
             out[-1].update(util=max(u_st, s_xps / a_xps), governing="member" if u_st >= s_xps / a_xps else "XPS behind the member")
         # the fixed roof with the bonded solar array and its own weight, spanning between the walls
@@ -298,8 +527,8 @@ class Body:
         f_rail = max(f_night, f_travel)
         st = self.p["wall"].d["stiffener"]
         aw = self.awning()
-        rows = [dict(id="INS-01", what=(f"Lift-bed rail screw, 1/4 in self-tapping through the inner skin into the {st['name'].split(' 6060')[0]} "
-                                        f"hardpoint's {st['wall']:g} mm wall, shear"), n=f_rail, rated_n=L["rail_screw_rated_n"],
+        rows = [dict(id="INS-01", what=(f"Lift-bed rail screw, 1/4 in self-drilling, {L['rail_screw_mm']:g} mm under the head, through the inner skin "
+                                        f"into the {st['name'].split(' 6060')[0]} hardpoint's {st['wall']:g} mm wall, shear"), n=f_rail, rated_n=L["rail_screw_rated_n"],
                      case=(f"{L['bed_night_factor']:g} x the {L['bed_kg']:.0f} kg bed at night" if f_night >= f_travel else
                            f"LC2, 3 g on the {L['bed_travel_kg']:.0f} kg moving bed") + f", over {screws} screws"),
                 dict(id="INS-02", what=f"Awning bracket bolt, {aw['bolt']} through the roof's kerb-edge insert strip, tension in travel",
@@ -314,6 +543,16 @@ class Body:
         for r in rows:
             r["util"] = r["n"] / (cr["insert_factor"] * r["rated_n"])
         return rows
+
+    def rail_screw(self) -> dict:
+        """CT-202 detail D (F4-10): how far a lift-bed rail screw reaches, from under its head. The rail's web, the inner skin
+        and the bond bring it to the member's face, and a longer screw than `back_mm` would touch the member's back wall,
+        and one longer than `skin_mm` the outer skin."""
+        L, wl = self.d["loads"], self.p["wall"]
+        st = wl.d["stiffener"]
+        face = L["rail_web_mm"] + wl.t2 + self.d["thermal"]["bond_mm"]
+        return dict(length_mm=L["rail_screw_mm"], face_mm=face, into_mm=L["rail_screw_mm"] - face,
+                    back_mm=face + st["depth"] - st["wall"], skin_mm=face + st["depth"] + st["break"])
 
     def awning(self) -> dict:
         """The Fiamma F80s on the roof's kerb edge (data/body/body.yaml `awning`): its bracket bolts in travel (INS-02) and
@@ -342,40 +581,114 @@ class Body:
         temperature (the HappiJac rails screwed to it run at about the same), the plain wall's surface and the extra heat
         loss per metre of member, both ways from its centreline."""
         th, wl = self.d["thermal"], self.p["wall"]
-        st = wl.d["stiffener"]
-        with_member = _wall_section(th, wl.t1, wl.c, wl.t2, st)
+        st, jn = wl.d["stiffener"], self.d["joiners"]
+        k = th["k"]
+        mc = self.members_clear()
+        single = _wall_section(th, wl.t1, wl.c, wl.t2, st)
         plain = _wall_section(th, wl.t1, wl.c, wl.t2, None)
+        ends_at = self.member_ends()
+        sections = self.member_sections(mc, ends_at)
+        beside = min(sections, key=lambda q: q["mid"])
+        ins = min((s["width_mm"] for s in mc["side_inserts"]), default=None)
+        gap = min((q["gap_mm"] for q in mc["pairs"]), default=None)
         dT = th["t_in"] - th["t_out"]
         heat = dict(th, rsi=th["rsi_heat"])                     # the heat loss figure on ISO 6946's film
         psi = 2 * (_wall_section(heat, wl.t1, wl.c, wl.t2, st)["q_w_m"] - _wall_section(heat, wl.t1, wl.c, wl.t2, None)["q_w_m"]) / dT
-        # along the member (F3-05): a fin between the inside and outside air, each end 10 mm from a joiner taken at the
-        # outside air (a bound), through a rigid PVC pad at the foot and XPS at the head. One-dimensional conductances over
-        # the member's width leave out its side paths, which makes the fin longer and its ends colder
-        k = th["k"]
+        # along the member: a fin between the inside and outside air. One-dimensional conductances over the member's width
+        # leave out its side paths, which makes the fin longer and its ends colder
         w, d, t, brk = st["width"], st["depth"], st["wall"], st["break"]
         kA = k["aluminium"] * (w * d - (w - 2 * t) * (d - 2 * t)) * 1e-6
         g_in = w / 1000 / (th["rsi"] + wl.t2 / 1000 / k["grp"])
         g_out = w / 1000 / (brk / 1000 / k["xps"] + wl.t1 / 1000 / k["grp"] + th["rse"])
         m = math.sqrt((g_in + g_out) / kA)
-        gap, pad = st["end_gap_mm"] / 1000, st["foot_pad_mm"]
-        tm = with_member["t_member"]
-        ends = {}
-        for name, g in (("foot", (k["pvc"] * pad + k["xps"] * (w - pad)) * d * 1e-6 / gap), ("head", k["xps"] * w * d * 1e-6 / gap)):
-            drop = g * (tm - th["t_out"]) / (kA * m + g)
-            ends[name] = dict(drop_k=drop, tsi=with_member["tsi_min"] - drop, g_w_k=g)
+        tm = single["t_member"]
+        ends = {name: self._member_end(e, kA * m, tm, min(q[name] for q in sections)) for name, e in ends_at.items()}
+        cover = jn["cover"]
+        joiner = th["t_in"] - dT * th["rsi"] / (th["rsi"] + cover["t_mm"] / 1000 / k[cover["k"]])
         # the dew point on the generators: e2 fans A and B and the RESPA-CF2 (report 19's moisture model)
         gm = th["generator_mode"]
         q = gm["e2_m3h"] + gm["respa_m3h"]
         eps = gm["eps_lat"] * gm["e2_m3h"] / q
         dew_gen = _dew(gm["w_out_factor"] * _w_sat(th["t_out"]) + gm["moisture_g_h"] / (1.2 * q * (1 - eps)))
-        length_m = sum(b.mass_kg for b in self.lay.blocks if b.id in th["members"]) / st["kg_m"]
+        each = self.V["ceiling_z"] - self.V["floor_underside_z"] - ends_at["foot"]["at_mm"] - ends_at["head"]["at_mm"]
+        length_m = len(mc["members"]) * each / 1000
         need = th["dew_point"] + th["margin_k"]
-        tsi = min(with_member["tsi_min"], ends["foot"]["tsi"], ends["head"]["tsi"])
-        return dict(tsi_min=tsi, tsi_mid=with_member["tsi_min"], t_member=tm, tsi_plain=plain["tsi_min"], need=need, ends=ends,
-                    fin_mm=1000 / m, gap_mm=st["end_gap_mm"], pad_mm=pad, rsi=th["rsi"], dew_gen=dew_gen,
+        where = dict(mid=single["tsi_min"], beside=beside["mid"], foot=ends["foot"]["tsi"], head=ends["head"]["tsi"], joiner=joiner)
+        gov = min(where, key=where.get)
+        return dict(tsi_min=where[gov], governs=gov, where=where, tsi_mid=single["tsi_min"], t_member=tm, tsi_plain=plain["tsi_min"],
+                    need=need, ends=ends, fin_mm=1000 / m, rsi=th["rsi"], dew_gen=dew_gen, insert_mm=ins, pair_gap_mm=gap,
+                    beside_member=beside["member"], sections=sections, door_u=th["door_u"],
+                    insert_k=k[th["insert"]], window_u=th["window_u"], cover_mm=cover["t_mm"],
                     need_gen=dew_gen + th["margin_k"], gen_m3h=q, psi=psi, length_m=length_m, w_k=psi * length_m,
                     members=th["members"], member=st["name"], brk=brk, t_out=th["t_out"], t_in=th["t_in"], dew=th["dew_point"],
                     bare=th["bare_panels_w_k"], bridges=th["bridges_w_k"])
+
+    def member_sections(self, mc: dict, ends_at: dict) -> list[dict]:
+        """BDY-22 across each wall member as it stands (F4-02, F4-04): its neighbours within the section's strip, the other
+        members, W1's and W2's side inserts with their windows beyond, and the doors' and windows' 70 mm insert strips (taken
+        as rigid PVC, a bound) with the door or window beyond. At mid-length every neighbour counts. At the foot and the head
+        only the openings that reach that height, as the doors reach the floor."""
+        th, wl, ru, V = self.d["thermal"], self.p["wall"], self.d["members_rule"], self.V
+        st, k = wl.d["stiffener"], th["k"]
+        half, L = st["width"] / 2, th["strip_mm"]
+        ops = [o for o in self.openings() if o["wall"] in ("kerb", "road") and not o.get("gland")]
+        cache, out = {}, []
+        for iid, wall, x in mc["members"]:
+            others = tuple(round(x2 - x, 1) for i2, w2, x2 in mc["members"] if w2 == wall and i2 != iid and abs(x2 - x) < L + half)
+            feats = []                                                  # (insert, hole, z0, z1) beside this member
+            for si in mc["side_inserts"]:
+                if si["member"] == iid:
+                    o = next(o for o in ops if o["id"] == si["opening"])
+                    sgn = 1 if V["body_x0"] + o["u0"] > x else -1
+                    a, c = sgn * half, sgn * (half + si["width_mm"])
+                    feats.append(((min(a, c), max(a, c), k[th["insert"]]), (min(c, sgn * L), max(c, sgn * L), th["window_u"]), o["z0"], o["z1"]))
+            for o in ops:
+                if o["id"] in ru["side_inserts"]["openings"] or not any(o.get("line", "").startswith(q) for q in ru["strip_lines"]):
+                    continue
+                u0, u1 = V["body_x0"] + o["u0"] - x, V["body_x0"] + o["u1"] - x
+                if u1 + ru["strip_mm"] < -L or u0 - ru["strip_mm"] > L:
+                    continue
+                U = th["window_u"] if o["line"].startswith("WN-") else th["door_u"]
+                feats.append(((u0 - ru["strip_mm"], u0, k[th["strip_k"]]), (u0, u1, U), o["z0"], o["z1"]))
+                feats.append(((u1, u1 + ru["strip_mm"], k[th["strip_k"]]), None, o["z0"], o["z1"]))
+            row = dict(member=iid, wall=wall)
+            for name, zs in (("mid", None), ("foot", ends_at["foot"]["z"]), ("head", ends_at["head"]["z"])):
+                use = [f for f in feats if zs is None or f[2] - 1e-6 <= zs <= f[3] + 1e-6]
+                key = (others, tuple(f[0] for f in use), tuple(f[1] for f in use if f[1]))
+                if key not in cache:
+                    cache[key] = _wall_line(th, wl.t1, wl.c, wl.t2, st, others, [f[0] for f in use], [f[1] for f in use if f[1]])["tsi"]
+                row[name] = cache[key]
+            out.append(row)
+        return out
+
+    def member_ends(self) -> dict:
+        """Where each wall member ends against its joiners (BDY-22, F4-01), mm from the wall's bottom and top edges. At its
+        foot it stands on its insulating bearing block `foot_clear_mm` above the floor joiner's inner leg, which wraps the
+        inner skin to `inner_leg_mm` (with its flange), so the leg overlaps none of it. At its head it stops `end_gap_mm`
+        under the wall's top insert strip, and the roof joiner's inner leg reaches `inner_leg_mm` down the inner skin."""
+        st, jn, V = self.p["wall"].d["stiffener"], self.d["joiners"], self.V
+        foot = jn["floor"]["inner_leg_mm"] + st["foot_clear_mm"]
+        head = jn["top_strip_mm"] + st["end_gap_mm"]
+        return dict(foot=dict(at_mm=foot, leg_mm=jn["floor"]["inner_leg_mm"], clear_mm=st["foot_clear_mm"], gap_mm=st["foot_clear_mm"],
+                              block_w=st["block_mm"], z=foot - V["floor_t"]),
+                    head=dict(at_mm=head, leg_mm=jn["roof"]["inner_leg_mm"], clear_mm=head - jn["roof"]["inner_leg_mm"],
+                              gap_mm=st["end_gap_mm"], block_w=st["head_pad_mm"], z=V["interior_h"] - head))
+
+    def _member_end(self, e: dict, fin_g: float, tm: float, tsi_mid: float) -> dict:
+        """The drop in a member's temperature at one end, a fin's end losing heat to a joiner taken at the outside air (a
+        bound). Three paths: through the rigid PVC block or pad and the XPS beside it, over the clearance to the floor
+        joiner's leg or the gap under the top insert strip, along the inner skin to the joiner's leg, and, where a leg
+        overlaps the member, through the bond and the skin between them (the path F4-01 found)."""
+        th, wl = self.d["thermal"], self.p["wall"]
+        st, k = wl.d["stiffener"], th["k"]
+        w, d = st["width"], st["depth"]
+        clear = max(e["clear_mm"], 1.0) / 1000
+        g = (k["pvc"] * e["block_w"] + k["xps"] * (w - e["block_w"])) * d * 1e-6 / (e["gap_mm"] / 1000)
+        g += k["grp"] * wl.t2 * w * 1e-6 / clear
+        overlap = max(0.0, e["leg_mm"] - e["at_mm"])
+        g += w * overlap * 1e-6 / (th["bond_mm"] / 1000 / k["ms"] + wl.t2 / 1000 / k["grp"])
+        drop = g * (tm - th["t_out"]) / (fin_g + g)
+        return dict(e, drop_k=drop, tsi=tsi_mid - drop, g_w_k=g, overlap_mm=overlap)
 
     def members_clear(self) -> dict:
         """FIT-07 (F3-02): each wall member against the cut-outs, insert strips and glands on its side wall, and the bays
@@ -385,19 +698,31 @@ class Body:
         st = self.p["wall"].d["stiffener"]
         x0, half = V["body_x0"], st["width"] / 2
         side = lambda y: "road" if y > 0 else "kerb"  # noqa: E731
-        mem = [(b.iid, side(b.cog[1]), b.cog[0]) for b in lay.blocks if b.id in ("BD-18", "BD-19")]
+        mem = [(b.iid, side(b.cog[1]), b.cog[0]) for b in lay.blocks if b.id in ru["members"]]
         mem += [(f"LB-06 at {b.iid}", side(b.cog[1]), b.cog[0]) for b in lay.blocks if b.id == ru["hardpoints_at"]]
-        obs = []
-        for o in self.openings():
-            if o["wall"] not in ("kerb", "road"):
+        obs, side_inserts = [], []
+        si = ru["side_inserts"]
+        ops = [o for o in self.openings() if o["wall"] in ("kerb", "road")]
+        for o in ops:
+            a, c = x0 + o["u0"], x0 + o["u1"]
+            if o["id"] in si["openings"]:
+                # F4-02: an S4's clamp bears on a solid edge at W1's and W2's sides too. Each side insert fills the core from
+                # the cut-out to the hardpoint beside it, bonded into the hardpoint's routed channel
+                for edge, sgn in ((a, -1), (c, 1)):
+                    near = min(mem, key=lambda q: abs(q[2] - edge) if q[1] == o["wall"] else math.inf)
+                    width = (near[2] - half - edge) if sgn > 0 else (edge - (near[2] + half))
+                    side_inserts.append(dict(opening=o["id"], member=near[0], wall=o["wall"], width_mm=width))
+                    obs.append((o["wall"], min(edge, edge + sgn * width), max(edge, edge + sgn * width),
+                                f"{o['id']}'s side insert", near[0]))
                 continue
-            strip = ru["strip_mm"] if any(o.get("line", "").startswith(p) for p in ru["strip_lines"]) and o["id"] not in ru["no_side_strips"] else 0
+            strip = ru["strip_mm"] if any(o.get("line", "").startswith(p) for p in ru["strip_lines"]) else 0
             what = f"{o['id']} ({o['name'].split(',')[0]})" + (f" with its {strip:g} mm insert strip" if strip else "")
-            obs.append((o["wall"], x0 + o["u0"] - strip, x0 + o["u1"] + strip, what))
+            obs.append((o["wall"], a - strip, c + strip, what, None))
+        as_openings = {o["id"] for o in ops}
         for g in yaml.safe_load((DATA / "services.yaml").read_text())["glands"]:
-            if g["at"] in ("kerb", "road"):
+            if g["at"] in ("kerb", "road") and g["id"] not in as_openings:
                 gw = g.get("w", g["d"])
-                obs.append((g["at"], g["x"] - gw / 2, g["x"] + gw / 2, f"gland {g['id']}"))
+                obs.append((g["at"], g["x"] - gw / 2, g["x"] + gw / 2, f"gland {g['id']}", None))
         strips = []
         for sp in ru.get("strips", []):            # a horizontal fixing strip stops clear_mm short of each member it meets
             bb = lay.find(sp["block"]).box
@@ -410,12 +735,18 @@ class Body:
                 pieces = [q for a, c in pieces for q in (((a, c),) if hi <= a or lo >= c else tuple(
                     p for p in ((a, lo), (hi, c)) if p[1] - p[0] > 1e-6))]
             strips += [(wall, a, c, sp["name"]) for a, c in pieces]
-        obs += strips
+        obs += [s + (None,) for s in strips]
         rows = []
         for iid, wall, x in mem:
-            gaps = [(max(o0 - (x + half), (x - half) - o1), what) for w2, o0, o1, what in obs if w2 == wall]
+            gaps = [(max(o0 - (x + half), (x - half) - o1), what) for w2, o0, o1, what, shares in obs if w2 == wall and shares != iid]
             g, what = min(gaps)
-            rows.append(dict(member=iid, wall=wall, x=x, gap_mm=g, to=what))
+            shared = [s for s in side_inserts if s["member"] == iid]
+            rows.append(dict(member=iid, wall=wall, x=x, gap_mm=g, to=what, shares=[s["opening"] for s in shared]))
+        pairs = []
+        for i, (a_id, a_w, a_x) in enumerate(mem):
+            for b_id, b_w, b_x in mem[i + 1:]:
+                if a_w == b_w and abs(a_x - b_x) - 2 * half < ru["clear_mm"] * 4:
+                    pairs.append(dict(members=(a_id, b_id), wall=a_w, gap_mm=abs(a_x - b_x) - 2 * half))
         bays = {}
         for wall in ("kerb", "road"):
             xs = [x0 + V["end_wall_t"], V["body_x1"] - V["end_wall_t"]] + [x for _, w2, x in mem if w2 == wall]
@@ -428,8 +759,90 @@ class Body:
         worst = min(r["gap_mm"] for r in rows)
         probs = [f"{r['member']} on the {r['wall']} side is {r['gap_mm']:.0f} mm from {r['to']}" for r in rows if r["gap_mm"] < ru["clear_mm"] - 1e-6]
         probs += [f"a {w2} side bay is {v:.0f} mm wide" for w2, v in bays.items() if v > st["pitch"] + 1e-6]
+        probs += [f"{s['opening']}'s side insert beside {s['member']} is {s['width_mm']:.0f} mm, under {si['min_mm']:g} mm"
+                  for s in side_inserts if s["width_mm"] < si["min_mm"] - 1e-6]
         return dict(ok=not probs, problems=probs, rows=rows, worst_mm=worst, bays=bays, pitch=st["pitch"], clear_mm=ru["clear_mm"],
-                    width=st["width"], strips=strips)
+                    width=st["width"], strips=strips, side_inserts=side_inserts, insert_min_mm=si["min_mm"], pairs=pairs,
+                    members=mem)
+
+    def wall_plates(self) -> dict:
+        """BDY-24 and BDY-25 (F4-04): each side wall as a plate from the front wall to the rear wall with every opening cut
+        out and every member on its line, so the bays that hold openings carry their real load. Supported along the floor
+        and roof joiners, at the end walls and on the kitchen tower's sides and the partition, as FIT-07 bounds the bays.
+        The model is linear, so it is solved once at 1 kPa and scaled to BDY-10's and BDY-06's winds and STB-05's gust."""
+        V, wl, lay = self.V, self.p["wall"], self.lay
+        st, ru = wl.d["stiffener"], self.d["members_rule"]
+        mc, ends = self.members_clear(), self.member_ends()
+        w, d, t = st["width"], st["depth"], st["wall"]
+        area = w * d - (w - 2 * t) * (d - 2 * t)
+        J = 4 * ((w - t) * (d - t)) ** 2 * t / (2 * ((w - t) + (d - t)))        # Bredt's thin-walled closed section
+        props = dict(EI=st["E"] * st["I"], GA=st["G"] * area * d / (w + d), GJ=st["G"] * J)
+        x0, x1, H = V["body_x0"] + V["end_wall_t"], V["body_x1"] - V["end_wall_t"], V["interior_h"]
+        bk = self.d["blocks"]
+        blocks = [dict(z0=0.0, z1=ends["foot"]["z"], EI=bk["E"] * ends["foot"]["block_w"] * d ** 3 / 12, GA=bk["G"] * ends["foot"]["block_w"] * d),
+                  dict(z0=ends["head"]["z"], z1=H, EI=bk["E"] * ends["head"]["block_w"] * d ** 3 / 12, GA=bk["G"] * ends["head"]["block_w"] * d)]
+        out = {}
+        for wall in ("kerb", "road"):
+            ops = [o for o in self.openings() if o["wall"] == wall]
+            cuts = [(V["body_x0"] + o["u0"], V["body_x0"] + o["u1"], o["z0"], o["z1"]) for o in ops]
+            mem = [dict(props, name=iid, x=x, z0=ends["foot"]["z"], z1=ends["head"]["z"], ends=blocks) for iid, w2, x in mc["members"] if w2 == wall]
+            sup = []
+            for bid in ru["bounds"]:
+                bb = lay.find(bid).box
+                if (wall == "road" and bb[4] >= V["half_bw"] - V["wall_t"] - 60) or (wall == "kerb" and bb[1] <= -V["half_bw"] + V["wall_t"] + 60):
+                    sup += [(bb[0], bb[2] - V["floor_z"], bb[5] - V["floor_z"]), (bb[3], bb[2] - V["floor_z"], bb[5] - V["floor_z"])]
+            r = _wall_plate(x0, x1, H, cuts, mem, sup, wl, 1e-3, self.d["plate"]["step_mm"], self.d["plate"]["corner_mm"])
+            j, i = np.unravel_index(np.argmax(r["w"]), r["w"].shape)
+            lines = sorted({x0, x1} | {m["x"] for m in mem} | {s[0] for s in sup})
+            bays = []
+            for a, b in zip(lines, lines[1:]):
+                sel = (r["X"] >= a - 1e-6) & (r["X"] <= b + 1e-6)
+                held = [o["id"] for o, c in zip(ops, cuts) if c[0] < b and c[1] > a]
+                bays.append(dict(x0=a, x1=b, w_mm=float(r["w"][:, sel].max()), openings=held))
+            mm = max(r["members"].items(), key=lambda kv: abs(kv[1]["M"]))
+            out[wall] = dict(w_mm=float(r["w"].max()), at_x=float(r["X"][i]), at_z=float(r["Z"][j]), bays=bays,
+                             member=mm[0], member_nmm=abs(mm[1]["M"]), member_z=mm[1]["z"],
+                             member_q=max(v["q"] for v in r["members"].values()), m_max=r["m_max"], q_max=r["q_max"],
+                             q_at=r["q_at"], v_end=max(v["V_end"] for v in r["members"].values()))
+        return dict(walls=out, props=props, J=J, step=self.d["plate"]["step_mm"], corner=self.d["plate"]["corner_mm"],
+                    block_area=min(ends["foot"]["block_w"], ends["head"]["block_w"]) * d)
+
+    def plate_checks(self) -> dict:
+        """BDY-24 at BDY-10's wind and BDY-25 at BDY-06's, from the plates at 1 kPa. Each wall member at its yield over 1.5,
+        the skins at half their ultimate and half their wrinkling stress, the core in shear at half its strength and the XPS
+        behind a member at half its compressive strength (BDY-06's criteria)."""
+        pl, wl, cr = self.wall_plates(), self.p["wall"], self.crit
+        st = wl.d["stiffener"]
+        wu, ws = self.wind()
+        v500 = self.tr.td["stability"]["overturn"]["tie_down"]["v_r_ms"] * self.d["wind"]["Mzcat"]
+        defl = {k: dict(v, w_s=v["w_mm"] * ws["kpa"]) for k, v in pl["walls"].items()}
+        strength = {}
+        for k, v in pl["walls"].items():
+            f = wu["kpa"]
+            s_mem = v["member_nmm"] * f * st["depth"] / 2 / st["I"]
+            s_skin = v["m_max"] * f / (min(wl.t1, wl.t2) * wl.dd)
+            tau = v["q_max"] * f / wl.dd
+            xps = v["member_q"] * f / st["width"]
+            blk = v["v_end"] * f / pl["block_area"]
+            u = dict(member=s_mem / (st["fy"] / cr["metal_factor"]),
+                     skins=max(s_skin / (cr["skin_factor"] * wl.ult), s_skin / (cr["wrinkling_factor"] * wl.wrinkling)),
+                     core=tau / (cr["core_factor"] * wl.core["shear"]), xps=xps / (cr["core_factor"] * wl.core["compression"]),
+                     blocks=blk / (cr["core_factor"] * self.d["blocks"]["shear_mpa"]))
+            gov = max(u, key=u.get)
+            strength[k] = dict(s_member=s_mem, s_skin=s_skin, tau=tau, xps=xps, blk=blk, v_end=v["v_end"] * f, utils=u, governing=gov, util=u[gov],
+                               q_at=v["q_at"])
+        f500 = (v500 / wu["V"]) ** 2
+        for q in strength.values():
+            # strapped down at STB-05's gust (reported): the governing item's factor on its own strength
+            sk = "ultimate" if q["s_skin"] / (cr["skin_factor"] * wl.ult) >= q["s_skin"] / (cr["wrinkling_factor"] * wl.wrinkling) else "wrinkling stress"
+            cap, s, on = dict(member=(st["fy"], q["s_member"], "yield"),
+                              skins=(wl.ult if sk == "ultimate" else wl.wrinkling, q["s_skin"], sk),
+                              core=(wl.core["shear"], q["tau"], "shear strength"), xps=(wl.core["compression"], q["xps"], "compressive strength"),
+                              blocks=(self.d["blocks"]["shear_mpa"], q["blk"], "shear strength"))[q["governing"]]
+            q["at500"] = dict(util=q["util"] * f500, factor=cap / (s * f500), on=on)
+        limit = self.V["interior_h"] / cr["wall_span_ratio"]
+        return dict(defl=defl, strength=strength, ws=ws, wu=wu, v500=v500, f500=f500, limit_mm=limit, props=pl["props"],
+                    step=pl["step"], corner=pl["corner"], block_shear=self.d["blocks"]["shear_mpa"])
 
     def cradle(self) -> dict:
         """The split's outdoor unit and its cradle on the rear wall (BDY-21): the stays carry the vertical load to the
@@ -656,6 +1069,15 @@ class Body:
             u0 = r["x"] if o["wall"] in ("kerb", "road") else r["y"] - r["w"] / 2
             r.update(u0=u0, u1=u0 + r["w"], z0=r["z"], z1=r["z"] + r["h"], area_m2=r["w"] * r["h"] / 1e6)
             out.append(r)
+        # a gland larger than the rule's size is an opening too (F4-05): its centre in DIM-01 (data/services.yaml)
+        for g in yaml.safe_load((DATA / "services.yaml").read_text())["glands"]:
+            w, h = g.get("w", g["d"]), g.get("h", g["d"])
+            if g["at"] not in ("kerb", "road", "front", "rear") or max(w, h) <= self.d["rules"]["gland_mm"]:
+                continue
+            u0 = (g["x"] - V["body_x0"] if g["at"] in ("kerb", "road") else g["y"]) - w / 2
+            z0 = g["z"] - V["floor_z"] - h / 2
+            out.append(dict(id=g["id"], wall=g["at"], name=g["what"], w=w, h=h, x=u0, z=z0, proj=g.get("proj"), gland=True,
+                            u0=u0, u1=u0 + w, z0=z0, z1=z0 + h, area_m2=w * h / 1e6))
         return out
 
     def openings_check(self) -> dict:
@@ -690,7 +1112,7 @@ class Body:
     def results(self) -> dict:
         panels = self.panel_checks()
         return dict(panels=panels, deflections=self.deflections(), roof=self.roof(), inserts=self.inserts(), cradle=self.cradle(),
-                    thermal=self.cold_bridge(), awning=self.awning(), members=self.members_clear(),
+                    thermal=self.cold_bridge(), awning=self.awning(), members=self.members_clear(), plates=self.plate_checks(),
                     openings=self.openings(), openings_check=self.openings_check(),
                     twist=self.tw, gj=self.box_gj(True),
                     joints=self.joints(), end_wall=self.end_wall(), mounts=self.mounts(),
@@ -731,28 +1153,70 @@ def check_row(c, res: dict) -> dict:
         t = res["thermal"]
         need = max(t["need"], t["need_gen"])
         m = t["tsi_min"] - need
-        e = t["ends"]
-        where = "foot" if t["tsi_min"] == e["foot"]["tsi"] else "head" if t["tsi_min"] == e["head"]["tsi"] else "mid-length"
+        e, wh = t["ends"], t["where"]
+        names = dict(mid="over a member at mid-length", foot="over a member at its foot", head="over a member at its head",
+                     beside=f"over {t['beside_member']} at mid-length, beside its neighbours", joiner="over a joiner's foam cover")
         return dict(limit=f">= {need:.0f} C, the dew point {t['dew']:.0f} C plus 4 K", measured=round(t["tsi_min"], 1), unit="C",
                     margin=round(m, 1), ok=m >= -1e-6,
-                    governing=f"inside surface over a member at its {where}, Rsi {t['rsi']:g} m2K/W, {t['t_out']:.0f} C outside, {t['t_in']:.0f} C inside",
+                    governing=f"inside surface {names[t['governs']]}, Rsi {t['rsi']:g} m2K/W, {t['t_out']:.0f} C outside, {t['t_in']:.0f} C inside",
                     detail=(f"{t['member']} with {t['brk']:g} mm of XPS behind it ({', '.join(t['members'])}, {t['length_m']:.1f} m in all), at ISO "
                             f"13788's Rsi of {t['rsi']:g} m2K/W. On the design cold night the inside surface over it is {t['tsi_mid']:.1f} C at "
-                            f"mid-length and the member {t['t_member']:.1f} C. It stops {t['gap_mm']:g} mm short of the joiners, on a {t['pad_mm']:g} mm "
-                            f"rigid PVC pad at its foot: with the joiner taken at the outside air, the surface is {e['foot']['tsi']:.1f} C at the foot "
-                            f"and {e['head']['tsi']:.1f} C at the head (the member a fin of {t['fin_mm']:.0f} mm), against {t['need']:.0f} C. The plain "
-                            f"wall is {t['tsi_plain']:.1f} C. On the generators e2 fans A and B and the RESPA-CF2, {t['gen_m3h']:.0f} m3/h, hold the "
-                            f"dew point at {t['dew_gen']:.1f} C, so {t['need_gen']:.1f} C there. Each metre of member adds {t['psi']:.3f} W/K of heat "
-                            f"loss on ISO 6946's film, {t['w_k']:.2f} W/K in all, {100 * t['w_k'] / t['bare']:.1f} % of the bare panels' {t['bare']:g} W/K "
-                            f"beside report 19's {t['bridges']:g} W/K for the joiners, mount bolts and inserts"))
+                            f"mid-length and the member {t['t_member']:.1f} C"
+                            + f" in a plain wall. Across each member as it stands, with W1's and W2's {t['insert_mm']:.0f} to 28 mm side inserts "
+                            f"({t['insert_k']:g} W/mK) and the windows beyond them (U {t['window_u']:g} W/m2K, est.), the doors' insert strips taken as "
+                            f"rigid PVC and the doors beyond them (U {t['door_u']:g} W/m2K, est.), and the members {t['pair_gap_mm']:.1f} mm apart "
+                            f"behind the bed, the coldest is {t['beside_member']} at {wh['beside']:.1f} C, every neighbour taken at its height"
+                            + f". Each member stands on a {e['foot']['block_w']:g} mm wide rigid PVC bearing block {e['foot']['clear_mm']:g} mm above the "
+                            f"floor joiner's inner leg, which wraps the inner skin to {e['foot']['leg_mm']:g} mm, so its foot is {e['foot']['at_mm']:g} mm "
+                            f"above the wall's bottom edge and no leg overlaps it. With the joiner taken at the outside air, through the block, the XPS "
+                            f"and the inner skin, the surface is {e['foot']['tsi']:.1f} C at the foot, and {e['head']['tsi']:.1f} C at the head, on a "
+                            f"{e['head']['block_w']:g} mm rigid PVC pad {e['head']['gap_mm']:g} mm under the top insert strip and {e['head']['clear_mm']:g} mm "
+                            f"below the roof joiner's leg (the member a fin of "
+                            f"{t['fin_mm']:.0f} mm). The joiners themselves, taken at the outside air under {t['cover_mm']:g} mm of closed-cell foam, "
+                            f"{wh['joiner']:.1f} C. The plain wall is {t['tsi_plain']:.1f} C. On the generators e2 fans A and B and the RESPA-CF2, "
+                            f"{t['gen_m3h']:.0f} m3/h, hold the dew point at {t['dew_gen']:.1f} C, so {t['need_gen']:.1f} C there. Each metre of member "
+                            f"adds {t['psi']:.3f} W/K of heat loss on ISO 6946's film, {t['w_k']:.2f} W/K in all, {100 * t['w_k'] / t['bare']:.1f} % of "
+                            f"the bare panels' {t['bare']:g} W/K beside report 19's {t['bridges']:g} W/K for the joiners, mount bolts and inserts"))
     if c.type == "body_members":
         r = res["members"]
         tight = min(r["rows"], key=lambda q: q["gap_mm"])
+        si = r["side_inserts"]
         return dict(limit=f">= {r['clear_mm']:g} mm clear, bays <= {r['pitch']:,.0f} mm", measured=round(r["worst_mm"], 0), unit="mm",
                     margin=round(r["worst_mm"] - r["clear_mm"], 0), ok=r["ok"], governing=f"{tight['member']} to {tight['to']}",
-                    detail=(". ".join(f"{q['member']} on the {q['wall']} side at X {q['x']:,.0f}: {q['gap_mm']:.0f} mm from {q['to']}" for q in r["rows"])
+                    detail=(". ".join(f"{q['member']} on the {q['wall']} side at X {q['x']:,.0f}: {q['gap_mm']:.0f} mm from {q['to']}"
+                                      + (f", and it shares its routed channel with {' and '.join(q['shares'])}'s side insert" if q["shares"] else "")
+                                      for q in r["rows"])
                             + f". The widest bay is {r['bays']['kerb']:,.0f} mm on the kerb side and {r['bays']['road']:,.0f} mm on the road side, "
-                            f"against {r['pitch']:,.0f} mm" + (". " + ". ".join(r["problems"]) if r["problems"] else "")))
+                            f"against {r['pitch']:,.0f} mm. The rule's exception: at W1's and W2's sides the insert fills the core from the cut-out "
+                            f"to the hardpoint, {min(s['width_mm'] for s in si):.0f} to {max(s['width_mm'] for s in si):.0f} mm, at least "
+                            f"{r['insert_min_mm']:g} mm, so an S4's clamp bears on a solid edge and no XPS is left to rout between them"
+                            + (". " + ". ".join(r["problems"]) if r["problems"] else "")))
+    if c.type in ("body_plate_defl", "body_plate_strength"):
+        p = res["plates"]
+        if c.type == "body_plate_defl":
+            k, v = max(p["defl"].items(), key=lambda kv: kv[1]["w_s"])
+            ws = p["ws"]["kpa"]
+            bays = "; ".join(f"{w2}: " + ", ".join(f"X {b['x0']:,.0f} to {b['x1']:,.0f} {b['w_mm'] * ws:.1f} mm" + (f" ({' '.join(b['openings'])})" if b["openings"] else "")
+                                                    for b in q["bays"] if b["x1"] - b["x0"] > 60) for w2, q in p["defl"].items())
+            return dict(limit=f"<= {p['limit_mm']:.1f} mm", measured=round(v["w_s"], 1), unit="mm", margin=round(p["limit_mm"] - v["w_s"], 1),
+                        ok=v["w_s"] <= p["limit_mm"] + 1e-9, governing=f"the {k} wall at X {v['at_x']:,.0f}, {v['at_z']:,.0f} mm above the floor",
+                        detail=(f"each side wall as a Mindlin plate (MITC4, {p['step']:g} mm elements) from the front wall to the rear wall, every "
+                                f"opening cut out with its wind load on its edges, the members as beams with their own bending, shear and torsion "
+                                f"(EI {p['props']['EI'] / 1e6:,.0f} N m2, GJ {p['props']['GJ'] / 1e6:,.0f} N m2), in region B's 25-year wind, {ws:.2f} kPa net. "
+                                f"The largest deflection in each bay: {bays}"))
+        k, v = max(p["strength"].items(), key=lambda kv: kv[1]["util"])
+        return dict(limit="<= 1.00 utilisation", measured=round(v["util"], 3), unit="", margin=round(1 - v["util"], 3), ok=v["util"] <= 1.0,
+                    governing=f"the {k} wall, {v['governing']}",
+                    detail=(f"the plates of BDY-24 at {p['wu']['kpa']:.2f} kPa net, {p['wu']['V']:.0f} m/s. "
+                            + ". ".join(f"{w2} wall: the worst member {q['s_member']:.0f} MPa ({q['utils']['member']:.2f}), skins {q['s_skin']:.1f} MPa "
+                                        f"({q['utils']['skins']:.2f}), core shear {q['tau']:.3f} MPa ({q['utils']['core']:.2f}) at X {q['q_at'][0]:,.0f}, "
+                                        f"{q['q_at'][1]:,.0f} mm up, away from the cut-outs' corners, the XPS behind a member {q['xps']:.3f} MPa ({q['utils']['xps']:.2f}), and a member's end shear "
+                                        f"{q['v_end']:.0f} N through its rigid PVC block or pad, {q['blk']:.1f} MPa ({q['utils']['blocks']:.2f} of half "
+                                        f"its {p['block_shear']:g} MPa, est.)" for w2, q in p["strength"].items())
+                            + f". Strapped down, at STB-05's {p['v500']:.1f} m/s gust, the {k} wall's "
+                            f"{dict(member='worst member', skins='skins', core='core shear', xps='XPS behind a member', blocks='end blocks')[v['governing']]} "
+                            f"works at {v['at500']['util']:.2f}, a factor of {v['at500']['factor']:.2f} on its {v['at500']['on']}. H23 checks the walls' "
+                            f"strength at {p['wu']['V']:.0f} m/s, so this figure is reported"))
     if c.type == "body_awning":
         a = res["awning"]
         return dict(limit="reported", measured=round(a["reach_mm"], 0), unit="mm", margin=None, ok=a["reach_mm"] >= 0,

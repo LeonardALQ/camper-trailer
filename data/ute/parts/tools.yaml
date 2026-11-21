@@ -26,13 +26,24 @@ parts:
     cog: {at: ["tool_x0 + tool_l / 2", "((half_width - 10 - tool_w / 2) * tool_w - (half_width - 10 - tool_wk / 2) * tool_wk) / (tool_w + tool_wk)", "tool_z0 + tool_h / 2"],
           basis: "Volume-weighted centre of the two chests"}
   U-TIEDOWN:
-    name: Trailer tie-down kit
-    product: Four 50 mm ratchet straps, lashing capacity 2,500 kg, and four 760 mm screw-in ground anchors, in a bag
+    name: Trailer tie-down straps
+    product: Four 50 mm ratchet straps, lashing capacity 2,500 kg
     maker: To choose
     qty: 1
     unit: set
-    mass: {basis: declared, total_kg: 12, maturity: estimate, source: "Straps about 1.6 kg and anchors about 1.4 kg each, and the bag (estimate). Priced with the trailer's lashing points, CH-B02"}
+    mass: {basis: declared, total_kg: 6.4, maturity: estimate, source: "About 1.6 kg a strap (estimate). Priced with the trailer's lashing points, CH-B02"}
     payload: true
-    notes: For the parked trailer when the ute is away and strong gusts are forecast (STB-05). The anchors' 760 mm fits the 780 mm chests.
+    notes: For the parked trailer when strong gusts are forecast (STB-05). They ride in the chests while towing and stay with the trailer, with the ground anchors, whenever the ute is unhitched for more than a day.
     cog: {at: ["tool_x0 + tool_l / 2", "((half_width - 10 - tool_w / 2) * tool_w - (half_width - 10 - tool_wk / 2) * tool_wk) / (tool_w + tool_wk)", "tool_z0 + tool_h / 2"],
           basis: "In the two chests, as U-TOOLS"}
+  U-ANCHORS:
+    name: Trailer ground anchors
+    product: "Four Tie Down Engineering 59086 for firm soil (3/4 in rod, 48 in, two 4 in helixes, HUD class 4A) and four 59099 for sand (3/4 in rod, 60 in, 7 in helix, class 4B), 3,150 lb working load each in their soil class, and a 900 mm turning bar, in a bag"
+    maker: Tie Down Engineering
+    qty: 1
+    unit: set
+    mass: {basis: declared, total_kg: 32.3, maturity: estimate, source: "59086 about 3.2 kg and 59099 about 4.0 kg each, from their rods' steel and the 30 in model's 4.79 lb listed weight, the bar 3.5 kg (estimates). Priced with the trailer's lashing points, CH-B02"}
+    payload: true
+    notes: STB-05 checks them at their rated working load in each soil (F4-03). Too long for the chests, so they ride in their bag on the box floor between the bikes, loaded last through the rear doors (T2), and stay with the trailer, with the straps, whenever the ute is unhitched for more than a day.
+    geometry: {generator: box, params: {}}
+    color: "#636e72"
