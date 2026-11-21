@@ -203,7 +203,8 @@ def tow_vehicle_page():
     every = len(T["closing"]) == len(data["cuts"])     # when only every cut closes the gap, its two rows are the last two
     closing_rows = "" if every else (f"| Less {names} | -{_aud(T['closing_saving'])} |\n"
                                      f"| Required with {listed} and the allowance | {_aud(T['with_closing'])} |\n")
-    out.append("\n### Totals\n\n<div data-sheet=\"off\">\n\n| Total | AUD |\n|---|---|\n"
+    # each row builds on the ones above, so Sum stays off
+    out.append("\n### Totals\n\n<div data-sheet-sum=\"off\">\n\n| Total | AUD |\n|---|---|\n"
                f"| Required | {_aud(T['required'])} |\n| Contingency allowance | {_aud(T['allowance'])} |\n"
                f"| Required with the contingency allowance | {_aud(T['with_contingency'])} |\n"
                f"| Leonard's figure for the car build | {_aud(T['budget'])} |\n"

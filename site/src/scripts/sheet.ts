@@ -34,6 +34,8 @@ const NO_SUM = /\bcog\b|centre of gravity|%|percent|\bshare\b|ratio|utilisation|
 const ALTERNATIVES = /^(case|cases|limit|limits|rule|check|mode|option|options|variant|candidate|design day|input|dimension|size|reading|level|speed|gear|day|unit|model|product|panel|family|kit|build|tuner|turbo|deck|track|measure)\b/i;
 const COG = /\bcog\b|centre of gravity/i;
 const MASS = /^(mass|kg|mass kg|mass \(kg\)|tare kg)$/i;
+const ID = /^(id|report|no\.?|number|#|mark|line|ref|revision|rev)$/i;
+const CURRENCY: Record<string, string> = { AUD: 'AUD', A$: 'AUD', $: 'AUD', US$: 'USD', USD: 'USD', EUR: 'EUR', '€': 'EUR', GBP: 'GBP', '£': 'GBP' };
 
 export interface Parsed {
   v: number;
@@ -105,6 +107,7 @@ class Sheet {
   readonly sel = new Set<HTMLTableRowElement>();
   readonly foot: HTMLTableCellElement[] = [];
   numeric: boolean[] = [];
+  mixed: boolean[] = [];   // the column mixes units or currencies, or has filled cells that are not one number
   sums: SumMode[] = [];
   mass = -1;   // the mass column the centre of gravity columns are weighted by
   fmt: { dec: number; pre: string; suf: string }[] = [];
@@ -184,6 +187,7 @@ class Sheet {
   // every cell shares it.
   detect() {
     this.numeric = [];
+    this.mixed = [];
     this.fmt = [];
     for (let c = 0; c < this.ncols; c++) {
       let filled = 0;
@@ -196,6 +200,9 @@ class Sheet {
       this.numeric.push(got.length > 0 && got.length * 2 >= filled && this.heads[c]?.dataset.sheetType !== 'text');
       const same = (k: 'pre' | 'suf') => (got.every((p) => p[k] === got[0]?.[k]) ? got[0]?.[k] ?? '' : '');
       this.fmt.push({ dec: Math.max(0, ...got.map((p) => p.dec)), pre: same('pre'), suf: same('suf') });
+      // a sum needs one unit and one currency, and every filled cell a number, or it would cover only some rows
+      const currencies = new Set(got.map((p) => CURRENCY[p.pre] ?? '').filter(Boolean));
+      this.mixed.push(new Set(got.map((p) => p.suf)).size > 1 || currencies.size > 1 || got.length < filled);
     }
     this.sumModes();
   }
@@ -212,7 +219,9 @@ class Sheet {
       const set = own(c);
       const mode: SumMode = marked ? (set === 'off' || set === 'cog' ? set : 'sum')
         : alternatives ? 'off' : COG.test(text(c)) ? 'cog' : NO_SUM.test(text(c)) ? 'off' : 'sum';
-      return !num || (mode === 'cog' && this.mass < 0) ? 'off' : mode;
+      // never a sum of mixed units, of ids or numbers that name a row, or of the first column, which names the rows
+      const naming = c === 0 || ID.test(text(c));
+      return !num || this.mixed[c] || naming || (mode === 'cog' && this.mass < 0) ? 'off' : mode;
     });
   }
 

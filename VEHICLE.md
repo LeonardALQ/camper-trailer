@@ -111,7 +111,7 @@ Goal: level B, certified straight away. Needs S2 done and S5's tow inside the te
 - Book the emissions test and the LC4 certifier first, so the uncertified tune is driven only to those appointments.
 - Tune day, one dyno: a run on the factory calibration, then the tune and the tuned run (TL01). Keep the factory file.
 - Settings: 230 to 250 kW at the crank (about 170 to 185 rwkW), never below 224 kW (166 rwkW). About 850 Nm from 1,800 rpm. 450 to 500 Nm in low range, first and reverse. Less torque below 1,600 rpm on the towing map. Fuel pulled from 650 °C EGT, never above 700 °C. EGR, DPF and catalyst untouched.
-- Emissions test with the clean DPF and no faults (TL04), then the LA4 certificate (TL05). If it is refused, flash the factory file back. Everything else stays legal.
+- Emissions test with the clean DPF and no faults (TL04), then the VSCCS certificate from the LC4 certifier (TL05). If it is refused, flash the factory file back. Everything else stays legal.
 - AUD 13,119. Contingency lines AUD 12,000: laboratory test 10,000, gas test 200, CV joints 1,800. If the tune cannot cap low-range torque, the CV joints and two tailshafts (AUD 5,800) become required.
 - Measure VEH-10 to VEH-13, then VEH-14 to VEH-17 on the next long tow.
 - Done when the certificate is endorsed and the towing temperatures pass.

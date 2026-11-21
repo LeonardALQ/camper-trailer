@@ -62,8 +62,8 @@ const label = (g: string) => LABEL[g] ?? g.replace(/_/g, ' ');
 )}
 
 {kind === 'totals' && (
-  <div class="data-table" data-sheet="off">
-    <table>
+  <div class="data-table">
+    <table data-sheet-sum="off">
       <thead><tr><th>Total</th><th>What it is</th><th class="num">AUD</th></tr></thead>
       <tbody>
         <tr><td>Subtotal</td><td>Every line above, {n(t.mass_kg_lines, 1)} kg</td><td class="num">{n(t.subtotal_aud, 0)}</td></tr>

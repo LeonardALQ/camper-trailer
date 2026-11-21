@@ -19,6 +19,8 @@ const pages = [
   { path: '/drawings/', viewer: false },
   { path: '/research/03-bike-restraint-garage/', viewer: false },
   { path: '/research/18-trailer-layout-79/', viewer: false, off: 1 },
+  { path: '/research/', viewer: false, off: 1 },
+  { path: '/electrical/', viewer: false, off: 3 },
 ];
 
 const browser = await chromium.launch({
@@ -67,8 +69,30 @@ for (const p of pages) {
       const rows = [...t.tBodies[0].rows].filter((r) => !r.classList.contains('row-total')
         && !r.classList.contains('sheet-out') && ![...r.cells].some((c) => c.colSpan > 1));
       const mass = cells.findIndex((c) => c.hasAttribute('data-mass'));
+      const heads = [...(t.tHead?.rows[t.tHead.rows.length - 1]?.cells ?? [])].map((h) => h.textContent.trim());
+      // a cell's number and unit by the sheet's own rule (sheet.ts parseNumber): one number, an allowed prefix and unit
+      const PREFIXES = new Set(['', 'AUD', 'A$', '$', 'US$', 'USD', 'EUR', '€', 'GBP', '£', '~', '≈', 'about']);
+      const NUMBER = /^([A-Za-z$€£~≈]{0,5})\s?([+\-−]?)(\d{1,3}(?:,\d{3})+|\d+)(\.\d+)?(?:\s?(.*))?$/;
+      const UNIT = /^(?:[A-Za-zµ°%²³·/]{1,8}(?: [A-Za-zµ°%²³·/]{1,8})?)?(?: ?\((?:est\.?|estimate)\))?$/;
+      const CUR = { AUD: 'AUD', A$: 'AUD', $: 'AUD', US$: 'USD', USD: 'USD', EUR: 'EUR', '€': 'EUR', GBP: 'GBP', '£': 'GBP' };
+      const unit = (raw) => {
+        const s = (raw || '').replace(/\s+/g, ' ').trim();
+        const m = s && s.length <= 40 ? s.match(NUMBER) : null;
+        if (!m || !PREFIXES.has(m[1]) || !UNIT.test(m[5] ?? '')) return null;
+        return { suf: (m[5] ?? '').replace(/\s*\((?:est\.?|estimate)\)$/, ''), cur: CUR[m[1]] ?? '' };
+      };
       cells.forEach((td, c) => {
         const text = td.textContent.trim();
+        if (td.dataset.sum === 'sum') {
+          const parsed = rows.map((r) => r.cells[c]?.textContent.trim() ?? '').filter(Boolean).map(unit);
+          const units = new Set(parsed.filter(Boolean).map((u) => u.suf));
+          const curs = new Set(parsed.filter(Boolean).map((u) => u.cur).filter(Boolean));
+          if (parsed.includes(null)) out.bad.push(`table ${k + 1} column ${c + 1} sums a column with cells that are not one number`);
+          if (units.size > 1 || curs.size > 1) out.bad.push(`table ${k + 1} column ${c + 1} sums mixed units: ${[...units, ...curs].join(', ')}`);
+          if (c === 0 || /^(id|report|no\.?|number|#|mark|line|ref|revision|rev)$/i.test(heads[c] ?? '')) {
+            out.bad.push(`table ${k + 1} column ${c + 1} (${heads[c]}) sums ids`);
+          }
+        }
         if (td.dataset.sum === 'off') {
           out.off += 1;
           if (text) out.bad.push(`table ${k + 1} column ${c + 1} shows ${text}`);

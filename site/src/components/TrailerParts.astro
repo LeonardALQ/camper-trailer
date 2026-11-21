@@ -84,8 +84,8 @@ const biggest = [...r.lines].sort((a: any, b: any) => b.price.aud - a.price.aud)
 )}
 
 {kind === 'totals' && (
-  <div class="data-table" data-sheet="off">
-    <table>
+  <div class="data-table">
+    <table data-sheet-sum="off">
       <thead><tr><th>Total</th><th>What it is</th><th class="num">AUD</th></tr></thead>
       <tbody>
         <tr><td>Subtotal</td><td>Every line below, {T.lines} lines</td><td class="num">{n(T.subtotal_aud, 0)}</td></tr>
@@ -98,8 +98,8 @@ const biggest = [...r.lines].sort((a: any, b: any) => b.price.aud - a.price.aud)
 )}
 
 {kind === 'biggest' && (
-  <div class="data-table" data-sheet="off">
-    <table>
+  <div class="data-table">
+    <table data-sheet-sum="sum">
       <thead><tr><th>ID</th><th>Item</th><th class="num">AUD</th><th>Basis</th></tr></thead>
       <tbody>
         {biggest.map((x: any) => (<tr><td>{x.id}</td><td>{x.name}</td><td class="num">{n(x.price.aud, 0)}</td><td>{basis(x)}</td></tr>))}
@@ -109,8 +109,8 @@ const biggest = [...r.lines].sort((a: any, b: any) => b.price.aud - a.price.aud)
 )}
 
 {kind === 'notin' && (
-  <div class="data-table" data-sheet="off">
-    <table>
+  <div class="data-table">
+    <table data-sheet-sum="sum">
       <thead><tr><th>Not in the total</th><th class="num">AUD</th><th>Why</th><th>Source</th></tr></thead>
       <tbody>
         {r.not_in_total.map((x: any) => (
@@ -122,8 +122,8 @@ const biggest = [...r.lines].sort((a: any, b: any) => b.price.aud - a.price.aud)
 )}
 
 {kind === 'savings' && (
-  <div class="data-table" data-sheet="off">
-    <table>
+  <div class="data-table">
+    <table data-sheet-sum="off">
       <thead><tr><th>ID</th><th>Option</th><th class="num">Saves AUD</th><th class="num">Tare kg</th><th>What it costs</th><th>Lines it removes</th></tr></thead>
       <tbody>
         {r.savings.map((s: any) => (

@@ -27,11 +27,11 @@ const note = [
 ].filter(Boolean).join(' ');
 ---
 
-<div class="data-table project-cost" data-sheet="off">
-  <table>
+<div class="data-table project-cost">
+  <table data-sheet-sum="sum">
     <thead>
       <tr>
-        <th>Part</th><th class="num">Before contingency AUD</th><th class="num">Contingency AUD</th><th class="num">Total AUD</th>
+        <th>Part</th><th class="num">Before contingency AUD</th><th class="num">Contingency AUD</th><th class="num" data-sheet-sum="off">Total AUD</th>
         <th>Parts list</th>
       </tr>
     </thead>
