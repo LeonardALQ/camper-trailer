@@ -86,13 +86,13 @@ parts:
     geometry: {generator: tube, params: {wall: 3}}
     color: "#b2bec3"
   U-SEALANT:
-    name: Seam and fastener sealant
-    material: "Sikaflex-291 polyurethane sealant"
-    product: Sikaflex-291 on stitched seams, floor penetrations and fasteners through the skin
+    name: Seam and fastener sealant, roof bow adhesive
+    material: "Sikaflex-291 polyurethane sealant, Sikaflex-252 polyurethane adhesive"
+    product: Sikaflex-291 on stitched seams, floor penetrations and fasteners through the skin, and Sikaflex-252 along the roof bows
     maker: Sika
     qty: 1
     unit: set
-    mass: {basis: declared, total_kg: 1.5, maturity: estimate, source: "Report 24 (data/ute/box-parts.yaml BX-F09), estimate"}
+    mass: {basis: declared, total_kg: 2.0, maturity: estimate, source: "Report 24 (data/ute/box-parts.yaml BX-F09) 1.5 kg and the roof bows' bead (BX-F10) 0.5 kg, estimates"}
     cog: {at: [1260, 0, 730], basis: "Spread over the seams, estimate"}
   U-ROOF-COAT:
     name: Roof top coating

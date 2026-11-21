@@ -15,9 +15,12 @@ checks:
       fall: 50            # the bows fall 1:50 from the crown to each side
       water_kpa: 0.1      # a 10 mm film of standing water
       knee_kn: 1.1        # a person kneeling: AS/NZS 1170.1's concentrated load on roof cladding
+      # the bead along each bow, under the skin as well as the stitches, so the skin is held at every bow
+      bond: {name: Sikaflex-252, lap_shear_mpa: 2.5, width_mm: 15, factor: 0.5,
+             src: "Sika's product data sheet, tensile lap-shear strength 2.5 MPa (ISO 4587): https://industry.sika.com/content/dam/dms/us01/o/sikaflex-252.pdf"}
     severity: fail
     inputs: []
-    why: "The 1.6 mm roof skin is welded to the bows, so between them it works as a held strip: highway suction drums it and membrane tension carries most of the load to the bows, where the weld has softened the sheet. With the bows' 1:50 fall, water runs off before it can pond. A kneeling person, 1.1 kN on roof cladding in AS/NZS 1170.1, would dent the sheet, so the roof carries no step and no kneeling, marked on CT-701 and in UTE-GARAGE.md. Hail dents any gauge"
+    why: "The 1.6 mm roof skin is welded along the front edge, the first bow and its butt joints, and bonded along every bow with a Sikaflex-252 bead as well as stitched, so between the bows it works as a held strip: highway suction drums it and membrane tension carries most of the load to the bows, where a weld has softened the sheet and the bead takes the tension in shear. The bead is checked at half its lap-shear strength, as BDY-19 checks the trailer's bonded roof. With the bows' 1:50 fall, water runs off before it can pond. A kneeling person, 1.1 kN on roof cladding in AS/NZS 1170.1, would dent the sheet, so the roof carries no step and no kneeling, on a label on the roof (BX-C03), on CT-701 and in UTE-GARAGE.md. Hail dents any gauge"
   - id: UGC-01
     title: Tuareg to Street Triple, anywhere
     type: clearance

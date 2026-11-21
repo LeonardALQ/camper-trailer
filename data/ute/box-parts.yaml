@@ -288,6 +288,16 @@ lines:
     mass: {kg: 1.5, basis: estimate, src: "About 1.1 L cured in the box (estimate)"}
     price: {aud_each: 33.65, aud: 201.90, url: "https://www.bluebottlemarine.com/products/sikaflex-291-white-310ml.html", date: 2026-11-20, basis: listing}
     model_part: U-SEALANT
+  - id: BX-F10
+    group: fasteners_sealants
+    name: Roof bow adhesive
+    part_number: "Sikaflex-252 White 300 ml"
+    spec: "A bead along the top of every roof bow under the 1.6 mm skin, about 11 m, set to a 15 mm wide bond line, with the 30 mm stitches as well, so the skin is held at every bow (UGF-01). Tensile lap-shear strength 2.5 MPa (Sika)"
+    qty: 2
+    unit: cartridge
+    mass: {kg: 0.5, basis: estimate, src: "About 0.45 L cured on the bows (estimate), carried in model part U-SEALANT"}
+    price: {aud_each: 35.00, aud: 70.00, url: "https://industry.sika.com/content/dam/dms/us01/o/sikaflex-252.pdf", date: 2026-11-21, basis: estimate}
+    model_part: U-SEALANT
   # ================================================================ doors
   - id: BX-D01
     group: doors
@@ -688,6 +698,15 @@ lines:
     price: {aud_each: 150.00, aud: 150.00, url: null, date: 2026-11-20, basis: estimate}
     model_part: U-ROOF-COAT
     note: "New line. A full exterior powder coat is the option: Tong Metal lists powder coating from AUD 4,000 for its trays and canopies (https://tongmetal.com.au/), about 3 kg"
+  - id: BX-C03
+    group: finish
+    name: Roof label
+    part_number: "NO STEP, NO KNEELING, outdoor vinyl decal, 300 x 100 mm"
+    spec: "On the roof itself, at the rear edge where a person would climb up, in red on the white roof (UGF-01). A second over the cab end"
+    qty: 2
+    unit: decal
+    mass: {kg: 0.0, basis: estimate, src: "Negligible"}
+    price: {aud_each: 15.00, aud: 30.00, url: null, date: 2026-11-21, basis: estimate}
   # ================================================================ tools
   - id: BX-T01
     group: tools
@@ -735,13 +754,13 @@ lines:
 # prices match the stated rates. Contingency 10 % (est.). owner_built_total_aud drops the shop labour line and its
 # contingency. mass_kg_lines is the fitted box as listed, which is the model's box mass (UGB-01).
 totals:
-  by_group: {materials: 7975.62, subframe_mounts: 990.0, fasteners_sealants: 891.9, doors: 1200.15, security: 3797.36, restraint: 1852.09, loading: 2972.61, services: 1771.42, finish: 644.42, tools: 246.62, fabrication: 22748.0, compliance: 2000.0}
-  subtotal_aud: 47090.19
+  by_group: {materials: 7975.62, subframe_mounts: 990.0, fasteners_sealants: 961.9, doors: 1200.15, security: 3797.36, restraint: 1852.09, loading: 2972.61, services: 1771.42, finish: 674.42, tools: 246.62, fabrication: 22748.0, compliance: 2000.0}
+  subtotal_aud: 47190.19
   contingency_pct: 10
-  contingency_aud: 4709.02
-  total_aud: 51799.21
-  owner_built_total_aud: 26776.41
-  mass_kg_lines: 436.47
+  contingency_aud: 4719.02
+  total_aud: 51909.21
+  owner_built_total_aud: 26886.41
+  mass_kg_lines: 436.97
   not_in_total:
     - {name: "Monimoto 9 subscriptions", aud_per_year: 158, src: "AUD 79 a year each (report 17)"}
     - {name: "FMC130 tracking platform", aud_per_year: 120, src: "Estimate"}

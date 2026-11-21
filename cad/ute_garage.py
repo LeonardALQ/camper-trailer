@@ -78,17 +78,29 @@ def roof_skin(prj, c) -> dict:
     sag = strip_membrane(q_w, t, span, r["E_mpa"])["defl_mm"]
     u_pond = sag / fall
     knee = 2 * math.pi * r["fy_mpa"] * t ** 2 / 4 / 1000
-    util = max(u_suction, u_pond)
+    # where the skin is not welded, the adhesive bead along each bow holds it: the strip's membrane tension in shear across
+    # the bead's width, and the suction on the two half spans either side of the bow pulling it off the bow
+    bd = r["bond"]
+    allow = bd["factor"] * bd["lap_shear_mpa"]
+    tau = s["tension_n_mm"] / bd["width_mm"]
+    pull = q * span / bd["width_mm"]
+    u_bond = max(tau, pull) / allow
+    util = max(u_suction, u_pond, u_bond)
     ok = util <= 1.0
-    return _row(c.id, c.title, c.severity, f"bow stress <= {r['fy_haz_mpa']:g} MPa, sag under the fall", round(s["end_mpa"], 1),
-                round(r["fy_haz_mpa"] - s["end_mpa"], 1), ok, "suction at the bow" if u_suction >= u_pond else "standing water",
-                (f"{t:g} mm 5052-H32 over bows {span:.0f} mm apart. Suction at {r['speed_kmh']:.0f} km/h with Cp -{r['cp']:g}, "
-                 f"{q * 1e6 / 1000:.2f} kPa: the sheet drums {s['defl_mm']:.1f} mm and reaches {s['end_mpa']:.0f} MPa at the bow with membrane "
-                 f"action, against welded 5052's {r['fy_haz_mpa']:g} MPa ({u_suction:.2f}). A {r['water_kpa'] * 100:.0f} mm water film sags it "
+    gov = max((u_suction, "suction at the bow"), (u_pond, "standing water"), (u_bond, "the bow's adhesive bead"))[1]
+    return _row(c.id, c.title, c.severity, f"bow stress <= {r['fy_haz_mpa']:g} MPa, sag under the fall, bead within half its strength",
+                round(s["end_mpa"], 1), round(r["fy_haz_mpa"] - s["end_mpa"], 1), ok, gov,
+                (f"{t:g} mm 5052-H32 over bows {span:.0f} mm apart, held at every bow: welded along the front edge, the first bow and the "
+                 f"butt joints, and bonded along every bow with {bd['name']} as well as stitched. Suction at {r['speed_kmh']:.0f} km/h with "
+                 f"Cp -{r['cp']:g}, {q * 1e6 / 1000:.2f} kPa: the sheet drums {s['defl_mm']:.1f} mm and reaches {s['end_mpa']:.0f} MPa at the bow "
+                 f"with membrane action, against welded 5052's {r['fy_haz_mpa']:g} MPa ({u_suction:.2f}). The {bd['width_mm']:g} mm bead would carry "
+                 f"the sheet's {s['tension_n_mm']:.1f} N/mm of tension at {tau:.2f} MPa even where the skin ended at a bow, and the suction's pull at {pull:.3f} MPa, against half its "
+                 f"{bd['lap_shear_mpa']:g} MPa lap shear ({u_bond:.2f}). A {r['water_kpa'] * 100:.0f} mm water film sags it "
                  f"{sag:.2f} mm against the 1:{r['fall']:g} fall's {fall:.1f} mm, so water runs off. A knee of {r['knee_kn']:g} kN punches "
-                 f"through at {knee:.2f} kN, so the roof is marked no step, no kneeling"),
+                 f"through at {knee:.2f} kN, so the roof is marked no step, no kneeling, on a label on the roof itself"),
                 c.why, unit="MPa", roof=dict(span_mm=span, suction_kpa=q * 1000, drum_mm=s["defl_mm"], bow_mpa=s["end_mpa"], sag_mm=sag,
-                                             fall_mm=fall, knee_capacity_kn=knee, knee_kn=r["knee_kn"]))
+                                             fall_mm=fall, knee_capacity_kn=knee, knee_kn=r["knee_kn"], bond_mpa=max(tau, pull),
+                                             bond_util=u_bond, tension_n_mm=s["tension_n_mm"]))
 
 
 def rhs_plastic_modulus(b: float, d: float, t: float) -> float:
