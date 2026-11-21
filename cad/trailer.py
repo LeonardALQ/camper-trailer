@@ -27,15 +27,7 @@ from .partsdb import DATA, ROOT, Mass, Params, Project
 
 TRAILER_YAML = DATA / "assemblies" / "trailer.yaml"
 GROWTH = {"estimate": 0.20, "calculated": 0.07, "spec": 0.0, "weighed": 0.0}
-STAGE_IDS = {"drawbar_structure": ("DB-KA", "DB-KB", "DB-RA", "DB-RB", "DB-BR", "DB-03", "DB-04"), "stowage": ("DX-01", "GS-01")}
 WEIGHINGS = ("TW-01", "TW-02", "TW-03")
-WEIGH_LABELS = {
-    "chassis": "chassis", "running_gear": "running gear", "drawbar_structure": "drawbar, coupling and stone guard",
-    "drawbar": "jockey wheel, safety chains and breakaway kit", "body": "body shell", "roof": "solar panels",
-    "underfloor": "tanks and guards under the floor", "electrical": "electrical system", "hvac": "HVAC and ventilation",
-    "wet_room": "wet room", "living": "living area", "bed": "lift bed", "stowage": "drawbar box and generators",
-    "spare": "spare wheel",
-}
 SYSTEM_LABELS = {
     "drawbar": "Coupling and drawbar fittings", "chassis": "Chassis and drawbar", "running_gear": "Running gear", "body": "Body",
     "roof": "Roof", "underfloor": "Under the floor", "bed": "Bed", "living": "Living area",
@@ -43,6 +35,11 @@ SYSTEM_LABELS = {
     "electrical": "Electrical", "hvac": "HVAC and ventilation", "wet_room": "Wet room",
 }
 TOL = 0.5  # mm: boxes that only touch do not overlap
+# the build order (data/assemblies/trailer.yaml build_order): the stage that fits each line, by its id or else its system
+BUILD_ORDER = yaml.safe_load(TRAILER_YAML.read_text())["build_order"]
+FIT_BY_ID = {k: s["stage"] for s in BUILD_ORDER for k in s["fits"] if k not in SYSTEM_LABELS}
+FIT_BY_SYSTEM = {k: s["stage"] for s in BUILD_ORDER for k in s["fits"] if k in SYSTEM_LABELS}
+WEIGH_LABELS = {s["stage"]: f"{s['label']} ({s['stage']})" for s in BUILD_ORDER}
 
 
 # ------------------------------------------------------------------ the tow vehicle
@@ -476,10 +473,8 @@ def _lc(name: str) -> str:
 
 
 def _stage_of(b: Block) -> str:
-    for k, ids in STAGE_IDS.items():
-        if b.id in ids:
-            return k
-    return b.system
+    """The build stage that fits a line (TRAILER.md build order): the stage that names its id, or else its system's."""
+    return FIT_BY_ID.get(b.id) or FIT_BY_SYSTEM.get(b.system, "")
 
 
 def _rot(poly, deg):

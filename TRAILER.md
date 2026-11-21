@@ -130,18 +130,18 @@ CT-001 general arrangement, CT-002 mass and centre of gravity, CT-003 compliance
 
 ## Build order
 
-Each stage needs the ones before it. The weighings TW-01 to TW-03 and the other inputs to measure are on the Measurements page with the range the design accepts.
+Each stage needs the ones before it. Each weighing, TW-01 to TW-03, takes the lines fitted by then (`build_order` in `data/assemblies/trailer.yaml`). They and the other inputs to measure are on the Measurements page with the range the design accepts.
 
 | Stage | Work | Needs first | Check before moving on |
 |---|---|---|---|
 | B0 Approvals | Engineer's review, RAV entry and VIN, orders for the XT kit, panels, tray, windows, doors and imports | The documents and drawings | Review closed, VIN issued |
 | B1 Chassis | Cut, jig, weld, stamp the VIN | B0, steel and plate parts | Weld inspection (report 02 WLD-03) |
 | B2 Galvanising | Hot-dip to AS/NZS 4680, touch up | B1, vent and drain holes | Frame flat and square |
-| B3 Rolling chassis | Suspension, brakes, TSC, wheels, coupling, chains, jockey, steadies, alignment | B2, the XT kit | TW-01 within 2 % of the model |
+| B3 Rolling chassis | Suspension, brakes, TSC, wheels, mud flaps, coupling, chains, breakaway kit, jockey, steadies, alignment | B2, the XT kit | TW-01 within 2 % of the model |
 | B4 Floor | Bearer strips, tanks, guards, diesel tank, air box, the floor on its 32 mounts, the shower well and the tray | B3, the floor panel with its inserts | Tray fill test, 24 h |
-| B5 Shell | Walls, rounded corners and roof bonded into the joiners, doors and windows | B4, panels with their hardpoints laid in | Hose test, TW-02 within 2 % |
+| B5 Shell | Walls with their stiffeners, rounded corners and roof bonded into the joiners, doors and windows | B4, panels with their hardpoints laid in | Hose test, TW-02 within 2 % |
 | B6 First fix | Cables, the 230 V bulkhead, glands, water pipes, drains at 1:50, ducts and fan sleeves | B5 closed and dry | Water lines pressure tested |
-| B7 Fit-out | Battery box, board, partition, cabinetry, appliances, lift bed, split, wet room, awning, drawbar box, solar | B6 | Bed locks and safety edge |
+| B7 Fit-out | Battery box, board, partition, cabinetry, appliances, lift bed, split, wet room, awning, steps, blackout covers, stone guard, drawbar box and generators, spare wheel, solar | B6 | Bed locks and safety edge |
 | B8 Commissioning | Electrical test, battery capacity, airflow and pressure, tanks filled and dosed, bed heights | B7 | AS/NZS 3001.2 certificate, TW-03 to TW-05, TR-01 to TR-10 |
 | B9 Registration | Permit to move it, HVAIS inspection with the identity approval, plate, NSW registration | B8, the weighbridge tickets | Plate at 3,500 kg ATM |
 

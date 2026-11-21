@@ -1,6 +1,6 @@
 """Frame analysis of the chassis and drawbar for report 11's load cases (CHASSIS.md).
 
-Loads come from the trailer layout's mass schedule for each trailer case TC1 to TC7, water included, scaled up to the
+Loads come from the trailer layout's mass schedule for each trailer case TC1 to TC8, water included, scaled up to the
 plated ATM, plus the designed members and fittings (cad/chassis.py) in place of the layout's chassis and drawbar
 blocks. Each mass goes onto the frame by a rule that follows its load path:
 

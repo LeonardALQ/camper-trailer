@@ -184,6 +184,23 @@ crossmembers:
 # Zones for the fit checks: box [x0, y0, z0, dx, dy, dz]. Items name their zone. A `keep_clear` item is floor
 # space that must stay free (door landings, walkways). Keep-clear spaces may overlap one another, but no solid
 # item may enter one. The underfloor zone reaches 50 mm below the rails for the grey tank and its guard.
+# The build order (TRAILER.md "Build order"): the stage that fits each tare line, and the words in that stage's row of
+# the table that name it. A line takes the stage that names its id, or else the stage that names its system. Each
+# weighing TW-01 to TW-03 covers the stages up to it (data/measurements.yaml `covers`), so its model figure is what is
+# on the scale by then (cad/trailer.py weighbridge, cad/tests/test_measurements.py).
+build_order:
+  - {stage: B1, label: chassis frame, fits: {chassis: Chassis}}
+  - {stage: B2, label: galvanising, fits: {CH-G01: Hot-dip}}
+  - {stage: B3, label: "running gear, coupling, chains, breakaway kit, jockey wheel, steadies and mud flaps",
+     fits: {running_gear: Suspension, DB-03: coupling, DB-05: jockey, DB-06: chains, DB-07: breakaway kit, CH-B01: steadies, CH-P10: steadies, CH-P11: jockey, BD-10: mud flaps}}
+  - {stage: B4, label: "bearer strips, tanks and guards, air box, floor, shower well and wet room tray",
+     fits: {underfloor: tanks, CH-S01: Bearer strips, RG-04: air box, BD-01: floor, WR-10: shower well, WR-01: tray}}
+  - {stage: B5, label: "walls with their stiffeners and hardpoints, roof, doors and windows", fits: {body: Walls, BD-18: stiffeners, LB-06: hardpoints}}
+  - {stage: B6, label: "cables and pipework", fits: {BD-11: Cables}}
+  - {stage: B7, label: fit-out,
+     fits: {electrical: Battery box, hvac: split, living: appliances, bed: lift bed, wet_room: wet room, stowage: drawbar box, spare: spare wheel, roof: solar,
+            DB-04: stone guard, BD-13: awning, BD-16: steps, WN-05: blackout covers}}
+
 zones:
   inside: {name: Inside the body, box: [in_x0, -half_in, floor_z, in_x1 - in_x0, 2 * half_in, interior_h]}
   drawbar_box: {name: Drawbar box (inside), box: [dbx_x0 + dbx_t, -dbx_w / 2 + dbx_t, dbx_z0 + dbx_t, dbx_l - 2 * dbx_t, dbx_w - 2 * dbx_t, dbx_h - 2 * dbx_t]}

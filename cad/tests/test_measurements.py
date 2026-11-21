@@ -1,12 +1,14 @@
 """Measured inputs (data/measurements.yaml): every input says when it is measured and what range the design accepts,
 with its source, and the value the design assumes sits inside that range."""
+import re
+
 import pytest
 import yaml
 
 from cad.inputs import Inputs
-from cad.partsdb import DATA, Project
+from cad.partsdb import DATA, ROOT, Project
 from cad.tests.test_trailer import EV, TRAILER
-from cad.trailer import WEIGHINGS, Trailer, _stage_of, measurement_refs
+from cad.trailer import BUILD_ORDER, WEIGHINGS, Trailer, _stage_of, measurement_refs
 
 STAGES = {"buy", "build", "weigh", "trailer built"}
 INPUTS = TRAILER.inputs
@@ -15,6 +17,8 @@ RANGES = INPUTS.resolve_ranges(REFS)
 MODEL_READINGS = {iid: REFS[f"model_{iid}"] for iid in WEIGHINGS}
 ITEMS = list(INPUTS.items.values())
 RAW = yaml.safe_load((DATA / "measurements.yaml").read_text())["inputs"]
+# TRAILER.md's build order table, each stage's whole row by its id
+BUILD_ROWS = {m.group(1): line for line in (ROOT / "TRAILER.md").read_text().splitlines() if (m := re.match(r"\| (B\d) ", line))}
 PARTS = {"car": "Car build", "box": "Bike box", "trailer": None}
 
 
@@ -91,3 +95,29 @@ def test_weighing_at_the_model_changes_nothing():
 def test_a_heavier_finished_trailer_raises_the_tare_by_the_difference():
     lay, _ = _weighed(MODEL_READINGS | {"TW-03": MODEL_READINGS["TW-03"] + 50})
     assert _tare(lay) == pytest.approx(_tare(EV["layout"]) + 50, abs=0.1)
+
+
+def test_every_tare_line_is_fitted_at_one_stage_whose_row_names_it():
+    """Each line goes to one stage of TRAILER.md's build order (data/assemblies/trailer.yaml build_order), and that
+    stage's row of the table names it, so a weighing sees exactly what the builder has fitted by then."""
+    seen = {}
+    for s in BUILD_ORDER:
+        for k, words in s["fits"].items():
+            assert k not in seen, f"{k} is fitted at {seen[k]} and at {s['stage']}"
+            seen[k] = s["stage"]
+            assert words.lower() in BUILD_ROWS[s["stage"]].lower(), f"{s['stage']}'s row in TRAILER.md does not name {k} ({words!r})"
+    for b in EV["layout"].blocks:
+        if b.load == "tare" and b.mass_kg > 0:
+            assert _stage_of(b) in BUILD_ROWS, f"{b.iid} ({b.system}) is fitted at no stage of the build order"
+
+
+def test_each_weighing_covers_the_stages_since_the_one_before():
+    """TW-01 to TW-03 cover every stage once, in build order, and the table weighs each at the end of the last stage it
+    covers, before the next weighing's first stage starts."""
+    order = [s["stage"] for s in BUILD_ORDER]
+    covers = [INPUTS.items[iid].extra["covers"] for iid in WEIGHINGS]
+    assert [st for c in covers for st in c] == order, f"the weighings cover {covers}, the build order is {order}"
+    for k, iid in enumerate(WEIGHINGS):
+        named = [st for st, row in BUILD_ROWS.items() if iid in row.split("|")[4]]
+        nxt = covers[k + 1][0] if k + 1 < len(covers) else "B99"
+        assert named and covers[k][-1] <= named[0] < nxt, f"{iid} covers {covers[k]} but the table weighs it at {named}"
