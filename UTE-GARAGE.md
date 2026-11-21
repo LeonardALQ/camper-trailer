@@ -107,7 +107,7 @@ The Black Widow MF-12038 ramp (3,048 x 965 mm, 680 kg rating, 34 kg) stands fold
 
 The parts list sums to 437.0 kg empty, 474.7 kg with growth, and the model carries every line, so UGB-01 and the list agree (`cad/tests/test_box_parts.py`). Revision D adds 0.4 kg: the flares 1.9 kg, less 1.6 kg of skin cut away for them, and the tubs and floor re-cut for the wider track (-0.8 and +0.9 kg). The list includes the wiring, the winch feed, sealant, the roof bows' adhesive (0.5 kg), pads, plates, the roof coat, the outlet and the drains. The roof is 1.6 mm sheet in place of 2.0 mm, which saves 5.1 kg and leaves 3.0 kg in hand under UGB-01's 440 kg. The roof carries no load, no step and no kneeling, and the bows and end frames under it are at most 640 mm apart (UGF-01). The engineer confirms the thinner sheet. If more margin is needed, a 10 mm chain in place of the 12 mm one saves about 2 kg (est.).
 
-On the Elite, with the home trailer's heaviest towball (317 kg with growth), the ute's rear axle carries 2,586 kg with growth when towing with the bikes aboard (UC3), 214 kg under the 2,800 kg plate.
+On the Elite, with the home trailer's heaviest towball (317 kg with growth), the ute's rear axle carries 2,587 kg with growth when towing with the bikes aboard (UC3), 213 kg under the 2,800 kg plate.
 
 ## 10. Parts list summary
 
