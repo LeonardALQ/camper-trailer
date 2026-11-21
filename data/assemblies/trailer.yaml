@@ -928,7 +928,7 @@ items:
     zone: inside
     box: [plinth_x0 + 480, plinth_y0, floor_z + plinth_h, 595, 590, 850]
     mass: {basis: declared, total_kg: 40, maturity: estimate, source: "https://www.haier.com.au/laundry/dryers/7kg-300-series-heat-pump-dryer-hdhps70lw1-61444.html", note: "Mass not published, 38 to 48 kg for its class (report 21 open point 8)"}
-    note: 1.4 kWh a 3.5 kg load. Its condensate drains to the grey tank. It stands an hour after a corrugated-road day before it runs.
+    note: "1.4 kWh a 3.5 kg load. Its condensate drains to the grey tank through the drain hose it comes with. It stands an hour after a corrugated-road day before it runs. Haier lists it as outgoing. Its successor, the HDHP70LCW2 (white) or HDHP70LCB2 (dark), has the same 850 x 595 x 590 mm case and 7 kg drum, a 7-star rating at 139 kWh a year against 130 (7 % more) and a built-in water tank in place of the drain hose (Haier's guides, 4 Nov 2026). Buy the HDHPS70LW1 while it is stocked. If only the successor is left, fit its drain kit if Haier offers one, or empty the tank, and take the energy budget's dry at about 1.5 kWh (est.). Neither model's mass is published"
   - id: LA-11P
     name: Plinth front panel and the end slot's cover
     material: "18 mm Garnica Ultralight poplar plywood with a laminate finish"

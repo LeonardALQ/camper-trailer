@@ -451,7 +451,7 @@ inputs:
     title: Load rating of the shared wheel, ROH Trak 2 16 x 7 ET 0, 5 x 150
     how: Read it from ROH's current table or the stamp on the wheel, and ask ROH whether it holds at the 80 psi of a load range E tyre.
     unit: kg
-    estimate: {v: 1400, src: "ROH's fitment table for the Trak 2 16 x 7 ET 0 5 x 150 (report 16 section 4), the wheel the ute and the trailer share"}
+    estimate: {v: 1400, basis: maker, src: "ROH's fitment table for the Trak 2 16 x 7 ET 0 5 x 150 (report 16 section 4), the wheel the ute and the trailer share. The maker's figure"}
     measured: {v: null, date: null}
     stage: buy
     range: {min: {ref: wheel_need}, max: null, src: "At least the larger of the trailer's per-wheel load in MAS-09 and the ute's rear wheel load in UTE-12, both with the growth allowance. No maximum: a higher rating only adds margin"}

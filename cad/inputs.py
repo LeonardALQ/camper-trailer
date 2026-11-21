@@ -40,10 +40,16 @@ class Input:
     stage: str = ""
     range: dict = field(default_factory=dict)
     extra: dict = field(default_factory=dict)
+    estimate_basis: str = ""
 
     @property
     def status(self) -> str:
-        return "measured" if self.measured is not None else ("estimate" if self.estimate is not None else "unknown")
+        """measured, maker figure (a value the maker publishes, not yet measured), estimate or unknown."""
+        if self.measured is not None:
+            return "measured"
+        if self.estimate is None:
+            return "unknown"
+        return "maker figure" if self.estimate_basis == "maker" else "estimate"
 
     @property
     def value(self):
@@ -67,7 +73,7 @@ class Inputs:
             m = d.get("measured") or {}
             self.items[d["id"]] = Input(
                 id=d["id"], group=d["group"], title=d["title"], how=d["how"], unit=d["unit"],
-                estimate=d["estimate"].get("v"), estimate_src=d["estimate"].get("src", ""), measured=m.get("v"),
+                estimate=d["estimate"].get("v"), estimate_src=d["estimate"].get("src", ""), estimate_basis=d["estimate"].get("basis", ""), measured=m.get("v"),
                 measured_date=m.get("date"), affects=d.get("affects", []), thresholds=d.get("thresholds", []),
                 stage=d.get("stage", ""), range=d.get("range") or {},
                 extra={k: d[k] for k in ("order", "covers", "part") if k in d} | ({"note": m["note"]} if m.get("note") else {}))

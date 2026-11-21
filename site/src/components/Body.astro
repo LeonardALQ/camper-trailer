@@ -14,6 +14,10 @@ const n = (v: number | null | undefined, d = 0) =>
 const checks = tr.checks.filter((x: any) => x.type.startsWith('body'));
 const statusClass = (x: any) => (x.ok ? 'status-pass' : x.severity === 'fail' ? 'status-fail' : 'status-report');
 const lines = tr.schedule.filter((x: any) => x.system === 'body');
+// the roof's solar panels and their adhesive, so the Body page's viewer finds them in the mass table too
+const roof = tr.schedule.filter((x: any) => x.system === 'roof');
+const roofKg = roof.reduce((s: number, x: any) => s + x.mass_kg, 0);
+const roofGr = roof.reduce((s: number, x: any) => s + x.mass_with_growth_kg, 0);
 const bodyKg = lines.reduce((s: number, x: any) => s + x.mass_kg, 0);
 const bodyGr = lines.reduce((s: number, x: any) => s + x.mass_with_growth_kg, 0);
 const fails = checks.filter((x: any) => x.severity === 'fail' && !x.ok);
@@ -57,6 +61,12 @@ const m = r.mounts;
         ))}
         <tr class="row-total"><td></td><td>Body</td><td class="num">{n(bodyKg, 1)}</td><td></td><td></td>
           <td class="num">{n(bodyGr, 1)}</td><td></td></tr>
+        {roof.map((x: any) => (
+          <tr><td>{x.iid}</td><td>{x.item}</td><td class="num">{n(x.mass_kg, 1)}</td><td>{x.maturity}</td><td class="num">{n(x.growth_pct)}</td>
+            <td class="num">{n(x.mass_with_growth_kg, 1)}</td><td>{x.source}</td></tr>
+        ))}
+        <tr class="row-total"><td></td><td>Roof: solar panels and their adhesive</td><td class="num">{n(roofKg, 1)}</td><td></td><td></td>
+          <td class="num">{n(roofGr, 1)}</td><td></td></tr>
       </tbody>
     </table>
   </div>
