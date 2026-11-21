@@ -8,14 +8,14 @@ Research report, 20 Nov 2026, for the enclosed bike garage on a used VDJ79 singl
 
 Leonard asked for an enclosed, theft-resistant box on the 79's tray for both bikes and some tools, so the trailer can shrink. This report sets its requirements and recommends:
 
-- **Build, do not buy.** Every stock canopy for a 79 tray is 850 to 960 mm tall and at most 2,350 mm long, and the Tuareg needs 1,435 mm inside. Build a one-piece welded aluminium body: 2.5 mm 5052 walls and doors, 2.0 mm roof, 4 mm floor, SHS 40 x 40 x 3 frame, on an RHS subframe (section 6).
-- **Inside 2,500 x 1,810 x 1,460 mm**, outside about 2,590 x 1,900 x 1,520 mm. That keeps inside Toyota's 1,910 mm width rule and the 1,908 mm legal rear overhang (1,510 mm).
-- **Doors and ramp.** Rear barn doors over a clear opening of at least 1,676 x 1,460 mm, and a kerb-side lift-up door to reach the second bike's straps. The 3,048 mm Black Widow MF-12038 ramp stows on edge in a slot behind the bikes. The WARN VRX 25-S winch pulls each bike up while the rider walks beside it.
-- **Floor.** A lower tray at about 850 mm (16.2 degree ramp) if the GVM kit's bump travel keeps the wheel tubs under 100 mm, otherwise a flat deck at about 1,080 mm (20.7 degrees). Both heights are estimates.
-- **Mounting.** The subframe bolts to Toyota's deck mount brackets, firm at the front and compliant at the rear. No drilling or welding of the frame.
-- **Restraint.** `DESIGN.md`'s layout, unchanged: Condor chocks, two flush L-track rows, LC 1,000 kg straps and 20 kN anchors. The NHVR's 2025 performance standards are the ones report 03 used.
-- **Security.** Shoot bolts and a cam bar on the barn doors, an ABLOY PL362 padlock, inset hinges, a disc lock and anchor chain per bike, a Teltonika FMC130 tracker with door switches and a siren, and a Monimoto 9 in each bike.
-- **Mass and cost.** About 440 kg empty and 880 kg with the bikes and tools. About AUD 13,900 of new spend (estimate), against about AUD 20,000 to 25,000 plus fitting for a custom shop body.
+- Build, do not buy. Every stock canopy for a 79 tray is 850 to 960 mm tall and at most 2,350 mm long, and the Tuareg needs 1,435 mm inside. Build a one-piece welded aluminium body: 2.5 mm 5052 walls and doors, 2.0 mm roof, 4 mm floor, SHS 40 x 40 x 3 frame, on an RHS subframe (section 6).
+- Inside 2,500 x 1,810 x 1,460 mm, outside about 2,590 x 1,900 x 1,520 mm. That keeps inside Toyota's 1,910 mm width rule and the 1,908 mm legal rear overhang (1,510 mm).
+- Doors and ramp. Rear barn doors over a clear opening of at least 1,676 x 1,460 mm, and a kerb-side lift-up door to reach the second bike's straps. The 3,048 mm Black Widow MF-12038 ramp stows on edge in a slot behind the bikes. The WARN VRX 25-S winch pulls each bike up while the rider walks beside it.
+- Floor. A lower tray at about 850 mm (16.2 degree ramp) if the GVM kit's bump travel keeps the wheel tubs under 100 mm, otherwise a flat deck at about 1,080 mm (20.7 degrees). Both heights are estimates.
+- Mounting. The subframe bolts to Toyota's deck mount brackets, firm at the front and compliant at the rear. No drilling or welding of the frame.
+- Restraint. `DESIGN.md`'s layout, unchanged: Condor chocks, two flush L-track rows, LC 1,000 kg straps and 20 kN anchors. The NHVR's 2025 performance standards are the ones report 03 used.
+- Security. Shoot bolts and a cam bar on the barn doors, an ABLOY PL362 padlock, inset hinges, a disc lock and anchor chain per bike, a Teltonika FMC130 tracker with door switches and a siren, and a Monimoto 9 in each bike.
+- Mass and cost. About 440 kg empty and 880 kg with the bikes and tools. About AUD 13,900 of new spend (estimate), against about AUD 20,000 to 25,000 plus fitting for a custom shop body.
 
 What blocks the design:
 
@@ -135,7 +135,7 @@ Mass of a one-piece body, 2,400 x 1,900 x 1,520 mm outside, calculated at 2.68 g
 | Frame | 30 m of SHS 40 x 40 x 3 and 22 m of SHS 25 x 25 x 3 | 51.6 |
 | Subframe | Two RHS 100 x 50 x 3 runners and nine RHS 75 x 50 x 3 crossmembers | 44.4 |
 | Hinges, locks, seals, mudguards, paint, lamps | Estimate | 45 |
-| **Total** | | **284** |
+| Total | | 284 |
 
 That compares with 240 to 475 kg for the stock tray and canopy sets in section 2.1. Section 6.1 grows it to about 330 kg for the recommended 2,590 mm length, 2.5 mm walls and the kerb-side door. Material cost is about AUD 4,360 for the aluminium (8 sheets of 2.0 mm, 2 of 4.0 mm, 12 tube lengths) and about AUD 9,000 with locks, hinges, seals, paint, lamps, the fan and consumables (estimate). A custom shop building the same body would charge about AUD 20,000 to 25,000 plus fitting (estimate, scaled from Teralume's AUD 16,990 for its 1,700 mm body).
 
@@ -284,7 +284,7 @@ Barn doors with internal shoot bolts and a cam bar, an ABLOY PL362 padlock on a 
 | Ramp and winch | 45 | move from the trailer |
 | Security set: two ABLOY PL362, FMC130, siren and switches, two Monimoto 9, two disc locks, two chains and anchors (the cam bar, shoot bolts and latches are in the body) | 13 | about 2,400 (estimate) |
 | Engineer's review | | about 2,000 (estimate) |
-| **Total, empty** | **440** | **about 13,900** |
+| Total, empty | 440 | about 13,900 |
 
 With the bikes and tools the ute carries about 880 kg more than the bare cab chassis. The rear axle then reaches about 2,260 kg with 250 kg on the towball, before any accessory. The full set puts the centre of gravity at about 940 mm and the SSF at about 0.80 (section 5 method).
 

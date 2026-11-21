@@ -76,7 +76,7 @@ The other chosen products have Australian distributors. I did not check Australi
 
 ## 1. Products per line
 
-Sections 2 to 5 cover the battery (UF-04), the LPG lines (GS-02, GS-05), the solar panels (RF-01) and the water tanks (UF-01). This section covers the rest.
+Sections 2 to 5 cover the battery (UF-04), the LPG lines (GS-02, GS-05), the solar panels (RF-01) and the water tanks (UF-01). The rest follow here.
 
 ### LA-01 Wet bathroom, 1 x 1 m
 

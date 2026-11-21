@@ -8,22 +8,22 @@ Status: research for the body design, 20 Nov 2026. Positions are in the project 
 
 ## Recommendation
 
-**Panels.**
+Panels.
 
 - Floor: 30 mm, two 2.0 mm woven roving polyester skins (48 % glass, the Lamilux Woven Roving 48 % Plus type) on 26 mm Divinycell H80 PVC foam. 8.9 kg/m2 (calculated). D is 11.0 kNm2/m. A 100 kg bike wheel midway between the raisers, 1,236 mm apart, deflects the floor 4.6 mm (span/269). Recycled PET at 100 kg/m3 is the alternative core, at 9.4 kg/m2.
 - Side and rear walls: 35 mm, two 1.5 mm gelcoat GRP skins (Optiplan Polydet, the German skin type Creative Composites uses) on 32 mm XPS foam. 6.0 kg/m2, scaled from Creative Composites' 5.8 kg/m2 for its 29 mm panel. The front wall has a 2.0 mm outer skin against stones, 6.7 kg/m2.
 - Raising roof lid: 40 mm, a 2.0 mm top skin and a 1.5 mm bottom skin on XPS of about 36 kg/m3. 7.0 kg/m2 (calculated).
 - Inserts: high-density PVC or pultruded GRP strips laid into the core along every fixing line, as Creative Composites and DIY Caravans build them. Every strap anchor and every body mount bolt passes through a strip and a crush tube.
 
-**Joints and the box round the openings.** Every panel edge is bonded into an aluminium extrusion with an MS polymer or PU adhesive: floor joiners, corner joiners and the pop-top bottom and top rings. An aluminium SHS 50 x 50 x 3 portal frames the rear garage opening: a header under the bed deck, two jambs and a post at the gas locker. It is bonded and riveted to the wall skins and its feet bolt through the floor to the rear crossmember. The portal and the 380 mm kerb-side pier keep the rear wall square (3.6 mm of racking and 18 MPa in the SHS in the twist case, calculated). Keep at least 300 mm of full wall between neighbouring openings in the kerb-side wall (assumption).
+Joints and the box round the openings. Every panel edge is bonded into an aluminium extrusion with an MS polymer or PU adhesive: floor joiners, corner joiners and the pop-top bottom and top rings. An aluminium SHS 50 x 50 x 3 portal frames the rear garage opening: a header under the bed deck, two jambs and a post at the gas locker. It is bonded and riveted to the wall skins and its feet bolt through the floor to the rear crossmember. The portal and the 380 mm kerb-side pier keep the rear wall square (3.6 mm of racking and 18 MPa in the SHS in the twist case, calculated). Keep at least 300 mm of full wall between neighbouring openings in the kerb-side wall (assumption).
 
-**Mounting.** Bolt the floor through the 50 x 21 mm EPDM-faced bearer strip into every raiser and every outrigger tip: 36 M10 bolts at the nine stations, as Lindapter Hollo-Bolt HB10 blind bolts (safe working load 8.5 kN in tension and 10 kN in shear). Do not bond the body to the chassis. The bonded body is 8 to 12 times stiffer in torsion than the chassis, so it takes about 80 % of the LC5a twist torque (10.7 kNm) and the chassis twist falls from 0.48 to about 0.10 degree. That torque puts about 0.5 MPa of shear in the wall skins. A torsion-free subframe would add a frame under the floor and raise the trailer, and a chassis this stiff does not need one.
+Mounting. Bolt the floor through the 50 x 21 mm EPDM-faced bearer strip into every raiser and every outrigger tip: 36 M10 bolts at the nine stations, as Lindapter Hollo-Bolt HB10 blind bolts (safe working load 8.5 kN in tension and 10 kN in shear). Do not bond the body to the chassis. The bonded body is 8 to 12 times stiffer in torsion than the chassis, so it takes about 80 % of the LC5a twist torque (10.7 kNm) and the chassis twist falls from 0.48 to about 0.10 degree. That torque puts about 0.5 MPa of shear in the wall skins. A torsion-free subframe would add a frame under the floor and raise the trailer, and a chassis this stiff does not need one.
 
-**Roof.** A hard lid on canvas walls, raised level by four 12 V electric linear actuators (LINAK LA36 class) in the corners, with an 825 mm lift. That gives 900 mm of sitting room over the mattress, keeps the roof-down ceiling at 1,800 mm and the travel height at 2,762 mm. Six over-centre latches with secondary catches hold the lid down for travel.
+Roof. A hard lid on canvas walls, raised level by four 12 V electric linear actuators (LINAK LA36 class) in the corners, with an 825 mm lift. That gives 900 mm of sitting room over the mattress, keeps the roof-down ceiling at 1,800 mm and the travel height at 2,762 mm. Six over-centre latches with secondary catches hold the lid down for travel.
 
-**Doors and windows.** Entry: Aussie Traveller DC door, 1,623 x 622 mm, left hinged. Gas locker: Aussie Traveller service door, 650 x 650 mm. Garage: the rear wall cut-out in an aluminium frame on a piano hinge, with two gas struts and four Southco E3 compression latches. Windows: Dometic S4. Roof hatches: a Midi Heki over the living area and a Mini Heki Style over the bed. A Carafan Sahara CP700 fan pressurises the living area against dust.
+Doors and windows. Entry: Aussie Traveller DC door, 1,623 x 622 mm, left hinged. Gas locker: Aussie Traveller service door, 650 x 650 mm. Garage: the rear wall cut-out in an aluminium frame on a piano hinge, with two gas struts and four Southco E3 compression latches. Windows: Dometic S4. Roof hatches: a Midi Heki over the living area and a Mini Heki Style over the bed. A Carafan Sahara CP700 fan pressurises the living area against dust.
 
-**Mass.** The body comes to 741 kg against the brief's 654 kg (+87 kg), and 829 kg with the growth allowance. The floor, the raising roof and the extrusions carry most of the rise. Section 10 has every line.
+Mass. The body comes to 741 kg against the brief's 654 kg (+87 kg), and 829 kg with the growth allowance. The floor, the raising roof and the extrusions carry most of the rise. Section 10 has every line.
 
 ## 1. Requirements
 
@@ -157,17 +157,17 @@ Under LC5a the bare chassis twists 0.48 degree between the XT front hinge and re
 | E. Three-point subframe: one fixed bearing and one or more pivots | Almost none. The chassis twists freely | 60 to 100 kg and 75 to 100 mm of height (estimate) | Pivots wear. Every pipe, cable and tank link must flex | [Foundation Vehicles](https://www.foundationvehicles.com/technology/3-point-vs-4-point-vs-5-point-subframes/), Unicat |
 | F. Four- or five-point subframe | Low, staged along a long body | More than E | As E, and over-constraint if the layout fights the frame | Foundation Vehicles |
 
-Truck campers need E or F because a truck frame twists many degrees (Foundation quotes up to 22 degrees of articulation for its E-Series subframe). This chassis twists less than half a degree at its design torque, and the floor needs the outriggers under its 557 mm edge, which a subframe would replace with its own frame. So **B is recommended**.
+Truck campers need E or F because a truck frame twists many degrees (Foundation quotes up to 22 degrees of articulation for its E-Series subframe). This chassis twists less than half a degree at its design torque, and the floor needs the outriggers under its 557 mm edge, which a subframe would replace with its own frame. So B is recommended.
 
-**Mount positions.** At each of the nine stations (X 1,845, 2,437, 3,003, 3,570, 4,162, 4,992, 5,822, 6,550 and 7,295): one bolt through the floor into each raiser at Y ±618, and one into each outrigger tip at about Y ±1,140, just inside the wall line. 36 bolts.
+Mount positions. At each of the nine stations (X 1,845, 2,437, 3,003, 3,570, 4,162, 4,992, 5,822, 6,550 and 7,295): one bolt through the floor into each raiser at Y ±618, and one into each outrigger tip at about Y ±1,140, just inside the wall line. 36 bolts.
 
-**Loads per bolt.** Shear about 0.9 kN (LC7 forward, 31.7 kN shared by 36 bolts). Tension up to 4.2 kN at the raiser bolts next to the axle group in LC5a. About 1.1 kN at each raiser bolt from the LC7 overturning moment.
+Loads per bolt. Shear about 0.9 kN (LC7 forward, 31.7 kN shared by 36 bolts). Tension up to 4.2 kN at the raiser bolts next to the axle group in LC5a. About 1.1 kN at each raiser bolt from the LC7 overturning moment.
 
-**Fastener.** Lindapter Hollo-Bolt HB10-3, hot-dip galvanised, grip 41 to 60 mm, which takes the 3 mm raiser wall, the 21 mm strip, the 30 mm floor and a 3 mm spreader. Its safe working load is 8.5 kN in tension and 10 kN in single shear at a factor of 5 in S275 hollow section, so the worst bolt works at 0.49 ([Lindapter Hollo-Bolt data](https://www.abbots-uk.com/files/ww/lindapter-type-hb-datasheet.pdf)). Lindapter warns that a thin wide face can fail first, so the engineer checks the 3 mm raiser top.
+Fastener. Lindapter Hollo-Bolt HB10-3, hot-dip galvanised, grip 41 to 60 mm, which takes the 3 mm raiser wall, the 21 mm strip, the 30 mm floor and a 3 mm spreader. Its safe working load is 8.5 kN in tension and 10 kN in single shear at a factor of 5 in S275 hollow section, so the worst bolt works at 0.49 ([Lindapter Hollo-Bolt data](https://www.abbots-uk.com/files/ww/lindapter-type-hb-datasheet.pdf)). Lindapter warns that a thin wide face can fail first, so the engineer checks the 3 mm raiser top.
 
-**Isolation (MAT-04).** Galvanised steel touches only the HDPE strip and the bolt. A pultruded GRP crush tube through the floor keeps aluminium off the steel. Where an aluminium extrusion or the portal foot sits over steel: Duralac on the faying surface and a nylon washer and sleeve on the bolt. Tef-Gel on any stainless thread in aluminium (report 04 section 6).
+Isolation (MAT-04). Galvanised steel touches only the HDPE strip and the bolt. A pultruded GRP crush tube through the floor keeps aluminium off the steel. Where an aluminium extrusion or the portal foot sits over steel: Duralac on the faying surface and a nylon washer and sleeve on the bolt. Tef-Gel on any stainless thread in aluminium (report 04 section 6).
 
-**Sealing and service.** Each bolt passes through a high-density insert, never bare foam. MS polymer sealant in the hole and under a bonded 50 x 50 mm spreader plate. Shim each outrigger tip to within 2 mm of the raiser plane (DIY Caravans' tolerance). Re-torque every bolt after the first rough trip (FAIL-03).
+Sealing and service. Each bolt passes through a high-density insert, never bare foam. MS polymer sealant in the hole and under a bonded 50 x 50 mm spreader plate. Shim each outrigger tip to within 2 mm of the raiser plane (DIY Caravans' tolerance). Re-torque every bolt after the first rough trip (FAIL-03).
 
 ## 5. The rear wall and the openings
 
@@ -175,10 +175,10 @@ The rear wall keeps a 40 mm strip on the road side (Y 1,125 to 1,165), a 380 mm 
 
 How the box keeps its shape:
 
-- **A portal round the rear opening.** Header: aluminium SHS 50 x 50 x 3, 6060-T5 (Capral EB1004, 1.52 kg/m, I = 20.8 cm4), 1,910 mm long, top at module Z 1,490, carrying the ledger under the bed deck's rear edge. Kerb-side post: the same SHS at Y -785 to -835, floor to header. It is also the frame of the gas locker's sealed divider. Road-side jamb: RHS 80 x 40 x 3 (Capral EL8019), 40 mm across in the 40 mm strip and 80 mm along the trailer, bonded to the side wall's inner skin. It keeps the full 1,910 mm opening, so CLR-09 does not change. Joints: bolted aluminium corner gussets, then the frame bonded and riveted to the wall skins. The feet bolt through the floor into the rear body crossmember at X 7,295 with the isolation in section 4. About 10 kg (calculated). With the portal and the pier together the rear wall racks 3.6 mm under the body's share of LC5a, and the SHS corners see about 18 MPa, against a 6060-T5 yield of 110 MPa (report 04 section 5).
-- **The rest of the garage box.** Partition A (20 mm honeycomb, sealed) closes the front of the garage and the 20 mm honeycomb bed deck closes its top. Bond and rivet both into the side walls on angles, so each acts as a diaphragm. With the portal they make the garage a closed box again.
-- **Edges.** Aluminium corner joiners at the four vertical corners (DIY Caravans' wall joiner is 1.8 kg/m), floor joiners round the floor edge (1.27 kg/m for 29 mm panels) and the pop-top bottom ring along the wall tops. Each edge is bonded with MS polymer, which DIY Caravans and the pop-top kit specify ([joiners](https://www.diycaravans.com.au/product-category/composite-panel-joiners-adhesives/), [pop-top kit](https://www.diycaravans.com.au/shop/pop-top-extrusion-kit-2-up-to-4-8m-x-2-4m/)).
-- **Framed openings.** Every cut edge is sealed and framed. Doors and windows bring their own frames: the DC door frame is about 36 mm deep, and the S4 window has an inner frame. Large cut-outs without a bought frame (the garage door and the kitchen opening) take DIY Caravans' 2 mm aluminium door profile, which it sells for food trucks and toy haulers ([door profile kit](https://www.diycaravans.com.au/shop/diy-door-profile-kit-parts-a-b/)). Cut-out corners are radiused, never square: 68 mm for Aussie Traveller service doors and 90 mm at the top of a DC door ([Aussie Traveller doors catalogue](https://cdn.shopify.com/s/files/1/0542/4939/0251/files/5_Caravan_Doors.pdf?v=1723079234)).
+- A portal round the rear opening. Header: aluminium SHS 50 x 50 x 3, 6060-T5 (Capral EB1004, 1.52 kg/m, I = 20.8 cm4), 1,910 mm long, top at module Z 1,490, carrying the ledger under the bed deck's rear edge. Kerb-side post: the same SHS at Y -785 to -835, floor to header. It is also the frame of the gas locker's sealed divider. Road-side jamb: RHS 80 x 40 x 3 (Capral EL8019), 40 mm across in the 40 mm strip and 80 mm along the trailer, bonded to the side wall's inner skin. It keeps the full 1,910 mm opening, so CLR-09 does not change. Joints: bolted aluminium corner gussets, then the frame bonded and riveted to the wall skins. The feet bolt through the floor into the rear body crossmember at X 7,295 with the isolation in section 4. About 10 kg (calculated). With the portal and the pier together the rear wall racks 3.6 mm under the body's share of LC5a, and the SHS corners see about 18 MPa, against a 6060-T5 yield of 110 MPa (report 04 section 5).
+- The rest of the garage box. Partition A (20 mm honeycomb, sealed) closes the front of the garage and the 20 mm honeycomb bed deck closes its top. Bond and rivet both into the side walls on angles, so each acts as a diaphragm. With the portal they make the garage a closed box again.
+- Edges. Aluminium corner joiners at the four vertical corners (DIY Caravans' wall joiner is 1.8 kg/m), floor joiners round the floor edge (1.27 kg/m for 29 mm panels) and the pop-top bottom ring along the wall tops. Each edge is bonded with MS polymer, which DIY Caravans and the pop-top kit specify ([joiners](https://www.diycaravans.com.au/product-category/composite-panel-joiners-adhesives/), [pop-top kit](https://www.diycaravans.com.au/shop/pop-top-extrusion-kit-2-up-to-4-8m-x-2-4m/)).
+- Framed openings. Every cut edge is sealed and framed. Doors and windows bring their own frames: the DC door frame is about 36 mm deep, and the S4 window has an inner frame. Large cut-outs without a bought frame (the garage door and the kitchen opening) take DIY Caravans' 2 mm aluminium door profile, which it sells for food trucks and toy haulers ([door profile kit](https://www.diycaravans.com.au/shop/diy-door-profile-kit-parts-a-b/)). Cut-out corners are radiused, never square: 68 mm for Aussie Traveller service doors and 90 mm at the top of a DC door ([Aussie Traveller doors catalogue](https://cdn.shopify.com/s/files/1/0542/4939/0251/files/5_Caravan_Doors.pdf?v=1723079234)).
 
 The kerb side wall carries the kitchen opening (1,500 x 450 mm, 50 mm above the floor), the entry door (622 x 1,623 mm), the gas locker hatch (650 x 650 mm) and a 500 x 450 mm window. That is 2,775 mm of openings along the 5,500 mm wall. The wall stands on the floor edge, which the outriggers carry at most 830 mm apart, so it does not have to span between supports as a beam. It does carry its share of the twist and the roof. Rules for the layout (assumptions, from the practice above):
 
@@ -195,7 +195,7 @@ The lifted load is the lid (90 kg), the solar panels (90 kg glass, or 31 kg for 
 
 | Type | Mass of the moving walls | Dust and water | Insulation when raised | Wind when raised | Field failures | Australian supply |
 |---|---|---|---|---|---|---|
-| **Hard lid on canvas walls, parallel lift (recommended)** | Canvas about 9 kg, top ring 26 kg (calculated from DIY Caravans' 3.3 kg/m for both rings) | Roof down, a bulb seal between the rings is compressed by the latches. Raised, the canvas zips leak dust, but the roof travels down | Canvas has almost none. 13 m2 of skirt at an 825 mm lift | The canvas flaps and the lid sways, so the corner posts take the side force | Latches that unhook in travel, canvas wear and mould, bent lifters, broken cables ([RV Daily](https://rvdaily.com.au/how-secure-are-the-latches-on-your-pop-top-roof/)) | DIY Caravans pop-top extrusions, corner joiners, seals and lifters ([pop-top kits](https://www.diycaravans.com.au/product-category/pop-top-roof-kits/)) |
+| Hard lid on canvas walls, parallel lift (recommended) | Canvas about 9 kg, top ring 26 kg (calculated from DIY Caravans' 3.3 kg/m for both rings) | Roof down, a bulb seal between the rings is compressed by the latches. Raised, the canvas zips leak dust, but the roof travels down | Canvas has almost none. 13 m2 of skirt at an 825 mm lift | The canvas flaps and the lid sways, so the corner posts take the side force | Latches that unhook in travel, canvas wear and mould, bent lifters, broken cables ([RV Daily](https://rvdaily.com.au/how-secure-are-the-latches-on-your-pop-top-roof/)) | DIY Caravans pop-top extrusions, corner joiners, seals and lifters ([pop-top kits](https://www.diycaravans.com.au/product-category/pop-top-roof-kits/)) |
 | Folding hard walls | About 80 kg of 35 mm panel for the sides and ends, plus hinges (estimate) | Many hinge lines to seal | Like the walls | Stiff | Hinge seals leak and hinges loosen | No maker found for a 5.5 m trailer |
 | Telescoping hard walls | An inner or outer box, 80 to 100 kg (estimate) | Sliding seals | Like the walls | Stiff | Sliding seals wear and bind | Alaskan Campers (USA), not sold in Australia ([Alaskan](https://www.alaskancampers.com/hard-sided/)) |
 | Front-hinged wedge | Triangular canvas ends, about 6 kg | As the canvas lid | As canvas | The lid acts as a sail about the hinge | Hinge and strut wear | Common on camper trailers |
@@ -206,7 +206,7 @@ The wedge is simpler, but it gives the full 825 mm only at one end. Hinged at th
 
 | System | Products | Force and speed | Mass | Failure modes |
 |---|---|---|---|---|
-| **Electric linear actuators, four corners (recommended)** | LINAK LA36, 12 V, 100 to 999 mm stroke ([LINAK LA36](https://www.linak.com/products/linear-actuators/la36/)). DIY Caravans' four-actuator kit: 300 kg each, 600 to 1,000 mm stroke, IP66, synchronised remote, assembled in Australia ([kit](https://www.diycaravans.com.au/shop/in-line-linear-actuators-kits-4/)) | LA36 at 12 mm pitch: 2,600 N push and pull at 31 to 41 mm/s, 4,500 N at 18 to 23 mm/s, 6,800 N at 12 to 16 mm/s. Self-lock 3,400 to 8,800 N. IP66 in use. 20 % duty at full load. Fitted length 250 mm plus stroke | About 3.5 kg each (estimate) plus guide posts and controls, 30 kg in all (estimate) | Corners out of step rack the lid, so use Hall feedback and parallel control (LA36 IC Parallel). Motors need 12 V at about 20 A each at full load. A hand crank is the fallback |
+| Electric linear actuators, four corners (recommended) | LINAK LA36, 12 V, 100 to 999 mm stroke ([LINAK LA36](https://www.linak.com/products/linear-actuators/la36/)). DIY Caravans' four-actuator kit: 300 kg each, 600 to 1,000 mm stroke, IP66, synchronised remote, assembled in Australia ([kit](https://www.diycaravans.com.au/shop/in-line-linear-actuators-kits-4/)) | LA36 at 12 mm pitch: 2,600 N push and pull at 31 to 41 mm/s, 4,500 N at 18 to 23 mm/s, 6,800 N at 12 to 16 mm/s. Self-lock 3,400 to 8,800 N. IP66 in use. 20 % duty at full load. Fitted length 250 mm plus stroke | About 3.5 kg each (estimate) plus guide posts and controls, 30 kg in all (estimate) | Corners out of step rack the lid, so use Hall feedback and parallel control (LA36 IC Parallel). Motors need 12 V at about 20 A each at full load. A hand crank is the fallback |
 | Hydraulic rams with a hand or electric pump | Alaskan Campers used hydraulics from 1958 and now offers electric actuators ([Truck Camper Magazine](https://www.truckcampermagazine.com/news/alaskan-campers-debuts-electric-actuator-lifts/)). No pop-top ram kit found in Australia | High force, a hand pump works with flat batteries | 25 to 35 kg with pump and lines (estimate) | Seal leaks, uneven rams without a flow divider, oil in a dusty body |
 | Gas struts | Generic | Force falls with cold | Light | Hard to balance on a 223 kg lid, struts fade and leak (DIY Caravans) |
 | Spring scissor canopy lifters | DIY Caravans: 900 mm lift, 35 kg per lifter, 5.5 kg ([large lifter](https://www.diycaravans.com.au/shop/pop-top-canopy-lifter-large/)) | Seven needed for 223 kg | 38 kg for seven | Arms bend if over-extended. DIY Caravans advises 70 to 80 % of full lift |
@@ -218,7 +218,7 @@ The wedge is simpler, but it gives the full 825 mm only at one end. Hinged at th
 
 | Roof-down ceiling | Lift | Travel height | Effect |
 |---|---|---|---|
-| **1,800 mm (recommended)** | 823 mm, so 825 mm | 2,762 mm | As planned. Inside the LA36's 999 mm stroke and DIY Caravans' 1,000 mm kit |
+| 1,800 mm (recommended) | 823 mm, so 825 mm | 2,762 mm | As planned. Inside the LA36's 999 mm stroke and DIY Caravans' 1,000 mm kit |
 | 2,000 mm | 623 mm | 2,962 mm | 0.48 m2 more frontal area on a body of about 6.6 m2, so about 7 % more drag (estimate). About 19 kg more wall (calculated). Higher centre of gravity and side area. Standing room in the living area roof down |
 
 Recommendation: keep 1,800 mm and lift 825 mm. The longer stroke costs nothing in the actuator, while the taller body costs drag, mass and roll margin on every kilometre towed. The bed stays unusable roof down either way (77 or 277 mm of headroom).
@@ -257,30 +257,30 @@ Garage vents (GAR-01): petrol vapour is heavier than air. No Australian rule siz
 
 ## 8. Dust and water
 
-**Why dust gets in.** On a dirt road the air flowing round the body leaves the inside below outside pressure, and dust is drawn through vents and gaps (report 02 FAIL-05). Australian off-road vans answer it two ways: seal every gap, and push filtered air in so the inside stays above outside pressure.
+Why dust gets in. On a dirt road the air flowing round the body leaves the inside below outside pressure, and dust is drawn through vents and gaps (report 02 FAIL-05). Australian off-road vans answer it two ways: seal every gap, and push filtered air in so the inside stays above outside pressure.
 
 | Product | How it works | Power | Mass | Fitting | Source |
 |---|---|---|---|---|---|
-| **Carafan Sahara CP700 (recommended)** | Fan and filter that pressurise the van, moving or parked | About 5.8 A at 12 V (an owner's measurement) | Not published, 7 kg with ducts (estimate) | Inside a cabinet with the intake through the wall | [Carafan](https://carafan.com.au/), [Victron community](https://community.victronenergy.com/t/mppt-75-15-settings-and-carafan-dust-extraction-instal/27393) |
+| Carafan Sahara CP700 (recommended) | Fan and filter that pressurise the van, moving or parked | About 5.8 A at 12 V (an owner's measurement) | Not published, 7 kg with ducts (estimate) | Inside a cabinet with the intake through the wall | [Carafan](https://carafan.com.au/), [Victron community](https://community.victronenergy.com/t/mppt-75-15-settings-and-carafan-dust-extraction-instal/27393) |
 | Gusto DRS | Wall-mounted fan and filter, intake facing forward, not for use in rain | 18 A at most, on a 30 A fused supply | Not published | 310 x 310 mm wall cut-out, 260 x 260 mm cabinet vent | [Gusto manual](https://www.coastrv.com.au/cdn/shop/files/Gusto_DRS_Manual.pdf?v=6428087926919287103), [flyer](https://atlref.websitedevserver.com/wp-content/uploads/2024/06/Gusto_DRS-_Flyer_2023.pdf) |
 | Dometic DRS2 | Unpowered roof scoop and filter, works only while moving | None | About 5 kg (estimate) | Roof 30 to 65 mm thick, so it would sit on the lid and take solar area | [Dometic manual](https://www.caravansplus.com.au/pdf/Dometic-DRS2-Manual.pdf) |
 
 The CP700 is chosen because it works parked as well as moving and needs no roof space. Put its intake high on the front wall, beside the spare wheel, where it is clear of wheel spray (assumption).
 
-**Seals and joints.**
+Seals and joints.
 
 - Doors and hatches: EPDM bulb seals pulled tight by compression latches. The DC door's triple compression lock, Southco E3 latches on the garage door and the kitchen opening, and a second D seal on the garage door. One Australian toy hauler maker triple-seals its garage-to-cabin door ([Titanium Caravans](https://titaniumcaravans.com.au/toy-hauler-caravans/)).
 - Panel joints: bonded into extrusions with MS polymer, a bead inside and out.
 - Penetrations: every cable, hose, filler and vent passes through a gland or grommet sealed on both skins (ADR 42 clause 21.1.1 asks for grommets in metal). Every cut edge of a panel is sealed with resin or an edge insert, so water cannot track along the skin bond.
 - The lid: the bulb seal on the bottom ring and a drip lip on the top ring (section 6.5).
 
-**The garage (GAR-02).** Partition A runs from the floor to the bed deck, and above the deck the bed space is open to the living area. So pressurising the living area also pressurises the bed space, and any leak at partition A or the deck runs from the bed side into the garage. That keeps petrol vapour and dust on the garage side even where a seal is imperfect. Seal partition A and the deck to the floor, walls and each other with Sikaflex-221 (report 04 section 9), and draw every penetration through them. The garage itself is not pressurised and its low vents admit some dust, which the bikes tolerate.
+The garage (GAR-02). Partition A runs from the floor to the bed deck, and above the deck the bed space is open to the living area. So pressurising the living area also pressurises the bed space, and any leak at partition A or the deck runs from the bed side into the garage. That keeps petrol vapour and dust on the garage side even where a seal is imperfect. Seal partition A and the deck to the floor, walls and each other with Sikaflex-221 (report 04 section 9), and draw every penetration through them. The garage itself is not pressurised and its low vents admit some dust, which the bikes tolerate.
 
-**Garage venting for petrol vapour (GAR-01).** Two low vents and one high vent, sized in section 7. The low vents sit 500 mm or more from the gas locker's drain outlet and away from the battery box vent on the road side.
+Garage venting for petrol vapour (GAR-01). Two low vents and one high vent, sized in section 7. The low vents sit 500 mm or more from the gas locker's drain outlet and away from the battery box vent on the road side.
 
-**Water.** Drip rails over the garage door, the entry door and the kitchen opening. Drainage paths drawn for each opening (FAIL-06). The garage door seal closes onto a 10 mm raised lip at the sill, so spray running down the closed door stays outside (assumption).
+Water. Drip rails over the garage door, the entry door and the kitchen opening. Drainage paths drawn for each opening (FAIL-06). The garage door seal closes onto a 10 mm raised lip at the sill, so spray running down the closed door stays outside (assumption).
 
-**Test.** Report 02 FAIL-05: a dust run on a dirt road before the fit-out, with the CP700 on and off.
+Test. Report 02 FAIL-05: a dust run on a dirt road before the fit-out, with the CP700 on and off.
 
 ## 9. The awning and the mud flaps
 
@@ -290,7 +290,7 @@ The awning runs along the kerb side over the kitchen and the entry door. It moun
 
 | Product | Case length | Extension | Mass | Source |
 |---|---|---|---|---|
-| **Fiamma F45L 500, Polar White, 06530A01R (recommended)** | 5,020 mm (canopy 4,350 mm) | 2,500 mm, 10.9 m2 of shade | 39.0 kg (maker) | [Fiamma F45 data sheet](https://www.fiammausa.com/en/f45s-en.html) |
+| Fiamma F45L 500, Polar White, 06530A01R (recommended) | 5,020 mm (canopy 4,350 mm) | 2,500 mm, 10.9 m2 of shade | 39.0 kg (maker) | [Fiamma F45 data sheet](https://www.fiammausa.com/en/f45s-en.html) |
 | Fiamma F45s 450 | 4,230 mm | 2,500 mm, 10.8 m2 | 29.5 kg (65 lb, maker) | Same |
 | Thule 4200 cassette | 3,500 to 4,500 mm | Not found | 21.7 kg for 3.5 m (retailer) | [DIY Caravans](https://www.diycaravans.com.au/shop/thule-4200-cassette-awning/) |
 | Aussie Traveller cassette awning | Several | Not found | 28 kg (retailer listing, probably shipping) | [DIY Caravans](https://www.diycaravans.com.au/shop/atrv-cassette-awning/) |
@@ -326,7 +326,7 @@ Growth allowances follow MASS-06: 7 % on calculated lines, 20 % on estimates and
 | BD-11 | Wiring, plumbing, lighting and hardware | 60.0 | Estimate, kept until the systems design | 72.0 | 60.0 | 0 |
 | BD-12 | Pop-top lift and skirt: top ring 26.1, canvas 9.4, four actuators with guide posts and controls 30.0, six latches 2.4, seals 3.2 | 71.0 | Mixed, ring calculated, the rest estimates | 85.2 | 45.0 | +26.0 |
 | BD-13 | Fiamma F45L 500 (39.0, maker) and brackets (2.0, estimate) | 41.0 | Maker | 41.4 | 35.0 | +6.0 |
-| | **Total** | **740.9** | | **828.6** | **653.9** | **+87.0** |
+| | Total | 740.9 | | 828.6 | 653.9 | +87.0 |
 
 The repo carries the body at 636.9 kg now (BD-10 at 8 kg), so this design basis adds 104 kg to the tare, or 64 kg with growth (764.3 to 828.6 kg). Most of it sits near the body's middle, so the towball barely moves, but the gross mass does. On its own it takes the fully loaded case TC2 from 3,408 to about 3,512 kg, 12 kg over the 3,500 kg ATM, and TC6 to about 3,536 kg. Report 13's equipment changes, for example 58.8 kg off the roof with glass-free solar panels, are needed to bring every case back under the ATM.
 

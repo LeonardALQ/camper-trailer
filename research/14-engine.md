@@ -6,13 +6,13 @@ Research report 14, 20 Nov 2026. It covers the engine side of the VDJ79 single c
 
 ## Recommendation
 
-*Superseded 20 Nov 2026: the plan runs level B from the start, not level A (decision log 20:15, see the note above). This section is kept as written.*
+Superseded 20 Nov 2026: the plan runs level B from the start, not level A (decision log 20:15, see the note above). The text below is kept as written.
 
-**Power level A: the legal 20 % tune, on hardware that can go further.** Build the engine for about 181 kW at the crank (243 hp). That is 20 % over the factory 151 kW. Torque is about 650 Nm from about 1,800 to 2,700 rpm (estimate). Use a turbo and intercooler sized for level B (220 to 250 kW), so the engine runs well inside their limits when towing and can be retuned later if a certifier signs it off.
+Power level A: the legal 20 % tune, on hardware that can go further. Build the engine for about 181 kW at the crank (243 hp). That is 20 % over the factory 151 kW. Torque is about 650 Nm from about 1,800 to 2,700 rpm (estimate). Use a turbo and intercooler sized for level B (220 to 250 kW), so the engine runs well inside their limits when towing and can be retuned later if a certifier signs it off.
 
 Why this level:
 
-- It is the most power NSW allows without a certificate. *Superseded 20 Nov 2026: VSI 06 Rev 4 item 6 needs a VSCCS certificate for this tune, the LA4 certificate at about AUD 2,000 (estimate). See the note above.* Transport for NSW (TfNSW) requires certification when power rises more than 20 % or when emissions rise ([TfNSW VSI 06](https://www.rms.nsw.gov.au/documents/roads/safety-rules/standards/vsi-06-light-vehicle-modifications.pdf), items 2 and 5).
+- It is the most power NSW allows without a certificate. Superseded 20 Nov 2026: VSI 06 Rev 4 item 6 needs a VSCCS certificate for this tune, the LA4 certificate at about AUD 2,000 (estimate). See the note above. Transport for NSW (TfNSW) requires certification when power rises more than 20 % or when emissions rise ([TfNSW VSI 06](https://www.rms.nsw.gov.au/documents/roads/safety-rules/standards/vsi-06-light-vehicle-modifications.pdf), items 2 and 5).
 - It holds about 88 km/h on a 6 % grade at 6.6 t, against about 76 km/h stock (estimate, section 3.8). Level B would hold about 105 km/h, but needs an LA4 certificate (the national code's approval for a modified engine, section 4.1) and a driveline built for about 850 Nm.
 - A bigger turbo and a front-mount intercooler lower exhaust and intake temperatures at the same power ([GTurbo booklet](https://cdn.shopify.com/s/files/1/0823/4241/2531/files/1VD-FTV-VDJ70-Booklet-v1_4c.pdf), pages 18 and 28). That margin matters more than peak power for hours of towing in heat.
 - The factory clutch slips above about 500 Nm ([GTurbo booklet](https://cdn.shopify.com/s/files/1/0823/4241/2531/files/1VD-FTV-VDJ70-Booklet-v1_4c.pdf), page 23), so even level A needs the clutch from report 15.
@@ -26,15 +26,15 @@ The build (full list in section 5):
 - Tune: custom, with a towing map, peak power capped at 1.2 times the truck's own stock dyno reading, and a fuel limit on exhaust gas temperature (EGT).
 - Gauges: boost, EGT before the turbo, coolant and oil temperature.
 
-**Legal path: no VSCCS certificate** (the NSW modification certificate, section 4.3). Keep the catalytic converters or DPF, the EGR and a quiet muffler. Keep before-and-after dyno sheets from the same dyno. Book the free TfNSW emissions test that VSI 06 names, and tell the insurer about every change. Cost about AUD 0 (estimate).
+Legal path: no VSCCS certificate (the NSW modification certificate, section 4.3). Keep the catalytic converters or DPF, the EGR and a quiet muffler. Keep before-and-after dyno sheets from the same dyno. Book the free TfNSW emissions test that VSI 06 names, and tell the insurer about every change. Cost about AUD 0 (estimate).
 
-*Superseded 20 Nov 2026: VSI 06 Rev 4 item 6 needs a VSCCS certificate for this tune, the LA4 certificate at about AUD 2,000 (estimate). See the note above.*
+Superseded 20 Nov 2026: VSI 06 Rev 4 item 6 needs a VSCCS certificate for this tune, the LA4 certificate at about AUD 2,000 (estimate). See the note above.
 
-**Total: about AUD 32,200** for parts, machining and tune, with estimates included. That is about twice the AUD 15,000 share of the budget. The cheapest reliable version (rebuilt standard turbo, no front mount, aluminised exhaust) is about AUD 27,000. Reusing the injectors, supply pump, radiator and oil pump after they pass tests saves up to about AUD 6,600 more, at some risk. So the AUD 30,000 total budget needs to rise, by at least the AUD 12,000 to 17,000 that the engine side runs over its share.
+Total: about AUD 32,200 for parts, machining and tune, with estimates included. That is about twice the AUD 15,000 share of the budget. The cheapest reliable version (rebuilt standard turbo, no front mount, aluminised exhaust) is about AUD 27,000. Reusing the injectors, supply pump, radiator and oil pump after they pass tests saves up to about AUD 6,600 more, at some risk. So the AUD 30,000 total budget needs to rise, by at least the AUD 12,000 to 17,000 that the engine side runs over its share.
 
-**Model years.** For the engine alone, prefer a pre-DPF truck built from 2010 to October 2016. Its injectors cost about half as much as the later piezo injectors, and its exhaust has no DPF to keep. A DPF truck (October 2016 to 2024) costs about AUD 3,600 more at this level. Its single cab has a stronger chassis and stability control, so reports 15 and 16 may favour it anyway. *Superseded 20 Nov 2026: the GVM kit needs a truck built from 01/2017, so the plan buys a DPF truck and takes this report's DPF variant (decision log 11:25).*
+Model years. For the engine alone, prefer a pre-DPF truck built from 2010 to October 2016. Its injectors cost about half as much as the later piezo injectors, and its exhaust has no DPF to keep. A DPF truck (October 2016 to 2024) costs about AUD 3,600 more at this level. Its single cab has a stronger chassis and stability control, so reports 15 and 16 may favour it anyway. Superseded 20 Nov 2026: the GVM kit needs a truck built from 01/2017, so the plan buys a DPF truck and takes this report's DPF variant (decision log 11:25).
 
-**Levels B and C.** Level B (220 to 250 kW, about 850 Nm) needs an LA4 certificate (about AUD 2,000, estimate), emissions evidence and a driveline the certifier accepts for the torque. Its engine side costs about AUD 34,700. Level C (about 300 kW, about 1,050 Nm) costs about AUD 38,700 before certification and is not realistic to certify for this use (section 4.5).
+Levels B and C. Level B (220 to 250 kW, about 850 Nm) needs an LA4 certificate (about AUD 2,000, estimate), emissions evidence and a driveline the certifier accepts for the torque. Its engine side costs about AUD 34,700. Level C (about 300 kW, about 1,050 Nm) costs about AUD 38,700 before certification and is not realistic to certify for this use (section 4.5).
 
 ## 1. The base engine
 
@@ -61,8 +61,8 @@ Power and torque stayed at 151 kW and 430 Nm through the 2016 update ([Carscoops
 
 Which years to prefer for this build:
 
-- **Engine only: pre-DPF, 2010 to October 2016.** New genuine injectors cost AUD 4,290 against AUD 9,256 for the piezo set ([GTurbo](https://gturbo.com.au/products/toyota-1vd-ftv-injectors), [GTurbo](https://gturbo.com.au/products/toyota-1vd-ftv-dpf-injectors)). High-flow nozzles cost AUD 1,190 against AUD 2,790. There is no DPF to keep clean or to keep legal. Starting at 2010 avoids the early engines that drew oil consumption reports.
-- **Whole vehicle: the DPF truck may still win.** The 2016 single cab chassis and stability control matter for a 3.6 to 3.9 t ute towing 3 t. Reports 15 and 16 decide. A DPF engine at level A costs about AUD 3,600 more (section 5).
+- Engine only: pre-DPF, 2010 to October 2016. New genuine injectors cost AUD 4,290 against AUD 9,256 for the piezo set ([GTurbo](https://gturbo.com.au/products/toyota-1vd-ftv-injectors), [GTurbo](https://gturbo.com.au/products/toyota-1vd-ftv-dpf-injectors)). High-flow nozzles cost AUD 1,190 against AUD 2,790. There is no DPF to keep clean or to keep legal. Starting at 2010 avoids the early engines that drew oil consumption reports.
+- Whole vehicle: the DPF truck may still win. The 2016 single cab chassis and stability control matter for a 3.6 to 3.9 t ute towing 3 t. Reports 15 and 16 decide. A DPF engine at level A costs about AUD 3,600 more (section 5).
 - At 400,000 km, most trucks for sale will be pre-DPF. A DPF truck at that distance has averaged at least 40,000 km a year (estimate from its age).
 
 ### 1.3 Known failure modes
@@ -110,11 +110,11 @@ Prices are AUD including GST, read from the supplier's page on 20 Nov 2026 unles
 | Glow plugs, eight | By VIN | Toyota dealer | 400 (estimate) | Replace at 400,000 km |
 | Engine mounts, two | By VIN | Toyota dealer | 350 (estimate) | More torque loads them harder |
 
-**Head studs.** No head stud kit for the 1VD was found. ARP's Australian listings found cover the older 1HD six-cylinder only ([eBay](https://www.ebay.com.au/itm/302149906815)). So every level uses new genuine TTY head bolts and correctly graded gaskets. This is one reason level C is a poor fit for sustained towing.
+Head studs. No head stud kit for the 1VD was found. ARP's Australian listings found cover the older 1HD six-cylinder only ([eBay](https://www.ebay.com.au/itm/302149906815)). So every level uses new genuine TTY head bolts and correctly graded gaskets. This is one reason level C is a poor fit for sustained towing.
 
-**Pistons for high power.** No forged piston set for the 1VD was found from an Australian supplier. GTurbo's 5.0 L stroker long block uses custom pistons, forged 4340 conrods and a billet crank, and costs AUD 34,900 ([GTurbo](https://gturbo.com.au/products/1vd-ftv-5-0l-stroker)).
+Pistons for high power. No forged piston set for the 1VD was found from an Australian supplier. GTurbo's 5.0 L stroker long block uses custom pistons, forged 4340 conrods and a billet crank, and costs AUD 34,900 ([GTurbo](https://gturbo.com.au/products/1vd-ftv-5-0l-stroker)).
 
-**DPF engines.** The NVP kit is listed for pre-DPF engines with the injectors inside the rocker covers. Assumption for a DPF engine: a kit of the same parts at the same price, with the DPF-engine gasket set.
+DPF engines. The NVP kit is listed for pre-DPF engines with the injectors inside the rocker covers. Assumption for a DPF engine: a kit of the same parts at the same price, with the DPF-engine gasket set.
 
 ### 2.2 Machine shop
 
@@ -130,7 +130,7 @@ No 1VD price list was found. The estimates scale DieselWorks' published unit pri
 | Conrods: check, resize big ends, new small-end bushes | 400 |
 | Two heads: crack and pressure test, resurface, cut seats, reface or replace valves, lap | 1,400 |
 | Allowance for valve guides, valves and seals found worn | 400 |
-| **Required total** | **4,200** |
+| Required total | 4,200 |
 | Balance the rotating assembly (optional) | 400 |
 
 Measure first, then order the kit sizes. The kit is built to the selected piston, ring and bearing sizes ([GTurbo](https://gturbo.com.au/products/nvp-engine-rebuild-kit-toyota-1vd-ftv-70-series)).
@@ -176,7 +176,7 @@ Lift pump: none needed. With a 30 micron pre-filter ahead of the factory filter,
 | Fuel system, pre-DPF | 6,562 |
 | Cooling | 3,296 |
 | Sundries | 400 |
-| **Rebuild total, pre-DPF, before any power parts** | **19,279** |
+| Rebuild total, pre-DPF, before any power parts | 19,279 |
 
 This is the part of the spend that buys reliability. It is already above the AUD 15,000 target. Parts that may pass a test and be reused: the injectors (a specialist service is about AUD 1,600 for eight, estimate), the supply pump, the radiator and the oil pump. Together they save up to about AUD 6,600.
 
@@ -204,7 +204,7 @@ Torque is not capped by the rule. Power is torque times engine speed, so a tune 
 
 GTurbo's figures are its own and assume a turbo-back exhaust. Keeping the DPF lowers them slightly (booklet pages 15 to 19). GTurbo reports its first development truck ran over 80,000 km of high-load use at more than 70 % above factory power, and that its race 79 finished three seasons with no engine or turbo failure (booklet pages 9 to 11). These are maker's claims, not independent tests. Warranty is 12 months, or 24 months on some models (booklet, warranty page).
 
-Choice: the **VD-G333 Titan**, journal bearing. GTurbo pitches it at towing and low-end torque. It is a direct fit with a VNT like the factory unit, so the ECU controls boost the factory way, and it has the stainless actuator with a raised breather. At level A it runs far below its design boost, which keeps exhaust drive pressure and EGT down. Add the AUD 299 [VDJ70 turbo gasket kit](https://gturbo.com.au/products/vdj70-turbo-gasket-kit).
+Choice: the VD-G333 Titan, journal bearing. GTurbo pitches it at towing and low-end torque. It is a direct fit with a VNT like the factory unit, so the ECU controls boost the factory way, and it has the stainless actuator with a raised breather. At level A it runs far below its design boost, which keeps exhaust drive pressure and EGT down. Add the AUD 299 [VDJ70 turbo gasket kit](https://gturbo.com.au/products/vdj70-turbo-gasket-kit).
 
 ### 3.3 Intercoolers
 
@@ -278,7 +278,7 @@ Fit the EGT probe in the exhaust manifold before the turbo. That reading is fast
 
 ### 3.8 What each level means for sustained towing
 
-**Power the combination needs.** Estimate for 6.6 t, a drag area of 2.5 m² for the ute and a boxy trailer, rolling resistance 0.011, and wheel power at 74 % of crank power. All inputs are estimates, so treat the results as rough.
+Power the combination needs. Estimate for 6.6 t, a drag area of 2.5 m² for the ute and a boxy trailer, rolling resistance 0.011, and wheel power at 74 % of crank power. All inputs are estimates, so treat the results as rough.
 
 | Speed | Grade | At the wheels | At the crank |
 |---|---|---|---|
@@ -291,9 +291,9 @@ Fit the EGT probe in the exhaust manifold before the turbo. That reading is fast
 
 Speed held on a 6 % grade at full power: stock 151 kW about 76 km/h, level A 181 kW about 88 km/h, level B 230 kW about 105 km/h, level C 300 kW about 125 km/h (calculated). On the flat, any level loafs. On long grades, power is used for minutes at a time, and that is where heat builds.
 
-**Heat.** A diesel at full load sends heat to the coolant and exhaust roughly in step with the fuel it burns. So holding 230 kW up a long grade puts about 50 % more heat into the radiator than the factory 151 kW (estimate). The factory cooling system was sized for 151 kW. This is why the rebuild includes a new radiator and fan clutch, why levels B and C need extra cooling margin, and why the tune needs a temperature-based limit.
+Heat. A diesel at full load sends heat to the coolant and exhaust roughly in step with the fuel it burns. So holding 230 kW up a long grade puts about 50 % more heat into the radiator than the factory 151 kW (estimate). The factory cooling system was sized for 151 kW. This is why the rebuild includes a new radiator and fan clutch, why levels B and C need extra cooling margin, and why the tune needs a temperature-based limit.
 
-**Limits to tune and drive to.** These are general diesel towing figures, not 1VD data:
+Limits to tune and drive to. These are general diesel towing figures, not 1VD data:
 
 | Reading | Sustained | Action point | Source |
 |---|---|---|---|
@@ -303,7 +303,7 @@ Speed held on a 6 % grade at full power: stock 151 kW about 76 km/h, level A 181
 
 Assumption for the tune: start pulling fuel at 650 °C before the turbo and hold no more than 700 °C. Do not lug the engine below about 1,600 rpm under full load, because EGT spikes there (BD Diesel).
 
-**Piston, ring and head gasket life.** No published life data for a tuned 1VD was found. What is known: the pistons are cast aluminium (TIK in the NVP kit), the head bolts are TTY and no head studs exist (section 2.1), and GTurbo claims 80,000 km of high-load use at 70 % over factory power on its test truck (section 3.2). Assumptions used here:
+Piston, ring and head gasket life. No published life data for a tuned 1VD was found. What is known: the pistons are cast aluminium (TIK in the NVP kit), the head bolts are TTY and no head studs exist (section 2.1), and GTurbo claims 80,000 km of high-load use at 70 % over factory power on its test truck (section 3.2). Assumptions used here:
 
 - Level A: life close to a stock engine's, because peak power rises 20 % and the EGT limit caps the heat.
 - Level B: shorter but acceptable life if the EGT limit is enforced. Head gasket and ring wear are the first risks.
@@ -330,40 +330,40 @@ The level A hardware is the level B hardware. Moving from A to B later costs a r
 
 ## 4. Legality in NSW
 
-*Superseded in part, 20 Nov 2026: this section reads the 2013 revision of VSI 06. Rev 4, in force since 1 July 2026, adds item 6, so every tune that alters emissions output needs a VSCCS certificate, level A included. Each passage below that says level A needs none is marked. VEHICLE.md's legal section is current.*
+Superseded in part, 20 Nov 2026: the text below reads the 2013 revision of VSI 06. Rev 4, in force since 1 July 2026, adds item 6, so every tune that alters emissions output needs a VSCCS certificate, level A included. Each passage below that says level A needs none is marked. VEHICLE.md's legal section is current.
 
 ### 4.1 Which rules apply
 
 NSW lists the modifications that need a VSCCS certificate in an Order, summarised in Vehicle Standards Information 6 ([VSI 06](https://www.rms.nsw.gov.au/documents/roads/safety-rules/standards/vsi-06-light-vehicle-modifications.pdf)). VSCCS is the Vehicle Safety Compliance Certification Scheme, which licenses private certifiers. Two items cover this build:
 
-- **Item 2.** Fitting a turbo the maker never offered, or raising the original power by more than 20 %. VSI 06's own example: a 100 kW vehicle modified to more than 120 kW needs certification.
-- **Item 5.** Engine or exhaust changes that increase emissions above the ADR levels for the vehicle. Examples that need certification include non-original fuel injection equipment, removing the EGR, crankcase ventilation or catalytic converters, and replacing the original ECU. Examples that do not: exhausts, intakes and intercoolers that keep the emission control equipment. If non-original engine control parts are fitted, the owner must show emissions are retained. VSI 06 adds that certifiers may ask for a TfNSW emissions test, free at the Botany or Penrith heavy vehicle inspection stations, or a 4 or 5 gas analyser test at a repairer.
+- Item 2. Fitting a turbo the maker never offered, or raising the original power by more than 20 %. VSI 06's own example: a 100 kW vehicle modified to more than 120 kW needs certification.
+- Item 5. Engine or exhaust changes that increase emissions above the ADR levels for the vehicle. Examples that need certification include non-original fuel injection equipment, removing the EGR, crankcase ventilation or catalytic converters, and replacing the original ECU. Examples that do not: exhausts, intakes and intercoolers that keep the emission control equipment. If non-original engine control parts are fitted, the owner must show emissions are retained. VSI 06 adds that certifiers may ask for a TfNSW emissions test, free at the Botany or Penrith heavy vehicle inspection stations, or a 4 or 5 gas analyser test at a repairer.
 
 The national code, VSB 14 Section LA, sets how a certifier assesses the work ([VSB 14 Section LA, version 2.0, copy](https://dl.icdst.org/pdfs/files1/5c5daf35fb353984f640c166f77157fd.pdf)). Its codes:
 
 - LA1: an equivalent replacement engine, at most 20 % more power or mass.
 - LA2: a performance replacement engine.
 - LA3: fitting a turbo or supercharger the engine or vehicle maker did not offer. It excludes engines that came turbocharged.
-- **LA4: modifying the original engine**, including changes to engine management and induction. VSB 14 says these are generally treated like a performance engine conversion.
+- LA4: modifying the original engine, including changes to engine management and induction. VSB 14 says these are generally treated like a performance engine conversion.
 
-So a VDJ79 with a bigger turbo and a tune over 20 % is an **LA4** job, not LA2 or LA3. The VDJ79 came with a turbo, so LA3 does not apply.
+So a VDJ79 with a bigger turbo and a tune over 20 % is an LA4 job, not LA2 or LA3. The VDJ79 came with a turbo, so LA3 does not apply.
 
-VSB 14 is stricter in wording than VSI 06. It says that if an engine is modified it must be certified under an LA code. Assumption: NSW registration follows its own Order (VSI 06), so a level A build that stays under 20 % and does not raise emissions needs no certificate. *Superseded 20 Nov 2026: VSI 06 Rev 4 item 6 needs a VSCCS certificate for this tune, the LA4 certificate at about AUD 2,000 (estimate). See the note above.*
+VSB 14 is stricter in wording than VSI 06. It says that if an engine is modified it must be certified under an LA code. Assumption: NSW registration follows its own Order (VSI 06), so a level A build that stays under 20 % and does not raise emissions needs no certificate. Superseded 20 Nov 2026: VSI 06 Rev 4 item 6 needs a VSCCS certificate for this tune, the LA4 certificate at about AUD 2,000 (estimate). See the note above.
 
 ### 4.2 What LA4 certification involves for a modified diesel
 
 From [VSB 14 Section LA](https://dl.icdst.org/pdfs/files1/5c5daf35fb353984f640c166f77157fd.pdf) clauses 2 and 3 and code LA4:
 
-- **Emissions.** The vehicle must still meet the emission ADR it was built to. Changes to engine management need proof under code LT3, the gaseous emissions test in VSB 14 Section LT. An aftermarket calibration does not prove compliance unless that combination has been tested (clause 3.1.3). The VDJ79 was built to Euro 4 before the October 2016 update ([Drive](https://www.drive.com.au/news/toyota-landcruiser-70-series-specifications/)), which is ADR 79/02 ([TfNSW ADR emission table](https://www.transport.nsw.gov.au/system/files/media/documents/2023/aust-design-rules-emission-standards.pdf)). After it, the truck is Euro 5 ([4x4 Australia](https://www.4x4australia.com.au/news/toyota-landcruiser-70-series-upgraded-range-launched)). ADR 79/04 applies Euro 5 to all new light vehicles built from 1 November 2016 ([ADR 79/04 explanatory statement](https://www.legislation.gov.au/F2012L01035/asmade/2012-05-15/es/original/pdf)). In NSW the certifier can accept the free TfNSW test (section 4.1).
-- **Noise.** A modified exhaust needs proof under code LT4, the noise test, or an ADR test. The NSW in-service limit for vehicles built to ADR 83/00 is the vehicle's ADR 83/00 "signature" stationary noise level plus 5 dB(A). For compliance plates on or before 1 September 2011 it is the higher of that and the Schedule 1 level, which is 90 dB(A) for vehicles built from 1983 ([NSW EPA](https://www.epa.nsw.gov.au/sites/default/files/21p3040-managing-motor-vehicle-noise.pdf)). The VDJ79's signature level was not found. Assumption: a Manta "quiet" system keeps the truck within it.
-- **Brakes.** For a more powerful engine, VSB 14 requires "any necessary upgrading of equipment, e.g. brakes" (clause 2.1, written for engine conversions). LA4 says engine modifications are treated on the same basis as a performance engine conversion. Assumption: the certifier asks for brake evidence at the upgraded GVM. Report 16 covers the brakes.
-- **Driveline.** Clause 2.1 also says the power and torque must not exceed the capacity of the vehicle driveline. Assumption: the certifier asks for ratings or evidence for the clutch, gearbox, transfer case, tailshafts and axles at the tuned torque. Report 15 covers this.
-- **Installation.** Fasteners to VSB 14 Appendix A, guarding, fuel lines clear of the turbo and exhaust, sound workmanship, and engine mounts that take the torque (LA4 checklist). Intercoolers must not need structural changes at the front that affect occupant protection or move airbag sensors (LA1 requirements, applied the same way). The PDI front mount fits without cutting ([booklet](https://cdn.shopify.com/s/files/1/0823/4241/2531/files/1VD-FTV-VDJ70-Booklet-v1_4c.pdf) page 28).
+- Emissions. The vehicle must still meet the emission ADR it was built to. Changes to engine management need proof under code LT3, the gaseous emissions test in VSB 14 Section LT. An aftermarket calibration does not prove compliance unless that combination has been tested (clause 3.1.3). The VDJ79 was built to Euro 4 before the October 2016 update ([Drive](https://www.drive.com.au/news/toyota-landcruiser-70-series-specifications/)), which is ADR 79/02 ([TfNSW ADR emission table](https://www.transport.nsw.gov.au/system/files/media/documents/2023/aust-design-rules-emission-standards.pdf)). After it, the truck is Euro 5 ([4x4 Australia](https://www.4x4australia.com.au/news/toyota-landcruiser-70-series-upgraded-range-launched)). ADR 79/04 applies Euro 5 to all new light vehicles built from 1 November 2016 ([ADR 79/04 explanatory statement](https://www.legislation.gov.au/F2012L01035/asmade/2012-05-15/es/original/pdf)). In NSW the certifier can accept the free TfNSW test (section 4.1).
+- Noise. A modified exhaust needs proof under code LT4, the noise test, or an ADR test. The NSW in-service limit for vehicles built to ADR 83/00 is the vehicle's ADR 83/00 "signature" stationary noise level plus 5 dB(A). For compliance plates on or before 1 September 2011 it is the higher of that and the Schedule 1 level, which is 90 dB(A) for vehicles built from 1983 ([NSW EPA](https://www.epa.nsw.gov.au/sites/default/files/21p3040-managing-motor-vehicle-noise.pdf)). The VDJ79's signature level was not found. Assumption: a Manta "quiet" system keeps the truck within it.
+- Brakes. For a more powerful engine, VSB 14 requires "any necessary upgrading of equipment, e.g. brakes" (clause 2.1, written for engine conversions). LA4 says engine modifications are treated on the same basis as a performance engine conversion. Assumption: the certifier asks for brake evidence at the upgraded GVM. Report 16 covers the brakes.
+- Driveline. Clause 2.1 also says the power and torque must not exceed the capacity of the vehicle driveline. Assumption: the certifier asks for ratings or evidence for the clutch, gearbox, transfer case, tailshafts and axles at the tuned torque. Report 15 covers this.
+- Installation. Fasteners to VSB 14 Appendix A, guarding, fuel lines clear of the turbo and exhaust, sound workmanship, and engine mounts that take the torque (LA4 checklist). Intercoolers must not need structural changes at the front that affect occupant protection or move airbag sensors (LA1 requirements, applied the same way). The PDI front mount fits without cutting ([booklet](https://cdn.shopify.com/s/files/1/0823/4241/2531/files/1VD-FTV-VDJ70-Booklet-v1_4c.pdf) page 28).
 - The pre-ADR safety upgrades in LA4 (seat belts, dual brakes, collapsible column) do not apply. The VDJ79 already meets the ADRs.
 
 ### 4.3 The VSCCS process in NSW
 
-1. Choose a certifier licensed in category **LC4**: light commercial vehicles, engine, fuel, intake or exhaust systems ([VSCCS Bulletin 1](https://www.transport.nsw.gov.au/system/files/media/documents/2025/VSFC01-VSCCS-Bulletin-1.pdf)). Bulletin 1 lists them.
+1. Choose a certifier licensed in category LC4: light commercial vehicles, engine, fuel, intake or exhaust systems ([VSCCS Bulletin 1](https://www.transport.nsw.gov.au/system/files/media/documents/2025/VSFC01-VSCCS-Bulletin-1.pdf)). Bulletin 1 lists them.
 2. Talk to the certifier before starting. They may ask for photos of the work or for inspections at stages ([NSW Government](https://www.nsw.gov.au/topics/vehicle-registration/how-to/used-or-secondhand/modified-non-standard-vehicles)).
 3. The certifier inspects, assesses and tests. If the vehicle complies, they issue a VSCCS compliance certificate (same page).
 4. Take the certificate and inspection papers to a service centre to update the registration record. The certificate does not expire (same page).
@@ -380,8 +380,8 @@ TfNSW warns that insurance could be void if modifications are not assessed and c
 
 No public record was found of a NSW LA4 certificate for a tuned VDJ79 at any power. The tuner and turbo pages read for this report sell parts, tunes and dyno results and do not offer certification ([GTurbo](https://cdn.shopify.com/s/files/1/0823/4241/2531/files/1VD-FTV-VDJ70-Booklet-v1_4c.pdf), [HD Automotive](https://hdautomotive.com.au/blog/2024/01/24/70-series-ecu-remapping-brisbane/), [Just Diesel Performance](https://www.justdieselperformance.com.au/toyota/70-series-land-cruiser/), [4x4 Australia on HP-F](https://www.4x4australia.com.au/gear/stage-1-hp-f-upgrade-landcruiser-79-build)). Exhaust sellers mark their DPF and catalyst deletes as off-road only ([Manta via GTurbo](https://gturbo.com.au/products/vdj79-v8-4-5l-td-dpf-single-cab-ute-oct-2016-to-current-turbo-back-dpf-back-exhaust)). This suggests most tuned 79s on the road carry no certificate. That is the owner's risk and not a path this report recommends.
 
-- **Level B, 220 to 250 kW: possible, not assured.** Its strengths: the factory ECU, EGR, catalysts or DPF all stay, the exhaust is quiet, and the injectors are the factory type. Its risks: the certifier may not accept a TfNSW test and may want laboratory ADR 79 evidence, which would cost AUD 10,000 or more (estimate). The driveline must also be shown to take about 850 Nm. Assumption: talk to an LC4 certifier with the level A truck built, and decide on level B then.
-- **Level C, about 300 kW: not realistic for this use.** High-flow injectors are non-original fuel injection equipment, an explicit item 5 example. That makes laboratory emissions evidence likely. The driveline needs to take over 1,000 Nm and the brakes will draw scrutiny at a 3.9 t GVM.
+- Level B, 220 to 250 kW: possible, not assured. Its strengths: the factory ECU, EGR, catalysts or DPF all stay, the exhaust is quiet, and the injectors are the factory type. Its risks: the certifier may not accept a TfNSW test and may want laboratory ADR 79 evidence, which would cost AUD 10,000 or more (estimate). The driveline must also be shown to take about 850 Nm. Assumption: talk to an LC4 certifier with the level A truck built, and decide on level B then.
+- Level C, about 300 kW: not realistic for this use. High-flow injectors are non-original fuel injection equipment, an explicit item 5 example. That makes laboratory emissions evidence likely. The driveline needs to take over 1,000 Nm and the brakes will draw scrutiny at a 3.9 t GVM.
 
 ### 4.6 Legal path and cost by level
 
@@ -410,17 +410,17 @@ Level A, pre-DPF truck. Every line is in `14-engine-parts.yaml` with its link.
 | Tune | Custom, capped at 1.20 times stock, towing map, EGT limit, before-and-after dyno (estimate) | 2,000 |
 | Gauges | Autometer boost, EGT and water combo, plus oil temperature (estimate) | 1,210 |
 | Legal | TfNSW emissions test | 0 |
-| **Total** | | **32,208** |
+| Total | | 32,208 |
 
-*Superseded 20 Nov 2026: the LA4 certificate for the reflash adds about AUD 2,000 (estimate) under VSI 06 Rev 4 item 6, so this total becomes about AUD 34,208. VEHICLE.md carries it as line TL05.*
+Superseded 20 Nov 2026: the LA4 certificate for the reflash adds about AUD 2,000 (estimate) under VSI 06 Rev 4 item 6, so this total becomes about AUD 34,208. VEHICLE.md carries it as line TL05.
 
 About a third of the total (about AUD 11,000) is estimates: the machine shop, the Toyota dealer parts without a published price, the pre-filter, the intake pipe, the tune and one gauge.
 
 Variants:
 
-- **DPF truck:** about AUD 35,800. The piezo injectors add AUD 4,966. The DPF fitting kit saves AUD 130 and the 3 inch DPF-back exhaust (SSMKTY0123) saves AUD 1,200.
-- **Cheapest reliable version:** about AUD 27,000. It swaps in the rebuilt standard turbo (AUD 1,990), drops the front mount and uses the aluminised exhaust (AUD 2,000). It gives up the level B upgrade path and some towing heat margin.
-- **Reuse after testing:** the injectors (specialist service about AUD 1,600 instead of AUD 4,290, estimate), the supply pump, the radiator and the oil pump save up to about AUD 6,600 together. Each one reused is a 400,000 km part on a rebuilt engine.
+- DPF truck: about AUD 35,800. The piezo injectors add AUD 4,966. The DPF fitting kit saves AUD 130 and the 3 inch DPF-back exhaust (SSMKTY0123) saves AUD 1,200.
+- Cheapest reliable version: about AUD 27,000. It swaps in the rebuilt standard turbo (AUD 1,990), drops the front mount and uses the aluminised exhaust (AUD 2,000). It gives up the level B upgrade path and some towing heat margin.
+- Reuse after testing: the injectors (specialist service about AUD 1,600 instead of AUD 4,290, estimate), the supply pump, the radiator and the oil pump save up to about AUD 6,600 together. Each one reused is a 400,000 km part on a rebuilt engine.
 
 Not in the total: balancing (AUD 400, optional), the clutch and anything else report 15 specifies, and the GVM and brake work in report 16.
 
@@ -441,8 +441,8 @@ Upgrade path to level B: the same parts, a retune to 220 to 250 kW, the LA4 cert
 
 Each ends with the assumption this report uses.
 
-1. Pre-DPF or DPF truck? Reports 15 and 16 may favour the 2016 single cab chassis and stability control. Assumption: pre-DPF, built 2010 to October 2016. A DPF truck adds about AUD 3,600 to the engine side. *Superseded 20 Nov 2026: a DPF truck built from 01/2017 (decision log 11:25).*
-2. Does NSW need a certificate for a different turbo on an engine that came turbocharged, when power stays within 20 % and emissions do not rise? Assumption: no, because VSI 06 items 2 and 5 are the only engine triggers. *Superseded 20 Nov 2026: Rev 4 item 6 adds the reflash as a trigger, so the tune needs a certificate whatever the turbo. A turbo, intercooler or exhaust that keeps the emission controls still needs none of its own (item 5).*
+1. Pre-DPF or DPF truck? Reports 15 and 16 may favour the 2016 single cab chassis and stability control. Assumption: pre-DPF, built 2010 to October 2016. A DPF truck adds about AUD 3,600 to the engine side. Superseded 20 Nov 2026: a DPF truck built from 01/2017 (decision log 11:25).
+2. Does NSW need a certificate for a different turbo on an engine that came turbocharged, when power stays within 20 % and emissions do not rise? Assumption: no, because VSI 06 items 2 and 5 are the only engine triggers. Superseded 20 Nov 2026: Rev 4 item 6 adds the reflash as a trigger, so the tune needs a certificate whatever the turbo. A turbo, intercooler or exhaust that keeps the emission controls still needs none of its own (item 5).
 3. Will an LC4 certifier accept the free TfNSW emissions test for an LA4 certificate at level B? Assumption: unknown until asked with the built truck. Plan for level A, and treat level B as a later option.
 4. Is the free TfNSW emissions test at Botany and Penrith still offered? Assumption: yes, as VSI 06 states. If not, a 4 or 5 gas analyser test at a repairer, about AUD 200 (estimate).
 5. What is the VDJ79's ADR 83/00 stationary noise signature level? Assumption: the Manta "quiet" system stays within signature plus 5 dB(A). Test it before the first registration inspection.

@@ -145,7 +145,7 @@ Tare, kg (with growth in brackets):
 | Bed | 87 | 58 (67) | 55 (64) | 83 (97) |
 | Garage kit | 101 | 0 | 0 | 0 |
 | Living area and the XT Air supply | 395 | 400 (446) | 410 (457) | 400 (445) |
-| **Tare** | **2,528** | **2,183 (2,409)** | **2,320 (2,559)** | **2,084 (2,308)** |
+| Tare | 2,528 | 2,183 (2,409) | 2,320 (2,559) | 2,084 (2,308) |
 
 Where layout 1's 345 kg saving comes from: the garage kit 101 kg, the body shell 189 kg (1,080 mm shorter, no garage door, portal or pop-top, against 150 mm taller walls), the chassis 58 kg and the bed 29 kg. The new wheels, tyres and spare add 21 kg, the locker 7 kg and the living area's extinguisher and blanket 5 kg. Layout 3 saves only 99 kg more than layout 1, because its pop-top (about 49 kg net of the lower walls), bed lift (42 kg) and drawbar box (15 kg) eat most of what its short body saves.
 
