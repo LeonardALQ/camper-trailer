@@ -12,6 +12,8 @@ import parts from '../../data/generated/trailer-parts.json';
 import { withBase } from '../../lib/url';
 
 export const n = (v) => Math.round(v).toLocaleString('en-AU');
+export const n1 = (v) => v.toLocaleString('en-AU', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+export const m10 = t.checks.find((c) => c.id === 'MAS-10');
 export const P = t.params;
 export const ch = t.chassis;
 export const tv = t.tow_vehicle;
@@ -93,8 +95,11 @@ The trailer and the ute share one wheel and tyre (report 16), so each spare fits
 
 ## Water and the towball
 
-The trailer tows with at most {n(P.water_travel_l)} L of fresh and grey water and fills its tanks at camp (decision
-H13). There is no water tank in the ute and no ballast. The axle group centre is {n(P.axle_x)} mm behind the ball,
+The trailer tows with at most {n(P.water_travel_l)} L of fresh and grey water and fills its tanks at camp (decisions
+H13 and H21). Fully loaded with growth, in {m10.governing.split(' ')[0]}, it weighs {n1(m10.measured)} kg,
+{n1(Math.abs(m10.margin))} kg {m10.margin >= 0 ? 'under' : 'over'} the {n(m10.measured + m10.margin)} kg design target (MAS-10).
+Decision H21 takes mass added later off the travel water in 5 L steps, so the target and the plate stay. There is no
+water tank in the ute and no ballast. The axle group centre is {n(P.axle_x)} mm behind the ball,
 solved so that {t.target_why}.
 
 ## Load cases
