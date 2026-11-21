@@ -43,7 +43,7 @@ Welding:
 - TIG (AC) on sheet, pulsed MIG allowed on tube. Filler ER5356 throughout, which ESAB's chart rates for 5052 and 6061 joints ([ESAB guide](https://ldgsesabwe.blob.core.windows.net/manuals/InstructionManuals/XA00248621_ESAB_Aluminum_Technical_Guide_EN.pdf)). Welders qualified to ISO 9606-2.
 - Design welded 6061-T6 at 165 MPa ultimate and 103 MPa yield ([Aluminum Design Manual minimums](https://www.eng-tips.com/threads/accounting-for-haz-in-6061-t6-pipe.435571/)), and welded 5052-H32 at O temper, 170 and 65 MPa (est.). Take the softened zone as 25 mm either side of a weld ([15 to 25 mm](https://industrialmonitordirect.com/blogs/knowledgebase/6061-t6-aluminum-weld-strength-post-weld-yield-values)) and keep bolt holes out of it.
 - Welded: body, subframe, mount angles, door leaves, keepers, shrouds. Skins continuous on outer edges and butt joints, and the roof skin along the first bow behind the front edge, where the highway suction peaks. Stitched 30 mm at 150 mm pitch elsewhere.
-- Bonded: the roof skin along every bow, with a Sikaflex-252 bead set to a 15 mm bond line under the stitches (2.5 MPa lap shear, [Sika](https://industry.sika.com/content/dam/dms/us01/o/sikaflex-252.pdf)), so the skin is held at each bow (UGF-01).
+- Rivet-bonded: the roof skin along every bow behind the first, with a Sikaflex-252 bead set to a 15 mm bond line (2.5 MPa lap shear, [Sika](https://industry.sika.com/content/dam/dms/us01/o/sikaflex-252.pdf)) and 4.8 mm sealed blind rivets through it at 75 mm, in place of stitch welds, so no welding heat reaches the bead. The 5052 is abraded with a very fine pad, cleaned and wiped with Sika Aktivator-100 first, Sika's pre-treatment for aluminium under 1-part polyurethanes ([Sika](https://aus.sika.com/dam/dms/au01/2/Pre-treatment_Chart_1C_PU_2020.pdf)). The front edge and the first bow stay welded continuously (UGF-01).
 - Bolted: aluminium to steel, body to subframe, subframe to brackets, track, chocks, anchors, cam bar, lamps. Hinges riveted with stainless rivets.
 
 ## 4. Structure and mounting
@@ -58,7 +58,7 @@ The body bolts down to the subframe from inside, with about 40 sealed M8 bolts i
 
 Wheel tubs and flares. The tubs follow the rear tyres, 25 mm over them at full bump and 40 mm inside them. The Elite's housing gives a 1,555 mm rear track (research report 26, est.), 95 mm wider than Toyota's 1,460 mm, so each tyre's outer face is 911.5 mm from the centreline, 11 mm from the 1,850 mm body's skin against Toyota's 30 mm. Over each tub the side skin is cut away up to the top of the bottom rail, 130.5 mm above the floor's underside, and a flare of 2.5 mm sheet, folded into a channel 925 mm long and 20 mm deep, closes the opening. Its top is welded to the rail and its ends to the skin. The tyre keeps 31 mm (UGW-03), and the box is 1,890 mm over the flares against UTE-09's 1,910 mm. The mount angles stay over Toyota's brackets, the road-side tool chest is 270 mm wide so it stays on its tub, and Lovells' two mudflaps hang behind the tyres from the rear outriggers, 47.5 mm further out than on the factory track. Measure the rear track (VEH-28) once the kit is fitted and build the tubs and flares to it.
 
-Roof. The 1.6 mm skin spans bows at most 640 mm apart, crowned 1:50 from the centreline to each side wall, so the box stands 17.6 mm taller at the centre than at its walls. At 110 km/h the flow behind the step over the cab's roof pulls on it at about 0.84 kPa (Cp -1.5, est.). Held at every bow, the sheet drums about 4 mm and its membrane tension puts 38 MPa on the softened sheet at a weld, against 65 MPa. The bead would carry that tension at 0.91 MPa even where the skin ended at a bow, against half its 2.5 MPa (UGF-01). A 10 mm film of water sags it 2.3 mm, inside the crown's 17.6 mm fall, so it runs off. A knee, 1.1 kN on roof cladding in AS/NZS 1170.1, would punch a dent at 0.64 kN, so the roof carries no step and no kneeling, marked on CT-701 and by two labels on the roof itself (BX-C03). Hail dents any gauge.
+Roof. The 1.6 mm skin spans bows at most 640 mm apart, crowned 1:50 from the centreline to each side wall, so the box stands 17.6 mm taller at the centre than at its walls. At 110 km/h the flow behind the step over the cab's roof pulls on it at about 0.84 kPa (Cp -1.5, est.). Held at every bow, the sheet drums about 4 mm and its membrane tension puts 38 MPa on the softened sheet at a weld, against 65 MPa. The bead would carry that tension at 0.91 MPa even where the skin ended at a bow, against half its 2.5 MPa, and the rivets alone, as if the bead had let go, 1,024 N each in shear against half of 2,200 N (est.), 0.93 (UGF-01). A 10 mm film of water sags it 2.3 mm, inside the crown's 17.6 mm fall, so it runs off. A knee, 1.1 kN on roof cladding in AS/NZS 1170.1, would punch a dent at 0.64 kN, so the roof carries no step and no kneeling, marked on CT-701 and by two labels on the roof itself (BX-C03). Hail dents any gauge.
 
 ## 5. Doors and security
 
@@ -105,9 +105,9 @@ The Black Widow MF-12038 ramp (3,048 x 965 mm, 680 kg rating, 34 kg) stands fold
 
 ## 9. Mass
 
-The parts list sums to 437.0 kg empty, 474.7 kg with growth, and the model carries every line, so UGB-01 and the list agree (`cad/tests/test_box_parts.py`). Revision D adds 0.4 kg: the flares 1.9 kg, less 1.6 kg of skin cut away for them, and the tubs and floor re-cut for the wider track (-0.8 and +0.9 kg). The list includes the wiring, the winch feed, sealant, the roof bows' adhesive (0.5 kg), pads, plates, the roof coat, the outlet and the drains. The roof is 1.6 mm sheet in place of 2.0 mm, which saves 5.1 kg and leaves 3.0 kg in hand under UGB-01's 440 kg. The roof carries no load, no step and no kneeling, and the bows and end frames under it are at most 640 mm apart (UGF-01). The engineer confirms the thinner sheet. If more margin is needed, a 10 mm chain in place of the 12 mm one saves about 2 kg (est.).
+The parts list sums to 437.3 kg empty, 475.0 kg with growth, and the model carries every line, so UGB-01 and the list agree (`cad/tests/test_box_parts.py`). Revision D adds 0.4 kg: the flares 1.9 kg, less 1.6 kg of skin cut away for them, and the tubs and floor re-cut for the wider track (-0.8 and +0.9 kg). The list includes the wiring, the winch feed, sealant, the roof bows' adhesive (0.5 kg) and rivets (0.3 kg), pads, plates, the roof coat, the outlet and the drains. The roof is 1.6 mm sheet in place of 2.0 mm, which saves 5.1 kg and leaves 2.7 kg in hand under UGB-01's 440 kg. The roof carries no load, no step and no kneeling, and the bows and end frames under it are at most 640 mm apart (UGF-01). The engineer confirms the thinner sheet. If more margin is needed, a 10 mm chain in place of the 12 mm one saves about 2 kg (est.).
 
-On the Elite, with the home trailer's heaviest towball (317 kg with growth), the ute's rear axle carries 2,587 kg with growth when towing with the bikes aboard (UC3), 213 kg under the 2,800 kg plate.
+On the Elite, with the home trailer's heaviest towball (317 kg with growth), the ute's rear axle carries 2,601 kg with growth when towing with the bikes aboard (UC3), 199 kg under the 2,800 kg plate. The trailer's tie-down kit, four straps and four ground anchors, 12 kg (est.), rides in the tool chests with the tools (STB-05).
 
 ## 10. Parts list summary
 
@@ -115,7 +115,7 @@ On the Elite, with the home trailer's heaviest towball (317 kg with growth), the
 |---|---|
 | Materials | 7,976 |
 | Subframe and mounts | 990 |
-| Fasteners and sealants | 962 |
+| Fasteners and sealants | 1,067 |
 | Doors | 1,200 |
 | Security | 3,797 |
 | Restraint | 1,852 |
@@ -124,9 +124,9 @@ On the Elite, with the home trailer's heaviest towball (317 kg with growth), the
 | Finish and tool chests | 921 |
 | Shop labour, 188 h at AUD 121 | 22,748 |
 | Engineer's review | 2,000 |
-| Contingency 10 % | 4,719 |
-| Total, shop-built | 51,909 |
-| Total, owner-built (no shop labour) | 26,886 |
+| Contingency 10 % | 4,730 |
+| Total, shop-built | 52,025 |
+| Total, owner-built (no shop labour) | 27,002 |
 
 The LC5 inspection is counted once, in the car build's GV03, because one inspection covers the GVM kit, the GCM revision, the box and the winch. The box keeps only the engineer's review. Not in the total: the trackers' subscriptions (about AUD 278 a year) and a full exterior powder coat (from about AUD 4,000).
 
@@ -152,7 +152,7 @@ The LC5 inspection is counted once, in the car build's GV03, because one inspect
 3. Compliant mounts: Toyota cab cushions, preload set by the engineer.
 4. Off-road factor 2 and 1.0 g up (report 03), for the engineer to confirm.
 5. Anchors withstand the strap's breaking load, so straps are LC 500 kg. LC 1,000 kg needs the outer anchors tied into the wall frame.
-6. Box mass 437.0 kg with the 1.6 mm roof and the flares, against UGB-01's 440 kg. The 1.6 mm roof holds highway suction and drains on its 1:50 crown (UGF-01), but a knee would dent it, so it carries no step and no kneeling. Assumption: nobody stands on it. The engineer confirms the 1.6 mm roof on bows at most 640 mm apart.
+6. Box mass 437.3 kg with the 1.6 mm roof and the flares, against UGB-01's 440 kg. The 1.6 mm roof holds highway suction and drains on its 1:50 crown (UGF-01), but a knee would dent it, so it carries no step and no kneeling. Assumption: nobody stands on it. The engineer confirms the 1.6 mm roof on bows at most 640 mm apart.
 7. Prices: 6061-T6 at the 6060-T5 listing plus 25 %, ABLOY from a UK listing, detector and labour hours estimated.
 8. Rear track on the Elite: 1,555 mm (research report 26, est.). Lovells says only that the housing brings the rear in line with the front. The tubs and flares follow the measured track (VEH-28), and the tyre keeps 30 mm to the flare (BOX-20). Above 1,577 mm the flares would pass 1,910 mm.
 9. Lovells' mudflaps hang from the rear outriggers behind the tyres, about 300 mm wide with their bottom edge about 230 mm above the ground. Confirm the brackets with the kit.
