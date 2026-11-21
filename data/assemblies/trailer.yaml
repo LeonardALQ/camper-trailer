@@ -199,7 +199,7 @@ build_order:
   - {stage: B6, label: "cables and pipework", fits: {BD-11: Cables}}
   - {stage: B7, label: fit-out,
      fits: {electrical: Battery box, hvac: split, living: appliances, bed: lift bed, wet_room: wet room, stowage: drawbar box, spare: spare wheel, roof: solar,
-            DB-04: stone guard, BD-13: awning, BD-16: steps, WN-05: blackout covers}}
+            DB-04: stone guard, BD-13: awning, BD-16: steps, WN-05: blackout covers, LG-01: lamps}}
 
 # Roll and sway (STB-01 to STB-03, cad/trailer.py rollover). The static rollover threshold is the steady lateral
 # acceleration at which the inner wheels lift, with the body rolled on its suspension and its tyres so the centre of
@@ -490,7 +490,23 @@ items:
       - {item: "Fresh water pipework: 30 m of 12 mm PEX, 40 push-fit fittings, tank fittings and breathers", aud: 710, basis: estimate, date: 2026-11-20}
       - {item: "General hardware: rivnuts, screws, brackets and P-clips", aud: 400, basis: estimate, date: 2026-11-20}
     point: [body_x0 + body_length / 2, 0, floor_z + 400]
-    mass: {basis: declared, total_kg: 60, maturity: estimate, source: "Older block model, kept until the systems design (report 12 section 10). Reports 20 and 21 leave the house wiring and the fresh water pipework in it"}
+    parts:
+      - {item: "12 and 24 V wiring, about 150 m of tinned twin core, 2.5 to 6 mm2", kg: 15.0, basis: estimate}
+      - {item: "230 V wiring, 40 m of 2.5 mm2 TPS, six outlets and the inlet's tails", kg: 6.0, basis: estimate}
+      - {item: "Fourteen LED lights inside and out", kg: 2.1, basis: estimate}
+      - {item: "Switches, fuse blocks, terminals, lugs, heat shrink, conduit, glands and ties", kg: 5.0, basis: estimate}
+      - {item: "Fresh water pipework: 30 m of 12 mm PEX, 40 push-fit fittings, tank fittings and breathers", kg: 4.0, basis: estimate}
+      - {item: "General hardware: rivnuts, screws, brackets and P-clips", kg: 6.0, basis: estimate}
+      - {item: "Allowance not yet given to a part, kept until the systems design", kg: 17.9, basis: estimate}
+    note: "The older block model's 60 kg (report 12 section 10), listed line by line (est.). The lamps, about 4 kg, are line LG-01. Reports 20 and 21 leave the house wiring and the fresh water pipework here"
+  - id: LG-01
+    name: Lamps, reflectors, the number plate and the lamp loom (data/services.yaml lamps, CT-011)
+    material: "Multivolt LED lamps in polycarbonate housings, acrylic reflectors, an aluminium plate bracket, 7-core trailer cable"
+    system: electrical
+    price: {aud: 0, included_in: LGT-01}
+    point: [body_x0 + 2900, -150, 1100]
+    mass: {basis: declared, total_kg: 4.0, maturity: estimate, source: "The decision log's 08:20 estimate for the set, about 4 kg, taken out of BD-11's allowance. The centre of gravity is about the devices' and the loom's (est.)"}
+    note: The lamps stand at their data/services.yaml positions in the 3D model, each named (cad/lamps.py).
   - id: BD-13
     name: Awning, Fiamma F80s 400, on the roof's kerb edge, inside the body width
     material: "Aluminium case, arms and lead bar, vinyl canopy, on aluminium angle brackets"

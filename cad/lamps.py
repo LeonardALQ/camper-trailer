@@ -141,6 +141,30 @@ def _plate(p: dict) -> dict:
     return dict(p, y0=p["y"] - p["w"] / 2, y1=p["y"] + p["w"] / 2, z0=p["z"] - p["h"] / 2, z1=p["z"] + p["h"] / 2)
 
 
+DEPTH = 30   # how far a lamp's housing stands off its face in the 3D model (est.)
+
+
+def model_parts(lay, LM: dict) -> list[dict]:
+    """Every lamp, reflector and the number plate as a small box at its resolved position, for the 3D model and its part
+    cards. The key, LG-01 and the device's own id, names the part. Their mass is line LG-01's."""
+    V = lay.V
+    out = []
+    for d in LM["devices"]:
+        side = {"kerb": "kerb side", "road": "road side"}[d["side"]]
+        if d["face"] == "side":
+            s = -1 if d["side"] == "kerb" else 1
+            y0, y1 = sorted((s * (V["half_bw"] - DEPTH), s * V["half_bw"]))
+            box = (d["x0"], y0, d["z0"], d["x1"], y1, d["z1"])
+        else:
+            x = V["body_x1"] if d["face"] == "rear" else V["body_x0"] - DEPTH
+            box = (x, d["y0"], d["z0"], x + DEPTH, d["y1"], d["z1"])
+        out.append(dict(key=f"LG-01.{d['id']}", name=f"{d['name']}, {side}", box=box, colour=d["colour"]))
+    p = LM["plate"]
+    out.append(dict(key="LG-01.PLATE", name=f"Number plate, {p['w']} x {p['h']} mm, on the rear wall's kerb half",
+                    box=(V["body_x1"], p["y0"], p["z0"], V["body_x1"] + 5, p["y1"], p["z1"]), colour="white"))
+    return out
+
+
 def _more(chk, data, I, V, ch, lay, body, face, ow, floor_under):
     """The checks beyond the per-function ones: spacing along the side, the plate, the views and the clearances."""
     side = [i for i in I if i["face"] == "side"]

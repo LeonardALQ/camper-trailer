@@ -25,6 +25,7 @@ OVERRIDE = {"BD-01": ("#8c8c8c", 0.6), "RG-01": ("#7b7d7d", 1.0), "LA-11T": ("#5
             "BD-15": ("#b2bec3", 0.5), "BD-13": ("#27ae60", 0.8), "GS-01": ("#c0392b", 1.0),
             "GS-04": ("#e74c3c", 1.0), "DX-01": ("#aab7b8", 0.45), "LB-04": ("#d4e6f1", 0.25), "LB-01": ("#f8f9f9", 1.0),
             "BD-07": ("#b2bec3", 0.5), "DB-03": ("#2c3e50", 1.0), "DB-04": ("#aab7b8", 0.8)}
+LAMP_COLOURS = {"red": "#c0392b", "amber": "#f39c12", "white": "#fdfefe", "red and amber": "#d35400"}
 ROLE_COLOURS = {"rail": "#566573", "raiser": "#7b8a8b", "drawbar": "#34495e", "brace": "#34495e", "outrigger": "#95a5a6",
                 "cm_xt": "#5d6d7e", "cm_end": "#5d6d7e", "cm_floor": "#839192", "plan_brace": "#a04000", "spare_post": "#5d6d7e"}
 
@@ -113,6 +114,14 @@ class TrailerModel:
                 shp.label = label.replace("/", "-")
                 shp.color = rgba(col, a)
                 self.groups.setdefault("body", []).append(shp)
+            # the lamps, reflectors and the number plate at their resolved positions (cad/lamps.py), line LG-01
+            from .lamps import model_parts, resolve
+            for p in model_parts(lay, resolve(lay)):
+                x0, y0, z0, x1, y1, z1 = p["box"]
+                s = box(x0, y0, z0, x1 - x0, y1 - y0, z1 - z0)
+                s.label = f"{p['key']} {p['name']}".replace("/", "-")
+                s.color = rgba(LAMP_COLOURS.get(p["colour"], "#f39c12"), 1.0)
+                self.groups.setdefault("electrical", []).append(s)
 
     def compound(self, label="ASM-TR"):
         kids = [Compound(label=SYSTEM_LABELS[g], children=self.groups[g]) for g in SYSTEM_ORDER if g in self.groups]

@@ -144,7 +144,7 @@ Each stage needs the ones before it. Each weighing, TW-01 to TW-03, takes the li
 | B4 Floor | Bearer strips, tanks, guards, diesel tank, air box, the floor on its 32 mounts, the shower well and the tray | B3, the floor panel with its inserts | Tray fill test, 24 h |
 | B5 Shell | Walls with their stiffeners, rounded corners and roof bonded into the joiners, doors and windows | B4, panels with their hardpoints laid in | Hose test, TW-02 within 2 % |
 | B6 First fix | Cables, the 230 V bulkhead, glands, water pipes, drains at 1:50, ducts and fan sleeves | B5 closed and dry | Water lines pressure tested |
-| B7 Fit-out | Battery box, board, partition, cabinetry, appliances, lift bed, split, wet room, awning, steps, blackout covers, stone guard, drawbar box and generators, spare wheel, solar | B6 | Bed locks and safety edge |
+| B7 Fit-out | Battery box, board, partition, cabinetry, appliances, lift bed, split, wet room, awning, steps, blackout covers, stone guard, lamps, drawbar box and generators, spare wheel, solar | B6 | Bed locks and safety edge |
 | B8 Commissioning | Electrical test, battery capacity, airflow and pressure, tanks filled and dosed, bed heights | B7 | AS/NZS 3001.2 certificate, TW-03 to TW-05, TR-01 to TR-10 |
 | B9 Registration | Permit to move it, HVAIS inspection with the identity approval, plate, NSW registration | B8, the weighbridge tickets | Plate at 3,500 kg ATM |
 

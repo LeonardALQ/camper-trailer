@@ -82,8 +82,15 @@ def trailer_lookup(lay, body: dict):
     for b in lay.blocks:
         lines.setdefault(b.id, []).append(b)
     openings = {o["id"]: o for o in body.get("openings", [])}
+    from .lamps import model_parts, resolve
+    lamps = {p["key"]: p for p in model_parts(lay, resolve(lay))}
 
     def meta(key: str):
+        if key in lamps:
+            lg = by_iid.get("LG-01")
+            return dict(id="LG-01", iid=key, name=lamps[key]["name"], group=SYSTEM_LABELS["electrical"], system="electrical",
+                        material=lg.material if lg else None, source=f"Part of line LG-01, {lg.mass_kg:.1f} kg for the set (est.)" if lg else "Line LG-01",
+                        drawing="CT-011", load="tare", price_note="Priced with the set in line LGT-01 of the parts list")
         bs = [by_iid[key]] if key in by_iid else lines.get(key, [])
         if bs:
             b = bs[0]
@@ -122,6 +129,26 @@ def ute_lookup(ute, gmodel):
     for i in inst.values():
         if not i.check_only:
             bodies[i.part] = bodies.get(i.part, 0) + 1
+    # each box part's price: the lines of data/ute/box-parts.yaml that name it in model_part
+    import yaml
+    from .partsdb import DATA
+    by_part: dict[str, list] = {}
+    for ln in yaml.safe_load((DATA / "ute" / "box-parts.yaml").read_text(encoding="utf-8"))["lines"]:
+        names = ln.get("model_part") or []
+        for p in [names] if isinstance(names, str) else names:
+            by_part.setdefault(p, []).append(ln)
+
+    def box_price(pid: str) -> dict:
+        lns = by_part.get(pid)
+        if not lns:
+            return dict(price_aud=None, price_basis=None, price_note=None)
+        others = sorted({q for ln in lns for q in ([ln["model_part"]] if isinstance(ln["model_part"], str) else ln["model_part"]) if q != pid})
+        note = f"Line{'s' if len(lns) > 1 else ''} {', '.join(ln['id'] for ln in lns)} of the bike box's parts list"
+        if bodies.get(pid, 1) > 1:
+            note += f", for all {bodies[pid]} of these parts together"
+        if others:
+            note += f", shared with {', '.join(others)}"
+        return dict(price_aud=round(sum(ln["price"]["aud"] for ln in lns), 2), price_basis=lns[0]["price"].get("basis"), price_note=note)
 
     def line_meta(ln, key, name, group, system, drawing, material=None, mass=None):
         kg = ln["kg"] if mass is None else mass
@@ -159,6 +186,6 @@ def ute_lookup(ute, gmodel):
         m = part.mass
         return dict(id=part.id, iid=key, name=part.name, group=group, system=i.group, material=part.material,
                     mass_kg=_r(kg), mass_growth_kg=_r(kg * (1 + GROWTH[m.maturity])) if kg is not None else None,
-                    maturity=m.maturity, basis=m.basis, source=m.source, drawing=drawing, price_aud=None,
+                    maturity=m.maturity, basis=m.basis, source=m.source, drawing=drawing, **box_price(part.id),
                     load="payload" if part.payload else "tare")
     return meta

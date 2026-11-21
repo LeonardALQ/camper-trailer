@@ -181,7 +181,7 @@ lines:
       - {item: "Six amber side marker lamps with built-in reflectors", aud: 150, basis: estimate, date: 2026-11-21}
       - {item: "Hooded number plate lamp, and the plate's bracket and rivnuts", aud: 65, basis: estimate, date: 2026-11-21}
       - {item: "Lamp loom: 25 m of 7-core trailer cable, a junction box at the front, glands, grommets and heat shrink", aud: 170, basis: estimate, date: 2026-11-21}
-    note: About 4 kg (est.), inside BD-11's 60 kg allowance for wiring, lighting and hardware. The fitting is in LAB-08's services hours.
+    note: Its mass is line LG-01 of the mass schedule, about 4 kg (est.), taken out of BD-11's allowance. The fitting is in LAB-08's services hours.
   # ================================================================ licensed trades
   - id: ELI-01
     group: installation
