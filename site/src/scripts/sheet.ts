@@ -9,7 +9,9 @@
 //   ct:parts-ready  {ids}         a 3D viewer has loaded the part ids it knows, so tables with those rows offer
 //                                 "Show in 3D"
 //   ct:show-parts   {ids, count}  sent by "Show in 3D". A viewer that knows the parts highlights them and sets `count`
-// and with `ct:sheet-refresh` on a table when a script changes its cells.
+// and with `ct:sheet-refresh` on a table when a script changes its cells. A script that hides rows of its own (the
+// Measurements page's part filter) sets `data-sheet-hide` on them and sends `ct:sheet-filter` on the table: those rows
+// then count as filtered out, as the filter box does.
 
 const ROWS_VISIBLE = 12;
 const FRAME_MAX_VH = 0.75;
@@ -315,9 +317,11 @@ class Sheet {
       this.rows.forEach((r) => this.parse(r));
       this.refresh();
     });
+    t.addEventListener('ct:sheet-filter', () => this.applyFilter());
     frames.set(this.frame, this);
     resized.observe(this.frame);
-    this.refresh();
+    if (this.rows.some((r) => r.hasAttribute('data-sheet-hide'))) this.applyFilter();
+    else this.refresh();
     this.update3d();
   }
 
@@ -488,12 +492,15 @@ class Sheet {
   // rows only with nothing filtered.
   applyFilter() {
     const q = this.ui.filter.value.trim().toLowerCase();
+    let hidden = false;
     for (const r of this.rows) {
       const text = Array.from(r.cells).map(cellText).join(' ').toLowerCase();
-      r.classList.toggle('sheet-out', !!q && !text.includes(q));
-      if (q && this.sel.has(r) && !text.includes(q)) this.mark(r, false);
+      const out = r.hasAttribute('data-sheet-hide') || (!!q && !text.includes(q));
+      hidden ||= r.hasAttribute('data-sheet-hide');
+      r.classList.toggle('sheet-out', out);
+      if (out && this.sel.has(r)) this.mark(r, false);
     }
-    for (const [r, kind] of this.kind) r.classList.toggle('sheet-off', !!q || (kind === 'group' && this.sortDir !== 0));
+    for (const [r, kind] of this.kind) r.classList.toggle('sheet-off', !!q || hidden || (kind === 'group' && this.sortDir !== 0));
     this.refresh();
   }
 

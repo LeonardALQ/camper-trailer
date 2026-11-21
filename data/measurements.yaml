@@ -14,29 +14,38 @@
 # the order of `order`), or {ref: name} for a figure the build works out from the model (cad/trailer.py,
 # measurement_refs). {ref: name, rel: 0.02} means within 2 % of that figure. The Measurements page shows the range
 # beside an input box and colours what is typed in or out of it. A range is a guide for measuring, not a check limit.
-# `stage` says when it is measured: buy (an answer from the seller or the maker), build (on the ute, the bikes or the
+# `stage` says when it is measured: buy (an answer from the seller or the maker, or a test when buying the truck), build (on the ute, the bikes or the
 # parts, before or while building), weigh (at a weighbridge during the build) or trailer built. `covers` lists the
 # build stages a weighbridge reading includes.
 #
 # Revision of 20 Nov 2026: the tow vehicle is the LandCruiser 79 (research report 16), so the Cayenne's inputs
 # (CAR-01 to CAR-07) are gone. The bike, chock and pannier inputs now set the ute's bike box (UTE-GARAGE.md).
+#
+# `part` is the part of the project the input belongs to: car (the LandCruiser 79 car build, VEHICLE.md), box (the bike
+# box, UTE-GARAGE.md) or trailer. The Measurements page filters by it, for example /measurements/?part=car.
+#
+# Revision of 20 Nov 2026, later: R23's car build inputs (VEH-01 to VEH-27, group Car build) and R24's bike box
+# inputs (BOX-01 to BOX-19, group Bike box) are merged in, and R23's UTE-01 replaces the earlier one. Their design
+# values come from the model with the 180 L tank, the trailer charging and the 1.6 mm box roof.
 inputs:
   # ================================================================ the ute (report 16, data/ute/ute.yaml)
   - id: UTE-01
     group: Ute
-    title: Ute's towball pin height, laden, with about 250 kg on the ball and the bikes aboard
-    how: Ute loaded as for the trip with both bikes in the box. Put about 250 kg on the tongue (a towball scale under a stand, or the loaded trailer coupled) on level ground, and measure from the ground to the centre of the DO35 pin hole.
+    part: car
+    title: Ute's towball pin height, laden, with the loaded trailer's ball load and the bikes aboard
+    how: "Line CK03's visit. Ute loaded as for the trip, the loaded trailer coupled on level ground. Measure from the ground to the centre of the DO35 pin hole. Choose the tongue drop (TW08) from it."
     unit: mm
-    estimate: {v: 440, src: "Decision log 12:10 UTC: the ute's tongue is set for 440 mm laden, plus or minus 20 mm, so the coupling stays inside VSB1's 460 mm (report 18 section 3.5)"}
+    estimate: {v: 440, src: "Decision log 12:10: 440 mm laden, plus or minus 20 mm, so the coupling stays inside VSB1's 460 mm"}
     measured: {v: null, date: null}
-    stage: build
-    range: {min: 370, max: 440, src: "VSB1 9.3.2 and report 08 section 5.3: with its 20 mm tolerance the coupling stays inside VSB1's 350 to 460 mm only between 370 and 440 mm. Outside it, a tongue with more or less drop"}
-    affects: [coupling height, drawbar drop, DIM-03, UTE-13, JK-02]
+    stage: trailer built
+    affects: [TW08 tongue drop, coupling height, DIM-03, UTE-13, JK-02]
     thresholds:
       - {at: 440, rule: "The trailer is designed level at this height: the coupling point Z follows the value and the drawbar drop below the rails re-solves", src: "VSB1 9.3.2: trailers should be designed to be level within the towball range"}
-      - {at: [370, 440], rule: "Outside 370 to 440 mm the 20 mm tolerance no longer stays inside VSB1's 350 to 460 mm, so choose a tongue with more or less drop", src: "VSB1 9.3.2 and report 08 section 5.3"}
+      - {at: [370, 440], rule: "Outside 370 to 440 mm the 20 mm tolerance no longer stays inside VSB1's 350 to 460 mm, so choose a tongue (TW08) with more or less drop", src: "VSB1 9.3.2 and report 08 section 5.3"}
+    range: {min: 370, max: 440, src: "VSB1 9.3.2 (350 to 460 mm laden) less the plan's 20 mm tolerance each way (decision log 12:10)"}
   - id: UTE-02
     group: Ute
+    part: car
     title: Ute's rear axle centre to the towball pin
     how: Hang a plumb line from the centre of a rear wheel hub and another from the pin's centre, mark both on the ground and measure between the marks.
     unit: mm
@@ -49,6 +58,7 @@ inputs:
       - {rule: "Sets the lever arm of the towball on the ute's axles (UTE-03, UTE-12) and how far the bike box overhangs the ball, so the jack-knife sweep re-solves. Each 10 mm less adds about 10 mm to the box's overhang", src: "Report 16 section 5, U2 model"}
   - id: UTE-03
     group: Ute
+    part: trailer
     title: Towball load the trailer puts on the ute, from a towball scale
     how: Later, with the trailer built and fully loaded, level on firm ground. Put a towball scale under the coupling at the design height and read it.
     unit: kg
@@ -60,9 +70,370 @@ inputs:
     thresholds:
       - {at: 0.10, rule: "More than 10 % away from the model's fully loaded towball means the centre of gravity estimates are wrong: weigh the parts again before relying on the axle position", src: "Report 02 MASS-07 asks for differences over 2 % in mass to be explained. 10 % on the towball is this layout's rule"}
 
+  # ================================================================ the car build (R23, VEHICLE.md), group Car build
+  # ================================================================ engine and driveline health, stage S0 (the branch switch)
+  - id: VEH-01
+    group: Car build
+    part: car
+    title: Compression spread across the eight cylinders, warm engine, cranking
+    how: "Diesel workshop, line BI01. Warm engine, injection disabled, all eight glow plugs out, a diesel compression gauge on each cylinder at the same cranking speed. Write all eight readings in kPa in a note. Value is (highest less lowest) divided by highest, in %."
+    unit: "%"
+    estimate: {v: 5, src: "Assumed for a sound 400,000 km engine (est.). No Toyota figure for the 1VD-FTV was found"}
+    measured: {v: null, date: null}
+    stage: buy
+    affects: [branch A or B, stage S2 timing]
+    thresholds:
+      - {at: 10, rule: "Over 10 %, or one cylinder clearly low, take branch A: rebuild in S2 straight after S1", src: "Diesel cylinders within about 10 % of each other are treated as healthy (https://www.apexinds.com/blog/commercial-diesel-cylinder-compression-testing-procedure-guide.html)"}
+    range: {min: 0, max: 10, src: "Apex Industries diesel compression guide (link above)"}
+  - id: VEH-02
+    group: Car build
+    part: car
+    title: Leak-down, worst cylinder
+    how: "Same visit. Each cylinder at top dead centre on compression, crank locked, tester calibrated and set to 100 psi. Listen at the oil filler (rings), intake (inlet valve), exhaust (exhaust valve) and coolant tank (head gasket). Write all eight results and the leak path in a note."
+    unit: "%"
+    estimate: {v: 10, src: "Assumed (est.)"}
+    measured: {v: null, date: null}
+    stage: buy
+    affects: [branch A or B]
+    thresholds:
+      - {at: 20, rule: "Over 20 % on any cylinder, or bubbles in the coolant tank, take branch A", src: "Shop guidance treats up to about 20 % as acceptable (https://blog.nationwideheavytruckparts.com/blog/diesel-leak-down-test)"}
+    range: {min: 0, max: 20, src: "Nationwide Heavy Truck Parts leak-down guide (link above)"}
+  - id: VEH-03
+    group: Car build
+    part: car
+    title: Blow-by at the oil filler, hot, 2,000 rpm, no load
+    how: "Same visit. Blow-by flow meter on the oil filler with the breather outlet blocked, engine at working temperature. Hold 2,000 rpm for 30 s and read the flow. This is also the baseline for later checks."
+    unit: L/min
+    estimate: {v: 50, src: "R23 estimate (est.): about 1 % of the intake flow at 2,000 rpm (4.5 L x 1,000 intake cycles a minute, 4,500 L/min). No Toyota figure was found"}
+    measured: {v: null, date: null}
+    stage: buy
+    affects: [branch A or B]
+    thresholds:
+      - {at: 100, rule: "Over 100 L/min, or the filler cap lifting off at idle, take branch A", src: "Twice the estimate (est.)"}
+    range: {min: 0, max: 100, src: "R23 estimate (est.)"}
+  - id: VEH-04
+    group: Car build
+    part: car
+    title: Injector back-leak, largest deviation of one injector from the mean of eight
+    how: "Same visit. Return-flow kit on the injector leak-off connections, warm idle, 2 min. Write each injector's volume in mL in a note. Read the eight injector correction values and any stored injector faults by scan tool and note them too."
+    unit: "%"
+    estimate: {v: 15, src: "Assumed (est.)"}
+    measured: {v: null, date: null}
+    stage: buy
+    affects: [branch A or B, FS01, cut CUT1]
+    thresholds:
+      - {at: 25, rule: "Over 25 %, or a stored injector fault, take branch A, because worn injectors wash the bores. Cut CUT1 is then off", src: "R23 estimate (est.). No Denso or Toyota limit for this test was found, so a Denso specialist's bench test overrides it"}
+    range: {min: 0, max: 25, src: "R23 estimate (est.)"}
+  - id: VEH-05
+    group: Car build
+    part: car
+    title: Oil analysis, silicon (dust in the oil)
+    how: "Hot sample taken mid-drain from the engine as bought, before any oil change, sent to an oil lab with the BI01 kit. Note iron, chromium, aluminium, copper, lead, sodium, potassium and soot as well."
+    unit: ppm
+    estimate: {v: 10, src: "Assumed (est.)"}
+    measured: {v: null, date: null}
+    stage: buy
+    affects: [branch A or B, ID01]
+    thresholds:
+      - {at: 20, rule: "Over 20 ppm means dust got past the air filter seal. Inspect the intake. If iron and chromium are high too, take branch A", src: "Silicon should sit low, and any rise with iron and chromium points to an air filter seal failure (https://heavyvehicleinspection.com/blog/post/diesel-engine-oil-analysis-reading-results). The 20 ppm figure is an estimate (est.)"}
+    range: {min: 0, max: 20, src: "Heavy Vehicle Inspection guide (link above) and R23 estimate"}
+  - id: VEH-06
+    group: Car build
+    part: car
+    title: Oil analysis, fuel dilution
+    how: Same sample as VEH-05.
+    unit: "%"
+    estimate: {v: 1, src: "Assumed (est.)"}
+    measured: {v: null, date: null}
+    stage: buy
+    affects: [branch A or B, FS01]
+    thresholds:
+      - {at: 2, rule: "2 to 4 %: re-sample after 1,000 km and read the regeneration history", src: "Under 2 % is acceptable, 2 to 4 % is watched (Heavy Vehicle Inspection guide, VEH-05)"}
+      - {at: 4, rule: "Over 4 %: an injector or regeneration fault. Take branch A, so the new injectors come forward", src: "Over 4 % is a fault signature (same source)"}
+    range: {min: 0, max: 4, src: "Heavy Vehicle Inspection guide (VEH-05)"}
+  - id: VEH-07
+    group: Car build
+    part: car
+    title: "Oil analysis, glycol (coolant in the oil): 1 for found, 0 for none"
+    how: Same sample as VEH-05. Glycol test, plus sodium and potassium against the lab's limits.
+    unit: yes or no
+    estimate: {v: 0, src: "Assumed none (est.)"}
+    measured: {v: null, date: null}
+    stage: buy
+    affects: [branch A or B, EN22, EN21]
+    thresholds:
+      - {at: 1, rule: "Any glycol: stop driving, pressure-test the cooling system, the oil cooler (EN22) and the head gaskets, then take branch A", src: "Glycol in the oil corrodes bearings fast (Heavy Vehicle Inspection guide, VEH-05)"}
+    range: {min: 0, max: 0, src: "Heavy Vehicle Inspection guide (VEH-05)"}
+  - id: VEH-08
+    group: Car build
+    part: car
+    title: "DPF flow test after the off-car clean: 1 for pass, 0 for fail"
+    how: "Before removing the DPF, read its differential pressure, soot and ash values and the regeneration history by scan tool and note them. After the specialist's clean (line ID02), record the flow test result."
+    unit: pass or fail
+    estimate: {v: 1, src: "Assumed pass (est.)"}
+    measured: {v: null, date: null}
+    stage: buy
+    affects: [ID03, TL04, TL05]
+    thresholds:
+      - {at: 0, rule: "Fail (cracked, melted or flow not restored): buy a new DPF (ID03) before the emissions test", src: "The specialist replaces a filter only when it is cracked or melted (line ID02, https://dpfcleaningservices.com.au/)"}
+    range: {min: 1, max: 1, src: "Line ID02"}
+  - id: VEH-09
+    group: Car build
+    part: car
+    title: "Clutch and gearbox check: 1 for pass, 0 for fail"
+    how: "Warm, on a quiet road, fifth gear at 60 km/h, full throttle: engine speed must not rise faster than road speed. Then shift through every gear up and down, listening for synchro crunch and bearing whine. Note the gearbox oil's colour and any metal on the drain plug."
+    unit: pass or fail
+    estimate: {v: 1, src: "Assumed pass (est.)"}
+    measured: {v: null, date: null}
+    stage: buy
+    affects: [branch A or B, CG01, CG09]
+    thresholds:
+      - {at: 0, rule: "Slip, crunch or whine: take branch A, because the clutch and gearbox come out with the engine in S2", src: "Plan rule (R23): the gearbox is removed only once"}
+    range: {min: 1, max: 1, src: "Plan rule (R23)"}
+  # ================================================================ power, stage S6 (same dyno, same day)
+  - id: VEH-10
+    group: Car build
+    part: car
+    title: Peak power at the wheels before the tune, finished hardware on the factory calibration
+    how: "Chassis dyno, three runs in fourth gear, take the middle run. Same dyno, operator and day as VEH-11. Keep the sheet for the certifier."
+    unit: rwkW
+    estimate: {v: 110, src: "GTurbo booklet page 15: stock VDJ79 100 to 120 rwkW (https://cdn.shopify.com/s/files/1/0823/4241/2531/files/1VD-FTV-VDJ70-Booklet-v1_4c.pdf)"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [TL01, TL05]
+    thresholds:
+      - {at: 96, rule: "Under 96 rwkW: find the fault (boost leak, injector, DPF) before the tuner starts", src: "Report 14's published stock range, 96 to 120 rwkW"}
+    range: {min: 96, max: 120, src: "Report 14 and the GTurbo booklet"}
+  - id: VEH-11
+    group: Car build
+    part: car
+    title: Peak power at the wheels after the tune
+    how: Same dyno and day as VEH-10, with the towing map active.
+    unit: rwkW
+    estimate: {v: 177, src: "Plan: 230 to 250 kW at the crank, about 170 to 185 rwkW at report 14's 74 % crank to wheels (decision log 20:15)"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [TL05, the 224 kW minimum]
+    thresholds:
+      - {at: 166, rule: "Under 166 rwkW (224 kW at the crank) the build misses its minimum. The tuner checks boost and fuelling. Never raise the EGT limit to reach it", src: "Leonard's 300 hp minimum (decision log 20:15)"}
+    range: {min: 166, max: 185, src: "Decision log 20:15 and report 14 section 3.9"}
+  - id: VEH-12
+    group: Car build
+    part: car
+    title: Boost at full load, steady, 2,500 rpm, after the tune
+    how: Read the boost gauge (TL02) or the tuner's log on the dyno and on a long towing grade.
+    unit: psi
+    estimate: {v: 24, src: "GTurbo booklet page 15: VD-G333 design target 24 psi, efficient from 16 to 33 psi"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [TL01, EGT]
+    thresholds:
+      - {at: 18, rule: "Under 18 psi at full load: look for a boost leak or a vane fault before towing hard", src: "R23 estimate (est.)"}
+      - {at: 24, rule: "Over 24 psi steady: ask the tuner to hold the design target", src: "GTurbo design target"}
+    range: {min: 18, max: 24, src: "GTurbo booklet page 15 and R23 estimate"}
+  - id: VEH-13
+    group: Car build
+    part: car
+    title: Exhaust temperature before the turbo, sustained full load while towing
+    how: "Read the EGT gauge (TL02, probe in the manifold before the turbo) on the longest steep grade with the loaded trailer, after the tune."
+    unit: °C
+    estimate: {v: 650, src: "Plan tune setting: fuel pulled from 650 °C (report 14)"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    affects: [TL01]
+    thresholds:
+      - {at: 700, rule: "Over 700 °C: lift off and have the tuner lower the fuel limit", src: "Plan tune setting: never more than 700 °C (report 14)"}
+    range: {min: 0, max: 700, src: "Report 14 tune settings"}
+  # ================================================================ towing temperatures, stage S5 at stock power, repeated after S6
+  - id: VEH-14
+    group: Car build
+    part: car
+    title: Coolant temperature on a long grade, towing the loaded trailer in heat
+    how: "Read the water temperature gauge (TL02) at the top of the longest grade of the first long tow, air at 30 °C or more. Repeat after the tune."
+    unit: °C
+    estimate: {v: 100, src: "Report 14: 90 to 104 °C towing (general diesel figures, not 1VD data)"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    affects: [EN14, TX04, fan kit]
+    thresholds:
+      - {at: 107, rule: "Over 107 °C for long means an airflow problem: check the intercooler's effect and add GTurbo's AUD 1,895 fan kit (report 14)", src: "Report 14"}
+    range: {min: 85, max: 104, src: "Report 14"}
+  - id: VEH-15
+    group: Car build
+    part: car
+    title: Engine oil temperature, same tow
+    how: Read the oil temperature gauge (TL03) at the same point as VEH-14.
+    unit: °C
+    estimate: {v: 110, src: "Report 14: 99 to 116 °C towing"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    affects: [EN22, oil cooling]
+    thresholds:
+      - {at: 121, rule: "Over 121 °C sustained: review oil cooling before the next long tow", src: "Report 14"}
+    range: {min: 90, max: 116, src: "Report 14 (90 °C lower bound est.)"}
+  - id: VEH-16
+    group: Car build
+    part: car
+    title: Gearbox oil temperature, same tow
+    how: Read the gearbox sender (CG11) at the same point as VEH-14. Repeat after the tune.
+    unit: °C
+    estimate: {v: 95, src: "R23 estimate (est.)"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    affects: [gearbox cooler, CG09]
+    thresholds:
+      - {at: 110, rule: "Over 110 °C sustained: fit a gearbox oil cooler before the next long tow", src: "R23 estimate (est.). No Toyota limit for the H152F was found, and report 15 plans no cooler until the senders show one is needed"}
+    range: {min: 0, max: 110, src: "R23 estimate (est.)"}
+  - id: VEH-17
+    group: Car build
+    part: car
+    title: Rear diff oil temperature, same tow
+    how: Read the rear diff sender (CG11) at the same point as VEH-14.
+    unit: °C
+    estimate: {v: 100, src: "R23 estimate (est.)"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    affects: [rear diff, ball load]
+    thresholds:
+      - {at: 120, rule: "Over 120 °C sustained: check the diff oil and backlash (DL10) and consider a diff cooler", src: "R23 estimate (est.). No Toyota limit was found"}
+    range: {min: 0, max: 120, src: "R23 estimate (est.)"}
+  # ================================================================ weights on a public weighbridge (stages S0 and S5)
+  - id: VEH-18
+    group: Car build
+    part: car
+    title: Front axle of the bare cab chassis, from the as-bought weighing
+    how: "Line CK01. Full fuel, nobody aboard, weigh each axle. Subtract the tray, bar, winch and other fitted parts by their weighed or listed masses, split by their positions."
+    unit: kg
+    estimate: {v: 1280, src: "Ute model line UT-01: GXL cab chassis 2,202.5 kg kerb, 922.5 kg on the rear axle (Toyota BBGJ1007, mid-range)"}
+    measured: {v: null, date: null}
+    stage: weigh
+    affects: [UT-01, the S3 gate sum, front axle checks]
+    thresholds:
+      - {rule: "Replaces UT-01's front share. The gate sum and the ute checks re-solve", src: "Report 16, decision log 12:45"}
+    range: {min: 1240, max: 1320, src: "Toyota BBGJ1007 GXL range: kerb 2,175 to 2,230 kg, rear axle 910 to 935 kg"}
+  - id: VEH-19
+    group: Car build
+    part: car
+    title: Rear axle of the bare cab chassis, from the as-bought weighing
+    how: Same weighing as VEH-18.
+    unit: kg
+    estimate: {v: 922.5, src: "Ute model line UT-01 (Toyota BBGJ1007, mid-range)"}
+    measured: {v: null, date: null}
+    stage: weigh
+    affects: [UT-01, the S3 gate sum, UTE-03]
+    thresholds:
+      - {rule: "Replaces UT-01's rear share. Each extra kg on the rear axle here is a kg less for the ball load at the gate", src: "Report 16"}
+    range: {min: 910, max: 935, src: "Toyota BBGJ1007 GXL range"}
+  - id: VEH-20
+    group: Car build
+    part: car
+    title: Rear axle, laden ute towing the loaded trailer
+    how: "Line CK03. Two people, both bikes, tools, full fuel, one spare, then the loaded trailer coupled. Weigh the ute's rear axle with the trailer's wheels off the plate."
+    unit: kg
+    estimate: {v: 2487, src: "Ute model case UC2 with growth, with the 180 L tank and the trailer charging (2,127.5 kg), plus 1.409 kg per kg of ball load, at 255 kg (7.5 % of 3,400 kg)"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    affects: [UTE-03 check, kit choice, ball load]
+    thresholds:
+      - {at: 2550, rule: "Over 2,550 kg on the Platinum: take mass off the box, tray or ball before towing. The Platinum carries a ball load of up to about 300 kg with growth", src: "Lovells TOYKIT080-GVM rear axle rating"}
+    range: {min: 0, max: 2550, src: "Lovells sheet, Oct 2026 (2,850 kg with the Elite)"}
+  - id: VEH-21
+    group: Car build
+    part: car
+    title: Front axle, laden ute with the bikes and no trailer
+    how: Line CK03, the ute alone, loaded as VEH-20.
+    unit: kg
+    estimate: {v: 1480, src: "Ute model case UC2 with growth, with the 180 L tank and the trailer charging"}
+    measured: {v: null, date: null}
+    stage: weigh
+    affects: [UTE-02 check]
+    thresholds:
+      - {at: 1650, rule: "Over 1,650 kg: move mass rearward off the front", src: "Lovells TOYKIT080-GVM front axle rating"}
+    range: {min: 0, max: 1650, src: "Lovells sheet, Oct 2026"}
+  - id: VEH-22
+    group: Car build
+    part: car
+    title: Front axle share of the ute's mass, towing
+    how: From VEH-20's weighing, front axle divided by the ute's total.
+    unit: "%"
+    estimate: {v: 35.6, src: "Ute model case UC2 with growth, with the 180 L tank and the trailer charging, and a 255 kg ball: 1,376 kg of 3,862 kg"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    affects: [UTE-07 check]
+    thresholds:
+      - {at: 20, rule: "Under 20 %: the steering and braking share is too small. Cut the ball load", src: "Toyota BBGJ1007 section 1-2"}
+    range: {min: 20, max: 100, src: "Toyota BBGJ1007 section 1-2"}
+  - id: VEH-23
+    group: Car build
+    part: car
+    title: Laden ute mass towing, including the ball load (GVM check)
+    how: From VEH-20's weighing, the ute's two axles added.
+    unit: kg
+    estimate: {v: 3862, src: "Ute model case UC2 with growth, with the 180 L tank and the trailer charging (3,607.5 kg), plus a 255 kg ball"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    affects: [UTE-01 check]
+    thresholds:
+      - {at: 4200, rule: "Over 4,200 kg: unload before driving", src: "Lovells TOYKIT080-GVM"}
+    range: {min: 0, max: 4200, src: "Lovells sheet, Oct 2026"}
+  - id: VEH-24
+    group: Car build
+    part: car
+    title: Combination mass, laden ute plus loaded trailer (GCM check)
+    how: Line CK03. The ute's axles and the trailer's axles weighed coupled, added.
+    unit: kg
+    estimate: {v: 7007, src: "Ute model case UC2 with growth, with the 180 L tank and the trailer charging (3,607.5 kg), plus the trailer's 3,400 kg design limit with growth (decision H2)"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    affects: [GV06, decision H2 water limit]
+    thresholds:
+      - {at: 6900, rule: "If the GCM revision was refused: over 6,900 kg, drain water (about 1 kg a litre) until under. About 110 L at the design figures", src: "Decision H2, Toyota's 6,900 kg GCM"}
+      - {at: 7400, rule: "Over 7,400 kg: unload before driving", src: "Lovells GCM revision (GV06)"}
+    range: {min: 0, max: 7400, src: "Lovells sheet, Oct 2026 (6,900 kg without GV06)"}
+  # ================================================================ heights (stages S1, S4 and S5)
+  - id: VEH-25
+    group: Car build
+    part: car
+    title: Rear frame-rail top above the ground at the rear axle, unladen, after the GVM kit
+    how: "Level floor, correct tyre pressures, nobody aboard, box off. Measure each rail top straight above the rear axle and average."
+    unit: mm
+    estimate: {v: 774, src: "Ute model parameter frame_top_z (UTE-GARAGE.md)"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [box floor height 834 mm, box subframe, coupling height]
+    thresholds:
+      - {rule: "The box subframe packing follows the measured value so the floor stays at 834 mm. Outside the range, re-check the floor and tub heights", src: "Report 17 section 6.4"}
+    range: {min: 750, max: 800, src: "R23 estimate (est.), the model value plus or minus about 25 mm"}
+  - id: VEH-26
+    group: Car build
+    part: car
+    title: Rear bump travel, axle to bump stop, after the GVM kit
+    how: Unladen, measure from the axle's bump stop pad to the bump stop on each side and take the larger.
+    unit: mm
+    estimate: {v: 110, src: "Report 17: Lovells kit, estimated"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [wheel tub height, box floor]
+    thresholds:
+      - {at: 123, rule: "Over 123 mm the tubs stand more than 100 mm above the floor and the lower floor no longer works", src: "Ute model: tubs 86.5 mm at 110 mm of travel. Report 17 section 6.4 limit of 100 mm (calculated)"}
+    range: {min: 0, max: 123, src: "Ute model and report 17 (calculated)"}
+  - id: VEH-27
+    group: Car build
+    part: car
+    title: Ride height change from the GVM kit, wheel centre to guard, unladen, largest corner
+    how: "Measure all four corners before the kit (stage S1) and after it (stage S4), same tyres and pressures."
+    unit: mm
+    estimate: {v: 50, src: "Assumed (est.). Lovells publishes no lift figure for the 79 kit"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [GV03, coupling height, steering geometry]
+    thresholds:
+      - {at: 50, rule: "Over 50 mm needs certification (item 13). Ask the LC5 certifier to include it in GV03", src: "VSI 06 Rev 4 item 13"}
+    range: {min: 0, max: 50, src: "VSI 06 Rev 4 item 13"}
   # ================================================================ wheel and supplier answers (reports 06 and 16)
   - id: WHL-01
     group: Wheel and suppliers
+    part: trailer
     title: Load rating of the shared wheel, ROH Trak 2 16 x 7 ET 0, 5 x 150
     how: Read it from ROH's current table or the stamp on the wheel, and ask ROH whether it holds at the 80 psi of a load range E tyre.
     unit: kg
@@ -75,6 +446,7 @@ inputs:
       - {rule: "MAS-09 checks the rating against the per-wheel load MAS-06 uses: 1.2 times the axle group load with the growth allowance, over four wheels. Below it, choose a higher-rated wheel", src: "VSB1 Rev 6 axles and suspension, report 16"}
   - id: SUP-01
     group: Wheel and suppliers
+    part: trailer
     title: Cruisemaster's GTM for the XT Air build
     how: Cruisemaster sets it in the design session. It has said it will design to VSB1's 120 % rule (18 Nov).
     unit: kg
@@ -87,6 +459,7 @@ inputs:
       - {rule: "The axle group load in MAS-02 is checked against this rating. VSB1's 120 % rule at the ATM needs 1.2 x (ATM less the towball target), worked out from the current values", src: "Report 06, VSB1 Rev 6 axles and suspension"}
   - id: SUP-02
     group: Wheel and suppliers
+    part: trailer
     title: Do Cruisemaster's ratings already include VSB1's 120 % rule? (1 for yes, 0 for no)
     how: Cruisemaster's written answer to report 06 open question 2.
     unit: yes or no
@@ -99,6 +472,7 @@ inputs:
       - {at: 0, rule: "No: MAS-02 checks 1.2 times the axle group load against the kit's GTM. Yes: it checks the axle group load itself", src: "VSB1 Rev 6 axles and suspension, report 06"}
   - id: SUP-04
     group: Wheel and suppliers
+    part: trailer
     title: Cruisemaster's C/F for the ROH Trak 2 16 x 7 ET 0 wheel, from the rail's outside face to the hub face
     how: Cruisemaster sets it in the design session from the wheel's offset and the track.
     unit: mm
@@ -114,6 +488,7 @@ inputs:
   # ================================================================ the bikes and the chock, in the ute's bike box (UTE-GARAGE.md, report 05)
   - id: TU-01
     group: Bikes (ute bike box)
+    part: box
     title: Tuareg width across the fairing side panels, about 1,010 mm off the floor and 380 mm behind the front axle
     how: Bike upright on its stand. Hold a straight board flat against each side panel at that height and spot, keep both boards parallel to the bike, and measure between them.
     unit: mm
@@ -127,6 +502,7 @@ inputs:
       - {at: 780, rule: "The box is 1,850 mm wide outside at most, so it does not grow. Above a 780 mm spacing (about 708 mm across the side panels) the Street Triple's belly pan comes within 15 mm of the kerb-side tool chest, UGC-02 fails and the box layout has to be redesigned", src: "UTE-GARAGE.md, check UGC-02"}
   - id: TU-09
     group: Bikes (ute bike box)
+    part: box
     title: Tuareg crash bars, top height
     how: Bike upright on level floor. Lay a straight board level across the highest point of the bars, front to back, and measure from the floor to its underside.
     unit: mm
@@ -139,6 +515,7 @@ inputs:
       - {at: 970, rule: "The Street Triple's right bar end sits at about 1,000 to 1,030 mm. If the bars top out at about 970 mm or lower (30 mm under it), the bar end passes over them and the side panels govern. Above it the bars may meet the bar end, and the build re-solves the spacing from the geometry", src: "Report 05 (Street Triple bars at 1,013 mm), UTE-GARAGE.md UGC-01"}
   - id: TU-02
     group: Bikes (ute bike box)
+    part: box
     title: Tuareg overall length with the number plate hanger
     how: Bike upright. Stand a board square to the floor against the front tyre and another against the rear-most point of the plate or hanger, and measure between them.
     unit: mm
@@ -151,6 +528,7 @@ inputs:
       - {at: 2288, rule: "Above about 2,288 mm the plate comes within 15 mm of the ramp stowed across the back of the box (UGC-04 measures 40.8 mm at 2,263 mm). The box length is set by the ute's rear overhang, so the bikes move forward only if the chock nose (CHK-01) measures shorter", src: "UTE-GARAGE.md UGC-02 and UGC-04"}
   - id: TU-03
     group: Bikes (ute bike box)
+    part: box
     title: Tuareg screen top height, mirrors folded
     how: Bike upright on level floor. Lay a straight board across the top of the screen, level it, and measure from the floor to its underside.
     unit: mm
@@ -163,6 +541,7 @@ inputs:
       - {at: 1420, rule: "The box is 1,460 mm high inside to the roof bows and the door header. With the front wheel 25 mm up in the chock, a screen or folded mirror above about 1,420 mm comes within 15 mm of them (UGC-02), and the walls must grow", src: "UTE-GARAGE.md"}
   - id: TU-04
     group: Bikes (ute bike box)
+    part: box
     title: Tuareg folded mirror top height
     how: Fold the mirrors as for transport. Measure from the floor to the highest point of either mirror.
     unit: mm
@@ -175,6 +554,7 @@ inputs:
       - {rule: "If the mirrors stand above the screen they set the height instead (TU-03 rule)", src: "UTE-GARAGE.md"}
   - id: TU-05
     group: Bikes (ute bike box)
+    part: box
     title: Tuareg width over the panniers
     how: Bags on and packed as for the trip. Hold a board against the outside of each bag, parallel to the bike, and measure between the boards.
     unit: mm
@@ -187,6 +567,7 @@ inputs:
       - {at: 1049, rule: "Above about 1,049 mm the road-side bag comes within 15 mm of the barn door portal as the Tuareg rolls out (UGC-03 measures 49.5 mm at 980 mm). The Tuareg would have to move towards the kerb side", src: "UTE-GARAGE.md UGC-03"}
   - id: TU-06
     group: Bikes (ute bike box)
+    part: box
     title: Tuareg pannier length, height and position
     how: Measure one bag's length along the bike and its height, and how far its front edge is behind the front axle and its bottom above the floor.
     unit: mm
@@ -200,6 +581,7 @@ inputs:
       - {rule: "The envelope follows the values and UGC-06 re-measures the gap to the straps", src: "UTE-GARAGE.md"}
   - id: TU-07
     group: Bikes (ute bike box)
+    part: box
     title: Tuareg footpeg width, tip to tip
     how: Pegs down. Hold a board against the tip of each peg, parallel to the bike, and measure between them.
     unit: mm
@@ -212,6 +594,7 @@ inputs:
       - {at: 730, rule: "The two bikes' facing pegs must stay 30 mm apart: half the Tuareg's width plus half the Street Triple's at most 730 mm (760 - 30). Above it the spacing grows by the excess, as in TU-01", src: "UTE-GARAGE.md UGC-01"}
   - id: ST-01
     group: Bikes (ute bike box)
+    part: box
     title: Street Triple footpeg width, tip to tip
     how: As TU-07, on the Street Triple.
     unit: mm
@@ -224,6 +607,7 @@ inputs:
       - {at: 730, rule: "With TU-07: half of each peg width added together at most 730 mm, or the spacing grows by the excess", src: "UTE-GARAGE.md UGC-01"}
   - id: CHK-01
     group: Bikes (ute bike box)
+    part: box
     title: Condor chock nose depth, the box's front wall to the front tyre's leading edge
     how: Bolt a chock to a board against a wall, roll a front wheel into it, and measure from the wall to the front of the tyre.
     unit: mm
@@ -235,9 +619,267 @@ inputs:
     thresholds:
       - {rule: "The front tyre's leading edge sits this far behind the box's front wall, so both bikes move with it", src: "UTE-GARAGE.md"}
 
+  # ================================================================ the bike box (R24, UTE-GARAGE.md), group Bike box
+  # ================================================================ before the build: the bought ute
+  - id: BOX-01
+    group: Bike box
+    part: box
+    title: Rear frame rail top above the ground, laden, at the last deck mount
+    how: Ute with its GVM kit, tyres at road pressure, loaded to the trip mass (both bikes and the tools, or 650 kg of ballast over the rear axle) on level ground. Measure from the ground to the top of each rail at the last deck mount bracket and average the two.
+    unit: mm
+    estimate: {v: 774, src: "UTE-GARAGE.md assumption 6: Toyota's 724 mm (BBGJ1007 pp. 55 and 62) plus about 50 mm of Lovells lift (estimate)"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [floor height, tub height, ramp angle, UGD-01, UGW-01, UGL-01, JK-02]
+    range: {min: 760.5, max: 952, src: "Below 760.5 mm the floor drops 13.5 mm and the tubs pass 100 mm (UGD-01 measures 86.5 mm). Above 952 mm the empty sill passes 1,042 mm and the 3,048 mm ramp passes 20 degrees (report 03)"}
+    thresholds:
+      - {at: 760.5, rule: "Below this the wheel tubs stand more than 100 mm above the floor and the box goes to the flat deck at about 1,080 mm (report 17 section 6.4)", src: "UTE-GARAGE.md, UGD-01"}
+  - id: BOX-02
+    group: Bike box
+    part: box
+    title: Rear wheel travel from laden ride height to the bump stop, compressed
+    how: Box off. Ute laden as BOX-01. Measure the gap from the bump stop to its striker on the axle, then add the bump stop's crush (its height less its fully compressed height, from the Lovells kit sheet or by test).
+    unit: mm
+    estimate: {v: 110, src: "UTE-GARAGE.md assumption 7, report 17 section 3.3 (estimate)"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [tub height, UGD-01, UGW-01]
+    range: {min: null, max: 123.5, src: "Each extra mm raises the tub top 1 mm. 86.5 mm tubs reach the 100 mm limit at 123.5 mm of travel (UGD-01)"}
+    thresholds:
+      - {at: 123.5, rule: "Above this the tubs pass 100 mm above the floor: flat deck, or Leonard accepts taller tubs and UGC-02 runs again", src: "Report 17 section 3.3, UGD-01"}
+  - id: BOX-03
+    group: Bike box
+    part: box
+    title: Rear tyre static loaded radius, laden
+    how: Ute laden as BOX-01, tyres at the placard pressure. Measure from the ground to the centre of each rear hub and average.
+    unit: mm
+    estimate: {v: 380, src: "UTE-GARAGE.md assumption 5 (estimate, about 22 mm deflection on the 805 mm tyre)"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [tub height, UGD-01]
+    range: {min: 360, max: 393.5, src: "Each mm above 380 raises the tyre 1 mm against the fixed floor, so the tubs reach 100 mm at 393.5 mm. Below 360 mm the tyre is under-inflated or overloaded (est.)"}
+    thresholds:
+      - {at: 393.5, rule: "The tubs pass 100 mm. Treat as BOX-02", src: "UGD-01"}
+  - id: BOX-04
+    group: Bike box
+    part: box
+    title: Deck mount bracket positions from the rear axle centre
+    how: Plumb lines from the rear hub centre and from each bracket's bolt hole, marked on the floor. Measure along the rail, minus ahead of the axle and plus behind it. Both rails.
+    unit: mm
+    estimate: {v: [-879, -490, 123, 490, 755, 1025], src: "Toyota BBGJ1007, report 17 section 1.4"}
+    measured: {v: null, date: null}
+    stage: build
+    order: [station 1, station 2, station 3, station 4, station 5, station 6]
+    affects: [subframe drawing CT-702, track rows, strap geometry, UGR-01, UGM-01]
+    range: {min: [-904, -515, 98, 465, 730, 1000], max: [-854, -465, 148, 515, 780, 1050], src: "Each station within 25 mm of the estimate. The L-track rows sit on stations 1 and 6 and report 03 holds anchor X within 50 mm, so half of that is kept for build tolerance (est.)"}
+    thresholds:
+      - {rule: "Any station more than 25 mm off: redraw the subframe and re-run UGR-01 with the new track rows", src: "Report 03 section 4"}
+  - id: BOX-05
+    group: Bike box
+    part: box
+    title: Deck mount bracket hole diameter
+    how: Vernier on each bolt hole. Note the flange width from the rail's outer face to its edge as well (about 60 mm expected).
+    unit: mm
+    estimate: {v: 13, src: "UTE-GARAGE.md assumption 9: an M12 clearance hole in a flange about 60 mm out from the rail (estimate)"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [bolt size BX-F01, mount plates BX-U02, UGM-01]
+    range: {min: 12.5, max: 14.5, src: "A hole that takes an M12 bolt with normal to coarse clearance (est.)"}
+    thresholds:
+      - {rule: "A hole sized for M10 or M14 changes the bolt in BX-F01 and the engineer re-checks UGM-01", src: "UGM-01"}
+  - id: BOX-06
+    group: Bike box
+    part: box
+    title: Frame rail width over the outsides, at stations 1 and 6
+    how: Straight edges against the outer faces of both rails, measured square across.
+    unit: mm
+    estimate: {v: 1046, src: "UTE-GARAGE.md assumption 4 (estimate from the frame drawing)"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [runner positions, mount plates, UGW-02]
+    range: {min: 1036, max: 1056, src: "Plus or minus 10 mm (est.): the 75 mm runners still bear on the 60 mm rail tops, and the mount angles keep their 5 mm to the tub walls, which the tyres set (UGW-02)"}
+    thresholds:
+      - {rule: "Outside the range, move the runners to the measured rails, re-draw the mount angles and re-run UGW-02", src: "UGW-02"}
+  # ================================================================ the built box, before it goes on
+  - id: BOX-07
+    group: Bike box
+    part: box
+    title: Box mass empty, with its restraint, ramp, winch, security and tool chests, no tools
+    how: Weigh the finished box on four platform scales under its mount points, or on a weighbridge on a trailer weighed empty first. Record the sum.
+    unit: kg
+    estimate: {v: 436.1, src: "data/ute/box-parts.yaml line sum, equal to the model's box (build/ute/ute.json), with the 1.6 mm roof"}
+    measured: {v: null, date: null}
+    stage: weigh
+    affects: [every ute mass check, UGB-01, UTE-06, the rear axle]
+    range: {min: 392, max: 440, src: "Max: UGB-01's 440 kg limit (report 17, data/ute/garage-checks.yaml). Min: 10 % under the list, below which a part is missing (est.)"}
+    thresholds:
+      - {at: 0.02, rule: "A difference over 2 % from the line sum is explained before the box is fitted", src: "Report 02 MASS-07"}
+      - {at: 440, rule: "UGB-01 asks for less than report 17's 440 kg. The list is 3.9 kg under it with the 1.6 mm roof (UTE-GARAGE.md). Over it, take mass out of the box before it goes on the ute", src: "data/ute/garage-checks.yaml via cad/ute_garage.py"}
+  - id: BOX-08
+    group: Bike box
+    part: box
+    title: Box centre of gravity along the box and its height above the floor, empty
+    how: "Along: from the four scale readings of BOX-07, the mass-weighted X of the front and rear pairs. Height: raise the front pair of mounts a known height (about 300 mm) on blocks, weigh again, and compute the height from the shift of load to the rear pair (tilt method)."
+    unit: mm
+    estimate: {v: [1262, 487], src: "Model line sum, build/ute/ute.json: X 1,262 mm from the front wall's inner face (225 mm behind the rear axle), 487 mm above the floor top"}
+    measured: {v: null, date: null}
+    stage: weigh
+    order: [X from the front wall, height above the floor]
+    affects: [ute axle loads, SSF, UGM-01]
+    range: {min: [1162, 387], max: [1362, 587], src: "Each value within 100 mm of the estimate. 100 mm along moves about 14 kg between the axles. The unladen 1,000 mm limit (Toyota) has about 1.4 m in hand (est.)"}
+    thresholds:
+      - {rule: "The measured values replace the model's for the box lines and the ute checks run again", src: "Report 02 MASS-07"}
+  - id: BOX-09
+    group: Bike box
+    part: box
+    title: Barn door meeting gap, closed and locked
+    how: Feeler gauges at the top, middle and bottom of the meeting edge between the leaves. Check the hinge gaps at the corner posts at the same time, 9 to 11 mm.
+    unit: mm
+    estimate: {v: 5, src: "Model leaf_gap (data/assemblies/ute-garage.yaml)"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [seal contact, cam bar keepers, dog bolts, UGC-03]
+    range: {min: 3, max: 8, src: "The cam bar keepers and the edge seal work from 3 to 8 mm (est.)"}
+    thresholds:
+      - {rule: "Out of range: re-hang the leaf before the seals go on", src: "Build step 7"}
+  - id: BOX-10
+    group: Bike box
+    part: box
+    title: Kerb door gap all round, closed
+    how: Feeler gauges at each corner and mid-side.
+    unit: mm
+    estimate: {v: 5, src: "Design (est.)"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [seal contact, latch]
+    range: {min: 3, max: 8, src: "As BOX-09 (est.)"}
+    thresholds:
+      - {rule: "Out of range: re-set the hinge and the strut brackets", src: "Build step 7"}
+  - id: BOX-11
+    group: Bike box
+    part: box
+    title: Door seal contact, paper test
+    how: Close and lock each door on a strip of paper at every 300 mm round the seal. The strip must drag at every point. Count the points where it pulls out freely.
+    unit: points
+    estimate: {v: 0, src: "Design"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [dust, water, positive pressure]
+    range: {min: 0, max: 0, src: "Every point must drag, so the fan holds the box above outside pressure (report 17 section 2.4)"}
+    thresholds:
+      - {rule: "Any loose point: adjust the keeper or add seal before the water test (build step 11)", src: "Report 17 section 2.4"}
+  # ================================================================ fitted on the ute
+  - id: BOX-12
+    group: Bike box
+    part: box
+    title: Cab back to the box front wall, at the roof
+    how: Measure the gap at the cab's roof line and at its lower corners after the mounts are torqued.
+    unit: mm
+    estimate: {v: 40, src: "Model cab_gap (data/assemblies/ute-garage.yaml)"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [UTE-15, rear overhang, box overhang behind the ball, JK-01]
+    range: {min: 39, max: 60, src: "Min: Toyota BBGJ1007 (UTE-15). Max: each mm more adds 1 mm of overhang behind the ball, and JK-01's 100 mm allowance is for the unmeasured ball position (est.)"}
+    thresholds:
+      - {at: 39, rule: "Below 39 mm UTE-15 fails: move the box back on its mounts", src: "Toyota BBGJ1007"}
+  - id: BOX-13
+    group: Bike box
+    part: box
+    title: Static gap from each rear tyre's top to the tub roof above it, laden
+    how: Ute laden as BOX-01, box fitted. Reach in from beside the wheel with a rule from the tyre's highest point to the tub's underside.
+    unit: mm
+    estimate: {v: 135, src: "Bump travel 110 mm plus Toyota's 25 mm at full bump (UGW-01)"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [UGW-01]
+    range: {min: 135, max: null, src: "Min: BOX-02's measured travel plus 25 mm (Toyota BBGJ1007 p. 28). 135 mm with the estimated travel"}
+    thresholds:
+      - {rule: "Less than the travel plus 25 mm: the tyre can strike the tub at full bump. Fit a taller bump stop or raise the tubs", src: "UGW-01"}
+  - id: BOX-14
+    group: Bike box
+    part: box
+    title: Clearance from the box's rear underside to the highest part of the coupled trailer within 600 mm of the ball
+    how: Ute laden and coupled to the loaded trailer on level ground. Measure from the underside of the box's rear crossmember straight down to the highest part of the coupling, handbrake, jockey wheel clamp, chains or drawbar box lid within 600 mm behind the ball.
+    unit: mm
+    estimate: {v: 130, src: "Box underside about 780 mm up, coupling and handbrake tops about 650 mm (est.)"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    affects: [JK-01, JK-02]
+    range: {min: 50, max: null, src: "Trailer check JK-02 (data/checks.yaml): everything inside the box's sweep stays 50 mm below its underside"}
+    thresholds:
+      - {at: 50, rule: "Below 50 mm: lower the part on the trailer's drawbar or move it outside the box's sweep (JK-01)", src: "JK-02"}
+  - id: BOX-15
+    group: Bike box
+    part: box
+    title: Sill height above the ground with the bikes out
+    how: Ute unladen except the empty box and two people's mass in the cab (or the people in it), level ground. Measure from the ground to the top of the sill angle.
+    unit: mm
+    estimate: {v: 864, src: "UTE-GARAGE.md: the laden floor at 834 mm rises about 30 mm with the bikes out (report 17)"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [ramp angle, UGL-01]
+    range: {min: null, max: 1042, src: "3,048 mm x sin 20 degrees: report 03's limit for walking a bike up beside the ramp"}
+    thresholds:
+      - {at: 1042, rule: "Above this the ramp is steeper than 20 degrees: use a longer ramp or load on a slope", src: "Report 03 section 10"}
+  # ================================================================ bikes in the box
+  - id: BOX-16
+    group: Bike box
+    part: box
+    title: Tuareg centreline from the ute's centreline, road side
+    how: Snap a chalk line on the floor down the ute's centreline. Measure square from it to the centreline of the Tuareg's chock.
+    unit: mm
+    estimate: {v: 333, src: "Model tuareg_y (data/assemblies/ute-garage.yaml)"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [UGC-01, UGC-02, UGC-03, strap anchors]
+    range: {min: 292, max: 357, src: "Towards the kerb, UGC-01's 41.5 mm margin to the Street Triple. Towards the road, UGC-02's 24.5 mm margin to the road-side tool chest"}
+    thresholds:
+      - {rule: "Outside the range: move the chock adapter and its fittings before strapping", src: "UGC-01, UGC-02"}
+  - id: BOX-17
+    group: Bike box
+    part: box
+    title: Street Triple centreline from the ute's centreline, kerb side
+    how: As BOX-16, to the Street Triple's chock.
+    unit: mm
+    estimate: {v: -427, src: "Model st_y"}
+    measured: {v: null, date: null}
+    stage: build
+    affects: [UGC-01, UGC-02, strap anchors]
+    range: {min: -437, max: -386, src: "Towards the kerb, UGC-02's 10.5 mm margin from the belly pan to the kerb tool chest. Towards the road, UGC-01's 41.5 mm margin"}
+    thresholds:
+      - {rule: "Outside the range: move the chock adapter. The kerb side is the tight one", src: "UGC-02"}
+  - id: BOX-18
+    group: Bike box
+    part: box
+    title: Track rows from the Tuareg's front axle, chocked
+    how: Tuareg in its chock. Plumb from the front axle centre to the floor and measure along the box to the centre of each L-track row.
+    unit: mm
+    estimate: {v: [240, -1665], src: "UTE-GARAGE.md section 4: front row 240 mm ahead, rear row 1,665 mm behind the front axle"}
+    measured: {v: null, date: null}
+    stage: build
+    order: [front row, rear row]
+    affects: [strap angles, UGR-01]
+    range: {min: [190, -1715], max: [290, -1615], src: "Each row within 50 mm of the estimate (report 03 section 4: hold anchor X within 50 mm)"}
+    thresholds:
+      - {rule: "More than 50 mm off: re-run UGR-01 with the measured rows", src: "Report 03 section 4"}
+  - id: BOX-19
+    group: Bike box
+    part: box
+    title: Fork compression under the front straps
+    how: Mark each fork's stanchion at the seal with the bike chocked and the straps slack, tighten the front pair evenly and measure how far the mark moves.
+    unit: mm
+    estimate: {v: [80, 40], src: "Report 03 section 3: one third of travel, 240 mm (Tuareg) and 115 mm (Street Triple)"}
+    measured: {v: null, date: null}
+    stage: build
+    order: [Tuareg, Street Triple]
+    affects: [strap tension on corrugations]
+    range: {min: [60, 30], max: [100, 50], src: "Tuareg 60 to 100 mm and Street Triple 30 to 50 mm, about a quarter to two fifths of the travel. Never bottomed (report 03 section 3)"}
+    thresholds:
+      - {rule: "Re-check after the first 10 to 20 km and after rough sections", src: "NTC light vehicle guide p. 8, report 03"}
   # ================================================================ the trailer, later (report 02 MASS-07)
   - id: TW-01
     group: Trailer weighbridge
+    part: trailer
     title: Weighed mass, chassis with running gear, drawbar and coupling
     how: Weigh the rolling chassis on a weighbridge before the body goes on. Record the whole mass.
     unit: kg
@@ -252,6 +894,7 @@ inputs:
       - {at: 0.02, rule: "A difference over 2 % from the model is explained before work continues", src: "Report 02 MASS-07"}
   - id: TW-02
     group: Trailer weighbridge
+    part: trailer
     title: Weighed mass, with the body shell on
     how: Weigh again once the floor, walls, roof and doors are on. Record the whole mass.
     unit: kg
@@ -265,6 +908,7 @@ inputs:
       - {rule: "The rise from TW-01 replaces the shell's estimates, as for TW-01", src: "Report 02 MASS-06 and MASS-07"}
   - id: TW-03
     group: Trailer weighbridge
+    part: trailer
     title: Weighed mass, fitted out, tanks empty and no payload
     how: Weigh the finished trailer as built, with the tanks and the jerry cans empty. This is the tare on the plate.
     unit: kg

@@ -2,7 +2,9 @@
 // The measurement sheet (S-04): every input in data/measurements.yaml, with how to measure it, the value the design
 // assumes, the range it accepts (cad/inputs.py resolves the ranges the model sets), an input box and the result.
 // From build/trailer/trailer.json and build/checks/checks.json. The page's tables script makes it a spreadsheet, and
-// the script below keeps what is typed in the browser's localStorage, with export and import.
+// the script below keeps what is typed in the browser's localStorage, with export and import. The part buttons (and
+// ?part=car, box or trailer in the URL) show one part's inputs: they set data-sheet-hide on the other rows and tell
+// the sheet to filter again (ct:sheet-filter).
 import t from '../data/generated/trailer.json';
 import checks from '../data/generated/checks.json';
 
@@ -12,10 +14,14 @@ const users = (id: string) => [
   ...(checks as any).results.filter((c: any) => (c.inputs ?? []).includes(id)).map((c: any) => c.id),
   ...r.checks.filter((c: any) => (c.inputs ?? []).includes(id)).map((c: any) => c.id),
 ].filter((v, i, a) => a.indexOf(v) === i);
-const yesNo = (m: any) => m.unit === 'yes or no';
+// Inputs answered with a choice: yes or no, and pass or fail, typed as 1 or 0.
+const CHOICES: Record<string, [string, string]> = { 'yes or no': ['yes', 'no'], 'pass or fail': ['pass', 'fail'] };
+const yesNo = (m: any) => m.unit in CHOICES;
 const num = (v: any) => (typeof v === 'number' ? v.toLocaleString('en-AU', { maximumFractionDigits: 2 }) : `${v}`);
+const word = (m: any, v: any) => (v ? `${CHOICES[m.unit][0]} (1)` : `${CHOICES[m.unit][1]} (0)`);
 const fmt = (m: any, v: any) =>
-  v == null ? '' : yesNo(m) ? (v ? 'yes (1)' : 'no (0)') : Array.isArray(v) ? v.map(num).join(', ') : num(v);
+  v == null ? '' : yesNo(m) ? word(m, v) : Array.isArray(v) ? v.map(num).join(', ') : num(v);
+const PARTS: [string, string][] = [['car', 'Car build'], ['box', 'Bike box'], ['trailer', 'Trailer']];
 const names = (m: any): string[] => m.order ?? (Array.isArray(m.estimate) ? m.estimate.map((_: any, k: number) => `value ${k + 1}`) : ['']);
 const count = (m: any) => (Array.isArray(m.estimate) ? m.estimate.length : 1);
 const at = (b: any, k: number) => (Array.isArray(b) ? b[k] : b);
@@ -23,7 +29,7 @@ const span = (lo: any, hi: any) =>
   lo != null && hi != null ? `${num(lo)} to ${num(hi)}` : lo != null ? `at least ${num(lo)}` : hi != null ? `at most ${num(hi)}` : 'any';
 const rangeText = (m: any) => {
   const g = m.range;
-  if (yesNo(m)) return 'either';
+  if (yesNo(m)) return g.min != null && g.min === g.max ? word(m, g.min) : 'either';
   const unit = m.unit ? ` ${m.unit}` : '';
   if (count(m) === 1) return span(g.min, g.max) + unit;
   return names(m).map((n, k) => `${n} ${span(at(g.min, k), at(g.max, k))}`).join(', ') + unit;
@@ -44,7 +50,7 @@ const spec = (m: any) => JSON.stringify({
   id: m.id, title: m.title, unit: m.unit, n: count(m), names: names(m), min: m.range.min, max: m.range.max,
   low: Array.from({ length: count(m) }, (_, k) => rule(m, at(m.range.min, k))),
   high: Array.from({ length: count(m) }, (_, k) => rule(m, at(m.range.max, k))),
-  committed: m.measured, date: m.measured_date,
+  committed: m.measured, date: m.measured_date, choice: yesNo(m) ? CHOICES[m.unit] : null,
 });
 const measured = rows.filter((m) => m.status === 'measured').length;
 ---
@@ -56,6 +62,13 @@ const measured = rows.filter((m) => m.status === 'measured').length;
 </p>
 
 <div class="measure-tools not-content">
+  <span class="measure-show" role="group" aria-label="Show the inputs of">
+    Show
+    <button type="button" data-part="" aria-pressed="true">All ({rows.length})</button>
+    {PARTS.map(([p, label]) => (
+      <button type="button" data-part={p} aria-pressed="false">{label} ({rows.filter((m) => m.part === p).length})</button>
+    ))}
+  </span>
   <button type="button" data-act="csv">Export CSV</button>
   <button type="button" data-act="yaml">Export YAML</button>
   <label class="measure-import">Import CSV <input type="file" accept=".csv,text/csv" data-act="import" /></label>
@@ -74,7 +87,7 @@ const measured = rows.filter((m) => m.status === 'measured').length;
     </thead>
     <tbody>
       {rows.map((m) => (
-        <tr id={m.id.toLowerCase()} data-measure={spec(m)}>
+        <tr id={m.id.toLowerCase()} data-measure={spec(m)} data-part={m.part}>
           <td>{m.id}</td>
           <td>{m.title}</td>
           <td class="not-content">
@@ -98,7 +111,7 @@ const measured = rows.filter((m) => m.status === 'measured').length;
           <td title={m.range.src}>{rangeText(m)}</td>
           <td class="measure-cell">
             {yesNo(m) ? (
-              <select data-k="0" aria-label={`Measured: ${m.id}`}><option value=""></option><option value="1">yes</option><option value="0">no</option></select>
+              <select data-k="0" aria-label={`Measured: ${m.id}`}><option value=""></option><option value="1">{CHOICES[m.unit][0]}</option><option value="0">{CHOICES[m.unit][1]}</option></select>
             ) : names(m).map((n, k) => (
               <label title={count(m) > 1 ? n : undefined}>{count(m) > 1 && <span>{n.split(' ')[0]}</span>}<input type="text" inputmode="decimal" size="6" data-k={k}
                 aria-label={`Measured: ${m.id}${count(m) > 1 ? ` ${n}` : ''}`} /></label>
@@ -135,6 +148,17 @@ const measured = rows.filter((m) => m.status === 'measured').length;
   }
   .measure-import input {
     display: none;
+  }
+  .measure-show {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    margin-right: 0.8rem;
+  }
+  .measure-tools button[aria-pressed='true'] {
+    border-color: var(--sl-color-accent);
+    background: var(--sl-color-accent-low);
   }
   .measure-msg {
     color: var(--sl-color-text-accent);
@@ -222,7 +246,7 @@ const measured = rows.filter((m) => m.status === 'measured').length;
   interface Spec {
     id: string; title: string; unit: string; n: number; names: string[];
     min: number | (number | null)[] | null; max: number | (number | null)[] | null;
-    low: string[]; high: string[]; committed: number | number[] | null; date: string | null;
+    low: string[]; high: string[]; committed: number | number[] | null; date: string | null; choice: [string, string] | null;
   }
   interface Saved { v: (number | null)[]; date: string }
   const KEY = 'ct-measure:';
@@ -274,7 +298,10 @@ const measured = rows.filter((m) => m.status === 'measured').length;
       const lo = at(s.min, k);
       const hi = at(s.max, k);
       const name = s.n > 1 ? `${s.names[k]}: ` : '';
-      if (lo != null && x < lo) bad.push(`${name}below ${lo.toLocaleString('en-AU')} ${s.unit}. ${s.low[k]}`);
+      if (s.choice && ((lo != null && x < lo) || (hi != null && x > hi))) {
+        const said = (v: number) => (v ? s.choice![0] : s.choice![1]);
+        bad.push(`${said(x)}, the design needs ${said(x < (lo ?? x) ? lo! : hi!)}. ${x < (lo ?? x) ? s.low[k] : s.high[k]}`);
+      } else if (lo != null && x < lo) bad.push(`${name}below ${lo.toLocaleString('en-AU')} ${s.unit}. ${s.low[k]}`);
       else if (hi != null && x > hi) bad.push(`${name}above ${hi.toLocaleString('en-AU')} ${s.unit}. ${s.high[k]}`);
     });
     const done = v.every((x) => x !== null);
@@ -421,4 +448,22 @@ const measured = rows.filter((m) => m.status === 'measured').length;
     if (f) importCsv(await f.text());
     (e.target as HTMLInputElement).value = '';
   });
+
+  // ---------------------------------------------------------------- one part's inputs (?part=car, box or trailer)
+  const table = document.querySelector('.measure-sheet table') as HTMLTableElement | null;
+  const partButtons = Array.from(document.querySelectorAll('.measure-show button')) as HTMLButtonElement[];
+  function showPart(part: string, keep: boolean) {
+    const known = partButtons.some((b) => b.dataset.part === part) ? part : '';
+    for (const r of rows) r.toggleAttribute('data-sheet-hide', !!known && r.dataset.part !== known);
+    for (const b of partButtons) b.setAttribute('aria-pressed', String(b.dataset.part === known));
+    table?.dispatchEvent(new CustomEvent('ct:sheet-filter'));
+    if (keep) {
+      const url = new URL(location.href);
+      if (known) url.searchParams.set('part', known);
+      else url.searchParams.delete('part');
+      history.replaceState(history.state, '', url);
+    }
+  }
+  for (const b of partButtons) b.addEventListener('click', () => showPart(b.dataset.part ?? '', true));
+  showPart(new URLSearchParams(location.search).get('part') ?? '', false);
 </script>

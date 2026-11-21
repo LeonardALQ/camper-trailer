@@ -11,6 +11,11 @@ The plan is worked out from estimates until the owner measures the real thing. E
 accepts without a redesign. Type a value in the Measured column and the sheet says whether it is in range, and which
 rule it breaks if it is not.
 
+The inputs belong to the three parts of the project. Show picks one: the car build (VEH-01 to VEH-27 and the ute's
+UTE-01 and UTE-02), the bike box (BOX-01 to BOX-19 and the bikes' own sizes) or the trailer (the wheel, the supplier
+answers, the towball load and the trailer's weighings). A link such as `/measurements/?part=car` opens with one part
+shown.
+
 Values typed here stay in this browser until you export them. Export YAML gives one `measured` line per input, ready
 to paste into `data/measurements.yaml`, and a push to main then rebuilds the site with the plan re-solved from them.
 Export CSV and Import CSV move the values to another browser or a spreadsheet.

@@ -59,8 +59,8 @@ class Inputs:
         raw = yaml.safe_load((root / "data" / "measurements.yaml").read_text())
         self.items: dict[str, Input] = {}
         for d in raw["inputs"]:
-            known = {"id", "group", "title", "how", "unit", "estimate", "measured", "affects", "thresholds", "order", "stage",
-                     "range", "covers"}
+            known = {"id", "group", "part", "title", "how", "unit", "estimate", "measured", "affects", "thresholds", "order",
+                     "stage", "range", "covers"}
             extra = set(d) - known
             if extra:
                 raise ValueError(f"measurement {d.get('id')}: unknown keys {sorted(extra)}")
@@ -70,7 +70,7 @@ class Inputs:
                 estimate=d["estimate"].get("v"), estimate_src=d["estimate"].get("src", ""), measured=m.get("v"),
                 measured_date=m.get("date"), affects=d.get("affects", []), thresholds=d.get("thresholds", []),
                 stage=d.get("stage", ""), range=d.get("range") or {},
-                extra={k: d[k] for k in ("order", "covers") if k in d} | ({"note": m["note"]} if m.get("note") else {}))
+                extra={k: d[k] for k in ("order", "covers", "part") if k in d} | ({"note": m["note"]} if m.get("note") else {}))
         self.outcomes: dict[str, str] = {}
         self.ranges: dict[str, dict] = {}
 
