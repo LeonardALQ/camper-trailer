@@ -1,10 +1,10 @@
-# Builds the model, checks, drawings and site in the project Docker image. On main it then publishes site/dist to
-# GitHub Pages. Pull requests get the build only, and nothing deploys while the repository is private.
+# Builds the model, checks, drawings and site in the project Docker image. Pushes to the live branch publish
+# site/dist to GitHub Pages. Pushes to main and pull requests get the build only, so the site only moves when live does.
 name: Build and publish the site
 
 on:
   push:
-    branches: [main]
+    branches: [main, live]
   pull_request:
   workflow_dispatch:
 
@@ -30,7 +30,7 @@ jobs:
           path: site/dist
 
   deploy:
-    if: ${{ github.ref == 'refs/heads/main' && !github.event.repository.private }}
+    if: ${{ github.ref == 'refs/heads/live' && !github.event.repository.private }}
     needs: build
     runs-on: ubuntu-latest
     permissions:
