@@ -1196,14 +1196,14 @@ def check_row(c, res: dict) -> dict:
         if c.type == "body_plate_defl":
             k, v = max(p["defl"].items(), key=lambda kv: kv[1]["w_s"])
             ws = p["ws"]["kpa"]
-            bays = "; ".join(f"{w2}: " + ", ".join(f"X {b['x0']:,.0f} to {b['x1']:,.0f} {b['w_mm'] * ws:.1f} mm" + (f" ({' '.join(b['openings'])})" if b["openings"] else "")
+            bays = ". ".join(f"The {w2} wall's largest deflection in each bay: " + ", ".join(f"{b['w_mm'] * ws:.1f} mm from X {b['x0']:,.0f} to {b['x1']:,.0f}" + (f" ({' '.join(b['openings'])})" if b["openings"] else "")
                                                     for b in q["bays"] if b["x1"] - b["x0"] > 60) for w2, q in p["defl"].items())
             return dict(limit=f"<= {p['limit_mm']:.1f} mm", measured=round(v["w_s"], 1), unit="mm", margin=round(p["limit_mm"] - v["w_s"], 1),
                         ok=v["w_s"] <= p["limit_mm"] + 1e-9, governing=f"the {k} wall at X {v['at_x']:,.0f}, {v['at_z']:,.0f} mm above the floor",
                         detail=(f"each side wall as a Mindlin plate (MITC4, {p['step']:g} mm elements) from the front wall to the rear wall, every "
                                 f"opening cut out with its wind load on its edges, the members as beams with their own bending, shear and torsion "
                                 f"(EI {p['props']['EI'] / 1e6:,.0f} N m2, GJ {p['props']['GJ'] / 1e6:,.0f} N m2), in region B's 25-year wind, {ws:.2f} kPa net. "
-                                f"The largest deflection in each bay: {bays}"))
+                                f"{bays}"))
         k, v = max(p["strength"].items(), key=lambda kv: kv[1]["util"])
         return dict(limit="<= 1.00 utilisation", measured=round(v["util"], 3), unit="", margin=round(1 - v["util"], 3), ok=v["util"] <= 1.0,
                     governing=f"the {k} wall, {v['governing']}",
