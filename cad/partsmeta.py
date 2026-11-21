@@ -178,8 +178,13 @@ def ute_lookup(ute, gmodel):
             return line_meta(bike, key, part.name, group, i.group, drawing)
         if part.kind != "bom" or part.mass is None:
             src = f"Included in {part.included_in}" if part.included_in else "Shown for context. It is not part of the box's mass"
+            # a sub-part is priced in its parent's line, so its card says where (14P, the spare winch plate, in U-WINCH)
+            host = by_part.get(part.included_in) if part.included_in else None
+            note = (f"Priced with {part.included_in}, line{'s' if len(host) > 1 else ''} {', '.join(ln['id'] for ln in host)} of the bike "
+                    "box's parts list") if host else None
             return dict(id=part.included_in or part.id, iid=key, name=part.name, group=group, system=i.group,
-                        material=part.material, source=src, drawing=drawing, load="tare")
+                        material=part.material, source=src, drawing=drawing, load="tare", price_aud=None, price_basis=None,
+                        price_note=note)
         body = BODY_MASS.get(key)
         ln = lines.get(part.id)
         kg = body["mass_kg"] if body else (ln["kg"] / max(1, bodies.get(part.id, 1)) if ln else None)

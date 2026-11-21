@@ -66,8 +66,9 @@ for (const p of pages) {
     const out = { off: 0, cog: 0, bad: [] };
     document.querySelectorAll('table.sheet-table').forEach((t, k) => {
       const cells = [...(t.tFoot?.rows[0]?.cells ?? [])];
+      // the rows the footer counts: not totals, not filtered out, not group headings and not loads it leaves out
       const rows = [...t.tBodies[0].rows].filter((r) => !r.classList.contains('row-total')
-        && !r.classList.contains('sheet-out') && ![...r.cells].some((c) => c.colSpan > 1));
+        && !r.classList.contains('sheet-out') && !r.hasAttribute('data-sheet-nosum') && ![...r.cells].some((c) => c.colSpan > 1));
       const mass = cells.findIndex((c) => c.hasAttribute('data-mass'));
       const heads = [...(t.tHead?.rows[t.tHead.rows.length - 1]?.cells ?? [])].map((h) => h.textContent.trim());
       // a cell's number and unit by the sheet's own rule (sheet.ts parseNumber): one number, an allowed prefix and unit
@@ -120,6 +121,29 @@ for (const p of pages) {
   });
   check('footer Sum blank where a sum means nothing, CoG weighted by mass',
     !foot.bad.length && foot.cog >= (p.cog ?? 0) && foot.off >= (p.off ?? 0), foot);
+
+  // The measurement sheet warns at a threshold inside the range: TR-11 at 2,495 mm is in range but past DIM-05's
+  // 2,490 mm, and 2,510 mm is out of range. The typed values are cleared again.
+  if (p.path === '/measurements/' && !p.theme) {
+    const tr11 = await page.evaluate(() => {
+      const row = document.getElementById('tr-11');
+      const f = row?.querySelector('[data-k]');
+      if (!row || !f) return { found: false };
+      const put = (v) => {
+        f.value = v;
+        f.dispatchEvent(new Event('input', { bubbles: true }));
+        return row.querySelector('.measure-status span')?.className ?? '';
+      };
+      const at2495 = put('2495');
+      const at2510 = put('2510');
+      const at2480 = put('2480');
+      put('');
+      localStorage.removeItem('ct-measure:TR-11');
+      return { found: true, at2495, at2510, at2480 };
+    });
+    check('a threshold inside the range warns (TR-11)',
+      tr11.found && tr11.at2495 === 'm-warn' && tr11.at2510 === 'm-out' && tr11.at2480 === 'm-in', tr11);
+  }
 
   // Wheel over a paragraph of text near the top of the page.
   await page.evaluate(() => window.scrollTo(0, 0));

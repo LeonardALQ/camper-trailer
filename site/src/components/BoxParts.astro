@@ -30,7 +30,7 @@ const label = (g: string) => LABEL[g] ?? g.replace(/_/g, ' ');
   <div class="data-table">
     <table data-sheet-sum="sum">
       <thead>
-        <tr><th>ID</th><th>Item</th><th>Group</th><th class="num">kg</th><th class="num">AUD</th><th>Basis</th><th class="num">Qty</th>
+        <tr><th>ID</th><th>Item</th><th>Group</th><th class="num">kg</th><th class="num">AUD</th><th>Basis</th><th class="num" data-sheet-sum="off">Qty</th>
           <th>Unit</th><th>Part number</th><th>Spec and notes</th><th>Source</th></tr>
       </thead>
       <tbody>

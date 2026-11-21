@@ -759,8 +759,10 @@ class Trailer:
                            ok=total <= lim["gcm_kg"] + 1e-6, governing="the ute with growth plus the trailer's plate (UTE-06)",
                            detail=(f"the ute with the bikes aboard ({tv['gcm_case']}, {tv['ute_kg_growth']:,.0f} kg with growth) plus the "
                                    f"{plate:,.0f} kg plate is {total:,.0f} kg. Without Lovells' revision, Toyota's {toyota:,.0f} kg needs the trailer "
-                                   f"plated at or below {plate_fb:,.0f} kg and at most {water_fb:.0f} L of water in travel, so {heavy['id']} with growth "
-                                   f"({heavy['growth']['mass_kg']:,.0f} kg at {lay.V['water_travel_l']:.0f} L) stays under that plate"),
+                                   f"plated at or below {plate_fb:,.0f} kg and at most {water_fb:.0f} L of water in travel: at {water_fb:.0f} L "
+                                   f"{heavy['id']} with growth weighs "
+                                   f"{heavy['growth']['mass_kg'] - (lay.V['water_travel_l'] - water_fb):,.0f} kg, under that plate, and at "
+                                   f"{lay.V['water_travel_l']:.0f} L it weighs {heavy['growth']['mass_kg']:,.0f} kg"),
                            gcm=dict(sum=total, ute_kg_growth=tv["ute_kg_growth"], plate=plate, toyota_kg=toyota, plate_without=plate_fb,
                                     water_without=water_fb, trailer_case=heavy["id"], trailer_kg_growth=heavy["growth"]["mass_kg"]))
             elif c.type in ("towball_ute", "towball_ute_input"):

@@ -70,7 +70,7 @@ params:
   roof_z: ceiling_z + frame_s       # roof skin underside
   top_z: roof_z + roof_t            # roof top above the floor at the side walls: 1,502 mm
   roof_fall: 50                     # the bows fall 1:50 from a crown on the centreline to each side wall (UGF-01)
-  roof_crown: half_width / roof_fall  # the crown stands 17.7 mm over the bows' ends, so the box is that much taller at the centre
+  roof_crown: half_width / roof_fall  # the crown stands 17.6 mm over the bows' ends, so the box is that much taller at the centre
   # posts along each side wall (X of each post's front face) and roof bows across
   post1_x: 560
   post2_x: 1200             # the kerb door's rear jamb, standing on the tub
@@ -208,7 +208,7 @@ items:
       - {id: K-front, at: [flare_x0, -outside_w / 2 - flare_out + skin_t, -floor_t], params: {dx: skin_t, dy: flare_out, dz: flare_z1 - skin_t + floor_t, normal: x}}
       - {id: K-rear, at: [flare_x1 - skin_t, -outside_w / 2 - flare_out + skin_t, -floor_t], params: {dx: skin_t, dy: flare_out, dz: flare_z1 - skin_t + floor_t, normal: x}}
   - {ref: B4, part: U-ROOF, group: body, label: "Roof skin, 1.6 mm",
-     at: [-front_t, -outside_w / 2, roof_z], params: {dx: outside_l, dy: outside_w, dz: roof_t, normal: z}}
+     at: [-front_t, -outside_w / 2, roof_z], params: {dx: outside_l, dy: outside_w, dz: roof_t, normal: z, crown: roof_crown}}
 
   # ---------------------------------------------------------------- frame, SHS 40 x 40 x 3 (`at` is each tube's low corner)
   - ref: B5
@@ -231,7 +231,7 @@ items:
       - {id: K-post-front, at: [-frame_s, -half_width - frame_s, frame_s], params: {dx: frame_s, dy: frame_s, dz: ceiling_z - frame_s}}
       - {id: R-post-rear, at: [x_end - frame_s, half_width, frame_s], params: {dx: frame_s, dy: frame_s, dz: ceiling_z - frame_s}}
       - {id: K-post-rear, at: [x_end - frame_s, -half_width - frame_s, frame_s], params: {dx: frame_s, dy: frame_s, dz: ceiling_z - frame_s}}
-      - {id: header, at: [x_end - frame_s, -half_width, ceiling_z], params: {dx: frame_s, dy: interior_width, dz: frame_s}}
+      - {id: header, at: [x_end - frame_s, -half_width, ceiling_z], params: {dx: frame_s, dy: interior_width, dz: frame_s, crown: roof_crown}}
       # side wall posts. The one at 1,200 mm is the kerb door's rear jamb and stands on the tub
       - {id: R-post-1, at: [post1_x, half_width, frame_s], params: {dx: frame_s, dy: frame_s, dz: ceiling_z - frame_s}}
       - {id: R-post-2, at: [post2_x, half_width, tub_top + frame_s], params: {dx: frame_s, dy: frame_s, dz: ceiling_z - tub_top - frame_s}}
@@ -249,14 +249,14 @@ items:
       - {id: F-bot, at: [-frame_s, -half_width, 0], params: {dx: frame_s, dy: interior_width, dz: frame_s}}
       - {id: F-winch-low, at: [-frame_s, -half_width, winch_z0 - 20], params: {dx: frame_s, dy: interior_width, dz: frame_s}}
       - {id: F-winch-high, at: [-frame_s, -half_width, winch_z0 + 140], params: {dx: frame_s, dy: interior_width, dz: frame_s}}
-      - {id: F-top, at: [-frame_s, -half_width, ceiling_z], params: {dx: frame_s, dy: interior_width, dz: frame_s}}
+      - {id: F-top, at: [-frame_s, -half_width, ceiling_z], params: {dx: frame_s, dy: interior_width, dz: frame_s, crown: roof_crown}}
   - ref: B6
     part: U-FRAME
     group: body
     label: Roof bow
     for: {x: bow_x}
     at: [x, -half_width, ceiling_z]
-    params: {dx: frame_s, dy: interior_width, dz: frame_s}
+    params: {dx: frame_s, dy: interior_width, dz: frame_s, crown: roof_crown}
 
   # ---------------------------------------------------------------- doors
   # Barn doors: two leaves inset in the rear portal, flush with its rear face, on continuous hinges in the gap at

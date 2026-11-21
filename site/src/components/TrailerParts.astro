@@ -50,7 +50,7 @@ const biggest = [...r.lines].sort((a: any, b: any) => b.price.aud - a.price.aud)
   <div class="data-table">
     <table data-sheet-sum="sum">
       <thead>
-        <tr><th>ID</th><th>Item</th><th>Group</th><th class="num">Qty</th><th>Unit</th><th class="num">kg</th>
+        <tr><th>ID</th><th>Item</th><th>Group</th><th class="num" data-sheet-sum="off">Qty</th><th>Unit</th><th class="num">kg</th>
           <th class="num">AUD</th><th class="num">Contingency AUD</th><th>Basis</th><th>Checked</th><th>Parts and notes</th><th>Source</th></tr>
       </thead>
       <tbody>

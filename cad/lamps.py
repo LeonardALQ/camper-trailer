@@ -154,7 +154,7 @@ def model_parts(lay, LM: dict) -> list[dict]:
         side = {"kerb": "kerb side", "road": "road side"}[d["side"]]
         if d["face"] == "side":
             s = -1 if d["side"] == "kerb" else 1
-            y0, y1 = sorted((s * (V["half_bw"] - DEPTH), s * V["half_bw"]))
+            y0, y1 = sorted((s * V["half_bw"], s * (V["half_bw"] + DEPTH)))     # proud of the skin, as the device stands
             box = (d["x0"], y0, d["z0"], d["x1"], y1, d["z1"])
         else:
             x = V["body_x1"] if d["face"] == "rear" else V["body_x0"] - DEPTH

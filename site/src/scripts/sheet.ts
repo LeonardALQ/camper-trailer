@@ -575,8 +575,11 @@ class Sheet {
   }
 
   refresh() {
-    const rows = this.target();
-    const picked = rows.filter((r) => this.sel.has(r)).length;
+    // rows marked data-sheet-nosum (loads aboard in some cases only) stay out of the footer unless they are selected
+    const all = this.target();
+    const picked = all.filter((r) => this.sel.has(r)).length;
+    const rows = picked ? all : all.filter((r) => !r.hasAttribute('data-sheet-nosum'));
+    const left = all.length - rows.length;
     const shown = this.shown().length;
     this.ui.count.textContent = picked
       ? `${picked} of ${shown} selected`
@@ -596,7 +599,9 @@ class Sheet {
         this.foot[c].textContent = v === null ? '' : this.format(c, v, this.stat);
       }
       const cog = this.stat === 'Sum' && this.sums.includes('cog') ? ', CoG weighted by mass' : '';
-      if (!this.numeric[0]) this.foot[0].textContent = `${this.stat} of ${picked ? `${picked} selected` : `${rows.length} rows`}${cog}`;
+      const why = this.table.dataset.sheetNosumWhy ?? 'aboard in some cases only';
+      const out = left ? `, ${left} left out, ${why}` : '';
+      if (!this.numeric[0]) this.foot[0].textContent = `${this.stat} of ${picked ? `${picked} selected` : `${rows.length} rows`}${out}${cog}`;
     }
     this.update3d();
   }

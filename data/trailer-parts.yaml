@@ -237,7 +237,7 @@ lines:
     name: NSW vehicle tax, private caravan, tare 2,501 to 2,790 kg, with the 40 % caravan discount, first year
     qty: 1
     unit: year
-    price: {aud: 516, basis: listing, url: "https://www.nsw.gov.au/topics/vehicle-registration/fees-concessions-forms/fees", date: 2026-11-20, note: "At the model's 2,581 kg tare. With the growth allowance the tare falls in the 2,791 to 3,050 kg band, AUD 586"}
+    price: {aud: 516, basis: listing, url: "https://www.nsw.gov.au/topics/vehicle-registration/fees-concessions-forms/fees", date: 2026-11-20, note: "The model's tare is in this band. With the growth allowance it falls in the 2,791 to 3,050 kg band, AUD 586"}
   - id: CMP-09
     group: compliance
     name: Number plate, standard

@@ -178,6 +178,8 @@ The model is the built ute (`build/ute/ute.json`) on the Elite kit, case UC2 wit
 | Box | Body at most 1,850 mm wide and rear tub flares at most 1,910 mm (H19), overhang at most 1,908 mm, unladen centre of gravity under 1,000 mm | 1,850 and 1,890, 1,555 and 781 mm |
 | Rear tyre to the box | 30 mm outside it, 40 mm inside it and 25 mm over it at full bump (Toyota BBGJ1007 p. 28) | 31, 40 and 25 mm on the Elite's 1,555 mm rear track |
 
+Toyota's body builder's guide BBGJ1007 (September 2017) sets the 20 % front axle share, the tyre clearances and the cab chassis' 700 mm centre of gravity that the model uses (UT-01). It is no longer online. Toyota's guide for trucks from January 2007, [LC70BBG](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf), is, and gives the same rules and 740 mm. At 740 mm the ute's stability factor would read about 0.86 in place of 0.89 (UTE-11, est.).
+
 On the Elite the rear axle keeps 214 kg in hand, and H20 retired the plan's 3,850 kg weighed target, which stood for the Platinum's rear axle margin. Each kg on the ball adds 1.41 kg to the rear axle, and each kg at the tray centre about 1.04 kg. Without the GCM revision, Toyota's 6,900 kg less the ute with growth leaves the trailer a 3,280 kg plate, and it tows with at most 203 L of water in place of 320 L, so the fully loaded trailer with growth stays under that plate (H20).
 
 Drive to: coolant 85 to 104 °C towing, oil 90 to 116 °C, EGT at most 700 °C, gearbox oil at most 110 °C sustained (est.), no full load below 1,600 rpm. Use fourth gear on long grades and low range for hill starts and reversing the trailer.

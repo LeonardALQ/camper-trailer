@@ -104,7 +104,7 @@ const drawings = ['CT-701', 'CT-702', 'CT-703', 'CT-704'];
 
 {kind === 'mass' && (
   <div class="data-table">
-    <table data-sheet-sum="sum">
+    <table data-sheet-sum="sum" data-sheet-nosum-why="aboard in some cases only">
       <thead><tr><th>Line</th><th>Item</th><th class="num">kg</th><th>Basis</th><th class="num">With growth</th><th>Source</th></tr></thead>
       <tbody>
         {groups.map((gr) => [
@@ -116,7 +116,7 @@ const drawings = ['CT-701', 'CT-702', 'CT-703', 'CT-704'];
         <tr class="row-total"><td></td><td>Box, empty</td><td class="num">{n(g.box_kg, 1)}</td><td></td>
           <td class="num">{n(g.box_kg_growth, 1)}</td><td>Report 17: 440 kg</td></tr>
         {r.lines.filter((x: any) => x.group === 'ute' || x.group === 'bikes' || x.id === 'U-TOOLS').map((x: any) => (
-          <tr><td>{x.id}</td><td>{x.item}</td><td class="num">{n(x.kg, 1)}</td><td>{x.maturity}</td><td class="num">{n(x.kg_growth, 1)}</td>
+          <tr data-sheet-nosum={x.cases.length === r.cases.length ? undefined : ''}><td>{x.id}</td><td>{x.item}</td><td class="num">{n(x.kg, 1)}</td><td>{x.maturity}</td><td class="num">{n(x.kg_growth, 1)}</td>
             <td>{x.cases.join(', ')}. {x.source}</td></tr>
         ))}
       </tbody>

@@ -23,7 +23,7 @@ Terms used throughout:
 
 ## Recommendation
 
-Buy a single cab built from 01/2017 to 08/2022. Lovells' 4,200 and 4,495 kg kits fit single cabs only from 01/2017, and earlier cars stop at 3,900 kg ([Lovells](https://lovells.com.au/wp-content/uploads/2025/04/Lovells_Toyota_79-Series_03-2007-08-2022.pdf)). The 3,900 kg kits' 2,360 kg rear axle is too small for this build (section 2.3). A 2022-on car also takes the kits but costs more. Prefer a GX or GXL. Both came on Toyota's 16 x 7 alloys with 265/70R16 tyres ([BBGJ1007](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf), [Drive](https://www.drive.com.au/news/2023-toyota-landcruiser-70-series-price-and-specs/)), so the planned wheel and tyre match their factory fit. The GXL adds front and rear diff locks (Drive). Report 14 covers the engine of this build range.
+Buy a single cab built from 01/2017 to 08/2022. Lovells' 4,200 and 4,495 kg kits fit single cabs only from 01/2017, and earlier cars stop at 3,900 kg ([Lovells](https://lovells.com.au/wp-content/uploads/2025/04/Lovells_Toyota_79-Series_03-2007-08-2022.pdf)). The 3,900 kg kits' 2,360 kg rear axle is too small for this build (section 2.3). A 2022-on car also takes the kits but costs more. Prefer a GX or GXL. Both came on Toyota's 16 x 7 alloys with 265/70R16 tyres (BBGJ1007, offline, see Toyota's [LC70BBG](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf), [Drive](https://www.drive.com.au/news/2023-toyota-landcruiser-70-series-price-and-specs/)), so the planned wheel and tyre match their factory fit. The GXL adds front and rear diff locks (Drive). Report 14 covers the engine of this build range.
 
 GVM: the Lovells 4,200 kg Platinum kit, TOYKIT080-GVM, with axle ratings of 1,650 kg front and 2,550 kg rear. Lovells' authorised fitter fits it, a NSW VSCCS certifier inspects it after registration, and the LSPV is reset. The planned build weighs about 3,753 kg, which leaves 447 kg under the GVM. The binding limit is the rear axle, with 121 kg in hand. It reaches 2,550 kg at about 3,870 kg in total. Hold the weighed ute to 3,850 kg with no more than 250 kg on the ball. The step up is Lovells' 4,495 kg Elite, which raises the rear axle to 2,850 kg and replaces the rear housing, axles and diff, at AUD 19,975 fitted.
 
@@ -74,7 +74,7 @@ Sources by row:
 - 2017 to 2022: Toyota's [June 2021 spec data](https://toyotamedia.b-cdn.net/files/2021/11/LC70_Spec_Data_Jun2021.pdf) and Toyota's 2017 [Body Builder's Guide BBGJ1007](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf) for the Australian VDJ79R-TJMRYQ3 (WorkMate) and TJMNYQ3 (GXL). Lovells confirms 3,400 kg and 6,900 kg "on single cab from 01/2017" ([Lovells Campbellfield](https://www.lovellscampbellfield.com.au/_files/ugd/a7ab81_cd324b9c9e354c4da0d3ab9103620a6d.pdf)).
 - 2022 on: [Drive, December 2022](https://www.drive.com.au/news/2023-toyota-landcruiser-70-series-price-and-specs/), the [Lovells J7 sheet](https://www.lovellscampbellfield.com.au/_files/ugd/a7ab81_eb6ad9c53f034149b69cc08e5072833e.pdf) and Toyota's [September 2023 spec sheet](https://brookshire.com.au/BrooksHire/media/Media/Spec%20Sheets/LandCruiser-70-Spec-Sheet.pdf).
 
-Kerb axle loads. Only Toyota's Body Builder's Guide gives them. For the 2017 single cab chassis it lists front 1,265 to 1,295 kg and rear 900 to 925 kg (WorkMate) or 910 to 935 kg (GXL), so about 58 % sits on the front axle. Toyota's own split at the 3,400 kg GVM is 1,470 kg front and 1,930 kg rear. The unsprung mass is 250 kg per axle ([BBGJ1007, section 4](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf)).
+Kerb axle loads. Only Toyota's Body Builder's Guide gives them. For the 2017 single cab chassis it lists front 1,265 to 1,295 kg and rear 900 to 925 kg (WorkMate) or 910 to 935 kg (GXL), so about 58 % sits on the front axle. Toyota's own split at the 3,400 kg GVM is 1,470 kg front and 1,930 kg rear. The unsprung mass is 250 kg per axle (BBGJ1007, section 4, offline, see Toyota's [LC70BBG](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf)).
 
 What the 2017 update changed: GVM up 100 kg, GCM up 100 kg, kerb mass up about 110 kg, the fuel tank down from 180 L to 130 L, and new gear ratios (second 2.464 to 2.294, fifth 0.881 to 0.750), from the 2014 and 2021 Toyota sheets. Report 14 covers the engine side of that update.
 
@@ -155,7 +155,7 @@ Every V8 79 has ventilated discs front and rear from 2007 ([Toyota 2011 brochure
 ### 3.1 What the GVM kit needs
 
 - The Lovells 4,200 kg kit lists no brake parts ([Powercurve](https://www.powercurve.com.au/lovells-gvm-upgrade-sunshine-coast/toyota-landcruiser-lc79-series-gvm/)), so Lovells rates it on the factory brakes. Lovells adds brake upgrades and a new booster only in the 4,495 kg Elite for 2017 to 2022 cars ([Unsealed 4x4](https://unsealed4x4.com.au/lovells-elite-series-79-series-gvm-upgrade/)).
-- The LSPV must be reset. Toyota says the brake system and piping must not be modified, and that the LSPV must be readjusted once a body or alteration is complete. The check uses Toyota's gauge set 09709-29018: at 5.9 MPa in the front circuit the rear should read 4.9 ± 0.5 MPa, and at 7.8 MPa it should read 5.4 ± 0.7 MPa, at Toyota's standard rear axle load ([BBGJ1007, section 2-5](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf)). A GVM kit changes the rear ride height and spring rate, so the valve must be reset after it is fitted. The Lovells fitter or a brake shop does this before the certifier's inspection.
+- The LSPV must be reset. Toyota says the brake system and piping must not be modified, and that the LSPV must be readjusted once a body or alteration is complete. The check uses Toyota's gauge set 09709-29018: at 5.9 MPa in the front circuit the rear should read 4.9 ± 0.5 MPa, and at 7.8 MPa it should read 5.4 ± 0.7 MPa, at Toyota's standard rear axle load (BBGJ1007, section 2-5, offline, see Toyota's [LC70BBG](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf)). A GVM kit changes the rear ride height and spring rate, so the valve must be reset after it is fitted. The Lovells fitter or a brake shop does this before the certifier's inspection.
 
 ### 3.2 Upgrades that keep the 16-inch wheel
 
@@ -185,7 +185,7 @@ The trailer carries its own electric brakes and Bosch TSC (report 06), so the ut
 
 ### 4.1 Factory wheels and the NSW rules
 
-- Factory sizes for the 2017 single cab: 225/95R16C as standard, with 7.50R16LT and 265/70R16LT as options. Placard pressures are 250 kPa front and 475 kPa rear, or 350 kPa rear for 265/70R16LT. The track is 1,515 mm front and 1,420 mm rear on the narrow tyres, and 1,555 and 1,460 mm on 265/70R16 ([BBGJ1007, section 4](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf)). Earlier cars ran 7.50R16 8-ply LT on steel wheels or 265/70R16 LT on alloys ([Toyota 2011 brochure](https://xr793.org/wp-content/uploads/2023/10/2011-Toyota-Land-Cruiser-70-Saver-AUS.pdf)).
+- Factory sizes for the 2017 single cab: 225/95R16C as standard, with 7.50R16LT and 265/70R16LT as options. Placard pressures are 250 kPa front and 475 kPa rear, or 350 kPa rear for 265/70R16LT. The track is 1,515 mm front and 1,420 mm rear on the narrow tyres, and 1,555 and 1,460 mm on 265/70R16 (BBGJ1007, section 4, offline, see Toyota's [LC70BBG](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf)). Earlier cars ran 7.50R16 8-ply LT on steel wheels or 265/70R16 LT on alloys ([Toyota 2011 brochure](https://xr793.org/wp-content/uploads/2023/10/2011-Toyota-Land-Cruiser-70-Saver-AUS.pdf)).
 - Toyota's alloy is 16 x 7, ET 0, on the 5 x 150 stud pattern ([genuine wheel listing](https://www.ebay.com.au/itm/155533183032)). Wheel nuts are M14 x 1.5 with a 21 mm hex, torqued to 209 Nm on steel wheels and 131 Nm on alloys ([70 Series Store](https://70seriesstore.com/blogs/information/recommended-79-series-wheel-nut-torque)).
 - The factory tyres must go with the GVM kit. Lovells gives the factory load index as 115 and needs 117 and speed M (130 km/h) for 4,200 kg ([Lovells Campbellfield](https://www.lovellscampbellfield.com.au/_files/ugd/a7ab81_cd324b9c9e354c4da0d3ab9103620a6d.pdf), [Powercurve](https://www.powercurve.com.au/lovells-gvm-upgrade-sunshine-coast/toyota-landcruiser-lc79-series-gvm/)).
 - NSW needs certification if the tyre diameter grows more than 7 % over the largest size on the placard or the speedometer is affected, if the rim or tyre is more than 25.4 mm wider than the largest factory size, or if the load rating falls below the placard ([VSI 06, items 15 to 17](https://www.nsw.gov.au/sites/default/files/noindex/2026-03/vsi-06-light-vehicle-modification-july-2026.pdf)). Track may grow at most 50 mm beyond the factory maximum on an NA or NB vehicle, every wheel on an axle must match, and spacers are banned ([VSI 09](https://www.nsw.gov.au/sites/default/files/2021-02/RMS-Guideline-for-alternative-wheels-and-tyres-Vehicle-Standards-Information-No-9-November-2003.pdf)).
@@ -235,7 +235,7 @@ Spares. One wheel and tyre now serves both vehicles, so two spares cover the com
 
 ### 5.2 Coupling height
 
-No published receiver or ball height was found for the 79, laden or unladen. VSB1 asks for a towball height of 350 to 460 mm with the vehicle fully loaded (report 08). Estimate: the 250 kg download alone lowers the ball about 20 to 30 mm. That figure uses Toyota's factory spring rates, 42.2 N/mm per front coil and 47.9 to 104.2 N/mm per rear leaf pack ([BBGJ1007, section 4](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf)), and the kit's springs are stiffer. The box and bikes lower it further.
+No published receiver or ball height was found for the 79, laden or unladen. VSB1 asks for a towball height of 350 to 460 mm with the vehicle fully loaded (report 08). Estimate: the 250 kg download alone lowers the ball about 20 to 30 mm. That figure uses Toyota's factory spring rates, 42.2 N/mm per front coil and 47.9 to 104.2 N/mm per rear leaf pack (BBGJ1007, section 4, offline, see Toyota's [LC70BBG](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf)), and the kit's springs are stiffer. The box and bikes lower it further.
 
 Assumption until the ute is measured: set the tongue drop so the coupling point sits at 450 mm, plus or minus 20 mm, with the ute fully laden and the trailer level. That is report 08's target, inside VSB1's window. Measure the receiver pin height unladen, laden without the trailer, and laden with the trailer coupled.
 
@@ -246,7 +246,7 @@ Assumption until the ute is measured: set the tongue drop so the coupling point 
 
 ### 5.4 Charging feed to the trailer battery
 
-- The ute is 12 V: a 12 V, 64 Ah battery and a 1,560 W alternator ([BBGJ1007, section 4](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf)). That is about 110 A at 14 V (my arithmetic).
+- The ute is 12 V: a 12 V, 64 Ah battery and a 1,560 W alternator (BBGJ1007, section 4, offline, see Toyota's [LC70BBG](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf)). That is about 110 A at 14 V (my arithmetic).
 - The trailer charges its 24 V battery through one Victron Orion-Tr Smart 12/24-15, which draws about 35 A from the ute (report 13). Run 6 B&S (13.5 mm²) twin cable from the ute's battery to an Anderson SB50 at the towbar, with a 50 A fuse at the battery. Toyota sizes a fuse at about 1.4 times the load, which gives 49 A.
 - Voltage drop: about 13 m of cable there and back (estimate) at 35 A drops about 0.6 V (my arithmetic, copper at 0.0172 ohm mm²/m). The Orion accepts 8 to 17 V (report 13), so it works.
 - A second Orion would draw 70 A, more than half of the alternator, and need 2 B&S (33.6 mm²) cable to keep the drop near 0.5 V. Keep one unless report 15 fits a larger alternator.
@@ -256,7 +256,7 @@ Assumption until the ute is measured: set the tongue drop so the coupling point 
 
 ### 6.1 Dimensions of the 2017 single cab chassis
 
-From Toyota's Body Builder's Guide for the Australian VDJ79R-TJMRYQ3 and TJMNYQ3, its cab-and-chassis drawing and its frame drawing ([BBGJ1007, sections 3 and 4](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf)), unless the row says otherwise.
+From Toyota's Body Builder's Guide for the Australian VDJ79R-TJMRYQ3 and TJMNYQ3, its cab-and-chassis drawing and its frame drawing (BBGJ1007, sections 3 and 4, offline, see Toyota's [LC70BBG](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf)), unless the row says otherwise.
 
 | Dimension | Value | Note |
 |---|---|---|
@@ -288,7 +288,7 @@ Tray sizes: no maker's tray data was captured in this research. A forum post say
 ### 6.2 Limits for the tray and the bike box
 
 - Rear overhang: no more than 60 % of the wheelbase or 3.7 m, whichever is less, including any equipment ([ADR 43/04, clause 6.1.2.1](https://www.legislation.gov.au/F2006L01430/2025-01-30/2025-01-30/text/original/pdf)). For the 79 that is 1,908 mm behind the rear axle (my arithmetic). Toyota's guide also limits the rear overhang by body type, but its figures sit in a drawing that did not extract, so ADR 43's figure is used. A box starting 50 mm behind the cab could be up to 2,978 mm long within it (1,120 less 50, plus 1,908), before the axle loads in section 2.3 and the departure angle are counted.
-- Width: no more than 2,500 mm for an NA or NB1 vehicle (ADR 43/04, clause 6.1.5.1). Toyota is stricter: a mounted part may stand at most 60 mm beyond the outermost point of the cab, mirrors excluded ([BBGJ1007, section 1-2](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf)). Assumption: the cab is 1,790 mm wide, the WorkMate's overall width, so the box may be up to 1,850 mm wide.
+- Width: no more than 2,500 mm for an NA or NB1 vehicle (ADR 43/04, clause 6.1.5.1). Toyota is stricter: a mounted part may stand at most 60 mm beyond the outermost point of the cab, mirrors excluded (BBGJ1007, section 1-2, offline, see Toyota's [LC70BBG](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf)). Assumption: the cab is 1,790 mm wide, the WorkMate's overall width, so the box may be up to 1,850 mm wide.
 - Centre of gravity: after body building, the unladen vehicle's centre of gravity must stay under 1,000 mm, against 700 mm for the cab chassis. Mount heavy parts near the centre of gravity (BBGJ1007, section 1-2).
 - Front axle share: Toyota sets a minimum share of the loaded weight on the front axle. The extracted figure reads 20 %, so that is the assumption. The planned build has 35 %.
 - Balance: no difference in weight between the left and right wheels, no local load concentration on the frame, and all wheels on one plane without twisting the frame (BBGJ1007, section 1-2).
@@ -298,7 +298,7 @@ Tray sizes: no maker's tray data was captured in this research. A forum post say
 
 ### 6.3 Toyota's mounting rules
 
-All from [BBGJ1007](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf) unless noted.
+All from BBGJ1007, offline, see Toyota's [LC70BBG](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf) unless noted.
 
 - The frame must not be modified. A conversion uses the frame's standard deck mounts, at the stations in section 6.1 (section 2-2). So the box does not drill or weld the rails or their flanges.
 - The front axle, steering and brake parts must not be welded, reinforced, machined or heated (section 1-3).

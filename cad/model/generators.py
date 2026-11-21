@@ -43,8 +43,14 @@ def gen_box(prm, at, P):
 def gen_panel(prm, at, P):
     dx, dy, dz = prm["dx"], prm["dy"], prm["dz"]
     x0, y0, z0 = at
-    s = box(x0, y0, z0, dx, dy, dz)
     normal = prm.get("normal", "x")
+    if prm.get("crown") and normal == "z":
+        # a sheet across the box crowned to its centre line: it rises `crown` there and falls to both edges
+        c = prm["crown"]
+        s = prism_yz([(y0, z0), (y0 + dy / 2, z0 + c), (y0 + dy, z0), (y0 + dy, z0 + dz), (y0 + dy / 2, z0 + c + dz), (y0, z0 + dz)],
+                     x0, x0 + dx)
+    else:
+        s = box(x0, y0, z0, dx, dy, dz)
     t = {"x": dx, "y": dy, "z": dz}[normal]
     area = dx * dy * dz / t
     for u0, v0, w, h in prm.get("cutouts", []):
@@ -365,7 +371,12 @@ def gen_tube(prm, at, P):
         inner = box(x + t, y - 1, z + t, dx - 2 * t, dy + 2, dz - 2 * t)
     else:
         inner = box(x + t, y + t, z - 1, dx - 2 * t, dy - 2 * t, dz + 2)
-    return s - inner, {"length_m": L / 1000}
+    s = s - inner
+    if prm.get("crown") and L == dy:
+        # a roof bow across the box: its top rises `crown` to the centre line and falls to both ends (the bike box's 1:50)
+        c = prm["crown"]
+        s = s + prism_yz([(y, z + dz), (y + dy / 2, z + dz + c), (y + dy, z + dz)], x, x + dx)
+    return s, {"length_m": L / 1000}
 
 
 def gen_tyre_sweep(prm, at, P):

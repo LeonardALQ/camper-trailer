@@ -1285,7 +1285,7 @@ items:
       - {item: "Splash cover", aud: 25, basis: estimate, date: 2026-11-21}
     point: [rear_x0 + part_t + 60, -half_in + 260, floor_z + 900]
     mass: {basis: declared, total_kg: 4.2, maturity: estimate, source: "As LA-12's extinguisher, 4.0 kg with its bracket, and a 0.2 kg cover (est.)"}
-    note: "One by each outside door, so the wet room is covered whether or not it counts as a second compartment (VSB1 13.2.2), and two 2 kg units suit the 25.6 kWh lithium battery and the diesel heater better than one 1 kg unit. Fire extinguisher, not water, on the battery box"
+    note: "One by each outside door, so the wet room is covered whether or not it counts as a second compartment (VSB1 13.2.2), and two 2 kg units suit the diesel heater and small fires better than one 1 kg unit. Battery fire rule: a 2 kg dry powder unit will not stop a lithium module in thermal runaway, so if the battery box smokes or burns, open the 300 A isolator, get everyone out and call 000. Use the extinguishers only on a fire that has not reached the box"
   - id: LA-15
     name: Carbon monoxide alarm between the tower and the bed, a GPS tracker and door sensors on the Cerbo GX
     system: living

@@ -256,13 +256,13 @@ class Chassis:
             sec = self.sections[own] if own else rs[role]
             xc = self.station_x(st)
             z = V["rail_underside_z"] + sec.d / 2 if role in ("cm_xt", "cm_end") else V["raiser_top_z"] - sec.d / 2
-            name = f"Crossmember, {st['id']}" if not st.get("generated") else f"Crossmember at X {st['x']:.0f}"
+            name = f"Crossmember, {st['id']}" if not st.get("generated") else f"Crossmember at X {st['x']:,.0f}"
             add(Member(f"CM-{k:02d}", role, name, sec, (xc, -y_in, z), (xc, y_in, z), depth_dir=(0, 0, 1), station=st["id"],
                        note=self.role_name[role]))
             osec = rs["outrigger"]
             zo = V["raiser_top_z"] - osec.d / 2
             for s in (-1, 1):
-                add(Member(f"OR-{k:02d}{SIDES[s]}", "outrigger", f"Outrigger at X {st['x']:.0f}, {SIDE_WORDS[s]}", osec,
+                add(Member(f"OR-{k:02d}{SIDES[s]}", "outrigger", f"Outrigger at X {st['x']:,.0f}, {SIDE_WORDS[s]}", osec,
                            (xc, s * V["outrigger_root_y"], zo), (xc, s * V["outrigger_tip_y"], zo), station=st["id"], side=s))
         dsec = rs["drawbar"]
         for s in (-1, 1):

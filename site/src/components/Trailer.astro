@@ -164,11 +164,11 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
 
 {kind === 'schedule' && (
   <div class="data-table">
-    <table>
+    <table data-sheet-nosum-why="the loads, aboard in some cases only, so the sum is the tare (TC1)">
       <thead><tr><th>Line</th><th>Item</th><th>Group</th><th class="num" data-sheet-mass>kg</th><th>Maturity</th><th class="num" data-sheet-sum="off">Growth</th><th class="num" data-sheet-sum="cog">CoG X</th><th class="num" data-sheet-sum="cog">CoG Y</th><th class="num" data-sheet-sum="cog">CoG Z</th><th>Aboard in</th><th>Source</th></tr></thead>
       <tbody>
         {r.schedule.map((s: any) => (
-          <tr>
+          <tr data-sheet-nosum={s.cases.length === r.cases.length ? undefined : ''}>
             <td>{s.iid}</td><td>{s.item}{s.note && s.note.includes('PLACEHOLDER') ? ' (placeholder)' : ''}</td><td>{s.group}</td>
             <td class="num">{n(s.mass_kg, 1)}</td><td>{s.maturity}</td><td class="num">{s.growth_pct} %</td>
             <td class="num">{n(s.cog?.[0])}</td><td class="num">{n(s.cog?.[1])}</td><td class="num">{n(s.cog?.[2])}</td>
