@@ -114,7 +114,7 @@ Research report 19's load calculation gives a design hot day of 37.1 kWh of heat
 - Autonomy (H3): the design hot day, all electric with the air-conditioning, two showers, cooking, a wash and dry, desk work and Starlink, takes 19.6 kWh. With 90 % usable, the battery alone runs it for 25.1 h when new and 17.2 h at end of life. The cold night takes 4.7 kWh on diesel heat or 11.2 kWh on the heat pump.
 - Shedding: the shower heater drops out first when the hob or the oven runs, and the shower stays warm on boiler water. The Combi element, washer and dryer follow. The split never sheds. The worst managed load is 89 % of the inverter's 40 °C rating.
 - Fire: a 2 kg ABE extinguisher stands by each outside door, D1 and D2, with a fire blanket at D1, a smoke alarm and a CO alarm (VSB1 13.2.2). Two 2 kg units suit the 25.6 kWh lithium battery and the diesel heater better than one 1 kg unit, and they cover the wet room whether or not it counts as a second compartment.
-- Lamps: the ute drives them at 12 V through the 12-pin plug. The rear lamps and red triangles sit on the rear outriggers, three amber side markers go on each side, and end-outline lamps sit high at both ends. The plate sits on the rear wall's kerb half, its top at 1,224 mm. All 22 checks to ADR 13/00 and VSB1 3.1 pass (CT-003, CT-011).
+- Lamps: the ute drives them at 12 V through the 12-pin plug. The rear lamps and red triangles sit on the rear outriggers, three amber side markers go on each side, and end-outline lamps sit high at both ends. The plate sits on the rear wall's kerb half, its top at 1,224 mm. All 24 checks to ADR 13/00 and VSB1 3.1 pass, the outdoor unit's cradle stays included (CT-003, CT-011).
 
 ## Plumbing and water
 

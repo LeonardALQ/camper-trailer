@@ -36,6 +36,7 @@ RULES = {
 REFLECTORS = {"rear_reflector", "front_reflector", "side_reflector"}
 INWARD_DEG = {"front_position": 5.0, "front_reflector": 10.0}  # the inward view a trailer needs (6.9.5, 6.16.5)
 END_OUTLINE_UP_DEG = 5.0                                       # 6.13.5
+UP_DEG = 15.0                                                  # 6.7.5 and 6.10.5: stop and rear position lamps seen 15 degrees up
 SIDE_FRONT_MAX, SIDE_GAP_MAX, SIDE_REAR_MAX = 3000.0, 3000.0, 1000.0  # 6.17.4.1 and 6.18.4.1, with the drawbar
 
 
@@ -216,10 +217,23 @@ def _more(chk, data, I, V, ch, lay, body, face, ow, floor_under):
     walls.append(dict(face="rear", y0=p["y0"], y1=p["y1"], z0=p["z0"], z1=p["z1"], kind="plate"))
     keep = [(o["wall"], (o["u0"], o["u1"], o["z0"] + fz, o["z1"] + fz), o["id"]) for o in body["openings"]]
     keep.append(("rear", (cr[1], cr[4], cr[2], cr[5]), "AC-03"))
+    stays = [(b.box[1], b.box[4], b.box[2], b.box[5], b.box[3] - V["body_x1"]) for b in lay.blocks if b.id == "AC-04" and b.box is not None]
+    keep += [("rear", s[:4], "AC-04") for s in stays]
     tight = min((_gap((w_["y0"], w_["y1"], w_["z0"], w_["z1"]), r), w_["kind"], k) for w_ in walls for f_, r, k in keep
                 if f_ == w_["face"])
-    _add(chk, "Wall-mounted devices clear of the openings and the cradle", "BDY-18",
+    _add(chk, "Wall-mounted devices clear of the openings, the cradle and its stays", "BDY-18",
          f"tightest {tight[0]:,.0f}, {tight[1]} to {tight[2]}", f"at least {data['clearance_mm']}", tight[0] - data["clearance_mm"])
+    if stays:
+        door = next(o for o in body["openings"] if o["id"] == "OP-15")
+        g_door = min(_gap(s[:4], (door["u0"], door["u1"], door["z0"] + fz, door["z1"] + fz)) for s in stays)
+        _add(chk, "Cradle stays clear of the rear door", "BD-15", f"{g_door:,.0f} to its cut-out, the door swings away from them",
+             f"at least {data['clearance_mm']}", g_door - data["clearance_mm"])
+        low = [(i, s) for i in I for s in stays if i["face"] == "rear" and i["y1"] > s[0] and i["y0"] < s[1] and i["z1"] <= s[2]]
+        if low:
+            up = math.radians(UP_DEG)
+            m, i, s = min(((s[2] - i["z1"]) - max(0.0, s[4] - DEPTH) * math.tan(up), i, s) for i, s in low)
+            _add(chk, "Rear lamps seen upward past the cradle stays", "6.7.5, 6.10.5",
+                 f"{i['id']} {s[2] - i['z1']:,.0f} below a stay, the {UP_DEG:.0f} degree view up clears it by {m:,.0f}", "clear", m)
     low = [i for i in I if i["face"] in ("front", "rear") and i["z1"] <= floor_under + 1e-6]
     fit = min(min(abs(i["y0"] if i["side"] == "road" else i["y1"]) - face["y0"], face["y1"] - abs(i["y1"] if i["side"] == "road" else i["y0"]),
                   i["z0"] - face["z0"], face["z1"] - i["z1"]) for i in low)

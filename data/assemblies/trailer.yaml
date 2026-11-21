@@ -1056,9 +1056,9 @@ items:
     system: hvac
     price: {aud: 150, basis: estimate, date: 2026-11-21, note: "3 m of RHS 40 x 20 x 3, two angle feet and brackets, made with the small fabrications (LAB-05)"}
     for: {k: [0, 1]}
-    point: [body_x1 + 20, "half_bw - 780 + k * 630", floor_z + 700]
+    box: [body_x1, "half_bw - 790 + k * 630", floor_underside_z, 40, 20, ceiling_z - 610 - floor_underside_z]
     mass: {basis: declared, unit_kg: 1.5, maturity: estimate, source: "1.45 m at 0.875 kg/m plus a foot and bolts (est.)"}
-    note: "At Y 420 and 1,050 mm they pass clear of the rear door, the rinse box and the end-outline lamp under the cradle, and their feet sit on the crossmember above the rear lamps. They carry the unit's weight at 3 g into the chassis (BDY-21)"
+    note: "Each stands 40 mm off the rear wall at Y 420 and 1,050 mm, from the cradle down to the floor's underside, where angle feet bolt to the rear crossmember and the road-side rear outrigger above the rear lamps. The lamp checks keep the rear door, the lamps and the plate clear of them (CT-003, CT-011). They carry the unit's weight at 3 g into the chassis (BDY-21)"
   - id: VE-01A
     name: Fresh air with heat recovery, LUNOS e2 60 fan A (pair 1), high in the kerb wall over the dryer, in the locker
     material: "Fan with a ceramic regenerator in a 200 mm sleeve, MERV 13 inner cover, stainless outer hood"

@@ -97,7 +97,8 @@ loads:
 # 0.5 g sideways, all at once.
 cradle:
   lines: [AC-02, AC-03]
-  bolts: 4                       # M8 through-bolts, two rows of two, on 80 x 80 x 3 aluminium pads in the rear wall's HD PVC insert strip
+  bolts: 4                       # two rows of two through the rear wall's HD PVC insert strip
+  bolt: "M8 stainless through-bolt on an 80 x 80 x 3 aluminium backing pad"
   row_lever_mm: 520              # top bolt row to the cradle's bottom bearing pad on the wall (est.)
   column_spacing_mm: 700         # between the two bolt columns, across the trailer (est.)
   pad_side_mm: 80                # backing pad side, for the pull-through (the mounts' spreader rule, skin 60 MPa, insert 6 MPa)
