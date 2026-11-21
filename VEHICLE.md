@@ -4,7 +4,7 @@ Revised 20 Nov 2026 (research report 23 and that day's decisions) and 21 Nov 202
 
 ## Summary
 
-The truck is a used Toyota LandCruiser VDJ79 single cab V8 diesel, built 01/2017 to 08/2022, a GXL by preference, with about 400,000 km. Each of its seven stages, over a year or more, leaves it registered and drivable. It ends at power level B, about 230 to 250 kW and 850 Nm at the crank and never below 224 kW (300 hp). It carries both bikes in the box on the Lovells 4,495 kg Elite GVM kit, plated at a 4,450 kg GVM and a 2,800 kg rear axle for its shared 1,400 kg wheels (H17, H18), and tows the trailer, plated at 3,500 kg, under Lovells' 7,400 kg GCM revision (H2). The required work is AUD 91,547, or AUD 95,602 with the AUD 4,055 contingency allowance: AUD 20,602 over Leonard's AUD 75,000 planning figure, AUD 16,547 without the allowance. The five cuts that reuse old parts once they pass their tests (CUT1 to CUT6) save AUD 13,979, not enough alone. CUT7 returns to the 4,200 kg Platinum kit (AUD 12,855) only if the S3 weighing leaves at least 30 kg under its 2,550 kg rear axle at the trailer's weighed towball. The fewest cuts that close the gap, CUT1, CUT4 and CUT7 (the injectors, the oil pump and the Platinum, AUD 21,211), give AUD 74,391, AUD 609 under. CUT1 and CUT7 alone fall AUD 91 short, and all six cuts give AUD 68,768, AUD 6,232 under. Estimates are 49 % of the required total. The truck (Leonard's AUD 50,000 planning figure), the bike box (AUD 52,025 shop-built or AUD 27,002 owner-built, `data/ute/box-parts.yaml`), the trailer and Leonard's labour are outside these figures.
+The truck is a used Toyota LandCruiser VDJ79 single cab V8 diesel, built 01/2017 to 08/2022, a GXL by preference, with about 400,000 km. Each of its seven stages, over a year or more, leaves it registered and drivable. It ends at power level B, about 230 to 250 kW and 850 Nm at the crank and never below 224 kW (300 hp). It carries both bikes in the box on the Lovells 4,495 kg Elite GVM kit, plated at a 4,450 kg GVM and a 2,800 kg rear axle for its shared 1,400 kg wheels (H17, H18), and tows the trailer, plated at 3,500 kg, under Lovells' 7,400 kg GCM revision (H2). The required work is AUD 91,547, or AUD 95,602 with the AUD 4,055 contingency allowance: AUD 20,602 over Leonard's AUD 75,000 planning figure, AUD 16,547 without the allowance. The five cuts that reuse old parts once they pass their tests (CUT1 to CUT6) save AUD 13,979, not enough alone. CUT7 returns to the 4,200 kg Platinum kit (AUD 12,855) only if the S3 weighing leaves at least 30 kg under its 2,550 kg rear axle at the trailer's weighed towball. The fewest cuts that close the gap, CUT1, CUT4 and CUT7 (the injectors, the oil pump and the Platinum, AUD 21,211), give AUD 74,391, AUD 609 under. CUT1 and CUT7 alone fall AUD 91 short, and all six cuts give AUD 68,768, AUD 6,232 under. Estimates are 49 % of the required total. The truck (Leonard's AUD 50,000 planning figure), the bike box (AUD 52,058 shop-built or AUD 27,035 owner-built, `data/ute/box-parts.yaml`), the trailer and Leonard's labour are outside these figures.
 
 ## Stage plan
 
@@ -73,7 +73,7 @@ Goal: confirm the GVM kit on weighed figures.
 - Build and weigh the box walls, roof and doors (box budget). Take the floor and subframe masses from the design.
 - Add up the rear axle on the weighed figures: VEH-19, bar and winch, two people, box, bikes, tools, spare, towbar, the full 180 L tank and the trailer's weighed towball.
 - The plan buys the Lovells 4,495 kg Elite (GV05, decision H17), plated at a 4,450 kg GVM and a 2,800 kg rear axle, twice the ROH wheel's 1,400 kg (decision H18). Return to the 4,200 kg Platinum (cut CUT7, saves AUD 12,855) only if the sum leaves at least 30 kg under its 2,550 kg rear axle at the trailer's weighed towball.
-- On the model the trailer's heaviest towball is 317 kg with growth (292 kg on base masses). The Platinum's rear axle would then carry about 2,465 kg on base masses, 85 kg under 2,550 kg, but about 2,590 kg with growth, 40 kg over, so the cut rests on the weighing. The Elite's 2,800 kg plate keeps 199 kg in hand with growth.
+- On the model the trailer's heaviest towball is 317 kg with growth (292 kg on base masses). The Platinum's rear axle would then carry about 2,495 kg on base masses, 55 kg under 2,550 kg, but about 2,626 kg with growth, 76 kg over, so the cut rests on the weighing. The Elite's 2,800 kg plate keeps 162 kg in hand with growth.
 - Settle the front bushes from the kit's contents and front lift (SS05). The Elite brings its own front and rear brakes, booster and handbrake kit, so BR01 to BR04 are gone.
 - Done when the kit is ordered.
 
@@ -161,26 +161,26 @@ The allowance is EN21, EN22, EN23 and TL06 in full (AUD 1,700) plus 15 % of repo
 
 ## Limits to build and drive to
 
-The model is the built ute (`build/ute/ute.json`) on the Elite kit, case UC2 with growth: two people, both bikes, the 437 kg box, tools and the trailer's tie-down kit, one spare, bar and winch, the trailer charging, the full 180 L tank and the Elite's extra 10 kg (est.), 3,635 kg with 1,480 kg front and 2,155 kg rear. The towing cases add the trailer's heaviest towball with growth, 317 kg (TC2, decision H17), which the trailer's MAS-03B and a test keep in step with the trailer.
+The model is the built ute (`build/ute/ute.json`) on the Elite kit, case UC2 with growth: two people, both bikes, the 437 kg box, tools and the trailer's tie-down straps and ground anchors, one spare, bar and winch, the trailer charging, the full 180 L tank and the Elite's extra 10 kg (est.), 3,667 kg with 1,475 kg front and 2,192 kg rear. The towing cases add the trailer's heaviest towball with growth, 317 kg (TC2, decision H17), which the trailer's MAS-03B and a test keep in step with the trailer.
 
 | Limit | Value | Model with growth |
 |---|---|---|
-| Ute, laden, ball load included | At most 4,450 kg (the Elite as plated, H18) | 3,952 kg |
-| Front axle | At most 1,650 kg | 1,480 kg, no trailer |
-| Rear axle | At most 2,800 kg (the Elite plated at twice the ROH wheel's 1,400 kg, H18), or 2,550 kg if CUT7 returns to the Platinum | 2,601 kg, 199 kg in hand |
+| Ute, laden, ball load included | At most 4,450 kg (the Elite as plated, H18) | 3,984 kg |
+| Front axle | At most 1,650 kg | 1,475 kg, no trailer |
+| Rear axle | At most 2,800 kg (the Elite plated at twice the ROH wheel's 1,400 kg, H18), or 2,550 kg if CUT7 returns to the Platinum | 2,638 kg, 162 kg in hand |
 | Ball load | At most 350 kg (towbar). H17's design range: at least 8.0 % of the trailer and at most 320 kg with growth | 317 kg (292 kg on base masses) |
-| Ute plus trailer | At most 7,400 kg with GV06, 6,900 kg without | 7,135 kg, the ute plus the trailer's 3,500 kg plate (H20) |
-| Trailer | At most 3,500 kg | 3,397 kg fully loaded, against its 3,400 kg design limit |
-| Front axle share | At least 20 % (Toyota BBGJ1007) | 34.2 %, towing |
+| Ute plus trailer | At most 7,400 kg with GV06, 6,900 kg without | 7,167 kg, the ute plus the trailer's 3,500 kg plate (H20) |
+| Trailer | At most 3,500 kg | 3,398 kg fully loaded, against its 3,400 kg design limit |
+| Front axle share | At least 20 % (Toyota BBGJ1007) | 33.8 %, towing |
 | Coupling point, laden | 440 mm plus or minus 20 mm (VSB1: 350 to 460 mm) | 440 mm |
-| Rear wheel | At most 1,400 kg (ROH), which sets the 2,800 kg plate | 1,293 kg towing, 107 kg in hand |
+| Rear wheel | At most 1,400 kg (ROH), which sets the 2,800 kg plate | 1,319 kg towing, 81 kg in hand |
 | Tyres | Load index 121 and speed M or better on the Elite (research report 26, est.) | 123/120 R |
 | Box | Body at most 1,850 mm wide and rear tub flares at most 1,910 mm (H19), overhang at most 1,908 mm, unladen centre of gravity under 1,000 mm | 1,850 and 1,890, 1,555 and 781 mm |
 | Rear tyre to the box | 30 mm outside it, 40 mm inside it and 25 mm over it at full bump (Toyota BBGJ1007 p. 28) | 31, 40 and 25 mm on the Elite's 1,555 mm rear track |
 
 Toyota's body builder's guide BBGJ1007 (September 2017) sets the 20 % front axle share, the tyre clearances and the cab chassis' 700 mm centre of gravity that the model uses (UT-01). It is no longer online. Toyota's guide for trucks from January 2007, [LC70BBG](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf), is, and gives the same rules and 740 mm. At 740 mm the ute's stability factor would read about 0.86 in place of 0.89 (UTE-11, est.).
 
-On the Elite the rear axle keeps 199 kg in hand, and H20 retired the plan's 3,850 kg weighed target, which stood for the Platinum's rear axle margin. Each kg on the ball adds 1.41 kg to the rear axle, and each kg at the tray centre about 1.04 kg. Without the GCM revision, Toyota's 6,900 kg less the ute with growth leaves the trailer a 3,264 kg plate, and it tows with at most 172 L of water in place of 305 L, so the fully loaded trailer with growth stays under that plate (H20).
+On the Elite the rear axle keeps 162 kg in hand, and H20 retired the plan's 3,850 kg weighed target, which stood for the Platinum's rear axle margin. Each kg on the ball adds 1.41 kg to the rear axle, and each kg at the tray centre about 1.04 kg. Without the GCM revision, Toyota's 6,900 kg less the ute with growth leaves the trailer a 3,232 kg plate, and it tows with at most 134 L of water in place of 300 L, so the fully loaded trailer with growth stays under that plate (H20).
 
 Drive to: coolant 85 to 104 °C towing, oil 90 to 116 °C, EGT at most 700 °C, gearbox oil at most 110 °C sustained (est.), no full load below 1,600 rpm. Use fourth gear on long grades and low range for hill starts and reversing the trailer.
 
@@ -190,7 +190,7 @@ NSW registration, Victoria as the fallback. Items are from TfNSW's [VSI 06 Rev 4
 
 GVM kit, GCM revision, box and winch (S4). Item 51 lists re-rating the GVM or the GCM as certifiable. Lovells rates the 4,200 kg kit at 7,400 kg GCM with 3,500 kg braked towing ([Lovells sheet, Oct 2026 ratings](https://www.lovellscampbellfield.com.au/_files/ugd/a7ab81_cd324b9c9e354c4da0d3ab9103620a6d.pdf)), and the 4,495 kg Elite at the same 7,400 kg GCM (report 16). The certifier plates the Elite at a 4,450 kg GVM and a 2,800 kg rear axle, twice the ROH Trak 2's 1,400 kg rating (assumption, decision H18). Lovells publishes a derate only for its 4,200 kg kit, so its written yes comes in S0, before GV05 is bought, and if it is refused Toyota's 16 x 7 ET 0 alloy, the wheel Lovells rates its kits on, goes on all ten wheels (WT04). Lovells' conditions for the 4,200 kg kit are tyres of load index 117 and speed M or better (research report 26 puts the Elite at about 121 and M, which the 123/120 R tyres pass), a Lovells authorised fitter and a Lovells-endorsed signatory ([Powercurve](https://www.powercurve.com.au/lovells-gvm-upgrade-sunshine-coast/toyota-landcruiser-lc79-series-gvm/)). The plan adds a towbar rated 3,500 kg and 350 kg. Braked towing means the trailer's own brakes on every wheel with a breakaway system (VSB1, above 2,000 kg ATM), driven by the REDARC controller. The revision is assumed to add AUD 1,750 (est.), the midpoint of the AUD 1,000 to 2,500 that [70 Series Store](https://70seriesstore.com/blogs/information/what-is-the-79-series-towing-gcm) gives for post-registration GCM engineering. The certificate also covers the ride height (item 13), the box (items 27 and 34, 1,890 mm over its rear tub flares, inside Toyota's 60 mm beyond the cab on each side, decision H19), the winch as a possible powered loading device (item 35) and the 180 L tank (item 50).
 
-If NSW refuses the GCM revision: Lovells warns it may not be available after registration in every state. Victoria needs a [VASS certificate](https://transport.vic.gov.au/registration-and-licensing/registration/standard-and-non-standard-vehicle-information/modified-and-non-standard-vehicles/vass-approval-certificate) to change the GVM and is stricter about post-registration GCM upgrades (70 Series Store), so assume Victoria refuses it too. The fallback is H20's: the trailer plated at or below 3,264 kg and at most 172 L of water in travel. NSW does not recognise interstate light vehicle certificates (VSI 06 Rev 4 page 3), so choose the state before the first certificate.
+If NSW refuses the GCM revision: Lovells warns it may not be available after registration in every state. Victoria needs a [VASS certificate](https://transport.vic.gov.au/registration-and-licensing/registration/standard-and-non-standard-vehicle-information/modified-and-non-standard-vehicles/vass-approval-certificate) to change the GVM and is stricter about post-registration GCM upgrades (70 Series Store), so assume Victoria refuses it too. The fallback is H20's: the trailer plated at or below 3,232 kg and at most 134 L of water in travel. NSW does not recognise interstate light vehicle certificates (VSI 06 Rev 4 page 3), so choose the state before the first certificate.
 
 The tune (S6). Item 6 needs a certificate for a reflash that alters emissions output. An LC4 certifier issues the LA4 certificate (LA4 is VSB 14's code for an engine modification) for about AUD 2,000 (est.) on the TfNSW test or the Interim NSW Vehicle Emissions Test Procedure (May 2023). Keep the same-dyno sheets, the emissions result, the DPF clean record and invoices for the genuine Denso injectors and pump. The certifier may ask for evidence that the driveline takes about 850 Nm.
 
@@ -208,12 +208,12 @@ No certificate: the rebuild with genuine fuel equipment, the airbox, intercooler
 | New H152F and NPC 1300 organic clutch, ZF 8-speed as fallback | A new gearbox costs about the same as a rebuild |
 | 450 to 500 Nm in low range, first and reverse | Protects the 8 inch front diff and the CV joints |
 | Elite kit (GV05) required, back to the Platinum (CUT7) only if the S3 weighing leaves at least 30 kg under 2,550 kg | The home trailer's towball and the 180 L tank leave the Platinum's rear axle no margin (H17) |
-| Lovells 7,400 kg GCM revision in the same inspection | The ute with growth plus the trailer's 3,500 kg plate is 7,135 kg (H2, H20) |
+| Lovells 7,400 kg GCM revision in the same inspection | The ute with growth plus the trailer's 3,500 kg plate is 7,167 kg (H2, H20) |
 | Tune last, certified at once, factory file kept | Every earlier stage stays legal |
 | Pre-tune dyno run on the finished hardware | The certifier compares like with like |
 | Gearbox and diff senders required (CG11) | The towing checks decide whether a cooler is needed |
 | Shared ROH 16 x 7 wheels and LT265/75R16 tyres | Toyota's size and offset, and one spare fits both vehicles |
-| Elite plated at a 4,450 kg GVM and a 2,800 kg rear axle on the 1,400 kg ROH wheels, Toyota's alloys as the fallback (WT04) | No 16 inch wheel that fits both vehicles is rated 1,425 kg, and the plate keeps 199 kg in hand (H18) |
+| Elite plated at a 4,450 kg GVM and a 2,800 kg rear axle on the 1,400 kg ROH wheels, Toyota's alloys as the fallback (WT04) | No 16 inch wheel that fits both vehicles is rated 1,425 kg, and the plate keeps 162 kg in hand (H18) |
 | The Elite's own brakes, BR01 to BR04 removed, spare pads carried (BR06) | The kit replaces the front and rear brakes, the booster and the handbrake (research report 26) |
 | Box body 1,850 mm, rear tub flares to 1,890 mm | The Elite's 1,555 mm rear track puts the tyre 11 mm from the body's skin, and Toyota allows 60 mm beyond the cab on each side, 1,910 mm (H19) |
 | 50 mm tongue for the DO35 pin (TW08) | The trailer's coupling kit has no tongue, and its drop sets the 440 mm height |
@@ -222,7 +222,7 @@ No certificate: the rebuild with genuine fuel equipment, the airbox, intercooler
 
 ## Open points and the assumption used
 
-1. Will the LC5 certifier include the GCM revision after registration? Assumed yes, for AUD 1,750. If not, a trailer plate at or below 3,264 kg and at most 172 L of water in travel (H20).
+1. Will the LC5 certifier include the GCM revision after registration? Assumed yes, for AUD 1,750. If not, a trailer plate at or below 3,232 kg and at most 134 L of water in travel (H20).
 2. Will the LC4 certifier accept the TfNSW test (assumed free) or the Interim NSW procedure at level B? Assumed yes. If not, a gas analyser test (TL06, AUD 200) or a laboratory test (TL07, AUD 10,000).
 3. Can the tune cap low-range torque? Assumed yes. If not, AUD 5,800 of CV joints and tailshafts.
 4. What torque does the H152F take? Assumed about 850 Nm in high range with sensible driving, inside report 15's 650 to 1,000 Nm. No rating is published.
