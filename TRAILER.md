@@ -11,11 +11,11 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 | Body | 4,420 x 2,400 mm outside, X 1,820 to 6,240. Inside 4,350 x 2,330 x 2,000 mm, floor at Z 925 |
 | Overall | 6,700 mm long, 2,470 mm wide over the entry door's handle, 3,078 mm high over the awning case |
 | Tare | 2,581 kg, 2,834 kg with the growth allowance |
-| Fully loaded with 350 L of water (TC2) | 3,111 kg, 3,397 kg with growth, against the 3,500 kg plate |
+| Fully loaded with 325 L of water (TC2) | 3,111 kg, 3,397 kg with growth, against the 3,500 kg plate |
 | Towball | 250 to 292 kg, 8.1 to 10.5 % of the trailer, at most 317 kg with growth |
 | Ute | Rear axle 2,586 kg with growth against its 2,800 kg plate. Combination 7,120 kg against 7,400 kg, the ute with growth plus the plate |
 | Battery | 25.6 kWh. A design hot day runs 25.1 h when new and 17.2 h at end of life |
-| Water | 420 L fresh, at most 350 L in travel, about 41 L a day. 130 L grey |
+| Water | 420 L fresh, at most 325 L in travel, about 41 L a day. 130 L grey |
 | Cost | AUD 230,736 with contingency, AUD 182,784 owner-built |
 
 Every fail check passes. The tightest are the towball share with the grey tank full (MAS-12, 8.1 % against 8.0 %), the heaviest towball (MAS-13, 316.8 kg against 320 kg) and the recovery pull in the road-side rail (CHS-08A, 0.91 of yield).
@@ -42,19 +42,19 @@ Masses in kg. The towball comes from moments about the axle group centre at X 4,
 | Case | Aboard | Mass | Towball | Share | With growth | Towball with growth |
 |---|---|---|---|---|---|---|
 | TC1 Tare | Nothing | 2,581 | 254.5 | 9.9 % | 2,834 | 273.3 |
-| TC2 Fully loaded | 350 L fresh, fuel, 150 kg of gear | 3,111 | 291.8 | 9.4 % | 3,397 | 316.8 |
+| TC2 Fully loaded | 325 L fresh, fuel, 150 kg of gear | 3,111 | 291.8 | 9.4 % | 3,397 | 316.8 |
 | TC3 Highway | 50 L, fuel, gear | 2,811 | 289.7 | 10.3 % | 3,097 | 314.7 |
-| TC4 Water, no gear | 350 L, fuel | 2,961 | 272.3 | 9.2 % | 3,217 | 293.5 |
+| TC4 Water, no gear | 325 L, fuel | 2,961 | 272.3 | 9.2 % | 3,217 | 293.5 |
 | TC5 Gear, no water | Fuel, gear | 2,761 | 289.3 | 10.5 % | 3,047 | 314.4 |
 | TC6 Fuel only | Fuel | 2,611 | 269.9 | 10.3 % | 2,867 | 291.1 |
-| TC7 Grey full | 220 L fresh, 130 L grey, fuel, gear | 3,111 | 251.8 | 8.1 % | 3,397 | 276.9 |
+| TC7 Grey full | 195 L fresh, 130 L grey, fuel, gear | 3,111 | 251.8 | 8.1 % | 3,397 | 276.9 |
 | TC8 Grey full, fresh empty | 130 L grey, fuel, gear | 2,891 | 250.3 | 8.7 % | 3,177 | 275.3 |
 
 - Plate: ATM 3,500 kg, the ute's braked towing rating and the limit of the DO35 and the chains (H2). The heaviest case with growth is 3,397 kg, inside H2's 3,400 kg target. The examiner's caps from the tyres, coupling, chains and brakes are 3,500 kg (MAS-07, MAS-08).
-- Water: at most 350 L of fresh and grey water while towing. The tanks hold 420 L and are filled at camp (H13). The grey tank travels empty, and TC7 and TC8 check the trailer with it full.
+- Water: at most 325 L of fresh and grey water while towing, H13's 350 L less 25 L by H21. The tanks hold 420 L and are filled at camp (H13). The grey tank travels empty, and TC7 and TC8 check the trailer with it full.
 - Towball: at least 7.5 % in every case and at most 350 kg, the 79's, the towbar's and the DO35's rating (MAS-04, H14). While the masses are estimates the axle sits in the middle of a 13.3 mm window between 8.0 % in the lightest case and 320 kg with growth in the heaviest (MAS-12, MAS-13, H17).
 - Ute: the heaviest towball puts the ute's rear axle at 2,586 kg with growth against the Elite kit's 2,800 kg plate (MAS-03, H18). MAS-14 reports the Platinum kit for the car build's cut CUT7.
-- GCM: the ute with growth, 3,620 kg, plus the 3,500 kg plate is 7,120 kg against Lovells' 7,400 kg (GCM-01, UTE-06, H20). If the revision is refused, Toyota's 6,900 kg needs the trailer plated at or below 3,280 kg and at most 232 L of water in travel, so the fully loaded trailer with growth stays under that plate.
+- GCM: the ute with growth, 3,620 kg, plus the 3,500 kg plate is 7,120 kg against Lovells' 7,400 kg (GCM-01, UTE-06, H20). If the revision is refused, Toyota's 6,900 kg needs the trailer plated at or below 3,280 kg and at most 207 L of water in travel, so the fully loaded trailer with growth stays under that plate.
 - Balance: the centre of gravity sits at most 32.8 mm to the kerb side against a 50 mm rule (MAS-11), at Z 1,215 to 1,308 mm with growth. The static stability factor is 0.58 to 0.62.
 - Roll: with the body rolled onto its bump stops and tyres, the static rollover threshold is about 0.37 g (est., Gillespie's method), over the 0.35 g of PBS level 1 and under the 0.40 g target (STB-01, STB-02). Each 100 mm of track would add about 0.04 g, but the 1,555 mm track keeps the trailer in the ute's ruts. The ute with the bikes aboard has a static stability factor of 0.89 (UTE-11).
 - Sway: the yaw inertia is about 7,200 kg m² fully loaded with growth, and the towball never falls under 8.1 % of the trailer (STB-03). No snaking speed is estimated, because the published models need tyre and hitch data that are not known. The Bosch TSC brakes the trailer when it senses sway.
@@ -120,7 +120,7 @@ Research report 19's load calculation gives a design hot day of 37.1 kWh of heat
 
 - Fresh: two welded HDPE tanks over the axles hold 420 L, filled at camp through a Puretec CR45 filter by hose or the creek transfer pump, with a chlorine dose. A Shurflo Trail King 7 at 2.1 bar feeds every outlet, the drinking tap through a CR-Z2 filter and a UV purifier. The Combi's 10 L boiler gives hot water through a 50 °C mixing valve (CT-611, CT-612).
 - Grey: every drain falls by gravity to a 130 L tank in the rear bay, with a valve and a camlock on the kerb side. It travels empty (CT-003's operating limits), TC7 and TC8 check the trailer with it full, and a 40 L tote serves longer stays.
-- Budget for two a day: showers 10 L, dishes 8, drinking 6, basin 6, outdoor rinse 4, cooking 3, flush 2 and cleaning 2, so 41 L, 27 L of it to grey. A wash adds 44 L. The 350 L aboard lasts about 8 days without laundry, and the full tanks 7 days with three washes. The grey tank holds 72 h with one wash.
+- Budget for two a day: showers 10 L, dishes 8, drinking 6, basin 6, outdoor rinse 4, cooking 3, flush 2 and cleaning 2, so 41 L, 27 L of it to grey. A wash adds 44 L. The 325 L aboard lasts about 8 days without laundry, and the full tanks 7 days with three washes. The grey tank holds 72 h with one wash.
 
 ## Running gear and coupling
 
@@ -194,17 +194,17 @@ Each is in full in `docs/decisions.md`.
 - H5, H6: an electric kitchen with a convection microwave as the oven, a washer and a heat-pump dryer. No LPG and no vent.
 - H7, H8, H15: an inverter split with diesel backup, filtered heat-recovery fresh air, four windows and two door glasses with blackout blinds.
 - H12: a fixed roof with rounded front edges. Most of a raising roof's fuel saving without its mass, cost and losses.
-- H13: at most 350 L of water in travel with both generators. It holds the 3,400 kg target.
+- H13: at most 350 L of water in travel with both generators, 325 L since H21. It holds the 3,400 kg target.
 - H14, H17: towball limits from the ute's rear axle and the 350 kg ratings, the axle centred in an 8.0 % to 320 kg window. Margin while the masses are estimates.
 - H16: the bed's footprint stays empty, as Leonard asked.
 - H20: one combination figure, the ute with growth plus the plate, and UTE-04's weighed target retired. UTE-03 checks the rear axle itself.
-- H21: mass added after H13 comes off the travel water in 5 L steps, so the 3,400 kg target and the plate stay.
+- H21: mass added after H13 comes off the travel water in 5 L steps, so the 3,400 kg target and the plate stay. The final review's fixes took 25 L.
 
 ## Open points and the assumption used
 
 1. Storage is about 0.2 m³ short (est.). Assumption: the footprint stays empty (H16). Question for Leonard: two 500 x 600 x 700 mm cabinets under the bed beside the desk would add 0.42 m³ and about 20 kg, and break his rule that the rest of that area stays empty.
 2. Estimate lines carry 891 kg, 34.5 % of the tare, and estimates set 55.7 % of the price subtotal. Assumption: the growth allowance covers the masses until TW-01 to TW-03 replace them, and the 20 % contingency covers the prices. A towball reading more than 10 % off the model means the centre of gravity estimates are wrong (UTE-03).
-3. Assumption: Lovells' 7,400 kg GCM is certified in the ute's LC5 inspection. If not, plate at or below 3,280 kg and tow with at most 232 L (H20).
+3. Assumption: Lovells' 7,400 kg GCM is certified in the ute's LC5 inspection. If not, plate at or below 3,280 kg and tow with at most 207 L (H20).
 4. Assumption: the isolators and the line set keep the split working on corrugations, without a maker's warranty. The fallback is a rooftop unit with a sixth battery module.
 5. The Dometic fridge, freezer, hob and sink carry converted European prices, and the oven, washer, panels, lamps and labour are estimates. Assumption: these prices stand, with their contingency, until an Australian stockist or a quote replaces them.
 6. Assumption: the engineer accepts calculation as VSB1's evidence for the drawbar and chain tests at 3,500 kg (CHASSIS.md).
