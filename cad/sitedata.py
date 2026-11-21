@@ -291,7 +291,10 @@ def main():
         text = re.sub(r"\]\((\d\d-[a-z0-9-]+)\.md\)", r"](../\1/)", text)
         # the YAML files beside a report are in the repository only, so name them instead of linking
         text = re.sub(r"\[[^\]]+\]\((\d\d-[a-z0-9-]+\.yaml)\)", r"`research/\1`", text)
-        body = (f"---\ntitle: '{title}'\nsidebar:\n  order: {order}\n---\n\n"
+        archived = ("**Archived** (decision H9): this report is the record from before the LandCruiser 79 plan, kept as written "
+                    "and not updated. Where it differs from the Car build, Bike box and Trailer pages, they are current.\n\n"
+                    if order <= 11 else "")
+        body = (f"---\ntitle: '{title}'\nsidebar:\n  order: {order}\n---\n\n" + archived +
                 f"This is research report {fname[:2]}, copied unchanged from `research/{fname}` apart from its first heading.\n\n"
                 + text)
         (DOCS / "research" / fname).write_text(body, encoding="utf-8")
