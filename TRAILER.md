@@ -1,8 +1,8 @@
 # Home trailer
 
-Status: concept, revision J, 21 Nov 2026. DRAFT, not for construction until the engineer reviews it. The data is `data/assemblies/trailer.yaml`, `data/load_cases.yaml`, `data/checks.yaml`, `data/services.yaml`, `data/measurements.yaml` and the parts list `data/trailer-parts.yaml`. The code is `cad/trailer.py`. CHASSIS.md and BODY.md design the frame and the shell, `docs/decisions.md` records the decisions, and research reports 19 to 22 and 25 hold the research. Positions are in the project datum DIM-01: X rearward from the ball, Y positive to the road side, Z up from the ground, in mm.
+Status: concept, revision J, 21 Nov 2026. DRAFT, not for construction until the engineer reviews it. Data: `data/assemblies/trailer.yaml`, `data/load_cases.yaml`, `data/checks.yaml`, `data/services.yaml`, `data/measurements.yaml` and the parts list `data/trailer-parts.yaml`. Code: `cad/trailer.py`. CHASSIS.md and BODY.md design the frame and the shell, `docs/decisions.md` records the decisions, and research reports 19 to 22 and 25 hold the research. Positions are in mm in the project datum DIM-01: X rearward from the ball, Y positive to the road side, Z up from the ground.
 
-Leonard asked for a home for long stays off-grid: a lifted bed over a 1.2 m desk, a wet bathroom entered from a rear door, a recirculating shower for two 20 min showers a day, an electric kitchen with an oven, a washer and a dryer, filtered fresh air with the windows shut, blackout blinds, and power for a hot day of air-conditioning for at least 12 h, 24 h if possible.
+The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a wet bathroom entered from a rear door, a recirculating shower for two 20 min showers a day, an electric kitchen with an oven, a washer and a dryer, filtered fresh air with the windows shut, blackout blinds, and power for a hot day of air-conditioning for at least 12 h, 24 h if possible.
 
 ## Summary
 
@@ -54,7 +54,7 @@ Masses in kg. The towball comes from moments about the axle group centre at X 4,
 - Water: at most 350 L of fresh and grey water while towing. The tanks hold 420 L and are filled at camp (H13).
 - Towball: at least 7.5 % in every case and at most 350 kg, the 79's, the towbar's and the DO35's rating (MAS-04, H14). While the masses are estimates the axle sits in the middle of a 13.3 mm window between 8.0 % in the lightest case and 320 kg with growth in the heaviest (MAS-12, MAS-13, H17).
 - Ute: the heaviest towball puts the ute's rear axle at 2,586 kg with growth against the Elite kit's 2,800 kg plate (MAS-03, H18). MAS-14 reports the Platinum kit for the car build's cut CUT7.
-- GCM: the ute at its 3,850 kg weighed limit plus the plate less the lightest towball is 7,100 kg against Lovells' 7,400 kg (GCM-01). If the revision is refused, Toyota's 6,900 kg allows 233 L of water in travel and a 3,300 kg plate.
+- GCM: the ute at its 3,850 kg weighed limit plus the plate less the lightest towball is 7,100 kg against Lovells' 7,400 kg (GCM-01). If the revision is refused, Toyota's 6,900 kg allows 232 L of water in travel and a 3,300 kg plate.
 - Balance: the centre of gravity sits at most 32.8 mm to the kerb side against a 50 mm rule (MAS-11), at Z 1,215 to 1,308 mm with growth. The static stability factor is 0.58 to 0.62.
 - Axles: the XT build carries 3,744 kg with VSB1's 120 % rule against its 4,050 kg, and each wheel 950 kg against its 1,400 kg (MAS-02, MAS-09).
 
@@ -66,7 +66,7 @@ The chassis is a galvanised ladder frame (CHASSIS.md revision E, CT-101 to CT-10
 
 The shell is bonded sandwich panels in aluminium joiners (BODY.md revision C, CT-201 to CT-203): a 30 mm GRP and PVC foam floor, 35 mm GRP and XPS walls 2,000 mm tall, and a fixed 40 mm roof that carries the solar panels. It bolts to the frame at 32 points and takes 98 % of the twist.
 
-The roof is fixed, with rounded front edges, 150 mm at the roof edge and 250 mm on the front verticals (H12). Research report 25 puts towing fuel at 21.3 L/100 km at 90 km/h, against 25.0 with a square front and 20.6 with a hard raising roof, which would add 117 kg and about AUD 32,900 and rule out the S4 windows, the stock doors, the lift bed and a full-height wet room.
+The roof is fixed, with rounded front edges, 150 mm at the roof edge and 250 mm on the front verticals (H12). Towing at 90 km/h it uses 21.3 L/100 km, against 25.0 with a square front and 20.6 with a hard raising roof, which would add 117 kg and about AUD 32,900 and rule out the S4 windows, the stock doors, the lift bed and a full-height wet room (research report 25).
 
 Four Dometic S4 windows (W1 and W2 at the bed, W4 in the kitchen, W6 frosted in the wet room) and the glass in both doors have integrated blackout blinds (H8, H15, CT-011, CT-013). W1's 804 x 454 mm opening is the second way out. All 17 openings keep 300 mm of wall between them (BDY-18).
 
@@ -195,8 +195,8 @@ Each is in full in `docs/decisions.md`.
 ## Open points and the assumption used
 
 1. Storage is about 0.2 m³ short (est.). Assumption: the footprint stays empty (H16). Question for Leonard: two 500 x 600 x 700 mm cabinets under the bed beside the desk would add 0.42 m³ and about 20 kg, and break his rule that the rest of that area stays empty.
-2. 55 % of the tare is estimates. Assumption: the growth allowance covers them until TW-01 to TW-03 replace them. A towball reading more than 10 % off the model means the centre of gravity estimates are wrong (UTE-03).
-3. Assumption: Lovells' 7,400 kg GCM is certified in the ute's LC5 inspection. If not, tow with at most 233 L and plate at 3,300 kg.
+2. Estimate lines carry 891 kg, 34.5 % of the tare, and estimates set 55.7 % of the price subtotal. Assumption: the growth allowance covers the masses until TW-01 to TW-03 replace them, and the 20 % contingency covers the prices. A towball reading more than 10 % off the model means the centre of gravity estimates are wrong (UTE-03).
+3. Assumption: Lovells' 7,400 kg GCM is certified in the ute's LC5 inspection. If not, tow with at most 232 L and plate at 3,300 kg.
 4. Assumption: the isolators and the line set keep the split working on corrugations, without a maker's warranty. The fallback is a rooftop unit with a sixth battery module.
-5. The Dometic fridge, freezer, hob and sink carry European prices, converted. The oven, washer, panels, lamps and labour are estimates.
+5. The Dometic fridge, freezer, hob and sink carry converted European prices, and the oven, washer, panels, lamps and labour are estimates. Assumption: these prices stand, with their contingency, until an Australian stockist or a quote replaces them.
 6. Assumption: the engineer accepts calculation as VSB1's evidence for the drawbar and chain tests at 3,500 kg (CHASSIS.md).
