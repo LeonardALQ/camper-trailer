@@ -20,7 +20,7 @@ const live = reg.drawings.filter((d: any) => d.status !== 'RETIRED');
         ) : (
           <tr>
             <td>{d.number}</td><td>{d.title}</td><td>{d.revision}</td><td>{d.status}</td><td>{d.date}</td>
-            <td>{d.size}, 1:{d.scale}</td>
+            <td>{d.size}, {typeof d.scale === 'number' ? `1:${d.scale}` : d.scale}</td>
             <td><a href={withBase(`/downloads/drawings/${d.number}.pdf`)}>PDF</a>, <a href={withBase(`/downloads/drawings/${d.number}.svg`)}>SVG</a>, <a href={withBase(`/drawings/${d.number}.png`)}>PNG</a></td>
           </tr>
         )
@@ -32,7 +32,7 @@ const live = reg.drawings.filter((d: any) => d.status !== 'RETIRED');
 {live.map((d: any) => (
   <section class="drawing-card">
     <h2 id={d.number.toLowerCase()}>{d.number} {d.title}</h2>
-    <p>{d.subtitle}. Revision {d.revision}, status {d.status}, issued {d.date}. A3, main scale 1:{d.scale}.</p>
+    <p>{d.subtitle}. Revision {d.revision}, status {d.status}, issued {d.date}. A3, {typeof d.scale === 'number' ? `main scale 1:${d.scale}` : 'not to scale'}.</p>
     <a href={withBase(`/drawings/${d.number}.png`)}><img src={withBase(`/drawings/${d.number}-preview.png`)} alt={`Preview of drawing ${d.number}, ${d.title}`} loading="lazy" /></a>
     <p><a href={withBase(`/downloads/drawings/${d.number}.pdf`)}>Download the PDF</a> or <a href={withBase(`/downloads/drawings/${d.number}.svg`)}>the SVG</a>.</p>
   </section>

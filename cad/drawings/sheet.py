@@ -376,7 +376,7 @@ def title_block(sh, *, owner, project, number, title, subtitle, rev, status, dat
     lab(287, 49.8, "SIZE")
     sh.text(287, 44.4, size, 3.0)
     lab(304, 49.8, "SCALE")
-    sh.text(304, 44.4, f"1:{scale:g}", 3.0)
+    sh.text(304, 44.4, f"1:{scale:g}" if isinstance(scale, (int, float)) else str(scale), 3.0)
     lab(324, 49.8, "SHEET (TB-08)")
     sh.text(324, 44.4, f"{sheet_no} of {sheets}", 3.0)
     lab(352, 49.8, "PROJECTION (TB-09)")

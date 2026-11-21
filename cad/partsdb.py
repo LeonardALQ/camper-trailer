@@ -231,7 +231,7 @@ class DrawingDef(Strict):
     project: str | None = None
     sheet: int
     size: Literal["A3"]
-    scale: float
+    scale: float | Literal["NTS"]   # NTS: a chart, schematic or schedule with no scaled view
     status: Literal["DRAFT", "FOR REVIEW", "FOR CONSTRUCTION", "AS BUILT", "RETIRED"]
     structural: bool = False
     retired: str | None = None      # why the sheet is no longer drawn, and what replaces it

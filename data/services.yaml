@@ -1,0 +1,76 @@
+# The home trailer's services, for the drawings CT-601 to CT-621 (TRAILER.md revision J): the body's glands, the
+# electrical cables and circuits (research report 20), the load-shedding order (decision of 20 Nov 2026 23:17)
+# and the ventilation modes (report 19). The blocks themselves (the battery, board, tanks, fans and units) stay in
+# data/assemblies/trailer.yaml, and the drawings take their positions from there.
+# Positions are in DIM-01, mm. A gland of 60 mm or less is not an opening for the body's spacing rule
+# (data/body/body.yaml). `src` is the source. `est` names what this file assumes, to confirm at fit-out.
+id: SVC-TR
+revision: A
+
+# Glands through the walls, roof and floor. Side walls give X and the height Z, end walls Y and Z, roof and floor X and Y.
+glands:
+  - {id: G1, what: "Fresh water fill with a lockable cap, filled through the CR45 filter on the hose", at: kerb, x: 3280, z: 1125, d: 50, src: "layout study section 4.2", est: "height"}
+  - {id: G2, what: "15 A appliance inlet and the 12 V Anderson SB50 outlet in one IP56 surface box", at: kerb, x: 4700, z: 1150, d: 60, src: "layout study section 4.1"}
+  - {id: G3, what: "Outdoor 230 V double outlet (C10), IP56 surface box under the awning", at: kerb, x: 4300, z: 1150, d: 60, src: "report 20 section 7", est: "position"}
+  - {id: G4, what: "Two 6 mm2 PV strings into a conduit down the partition's kerb end", at: roof, x: 5100, y: -900, d: 25, src: "layout study section 4.1"}
+  - {id: G5, what: "Split line set and the outdoor unit's 230 V feed (C8), behind the cradle", at: rear, y: 760, z: 2800, d: 60, src: "AC-02, AC-03", est: "position, moved to the road half with the outdoor unit in phase 1"}
+  - {id: G6, what: "Battery box vent from the bottom of the box, 20 mm bore with insect mesh", at: floor, x: 4300, y: -800, d: 20, src: "report 20 section 2, AS/NZS 3001.2 clause 5.4.12.2", est: "position"}
+  - {id: G7, what: "Battery box vent ducted from the top of the box, 20 mm bore with insect mesh", at: floor, x: 4900, y: -800, d: 20, src: "report 20 section 2", est: "position"}
+  - {id: G8, what: "Ute charging feed, 8 B&S twin from the drawbar Anderson SB50 along the kerb rail", at: floor, x: 5100, y: -700, d: 25, src: "layout study section 4.1"}
+  - {id: G9, what: "Combi diesel line from the heater fuel tank UF-06 into the tower base", at: floor, x: 3520, y: 720, d: 20, src: "LA-03, UF-06", est: "position"}
+  - {id: G10, what: "Sink, washer and dryer wastes through the wet room floor into the grey tank's top inlet", at: floor, x: 5260, y: 0, d: 50, src: "layout study section 4.2"}
+  - {id: G11, what: "Fresh tank feed to the pump in the sink cabinet", at: floor, x: 4960, y: 700, d: 25, src: "layout study section 4.2", est: "position"}
+
+electrical:
+  # report 20 section 7, main cables and fuses. Lengths are along the routes on CT-602 (est.)
+  cables:
+    - {run: "Each battery module to the bank busbar", current: "100 A (1C)", fuse: "125 A MEGA", cable: "25 mm2", length: "under 1 m, sleeved"}
+    - {run: "Bank busbar to the Lynx Smart BMS NG", current: "150 A, 260 A for 1 min", fuse: "Module fuses, BMS contactor", cable: "70 mm2", length: "1.0 m"}
+    - {run: "Lynx Distributor to the MultiPlus-II", current: "144 A at 6 kW", fuse: "200 A MEGA", cable: "50 mm2", length: "2 m each way, 0.2 V drop"}
+    - {run: "Each SmartSolar MPPT 150/35", current: "35 A", fuse: "40 A MIDI", cable: "10 mm2", length: "0.5 m"}
+    - {run: "Each Orion-Tr converter input", current: "9 A", fuse: "15 A", cable: "4 mm2", length: "0.5 m"}
+    - {run: "24 V converter pair to its fuse panel", current: "32 A", fuse: "40 A", cable: "10 mm2", length: "0.5 m"}
+    - {run: "12 V converter pair to its fuse panel", current: "60 A", fuse: "80 A", cable: "16 mm2", length: "0.5 m"}
+    - {run: "Ute charging feed, drawbar Anderson to the Lynx Distributor", current: "16 A, 32 A after TC02", fuse: "40 A", cable: "8 B&S twin", length: "about 6.5 m"}
+    - {run: "Each PV string, two panels in series", current: "10.7 A (Isc)", fuse: "None, one string per controller", cable: "6 mm2 PV", length: "about 6 m"}
+  # report 20 section 7, 230 V circuits. Every circuit has a 30 mA RCBO. `at` is the layout line it feeds
+  circuits:
+    - {id: C1, load: "Hob, Dometic CVI1525", amps: 10.0, rcbo: 16, control: "Current relay: above 4.5 A it opens K4, any current opens S1", at: LA-07A}
+    - {id: C2, load: "Oven, Camec 053632", amps: 6.3, rcbo: 10, control: "Contactor K2. Its current relay opens K4 and S1", at: LA-13}
+    - {id: C3, load: "Kitchen bench outlets, two double", amps: null, rcbo: 10, control: "Total power rule", at: LA-11B}
+    - {id: C4, load: "DauerShower 2.0 heater", amps: 10.4, rcbo: 16, control: "Contactor K4. Its current relay opens S1", at: WR-09}
+    - {id: C5, load: "Truma Combi D 6 E element", amps: 7.8, rcbo: 10, control: "Contactor S1", at: LA-03}
+    - {id: C6, load: "Washer, Camec", amps: 1.2, rcbo: 10, control: "Contactor S1", at: LA-02}
+    - {id: C7, load: "Dryer, Haier heat pump", amps: 4.3, rcbo: 10, control: "Contactor S1", at: LA-14}
+    - {id: C8, load: "Split, outdoor unit feed", amps: 7.1, rcbo: 10, control: "Never shed", at: AC-02}
+    - {id: C9, load: "Desk and living outlets, three double", amps: null, rcbo: 10, control: "Total power rule", at: LA-09}
+    - {id: C10, load: "Outdoor double outlet, kerb side", amps: null, rcbo: 10, control: "Total power rule", at: G3}
+  # Load shedding (decision of 20 Nov 2026 23:17): the shower heater is the load that sheds when the hob or the oven needs
+  # the inverter, so cooking keeps priority and the oven's relay never opens for the shower.
+  shedding:
+    - {step: "1", sheds: "K4: C4, the DauerShower heater", when: "The hob draws more than about 4.5 A, or the oven runs", after: "The shower keeps running warm in its 12 V mode, topped up with 0.5 to 3 L/min of boiler water, and the Combi reheats on diesel"}
+    - {step: "2", sheds: "S1: C5 Combi element, C6 washer, C7 dryer", when: "The hob, the oven or the shower heater runs", after: "The Combi heats on diesel. The washer and dryer wait"}
+    - {step: "-", sheds: "C3, C9 and C10 outlets", when: "The total power rule on the Cerbo GX (Node-RED)", after: "The user's loads, warned on the GX Touch"}
+    - {step: "Never", sheds: "C8, the split", when: "Never shed", after: "Cooling and heating stay on (H3)"}
+  # report 20 section 7, DC buses
+  bus_12v: "LUNOS e2 pairs, RA 15-60 and controller, range hood, CO2 sensor and pressure display, DauerShower pump and controls, Shurflo pump, UV purifier, transfer pump, Thetford flush, HappiJac bed, Combi D 6 E, XT Air compressor, alarms and tracker, breakaway charger, 10 A external outlet"
+  bus_24v: "Fridge, freezer, lights, USB-C outlets, Starlink Mini, top-up fan, RESPA-CF2"
+  # report 20 section 7, outlets and DC points by zone
+  outlets:
+    - {zone: "Kitchen", ac: "2 double on the bench. The hob and the oven on their own circuits", dc: "1 USB-C PD 65 W"}
+    - {zone: "Desk under the bed", ac: "2 double, the monitor and a spare", dc: "2 USB-C PD 100 W for the laptops, 1 USB-A"}
+    - {zone: "Bed, night position", ac: "None", dc: "2 USB-C PD 65 W, one each side. 2 reading lights"}
+    - {zone: "Living area", ac: "1 double", dc: "2 USB-C PD 65 W"}
+    - {zone: "Wet room", ac: "None in the wet area", dc: "24 V light. The RA 15-60 runs from the 12 V bus"}
+    - {zone: "Laundry", ac: "2 single, the washer and the dryer, on S1", dc: "-"}
+    - {zone: "Electrical board", ac: "1 single service outlet", dc: "Starlink Mini on a 24 V fused circuit"}
+    - {zone: "Outside, kerb side", ac: "1 weatherproof double, IP56 (G3)", dc: "1 Anderson SB50 12 V outlet with a 10 A fuse, 1 USB-C (G2)"}
+
+# report 19 section 6, the ventilation modes (one rotary switch or a Cerbo GX page), m3/h
+ventilation_modes:
+  - {mode: "Normal day", e2: "30 a pair", ra: "15, boost on humidity", topup: "15", respa: "Off", split: "Thermostat"}
+  - {mode: "Night", e2: "22.5 a pair", ra: "15", topup: "15", respa: "Off", split: "Quiet fan"}
+  - {mode: "Towing (dust)", e2: "Off", ra: "Off", topup: "Off", respa: "On, 150 to 200", split: "Off"}
+  - {mode: "Parked, dust storm", e2: "Off", ra: "Off", topup: "40", respa: "On", split: "Thermostat"}
+  - {mode: "Smoke", e2: "Off", ra: "Off", topup: "15 to 40 through the carbon", respa: "Off, or on with the odour filter", split: "Thermostat"}
+  - {mode: "Low battery", e2: "22.5 a pair", ra: "15", topup: "15", respa: "Off", split: "Setpoint up 2 K, heat by diesel"}

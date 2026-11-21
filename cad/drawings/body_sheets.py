@@ -82,8 +82,24 @@ def ct201(prj, model, bom, checks, reg, dwg):
     sh.rect(ox, oy - V["floor_t"] / k, ox + L / k, oy, "medium")
     sh.rect(ox, oy + H / k, ox + L / k, oy + (H + V["roof_t"]) / k, "medium")
     zb = V["mattress_z"] + V["mattress_t"] - V["floor_z"]
-    sh.line(ox, oy + zb / k, ox + V["bed_u1"] / k, oy + zb / k, "phantom")
-    sh.text(ox + V["bed_u1"] / k + 1, oy + zb / k - 0.6, f"MATTRESS TOP {zb:.0f}", 1.4)
+    zn = V["bed_night_h"] + V["deck_t"] + V["underlay_t"] + V["mattress_t"]
+    for z, t in ((zb, "DAY"), (zn, "NIGHT")):
+        sh.line(ox + V["end_wall_t"] / k, oy + z / k, ox + V["bed_u1"] / k, oy + z / k, "phantom")
+        sh.text(ox + V["end_wall_t"] / k + 0.6, oy + z / k + 0.7, t, 1.25)
+    # the side-wall stiffener in the living-zone bay (BD-18, BDY-10) and the H12 radius at the roof's front edge
+    us = lay.find("BD-18.1").cog[0] - V["body_x0"]
+    for yy, flip in ((oy, False), (166.0, True)):
+        xs = ox + ((L - us) if flip else us) / k
+        sh.line(xs, yy, xs, yy + H / k, "phantom")
+        sh.text(xs + 0.8, yy + H / k - 3.0, "BD-18", 1.3)
+        xr = ox + (L / k if flip else 0)
+        r = V["roof_front_r"] / k
+        sgn = -1 if flip else 1
+        sh.fillrect(min(xr, xr + sgn * r), yy + H / k + V["roof_t"] / k - r, max(xr, xr + sgn * r), yy + H / k + V["roof_t"] / k + 0.3, "white")
+        import math
+        pts = [(xr + sgn * (r - r * math.cos(math.radians(a))), yy + H / k + V["roof_t"] / k - r + r * math.sin(math.radians(a))) for a in range(0, 91, 10)]
+        sh.path(pts, "thick")
+    sh.text(ox + 1.2, oy + (H + V["roof_t"]) / k + 1.2, f"R{V['roof_front_r']:.0f}", 1.3)
     S.hdim(sh, ox, oy - V["floor_t"] / k, ox + L / k, oy - V["floor_t"] / k, oy - 6, f"{L:.0f} BODY", size=1.7)
     S.vdim(sh, ox + L / k, oy, ox + L / k, oy + H / k, ox + L / k + 8, f"{H:.0f}", size=1.6)
     # road-side wall seen from outside (front to the right)
@@ -95,6 +111,12 @@ def ct201(prj, model, bom, checks, reg, dwg):
     oy3 = 104.0
     sh.text(ox, oy3 + W / k + 4.5, "FIXED ROOF, PLAN (FRONT LEFT): SOLAR ARRAY BONDED, NO HATCHES", 2.2, bold=True)
     sh.rect(ox, oy3, ox + L / k, oy3 + W / k, "thick")
+    rv = V["front_vert_r"] / k
+    import math
+    for yc, s_ in ((oy3, 1), (oy3 + W / k, -1)):     # the 250 mm radius on both front verticals (H12), seen from above
+        sh.fillrect(ox - 0.4, min(yc, yc + s_ * rv), ox + rv, max(yc, yc + s_ * rv), "white")
+        sh.path([(ox + rv - rv * math.sin(math.radians(a)), yc + s_ * (rv - rv * math.cos(math.radians(a)))) for a in range(0, 91, 10)], "thick")
+    sh.text(ox + rv + 0.8, oy3 + 1.2, f"R{V['front_vert_r']:.0f}", 1.3)
     sx = (V["solar_x0"] - V["body_x0"]) / k
     sh.rect(ox + sx, oy3 + (W / 2 - V["solar_w"]) / k, ox + sx + 2 * V["solar_l"] / k, oy3 + (W / 2 + V["solar_w"]) / k, "medium")
     sh.line(ox + sx + V["solar_l"] / k, oy3 + (W / 2 - V["solar_w"]) / k, ox + sx + V["solar_l"] / k, oy3 + (W / 2 + V["solar_w"]) / k, "thin")
@@ -124,7 +146,11 @@ def ct201(prj, model, bom, checks, reg, dwg):
         "FLOOR, BOTH SIDE WALLS AND THE ROOF ARE ONE PIECE EACH. EVERY PANEL EDGE BONDS INTO AN ALUMINIUM EXTRUSION (CT-202). THE ROOF IS FIXED.",
         f"OPENINGS: 300 mm OF FULL WALL BETWEEN THEM, 150 mm TO A PANEL EDGE, NONE WITHIN 300 mm OF THE REAR CORNERS (BDY-18: "
         f"{'PASS' if oc['ok'] else 'FAIL'}). CUT-OUT CORNERS RADIUSED, 68 mm FOR SERVICE DOORS, 90 mm AT THE TOP OF THE DC DOOR.",
-        "OP-03 OVER THE BED OPENS FROM INSIDE AND IS THE SECOND WAY OUT. THE KITCHEN SLIDE-OUT (OP-01) RUNS UNDER THE BED.",
+        "W1 (OP-01) OVER THE BED IS THE SECOND WAY OUT, 804 x 454 mm CLEAR. D2 (OP-15) OPENS INTO THE WET ROOM. THE PRODUCTS ARE ON "
+        "CT-013 AND EACH OPENING'S MARGIN ON CT-011. H12: GRP CORNER PIECES GIVE THE ROOF'S FRONT EDGE A 150 mm RADIUS AND THE FRONT "
+        "VERTICALS 250 mm. BD-18: ONE SHS 20 x 20 x 1.6 STIFFENER IN EACH SIDE WALL (BDY-10). PHANTOM DAY AND NIGHT: THE MATTRESS TOP, "
+        f"{V['mattress_z'] + V['mattress_t'] - V['floor_z']:.0f} AND "
+        f"{V['bed_night_h'] + V['deck_t'] + V['underlay_t'] + V['mattress_t']:.0f} mm ABOVE THE FLOOR (CT-010).",
         "WHERE AN OPENING CROSSES A CHASSIS STATION THE OUTRIGGER-TIP MOUNT MOVES INBOARD OF ITS FRAME AND THE FLOOR JOINER RUNS UNBROKEN.",
     ], width_chars=118, size=1.6)
     _stamp(sh, 320, 96)
@@ -195,25 +221,31 @@ def ct202(prj, model, bom, checks, reg, dwg):
     _sandwich(sh, 40 - 2 / k, wy + 30 + 2 / k, 40 + 35 / k + 14, wy + 30 + 2 / k + 40 / k, 2.0, k)                  # roof edge
     sh.line(40 - 2 / k, wy + 30 + 2 / k + 40 / k, 40 - 4, wy + 30 + 40 / k - 2, "thick")                           # drip edge
     rf = res["roof"]
-    for i, t in enumerate(("ROOF-TO-WALL JOINER 1.65 kg/m, IN PLACE OF THE POP-TOP RINGS, BONDED MS POLYMER ALL ROUND",
+    for i, t in enumerate(("ROOF-TO-WALL JOINER 1.65 kg/m, BONDED MS POLYMER ALL ROUND, THE WALL'S TOP INSERT STRIP UNDER IT",
                            f"40 m/s UPLIFT {rf['q_n_mm']:.2f} N/mm ON THE BOND, AGAINST {rf['allow_n_mm']:.0f} N/mm (BDY-19)",
                            "ROOF EDGE CAPPED, DRIP EDGE OUTSIDE THE WALL SKIN, AWNING RAIL ON THE KERB-SIDE STRIP BELOW")):
         sh.text(22, 106 - 3 * i, t, 1.5)
-    # ---- D: bed deck ledger on the front wall, 1:2
+    # ---- D: lift bed rail on its hardpoint in the side wall, plan section, 1:2
     cx, top = 150.0, 186.0
-    _dt(sh, cx, top, "D: BED DECK LEDGER ON THE WALL", k)
-    dy = 130.0
-    _sandwich(sh, 130, dy - 20, 130 + 35 / k, dy + 30, 1.5, k, vertical=True)       # wall
-    sh.path([(130 + 35 / k, dy - 20 / k), (130 + 35 / k + 3 / k, dy - 20 / k), (130 + 35 / k + 3 / k, dy - 3 / k),
-             (130 + 35 / k + 40 / k, dy - 3 / k), (130 + 35 / k + 40 / k, dy)], "thick")                             # 40 x 40 x 3 angle
-    sh.rect(130 + 35 / k + 2 / k, dy, 185, dy + 20 / k, "shade")                                                      # 20 mm deck
-    sh.rect(127, dy - 14 / k, 130 + 35 / k + 1, dy - 10 / k, "fill")                                                 # Deform-Nut line
+    _dt(sh, cx, top, "D: LIFT BED RAIL ON ITS HARDPOINT, PLAN", k)
+    dy = 112.0
+    _sandwich(sh, 125, dy, 125 + 35 / k, dy + 60, 1.5, k, vertical=True)            # side wall, plan section
+    hx0, hy0 = 125 + 3.5 / k, dy + 20
+    sh.rect(hx0, hy0, hx0 + 20 / k, hy0 + 40 / k, "shade")                            # RHS 40 x 20 x 3 laid flat in the core
+    sh.rect(hx0 + 3 / k, hy0 + 3 / k, hx0 + 17 / k, hy0 + 37 / k, "white")
+    sh.rect(hx0 + 3 / k, hy0 + 3 / k, hx0 + 17 / k, hy0 + 37 / k, "medium")
+    rx = 125 + 35 / k
+    sh.path([(rx, hy0 - 5 / k), (rx + 20 / k, hy0 - 5 / k), (rx + 20 / k, hy0 + 2), (rx + 4 / k, hy0 + 2), (rx + 4 / k, hy0 + 45 / k - 2),
+             (rx + 20 / k, hy0 + 45 / k - 2), (rx + 20 / k, hy0 + 45 / k), (rx, hy0 + 45 / k)], "thick")         # the rail's C-channel
+    for yy in (hy0 + 10 / k, hy0 + 30 / k):
+        sh.line(hx0 + 6 / k, yy, rx + 4 / k, yy, "medium")                             # 1/4 in screws into the tube's 3 mm wall
+    sh.line(hx0 - 8, hy0 + 20 / k, rx + 30 / k, hy0 + 20 / k, "centre")
     ins = next(i for i in res["inserts"] if i["id"] == "INS-01")
-    for i, t in enumerate(("ANGLE 40 x 40 x 3 6060-T5 ON THE FRONT AND KERB WALLS UNDER THE DECK EDGES",
-                           "DEFORM-NUT M6 AT 150 IN A PULTRUDED GRP INSERT STRIP IN THE WALL",
-                           f"{ins['n'] / 1000:.2f} kN PER FIXING AT 3 g, AGAINST HALF OF {ins['rated_n'] / 1000:.1f} kN (BDY-11)",
-                           "THE DECK'S ROAD-SIDE AND REAR EDGES SIT ON THE BED BASE DIVIDERS")):
-        sh.text(122, 99 - 3 * i, t, 1.5)
+    for i, t in enumerate(("HARDPOINT RHS 40 x 20 x 3 6060-T5 LAID FLAT IN THE XPS CORE AS THE PANEL IS LAID UP (LB-06)",
+                           "HAPPIJAC C-CHANNEL RAIL ON THE INNER SKIN, 1/4 in SELF-TAPPING SCREWS INTO THE TUBE'S 3 mm WALL",
+                           f"{ins['n']:.0f} N PER SCREW, {ins['case'].upper().replace(' KG', ' kg')}, {ins['util']:.2f} OF HALF ITS RATED SHEAR (BDY-11)",
+                           "FOUR RAILS, TWO ON EACH SIDE WALL, 1,067 mm APART ALONG THE TRAILER (CT-203)")):
+        sh.text(122, 99 - 3 * i, t, 1.4)
     # ---- E: insert with crush tube at a body mount, 1:2 (the bolt detail is on CT-301)
     k, cx, top = 2.0, 200.0, 278.0
     _dt(sh, cx + 5, top, "E: FLOOR INSERT AND CRUSH TUBE", k)
@@ -279,15 +311,26 @@ def ct203(prj, model, bom, checks, reg, dwg):
         bb = lay.find(iid).box
         p0, p1 = P(bb[0], bb[1]), P(bb[3], bb[4])
         sh.rect(p0[0], p0[1], p1[0], p1[1], "thin")
-        sh.text((p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2 - 0.6, iid, 1.3, "middle")
+        if iid != "LA-14F":    # the machine base shares the plinth's footprint
+            sh.text((p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2 - 0.6, "EL-02, LA-14F" if iid == "EL-02" else iid, 1.3, "middle")
     # kerb-side wall from inside, with its insert strips
     oy2 = 126.0
     sh.text(ox, oy2 + V["interior_h"] / k + 5, "KERB-SIDE WALL FROM INSIDE (FRONT RIGHT): INSERT STRIPS", 2.2, bold=True)
     L, H = V["body_length"], V["interior_h"]
     sh.rect(ox, oy2, ox + L / k, oy2 + H / k, "thick")
-    zl = V["deck_z"] - V["floor_z"]
-    sh.rect(ox + (L - V["bed_u1"] - V["end_wall_t"]) / k, oy2 + (zl - 40) / k, ox + L / k, oy2 + zl / k, "fill")
-    sh.text(ox + (L - V["bed_u1"]) / k - 1, oy2 + zl / k + 1.2, "BED DECK LEDGER STRIP, DEFORM-NUT M6 AT 150", 1.4, "end")
+    fz = V["floor_z"]
+    for iid in ("LB-04.2", "LB-04.4"):          # the lift bed's hardpoints behind the kerb-side rails (LB-06)
+        rb = lay.find(iid).box
+        x0, x1 = ox + (L - (rb[3] - V["body_x0"])) / k, ox + (L - (rb[0] - V["body_x0"])) / k
+        sh.rect(x0, oy2 + (rb[2] - fz) / k, x1, oy2 + (rb[5] - fz) / k, "fill")
+    rb = lay.find("LB-04.2").box
+    sh.text(ox + (L - (rb[3] - V["body_x0"])) / k - 1, oy2 + (rb[2] - fz) / k + 1.0, "LIFT BED HARDPOINTS LB-06, RHS 40 x 20 x 3", 1.4, "end")
+    lk = lay.find("LA-11L").box                  # the lockers over the plinth hang on an insert strip
+    sh.rect(ox + (L - (lk[3] - V["body_x0"])) / k, oy2 + (lk[5] - fz - 60) / k, ox + (L - (lk[0] - V["body_x0"])) / k, oy2 + (lk[5] - fz - 25) / k, "fill")
+    sh.text(ox + (L - (lk[3] - V["body_x0"])) / k, oy2 + (lk[2] - fz) / k - 2.6, "LOCKERS' INSERT STRIP", 1.3)
+    us = lay.find("BD-18.1").cog[0] - V["body_x0"]
+    sh.line(ox + (L - us) / k, oy2, ox + (L - us) / k, oy2 + H / k, "phantom")
+    sh.text(ox + (L - us) / k + 0.8, oy2 + 3.0, "STIFFENER BD-18", 1.3)
     sh.rect(ox, oy2 + (H - 25) / k, ox + L / k, oy2 + H / k, "fill")
     sh.text(ox + 1, oy2 + H / k - 3, "TOP INSERT STRIP: ROOF JOINER AND THE AWNING BRACKETS", 1.4)
     rows = []
@@ -297,13 +340,17 @@ def ct203(prj, model, bom, checks, reg, dwg):
     rows += [("FLOOR, BODY MOUNTS", "HD PVC 70 x 26, GRP CRUSH TUBE, SPREADER", f"{res['mounts']['tension_n'] / 1000:.1f} kN TENSION", f"{res['mounts']['util']:.2f} (BDY-16)"),
              ("ROOF EDGE, ROOF JOINER", "BONDED, NO FIXINGS", f"{res['roof']['q_n_mm']:.2f} N/mm UPLIFT", f"{res['roof']['util']:.3f} (BDY-19)"),
              ("ROOF, SOLAR ARRAY", "NONE: BONDED, NO FIXINGS, NO HATCHES", "", ""),
-             ("FLOOR, FURNITURE", "M6 INTO HD PVC INSERTS UNDER EACH FOOTPRINT", "LC7 FIXINGS (CHASSIS.md)", "")]
+             ("FLOOR, FURNITURE", "M6 INTO HD PVC INSERTS UNDER EACH FOOTPRINT", "LC7 FIXINGS (CHASSIS.md)", ""),
+             ("FLOOR, PLINTH AND TOWER", "M10 TO THE RAISERS AND OUTRIGGERS, 100 x 100 SPREADERS", "SEE CT-104", ""),
+             ("REAR WALL, SPLIT CRADLE", "INSERT STRIPS AND THE ROOF JOINER, TWO STAYS", "SEE CT-104", "")]
     S.table(sh, 230.0, 232.0, [("FIXING LINE", 46), ("INSERT", 64), ("LOAD", 40), ("UTIL.", 30)], rows, size=1.45, row_h=3.2,
             title="FIXING LINES AND INSERTS")
     S.notes(sh, 22, 76, [
         "LEGEND: CROSS, BODY MOUNT (CT-301). THIN OUTLINE, A FURNITURE FOOTPRINT WITH ITS FLOOR INSERTS. PHANTOM, RAILS AND CHASSIS STATIONS.",
         "EVERY FIXING PASSES THROUGH AN INSERT STRIP AND, THROUGH THE FLOOR, A CRUSH TUBE. NO FIXING INTO BARE FOAM.",
-        "THE L-TRACK HARDPOINT STRIPS LEFT WITH THE GARAGE. THE BIKE ANCHORS ARE IN THE UTE'S BIKE BOX (CT-704).",
+        "THE LIFT BED'S FOUR HARDPOINTS, THE LOCKERS' AND THE TOWER'S INSERT STRIPS AND THE STIFFENERS ARE LAID UP IN THE PANELS. THE PLINTH "
+        "AND THE TOWER ALSO BOLT THROUGH THE FLOOR TO THE CHASSIS (HARD POINTS, CT-104). THE SPLIT'S CRADLE BOLTS THROUGH INSERT STRIPS IN THE "
+        "REAR WALL AND THE ROOF JOINER.",
         "PULL-TEST A SAMPLE OF EACH INSERT IN THE REAL PANEL BEFORE THE PANELS ARE ORDERED (report 02 LR-09).",
     ], width_chars=118, size=1.6)
     _stamp(sh, 320, 96)

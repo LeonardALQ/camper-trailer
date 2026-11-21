@@ -65,8 +65,10 @@ def _title(sh, dwg, reg, mass_note, scale, rev_model):
         checked=rev["checked"], approved=rev["approved"], engineer="NOT REVIEWED", sheet_no=dwg["sheet"], sheets=reg["sheets_total"],
         size=dwg["size"], scale=scale, material="C450L0 RHS/SHS, PLATE GR 350, HDG", mass_note=mass_note,
         model_ref=f"chassis.step (ASM-CH rev {rev_model})", git=git_hash(), weld_note=WELD_NOTE)
+    # the sheet's own layout leaves room for this many revision rows. The register (and the site's Drawings page) keeps every one
+    rows = {"CT-101": 5, "CT-102": 2, "CT-103": 2}.get(dwg["number"], 7)
     S.revision_table(sh, [dict(rev=r["rev"], date=str(r["date"]), description=r["description"], drawn=r["drawn"],
-                               checked=r["checked"], approved=r["approved"]) for r in dwg["revisions"]])
+                               checked=r["checked"], approved=r["approved"]) for r in dwg["revisions"]], max_rows=rows)
 
 
 def _draft_stamp(sh, x, y):
@@ -231,7 +233,9 @@ def ct101(prj, model, bom, checks, reg, dwg):
     S.notes(sh, 22, 46, [
         "DATUM DIM-01: X FROM THE BALL CENTRE, POSITIVE REARWARD. Y FROM THE CENTRELINE, POSITIVE TO THE ROAD SIDE. Z UP FROM THE GROUND AT DESIGN RIDE HEIGHT.",
         "RAILS RHS 150x50x3 C450L0 WITH A CONTINUOUS RHS 127x51x3.5 C350L0 RAISER (ONE COMPOSITE SECTION), 20.5 mm FLOOR BEARER STRIP. NO WELD ACROSS THE WIDTH OF A RAIL (TB 070).",
-        "REVISION E: THE HOME TRAILER. 4420 mm RAILS 1175 mm WIDE FOR THE 1555 mm TRACK, OUTRIGGERS RHS 127x51x3.5 C350L0, GREY TANK BAY, EVERY CASE AT THE 3500 kg PLATE.",
+        (f"REVISION {dwg['revisions'][-1]['rev']}: THE HOME TRAILER. AXLE GROUP CENTRE AT X {lay.V['axle_x']:,.0f} (H17). THE XT REAR SHOCK "
+         "CROSSMEMBER IS RHS 150x50x4, A GREY-BAY FLOOR CROSSMEMBER CARRIES THE GREY TANK, NO PLAN BRACES BEHIND THE XT FRONT HINGE, "
+         "EVERY CASE AT THE 3500 kg PLATE. LOAD PATHS ON CT-104."),
         "XT CROSSMEMBERS AND BODY END CROSSMEMBERS FULL RAIL HEIGHT, NO HOLES. OTHER CROSSMEMBERS AND ALL OUTRIGGERS AT RAISER HEIGHT, TOPS FLUSH WITH THE RAISER.",
         "BURR-GRIND THE WELD TOES ON THE RAIL AT EVERY FULL-HEIGHT CROSSMEMBER (FAT-01). HOT-DIP GALVANISE THE WHOLE FRAME AFTER WELDING, VENTED TO report 02 WLD-05.",
         "SEE CHASSIS.md FOR THE LOAD CASES, THE RESULTS AND WHAT THE ENGINEER MUST CHECK.",

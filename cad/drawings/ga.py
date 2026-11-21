@@ -58,7 +58,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
     # the bike box's sweep about the ball (JK-01): the arc on the trailer's side of the ball
     r = sw["radius_mm"] / sc
     sh.el.append(f'<path d="M{o[0]:.2f},{sh._y(o[1] + r):.2f} A{r:.2f},{r:.2f} 0 0,1 {o[0]:.2f},{sh._y(o[1] - r):.2f}" {sh.STY["phantom"]}/>')
-    sh.text(o[0] + r * 0.72 + 1.0, o[1] + r * 0.72, f"BIKE BOX SWEEP R {sw['radius_mm']:.1f}", 1.6)
+    sh.text(o[0] + 2.0, o[1] - r - 3.2, f"BIKE BOX SWEEP R {sw['radius_mm']:.1f}", 1.5)
     # zone lengths along the road side
     yd = P(0, hb)[1] + 9
     xs = [V["in_x0"], V["bed_x1"], V["rear_x0"], V["in_x1"]]
@@ -92,7 +92,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
     k = lay.find("EL-02")
     p0, p1 = P(k.box[0], -(hb + 25)), P(k.box[3], -(hb + 25))
     sh.line(p0[0], p0[1], p1[0], p1[1], "thick")
-    sh.text((p0[0] + p1[0]) / 2, p0[1] - 3.4, f"BATTERY PLINTH {k.box[3] - k.box[0]:.0f}", 1.6, "middle")
+    sh.text((p0[0] + p1[0]) / 2 + 4.0, p0[1] - 6.2, f"BATTERY PLINTH {k.box[3] - k.box[0]:.0f}", 1.5, "middle")
 
     # ---- elevation from the kerb side, ball on the left (third angle: the plan sits above it)
     elev_src = [s for s in shapes if not s.label.startswith(("BD-01",))]
@@ -143,62 +143,72 @@ def ct001(prj, model, bom, checks, reg, dwg):
         _cog(sh, p[0], p[1], "")
         sh.text(p[0] + 2.4, p[1] + dy - 0.6, f"CoG {cid} {'TARE' if cid == 'TC1' else 'FULLY LOADED'}, Z {c[2]:.0f}", 1.6)
 
-    # ---- mass and CoG schedule by load case (MASS-03), right column
+    # ---- front and rear views (third angle: the front view, seen from ahead, would sit to the right of the elevation's
+    # front end. They are placed in the right column with their own labels)
+    yr0 = S.revision_table(sh, [dict(rev=r["rev"], date=str(r["date"]), description=r["description"], drawn=r["drawn"],
+                                     checked=r["checked"], approved=r["approved"]) for r in dwg["revisions"]], max_rows=8)
+    gz = yr0 - 74.0
+    vF = S.View(sh, (-1, 0, 0), (0, 0, 1), sc, ox=268.0, oy=gz)
+    vF.draw(_leaves([s_ for s_ in shapes if not s_.label.startswith(("BD-01",))]), sty="medium")
+    vR = S.View(sh, (1, 0, 0), (0, 0, 1), sc, ox=362.0, oy=gz)
+    vR.draw(_leaves([s_ for s_ in shapes if not s_.label.startswith(("BD-01", "DB-", "GS-", "DX-", "SP-", "PL-03A"))]), sty="medium")
+    for vx, lab, left, right in ((268.0, "FRONT VIEW, FROM AHEAD", "ROAD", "KERB"), (362.0, "REAR VIEW, FROM BEHIND", "KERB", "ROAD")):
+        sh.line(vx - 30, gz, vx + 30, gz, "thick")
+        sh.line(vx, gz - 2, vx, gz + ch["travel_height"] / sc + 2, "centre")
+        sh.text(vx, gz + ch["travel_height"] / sc + 5.0, lab, 2.0, "middle", bold=True)
+        sh.text(vx, gz + ch["travel_height"] / sc + 2.4, f"SCALE 1:{sc:g}", 1.5, "middle")
+        sh.text(vx - 29, gz - 3.0, left, 1.4)
+        sh.text(vx + 29, gz - 3.0, right, 1.4, "end")
+    S.hdim(sh, 362.0 - (V["half_bw"] + 100) / sc, gz, 362.0 + V["half_bw"] / sc, gz, gz - 6.0, f"{ch['overall_width']:.0f} WITH THE AWNING", size=1.4)
+    S.hdim(sh, 268.0 - V["half_bw"] / sc, gz, 268.0 + V["half_bw"] / sc, gz, gz - 6.0, f"{V['body_width']:.0f} BODY", size=1.4)
+    xr2 = 362.0 + (V["half_bw"] + 30) / sc
+    S.vdim(sh, xr2, gz, xr2, gz + ch["travel_height"] / sc, xr2 + 5, f"{ch['travel_height']:.0f}", size=1.4)
+    # ---- key figures, right column (the case table is CT-002, the checks CT-003)
     plate = rep["caps"]["plated"]
-    rows = []
-    for c in rep["cases"]:
-        n, g = c["nominal"], c["growth"]
-        rows.append([c["id"], c["name"][:30], f"{n['mass_kg']:.0f}", f"{g['mass_kg']:.0f}", f"{n['cog'][0]:.0f}", f"{n['cog'][2]:.0f}",
-                     f"{n['towball_kg']:.0f} / {g['towball_kg']:.0f}", f"{n['towball_pct']:.1f}", f"{n['axle_kg']:.0f}",
-                     (f"{plate - g['mass_kg']:+.0f}", "#000" if g["mass_kg"] <= plate else "#c00")])
-    yt = S.table(sh, 230.0, 236.0, [("CASE", 10), ("WHAT IS ABOARD", 44), ("kg", 11), ("kg +GR", 13), ("CoG X", 12), ("CoG Z", 12),
-                                    ("BALL / +GR", 20), ("BALL %", 13), ("AXLE kg", 14), ("PLATE +GR", 31)], rows, size=1.6, row_h=3.2,
-                 title=f"MASS AND CoG BY LOAD CASE (MASS-03). +GR = WITH MASS-06 GROWTH. ATM PLATE {plate:,.0f} kg")
-    rows = []
-    for r in (r for r in rep["checks"] if not r["type"].startswith(("chassis_", "body_"))):
-        col = "#000" if r["ok"] else ("#c00" if r["severity"] == "fail" else "#b06000")
-        val = "" if r["measured"] is None else f"{r['measured']:.1f} {r['unit']}"
-        rows.append([r["id"], r["title"][:95], (val, col), (r["status"], col)])
-    for pre, what in (("chassis_", "Chassis: {n} stress, fitting, deflection, twist and fatigue checks (CT-101, CT-103, CHASSIS.md)"),
-                      ("body_", "Body: {n} panel, insert, joint, mount, end wall and opening checks (CT-201 to CT-301, BODY.md)")):
-        grp = [r for r in rep["checks"] if r["type"].startswith(pre)]
-        bad = [r["id"] for r in grp if not r["ok"] and r["severity"] == "fail"]
-        rows.append([pre[:3].upper(), what.format(n=len(grp))[:95], f"{len(grp) - len(bad)} of {len(grp)} ok",
-                     ("FAIL " + ", ".join(bad), "#c00") if bad else "PASS"])
-    yt = S.table(sh, 230.0, yt - 5.5, [("CHECK", 13), ("TITLE", 119), ("MODEL", 25), ("RESULT", 23)], rows, size=1.6, row_h=3.0,
-                 title="WHOLE-TRAILER CHECKS (data/checks.yaml)")
-    gcm = next(r for r in rep["checks"] if r["id"] == "GCM-01")
+    chk = {c["id"]: c for c in rep["checks"]}
+    tc2 = cases["TC2"]
+    w = rep["solved"]["window"]
+    fails = [c["id"] for c in rep["checks"] if c["severity"] == "fail" and not c["ok"]]
+    nf = sum(1 for c in rep["checks"] if c["severity"] == "fail")
+    lo_ball = min(c["nominal"]["towball_kg"] for c in rep["cases"])
+    hi_ball = max(c["nominal"]["towball_kg"] for c in rep["cases"])
     rows = [
-        ["Rail outer width at the XT hinges", f"{ch['rail_outer_width']:.0f}", f"C/F {ch['cf']:.0f} with ET {ch['wheel_offset']:.0f}, {ch['track']:.0f} track"],
-        ["Raiser and strip, rail top to floor underside", f"{ch['raiser_h']:.0f}", "RHS 150x50x3 RAIL, RHS 127x51x3.5 RAISER (CT-101)"],
-        ["Axle group centre from the ball", f"{V['axle_x']:.0f}", f"hubs {hx[0]:.0f} and {hx[1]:.0f}"],
-        ["CoG height, fully loaded", f"{ch['cog_loaded'][2]:.0f}", f"{ch['cog_loaded_growth'][2]:.0f} with growth"],
-        ["Bike box sweep and underside", f"{sw['radius_mm']:.1f} / {sw['underside_z']:.0f}", f"box {sw['body_overhang_mm']:.0f} behind the ball (U2 model)"],
-        ["Wheel and tyre", f"{ch['tyre_d']:.0f}", "ROH TRAK 2 16x7 ET 0, LT265/75R16, LC5 HUBS"],
-        ["Combination (GCM-01)", f"{gcm['measured']:,.0f} kg", f"against {rep['tow_vehicle']['limits']['gcm_kg']:,.0f} kg with the ute"],
+        ["Body", f"{V['body_length']:.0f} x {V['body_width']:.0f} mm", f"Fixed roof, {rep['params']['interior_h']:.0f} mm inside, rounded front edges (H12)"],
+        ["Overall", f"{ch['overall_length']:.0f} x {ch['overall_width']:.0f} mm", f"Travel height {ch['travel_height']:.0f} mm on the solar panels"],
+        ["Axle group centre", f"X {V['axle_x']:,.0f}", f"Window X {w['x_lo']:,.0f} to {w['x_hi']:,.0f} (H17, MAS-05)"],
+        ["Tare", f"{rep['tare_kg']:,.0f} kg", f"{cases['TC1']['growth']['mass_kg']:,.0f} kg with growth"],
+        ["Fully loaded, TC2", f"{tc2['nominal']['mass_kg']:,.0f} kg", f"{tc2['growth']['mass_kg']:,.0f} kg with growth, ATM plate {plate:,.0f} kg"],
+        ["Towball", f"{lo_ball:.0f} to {hi_ball:.0f} kg", f"{chk['MAS-12']['measured']:.1f} % lowest (TC7), {chk['MAS-13']['measured']:.0f} kg heaviest with growth"],
+        ["Ute rear axle", f"{chk['MAS-03']['measured']:,.0f} kg", f"Against the Elite kit's {rep['tow_vehicle']['limits']['rear_axle_kg']:,.0f} kg with growth (MAS-03)"],
+        ["Combination", f"{chk['GCM-01']['measured']:,.0f} kg", f"Against Lovells' {rep['tow_vehicle']['limits']['gcm_kg']:,.0f} kg GCM revision (GCM-01)"],
+        ["CoG, fully loaded", f"Z {ch['cog_loaded'][2]:,.0f}", f"Z {ch['cog_loaded_growth'][2]:,.0f} with growth. Across: {chk['MAS-11']['measured']:.1f} mm at worst (MAS-11)"],
+        ["Coupling", f"{V['coupling_z']:.0f} mm", "Laden, plus or minus 20 mm (UTE-01). DO35 V3Plus"],
+        ["Water", f"{rep['params']['water_full_l']:.0f} L net", f"At most {rep['params']['water_travel_l']:.0f} L in travel (H13), 130 L grey tank"],
+        ["Wheels and tyres", f"{ch['tyre_d']:.0f} mm", "ROH Trak 2 16x7 ET 0, LT265/75R16, the ute's wheel"],
+        ["Fail checks", f"{nf - len(fails)} of {nf} pass", ("FAILING: " + ", ".join(fails)) if fails else "Every fail check passes (CT-003 lists them by item)"],
     ]
-    S.table(sh, 230.0, yt - 5.5, [("KEY FIGURE (mm)", 70), ("VALUE", 30), ("NOTE", 80)], rows, size=1.6, row_h=3.0, title="CHASSIS INPUTS")
+    yk = S.table(sh, 230.0, gz - 14.0, [("KEY FIGURE", 34), ("VALUE", 30), ("NOTE", 116)], rows, size=1.5, row_h=3.1, title="KEY FIGURES")
+    S.notes(sh, 230.0, yk - 6.0, [
+        "THE SET: CT-002 MASS AND CoG, CT-003 COMPLIANCE, CT-010 TO CT-013 LAYOUT, CT-101 TO CT-104 CHASSIS AND LOAD PATHS, CT-201 TO "
+        "CT-301 BODY, CT-601 TO CT-621 SERVICES, CT-701 TO CT-704 THE UTE'S BIKE BOX.",
+    ], title="", size=1.4, width_chars=150)
     S.notes(sh, 22, 76, [
         "DATUM DIM-01: X FROM THE BALL CENTRE, POSITIVE REARWARD. Y FROM THE CENTRELINE, POSITIVE TO THE ROAD SIDE. Z UP FROM THE GROUND, "
         "TRAILER LEVEL AT DESIGN RIDE HEIGHT. A RIGHT-HANDED FRAME, SO THE 3D MODEL AND THESE VIEWS SHOW THE TRAILER AS IT IS.",
-        "BLOCK LAYOUT. EVERY ITEM EXCEPT THE CHASSIS IS AN ENVELOPE WITH A MASS. POSITIONS MARKED PLACEHOLDER IN assemblies/trailer.yaml ARE NOT DESIGNED YET.",
-        (f"AXLE IN THE MIDDLE OF THE TOWBALL WINDOW, X {rep['solved']['window']['x_lo']:,.0f} TO {rep['solved']['window']['x_hi']:,.0f}: EVERY CASE "
-         f"KEEPS {rep['solved']['window']['pct_min']:.1f} % ON THE BALL AND THE HEAVIEST TOWBALL WITH GROWTH STAYS AT OR UNDER "
-         f"{rep['solved']['window']['ball_max']['kg']:.0f} kg (H17, MAS-12, MAS-13). THE UTE'S REAR AXLE STAYS WITHIN THE ELITE KIT'S "
-         f"{rep['tow_vehicle']['limits']['rear_axle_kg']:.0f} kg (MAS-03). "
-         "NO BALLAST IN ANY CASE."),
-        "REVISION J: THE HOME TRAILER. THE BIKES RIDE IN THE UTE'S BIKE BOX (CT-701 TO CT-704). LIFT BED OVER THE DESK ACROSS THE FRONT, "
-        f"FIXED ROOF {rep['params']['interior_h']:.0f} INSIDE, {rep['params']['body_length']:.0f} BODY, WET ROOM AT THE REAR. AT MOST "
-        f"{rep['params']['water_travel_l']:.0f} L OF WATER IN TRAVEL. INTERIM SHEET: THE PHASE 2 SET REDRAWS IT.",
-        "THE GENERATOR AND THE JERRY CANS RIDE IN A SEALED, VENTED DRAWBAR BOX BEHIND THE STONE GUARD, OUTSIDE THE BIKE BOX'S SWEEP. NO PETROL IN THE BODY.",
-        "XT AIR 4500 kg BUILD ON LC5 M14 HUBS AT 900 mm, ROH TRAK 2 16x7 ET 0 WITH LT265/75R16, THE UTE'S WHEEL. ONE SPARE HERE, ONE UNDER THE UTE'S TRAY.",
-        "THE UTE'S BALL SITS AT 440 mm LADEN, PLUS OR MINUS 20 mm, 1300 mm BEHIND ITS REAR AXLE (measurements.yaml UTE-01, UTE-02).",
-        "PHANTOM OUTLINES ON THE PLAN ARE FLOOR SPACE KEPT CLEAR (DOOR LANDINGS, CHAIR SPACE, AISLE, WALK BAND, STEP ZONE). THE ARC IS THE BIKE BOX'S SWEEP (JK-01).",
-        ("CHECKS " + ", ".join(c["id"] for c in rep["checks"] if c["severity"] == "fail" and not c["ok"]) + " FAIL. SEE TRAILER.md.")
-        if any(c["severity"] == "fail" and not c["ok"] for c in rep["checks"]) else "EVERY FAIL CHECK PASSES.",
-    ], width_chars=118, size=1.7)
-    S.revision_table(sh, [dict(rev=r["rev"], date=str(r["date"]), description=r["description"], drawn=r["drawn"],
-                               checked=r["checked"], approved=r["approved"]) for r in dwg["revisions"]], max_rows=8)
+        (f"AXLE IN THE MIDDLE OF THE TOWBALL WINDOW, X {w['x_lo']:,.0f} TO {w['x_hi']:,.0f}: EVERY CASE KEEPS {w['pct_min']:.1f} % ON THE BALL AND "
+         f"THE HEAVIEST TOWBALL WITH GROWTH STAYS AT OR UNDER {w['ball_max']['kg']:.0f} kg (H17, MAS-12, MAS-13). THE UTE'S REAR AXLE STAYS "
+         f"WITHIN THE ELITE KIT'S {rep['tow_vehicle']['limits']['rear_axle_kg']:.0f} kg (MAS-03). NO BALLAST IN ANY CASE."),
+        "REVISION " + dwg["revisions"][-1]["rev"] + ": THE HOME TRAILER. THE BIKES RIDE IN THE UTE'S BIKE BOX. THE LIFT BED OVER THE DESK ACROSS "
+        f"THE FRONT, THE KITCHEN ON THE ROAD SIDE, THE BATTERY PLINTH ON THE KERB SIDE, THE WET ROOM ACROSS THE REAR. AT MOST "
+        f"{rep['params']['water_travel_l']:.0f} L OF WATER IN TRAVEL (H13), 233 L IF LOVELLS' GCM REVISION IS REFUSED (CT-003).",
+        "ROOF (H12): FIXED, WITH ROUNDED FRONT EDGES (ABOUT +6 kg AND AUD 3,500, RESEARCH REPORT 25). TOWING FUEL IS ABOUT 21.3 L/100 km AT "
+        "90 km/h AGAINST 25.0 FOR A SQUARE FRONT. A HARD-WALLED TELESCOPING ROOF GIVES 20.6 BUT COSTS +117 kg AND ABOUT AUD 32,900 MORE "
+        "AND RULES OUT THE S4 WINDOWS, STOCK DOORS, THE HAPPIJAC BED AND A FULL-HEIGHT WET ROOM. A CANVAS POP-TOP FAILS H3 AND H7.",
+        "THE TWO GENERATORS AND THE JERRY CANS RIDE IN A SEALED, VENTED DRAWBAR BOX BEHIND THE STONE GUARD, OUTSIDE THE BIKE BOX'S SWEEP. "
+        "NO PETROL IN THE BODY. THE SPARE WHEEL STANDS ON THE FRONT WALL ABOVE THE BOX.",
+        "XT AIR 4500 kg BUILD ON LC5 M14 HUBS AT 900 mm. THE UTE'S BALL SITS AT 440 mm LADEN, 1300 mm BEHIND ITS REAR AXLE (UTE-01, UTE-02).",
+        "PHANTOM OUTLINES ON THE PLAN ARE FLOOR SPACE KEPT CLEAR (CT-010). THE ARC IS THE BIKE BOX'S SWEEP (JK-01).",
+    ], width_chars=150, size=1.5)
     rev = dwg["revisions"][-1]
     tare = cases["TC1"]
     S.title_block(

@@ -4,11 +4,11 @@
 owner: Camper trailer project (owner-builder)
 project: Off-road camper trailer for the LandCruiser 79
 drawn_by: Kiro (AI agent)
-sheets_total: 12
+sheets_total: 24
 drawings:
   - number: CT-001
     title: General arrangement, whole trailer
-    subtitle: Block layout for the 79. Plan, kerb-side elevation, bike box sweep, mass and CoG by case
+    subtitle: Home trailer. Plan, kerb-side elevation, front and rear views, key figures and the bike box sweep
     project: Off-road camper trailer, whole trailer block layout
     sheet: 1
     size: A3
@@ -28,11 +28,78 @@ drawings:
       - {rev: J, date: 2026-11-20, description: "Notice: trailer for the 79, layout 1, no garage, fixed roof, drawbar box. Redrawn", drawn: Kiro, checked: "", approved: ""}
       - {rev: K, date: 2026-11-20, description: "Notice: jockey wheel swung up for travel, axle X 4,197, sweep R 948.5", drawn: Kiro, checked: "", approved: ""}
       - {rev: L, date: 2026-11-21, description: "Interim: home trailer data, model and checks (phase 1). Sheet redrawn in phase 2", drawn: Kiro, checked: "", approved: ""}
+      - {rev: M, date: 2026-11-21, description: "Notice: home trailer GA, four views, roof comparison (H12), water limit (H13). Redrawn", drawn: Kiro, checked: "", approved: ""}
+  - number: CT-002
+    title: Mass and centre of gravity
+    subtitle: Every load case with growth, the axle window of H17, the CoG in elevation and across
+    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    sheet: 2
+    size: A3
+    scale: NTS
+    status: DRAFT
+    structural: true
+    revisions:
+      - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
+  - number: CT-003
+    title: Compliance
+    subtitle: VSB1 items and the standards with the design figures, operating limits and the plate
+    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    sheet: 3
+    size: A3
+    scale: 60
+    status: DRAFT
+    structural: false
+    revisions:
+      - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
+  - number: CT-010
+    title: Floor plan, bed up and bed down
+    subtitle: Day and night plans, walkways, door swings, spaces kept clear and the bed positions
+    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    sheet: 4
+    size: A3
+    scale: 40
+    status: DRAFT
+    structural: false
+    revisions:
+      - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
+  - number: CT-011
+    title: Elevations and openings
+    subtitle: Kerb, road, front and rear walls with the 17 openings, their positions and margins
+    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    sheet: 5
+    size: A3
+    scale: 40
+    status: DRAFT
+    structural: false
+    revisions:
+      - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
+  - number: CT-012
+    title: Sections
+    subtitle: Through the bed by day and night, the plinth and bench, the wet room, well and grey tank
+    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    sheet: 6
+    size: A3
+    scale: 40
+    status: DRAFT
+    structural: false
+    revisions:
+      - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
+  - number: CT-013
+    title: Window, door and hatch schedule
+    subtitle: The 17 openings with product, cut-out, clear opening, operation, blind and position
+    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    sheet: 7
+    size: A3
+    scale: 100
+    status: DRAFT
+    structural: false
+    revisions:
+      - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-101
     title: Chassis general arrangement
     subtitle: Plan, kerb-side elevation, end views, member schedule and frame analysis summary
     project: Off-road camper trailer, chassis and drawbar
-    sheet: 2
+    sheet: 8
     size: A3
     scale: 50
     status: DRAFT
@@ -43,11 +110,12 @@ drawings:
       - {rev: C, date: 2026-11-20, description: "Notice: report 13 masses, corner steadies 8.8 kg, axle re-solved", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-20, description: "Notice: 79 layout, 4,420 rails 1,175 wide, RHS 125 raisers, plate 3,100 kg", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-21, description: "Interim: home trailer data, model and checks (phase 1). Sheet redrawn in phase 2", drawn: Kiro, checked: "", approved: ""}
+      - {rev: F, date: 2026-11-21, description: "Notice: home trailer, axle X 4,381, grey-bay station, XT rear shock RHS 150x50x4", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
     project: Off-road camper trailer, chassis and drawbar
-    sheet: 3
+    sheet: 9
     size: A3
     scale: 20
     status: DRAFT
@@ -59,11 +127,12 @@ drawings:
       - {rev: D, date: 2026-11-20, description: "Notice: jockey at X 1,000, drawbar box brackets, VSB1 forces at 3,100 kg", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-20, description: "Notice: jockey wheel swung up for travel, stone guard trimmed (kerb side)", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-21, description: "Interim: home trailer data, model and checks (phase 1). Sheet redrawn in phase 2", drawn: Kiro, checked: "", approved: ""}
+      - {rev: G, date: 2026-11-21, description: "Notice: home trailer, drawbar box for two EU22i, VSB1 forces at the 3,500 kg plate", drawn: Kiro, checked: "", approved: ""}
   - number: CT-103
     title: Chassis details
     subtitle: Composite rail, outrigger root, crossmember to rail, overlap end, jacking pad, recovery tongue, spare posts
     project: Off-road camper trailer, chassis and drawbar
-    sheet: 4
+    sheet: 10
     size: A3
     scale: 5
     status: DRAFT
@@ -73,11 +142,23 @@ drawings:
       - {rev: B, date: 2026-11-20, description: "Notice: 50 x 21 mm bearer strip, fatigue table from the re-solved axle", drawn: Kiro, checked: "", approved: ""}
       - {rev: C, date: 2026-11-20, description: "Notice: RHS 125 raiser and outrigger details, fatigue table re-solved", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-21, description: "Interim: home trailer data, model and checks (phase 1). Sheet redrawn in phase 2", drawn: Kiro, checked: "", approved: ""}
+      - {rev: E, date: 2026-11-21, description: "Notice: home trailer details, spare posts to the raised spare, fatigue re-solved", drawn: Kiro, checked: "", approved: ""}
+  - number: CT-104
+    title: Structural load paths and body mounts
+    subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads
+    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    sheet: 11
+    size: A3
+    scale: 40
+    status: DRAFT
+    structural: true
+    revisions:
+      - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-201
     title: Body shell
     subtitle: Kerb, road, front and rear walls, the fixed roof plan, the panels and every opening with its size
     project: Off-road camper trailer for the LandCruiser 79, body
-    sheet: 5
+    sheet: 12
     size: A3
     scale: 50
     status: DRAFT
@@ -85,11 +166,12 @@ drawings:
     revisions:
       - {rev: A, date: 2026-11-20, description: "First draft of the fixed-roof body for the 79 (BODY.md, report 12)", drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-21, description: "Interim: home trailer data, model and checks (phase 1). Sheet redrawn in phase 2", drawn: Kiro, checked: "", approved: ""}
+      - {rev: C, date: 2026-11-21, description: "Notice: 2,000 mm walls, front radii (H12), 17 openings (H15), bed rails, stiffeners", drawn: Kiro, checked: "", approved: ""}
   - number: CT-202
     title: Body joint details
-    subtitle: Floor joiner, corner joiner, roof-to-wall joiner, bed deck ledger and a floor insert with its crush tube
+    subtitle: Floor joiner, corner joiner, roof-to-wall joiner, lift bed rail hardpoint and a floor insert with its crush tube
     project: Off-road camper trailer for the LandCruiser 79, body
-    sheet: 6
+    sheet: 13
     size: A3
     scale: 2
     status: DRAFT
@@ -97,11 +179,12 @@ drawings:
     revisions:
       - {rev: A, date: 2026-11-20, description: "First draft of the fixed-roof body for the 79 (BODY.md, report 12)", drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-21, description: "Interim: home trailer data, model and checks (phase 1). Sheet redrawn in phase 2", drawn: Kiro, checked: "", approved: ""}
+      - {rev: C, date: 2026-11-21, description: "Notice: lift bed rail hardpoint in place of the deck ledger, roof joiner", drawn: Kiro, checked: "", approved: ""}
   - number: CT-203
     title: Body insert map
     subtitle: Every fixing line in the floor, the walls and the roof, the mount inserts and the furniture fixings
     project: Off-road camper trailer for the LandCruiser 79, body
-    sheet: 7
+    sheet: 14
     size: A3
     scale: 50
     status: DRAFT
@@ -109,11 +192,12 @@ drawings:
     revisions:
       - {rev: A, date: 2026-11-20, description: "First draft of the fixed-roof body for the 79 (BODY.md, report 12)", drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-21, description: "Interim: home trailer data, model and checks (phase 1). Sheet redrawn in phase 2", drawn: Kiro, checked: "", approved: ""}
+      - {rev: C, date: 2026-11-21, description: "Notice: bed rail hardpoints, wall stiffeners, cradle and tower insert strips", drawn: Kiro, checked: "", approved: ""}
   - number: CT-301
     title: Body to chassis
     subtitle: Mount positions, the bolt and nut-plate detail, isolation and sealing, the twist sharing
     project: Off-road camper trailer for the LandCruiser 79, body
-    sheet: 8
+    sheet: 15
     size: A3
     scale: 50
     status: DRAFT
@@ -121,6 +205,7 @@ drawings:
     revisions:
       - {rev: A, date: 2026-11-20, description: "First draft of the fixed-roof body for the 79 (BODY.md, report 12)", drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-21, description: "Interim: home trailer data, model and checks (phase 1). Sheet redrawn in phase 2", drawn: Kiro, checked: "", approved: ""}
+      - {rev: C, date: 2026-11-21, description: "Notice: home trailer masses and mounts, hard points on CT-104", drawn: Kiro, checked: "", approved: ""}
   - number: CT-401
     title: Garage and bed general arrangement
     subtitle: Plan, kerb-side section and section looking forward at partition A
@@ -170,11 +255,66 @@ drawings:
       - {rev: D, date: 2026-11-19, description: "Notice: SHS 50x50x3 beams across, deck 2375 laps partition A. Redrawn", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-20, description: "Notice: DIM-01 made right-handed. Plan and detail F redrawn as seen", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-20, description: "Retired: the garage and bed module left the trailer for the 79", drawn: Kiro, checked: "", approved: ""}
+  - number: CT-601
+    title: Electrical single-line diagram
+    subtitle: 48 V battery, BMS, inverter, solar, converters, ute feed, 230 V circuits, load shedding
+    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    sheet: 16
+    size: A3
+    scale: NTS
+    status: DRAFT
+    structural: false
+    revisions:
+      - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
+  - number: CT-602
+    title: Electrical layout
+    subtitle: Battery plinth, board, inverter, cable routes, glands, outlets and the cable schedule
+    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    sheet: 17
+    size: A3
+    scale: 25
+    status: DRAFT
+    structural: false
+    revisions:
+      - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
+  - number: CT-611
+    title: Plumbing schematic
+    subtitle: Fill, fresh tanks, pump, filters, cold and hot lines, drains to the grey tank and the dump
+    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    sheet: 18
+    size: A3
+    scale: NTS
+    status: DRAFT
+    structural: false
+    revisions:
+      - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
+  - number: CT-612
+    title: Plumbing layout
+    subtitle: Tanks, pump cabinet, drains with their falls, the shower well, fill and dump points
+    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    sheet: 19
+    size: A3
+    scale: 25
+    status: DRAFT
+    structural: false
+    revisions:
+      - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
+  - number: CT-621
+    title: HVAC and ventilation
+    subtitle: Split, heat-recovery pairs, extract, towing pressurisation, relief, hood, Combi ducts
+    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    sheet: 20
+    size: A3
+    scale: 25
+    status: DRAFT
+    structural: false
+    revisions:
+      - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-701
     title: Ute with the bike garage, general arrangement
     subtitle: Kerb-side elevations travelling and loading, plan, rear view, mass by case and the ute checks
     project: LandCruiser 79 bike garage (UTE-GARAGE.md)
-    sheet: 9
+    sheet: 21
     size: A3
     scale: 50
     status: DRAFT
@@ -182,12 +322,12 @@ drawings:
     revisions:
       - {rev: A, date: 2026-11-20, description: "First draft", drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-20, description: "Notice: ball 1300 behind axle, 440 laden, trailer 3100 kg, re-solved", drawn: Kiro, checked: "", approved: ""}
-      - {rev: C, date: 2026-11-20, description: "Notice: box rev C (R24), 436.1 kg with the 1.6 mm roof, anchors at X 450", drawn: Kiro, checked: "", approved: ""}
+      - {rev: C, date: 2026-11-20, description: "Notice: box revision C, 436.1 kg with the 1.6 mm roof, anchors at X 450", drawn: Kiro, checked: "", approved: ""}
   - number: CT-702
     title: Ute garage box frame and panels
     subtitle: Kerb-side frame elevation, subframe plan on Toyota's deck mounts, section at the rear axle, member schedule
     project: LandCruiser 79 bike garage (UTE-GARAGE.md)
-    sheet: 10
+    sheet: 22
     size: A3
     scale: 20
     status: DRAFT
@@ -200,7 +340,7 @@ drawings:
     title: Ute garage doors and security
     subtitle: Rear view, kerb-side door, plan section through the barn doors, security layers
     project: LandCruiser 79 bike garage (UTE-GARAGE.md)
-    sheet: 11
+    sheet: 23
     size: A3
     scale: 20
     status: DRAFT
@@ -213,7 +353,7 @@ drawings:
     title: Ute garage restraint layout
     subtitle: Plan with the roof off, section at the rear L-track row, strap loads and anchors
     project: LandCruiser 79 bike garage (UTE-GARAGE.md)
-    sheet: 12
+    sheet: 24
     size: A3
     scale: 20
     status: DRAFT
