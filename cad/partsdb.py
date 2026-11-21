@@ -133,7 +133,7 @@ class AssemblyDef(Strict):
 class Check(Strict):
     id: str
     title: str
-    type: Literal["clearance", "height", "contact", "landing", "beam", "restraint"]
+    type: Literal["clearance", "height", "contact", "landing", "beam", "restraint", "roof"]
     a: list[str] | None = None
     b: list[str] | None = None
     each: list[str] | None = None
@@ -145,6 +145,7 @@ class Check(Strict):
     tolerance_mm: float = 0.01
     beam: dict[str, Any] | None = None
     restraint: dict[str, Any] | None = None
+    roof: dict[str, Any] | None = None     # roof: the bike box's roof skin (cad/ute_garage.py roof_skin)
     span_ratio: float | None = None
     severity: Literal["fail", "report"]
     added_by_build: bool = False

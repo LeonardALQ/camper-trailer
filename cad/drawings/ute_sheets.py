@@ -211,7 +211,9 @@ def ct701(prj, model, bom, checks, reg, dwg):
         f"WITH THE REVISION. TOWBALL {V['towball_design']:.0f} kg WITH GROWTH, AT MOST {L['towball_rating_kg']:.0f} kg.",
         f"BOX FLOOR {g['deck_z']:.0f} ABOVE THE GROUND ON A 50 mm SUBFRAME ON THE RAILS, WITH WHEEL TUBS {g['dims']['tub_h']:.1f} HIGH (ESTIMATE: FRAME TOP 774, BUMP TRAVEL 110). MEASURE BOTH ON THE VEHICLE.",
         f"THE REAR-MOST POINT IS THE CAM BAR ON THE BARN DOORS. BOX OUTSIDE {P['outside_l']:.0f} LONG, {P['outside_w']:.0f} WIDE, "
-        f"{P['top_z']:.0f} HIGH ABOVE THE FLOOR, {P['flare_w']:.0f} WIDE OVER THE REAR TUB FLARES (DETAIL B).",
+        f"{P['top_z']:.0f} HIGH ABOVE THE FLOOR AT THE WALLS AND {P['top_z'] + P['roof_crown']:.0f} AT THE ROOF'S CROWN, {P['flare_w']:.0f} WIDE OVER THE REAR TUB FLARES (DETAIL B).",
+        f"ROOF: NO STEP, NO KNEELING. {P['roof_t']:g} mm 5052-H32 ON BOWS CROWNED 1:{P['roof_fall']:.0f} TO BOTH SIDES, WELDED CONTINUOUSLY ALONG THE "
+        "FRONT EDGE AND THE FIRST BOW BEHIND IT, STITCHED TO THE OTHER BOWS (UGF-01). A KNEE DENTS THE SHEET.",
         "NO DRILLING OR WELDING OF THE FRAME. THE SUBFRAME BOLTS TO TOYOTA'S DECK MOUNT BRACKETS (CT-702).",
     ], width_chars=100, size=1.75)
     _detail_b(sh, 240, 165, P, V, L)

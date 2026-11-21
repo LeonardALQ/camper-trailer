@@ -68,7 +68,9 @@ params:
   x_end: garage_length + leaf_t                 # outside rear face, module X
   ceiling_z: 1460           # underside of the roof bows and the door header (report 17)
   roof_z: ceiling_z + frame_s       # roof skin underside
-  top_z: roof_z + roof_t            # roof top above the floor: 1,502 mm
+  top_z: roof_z + roof_t            # roof top above the floor at the side walls: 1,502 mm
+  roof_fall: 50                     # the bows fall 1:50 from a crown on the centreline to each side wall (UGF-01)
+  roof_crown: half_width / roof_fall  # the crown stands 17.7 mm over the bows' ends, so the box is that much taller at the centre
   # posts along each side wall (X of each post's front face) and roof bows across
   post1_x: 560
   post2_x: 1200             # the kerb door's rear jamb, standing on the tub

@@ -157,6 +157,9 @@ def evaluate(prj: Project, model, checks: list[Check] | None = None) -> list[dic
                         f"{w['worst_kgf'] / lc:.2f} of the {lc:g} kg LC. Chock push in braking: "
                         + ", ".join(f"{b['bike']} {b['chock_push_kgf']:.0f} kgf" for b in res["bikes"])),
                 why=c.why, seconds=round(time.time() - t0, 2)))
+        elif c.type == "roof":
+            from .ute_garage import roof_skin
+            out.append(dict(roof_skin(prj, c), seconds=round(time.time() - t0, 2)))
         elif c.type == "beam":
             # Simply supported beam under a uniform load: deflection 5 W L^3 / (384 E I), stress W L / (8 Z)
             bm = c.beam

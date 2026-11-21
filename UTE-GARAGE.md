@@ -22,7 +22,7 @@ Outside 2,590 x 1,850 x 1,502 mm, and 1,890 mm wide over the rear tub flares. In
 | Part | Material, size |
 |---|---|
 | Walls, front, door skins | 5052-H32 2.5 mm, sheets on end, joints on posts |
-| Roof | 5052-H32 1.6 mm, joints on bows |
+| Roof | 5052-H32 1.6 mm on bows crowned 1:50, joints on bows. No step, no kneeling |
 | Floor | 5052-H32 4.0 mm, joints on crossmembers |
 | Wheel tubs | 5052-H32 3.0 mm |
 | Rear tub flares | 5052-H32 2.5 mm, folded |
@@ -42,7 +42,7 @@ Welding:
 
 - TIG (AC) on sheet, pulsed MIG allowed on tube. Filler ER5356 throughout, which ESAB's chart rates for 5052 and 6061 joints ([ESAB guide](https://ldgsesabwe.blob.core.windows.net/manuals/InstructionManuals/XA00248621_ESAB_Aluminum_Technical_Guide_EN.pdf)). Welders qualified to ISO 9606-2.
 - Design welded 6061-T6 at 165 MPa ultimate and 103 MPa yield ([Aluminum Design Manual minimums](https://www.eng-tips.com/threads/accounting-for-haz-in-6061-t6-pipe.435571/)), and welded 5052-H32 at O temper, 170 and 65 MPa (est.). Take the softened zone as 25 mm either side of a weld ([15 to 25 mm](https://industrialmonitordirect.com/blogs/knowledgebase/6061-t6-aluminum-weld-strength-post-weld-yield-values)) and keep bolt holes out of it.
-- Welded: body, subframe, mount angles, door leaves, keepers, shrouds. Skins continuous on outer edges and butt joints, stitched 30 mm at 150 mm pitch elsewhere.
+- Welded: body, subframe, mount angles, door leaves, keepers, shrouds. Skins continuous on outer edges and butt joints, and the roof skin along the first bow behind the front edge, where the highway suction peaks. Stitched 30 mm at 150 mm pitch elsewhere.
 - Bolted: aluminium to steel, body to subframe, subframe to brackets, track, chocks, anchors, cam bar, lamps. Hinges riveted with stainless rivets.
 
 ## 4. Structure and mounting
@@ -56,6 +56,8 @@ Laden rail tops sit about 774 mm up (est.), so the 6 mm strip, 50 mm subframe an
 The body bolts down to the subframe from inside, with about 40 sealed M8 bolts into rivet nuts.
 
 Wheel tubs and flares. The tubs follow the rear tyres, 25 mm over them at full bump and 40 mm inside them. The Elite's housing gives a 1,555 mm rear track (research report 26, est.), 95 mm wider than Toyota's 1,460 mm, so each tyre's outer face is 911.5 mm from the centreline, 11 mm from the 1,850 mm body's skin against Toyota's 30 mm. Over each tub the side skin is cut away up to the top of the bottom rail, 130.5 mm above the floor's underside, and a flare of 2.5 mm sheet, folded into a channel 925 mm long and 20 mm deep, closes the opening. Its top is welded to the rail and its ends to the skin. The tyre keeps 31 mm (UGW-03), and the box is 1,890 mm over the flares against UTE-09's 1,910 mm. The mount angles stay over Toyota's brackets, the road-side tool chest is 270 mm wide so it stays on its tub, and Lovells' two mudflaps hang behind the tyres from the rear outriggers, 47.5 mm further out than on the factory track. Measure the rear track (VEH-28) once the kit is fitted and build the tubs and flares to it.
+
+Roof. The 1.6 mm skin spans bows at most 640 mm apart, crowned 1:50 from the centreline to each side wall, so the box stands 17.7 mm taller at the centre than at its walls. At 110 km/h the flow behind the step over the cab's roof pulls on it at about 0.84 kPa (Cp -1.5, est.). Welded to the bows, the sheet drums about 4 mm and its membrane tension puts 38 MPa on the softened sheet at the bow, against 65 MPa (UGF-01). A 10 mm film of water sags it 2.3 mm, inside the crown's 17.7 mm fall, so it runs off. A knee, 1.1 kN on roof cladding in AS/NZS 1170.1, would punch a dent at 0.64 kN, so the roof carries no step and no kneeling, marked on CT-701. Hail dents any gauge.
 
 ## 5. Doors and security
 
@@ -149,7 +151,7 @@ The LC5 inspection is counted once, in the car build's GV03, because one inspect
 3. Compliant mounts: Toyota cab cushions, preload set by the engineer.
 4. Off-road factor 2 and 1.0 g up (report 03), for the engineer to confirm.
 5. Anchors withstand the strap's breaking load, so straps are LC 500 kg. LC 1,000 kg needs the outer anchors tied into the wall frame.
-6. Box mass 436.5 kg with the 1.6 mm roof and the flares, against UGB-01's 440 kg. The engineer confirms the 1.6 mm roof on bows at most 640 mm apart.
+6. Box mass 436.5 kg with the 1.6 mm roof and the flares, against UGB-01's 440 kg. The 1.6 mm roof holds highway suction and drains on its 1:50 crown (UGF-01), but a knee would dent it, so it carries no step and no kneeling. Assumption: nobody stands on it. The engineer confirms the 1.6 mm roof on bows at most 640 mm apart.
 7. Prices: 6061-T6 at the 6060-T5 listing plus 25 %, ABLOY from a UK listing, detector and labour hours estimated.
 8. Rear track on the Elite: 1,555 mm (research report 26, est.). Lovells says only that the housing brings the rear in line with the front. The tubs and flares follow the measured track (VEH-28), and the tyre keeps 30 mm to the flare (BOX-20). Above 1,577 mm the flares would pass 1,910 mm.
 9. Lovells' mudflaps hang from the rear outriggers behind the tyres, about 300 mm wide with their bottom edge about 230 mm above the ground. Confirm the brackets with the kit.

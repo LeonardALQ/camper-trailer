@@ -3,6 +3,21 @@
 # clearances (BBGJ1007 p. 28). Limits are never changed to make a check pass. cad/ute_garage.py adds the deck mount
 # loads and the ramp angle, which are computed rather than measured.
 checks:
+  - id: UGF-01
+    title: Roof skin between the bows holds highway suction and drains on its 1:50 fall, and carries no step or kneeling
+    type: roof
+    roof:
+      speed_kmh: 110      # highway speed, still air
+      cp: 1.5             # suction behind the 380 mm step over the cab's roof (est., the review's 1.0 to 1.5, the larger)
+      E_mpa: 70300        # 5052
+      fy_haz_mpa: 65      # welded 5052-H32 at O temper (UTE-GARAGE.md section 3), at the bow's weld
+      fy_mpa: 160         # 5052-H32 parent metal, for the knee's yield-line load
+      fall: 50            # the bows fall 1:50 from the crown to each side
+      water_kpa: 0.1      # a 10 mm film of standing water
+      knee_kn: 1.1        # a person kneeling: AS/NZS 1170.1's concentrated load on roof cladding
+    severity: fail
+    inputs: []
+    why: "The 1.6 mm roof skin is welded to the bows, so between them it works as a held strip: highway suction drums it and membrane tension carries most of the load to the bows, where the weld has softened the sheet. With the bows' 1:50 fall, water runs off before it can pond. A kneeling person, 1.1 kN on roof cladding in AS/NZS 1170.1, would dent the sheet, so the roof carries no step and no kneeling, marked on CT-701 and in UTE-GARAGE.md. Hail dents any gauge"
   - id: UGC-01
     title: Tuareg to Street Triple, anywhere
     type: clearance

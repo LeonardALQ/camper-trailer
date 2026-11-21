@@ -34,6 +34,63 @@ def _row(cid, title, severity, limit, measured, margin, ok, governing, detail, w
                 governing=governing, points=[], detail=detail, why=why, unit=unit, **extra)
 
 
+def strip_membrane(q: float, t: float, span: float, E: float, n: int = 400) -> dict:
+    """A unit-width strip of sheet welded to two bows (clamped, ends held) under a uniform pressure q (N/mm2), with bending
+    and membrane tension together: the closed-form clamped beam-column, iterated until the tension matches the strip's
+    stretch. Returns the centre deflection, the tension and the stress at the bow."""
+    I = t ** 3 / 12.0
+    N = 1e-6
+
+    def w(x, N):
+        k = math.sqrt(N / (E * I))
+        a = k * span / 2.0
+        if a < 1e-4:
+            return q * x * x * (span - x) ** 2 / (24 * E * I)
+        u = abs(k * (x - span / 2))
+        d = 1 - math.exp(-2 * a)
+        ratio = (math.exp(u - a) + math.exp(-u - a)) / d - (1 + math.exp(-2 * a)) / d
+        return q / (2 * N) * x * (span - x) - q * span / (2 * N * k) * ratio
+    for _ in range(2000):
+        h = span / n
+        s = sum(((w((i + 1) * h, N) - w(i * h, N)) / h) ** 2 * h for i in range(n))
+        N_new = E * t / (2 * span) * s
+        if abs(N_new - N) < 1e-6 * max(N_new, 1e-9):
+            break
+        N = 0.5 * N + 0.5 * N_new
+    hh = 1e-3
+    M_end = E * I * abs((w(2 * hh, N) - 2 * w(hh, N) + w(0, N)) / hh ** 2)
+    return dict(defl_mm=w(span / 2, N), tension_n_mm=N, end_mpa=6 * M_end / t ** 2 + N / t)
+
+
+def roof_skin(prj, c) -> dict:
+    """UGF-01: the roof skin between its bows (data/ute/garage-checks.yaml `roof`). Highway suction with membrane action
+    against welded 5052's yield at the bow, standing water against the 1:50 fall from the crown to each edge, and a
+    knee against the sheet's yield-line punching load, which is the reason for the no-step rule (reported)."""
+    P, r = prj.P, c.roof
+    t, fs = P.get("roof_t"), P.get("frame_s")
+    centres = sorted([-fs / 2] + [x + fs / 2 for x in P.get("bow_x")] + [P.get("garage_length") + P.get("leaf_t") / 2])
+    span = max(b - a for a, b in zip(centres, centres[1:]))
+    q = 0.6 * (r["speed_kmh"] / 3.6) ** 2 * r["cp"] / 1e6
+    s = strip_membrane(q, t, span, r["E_mpa"])
+    u_suction = s["end_mpa"] / r["fy_haz_mpa"]
+    fall = P.get("half_width") / r["fall"]
+    q_w = r["water_kpa"] * 1e-3 + 2.68e-6 * 9.81 * t      # the water film and the sheet's own weight, N/mm2
+    sag = strip_membrane(q_w, t, span, r["E_mpa"])["defl_mm"]
+    u_pond = sag / fall
+    knee = 2 * math.pi * r["fy_mpa"] * t ** 2 / 4 / 1000
+    util = max(u_suction, u_pond)
+    ok = util <= 1.0
+    return _row(c.id, c.title, c.severity, f"bow stress <= {r['fy_haz_mpa']:g} MPa, sag under the fall", round(s["end_mpa"], 1),
+                round(r["fy_haz_mpa"] - s["end_mpa"], 1), ok, "suction at the bow" if u_suction >= u_pond else "standing water",
+                (f"{t:g} mm 5052-H32 over bows {span:.0f} mm apart. Suction at {r['speed_kmh']:.0f} km/h with Cp -{r['cp']:g}, "
+                 f"{q * 1e6 / 1000:.2f} kPa: the sheet drums {s['defl_mm']:.1f} mm and reaches {s['end_mpa']:.0f} MPa at the bow with membrane "
+                 f"action, against welded 5052's {r['fy_haz_mpa']:g} MPa ({u_suction:.2f}). A {r['water_kpa'] * 100:.0f} mm water film sags it "
+                 f"{sag:.2f} mm against the 1:{r['fall']:g} fall's {fall:.1f} mm, so water runs off. A knee of {r['knee_kn']:g} kN punches "
+                 f"through at {knee:.2f} kN, so the roof is marked no step, no kneeling"),
+                c.why, unit="MPa", roof=dict(span_mm=span, suction_kpa=q * 1000, drum_mm=s["defl_mm"], bow_mpa=s["end_mpa"], sag_mm=sag,
+                                             fall_mm=fall, knee_capacity_kn=knee, knee_kn=r["knee_kn"]))
+
+
 def rhs_plastic_modulus(b: float, d: float, t: float) -> float:
     """Plastic section modulus (mm3) of an RHS b wide and d deep, bent about the axis along its width, with Australian
     Tube Mills' corner radii (outer 2.0 t up to 3 mm wall and 2.5 t above, inner the outer less t), as
@@ -253,7 +310,7 @@ def build_garage(prj: Project | None = None, limits: dict | None = None):
     dims = dict(outside_l=round(ext["x1"] - ext["x0"], 1), outside_l_body=P.get("outside_l"), outside_w=round(body_ext["y1"] - body_ext["y0"], 1),
                 outside_w_flares=round(ext["y1"] - ext["y0"], 1), flare_l=P.get("flare_x1") - P.get("flare_x0"), flare_out=P.get("flare_out"),
                 wheel_y=P.get("wheel_y"),
-                outside_h=round(P.get("top_z"), 1), inside_l=P.get("garage_length"), inside_w=P.get("interior_width"), inside_h=P.get("ceiling_z"),
+                outside_h=round(P.get("top_z"), 1), outside_h_crown=round(P.get("top_z") + P.get("roof_crown"), 1), inside_l=P.get("garage_length"), inside_w=P.get("interior_width"), inside_h=P.get("ceiling_z"),
                 opening_w=P.get("door_y1") - P.get("door_y0"), opening_h=P.get("door_h"), deck_z=dz, top_z=round(dz + P.get("top_z"), 1),
                 tub_h=round(tub_h, 1), tuareg_y=P.get("tuareg_y"), st_y=P.get("st_y"), bike_spacing=P.get("bike_spacing"),
                 ramp_deg=round(ang, 2), ramp_deg_laden=round(ang_l, 2))
