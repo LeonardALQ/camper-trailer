@@ -12,20 +12,18 @@ import { withBase } from '../../lib/url';
 
 export const aud = (v) => Math.round(v).toLocaleString('en-AU');
 
-This site holds the design of a one-off off-road camper trailer and the vehicle that tows it. The owner is designing
-both and will build them himself in Australia. The project has three parts:
+The design of a one-off off-road home trailer and the LandCruiser 79 that tows it, both to be built in Australia.
+It has three parts:
 
-- **Car build**: a used Toyota LandCruiser 79 single cab V8, rebuilt in stages into a reliable tow vehicle.
-- **Bike box**: an enclosed, lockable box on the ute's tray for the two motorcycles and the tools.
-- **Trailer**: the home trailer, a 4,420 mm body with a lift bed over the desk across the front, a wet room at the
-  rear, a fixed roof, and the generators and fuel in a box on the drawbar. It is built to VSB1, the Australian guide for light trailers, then inspected for registration and
-  reviewed by an engineer. Most of its life is highway towing, plus grass, desert tracks, fire trails, light mud and
-  shallow river crossings.
+- Car build: a used Toyota LandCruiser 79 single cab V8, rebuilt in stages into a reliable tow vehicle.
+- Bike box: an enclosed, lockable box on the ute's tray for the two motorcycles and the tools.
+- Trailer: a 4,420 mm body with a lift bed over the desk across the front, a wet room across the rear, a fixed roof,
+  and the generators and fuel in a box on the drawbar. It is built to VSB1, the Australian guide for light trailers,
+  inspected for registration and reviewed by an engineer. Most of its life is highway towing, with grass, desert
+  tracks, fire trails, light mud and shallow river crossings.
 
-Each part has its plan, its parts list, its 3D model and drawings, and the measurements to take, in the menu under
-the part's name. Everything comes from one set of data files: the models, the checks, the mass schedules, the
-drawings, the parts lists and the costs are generated from them, so they always agree. When a number changes in the
-data, the whole site is rebuilt.
+Each part has its plan, parts list, 3D model, drawings and measurements under its name in the menu. The models,
+checks, mass schedules, drawings, parts lists and costs are all generated from one set of data files, so they agree.
 
 ## Whole-project cost
 
@@ -35,10 +33,10 @@ data, the whole site is rebuilt.
 
 <a href={withBase('/tow-vehicle/')}><img src={withBase('/drawings/CT-701-preview.png')} alt="Drawing CT-701: the LandCruiser 79 with the bike box, kerb-side elevations, plan and rear view" loading="lazy" /></a>
 
-The truck is a VDJ79 built 01/2017 to 08/2022 with about 400,000 km. It is built in {car.stages.length} stages, from
-buying and testing it to the power stage at about 230 to 250 kW, and every stage leaves it registered and drivable.
-The required work is AUD {aud(car.computed.required)}, or AUD {aud(car.computed.with_contingency)} with the contingency
-allowance, against Leonard's AUD {aud(car.computed.budget)} for the build.
+A VDJ79 built 01/2017 to 08/2022 with about 400,000 km, rebuilt in {car.stages.length} stages from buying and testing
+it to the power stage at about 230 to 250 kW. Every stage leaves it registered and drivable. The required work is
+AUD {aud(car.computed.required)}, or AUD {aud(car.computed.with_contingency)} with the contingency allowance, against
+Leonard's AUD {aud(car.computed.budget)} for the build.
 
 <Ute kind="summary" />
 
@@ -52,8 +50,8 @@ allowance, against Leonard's AUD {aud(car.computed.budget)} for the build.
 <a href={withBase('/ute-garage/')}><img src={withBase('/drawings/CT-702-preview.png')} alt="Drawing CT-702: the bike box's frame and panels" loading="lazy" /></a>
 
 A welded aluminium box on the ute's deck-mount stations, {aud(box.totals.mass_kg_lines)} kg empty, with rear barn
-doors, a kerb-side door, a ramp, a winch, a chock and five straps per bike, and the locks. It costs AUD
-{aud(box.totals.total_aud)} built by a shop, or AUD {aud(box.totals.owner_built_total_aud)} if the owner builds it.
+doors, a kerb-side door, a ramp, a winch, a chock and five straps per bike, and locks. It costs AUD
+{aud(box.totals.total_aud)} shop-built, or AUD {aud(box.totals.owner_built_total_aud)} owner-built.
 
 - <a href={withBase('/ute-garage/')}>Box design</a>: how it is built, its checks and its mass (`UTE-GARAGE.md`)
 - <a href={withBase('/ute-garage/#parts-list')}>Parts list and totals</a>: {box.lines.length} lines with price and mass
@@ -67,26 +65,24 @@ doors, a kerb-side door, a ramp, a winch, a chock and five straps per bike, and 
 <Trailer kind="summary" />
 
 - <a href={withBase('/trailer/')}>Whole trailer</a>, <a href={withBase('/chassis/')}>Chassis</a> and <a href={withBase('/body/')}>Body</a>: the design, the checks and the load cases (`TRAILER.md`, `CHASSIS.md`, `BODY.md`)
-- <a href={withBase('/trailer/#every-line')}>Parts and masses</a>: every line of the mass schedule. Prices are still to come
+- <a href={withBase('/trailer/#parts-list')}>Parts list</a> with prices, and the <a href={withBase('/trailer/#every-line')}>mass schedule</a>
 - <a href={withBase('/trailer/#3d-model')}>3D model</a> and drawings <a href={withBase('/drawings/#ct-001')}>CT-001 to CT-621</a>: the general arrangement, mass, compliance, layout, chassis, body and services sheets
 - <a href={withBase('/measurements/?part=trailer')}>Measurements</a> for the trailer
 
 ## The constraints
 
-- The trailer body is 2,400 mm wide at most. That is a hard limit. With 35 mm walls it leaves 2,330 mm inside.
+- The trailer body is at most 2,400 mm wide, so 2,330 mm inside with 35 mm walls.
 - The trailer is plated at 3,500 kg ATM (decision H2), so the combination stays inside the 7,400 kg GCM of Lovells' revision with the ute at its 3,850 kg limit. Toyota's 6,900 kg applies if the revision is refused.
 - The towball carries at least 8.0 % of the trailer's mass in every case and at most 320 kg with growth (decision H17), inside the towbar's 350 kg. The ute's Lovells Elite kit, plated at a 2,800 kg rear axle for its 1,400 kg wheels (decision H18), keeps its rear axle within that plate at this ball.
 - The ute's ball sits 440 mm above the ground laden, plus or minus 20 mm, so the coupling stays inside VSB1's 460 mm.
 - The bike box's body is 1,850 mm wide outside at most, its rear tub flares at most 1,910 mm (decision H19), and it weighs less than 440 kg empty.
 
-## What is done
+## Where the design stands
 
-- The car build (`VEHICLE.md`): seven stages from buying the truck to the level B tune, every part and job with its price, priority, reason and stage, the limits and the legal path.
-- The bike box (`UTE-GARAGE.md` revision C, research report 17): its 3D model and checks, the priced parts list, and drawings CT-701 to CT-704.
-- The home trailer's data, model and checks (revision J, decisions H13 to H17): the lift bed over the desk, the kitchen and the battery plinth, the wet room across the rear, the 48 V system, at most 350 L of water in travel, plated at 3,500 kg and checked against the ute on its Lovells Elite kit. The 3D model shows the bed up and down. The H11 drawing set is drawn for it: CT-001 to CT-003, the layout sheets CT-010 to CT-013, the chassis and load paths CT-101 to CT-104, the body CT-201 to CT-301 and the services CT-601 to CT-621. The trailer's prices and `TRAILER.md` follow in the next phases.
-- The trailer redesigned for the 79 (`TRAILER.md` revision H): layout 1 with the queen bed across the front, a fixed roof and a 4,420 mm body, the generator and fuel in a drawbar box, checked at the 3,100 kg plate against the ute's limits and the bike box's jack-knife sweep. The chassis (revision D, research report 11, `CHASSIS.md`) and the body (`BODY.md` revision B, research report 12) are re-solved for it, and CT-001, CT-101 to CT-103 and CT-201 to CT-301 are drawn for it. The home trailer replaces it.
-- The appliances, equipment and energy system (research report 13), built into the trailer.
-- Research reports 01 to 26, under Reference in the menu, with an index. Reports 01 to 11 are archived: they are the record from the Porsche Cayenne plan and the trailer with its own garage, kept as written (decision H9). Reports 23 and 24 are the car build plan and the bike box design, `VEHICLE.md` and `UTE-GARAGE.md`.
+- Car build (`VEHICLE.md`): seven stages from buying the truck to the level B tune, every part and job with its price, priority, reason and stage, the limits and the legal path.
+- Bike box (`UTE-GARAGE.md` revision D): the 3D model, the checks, the priced parts list and drawings CT-701 to CT-704.
+- Trailer (`TRAILER.md` revision J, `CHASSIS.md` revision E, `BODY.md` revision C): plated at 3,500 kg and checked against the ute on its Lovells Elite kit, with the priced parts list, the 3D model with the bed up and down, and the H11 drawing set from CT-001 to CT-621.
+- Research reports 01 to 26 are under Reference in the menu, with an index. Reports 01 to 11 are the archived record of the Porsche Cayenne plan and the trailer with its own garage (decision H9).
 
 ## What is next
 
@@ -95,8 +91,6 @@ doors, a kerb-side door, a ramp, a winch, a chock and five straps per bike, and 
 
 ## How products are chosen
 
-Each product is chosen in this order. First comes reliability and a record of hard use, for example in race
-trailers, toy haulers, boats or overland caravans. Next comes parts and service, in Australia if possible. Then
-comes serviceability, so a part can be repaired or swapped, ideally in the field. Only then does weight decide,
-and the lightest product that passes the first three wins. Price is ignored for the trailer. The car build has a
-budget.
+In this order: reliability and a record of hard use (race trailers, toy haulers, boats, overland caravans), then
+parts and service in Australia, then field serviceability, then mass, so the lightest product that passes the first
+three wins. Price is recorded and decides only between two otherwise equal products. The car build has a budget.

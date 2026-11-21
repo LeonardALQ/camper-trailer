@@ -160,11 +160,11 @@ def tow_vehicle_page():
     get = lambda *k: S.get(k, 0.0)
     out = ["---\ntitle: Car build\ndescription: 'The LandCruiser 79 car build: stages, the priced parts list with priority, reason and "
            "stage on every line, the totals, the limits and the legal path.'\n---\n\n",
-           "The car build turns a used Toyota LandCruiser 79 single cab V8 (VDJ79) into the tow vehicle for the trailer, with both "
+           "The car build turns a used Toyota LandCruiser 79 single cab V8 (VDJ79) into the trailer's tow vehicle, with both "
            "motorbikes in the [bike box](../ute-garage/) on its tray. The plan is `VEHICLE.md`, and every part and paid job is a line in "
-           "`data/vehicle/vehicle-parts.yaml`. This page shows the plan's summary and stages, then every line and total from the YAML. "
-           "The 3D model of the ute with its box is on the [Bike box](../ute-garage/#3d-model) page and the general arrangement is "
-           "drawing [CT-701](../drawings/#ct-701). VEH-01 to VEH-28 are on the [Measurements](../measurements/?part=car) page.\n\n"]
+           "`data/vehicle/vehicle-parts.yaml`, shown below with the totals. The 3D model of the ute with its box is on the "
+           "[Bike box](../ute-garage/#3d-model) page, the general arrangement is drawing [CT-701](../drawings/#ct-701), and VEH-01 to "
+           "VEH-28 are on the [Measurements](../measurements/?part=car) page.\n\n"]
     secs = dict(zip(VEHICLE_TOP + VEHICLE_END, _sections(plan, VEHICLE_TOP + VEHICLE_END)))
     out.append(secs["Summary"] + "\n")
     rows = ("| Stage | Work | Required AUD | Contingency lines AUD | Optional AUD | Paid labour | Downtime (est.) | "
@@ -230,7 +230,7 @@ def tow_vehicle_page():
                + SUMS_OPEN + "| Cut | What | Replaces | Saves AUD | Risk |\n|---|---|---|---|---|\n")
     for c in data["cuts"]:
         out.append(f"| {c['id']} | {_cell(c['name'])} | {c['replaces']} | {c['saving_aud']:,.0f} | {_cell(c.get('risk'))} |\n")
-    out.append(SUMS_CLOSE + "### Lines the merges removed\n\nNot counted anywhere.\n\n" + SUMS_OPEN + "| Item | AUD | Why |\n|---|---|---|\n")
+    out.append(SUMS_CLOSE + "### Lines left out\n\nNot counted in any total.\n\n" + SUMS_OPEN + "| Item | AUD | Why |\n|---|---|---|\n")
     for it in data.get("removed", []):
         out.append(f"| {_cell(it['name'])} | {it['price_aud']:,.2f} | {_cell(it['reason'])} |\n")
     out.append(SUMS_CLOSE)
@@ -356,9 +356,9 @@ def research_index():
     rows.sort(key=lambda r: r[0])
     out = ["---\ntitle: Research index\nsidebar:\n  order: 0\n---\n\n",
            "The research behind the design, one report per question, with its sources. Reports 01 to 11 are the record "
-           "from the Porsche Cayenne plan and the trailer with its own garage, kept as written. Reports 23 and 24 are "
-           "the car build plan and the bike box design themselves, so they live in the repository as `VEHICLE.md` and "
-           "`UTE-GARAGE.md`. Each report's data files and models are in `research/` in the repository.\n\n",
+           "of the Porsche Cayenne plan and the trailer with its own garage, kept as written. Reports 23 and 24 are the car "
+           "build plan and the bike box design, `VEHICLE.md` and `UTE-GARAGE.md`. Each report's data files and models are in "
+           "`research/` in the repository.\n\n",
            "| Report | Title | Status |\n|---|---|---|\n"]
     out += [f"| {n} | {title} | {status} |\n" for n, title, status in rows]
     (DOCS / "research" / "index.md").write_text("".join(out), encoding="utf-8")
@@ -429,11 +429,10 @@ def main():
         text = re.sub(r"\]\((\d\d-[a-z0-9-]+)\.md\)", r"](../\1/)", text)
         # the YAML files beside a report are in the repository only, so name them instead of linking
         text = re.sub(r"\[[^\]]+\]\((\d\d-[a-z0-9-]+\.yaml)\)", r"`research/\1`", text)
-        archived = ("Archived (decision H9). This report is the record from before the LandCruiser 79 plan, kept as written "
-                    "and not updated. Where it differs from the Car build, Bike box and Trailer pages, they are current.\n\n"
-                    if order <= 11 else "")
+        archived = ("Archived (decision H9): the record from before the LandCruiser 79 plan, kept as written. Where it differs "
+                    "from the Car build, Bike box and Trailer pages, those pages are current.\n\n" if order <= 11 else "")
         body = (f"---\ntitle: '{title}'\nsidebar:\n  order: {order}\n---\n\n" + archived +
-                f"This is research report {fname[:2]}, copied unchanged from `research/{fname}` apart from its first heading.\n\n"
+                f"Research report {fname[:2]}, copied from `research/{fname}` apart from its first heading.\n\n"
                 + text)
         (DOCS / "research" / fname).write_text(body, encoding="utf-8")
     research_index()

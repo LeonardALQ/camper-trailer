@@ -19,60 +19,56 @@ export const tc = (id) => t.cases.find((c) => c.id === id);
 export const chk = (id) => t.checks.find((c) => c.id === id);
 export const PT = parts.totals;
 
-This is the whole trailer, revision J, the home trailer. The motorbikes now ride in an enclosed box on the
-<a href={withBase('/tow-vehicle/')}>LandCruiser 79</a> (see the <a href={withBase('/ute-garage/')}>Bike box</a> page),
-so the trailer has no garage. It follows the home layout study (decisions H1 to H17): a lift bed across the front over
-the desk, the kitchen on the road side and the battery plinth on the kerb side, a wet room across the rear, a fixed
-roof and a {n(t.body_length)} mm body. The <a href={withBase('/chassis/')}>chassis</a> and the <a href={withBase('/body/')}>body</a>
-are designed to planning level. The other systems are blocks with a mass. The design notes are in `TRAILER.md` in
-the repository, and drawing CT-001 is the general arrangement.
+The home trailer, revision J. The motorbikes ride in the <a href={withBase('/ute-garage/')}>bike box</a> on the
+<a href={withBase('/tow-vehicle/')}>LandCruiser 79</a>, so the trailer has no garage. A lift bed spans the front over
+the desk, the kitchen runs along the road side with the battery plinth on the kerb side, a wet room spans the rear,
+and a fixed roof tops the {n(t.body_length)} mm body (decisions H1 to H17). The <a href={withBase('/chassis/')}>chassis</a>
+and the <a href={withBase('/body/')}>body</a> are designed to planning level, and the other systems are blocks with a
+mass. The design document is `TRAILER.md`, and drawing CT-001 is the general arrangement.
 
 <Trailer kind="summary" />
 
 ## 3D model
 
-The tree on the left runs by system, from the drawbar and its box to the bed, the living area and the rear of the
-body. Each block's name starts with its line in the mass schedule below.
+The tree on the left runs by system, from the drawbar and its box to the rear of the body. Each block's name starts
+with its line in the mass schedule.
 
 <CadViewer src={withBase('/models/trailer.json')} height={560} />
 
-The project datum in research report 02 measures X rearward from the ball, Y towards the road side and Z up. That
-is a right-handed frame, so the model shows the real trailer: the entry door is on the left when you look from
+The project datum (research report 02) measures X rearward from the ball, Y towards the road side and Z up. It is a
+right-handed frame, so the model shows the real trailer, with the entry door on the kerb side, on the left seen from
 behind.
 
 ## The layout and why
 
-From front to back there are the drawbar with its box, the bed zone ({n(t.zones.bed)} mm), the living area
-({n(t.zones.living)} mm) and the rear zone ({n(t.zones.rear)} mm). The inside of the body is {n(t.zones.interior)} mm long.
+From the front: the drawbar with its box, the bed zone ({n(t.zones.bed)} mm), the living area ({n(t.zones.living)} mm)
+and the rear zone ({n(t.zones.rear)} mm), {n(t.zones.interior)} mm inside in all.
 
-- **Drawbar box.** A sealed, vented 2 mm aluminium box, {n(P.dbx_w)} mm wide and {n(P.dbx_h)} mm high, sits on the drawbar
-  members. It holds the two Honda EU22i generators and the petrol and diesel jerry cans, so no fuel rides inside the
-  body. The spare wheel stands on the body's front wall above it, high enough to lift off over the box.
-- **Bed and desk.** The lift bed spans the front from side to side on rails on both side walls. By day it rises to
-  1,600 mm under its platform, over the desk and the chair space, and at night it comes down over the desk (BED-01).
-  The rest of its footprint stays empty (H1, H16).
-- **Living area.** The kitchen tower and bench run along the road side: the Combi, the fridge and the oven in the
-  tower, the hob over the freezer and the sink in the bench. On the kerb side the battery plinth stands 125 mm off the
-  wall with the washer and the dryer on it, and the entry door is in the kerb wall.
-- **Partition and wet room.** The partition carries the 48 V board on its kerb end and the inverter and the split's
-  indoor unit on its road end. The wet room spans the rear: the DauerShower over its floor well on the road side, the
-  cassette toilet against the kerb wall, and its own door in the rear wall, hinged on its kerb edge. The split's
-  outdoor unit sits high on the rear wall's road half.
-- **Under the floor.** The fresh tanks sit between the rails in the suspension bays and the grey tank in the rear
-  bay, so the towball changes little as the water is used.
+- Drawbar box: sealed and vented, {P.dbx_t} mm aluminium, {n(P.dbx_w)} mm wide and {n(P.dbx_h)} mm high on the
+  drawbar members. It holds the two Honda EU22i generators and the petrol and diesel jerry cans, so no fuel rides in
+  the body. The spare wheel stands on the front wall above it, high enough to lift off over the box.
+- Bed and desk: the lift bed spans the front on rails on both side walls. By day its platform's underside is
+  1,600 mm up, over the desk and the chair, and at night it comes down over the desk (BED-01). The rest of its
+  footprint stays empty (H1, H16).
+- Living area: the kitchen runs along the road side, the Combi, fridge and oven in the tower and the hob over the
+  freezer and the sink in the bench. On the kerb side the battery plinth stands 125 mm off the wall with the washer
+  and the dryer on it, and the entry door is in the kerb wall.
+- Partition and wet room: the partition carries the 48 V board at its kerb end and the inverter and the split's
+  indoor unit at its road end. The wet room spans the rear, with the DauerShower over its floor well on the road
+  side, the cassette toilet against the kerb wall, and its own door in the rear wall, hinged on its kerb edge. The
+  split's outdoor unit sits high on the rear wall's road half.
+- Under the floor: the fresh tanks sit between the rails in the suspension bays and the grey tank in the rear bay,
+  so the towball changes little as the water is used.
 
-The fixed roof carries the solar panels. With no raising roof, the inside is {n(P.interior_h)} mm high. The floor
-height comes from the running gear in report 06 and the ute's tyre from report 16. The tyre is {n(ch.tyre_d)} mm
-across, the hubs sit at {n(ch.hub_z)} mm, and the XT suspension rises 60 mm at full bump. With 50 mm of clearance
-above the tyre, the floor underside is at {n(ch.floor_underside_z)} mm and the floor surface at {n(ch.floor_z)} mm. The
-travel height is {n(ch.travel_height)} mm.
-
-The <a href={withBase('/decisions/')}>decision record</a> gives the reasons for the layout's main choices.
+The fixed roof carries the solar panels, and the inside is {n(P.interior_h)} mm high. The floor height follows from the
+running gear (report 06) and the ute's tyre (report 16): the tyre is {n(ch.tyre_d)} mm across, the hubs sit at
+{n(ch.hub_z)} mm and the XT suspension rises 60 mm at full bump, so with {n(ch.tyre_floor_clearance)} mm over the tyre
+the floor underside is at {n(ch.floor_underside_z)} mm and the floor surface at {n(ch.floor_z)} mm. The travel height is
+{n(ch.travel_height)} mm. The <a href={withBase('/decisions/')}>decision record</a> gives the reasons for the layout.
 
 ## Appliances and equipment
 
-Research reports 13 and 19 to 22 chose the products for the home trailer. Every line of the mass schedule below names
-its product and source.
+The products come from research reports 13 and 19 to 22. Each line of the mass schedule names its product and source.
 
 - Wet room: Thetford C223-CS cassette toilet and a DauerShower 2.0 recirculating shower over a sealed floor well.
 - Laundry: Camec Compact RV II 3.5 kg washer and a Haier 7 kg heat pump dryer on the battery plinth.
@@ -83,12 +79,11 @@ its product and source.
 - Generators: two Honda EU22i in parallel, in the drawbar box.
 
 The <a href={withBase('/electrical/')}>Electrical</a>, <a href={withBase('/plumbing/')}>Plumbing and water</a> and
-<a href={withBase('/hvac/')}>HVAC and fresh air</a> pages give each system's drawings, its energy or water budget and
-its modes.
+<a href={withBase('/hvac/')}>HVAC and fresh air</a> pages give each system's drawings, budget and modes.
 
 ## Wheels, tyres and spares
 
-The trailer and the ute share one wheel and tyre, from report 16, so each spare fits both.
+The trailer and the ute share one wheel and tyre (report 16), so each spare fits both.
 
 - Wheel: {t.wheel.name}, rated {n(t.wheel.rating_kg)} kg in ROH's fitment table (WHL-01), until ROH confirms it in writing.
 - Tyre: {t.wheel.tyre}.
@@ -98,9 +93,9 @@ The trailer and the ute share one wheel and tyre, from report 16, so each spare 
 
 ## Water and the towball
 
-The trailer tows with at most {n(P.water_travel_l)} L of fresh and grey water aboard and fills its tanks at camp
-(decision H13). There is no tank in the ute and no ballast. The axle group centre is
-{n(P.axle_x)} mm behind the ball. The build solved it: {t.target_why}.
+The trailer tows with at most {n(P.water_travel_l)} L of fresh and grey water and fills its tanks at camp (decision
+H13). There is no water tank in the ute and no ballast. The axle group centre is {n(P.axle_x)} mm behind the ball,
+solved so that {t.target_why}.
 
 ## Load cases
 
@@ -113,8 +108,7 @@ figure.
 
 ## The ute and the combination
 
-The ute is the {tv.name}. Its limits come from the ute model on the <a href={withBase('/ute-garage/')}>Bike box</a> page. The trailer is checked against
-them here:
+The ute is the {tv.name}. Its limits come from the ute model on the <a href={withBase('/ute-garage/')}>Bike box</a> page.
 
 - Towball: decision H17 sets the design range. Every case keeps at least {chk('MAS-05').window.pct_min.toFixed(1)} % of its mass on the ball (MAS-12), and the heaviest towball with growth stays at or under {n(chk('MAS-05').window.ball_max.kg)} kg (MAS-13), inside the towbar's {n(tv.limits.towball_rating_kg)} kg. At that ball the ute's rear axle carries {n(chk('MAS-03').measured)} kg of the Elite kit's {n(tv.limits.rear_axle_kg)} kg (MAS-03). MAS-14 reports the Platinum kit's {n(tv.limits.platinum_rear_axle_kg)} kg rear axle for cut CUT7.
 - GCM: the larger of two sums against Lovells' {n(tv.limits.gcm_kg)} kg revision. The plan's sum is the ute at its {n(tv.limits.weighed_max_kg)} kg limit plus the {n(t.caps.plated)} kg plate less the lightest towball, {n(chk('GCM-01').gcm.plan)} kg. The model's sum is the ute's {tv.gcm_case} case with growth ({n(tv.ute_kg_growth)} kg) plus the heaviest trailer case with growth, {n(chk('GCM-01').gcm.model)} kg. GCM-01 measures {n(chk('GCM-01').measured)} kg.
@@ -123,17 +117,17 @@ them here:
 
 ## Checks
 
-The trailer is to be registered in NSW. The examiner caps GTM at the lowest of the tyre, coupling, chain and brake
-ratings ({n(t.caps.gtm)} kg here) and ATM at the lower of the coupling and chain ratings ({n(t.caps.atm)} kg). The design
-plates it lower, at {n(t.caps.plated)} kg, so the combination stays inside the ute's GCM. A failed check shows in red.
-The limits stay as they are, and a part that fails is resized.
+The trailer is registered in NSW. The examiner caps GTM at the lowest of the tyre, coupling, chain and brake ratings
+({n(t.caps.gtm)} kg here) and ATM at the lower of the coupling and chain ratings ({n(t.caps.atm)} kg). The plate is
+{n(t.caps.plated)} kg, the ute's braked towing rating (decision H2). A failed check shows in red. Limits are never
+changed to pass a check, and a part that fails is resized.
 
 <Trailer kind="checks" />
 
 ## Chassis inputs
 
-The chassis is designed on the <a href={withBase('/chassis/')}>Chassis</a> page, with its members, frame analysis, checks
-and drawings. These are the main figures the layout gives it and takes from it.
+The figures the layout gives the chassis and takes from it. The <a href={withBase('/chassis/')}>Chassis</a> page has the
+members, the frame analysis, the checks and the drawings.
 
 <Trailer kind="chassis" />
 
@@ -153,26 +147,25 @@ travel.
 
 ### The least certain masses
 
-The estimate lines with the largest growth allowance, and how far each moves the fully loaded towball if it comes
-out 20 % heavier.
+The estimate lines with the largest growth allowance, and how far each moves the fully loaded towball if it is 20 %
+heavier.
 
 <Trailer kind="uncertain" />
 
 ### Every line
 
-Each line has its source, its maturity and the load cases it is aboard in (MASS-01 and MASS-02). Its price is in the
-parts list below.
+Each line with its source, maturity and the load cases it is aboard in (MASS-01, MASS-02). Prices are in the parts
+list. On Sum, the footer gives the selected lines' mass and their centre of gravity.
 
 <Trailer kind="schedule" />
 
 ## Parts list
 
-Every part the trailer needs, in AUD including GST, with the labour, installation, compliance, freight and consumables
-to build it and register it in NSW. Each line of the mass schedule carries its own price. The chassis steel is bought
-in 8 m lengths and shared by mass over the members it covers. A basis is listing (a published price), quote, rate (a
-published rate applied to a quantity) or estimate, and each line gives the date it was checked and its source. Foreign
-prices are converted at 1 USD = 1.55 AUD, 1 EUR = 1.68 AUD and 1 GBP = 1.98 AUD. The part cards in the 3D model show
-each part's price.
+Every part, in AUD including GST, with the labour, installation, compliance, freight and consumables to build the
+trailer and register it in NSW. Each line of the mass schedule carries its own price, and the chassis steel, bought
+in 8 m lengths, is shared by mass over the members it covers. The basis is listing (a published price), quote, rate
+(a published rate times a quantity) or estimate, with the date checked and the source. Foreign prices are converted
+at 1 USD = 1.55 AUD, 1 EUR = 1.68 AUD and 1 GBP = 1.98 AUD. The part cards in the 3D model show each price.
 
 <TrailerParts kind="totals" />
 
@@ -186,8 +179,8 @@ each part's price.
 
 ### Where to save
 
-Each option is worked out from the lines it removes, with their contingency, less what replaces it. Options that
-share lines overlap, so they do not add up. A negative figure costs more. `TRAILER.md` explains each one.
+Each option is the lines it removes, with their contingency, less what replaces them. Options that share lines
+overlap, so they do not add up. A negative figure costs more. `TRAILER.md` explains each one.
 
 <TrailerParts kind="savings" />
 
@@ -198,6 +191,6 @@ share lines overlap, so they do not add up. A negative figure costs more. `TRAIL
 ### Every priced line
 
 Select rows to total them in the footer, or sort and filter by group or basis. A line made of several bought parts
-lists each part with its own price and basis.
+lists each with its own price and basis.
 
 <TrailerParts kind="lines" />

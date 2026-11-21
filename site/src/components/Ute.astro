@@ -39,7 +39,7 @@ const drawings = ['CT-701', 'CT-702', 'CT-703', 'CT-704'];
 {kind === 'summary' && (
   <p>
     Towing with both bikes aboard (case UC3), the ute weighs {n(cs.UC3.nominal.mass_kg)} kg, {n(cs.UC3.growth.mass_kg)} kg with the
-    growth allowance. Its rear axle carries {n(cs.UC3.growth.rear_kg)} kg of its {n(r.limits.rear_axle_kg)} kg rating, with the trailer's
+    growth allowance. Its rear axle carries {n(cs.UC3.growth.rear_kg)} kg of its {n(r.limits.rear_axle_kg)} kg plate, with the trailer's
     heaviest towball, {n(r.params.towball_design, 1)} kg, on the ball. The combination is{' '}
     {n(gcm.gcm.plan)} kg against the {n(r.limits.gcm_kg)} kg GCM, with the ute at its{' '}
     {n(r.limits.weighed_max_kg)} kg limit and the trailer at its {n(r.params.trailer_atm)} kg plate less its lightest towball (the trailer's GCM-01), and{' '}
@@ -57,14 +57,14 @@ const drawings = ['CT-701', 'CT-702', 'CT-703', 'CT-704'];
       <tbody>
         <tr><td>Outside length, body</td><td class="num">{n(d.outside_l_body)}</td><td>{n(d.outside_l)} mm with the cam bar and hasp</td></tr>
         <tr><td>Outside width, body</td><td class="num">{n(d.outside_w)}</td><td>UTE-09's body limit is 1,850 mm (decision H19)</td></tr>
-        <tr><td>Width over the rear tub flares</td><td class="num">{n(d.outside_w_flares)}</td><td>UTE-09's flare limit is 1,910 mm, Toyota's 60 mm beyond the cab on each side (decision H19). Each flare is {n(d.flare_l)} mm long and stands {n(d.flare_out)} mm out, so the Elite's rear tyres, {n(2 * d.wheel_y)} mm apart, keep 30 mm</td></tr>
+        <tr><td>Width over the rear tub flares</td><td class="num">{n(d.outside_w_flares)}</td><td>UTE-09's flare limit is 1,910 mm, Toyota's 60 mm beyond the cab on each side (decision H19). Each flare is {n(d.flare_l)} mm long and stands {n(d.flare_out)} mm out, so the Elite's rear tyres, {n(2 * d.wheel_y)} mm apart, keep Toyota's 30 mm</td></tr>
         <tr><td>Outside height above the floor</td><td class="num">{n(d.outside_h)}</td><td>Roof top {n(d.top_z)} mm above the ground</td></tr>
         <tr><td>Inside length</td><td class="num">{n(d.inside_l)}</td><td>Front wall to the closed barn doors</td></tr>
         <tr><td>Inside width</td><td class="num">{n(d.inside_w)}</td><td>Between the wall frames</td></tr>
         <tr><td>Inside height</td><td class="num">{n(d.inside_h)}</td><td>To the roof bows and the door header</td></tr>
         <tr><td>Rear opening</td><td class="num">{n(d.opening_w)} x {n(d.opening_h)}</td><td>Clear, between the hinge gaps</td></tr>
-        <tr><td>Floor above the ground</td><td class="num">{n(d.deck_z)}</td><td>Laden, estimate. {n(d.deck_z + 30)} mm with the bikes out</td></tr>
-        <tr><td>Wheel tubs above the floor</td><td class="num">{n(d.tub_h, 1)}</td><td>25 mm over the tyre at full bump (estimate)</td></tr>
+        <tr><td>Floor above the ground</td><td class="num">{n(d.deck_z)}</td><td>Laden (est.). {n(d.deck_z + 30)} mm with the bikes out</td></tr>
+        <tr><td>Wheel tubs above the floor</td><td class="num">{n(d.tub_h, 1)}</td><td>25 mm over the tyre at full bump (est.)</td></tr>
         <tr><td>Bike centrelines</td><td class="num">{n(d.tuareg_y, 0)} / {n(d.st_y, 0)}</td><td>Tuareg road side, Street Triple kerb side, {n(d.bike_spacing)} mm apart</td></tr>
         <tr><td>Ramp angle</td><td class="num">{n(d.ramp_deg, 1)} deg</td><td>Bikes out. {n(d.ramp_deg_laden, 1)} degrees at the laden floor height</td></tr>
       </tbody>
@@ -110,13 +110,13 @@ const drawings = ['CT-701', 'CT-702', 'CT-703', 'CT-704'];
       <thead><tr><th>Line</th><th>Item</th><th class="num">kg</th><th>Basis</th><th class="num">With growth</th><th>Source</th></tr></thead>
       <tbody>
         {groups.map((gr) => [
-          <tr><td colspan="6"><strong>{groupName[gr]}</strong>, {n(g.by_group[gr] ?? 0, 1)} kg</td></tr>,
+          <tr><td colspan="6">{groupName[gr]}, {n(g.by_group[gr] ?? 0, 1)} kg</td></tr>,
           ...boxLines.filter((x: any) => x.group === gr).map((x: any) => (
             <tr><td>{x.id}</td><td>{x.item}</td><td class="num">{n(x.kg, 1)}</td><td>{x.maturity}</td><td class="num">{n(x.kg_growth, 1)}</td><td>{x.source}</td></tr>
           )),
         ])}
-        <tr class="row-total"><td></td><td><strong>Box, empty</strong></td><td class="num"><strong>{n(g.box_kg, 1)}</strong></td><td></td>
-          <td class="num"><strong>{n(g.box_kg_growth, 1)}</strong></td><td>Report 17: 440 kg</td></tr>
+        <tr class="row-total"><td></td><td>Box, empty</td><td class="num">{n(g.box_kg, 1)}</td><td></td>
+          <td class="num">{n(g.box_kg_growth, 1)}</td><td>Report 17: 440 kg</td></tr>
         {r.lines.filter((x: any) => x.group === 'ute' || x.group === 'bikes' || x.id === 'U-TOOLS').map((x: any) => (
           <tr><td>{x.id}</td><td>{x.item}</td><td class="num">{n(x.kg, 1)}</td><td>{x.maturity}</td><td class="num">{n(x.kg_growth, 1)}</td>
             <td>{x.cases.join(', ')}. {x.source}</td></tr>

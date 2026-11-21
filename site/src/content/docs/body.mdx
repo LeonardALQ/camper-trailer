@@ -5,34 +5,37 @@ description: The body of the LandCruiser 79 trailer to planning level, with its 
 
 import CadViewer from '../../components/CadViewer.astro';
 import Body from '../../components/Body.astro';
+import t from '../../data/generated/trailer.json';
 import { withBase } from '../../lib/url';
 
-The body is a box of bonded sandwich panels on the chassis, 4,420 mm long and 2,400 mm wide. A sandwich panel is two
-thin glass-fibre skins bonded to a light foam core. The floor is a 30 mm panel with woven-roving skins on a PVC foam
-core. The walls are 35 mm panels with gelcoat skins on XPS foam. The fixed roof is a 40 mm panel of the same kind,
-bonded to the walls, and it carries the four solar panels. Aluminium extrusions join every panel edge. The body bolts
-to the chassis at every station with 32 M12 bolts into welded nut plates on the raisers, and it is not bonded to the
-steel. The design starts from research report 12 and is set out in `BODY.md`, revision B.
+export const n = (v) => Math.round(v).toLocaleString('en-AU');
 
-This is a planning-level proposal for the engineer to check.
+A box of bonded sandwich panels on the chassis, {n(t.body_length)} mm long and {n(t.params.body_width)} mm wide. Each
+panel is two thin glass-fibre skins bonded to a light foam core: the floor is 30 mm with woven-roving skins on PVC
+foam, the walls 35 mm with gelcoat skins on XPS foam, and the fixed roof 40 mm of the same kind, bonded to the walls
+and carrying the four solar panels. Aluminium extrusions join every panel edge. The body bolts to the chassis at every
+station with 32 M12 bolts into welded nut plates on the raisers, and is not bonded to the steel. The design is
+`BODY.md` revision C, from research report 12.
+
+A planning-level proposal for the engineer to check.
 
 <Body kind="summary" />
 
 ## 3D model
 
-The body as it travels, with the four bonded solar panels on the fixed roof. The tree on the left lists every panel,
-opening and fitting.
+The body as it travels, with the four solar panels bonded to the roof. The tree on the left lists every panel, opening
+and fitting.
 
 <CadViewer src={withBase('/models/body.json')} height={520} />
 
 ### Inside
 
-The same body with the bed, the desk, the kitchen, the living area and the wet room fitted. Hide the Body group in
-the tree to see them clearly. This is the day and travel position, with the bed lifted to the ceiling.
+The same body fitted out, in the day and travel position with the bed raised. Hide the Body group in the tree to see
+the bed, desk, kitchen, living area and wet room.
 
 <CadViewer src={withBase('/models/body-inside.json')} height={520} />
 
-At night the bed comes down on its lift rails over the desk. Everything else is as in the day model.
+At night the bed comes down on its lift rails over the desk.
 
 <CadViewer src={withBase('/models/body-inside-night.json')} height={520} />
 
@@ -40,8 +43,8 @@ The whole trailer, with the body in place, is on the <a href={withBase('/trailer
 
 ## Panels
 
-D is the panel's bending stiffness and S its shear stiffness, per metre width. Wrinkling is the stress at which a
-compressed skin buckles into the core.
+D is the bending stiffness and S the shear stiffness per metre width. Wrinkling is the stress at which a compressed
+skin buckles into the core.
 
 <Body kind="panels" />
 
@@ -61,8 +64,8 @@ Strength, insert, joint and spacing checks fail the build if they miss. Deflecti
 ### Twist sharing
 
 The frame model takes the body as a torsion box tied to the chassis at every station. With the roof bonded to the
-walls the box is closed, so it takes almost all of the twist. The chassis checks stay on the bare frame, so they hold
-if the body mounts loosen.
+walls the box is closed and takes almost all the twist. The chassis checks stay on the bare frame, so they hold if the
+body mounts loosen.
 
 <Body kind="twist" />
 

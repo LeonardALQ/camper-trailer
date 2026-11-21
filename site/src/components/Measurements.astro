@@ -36,7 +36,7 @@ const rangeText = (m: any) => {
 };
 const design = (m: any) =>
   m.status === 'measured' ? `${fmt(m, m.value)} (measured ${m.measured_date ?? ''})`.replace(' )', ')')
-    : m.estimate != null ? `${fmt(m, m.estimate)} (estimate)`
+    : m.estimate != null ? `${fmt(m, m.estimate)} (est.)`
       : m.range.reference != null ? `model ${num(m.range.reference)}` : 'none yet';
 // The rule shown when a value is out of range: the threshold set at that bound (a range threshold first), or the
 // range's own source.

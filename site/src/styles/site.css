@@ -32,6 +32,9 @@ html body {
   text-align: right;
   white-space: nowrap;
 }
+.data-table tr.row-total td {
+  font-weight: 600;
+}
 .status-pass {
   color: #1a7f37;
   font-weight: 600;

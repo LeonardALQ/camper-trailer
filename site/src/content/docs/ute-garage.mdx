@@ -10,16 +10,16 @@ import { withBase } from '../../lib/url';
 
 The bike box carries the Aprilia Tuareg 660 Rally and the Triumph Street Triple 765 side by side, noses forward, with
 about 60 kg of tools. It is a welded aluminium body on its own subframe, bolted to Toyota's deck mount brackets on the
-<a href={withBase('/tow-vehicle/')}>LandCruiser 79</a>. It is locked, sealed against dust and vented for fuelled bikes.
-The build document is `UTE-GARAGE.md` revision C, and the parts list below is `data/ute/box-parts.yaml`. This is a
-planning-level design for the engineer to check.
+<a href={withBase('/tow-vehicle/')}>LandCruiser 79</a>, locked, sealed against dust and vented for fuelled bikes. The
+build document is `UTE-GARAGE.md` revision D and the parts list `data/ute/box-parts.yaml`. A planning-level design for
+the engineer to check.
 
 <Ute kind="summary" />
 
 ## 3D model
 
 The ute as it travels, with the box closed. Hide the body group in the tree, or click a wall and choose Hide this part,
-to see the bikes, the straps and the tool chests inside.
+to see the bikes, straps and tool chests inside.
 
 <CadViewer src={withBase('/models/ute.json')} height={520} />
 
@@ -38,37 +38,36 @@ The 3D model is also a <a href={withBase('/downloads/ute.step')}>STEP file</a>.
 
 ## How it is built
 
-- **Body.** Walls, front and door skins in 5052-H32 2.5 mm, the roof in 1.6 mm, the floor in 4.0 mm and the wheel tubs
-  in 3.0 mm, TIG-welded with ER5356 to a 6061-T6 frame of SHS 40 x 40 x 3. Buy the 6061-T6 with mill certificates,
-  because the common stock tube is 6060-T5, which is weaker when welded.
-- **Subframe.** 6061-T6 runners on a 6 mm rubber strip on the rails, with crossmembers and outriggers between and outside
-  them. Under each track row a C350L0 RHS 65 x 35 x 4.0, hot-dip galvanised, runs the full width and bolts to a pair of
+- Body: walls, front and door skins in 5052-H32 2.5 mm, the roof in 1.6 mm, the floor in 4.0 mm, the wheel tubs in
+  3.0 mm and a folded 2.5 mm flare over each rear tub, TIG-welded with ER5356 to a 6061-T6 frame of SHS 40 x 40 x 3.
+  Buy the 6061-T6 with mill certificates, because the common stock tube is 6060-T5, which is weaker when welded.
+- Subframe: 6061-T6 runners on a 6 mm rubber strip on the rails, with crossmembers and outriggers between and outside
+  them. Under each track row a hot-dip galvanised C350L0 RHS 65 x 35 x 4.0 runs the full width and bolts to a pair of
   Toyota's brackets, so a strap's load reaches the frame through steel. Nothing is drilled or welded on the frame.
-- **Mounting.** Firm mounts at the front two stations with two M12 8.8 bolts each, compliant mounts at the rear four
-  with one bolt through two cab cushions. Every bracket bolt goes in head up from inside the subframe, with a nyloc nut
+- Mounting: firm mounts at the front two stations with two M12 8.8 bolts each, compliant mounts at the rear four with
+  one bolt through two cab cushions. Every bracket bolt goes in head up from inside the subframe with a nyloc nut
   below, so the box comes off only from inside it (CT-702 detail A).
-- **Doors and security.** Barn doors on continuous stainless hinges with dog bolts, a cam bar on the road leaf and an
+- Doors and security: barn doors on continuous stainless hinges with dog bolts, a cam bar on the road leaf and an
   ABLOY PL362 padlock in a welded shroud. Inside, an alarmed ABUS disc lock on each front disc closes a 12 mm chain to a
   floor anchor at X 450 mm. A Teltonika tracker with door switches and a siren, and a Monimoto 9 in each bike.
-- **Restraint.** A Condor SC-2000 chock for each front wheel, two rows of plain Kinedyne FE750 track, US Cargo Control
-  1519 double-stud fittings and 35 mm SpanSet straps of LC 500 kg. An anchor must withstand its strap's breaking load,
-  about 9.8 kN at LC 500 kg, and the steel crossmember carries that at its worst anchor (UGR-03). LC is the strap's
-  rated lashing capacity.
-- **Services.** A filtered ignition-protected fan keeps the box above outside pressure, two low vents let air and petrol
+- Restraint: a Condor SC-2000 chock for each front wheel, two rows of plain Kinedyne FE750 track, US Cargo Control
+  1519 double-stud fittings and 35 mm SpanSet straps rated LC 500 kg (LC is the rated lashing capacity). An anchor must
+  withstand its strap's breaking load, about 9.8 kN, and the steel crossmember carries that at its worst anchor (UGR-03).
+- Services: a filtered, ignition-protected fan keeps the box above outside pressure, two low vents let air and petrol
   vapour out, and a fume detector starts the fan and signals the tracker.
 
 ## Parts list
 
-Every line with its part number, mass, price and source, AUD including GST. The kg column is the mass the line adds to
-the fitted box, and it adds up to the model's box mass. Select rows to total them in the footer.
+Every line with its part number, mass, price and source, AUD including GST. The kg column is the mass each line adds
+to the fitted box, and it adds up to the model's box mass. Select rows to total them in the footer.
 
 <BoxParts kind="lines" />
 
 ### Totals
 
-The shop-built total pays a fabricator for 184 h at AUD 121 an hour. The owner-built total leaves that line out. The
-LC5 inspection is counted once, in the car build's GV03, because one inspection covers the GVM kit, the GCM revision, the
-box and the winch.
+The shop-built total pays a fabricator for 184 h at AUD 121 an hour, and the owner-built total leaves that line out.
+The LC5 inspection is counted once, in the car build's GV03, because one inspection covers the GVM kit, the GCM
+revision, the box and the winch.
 
 <BoxParts kind="groups" />
 
@@ -76,10 +75,9 @@ box and the winch.
 
 ## The ute
 
-Case UC3 is the heaviest: towing the trailer with both bikes in the box and the trailer's heaviest towball with growth
-on the ball (the trailer's MAS-03B checks it). The static
-stability factor (SSF) is half the track divided by the centre of gravity height. A lower SSF means a higher risk of
-rolling over.
+Case UC3 is the heaviest: towing with both bikes in the box and the trailer's heaviest towball with growth on the ball
+(the trailer's MAS-03B checks it). The static stability factor (SSF) is half the track divided by the centre of gravity
+height, and a lower SSF means a higher risk of rolling over.
 
 <Ute kind="cases" />
 
@@ -87,24 +85,23 @@ rolling over.
 
 ## Checks
 
-The clearance and contact checks are measured on the 3D model. Clearance limits come from the retired trailer garage's
-design, and the tyre clearances are Toyota's. A fail check that misses its limit fails the build. A reported check is
-shown and never fails it.
+Clearance and contact checks measured on the 3D model. The clearance limits come from the retired trailer garage's
+design and the tyre clearances from Toyota. A fail check that misses its limit fails the build, and a reported check
+never does.
 
 <Ute kind="garage-checks" />
 
 ### Deck mount loads
 
 Report 03's load cases with its off-road factor of 2: braking at 1.6 g, cornering at 1.0 g and a net 1.0 g upward, on
-the box and everything in it with the growth allowance. Toyota publishes no capacity for its brackets, so the
-engineer confirms them.
+the box and its contents with the growth allowance. Toyota publishes no capacity for its brackets, so the engineer
+confirms them.
 
 <Ute kind="mounts" />
 
 ## Mass
 
-Each line of the model gives its basis. A maker's figure carries no growth allowance, a calculated mass 7 % and an
-estimate 20 %.
+Each line gives its basis. A maker's figure carries no growth allowance, a calculated mass 7 % and an estimate 20 %.
 
 <Ute kind="mass" />
 
@@ -115,6 +112,6 @@ page, each with how to measure it and the range the design accepts.
 
 ## Drawings
 
-All four drawings are DRAFT. The <a href={withBase('/drawings/')}>Drawings</a> page has the previews.
+All four are drafts. The <a href={withBase('/drawings/')}>Drawings</a> page has the previews.
 
 <Ute kind="drawings" />

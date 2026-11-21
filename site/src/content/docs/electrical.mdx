@@ -11,11 +11,11 @@ export const A = s.autonomy;
 export const n = (v, d = 0) => v.toLocaleString('en-AU', { minimumFractionDigits: d, maximumFractionDigits: d });
 
 The trailer runs at 48 V. Research report 20 chose the parts and models every load minute by minute through four
-design days (`research/models/20/energy.py`). The tables on this page come from that model's output, so they follow
-it when it is rerun. The parts and their prices are in the <a href={withBase('/trailer/#parts-list')}>trailer's parts list</a>.
+design days (`research/models/20/energy.py`), and the tables on this page are that model's output. The parts and
+their prices are in the <a href={withBase('/trailer/#parts-list')}>trailer's parts list</a>.
 
 - Battery: five Victron Lithium NG 51.2 V 100 Ah modules, 25.6 kWh, upright in a sealed, lined box that forms the
-  plinth under the washer and the dryer. It vents outside and has a heat detector, as AS/NZS 3001.2 asks for a
+  plinth under the washer and the dryer. The box vents outside and has a heat detector, as AS/NZS 3001.2 asks for a
   battery inside the body.
 - Board: a Lynx Smart BMS NG and a Lynx Distributor, a MultiPlus-II 48/6k5 inverter-charger for the 230 V circuits,
   two Orion-Tr 48/12-30 for the 12 V bus, two Orion-Tr 48/24-16 for the 24 V bus, and a Cerbo GX MK2 that runs the
@@ -32,10 +32,10 @@ it when it is rerun. The parts and their prices are in the <a href={withBase('/t
 ## Energy budget
 
 Each design day's energy by load group. A 230 V load counts at the inverter's output and a DC load at its own bus,
-and the conversion losses are a group of their own, so each column adds up to the energy taken from the battery.
-The hot day runs everything at once: the air-conditioning, two 20 min showers, the hob and a 45 min bake, a wash and
-dry, desk work and Starlink. The cold day heats on diesel as designed, or on the heat pump. The last row is the
-model's own total, and the rows are rounded.
+and the conversion losses are a group of their own, so each column adds up to the energy taken from the battery. The
+hot day runs everything: the air-conditioning, two 20 min showers, the hob and a 45 min bake, a wash and dry, desk
+work and Starlink. The cold day heats on diesel, or on the heat pump. The last row is the model's own total, and the
+rows are rounded.
 
 <Services kind="energy" />
 
@@ -50,8 +50,8 @@ starting hour.
 
 ## Recharge
 
-What each source puts back after one all-electric design hot day. The generators are the third source, after the sun
-and the drive.
+What each source puts back after one all-electric design hot day. The generators come third, after the sun and the
+drive.
 
 <Services kind="recharge" />
 
@@ -96,7 +96,6 @@ The marks L1 to L9 match drawing CT-011. All prices are in the trailer's parts l
 
 <Services kind="drawing" number="CT-011" title="Elevations and openings, with the lamps" />
 
-Every check below comes from `cad/lamps.py`, which places each device on the model and tests it against the rule.
-Drawing CT-003 lists the same checks.
+`cad/lamps.py` places each device on the model and tests it against its rule. Drawing CT-003 lists the same checks.
 
 <Services kind="lamp-checks" />

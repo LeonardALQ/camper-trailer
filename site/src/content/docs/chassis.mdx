@@ -5,18 +5,23 @@ description: The chassis and drawbar for the LandCruiser 79 trailer to planning 
 
 import CadViewer from '../../components/CadViewer.astro';
 import Chassis from '../../components/Chassis.astro';
+import t from '../../data/generated/trailer.json';
 import { withBase } from '../../lib/url';
 
-The chassis is a ladder frame of two composite rails. Each composite rail is an RHS 150 x 50 x 3 main rail with an
-RHS 125 x 50 x 3 raiser welded on top along its whole length, so the two bend as one 275 mm deep section and lift
-the floor above the tyres. The rails run the full 4,420 mm of the body. Crossmembers join the rails at eight stations, an outrigger runs out to the body edge at
-every station, and an A-frame drawbar of RHS 150 x 50 x 5 runs from the coupling to the body front and on under the
-rails for 1,000 mm. The drawbar carries the drawbar box with the generator and the fuel cans. All the tube is C450L0 steel, every structural weld is SP to AS/NZS 1554.1, and the whole frame
-is hot-dip galvanised after welding. The design starts from research report 11 and is set out in `CHASSIS.md`.
-The current revision (CHASSIS.md revision D) is the frame for the LandCruiser 79 trailer: a shorter body, the 3,100 kg plate, a diesel bay and
-RHS 125 raisers and outriggers.
+export const n = (v) => Math.round(v).toLocaleString('en-AU');
 
-This is a planning-level proposal for the engineer to check. The drawings are drafts and are not for construction.
+A galvanised ladder frame of two composite rails, set out in `CHASSIS.md` revision E from research report 11. Each
+composite rail is an RHS 150 x 50 x 3 C450L0 main rail with an RHS 127 x 51 x 3.5 C350L0 raiser welded along its whole
+length, so the two bend as one 277 mm deep section and lift the floor above the tyres. The rails run the full
+{n(t.body_length)} mm of the body. Crossmembers join them at eight stations, an outrigger runs to the body edge at every
+station, and an A-frame drawbar of RHS 150 x 50 x 5 runs from the coupling to the body front and 1,000 mm on under the
+rails. The drawbar carries the box with the two generators and the fuel cans.
+
+The rails, full-height crossmembers, drawbar and braces are C450L0, and the raisers, outriggers and floor
+crossmembers C350L0. Every structural weld is SP to AS/NZS 1554.1, and the frame is hot-dip galvanised after welding.
+Every case is checked at the {n(t.caps.plated)} kg plate (decision H2).
+
+A planning-level proposal for the engineer to check. The drawings are drafts, not for construction.
 
 <Chassis kind="summary" />
 
@@ -29,7 +34,7 @@ The whole trailer, with the chassis as its own group, is on the <a href={withBas
 
 ## Members
 
-Lengths are on each member's centroid axis. The masses are calculated from the lengths and Austube Mills' kg/m.
+Lengths on each member's centroid axis, masses from the lengths and Austube Mills' kg/m.
 
 <Chassis kind="schedule" />
 
@@ -43,9 +48,9 @@ Lengths are on each member's centroid axis. The masses are calculated from the l
 
 ## Load cases
 
-The frame analysis runs every case on all six trailer cases, water included, with the masses scaled so the
-heaviest case sits at the 3,100 kg plated ATM. LC5b runs at tare. The limit is the yield stress of 450 MPa divided by the
-factor shown.
+The frame analysis runs every case on all {t.cases.length} trailer cases, water included, with the masses scaled so
+the heaviest sits at the {n(t.caps.plated)} kg plated ATM. LC5b runs at tare. The limit is each member's yield stress,
+450 MPa for C450L0 and 350 MPa for C350L0, divided by the factor shown.
 
 <Chassis kind="cases" />
 

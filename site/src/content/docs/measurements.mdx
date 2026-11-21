@@ -6,23 +6,22 @@ tableOfContents: false
 
 import Measurements from '../../components/Measurements.astro';
 
-The plan is worked out from estimates until the owner measures the real thing. Each input below lives in
+The plan runs on estimates until the owner measures the real thing. Each input below is in
 `data/measurements.yaml` with how to measure it, when (buy, build, weigh or trailer built) and the range the design
 accepts without a redesign. Type a value in the Measured column and the sheet says whether it is in range, and which
 rule it breaks if it is not.
 
-The inputs belong to the three parts of the project. Show picks one: the car build (VEH-01 to VEH-28 and the ute's
-UTE-01 and UTE-02), the bike box (BOX-01 to BOX-20 and the bikes' own sizes) or the trailer (the wheel, the supplier
-answers, the towball load and the trailer's weighings). A link such as `/measurements/?part=car` opens with one part
-shown.
+Show picks one part: the car build (VEH-01 to VEH-28 and the ute's UTE-01 and UTE-02), the bike box (BOX-01 to
+BOX-20 and the bikes' sizes) or the trailer (the wheel, the supplier answers, the towball load and the weighings). A
+link such as `/measurements/?part=car` opens with one part shown.
 
-Values typed here stay in this browser until you export them. Export YAML gives one `measured` line per input, ready
-to paste into `data/measurements.yaml`, and a push to main then rebuilds the site with the plan re-solved from them.
-Export CSV and Import CSV move the values to another browser or a spreadsheet.
+Typed values stay in this browser until exported. Export YAML gives one `measured` line per input, ready to paste
+into `data/measurements.yaml`. A commit on main is built and checked, and the site, with the plan re-solved from the
+new values, updates once the live branch moves to it. Export CSV and Import CSV move the values to another browser
+or a spreadsheet.
 
-Each input also has rules that change the plan, not only a warning. The Tuareg's width across its side panels sets
-the bike spacing in the ute's bike box, and the ute's laden ball height (UTE-01) sets the trailer's coupling height
-and the drawbar drop. These are design rules with their source, and a range is a guide for measuring. Neither changes
-a check's limit.
+Some inputs change the plan, not only the result. The Tuareg's width across its side panels sets the bike spacing in
+the box, and the ute's laden ball height (UTE-01) sets the trailer's coupling height and the drawbar drop. Each rule
+is listed with its source under How. Neither the rules nor the ranges change a check's limit.
 
 <Measurements />
