@@ -85,22 +85,32 @@ def roof_skin(prj, c) -> dict:
     tau = s["tension_n_mm"] / bd["width_mm"]
     pull = q * span / bd["width_mm"]
     u_bond = max(tau, pull) / allow
-    util = max(u_suction, u_pond, u_bond)
+    # the rivets through the bead, alone, as if it had let go: the membrane tension in shear, against the rivet's shear and
+    # the 1.6 mm skin's bearing, and the suction's pull in tension, each at `factor` of its rating
+    rv = r["rivets"]
+    v_rivet = s["tension_n_mm"] * rv["pitch_mm"]
+    t_rivet = q * span * rv["pitch_mm"]
+    bearing = 1.5 * rv["bearing_fu_mpa"] * 4.8 * t
+    u_rivet = max(v_rivet / (rv["factor"] * min(rv["shear_n"], bearing)), t_rivet / (rv["factor"] * rv["tensile_n"]))
+    util = max(u_suction, u_pond, u_bond, u_rivet)
     ok = util <= 1.0
-    gov = max((u_suction, "suction at the bow"), (u_pond, "standing water"), (u_bond, "the bow's adhesive bead"))[1]
+    gov = max((u_suction, "suction at the bow"), (u_pond, "standing water"), (u_bond, "the bow's adhesive bead"), (u_rivet, "the bow's rivets"))[1]
     return _row(c.id, c.title, c.severity, f"bow stress <= {r['fy_haz_mpa']:g} MPa, sag under the fall, bead within half its strength",
                 round(s["end_mpa"], 1), round(r["fy_haz_mpa"] - s["end_mpa"], 1), ok, gov,
                 (f"{t:g} mm 5052-H32 over bows {span:.0f} mm apart, held at every bow: welded along the front edge, the first bow and the "
-                 f"butt joints, and bonded along every bow with {bd['name']} as well as stitched. Suction at {r['speed_kmh']:.0f} km/h with "
+                 f"butt joints, and rivet-bonded along every other bow, {bd['name']} with {rv['name']} at {rv['pitch_mm']:g} mm through it and no welds there. Suction at {r['speed_kmh']:.0f} km/h with "
                  f"Cp -{r['cp']:g}, {q * 1e6 / 1000:.2f} kPa: the sheet drums {s['defl_mm']:.1f} mm and reaches {s['end_mpa']:.0f} MPa at the bow "
                  f"with membrane action, against welded 5052's {r['fy_haz_mpa']:g} MPa ({u_suction:.2f}). The {bd['width_mm']:g} mm bead would carry "
                  f"the sheet's {s['tension_n_mm']:.1f} N/mm of tension at {tau:.2f} MPa even where the skin ended at a bow, and the suction's pull at {pull:.3f} MPa, against half its "
-                 f"{bd['lap_shear_mpa']:g} MPa lap shear ({u_bond:.2f}). A {r['water_kpa'] * 100:.0f} mm water film sags it "
+                 f"{bd['lap_shear_mpa']:g} MPa lap shear ({u_bond:.2f}). Alone, each rivet would carry {v_rivet:.0f} N of that tension in shear "
+                 f"and {t_rivet:.0f} N of the pull, against half its {min(rv['shear_n'], bearing):,.0f} N and {rv['tensile_n']:,.0f} N ({u_rivet:.2f}). "
+                 f"A {r['water_kpa'] * 100:.0f} mm water film sags it "
                  f"{sag:.2f} mm against the 1:{r['fall']:g} fall's {fall:.1f} mm, so water runs off. A knee of {r['knee_kn']:g} kN punches "
                  f"through at {knee:.2f} kN, so the roof is marked no step, no kneeling, on a label on the roof itself"),
                 c.why, unit="MPa", roof=dict(span_mm=span, suction_kpa=q * 1000, drum_mm=s["defl_mm"], bow_mpa=s["end_mpa"], sag_mm=sag,
                                              fall_mm=fall, knee_capacity_kn=knee, knee_kn=r["knee_kn"], bond_mpa=max(tau, pull),
-                                             bond_util=u_bond, tension_n_mm=s["tension_n_mm"]))
+                                             bond_util=u_bond, tension_n_mm=s["tension_n_mm"], rivet_shear_n=v_rivet,
+                                             rivet_pull_n=t_rivet, rivet_util=u_rivet, rivet_pitch_mm=rv["pitch_mm"]))
 
 
 def rhs_plastic_modulus(b: float, d: float, t: float) -> float:

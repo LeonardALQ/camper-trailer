@@ -35,10 +35,14 @@ panels:
     # the bed's rail pairs. A member on one skin bends about its own centroid, so only its own EI adds to the
     # sandwich's (the composite term through the core is left out, conservative). The wind deflection (BDY-10) takes
     # it smeared over that pitch. The skin stress (BDY-06) leaves it out, and BDY-06 checks the member's own share at
-    # the ultimate wind. I is about the axis along the wall, for the 25 mm depth through it (sharp corners). The section
-    # is stocked: InfraBuild EL8018, 6060-T5, 10.426 kg per 6.5 m length, so 1.604 kg/m
-    stiffener: {name: "RHS 80 x 25 x 3 6060-T5 aluminium on the inner skin", E: 69000, I: 61870, depth: 25, width: 80, wall: 3,
-                break: 7, fy: 110, pitch: 1067, kg_m: 1.604,
+    # the ultimate wind. I is about the axis along the wall, for the 19 mm depth through it (sharp corners). F3-01: at
+    # ISO 13788's Rsi of 0.25 the surface over a member needs 13 mm of XPS behind it, so the member is 19 mm deep, and
+    # 110 mm wide so the hardpoints stand 27 mm off W1's and W2's cut-outs (FIT-07). No Australian stockist lists a
+    # 6060-T5 RHS under 25 mm deep this stiff (InfraBuild's range goes from 40 x 20 x 2.0 to its 25 mm deep sections), so
+    # the section is made to order (LB-06's price). Each member stops `end_gap_mm` short of the floor and roof joiners:
+    # at its foot on a rigid PVC pad `foot_pad_mm` wide across its depth, the rest of the gap and its head in XPS
+    stiffener: {name: "RHS 110 x 19 x 3.5 6060-T5 aluminium on the inner skin", E: 69000, I: 48042, depth: 19, width: 110, wall: 3.5,
+                break: 13, fy: 110, pitch: 1067, kg_m: 2.306, end_gap_mm: 10, foot_pad_mm: 20,
                 src: "https://www.infrabuild.com/steel/products/aluminium/aluminium-rhs-rectangular-box-section/"}
   front_wall:
     name: "Front wall, 35 mm: 2.0 mm outer and 1.5 mm inner Polydet skins on 31.5 mm XPS, against stones"
@@ -111,14 +115,16 @@ cradle:
 # region B, the non-cyclonic Queensland coast (Brisbane included) where Leonard will camp, and so in region A too.
 # Terrain category 2 (open country) at the wall's height, no shielding, flat ground, any direction
 # (M_d = M_s = M_t = 1). Net pressure 0.6 V^2 (Cp,e - Cp,i) Pa, with C_dyn and the K factors at 1.0: the side wall's
-# 8.8 m2 is under Table 5.4's 10 m2, and its 2 m span is far larger than the local pressure zones. Strength stays at
-# BDY-19's 40 m/s, because the parked trailer overturns below it (STB-04) and above that speed the walls are not what
-# fails. The operating rule in TRAILER.md and on CT-003 keeps it out of winds near that speed and out of the cyclonic
+# 8.8 m2 is under Table 5.4's 10 m2, and its 2 m span is far larger than the local pressure zones. Strength is checked at
+# 41 m/s: BDY-19's 40 m/s, raised by H23 to STB-04's highest overturning speed, 40.9 m/s with a box's Cf (F3-08).
+# Strapped down on its tie-downs (STB-05) the trailer stands in region B's 500-year gust, so BDY-06 also gives the walls
+# at the 250-year gust (`V_250`). The operating rule in TRAILER.md and on CT-003 keeps it out of winds near that speed and out of the cyclonic
 # regions C and D in the cyclone season.
 wind:
   V_s: 39            # m/s, serviceability: region B's 25-year regional wind V_25 (Table 3.1), for the wall's deflection
   Mzcat: 0.91        # Table 4.1, terrain category 2 at 3 m or less
-  V_u: 40            # m/s, ultimate for strength: BDY-19's 40 m/s, or STB-04's overturning speed if that is higher (H23)
+  V_u: 41            # m/s, ultimate for strength: BDY-19's 40 m/s, raised to STB-04's highest overturning speed (H23)
+  V_250: 53          # m/s, region B's 250-year regional wind (Table 3.1), for the walls when the trailer is held down
   cpe: 0.7           # Table 5.2(A), windward wall
   cpi: -0.3          # Table 5.1(A), all walls equally permeable: -0.3 or 0.0, the more severe with the windward wall
   region: B
@@ -128,23 +134,34 @@ wind:
 # Research report 19's design cold night: -5 C outside, 20 C inside, the e2 pairs' humidity boost holding the dew point at
 # 6 C or lower, and inside surfaces kept 4 K above it (the rule report 19 applies to the bare joiners). cad/body.py solves
 # the steady two-dimensional conduction through the wall at one member: outer skin, XPS, the member with still air in its
-# hollow, inner skin, with the surface resistances of ISO 6946 for horizontal heat flow, the basis report 19 uses for its
-# 17.3 C wall surface. Half the strip is modelled, from the member's centreline to `strip_mm` away, where the wall is
-# one-dimensional again.
+# hollow, inner skin. F3-01: the surfaces take ISO 13788's Rsi of 0.25 m2K/W for condensation and mould on opaque
+# elements, which allows for corners, furniture and curtains, and the heat loss figure ISO 6946's 0.13. Half the strip is
+# modelled, from the member's centreline to `strip_mm` away, where the wall is one-dimensional again. Along the member
+# its ends lose heat to the floor and roof joiners through the 10 mm gap (F3-05): the member is a fin, and the joiner is
+# taken at the outside air, a bound.
 thermal:
   t_out: -5
   t_in: 20
   dew_point: 6
   margin_k: 4
-  rsi: 0.13          # m2K/W, inside surface, horizontal heat flow (ISO 6946 Table 7)
+  rsi: 0.25          # m2K/W, inside surface for surface condensation and mould (ISO 13788:2012 clause 4.4.1)
+  rsi_heat: 0.13     # m2K/W, inside surface for the heat loss figure, horizontal heat flow (ISO 6946 Table 7)
   rse: 0.04          # m2K/W, outside surface
-  k: {grp: 0.30, xps: 0.035, aluminium: 200, air: 0.15}   # W/mK
+  k: {grp: 0.30, xps: 0.035, aluminium: 200, air: 0.15, pvc: 0.16}   # W/mK
   strip_mm: 300
   cell_mm: 0.5
   bare_panels_w_k: 36.8   # report 19 section 1: the bare panels, before its 20 % for bridges
   bridges_w_k: 7.3        # report 19 section 1: the joiners, the mount bolts and the insert strips
   members: [BD-18, BD-19, LB-06]
+  # On the generators e2 fans C and D (low on the front wall, facing the generators) stop, and fans A and B on the side
+  # walls run on as a pair with the RESPA-CF2, the RESPA holding the cabin above outside through its MERV 16 and carbon
+  # filters. Report 19's moisture model (research/models/19/loads.py condensation_check: the evening hour's 200 g/h,
+  # outside air at 90 % of saturation, the e2's 20 % moisture recovery on its share of the flow) gives that mode's
+  # dew point, and BDY-22 holds against it as well as against the normal 6 C
+  generator_mode: {e2_m3h: 22.5, respa_m3h: 150, moisture_g_h: 200, w_out_factor: 0.9, eps_lat: 0.20}
   src:
+    iso13788: "ISO 13788:2012 clause 4.4.1, Rsi 0.25 m2K/W for surface condensation and mould on opaque elements: https://cdn.standards.iteh.ai/samples/51615/261e3f395b8a425983c1eb1a5f05d3ca/ISO-13788-2012.pdf"
+    pvc: "Rigid PVC at about 0.16 W/mK (est.)"
     films: "ISO 6946 surface resistances for a wall, Rsi 0.13 and Rse 0.04 m2K/W, as BRE's BR 443 (2019) gives them: https://www.cibse.org/media/wzrjrf3l/conventions-for-u-value-calculations.pdf"
     xps: "XPS 0.035 W/mK, a little above the 0.034 W/mK Kingspan gives its best XPS boards, for the thin layer behind the member (est., report 19 used 0.031): https://www.insulation.kingspan.com/gb/en/products/insulation-boards/roof-insulation-boards/kingspan-greenguard-gg500"
     grp: "GRP skins 0.30 W/mK, report 19 section 1 (est.)"
@@ -153,15 +170,17 @@ thermal:
 
 # ---------------------------------------------------------------- the awning on the roof's kerb edge (BDY-11, BDY-23)
 # The Fiamma F80s 400 (BD-13) sits on five 4 mm aluminium angle brackets along its case. Each bracket bolts through the
-# roof's kerb-edge insert strip with two Panelok APLB-1024 bolts and APLN-1010 T-nuts, the pair whose grip, 37.5 to
-# 44.4 mm, takes the 40 mm roof (the APLB-1020 grips 30.8 to 37.7 mm only). Rivtec rates every Panelok at 14 kN shear
+# roof's kerb-edge insert strip with two Panelok APLB-1024 bolts and APLN-1016 T-nuts, whose grip, 38.1 to
+# 54.3 mm, takes the 40 mm roof, the 4 mm bracket and a 2 mm EPDM pad under it, 46 mm in all (F3-06: the APLN-1010's
+# 37.5 to 44.4 mm left 0.4 mm). Nylon shoulder washers and Duralac on the shanks keep the zinc-plated steel bolts off the
+# aluminium bracket and the roof's skin. Rivtec rates every Panelok at 14 kN shear
 # and 20 kN tension, from tests in various panels, and Rivetlab sells them in Australia. BDY-11 allows half of it, then
 # a pull test in the real roof (LR-09). Fiamma tells owners to close the awning in wind and to peg its legs, but gives no
 # speed. The operating rule closes it before gusts reach `close_kmh`, Beaufort force 5, and the fixing is checked at
 # `check_kmh`, the top of force 7, for a gust that comes before it is closed.
 awning:
   line: BD-13
-  bolt: "Panelok APLB-1024 with an APLN-1010 T-nut"
+  bolt: "Panelok APLB-1024 with an APLN-1016 T-nut on a 2 mm EPDM pad"
   brackets: 5
   bolts_per_bracket: 2
   bolt_pitch_mm: 90            # the bracket's two bolts across the roof, inboard and outboard (est.)
@@ -281,3 +300,17 @@ rules:
   between_mm: 300              # full-height wall between neighbouring openings (assumption, report 12 section 5)
   edge_mm: 150                 # from an opening to a panel edge or corner
   rear_corner_mm: 300          # no opening within 300 mm of the rear corners (report 12 section 5)
+
+# ---------------------------------------------------------------- wall members against the openings (FIT-07, F3-02)
+# Each member stands at least `clear_mm` from every cut-out, gland and insert strip on its wall, so the panel maker can
+# rout its channel with XPS between. The doors' and windows' cut-outs carry `strip_mm` insert strips round them. W1 and
+# W2 sit between the bed's hardpoints: a Dometic S4's outer and inner frames screw to each other through the cut-out and
+# clamp the panel, so their sides carry no strip and the hardpoints stand clear of the cut-outs themselves. The members,
+# the kitchen tower's sides, the partition and the end walls keep every side-wall bay within the members' pitch.
+members_rule:
+  clear_mm: 25
+  strip_mm: 70
+  strip_lines: [WN-, BD-07, BD-15, BD-17]
+  no_side_strips: [OP-01, OP-05]
+  bounds: [LA-11T, WR-03]
+  hardpoints_at: LB-04

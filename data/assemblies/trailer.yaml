@@ -222,8 +222,24 @@ stability:
     moment_factor: 1.5       # the operating rule acts at the overturning moment over 1.5 (est.)
     warning_kmh: 90          # the Bureau of Meteorology warns of damaging winds at gusts of 90 km/h or more
     cell_mm: 10
+    friction: 0.35           # tyres and steadies on wet grass (est.), for sliding (F3-03)
+    # STB-05 (F3-03): four lashing points under the outrigger ends (CH-B02) take ratchet straps down and out at 45 degrees to
+    # screw-in ground anchors. The windward pair holds the trailer against tipping and, with the friction, sliding
+    tie_down:
+      v_r_ms: 57             # region B's 500-year regional wind (AS/NZS 1170.2 Table 3.1), times Mz,cat 0.91 at 3 m
+      angle_deg: 45
+      lug_y_mm: 1170         # the lashing point under the outrigger's end
+      lug_z_mm: 717
+      strap_lc_n: 24500      # 50 mm ratchet strap, lashing capacity 2,500 kg (AS/NZS 4380, est.)
+      lug_wll_n: 17800       # forged 1/2 in weld-on D-ring, working load limit 4,000 lb
+      anchor_n: 15000        # 760 mm screw-in auger anchor in firm soil (est.), pull-tested on site
+      outrigger_z_mm3: 37317 # RHS 127 x 51 x 3.5 about its strong axis
+      outrigger_l_mm: 532    # from the raiser's face to the lashing point
+      outrigger_fy: 350
+      kit_kg: 12             # four straps and four anchors, in the bike box's tool chest (UT-17, est.)
     src:
       cf: "https://www.mecaenterprises.com/wind-loads-on-freestanding-walls/"
+      lug: "https://www.amazon.com/gp/product/B0B53NL2MB"
       warning: "https://www.bom.gov.au/resources/learn-and-explore/severe-weather-knowledge-centre/severe-weather-and-coastal-hazard-warning-services"
 
 zones:
@@ -396,23 +412,23 @@ items:
     mass: {basis: declared, total_kg: 6, maturity: estimate, source: "Research report 25 section 2: about +6 kg (0 to +12 kg) net of the square corner joiners and panel strips they replace", note: "H12, option A+"}
     note: H12 keeps a fixed roof. Report 25 puts towing fuel at 21.3 L/100 km at 90 km/h against 25.0 with the square front, for about AUD 3,500 (est.).
   - id: BD-18
-    name: Side-wall stiffeners, RHS 80 x 25 x 3 aluminium on the inner skin, one in each wall's living-zone bay
-    material: "6060-T5 aluminium RHS 80 x 25 x 3, bonded into a 25 mm channel the panel maker routs in the XPS from the inner face, 7 mm of XPS behind it"
+    name: Road-side wall stiffener, RHS 110 x 19 x 3.5 aluminium on the inner skin, between the kitchen tower and the partition
+    material: "6060-T5 aluminium RHS 110 x 19 x 3.5, made to order, bonded into a 19 mm channel the panel maker routs in the XPS from the inner face, 13 mm of XPS behind it, 10 mm short of the floor and roof joiners on a rigid PVC pad"
     system: body
-    price: {aud: 160, basis: estimate, date: 2026-11-21, note: "4 m of 6060-T5 RHS 80 x 25 x 3 (InfraBuild EL8018) at about AUD 30/m and the routed channel at about AUD 10/m (est.)"}
-    for: {s: [1, -1]}
-    point: [body_x0 + 2795, s * (half_bw - wall_t / 2), floor_z + interior_h / 2]
-    mass: {basis: declared, unit_kg: 3.21, maturity: calculated, source: "2.0 m at 1.604 kg/m, InfraBuild's 10.426 kg for a 6.5 m length (https://www.infrabuild.com/steel/products/aluminium/aluminium-rhs-rectangular-box-section/)"}
-    note: "With the lift-bed hardpoints (LB-06), the entry door's jamb members (BD-19), the tower's sides and the partition, no side-wall bay is wider than 1,067 mm (data/body/body.yaml, BDY-06, BDY-10). Kerb side between the washer and the dryer, road side just ahead of W4. Bonded to the inner skin only, so no metal crosses the core and the inside surface over them stays above the cold night's dew point (BDY-22). They also take cabinetry screws"
+    price: {aud: 20, basis: estimate, date: 2026-11-21, note: "The routed channel, 2 m at about AUD 10/m (est.). The member is cut from the made-to-order run priced on LB-06"}
+    for: {s: [1]}
+    point: [body_x0 + 2530, s * (half_bw - wall_t / 2), floor_z + interior_h / 2]
+    mass: {basis: declared, unit_kg: 4.57, maturity: calculated, source: "1.98 m at 2.306 kg/m, 854 mm2 at 2.70 t/m3, with its 10 mm rigid PVC pad (calculated)"}
+    note: "With the lift-bed hardpoints (LB-06), the entry door's jamb members (BD-19), the tower's sides and the partition, no side-wall bay is wider than 1,067 mm (data/body/body.yaml, BDY-06, BDY-10). On the road side behind the kitchen tower, 145 mm clear of W4's insert strip and of the range hood's duct (FIT-07). The kerb side needs none: its bays are 955 mm and less. Bonded to the inner skin only, so no metal crosses the core and the inside surface over them stays above the cold night's dew point (BDY-22). They also take cabinetry screws"
   - id: BD-19
-    name: Entry door jamb members, RHS 80 x 25 x 3 aluminium on the inner skin, floor joiner to roof joiner on both sides of D1
-    material: "6060-T5 aluminium RHS 80 x 25 x 3, bonded into a 25 mm channel the panel maker routs in the XPS from the inner face, 7 mm of XPS behind it"
+    name: Entry door's rear jamb member, RHS 110 x 19 x 3.5 aluminium on the inner skin, floor joiner to roof joiner behind D1
+    material: "6060-T5 aluminium RHS 110 x 19 x 3.5, made to order, bonded into a 19 mm channel the panel maker routs in the XPS from the inner face, 13 mm of XPS behind it, 10 mm short of the floor and roof joiners on a rigid PVC pad"
     system: body
-    price: {aud: 160, basis: estimate, date: 2026-11-21, note: "4 m of 6060-T5 RHS 80 x 25 x 3 (InfraBuild EL8018) at about AUD 30/m and the routed channel at about AUD 10/m (est.)"}
-    for: {k: [0, 1]}
-    point: [lz_door_x - 120 + k * (lz_door_w + 240), -half_bw + wall_t / 2, floor_z + interior_h / 2]
-    mass: {basis: declared, unit_kg: 3.21, maturity: calculated, source: "2.0 m at 1.604 kg/m, InfraBuild's 10.426 kg for a 6.5 m length (https://www.infrabuild.com/steel/products/aluminium/aluminium-rhs-rectangular-box-section/)"}
-    note: "The door's cut-out breaks the wall's span, so a full-height member beside each jamb carries the door's share of the wind and bounds the bays on either side (BDY-10). Each is centred 120 mm off the door's edge, clear of the 70 mm insert strip round the cut-out, so the door frame's screws go into that strip and the door's aluminium frame, which crosses the wall, never touches a member (BDY-22)"
+    price: {aud: 20, basis: estimate, date: 2026-11-21, note: "The routed channel, 2 m at about AUD 10/m (est.). The member is cut from the made-to-order run priced on LB-06"}
+    for: {k: [1]}
+    point: [lz_door_x + lz_door_w + 156, -half_bw + wall_t / 2, floor_z + interior_h / 2]
+    mass: {basis: declared, unit_kg: 4.57, maturity: calculated, source: "1.98 m at 2.306 kg/m, 854 mm2 at 2.70 t/m3, with its 10 mm rigid PVC pad (calculated)"}
+    note: "The door's cut-out breaks the wall's span. The bed's rear kerb-side hardpoint (LB-06) bounds the door's bay at its front, 276 mm off the door's edge with the fresh water fill G1 between, and this member at its rear, 155 mm off the door's edge, 30 mm clear of the 70 mm insert strip round the cut-out and of the outlet G3 (FIT-07). The bay between them is 1,056 mm, inside the 1,067 mm pitch (BDY-10). The door frame's screws go into the strip, and the door's aluminium frame, which crosses the wall, never touches a member (BDY-22)"
   - id: BD-08
     name: Extrusions, adhesive, sealant and the body mount fixings
     material: "Aluminium extrusions, MS polymer adhesive and sealant, galvanised fixings (est.)"
@@ -525,11 +541,11 @@ items:
     system: body
     price:
       - {item: "Fiamma F80s 400 roof awning, manual", aud: 2687.70, basis: listing, converted_from: "USD 1,734", url: "https://www.campervan-hq.com/products/fiamma-f80s-400-rv-awning-132", date: 2026-11-21, note: "Polar White. JayParts (Jayco) stocks the F80s in Australia but its page could not be read"}
-      - {item: "Five 4 mm aluminium angle brackets, each bolted through the roof's kerb-edge insert strip by two Panelok APLB-1024 bolts with APLN-1010 T-nuts", aud: 290, basis: estimate, url: "https://rivetlab.com/collections/panelok", date: 2026-11-21, note: "The brackets about AUD 250 and the ten Panelok sets about AUD 40 (est.)"}
+      - {item: "Five 4 mm aluminium angle brackets, each bolted through the roof's kerb-edge insert strip by two Panelok APLB-1024 bolts with APLN-1016 T-nuts, on a 2 mm EPDM pad, the bolts in nylon shoulder washers with Duralac", aud: 310, basis: estimate, url: "https://rivetlab.com/collections/panelok", date: 2026-11-21, note: "The brackets about AUD 250, the ten Panelok sets about AUD 40, and the pads and washers about AUD 20 (est.)"}
     box: [body_x0 + 320, -half_bw + 5, roof_top_z, 4000, 153, 113]
     parts:
       - {item: "Fiamma F80s 400, 4,000 mm case, 3,880 mm canopy, 2,500 mm extension", kg: 34.0, basis: maker, source: "https://www.jacksonsleisure.com/fiamma/f80s/wind/out/awning/"}
-      - {item: Roof brackets and ten Panelok bolts with their T-nuts, kg: 2.6, basis: estimate}
+      - {item: Roof brackets and ten Panelok bolts with their T-nuts, pads and washers, kg: 2.7, basis: estimate}
     note: "The case is 153 mm across and 113 mm high on its bracket (Fiamma's F80s data sheet, https://files.ekmcdn.com/grasshopper/resources/other/f80s-ducato-information.pdf). Its outer face stands 5 mm inside the kerb wall's skin, so it adds nothing to the width (DIM-01). It starts 70 mm behind the front vertical edge's 250 mm radius. The legs rest on the ground and are pegged whenever it is out, so nothing is fixed to the wall. Closed in wind (TRAILER.md, CT-003). The legs set the canopy's fall, 10 degrees on level ground (BDY-23). The canopy covers 9.7 m2, 1.1 m2 less than the wall-mounted F45s 450 it replaces, which stood 100 mm off the wall"
 
   # ================================================================ roof
@@ -714,13 +730,13 @@ items:
       - {item: "Four stainless spring index plungers, M12, with interlock microswitches, at the day and night stops", kg: 0.6, basis: estimate, source: "Report 21 section 1.2"}
       - {item: "Pressure-sensitive safety edge round the platform's lower perimeter, with its relay in the down circuit", kg: 0.8, basis: estimate, source: "Report 21 section 1.2"}
   - id: LB-06
-    name: Lift bed hardpoints, four RHS 80 x 25 x 3 aluminium members on the inner skin, full wall height, behind the rails
-    material: "6060-T5 aluminium RHS 80 x 25 x 3, bonded into a 25 mm channel the panel maker routs in the XPS from the inner face, 7 mm of XPS behind it"
+    name: Lift bed hardpoints, four RHS 110 x 19 x 3.5 aluminium members on the inner skin, full wall height, behind the rails
+    material: "6060-T5 aluminium RHS 110 x 19 x 3.5, made to order, bonded into a 19 mm channel the panel maker routs in the XPS from the inner face, 13 mm of XPS behind it, 10 mm short of the floor and roof joiners on a rigid PVC pad"
     system: bed
-    price: {aud: 320, basis: estimate, date: 2026-11-21, note: "8 m of 6060-T5 RHS 80 x 25 x 3 (InfraBuild EL8018) at about AUD 30/m and the routed channel at about AUD 10/m (est.)"}
+    price: {aud: 3080, basis: estimate, date: 2026-11-21, note: "A made-to-order 6060-T5 die, about AUD 2,000, and its 100 kg minimum run at about AUD 10/kg, about 43 m, which covers all six wall members (11.9 m, 27.4 kg), and the routed channels, 8 m at about AUD 10/m (est.). InfraBuild stocks no 6060-T5 RHS under 25 mm deep this stiff: https://www.infrabuild.com/steel/products/aluminium/aluminium-rhs-rectangular-box-section/"}
     point: [in_x0 + bed_rail_u + 533, 0, floor_z + 1000]
-    mass: {basis: declared, total_kg: 12.83, maturity: calculated, source: "4 x 2.0 m at 1.604 kg/m, InfraBuild's 10.426 kg for a 6.5 m length (https://www.infrabuild.com/steel/products/aluminium/aluminium-rhs-rectangular-box-section/). Report 21 section 1.4 had four 1.6 m lengths of RHS 40 x 20 x 3 laid flat, 5.6 kg"}
-    note: Laid into the wall cores as the panels are made, floor joiner to roof joiner and bonded to the inner skin, so the rail screws pass through the inner skin and bite 3 mm aluminium (Lippert's backing rule), and each hardpoint also stiffens the wall against wind (BDY-10). The 7 mm of XPS behind each keeps the rails off the cold outer skin (BDY-22). The bed's rail pairs are 1,067 mm apart, the widest side-wall bay.
+    mass: {basis: declared, total_kg: 18.28, maturity: calculated, source: "4 x 1.98 m at 2.306 kg/m, 854 mm2 at 2.70 t/m3, with their rigid PVC pads (calculated). Report 21 section 1.4 had four 1.6 m lengths of RHS 40 x 20 x 3 laid flat, 5.6 kg"}
+    note: Laid into the wall cores as the panels are made, floor joiner to roof joiner and bonded to the inner skin, so the rail screws pass through the inner skin and bite 3.5 mm aluminium (Lippert's 3 mm backing rule), and each hardpoint also stiffens the wall against wind (BDY-10). The 13 mm of XPS behind each keeps the surface over it 4 K above the cold night's dew point, to its ends (BDY-22). The bed's rail pairs are 1,067 mm apart, the widest side-wall bay, and W1 and W2 sit between them 27 mm clear of the hardpoints (FIT-07). The rear kerb-side hardpoint also bounds the entry door's bay at its front.
   - id: LB-03
     name: Bed platform, 40 mm aluminium honeycomb, 0.8 and 0.5 mm skins, 1,550 x 2,290 mm, on the lift's support rails
     material: "Aluminium honeycomb sandwich, 0.8 mm top and 0.5 mm bottom aluminium skins on a 40 kg/m3 core"
@@ -1001,7 +1017,7 @@ items:
       - {item: "Victron Lynx Distributor (M10)", aud: 293, basis: listing, url: "https://energyconnections.net.au/products/victron-lynx-distributor-m10", date: 2026-11-20}
       - {item: "Victron Cerbo GX MK2 with GX Touch 50", aud: 616, basis: listing, url: "https://www.solar4rvs.com.au/products/victron-cerbo-gx-mk2-gx-touch-50-display-combo-1", date: 2026-11-20}
       - {item: "230 V board: enclosure, inlet, main switch, eleven RCBOs, three contactors, three current relays, 300 A DC isolator, Anderson SB50", aud: 1480, basis: estimate, date: 2026-11-20}
-      - {item: "Generator inlet and changeover: a second 15 A appliance inlet beside the shore inlet, and a 2-pole 20 A cam changeover switch, SHORE - OFF - GENERATOR, with two auxiliary contact stages (Kraus & Naimer CA10 class)", aud: 230, basis: estimate, url: "https://www.krausnaimer.com/fileadmin/user_upload/Kraus_u_Naimer/Pdfcat/Local/AUS/CA10_CAD11_CAD12_ver2.pdf", date: 2026-11-21, note: "Inlet about AUD 50, switch about AUD 160, labels and the e2 and Cerbo leads about AUD 20 (est.)"}
+      - {item: "Generator inlet and changeover: a second 15 A appliance inlet beside the shore inlet, and a 2-pole 20 A cam changeover switch, SHORE - OFF - GENERATOR, with two auxiliary contact stages and a neutral-earth bonding contact made on GENERATOR only (Kraus & Naimer CA10 class)", aud: 250, basis: estimate, url: "https://www.krausnaimer.com/fileadmin/user_upload/Kraus_u_Naimer/Pdfcat/Local/AUS/CA10_CAD11_CAD12_ver2.pdf", date: 2026-11-21, note: "Inlet about AUD 50, switch with its bonding contact about AUD 180, labels and the e2 and Cerbo leads about AUD 20 (est.)"}
       - {item: "Board panel 800 x 700 mm and the wiring on it", aud: 150, basis: estimate, date: 2026-11-20}
     point: [rear_x0 - 100, -560, ceiling_z - 500]
     parts:

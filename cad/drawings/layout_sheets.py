@@ -180,6 +180,22 @@ def ct011(prj, model, bom, checks, reg, dwg):
     X, Z = views["rear"]
     LM = resolve_lamps(lay)
     _lamps_on_walls(sh, V, views, LM)
+    # the side walls' members (FIT-07) and the glands on them, phantom
+    mc = res["members"]
+    for q in mc["rows"]:
+        Xw, Zw = views[q["wall"]]
+        u = q["x"] - V["body_x0"]
+        x0, x1 = sorted((Xw(u - mc["width"] / 2), Xw(u + mc["width"] / 2)))
+        sh.rect(x0, Zw(10), x1, Zw(V["interior_h"] - 10), "phantom")
+        sh.text((x0 + x1) / 2, Zw(V["interior_h"] - 10) + 0.6, q["member"].split(" at ")[0].split(".")[0], 0.95, "middle")
+    for g in yaml.safe_load((ROOT / "data" / "services.yaml").read_text())["glands"]:
+        if g["at"] in ("kerb", "road"):
+            Xw, Zw = views[g["at"]]
+            gw, gh = g.get("w", g["d"]), g.get("h", g["d"])
+            u = g["x"] - V["body_x0"]
+            x0, x1 = sorted((Xw(u - gw / 2), Xw(u + gw / 2)))
+            sh.rect(x0, Zw(g["z"] - gh / 2), x1, Zw(g["z"] + gh / 2), "medium")
+            sh.text((x0 + x1) / 2, Zw(g["z"] + gh / 2) + 0.5, g["id"], 0.95, "middle")
     # the split's outdoor unit and its cradle on the rear wall (phantom), and the awning on the roof's kerb edge
     for iid in ("AC-03",):
         b = lay.find(iid).box

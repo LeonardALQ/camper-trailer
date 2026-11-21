@@ -71,7 +71,7 @@ def ct601(prj, model, bom, checks, reg, dwg):
     box(sh, 112, 262, 166, 280, ["THE UTE (CAR BUILD TC01)", "2 x ORION-TR SMART 12/48-8", "ON THE STOCK ALTERNATOR", "48 V TO THE TRAILER WHILE DRIVING"])
     box(sh, 172, 262, 226, 280, ["12-PIN PLUG, AS 4177.5", "LAMPS, BRAKES, BREAKAWAY SWITCH", "TSC POWER FROM THE UTE'S HARNESS", "NOT PART OF THE 48 V SYSTEM"], sty="light")
     box(sh, 172, 238, 226, 256, ["TWO 15 A INLETS (G2): SHORE, AND", "GENERATOR FOR THE TWO EU22i IN PARALLEL", "CHANGEOVER SHORE - OFF - GENERATOR",
-                                 "ON GEN: e2 FEED OPEN, CERBO INPUT 3 SHUT"])
+                                 "ON GEN: e2 C, D OFF, CERBO IN 3, N-E BOND"])
     # MPPTs
     for x0, n in ((24, 1), (54, 2)):
         box(sh, x0, 238, x0 + 26, 254, [f"MPPT {n}", "SMARTSOLAR 150/35", "DC ISOLATOR"])

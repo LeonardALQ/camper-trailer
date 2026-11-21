@@ -27,7 +27,8 @@ def test_the_walls_strength_wind_covers_the_overturning_speed():
     higher. If a change lets the parked trailer stand in a stronger wind than the walls are checked for, this fails."""
     o = next(r for r in RESULTS if r["id"] == "STB-04")["overturn"]
     for q in o["cases"]:
-        assert q["v"] <= o["v_u"] + 1e-9, f"{q['case']} overturns at {q['v']:.1f} m/s, above the {o['v_u']:g} m/s the walls are checked at"
+        v = max(q["v"], q["v_box"])
+        assert v <= o["v_u"] + 1e-9, f"{q['case']} overturns at {v:.1f} m/s, above the {o['v_u']:g} m/s the walls are checked at"
 
 
 def test_the_wall_section_model_matches_a_plain_wall():

@@ -205,7 +205,7 @@ class Chassis:
         self.P = Params(raw)
         self.V = self.P.values
         self.sections = load_sections()
-        self.stations = stations
+        self.stations = [dict(s, x=float(round(s["x"]))) for s in stations]   # each position rounded once, here (F3-09)
         roles = self.data["roles"]
         self.role_sec = {r: self.sections[d["section"]] for r, d in roles.items()}
         self.role_name = {r: d["name"] for r, d in roles.items()}

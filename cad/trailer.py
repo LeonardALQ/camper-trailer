@@ -874,18 +874,43 @@ class Trailer:
                 w, hv = min(rs, key=lambda q: q["v"]), max(rs, key=lambda q: q["v"])
                 o = st["overturn"]
                 act = min(w["act_kmh"], o["warning_kmh"])
+                slide_f = (min(q["v_slide"] for q in rs) / (act / 3.6 * wd["Mzcat"])) ** 2
                 row.update(limit="reported", measured=round(w["v"], 1), unit="m/s", margin=None, ok=True,
                            governing=f"{w['case']} {by_id[w['case']]['name']}, no growth",
                            detail=(f"side silhouette {sil['area_m2']:.1f} m2, its centroid {sil['z_mm']:,.0f} mm up, Cf {o['cf']:g}. "
                                    + ". ".join(f"{q['case']} at {q['mass_kg']:,.0f} kg tips at {q['v']:.1f} m/s at the trailer, a "
                                                f"{q['forecast_kmh']:.0f} km/h forecast gust" for q in rs)
-                                   + f". With a box's Cf of {o['cf_box']:g} the heaviest would tip at {hv['v_box']:.1f} m/s. The operating rule "
-                                   f"acts at the overturning moment over {o['moment_factor']:g}, forecast gusts of {w['act_kmh']:.0f} km/h, or at a "
-                                   f"Bureau warning of damaging winds ({o['warning_kmh']:.0f} km/h gusts), so at {act:.0f} km/h. The highest "
-                                   f"overturning speed, {hv['v']:.1f} m/s, is under BDY-19's {wd['V_u']:g} m/s, so the walls' strength stays at "
-                                   f"{wd['V_u']:g} m/s (H23)"),
+                                   + f". With a box's Cf of {o['cf_box']:g} the heaviest would tip at {hv['v_box']:.1f} m/s. "
+                                   + ". ".join(f"{q['case']} slides at {q['v_slide']:.1f} m/s on wet grass (friction {o['friction']:g}, est.), a "
+                                               f"{q['slide_forecast_kmh']:.0f} km/h forecast gust" for q in rs)
+                                   + f". The operating rule acts at the overturning moment over {o['moment_factor']:g}, forecast gusts of "
+                                   f"{w['act_kmh']:.0f} km/h, or at a Bureau warning of damaging winds ({o['warning_kmh']:.0f} km/h gusts), so at "
+                                   f"{act:.0f} km/h, where the lightest case's sliding force has a factor of {slide_f:.2f}. Strapped down it holds to "
+                                   f"region B's 500-year gust (STB-05). The walls' strength wind, {wd['V_u']:g} m/s, covers the highest overturning "
+                                   f"speed, {max(hv['v'], hv['v_box']):.1f} m/s with a box's Cf (H23)"),
                            overturn=dict(cases=rs, silhouette=sil, act_kmh=act, rule_kmh=w["act_kmh"], warning_kmh=o["warning_kmh"],
-                                         v_u=wd["V_u"], cf=o["cf"], cf_box=o["cf_box"], factor=o["moment_factor"]))
+                                         v_u=wd["V_u"], cf=o["cf"], cf_box=o["cf_box"], factor=o["moment_factor"], friction=o["friction"],
+                                         slide_factor=slide_f))
+            elif c.type == "tie_down":
+                from .body import load_data
+                st, wd = self.td["stability"], load_data()["wind"]
+                o = st["overturn"]
+                td = o["tie_down"]
+                sil = side_silhouette(lay, o["cell_mm"])
+                ids = [x["id"] for x in cases] if c.cases == "all" else c.cases
+                rs = [tie_down(lay, overturn(lay, by_id[i], st, sil, wd["Mzcat"]), st, sil, wd["Mzcat"]) for i in ids]
+                w = max(rs, key=lambda q: q["util"])
+                row.update(limit="<= 1.00 utilisation", measured=round(w["util"], 2), unit="", margin=round(1 - w["util"], 2), ok=w["util"] <= 1.0,
+                           governing=f"{w['case']}, {w['governs']}, the {w['governing']}",
+                           detail=(f"region B's 500-year gust at 3 m, {td['v_r_ms']:g} m/s times {wd['Mzcat']:g}, {w['v']:.1f} m/s, with Cf {o['cf']:g} on "
+                                   f"the {sil['area_m2']:.1f} m2 side silhouette, {w['push_n'] / 1000:.1f} kN. "
+                                   + ". ".join(f"{q['case']} at {q['mass_kg']:,.0f} kg: each windward strap {q['t_tip_n'] / 1000:.1f} kN against tipping "
+                                               f"and {q['t_slide_n'] / 1000:.1f} kN against sliding on wet grass (friction {o['friction']:g}, est.)" for q in rs)
+                                   + f". At {w['t_n'] / 1000:.1f} kN the strap works at {w['utils']['strap']:.2f} of its {td['strap_lc_n'] / 1000:.1f} kN "
+                                   f"lashing capacity, the D-ring at {w['utils']['lug']:.2f} of its {td['lug_wll_n'] / 1000:.1f} kN working load limit, the "
+                                   f"anchor at {w['utils']['anchor']:.2f} of {td['anchor_n'] / 1000:.0f} kN in firm soil (est.), and the outrigger at "
+                                   f"{w['outrigger_mpa']:.0f} MPa, {w['utils']['outrigger']:.2f} of its yield over 1.5"),
+                           tie_down=dict(cases=rs, v=w["v"]))
             elif c.type == "towball_scale":
                 m = self.inputs.v("UTE-03")
                 model = by_id[self.target_case.id]["nominal"]["towball_kg"]
@@ -1076,10 +1101,34 @@ def overturn(lay: Layout, ev: dict, st: dict, sil: dict, mzcat: float, basis: st
     for key, cf in (("v", o["cf"]), ("v_box", o["cf_box"])):
         q = W * lever / (cf * sil["area_m2"] * zc)            # Pa: N mm over (m2 mm)
         out[key] = math.sqrt(q / 0.6)
+    out["v_slide"] = math.sqrt(o["friction"] * W / (0.6 * o["cf"] * sil["area_m2"]))   # the push passes the friction on wet grass
+    out["slide_forecast_kmh"] = out["v_slide"] / mzcat * 3.6
     out["v_act"] = out["v"] / math.sqrt(o["moment_factor"])
     out["forecast_kmh"] = out["v"] / mzcat * 3.6
     out["act_kmh"] = 5 * math.floor(out["v_act"] / mzcat * 3.6 / 5)
     return out
+
+
+def tie_down(lay: Layout, ot: dict, st: dict, sil: dict, mzcat: float) -> dict:
+    """STB-05 (F3-03): the windward pair of straps from the lashing points under the outrigger ends, holding the parked
+    trailer against tipping and sliding in region B's 500-year gust at 3 m. Moments about the leeward wheels' line on the
+    ground, with STB-04's weight and lever, and the straps `angle_deg` down and out to windward."""
+    V, o = lay.V, st["overturn"]
+    td = o["tie_down"]
+    v = td["v_r_ms"] * mzcat
+    a = math.radians(td["angle_deg"])
+    sa, ca = math.sin(a), math.cos(a)
+    F = 0.6 * v ** 2 * o["cf"] * sil["area_m2"]
+    W = ot["mass_kg"] * 9.81
+    arm = (V["track"] / 2 + td["lug_y_mm"]) * sa + td["lug_z_mm"] * ca       # mm, each strap's restoring lever
+    t_tip = max(0.0, (F * sil["z_mm"] - W * ot["lever_mm"]) / (2 * arm))
+    t_slide = max(0.0, (F - o["friction"] * W) / (2 * (o["friction"] * sa + ca)))
+    t = max(t_tip, t_slide)
+    s_out = t * sa * td["outrigger_l_mm"] / td["outrigger_z_mm3"]
+    utils = dict(strap=t / td["strap_lc_n"], lug=t / td["lug_wll_n"], anchor=t / td["anchor_n"], outrigger=s_out / (td["outrigger_fy"] / 1.5))
+    gov = max(utils, key=utils.get)
+    return dict(case=ot["case"], mass_kg=ot["mass_kg"], v=v, push_n=F, t_tip_n=t_tip, t_slide_n=t_slide, t_n=t,
+                governs="sliding" if t_slide >= t_tip else "tipping", outrigger_mpa=s_out, utils=utils, governing=gov, util=utils[gov])
 
 
 def yaw_inertia(lay: Layout, case, basis: str = "growth") -> dict:

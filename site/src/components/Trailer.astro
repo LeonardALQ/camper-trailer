@@ -33,6 +33,16 @@ const measured = (c: any) => {
 };
 const groupRows = Object.entries(r.tare_by_group) as [string, any][];
 const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
+// whole kg by largest remainder, so the rows add up to the rounded total (F3-09)
+const lr = (vals: number[]) => {
+  const out = vals.map((v) => Math.floor(v));
+  let rem = Math.round(vals.reduce((a, b) => a + b, 0)) - out.reduce((a, b) => a + b, 0);
+  vals.map((v, i) => [v - Math.floor(v), i] as [number, number]).sort((a, b) => b[0] - a[0])
+    .forEach(([, i]) => { if (rem > 0) { out[i] += 1; rem -= 1; } });
+  return out;
+};
+const gMass = lr(groupRows.map(([, g]) => g.mass_kg));
+const gGrowth = lr(groupRows.map(([, g]) => g.growth_kg));
 ---
 
 {kind === 'summary' && (
@@ -141,8 +151,8 @@ const tareGroups = groupRows.reduce((s, [, g]) => s + g.mass_kg, 0);
     <table data-sheet-sum="sum">
       <thead><tr><th>Group</th><th class="num">Tare kg</th><th class="num">With growth kg</th></tr></thead>
       <tbody>
-        {groupRows.map(([g, v]) => (<tr><td>{g}</td><td class="num">{n(v.mass_kg)}</td><td class="num">{n(v.growth_kg)}</td></tr>))}
-        <tr class="row-total"><td>Tare</td><td class="num">{n(tareGroups)}</td><td class="num">{n(groupRows.reduce((s, [, g]) => s + g.growth_kg, 0))}</td></tr>
+        {groupRows.map(([g], i) => (<tr><td>{g}</td><td class="num">{n(gMass[i])}</td><td class="num">{n(gGrowth[i])}</td></tr>))}
+        <tr class="row-total"><td>Tare</td><td class="num">{n(gMass.reduce((a, b) => a + b, 0))}</td><td class="num">{n(gGrowth.reduce((a, b) => a + b, 0))}</td></tr>
       </tbody>
     </table>
   </div>

@@ -92,11 +92,11 @@ def ct201(prj, model, bom, checks, reg, dwg):
         sh.line(ox + V["end_wall_t"] / k, oy + z / k, ox + V["bed_u1"] / k, oy + z / k, "phantom")
         sh.text(ox + V["end_wall_t"] / k + 0.6, oy + z / k + 0.7, t, 1.25)
     # the side-wall stiffener in the living-zone bay (BD-18, BDY-10) and the H12 radius at the roof's front edge
-    us = lay.find("BD-18.1").cog[0] - V["body_x0"]
-    for yy, flip in ((oy, False), (166.0, True)):
+    for yy, flip, iid in ((oy, False, "BD-19.1"), (166.0, True, "BD-18.1")):   # the door's rear jamb member, the road wall's stiffener
+        us = lay.find(iid).cog[0] - V["body_x0"]
         xs = ox + ((L - us) if flip else us) / k
         sh.line(xs, yy, xs, yy + H / k, "phantom")
-        sh.text(xs + 0.8, yy + H / k - 3.0, "BD-18", 1.3)
+        sh.text(xs + 0.8, yy + H / k - 3.0, iid.split(".")[0], 1.3)
         xr = ox + (L / k if flip else 0)
         r = V["roof_front_r"] / k
         sgn = -1 if flip else 1
@@ -153,8 +153,8 @@ def ct201(prj, model, bom, checks, reg, dwg):
         f"{'PASS' if oc['ok'] else 'FAIL'}). CUT-OUT CORNERS RADIUSED, 68 mm FOR SERVICE DOORS, 90 mm AT THE TOP OF THE DC DOOR.",
         "W1 (OP-01) OVER THE BED IS THE SECOND WAY OUT, 804 x 454 mm CLEAR. D2 (OP-15) OPENS INTO THE WET ROOM. THE PRODUCTS ARE ON "
         "CT-013 AND EACH OPENING'S MARGIN ON CT-011. H12: GRP CORNER PIECES GIVE THE ROOF'S FRONT EDGE A 150 mm RADIUS AND THE FRONT "
-        f"VERTICALS 250 mm. BD-18: ONE {_member(b)} STIFFENER ON THE INNER SKIN IN EACH SIDE WALL, WITH THE JAMB MEMBERS BD-19 AND THE BED'S "
-        "HARDPOINTS LB-06 (BDY-10, BDY-22). PHANTOM DAY AND NIGHT: THE MATTRESS TOP, "
+        f"VERTICALS 250 mm. BD-18: ONE {_member(b)} STIFFENER ON THE ROAD WALL'S INNER SKIN BEHIND THE TOWER, WITH THE DOOR'S REAR JAMB "
+        "MEMBER BD-19 AND THE BED'S FOUR HARDPOINTS LB-06, EACH 10 mm SHORT OF THE JOINERS (BDY-10, BDY-22, FIT-07). PHANTOM DAY AND NIGHT: THE MATTRESS TOP, "
         f"{V['mattress_z'] + V['mattress_t'] - V['floor_z']:.0f} AND "
         f"{V['bed_night_h'] + V['deck_t'] + V['underlay_t'] + V['mattress_t']:.0f} mm ABOVE THE FLOOR (CT-010).",
         "WHERE AN OPENING CROSSES A CHASSIS STATION THE OUTRIGGER-TIP MOUNT MOVES INBOARD OF ITS FRAME AND THE FLOOR JOINER RUNS UNBROKEN.",
@@ -259,6 +259,23 @@ def ct202(prj, model, bom, checks, reg, dwg):
                            f"{ins['n']:.0f} N PER SCREW, {ins['case'].upper().replace(' KG', ' kg')}, {ins['util']:.2f} OF HALF ITS RATED SHEAR (BDY-11)",
                            "FOUR RAILS, TWO ON EACH SIDE WALL, 1,067 mm APART ALONG THE TRAILER (CT-203)")):
         sh.text(122, 99 - 3 * i, t, 1.4)
+    # ---- F: a wall member's foot at the floor joiner, section, 1:2 (BDY-22, F3-05)
+    gap, padw = st["end_gap_mm"], st["foot_pad_mm"]
+    xo, yj = 190.0, 118.0
+    xi = xo + 35 / k
+    _dt(sh, 201.0, 186.0, "F: MEMBER FOOT", k)
+    _sandwich(sh, xo, yj + 1.0, xi, 172.0, 1.5, k, vertical=True)                   # the wall, section, outer face on the left
+    sh.path([(xo - 1.0, yj + 14.0), (xo - 1.0, yj), (xi + 1.0, yj), (xi + 1.0, yj + 14.0)], "thick")   # the floor joiner round the foot
+    mx0, mx1 = xi - (1.5 + dd) / k, xi - 1.5 / k
+    sh.rect(mx0, yj + 1.0 + gap / k, mx1, 172.0, "shade")                         # the member, its foot 10 mm off the joiner
+    sh.rect(mx0 + tt / k, yj + 1.0 + gap / k + tt / k, mx1 - tt / k, 172.0, "white")
+    sh.rect(mx0, yj + 1.0, mx1, yj + 1.0 + gap / k, "medium")                     # the rigid PVC pad
+    sh.text(xi + 2.0, yj + 0.6, "FLOOR JOINER", 1.2)
+    sh.text(xi + 2.0, yj + 3.6, f"{gap:g} mm PVC PAD", 1.2)
+    for i, t in enumerate((f"{_member(b)}", "ON THE INNER SKIN,", f"{st['break']:g} mm OF XPS BEHIND IT.", f"IT STOPS {gap:g} mm SHORT OF",
+                           f"THE JOINER ON A {padw:g} mm WIDE", "RIGID PVC PAD, XPS IN THE", "REST OF THE GAP. AT ITS HEAD,",
+                           f"{gap:g} mm OF XPS (BDY-22)")):
+        sh.text(187.0, 169.0 - 2.4 * i, t, 1.2, "end")
     # ---- E: insert with crush tube at a body mount, 1:2 (the bolt detail is on CT-301)
     k, cx, top = 2.0, 200.0, 278.0
     _dt(sh, cx + 5, top, "E: FLOOR INSERT AND CRUSH TUBE", k)
@@ -363,8 +380,9 @@ def ct203(prj, model, bom, checks, reg, dwg):
         "LEGEND: CROSS, BODY MOUNT (CT-301). THIN OUTLINE, A FURNITURE FOOTPRINT WITH ITS FLOOR INSERTS. PHANTOM, RAILS AND CHASSIS STATIONS.",
         "EVERY FIXING PASSES THROUGH AN INSERT STRIP AND, THROUGH THE FLOOR, A CRUSH TUBE. NO FIXING INTO BARE FOAM.",
         "THE LIFT BED'S FOUR HARDPOINTS, THE LOCKERS' AND THE TOWER'S INSERT STRIPS AND THE STIFFENERS ARE LAID UP IN THE PANELS. THE PLINTH "
-        "AND THE TOWER ALSO BOLT THROUGH THE FLOOR TO THE CHASSIS (HARD POINTS, CT-104). THE SPLIT'S CRADLE BOLTS THROUGH INSERT STRIPS IN THE "
-        "REAR WALL AND THE ROOF JOINER.",
+        "AND THE TOWER ALSO BOLT THROUGH THE FLOOR TO THE CHASSIS (HARD POINTS, CT-104). THE SPLIT'S CRADLE (AC-03) BOLTS TO THE REAR WALL'S INSERT STRIP WITH "
+        f"{b.d['cradle']['bolts']} M8 AND STANDS ON {b.d['cradle']['stays']['n']} STAYS TO THE REAR CROSSMEMBER (AC-04). THE WALL MEMBERS STOP "
+        f"{b.d['panels']['wall']['stiffener']['end_gap_mm']:g} mm SHORT OF THE FLOOR AND ROOF JOINERS, ON A RIGID PVC PAD AT THE FOOT (CT-202 DETAIL F).",
         "PULL-TEST A SAMPLE OF EACH INSERT IN THE REAL PANEL BEFORE THE PANELS ARE ORDERED (report 02 LR-09).",
     ], width_chars=118, size=1.6)
     _stamp(sh, 320, 96)

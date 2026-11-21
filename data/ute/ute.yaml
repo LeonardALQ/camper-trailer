@@ -170,6 +170,15 @@ lines:
     source: "Report 17 open question 5: 60 kg in about 0.3 m3 (estimate)"
     cases: [UC2, UC3, UC4]
     box: true
+  - id: UT-17
+    item: "Trailer tie-down kit in the box's tool chest: four 50 mm ratchet straps and four 760 mm screw-in ground anchors (STB-05)"
+    kg: 12
+    x: box_x0 + 1000
+    z: frame_top_z + 300
+    maturity: estimate
+    source: "Estimate: straps about 1.6 kg and anchors about 1.4 kg each, and the bag. Priced with the trailer's lashing points, CH-B02"
+    cases: [UC2, UC3, UC4]
+    box: true
   - id: UT-08
     item: "Bike box, empty, with the restraint kit, ramp, winch and security (report 17, until U2 designs it)"
     kg: 440

@@ -348,10 +348,11 @@ def ct003(prj, model, bom, checks, reg, dwg):
         ("GREY WATER", f"EMPTY FOR TRAVEL. A FULL {V['grey_full_l']:.0f} L TANK IS CHECKED IN CASES TC7 AND TC8."),
         ("AWNING (BDY-11, BDY-23)", f"CLOSE THE AWNING IN WIND, LEGS PEGGED: PEG THE LEGS WHENEVER IT IS OUT, AND CLOSE IT BEFORE GUSTS REACH "
                                     f"{aw['close_kmh']:.0f} km/h AND WHENEVER THE TRAILER IS LEFT. SET THE LEGS FOR A {aw['pitch_deg']:.0f} DEGREE FALL."),
-        ("PARKED IN WIND (H23, STB-04)", f"UNHITCHED ON ITS STEADIES THE TRAILER TIPS IN A {ot_low['v']:.0f} m/s GUST AT TARE, A "
-                                         f"{ot_low['forecast_kmh']:.0f} km/h FORECAST GUST. AT A FORECAST OR A BUREAU WARNING OF GUSTS OF "
-                                         f"{ot['act_kmh']:.0f} km/h OR MORE, CLOSE THE AWNING, AND HITCH THE TRAILER TO THE UTE, STRAP IT TO GROUND "
-                                         "ANCHORS OR MOVE IT. NO STAYS IN CYCLONIC REGIONS C AND D FROM NOVEMBER TO APRIL."),
+        ("PARKED IN WIND (H23, STB-04, STB-05)", f"UNHITCHED ON ITS STEADIES THE TRAILER SLIDES ON WET GRASS IN A "
+                                         f"{min(q['v_slide'] for q in ot['cases']):.0f} m/s GUST AT TARE AND TIPS IN A {ot_low['v']:.0f} m/s GUST. AT A "
+                                         f"FORECAST OR A BUREAU WARNING OF GUSTS OF {ot['act_kmh']:.0f} km/h OR MORE, CLOSE THE AWNING, AND HITCH THE "
+                                         "TRAILER TO THE UTE, STRAP IT DOWN AT ITS FOUR LASHING POINTS OR MOVE IT. WITH THE UTE AWAY, STRAP IT DOWN "
+                                         "WHENEVER SUCH GUSTS ARE FORECAST. NO STAYS IN CYCLONIC REGIONS C AND D FROM NOVEMBER TO APRIL."),
     ]
     yy = yb - 13
     top = yb - 4

@@ -92,7 +92,7 @@ parts:
     maker: Sika
     qty: 1
     unit: set
-    mass: {basis: declared, total_kg: 2.0, maturity: estimate, source: "Report 24 (data/ute/box-parts.yaml BX-F09) 1.5 kg and the roof bows' bead (BX-F10) 0.5 kg, estimates"}
+    mass: {basis: declared, total_kg: 2.3, maturity: estimate, source: "With BX-F11's 0.3 kg of roof bow rivets (F3-04). Report 24 (data/ute/box-parts.yaml BX-F09) 1.5 kg and the roof bows' bead (BX-F10) 0.5 kg, estimates"}
     cog: {at: [1260, 0, 730], basis: "Spread over the seams, estimate"}
   U-ROOF-COAT:
     name: Roof top coating

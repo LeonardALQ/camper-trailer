@@ -177,7 +177,14 @@ trailer_checks:
     cases: [TC1, TC2]
     severity: report
     inputs: [TR-01, TW-04, TW-05]
-    why: Decision H23. The trailer tips about its leeward wheels when the wind's moment on its side silhouette passes its weight's. The force coefficient is ASCE 7-16's for a solid sign of these proportions, the high side for a box (data/assemblies/trailer.yaml `stability` `overturn`). The speed is the gust at the trailer, and the forecast gust is that over 0.91, the factor from 10 m to 3 m in open country. The operating rule in TRAILER.md and on CT-003 acts well below it.
+    why: Decision H23. The trailer tips about its leeward wheels when the wind's moment on its side silhouette passes its weight's. The force coefficient is ASCE 7-16's for a solid sign of these proportions, the high side for a box (data/assemblies/trailer.yaml `stability` `overturn`). The speed is the gust at the trailer, and the forecast gust is that over 0.91, the factor from 10 m to 3 m in open country. It also slides when the push passes the tyres' and steadies' friction on wet grass, 0.35 (est.), and the lower of the two speeds governs. The operating rule in TRAILER.md and on CT-003 acts below both, and STB-05 checks the tie-downs for when the ute is away.
+  - id: STB-05
+    title: Tie-downs hold the parked trailer at region B's 500-year gust, against tipping and sliding
+    type: tie_down
+    cases: [TC1, TC2]
+    severity: fail
+    inputs: [TR-01]
+    why: "Decision H23 and F3-03. With the ute away the trailer can be neither hitched nor moved, so four rated lashing points under the outrigger ends (CH-B02) take 50 mm ratchet straps down and out at 45 degrees to screw-in ground anchors, a kit that rides in the bike box's tool chest. The windward pair holds the trailer against tipping and, with the tyres' friction on wet grass, against sliding, in region B's 500-year gust at 3 m in terrain category 2, 57 m/s times 0.91, 51.9 m/s, with STB-04's Cf of 1.6. Each strap's tension is checked against the strap's lashing capacity, the D-ring's working load limit and the anchor's holding capacity in firm soil (est.), and the outrigger in bending at its yield over 1.5"
   - id: GCM-01
     title: Ute and trailer within the 7,400 kg GCM with Lovells' revision
     type: gcm
@@ -220,6 +227,12 @@ trailer_checks:
     severity: fail
     inputs: []
     why: H1. The layout is evaluated a second time with the bed lowered to its night stop (bed_state 1), 75 mm above the desk top.
+  - id: FIT-07
+    title: Wall members clear of every opening, gland and insert strip by 25 mm, and no side-wall bay wider than their pitch
+    type: body_members
+    severity: fail
+    inputs: []
+    why: "F3-02. The side walls' members (BD-18, BD-19, LB-06) are laid into the panels as they are made. Each stands at least 25 mm from every cut-out, gland and insert strip on its wall, so the panel maker can rout its channel with XPS between, and with the kitchen tower's sides, the partition and the end walls they keep every bay within the 1,067 mm pitch BDY-06 and BDY-10 take (data/body/body.yaml `members_rule`)"
   - id: BED-01
     title: Lift bed heights meet H1 by day and by night
     type: bed
@@ -543,8 +556,8 @@ trailer_checks:
      why: "Report 12 section 3. 100 kg on 100 x 150 mm. Bearing at most half the core's compressive strength. With the bikes gone this governs the floor (report 18 open question 13)"}
   - {id: BDY-04, title: "Floor edge beside the raisers between outriggers, LC2 3 g", type: body_panel, body: {item: BDY-04}, severity: fail,
      why: "Report 12 section 3 and report 11 section 5.3: 160 kg/m2 of floor and contents spanning between outriggers, no edge member"}
-  - {id: BDY-06, title: "Side wall and its members in the ultimate wind, 40 m/s", type: body_panel, body: {item: BDY-06}, severity: fail,
-     why: "AS/NZS 1170.2 for the parked trailer: BDY-19's 40 m/s, Cp,e 0.7 on the windward wall and Cp,i -0.3 inside (Tables 5.2(A) and 5.1(A)), 0.96 kPa net. Decision H23 keeps the strength wind at 40 m/s, or at STB-04's overturning speed if that is higher, because above the speed that tips the trailer over the walls are not what fails. The wall spans from the floor joiner to the roof-to-wall joiner, 2,000 mm (H1a). Skins at half their ultimate without the members, each member at its yield over 1.5 for the share its stiffness draws, and the XPS behind it at half its compressive strength"}
+  - {id: BDY-06, title: "Side wall and its members in the ultimate wind, 41 m/s", type: body_panel, body: {item: BDY-06}, severity: fail,
+     why: "AS/NZS 1170.2 for the parked trailer: 41 m/s, BDY-19's 40 m/s raised to STB-04's highest overturning speed, 40.9 m/s with a box's Cf (H23, F3-08), Cp,e 0.7 on the windward wall and Cp,i -0.3 inside (Tables 5.2(A) and 5.1(A)), 1.01 kPa net. Strapped down (STB-05) the trailer stands in stronger winds, so the detail also gives the walls at region B's 250-year gust at 3 m. The wall spans from the floor joiner to the roof-to-wall joiner, 2,000 mm (H1a). Skins at half their ultimate without the members, each member at its yield over 1.5 for the share its stiffness draws, and the XPS behind it at half its compressive strength"}
   - {id: BDY-07, title: "Fixed roof with the bonded solar array, LC2 3 g, spanning between the walls", type: body_panel, body: {item: BDY-07}, severity: fail,
      why: "Report 12 section 3 with report 13's 29 kg Sunman array"}
   - {id: BDY-09, title: "Roof deflection with the solar array at 1 g within span/150 (reported)", type: body_deflection, body: {item: DEF-B2}, severity: report,
@@ -552,9 +565,9 @@ trailer_checks:
   - {id: BDY-10, title: "Wall deflection in region B's 25-year wind within span/100 (reported)", type: body_deflection, body: {item: DEF-B3}, severity: report,
      why: "AS/NZS 1170.2: region B's 25-year wind, 39 m/s, times 0.91 for terrain category 2 at 3 m (Tables 3.1 and 4.1), with Cp,e 0.7 and Cp,i -0.3, 0.76 kPa net. Decision H23: region B, the Queensland coast, is non-cyclonic and Leonard will camp there, and region A's 37 m/s is lower. Span/100, 20 mm on the 2,000 mm wall, is report 12's planning limit (section 3) for the engineer to set. The members on the inner skin carry the load with the sandwich (data/body/body.yaml)"}
   - {id: BDY-11, title: "Panel fixings: lift-bed rail screws in their hardpoints and the awning's roof bolts within half their rated load", type: body_insert, severity: fail,
-     why: "Report 12 section 3 and report 02 MAT-05. The awning's Panelok bolts are rated for the 40 mm roof, and are checked in travel and with the canopy open in a 60 km/h gust, above the 40 km/h at which the operating rule closes it (data/body/body.yaml `awning`). A pull test in the real panel confirms each insert (LR-09)"}
+     why: "Report 12 section 3 and report 02 MAT-05. The awning's Panelok bolts are rated for the 40 mm roof, and are checked in travel and with the canopy open in a 60 km/h gust, above the 40 km/h at which the operating rule closes it (data/body/body.yaml `awning`). That is a check of the fixing only: the 40 km/h rule protects the canopy, its arms and its legs. A pull test in the real panel confirms each insert (LR-09)"}
   - {id: BDY-22, title: "Inside surface over each wall member at least 4 K above the cold night's dew point", type: body_thermal, severity: fail,
-     why: "Research report 19's design cold night, -5 C outside and 20 C inside, with the dew point held at 6 C or lower, and its rule that inside surfaces stay 4 K above it, so 10 C. The members sit on the inner skin with 7 mm of XPS behind them, so no metal crosses the core. A two-dimensional conduction model of the wall at a member, with ISO 6946's surface resistances and the conductivities in data/body/body.yaml `thermal`"}
+     why: "Research report 19's design cold night, -5 C outside and 20 C inside, with the dew point held at 6 C or lower, and its rule that inside surfaces stay 4 K above it, so 10 C. ISO 13788 clause 4.4.1's Rsi of 0.25 m2K/W for surface condensation and mould, which allows for furniture against the wall (F3-01). The members sit on the inner skin with 13 mm of XPS behind them, so no metal crosses the core, and stop 10 mm short of the joiners (F3-05). A two-dimensional conduction model of the wall at a member gives the surface at mid-length, and a fin along the member, with its joiner taken at the outside air, the surface at its foot and head. On the generators the front e2 pair stops, and the dew point in that mode is checked too (data/body/body.yaml `thermal`)"}
   - {id: BDY-23, title: "Awning legs: the lead bar's pitch on level ground and the reach left for uneven ground (reported)", type: body_awning, severity: report,
      why: "The F80s case sits on the roof at Z 2,965 to 3,078, above the 1.8 to 2.8 m Fiamma's sheets give for the F45 and F80 family. Its 370 to 450 leg, the same part as the F80L's for large motorhomes, sets where the lead bar stands. A fall of about 10 degrees sheds rain"}
   - {id: BDY-21, title: "Outdoor unit's cradle: wall bolts within half their rated load, and the stays carry the vertical load to the chassis", type: body_cradle, severity: fail,
