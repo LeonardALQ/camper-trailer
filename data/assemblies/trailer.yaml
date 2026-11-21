@@ -503,7 +503,7 @@ items:
     name: Lamps, reflectors, the number plate and the lamp loom (data/services.yaml lamps, CT-011)
     material: "Multivolt LED lamps in polycarbonate housings, acrylic reflectors, an aluminium plate bracket, 7-core trailer cable"
     system: electrical
-    price: {aud: 0, included_in: LGT-01}
+    price: {aud: 0, basis: estimate, included_in: LGT-01, date: 2026-11-21, note: "In LGT-01's price for the set (data/trailer-parts.yaml)"}
     point: [body_x0 + 2900, -150, 1100]
     mass: {basis: declared, total_kg: 4.0, maturity: estimate, source: "The decision log's 08:20 estimate for the set, about 4 kg, taken out of BD-11's allowance. The centre of gravity is about the devices' and the loom's (est.)"}
     note: The lamps stand at their data/services.yaml positions in the 3D model, each named (cad/lamps.py).

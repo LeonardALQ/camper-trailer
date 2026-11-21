@@ -153,20 +153,20 @@ The insert map CT-203 must be final before the panels are ordered, because the m
 
 ## Cost and where to save
 
-The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 148 lines in AUD including GST, each with its source and the date checked. Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 199,341 subtotal carries AUD 31,395 (15.7 %), for AUD 230,736. Without hired labour it is AUD 182,784.
+The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 152 lines in AUD including GST, each with its source and the date checked. Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 200,804 subtotal carries AUD 31,592 (15.7 %), for AUD 232,396. Without hired labour it is AUD 184,444.
 
 | Group | AUD | Group | AUD |
 |---|---|---|---|
 | Hired labour, 333 h | 39,960 | Chassis | 5,116 |
-| Body | 33,584 | Licensed electrician | 4,600 |
+| Body | 34,722 | Licensed electrician | 4,600 |
 | Electrical | 23,458 | Drawbar box | 4,388 |
-| Living area | 21,100 | Under the floor | 3,162 |
+| Living area | 21,186 | Under the floor | 3,162 |
 | Running gear | 14,181 | Roof | 2,926 |
-| HVAC and ventilation | 12,517 | Coupling and drawbar | 1,695 |
+| HVAC and ventilation | 12,667 | Coupling and drawbar | 1,695 |
 | Wet room | 11,627 | Lamps, reflectors and the number plate | 905 |
-| Bed | 8,098 | Spare wheel | 736 |
+| Bed | 8,188 | Spare wheel | 736 |
 | Compliance | 5,976 | Freight and consumables | 5,310 |
-| Subtotal | 199,341 | | |
+| Subtotal | 200,804 | | |
 
 The ten largest savings, with their contingency and what each costs the requirements. The site's parts list works out all fifteen from the lines. Some share lines, so they do not add up.
 
@@ -174,7 +174,7 @@ The ten largest savings, with their contingency and what each costs the requirem
 2. Only the fit-out done yourself: AUD 25,488, part of the first. About 177 h.
 3. Two self-built EVE MB31 packs in place of the Victron modules: AUD 6,113. More capacity, but no AS IEC 62619 test, so the electrician may refuse the certificate, and the cell terminals loosen on corrugations.
 4. A plain low-flow shower: AUD 5,779. Two 20 min showers then use about 240 L a day.
-5. A fixed bed at night height: AUD 5,534. The desk loses its place under the bed, so H1 fails.
+5. A fixed bed at night height: AUD 5,642. The desk loses its place under the bed, so H1 fails.
 6. A 230 V water heater and the heat pump in place of the Combi: AUD 5,308. No heat or hot water without the battery.
 7. No engineer's review: AUD 5,280. Not required in NSW, but the designs stay unchecked.
 8. Square front edges: AUD 4,200. About 3.7 L/100 km more towing, about AUD 1,550 a year.

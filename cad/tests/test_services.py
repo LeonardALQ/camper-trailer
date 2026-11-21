@@ -3,6 +3,8 @@ groups add up to the model's daily totals, the autonomy figures meet decision H3
 TRAILER.md quotes."""
 import re
 
+import yaml
+
 from cad.partsdb import ROOT
 from cad.services import ENERGY_OUT, _cases, services
 
@@ -46,5 +48,8 @@ def test_water_budget_is_the_one_trailer_md_quotes():
     assert f"A wash adds {w['wash']['fresh_l']} L" in TRAILER
     for r in w["daily"]:
         assert r["fresh_l"] >= r["grey_l"] >= 0, r["use"]
+    # the travel store is the trailer's travel water limit (H13, H21), so a change to it reaches the budget and TRAILER.md
+    travel = yaml.safe_load((ROOT / "data/assemblies/trailer.yaml").read_text())["params"]["water_travel_l"]
     days = {d["litres"]: d["days"] for d in w["days"] if d["washes_a_week"] == 0}
-    assert re.search(rf"lasts about {int(days[350])} days", TRAILER)
+    assert travel in days, f"data/services.yaml has no no-laundry store at the {travel} L travel limit"
+    assert re.search(rf"The {travel} L aboard lasts about {round(days[travel])} days", TRAILER)
