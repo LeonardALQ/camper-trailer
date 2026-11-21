@@ -89,7 +89,7 @@ Sideways sliding is held by the chock at the front and by tyre friction under st
 
 Anchors must withstand their strap's breaking load (NTC guide p. 201, report 03), about 9.8 kN for LC 500 kg. The worst anchor is 276 mm from a bracket, so 9.8 kN x 0.86 vertical x 0.276 m = 2.33 kN m on the steel crossmember, against 0.9 x 350 MPa x 8,583 mm3 = 2.70 kN m for the compact RHS 65 x 35 x 4.0 with Australian Tube Mills' corner radii, a utilisation of 0.86 (UGR-03). Revision B's LC 1,000 kg straps would need 4.62 kN m, beyond any 40 mm deep steel section, so the straps change.
 
-Clearances (model): bike to bike 71.5 mm (limit 30), the Tuareg to the roof light 57.2 mm and the Street Triple to the kerb tool chest 25.5 mm, both to the door portal 49.5 mm (limit 15), panniers to the nearest strap 55.7 mm.
+Clearances (model): bike to bike 71.5 mm (limit 30), the Tuareg to the anchors' bag 25.9 mm and the Street Triple to it 17.5 mm, both to the door portal 49.5 mm (limit 15), panniers to the nearest strap 55.7 mm.
 
 ## 7. Loading
 
@@ -107,7 +107,7 @@ The Black Widow MF-12038 ramp (3,048 x 965 mm, 680 kg rating, 34 kg) stands fold
 
 The parts list sums to 437.3 kg empty, 475.0 kg with growth, and the model carries every line, so UGB-01 and the list agree (`cad/tests/test_box_parts.py`). Revision D adds 0.4 kg: the flares 1.9 kg, less 1.6 kg of skin cut away for them, and the tubs and floor re-cut for the wider track (-0.8 and +0.9 kg). The list includes the wiring, the winch feed, sealant, the roof bows' adhesive (0.5 kg) and rivets (0.3 kg), pads, plates, the roof coat, the outlet and the drains. The roof is 1.6 mm sheet in place of 2.0 mm, which saves 5.1 kg and leaves 2.7 kg in hand under UGB-01's 440 kg. The roof carries no load, no step and no kneeling, and the bows and end frames under it are at most 640 mm apart (UGF-01). The engineer confirms the thinner sheet. If more margin is needed, a 10 mm chain in place of the 12 mm one saves about 2 kg (est.).
 
-On the Elite, with the home trailer's heaviest towball (317 kg with growth), the ute's rear axle carries 2,638 kg with growth when towing with the bikes aboard (UC3), 162 kg under the 2,800 kg plate. The trailer's tie-down kit rides in the box while towing: its four ratchet straps, 6.4 kg (est.), in the tool chests, and its eight rated ground anchors with their turning bar, 32.3 kg (est.), in a bag on the floor between the bikes, loaded last through the barn doors (T2, UGC-02). The kit stays with the trailer whenever the ute is unhitched for more than a day (STB-05).
+On the Elite, with the home trailer's heaviest towball (317 kg with growth), the ute's rear axle carries 2,646 kg with growth when towing with the bikes aboard (UC3), 154 kg under the 2,800 kg plate. The trailer's tie-down kit rides in the box while towing: its four ratchet straps, 6.4 kg (est.), in the tool chests, and its four Tie Down 59099 ground anchors with their four 59286 stabilizer plates, Tie Down's 59200 soil test probe kit and the turning bar, 38.6 kg (est.), in a bag on the floor between the bikes, about 1,600 x 345 x 230 mm with the plates flat in its base, loaded last through the barn doors (T2, UGC-02). Two 25 mm ratchet straps of LC 250 kg (est.) lash the bag to the L-track either side: twice the Load Restraint Guide's 0.8 g forward, UGR-01's off-road factor, is 0.61 kN on the bag, against 3.47 kN from one 45 degree leg of each strap, 0.17 (est.). The kit stays with the trailer whenever the ute is unhitched for more than a day (STB-05).
 
 ## 10. Parts list summary
 
