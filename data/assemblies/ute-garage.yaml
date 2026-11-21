@@ -6,7 +6,7 @@
 # trailer's garage. Any number may be an expression over `params`.
 id: ASM-UG
 name: Ute bike garage
-revision: A
+revision: B
 
 params:
   # ---------------------------------------------------------------- placement on the ute (data/ute/ute.yaml)
@@ -29,7 +29,7 @@ params:
   tyre_w: 268
   tyre_slr: 380             # static loaded radius (estimate)
   rear_bump: 110            # rear wheel travel to the bump stops (estimate, report 17 section 3.3)
-  wheel_y: 730              # half the 1,460 mm rear track
+  wheel_y: 777.5            # half the Elite's 1,555 mm rear track (R26, estimate, decision H18). 730 on the factory 1,460 mm
   wheel_z: tyre_slr - deck_z        # module Z of the wheel centre at static
   tub_top_gap: 25           # Toyota: 25 mm over the tyre at full bump, 40 mm inside it, 30 mm outside it
   tub_in_gap: 40
@@ -39,8 +39,20 @@ params:
   tub_x1: axle_m + tyre_d / 2 + tub_end_gap
   tub_y0: wheel_y - tyre_w / 2 - tub_in_gap  # inner face of the tub's inboard wall
   tub_top: wheel_z + rear_bump + tyre_d / 2 + tub_top_gap + tub_t   # tub top surface above the floor
+  # Rear tub flares (decision H19, R26 fix A). On the Elite's track the tyre's outer face is 911.5 mm out, 11 mm from the
+  # 1,850 mm body's skin against Toyota's 30 mm. Over each rear tub the skin is cut away up to the top of the side wall's
+  # bottom rail, and a folded 2.5 mm flare closes the opening 20 mm further out, 30 mm past each end of the tub.
+  flare_out: 20             # outer face 20 mm outside the skin: 31 mm outside the tyre
+  flare_x0: tub_x0 - 30
+  flare_x1: tub_x1 + 30
+  flare_z1: tub_top + frame_s     # flare top, over the bottom rail that sits on the tub
+  flare_w: outside_w + 2 * flare_out   # 1,890 mm over the flares, against UTE-09's 1,910 mm
+  # Lovells' mudflap behind each rear tyre (in the Elite kit), on its bracket under the rear outrigger at module X 1,500
+  mudflap_x: 1525
+  mudflap_w: 300
+  mudflap_h: deck_z + sub_z0 - 230    # bottom edge about 230 mm above the ground (assumption)
   # ---------------------------------------------------------------- the box
-  outside_w: 1850           # the decision log's limit
+  outside_w: 1850           # body outside width, UTE-09's body limit (decision H19). The flares reach flare_w
   outside_l: 2590           # report 17 section 6.2
   skin_t: 2.5               # 5052-H32 walls, front and doors
   roof_t: 1.6               # 5052-H32 1.6 mm roof skin (R24's 2.0 mm, thinned 0.4 mm to keep the box under 440 kg)
@@ -95,6 +107,8 @@ params:
   runner_w: 75              # aluminium RHS 75 x 50 x 3, laid flat on each rail
   runner_y0: rail_y - runner_w / 2
   runner_y1: rail_y + runner_w / 2
+  mount_dy: 17.5            # each mount angle's reach beyond the runner, over Toyota's bracket on the rail. The brackets
+                            # stay with the frame, so the angles do not follow the tubs out
   steel_w: 65               # galvanised C350L0 RHS 65 x 35 x 4.0, laid flat, under each L-track row (R24)
   steel_h: 35
   steel_t: 4.0
@@ -124,7 +138,8 @@ params:
   # the rear straps through the back, so the tubs are the lowest free floor that is forward of the ramp.
   tool_x0: tub_x0 + 45
   tool_l: tub_x1 - tub_x0 - 90
-  tool_w: 300               # road side, beside the Tuareg
+  tool_w: 270               # road side, beside the Tuareg: on the tub top, 2 mm in from its inboard edge. 300 mm on the
+                            # factory track, before the tubs moved out 47.5 mm
   tool_wk: 220              # kerb side, narrower: the Street Triple's belly pan reaches 200 mm out from its centreline
   tool_h: 200
   tool_z0: tub_top
@@ -171,10 +186,25 @@ items:
     group: body
     label: Wall skin, 2.5 mm
     copies:
-      - {id: road, at: [-front_t, half_width + frame_s, -floor_t], params: {dx: outside_l, dy: skin_t, dz: roof_z + floor_t, normal: y}}
+      - {id: road, at: [-front_t, half_width + frame_s, -floor_t], params: {dx: outside_l, dy: skin_t, dz: roof_z + floor_t, normal: y,
+                                                                         cutouts: [[flare_x0 + front_t, 0, flare_x1 - flare_x0, flare_z1 + floor_t]]}}
       - {id: kerb, at: [-front_t, -half_width - wall_t, -floor_t], params: {dx: outside_l, dy: skin_t, dz: roof_z + floor_t, normal: y,
-                                                                         cutouts: [[kd_x0 + front_t, kd_z0 + floor_t, kd_x1 - kd_x0, kd_z1 - kd_z0]]}}
+                                                                         cutouts: [[kd_x0 + front_t, kd_z0 + floor_t, kd_x1 - kd_x0, kd_z1 - kd_z0],
+                                                                                   [flare_x0 + front_t, 0, flare_x1 - flare_x0, flare_z1 + floor_t]]}}
       - {id: front, at: [-front_t, -half_width - frame_s, -floor_t], params: {dx: skin_t, dy: interior_width + 2 * frame_s, dz: roof_z + floor_t, normal: x}}
+  - ref: B7
+    part: U-FLARE
+    group: body
+    label: Rear tub flare, 2.5 mm
+    copies:
+      - {id: R-out, at: [flare_x0, outside_w / 2 + flare_out - skin_t, -floor_t], params: {dx: flare_x1 - flare_x0, dy: skin_t, dz: flare_z1 + floor_t, normal: y}}
+      - {id: R-top, at: [flare_x0, half_width + frame_s, flare_z1 - skin_t], params: {dx: flare_x1 - flare_x0, dy: flare_out, dz: skin_t, normal: z}}
+      - {id: R-front, at: [flare_x0, half_width + frame_s, -floor_t], params: {dx: skin_t, dy: flare_out, dz: flare_z1 - skin_t + floor_t, normal: x}}
+      - {id: R-rear, at: [flare_x1 - skin_t, half_width + frame_s, -floor_t], params: {dx: skin_t, dy: flare_out, dz: flare_z1 - skin_t + floor_t, normal: x}}
+      - {id: K-out, at: [flare_x0, -outside_w / 2 - flare_out, -floor_t], params: {dx: flare_x1 - flare_x0, dy: skin_t, dz: flare_z1 + floor_t, normal: y}}
+      - {id: K-top, at: [flare_x0, -outside_w / 2 - flare_out + skin_t, flare_z1 - skin_t], params: {dx: flare_x1 - flare_x0, dy: flare_out, dz: skin_t, normal: z}}
+      - {id: K-front, at: [flare_x0, -outside_w / 2 - flare_out + skin_t, -floor_t], params: {dx: skin_t, dy: flare_out, dz: flare_z1 - skin_t + floor_t, normal: x}}
+      - {id: K-rear, at: [flare_x1 - skin_t, -outside_w / 2 - flare_out + skin_t, -floor_t], params: {dx: skin_t, dy: flare_out, dz: flare_z1 - skin_t + floor_t, normal: x}}
   - {ref: B4, part: U-ROOF, group: body, label: "Roof skin, 1.6 mm",
      at: [-front_t, -outside_w / 2, roof_z], params: {dx: outside_l, dy: outside_w, dz: roof_t, normal: z}}
 
@@ -312,23 +342,23 @@ items:
     group: subframe
     label: Firm mount, two M12 bolts
     copies:
-      - {id: 1R, at: [mount1_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t}}
-      - {id: 1K, at: [mount1_x - 40, -tub_y0 + tub_t + 5, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t}}
-      - {id: 2R, at: [mount2_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t + 30}}
-      - {id: 2K, at: [mount2_x - 40, -tub_y0 + tub_t + 5, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t + 30}}
+      - {id: 1R, at: [mount1_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t}}
+      - {id: 1K, at: [mount1_x - 40, -runner_y1 - mount_dy, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t}}
+      - {id: 2R, at: [mount2_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t + 30}}
+      - {id: 2K, at: [mount2_x - 40, -runner_y1 - mount_dy, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t + 30}}
   - ref: S8
     part: U-MOUNT-SPRING
     group: subframe
     label: Compliant mount, one M12 bolt through rubber
     copies:
-      - {id: 3R, at: [mount3_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t + 30}}
-      - {id: 3K, at: [mount3_x - 40, -tub_y0 + tub_t + 5, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t + 30}}
-      - {id: 4R, at: [mount4_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t + 30}}
-      - {id: 4K, at: [mount4_x - 40, -tub_y0 + tub_t + 5, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t + 30}}
-      - {id: 5R, at: [mount5_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t + 30}}
-      - {id: 5K, at: [mount5_x - 40, -tub_y0 + tub_t + 5, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t + 30}}
-      - {id: 6R, at: [mount6_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t}}
-      - {id: 6K, at: [mount6_x - 40, -tub_y0 + tub_t + 5, sub_z0 - pad_t], params: {dx: 80, dy: tub_y0 - tub_t - runner_y1 - 5, dz: pad_t}}
+      - {id: 3R, at: [mount3_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t + 30}}
+      - {id: 3K, at: [mount3_x - 40, -runner_y1 - mount_dy, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t + 30}}
+      - {id: 4R, at: [mount4_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t + 30}}
+      - {id: 4K, at: [mount4_x - 40, -runner_y1 - mount_dy, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t + 30}}
+      - {id: 5R, at: [mount5_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t + 30}}
+      - {id: 5K, at: [mount5_x - 40, -runner_y1 - mount_dy, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t + 30}}
+      - {id: 6R, at: [mount6_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t}}
+      - {id: 6K, at: [mount6_x - 40, -runner_y1 - mount_dy, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t}}
 
   # ---------------------------------------------------------------- restraint (the trailer's layout, refs 10 to 14 as there)
   - ref: "10"
@@ -460,6 +490,13 @@ items:
     copies:
       - {id: R, at: [-frame_s, rail_y - rail_w / 2, bracket_z1], params: {dx: x_end + frame_s, dy: rail_w, dz: pad_t}}
       - {id: K, at: [-frame_s, -rail_y - rail_w / 2, bracket_z1], params: {dx: x_end + frame_s, dy: rail_w, dz: pad_t}}
+  - ref: C6
+    part: U-MUDFLAP
+    group: context
+    label: Lovells mudflap behind the rear tyre
+    copies:
+      - {id: R, at: [mudflap_x, wheel_y - mudflap_w / 2, sub_z0 - mudflap_h], params: {dx: 6, dy: mudflap_w, dz: mudflap_h}}
+      - {id: K, at: [mudflap_x, -wheel_y - mudflap_w / 2, sub_z0 - mudflap_h], params: {dx: 6, dy: mudflap_w, dz: mudflap_h}}
   - {ref: C3, part: U-GROUND, group: context, label: Assumed ground, display: loading_only,
      at: [x_end - 100, tuareg_y - 750, -ground_drop - 10]}
   # Check-only solids

@@ -24,7 +24,7 @@ parts:
     qty: 0.9
     unit: m2
     mass: {basis: per_area, kg_per_m2: 8.04, maturity: calculated, source: "3.0 mm at 2.68 g/cm3"}
-    size: 871 x 370 mm each, top 86.5 mm above the floor
+    size: 871 x 322 mm each, top 86.5 mm above the floor, 47.5 mm further out on the Elite's rear track
     rating: 25 mm over the tyre at full bump, 40 mm inside it and 30 mm fore and aft (Toyota BBGJ1007 p. 28)
     notes: The tub top carries the side wall's bottom rail and the post at 1,200 mm.
     geometry: {generator: panel, params: {}}
@@ -39,7 +39,22 @@ parts:
     unit: m2
     mass: {basis: per_area, kg_per_m2: 6.70, maturity: calculated, source: "2.5 mm at 2.68 g/cm3. All Aluminium lists 19.3 kg per sheet (MAT-02)"}
     size: Sides 2,590 x 1,504 mm, front 1,845 x 1,504 mm
-    notes: TIG-welded to the frame. The kerb-side skin has the 1,200 x 1,000 mm opening for the lift-up door.
+    notes: TIG-welded to the frame. The kerb-side skin has the 1,200 x 1,000 mm opening for the lift-up door, and each side skin a 925 x 130.5 mm notch over the rear tub for the flare (U-FLARE).
+    geometry: {generator: panel, params: {}}
+    color: "#dfe6e9"
+    alpha: 0.35
+  U-FLARE:
+    name: Rear tub flares
+    material: "5052-H32 aluminium sheet, 2.5 mm"
+    product: 5052-H32 marine sheet, 2.5 mm, folded into a channel over each rear tub and welded into a notch in the side wall skin
+    maker: Fabricator
+    part_no: Marine sheet 5052-H32 2.5 mm (MAT-02)
+    qty: 0.29
+    unit: m2
+    mass: {basis: per_area, kg_per_m2: 6.70, maturity: calculated, source: "2.5 mm at 2.68 g/cm3, as U-SKIN"}
+    size: 925 mm long, 20 mm out from the skin, 130.5 mm high from the floor's underside, each side
+    rating: "Toyota BBGJ1007 p. 28: 30 mm outside the tyre (UGW-03). The box is 1,890 mm over the flares against UTE-09's 1,910 mm (decision H19)"
+    notes: "The Elite's 1,555 mm rear track puts each rear tyre's outer face 911.5 mm out, 11 mm from the 1,850 mm body's skin. Over each tub the skin is cut away up to the top of the side wall's bottom rail, and the flare closes the opening 20 mm further out, so the tyre keeps 31 mm (R26 fix A)"
     geometry: {generator: panel, params: {}}
     color: "#dfe6e9"
     alpha: 0.35

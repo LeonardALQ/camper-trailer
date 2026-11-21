@@ -271,7 +271,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
         ["Width", "Across the body, guards and awning, at most 2,500 mm (VSB1 2, 5.2)", f"{mv('DIM-01')} with the awning", st("DIM-01")],
         ["Overhang", "Front load space at least the rear overhang (VSB1 5.1.1)", f"{V['axle_x'] - V['body_x0']:.0f} against {ch['overall_x1'] - V['axle_x']:.0f} mm", st("DIM-02")],
         ["Combination", "Ute and trailer within Lovells' 7,400 kg GCM revision (H2, GV06)", f"{gcm['plan']:,.0f} kg plan, {gcm['model']:,.0f} kg on the model", st("GCM-01")],
-        ["Ute rear axle", "Towball keeps the Elite kit's 2,850 kg rear axle with growth (H14, H17)", f"{mv('MAS-03')} at the heaviest ball", st("MAS-03")],
+        ["Ute rear axle", f"Towball keeps the Elite kit's {tv['limits']['rear_axle_kg']:,.0f} kg rear axle plate with growth (H14, H17, H18)", f"{mv('MAS-03')} at the heaviest ball", st("MAS-03")],
         ["Jack-knife", "Front parts 100 mm outside the bike box's sweep, 50 mm under it (JK-01, JK-02)", f"{chk['JK-01']['measured']:.0f} mm and {chk['JK-02']['measured']:.0f} mm", st("JK-01")],
         ["Plug", "7 or 12 pin to AS 4177.5 (VSB1 7.2)", "12-pin flat plug, and a grey Anderson SB50 for the 48 V charging feed", ("AS 4177.5", "#000")],
         ["Wiring", "Supported every 600 mm, insulated joints, grommets through metal, earth wire (VSB1 7.1)", "Two-wire DC, no chassis return (report 20). Glands on CT-602", ("CT-601, CT-602", "#000")],
@@ -308,7 +308,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
         ("ATM AND DESIGN LIMIT", f"PLATE {rep['caps']['plated']:,.0f} kg. EVERY CASE WITH GROWTH AT MOST 3,400 kg (MAS-10)."),
         ("TOWBALL (H17)", f"AT LEAST {rep['solved']['window']['pct_min']:.1f} % OF THE TRAILER IN EVERY CASE AND AT MOST "
                           f"{rep['solved']['window']['ball_max']['kg']:.0f} kg WITH GROWTH. TOWBAR AND DO35 {lim['towball_rating_kg']:.0f} kg."),
-        ("THE UTE (H17)", f"LOVELLS ELITE, {lim['gvm_kg']:,.0f} kg GVM, REAR AXLE {lim['rear_axle_kg']:,.0f} kg ({uc['UTE-03']['measured']:,.0f} kg "
+        ("THE UTE (H17, H18)", f"LOVELLS ELITE PLATED AT {lim['gvm_kg']:,.0f} kg GVM, REAR AXLE {lim['rear_axle_kg']:,.0f} kg ({uc['UTE-03']['measured']:,.0f} kg "
                           f"TOWING WITH GROWTH). {lim['platinum_rear_axle_kg']:,.0f} kg IF CUT CUT7 RETURNS TO THE PLATINUM."),
         ("COUPLING HEIGHT", f"{V['coupling_z']:.0f} mm LADEN, PLUS OR MINUS 20 mm. SET THE TONGUE'S DROP AT THE FINAL WEIGHING (TW08)."),
         ("GREY WATER", f"EMPTY FOR TRAVEL. A FULL {V['grey_full_l']:.0f} L TANK IS CHECKED IN CASES TC7 AND TC8."),

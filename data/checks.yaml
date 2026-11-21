@@ -9,9 +9,9 @@ checks: []
 # The tow vehicle is the LandCruiser 79 (data/ute/ute.yaml, research report 16). Its towbar is rated 350 kg. H14
 # (21 Nov 2026) replaced the plan's 250 kg towball cap with the rule it stood for: in every case the towball keeps the
 # ute's rear axle within its rating with growth, computed from the ute model at that ball load. H17 put the Lovells Elite
-# kit on the ute, so that rating is 2,850 kg, and set the design towball range the axle solve uses: at least 8.0 % in
-# every case and at most 320 kg with growth. H2 sets the 7.5 % floor and the 3,500 kg plate. VSB1 sets no towball
-# share. Limits here are never changed to make a check pass.
+# kit on the ute, and H18 plates its rear axle at 2,800 kg, twice the shared wheel's 1,400 kg. H17 also set the design
+# towball range the axle solve uses: at least 8.0 % in every case and at most 320 kg with growth. H2 sets the 7.5 %
+# floor and the 3,500 kg plate. VSB1 sets no towball share. Limits here are never changed to make a check pass.
 trailer_checks:
   - id: MAS-01
     title: Trailer mass with growth within the 3,500 kg plated ATM
@@ -44,7 +44,7 @@ trailer_checks:
     inputs: [SUP-01, SUP-02, TW-01, TW-02, TW-03]
     why: VSB1 asks the axles to carry 120 % of their share where they do not share load, as the XT's do not (report 06). The kit's GTM is Cruisemaster's figure for the 4,500 kg XT Air build.
   - id: MAS-03
-    title: Towball keeps the ute's rear axle within its 2,850 kg rating with growth and stays within the 350 kg towbar, in every case
+    title: Towball keeps the ute's rear axle within its 2,800 kg plate with growth and stays within the 350 kg towbar, in every case
     type: towball_ute
     basis: growth
     cases: all

@@ -1,13 +1,14 @@
 # The tow vehicle: a Toyota LandCruiser 79 single cab chassis, V8 (VDJ79R, GXL, built 01/2017 to 08/2022), with the
-# Lovells 4,495 kg Elite GVM kit (decision H17, VEHICLE.md, research report 16, `docs/decisions.md`). Cut CUT7 returns to
-# the 4,200 kg Platinum kit if the S3 weighing leaves at least 30 kg under its 2,550 kg rear axle.
+# Lovells 4,495 kg Elite GVM kit (decision H17, VEHICLE.md, research report 16, `docs/decisions.md`), plated at a 4,450 kg
+# GVM and a 2,800 kg rear axle so the shared 1,400 kg ROH wheels carry it (decision H18). Cut CUT7 returns to the 4,200 kg
+# Platinum kit if the S3 weighing leaves at least 30 kg under its 2,550 kg rear axle.
 # Ute frame (DIM-U1): X along the ute from the front axle centre, positive rearward. Y from the centreline, positive to
 # the road (right) side. Z up from the ground, ute level at its laden ride height. mm and kg.
 # Any number may be an expression over `params`. Masses carry a maturity as in report 02 MASS-06: spec (a maker's
 # figure, 0 % growth), calculated (7 %) and estimate (20 %).
 id: UTE-79
 name: Toyota LandCruiser 79 single cab V8, GXL, with the bike garage
-revision: A
+revision: B
 
 params:
   # ---------------------------------------------------------------- the cab chassis (Toyota BBGJ1007, report 16)
@@ -25,7 +26,8 @@ params:
   frame_top_z: 774             # rear frame top: about 724 mm on the factory springs (BBGJ1007 pp. 55 and 62) plus the
                                # Lovells kit's lift of about 50 mm (estimate). The 805 mm tyre matches the 7.50R16's diameter
   track_front: 1555            # with 265/70R16 tyres (BBGJ1007 p. 76). ET 0 wheels keep it
-  track_rear: 1460
+  track_rear: 1555             # the Elite's wide-track housing brings the rear in line with the front (R26, estimate).
+                               # Toyota's factory rear track is 1,460 mm. measurements.yaml VEH-28 checks it
   tyre_d: 805                  # LT265/75R16 123/120, Yokohama G015 (report 09) or Toyo AT III (804)
   tyre_w: 268                  # section width (estimate)
   tyre_slr: 380                # static loaded radius (estimate, about 22 mm of deflection)
@@ -41,7 +43,7 @@ params:
   box_gap_cab: 40              # body front wall to the back of the cab (Toyota: at least 39 mm at the roof)
   box_x0: cab_back_x + box_gap_cab
   box_l: 2590                  # outside length (report 17 section 6.2)
-  box_w: 1850                  # outside width: the decision log's limit (cab 1,790 mm plus 60 mm)
+  box_w: 1850                  # body outside width (UTE-09). The rear tub flares reach 1,890 mm (decision H19)
   box_x1: box_x0 + box_l
   deck_z: 834                  # box floor top: frame top + 6 mm pad + 50 mm subframe + 4 mm floor. The garage module
                                # (data/assemblies/ute-garage.yaml) sets it. This copy places the U1 block when no module is built
@@ -55,9 +57,9 @@ params:
 
 # Limits. `src` is the source and `basis` its kind.
 limits:
-  gvm_kg: {v: 4495, src: "Lovells 4,495 kg Elite kit for the single cab from 01/2017 (report 16 section 2.3, decision H17, car build line GV05)", basis: installer}
+  gvm_kg: {v: 4450, src: "Decision H18: the Lovells 4,495 kg Elite kit (report 16 section 2.3, decision H17, car build line GV05) plated at the sum of its axle plates, 1,650 + 2,800 kg, in the LC5 inspection (GV03). Lovells offers the same derate on its 4,200 kg kit (R26)", basis: plan}
   front_axle_kg: {v: 1650, src: "Lovells Elite front axle rating, as the Platinum's (report 16)", basis: installer}
-  rear_axle_kg: {v: 2850, src: "Lovells Elite rear axle rating, wide-track housing and chrome-moly axles (report 16, decision H17)", basis: installer}
+  rear_axle_kg: {v: 2800, src: "Decision H18: the Elite's 2,850 kg rear axle (wide-track housing and chrome-moly axles, report 16, decision H17) plated at 2,800 kg, twice the ROH Trak 2's 1,400 kg rating, because no 16 inch wheel that fits the ute and the trailer is rated 1,425 kg (R26)", basis: plan}
   platinum_rear_axle_kg: {v: 2550, src: "Lovells TOYKIT080-GVM rear axle rating, the kit cut CUT7 returns to", basis: installer}
   platinum_return_margin_kg: {v: 30, src: "Decision H17: CUT7 applies only if the S3 weighing leaves at least 30 kg under the Platinum's rear axle at the trailer's weighed towball", basis: plan}
   weighed_max_kg: {v: 3850, src: "Decision log: hold the weighed ute to 3,850 kg, towball included", basis: plan}
@@ -66,9 +68,10 @@ limits:
   towball_rating_kg: {v: 350, src: "Hayman Reese 03186RW, 3,500 kg and 350 kg (ARB)", basis: maker}
   front_share_min_pct: {v: 20, src: "Toyota BBGJ1007 section 1-2 (extracted text)", basis: maker}
   cog_unladen_max_mm: {v: 1000, src: "Toyota BBGJ1007 section 1-2: unladen centre of gravity after body building", basis: maker}
-  box_width_max_mm: {v: 1850, src: "Decision log: cab 1,790 mm plus Toyota's 60 mm (BBGJ1007 section 1-2)", basis: maker}
+  box_width_max_mm: {v: 1850, src: 'Toyota BBGJ1007 section 1-2, quoted at flare_width_max_mm. The decision log read the 60 mm as a total on the 1,790 mm cab, and decision H19 keeps that 1,850 mm for the body', basis: plan}
+  flare_width_max_mm: {v: 1910, src: 'Toyota BBGJ1007 section 1-2: "the width of a mounted part should be 60 mm maximum as measured from the outermost point of the cab of the base vehicle (not including the outside mirror)". Measured on each side: 1,790 + 2 x 60 = 1,910 mm. Decision H19 lets the rear tub flares use it', basis: maker}
   rear_overhang_max_mm: {v: 1908, src: "ADR 43/04 clause 6.1.2.1: 60 % of the 3,180 mm wheelbase", basis: law}
-  wheel_rating_kg: {v: 1400, src: "ROH Trak 2 16 x 7 ET 0 5 x 150 (ROH fitment table)", basis: maker}
+  wheel_rating_kg: {v: 1400, src: "ROH Trak 2 16 x 7 ET 0 5 x 150 (ROH fitment table). The Elite is plated at twice it, 2,800 kg (decision H18)", basis: maker}
   tyre_rating_kg: {v: 1550, src: "LT265/75R16 123/120 load range E at 80 psi (report 09)", basis: maker}
   coupling_window_mm: {v: [350, 460], src: "VSB1 towball height, vehicle fully loaded (report 08)", basis: law}
   ssf_reference: {v: 1.02, src: "Report 17 section 5.2, case B: the bikes in the trailer, a plain tray and the tools", basis: calculated}
@@ -230,12 +233,12 @@ cases:
 
 # Checks. basis `both` checks the base masses and the masses with the growth allowance.
 checks:
-  - {id: UTE-01, title: "Ute mass within the 4,495 kg GVM", type: mass, quantity: mass, limit: gvm_kg, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
-     why: "The Lovells Elite kit's GVM, once the NSW certifier has inspected it (report 16, decision H17)"}
+  - {id: UTE-01, title: "Ute mass within the 4,450 kg GVM", type: mass, quantity: mass, limit: gvm_kg, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
+     why: "The Lovells Elite kit plated at 4,450 kg, its front and rear axles as plated, once the NSW certifier has inspected it (report 16, decisions H17 and H18)"}
   - {id: UTE-02, title: "Front axle within its 1,650 kg rating", type: mass, quantity: front, limit: front_axle_kg, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
      why: "Lovells' front axle rating, the same for the Elite and the Platinum"}
-  - {id: UTE-03, title: "Rear axle within its 2,850 kg rating", type: mass, quantity: rear, limit: rear_axle_kg, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
-     why: "The Elite's rating (decision H17). The bikes, the box and the towball all sit over or behind the rear axle. The trailer's MAS-14 reports the Platinum's return (cut CUT7)"}
+  - {id: UTE-03, title: "Rear axle within its 2,800 kg plate", type: mass, quantity: rear, limit: rear_axle_kg, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
+     why: "The Elite plated at twice the ROH wheel's 1,400 kg (decisions H17 and H18). The bikes, the box and the towball all sit over or behind the rear axle. The trailer's MAS-14 reports the Platinum's return (cut CUT7)"}
   - {id: UTE-04, title: "Ute mass within the plan's 3,850 kg weighed limit", type: mass, quantity: mass, limit: weighed_max_kg, basis: nominal, cases: [UC1, UC2, UC3, UC4], severity: fail,
      why: "Decision log: the weighed ute stays at or under 3,850 kg, so the rear axle keeps its margin"}
   - {id: UTE-05, title: "Design towball within the towbar's 350 kg", type: towball, severity: fail,
@@ -246,14 +249,14 @@ checks:
      why: "Toyota's minimum front axle share, so the ute steers and brakes"}
   - {id: UTE-08, title: "Unladen centre of gravity under 1,000 mm with the body fitted", type: mass, quantity: cog_z, limit: cog_unladen_max_mm, basis: nominal, cases: [UC1], severity: fail,
      why: "Toyota BBGJ1007 section 1-2"}
-  - {id: UTE-09, title: "Bike box no wider than 1,850 mm", type: width, limit: box_width_max_mm, severity: fail,
-     why: "Toyota allows a body 60 mm beyond the cab's outermost point. The decision log takes the cab at 1,790 mm"}
+  - {id: UTE-09, title: "Bike box body no wider than 1,850 mm, and its rear tub flares no wider than 1,910 mm", type: width, limit: box_width_max_mm, limit_flares: flare_width_max_mm, severity: fail,
+     why: "Toyota allows a mounted part 60 mm beyond the cab's outermost point, measured on each side (BBGJ1007 section 1-2), so 1,910 mm on the 1,790 mm cab. The body keeps the decision log's 1,850 mm, and only the flares over the rear tubs, which the Elite's wider rear track needs, go beyond it (decision H19). The factory GXL is already 1,870 mm over its own wheel flares (report 16)"}
   - {id: UTE-10, title: "Rear overhang no more than 1,908 mm behind the rear axle", type: overhang, limit: rear_overhang_max_mm, severity: fail,
      why: "ADR 43/04, including any equipment. The towbar and its tongue count too"}
   - {id: UTE-11, title: "Static stability factor with the bikes aboard (reported against 1.02 with the bikes in the trailer)", type: ssf, cases: [UC2, UC3], severity: report,
-     why: "Half the mean track over the centre of gravity height (NHTSA). Report 17 found 1.02 with the bikes in the trailer and about 0.80 to 0.82 on the ute"}
+     why: "Half the mean track over the centre of gravity height (NHTSA), with the Elite's 1,555 mm rear track (R26). Report 17 found 1.02 with the bikes in the trailer and about 0.80 to 0.82 on the ute, both on the factory 1,460 mm rear track"}
   - {id: UTE-12, title: "Each rear wheel and tyre within its rating", type: wheel, basis: both, cases: [UC3], severity: fail,
-     why: "Half the rear axle load on each rear wheel. ROH rates the Trak 2 at 1,400 kg and the tyre carries 1,550 kg"}
+     why: "Half the rear axle load on each rear wheel. ROH rates the Trak 2 at 1,400 kg, which sets the Elite's 2,800 kg plate (decision H18), and the tyre carries 1,550 kg"}
   - {id: UTE-13, title: "Coupling point window laden inside VSB1's 350 to 460 mm", type: coupling, severity: fail,
      why: "The decision log sets 440 mm, plus or minus 20 mm, laden (12:10 UTC, in place of 450 mm, which reached 470 mm). VSB1 asks for 350 to 460 mm with the vehicle fully loaded"}
   - {id: UTE-14, title: "Trailer within the 3,500 kg braked towing capacity", type: towing, severity: fail,

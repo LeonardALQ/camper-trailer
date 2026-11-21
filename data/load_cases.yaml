@@ -75,7 +75,7 @@ registration:
 # in data/ute/ute.yaml and its masses and the bike box's sweep come from the ute model (build/ute/ute.json, cad/ute.py
 # and cad/ute_garage.py). The Cayenne of report 07 is no longer the tow vehicle (reports 14 to 16 replace 07 and 10).
 tow_vehicle:
-  name: Toyota LandCruiser VDJ79 GXL single cab V8, Lovells 4,495 kg Elite GVM kit (decision H17), with the bike box
+  name: Toyota LandCruiser VDJ79 GXL single cab V8, Lovells Elite GVM kit plated at 4,450 kg (decisions H17 and H18), with the bike box
   data: data/ute/ute.yaml
   model: build/ute/ute.json
   gcm_case: UC2          # the ute with the bikes aboard and no towball, added to the trailer's own mass

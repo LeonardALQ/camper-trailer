@@ -14,7 +14,7 @@
 # Any number may be an expression over `params`. axle_x is set by the axle solve (cad/trailer.py): the middle of the
 # window in which every case keeps at least 8.0 % of its mass on the ball (MAS-12) and the heaviest towball with growth
 # stays at or under 320 kg (MAS-13), decision H17's design targets in data/load_cases.yaml. The hard limits sit outside
-# it: 7.5 % (MAS-04) and the ute's rear axle within the Elite kit's 2,850 kg and the 350 kg towbar (MAS-03, H14). The
+# it: 7.5 % (MAS-04) and the ute's rear axle within the Elite kit's 2,800 kg plate (H18) and the 350 kg towbar (MAS-03, H14). The
 # solve never changes a limit or a block size. An item's optional `material` says what it is made of. The 3D
 # viewer on the site shows it on the part's card (cad/partsmeta.py), and the chassis members and plates take theirs
 # from the chassis data.

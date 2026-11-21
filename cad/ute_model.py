@@ -113,4 +113,4 @@ def bike_box_sweep(ute, garage_model) -> dict:
     ext = ute.box_extent()
     return dict(radius_mm=round(r, 1), governing=who, underside_z=round(under, 1), ball_x=bx, ball_z=V["coupling_z"],
                 overhang_mm=round(ext["x1"] - bx, 1), body_overhang_mm=round(ute.garage["module_x0"] + garage_model.prj.P.values["x_end"] - bx, 1),
-                half_width_mm=round(max(abs(ext["y0"]), abs(ext["y1"])), 1))
+                half_width_mm=round(max(abs(ute.body_extent()["y0"]), abs(ute.body_extent()["y1"])), 1))

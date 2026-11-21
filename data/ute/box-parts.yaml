@@ -1,6 +1,7 @@
-# Bike box parts list (R24, 20 Nov 2026, UTE-GARAGE.md revision C). The enclosed welded aluminium box on the
-# LandCruiser VDJ79's frame. The ute-garage page renders it (cad/sitedata.py), and cad/tests/test_box_parts.py checks that
-# the lines add up to the totals below and to the model's box mass (UGB-01).
+# Bike box parts list (R24, 20 Nov 2026, UTE-GARAGE.md revision C, and revision D of 21 Nov 2026: the rear tub flares
+# for the Elite's 1,555 mm rear track, decision H19). The enclosed welded aluminium box on the LandCruiser VDJ79's frame.
+# The ute-garage page renders it (cad/sitedata.py), and cad/tests/test_box_parts.py checks that the lines add up to the
+# totals below and to the model's box mass (UGB-01).
 # One entry per line. mass.kg is the mass the line adds to the fitted box, not the mass of stock bought. model_part
 # names the part in data/ute/parts that carries that mass in the model. Lines whose mass sits in another line say so
 # in mass.src.
@@ -43,10 +44,10 @@ lines:
     group: materials
     name: Wall, front wall and door skin sheet
     part_number: "Aluminium Marine Sheet 5052 H32 2.5mm 1200x2400"
-    spec: 5052-H32, 2.5 mm, 2,400 x 1,200 mm. Sheets stand on end so every vertical joint lands on a post. 13.1 m2 fitted, 9 sheets with nesting losses (est.)
+    spec: 5052-H32, 2.5 mm, 2,400 x 1,200 mm. Sheets stand on end so every vertical joint lands on a post. 12.9 m2 fitted, 9 sheets with nesting losses (est.)
     qty: 9
     unit: sheet
-    mass: {kg: 87.8, basis: calculated, src: "Model U-SKIN 62.7 kg, the two leaf skins 17.0 kg and the kerb door skin 8.0 kg, at 6.70 kg/m2"}
+    mass: {kg: 86.2, basis: calculated, src: "Model U-SKIN 61.1 kg with the notches over the rear tubs for the flares (BX-M12), the two leaf skins 17.0 kg and the kerb door skin 8.0 kg, at 6.70 kg/m2"}
     price: {aud_each: 260.37, aud: 2343.33, url: "https://store.allaluminium.com.au/products/aluminium-marine-sheet-5052-h32-2-5mm-1200x2400", date: 2026-11-20, basis: listing}
     model_part: [U-SKIN, U-LEAF, U-KDOOR]
   - id: BX-M03
@@ -56,7 +57,7 @@ lines:
     spec: 5052-H32, 3.0 mm. Both tubs, folded and welded
     qty: 1
     unit: sheet
-    mass: {kg: 7.4, basis: calculated, src: "Model U-TUB, 0.92 m2 at 8.04 kg/m2"}
+    mass: {kg: 6.6, basis: calculated, src: "Model U-TUB, 0.83 m2 at 8.04 kg/m2. The tubs follow the Elite's rear track 47.5 mm outward, so their tops are 322 mm wide in place of 369.5 mm"}
     price: {aud_each: 312.39, aud: 312.39, url: "https://store.allaluminium.com.au/collections/marine-sheet-aluminium", date: 2026-11-20, basis: listing}
     model_part: U-TUB
   - id: BX-M04
@@ -66,7 +67,7 @@ lines:
     spec: 5052-H32, 4.0 mm. Three pieces 1,845 mm across, butt welded over the crossmembers at module X 1,150 and 2,300 mm
     qty: 3
     unit: sheet
-    mass: {kg: 43.0, basis: calculated, src: "Model U-FLOOR, 4.01 m2 at 10.72 kg/m2"}
+    mass: {kg: 43.9, basis: calculated, src: "Model U-FLOOR, 4.09 m2 at 10.72 kg/m2. With the tubs 47.5 mm further out, the floor between them is 1,201 mm wide"}
     price: {aud_each: 416.59, aud: 1249.77, url: "https://store.allaluminium.com.au/collections/marine-sheet-aluminium", date: 2026-11-20, basis: listing}
     model_part: U-FLOOR
   - id: BX-M05
@@ -145,6 +146,17 @@ lines:
     price: {aud_each: 41.57, aud: 83.14, url: "https://store.allaluminium.com.au/products/aluminium-flat-bar-10mm-x-20mm-mill-finish", date: 2026-11-20, basis: listing}
     model_part: U-STRIP
     note: The model's strips are 20 mm wide on a 76 mm crossmember. On the 65 mm crossmember they are 15 mm wide
+  - id: BX-M12
+    group: materials
+    name: Rear tub flare sheet
+    part_number: "Aluminium Marine Sheet 5052 H32 2.5mm 1200x2400"
+    spec: "5052-H32, 2.5 mm. Two flares, each folded from a blank about 925 x 150 mm into a channel 20 mm deep and 130.5 mm high, with welded ends, set into a notch over the rear tub in each side wall (decision H19, R26 fix A). The box is 1,890 mm over the flares"
+    qty: 1
+    unit: sheet
+    mass: {kg: 1.9, basis: calculated, src: "Model U-FLARE, 0.29 m2 at 6.70 kg/m2. The notches take 1.6 kg off the skins (BX-M02), so the box gains 0.3 kg"}
+    price: {aud_each: 260.37, aud: 260.37, url: "https://store.allaluminium.com.au/products/aluminium-marine-sheet-5052-h32-2-5mm-1200x2400", date: 2026-11-21, basis: listing}
+    model_part: U-FLARE
+    note: "A sheet of its own (est.). BX-M02's offcuts, about 1,200 x 896 mm each, may cover both blanks and save it. The work is in BX-X01"
   # ================================================================ subframe and mounts
   - id: BX-U01
     group: subframe_mounts
@@ -681,7 +693,7 @@ lines:
     group: tools
     name: Tool chest sheet
     part_number: "Aluminium Marine Sheet 5052 H32 1.6mm 1200x2400"
-    spec: Two chests, 780 x 300 x 200 mm and 780 x 220 x 200 mm, bolted to the wheel tubs
+    spec: Two chests, 780 x 270 x 200 mm and 780 x 220 x 200 mm, bolted to the wheel tubs. The road-side chest is 30 mm narrower than before, so it stays on its tub on the Elite's rear track
     qty: 1
     unit: sheet
     mass: {kg: 9.0, basis: estimate, src: "Model U-TOOLBOX share"}
@@ -702,11 +714,11 @@ lines:
     group: fabrication
     name: Shop labour, cut, weld, fit out and fit to the ute
     part_number: null
-    spec: "Hours (est.): cutting and nesting 12, subframe and mounts 30, body frame 36, floor, tubs and skins 44, doors and locking 28, fit-out and wiring 20, fitting to the ute 8, tests 6"
-    qty: 184
+    spec: "Hours (est.): cutting and nesting 12, subframe and mounts 30, body frame 36, floor, tubs and skins 44, the two rear tub flares 4, doors and locking 28, fit-out and wiring 20, fitting to the ute 8, tests 6"
+    qty: 188
     unit: h
     mass: {kg: 0.0, basis: estimate, src: "Not a part"}
-    price: {aud_each: 121.00, aud: 22264.00, url: "https://mosesmech.com/", date: 2026-11-20, basis: listing}
+    price: {aud_each: 121.00, aud: 22748.00, url: "https://mosesmech.com/", date: 2026-11-20, basis: listing}
     note: "Sydney subcontract rate AUD 90 + GST an hour plus AUD 20 + GST an hour for aluminium consumables (filler, argon, tungsten). An aluminium body shop may charge up to about AUD 150 + GST (est.). The hours are an estimate. If Leonard builds it, this line drops out"
   # ================================================================ compliance
   - id: BX-E01
@@ -723,13 +735,13 @@ lines:
 # prices match the stated rates. Contingency 10 % (est.). owner_built_total_aud drops the shop labour line and its
 # contingency. mass_kg_lines is the fitted box as listed, which is the model's box mass (UGB-01).
 totals:
-  by_group: {materials: 7715.25, subframe_mounts: 990.0, fasteners_sealants: 891.9, doors: 1200.15, security: 3797.36, restraint: 1852.09, loading: 2972.61, services: 1771.42, finish: 644.42, tools: 246.62, fabrication: 22264.0, compliance: 2000.0}
-  subtotal_aud: 46345.82
+  by_group: {materials: 7975.62, subframe_mounts: 990.0, fasteners_sealants: 891.9, doors: 1200.15, security: 3797.36, restraint: 1852.09, loading: 2972.61, services: 1771.42, finish: 644.42, tools: 246.62, fabrication: 22748.0, compliance: 2000.0}
+  subtotal_aud: 47090.19
   contingency_pct: 10
-  contingency_aud: 4634.58
-  total_aud: 50980.4
-  owner_built_total_aud: 26490.0
-  mass_kg_lines: 436.07
+  contingency_aud: 4709.02
+  total_aud: 51799.21
+  owner_built_total_aud: 26776.41
+  mass_kg_lines: 436.47
   not_in_total:
     - {name: "Monimoto 9 subscriptions", aud_per_year: 158, src: "AUD 79 a year each (report 17)"}
     - {name: "FMC130 tracking platform", aud_per_year: 120, src: "Estimate"}

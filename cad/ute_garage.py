@@ -84,10 +84,12 @@ def crossmember_check(prj, model, P) -> dict:
                 "AS 4100 clause 5.1: the section is compact, so Ze is the plastic modulus.", unit="")
 
 
-def _extent(model, P, x0, dz) -> dict:
-    """Outside extent of the box in the ute frame, as it travels: everything but the loading view and the context."""
+def _extent(model, P, x0, dz, skip_parts=()) -> dict:
+    """Outside extent of the box in the ute frame, as it travels: everything but the loading view and the context. With
+    skip_parts=("U-FLARE",) it is the body's extent without the rear tub flares (UTE-09's body limit, decision H19)."""
     shapes = [b.shape for b in model.built.values()
-              if not b.inst.check_only and b.inst.display != "loading_only" and b.inst.group not in ("context", "bikes")]
+              if not b.inst.check_only and b.inst.display != "loading_only" and b.inst.group not in ("context", "bikes")
+              and b.inst.part not in skip_parts]
     bb = Compound(children=shapes).bounding_box()
     return dict(x0=bb.min.X + x0, x1=bb.max.X + x0, y0=bb.min.Y, y1=bb.max.Y, z0=bb.min.Z + dz, z1=bb.max.Z + dz)
 
@@ -114,8 +116,8 @@ def mount_loads(lines: list[dict], P, limits: dict) -> dict:
     n = len(xs)
     xb = sum(xs) / n
     S = sum((x - xb) ** 2 for x in xs)
-    # bolt line to bolt line across the ute: the mounts' centres either side
-    b_track = P.get("runner_y1") + P.get("tub_y0") - P.get("tub_t") - 5
+    # bolt line to bolt line across the ute: the mounts' centres either side, on Toyota's brackets
+    b_track = 2 * P.get("runner_y1") + P.get("mount_dy")
 
     def vertical(Wz, Fx):
         """Upward reaction per station (kN) for a downward load Wz at xc and a forward force Fx at height h."""
@@ -197,6 +199,7 @@ def build_garage(prj: Project | None = None, limits: dict | None = None):
 
     # ---------------------------------------------------------------- computed checks
     ext = _extent(model, P, x0, dz)
+    body_ext = _extent(model, P, x0, dz, skip_parts=("U-FLARE",))
     tub_h = P.get("tub_top")
     checks.append(_row("UGD-01", "Wheel tubs no more than 100 mm above the floor, so the lower floor works", "fail",
                        f"<= {lim['tub_height_max_mm']:.0f} mm", round(tub_h, 1), round(lim["tub_height_max_mm"] - tub_h, 1),
@@ -247,12 +250,14 @@ def build_garage(prj: Project | None = None, limits: dict | None = None):
                        "Report 03 section 10: 20 degrees is the limit for walking a bike up beside it. The winch does the pulling.", unit="deg"))
 
     gaps = {c["sub"] or c["id"]: c for c in checks if c["id"] == "UGC-02"}
-    dims = dict(outside_l=round(ext["x1"] - ext["x0"], 1), outside_l_body=P.get("outside_l"), outside_w=round(ext["y1"] - ext["y0"], 1),
+    dims = dict(outside_l=round(ext["x1"] - ext["x0"], 1), outside_l_body=P.get("outside_l"), outside_w=round(body_ext["y1"] - body_ext["y0"], 1),
+                outside_w_flares=round(ext["y1"] - ext["y0"], 1), flare_l=P.get("flare_x1") - P.get("flare_x0"), flare_out=P.get("flare_out"),
+                wheel_y=P.get("wheel_y"),
                 outside_h=round(P.get("top_z"), 1), inside_l=P.get("garage_length"), inside_w=P.get("interior_width"), inside_h=P.get("ceiling_z"),
                 opening_w=P.get("door_y1") - P.get("door_y0"), opening_h=P.get("door_h"), deck_z=dz, top_z=round(dz + P.get("top_z"), 1),
                 tub_h=round(tub_h, 1), tuareg_y=P.get("tuareg_y"), st_y=P.get("st_y"), bike_spacing=P.get("bike_spacing"),
                 ramp_deg=round(ang, 2), ramp_deg_laden=round(ang_l, 2))
-    garage = dict(lines=lines, box_extent=ext, module_x0=x0, deck_z=dz, dims=dims, checks=checks, box_kg=round(box_kg, 1),
+    garage = dict(lines=lines, box_extent=ext, body_extent=body_ext, module_x0=x0, deck_z=dz, dims=dims, checks=checks, box_kg=round(box_kg, 1),
                   box_kg_growth=round(box_kg_g, 1), by_group={k: round(v, 1) for k, v in by_group.items()}, mounts=ml,
                   bike_gaps={k: dict(measured=v["measured_mm"], governing=v["governing"]) for k, v in gaps.items()},
                   timings=model.timings)

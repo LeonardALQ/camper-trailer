@@ -1,4 +1,5 @@
-"""The tow vehicle: the LandCruiser 79 single cab with the Lovells 4,495 kg Elite GVM kit (decision H17, VEHICLE.md).
+"""The tow vehicle: the LandCruiser 79 single cab with the Lovells Elite GVM kit, plated at 4,450 kg (decisions H17 and H18,
+VEHICLE.md).
 
 Its mass budget, axle loads, centre of gravity and static stability factor per case, and the ute checks, from
 data/ute/ute.yaml. Positions are in the ute frame DIM-U1: X from the front axle centre, positive rearward, Y positive
@@ -81,6 +82,12 @@ class Ute:
         V = self.V
         return dict(x0=V["box_x0"], x1=V["box_x1"], y0=-V["box_w"] / 2, y1=V["box_w"] / 2, z0=V["deck_z"] - 135, z1=V["deck_z"] + V["box_h"])
 
+    def body_extent(self) -> dict:
+        """The box body's outside extent without the rear tub flares, for UTE-09's body limit (decision H19)."""
+        if self.garage and "body_extent" in self.garage:
+            return dict(self.garage["body_extent"])
+        return self.box_extent()
+
     def rear_most(self) -> dict:
         V, b = self.V, self.box_extent()
         cand = [(b["x1"], "bike box rear doors"), (V["ball_x"] + 60, "coupling on the towbar tongue"),
@@ -130,11 +137,16 @@ class Ute:
                            detail=(f"{v:.1f} kg on the ball, the trailer's heaviest towball with growth, against the towbar's {lim:.0f} kg. "
                                    "The rear axle at this ball is UTE-03 (H14)"))
             elif t == "width":
-                b = self.box_extent()
-                w = b["y1"] - b["y0"]
-                lim = L[c["limit"]]
-                row.update(limit=f"<= {lim:.0f} mm", measured=round(w, 1), unit="mm", margin=round(lim - w, 1), ok=w <= lim + 1e-6,
-                           governing="bike box outside width", detail=f"{w:.0f} mm outside, cab {V['cab_width']:.0f} mm")
+                # two limits (decision H19): the body, and the whole box over the rear tub flares
+                body, full = self.body_extent(), self.box_extent()
+                wb_, wf = body["y1"] - body["y0"], full["y1"] - full["y0"]
+                lb, lf = L[c["limit"]], L[c["limit_flares"]]
+                mb, mf = lb - wb_, lf - wf
+                row.update(limit=f"<= {lb:.0f} mm body, <= {lf:.0f} mm flares", measured=round(wb_, 1), unit="mm", margin=round(min(mb, mf), 1),
+                           ok=mb >= -1e-6 and mf >= -1e-6, measured_flares=round(wf, 1),
+                           governing="bike box body" if mb <= mf else "rear tub flares",
+                           detail=(f"body {wb_:.0f} mm outside against {lb:.0f} mm, {wf:.0f} mm over the rear tub flares against {lf:.0f} mm, "
+                                   f"cab {V['cab_width']:.0f} mm"))
             elif t == "overhang":
                 r = self.rear_most()
                 lim = L[c["limit"]]
