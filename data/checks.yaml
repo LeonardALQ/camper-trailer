@@ -32,7 +32,7 @@ trailer_checks:
     max: 3400
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: Decision H2 keeps 100 kg of the 3,500 kg plate in reserve for the estimates. H13 holds it with the travel limit on water, 310 L since H21.
+    why: Decision H2 keeps 100 kg of the 3,500 kg plate in reserve for the estimates. H13 holds it with the travel limit on water, 305 L since H21.
   - id: MAS-02
     title: Axle group load with growth, times 1.2 for VSB1's 120 % rule, within the kit's GTM
     type: mass
