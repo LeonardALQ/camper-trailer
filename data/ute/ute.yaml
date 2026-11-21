@@ -57,7 +57,7 @@ params:
 
 # Limits. `src` is the source and `basis` its kind.
 limits:
-  gvm_kg: {v: 4450, src: "Decision H18: the Lovells 4,495 kg Elite kit (report 16 section 2.3, decision H17, car build line GV05) plated at the sum of its axle plates, 1,650 + 2,800 kg, in the LC5 inspection (GV03). Lovells offers the same derate on its 4,200 kg kit (report 26)", basis: plan}
+  gvm_kg: {v: 4450, src: "Decision H18: the Lovells 4,495 kg Elite kit (report 16 section 2.3, decision H17, car build line GV05) plated at the sum of its axle plates, 1,650 + 2,800 kg, in the LC5 inspection (GV03). An assumption: Lovells publishes a derate only for its 4,200 kg kit (report 26), so its written yes comes in stage S0", basis: plan}
   front_axle_kg: {v: 1650, src: "Lovells Elite front axle rating, as the Platinum's (report 16)", basis: installer}
   rear_axle_kg: {v: 2800, src: "Decision H18: the Elite's 2,850 kg rear axle (wide-track housing and chrome-moly axles, report 16, decision H17) plated at 2,800 kg, twice the ROH Trak 2's 1,400 kg rating, because no 16 inch wheel that fits the ute and the trailer is rated 1,425 kg (report 26)", basis: plan}
   platinum_rear_axle_kg: {v: 2550, src: "Lovells TOYKIT080-GVM rear axle rating, the kit cut CUT7 returns to", basis: installer}
