@@ -11,7 +11,7 @@ revision: A
 glands:
   # `proj` on a side-wall gland is how far it stands proud of the skin, mm, for the overall width (data/body/body.yaml `width`)
   - {id: G1, what: "Fresh water fill with a lockable cap, filled through the CR45 filter on the hose", at: kerb, x: 3280, z: 1125, d: 50, proj: 30, src: "TRAILER.md, Plumbing and water", est: "height, and the cap 30 mm proud"}
-  - {id: G2, what: "15 A appliance inlet and the 12 V Anderson SB50 outlet, flush-mounted IP56 with hinged covers", at: kerb, x: 4700, z: 1150, d: 60, proj: 30, src: "TRAILER.md, Electrical", est: "covers 30 mm proud. A surface box would stand about 60 mm and set the width"}
+  - {id: G2, what: "Two 15 A appliance inlets, SHORE and GENERATOR, and the 12 V Anderson SB50 outlet, flush-mounted IP56 with hinged covers", at: kerb, x: 4700, z: 1150, d: 60, proj: 30, src: "TRAILER.md, Electrical", est: "covers 30 mm proud. A surface box would stand about 60 mm and set the width"}
   - {id: G3, what: "Outdoor 230 V double outlet (C10), flush-mounted IP56 with a hinged cover, under the awning", at: kerb, x: 4300, z: 1150, d: 60, proj: 30, src: "report 20 section 7", est: "position, and the cover 30 mm proud"}
   - {id: G4, what: "Two 6 mm2 PV strings into a conduit down the partition's kerb end", at: roof, x: 5100, y: -900, d: 25, src: "TRAILER.md, Electrical"}
   - {id: G5, what: "Split line set and the outdoor unit's 230 V feed (C8), behind the cradle", at: rear, y: 760, z: 2800, d: 60, src: "AC-02, AC-03", est: "position, moved to the road half with the outdoor unit"}
@@ -76,7 +76,7 @@ ventilation_modes:
   - {mode: "Parked, dust storm", e2: "Off", ra: "Off", topup: "40", respa: "On", split: "Thermostat"}
   - {mode: "Smoke", e2: "Off", ra: "Off", topup: "15 to 40 through the carbon", respa: "Off, or on with the odour filter", split: "Thermostat"}
   - {mode: "Low battery", e2: "22.5 a pair", ra: "15", topup: "15", respa: "Off", split: "Setpoint up 2 K, heat by diesel"}
-  - {mode: "On the generators", e2: "Off: the Cerbo stops both pairs whenever the AC input is on the generators, because fans C and D sit low on the front wall", ra: "15", topup: "40 through the carbon, so the cabin stays above outside", respa: "Off", split: "Thermostat"}
+  - {mode: "On the generators", e2: "Off: on GENERATOR the changeover switch's first auxiliary stage opens both pairs' 12 V feed and its second closes the Cerbo's digital input 3, which shows the mode, because fans C and D sit low on the front wall", ra: "15", topup: "40 through the carbon, so the cabin stays above outside", respa: "Off", split: "Thermostat"}
 
 # The energy budget's groups for the site's Electrical page (cad/services.py). Each names load ids of research report
 # 20's model (research/models/20/loads.yaml), or their two-letter prefixes. INV and DCDC are the model's conversion losses.

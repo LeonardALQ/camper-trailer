@@ -70,7 +70,8 @@ def ct601(prj, model, bom, checks, reg, dwg):
     box(sh, 24, 262, 84, 280, ["PV ARRAY ON THE FIXED ROOF", "4 x SUNMAN eARC 430 W, 1,720 W", "TWO STRINGS OF TWO PANELS", "6 mm2 PV CABLE, ABOUT 6 m (G4)"])
     box(sh, 112, 262, 166, 280, ["THE UTE (CAR BUILD TC01)", "2 x ORION-TR SMART 12/48-8", "ON THE STOCK ALTERNATOR", "48 V TO THE TRAILER WHILE DRIVING"])
     box(sh, 172, 262, 226, 280, ["12-PIN PLUG, AS 4177.5", "LAMPS, BRAKES, BREAKAWAY SWITCH", "TSC POWER FROM THE UTE'S HARNESS", "NOT PART OF THE 48 V SYSTEM"], sty="light")
-    box(sh, 172, 238, 226, 256, ["15 A APPLIANCE INLET (G2)", "SHORE POWER, OR THE TWO", "HONDA EU22i IN PARALLEL", "FROM THE DRAWBAR BOX"])
+    box(sh, 172, 238, 226, 256, ["TWO 15 A INLETS (G2): SHORE, AND", "GENERATOR FOR THE TWO EU22i IN PARALLEL", "CHANGEOVER SHORE - OFF - GENERATOR",
+                                 "ON GEN: e2 FEED OPEN, CERBO INPUT 3 SHUT"])
     # MPPTs
     for x0, n in ((24, 1), (54, 2)):
         box(sh, x0, 238, x0 + 26, 254, [f"MPPT {n}", "SMARTSOLAR 150/35", "DC ISOLATOR"])
@@ -101,7 +102,7 @@ def ct601(prj, model, bom, checks, reg, dwg):
     # the ute's feed, the MultiPlus and its AC
     wire(sh, [(139, 262), (139, 226), (110, 226)], "dc")
     textblock(sh, 140, 257, ["GREY ANDERSON SB50 AT", "THE DRAWBAR, 8 B&S TWIN,", "ABOUT 6.5 m (G8), 40 A MEGA", "16 A, 32 A AFTER TC02"], size=1.15, gap=0.55)
-    box(sh, 148, 196, 226, 230, ["VICTRON MULTIPLUS-II 48/6k5/100-50 230 V", "6.0 kW AT 25 C, 5.7 kW AT 40 C", "AC-IN FROM THE INLET THROUGH A 16 A RCBO",
+    box(sh, 148, 196, 226, 230, ["VICTRON MULTIPLUS-II 48/6k5/100-50 230 V", "6.0 kW AT 25 C, 5.7 kW AT 40 C", "AC-IN FROM THE CHANGEOVER THROUGH A 16 A RCBO",
                                  "AC-OUT-1 TO THE 230 V BOARD", "AC-OUT-2 SPARE, LIVE ONLY ON SHORE OR GENERATOR",
                                  "BONDS NEUTRAL TO EARTH WHEN INVERTING"])
     wire(sh, [(199, 238), (199, 230)], "ac")

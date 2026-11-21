@@ -659,7 +659,7 @@ items:
     zone: drawbar_box
     box: [dbx_x0 + 15, -dbx_w / 2 + 20, dbx_z0 + dbx_t + 10, 290, 1038, 425]
     mass: {basis: declared, total_kg: 42.2, maturity: spec, source: "https://powerequipment.honda.com.au/models/generators/eu22/specifications", note: "Honda EU22i, 21.1 kg dry each (Honda Australia, report 20 E-16)"}
-    note: Each 509 x 290 x 425 mm, turned with its 290 mm width along the trailer. They run on the ground at least 6 m from the trailer and downwind of it, exhausts pointing away, never in the box, and the Cerbo stops the e2 pairs while the AC input is on them (data/services.yaml). The pair puts a design hot day back in 6.3 h, or 8.4 h while the household runs (report 20).
+    note: Each 509 x 290 x 425 mm, turned with its 290 mm width along the trailer. They run on the ground at least 6 m from the trailer and downwind of it, exhausts pointing away, never in the box. They plug into their own inlet, and on GENERATOR the changeover switch stops the e2 pairs and tells the Cerbo (data/services.yaml). The pair puts a design hot day back in 6.3 h, or 8.4 h while the household runs (report 20).
   - id: GS-02
     name: Honda parallel cable
     system: stowage
@@ -1001,12 +1001,14 @@ items:
       - {item: "Victron Lynx Distributor (M10)", aud: 293, basis: listing, url: "https://energyconnections.net.au/products/victron-lynx-distributor-m10", date: 2026-11-20}
       - {item: "Victron Cerbo GX MK2 with GX Touch 50", aud: 616, basis: listing, url: "https://www.solar4rvs.com.au/products/victron-cerbo-gx-mk2-gx-touch-50-display-combo-1", date: 2026-11-20}
       - {item: "230 V board: enclosure, inlet, main switch, eleven RCBOs, three contactors, three current relays, 300 A DC isolator, Anderson SB50", aud: 1480, basis: estimate, date: 2026-11-20}
+      - {item: "Generator inlet and changeover: a second 15 A appliance inlet beside the shore inlet, and a 2-pole 20 A cam changeover switch, SHORE - OFF - GENERATOR, with two auxiliary contact stages (Kraus & Naimer CA10 class)", aud: 230, basis: estimate, url: "https://www.krausnaimer.com/fileadmin/user_upload/Kraus_u_Naimer/Pdfcat/Local/AUS/CA10_CAD11_CAD12_ver2.pdf", date: 2026-11-21, note: "Inlet about AUD 50, switch about AUD 160, labels and the e2 and Cerbo leads about AUD 20 (est.)"}
       - {item: "Board panel 800 x 700 mm and the wiring on it", aud: 150, basis: estimate, date: 2026-11-20}
     point: [rear_x0 - 100, -560, ceiling_z - 500]
     parts:
       - {item: "Victron Lynx Distributor (M10)", kg: 1.5, basis: estimate, source: "Report 20 E-03"}
       - {item: "Cerbo GX MK2 and GX Touch 50 (the display beside the entry door)", kg: 0.6, basis: estimate, source: "Report 20 E-08"}
       - {item: "230 V board: 15 A inlet with a 16 A RCBO, main switch, ten 30 mA RCBOs, three contactors, three current relays, 300 A DC isolator, Anderson SB50", kg: 4.7, basis: estimate, source: "Report 20 E-12"}
+      - {item: "Generator inlet and the changeover switch with its two auxiliary stages", kg: 0.5, basis: estimate}
       - {item: "Board panel 800 x 700 mm and the wiring on it", kg: 5.0, basis: estimate, source: "Report 20 E-13"}
   - id: EL-07
     name: Main DC cables and lugs, bank 70 mm2, inverter 50 mm2, MPPT and converters 10 mm2
