@@ -18,10 +18,20 @@ rules:
     overhead_mm: 60             # (est.) to 60 mm under the ceiling, the depth of the ceiling's cable covers, which run over the aisles
   spacing:                      # SVC-08: run to run, centreline to centreline at least the two radii plus the gap
     gap_mm: 5                   # (est.) two runs on their own clips or saddles: a clip's band each side and room to fit it
-    wet_ac_mm: 25               # a water, waste or diesel line from a 230 V run, and never over one within it in plan (IB 052/2015)
+    wet:                        # a wet line's least gap from a cable, surface to surface, by the line's system and the cable's band
+      fresh: {ac230: 25}        # cold water: IB 052/2015's 25 mm for an above-ground cold water service, from the 230 V
+      vent: {ac230: 25}         # (design) a tank breather can carry water when the tank is overfilled, so as cold water
+      diesel: {ac230: 25}       # (design) the sealed PA12 fuel line, jointed only at the tank and the Combi, as cold water
+      hot: {ac230: 50, ELV: 25} # (design) heated water: its heat on a cable and a scald-hot leak, half IB 052/2015's 100 mm for a building
+      waste: {ac230: 50, ELV: 25}   # (design) wastes and drains: dirty water at every joint, half IB 052/2015's 100 mm for a building
+    elv_inside_only: true       # (design) the hot lines' and wastes' 25 mm from the extra-low-voltage cables holds above the floor, the gap under it
+    rigid_waste_elv_gap: true   # (design) a solvent-welded DWV waste has no joint between its trap and the tank, so it keeps the gap from ELV
+    tempered: [H-02, H-03, H-04, H-05, H-06, L-01, L-02]   # (design) held at 50 C or less by the mixing valve or the shower's thermostat, so as cold water
+    over_mm: 25                 # (design) and no wet line passes over a 230 V run within 25 mm in plan, the floor panel aside
     touch: [ELV, ac230]         # cables of one band that share a way are one loom and may touch their lane neighbours
-    duct: LA-11E                # inside the board cabinet the cables lie in its slotted duct, so the test starts at its faces
-  drop_pct: 2.0                 # SVC-06: DC circuits at their design current, report 20's limit (section 6, the ute feed)
+    duct: LA-11E                # inside the board cabinet the cables lie in its 60 x 80 mm slotted duct (EL-06, sized to its fill) or, the four
+                                # heavy ones, cleated to the panel to their terminals, laid out by the electrician, so the test starts at its faces
+  drop_pct: 2.0                 # SVC-06: DC circuits at their design current, the design's own limit, stricter than AS/NZS 3000 (I2-15)
   drop_ac_pct: 5.0              # 230 V circuits, AS/NZS 3000:2018 clause 3.6.2
   segregation_mm: 50            # SVC-03: 230 V runs from extra-low-voltage runs, AS/NZS 3000 clause 3.9.8.3 by way of AS/NZS 3001.2
   segregation_reach_mm: 150     # where both enter the board or one appliance, at its terminals
@@ -52,13 +62,13 @@ checks:
     kind: clearance
     severity: fail
     why: "The brief's rule for H28, so the services can be fitted after the fit-out without cutting a part, and it2-interior's boxes can move by up to 20 mm without a clash. Runs threaded through a closed chassis member skip the parts welded to it while inside it."
-    source: "H27 and H28 (docs/decisions.md); research/30-services-routing.md section 6"
+    source: "H27 and H28 (docs/decisions.md), research/30-services-routing.md section 6"
   - id: SVC-02
-    title: Every cable and hose bend at or above its least bending radius; PEX and DWV turn at fittings where it does not fit
+    title: Every cable and hose bend at or above its least bending radius, PEX and DWV turning at fittings where it does not fit
     kind: bends
     severity: fail
     why: "A cable bent tighter than its installed radius damages its insulation and a hose kinks. Rigid DWV turns only at bend fittings and PEX at push-fit elbows."
-    source: "Prysmian V-90 0.6/1 kV table (least installed radius by outside diameter); Helukabel 6 x D for flexible cable; John Guest Speedfit PEX 15 mm at 175 mm with clips; research/30 section 2"
+    source: "Prysmian V-90 0.6/1 kV table (least installed radius by outside diameter), Helukabel 6 x D for flexible cable, John Guest Speedfit PEX 15 mm at 175 mm with clips, research/30 section 2"
   - id: SVC-03
     title: 230 V runs 50 mm from extra-low-voltage runs outside their own conduit, except at the board and a shared appliance's terminals
     kind: separation
@@ -69,8 +79,8 @@ checks:
     title: No water, waste or diesel line within 300 mm of the battery's terminal face, but the washer's hoses in their sleeve
     kind: terminal_face
     severity: fail
-    why: "A leak must not reach the battery's terminals; the rule on CT-602. The washer's fill and drain hoses pass in a dielectric sleeve."
-    source: "AS/NZS 3001.2:2022 clause 5.4.10.2; CT-602"
+    why: "A leak must not reach the battery's terminals, the rule on CT-602. The washer's fill and drain hoses pass in a dielectric sleeve."
+    source: "AS/NZS 3001.2:2022 clause 5.4.10.2 and CT-602"
   - id: SVC-05
     title: Every load, outlet, DC point, water outlet and fitting has its run from its source
     kind: coverage
@@ -81,20 +91,20 @@ checks:
     title: Every sized circuit's voltage drop at its design current over its routed length within its limit
     kind: drops
     severity: fail
-    why: "DC circuits are sized by current and by a 2 % drop at the routed length (report 20), stricter than AS/NZS 3000's 10 % for ELV; 230 V circuits at 5 %."
-    source: "Report 20 section 6; AS/NZS 3000:2018 clause 3.6.2 (5 %) and 7.5.7 (ELV); Prysmian mV/A.m at 75 C"
+    why: "DC circuits are sized by their current and by a 2 % drop over the routed length, the design's own limit, stricter than AS/NZS 3000, so the 12 V and 24 V loads keep their voltage and the ute's feed charges at its rate from end to end. 230 V circuits keep AS/NZS 3000's 5 %."
+    source: "The design's own 2 % (research/30-services-routing.md section 2), against AS/NZS 3000:2018 clause 3.6.2 (5 %) and 7.5.7 (ELV), with Prysmian's mV/A.m at 75 C"
   - id: SVC-07
     title: Every gravity waste falls at least 1:50 all the way to the grey tank
     kind: falls
     severity: fail
-    why: "A waste laid flatter than 1:50 holds water and silts; CT-611 and CT-612 give the falls."
+    why: "A waste laid flatter than 1:50 holds water and silts. CT-611 and CT-612 give the falls."
     source: "AS/NZS 3500.2 (1.65 % least grade for DN40 fixture discharge pipes), CT-611, CT-612"
   - id: SVC-08
-    title: Every run keeps its radius plus 5 mm from every other run, a wet line 25 mm from 230 V and never over it
+    title: Every run keeps its radius plus 5 mm from every other, a wet line 25 to 50 mm from 230 V by its kind and never over it
     kind: spacing
     severity: fail
-    why: "No two runs may pass through each other, and each needs room for its own clip. Cables of one band that share a way are one loom and may touch their lane neighbours. A leak or a drip must not reach a 230 V cable, so a water, waste or diesel line keeps 25 mm from one and never passes over one within 25 mm in plan, unless the floor is between them. Inside the board cabinet the cables lie in its slotted duct, which the electrician lays out, so each run is measured from where it leaves the cabinet."
-    source: "The design's own rule (research/30-services-routing.md section 5). The 5 mm gap is a clip's band each side (est.). The 25 mm is the least above-ground separation of a cold water service from an electrical cable in the WA Building Commission's Industry Bulletin IB 052/2015, from AS/NZS 3500.1. The no-drip rule is the design's own."
+    why: "No two runs may pass through each other, and each needs room for its own clip. Cables of one band that share a way are one loom and may touch their lane neighbours. A leak or a drip must not reach a 230 V cable, so a cold water, vent or diesel line keeps 25 mm from one, a hot water line or a waste 50 mm, and none passes over one within 25 mm in plan, unless the floor is between them. A hot line or a waste also keeps 25 mm from the extra-low-voltage cables, for its heat and its dirty water. Inside the board cabinet the control and branch cables lie in its 60 x 80 mm slotted duct, at 73 % of the maker's 50 % fill at its busiest section (EL-06), and the four heavy cables are cleated to the panel to their terminals, which the electrician lays out, so each run is measured from where it leaves the cabinet."
+    source: "The design's own rule (research/30-services-routing.md section 5). The 5 mm gap is a clip's band each side (est.). The 25 mm for cold water is the least above-ground separation of a cold water service from an electrical cable in the WA Building Commission's Industry Bulletin IB 052/2015, which asks 100 mm for heated water and for drains in a building. A trailer cannot keep 100 mm, so the design's own rule keeps 50 mm from 230 V for hot water and wastes, with the 230 V in TPS sheath and in its own conduit where the wet lines run near it, 25 mm from the other cables, and the vents' and diesel's 25 mm and the no-drip rule are the design's own too."
   - id: SVC-09
     title: Every gland's fitting has room in its panel, a spanner's room round each locknut, and no floor fitting stands in a keep-clear box or under a part
     kind: glands
@@ -157,7 +167,7 @@ kinds:
     kg_m: "2 * kg1 + 0.025"
     bend_r: "6 * od"
     aud_m: "9.90 if mm2 < 10 else (14.90 if mm2 < 20 else 25.00)"
-    price_basis: "listing: solar4rvs.com.au 8 B&S twin AUD 9.90 and 6 B&S twin AUD 14.90 a metre (report 20, 20 Nov 2026), KEY 4 B&S twin AUD 25.00 a metre (solar4rvs.com.au, 22 Nov 2026)"
+    price_basis: "listing: solar4rvs.com.au 8 B&S twin AUD 9.90 and 6 B&S twin AUD 14.90 a metre (report 20, 20 Nov 2026), 4 B&S twin AUD 25.00 a metre (solar4rvs.com.au, 22 Nov 2026)"
     mass_basis: "Two cores of the size and a sheath (est.)"
     priced_in: BD-11
   twin:
@@ -375,6 +385,7 @@ consts:
   RDY: LA_11B.y0 - 45               # the riser's DC lanes
   RAY: EL_04.y0 + 35                # the riser's 230 V lane
   KW_Y: -half_in + 95               # the chase: the water and waste lines, 75 mm inboard of the electrics
+  KD_Y: -half_in + 110              # the chase's drains, 25 mm from its extra-low-voltage risers and 50 mm from the 230 V (SVC-08)
   DCR_X: rear_x0 - 25               # the battery's riser behind the dryer, to the isolator and the BMS, clipped to the partition
   DCR_Y: -half_in + 55              # the chase's mid row, down through the cabinet's floor: the risers and the loom to G20, 30 mm clear of the water lines
   WSY: -half_in + 12                # the chase's wall strip, outside the cabinet's kerb face: the cables to the kerb frame's raiser space and the tank senders
@@ -494,7 +505,7 @@ fixtures:
   - {id: AC-DO, what: "Split's condensate spout through the road wall, dripping clear of the body", line: AC-01, at: [AC_01.x0 + 40, half_bw + 10, AC_01.z0 - 25], size: [30, 20, 30], needs_run: false}
   - {id: VT-02, what: "Grey tank's breather outlet, insect-meshed, high on the rear wall's kerb half", line: UF-08, at: [body_x1 + 10, -450, 2550], size: [20, 60, 60], needs_run: false}
   # ---------------------------------------------------------------- the drawbar and the lamps
-  - {id: DB-AN, what: "Grey Anderson SB50 at the drawbar, the ute's 48 V charging feed", line: BD-11, at: [450, -185, 523], size: [80, 60, 60], needs_run: false}
+  - {id: DB-AN, what: "Grey Anderson SB120 with 4 AWG contacts at the drawbar, the ute's 48 V charging feed (DB-07)", line: BD-11, at: [450, -185, 523], size: [80, 60, 60], needs_run: false}
   - {id: DB-PL, what: "12-pin plug's junction box at the drawbar (AS 4177.5)", line: LG-01, at: [450, 185, 523], size: [80, 60, 60], needs_run: false}
   - {id: DB-BK, what: "Breakaway kit's battery box and controller between the drawbar members (DB-07)", line: DB-07, at: [700, 0, 545], size: [140, 120, 100], serves: ["12 V: breakaway charger"]}
   - {id: LJ-01, what: "Rear lamp junction box under the rear crossmember", line: LG-01, at: [CM_08.x0 + 25, -300, CM_08.z0 - 40], size: [100, 80, 60], needs_run: false}
@@ -532,7 +543,7 @@ runs:
      passes: [BR-ISO], along: [BD-03, WR-03], from: {line: BR-BUS, at: [DCR_X, BR_BUS.y0, BR_BUS.cz]}, path: [[., DCR_Y, .]], to: {line: BR-BMS, at: [., ., BR_BMS.z0]}}
   - {id: D-07, system: dc48, kind: pair, size: 50, amps: 144, volts: 48, feeds: "Lynx Distributor to the MultiPlus-II, down the chase's mid row, through the kerb frame, across over the grey tank's front and up through the road frame", protection: "200 A MEGA in the Lynx Distributor",
      glands: [G20, G15], along: [BD-01, BD-03, RS-K, CM-06, RS-R], from: {line: BR-LYNX, at: [BR_LYNX.cx, BR_LYNX.cy, BR_LYNX.z0]},
-     path: [[., ., LA_11E.z0 + 20], [G20_D_07.cx, DCR_Y, .], [., ., ESZ], [., G20_D_07.cy, .], [., ., UFZ - 34], [5260, ., .], [., G15_D_07.cy, .], [G15_D_07.cx, ., .]],
+     path: [[., ., LA_11E.z0 + 20], [G20_D_07.cx, DCR_Y, .], [., ., ESZ], [., G20_D_07.cy, .], [., ., UFZ - 16], [5260, ., .], [., G15_D_07.cy, .], [G15_D_07.cx, ., .]],
      to: {line: EL-04, at: [., ., EL_04.z0]}}
   - {id: D-08, system: dc48, kind: pair, size: 10, amps: 35, volts: 48, feeds: "MPPT 1 to the Lynx Distributor", protection: "40 A MIDI",
      from: {line: BR-MPPT1, at: [BR_MPPT1.x0, BR_MPPT1.cy, BR_MPPT1.cz]}, path: [[BFX - 0, ., .], [., BR_LYNX.cy + 40, BR_LYNX.cz + 40]], to: {line: BR-LYNX, at: [BR_LYNX.x0, ., .]}}
@@ -563,35 +574,35 @@ runs:
   - {id: A-01, system: ac230, kind: tps, amps: 26, volts: 230, ways: [AB], feeds: "MultiPlus-II AC-out-1 to the 230 V board", protection: "The MultiPlus-II's output, the board's main switch",
      serves: [inverter], glands: [G20, G15], along: [BD-01, BD-03, RS-K, CM-06, RS-R],
      from: {line: BR-AC, at: [BR_AC.x0, BR_AC.cy - 40, BR_AC.cz]},
-     path: [[LA_11E.x0 + 20, -1125, 2340], [4495, ., .], [., ., 1035], [G20_A_01.cx, ., .], [., G20_A_01.cy, .], [., ., UFZ - 4], [5245, ., .], [., G15_A_01.cy, .], [G15_A_01.cx, ., .]],
+     path: [[LA_11E.x0 + 20, -1125, 2340], [4495, ., .], [., ., 1035], [G20_A_01.cx, ., .], [., G20_A_01.cy, .], [., ., UFZ + 9], [5240, ., .], [., G15_A_01.cy, .], [G15_A_01.cx, ., .]],
      to: {line: EL-04, at: [., ., EL_04.z0]}}
   - {id: A-02, system: ac230, kind: tps, size: 2.5, amps: 16, volts: 230, ways: [AB], feeds: "Changeover switch to the MultiPlus-II's AC-in", protection: "16 A RCBO on the board",
      serves: [inverter], glands: [G20, G15], along: [BD-01, BD-03, RS-K, CM-06, RS-R],
      from: {line: BR-AC, at: [BR_AC.x0, BR_AC.cy - 30, BR_AC.cz]},
-     path: [[LA_11E.x0 + 20, -1140, 2340], [4495, ., .], [., ., 1035], [G20_A_02.cx, ., .], [., G20_A_02.cy, .], [., ., UFZ + 11], [5245, ., .], [., G15_A_02.cy, .], [G15_A_02.cx, ., .]],
+     path: [[LA_11E.x0 + 20, -1140, 2340], [4495, ., .], [., ., 1035], [G20_A_02.cx, ., .], [., G20_A_02.cy, .], [., ., UFZ + 20], [5240, ., .], [., G15_A_02.cy, .], [G15_A_02.cx, ., .]],
      to: {line: EL-04, at: [., ., EL_04.z0]}}
   - {id: C1, system: ac230, kind: tps, size: 2.5, amps: 10.0, volts: 230, ways: [AB, BK], feeds: "Hob, Dometic CVI1525", protection: "16 A RCBO, its current relay opens K4 and S1",
      serves: [C1], glands: [G20, G15], along: [BD-01, BD-03, RS-K, CM-06, RS-R],
      from: {line: BR-AC, at: [BR_AC.x0, BR_AC.cy - 20, BR_AC.cz]},
-     path: [[LA_11E.x0 + 20, -1140, 2370], [4465, ., .], [., ., 1005], [G20_C1.cx, ., .], [., G20_C1.cy, .], [., ., UFZ + 11], [5275, ., .], [., G15_C1.cy, .], [G15_C1.cx, ., .],
+     path: [[LA_11E.x0 + 20, -1140, 2370], [4465, ., .], [., ., 1005], [G20_C1.cx, ., .], [., G20_C1.cy, .], [., ., UFZ + 20], [5270, ., .], [., G15_C1.cy, .], [G15_C1.cx, ., .],
             [., ., BKZ + 15], [., BKY, .], [LA_07A.cx, ., .]],
      to: {line: LA-07A, at: [., ., LA_07A.z0]}}
   - {id: C2, system: ac230, kind: tps, amps: 6.3, volts: 230, ways: [AB, BK], feeds: "Oven, Camec 053632, by its outlet on the tower's side face over the bench", protection: "10 A RCBO, contactor K2",
      serves: [C2, "fixture: PO-09"], glands: [G20, G15], along: [BD-01, BD-03, RS-K, CM-06, RS-R],
      from: {line: BR-AC, at: [BR_AC.x0, BR_AC.cy - 10, BR_AC.cz]},
-     path: [[LA_11E.x0 + 20, -1140, 2355], [4480, ., .], [., ., 1020], [G20_C2.cx, ., .], [., G20_C2.cy, .], [., ., UFZ + 11], [5260, ., .], [., G15_C2.cy, .], [G15_C2.cx, ., .],
+     path: [[LA_11E.x0 + 20, -1140, 2355], [4480, ., .], [., ., 1020], [G20_C2.cx, ., .], [., G20_C2.cy, .], [., ., UFZ + 20], [5255, ., .], [., G15_C2.cy, .], [G15_C2.cx, ., .],
             [., ., BKZ + 30], [., BKY - 28, .], [PO_09.x1 - 1, ., .], [., PO_09.cy, .]],
      to: {line: PO-09, at: [., ., PO_09.z0]}}
   - {id: C3, system: ac230, kind: tps, size: 2.5, amps: 10, volts: 230, ways: [AB, BK], feeds: "Kitchen bench outlets, two double", protection: "10 A RCBO, the total power rule",
      serves: [C3, "fixture: PO-01", "fixture: PO-02"], glands: [G20, G15], along: [BD-01, BD-03, RS-K, CM-06, RS-R], passes: [PO-01],
      from: {line: BR-AC, at: [BR_AC.x0, BR_AC.cy, BR_AC.cz]},
-     path: [[LA_11E.x0 + 20, -1125, 2370], [4465, ., .], [., ., 1005], [G20_C3.cx, ., .], [., G20_C3.cy, .], [., ., UFZ - 4], [5275, ., .], [., G15_C3.cy, .], [G15_C3.cx, ., .],
+     path: [[LA_11E.x0 + 20, -1125, 2370], [4465, ., .], [., ., 1005], [G20_C3.cx, ., .], [., G20_C3.cy, .], [., ., UFZ + 9], [5270, ., .], [., G15_C3.cy, .], [G15_C3.cx, ., .],
             [., ., BKZ + 15], [., BKY - 14, .], [PO_01.x1 - 10, ., .], [., ., PO_01.z0 - 10], [PO_01.x0 + 10, ., .], [., ., BKZ + 45], [PO_02.x1 - 1, ., .], [., PO_02.cy, .]],
      to: {line: PO-02, at: [., ., PO_02.z0]}}
   - {id: C4, system: ac230, kind: tps, size: 2.5, amps: 10.4, volts: 230, ways: [AB, BK], feeds: "DauerShower 2.0 heater, up behind the sink to its technical unit", protection: "16 A RCBO, contactor K4",
      serves: [C4], glands: [G20, G15], along: [BD-01, BD-03, RS-K, CM-06, RS-R, WR-03],
      from: {line: BR-AC, at: [BR_AC.x0, BR_AC.cy + 10, BR_AC.cz]},
-     path: [[LA_11E.x0 + 20, -1125, 2355], [4480, ., .], [., ., 1020], [G20_C4.cx, ., .], [., G20_C4.cy, .], [., ., UFZ - 4], [5260, ., .], [., G15_C4.cy, .], [G15_C4.cx, ., .],
+     path: [[LA_11E.x0 + 20, -1125, 2355], [4480, ., .], [., ., 1020], [G20_C4.cx, ., .], [., G20_C4.cy, .], [., ., UFZ + 9], [5255, ., .], [., G15_C4.cy, .], [G15_C4.cx, ., .],
             [., ., BKZ + 30], [., WR_09.y0 + 60, .]],
      to: {line: WR-09, at: [., ., WR_09.z0]}}
   - {id: C5, system: ac230, kind: tps, size: 2.5, amps: 7.8, volts: 230, ways: [AB], feeds: "Truma Combi D 6 E element, under the floor along the kerb raiser, under the fill hose and up G19", protection: "10 A RCBO, contactor S1",
@@ -646,7 +657,7 @@ runs:
      to: {line: VE-01C, at: [., ., VE_01C.z0]}}
   - {id: B-05, system: dc12, kind: twin, amps: 0.5, volts: 12, lane: {CH: 3, UF: 2}, feeds: "e2 fan D, low in the front wall, road side, under the floor, across behind the air box and up G18 under the fan", protection: "The controller's output, the changeover's first auxiliary stage",
      serves: ["12 V: LUNOS e2 pairs"], glands: [G20, G18], along: [BD-01, BD-03, BD-04, RS-K],
-     from: {line: BR-UNI, at: [BR_UNI.cx + 10, BR_UNI.cy, BR_UNI.z0]}, path: [[., ., LA_11E.z0 + 30], [CHX + L_CH, DCR_Y, .], [., ., ESZ], [G20_B_05.cx, G20_B_05.cy, .], [., ., UFZ - L_UF], [CM_04.x0 - 42, ., .], [., -555, LOWZ], [2300, ., .], [., ., 420], [., G18.cy, .], [G18.cx, ., .], [., ., floor_z]],
+     from: {line: BR-UNI, at: [BR_UNI.cx + 10, BR_UNI.cy, BR_UNI.z0]}, path: [[., ., LA_11E.z0 + 30], [CHX + L_CH, DCR_Y, .], [., ., ESZ], [G20_B_05.cx, G20_B_05.cy, .], [., ., UFZ - L_UF], [CM_04.x0 - 47, ., .], [., -555, LOWZ], [2300, ., .], [., ., 420], [., G18.cy, .], [G18.cx, ., .], [., ., floor_z]],
      to: {line: VE-01D, at: [., ., VE_01D.z0]}}
   - {id: B-06, system: dc12, kind: twin, amps: 0.5, volts: 12, lane: 3, feeds: "Wet room extract, LUNOS RA 15-60, high in the rear wall", protection: "The controller's output",
      serves: ["12 V: RA 15-60 and controller"], passes: [WR-03], along: [BD-02], from: {line: BR-UNI, at: [BR_UNI.cx, BR_UNI.cy, BR_UNI.z1]},
@@ -835,7 +846,7 @@ runs:
      to: {line: SK-01, at: [., ., SK_01.z0]}}
   - {id: Q-01, system: diesel, kind: fuel4, feeds: "Diesel from the heater tank's pick-up to the Combi D 6 E, under the floor and up G9", protection: "The tank's filter, the Combi's own pump",
      serves: [diesel], glands: [G9], along: [BD-01, RL-R, RS-R], from: {line: UF-06, at: [UF_06.x1 - 14, UF_06.y1, UF_06.cz]},
-     path: [[UF_06.x1 - 32, UF_06.y1 + 60, UFZ - 40], [UF_06.x1 - 47, G9_Q_01.cy - 58, .], [G9_Q_01.cx, G9_Q_01.cy, .], [., ., floor_z + 230], [., LA_03.y0 + 85, .]], to: {line: LA-03, at: [LA_03.x0, ., .]}}
+     path: [[UF_06.x1 - 32, UF_06.y1 + 60, UFZ - 40], [UF_06.x1 - 55, G9_Q_01.cy - 58, .], [G9_Q_01.cx, G9_Q_01.cy, .], [., ., floor_z + 230], [., LA_03.y0 + 85, .]], to: {line: LA-03, at: [LA_03.x0, ., .]}}
   # ================================================================ the wet room: home runs from the partition's road corner (WT-MAN), the kerb half's
   # fittings by the wet room's ceiling over the inner door, the wastes into the grey tank's top under the wet room
   - {id: F-11, system: fresh, kind: pex12, feeds: "Cold trunk from the cabinet's manifold under the e2 fan and through the partition to the wet room's manifold", protection: "-",
@@ -853,7 +864,7 @@ runs:
      to: {line: WR-06, at: [., ., WR_06.z1]}}
   - {id: F-14, system: fresh, kind: pex12, feeds: "Cold to the washer's tap behind the dryer, across the wet room's ceiling and back through the partition above the cassette bin", protection: "-", serves: ["water: washer"],
      passes: [WR-03], along: [WR-03, BD-02, BD-03, LA-14], from: {line: WT-MAN, at: [WT_MAN.x1, WT_MAN.y1 - 10, WT_MAN.z1 - 20]},
-     path: [[5268, ., .], [., WT_MAN.y1 + 140, .], [., ., WCZ], [5370, ., .], [., KW_Y, .], [., ., 1950], [WT_01.x1 + 40, ., .], [., KW_Y + 23, .], [., ., WT_01.cz], [., KW_Y, .]], to: {line: WT-01, at: [WT_01.x1, ., .]}}
+     path: [[5268, ., .], [., WT_MAN.y1 + 140, .], [., ., WCZ], [5370, ., .], [., KW_Y, .], [., ., 1950], [WT_01.x1 + 40, ., .], [., KW_Y - 15, .], [., ., WT_01.cz], [., KW_Y, .]], to: {line: WT-01, at: [WT_01.x1, ., .]}}
   - {id: F-10, system: fresh, kind: fillhose, sleeve: true, feeds: "The washer's fill hose from its tap, along the chase to the washer's back, in its dielectric sleeve", protection: "The tap's non-return valve",
      serves: ["water: washer"], along: [LA-14, LA-02], from: {line: WT-01, at: [WT_01.x0, WT_01.cy, WT_01.cz]}, path: [[4580, ., .]], to: {line: LA-02, at: [4520, LA_02.y0, .]}}
   - {id: F-15, system: fresh, kind: pex12, feeds: "Cold up to the shower bypass mixer", protection: "-", serves: ["water: shower bypass"],
@@ -879,10 +890,10 @@ runs:
      path: [[., ., 1380], [G15_W_01.cx, ., .], [., G15_W_01.cy, .], [., ., 775], [5325, ., .], [., 450, .]], to: {line: UF-08, at: [., ., UF_08.z1]}}
   - {id: W-02, system: waste, kind: drain16, pumped: true, sleeve: true, feeds: "The washer's drain hose, up behind the dryer above the battery's zone and through the partition into the basin", protection: "The washer's drain pump",
      serves: [washer drain], passes: [WR-03], along: [WR-03, LA-14], from: {line: LA-02, at: [4450, LA_02.y0, 1400]},
-     path: [[., KW_Y, .], [., ., 1850], [WFX + 7, ., .], [., WR_08.y0 + 200, .]], to: {line: WR-08, at: [., ., WR_08.z1]}}
+     path: [[., KD_Y, .], [., ., 1850], [WFX + 7, ., .], [., WR_08.y0 + 200, .]], to: {line: WR-08, at: [., ., WR_08.z1]}}
   - {id: W-03, system: waste, kind: drain16, pumped: true, feeds: "The heat-pump dryer's condensate pump hose from its back, through the partition into the basin", protection: "The dryer's pump",
      serves: [dryer drain], passes: [WR-03], along: [WR-03, LA-14], from: {line: LA-14, at: [rear_x0 - 35, LA_14.y0, 1800]},
-     path: [[., KW_Y, .], [WFX + 7, ., .], [., WR_08.y0 + 140, .]], to: {line: WR-08, at: [., ., WR_08.z1]}}
+     path: [[., KD_Y, .], [WFX + 7, ., .], [., WR_08.y0 + 140, .]], to: {line: WR-08, at: [., ., WR_08.z1]}}
   - {id: W-04, system: waste, kind: dwv40, feeds: "Basin waste from its trap down G13 into the grey tank's top", protection: "The basin's trap",
      serves: [basin waste], glands: [G13], passes: [WR-01], from: {line: BS-02, at: [BS_02.cx, BS_02.cy, BS_02.z0]},
      path: [[., ., UFZ - 30]], to: {line: UF-08, at: [., ., UF_08.z1]}}

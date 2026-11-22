@@ -806,7 +806,8 @@ def _floor_groups(glands: list[dict]) -> list[list[dict]]:
     for x in (g for g in glands if g["at"] == "floor"):
         hit = [gr for gr in groups if any(math.dist((x["x"], x["y"]), (y["x"], y["y"])) < GROUP_MM for y in gr)]
         groups = [gr for gr in groups if not any(gr is h for h in hit)] + [[x] + [y for gr in hit for y in gr]]
-    return sorted((sorted(gr, key=lambda g: (g["x"], g["y"])) for gr in groups if len(gr) > 1), key=lambda gr: gr[0]["x"])
+    return sorted((sorted(gr, key=lambda g: (g["x"], g["y"])) for gr in groups if len(gr) > 1 or any(_is_frame(g) for g in gr)),
+                  key=lambda gr: gr[0]["x"])
 
 
 def _gland_details(sh, lay, V, glands, top: float, x0: float = 24.0, x1: float = 226.0, bottom: float = 13.0, fits: dict | None = None):

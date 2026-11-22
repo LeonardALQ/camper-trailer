@@ -234,10 +234,11 @@ def check_rows(res: dict, ev: dict) -> list[dict]:
                        measured=e["margin"], unit="mm spare", margin=e["margin"], governing=e["governing"])
         elif c["kind"] == "spacing":
             sp = res["data"]["rules"]["spacing"]
-            row.update(limit=f"each run's radius plus {sp['gap_mm']:g} mm, a wet line {sp['wet_ac_mm']:g} mm from 230 V, lane neighbours may touch",
+            ac = sorted({v.get("ac230", 0) for v in sp["wet"].values() if v})
+            row.update(limit=f"each run's radius plus {sp['gap_mm']:g} mm, a wet line {ac[0]:g} to {ac[-1]:g} mm from 230 V by its kind, lane neighbours may touch",
                        measured=e["margin"], unit="mm spare", margin=e["margin"],
                        governing=f"{e['governing']}, {e['pairs']} pairs measured, {e['overlaps']} overlapping")
-        row["detail"] = "; ".join(e["problems"][:3]) if e["problems"] else f"{row.get('governing') or ''}".strip()
+        row["detail"] = ". ".join(e["problems"][:3]) if e["problems"] else f"{row.get('governing') or ''}".strip()
         row["status"] = ("PASS" if row["ok"] else "FAIL") if c["severity"] == "fail" else ("MEETS LIMIT" if row["ok"] else "REPORTED")
         rows.append(row)
     return rows

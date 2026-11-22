@@ -964,13 +964,17 @@ def _shared_ways(res: dict) -> set:
 
 def need_mm(a: dict, b: dict, rule: dict, neighbours: set) -> float:
     """SVC-08's least gap between two runs' surfaces: none between cables of one band that share a way (one loom),
-    the wet lines' distance between a water, waste or diesel line and a 230 V run, else the rule's gap."""
+    a water, waste, vent or diesel line's own distance from a cable of each band (rule spacing.wet, by the line's
+    system), else the rule's gap."""
     sp = rule["spacing"]
     if band(a) and band(a) == band(b) and band(a) in sp["touch"] and frozenset((a["id"], b["id"])) in neighbours:
         return 0.0
-    wet = {a["system"], b["system"]} & set(WETS)
-    if wet and "ac230" in (a["system"], b["system"]):
-        return float(sp["wet_ac_mm"])
+    for w, c in ((a, b), (b, a)):
+        if w["system"] in WETS and band(c):
+            kind = "fresh" if w["id"] in (sp.get("tempered") or []) else w["system"]
+            if kind == "waste" and w.get("rigid") and band(c) == "ELV" and sp.get("rigid_waste_elv_gap"):
+                return float(sp["gap_mm"])   # a solvent-welded pipe: no joint between the trap and the tank
+            return float(max(sp["gap_mm"], (sp["wet"].get(kind) or {}).get(band(c), 0.0)))
     return float(sp["gap_mm"])
 
 
@@ -1009,22 +1013,41 @@ def _over(wet: dict, ac: dict, reach: float, floor: tuple, zones: list | None = 
     return None
 
 
+FRAME_DEPTH = 60.0   # a Roxtec RM module's depth, flush with the floor's top face and 30 mm below its underside
+
+
+def _split_z(pts: list, zs) -> list:
+    """The polyline with a point added wherever a segment crosses one of the heights `zs`."""
+    out = [pts[0]]
+    for a, b in zip(pts, pts[1:]):
+        cuts = sorted(((z - a[2]) / (b[2] - a[2]) for z in zs if (a[2] - z) * (b[2] - z) < 0), key=float)
+        for t in cuts:
+            out.append((a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t))
+        out.append(b)
+    return out
+
+
 def spacing(res: dict) -> dict:
     """SVC-08: every run keeps its own radius plus a gap from every other run, so no two pass through each other and
     each can be clipped on its own. Cables of one band that share a way are one loom and may touch their lane
-    neighbours. A water, waste or diesel line keeps the wet lines' distance from a 230 V run and never passes over one
-    within that distance in plan, the floor panel aside. The stretches inside a box both runs end at are on its
-    terminals and are not measured."""
+    neighbours. A water, waste, vent or diesel line keeps its kind's distance from each cable (rule spacing.wet) and
+    never passes over a 230 V run within the rule's over_mm in plan, the floor panel aside. The stretches inside a box
+    both runs end at are on its terminals, and those inside a transit frame both pass are in their own modules, so
+    neither is measured."""
     rule = res["data"]["rules"]
     sp = rule["spacing"]
     neighbours = _shared_ways(res)
     boxes = {b["iid"]: b["box"] for b in res["blocks"] if b.get("box")} | {b["id"]: b["box"] for b in res["blocks"] if b.get("box")}
     boxes |= {k: f["box"] for k, f in res["fixtures"].items()}
     runs = res["runs"]
-    segs = {r["id"]: [(p, q, _aabb((p, q), r["od"] / 2)) for p, q in _segs(r["dense"])] for r in runs}
-    hull = {r["id"]: _aabb(r["dense"], r["od"] / 2) for r in runs}
     floor = (res["V"]["floor_z"], res["V"]["floor_underside_z"])
-    reach = max(sp["gap_mm"], sp["wet_ac_mm"])
+    # the floor's planes and a frame's foot split each run, so a stretch is wholly under the floor, in a frame or above
+    planes = (floor[1], floor[0], floor[0] - FRAME_DEPTH)
+    segs = {r["id"]: [(p, q, _aabb((p, q), r["od"] / 2)) for p, q in _segs(_split_z(r["dense"], planes))] for r in runs}
+    hull = {r["id"]: _aabb(r["dense"], r["od"] / 2) for r in runs}
+    frames = {g: (v["p"][0] - v["w"] / 2, v["p"][1] - v["h"] / 2, floor[0] - FRAME_DEPTH, v["p"][0] + v["w"] / 2, v["p"][1] + v["h"] / 2, floor[0])
+              for g, v in res["glands"].items() if v.get("cells")}
+    reach = max([sp["gap_mm"], sp["over_mm"]] + [v for d in sp["wet"].values() for v in (d or {}).values()])
     duct = [boxes[sp["duct"]]] if sp.get("duct") in boxes else []
     problems, rows, n_pairs, overlaps = [], [], 0, 0
     for i, a in enumerate(runs):
@@ -1032,7 +1055,12 @@ def spacing(res: dict) -> dict:
             if not _hit(_aabb([hull[a["id"]][:3], hull[a["id"]][3:]], reach), hull[b["id"]]):
                 continue
             need = need_mm(a, b, rule, neighbours)
-            common = [boxes[k] for k in _end_lines(a) & _end_lines(b) if k in boxes] + duct
+            # a hot line's or a waste's distance from the extra-low-voltage cables holds inside the trailer: under the
+            # floor every run is open to the road's spray and a waste's drip falls to the road, so the gap holds there
+            under = sp.get("elv_inside_only") and band(a) != "ac230" and band(b) != "ac230" and need > sp["gap_mm"]
+            # inside a transit frame both runs pass, each lies in its own sealed module
+            common = [boxes[k] for k in _end_lines(a) & _end_lines(b) if k in boxes] + duct + \
+                [frames[g] for g in _ids(a, "glands") & _ids(b, "glands") if g in frames]
             inside = lambda p, q: any(_in_box(p, c, 1.0) and _in_box(q, c, 1.0) for c in common)  # noqa: E731
             m, at = math.inf, None
             for p1, q1, b1 in segs[a["id"]]:
@@ -1041,6 +1069,8 @@ def spacing(res: dict) -> dict:
                 for p2, q2, b2 in segs[b["id"]]:
                     if _hit(_aabb([b1[:3], b1[3:]], need), b2) and not inside(p2, q2):
                         d = seg_seg(p1, q1, p2, q2) - a["od"] / 2 - b["od"] / 2
+                        if under and max(p1[2], q1[2], p2[2], q2[2]) <= floor[1] + 0.5:
+                            d += need - sp["gap_mm"]   # both stretches under the floor: measured against the gap
                         if d < m:
                             m, at = d, p1
             if at is None:
@@ -1055,7 +1085,7 @@ def spacing(res: dict) -> dict:
     zones = [tuple(_eval(v, res["ns"]) for v in z["box"]) for z in rule.get("conduit", [])]
     for w in wet:
         for c in (r for r in runs if r["system"] == "ac230"):
-            hit = _over(w, c, sp["wet_ac_mm"], floor, zones)
+            hit = _over(w, c, sp["over_mm"], floor, zones)
             if hit:
                 p, q = hit
                 problems.append(f"{w['id']} passes over the 230 V run {c['id']} at X {p[0]:.0f} Y {p[1]:.0f}, {p[2] - q[2]:.0f} mm above it")

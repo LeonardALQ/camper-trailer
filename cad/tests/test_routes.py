@@ -39,7 +39,10 @@ def test_limits_are_the_rules():
     r = RES["data"]["rules"]
     assert (r["clear_mm"], r["segregation_mm"], r["drop_pct"], r["drop_ac_pct"], r["fall"], r["terminal_face"]["mm"]) == (20, 50, 2.0, 5.0, 0.02, 300)
     assert set(r["terminal_face"]["exempt"]) == {"W-02", "F-10"}
-    assert (r["spacing"]["gap_mm"], r["spacing"]["wet_ac_mm"], set(r["spacing"]["touch"])) == (5, 25, {"ELV", "ac230"})
+    sp = r["spacing"]
+    assert (sp["gap_mm"], sp["over_mm"], set(sp["touch"])) == (5, 25, {"ELV", "ac230"})
+    assert sp["wet"]["fresh"]["ac230"] == 25   # IB 052/2015, cold water above ground
+    assert (sp["wet"]["hot"], sp["wet"]["waste"]) == ({"ac230": 50, "ELV": 25}, {"ac230": 50, "ELV": 25})
 
 
 def test_a_ways_pitch_is_its_largest_cable_or_pipe():
@@ -81,6 +84,22 @@ def test_every_frame_cell_is_inside_its_frame_and_clear_of_the_others():
         for i, a in enumerate(boxes):
             for b in boxes[i + 1:]:
                 assert a[3] <= b[1] + 1e-6 or b[3] <= a[1] + 1e-6 or a[4] <= b[2] + 1e-6 or b[4] <= a[2] + 1e-6, (g["id"], a[0], b[0])
+
+
+def test_bd11s_routed_item_follows_the_routes_and_the_line_adds_to_its_total():
+    """I2-19: BD-11's routed item is the routed runs' mass (bd11_routed_kg) above the three items they price, the
+    allowance not yet given to a part is the rest, and the items add to the line's 53.6 kg."""
+    import yaml
+    items = yaml.safe_load((R.DATA / "assemblies" / "trailer.yaml").read_text(encoding="utf-8"))["items"]
+    parts = next(it for it in items if it["id"] == "BD-11")["parts"]
+    routed = round(R.totals(RES)["lines"]["BD-11"]["mass_kg"], 2)
+    priced = sum(p["kg"] for p in parts if p["item"].startswith(("12 and 24 V wiring", "230 V wiring", "Fresh water pipework")))
+    item = next(p for p in parts if p["item"].startswith("The routed runs priced here"))
+    allow = next(p for p in parts if p["item"].startswith("Allowance not yet given"))
+    assert priced == pytest.approx(25.0)
+    assert item["kg"] == pytest.approx(routed - priced, abs=0.051), (item["kg"], routed)
+    assert f"{routed:.1f} kg routed" in item["item"]
+    assert allow["kg"] >= 0 and sum(p["kg"] for p in parts) == pytest.approx(53.6, abs=0.001)
 
 
 def test_svc01_tests_the_keep_clear_boxes_up_to_the_ceilings_services_zone():

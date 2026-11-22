@@ -131,7 +131,7 @@ params:
   axle_x: 4381               # axle group centre from the ball. The build solves it: the middle of the towball window (H17)
   # ---------------------------------------------------------------- water (H13)
   water_full_l: 420          # the fresh tanks' net capacity, filled at camp with the transfer pump, CR45 filter and chlorine (H13)
-  water_travel_l: 300        # most fresh and grey water aboard while towing: H13's 350 L less 30 L by H21 after the final review, 10 L more by H21 after the fix-pass review (MAS-10 7.7 kg over at 320 L), 5 L more after the re-check (MAS-10 1.9 kg over at 310 L), and 5 L more after the second re-check (MAS-10 2.5 kg over at 305 L). Less if the 7,400 kg GCM revision is refused (GCM-01, H20)
+  water_travel_l: 295        # most fresh and grey water aboard while towing: H13's 350 L less 30 L by H21 after the final review, 10 L more by H21 after the fix-pass review (MAS-10 7.7 kg over at 320 L), 5 L more after the re-check (MAS-10 1.9 kg over at 310 L), 5 L more after the second re-check (MAS-10 2.5 kg over at 305 L), and 5 L more after the iteration-2 re-check (MAS-10 3.9 kg over at 300 L with the floor's transit frames, the board's duct and the SB120 plug). Less if the 7,400 kg GCM revision is refused (GCM-01, H20)
   water_highway_l: 50        # owner's highway figure
   grey_full_l: 130           # grey tank's net capacity (report 21 section 10)
   tank_z0: rail_underside_z
@@ -196,7 +196,7 @@ build_order:
   - {stage: B4, label: "bearer strips, tanks and guards, air box, floor, shower well and wet room tray",
      fits: {underfloor: tanks, CH-S01: Bearer strips, RG-04: air box, BD-01: floor, WR-10: shower well, WR-01: tray}}
   - {stage: B5, label: "walls with their stiffeners and hardpoints, roof, doors and windows", fits: {body: Walls, BD-18: stiffeners, LB-06: hardpoints}}
-  - {stage: B6, label: "cables and pipework", fits: {BD-11: Cables}}
+  - {stage: B6, label: "cables and pipework", fits: {BD-11: Cables, BD-25: Cables}}
   - {stage: B7, label: fit-out,
      fits: {electrical: Battery box, hvac: split, living: appliances, bed: lift bed, wet_room: wet room, stowage: drawbar box, spare: spare wheel, roof: solar,
             DB-04: stone guard, BD-13: awning, BD-16: steps, WN-05: blackout covers, LG-01: lamps, LG-02: lamps}}
@@ -571,9 +571,24 @@ items:
       - {item: "Switches, fuse blocks, terminals, lugs, heat shrink, conduit, glands and ties", kg: 5.0, basis: estimate}
       - {item: "Fresh water pipework: 36 m of 12 mm PEX, 47 push-fit fittings, tank fittings, breathers and the wastes", kg: 4.0, basis: estimate}
       - {item: "General hardware: rivnuts, screws, brackets and P-clips", kg: 6.0, basis: estimate}
-      - {item: "The routed runs priced here above the four items' estimates: 38.5 kg routed against 25.0 kg (data/routes.yaml, H28), at the routes' estimated masses a metre", kg: 13.5, basis: estimate}
-      - {item: "Allowance not yet given to a part, kept until the systems design", kg: 2.0, basis: estimate}
+      - {item: "The routed runs priced here above the three items' estimates (the 12 and 24 V wiring, the 230 V wiring and the fresh water pipework): 40.0 kg routed against 25.0 kg (bd11_routed_kg, data/routes.yaml, H28), at the routes' estimated masses a metre", kg: 15.0, basis: estimate}
+      - {item: "Allowance not yet given to a part, kept until the systems design: the rest of the line's 53.6 kg", kg: 0.5, basis: estimate}
     note: "The older block model's 60 kg (report 12 section 10), listed line by line (est.). The lamps, about 4 kg, are line LG-01. Reports 20 and 21 leave the house wiring and the fresh water pipework here. The jockey's spacers (DB-08), the diesel tank's cradle (UF-06B) and the side marker mounts (LG-02), 2.4 kg, came out of the allowance (H27)"
+  - id: BD-25
+    name: Floor transit frames G9, G15 and G20, Roxtec RM modules in 4 mm aluminium frames bonded into the floor's cut-outs (data/services.yaml)
+    material: "Roxtec RM Multidiameter modules (EPDM rubber) and solid modules, 4 mm 5052 aluminium frames with an 8 mm rim, stayplates, compression wedges and Roxtec's lubricant"
+    system: electrical
+    price:
+      - {item: "Roxtec RM modules for the runs and solid modules to fill the packing spaces: 25 RM 15 and 7 RM 20 at about AUD 25, 17 RM 30 and 2 RM 40 at about AUD 35, 1 RM 60 at about AUD 60", aud: 1525, basis: estimate, date: 2026-11-22, note: "From RS Components' listing of the RM 20 at EUR 14.92 (read 22 Nov 2026) at about AUD 1.65 a euro, the other sizes scaled (est.)"}
+      - {item: "Three 4 mm aluminium frames made to the packing spaces, 156 x 110, 180 x 60 and 30 x 75 mm, with their rims", aud: 360, basis: estimate, date: 2026-11-22}
+      - {item: "Three compression wedges, eight stayplates and the assembly lubricant", aud: 350, basis: estimate, date: 2026-11-22}
+    point: [4863, -24, floor_z - 15]
+    parts:
+      - {item: "Roxtec RM modules, 52: 25 RM 15 at 0.02 kg, 7 RM 20 at 0.04, 17 RM 30 at 0.08, 2 RM 40 at 0.14 and 1 RM 60 at 0.32, as supplied", kg: 2.74, basis: maker, source: "Roxtec RM module with Multidiameter, product page (www.roxtec.com), read 22 Nov 2026"}
+      - {item: "Three frames, 4 mm 5052 aluminium, 60 mm deep, with an 8 mm rim: 0.39, 0.36 and 0.16 kg at 2.68 t/m3", kg: 0.91, basis: calculated}
+      - {item: "Three compression wedges at about 0.15 kg", kg: 0.45, basis: estimate}
+      - {item: "Eight stayplates and the lubricant", kg: 0.21, basis: estimate}
+    note: "The floor's three multi-cable penetrations (I2-14, I2-24): the kerb frame G20 under the plinth's end slot, the road frame G15 under the MultiPlus-II and the Combi's frame G9 at the tower's bed-side end, each module round its run and the rest of each packing space filled with solid modules, compressed from above, so nothing is turned under the floor. The round glands they replace were in BD-11's glands and ties item, which keeps them as a margin (est.). The point is the frames' mass-weighted centre (est.)"
   - id: LG-02
     name: Side marker mounts, six 3 mm aluminium caps riveted over the ends of the outriggers that carry the side marker lamps
     material: "3 mm 5052 aluminium plate, stainless rivets over Duralac"
@@ -1145,6 +1160,7 @@ items:
       - {item: "230 V board: enclosure, inlet, main switch, eleven RCBOs, three contactors, three current relays, 300 A DC isolator, Anderson SB50", aud: 1480, basis: estimate, date: 2026-11-20}
       - {item: "Generator inlet and changeover: a second 15 A appliance inlet beside the shore inlet, and a 2-pole 20 A cam changeover switch, SHORE - OFF - GENERATOR, with two auxiliary contact stages and a neutral-earth bonding contact made on GENERATOR only (Kraus & Naimer CA10 class)", aud: 250, basis: estimate, url: "https://www.krausnaimer.com/fileadmin/user_upload/Kraus_u_Naimer/Pdfcat/Local/AUS/CA10_CAD11_CAD12_ver2.pdf", date: 2026-11-21, note: "Inlet about AUD 50, switch with its bonding contact about AUD 180, labels and the e2 and Cerbo leads about AUD 20 (est.)"}
       - {item: "Board panel 800 x 700 mm and the wiring on it", aud: 150, basis: estimate, date: 2026-11-20}
+      - {item: "Slotted PVC wiring duct 60 x 80 mm with its cover on the board panel, 2.6 m along its foot, up its sides and across its top", aud: 65, basis: estimate, date: 2026-11-22}
     point: [rear_x0 - 100, -560, ceiling_z - 500]
     parts:
       - {item: "Victron Lynx Distributor (M10)", kg: 1.5, basis: estimate, source: "Report 20 E-03"}
@@ -1152,6 +1168,7 @@ items:
       - {item: "230 V board: 15 A inlet with a 16 A RCBO, main switch, ten 30 mA RCBOs, three contactors, three current relays, 300 A DC isolator, Anderson SB50", kg: 4.7, basis: estimate, source: "Report 20 E-12"}
       - {item: "Generator inlet and the changeover switch with its two auxiliary stages", kg: 0.5, basis: estimate}
       - {item: "Board panel 800 x 700 mm and the wiring on it", kg: 5.0, basis: estimate, source: "Report 20 E-13"}
+      - {item: "Slotted PVC wiring duct 60 x 80 mm, 2.6 m at about 0.55 kg a metre with its cover. Its busiest section, 140 mm over the cabinet's floor, carries 25 control and branch cables of 1,596 mm2 outside area (cad/routes.py on the routed sizes), 73 % of the 2,184 mm2 that Panduit's 50 % fill allows in its 56 x 78 mm inside (est.). The four heavy cables D-06, D-07, D-14 and B-16 are cleated to the panel to their terminals, outside the duct", kg: 1.4, basis: estimate}
   - id: EL-07
     name: Main DC cables and lugs, bank 70 mm2, inverter 50 mm2, MPPT and converters 10 mm2
     material: "Tinned flexible copper, double insulated"

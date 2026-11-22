@@ -130,7 +130,7 @@ Research report 19's load calculation gives a design hot day of 37.1 kWh of heat
 
 - Fresh: two welded HDPE tanks over the axles hold 420 L, filled at camp through a Puretec CR45 filter by hose or the creek transfer pump, with a chlorine dose. A Shurflo Trail King 7 at 2.1 bar feeds every outlet, the drinking tap through a CR-Z2 filter and a UV purifier. The Combi's 10 L boiler gives hot water through a 50 °C mixing valve (CT-611, CT-612).
 - Grey: every drain falls by gravity to a 130 L tank in the rear bay, with a valve and a camlock on the kerb side. It travels empty (CT-003's operating limits), TC7 and TC8 check the trailer with it full, and a 40 L tote serves longer stays.
-- Budget for two a day: showers 10 L, dishes 8, drinking 6, basin 6, outdoor rinse 4, cooking 3, flush 2 and cleaning 2, so 41 L, 27 L of it to grey. A wash adds 44 L. The 300 L aboard lasts about 7 days without laundry, and the full tanks 7 days with three washes. The grey tank holds 72 h with one wash.
+- Budget for two a day: showers 10 L, dishes 8, drinking 6, basin 6, outdoor rinse 4, cooking 3, flush 2 and cleaning 2, so 41 L, 27 L of it to grey. A wash adds 44 L. The 295 L aboard lasts about 7 days without laundry, and the full tanks 7 days with three washes. The grey tank holds 72 h with one wash.
 
 ## Running gear and coupling
 
