@@ -36,9 +36,15 @@ def test_totals_add_up():
     cont = sub * TOT["contingency_pct"] / 100
     assert abs(cont - TOT["contingency_aud"]) < 0.01
     assert abs(sub + cont - TOT["total_aud"]) < 0.01
-    owner = sub + cont - by["fabrication"] * (1 + TOT["contingency_pct"] / 100)
-    assert abs(owner - TOT["owner_built_total_aud"]) < 0.01
     assert abs(sum(ln["mass"]["kg"] for ln in LINES) - TOT["mass_kg_lines"]) < 0.01
+
+
+def test_one_total_with_no_hired_labour_or_certification():
+    """Leonard builds the box himself and does not certify it (decision H25), so the list has no labour or review line
+    and one total."""
+    assert not {"fabrication", "compliance"} & set(BOX["groups"]), "the box still has a labour or review group"
+    assert not {"fabrication", "compliance"} & {ln["group"] for ln in LINES}
+    assert "owner_built_total_aud" not in TOT, "the box has one total"
 
 
 def test_every_line_with_mass_names_a_model_part():

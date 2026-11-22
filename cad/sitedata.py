@@ -42,11 +42,12 @@ RESEARCH = [
     ("22-trailer-prices.md", "Trailer prices outside the new interior", 22),
     ("25-roof.md", "Roof study, fixed roof against a raising roof", 25),
     ("26-elite-wheels.md", "What the Lovells Elite kit needs from the wheels, track and brakes", 26),
+    ("27-car-build-scope.md", "The car build’s scope, the injectors, the driveline for level B and the trailer’s weld evidence", 27),
 ]
 # research reports 23 and 24 are the car build and bike box plans themselves, so the index points at their pages
 RESEARCH_PLANS = [("23", "The car build plan", "`VEHICLE.md`, the Car build page", "../tow-vehicle/"),
                   ("24", "The bike box design", "`UTE-GARAGE.md`, the Bike box page", "../ute-garage/")]
-# sections of VEHICLE.md shown on the Car build page, in order. The stage table, the parts list and every total are
+# sections of VEHICLE.md shown on the Car build page, in order. The stage table, the three lists and every total are
 # rendered from data/vehicle/vehicle-parts.yaml instead, so the page types no figure itself.
 VEHICLE_TOP = ("Summary", "Stage plan")
 VEHICLE_END = ("Limits to build and drive to", "Legal path", "Decisions", "Open points and the assumption used")
@@ -60,9 +61,10 @@ SYSTEMS = {
     "towing": "Towing and trailer charging", "freight_weighing": "Freight and weighing", "fuel_tank": "Long-range fuel tank",
     "bar_winch": "Bull bar and winch, only if the truck has none",
 }
-STATUSES = ("required", "contingency", "optional")
-PRIORITIES = {"P1": "Safe, legal and reliable towing, or protecting the truck", "P2": "The 224 kW minimum",
-              "P3": "Optional, comfort or a cost cut"}
+STATUSES = ("build", "check", "optional")
+LISTS = {"build": "Build", "check": "Check list", "optional": "Optional"}
+PRIORITIES = {"P1": "Legal, safe and able to tow, or protecting the truck", "P2": "The 224 kW minimum",
+              "P3": "Optional or comfort"}
 
 # the sheet's footer sums every number column of the tables wrapped in these (site/src/scripts/sheet.ts)
 SUMS_OPEN, SUMS_CLOSE = '<div data-sheet-sum="sum">\n\n', "\n</div>\n\n"
@@ -118,39 +120,114 @@ def project() -> dict:
 
 
 def car_totals(data, budget) -> dict:
-    """Every total of the car build, worked out from its lines: by status, priority, stage and system, and the
-    figures against Leonard's build budget, with the fewest cuts that close the gap (of those, the set that saves least,
-    named in the list's order). The figures against
-    the budget add up whole dollars (the required total and the savings rounded first), so the Totals table adds up
-    as shown and matches VEHICLE.md."""
+    """Every total of the car build, worked out from its lines: by list (build, check, optional), priority, stage and
+    system, the build's one allowance by its rule (allowance_pct of each build line by its price basis, decision H24),
+    and the figures against Leonard's build budget, with the fewest cuts that close the gap (of those, the set that saves
+    least, named in the list's order). A cut saves its line and that line's share of the allowance. The figures against
+    the budget add up whole dollars, so the Totals table adds up as shown and matches VEHICLE.md."""
     sums = {}
     for it in data["items"]:
         for key in ((it["status"],), ("priority", it["priority"], it["status"]), ("stage", it["stage"], it["status"]),
                     ("system", it["system"], it["status"])):
             sums[key] = sums.get(key, 0.0) + it["price_aud"]
-    req = round(sums.get(("required",), 0.0))
-    allow = data["totals_aud"]["contingency_allowance"]
-    gap = req + allow - budget
-    closing, saved = [c["id"] for c in data["cuts"]], sum(c["saving_aud"] for c in data["cuts"])
-    if gap <= 0:
-        closing, saved = [], 0.0
-    for n in range(1, len(data["cuts"]) + 1):
-        fits = [s for s in combinations(data["cuts"], n) if sum(c["saving_aud"] for c in s) >= gap]
-        if gap > 0 and fits:
-            best = min(fits, key=lambda s: sum(c["saving_aud"] for c in s))
-            closing, saved = [c["id"] for c in best], sum(c["saving_aud"] for c in best)
-            break
-    saved, cuts = round(saved), round(sum(c["saving_aud"] for c in data["cuts"]))
-    return dict(sums=sums, required=req, contingency_lines=round(sums.get(("contingency",), 0.0)),
-                optional=round(sums.get(("optional",), 0.0)), allowance=allow, with_contingency=req + allow, budget=budget,
-                gap=gap, closing=closing, closing_saving=saved, with_closing=req + allow - saved, cuts=cuts,
-                with_cuts=req - cuts + allow)
+    pct = data["totals_aud"]["allowance_pct"]
+    line = {it["id"]: it for it in data["items"]}
+    build = round(sums.get(("build",), 0.0))
+    allow = round(sum(it["price_aud"] * pct[it["price_basis"]] / 100 for it in data["items"] if it["status"] == "build"))
+    saves = {c["id"]: c["saving_aud"] + line[c["replaces"]]["price_aud"] * pct[line[c["replaces"]]["price_basis"]] / 100
+             for c in data["cuts"]}
+    gap = build + allow - budget
+    closing, saved = [], 0.0
+    if gap > 0:
+        closing, saved = [c["id"] for c in data["cuts"]], sum(saves.values())
+        for n in range(1, len(data["cuts"]) + 1):
+            fits = [s for s in combinations(data["cuts"], n) if sum(saves[c["id"]] for c in s) >= gap]
+            if fits:
+                best = min(fits, key=lambda s: sum(saves[c["id"]] for c in s))
+                closing, saved = [c["id"] for c in best], sum(saves[c["id"]] for c in best)
+                break
+    saved, cuts = round(saved), round(sum(saves.values()))
+    return dict(sums=sums, build=build, check=round(sums.get(("check",), 0.0)), optional=round(sums.get(("optional",), 0.0)),
+                allowance=allow, allowance_pct=pct, with_contingency=build + allow, budget=budget, gap=gap, closing=closing,
+                closing_saving=saved, with_closing=build + allow - saved, cuts=cuts, with_cuts=build + allow - cuts,
+                cut_saves={k: round(v) for k, v in saves.items()},
+                every_line=round(sum(sums.get((s,), 0.0) for s in STATUSES)))
+
+
+def _names(ids):
+    return " and ".join(ids) if len(ids) < 3 else ", ".join(ids[:-1]) + " and " + ids[-1]
+
+
+def _car_lists(data, T):
+    """The build, the purchase check list and the optional extras, one spreadsheet each."""
+    pct = T["allowance_pct"]
+    rows = {s: [it for it in data["items"] if it["status"] == s] for s in STATUSES}
+    link = lambda it: f"[{_cell(it['name'])}]({it['link']})" if it.get("link") else _cell(it["name"])
+    deps = lambda it: ", ".join(it.get("depends_on") or [])
+    out = [f"### The build\n\nThe upgrades and what makes them legal and able to tow. Priced and counted, with one allowance of "
+           f"{pct['listing']} % of listed prices and {pct['estimate']} % of estimates.\n\n" + SUMS_OPEN +
+           "| ID | Item | Part number | Supplier | AUD | Basis | Priority | Why | Stage | Depends on | Note |\n"
+           "|---|---|---|---|---|---|---|---|---|---|---|\n"]
+    for it in rows["build"]:
+        out.append(f"| {it['id']} | {link(it)} | {_cell(it.get('part_number'))} | {_cell(it.get('supplier'))} | "
+                   f"{it['price_aud']:,.2f} | {it['price_basis']} | {it['priority']} | {_cell(it['why'])} | {it['stage']} | "
+                   f"{deps(it)} | {_cell(it.get('note'))} |\n")
+    out.append(SUMS_CLOSE + "### Purchase check list\n\nWear and age items that may still be good or already replaced, and every line "
+               "bought only if a test, an inspection or a certifier calls for it. Each is checked at the stage in the When column, "
+               "most at the S0 inspection, and bought only if it fails, in the stage shown. Not counted, and the check list carries "
+               "no allowance.\n\n" + SUMS_OPEN +
+               "| ID | Item | AUD if it fails | Basis | When | Check | Pass mark | Why | Fitted in | Note |\n"
+               "|---|---|---|---|---|---|---|---|---|---|\n")
+    for it in rows["check"]:
+        out.append(f"| {it['id']} | {link(it)} | {it['price_aud']:,.2f} | {it['price_basis']} | {it['checked_at']} | "
+                   f"{_cell(it['check'])} | {_cell(it.get('pass_mark'))} | {_cell(it['why'])} | {it['stage']} | {_cell(it.get('note'))} |\n")
+    out.append(SUMS_CLOSE + f"If every item on the check list failed, it would come to AUD {_aud(T['check'])}. That is a note, not a "
+               "total: several lines are alternatives or only-if steps, and they are priced as if each one were needed.\n\n"
+               "### Optional extras\n\nExtras the plan does not need. Not counted.\n\n" + SUMS_OPEN +
+               "| ID | Item | Part number | Supplier | AUD | Basis | Why | Stage | Note |\n|---|---|---|---|---|---|---|---|---|\n")
+    for it in rows["optional"]:
+        out.append(f"| {it['id']} | {link(it)} | {_cell(it.get('part_number'))} | {_cell(it.get('supplier'))} | "
+                   f"{it['price_aud']:,.2f} | {it['price_basis']} | {_cell(it['why'])} | {it['stage']} | {_cell(it.get('note'))} |\n")
+    out.append(SUMS_CLOSE)
+    return out
+
+
+def _car_totals_table(data, T):
+    over = "Over" if T["gap"] > 0 else "Under"
+    every = len(T["closing"]) == len(data["cuts"])
+    closing_rows = "" if every or not T["closing"] else (
+        f"| Less {_names(T['closing'])}, with {'its' if len(T['closing']) == 1 else 'their'} share of the allowance | "
+        f"-{_aud(T['closing_saving'])} |\n"
+        f"| The build with {', '.join(T['closing'])} and the allowance | {_aud(T['with_closing'])} |\n")
+    pct = T["allowance_pct"]
+    out = ["\n### Totals\n\n<div data-sheet-sum=\"off\">\n\n| Total | AUD |\n|---|---|\n"
+           f"| The build | {_aud(T['build'])} |\n"
+           f"| Allowance, {pct['listing']} % of listed prices and {pct['estimate']} % of estimates | {_aud(T['allowance'])} |\n"
+           f"| The build with its allowance | {_aud(T['with_contingency'])} |\n"
+           f"| Leonard's figure for the car build | {_aud(T['budget'])} |\n"
+           f"| {over} that figure, with the allowance | {_aud(abs(T['gap']))} |\n" + closing_rows +
+           f"| Less every cut, with its share of the allowance | -{_aud(T['cuts'])} |\n"
+           f"| The build with every cut and the allowance | {_aud(T['with_cuts'])} |\n"
+           f"| Purchase check list, if every item failed (not counted) | {_aud(T['check'])} |\n"
+           f"| Optional extras (not counted) | {_aud(T['optional'])} |\n\n</div>\n\n"]
+    if T["gap"] > 0:
+        one = len(T["closing"]) == 1
+        out.append(("Only every cut together closes" if every else f"{_names(T['closing'])} closes" if one
+                    else f"{_names(T['closing'])} close") + f" the gap to Leonard's AUD {_aud(T['budget'])}, "
+                   + ("taken only if its condition holds" if one else "each taken only if its condition holds")
+                   + " (see the cuts below). ")
+    else:
+        out.append(f"The build with its allowance is under Leonard's AUD {_aud(T['budget'])}, so it needs no cut. ")
+    out.append("The truck, the bike box, the trailer and Leonard's labour are outside these figures (see the cost table on the "
+               "[home page](../)).\n\n")
+    return out
 
 
 def tow_vehicle_page():
-    """The Car build page: VEHICLE.md's summary and stage plan with the stage table, the whole parts list as one
-    spreadsheet and the totals, all from data/vehicle/vehicle-parts.yaml, then VEHICLE.md's limits, legal path,
-    decisions and open points. The URL stays /tow-vehicle/ so earlier links still work."""
+    """The Car build page: VEHICLE.md's summary and stage plan with the stage table, then the build, the purchase check
+    list and the optional extras as three spreadsheets with the totals, all from data/vehicle/vehicle-parts.yaml, then
+    VEHICLE.md's limits, legal path, decisions and open points. The URL stays /tow-vehicle/ so earlier links still
+    work."""
     plan = (ROOT / "VEHICLE.md").read_text(encoding="utf-8")
     data = yaml.safe_load((ROOT / "data" / "vehicle" / "vehicle-parts.yaml").read_text(encoding="utf-8"))
     T = car_totals(data, project()["car_build"]["budget_aud"])
@@ -158,16 +235,17 @@ def tow_vehicle_page():
     (GEN / "vehicle.json").write_text(json.dumps(data, indent=1, default=str))
     S = T["sums"]
     get = lambda *k: S.get(k, 0.0)
-    out = ["---\ntitle: Car build\ndescription: 'The LandCruiser 79 car build: stages, the priced parts list with priority, reason and "
-           "stage on every line, the totals, the limits and the legal path.'\n---\n\n",
+    out = ["---\ntitle: Car build\ndescription: 'The LandCruiser 79 car build: stages, the build with its price, reason and stage "
+           "on every line, the purchase check list, the optional extras, the totals, the limits and the legal path.'\n---\n\n",
            "The car build turns a used Toyota LandCruiser 79 single cab V8 (VDJ79) into the trailer's tow vehicle, with both "
-           "motorbikes in the [bike box](../ute-garage/) on its tray. The plan is `VEHICLE.md`, and every part and paid job is a line in "
-           "`data/vehicle/vehicle-parts.yaml`, shown below with the totals. The 3D model of the ute with its box is on the "
-           "[Bike box](../ute-garage/#3d-model) page, the general arrangement is drawing [CT-701](../drawings/#ct-701), and VEH-01 to "
-           "VEH-28 are on the [Measurements](../measurements/?part=car) page.\n\n"]
+           "motorbikes in the [bike box](../ute-garage/) on its tray. The plan is `VEHICLE.md`, and every part and paid job is a line "
+           "in `data/vehicle/vehicle-parts.yaml` on one of three lists (decision H24): the build, which is priced and counted, the "
+           "purchase check list of parts that may still be good, and the optional extras. The 3D model of the ute with its box is on "
+           "the [Bike box](../ute-garage/#3d-model) page, the general arrangement is drawing [CT-701](../drawings/#ct-701), and VEH-01 "
+           "to VEH-28 are on the [Measurements](../measurements/?part=car) page.\n\n"]
     secs = dict(zip(VEHICLE_TOP + VEHICLE_END, _sections(plan, VEHICLE_TOP + VEHICLE_END)))
     out.append(secs["Summary"] + "\n")
-    rows = ("| Stage | Work | Required AUD | Contingency lines AUD | Optional AUD | Paid labour | Downtime (est.) | "
+    rows = ("| Stage | Work | Build AUD | Check list AUD | Optional AUD | Paid labour | Downtime (est.) | "
             "Place in branch A, B | The ute can then |\n|---|---|---|---|---|---|---|---|---|\n")
     for st in data["stages"]:
         rows += (f"| {st['id']} | {_cell(st.get('work'))} | " +
@@ -175,62 +253,30 @@ def tow_vehicle_page():
                  f" | {_cell(st.get('labour'))} | {_cell(st.get('downtime'))} | A {st['order_a'] + 1}, B {st['order_b'] + 1} | "
                  f"{_cell(st['can_do'])} |\n")
     head, rest = secs["Stage plan"].split("\n", 1)
-    out.append(head + "\n\nEach stage's lines added up by status, from the YAML. The sheet's footer gives the totals. Contingency "
-               "lines are bought only if a test calls for them.\n\n" + _sums(rows) + _drop_first_table(rest) + "\n")
-
-    # ---------------------------------------------------------------- the parts list, one spreadsheet
-    out.append("## Parts list\n\nEvery line of `data/vehicle/vehicle-parts.yaml`, AUD including GST, the line total. Basis is "
-               "listing (read from a supplier or regulator page) or estimate. Priority: " +
-               ", ".join(f"{p} {d[0].lower() + d[1:]}" for p, d in PRIORITIES.items()) + ". Status is required, contingency (only "
-               "if an inspection or test calls for it) or optional. Select rows to total them in the footer, or sort and filter by "
-               "stage, priority or status.\n\n" + SUMS_OPEN +
-               "| ID | Item | Part number | Supplier | AUD | Basis | Priority | Why | Stage | Depends on | Status | Note |\n"
-               "|---|---|---|---|---|---|---|---|---|---|---|---|\n")
-    for it in data["items"]:
-        name = _cell(it["name"])
-        if it.get("link"):
-            name = f"[{name}]({it['link']})"
-        out.append(f"| {it['id']} | {name} | {_cell(it.get('part_number'))} | {_cell(it.get('supplier'))} | "
-                   f"{it['price_aud']:,.2f} | {it.get('price_basis', '')} | {it['priority']} | {_cell(it.get('why'))} | "
-                   f"{it['stage']} | {', '.join(it.get('depends_on') or [])} | {it['status']} | {_cell(it.get('note'))} |\n")
-
-    out.append(SUMS_CLOSE)
-
-    # ---------------------------------------------------------------- totals
-    over = "Over" if T["gap"] > 0 else "Under"
-    names = " and ".join(T["closing"]) if len(T["closing"]) < 3 else ", ".join(T["closing"][:-1]) + " and " + T["closing"][-1]
-    listed = ", ".join(T["closing"])
-    every = len(T["closing"]) == len(data["cuts"])     # when only every cut closes the gap, its two rows are the last two
-    closing_rows = "" if every else (f"| Less {names} | -{_aud(T['closing_saving'])} |\n"
-                                     f"| Required with {listed} and the allowance | {_aud(T['with_closing'])} |\n")
-    # each row builds on the ones above, so Sum stays off
-    out.append("\n### Totals\n\n<div data-sheet-sum=\"off\">\n\n| Total | AUD |\n|---|---|\n"
-               f"| Required | {_aud(T['required'])} |\n| Contingency allowance | {_aud(T['allowance'])} |\n"
-               f"| Required with the contingency allowance | {_aud(T['with_contingency'])} |\n"
-               f"| Leonard's figure for the car build | {_aud(T['budget'])} |\n"
-               f"| {over} that figure, with the allowance | {_aud(abs(T['gap']))} |\n"
-               + closing_rows +
-               f"| Less every cut | -{_aud(T['cuts'])} |\n| Required with every cut and the allowance | {_aud(T['with_cuts'])} |\n"
-               f"| Contingency lines, if every one happened | {_aud(T['contingency_lines'])} |\n| Optional lines | {_aud(T['optional'])} |\n\n"
-               "</div>\n\n"
-               + ("Only every cut together closes" if every else f"{names} close")
-               + f" the gap to Leonard's AUD {_aud(T['budget'])}, each taken only if the old part passes its test or the weighing "
-               "allows it (see the cuts below). The allowance is the plan's own figure (`VEHICLE.md`), not the sum of the contingency lines: those are "
-               "bought only if a test calls for them, and a new DPF and a laboratory emissions test are outside it. The truck, the bike "
-               "box, the trailer and Leonard's labour are outside these figures (see the cost table on the [home page](../)).\n\n")
-    out.append("#### By priority\n\n" + SUMS_OPEN + "| Priority | What it is for | Required AUD | Contingency lines AUD | Optional AUD |\n|---|---|---|---|---|\n")
+    out.append(head + "\n\nEach stage's lines added up by list, from the YAML. The sheet's footer gives the totals.\n\n" + _sums(rows) +
+               _drop_first_table(rest) + "\n")
+    out.append("## Parts list\n\nEvery line of `data/vehicle/vehicle-parts.yaml`, AUD including GST, the line total, sorted into three "
+               "lists by decision H24 and research report 27. Basis is listing (read from a supplier or regulator page) or estimate. "
+               "Priority: " + ", ".join(f"{p} {d[0].lower() + d[1:]}" for p, d in PRIORITIES.items()) + ". Select rows to total them "
+               "in the footer, or sort and filter by stage or priority.\n\n")
+    out += _car_lists(data, T)
+    out += _car_totals_table(data, T)
+    heads = " | ".join(f"{LISTS[s]} AUD" for s in STATUSES)
+    out.append("#### By priority\n\n" + SUMS_OPEN + f"| Priority | What it is for | {heads} |\n|---|---|---|---|---|\n")
     for p, d in PRIORITIES.items():
         out.append(f"| {p} | {d} | " + " | ".join(_cents(get("priority", p, s)) for s in STATUSES) + " |\n")
-    out.append(SUMS_CLOSE + "#### By stage\n\n" + SUMS_OPEN + "| Stage | Name | Required AUD | Contingency lines AUD | Optional AUD |\n|---|---|---|---|---|\n")
+    out.append(SUMS_CLOSE + "#### By stage\n\n" + SUMS_OPEN + f"| Stage | Name | {heads} |\n|---|---|---|---|---|\n")
     for st in data["stages"]:
         out.append(f"| {st['id']} | {_cell(st['name'])} | " + " | ".join(_cents(get("stage", st["id"], s)) for s in STATUSES) + " |\n")
-    out.append(SUMS_CLOSE + "#### By system\n\n" + SUMS_OPEN + "| System | Required AUD | Contingency lines AUD | Optional AUD |\n|---|---|---|---|\n")
+    out.append(SUMS_CLOSE + "#### By system\n\n" + SUMS_OPEN + f"| System | {heads} |\n|---|---|---|---|\n")
     for key in dict.fromkeys(it["system"] for it in data["items"]):
         out.append(f"| {SYSTEMS.get(key, key)} | " + " | ".join(_cents(get("system", key, s)) for s in STATUSES) + " |\n")
-    out.append(SUMS_CLOSE + "### Cuts that keep it reliable\n\nEach cut applies only if the old part passes its test.\n\n"
-               + SUMS_OPEN + "| Cut | What | Replaces | Saves AUD | Risk |\n|---|---|---|---|---|\n")
+    out.append(SUMS_CLOSE + "### Cuts\n\nEach cut applies only if its condition holds, and it saves its line with that line's share of "
+               "the allowance.\n\n" + SUMS_OPEN + "| Cut | What | Replaces | Saves AUD | With its allowance AUD | Risk |\n"
+               "|---|---|---|---|---|---|\n")
     for c in data["cuts"]:
-        out.append(f"| {c['id']} | {_cell(c['name'])} | {c['replaces']} | {c['saving_aud']:,.0f} | {_cell(c.get('risk'))} |\n")
+        out.append(f"| {c['id']} | {_cell(c['name'])} | {c['replaces']} | {c['saving_aud']:,.0f} | {T['cut_saves'][c['id']]:,.0f} | "
+                   f"{_cell(c.get('risk'))} |\n")
     out.append(SUMS_CLOSE + "### Lines left out\n\nNot counted in any total.\n\n" + SUMS_OPEN + "| Item | AUD | Why |\n|---|---|---|\n")
     for it in data.get("removed", []):
         out.append(f"| {_cell(it['name'])} | {it['price_aud']:,.2f} | {_cell(it['reason'])} |\n")
@@ -243,7 +289,8 @@ def tow_vehicle_page():
 
 def box_parts() -> dict:
     """The bike box's parts list (data/ute/box-parts.yaml) for the site, with the totals worked out from the lines.
-    cad/tests/test_box_parts.py checks that they equal the totals typed in the file."""
+    Leonard builds the box, so it has one total (decision H25). cad/tests/test_box_parts.py checks that they equal the
+    totals typed in the file."""
     data = yaml.safe_load((ROOT / "data" / "ute" / "box-parts.yaml").read_text(encoding="utf-8"))
     aud, kg = {}, {}
     for ln in data["lines"]:
@@ -255,7 +302,6 @@ def box_parts() -> dict:
     data["totals"] = dict(data["totals"], by_group={g: round(aud[g], 2) for g in data["groups"] if g in aud},
                           kg_by_group={g: round(kg[g], 2) for g in data["groups"] if g in kg},
                           subtotal_aud=round(sub, 2), contingency_aud=round(sub * pct / 100, 2), total_aud=round(total, 2),
-                          owner_built_total_aud=round(total - aud.get("fabrication", 0.0) * (1 + pct / 100), 2),
                           mass_kg_lines=round(sum(kg.values()), 2))
     (GEN / "box-parts.json").write_text(json.dumps(data, indent=1, default=str))
     return data
@@ -293,20 +339,22 @@ def project_costs(box_totals, proj=None) -> dict:
     trailer, each with its figure before contingency, its contingency, its total and its parts list. From
     data/project.yaml (or proj), the car build's lines (car_totals) and the bike box's totals. The trailer is pending
     until data/project.yaml names its priced parts list, in the bike box list's format (lines with price.aud, and
-    totals with contingency_pct, or contingency_aud and owner_built_total_aud when the list works them out): then its
-    row is worked out from that list's lines. The total leaves out what is pending."""
+    totals with contingency_pct, or contingency_aud when the list works it out): then its row is worked out from that
+    list's lines. Leonard builds the box and the trailer himself, so each part has one total (decisions H25 and H26).
+    The total leaves out what is pending."""
     p = proj or project()
     car = car_totals(yaml.safe_load((ROOT / "data" / "vehicle" / "vehicle-parts.yaml").read_text(encoding="utf-8")),
                      p["car_build"]["budget_aud"])
     bt = box_totals
     rows = [
         dict(id="truck", part="Truck purchase", basis=p["truck"]["basis"], before=p["truck"]["purchase_aud"], contingency=0,
-             total=p["truck"]["purchase_aud"], link="/tow-vehicle/#s0-buy-and-baseline", link_text="Stage S0, buy and baseline"),
-        dict(id="car", part="Car build (LandCruiser 79)", basis="The required lines and the plan's contingency allowance",
-             before=car["required"], contingency=car["allowance"], total=car["with_contingency"], link="/tow-vehicle/#parts-list",
-             link_text="Car build parts list"),
+             total=p["truck"]["purchase_aud"], link="/tow-vehicle/#s0-buy-inspect-and-baseline",
+             link_text="Stage S0, buy, inspect and baseline"),
+        dict(id="car", part="Car build (LandCruiser 79)", basis="The build list with its allowance (decision H24)",
+             before=car["build"], contingency=car["allowance"], total=car["with_contingency"], link="/tow-vehicle/#the-build",
+             link_text="Car build list"),
         dict(id="box", part="Bike box", basis=p["bike_box"]["basis"], before=bt["subtotal_aud"], contingency=bt["contingency_aud"],
-             total=bt["total_aud"], owner_built=bt["owner_built_total_aud"], contingency_pct=bt["contingency_pct"],
+             total=bt["total_aud"], contingency_pct=bt["contingency_pct"],
              link="/ute-garage/#parts-list", link_text="Bike box parts list"),
     ]
     tr = p["trailer"]
@@ -316,19 +364,17 @@ def project_costs(box_totals, proj=None) -> dict:
         lt = lst["totals"]
         pct = lt["contingency_pct"]
         cont = lt["contingency_aud"] if "contingency_aud" in lt else sub * pct / 100
-        row = dict(id="trailer", part="Trailer", basis=tr["basis"], before=sub, contingency=cont, total=sub + cont,
-                   contingency_pct=pct, link=tr["link"], link_text="Trailer parts list")
-        if "owner_built_total_aud" in lt:
-            row["owner_built"] = lt["owner_built_total_aud"]
-        rows.append(row)
+        rows.append(dict(id="trailer", part="Trailer", basis=tr["basis"], before=sub, contingency=cont, total=sub + cont,
+                         contingency_pct=pct, link=tr["link"], link_text="Trailer parts list"))
     else:
         rows.append(dict(id="trailer", part="Trailer", basis=tr["basis"], pending=True, link=tr["link"],
                          link_text="Mass schedule, no prices yet"))
     known = [r for r in rows if not r.get("pending")]
     return dict(rows=rows, pending=[r["part"] for r in rows if r.get("pending")],
                 before=sum(r["before"] for r in known), contingency=sum(r["contingency"] for r in known),
-                total=sum(r["total"] for r in known), total_owner_built=sum(r.get("owner_built", r["total"]) for r in known),
-                car=dict(budget=car["budget"], gap=car["gap"], closing=car["closing"], with_closing=car["with_closing"]))
+                total=sum(r["total"] for r in known),
+                car=dict(budget=car["budget"], gap=car["gap"], closing=car["closing"], with_closing=car["with_closing"],
+                         allowance_pct=car["allowance_pct"], check=car["check"], optional=car["optional"]))
 
 
 RESEARCH_STATUS = {
@@ -345,6 +391,7 @@ RESEARCH_STATUS = {
     22: "Record, 20 Nov 2026. The prices of the lines the interior left unchanged, the labour and the NSW compliance",
     25: "Record, 20 Nov 2026. The fixed roof with rounded front edges, decision H12",
     26: "Record, 21 Nov 2026. The Elite kit's wheels, rear track and brakes, decisions H18 and H19",
+    27: "Record, 22 Nov 2026. The car build's three lists, the injectors, the gearbox and the trailer's weld evidence, decisions H24 and H26",
 }
 
 

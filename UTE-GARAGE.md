@@ -1,6 +1,6 @@
 # UTE-GARAGE: the bike box on the LandCruiser 79
 
-Revision D, 21 Nov 2026: revision C of 20 Nov with the wheel tubs moved out and a flare over each rear tub for the Lovells Elite kit's wider rear track (decisions H18 and H19). Build document for a fabricator to quote from and an engineer to check. Parts list `data/ute/box-parts.yaml`, measurements BOX-01 to BOX-20 and VEH-28 in `data/measurements.yaml`, model `data/assemblies/ute-garage.yaml` and `data/ute/parts/`, drawings CT-701 to CT-704. The site's Bike box page shows the parts list and the checks.
+Revision D, 21 Nov 2026: revision C of 20 Nov with the wheel tubs moved out and a flare over each rear tub for the Lovells Elite kit's wider rear track (decisions H18 and H19). Build document for Leonard, who builds the box himself and does not have it certified (decision H25, 22 Nov 2026). Parts list `data/ute/box-parts.yaml`, measurements BOX-01 to BOX-20 and VEH-28 in `data/measurements.yaml`, model `data/assemblies/ute-garage.yaml` and `data/ute/parts/`, drawings CT-701 to CT-704. The site's Bike box page shows the parts list and the checks.
 
 ## 1. Purpose and limits
 
@@ -105,7 +105,7 @@ The Black Widow MF-12038 ramp (3,048 x 965 mm, 680 kg rating, 34 kg) stands fold
 
 ## 9. Mass
 
-The parts list sums to 437.3 kg empty, 475.0 kg with growth, and the model carries every line, so UGB-01 and the list agree (`cad/tests/test_box_parts.py`). Revision D adds 0.4 kg: the flares 1.9 kg, less 1.6 kg of skin cut away for them, and the tubs and floor re-cut for the wider track (-0.8 and +0.9 kg). The list includes the wiring, the winch feed, sealant, the roof bows' adhesive (0.5 kg) and rivets (0.3 kg), pads, plates, the roof coat, the outlet and the drains. The roof is 1.6 mm sheet in place of 2.0 mm, which saves 5.1 kg and leaves 2.7 kg in hand under UGB-01's 440 kg. The roof carries no load, no step and no kneeling, and the bows and end frames under it are at most 640 mm apart (UGF-01). The engineer confirms the thinner sheet. If more margin is needed, a 10 mm chain in place of the 12 mm one saves about 2 kg (est.).
+The parts list sums to 437.3 kg empty, 475.0 kg with growth, and the model carries every line, so UGB-01 and the list agree (`cad/tests/test_box_parts.py`). Revision D adds 0.4 kg: the flares 1.9 kg, less 1.6 kg of skin cut away for them, and the tubs and floor re-cut for the wider track (-0.8 and +0.9 kg). The list includes the wiring, the winch feed, sealant, the roof bows' adhesive (0.5 kg) and rivets (0.3 kg), pads, plates, the roof coat, the outlet and the drains. The roof is 1.6 mm sheet in place of 2.0 mm, which saves 5.1 kg and leaves 2.7 kg in hand under UGB-01's 440 kg. The roof carries no load, no step and no kneeling, and the bows and end frames under it are at most 640 mm apart (UGF-01), and UGF-01 is the check that the thinner sheet holds highway suction. If more margin is needed, a 10 mm chain in place of the 12 mm one saves about 2 kg (est.).
 
 On the Elite, with the home trailer's heaviest towball (317 kg with growth), the ute's rear axle carries 2,646 kg with growth when towing with the bikes aboard (UC3), 154 kg under the 2,800 kg plate. The trailer's tie-down kit rides in the box while towing: its four ratchet straps, 6.4 kg (est.), in the tool chests, and its four Tie Down 59099 ground anchors with their four 59286 stabilizer plates, Tie Down's 59200 soil test probe kit and the turning bar, 38.6 kg (est.), in a bag on the floor between the bikes, loaded last through the barn doors (T2, UGC-02). The bag is about 1,760 x 345 x 230 mm (est.), with the anchors staggered along it so that no rod passes a neighbour's helix, the plates flat in its base, and the probe and its torque wrench out of the kit's 65 in case, which stays home. Two 25 mm ratchet straps of LC 250 kg (est.) lash the bag to the L-track either side: twice the Load Restraint Guide's 0.8 g forward, UGR-01's off-road factor, is 0.61 kN on the bag, against 3.47 kN from one 45 degree leg of each strap, 0.17 (est.). The kit stays with the trailer whenever the ute is unhitched for more than a day (STB-05).
 
@@ -122,13 +122,10 @@ On the Elite, with the home trailer's heaviest towball (317 kg with growth), the
 | Loading, with freight | 2,973 |
 | Services | 1,771 |
 | Finish and tool chests | 921 |
-| Shop labour, 188 h at AUD 121 | 22,748 |
-| Engineer's review | 2,000 |
-| Contingency 10 % | 4,733 |
-| Total, shop-built | 52,058 |
-| Total, owner-built (no shop labour) | 27,035 |
+| Contingency 10 % | 2,258 |
+| Total | 24,835 |
 
-The LC5 inspection is counted once, in the car build's GV03, because one inspection covers the GVM kit, the GCM revision, the box and the winch. The box keeps only the engineer's review. Not in the total: the trackers' subscriptions (about AUD 278 a year) and a full exterior powder coat (from about AUD 4,000).
+Leonard builds the box himself, so no labour is paid, and the box is not certified, so it has no review or inspection line (decision H25). The car build's LC5 inspection (GV03) covers the GVM kit and the GCM revision only. What makes a box he builds himself safe to carry the two bikes is the design's checks in sections 4 to 9 and the tests of section 11, and every one of them stays. Not in the total: the trackers' subscriptions (about AUD 278 a year) and a full exterior powder coat (from about AUD 4,000).
 
 ## 11. Build and test steps
 
@@ -140,19 +137,19 @@ The LC5 inspection is counted once, in the car build's GV03, because one inspect
 6. Fit track, chock adapters, anchors, winch plates, vents, fan, drains, wiring, alarm, detector, lights, lamps.
 7. Weigh and find the centre of gravity (BOX-07, BOX-08).
 8. Hose every seam for 5 minutes, fan off then on. No water inside.
-9. Fit to the ute, firm mounts to the engineer's torque, compliant mounts to their sleeves.
+9. Fit to the ute, firm mounts torqued to about 85 Nm, a common figure for a lightly oiled M12 8.8 bolt (est.), compliant mounts to their sleeves.
 10. Test switches, siren, tracker, fan, detector (unlit butane at a sensor) and lights. Proof-load each outer fitting to 4.9 kN with no permanent set.
-11. Load both bikes, set fork compression and measure BOX-12 to BOX-20. Drive 20 km with rough road and re-tension.
-12. Wheel alignment and LSPV reset, then the LC5 inspection.
+11. Load both bikes, set fork compression and measure BOX-12 to BOX-20. Drive 20 km with rough road and re-tension. Then dye-penetrant test Toyota's six pairs of deck mount brackets, the mount plates and the anchor crossmember welds with the car build's RF01 kit, and again at each service for the first year.
+12. Wheel alignment and LSPV reset with the box on (GV04), before the GVM kit's LC5 inspection, which does not cover the box.
 
 ## 12. Open points and the assumption used
 
 1. Floor height and bump travel: rails 774 mm laden, 110 mm travel, tyre radius 380 mm (BOX-01 to BOX-03).
-2. Toyota's brackets take M12 bolts and carry 0.8 kN up and 2.5 kN down each.
-3. Compliant mounts: Toyota cab cushions, preload set by the engineer.
-4. Off-road factor 2 and 1.0 g up (report 03), for the engineer to confirm.
+2. Toyota's brackets take M12 bolts and carry 0.8 kN up and 2.5 kN down each (UGM-02). Toyota publishes no capacity. Assumption: a bracket made for a body on this frame carries these loads, and build step 11's crack test after the rough-road drive shows if one does not.
+3. Compliant mounts: Toyota cab cushions, with the preload set by their steel sleeves. Assumption: Toyota's cushions suit the box's 475 kg with growth as they suit the cab. Build step 11's rough-road drive and crack test show a knock, bottoming or a cracked bracket.
+4. Off-road factor 2 and 1.0 g up (report 03). Assumption: these cases cover the box's use, and UGM-01 and UGR-01 to UGR-03 are checked at them.
 5. Anchors withstand the strap's breaking load, so straps are LC 500 kg. LC 1,000 kg needs the outer anchors tied into the wall frame.
-6. Box mass 437.3 kg with the 1.6 mm roof and the flares, against UGB-01's 440 kg. The 1.6 mm roof holds highway suction and drains on its 1:50 crown (UGF-01), but a knee would dent it, so it carries no step and no kneeling. Assumption: nobody stands on it. The engineer confirms the 1.6 mm roof on bows at most 640 mm apart.
+6. Box mass 437.3 kg with the 1.6 mm roof and the flares, against UGB-01's 440 kg. The 1.6 mm roof holds highway suction and drains on its 1:50 crown (UGF-01), but a knee would dent it, so it carries no step and no kneeling. Assumption: nobody stands on it, and the NO STEP labels (BX-C03) say so. UGF-01 checks the 1.6 mm roof on bows at most 640 mm apart.
 7. Prices: 6061-T6 at the 6060-T5 listing plus 25 %, ABLOY from a UK listing, detector and labour hours estimated.
 8. Rear track on the Elite: 1,555 mm (research report 26, est.). Lovells says only that the housing brings the rear in line with the front. The tubs and flares follow the measured track (VEH-28), and the tyre keeps 30 mm to the flare (BOX-20). Above 1,577 mm the flares would pass 1,910 mm.
 9. Lovells' mudflaps hang from the rear outriggers behind the tyres, about 300 mm wide with their bottom edge about 230 mm above the ground. Confirm the brackets with the kit.

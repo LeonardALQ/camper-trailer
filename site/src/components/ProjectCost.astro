@@ -11,17 +11,16 @@ const aud = (v: number) => Math.round(v).toLocaleString('en-AU');
 const box = d.rows.find((r: any) => r.id === 'box');
 const trailer = d.rows.find((r: any) => r.id === 'trailer' && !r.pending);
 const left = d.pending.length ? `, without the ${d.pending.join(' and ').toLowerCase()}` : '';
-const ownerBuilt = d.rows.some((r: any) => r.owner_built != null);
 const tpct = trailer?.contingency_pct;
 const car = d.car;
 const list = (a: string[]) => (a.length < 3 ? a.join(' and ') : `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}`);
 const closes = car.gap > 0 && car.closing.length
-  ? `, and ${list(car.closing)} bring it to AUD ${aud(car.with_closing)} if each one's test or weighing allows it` : '';
+  ? `, and ${list(car.closing)} ${car.closing.length > 1 ? 'bring' : 'brings'} it to AUD ${aud(car.with_closing)} if ${car.closing.length > 1 ? 'each one\'s' : 'its'} condition holds` : '';
 const note = [
   "The truck is Leonard's planning figure.",
-  `The car build is its required lines with the plan's contingency allowance, AUD ${aud(Math.abs(car.gap))} ${car.gap > 0 ? 'over' : 'under'} Leonard's AUD ${aud(car.budget)} for it${closes}.`,
-  box ? `The bike box is every line of its parts list with ${box.contingency_pct} % contingency, and owner-built leaves out the shop's fabrication labour.` : '',
-  trailer && tpct ? `The trailer is every line of its parts list with ${tpct.listing} % contingency on listed prices and ${tpct.estimate} % on rates and estimates, and owner-built leaves out the hired labour.` : '',
+  `The car build is its build list with an allowance of ${car.allowance_pct.listing} % on listed prices and ${car.allowance_pct.estimate} % on estimates, AUD ${aud(Math.abs(car.gap))} ${car.gap > 0 ? 'over' : 'under'} Leonard's AUD ${aud(car.budget)} for it${closes}. Its purchase check list, AUD ${aud(car.check)} if every item failed, and its optional extras are not counted.`,
+  box ? `The bike box is every line of its parts list with ${box.contingency_pct} % contingency. Leonard builds it, so no labour is paid.` : '',
+  trailer && tpct ? `The trailer is every line of its parts list with ${tpct.listing} % contingency on listed prices and ${tpct.estimate} % on rates and estimates. Leonard builds it, so no labour is hired.` : '',
   d.pending.length ? `The ${d.pending.join(' and ').toLowerCase()} has no prices yet.` : '',
   "Leonard's own labour is outside every figure. Each figure is rounded to the dollar, so a row can differ from its parts by AUD 1.",
 ].filter(Boolean).join(' ');
@@ -47,7 +46,7 @@ const note = [
             <>
               <td class="num">{aud(r.before)}</td>
               <td class="num">{aud(r.contingency)}</td>
-              <td class="num">{aud(r.total)}{r.owner_built != null && <> shop-built,<br />{aud(r.owner_built)} owner-built</>}</td>
+              <td class="num">{aud(r.total)}</td>
             </>
           )}
           <td><a href={withBase(r.link)}>{r.link_text}</a></td>
@@ -57,7 +56,7 @@ const note = [
         <td>{d.pending.length ? `Total so far${left}` : 'Total'}</td>
         <td class="num">{aud(d.before)}</td>
         <td class="num">{aud(d.contingency)}</td>
-        <td class="num">{aud(d.total)}{ownerBuilt && <> shop-built,<br />{aud(d.total_owner_built)} owner-built</>}</td>
+        <td class="num">{aud(d.total)}</td>
         <td></td>
       </tr>
     </tbody>

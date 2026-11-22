@@ -11,8 +11,8 @@ import { withBase } from '../../lib/url';
 The bike box carries the Aprilia Tuareg 660 Rally and the Triumph Street Triple 765 side by side, noses forward, with
 about 60 kg of tools. It is a welded aluminium body on its own subframe, bolted to Toyota's deck mount brackets on the
 <a href={withBase('/tow-vehicle/')}>LandCruiser 79</a>, locked, sealed against dust and vented for fuelled bikes. The
-build document is `UTE-GARAGE.md` revision D and the parts list `data/ute/box-parts.yaml`. A planning-level design for
-the engineer to check.
+build document is `UTE-GARAGE.md` revision D and the parts list `data/ute/box-parts.yaml`. Leonard builds it himself to
+its own checks and does not have it certified (decision H25).
 
 <Ute kind="summary" />
 
@@ -65,9 +65,9 @@ to the fitted box, and it adds up to the model's box mass. Select rows to total 
 
 ### Totals
 
-The shop-built total pays a fabricator for 184 h at AUD 121 an hour, and the owner-built total leaves that line out.
-The LC5 inspection is counted once, in the car build's GV03, because one inspection covers the GVM kit, the GCM
-revision, the box and the winch.
+Leonard builds the box himself and does not have it certified (decision H25), so the list pays no labour and no review,
+and the box has one total. The car build's LC5 inspection (GV03) covers the GVM kit and the GCM revision only. The
+design checks below and the build's tests in `UTE-GARAGE.md` are what make the box safe to carry the two bikes.
 
 <BoxParts kind="groups" />
 
@@ -94,8 +94,8 @@ never does.
 ### Deck mount loads
 
 Report 03's load cases with its off-road factor of 2: braking at 1.6 g, cornering at 1.0 g and a net 1.0 g upward, on
-the box and its contents with the growth allowance. Toyota publishes no capacity for its brackets, so the engineer
-confirms them.
+the box and its contents with the growth allowance. Toyota publishes no capacity for its brackets, so the build's
+rough-road drive and dye-penetrant test check them (`UTE-GARAGE.md` step 11).
 
 <Ute kind="mounts" />
 

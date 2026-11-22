@@ -120,9 +120,9 @@ inputs:
     estimate: {v: 15, src: "Assumed (est.)"}
     measured: {v: null, date: null}
     stage: buy
-    affects: [branch A or B, FS01, cut CUT1]
+    affects: [branch A or B, FS06, FS01]
     thresholds:
-      - {at: 25, rule: "Over 25 %, or a stored injector fault, take branch A, because worn injectors wash the bores. Cut CUT1 is then off", src: "Report 23 estimate (est.). No Denso or Toyota limit for this test was found, so a Denso specialist's bench test overrides it"}
+      - {at: 25, rule: "Over 25 %, or a stored injector fault, take branch A, because worn injectors wash the bores. A new injector replaces each one that fails (FS06) before the run-in", src: "Report 23 estimate (est.). No Denso or Toyota limit for this test was found, so a Denso specialist's bench test overrides it"}
     range: {min: 0, max: 25, src: "Report 23 estimate (est.)"}
   - id: VEH-05
     group: Car build
@@ -146,10 +146,10 @@ inputs:
     estimate: {v: 1, src: "Assumed (est.)"}
     measured: {v: null, date: null}
     stage: buy
-    affects: [branch A or B, FS01]
+    affects: [branch A or B, FS06]
     thresholds:
       - {at: 2, rule: "2 to 4 %: re-sample after 1,000 km and read the regeneration history", src: "Under 2 % is acceptable, 2 to 4 % is watched (Heavy Vehicle Inspection guide, VEH-05)"}
-      - {at: 4, rule: "Over 4 %: an injector or regeneration fault. Take branch A, so the new injectors come forward", src: "Over 4 % is a fault signature (same source)"}
+      - {at: 4, rule: "Over 4 %: an injector or regeneration fault. Take branch A, and replace any injector that fails VEH-04 (FS06)", src: "Over 4 % is a fault signature (same source)"}
     range: {min: 0, max: 4, src: "Heavy Vehicle Inspection guide (VEH-05)"}
   - id: VEH-07
     group: Car build
@@ -188,14 +188,14 @@ inputs:
     stage: buy
     affects: [branch A or B, CG01, CG09]
     thresholds:
-      - {at: 0, rule: "Slip, crunch or whine: take branch A, because the clutch and gearbox come out with the engine in S2", src: "Plan rule (report 23): the gearbox is removed only once"}
+      - {at: 0, rule: "Slip, crunch or whine: take branch A, because the clutch and gearbox come out with the engine in S2. Crunch or whine also buys the new H152F (CG09)", src: "Plan rule (report 23): the gearbox is removed only once"}
     range: {min: 1, max: 1, src: "Plan rule (report 23)"}
-  # ================================================================ power, stage S6 (same dyno, same day)
+  # ================================================================ power, stage S6 (same dyno and operator)
   - id: VEH-10
     group: Car build
     part: car
     title: Peak power at the wheels before the tune, finished hardware on the factory calibration
-    how: "Chassis dyno, three runs in fourth gear, take the middle run. Same dyno, operator and day as VEH-11. Keep the sheet for the certifier."
+    how: "Chassis dyno, three runs in fourth gear, take the middle run. Same dyno and operator as VEH-11, made before the injectors go to GTurbo for the Pro 100 service (FS01), which the factory calibration cannot run. Keep the sheet for the certifier."
     unit: rwkW
     estimate: {v: 110, src: "GTurbo booklet page 15: stock VDJ79 100 to 120 rwkW (https://cdn.shopify.com/s/files/1/0823/4241/2531/files/1VD-FTV-VDJ70-Booklet-v1_4c.pdf)"}
     measured: {v: null, date: null}
@@ -208,7 +208,7 @@ inputs:
     group: Car build
     part: car
     title: Peak power at the wheels after the tune
-    how: Same dyno and day as VEH-10, with the towing map active.
+    how: Same dyno and operator as VEH-10, after the Pro 100 injectors and the tune, with the towing map active.
     unit: rwkW
     estimate: {v: 177, src: "Plan: 230 to 250 kW at the crank, about 170 to 185 rwkW at report 14's 74 % crank to wheels (decision log 20:15)"}
     measured: {v: null, date: null}
@@ -275,7 +275,7 @@ inputs:
     group: Car build
     part: car
     title: Gearbox oil temperature, same tow
-    how: Read the gearbox sender (CG11) at the same point as VEH-14. Repeat after the tune.
+    how: "Only with the optional senders (CG11): read the gearbox sender at the same point as VEH-14, and repeat after the tune. Without them, read the gearbox case with an infrared thermometer right after the climb, which reads below the oil (est.)."
     unit: °C
     estimate: {v: 95, src: "Report 23 estimate (est.)"}
     measured: {v: null, date: null}
@@ -288,7 +288,7 @@ inputs:
     group: Car build
     part: car
     title: Rear diff oil temperature, same tow
-    how: Read the rear diff sender (CG11) at the same point as VEH-14.
+    how: "Only with the optional senders (CG11): read the rear diff sender at the same point as VEH-14. Without them, read the diff housing with an infrared thermometer right after the climb, which reads below the oil (est.)."
     unit: °C
     estimate: {v: 100, src: "Report 23 estimate (est.)"}
     measured: {v: null, date: null}
@@ -421,7 +421,7 @@ inputs:
     group: Car build
     part: car
     title: Ride height change from the GVM kit, wheel centre to guard, unladen, largest corner
-    how: "Measure all four corners before the kit (stage S1) and after it (stage S4), same tyres and pressures."
+    how: "Measure all four corners before the kit (stage S0 or S1) and after it (stage S4), same tyres and pressures."
     unit: mm
     estimate: {v: 50, src: "Assumed (est.). Lovells publishes no lift figure for the 79 kit"}
     measured: {v: null, date: null}
@@ -700,7 +700,7 @@ inputs:
     affects: [bolt size BX-F01, mount plates BX-U02, UGM-01]
     range: {min: 12.5, max: 14.5, src: "A hole that takes an M12 bolt with normal to coarse clearance (est.)"}
     thresholds:
-      - {rule: "A hole sized for M10 or M14 changes the bolt in BX-F01 and the engineer re-checks UGM-01", src: "UGM-01"}
+      - {rule: "A hole sized for M10 or M14 changes the bolt in BX-F01, and UGM-01 is run again with it", src: "UGM-01"}
   - id: BOX-06
     group: Bike box
     part: box

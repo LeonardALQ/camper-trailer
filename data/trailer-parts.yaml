@@ -4,7 +4,9 @@
 # Every line of the mass schedule carries its own price: the items of data/assemblies/trailer.yaml and the bought
 # fittings of data/chassis/chassis.yaml, each in a `price` field. This file holds the rest. The stock bought for the
 # chassis (steel by section, plate and galvanising) is shared by mass over the generated lines it `covers`. The other
-# lines have no line in the mass schedule: labour, installation, compliance, freight and consumables.
+# lines have no line in the mass schedule: installation, compliance, freight and consumables.
+# Decision H26, 22 Nov 2026: Leonard builds the trailer himself, so the hired labour lines (were LAB-01 to LAB-08) are
+# gone and the trailer has one total. What its NSW registration needs stays, with the weld evidence in CMP-14.
 # cad/trailer_costs.py puts the three files together.
 #
 # A price is one of these, AUD including GST:
@@ -25,10 +27,9 @@ fx: {USD: 1.55, EUR: 1.68, GBP: 1.98}
 sources: [data/assemblies/trailer.yaml, data/chassis/chassis.yaml]
 # groups for the lines here that have no system in the mass schedule. The others take their schedule group.
 groups:
-  labour: Hired fabrication and fitting labour at AUD 120 an hour
   installation: Licensed electrical work
   lamps: Lamps, reflectors and the number plate (ADR 13/00, VSB1 3.1)
-  compliance: Engineering review, inspection and the first year's registration in NSW
+  compliance: Engineering review, weld evidence, inspection and the first year's registration in NSW
   freight: Freight and consumables
 totals:
   contingency_pct: {listing: 10, quote: 10, rate: 20, estimate: 20}
@@ -36,13 +37,14 @@ totals:
     No Australian trailer builder publishes the contingency it uses. Published guidance runs from 10 to 15 % for DIY
     camper trailers to 20 % for a one-off build that the owner manages, and 15 to 25 % for early estimates (research
     report 22 section 2.15). So a listed or quoted price carries 10 % and a rate or an estimate 20 %.
-  owner_built_leaves_out: [labour]
-  owner_built_why: >-
-    Owner-built leaves out the hired labour and its contingency. The licensed electrician, the refrigeration fitting
-    in AC-03, the wheel alignment and the engineer's review stay, because the law or the equipment needs them.
+  labour_why: >-
+    Leonard builds the trailer himself, so no labour is hired (decision H26). The licensed electrician, the
+    refrigeration fitting in AC-03, the wheel alignment, the engineer's review and the weld evidence stay, because the
+    law, the equipment or the registration needs them.
 not_in_total:
   - {name: "Comprehensive caravan insurance, first year, agreed value AUD 130,000 (est.)", aud: 1560, basis: estimate, url: "https://www.canstar.com.au/car-insurance/caravan-insurance/", note: "About 1.2 % of the agreed value. Optional by law. A running cost, like the Starlink plan and the tracker's subscription"}
   - {name: "CTP insurance (green slip)", aud: 0, basis: listing, url: "https://www.nsw.gov.au/driving-boating-and-transport/vehicle-registration/how-to-register/registering-a-brand-new-vehicle", note: "Not required for a trailer"}
+  - {name: "Leonard's own labour, about 333 h (est.)", aud: 0, basis: estimate, note: "The hours research report 22 gave for the hired lines that decision H26 removed: 70 h on the chassis and drawbar, 16 h on the running gear, 70 h on the shell, 19 h of small fabrications, 26 h of cabinetry, 12 h of fitting and 120 h of services. At its AUD 120 an hour they were AUD 39,960"}
   - {name: "Motor vehicle duty", aud: 0, basis: listing, url: "https://www.service.nsw.gov.au/guide/buying-a-vehicle", note: "NSW charges no duty on registering a caravan or camper trailer"}
 lines:
   # ================================================================ chassis stock, shared over the members and plates it covers
@@ -123,49 +125,6 @@ lines:
     qty: 1
     unit: job
     price: {aud: 200, basis: estimate, date: 2026-11-20, note: "The XT arms adjust for camber and toe"}
-  # ================================================================ hired labour, AUD 120 an hour (research report 22). Owner-built leaves these out
-  - id: LAB-01
-    group: labour
-    name: Chassis and drawbar fabrication, cut, fit, weld, grind, inspect and prepare for galvanising
-    qty: 70
-    unit: h
-    price: {aud_each: 120, basis: estimate, url: "https://mobilewelders.com.au/", date: 2026-11-20, note: "Cutting and drilling 12 h, jig and tack 14 h, welding 28 h, grinding and inspection 10 h, handling 6 h. Mobile welders charge from AUD 110/h"}
-  - id: LAB-02
-    group: labour
-    name: Running gear and chassis assembly after galvanising, arms, airbags, shocks, brakes, Bosch TSC, air system, hubs and wheels, coupling, jockey wheel, steadies and chains
-    qty: 16
-    unit: h
-    price: {aud_each: 120, basis: estimate, date: 2026-11-20}
-  - id: LAB-04
-    group: labour
-    name: Body shell assembly, floor on the chassis and its 32 mounts, walls and roof bonded into the joiners, openings framed and sealed, water test, vinyl laid
-    qty: 70
-    unit: h
-    price: {aud_each: 120, basis: estimate, url: "https://outbacktravelaustralia.com.au/4wd-mods-diy-workshop/styromax-diy-motorhome-bodies/", date: 2026-11-20, note: "Two people. Floor and mounts 10 h, walls and roof 24 h, openings 16 h, sealing and a hose test 12 h, vinyl 6 h. Panel makers sell kits for owner assembly but publish no assembly price"}
-  - id: LAB-05
-    group: labour
-    name: Small fabrications, the drawbar box, stone guard, tank guards and bearers, mud flap hangers and the air supply box
-    qty: 19
-    unit: h
-    price: {aud_each: 120, basis: estimate, date: 2026-11-20, note: "Drawbar box 8 h, stone guard 3 h, tank guards and bearers 6 h, hangers 2 h"}
-  - id: LAB-06
-    group: labour
-    name: Cabinetry, cut and assemble the kitchen tower, the bench, the lockers, the plinth panel and the board cabinet, and fit the trims
-    qty: 26
-    unit: h
-    price: {aud_each: 120, basis: estimate, date: 2026-11-20, note: "The hours research report 22 gave for the earlier layout's carcasses, benches and trims"}
-  - id: LAB-07
-    group: labour
-    name: Fitting the tanks and guards, the heater fuel tank, the awning, mud flaps, drawbar box and the fire safety items
-    qty: 12
-    unit: h
-    price: {aud_each: 120, basis: estimate, date: 2026-11-20}
-  - id: LAB-08
-    group: labour
-    name: Installing the services, plumbing and the water system, HVAC and ventilation, appliances, the lift bed, the wet room fittings and the low-voltage fittings
-    qty: 120
-    unit: h
-    price: {aud_each: 120, basis: estimate, date: 2026-11-21, note: "Research report 22's allowance (open point 6). The research gave no hours for these systems. The licensed electrical work is ELI-01 and the split's refrigeration fitting is in AC-03"}
   # ================================================================ lamps, reflectors and the number plate (data/services.yaml lamps, CT-011)
   - id: LGT-01
     group: lamps
@@ -181,7 +140,7 @@ lines:
       - {item: "Six amber side marker lamps with built-in reflectors", aud: 150, basis: estimate, date: 2026-11-21}
       - {item: "Hooded number plate lamp, and the plate's bracket and rivnuts", aud: 65, basis: estimate, date: 2026-11-21}
       - {item: "Lamp loom: 25 m of 7-core trailer cable, a junction box at the front, glands, grommets and heat shrink", aud: 170, basis: estimate, date: 2026-11-21}
-    note: Its mass is line LG-01 of the mass schedule, about 4 kg (est.), taken out of BD-11's allowance. The fitting is in LAB-08's services hours.
+    note: Its mass is line LG-01 of the mass schedule, about 4 kg (est.), taken out of BD-11's allowance. Leonard fits it.
   # ================================================================ licensed trades
   - id: ELI-01
     group: installation
@@ -250,13 +209,22 @@ lines:
     qty: 1
     unit: certificate
     price: {aud: 400, basis: estimate, date: 2026-11-20, note: "No gas certificate is needed, because there is no LPG"}
+  - id: CMP-14
+    group: compliance
+    name: Weld evidence for the chassis and drawbar, Leonard's welder qualification test to AS/NZS 1554.1 and dye-penetrant tests of the critical joints
+    qty: 1
+    unit: lot
+    price:
+      - {item: "Welder qualification test for Leonard to AS/NZS 1554.1 clause 4.12.2.3, a test piece of at least 300 mm welded to the chassis welding procedure, examined visually and by macro, witnessed by a NATA-accredited test house", aud: 1000, basis: estimate, url: "https://www.technoweld.com.au/services/welder-qualification/", date: 2026-11-22, note: "No Australian price is published, and Technoweld quotes on request. About 4 h of a weld inspector's time at about AUD 150 an hour, the macro section and the certificate (est.)"}
+      - {item: "Two CRC Crick 110, 120 and 130 sets of cleaner, red penetrant and developer, for Leonard's tests of the drawbar-to-rail welds, the coupling plate, the XT crossmembers and the chain lugs before galvanising", aud: 143.68, basis: listing, converted_from: "EUR 42.76 a set including VAT", url: "https://www.soldufer.com/producto/kit-soldadura-110120130-crick-ref117073160338-crc/", date: 2026-11-22, note: "No Australian listing was found"}
+    note: "Neither VSB1, the HVAIS inspection nor the concessional RAV entry asks for a qualified welder, a weld certificate or crack tests (research report 27). The RAV entry needs ADR 62/02's drawbar evidence in hand, and the engineer's calculation (CMP-03) is that evidence only for the SP welds to AS/NZS 1554.1 that CHASSIS.md specifies, which the standard has a qualified welder make. Report 02's WLD-03 asks for the dye-penetrant tests"
   # ================================================================ freight and consumables
   - id: CON-01
     group: freight
     name: Welding and grinding consumables, MIG wire, shielding gas, cutting and flap discs, burrs and drill bits
     qty: 1
     unit: lot
-    price: {aud: 450, basis: estimate, date: 2026-11-20, note: "A hired shop may include these in its rate"}
+    price: {aud: 450, basis: estimate, date: 2026-11-20, note: "Leonard welds the chassis himself, so the list buys them"}
   - id: CON-02
     group: freight
     name: Zinc-rich touch-up paint for the bolt holes and coupling faces after dipping, and Loctite 567 thread sealant
@@ -317,16 +285,6 @@ lines:
 # parts whose item starts with `item`, or a `share` of the line. Options that remove the same lines overlap, so they do
 # not add up. `mass_kg` is the change in tare, an estimate, and `costs` is what the option costs the requirements.
 savings:
-  - id: SV-01
-    name: Build the whole trailer yourself, with no hired labour
-    removes: {groups: [labour]}
-    mass_kg: 0
-    costs: "About 333 h of Leonard's time (est.). The chassis welds still need a welder qualified to AS/NZS 1554.1 and the engineer's inspection"
-  - id: SV-02
-    name: Do the fit-out yourself, and hire only the chassis, running gear and body shell work
-    removes: {lines: [LAB-05, LAB-06, LAB-07, LAB-08]}
-    mass_kg: 0
-    costs: "About 177 h of Leonard's time (est.). It is part of SV-01"
   - id: SV-03
     name: Two self-built 16S EVE MB31 314 Ah packs, 32.1 kWh, in place of the five Victron NG modules
     removes: {lines: [EL-01]}
@@ -354,7 +312,7 @@ savings:
     name: No engineer's review
     removes: {lines: [CMP-03]}
     mass_kg: 0
-    costs: "NSW does not need one for a VSB1 trailer of 4.5 t ATM or less, but the chassis and body designs stay unchecked drafts"
+    costs: "NSW's inspection does not ask for one, but the concessional RAV entry needs ADR 62/02's drawbar evidence in hand, which is then a drawbar test at an approved facility, and the chassis and body designs stay unchecked drafts (research report 27)"
   - id: SV-08
     name: Square front edges in place of the rounded ones
     removes: {lines: [BD-14]}
