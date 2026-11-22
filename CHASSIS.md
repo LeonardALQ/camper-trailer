@@ -9,7 +9,7 @@ The frame now carries the home trailer of TRAILER.md revision J. Revision D, the
 - Every case is checked at the 3,500 kg plate (decision H2), on all eight trailer cases TC1 to TC8, including the grey-full cases. VSB1's drawbar and chain forces follow the plate: 51.5 kN and 17.2 kN at the coupling, 34.3 kN and 17.2 kN at each chain point.
 - The raisers, outriggers and floor crossmembers are RHS 127 x 51 x 3.5 C350L0, because RHS 125 x 50 x 3 is not a stocked size (research report 22). Each member is checked at its own grade, so the composite rail is checked at the raiser's 350 MPa.
 - The grey tank fills the rear bay, so a floor crossmember crosses its middle in place of the battery bay's, and the rear bay's plan braces went. The XT rear shock crossmember is RHS 150 x 50 x 4 in place of 150 x 50 x 3, so the rear recovery pull (CHS-08A) passes without them. The tank's 2 mm guard is not counted as a shear plate, because it would buckle at about 4 kN (est.).
-- The axle group sits at X 4,379.9 mm, so the XT stations moved 182.9 mm rearward.
+- The axle group sits at X 4,379.8 mm, so the XT stations moved 182.8 mm rearward.
 - The rails are 1,275 mm over their outsides for the 1,655 mm track (decision H22, 21 Nov 2026), 100 mm wider than report 18's 1,175 mm, so the crossmembers, drawbar brace and plan braces are longer and the outriggers 50 mm shorter. The tanks keep their 975 mm width.
 - The drawbar box is 1,480 x 320 x 720 mm for two Honda EU22i. The spare wheel sits 415 mm higher on longer posts, so it lifts off over the box.
 - No check limit changed, and no estimate changed to pass a check.
@@ -175,20 +175,19 @@ CHS-10 says where a hole may go and checks its fatigue, with three rules. Its ce
 | H-09 | B-18 | Kerb raiser's inner web, 2,015 | 14 x 54 slot | 87 of 350 MPa, LC6 | 25.8, 17.5 | 81.5, 14 | 25.9 of 81.9 MPa | meets |
 | H-10 | B-16 | Kerb raiser's inner web, 2,267 | 28 x 103 slot | 84 of 350 MPa, LC6 | 39.8, 35 | 30.5, 28 | 23.8 of 81.9 MPa | meets |
 | H-11 | D-14 | Kerb raiser's outer web, 2,291 | 24 x 74 slot | 104 of 350 MPa, LC6 | 43.8, 30 | 24.4, 24, nut plate | 17.3 of 81.9 MPa | meets |
-| H-12 | B-18 | Kerb raiser's top face, 5,024 | 14 x 15 slot | 190 of 350 MPa, LC8a | 10.2, 17.5 | 8.0, 24, H-13 | 65.2 of 81.9 MPa | fails |
-| H-13 | D-14 | Kerb raiser's top face, 5,052 | 24 x 25 slot | 207 of 350 MPa, LC8a | 10.2, 30 | 8.0, 24, H-12 | 69.8 of 81.9 MPa | fails |
-| H-14 | B-16 | Kerb raiser's top face, 5,094 | 28 | 215 of 350 MPa, LC8a | 10.2, 35 | 15.5, 28, H-13 | 71.7 of 81.9 MPa | fails |
+| H-12 | D-14 | Kerb raiser's inner web, 4,669 | 24 x 58 slot | 194 of 350 MPa, LC8a | 49.8, 30 | 42.5, 24 | 43.0 of 81.9 MPa | meets |
+| H-13 | B-16 | Kerb raiser's inner web, 4,840 | 28 x 66 slot | 151 of 350 MPa, LC8a | 43.8, 35 | 32.5, 28, airbag bracket | 48.7 of 81.9 MPa | meets |
+| H-14 | B-18 | Kerb raiser's inner web, 4,952 | 14 x 31 slot | 179 of 350 MPa, LC8a | 25.8, 17.5 | 66.3, 28, H-13 | 52.9 of 81.9 MPa | meets |
 | H-15 | K-08 | Kerb raiser's inner web, 5,996 | 16 x 23 slot | 161 of 350 MPa, LC8a | 39.8, 20 | 66.5, 16 | 2.8 of 81.9 MPa | meets |
 | H-16 | K-09 | Road raiser's inner web, 5,988 | 16 x 33 slot | 158 of 350 MPa, LC8a | 54.8, 20 | 51.5, 16 | 5.0 of 81.9 MPa | meets |
 
-Eleven of the 14 meet every rule. The services moved nine of them off the rails' and raisers' 50 mm faces and the welds:
+All 14 meet every rule. The services moved twelve of them off the rails' and raisers' 50 mm faces and the welds:
 
 - K-08 and K-09 rise inboard of the rails behind the grey tank, enter the raisers through their inner webs at 78 and 64 mm above the seam (H-15, H-16), and run forward inside them in the inboard lane, K-08 between D-14 and B-18. At the XT centre station each turns square across its raiser into OR-05 through a round 16 mm hole on the outrigger's centre line, tied to it, its edge 17.5 mm from the root weld's toes either side (H-01, H-03). A lamp cable bends at 57 mm, so only a turn that starts in the inboard lane meets the outer web square.
 - K-10 leaves the road rail through its outer web at Z 652 beside X 4,089, where the range at its edge is 60.8 MPa, and drops outside the rail to pass under it to the TSC (H-07, was the rail's bottom face).
 - K-01 leaves the road rail through its outer web at Z 680 beside X 6,021, ahead of the rear steady's swing, and drops behind it (H-08, was the rail's bottom face 14 mm from K-09's hole).
 - B-16 leaves the kerb raiser at Z 796, 30.5 mm from the seam's fillet, under D-14, which rides 16 mm higher from X 2,560 forward (H-10).
-
-The three under G20 (H-12 to H-14) still pass down through the kerb raiser's top face, and CHS-10 reports them. G20's raiser-space cells cannot move inboard of the raiser as planned, because the 79.5 mm left between the raiser and the rear tank's 20 mm is full of the chase's loom. A frame of their own outboard of the raiser, with the three cables entering its outer web on diagonal slots, or a reinforced opening in the top face, is the next step.
+- B-18, B-16 and D-14 leave G20's outboard row and come down into the 79.5 mm between the kerb raiser and the rear tank's 20 mm. They run forward against the raiser and enter it on slants through its inner web, B-18 at Z 840, B-16 at Z 800 and D-14 at Z 806, after it runs at Z 760 for its 110 mm bend (H-12 to H-14, were the raiser's top face). G20 became one packing space over the gap with the chase's loom inboard of the three, so they add no hole and no frame. A frame outboard of the raiser would sit within FIT-05's 50 mm of the rear tyre at full travel and in its spray, and a reinforced opening in the top face would put its collar's welds across the composite rail's top flange (TB 070).
 
 ## What the engineer must check
 
@@ -200,7 +199,7 @@ The three under G20 (H-12 to H-14) still pass down through the kerb raiser's top
 6. SP to AS/NZS 1554.1 for every weld, or AS/NZS 1554.5 for the most fatigue-loaded joints, and the C350L0 and C450L0 grades on the mill certificates.
 7. The floor panel spanning from the raiser to the body edge between outriggers at most 900 mm apart, with no edge member (BODY.md, BDY-04).
 8. ARK's corner steady brackets welded under the rails along the rails' bottom corners only (FAT-16, LOC-06), and the steadies' jacking loads through them into the rails' 3 mm webs.
-9. The holes the services make in the rails and raisers, once they move to CHS-10's rules (CHS-09, CHS-10), above all any hole left in a raiser's outer web inside an outrigger's root weld, which the hot-spot check of that joint must count.
+9. The holes the services make in the rails and raisers (CHS-09, CHS-10), above all the two in the raisers' outer webs inside OR-05's root welds (H-01, H-03), which the hot-spot check of that joint must count.
 
 ## Assumptions made for the design
 

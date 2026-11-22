@@ -484,7 +484,7 @@ consts:
   KD_Y: -half_in + 110              # the chase's drains, 25 mm from its extra-low-voltage risers and 50 mm from the 230 V (SVC-08)
   DCR_X: rear_x0 - 25               # the battery's riser behind the dryer, to the isolator and the BMS, clipped to the partition
   DCR_Y: -half_in + 55              # the chase's mid row, down through the cabinet's floor: the risers and the loom to G20, 30 mm clear of the water lines
-  WSY: -half_in + 12                # the chase's wall strip, outside the cabinet's kerb face: the cables to the kerb frame's raiser space and the tank senders
+  WSY: -half_in + 12                # the chase's wall strip, outside the cabinet's kerb face: the cables to the kerb frame's outboard row and the tank senders
   RZ1: RS_K.z1 - 34                 # inside the kerb raiser, clear of its seam with the rail: the breakaway feed B-18 on top,
   RZ2: RS_K.z1 - 69                 # the ute feed D-14 in the middle
   RZ3: RS_K.z1 - 102                # and the compressor feed B-16 at the bottom, each 7 mm inboard of the raiser's centre for K-08's riser
@@ -690,8 +690,8 @@ runs:
      path: [[G4.cx + 7.5, ., .], [., KB_Y + L_KB, .], [., ., CZ], [KBX, ., .], [., ., ZD], [BR_MPPT2.cx, BR_MPPT2.cy, .]], to: {line: BR-MPPT2, at: [., ., BR_MPPT2.z1]}}
   # ================================================================ 230 V (report 20 section 7): the kerb lane over the dryer, the riser behind the washer,
   # the plinth's end slot and under the floor in conduit, up at G15 into the kitchen and the MultiPlus-II, at G17 to the desk and G19 to the Combi
-  - {id: A-01, system: ac230, kind: tps, size: 4, amps: 23.8, volts: 230, feeds: "MultiPlus-II AC-out-1 to the 230 V board, in its own conduit apart from the 230 V group: out of the board cabinet's inboard face, down the partition beside the dryer and round the pressure gauge, across the end slot, through G20 and G15 in modules of its own", protection: "25 A two-pole circuit breaker as the board's main switch, in series with AC-out-1 as Victron's installation manual asks, rated for the board's managed peak",
-     amps_why: "The board's managed peak, 5,465 W on the all-electric cold day (report 20 section 3), under the MultiPlus-II 48/6k5's 5.7 kW at 40 C",
+  - {id: A-01, system: ac230, kind: tps, size: 4, amps: 23.8, volts: 230, feeds: "MultiPlus-II AC-out-1 to the 230 V board, alone, apart from the 230 V group: out of the board cabinet's inboard face, clipped down the partition beside the dryer and round the pressure gauge, across the end slot, through G20 and G15 in modules of its own", protection: "25 A two-pole circuit breaker as the board's main switch, in series with AC-out-1 as Victron's installation manual asks, rated for the board's managed peak",
+     amps_why: "The board's managed peak, 5,465 W on the all-electric cold day (report 20 section 4), under the MultiPlus-II 48/6k5's 5.7 kW at 40 C",
      serves: [inverter], glands: [G20, G15], along: [BD-01, BD-03, WR-03, LA-14F, RS-K, CM-06, RS-R],
      from: {line: BR-AC, at: [BR_AC.x0, BR_AC.cy - 40, BR_AC.cz]},
      path: [[rear_x0 - 20, ., .], [., EL_02.y1 + 7, .], [., ., SN_02.z1 + 50], [rear_x0 - 55, ., SN_02.z1 + 15], [., ., SN_02.z0 - 15], [rear_x0 - 20, ., SN_02.z0 - 50], [., ., LA_14F.z0 - 45], [G20_A_01.cx, G20_A_01.cy, .], [., ., UFZ + 3], [5238, ., .], [., G15_A_01.cy, .], [G15_A_01.cx, ., .]],

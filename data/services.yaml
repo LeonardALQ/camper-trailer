@@ -57,8 +57,9 @@ fittings:
 # (I2-27). A hole is where a run threaded through a member crosses its wall (cad/routes.py member_holes, which
 # cad/tests/test_routes.py holds this list to): its point, its size across (the run's outside diameter and a 6 mm
 # bush, est.) and its length along the wall where the run passes it on a slant. A frame's cut-out is its packing
-# space and its 4 mm walls. The three cables of the kerb frame's raiser space keep inside the raiser, clear of its
-# seam with the rail. Every hole is in a web, none in a 50 mm face (CHS-10): K-08 and K-09 rise inboard of the rails
+# space and its 4 mm walls. The kerb frame G20's three raiser cables, D-14, B-16 and B-18, leave the kerb raiser
+# through its inner web ahead of the frame, clear of its seam with the rail, and rise beside it into the frame's
+# outboard row. Every hole is in a web, none in a 50 mm face (CHS-10): K-08 and K-09 rise inboard of the rails
 # behind the grey tank, enter the raisers through their inner webs and turn square across them into the outriggers
 # OR-05 through a round hole on the outrigger's centre line, 17.5 mm from its root weld either side, and K-01 and K-10
 # leave the road rail through its outer web at its flat's middle, not its bottom face.

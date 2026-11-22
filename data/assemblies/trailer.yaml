@@ -581,13 +581,13 @@ items:
     material: "Roxtec RM Multidiameter modules (EPDM rubber) and solid modules, 4 mm 5052 aluminium frames with an 8 mm rim, stayplates, compression wedges and Roxtec's lubricant"
     system: electrical
     price:
-      - {item: "Roxtec RM modules for the runs and solid modules to fill the packing spaces: 25 RM 15 and 7 RM 20 at about AUD 25, 17 RM 30 and 2 RM 40 at about AUD 35, 1 RM 60 at about AUD 60", aud: 1525, basis: estimate, date: 2026-11-22, note: "From RS Components' listing of the RM 20 at EUR 14.92 (read 22 Nov 2026) at about AUD 1.65 a euro, the other sizes scaled (est.)"}
-      - {item: "Three 4 mm aluminium frames made to the packing spaces, 156 x 110, 180 x 60 and 30 x 75 mm, with their rims", aud: 360, basis: estimate, date: 2026-11-22}
+      - {item: "Roxtec RM modules for the runs and solid modules to fill the packing spaces: 23 RM 15 and 7 RM 20 at about AUD 25, 13 RM 30 and 2 RM 40 at about AUD 35, 1 RM 60 at about AUD 60", aud: 1335, basis: estimate, date: 2026-11-22, note: "From RS Components' listing of the RM 20 at EUR 14.92 (read 22 Nov 2026) at about AUD 1.65 a euro, the other sizes scaled (est.). G20's one packing space of 156 x 84 mm needs about 4,050 mm2 less filling than its two of 156 x 110 did, four RM 30 and two RM 15 (est.)"}
+      - {item: "Three 4 mm aluminium frames made to the packing spaces, 156 x 84, 180 x 60 and 30 x 90 mm, with their rims", aud: 360, basis: estimate, date: 2026-11-22}
       - {item: "Three compression wedges, eight stayplates and the assembly lubricant", aud: 350, basis: estimate, date: 2026-11-22}
-    point: [4863, -24, floor_z - 15]
+    point: [4830, 44, floor_z - 15]
     parts:
-      - {item: "Roxtec RM modules, 52: 25 RM 15 at 0.02 kg, 7 RM 20 at 0.04, 17 RM 30 at 0.08, 2 RM 40 at 0.14 and 1 RM 60 at 0.32, as supplied", kg: 2.74, basis: maker, source: "Roxtec RM module with Multidiameter, product page (www.roxtec.com), read 22 Nov 2026"}
-      - {item: "Three frames, 4 mm 5052 aluminium, 60 mm deep, with an 8 mm rim: 0.39, 0.36 and 0.16 kg at 2.68 t/m3", kg: 0.91, basis: calculated}
+      - {item: "Roxtec RM modules, 46: 23 RM 15 at 0.02 kg, 7 RM 20 at 0.04, 13 RM 30 at 0.08, 2 RM 40 at 0.14 and 1 RM 60 at 0.32, as supplied", kg: 2.38, basis: maker, source: "Roxtec RM module with Multidiameter, product page (www.roxtec.com), read 22 Nov 2026"}
+      - {item: "Three frames, 4 mm 5052 aluminium, 60 mm deep, with an 8 mm rim: 0.36, 0.36 and 0.18 kg at 2.68 t/m3", kg: 0.90, basis: calculated}
       - {item: "Three compression wedges at about 0.15 kg", kg: 0.45, basis: estimate}
       - {item: "Eight stayplates and the lubricant", kg: 0.21, basis: estimate}
     note: "The floor's three multi-cable penetrations (I2-14, I2-24): the kerb frame G20 under the plinth's end slot, the road frame G15 under the MultiPlus-II and the Combi's frame G9 at the tower's bed-side end, each module round its run and the rest of each packing space filled with solid modules, compressed from above, so nothing is turned under the floor. The round glands they replace were in BD-11's glands and ties item, which keeps them as a margin (est.). The point is the frames' mass-weighted centre (est.)"
