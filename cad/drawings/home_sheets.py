@@ -306,7 +306,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
         ["230 V", "AS/NZS 3001.2:2022: RCD on the inverter's output, labelled (VSB1 7.3)", "30 mA RCBO on every circuit, board labelled, licensed electrician", ("CT-601", "#000")],
         ["Battery", "Sealed compartment vented outside, BMS, fuse within 1 m sleeved (AS/NZS 3001.2 5.4)", "Sealed 2 mm 5052 box, two 20 mm vents through the floor (G6, G7)", ("CT-602", "#000")],
         ["Doors", "Outward opening, one on the left (kerb) side or the rear (VSB1 13.2.1)", "D1 kerb side and D2 rear, both outward, triple locks", ("CT-010, CT-013", "#000")],
-        ["Extinguisher", "1A:5B, one a compartment, smoke alarm (VSB1 13.2.2)", "A 2 kg ABE by each outside door, D1 and D2, fire blanket at D1, smoke and CO alarms (LA-12, LA-15, LA-16)", ("ONE AT EACH DOOR", "#000")],
+        ["Extinguisher", "1A:5B, one a compartment, smoke alarm (VSB1 13.2.2)", "2 kg ABE at D1 and D2, fire blanket at D1, smoke and CO alarms (LA-12, LA-15, LA-16)", ("ONE AT EACH DOOR", "#000")],
         ["LPG", "Caravan LPG code and AS/NZS 5601 (VSB1 13.2.4)", "None fitted. Cooking, hot water and heat are electric or diesel", ("NONE", "#000")],
         ["Mud flaps", "Behind the rear wheels", "610 x 455 mm rubber on the XT rear shock outriggers (BD-10)", ("BD-10", "#000")],
         ["Number plate", "Upright, no part above 1,300 mm, lit white, legible from 20 m (VSB1 3.1)",
@@ -357,16 +357,17 @@ def ct003(prj, model, bom, checks, reg, dwg):
                                          f"FOUR STRAPS, FOUR {an['name'].split(',')[0].upper()} ANCHORS, FOUR {an['plate_no']} STABILIZER PLATES AND A SOIL "
                                          "TEST PROBE."),
         ("SETTING EACH ANCHOR (STB-05)", [
-            f"1. PROBE WHERE THE ANCHOR GOES, TO THE HELIX DEPTH, {an['helix_mm'] / 1000:.1f} m. LESS THAN {an['min_probe_inlb']} in-lb: "
+            f"1. MARK THE ANCHOR'S PLACE {td_case['head_mm'][0]:,.0f} TO {td_case['head_mm'][1]:,.0f} mm OUT FROM THE POINT UNDER ITS "
+            f"LASHING POINT AND PROBE THERE TO THE HELIX DEPTH, {an['helix_mm'] / 1000:.1f} m. LESS THAN {an['min_probe_inlb']} in-lb: "
             "HITCH THE TRAILER OR MOVE IT.",
-            f"2. WIND THE ANCHOR INTO UNDISTURBED SOIL AT A {an['back_angle_deg']:g} DEGREE BACK ANGLE TO ABOUT 2/3 DEPTH, "
-            f"{sa[0]} TO {sa[1]} mm ({an['set_above_in'][0]} TO {an['set_above_in'][1]} in) LEFT ABOVE GROUND.",
+            f"2. WIND THE ANCHOR INTO UNDISTURBED SOIL AT A {an['back_angle_deg']:g} DEGREE BACK ANGLE, HEAD TOWARD THE TRAILER, TO ABOUT "
+            f"2/3 DEPTH, {sa[0]} TO {sa[1]} mm ({an['set_above_in'][0]} TO {an['set_above_in'][1]} in) LEFT ABOVE GROUND.",
             f"3. DRIVE THE PLATE VERTICALLY ON THE TRAILER SIDE OF THE ROD, {pg[0]} TO {pg[1]} mm ({an['plate_gap_in'][0]} TO "
             f"{an['plate_gap_in'][1]} in) FROM IT.",
             "4. WIND THE ANCHOR TO FULL DEPTH, ITS HEAD AT THE GROUND.",
-            f"5. TENSION THE STRAP AT {min(ang):g} TO {max(ang):g} DEGREES, CHECKED ALONG IT WITH AN ANGLE FINDER, UNTIL THE ROD "
-            "BEARS ON THE PLATE.",
-            "NEVER DIG A HOLE AND BACKFILL IT: TIE DOWN PAIRS THAT WITH A LOAD TEST IN LOOSE SOIL. "
+            f"5. TENSION THE STRAP UNTIL THE ROD BEARS ON THE PLATE. CHECK ITS ANGLE ALONG IT WITH AN ANGLE FINDER: {min(ang):g} TO "
+            f"{max(ang):g} DEGREES, {min(ang) - an['min_angle_deg']:g} DEGREES CLEAR OF THE LISTING'S {an['min_angle_deg']:g}.",
+            "NEVER DIG A HOLE AND BACKFILL IT: TIE DOWN WARNS THAT LOOSE SOIL MAY THEN NEED A LOAD TEST. "
             f"STEPS FROM TIE DOWN'S MANUAL, {an['steps_src'].upper()}."]),
     ]
     yy = yb - 13

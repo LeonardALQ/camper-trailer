@@ -37,16 +37,19 @@ def _route(pr, pts, sty, arrow=False):
         arrow_line(pr.sh, q[-2], q[-1], sty, 1.6)
 
 
-def _gland(sh, pr, g, V, size=1.15):
-    """A gland from data/services.yaml as a small circle with its id, on its wall, the floor or the roof."""
+def _gland(sh, pr, g, V, size=1.15, label=True, right=False):
+    """A gland from data/services.yaml as a small circle with its id, on its wall, the floor or the roof. `label` False
+    where the plan already names it as an opening, `right` puts the id beside the circle."""
     at = g["at"]
     x, y = {"kerb": (g.get("x"), -V["half_bw"]), "road": (g.get("x"), V["half_bw"]), "rear": (V["body_x1"], g.get("y")),
             "front": (V["body_x0"], g.get("y"))}.get(at, (g.get("x"), g.get("y")))
     p = pr.p(x, y, 0)
     sh.circle(p[0], p[1], 0.9, "box")
     sh.circle(p[0], p[1], 0.9, "medium")
-    dy = -2.6 if at == "kerb" else 1.3
-    sh.text(p[0], p[1] + dy, g["id"], size, "middle", bold=True)
+    if right:
+        sh.text(p[0] + 1.4, p[1] - 0.4, g["id"], size, bold=True)
+    elif label:
+        sh.text(p[0], p[1] + (-2.6 if at == "kerb" else 1.3), g["id"], size, "middle", bold=True)
     return p
 
 
@@ -211,8 +214,8 @@ def ct602(prj, model, bom, checks, reg, dwg):
         sh.text(q[0] + 0.6, q[1], t, 1.15, color="#b00000", bold=True)
     sh_ = f("WR-09")
     _route(pr, [(xb, sh_[1]), (sh_[0], sh_[1])], "ac", arrow=True)
-    q = pr.p(xb, sh_[1] - 120)
-    sh.text(q[0] - 0.6, q[1], "C4", 1.15, "end", color="#b00000", bold=True)
+    q = pr.p(xb + 150, sh_[1] + 40)
+    sh.text(q[0], q[1], "C4", 1.15, color="#b00000", bold=True)
     wa, dr = f("LA-02"), f("LA-14")
     _route(pr, [(bd[0] + 100, yk), (wa[0], yk)], "ac")
     for x, t in ((wa[0], "C6"), (dr[0], "C7")):
@@ -235,8 +238,9 @@ def ct602(prj, model, bom, checks, reg, dwg):
         _route(pr, [(xs, y), (V["in_x0"] + 120, y)], "bus", arrow=True)
     m = lay.find("LB-04M").cog
     _route(pr, [(V["in_x0"] + 400, yr - 60), (m[0], yr - 60), (m[0], m[1])], "bus", arrow=True)
+    as_openings = {o["id"] for o in res["openings"]}
     for gid in ("G2", "G3", "G4", "G5", "G6", "G7", "G8"):
-        _gland(sh, pr, g[gid], V)
+        _gland(sh, pr, g[gid], V, label=gid not in as_openings, right=gid == "G7")
     # outlets, indicative: one symbol for each outlet in its zone (report 20 section 7)
     outs = [(4350, hi - 25, "2"), (4950, hi - 25, "2"), (V["in_x0"] + 25, -350, "2"), (V["in_x0"] + 25, 350, "2"),
             (3300, -hi + 25, "2"), (wa[0], -hi + 25, "1"), (dr[0], -hi + 25, "1"), (bd[0] + 60, -hi + 25, "1")]

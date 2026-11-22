@@ -81,8 +81,10 @@ def _title(sh, dwg, reg, mass_note, scale, c, weld_note=None):
         sheet_no=dwg["sheet"], sheets=reg["sheets_total"], size=dwg["size"], scale=scale, material="SEE TABLE",
         mass_note=mass_note, model_ref=f"ute.step (ASM-UG rev {c['prj'].assembly.revision}, UTE-79 rev {c['ute'].d['revision']})",
         git=git_hash(), weld_note=weld_note)
+    # the sheet's own layout leaves room for this many revision rows. The register (and the site's Drawings page) keeps every one
+    rows = {"CT-701": 4, "CT-702": 3, "CT-703": 4, "CT-704": 3}.get(dwg["number"], 7)
     S.revision_table(sh, [dict(rev=r["rev"], date=str(r["date"]), description=r["description"], drawn=r["drawn"],
-                               checked=r["checked"], approved=r["approved"]) for r in dwg["revisions"]])
+                               checked=r["checked"], approved=r["approved"]) for r in dwg["revisions"]], max_rows=rows)
 
 
 def _stamp(sh, x, y):
@@ -458,7 +460,7 @@ def ct703(prj, model, bom, checks, reg, dwg):
     hp = vR.p(0, P["door_y1"] - 165, 755)
     S.leader(sh, hp, (hp[0] + 22, hp[1] - 14), "SHROUDED HASP, ABLOY PL362", size=1.6)
     kl = vR.p(0, -300, 1200)
-    S.leader(sh, kl, (kl[0] - 22, kl[1] + 16), "KERB LEAF: SHOOT BOLTS INSIDE", size=1.6)
+    S.leader(sh, kl, (kl[0] - 10, kl[1] + 22), "KERB LEAF: SHOOT BOLTS INSIDE", size=1.6)
 
     # ---- kerb-side door elevation
     kerb = _clip(_leaves(_module(c, groups=("body", "doors", "security"))), -100, 1500, -1000, -800, -10, 1600)
@@ -484,8 +486,8 @@ def ct703(prj, model, bom, checks, reg, dwg):
     _shade(sh, vS, cut, "Z", zc)
     S.view_label(sh, 120, 84, "PLAN SECTION AT Z 700 THROUGH THE BARN DOORS, REAR AT THE BOTTOM", sp)
     for side, lab in ((1, "ROAD"), (-1, "KERB")):
-        p = vS.p(P["x_end"], side * (P["outside_w"] / 2 + 60), zc)
-        sh.text(p[0], p[1] + 2, lab, 1.8, "middle")
+        p = vS.p(P["x_end"], side * P["outside_w"] / 2, zc)
+        sh.text(p[0] + 1.2 * side, p[1] + 2, lab, 1.8, "start" if side > 0 else "end")
     rp = vS.p(P["ramp_x0"] + P["ramp_fold_t"] / 2, 0, zc)
     S.leader(sh, rp, (rp[0] + 25, rp[1] + 30), "RAMP FOLDED ON ITS EDGE, COMES OUT FIRST", size=1.6)
     hgp = vS.p(P["x_end"] - 5, hw + 5, zc)

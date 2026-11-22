@@ -121,7 +121,7 @@ def ct201(prj, model, bom, checks, reg, dwg):
         us = lay.find(iid).cog[0] - V["body_x0"]
         xs = ox + ((L - us) if flip else us) / k
         sh.line(xs, yy, xs, yy + H / k, "phantom")
-        sh.text(xs + 0.8, yy + H / k - 3.0, iid.split(".")[0], 1.3)
+        sh.text(xs + (-0.8 if flip else 0.8), yy + H / k - 3.0, iid.split(".")[0], 1.3, "end" if flip else "start")
         xr = ox + (L / k if flip else 0)
         r = V["roof_front_r"] / k
         sgn = -1 if flip else 1

@@ -406,7 +406,7 @@ def ct103(prj, model, bom, checks, reg, dwg):
     sh.text(cx + 9.5, zc - 0.6, "CENTROID", 1.5)
     S.vdim(sh, cx - 6, zb, cx - 6, zb + 150 / k, cx - 9, "150", size=1.6)
     S.vdim(sh, cx - 6, zb + 150 / k, cx - 6, zb + 275 / k, cx - 9, "125", size=1.6)
-    S.leader(sh, (cx + 25 / k, zb + (275 + P["strip_t"] / 2) / k), (cx + 9, zb + 66), f"{P['strip_t']:.1f} BEARER STRIP", size=1.5)
+    S.leader(sh, (cx + 25 / k, zb + (275 + P["strip_t"] / 2) / k), (cx + 9, zb + 61), f"{P['strip_t']:.1f} BEARER STRIP", size=1.5)
     weld_symbol(sh, (cx + 25 / k, zb + 150 / k), (cx + 7, zb + 45), "4", both=True, note="CONTINUOUS")
     for i, t in enumerate((f"RAIL 150x50x3 C450L0 + RAISER 127x51x3.5 C350L0", f"I {comp['I'] / 1e6:.1f} x 10^6 mm4",
                            f"Z {comp['Z_bottom'] / 1e3:.1f} (BOTTOM), {comp['Z_top'] / 1e3:.1f} (TOP) x 10^3 mm3", "VENT EACH END OF EACH BAY")):
@@ -481,12 +481,12 @@ def ct103(prj, model, bom, checks, reg, dwg):
     # ---- J: spare carrier posts, side elevation, 1:20 (right column)
     k = 20.0
     cx, zb = 380.0, 92.0
-    _detail_title(sh, cx, 172, "J: SPARE CARRIER POSTS", k)
     h = (P["spare_post_top_z"] - 569.7) / k
-    sh.rect(cx, zb, cx + 50 / k, zb + h, "medium")
     zs = zb + (P["spare_z"] - 569.7) / k
+    _detail_title(sh, cx, max(172.0, zs + 375 / k + 7.0), "J: SPARE CARRIER POSTS", k)
+    sh.rect(cx, zb, cx + 50 / k, zb + h, "medium")
     sh.rect(cx - 311 / k, zs - 375 / k, cx - 60 / k, zs + 375 / k, "phantom")
-    sh.text(cx - 186 / k, zs + 375 / k + 1.5, "SPARE WHEEL", 1.4, "middle")
+    sh.text(cx - 186 / k, zs + 375 / k - 3.0, "SPARE WHEEL", 1.4, "middle")
     sh.rect(cx + 50 / k, zb - 150 / k, cx + 100 / k, zb, "medium")
     sh.text(cx + 4, zb + h - 2, "SHS 50x50x2.5 x 2", 1.5)
     for i, t in enumerate(("POSTS BOLTED (M12) TO CLEATS ON THE FRONT", "CROSSMEMBER, TIED TO THE WALL AT THE TOP.", "NOTHING ON THE DRAWBAR (LOC-05).")):

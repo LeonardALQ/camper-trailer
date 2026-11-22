@@ -120,7 +120,8 @@ def ct001(prj, model, bom, checks, reg, dwg):
     # the bike box's underside over the drawbar (JK-02), as far as its sweep reaches
     u0, u1 = E(0, sw["underside_z"]), E(sw["radius_mm"], sw["underside_z"])
     sh.line(u0[0], u0[1], u1[0], u1[1], "phantom")
-    sh.text(u0[0] - 1.0, u0[1] + 1.0, f"BIKE BOX UNDERSIDE Z {sw['underside_z']:.0f}", 1.5, "end")
+    sh.text(u0[0] - 1.0, u0[1] + 2.9, "BIKE BOX", 1.5, "end")
+    sh.text(u0[0] - 1.0, u0[1] + 1.0, f"UNDERSIDE Z {sw['underside_z']:.0f}", 1.5, "end")
     xr = E(V["body_x1"], 0)[0]
     levels = [(V["coupling_z"], f"{V['coupling_z']:.0f} COUPLING POINT"), (V["rail_underside_z"], f"{V['rail_underside_z']:.0f} RAIL UNDERSIDE"),
               (fz, f"{fz:.0f} FLOOR"), (V["mattress_z"] + V["mattress_t"], f"{V['mattress_z'] + V['mattress_t']:.0f} MATTRESS TOP"),

@@ -4,6 +4,7 @@ hidden-line views from build123d / OCCT HLR. Output is SVG with real text, then 
 from __future__ import annotations
 
 import math
+import re
 from dataclasses import dataclass
 
 from build123d import Edge, GeomType, Keep, Plane, split
@@ -100,7 +101,7 @@ class Sheet:
         "centre": 'stroke="#000" stroke-width="0.18" fill="none" stroke-dasharray="6,1,1,1"',
         "phantom": 'stroke="#555" stroke-width="0.18" fill="none" stroke-dasharray="5,1,1,1,1,1"',
         "cut": 'stroke="#000" stroke-width="0.7" fill="none"',
-        "frame": 'stroke="#000" stroke-width="0.7" fill="none"',
+        "frame": 'stroke="#000" stroke-width="0.7" fill="none" class="frame"',
         "hatch": 'stroke="#000" stroke-width="0.13" fill="none"',
         "fill": 'fill="#000" stroke="none"',
         "shade": 'fill="#c8c8c8" stroke="#000" stroke-width="0.25"',
@@ -111,6 +112,7 @@ class Sheet:
 
     def __init__(self):
         self.el: list[str] = []
+        self.texts: list[dict] = []
 
     def _y(self, y):
         return self.H - y
@@ -139,11 +141,16 @@ class Sheet:
     def circle(self, cx, cy, r, sty="thin"):
         self.el.append(f'<circle cx="{cx:.2f}" cy="{self._y(cy):.2f}" r="{r:.2f}" {self.STY[sty]}/>')
 
-    def text(self, x, y, s, size=2.5, anchor="start", rot=0.0, bold=False, color="#000"):
-        s = str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    def text(self, x, y, s, size=2.5, anchor="start", rot=0.0, bold=False, color="#000", cell=False):
+        """`cell`: the text sits in a table's or the title block's cell, so a line through it is a layout fault, never
+        broken for it. Any other text breaks the lines that cross its letters (`knockouts`)."""
+        raw = str(s)
+        s = raw.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
         tr = f' transform="rotate({rot:.1f} {x:.2f} {self._y(y):.2f})"' if rot else ""
         w = ' font-weight="bold"' if bold else ""
         c = f' fill="{color}"' if color != "#000" else ""
+        if not cell and raw.strip():
+            self.texts.append(dict(i=len(self.el), x=x, y=self._y(y), s=size, anchor=anchor, rot=rot, bold=bold, t=raw, tr=tr))
         self.el.append(f'<text x="{x:.2f}" y="{self._y(y):.2f}" font-size="{size}" text-anchor="{anchor}" '
                        f'font-family="DejaVu Sans, Arial, sans-serif"{w}{c}{tr}>{s}</text>')
 
@@ -158,7 +165,7 @@ class Sheet:
                 f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.W:g}mm" height="{self.H:g}mm" '
                 f'viewBox="0 0 {self.W:g} {self.H:g}">\n'
                 f'<rect x="0" y="0" width="{self.W:g}" height="{self.H:g}" fill="#fff"/>\n'
-                + "\n".join(self.el) + "\n</svg>\n")
+                + "\n".join(knockouts(self)) + "\n</svg>\n")
 
 
 _METRICS: dict = {}
@@ -201,6 +208,136 @@ def rev_room(col: str) -> float:
     edges = [x for _, x in REV_COLS] + [REV_W]
     i = [c for c, _ in REV_COLS].index(col)
     return edges[i + 1] - edges[i] - 2 * REV_PAD
+
+
+_PATH = re.compile(r'<path d="([^"]+)"([^>]*)/>')
+_CIRCLE = re.compile(r'<circle cx="([-\d.]+)" cy="([-\d.]+)" r="([\d.]+)"([^>]*)/>')
+
+
+def _arc(p0, rx, ry, phi, large, sweep, p1, n=16):
+    """An SVG arc from p0 to p1 as n points (the SVG specification's endpoint to centre conversion)."""
+    if not rx or not ry:
+        return [p1]
+    c, s = math.cos(math.radians(phi)), math.sin(math.radians(phi))
+    hx, hy = (p0[0] - p1[0]) / 2, (p0[1] - p1[1]) / 2
+    x1, y1 = c * hx + s * hy, -s * hx + c * hy
+    rx, ry = abs(rx), abs(ry)
+    lam = (x1 / rx) ** 2 + (y1 / ry) ** 2
+    if lam > 1:
+        rx, ry = rx * math.sqrt(lam), ry * math.sqrt(lam)
+    den = (rx * y1) ** 2 + (ry * x1) ** 2
+    k = math.sqrt(max(0.0, ((rx * ry) ** 2 - den) / den)) if den else 0.0
+    k = -k if large == sweep else k
+    cx1, cy1 = k * rx * y1 / ry, -k * ry * x1 / rx
+    cx, cy = c * cx1 - s * cy1 + (p0[0] + p1[0]) / 2, s * cx1 + c * cy1 + (p0[1] + p1[1]) / 2
+    t0 = math.atan2((y1 - cy1) / ry, (x1 - cx1) / rx)
+    dt = math.atan2((-y1 - cy1) / ry, (-x1 - cx1) / rx) - t0
+    if sweep and dt < 0:
+        dt += 2 * math.pi
+    elif not sweep and dt > 0:
+        dt -= 2 * math.pi
+    return [(cx + rx * math.cos(t) * c - ry * math.sin(t) * s, cy + rx * math.cos(t) * s + ry * math.sin(t) * c)
+            for t in (t0 + dt * i / n for i in range(1, n + 1))]
+
+
+def _segments(el) -> list:
+    """Every stroked straight piece on the sheet in SVG coordinates, arcs and circles as chords, the frame's left out."""
+    out = []
+    for e in el:
+        if e.startswith("<path"):
+            m = _PATH.match(e)
+            if not m or 'stroke="none"' in m[2] or "stroke=" not in m[2] or 'class="frame"' in m[2]:
+                continue
+            tok = re.findall(r"[MLAZ]|[-\d.]+", m[1])
+            pts, start, cmd, i = [], None, "M", 0
+            while i < len(tok):
+                t = tok[i]
+                if t in "MLAZ":
+                    cmd, i = t, i + 1
+                    if t == "Z" and pts:
+                        pts.append(start)
+                        out += list(zip(pts, pts[1:]))
+                        pts = []
+                    continue
+                if cmd == "A":
+                    rx, ry, phi, large, sweep, x, y = map(float, tok[i:i + 7])
+                    pts += _arc(pts[-1], rx, ry, phi, int(large), int(sweep), (x, y))
+                    i += 7
+                    continue
+                p = (float(tok[i]), float(tok[i + 1]))
+                if cmd == "M":
+                    out += list(zip(pts, pts[1:]))
+                    pts, start, cmd = [p], p, "L"
+                else:
+                    pts.append(p)
+                i += 2
+            out += list(zip(pts, pts[1:]))
+        elif e.startswith("<circle"):
+            m = _CIRCLE.match(e)
+            if not m or 'stroke="none"' in m[4]:
+                continue
+            cx, cy, r = float(m[1]), float(m[2]), float(m[3])
+            p = [(cx + r * math.cos(math.pi * k / 16), cy + r * math.sin(math.pi * k / 16)) for k in range(33)]
+            out += list(zip(p, p[1:]))
+    return out
+
+
+def _enters(p, q, box) -> bool:
+    """Liang-Barsky: does the segment p-q enter the box (x0, x1, y0, y1)?"""
+    u0, u1 = 0.0, 1.0
+    dx, dy = q[0] - p[0], q[1] - p[1]
+    for a, b in ((-dx, p[0] - box[0]), (dx, box[1] - p[0]), (-dy, p[1] - box[2]), (dy, box[3] - p[1])):
+        if abs(a) < 1e-12:
+            if b < 0:
+                return False
+        elif a < 0:
+            u0 = max(u0, b / a)
+        else:
+            u1 = min(u1, b / a)
+        if u0 > u1:
+            return False
+    return True
+
+
+def knockouts(sh) -> list[str]:
+    """The sheet's elements with a white mask behind every text that a stroked line crosses, the text and its mask
+    drawn last, so the line breaks at the lettering. Cell texts and the frame are left alone."""
+    if not sh.texts:
+        return sh.el
+    segs, grid, G = _segments(sh.el), {}, 5.0
+    for k, (p, q) in enumerate(segs):
+        for gx in range(int(min(p[0], q[0]) // G), int(max(p[0], q[0]) // G) + 1):
+            for gy in range(int(min(p[1], q[1]) // G), int(max(p[1], q[1]) // G) + 1):
+                grid.setdefault((gx, gy), []).append(k)
+    masked = {}
+    for t in sh.texts:
+        s, txt = t["s"], t["t"]
+        lead, trail = len(txt) - len(txt.lstrip()), len(txt) - len(txt.rstrip())
+        w = text_mm(txt.strip(), s, t["bold"])
+        full = text_mm(txt, s, t["bold"])
+        x0 = t["x"] if t["anchor"] == "start" else t["x"] - full / 2 if t["anchor"] == "middle" else t["x"] - full
+        x0 += text_mm(" " * lead, s, t["bold"]) if lead else 0.0
+        core = (x0 + 0.12 * s, x0 + w - 0.12 * s, t["y"] - 0.62 * s, t["y"] - 0.06 * s)
+        a = math.radians(t["rot"])
+        ca, sa = math.cos(a), math.sin(a)
+
+        def to_sheet(u, v):
+            return (t["x"] + (u - t["x"]) * ca - (v - t["y"]) * sa, t["y"] + (u - t["x"]) * sa + (v - t["y"]) * ca)
+
+        def to_local(p):
+            return (t["x"] + (p[0] - t["x"]) * ca + (p[1] - t["y"]) * sa, t["y"] - (p[0] - t["x"]) * sa + (p[1] - t["y"]) * ca)
+        cs = [to_sheet(u, v) for u in core[:2] for v in core[2:]]
+        cand = set()
+        for gx in range(int(min(c[0] for c in cs) // G), int(max(c[0] for c in cs) // G) + 1):
+            for gy in range(int(min(c[1] for c in cs) // G), int(max(c[1] for c in cs) // G) + 1):
+                cand.update(grid.get((gx, gy), ()))
+        if any(_enters(to_local(segs[k][0]), to_local(segs[k][1]), core) for k in cand):
+            masked[t["i"]] = (f'<rect x="{x0 - 0.3:.2f}" y="{t["y"] - 0.78 * s - 0.2:.2f}" width="{w + 0.6:.2f}" '
+                              f'height="{1.02 * s + 0.4:.2f}" fill="#fff"{t["tr"]}/>')
+    if not masked:
+        return sh.el
+    keep = [e for i, e in enumerate(sh.el) if i not in masked]
+    return keep + [m + "\n" + sh.el[i].replace("<text ", '<text class="masked" ', 1) for i, m in sorted(masked.items())]
 
 
 # ------------------------------------------------------------------ views
@@ -351,7 +488,7 @@ def table(sh, x, y, cols, rows, size=1.8, row_h=3.4, header=True, title=None):
     if header:
         cx = x
         for h, cw in cols:
-            sh.text(cx + 0.8, yy - row_h + 0.9, h, size, bold=True)
+            sh.text(cx + 0.8, yy - row_h + 0.9, h, size, bold=True, cell=True)
             cx += cw
         yy -= row_h
         sh.line(x, yy, x + w, yy, "thin")
@@ -361,7 +498,7 @@ def table(sh, x, y, cols, rows, size=1.8, row_h=3.4, header=True, title=None):
             color = "#000"
             if isinstance(v, tuple):
                 v, color = v
-            sh.text(cx + 0.8, yy - row_h + 0.9, str(v), size, color=color)
+            sh.text(cx + 0.8, yy - row_h + 0.9, str(v), size, color=color, cell=True)
             cx += cw
         yy -= row_h
         sh.line(x, yy, x + w, yy, "thin")
@@ -399,6 +536,7 @@ def title_block(sh, *, owner, project, number, title, subtitle, rev, status, dat
                 engineer, sheet_no, sheets, size, scale, material, mass_note, model_ref, git, weld_note=None):
     """180 x 56 title block, bottom right (ISO 7200 width), fields TB-01 to TB-13."""
     x0, x1, y0, y1 = 230.0, 410.0, 10.0, 66.0
+    n0 = len(sh.texts)
     sh.fillrect(x0, y0, x1, y1)
     sh.rect(x0, y0, x1, y1, "frame")
     lab = lambda x, y, t: sh.text(x, y, t, 1.6, color="#333")  # noqa: E731
@@ -452,6 +590,7 @@ def title_block(sh, *, owner, project, number, title, subtitle, rev, status, dat
     sh.text(232, 18.6, "ALL DIMENSIONS IN mm. DO NOT SCALE. GENERAL TOLERANCE ISO 2768-c UNLESS STATED (TO BE CONFIRMED).", 1.75)
     sh.text(232, 15.6, (weld_note or "NO WELDS ON THIS SHEET (WELD SYMBOLS WOULD BE TO AS 1101.3). ") + mass_note, 1.75)
     sh.text(232, 12.4, f"MODEL: {model_ref}  DATA REV {git}  (TB-12)", 1.75)
+    del sh.texts[n0:]
 
 
 def revision_table(sh, revisions, x0=230.0, x1=410.0, ytop=287.0, max_rows=7):
@@ -468,7 +607,7 @@ def revision_table(sh, revisions, x0=230.0, x1=410.0, ytop=287.0, max_rows=7):
     for cx, labl in cols:
         if cx != x0:
             sh.line(cx, yb, cx, ytop - 5)
-        sh.text(cx + REV_PAD, ytop - 8.6, labl, 1.7)
+        sh.text(cx + REV_PAD, ytop - 8.6, labl, 1.7, cell=True)
     sh.line(x0, ytop - 10, x1, ytop - 10)
     for i, r in enumerate(revisions):
         y = ytop - 13.8 - i * 5
@@ -476,7 +615,7 @@ def revision_table(sh, revisions, x0=230.0, x1=410.0, ytop=287.0, max_rows=7):
             sh.line(x0, ytop - 10 - 5 * i, x1, ytop - 10 - 5 * i)
         vals = [r["rev"], r["date"], r["description"], r["drawn"], r["checked"] or "-", r["approved"] or "-"]
         for (cx, _), v in zip(cols, vals):
-            sh.text(cx + REV_PAD, y, v, REV_TEXT)
+            sh.text(cx + REV_PAD, y, v, REV_TEXT, cell=True)
     return yb
 
 
@@ -495,7 +634,7 @@ def parts_list(sh, rows, x0=230.0, x1=410.0, ybase=66.0, row_h=4.6, title="PARTS
     for cx, lab, _ in cols[1:]:
         sh.line(cx, ybase, cx, top, "thin")
     for cx, lab, _ in cols:
-        sh.text(cx + 0.8, ybase + 1.5, lab, 1.7, bold=True)
+        sh.text(cx + 0.8, ybase + 1.5, lab, 1.7, bold=True, cell=True)
     for i, r in enumerate(rows):
         yb = ybase + row_h * (i + 1) + 1.4
         vals = [r["item"], r["part"], r["description"], r["qty"], r["mass"], r.get("supplier", "")]
@@ -504,7 +643,7 @@ def parts_list(sh, rows, x0=230.0, x1=410.0, ybase=66.0, row_h=4.6, title="PARTS
             maxc = int(w / 1.05)
             if len(s) > maxc:
                 s = s[: maxc - 1] + "…"
-            sh.text(cx + 0.8, yb, s, 1.75)
+            sh.text(cx + 0.8, yb, s, 1.75, cell=True)
         if tags and r["item"] in tags:
             rev_tag(sh, x0 - 3.6, ybase + row_h * (i + 1.5) - 0.4, tags[r["item"]], 4.2)
     return top + 5

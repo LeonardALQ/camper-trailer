@@ -33,7 +33,8 @@ drawings:
       - {rev: O, date: 2026-11-21, description: "Notice: inner-skin wall members, tare 2,618 kg, 310 L in travel (H21)", drawn: Kiro, checked: "", approved: ""}
       - {rev: P, date: 2026-11-21, description: "Notice: tare 2,622 kg, the axle at X 4,375, 305 L in travel (H21), the ute at 2,601 kg", drawn: Kiro, checked: "", approved: ""}
       - {rev: Q, date: 2026-11-21, description: "Notice: the axle at X 4,373, the centres of gravity, 300 L in travel (H21), the ute at 2,638 kg", drawn: Kiro, checked: "", approved: ""}
-      - {rev: R, date: 2026-11-21, description: "Notice: the ute at 2,646 kg and 7,175 kg with the anchors' kit (STB-05), TC1 2,885 kg", drawn: Kiro, checked: "", approved: ""}
+      - {rev: R, date: 2026-11-21, description: "Notice: the ute at 2,646 kg and 7,175 kg with the anchors' kit, TC1 2,885 kg with growth", drawn: Kiro, checked: "", approved: ""}
+      - {rev: S, date: 2026-11-22, description: "Memo: labels clear of the lines and the frame, revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
   - number: CT-002
     title: Mass and centre of gravity
     subtitle: Every load case with growth, the axle window of H17, the CoG in elevation and across
@@ -50,6 +51,7 @@ drawings:
       - {rev: D, date: 2026-11-21, description: "Notice: masses and centres of gravity after the re-check's fixes, 305 L (H21)", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-21, description: "Notice: masses after the second re-check's fixes, the axle window 14.4 mm, 300 L (H21)", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-21, description: "Notice: masses with the H200 fill at BD-20 (F5-03), the worst offset 34.9 mm", drawn: Kiro, checked: "", approved: ""}
+      - {rev: G, date: 2026-11-22, description: "Memo: labels clear of the lines, revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
   - number: CT-003
     title: Compliance
     subtitle: VSB1 items and the standards with the design figures, operating limits and the plate
@@ -62,11 +64,12 @@ drawings:
     revisions:
       - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-21, description: "Lamps, reflectors and number plate designed, open rows closed", drawn: Kiro, checked: "", approved: ""}
-      - {rev: C, date: 2026-11-21, description: "Notice: 2,470 mm wide (DIM-05), extinguishers at D1 and D2, 320 L and 203 L (H21)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: C, date: 2026-11-21, description: "Notice: 2,470 mm wide (DIM-05), extinguishers at D1 and D2, 320 L, fallback 203 L (H21)", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-21, description: "Notice: awning and parked-in-wind rules (H23, STB-04), 24 lamp checks, 310 L (H21)", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-21, description: "Notice: sliding and the tie-downs in the wind rule (STB-04, STB-05), 305 L, 172 L", drawn: Kiro, checked: "", approved: ""}
-      - {rev: F, date: 2026-11-21, description: "Notice: the wind rule at 85 km/h (STB-04), rated anchors (STB-05), 300 L and 134 L", drawn: Kiro, checked: "", approved: ""}
+      - {rev: F, date: 2026-11-21, description: "Notice: the wind rule at 85 km/h (STB-04), rated anchors (STB-05), 300 L, fallback 134 L", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-21, description: "Notice: the listed anchors, plates and soil probe (STB-05), fallback 3,225 kg and 127 L", drawn: Kiro, checked: "", approved: ""}
+      - {rev: H, date: 2026-11-22, description: "Notice: strap at 48 to 55 degrees, the anchors' steps, no dig and backfill (STB-05)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-010
     title: Floor plan, bed up and bed down
     subtitle: Day and night plans, walkways, door swings, spaces kept clear and the bed positions
@@ -79,6 +82,7 @@ drawings:
     revisions:
       - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-21, description: "Notice: G2 drawn as an opening (F4-05)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: C, date: 2026-11-22, description: "Memo: labels clear of the lines", drawn: Kiro, checked: "", approved: ""}
   - number: CT-011
     title: Elevations and openings
     subtitle: Kerb, road, front and rear walls with every opening, its position and margins, and the lamps
@@ -96,6 +100,7 @@ drawings:
       - {rev: E, date: 2026-11-21, description: "Notice: wall members and glands drawn on the side walls (FIT-07), G2 at its real size", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-21, description: "Notice: BD-20 and G1 at X 3,040 on the kerb wall, G2 an opening, 18 openings (BDY-18)", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-21, description: "Notice: the opening count from BDY-18 only (F5-06)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: H, date: 2026-11-22, description: "Memo: kerb wall title clear of the awning case, labels clear of the lines", drawn: Kiro, checked: "", approved: ""}
   - number: CT-012
     title: Sections
     subtitle: Through the bed by day and night, the plinth and bench, the wet room, well and grey tank
@@ -108,6 +113,7 @@ drawings:
     revisions:
       - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-21, description: "Notice: 1,275 mm rails for the 1,655 mm track (H22), full-depth members, roof awning", drawn: Kiro, checked: "", approved: ""}
+      - {rev: C, date: 2026-11-22, description: "Memo: labels clear of the lines, revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
   - number: CT-013
     title: Window, door and hatch schedule
     subtitle: Every opening with its product, cut-out, clear opening, operation, blind and position
@@ -141,6 +147,7 @@ drawings:
       - {rev: H, date: 2026-11-21, description: "Notice: stations and stresses with the axle at X 4,380, LC5b at 0.52", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-21, description: "Notice: stations rounded at the source, the axle at X 4,375, lashing points CH-B02", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-21, description: "Notice: stations with the axle at X 4,373", drawn: Kiro, checked: "", approved: ""}
+      - {rev: K, date: 2026-11-22, description: "Memo: labels clear of the lines, revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
@@ -161,6 +168,7 @@ drawings:
       - {rev: H, date: 2026-11-21, description: "Notice: drawbar members to the 1,275 mm rails (H22), cross brace 527 mm", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-21, description: "Notice: drawbar stresses with the axle at X 4,375", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-21, description: "Notice: stresses with the axle at X 4,373", drawn: Kiro, checked: "", approved: ""}
+      - {rev: K, date: 2026-11-22, description: "Memo: labels clear of the lines", drawn: Kiro, checked: "", approved: ""}
   - number: CT-103
     title: Chassis details
     subtitle: Composite rail, outrigger root, crossmember to rail, overlap end, jacking pad, recovery tongue, spare posts
@@ -180,6 +188,7 @@ drawings:
       - {rev: G, date: 2026-11-21, description: "Notice: fatigue re-solved with the axle at X 4,380", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-21, description: "Notice: fatigue re-solved with the axle at X 4,375", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-21, description: "Notice: fatigue re-solved with the axle at X 4,373", drawn: Kiro, checked: "", approved: ""}
+      - {rev: J, date: 2026-11-22, description: "Memo: detail J's title clear of the spare wheel, detail C's strip label lowered", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads
@@ -195,6 +204,7 @@ drawings:
       - {rev: C, date: 2026-11-21, description: "Notice: rows and notes 3 and 5 from the data, inner-skin members, AC-04 stays", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-21, description: "Notice: wall members RHS 110 x 19 x 3.5 (BDY-10 19.7 mm), stations at X 4,375", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-21, description: "Notice: stations with the axle at X 4,373", drawn: Kiro, checked: "", approved: ""}
+      - {rev: F, date: 2026-11-22, description: "Memo: labels clear of the lines, revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
   - number: CT-201
     title: Body shell
     subtitle: Kerb, road, front and rear walls, the fixed roof plan, the panels and every opening with its size
@@ -213,6 +223,7 @@ drawings:
       - {rev: F, date: 2026-11-21, description: "Notice: six wall members RHS 110 x 19 x 3.5, BD-18 on the road side, one BD-19", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-21, description: "Notice: BD-20 behind the bed's rear kerb-side hardpoint, G2 an opening, body 633 kg", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-21, description: "Notice: note 4 from the members' data, BD-20 and the hardpoint in one channel (F5-03)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: I, date: 2026-11-22, description: "Memo: BD-18's label clear of OP-08, labels clear of the lines, rows fit", drawn: Kiro, checked: "", approved: ""}
   - number: CT-202
     title: Body joint details
     subtitle: Floor joiner, corner joiner, roof-to-wall joiner, lift bed rail hardpoint and a floor insert with its crush tube
@@ -230,6 +241,7 @@ drawings:
       - {rev: E, date: 2026-11-21, description: "Notice: detail D redrawn, members on the inner skin (BDY-22), APLB-1024 bolts", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-21, description: "Notice: detail F, a member's foot on its PVC pad (BDY-22), APLN-1016 nuts on pads", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-21, description: "Notice: detail F's bearing blocks and joiner foam, detail D's 16 mm rail screws", drawn: Kiro, checked: "", approved: ""}
+      - {rev: H, date: 2026-11-22, description: "Memo: labels clear of the lines, revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
   - number: CT-203
     title: Body insert map
     subtitle: Every fixing line in the floor, the walls and the roof, the mount inserts and the furniture fixings
@@ -247,6 +259,7 @@ drawings:
       - {rev: E, date: 2026-11-21, description: "Notice: LB-06 label and cradle fixing from the data, awning bolts (BDY-11)", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-21, description: "Notice: cradle note from AC-03 and AC-04, the lockers' strip clear of BD-19", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-21, description: "Notice: BD-20, the bench's insert strip in the members' rule, self-drilling rail screws", drawn: Kiro, checked: "", approved: ""}
+      - {rev: H, date: 2026-11-22, description: "Memo: labels clear of the lines, revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
   - number: CT-301
     title: Body to chassis
     subtitle: Mount positions, the bolt and nut-plate detail, isolation and sealing, the twist sharing
@@ -264,6 +277,7 @@ drawings:
       - {rev: E, date: 2026-11-21, description: "Notice: mounts re-solved with the axle at X 4,380 and the body at 631 kg", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-21, description: "Notice: mounts re-solved with the axle at X 4,375", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-21, description: "Notice: stations with the axle at X 4,373", drawn: Kiro, checked: "", approved: ""}
+      - {rev: H, date: 2026-11-22, description: "Memo: revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
   - number: CT-401
     title: Garage and bed general arrangement
     subtitle: Plan, kerb-side section and section looking forward at partition A
@@ -327,6 +341,7 @@ drawings:
       - {rev: B, date: 2026-11-21, description: "Notice: generators 6 m away and downwind, both e2 pairs stop on generator power", drawn: Kiro, checked: "", approved: ""}
       - {rev: C, date: 2026-11-21, description: "Notice: second 15 A inlet, SHORE - OFF - GENERATOR changeover (F2-07)", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-21, description: "Notice: on GENERATOR e2 fans C and D off and a neutral-earth bond (F3-07)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: E, date: 2026-11-22, description: "Memo: labels clear of the lines", drawn: Kiro, checked: "", approved: ""}
   - number: CT-602
     title: Electrical layout
     subtitle: Battery plinth, board, inverter, cable routes, glands, outlets and the cable schedule
@@ -342,6 +357,7 @@ drawings:
       - {rev: C, date: 2026-11-21, description: "Notice: two 15 A appliance inlets, SHORE and GENERATOR (F2-07)", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-21, description: "Notice: G2's two inlets and SB50 in a 310 x 120 mm cut-out", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-21, description: "Notice: G2 counted as an opening (F4-05)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: F, date: 2026-11-22, description: "Memo: labels clear of the lines, G2 named once, C4 and G7 moved clear", drawn: Kiro, checked: "", approved: ""}
   - number: CT-611
     title: Plumbing schematic
     subtitle: Fill, fresh tanks, pump, filters, cold and hot lines, drains to the grey tank and the dump
@@ -371,6 +387,7 @@ drawings:
       - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-21, description: "Notice: tanks 975 mm wide between the 1,275 mm rails (H22), 320 L travel limit (H21)", drawn: Kiro, checked: "", approved: ""}
       - {rev: C, date: 2026-11-21, description: "Notice: G1 at X 3,040 under W1, clear of BD-20 (F4-04)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: D, date: 2026-11-22, description: "Memo: labels clear of the lines", drawn: Kiro, checked: "", approved: ""}
   - number: CT-621
     title: HVAC and ventilation
     subtitle: Split, heat-recovery pairs, extract, towing pressurisation, relief, hood, Combi ducts
@@ -387,6 +404,7 @@ drawings:
       - {rev: D, date: 2026-11-21, description: "Notice: generator mode, fans A and B with the RESPA-CF2 (BDY-22)", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-21, description: "Notice: G2 drawn as an opening (F4-05)", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-21, description: "Notice: the generators downwind in any wind, never off the road side (F5-04)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: G, date: 2026-11-22, description: "Memo: labels clear of the lines, revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
   - number: CT-701
     title: Ute with the bike garage, general arrangement
     subtitle: Kerb-side elevations travelling and loading, plan, rear view, mass by case and the ute checks
@@ -406,6 +424,7 @@ drawings:
       - {rev: G, date: 2026-11-21, description: "Notice: roof rivet-bonded at the bows (UGF-01), the tie-down kit in the tool chests", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-21, description: "Notice: the ute's masses with the trailer's anchors aboard (T2)", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-21, description: "Notice: the ute's masses with the anchors' kit at 38.6 kg (T2)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: J, date: 2026-11-22, description: "Memo: the latest four revisions listed, clear of the mass table", drawn: Kiro, checked: "", approved: ""}
   - number: CT-702
     title: Ute garage box frame and panels
     subtitle: Kerb-side frame elevation, subframe plan on Toyota's deck mounts, section at the rear axle, member schedule
@@ -422,6 +441,7 @@ drawings:
       - {rev: D, date: 2026-11-21, description: "Notice: tubs 47.5 out for the Elite's 1555 rear track, tub flares (H19), mudflaps", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-21, description: "Notice: box body 189.9 kg with the roof bead (BX-F10)", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-21, description: "Notice: box body 190.2 kg with the roof's rivets (BX-F11)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: G, date: 2026-11-22, description: "Memo: the latest three revisions listed, clear of the section", drawn: Kiro, checked: "", approved: ""}
   - number: CT-703
     title: Ute garage doors and security
     subtitle: Rear view, kerb-side door, plan section through the barn doors, security layers
@@ -436,6 +456,7 @@ drawings:
       - {rev: B, date: 2026-11-20, description: "Notice: title block wording only", drawn: Kiro, checked: "", approved: ""}
       - {rev: C, date: 2026-11-20, description: "Notice: ground anchors at X 450, so the disc lock chain reaches the disc", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-21, description: "Notice: rear tub flares for the Elite's 1555 rear track (H19)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: E, date: 2026-11-22, description: "Memo: the kerb leaf's note and the side labels clear of the lines", drawn: Kiro, checked: "", approved: ""}
   - number: CT-704
     title: Ute garage restraint layout
     subtitle: Plan with the roof off, section at the rear L-track row, strap loads and anchors
@@ -451,3 +472,4 @@ drawings:
       - {rev: C, date: 2026-11-20, description: "Notice: LC 500 kg straps, plain FE750 track, 1519 fittings, check UGR-03", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-21, description: "Notice: tubs and flares for the Elite's 1555 rear track (H19), road chest 270 wide", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-21, description: "Notice: the bikes' gaps to the anchors' bag at its packed size (UGC-02, F5-05)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: F, date: 2026-11-22, description: "Notice: the anchors' bag 1,760 mm long, the anchors staggered in it (F6-03)", drawn: Kiro, checked: "", approved: ""}

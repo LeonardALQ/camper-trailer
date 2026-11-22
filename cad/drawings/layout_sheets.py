@@ -50,7 +50,7 @@ def _op_key(line):
 
 
 # ------------------------------------------------------------------ CT-011 elevations
-def _wall_view(sh, V, res, wall, k, ox, oy, lay, title_txt, marks=True, dims=True, small=False, dims_y=2.0):
+def _wall_view(sh, V, res, wall, k, ox, oy, lay, title_txt, marks=True, dims=True, small=False, dims_y=2.0, title_y=None):
     """One wall from outside at 1:k. (ox, oy) is the sheet point of the wall's left end at the floor underside.
     Side walls run along the trailer (u from the body front), end walls across it (u is Y). `dims_y` is how far below
     the wall the opening figures sit. Returns the u to sheet x map and the height to sheet y map."""
@@ -125,7 +125,7 @@ def _wall_view(sh, V, res, wall, k, ox, oy, lay, title_txt, marks=True, dims=Tru
         if wall in ("front", "rear"):
             xc = X(0)
             sh.line(xc, Z(zb) - 1, xc, Z(zt) + 1, "centre")
-    sh.text(left, Z(zt) + 2.5, title_txt, 1.9 if not small else 1.5, bold=True)
+    sh.text(left, max(Z(zt) + 2.5, title_y or 0.0), title_txt, 1.9 if not small else 1.5, bold=True)
     return X, Z
 
 
@@ -172,11 +172,13 @@ def ct011(prj, model, bom, checks, reg, dwg):
     S.frame(sh)
     k = dwg["scale"]
     views = {}
+    aw = lay.find("BD-13").box
+    aw_z = ((aw[2] - V["floor_z"] + V["floor_t"]) / k, (aw[5] - V["floor_z"] + V["floor_t"]) / k)
     for wall, ox, oy, txt in (("kerb", 26, 214, "KERB-SIDE WALL FROM OUTSIDE, FRONT LEFT. FIGURES: mm FROM THE BODY FRONT"),
                               ("front", 160, 214, "FRONT WALL, KERB SIDE RIGHT. mm FROM THE CENTRELINE"),
                               ("road", 26, 143, "ROAD-SIDE WALL FROM OUTSIDE, FRONT RIGHT. FIGURES: mm FROM THE BODY FRONT"),
                               ("rear", 160, 143, "REAR WALL, ROAD SIDE RIGHT. mm FROM THE CENTRELINE")):
-        views[wall] = _wall_view(sh, V, res, wall, k, ox, oy, lay, txt, dims_y=6.6)
+        views[wall] = _wall_view(sh, V, res, wall, k, ox, oy, lay, txt, dims_y=6.6, title_y=oy + aw_z[1] + 1.2 if wall == "kerb" else None)
     X, Z = views["rear"]
     LM = resolve_lamps(lay)
     _lamps_on_walls(sh, V, views, LM)
@@ -204,10 +206,8 @@ def ct011(prj, model, bom, checks, reg, dwg):
         x0, x1 = sorted((X(b[1]), X(b[4])))
         sh.rect(x0, Z(b[2] - fz), x1, Z(b[5] - fz), "phantom")
         sh.text((x0 + x1) / 2, Z(b[2] - fz) + 1.0, "SPLIT OUTDOOR UNIT", 1.15, "middle")
-    aw = lay.find("BD-13").box
-    sh.rect(26 + (aw[0] - V["body_x0"]) / k, 214 + (aw[2] - V["floor_z"] + V["floor_t"]) / k,
-            26 + (aw[3] - V["body_x0"]) / k, 214 + (aw[5] - V["floor_z"] + V["floor_t"]) / k, "phantom")
-    sh.text(26 + (aw[0] - V["body_x0"]) / k, 214 + (aw[5] - V["floor_z"] + V["floor_t"]) / k + 0.8, "AWNING CASE ON THE ROOF, PHANTOM", 1.15)
+    sh.rect(26 + (aw[0] - V["body_x0"]) / k, 214 + aw_z[0], 26 + (aw[3] - V["body_x0"]) / k, 214 + aw_z[1], "phantom")
+    sh.text(26 + (aw[0] - V["body_x0"]) / k + 1.0, 214 + (aw_z[0] + aw_z[1]) / 2 - 0.4, "AWNING CASE ON THE ROOF, PHANTOM", 1.15)
     # ---- margins, right column
     yb = title(sh, dwg, reg, "OPENINGS WITH THEIR MASSES ON CT-013 (TB-11).", "GRP AND XPS SANDWICH, OPENINGS CUT AFTER LAY-UP")
     mg = opening_margins(lay, res, RULES)

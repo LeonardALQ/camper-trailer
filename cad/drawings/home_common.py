@@ -131,7 +131,7 @@ def wtable(sh, x, y, cols, rows, size=1.3, title=None, gap=0.65, header=True):
         cx = x
         for (lines, col), (h, cw) in zip(cs, cols):
             for j, t in enumerate(lines):
-                sh.text(cx + 0.7, yy - 0.5 - size * 0.85 - j * lh, t, size, bold=header and i == 0, color=col)
+                sh.text(cx + 0.7, yy - 0.5 - size * 0.85 - j * lh, t, size, bold=header and i == 0, color=col, cell=True)
             cx += cw
         yy -= hgt
         sh.line(x, yy, x + w, yy, "thin")
