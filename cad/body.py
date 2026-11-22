@@ -517,7 +517,8 @@ class Body:
         36 km/h headwind), against the bond's tensile strength over the joiner leg, with half of it allowed."""
         V, tw, L = self.V, self.d["twist"], self.d["loads"]
         perim = 2 * (V["body_length"] + V["body_width"])
-        roof_kg = V["body_length"] * V["body_width"] / 1e6 * self.p["roof"].d["kg_m2"] + sum(b.mass_kg for b in self.lay.blocks if b.system == "roof")
+        # BD-02 as weighed in the mass schedule, its insert strips with it, and the solar array: the figure BODY.md gives
+        roof_kg = sum(b.mass_kg for b in self.lay.blocks if b.id == "BD-02" or b.system == "roof")
         net = max(0.0, L["uplift_40ms_n"] - roof_kg * G)
         q = L["uplift_40ms_n"] / perim
         allow = 0.5 * tw["bond_tension_strength"] * tw["bond_width"]
