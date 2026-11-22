@@ -3,7 +3,7 @@ HDHPS70LW1 dryer, the machine base, the battery box with its five Victron module
 lockers over the machines."""
 from __future__ import annotations
 
-from . import ALU, BLACK, BLUE, CHROME, DARK, GLASS, GREY, PLY, RUBBER, STEEL, WHITE, product
+from . import ALU, BLACK, CHROME, DARK, GLASS, GREY, PLY, RUBBER, STEEL, WHITE, product
 
 VICTRON = "#2f5d9e"
 

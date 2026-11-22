@@ -1,22 +1,23 @@
 """H27: nothing in the trailer's 3D models floats (Leonard, 22 Nov 2026: "Many of the models are floating").
 
-Each model the trailer pages show is broken into its solids. Two solids are joined where they touch, or overlap by
-1 mm or less, over a real area: a contact patch at least W_MIN wide and A_MIN in area, not a point or an edge. Solids
-that overlap by more than 1 mm are joined too, as they are welded, bonded, bolted through or let into one another.
+Each model the trailer pages show is broken into its solids. Two solids are joined where they touch within 1 mm, a gap
+or an overlap of 1 mm or less, over a real area: a contact patch at least W_MIN wide and A_MIN in area, not a point or
+an edge. Solids that overlap by more than 1 mm are joined too, as they are welded, bonded, bolted through or let into
+one another.
 
 1. Every solid connects through these joints to the ground, through the tyres, the jockey wheel or the corner steadies.
-   The Body page's three models show the body off its chassis, so their root is the floor panel BD-01, which stands on
-   the chassis's 32 mounts in the trailer model, where the same test reaches it from the tyres.
+   In travel the jockey and the steadies are wound up, so the tyres hold the trailer. The Body page's three models
+   show the body off its chassis, so their root is the floor panel BD-01, which stands on the bearer strips on the
+   raisers and outriggers in the trailer model, where the same test reaches it from the tyres.
 2. Every line of the fit-out and of the drawbar box stands on something below it, or hangs from what its maker's
    guide fixes it to (HANGS, with that fixing). A line's own pieces do not hold it up.
 """
 from __future__ import annotations
 
 import functools
-import math
 
 import pytest
-from build123d import Compound, GeomType, Vector, extrude
+from build123d import Compound, GeomType, extrude
 
 TOL = 1.0       # mm: a joint's gap or shallow overlap
 W_MIN = 3.0     # mm: the narrowest contact patch that counts as an area
@@ -32,7 +33,6 @@ HANGS = {
     "EL-05": "the Lynx Smart BMS, the MPPTs and the Orion-Tr converters screw to the board panel",
     "EL-06": "the board panel screws to the cabinet's back, the Lynx Distributor, Cerbo GX and 230 V board to the panel",
     "AC-01": "the indoor unit hangs on its installation plate on the partition (Mitsubishi Electric's guide)",
-    "AC-02": "the outdoor unit bolts to its cradle (AC-03)",
     "AC-03": "the cradle bolts to the rear wall and stands on its stays (AC-04, BDY-21)",
     "AC-04": "the stays bolt to the rear wall and to the rear crossmember",
     "VE-01": "each LUNOS e2 sleeve is let into the wall and sealed (LUNOS's guide)",
@@ -43,13 +43,7 @@ HANGS = {
     "WR-08": "the basin, mirror cabinet and towel rail screw to the partition",
     "WR-09": "the DauerShower's technical unit screws to the partition in its dry cabinet",
     "WR-03": "the partition is bonded to the tray, the walls and the ceiling",
-    "LA-07A": "the hob drops into its cut-out in the worktop and clamps under it (Dometic's guide)",
-    "LA-07B": "the sink drops into its cut-out in the worktop and clamps under it (Dometic's guide)",
-    "LB-03": "the platform bolts to the HappiJac carriages on the four rails",
-    "LB-01": "the mattress lies on the underlay on the platform",
-    "SP-01": "the spare hangs on the carrier posts' hub plate",
     "LG-02": "each cap is riveted over an outrigger's open end",
-    "PL-03A": "the gear lies on the drawbar box's shelf",
 }
 
 
@@ -221,10 +215,8 @@ def graph(name: str):
 
 
 def roots(name: str, nodes) -> list[int]:
-    import os
-    extra = tuple(os.environ.get("SUPPORT_EXTRA_ROOTS", "").split(",")) if os.environ.get("SUPPORT_EXTRA_ROOTS") else ()
     if name == "trailer":
-        return [n for n, x in enumerate(nodes) if (x.line in ROOTS and x.bb[2] <= TOL) or x.key in extra]
+        return [n for n, x in enumerate(nodes) if x.line in ROOTS and x.bb[2] <= TOL]
     return [n for n, x in enumerate(nodes) if x.line == "BD-01"]
 
 

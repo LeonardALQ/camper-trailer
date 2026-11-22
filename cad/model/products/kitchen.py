@@ -4,7 +4,7 @@ the Dometic CVI1525 hob and CVS1350G sink with the mixer, the range hood, and th
 tower's top cupboard."""
 from __future__ import annotations
 
-from . import ALU, BLACK, CHROME, DARK, DOOR, GLASS, GREY, PLY, RUBBER, STEEL, WHITE, product
+from . import ALU, BLACK, CHROME, DARK, DOOR, GREY, PLY, RUBBER, STEEL, product
 
 T = 18.0          # carcass panels
 TOP = "#efe7da"   # laminated worktop

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from build123d import Ellipse, Plane, extrude
 
-from . import ALU, BLACK, CHROME, DARK, GLASS, GREY, RUBBER, STEEL, WHITE, product
+from . import ALU, BLACK, CHROME, DARK, GREY, RUBBER, STEEL, WHITE, product
 
 GRP = "#eef2f3"
 TRAY = "#dfe9ea"

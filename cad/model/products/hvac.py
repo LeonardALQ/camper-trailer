@@ -2,7 +2,7 @@
 units, the outdoor unit's cradle on its wire-rope isolators, and the LUNOS e2 60 and RA 15-60 fans."""
 from __future__ import annotations
 
-from . import ALU, BLACK, DARK, GREY, RUBBER, STEEL, WHITE, product
+from . import ALU, DARK, GREY, STEEL, WHITE, product
 
 
 @product("msz_ap25")
