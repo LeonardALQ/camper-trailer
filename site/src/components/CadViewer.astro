@@ -170,6 +170,11 @@ const parts = src.replace(/\.json$/, '.parts.json');
     price_note: string | null;
     load: string | null;
     paths: string[];
+    // a run in the trailer-electrical and trailer-plumbing models (cad/routes_model.py)
+    route?: {
+      feeds: string; ends: string; kind: string; cable: string; size: string; length_m: number;
+      protection: string | null; circuit: string; fittings: number; drop_pct: number | null; size_why: string | null;
+    } | null;
   }
   interface PartsFile {
     parts: Record<string, Part>;
@@ -323,6 +328,7 @@ const parts = src.replace(/\.json$/, '.parts.json');
         const act = (e.target as Element).closest('button')?.dataset.act;
         if (act) this.act(act);
       });
+      this.card.addEventListener('mousedown', (e) => e.stopPropagation());
       const parts = Object.values(this.data.parts);
       this.partKeys = [...new Set(parts.flatMap((p) => [p.iid, p.id]))];
       document.dispatchEvent(new CustomEvent('ct:parts-ready', { detail: { ids: this.partKeys } }));
@@ -345,7 +351,8 @@ const parts = src.replace(/\.json$/, '.parts.json');
       const h = this.resolve(this.hover);
       const p = h.part;
       const title = p && same(p.name) === same(h.label) ? p.name : h.label;
-      const facts = p ? [p.material, p.mass_kg != null ? `${kg(p.mass_kg)}${p.maturity ? ` (${p.maturity})` : ''}` : ''] : [];
+      const facts = p?.route ? [`${p.route.cable}, ${p.route.length_m.toFixed(2)} m routed`]
+        : p ? [p.material, p.mass_kg != null ? `${kg(p.mass_kg)}${p.maturity ? ` (${p.maturity})` : ''}` : ''] : [];
       this.tip.innerHTML = `${p ? `<b>${esc(p.iid)}</b> ` : ''}${esc(title)}`
         + facts.filter(Boolean).map((f) => `<br><span class="dim">${esc(f!)}</span>`).join('');
       this.tip.hidden = false;
@@ -389,7 +396,17 @@ const parts = src.replace(/\.json$/, '.parts.json');
       const p = h.part;
       const rows: [string, string][] = [];
       const base = this.dataset.drawings ?? '/drawings/';
-      if (p) {
+      const r = p?.route;
+      if (p && r) {
+        // a run: what it feeds, its two ends, the cable or pipe, its size, its length from the geometry and its protection
+        rows.push(['Feeds', esc(r.feeds)], ['Ends', esc(r.ends)], [r.kind, esc(r.cable)],
+          ['Size', `${esc(r.size)}${r.size_why ? `. ${esc(r.size_why)}` : ''}`],
+          ['Length', `${r.length_m.toFixed(2)} m from the routed geometry${r.fittings ? `, ${r.fittings} fittings` : ''}${r.drop_pct != null ? `, ${r.drop_pct.toFixed(2)} % drop` : ''}`],
+          ['Protection', r.protection ? esc(r.protection) : '<span class="dim">None recorded</span>'], ['Circuit', esc(r.circuit)]);
+        if (p.mass_kg != null) rows.push(['Mass', kg(p.mass_kg)]);
+        if (p.drawing) rows.push(['Drawing', `<a href="${esc(base)}#${p.drawing.toLowerCase()}">${esc(p.drawing)}</a>`]);
+        if (p.price_aud != null) rows.push(['Price', `AUD ${p.price_aud.toFixed(2)}${p.price_basis ? `, ${esc(p.price_basis)}` : ''}${p.price_note ? `. ${esc(p.price_note)}` : ''}`]);
+      } else if (p) {
         if (p.name && same(p.name) !== same(h.label)) rows.push(['Line', esc(p.name)]);
         if (p.group) rows.push(['Group', esc(p.group)]);
         rows.push(['Material', p.material ? esc(p.material) : '<span class="dim">Not recorded yet</span>']);
