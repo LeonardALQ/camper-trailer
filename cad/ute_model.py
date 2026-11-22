@@ -1,13 +1,13 @@
-"""3D model of the ute (cad/ute.py, data/ute/ute.yaml): envelope solids for the cab chassis, wheels, bull bar, towbar
-and spare, plus the bike box. Phase U1 shows the box as an envelope. With a built ute garage module (phase U2) the
-module's bodies are moved into the ute frame instead. Exports the three-cad-viewer JSON and STEP."""
+"""3D model of the ute (cad/ute.py, data/ute/ute.yaml): the LandCruiser 79 as a product model (decision H27,
+cad/model/vehicles/landcruiser.py) with the bike box. Phase U1 shows the box as an envelope. With a built ute garage
+module (phase U2) the module's bodies are moved into the ute frame instead. Exports the three-cad-viewer JSON and STEP."""
 from __future__ import annotations
 
 import json
 import math
 from pathlib import Path
 
-from build123d import Compound, Cylinder, Pos, Rot, export_step
+from build123d import Compound, Pos, export_step
 
 from .model.assembly import GROUP_LABELS
 from .model.prims import box, rgba
@@ -18,32 +18,29 @@ from .trailer_model import _moved
 TESSELLATION = dict(deviation=1.0, angular_tolerance=0.5)
 
 
-def _solid(ute, s):
-    P = ute.P
-    if "box" in s:
-        x0, y0, z0, dx, dy, dz = P.eval(s["box"], {})
-        return box(x0, y0, z0, dx, dy, dz)
-    c = P.eval(s["cyl"], {})
-    cx, cy, cz = c["c"]
-    if c.get("axis", "y") == "z":
-        return Pos(cx, cy, cz) * Cylinder(c["r"], c["w"])
-    return Pos(cx, cy, cz) * Rot(90, 0, 0) * Cylinder(c["r"], c["w"])
-
-
-def vehicle_solids(ute) -> list:
-    """The cab chassis, wheels and accessories as labelled envelope solids in the ute frame."""
+def vehicle_solids(ute, plain=False) -> list:
+    """The LandCruiser in the ute frame (cad/model/vehicles/landcruiser.py): one node per part listed in data/ute/ute.yaml's
+    `solids` and one per wheel, each holding its pieces in their colours. plain=True leaves out the tyres' tread and the
+    wheel nuts, for the drawings."""
+    from .model.vehicles import landcruiser as LC
     V = ute.V
+    parts = LC.build(V, plain)
     vehicle = []
     for s in ute.d["solids"]:
-        shp = _solid(ute, s)
-        shp.label, shp.color = f"{s['id']} {s['name']}", rgba(s["color"], s["alpha"])
-        vehicle.append(shp)
+        kids = []
+        for name, shape, colour, alpha in parts[s["id"]]:
+            shape.label, shape.color = name, rgba(colour, alpha)
+            kids.append(shape)
+        vehicle.append(Compound(label=f"{s['id']} {s['name']}", children=kids))
     for w in ute.d["wheels"]:
         x, y = ute.P.eval(w["x"], {}), ute.P.eval(w["y"], {})
-        shp = Pos(x, y, V["tyre_slr"]) * Rot(90, 0, 0) * Cylinder(V["tyre_d"] / 2, V["tyre_w"])
         side = ("front" if w["id"][0] == "F" else "rear") + (", kerb side" if w["id"][1] == "K" else ", road side")
-        shp.label, shp.color = f"WH-{w['id']} Wheel and tyre, {side}, ROH Trak 2 with LT265-75R16", rgba("#1c2833")
-        vehicle.append(shp)
+        kids = []
+        for name, shape, colour, alpha in LC.wheel_parts(V, plain):
+            k = LC.place_wheel(shape, (x, y, V["tyre_slr"]), 1.0 if y > 0 else -1.0)
+            k.label, k.color = name, rgba(colour, alpha)
+            kids.append(k)
+        vehicle.append(Compound(label=f"WH-{w['id']} Wheel and tyre, {side}, ROH Trak 2 with LT265-75R16", children=kids))
     return vehicle
 
 

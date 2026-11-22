@@ -122,7 +122,7 @@ def ct701(prj, model, bom, checks, reg, dwg):
     sh = S.Sheet()
     S.frame(sh)
     sc = 50.0
-    outside = vehicle_solids(ute) + _gs(c, groups=("body", "doors", "subframe", "security"))
+    outside = vehicle_solids(ute, plain=True) + _gs(c, groups=("body", "doors", "subframe", "security"))
     ext = g["box_extent"]
     wb = V["wheelbase"]
 
@@ -151,7 +151,7 @@ def ct701(prj, model, bom, checks, reg, dwg):
     S.leader(sh, (cz[0], cz[1] + 0.2), (cz[0] - 8, cz[1] + 7), f"CAB ROOF {V['cab_height']:.0f}", size=1.8)
 
     # ---- loading: doors open, ramp on the sill, bikes in
-    loading = vehicle_solids(ute) + _gs(c, groups=("body", "doors", "subframe", "security", "bikes", "restraint", "context"), loading=True)
+    loading = vehicle_solids(ute, plain=True) + _gs(c, groups=("body", "doors", "subframe", "security", "bikes", "restraint", "context"), loading=True)
     vL = S.View(sh, (0, -1, 0), (0, 0, 1), sc, ox=62.0, oy=152.0)
     vL.draw(loading)
     S.view_label(sh, 100, 139, "ELEVATION FROM THE KERB SIDE, LOADING", sc)
