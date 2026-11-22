@@ -350,6 +350,7 @@ drawings:
       - {rev: D, date: 2026-11-21, description: "Notice: on GENERATOR e2 fans C and D off and a neutral-earth bond (F3-07)", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-22, description: "Memo: labels clear of the lines", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-22, description: "Notice: cable sizes, lengths and drops from the routes (I2-16)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: G, date: 2026-11-22, description: "Notice: the ute feed through the kerb frame G20, G8 merged into it (I2-14)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-602
     title: Electrical layout
     subtitle: Battery plinth, board, inverter, cable routes, glands, outlets and the cable schedule
@@ -368,6 +369,7 @@ drawings:
       - {rev: F, date: 2026-11-22, description: "Memo: labels clear of the lines and the glands, G2 named once", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-22, description: "Notice: every cable as routed in data/routes.yaml (H28)", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-22, description: "Notice: runs tagged at their ends and levels, glands to CT-603 (I2-17)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: I, date: 2026-11-22, description: "Notice: G8 merged into the kerb frame G20 (I2-14)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-603
     title: Floor and wall penetrations
     subtitle: Every gland through the floor, walls and roof, its position, hole, fitting and runs
@@ -379,6 +381,7 @@ drawings:
     structural: false
     revisions:
       - {rev: A, date: 2026-11-22, description: "First draft: every gland, its position, hole, fitting and runs (I2-17)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: B, date: 2026-11-22, description: "Notice: frames as packing, rim and modules, webs from SVC-09 (I2-14)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-611
     title: Plumbing schematic
     subtitle: Fill, fresh tanks, pump, filters, cold and hot lines, drains to the grey tank and the dump

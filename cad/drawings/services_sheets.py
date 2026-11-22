@@ -499,7 +499,7 @@ def ct601(prj, model, bom, checks, reg, dwg):
     wire(sh, [(92, 220), (96, 220)], "dc")
     # the ute's feed, the MultiPlus and its AC
     wire(sh, [(139, 262), (139, 226), (110, 226)], "dc")
-    textblock(sh, 140, 257, ["GREY ANDERSON SB50 AT", f"THE DRAWBAR, {mm2('D-14')} TWIN,", f"{rt['D-14']['length_m']:.2f} m (G8), 40 A MEGA",
+    textblock(sh, 140, 257, ["GREY ANDERSON SB50 AT", f"THE DRAWBAR, {mm2('D-14')} TWIN,", f"{rt['D-14']['length_m']:.2f} m (G20), 40 A MEGA",
                          "16 A, 32 A AFTER TC02"], size=1.15, gap=0.55)
     box(sh, 148, 196, 226, 230, ["VICTRON MULTIPLUS-II 48/6k5/100-50 230 V", "6.0 kW AT 25 C, 5.7 kW AT 40 C", "AC-IN FROM THE CHANGEOVER THROUGH A 16 A RCBO",
                                  "AC-OUT-1 TO THE 230 V BOARD", "AC-OUT-2 SPARE, LIVE ONLY ON SHORE OR GENERATOR",
@@ -581,7 +581,7 @@ def ct602(prj, model, bom, checks, reg, dwg):
     pr = Proj(sh, "plan", k, 34.0, 166.0, ref=(V["body_x0"], -hb, 0))
     show = {"EL-02", "LA-02", "LA-14", "LA-11E", "EL-04", "AC-01", "LA-11T", "LA-11B", "LA-07A", "LA-09", "WR-09", "WR-06", "LA-03"}
     g = {x["id"]: x for x in svc["glands"]}
-    gids = ("G2", "G3", "G4", "G5", "G6", "G7", "G8")
+    gids = ("G2", "G3", "G4", "G5", "G6", "G7")
     gp = {i: pr.p(*_gland_xy(g[i], V), 0) for i in gids}
     # every cable as routed in data/routes.yaml by cad/routes.py on this layout, its centreline in plan (H28)
     rr = _routes(lay)
@@ -692,6 +692,22 @@ def _hole(g: dict) -> str:
     return f"{g['w']:g} x {g['h']:g}" if g.get("w") and g.get("h") else f"{g['d']:g}"
 
 
+def _is_frame(g: dict) -> bool:
+    return g["at"] in ("floor", "roof") and bool(g.get("w") and g.get("h")) and (g.get("fit") or {}).get("kind", "frame") == "frame"
+
+
+def _frame(sh, pr, g: dict, xy, fits: dict, cells: bool = True):
+    """A transit frame in plan: its packing space (medium), the rim of its frame (thin) and each run's module (thin)."""
+    x, y = xy
+    hx, hy = g["w"] / 2, g["h"] / 2
+    rim = float((g.get("fit") or {}).get("rim", fits["frame_rim_mm"]))
+    sh.rect(*pr.rect3((x - hx - rim, y - hy - rim, 0, x + hx + rim, y + hy + rim, 0)), "thin")
+    sh.rect(*pr.rect3((x - hx, y - hy, 0, x + hx, y + hy, 0)), "medium")
+    if cells:
+        for dx, dy, m in (g.get("cells") or {}).values():
+            sh.rect(*pr.rect3((x + dx - m / 2, y + dy - m / 2, 0, x + dx + m / 2, y + dy + m / 2, 0)), "thin")
+
+
 def ct603(prj, model, bom, checks, reg, dwg):
     t0 = time.time()
     from .. import routes as R
@@ -724,7 +740,9 @@ def ct603(prj, model, bom, checks, reg, dwg):
         xy = _gland_xy(x, V)
         q = pr.p(*xy, 0)
         r = max(0.45, x["d"] / 2 / k)
-        if x["at"] in ("floor", "roof"):
+        if _is_frame(x):
+            _frame(sh, pr, x, xy, svc["fittings"], cells=False)
+        elif x["at"] in ("floor", "roof"):
             sh.circle(q[0], q[1], r, "medium" if x["at"] == "floor" else "hidden")
             sh.line(q[0] - r - 0.4, q[1], q[0] + r + 0.4, q[1], "thin")
             sh.line(q[0], q[1] - r - 0.4, q[0], q[1] + r + 0.4, "thin")
@@ -742,17 +760,21 @@ def ct603(prj, model, bom, checks, reg, dwg):
         if sty == "box":
             sh.circle(38.0, yy + 0.45, 0.9, "medium")
         sh.text(43.5, yy, t, 1.3)
-    sh.circle(37.7, yl - 9.6 + 0.4, 0.32, "fill")
-    sh.line(37.7, yl - 9.6 + 0.4, 40.0, yl - 9.6 + 0.4, "thin")
-    sh.text(43.5, yl - 9.6, "A GLAND'S ID, ON A LEADER FROM ITS CENTRE", 1.3)
-    yn, _ = S.notes(sh, 22, yl - 16, [
+    yy = yl - 9.6
+    sh.rect(36.2, yy - 0.35, 39.8, yy + 1.25, "thin")
+    sh.rect(36.8, yy + 0.05, 39.2, yy + 0.85, "medium")
+    sh.text(43.5, yy, "TRANSIT FRAME: ITS PACKING SPACE AND ITS RIM, THE MODULES IN THE DETAILS", 1.3)
+    sh.circle(37.7, yl - 12.8 + 0.4, 0.32, "fill")
+    sh.line(37.7, yl - 12.8 + 0.4, 40.0, yl - 12.8 + 0.4, "thin")
+    sh.text(43.5, yl - 12.8, "A GLAND'S ID, ON A LEADER FROM ITS CENTRE", 1.3)
+    yn, _ = S.notes(sh, 22, yl - 19, [
         "DATUM DIM-01: X FROM THE BALL REARWARD, Y FROM THE CENTRELINE WITH THE ROAD SIDE POSITIVE, Z UP FROM THE GROUND. EACH POSITION IS "
         "THE GLAND'S CENTRE IN THE PANEL IT PASSES, FROM data/services.yaml, AND THE RUNS THROUGH IT ARE THOSE data/routes.yaml ROUTES "
         "THROUGH IT (cad/routes.py). A DASH IN X, Y OR Z IS THE PANEL'S OWN PLANE.",
         "THE FLOOR GLANDS ARE SET OUT ON THE FLOOR PANEL FROM THIS SHEET BEFORE THE PANEL IS ORDERED (TRAILER.md OPEN POINT 11). "
         "THE CHASSIS MEMBERS AND THE TANKS UNDER THEM ARE DRAWN DASHED.",
         f"THE DETAILS ENLARGE THE FLOOR GLANDS THAT STAND UNDER {GROUP_MM:.0f} mm APART, CENTRE TO CENTRE, WITH THE SPACES KEPT CLEAR "
-        "(PHANTOM), AND GIVE THE MATERIAL LEFT BETWEEN EACH PAIR OF HOLES.",
+        "(PHANTOM), EACH TRANSIT FRAME'S MODULES, AND THE WEB LEFT BETWEEN EACH PAIR OF FITTINGS (SVC-09: 12 mm ROUND A LOCKNUT, 10 mm ELSE).",
         "EVERY PENETRATION PASSES A SEALED GLAND OR FITTING (VSB1 7.1), AND A RUN THROUGH METAL PASSES A GROMMET. THE FITTING COLUMN IS "
         "EACH GLAND'S FITTING IN data/services.yaml.",
         "THE ASSUMPTION BEHIND EACH POSITION IS THE GLAND'S est IN data/services.yaml. CT-602 AND CT-612 TAG THE RUNS AT EACH GLAND.",
@@ -764,12 +786,13 @@ def ct603(prj, model, bom, checks, reg, dwg):
         p = centre[x["id"]]
         own = {"floor": 2, "roof": 2, "kerb": 1, "road": 1, "rear": 0, "front": 0}[x["at"]]
         xyz = ["-" if i == own else f"{v:,.0f}" for i, v in enumerate(p)]
-        rows.append([x["id"], THROUGH[x["at"]], *xyz, _hole(x), _fitting(x), _gland_runs(rr, x["id"], every) or "-", x["what"]])
+        fit = _fitting(x) if x.get("fitting") else R.fitting(x, svc["fittings"])["what"]
+        rows.append([x["id"], THROUGH[x["at"]], *xyz, _hole(x), fit, _gland_runs(rr, x["id"], every) or "-", x["what"]])
     wtable(sh, 230, yb - 6, [("GLAND", 11), ("THROUGH", 14), ("X", 11), ("Y", 11), ("Z", 11), ("HOLE, mm", 13), ("FITTING", 27),
                              ("RUNS THROUGH IT", 31), ("WHAT PASSES", 51)], rows, size=1.1, gap=0.5,
            title="EVERY GLAND (data/services.yaml, the runs from data/routes.yaml)")
     draw_tags(sh, pr, labels, regions=[(21.5, 151.0, 229.0, 266.0)])
-    _gland_details(sh, lay, V, svc["glands"], top=yn - 7.0)
+    _gland_details(sh, lay, V, svc["glands"], top=yn - 7.0, fits=svc["fittings"])
     write(sh, dwg)
     return time.time() - t0
 
@@ -786,10 +809,12 @@ def _floor_groups(glands: list[dict]) -> list[list[dict]]:
     return sorted((sorted(gr, key=lambda g: (g["x"], g["y"])) for gr in groups if len(gr) > 1), key=lambda gr: gr[0]["x"])
 
 
-def _gland_details(sh, lay, V, glands, top: float, x0: float = 24.0, x1: float = 226.0, bottom: float = 13.0):
-    """Each group of close floor glands enlarged: every hole at its size with its centre lines and its id, the chassis
-    members under the floor dashed, the fit-out's parts that stand on the floor thin, the spaces kept clear phantom, and
-    under it the centre and clear distances between the holes."""
+def _gland_details(sh, lay, V, glands, top: float, x0: float = 24.0, x1: float = 226.0, bottom: float = 13.0, fits: dict | None = None):
+    """Each group of close floor glands enlarged: every hole at its size with its centre lines and its id, a transit
+    frame as its packing space, rim and modules, the chassis members under the floor dashed, the fit-out's parts that
+    stand on the floor thin, the spaces kept clear phantom, and under it the centre distance and the web left between
+    each pair's fittings on the floor's top face (SVC-09)."""
+    from .. import routes as R
     groups = _floor_groups(glands)
     if not groups:
         return
@@ -797,12 +822,16 @@ def _gland_details(sh, lay, V, glands, top: float, x0: float = 24.0, x1: float =
     wins = []
     for gr in groups:
         xs, ys = [g["x"] for g in gr], [g["y"] for g in gr]
-        r = max(g["d"] for g in gr) / 2
+        r = max(max(g["d"], g.get("w") or 0, g.get("h") or 0) for g in gr) / 2
         wins.append((min(xs) - r - margin, min(ys) - r - margin, max(xs) + r + margin, max(ys) + r + margin))
     close = [[(a, b) for ia, a in enumerate(gr) for b in gr[ia + 1:] if math.dist((a["x"], a["y"]), (b["x"], b["y"])) < GROUP_MM]
              for gr in groups]
+
+    def web(a, b):
+        fa, fb = R.fitting(a, fits), R.fitting(b, fits)
+        return R._fp_gap((a["x"], a["y"]), fa["inner"], (b["x"], b["y"]), fb["inner"])
     texts = [[f"{a['id']} TO {b['id']}: {math.dist((a['x'], a['y']), (b['x'], b['y'])):.0f} mm CENTRES, "
-              f"{math.dist((a['x'], a['y']), (b['x'], b['y'])) - (a['d'] + b['d']) / 2:.0f} mm BETWEEN THE HOLES" for a, b in c] for c in close]
+              f"{web(a, b):.0f} mm BETWEEN THEIR FITTINGS" for a, b in c] for c in close]
     for k in (5.0, 10.0):
         rows, cur, used = [], [], 0.0
         for i, w in enumerate(wins):
@@ -838,8 +867,11 @@ def _gland_details(sh, lay, V, glands, top: float, x0: float = 24.0, x1: float =
             sh.rect(sx0, sy0, sx1, sy1, "medium")
             for g in gr:
                 q = pr.p(g["x"], g["y"])
-                r = g["d"] / 2 / k
-                sh.circle(q[0], q[1], r, "medium")
+                r = (max(g.get("w") or 0, g.get("h") or 0) if _is_frame(g) else g["d"]) / 2 / k
+                if _is_frame(g):
+                    _frame(sh, pr, g, (g["x"], g["y"]), fits)
+                else:
+                    sh.circle(q[0], q[1], r, "medium")
                 sh.line(q[0] - r - 0.8, q[1], q[0] + r + 0.8, q[1], "centre")
                 sh.line(q[0], q[1] - r - 0.8, q[0], q[1] + r + 0.8, "centre")
             yy = sy0 - 2.6

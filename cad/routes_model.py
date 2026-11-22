@@ -198,7 +198,7 @@ def viewer_json(name: str, root: Compound) -> str:
 
 # ------------------------------------------------------------------ check rows and the pages' data
 def check_rows(res: dict, ev: dict) -> list[dict]:
-    """SVC-01 to SVC-08 as check rows (data/routes.yaml `checks`), each with its limit, measured value and governing run."""
+    """SVC-01 to SVC-09 as check rows (data/routes.yaml `checks`), each with its limit, measured value and governing run."""
     rows = []
     for c in res["data"].get("checks") or []:
         e = ev[c["kind"]]
@@ -228,6 +228,10 @@ def check_rows(res: dict, ev: dict) -> list[dict]:
         elif c["kind"] == "falls":
             row.update(limit=f"at least 1:{1 / res['data']['rules']['fall']:.0f}", measured=e["slope"], unit="fall",
                        margin=None if e["slope"] is None else round(e["slope"] - res["data"]["rules"]["fall"], 4), governing="flattest level leg")
+        elif c["kind"] == "glands":
+            fits = res["svc"]["fittings"]
+            row.update(limit=f"{fits['web_mm']:g} mm between fittings, {fits['spanner_mm']:g} mm round a locknut, none in a keep-clear box",
+                       measured=e["margin"], unit="mm spare", margin=e["margin"], governing=e["governing"])
         elif c["kind"] == "spacing":
             sp = res["data"]["rules"]["spacing"]
             row.update(limit=f"each run's radius plus {sp['gap_mm']:g} mm, a wet line {sp['wet_ac_mm']:g} mm from 230 V, lane neighbours may touch",

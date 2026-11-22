@@ -83,6 +83,31 @@ def test_every_frame_cell_is_inside_its_frame_and_clear_of_the_others():
                 assert a[3] <= b[1] + 1e-6 or b[3] <= a[1] + 1e-6 or a[4] <= b[2] + 1e-6 or b[4] <= a[2] + 1e-6, (g["id"], a[0], b[0])
 
 
+def test_svc01_tests_the_keep_clear_boxes_up_to_the_ceilings_services_zone():
+    """I2-14: the aisles, landings and the chair space are obstacles to SVC-01 from the floor up, under the ceiling's
+    services zone, so no run or riser stands in them."""
+    kc = R.keep_clear_boxes(RES)
+    top = RES["V"]["ceiling_z"] - RES["data"]["rules"]["keep_clear"]["overhead_mm"]
+    assert len(kc) >= 5 and all(box[5] <= top + 1e-6 for _, box in kc)
+    assert {b["id"] for b, _ in kc} >= {"LA-K1", "LA-K2", "LA-K4", "LA-K5"}
+    assert not [p for p in EVAL["clearance"]["problems"] if "keep-clear" in p]
+
+
+def test_every_gland_has_a_fitting_with_room_round_it():
+    """I2-14: every gland's fitting is sized (a locknut by its thread, a frame by its packing and rim), and SVC-09 measures
+    every pair in a panel on both faces."""
+    fits = RES["svc"]["fittings"]
+    for g in RES["svc"]["glands"]:
+        f = R.fitting(g, fits)
+        assert f["inner"] and f["outer"], g["id"]
+        if g.get("cells"):
+            assert f["kind"] == "frame" and not f["turned"], g["id"]
+            assert f["inner"]["hx"] == pytest.approx(g["w"] / 2 + fits["frame_rim_mm"]), g["id"]
+    e = EVAL["glands"]
+    assert e["ok"], e["problems"][:5]
+    assert e["closest"] and all(c["gap"] >= c["need"] - 0.05 for c in e["closest"])
+
+
 def test_ids_are_unique_and_every_end_is_a_real_line():
     ids = [r["id"] for r in RES["runs"]]
     assert len(ids) == len(set(ids))
