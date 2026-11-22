@@ -293,8 +293,9 @@ def project_costs(box_totals, proj=None) -> dict:
     trailer, each with its figure before contingency, its contingency, its total and its parts list. From
     data/project.yaml (or proj), the car build's lines (car_totals) and the bike box's totals. The trailer is pending
     until data/project.yaml names its priced parts list, in the bike box list's format (lines with price.aud, and
-    totals with contingency_pct, or contingency_aud and owner_built_total_aud when the list works them out): then its
-    row is worked out from that list's lines. The total leaves out what is pending."""
+    totals with contingency_pct, or contingency_aud when the list works it out): then its row is worked out from that
+    list's lines. Leonard builds the box and the trailer himself, so each part has one total (decisions H25 and H26).
+    The total leaves out what is pending."""
     p = proj or project()
     car = car_totals(yaml.safe_load((ROOT / "data" / "vehicle" / "vehicle-parts.yaml").read_text(encoding="utf-8")),
                      p["car_build"]["budget_aud"])
@@ -316,18 +317,15 @@ def project_costs(box_totals, proj=None) -> dict:
         lt = lst["totals"]
         pct = lt["contingency_pct"]
         cont = lt["contingency_aud"] if "contingency_aud" in lt else sub * pct / 100
-        row = dict(id="trailer", part="Trailer", basis=tr["basis"], before=sub, contingency=cont, total=sub + cont,
-                   contingency_pct=pct, link=tr["link"], link_text="Trailer parts list")
-        if "owner_built_total_aud" in lt:
-            row["owner_built"] = lt["owner_built_total_aud"]
-        rows.append(row)
+        rows.append(dict(id="trailer", part="Trailer", basis=tr["basis"], before=sub, contingency=cont, total=sub + cont,
+                         contingency_pct=pct, link=tr["link"], link_text="Trailer parts list"))
     else:
         rows.append(dict(id="trailer", part="Trailer", basis=tr["basis"], pending=True, link=tr["link"],
                          link_text="Mass schedule, no prices yet"))
     known = [r for r in rows if not r.get("pending")]
     return dict(rows=rows, pending=[r["part"] for r in rows if r.get("pending")],
                 before=sum(r["before"] for r in known), contingency=sum(r["contingency"] for r in known),
-                total=sum(r["total"] for r in known), total_owner_built=sum(r.get("owner_built", r["total"]) for r in known),
+                total=sum(r["total"] for r in known),
                 car=dict(budget=car["budget"], gap=car["gap"], closing=car["closing"], with_closing=car["with_closing"]))
 
 

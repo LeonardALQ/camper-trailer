@@ -14,8 +14,8 @@ bike_box:
   parts_list: data/ute/box-parts.yaml
   basis: "Every line of the box's parts list with its contingency. Leonard builds the box, so no labour is paid (decision H25)"
 # The trailer's row works itself out from its parts list: the lines of the mass schedule with their prices, and the
-# stock, labour, installation, compliance and freight lines in data/trailer-parts.yaml (cad/trailer_costs.py).
+# stock, installation, compliance and freight lines in data/trailer-parts.yaml (cad/trailer_costs.py).
 trailer:
   parts_list: data/trailer-parts.yaml
   link: /trailer/#parts-list
-  basis: "Every line of the trailer's parts list with its contingency, 10 % on listed prices and 20 % on rates and estimates. Owner-built leaves out the hired labour"
+  basis: "Every line of the trailer's parts list with its contingency, 10 % on listed prices and 20 % on rates and estimates. Leonard builds the trailer, so no labour is hired (decision H26)"

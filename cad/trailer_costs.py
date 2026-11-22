@@ -1,5 +1,6 @@
-"""The trailer's priced parts list: every priced line of the mass schedule, the stock bought for the chassis, the labour,
-installation, compliance, freight and consumables, the contingency and the totals.
+"""The trailer's priced parts list: every priced line of the mass schedule, the stock bought for the chassis, the
+installation, compliance, freight and consumables, the contingency and the total. Leonard builds the trailer himself,
+so no labour is hired and the list has one total (decision H26).
 
 Prices sit on the lines: the items of data/assemblies/trailer.yaml and the bought fittings of data/chassis/chassis.yaml
 carry a `price`, and data/trailer-parts.yaml holds the rest and the rules (its header gives the price forms). The site
@@ -67,7 +68,7 @@ def _line(lid: str, name: str, group: str, qty: float, unit: str, price, pct: di
 
 def parts_list(path: Path = PARTS_YAML) -> dict:
     """The whole priced list with its totals, in the bike box list's shape: `lines` with price.aud, and `totals` with
-    the contingency and the owner-built total worked out from the lines."""
+    the contingency and the total worked out from the lines."""
     from .trailer import SYSTEM_LABELS
     head = _load(path)
     pct = head["totals"]["contingency_pct"]
@@ -92,8 +93,7 @@ def parts_list(path: Path = PARTS_YAML) -> dict:
 
 
 def totals(lines: list[dict], rule: dict) -> dict:
-    """Totals by group and by basis, the contingency, the grand total and the owner-built total, which leaves out the
-    groups in rule['owner_built_leaves_out'] with their contingency."""
+    """Totals by group and by basis, the contingency and the total."""
     aud, cont = defaultdict(float), defaultdict(float)
     by_basis = defaultdict(float)
     for ln in lines:
@@ -102,15 +102,11 @@ def totals(lines: list[dict], rule: dict) -> dict:
         for p in ln.get("parts") or [dict(aud=ln["price"]["aud"], basis=ln["price"]["basis"])]:
             by_basis[p["basis"]] += p["aud"]
     sub, contingency = sum(aud.values()), sum(cont.values())
-    left_out = rule.get("owner_built_leaves_out") or []
-    hired = sum(aud[g] + cont[g] for g in left_out)
     return dict(
-        contingency_pct=rule["contingency_pct"], contingency_why=rule.get("contingency_why"),
-        owner_built_leaves_out=left_out, owner_built_why=rule.get("owner_built_why"),
+        contingency_pct=rule["contingency_pct"], contingency_why=rule.get("contingency_why"), labour_why=rule.get("labour_why"),
         by_group={g: round(v, 2) for g, v in aud.items()}, contingency_by_group={g: round(v, 2) for g, v in cont.items()},
         by_basis={b: round(by_basis[b], 2) for b in BASES if b in by_basis},
         subtotal_aud=round(sub, 2), contingency_aud=round(contingency, 2), total_aud=round(sub + contingency, 2),
-        owner_built_left_out_aud=round(hired, 2), owner_built_total_aud=round(sub + contingency - hired, 2),
         lines=len(lines))
 
 
@@ -120,7 +116,8 @@ def _with_contingency(parts: list[dict], pct: dict) -> float:
 
 def savings(lst: dict | None = None, path: Path = PARTS_YAML) -> list[dict]:
     """The options in data/trailer-parts.yaml's `savings`, each worked out from the lines it removes, with their
-    contingency, less what replaces it at its own contingency. Largest first. A negative saving costs more."""
+    contingency, less what replaces it at its own contingency, and its share of the list's total. Largest first. A
+    negative saving costs more."""
     head = _load(path)
     lst = lst or parts_list(path)
     pct = head["totals"]["contingency_pct"]
@@ -143,7 +140,8 @@ def savings(lst: dict | None = None, path: Path = PARTS_YAML) -> list[dict]:
                 assert len(hit) == 1, f"{sv['id']}: {p['item']!r} matches {len(hit)} parts of {p['line']}"
                 removed += _with_contingency(hit, pct)
         added = _with_contingency(price_parts(sv["adds"], 1), pct) if sv.get("adds") else 0.0
-        out.append(dict(sv, removed_aud=round(removed, 2), added_aud=round(added, 2), saving_aud=round(removed - added, 2)))
+        out.append(dict(sv, removed_aud=round(removed, 2), added_aud=round(added, 2), saving_aud=round(removed - added, 2),
+                        share_pct=round(100 * (removed - added) / lst["totals"]["total_aud"], 1)))
     return sorted(out, key=lambda s: -s["saving_aud"])
 
 

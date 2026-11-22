@@ -16,7 +16,7 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 | Ute | Rear axle 2,646 kg with growth against its 2,800 kg plate. Combination 7,175 kg against 7,400 kg, the ute with growth plus the plate |
 | Battery | 25.6 kWh. A design hot day runs 25.1 h when new and 17.2 h at end of life |
 | Water | 420 L fresh, at most 300 L in travel, about 41 L a day. 130 L grey |
-| Cost | AUD 238,308 with contingency, AUD 190,356 owner-built |
+| Cost | AUD 191,714 with contingency, built by Leonard (H26) |
 
 Every fail check passes. The tightest are the fully loaded mass with growth (MAS-10, 3,397.7 kg against the 3,400 kg target), the towball share with the grey tank full (MAS-12, 8.1 % against 8.0 %), the heaviest towball (MAS-13, 316.5 kg against 320 kg) and the recovery pull in the road-side rail (CHS-08A, 0.91 of yield).
 
@@ -148,8 +148,8 @@ Each stage needs the ones before it. Each weighing, TW-01 to TW-03, takes the li
 
 | Stage | Work | Needs first | Check before moving on |
 |---|---|---|---|
-| B0 Approvals | Engineer's review, RAV entry and VIN, orders for the XT kit, panels, tray, windows, doors and imports | The documents and drawings | Review closed, VIN issued |
-| B1 Chassis | Cut, jig, weld, stamp the VIN | B0, steel and plate parts | Weld inspection (report 02 WLD-03) |
+| B0 Approvals | Engineer's review, RAV entry and VIN, Leonard's welder qualification test (CMP-14), orders for the XT kit, panels, tray, windows, doors and imports | The documents and drawings | Review closed, VIN issued, Leonard qualified |
+| B1 Chassis | Cut, jig, weld, stamp the VIN | B0, steel and plate parts | Weld inspection (report 02 WLD-03), with Leonard's dye-penetrant tests of the critical joints (CMP-14) |
 | B2 Galvanising | Hot-dip to AS/NZS 4680, touch up | B1, vent and drain holes | Frame flat and square |
 | B3 Rolling chassis | Suspension, brakes, TSC, wheels, mud flaps, coupling, chains, breakaway kit, jockey, steadies, alignment | B2, the XT kit | TW-01 within 2 % of the model |
 | B4 Floor | Bearer strips, tanks, guards, diesel tank, air box, the floor on its 32 mounts, the shower well and the tray | B3, the floor panel with its inserts | Tray fill test, 24 h |
@@ -163,35 +163,36 @@ The insert map CT-203 must be final before the panels are ordered, because the m
 
 ## Cost and where to save
 
-The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 154 lines in AUD including GST, each with its source and the date checked. Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 205,731 subtotal carries AUD 32,577 (15.8 %), for AUD 238,308. Without hired labour it is AUD 190,356.
+The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 148 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 166,915 subtotal carries AUD 24,800 (14.9 %), for AUD 191,714.
 
 | Group | AUD | Group | AUD |
 |---|---|---|---|
-| Hired labour, 333 h | 39,960 | Chassis | 6,828 |
-| Body | 37,847 | Licensed electrician | 4,600 |
-| Electrical | 23,708 | Drawbar box | 4,388 |
-| Living area | 21,186 | Under the floor | 3,162 |
-| Running gear | 14,181 | Roof | 2,926 |
-| HVAC and ventilation | 12,667 | Coupling and drawbar | 1,695 |
-| Wet room | 11,627 | Lamps, reflectors and the number plate | 905 |
-| Bed | 8,028 | Spare wheel | 736 |
-| Compliance | 5,976 | Freight and consumables | 5,310 |
-| Subtotal | 205,731 | | |
+| Body | 37,847 | Chassis | 6,828 |
+| Electrical | 23,708 | Freight and consumables | 5,310 |
+| Living area | 21,186 | Licensed electrician | 4,600 |
+| Running gear | 14,181 | Drawbar box | 4,388 |
+| HVAC and ventilation | 12,667 | Under the floor | 3,162 |
+| Wet room | 11,627 | Roof | 2,926 |
+| Bed | 8,028 | Coupling and drawbar | 1,695 |
+| Compliance and weld evidence | 7,120 | Lamps, reflectors and the number plate | 905 |
+| Subtotal | 166,915 | Spare wheel | 736 |
 
-The ten largest savings, with their contingency and what each costs the requirements. The site's parts list works out all fifteen from the lines. Some share lines, so they do not add up.
+What the registration needs stays: the licensed electrician and the AS/NZS 3001.2 certificate (ELI-01, CMP-13), the refrigeration fitting in AC-03, the wheel alignment (ALN-01), the engineer's review (CMP-03) and the registration lines. One line is new, the weld evidence for the chassis (CMP-14, AUD 1,144). Neither VSB1, the HVAIS inspection nor the concessional RAV entry asks for a qualified welder, a weld certificate or crack tests (research report 27). The RAV entry does need the drawbar's ADR 62/02 evidence in hand, and the engineer's calculation is that evidence only for the SP welds to AS/NZS 1554.1 that CHASSIS.md specifies, which the standard has a qualified welder make. So CMP-14 pays for Leonard's welder qualification test (AUD 1,000, est.) and two dye-penetrant sets for his own tests of the joints report 02's WLD-03 names (AUD 144). A qualified welder hired for the chassis welds alone would cost about AUD 3,100 to 3,400 (28 h at AUD 110 to 120 an hour, est.). Leonard's own time, about 333 h (est.), is outside the figures.
 
-1. No hired labour: AUD 47,952. About 333 h of Leonard's time, and the chassis welds still need a qualified welder and the engineer's inspection.
-2. Only the fit-out done yourself: AUD 25,488, part of the first. About 177 h.
-3. Two self-built EVE MB31 packs in place of the Victron modules: AUD 6,113. More capacity, but no AS IEC 62619 test, so the electrician may refuse the certificate, and the cell terminals loosen on corrugations.
-4. A plain low-flow shower: AUD 5,779. Two 20 min showers then use about 240 L a day.
-5. A fixed bed at night height: AUD 5,450. The desk loses its place under the bed, so H1 fails.
-6. A 230 V water heater and the heat pump in place of the Combi: AUD 5,308. No heat or hot water without the battery.
-7. No engineer's review: AUD 5,280. Not required in NSW, but the designs stay unchecked.
-8. Square front edges: AUD 4,200. About 3.7 L/100 km more towing, about AUD 1,550 a year.
-9. No generators: AUD 4,085. Cloud with no drive then needs shore power.
-10. No freezer: AUD 2,455. Frozen food fits only the fridge's 8.2 L compartment.
+The ten largest savings, with their contingency, their share of the total and what each costs the requirements. The site's parts list works out all thirteen from the lines. Some share lines, so they do not add up.
 
-Smaller ones: a Carafan fan for the RESPA (AUD 1,521), one generator (AUD 1,336, 24.7 h to put a hot day back), no UV purifier (AUD 1,207) and no dryer (AUD 1,099). A rooftop air-conditioner costs AUD 3,443 more than the split, because its extra 5.1 kWh a day needs a sixth battery module.
+1. Two self-built EVE MB31 packs in place of the Victron modules: AUD 6,113 (3.2 %). More capacity, but no AS IEC 62619 test, so the electrician may refuse the certificate, and the cell terminals loosen on corrugations.
+2. A plain low-flow shower: AUD 5,779 (3.0 %). Two 20 min showers then use about 240 L a day.
+3. A fixed bed at night height: AUD 5,450 (2.8 %). The desk loses its place under the bed, so H1 fails.
+4. A 230 V water heater and the heat pump in place of the Combi: AUD 5,308 (2.8 %). No heat or hot water without the battery.
+5. No engineer's review: AUD 5,280 (2.8 %). The inspection does not ask for one, but the RAV entry then needs a drawbar test at an approved facility, and the designs stay unchecked.
+6. Square front edges: AUD 4,200 (2.2 %). About 3.7 L/100 km more towing, about AUD 1,550 a year.
+7. No generators: AUD 4,085 (2.1 %). Cloud with no drive then needs shore power.
+8. No freezer: AUD 2,455 (1.3 %). Frozen food fits only the fridge's 8.2 L compartment.
+9. A Carafan fan in place of the RESPA: AUD 1,521 (0.8 %). No powered precleaner, so the filter loads faster in dust.
+10. One generator in place of two: AUD 1,336 (0.7 %). A design hot day then takes 24.7 h of running to put back.
+
+Smaller ones: no UV purifier (AUD 1,207) and no dryer (AUD 1,099). A rooftop air-conditioner costs AUD 3,443 more than the split, because its extra 5.1 kWh a day needs a sixth battery module.
 
 ## Decisions
 
@@ -215,10 +216,10 @@ Each is in full in `docs/decisions.md`.
 ## Open points and the assumption used
 
 1. Storage is about 0.2 m³ short (est.). Assumption: the footprint stays empty (H16). Question for Leonard: two 500 x 600 x 700 mm cabinets under the bed beside the desk would add 0.42 m³ and about 20 kg, and break his rule that the rest of that area stays empty.
-2. Estimate lines carry 905 kg, 34.4 % of the tare, and estimates set 56.4 % of the price subtotal. Assumption: the growth allowance covers the masses until TW-01 to TW-03 replace them, and the 20 % contingency covers the prices. A towball reading more than 10 % off the model means the centre of gravity estimates are wrong (UTE-03).
+2. Estimate lines carry 905 kg, 34.4 % of the tare, and estimates set 46.2 % of the price subtotal. Assumption: the growth allowance covers the masses until TW-01 to TW-03 replace them, and the 20 % contingency covers the prices. A towball reading more than 10 % off the model means the centre of gravity estimates are wrong (UTE-03).
 3. Assumption: Lovells' 7,400 kg GCM is certified in the ute's LC5 inspection. If not, plate at or below 3,225 kg and tow with at most 127 L (H20).
 4. Assumption: the isolators and the line set keep the split working on corrugations, without a maker's warranty. The fallback is a rooftop unit with a sixth battery module.
-5. The Dometic fridge, freezer, hob and sink carry converted European prices, and the oven, washer, panels, lamps and labour are estimates. Assumption: these prices stand, with their contingency, until an Australian stockist or a quote replaces them.
+5. The Dometic fridge, freezer, hob and sink carry converted European prices, and the oven, washer, panels and lamps are estimates. Assumption: these prices stand, with their contingency, until an Australian stockist or a quote replaces them.
 6. Assumption: the engineer accepts calculation as VSB1's evidence for the drawbar and chain tests at 3,500 kg (CHASSIS.md).
 7. Assumption: no anti-roll bar is fitted, and the 1,655 mm track (H22) meets the 0.40 g target without one. Question for Cruisemaster: the rate of its optional XT anti-roll bar and whether it clears the fresh tanks in the XT bays, as more margin if TR-01's measured centre of gravity comes out higher than the estimate.
 8. Fiamma publishes no length for the F80s 400's leg, 98667-04, the same part as on the F80L. Assumption: it reaches 2,686 mm like the 320's leg, which ships in the same carton. If it is shorter, the canopy falls more steeply on the same ground (BDY-23).

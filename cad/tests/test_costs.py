@@ -158,8 +158,8 @@ def test_vehicle_md_system_table():
 
 
 def test_project_cost_table():
-    """The home page's table: the truck, the car build with its allowance, and the box and the trailer, each with its
-    owner-built total beside it. The trailer's row is its parts list's totals (test_trailer_parts.py)."""
+    """The home page's table: the truck, the car build with its allowance, and the box and the trailer, which Leonard
+    builds, each with one total. The trailer's row is its parts list's totals (test_trailer_parts.py)."""
     t = project_costs(BOX)
     rows = {r["id"]: r for r in t["rows"]}
     assert [r["id"] for r in t["rows"]] == ["truck", "car", "box", "trailer"]
@@ -170,11 +170,10 @@ def test_project_cost_table():
     assert rows["box"]["total"] == BOX["total_aud"] and "owner_built" not in rows["box"]
     tr = rows["trailer"]
     assert not tr.get("pending") and t["pending"] == []
-    assert abs(tr["total"] - TRAILER["total_aud"]) < 0.01 and tr["owner_built"] == TRAILER["owner_built_total_aud"]
+    assert abs(tr["total"] - TRAILER["total_aud"]) < 0.01 and "owner_built" not in tr
     known = PROJECT["truck"]["purchase_aud"] + TYPED["required_plus_contingency"] + BOX["total_aud"] + TRAILER["total_aud"]
     assert abs(t["total"] - known) < 0.01
-    owner = known - TRAILER["total_aud"] + TRAILER["owner_built_total_aud"]
-    assert abs(t["total_owner_built"] - owner) < 0.01
+    assert "total_owner_built" not in t, "the box and the trailer are owner-built, so the project has one total"
     assert abs(t["before"] + t["contingency"] - t["total"]) < 0.01
 
 

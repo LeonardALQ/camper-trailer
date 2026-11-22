@@ -90,8 +90,7 @@ const biggest = [...r.lines].sort((a: any, b: any) => b.price.aud - a.price.aud)
       <tbody>
         <tr><td>Subtotal</td><td>Every line below, {T.lines} lines</td><td class="num">{n(T.subtotal_aud, 0)}</td></tr>
         <tr><td>Contingency</td><td>{pct.listing} % of listed and quoted prices and {pct.estimate} % of rates and estimates, {n(100 * T.contingency_aud / T.subtotal_aud, 1)} % overall</td><td class="num">{n(T.contingency_aud, 0)}</td></tr>
-        <tr class="row-total"><td>Total</td><td>Built with hired labour</td><td class="num">{n(T.total_aud, 0)}</td></tr>
-        <tr><td>Owner-built</td><td>Without the hired labour and its contingency, AUD {n(T.owner_built_left_out_aud, 0)}</td><td class="num">{n(T.owner_built_total_aud, 0)}</td></tr>
+        <tr class="row-total"><td>Total</td><td>Leonard builds it, so no labour is hired (decision H26)</td><td class="num">{n(T.total_aud, 0)}</td></tr>
       </tbody>
     </table>
   </div>
@@ -124,11 +123,11 @@ const biggest = [...r.lines].sort((a: any, b: any) => b.price.aud - a.price.aud)
 {kind === 'savings' && (
   <div class="data-table">
     <table data-sheet-sum="off">
-      <thead><tr><th>ID</th><th>Option</th><th class="num">Saves AUD</th><th class="num">Tare kg</th><th>What it costs</th><th>Lines it removes</th></tr></thead>
+      <thead><tr><th>ID</th><th>Option</th><th class="num">Saves AUD</th><th class="num">Share of the total %</th><th class="num">Tare kg</th><th>What it costs</th><th>Lines it removes</th></tr></thead>
       <tbody>
         {r.savings.map((s: any) => (
           <tr>
-            <td>{s.id}</td><td>{s.name}</td><td class="num">{n(s.saving_aud, 0)}</td>
+            <td>{s.id}</td><td>{s.name}</td><td class="num">{n(s.saving_aud, 0)}</td><td class="num">{n(s.share_pct, 1)}</td>
             <td class="num">{s.mass_kg > 0 ? '+' : ''}{n(s.mass_kg, Number.isInteger(s.mass_kg) ? 0 : 1)}</td><td>{s.costs}</td>
             <td>{[...(s.removes.groups ?? []).map((g: string) => `every ${g} line`), ...(s.removes.lines ?? []),
                   ...(s.removes.parts ?? []).map((p: any) => `part of ${p.line}`)].join(', ')}{s.adds ? `, plus ${s.adds.map((a: any) => a.item).join(' and ')}` : ''}</td>

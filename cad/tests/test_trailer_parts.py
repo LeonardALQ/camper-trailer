@@ -72,7 +72,7 @@ def test_public_text_follows_the_style_rules():
         texts += [f"{p.get('item', '')} {p.get('note', '')}" for p in ln.get("parts") or []]
         for s in texts:
             assert not PUBLIC_WORDS.search(s), f"{ln['id']}: {s!r}"
-    for s in (TOT["contingency_why"], TOT["owner_built_why"], *(x["note"] for x in LIST["not_in_total"])):
+    for s in (TOT["contingency_why"], TOT["labour_why"], *(x["note"] for x in LIST["not_in_total"])):
         assert not PUBLIC_WORDS.search(s), s
 
 
@@ -91,9 +91,19 @@ def test_totals_add_up():
     sub, c = sum(by.values()), sum(cont.values())
     assert abs(TOT["subtotal_aud"] - sub) < 0.011 and abs(TOT["contingency_aud"] - c) < 0.011
     assert abs(TOT["total_aud"] - sub - c) < 0.011
-    hired = sum(by[g] + cont[g] for g in TOT["owner_built_leaves_out"])
-    assert hired > 0 and abs(TOT["owner_built_total_aud"] - (sub + c - hired)) < 0.011
     assert abs(sum(TOT["by_basis"].values()) - sub) < 0.05
+
+
+def test_one_total_with_no_hired_labour():
+    """Leonard builds the trailer himself (decision H26): no labour group or line, one total, and what the registration
+    needs stays: the electrician, the engineer's review, the alignment, the registration lines and the weld evidence."""
+    groups = {ln["group"] for ln in LINES}
+    assert "labour" not in groups and "labour" not in LIST["group_labels"], "the trailer still has a labour group"
+    assert not [ln["id"] for ln in LINES if ln["id"].startswith("LAB-")]
+    assert "owner_built_total_aud" not in TOT, "the trailer has one total"
+    ids = {ln["id"] for ln in LINES}
+    for keep in ("ELI-01", "ALN-01", "CMP-03", "CMP-04", "CMP-07", "CMP-13", "CMP-14", "AC-03"):
+        assert keep in ids, f"{keep} left the list"
 
 
 def test_the_steel_bought_covers_the_cut_list():
@@ -129,12 +139,12 @@ def test_the_cost_table_quotes_the_list():
     assert abs(row["before"] - TOT["subtotal_aud"]) < 0.011
     assert abs(row["contingency"] - TOT["contingency_aud"]) < 0.011
     assert abs(row["total"] - TOT["total_aud"]) < 0.011
-    assert abs(row["owner_built"] - TOT["owner_built_total_aud"]) < 0.011
+    assert "owner_built" not in row
 
 
 def test_savings_are_worked_out_from_the_lines():
-    """Every option names lines that exist, the labour option is the gap to the owner-built total, and the list is
-    largest first."""
+    """Every option names lines that exist, no option removes hired labour any more (decision H26), each carries its
+    share of the total, and the list is largest first."""
     S = savings(LIST)
     ids = {ln["id"] for ln in LINES}
     assert len({s["id"] for s in S}) == len(S)
@@ -145,15 +155,15 @@ def test_savings_are_worked_out_from_the_lines():
             assert i in ids, f"{s['id']}: unknown line {i}"
         assert s["costs"] and not PUBLIC_WORDS.search(s["costs"] + s["name"]), s["id"]
         assert abs(s["removed_aud"] - s["added_aud"] - s["saving_aud"]) < 0.011, s["id"]
-    labour = next(s for s in S if s["removes"].get("groups") == ["labour"])
-    assert abs(labour["saving_aud"] - (TOT["total_aud"] - TOT["owner_built_total_aud"])) < 0.011
+        assert abs(s["share_pct"] - 100 * s["saving_aud"] / TOT["total_aud"]) < 0.051, s["id"]
+        assert "labour" not in rm.get("groups", []) and not any(i.startswith("LAB-") for i in rm.get("lines", [])), s["id"]
     assert [s["saving_aud"] for s in S] == sorted((s["saving_aud"] for s in S), reverse=True)
 
 
 def test_trailer_md_quotes_the_costs():
     """TRAILER.md's cost section quotes the list's totals, every group and the ten largest savings."""
     text = (ROOT / "TRAILER.md").read_text()
-    for v in (TOT["subtotal_aud"], TOT["contingency_aud"], TOT["total_aud"], TOT["owner_built_total_aud"]):
+    for v in (TOT["subtotal_aud"], TOT["contingency_aud"], TOT["total_aud"]):
         assert f"AUD {round(v):,}" in text, f"TRAILER.md does not quote AUD {round(v):,}"
     for g, v in TOT["by_group"].items():
         assert f"| {round(v):,} |" in text, f"TRAILER.md's cost table has no {g} row of {round(v):,}"
