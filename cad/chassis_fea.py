@@ -825,10 +825,10 @@ class Analysis:
             lw = p["weld_l"]
             y0, y1 = abs(p["bracket"][1]), abs(p["bracket"][4])
             webs = sum(min(y0, y1) <= V["rail_c"] + k * (rail.b - rail.t) / 2 <= max(y0, y1) for k in (-1, 1))   # the webs over it
-            rows += [(f"{p['pair']} bracket's two {lw:g} mm fillets", F / (2 * lw * a), wcap),
-                     (f"{p['pair']} rail {'webs' if webs > 1 else 'web'} in bearing over {lw:g} mm", F / (webs * rail.t * (lw + 5 * rail.t)), rail.fy / 1.5)]
-        out["steady_bracket"] = _local("Corner steady bracket, ARK's, welded under the rail (CH-B01)", rows,
-                                       f"the steady's {c['steady_kg']:.0f} kg rating at 90 degrees")
+            rows += [(f"{p['pair']} welds, 2 x {lw:g} mm", F / (2 * lw * a), wcap),
+                     (f"{p['pair']} {'webs' if webs > 1 else 'web'} bearing, {lw:g} mm", F / (webs * rail.t * (lw + 5 * rail.t)), rail.fy / 1.5)]
+        out["steady_bracket"] = _local("Corner steady bracket, ARK's (CH-B01)", rows,
+                                       f"the steady's {c['steady_kg']:.0f} kg rating at 90 degrees, its bracket welded under the rail")
         return out
 
     def fixings(self) -> list[dict]:
