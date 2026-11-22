@@ -58,6 +58,8 @@ def body_solids(lay) -> list[tuple[str, object, tuple[str, float]]]:
         glass, col, label = filler(o)
         if glass or o.get("from") in ("BD-07", "BD-15"):
             return label, (_window if glass else _door)(Frame(hole, front), label), col
+        if "service door" in o["name"]:
+            return label, _service_door(Frame(hole, front), label), col
         return label, plain, col
 
     out.append(("BD-01 Floor, 30 mm woven roving and H80", box(x0, -hw, V["floor_underside_z"], L, 2 * hw, V["floor_t"]), ("#8c8c8c", 0.7)))
@@ -130,6 +132,17 @@ def _window(fr, label):
         ("double acrylic pane", fr.box(e, D / 2 - 5, e, W - 2 * e, 10, H - 2 * e), "#5d6d7e", 0.55),
         ("inner frame", fr.box(-15, D, -15, W + 30, 10, H + 30) - fr.box(e, D - 1, e, W - 2 * e, 12, H - 2 * e), "#f4f6f6", 1.0),
         ("blind and fly screen cassette", fr.box(e, D, H - e - 40, W - 2 * e, 10, 40), "#f4f6f6", 1.0)])
+
+
+def _service_door(fr, label):
+    """The Thetford 2680584 service door for the cassette: its white frame 8 mm proud of the skin, the door in it, and
+    the lock (Thetford)."""
+    W, D, H = fr.W, fr.D, fr.H
+    return _pieces(label, [
+        ("frame", fr.box(-15, -8, -15, W + 30, 8, H + 30) - fr.box(15, -9, 15, W - 30, 10, H - 30), "#f4f6f6", 1.0),
+        ("frame in the cut-out", fr.box(0, 0, 0, W, D, H) - fr.box(15, -1, 15, W - 30, D + 2, H - 30), "#e5e8e8", 1.0),
+        ("door", fr.box(16, -6, 16, W - 32, 10, H - 32), "#fdfefe", 1.0),
+        ("lock", fr.cyl_v(W - 50, H / 2, 14, -8, -6), "#566573", 1.0)])
 
 
 def _door(fr, label):

@@ -20,7 +20,7 @@ Sizes are width by depth by height in mm, as the maker gives them. Where a maker
 | Partition and inner door | WR-03, WR-04 | 620 x 1,850 door | Report 21 | The 20 mm panel with the door's opening, the frame, the leaf, two hinges and a lever on each face |
 | 40 L grey water tote | WR-11 | 300 x 400 x 600 (est.) | Report 21 section 10 | Tank, wheels, front feet, handle, cap and strap |
 
-The toilet, the bin and the tote stand on the tray's floor. The basin's shelf, the mirror cabinet, the mixer, the rail and the shower's parts screw to the partition or the kerb wall. The partition is bonded to the tray, the walls and the ceiling.
+The toilet, the bin and the tote stand on the tray's floor. The basin's shelf, the mirror cabinet, the mixer, the rail and the shower's parts screw to the partition or the kerb wall. The partition is bonded to the tray, the walls and the ceiling. The cassette's Thetford 2680584 service door sits in its cut-out in the kerb wall behind the toilet, with its frame, door and lock. The design has no shower screen or curtain, because the whole room is the shower and is hosed down (H4), so the model shows none.
 
 ## 2. Laundry and the plinth
 
