@@ -63,23 +63,23 @@ fittings:
 # OR-05 through a round hole on the outrigger's centre line, 17.5 mm from its root weld either side, and K-01 and K-10
 # leave the road rail through its outer web at its flat's middle, not its bottom face.
 holes:
-  - {member: OR-05K, face: road side, run: K-08, x: 4387, y: -638, z: 826, d: 16, length: 16}
-  - {member: OR-05K, face: kerb side, run: K-08, x: 4387, y: -1200, z: 800, d: 16, length: 16}
-  - {member: OR-05R, face: kerb side, run: K-09, x: 4387, y: 638, z: 811, d: 16, length: 16}
-  - {member: OR-05R, face: road side, run: K-09, x: 4387, y: 1200, z: 800, d: 16, length: 16}
+  - {member: OR-05K, face: road side, run: K-08, x: 4386, y: -638, z: 826, d: 16, length: 16}
+  - {member: OR-05K, face: kerb side, run: K-08, x: 4386, y: -1200, z: 800, d: 16, length: 16}
+  - {member: OR-05R, face: kerb side, run: K-09, x: 4386, y: 638, z: 811, d: 16, length: 16}
+  - {member: OR-05R, face: road side, run: K-09, x: 4386, y: 1200, z: 800, d: 16, length: 16}
   - {member: RL-R, face: road side, run: K-01, x: 2360, y: 637, z: 671, d: 16, length: 39}
   - {member: RL-R, face: road side, run: K-10, x: 2415, y: 637, z: 641, d: 16, length: 34}
-  - {member: RL-R, face: road side, run: K-10, x: 4090, y: 637, z: 652, d: 16, length: 25}
+  - {member: RL-R, face: road side, run: K-10, x: 4089, y: 637, z: 652, d: 16, length: 25}
   - {member: RL-R, face: road side, run: K-01, x: 6021, y: 637, z: 680, d: 16, length: 25}
   - {member: RS-K, face: road side, run: B-18, x: 2015, y: -587, z: 840, d: 14, length: 54}
   - {member: RS-K, face: road side, run: B-16, x: 2267, y: -587, z: 796, d: 28, length: 103}
   - {member: RS-K, face: kerb side, run: D-14, x: 2291, y: -638, z: 822, d: 24, length: 74}
-  - {member: RS-K, face: kerb side, run: K-08, x: 4387, y: -638, z: 826, d: 16, length: 16}
+  - {member: RS-K, face: kerb side, run: K-08, x: 4386, y: -638, z: 826, d: 16, length: 16}
   - {member: RS-K, face: top, run: B-18, x: 5024, y: -606, z: 874, d: 14, length: 15}
   - {member: RS-K, face: top, run: D-14, x: 5052, y: -606, z: 874, d: 24, length: 25}
   - {member: RS-K, face: top, run: B-16, x: 5094, y: -606, z: 874, d: 28, length: 28}
   - {member: RS-K, face: road side, run: K-08, x: 5996, y: -587, z: 826, d: 16, length: 23}
-  - {member: RS-R, face: road side, run: K-09, x: 4387, y: 638, z: 811, d: 16, length: 16}
+  - {member: RS-R, face: road side, run: K-09, x: 4386, y: 638, z: 811, d: 16, length: 16}
   - {member: RS-R, face: kerb side, run: K-09, x: 5988, y: 587, z: 811, d: 16, length: 33}
 cutouts:
   - {panel: BD-01, gland: G9, x: 3392, y: 515.5, w: 38, h: 98}
@@ -168,8 +168,8 @@ water_budget:
     - {use: "Cleaning", fresh_l: 2, grey_l: 2, basis: "Estimate"}
   wash: {use: "One wash and dry", fresh_l: 44, grey_l: 44, basis: "Camec 3.5 kg washer, 44 L (WELS, maker). The dryer returns about 2 L as condensate (est.)"}
   stores:
-    - {case: "In travel, at most 295 L (H13, H21), no laundry", litres: 295, washes_a_week: 0}
-    - {case: "In travel, 295 L, three washes a week", litres: 295, washes_a_week: 3}
+    - {case: "In travel, at most 280 L (H13, H21), no laundry", litres: 280, washes_a_week: 0}
+    - {case: "In travel, 280 L, three washes a week", litres: 280, washes_a_week: 3}
     - {case: "Tanks full at camp, 420 L, three washes a week", litres: 420, washes_a_week: 3}
   grey_tank_l: 130
   grey_hours_one_wash: 72

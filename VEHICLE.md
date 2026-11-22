@@ -80,7 +80,7 @@ Goal: confirm the GVM kit on weighed figures.
 - Leonard builds and weighs the box walls, roof and doors. Take the floor and subframe masses from the design.
 - Add up the rear axle on the weighed figures: VEH-19, bar and winch, two people, box, bikes, tools, spare, towbar, the fuel and the trailer's weighed towball.
 - The plan buys the Lovells 4,495 kg Elite (GV05, decision H17), plated at a 4,450 kg GVM and a 2,800 kg rear axle, twice the ROH wheel's 1,400 kg (decision H18). Return to the 4,200 kg Platinum (cut CUT7, saves AUD 14,140 with its share of the allowance) only if the sum leaves at least 30 kg under its 2,550 kg rear axle at the trailer's weighed towball.
-- On the model, which keeps the optional 180 L tank full as the heavier case, the trailer's heaviest towball is 317 kg with growth (292 kg on base masses). The Platinum's rear axle would then carry about 2,503 kg on base masses, 47 kg under 2,550 kg, but about 2,635 kg with growth, 85 kg over, so the cut rests on the weighing. The Elite's 2,800 kg plate keeps 153 kg in hand with growth.
+- On the model, which keeps the optional 180 L tank full as the heavier case, the trailer's heaviest towball is 317 kg with growth (292 kg on base masses). The Platinum's rear axle would then carry about 2,504 kg on base masses, 46 kg under 2,550 kg, but about 2,635 kg with growth, 85 kg over, so the cut rests on the weighing. The Elite's 2,800 kg plate keeps 151 kg in hand with growth.
 - Settle the front bushes from the kit's contents and front lift (SS05). The Elite brings its own front and rear brakes, booster and handbrake kit, so BR01 to BR04 are gone.
 - Done when the kit is ordered.
 
@@ -184,7 +184,7 @@ The model is the built ute (`build/ute/ute.json`) on the Elite kit, case UC2 wit
 | Rear axle | At most 2,800 kg (the Elite plated at twice the ROH wheel's 1,400 kg, H18), or 2,550 kg if CUT7 returns to the Platinum | 2,649 kg, 151 kg in hand |
 | Ball load | At most 350 kg (towbar). H17's design range: at least 8.0 % of the trailer and at most 320 kg with growth | 317 kg (292 kg on base masses) |
 | Ute plus trailer | At most 7,400 kg with GV06, 6,900 kg without | 7,178 kg, the ute plus the trailer's 3,500 kg plate (H20) |
-| Trailer | At most 3,500 kg | 3,399 kg fully loaded, against its 3,400 kg design limit |
+| Trailer | At most 3,500 kg | 3,400 kg fully loaded, against its 3,400 kg design limit |
 | Front axle share | At least 20 % (Toyota BBGJ1007) | 33.7 %, towing |
 | Coupling point, laden | 440 mm plus or minus 20 mm (VSB1: 350 to 460 mm) | 440 mm |
 | Rear wheel | At most 1,400 kg (ROH), which sets the 2,800 kg plate | 1,324 kg towing, 76 kg in hand |
@@ -194,7 +194,7 @@ The model is the built ute (`build/ute/ute.json`) on the Elite kit, case UC2 wit
 
 Toyota's body builder's guide BBGJ1007 (September 2017) sets the 20 % front axle share, the tyre clearances and the cab chassis' 700 mm centre of gravity that the model uses (UT-01). It is no longer online. Toyota's guide for trucks from January 2007, [LC70BBG](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf), is, and gives the same rules and 740 mm. At 740 mm the ute's stability factor would read about 0.86 in place of 0.89 (UTE-11, est.).
 
-On the Elite the rear axle keeps 151 kg in hand, and H20 retired the plan's 3,850 kg weighed target, which stood for the Platinum's rear axle margin. Each kg on the ball adds 1.41 kg to the rear axle, and each kg at the tray centre about 1.04 kg. Without the GCM revision, Toyota's 6,900 kg less the ute with growth leaves the trailer a 3,222 kg plate, and it tows with at most 118 L of water in place of 295 L, so the fully loaded trailer with growth stays under that plate (H20).
+On the Elite the rear axle keeps 151 kg in hand, and H20 retired the plan's 3,850 kg weighed target, which stood for the Platinum's rear axle margin. Each kg on the ball adds 1.41 kg to the rear axle, and each kg at the tray centre about 1.04 kg. Without the GCM revision, Toyota's 6,900 kg less the ute with growth leaves the trailer a 3,222 kg plate, and it tows with at most 102 L of water in place of 280 L, so the fully loaded trailer with growth stays under that plate (H20).
 
 Drive to: coolant 85 to 104 °C towing, oil 90 to 116 °C, EGT at most 700 °C, gearbox oil at most 110 °C sustained (est.) where the optional senders are fitted, no full load below 1,600 rpm. Use fourth gear on long grades and low range for hill starts and reversing the trailer.
 

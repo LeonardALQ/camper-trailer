@@ -131,7 +131,7 @@ params:
   axle_x: 4381               # axle group centre from the ball. The build solves it: the middle of the towball window (H17)
   # ---------------------------------------------------------------- water (H13)
   water_full_l: 420          # the fresh tanks' net capacity, filled at camp with the transfer pump, CR45 filter and chlorine (H13)
-  water_travel_l: 295        # most fresh and grey water aboard while towing: H13's 350 L less 30 L by H21 after the final review, 10 L more by H21 after the fix-pass review (MAS-10 7.7 kg over at 320 L), 5 L more after the re-check (MAS-10 1.9 kg over at 310 L), 5 L more after the second re-check (MAS-10 2.5 kg over at 305 L), and 5 L more after the iteration-2 re-check (MAS-10 3.9 kg over at 300 L with the floor's transit frames, the board's duct and the SB120 plug). Less if the 7,400 kg GCM revision is refused (GCM-01, H20)
+  water_travel_l: 280        # most fresh and grey water aboard while towing: H13's 350 L less 70 L by H21 after the services' and the structure's fixes of 22 Nov (MAS-10 15.0 kg over at 295 L, 69.95 kg over at 350 L). Before that: 30 L off by H21 after the final review, 10 L more by H21 after the fix-pass review (MAS-10 7.7 kg over at 320 L), 5 L more after the re-check (MAS-10 1.9 kg over at 310 L), 5 L more after the second re-check (MAS-10 2.5 kg over at 305 L), and 5 L more after the iteration-2 re-check (MAS-10 3.9 kg over at 300 L with the floor's transit frames, the board's duct and the SB120 plug). Less if the 7,400 kg GCM revision is refused (GCM-01, H20)
   water_highway_l: 50        # owner's highway figure
   grey_full_l: 130           # grey tank's net capacity (report 21 section 10)
   tank_z0: rail_underside_z
@@ -665,7 +665,7 @@ items:
     box: [tank_r_x0, -tank_w / 2, tank_z0, tank_r_l, tank_w, tank_h]
     tank: true
     mass: {basis: declared, unit_kg: 18.3, maturity: calculated, source: "As UF-01, scaled to 760 mm (report 18 section 1.1)", note: "6 mm HDPE kept (saving 1b, H13)"}
-    note: Between the XT centre and rear shock crossmembers, over the rear axle. About 200 L net. The two tanks hold 420 L net, filled at camp. At most 300 L of fresh and grey water ride in travel (H13, H21).
+    note: Between the XT centre and rear shock crossmembers, over the rear axle. About 200 L net. The two tanks hold 420 L net, filled at camp. At most 280 L of fresh and grey water ride in travel (H13, H21).
   - id: UF-02
     name: Water in the tanks
     system: underfloor

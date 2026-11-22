@@ -917,7 +917,7 @@ runs:
      serves: [side markers], along: [CM-08, RL-R, RS-R, OR-05R], from: {line: LJ-01, at: [LJ_01.cx - 30, LJ_01.y1, LJ_01.cz + 22]}, path: [[6182, 540, .], [., ., KRZM], [6060, ., .], [5975, 596, .], [OR_05R.cx - 2, ., .], [., 800, .], [LM_SR.cx, 1100, 800], [., LM_SR.y0 - 10, .]], to: {line: LM-SR, at: [., LM_SR.y0, .]}}
   - {id: K-10, system: lamps, kind: lamp7, feeds: "Brake, ABS and breakaway switch circuit from the 12-pin plug to the Bosch TSC", inside: [RL-R], passes: [], protection: "The ute's brake controller",
      serves: [brakes], along: [DB-RA, CH-P03, DB-RB, RL-R, RS-R, UF-03, CM-05], from: {line: DB-PL, at: [DB_PL.x1, DB_PL.cy, DB_PL.cz - 15]},
-     path: [[1430, 514.2, 508], [1520, 630, .], [2010, 683, .], [2315, ., .], [2405, 644, 640], [2475, 598, 652], [4040, ., .], [4120, 660, .], [4200, ., .], [4300, ., 560], [., 60, .]], to: {line: BR-TSC, at: [BR_TSC.x0, ., .]}}
+     path: [[1430, 514.2, 508], [1520, 630, .], [2010, 683, .], [2315, ., .], [2405, 644, 640], [2475, 598, 652], [BR_TSC.x0 - 322, ., .], [BR_TSC.x0 - 242, 660, .], [BR_TSC.x0 - 162, ., .], [BR_TSC.x0 - 62, ., 560], [., 60, .]], to: {line: BR-TSC, at: [BR_TSC.x0, ., .]}}
   - {id: K-11, system: lamps, kind: lamp7, feeds: "Bosch TSC to the road side drums' magnets and ABS sensors", protection: "The TSC's outputs",
      serves: [brakes], along: [RL-R, UF-03, CM-05], from: {line: BR-TSC, at: [BR_TSC.cx, BR_TSC.y1, BR_TSC.z0 + 10]}, path: [[., BR_DR.y0 - 40, .]], to: {line: BR-DR, at: [., BR_DR.y0, BR_DR.cz]}}
   - {id: K-12, system: lamps, kind: lamp7, feeds: "Bosch TSC to the kerb side drums' magnets and ABS sensors", protection: "The TSC's outputs",
