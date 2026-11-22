@@ -6,7 +6,7 @@ Revised 22 Nov 2026 for decision H24 (research report 27): the build buys the up
 
 The truck is a used Toyota LandCruiser VDJ79 single cab V8 diesel, built 01/2017 to 08/2022, a GXL by preference, with about 400,000 km. Each of its seven stages, over a year or more, leaves it registered and drivable. It ends at power level B, about 230 to 250 kW and 850 Nm at the crank and never below 224 kW (300 hp). It carries both bikes in the box on the Lovells 4,495 kg Elite GVM kit, plated at a 4,450 kg GVM and a 2,800 kg rear axle for its shared 1,400 kg wheels (H17, H18), and tows the trailer, plated at 3,500 kg, under Lovells' 7,400 kg GCM revision (H2).
 
-Decision H24 sorts the work into three lists. The build is the upgrades and what makes them legal and able to tow: the engine rebuild, the clutch, upgraded injectors, the turbo, intercooler and exhaust, and the tune with its certificate, then the GVM kit and the GCM revision with their wheels, tyres and inspection, the towing gear and the trailer charging. It comes to AUD 67,703, or AUD 77,777 with one allowance of 10 % on listed prices and 20 % on estimates (AUD 10,074). That is AUD 2,777 over Leonard's AUD 75,000. Cut CUT7, back to the 4,200 kg Platinum kit if the S3 weighing allows it, closes the gap at AUD 63,609, and both cuts give AUD 62,333. Estimates are 48.8 % of the build.
+Decision H24 sorts the work into three lists. The build is the upgrades and what makes them legal and able to tow: the engine rebuild, the clutch, upgraded injectors, the turbo, intercooler and exhaust, and the tune with its certificate, then the GVM kit and the GCM revision with their wheels, tyres and inspection, the towing gear and the trailer charging. It comes to AUD 67,703, or AUD 77,777 with one allowance of 10 % on listed prices and 20 % on estimates (AUD 10,074). That is AUD 2,777 over Leonard's AUD 75,000. Cut CUT7, back to the 4,200 kg Platinum kit if the S3 weighing allows it, closes the gap at AUD 63,637, and both cuts give AUD 62,361. Estimates are 48.8 % of the build.
 
 The upgraded injectors bring one risk the build does not price. The Pro 100 is non-original fuel injection equipment, which report 14 judged makes a laboratory ADR 79 emissions test likely (TL07, AUD 10,000 est., on the check list). The plan assumes the LC4 certifier accepts the free TfNSW test of the finished truck. If its written evidence list at S0 asks for a laboratory test, the build drops the Pro 100 service and its fitting kit (FS01 and FS07, AUD 5,080) and runs level B on the truck's own tested injectors at factory flow, which carry it with about 10 to 25 % in hand (research report 27).
 
@@ -161,7 +161,7 @@ Each figure is rounded to the dollar, so a column can differ from its total by A
 | Leonard's build figure | 75,000 |
 | Over the build figure, with the allowance | 2,777 |
 | Less CUT7, with its share of the allowance | -14,140 |
-| The build with CUT7 and the allowance | 63,532 |
+| The build with CUT7 and the allowance | 63,637 |
 | Less both cuts, CUT6 and CUT7 | -15,416 |
 | The build with both cuts and the allowance | 62,361 |
 | Purchase check list, if every line failed (not counted) | 53,956 |
