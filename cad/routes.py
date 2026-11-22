@@ -298,6 +298,8 @@ def resolve(lay=None, V: dict | None = None, blocks: list | None = None) -> dict
                    vd_v=None if vd is None else round(vd, 3), vd_pct=None if vd is None else round(100 * vd / r["volts"], 2),
                    size_why=why, cores=cores, price_basis=kind.get("price_basis"), mass_basis=kind.get("mass_basis"),
                    rating_a=k["amps"], priced_in=r.get("priced_in") or kind.get("priced_in"))
+        ends = {r["from"]["line"], r["to"]["line"]} | _ids(r, "ends_also")
+        row["ends"] = ends | {fixtures[e]["line"] for e in list(ends) if e in fixtures}
         runs.append(row)
     return dict(runs=runs, data=data, kinds=K, V=V, blocks=blocks, glands=glands, fixtures=fixtures, svc=svc, ns=ns, bars=bars)
 
@@ -374,6 +376,9 @@ def _ids(run: dict, which: str) -> set:
 
 
 def _end_lines(run: dict) -> set:
+    """The run's two ends, the lines its fixture ends belong to, and any it names in `ends_also`."""
+    if "ends" in run:
+        return run["ends"]
     return {run["from"]["line"], run["to"]["line"]} | _ids(run, "ends_also")
 
 
@@ -387,7 +392,7 @@ def _bar_capsules(lay) -> list:
     for b in getattr(lay, "blocks", []) or []:
         if getattr(b, "bar", None):
             out.append(dict(iid=b.iid, id=b.id, name=b.name, p0=tuple(b.bar["p0"]), p1=tuple(b.bar["p1"]),
-                            r=math.hypot(b.bar["w"], b.bar["h"]) / 2))
+                            r=max(b.bar["w"], b.bar["h"]) / 2))
     return out
 
 
@@ -540,7 +545,13 @@ def coverage(res: dict) -> dict:
     point the zones list, and every water outlet has its runs, from its source to the load."""
     svc, data = res["svc"]["electrical"], res["data"]
     runs = res["runs"]
-    feeds_ = lambda tag: [r["id"] for r in runs if tag in (r.get("serves") or [])]  # noqa: E731
+    def feeds_(tag):
+        out = []
+        for r in runs:
+            touched = {f"fixture: {x}" for x in _end_lines(r) | _ids(r, "passes")}
+            if tag in (r.get("serves") or []) or tag in touched:
+                out.append(r["id"])
+        return out
     missing, rows = [], []
     need = [(c["id"], f"230 V circuit {c['id']}, {c['load']}") for c in svc["circuits"]]
     for bus, text in (("12 V", svc["bus_12v"]), ("24 V", svc["bus_24v"])):
