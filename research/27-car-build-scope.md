@@ -4,7 +4,7 @@ Research for decisions H24 and H26, 22 Nov 2026. Prices in AUD including GST, re
 
 ## Findings
 
-1. The DPF 1VD-FTV runs Denso piezo injectors. The only upgraded injector sold for it in Australia is GTurbo's Pro 100, with 100 % more flow. GTurbo publishes builds of 280 to 330 kW at the wheels on it, but this research found no independent record. Level B, about 170 to 185 kW at the wheels, sits under the 200 to 230 kW where GTurbo says the factory injectors start to restrict, so the upgrade buys margin rather than power. The best path is GTurbo's service of the truck's own injectors, AUD 4,890, fitted with the tune at S6.
+1. The DPF 1VD-FTV runs Denso piezo injectors. The only upgraded injector sold for it in Australia is GTurbo's Pro 100, with 100 % more flow. GTurbo publishes builds of 280 to 330 kW at the wheels on it, but this research found no independent record. Level B, about 170 to 185 kW at the wheels, sits under the 200 to 230 kW where GTurbo says the factory injectors start to restrict, so the upgrade buys margin rather than power. The best path is GTurbo's service of the truck's own injectors, AUD 4,890, fitted with the tune at S6. Their main risk is the LC4 certifier asking for a laboratory emissions test, and if it does, the build drops them and runs level B on the factory injectors.
 2. The supply pump needs no upgrade for the Pro 100. GTurbo's 400 hp package includes no pump, and larger injectors reach the same fuel at lower rail pressure.
 3. The truck's own H152F gearbox carries level B if it passes its S0 check. Torque is not its known weak point, worn synchros are, and the NPC 1300 clutch is the only driveline part GTurbo lists for its packages, which put more torque than level B through the factory box.
 4. A level B rebuild needs nothing beyond factory specification. No head stud kit exists for the 1VD, and GTurbo's test truck ran 80,000 km at 70 % or more over factory power.
@@ -38,6 +38,10 @@ What the supply pump needs. Nothing new. GTurbo's top single-turbo package, 400 
 
 What the law needs. TfNSW's [VSI 06 Rev 4](https://www.nsw.gov.au/sites/default/files/noindex/2026-03/vsi-06-light-vehicle-modification-july-2026.pdf) lists non-original or non-equivalent fuel injection equipment under item 5 and fuel system changes under item 49 as needing certification, beside item 6 for the reflash and item 2 for a power rise of more than 20 %. The Pro 100 injectors therefore go into the same LC4 certificate as the tune (TL05), with GTurbo's invoice and flow sheet in the evidence. Assumption: no extra fee.
 
+The certificate's emissions evidence is the harder part. A modified vehicle must still meet ADR 79/04, and VSCCS Bulletin 2 accepts an IM240 test at TfNSW's emission testing facility or an equivalent NATA facility as the evidence ([Bulletin 2, October 2017](https://nsw.gov.au/sites/default/files/2023-01/VSCCS%20Bulletin%2002%20Modified%20_%20Individually%20Constructed%20Vehicles%20Oct2017.pdf)). Its 2024 revision adds the gazetted Interim NSW Vehicle Emissions Test Procedure as an alternative to ADR 79/04 (VSCCS Notice 19, seen as a search extract because the server refused the download). The scheme leaves the choice of tests to the certifier ([TfNSW's guide to becoming a certifier](https://www.transport.nsw.gov.au/system/files/media/documents/2022/vsccs-becoming-a-licensed-certifier.pdf)). Report 14 section 4.5 judged that high-flow injectors, as non-original fuel injection equipment and an explicit item 5 example, make laboratory emissions evidence likely. No published account of an LC4 certifier's evidence list for non-original injectors on a diesel was found.
+
+Assumption used: the LC4 certifier accepts the TfNSW IM240 test of the finished truck with the clean DPF (TL04), with GTurbo's flow sheet for the matched set, and asks for no laboratory test. Fallback: if the certifier's written evidence list at S0 asks for a laboratory test with the Pro 100, the build drops FS01 and FS07 (AUD 5,080) and runs level B on the truck's own tested injectors, which carry it at factory flow with about 10 to 25 % in hand, and the certifier is asked for the list again for the tune alone. TL07, the AUD 10,000 (est.) laboratory test, stays on the check list for the case where even the tune alone needs one. So the laboratory test is the Pro 100's main risk, at 13 % of the build, and the fallback costs no more than the injectors' margin.
+
 ## 2. The gearbox and the clutch at level B
 
 Level B is about 850 Nm at the crank (report 14). GTurbo finds the factory clutch slips beyond about 500 Nm (booklet p. 23), so the NPC Super Heavy Duty Organic 1300 kit stays in the build (CG01), with the bearings, bolts and input shaft seal fitted with it (CG06 to CG08).
@@ -62,7 +66,7 @@ The gauge. The overheating reports this search found concern automatic gearboxes
 
 - The sealed airbox (ID01) stays in the build. Unsealed 4X4 lists airbox dusting as a common 1VD fault: dust passes the factory seal, upsets the MAF sensor and wears the turbo, and an aftermarket airbox is the proven fix. A rebuilt engine and a new turbo are what it protects.
 - The DPF clean (ID02) stays in the build, at S6. The emissions evidence for the tune's certificate needs a working DPF (TL04), and regeneration does not burn the ash that 400,000 km leaves.
-- The radiator (EN14) stays in the build, because report 14 section 3.9 accepts level B for towing only with a new radiator.
+- The radiator (EN14) stays in the build, because report 14 section 3.9 accepts level B for towing only with a new radiator. The reason is as-new heat rejection for sustained towing, which a flow test cannot show a 400,000 km core still gives. The factory-type core is enough, because level B's extra heat is held by the tune's EGT limit and its towing map, so a heavier core is not priced.
 - The allowance follows the trailer's rule, 10 % of listed prices and 20 % of estimates. Report 22 section 2.15 found 10 to 15 % for DIY campers, 20 % for an owner-managed one-off and 15 to 25 % for early estimates. No better basis was found for a one-off truck build, so the rule stands, on the build only.
 
 ## 6. NSW registration and the trailer's chassis welds
@@ -90,7 +94,7 @@ The least that registers the trailer with the engineer's calculation standing is
 1. Can the factory calibration run the Pro 100 injectors? Assumed not, so they go in with the tune.
 2. Can GTurbo return the old nozzles with its service? Assumed yes. If not, a standard set is AUD 9,256 for a return to stock.
 3. Does a passed S0 back-leak test show the piezo bodies sound for the Pro 100 service? Assumed yes, as the nozzle, the other wear part, is replaced.
-4. Does the LC4 certificate cover the injectors at TL05's price? Assumed yes.
+4. Does the LC4 certificate cover the injectors at TL05's price, on the TfNSW test with no laboratory test? Assumed yes. If the S0 evidence list asks for a laboratory test with the Pro 100, the build drops FS01 and FS07 and runs level B on the factory injectors (section 1).
 5. Does the HVAIS examiner judge a light trailer's welds as the NHVIM does? Assumed yes, by eye, as AIS Notice 41 could not be read.
 6. What does a welder qualification test cost in NSW? Assumed AUD 1,000 (est.) until a test house quotes.
 
