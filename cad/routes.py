@@ -99,6 +99,125 @@ def _unit(v):
     return (v[0] / n, v[1] / n, v[2] / n), n
 
 
+def _dot(a, b):
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
+
+
+def smooth_jogs(pts: list[tuple], r: float) -> list[tuple]:
+    """A flexible cable or hose steps between lanes, or round a small offset, as an S: two corners that turn back to
+    the first direction a short leg apart. Where that leg is too short for both bends at radius r, the step is spread
+    along the straights either side as a slant, which is how the cable lies, so each corner keeps its radius. A step
+    the straights cannot take is left for SVC-02 to report."""
+    pts = [tuple(float(c) for c in p) for p in pts]
+
+    def turns(j):
+        if j <= 0 or j >= len(pts) - 1:
+            return False
+        a, _ = _unit(_sub(pts[j], pts[j - 1]))
+        b, _ = _unit(_sub(pts[j + 1], pts[j]))
+        return _dot(a, b) < 1 - 1e-6
+
+    for _ in range(60):
+        done = True
+        for i in range(1, len(pts) - 2):
+            a, b, c, d = pts[i - 1], pts[i], pts[i + 1], pts[i + 2]
+            if min(math.dist(a, b), math.dist(b, c), math.dist(c, d)) < 1e-6:
+                continue
+            (u, l0), (w, l1), (v, l2) = _unit(_sub(b, a)), _unit(_sub(c, b)), _unit(_sub(d, c))
+            if _dot(u, v) < 0.999 or abs(_dot(u, w)) > 0.999:
+                continue
+            phi = math.acos(max(-1.0, min(1.0, _dot(u, w))))
+            if l1 >= 2 * r * math.tan(phi / 2) - 1e-6:
+                continue
+            sh0 = 0.5 if turns(i - 1) else 1.0
+            sh2 = 0.5 if turns(i + 2) else 1.0
+
+            def t_at(j):  # the tangent length the neighbouring corner j needs at radius r
+                if not turns(j):
+                    return 0.0
+                p, _ = _unit(_sub(pts[j], pts[j - 1]))
+                q, _ = _unit(_sub(pts[j + 1], pts[j]))
+                return r * math.tan(math.acos(max(-1.0, min(1.0, _dot(p, q)))) / 2)
+
+            t0, t2 = t_at(i - 1), t_at(i + 2)
+            s, best = 1.0, None
+            while s < min(l0, l2):
+                b2 = (b[0] - u[0] * s, b[1] - u[1] * s, b[2] - u[2] * s)
+                c2 = (c[0] + u[0] * s, c[1] + u[1] * s, c[2] + u[2] * s)
+                wd, ld = _unit(_sub(c2, b2))
+                t = r * math.tan(math.acos(max(-1.0, min(1.0, _dot(u, wd)))) / 2)
+                if (t <= ld / 2 and t <= (l0 - s) * sh0 and t <= (l2 - s) * sh2
+                        and t0 <= (l0 - s) * sh0 + 1e-6 and t2 <= (l2 - s) * sh2 + 1e-6):
+                    best = (b2, c2)
+                    break
+                s += 1.0
+            if best:
+                pts[i], pts[i + 1] = best
+                done = False
+                break
+        if done:
+            break
+    return _drop_steps(pts, r)
+
+
+def _drop_steps(pts: list[tuple], r: float, max_deg: float = 3.0) -> list[tuple]:
+    """A lane step or a small offset that turns out of the run's plane (up, a few millimetres across, then along)
+    is two corners a short leg apart that cannot both take the bend radius. The cable lies on the slant instead: the
+    step's corner is dropped where the straight it merges into turns by no more than `max_deg`."""
+    pts = list(pts)
+
+    def turn(j):
+        if j <= 0 or j >= len(pts) - 1:
+            return 0.0
+        a, _ = _unit(_sub(pts[j], pts[j - 1]))
+        b, _ = _unit(_sub(pts[j + 1], pts[j]))
+        return math.acos(max(-1.0, min(1.0, _dot(a, b))))
+
+    def fits(j):
+        phi = turn(j)
+        if phi < 1e-3:
+            return True
+        sh0 = 0.5 if turn(j - 1) >= 1e-3 else 1.0
+        sh1 = 0.5 if turn(j + 1) >= 1e-3 else 1.0
+        t = r * math.tan(phi / 2)
+        return t <= min(math.dist(pts[j - 1], pts[j]) * sh0, math.dist(pts[j], pts[j + 1]) * sh1) + 1e-6
+
+    def angle(p, q, s):  # between the leg p->q and p->s
+        a, la = _unit(_sub(q, p))
+        b, lb = _unit(_sub(s, p))
+        return 0.0 if la < 1e-9 or lb < 1e-9 else math.degrees(math.acos(max(-1.0, min(1.0, _dot(a, b)))))
+
+    skip = set()
+    for _ in range(80):
+        bad = [j for j in range(1, len(pts) - 1) if not fits(j) and pts[j] not in skip]
+        if not bad:
+            break
+        j = bad[0]
+        options = []
+        for k in (j, j - 1, j + 1):
+            if not 0 < k < len(pts) - 1:
+                continue
+            # dropping k merges the legs k-1 -> k and k -> k+1; the longer one must keep its direction
+            long_from = math.dist(pts[k - 1], pts[k]) >= math.dist(pts[k], pts[k + 1])
+            dev = angle(pts[k - 1], pts[k], pts[k + 1]) if long_from else angle(pts[k + 1], pts[k], pts[k - 1])
+            if dev > max_deg:
+                continue
+            trial = pts[:k] + pts[k + 1:]
+            options.append((dev, k, trial))
+        took = False
+        for dev, k, trial in sorted(options, key=lambda o: o[0]):
+            before = sum(1 for m in range(max(1, k - 2), min(len(pts) - 1, k + 3)) if not fits(m))
+            saved, pts = pts, trial
+            after = sum(1 for m in range(max(1, k - 2), min(len(pts) - 1, k + 2)) if not fits(m))
+            if after < before:
+                took = True
+                break
+            pts = saved
+        if not took:
+            skip.add(pts[j])
+    return pts
+
+
 def fillet(pts: list[tuple], r: float, elbow_r: float | None = None, rigid: bool = False) -> dict:
     """The centreline with each corner bent at radius r: the corners' largest radius the straight lengths allow, the
     routed length and a dense polyline (arcs every 10 degrees) for the clearance tests and the drawings. A pipe that
@@ -286,6 +405,9 @@ def resolve(lay=None, V: dict | None = None, blocks: list | None = None) -> dict
         k = kind["sizes"][size]
         rigid = bool(kind.get("rigid"))
         elbow_r = k["od"] * kind["elbow_r"] if kind.get("elbow_r") else None
+        if not rigid:
+            pts = smooth_jogs(pts, k["bend_r"])
+            row["points"] = pts
         f = fillet(pts, k["bend_r"], elbow_r=elbow_r, rigid=rigid)
         length_m = f["length"] / 1000
         if vd is not None:
