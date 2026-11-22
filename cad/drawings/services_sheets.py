@@ -19,7 +19,7 @@ import math
 import time
 
 from . import sheet as S
-from .home_common import (Proj, arrow_line, body_plan, box, ctx, label_in, short, stamp, textblock, title, wire, wrap,
+from .home_common import (Proj, arrow_line, body_plan, box, ctx, label_in, short, stamp, textblock, title, tw, wire, wrap,
                           write, wtable)
 
 
@@ -62,17 +62,43 @@ def _route(pr, pts, sty, arrow=False):
         arrow_line(pr.sh, q[-2], q[-1], sty, 1.6)
 
 
+def _clip_x(pts, x_min):
+    """The pieces of a plan polyline at X >= x_min, cut where it crosses that line: the runs that leave the body for the
+    drawbar stop at the sheet's frame."""
+    pieces, cur = [], []
+    for a, b in zip(pts, pts[1:]):
+        ina, inb = a[0] >= x_min, b[0] >= x_min
+        if ina and not cur:
+            cur = [a]
+        if ina != inb:
+            t = (x_min - a[0]) / (b[0] - a[0])
+            q = (x_min, a[1] + t * (b[1] - a[1]))
+            if ina:
+                pieces.append(cur + [q])
+                cur = []
+            else:
+                cur = [q, b]
+        elif inb:
+            cur.append(b)
+    if len(cur) > 1:
+        pieces.append(cur)
+    return pieces
+
+
 def _gland_xy(g, V):
     """A gland's plan position: on its wall's outer face, or where the data puts it on the floor or the roof."""
     return {"kerb": (g.get("x"), -V["half_bw"]), "road": (g.get("x"), V["half_bw"]), "rear": (V["body_x1"], g.get("y")),
             "front": (V["body_x0"], g.get("y"))}.get(g["at"], (g.get("x"), g.get("y")))
 
 
-def _gland(sh, pr, g, V, size=1.15, label=True, right=False):
+def _gland(sh, pr, g, V, size=1.15, label=True, right=False, inset=0.0):
     """A gland from data/services.yaml as a small circle with its id, on its wall, the floor or the roof. `label` False
-    where the plan already names it as an opening, `right` puts the id beside the circle."""
+    where the plan already names it as an opening, `right` puts the id beside the circle, `inset` draws a rear-wall
+    gland that far inside the wall's outer face, clear of an opening's id."""
     at = g["at"]
     p = pr.p(*_gland_xy(g, V), 0)
+    if at == "rear" and inset:
+        p = (p[0] - inset, p[1])
     sh.circle(p[0], p[1], 0.9, "box")
     sh.circle(p[0], p[1], 0.9, "medium")
     if right:
@@ -216,22 +242,36 @@ def ct602(prj, model, bom, checks, reg, dwg):
     g = {x["id"]: x for x in svc["glands"]}
     gids = ("G2", "G3", "G4", "G5", "G6", "G7", "G8")
     gp = {i: pr.p(*_gland_xy(g[i], V), 0) for i in gids}
+    # every cable as routed in data/routes.yaml by cad/routes.py on this layout, its centreline in plan (H28)
+    rr = _routes(lay)
+    floor_g = sorted({x for run in rr["runs"] if run["system"] in ELEC_STYLE for x in run.get("glands") or []} - set(gids),
+                     key=lambda s_: int(s_[1:]))
+    fp = {i: pr.p(*_gland_xy(g[i], V), 0) for i in floor_g}
     rects = body_plan(sh, pr, lay, res, cut=1000.0, show=show, size=1.2, keep=False, swings=False, light=("EL-02", "LA-11E", "EL-04"),
-                      nolabel=("EL-02", "LA-03", "LA-11B", "LA-02"), avoid=list(gp.values()))
+                      nolabel=("EL-02", "LA-03", "LA-11B", "LA-02", "EL-04"), avoid=list(gp.values()) + list(fp.values()))
     f = lambda iid: _centre(lay.find(iid))  # noqa: E731
     bd = lay.find("LA-11E").box
     wa, dr = f("LA-02"), f("LA-14")
-    # every cable as routed in data/routes.yaml by cad/routes.py on this layout, its centreline in plan (H28)
-    rr = _routes(lay)
+    x_cut = V["body_x0"] - 250.0    # the runs to the drawbar stop 250 mm ahead of the body, inside the frame
+    cuts = []
     for run in rr["runs"]:
         if run["system"] in ELEC_STYLE:
-            _route(pr, [(p[0], p[1]) for p in run["dense"]], ELEC_STYLE[run["system"]])
+            for piece in _clip_x([(p[0], p[1]) for p in run["dense"]], x_cut):
+                _route(pr, piece, ELEC_STYLE[run["system"]])
+                cuts += [e for e in (piece[0], piece[-1]) if e[0] == x_cut]
+    if cuts:    # the note runs up the margin ahead of the body, over the cut ends
+        t, xs = "TO THE DRAWBAR (CT-102)", pr.p(x_cut, 0, 0)[0]
+        top = max(pr.p(x, y, 0)[1] for x, y in cuts)
+        sh.text(xs - 0.6, top + 2.5 + tw(t, 1.15) / 2, t, 1.15, "middle", bold=True, rot=-90)
     as_openings = {o["id"] for o in res["openings"]}
     for gid in gids:
         _gland(sh, pr, g[gid], V, label=gid not in as_openings, right=gid == "G7")
-    for gid in sorted({x for run in rr["runs"] if run["system"] in ELEC_STYLE for x in run.get("glands") or []} - set(gids),
-                      key=lambda s_: int(s_[1:])):
-        _gland(sh, pr, g[gid], V, size=1.0)
+    for gid in floor_g:
+        _gland(sh, pr, g[gid], V, size=1.0, label=False)   # the floor glands, unlabelled: the note names them
+    r = rects["EL-04"]    # the inverter's name in the larger part of its rectangle clear of the floor glands under it
+    ys = sorted(q[1] for q in fp.values() if r[0] - 1 <= q[0] <= r[2] + 1 and r[1] - 1 <= q[1] <= r[3] + 1)
+    lo, hi = max(((r[1], ys[0] - 1.5), (ys[-1] + 1.5, r[3])), key=lambda s_: s_[1] - s_[0]) if ys else (r[1], r[3])
+    label_in(sh, (r[0], lo, r[2], hi), short(lay.find("EL-04")), 1.2)
     r = rects["LA-02"]    # the washer's name over G6, its floor gland, and the gland's id
     label_in(sh, (r[0], gp["G6"][1] + 2.4, r[2], r[3]), short(lay.find("LA-02")), 1.2)
     # outlets, indicative: one symbol for each outlet in its zone (report 20 section 7)
@@ -261,7 +301,7 @@ def ct602(prj, model, bom, checks, reg, dwg):
         "DATUM DIM-01. EVERY CABLE IS DRAWN AS ROUTED IN data/routes.yaml BY cad/routes.py ON THE SOLVED LAYOUT, ITS CENTRELINE IN "
         "PLAN. ITS LENGTH, SIZE, DROP AND PROTECTION ARE IN THE ELECTRICAL PAGE'S CABLE SCHEDULE, AND IN 3D IN trailer-electrical.",
         "THE DC LEAVES THE BOARD BY THE CEILING BULKHEADS AND BY THE CHASE BEHIND THE PLINTH. UNDER THE FLOOR THE RUNS PASS BETWEEN "
-        "THE RAILS, OR INSIDE THEM PAST THE ARM HANGERS, AND UP THE FLOOR GLANDS. THE 230 V RUNS IN CONDUIT UNDER THE FLOOR AND IN THE "
+        "THE RAILS, OR INSIDE THEM PAST THE ARM HANGERS, AND UP THE FLOOR GLANDS G14 TO G23 (CIRCLES). THE 230 V RUNS IN CONDUIT UNDER THE FLOOR AND IN THE "
         "PLINTH'S END SLOT, AND 50 mm FROM EXTRA-LOW VOLTAGE ELSEWHERE (SVC-03, AS/NZS 3000 3.9.8.3).",
         "NO WATER OR DIESEL LINE WITHIN 300 mm OF THE BATTERY'S TERMINAL FACE EXCEPT THE WASHER'S TWO HOSES, WHICH RUN IN A "
         "DIELECTRIC SLEEVE (AS/NZS 3001.2 5.4.10.2).",
@@ -414,7 +454,8 @@ def ct612(prj, model, bom, checks, reg, dwg):
     gt = lay.find("UF-08").box
     for gid in sorted({x for run in rr["runs"] if run["system"] in PIPE_STYLE for x in run.get("glands") or []} | {"G1"},
                       key=lambda s_: int(s_[1:])):
-        _gland(sh, pr, g[gid], V)
+        _gland(sh, pr, g[gid], V, label=gid not in ("G5", "G26"),   # G5 and G26 sit beside other labels on the rear wall
+               inset=1.4 if gid in ("G5", "G26") else 0.0)
     q = pr.p(gt[0] + 450, gt[1])
     sh.path([(q[0] - 1.2, q[1]), (q[0] + 1.2, q[1]), (q[0], q[1] - 1.8)], "fill", closed=True)
     q2 = pr.p(gt[0] + 450, -hb - 330)
