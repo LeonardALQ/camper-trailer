@@ -42,7 +42,7 @@ RESEARCH = [
     ("22-trailer-prices.md", "Trailer prices outside the new interior", 22),
     ("25-roof.md", "Roof study, fixed roof against a raising roof", 25),
     ("26-elite-wheels.md", "What the Lovells Elite kit needs from the wheels, track and brakes", 26),
-    ("27-car-build-scope.md", "The car build's scope, the injectors, the driveline for level B and the trailer's weld evidence", 27),
+    ("27-car-build-scope.md", "The car build’s scope, the injectors, the driveline for level B and the trailer’s weld evidence", 27),
 ]
 # research reports 23 and 24 are the car build and bike box plans themselves, so the index points at their pages
 RESEARCH_PLANS = [("23", "The car build plan", "`VEHICLE.md`, the Car build page", "../tow-vehicle/"),
