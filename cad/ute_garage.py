@@ -301,6 +301,7 @@ def build_garage(prj: Project | None = None, limits: dict | None = None):
                        f"{box_kg:.1f} kg, {box_kg_g:.1f} kg with growth. " + ", ".join(f"{g} {v:.1f} kg" for g, v in sorted(by_group.items())),
                        "The decision log asks for a box lighter than report 17's 440 kg.", unit="kg"))
     ml = mount_loads(lines, P, lim)
+    proof = lim["bracket_proof_factor"]
     w = ml["worst"]
     checks.append(_row("UGM-01", "Deck mount bolts within M12 8.8 design capacity, combined tension and shear", "fail",
                        "<= 1.00", w["interaction"], round(1 - w["interaction"], 4), w["interaction"] <= 1.0,
@@ -313,10 +314,11 @@ def build_garage(prj: Project | None = None, limits: dict | None = None):
                        mounts=ml))
     checks.append(_row("UGM-02", "Deck mount bracket loads (reported)", "report", "reported",
                        ml["max_tension_kn"], None, True, "largest uplift and largest downward load on one bracket",
-                       f"largest uplift {ml['max_tension_kn']:.1f} kN, largest downward load {ml['max_down_kn']:.1f} kN, "
+                       f"largest uplift {ml['max_tension_kn']:.2f} kN, largest downward load {ml['max_down_kn']:.2f} kN, "
                        f"fore and aft shear {ml['firm_bolt_shear_kn']:.1f} kN per firm bolt in braking",
-                       "Toyota publishes no capacity for its deck mount brackets. Build step 9 proof-loads each one to twice these, "
-                       f"{2 * ml['max_tension_kn']:.1f} kN up and {2 * ml['max_down_kn']:.1f} kN down for the off-road factor of 2, "
+                       "Toyota publishes no capacity for its deck mount brackets. These loads already carry report 03's off-road "
+                       f"factor, so build step 9 proof-loads each bracket to {proof:g} times them (est.), "
+                       f"{proof * ml['max_tension_kn']:.2f} kN up and {proof * ml['max_down_kn']:.2f} kN down, "
                        "held 10 s with no permanent set at a dial gauge, and step 11 crack-tests them after the rough-road drive.", unit="kN"))
     res = next(c for c in checks if c["id"] == "UGR-01")["restraint"]
     kn = res["worst"]["worst_kgf"] * G / 1000
