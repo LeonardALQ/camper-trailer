@@ -110,14 +110,15 @@ def test_bd11s_routed_item_follows_the_routes_and_the_line_adds_to_its_total():
 
 
 def test_every_hole_in_a_chassis_member_and_every_large_floor_cut_out_is_listed():
-    """I2-27: data/services.yaml lists every hole the runs make in a chassis member, at its place within 15 mm, and
-    every floor cut-out over 60 mm with its size, so a structural check can read them."""
+    """I2-27: data/services.yaml lists every hole the runs make in a chassis member, at its place within 15 mm and its
+    size and slot length within 1 and 2 mm, because CHS-10 reads its edge and toe distances from them, and every floor
+    cut-out over 60 mm with its size, so a structural check can read them."""
     listed = RES["svc"]["holes"]
     got = R.member_holes(RES)
     same = lambda a, b: (a["member"], a["run"], a["face"]) == (b["member"], b["run"], b["face"])  # noqa: E731
     for h in got:
         assert any(same(h, x) and math.dist((h["x"], h["y"], h["z"]), (x["x"], x["y"], x["z"])) <= 15 and abs(h["d"] - x["d"]) <= 1
-                   for x in listed), h
+                   and abs(h["length"] - x["length"]) <= 2 for x in listed), h
     assert len(listed) == len(got), (len(listed), len(got))
     cuts = {c["gland"]: c for c in RES["svc"]["cutouts"]}
     for g in RES["svc"]["glands"]:
