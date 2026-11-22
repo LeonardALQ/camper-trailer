@@ -99,7 +99,7 @@ def test_bd11s_routed_item_follows_the_routes_and_the_line_adds_to_its_total():
     assert priced == pytest.approx(25.0)
     assert item["kg"] == pytest.approx(routed - priced, abs=0.051), (item["kg"], routed)
     assert f"{routed:.1f} kg routed" in item["item"]
-    assert allow["kg"] >= 0 and sum(p["kg"] for p in parts) == pytest.approx(53.6, abs=0.001)
+    assert allow["kg"] >= 0 and sum(p["kg"] for p in parts) == pytest.approx(54.6, abs=0.001)   # 53.6 kg until SVC-10 (I2-15 b)
 
 
 def test_every_hole_in_a_chassis_member_and_every_large_floor_cut_out_is_listed():
@@ -222,3 +222,74 @@ def test_a_run_sweeps_to_one_valid_solid(rid):
 def test_the_priced_comparison_says_which_is_larger():
     for p in M.summary(RES, EVAL)["priced"]:
         assert p["larger"] == ("routed" if p["routed"] > p["quantity"] else "priced"), p
+
+
+def test_the_new_checks_keep_their_limits():
+    """I2-15 b and I2-18 a, c, d: VSB1's 600 mm, the 1 in 5 cone, SVC-08's heated-water distances and Table 22."""
+    r = RES["data"]["rules"]
+    assert (r["supports"]["max_mm"], r["supports"]["clip_mm"]) == (600, 30)
+    assert r["terminal_face"]["cone"] == 0.2
+    assert r["heat"]["lines"] == ["H-01"] and r["heat"]["line_mm"] == {"ELV": 25, "ac230": 50}
+    g = r["ratings"]["groups"]
+    assert (g["bunched"][6], g["layer"][2], g["light_pct"]) == (0.57, 0.85, 30)
+
+
+def test_svc10_holds_each_fuse_between_its_current_and_the_cables_rating():
+    """I2-15 b: D-07's 200 A MEGA sits between its 144 A and its 95 mm2 pair's rating in the board. On the old 50 mm2
+    the fuse is over the cable's rating."""
+    row = {x["run"]: x for x in EVAL["ratings"]["rows"]}
+    d07 = row["D-07"]
+    assert d07["ib"] <= d07["device"] <= d07["iz"], d07
+    runs = [dict(r, size=50) if r["id"] == "D-07" else r for r in RES["runs"]]
+    bad = R.ratings(dict(RES, runs=runs))["problems"]
+    assert any(p.startswith("D-07's 200 A device is over") for p in bad), bad
+
+
+def test_svc11_finds_a_cable_beside_the_hot_line():
+    """I2-18 d: a cable laid 10 mm over H-01 (and through its risers) is closer than SVC-08's 25 mm for heated water."""
+    h01 = next(r for r in RES["runs"] if r["id"] == "H-01")
+    b15 = next(r for r in RES["runs"] if r["id"] == "B-15")
+    up = h01["od"] / 2 + b15["od"] / 2 + 10
+    runs = [dict(r, dense=[(p[0], p[1], p[2] + up) for p in h01["dense"]], glands=[]) if r["id"] == "B-15" else r for r in RES["runs"]]
+    bad = R.heat(dict(RES, runs=runs))["problems"]
+    assert any(p.startswith("B-15 passes") and "from the hot line H-01" in p for p in bad), bad
+
+
+def test_svc04s_cone_spares_a_line_over_the_tray_and_catches_one_under_it():
+    """I2-18 c: a line straight over the terminal face is caught by the tray EL-09 above it, never below it."""
+    tf = RES["data"]["rules"]["terminal_face"]
+    face = RES["ns"][R.key(tf["line"])]
+    tz = R._eval(tf["tray"]["z"], RES["ns"])
+    f12 = next(r for r in RES["runs"] if r["id"] == "F-12")
+
+    def at(z):
+        line = dict(f12, dense=[(face.cx - 50, face.cy, z), (face.cx + 50, face.cy, z)])
+        return R.drip_cone(dict(RES, runs=[line]))
+    assert at(tz + f12["od"] / 2 + 20)["ok"]
+    low = at((face.z1 + tz) / 2)
+    assert not low["ok"] and low["problems"][0].startswith("F-12"), low
+
+
+def test_svc12_finds_a_cable_left_hanging():
+    """I2-18 a: without the raiser it is threaded through and the parts it is clipped to, K-09 hangs over 600 mm."""
+    assert EVAL["supports"]["longest"] <= 600
+    runs = [dict(r, along=[], inside=[]) if r["id"] == "K-09" else r for r in RES["runs"]]
+    bad = R.supports(dict(RES, runs=runs))["problems"]
+    assert any(p.startswith("K-09 lies") for p in bad), bad
+
+
+def test_k08_and_k09_pass_into_the_outriggers_clear_of_the_seams():
+    """I2-27: the marker lamps' looms cross no seam. They enter each raiser through its inner face well above its seam
+    with the rail, and leave it into the outrigger OR-05 through the middle of the outrigger's end."""
+    boxes = {b["id"]: b["box"] for b in RES["blocks"] if b.get("box")}
+    for h in R.member_holes(RES):
+        if h["run"] not in ("K-08", "K-09"):
+            continue
+        assert h["face"] not in ("top", "bottom"), h
+        if h["member"].startswith("RS-"):
+            seam = boxes[h["member"]][2]
+            assert h["z"] - h["d"] / 2 - seam >= 20, h
+        if h["member"].startswith("OR-05") and abs(abs(h["y"]) - 638) < 1:
+            x0, _, z0, x1, _, _ = boxes[h["member"]]
+            assert min(h["x"] - h["length"] / 2 - x0, x1 - h["x"] - h["length"] / 2) >= 10, h
+            assert h["z"] - h["d"] / 2 - z0 >= 20, h

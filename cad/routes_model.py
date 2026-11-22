@@ -198,7 +198,7 @@ def viewer_json(name: str, root: Compound) -> str:
 
 # ------------------------------------------------------------------ check rows and the pages' data
 def check_rows(res: dict, ev: dict) -> list[dict]:
-    """SVC-01 to SVC-09 as check rows (data/routes.yaml `checks`), each with its limit, measured value and governing run."""
+    """SVC-01 to SVC-12 as check rows (data/routes.yaml `checks`), each with its limit, measured value and governing run."""
     rows = []
     for c in res["data"].get("checks") or []:
         e = ev[c["kind"]]
@@ -231,6 +231,16 @@ def check_rows(res: dict, ev: dict) -> list[dict]:
         elif c["kind"] == "glands":
             fits = res["svc"]["fittings"]
             row.update(limit=f"{fits['web_mm']:g} mm between fittings, {fits['spanner_mm']:g} mm round a locknut, none in a keep-clear box",
+                       measured=e["margin"], unit="mm spare", margin=e["margin"], governing=e["governing"])
+        elif c["kind"] == "ratings":
+            row.update(limit="each cable's design current and its device at most its rating where it lies (Ib <= In <= Iz)",
+                       measured=e["margin"], unit="A spare", margin=e["margin"], governing=e["governing"])
+        elif c["kind"] == "supports":
+            row.update(limit=f"each cable's longest unsupported span at most {e['limit']:g} mm", measured=e["longest"], unit="mm",
+                       margin=e["margin"], governing=e["governing"])
+        elif c["kind"] == "heat":
+            hr = res["data"]["rules"]["heat"]
+            row.update(limit=f"cables {hr['line_mm']['ELV']:g} mm (ELV) and {hr['line_mm']['ac230']:g} mm (230 V) from {', '.join(hr['lines'])}, the hot surfaces' own distances",
                        measured=e["margin"], unit="mm spare", margin=e["margin"], governing=e["governing"])
         elif c["kind"] == "spacing":
             sp = res["data"]["rules"]["spacing"]
