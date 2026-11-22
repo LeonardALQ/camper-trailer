@@ -1196,6 +1196,45 @@ def glands(res: dict) -> dict:
                 governing=f"{tight[0]['a']} to {tight[0]['b']}" if tight else None, limit=fits["spanner_mm"])
 
 
+MEMBERS = ("RL-", "RS-", "CM-", "OR-", "DB-K", "DB-R")   # the chassis members a run may pass through (`inside`)
+FACE_NAMES = {"x0": "front", "x1": "rear", "y0": "kerb side", "y1": "road side", "z0": "bottom", "z1": "top"}
+BUSH_MM = 6.0   # (est.) a hole's bush or grommet round the run, added to its outside diameter
+
+
+def member_holes(res: dict) -> list[dict]:
+    """Every hole a run makes in a chassis member's wall: where the run, threaded through the member (`inside`), crosses
+    its box's face. Each hole is the run's outside diameter plus a bush across, and as long along the face as the run's
+    slant through it makes it (a slot where it passes obliquely), for the structural checks (data/services.yaml holes)."""
+    mem = [b for b in res["blocks"] if b.get("box") and b["id"].startswith(MEMBERS)]
+    out = []
+    for r in res["runs"]:
+        inn = _ids(r, "inside")
+        pts = r["dense"]
+        for b in (m for m in mem if _matches(m, inn)):
+            box = b["box"]
+            inside = lambda p: all(box[k] + 0.5 < p[k] < box[k + 3] - 0.5 for k in range(3))  # noqa: E731
+            for a, c in zip(pts, pts[1:]):
+                ia, ic = inside(a), inside(c)
+                if ia == ic:
+                    continue
+                lo, hi = (a, c) if ia else (c, a)
+                for _ in range(30):
+                    m = tuple((lo[k] + hi[k]) / 2 for k in range(3))
+                    lo, hi = (m, hi) if inside(m) else (lo, m)
+                p = hi
+                gaps = [abs(p[0] - box[0]), abs(p[1] - box[1]), abs(p[2] - box[2]), abs(p[0] - box[3]), abs(p[1] - box[4]), abs(p[2] - box[5])]
+                f = gaps.index(min(gaps))
+                u, n = _unit(_sub(c, a))
+                cos = abs(u[f % 3]) if n > 0 else 1.0
+                d = r["od"] + BUSH_MM
+                hole = dict(member=b["iid"], face=FACE_NAMES[("x0", "y0", "z0", "x1", "y1", "z1")[f]], run=r["id"],
+                            x=round(p[0]), y=round(p[1]), z=round(p[2]), d=round(d), length=round(min(d / max(cos, 0.2), 5 * d)))
+                if not any(h["run"] == hole["run"] and h["member"] == hole["member"] and
+                           math.dist((h["x"], h["y"], h["z"]), (hole["x"], hole["y"], hole["z"])) < 5 for h in out):
+                    out.append(hole)
+    return sorted(out, key=lambda h: (h["member"], h["x"], h["run"]))
+
+
 CHECKS = {"clearance": clearance, "bends": bends, "separation": separation, "terminal_face": terminal_face,
           "coverage": coverage, "drops": drops, "falls": falls, "spacing": spacing, "glands": glands}
 

@@ -51,9 +51,13 @@ they are threaded through (`inside`).
 - The tank guard closes the gaps beside the fresh tanks from below, so the fill reaches the front tank only from the
   front: G12 is in the floor under the bed's rear end, in front of CM-04, and the hose enters the tank's front face.
   The two tanks share a balance hose over CM-05 on dip tubes to their sumps.
-- it2-interior's arm hangers fill the outside of the rails through both wheel bays. The ute feed, the compressor and
-  breakaway cables and the lamp looms run inside the rails there and leave them through the raiser and the outrigger
-  (OR-05) or at the kerb frame G20's raiser space. SVC-01 skips the parts welded to a member while a run is inside it.
+- it2-interior's arm hangers fill the outside of the rails through both wheel bays. The lamp looms run inside the rails
+  there and leave them through the raiser and the outrigger (OR-05). The ute feed D-14, the compressor feed B-16 and
+  the breakaway feed B-18 run inside the kerb raiser RS-K only, clear of its seam with the rail. Each enters through a
+  slotted hole in the face it arrives at, ahead of CM-02 (B-16 and B-18 the inner face, D-14 from the drawbar the outer
+  face), and leaves through the raiser's top into the kerb frame G20. Every hole in a chassis member and every floor
+  cut-out over 60 mm is listed in `data/services.yaml` (`holes`, `cutouts`) with its member or panel, point and size.
+  SVC-01 skips the parts welded to a member while a run is inside it.
 - The desk reaches the floor, so its outlets and USB panel are in a power module in the desk top, fed up the front
   wall's kerb corner (G17 for 230 V, G23 for 24 V, 70 mm apart) and through the desk's front leg. The e2 fans C and D
   have their own glands under them (G16, G18).

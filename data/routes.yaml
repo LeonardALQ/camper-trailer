@@ -389,6 +389,9 @@ consts:
   DCR_X: rear_x0 - 25               # the battery's riser behind the dryer, to the isolator and the BMS, clipped to the partition
   DCR_Y: -half_in + 55              # the chase's mid row, down through the cabinet's floor: the risers and the loom to G20, 30 mm clear of the water lines
   WSY: -half_in + 12                # the chase's wall strip, outside the cabinet's kerb face: the cables to the kerb frame's raiser space and the tank senders
+  RZ1: RS_K.z1 - 34                 # inside the kerb raiser, clear of its seam with the rail: the breakaway feed B-18 on top,
+  RZ2: RS_K.z1 - 69                 # the ute feed D-14 in the middle
+  RZ3: RS_K.z1 - 102                # and the compressor feed B-16 at the bottom, each 7 mm inboard of the raiser's centre for K-08's riser
   ZW: floor_z + 165                 # the wall strip's cables cross the end slot to the frames here, over the 230 V conduit
   CHX: rear_x0 - 158                # the 12 V and 24 V loom down the chase's mid row to G20, lanes rearward
   KAX: LA_02.x1 - 60                # the 230 V riser behind the washer, 550 mm forward of the DC risers
@@ -557,11 +560,11 @@ runs:
      from: {line: BR-O24, at: [BR_O24.x0, BR_O24.cy, BR_O24.cz]}, path: [[BFX - 56, ., .], [., ., BR_P24.cz]], to: {line: BR-P24, at: [BR_P24.x0, ., .]}}
   - {id: D-13, system: dc12, kind: pair, size: 16, amps: 60, volts: 12, feeds: "The 48/12 pair to the 12 V fuse panel", protection: "80 A",
      from: {line: BR-O12, at: [BR_O12.x0, BR_O12.cy, BR_O12.cz]}, path: [[BFX - 70, ., .], [., ., BR_P12.cz]], to: {line: BR-P12, at: [BR_P12.x0, ., .]}}
-  - {id: D-14, system: dc48, kind: twin8, amps: 32, volts: 48, feeds: "Ute charging feed: the drawbar Anderson along the kerb drawbar member, under the jockey's spacers, inside the kerb rail past the arm hangers, up through the kerb frame G20 and the chase's wall strip to the Lynx Distributor", inside: [RL-K, RS-K], passes: [], protection: "40 A MEGA in the Lynx, the ute's own fuses at its end",
+  - {id: D-14, system: dc48, kind: twin8, amps: 32, volts: 48, feeds: "Ute charging feed: the drawbar Anderson along the kerb drawbar member, under the jockey's spacers, into the kerb raiser through a slot in its outer face ahead of OR-02K, inside the raiser past the arm hangers, up through the kerb frame G20 and the chase's wall strip to the Lynx Distributor", inside: [RS-K], passes: [], protection: "40 A MEGA in the Lynx, the ute's own fuses at its end",
      upstream: {what: "TW06, the ute half from the chargers to the towbar Anderson: 7 m of 4 B&S twin", m: 7, mm2: 21.2, mv: 2.12,
                 source: "Car build line TW06 (data/vehicle-parts.yaml), at 4 B&S with D-14 so the feed holds 2 % from the chargers to the Lynx at 32 A, report 20's current after the upgrade"},
      serves: [ute feed], glands: [G20], along: [DB-KA, DB-KB, RL-K, RS-K, BD-03], from: {line: DB-AN, at: [DB_AN.x1, DB_AN.cy, DB_AN.cz]},
-     path: [[780, -284.7, 523], [900, -327.0, 440], [1100, -397.4, 440], [1220, -439.6, 523], [1820, -650.8, 523], [2260, -651, 523], [2330, -651, 670], [2460, RL_K.cy + 8, 680], [G20_D_14.cx - 285, ., .], [G20_D_14.cx - 160, G20_D_14.cy, .], [G20_D_14.cx, ., floor_underside_z - 55], [., ., ZW], [., WSY, .], [., ., LA_11E.z0 + 195]],
+     path: [[780, -284.7, 523], [900, -327.0, 440], [1100, -397.4, 440], [1220, -439.6, 523], [1820, -650.8, 523], [2000, -651, 523], [2130, ., RZ2], [2300, RS_K.cy + 7, .], [G20_D_14.cx - 64.5, ., .], [G20_D_14.cx, G20_D_14.cy, RZ2 + 64.5], [., ., ZW], [., WSY, .], [., ., LA_11E.z0 + 195]],
      to: {line: BR-LYNX, at: [BR_LYNX.cx, BR_LYNX.y0, .]}}
   - {id: D-15, system: pv, kind: pv, lane: 0, feeds: "PV string 1, the two kerb-side panels in series, through G4, the kerb bulkhead over the wet room and the board's duct to MPPT 1", protection: "None, one string to its controller, a DC isolator at the MPPT",
      serves: [pv1], glands: [G4], passes: [WR-03], along: [BD-02], from: {line: RF-01.4, at: [RF_01_4.x1 - 40, RF_01_4.cy, RF_01_4.z1 + 8]},
@@ -690,16 +693,16 @@ runs:
      serves: ["12 V: Combi D 6 E"], glands: [G20, G9], along: [BD-01, BD-03, RS-K], from: {line: BR-P12, at: [BR_P12.cx + 10, BR_P12.cy, BR_P12.z0]},
      path: [[., ., LA_11E.z0 + 30], [CHX + L_CH, DCR_Y, .], [., ., ESZ], [G20_B_15.cx, G20_B_15.cy, .], [., ., UFZ - L_UF], [G9.cx + 214, ., .], [G9.cx + 72, ., floor_underside_z - 9], [., -350, .], [., G9_B_15.cy - 180, floor_underside_z - 65], [G9_B_15.cx, G9_B_15.cy, .], [., ., floor_z + 260], [., LA_03.y0 + 40, .]],
      to: {line: LA-03, at: [LA_03.x0, ., .]}}
-  - {id: B-16, system: dc12, kind: twin, amps: 25, volts: 12, feeds: "Cruisemaster XT Air compressor, down the chase's wall strip, through the kerb frame G20, forward inside the kerb rail past the arm hangers, and across to the air box", inside: [RL-K, RS-K], passes: [], protection: "40 A on the 12 V panel",
+  - {id: B-16, system: dc12, kind: twin, amps: 25, volts: 12, feeds: "Cruisemaster XT Air compressor, down the chase's wall strip, through the kerb frame G20, forward inside the kerb raiser past the arm hangers, out of its inner face ahead of CM-02 and across to the air box", inside: [RS-K], passes: [], protection: "40 A on the 12 V panel",
      serves: ["12 V: XT Air compressor"], glands: [G20], along: [BD-03, RL-K, RS-K, DB-KB], from: {line: BR-P12, at: [BR_P12.cx + 20, BR_P12.cy, BR_P12.z0]},
-     path: [[., ., LA_11E.z0 + 120], [G20_B_16.cx, WSY, .], [., ., ZW], [., G20_B_16.cy, .], [., ., floor_underside_z - 65], [G20_B_16.cx - 180, ., 650], [G20_B_16.cx - 365, RL_K.cy + 10, .], [2230, ., .], [2170, -560, .], [2120, -330, .]],
+     path: [[., ., LA_11E.z0 + 120], [G20_B_16.cx, WSY, .], [., ., ZW], [., G20_B_16.cy, .], [., ., RZ3 + 73], [G20_B_16.cx - 73, RS_K.cy + 7, RZ3], [2330, ., .], [2200, -565, .], [2170, -560, .], [2120, -330, .]],
      to: {line: RG-04, at: [., RG_04.y0, .]}}
   - {id: B-17, system: dc12, kind: twin, amps: 0.5, volts: 12, lane: 11, feeds: "Smoke alarm, then the CO alarm, the GPS tracker and the door sensors", protection: "3 A on the 12 V panel",
      serves: ["12 V: alarms and tracker"], passes: [AL-01], along: [BD-02], from: {line: BR-P12, at: [BR_P12.cx, BR_P12.cy, BR_P12.z1]},
      path: [[KBX, KB_Y + L_KB, ZD], [., ., CZ], [AL_01.cx, ., .], [., KB_Y + L_KB + 75, CZ - 17], [., AL_01.cy, .], [AL_02.x1 + 30, AL_02.cy, .]], to: {line: AL-02, at: [AL_02.x1, ., .]}}
-  - {id: B-18, system: dc12, kind: twin, amps: 0.5, volts: 12, feeds: "Breakaway kit's battery charger on the drawbar, with the ute feed down the chase's wall strip, through the kerb frame G20 and along the kerb rail", inside: [RL-K, RS-K], passes: [], protection: "3 A on the 12 V panel",
+  - {id: B-18, system: dc12, kind: twin, amps: 0.5, volts: 12, feeds: "Breakaway kit's battery charger on the drawbar, with the ute feed down the chase's wall strip, through the kerb frame G20 and inside the kerb raiser, out of its inner face ahead of CM-02", inside: [RS-K], passes: [], protection: "3 A on the 12 V panel",
      serves: ["12 V: breakaway charger"], glands: [G20], along: [BD-03, RL-K, RS-K, DB-KA, DB-KB], from: {line: BR-P12, at: [BR_P12.cx + 30, BR_P12.cy, BR_P12.z0]},
-     path: [[., ., LA_11E.z0 + 30], [G20_B_18.cx, WSY, .], [., ., ZW], [., G20_B_18.cy, .], [., ., floor_underside_z - 25], [G20_B_18.cx - 158, ., 712], [G20_B_18.cx - 300, RL_K.cy + 8, .], [2340, ., .], [2300, -578, 680], [2240, ., 553], [1820, -580.5, .], [1140, -337, .], [1100, -290, .], [1010, -290, .], [960, -274, 420], [800, -213, 420], [750, -194, 520], [700, -175, .], [., DB_BK.y0 - 40, .]],
+     path: [[., ., LA_11E.z0 + 30], [G20_B_18.cx, WSY, .], [., ., ZW], [., G20_B_18.cy, .], [., ., RZ1 + 26.5], [G20_B_18.cx - 26.5, RS_K.cy + 7, RZ1], [2080, ., .], [1980, RS_K.y1 + 9, .], [1900, ., 553], [1820, -580.5, .], [1140, -337, .], [1100, -290, .], [1010, -290, .], [960, -274, 420], [800, -213, 420], [750, -194, 520], [700, -175, .], [., DB_BK.y0 - 40, .]],
      to: {line: DB-BK, at: [., DB_BK.y0, DB_BK.cz]}}
   - {id: B-19, system: dc12, kind: twin, amps: 10, volts: 12, feeds: "External 12 V Anderson outlet at G2, and the creek transfer pump plugged into it, out of the board cabinet's front over the chase", protection: "10 A on the 12 V panel",
      serves: ["12 V: 10 A external outlet", "12 V: transfer pump"], along: [BD-03], from: {line: BR-P12, at: [BR_P12.x1 - 2, BR_P12.cy, BR_P12.z0]},
@@ -772,10 +775,10 @@ runs:
      to: {line: BR-CX, at: [., ., BR_CX.z0]}}
   - {id: N-08, system: data, kind: sig, lane: {UF: 3}, feeds: "Front fresh tank's level sender, down the chase's wall strip, through the kerb frame and forward under the floor beside the kerb raiser", protection: "-", serves: [tank senders],
      glands: [G20], along: [BD-01, BD-03, RS-K], from: {line: BR-CX, at: [BR_CX.cx, BR_CX.cy, BR_CX.z0]},
-     path: [[., ., LA_11E.z0 + 20], [G20_N_08.cx, WSY, .], [., ., ZW], [., G20_N_08.cy, .], [., ., UFZ - L_UF], [UF_01.cx, ., .]], to: {line: UF-01, at: [., UF_01.y0, .]}}
+     path: [[., ., LA_11E.z0 + 20], [G20_N_08.cx + 12, WSY, .], [., ., ZW], [., G20_N_08.cy, .], [G20_N_08.cx, ., ZW - 60], [., ., UFZ - L_UF], [UF_01.cx, ., .]], to: {line: UF-01, at: [., UF_01.y0, .]}}
   - {id: N-09, system: data, kind: sig, lane: {UF: 4}, feeds: "Rear fresh tank's level sender", protection: "-", serves: [tank senders],
      glands: [G20], along: [BD-01, BD-03, RS-K], from: {line: BR-CX, at: [BR_CX.cx + 10, BR_CX.cy, BR_CX.z0]},
-     path: [[., ., LA_11E.z0 + 20], [G20_N_09.cx, WSY, .], [., ., ZW], [., G20_N_09.cy, .], [., ., UFZ - L_UF], [UF_01R.cx, ., .]], to: {line: UF-01R, at: [., UF_01R.y0, .]}}
+     path: [[., ., LA_11E.z0 + 20], [G20_N_09.cx + 12, WSY, .], [., ., ZW], [., G20_N_09.cy, .], [G20_N_09.cx, ., ZW - 60], [., ., UFZ - L_UF], [UF_01R.cx, ., .]], to: {line: UF-01R, at: [., UF_01R.y0, .]}}
   - {id: N-10, system: data, kind: sig, feeds: "Grey tank's level sender, back under the floor under the crossing cables to its kerb side", protection: "-", serves: [tank senders],
      glands: [G20], along: [BD-01, BD-03, CM-06, WR-03, RL-K, RS-K], from: {line: BR-CX, at: [BR_CX.cx + 20, BR_CX.cy, BR_CX.z0]},
      path: [[., ., LA_11E.z0 + 20], [G20_N_10.cx, WSY, .], [., ., ZW], [., G20_N_10.cy, .], [., ., UFZ - 50], [UF_08.x0 + 56, ., .], [., ., UF_08.z1 - 40]], to: {line: UF-08, at: [., UF_08.y0, .]}}
@@ -797,8 +800,8 @@ runs:
      serves: [front lamps], along: [DB-RA], from: {line: DB-PL, at: [DB_PL.x1, DB_PL.cy, DB_PL.cz + 15]}, path: [[1790, 640, 538], [., LM_FR.cy, .]], to: {line: LM-FR, at: [., ., LM_FR.z0]}}
   - {id: K-07, system: lamps, kind: lamp7, feeds: "Kerb side front position lamp, under the drawbar members", protection: "The ute's lamp fuses",
      serves: [front lamps], along: [DB-RA, DB-KA], from: {line: DB-PL, at: [DB_PL.x1, DB_PL.cy, DB_PL.cz - 30]}, path: [[1790, 640, 493], [., ., 375], [., LM_FK.cy + 60, .], [., LM_FK.cy, LM_FK.z0 - 60]], to: {line: LM-FK, at: [., ., LM_FK.z0]}}
-  - {id: K-08, system: lamps, kind: lamp7, feeds: "Kerb side marker lamps, inside the kerb rail under the kerb frame's raiser cables past the arm hangers, out of its outer web and up into the outrigger OR-05K", inside: [RL-K, RS-K, OR-05K], passes: [], protection: "The ute's lamp fuses",
-     serves: [side markers], along: [CM-08, RL-K, RS-K, OR-05K], from: {line: LJ-01, at: [LJ_01.cx - 30, LJ_01.y0, LJ_01.cz]}, path: [[6162, RL_K.cy - 15, .], [6050, ., 615], [LM_SK.cx, ., .], [., ., LM_SK.cz + 39], [., LM_SK.y1 + 10, .]], to: {line: LM-SK, at: [., LM_SK.y1, .]}}
+  - {id: K-08, system: lamps, kind: lamp7, feeds: "Kerb side marker lamps, inside the kerb rail past the arm hangers, up into the raiser beside the three cables in it and out of its outer face into the outrigger OR-05K", inside: [RL-K, RS-K, OR-05K], passes: [], protection: "The ute's lamp fuses",
+     serves: [side markers], along: [CM-08, RL-K, RS-K, OR-05K], from: {line: LJ-01, at: [LJ_01.cx - 30, LJ_01.y0, LJ_01.cz]}, path: [[6162, RL_K.cy - 17, .], [6050, ., 615], [LM_SK.cx, ., .], [., ., LM_SK.cz + 39], [., LM_SK.y1 + 10, .]], to: {line: LM-SK, at: [., LM_SK.y1, .]}}
   - {id: K-09, system: lamps, kind: lamp7, feeds: "Road side marker lamps, inside the road rail past the arm hangers and out through the raiser and the outrigger OR-05R", inside: [RL-R, RS-R, OR-05R], passes: [], protection: "The ute's lamp fuses",
      serves: [side markers], along: [CM-08, RL-R, RS-R, OR-05R], from: {line: LJ-01, at: [LJ_01.cx - 30, LJ_01.y1, LJ_01.cz - 15]}, path: [[6180, 598, .], [., ., 708], [LM_SR.cx - 9, ., .], [., ., LM_SR.cz + 19], [., LM_SR.y0 - 10, .]], to: {line: LM-SR, at: [., LM_SR.y0, .]}}
   - {id: K-10, system: lamps, kind: lamp7, feeds: "Brake, ABS and breakaway switch circuit from the 12-pin plug to the Bosch TSC", inside: [RL-R], passes: [], protection: "The ute's brake controller",

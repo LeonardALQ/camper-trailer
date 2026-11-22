@@ -370,6 +370,7 @@ drawings:
       - {rev: G, date: 2026-11-22, description: "Notice: every cable as routed in data/routes.yaml (H28)", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-22, description: "Notice: runs tagged at their ends and levels, glands to CT-603 (I2-17)", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-22, description: "Notice: G8 merged into the kerb frame G20 (I2-14)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: J, date: 2026-11-22, description: "Notice: G20's three raiser cables inside RS-K, clear of the rail seam (I2-27)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-603
     title: Floor and wall penetrations
     subtitle: Every gland through the floor, walls and roof, its position, hole, fitting and runs
@@ -382,6 +383,7 @@ drawings:
     revisions:
       - {rev: A, date: 2026-11-22, description: "First draft: every gland, its position, hole, fitting and runs (I2-17)", drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-22, description: "Notice: frames as packing, rim and modules, webs from SVC-09 (I2-14)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: C, date: 2026-11-22, description: "Notice: G20's raiser cells for the routes inside RS-K, frames in BD-25 (I2-27)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-611
     title: Plumbing schematic
     subtitle: Fill, fresh tanks, pump, filters, cold and hot lines, drains to the grey tank and the dump

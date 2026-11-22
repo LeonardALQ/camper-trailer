@@ -102,6 +102,27 @@ def test_bd11s_routed_item_follows_the_routes_and_the_line_adds_to_its_total():
     assert allow["kg"] >= 0 and sum(p["kg"] for p in parts) == pytest.approx(53.6, abs=0.001)
 
 
+def test_every_hole_in_a_chassis_member_and_every_large_floor_cut_out_is_listed():
+    """I2-27: data/services.yaml lists every hole the runs make in a chassis member, at its place within 15 mm, and
+    every floor cut-out over 60 mm with its size, so a structural check can read them."""
+    listed = RES["svc"]["holes"]
+    got = R.member_holes(RES)
+    same = lambda a, b: (a["member"], a["run"], a["face"]) == (b["member"], b["run"], b["face"])  # noqa: E731
+    for h in got:
+        assert any(same(h, x) and math.dist((h["x"], h["y"], h["z"]), (x["x"], x["y"], x["z"])) <= 15 and abs(h["d"] - x["d"]) <= 1
+                   for x in listed), h
+    assert len(listed) == len(got), (len(listed), len(got))
+    cuts = {c["gland"]: c for c in RES["svc"]["cutouts"]}
+    for g in RES["svc"]["glands"]:
+        if g["at"] == "floor":
+            w, h = (g["w"] + 8, g["h"] + 8) if g.get("w") and g.get("h") else (g["d"], g["d"])
+            assert (max(w, h) > 60) == (g["id"] in cuts), g["id"]
+            if g["id"] in cuts:
+                assert (cuts[g["id"]]["w"], cuts[g["id"]]["h"]) == (w, h), g["id"]
+    # the kerb frame's three raiser cables stay in the raiser, clear of its seam with the rail (I2-27)
+    assert not [h for h in got if h["run"] in ("B-16", "B-18", "D-14") and h["member"] == "RL-K"]
+
+
 def test_svc01_tests_the_keep_clear_boxes_up_to_the_ceilings_services_zone():
     """I2-14: the aisles, landings and the chair space are obstacles to SVC-01 from the floor up, under the ceiling's
     services zone, so no run or riser stands in them."""

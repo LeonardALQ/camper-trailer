@@ -780,7 +780,7 @@ def ct603(prj, model, bom, checks, reg, dwg):
         "THE ASSUMPTION BEHIND EACH POSITION IS THE GLAND'S est IN data/services.yaml. CT-602 AND CT-612 TAG THE RUNS AT EACH GLAND.",
     ], size=1.42, width_chars=185)
     # ---- right column: every gland
-    yb = title(sh, dwg, reg, "GLANDS AND FITTINGS IN BD-11 (TB-11).", "SEE THE FITTING COLUMN")
+    yb = title(sh, dwg, reg, "GLANDS IN BD-11, TRANSIT FRAMES IN BD-25 (TB-11).", "SEE THE FITTING COLUMN")
     rows = []
     for x in svc["glands"]:
         p = centre[x["id"]]
