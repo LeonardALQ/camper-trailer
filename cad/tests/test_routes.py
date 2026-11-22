@@ -57,6 +57,32 @@ def test_no_two_runs_overlap_outside_the_board_duct():
     assert e["overlaps"] == 0, [p for p in e["problems"] if "overlapping" in p][:5]
 
 
+def test_the_ute_feed_holds_its_drop_from_the_chargers_to_the_lynx():
+    """I2-15 (a): SVC-06 adds the ute half (TW06, its `upstream`) to D-14's own drop at the design current."""
+    d14 = next(r for r in RES["runs"] if r["id"] == "D-14")
+    up = d14["upstream"]
+    own = d14["size"] and RES["kinds"]["twin8"]["sizes"][d14["size"]]["mv_am"] * d14["amps"] * d14["length_m"] / 1000
+    assert up["m"] == 7 and d14["amps"] == 32 and "TW06" in up["source"]
+    assert d14["vd_v"] == pytest.approx(own + up["mv"] * d14["amps"] * up["m"] / 1000, abs=0.002)
+    assert d14["vd_pct"] <= RES["data"]["rules"]["drop_pct"]
+
+
+def test_every_frame_cell_is_inside_its_frame_and_clear_of_the_others():
+    """I2-14: a transit frame's modules fit its packing, side by side, each named for the run that passes it."""
+    by = {r["id"]: r for r in RES["runs"]}
+    for g in RES["svc"]["glands"]:
+        cells = g.get("cells") or {}
+        boxes = []
+        for rid, (dx, dy, m) in cells.items():
+            assert rid in by and g["id"] in (by[rid].get("glands") or []), (g["id"], rid)
+            assert abs(dx) + m / 2 <= g["w"] / 2 + 1e-6 and abs(dy) + m / 2 <= g["h"] / 2 + 1e-6, (g["id"], rid)
+            assert by[rid]["od"] <= m, (g["id"], rid, by[rid]["od"], m)
+            boxes.append((rid, dx - m / 2, dy - m / 2, dx + m / 2, dy + m / 2))
+        for i, a in enumerate(boxes):
+            for b in boxes[i + 1:]:
+                assert a[3] <= b[1] + 1e-6 or b[3] <= a[1] + 1e-6 or a[4] <= b[2] + 1e-6 or b[4] <= a[2] + 1e-6, (g["id"], a[0], b[0])
+
+
 def test_ids_are_unique_and_every_end_is_a_real_line():
     ids = [r["id"] for r in RES["runs"]]
     assert len(ids) == len(set(ids))
