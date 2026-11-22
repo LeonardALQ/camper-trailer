@@ -18,6 +18,8 @@ const jobs = [
   { path: '/body/', name: 'body-inside', viewer: true, nth: 1 },
   { path: '/ute-garage/', name: 'ute-garage', viewer: true, full: true, sections: ['checks', 'mass'] },
   { path: '/ute-garage/', name: 'ute-garage-loading', viewer: true, nth: 1 },
+  { path: '/electrical/', name: 'electrical', viewer: true, full: true, sections: ['cable-schedule', 'services-checks'] },
+  { path: '/plumbing/', name: 'plumbing', viewer: true, full: true, sections: ['pipe-schedule'] },
   { path: '/tow-vehicle/', name: 'tow-vehicle', full: true },
   { path: '/drawings/', name: 'drawings', full: true },
   { path: '/research/03-bike-restraint-garage/', name: 'research-03' },

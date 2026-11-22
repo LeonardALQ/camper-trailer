@@ -220,6 +220,7 @@ def check_rows(res: dict, ev: dict) -> list[dict]:
             row.update(limit=f"at least 1:{1 / res['data']['rules']['fall']:.0f}", measured=e["slope"], unit="fall",
                        margin=None if e["slope"] is None else round(e["slope"] - res["data"]["rules"]["fall"], 4), governing="flattest level leg")
         row["detail"] = "; ".join(e["problems"][:3]) if e["problems"] else f"{row.get('governing') or ''}".strip()
+        row["status"] = ("PASS" if row["ok"] else "FAIL") if c["severity"] == "fail" else ("MEETS LIMIT" if row["ok"] else "REPORTED")
         rows.append(row)
     return rows
 

@@ -23,6 +23,31 @@ from .home_common import (Proj, arrow_line, body_plan, box, ctx, label_in, short
                           write, wtable)
 
 
+ELEC_STYLE = {"dc48": "dc", "pv": "pv", "ac230": "ac", "dc24": "bus", "dc12": "bus", "data": "bus", "lamps": "bus"}
+PIPE_STYLE = {"fresh": "cold", "hot": "hot", "waste": "drain", "vent": "thin", "diesel": "thin", "refrigerant": "thin"}
+_ROUTED: dict = {}
+
+
+def _routes(lay) -> dict:
+    """data/routes.yaml resolved on the sheet's layout by cad/routes.py, once per build (H28)."""
+    if id(lay) not in _ROUTED:
+        from .. import routes as R
+        _ROUTED[id(lay)] = R.resolve(lay)
+    return _ROUTED[id(lay)]
+
+
+def _by_system(rr: dict, styles: dict) -> list[list[str]]:
+    from ..routes_model import SYSTEM_STYLE
+    tot: dict[str, list] = {}
+    for run in rr["runs"]:
+        if run["system"] in styles:
+            t = tot.setdefault(run["system"], [0, 0.0, 0.0])
+            t[0] += 1
+            t[1] += run["length_m"]
+            t[2] += run["mass_kg"]
+    return [[SYSTEM_STYLE[s_][1].upper(), str(v[0]), f"{v[1]:.1f}", f"{v[2]:.2f}"] for s_, v in tot.items()]
+
+
 def _centre(b):
     bb = b.box
     if bb is None:
@@ -193,60 +218,20 @@ def ct602(prj, model, bom, checks, reg, dwg):
     gp = {i: pr.p(*_gland_xy(g[i], V), 0) for i in gids}
     rects = body_plan(sh, pr, lay, res, cut=1000.0, show=show, size=1.2, keep=False, swings=False, light=("EL-02", "LA-11E", "EL-04"),
                       nolabel=("EL-02", "LA-03", "LA-11B", "LA-02"), avoid=list(gp.values()))
-    fz = V["floor_z"]
     f = lambda iid: _centre(lay.find(iid))  # noqa: E731
     bd = lay.find("LA-11E").box
-    inv = lay.find("EL-04").box
-    xp = V["rear_x0"] - 25
-    # 48 V main: bank to the BMS on the board, the board to the inverter across the door head
-    _route(pr, [(lay.find("EL-02").box[3] - 40, -690), (bd[0] + 40, -690)], "dc")
-    _route(pr, [(xp, bd[4]), (xp, inv[1])], "dc")
-    # PV down the partition's kerb end, and the ute feed along the kerb rail
-    _route(pr, [(g["G4"]["x"], g["G4"]["y"]), (bd[0] + 60, g["G4"]["y"])], "pv")
-    _route(pr, [(V["body_x0"], -V["rail_c"]), (g["G8"]["x"], -V["rail_c"]), (g["G8"]["x"], g["G8"]["y"])], "pv")
-    q = pr.p(V["body_x0"], -V["rail_c"])
-    arrow_line(sh, (q[0] - 9, q[1] - 6), (q[0], q[1]), "thin", 1.4)
-    textblock(sh, 22.5, q[1] - 7.5, ["UTE FEED", "(G8)"], size=1.1, gap=0.5)
-    # 230 V: the board up into the partition bulkhead, then along the walls at ceiling level
-    yk, yr = -hi + 70, hi - 70
-    xb = V["rear_x0"] - 60
-    _route(pr, [(bd[0] + 100, bd[1] + 60), (xb, bd[1] + 60), (xb, yr)], "ac")
-    hob, oven, comb = f("LA-07A"), f("LA-13"), f("LA-03")
-    _route(pr, [(xb, yr), (comb[0], yr)], "ac")
-    bench_mid = (lay.find("LA-11B").box[0] + lay.find("LA-11B").box[3]) / 2 + 300
-    for x, t in ((hob[0], "C1"), (oven[0] + 60, "C2"), (comb[0] - 60, "C5"), (bench_mid, "C3")):
-        _route(pr, [(x, yr), (x, yr - 140)], "ac", arrow=True)
-        q = pr.p(x, yr - 200)
-        sh.text(q[0] + 0.6, q[1], t, 1.15, color="#b00000", bold=True)
-    sh_ = f("WR-09")
-    _route(pr, [(xb, sh_[1]), (sh_[0], sh_[1])], "ac", arrow=True)
-    q = pr.p(xb + 150, sh_[1] + 40)
-    sh.text(q[0], q[1], "C4", 1.15, color="#b00000", bold=True)
     wa, dr = f("LA-02"), f("LA-14")
-    _route(pr, [(bd[0] + 100, yk), (wa[0], yk)], "ac")
-    for x, t in ((wa[0], "C6"), (dr[0], "C7")):
-        _route(pr, [(x, yk), (x, yk + 120)], "ac", arrow=True)
-        q = pr.p(x + 40, yk + 140)
-        sh.text(q[0], q[1], t, 1.15, color="#b00000", bold=True)
-    _route(pr, [(wa[0], yk), (V["in_x0"] + 350, yk), (V["in_x0"] + 350, -250)], "ac", arrow=True)
-    q = pr.p(V["in_x0"] + 380, -330)
-    sh.text(q[0], q[1], "C9", 1.15, color="#b00000", bold=True)
-    _route(pr, [(g["G3"]["x"], yk), (g["G3"]["x"], -hb)], "ac", arrow=True)
-    q = pr.p(g["G3"]["x"] + 40, yk - 120)
-    sh.text(q[0], q[1], "C10", 1.15, color="#b00000", bold=True)
-    _route(pr, [(V["wet_x0"], g["G5"]["y"]), (V["in_x1"], g["G5"]["y"])], "ac", arrow=True)
-    q = pr.p(V["wet_x0"] + 400, g["G5"]["y"] + 50)
-    sh.text(q[0], q[1], "C8 TO THE OUTDOOR UNIT", 1.1, color="#b00000")
-    # 12 V and 24 V: the partition bulkhead, then forward along both walls at ceiling level to the bed zone
-    xs = V["rear_x0"] - 100
-    _route(pr, [(bd[0] + 140, yk + 60), (xs, yk + 60), (xs, yr - 60)], "bus")
-    for y in (yk + 60, yr - 60):
-        _route(pr, [(xs, y), (V["in_x0"] + 120, y)], "bus", arrow=True)
-    m = lay.find("LB-04M").cog
-    _route(pr, [(V["in_x0"] + 400, yr - 60), (m[0], yr - 60), (m[0], m[1])], "bus", arrow=True)
+    # every cable as routed in data/routes.yaml by cad/routes.py on this layout, its centreline in plan (H28)
+    rr = _routes(lay)
+    for run in rr["runs"]:
+        if run["system"] in ELEC_STYLE:
+            _route(pr, [(p[0], p[1]) for p in run["dense"]], ELEC_STYLE[run["system"]])
     as_openings = {o["id"] for o in res["openings"]}
     for gid in gids:
         _gland(sh, pr, g[gid], V, label=gid not in as_openings, right=gid == "G7")
+    for gid in sorted({x for run in rr["runs"] if run["system"] in ELEC_STYLE for x in run.get("glands") or []} - set(gids),
+                      key=lambda s_: int(s_[1:])):
+        _gland(sh, pr, g[gid], V, size=1.0)
     r = rects["LA-02"]    # the washer's name over G6, its floor gland, and the gland's id
     label_in(sh, (r[0], gp["G6"][1] + 2.4, r[2], r[3]), short(lay.find("LA-02")), 1.2)
     # outlets, indicative: one symbol for each outlet in its zone (report 20 section 7)
@@ -273,10 +258,11 @@ def ct602(prj, model, bom, checks, reg, dwg):
     gr = [[x["id"], x["at"].upper(), x["what"], x.get("est", "-")] for x in svc["glands"] if x["id"] in ("G2", "G3", "G4", "G5", "G6", "G7", "G8")]
     wtable(sh, 112, 150, [("GLAND", 12), ("AT", 12), ("WHAT PASSES", 64), ("ASSUMED", 28)], gr, size=1.15, title="ELECTRICAL GLANDS")
     S.notes(sh, 22, 84, [
-        "DATUM DIM-01. ROUTES ARE THE DESIGN INTENT: THE DC BUSES LEAVE THE BOARD UP INTO A CEILING BULKHEAD ALONG THE PARTITION AND "
-        "RUN FORWARD ALONG BOTH WALLS AT CEILING LEVEL. THE 230 V CIRCUITS RUN IN THEIR OWN BULKHEAD, SEGREGATED FROM THE DC.",
-        "C1 TO C3 AND C9 CROSS TO THE ROAD-SIDE KITCHEN ALONG THE PARTITION. C4 RUNS TO THE SHOWER'S TECHNICAL UNIT. C6 AND C7 DROP "
-        "TO THE WASHER AND DRYER BEHIND THE PLINTH. C8 RUNS ALONG THE WET ROOM CEILING TO THE OUTDOOR UNIT THROUGH G5.",
+        "DATUM DIM-01. EVERY CABLE IS DRAWN AS ROUTED IN data/routes.yaml BY cad/routes.py ON THE SOLVED LAYOUT, ITS CENTRELINE IN "
+        "PLAN. ITS LENGTH, SIZE, DROP AND PROTECTION ARE IN THE ELECTRICAL PAGE'S CABLE SCHEDULE, AND IN 3D IN trailer-electrical.",
+        "THE DC LEAVES THE BOARD BY THE CEILING BULKHEADS AND BY THE CHASE BEHIND THE PLINTH. UNDER THE FLOOR THE RUNS PASS BETWEEN "
+        "THE RAILS, OR INSIDE THEM PAST THE ARM HANGERS, AND UP THE FLOOR GLANDS. THE 230 V RUNS IN CONDUIT UNDER THE FLOOR AND IN THE "
+        "PLINTH'S END SLOT, AND 50 mm FROM EXTRA-LOW VOLTAGE ELSEWHERE (SVC-03, AS/NZS 3000 3.9.8.3).",
         "NO WATER OR DIESEL LINE WITHIN 300 mm OF THE BATTERY'S TERMINAL FACE EXCEPT THE WASHER'S TWO HOSES, WHICH RUN IN A "
         "DIELECTRIC SLEEVE (AS/NZS 3001.2 5.4.10.2).",
         "WIRING SUPPORTED AT LEAST EVERY 600 mm, GROMMETS THROUGH METAL, EVERY PENETRATION THROUGH A SEALED GLAND (VSB1 7.1).",
@@ -284,9 +270,8 @@ def ct602(prj, model, bom, checks, reg, dwg):
     ], size=1.42, width_chars=185)
     # ---- right column: cable schedule and outlets
     yb = title(sh, dwg, reg, "CABLES AND FITTINGS IN BD-11 AND EL-07 (TB-11).", "CABLE TO AS/NZS 3008.1.1, TINNED COPPER")
-    rows = [[c["run"], c["current"], c["fuse"], c["cable"], c["length"]] for c in svc["electrical"]["cables"]]
-    y = wtable(sh, 230, yb - 6, [("RUN", 64), ("DESIGN CURRENT", 30), ("FUSE", 34), ("CABLE", 20), ("LENGTH (est.)", 32)], rows, size=1.25,
-               title="MAIN CABLES AND FUSES (report 20 section 7)")
+    y = wtable(sh, 230, yb - 6, [("SYSTEM", 64), ("RUNS", 20), ("ROUTED LENGTH, m", 50), ("MASS, kg", 46)], _by_system(rr, ELEC_STYLE),
+               size=1.25, title="ROUTED CABLES BY SYSTEM (data/routes.yaml, H28)")
     rows = [[o["zone"], o["ac"], o["dc"]] for o in svc["electrical"]["outlets"]]
     y = wtable(sh, 230, y - 7, [("ZONE", 34), ("230 V OUTLETS", 70), ("24 V AND USB POINTS", 76)], rows, size=1.25,
                title="OUTLETS AND DC POINTS BY ZONE (report 20 section 7)")
@@ -419,31 +404,16 @@ def ct612(prj, model, bom, checks, reg, dwg):
             "UF-08", "UF-06"}
     body_plan(sh, pr, lay, res, cut=1000.0, show=show, size=1.2, keep=False, swings=False, light=("UF-01", "UF-01R", "UF-08"),
               hidden=("UF-01", "UF-01R", "UF-08", "UF-06", "WR-10"), nolabel=("LA-11B", "LA-11T", "EL-02", "LA-14", "UF-01", "UF-01R", "UF-08"))
-    f = lambda iid: _centre(lay.find(iid))  # noqa: E731
     g = {x["id"]: x for x in svc["glands"]}
     ws = lay.find("WS-01").cog
-    sink, basin, wash, comb, tray = f("LA-07B"), f("WR-08"), f("LA-02"), f("LA-03"), lay.find("WR-01").box
-    dsh = f("WR-09")
-    wc = f("WR-06")
-    xp = V["rear_x0"] - 15
-    # cold: tanks to the pump through G11, then to every outlet
-    _route(pr, [(lay.find("UF-01R").box[3] - 60, 300), (g["G11"]["x"], 300), (g["G11"]["x"], g["G11"]["y"]), (ws[0], ws[1])], "cold")
-    _route(pr, [(ws[0], ws[1]), (sink[0], sink[1])], "cold", arrow=True)
-    _route(pr, [(ws[0], ws[1] + 120), (comb[0] + 120, ws[1] + 120), (comb[0] + 120, comb[1])], "cold", arrow=True)
-    _route(pr, [(ws[0], ws[1]), (xp, ws[1]), (xp, -500), (basin[0], -500)], "cold", arrow=True)
-    _route(pr, [(xp, -500), (xp, -hi + 90), (wash[0], -hi + 90)], "cold", arrow=True)
-    _route(pr, [(V["wet_x0"] + 30, -500), (V["wet_x0"] + 30, -hi + 60), (wc[0], -hi + 60)], "cold", arrow=True)
-    _route(pr, [(xp, ws[1]), (xp, hi - 80), (V["in_x1"] - 40, hi - 80), (V["in_x1"] - 40, 750)], "cold", arrow=True)
-    # hot: the Combi to the sink, the shower and the basin
-    _route(pr, [(comb[0], comb[1] + 150), (comb[0], hi - 40), (sink[0] - 60, hi - 40), (sink[0] - 60, sink[1])], "hot", arrow=True)
-    _route(pr, [(sink[0] - 60, hi - 40), (dsh[0], hi - 40), (dsh[0], dsh[1])], "hot", arrow=True)
-    _route(pr, [(xp + 8, hi - 40), (xp + 8, -460), (basin[0] - 40, -460)], "hot", arrow=True)
-    # drains to the grey tank's top inlet through G10, the basin and the well straight down
-    _route(pr, [(sink[0], sink[1]), (xp + 40, sink[1]), (xp + 40, g["G10"]["y"]), (g["G10"]["x"], g["G10"]["y"])], "drain", arrow=True)
-    _route(pr, [(wash[0], wash[1]), (wash[0], -hi + 55), (xp + 40, -hi + 55), (xp + 40, g["G10"]["y"])], "drain")
-    _route(pr, [(basin[0], basin[1]), (basin[0], -420)], "drain", arrow=True)
+    # every pipe and hose as routed in data/routes.yaml by cad/routes.py on this layout, its centreline in plan (H28)
+    rr = _routes(lay)
+    for run in rr["runs"]:
+        if run["system"] in PIPE_STYLE:
+            _route(pr, [(p[0], p[1]) for p in run["dense"]], PIPE_STYLE[run["system"]])
     gt = lay.find("UF-08").box
-    for gid in ("G1", "G9", "G10", "G11"):
+    for gid in sorted({x for run in rr["runs"] if run["system"] in PIPE_STYLE for x in run.get("glands") or []} | {"G1"},
+                      key=lambda s_: int(s_[1:])):
         _gland(sh, pr, g[gid], V)
     q = pr.p(gt[0] + 450, gt[1])
     sh.path([(q[0] - 1.2, q[1]), (q[0] + 1.2, q[1]), (q[0], q[1] - 1.8)], "fill", closed=True)
@@ -479,34 +449,35 @@ def ct612(prj, model, bom, checks, reg, dwg):
     S.vdim(sh, a[0], a[1], b_[0], b_[1], a[0], f"{w[2] - gt[5]:.0f}", size=1.15, ext=False)
     a, b_ = ve.p(gt[3] - 60, 0, gt[5]), ve.p(gt[3] - 60, 0, V["floor_underside_z"])
     S.vdim(sh, a[0], a[1], b_[0], b_[1], a[0] - 3.0, f"{V['floor_underside_z'] - gt[5]:.0f}", size=1.15, ext=False)
-    p = ve.p(g["G10"]["x"], 0, V["floor_z"])
+    p = ve.p(g["G13"]["x"], 0, V["floor_z"])
     arrow_line(sh, (p[0], p[1] + 9), (p[0], ve.p(0, 0, gt[5])[1]), "drain", 1.6)
-    sh.text(p[0] + 1.0, p[1] + 9.5, "G10: SINK, WASHER AND DRYER WASTES INTO THE TOP INLET", 1.1)
+    sh.text(p[0] + 1.0, p[1] + 9.5, "G13: THE BASIN WASTE STRAIGHT DOWN INTO THE TOP INLET", 1.1)
     sh.text(40, ve.p(x0, 0, V["floor_z"] + 230)[1], "SECTION ON THE CENTRELINE, FROM THE KERB SIDE: TANKS, THE WELL, THE GREY TANK", 1.9, bold=True)
     sh.text(40, ve.p(x0, 0, V["floor_z"] + 230)[1] - 3.2, "SCALE 1:20", 1.5)
     sh.text(ve.p(w[0], 0, 0)[0], ve.p(0, 0, V["floor_z"])[1] + 1.6, "WELL WR-10, 300 x 400 x 120", 1.1)
     S.notes(sh, 22, 84, [
-        "DATUM DIM-01. ROUTES ARE THE DESIGN INTENT. THE SINK, WASHER AND DRYER WASTES RUN REARWARD AT 1:50 INSIDE THE CABINETS, "
-        "PASS THROUGH THE PARTITION BASE AND DROP THROUGH THE WET ROOM FLOOR (G10) INTO THE GREY TANK'S TOP INLET.",
+        "DATUM DIM-01. EVERY PIPE AND HOSE IS DRAWN AS ROUTED IN data/routes.yaml BY cad/routes.py, ITS CENTRELINE IN PLAN. THE SINK "
+        "WASTE DROPS THROUGH G10 AND RUNS UNDER THE FLOOR OVER CM-06 AT 1:50 INTO THE GREY TANK'S TOP. THE WASHER'S AND DRYER'S "
+        "PUMPED DRAINS RISE BEHIND THE DRYER AND DISCHARGE INTO THE BASIN, WHICH DROPS THROUGH G13.",
         f"THE GREY TANK'S TOP SITS {V['floor_underside_z'] - gt[5]:.0f} mm UNDER THE FLOOR'S UNDERSIDE FOR THE INLETS, AND THE WELL'S "
         f"SHELL BOTTOM {w[2] - gt[5]:.0f} mm ABOVE THE TANK, SO THE SHOWER'S SWITCHING UNIT DRAINS STRAIGHT DOWN (H4A).",
         "EVERY WET ROOM DRAIN SITS OVER THE GREY TANK. THE TRAY FALLS 1:60 TO ITS FLOOR WASTE AND THE SHOWER ZONE TO ITS OWN DRAIN.",
-        "FRESH TANKS VENT TO THE ROAD SIDE, THE GREY TANK TOO. ITS OUTLET, LEVER VALVE AND CAMLOCK ARE ON THE KERB SIDE FOR THE DUMP HOSE.",
+        "THE FRESH TANKS BREATHE THROUGH G12 TO THE FILL CAP AT G1, THE GREY TANK UP THE REAR WALL TO A MESHED OUTLET (G25, G26). "
+        "THE GREY TANK'S OUTLET, LEVER VALVE AND CAMLOCK ARE ON THE KERB SIDE FOR THE DUMP HOSE.",
         "THE COMBI'S DIESEL LINE COMES UP FROM THE HEATER FUEL TANK (UF-06) THROUGH G9. NO WATER LINE PASSES THE BATTERY'S TERMINAL FACE UNSLEEVED.",
     ], size=1.42, width_chars=185)
     yb = title(sh, dwg, reg, "TANKS AND FITTINGS IN THE MASS SCHEDULE (TB-11).", "6 mm HDPE TANKS, FOOD-GRADE LINES")
-    rows = [["Fill", "G1 on the kerb wall", "Both fresh tanks", "Through the CR45 on the hose"],
-            ["Tank outlets", "Both fresh tanks, joined", "G11, the pump", "Through the 40-mesh strainer"],
-            ["Cold", "Pump, sink cabinet", "Sink, basin, washer, flush, shower bypass, rinse box, Combi", "Along the partition and the walls"],
-            ["Hot", "Combi in the tower base", "Sink, shower's hot inlet, basin, rinse box", "Mixing valve at 50 C"],
-            ["Sink waste", "Sink", "G10, the grey tank's top inlet", "1:50, through the partition base"],
-            ["Washer, dryer", "Behind the plinth", "G10", "1:50, sleeved past the battery"],
-            ["Basin", "Basin on the partition", "Grey tank, straight down", "Trap"],
-            ["Shower", "Shower zone drain", "DauerShower switching unit in the well", "12 mm hose, continuous fall"],
-            ["Floor waste", "Wet room tray", "Grey tank", "Membrane trap"],
+    rows = [["Fill", "G1 on the kerb wall", "The front tank, over CM-04", "Under the bed, down G12"],
+            ["Tank outlets", "Both tanks, balanced over CM-05", "G11, the strainer and the pump", "From the rear tank"],
+            ["Cold", "Manifold, sink cabinet", "Sink, drinking tap, Combi by G11 and G9", "Push-fit PEX"],
+            ["Wet room", "Manifold, shower corner", "Basin, flush, washer tap, bypass, shower, rinse box", "Over the inner door"],
+            ["Hot", "Combi, by G9 and G11", "Mixing valve at 50 C, then sink and wet room", "PEX"],
+            ["Sink waste", "Sink", "Grey tank's top, by G10", "1:50 under the floor"],
+            ["Washer, dryer", "Behind the dryer", "The basin", "Pumped, the washer's sleeved"],
+            ["Basin, well, floor", "The wet room", "Grey tank, straight down", "G13, the well's valve, G24"],
             ["Dump", "Grey tank, kerb side", "Dump point or the 40 L tote", "Lever valve and camlock"]]
     y = wtable(sh, 230, yb - 6, [("LINE", 24), ("FROM", 40), ("TO", 66), ("HOW", 50)], rows, size=1.25, title="THE RUNS ON THIS SHEET")
-    gr = [[x["id"], x["what"], x.get("est", "-")] for x in svc["glands"] if x["id"] in ("G1", "G9", "G10", "G11")]
+    gr = [[x["id"], x["what"], x.get("est", "-")] for x in svc["glands"] if x["id"] in ("G1", "G10", "G11", "G12", "G13")]
     y = wtable(sh, 230, y - 7, [("GLAND", 14), ("WHAT PASSES", 126), ("ASSUMED", 40)], gr, size=1.25, title="PLUMBING GLANDS (data/services.yaml)")
     _legend(sh, 232, y - 7, [("cold", "COLD WATER"), ("hot", "HOT WATER"), ("drain", "DRAIN, FALLING TO THE GREY TANK")])
     write(sh, dwg)
