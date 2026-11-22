@@ -107,15 +107,20 @@ def fillet(pts: list[tuple], r: float, elbow_r: float | None = None, rigid: bool
     n = len(pts)
     seg = [_unit(_sub(pts[i + 1], pts[i])) for i in range(n - 1)]
     corners, dense, length = [], [pts[0]], 0.0
+    phis = {}
+    for i in range(1, n - 1):
+        cosang = max(-1.0, min(1.0, sum(a * b for a, b in zip(seg[i - 1][0], seg[i][0]))))
+        phis[i] = math.acos(cosang)
+    turns = lambda j: 0 < j < n - 1 and phis[j] >= 1e-3  # noqa: E731
     for i in range(1, n - 1):
         (d0, l0), (d1, l1) = seg[i - 1], seg[i]
-        cosang = max(-1.0, min(1.0, sum(a * b for a, b in zip(d0, d1))))
-        phi = math.acos(cosang)
+        phi = phis[i]
         if phi < 1e-3:
             corners.append(dict(i=i, phi=0.0, r_max=math.inf, r=0.0, t=0.0))
             continue
-        share0 = 1.0 if i == 1 else 0.5
-        share1 = 1.0 if i == n - 2 else 0.5
+        # a leg is shared with the corner at its other end only if that corner turns too
+        share0 = 0.5 if turns(i - 1) else 1.0
+        share1 = 0.5 if turns(i + 1) else 1.0
         t_avail = min(l0 * share0, l1 * share1)
         r_max = t_avail / math.tan(phi / 2)
         elbow = rigid or (elbow_r is not None and r_max < r)
@@ -480,10 +485,14 @@ def separation(res: dict) -> dict:
     ac = [r for r in res["runs"] if r["system"] == "ac230"]
     elv = [r for r in res["runs"] if r["system"] in ELV]
     floor = res["V"]["floor_z"]
+    zones = [tuple(_eval(v, res["ns"]) for v in z["box"]) for z in rule.get("conduit", [])]
+    mid = lambda p, q: ((p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2)  # noqa: E731
+    walled = lambda p, q: max(p[2], q[2]) <= floor + 1 or any(_pt_box(mid(p, q), z) <= 0 for z in zones)  # noqa: E731
     problems, worst = [], (math.inf, "")
     for a in ac:
-        # under the floor and through the floor glands every 230 V run is in its own conduit, a separate enclosure
-        sa = [s_ for s_ in _seg_list(a, a["od"] / 2 + sep) if max(s_[0][2], s_[1][2]) > floor + 1]
+        # under the floor, through the floor glands and in the rule's conduit zones every 230 V run is in its own
+        # conduit, a separate wiring enclosure, so the distance applies everywhere else
+        sa = [s_ for s_ in _seg_list(a, a["od"] / 2 + sep) if not walled(s_[0], s_[1])]
         for e in elv:
             shared = [boxes[k] for k in ({rule["board"]} | (_end_lines(a) & _end_lines(e))) if k in boxes]
             free = lambda p, q: not any(_pt_box(((p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2), s) <= reach for s in shared)  # noqa: E731
