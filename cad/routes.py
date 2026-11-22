@@ -6,12 +6,13 @@ chase behind the plinth, the under-floor runs along the rails and the glands of 
 three expressions over the layout's parameters, the envelope boxes (EL_04.x0 for line EL-04's box) and the ways'
 constants, and "." repeats the previous point's value. resolve() turns the runs into filleted centrelines at the
 cable's or pipe's minimum bend radius, sizes every DC circuit by its current and its voltage drop at the routed length
-(report 20's 2 % limit), and adds up the lengths, masses and prices. checks() measures SVC-01 to SVC-08.
+(report 20's 2 % limit), and adds up the lengths, masses and prices. checks() measures SVC-01 to SVC-09.
 """
 from __future__ import annotations
 
 import math
 import re
+from collections import defaultdict
 from pathlib import Path
 
 import yaml
@@ -685,7 +686,7 @@ def _bar_gap(segs: list, c: dict, step: float = 15.0) -> float:
     return best
 
 
-# ------------------------------------------------------------------ the checks, SVC-01 to SVC-08
+# ------------------------------------------------------------------ the checks, SVC-01 to SVC-09
 PANELS = ("BD-01", "BD-02", "BD-03", "BD-04")
 
 
@@ -713,9 +714,13 @@ def clearance(res: dict) -> dict:
     the parts it passes through by design (`passes`), the parts it is clipped to (`along`, touching allowed but not
     entering), the body's panels where it crosses them at one of its glands, and, along the stretches threaded through
     a closed chassis member (`inside`), the parts welded to that member's faces. Hollow carcasses are the cabinets the
-    runs pass inside, so they are not obstacles."""
+    runs pass inside, so they are not obstacles. The keep-clear boxes (aisles, landings, the chair space) are tested
+    too, above the floor, up to their own tops or the ceiling's services zone (keep_clear_boxes)."""
     clear = res["data"]["rules"]["clear_mm"]
     solids = _solids(res)
+    keep = keep_clear_boxes(res)
+    hollow = [b["box"] for b in res["blocks"] if b.get("hollow") and b.get("box")]
+    floor_z = res["V"]["floor_z"]
     problems, gaps = [], []
     for run in res["runs"]:
         r = run["od"] / 2
@@ -760,8 +765,37 @@ def clearance(res: dict) -> dict:
                 gaps.append(dict(run=run["id"], part=c["iid"], name=c["name"], gap=round(m, 1), limit=lim, at=None))
             if m < lim - 0.05:
                 problems.append(f"{run['id']} passes the bar {c['iid']} ({c['name'][:40]}) {m:.0f} mm clear")
+        own = [res["ns"][key(e)].box for e in ends if key(e) in res["ns"]] + hollow
+        for b, kb in keep:
+            # a keep-clear box from the floor to the ceiling's services zone: the run's stretches above the floor,
+            # outside its own ends' boxes and outside the cabinets (behind their panels), keep the clearance beside
+            # it and may run over it in the services zone, so a run may end at an outlet on a cabinet's face
+            if not _hit(box, kb):
+                continue
+            worst = (math.inf, None, clear)
+            for a, c in segs:
+                if min(a[2], c[2]) < floor_z - 0.5 or any(_in_box(a, o, 1.0) and _in_box(c, o, 1.0) for o in own):
+                    continue
+                d, p = seg_box(a, c, kb)
+                lim = 0.0 if p[2] - r >= kb[5] - 0.5 else clear
+                if d - r - lim < worst[0] - worst[2]:
+                    worst = (d - r, p, lim)
+            if worst[1] is None:
+                continue
+            gaps.append(dict(run=run["id"], part=b["iid"], name=b["name"], gap=round(worst[0], 1), limit=worst[2], at=[round(v) for v in worst[1]]))
+            if worst[0] < worst[2] - 0.05:
+                problems.append(f"{run['id']} {'enters' if worst[0] < 0 else 'passes'} the keep-clear {b['iid']} ({b['name'][:40]}) "
+                                f"{abs(worst[0]):.0f} mm {'deep' if worst[0] < 0 else 'clear'} at X {worst[1][0]:.0f} Y {worst[1][1]:.0f} Z {worst[1][2]:.0f}")
     tested = sorted((g for g in gaps if g["limit"] > 0), key=lambda g: g["gap"])
     return dict(ok=not problems, problems=problems, closest=tested[:10], smallest=tested[0]["gap"] if tested else None, limit=clear)
+
+
+def keep_clear_boxes(res: dict) -> list:
+    """The layout's keep-clear boxes (aisles, landings, the chair space) as SVC-01 tests them: from their own floor to
+    their own top, but no higher than the ceiling's services zone, where the cables run in the ceiling's covers over
+    the aisles (data/routes.yaml rules.keep_clear)."""
+    top = res["V"]["ceiling_z"] - res["data"]["rules"]["keep_clear"]["overhead_mm"]
+    return [(b, (*b["box"][:5], min(b["box"][5], top))) for b in res["blocks"] if b.get("keep_clear") and b.get("box")]
 
 
 def bends(res: dict) -> dict:
@@ -875,7 +909,50 @@ def coverage(res: dict) -> dict:
         rows.append(dict(need=what, runs=got))
         if not got:
             missing.append(what)
-    return dict(ok=not missing, problems=[f"no run serves {m}" for m in missing], rows=rows, n=len(need))
+    problems = [f"no run serves {m}" for m in missing] + continuity(res)
+    return dict(ok=not problems, problems=problems, rows=rows, n=len(need))
+
+
+def continuity(res: dict) -> list:
+    """SVC-05's second half (I2-18 e): the runs that serve a tag join up end to end, one run's end line the next one's,
+    and each 230 V circuit's runs reach from a source fixture (`needs_run: false`, the board's AC bar) to the circuit's
+    load line or an outlet whose `for` is that line. A run that stops short or starts from the wrong part fails."""
+    data = res["data"]
+    sources = {f["id"] for f in data["fixtures"] if f.get("needs_run") is False}
+    serves_ = defaultdict(set)
+    for f in data["fixtures"]:
+        if f.get("for"):
+            serves_[f["for"]].add(f["id"])
+    tagged = defaultdict(list)
+    for r in res["runs"]:
+        for t in r.get("serves") or []:
+            tagged[t].append(r)
+    problems = []
+    for tag, rs in tagged.items():
+        adj = defaultdict(set)
+        for r in rs:
+            a, b = r["from"]["line"], r["to"]["line"]
+            adj[a].add(b)
+            adj[b].add(a)
+        seen, todo = set(), [next(iter(adj))]
+        while todo:
+            x = todo.pop()
+            if x not in seen:
+                seen.add(x)
+                todo += list(adj[x] - seen)
+        if seen != set(adj):
+            problems.append(f"{tag}'s runs do not join up end to end: " +
+                            ", ".join(f"{r['id']} {r['from']['line']} to {r['to']['line']}" for r in rs))
+    for c in res["svc"]["electrical"]["circuits"]:
+        ends = {e for r in tagged.get(c["id"], []) for e in (r["from"]["line"], r["to"]["line"])}
+        if not ends:
+            continue
+        loads = {c["at"]} | serves_[c["at"]]
+        if not ends & sources:
+            problems.append(f"{c['id']}'s runs start from no source (the board's AC bar)")
+        if not ends & loads:
+            problems.append(f"{c['id']}'s runs reach neither its load {c['at']} nor an outlet for it")
+    return problems
 
 
 def drops(res: dict) -> dict:
@@ -931,13 +1008,17 @@ def _shared_ways(res: dict) -> set:
 
 def need_mm(a: dict, b: dict, rule: dict, neighbours: set) -> float:
     """SVC-08's least gap between two runs' surfaces: none between cables of one band that share a way (one loom),
-    the wet lines' distance between a water, waste or diesel line and a 230 V run, else the rule's gap."""
+    a water, waste, vent or diesel line's own distance from a cable of each band (rule spacing.wet, by the line's
+    system), else the rule's gap."""
     sp = rule["spacing"]
     if band(a) and band(a) == band(b) and band(a) in sp["touch"] and frozenset((a["id"], b["id"])) in neighbours:
         return 0.0
-    wet = {a["system"], b["system"]} & set(WETS)
-    if wet and "ac230" in (a["system"], b["system"]):
-        return float(sp["wet_ac_mm"])
+    for w, c in ((a, b), (b, a)):
+        if w["system"] in WETS and band(c):
+            kind = "fresh" if w["id"] in (sp.get("tempered") or []) else w["system"]
+            if kind == "waste" and w.get("rigid") and band(c) == "ELV" and sp.get("rigid_waste_elv_gap"):
+                return float(sp["gap_mm"])   # a solvent-welded pipe: no joint between the trap and the tank
+            return float(max(sp["gap_mm"], (sp["wet"].get(kind) or {}).get(band(c), 0.0)))
     return float(sp["gap_mm"])
 
 
@@ -976,22 +1057,41 @@ def _over(wet: dict, ac: dict, reach: float, floor: tuple, zones: list | None = 
     return None
 
 
+FRAME_DEPTH = 60.0   # a Roxtec RM module's depth, flush with the floor's top face and 30 mm below its underside
+
+
+def _split_z(pts: list, zs) -> list:
+    """The polyline with a point added wherever a segment crosses one of the heights `zs`."""
+    out = [pts[0]]
+    for a, b in zip(pts, pts[1:]):
+        cuts = sorted(((z - a[2]) / (b[2] - a[2]) for z in zs if (a[2] - z) * (b[2] - z) < 0), key=float)
+        for t in cuts:
+            out.append((a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t))
+        out.append(b)
+    return out
+
+
 def spacing(res: dict) -> dict:
     """SVC-08: every run keeps its own radius plus a gap from every other run, so no two pass through each other and
     each can be clipped on its own. Cables of one band that share a way are one loom and may touch their lane
-    neighbours. A water, waste or diesel line keeps the wet lines' distance from a 230 V run and never passes over one
-    within that distance in plan, the floor panel aside. The stretches inside a box both runs end at are on its
-    terminals and are not measured."""
+    neighbours. A water, waste, vent or diesel line keeps its kind's distance from each cable (rule spacing.wet) and
+    never passes over a 230 V run within the rule's over_mm in plan, the floor panel aside. The stretches inside a box
+    both runs end at are on its terminals, and those inside a transit frame both pass are in their own modules, so
+    neither is measured."""
     rule = res["data"]["rules"]
     sp = rule["spacing"]
     neighbours = _shared_ways(res)
     boxes = {b["iid"]: b["box"] for b in res["blocks"] if b.get("box")} | {b["id"]: b["box"] for b in res["blocks"] if b.get("box")}
     boxes |= {k: f["box"] for k, f in res["fixtures"].items()}
     runs = res["runs"]
-    segs = {r["id"]: [(p, q, _aabb((p, q), r["od"] / 2)) for p, q in _segs(r["dense"])] for r in runs}
-    hull = {r["id"]: _aabb(r["dense"], r["od"] / 2) for r in runs}
     floor = (res["V"]["floor_z"], res["V"]["floor_underside_z"])
-    reach = max(sp["gap_mm"], sp["wet_ac_mm"])
+    # the floor's planes and a frame's foot split each run, so a stretch is wholly under the floor, in a frame or above
+    planes = (floor[1], floor[0], floor[0] - FRAME_DEPTH)
+    segs = {r["id"]: [(p, q, _aabb((p, q), r["od"] / 2)) for p, q in _segs(_split_z(r["dense"], planes))] for r in runs}
+    hull = {r["id"]: _aabb(r["dense"], r["od"] / 2) for r in runs}
+    frames = {g: (v["p"][0] - v["w"] / 2, v["p"][1] - v["h"] / 2, floor[0] - FRAME_DEPTH, v["p"][0] + v["w"] / 2, v["p"][1] + v["h"] / 2, floor[0])
+              for g, v in res["glands"].items() if v.get("cells")}
+    reach = max([sp["gap_mm"], sp["over_mm"]] + [v for d in sp["wet"].values() for v in (d or {}).values()])
     duct = [boxes[sp["duct"]]] if sp.get("duct") in boxes else []
     problems, rows, n_pairs, overlaps = [], [], 0, 0
     for i, a in enumerate(runs):
@@ -999,7 +1099,12 @@ def spacing(res: dict) -> dict:
             if not _hit(_aabb([hull[a["id"]][:3], hull[a["id"]][3:]], reach), hull[b["id"]]):
                 continue
             need = need_mm(a, b, rule, neighbours)
-            common = [boxes[k] for k in _end_lines(a) & _end_lines(b) if k in boxes] + duct
+            # a hot line's or a waste's distance from the extra-low-voltage cables holds inside the trailer: under the
+            # floor every run is open to the road's spray and a waste's drip falls to the road, so the gap holds there
+            under = sp.get("elv_inside_only") and band(a) != "ac230" and band(b) != "ac230" and need > sp["gap_mm"]
+            # inside a transit frame both runs pass, each lies in its own sealed module
+            common = [boxes[k] for k in _end_lines(a) & _end_lines(b) if k in boxes] + duct + \
+                [frames[g] for g in _ids(a, "glands") & _ids(b, "glands") if g in frames]
             inside = lambda p, q: any(_in_box(p, c, 1.0) and _in_box(q, c, 1.0) for c in common)  # noqa: E731
             m, at = math.inf, None
             for p1, q1, b1 in segs[a["id"]]:
@@ -1008,6 +1113,8 @@ def spacing(res: dict) -> dict:
                 for p2, q2, b2 in segs[b["id"]]:
                     if _hit(_aabb([b1[:3], b1[3:]], need), b2) and not inside(p2, q2):
                         d = seg_seg(p1, q1, p2, q2) - a["od"] / 2 - b["od"] / 2
+                        if under and max(p1[2], q1[2], p2[2], q2[2]) <= floor[1] + 0.5:
+                            d += need - sp["gap_mm"]   # both stretches under the floor: measured against the gap
                         if d < m:
                             m, at = d, p1
             if at is None:
@@ -1022,7 +1129,7 @@ def spacing(res: dict) -> dict:
     zones = [tuple(_eval(v, res["ns"]) for v in z["box"]) for z in rule.get("conduit", [])]
     for w in wet:
         for c in (r for r in runs if r["system"] == "ac230"):
-            hit = _over(w, c, sp["wet_ac_mm"], floor, zones)
+            hit = _over(w, c, sp["over_mm"], floor, zones)
             if hit:
                 p, q = hit
                 problems.append(f"{w['id']} passes over the 230 V run {c['id']} at X {p[0]:.0f} Y {p[1]:.0f}, {p[2] - q[2]:.0f} mm above it")
@@ -1032,8 +1139,148 @@ def spacing(res: dict) -> dict:
                 governing=f"{tight[0]['a']} to {tight[0]['b']}" if tight else None, limit=sp["gap_mm"])
 
 
+def fitting(g: dict, fits: dict) -> dict:
+    """A gland's fitting in the plane of its panel (data/services.yaml `fit`, else by its shape): its footprint on the
+    inner face and the outer face, each a circle (`r`) or a rectangle's half sizes (`hx`, `hy`) about the gland's
+    centre, and whether a nut is turned with a spanner there. A round gland with no `fit` is a cable gland of its
+    hole's metric thread, its body above and its locknut below, a gland with `w` and `h` a transit frame bonded into
+    the cut-out and compressed from above, so nothing is turned under it."""
+    f = dict(g.get("fit") or {})
+    kind = f.get("kind") or ("frame" if g.get("w") and g.get("h") else "gland")
+    if kind == "gland":
+        r = fits["locknut_ac"][int(f.get("thread", g["d"]))] / 2
+        return dict(kind=kind, inner=dict(r=r), outer=dict(r=r), turned=True, what=f"M{int(f.get('thread', g['d']))} gland and locknut")
+    if kind == "frame":
+        rim = float(f.get("rim", fits["frame_rim_mm"]))
+        hx, hy = g["w"] / 2, g["h"] / 2
+        return dict(kind=kind, inner=dict(hx=hx + rim, hy=hy + rim), outer=dict(hx=hx + fits["frame_wall_mm"], hy=hy + fits["frame_wall_mm"]),
+                    turned=False, what=f"transit frame {g['w']:g} x {g['h']:g} packing, {rim:g} mm rim")
+    if kind == "grommet":
+        r = g["d"] / 2 + float(f.get("lip", fits["grommet_lip_mm"]))
+        return dict(kind=kind, inner=dict(r=r), outer=dict(r=r), turned=False, what=f"grommet, {g['d']:g} mm hole")
+    if kind == "plate":
+        hx, hy = f["w"] / 2, f["h"] / 2
+        return dict(kind=kind, inner=dict(hx=hx, hy=hy), outer=dict(hx=hx, hy=hy), turned=False, what=f"plate {f['w']:g} x {f['h']:g}")
+    raise ValueError(f"{g['id']}: fitting kind {kind} is not one of gland, frame, grommet, plate")
+
+
+def _plane_xy(g: dict, p: tuple) -> tuple:
+    """A gland's centre in its panel's own plane: X and Y on the floor and roof, X and Z on a side wall, Y and Z on
+    an end wall."""
+    return {"floor": (p[0], p[1]), "roof": (p[0], p[1]), "kerb": (p[0], p[2]), "road": (p[0], p[2])}.get(g["at"], (p[1], p[2]))
+
+
+def _fp_gap(c1, f1: dict, c2, f2: dict) -> float:
+    """The least distance between two footprints in one plane, negative where they overlap (by the depth along the
+    centre line for two circles, by the smaller axis overlap otherwise)."""
+    def rect(c, f):
+        if "r" in f:
+            return None
+        return (c[0] - f["hx"], c[1] - f["hy"], c[0] + f["hx"], c[1] + f["hy"])
+    r1, r2 = rect(c1, f1), rect(c2, f2)
+    if r1 is None and r2 is None:
+        return math.dist(c1, c2) - f1["r"] - f2["r"]
+    if r1 is not None and r2 is not None:
+        dx = max(r2[0] - r1[2], r1[0] - r2[2])
+        dy = max(r2[1] - r1[3], r1[1] - r2[3])
+        return math.hypot(max(dx, 0), max(dy, 0)) if (dx > 0 or dy > 0) else max(dx, dy)
+    (c, f), rc = ((c1, f1), r2) if r1 is None else ((c2, f2), r1)
+    dx = max(rc[0] - c[0], 0.0, c[0] - rc[2])
+    dy = max(rc[1] - c[1], 0.0, c[1] - rc[3])
+    if dx == dy == 0.0:
+        return -min(c[0] - rc[0], rc[2] - c[0], c[1] - rc[1], rc[3] - c[1]) - f["r"]
+    return math.hypot(dx, dy) - f["r"]
+
+
+def glands(res: dict) -> dict:
+    """SVC-09: every gland's fitting has room in its panel. Two fittings in one panel keep the fittings' web between
+    their footprints on each face, the spanner's room where a nut is turned there, and a floor fitting stands clear of
+    the keep-clear boxes and of the parts that stand on the floor (data/services.yaml `fittings`)."""
+    svc = res["svc"]
+    fits = svc["fittings"]
+    pts = res["glands"]
+    fit = {g["id"]: fitting(g, fits) for g in svc["glands"]}
+    floor_z = res["V"]["floor_z"]
+    problems, rows = [], []
+    gl = svc["glands"]
+    for i, a in enumerate(gl):
+        for b in gl[i + 1:]:
+            if a["at"] != b["at"]:
+                continue
+            ca, cb = _plane_xy(a, pts[a["id"]]["p"]), _plane_xy(b, pts[b["id"]]["p"])
+            if math.dist(ca, cb) > 400:
+                continue
+            for face in ("inner", "outer"):
+                need = fits["spanner_mm"] if (fit[a["id"]]["turned"] or fit[b["id"]]["turned"]) else fits["web_mm"]
+                gap = _fp_gap(ca, fit[a["id"]][face], cb, fit[b["id"]][face])
+                rows.append(dict(a=a["id"], b=b["id"], face=face, gap=round(gap, 1), need=need))
+                if gap < need - 0.05:
+                    problems.append(f"{a['id']} and {b['id']} leave {gap:.0f} mm between their fittings "
+                                    f"{'inside' if face == 'inner' else 'under the floor' if a['at'] == 'floor' else 'outside'}, {need:g} mm needed")
+    standing = [s for s in _solids(res) if s["box"][2] <= floor_z + 5 and s["box"][5] > floor_z + 5 and s["id"] not in PANELS]
+    for g in (x for x in gl if x["at"] == "floor"):
+        c, f = _plane_xy(g, pts[g["id"]]["p"]), fit[g["id"]]["inner"]
+        under = set(g.get("under") or [])
+        flush = bool((g.get("fit") or {}).get("flush"))
+        for b, kb in ([] if flush else keep_clear_boxes(res)):
+            gap = _fp_gap(c, f, ((kb[0] + kb[3]) / 2, (kb[1] + kb[4]) / 2), dict(hx=(kb[3] - kb[0]) / 2, hy=(kb[4] - kb[1]) / 2))
+            rows.append(dict(a=g["id"], b=b["iid"], face="inner", gap=round(gap, 1), need=0.0))
+            if gap < -0.05:
+                problems.append(f"{g['id']}'s fitting stands {-gap:.0f} mm into the keep-clear {b['iid']} ({b['name'][:40]})")
+        for s in standing:
+            if _matches(s, under):
+                continue
+            sb = s["box"]
+            gap = _fp_gap(c, f, ((sb[0] + sb[3]) / 2, (sb[1] + sb[4]) / 2), dict(hx=(sb[3] - sb[0]) / 2, hy=(sb[4] - sb[1]) / 2))
+            if gap < -0.05:
+                problems.append(f"{g['id']}'s fitting is {-gap:.0f} mm under {s['iid']} ({s['name'][:40]}), which stands on the floor")
+    tight = sorted((r for r in rows if r["need"] > 0), key=lambda r: r["gap"] - r["need"])
+    return dict(ok=not problems, problems=problems, closest=tight[:10], fittings={k: v["what"] for k, v in fit.items()},
+                margin=round(tight[0]["gap"] - tight[0]["need"], 1) if tight else None,
+                governing=f"{tight[0]['a']} to {tight[0]['b']}" if tight else None, limit=fits["spanner_mm"])
+
+
+MEMBERS = ("RL-", "RS-", "CM-", "OR-", "DB-K", "DB-R")   # the chassis members a run may pass through (`inside`)
+FACE_NAMES = {"x0": "front", "x1": "rear", "y0": "kerb side", "y1": "road side", "z0": "bottom", "z1": "top"}
+BUSH_MM = 6.0   # (est.) a hole's bush or grommet round the run, added to its outside diameter
+
+
+def member_holes(res: dict) -> list[dict]:
+    """Every hole a run makes in a chassis member's wall: where the run, threaded through the member (`inside`), crosses
+    its box's face. Each hole is the run's outside diameter plus a bush across, and as long along the face as the run's
+    slant through it makes it (a slot where it passes obliquely), for the structural checks (data/services.yaml holes)."""
+    mem = [b for b in res["blocks"] if b.get("box") and b["id"].startswith(MEMBERS)]
+    out = []
+    for r in res["runs"]:
+        inn = _ids(r, "inside")
+        pts = r["dense"]
+        for b in (m for m in mem if _matches(m, inn)):
+            box = b["box"]
+            inside = lambda p: all(box[k] + 0.5 < p[k] < box[k + 3] - 0.5 for k in range(3))  # noqa: E731
+            for a, c in zip(pts, pts[1:]):
+                ia, ic = inside(a), inside(c)
+                if ia == ic:
+                    continue
+                lo, hi = (a, c) if ia else (c, a)
+                for _ in range(30):
+                    m = tuple((lo[k] + hi[k]) / 2 for k in range(3))
+                    lo, hi = (m, hi) if inside(m) else (lo, m)
+                p = hi
+                gaps = [abs(p[0] - box[0]), abs(p[1] - box[1]), abs(p[2] - box[2]), abs(p[0] - box[3]), abs(p[1] - box[4]), abs(p[2] - box[5])]
+                f = gaps.index(min(gaps))
+                u, n = _unit(_sub(c, a))
+                cos = abs(u[f % 3]) if n > 0 else 1.0
+                d = r["od"] + BUSH_MM
+                hole = dict(member=b["iid"], face=FACE_NAMES[("x0", "y0", "z0", "x1", "y1", "z1")[f]], run=r["id"],
+                            x=round(p[0]), y=round(p[1]), z=round(p[2]), d=round(d), length=round(min(d / max(cos, 0.2), 5 * d)))
+                if not any(h["run"] == hole["run"] and h["member"] == hole["member"] and
+                           math.dist((h["x"], h["y"], h["z"]), (hole["x"], hole["y"], hole["z"])) < 5 for h in out):
+                    out.append(hole)
+    return sorted(out, key=lambda h: (h["member"], h["x"], h["run"]))
+
+
 CHECKS = {"clearance": clearance, "bends": bends, "separation": separation, "terminal_face": terminal_face,
-          "coverage": coverage, "drops": drops, "falls": falls, "spacing": spacing}
+          "coverage": coverage, "drops": drops, "falls": falls, "spacing": spacing, "glands": glands}
 
 
 def evaluate(res: dict) -> dict:

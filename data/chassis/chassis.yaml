@@ -140,10 +140,10 @@ fittings:
      price: [{item: "Safety chain CHR13Z, 13 mm, rated 3,500 kg, 2 m at AUD 38.92/m, cut and tagged to AS 4177.4", aud: 77.84, basis: rate, url: "https://www.arkcorp.com.au/product/trailer-safety-chain/", date: 2026-11-20},
              {item: "Two ARK HLS13 hammerlock shackles at AUD 43.44", aud: 86.88, basis: listing, url: "https://www.arkcorp.com.au/product/hammerlock-shackles/", date: 2026-11-20}],
      source: "Estimate: 3,500 kg grade chain about 2 kg/m, shackles 0.25 kg each", at: [chain_lug_x, 0, db_z - 80]}
-  - {id: DB-07, size: [250, 150, 150], name: "Breakaway kit (battery box, switch, controller) and plugs and cables", kind: bought, mass_kg: 5.0, maturity: estimate,
+  - {id: DB-07, size: [250, 150, 150], name: "Breakaway kit (battery box, switch, controller) and plugs and cables", kind: bought, mass_kg: 5.1, maturity: estimate,
      price: [{item: "Breakaway kit: 12 V sealed battery in a box, switch with lanyard, charge controller", aud: 250, basis: estimate, date: 2026-11-20, note: "No Australian listing was readable"},
              {item: "12-pin flat plug", aud: 52.62, basis: listing, url: "https://www.arkcorp.com.au/product/12-pin-flat/", date: 2026-11-20},
-             {item: "12-core trailer cable, Anderson 50 A plug and charge cable, glands and loom", aud: 180, basis: estimate, date: 2026-11-20}],
+             {item: "12-core trailer cable, the grey Anderson SB120 plug with 4 AWG contacts for the 48 V charging feed (DB-AN, AUD 22 at The 12 Volt Shop, 22 Nov 2026, in place of a 50 A plug about AUD 12), charge cable, glands and loom", aud: 190, basis: estimate, date: 2026-11-22}],
      source: "Estimate (report 11: breakaway kit mass not found)", at: [750, 0, rail_underside_z - 75]}   # bolted to the cross brace's front face, under the stone guard (H27)
   - {id: DB-04, name: "Stone guard: 25 x 25 x 2 SHS frame with 2 mm aluminium checker plate on rubber mounts, on the cross brace, trimmed on the kerb side round the swung-up jockey wheel", kind: bought, material: "Steel SHS 25 x 25 x 2 frame, 2 mm aluminium checker plate, rubber mounts", mass_kg: 6.5, maturity: calculated,
      source: "Calculated: 2.2 m of 25 x 25 x 2 SHS at 1.36 kg/m, 0.30 m2 of 2 mm aluminium at 5.4 kg/m2, 1.9 kg of mounts and bolts. Kerb side trimmed to Y -370, 30 mm clear of the jockey wheel", at: [735, 65, rail_underside_z + 10],

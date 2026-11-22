@@ -16,7 +16,7 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 | Ute | Rear axle 2,649 kg with growth against its 2,800 kg plate. Combination 7,178 kg against 7,400 kg, the ute with growth plus the plate |
 | Battery | 25.6 kWh. A design hot day runs 25.1 h when new and 17.2 h at end of life |
 | Water | 420 L fresh, at most 300 L in travel, about 41 L a day. 130 L grey |
-| Cost | AUD 193,496 with contingency, built by Leonard (H26) |
+| Cost | AUD 196,268 with contingency, built by Leonard (H26) |
 
 Every fail check passes. The tightest are the fully loaded mass with growth (MAS-10, 3,397.6 kg against the 3,400 kg target), the towball share with the grey tank full (MAS-12, 8.1 % against 8.0 %), the heaviest towball (MAS-13, 316.7 kg against 320 kg) and the recovery pull in the road-side rail (CHS-08A, 0.91 of yield).
 
@@ -130,7 +130,7 @@ Research report 19's load calculation gives a design hot day of 37.1 kWh of heat
 
 - Fresh: two welded HDPE tanks over the axles hold 420 L, filled at camp through a Puretec CR45 filter by hose or the creek transfer pump, with a chlorine dose. A Shurflo Trail King 7 at 2.1 bar feeds every outlet, the drinking tap through a CR-Z2 filter and a UV purifier. The Combi's 10 L boiler gives hot water through a 50 °C mixing valve (CT-611, CT-612).
 - Grey: every drain falls by gravity to a 130 L tank in the rear bay, with a valve and a camlock on the kerb side. It travels empty (CT-003's operating limits), TC7 and TC8 check the trailer with it full, and a 40 L tote serves longer stays.
-- Budget for two a day: showers 10 L, dishes 8, drinking 6, basin 6, outdoor rinse 4, cooking 3, flush 2 and cleaning 2, so 41 L, 27 L of it to grey. A wash adds 44 L. The 300 L aboard lasts about 7 days without laundry, and the full tanks 7 days with three washes. The grey tank holds 72 h with one wash.
+- Budget for two a day: showers 10 L, dishes 8, drinking 6, basin 6, outdoor rinse 4, cooking 3, flush 2 and cleaning 2, so 41 L, 27 L of it to grey. A wash adds 44 L. The 295 L aboard lasts about 7 days without laundry, and the full tanks 7 days with three washes. The grey tank holds 72 h with one wash.
 
 ## Running gear and coupling
 
@@ -163,19 +163,19 @@ The insert map CT-203 must be final before the panels are ordered, because the m
 
 ## Cost and where to save
 
-The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 151 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 168,399 subtotal carries AUD 25,097 (14.9 %), for AUD 193,496.
+The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 152 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 170,709 subtotal carries AUD 25,559 (15.0 %), for AUD 196,268.
 
 | Group | AUD | Group | AUD |
 |---|---|---|---|
 | Body | 38,107 | Chassis | 6,828 |
-| Electrical | 23,708 | Freight and consumables | 5,310 |
+| Electrical | 26,008 | Freight and consumables | 5,310 |
 | Living area | 21,186 | Licensed electrician | 4,600 |
 | Running gear | 14,181 | Drawbar box | 4,388 |
 | HVAC and ventilation | 12,667 | Under the floor | 3,162 |
 | Wet room | 11,627 | Roof | 2,926 |
-| Bed | 8,028 | Coupling and drawbar | 1,695 |
+| Bed | 8,028 | Coupling and drawbar | 1,705 |
 | Compliance and weld evidence | 8,320 | Lamps, reflectors and the number plate | 930 |
-| Subtotal | 168,399 | Spare wheel | 736 |
+| Subtotal | 170,709 | Spare wheel | 736 |
 
 What the registration needs stays: the licensed electrician and the AS/NZS 3001.2 certificate (ELI-01, CMP-13), the refrigeration fitting in AC-03, the wheel alignment (ALN-01), the engineer's review (CMP-03) and the registration lines. The registration itself also needs papers. A concessional trailer never registered in NSW needs TfNSW's Identity Approval before the examiner can pass it (VIB 78 rule 221.04), and its application, form 5703, is rejected without clear photographs of all four sides and the drawbar, of the vehicle plate and of the VIN stamped in the frame, the weighbridge ticket, and receipts proving the origin of the materials (CMP-04). So keep every receipt for the chassis steel, the running gear, the coupling and the panels from stage B0, and photograph the trailer as AIS Notice 41 and VIB 78 ask.
 
@@ -183,12 +183,12 @@ One line is new, the weld evidence for the chassis (CMP-14, AUD 2,344). Neither 
 
 The ten largest savings, with their contingency, their share of the total and what each costs the requirements. The site's parts list works out all thirteen from the lines. Some share lines, so they do not add up.
 
-1. Two self-built EVE MB31 packs in place of the Victron modules: AUD 6,113 (3.2 %). More capacity, but no AS IEC 62619 test, so the electrician may refuse the certificate, and the cell terminals loosen on corrugations.
-2. A plain low-flow shower: AUD 5,779 (3.0 %). Two 20 min showers then use about 240 L a day.
+1. Two self-built EVE MB31 packs in place of the Victron modules: AUD 6,113 (3.1 %). More capacity, but no AS IEC 62619 test, so the electrician may refuse the certificate, and the cell terminals loosen on corrugations.
+2. A plain low-flow shower: AUD 5,779 (2.9 %). Two 20 min showers then use about 240 L a day.
 3. A fixed bed at night height: AUD 5,450 (2.8 %). The desk loses its place under the bed, so H1 fails.
 4. A 230 V water heater and the heat pump in place of the Combi: AUD 5,308 (2.7 %). No heat or hot water without the battery.
 5. No engineer's review: AUD 5,280 (2.7 %). The inspection does not ask for one. The RAV entry's drawbar evidence then rests on Leonard's own calculation, and if the department does not accept it, on a drawbar and chain-point test at an approved facility, about AUD 5,000 (est.). The designs stay unchecked.
-6. Square front edges: AUD 4,200 (2.2 %). About 3.7 L/100 km more towing, about AUD 1,550 a year.
+6. Square front edges: AUD 4,200 (2.1 %). About 3.7 L/100 km more towing, about AUD 1,550 a year.
 7. No generators: AUD 4,085 (2.1 %). Cloud with no drive then needs shore power.
 8. No freezer: AUD 2,455 (1.3 %). Frozen food fits only the fridge's 8.2 L compartment.
 9. A Carafan fan in place of the RESPA: AUD 1,521 (0.8 %). No powered precleaner, so the filter loads faster in dust.

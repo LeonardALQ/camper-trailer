@@ -39,7 +39,10 @@ def test_limits_are_the_rules():
     r = RES["data"]["rules"]
     assert (r["clear_mm"], r["segregation_mm"], r["drop_pct"], r["drop_ac_pct"], r["fall"], r["terminal_face"]["mm"]) == (20, 50, 2.0, 5.0, 0.02, 300)
     assert set(r["terminal_face"]["exempt"]) == {"W-02", "F-10"}
-    assert (r["spacing"]["gap_mm"], r["spacing"]["wet_ac_mm"], set(r["spacing"]["touch"])) == (5, 25, {"ELV", "ac230"})
+    sp = r["spacing"]
+    assert (sp["gap_mm"], sp["over_mm"], set(sp["touch"])) == (5, 25, {"ELV", "ac230"})
+    assert sp["wet"]["fresh"]["ac230"] == 25   # IB 052/2015, cold water above ground
+    assert (sp["wet"]["hot"], sp["wet"]["waste"]) == ({"ac230": 50, "ELV": 25}, {"ac230": 50, "ELV": 25})
 
 
 def test_a_ways_pitch_is_its_largest_cable_or_pipe():
@@ -81,6 +84,83 @@ def test_every_frame_cell_is_inside_its_frame_and_clear_of_the_others():
         for i, a in enumerate(boxes):
             for b in boxes[i + 1:]:
                 assert a[3] <= b[1] + 1e-6 or b[3] <= a[1] + 1e-6 or a[4] <= b[2] + 1e-6 or b[4] <= a[2] + 1e-6, (g["id"], a[0], b[0])
+
+
+def test_bd11s_routed_item_follows_the_routes_and_the_line_adds_to_its_total():
+    """I2-19: BD-11's routed item is the routed runs' mass (bd11_routed_kg) above the three items they price, the
+    allowance not yet given to a part is the rest, and the items add to the line's 53.6 kg."""
+    import yaml
+    items = yaml.safe_load((R.DATA / "assemblies" / "trailer.yaml").read_text(encoding="utf-8"))["items"]
+    parts = next(it for it in items if it["id"] == "BD-11")["parts"]
+    routed = round(R.totals(RES)["lines"]["BD-11"]["mass_kg"], 2)
+    priced = sum(p["kg"] for p in parts if p["item"].startswith(("12 and 24 V wiring", "230 V wiring", "Fresh water pipework")))
+    item = next(p for p in parts if p["item"].startswith("The routed runs priced here"))
+    allow = next(p for p in parts if p["item"].startswith("Allowance not yet given"))
+    assert priced == pytest.approx(25.0)
+    assert item["kg"] == pytest.approx(routed - priced, abs=0.051), (item["kg"], routed)
+    assert f"{routed:.1f} kg routed" in item["item"]
+    assert allow["kg"] >= 0 and sum(p["kg"] for p in parts) == pytest.approx(53.6, abs=0.001)
+
+
+def test_every_hole_in_a_chassis_member_and_every_large_floor_cut_out_is_listed():
+    """I2-27: data/services.yaml lists every hole the runs make in a chassis member, at its place within 15 mm, and
+    every floor cut-out over 60 mm with its size, so a structural check can read them."""
+    listed = RES["svc"]["holes"]
+    got = R.member_holes(RES)
+    same = lambda a, b: (a["member"], a["run"], a["face"]) == (b["member"], b["run"], b["face"])  # noqa: E731
+    for h in got:
+        assert any(same(h, x) and math.dist((h["x"], h["y"], h["z"]), (x["x"], x["y"], x["z"])) <= 15 and abs(h["d"] - x["d"]) <= 1
+                   for x in listed), h
+    assert len(listed) == len(got), (len(listed), len(got))
+    cuts = {c["gland"]: c for c in RES["svc"]["cutouts"]}
+    for g in RES["svc"]["glands"]:
+        if g["at"] == "floor":
+            w, h = (g["w"] + 8, g["h"] + 8) if g.get("w") and g.get("h") else (g["d"], g["d"])
+            assert (max(w, h) > 60) == (g["id"] in cuts), g["id"]
+            if g["id"] in cuts:
+                assert (cuts[g["id"]]["w"], cuts[g["id"]]["h"]) == (w, h), g["id"]
+    # the kerb frame's three raiser cables stay in the raiser, clear of its seam with the rail (I2-27)
+    assert not [h for h in got if h["run"] in ("B-16", "B-18", "D-14") and h["member"] == "RL-K"]
+
+
+def test_svc01_tests_the_keep_clear_boxes_up_to_the_ceilings_services_zone():
+    """I2-14: the aisles, landings and the chair space are obstacles to SVC-01 from the floor up, under the ceiling's
+    services zone, so no run or riser stands in them."""
+    kc = R.keep_clear_boxes(RES)
+    top = RES["V"]["ceiling_z"] - RES["data"]["rules"]["keep_clear"]["overhead_mm"]
+    assert len(kc) >= 5 and all(box[5] <= top + 1e-6 for _, box in kc)
+    assert {b["id"] for b, _ in kc} >= {"LA-K1", "LA-K2", "LA-K4", "LA-K5"}
+    assert not [p for p in EVAL["clearance"]["problems"] if "keep-clear" in p]
+
+
+def test_every_gland_has_a_fitting_with_room_round_it():
+    """I2-14: every gland's fitting is sized (a locknut by its thread, a frame by its packing and rim), and SVC-09 measures
+    every pair in a panel on both faces."""
+    fits = RES["svc"]["fittings"]
+    for g in RES["svc"]["glands"]:
+        f = R.fitting(g, fits)
+        assert f["inner"] and f["outer"], g["id"]
+        if g.get("cells"):
+            assert f["kind"] == "frame" and not f["turned"], g["id"]
+            assert f["inner"]["hx"] == pytest.approx(g["w"] / 2 + fits["frame_rim_mm"]), g["id"]
+    e = EVAL["glands"]
+    assert e["ok"], e["problems"][:5]
+    assert e["closest"] and all(c["gap"] >= c["need"] - 0.05 for c in e["closest"])
+
+
+def test_svc05_finds_a_circuit_whose_runs_stop_short():
+    """I2-18 (e): the runs of a tag join end to end, and a 230 V circuit runs from the board to its load or the outlet
+    the load plugs into. Moving one end of a run breaks SVC-05."""
+    assert R.coverage(RES)["ok"]
+
+    def moved(rid, end, line):
+        return [dict(r, **{end: dict(r[end], line=line)}) if r["id"] == rid else r for r in RES["runs"]]
+    bad = R.coverage(dict(RES, runs=moved("C9B", "from", "PO-02")))["problems"]
+    assert any(p.startswith("C9's runs do not join up") for p in bad), bad
+    bad = R.coverage(dict(RES, runs=moved("C2", "to", "PO-08")))["problems"]
+    assert any(p.startswith("C2's runs reach neither") for p in bad), bad
+    bad = R.coverage(dict(RES, runs=moved("C5", "from", "LA-11E")))["problems"]
+    assert any(p.startswith("C5's runs start from no source") for p in bad), bad
 
 
 def test_ids_are_unique_and_every_end_is_a_real_line():

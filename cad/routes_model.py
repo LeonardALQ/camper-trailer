@@ -198,7 +198,7 @@ def viewer_json(name: str, root: Compound) -> str:
 
 # ------------------------------------------------------------------ check rows and the pages' data
 def check_rows(res: dict, ev: dict) -> list[dict]:
-    """SVC-01 to SVC-08 as check rows (data/routes.yaml `checks`), each with its limit, measured value and governing run."""
+    """SVC-01 to SVC-09 as check rows (data/routes.yaml `checks`), each with its limit, measured value and governing run."""
     rows = []
     for c in res["data"].get("checks") or []:
         e = ev[c["kind"]]
@@ -220,7 +220,7 @@ def check_rows(res: dict, ev: dict) -> list[dict]:
                        margin=None if e["smallest"] is None else round(e["smallest"] - e["limit"], 1),
                        governing=e["near"][0]["run"] if e["near"] else None)
         elif c["kind"] == "coverage":
-            row.update(limit="every load, outlet, water outlet and fixture has its run", measured=e["n"] - len(e["problems"]), unit="served",
+            row.update(limit="every load, outlet, water outlet and fixture has its run, joined up from its source", measured=e["n"] - len(e["problems"]), unit="served",
                        margin=-len(e["problems"]), governing=f"{e['n']} needs")
         elif c["kind"] == "drops":
             row.update(limit="DC 2 % at the design current, 230 V 5 %", measured=round(100 * e["use"], 1), unit="% of the limit",
@@ -228,12 +228,17 @@ def check_rows(res: dict, ev: dict) -> list[dict]:
         elif c["kind"] == "falls":
             row.update(limit=f"at least 1:{1 / res['data']['rules']['fall']:.0f}", measured=e["slope"], unit="fall",
                        margin=None if e["slope"] is None else round(e["slope"] - res["data"]["rules"]["fall"], 4), governing="flattest level leg")
+        elif c["kind"] == "glands":
+            fits = res["svc"]["fittings"]
+            row.update(limit=f"{fits['web_mm']:g} mm between fittings, {fits['spanner_mm']:g} mm round a locknut, none in a keep-clear box",
+                       measured=e["margin"], unit="mm spare", margin=e["margin"], governing=e["governing"])
         elif c["kind"] == "spacing":
             sp = res["data"]["rules"]["spacing"]
-            row.update(limit=f"each run's radius plus {sp['gap_mm']:g} mm, a wet line {sp['wet_ac_mm']:g} mm from 230 V, lane neighbours may touch",
+            ac = sorted({v.get("ac230", 0) for v in sp["wet"].values() if v})
+            row.update(limit=f"each run's radius plus {sp['gap_mm']:g} mm, a wet line {ac[0]:g} to {ac[-1]:g} mm from 230 V by its kind, lane neighbours may touch",
                        measured=e["margin"], unit="mm spare", margin=e["margin"],
                        governing=f"{e['governing']}, {e['pairs']} pairs measured, {e['overlaps']} overlapping")
-        row["detail"] = "; ".join(e["problems"][:3]) if e["problems"] else f"{row.get('governing') or ''}".strip()
+        row["detail"] = ". ".join(e["problems"][:3]) if e["problems"] else f"{row.get('governing') or ''}".strip()
         row["status"] = ("PASS" if row["ok"] else "FAIL") if c["severity"] == "fail" else ("MEETS LIMIT" if row["ok"] else "REPORTED")
         rows.append(row)
     return rows
