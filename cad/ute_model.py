@@ -75,7 +75,9 @@ def ute_compound(ute, garage_model=None, label="UTE-79", loading=False):
             part = garage_model.prj.parts[i.part]
             # a bike shown elsewhere in the loading view (on the ramp) keeps its own id, so hover names the same bike
             who = i.special.get("bike", {}).get("shows", i.iid)
-            s.label, s.color = f"{who} {i.label}".replace("/", "-"), rgba(part.color, part.alpha)
+            s.label = f"{who} {i.label}".replace("/", "-")
+            if "bike" not in i.special:          # a bike's pieces carry their own colours (cad/model/vehicles)
+                s.color = rgba(part.color, part.alpha)
             groups.setdefault(i.group, []).append(s)
         kids.append(Compound(label="Bike garage", children=[Compound(label=GROUP_LABELS[g], children=v) for g, v in groups.items()]))
     return Compound(label=label, children=kids)

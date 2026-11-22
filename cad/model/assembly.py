@@ -55,7 +55,8 @@ class Model:
         for b in self.built.values():
             part = prj.parts[b.inst.part]
             b.shape.label = b.name
-            b.shape.color = rgba(part.color, part.alpha)
+            if b.bike is None:                   # a bike's pieces carry their own colours (cad/model/vehicles)
+                b.shape.color = rgba(part.color, part.alpha)
         self.timings["build_s"] = round(time.time() - t0, 3)
 
     # ------------------------------------------------------------------
