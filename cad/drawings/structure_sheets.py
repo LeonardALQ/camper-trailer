@@ -85,18 +85,28 @@ def ct104(prj, model, bom, checks, reg, dwg):
           (lay.chassis.station_x(next(s for s in lay.chassis.stations if s["id"] == "XT centre")), -900, "H3"),
           (V["bed_x1"] + 60, V["rail_c"], "H5"),
           (lay.chassis.station_x(next(s for s in lay.chassis.stations if s["id"] == "XT front hinge")), 880, "H6")]
+    oy_tip = 1145.0
+    mounts = [pr.p(lay.chassis.station_x(st), y) for st in lay.chassis.stations for y in (-oy_tip, -V["rail_c"], V["rail_c"], oy_tip)]
+
+    def hp_label(p, t, color="#000"):
+        """A hard point's mark beside its triangle, on the side clear of the body mounts' circles."""
+        w = S.text_mm(t, 1.2, True)
+        for side in (1, -1):
+            x0 = p[0] + 1.5 if side > 0 else p[0] - 1.5 - w
+            if not any(q[0] + 1.0 > x0 and q[0] - 1.0 < x0 + w and q[1] + 1.0 > p[1] + 0.4 and q[1] - 1.0 < p[1] + 1.5 for q in mounts):
+                break
+        sh.text(p[0] + 1.5 * side, p[1] + 0.6, t, 1.2, "start" if side > 0 else "end", bold=True, color=color)
     for x, y, t in hp:
         p = pr.p(x, y)
         sh.path([(p[0], p[1] + 1.4), (p[0] - 1.2, p[1] - 0.8), (p[0] + 1.2, p[1] - 0.8)], "fill", closed=True)
-        sh.text(p[0] + 1.5, p[1] + 0.6, t, 1.2, bold=True)
+        hp_label(p, t)
     # the plinth's fourth foot: no member under it (open point)
     xo = V["plinth_x0"] + V["plinth_l"] - 25
     p = pr.p(xo, -900)
     sh.path([(p[0], p[1] + 1.4), (p[0] - 1.2, p[1] - 0.8), (p[0] + 1.2, p[1] - 0.8)], "fail", closed=True)
-    sh.text(p[0] + 1.5, p[1] + 0.6, "H4", 1.2, bold=True, color="#c00")
+    hp_label(p, "H4", "#c00")
     n = 0
     tip = res.get("mounted") or {}
-    oy_tip = 1145.0
     for st in lay.chassis.stations:
         x = lay.chassis.station_x(st)
         for y in (-oy_tip, -V["rail_c"], V["rail_c"], oy_tip):

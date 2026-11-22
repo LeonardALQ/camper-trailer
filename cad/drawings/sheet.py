@@ -22,6 +22,7 @@ except ImportError:  # pragma: no cover
 
 GAP, EXT, TXT = 1.0, 2.0, 2.5  # projection-line gap and overshoot, dimension text height (mm)
 FONT, PNG_PX = "DejaVu Sans", 3508
+SYMBOL_R = 3.5   # mm: a circle this small is a symbol (gland, mount, balloon), never broken for a label, so its label moves
 # REV-01's columns, their left edges from the table's left edge (mm), its text height and each cell's inset
 REV_COLS = (("REV", 0.0), ("DATE", 10.0), ("DESCRIPTION", 30.0), ("DRAWN", 120.0), ("CHECKED", 140.0), ("APPROVED", 160.0))
 REV_W, REV_TEXT, REV_PAD = 180.0, 1.9, 1.0
@@ -283,7 +284,7 @@ def _segments(el) -> tuple[list, list]:
             out += [(p, q, n, hw) for p, q in zip(pts, pts[1:])]
         elif e.startswith("<circle"):
             m = _CIRCLE.match(e)
-            if not m or 'stroke="none"' in m[4]:
+            if not m or 'stroke="none"' in m[4] or float(m[3]) <= SYMBOL_R:
                 continue
             sw = re.search(r'stroke-width="([\d.]+)"', m[4])
             cx, cy, r = float(m[1]), float(m[2]), float(m[3])

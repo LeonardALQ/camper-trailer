@@ -278,10 +278,11 @@ DOORS = {"BD-07": "hinge_front", "BD-15": "hinge_kerb"}
 
 
 def body_plan(sh, pr, lay, res, cut=1000.0, show=None, labels=True, size=1.35, keep=True, openings=True, swings=True,
-              open_labels=True, light=(), hidden=(), nolabel=()):
+              open_labels=True, light=(), hidden=(), nolabel=(), avoid=()):
     """The body cut at `cut` above the floor, seen from above: the walls and the partition shaded, the openings in them,
     the door swings, the items in `show` (outlined, dashed when wholly above the cut or named in `hidden`) and the spaces
-    kept clear (phantom). Returns a dict of the item rectangles on the sheet by line."""
+    kept clear (phantom). The openings' marks keep clear of the sheet points in `avoid` (symbols drawn later). Returns a
+    dict of the item rectangles on the sheet by line."""
     V = lay.V
     hb, hi = V["half_bw"], V["half_in"]
     x0, x1, i0, i1 = V["body_x0"], V["body_x1"], V["in_x0"], V["in_x1"]
@@ -299,7 +300,7 @@ def body_plan(sh, pr, lay, res, cut=1000.0, show=None, labels=True, size=1.35, k
         pr.arc_plan(wr[3], d0, d1 - d0, 90, 0, "thin")
     out = {}
     if openings:
-        placed: list = []
+        placed: list = list(avoid)
         for o in res["openings"]:
             _opening_plan(sh, pr, lay, o, swings=swings, label=open_labels, placed=placed)
     picked = []

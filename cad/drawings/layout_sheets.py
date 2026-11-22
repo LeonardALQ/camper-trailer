@@ -414,7 +414,7 @@ def ct013(prj, model, bom, checks, reg, dwg):
     sh = S.Sheet()
     S.frame(sh)
     yb = title(sh, dwg, reg, "THE MASS COLUMN IS THE WHOLE LINE'S, A FAN OR UNIT WITH ITS HOOD (TB-11).",
-               "MAKERS' PRODUCTS, CUT-OUTS TO THE MAKERS' SHEETS")
+               "MAKERS' PRODUCTS, CUT-OUTS TO THE MAKERS' SHEETS", rows=3)   # the schedule starts under three rows
     rows = []
     wall_order = {"kerb": 0, "road": 1, "front": 2, "rear": 3}
     for o in sorted(res["openings"], key=lambda o: (wall_order[o["wall"]], o["u0"])):

@@ -19,8 +19,8 @@ import math
 import time
 
 from . import sheet as S
-from .home_common import (Proj, arrow_line, body_plan, box, ctx, label_in, stamp, textblock, title, wire, wrap, write,
-                          wtable)
+from .home_common import (Proj, arrow_line, body_plan, box, ctx, label_in, short, stamp, textblock, title, wire, wrap,
+                          write, wtable)
 
 
 def _centre(b):
@@ -37,13 +37,17 @@ def _route(pr, pts, sty, arrow=False):
         arrow_line(pr.sh, q[-2], q[-1], sty, 1.6)
 
 
+def _gland_xy(g, V):
+    """A gland's plan position: on its wall's outer face, or where the data puts it on the floor or the roof."""
+    return {"kerb": (g.get("x"), -V["half_bw"]), "road": (g.get("x"), V["half_bw"]), "rear": (V["body_x1"], g.get("y")),
+            "front": (V["body_x0"], g.get("y"))}.get(g["at"], (g.get("x"), g.get("y")))
+
+
 def _gland(sh, pr, g, V, size=1.15, label=True, right=False):
     """A gland from data/services.yaml as a small circle with its id, on its wall, the floor or the roof. `label` False
     where the plan already names it as an opening, `right` puts the id beside the circle."""
     at = g["at"]
-    x, y = {"kerb": (g.get("x"), -V["half_bw"]), "road": (g.get("x"), V["half_bw"]), "rear": (V["body_x1"], g.get("y")),
-            "front": (V["body_x0"], g.get("y"))}.get(at, (g.get("x"), g.get("y")))
-    p = pr.p(x, y, 0)
+    p = pr.p(*_gland_xy(g, V), 0)
     sh.circle(p[0], p[1], 0.9, "box")
     sh.circle(p[0], p[1], 0.9, "medium")
     if right:
@@ -184,8 +188,11 @@ def ct602(prj, model, bom, checks, reg, dwg):
     hb, hi = V["half_bw"], V["half_in"]
     pr = Proj(sh, "plan", k, 34.0, 166.0, ref=(V["body_x0"], -hb, 0))
     show = {"EL-02", "LA-02", "LA-14", "LA-11E", "EL-04", "AC-01", "LA-11T", "LA-11B", "LA-07A", "LA-09", "WR-09", "WR-06", "LA-03"}
-    body_plan(sh, pr, lay, res, cut=1000.0, show=show, size=1.2, keep=False, swings=False, light=("EL-02", "LA-11E", "EL-04"),
-              nolabel=("EL-02", "LA-03", "LA-11B"))
+    g = {x["id"]: x for x in svc["glands"]}
+    gids = ("G2", "G3", "G4", "G5", "G6", "G7", "G8")
+    gp = {i: pr.p(*_gland_xy(g[i], V), 0) for i in gids}
+    rects = body_plan(sh, pr, lay, res, cut=1000.0, show=show, size=1.2, keep=False, swings=False, light=("EL-02", "LA-11E", "EL-04"),
+                      nolabel=("EL-02", "LA-03", "LA-11B", "LA-02"), avoid=list(gp.values()))
     fz = V["floor_z"]
     f = lambda iid: _centre(lay.find(iid))  # noqa: E731
     bd = lay.find("LA-11E").box
@@ -195,7 +202,6 @@ def ct602(prj, model, bom, checks, reg, dwg):
     _route(pr, [(lay.find("EL-02").box[3] - 40, -690), (bd[0] + 40, -690)], "dc")
     _route(pr, [(xp, bd[4]), (xp, inv[1])], "dc")
     # PV down the partition's kerb end, and the ute feed along the kerb rail
-    g = {x["id"]: x for x in svc["glands"]}
     _route(pr, [(g["G4"]["x"], g["G4"]["y"]), (bd[0] + 60, g["G4"]["y"])], "pv")
     _route(pr, [(V["body_x0"], -V["rail_c"]), (g["G8"]["x"], -V["rail_c"]), (g["G8"]["x"], g["G8"]["y"])], "pv")
     q = pr.p(V["body_x0"], -V["rail_c"])
@@ -239,8 +245,10 @@ def ct602(prj, model, bom, checks, reg, dwg):
     m = lay.find("LB-04M").cog
     _route(pr, [(V["in_x0"] + 400, yr - 60), (m[0], yr - 60), (m[0], m[1])], "bus", arrow=True)
     as_openings = {o["id"] for o in res["openings"]}
-    for gid in ("G2", "G3", "G4", "G5", "G6", "G7", "G8"):
+    for gid in gids:
         _gland(sh, pr, g[gid], V, label=gid not in as_openings, right=gid == "G7")
+    r = rects["LA-02"]    # the washer's name over G6, its floor gland, and the gland's id
+    label_in(sh, (r[0], gp["G6"][1] + 2.4, r[2], r[3]), short(lay.find("LA-02")), 1.2)
     # outlets, indicative: one symbol for each outlet in its zone (report 20 section 7)
     outs = [(4350, hi - 25, "2"), (4950, hi - 25, "2"), (V["in_x0"] + 25, -350, "2"), (V["in_x0"] + 25, 350, "2"),
             (3300, -hi + 25, "2"), (wa[0], -hi + 25, "1"), (dr[0], -hi + 25, "1"), (bd[0] + 60, -hi + 25, "1")]

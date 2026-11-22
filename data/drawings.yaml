@@ -127,6 +127,7 @@ drawings:
       - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-21, description: "Notice: G2 drawn and scheduled as an opening, 310 x 120 mm (F4-05)", drawn: Kiro, checked: "", approved: ""}
       - {rev: C, date: 2026-11-21, description: "Notice: the title block's opening count dropped (F5-06)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: D, date: 2026-11-22, description: "Memo: labels clear of the lines", drawn: Kiro, checked: "", approved: ""}
   - number: CT-101
     title: Chassis general arrangement
     subtitle: Plan, kerb-side elevation, end views, member schedule and frame analysis summary
@@ -204,7 +205,7 @@ drawings:
       - {rev: C, date: 2026-11-21, description: "Notice: rows and notes 3 and 5 from the data, inner-skin members, AC-04 stays", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-21, description: "Notice: wall members RHS 110 x 19 x 3.5 (BDY-10 19.7 mm), stations at X 4,375", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-21, description: "Notice: stations with the axle at X 4,373", drawn: Kiro, checked: "", approved: ""}
-      - {rev: F, date: 2026-11-22, description: "Memo: labels clear of the lines, revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
+      - {rev: F, date: 2026-11-22, description: "Memo: labels clear of the lines and the mounts, revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
   - number: CT-201
     title: Body shell
     subtitle: Kerb, road, front and rear walls, the fixed roof plan, the panels and every opening with its size
@@ -357,7 +358,7 @@ drawings:
       - {rev: C, date: 2026-11-21, description: "Notice: two 15 A appliance inlets, SHORE and GENERATOR (F2-07)", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-21, description: "Notice: G2's two inlets and SB50 in a 310 x 120 mm cut-out", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-21, description: "Notice: G2 counted as an opening (F4-05)", drawn: Kiro, checked: "", approved: ""}
-      - {rev: F, date: 2026-11-22, description: "Memo: labels clear of the lines, G2 named once, C4 and G7 moved clear", drawn: Kiro, checked: "", approved: ""}
+      - {rev: F, date: 2026-11-22, description: "Memo: labels clear of the lines and the glands, G2 named once", drawn: Kiro, checked: "", approved: ""}
   - number: CT-611
     title: Plumbing schematic
     subtitle: Fill, fresh tanks, pump, filters, cold and hot lines, drains to the grey tank and the dump
