@@ -274,7 +274,7 @@ consts:
   RDY: LA_11B.y0 - 45               # the riser's DC lanes
   RAY: EL_04.y0 + 35                # the riser's 230 V lane
   KC_Y: -half_in + 25               # the chase behind the plinth: the electrical risers against the kerb wall
-  KW_Y: -half_in + 100              # the chase: the water and waste lines, 75 mm inboard of the electrics
+  KW_Y: -half_in + 95               # the chase: the water and waste lines, 75 mm inboard of the electrics
   DCR_X: rear_x0 - 25               # the battery's riser behind the dryer, to the isolator and the BMS, clipped to the partition
   DLX: rear_x0 - 96                 # the Lynx Distributor's riser to the MultiPlus-II, 71 mm forward
   UTX: rear_x0 - 140                # the ute feed's riser
@@ -327,7 +327,7 @@ fixtures:
   - {id: BR-AC, what: "230 V board: changeover switch, RCBOs, contactors K2, K4, S1 and their relays", line: EL-06, at: [BX, -530, LA_11E.z0 + 110], size: [90, 340, 160], obstacle: false, needs_run: false}
   - {id: BR-BUS, what: "Bank busbars and the six-way MEGA fuse holder, in the plinth's end slot", line: EL-03, at: [EL_02.x1 + 87, -690, EL_01.z1 + 15], size: [120, 200, 90], obstacle: false, needs_run: false}
   # ---------------------------------------------------------------- the water supply in the sink cabinet (WS-01)
-  - {id: WS-STR, what: "40-mesh strainer", line: WS-01, at: [LA_07B.cx + 85, LA_11B.y0 + 35, floor_z + 75], size: [80, 60, 60], obstacle: false, needs_run: false}
+  - {id: WS-STR, what: "40-mesh strainer", line: WS-01, at: [G11.cx + 18, LA_11B.y0 + 35, floor_z + 75], size: [80, 60, 60], obstacle: false, needs_run: false}
   - {id: WS-PMP, what: "Shurflo Trail King 7 pump", line: WS-01, at: [LA_07B.cx + 30, LA_11B.y0 + 135, floor_z + 75], size: [220, 120, 120], needs_run: false}
   - {id: WS-ACC, what: "Accumulator, 0.75 L", line: WS-01, at: [LA_07B.cx + 30, LA_11B.y0 + 315, floor_z + 85], size: [110, 110, 170]}
   - {id: WS-MAN, what: "Cold manifold on the cabinet's back", line: WS-01, at: [LA_07B.cx + 55, half_in - 55, floor_z + 65], size: [160, 40, 40], obstacle: false, needs_run: false}
@@ -385,10 +385,13 @@ fixtures:
   - {id: SH-03, what: "Shower zone drain over the well", line: WR-01, at: [WR_10.cx, WR_10.cy, floor_z + 15], size: [110, 110, 30], needs_run: false}
   - {id: SH-04, what: "DauerShower switching unit in the well (WR-10)", line: WR-10, at: [WR_10.cx, WR_10.cy, WR_10.z0 + 40], size: [200, 200, 60], obstacle: false, needs_run: false}
   - {id: FW-01, what: "Wet room floor waste with its membrane trap, by the rear door's sand grate", line: WR-01, at: [6050, 0, floor_z + 15], size: [110, 110, 30], needs_run: false}
-  - {id: RB-01, what: "Outdoor rinse box, hot and cold, non-return valves (WR-05)", line: WR-05, at: [in_x1 - 30, 750, floor_z + 150], size: [60, 160, 160], serves: ["water: rinse box"]}
+  - {id: RB-01, what: "Outdoor rinse box, hot and cold, non-return valves (WR-05)", line: WR-05, at: [in_x1 - 30, 905, floor_z + 150], size: [60, 160, 160], serves: ["water: rinse box"]}
   - {id: WT-01, what: "Washer tap behind the dryer, above the battery's 300 mm zone", line: LA-02, at: [LA_14.cx, KW_Y, floor_z + 600], size: [60, 50, 60], needs_run: false}
   - {id: DV-01, what: "Grey tank's lever valve and camlock, kerb side", line: UF-08, at: [5450, -1060, UF_08.z0 - 45], size: [140, 90, 90]}
-  - {id: AC-DR, what: "Split's condensate outlet with its trap (AC-01)", line: AC-01, at: [AC_01.x0 + 40, AC_01.y0 + 30, AC_01.z0 - 10], size: [40, 40, 20], needs_run: false}
+  - {id: AC-DR, what: "Split's condensate outlet with its trap (AC-01)", line: AC-01, at: [AC_01.x0 + 40, AC_01.y1 - 30, AC_01.z0 - 10], size: [40, 40, 20], needs_run: false}
+  - {id: WT-MAN, what: "The wet room's cold and hot manifolds in the partition's road corner, behind the shower's access panel", line: WS-01, at: [WFX + 5, 975, floor_z + 270], size: [50, 70, 110], obstacle: false}
+  - {id: AC-DO, what: "Split's condensate spout through the road wall, dripping clear of the body", line: AC-01, at: [AC_01.x0 + 40, half_bw + 10, AC_01.z0 - 25], size: [30, 20, 30], needs_run: false}
+  - {id: VT-02, what: "Grey tank's breather outlet, insect-meshed, high on the rear wall's kerb half", line: UF-08, at: [body_x1 + 10, -450, 2550], size: [20, 60, 60], needs_run: false}
   # ---------------------------------------------------------------- the drawbar and the lamps
   - {id: DB-AN, what: "Grey Anderson SB50 at the drawbar, the ute's 48 V charging feed", line: BD-11, at: [450, -170, 523], size: [80, 60, 60], needs_run: false}
   - {id: DB-PL, what: "12-pin plug's junction box at the drawbar (AS 4177.5)", line: LG-01, at: [450, 170, 523], size: [80, 60, 60], needs_run: false}
@@ -703,7 +706,7 @@ runs:
      serves: [tank balance], along: [CM-05], from: {line: UF-01, at: [UF_01.x1, 0, UFZ - 35]}, to: {line: UF-01R, at: [UF_01R.x0, ., .]}}
   - {id: F-03, system: fresh, kind: hose12, feeds: "Rear tank's outlet up G11 through the strainer to the pump", protection: "40-mesh strainer",
      serves: [pump feed], glands: [G11], passes: [WS-STR], along: [BD-01, RL-R, RS-R], from: {line: UF-01R, at: [G11.cx + 18, UF_01R.y1, UFZ - 90]},
-     path: [[., G11.cy - 5, .], [., ., WS_STR.cz], [WS_STR.cx, ., .]], to: {line: WS-PMP, at: [., WS_PMP.y0, .]}}
+     path: [[., G11.cy - 5, .], [., ., WS_STR.cz]], to: {line: WS-PMP, at: [., WS_PMP.y0, .]}}
   - {id: F-04, system: fresh, kind: hose12, feeds: "Pump to the accumulator", protection: "The pump's pressure switch",
      from: {line: WS-PMP, at: [WS_ACC.cx, WS_PMP.y1, WS_PMP.cz]}, to: {line: WS-ACC, at: [., WS_ACC.y0, .]}}
   - {id: F-05, system: fresh, kind: pex12, feeds: "Accumulator to the cold manifold", protection: "-",
@@ -714,7 +717,7 @@ runs:
      serves: ["water: drinking tap"], passes: [WS-CRZ, WS-UV], from: {line: WS-MAN, at: [WS_MAN.x0, WS_MAN.cy, WS_MAN.cz]},
      path: [[WS_CRZ.cx, ., .], [., ., WS_CRZ.cz], [., WS_UV.cy, .], [., ., WS_UV.z1 + 80], [SK_01.cx - 20, ., .], [., SK_01.cy, .]], to: {line: SK-01, at: [., ., SK_01.z0]}}
   - {id: F-08, system: fresh, kind: pex12, feeds: "Cold to the thermostatic mixing valve", protection: "-",
-     from: {line: WS-MAN, at: [WS_MAN.x1, WS_MAN.cy, WS_MAN.cz]}, path: [[WS_TMV.cx, ., .], [., WS_TMV.cy, .]], to: {line: WS-TMV, at: [., ., WS_TMV.z0]}}
+     from: {line: WS-MAN, at: [WS_MAN.x1 - 20, WS_MAN.y0, WS_MAN.cz]}, path: [[., WS_TMV.cy, .], [WS_TMV.cx, ., .]], to: {line: WS-TMV, at: [., ., WS_TMV.z0]}}
   - {id: F-09, system: fresh, kind: pex12, feeds: "Cold to the Combi D 6 E, down G11, forward in the road rail's gap and up G9", protection: "The Combi's safety and drain valve",
      serves: ["water: Combi"], glands: [G11, G9], along: [BD-01, RL-R, RS-R], from: {line: WS-MAN, at: [WS_MAN.x0 + 15, WS_MAN.y0, WS_MAN.cz]},
      path: [[., WS_MAN.y0 - 30, .], [., ., WS_PMP.z1 + 40], [G11.cx - 40, ., .], [., G11.cy - 15, .], [G11.cx - 15, ., .], [., ., UFZ], [G9.cx - 22, ., .], [., G9.cy - 15, .], [., ., floor_z + 135]],
@@ -729,3 +732,67 @@ runs:
   - {id: Q-01, system: diesel, kind: fuel4, feeds: "Diesel from the heater tank's pick-up to the Combi D 6 E, under the floor and up G9", protection: "The tank's filter, the Combi's own pump",
      serves: [diesel], glands: [G9], along: [BD-01, RL-R, RS-R], from: {line: UF-06, at: [UF_06.x1 - 14, UF_06.y1, UF_06.cz]},
      path: [[., ., UFZ - 5], [., G9.cy + 28, .], [G9.cx + 24, ., .], [., ., floor_z + 35]], to: {line: LA-03, at: [LA_03.x0, LA_03.y0 + 85, .]}}
+  # ================================================================ the wet room: home runs from the partition's road corner (WT-MAN), the kerb half's
+  # fittings by the wet room's ceiling over the inner door, the wastes into the grey tank's top under the wet room
+  - {id: F-11, system: fresh, kind: pex12, feeds: "Cold trunk from the cabinet's manifold under the e2 fan and through the partition to the wet room's manifold", protection: "-",
+     passes: [WR-03], from: {line: WS-MAN, at: [WS_MAN.x1, WS_MAN.cy, WS_MAN.cz]}, path: [[rear_x0 - 25, ., .], [., WT_MAN.cy - 10, .], [., ., WT_MAN.cz - 20]], to: {line: WT-MAN, at: [WT_MAN.x0, ., .]}}
+  - {id: H-03, system: hot, kind: pex12, feeds: "Tempered hot trunk from the mixing valve through the partition to the wet room's manifold", protection: "Thermostatic mixing valve at 50 C",
+     passes: [WR-03], from: {line: WS-TMV, at: [WS_TMV.x1, WS_TMV.cy, WS_TMV.cz - 25]}, to: {line: WT-MAN, at: [WT_MAN.x0, WT_MAN.cy + 20, WT_MAN.cz + 20]}}
+  - {id: F-12, system: fresh, kind: pex12, feeds: "Cold to the basin, up the shower's road corner and across the wet room's ceiling over the inner door", protection: "-", serves: ["water: basin"],
+     along: [WR-03, BD-02], from: {line: WT-MAN, at: [WT_MAN.x0 + 9, WT_MAN.y1, WT_MAN.cz]}, path: [[., WT_MAN.y1 + 85, .], [., ., 2870], [5290, ., .], [., BS_01.cy, .], [., ., BS_01.cz]],
+     to: {line: BS-01, at: [BS_01.x0, ., .]}}
+  - {id: H-04, system: hot, kind: pex12, feeds: "Tempered hot to the basin, beside the cold", protection: "Thermostatic mixing valve at 50 C", serves: ["water: basin"],
+     along: [WR-03, BD-02], from: {line: WT-MAN, at: [WT_MAN.x0 + 25, WT_MAN.y1, WT_MAN.cz]}, path: [[., WT_MAN.y1 + 85, .], [., ., 2850], [5330, ., .], [., BS_01.cy + 20, .]],
+     to: {line: BS-01, at: [., ., BS_01.z1]}}
+  - {id: F-13, system: fresh, kind: pex12, feeds: "Cold to the cassette toilet's electric flush, across the wet room's ceiling and down the kerb wall", protection: "-", serves: ["water: toilet flush"],
+     along: [WR-03, BD-02, BD-03], from: {line: WT-MAN, at: [WT_MAN.x0 + 41, WT_MAN.y1, WT_MAN.cz]}, path: [[., WT_MAN.y1 + 85, .], [., ., 2830], [5350, ., .], [., -half_in + 30, .], [5600, ., .]],
+     to: {line: WR-06, at: [., ., WR_06.z1]}}
+  - {id: F-14, system: fresh, kind: pex12, feeds: "Cold to the washer's tap behind the dryer, across the wet room's ceiling and back through the partition above the cassette bin", protection: "-", serves: ["water: washer"],
+     passes: [WR-03], along: [WR-03, BD-02, BD-03], from: {line: WT-MAN, at: [WT_MAN.x1, WT_MAN.y1 - 10, WT_MAN.z1 - 20]},
+     path: [[5268, ., .], [., WT_MAN.y1 + 85, .], [., ., 2810], [5370, ., .], [., KW_Y, .], [5250, ., .], [., ., 1950], [WT_01.x1 + 40, ., .], [., ., WT_01.cz]], to: {line: WT-01, at: [WT_01.x1, ., .]}}
+  - {id: F-10, system: fresh, kind: fillhose, sleeve: true, feeds: "The washer's fill hose from its tap, along the chase to the washer's back, in its dielectric sleeve", protection: "The tap's non-return valve",
+     serves: ["water: washer"], from: {line: WT-01, at: [WT_01.x0, WT_01.cy, WT_01.cz]}, path: [[4500, ., .]], to: {line: LA-02, at: [4400, LA_02.y0, .]}}
+  - {id: F-15, system: fresh, kind: pex12, feeds: "Cold up to the shower bypass mixer", protection: "-", serves: ["water: shower bypass"],
+     along: [WR-03], from: {line: WT-MAN, at: [WT_MAN.cx - 10, WT_MAN.cy - 15, WT_MAN.z1]}, to: {line: SH-02, at: [., ., SH_02.z0]}}
+  - {id: H-05, system: hot, kind: pex12, feeds: "Tempered hot up to the shower bypass mixer", protection: "Thermostatic mixing valve at 50 C", serves: ["water: shower bypass"],
+     along: [WR-03], from: {line: WT-MAN, at: [WT_MAN.cx + 10, WT_MAN.cy + 15, WT_MAN.z1]}, to: {line: SH-02, at: [., ., SH_02.z0]}}
+  - {id: F-16, system: fresh, kind: pex12, feeds: "Cold to the DauerShower's first fill, up past the bypass mixer and back through the partition to its unit", protection: "The unit's fill valve", serves: ["water: shower"],
+     passes: [WR-03], along: [WR-03], from: {line: WT-MAN, at: [WT_MAN.x1, WT_MAN.y0 + 10, WT_MAN.z0 + 5]}, path: [[5285, ., .], [., ., 2440], [., WR_09.y1 - 40, .]],
+     to: {line: WR-09, at: [WR_09.x1, ., .]}}
+  - {id: F-17, system: fresh, kind: pex12, feeds: "Cold to the outdoor rinse box, along the shower's road wall behind its skirting", protection: "The box's non-return valves", serves: ["water: rinse box"],
+     along: [BD-02], from: {line: WT-MAN, at: [WT_MAN.x1, WT_MAN.y1 - 15, WT_MAN.z0 + 15]}, path: [[5300, half_in - 35, .], [6100, ., .], [., RB_01.cy - 20, .]],
+     to: {line: RB-01, at: [RB_01.x0, ., .]}}
+  - {id: H-06, system: hot, kind: pex12, feeds: "Tempered hot to the outdoor rinse box", protection: "Thermostatic mixing valve at 50 C", serves: ["water: rinse box"],
+     along: [BD-02], from: {line: WT-MAN, at: [WT_MAN.x1, WT_MAN.y1 - 35, WT_MAN.z0 + 40]}, path: [[5320, half_in - 55, .], [6080, ., .], [., RB_01.cy + 20, .]],
+     to: {line: RB-01, at: [RB_01.x0, ., .]}}
+  - {id: L-01, system: hot, kind: hose12, feeds: "DauerShower 2.0 loop: the well's suction up the partition's wet face to the unit", protection: "The unit's strainer and UV-C", serves: ["water: shower"],
+     passes: [WR-01, WR-03, BD-01], along: [WR-03], from: {line: WR-10, at: [WR_10.x0 + 20, WR_10.y1 - 28, WR_10.z1]},
+     path: [[., ., floor_z + 175], [WFX + 7, ., .], [., ., 2380], [., WR_09.y0 + 60, .]], to: {line: WR-09, at: [WR_09.x1, ., .]}}
+  - {id: L-02, system: hot, kind: hose12, feeds: "DauerShower 2.0 loop: the unit's heated outlet through the partition to the shower head", protection: "The unit's thermostat", serves: ["water: shower"],
+     passes: [WR-03], along: [WR-03], from: {line: WR-09, at: [WR_09.x1, SH_01.cy, WR_09.z1 - 60]}, path: [[WFX + 7, ., .]], to: {line: SH-01, at: [., ., SH_01.z0]}}
+  - {id: W-01, system: waste, kind: dwv40, feeds: "Sink waste down G10 and under the floor over CM-06 into the grey tank's top", protection: "The sink's trap",
+     serves: [sink waste], glands: [G10], along: [BD-01, RL-R, RS-R, CM-06], from: {line: SK-02, at: [SK_02.cx, SK_02.cy, SK_02.z0]},
+     path: [[., ., 1380], [G10.cx, ., .], [., G10.cy, .], [., ., UFZ - 20], [G10.cx + 60, G10.cy + 25, .], [5300, ., .], [., 450, .]], to: {line: UF-08, at: [., ., UF_08.z1]}}
+  - {id: W-02, system: waste, kind: drain16, pumped: true, sleeve: true, feeds: "The washer's drain hose, up behind the dryer above the battery's zone and through the partition into the basin", protection: "The washer's drain pump",
+     serves: [washer drain], passes: [WR-03], along: [WR-03, LA-14], from: {line: LA-02, at: [4450, LA_02.y0, 1400]},
+     path: [[., KW_Y, .], [., ., 1850], [WFX + 7, ., .], [., WR_08.y0 + 200, .]], to: {line: WR-08, at: [., ., WR_08.z1]}}
+  - {id: W-03, system: waste, kind: drain16, pumped: true, feeds: "The heat-pump dryer's condensate pump hose from its back, through the partition into the basin", protection: "The dryer's pump",
+     serves: [dryer drain], passes: [WR-03], along: [WR-03, LA-14], from: {line: LA-14, at: [rear_x0 - 35, LA_14.y0, 1800]},
+     path: [[., KW_Y, .], [WFX + 7, ., .], [., WR_08.y0 + 140, .]], to: {line: WR-08, at: [., ., WR_08.z1]}}
+  - {id: W-04, system: waste, kind: dwv40, feeds: "Basin waste from its trap down G13 into the grey tank's top", protection: "The basin's trap",
+     serves: [basin waste], glands: [G13], passes: [WR-01], from: {line: BS-02, at: [BS_02.cx, BS_02.cy, BS_02.z0]},
+     path: [[., ., UFZ - 30]], to: {line: UF-08, at: [., ., UF_08.z1]}}
+  - {id: W-05, system: waste, kind: waste25, feeds: "DauerShower well's drain valve straight down into the grey tank", protection: "The well's valve", serves: [shower drain],
+     from: {line: WR-10, at: [WR_10.cx, WR_10.cy, WR_10.z0]}, to: {line: UF-08, at: [., ., UF_08.z1]}}
+  - {id: W-06, system: waste, kind: dwv40, feeds: "Wet room floor waste by the rear door, through G24 into the grey tank's top", protection: "Membrane trap", serves: [floor waste],
+     glands: [G24], passes: [WR-01], from: {line: FW-01, at: [FW_01.cx, FW_01.cy, FW_01.z0]}, to: {line: UF-08, at: [., ., UF_08.z1]}}
+  - {id: W-07, system: waste, kind: dwv40, feeds: "Grey tank's dump line from its kerb face under the rail to the lever valve and camlock", protection: "Lever valve DV-01",
+     serves: [grey dump], along: [UF-09, RL-K, RS-K], from: {line: UF-08, at: [DV_01.cx, UF_08.y0, UF_08.z0 + 27]}, path: [[., -560, .], [., -620, 550]],
+     to: {line: DV-01, at: [., DV_01.y1, DV_01.cz]}}
+  - {id: V-02, system: vent, kind: vent12, feeds: "Grey tank's breather up the rear wall's kerb half to a meshed outlet high on the wall", protection: "-", serves: [grey breather],
+     glands: [G25, G26], passes: [WR-01], along: [BD-04, CM-08], from: {line: UF-08, at: [UF_08.x1 - 30, -450, UF_08.z1]}, path: [[., ., UFZ - 50], [G25.cx, ., .], [., ., G26.cz]],
+     to: {line: VT-02, at: [VT_02.x0, ., .]}}
+  - {id: W-08, system: waste, kind: drain16, feeds: "Split's condensate from the indoor unit's road end out through the road wall", protection: "The unit's trap", serves: [condensate],
+     glands: [G27], from: {line: AC-DR, at: [AC_DR.cx, AC_DR.y1, AC_DR.cz]}, to: {line: AC-DO, at: [., AC_DO.y0, AC_DO.cz]}}
+  - {id: R-01, system: refrigerant, kind: lineset, feeds: "Split line set from the indoor unit through the partition, over the shower and out G5 to the outdoor unit", protection: "Flared joints at the units",
+     serves: [line set], glands: [G5], passes: [WR-03, AC-03], from: {line: AC-01, at: [AC_01.x1, 730, 2760]}, to: {line: AC-02, at: [AC_02.x0, ., .]}}
