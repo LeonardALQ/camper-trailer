@@ -551,7 +551,7 @@ items:
     parts:
       - {item: "Flap 24X18B, 610 x 455 x 6 mm at 1,500 kg/m3", kg: 2.5, basis: calculated, source: "https://www.thebossshop.com.au/mudflap-rubber-610mmw-x-455mml-black"}
       - {item: Hanger and bolts, kg: 2.1, basis: estimate}
-    note: The bottom edge hangs at Z 300 or lower (VSB1 10.2.2, approach 2 for off-road). The corner steadies are CH-B01 (CHASSIS.md).
+    note: The bottom edge hangs at Z 300 or lower (VSB1 10.2.2, approach 2 for off-road). Its top edge hangs from a flat bar off the outrigger's back face, and its inboard top corner is cut 3 mm clear of the rail and the raiser (H27). The corner steadies are CH-B01 (CHASSIS.md).
   - id: BD-11
     name: Wiring, plumbing, lighting and hardware
     system: body
