@@ -31,13 +31,39 @@ def ctx() -> dict:
     return _CTX
 
 
+def _drawn(c, b):
+    """What a sheet draws of a built body: a bike as its envelope (cad/model/vehicles/envelope.py), placed as the product
+    model is, because hidden-line removal of the product models inside the box takes minutes a view. Everything else as
+    built."""
+    if b.bike is None:
+        return b.shape
+    cache = c.setdefault("drawn", {})
+    if b.inst.iid not in cache:
+        from ..model.bike import PlacedBike, bike_compound
+        from ..model.vehicles import envelope
+        prm = dict(c["prj"].parts[b.inst.part].geometry.params)
+        for k in ("length", "screen_top_z"):
+            if k in b.inst.special["bike"]:
+                prm[k] = b.inst.special["bike"][k]
+        key = prm["source_key"]
+        model = envelope.BUILDERS[key](c["prj"].bike_geometry["bikes"][key], prm)
+        pb = b.bike
+        cache[b.inst.iid] = bike_compound(PlacedBike(model, pb.rot, pb.move, pb.pitch_deg), b.shape.label)
+    return cache[b.inst.iid]
+
+
 def _gs(c, groups=None, exclude=(), only=None, loading=False):
+    from build123d import Pos
+
+    from ..trailer_model import _moved
     from ..ute_model import garage_solids
+    g = c["ute"].garage
     out = []
     for i, s in garage_solids(c["ute"], c["m"], loading=loading, groups=groups, exclude=exclude):
         if only is not None and i.ref not in only and i.iid not in only:
             continue
-        out.append(s)
+        b = c["m"].built[i.iid]
+        out.append(_moved(_drawn(c, b), Pos(g["module_x0"], 0, g["deck_z"])) if b.bike else s)
     return out
 
 
@@ -52,7 +78,7 @@ def _module(c, groups=None, exclude=(), only=None):
             continue
         if only is not None and i.ref not in only and i.iid not in only:
             continue
-        out.append(b.shape)
+        out.append(_drawn(c, b))
     return out
 
 

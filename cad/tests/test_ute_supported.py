@@ -22,6 +22,7 @@ from OCP.Extrema import Extrema_ExtFlag_MIN
 
 TOL = 1.0          # mm, the gap that still counts as touching
 MIN_VOL = 1.0      # mm3 of common volume once the pair is pushed TOL further together
+_SHARED: dict[tuple, bool] = {}    # measurements by (path, box) of both solids, shared by the two models' graphs
 
 
 def _nodes(shape, path=""):
@@ -79,7 +80,11 @@ class Graph:
     def joined(self, i, j) -> bool:
         key = (min(i, j), max(i, j))
         if key not in self._known:
-            self._known[key] = self._measure(*key)
+            # the two models share most of their solids, the same parts in the same places: one measurement serves both
+            same = tuple(sorted((self.nodes[k][0], tuple(np.round(self.lo[k], 2)), tuple(np.round(self.hi[k], 2))) for k in key))
+            if same not in _SHARED:
+                _SHARED[same] = self._measure(*key)
+            self._known[key] = _SHARED[same]
         return self._known[key]
 
     def _measure(self, i, j) -> bool:

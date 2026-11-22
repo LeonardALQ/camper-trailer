@@ -94,7 +94,7 @@ parts:
           peg_tip_y: {v: 220, src: "design estimate, to be measured"}
           peg_root_y: {v: 140, src: estimate}
           bar_clamp_y: {v: 40, src: estimate}
-          fork: {half_spacing: 100, stanchion: 43, outer: 55, src: "Triumph: Ohlins NIX30 43 mm upside-down fork. Spacing and outer tube estimated"}
+          fork: {half_spacing: 100, stanchion: 41, outer: 53, src: "Triumph's Australian specification page, 22 Nov 2026: 41 mm upside-down forks. Spacing and outer tube estimated"}
           headlight_half_width: {v: 110, src: estimate}
           tank_half_width: {v: 170, src: estimate}
           seat_half_width: {v: 140, src: estimate}

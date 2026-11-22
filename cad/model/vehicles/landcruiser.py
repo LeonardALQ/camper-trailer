@@ -15,9 +15,9 @@ from __future__ import annotations
 
 import math
 
-from build123d import Circle, Helix, Plane, Pos, Rot, Solid, sweep
+from build123d import Plane
 
-from ..prims import box_span, cyl, prism_xz, prism_yz
+from ..prims import box_span, cyl, prism_xz
 from . import kit
 
 WHITE, GLASS, BLACK, STEEL, CHASSIS = "#f4f4f2", "#8fb3c9", "#1e1e1e", "#b8b8b8", "#1c2833"
@@ -178,19 +178,25 @@ def _hubs(V, x, track):
     return tube, hubs
 
 
-def front_axle(V):
+def front_axle(V, plain=False):
     """The front beam axle with its diff, hubs and drums, and the two coil springs on their seats, from the axle tube to
-    the rails' bottom flanges."""
+    the rails' bottom flanges. Each coil is a 16 mm wire on a 62 mm radius, eight straight runs a turn with round bends,
+    which draws as a coil at a tenth of a true helix's facets. The drawings take each coil as its outline cylinder."""
     z, zb = V["tyre_slr"], V["frame_top_z"] - V["rail_h"]
     tube, hubs = _hubs(V, 0.0, V["track_front"])
     diff = cyl((-130, 120, z), (130, 120, z), 125)
     out = [("axle", kit.fuse([tube, diff] + hubs), CHASSIS, 1.0)]
     yc = V["frame_w"] / 2 - V["rail_w"] / 2
     coils, seats = [], []
+    z0, z1, pitch = z + 52, zb - 8, 36.0
     for s in (1, -1):
         seats += [cyl((0, s * yc, z + 45), (0, s * yc, z + 55), 80), cyl((0, s * yc, zb - 10), (0, s * yc, zb), 80)]
-        h = Helix(pitch=36, height=zb - z - 60, radius=62, center=(0, s * yc, z + 52), direction=(0, 0, 1))
-        coils.append(sweep(Plane(origin=h.position_at(0), z_dir=h.tangent_at(0)) * Circle(8), path=h, is_frenet=True).solids()[0])
+        if plain:
+            coils.append(cyl((0, s * yc, z0 - 8), (0, s * yc, z1 + 8), 70))
+            continue
+        n = int((z1 - z0) / pitch * 8)
+        pts = [(62 * math.cos(math.pi * k / 4), s * yc + 62 * math.sin(math.pi * k / 4), z0 + (z1 - z0) * k / n) for k in range(n + 1)]
+        coils.append(kit.tube(pts, 8))
     out += [("coil springs", kit.fuse(coils), "#c0392b", 1.0), ("spring seats", kit.fuse(seats), CHASSIS, 1.0)]
     return out
 
@@ -248,10 +254,11 @@ RIM_R, RIM_W = 16 * 25.4 / 2, 7 * 25.4
 
 
 def wheel_parts(V, plain=False):
-    """One wheel built about Z (cad/model/vehicles/kit.py): the tyre, the steel wheel, and its nuts and centre cap."""
-    tyre = kit.truck_tyre(V["tyre_d"], V["tyre_w"], RIM_R, RIM_W)
+    """One wheel built about Z (cad/model/vehicles/kit.py): the tyre, the steel wheel, and its nuts and centre cap. The
+    drawings take the wheel and tyre as their outline cylinder, as the sheets drew them before."""
     if plain:
-        tyre = tyre.solids()[0]
+        return [("tyre", cyl((0, 0, -V["tyre_w"] / 2), (0, 0, V["tyre_w"] / 2), V["tyre_d"] / 2), TYRE, 1.0)]
+    tyre = kit.truck_tyre(V["tyre_d"], V["tyre_w"], RIM_R, RIM_W)
     out = [("tyre", tyre, TYRE, 1.0), ("wheel", kit.steel_wheel(RIM_R, RIM_W), RIM, 1.0)]
     if not plain:
         nuts = [cyl((75 * math.cos(a), 75 * math.sin(a), 0), (75 * math.cos(a), 75 * math.sin(a), 22), 14)
@@ -275,9 +282,24 @@ def spare(V, plain=False):
 
 
 def build(V, plain=False) -> dict:
-    """Every part of the LandCruiser, by the ids of data/ute/ute.yaml's `solids`."""
+    """Every part of the LandCruiser, by the ids of data/ute/ute.yaml's `solids`. plain=True builds the drawings'
+    version: straight tubes, the coils as cylinders, no tread and no wheel nuts."""
+    if plain:
+        # the drawings' LandCruiser: its outline at A3, without the parts too small to read at 1:50 and with the bull
+        # bar, the rails and the wheels as the sheets' blocks, because hidden-line removal is slow on fine detail
+        x0, zt = -V["front_overhang"] - 80, V["frame_top_z"]
+        drop = {"door handles, mirror bases and roof gutters", "bonnet scoop's intake", "grille slats", "winch"}
+        with kit.straight():
+            parts = {k: [p for p in v if p[0] not in drop] for k, v in build(V).items()}
+        parts["BAR"] = [("bar", box_span(x0, x0 + 120, -HALF_W - 20, HALF_W + 20, 380, 1030), BAR, 1.0)]
+        yo, yi = V["frame_w"] / 2, V["frame_w"] / 2 - V["rail_w"]
+        parts["FRAME"] = [("rails", kit.fuse([box_span(V["frame_x0"], V["frame_x1"], *sorted((s * yi, s * yo)), zt - V["rail_h"], zt)
+                                              for s in (1, -1)]), CHASSIS, 1.0)]
+        parts["FAXLE"] = front_axle(V, plain=True)
+        parts["SPARE"] = spare(V, plain=True)
+        return parts
     return {"CAB": cab(V), "FRONT": front(V), "BAR": bull_bar(V), "FRAME": frame(V), "FAXLE": front_axle(V),
-            "RAXLE": rear_axle(V), "TANK": tank(V), "TOWBAR": towbar(V), "SPARE": spare(V, plain)}
+            "RAXLE": rear_axle(V), "TANK": tank(V), "TOWBAR": towbar(V), "SPARE": spare(V)}
 
 
 def place_wheel(shape, centre, outward_y):

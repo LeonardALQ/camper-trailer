@@ -33,11 +33,27 @@ def fuse(parts):
     return parts[0].fuse(*parts[1:]) if len(parts) > 1 else parts[0]
 
 
+SWEEP = [True]          # tube() sweeps round bends; straight() turns it off for the drawings, whose hidden-line removal
+                        # is slow on swept surfaces
+
+
+class straight:
+    """Within `with straight():` every tube is straight cylinders end to end, for the drawings."""
+
+    def __enter__(self):
+        SWEEP.append(False)
+
+    def __exit__(self, *exc):
+        SWEEP.pop()
+
+
 def tube(points, r, round_ends=False):
     """Round bar through the points: a circle swept along the polyline with round bends, as a bent tube is. If OCCT
     cannot sweep the path, the bar is straight segments with a ball at every bend, the balls 5 % larger than the bar so
-    that they cut it cleanly instead of meeting it tangentially."""
+    that they cut it cleanly instead of meeting it tangentially. Inside `straight()` it is the straight segments alone."""
     pts = [points[0]] + [p for a, p in zip(points, points[1:]) if math.dist(a, p) > 0.5]
+    if not SWEEP[-1]:
+        return fuse([cyl(a, b, r) for a, b in zip(pts, pts[1:])])
     if len(pts) > 2:
         try:
             from build123d import Circle, Transition, sweep
@@ -122,10 +138,11 @@ def moto_tyre(D, W, rim_r, bead_w, knob=0.0, n=40):
 
 
 @lru_cache(maxsize=None)
-def truck_tyre(D, W, rim_r, bead_w, depth=13.0, n=44):
+def truck_tyre(D, W, rim_r, bead_w, depth=13.0, n=36, tread=True):
     """Light-truck all-terrain tyre: a square-shouldered carcass with its sidewalls, and five rows of tread blocks, the
     two inner rows and the centre row staggered half a pitch, and shoulder rows that run down onto the sidewall. The
-    tread tops reach the overall diameter and a block sits at the bottom. A compound of the carcass and its rows."""
+    tread tops reach the overall diameter and a block sits at the bottom. A compound of the carcass and its rows, or with
+    tread=False the carcass alone, for the drawings."""
     from build123d import Compound
     R = D / 2
     rc = R - depth                       # carcass at the tread's base
@@ -134,6 +151,8 @@ def truck_tyre(D, W, rim_r, bead_w, depth=13.0, n=44):
     prof = [(rim_r - 3, -(bw - 10)), (rim_r + 20, -(bw + 6)), (rim_r + 0.45 * h, -w), (rc - 22, -w), (rc - 4, -w + 14), (rc, -w + 40),
             (rc, w - 40), (rc - 4, w - 14), (rc - 22, w), (rim_r + 0.45 * h, w), (rim_r + 20, bw + 6), (rim_r - 3, bw - 10)]
     carcass = lathe(prof)
+    if not tread:
+        return carcass
     rows = [tread_ring(rc - 3, R, -0.06 * W, 0.06 * W, n, 0.55)]
     for s in (1, -1):
         z0, z1 = sorted((s * 0.09 * W, s * 0.27 * W))
