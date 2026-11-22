@@ -466,13 +466,18 @@ FP_AREAS = {"bed": "BED AND DESK", "kit": "KITCHEN", "lau": "LAUNDRY", "wet": "W
 S.Sheet.STY.update({"kept": 'fill="#f2f2f2" stroke="none"', "cutface": 'fill="#e0e0e0" stroke="#000" stroke-width="0.25"'})
 
 
+def _crossed(b, segs, pad):
+    from ..floorplan import _crossed as crossed
+    return crossed(b, segs, pad)
+
+
 def _fp_free(placed, b, pad=0.4) -> bool:
     return not any(b[0] < q[2] + pad and q[0] < b[2] + pad and b[1] < q[3] + pad and q[1] < b[3] + pad for q in placed)
 
 
-def _fp_text(sh, placed, x, y, s, size, anchor="middle", rot=0, bold=False, color="#000", inside=None) -> bool:
-    """Write a text where its box is clear of the texts already placed and, if `inside` is given, within that sheet
-    rectangle. Records the box and returns whether it was written."""
+def _fp_text(sh, placed, x, y, s, size, anchor="middle", rot=0, bold=False, color="#000", inside=None, avoid=()) -> bool:
+    """Write a text where its box is clear of the texts already placed and of the dashed lines `avoid`, and, if
+    `inside` is given, within that sheet rectangle. Records the box and returns whether it was written."""
     w = S.text_mm(s, size, bold)
     if rot:                          # turned to read upward: the letters lie to the left of (x, y)
         b = (x - 0.75 * size, y - w / 2, x + 0.2 * size, y + w / 2)
@@ -482,6 +487,8 @@ def _fp_text(sh, placed, x, y, s, size, anchor="middle", rot=0, bold=False, colo
     if inside is not None and not (b[0] >= inside[0] and b[1] >= inside[1] and b[2] <= inside[2] and b[3] <= inside[3]):
         return False
     if not _fp_free(placed, b):
+        return False
+    if avoid and _crossed(b, avoid, pad=0.3):
         return False
     sh.text(x, y, s, size, anchor, rot=rot, bold=bold, color=color)
     placed.append(b)
@@ -576,17 +583,29 @@ def _fp_rect(pr, q):
     return pr.rect3((x0, y0, 0, x1, y1, 0))
 
 
+def _fp_slide(sh, placed, x, y, s, sizes, avoid, bold=False, span=20.0):
+    """Write a text at the first X from x outward, up to span mm either way on the sheet, and the first of the sizes,
+    where it is clear of the other texts and the dashed lines."""
+    for size in sizes:
+        for k in range(0, int(span) * 2 + 1):
+            dx = (k + 1) // 2 * (1 if k % 2 else -1) * 0.5
+            if _fp_text(sh, placed, x + dx, y, s, size, bold=bold, avoid=avoid):
+                return True
+    return False
+
+
 def _fp_labels(sh, P, pr, lay, placed):
-    """The area names, the notes, the marks of the spaces kept clear and each visible part's short name."""
-    from ..floorplan import FLOOR_TOP, NOLABEL
+    """The area names, the notes, the marks of the spaces kept clear and each visible part's short name, each clear of
+    the other texts and of the dashed outlines of the parts above the plane and under the lowered bed."""
+    from ..floorplan import FLOOR_TOP, NOLABEL, bed_above, dashed_lines
     V = lay.V
     st = P["stations"]
-    bed_up = any(q["kind"] == "above" and q["system"] == "bed" for q in P["parts"])
+    dashes = [(pr.p(*a), pr.p(*b)) for a, b in dashed_lines(P)]
     for key, x, y in (("bed", (st[0] + st[1]) / 2 + 150, -V["half_in"] + 200), ("kit", 4400.0, P["aisle"][3] - 218),
                       ("lau", 4400.0, P["aisle"][1] + 120), ("wet", (st[2] + st[3]) / 2, V["half_in"] - 218)):
         q = pr.p(x, y)
-        _fp_text(sh, placed, q[0], q[1], FP_AREAS[key], 1.7, bold=True)
-    notes = [("BED ABOVE, DASHED", (st[0] + st[1]) / 2 + 300, 760.0)] if bed_up else []
+        _fp_slide(sh, placed, q[0], q[1], FP_AREAS[key], (1.7, 1.45), dashes, bold=True)
+    notes = [("BED ABOVE, DASHED", (st[0] + st[1]) / 2 + 300, 760.0)] if bed_above(P) else []
     if P.get("shower"):
         notes.append(("SHOWER", (P["shower"][0] + P["shower"][2]) / 2, 430.0))
     for b, t in (("LA-11B", "BENCH"), ("LA-14F", "PLINTH")):
@@ -596,7 +615,7 @@ def _fp_labels(sh, P, pr, lay, placed):
             notes.append((t, (x0 + x1) / 2 + 60, y0 + 70 if b == "LA-11B" else y1 - 200))
     for t, x, y in notes:
         q = pr.p(x, y)
-        _fp_text(sh, placed, q[0], q[1], t, 1.25)
+        _fp_slide(sh, placed, q[0], q[1], t, (1.25,), dashes, span=8.0)
     solid = [_fp_rect(pr, q) for q in P["parts"] if q["kind"] != "above" and q["top"] > P["floor_z"] + FLOOR_TOP]
     for c in P["clear"]:                 # each mark in the first corner of its space clear of the parts and the texts
         r = _fp_rect(pr, c)
@@ -613,10 +632,24 @@ def _fp_labels(sh, P, pr, lay, placed):
         if not _fp_free([_fp_rect(pr, o) for o in shown[n + 1:]], inner, -0.1):
             continue
         s, cx, cy = _fp_name(q), (r[0] + r[2]) / 2, (r[1] + r[3]) / 2
-        for size in (1.3, 1.2, 1.1, 1.0):
-            if _fp_text(sh, placed, cx, cy - 0.36 * size, s, size, inside=inner) or \
-                    _fp_text(sh, placed, cx + 0.36 * size, cy, s, size, rot=-90, inside=inner):
-                break
+        _fp_part_name(sh, placed, s, cx, cy, inner, dashes)
+
+
+def _fp_part_name(sh, placed, s, cx, cy, inner, dashes):
+    """A part's name inside its outline: upright, or turned to read upward, from the middle outward, at the first size
+    that fits clear of the other texts and the dashed lines."""
+    rx, ry = (inner[2] - inner[0]) / 2, (inner[3] - inner[1]) / 2
+    steps = sorted(((fx, fy) for fx in _STEPS for fy in _STEPS), key=lambda f: abs(f[0]) + abs(f[1]))
+    for size in (1.3, 1.2, 1.1, 1.0):
+        for fx, fy in steps:
+            x, y = cx + fx * rx, cy + fy * ry
+            if _fp_text(sh, placed, x, y - 0.36 * size, s, size, inside=inner, avoid=dashes) or \
+                    _fp_text(sh, placed, x + 0.36 * size, y, s, size, rot=-90, inside=inner, avoid=dashes):
+                return True
+    return False
+
+
+_STEPS = (0.0, 0.25, -0.25, 0.5, -0.5, 0.75, -0.75)
 
 
 def _fp_dims(sh, P, pr, V, placed):

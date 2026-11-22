@@ -431,6 +431,28 @@ class _Svg:
 
 
 NOLABEL = ("WR-01", "EL-01", "EL-02", "LA-14F", "LB-02", "LB-03", "LB-04")   # floors, covered boxes and the bed's layers
+BED_LINES = ("LB-01", "LB-02", "LB-03")   # the bed itself: the mattress, its underlay and the platform, not its drive
+
+
+def bed_above(p) -> bool:
+    """Whether the bed lies wholly above the plan's cut, as it does by day: the mattress, the underlay and the
+    platform all above. At night the plane cuts the mattress."""
+    return any(q["id"] in BED_LINES for q in p["parts"]) and all(q["kind"] == "above" for q in p["parts"] if q["id"] in BED_LINES)
+
+
+def _clear_x(s, x, y, size, span, placed, dashes):
+    """The X nearest to x, within span, where the name at height y keeps 20 mm from the other texts and clear of the
+    dashed lines, at its size or 15 % smaller. The given x and size if there is none."""
+    for sz in (size, 0.85 * size):
+        half = text_w(s, sz) / 2
+        xs = [x] + [x + d * k for k in range(1, 80) for d in (25.0, -25.0)]
+        for cx in xs:
+            if cx - half < span[0] + 30 or cx + half > span[1] - 30:
+                continue
+            bx = _label_box(cx, y, s, sz)
+            if not any(_overlaps(bx, o, 20) for o in placed) and not _crossed(bx, dashes):
+                return cx, sz
+    return x, size
 
 
 def _overlaps(a, b, pad=0.0) -> bool:
@@ -443,37 +465,120 @@ def _label_box(x, y, s, size, rot=False):
         (x - w / 2, y - 0.2 * size, x + w / 2, y + 0.8 * size)
 
 
-def _place_labels(g, p, placed):
-    """Each part below the cut named inside its outline where the name fits, nothing covers it and no other text is
-    there, upright or turned for a tall narrow part."""
+def _place_labels(g, p, placed, dashes):
+    """Each part below the cut named inside its outline where the name fits, nothing covers it, no other text is there
+    and no dashed outline of a part above crosses it, upright or turned for a tall narrow part. The name slides along
+    the part's longer side to find such a place. Returns the parts named."""
     shown = [q for q in p["parts"] if q["kind"] != "above"]
+    named = set()
     for n, q in enumerate(shown):
         if q["id"] in NOLABEL:
             continue
-        xs = [x for lp in q["outline"] for x, _ in lp]
-        ys = [y for lp in q["outline"] for _, y in lp]
-        x0, y0, x1, y1 = min(xs), min(ys), max(xs), max(ys)
-        if any(_overlaps((x0 + 5, y0 + 5, x1 - 5, y1 - 5), (min(x for lp in r["outline"] for x, _ in lp),
-                                                         min(y for lp in r["outline"] for _, y in lp),
-                                                         max(x for lp in r["outline"] for x, _ in lp),
-                                                         max(y for lp in r["outline"] for _, y in lp)))
-               for r in shown[n + 1:]):
+        x0, y0, x1, y1 = _extent(q["outline"])
+        if any(_overlaps((x0 + 5, y0 + 5, x1 - 5, y1 - 5), _extent(r["outline"])) for r in shown[n + 1:]):
             continue
         s = short_name(q["iid"], q["id"], q["name"])
-        cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
         for size in (T_PART, 0.85 * T_PART):
             flat = text_w(s, size) + 60 <= x1 - x0 and 1.3 * size <= y1 - y0
             tall = text_w(s, size) + 60 <= y1 - y0 and 1.3 * size <= x1 - x0
-            if flat or tall:
-                bx = _label_box(cx, cy - 0.3 * size, s, size) if flat else _label_box(cx + 0.3 * size, cy, s, size, rot=True)
-                if any(_overlaps(bx, o, 20) for o in placed):
+            spots = [(o, _free_spot(s, size, (x0, y0, x1, y1), o, placed, dashes)) for o, fits in ((True, flat), (False, tall)) if fits]
+            upright, spot = next(((o, sp) for o, sp in spots if sp is not None), (None, None))
+            if spot is None:
+                continue
+            cx, cy, bx = spot
+            placed.append(bx)
+            named.add(q["iid"])
+            if upright:
+                g.text(cx, cy - 0.35 * size, s, size, "fp-t-part")
+            else:
+                g.text(cx + 0.35 * size, cy, s, size, "fp-t-part", rot=-90)
+            break
+    return named
+
+
+def _free_spot(s, size, box, flat, placed, dashes):
+    """A centre inside the box for a name, from the middle outward, where the name keeps 20 mm from the other texts
+    and no dashed line crosses it, with the name's box. None if there is none."""
+    x0, y0, x1, y1 = box
+    cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+    w = text_w(s, size) + 60
+    rx = max(((x1 - x0) - (w if flat else 1.3 * size)) / 2, 0.0)
+    ry = max(((y1 - y0) - (1.3 * size if flat else w)) / 2, 0.0)
+    steps = sorted(((fx, fy) for fx in STEPS for fy in STEPS), key=lambda f: abs(f[0]) + abs(f[1]))
+    for fx, fy in steps:
+        x, y = cx + fx * rx, cy + fy * ry
+        bx = _label_box(x, y - 0.3 * size, s, size) if flat else _label_box(x + 0.3 * size, y, s, size, rot=True)
+        if not any(_overlaps(bx, o, 20) for o in placed) and not _crossed(bx, dashes):
+            return x, y, bx
+    return None
+
+
+STEPS = (0.0, 0.35, -0.35, 0.7, -0.7, 1.0, -1.0)   # where a name may sit, as fractions of its room either way
+
+
+def _extent(loops) -> tuple:
+    xs = [x for lp in loops for x, _ in lp]
+    ys = [y for lp in loops for _, y in lp]
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+def dashed_lines(p) -> list:
+    """The segments drawn dashed on a plan: the outlines of the parts above the cut and of those under the lowered bed."""
+    segs = []
+    for q in p["parts"]:
+        if q["kind"] == "above" or q.get("under"):
+            for lp in q["outline"]:
+                segs += list(zip(lp, lp[1:] + lp[:1]))
+    return segs
+
+
+def _crossed(bx, segs, pad=15.0) -> bool:
+    """Whether any segment passes through the box, grown by pad (Liang and Barsky's clip)."""
+    x0, y0, x1, y1 = bx[0] - pad, bx[1] - pad, bx[2] + pad, bx[3] + pad
+    for (ax, ay), (bx_, by) in segs:
+        if max(ax, bx_) < x0 or min(ax, bx_) > x1 or max(ay, by) < y0 or min(ay, by) > y1:
+            continue
+        dx, dy = bx_ - ax, by - ay
+        t0, t1 = 0.0, 1.0
+        for pk, qk in ((-dx, ax - x0), (dx, x1 - ax), (-dy, ay - y0), (dy, y1 - ay)):
+            if pk == 0:
+                if qk < 0:
                     break
-                placed.append(bx)
-                if flat:
-                    g.text(cx, cy - 0.35 * size, s, size, "fp-t-part")
-                else:
-                    g.text(cx + 0.35 * size, cy, s, size, "fp-t-part", rot=-90)
-                break
+                continue
+            t = qk / pk
+            if pk < 0:
+                t0 = max(t0, t)
+            else:
+                t1 = min(t1, t)
+        else:
+            if t0 <= t1:
+                return True
+    return False
+
+
+LEADERS = ("EL-04",)   # lines named beside their outline, with a leader, where the name does not fit inside it
+
+
+def _leader_labels(g, p, placed, dashes, named):
+    """The lines in LEADERS that are drawn but not named inside their outline, named beside it with a leader line from
+    the outline's edge, in the first place round it that is clear of the other texts and the dashed lines."""
+    for q in p["parts"]:
+        if q["id"] not in LEADERS or q["iid"] in named or q["kind"] == "above":
+            continue
+        s = short_name(q["iid"], q["id"], q["name"])
+        x0, y0, x1, y1 = _extent(q["outline"])
+        w = text_w(s, T_PART)
+        cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+        for tx, ty, ex, ey in ((cx, y0 - 260, cx, y0), (cx, y1 + 200, cx, y1), (x0 - 120 - w / 2, cy, x0, cy),
+                               (x1 + 120 + w / 2, cy, x1, cy)):
+            bx = _label_box(tx, ty, s, T_PART)
+            if any(_overlaps(bx, o, 20) for o in placed) or _crossed(bx, dashes):
+                continue
+            placed.append(bx)
+            nx, ny = min(max(ex, bx[0]), bx[2]), min(max(ey, bx[1] - 15), bx[3] + 15)   # the label's nearest point
+            g.line(ex, ey, nx, ny, "fp-ext")
+            g.text(tx, ty, s, T_PART, "fp-t-part")
+            break
 
 
 def svg(p) -> str:
@@ -521,7 +626,7 @@ def svg(p) -> str:
     for q in p["parts"]:
         if q["kind"] == "above":
             dd = g.d(q["outline"])
-            g.group(q, f'fp-a-{q["area"]} fp-above' + (" fp-bedup" if q["area"] == "bed" else ""),
+            g.group(q, f'fp-a-{q["area"]} fp-above' + (" fp-bedup" if q["id"] in BED_LINES else ""),
                     f'<path class="fp-dash" d="{dd}"/><path class="fp-hit" d="{dd}"/>')
     g.out.append('<g class="fp-notes">')
     _notes(g, p, bx0, bx1, hb, ix0, iy0, ix1, iy1, st)
@@ -536,15 +641,17 @@ def _notes(g, p, bx0, bx1, hb, ix0, iy0, ix1, iy1, st):
     dm, ax0, ay0, ax1, ay1 = p["dims"], *p["aisle"]
     wx0, wy0, wx1, wy1 = p["walk_band"]
     placed = []
-    bed_up = any(q["kind"] == "above" and q["area"] == "bed" for q in p["parts"])
+    dashes = dashed_lines(p)
+    zones = {"bed": (st[0], st[1]), "kit": (st[1], st[2]), "lau": (st[1], st[2]), "wet": (st[2], st[3])}
     for key, x, y in (("bed", (st[0] + st[1]) / 2 + 150, iy0 + 230), ("kit", (ax0 + ax1) / 2 + 320, ay1 - 120 - 0.8 * T_AREA),
                       ("lau", (ax0 + ax1) / 2 + 320, ay0 + 120), ("wet", (st[2] + st[3]) / 2, iy1 - 120 - 0.8 * T_AREA)):
-        g.text(x, y, AREAS[key], T_AREA, f"fp-t-area fp-c-{key}")
-        placed.append(_label_box(x, y, AREAS[key], T_AREA))
-    if bed_up:                       # between the mattress's dashed edge and the desk
-        x, y = (st[0] + st[1]) / 2 + 150, iy1 - 420
-        g.text(x, y, "Bed above, dashed", T_PART, "fp-t-note")
-        placed.append(_label_box(x, y, "Bed above, dashed", T_PART))
+        x, size = _clear_x(AREAS[key], x, y, T_AREA, zones[key], placed, dashes)
+        g.text(x, y, AREAS[key], size, f"fp-t-area fp-c-{key}")
+        placed.append(_label_box(x, y, AREAS[key], size))
+    if bed_above(p):                 # between the mattress's dashed edge and the desk
+        x, size = _clear_x("Bed above, dashed", (st[0] + st[1]) / 2 + 150, iy1 - 420, T_PART, zones["bed"], placed, dashes)
+        g.text(x, iy1 - 420, "Bed above, dashed", size, "fp-t-note")
+        placed.append(_label_box(x, iy1 - 420, "Bed above, dashed", size))
     if p.get("shower"):
         x0, y0, x1, y1 = p["shower"]
         x, y = (x0 + x1) / 2, (y0 + y1) / 2 + 60
@@ -565,7 +672,8 @@ def _notes(g, p, bx0, bx1, hb, ix0, iy0, ix1, iy1, st):
     g.vdim(ax0 + 380, ay0, ay1, None, f"{dm['aisle']:,.0f} aisle", left=False)
     g.vdim(xw, wy0, wy1, None, f"{dm['walk_band']:,.0f} walk band", left=False)
     placed += [(ax0 + 340, ay0, ax0 + 480, ay1), (xw - 40, wy0, xw + 140, wy1)]
-    _place_labels(g, p, placed)
+    named = _place_labels(g, p, placed, dashes)
+    _leader_labels(g, p, placed, dashes, named)
     # openings' marks outside the walls
     for w in p["windows"]:
         x0, y0, x1, y1 = w["box"]

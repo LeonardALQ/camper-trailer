@@ -578,6 +578,26 @@ const plan = fp.models.includes(model) ? [fp.cut_mm, fp.cut_z, ...fp.body].join(
       });
     }
 
+    // The floor panel (BD-01) is see-through in the 3D view. The plan view draws it opaque, so the chassis under it does
+    // not show through as lines across the floor, and gives it back its own alpha after.
+    floorSaved: [any, number][] = [];
+
+    floorOpaque(flag: boolean) {
+      const v = this.viewer;
+      if (flag) {
+        const groups = (v.rendered?.nestedGroup ?? v.nestedGroup)?.groups ?? {};
+        this.floorSaved = Object.entries(groups)
+          .filter(([path]) => /\/BD-01 [^/]*$/.test(path))
+          .map(([, g]: [string, any]) => [g, g.alpha] as [any, number]);
+        for (const [g] of this.floorSaved) g.alpha = 1;
+      } else {
+        for (const [g, a] of this.floorSaved) g.alpha = a;
+      }
+      for (const [g] of this.floorSaved) g.setTransparent(g.transparent);
+      if (!flag) this.floorSaved = [];
+      v.update(true, false);
+    }
+
     clipOn(flag: boolean) {
       const v = this.viewer;
       v.setLocalClipping(flag);
@@ -610,6 +630,7 @@ const plan = fp.models.includes(model) ? [fp.cut_mm, fp.cut_z, ...fp.body].join(
       v.setClipIntersection(false);
       v.setClipObjectColorCaps(true);
       this.clipOn(true);
+      this.floorOpaque(true);
       this.planOn = true;
       this.planBtn.textContent = '3D view';
       this.planBtn.setAttribute('aria-pressed', 'true');
@@ -623,6 +644,7 @@ const plan = fp.models.includes(model) ? [fp.cut_mm, fp.cut_z, ...fp.body].join(
       [0, 1, 2].forEach((i) => v.setClipNormal(i, s.normals[i], s.sliders[i]));
       v.setClipIntersection(s.intersection);
       v.setClipObjectColorCaps(s.caps);
+      this.floorOpaque(false);
       if (v.state.get('activeTab') !== 'clip') this.clipOn(false);
       const c = s.camera;
       v.setCameraLocationSettings(c.position, c.quaternion, c.target, c.zoom);
