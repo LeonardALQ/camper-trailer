@@ -7,7 +7,7 @@ import math
 
 from build123d import Keep, Plane, RectangleRounded, Solid, Vector, extrude, split
 
-from . import ALU, BLACK, CHROME, DARK, GREY, RUBBER, STEEL, WHITE, product
+from . import ALU, BLACK, CHROME, DARK, GREY, RUBBER, STEEL, WHITE, Frame, product
 
 GALV = "#a6acaf"
 HONDA = "#c0392b"
@@ -113,15 +113,50 @@ def jockey(fr, V, sp, b):
             ("axle", fr.cyl((W - 100, 30, w), (W - 100, D, w), 10), STEEL, 1.0)]
 
 
+STEADY_BRACKET = 117.0      # ARK's chassis mount bracket along the fold (data/chassis/chassis.yaml `steadies`)
+
+
+def _steady_frame(fr):
+    """The folded steady's frame: u along the fold from the bracket's end, v across, w up. The envelope's long side is
+    the fold. A fold across the trailer has its bracket at the outboard end, a fold along it at the rear end, as
+    data/chassis/chassis.yaml places the pairs (the front pair folds inboard, the rear pair forward)."""
+    x0, y0, _, x1, y1, _ = fr.bx
+    if x1 - x0 >= y1 - y0:
+        return Frame(fr.bx, "+y")                       # u runs forward from the rear end
+    return Frame(fr.bx, "+x" if y0 + y1 < 0 else "-x")  # u runs inboard from the outer end
+
+
 @product("ark_steady")
 def steady(fr, V, sp, b):
-    """ARK XO DDS650 drop-down corner steady, wound up for travel: the top plate bolted under the rail and to its
-    bracket, the outer leg, the wind-down nut and the foot pad (ARK)."""
+    """ARK XO DDS650 drop-down corner steady folded flat at 0 degrees for travel (ARK's XO fitting guide, RTC614 V1
+    1/21): ARK's chassis mount bracket welded under the rail, the head and its locking handle in the bracket on two
+    8 mm bolts at 78 mm centres, the 19 mm hex drive, the outer and inner legs along the fold and the foot plate at the
+    leg's end."""
+    f = _steady_frame(fr)
+    W, D, H = f.W, f.D, f.H
+    L, c = STEADY_BRACKET, D / 2
+    bracket = f.box(0, 0, H - 35, L, D, 35) - f.box(-1, 5, H - 36, L + 2, D - 10, 31)
+    out = [("chassis mount bracket, welded under the rail", bracket, GALV, 1.0),
+           ("head", f.box(12, 5, H - 95, L - 24, D - 10, 90), STEEL, 1.0),
+           ("locking handle", f.box(L - 12, c - 10, H - 80, 20, 20, 20), BLACK, 1.0),
+           ("hex drive, 19 mm", f.cyl_u(c, H - 65, 11, 1, 12), STEEL, 1.0),
+           ("outer leg", f.box(L - 12, c - 30, H - 95, W - 160 - L, 60, 60), GALV, 1.0),
+           ("inner leg", f.box(W - 172, c - 25, H - 90, 147, 50, 50), GALV, 1.0),
+           ("foot plate", f.box(W - 25, 0, 0, 15, D, H - 30), GALV, 1.0)]
+    for u in (L / 2 - 39, L / 2 + 39):
+        out.append(("8 mm bolt", f.cyl_v(u, H - 20, 4, 0, D), CHROME, 1.0))
+    return out
+
+
+@product("ark_steady_use")
+def steady_use(fr, V, sp, b):
+    """The same steady locked at 90 degrees for use, wound down to the ground at design ride height: the outer leg
+    hanging from the head, the inner leg out of it and the foot plate flat on the ground (ARK's guide: the rated and
+    only jacking position). Drawn see-through beside the folded steady on the chassis model."""
     W, D, H = fr.W, fr.D, fr.H
-    return [("top plate", fr.box(0, 0, H - 8, W, D, 8), GALV, 1.0),
-            ("outer leg", fr.box(W / 2 - 30, D / 2 - 30, 10, 60, 60, H - 18), GALV, 1.0),
-            ("wind-down nut", fr.cyl_w(W / 2, D / 2, 18, H - 30, H - 8), STEEL, 1.0),
-            ("foot pad", fr.box(W / 2 - 55, 0, 0, 110, D, 10), GALV, 1.0)]
+    return [("outer leg at 90 degrees", fr.box(W / 2 - 30, D / 2 - 30, H - 365, 60, 60, 365), GALV, 0.35),
+            ("inner leg at 90 degrees", fr.box(W / 2 - 25, D / 2 - 25, 15, 50, 50, H - 380), GALV, 0.35),
+            ("foot plate on the ground", fr.box(0, 0, 0, W, D, 15), GALV, 0.35)]
 
 
 @product("d_ring")

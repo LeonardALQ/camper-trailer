@@ -1,6 +1,6 @@
 # Body: design (planning level)
 
-Status: proposal, revision C of 21 Nov 2026, updated 22 Nov 2026 for the fit-out's supports (H27) and BD-11's routed runs (H28). DRAFT, not for construction until the engineer reviews it. This is the body's design basis as report 02 asks: the panels, the load cases with their criteria and sources, the joints, the mounting, the twist sharing, the roof, the openings, the results and what the engineer must check. It starts from research report 12 and changes it only where a check failed or the layout asks for it. The data is `data/body/body.yaml`, the checks `cad/body.py`, the solids `cad/body_model.py`, and the mass lines are in `data/assemblies/trailer.yaml`. Drawings CT-201 (shell), CT-202 (joints), CT-203 (insert map) and CT-301 (body to chassis) show it.
+Status: proposal, revision C of 21 Nov 2026, updated 22 Nov 2026 for the fit-out's supports (H27), BD-11's routed runs (H28) and the floor round its cut-outs (BDY-26). DRAFT, not for construction until the engineer reviews it. This is the body's design basis as report 02 asks: the panels, the load cases with their criteria and sources, the joints, the mounting, the twist sharing, the roof, the openings, the results and what the engineer must check. It starts from research report 12 and changes it only where a check failed or the layout asks for it. The data is `data/body/body.yaml`, the checks `cad/body.py`, the solids `cad/body_model.py`, and the mass lines are in `data/assemblies/trailer.yaml`. Drawings CT-201 (shell), CT-202 (joints), CT-203 (insert map) and CT-301 (body to chassis) show it.
 
 ## What changed in revision C, 21 Nov 2026
 
@@ -66,7 +66,7 @@ Under the body's share of LC5a the shear flow in a joiner leg's bond is 0.86 N/m
 The body bolts to the chassis through the EPDM-faced HDPE bearer strip at every station: one bolt into each raiser and one into each outrigger tip, 32 mounts at the 8 stations. The body is not bonded to the steel (report 12 option B).
 
 - Each mount is an M12 8.8 hot-dip galvanised bolt into a 10 mm nut plate, 80 x 44 mm, welded inside the raiser or the outrigger tip before galvanising (CH-P14). On the floor it bears on a bonded 100 x 100 x 3 mm aluminium spreader over a high-density PVC insert and a GRP crush tube.
-- The worst bolt carries 6.08 kN of tension under LC5a, with TC2's 1,632 kg of body and contents scaled by 1.127 to the plate, 1,839 kg. The bolt works at 0.26 of a third of its ultimate tension, the plate at 0.14 in bending, its welds at 0.09 and the floor's pull-through at 0.11 (BDY-16). Shear is 0.45 kN per bolt in LC3 braking.
+- The worst bolt carries 6.07 kN of tension under LC5a, with TC2's 1,638 kg of body and contents scaled by 1.129 to the plate, 1,848 kg. The bolt works at 0.26 of a third of its ultimate tension, the plate at 0.14 in bending, its welds at 0.09 and the floor's pull-through at 0.11 (BDY-16). Shear is 0.45 kN per bolt in LC3 braking.
 - Report 12's Lindapter Hollo-Bolt HB10 would work at 0.72 of its 8.5 kN safe load, so the nut plate is the design.
 
 The tension comes from the body holding the chassis against its own twist, so it is real only while the body stays stiff. A weighed and pull-tested sample replaces these planning numbers.
@@ -81,9 +81,9 @@ The frame model takes the body as a torsion box on the centreline, tied at every
 |---|---|---|---|---|---|
 | Bare chassis (the chassis checks) | 0.377 degree | 0 | | | 75 MPa |
 | Body, roof joint neglected | 0.350 degree | 6 % | 0.1 kNm | 2.9 kN | 69 MPa |
-| Body, bonded roof (the design) | 0.008 degree | 98 % | 8.3 kNm | 6.55 kN, 6.08 kN after its 1 g share of weight | 51 MPa |
+| Body, bonded roof (the design) | 0.008 degree | 98 % | 8.3 kNm | 6.54 kN, 6.07 kN after its 1 g share of weight | 51 MPa |
 
-The bonded body takes almost all the twist. The closed box loads the mounts and joints most, so the body checks use it, and the chassis checks keep the bare frame, which carries 121 MPa at worst in LC5b without the body's help.
+The bonded body takes almost all the twist. The closed box loads the mounts and joints most, so the body checks use it, and the chassis checks keep the bare frame, which carries 114 MPa at worst in LC5b without the body's help.
 
 ## The rear wall as a diaphragm
 
@@ -126,6 +126,14 @@ The roof is one 40 mm sandwich panel, 10.6 m², bonded into the roof-to-wall joi
 
 Glands of 60 mm or less are not openings. G2's 310 x 120 mm box of inlets is larger, so it counts as one. Where an opening crosses a chassis station, its outrigger-tip mount moves inboard of the frame and the floor joiner runs unbroken.
 
+## The floor's cut-outs
+
+Three cut-outs in the floor are over 60 mm, the services' Roxtec transit frames (data/services.yaml `cutouts`, review I2-27): G9, 38 x 98 mm at X 3,392 between the chair space and the aisle, G15, 188 x 68 mm at X 5,067 under the MultiPlus-II, and G20, 164 x 118 mm at X 5,095 under the plinth's end slot. G9 and G15 sit inboard of the road raiser, 23 mm and 6 mm from its bearer strip. G20 lies over the kerb raiser and takes away 44 mm of its 50 mm bearer strip over its 164 mm length. TRAILER.md open point 11 assumes a high-density insert round each cut-out. The design makes it Divinycell H200, 30 mm wide round the cut-out (est.), wide enough for the frame's 8 mm rim and its screws, laid into the core by the floor maker, at Diab's minimum 3.2 MPa in shear and 4.5 MPa in compression. Every cut-out's corners are radiused 10 mm (est.).
+
+BDY-26 checks the floor round each one with BDY-03's foot standing beside it and BDY-04's 160 kg/m², both at 3 g on the one-way span between the raisers. The strip under the foot loses the cut-out's length from its effective width, and the skins and the insert at the cut-out's edge take Kirsch's 3.0, the factor of a round hole in a plate, a lower bound for a radiused rectangular cut-out that its bonded frame and insert stiffen (est.). The H80 at the insert's outer edge takes the same field fallen off as Kirsch's solution falls, the cut-out taken as a hole of half its mean side. Where G20 takes the bearer strip away, the floor bridges the gap along the raiser with a foot at its middle and bears on the insert at the gap's ends. G20 governs, at 0.67, with the insert in shear while it bridges the gap. G15 works at 0.51 and G9 at 0.31, both on the H80 beyond the insert. The criteria are BDY-03's: skins at half their ultimate and half the wrinkling stress, cores at half their shear strength and bearing at half the compressive strength.
+
+The chassis's holes under G20 (CHASSIS.md, CHS-10) need its raiser-space cables to leave the kerb raiser through its inner web, so the services move the frame's raiser cells inboard of the raiser, which gives the floor its full bearing there again.
+
 ## Mass
 
 | Line | Item | Mass | Basis | With growth |
@@ -152,6 +160,7 @@ The solar panels are in the roof group, the wet room tray in the wet room group,
 |---|---|---|---|
 | BDY-03 | Floor under a foot, with bearing | Skin 22.6 MPa, bearing 0.20 of 0.70 MPa | 0.31 |
 | BDY-04 | Floor edge between outriggers 900 mm apart | Core 0.076 MPa | 0.13 |
+| BDY-26 | Floor round its three cut-outs with their H200 inserts, and its bearing on the raisers | G20's insert in shear, 1.07 MPa of 1.60 MPa | 0.67 |
 | BDY-06 | Side wall, 2,000 mm, in the ultimate wind, 1.01 kPa | Skin 10.0 MPa, member 39 MPa of 73 MPa | 0.53 |
 | BDY-07 | Fixed roof with the solar array, 3 g | Skin 3.6 MPa | 0.14 |
 | BDY-09 | Roof deflection at 1 g (reported) | 5.5 mm of 15.8 mm | |
@@ -159,7 +168,7 @@ The solar panels are in the roof group, the wet room tray in the wet room group,
 | BDY-11 | Lift-bed rail screws, awning bolts in travel and with the canopy open | 0.12 kN of 1.50 kN, 0.32 kN of 10.0 kN | 0.08 |
 | BDY-13 | Body share of LC5a (reported) | 98 % with the bonded roof, 6 % without | |
 | BDY-14 | Skins and bonded joints in twist | 0.86 N/mm of 22.5 N/mm | 0.04 |
-| BDY-16 | Body mounts, M12 into nut plates | 6.08 kN of 23.3 kN | 0.26 |
+| BDY-16 | Body mounts, M12 into nut plates | 6.07 kN of 23.3 kN | 0.26 |
 | BDY-18 | Opening spacing, 18 openings | Every rule met, the tightest by 0 mm | |
 | BDY-19 | Roof-to-wall joint in a 40 m/s uplift | 0.37 N/mm of 30 N/mm | 0.01 |
 | BDY-20 | Rear wall with its door, as the rear diaphragm | 1.21 N/mm of 22.5 N/mm | 0.05 |
@@ -180,6 +189,7 @@ The solar panels are in the roof group, the wet room tray in the wet room group,
 6. The inserts and hardpoints, by pull tests, above all the lift-bed rail screws, the awning's roof bolts and the outdoor unit's cradle bolts, and the cradle's stays and their feet.
 7. The wall members' bond to the inner skin, which carries their share of the wind and the bed's rail loads, their blocks and spigots at the joiners, the plate model of the walls with their openings (BDY-24, BDY-25), and the cold-surface model (BDY-22), for example by a thermal image of a finished wall on a cold night.
 8. The skin data (woven roving at 14 GPa and 200 MPa, XPS shear strength 0.25 MPa), which no maker publishes for these panels.
+9. The floor round its three cut-outs (BDY-26): the H200 inserts' width, the stress concentration at the radiused corners, and the floor's bearing on the kerb raiser beside G20 while the frame lies over it.
 
 ## Assumptions made for the design
 

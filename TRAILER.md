@@ -10,15 +10,15 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 |---|---|
 | Body | 4,420 x 2,400 mm outside, X 1,820 to 6,240. Inside 4,350 x 2,330 x 2,000 mm, floor at Z 925 |
 | Overall | 6,700 mm long, 2,470 mm wide over the entry door's handle, 3,078 mm high over the awning case |
-| Tare | 2,633 kg, 2,891 kg with the growth allowance |
-| Fully loaded with 295 L of water (TC2) | 3,107 kg, 3,399 kg with growth, against the 3,500 kg plate |
-| Towball | 250 to 292 kg, 8.1 to 10.3 % of the trailer, at most 316.7 kg with growth |
+| Tare | 2,627 kg, 2,885 kg with the growth allowance |
+| Fully loaded with 295 L of water (TC2) | 3,102 kg, 3,393 kg with growth, against the 3,500 kg plate |
+| Towball | 250 to 292 kg, 8.1 to 10.3 % of the trailer, at most 316.4 kg with growth |
 | Ute | Rear axle 2,649 kg with growth against its 2,800 kg plate. Combination 7,178 kg against 7,400 kg, the ute with growth plus the plate |
 | Battery | 25.6 kWh. A design hot day runs 25.1 h when new and 17.2 h at end of life |
 | Water | 420 L fresh, at most 295 L in travel, about 41 L a day. 130 L grey |
-| Cost | AUD 196,268 with contingency, built by Leonard (H26) |
+| Cost | AUD 196,181 with contingency, built by Leonard (H26) |
 
-Every fail check passes. The tightest are the fully loaded mass with growth (MAS-10, 3,398.9 kg against the 3,400 kg target), the towball share with the grey tank full (MAS-12, 8.1 % against 8.0 %), the heaviest towball (MAS-13, 316.7 kg against 320 kg) and the recovery pull in the road-side rail (CHS-08A, 0.91 of yield).
+Every fail check passes. The tightest are the fully loaded mass with growth (MAS-10, 3,392.7 kg against the 3,400 kg target), the towball share with the grey tank full (MAS-12, 8.1 % against 8.0 %), the heaviest towball (MAS-13, 316.4 kg against 320 kg) and the recovery pull in the kerb-side rail (CHS-08A, 0.91 of yield).
 
 ## Layout
 
@@ -37,28 +37,28 @@ Storage is 0.38 m³ inside and 0.09 m³ in the drawbar box, about 0.2 m³ short 
 
 ## Mass and limits
 
-Masses in kg. The towball comes from moments about the axle group centre at X 4,380.5 mm. "With growth" adds 20 % to an estimate, 7 % to a calculated mass and nothing to a maker's figure (report 02, MASS-06). CT-002 shows each case's centre of gravity.
+Masses in kg. The towball comes from moments about the axle group centre at X 4,377.5 mm. "With growth" adds 20 % to an estimate, 7 % to a calculated mass and nothing to a maker's figure (report 02, MASS-06). CT-002 shows each case's centre of gravity.
 
 | Case | Aboard | Mass | Towball | Share | With growth | Towball with growth |
 |---|---|---|---|---|---|---|
-| TC1 Tare | Nothing | 2,633 | 254.8 | 9.7 % | 2,891 | 273.6 |
-| TC2 Fully loaded | 295 L fresh, fuel, 150 kg of gear | 3,107 | 291.6 | 9.4 % | 3,399 | 316.7 |
-| TC3 Highway | 50 L, fuel, gear | 2,862 | 289.9 | 10.1 % | 3,154 | 315.0 |
-| TC4 Water, no gear | 295 L, fuel | 2,957 | 272.2 | 9.2 % | 3,219 | 293.4 |
-| TC5 Gear, no water | Fuel, gear | 2,812 | 289.6 | 10.3 % | 3,104 | 314.7 |
-| TC6 Fuel only | Fuel | 2,662 | 270.1 | 10.1 % | 2,924 | 291.3 |
-| TC7 Grey full | 165 L fresh, 130 L grey, fuel, gear | 3,107 | 251.7 | 8.1 % | 3,399 | 276.7 |
-| TC8 Grey full, fresh empty | 130 L grey, fuel, gear | 2,942 | 250.5 | 8.5 % | 3,234 | 275.6 |
+| TC1 Tare | Nothing | 2,627 | 254.7 | 9.7 % | 2,885 | 273.4 |
+| TC2 Fully loaded | 295 L fresh, fuel, 150 kg of gear | 3,102 | 291.5 | 9.4 % | 3,393 | 316.4 |
+| TC3 Highway | 50 L, fuel, gear | 2,857 | 289.8 | 10.1 % | 3,148 | 314.7 |
+| TC4 Water, no gear | 295 L, fuel | 2,952 | 272.1 | 9.2 % | 3,213 | 293.2 |
+| TC5 Gear, no water | Fuel, gear | 2,807 | 289.4 | 10.3 % | 3,098 | 314.4 |
+| TC6 Fuel only | Fuel | 2,657 | 270.1 | 10.2 % | 2,918 | 291.2 |
+| TC7 Grey full | 165 L fresh, 130 L grey, fuel, gear | 3,102 | 251.5 | 8.1 % | 3,393 | 276.4 |
+| TC8 Grey full, fresh empty | 130 L grey, fuel, gear | 2,937 | 250.3 | 8.5 % | 3,228 | 275.3 |
 
-- Plate: ATM 3,500 kg, the ute's braked towing rating and the limit of the DO35 and the chains (H2). The heaviest case with growth is 3,398.9 kg, 1.1 kg inside H2's 3,400 kg target (MAS-10). The examiner's caps from the tyres, coupling, chains and brakes are 3,500 kg (MAS-07, MAS-08).
+- Plate: ATM 3,500 kg, the ute's braked towing rating and the limit of the DO35 and the chains (H2). The heaviest case with growth is 3,392.7 kg, 7.3 kg inside H2's 3,400 kg target (MAS-10). The examiner's caps from the tyres, coupling, chains and brakes are 3,500 kg (MAS-07, MAS-08).
 - Water: at most 295 L of fresh and grey water while towing, H13's 350 L less 55 L by H21. The tanks hold 420 L and are filled at camp (H13). The grey tank travels empty, and TC7 and TC8 check the trailer with it full.
-- Towball: at least 7.5 % in every case and at most 350 kg, the 79's, the towbar's and the DO35's rating (MAS-04, H14). While the masses are estimates the axle sits in the middle of a 13.5 mm window between 8.0 % in the lightest case and 320 kg with growth in the heaviest (MAS-12, MAS-13, H17).
+- Towball: at least 7.5 % in every case and at most 350 kg, the 79's, the towbar's and the DO35's rating (MAS-04, H14). While the masses are estimates the axle sits in the middle of a 14.8 mm window between 8.0 % in the lightest case and 320 kg with growth in the heaviest (MAS-12, MAS-13, H17).
 - Ute: the heaviest towball puts the ute's rear axle at 2,649 kg with growth against the Elite kit's 2,800 kg plate (MAS-03, H18). MAS-14 reports the Platinum kit for the car build's cut CUT7.
-- GCM: the ute with growth, 3,678 kg, plus the 3,500 kg plate is 7,178 kg against Lovells' 7,400 kg (GCM-01, UTE-06, H20). If the revision is refused, Toyota's 6,900 kg needs the trailer plated at or below 3,222 kg and at most 118 L of water in travel, so the fully loaded trailer with growth stays under that plate.
-- Balance: the centre of gravity sits at most 35.3 mm to the kerb side against a 50 mm rule (MAS-11), at Z 1,232 to 1,318 mm with growth. The static stability factor is 0.61 to 0.65 on the 1,655 mm track.
+- GCM: the ute with growth, 3,678 kg, plus the 3,500 kg plate is 7,178 kg against Lovells' 7,400 kg (GCM-01, UTE-06, H20). If the revision is refused, Toyota's 6,900 kg needs the trailer plated at or below 3,222 kg and at most 124 L of water in travel, so the fully loaded trailer with growth stays under that plate.
+- Balance: the centre of gravity sits at most 35.4 mm to the kerb side against a 50 mm rule (MAS-11), at Z 1,234 to 1,320 mm with growth. The static stability factor is 0.61 to 0.65 on the 1,655 mm track.
 - Roll: with the body rolled onto its bump stops and tyres, the static rollover threshold is about 0.42 g (est., Gillespie's method), over the 0.35 g of PBS level 1 and the 0.40 g target (STB-01, STB-02). Decision H22 widened the track from 1,555 to 1,655 mm for it, through the rails. The ute with the bikes aboard has a static stability factor of 0.89 (UTE-11).
-- Sway: the yaw inertia is about 7,323 kg m² fully loaded with growth, and the towball never falls under 8.1 % of the trailer (STB-03). No snaking speed is estimated, because the published models need tyre and hitch data that are not known. The Bosch TSC brakes the trailer when it senses sway.
-- Axles: the XT build carries 3,747 kg with VSB1's 120 % rule against its 4,050 kg, and each wheel 953 kg against its 1,400 kg (MAS-02, MAS-09).
+- Sway: the yaw inertia is about 7,315 kg m² fully loaded with growth, and the towball never falls under 8.1 % of the trailer (STB-03). No snaking speed is estimated, because the published models need tyre and hitch data that are not known. The Bosch TSC brakes the trailer when it senses sway.
+- Axles: the XT build carries 3,740 kg with VSB1's 120 % rule against its 4,050 kg, and each wheel 952 kg against its 1,400 kg (MAS-02, MAS-09).
 - Parked in wind: unhitched on its corner steadies, the trailer slides on wet grass in a side gust of about 27 m/s at tare and 29 m/s fully loaded, forecast gusts of about 106 and 115 km/h, before it tips at about 30 and 33 m/s, both with the same force coefficient (STB-04, the friction est.). When a forecast gives gusts of 85 km/h or more, close the awning, and hitch the trailer to the ute, strap it down or move it. 85 km/h is the lower speed, sliding at tare, over the square root of 1.5, rounded down to 5 km/h, so the wind's force keeps a factor of 1.54 against sliding and 1.98 against tipping. A Bureau of Meteorology warning of damaging winds, 90 km/h and more, always meets it ([BoM](https://www.bom.gov.au/resources/learn-and-explore/severe-weather-knowledge-centre/severe-weather-and-coastal-hazard-warning-services)). Four rated lashing points under the outrigger ends take ratchet straps down to four Tie Down Engineering 59099 ground anchors (model M607, 3/4 in rod, 60 in, one 7 in helix), each with a Tie Down 59286 stabilizer plate on the trailer side of its rod and installed as RADCO's listing #1349 tested them, in the steps below. The listing rates the anchor at 3,922 lb (17.4 kN) working and 5,883 lb (26.2 kN) ultimate at a 45 degree pull in HUD's class 4B, "Loose sands", "firm clays" and "alluvial fills", and in the firmer classes ([Tie Down's manual with the RADCO listing](https://irp.cdn-website.com/871418b2/files/uploaded/Tie_Down_Anchor_Installation_Manual.pdf), [24 CFR 3285.202](https://www.law.cornell.edu/cfr/text/24/3285.202)). Strapped down it holds in region B's 500-year gust, 51.9 m/s at 3 m, with 14.5 kN in each windward strap at 55 degrees, 0.83 of the anchor's working load (STB-05). Where the soil reads less than 225 in-lb on the probe (step 1 below), as in class 5, "Uncompacted fill", "peat" and "organic clays", or an anchor will not wind in to its full depth, hitch the trailer or move it. The kit, 45.0 kg, rides in the ute while towing and stays with the trailer whenever the ute is unhitched for more than a day, so it is there with the ute away. No stays in the cyclonic regions C and D in the cyclone season, 1 November to 30 April ([BoM](https://www.bom.gov.au/resources/learn-and-explore/tropical-cyclone-knowledge-centre)). The walls are designed for region B's 25-year wind, which takes in the Queensland coast (H23).
 - Setting each anchor, from Tie Down's manual, pp. 4, 6 and 9:
   1. Mark the anchor's place 502 to 646 mm out from the point under its lashing point on level ground, so that the strap runs at 48 to 55 degrees to the ground. 48 degrees stays 3 degrees clear of the listing's 45 degree minimum, so ground slope and the trailer's ride height cannot take the pull under it. Probe the soil there: Tie Down's 59200 soil test probe, driven to the helix depth, about 1.50 m, must read at least 225 in-lb, the Missouri Public Service Commission's figure for the M607 ([Missouri PSC](https://psc.mo.gov/CMSInternetData/ManufacturedHousing/Anchoring%20Companies%20and%20Systems/Tie%20Down%20Engineering.pdf)).
@@ -163,11 +163,11 @@ The insert map CT-203 must be final before the panels are ordered, because the m
 
 ## Cost and where to save
 
-The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 152 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 170,709 subtotal carries AUD 25,559 (15.0 %), for AUD 196,268.
+The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 152 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 170,637 subtotal carries AUD 25,544 (15.0 %), for AUD 196,181.
 
 | Group | AUD | Group | AUD |
 |---|---|---|---|
-| Body | 38,107 | Chassis | 6,828 |
+| Body | 38,107 | Chassis | 6,756 |
 | Electrical | 26,008 | Freight and consumables | 5,310 |
 | Living area | 21,186 | Licensed electrician | 4,600 |
 | Running gear | 14,181 | Drawbar box | 4,388 |
@@ -175,7 +175,7 @@ The parts list is `data/trailer-parts.yaml` with the priced lines of the mass sc
 | Wet room | 11,627 | Roof | 2,926 |
 | Bed | 8,028 | Coupling and drawbar | 1,705 |
 | Compliance and weld evidence | 8,320 | Lamps, reflectors and the number plate | 930 |
-| Subtotal | 170,709 | Spare wheel | 736 |
+| Subtotal | 170,637 | Spare wheel | 736 |
 
 What the registration needs stays: the licensed electrician and the AS/NZS 3001.2 certificate (ELI-01, CMP-13), the refrigeration fitting in AC-03, the wheel alignment (ALN-01), the engineer's review (CMP-03) and the registration lines. The registration itself also needs papers. A concessional trailer never registered in NSW needs TfNSW's Identity Approval before the examiner can pass it (VIB 78 rule 221.04), and its application, form 5703, is rejected without clear photographs of all four sides and the drawbar, of the vehicle plate and of the VIN stamped in the frame, the weighbridge ticket, and receipts proving the origin of the materials (CMP-04). So keep every receipt for the chassis steel, the running gear, the coupling and the panels from stage B0, and photograph the trailer as AIS Notice 41 and VIB 78 ask.
 

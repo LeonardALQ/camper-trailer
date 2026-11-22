@@ -317,6 +317,20 @@ width:
     hood: "Estimate: a low hood, cowl or louvre, 30 mm proud. Ask for that depth or less when buying"
     service_door: "Estimate: the Thetford door's frame and lock"
 
+# ---------------------------------------------------------------- the floor round its cut-outs (BDY-26, review I2-27)
+# Every cut-out over 60 mm in the floor (data/services.yaml `cutouts`, the services' list: the transit frames G9, G15 and
+# G20) has a high-density insert laid into the core round it by the floor maker (TRAILER.md open point 11), wide enough
+# for the frame's 8 mm rim and its screws (est.). The skins and the insert at the cut-out's edge carry Kirsch's 3.0, the
+# factor of a round hole in a plate, a lower bound for a rectangular cut-out with its corners radiused, which the frame
+# bonded into it and its insert stiffen (est.), and the H80 beyond the insert the same field fallen off as Kirsch's
+# solution falls, the cut-out taken as a hole of half its mean side. Where a cut-out takes a raiser's bearer strip away,
+# the floor bridges the gap along the raiser, a foot at its middle, and bears on the insert at the gap's ends.
+cutouts:
+  insert: {name: "Divinycell H200", width: 30, shear: 3.20, compression: 4.50,
+           src: "Diab Divinycell H datasheet rev 26, May 2026: 464 psi shear and 653 psi compression, the minimum values"}
+  kt: 3.0
+  corner_r: 10                 # (est.) every cut-out's corners radiused 10 mm, and each frame's outer corners to suit
+
 rules:
   between_mm: 300              # full-height wall between neighbouring openings (assumption, report 12 section 5)
   edge_mm: 150                 # from an opening to a panel edge or corner
