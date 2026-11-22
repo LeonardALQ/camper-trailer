@@ -1,5 +1,7 @@
 """The home trailer's body layout sheets (TRAILER.md revision J, the H11 set), A3, third angle:
 
+CT-010: floor plans with the bed up (day and travel) and down (night), cut from the 3D model 1,000 mm above the floor
+        (cad/floorplan.py, decision H28): walkways, door swings, the spaces kept clear and the bed positions.
 CT-011: elevations of the four walls from outside with the 17 openings, their positions and each one's spacing margin.
 CT-012: sections through the bed by day and by night, through the plinth and the bench, and through the wet room, the
         shower well and the grey tank.
@@ -9,14 +11,17 @@ The views come from the layout's blocks and the body's openings (data/assemblies
 """
 from __future__ import annotations
 
+import json
 import time
 
 import yaml
 
+from ..build import BUILD
 from ..lamps import resolve as resolve_lamps
 from ..partsdb import ROOT
 from . import sheet as S
-from .home_common import MARK, Proj, ctx, label_in, opening_margins, short, textblock, title, wrap, write
+from .home_common import (DOORS, MARK, SHORT, Proj, _opening_plan, ctx, label_in, opening_margins, short, textblock, title,
+                          wrap, write)
 
 RULES = yaml.safe_load((ROOT / "data" / "body" / "body.yaml").read_text())["rules"]
 # clear openings of the Dometic S4 windows (report 19 section 7)
@@ -447,5 +452,314 @@ def ct013(prj, model, bom, checks, reg, dwg):
         "section 4, THE DUST PLAN).",
         "BOTH DOORS OPEN OUTWARD (VSB1 13.2.1). EACH HAS A FOLD-OUT STEP THAT STOWS UPRIGHT INSIDE ITS OPENING (BD-16).",
     ], size=1.45, width_chars=125)
+    write(sh, dwg)
+    return time.time() - t0
+
+
+# ------------------------------------------------------------------ CT-010 floor plan
+# Revision D draws both plans from the 3D model's plan cut (cad/floorplan.py, build/floorplan/floorplan.json), the
+# same geometry the trailer page shows: each part's outline from above, the faces the plane cuts, the walls at their
+# real thickness, the doors open with their swings, the windows and the spaces kept clear.
+FP_LEGEND = [("medium", "AN ITEM BELOW THE PLAN, ITS OUTLINE FROM ABOVE"), ("hidden", "AN ITEM ABOVE IT, OR UNDER THE BED AT NIGHT"),
+             ("phantom", "SPACE KEPT CLEAR, K1 TO K6"), ("thin", "DOOR SWING, OPEN AT 90 DEGREES")]
+FP_AREAS = {"bed": "BED AND DESK", "kit": "KITCHEN", "lau": "LAUNDRY", "wet": "WET ROOM"}
+S.Sheet.STY.update({"kept": 'fill="#f2f2f2" stroke="none"', "cutface": 'fill="#e0e0e0" stroke="#000" stroke-width="0.25"'})
+
+
+def _fp_free(placed, b, pad=0.4) -> bool:
+    return not any(b[0] < q[2] + pad and q[0] < b[2] + pad and b[1] < q[3] + pad and q[1] < b[3] + pad for q in placed)
+
+
+def _fp_text(sh, placed, x, y, s, size, anchor="middle", rot=0, bold=False, color="#000", inside=None) -> bool:
+    """Write a text where its box is clear of the texts already placed and, if `inside` is given, within that sheet
+    rectangle. Records the box and returns whether it was written."""
+    w = S.text_mm(s, size, bold)
+    if rot:                          # turned to read upward: the letters lie to the left of (x, y)
+        b = (x - 0.75 * size, y - w / 2, x + 0.2 * size, y + w / 2)
+    else:
+        x0 = x if anchor == "start" else x - w / 2 if anchor == "middle" else x - w
+        b = (x0, y - 0.2 * size, x0 + w, y + 0.75 * size)
+    if inside is not None and not (b[0] >= inside[0] and b[1] >= inside[1] and b[2] <= inside[2] and b[3] <= inside[3]):
+        return False
+    if not _fp_free(placed, b):
+        return False
+    sh.text(x, y, s, size, anchor, rot=rot, bold=bold, color=color)
+    placed.append(b)
+    return True
+
+
+def _fp_name(q) -> str:
+    return SHORT.get(q["iid"]) or SHORT.get(q["id"]) or " ".join(q["name"].split(",")[0].split()[:2]).upper()
+
+
+def _fp_loops(pr, loops):
+    return [[pr.p(x, y) for x, y in lp] for lp in loops]
+
+
+def _fp_draw(sh, P, pr, lay, res):
+    """The lines and fills of one plan: the spaces kept clear tinted, each part's outline from above in drawing order
+    (lowest top first, so a higher part covers what is under it), its cut faces, the walls cut, the windows, the doors
+    open, the parts above the plane and under the lowered bed dashed, and the other openings from the body."""
+    from ..floorplan import FLOOR_TOP
+    tinted = False
+    for q in P["parts"]:
+        if not tinted and q["top"] > P["floor_z"] + FLOOR_TOP:    # the spaces kept clear lie on the floor finishes
+            for c in P["clear"]:
+                sh.multipath(_fp_loops(pr, c["outline"]), "kept")
+            tinted = True
+        if q["kind"] == "above":
+            continue
+        sh.multipath(_fp_loops(pr, q["outline"]), "box")
+        for e in q["edges"]:
+            sh.path([pr.p(x, y) for x, y in e], "thin")
+        for f in q["cut"]:
+            sh.multipath(_fp_loops(pr, f), "cutface")
+    for w in P["walls"]:
+        for f in w["cut"]:
+            sh.multipath(_fp_loops(pr, f), "shade")
+    for w in P["windows"]:
+        x0, y0, x1, y1 = w["box"]
+        r = pr.rect3((x0, y0, 0, x1, y1, 0))
+        if not w["cut"]:
+            sh.rect(*r, "hidden")
+            continue
+        sh.fillrect(*r, "white")
+        sh.rect(*r, "thin")
+        for f in (0.35, 0.65):
+            if w["wall"] in ("kerb", "road"):
+                sh.line(r[0], r[1] + f * (r[3] - r[1]), r[2], r[1] + f * (r[3] - r[1]), "thin")
+            else:
+                sh.line(r[0] + f * (r[2] - r[0]), r[1], r[0] + f * (r[2] - r[0]), r[3], "thin")
+    for d in P["doors"]:
+        sh.path([pr.p(x, y) for x, y in d["gap"]], "white", closed=True)
+        sh.path([pr.p(x, y) for x, y in d["leaf"]], "medium", closed=True)
+        sh.path([pr.p(x, y) for x, y in d["arc"]], "thin")
+    for q in P["parts"]:
+        if q["kind"] == "above" or q.get("under"):
+            for lp in _fp_loops(pr, q["outline"]):
+                sh.path(lp, "hidden", closed=True)
+    for c in P["clear"]:
+        for lp in _fp_loops(pr, c["outline"]):
+            sh.path(lp, "phantom", closed=True)
+    for o in res["openings"]:
+        line = o.get("line") or ""
+        if not (line.startswith("WN-") or line in DOORS):
+            _opening_plan(sh, pr, lay, o, swings=False, label=False)
+
+
+def _fp_marks(sh, P, pr, lay, res, placed):
+    """Each opening's mark outside its wall, moved along the wall until it is clear of the marks already placed."""
+    V = lay.V
+    hb, x0, x1 = V["half_bw"], V["body_x0"], V["body_x1"]
+    for o in res["openings"]:
+        line = o.get("line") or ""
+        w = o["wall"]
+        if w in ("kerb", "road"):
+            a, b = x0 + o["u0"], x0 + o["u1"]
+            cx, cy = pr.p((a + b) / 2, -hb if w == "kerb" else hb)
+        else:
+            cx, cy = pr.p(x0 if w == "front" else x1, (o["u0"] + o["u1"]) / 2)
+        off = {"kerb": (0, -2.6), "road": (0, 1.0), "front": (-1.2, -0.5), "rear": (1.2, -0.5)}[w]
+        if line in DOORS and w == "kerb":
+            off = (3.0, -2.6)
+        anchor = {"kerb": "middle", "road": "middle", "front": "end", "rear": "start"}[w]
+        step = (0, 2.3) if w in ("front", "rear") else (2.6, 0)
+        tx, ty = cx + off[0], cy + off[1]
+        for _ in range(12):
+            if _fp_text(sh, placed, tx, ty, MARK.get(line, o["id"]), 1.4, anchor, bold=True):
+                break
+            tx, ty = tx + step[0], ty + step[1]
+
+
+def _fp_rect(pr, q):
+    x0, y0, x1, y1 = q["box"]
+    return pr.rect3((x0, y0, 0, x1, y1, 0))
+
+
+def _fp_labels(sh, P, pr, lay, placed):
+    """The area names, the notes, the marks of the spaces kept clear and each visible part's short name."""
+    from ..floorplan import FLOOR_TOP, NOLABEL
+    V = lay.V
+    st = P["stations"]
+    bed_up = any(q["kind"] == "above" and q["system"] == "bed" for q in P["parts"])
+    for key, x, y in (("bed", (st[0] + st[1]) / 2 + 150, -V["half_in"] + 200), ("kit", 4400.0, P["aisle"][3] - 218),
+                      ("lau", 4400.0, P["aisle"][1] + 120), ("wet", (st[2] + st[3]) / 2, V["half_in"] - 218)):
+        q = pr.p(x, y)
+        _fp_text(sh, placed, q[0], q[1], FP_AREAS[key], 1.7, bold=True)
+    notes = [("BED ABOVE, DASHED", (st[0] + st[1]) / 2 + 300, 760.0)] if bed_up else []
+    if P.get("shower"):
+        notes.append(("SHOWER", (P["shower"][0] + P["shower"][2]) / 2, 430.0))
+    for b, t in (("LA-11B", "BENCH"), ("LA-14F", "PLINTH")):
+        q = next((q for q in P["parts"] if q["iid"] == b), None)
+        if q:
+            x0, y0, x1, y1 = q["box"]
+            notes.append((t, (x0 + x1) / 2 + 60, y0 + 70 if b == "LA-11B" else y1 - 200))
+    for t, x, y in notes:
+        q = pr.p(x, y)
+        _fp_text(sh, placed, q[0], q[1], t, 1.25)
+    solid = [_fp_rect(pr, q) for q in P["parts"] if q["kind"] != "above" and q["top"] > P["floor_z"] + FLOOR_TOP]
+    for c in P["clear"]:                 # each mark in the first corner of its space clear of the parts and the texts
+        r = _fp_rect(pr, c)
+        w = S.text_mm(c["mark"], 1.2)
+        for x, y in ((r[0] + 0.8, r[1] + 0.8), (r[0] + 0.8, r[3] - 2.0), (r[2] - 0.8 - w, r[1] + 0.8), (r[2] - 0.8 - w, r[3] - 2.0)):
+            if _fp_free(solid, (x, y - 0.24, x + w, y + 0.9), 0.0) and _fp_text(sh, placed, x, y, c["mark"], 1.2, "start", color="#555"):
+                break
+    shown = [q for q in P["parts"] if q["kind"] != "above"]
+    for n, q in enumerate(shown):        # a part is named where nothing drawn later covers it and its name fits
+        if q["id"] in NOLABEL or q.get("under"):
+            continue
+        r = _fp_rect(pr, q)
+        inner = (r[0] + 0.3, r[1] + 0.3, r[2] - 0.3, r[3] - 0.3)
+        if not _fp_free([_fp_rect(pr, o) for o in shown[n + 1:]], inner, -0.1):
+            continue
+        s, cx, cy = _fp_name(q), (r[0] + r[2]) / 2, (r[1] + r[3]) / 2
+        for size in (1.3, 1.2, 1.1, 1.0):
+            if _fp_text(sh, placed, cx, cy - 0.36 * size, s, size, inside=inner) or \
+                    _fp_text(sh, placed, cx + 0.36 * size, cy, s, size, rot=-90, inside=inner):
+                break
+
+
+def _fp_dims(sh, P, pr, V, placed):
+    """The zone lengths and the inside length along the road side, the inside width beside the rear wall, the aisle
+    (K4) and the wet room's walk band (K5), with the inside figures' boxes recorded so no label lands on them."""
+    dm, st, hb, hi = P["dims"], P["stations"], V["half_bw"], V["half_in"]
+    y_road = pr.p(0, hb)[1]
+    yd = y_road + 3.5
+    for (a, b), lab in zip(zip(st, st[1:]), (f"{dm['bed']:.0f} BED AND DESK", f"{dm['living']:.0f} LIVING", f"{dm['rear']:.0f} WET ROOM")):
+        S.hdim(sh, pr.p(a)[0], y_road, pr.p(b)[0], y_road, yd, lab, size=1.3)
+    S.hdim(sh, pr.p(st[0])[0], yd, pr.p(st[3])[0], yd, yd + 5.0, f"{dm['inside_length']:.0f} INSIDE", size=1.3)
+    xr = pr.p(V["body_x1"])[0]
+    S.vdim(sh, xr, pr.p(0, -hi)[1], xr, pr.p(0, hi)[1], xr + 18.0, f"{dm['inside_width']:.0f} INSIDE", size=1.3)
+    ax0, ay0, _, ay1 = P["aisle"]
+    wx1 = max(x for x, _ in next(d for d in P["doors"] if d["iid"] == "WR-04")["leaf"]) + 40.0   # clear of the inner door
+    _, wy0, _, wy1 = P["walk_band"]
+    for x, y0, y1, v in ((ax0 + 380.0, ay0, ay1, dm["aisle"]), (wx1, wy0, wy1, dm["walk_band"])):
+        p0, p1 = pr.p(x, y0), pr.p(x, y1)
+        S.vdim(sh, p0[0], p0[1], p1[0], p1[1], p0[0], f"{v:.0f}", size=1.25, ext=False)
+        w = S.text_mm(f"{v:.0f}", 1.25)
+        placed.append((p0[0] - 0.8 - 0.75 * 1.25, (p0[1] + p1[1] - w) / 2, p0[0] + 0.3, (p0[1] + p1[1] + w) / 2))
+    return yd
+
+
+def _fp_legend(sh, lx, ly):
+    sh.text(lx, ly, "LEGEND", 1.8, bold=True)
+    for i, (st_, t) in enumerate(FP_LEGEND):
+        y = ly - 4 - i * 3.4
+        sh.line(lx, y + 0.6, lx + 7, y + 0.6, st_)
+        sh.text(lx + 8.5, y, t, 1.3)
+    y = ly - 4 - len(FP_LEGEND) * 3.4
+    for sty, t in (("cutface", "AN ITEM CUT BY THE PLAN, ITS CUT FACE"), ("shade", "WALL OR PARTITION, CUT"), ("kept", "FLOOR KEPT CLEAR")):
+        sh.fillrect(lx, y - 0.4, lx + 7, y + 1.8, sty)
+        if sty == "kept":
+            sh.rect(lx, y - 0.4, lx + 7, y + 1.8, "phantom")
+        sh.text(lx + 8.5, y, t, 1.3)
+        y -= 3.4
+    textblock(sh, lx, y - 1.2, ["W WINDOW, D DOOR, S SERVICE DOOR,", "V VENT OR COWL, R RINSE BOX", "(SCHEDULE CT-013)"], size=1.3, gap=0.8)
+
+
+def _bed_section(sh, lay_day, lay_night, k, ox, oy):
+    """A small kerb-side elevation of the bed zone: the desk, the bed by day (phantom) and by night."""
+    V = lay_day.V
+    pr = Proj(sh, "kerb", k, ox, oy, ref=(V["in_x0"], 0, V["floor_z"]))
+    x0, x1 = V["in_x0"], V["bed_x1"]
+    pr.box((x0, 0, V["floor_z"], x1, 0, V["ceiling_z"]), "thin")
+    pr.fill((x0 - 35, 0, V["floor_z"] - 30, x1, 0, V["floor_z"]), "shade")
+    pr.fill((x0 - 35, 0, V["ceiling_z"], x1, 0, V["ceiling_z"] + 40), "shade")
+    pr.fill((x0 - 35, 0, V["floor_z"] - 30, x0, 0, V["ceiling_z"] + 40), "shade")
+    d = lay_day.find("LA-09").box
+    pr.fill((d[0], 0, d[2], d[3], 0, d[5]), "light")
+    pr.box((d[0], 0, d[2], d[3], 0, d[5]), "medium")
+    pr.line((d[3] - 30, 0, d[2]), (d[3] - 30, 0, V["floor_z"]), "medium")
+    for lay, sty in ((lay_day, "phantom"), (lay_night, "medium")):
+        for iid in ("LB-03", "LB-01"):
+            b = lay.find(iid).box
+            pr.box((b[0], 0, b[2], b[3], 0, b[5]), sty)
+    bd, bn = lay_day.find("LB-03").box, lay_night.find("LB-03").box
+    mt = lay_night.find("LB-01").box[5]
+    fz = V["floor_z"]
+    xd = pr.p(x1, 0, 0)[0]
+    for z, t in ((bd[2], f"{bd[2] - fz:.0f} DAY UNDERSIDE"), (bn[2], f"{bn[2] - fz:.0f} NIGHT UNDERSIDE"),
+                 (mt, f"{mt - fz:.0f} NIGHT MATTRESS TOP"), (d[5], f"{d[5] - fz:.0f} DESK TOP")):
+        p = pr.p(x1, 0, z)
+        sh.line(xd + 0.5, p[1], xd + 3, p[1], "thin")
+        sh.text(xd + 3.5, p[1] - 0.5, t, 1.3)
+    p0, p1 = pr.p(x0 + 300, 0, d[5]), pr.p(x0 + 300, 0, bn[2])
+    sh.text(p0[0] + 1, (p0[1] + p1[1]) / 2 - 0.5, f"{bn[2] - d[5]:.0f}", 1.3)
+    p2 = pr.p(x0 + 700, 0, mt)
+    p3 = pr.p(x0 + 700, 0, V["ceiling_z"])
+    S.vdim(sh, p2[0], p2[1], p3[0], p3[1], p2[0], f"{V['ceiling_z'] - mt:.0f} CLEAR", size=1.2, ext=False)
+    sh.text(pr.p(x0, 0, 0)[0], pr.p(0, 0, V["ceiling_z"] + 40)[1] + 2.0, "BED ZONE FROM THE KERB SIDE (PHANTOM: DAY)", 1.6, bold=True)
+
+
+def lay_w(lay, iid):
+    b = lay.find(iid).box
+    return b[4] - b[1]
+
+
+def ct010(prj, model, bom, checks, reg, dwg):
+    t0 = time.time()
+    C = ctx(prj)
+    res, V = C["res"], C["V"]
+    day, night = C["day"], C["night"]
+    FP = json.loads((BUILD / "floorplan" / "floorplan.json").read_text())
+    sh = S.Sheet()
+    S.frame(sh)
+    k = dwg["scale"]
+    hb = V["half_bw"]
+    plans = ((day, FP["plans"]["day"], 205.0, "DAY AND TRAVEL: BED UP. PLAN 1000 ABOVE THE FLOOR"),
+             (night, FP["plans"]["night"], 110.0, "NIGHT: BED DOWN. PLAN 1000 ABOVE THE FLOOR"))
+    for lay, P, oy, head in plans:
+        pr = Proj(sh, "plan", k, 30.0, oy, ref=(V["body_x0"], -hb, 0))
+        _fp_draw(sh, P, pr, lay, res)
+    for lay, P, oy, head in plans:      # the texts after every line, so no fill drawn later hides one
+        pr = Proj(sh, "plan", k, 30.0, oy, ref=(V["body_x0"], -hb, 0))
+        placed: list = []
+        yd = _fp_dims(sh, P, pr, V, placed)
+        sh.text(30, yd + 11.0, head, 2.2, bold=True)
+        _fp_marks(sh, P, pr, lay, res, placed)
+        _fp_labels(sh, P, pr, lay, placed)
+    _fp_legend(sh, 168, 262)
+    _bed_section(sh, day, night, k, 168.0, 120.0)
+
+    # ---- right column
+    yb = title(sh, dwg, reg, "FIT-OUT MASSES ON CT-002 (TB-11).", "SEE CT-013 FOR THE OPENINGS")
+    rows = []
+    for b in (b for b in day.blocks if b.keep_clear):
+        x0, y0, z0, x1, y1, z1 = b.box
+        rows.append([b.iid.split("-")[1], b.name[:60], f"{x1 - x0:.0f} x {y1 - y0:.0f}", f"{z1 - z0:.0f}"])
+    y = S.table(sh, 230, yb - 6, [("", 8), ("SPACE KEPT CLEAR (FIT-01, FIT-06)", 112), ("PLAN mm", 36), ("HIGH", 24)], rows, size=1.38,
+                row_h=3.1, title="SPACES KEPT CLEAR. NOTHING STANDS IN THEM, BED UP OR DOWN")
+    bd, bn = day.find("LB-03").box, night.find("LB-03").box
+    md, mn = day.find("LB-01").box[5], night.find("LB-01").box[5]
+    fz = V["floor_z"]
+    desk = day.find("LA-09").box[5]
+    chk = C["chk"]
+    rows = [["Day and travel", f"{bd[2] - fz:.0f}", f"{md - fz:.0f}", f"{V['ceiling_z'] - md:.0f} to the ceiling", "Locked at the rail tops (LB-05)"],
+            ["Night", f"{bn[2] - fz:.0f}", f"{mn - fz:.0f}", f"{V['ceiling_z'] - mn:.0f} above the mattress", f"{bn[2] - desk:.0f} over the desk top"]]
+    y = S.table(sh, 230, y - 7, [("BED", 24), ("UNDERSIDE", 20), ("MATTRESS TOP", 24), ("CLEAR", 46), ("NOTE", 66)], rows, size=1.38,
+                row_h=3.1, title=f"BED POSITIONS ABOVE THE FLOOR, mm ({chk['BED-01']['status']}, BED-01, H1)")
+    d1, d2 = day.find("BD-07").box, day.find("BD-15").box
+    rows = [["D1 entry", f"{d1[3] - d1[0]:.0f}", "Kerb wall, hinged on its front edge, opens outward", "Fold-out step BD-16"],
+            ["D2 rear", f"{d2[4] - d2[1]:.0f}", "Rear wall, hinged on its kerb edge, opens outward", "Step BD-16, stows in K6"],
+            ["Inner", "620", "Partition, opens into the wet room's walk band (hinge side to confirm)", "About 560 clear"],
+            ["S1", "450", "Cassette service door, kerb wall, from outside", "Gasket, two latches"]]
+    y = S.table(sh, 230, y - 7, [("DOOR", 20), ("LEAF", 12), ("WHERE AND HOW IT OPENS", 104), ("NOTE", 44)], rows, size=1.38, row_h=3.1,
+                title="DOORS AND STEPS")
+    S.notes(sh, 230, y - 6, [
+        "DATUM DIM-01. FRONT TO THE LEFT, ROAD SIDE UP. BOTH PLANS CUT THE 3D MODEL (trailer.step) WITH A LEVEL PLANE 1000 mm ABOVE THE "
+        f"FLOOR (Z {FP['cut_z']:.0f}), THE FLOOR AT Z {fz:.0f}, AND LOOK DOWN. EACH OUTLINE IS THE MODEL'S SOLID SEEN FROM ABOVE.",
+        "H1: BY DAY THE BED'S FOOTPRINT HOLDS ONLY THE DESK AND THE CHAIR SPACE (K2). THE TWO CHAIRS STOW IN A BENCH DRAWER FOR TRAVEL.",
+        "H4: THE REAR DOOR OPENS STRAIGHT INTO THE WALK BAND (K5), WITH THE STEP ZONE (K6) AND THE SAND GRATE JUST INSIDE IT.",
+        "THE BATTERY PLINTH STANDS 125 mm OFF THE KERB WALL WITH THE WASHER AND DRYER ON IT. ITS FRONT PANEL FACES THE AISLE.",
+        "ITEMS ON THE PARTITION: THE BOARD AT THE KERB END, THE INVERTER AND THE SPLIT'S INDOOR UNIT AT THE ROAD END.",
+    ], size=1.4, width_chars=150)
+    S.notes(sh, 22, 86, [
+        f"THE AISLE (K4) IS {lay_w(day, 'LA-K4'):.0f} mm WIDE AT FULL HEIGHT BETWEEN THE BENCH AND THE PLINTH, 1,030 mm AT FLOOR LEVEL. THE WET ROOM'S "
+        f"WALK BAND (K5) IS {lay_w(day, 'LA-K5'):.0f} mm. EVERY WALKWAY IS AT LEAST 550 mm.",
+        "DOOR SWINGS ARE DRAWN OPEN AT 90 DEGREES. D1'S OPEN LEAF LIES UNDER THE AWNING TOWARD W1. D2'S LIES ON THE KERB HALF, AWAY "
+        "FROM THE SPLIT'S OUTDOOR UNIT ON THE ROAD HALF. W4 AND W6 SIT ABOVE THE PLANE, SO THEY ARE DASHED.",
+        "AT NIGHT THE BED COVERS THE DESK AND THE CHAIR SPACE, DASHED UNDER IT. THE LIFT RAILS ON BOTH SIDE WALLS ARE THE SMALL STRIPS THE "
+        "PLANE CUTS. THE TRAILER PAGE SHOWS THE SAME PLANS, EACH PART NAMED BY ITS LINE.",
+    ], size=1.5, width_chars=185)
     write(sh, dwg)
     return time.time() - t0

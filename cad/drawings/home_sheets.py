@@ -6,7 +6,8 @@ CT-002: mass and centre of gravity: every load case with and without growth, the
 CT-003: compliance: the trailer's VSB1 items and the standards on one page with the design's figure for each, the
         operating limits (H13's water in travel and its fallback without the GCM revision, the towball range of H17),
         the vehicle plate and what is not designed yet.
-CT-010: floor plan with the bed up (day and travel) and down (night), walkways, door swings and the spaces kept clear.
+
+The floor plan CT-010 is drawn from the 3D model's plan cut in cad/drawings/layout_sheets.py (decision H28).
 """
 from __future__ import annotations
 
@@ -18,8 +19,8 @@ from ..lamps import resolve as resolve_lamps
 from ..trailer import _kg
 from ..trailer_model import TrailerModel
 from . import sheet as S
-from .home_common import (MARK, Proj, body_plan, cog_symbol, ctx, label_in, stamp, textblock, title, tw,
-                          water_without_gcm_revision, write)
+from .home_common import (MARK, cog_symbol, ctx, label_in, stamp, textblock, title, tw, water_without_gcm_revision,
+                          write)
 from .sheets import _leaves
 
 
@@ -402,144 +403,3 @@ def _lamp_checks(sh, LM, y):
              ("PASS" if c["ok"] else "FAIL", "#000" if c["ok"] else "#c00")] for c in LM["checks"]]
     S.table(sh, 230, y, [("ID", 13), ("CHECK", 45), ("CLAUSE", 14), ("THE DESIGN, mm", 58), ("THE LIMIT, mm", 36), ("RESULT", 14)],
             rows, size=1.2, row_h=2.7, title="LAMPS, REFLECTORS AND THE NUMBER PLATE (ADR 13/00 APPENDIX A, VSB1 3.1)")
-
-
-# ------------------------------------------------------------------ CT-010 floor plan
-def _bed_section(sh, lay_day, lay_night, k, ox, oy):
-    """A small kerb-side elevation of the bed zone: the desk, the bed by day (phantom) and by night."""
-    V = lay_day.V
-    pr = Proj(sh, "kerb", k, ox, oy, ref=(V["in_x0"], 0, V["floor_z"]))
-    x0, x1 = V["in_x0"], V["bed_x1"]
-    pr.box((x0, 0, V["floor_z"], x1, 0, V["ceiling_z"]), "thin")
-    pr.fill((x0 - 35, 0, V["floor_z"] - 30, x1, 0, V["floor_z"]), "shade")
-    pr.fill((x0 - 35, 0, V["ceiling_z"], x1, 0, V["ceiling_z"] + 40), "shade")
-    pr.fill((x0 - 35, 0, V["floor_z"] - 30, x0, 0, V["ceiling_z"] + 40), "shade")
-    d = lay_day.find("LA-09").box
-    pr.fill((d[0], 0, d[2], d[3], 0, d[5]), "light")
-    pr.box((d[0], 0, d[2], d[3], 0, d[5]), "medium")
-    pr.line((d[3] - 30, 0, d[2]), (d[3] - 30, 0, V["floor_z"]), "medium")
-    for lay, sty in ((lay_day, "phantom"), (lay_night, "medium")):
-        for iid in ("LB-03", "LB-01"):
-            b = lay.find(iid).box
-            pr.box((b[0], 0, b[2], b[3], 0, b[5]), sty)
-    bd, bn = lay_day.find("LB-03").box, lay_night.find("LB-03").box
-    mt = lay_night.find("LB-01").box[5]
-    fz = V["floor_z"]
-    xd = pr.p(x1, 0, 0)[0]
-    for z, t in ((bd[2], f"{bd[2] - fz:.0f} DAY UNDERSIDE"), (bn[2], f"{bn[2] - fz:.0f} NIGHT UNDERSIDE"),
-                 (mt, f"{mt - fz:.0f} NIGHT MATTRESS TOP"), (d[5], f"{d[5] - fz:.0f} DESK TOP")):
-        p = pr.p(x1, 0, z)
-        sh.line(xd + 0.5, p[1], xd + 3, p[1], "thin")
-        sh.text(xd + 3.5, p[1] - 0.5, t, 1.3)
-    p0, p1 = pr.p(x0 + 300, 0, d[5]), pr.p(x0 + 300, 0, bn[2])
-    sh.text(p0[0] + 1, (p0[1] + p1[1]) / 2 - 0.5, f"{bn[2] - d[5]:.0f}", 1.3)
-    p2 = pr.p(x0 + 700, 0, mt)
-    p3 = pr.p(x0 + 700, 0, V["ceiling_z"])
-    S.vdim(sh, p2[0], p2[1], p3[0], p3[1], p2[0], f"{V['ceiling_z'] - mt:.0f} CLEAR", size=1.2, ext=False)
-    sh.text(pr.p(x0, 0, 0)[0], pr.p(0, 0, V["ceiling_z"] + 40)[1] + 2.0, "BED ZONE FROM THE KERB SIDE (PHANTOM: DAY)", 1.6, bold=True)
-
-
-def ct010(prj, model, bom, checks, reg, dwg):
-    t0 = time.time()
-    C = ctx(prj)
-    rep, res, V = C["rep"], C["res"], C["V"]
-    day, night = C["day"], C["night"]
-    sh = S.Sheet()
-    S.frame(sh)
-    k = dwg["scale"]
-    hb = V["half_bw"]
-    show = {"LA-09", "LA-11T", "LA-11B", "LA-07A", "LA-07B", "EL-02", "LA-02", "LA-14", "EL-04",
-            "WR-06", "WR-07", "WR-08", "WR-09", "WR-10", "WR-11", "LB-01", "LB-04.1", "LB-04.2", "LB-04.3", "LB-04.4"}
-    for lay, oy, head, cut in ((day, 205.0, "DAY AND TRAVEL: BED UP. PLAN 1000 ABOVE THE FLOOR", 1000.0),
-                               (night, 110.0, "NIGHT: BED DOWN. PLAN 1000 ABOVE THE FLOOR", 1000.0)):
-        pr = Proj(sh, "plan", k, 30.0, oy, ref=(V["body_x0"], -hb, 0))
-        r = body_plan(sh, pr, lay, res, cut=cut, show=show, size=1.3, light=("LB-01",) if lay is night else (),
-                      hidden=("LA-09",) if lay is night else (), nolabel=("EL-02", "LA-11B"))
-        pl, bn = lay.find("EL-02").box, lay.find("LA-11B").box
-        pr.text(((pl[0] + lay.find("LA-02").box[3]) / 2, (pl[4] + lay.find("LA-02").box[4]) / 2), "PLINTH", 1.25)
-        pr.text(((bn[0] + bn[3]) / 2 + 60, bn[1] + 70), "BENCH", 1.25)
-        # zone lengths along the road side
-        yd = pr.p(0, hb)[1] + 3.5
-        xs = [V["in_x0"], V["bed_x1"], V["rear_x0"], V["in_x1"]]
-        for (a, b), lab in zip(zip(xs, xs[1:]), (f"{V['bed_x1'] - V['in_x0']:.0f} BED AND DESK", f"{V['rear_x0'] - V['bed_x1']:.0f} LIVING",
-                                                 f"{V['in_x1'] - V['rear_x0']:.0f} WET ROOM")):
-            S.hdim(sh, pr.p(a, hb)[0], pr.p(0, hb)[1], pr.p(b, hb)[0], pr.p(0, hb)[1], yd, lab, size=1.3)
-        sh.text(30, yd + 6.0, head, 2.2, bold=True)
-        # walkway widths
-        k4 = lay.find("LA-K4").box
-        xa = (k4[0] + k4[3]) / 2 + 120
-        p0, p1 = pr.p(xa, k4[1]), pr.p(xa, k4[4])
-        S.vdim(sh, p0[0], p0[1], p1[0], p1[1], p0[0], f"{k4[4] - k4[1]:.0f}", size=1.25, ext=False)
-        k5 = lay.find("LA-K5").box
-        p0, p1 = pr.p(k5[3] - 60, k5[1]), pr.p(k5[3] - 60, k5[4])
-        S.vdim(sh, p0[0], p0[1], p1[0], p1[1], p0[0], f"{k5[4] - k5[1]:.0f}", size=1.2, ext=False)
-        if lay is day:
-            tx = pr.p((V["in_x0"] + V["bed_x1"]) / 2, -880)
-            sh.text(tx[0], tx[1], "BED ABOVE, DASHED", 1.25, "middle")
-        for kid in ("LA-K1", "LA-K2", "LA-K3", "LA-K4", "LA-K5", "LA-K6"):
-            if kid in r:
-                rr = r[kid]
-                sh.text(rr[0] + 0.8, rr[1] + 0.8, kid.split("-")[1], 1.2, color="#555")
-        wl = lay.find("WR-10").box
-        q = pr.p((wl[0] + wl[3]) / 2, wl[4] + 200)
-        sh.text(q[0], q[1], "SHOWER ZONE", 1.25, "middle")
-    # legend beside the day plan
-    lx, ly = 168, 262
-    sh.text(lx, ly, "LEGEND", 1.8, bold=True)
-    items = [("medium", "AN ITEM CUT OR BELOW THE PLAN"), ("hidden", "AN ITEM ABOVE IT"), ("phantom", "SPACE KEPT CLEAR, K1 TO K6"),
-             ("thin", "DOOR SWING")]
-    for i, (st_, t) in enumerate(items):
-        y = ly - 4 - i * 3.4
-        sh.line(lx, y + 0.6, lx + 7, y + 0.6, st_)
-        sh.text(lx + 8.5, y, t, 1.3)
-    sh.fillrect(lx, ly - 18.6, lx + 7, ly - 16.4, "shade")
-    sh.text(lx + 8.5, ly - 18.2, "WALL OR PARTITION, CUT", 1.3)
-    textblock(sh, lx, ly - 23, ["W WINDOW, D DOOR, S SERVICE DOOR,", "V VENT OR COWL, R RINSE BOX", "(SCHEDULE CT-013)"], size=1.3, gap=0.8)
-    _bed_section(sh, day, night, k, 168.0, 120.0)
-
-    # ---- right column
-    yb = title(sh, dwg, reg, "FIT-OUT MASSES ON CT-002 (TB-11).", "SEE CT-013 FOR THE OPENINGS")
-    rows = []
-    for b in (b for b in day.blocks if b.keep_clear):
-        x0, y0, z0, x1, y1, z1 = b.box
-        rows.append([b.iid.split("-")[1], b.name[:60], f"{x1 - x0:.0f} x {y1 - y0:.0f}", f"{z1 - z0:.0f}"])
-    y = S.table(sh, 230, yb - 6, [("", 8), ("SPACE KEPT CLEAR (FIT-01, FIT-06)", 112), ("PLAN mm", 36), ("HIGH", 24)], rows, size=1.38,
-                row_h=3.1, title="SPACES KEPT CLEAR. NOTHING STANDS IN THEM, BED UP OR DOWN")
-    bd, bn = day.find("LB-03").box, night.find("LB-03").box
-    md, mn = day.find("LB-01").box[5], night.find("LB-01").box[5]
-    fz = V["floor_z"]
-    desk = day.find("LA-09").box[5]
-    chk = C["chk"]
-    rows = [["Day and travel", f"{bd[2] - fz:.0f}", f"{md - fz:.0f}", f"{V['ceiling_z'] - md:.0f} to the ceiling", "Locked at the rail tops (LB-05)"],
-            ["Night", f"{bn[2] - fz:.0f}", f"{mn - fz:.0f}", f"{V['ceiling_z'] - mn:.0f} above the mattress", f"{bn[2] - desk:.0f} over the desk top"]]
-    y = S.table(sh, 230, y - 7, [("BED", 24), ("UNDERSIDE", 20), ("MATTRESS TOP", 24), ("CLEAR", 46), ("NOTE", 66)], rows, size=1.38,
-                row_h=3.1, title=f"BED POSITIONS ABOVE THE FLOOR, mm ({chk['BED-01']['status']}, BED-01, H1)")
-    d1, d2 = day.find("BD-07").box, day.find("BD-15").box
-    rows = [["D1 entry", f"{d1[3] - d1[0]:.0f}", "Kerb wall, hinged on its front edge, opens outward", "Fold-out step BD-16"],
-            ["D2 rear", f"{d2[4] - d2[1]:.0f}", "Rear wall, hinged on its kerb edge, opens outward", "Step BD-16, stows in K6"],
-            ["Inner", "620", "Partition, opens into the wet room's walk band (hinge side to confirm)", "About 560 clear"],
-            ["S1", "450", "Cassette service door, kerb wall, from outside", "Gasket, two latches"]]
-    y = S.table(sh, 230, y - 7, [("DOOR", 20), ("LEAF", 12), ("WHERE AND HOW IT OPENS", 104), ("NOTE", 44)], rows, size=1.38, row_h=3.1,
-                title="DOORS AND STEPS")
-    S.notes(sh, 230, y - 6, [
-        "DATUM DIM-01. FRONT TO THE LEFT, ROAD SIDE UP. BOTH PLANS AT 1000 mm ABOVE THE FLOOR (Z "
-        f"{fz + 1000:.0f}), THE FLOOR AT Z {fz:.0f}.",
-        "H1: BY DAY THE BED'S FOOTPRINT HOLDS ONLY THE DESK AND THE CHAIR SPACE (K2). THE TWO CHAIRS STOW IN A BENCH DRAWER FOR TRAVEL.",
-        "H4: THE REAR DOOR OPENS STRAIGHT INTO THE WALK BAND (K5), WITH THE STEP ZONE (K6) AND THE SAND GRATE JUST INSIDE IT.",
-        "THE BATTERY PLINTH STANDS 125 mm OFF THE KERB WALL WITH THE WASHER AND DRYER ON IT. ITS FRONT PANEL FACES THE AISLE.",
-        "ITEMS ON THE PARTITION: THE BOARD AT THE KERB END, THE INVERTER AND THE SPLIT'S INDOOR UNIT AT THE ROAD END.",
-    ], size=1.4, width_chars=150)
-    S.notes(sh, 22, 86, [
-        f"THE AISLE (K4) IS {lay_w(day, 'LA-K4'):.0f} mm WIDE AT FULL HEIGHT BETWEEN THE BENCH AND THE PLINTH, 1,030 mm AT FLOOR LEVEL. THE WET ROOM'S "
-        f"WALK BAND (K5) IS {lay_w(day, 'LA-K5'):.0f} mm. EVERY WALKWAY IS AT LEAST 550 mm.",
-        "DOOR SWINGS ARE DRAWN OPEN AT 90 DEGREES. D1'S OPEN LEAF LIES UNDER THE AWNING TOWARD W1. D2'S LIES ON THE KERB HALF, AWAY "
-        "FROM THE SPLIT'S OUTDOOR UNIT ON THE ROAD HALF.",
-        "AT NIGHT THE BED COVERS THE DESK AND THE CHAIR SPACE. THE LIFT RAILS ON BOTH SIDE WALLS ARE THE SMALL SOLID STRIPS.",
-    ], size=1.5, width_chars=185)
-    write(sh, dwg)
-    return time.time() - t0
-
-
-def lay_w(lay, iid):
-    b = lay.find(iid).box
-    return b[4] - b[1]

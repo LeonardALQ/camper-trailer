@@ -90,8 +90,8 @@ def main(only: list[str] | None = None):
     from .body_sheets import ct201, ct202, ct203, ct301
     from .chassis_sheets import ct101, ct102, ct103
     from .ga import ct001
-    from .home_sheets import ct002, ct003, ct010
-    from .layout_sheets import ct011, ct012, ct013
+    from .home_sheets import ct002, ct003
+    from .layout_sheets import ct010, ct011, ct012, ct013
     from .services_sheets import ct601, ct602, ct611, ct612, ct621
     from .structure_sheets import ct104
     from .ute_sheets import ct701, ct702, ct703, ct704
