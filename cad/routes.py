@@ -428,9 +428,24 @@ def upstream_v(run: dict) -> float:
 
 # ------------------------------------------------------------------ the layout's boxes and the glands
 def _blocks_of(lay) -> tuple[dict, list]:
-    """The parameters and the envelope blocks of a Layout (cad/trailer.py), as plain dicts."""
+    """The parameters and the envelope blocks of a Layout (cad/trailer.py), as plain dicts. A chassis fitting with more
+    than one position has no box of its own, so each of its positions is a block (cad/chassis.py fitting_boxes): each
+    D-ring, and each corner steady over the box its leg sweeps from folded for travel to standing at 90 degrees."""
     bl = [dict(iid=b.iid, id=b.id, name=b.name, system=b.system, box=b.box, hollow=b.hollow, keep_clear=b.keep_clear)
           for b in lay.blocks if b.box is not None]
+    ch = getattr(lay, "chassis", None)
+    for b in lay.blocks:
+        f = b.extra.get("fitting") if b.box is None else None
+        if f is None or ch is None:
+            continue
+        spec = next(d for d in ch.data["fittings"] if d["id"] == f.id)
+        if spec.get("poses") == "steadies":
+            boxes = [(f"{b.name.split(',')[0]} {k}, folded to standing", p["sweep"]) for k, p in enumerate(ch.steady_poses(), 1)]
+        else:
+            from .chassis import fitting_boxes
+            boxes = [(f"{b.name.split(',')[0]} {k}", bx) for k, bx in enumerate(fitting_boxes(ch, f), 1)]
+        bl += [dict(iid=f"{b.iid} #{k}", id=b.id, name=name, system=b.system, box=tuple(bx), hollow=False, keep_clear=False)
+               for k, (name, bx) in enumerate(boxes, 1)]
     return dict(lay.V), bl
 
 

@@ -67,8 +67,8 @@ holes:
   - {member: OR-05K, face: kerb side, run: K-08, x: 4387, y: -1200, z: 800, d: 16, length: 16}
   - {member: OR-05R, face: kerb side, run: K-09, x: 4387, y: 638, z: 811, d: 16, length: 16}
   - {member: OR-05R, face: road side, run: K-09, x: 4387, y: 1200, z: 800, d: 16, length: 16}
-  - {member: RL-R, face: road side, run: K-01, x: 2304, y: 637, z: 669, d: 16, length: 49}
-  - {member: RL-R, face: road side, run: K-10, x: 2378, y: 637, z: 637, d: 16, length: 37}
+  - {member: RL-R, face: road side, run: K-01, x: 2360, y: 637, z: 671, d: 16, length: 39}
+  - {member: RL-R, face: road side, run: K-10, x: 2415, y: 637, z: 641, d: 16, length: 34}
   - {member: RL-R, face: road side, run: K-10, x: 4090, y: 637, z: 652, d: 16, length: 25}
   - {member: RL-R, face: road side, run: K-01, x: 6021, y: 637, z: 680, d: 16, length: 25}
   - {member: RS-K, face: road side, run: B-18, x: 2015, y: -587, z: 840, d: 14, length: 54}
@@ -78,9 +78,9 @@ holes:
   - {member: RS-K, face: top, run: B-18, x: 5024, y: -606, z: 874, d: 14, length: 15}
   - {member: RS-K, face: top, run: D-14, x: 5052, y: -606, z: 874, d: 24, length: 25}
   - {member: RS-K, face: top, run: B-16, x: 5094, y: -606, z: 874, d: 28, length: 28}
-  - {member: RS-K, face: road side, run: K-08, x: 6010, y: -587, z: 826, d: 16, length: 28}
+  - {member: RS-K, face: road side, run: K-08, x: 5996, y: -587, z: 826, d: 16, length: 23}
   - {member: RS-R, face: road side, run: K-09, x: 4387, y: 638, z: 811, d: 16, length: 16}
-  - {member: RS-R, face: kerb side, run: K-09, x: 5995, y: 587, z: 811, d: 16, length: 40}
+  - {member: RS-R, face: kerb side, run: K-09, x: 5988, y: 587, z: 811, d: 16, length: 33}
 cutouts:
   - {panel: BD-01, gland: G9, x: 3392, y: 515.5, w: 38, h: 98}
   - {panel: BD-01, gland: G15, x: 5067, y: 547.5, w: 188, h: 68}
