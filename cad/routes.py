@@ -56,8 +56,11 @@ def namespace(V: dict, blocks: list, data: dict, glands: dict | None = None) -> 
             ns.setdefault(key(b["id"]), ns[key(b["iid"])])
     for gid, g in (glands or {}).items():
         x, y, z = g["p"]
-        h = g["d"] / 2
-        ns[gid] = B((x - h, y - h, z - h, x + h, y + h, z + h))
+        hx, hy = g.get("w", g["d"]) / 2, g.get("h", g["d"]) / 2
+        ns[gid] = B((x - hx, y - hy, z - hy, x + hx, y + hy, z + hy)) if g["at"] in ("floor", "roof") else \
+            B((x - g["d"] / 2, y - g["d"] / 2, z - g["d"] / 2, x + g["d"] / 2, y + g["d"] / 2, z + g["d"] / 2))
+        for rid, (dx, dy, m) in (g.get("cells") or {}).items():   # a transit frame's module for each run, by its centre
+            ns[f"{gid}_{key(rid)}"] = B((x + dx - m / 2, y + dy - m / 2, z - m / 2, x + dx + m / 2, y + dy + m / 2, z + m / 2))
     for k, v in (data.get("consts") or {}).items():
         ns[k] = _eval(v, ns)
     for f in data.get("fixtures") or []:
@@ -67,13 +70,73 @@ def namespace(V: dict, blocks: list, data: dict, glands: dict | None = None) -> 
     return ns
 
 
-def _points(run: dict, ns: dict) -> list[tuple]:
+def _cross(a, b):
+    return (a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0])
+
+
+def _add(a, b, s=1.0):
+    return (a[0] + b[0] * s, a[1] + b[1] * s, a[2] + b[2] * s)
+
+
+def _spec_points(specs: list, ns: dict, prev=None) -> list[tuple]:
+    out = []
+    for spec in specs:
+        p = tuple(prev[i] if (v == "." and prev) else _eval(v, ns) for i, v in enumerate(spec))
+        out.append(p)
+        prev = p
+    return out
+
+
+def bundle_points(way: dict, k: float, n: int, pitch: float, ns: dict) -> list[tuple]:
+    """A member's centreline through a bundle way: the way's centreline offset by the member's place in the way's grid
+    (`cols` across, rows after, centred), the offset carried through every corner so the inside of a turn stays the
+    inside, each corner the mitre of the two offset legs. The grid's first axis is the way's `side` (a direction across
+    its first leg), the second the first leg crossed with it."""
+    C = _spec_points(way["path"], ns)
+    cols = int(way.get("cols", 1))
+    rows = max(1, math.ceil(n / cols))
+    u = ((k % cols) - (cols - 1) / 2) * pitch
+    v = ((k // cols) - (rows - 1) / 2) * pitch
+    d, _ = _unit(_sub(C[1], C[0]))
+    side = tuple(float(x) for x in way.get("side", (0.0, 0.0, 1.0)))
+    e1, _ = _unit(_add(side, d, -_dot(side, d)))
+    e2 = _cross(d, e1)
+    o = _add(_add((0.0, 0.0, 0.0), e1, u), e2, v)
+    pts = [_add(C[0], o)]
+    for i in range(1, len(C) - 1):
+        d1, _ = _unit(_sub(C[i], C[i - 1]))
+        d2, _ = _unit(_sub(C[i + 1], C[i]))
+        c = _dot(d1, d2)
+        if c > 1 - 1e-9:
+            pts.append(_add(C[i], o))
+            continue
+        a, _ = _unit(_cross(d1, d2))
+        th = math.acos(max(-1.0, min(1.0, c)))
+        o2 = _add(_add(_add((0.0, 0.0, 0.0), o, math.cos(th)), _cross(a, o), math.sin(th)), a, _dot(a, o) * (1 - math.cos(th)))
+        w = _sub(o, o2)
+        t = (_dot(w, d1) - c * _dot(w, d2)) / (c * c - 1)
+        pts.append(_add(_add(C[i], o), d1, t))
+        o = o2
+    pts.append(_add(C[-1], o))
+    return pts
+
+
+def _points(run: dict, ns: dict, bundles: dict | None = None) -> list[tuple]:
+    """The run's points: its ends and path, where a path entry "@<way>" follows that bundle way at the run's place."""
     pts, prev = [], None
     for spec in [run["from"]["at"]] + list(run.get("path") or []) + [run["to"]["at"]]:
-        p = [prev[i] if (v == "." and prev) else _eval(v, ns) for i, v in enumerate(spec)]
-        if prev is None or math.dist(p, prev) > 0.5:
-            pts.append(tuple(p))
-        prev = p
+        if isinstance(spec, str) and spec.startswith("@"):
+            w, *cut = spec[1:].split(":")   # "@W" the whole bundle way, "@W:a:b" its points a to b
+            b = bundles[w]
+            seq = bundle_points(b["way"], lane_of(run, w), b["n"], b["pitch"], ns)
+            if cut:
+                seq = seq[int(cut[0]):int(cut[1]) + 1]
+        else:
+            seq = [tuple(prev[i] if (v == "." and prev) else _eval(v, ns) for i, v in enumerate(spec))]
+        for p in seq:
+            if prev is None or math.dist(p, prev) > 0.5:
+                pts.append(tuple(p))
+            prev = p
     return pts
 
 
@@ -393,11 +456,22 @@ def way_members(data: dict) -> dict:
     lane offset, L_<way>."""
     out = {w: [] for w in data.get("ways") or {}}
     for r in data["runs"]:
-        for w in sorted(set(WAY_RE.findall(str([r["from"]["at"], r.get("path"), r["to"]["at"]])))):
+        spec = [r["from"]["at"], *(r.get("path") or []), r["to"]["at"]]
+        named = set(WAY_RE.findall(str(spec))) | {s[1:].split(":")[0] for s in spec if isinstance(s, str) and s.startswith("@")}
+        for w in sorted(named):
             if w not in out:
                 raise KeyError(f"{r['id']} names the way {w}, which data/routes.yaml `ways` does not list")
             out[w].append(r["id"])
     return out
+
+
+def _way_what(v) -> str:
+    return v if isinstance(v, str) else v["what"]
+
+
+def _min_pitch(v) -> float:
+    """A way's least pitch, where a fitting sets it (a transit frame's modules), else none."""
+    return 0.0 if isinstance(v, str) else float(v.get("min_pitch", 0.0))
 
 
 def lane_of(run: dict, way: str) -> float:
@@ -424,23 +498,25 @@ def resolve(lay=None, V: dict | None = None, blocks: list | None = None) -> dict
     members = way_members(data)
     pitch = {w: 0.0 for w in members}
     for _ in range(8):
-        runs = [_resolve_run(r, ns, K, data["rules"], fixtures, pitch) for r in data["runs"]]
+        bundles = {w: dict(way=v, n=len(members[w]), pitch=pitch[w]) for w, v in data["ways"].items() if isinstance(v, dict) and v.get("path")}
+        runs = [_resolve_run(r, ns, K, data["rules"], fixtures, pitch, bundles) for r in data["runs"]]
         od = {r["id"]: r["od"] for r in runs}
-        new = {w: float(math.ceil(max((od[i] for i in ids), default=0.0) - 1e-6)) for w, ids in members.items()}
+        new = {w: max(float(math.ceil(max((od[i] for i in ids), default=0.0) - 1e-6)), _min_pitch(data["ways"][w]))
+               for w, ids in members.items()}
         if new == pitch:
             break
         pitch = new
-    ways = {w: dict(what=data["ways"][w], runs=ids, pitch_mm=pitch[w]) for w, ids in members.items()}
+    ways = {w: dict(what=_way_what(data["ways"][w]), runs=ids, pitch_mm=pitch[w], bundle=w in bundles) for w, ids in members.items()}
     return dict(runs=runs, data=data, kinds=K, V=V, blocks=blocks, glands=glands, fixtures=fixtures, svc=svc, ns=ns, bars=bars,
                 ways=ways)
 
 
-def _resolve_run(r: dict, ns: dict, K: dict, rule: dict, fixtures: dict, pitch: dict) -> dict:
+def _resolve_run(r: dict, ns: dict, K: dict, rule: dict, fixtures: dict, pitch: dict, bundles: dict) -> dict:
     """One run on the layout, with its lane offset in each way it shares."""
     kind = K[r["kind"]]
     for w, p in pitch.items():
         ns[f"L_{w}"] = lane_of(r, w) * p
-    pts = _points(r, ns)
+    pts = _points(r, ns, bundles)
     if r["system"] == "waste" and not r.get("pumped"):
         pts = _apply_fall(pts, rule["fall"])
     raw = sum(math.dist(pts[i], pts[i + 1]) for i in range(len(pts) - 1)) / 1000
