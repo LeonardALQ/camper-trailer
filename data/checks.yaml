@@ -535,7 +535,20 @@ trailer_checks:
     min: 100
     severity: fail
     inputs: [UTE-01]
-    why: Every part carried by the suspension needs 100 mm of running clearance. The arms, hubs and wheels are not carried by it.
+    why: Every part carried by the suspension needs 100 mm of running clearance, the chassis fittings and the spare wheel included. The arms, hubs and wheels are not carried by it, and the safety chains and the rubber mud flaps bend, so they are left out.
+  - id: DIM-06
+    title: Lowest rigid sprung part at least 290 mm, unladen, for the tracks the trailer is built for (design target)
+    type: clearance_ground
+    min: 290
+    severity: fail
+    inputs: [UTE-01]
+    why: "The trailer is built for off-road tracks (the drawing set's title, report 11's off-road load cases), where drainage berms, creek banks and ruts stand well above VSB1 5.4's 100 mm road minimum (review I2-22). 290 mm (est.) is the height of the rear corner steadies' stowed feet, the lowest rigid part the design accepts, so no other part may hang lower. Measured on the same parts as DIM-04."
+  - id: DIM-07
+    title: Breakover between the ute's rear axle and the trailer's axle group (reported)
+    type: breakover
+    severity: report
+    inputs: [UTE-01, UTE-02]
+    why: "The crest the ute and the trailer can straddle before the ground touches a rigid sprung part between the ute's rear wheels and the trailer's axle group: for each part, the slope up from the ute's rear axle, UTE-02's 1,300 mm (est.) ahead of the ball, plus the slope up from the axle group's centre, both to the part's underside at design ride height with both vehicles level (est.). The least of these is reported. No rule sets a limit for a combination (review I2-22)."
   - id: JK-01
     title: Everything that stands above the bike box's underside clears its sweep by 100 mm at any jack-knife angle
     type: jackknife

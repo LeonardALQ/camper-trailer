@@ -25,8 +25,7 @@ import pytest
 from build123d import Compound, GeomType, extrude
 
 TOL = 1.0       # mm: a joint's gap or shallow overlap
-W_MIN = 2.0     # mm: the narrowest contact patch that counts as an area, under the 2.5 mm sheet welded edge-on in the
-                # ute's box
+W_MIN = 3.0     # mm: the narrowest contact patch that counts as an area
 A_MIN = 25.0    # mm2
 FIX_W = 12.0    # mm: the land a fixing needs both ways, an M6 flat washer's outside diameter (ISO 7089)
 EPS = 0.01      # mm: rounding in the measured widths

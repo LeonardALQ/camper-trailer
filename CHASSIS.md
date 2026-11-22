@@ -9,7 +9,7 @@ The frame now carries the home trailer of TRAILER.md revision J. Revision D, the
 - Every case is checked at the 3,500 kg plate (decision H2), on all eight trailer cases TC1 to TC8, including the grey-full cases. VSB1's drawbar and chain forces follow the plate: 51.5 kN and 17.2 kN at the coupling, 34.3 kN and 17.2 kN at each chain point.
 - The raisers, outriggers and floor crossmembers are RHS 127 x 51 x 3.5 C350L0, because RHS 125 x 50 x 3 is not a stocked size (research report 22). Each member is checked at its own grade, so the composite rail is checked at the raiser's 350 MPa.
 - The grey tank fills the rear bay, so a floor crossmember crosses its middle in place of the battery bay's, and the rear bay's plan braces went. The XT rear shock crossmember is RHS 150 x 50 x 4 in place of 150 x 50 x 3, so the rear recovery pull (CHS-08A) passes without them. The tank's 2 mm guard is not counted as a shear plate, because it would buckle at about 4 kN (est.).
-- The axle group sits at X 4,371 mm, so the XT stations moved 174 mm rearward.
+- The axle group sits at X 4,379 mm, so the XT stations moved 182 mm rearward.
 - The rails are 1,275 mm over their outsides for the 1,655 mm track (decision H22, 21 Nov 2026), 100 mm wider than report 18's 1,175 mm, so the crossmembers, drawbar brace and plan braces are longer and the outriggers 50 mm shorter. The tanks keep their 975 mm width.
 - The drawbar box is 1,480 x 320 x 720 mm for two Honda EU22i. The spare wheel sits 415 mm higher on longer posts, so it lifts off over the box.
 - No check limit changed, and no estimate changed to pass a check.
@@ -48,7 +48,7 @@ CT-101 and CT-102 carry the member and plate lists, and the site's Downloads pag
 1. Outriggers RHS 127 x 51 x 3.5 in place of 75 x 50 x 3, with 6 mm fillets all round. With 75 x 50 x 3 the frequent fatigue range at the root weld was 34.7 MPa against the FAT 36 root's CAFL of 21.1 MPa (IIW 414). Now it is 16.2 MPa (FAT-05).
 2. Plan bracing in the two bays ahead of the axles. With no bracing, a recovery pull 30 degrees off the rail axis (LC8a) bent the ladder sideways in a Vierendeel shape. The tanks fill the bays behind, so the thicker XT rear shock crossmember takes the rear pull.
 3. Jacking pads on the XT centre crossmember beside the rail, not on the rail's bottom face, so the pad's weld end (IIW 513, FAT 71) sees 18.0 MPa against a CAFL of 41.5 MPa (FAT-11).
-4. The weld toes on the rail at the full-height crossmembers are burr-ground (IIW 512, a CAFL of 60.8 MPa). They see 26.7 MPa (FAT-01).
+4. The weld toes on the rail at the full-height crossmembers are burr-ground (IIW 512, a CAFL of 60.8 MPa). They see 26.3 MPa (FAT-01).
 5. 6 mm fillets round the ends of the XT crossmembers. The root (IIW 414) sees 15.3 MPa against 21.1 MPa (FAT-03).
 6. Raisers RHS 127 x 51 x 3.5 in place of 100 x 50 x 3, to lift the floor above the 805 mm tyre with 50 mm in hand at full bump.
 7. A fixed station at the diesel bay, so the heater's tank sits between two crossmembers, and one at the grey bay over the grey tank.
@@ -80,7 +80,7 @@ CT-101 and CT-102 carry the member and plate lists, and the site's Downloads pag
 | Breakaway kit | VSB1 8 | 5.0 kg (est.) |
 | Front recovery lugs, 20 mm, at X 2,150, and rear tongues, 20 mm, through the rear crossmember at X 6,170 | LC8a | 7.5 kg and 9.8 kg |
 | Jacking pads, 100 x 100 x 10 with a locating cup, on the XT centre crossmember | LC8b | 1.6 kg |
-| Four ARK XO DDS650 corner steadies (875 kg) at X 2,220 and 6,070 | LC5b | 35.2 kg (retailer) |
+| Four ARK XO DDS650 corner steadies (875 kg) on 6 mm brackets under the rails, the front pair at X 3,000 behind the drawbar overlap and the rear pair at X 6,070, their feet 291.5 mm up in travel | LC5b, DIM-06 | 35.2 kg (retailer) |
 | Four lashing points, forged 1/2 in weld-on D-rings with their clips (4,000 lb working load limit), under the outrigger ends at X 1,845 and 6,215, welded before galvanising | STB-05 | 1.8 kg (est.) |
 | 32 body mount nut plates, 10 mm, M12 tapped | BODY.md | 8.8 kg |
 | Spare carrier cleats and hub plate | LC2, LC7 | 4.2 kg |
@@ -112,7 +112,7 @@ Every case runs on the eight trailer cases TC1 to TC8, with the water, fuel and 
 
 ## Analysis
 
-The frame is a 3D beam model on the members' centroid axes, solved by the direct stiffness method in `cad/frame.py`, with 239 nodes, 205 beam elements and 62 rigid links. `cad/tests/test_frame.py` checks the solver against closed forms: cantilevers in bending and torsion, a simply supported beam and the equilibrium of a 3D portal frame.
+The frame is a 3D beam model on the members' centroid axes, solved by the direct stiffness method in `cad/frame.py`, with 235 nodes, 201 beam elements and 60 rigid links. `cad/tests/test_frame.py` checks the solver against closed forms: cantilevers in bending and torsion, a simply supported beam and the equilibrium of a 3D portal frame.
 
 - The composite rail is one beam with the combined section: centroid at Z 742, I = 16.2 x 10⁶ mm⁴, Z = 111.9 x 10³ mm³ at the bottom and 122.4 x 10³ mm³ at the top. `cad/tests/test_chassis.py` pins it.
 - Crossmembers, outriggers, braces and the drawbar members are beams on their own axes, joined to the rail through rigid links, so every joint is rigid. The drawbar's overlap is linked to the rail at every node along its 1,000 mm.
@@ -124,26 +124,26 @@ Each mass goes onto the frame by its load path, with its resultant and the momen
 
 | Case | Governing member | Where and when | Stress | Limit | Utilisation |
 |---|---|---|---|---|---|
-| LC1 | Road-side rail | X 4,820, TC7 | 36 MPa | 117 MPa | 0.31 |
-| LC2 | Road-side rail | X 4,820, TC7 | 109 MPa | 350 MPa | 0.31 |
+| LC1 | Road-side rail | X 4,828, TC7 | 36 MPa | 117 MPa | 0.31 |
+| LC2 | Road-side rail | X 4,828, TC7 | 108 MPa | 350 MPa | 0.31 |
 | LC3 | Kerb-side drawbar member | At the body front, TC2 | 159 MPa | 300 MPa | 0.53 |
-| LC4 | Road-side rail | X 4,377, TC7 cornering towards the road side | 93 MPa | 233 MPa | 0.40 |
-| LC5a | Kerb-side rail | X 3,920, TC7, diagonal B | 75 MPa | 233 MPa | 0.32 |
-| LC5b | Road-side rail | X 2,820, at tare, one steady wound to 875 kg | 122 MPa | 233 MPa | 0.52 |
-| LC6 | Kerb-side rail | X 3,477, 17.2 kN up at the coupling | 267 MPa | 350 MPa | 0.76 |
-| LC6b | Kerb-side rail | X 3,477, kerb-side lug, 17.2 kN down | 258 MPa | 350 MPa | 0.74 |
-| LC8a | Road-side rail | X 4,377, the rear road-side point pulled 30 degrees sideways and 15 degrees down | 319 MPa | 350 MPa | 0.91 |
-| LC8b | Road-side rail | X 4,377, TC7, road side jacked | 122 MPa | 350 MPa | 0.35 |
+| LC4 | Road-side rail | X 4,385, TC7 cornering towards the road side | 93 MPa | 233 MPa | 0.40 |
+| LC5a | Kerb-side rail | X 3,928, TC7, diagonal B | 75 MPa | 233 MPa | 0.32 |
+| LC5b | Road-side rail | X 2,925, at tare, one steady wound to 875 kg | 114 MPa | 233 MPa | 0.49 |
+| LC6 | Kerb-side rail | X 3,485, 17.2 kN up at the coupling | 268 MPa | 350 MPa | 0.77 |
+| LC6b | Kerb-side rail | X 3,485, kerb-side lug, 17.2 kN down | 259 MPa | 350 MPa | 0.74 |
+| LC8a | Road-side rail | X 4,385, the rear road-side point pulled 30 degrees sideways and 15 degrees down | 319 MPa | 350 MPa | 0.91 |
+| LC8b | Road-side rail | X 4,385, TC7, road side jacked | 122 MPa | 350 MPa | 0.35 |
 
 The rear recovery pull governs, then VSB1's drawbar tests. The rails' checks use the raiser's 350 MPa, which is where the margin went.
 
-Deflection and twist (LC1, at the plate): the rail between the drawbar root and the front hub deflects 0.09 mm against 4.2 mm, the rear overhang tip 1.31 mm against 6.2 mm, and the worst outrigger tip 0.37 mm against 2.0 mm. Under LC5a the frame twists 0.374 degree against 0.5 degree, a 25 % margin.
+Deflection and twist (LC1, at the plate): the rail between the drawbar root and the front hub deflects 0.08 mm against 4.2 mm, the rear overhang tip 1.29 mm against 6.2 mm, and the worst outrigger tip 0.37 mm against 2.0 mm. Under LC5a the frame twists 0.377 degree against 0.5 degree, a 25 % margin.
 
 Fittings: the chain lugs reach 41 % of their limit (bearing), the front recovery lugs 73 % (plate bending at 78.5 kN), the rear tongues 62 %, the jacking pads 37 % under 39.0 kN, and the spare carrier posts 16 %. The tyre swung through its travel comes 53.5 mm from the kerb-side raiser at its closest, against 50 mm (FIT-05).
 
 ### Fatigue (LC10)
 
-Every detail passes its frequent check, and the largest Miner damage from the occasional case is 0.12, at the outrigger root weld beside the XT centre station (FAT-05). The tightest are FAT-05 (16.2 MPa against a CAFL of 21.1 MPa), FAT-03 at the XT crossmember roots (15.3 against 21.1 MPa) and the drawbar root (FAT-07, 34.9 against 52.6 MPa). CT-103 and the Chassis page list every detail.
+Every detail passes its frequent check, and the largest Miner damage from the occasional case is 0.12, at the outrigger root weld beside the XT centre station (FAT-05). The tightest are FAT-05 (16.2 MPa against a CAFL of 21.1 MPa), FAT-03 at the XT crossmember roots (15.3 against 21.1 MPa) and the drawbar root (FAT-07, 34.7 against 52.6 MPa). CT-103 and the Chassis page list every detail.
 
 The hollow-section T-joints are marked HS: the crossmember-to-rail joints, the outrigger roots, the cross brace and the brackets on the rail. Their nominal stress understates the stress at the weld toe, often by a factor of two to four, so the engineer checks them by the hot-spot method or CIDECT design guide 8.
 
