@@ -25,6 +25,8 @@ const jobs = [
     look: { hide: ['/ASM-BD/Body'], target: [4650, -650, 1500], from: [-600, 2200, 3500], zoom: 2.4 } },
   { path: '/ute-garage/', name: 'ute-garage', viewer: true, full: true, sections: ['checks', 'mass'] },
   { path: '/ute-garage/', name: 'ute-garage-loading', viewer: true, nth: 1 },
+  { path: '/electrical/', name: 'electrical', viewer: true, full: true, sections: ['cable-schedule', 'services-checks'] },
+  { path: '/plumbing/', name: 'plumbing', viewer: true, full: true, sections: ['pipe-schedule'] },
   { path: '/tow-vehicle/', name: 'tow-vehicle', full: true },
   { path: '/drawings/', name: 'drawings', full: true },
   { path: '/research/03-bike-restraint-garage/', name: 'research-03' },

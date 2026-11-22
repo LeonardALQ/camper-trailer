@@ -3,16 +3,35 @@
 // cad/sitedata.py writes with cad/services.py: the energy budget from research report 20's model output, the water
 // budget, the circuits, the shedding order, the outlets and the ventilation modes in data/services.yaml.
 import s from '../data/generated/services.json';
+// The routed runs (H28): cad/routes_model.py writes routes.json with the trailer's build, from data/routes.yaml.
+import routes from '../data/generated/routes.json';
 import { withBase } from '../lib/url';
 
 interface Props {
   kind: 'drawing' | 'energy' | 'autonomy' | 'recharge' | 'circuits' | 'shedding' | 'outlets' | 'cables' | 'water' | 'water-days'
-    | 'modes' | 'design-days' | 'units' | 'lamps' | 'lamp-checks';
+    | 'modes' | 'design-days' | 'units' | 'lamps' | 'lamp-checks'
+    | 'routes-legend' | 'cable-schedule' | 'pipe-schedule' | 'routes-lines' | 'svc-checks' | 'closest';
   number?: string;
   title?: string;
+  model?: 'trailer-electrical' | 'trailer-plumbing';
 }
-const { kind, number, title } = Astro.props;
+const { kind, number, title, model } = Astro.props;
 const d: any = s;
+const rt: any = routes;
+const ELEC = ['dc48', 'pv', 'dc24', 'dc12', 'data', 'ac230', 'lamps'];
+const elec = rt.runs.filter((r: any) => ELEC.includes(r.system));
+const wet = rt.runs.filter((r: any) => !ELEC.includes(r.system));
+const side = model === 'trailer-plumbing' ? wet : elec;
+// the routed runs on this page by the parts-list line that prices them
+const lineTotals = Object.values(side.reduce((m: Record<string, any>, r: any) => {
+  const k = r.priced_in ?? '-';
+  const x = (m[k] ??= { line: k, length_m: 0, mass_kg: 0, aud: 0, runs: 0 });
+  x.length_m += r.length_m; x.mass_kg += r.mass_kg; x.aud += r.aud; x.runs += 1;
+  return m;
+}, {})) as any[];
+const pricedHere = (rt.priced as any[]).filter((p) => side.some((r: any) => p.kinds.includes(r.kind)));
+const bd = rt.bd11;
+const bdRouted = rt.bd11_routed_kg;
 const n = (v: number | null | undefined, dp = 0) =>
   v == null ? '' : v.toLocaleString('en-AU', { minimumFractionDigits: dp, maximumFractionDigits: dp });
 const cases = d.energy.cases;
@@ -169,4 +188,82 @@ const cases = d.energy.cases;
 <style>
   .sheet img { width: 100%; height: auto; border: 1px solid var(--sl-color-gray-5); }
   .sheet figcaption { font-size: var(--sl-text-sm); }
+  .route-legend { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.3rem 1.2rem; font-size: 0.9rem; }
+  .route-legend li { display: flex; align-items: center; gap: 0.4rem; margin: 0; }
+  .route-legend .swatch { display: inline-block; width: 1.6rem; height: 0.55rem; border-radius: 2px; }
+  .route-legend .swatch.ghost { background: #9aa5ad; opacity: 0.35; }
 </style>
+
+{kind === 'routes-legend' && (
+  <ul class="route-legend">
+    {rt.legend.filter((l: any) => l.model === (model ?? 'trailer-electrical')).map((l: any) => (
+      <li><span class="swatch" style={`background:${l.colour}`}></span>{l.label}</li>))}
+    <li><span class="swatch ghost"></span>Body, chassis and fit-out, see-through</li>
+  </ul>
+)}
+
+{kind === 'cable-schedule' && (
+  <div class="data-table">
+    <table data-sheet-sum="sum">
+      <thead><tr><th>Run</th><th>System</th><th>Feeds</th><th>Cable</th><th>Length, m</th><th>Mass, kg</th><th>AUD</th><th>Priced in</th><th>Drop, %</th><th>Protection</th></tr></thead>
+      <tbody>{elec.map((r: any) => (
+        <tr><td>{r.id}</td><td>{r.system_label}</td><td>{r.feeds}</td><td>{r.cable}{r.size_why ? `. ${r.size_why}` : ''}</td>
+          <td>{n(r.length_m, 2)}</td><td>{n(r.mass_kg, 2)}</td><td>{n(r.aud, 2)}</td><td>{r.priced_in}</td>
+          <td>{r.vd_pct == null ? '' : n(r.vd_pct, 2)}</td><td>{r.protection}</td></tr>))}</tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'pipe-schedule' && (
+  <div class="data-table">
+    <table data-sheet-sum="sum">
+      <thead><tr><th>Run</th><th>System</th><th>Feeds</th><th>Pipe or hose</th><th>Length, m</th><th>Fittings</th><th>Mass, kg</th><th>AUD</th><th>Priced in</th></tr></thead>
+      <tbody>{wet.map((r: any) => (
+        <tr><td>{r.id}</td><td>{r.system_label}</td><td>{r.feeds}</td><td>{r.cable}</td>
+          <td>{n(r.length_m, 2)}</td><td>{r.fittings}</td><td>{n(r.mass_kg, 2)}</td><td>{n(r.aud, 2)}</td><td>{r.priced_in}</td></tr>))}</tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'routes-lines' && (
+  <>
+    <div class="data-table">
+      <table data-sheet-sum="sum">
+        <thead><tr><th>Priced in</th><th>Runs</th><th>Routed length, m</th><th>Routed mass, kg</th><th>Routed price, AUD</th></tr></thead>
+        <tbody>{lineTotals.map((x: any) => (<tr><td>{x.line}</td><td>{x.runs}</td><td>{n(x.length_m, 1)}</td><td>{n(x.mass_kg, 2)}</td><td>{n(x.aud, 2)}</td></tr>))}</tbody>
+      </table>
+    </div>
+    <div class="data-table">
+      <table data-sheet-sum="off">
+        <thead><tr><th>Line</th><th>Priced item</th><th>Priced</th><th>Routed</th><th>Larger</th></tr></thead>
+        <tbody>{pricedHere.map((p: any) => (<tr><td>{p.line}</td><td>{p.item}</td><td>{n(p.quantity)} {p.unit}</td><td>{n(p.routed, 1)} {p.unit}</td>
+          <td>{p.larger === 'routed' ? 'Routed: the line is to be raised' : 'Priced'}</td></tr>))}</tbody>
+      </table>
+    </div>
+    {bd && (
+      <p>BD-11's allowance is {n(bd.mass_kg, 1)} kg. Every routed cable and pipe it prices, on both pages, weighs {n(bdRouted, 1)} kg, so the
+        {bd.mass_kg >= bdRouted ? ' allowance is the larger and stands.' : ' routed mass is the larger and BD-11 is to be raised to it.'}</p>
+    )}
+  </>
+)}
+
+{kind === 'svc-checks' && (
+  <div class="data-table">
+    <table data-sheet-sum="off">
+      <thead><tr><th>Check</th><th>What it checks</th><th>Limit</th><th>Measured</th><th>Governing</th><th>Result</th><th>Source</th></tr></thead>
+      <tbody>{rt.checks.map((c: any) => (
+        <tr><td>{c.id}</td><td>{c.title}</td><td>{c.limit}</td><td>{c.measured == null ? '' : `${c.measured} ${c.unit}`}</td>
+          <td>{c.governing}</td><td>{c.ok ? 'Pass' : `Fail: ${c.detail}`}</td><td>{c.source}</td></tr>))}</tbody>
+    </table>
+  </div>
+)}
+
+{kind === 'closest' && (
+  <div class="data-table">
+    <table data-sheet-sum="off">
+      <thead><tr><th>Run</th><th>Part</th><th>Clear, mm</th></tr></thead>
+      <tbody>{rt.closest.map((g: any) => (<tr><td>{g.run}</td><td>{g.part} {g.name}</td><td>{n(g.gap, 1)}</td></tr>))}</tbody>
+    </table>
+  </div>
+)}
+
