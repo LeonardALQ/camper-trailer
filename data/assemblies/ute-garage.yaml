@@ -149,8 +149,11 @@ params:
 
 items:
   # ---------------------------------------------------------------- bikes (the trailer's bike models)
-  - {ref: TU, part: BIKE-TU, group: bikes, label: Aprilia Tuareg 660 Rally,
+  # In the loading view the Tuareg is on the ramp, half way up on the winch's rope, and its straps are off (decision H27)
+  - {ref: TU, part: BIKE-TU, group: bikes, label: Aprilia Tuareg 660 Rally, display: closed_only,
      bike: {centre_y: tuareg_y, front_tyre_x: front_tyre_x, front_rise: chock_rise}}
+  - {ref: TU_RAMP, part: BIKE-TU, group: bikes, label: "Aprilia Tuareg 660 Rally, winched up the ramp", display: loading_only,
+     bike: {centre_y: tuareg_y, on_ramp: 700, shows: TU}}
   - {ref: ST, part: BIKE-ST, group: bikes, label: Triumph Street Triple 765,
      bike: {centre_y: st_y, front_tyre_x: front_tyre_x, front_rise: chock_rise}}
   - {ref: TU-2263, part: BIKE-TU, group: bikes, label: "Tuareg with the photo-measured 2,263 mm length", check_only: true,
@@ -398,12 +401,18 @@ items:
     part: U-STRAP
     group: restraint
     label: Ratchet strap
+    display: closed_only
     copies:
       - {id: TU-F+, strap: {bike: TU, point: handlebar_inboard, side: 1, anchor: [front_row_x, tuareg_y + tu_strap_dy, fitting_h]}}
       - {id: TU-F-, strap: {bike: TU, point: handlebar_inboard, side: -1, anchor: [front_row_x, tuareg_y - tu_strap_dy, fitting_h]}}
       - {id: TU-R+, strap: {bike: TU, point: pillion_peg_hangers, side: 1, anchor: [rear_row_x, tuareg_y + tu_strap_dy, fitting_h]}}
       - {id: TU-R-, strap: {bike: TU, point: pillion_peg_hangers, side: -1, anchor: [rear_row_x, tuareg_y - tu_strap_dy, fitting_h]}}
       - {id: TU-W, strap: {bike: TU, point: rear_wheel, anchors: [[rear_row_x, tuareg_y + wheel_strap_dy, fitting_h], [rear_row_x, tuareg_y - wheel_strap_dy, fitting_h]]}}
+  - ref: "13"
+    part: U-STRAP
+    group: restraint
+    label: Ratchet strap
+    copies:
       - {id: ST-F+, strap: {bike: ST, point: handlebar_beside_risers, side: 1, anchor: [front_row_x, st_y + st_strap_dy, fitting_h]}}
       - {id: ST-F-, strap: {bike: ST, point: handlebar_beside_risers, side: -1, anchor: [front_row_x, st_y - st_strap_dy, fitting_h]}}
       - {id: ST-R+, strap: {bike: ST, point: pillion_peg_hangers, side: 1, anchor: [rear_row_x, st_y + st_strap_dy, fitting_h]}}
@@ -416,7 +425,49 @@ items:
   - {ref: R1, part: U-RAMP, group: restraint, label: "Ramp, folded on its edge across the back", display: closed_only,
      at: [ramp_x0, -ramp_fold_l / 2, 0], params: {dx: ramp_fold_t, dy: ramp_fold_l, dz: ramp_fold_w}}
   - {ref: R2, part: U-RAMP-OPEN, group: restraint, label: "Ramp hooked on the sill (loading)", display: loading_only,
-     ramp: {centre_y: tuareg_y, sill_x: x_end, drop: ground_drop}}
+     ramp: {centre_y: tuareg_y, sill_x: x_end, drop: ground_drop}, params: {hook_l: 60, hook_w: 100, hook_t: 6}}
+  - {ref: R4, part: U-ROPE, group: restraint, label: "Winch rope to the Tuareg on the ramp", display: loading_only}
+
+  # ---------------------------------------------------------------- what holds the doors, the fittings and the mudflaps (H27)
+  # Barn door hinges: closed, in the 10 mm gap between each leaf and its corner post at the rear face; open, between the
+  # side wall's skin and the leaf folded back 5 mm off it
+  - ref: D5
+    part: U-HINGE
+    group: doors
+    label: Barn door hinge
+    display: closed_only
+    copies:
+      - {id: road, at: [x_end - 12, door_y1, 20], params: {dx: 12, dy: hinge_gap, dz: door_h - 45}}
+      - {id: kerb, at: [x_end - 12, door_y0 - hinge_gap, 20], params: {dx: 12, dy: hinge_gap, dz: door_h - 45}}
+  - ref: D6
+    part: U-HINGE-OPEN
+    group: doors
+    label: Barn door hinge, leaf folded back
+    display: loading_only
+    copies:
+      - {id: road, at: [x_end - 14.5, outside_w / 2, 20], params: {dx: 12, dy: 5, dz: door_h - 45}}
+      - {id: kerb, at: [x_end - 14.5, -outside_w / 2 - 5, 20], params: {dx: 12, dy: 5, dz: door_h - 45}}
+  - {ref: D7, part: U-CAMHANDLE, group: doors, label: "Cam bar handle, in the hasp's shroud", display: closed_only,
+     at: [x_end + 30, door_y1 - 200 + 70, 715], params: {dx: 15, dy: 47.5, dz: 40}}
+  - {ref: D8, part: U-KHINGE, group: doors, label: "Kerb-side door's top hinge, inside",
+     at: [kd_x0 + 20, -outside_w / 2 + leaf_t, kd_z1 - 20], params: {dx: kd_x1 - kd_x0 - 40, dy: 10, dz: 20}}
+  - {ref: D9, part: U-KLATCH, group: doors, label: "Kerb-side door's keyed latch, inside",
+     at: [kd_x1 - 160, -outside_w / 2 + leaf_t, 560], params: {dx: 60, dy: 20, dz: 80}}
+  - {ref: V2D, part: U-FANDUCT, group: safety, label: "Fan's inlet duct through the front wall",
+     at: [-frame_s, (tuareg_y + st_y) / 2, 1250], params: {axis: x}}
+  - {ref: V4B, part: U-FUMEBKT, group: safety, label: "Front fume sensor's bracket on the front wall skin",
+     at: [-frame_s, (tuareg_y + st_y) / 2 - 30, 90], params: {dx: frame_s, dy: 60, dz: 60}}
+  - {ref: K3P, part: U-TRKPLATE, group: security, label: "Tracker's mounting plate on the front wall skin",
+     at: [-frame_s, -half_width + 90, 1240], params: {dx: frame_s, dy: 180, dz: 130}}
+  - {ref: V5B, part: U-EXTBKT, group: safety, label: "Extinguisher's bracket on its rail on the kerb wall",
+     at: [garage_length - 370, -half_width - frame_s, 650], params: {dx: 80, dy: frame_s + 5, dz: 220}}
+  - ref: C7
+    part: U-MUDFLAP-BKT
+    group: context
+    label: Lovells mudflap bracket under the rear outrigger
+    copies:
+      - {id: R, at: [mudflap_x - 45, wheel_y - mudflap_w / 2, sub_z0 - 6], params: {dx: 51, dy: half_width + frame_s - wheel_y + mudflap_w / 2, dz: 6}}
+      - {id: K, at: [mudflap_x - 45, -half_width - frame_s, sub_z0 - 6], params: {dx: 51, dy: half_width + frame_s - wheel_y + mudflap_w / 2, dz: 6}}
 
   # ---------------------------------------------------------------- vents, light and safety
   - ref: V1
@@ -504,8 +555,8 @@ items:
     group: context
     label: Lovells mudflap behind the rear tyre
     copies:
-      - {id: R, at: [mudflap_x, wheel_y - mudflap_w / 2, sub_z0 - mudflap_h], params: {dx: 6, dy: mudflap_w, dz: mudflap_h}}
-      - {id: K, at: [mudflap_x, -wheel_y - mudflap_w / 2, sub_z0 - mudflap_h], params: {dx: 6, dy: mudflap_w, dz: mudflap_h}}
+      - {id: R, at: [mudflap_x, wheel_y - mudflap_w / 2, sub_z0 - mudflap_h], params: {dx: 6, dy: mudflap_w, dz: mudflap_h - 6}}
+      - {id: K, at: [mudflap_x, -wheel_y - mudflap_w / 2, sub_z0 - mudflap_h], params: {dx: 6, dy: mudflap_w, dz: mudflap_h - 6}}
   - {ref: C3, part: U-GROUND, group: context, label: Assumed ground, display: loading_only,
      at: [x_end - 100, tuareg_y - 750, -ground_drop - 10]}
   # Check-only solids

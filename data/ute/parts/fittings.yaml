@@ -1,0 +1,88 @@
+# The bike box's visible fittings (decision H27): what holds each part to the box, and the hinges, handles, hooks and
+# rope a person sees. They are visual. Each is priced and weighed with the part it belongs to (`included_in`), so the
+# parts list and the box mass are unchanged. Sizes are estimates unless a source is given.
+group: ute-fittings
+parts:
+  U-HINGE:
+    name: Continuous hinge, stainless, at a barn door leaf's corner post
+    kind: sub_part
+    included_in: U-LEAF
+    material: "304 stainless piano hinge, 2 mm leaves, 6 mm pin (est.)"
+    notes: In the 10 mm gap between each leaf and its corner post (UTE-GARAGE.md), the full height of the leaf.
+    geometry: {generator: box, params: {}}
+    color: "#b2bec3"
+  U-HINGE-OPEN:
+    name: Continuous hinge, stainless, with its leaf folded back against the side wall
+    kind: sub_part
+    included_in: U-LEAF
+    material: "304 stainless piano hinge (est.)"
+    geometry: {generator: box, params: {}}
+    color: "#b2bec3"
+  U-CAMHANDLE:
+    name: Cam bar handle and its keeper
+    kind: sub_part
+    included_in: U-CAMBAR
+    material: "Zinc-plated steel (est.)"
+    notes: The handle turns the cam bar. Its keeper takes the shrouded hasp's padlock.
+    geometry: {generator: box, params: {}}
+    color: "#636e72"
+  U-KHINGE:
+    name: Kerb-side door's top hinge
+    kind: sub_part
+    included_in: U-KDOOR
+    material: "304 stainless piano hinge (est.)"
+    notes: Along the door's top edge on the outside, so the door lifts up on its two gas struts.
+    geometry: {generator: box, params: {}}
+    color: "#b2bec3"
+  U-KLATCH:
+    name: Kerb-side door's keyed latch
+    kind: sub_part
+    included_in: U-KDOOR
+    material: "Stainless T-handle latch (est.)"
+    geometry: {generator: box, params: {}}
+    color: "#636e72"
+  U-FANDUCT:
+    name: Fan's inlet duct through the front wall
+    kind: sub_part
+    included_in: U-FAN
+    material: "Plastic duct with a stainless mesh grille on the outside (est.)"
+    notes: The fan draws through the front wall skin above the cab roof.
+    geometry: {generator: disc, params: {diameter: 160, depth: 40}}
+    color: "#636e72"
+  U-FUMEBKT:
+    name: Fume sensor's bracket on the front wall
+    kind: sub_part
+    included_in: U-FUME
+    material: "Aluminium angle, riveted to the skin (est.)"
+    geometry: {generator: box, params: {}}
+    color: "#b2bec3"
+  U-TRKPLATE:
+    name: Tracker's mounting plate and cover on the front wall
+    kind: sub_part
+    included_in: U-TRACKER
+    material: "Aluminium plate, riveted to the skin (est.)"
+    geometry: {generator: box, params: {}}
+    color: "#b2bec3"
+  U-EXTBKT:
+    name: Extinguisher's vehicle bracket on its mounting rail
+    kind: sub_part
+    included_in: U-EXT
+    material: "Steel bracket on an aluminium rail riveted to the kerb wall (est.)"
+    geometry: {generator: box, params: {}}
+    color: "#d63031"
+  U-ROPE:
+    name: Winch rope, 4.8 mm synthetic, pulling the Tuareg up the ramp
+    kind: sub_part
+    included_in: U-WINCH
+    material: "4.8 mm synthetic rope (WARN VRX 25-S)"
+    notes: From the drum to a soft loop round the Tuareg's lower triple clamp. Shown in the loading view.
+    geometry: {generator: winch_rope, params: {diameter: 4.8}}
+    color: "#e17055"
+  U-MUDFLAP-BKT:
+    name: Lovells mudflap bracket under the rear outrigger
+    kind: context
+    included_in: U-MUDFLAP
+    material: "Steel flat bar, galvanised (est.)"
+    notes: In the Lovells Elite kit (car build line GV05), so its mass is in the kit's extra mass, ute line UT-16.
+    geometry: {generator: box, params: {}}
+    color: "#1c2833"

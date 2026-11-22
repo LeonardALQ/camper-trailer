@@ -13,6 +13,10 @@ from .model.assembly import GROUP_LABELS
 from .model.prims import box, rgba
 from .trailer_model import _moved
 
+# The viewer's tessellation of the ute: 1 mm of chord error and 0.5 rad between facets keep the two product models, the
+# LandCruiser and the bikes with their tyres and spokes, under the site's 8 MB a file (decision H27)
+TESSELLATION = dict(deviation=1.0, angular_tolerance=0.5)
+
 
 def _solid(ute, s):
     P = ute.P
@@ -72,24 +76,50 @@ def ute_compound(ute, garage_model=None, label="UTE-79", loading=False):
         groups: dict[str, list] = {}
         for i, s in garage_solids(ute, garage_model, loading=loading):
             part = garage_model.prj.parts[i.part]
-            s.label, s.color = f"{i.iid} {i.label}".replace("/", "-"), rgba(part.color, part.alpha)
+            # a bike shown elsewhere in the loading view (on the ramp) keeps its own id, so hover names the same bike
+            who = i.special.get("bike", {}).get("shows", i.iid)
+            s.label, s.color = f"{who} {i.label}".replace("/", "-"), rgba(part.color, part.alpha)
             groups.setdefault(i.group, []).append(s)
         kids.append(Compound(label="Bike garage", children=[Compound(label=GROUP_LABELS[g], children=v) for g, v in groups.items()]))
     return Compound(label=label, children=kids)
 
 
-def write_outputs(ute, out: Path, garage_model=None):
+def _compact(o):
+    """Round the tessellation in a viewer file: positions to 0.1 mm and normals to 0.001, which nobody sees and which
+    halves the file."""
+    if isinstance(o, dict):
+        for k, v in o.items():
+            if k in ("vertices", "edges", "obj_vertices"):
+                o[k] = _rounded(v, 1)
+            elif k == "normals":
+                o[k] = _rounded(v, 3)
+            else:
+                _compact(v)
+    elif isinstance(o, list):
+        for v in o:
+            _compact(v)
+    return o
+
+
+def _rounded(v, n):
+    if isinstance(v, list):
+        return [_rounded(x, n) for x in v]
+    return round(v, n) if isinstance(v, float) else v
+
+
+def _viewer(comp) -> str:
     from .export import _viewer_js
+    js = _viewer_js("UTE-79", comp, **TESSELLATION)
+    return json.dumps(_compact(json.loads(js[js.index("{"): js.rindex("}") + 1])), separators=(",", ":"))
+
+
+def write_outputs(ute, out: Path, garage_model=None):
     out.mkdir(parents=True, exist_ok=True)
     comp = ute_compound(ute, garage_model)
-    js = _viewer_js("UTE-79", comp)
-    shapes = json.loads(js[js.index("{"): js.rindex("}") + 1])
-    (out / "ute.viewer.json").write_text(json.dumps(shapes, separators=(",", ":")))
+    (out / "ute.viewer.json").write_text(_viewer(comp))
     export_step(comp, str(out / "ute.step"), timestamp="2026-11-20T00:00:00")
     if garage_model is not None:
-        comp = ute_compound(ute, garage_model, loading=True)
-        js = _viewer_js("UTE-79", comp)
-        (out / "ute-loading.viewer.json").write_text(js[js.index("{"): js.rindex("}") + 1])
+        (out / "ute-loading.viewer.json").write_text(_viewer(ute_compound(ute, garage_model, loading=True)))
     return comp
 
 

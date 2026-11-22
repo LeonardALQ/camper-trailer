@@ -34,10 +34,32 @@ def fuse(parts):
 
 
 def tube(points, r, round_ends=False):
-    """Round bar through the points, with a ball at every bend so that the segments join."""
-    segs = [cyl(a, b, r) for a, b in zip(points, points[1:]) if math.dist(a, b) > 0.5]
-    joints = [ball(p, r) for p in (points if round_ends else points[1:-1])]
+    """Round bar through the points: a circle swept along the polyline with round bends, as a bent tube is. If OCCT
+    cannot sweep the path, the bar is straight segments with a ball at every bend, the balls 5 % larger than the bar so
+    that they cut it cleanly instead of meeting it tangentially."""
+    pts = [points[0]] + [p for a, p in zip(points, points[1:]) if math.dist(a, p) > 0.5]
+    if len(pts) > 2:
+        try:
+            from build123d import Circle, Transition, sweep
+            path = Wire.make_polygon([Vector(*p) for p in pts], close=False)
+            prof = Plane(origin=pts[0], z_dir=Vector(*pts[1]) - Vector(*pts[0])) * Circle(r)
+            s = sweep(prof, path=path, transition=Transition.ROUND)
+            solids = s.solids()
+            if len(solids) == 1 and solids[0].is_valid and solids[0].volume > 0:
+                return solids[0]
+        except Exception:
+            pass
+    segs = [cyl(a, b, r) for a, b in zip(pts, pts[1:])]
+    joints = [ball(p, 1.05 * r) for p in (pts if round_ends else pts[1:-1])]
     return fuse(segs + joints)
+
+
+def stick(p0, p1, w):
+    """Square bar w wide from p0 to p1, for spokes: twelve triangles in the viewer where a round bar needs a hundred."""
+    from build123d import Box
+    a, b = Vector(*p0), Vector(*p1)
+    d = b - a
+    return Plane(origin=a, z_dir=d) * Pos(0, 0, d.length / 2) * Box(w, w, d.length)
 
 
 def on_axle(shape, centre, outward):
@@ -66,36 +88,89 @@ def _crown_r(r0, a, b, z):
     return r0 + a * math.sqrt(max(0.0, 1 - (z / b) ** 2))
 
 
-def _block(r_in, r_out, z0, z1, half_deg, at_deg):
-    """A tread block between two radii and two axial planes, spanning +/-half_deg about the angle at_deg. Its outer face
-    reaches r_out at its middle and at both ends."""
-    h = math.radians(half_deg)
-    pts = [(r_in * math.cos(-h), r_in * math.sin(-h)), (r_out * math.cos(-h), r_out * math.sin(-h)), (r_out, 0.0),
-           (r_out * math.cos(h), r_out * math.sin(h)), (r_in * math.cos(h), r_in * math.sin(h))]
-    f = face([(x, y, z0) for x, y in pts])
-    return Rot(0, 0, at_deg) * extrude(f, amount=z1 - z0, dir=(0, 0, 1))
+def tread_ring(r_root, r_tip, z0, z1, n, duty=0.5, phase=0.0):
+    """A ring of n tread blocks round the Z axis: a toothed outline between r_root and r_tip, extruded from z0 to z1. One
+    block is centred on +X when phase is 0, the direction on_axle turns to the ground, so the tyre stands on a block.
+    Each block's top is two flats that reach r_tip at its middle and at both ends. The root lies inside the carcass."""
+    half = math.pi * duty / n
+    pts = []
+    for k in range(n):
+        c = 2 * math.pi * k / n + math.radians(phase)
+        for r, a in ((r_root, c - half), (r_tip, c - half), (r_tip, c), (r_tip, c + half), (r_root, c + half)):
+            pts.append((r * math.cos(a), r * math.sin(a), z0))
+    return extrude(face(pts), amount=z1 - z0, dir=(0, 0, 1))
 
 
 @lru_cache(maxsize=None)
 def moto_tyre(D, W, rim_r, bead_w, knob=0.0, n=40):
-    """Motorcycle tyre: a round-crowned carcass seated on the rim, with knobs on its crown when `knob` is set. A knob
-    sits at the bottom, so the tyre stands on one, and the knob tops reach the tyre's overall diameter."""
+    """Motorcycle tyre: a round-crowned carcass seated on the rim, with knobs on its crown when `knob` is set: a centre row
+    and a shoulder row each side, half a pitch round from it. The centre row's tops reach the tyre's overall diameter,
+    and a centre knob sits at the bottom, so the tyre stands on one. The tyre is a compound of the carcass and its three
+    rows of knobs, which keeps it light to tessellate and to measure."""
     R = D / 2
     pts, (r0, a, b) = _ellipse_crown(rim_r, R - knob, W, bead_w)
     carcass = lathe(pts)
     if not knob:
         return carcass
-    pitch = 360.0 / n
-    blocks = []
-    for k in range(n):
-        ang = k * pitch
-        blocks.append(_block(R - knob - 3, R, -0.17 * W, 0.17 * W, 0.28 * pitch, ang))
-        for s in (1, -1):
-            zc = s * 0.6 * b
-            ro = _crown_r(r0, a, b, abs(zc)) + knob
-            z0, z1 = sorted((s * 0.42 * b, s * 0.86 * b))
-            blocks.append(_block(ro - knob - 6, ro, z0, z1, 0.22 * pitch, ang + pitch / 2))
-    return fuse([carcass] + blocks)
+    from build123d import Compound
+    rows = [tread_ring(_crown_r(r0, a, b, 0.17 * W) - 3, R, -0.17 * W, 0.17 * W, n, 0.56)]
+    for s in (1, -1):
+        z0, z1 = sorted((s * 0.42 * b, s * 0.86 * b))
+        r_out, r_in = _crown_r(r0, a, b, 0.86 * b), _crown_r(r0, a, b, 0.42 * b)
+        rows.append(tread_ring(r_out - 4, r_in + knob, z0, z1, n, 0.44, 180.0 / n))
+    return Compound([carcass] + rows)
+
+
+@lru_cache(maxsize=None)
+def truck_tyre(D, W, rim_r, bead_w, depth=13.0, n=44):
+    """Light-truck all-terrain tyre: a square-shouldered carcass with its sidewalls, and five rows of tread blocks, the
+    two inner rows and the centre row staggered half a pitch, and shoulder rows that run down onto the sidewall. The
+    tread tops reach the overall diameter and a block sits at the bottom. A compound of the carcass and its rows."""
+    from build123d import Compound
+    R = D / 2
+    rc = R - depth                       # carcass at the tread's base
+    h = rc - rim_r
+    w, bw = W / 2, bead_w / 2
+    prof = [(rim_r - 3, -(bw - 10)), (rim_r + 20, -(bw + 6)), (rim_r + 0.45 * h, -w), (rc - 22, -w), (rc - 4, -w + 14), (rc, -w + 40),
+            (rc, w - 40), (rc - 4, w - 14), (rc - 22, w), (rim_r + 0.45 * h, w), (rim_r + 20, bw + 6), (rim_r - 3, bw - 10)]
+    carcass = lathe(prof)
+    rows = [tread_ring(rc - 3, R, -0.06 * W, 0.06 * W, n, 0.55)]
+    for s in (1, -1):
+        z0, z1 = sorted((s * 0.09 * W, s * 0.27 * W))
+        rows.append(tread_ring(rc - 3, R, z0, z1, n, 0.62, 180.0 / n))
+        z0, z1 = sorted((s * 0.30 * W, s * (w - 6)))
+        rows.append(tread_ring(rc - 26, R - 3, z0, z1, n, 0.5, 0.0))
+    return Compound([carcass] + rows)
+
+
+@lru_cache(maxsize=None)
+def steel_wheel(rim_r, width, windows=8, studs=5, pcd=150.0, bore=110.0, offset=0.0):
+    """Steel sunraysia wheel (ROH Trak 2): a rolled rim with its bead seats, flanges and drop centre, and a pressed centre
+    disc with `windows` triangular windows, the stud holes on the pitch circle and the centre bore, its mounting face at
+    `offset` from the rim's centre plane. Built about Z, +Z the wheel's outer face."""
+    w = width / 2
+    t = 4.0
+    rim = lathe([(rim_r - 2, -w), (rim_r + 17, -w - 3), (rim_r + 17, -w + 3), (rim_r + 2, -w + 6), (rim_r + 2, -w + 30),
+                 (rim_r - 22, -w + 48), (rim_r - 22, w - 48), (rim_r + 2, w - 30), (rim_r + 2, w - 6), (rim_r + 17, w - 3),
+                 (rim_r + 17, w + 3), (rim_r - 2, w), (rim_r - 2, w - 28), (rim_r - 22 - t, w - 46), (rim_r - 22 - t, -w + 46),
+                 (rim_r - 2, -w + 28)])
+    z0 = offset
+    disc = lathe([(bore / 2, z0), (pcd / 2 + 32, z0), (pcd / 2 + 60, z0 + 22), (rim_r - 40, z0 + 26), (rim_r - 22, z0 + 26),
+                  (rim_r - 22, z0 + 26 - t), (rim_r - 40, z0 + 26 - t), (pcd / 2 + 58, z0 + 22 - t), (pcd / 2 + 30, z0 - t),
+                  (bore / 2, z0 - t)])
+    cuts = []
+    r0, r1 = pcd / 2 + 52, rim_r - 46
+    for k in range(windows):
+        c = 2 * math.pi * (k + 0.5) / windows
+        a0, a1 = math.pi / windows * 0.62, math.pi / windows * 0.30
+        tri = [(r0 * math.cos(c), r0 * math.sin(c), z0 - 20), (r1 * math.cos(c - a0), r1 * math.sin(c - a0), z0 - 20),
+               (r1 * math.cos(c + a0), r1 * math.sin(c + a0), z0 - 20)]
+        cuts.append(extrude(face(tri), amount=70, dir=(0, 0, 1)))
+    for k in range(studs):
+        a = 2 * math.pi * k / studs
+        cuts.append(cyl((pcd / 2 * math.cos(a), pcd / 2 * math.sin(a), z0 - 20), (pcd / 2 * math.cos(a), pcd / 2 * math.sin(a), z0 + 20), 11))
+    disc = disc.cut(*cuts)
+    return rim.fuse(disc)
 
 
 @lru_cache(maxsize=None)
@@ -131,13 +206,16 @@ def _spoke_phase(p0, p1, r):
 
 
 @lru_cache(maxsize=None)
-def spoked_wheel(rim_r, rim_w, hub_r, hub_w, flange_r, n=36, spoke_r=2.2, cross_deg=24.0, down_r=0.0):
-    """Wire wheel: rim, hub with a spoke flange each side, and n tangential spokes. With down_r set, one spoke from
-    each flange crosses that radius straight below the axle, where a strap through the wheel bears on them."""
+def spoked_wheel(rim_r, rim_w, hub_r, hub_w, flange_r, n=36, spoke_w=4.0, cross_deg=24.0, down_r=0.0):
+    """Wire wheel: rim, hub with a spoke flange each side, and n tangential spokes, each running from inside its flange
+    into the rim. With down_r set, one spoke from each flange crosses that radius straight below the axle, where a strap
+    through the wheel bears on them. A compound of the rim, the hub and the spokes, which are not fused: fusing them
+    cuts every spoke's outline into the rim and the flanges and makes the wheel several times heavier to draw."""
+    from build123d import Compound
     rim = moto_rim(rim_r, rim_w)
     hub = fuse([cyl((0, 0, -hub_w / 2), (0, 0, hub_w / 2), hub_r),
                 ring(hub_r - 2, flange_r, hub_w / 2 - 14, hub_w / 2 - 8), ring(hub_r - 2, flange_r, -hub_w / 2 + 8, -hub_w / 2 + 14)])
-    ri = rim_r - 15
+    ri, rf = rim_r - 13, flange_r - 4
     spokes = []
     per = n // 2
     for side in (1, -1):
@@ -146,12 +224,12 @@ def spoked_wheel(rim_r, rim_w, hub_r, hub_w, flange_r, n=36, spoke_r=2.2, cross_
         for k in range(per):
             a0 = 360.0 * k / per + (180.0 / per if side < 0 else 0.0)
             a1 = a0 + (cross_deg if k % 2 == 0 else -cross_deg)
-            base.append(((flange_r * math.cos(math.radians(a0)), flange_r * math.sin(math.radians(a0)), zf),
+            base.append(((rf * math.cos(math.radians(a0)), rf * math.sin(math.radians(a0)), zf),
                          (ri * math.cos(math.radians(a1)), ri * math.sin(math.radians(a1)), zr)))
         turn = -_spoke_phase(base[0][0], base[0][1], down_r) if down_r else 0.0
         for p0, p1 in base:
-            spokes.append(Rot(0, 0, turn) * cyl(p0, p1, spoke_r))
-    return fuse([rim, hub] + spokes)
+            spokes.append(Rot(0, 0, turn) * stick(p0, p1, spoke_w))
+    return Compound([rim, hub] + spokes)
 
 
 @lru_cache(maxsize=None)

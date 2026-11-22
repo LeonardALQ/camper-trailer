@@ -16,7 +16,8 @@ from .partsdb import ROOT
 
 OUT = ROOT / "build" / "solved" / "module.json"
 DEPENDS = ["data/measurements.yaml", "data/parts/bikes.yaml", "data/assemblies/ute-garage.yaml", "data/ute/garage-checks.yaml",
-           "research/05-bike-geometry.yaml", "cad/model/bike.py", "cad/inputs.py", "cad/solve.py"]
+           "research/05-bike-geometry.yaml", "cad/model/bike.py", "cad/inputs.py", "cad/solve.py", "cad/model/vehicles/kit.py",
+           "cad/model/vehicles/moto.py", "cad/model/vehicles/tuareg.py", "cad/model/vehicles/street_triple.py"]
 
 
 def key() -> str:
