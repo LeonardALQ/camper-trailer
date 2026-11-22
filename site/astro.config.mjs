@@ -40,6 +40,7 @@ export default defineConfig({
           label: 'Trailer',
           items: [
             { label: 'Whole trailer', link: '/trailer/' },
+            { label: 'Floor plan', link: '/trailer/#floor-plan' },
             { label: 'Chassis', link: '/chassis/' },
             { label: 'Body', link: '/body/' },
             { label: 'Electrical', link: '/electrical/' },
