@@ -268,6 +268,12 @@ class TrailerModel:
         return [s for v in self.groups.values() for s in v]
 
 
+def chassis_compound(tm: TrailerModel) -> Compound:
+    """The chassis and drawbar on their own, for the chassis page and the engineer."""
+    return Compound(label="ASM-CH Chassis and drawbar",
+                    children=[Compound(label=SYSTEM_LABELS[g], children=tm.groups[g]) for g in ("chassis", "drawbar") if g in tm.groups])
+
+
 def write_outputs(tm: TrailerModel, out: Path):
     from .export import _viewer_js
     out.mkdir(parents=True, exist_ok=True)
@@ -277,9 +283,7 @@ def write_outputs(tm: TrailerModel, out: Path):
     (out / "trailer.viewer.json").write_text(json.dumps(shapes, separators=(",", ":")))
     export_step(comp, str(out / "trailer.step"), timestamp="2026-11-18T00:00:00")
     export_gltf(comp, str(out / "trailer.glb"), binary=True, linear_deflection=0.8, angular_deflection=0.5)
-    # the chassis and drawbar on their own, for the chassis page and the engineer
-    ch = Compound(label="ASM-CH Chassis and drawbar",
-                  children=[Compound(label=SYSTEM_LABELS[g], children=tm.groups[g]) for g in ("chassis", "drawbar") if g in tm.groups])
+    ch = chassis_compound(tm)
     js = _viewer_js("ASM-CH", ch, **VIEWER_MESH)
     (out / "chassis.viewer.json").write_text(js[js.index("{"): js.rindex("}") + 1])
     export_step(ch, str(out / "chassis.step"), timestamp="2026-11-20T00:00:00")

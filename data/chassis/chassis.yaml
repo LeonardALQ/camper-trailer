@@ -93,7 +93,8 @@ plan_braces:
 
 # Welded and bolted fittings. Plates: length x width x thickness in mm, with a count. Bought parts carry a mass and its
 # source. `at` is a position (X, Y, Z), `side_y` repeats the item on both sides at that Y magnitude, `rear_x` adds a
-# rear pair, and `box` (X0, Y0, Z0, dX, dY, dZ) is an envelope the trailer layout's checks see (coupling, stone guard).
+# rear pair, at its own `rear_y` and `rear_z` where they are given, and `box` (X0, Y0, Z0, dX, dY, dZ) is an envelope
+# the trailer layout's checks see (coupling, stone guard).
 # The DB- items are the coupling and drawbar fittings (they replace the layout's DB-03 and DB-04 blocks). Bought
 # fittings and the bearer strip carry a `price` in the form data/trailer-parts.yaml describes. The members, plates and
 # the galvanising are priced there as stock bought for the whole frame.
@@ -117,8 +118,10 @@ fittings:
   - {id: CH-P09, plane: yz, name: "Spare carrier cleats and hub plate, 6 mm (posts in the member list)", kind: plate, l: 300, w: 300, t: 6, qty: 1,
      at: ["body_x0 - 40", 0, spare_z], fat: null,
      box: ["body_x0 - spare_bracket_d - tyre_w / 2 - 24", -150, "spare_z - 150", "spare_bracket_d + tyre_w / 2 - 26", 300, 300]}
-  - {id: CH-P10, plane: xz, name: "Corner steady brackets, 6 mm, bolted to the rail with crush tubes", kind: plate, l: 200, w: 150, t: 6, qty: 4,
-     at: [steady_front_x, 0, rail_underside_z - 20], side_y: rail_c, rear_x: steady_rear_x}
+  # The front pair sits where the drawbar members run under the rails, so its brackets bolt under the drawbar members,
+  # their outer edge flush with the members' outer face to clear the front recovery lugs (H27)
+  - {id: CH-P10, name: "Corner steady brackets, 6 mm plates bolted up through the rail with crush tubes, through the drawbar member at the front pair", kind: plate, l: 200, w: 150, t: 6, qty: 4,
+     at: [steady_front_x, 0, rail_underside_z - db_depth - 3], side_y: rail_c - 50, rear_x: steady_rear_x, rear_y: rail_c, rear_z: rail_underside_z - 3}
   - {id: CH-P14, name: "Body mount nut plate, 10 mm, M12 tapped, welded inside the raiser or outrigger tip under each body bolt (BODY.md)", kind: plate,
      l: 80, w: 44, t: 10, qty: 32, at: ["body_x0 + body_length / 2", 0, raiser_top_z - 13]}
   - {id: CH-P11, plane: xz, name: "Jockey wheel bracket plate, 8 mm, bolted to the kerb-side member", kind: plate, l: 200, w: 160, t: 8, qty: 1,
@@ -143,7 +146,7 @@ fittings:
      price: [{item: "Breakaway kit: 12 V sealed battery in a box, switch with lanyard, charge controller", aud: 250, basis: estimate, date: 2026-11-20, note: "No Australian listing was readable"},
              {item: "12-pin flat plug", aud: 52.62, basis: listing, url: "https://www.arkcorp.com.au/product/12-pin-flat/", date: 2026-11-20},
              {item: "12-core trailer cable, Anderson 50 A plug and charge cable, glands and loom", aud: 180, basis: estimate, date: 2026-11-20}],
-     source: "Estimate (report 11: breakaway kit mass not found)", at: [700, 0, rail_underside_z]}
+     source: "Estimate (report 11: breakaway kit mass not found)", at: [750, 0, rail_underside_z - 75]}   # bolted to the cross brace's front face, under the stone guard (H27)
   - {id: DB-04, name: "Stone guard: 25 x 25 x 2 SHS frame with 2 mm aluminium checker plate on rubber mounts, on the cross brace, trimmed on the kerb side round the swung-up jockey wheel", kind: bought, material: "Steel SHS 25 x 25 x 2 frame, 2 mm aluminium checker plate, rubber mounts", mass_kg: 6.5, maturity: calculated,
      source: "Calculated: 2.2 m of 25 x 25 x 2 SHS at 1.36 kg/m, 0.30 m2 of 2 mm aluminium at 5.4 kg/m2, 1.9 kg of mounts and bolts. Kerb side trimmed to Y -370, 30 mm clear of the jockey wheel", at: [735, 65, rail_underside_z + 10],
      price: {aud: 84.01, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/15-shs-mild-steel-square.html", date: 2026-11-20,
@@ -151,7 +154,8 @@ fittings:
      box: ["db_apex_x + 200", -370, rail_underside_z, sg_l, 870, 10]}
   - {id: CH-B01, size: [120, 80, 300], name: "ARK XO DDS650 drop-down corner steady, 875 kg rating", kind: bought, material: "Steel, zinc plated (est.)", mass_kg: 8.8, qty: 4, maturity: spec,
      price: {aud: 299.90, basis: listing, url: "https://www.arkcorp.com.au/product/xo-corner-steadies/", date: 2026-11-20, note: "Two pairs at AUD 149.95, SKU XODDS650"},
-     source: "Retailer: 38.9 lb (17.6 kg) for a set of two with the winding handle (report 13 section 6)", at: [steady_front_x, 0, rail_underside_z - 150], side_y: rail_c, rear_x: steady_rear_x}
+     source: "Retailer: 38.9 lb (17.6 kg) for a set of two with the winding handle (report 13 section 6)", at: [steady_front_x, 0, rail_underside_z - db_depth - 156], side_y: rail_c - 15,
+     rear_x: steady_rear_x, rear_y: rail_c, rear_z: rail_underside_z - 156}
   - {id: CH-B02, size: [60, 40, 42.5], name: "Lashing point, forged 1/2 in weld-on D-ring with its clip under an outrigger's end, 4,000 lb working load limit, welded before galvanising", kind: bought, material: "Forged steel, galvanised with the frame", mass_kg: 0.45, qty: 4, maturity: estimate,
      price: {aud: 1712, basis: estimate, url: "https://www.amazon.com/gp/product/B0B53NL2MB", date: 2026-11-21, note: "Four D-rings at about AUD 15, and the tie-down kit, about AUD 1,652: four 50 mm ratchet straps at about AUD 45 (est.), four Tie Down Engineering 59099 anchors at about USD 45 (AUD 76.73 each, est., converted with GST), four Tie Down 59286 stabilizer plates at USD 28.19 (AUD 48.06 each, converted with GST, https://www.shelllumber.com/collections/tie-down-engineering), Tie Down's 59200 Soil Test Probe Kit at USD 505.99 (AUD 862.71, converted with GST, https://mobilehomeoutfitters.com/tools/soil-test-probe-kit/), a turning bar about AUD 40, and a bag with two 25 mm ratchet straps to lash it in the bike box about AUD 70 (est.). The kit's 45.0 kg rides in the ute while towing (U-TIEDOWN, U-ANCHORS) and stays with the trailer whenever the ute is unhitched for more than a day"},
      source: "Estimate: a 1/2 in forged D-ring with its bracket, about 0.45 kg", at: ["body_x0 + xm_w / 2", 0, "raiser_top_z - 148.25"], side_y: "outrigger_tip_y - 30", rear_x: "body_x1 - xm_w / 2"}

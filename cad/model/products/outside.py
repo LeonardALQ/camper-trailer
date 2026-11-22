@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import math
 
-from build123d import Plane, RectangleRounded, Solid, Vector, extrude
+from build123d import Keep, Plane, RectangleRounded, Solid, Vector, extrude, split
 
 from . import ALU, BLACK, CHROME, DARK, GREY, RUBBER, STEEL, WHITE, product
 
@@ -58,13 +58,14 @@ def xt_hub(fr, V, sp, b):
 
 @product("steel_wheel")
 def wheel(fr, V, sp, b):
-    """ROH Trak 2 16 x 7 ET 0 steel wheel: the rim with its flanges and the disc on the centre plane, with the 110 mm
-    centre bore. `hub` says which side of the centre plane the hub is: the disc lies on the other side of it."""
+    """ROH Trak 2 16 x 7 ET 0 steel wheel: the rim with its flanges and the disc against the centre plane, with the
+    110 mm centre bore. `hub_side` says which side of the centre plane, low or high v, the hub or the carrier's hub plate
+    is: the disc lies on the other side, its mounting face on the centre plane."""
     W, D, H = fr.W, fr.D, fr.H
     u, w = W / 2, H / 2
     rim = fr.cyl_v(u, w, 203, 8, D - 8) - fr.cyl_v(u, w, 197, 0, D)
     flanges = [fr.cyl_v(u, w, W / 2, v0, v0 + 8) - fr.cyl_v(u, w, 197, v0 - 1, v0 + 9) for v0 in (0.0, D - 8)]
-    v0 = D / 2 - 8 if sp.get("hub") == "out" else D / 2
+    v0 = D / 2 - 8 if sp.get("hub_side") == "high" else D / 2
     disc = fr.cyl_v(u, w, 199, v0, v0 + 8) - fr.cyl_v(u, w, 55, v0 - 1, v0 + 9)
     return [("rim", rim, "#f4f6f6", 1.0), ("rim flange", flanges[0], "#f4f6f6", 1.0), ("rim flange", flanges[1], "#f4f6f6", 1.0),
             ("disc", disc, "#f4f6f6", 1.0)]
@@ -76,7 +77,7 @@ def tyre(fr, V, sp, b):
     W, D, H = fr.W, fr.D, fr.H
     u, w = W / 2, H / 2
     R = min(W, H) / 2
-    return [("tyre", fr.cyl_v(u, w, R - 10, 0, D) - fr.cyl_v(u, w, 202, -1, D + 1), RUBBER, 1.0),
+    return [("tyre", fr.cyl_v(u, w, R - 10, 0, D) - fr.cyl_v(u, w, 202.5, -1, D + 1), RUBBER, 1.0),
             ("tread", fr.cyl_v(u, w, R, 25, D - 25) - fr.cyl_v(u, w, R - 11, 24, D - 24), "#17202a", 1.0)]
 
 
@@ -205,20 +206,51 @@ def tank_cradle(fr, V, sp, b):
         angle = fr.box(u0, 0, H - 6, 25, D, 3) + fr.box(u0, 0, 0, 3, D, H - 3)
         out.append(("angle bearer", angle, ALU, 1.0))
         out.append(("rubber strip", fr.box(u0, v0, H - 3, 25, v1 - v0, 3), RUBBER, 1.0))
+        for v in (0.0, D - 3):              # the end cleats the bolts pass through into the raisers
+            out.append(("end cleat", fr.box(u0 - 7.5, v, 0, 40, 3, H - 3), ALU, 1.0))
+    return out
+
+
+@product("tank_guard")
+def tank_guard(fr, V, sp, b):
+    """A tank guard plate between the rails, in pieces round the `gaps` (u ranges kept open), `half` wide either side of
+    the envelope's centre (the envelope's own half width if not given). Frame front -y: u runs rearward along X."""
+    W, D, H = fr.W, fr.D, fr.H
+    half = sp.get("half", D / 2)
+    cuts = [0.0] + [u for g in sorted(sp.get("gaps", [])) for u in g] + [W]
+    return [("guard plate", fr.box(u0, D / 2 - half, 0, u1 - u0, 2 * half, H), ALU, 1.0) for u0, u1 in zip(cuts[::2], cuts[1::2])]
+
+
+@product("guard_hangers")
+def guard_hangers(fr, V, sp, b):
+    """The 50 mm long aluminium angles a tank guard hangs on, a pair at each u station `at`: each angle's upright leg
+    bolted to a rail's inner face, the envelope's side, and its foot `foot` mm long under the plate's edge at the
+    envelope's base."""
+    D, H, f = fr.D, fr.H, sp["foot"]
+    out = []
+    for u in sp["at"]:
+        kerb = fr.box(u - 25, 0, 0, 50, 3, H) + fr.box(u - 25, 0, 0, 50, f, 3)
+        road = fr.box(u - 25, D - 3, 0, 50, 3, H) + fr.box(u - 25, D - f, 0, 50, f, 3)
+        out += [("hanger angle", kerb, ALU, 1.0), ("hanger angle", road, ALU, 1.0)]
     return out
 
 
 @product("jockey_spacers")
 def jockey_spacers(fr, V, sp, b):
     """Four zinc-plated spacer tubes on M12 bolts between the jockey's bracket plate and the angled drawbar member, each
-    from the plate's inner face to 3 mm inside the member's outer face. `face` is two points of that face in plan."""
+    from the plate's inner face to the member's outer face, its end cut to the member's angle so it sits flat on the
+    face. `face` is two points of that face in plan."""
     (xa, ya), (xb, yb) = sp["face"]
+    along = Vector(xb - xa, yb - ya, 0).normalized()
+    into = Vector(-along.Y, along.X, 0) if along.X > 0 else Vector(along.Y, -along.X, 0)   # from the plate to the member
+    face = Plane(origin=(xa, ya, 0), x_dir=along, z_dir=-into)
     out = []
     for x in sp["xs"]:
         y_face = ya + (yb - ya) * (x - xa) / (xb - xa)
         for z in sp["zs"]:
-            p, q = Vector(x, sp["plate"], z), Vector(x, y_face + 3, z)
-            out.append(("spacer tube on its bolt", Solid.make_cylinder(12.5, (q - p).length, Plane(origin=p, z_dir=q - p)), CHROME, 1.0))
+            p, q = Vector(x, sp["plate"], z), Vector(x, y_face + 15, z)
+            tube = Solid.make_cylinder(12.5, (q - p).length, Plane(origin=p, z_dir=q - p))
+            out.append(("spacer tube on its bolt", split(tube, bisect_by=face, keep=Keep.TOP), CHROME, 1.0))
     return out
 
 

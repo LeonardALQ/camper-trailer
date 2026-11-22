@@ -97,14 +97,16 @@ def body_solids(lay) -> list[tuple[str, object, tuple[str, float]]]:
 
 
 def _mud_flap(lay, xf, s):
-    """The 610 x 455 x 6 mm flap behind a rear tyre, its inboard top corner cut clear of the rail and the raiser, hung
-    from a flat bar off the XT rear shock outrigger's back face (BD-10, CT-003)."""
+    """The 610 x 455 x 6 mm flap behind a rear tyre, its inboard top corner cut clear of the rail, the raiser and the
+    grey tank's guard under the rails, hung from a flat bar off the XT rear shock outrigger's back face (BD-10, CT-003)."""
     V = lay.V
     yc = s * V["hub_y"]
     flap = box(xf - 3, yc - 305, 300, 6, 610, 455)
     clear = V["rail_outer_w"] / 2 + 3                      # 3 mm outboard of the rail's and the raiser's outer face
     inboard = clear - 600 if s > 0 else -clear
-    flap = flap - box(xf - 4, inboard, V["rail_underside_z"] - 5, 8, 600, 460)
+    guard = next((g.box for g in lay.blocks if g.id == "UF-09" and g.box), None)
+    cut_z = min(V["rail_underside_z"], guard[2] if guard and guard[0] <= xf <= guard[3] else V["rail_underside_z"]) - 5
+    flap = flap - box(xf - 4, inboard, cut_z, 8, 600, 300 + 455 - cut_z + 5)
     tips = [b.extra["member"].box() for b in lay.blocks if b.extra.get("role") == "outrigger" and "member" in b.extra]
     ox1, oz0 = next((t[3], t[2]) for t in tips if 0 < xf - t[3] < 100 and (t[1] + t[4] > 0) == (s > 0))
     y0, y1 = (clear + 5, yc + 275) if s > 0 else (yc - 275, -clear - 5)

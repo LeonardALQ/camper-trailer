@@ -1,0 +1,199 @@
+# How the parts of the 3D models are held where they do not stand on something below them (decision H27). The support
+# tests read this file: cad/tests/test_supported.py for the trailer's models and test_ute_supported.py for the ute's.
+#
+# A part stands on another where its underside touches the other's top over an area, and then it needs no rule here.
+# Every other part needs a rule: the lines it covers (`lines`), what they are fixed to (`to`), how, and the maker's guide
+# or design document that shows the fixing (`why`). Lines are named by their id, and * matches any characters.
+#   screwed, bolted, riveted, clamped, hooked or seated: the model shows a contact with one of `to` at least 12 mm wide
+#     both ways and 144 mm2 in area, the land an M6 flat washer needs (ISO 7089, 12 mm outside diameter). Seated is a
+#     tyre's beads on its rim
+#   welded, bonded or let in: any contact over an area, or the one solid running into the other, as a weld, a bond or
+#     a sleeve let into a wall does
+# A deep overlap that no welded, bonded or let-in rule covers holds nothing: it is two parts in one space. A fixing
+# holds both of its sides, so each pair is listed once.
+
+trailer:
+  # ---------------------------------------------------------------- chassis and drawbar (data/chassis/chassis.yaml)
+  - lines: ["RL-*", "RS-*", "CM-*", "OR-*", "PB-*", "DB-KA", "DB-KB", "DB-RA", "DB-RB", "DB-BR", "SP-P?"]
+    to: ["RL-*", "RS-*", "CM-*", "OR-*", "PB-*", "DB-KA", "DB-KB", "DB-RA", "DB-RB", "DB-BR", "SP-P?"]
+    how: welded
+    why: "The frame and the drawbar are one welded frame, every structural weld SP to AS/NZS 1554.1 (CHASSIS.md)"
+  - lines: [CH-P01, CH-P02, CH-P03, CH-P04]
+    to: ["DB-??", "RL-*"]
+    how: welded
+    why: "The coupling plate, chain lugs, root gussets and front recovery lugs are welded to the drawbar members (CHASSIS.md)"
+  - lines: [CH-P05, CH-P06, CH-P07, CH-P08]
+    to: ["CM-*", "RL-*"]
+    how: welded
+    why: "The rear recovery tongues through the rear crossmember, the jacking pads, shock plates and hinge gussets (CHASSIS.md)"
+  - lines: [CH-P09]
+    to: ["SP-P?"]
+    how: welded
+    why: "The spare carrier's cleats and hub plate are welded to its posts (CHASSIS.md)"
+  - lines: [CH-P14, CH-B02]
+    to: ["RS-*", "OR-*"]
+    how: welded
+    why: "The nut plates inside the raisers and outrigger tips, and the D-rings' clips under the outriggers' ends (CHASSIS.md)"
+  - lines: [CH-P10]
+    to: ["RL-*", DB-KB, DB-RB]
+    how: bolted
+    why: "The corner steady brackets bolt up through the rails, and the front pair through the drawbar members under them, with crush tubes (CHASSIS.md)"
+  - lines: [DB-07]
+    to: [DB-BR]
+    how: bolted
+    why: "The breakaway kit's box bolts to the drawbar cross brace's front face, under the stone guard"
+  - lines: [CH-B01]
+    to: [CH-P10]
+    how: bolted
+    why: "Each ARK XO DDS650 steady bolts to its bracket (ARK's fitting instructions)"
+  - lines: [DB-08]
+    to: [DB-KA, CH-P11]
+    how: bolted
+    why: "The jockey bracket's four spacer tubes sit on M12 bolts through the bracket plate and the drawbar member (TRAILER.md)"
+  - lines: [DB-05]
+    to: [CH-P11]
+    how: clamped
+    why: "The ARK XO750's swivel clamp bolts to the bracket plate (ARK's fitting instructions)"
+  - lines: [DB-03]
+    to: [CH-P01]
+    how: bolted
+    why: "The Cruisemaster DO35 bolts under the coupling plate with 4 x M12 8.8 bolts (Cruisemaster's fitting guide)"
+  - lines: [DB-06]
+    to: [CH-P02]
+    how: hooked
+    why: "Each safety chain's shackle passes through its chain lug (AS 4177.4)"
+  # ---------------------------------------------------------------- running gear and the spare wheel
+  - lines: ["RG-01*"]
+    to: ["RL-*", "CM-*"]
+    how: welded
+    why: "Each XT arm's pivot hanger and shock bracket are welded to the rail's outer face (Cruisemaster's XT fitting guide)"
+  - lines: ["RG-06*"]
+    to: ["RG-01*"]
+    how: bolted
+    why: "Each wheel bolts to its hub on five studs (ROH, Cruisemaster)"
+  - lines: [RG-03]
+    to: [CM-05]
+    how: bolted
+    why: "The Bosch TSC module bolts under the XT centre crossmember (Cruisemaster's TSC guide)"
+  - lines: [RG-04]
+    to: [CM-01]
+    how: bolted
+    why: "The XT air supply box bolts to the front crossmember on its brackets (TRAILER.md)"
+  - lines: [SP-02]
+    to: [CH-P09]
+    how: bolted
+    why: "The spare wheel bolts to the carrier's hub plate on five studs (CHASSIS.md)"
+  - lines: [UF-03, UF-09]
+    to: ["RL-*"]
+    how: bolted
+    why: "The tank guards hang from the rails' inner faces on aluminium angles (UF-03's and UF-09's parts)"
+  - lines: [UF-06B]
+    to: ["RS-*"]
+    how: bolted
+    why: "The diesel tank's cradle angles bolt to the raisers' inner faces through their end cleats (TRAILER.md)"
+  - lines: ["BD-10*"]
+    to: ["OR-06*"]
+    how: bolted
+    why: "Each mud flap's hanger plate bolts to the XT rear shock outrigger's back face (BODY.md)"
+  - lines: ["RG-02*", SP-01]
+    to: ["RG-06*", SP-02]
+    how: seated
+    why: "Each tyre's beads sit on its rim's bead seats, held there by the inflation pressure"
+  # ---------------------------------------------------------------- the body (BODY.md)
+  - lines: ["BD-03*", "BD-04*", BD-08]
+    to: [BD-01, BD-02, "BD-03*", "BD-04*", BD-08]
+    how: bonded
+    why: "The walls are bonded to the floor, to each other at the corners and to the roof through the roof-to-wall joiner (BODY.md)"
+  - lines: [BD-02]
+    to: [BD-08]
+    how: bonded
+    why: "The fixed roof is bonded on the roof-to-wall joiner (BODY.md)"
+  - lines: ["WN-*", BD-07, BD-15, BD-17, "VE-0*", LA-03, WR-05, G2]
+    to: ["BD-03*", "BD-04*"]
+    how: let in
+    why: "Each window, door, service door, vent, cowl, rinse box and inlet is let into its cut-out and screwed through its frame (the makers' guides)"
+  - lines: [BD-13]
+    to: ["BD-03*", BD-02, BD-08]
+    how: bolted
+    why: "The Fiamma F80s bolts to the roof's kerb edge on its brackets (Fiamma's fitting guide)"
+  # ---------------------------------------------------------------- the fit-out (cad/model/products, research report 28)
+  - lines: ["LB-04.*"]
+    to: ["BD-03*"]
+    how: screwed
+    why: "The HappiJac rails screw into the hardpoints in the side walls (Lippert's HappiJac guide, LB-06)"
+  - lines: [LB-04M]
+    to: [BD-02, BD-08, "LB-04.*"]
+    how: screwed
+    why: "The HappiJac drive screws to the ceiling and drives the rails' shafts (Lippert's HappiJac guide)"
+  - lines: [LA-11L]
+    to: ["BD-03*", "BD-04*", WR-03]
+    how: screwed
+    why: "The overhead lockers screw through their back rail into the kerb wall's insert strips"
+  - lines: [LA-11E]
+    to: [WR-03, "BD-03*"]
+    how: screwed
+    why: "The board cabinet screws to the partition and to the kerb wall"
+  - lines: [EL-04]
+    to: [WR-03, LA-11B]
+    how: hooked
+    why: "The MultiPlus-II hangs on its wall bracket on the partition (Victron's manual)"
+  - lines: [EL-05]
+    to: [EL-06]
+    how: screwed
+    why: "The Lynx Smart BMS, the MPPTs and the Orion-Tr converters screw to the board panel (Victron's manuals)"
+  - lines: [EL-06]
+    to: [LA-11E]
+    how: screwed
+    why: "The board panel screws to the cabinet's back, the Lynx Distributor, Cerbo GX and 230 V board to the panel"
+  - lines: [AC-01]
+    to: [WR-03]
+    how: hooked
+    why: "The indoor unit hangs on its installation plate on the partition (Mitsubishi Electric's installation guide)"
+  - lines: [AC-03]
+    to: ["BD-04*", "AC-04*"]
+    how: bolted
+    why: "The cradle bolts to the rear wall and stands on its stays (AC-04, BDY-21)"
+  - lines: ["AC-04*"]
+    to: ["BD-04*", CM-08]
+    how: bolted
+    why: "The stays bolt to the rear wall and to the rear crossmember"
+  - lines: [VE-04]
+    to: ["BD-03*"]
+    how: bolted
+    why: "The RESPA-CF2 bolts to the road wall behind its intake hood (Sy-Klone's guide)"
+  - lines: [VE-05]
+    to: ["BD-03*", VE-04]
+    how: screwed
+    why: "The top-up fan's box screws to the road wall beside the RESPA"
+  - lines: [VE-07]
+    to: ["BD-03*", LA-11T, LA-11B]
+    how: screwed
+    why: "The range hood screws to the underside of the cupboard over the bench and to the road wall"
+  - lines: [WR-08]
+    to: [WR-03, "BD-03*", "BD-04*"]
+    how: screwed
+    why: "The basin, mirror cabinet and towel rail screw to the partition"
+  - lines: [WR-09]
+    to: [WR-03]
+    how: screwed
+    why: "The DauerShower's technical unit screws to the partition in its dry cabinet (DauerShower's guide)"
+  - lines: [WR-03]
+    to: [WR-01, "BD-03*", BD-02, BD-08]
+    how: bonded
+    why: "The partition is bonded to the tray, the walls and the ceiling"
+  - lines: [WR-02]
+    to: [WR-01]
+    how: let in
+    why: "The linear grate is let into the tray's floor over its sand basket"
+  - lines: [WR-10]
+    to: [BD-01, WR-01]
+    how: let in
+    why: "The shower's well is let into the floor under the drain and bonded to the tray (H4a)"
+  - lines: [LG-02]
+    to: ["OR-*"]
+    how: riveted
+    why: "Each cap is riveted over an outrigger's open end"
+  - lines: ["LG-01.*"]
+    to: ["BD-0*", LG-02, "OR-*", "CM-*"]
+    how: screwed
+    why: "Each lamp and reflector screws to the body, a cap or the frame where cad/lamps.py places it (ADR 13/00)"
