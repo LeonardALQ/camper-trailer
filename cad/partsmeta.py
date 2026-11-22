@@ -13,7 +13,9 @@ import re
 from pathlib import Path
 
 FIELDS = ("id", "iid", "name", "group", "system", "material", "mass_kg", "mass_growth_kg", "maturity", "basis",
-          "source", "drawing", "price_aud", "price_basis", "price_note", "load")
+          "source", "drawing", "price_aud", "price_basis", "price_note", "load", "route")
+# `route`: a run's routing facts in the trailer-electrical and trailer-plumbing models (cad/routes_model.py): what it
+# feeds, its ends, cable or pipe, size, length from the geometry and protection, for the part card.
 
 
 def _r(v):

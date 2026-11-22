@@ -272,6 +272,9 @@ def fillet(pts: list[tuple], r: float, elbow_r: float | None = None, rigid: bool
             ctr = (b[0] + bis2[0] * centre_d, b[1] + bis2[1] * centre_d, b[2] + bis2[2] * centre_d)
             u, _ = _unit(_sub(p_end, ctr))
             w, _ = _unit(_sub(q, ctr))
+            hm = 2 * math.cos(c["phi"] / 2)
+            mid = tuple(ctr[k] + (u[k] + w[k]) / hm * c["r"] for k in range(3))
+            c.update(p0=p_end, p1=q, mid=mid)   # the bend's tangent points and its midpoint, for the swept model
             steps = max(2, int(math.degrees(c["phi"]) / 10))
             for k in range(1, steps):
                 s = k / steps

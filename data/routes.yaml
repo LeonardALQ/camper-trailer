@@ -30,6 +30,54 @@ rules:
     exempt: [W-02, F-10]        # the washer's drain and fill hoses, in their dielectric sleeve
   not_tested: [BD-11, LG-01]    # allowances with no box of their own
 
+# The services' design checks, measured on the routed runs by cad/routes.py and listed with the trailer's checks
+# (build/trailer/trailer.json, the Checks page). They live here beside the routes, as the lamps' checks live in
+# data/services.yaml, because data/checks.yaml's trailer check types are cad/partsdb.py's; its SVC note points here.
+# severity: fail (a failure is a design failure). Limits are never changed to make a check pass.
+checks:
+  - id: SVC-01
+    title: Every run keeps 20 mm from every envelope box but its own ends and the parts it passes or is clipped to
+    kind: clearance
+    severity: fail
+    why: "The brief's rule for H28, so the services can be fitted after the fit-out without cutting a part, and it2-interior's boxes can move by up to 20 mm without a clash. Runs threaded through a closed chassis member skip the parts welded to it while inside it."
+    source: "H27 and H28 (docs/decisions.md); research/30-services-routing.md section 6"
+  - id: SVC-02
+    title: Every cable and hose bend at or above its least bending radius; PEX and DWV turn at fittings where it does not fit
+    kind: bends
+    severity: fail
+    why: "A cable bent tighter than its installed radius damages its insulation and a hose kinks. Rigid DWV turns only at bend fittings and PEX at push-fit elbows."
+    source: "Prysmian V-90 0.6/1 kV table (least installed radius by outside diameter); Helukabel 6 x D for flexible cable; John Guest Speedfit PEX 15 mm at 175 mm with clips; research/30 section 2"
+  - id: SVC-03
+    title: 230 V runs 50 mm from extra-low-voltage runs outside their own conduit, except at the board and a shared appliance's terminals
+    kind: separation
+    severity: fail
+    why: "Segregation of low-voltage from extra-low-voltage wiring by spacing, partition or enclosure."
+    source: "AS/NZS 3000:2018 clause 3.9.8.3, applied to caravans by AS/NZS 3001.2:2022"
+  - id: SVC-04
+    title: No water, waste or diesel line within 300 mm of the battery's terminal face, but the washer's hoses in their sleeve
+    kind: terminal_face
+    severity: fail
+    why: "A leak must not reach the battery's terminals; the rule on CT-602. The washer's fill and drain hoses pass in a dielectric sleeve."
+    source: "AS/NZS 3001.2:2022 clause 5.4.10.2; CT-602"
+  - id: SVC-05
+    title: Every load, outlet, DC point, water outlet and fitting has its run from its source
+    kind: coverage
+    severity: fail
+    why: "The schedules and the models are complete only if every 230 V circuit, every 12 V and 24 V load of data/services.yaml and every water outlet is reached."
+    source: "data/services.yaml (circuits, buses), report 20 section 7, TRAILER.md (Plumbing and water)"
+  - id: SVC-06
+    title: Every sized circuit's voltage drop at its design current over its routed length within its limit
+    kind: drops
+    severity: fail
+    why: "DC circuits are sized by current and by a 2 % drop at the routed length (report 20), stricter than AS/NZS 3000's 10 % for ELV; 230 V circuits at 5 %."
+    source: "Report 20 section 6; AS/NZS 3000:2018 clause 3.6.2 (5 %) and 7.5.7 (ELV); Prysmian mV/A.m at 75 C"
+  - id: SVC-07
+    title: Every gravity waste falls at least 1:50 all the way to the grey tank
+    kind: falls
+    severity: fail
+    why: "A waste laid flatter than 1:50 holds water and silts; CT-611 and CT-612 give the falls."
+    source: "AS/NZS 3500.2 (1.65 % least grade for DN40 fixture discharge pipes), CT-611, CT-612"
+
 # Copper conductors, PVC insulated: Prysmian's V-90 0.6/1 kV single-core table (outside diameter, mass, least installed
 # bending radius) and its two-single-core table for AS/NZS 3008.1.1 (current enclosed in air, `free` unenclosed and spaced
 # from a surface, and the single-phase drop at 75 C in mV per amp and metre of route, which is the two-wire DC drop). research/30-services-routing.md section 2.
