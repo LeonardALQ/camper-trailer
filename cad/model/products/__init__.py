@@ -29,7 +29,7 @@ FITTING_MODELS: dict[str, dict] = {
     "DB-05": {"name": "ark_xo750", "front": "+y"},
     "CH-P09": {"name": "spare_carrier", "front": "-x", "studs": 24, "cleat_u": 100},
 }
-RAW = ("name", "front", "when", "extras")
+RAW = ("name", "front", "when", "extras", "hub_side")
 
 WHITE, GREY, DARK, BLACK, STEEL, ALU = "#f4f6f6", "#aab7b8", "#566573", "#1c2833", "#909497", "#c8cfd2"
 GLASS, PLY, RUBBER, CHROME, BLUE = "#5dade2", "#d9c3a0", "#212f3c", "#dfe6e9", "#2e86c1"

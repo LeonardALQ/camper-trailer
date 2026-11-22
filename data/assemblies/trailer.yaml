@@ -658,6 +658,15 @@ items:
   - id: UF-03
     name: Tank guards
     system: underfloor
+    # model: the sheet in two pieces either side of the XT centre crossmember's jacking pads and the Bosch TSC module, each
+    # hung from the rails' inner faces on three pairs of 50 mm angles (H27)
+    model: {name: tank_guard, half: rail_in - 3,
+            gaps: [[xt_centre_front + xm_w / 2 - 50 - xt_front_hinge_rear, xt_centre_front + xm_w / 2 + 50 - xt_front_hinge_rear]],
+            extras: [{name: guard_hangers, foot: 23,
+                      at: [60, (xt_centre_front + xm_w / 2 - 50 - xt_front_hinge_rear) / 2, xt_centre_front + xm_w / 2 - 110 - xt_front_hinge_rear,
+                           xt_centre_front + xm_w / 2 + 110 - xt_front_hinge_rear, (xt_centre_front + xm_w / 2 + 50 + xt_rear_shock_front) / 2 - xt_front_hinge_rear,
+                           xt_rear_shock_front - xt_front_hinge_rear - 60],
+                      box: [axle_x + xt_front_hinge_rear, -rail_in, rail_underside_z - 9, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 50]}]}
     price: {aud: 341.75, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/107-aluminium-5-bar-checker-plate-tread.html", date: 2026-11-20, note: "One 1200 x 2400 sheet of 3 mm aluminium checker plate, AUD 261.75 (listing), plus angle and fixings AUD 80 (est.)"}
     box: [axle_x + xt_front_hinge_rear, -rail_in, rail_underside_z - 6, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 6]
     parts:
@@ -713,6 +722,10 @@ items:
     name: Grey tank guard, 2 mm aluminium on rubber, bolted to the rails
     material: "2 mm aluminium sheet on rubber strips"
     system: underfloor
+    # model: hung 40 mm under the rails on three pairs of 50 mm angles bolted to the rails' inner faces, clear of the dump
+    # line at X 5,450 and of the rear steadies (H27)
+    model: {name: tank_guard, extras: [{name: guard_hangers, foot: 47.5, at: [5300 - grey_x0, 5620 - grey_x0, 5940 - grey_x0],
+                                        box: [grey_x0, -rail_in, grey_z0 - 9, grey_l, 2 * rail_in, rail_underside_z + 25 - grey_z0 + 9]}]}
     price: {aud: 250, basis: estimate, url: "https://store.allaluminium.com.au/collections/marine-sheet-aluminium", date: 2026-11-21, note: "One 1200 x 2400 sheet of 2 mm 5052, between the listed 1.6 and 2.5 mm sheets (AUD 166.62 and 260.37), plus rubber strip and bolts"}
     zone: underfloor
     box: [grey_x0, -(rail_in - 27.5), grey_z0 - 6, grey_l, 2 * rail_in - 55, 6]
@@ -724,7 +737,7 @@ items:
   # ================================================================ the sealed drawbar box (decision log 12:45, research report 20)
   - id: DB-08
     name: Jockey bracket spacers, four zinc-plated steel tubes on M12 8.8 bolts between the bracket plate and the kerb-side drawbar member
-    model: {name: jockey_spacers, face: [[900, -(db_apex_y + (rail_c - db_apex_y) * (900 - db_apex_x) / (body_x0 - db_apex_x)) - 26.5], [1100, -(db_apex_y + (rail_c - db_apex_y) * (1100 - db_apex_x) / (body_x0 - db_apex_x)) - 26.5]], plate: -(db_apex_y + (rail_c - db_apex_y) * (1000 - db_apex_x) / (body_x0 - db_apex_x)) - 86, xs: [930, 1070], zs: [rail_underside_z - db_depth / 2 - 40, rail_underside_z - db_depth / 2 + 40], box: [917.5, -(db_apex_y + (rail_c - db_apex_y) * (1000 - db_apex_x) / (body_x0 - db_apex_x)) - 86, rail_underside_z - db_depth / 2 - 52.5, 165, 87.5, 105]}
+    model: {name: jockey_spacers, face: [[900, -(db_apex_y + (rail_c - db_apex_y) * (900 - db_apex_x) / (body_x0 - db_apex_x)) - 26.5], [1100, -(db_apex_y + (rail_c - db_apex_y) * (1100 - db_apex_x) / (body_x0 - db_apex_x)) - 26.5]], plate: -(db_apex_y + (rail_c - db_apex_y) * (1000 - db_apex_x) / (body_x0 - db_apex_x)) - 86, xs: [930, 1070], zs: [rail_underside_z - db_depth / 2 - 40, rail_underside_z - db_depth / 2 + 40], box: [917.5, -(db_apex_y + (rail_c - db_apex_y) * (1000 - db_apex_x) / (body_x0 - db_apex_x)) - 86, rail_underside_z - db_depth / 2 - 52.5, 165, 92.5, 105]}
     material: "Zinc-plated steel tube 25 x 3 mm, M12 8.8 bolts with nyloc nuts"
     system: drawbar
     price: {aud: 0, basis: estimate, included_in: BD-11, date: 2026-11-22, note: "Bolts and spacer tubes from BD-11's general hardware"}

@@ -324,11 +324,14 @@ class Chassis:
             base = self.ev(f["at"]) if "at" in f else [0.0, 0.0, 0.0]
             at = []
             if "side_y" in f:
-                sy = self.ev(f["side_y"])
-                xs = [base[0]] if "rear_x" not in f else [base[0], self.ev(f["rear_x"])]
-                for x in xs:
+                pairs = [(base[0], self.ev(f["side_y"]), base[2])]
+                if "rear_x" in f:
+                    rear_y = self.ev(f["rear_y"]) if "rear_y" in f else pairs[0][1]
+                    rear_z = self.ev(f["rear_z"]) if "rear_z" in f else base[2]
+                    pairs.append((self.ev(f["rear_x"]), rear_y, rear_z))
+                for x, sy, z in pairs:
                     for s in (-1, 1):
-                        at.append((x, s * sy, base[2]))
+                        at.append((x, s * sy, z))
             else:
                 at = [tuple(base)]
             kind = f["kind"]

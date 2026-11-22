@@ -86,6 +86,7 @@ drawings:
       - {rev: B, date: 2026-11-21, description: "Notice: G2 drawn as an opening (F4-05)", drawn: Kiro, checked: "", approved: ""}
       - {rev: C, date: 2026-11-22, description: "Memo: labels clear of the lines", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-22, description: "Memo: drawn from the 3D model cut 1000 above the floor (H28)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: E, date: 2026-11-22, description: "Memo: night plan's bed note from the bed, labels clear of dashes (I2-12)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-011
     title: Elevations and openings
     subtitle: Kerb, road, front and rear walls with every opening, its position and margins, and the lamps
