@@ -606,7 +606,8 @@ def write_plans(day, night, res, out: Path, tms=None) -> dict:
     for (state, lay), tm in zip((("day", day), ("night", night)), tms or (None, None)):
         plans[state] = plan(lay, res, tm, state)
         (out / f"floorplan-{state}.svg").write_text(svg(plans[state]), encoding="utf-8")
-    data = dict(cut_mm=CUT, floor_z=day.V["floor_z"], cut_z=day.V["floor_z"] + CUT, areas=AREAS,
+    # the viewer's plan view (site/src/components/CadViewer.astro) cuts these models at cut_z and frames the body
+    data = dict(cut_mm=CUT, floor_z=day.V["floor_z"], cut_z=day.V["floor_z"] + CUT, areas=AREAS, body=plans["day"]["body"],
                 models=["trailer", "body-inside", "body-inside-night"], plans=plans)
     (out / "floorplan.json").write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
     n = {k: len(v["parts"]) for k, v in plans.items()}

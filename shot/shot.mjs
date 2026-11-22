@@ -22,6 +22,11 @@ const jobs = [
   { path: '/drawings/', name: 'drawings', full: true },
   { path: '/research/03-bike-restraint-garage/', name: 'research-03' },
   { path: '/downloads/', name: 'downloads', full: true },
+  // the trailer page's floor plan (H28), probed by pointing at the washer and clicking it, and the viewers' plan view
+  { path: '/trailer/', name: 'trailer-floorplan', el: '.fp', probe: 'LA-02' },
+  { path: '/trailer/', name: 'trailer-floorplan-dark', el: '.fp', theme: 'dark' },
+  { path: '/trailer/', name: 'trailer-plan-view', viewer: true, plan: true },
+  { path: '/body/', name: 'body-inside-plan-view', viewer: true, nth: 1, plan: true },
 ];
 const browser = await chromium.launch({
   args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
@@ -50,7 +55,40 @@ for (const j of jobs) {
     await page.screenshot({ path: `${out}/${file}`, ...opts });
     files.push(file);
   };
-  await shoot(`${j.name}.png`, { fullPage: !!j.full });
+  const probe = {};
+  if (j.plan) {
+    // press the viewer's Floor plan button, then point at the middle of the canvas and read the tooltip
+    const v = (await page.$$('cad-viewer'))[j.nth || 0];
+    const b = v && (await v.$('.cad-plan button'));
+    if (b) {
+      await b.click();
+      await page.waitForTimeout(2500);
+      const c = await (await v.$('canvas')).boundingBox();
+      await page.mouse.move(c.x + c.width * 0.45, c.y + c.height * 0.5);
+      await page.waitForTimeout(1200);
+      probe.button = await b.textContent();
+      probe.tip = await v.$eval('.cad-tip', (t) => (t.hidden ? null : t.textContent));
+    } else probe.button = null;
+  }
+  if (j.el) {
+    const e = await page.$(j.el);
+    if (e) {
+      await e.screenshot({ path: `${out}/${j.name}.png` });
+      files.push(`${j.name}.png`);
+    }
+    if (e && j.probe) {
+      // point at a part of the plan, read the tooltip, click it and read where the row was found
+      const p = await e.$(`.fp-part[data-iid="${j.probe}"]`);
+      const r = await p.boundingBox();
+      await page.mouse.move(r.x + r.width / 2, r.y + r.height / 2);
+      await page.waitForTimeout(300);
+      probe.tip = await e.$eval('.fp-tip', (t) => (t.hidden ? null : t.textContent));
+      await page.mouse.click(r.x + r.width / 2, r.y + r.height / 2);
+      await page.waitForTimeout(1500);
+      probe.msg = await e.$eval('.fp-msg', (t) => t.textContent);
+      probe.selected = await page.evaluate(() => Array.from(document.querySelectorAll('tr.is-selected'), (r) => r.cells[0]?.textContent));
+    }
+  } else await shoot(`${j.name}.png`, { fullPage: !!j.full });
   if (j.viewer) {
     const el = (await page.$$('cad-viewer'))[j.nth || 0];
     if (el) {
@@ -82,7 +120,8 @@ for (const j of jobs) {
       title: document.title,
     };
   });
-  report.push({ path: j.path + (j.theme ? ` (${j.theme})` : ''), status: resp ? resp.status() : null, ready, ...info, files, logs: logs.slice(0, 12) });
+  report.push({ path: j.path + (j.theme ? ` (${j.theme})` : ''), status: resp ? resp.status() : null, ready, ...info, files,
+    ...(Object.keys(probe).length ? { probe } : {}), logs: logs.slice(0, 12) });
   await page.close();
 }
 await browser.close();

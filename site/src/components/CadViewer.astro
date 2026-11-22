@@ -3,6 +3,7 @@
 // clicking it opens a card that hides it, shows only it or finds its row in the page's tables (S-01, S-02). The part
 // data is the .parts.json written beside the model (cad/partsmeta.py).
 import { withBase } from '../lib/url';
+import fp from '../data/generated/floorplan.json';
 
 interface Props {
   src?: string;
@@ -11,16 +12,21 @@ interface Props {
 const { src = withBase('/models/trailer.json'), height = 520 } = Astro.props;
 const rev = process.env.GIT_REV ?? 'dev';
 const parts = src.replace(/\.json$/, '.parts.json');
+// The trailer and the body with its fit-out get the Floor plan control (H28): the cut height above the floor, its Z
+// and the body's plan box, from the build's plan cut (cad/floorplan.py).
+const model = src.split('/').pop()?.replace(/\.json$/, '') ?? '';
+const plan = fp.models.includes(model) ? [fp.cut_mm, fp.cut_z, ...fp.body].join(',') : undefined;
 ---
 
 <cad-viewer class="not-content" data-src={`${src}?v=${rev}`} data-parts={`${parts}?v=${rev}`}
-  data-drawings={withBase('/drawings/')} data-height={height}>
+  data-drawings={withBase('/drawings/')} data-height={height} data-plan={plan}>
   <p class="cad-loading">Loading the 3D model (about 3 MB)...</p>
 </cad-viewer>
 <p class="cad-help">
   Drag to rotate, right-drag to pan, and pinch or hold Ctrl (⌘ on a Mac) while you scroll to zoom, since plain
   scrolling moves the page. Point at a part to see what it is, and click it for a card that hides it, shows only it or
-  finds its row in the tables.
+  finds its row in the tables.{plan && ` The Floor plan button looks straight down with everything more than
+  ${fp.cut_mm.toLocaleString('en-AU')} mm above the floor cut away, and pressing it again brings back the 3D view.`}
 </p>
 
 <style>
@@ -148,6 +154,38 @@ const parts = src.replace(/\.json$/, '.parts.json');
       transition: none;
     }
   }
+  cad-viewer :global(.cad-plan) {
+    position: absolute;
+    z-index: 19;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    pointer-events: none;
+  }
+  cad-viewer :global(.cad-plan button) {
+    pointer-events: auto;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid var(--sl-color-gray-4);
+    border-radius: 0.3rem;
+    background: var(--sl-color-bg);
+    color: var(--sl-color-white);
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  }
+  cad-viewer :global(.cad-plan button:hover),
+  cad-viewer :global(.cad-plan button[aria-pressed='true']) {
+    border-color: var(--sl-color-accent);
+  }
+  cad-viewer :global(.cad-plan .note) {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 0.25rem;
+    background: rgba(20, 20, 20, 0.72);
+    color: #fff;
+  }
 </style>
 
 <script>
@@ -254,6 +292,7 @@ const parts = src.replace(/\.json$/, '.parts.json');
       );
 
       this.setupParts();
+      if (this.dataset.plan) this.setupPlan();
 
       // Reserve the full height of the viewer (canvas, tree and info panel) so nothing overlaps the text below.
       const reserve = () => {
@@ -479,6 +518,97 @@ const parts = src.replace(/\.json$/, '.parts.json');
       this.pin({ node: first.paths[0], label: this.data.nodes[first.paths[0]]?.[1] ?? first.name, part: first });
       if (hits.length > 1) this.say(`${hits.length} parts highlighted`);
       this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // ---------------------------------------------------------------- the plan view (H28)
+    // The Floor plan button turns the camera to look straight down and cuts the model with the viewer's own clipping
+    // plane 2 at the cut height, so the roof and the upper lockers are gone. Pressing it again puts back the camera and
+    // the clipping planes as they were. Hover, the part card, hide and show work as in the 3D view, and the Clipping tab
+    // moves the same plane.
+    planOn = false;
+    planBtn = document.createElement('button');
+    planNote = document.createElement('span');
+    planSaved: any = null;
+
+    setupPlan() {
+      const [cutMm] = this.dataset.plan!.split(',').map(Number);
+      const box = document.createElement('div');
+      box.className = 'cad-plan';
+      this.planBtn.type = 'button';
+      this.planBtn.setAttribute('aria-pressed', 'false');
+      this.planBtn.textContent = 'Floor plan';
+      this.planBtn.title = `Look straight down, cut ${cutMm.toLocaleString('en-AU')} mm above the floor`;
+      this.planNote.className = 'note';
+      this.planNote.hidden = true;
+      this.planNote.textContent = `Cut ${cutMm.toLocaleString('en-AU')} mm above the floor. Front to the left, road side up`;
+      box.append(this.planBtn, this.planNote);
+      this.append(box);
+      const place = () => {
+        const c = this.viewer.renderer.domElement.getBoundingClientRect();
+        const me = this.getBoundingClientRect();
+        box.style.left = `${c.left - me.left + 10}px`;
+        box.style.top = `${c.top - me.top + 10}px`;
+      };
+      place();
+      setTimeout(place, 300);
+      this.planBtn.addEventListener('click', () => (this.planOn ? this.leavePlan() : this.enterPlan()));
+      // Going back from the Clipping tab to the tree switches the viewer's clipping off, so the plan view puts it back.
+      this.viewer.state.subscribe('activeTab', (change: any) => {
+        if (this.planOn && change.new === 'tree') this.clipOn(true);
+      });
+    }
+
+    clipOn(flag: boolean) {
+      const v = this.viewer;
+      v.setLocalClipping(flag);
+      v.clipping.setVisible(flag);
+      v.nestedGroup.setBackVisible(flag);
+    }
+
+    enterPlan() {
+      const v = this.viewer;
+      const [, cutZ, x0, y0, x1, y1] = this.dataset.plan!.split(',').map(Number);
+      this.planSaved = {
+        camera: v.getCameraLocationSettings(),
+        normals: [0, 1, 2].map((i) => v.getClipNormal(i)),
+        sliders: [0, 1, 2].map((i) => v.getClipSlider(i)),
+        intersection: v.getClipIntersection(),
+        caps: v.getObjectColorCaps(),
+      };
+      // the camera: straight down on the body's centre, zoomed so the body and its door swings fill the canvas
+      v.setView('top');
+      v.setCameraTarget([(x0 + x1) / 2, (y0 + y1) / 2, cutZ]);
+      const aspect = v.state.get('cadWidth') / v.state.get('height');
+      const r = v.bb_radius;              // at zoom 1 the orthographic camera shows 2r across the canvas's shorter side
+      const [w, h] = aspect >= 1 ? [2 * r * aspect, 2 * r] : [2 * r, (2 * r) / aspect];
+      v.setCameraZoom(Math.min(w / ((x1 - x0) * 1.2), h / ((y1 - y0) * 1.7)));
+      // the cut: planes 0 and 1 open, plane 2 facing down at the cut height (its slider counts from the model's centre)
+      const open = v.gridSize / 2;
+      v.setClipNormal(0, [-1, 0, 0], open);
+      v.setClipNormal(1, [0, -1, 0], open);
+      v.setClipNormal(2, [0, 0, -1], cutZ - v.bbox.center()[2]);
+      v.setClipIntersection(false);
+      v.setClipObjectColorCaps(true);
+      this.clipOn(true);
+      this.planOn = true;
+      this.planBtn.textContent = '3D view';
+      this.planBtn.setAttribute('aria-pressed', 'true');
+      this.planNote.hidden = false;
+    }
+
+    leavePlan() {
+      const v = this.viewer;
+      const s = this.planSaved;
+      this.planOn = false;
+      [0, 1, 2].forEach((i) => v.setClipNormal(i, s.normals[i], s.sliders[i]));
+      v.setClipIntersection(s.intersection);
+      v.setClipObjectColorCaps(s.caps);
+      if (v.state.get('activeTab') !== 'clip') this.clipOn(false);
+      const c = s.camera;
+      v.setCameraLocationSettings(c.position, c.quaternion, c.target, c.zoom);
+      this.planBtn.textContent = 'Floor plan';
+      this.planBtn.setAttribute('aria-pressed', 'false');
+      this.planNote.hidden = true;
     }
   }
   customElements.define('cad-viewer', CadViewerElement);
