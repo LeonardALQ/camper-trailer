@@ -78,6 +78,16 @@ checks:
     why: "A waste laid flatter than 1:50 holds water and silts; CT-611 and CT-612 give the falls."
     source: "AS/NZS 3500.2 (1.65 % least grade for DN40 fixture discharge pipes), CT-611, CT-612"
 
+# The priced quantities the routed ones are compared with on the Electrical and Plumbing pages: BD-11's price items
+# (data/assemblies/trailer.yaml) and LGT-01's lamp loom (data/trailer-parts.yaml). Where the routed quantity is larger,
+# the line is raised with this model as its source; an allowance is never lowered.
+priced:
+  - {line: BD-11, item: "12 and 24 V DC wiring, tinned twin core", kinds: [twin, twin8], quantity: 150, unit: m}
+  - {line: BD-11, item: "230 V wiring, 2.5 and 4 mm2 TPS and the appliance cords", kinds: [tps, flex], quantity: 40, unit: m}
+  - {line: BD-11, item: "Fresh water pipework, 12 mm PEX", kinds: [pex12], quantity: 30, unit: m}
+  - {line: BD-11, item: "Fresh water pipework, push-fit fittings", kinds: [pex12], quantity: 40, unit: fittings}
+  - {line: LGT-01, item: "Lamp loom, 7-core trailer cable", kinds: [lamp7], quantity: 32, unit: m}
+
 # Copper conductors, PVC insulated: Prysmian's V-90 0.6/1 kV single-core table (outside diameter, mass, least installed
 # bending radius) and its two-single-core table for AS/NZS 3008.1.1 (current enclosed in air, `free` unenclosed and spaced
 # from a surface, and the single-phase drop at 75 C in mV per amp and metre of route, which is the two-wire DC drop). research/30-services-routing.md section 2.

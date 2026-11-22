@@ -180,7 +180,7 @@ lines:
       - {item: "Two white front position lamps and two white front reflectors", aud: 80, basis: estimate, date: 2026-11-21}
       - {item: "Six amber side marker lamps with built-in reflectors", aud: 150, basis: estimate, date: 2026-11-21}
       - {item: "Hooded number plate lamp, and the plate's bracket and rivnuts", aud: 65, basis: estimate, date: 2026-11-21}
-      - {item: "Lamp loom: 25 m of 7-core trailer cable, a junction box at the front, glands, grommets and heat shrink", aud: 170, basis: estimate, date: 2026-11-21}
+      - {item: "Lamp loom: 32 m of 7-core trailer cable, a junction box at the front, glands, grommets and heat shrink", aud: 195, basis: estimate, date: 2026-11-22, note: "32 m is the routed loom, 31.9 m (data/routes.yaml K-01 to K-12, cad/routes.py), up from 25 m; the 7 m more at AUD 3.50/m"}
     note: Its mass is line LG-01 of the mass schedule, about 4 kg (est.), taken out of BD-11's allowance. The fitting is in LAB-08's services hours.
   # ================================================================ licensed trades
   - id: ELI-01

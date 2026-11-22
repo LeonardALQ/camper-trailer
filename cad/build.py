@@ -95,7 +95,7 @@ def cmd_trailer():
         write_parts(out / f"{name}.viewer.json", look)
     # H28: the services routed on this layout, their SVC rows in the trailer's checks, and the two 3D services models
     from .routes_model import write_outputs as write_routes
-    rep["checks"] += write_routes(lay, out, look, site=ROOT / "site")["checks"]
+    rep["checks"] += write_routes(lay, out, look, site=ROOT / "site", rep=rep)["checks"]
     _write(out / "trailer.json", rep)
     fails = [c["id"] for c in rep["checks"] if c["severity"] == "fail" and not c["ok"]]
     print(json.dumps(dict(

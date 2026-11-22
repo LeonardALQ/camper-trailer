@@ -4,6 +4,7 @@ description: The home trailer's 48 V system, its energy budget on the design day
 ---
 
 import Services from '../../components/Services.astro';
+import CadViewer from '../../components/CadViewer.astro';
 import s from '../../data/generated/services.json';
 import { withBase } from '../../lib/url';
 
@@ -13,6 +14,36 @@ export const n = (v, d = 0) => v.toLocaleString('en-AU', { minimumFractionDigits
 The trailer runs at 48 V. Research report 20 chose the parts and models every load minute by minute through four
 design days (`research/models/20/energy.py`), and the tables on this page are that model's output. The parts and
 their prices are in the <a href={withBase('/trailer/#parts-list')}>trailer's parts list</a>.
+
+## 3D wiring plan
+
+<CadViewer src={withBase('/models/trailer-electrical.json')} height={560} />
+
+Every cable is drawn at its real outside diameter along its routed path, in its system's colour, with the body, the
+chassis and the fit-out see-through around it. Point at a cable to see its run and routed length, click it for a card
+with what it feeds, its ends, its size and its protection, and use the tree to show one system or circuit at a time.
+
+<Services kind="routes-legend" model="trailer-electrical" />
+
+## Cable schedule
+
+Each run of `data/routes.yaml`, routed on the solved layout by `cad/routes.py`: its length is the routed centreline
+with its bends, each DC circuit is sized by its current and by a 2 % drop at that length, and the price adds 10 % for
+cut-offs. Research report 30 gives the cable data and the rules.
+
+<Services kind="cable-schedule" />
+
+The routed runs by the parts-list line that prices them, and the priced quantities they are compared with:
+
+<Services kind="routes-lines" model="trailer-electrical" />
+
+### Services checks
+
+<Services kind="svc-checks" />
+
+The ten closest approaches of any run to an envelope box, for the fit-out's next changes:
+
+<Services kind="closest" />
 
 - Battery: five Victron Lithium NG 51.2 V 100 Ah modules, 25.6 kWh, upright in a sealed, lined box that forms the
   plinth under the washer and the dryer. The box vents outside and has a heat detector, as AS/NZS 3001.2 asks for a

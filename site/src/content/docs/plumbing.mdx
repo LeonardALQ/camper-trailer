@@ -4,6 +4,7 @@ description: The home trailer's water system, its daily water budget for two peo
 ---
 
 import Services from '../../components/Services.astro';
+import CadViewer from '../../components/CadViewer.astro';
 import s from '../../data/generated/services.json';
 import { withBase } from '../../lib/url';
 
@@ -11,6 +12,30 @@ export const W = s.water;
 
 Research report 21 sized the water system for two people on long stays off-grid. The parts and their prices are in
 the <a href={withBase('/trailer/#parts-list')}>trailer's parts list</a>.
+
+## 3D plumbing plan
+
+<CadViewer src={withBase('/models/trailer-plumbing.json')} height={560} />
+
+Every pipe and hose is drawn at its real outside diameter along its routed path, cold in blue, hot in orange and the
+wastes in grey, with the body, the chassis and the fit-out see-through around it. Point at a pipe to see its run and
+routed length, click it for a card with what it feeds, its ends and its size, and use the tree to show one system at a time.
+
+<Services kind="routes-legend" model="trailer-plumbing" />
+
+## Pipe schedule
+
+Each pipe and hose of `data/routes.yaml`, routed on the solved layout by `cad/routes.py`. PEX turns at a push-fit
+elbow where its 130 mm clipped radius does not fit, and the DWV wastes turn only at bends, so each counts its
+fittings. Every gravity waste falls at least 1:50 to the grey tank under the wet room.
+
+<Services kind="pipe-schedule" />
+
+The routed pipes by the parts-list line that prices them, and the priced quantities they are compared with:
+
+<Services kind="routes-lines" model="trailer-plumbing" />
+
+The services checks, SVC-01 to SVC-07, are on the <a href={withBase('/electrical/#services-checks')}>Electrical page</a>.
 
 - Fresh: two welded HDPE tanks between the rails over the axles hold 420 L. At most 300 L ride while towing
   (decisions H13 and H21), and the rest goes in at camp through the Puretec CR45 filter, by hose or the creek transfer pump,

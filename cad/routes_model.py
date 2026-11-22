@@ -227,25 +227,51 @@ def check_rows(res: dict, ev: dict) -> list[dict]:
 def summary(res: dict, ev: dict) -> dict:
     rows = []
     for r in res["runs"]:
-        rows.append(dict(id=r["id"], system=r["system"], system_label=SYSTEM_STYLE[r["system"]][1], group=r["group"],
+        rows.append(dict(id=r["id"], kind=r["kind"], system=r["system"], system_label=SYSTEM_STYLE[r["system"]][1], group=r["group"],
                          circuit=circuit_of(r, res), feeds=r["feeds"], ends=f"{_name(res, r['from']['line'])} to {_name(res, r['to']['line'])}",
                          cable=r["cable"], size=r["size"], od=r["od"], length_m=r["length_m"], mass_kg=r["mass_kg"], aud=r["aud"],
                          priced_in=r.get("priced_in"), protection=r.get("protection"), vd_pct=r.get("vd_pct"), size_why=r.get("size_why"),
                          fittings=r["fittings"], amps=r.get("amps"), price_basis=r.get("price_basis"), mass_basis=r.get("mass_basis")))
     legend = [dict(system=k, colour=c, label=lab, model=next(m for m, s in MODELS.items() if k in s["systems"]))
               for k, (c, lab) in SYSTEM_STYLE.items()]
+    kinds: dict[str, dict] = {}
+    for r in res["runs"]:
+        k = kinds.setdefault(r["kind"], dict(kind=r["kind"], what=r["kind_what"], length_m=0.0, mass_kg=0.0, aud=0.0, runs=0, fittings=0,
+                                             priced_in=r.get("priced_in")))
+        k["length_m"] += r["length_m"]
+        k["mass_kg"] += r["mass_kg"]
+        k["aud"] += r["aud"]
+        k["runs"] += 1
+        k["fittings"] += r["fittings"]
+    priced = []
+    for p in res["data"].get("priced") or []:
+        got = [kinds[k] for k in p["kinds"] if k in kinds]
+        routed = sum(g["fittings"] if p["unit"] == "fittings" else g["length_m"] for g in got)
+        priced.append(dict(p, routed=round(routed, 1), larger="routed" if routed > p["quantity"] + 1e-6 else "priced"))
     return dict(runs=rows, totals=R.totals(res), checks=check_rows(res, ev), closest=ev["clearance"]["closest"],
-                terminal_face=ev["terminal_face"]["near"][:6], legend=legend, rules=res["data"]["rules"])
+                terminal_face=ev["terminal_face"]["near"][:6], legend=legend, rules=res["data"]["rules"],
+                kinds=[dict(v, length_m=round(v["length_m"], 2), mass_kg=round(v["mass_kg"], 2), aud=round(v["aud"], 2)) for v in kinds.values()],
+                priced=priced)
 
 
-def write_outputs(lay, out: Path, lookup=None, site: Path | None = None) -> dict:
+def allowance(rep: dict | None, line: str = "BD-11") -> dict | None:
+    """A mass line's allowance from the trailer's mass schedule, for the pages' comparison with the routed runs."""
+    if not rep:
+        return None
+    e = next((x for x in rep.get("schedule", []) if x.get("id") == line), None)
+    return None if e is None else dict(line=line, item=e.get("item"), mass_kg=e.get("mass_kg"), source=e.get("source"), price_aud=e.get("price_aud"))
+
+
+def write_outputs(lay, out: Path, lookup=None, site: Path | None = None, rep: dict | None = None) -> dict:
     """Resolve the routes on the solved layout, write both viewer models with their parts files, routes.json, and the
     site's copies (site/public/models, site/src/data/generated). Returns the summary, whose `checks` the trailer's
-    report carries."""
+    report carries. `rep` is the trailer's report, for BD-11's allowance."""
     from .partsmeta import write as write_parts
     res = R.resolve(lay)
     ev = R.evaluate(res)
     data = summary(res, ev)
+    data["bd11"] = allowance(rep)
+    data["bd11_routed_kg"] = round(data["totals"]["lines"].get("BD-11", {}).get("mass_kg", 0.0), 2)
     out.mkdir(parents=True, exist_ok=True)
     (out / "routes.json").write_text(json.dumps(data, separators=(",", ":"), default=str), encoding="utf-8")
     for name in MODELS:
