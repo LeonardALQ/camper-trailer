@@ -1,7 +1,9 @@
 # Bike box parts list (report 24, 20 Nov 2026, UTE-GARAGE.md revision C, and revision D of 21 Nov 2026: the rear tub flares
 # for the Elite's 1,555 mm rear track, decision H19). The enclosed welded aluminium box on the LandCruiser VDJ79's frame.
 # Decision H25, 22 Nov 2026: Leonard builds the box himself and it is not certified, so the shop labour (was BX-X01) and
-# the engineer's review (was BX-E01) are gone and the box has one total. The design checks stay.
+# the engineer's review (was BX-E01) are gone and the box has one total. The design checks stay. The welding group
+# (BX-W01 to BX-W08, 22 Nov 2026) prices what the shop's line used to cover and the box's own proof: Leonard's gas,
+# filler, tungsten and abrasives, the laboratory tests of his weld coupons and the gauges for the bracket proof load.
 # The ute-garage page renders it (cad/sitedata.py), and cad/tests/test_box_parts.py checks that the lines add up to the
 # totals below and to the model's box mass (UGB-01).
 # One entry per line. mass.kg is the mass the line adds to the fitted box, not the mass of stock bought. model_part
@@ -27,6 +29,7 @@ groups:
   services: Ventilation, fume detection, light, power, lamps, extinguisher
   finish: Floor coating and roof coating
   tools: Tool chests on the wheel tubs
+  welding: Leonard's welding gas, filler, tungsten and abrasives, the laboratory tests of his weld coupons and the gauges for the bracket proof load
 lines:
   # ================================================================ materials
   - id: BX-M01
@@ -738,15 +741,96 @@ lines:
     mass: {kg: 1.0, basis: estimate, src: "Model U-TOOLBOX share"}
     price: {aud_each: 80.00, aud: 80.00, url: null, date: 2026-11-20, basis: estimate}
     model_part: U-TOOLBOX
+  # ================================================================ welding and tests (Leonard welds the box himself, decision H25)
+  # Gas and filler are sized from the 188 h the box's shop labour line (was BX-X01) gave the build, taken as about a
+  # quarter with the arc lit (est.): 47 h at about 15 L/min across TIG on sheet and pulsed MIG on tube (est.) is
+  # 42 m3 of argon, about 46 m3 with purging and pre- and post-flow, so five fills of a G cylinder (8.7 m3). Weld metal
+  # of about 2 % of the 437 kg box (est.) is about 9 kg, so one 7 kg spool of wire and 2.5 kg of rod.
+  - id: BX-W01
+    group: welding
+    name: Argon for TIG and pulsed MIG on aluminium, a rent-free G cylinder bought full
+    part_number: "SpeedGas G size (8.7 m3) bottle, pure argon"
+    spec: Bought once and kept, so the cylinder carries no rent. Pure argon for both processes on 5052 and 6061
+    qty: 1
+    unit: cylinder
+    mass: {kg: 0.0, basis: estimate, src: "Used in the build, nothing stays on the box"}
+    price: {aud_each: 659.00, aud: 659.00, url: "https://sydneytools.com.au/product/speedgas-botarg52-g-size-bottle-with-c502-argon-mix", date: 2026-11-22, basis: estimate}
+    note: "Sydney Tools lists SpeedGas's G size bottle full of argon C5/O2 mix at AUD 659 (search extract, 22 Nov 2026), and pure argon is taken at the same price (est.)"
+  - id: BX-W02
+    group: welding
+    name: Argon refills for the G cylinder
+    part_number: "G size argon, swap and refill"
+    spec: Four more fills after the first, about 35 m3
+    qty: 4
+    unit: refill
+    mass: {kg: 0.0, basis: estimate, src: "Used in the build"}
+    price: {aud_each: 180.00, aud: 720.00, url: "https://www.nationalwelding.com.au/assets/brochures/cylinderinfo_1410964681.pdf", date: 2026-11-22, basis: estimate}
+    note: "National Welding's price sheet of 1 July 2014 gives AUD 150 including GST to refill a G argon cylinder, raised 20 % for 2026 (est.). No current listed refill price was found"
+  - id: BX-W03
+    group: welding
+    name: ER5356 aluminium MIG wire, 1.0 mm, 7 kg spool
+    part_number: "UNIMIG HYPERMIG 5356 Premium, U11162"
+    spec: For pulsed MIG on the 6061 tube frame, subframe and mount angles, through a spool gun or push-pull torch
+    qty: 1
+    unit: spool
+    mass: {kg: 0.0, basis: estimate, src: "Used in the build. The welds' mass is in the lines they join"}
+    price: {aud_each: 209.95, aud: 209.95, url: "https://unimig.com.au/product/hypermig-5356-premium-aluminium-mig-wire-7kg", date: 2026-11-22, basis: listing}
+  - id: BX-W04
+    group: welding
+    name: ER5356 aluminium TIG rod, 1.6 and 2.4 mm, about 2.5 kg
+    part_number: "ER5356 (AlMg5) cut lengths"
+    spec: For TIG (AC) on the 1.6 to 5 mm 5052 sheet and the flares
+    qty: 1
+    unit: lot
+    mass: {kg: 0.0, basis: estimate, src: "Used in the build"}
+    price: {aud_each: 90.00, aud: 90.00, url: null, date: 2026-11-22, basis: estimate}
+  - id: BX-W05
+    group: welding
+    name: Tungsten electrodes and torch consumables
+    part_number: "2.4 and 3.2 mm tungsten for AC, cups, collets, collet bodies, gas lenses, aluminium MIG contact tips and a liner"
+    spec: Two packs of ten tungsten electrodes and a spare set of each torch part
+    qty: 1
+    unit: lot
+    mass: {kg: 0.0, basis: estimate, src: "Used in the build"}
+    price: {aud_each: 200.00, aud: 200.00, url: null, date: 2026-11-22, basis: estimate}
+  - id: BX-W06
+    group: welding
+    name: Abrasives and cleaning for aluminium
+    part_number: "Flap discs, stainless wire brushes kept for aluminium only, carbide burrs, acetone and lint-free cloths"
+    spec: Every joint is brushed and wiped with acetone just before it is welded, so the oxide and oil do not leave porosity
+    qty: 1
+    unit: lot
+    mass: {kg: 0.0, basis: estimate, src: "Used in the build"}
+    price: {aud_each: 250.00, aud: 250.00, url: null, date: 2026-11-22, basis: estimate}
+  - id: BX-W07
+    group: welding
+    name: Laboratory tests of Leonard's weld coupons
+    part_number: "A macro section of a 6061 SHS 40 x 40 x 3 fillet to 5052 2.5 mm, and a transverse tensile test of a 6061 3 mm butt"
+    spec: "UTE-GARAGE.md build step 1. The tensile test checks the 165 MPa the design takes for welded 6061-T6, and the macro the root and toe fusion. Leonard breaks his other coupons in a vice himself"
+    qty: 2
+    unit: test
+    mass: {kg: 0.0, basis: estimate, src: "Coupons cut from offcuts"}
+    price: {aud_each: 200.00, aud: 400.00, url: null, date: 2026-11-22, basis: estimate}
+    note: "No NATA-accredited laboratory publishes its prices. About an hour of a technician's time with the section, the etch or the pull and the report, AUD 200 a test (est.)"
+  - id: BX-W08
+    group: welding
+    name: Gauges for the deck mount bracket proof load
+    part_number: "1 t digital crane scale, 300 kg platform scale, and a 0.01 mm dial gauge on a magnetic base"
+    spec: "UTE-GARAGE.md build step 9. The platform scale reads the jack's push for the uplift and the crane scale the chain's pull for the downward load. Leonard's own bottle jack, lever hoist and chain do the loading"
+    qty: 1
+    unit: set
+    mass: {kg: 0.0, basis: estimate, src: "Tools, not on the box"}
+    price: {aud_each: 230.00, aud: 230.00, url: null, date: 2026-11-22, basis: estimate}
+    note: "About AUD 80 each for the two scales and AUD 70 for the dial gauge and base (est.)"
 # Totals from the lines, 22 Nov 2026 (cad/tests/test_box_parts.py checks them): every aud is qty x aud_each, and converted
 # prices match the stated rates. Contingency 10 % (est.). Leonard builds the box, so it has one total (H25).
 # mass_kg_lines is the fitted box as listed, which is the model's box mass (UGB-01).
 totals:
-  by_group: {materials: 7975.62, subframe_mounts: 990.0, fasteners_sealants: 1096.9, doors: 1200.15, security: 3797.36, restraint: 1852.09, loading: 2972.61, services: 1771.42, finish: 674.42, tools: 246.62}
-  subtotal_aud: 22577.19
+  by_group: {materials: 7975.62, subframe_mounts: 990.0, fasteners_sealants: 1096.9, doors: 1200.15, security: 3797.36, restraint: 1852.09, loading: 2972.61, services: 1771.42, finish: 674.42, tools: 246.62, welding: 2758.95}
+  subtotal_aud: 25336.14
   contingency_pct: 10
-  contingency_aud: 2257.72
-  total_aud: 24834.91
+  contingency_aud: 2533.61
+  total_aud: 27869.75
   mass_kg_lines: 437.27
   not_in_total:
     - {name: "Monimoto 9 subscriptions", aud_per_year: 158, src: "AUD 79 a year each (report 17)"}

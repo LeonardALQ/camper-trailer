@@ -309,13 +309,15 @@ def build_garage(prj: Project | None = None, limits: dict | None = None):
                        f"against {lim['m12_tension_kn']:.1f} kN and {lim['m12_shear_kn']:.1f} kN. {ml['mass_kg']:.0f} kg with growth, "
                        f"centre of gravity {ml['h_mm']:.0f} mm above the brackets",
                        "AS 4100 clause 9.3 design capacities for one M12 property class 8.8 bolt with the threads in the shear plane. "
-                       "Report 03's factored cases. Toyota's bracket capacity is not published, so UGM-02 reports the loads and build step 11's crack test checks the brackets.",
+                       "Report 03's factored cases. Toyota's bracket capacity is not published, so UGM-02 reports the loads and build step 9 proof-loads the brackets.",
                        mounts=ml))
     checks.append(_row("UGM-02", "Deck mount bracket loads (reported)", "report", "reported",
                        ml["max_tension_kn"], None, True, "largest uplift and largest downward load on one bracket",
                        f"largest uplift {ml['max_tension_kn']:.1f} kN, largest downward load {ml['max_down_kn']:.1f} kN, "
                        f"fore and aft shear {ml['firm_bolt_shear_kn']:.1f} kN per firm bolt in braking",
-                       "Toyota publishes no capacity for its deck mount brackets. Build step 11 crack-tests them after the rough-road drive.", unit="kN"))
+                       "Toyota publishes no capacity for its deck mount brackets. Build step 9 proof-loads each one to twice these, "
+                       f"{2 * ml['max_tension_kn']:.1f} kN up and {2 * ml['max_down_kn']:.1f} kN down for the off-road factor of 2, "
+                       "held 10 s with no permanent set at a dial gauge, and step 11 crack-tests them after the rough-road drive.", unit="kN"))
     res = next(c for c in checks if c["id"] == "UGR-01")["restraint"]
     kn = res["worst"]["worst_kgf"] * G / 1000
     ad = lim["anchor_design_kn"]

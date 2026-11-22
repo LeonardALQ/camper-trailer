@@ -146,12 +146,12 @@ lines:
     source: "Report 20, the trailer's electrical research of 20 Nov 2026 (VEHICLE.md stage S5). The position low on the box's front wall is an assumption"
     cases: [UC1, UC2, UC3, UC4, UCB]
   - id: UT-15
-    item: "48 V feed to the towbar (TW06): 7 m of 8 B&S twin cable and a grey Anderson SB50"
-    kg: 1.9
+    item: "48 V feed to the towbar (TW06): 7 m of 6 B&S twin cable and a grey Anderson SB50"
+    kg: 2.6
     x: (box_x0 + ball_x) / 2
     z: frame_top_z - 100
     maturity: estimate
-    source: "Report 20 (VEHICLE.md stage S5). The cable's centre is taken halfway from the box front to the ball (assumption)"
+    source: "Report 20 (VEHICLE.md stage S5), with 6 B&S in place of 8 B&S since 22 Nov 2026: 2.0 kg of cable at 0.145 kg a metre a core (data/routes.yaml) and 0.6 kg of holders, fuses and the Anderson panel, as before. The cable's centre is taken halfway from the box front to the ball (assumption)"
     cases: [UC1, UC2, UC3, UC4, UCB]
   - id: UT-06
     item: "Two people"

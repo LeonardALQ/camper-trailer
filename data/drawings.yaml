@@ -35,6 +35,7 @@ drawings:
       - {rev: Q, date: 2026-11-21, description: "Notice: the axle at X 4,373, the centres of gravity, 300 L in travel (H21), the ute at 2,638 kg", drawn: Kiro, checked: "", approved: ""}
       - {rev: R, date: 2026-11-21, description: "Notice: the ute at 2,646 kg and 7,175 kg with the anchors' kit, TC1 2,885 kg with growth", drawn: Kiro, checked: "", approved: ""}
       - {rev: S, date: 2026-11-22, description: "Memo: labels clear of the lines and the frame, revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
+      - {rev: T, date: 2026-11-22, description: "Notice: the ute at 2,647 and 7,176 kg (TW06 on 6 B&S), fallback 126 L", drawn: Kiro, checked: "", approved: ""}
   - number: CT-002
     title: Mass and centre of gravity
     subtitle: Every load case with growth, the axle window of H17, the CoG in elevation and across
@@ -70,6 +71,7 @@ drawings:
       - {rev: F, date: 2026-11-21, description: "Notice: the wind rule at 85 km/h (STB-04), rated anchors (STB-05), 300 L, fallback 134 L", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-21, description: "Notice: the listed anchors, plates and soil probe (STB-05), fallback 3,225 kg and 127 L", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-22, description: "Notice: strap at 48 to 55 degrees, the anchors' steps, no dig and backfill (STB-05)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: I, date: 2026-11-22, description: "Notice: the ute at 2,647 and 7,176 kg (TW06), fallback 3,224 kg and 126 L", drawn: Kiro, checked: "", approved: ""}
   - number: CT-010
     title: Floor plan, bed up and bed down
     subtitle: Day and night plans, walkways, door swings, spaces kept clear and the bed positions
@@ -377,6 +379,7 @@ drawings:
       - {rev: D, date: 2026-11-21, description: "Notice: 305 L travel limit (H21), tank stations with the axle at X 4,375", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-21, description: "Notice: 300 L in travel (H21), tank stations with the axle at X 4,373", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-21, description: "Notice: the GCM fallback at 127 L (H20)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: G, date: 2026-11-22, description: "Notice: the GCM fallback at 126 L (H20), the ute's feed on 6 B&S (TW06)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-612
     title: Plumbing layout
     subtitle: Tanks, pump cabinet, drains with their falls, the shower well, fill and dump points
@@ -430,6 +433,7 @@ drawings:
       - {rev: I, date: 2026-11-21, description: "Notice: the ute's masses with the anchors' kit at 38.6 kg (T2)", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-22, description: "Memo: the latest four revisions listed, clear of the mass table", drawn: Kiro, checked: "", approved: ""}
       - {rev: K, date: 2026-11-22, description: "Notice: the LandCruiser's outline, owner-built, no engineer (H25, H27)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: L, date: 2026-11-22, description: "Notice: the ute's masses with TW06's 6 B&S feed, rear wheel 1,323.6 kg", drawn: Kiro, checked: "", approved: ""}
   - number: CT-702
     title: Ute garage box frame and panels
     subtitle: Kerb-side frame elevation, subframe plan on Toyota's deck mounts, section at the rear axle, member schedule

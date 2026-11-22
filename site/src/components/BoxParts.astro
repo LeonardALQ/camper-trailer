@@ -21,6 +21,7 @@ const host = (u: string) => {
 const LABEL: Record<string, string> = {
   materials: 'Materials', subframe_mounts: 'Subframe and mounts', fasteners_sealants: 'Fasteners and sealants', doors: 'Doors',
   security: 'Security', restraint: 'Restraint', loading: 'Loading', services: 'Services', finish: 'Finish', tools: 'Tool chests',
+  welding: 'Welding and tests',
 };
 const label = (g: string) => LABEL[g] ?? g.replace(/_/g, ' ');
 ---

@@ -16,6 +16,7 @@ const statusClass = (x: any) => (x.ok ? 'status-pass' : x.severity === 'fail' ? 
 const rowClass = (x: any) => (x.ok ? '' : x.severity === 'fail' ? 'row-fail' : 'row-report');
 const cs = Object.fromEntries(r.cases.map((c: any) => [c.id, c]));
 const gcm: any = (t as any).checks.find((c: any) => c.id === 'GCM-01');
+const ballMax: any = (t as any).checks.find((c: any) => c.id === 'MAS-13');
 const allChecks = [...r.checks, ...g.checks];
 const fails = allChecks.filter((x: any) => x.severity === 'fail' && !x.ok);
 const d = g.dims;
@@ -39,8 +40,9 @@ const drawings = ['CT-701', 'CT-702', 'CT-703', 'CT-704'];
 {kind === 'summary' && (
   <p>
     Towing with both bikes aboard (case UC3), the ute weighs {n(cs.UC3.nominal.mass_kg)} kg, {n(cs.UC3.growth.mass_kg)} kg with the
-    growth allowance. Its rear axle carries {n(cs.UC3.growth.rear_kg)} kg of its {n(r.limits.rear_axle_kg)} kg plate, with the trailer's
-    heaviest towball, {n(r.params.towball_design, 1)} kg, on the ball. The combination is{' '}
+    growth allowance. Its rear axle carries {n(cs.UC3.growth.rear_kg)} kg of its {n(r.limits.rear_axle_kg)} kg plate, with the ute's
+    design towball, {n(r.params.towball_design, 1)} kg, on the ball, at least the trailer's heaviest with growth, {n(ballMax?.measured, 1)} kg
+    (MAS-13). The combination is{' '}
     {n(gcm.gcm.sum)} kg against the {n(r.limits.gcm_kg)} kg GCM: the ute with growth and without the ball, plus the trailer's{' '}
     {n(r.params.trailer_atm)} kg plate (UTE-06 and the trailer's GCM-01, decision H20). The box is {n(d.outside_l_body)} x {n(d.outside_w)} mm outside, {n(d.outside_w_flares)} mm over its rear tub flares, and weighs {n(g.box_kg, 1)} kg
     empty ({n(g.box_kg_growth, 1)} kg with growth) against report 17's 440 kg. {fails.length === 0
