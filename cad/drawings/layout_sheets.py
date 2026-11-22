@@ -184,12 +184,18 @@ def ct011(prj, model, bom, checks, reg, dwg):
     _lamps_on_walls(sh, V, views, LM)
     # the side walls' members (FIT-07) and the glands on them, phantom
     mc = res["members"]
+    labels = {}     # each member's label under the ceiling line, a close neighbour's one row lower
     for q in mc["rows"]:
         Xw, Zw = views[q["wall"]]
         u = q["x"] - V["body_x0"]
         x0, x1 = sorted((Xw(u - mc["width"] / 2), Xw(u + mc["width"] / 2)))
         sh.rect(x0, Zw(10), x1, Zw(V["interior_h"] - 10), "phantom")
-        sh.text((x0 + x1) / 2, Zw(V["interior_h"] - 10) + 0.6, q["member"].split(" at ")[0].split(".")[0], 0.95, "middle")
+        name, xc = q["member"].split(" at ")[0].split(".")[0], (x0 + x1) / 2
+        w, row = S.text_mm(name, 0.95), 0
+        while any(abs(xc - p) < (w + pw) / 2 + 0.4 for p, pw in labels.get((q["wall"], row), [])):
+            row += 1
+        labels.setdefault((q["wall"], row), []).append((xc, w))
+        sh.text(xc, Zw(V["interior_h"] - 10) - 1.2 - 1.3 * row, name, 0.95, "middle")
     as_openings = {o["id"] for o in res["openings"]}
     for g in yaml.safe_load((ROOT / "data" / "services.yaml").read_text())["glands"]:
         if g["at"] in ("kerb", "road") and g["id"] not in as_openings:   # a gland's Z is DIM-01's, the wall view's height the floor's

@@ -241,8 +241,9 @@ def _arc(p0, rx, ry, phi, large, sweep, p1, n=16):
 
 
 def _segments(el) -> tuple[list, list]:
-    """Every stroked straight piece on the sheet in SVG coordinates as (p, q, element index), arcs and circles as chords,
-    the frame's left out, and the boxes of the white fills (the title block's, the tables') as (box, element index)."""
+    """Every stroked straight piece on the sheet in SVG coordinates as (p, q, element index, half its stroke width), arcs
+    and circles as chords, the frame's left out, and the boxes of the white fills (the title block's, the tables') as
+    (box, element index)."""
     out, fills = [], []
     for n, e in enumerate(el):
         if e.startswith("<path"):
@@ -254,6 +255,8 @@ def _segments(el) -> tuple[list, list]:
                 fills.append(((min(xs), max(xs), min(ys), max(ys)), n))
             if 'stroke="none"' in m[2] or "stroke=" not in m[2] or 'class="frame"' in m[2]:
                 continue
+            sw = re.search(r'stroke-width="([\d.]+)"', m[2])
+            hw = float(sw[1]) / 2 if sw else 0.5
             tok = re.findall(r"[MLAZ]|[-\d.]+", m[1])
             pts, start, cmd, i = [], None, "M", 0
             while i < len(tok):
@@ -262,7 +265,7 @@ def _segments(el) -> tuple[list, list]:
                     cmd, i = t, i + 1
                     if t == "Z" and pts:
                         pts.append(start)
-                        out += [(p, q, n) for p, q in zip(pts, pts[1:])]
+                        out += [(p, q, n, hw) for p, q in zip(pts, pts[1:])]
                         pts = []
                     continue
                 if cmd == "A":
@@ -272,19 +275,20 @@ def _segments(el) -> tuple[list, list]:
                     continue
                 p = (float(tok[i]), float(tok[i + 1]))
                 if cmd == "M":
-                    out += [(a, b, n) for a, b in zip(pts, pts[1:])]
+                    out += [(a, b, n, hw) for a, b in zip(pts, pts[1:])]
                     pts, start, cmd = [p], p, "L"
                 else:
                     pts.append(p)
                 i += 2
-            out += [(p, q, n) for p, q in zip(pts, pts[1:])]
+            out += [(p, q, n, hw) for p, q in zip(pts, pts[1:])]
         elif e.startswith("<circle"):
             m = _CIRCLE.match(e)
             if not m or 'stroke="none"' in m[4]:
                 continue
+            sw = re.search(r'stroke-width="([\d.]+)"', m[4])
             cx, cy, r = float(m[1]), float(m[2]), float(m[3])
             p = [(cx + r * math.cos(math.pi * k / 16), cy + r * math.sin(math.pi * k / 16)) for k in range(33)]
-            out += [(a, b, n) for a, b in zip(p, p[1:])]
+            out += [(a, b, n, float(sw[1]) / 2 if sw else 0.09) for a, b in zip(p, p[1:])]
     return out, fills
 
 
@@ -312,7 +316,7 @@ def knockouts(sh) -> list[str]:
     if not sh.texts:
         return sh.el
     (segs, fills), grid, G = _segments(sh.el), {}, 5.0
-    for k, (p, q, _) in enumerate(segs):
+    for k, (p, q, _, _) in enumerate(segs):
         for gx in range(int(min(p[0], q[0]) // G), int(max(p[0], q[0]) // G) + 1):
             for gy in range(int(min(p[1], q[1]) // G), int(max(p[1], q[1]) // G) + 1):
                 grid.setdefault((gx, gy), []).append(k)
@@ -338,10 +342,11 @@ def knockouts(sh) -> list[str]:
         if any(n > t["i"] and f[0] < bx[1] and bx[0] < f[1] and f[2] < bx[3] and bx[2] < f[3] for f, n in fills):
             continue
         cand = set()
-        for gx in range(int(bx[0] // G), int(bx[1] // G) + 1):
-            for gy in range(int(bx[2] // G), int(bx[3] // G) + 1):
+        for gx in range(int((bx[0] - 0.5) // G), int((bx[1] + 0.5) // G) + 1):
+            for gy in range(int((bx[2] - 0.5) // G), int((bx[3] + 0.5) // G) + 1):
                 cand.update(grid.get((gx, gy), ()))
-        hits = [segs[k][2] for k in cand if _enters(to_local(segs[k][0]), to_local(segs[k][1]), core)]
+        hits = [n for p, q, n, hw in (segs[k] for k in cand)
+                if _enters(to_local(p), to_local(q), (core[0] - hw, core[1] + hw, core[2] - hw, core[3] + hw))]
         if hits:
             masked[t["i"]] = (max(max(hits), t["i"]), f'<rect x="{x0 - 0.3:.2f}" y="{t["y"] - 0.78 * s - 0.2:.2f}" '
                               f'width="{w + 0.6:.2f}" height="{1.02 * s + 0.4:.2f}" fill="#fff"{t["tr"]}/>')
