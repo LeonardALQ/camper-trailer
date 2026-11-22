@@ -9,7 +9,7 @@ The frame now carries the home trailer of TRAILER.md revision J. Revision D, the
 - Every case is checked at the 3,500 kg plate (decision H2), on all eight trailer cases TC1 to TC8, including the grey-full cases. VSB1's drawbar and chain forces follow the plate: 51.5 kN and 17.2 kN at the coupling, 34.3 kN and 17.2 kN at each chain point.
 - The raisers, outriggers and floor crossmembers are RHS 127 x 51 x 3.5 C350L0, because RHS 125 x 50 x 3 is not a stocked size (research report 22). Each member is checked at its own grade, so the composite rail is checked at the raiser's 350 MPa.
 - The grey tank fills the rear bay, so a floor crossmember crosses its middle in place of the battery bay's, and the rear bay's plan braces went. The XT rear shock crossmember is RHS 150 x 50 x 4 in place of 150 x 50 x 3, so the rear recovery pull (CHS-08A) passes without them. The tank's 2 mm guard is not counted as a shear plate, because it would buckle at about 4 kN (est.).
-- The axle group sits at X 4,373 mm, so the XT stations moved 176 mm rearward.
+- The axle group sits at X 4,371 mm, so the XT stations moved 174 mm rearward.
 - The rails are 1,275 mm over their outsides for the 1,655 mm track (decision H22, 21 Nov 2026), 100 mm wider than report 18's 1,175 mm, so the crossmembers, drawbar brace and plan braces are longer and the outriggers 50 mm shorter. The tanks keep their 975 mm width.
 - The drawbar box is 1,480 x 320 x 720 mm for two Honda EU22i. The spare wheel sits 415 mm higher on longer posts, so it lifts off over the box.
 - No check limit changed, and no estimate changed to pass a check.
@@ -32,11 +32,11 @@ A ladder of two composite rails with crossmembers at eight stations, outriggers 
 | Main rails | RHS 150 x 50 x 3 C450L0 | X 1,820 to 6,240, 1,275 mm over their outsides (H22), Z 597.5 to 747.5 | 2 | 79.1 kg |
 | Raisers | RHS 127 x 51 x 3.5 C350L0, continuous fillets | On each rail, Z 747.5 to 874.5, with a 20.5 mm bearer strip up to the floor at Z 895 | 2 | 80.2 kg |
 | Body end crossmembers | RHS 150 x 50 x 3, full height, 1,175 mm | X 1,820 and 6,190 | 2 | 21.0 kg |
-| XT crossmembers | RHS 150 x 50 x 3, full height, no holes | Front hinge X 3,454, centre X 4,354 | 2 | 21.0 kg |
-| XT rear shock crossmember | RHS 150 x 50 x 4, with a 5 mm shock plate | X 5,184 | 1 | 13.6 kg |
-| Floor crossmembers | RHS 127 x 51 x 3.5, top flush with the raisers | X 2,357, the diesel bay at X 2,894 and the grey bay at X 5,664 | 3 | 32.0 kg |
+| XT crossmembers | RHS 150 x 50 x 3, full height, no holes | Front hinge X 3,452, centre X 4,352 | 2 | 21.0 kg |
+| XT rear shock crossmember | RHS 150 x 50 x 4, with a 5 mm shock plate | X 5,182 | 1 | 13.6 kg |
+| Floor crossmembers | RHS 127 x 51 x 3.5, top flush with the raisers | X 2,356, the diesel bay at X 2,892 and the grey bay at X 5,662 | 3 | 32.0 kg |
 | Outriggers | RHS 127 x 51 x 3.5, top flush, 562 mm out to the body edge | Every station, each side | 16 | 81.6 kg |
-| Plan bracing | SHS 40 x 40 x 2.5, an X at rail height | Bays X 2,357 to 2,894 and 2,894 to 3,454 | 4 | 14.4 kg |
+| Plan bracing | SHS 40 x 40 x 2.5, an X at rail height | Bays X 2,356 to 2,892 and 2,892 to 3,452 | 4 | 14.4 kg |
 | Drawbar members | RHS 150 x 50 x 5 | Apex X 250 at Y ±60, to the rails at X 1,820, then 1,000 mm on under them | 2 (4 lengths) | 75.7 kg |
 | Drawbar cross brace | RHS 75 x 50 x 3 | X 900 | 1 | 2.9 kg |
 | Spare carrier posts | SHS 50 x 50 x 2.5 | X 1,795, Y ±120, up to Z 1,915 | 2 | 9.5 kg |
@@ -124,16 +124,16 @@ Each mass goes onto the frame by its load path, with its resultant and the momen
 
 | Case | Governing member | Where and when | Stress | Limit | Utilisation |
 |---|---|---|---|---|---|
-| LC1 | Road-side rail | X 4,822, TC7 | 36 MPa | 117 MPa | 0.31 |
-| LC2 | Road-side rail | X 4,822, TC7 | 109 MPa | 350 MPa | 0.31 |
+| LC1 | Road-side rail | X 4,820, TC7 | 36 MPa | 117 MPa | 0.31 |
+| LC2 | Road-side rail | X 4,820, TC7 | 109 MPa | 350 MPa | 0.31 |
 | LC3 | Kerb-side drawbar member | At the body front, TC2 | 159 MPa | 300 MPa | 0.53 |
-| LC4 | Road-side rail | X 4,379, TC7 cornering towards the road side | 93 MPa | 233 MPa | 0.40 |
-| LC5a | Kerb-side rail | X 3,922, TC7, diagonal B | 75 MPa | 233 MPa | 0.32 |
-| LC5b | Road-side rail | X 2,820, at tare, one steady wound to 875 kg | 121 MPa | 233 MPa | 0.52 |
-| LC6 | Road-side rail | X 3,479, 17.2 kN up at the coupling | 267 MPa | 350 MPa | 0.76 |
-| LC6b | Road-side rail | X 3,479, road-side lug, 17.2 kN down | 258 MPa | 350 MPa | 0.74 |
-| LC8a | Road-side rail | X 4,379, the rear road-side point pulled 30 degrees sideways and 15 degrees down | 319 MPa | 350 MPa | 0.91 |
-| LC8b | Road-side rail | X 4,379, TC7, road side jacked | 122 MPa | 350 MPa | 0.35 |
+| LC4 | Road-side rail | X 4,377, TC7 cornering towards the road side | 93 MPa | 233 MPa | 0.40 |
+| LC5a | Kerb-side rail | X 3,920, TC7, diagonal B | 75 MPa | 233 MPa | 0.32 |
+| LC5b | Road-side rail | X 2,820, at tare, one steady wound to 875 kg | 122 MPa | 233 MPa | 0.52 |
+| LC6 | Kerb-side rail | X 3,477, 17.2 kN up at the coupling | 267 MPa | 350 MPa | 0.76 |
+| LC6b | Kerb-side rail | X 3,477, kerb-side lug, 17.2 kN down | 258 MPa | 350 MPa | 0.74 |
+| LC8a | Road-side rail | X 4,377, the rear road-side point pulled 30 degrees sideways and 15 degrees down | 319 MPa | 350 MPa | 0.91 |
+| LC8b | Road-side rail | X 4,377, TC7, road side jacked | 122 MPa | 350 MPa | 0.35 |
 
 The rear recovery pull governs, then VSB1's drawbar tests. The rails' checks use the raiser's 350 MPa, which is where the margin went.
 

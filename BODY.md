@@ -66,7 +66,7 @@ Under the body's share of LC5a the shear flow in a joiner leg's bond is 0.86 N/m
 The body bolts to the chassis through the EPDM-faced HDPE bearer strip at every station: one bolt into each raiser and one into each outrigger tip, 32 mounts at the 8 stations. The body is not bonded to the steel (report 12 option B).
 
 - Each mount is an M12 8.8 hot-dip galvanised bolt into a 10 mm nut plate, 80 x 44 mm, welded inside the raiser or the outrigger tip before galvanising (CH-P14). On the floor it bears on a bonded 100 x 100 x 3 mm aluminium spreader over a high-density PVC insert and a GRP crush tube.
-- The worst bolt carries 6.02 kN of tension under LC5a, with TC2's 1,634 kg of body and contents scaled by 1.127 to the plate, 1,841 kg. The bolt works at 0.26 of a third of its ultimate tension, the plate at 0.14 in bending, its welds at 0.09 and the floor's pull-through at 0.11 (BDY-16). Shear is 0.45 kN per bolt in LC3 braking.
+- The worst bolt carries 6.02 kN of tension under LC5a, with TC2's 1,632 kg of body and contents scaled by 1.127 to the plate, 1,839 kg. The bolt works at 0.26 of a third of its ultimate tension, the plate at 0.14 in bending, its welds at 0.09 and the floor's pull-through at 0.11 (BDY-16). Shear is 0.45 kN per bolt in LC3 braking.
 - Report 12's Lindapter Hollo-Bolt HB10 would work at 0.71 of its 8.5 kN safe load, so the nut plate is the design.
 
 The tension comes from the body holding the chassis against its own twist, so it is real only while the body stays stiff. A weighed and pull-tested sample replaces these planning numbers.
@@ -79,9 +79,9 @@ The frame model takes the body as a torsion box on the centreline, tied at every
 
 | LC5a, TC1, diagonal A | Chassis twist | Body share | Largest body torque | Largest bolt force | Chassis peak stress |
 |---|---|---|---|---|---|
-| Bare chassis (the chassis checks) | 0.374 degree | 0 | | | 75 MPa |
+| Bare chassis (the chassis checks) | 0.373 degree | 0 | | | 75 MPa |
 | Body, roof joint neglected | 0.350 degree | 6 % | 0.1 kNm | 2.9 kN | 69 MPa |
-| Body, bonded roof (the design) | 0.008 degree | 98 % | 8.2 kNm | 6.56 kN, 6.02 kN after its 1 g share of weight | 51 MPa |
+| Body, bonded roof (the design) | 0.008 degree | 98 % | 8.3 kNm | 6.55 kN, 6.02 kN after its 1 g share of weight | 51 MPa |
 
 The bonded body takes almost all the twist. The closed box loads the mounts and joints most, so the body checks use it, and the chassis checks keep the bare frame, which carries 121 MPa at worst in LC5b without the body's help.
 

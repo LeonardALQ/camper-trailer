@@ -18,7 +18,7 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 | Water | 420 L fresh, at most 300 L in travel, about 41 L a day. 130 L grey |
 | Cost | AUD 192,052 with contingency, built by Leonard (H26) |
 
-Every fail check passes. The tightest are the fully loaded mass with growth (MAS-10, 3,397.7 kg against the 3,400 kg target), the towball share with the grey tank full (MAS-12, 8.1 % against 8.0 %), the heaviest towball (MAS-13, 316.5 kg against 320 kg) and the recovery pull in the road-side rail (CHS-08A, 0.91 of yield).
+Every fail check passes. The tightest are the fully loaded mass with growth (MAS-10, 3,397.6 kg against the 3,400 kg target), the towball share with the grey tank full (MAS-12, 8.1 % against 8.0 %), the heaviest towball (MAS-13, 316.5 kg against 320 kg) and the recovery pull in the road-side rail (CHS-08A, 0.91 of yield).
 
 ## Layout
 
@@ -37,7 +37,7 @@ Storage is 0.38 m³ inside and 0.09 m³ in the drawbar box, about 0.2 m³ short 
 
 ## Mass and limits
 
-Masses in kg. The towball comes from moments about the axle group centre at X 4,373 mm. "With growth" adds 20 % to an estimate, 7 % to a calculated mass and nothing to a maker's figure (report 02, MASS-06). CT-002 shows each case's centre of gravity.
+Masses in kg. The towball comes from moments about the axle group centre at X 4,371 mm. "With growth" adds 20 % to an estimate, 7 % to a calculated mass and nothing to a maker's figure (report 02, MASS-06). CT-002 shows each case's centre of gravity.
 
 | Case | Aboard | Mass | Towball | Share | With growth | Towball with growth |
 |---|---|---|---|---|---|---|
@@ -50,9 +50,9 @@ Masses in kg. The towball comes from moments about the axle group centre at X 4,
 | TC7 Grey full | 170 L fresh, 130 L grey, fuel, gear | 3,106 | 251.8 | 8.1 % | 3,398 | 276.5 |
 | TC8 Grey full, fresh empty | 130 L grey, fuel, gear | 2,936 | 250.6 | 8.5 % | 3,228 | 275.3 |
 
-- Plate: ATM 3,500 kg, the ute's braked towing rating and the limit of the DO35 and the chains (H2). The heaviest case with growth is 3,397.7 kg, 2.3 kg inside H2's 3,400 kg target (MAS-10). The examiner's caps from the tyres, coupling, chains and brakes are 3,500 kg (MAS-07, MAS-08).
+- Plate: ATM 3,500 kg, the ute's braked towing rating and the limit of the DO35 and the chains (H2). The heaviest case with growth is 3,397.6 kg, 2.4 kg inside H2's 3,400 kg target (MAS-10). The examiner's caps from the tyres, coupling, chains and brakes are 3,500 kg (MAS-07, MAS-08).
 - Water: at most 300 L of fresh and grey water while towing, H13's 350 L less 50 L by H21. The tanks hold 420 L and are filled at camp (H13). The grey tank travels empty, and TC7 and TC8 check the trailer with it full.
-- Towball: at least 7.5 % in every case and at most 350 kg, the 79's, the towbar's and the DO35's rating (MAS-04, H14). While the masses are estimates the axle sits in the middle of a 14.4 mm window between 8.0 % in the lightest case and 320 kg with growth in the heaviest (MAS-12, MAS-13, H17).
+- Towball: at least 7.5 % in every case and at most 350 kg, the 79's, the towbar's and the DO35's rating (MAS-04, H14). While the masses are estimates the axle sits in the middle of a 14.2 mm window between 8.0 % in the lightest case and 320 kg with growth in the heaviest (MAS-12, MAS-13, H17).
 - Ute: the heaviest towball puts the ute's rear axle at 2,646 kg with growth against the Elite kit's 2,800 kg plate (MAS-03, H18). MAS-14 reports the Platinum kit for the car build's cut CUT7.
 - GCM: the ute with growth, 3,675 kg, plus the 3,500 kg plate is 7,175 kg against Lovells' 7,400 kg (GCM-01, UTE-06, H20). If the revision is refused, Toyota's 6,900 kg needs the trailer plated at or below 3,225 kg and at most 127 L of water in travel, so the fully loaded trailer with growth stays under that plate.
 - Balance: the centre of gravity sits at most 34.9 mm to the kerb side against a 50 mm rule (MAS-11), at Z 1,232 to 1,318 mm with growth. The static stability factor is 0.61 to 0.65 on the 1,655 mm track.
@@ -225,3 +225,4 @@ Each is in full in `docs/decisions.md`.
 8. Fiamma publishes no length for the F80s 400's leg, 98667-04, the same part as on the F80L. Assumption: it reaches 2,686 mm like the 320's leg, which ships in the same carton. If it is shorter, the canopy falls more steeply on the same ground (BDY-23).
 9. No published force coefficient fits a box-shaped trailer on its wheels. Assumption: ASCE 7-16's 1.6 for a solid sign of these proportions, the high side, for STB-04's rule. A box's 1.05 would put the overturning speeds about a quarter higher.
 10. RADCO's listing #1349, Table 1, names stabilizer "No 59285" as the M607's minimum device, while Tie Down's anchor chart and plate sheet (manual pp. 5 and 9) give the 59286, 17-1/2 x 13-1/2 in, for the 59099, and the kit takes the 59286. Assumption: the 59286 is the listing's device under its catalogue number. Action: Tie Down's written confirmation before the plates are bought (STB-05).
+11. The floor glands at the partition's road end, G11, G15, G10 and G14, sit in the corner chase between the landing and the bench with almost no floor between them: 16 mm between G11 and G15, 4 mm between G15 and G10, and G10 touching G14. The road gap beside the fresh tanks is the only way under the floor there, so the holes line up along it. Assumption: the floor maker lays a high-density insert under the four holes, and the next services pass spreads them along the chase with at least 25 mm of floor between holes before the floor panel is ordered.
