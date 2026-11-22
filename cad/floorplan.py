@@ -442,10 +442,10 @@ def bed_above(p) -> bool:
 
 def _clear_x(s, x, y, size, span, placed, dashes):
     """The X nearest to x, within span, where the name at height y keeps 20 mm from the other texts and clear of the
-    dashed lines, at its size or 15 % smaller. The given x and size if there is none."""
-    for sz in (size, 0.85 * size):
+    dashed lines, at its size or up to 30 % smaller. The given x and size if there is none."""
+    for sz in (size, 0.85 * size, 0.7 * size):
         half = text_w(s, sz) / 2
-        xs = [x] + [x + d * k for k in range(1, 80) for d in (25.0, -25.0)]
+        xs = [x] + [x + d * k for k in range(1, 300) for d in (5.0, -5.0)]
         for cx in xs:
             if cx - half < span[0] + 30 or cx + half > span[1] - 30:
                 continue
@@ -513,7 +513,7 @@ def _free_spot(s, size, box, flat, placed, dashes):
     return None
 
 
-STEPS = (0.0, 0.35, -0.35, 0.7, -0.7, 1.0, -1.0)   # where a name may sit, as fractions of its room either way
+STEPS = tuple(sorted({s * k / 10 for k in range(11) for s in (1, -1)}, key=abs))   # where a name may sit, as fractions of its room
 
 
 def _extent(loops) -> tuple:

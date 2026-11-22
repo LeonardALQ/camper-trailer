@@ -649,7 +649,7 @@ def _fp_part_name(sh, placed, s, cx, cy, inner, dashes):
     return False
 
 
-_STEPS = (0.0, 0.25, -0.25, 0.5, -0.5, 0.75, -0.75)
+_STEPS = tuple(sorted({s * k / 10 for k in range(9) for s in (1, -1)}, key=abs))   # fractions of the half width or height
 
 
 def _fp_dims(sh, P, pr, V, placed):
