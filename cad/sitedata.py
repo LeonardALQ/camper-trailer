@@ -176,11 +176,11 @@ def _car_lists(data, T):
                "bought only if a test, an inspection or a certifier calls for it. Each is checked at the stage in the When column, "
                "most at the S0 inspection, and bought only if it fails, in the stage shown. Not counted, and the check list carries "
                "no allowance.\n\n" + SUMS_OPEN +
-               "| ID | Item | Check | When | Pass mark | AUD if it fails | Basis | Why | Fitted in | Note |\n"
+               "| ID | Item | AUD if it fails | Basis | When | Check | Pass mark | Why | Fitted in | Note |\n"
                "|---|---|---|---|---|---|---|---|---|---|\n")
     for it in rows["check"]:
-        out.append(f"| {it['id']} | {link(it)} | {_cell(it['check'])} | {it['checked_at']} | {_cell(it.get('pass_mark'))} | "
-                   f"{it['price_aud']:,.2f} | {it['price_basis']} | {_cell(it['why'])} | {it['stage']} | {_cell(it.get('note'))} |\n")
+        out.append(f"| {it['id']} | {link(it)} | {it['price_aud']:,.2f} | {it['price_basis']} | {it['checked_at']} | "
+                   f"{_cell(it['check'])} | {_cell(it.get('pass_mark'))} | {_cell(it['why'])} | {it['stage']} | {_cell(it.get('note'))} |\n")
     out.append(SUMS_CLOSE + f"If every item on the check list failed, it would come to AUD {_aud(T['check'])}. That is a note, not a "
                "total: several lines are alternatives or only-if steps, and they are priced as if each one were needed.\n\n"
                "### Optional extras\n\nExtras the plan does not need. Not counted.\n\n" + SUMS_OPEN +
@@ -196,7 +196,8 @@ def _car_totals_table(data, T):
     over = "Over" if T["gap"] > 0 else "Under"
     every = len(T["closing"]) == len(data["cuts"])
     closing_rows = "" if every or not T["closing"] else (
-        f"| Less {_names(T['closing'])}, with their share of the allowance | -{_aud(T['closing_saving'])} |\n"
+        f"| Less {_names(T['closing'])}, with {'its' if len(T['closing']) == 1 else 'their'} share of the allowance | "
+        f"-{_aud(T['closing_saving'])} |\n"
         f"| The build with {', '.join(T['closing'])} and the allowance | {_aud(T['with_closing'])} |\n")
     pct = T["allowance_pct"]
     out = ["\n### Totals\n\n<div data-sheet-sum=\"off\">\n\n| Total | AUD |\n|---|---|\n"
@@ -210,9 +211,11 @@ def _car_totals_table(data, T):
            f"| Purchase check list, if every item failed (not counted) | {_aud(T['check'])} |\n"
            f"| Optional extras (not counted) | {_aud(T['optional'])} |\n\n</div>\n\n"]
     if T["gap"] > 0:
-        out.append(("Only every cut together closes" if every else f"{_names(T['closing'])} closes" if len(T["closing"]) == 1
-                    else f"{_names(T['closing'])} close") + f" the gap to Leonard's AUD {_aud(T['budget'])}, each taken only if "
-                   "its condition holds (see the cuts below). ")
+        one = len(T["closing"]) == 1
+        out.append(("Only every cut together closes" if every else f"{_names(T['closing'])} closes" if one
+                    else f"{_names(T['closing'])} close") + f" the gap to Leonard's AUD {_aud(T['budget'])}, "
+                   + ("taken only if its condition holds" if one else "each taken only if its condition holds")
+                   + " (see the cuts below). ")
     else:
         out.append(f"The build with its allowance is under Leonard's AUD {_aud(T['budget'])}, so it needs no cut. ")
     out.append("The truck, the bike box, the trailer and Leonard's labour are outside these figures (see the cost table on the "
@@ -242,7 +245,7 @@ def tow_vehicle_page():
            "to VEH-28 are on the [Measurements](../measurements/?part=car) page.\n\n"]
     secs = dict(zip(VEHICLE_TOP + VEHICLE_END, _sections(plan, VEHICLE_TOP + VEHICLE_END)))
     out.append(secs["Summary"] + "\n")
-    rows = ("| Stage | Work | Build AUD | Check list AUD, if every item failed | Optional AUD | Paid labour | Downtime (est.) | "
+    rows = ("| Stage | Work | Build AUD | Check list AUD | Optional AUD | Paid labour | Downtime (est.) | "
             "Place in branch A, B | The ute can then |\n|---|---|---|---|---|---|---|---|---|\n")
     for st in data["stages"]:
         rows += (f"| {st['id']} | {_cell(st.get('work'))} | " +
@@ -250,8 +253,7 @@ def tow_vehicle_page():
                  f" | {_cell(st.get('labour'))} | {_cell(st.get('downtime'))} | A {st['order_a'] + 1}, B {st['order_b'] + 1} | "
                  f"{_cell(st['can_do'])} |\n")
     head, rest = secs["Stage plan"].split("\n", 1)
-    out.append(head + "\n\nEach stage's lines added up by list, from the YAML. The sheet's footer gives the totals. The check list "
-               "column is what the stage would cost if every check line in it failed, and it is not counted.\n\n" + _sums(rows) +
+    out.append(head + "\n\nEach stage's lines added up by list, from the YAML. The sheet's footer gives the totals.\n\n" + _sums(rows) +
                _drop_first_table(rest) + "\n")
     out.append("## Parts list\n\nEvery line of `data/vehicle/vehicle-parts.yaml`, AUD including GST, the line total, sorted into three "
                "lists by decision H24 and research report 27. Basis is listing (read from a supplier or regulator page) or estimate. "
