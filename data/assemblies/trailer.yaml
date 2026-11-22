@@ -557,7 +557,7 @@ items:
     system: body
     price:
       - {item: "12 and 24 V DC wiring, tinned twin core 2.5 to 6 mm2, 150 m at AUD 4.50/m", aud: 675, basis: estimate, date: 2026-11-20}
-      - {item: "230 V wiring: 77 m of 2.5 mm2 TPS and cord, six outlets and the inlet's tails", aud: 433.60, basis: estimate, date: 2026-11-22, note: "Was 40 m at AUD 330. The routes give 76.1 m (data/routes.yaml, H28), so 37 m more at AUD 2.80/m"}
+      - {item: "230 V wiring: 78 m of 2.5 mm2 TPS and cord, six outlets and the inlet's tails", aud: 436.40, basis: estimate, date: 2026-11-22, note: "Was 40 m at AUD 330. The routes give 77.0 m after SVC-08's reroutes (data/routes.yaml, H28), so 38 m more at AUD 2.80/m"}
       - {item: "LED lights: ten ceiling, two reading, two outside, at AUD 40", aud: 560, basis: estimate, date: 2026-11-20}
       - {item: "Switches, fuse blocks, fuses, terminals, lugs, heat shrink, conduit, glands and ties", aud: 650, basis: estimate, date: 2026-11-20}
       - {item: "Fresh water pipework: 36 m of 12 mm PEX, 47 push-fit fittings, tank fittings and breathers", aud: 801, basis: estimate, date: 2026-11-22, note: "Was 30 m and 40 fittings at AUD 710. The routes give 35.3 m and 47 fittings (data/routes.yaml, H28): 6 m more at AUD 3.50/m and 7 fittings at AUD 10 (est.)"}
@@ -566,7 +566,7 @@ items:
     point: [body_x0 + body_length / 2, 0, floor_z + 400]
     parts:
       - {item: "12 and 24 V wiring, about 150 m of tinned twin core, 2.5 to 6 mm2", kg: 15.0, basis: estimate}
-      - {item: "230 V wiring, 77 m of 2.5 mm2 TPS and cord, six outlets and the inlet's tails", kg: 6.0, basis: estimate}
+      - {item: "230 V wiring, 78 m of 2.5 mm2 TPS and cord, six outlets and the inlet's tails", kg: 6.0, basis: estimate}
       - {item: "Fourteen LED lights inside and out", kg: 2.1, basis: estimate}
       - {item: "Switches, fuse blocks, terminals, lugs, heat shrink, conduit, glands and ties", kg: 5.0, basis: estimate}
       - {item: "Fresh water pipework: 36 m of 12 mm PEX, 47 push-fit fittings, tank fittings, breathers and the wastes", kg: 4.0, basis: estimate}

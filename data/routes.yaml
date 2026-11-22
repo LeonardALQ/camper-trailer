@@ -1,5 +1,5 @@
 # Every cable and pipe of the home trailer from its source to its load (H28), for the 3D services models, the cable
-# and pipe schedules, CT-602, CT-612 and the checks SVC-01 to SVC-07. cad/routes.py resolves it on the solved layout.
+# and pipe schedules, CT-602, CT-612 and the checks SVC-01 to SVC-08. cad/routes.py resolves it on the solved layout.
 #
 # Positions are DIM-01, mm: X from the ball rearward, Y from the centreline with the road side positive, Z up from the
 # ground. A path point is three expressions over the layout's parameters, the envelope boxes (EL_04.x0 is the front
@@ -99,7 +99,7 @@ checks:
 # the line is raised with this model as its source; an allowance is never lowered.
 priced:
   - {line: BD-11, item: "12 and 24 V DC wiring, tinned twin core", kinds: [twin, twin8], quantity: 150, unit: m}
-  - {line: BD-11, item: "230 V wiring, 2.5 and 4 mm2 TPS and the appliance cords", kinds: [tps, flex], quantity: 77, unit: m}
+  - {line: BD-11, item: "230 V wiring, 2.5 and 4 mm2 TPS and the appliance cords", kinds: [tps, flex], quantity: 78, unit: m}
   - {line: BD-11, item: "Fresh water pipework, 12 mm PEX", kinds: [pex12], quantity: 36, unit: m}
   - {line: BD-11, item: "Fresh water pipework, push-fit fittings", kinds: [pex12], quantity: 47, unit: fittings}
   - {line: LGT-01, item: "Lamp loom, 7-core trailer cable", kinds: [lamp7], quantity: 32, unit: m}

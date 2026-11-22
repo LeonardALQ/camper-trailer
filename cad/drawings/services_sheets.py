@@ -132,7 +132,7 @@ def _tag_legend(sh, x, y, width=74.0, size=1.15) -> float:
     """The run tags' key under a legend: a sample tag, what its codes mean and the four levels. Returns the y below."""
     sh.circle(x + 1.1, y + 0.4, 0.32, "fill")
     sh.line(x + 1.1, y + 0.4, x + 3.4, y + 0.4, "thin")
-    sh.text(x + 3.7, y + 1.1, "G21", TAG_SIZE, bold=True)
+    sh.text(x + 3.7, y + 1.1, "G20", TAG_SIZE, bold=True)
     sh.text(x + 3.7, y - 0.35, "F/U", TAG_SIZE, bold=True)
     sh.text(x + 3.7 + S.text_mm("F/U", TAG_SIZE, True) + 0.7, y - 0.35, "C1, C2", TAG_SIZE)
     text = ("RUN TAG ON A LEADER: THE GLAND IT MARKS, IF ANY, THEN EACH LEVEL CODE IN BOLD WITH ITS RUNS. AT A RUN'S END THE "
@@ -1030,7 +1030,7 @@ def ct612(prj, model, bom, checks, reg, dwg):
     sh.text(ve.p(w[0], 0, 0)[0], ve.p(0, 0, V["floor_z"])[1] + 1.6, "WELL WR-10, 300 x 400 x 120", 1.1)
     S.notes(sh, 22, 84, [
         "DATUM DIM-01. EVERY PIPE AND HOSE IS DRAWN AS ROUTED IN data/routes.yaml BY cad/routes.py, ITS CENTRELINE IN PLAN. THE SINK "
-        "WASTE DROPS THROUGH G10 AND RUNS UNDER THE FLOOR OVER CM-06 AT 1:50 INTO THE GREY TANK'S TOP. THE WASHER'S AND DRYER'S "
+        "WASTE DROPS THROUGH THE ROAD GAP FRAME G15 AND RUNS UNDER THE FLOOR OVER CM-06 AT 1:50 INTO THE GREY TANK'S TOP. THE WASHER'S AND DRYER'S "
         "PUMPED DRAINS RISE BEHIND THE DRYER AND DISCHARGE INTO THE BASIN, WHICH DROPS THROUGH G13.",
         f"THE GREY TANK'S TOP SITS {V['floor_underside_z'] - gt[5]:.0f} mm UNDER THE FLOOR'S UNDERSIDE FOR THE INLETS, AND THE WELL'S "
         f"SHELL BOTTOM {w[2] - gt[5]:.0f} mm ABOVE THE TANK, SO THE SHOWER'S SWITCHING UNIT DRAINS STRAIGHT DOWN (H4A).",
@@ -1041,11 +1041,11 @@ def ct612(prj, model, bom, checks, reg, dwg):
     ], size=1.42, width_chars=185)
     yb = title(sh, dwg, reg, "TANKS AND FITTINGS IN THE MASS SCHEDULE (TB-11).", "6 mm HDPE TANKS, FOOD-GRADE LINES")
     rows = [["Fill", "G1 on the kerb wall", "The front tank, over CM-04", "Under the bed, down G12"],
-            ["Tank outlets", "Both tanks, balanced over CM-05", "G11, the strainer and the pump", "From the rear tank"],
-            ["Cold", "Manifold, sink cabinet", "Sink, drinking tap, Combi by G11 and G9", "Push-fit PEX"],
+            ["Tank outlets", "Both tanks, balanced over CM-05", "G15, the strainer and the pump", "From the rear tank"],
+            ["Cold", "Manifold, sink cabinet", "Sink, drinking tap, Combi by G15 and G9", "Push-fit PEX"],
             ["Wet room", "Manifold, shower corner", "Basin, flush, washer tap, bypass, shower, rinse box", "Over the inner door"],
-            ["Hot", "Combi, by G9 and G11", "Mixing valve at 50 C, then sink and wet room", "PEX"],
-            ["Sink waste", "Sink", "Grey tank's top, by G10", "1:50 under the floor"],
+            ["Hot", "Combi, by G9 and G15", "Mixing valve at 50 C, then sink and wet room", "PEX"],
+            ["Sink waste", "Sink", "Grey tank's top, by G15", "1:50 under the floor"],
             ["Washer, dryer", "Behind the dryer", "The basin", "Pumped, the washer's sleeved"],
             ["Basin, well, floor", "The wet room", "Grey tank, straight down", "G13, the well's valve, G24"],
             ["Dump", "Grey tank, kerb side", "Dump point or the 40 L tote", "Lever valve and camlock"]]

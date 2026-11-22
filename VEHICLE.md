@@ -6,7 +6,7 @@ Revised 22 Nov 2026 for decision H24 (research report 27): the build buys the up
 
 The truck is a used Toyota LandCruiser VDJ79 single cab V8 diesel, built 01/2017 to 08/2022, a GXL by preference, with about 400,000 km. Each of its seven stages, over a year or more, leaves it registered and drivable. It ends at power level B, about 230 to 250 kW and 850 Nm at the crank and never below 224 kW (300 hp). It carries both bikes in the box on the Lovells 4,495 kg Elite GVM kit, plated at a 4,450 kg GVM and a 2,800 kg rear axle for its shared 1,400 kg wheels (H17, H18), and tows the trailer, plated at 3,500 kg, under Lovells' 7,400 kg GCM revision (H2).
 
-Decision H24 sorts the work into three lists. The build is the upgrades and what makes them legal and able to tow: the engine rebuild, the clutch, upgraded injectors, the turbo, intercooler and exhaust, and the tune with its certificate, then the GVM kit and the GCM revision with their wheels, tyres and inspection, the towing gear and the trailer charging. It comes to AUD 67,608, or AUD 77,672 with one allowance of 10 % on listed prices and 20 % on estimates (AUD 10,064). That is AUD 2,672 over Leonard's AUD 75,000. Cut CUT7, back to the 4,200 kg Platinum kit if the S3 weighing allows it, closes the gap at AUD 63,532, and both cuts give AUD 62,256. Estimates are 48.9 % of the build.
+Decision H24 sorts the work into three lists. The build is the upgrades and what makes them legal and able to tow: the engine rebuild, the clutch, upgraded injectors, the turbo, intercooler and exhaust, and the tune with its certificate, then the GVM kit and the GCM revision with their wheels, tyres and inspection, the towing gear and the trailer charging. It comes to AUD 67,678, or AUD 77,749 with one allowance of 10 % on listed prices and 20 % on estimates (AUD 10,071). That is AUD 2,749 over Leonard's AUD 75,000. Cut CUT7, back to the 4,200 kg Platinum kit if the S3 weighing allows it, closes the gap at AUD 63,609, and both cuts give AUD 62,333. Estimates are 48.8 % of the build.
 
 The upgraded injectors bring one risk the build does not price. The Pro 100 is non-original fuel injection equipment, which report 14 judged makes a laboratory ADR 79 emissions test likely (TL07, AUD 10,000 est., on the check list). The plan assumes the LC4 certifier accepts the free TfNSW test of the finished truck. If its written evidence list at S0 asks for a laboratory test, the build drops the Pro 100 service and its fitting kit (FS01 and FS07, AUD 5,080) and runs level B on the truck's own tested injectors at factory flow, which carry it with about 10 to 25 % in hand (research report 27).
 
@@ -21,9 +21,9 @@ The purchase check list holds what a 400,000 km truck may or may not need: beari
 | S2 | Factory-spec engine rebuild, NPC clutch on the truck's own H152F, new radiator, sealed airbox and pre-filter | 14,450 | 8,298 | Machine shop | 6 to 10 weeks, then a 1,000 km run-in | As after S1, rebuilt |
 | S3 | Gate: build and weigh the box body, confirm the kit | 0 | 0 | None, Leonard builds the box body | None | Unchanged |
 | S4 | Wheels, tyres, front bushes, the Elite GVM kit with its own brakes, the box fitted, towing gear, one LC5 inspection with the GCM revision and the 2,800 kg plate | 30,059 | 3,200 | Lovells fitter, tyre shop, alignment, certifier | 2 to 3 weeks | Carries the bikes and, once certified, tows up to 3,500 kg at stock power |
-| S5 | Gauges, trailer charging, tongue, final weighing | 3,210 | 1,723 | Weighbridge, auto electrician | 1 week | Tows the loaded trailer with charging |
+| S5 | Gauges, trailer charging, tongue, final weighing | 3,280 | 1,723 | Weighbridge, auto electrician | 1 week | Tows the loaded trailer with charging |
 | S6 | Turbo, intercooler, exhaust, the Pro 100 injectors and the DPF clean, then the tune and its certificate | 18,899 | 21,000 | GTurbo, DPF specialist, tuner, emissions test, LC4 certifier | 2 to 4 weeks | Tows the trailer with the box at level B |
-| Total | | 67,608 | 53,956 | | | |
+| Total | | 67,678 | 53,956 | | | |
 
 The check list column is what a stage would cost if every check line fitted in it failed, and it is not counted.
 
@@ -109,7 +109,7 @@ Goal: tow the loaded trailer legally, level and charged.
 - Log the ute's battery voltage on the first hot night tow with both chargers running. If it stays under 13.3 V, run one charger until the upgrade (TC02, on the check list, AUD 1,723): a Jaylec BKS-240LC 240 A alternator and two more chargers, 7.2 kWh on a 5 h drive.
 - Weigh the laden ute alone and coupled to the loaded trailer (CK03). Choose the DO35 tongue's drop from the laden coupling height (TW08). Set tyre pressures from the tyre maker's load table.
 - Make the first long tow at stock power and record the temperatures.
-- AUD 3,210. Measure UTE-01, UTE-03, VEH-14 to VEH-17 and VEH-20 to VEH-24.
+- AUD 3,280. Measure UTE-01, UTE-03, VEH-14 to VEH-17 and VEH-20 to VEH-24.
 - Done when every weighed figure and towing temperature is inside its range.
 
 ### S6 Power, then the tune and its certificate
@@ -145,45 +145,45 @@ AUD including GST. Every line, with its list, priority, reason, stage and depend
 | GVM kit, GCM revision, certificate | 23,475 | 0 | 0 | Elite net extra 12,855, Platinum kit 5,620, GCM revision 1,750 |
 | Brakes | 40 | 0 | 350 | DOT 4 flush. The Elite brings its own brakes |
 | Wheels and tyres, six of each | 4,110 | 3,200 | 0 | Tyres 2,520. Toyota alloys, 3,200, only if needed (WT04) |
-| Towing and trailer charging | 3,954 | 1,723 | 639 | Charging 1,612, towbar 1,160 |
+| Towing and trailer charging | 4,024 | 1,723 | 639 | Charging 1,612, towbar 1,160 |
 | Freight and weighing | 910 | 0 | 0 | Freight 850 |
 | Long-range tank | 0 | 0 | 1,557 | ARB Frontier 180 L, an extra |
 | Bull bar and winch | 0 | 0 | 4,233 | Only if the truck has none |
-| Total | 67,608 | 53,956 | 12,070 | |
+| Total | 67,678 | 53,956 | 12,070 | |
 
 Each figure is rounded to the dollar, so a column can differ from its total by AUD 1.
 
 | Total | AUD |
 |---|---|
-| The build | 67,608 |
-| Allowance, 10 % of listed prices and 20 % of estimates | 10,064 |
-| The build with its allowance | 77,672 |
+| The build | 67,678 |
+| Allowance, 10 % of listed prices and 20 % of estimates | 10,071 |
+| The build with its allowance | 77,749 |
 | Leonard's build figure | 75,000 |
-| Over the build figure, with the allowance | 2,672 |
+| Over the build figure, with the allowance | 2,749 |
 | Less CUT7, with its share of the allowance | -14,140 |
 | The build with CUT7 and the allowance | 63,532 |
 | Less both cuts, CUT6 and CUT7 | -15,416 |
-| The build with both cuts and the allowance | 62,256 |
+| The build with both cuts and the allowance | 62,333 |
 | Purchase check list, if every line failed (not counted) | 53,956 |
 | Optional extras (not counted) | 12,070 |
 
-By priority: P1 (legal, safe and able to tow, or protecting the truck) is AUD 49,309 of the build, and P2 (the 224 kW minimum) is AUD 18,299. The optional extras are AUD 12,070.
+By priority: P1 (legal, safe and able to tow, or protecting the truck) is AUD 49,379 of the build, and P2 (the 224 kW minimum) is AUD 18,299. The optional extras are AUD 12,070.
 
-The allowance follows the trailer's rule: 10 % of the build's listed prices (AUD 34,573) and 20 % of its estimates (AUD 33,035). Research report 27 found no better basis for a one-off build. The check list carries none, because each of its prices is already the price if the line fails, and it is not added to the build.
+The allowance follows the trailer's rule: 10 % of the build's listed prices (AUD 34,644) and 20 % of its estimates (AUD 33,035). Research report 27 found no better basis for a one-off build. The check list carries none, because each of its prices is already the price if the line fails, and it is not added to the build.
 
 The cuts are two. Keep a rated factory towbar if the bought truck has one (CUT6, AUD 1,276 with its share of the allowance), and return to the Platinum kit if the S3 weighing allows it (CUT7, AUD 14,140). CUT7 alone closes the gap. The old cuts that tested and reused the injectors, the supply pump, the oil pump and the gearbox are now the plan itself, because those parts sit on the check list.
 
 ## Limits to build and drive to
 
-The model is the built ute (`build/ute/ute.json`) on the Elite kit, case UC2 with growth: two people, both bikes, the 437 kg box, tools and the trailer's tie-down straps and ground anchors, one spare, bar and winch, the trailer charging, the optional 180 L tank full, which the model keeps as the heavier case, and the Elite's extra 10 kg (est.), 3,676 kg with 1,475 kg front and 2,201 kg rear. The towing cases add the trailer's heaviest towball with growth, 317 kg (TC2, decision H17), which the trailer's MAS-03B and a test keep in step with the trailer.
+The model is the built ute (`build/ute/ute.json`) on the Elite kit, case UC2 with growth: two people, both bikes, the 437 kg box, tools and the trailer's tie-down straps and ground anchors, one spare, bar and winch, the trailer charging, the optional 180 L tank full, which the model keeps as the heavier case, and the Elite's extra 10 kg (est.), 3,678 kg with 1,475 kg front and 2,203 kg rear. The towing cases add the trailer's heaviest towball with growth, 317 kg (TC2, decision H17), which the trailer's MAS-03B and a test keep in step with the trailer.
 
 | Limit | Value | Model with growth |
 |---|---|---|
-| Ute, laden, ball load included | At most 4,450 kg (the Elite as plated, H18) | 3,992 kg |
+| Ute, laden, ball load included | At most 4,450 kg (the Elite as plated, H18) | 3,994 kg |
 | Front axle | At most 1,650 kg | 1,475 kg, no trailer |
-| Rear axle | At most 2,800 kg (the Elite plated at twice the ROH wheel's 1,400 kg, H18), or 2,550 kg if CUT7 returns to the Platinum | 2,647 kg, 153 kg in hand |
+| Rear axle | At most 2,800 kg (the Elite plated at twice the ROH wheel's 1,400 kg, H18), or 2,550 kg if CUT7 returns to the Platinum | 2,649 kg, 151 kg in hand |
 | Ball load | At most 350 kg (towbar). H17's design range: at least 8.0 % of the trailer and at most 320 kg with growth | 317 kg (292 kg on base masses) |
-| Ute plus trailer | At most 7,400 kg with GV06, 6,900 kg without | 7,176 kg, the ute plus the trailer's 3,500 kg plate (H20) |
+| Ute plus trailer | At most 7,400 kg with GV06, 6,900 kg without | 7,178 kg, the ute plus the trailer's 3,500 kg plate (H20) |
 | Trailer | At most 3,500 kg | 3,398 kg fully loaded, against its 3,400 kg design limit |
 | Front axle share | At least 20 % (Toyota BBGJ1007) | 33.7 %, towing |
 | Coupling point, laden | 440 mm plus or minus 20 mm (VSB1: 350 to 460 mm) | 440 mm |
@@ -194,7 +194,7 @@ The model is the built ute (`build/ute/ute.json`) on the Elite kit, case UC2 wit
 
 Toyota's body builder's guide BBGJ1007 (September 2017) sets the 20 % front axle share, the tyre clearances and the cab chassis' 700 mm centre of gravity that the model uses (UT-01). It is no longer online. Toyota's guide for trucks from January 2007, [LC70BBG](https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf), is, and gives the same rules and 740 mm. At 740 mm the ute's stability factor would read about 0.86 in place of 0.89 (UTE-11, est.).
 
-On the Elite the rear axle keeps 153 kg in hand, and H20 retired the plan's 3,850 kg weighed target, which stood for the Platinum's rear axle margin. Each kg on the ball adds 1.41 kg to the rear axle, and each kg at the tray centre about 1.04 kg. Without the GCM revision, Toyota's 6,900 kg less the ute with growth leaves the trailer a 3,224 kg plate, and it tows with at most 126 L of water in place of 300 L, so the fully loaded trailer with growth stays under that plate (H20).
+On the Elite the rear axle keeps 151 kg in hand, and H20 retired the plan's 3,850 kg weighed target, which stood for the Platinum's rear axle margin. Each kg on the ball adds 1.41 kg to the rear axle, and each kg at the tray centre about 1.04 kg. Without the GCM revision, Toyota's 6,900 kg less the ute with growth leaves the trailer a 3,222 kg plate, and it tows with at most 124 L of water in place of 300 L, so the fully loaded trailer with growth stays under that plate (H20).
 
 Drive to: coolant 85 to 104 °C towing, oil 90 to 116 °C, EGT at most 700 °C, gearbox oil at most 110 °C sustained (est.) where the optional senders are fitted, no full load below 1,600 rpm. Use fourth gear on long grades and low range for hill starts and reversing the trailer.
 
@@ -204,7 +204,7 @@ NSW registration, Victoria as the fallback. Items are from TfNSW's [VSI 06 Rev 4
 
 GVM kit and GCM revision (S4). Item 51 lists re-rating the GVM or the GCM as certifiable. Lovells rates the 4,200 kg kit at 7,400 kg GCM with 3,500 kg braked towing ([Lovells sheet, Oct 2026 ratings](https://www.lovellscampbellfield.com.au/_files/ugd/a7ab81_cd324b9c9e354c4da0d3ab9103620a6d.pdf)), and the 4,495 kg Elite at the same 7,400 kg GCM (report 16). The certifier plates the Elite at a 4,450 kg GVM and a 2,800 kg rear axle, twice the ROH Trak 2's 1,400 kg rating (assumption, decision H18). Lovells publishes a derate only for its 4,200 kg kit, so its written yes comes in S0, before GV05 is bought, and if it is refused Toyota's 16 x 7 ET 0 alloy, the wheel Lovells rates its kits on, goes on all ten wheels (WT04). Lovells' conditions for the 4,200 kg kit are tyres of load index 117 and speed M or better (research report 26 puts the Elite at about 121 and M, which the 123/120 R tyres pass), a Lovells authorised fitter and a Lovells-endorsed signatory ([Powercurve](https://www.powercurve.com.au/lovells-gvm-upgrade-sunshine-coast/toyota-landcruiser-lc79-series-gvm/)). The plan adds a towbar rated 3,500 kg and 350 kg. Braked towing means the trailer's own brakes on every wheel with a breakaway system (VSB1, above 2,000 kg ATM), driven by the REDARC controller. The revision is assumed to add AUD 1,750 (est.), the midpoint of the AUD 1,000 to 2,500 that [70 Series Store](https://70seriesstore.com/blogs/information/what-is-the-79-series-towing-gcm) gives for post-registration GCM engineering. The certificate also covers the ride height (item 13) and, if it is fitted, the optional 180 L tank (item 50). Leonard builds the bike box and its winch himself and does not have them certified (H25). The box stays inside Toyota's 60 mm beyond the cab on each side, 1,890 mm over its rear tub flares (H19).
 
-If NSW refuses the GCM revision: Lovells warns it may not be available after registration in every state. Victoria needs a [VASS certificate](https://transport.vic.gov.au/registration-and-licensing/registration/standard-and-non-standard-vehicle-information/modified-and-non-standard-vehicles/vass-approval-certificate) to change the GVM and is stricter about post-registration GCM upgrades (70 Series Store), so assume Victoria refuses it too. The fallback is H20's: the trailer plated at or below 3,224 kg and at most 126 L of water in travel. NSW does not recognise interstate light vehicle certificates (VSI 06 Rev 4 page 3), so choose the state before the first certificate.
+If NSW refuses the GCM revision: Lovells warns it may not be available after registration in every state. Victoria needs a [VASS certificate](https://transport.vic.gov.au/registration-and-licensing/registration/standard-and-non-standard-vehicle-information/modified-and-non-standard-vehicles/vass-approval-certificate) to change the GVM and is stricter about post-registration GCM upgrades (70 Series Store), so assume Victoria refuses it too. The fallback is H20's: the trailer plated at or below 3,222 kg and at most 124 L of water in travel. NSW does not recognise interstate light vehicle certificates (VSI 06 Rev 4 page 3), so choose the state before the first certificate.
 
 The power, the injectors and the tune (S6). Item 6 needs a certificate for a reflash that alters emissions output, item 2 for a power rise of more than 20 %, and items 5 and 49 for non-original fuel injection equipment, which the Pro 100 injectors are. One LC4 certifier issues one LA4 certificate for them all (LA4 is VSB 14's code for an engine modification) for about AUD 2,000 (est.). A modified vehicle must still meet ADR 79/04, and VSCCS Bulletin 2 accepts as evidence an IM240 test at TfNSW's emission testing facility or an equivalent NATA facility, or the gazetted Interim NSW Vehicle Emissions Test Procedure (May 2023). Which test the certifier asks for is its own call. Report 14 judged that non-original injectors make a laboratory test likely, so the plan carries TL07 with FS01 and drops FS01 and FS07 if the certifier's S0 list asks for one. Keep the same-dyno sheets, the emissions result, the DPF clean record and GTurbo's invoice and flow sheet for the injectors. The certifier may ask for evidence that the driveline takes about 850 Nm.
 
@@ -224,7 +224,7 @@ No certificate: the rebuild on the truck's own fuel equipment, the airbox, inter
 | The truck's own H152F with the NPC 1300 organic clutch, a new H152F only if it fails at S0, the ZF 8-speed as the fallback | GTurbo's packages put more torque than level B through the factory gearbox, and its common fault, synchro wear, shows at the S0 check (research report 27) |
 | 450 to 500 Nm in low range, first and reverse | Protects the 8 inch front diff and the CV joints |
 | Elite kit (GV05) in the build, back to the Platinum (CUT7) only if the S3 weighing leaves at least 30 kg under 2,550 kg | The home trailer's towball and the 180 L tank leave the Platinum's rear axle no margin (H17) |
-| Lovells 7,400 kg GCM revision in the same inspection | The ute with growth plus the trailer's 3,500 kg plate is 7,176 kg (H2, H20) |
+| Lovells 7,400 kg GCM revision in the same inspection | The ute with growth plus the trailer's 3,500 kg plate is 7,178 kg (H2, H20) |
 | Tune last, certified at once, factory file kept | Every earlier stage stays legal |
 | Pre-tune dyno run on the finished hardware | The certifier compares like with like |
 | Gearbox and diff senders optional (CG11) | No report of the manual gearbox overheating when towing was found (research report 27) |
@@ -238,7 +238,7 @@ No certificate: the rebuild on the truck's own fuel equipment, the airbox, inter
 
 ## Open points and the assumption used
 
-1. Will the LC5 certifier include the GCM revision after registration? Assumed yes, for AUD 1,750. If not, a trailer plate at or below 3,224 kg and at most 126 L of water in travel (H20).
+1. Will the LC5 certifier include the GCM revision after registration? Assumed yes, for AUD 1,750. If not, a trailer plate at or below 3,222 kg and at most 124 L of water in travel (H20).
 2. Will the LC4 certifier accept the TfNSW test (assumed free) or the Interim NSW procedure at level B with the Pro 100 injectors? Assumed yes. If its S0 list asks for a laboratory test with them, the build drops FS01 and FS07 (AUD 5,080) and the tune runs on the factory injectors. If it asks for one even then, a gas analyser test (TL06, AUD 200) or a laboratory test (TL07, AUD 10,000).
 3. Can the tune cap low-range torque? Assumed yes. If not, AUD 5,800 of CV joints and tailshafts.
 4. What torque does the truck's own H152F take? No rating is published. GTurbo's power packages for the VDJ70 reach 850 to 1,100 Nm at the wheels through the factory gearbox, with its NPC clutch as the only driveline part it lists, and the box's common fault is synchro wear (research report 27). Assumed: a box that passes its S0 check carries about 850 Nm at the crank in high range with sensible driving.

@@ -1,7 +1,7 @@
 # 30. Services routing: the 3D wiring and plumbing plans (H28)
 
 Every cable and pipe of the home trailer is a run in `data/routes.yaml`. `cad/routes.py` resolves each run on the
-solved layout, gives it a centreline with real bends, sizes it, measures it and checks it (SVC-01 to SVC-07).
+solved layout, gives it a centreline with real bends, sizes it, measures it and checks it (SVC-01 to SVC-08).
 `cad/routes_model.py` sweeps the runs into the two viewer models, `trailer-electrical` and `trailer-plumbing`, and
 writes the schedules for the Electrical and Plumbing pages. CT-602 and CT-612 draw the same centrelines in plan.
 

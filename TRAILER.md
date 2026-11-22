@@ -13,10 +13,10 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 | Tare | 2,627 kg, 2,885 kg with the growth allowance |
 | Fully loaded with 300 L of water (TC2) | 3,106 kg, 3,398 kg with growth, against the 3,500 kg plate |
 | Towball | 251 to 292 kg, 8.1 to 10.3 % of the trailer, at most 316.5 kg with growth |
-| Ute | Rear axle 2,647 kg with growth against its 2,800 kg plate. Combination 7,176 kg against 7,400 kg, the ute with growth plus the plate |
+| Ute | Rear axle 2,649 kg with growth against its 2,800 kg plate. Combination 7,178 kg against 7,400 kg, the ute with growth plus the plate |
 | Battery | 25.6 kWh. A design hot day runs 25.1 h when new and 17.2 h at end of life |
 | Water | 420 L fresh, at most 300 L in travel, about 41 L a day. 130 L grey |
-| Cost | AUD 193,492 with contingency, built by Leonard (H26) |
+| Cost | AUD 193,496 with contingency, built by Leonard (H26) |
 
 Every fail check passes. The tightest are the fully loaded mass with growth (MAS-10, 3,397.6 kg against the 3,400 kg target), the towball share with the grey tank full (MAS-12, 8.1 % against 8.0 %), the heaviest towball (MAS-13, 316.5 kg against 320 kg) and the recovery pull in the road-side rail (CHS-08A, 0.91 of yield).
 
@@ -53,8 +53,8 @@ Masses in kg. The towball comes from moments about the axle group centre at X 4,
 - Plate: ATM 3,500 kg, the ute's braked towing rating and the limit of the DO35 and the chains (H2). The heaviest case with growth is 3,397.6 kg, 2.4 kg inside H2's 3,400 kg target (MAS-10). The examiner's caps from the tyres, coupling, chains and brakes are 3,500 kg (MAS-07, MAS-08).
 - Water: at most 300 L of fresh and grey water while towing, H13's 350 L less 50 L by H21. The tanks hold 420 L and are filled at camp (H13). The grey tank travels empty, and TC7 and TC8 check the trailer with it full.
 - Towball: at least 7.5 % in every case and at most 350 kg, the 79's, the towbar's and the DO35's rating (MAS-04, H14). While the masses are estimates the axle sits in the middle of a 14.2 mm window between 8.0 % in the lightest case and 320 kg with growth in the heaviest (MAS-12, MAS-13, H17).
-- Ute: the heaviest towball puts the ute's rear axle at 2,647 kg with growth against the Elite kit's 2,800 kg plate (MAS-03, H18). MAS-14 reports the Platinum kit for the car build's cut CUT7.
-- GCM: the ute with growth, 3,676 kg, plus the 3,500 kg plate is 7,176 kg against Lovells' 7,400 kg (GCM-01, UTE-06, H20). If the revision is refused, Toyota's 6,900 kg needs the trailer plated at or below 3,224 kg and at most 126 L of water in travel, so the fully loaded trailer with growth stays under that plate.
+- Ute: the heaviest towball puts the ute's rear axle at 2,649 kg with growth against the Elite kit's 2,800 kg plate (MAS-03, H18). MAS-14 reports the Platinum kit for the car build's cut CUT7.
+- GCM: the ute with growth, 3,678 kg, plus the 3,500 kg plate is 7,178 kg against Lovells' 7,400 kg (GCM-01, UTE-06, H20). If the revision is refused, Toyota's 6,900 kg needs the trailer plated at or below 3,222 kg and at most 124 L of water in travel, so the fully loaded trailer with growth stays under that plate.
 - Balance: the centre of gravity sits at most 34.9 mm to the kerb side against a 50 mm rule (MAS-11), at Z 1,232 to 1,318 mm with growth. The static stability factor is 0.61 to 0.65 on the 1,655 mm track.
 - Roll: with the body rolled onto its bump stops and tyres, the static rollover threshold is about 0.42 g (est., Gillespie's method), over the 0.35 g of PBS level 1 and the 0.40 g target (STB-01, STB-02). Decision H22 widened the track from 1,555 to 1,655 mm for it, through the rails. The ute with the bikes aboard has a static stability factor of 0.89 (UTE-11).
 - Sway: the yaw inertia is about 7,300 kg m² fully loaded with growth, and the towball never falls under 8.1 % of the trailer (STB-03). No snaking speed is estimated, because the published models need tyre and hitch data that are not known. The Bosch TSC brakes the trailer when it senses sway.
@@ -163,11 +163,11 @@ The insert map CT-203 must be final before the panels are ordered, because the m
 
 ## Cost and where to save
 
-The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 151 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 168,396 subtotal carries AUD 25,096 (14.9 %), for AUD 193,492.
+The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 151 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 168,399 subtotal carries AUD 25,097 (14.9 %), for AUD 193,496.
 
 | Group | AUD | Group | AUD |
 |---|---|---|---|
-| Body | 38,104 | Chassis | 6,828 |
+| Body | 38,107 | Chassis | 6,828 |
 | Electrical | 23,708 | Freight and consumables | 5,310 |
 | Living area | 21,186 | Licensed electrician | 4,600 |
 | Running gear | 14,181 | Drawbar box | 4,388 |
@@ -175,7 +175,7 @@ The parts list is `data/trailer-parts.yaml` with the priced lines of the mass sc
 | Wet room | 11,627 | Roof | 2,926 |
 | Bed | 8,028 | Coupling and drawbar | 1,695 |
 | Compliance and weld evidence | 8,320 | Lamps, reflectors and the number plate | 930 |
-| Subtotal | 168,396 | Spare wheel | 736 |
+| Subtotal | 168,399 | Spare wheel | 736 |
 
 What the registration needs stays: the licensed electrician and the AS/NZS 3001.2 certificate (ELI-01, CMP-13), the refrigeration fitting in AC-03, the wheel alignment (ALN-01), the engineer's review (CMP-03) and the registration lines. The registration itself also needs papers. A concessional trailer never registered in NSW needs TfNSW's Identity Approval before the examiner can pass it (VIB 78 rule 221.04), and its application, form 5703, is rejected without clear photographs of all four sides and the drawbar, of the vehicle plate and of the VIN stamped in the frame, the weighbridge ticket, and receipts proving the origin of the materials (CMP-04). So keep every receipt for the chassis steel, the running gear, the coupling and the panels from stage B0, and photograph the trailer as AIS Notice 41 and VIB 78 ask.
 
@@ -219,7 +219,7 @@ Each is in full in `docs/decisions.md`.
 
 1. Storage is about 0.2 m³ short (est.). Two 500 x 600 x 700 mm cabinets under the bed beside the desk would add 0.42 m³ and about 20 kg, and break Leonard's rule that the rest of that area stays empty. Assumption: the footprint stays empty (H16).
 2. Estimate lines carry 905 kg, 34.4 % of the tare, and estimates set 46.6 % of the price subtotal. MAS-10 has 2.4 kg of margin, 3,397.6 kg against 3,400 kg, and only 2.0 kg of BD-11's 53.6 kg is not yet given to a part, so the next part that is in no line takes travel water off by H21. Assumption: the growth allowance covers the masses until TW-01 to TW-03 replace them, and the 20 % contingency covers the prices. A towball reading more than 10 % off the model means the centre of gravity estimates are wrong (UTE-03).
-3. Assumption: Lovells' 7,400 kg GCM is certified in the ute's LC5 inspection. If not, plate at or below 3,224 kg and tow with at most 126 L (H20).
+3. Assumption: Lovells' 7,400 kg GCM is certified in the ute's LC5 inspection. If not, plate at or below 3,222 kg and tow with at most 124 L (H20).
 4. Assumption: the isolators and the line set keep the split working on corrugations, without a maker's warranty. The fallback is a rooftop unit with a sixth battery module.
 5. The Dometic fridge, freezer, hob and sink carry converted European prices, and the oven, washer, panels and lamps are estimates. Assumption: these prices stand, with their contingency, until an Australian stockist or a quote replaces them.
 6. VSB1 9.1 accepts a drawbar test or approved calculations, and approved calculations are those the department approves. Assumption: the department accepts the engineer's calculation, which covers strength and fatigue, as VSB1 9.1's approved calculation for the concessional entry at 3,500 kg (CHASSIS.md). If it does not, the drawbar and chain points are tested at an approved facility to VSB1 chapter 14, about AUD 5,000 (est.), outside the total.
@@ -227,4 +227,4 @@ Each is in full in `docs/decisions.md`.
 8. Fiamma publishes no length for the F80s 400's leg, 98667-04, the same part as on the F80L. Assumption: it reaches 2,686 mm like the 320's leg, which ships in the same carton. If it is shorter, the canopy falls more steeply on the same ground (BDY-23).
 9. No published force coefficient fits a box-shaped trailer on its wheels. Assumption: ASCE 7-16's 1.6 for a solid sign of these proportions, the high side, for STB-04's rule. A box's 1.05 would put the overturning speeds about a quarter higher.
 10. RADCO's listing #1349, Table 1, names stabilizer "No 59285" as the M607's minimum device, while Tie Down's anchor chart and plate sheet (manual pp. 5 and 9) give the 59286, 17-1/2 x 13-1/2 in, for the 59099, and the kit takes the 59286. Assumption: the 59286 is the listing's device under its catalogue number, as Tie Down's own chart pairs it with the 59099 (STB-05).
-11. The floor glands at the partition's road end, G11, G15, G10 and G14, sit in the corner chase between the landing and the bench with almost no floor between them: 16 mm between G11 and G15, 4 mm between G15 and G10, and G10 touching G14. The road gap beside the fresh tanks is the only way under the floor there, so the holes line up along it. Assumption: the floor maker lays a high-density insert under the four holes, and the next services pass spreads them along the chase with at least 25 mm of floor between holes before the floor panel is ordered.
+11. The services leave the board and the kitchen through the floor in three Roxtec RM transit frames in place of round glands: G15, 180 x 60 mm in the road gap under the MultiPlus-II, G20, 168 x 60 mm in the kerb gap under the plinth's end slot, and G8, 90 x 30 mm into the kerb raiser (CT-603). Their modules are compressed from above, so nothing is tightened under the floor, and G15 stands clear of the aisle. Assumption: each frame's cut-out suits the floor panel as CT-603 draws it, with a high-density insert laid round it by the floor maker. A check of each frame's distance to the glands beside it, from their fittings' sizes, is still to come.

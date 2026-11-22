@@ -198,7 +198,7 @@ def viewer_json(name: str, root: Compound) -> str:
 
 # ------------------------------------------------------------------ check rows and the pages' data
 def check_rows(res: dict, ev: dict) -> list[dict]:
-    """SVC-01 to SVC-07 as check rows (data/routes.yaml `checks`), each with its limit, measured value and governing run."""
+    """SVC-01 to SVC-08 as check rows (data/routes.yaml `checks`), each with its limit, measured value and governing run."""
     rows = []
     for c in res["data"].get("checks") or []:
         e = ev[c["kind"]]

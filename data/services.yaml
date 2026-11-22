@@ -35,17 +35,6 @@ glands:
   - {id: G27, what: "Split's condensate drain out through the road wall under the indoor unit", at: road, x: 5006, z: 2558, d: 25, src: "data/routes.yaml", est: "position"}
 
 electrical:
-  # report 20 section 7, main cables and fuses. Lengths are along the routes on CT-602 (est.)
-  cables:
-    - {run: "Each battery module to the bank busbar", current: "100 A (1C)", fuse: "125 A MEGA", cable: "25 mm2", length: "under 1 m, sleeved"}
-    - {run: "Bank busbar to the Lynx Smart BMS NG", current: "150 A, 260 A for 1 min", fuse: "Module fuses, BMS contactor", cable: "70 mm2", length: "1.0 m"}
-    - {run: "Lynx Distributor to the MultiPlus-II", current: "144 A at 6 kW", fuse: "200 A MEGA", cable: "50 mm2", length: "2 m each way, 0.2 V drop"}
-    - {run: "Each SmartSolar MPPT 150/35", current: "35 A", fuse: "40 A MIDI", cable: "10 mm2", length: "0.5 m"}
-    - {run: "Each Orion-Tr converter input", current: "9 A", fuse: "15 A", cable: "4 mm2", length: "0.5 m"}
-    - {run: "24 V converter pair to its fuse panel", current: "32 A", fuse: "40 A", cable: "10 mm2", length: "0.5 m"}
-    - {run: "12 V converter pair to its fuse panel", current: "60 A", fuse: "80 A", cable: "16 mm2", length: "0.5 m"}
-    - {run: "Ute charging feed, drawbar Anderson to the Lynx Distributor", current: "16 A, 32 A after TC02", fuse: "40 A", cable: "8 B&S twin", length: "about 6.5 m"}
-    - {run: "Each PV string, two panels in series", current: "10.7 A (Isc)", fuse: "None, one string per controller", cable: "6 mm2 PV", length: "about 6 m"}
   # report 20 section 7, 230 V circuits. Every circuit has a 30 mA RCBO. `at` is the layout line it feeds
   circuits:
     - {id: C1, load: "Hob, Dometic CVI1525", amps: 10.0, rcbo: 16, control: "Current relay: above 4.5 A it opens K4, any current opens S1", at: LA-07A}

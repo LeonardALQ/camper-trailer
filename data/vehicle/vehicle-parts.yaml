@@ -167,7 +167,7 @@ items:
   - {id: TW03, name: "REDARC Universal Tow-Pro Wiring Kit", part_number: TPWKIT-013, supplier: REDARC, price_aud: 255.99, price_basis: listing, link: "https://www.redarcelectronics.com/au/tow-pro-elite", status: build, system: towing, source: "report 16", note: "Listed from this price", priority: P1, why: "Towing gear: wires the controller to the brake switch and the 12-pin socket.", stage: S4, depends_on: [TW02]}
   - {id: TW04, name: "REDARC Tow-Pro Universal Mount", part_number: TPSI-001, supplier: REDARC, price_aud: 19, price_basis: listing, link: "https://www.redarcelectronics.com/au/tow-pro-elite", status: build, system: towing, source: "report 16", priority: P1, why: "Towing gear: holds the controller head where the driver can reach it.", stage: S4, depends_on: [TW02]}
   - {id: TW05, name: "12-pin flat trailer socket to AS 4177.5 with wiring, brake output on pin 5", part_number: null, supplier: "Auto electrical supplier", price_aud: 80, price_basis: estimate, link: null, status: build, system: towing, source: "report 16", priority: P1, why: "Towing gear: carries the trailer's lights and the brake signal.", stage: S4, depends_on: [TW01]}
-  - {id: TW06, name: "48 V charging feed to the towbar: two inline MIDI holders with 23 A fuses on the chargers' outputs, 7 m of 6 B&S twin cable (13.3 mm2), a grey Anderson SB50 in a flush-mount panel, clips", part_number: "Exotronic MIDI in-line holder, 23 A MIDI fuse, 6 B&S twin, flush-mount 50 A Anderson panel", supplier: Solar4RVs, price_aud: 157.90, price_basis: listing, link: "https://www.solar4rvs.com.au/products/6bs-twin-core-automotive-cable-per-metre", status: build, system: towing, source: "research/20-electrical.md (report 20), car build lines TC01 and TW06, review finding I2-15", note: "Holders and fuses 21.60 and the Anderson panel 12.00 read 20 Nov 2026, the cable 104.30 at 14.90 a metre read 22 Nov 2026, all Solar4RVs listings, and clips 20 (est.). The listing gives 13.51 mm2 a core, and the drop is worked on 13.3 mm2 at 3.38 mV/A.m (data/routes.yaml): 0.38 V, 0.8 % at 48 V, at today's 16 A and 0.76 V, 1.6 %, at TC02's 32 A, losing about 6 and 24 W. 2.6 kg (est.), at the routes data's 0.145 kg a metre a core. The grey housing does not mate with red 12 V plugs", priority: P1, why: "Trailer charging: carries the chargers' 48 V output to the trailer plug. 6 B&S drops 1.6 % at TC02's 32 A over the ute's 7 m, where 8 B&S dropped 2.5 %.", stage: S5, depends_on: [TC01], checked: "2026-11-22"}
+  - {id: TW06, name: "48 V charging feed to the towbar: two inline MIDI holders with 23 A fuses on the chargers' outputs, 7 m of 4 B&S twin cable (20.27 mm2), a grey Anderson SB50 in a flush-mount panel, clips", part_number: "Exotronic MIDI in-line holder, 23 A MIDI fuse, 4 B&S twin, flush-mount 50 A Anderson panel", supplier: Solar4RVs, price_aud: 228.60, price_basis: listing, link: "https://www.solar4rvs.com.au/products/4b-s-20-29mm-twin-core-automotive-cable-per-metre", status: build, system: towing, source: "research/20-electrical.md (report 20), car build lines TC01 and TW06, review finding I2-15", note: "Holders and fuses 21.60 and the Anderson panel 12.00 read 20 Nov 2026, the cable 175.00 at 25.00 a metre read 22 Nov 2026, all Solar4RVs listings, and clips 20 (est.). The listing gives 20.27 mm2 a core, and the drop is worked on 21.2 mm2 at 2.12 mV/A.m (data/routes.yaml): 0.47 V, 1.0 % at 48 V, at TC02's 32 A, so with the trailer half D-14 on the same cable the feed holds 2 % from the chargers to the Lynx (SVC-06). 4.1 kg (est.), 3.5 kg of cable at the routes data's 0.501 kg a metre for the twin and 0.6 kg of holders, fuses and the panel. The grey housing does not mate with red 12 V plugs", priority: P1, why: "Trailer charging: carries the chargers' 48 V output to the trailer plug. Both halves of the feed are sized now for TC02's 32 A, as report 20 sizes them, because the cable is the part that is hard to change later: 4 B&S on each half holds 2 % end to end, where 6 B&S gave 3.1 %.", stage: S5, depends_on: [TC01], checked: "2026-11-22"}
   - {id: TW07, name: "Hayman Reese X-Bar with rated recovery points in place of TW01, net extra", part_number: "03237RW", supplier: ARB, price_aud: 639, price_basis: listing, link: "https://www.arb.com.au/product/t03237rw-x-bar-3500-350kg-tow-and-ball-rating-toyota-landcruiser-79-series", status: optional, system: towing, source: "report 16", note: "AUD 1,799 listed, less TW01's AUD 1,160", priority: P3, why: "Rated recovery points on the towbar, a nice-to-have.", stage: S4, depends_on: [GV02]}
   - {id: TW08, name: "50 mm hitch tongue rated 3,500 kg and 350 kg, drilled for the DO35 22 mm tow pin, drop chosen at the final weighing", part_number: null, supplier: "Hayman Reese or Cruisemaster stockist", price_aud: 200, price_basis: estimate, link: "https://cruisemaster.com.au/do35-v3plus-no-handbrake/", status: build, system: towing, source: "plan (report 23)", note: "The DO35 kit in the trailer budget supplies the tow pin but no tongue (Cruisemaster's item list, read 20 Nov 2026). No tongue price was read. The ute model's towbar mass (UT-04) already includes it", priority: P1, why: "Towing gear: the DO35 pin needs a 50 mm tongue, and its drop sets the 440 mm coupling height.", stage: S5, depends_on: [S4], checked: "2026-11-20"}
   - {id: TC01, name: "Trailer charging: two Victron Orion-Tr Smart 12/48-8 isolated chargers on the stock alternator, in a vented cover in the bike box front, with their 12 V wiring and fuses, fitted", part_number: "Victron Orion-Tr Smart 12/48-8 (two), ANL 100 A holder and fuse, 2 B&S cable, 4-way MIDI holder with two 50 A fuses", supplier: "Solar4RVs, auto electrician", price_aud: 1611.70, price_basis: estimate, link: "https://www.solar4rvs.com.au/products/victron-12v-to-48v-orion-tr-8a-380w-isolated-charger", status: build, system: towing, source: "research/20-electrical.md (report 20), car build lines TC01 and TW06", note: "AUD 841.70 of listings (chargers 651.90, fuses and holders 54.60, cables 135.20, Solar4RVs, 20 Nov 2026) and AUD 770 estimated (mounting plate and cover 60, lugs and clips 60, auto electrician 5 h at AUD 130 an hour, TW06 included). 8.4 kg. 720 W, 3.6 kWh on a 5 h drive, about 62 A from the ute at 13 V. Replaces the AUD 3,500 placeholder", priority: P1, why: "Trailer charging: keeps the trailer's batteries, which also feed its breakaway brakes, charged on travel days.", stage: S5, depends_on: [RF04, S4], checked: "2026-11-20"}
@@ -223,22 +223,22 @@ bike_box: {parts_list: "data/ute/box-parts.yaml", doc: UTE-GARAGE.md, note: "Leo
 totals_aud:
   build_budget: 75000
   allowance_pct: {listing: 10, estimate: 20}
-  build_by_system: {engine: 10778, fuel_system: 5742, intake_dpf: 2095, turbo_exhaust: 8269, tune_legal: 5710, clutch_gearbox: 2015, steering_suspension: 450, refresh: 60, gvm: 23475, brakes: 40, wheels_tyres: 4110, towing: 3954, freight_weighing: 910}
-  build: 67608
-  build_listed: 34573
+  build_by_system: {engine: 10778, fuel_system: 5742, intake_dpf: 2095, turbo_exhaust: 8269, tune_legal: 5710, clutch_gearbox: 2015, steering_suspension: 450, refresh: 60, gvm: 23475, brakes: 40, wheels_tyres: 4110, towing: 4024, freight_weighing: 910}
+  build: 67678
+  build_listed: 34644
   build_estimated: 33035
-  contingency_allowance: 10064
-  build_plus_contingency: 77672
+  contingency_allowance: 10071
+  build_plus_contingency: 77749
   cuts_with_allowance: 15416
-  build_with_cuts_plus_contingency: 62256
-  against_budget: {build: -7392, build_plus_contingency: 2672, build_with_cuts_plus_contingency: -12744}
+  build_with_cuts_plus_contingency: 62333
+  against_budget: {build: -7322, build_plus_contingency: 2749, build_with_cuts_plus_contingency: -12667}
   check_by_system: {engine: 4340, fuel_system: 2637, intake_dpf: 5000, turbo_exhaust: 250, tune_legal: 10200, clutch_gearbox: 4591, driveline: 14245, steering_suspension: 2200, refresh: 5570, wheels_tyres: 3200, towing: 1723}
   check_if_every_item_failed: 53956
   optional_by_system: {engine: 400, clutch_gearbox: 454, driveline: 2850, steering_suspension: 1200, refresh: 387, brakes: 350, towing: 639, fuel_tank: 1557, bar_winch: 4233}
   optional: 12070
-  every_line: 133633
+  every_line: 133704
   by_priority:
-    P1: {build: 49309, check: 36233, optional: 0}
+    P1: {build: 49379, check: 36233, optional: 0}
     P2: {build: 18299, check: 16000, optional: 0}
     P3: {build: 0, check: 1723, optional: 12070}
   by_stage:
@@ -247,5 +247,5 @@ totals_aud:
     S2: {build: 14450, check: 8298, optional: 554}
     S3: {build: 0, check: 0, optional: 0}
     S4: {build: 30059, check: 3200, optional: 3746}
-    S5: {build: 3210, check: 1723, optional: 300}
+    S5: {build: 3280, check: 1723, optional: 300}
     S6: {build: 18899, check: 21000, optional: 0}

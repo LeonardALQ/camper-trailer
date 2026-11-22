@@ -6,7 +6,7 @@ chase behind the plinth, the under-floor runs along the rails and the glands of 
 three expressions over the layout's parameters, the envelope boxes (EL_04.x0 for line EL-04's box) and the ways'
 constants, and "." repeats the previous point's value. resolve() turns the runs into filleted centrelines at the
 cable's or pipe's minimum bend radius, sizes every DC circuit by its current and its voltage drop at the routed length
-(report 20's 2 % limit), and adds up the lengths, masses and prices. checks() measures SVC-01 to SVC-06.
+(report 20's 2 % limit), and adds up the lengths, masses and prices. checks() measures SVC-01 to SVC-08.
 """
 from __future__ import annotations
 
@@ -685,7 +685,7 @@ def _bar_gap(segs: list, c: dict, step: float = 15.0) -> float:
     return best
 
 
-# ------------------------------------------------------------------ the checks, SVC-01 to SVC-07
+# ------------------------------------------------------------------ the checks, SVC-01 to SVC-08
 PANELS = ("BD-01", "BD-02", "BD-03", "BD-04")
 
 
