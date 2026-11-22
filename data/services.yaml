@@ -58,28 +58,29 @@ fittings:
 # cad/tests/test_routes.py holds this list to): its point, its size across (the run's outside diameter and a 6 mm
 # bush, est.) and its length along the wall where the run passes it on a slant. A frame's cut-out is its packing
 # space and its 4 mm walls. The three cables of the kerb frame's raiser space keep inside the raiser, clear of its
-# seam with the rail. K-08 and K-09 (I2-27) rise outside the rails behind the grey tank, enter the raisers through
-# their inner faces 110 mm above the seam, and leave them into the outriggers OR-05 through a 16 x 27 mm slot in the
-# middle of each outrigger's end, 26 mm above the seam and 12 mm inside the outrigger's walls, clear of its welds (est.).
+# seam with the rail. Every hole is in a web, none in a 50 mm face (CHS-10): K-08 and K-09 rise inboard of the rails
+# behind the grey tank, enter the raisers through their inner webs and turn square across them into the outriggers
+# OR-05 through a round hole on the outrigger's centre line, 17.5 mm from its root weld either side, and K-01 and K-10
+# leave the road rail through its outer web at its flat's middle, not its bottom face.
 holes:
-  - {member: OR-05K, face: road side, run: K-08, x: 4390, y: -638, z: 782, d: 16, length: 27}
-  - {member: OR-05K, face: kerb side, run: K-08, x: 4390, y: -1200, z: 800, d: 16, length: 16}
-  - {member: OR-05R, face: kerb side, run: K-09, x: 4390, y: 638, z: 782, d: 16, length: 27}
-  - {member: OR-05R, face: road side, run: K-09, x: 4390, y: 1200, z: 800, d: 16, length: 16}
+  - {member: OR-05K, face: road side, run: K-08, x: 4387, y: -638, z: 826, d: 16, length: 16}
+  - {member: OR-05K, face: kerb side, run: K-08, x: 4387, y: -1200, z: 800, d: 16, length: 16}
+  - {member: OR-05R, face: kerb side, run: K-09, x: 4387, y: 638, z: 811, d: 16, length: 16}
+  - {member: OR-05R, face: road side, run: K-09, x: 4387, y: 1200, z: 800, d: 16, length: 16}
   - {member: RL-R, face: road side, run: K-01, x: 2304, y: 637, z: 669, d: 16, length: 49}
   - {member: RL-R, face: road side, run: K-10, x: 2378, y: 637, z: 637, d: 16, length: 37}
-  - {member: RL-R, face: bottom, run: K-10, x: 4250, y: 611, z: 598, d: 16, length: 26}
-  - {member: RL-R, face: bottom, run: K-01, x: 6171, y: 609, z: 598, d: 16, length: 17}
+  - {member: RL-R, face: road side, run: K-10, x: 4090, y: 637, z: 652, d: 16, length: 25}
+  - {member: RL-R, face: road side, run: K-01, x: 6021, y: 637, z: 680, d: 16, length: 25}
   - {member: RS-K, face: road side, run: B-18, x: 2015, y: -587, z: 840, d: 14, length: 54}
-  - {member: RS-K, face: kerb side, run: D-14, x: 2180, y: -638, z: 804, d: 24, length: 99}
-  - {member: RS-K, face: road side, run: B-16, x: 2267, y: -587, z: 772, d: 28, length: 103}
-  - {member: RS-K, face: kerb side, run: K-08, x: 4391, y: -638, z: 783, d: 16, length: 27}
+  - {member: RS-K, face: road side, run: B-16, x: 2267, y: -587, z: 796, d: 28, length: 103}
+  - {member: RS-K, face: kerb side, run: D-14, x: 2291, y: -638, z: 822, d: 24, length: 74}
+  - {member: RS-K, face: kerb side, run: K-08, x: 4387, y: -638, z: 826, d: 16, length: 16}
   - {member: RS-K, face: top, run: B-18, x: 5024, y: -606, z: 874, d: 14, length: 15}
   - {member: RS-K, face: top, run: D-14, x: 5052, y: -606, z: 874, d: 24, length: 25}
   - {member: RS-K, face: top, run: B-16, x: 5094, y: -606, z: 874, d: 28, length: 28}
-  - {member: RS-K, face: road side, run: K-08, x: 6134, y: -587, z: 857, d: 16, length: 41}
-  - {member: RS-R, face: road side, run: K-09, x: 4391, y: 638, z: 783, d: 16, length: 27}
-  - {member: RS-R, face: kerb side, run: K-09, x: 6143, y: 587, z: 858, d: 16, length: 44}
+  - {member: RS-K, face: road side, run: K-08, x: 6010, y: -587, z: 826, d: 16, length: 28}
+  - {member: RS-R, face: road side, run: K-09, x: 4387, y: 638, z: 811, d: 16, length: 16}
+  - {member: RS-R, face: kerb side, run: K-09, x: 5995, y: 587, z: 811, d: 16, length: 40}
 cutouts:
   - {panel: BD-01, gland: G9, x: 3392, y: 515.5, w: 38, h: 98}
   - {panel: BD-01, gland: G15, x: 5067, y: 547.5, w: 188, h: 68}

@@ -488,6 +488,8 @@ consts:
   RZ1: RS_K.z1 - 34                 # inside the kerb raiser, clear of its seam with the rail: the breakaway feed B-18 on top,
   RZ2: RS_K.z1 - 69                 # the ute feed D-14 in the middle
   RZ3: RS_K.z1 - 102                # and the compressor feed B-16 at the bottom, each 7 mm inboard of the raiser's centre for K-08's riser
+  RZ2F: RS_K.z1 - 53                # ahead of CM-02 D-14 rides higher, so B-16 can rise under it to its exit,
+  RZ3F: RS_K.z1 - 79                # 39 mm clear of the seam's fillet (CHS-10)
   ZW: floor_z + 165                 # the wall strip's cables cross the end slot to the frames here, over the 230 V conduit
   CHX: rear_x0 - 158                # the 12 V and 24 V loom down the chase's mid row to G20, lanes rearward
   KAX: LA_02.x1 - 60                # the 230 V riser behind the washer, 550 mm forward of the DC risers
@@ -502,6 +504,9 @@ consts:
   GAP_K: (UF_01.y0 + RS_K.y1) / 2   # and the kerb rail
   LOWZ: (PB_1K.z1 + CM_02.z0) / 2   # under the floor crossmembers and over the plan braces, ahead of the tanks
   TOPZ: (CM_05.z1 + floor_underside_z) / 2 + 5   # over the XT crossmembers in the tank bays
+  KMZ: RS_K.z1 - 49                 # K-08 inside the kerb raiser and into OR-05K, between D-14 and B-18, under the nut plate (CHS-10)
+  KRZM: (RS_R.z0 + RS_R.z1) / 2     # K-09 inside the road raiser and into OR-05R, at the web's middle (CHS-10)
+  RWZ: RL_R.z0 + 82.5               # K-01 and K-10 leave the road rail through its outer web here, its flat's middle, not its bottom face (CHS-10)
   KRY: RL_K.y0 - 12                 # clipped to the kerb rail's outer face, under the outriggers
   KRZ: (RL_K.z0 + RL_K.z1) / 2 + 30
   FWX: in_x0 + 25                   # the bed zone's floor bulkhead along the front wall, under the desk
@@ -670,7 +675,7 @@ runs:
      upstream: {what: "TW06, the ute half from the chargers to the towbar Anderson: 7 m of 4 B&S twin", m: 7, mm2: 21.2, mv: 2.12,
                 source: "Car build line TW06 (data/vehicle-parts.yaml), at 4 B&S with D-14 so the feed holds 2 % from the chargers to the Lynx at 32 A, report 20's current after the upgrade"},
      serves: [ute feed], glands: [G20], along: [DB-KA, DB-KB, RL-K, RS-K, BD-03], from: {line: DB-AN, at: [DB_AN.x1, DB_AN.cy, DB_AN.cz]},
-     path: [[780, -284.7, 523], [900, -327.0, 440], [1100, -397.4, 440], [1220, -439.6, 523], [1820, -650.8, 523], [2000, -651, 523], [2130, ., RZ2], [2300, RS_K.cy + 7, .], [G20_D_14.cx - 64.5, ., .], [G20_D_14.cx, G20_D_14.cy, RZ2 + 64.5], [., ., ZW], [., WSY, .], [., ., LA_11E.z0 + 195]],
+     path: [[780, -284.7, 523], [900, -327.0, 440], [1100, -397.4, 440], [1220, -439.6, 523], [1820, -650.8, 523], [1942, -651, .], [2130, ., RZ2F], [2252, ., .], [2327, -625, .], [2382, RS_K.cy + 7, .], [2560, ., .], [2680, ., RZ2], [G20_D_14.cx - 64.5, ., .], [G20_D_14.cx, G20_D_14.cy, RZ2 + 64.5], [., ., ZW], [., WSY, .], [., ., LA_11E.z0 + 195]],
      to: {line: BR-LYNX, at: [BR_LYNX.cx, BR_LYNX.y0, .]}}
   - {id: D-15, system: pv, kind: pv, lane: 0, feeds: "PV string 1, the two kerb-side panels in series, through G4, the kerb bulkhead over the wet room and the board's duct to MPPT 1", protection: "None, one string to its controller, a DC isolator at the MPPT",
      serves: [pv1], glands: [G4], passes: [WR-03], along: [BD-02], from: {line: RF-01.4, at: [RF_01_4.x1 - 40, RF_01_4.cy, RF_01_4.z1 + 8]},
@@ -801,7 +806,7 @@ runs:
      to: {line: LA-03, at: [LA_03.x0, ., .]}}
   - {id: B-16, system: dc12, kind: twin, amps: 25, volts: 12, feeds: "Cruisemaster XT Air compressor, down the chase's wall strip, through the kerb frame G20, forward inside the kerb raiser past the arm hangers, out of its inner face ahead of CM-02 and across to the air box", inside: [RS-K], passes: [], protection: "40 A on the 12 V panel",
      serves: ["12 V: XT Air compressor"], glands: [G20], along: [BD-03, RL-K, RS-K, DB-KB], from: {line: BR-P12, at: [BR_P12.cx + 20, BR_P12.cy, BR_P12.z0]},
-     path: [[., ., LA_11E.z0 + 120], [G20_B_16.cx, WSY, .], [., ., ZW], [., G20_B_16.cy, .], [., ., RZ3 + 73], [G20_B_16.cx - 73, RS_K.cy + 7, RZ3], [2330, ., .], [2200, -565, .], [2170, -560, .], [2120, -330, .]],
+     path: [[., ., LA_11E.z0 + 120], [G20_B_16.cx, WSY, .], [., ., ZW], [., G20_B_16.cy, .], [., ., RZ3 + 73], [G20_B_16.cx - 73, RS_K.cy + 7, RZ3], [2560, ., .], [2440, ., RZ3F], [2330, ., .], [2200, -565, .], [2170, -560, .], [2120, -330, .]],
      to: {line: RG-04, at: [., RG_04.y0, .]}}
   - {id: B-17, system: dc12, kind: twin, amps: 0.5, volts: 12, lane: 11, feeds: "Smoke alarm, then the CO alarm, the GPS tracker and the door sensors", protection: "3 A on the 12 V panel",
      serves: ["12 V: alarms and tracker"], passes: [AL-01], along: [BD-02], from: {line: BR-P12, at: [BR_P12.cx, BR_P12.cy, BR_P12.z1]},
@@ -893,7 +898,7 @@ runs:
   # ================================================================ the lamps and the brakes, at 12 V from the ute's 12-pin plug (data/services.yaml lamps)
   - {id: K-01, system: lamps, kind: lamp7, feeds: "Lamp loom from the 12-pin plug along the road drawbar member and rail to the rear junction", inside: [RL-R], passes: [], protection: "The ute's lamp fuses",
      serves: [lamp loom], along: [DB-RA, DB-RB, RL-R, RS-R], from: {line: DB-PL, at: [DB_PL.x1, DB_PL.cy, DB_PL.cz]},
-     path: [[1820, 650.8, 523], [2220, 644, 523], [2290, 644, 670], [2360, 612, 680], [UF_08.x1 + 26, ., .], [., ., RL_R.z0 - 37], [., LJ_01.y1 + 40, .]], to: {line: LJ-01, at: [LJ_01.cx - 20, LJ_01.y1, LJ_01.cz]}}
+     path: [[1820, 650.8, 523], [2220, 644, 523], [2290, 644, 670], [2360, 612, RWZ], [5990, ., .], [6050, 660, .], [UF_08.x1 + 30, ., .], [., ., RL_R.z0 - 37], [., LJ_01.y1 + 40, .]], to: {line: LJ-01, at: [LJ_01.cx - 20, LJ_01.y1, LJ_01.cz]}}
   - {id: K-02, system: lamps, kind: lamp7, feeds: "Road side rear lamps on the rear outrigger", protection: "The ute's lamp fuses",
      serves: [rear lamps], along: [CM-08, RL-R, RS-R, OR-08R], from: {line: LJ-01, at: [LJ_01.cx + 20, LJ_01.y1, LJ_01.cz]}, path: [[body_x1 + 15, 600, .], [., ., 695], [., LM_RR.y0 - 60, .], [., ., LM_RR.cz]], to: {line: LM-RR, at: [LM_RR.cx, LM_RR.y0, .]}}
   - {id: K-03, system: lamps, kind: lamp7, feeds: "Kerb side rear lamps on the rear outrigger", protection: "The ute's lamp fuses",
@@ -906,13 +911,13 @@ runs:
      serves: [front lamps], along: [DB-RA, RL-R, RS-R, DB-RB, OR-01R], from: {line: DB-PL, at: [DB_PL.x1, DB_PL.cy, DB_PL.cz + 15]}, path: [[1770, 633, 538], [1810, 657, 735], [., LM_FR.cy, .]], to: {line: LM-FR, at: [., ., LM_FR.z0]}}
   - {id: K-07, system: lamps, kind: lamp7, feeds: "Kerb side front position lamp, under the drawbar members", protection: "The ute's lamp fuses",
      serves: [front lamps], along: [DB-RA, DB-KA], from: {line: DB-PL, at: [DB_PL.x1, DB_PL.cy, DB_PL.cz - 30]}, path: [[1790, 640, 493], [., ., 375], [., LM_FK.cy + 60, .], [., LM_FK.cy, LM_FK.z0 - 60]], to: {line: LM-FK, at: [., ., LM_FK.z0]}}
-  - {id: K-08, system: lamps, kind: lamp7, feeds: "Kerb side marker lamps, up the kerb rail's inner face behind the grey tank, into the raiser through its inner face above its seam with the rail, forward along its top outside the three cables in it, down to the outrigger OR-05K and out through the middle of the outrigger's end, clear of its welds", inside: [RS-K, OR-05K], passes: [], protection: "The ute's lamp fuses",
-     serves: [side markers], along: [CM-08, RL-K, RS-K, OR-05K], from: {line: LJ-01, at: [LJ_01.cx - 30, LJ_01.y0, LJ_01.cz]}, path: [[6170, -572, .], [., ., 860], [6040, -628, .], [4434, ., .], [4378, ., 760], [., -800, .], [LM_SK.cx, -1100, 800], [., LM_SK.y1 + 10, .]], to: {line: LM-SK, at: [., LM_SK.y1, .]}}
-  - {id: K-09, system: lamps, kind: lamp7, feeds: "Road side marker lamps, up the road rail's inner face behind the grey tank, into the raiser through its inner face above its seam with the rail, forward along its top, down to the outrigger OR-05R and out through the middle of the outrigger's end, clear of its welds", inside: [RS-R, OR-05R], passes: [], protection: "The ute's lamp fuses",
-     serves: [side markers], along: [CM-08, RL-R, RS-R, OR-05R], from: {line: LJ-01, at: [LJ_01.cx - 30, LJ_01.y1, LJ_01.cz + 22]}, path: [[6182, 572, .], [., ., 860], [6040, 628, .], [4434, ., .], [4378, ., 760], [., 800, .], [LM_SR.cx, 1100, 800], [., LM_SR.y0 - 10, .]], to: {line: LM-SR, at: [., LM_SR.y0, .]}}
+  - {id: K-08, system: lamps, kind: lamp7, feeds: "Kerb side marker lamps, up inboard of the kerb rail behind the grey tank, into the raiser through its inner web 78 mm above its seam with the rail, forward inside it between D-14 and B-18, out through a round hole in the middle of OR-05K's root and along the outrigger to its end, clear of its welds", inside: [RS-K, OR-05K], passes: [], protection: "The ute's lamp fuses",
+     serves: [side markers], along: [CM-08, RL-K, RS-K, OR-05K], from: {line: LJ-01, at: [LJ_01.cx - 30, LJ_01.y0, LJ_01.cz]}, path: [[6170, -560, .], [., ., KMZ], [6050, ., .], [5950, -628, .], [4640, ., .], [4540, -596, .], [OR_05K.cx - 2, ., .], [., -800, .], [LM_SK.cx, -1100, 800], [., LM_SK.y1 + 10, .]], to: {line: LM-SK, at: [., LM_SK.y1, .]}}
+  - {id: K-09, system: lamps, kind: lamp7, feeds: "Road side marker lamps, up inboard of the road rail behind the grey tank, into the raiser through its inner web at its middle, forward inside it, out through a round hole in the middle of OR-05R's root and along the outrigger to its end, clear of its welds", inside: [RS-R, OR-05R], passes: [], protection: "The ute's lamp fuses",
+     serves: [side markers], along: [CM-08, RL-R, RS-R, OR-05R], from: {line: LJ-01, at: [LJ_01.cx - 30, LJ_01.y1, LJ_01.cz + 22]}, path: [[6182, 560, .], [., ., KRZM], [6060, ., .], [5975, 596, .], [OR_05R.cx - 2, ., .], [., 800, .], [LM_SR.cx, 1100, 800], [., LM_SR.y0 - 10, .]], to: {line: LM-SR, at: [., LM_SR.y0, .]}}
   - {id: K-10, system: lamps, kind: lamp7, feeds: "Brake, ABS and breakaway switch circuit from the 12-pin plug to the Bosch TSC", inside: [RL-R], passes: [], protection: "The ute's brake controller",
      serves: [brakes], along: [DB-RA, DB-RB, RL-R, RS-R, UF-03, CM-05], from: {line: DB-PL, at: [DB_PL.x1, DB_PL.cy, DB_PL.cz - 15]},
-     path: [[1820, 650.8, 508], [2300, 644, 508], [2370, 644, 640], [2440, 598, 652], [4180, ., .], [4300, 620, 560], [., 60, .]], to: {line: BR-TSC, at: [BR_TSC.x0, ., .]}}
+     path: [[1820, 650.8, 508], [2300, 644, 508], [2370, 644, 640], [2440, 598, 652], [4040, ., .], [4120, 660, .], [4200, ., .], [4300, ., 560], [., 60, .]], to: {line: BR-TSC, at: [BR_TSC.x0, ., .]}}
   - {id: K-11, system: lamps, kind: lamp7, feeds: "Bosch TSC to the road side drums' magnets and ABS sensors", protection: "The TSC's outputs",
      serves: [brakes], along: [RL-R, UF-03, CM-05], from: {line: BR-TSC, at: [BR_TSC.cx, BR_TSC.y1, BR_TSC.z0 + 10]}, path: [[., BR_DR.y0 - 40, .]], to: {line: BR-DR, at: [., BR_DR.y0, BR_DR.cz]}}
   - {id: K-12, system: lamps, kind: lamp7, feeds: "Bosch TSC to the kerb side drums' magnets and ABS sensors", protection: "The TSC's outputs",
