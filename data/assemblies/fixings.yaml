@@ -34,18 +34,14 @@ trailer:
     to: ["RS-*", "OR-*"]
     how: welded
     why: "The nut plates inside the raisers and outrigger tips, and the D-rings' clips under the outriggers' ends (CHASSIS.md)"
-  - lines: [CH-P10]
-    to: ["RL-*"]
-    how: bolted
-    why: "The corner steady brackets bolt to the rails with crush tubes, the front pair behind the drawbar overlap (CHASSIS.md)"
   - lines: [DB-07]
     to: [DB-BR]
     how: bolted
     why: "The breakaway kit's box bolts to the drawbar cross brace's front face, under the stone guard"
   - lines: [CH-B01]
-    to: [CH-P10]
-    how: bolted
-    why: "Each ARK XO DDS650 steady bolts to its bracket (ARK's fitting instructions)"
+    to: ["RL-*"]
+    how: welded
+    why: "Each ARK XO DDS650 comes with its chassis mount bracket, welded under the rail along the rail's bottom corners before galvanising, and the steady bolts into the bracket with two 8 mm bolts at 78 mm centres, folded flat at 0 degrees for travel or locked at 90 degrees for use, its leg hanging from the same head (ARK's XO fitting guide, RTC614 V1 1/21)"
   - lines: [DB-08]
     to: [DB-KA, CH-P11]
     how: bolted

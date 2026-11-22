@@ -361,6 +361,13 @@ trailer_checks:
     severity: fail
     inputs: []
     why: Report 11 LC2 (4 g on fixings) and LC7 (0.8 g forward times 2 off road, fy / 1.5).
+  - id: LOC-06
+    title: Corner steady brackets carry the steady's 875 kg rating at 90 degrees (welds and the rail's webs)
+    type: chassis_local
+    item: steady_bracket
+    severity: fail
+    inputs: []
+    why: "ARK's XO fitting guide (RTC614 V1 1/21) rates each steady at 875 kg at 90 degrees, its only jacking position, and has its chassis mount bracket welded to the chassis. The welds run along the rail's bottom corners only (Cruisemaster TB 070), at the SP fillet capacity, 0.8 x 0.6 x 490 MPa, and the rail's two 3 mm webs bear the load over the bracket's length plus 5 t at fy / 1.5, LC5b's criterion."
   - id: DEF-01
     title: Rail deflection between the drawbar root and the front hub within span / 500, LC1
     type: chassis_deflection
@@ -501,6 +508,13 @@ trailer_checks:
     severity: report
     inputs: []
     why: "Report 11 LC10 and section 3.4. IIW 513, FAT 63. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+  - id: FAT-16
+    title: "Fatigue, Corner steady's chassis mount bracket under the rail, longitudinal fillets along the rail's bottom corners only"
+    type: chassis_fatigue
+    item: FAT-16
+    severity: report
+    inputs: []
+    why: "Report 11 LC10 and section 3.4. IIW 513, FAT 71, a non-load-carrying pad 50 to 150 mm long (72.5 mm of weld along the rail at the front pair, 117 mm at the rear), on the composite rail's extreme fibre at the brackets. ARK's guide welds the bracket to the chassis, so it is a longitudinal attachment on the rail's bottom flange. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
   - id: DIM-01
     title: Overall width within the 2,500 mm of ADR 43/04 and VSB1 5.2
     type: width
@@ -535,20 +549,20 @@ trailer_checks:
     min: 100
     severity: fail
     inputs: [UTE-01]
-    why: Every part carried by the suspension needs 100 mm of running clearance, the chassis fittings and the spare wheel included. The arms, hubs and wheels are not carried by it, and the safety chains and the rubber mud flaps bend, so they are left out.
+    why: Every part carried by the suspension needs 100 mm of running clearance, the chassis fittings in their travel positions (the corner steadies folded, the jockey wheel swung up) and the spare wheel included. The arms, hubs and wheels are not carried by it, and the safety chains and the rubber mud flaps bend, so they are left out.
   - id: DIM-06
-    title: Lowest rigid sprung part at least 290 mm, unladen, for the tracks the trailer is built for (design target)
+    title: Lowest rigid sprung part at least the ute's own 235 mm running clearance, unladen, for the tracks the trailer is built for
     type: clearance_ground
-    min: 290
+    min: 235
     severity: fail
     inputs: [UTE-01]
-    why: "The trailer is built for off-road tracks (the drawing set's title, report 11's off-road load cases), where drainage berms, creek banks and ruts stand well above VSB1 5.4's 100 mm road minimum (review I2-22). 290 mm (est.) is the height of the rear corner steadies' stowed feet, the lowest rigid part the design accepts, so no other part may hang lower. Measured on the same parts as DIM-04."
+    why: "The trailer is built for off-road tracks (the drawing set's title, report 11's off-road load cases), where drainage berms, creek banks and ruts stand well above VSB1 5.4's 100 mm road minimum (review I2-22). The ute leads it over them, so no rigid part the trailer's suspension carries may hang lower than the ute's own running clearance, 235 mm unladen (Toyota's LC70 specification sheets of 2014 and 2021, report 16 section 6.1). That is above the 200 mm that ADR's off-road passenger vehicle category (MC) and 49 CFR 523.6 ask of an off-road vehicle, where 49 CFR 523.2 measures running clearance to the lowest point excluding unsprung weight, as this check does. Measured on the same parts as DIM-04."
   - id: DIM-07
     title: Breakover between the ute's rear axle and the trailer's axle group (reported)
     type: breakover
     severity: report
     inputs: [UTE-01, UTE-02]
-    why: "The crest the ute and the trailer can straddle before the ground touches a rigid sprung part between the ute's rear wheels and the trailer's axle group: for each part, the slope up from the ute's rear axle, UTE-02's 1,300 mm (est.) ahead of the ball, plus the slope up from the axle group's centre, both to the part's underside at design ride height with both vehicles level (est.). The least of these is reported. No rule sets a limit for a combination (review I2-22)."
+    why: "The crest the ute and the trailer can straddle before the ground touches a rigid sprung part between the ute's rear wheels and the trailer's axle group: for each part, the slope up from the ute's rear axle, UTE-02's 1,300 mm (est.) ahead of the ball, plus the slope up from the axle group's centre, both to the part's underside at design ride height with both vehicles level (est.). The least of these is reported. No rule sets a limit for a combination (review I2-22). For one vehicle between its own axles, 49 CFR 523.6 asks 14 degrees of an off-road vehicle."
   - id: JK-01
     title: Everything that stands above the bike box's underside clears its sweep by 100 mm at any jack-knife angle
     type: jackknife

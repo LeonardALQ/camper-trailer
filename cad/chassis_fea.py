@@ -310,10 +310,13 @@ class Analysis:
             self._apply(F, p, self.fm.crossmember_fractions(cm, p[1]), q)
         if steady_n:
             V = self.ch.V
-            for x, sx in ((V["steady_front_x"], 1), (V["steady_rear_x"], -1)):
-                for s in (-1, 1):
-                    F = np.array([0.0, 0.0, sx * (-s) * steady_n])
-                    self._apply(F, (x, s * V["rail_c"], V["rail_underside_z"]), self.fm.rail_fractions(s, x), q)
+            # each steady at 90 degrees under its bracket, one diagonal up and one down. The couple balances in roll, so a
+            # pair standing wider than the other takes its share of the wound steady's load in the ratio of the widths
+            poses = self.ch.steady_poses()
+            ref = min(abs(p["y"]) for p in poses)
+            for p in poses:
+                F = np.array([0.0, 0.0, p["twist"] * steady_n * ref / abs(p["y"])])
+                self._apply(F, (p["x"], p["y"], V["rail_underside_z"]), self.fm.rail_fractions(p["side"], p["x"]), q)
         res = self.kinematic.solve(q)
         resid = max(abs(v) for v in res.reactions.values())
         return res, dict(ball=R["ball"], arms=arms, residual_n=resid, pad=R.get("pad", [None])[0])
@@ -662,6 +665,20 @@ class Analysis:
         M7 = 1.6 * spare_kg * G * hz / 2
         rows = [("post base, 4 g vertical", M4 / post.sec.Z_strong, post.sec.fy), ("post base, 1.6 g forward", M7 / post.sec.Z_strong, post.sec.fy / 1.5)]
         out["spare_posts"] = _local("Spare carrier posts, SHS 50 x 50 x 2.5", rows, f"the {spare_kg:.1f} kg wheel and tyre, 155 mm ahead of the posts")
+        # corner steady brackets: at 90 degrees the steady's rating goes up through ARK's bracket, welded along the rail's
+        # bottom corners only, into the rail's two webs. The pairs' brackets lie differently, so each pair's welds differ
+        c = L["steady_bracket"]
+        F = c["steady_kg"] * G
+        a = 0.7 * ch.data["steadies"]["weld_leg"]
+        rows = []
+        for p in ch.steady_poses()[::2]:
+            lw = p["weld_l"]
+            y0, y1 = abs(p["bracket"][1]), abs(p["bracket"][4])
+            webs = sum(min(y0, y1) <= V["rail_c"] + k * (rail.b - rail.t) / 2 <= max(y0, y1) for k in (-1, 1))   # the webs over it
+            rows += [(f"{p['pair']} bracket's two {lw:g} mm fillets", F / (2 * lw * a), wcap),
+                     (f"{p['pair']} rail {'webs' if webs > 1 else 'web'} in bearing over {lw:g} mm", F / (webs * rail.t * (lw + 5 * rail.t)), rail.fy / 1.5)]
+        out["steady_bracket"] = _local("Corner steady bracket, ARK's, welded under the rail (CH-B01)", rows,
+                                       f"the steady's {c['steady_kg']:.0f} kg rating at 90 degrees")
         return out
 
     def fixings(self) -> list[dict]:

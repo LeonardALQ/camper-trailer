@@ -323,7 +323,9 @@ class Chassis:
             qty = int(f.get("qty", 1))
             base = self.ev(f["at"]) if "at" in f else [0.0, 0.0, 0.0]
             at = []
-            if "side_y" in f:
+            if f.get("poses") == "steadies":       # each folded steady's mass at the middle of its box in travel (est.)
+                at = [tuple((p["travel"][i] + p["travel"][i + 3]) / 2 for i in range(3)) for p in self.steady_poses()]
+            elif "side_y" in f:
                 sy = self.ev(f["side_y"])
                 xs = [base[0]] if "rear_x" not in f else [base[0], self.ev(f["rear_x"])]
                 for x in xs:
@@ -359,6 +361,42 @@ class Chassis:
         """Floor bearer strip on every member top that carries the floor: raisers, outriggers and floor crossmembers."""
         L = sum(m.length for m in self.members if m.role in ("raiser", "outrigger", "cm_floor"))
         return L
+
+    # -- the corner steadies ------------------------------------------
+    def steady_poses(self) -> list[dict]:
+        """The four corner steadies (data `steadies`), each with its pair, side and bracket centre (x, y) under the rail,
+        the jacking station at 90 degrees, and its boxes (x0, y0, z0, x1, y1, z1): ARK's bracket, the steady folded flat
+        for travel, its leg and foot at 90 degrees wound down to the ground, and the box the leg sweeps between the two.
+        `twist` is the sign of its load in LC5b's twist couple."""
+        if getattr(self, "_steadies", None) is not None:
+            return self._steadies
+        sd, top = self.data["steadies"], self.V["rail_underside_z"]
+        bl, bw, bh = sd["bracket"]
+        length, width, depth = sd["folded"]
+        head = top - bh - 60                                  # the head's underside, where the leg hangs from at 90 degrees
+        foot = depth - 30                                     # the foot plate, its long side along the fold
+        out = []
+        for pr, pair, sx in zip(sd["pairs"], ("front", "rear"), (1, -1)):
+            x, ym = self.ev(pr["x"]), self.ev(pr["y"])
+            for s in (-1, 1):
+                y = s * ym
+                if pr["fold"] == "inboard":
+                    outer = y + s * bl / 2
+                    lo, hi = sorted((outer, outer - s * length))
+                    bracket = (x - bw / 2, y - bl / 2, top - bh, x + bw / 2, y + bl / 2, top)
+                    travel = (x - width / 2, lo, top - depth, x + width / 2, hi, top)
+                    use = (x - width / 2, y - foot / 2, 0.0, x + width / 2, y + foot / 2, head)
+                else:
+                    d = -1 if pr["fold"] == "forward" else 1
+                    lo, hi = sorted((x - d * bl / 2, x - d * bl / 2 + d * length))
+                    bracket = (x - bl / 2, y - bw / 2, top - bh, x + bl / 2, y + bw / 2, top)
+                    travel = (lo, y - width / 2, top - depth, hi, y + width / 2, top)
+                    use = (x - foot / 2, y - width / 2, 0.0, x + foot / 2, y + width / 2, head)
+                sweep = tuple(min(a, b) for a, b in zip(travel[:3], use[:3])) + tuple(max(a, b) for a, b in zip(travel[3:], use[3:]))
+                out.append(dict(pair=pair, side=s, x=x, y=y, fold=pr["fold"], bracket=bracket, travel=travel, use=use, sweep=sweep,
+                                twist=sx * -s, weld_l=bw if pr["fold"] == "inboard" else bl))
+        self._steadies = out
+        return out
 
     # -- galvanising --------------------------------------------------
     def galv_rate(self, t: float) -> float:
@@ -411,7 +449,8 @@ class Chassis:
         jack = next(st for st in self.stations if st["id"] == "XT centre")
         return dict(crossmember_stations=[self.station_x(st) for st in self.stations], body_x0=V["body_x0"], db_end_x=V["db_end_x"],
                     chain_lug_x=V["chain_lug_x"], jack_x=self.station_x(jack), hub_front_x=self.hub_x("front"), hub_rear_x=self.hub_x("rear"),
-                    rear_tongue_x=V["body_x1"] - 70, front_recovery_x=V["front_recovery_x"])
+                    rear_tongue_x=V["body_x1"] - 70, front_recovery_x=V["front_recovery_x"],
+                    steady_x=sorted({p["x"] for p in self.steady_poses()}))
 
     # -- the frame model ----------------------------------------------
     def frame(self, body: list[tuple[float, float, float]] | None = None) -> "FrameModel":
@@ -680,6 +719,8 @@ def fitting_boxes(ch: Chassis, f: Fitting) -> list[tuple]:
     if "box" in spec:
         x0, y0, z0, dx, dy, dz = ch.P.eval(spec["box"], {})
         return [(x0, y0, z0, x0 + dx, y0 + dy, z0 + dz)]
+    if spec.get("poses") == "steadies":
+        return [p["travel"] for p in ch.steady_poses()]
     if f.kind == "strip":
         return []
     if f.kind == "plate":
