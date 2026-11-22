@@ -89,6 +89,8 @@ def cmd_trailer():
     write_outputs(TrailerModel(lay, body=True), out)
     from .trailer_model import write_body_outputs
     write_body_outputs(lay, out, night=tr.layout(**{**rep["solved"]["overrides"], "bed_state": 1}))
+    from .floorplan import write_plans    # the floor plan, bed up and bed down, cut from the model (H28)
+    write_plans(lay, tr.layout(**{**rep["solved"]["overrides"], "bed_state": 1}), body, BUILD / "floorplan")
     from .partsmeta import trailer_lookup, write as write_parts
     look = trailer_lookup(lay, body)
     for name in ("trailer", "chassis", "body", "body-inside", "body-inside-night"):

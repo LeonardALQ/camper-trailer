@@ -5,6 +5,7 @@ tableOfContents: false
 ---
 
 import CadViewer from '../../components/CadViewer.astro';
+import FloorPlan from '../../components/FloorPlan.astro';
 import Trailer from '../../components/Trailer.astro';
 import TrailerParts from '../../components/TrailerParts.astro';
 import t from '../../data/generated/trailer.json';
@@ -29,6 +30,15 @@ and the <a href={withBase('/body/')}>body</a> are designed to planning level, an
 mass. The design document is `TRAILER.md`, and drawing CT-001 is the general arrangement.
 
 <Trailer kind="summary" />
+
+## Floor plan
+
+Both plans cut the 3D model 1,000 mm above the floor and look down on it. The walls show at their real thickness,
+each part below the cut shows its outline, and the parts above the cut are dashed. Point at a part to see its line
+and name, and click it to select its row in the mass schedule further down. The 3D model below has the same view
+under its Floor plan button.
+
+<FloorPlan />
 
 ## 3D model
 

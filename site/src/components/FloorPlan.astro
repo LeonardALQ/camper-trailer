@@ -1,0 +1,247 @@
+---
+// The trailer's floor plan, bed up and bed down (decision H28), drawn in the build from the 3D model (cad/floorplan.py)
+// as two inline SVGs. Pointing at a part names its line, and clicking it finds its row in the page's tables through
+// the same `ct:find-row` event the 3D viewer's "Find in table" sends (src/scripts/sheet.ts).
+import day from '../data/generated/floorplan-day.svg?raw';
+import night from '../data/generated/floorplan-night.svg?raw';
+import fp from '../data/generated/floorplan.json';
+
+const n = (v: number) => Math.round(v).toLocaleString('en-AU');
+const plans = [
+  { svg: day, title: fp.plans.day.title },
+  { svg: night, title: fp.plans.night.title },
+];
+const areas = Object.entries(fp.areas) as [string, string][];
+---
+
+<div class="fp not-content">
+  {plans.map((p) => (
+    <figure class="fp-plan">
+      <figcaption>{p.title}. Cut {n(fp.cut_mm)} mm above the floor, front to the left</figcaption>
+      <Fragment set:html={p.svg} />
+    </figure>
+  ))}
+  <ul class="fp-legend">
+    {areas.map(([key, name]) => (<li><span class={`fp-sw fp-a-${key}`}></span>{name}</li>))}
+    <li><span class="fp-sw fp-sw-cut"></span>Cut by the plane</li>
+    <li><span class="fp-sw fp-sw-above"></span>Above the plane, or under the lowered bed</li>
+    <li><span class="fp-sw fp-sw-k"></span>Kept clear, K1 to K6</li>
+    <li><span class="fp-sw fp-sw-wall"></span>Wall, cut</li>
+  </ul>
+  <p class="fp-msg" role="status"></p>
+  <div class="fp-tip" hidden></div>
+</div>
+
+<script>
+  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+  const STATE: Record<string, string> = {
+    cut: 'cut by the plane', below: 'below the plane', above: 'above the plane, dashed', clear: 'space kept clear',
+    under: 'under the lowered bed, dashed', wall: 'wall, cut', window: 'window', door: 'door, drawn open at 90 degrees',
+  };
+
+  for (const root of Array.from(document.querySelectorAll<HTMLElement>('.fp'))) {
+    const tip = root.querySelector<HTMLElement>('.fp-tip')!;
+    const msg = root.querySelector<HTMLElement>('.fp-msg')!;
+    let hot: Element | null = null;
+    const partAt = (e: Event) => (e.target as Element).closest('.fp-part');
+    const place = (e: PointerEvent) => {
+      const me = root.getBoundingClientRect();
+      const w = tip.offsetWidth;
+      const h = tip.offsetHeight;
+      let x = e.clientX - me.left + 14;
+      let y = e.clientY - me.top + 16;
+      if (e.clientX + 14 + w > me.right) x = e.clientX - me.left - w - 10;
+      if (e.clientY + 16 + h > window.innerHeight) y = e.clientY - me.top - h - 10;
+      tip.style.left = `${Math.max(0, x)}px`;
+      tip.style.top = `${Math.max(0, y)}px`;
+    };
+    const show = (part: Element | null, e: PointerEvent) => {
+      if (part !== hot) {
+        hot?.classList.remove('fp-hot');
+        hot = part;
+        hot?.classList.add('fp-hot');
+        if (part) {
+          const d = (part as HTMLElement).dataset;
+          tip.innerHTML = `<b>${esc(d.iid ?? '')}</b> ${esc(d.name ?? '')}<br><span class="dim">${esc(STATE[d.kind ?? ''] ?? '')}</span>`;
+        }
+      }
+      tip.hidden = !part;
+      if (part) place(e);
+    };
+    root.addEventListener('pointermove', (e) => show(partAt(e), e));
+    root.addEventListener('pointerleave', () => {
+      hot?.classList.remove('fp-hot');
+      hot = null;
+      tip.hidden = true;
+    });
+    root.addEventListener('click', (e) => {
+      const part = partAt(e) as HTMLElement | null;
+      if (!part) return;
+      const { iid = '', id = '' } = part.dataset;
+      show(part, e as PointerEvent);
+      root.querySelectorAll('.fp-pinned').forEach((el) => el.classList.remove('fp-pinned'));
+      root.querySelectorAll(`.fp-part[data-iid="${CSS.escape(iid)}"]`).forEach((el) => el.classList.add('fp-pinned'));
+      const detail = { ids: [iid, id], found: false };
+      document.dispatchEvent(new CustomEvent('ct:find-row', { detail }));
+      msg.textContent = detail.found ? `${iid}: its row is selected in the table below` : `${iid}: no table on this page lists it`;
+    });
+  }
+</script>
+
+<style is:global>
+  .fp {
+    --fp-floor: #f6f5f1;
+    --fp-ink: #23262b;
+    --fp-dim: #4f565e;
+    --fp-wall: #3a3f45;
+    --fp-k: #e8e8ea;
+    --fp-k-s: #8d939a;
+    --fp-glass: #2b78b8;
+    --fp-hot: #d0306a;
+    --fp-bed: #d8e7f8;
+    --fp-bed-s: #1f5c99;
+    --fp-kit: #fbe4c4;
+    --fp-kit-s: #9c5408;
+    --fp-lau: #d5eeda;
+    --fp-lau-s: #22743a;
+    --fp-wet: #e4daf5;
+    --fp-wet-s: #6739aa;
+    position: relative;
+    margin: 1rem 0 1.5rem 0;
+  }
+  :root[data-theme='dark'] .fp {
+    --fp-floor: #24272c;
+    --fp-ink: #e9eaec;
+    --fp-dim: #b5bcc4;
+    --fp-wall: #c3c8ce;
+    --fp-k: #33373d;
+    --fp-k-s: #858c95;
+    --fp-glass: #7cc2f2;
+    --fp-hot: #ff7eaa;
+    --fp-bed: #1b3452;
+    --fp-bed-s: #91c4f7;
+    --fp-kit: #4a3117;
+    --fp-kit-s: #f4b26c;
+    --fp-lau: #173a24;
+    --fp-lau-s: #86d69c;
+    --fp-wet: #33274e;
+    --fp-wet-s: #c5a7f6;
+  }
+  .fp-plan {
+    margin: 0 0 0.8rem 0;
+  }
+  .fp-plan figcaption {
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+  }
+  .fp-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    user-select: none;
+  }
+  .fp-svg path {
+    vector-effect: non-scaling-stroke;
+    stroke-linejoin: round;
+  }
+  .fp-a-bed { --f: var(--fp-bed); --s: var(--fp-bed-s); }
+  .fp-a-kit { --f: var(--fp-kit); --s: var(--fp-kit-s); }
+  .fp-a-lau { --f: var(--fp-lau); --s: var(--fp-lau-s); }
+  .fp-a-wet { --f: var(--fp-wet); --s: var(--fp-wet-s); }
+  .fp-floor { fill: var(--fp-floor); stroke: none; }
+  .fp-part .fp-fill { fill: var(--f); stroke: var(--s); stroke-width: 1.3px; }
+  .fp-part .fp-edge { fill: none; stroke: var(--s); stroke-width: 0.8px; }
+  .fp-part .fp-cut { fill: var(--s); fill-opacity: 0.42; stroke: var(--s); stroke-width: 2px; }
+  .fp-k .fp-fill { fill: var(--fp-k); stroke: var(--fp-k-s); stroke-width: 1px; stroke-dasharray: 7 3 2 3; }
+  .fp-wall .fp-poche { fill: var(--fp-wall); stroke: var(--fp-wall); stroke-width: 1px; }
+  .fp-gap { fill: var(--fp-floor); stroke: none; }
+  .fp-glass { fill: none; stroke: var(--fp-glass); stroke-width: 1.5px; }
+  .fp-highwin { fill: none; stroke: var(--fp-glass); stroke-width: 2px; stroke-dasharray: 5 3; pointer-events: all; }
+  .fp-leaf { fill: var(--fp-floor); stroke: var(--fp-ink); stroke-width: 1.4px; }
+  .fp-swing { fill: none; stroke: var(--fp-ink); stroke-width: 0.9px; stroke-dasharray: 3 3; pointer-events: none; }
+  .fp-above .fp-dash { fill: none; stroke: var(--s); stroke-width: 1px; stroke-dasharray: 5 4; }
+  .fp-bedup .fp-dash { stroke-width: 2.2px; stroke-dasharray: 11 6; }
+  .fp-under .fp-dash { fill: none; stroke: var(--fp-ink); stroke-width: 1.3px; stroke-dasharray: 6 4; }
+  .fp-above .fp-hit, .fp-under .fp-hit { fill: none; stroke: transparent; stroke-width: 9px; pointer-events: stroke; }
+  .fp-above, .fp-under { pointer-events: none; }
+  .fp-part.fp-hot .fp-fill, .fp-part.fp-hot .fp-poche, .fp-part.fp-hot .fp-leaf, .fp-part.fp-hot .fp-dash,
+  .fp-part.fp-pinned .fp-fill, .fp-part.fp-pinned .fp-poche, .fp-part.fp-pinned .fp-leaf, .fp-part.fp-pinned .fp-dash {
+    stroke: var(--fp-hot);
+    stroke-width: 3px;
+  }
+  .fp-part.fp-hot .fp-glass, .fp-part.fp-hot .fp-highwin { stroke: var(--fp-hot); stroke-width: 3px; }
+  .fp-part { cursor: pointer; }
+  .fp-notes { pointer-events: none; }
+  .fp-t {
+    fill: var(--fp-ink);
+    font-family: var(--__sl-font, system-ui, sans-serif);
+    paint-order: stroke;
+    stroke: var(--fp-floor);
+    stroke-width: 18px;
+    stroke-linejoin: round;
+  }
+  .fp-t-area { font-weight: 700; }
+  .fp-t-area.fp-c-bed { fill: var(--fp-bed-s); }
+  .fp-t-area.fp-c-kit { fill: var(--fp-kit-s); }
+  .fp-t-area.fp-c-lau { fill: var(--fp-lau-s); }
+  .fp-t-area.fp-c-wet { fill: var(--fp-wet-s); }
+  .fp-t-dim, .fp-t-side { fill: var(--fp-dim); }
+  .fp-t-side { font-weight: 600; }
+  .fp-t-mark { font-weight: 700; }
+  .fp-t-k { fill: var(--fp-k-s); font-weight: 600; }
+  .fp-t-note { fill: var(--fp-bed-s); }
+  .fp-dim, .fp-ext { fill: none; stroke: var(--fp-dim); stroke-width: 0.8px; }
+  .fp-tick { fill: none; stroke: var(--fp-dim); stroke-width: 1.5px; }
+  .fp-bar { fill: var(--fp-floor); stroke: var(--fp-ink); stroke-width: 1px; }
+  .fp-bar-on { fill: var(--fp-ink); }
+  .fp-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 1.1rem;
+    margin: 0.2rem 0 0.3rem 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.85rem;
+  }
+  .fp-legend li {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+  }
+  .fp-sw {
+    display: inline-block;
+    width: 1.5rem;
+    height: 0.85rem;
+    border: 2px solid var(--s, var(--fp-ink));
+    background: var(--f, transparent);
+  }
+  .fp-sw-cut { background: color-mix(in srgb, var(--fp-ink) 42%, transparent); border-color: var(--fp-ink); }
+  .fp-sw-above { border-style: dashed; }
+  .fp-sw-k { background: var(--fp-k); border: 1px dashed var(--fp-k-s); }
+  .fp-sw-wall { background: var(--fp-wall); border-color: var(--fp-wall); }
+  .fp-msg {
+    min-height: 1.3em;
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--sl-color-text-accent);
+  }
+  .fp-tip {
+    position: absolute;
+    z-index: 30;
+    max-width: 24rem;
+    padding: 0.35rem 0.55rem;
+    border-radius: 0.3rem;
+    background: rgba(20, 20, 20, 0.9);
+    color: #fff;
+    font-size: 0.8rem;
+    line-height: 1.35;
+    pointer-events: none;
+  }
+  .fp-tip b {
+    font-family: var(--__sl-font-mono, monospace);
+  }
+  .fp-tip .dim {
+    color: #c8ccd4;
+  }
+</style>

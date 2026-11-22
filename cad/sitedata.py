@@ -390,6 +390,12 @@ def main():
     _copy(BUILD / "ute" / "ute.step", SITE / "public" / "downloads" / "ute.step")
     _copy(BUILD / "chassis" / "chassis.json", GEN / "chassis.json")
     _copy(BUILD / "chassis" / "chassis-cut-list.csv", SITE / "public" / "downloads" / "chassis-cut-list.csv")
+    # the floor plan for the trailer page, and its cut height and models for the viewer's plan view (cad/floorplan.py)
+    for state in ("day", "night"):
+        _copy(BUILD / "floorplan" / f"floorplan-{state}.svg", GEN / f"floorplan-{state}.svg")
+    fp = json.loads((BUILD / "floorplan" / "floorplan.json").read_text())
+    fp["plans"] = {k: dict(title=v["title"], dims=v["dims"]) for k, v in fp["plans"].items()}
+    (GEN / "floorplan.json").write_text(json.dumps(fp, indent=1))
     # the part metadata beside each model, for the viewer's tooltip and part card (cad/partsmeta.py)
     for folder, names in (("trailer", ("trailer", "chassis", "body", "body-inside", "body-inside-night")), ("ute", ("ute", "ute-loading"))):
         for name in names:
