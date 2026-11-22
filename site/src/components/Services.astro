@@ -8,7 +8,7 @@ import routes from '../data/generated/routes.json';
 import { withBase } from '../lib/url';
 
 interface Props {
-  kind: 'drawing' | 'energy' | 'autonomy' | 'recharge' | 'circuits' | 'shedding' | 'outlets' | 'cables' | 'water' | 'water-days'
+  kind: 'drawing' | 'energy' | 'autonomy' | 'recharge' | 'circuits' | 'shedding' | 'outlets' | 'water' | 'water-days'
     | 'modes' | 'design-days' | 'units' | 'lamps' | 'lamp-checks'
     | 'routes-legend' | 'cable-schedule' | 'pipe-schedule' | 'routes-lines' | 'svc-checks' | 'closest';
   number?: string;
@@ -32,8 +32,12 @@ const lineTotals = Object.values(side.reduce((m: Record<string, any>, r: any) =>
 const pricedHere = (rt.priced as any[]).filter((p) => side.some((r: any) => p.kinds.includes(r.kind)));
 const bd = rt.bd11;
 const bdRouted = rt.bd11_routed_kg;
+// the part of BD-11 that data/assemblies/trailer.yaml still holds as an allowance not yet given to a part (cad/services.py)
+const bdFree: number | null = d.bd11?.unassigned_kg ?? null;
 const n = (v: number | null | undefined, dp = 0) =>
   v == null ? '' : v.toLocaleString('en-AU', { minimumFractionDigits: dp, maximumFractionDigits: dp });
+// a cable's conductor size, or its description where it has none (data, signal and lamp cables)
+const size = (r: any) => (r.size == null ? r.cable : `${n(r.size, r.size % 1 ? 1 : 0)} mm²`);
 const cases = d.energy.cases;
 ---
 
@@ -102,15 +106,6 @@ const cases = d.energy.cases;
     <table data-sheet-sum="sum">
       <thead><tr><th>Zone</th><th>230 V</th><th>DC</th></tr></thead>
       <tbody>{d.outlets.map((r: any) => (<tr><td>{r.zone}</td><td>{r.ac}</td><td>{r.dc}</td></tr>))}</tbody>
-    </table>
-  </div>
-)}
-
-{kind === 'cables' && (
-  <div class="data-table">
-    <table data-sheet-sum="off">
-      <thead><tr><th>Run</th><th>Current</th><th>Fuse</th><th>Cable</th><th>Length</th></tr></thead>
-      <tbody>{d.cables.map((r: any) => (<tr><td>{r.run}</td><td>{r.current}</td><td>{r.fuse}</td><td>{r.cable}</td><td>{r.length}</td></tr>))}</tbody>
     </table>
   </div>
 )}
@@ -192,7 +187,36 @@ const cases = d.energy.cases;
   .route-legend li { display: flex; align-items: center; gap: 0.4rem; margin: 0; }
   .route-legend .swatch { display: inline-block; width: 1.6rem; height: 0.55rem; border-radius: 2px; }
   .route-legend .swatch.ghost { background: #9aa5ad; opacity: 0.35; }
+  /* The cable schedule and the services checks show their first five columns (I2-21). The table's Wrap, or the All
+     columns button beside it, shows the rest. Without JavaScript the table is plain and shows every column. */
+  .svc-cols :global(table.sheet-table:not(.sheet-wrap):not(.svc-all) :is(th, td):nth-child(n + 6)) { display: none; }
 </style>
+
+<script>
+  // The All columns button in the tools of each .svc-cols table, once the spreadsheet tools have built them
+  // (src/scripts/sheet.ts). A resize event lets those tools measure the frame again.
+  function columns() {
+    for (const holder of Array.from(document.querySelectorAll('.svc-cols'))) {
+      const table = holder.querySelector('table');
+      const tools = holder.querySelector('.sheet-tools');
+      if (!table || !tools || tools.querySelector('.svc-all-btn')) continue;
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'svc-all-btn';
+      b.textContent = 'All columns';
+      b.title = 'Show every column, or only the first five';
+      b.setAttribute('aria-pressed', 'false');
+      b.addEventListener('click', () => {
+        const on = table.classList.toggle('svc-all');
+        b.setAttribute('aria-pressed', String(on));
+        window.dispatchEvent(new Event('resize'));
+      });
+      tools.insertBefore(b, tools.querySelector('.sheet-msg'));
+    }
+  }
+  if (document.readyState === 'complete') columns();
+  else window.addEventListener('load', columns);
+</script>
 
 {kind === 'routes-legend' && (
   <ul class="route-legend">
@@ -203,13 +227,15 @@ const cases = d.energy.cases;
 )}
 
 {kind === 'cable-schedule' && (
-  <div class="data-table">
+  <div class="data-table svc-cols">
     <table data-sheet-sum="sum">
-      <thead><tr><th>Run</th><th>System</th><th>Feeds</th><th>Cable</th><th>Length, m</th><th>Mass, kg</th><th>AUD</th><th>Priced in</th><th>Drop, %</th><th>Protection</th></tr></thead>
+      <thead><tr><th>Run</th><th>Feeds</th><th>Size</th><th>Length, m</th><th data-sheet-sum="off">Drop, %</th>
+        <th>Cable</th><th>System</th><th data-sheet-sum="off">Current, A</th><th>Protection</th><th>Why this size</th>
+        <th>Mass, kg</th><th>AUD</th><th>Priced in</th></tr></thead>
       <tbody>{elec.map((r: any) => (
-        <tr><td>{r.id}</td><td>{r.system_label}</td><td>{r.feeds}</td><td>{r.cable}{r.size_why ? `. ${r.size_why}` : ''}</td>
-          <td>{n(r.length_m, 2)}</td><td>{n(r.mass_kg, 2)}</td><td>{n(r.aud, 2)}</td><td>{r.priced_in}</td>
-          <td>{r.vd_pct == null ? '' : n(r.vd_pct, 2)}</td><td>{r.protection}</td></tr>))}</tbody>
+        <tr><td>{r.id}</td><td>{r.feeds}</td><td>{size(r)}</td><td>{n(r.length_m, 2)}</td><td>{r.vd_pct == null ? '' : n(r.vd_pct, 2)}</td>
+          <td>{r.cable}</td><td>{r.system_label}</td><td>{r.amps == null ? '' : n(r.amps, r.amps % 1 ? 1 : 0)}</td><td>{r.protection}</td>
+          <td>{r.size_why}</td><td>{n(r.mass_kg, 2)}</td><td>{n(r.aud, 2)}</td><td>{r.priced_in}</td></tr>))}</tbody>
     </table>
   </div>
 )}
@@ -241,19 +267,20 @@ const cases = d.energy.cases;
       </table>
     </div>
     {bd && (
-      <p>BD-11's allowance is {n(bd.mass_kg, 1)} kg. Every routed cable and pipe it prices, on both pages, weighs {n(bdRouted, 1)} kg, so the
-        {bd.mass_kg >= bdRouted ? ' allowance is the larger and stands.' : ' routed mass is the larger and BD-11 is to be raised to it.'}</p>
+      <p>BD-11, the line for {bd.item.toLowerCase()}, is {n(bd.mass_kg, 1)} kg. The routed cables and pipes it prices, on both
+        pages, weigh {n(bdRouted, 1)} kg{bdFree == null ? '.' : `, and ${n(bdFree, 1)} kg of the line is still unassigned, kept for parts not yet designed.`}
+        {bdRouted > bd.mass_kg ? ' The routed runs weigh more than the whole line, so BD-11 is to be raised to them.' : ''}</p>
     )}
   </>
 )}
 
 {kind === 'svc-checks' && (
-  <div class="data-table">
+  <div class="data-table svc-cols">
     <table data-sheet-sum="off">
-      <thead><tr><th>Check</th><th>What it checks</th><th>Limit</th><th>Measured</th><th>Governing</th><th>Result</th><th>Source</th></tr></thead>
+      <thead><tr><th>Check</th><th>Result</th><th>What it checks</th><th>Measured</th><th>Limit</th><th>Governing</th><th>Source</th></tr></thead>
       <tbody>{rt.checks.map((c: any) => (
-        <tr><td>{c.id}</td><td>{c.title}</td><td>{c.limit}</td><td>{c.measured == null ? '' : `${c.measured} ${c.unit}`}</td>
-          <td>{c.governing}</td><td>{c.ok ? 'Pass' : `Fail: ${c.detail}`}</td><td>{c.source}</td></tr>))}</tbody>
+        <tr><td>{c.id}</td><td>{c.ok ? 'Pass' : `Fail: ${c.detail}`}</td><td>{c.title}</td><td>{c.measured == null ? '' : `${c.measured} ${c.unit}`}</td>
+          <td>{c.limit}</td><td>{c.governing}</td><td>{c.source}</td></tr>))}</tbody>
     </table>
   </div>
 )}

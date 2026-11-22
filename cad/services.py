@@ -84,9 +84,21 @@ def services() -> dict:
         water=dict(daily=water["daily"], wash=wash, fresh_l=fresh, grey_l=grey, days=days,
                    grey_tank_l=water["grey_tank_l"], grey_hours_one_wash=water["grey_hours_one_wash"]),
         circuits=data["electrical"]["circuits"], shedding=data["electrical"]["shedding"],
-        outlets=data["electrical"]["outlets"], cables=data["electrical"]["cables"],
+        outlets=data["electrical"]["outlets"],
         buses=dict(v12=data["electrical"]["bus_12v"], v24=data["electrical"]["bus_24v"]),
-        modes=data["ventilation_modes"], hvac=data["hvac"], lamps=_lamps())
+        modes=data["ventilation_modes"], hvac=data["hvac"], lamps=_lamps(), bd11=_mass_line("BD-11"))
+
+
+def _mass_line(line: str) -> dict | None:
+    """A mass line's items from data/assemblies/trailer.yaml, and how much of it is still unassigned: the items that
+    are an allowance not yet given to a part. The Electrical page says so beside the routed runs it prices."""
+    items = yaml.safe_load((DATA / "assemblies" / "trailer.yaml").read_text(encoding="utf-8"))["items"]
+    e = next((x for x in items if x.get("id") == line), None)
+    if e is None:
+        return None
+    parts = [dict(item=p["item"], kg=p["kg"]) for p in e.get("parts") or []]
+    return dict(line=line, name=e["name"], parts=parts, kg=round(sum(p["kg"] for p in parts), 1),
+                unassigned_kg=round(sum(p["kg"] for p in parts if p["item"].lower().startswith("allowance")), 1))
 
 
 def _lamps() -> dict:
