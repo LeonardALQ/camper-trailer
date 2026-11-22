@@ -359,7 +359,7 @@ drawings:
       - {rev: D, date: 2026-11-21, description: "Notice: G2's two inlets and SB50 in a 310 x 120 mm cut-out", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-21, description: "Notice: G2 counted as an opening (F4-05)", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-22, description: "Memo: labels clear of the lines and the glands, G2 named once", drawn: Kiro, checked: "", approved: ""}
-      - {rev: G, date: 2026-11-22, description: "Notice: every cable as routed in data/routes.yaml (H28), the floor glands between the rails, the routed totals", drawn: Kiro, checked: "", approved: ""}
+      - {rev: G, date: 2026-11-22, description: "Notice: every cable as routed in data/routes.yaml (H28)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-611
     title: Plumbing schematic
     subtitle: Fill, fresh tanks, pump, filters, cold and hot lines, drains to the grey tank and the dump
@@ -390,7 +390,7 @@ drawings:
       - {rev: B, date: 2026-11-21, description: "Notice: tanks 975 mm wide between the 1,275 mm rails (H22), 320 L travel limit (H21)", drawn: Kiro, checked: "", approved: ""}
       - {rev: C, date: 2026-11-21, description: "Notice: G1 at X 3,040 under W1, clear of BD-20 (F4-04)", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-22, description: "Memo: labels clear of the lines", drawn: Kiro, checked: "", approved: ""}
-      - {rev: E, date: 2026-11-22, description: "Notice: every pipe and hose as routed in data/routes.yaml (H28), the wet room's manifold, the routed totals", drawn: Kiro, checked: "", approved: ""}
+      - {rev: E, date: 2026-11-22, description: "Notice: every pipe as routed in data/routes.yaml (H28)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-621
     title: HVAC and ventilation
     subtitle: Split, heat-recovery pairs, extract, towing pressurisation, relief, hood, Combi ducts

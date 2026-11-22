@@ -525,8 +525,29 @@ def _bar_capsules(lay) -> list:
     for b in getattr(lay, "blocks", []) or []:
         if getattr(b, "bar", None):
             out.append(dict(iid=b.iid, id=b.id, name=b.name, p0=tuple(b.bar["p0"]), p1=tuple(b.bar["p1"]),
-                            r=max(b.bar["w"], b.bar["h"]) / 2))
+                            r=max(b.bar["w"], b.bar["h"]) / 2, w=b.bar["w"], h=b.bar["h"]))
     return out
+
+
+def _bar_gap(segs: list, c: dict, step: float = 15.0) -> float:
+    """Least distance from a run's centreline to a bar member's real rectangular section (w across, h deep, along its
+    axis), negative inside it. The centreline is sampled every `step` mm."""
+    p0 = c["p0"]
+    u, ln = _unit(_sub(c["p1"], p0))
+    v, _ = _unit((-u[1], u[0], 0.0)) if abs(u[2]) < 0.99 else ((1.0, 0.0, 0.0), 1.0)
+    w = (u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0])
+    hw, hh = c["w"] / 2, c["h"] / 2
+    best = math.inf
+    for a, b in segs:
+        n = max(1, int(math.dist(a, b) / step))
+        for k in range(n + 1):
+            t = k / n
+            d = _sub((a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t), p0)
+            x, y, z = _dot(d, u), abs(_dot(d, v)), abs(_dot(d, w))
+            dx, dy, dz = max(0.0, -x, x - ln), max(0.0, y - hw), max(0.0, z - hh)
+            g = math.sqrt(dx * dx + dy * dy + dz * dz) if (dx or dy or dz) else -min(hw - y, hh - z, x, ln - x)
+            best = min(best, g)
+    return best
 
 
 # ------------------------------------------------------------------ the checks, SVC-01 to SVC-07
@@ -597,7 +618,9 @@ def clearance(res: dict) -> dict:
             if _matches(c, ends) or _matches(c, passes):
                 continue
             lim = 0.0 if _matches(c, along) else clear
-            m = min(seg_seg(a, b_, c["p0"], c["p1"]) for a, b_ in segs) - c["r"] - r
+            if min(seg_seg(a, b_, c["p0"], c["p1"]) for a, b_ in segs) - c["r"] - r >= clear + 50:
+                continue   # far from the capsule round the member: no closer look needed
+            m = _bar_gap(segs, c) - r
             if m < clear + 50:
                 gaps.append(dict(run=run["id"], part=c["iid"], name=c["name"], gap=round(m, 1), limit=lim, at=None))
             if m < lim - 0.05:

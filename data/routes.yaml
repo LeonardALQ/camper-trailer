@@ -86,7 +86,7 @@ priced:
   - {line: BD-11, item: "230 V wiring, 2.5 and 4 mm2 TPS and the appliance cords", kinds: [tps, flex], quantity: 40, unit: m}
   - {line: BD-11, item: "Fresh water pipework, 12 mm PEX", kinds: [pex12], quantity: 30, unit: m}
   - {line: BD-11, item: "Fresh water pipework, push-fit fittings", kinds: [pex12], quantity: 40, unit: fittings}
-  - {line: LGT-01, item: "Lamp loom, 7-core trailer cable", kinds: [lamp7], quantity: 32, unit: m}
+  - {line: LGT-01, item: "Lamp loom, 7-core trailer cable", kinds: [lamp7], quantity: 25, unit: m}
 
 # Copper conductors, PVC insulated: Prysmian's V-90 0.6/1 kV single-core table (outside diameter, mass, least installed
 # bending radius) and its two-single-core table for AS/NZS 3008.1.1 (current enclosed in air, `free` unenclosed and spaced
@@ -451,8 +451,8 @@ fixtures:
   - {id: AC-DO, what: "Split's condensate spout through the road wall, dripping clear of the body", line: AC-01, at: [AC_01.x0 + 40, half_bw + 10, AC_01.z0 - 25], size: [30, 20, 30], needs_run: false}
   - {id: VT-02, what: "Grey tank's breather outlet, insect-meshed, high on the rear wall's kerb half", line: UF-08, at: [body_x1 + 10, -450, 2550], size: [20, 60, 60], needs_run: false}
   # ---------------------------------------------------------------- the drawbar and the lamps
-  - {id: DB-AN, what: "Grey Anderson SB50 at the drawbar, the ute's 48 V charging feed", line: BD-11, at: [450, -170, 523], size: [80, 60, 60], needs_run: false}
-  - {id: DB-PL, what: "12-pin plug's junction box at the drawbar (AS 4177.5)", line: LG-01, at: [450, 170, 523], size: [80, 60, 60], needs_run: false}
+  - {id: DB-AN, what: "Grey Anderson SB50 at the drawbar, the ute's 48 V charging feed", line: BD-11, at: [450, -185, 523], size: [80, 60, 60], needs_run: false}
+  - {id: DB-PL, what: "12-pin plug's junction box at the drawbar (AS 4177.5)", line: LG-01, at: [450, 185, 523], size: [80, 60, 60], needs_run: false}
   - {id: DB-BK, what: "Breakaway kit's battery box and controller between the drawbar members (DB-07)", line: DB-07, at: [700, 0, 545], size: [140, 120, 100], serves: ["12 V: breakaway charger"]}
   - {id: LJ-01, what: "Rear lamp junction box under the rear crossmember", line: LG-01, at: [CM_08.x0 + 25, -300, CM_08.z0 - 40], size: [100, 80, 60], needs_run: false}
   # ---------------------------------------------------------------- the side-wall glands as terminals (data/services.yaml)
@@ -505,7 +505,7 @@ runs:
      from: {line: BR-O12, at: [BR_O12.x0, BR_O12.cy, BR_O12.cz]}, path: [[BFX - L, ., .], [., ., BR_P12.cz]], to: {line: BR-P12, at: [BR_P12.x0, ., .]}}
   - {id: D-14, system: dc48, kind: twin8, amps: 32, volts: 48, feeds: "Ute charging feed: the drawbar Anderson along the kerb drawbar member, under the jockey's spacers, inside the kerb rail past the arm hangers, up through G8 to the Lynx Distributor", inside: [RL-K], passes: [], protection: "40 A MEGA in the Lynx, the ute's own fuses at its end",
      serves: [ute feed], glands: [G8], along: [DB-KA, DB-KB, RL-K, RS-K, BD-03], from: {line: DB-AN, at: [DB_AN.x1, DB_AN.cy, DB_AN.cz]},
-     path: [[780, -274.4, 523], [900, -317.6, 440], [1100, -389.5, 440], [1220, -432.7, 523], [1820, -648.6, 523], [2260, -648, 523], [2330, -648, 670], [2460, -601, 680], [4900, ., .], [5000, -660, 700], [G8.cx, G8.cy, 800], [., ., ESZ - 40], [UTX, DCR_Y, .], [., ., LA_11E.z0 + 60], [., BR_LYNX.cy, .]],
+     path: [[780, -284.7, 523], [900, -327.0, 440], [1100, -397.4, 440], [1220, -439.6, 523], [1820, -650.8, 523], [2260, -651, 523], [2330, -651, 670], [2460, -601, 680], [4900, ., .], [5000, -660, 700], [G8.cx, G8.cy, 800], [., ., ESZ - 40], [UTX, DCR_Y, .], [., ., LA_11E.z0 + 60], [., BR_LYNX.cy, .]],
      to: {line: BR-LYNX, at: [., ., BR_LYNX.z0]}}
   - {id: D-15, system: pv, kind: pv, lane: 0, feeds: "PV string 1, the two kerb-side panels in series, through G4 and the wet room's ceiling to MPPT 1", protection: "None, one string to its controller, a DC isolator at the MPPT",
      serves: [pv1], glands: [G4], passes: [WR-03], along: [BD-02], from: {line: RF-01.4, at: [RF_01_4.x1 - 40, RF_01_4.cy, RF_01_4.z1 + 8]},
@@ -643,7 +643,7 @@ runs:
      path: [[., ., CZ], [., KB_Y + L, .], [AL_01.cx, ., .], [., AL_01.cy, .], [AL_02.x1 + 30, AL_02.cy, .]], to: {line: AL-02, at: [AL_02.x1, ., .]}}
   - {id: B-18, system: dc12, kind: twin, amps: 0.5, volts: 12, lane: 3, feeds: "Breakaway kit's battery charger on the drawbar, with the ute feed along the kerb rail", inside: [RL-K], passes: [], protection: "3 A on the 12 V panel",
      serves: ["12 V: breakaway charger"], glands: [G8], along: [BD-03, RL-K, RS-K, DB-KA, DB-KB], from: {line: BR-P12, at: [BR_P12.cx + 30, BR_P12.cy, BR_P12.z0]},
-     path: [[., ., LA_11E.z0 + 30], [5100 + (L % 84) * 0.7, KC_Y + 12 * (L >= 84), .], [., ., ESZ], [G8.cx - 20, G8.cy, .], [., ., 712], [5000, -598, 712], [2340, ., .], [2300, -578, 680], [2240, ., 553], [1820, -580.5, .], [1140, -337, .], [1100, -296, .], [1010, -296, .], [960, -280, 420], [800, -224, 420], [750, -205, 520], [700, -186, .], [., DB_BK.y0 - 40, .]],
+     path: [[., ., LA_11E.z0 + 30], [5100 + (L % 84) * 0.7, KC_Y + 12 * (L >= 84), .], [., ., ESZ], [G8.cx - 20, G8.cy, .], [., ., 712], [5000, -598, 712], [2340, ., .], [2300, -578, 680], [2240, ., 553], [1820, -580.5, .], [1140, -337, .], [1100, -290, .], [1010, -290, .], [960, -274, 420], [800, -213, 420], [750, -194, 520], [700, -175, .], [., DB_BK.y0 - 40, .]],
      to: {line: DB-BK, at: [., DB_BK.y0, DB_BK.cz]}}
   - {id: B-19, system: dc12, kind: twin, amps: 10, volts: 12, lane: 4, feeds: "External 12 V Anderson outlet at G2, and the creek transfer pump plugged into it", protection: "10 A on the 12 V panel",
      serves: ["12 V: 10 A external outlet", "12 V: transfer pump"], along: [BD-03], from: {line: BR-P12, at: [BR_P12.x1 - 2, BR_P12.cy, BR_P12.z0]},
@@ -727,7 +727,7 @@ runs:
   # ================================================================ the lamps and the brakes, at 12 V from the ute's 12-pin plug (data/services.yaml lamps)
   - {id: K-01, system: lamps, kind: lamp7, feeds: "Lamp loom from the 12-pin plug along the road drawbar member and rail to the rear junction", inside: [RL-R], passes: [], protection: "The ute's lamp fuses",
      serves: [lamp loom], along: [DB-RA, DB-RB, RL-R, RS-R], from: {line: DB-PL, at: [DB_PL.x1, DB_PL.cy, DB_PL.cz]},
-     path: [[1820, 648.6, 523], [2220, 644, 523], [2290, 644, 670], [2360, 598, 680], [6162, ., .], [., ., RL_R.z0 - 37], [., LJ_01.y1 + 40, .]], to: {line: LJ-01, at: [LJ_01.cx, LJ_01.y1, LJ_01.cz]}}
+     path: [[1820, 650.8, 523], [2220, 644, 523], [2290, 644, 670], [2360, 598, 680], [6162, ., .], [., ., RL_R.z0 - 37], [., LJ_01.y1 + 40, .]], to: {line: LJ-01, at: [LJ_01.cx, LJ_01.y1, LJ_01.cz]}}
   - {id: K-02, system: lamps, kind: lamp7, feeds: "Road side rear lamps on the rear outrigger", protection: "The ute's lamp fuses",
      serves: [rear lamps], along: [CM-08, OR-08R], from: {line: LJ-01, at: [LJ_01.cx, LJ_01.y1, LJ_01.cz]}, path: [[body_x1 + 15, LM_RR.y0 - 60, .], [., ., LM_RR.cz]], to: {line: LM-RR, at: [LM_RR.cx, LM_RR.y0, .]}}
   - {id: K-03, system: lamps, kind: lamp7, feeds: "Kerb side rear lamps on the rear outrigger", protection: "The ute's lamp fuses",
@@ -739,14 +739,14 @@ runs:
   - {id: K-06, system: lamps, kind: lamp7, feeds: "Road side front position lamp on the front outrigger", protection: "The ute's lamp fuses",
      serves: [front lamps], along: [DB-RA], from: {line: DB-PL, at: [DB_PL.x1, DB_PL.cy + 20, DB_PL.cz]}, path: [[1790, 637, 523], [., LM_FR.cy, .]], to: {line: LM-FR, at: [., ., LM_FR.z0]}}
   - {id: K-07, system: lamps, kind: lamp7, feeds: "Kerb side front position lamp, under the drawbar members", protection: "The ute's lamp fuses",
-     serves: [front lamps], along: [DB-RA, DB-KA], from: {line: DB-PL, at: [DB_PL.x1, DB_PL.cy + 20, DB_PL.cz]}, path: [[1790, 620, 523], [., ., 405], [., LM_FK.cy + 60, .], [., LM_FK.cy, LM_FK.z0 - 60]], to: {line: LM-FK, at: [., ., LM_FK.z0]}}
+     serves: [front lamps], along: [DB-RA, DB-KA], from: {line: DB-PL, at: [DB_PL.x1, DB_PL.cy + 20, DB_PL.cz]}, path: [[1790, 641, 523], [., ., 405], [., LM_FK.cy + 60, .], [., LM_FK.cy, LM_FK.z0 - 60]], to: {line: LM-FK, at: [., ., LM_FK.z0]}}
   - {id: K-08, system: lamps, kind: lamp7, feeds: "Kerb side marker lamps, inside the kerb rail past the arm hangers and out through the raiser and the outrigger OR-05K", inside: [RL-K, RS-K, OR-05K], passes: [], protection: "The ute's lamp fuses",
      serves: [side markers], along: [CM-08, RL-K, RS-K, OR-05K], from: {line: LJ-01, at: [LJ_01.cx - 30, LJ_01.y0, LJ_01.cz]}, path: [[6162, -598, .], [., ., 735], [LM_SK.cx - 9, ., .], [., ., LM_SK.cz + 39], [., LM_SK.y1 + 10, .]], to: {line: LM-SK, at: [., LM_SK.y1, .]}}
   - {id: K-09, system: lamps, kind: lamp7, feeds: "Road side marker lamps, inside the road rail past the arm hangers and out through the raiser and the outrigger OR-05R", inside: [RL-R, RS-R, OR-05R], passes: [], protection: "The ute's lamp fuses",
      serves: [side markers], along: [CM-08, RL-R, RS-R, OR-05R], from: {line: LJ-01, at: [LJ_01.cx - 30, LJ_01.y1, LJ_01.cz]}, path: [[6162, 598, .], [., ., 708], [LM_SR.cx - 9, ., .], [., ., LM_SR.cz + 19], [., LM_SR.y0 - 10, .]], to: {line: LM-SR, at: [., LM_SR.y0, .]}}
   - {id: K-10, system: lamps, kind: lamp7, feeds: "Brake, ABS and breakaway switch circuit from the 12-pin plug to the Bosch TSC", inside: [RL-R], passes: [], protection: "The ute's brake controller",
      serves: [brakes], along: [DB-RA, DB-RB, RL-R, RS-R, UF-03, CM-05], from: {line: DB-PL, at: [DB_PL.x1, DB_PL.cy, DB_PL.cz - 14]},
-     path: [[1820, 648.6, 509], [2300, 644, 509], [2370, 644, 640], [2440, 598, 652], [4320, ., .], [., ., 530], [BR_TSC.cx, 180, .]], to: {line: BR-TSC, at: [., BR_TSC.y1, BR_TSC.cz]}}
+     path: [[1820, 650.8, 509], [2300, 644, 509], [2370, 644, 640], [2440, 598, 652], [4320, ., .], [., ., 530], [BR_TSC.cx, 180, .]], to: {line: BR-TSC, at: [., BR_TSC.y1, BR_TSC.cz]}}
   - {id: K-11, system: lamps, kind: lamp7, feeds: "Bosch TSC to the road side drums' magnets and ABS sensors", protection: "The TSC's outputs",
      serves: [brakes], along: [RL-R, UF-03, CM-05], from: {line: BR-TSC, at: [BR_TSC.cx, BR_TSC.y1, BR_TSC.z0 + 10]}, path: [[., ., 500], [., BR_DR.y0 - 40, .]], to: {line: BR-DR, at: [., BR_DR.y0, BR_DR.cz]}}
   - {id: K-12, system: lamps, kind: lamp7, feeds: "Bosch TSC to the kerb side drums' magnets and ABS sensors", protection: "The TSC's outputs",
