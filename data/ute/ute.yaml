@@ -82,6 +82,7 @@ limits:
   anchor_design_kn: {v: 9.8, src: "Report 24 (UTE-GARAGE.md revision C section 6): an anchor withstands its strap's breaking load (NTC Load Restraint Guide 2018 p. 201, report 03), about 9.8 kN for the LC 500 kg straps. Was 20 kN with LC 1,000 kg straps", basis: plan}
   m12_tension_kn: {v: 56.0, src: "AS 4100 clause 9.3.2.2: 0.8 x 84.3 mm2 x 830 MPa for an M12 property class 8.8 bolt", basis: law}
   m12_shear_kn: {v: 31.4, src: "AS 4100 clause 9.3.2.1: 0.8 x 0.62 x 830 MPa x 76.2 mm2, threads in the shear plane", basis: law}
+  bracket_proof_factor: {v: 1.25, src: "Estimate: build step 9 proof-loads each deck mount bracket to UGM-02's loads times this. Those loads are report 03's factored cases, which already carry its off-road factor of 2 and 1.0 g up, so the test adds only a margin, the 25 % over the rated load that a crane's proof test applies (OSHA 29 CFR 1919.71, https://www.osha.gov/pls/oshaweb/owadisp.show_document?p_id=10542&p_table=STANDARDS)", basis: plan}
 
 # The mass budget. `x`, `y`, `z` place each line's centre of gravity in the ute frame. `cases` lists the cases that
 # carry it (UC1 as built unladen, UC2 bikes aboard, UC3 towing with the bikes, UC4 towing with the bikes out,
