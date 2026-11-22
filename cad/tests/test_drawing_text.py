@@ -26,4 +26,13 @@ def test_a_line_through_a_label_is_broken_at_it():
     sh.line(50, 20, 50, 40, "thin")
     svg = sh.svg()
     assert svg.count('class="masked"') == 1 and svg.count('fill="#fff"/>') == 2
-    assert svg.rindex("WET ROOM") > svg.rindex("<path")
+    mask = svg.index("<rect", svg.index("<rect") + 1)
+    assert svg.index("<path") < mask < svg.index("WET ROOM")
+
+
+def test_a_label_under_a_later_white_fill_stays_under_it():
+    sh = S.Sheet()
+    sh.line(50, 90, 50, 110, "medium")
+    sh.text(45, 100, "HIDDEN", 2.0)
+    sh.fillrect(40, 95, 70, 105)
+    assert 'class="masked"' not in sh.svg()
