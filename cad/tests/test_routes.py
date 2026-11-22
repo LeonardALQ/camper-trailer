@@ -19,7 +19,7 @@ ROWS = M.check_rows(RES, EVAL)
 
 def test_every_check_is_defined_once_with_its_source():
     ids = [c["id"] for c in RES["data"]["checks"]]
-    assert ids == [f"SVC-0{i}" for i in range(1, 8)], ids
+    assert ids == [f"SVC-{i:02d}" for i in range(1, len(ids) + 1)] and len(ids) >= 8, ids
     assert {c["kind"] for c in RES["data"]["checks"]} == set(R.CHECKS)
     assert all(c.get("source") and c.get("why") for c in RES["data"]["checks"])
 
@@ -39,6 +39,22 @@ def test_limits_are_the_rules():
     r = RES["data"]["rules"]
     assert (r["clear_mm"], r["segregation_mm"], r["drop_pct"], r["drop_ac_pct"], r["fall"], r["terminal_face"]["mm"]) == (20, 50, 2.0, 5.0, 0.02, 300)
     assert set(r["terminal_face"]["exempt"]) == {"W-02", "F-10"}
+    assert (r["spacing"]["gap_mm"], r["spacing"]["wet_ac_mm"], set(r["spacing"]["touch"])) == (5, 25, {"ELV", "ac230"})
+
+
+def test_a_ways_pitch_is_its_largest_cable_or_pipe():
+    """I2-13: a shared way's lane pitch is the largest outside diameter in it, so lane neighbours touch at most."""
+    od = {r["id"]: r["od"] for r in RES["runs"]}
+    assert RES["ways"], "no shared ways"
+    for w, way in RES["ways"].items():
+        assert way["runs"], w
+        assert way["pitch_mm"] >= max(od[i] for i in way["runs"]) - 1e-6, w
+
+
+def test_no_two_runs_overlap_outside_the_board_duct():
+    """SVC-08's measure in one number: no pair of runs passes through another, wherever both are outside the board."""
+    e = EVAL["spacing"]
+    assert e["overlaps"] == 0, [p for p in e["problems"] if "overlapping" in p][:5]
 
 
 def test_ids_are_unique_and_every_end_is_a_real_line():
