@@ -368,6 +368,20 @@ trailer_checks:
     severity: fail
     inputs: []
     why: "ARK's XO fitting guide (RTC614 V1 1/21) rates each steady at 875 kg at 90 degrees, its only jacking position, and has its chassis mount bracket welded to the chassis. The welds run along the rail's bottom corners only (Cruisemaster TB 070), at the SP fillet capacity, 0.8 x 0.6 x 490 MPa, and the rail's two 3 mm webs bear the load over the bracket's length plus 5 t at fy / 1.5, LC5b's criterion."
+  - id: CHS-09
+    title: Holes the runs make in the rails and raisers, net section in LC1 to LC8b within each case's limit
+    type: chassis_local
+    item: holes
+    severity: fail
+    inputs: []
+    why: "Review I2-27. Every hole in data/services.yaml `holes`, at its section of the composite rail with the hole taken out of the wall it is in (a seam hole out of both walls): the combined stress at the hole's edge in each of LC1 to LC8b against that case's limit, fy over its factor, or 0.85 fu over it where that is lower (AS 4100 clause 7.2's net-section term, kt 1). The rails take the raiser's 350 MPa, as CHS-01 to CHS-08B do."
+  - id: CHS-10
+    title: Holes the runs make in the rails and raisers, placed clear of the tubes' corners and the welds, and their fatigue (reported until the services move them)
+    type: chassis_local
+    item: hole_places
+    severity: report
+    inputs: []
+    why: "Review I2-27. Each hole's centre at least 1.25 d from the end of its face's flat, where the corner radius starts, and 1.5 d from the member's sawn end (AS 4100 Table 9.6.2, a rolled and a sawn edge), and its edge at least one hole diameter from every weld toe and the larger diameter from another hole, where Kirsch's solution for a hole in a plate puts the hole's stress field within 8 % of the nominal stress. The frequent range at the hole's edge, 3.0 times the net section's (Kirsch), within the CAFL of IIW-1823-07 Table 3.2-1 no. 121, a machine-cut edge dressed, FAT 140, 81.9 MPa, and the occasional range's Miner damage at most 0.5 (report 11 section 3.4). Reported, not failed, because the holes are the services' (data/services.yaml) and CHASSIS.md lists the moves they need. It becomes a fail check once they are made."
   - id: DEF-01
     title: Rail deflection between the drawbar root and the front hub within span / 500, LC1
     type: chassis_deflection
@@ -586,6 +600,8 @@ trailer_checks:
      why: "Report 12 section 3. 100 kg on 100 x 150 mm. Bearing at most half the core's compressive strength. With the bikes gone this governs the floor (report 18 open question 13)"}
   - {id: BDY-04, title: "Floor edge beside the raisers between outriggers, LC2 3 g", type: body_panel, body: {item: BDY-04}, severity: fail,
      why: "Report 12 section 3 and report 11 section 5.3: 160 kg/m2 of floor and contents spanning between outriggers, no edge member"}
+  - {id: BDY-26, title: "Floor round its cut-outs over 60 mm, with their high-density inserts, and its bearing on the raisers, LC2 3 g", type: body_panel, body: {item: BDY-26}, severity: fail,
+     why: "Review I2-27 and TRAILER.md open point 11. Every cut-out in data/services.yaml `cutouts` (the transit frames G9, G15 and G20), with the Divinycell H200 insert laid round it, 30 mm wide (est.), at Diab's minimum strengths. BDY-03's foot standing beside the cut-out, the strip's effective width less the cut-out's length, and BDY-04's 160 kg/m2, both at 3 g on the one-way span between the raisers, with Kirsch's 3.0 at the cut-out's edge (a round hole's factor, a lower bound for a radiused rectangular cut-out that its bonded frame and insert stiffen, est.) and that field fallen off to the insert's outer edge for the H80 core. Where a cut-out takes a raiser's bearer strip away, the floor bridges the gap along the raiser with a foot at its middle and bears on the insert at its ends. BDY-03's criteria: skins at half their ultimate and half the wrinkling stress, the cores at half their shear strength, bearing at half the compressive strength"}
   - {id: BDY-06, title: "Side wall and its members in the ultimate wind, 41 m/s", type: body_panel, body: {item: BDY-06}, severity: fail,
      why: "AS/NZS 1170.2 for the parked trailer: 41 m/s, BDY-19's 40 m/s raised to STB-04's highest overturning speed, 40.9 m/s with a box's Cf (H23, F3-08), Cp,e 0.7 on the windward wall and Cp,i -0.3 inside (Tables 5.2(A) and 5.1(A)), 1.01 kPa net. Strapped down (STB-05) the trailer stands in stronger winds, so the detail also gives the walls at STB-05's gust, region B's 500-year wind at 3 m (F4-07). The wall spans from the floor joiner to the roof-to-wall joiner, 2,000 mm (H1a). Skins at half their ultimate without the members, each member at its yield over 1.5 for the share its stiffness draws, and the XPS behind it at half its compressive strength"}
   - {id: BDY-07, title: "Fixed roof with the bonded solar array, LC2 3 g, spanning between the walls", type: body_panel, body: {item: BDY-07}, severity: fail,

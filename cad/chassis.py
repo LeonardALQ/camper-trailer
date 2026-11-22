@@ -443,6 +443,51 @@ class Chassis:
     def hub_x(self, axle: str) -> float:
         return next(w["hub"][0] for w in self.suspension if w["axle"] == axle)
 
+    # -- weld toes on the rails and raisers, for the hole checks (CHS-10) ----------
+    def weld_toes(self) -> list[tuple[str, tuple]]:
+        """Each weld on a rail or raiser as (what, box): the band its fillet covers on the member's face, its toe at the
+        band's edge. An end weld round a crossmember or an outrigger is four bands round its footprint, so a hole inside
+        the footprint is measured to the nearest band."""
+        V, rail, raiser = self.V, self.role_sec["rail"], self.role_sec["raiser"]
+        z0, zs, z1 = V["rail_underside_z"], V["rail_top_z"], V["raiser_top_z"]
+        out = []
+
+        def ring(what, x0, x1, y, za, zb, leg, toward):
+            """An all-round fillet on the face at y, the weld standing off it toward +Y or -Y."""
+            ya, yb = sorted((y, y + toward * leg))
+            out.extend([(what, (x0 - leg, ya, za - leg, x0, yb, zb + leg)), (what, (x1, ya, za - leg, x1 + leg, yb, zb + leg)),
+                        (what, (x0, ya, za - leg, x1, yb, za)), (what, (x0, ya, zb, x1, yb, zb + leg))])
+
+        for s in (-1, 1):
+            y_in, y_out = s * (V["rail_c"] - rail.b / 2), s * (V["rail_c"] + rail.b / 2)
+            for y, side in ((y_in, "inner"), (y_out, "outer")):
+                lo, hi = sorted((y, y + (s if side == "outer" else -s) * 4))
+                out.append((f"rail to raiser seam, {side} fillet", (V["body_x0"], lo, zs - 4, V["body_x1"], hi, zs + 4)))
+                lo, hi = sorted((y, y + (s if side == "outer" else -s) * 5))
+                out.append((f"drawbar overlap's {side} fillet under the rail", (V["body_x0"], lo, z0 - 5, V["db_end_x"], hi, z0 + 5)))
+            for m in self.members:
+                if m.role in ("cm_xt", "cm_end", "cm_floor"):
+                    _, _, za, _, _, zb = m.box()
+                    leg = 6 if m.role == "cm_xt" else 5
+                    ring(f"{m.id}'s end weld", m.p0[0] - m.sec.b / 2, m.p0[0] + m.sec.b / 2, y_in, za, zb, leg, -s)      # inboard
+                elif m.role == "outrigger" and m.side == s:
+                    _, _, za, _, _, zb = m.box()
+                    ring(f"{m.id}'s root weld", m.p0[0] - m.sec.b / 2, m.p0[0] + m.sec.b / 2, s * V["outrigger_root_y"], za, zb, 6, s)   # outboard
+            for st in self.stations:                                  # the body mount nut plates inside the raiser
+                xc = self.station_x(st)
+                out.append(("body mount nut plate's welds inside the raiser", (xc - 40, s * V["rail_c"] - raiser.b / 2, z1 - 23,
+                                                                               xc + 40, s * V["rail_c"] + raiser.b / 2, z1 - 3)))
+            for x in (self.hub_x("front"), self.hub_x("rear")):        # the XT airbag top brackets along the rail's top edge
+                lo, hi = sorted((y_in, y_in - s * 6))
+                out.append(("airbag top bracket's weld", (x - 80, lo, zs - 6, x + 80, hi, zs + 6)))
+            lo, hi = sorted((y_in, y_in - s * 6))
+            out.append(("rear recovery tongue's welds", (V["body_x1"] - 200, lo, z0 + 15, V["body_x1"], hi, z0 + 135)))
+            out.append(("drawbar root gusset's weld", (V["body_x0"], s * V["rail_c"] - 10, z0 - 5, V["body_x0"] + 30, s * V["rail_c"] + 10, z0 + 5)))
+        for p in self.steady_poses():                                  # ARK's brackets, welded along the rail's bottom corners
+            bx, yc = p["bracket"], p["side"] * V["rail_c"]
+            out.append(("corner steady bracket's welds", (bx[0], max(bx[1], yc - rail.b / 2), z0 - 5, bx[3], min(bx[4], yc + rail.b / 2), z0 + 5)))
+        return out
+
     # -- named positions for the checks -------------------------------
     def positions(self) -> dict[str, Any]:
         V = self.V

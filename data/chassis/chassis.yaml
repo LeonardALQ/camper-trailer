@@ -226,6 +226,23 @@ fatigue_details:
   - {id: FAT-15, name: "Front recovery lug on the drawbar member (L 200 mm)", iiw: "513", fat: 63, stress: member_at, x: [front_recovery_x]}
   - {id: FAT-16, name: "Corner steady's chassis mount bracket under the rail, longitudinal fillets along the rail's bottom corners only (L 72.5 mm at the front pair, 117 mm at the rear)", iiw: "513", fat: 71, stress: rail_extreme, where: steady_x}
 
+# Holes the runs make in the chassis members (data/services.yaml `holes`, the services' list, read here only). A hole is
+# the run's diameter and a bush across, a slot along the member where the run passes on a slant. CHS-09 checks the net
+# section at each hole in LC1 to LC8b against the case's limit (AS 4100 clause 7.2 and section 5, the hole taken out of
+# the section, and 0.85 fu on the net area where that is lower). CHS-10 checks where each hole is and its fatigue:
+# - edge: the hole's centre at least 1.25 d from its face's edge, here the end of the face's flat where the corner radius
+#   starts (AS 4100 Table 9.6.2, a rolled edge), so no hole runs into a tube's corner or its seam weld, and 1.5 d from the
+#   member's sawn end (the same table)
+# - toe: the hole's edge at least one hole diameter from every weld toe, where Kirsch's solution for a hole in a plate
+#   puts the hole's own stress field within 8 % of the nominal stress, so the hole adds nothing to the welds' FAT checks,
+#   and the larger of two holes' diameters between their edges, for the same reason
+# - fatigue: the frequent range at the hole's edge, Kirsch's 3.0 on the net section's range, within the CAFL of IIW-1823-07
+#   Table 3.2-1 no. 121 (machine-cut edge, dressed, FAT 140, m 3): a drilled or hole-sawn hole deburred and dressed,
+#   whose IIW note asks that the edge's shape be counted, and the occasional range's Miner damage at most 0.5
+# The open end of an outrigger under a side marker's cap has no wall, and an outrigger's root face is the raiser's web.
+hole_rules: {edge_factor: 1.25, end_factor: 1.5, toe_factor: 1.0, kt: 3.0, iiw: "121", fat: 140, fu_factor: 0.85,
+             fu: {rail: 500, raiser: 430}}   # AS/NZS 1163 C450L0 and C350L0 tensile strengths
+
 # Local checks of the fittings (CHASSIS.md). Sizes in mm. Plates are AS/NZS 3678 grade 350. The pin is the shackle pin
 # (ARK HLS13 for the chains, a 4.75 t bow shackle for recovery). Bearing is held to 1.5 fy so the hole does not
 # yield in the elastic VSB1 cases.

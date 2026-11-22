@@ -14,6 +14,33 @@ def chassis_row(c, res: dict) -> dict:
                     margin=round(g["limit"] - g["eq"], 1), ok=g["eq"] <= g["limit"] + 1e-6, governing=f"{g['member']}, {g['case']}",
                     detail=(f"{g['eq']:.0f} MPa combined in {g['member']} at X {g['at'][0]}, Y {g['at'][1]:+d}, Z {g['at'][2]}, "
                             f"{g['case']}: utilisation {g['util']:.2f}"), utilisation=round(g["util"], 3))
+    if c.type == "chassis_local" and c.item == "holes":
+        hs = [h for h in res["holes"] if not h["open"]]
+        w = max(hs, key=lambda h: h["util"])
+        s = w["static"]
+        return dict(limit="<= each case's limit on the net section", measured=round(100 * w["util"], 1), unit="%",
+                    margin=round(100 * (1 - w["util"]), 1), ok=all(h["static_ok"] for h in hs),
+                    governing=f"{w['id']} in {w['wall']} at X {w['x']:,.0f} ({', '.join(w['runs'])}), {s['lc']}",
+                    detail=(f"{len(hs)} holes in the rails and raisers. The worst, {w['id']}, {w['d']:g} mm across in {w['wall']} at X "
+                            f"{w['x']:,.0f} mm: {s['mpa']:.0f} MPa on the net section against {s['limit']:.0f} MPa in {s['lc']}, {s['case']}"))
+    if c.type == "chassis_local" and c.item == "hole_places":
+        hs = [h for h in res["holes"] if not h["open"]]
+        bad = [h for h in hs if not h["place_ok"]]
+        why = []
+        for h in bad:
+            parts = []
+            if not h["edge_ok"]:
+                parts.append(f"edge {h['edge_mm']:.1f} of {h['edge_need']:.0f} mm")
+            if not h["toe_ok"]:
+                parts.append(f"{h['toe_mm']:.0f} of {h['toe_need']:.0f} mm from the {h['toe_weld']}")
+            if not h["fat_ok"]:
+                parts.append(f"{h['peak_mpa']:.0f} MPa at its edge against {h['cafl']:.1f}")
+            why.append(f"{h['id']} ({', '.join(h['runs'])}, {h['wall']} at X {h['x']:,.0f}): {', '.join(parts)}")
+        top = max(hs, key=lambda h: h["peak_mpa"] / h["cafl"])
+        return dict(limit="edge 1.25 d, weld toes 1.0 d, edge range <= CAFL", measured=len(bad), unit=f"of {len(hs)} holes", margin=-len(bad),
+                    ok=not bad, governing="; ".join(f"{h['id']} {h['member']}" for h in bad[:4]) or f"{top['id']}, its edge range",
+                    detail=(f"{len(hs) - len(bad)} of {len(hs)} holes meet the three rules. " + ". ".join(why)
+                            + f". The highest range at a hole's edge is {top['peak_mpa']:.1f} MPa at {top['id']}, against {top['cafl']:.1f} MPa"))
     if c.type == "chassis_local":
         r = res["local"][LOCAL[c.item]]
         return dict(limit="<= 100 % of each part's limit", measured=round(100 * r["util"], 1), unit="%", margin=round(100 * (1 - r["util"]), 1),

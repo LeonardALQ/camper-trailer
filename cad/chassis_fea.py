@@ -406,12 +406,21 @@ class Analysis:
         cases = self.scaled_cases()
         env: dict[str, dict] = {}
         self.resid = 0.0
+        sites = self.hole_sites()
+        hole_env: dict[str, dict] = {}
 
         def take(lc_id, res, label, extra=None):
             for mem, r in self.stresses(res).items():
                 e = env.setdefault(lc_id, {})
                 if mem not in e or r["eq"] > e[mem]["eq"]:
                     e[mem] = dict(r, case=label, **(extra or {}))
+            he = hole_env.setdefault(lc_id, {})
+            for k, h in enumerate(sites):
+                if h.get("open"):
+                    continue
+                eq = self.hole_stress(res, h)["eq"]
+                if k not in he or eq > he[k]["eq"]:
+                    he[k] = dict(eq=eq, case=label)
 
         lc1 = {}
         defl = {}
@@ -487,6 +496,7 @@ class Analysis:
         out["pad_n"] = env["LC8b"]["_pad"]
         out["deflections"] = self._worst_deflections(defl)
         out["fatigue"] = self.fatigue(lc1)
+        out["holes"] = self.holes(hole_env, lc1, sites)
         out["local"] = self.local_checks(out["pad_n"]["pad_n"])
         out["fixings"] = self.fixings()
         out["cross_checks"] = self.cross_checks(out, lc6)
@@ -613,6 +623,146 @@ class Analysis:
                             hot_spot=bool(d.get("hot_spot"))))
         return out
 
+    # ------------------------------------------------------------------ holes in the members (CHS-09, CHS-10)
+    def hole_sites(self) -> list[dict]:
+        """Each hole a run makes in a rail or a raiser (data/services.yaml `holes`), once: a hole through the seam of a rail
+        and its raiser is one hole in two walls, and an outrigger's root face is the raiser's outer web. Each carries its
+        wall, its net section in the composite rail, its edge distance and its clear distance to the nearest weld toe.
+        An outrigger's open end under a side marker's cap has no wall."""
+        import yaml
+        from .partsdb import DATA
+        ch, V, comp = self.ch, self.ch.V, self.ch.comp
+        rail, raiser = comp.rail, comp.raiser
+        rules = ch.data["hole_rules"]
+        rows = yaml.safe_load((DATA / "services.yaml").read_text(encoding="utf-8")).get("holes") or []
+        toes = ch.weld_toes()
+        z0, zs, z1 = V["rail_underside_z"], V["rail_top_z"], V["raiser_top_z"]
+        sites: list[dict] = []
+        for r in rows:
+            s = 1 if r["y"] > 0 else -1
+            yc = s * V["rail_c"]
+            face, member = r["face"], r["member"]
+            outer = face == ("road side" if s > 0 else "kerb side")
+            if member.startswith("OR-"):
+                if abs(abs(r["y"]) - V["outrigger_tip_y"]) < 5:
+                    sites.append(dict(r, runs=[r["run"]], wall="the outrigger's open end, under the side marker's cap", open=True))
+                    continue
+                member, face, outer = f"RS-{SIDES[s]}", "road side" if s > 0 else "kerb side", True
+            same = next((h for h in sites if not h.get("open") and abs(h["x"] - r["x"]) < 5 and abs(h["y"] - r["y"]) < 5
+                         and abs(h["z"] - r["z"]) < 5 and h["frame"] == f"RL-{SIDES[s]}"), None)
+            if same is not None:
+                same["runs"] = sorted(set(same["runs"]) | {r["run"]})
+                same["rows"].append(f"{r['member']} {r['face']}")
+                continue
+            in_rail = member.startswith("RL-")
+            tube, zb, zt = (rail, z0, zs) if in_rail else (raiser, zs, z1)
+            fu = rules["fu"]["rail" if in_rail else "raiser"]
+            d, L = float(r["d"]), float(r["length"])
+            if face in ("top", "bottom"):
+                seam = (in_rail and face == "top") or (not in_rail and face == "bottom")
+                if seam:
+                    fu = min(rules["fu"].values())
+                    walls = [(rail, zs - rail.t / 2), (raiser, zs + raiser.t / 2)]
+                    wall, z_fibre = "the seam of the rail and its raiser, through both walls", zs
+                    half = min(rail.b / 2 - rail.ro, raiser.b / 2 - raiser.ro)
+                else:
+                    walls = [(tube, zb + tube.t / 2 if face == "bottom" else zt - tube.t / 2)]
+                    wall = "the rail's bottom face" if in_rail else "the raiser's top face"
+                    z_fibre, half = (zb if face == "bottom" else zt), tube.b / 2 - tube.ro
+                strips = [dict(dA=t.t * d, z=z, own=d * t.t ** 3 / 12, y=abs(r["y"] - yc), own_z=t.t * d ** 3 / 12, web=False) for t, z in walls]
+                edge = half - abs(r["y"] - yc)
+                hole_box = (r["x"] - L / 2, r["y"] - d / 2, r["z"] - 1, r["x"] + L / 2, r["y"] + d / 2, r["z"] + 1)
+                z_lever_pts, y_lever = [z_fibre], abs(r["y"] - yc) + d / 2
+                face_w = min(t.b - t.t for t, _ in walls)          # the wall's width on its centreline, corners included
+            else:
+                wall = f"the {'rail' if in_rail else 'raiser'}'s {'outer' if outer else 'inner'} web"
+                y_off = (tube.b - tube.t) / 2
+                strips = [dict(dA=tube.t * d, z=r["z"], own=tube.t * d ** 3 / 12, y=y_off, own_z=d * tube.t ** 3 / 12, web=True)]
+                edge = min(r["z"] - (zb + tube.ro), (zt - tube.ro) - r["z"])
+                hole_box = (r["x"] - L / 2, r["y"] - 1, r["z"] - d / 2, r["x"] + L / 2, r["y"] + 1, r["z"] + d / 2)
+                z_lever_pts, y_lever = [r["z"] - d / 2, r["z"] + d / 2], max(rail.b, raiser.b) / 2
+                face_w = tube.d - tube.t
+            A = comp.A - sum(p["dA"] for p in strips)
+            zc = (comp.A * comp.z_centroid - sum(p["dA"] * p["z"] for p in strips)) / A
+            I = comp.I_strong + comp.A * (zc - comp.z_centroid) ** 2 - sum(p["own"] + p["dA"] * (p["z"] - zc) ** 2 for p in strips)
+            Iw = comp.I_weak - sum(p["own_z"] + p["dA"] * p["y"] ** 2 for p in strips)
+            Aw = comp.Aw - sum(p["dA"] for p in strips if p["web"])
+            Aww = rail.Aw_width + raiser.Aw_width - sum(p["dA"] for p in strips if not p["web"])
+            gap, weld = min(((_box_gap(hole_box, bx), what) for what, bx in toes), key=lambda t: t[0])
+            sites.append(dict(r, runs=[r["run"]], rows=[f"{r['member']} {r['face']}"], frame=f"RL-{SIDES[s]}", wall=wall, open=False,
+                              d=d, length=L, fu=fu, box=hole_box, edge_mm=edge, edge_need=rules["edge_factor"] * d, toe_mm=gap, toe_need=rules["toe_factor"] * d,
+                              toe_weld=weld, net=dict(A=A, I=I, I_weak=Iw, Aw=Aw, Aw_width=Aww, z_lever=max(abs(z - zc) for z in z_lever_pts),
+                                                      y_lever=y_lever, k_torsion=face_w / max(face_w - d, 1.0))))
+        walled = [h for h in sites if not h.get("open")]
+        for h in walled:
+            # the member's sawn ends are edges too (AS 4100 Table 9.6.2, 1.5 d), and two holes keep the larger one's diameter
+            # between their edges, as a weld toe does (Kirsch)
+            end = min(h["x"] - V["body_x0"], V["body_x1"] - h["x"]) - (h["length"] - h["d"]) / 2
+            if end < rules["end_factor"] / rules["edge_factor"] * h["edge_mm"]:
+                h["edge_mm"], h["edge_need"] = end, rules["end_factor"] * h["d"]
+            others = [(_box_gap(h["box"], o["box"]), o) for o in walled if o is not h and o["frame"] == h["frame"]]
+            if others:
+                g, o = min(others, key=lambda t: t[0])
+                need = rules["toe_factor"] * max(h["d"], o["d"])
+                if g - need < h["toe_mm"] - h["toe_need"]:
+                    h["toe_mm"], h["toe_need"], h["toe_weld"] = g, need, f"hole for {', '.join(o['runs'])}"
+        for k, h in enumerate(sites, 1):
+            h["id"] = f"H-{k:02d}"
+        return sites
+
+    def hole_stress(self, res, h) -> dict:
+        """Normal and combined stress at a hole's edge on the composite rail's net section, at the element end nearest it."""
+        best, bd = None, math.inf
+        for el, fl in zip(self.f.elements, res.forces):
+            if el.member != h["frame"]:
+                continue
+            for nd, act in zip((el.i, el.j), end_actions(fl)):
+                dist = abs(self.f.nodes[nd][0] - h["x"])
+                if dist < bd - 1e-6 or (abs(dist - bd) < 1e-6 and abs(act["My"]) > abs(best["My"])):
+                    best, bd = act, dist
+        n, comp = h["net"], self.ch.comp
+        y_max = max(comp.rail.b, comp.raiser.b) / 2
+        sig = (abs(best["N"]) / n["A"] + abs(best["My"]) * n["z_lever"] / n["I"]
+               + abs(best["Mz"]) / comp.Z_weak * (comp.I_weak / n["I_weak"]) * (n["y_lever"] / y_max))
+        tau = abs(best["T"]) / comp.C * n["k_torsion"] + max(abs(best["Vz"]) / n["Aw"], abs(best["Vy"]) / n["Aw_width"])
+        return dict(sigma=sig, eq=math.sqrt(sig ** 2 + 3 * tau ** 2))
+
+    def holes(self, env: dict, lc1: dict, sites: list[dict]) -> list[dict]:
+        """CHS-09 and CHS-10 at each hole: the worst net-section stress of LC1 to LC8b against each case's limit, the
+        frequent range at the hole's edge with Kirsch's factor against IIW no. 121's CAFL, the edge and toe distances."""
+        ch = self.ch
+        rules = ch.data["hole_rules"]
+        lcs = {l["id"]: l for l in ch.data["load_cases"]}
+        lc10 = lcs["LC10"]
+        fy = min(ch.role_sec["rail"].fy, ch.role_sec["raiser"].fy)          # the composite rail's checks use the raiser's fy
+        out = []
+        for k, h in enumerate(sites):
+            row = {key: h[key] for key in ("id", "member", "face", "x", "y", "z", "d", "length", "runs", "wall", "open") if key in h}
+            if h.get("open"):
+                out.append(dict(row, ok=True, static_ok=True, place_ok=True, util=0.0))
+                continue
+            worst = None
+            for lc_id, e in env.items():
+                r = e.get(k)
+                if r is None:
+                    continue
+                lim = min(fy, rules["fu_factor"] * h["fu"]) / lcs[lc_id]["factor"]
+                u = r["eq"] / lim
+                if worst is None or u > worst["util"]:
+                    worst = dict(util=u, mpa=r["eq"], limit=lim, lc=lc_id, case=r["case"])
+            ds, cid = max(((self.hole_stress(res, h)["sigma"], c) for c, res in lc1.items()), key=lambda t: t[0])
+            peak = rules["kt"] * ds
+            cafl = 0.585 * rules["fat"]
+            dmg = _miner(rules["fat"], lc10["occasional_factor"] * peak, lc10)
+            fat_ok = peak <= cafl and dmg <= lc10["miner_limit"]
+            edge_ok, toe_ok = h["edge_mm"] >= h["edge_need"] - 1e-6, h["toe_mm"] >= h["toe_need"] - 1e-6
+            out.append(dict(row, rows=h["rows"], frame=h["frame"], static=worst, static_ok=worst["util"] <= 1 + 1e-9, util=worst["util"],
+                            range_mpa=ds, peak_mpa=peak, cafl=cafl, damage=dmg, fat_case=cid, fat_ok=fat_ok,
+                            edge_mm=h["edge_mm"], edge_need=h["edge_need"], edge_ok=edge_ok, toe_mm=h["toe_mm"], toe_need=h["toe_need"],
+                            toe_weld=h["toe_weld"], toe_ok=toe_ok, place_ok=edge_ok and toe_ok and fat_ok,
+                            ok=worst["util"] <= 1 + 1e-9 and edge_ok and toe_ok and fat_ok))
+        return out
+
     # ------------------------------------------------------------------ fittings
     def local_checks(self, pad_n: float) -> dict:
         ch, V = self.ch, self.ch.V
@@ -725,6 +875,22 @@ class Analysis:
 def _dir(F) -> str:
     i = int(np.argmax(np.abs(F)))
     return ("+" if F[i] > 0 else "-") + "XYZ"[i]
+
+
+def _box_gap(a, b) -> float:
+    """The clear distance between two boxes (x0, y0, z0, x1, y1, z1), 0 where they meet or overlap."""
+    return math.sqrt(sum(max(0.0, b[k] - a[k + 3], a[k] - b[k + 3]) ** 2 for k in range(3)))
+
+
+def _miner(fat: float, ds_o: float, lc: dict) -> float:
+    """LC10's Miner damage from the occasional range ds_o on IIW's curve for FAT, slope 3 to 10^7 cycles, then 22."""
+    cafl = 0.585 * fat
+    if ds_o <= cafl:
+        return 0.0
+    n = 2e6 * (fat / ds_o) ** 3
+    if n > 1e7:
+        n = 1e7 * (cafl / ds_o) ** 22
+    return lc["occasional_cycles"] / n
 
 
 def _local(name, rows, load) -> dict:
