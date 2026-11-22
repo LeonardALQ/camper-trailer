@@ -60,6 +60,56 @@ def block_shape(b):
     return box(x0, y0, z0, x1 - x0, y1 - y0, z1 - z0)
 
 
+def model_specs(lay) -> dict:
+    """The `model:` key of every line in data/assemblies/trailer.yaml that has one, by line id."""
+    specs = getattr(lay, "_model_specs", None)
+    if specs is None:
+        specs = {it["id"]: it["model"] for it in lay.td["items"] if "model" in it}
+        lay._model_specs = specs
+    return specs
+
+
+def _label(b) -> str:
+    return f"{b.iid} {b.name}".replace("/", "-")
+
+
+def part_shape(b, lay, colour: tuple | None = None):
+    """The one shape every consumer shows for a block (the viewer models, the STEP and GLB files and the drawings): the
+    product model where its line names one (cad/model/products, H27), else its envelope. Labelled with the line's
+    instance id and name, so a pointer on any piece of a product names the line."""
+    col = colour or OVERRIDE.get(b.id, COLOURS[b.system])
+    spec = model_specs(lay).get(b.id)
+    if spec is not None:
+        from .model import products as PR
+        sp = PR.spec_of(spec)
+        return PR.build(sp, b, lay.V, PR.envelope(sp, b, lay.P), _label(b), col)
+    s = block_shape(b)
+    if s is None:
+        return None
+    s.label, s.color = _label(b), rgba(*col)
+    return s
+
+
+def fitting_shape(b, lay, col: tuple):
+    """A chassis fitting at each of its positions: its product model where FITTING_MODELS names one, else its box."""
+    from .chassis import fitting_solids
+    from .model import products as PR
+    kids = fitting_solids(lay.chassis, b.extra["fitting"])
+    if not kids:
+        return None
+    name = PR.FITTING_MODELS.get(b.id)
+    if name:
+        out = []
+        for n, k in enumerate(kids, 1):
+            bb = k.bounding_box()
+            bx = (bb.min.X, bb.min.Y, bb.min.Z, bb.max.X, bb.max.Y, bb.max.Z)
+            out.append(PR.build({"name": name}, b, lay.V, bx, f"{n}" if len(kids) > 1 else "", col))
+        kids = out
+    s = kids[0] if len(kids) == 1 else Compound(children=kids)
+    s.label, s.color = _label(b), rgba(*col)
+    return s
+
+
 def _moved(shape, loc):
     """Move a shape, compounds leaf by leaf, so that the children carry the move too."""
     if isinstance(shape, Compound) and shape.children:
@@ -81,33 +131,26 @@ class TrailerModel:
         from .body_model import BODY_IDS, body_solids
         self.groups: dict[str, list] = {}
         self.names: dict[str, str] = {}
-        from .chassis import fitting_solids, member_solid
+        from .chassis import member_solid
+        specs = model_specs(lay)
         for b in lay.blocks:
-            if "member" in b.extra or "fitting" in b.extra:
-                if "member" in b.extra:
-                    s = member_solid(b.extra["member"])
-                    col = ROLE_COLOURS.get(b.extra["role"], COLOURS["chassis"][0])
-                    a = 1.0
-                else:
-                    kids = fitting_solids(lay.chassis, b.extra["fitting"])
-                    if not kids:
-                        continue
-                    s = kids[0] if len(kids) == 1 else Compound(children=kids)
-                    col, a = OVERRIDE.get(b.id, ("#d35400", 1.0) if b.system == "chassis" else COLOURS["drawbar"])
-                s.label = f"{b.iid} {b.name}".replace("/", "-")
-                s.color = rgba(col, a)
+            if "member" in b.extra:
+                s = member_solid(b.extra["member"])
+                s.label, s.color = _label(b), rgba(ROLE_COLOURS.get(b.extra["role"], COLOURS["chassis"][0]), 1.0)
                 self.groups.setdefault(b.system, []).append(s)
                 continue
-            if b.keep_clear or b.box is None and b.cyl is None and b.bar is None:
+            if "fitting" in b.extra:
+                s = fitting_shape(b, lay, OVERRIDE.get(b.id, ("#d35400", 1.0) if b.system == "chassis" else COLOURS["drawbar"]))
+                if s is not None:
+                    self.groups.setdefault(b.system, []).append(s)
+                continue
+            if b.keep_clear or (b.box is None and b.cyl is None and b.bar is None and b.id not in specs):
                 continue
             if body and b.id in BODY_IDS:
                 continue
-            s = block_shape(b)
+            s = part_shape(b, lay)
             if s is None:
                 continue
-            col, a = OVERRIDE.get(b.id, COLOURS[b.system])
-            s.label = f"{b.iid} {b.name}".replace("/", "-")
-            s.color = rgba(col, a)
             self.groups.setdefault(b.system, []).append(s)
         if body:
             for label, shp, (col, a) in body_solids(lay):
@@ -148,39 +191,65 @@ def write_outputs(tm: TrailerModel, out: Path):
     export_step(ch, str(out / "chassis.step"), timestamp="2026-11-20T00:00:00")
 
 
-def write_body_outputs(lay: Layout, out: Path, night: Layout | None = None):
-    """The body on its own with its fixed roof, and the body with the bed and the living area fitted, for the Body page
-    (BODY.md), and the body's STEP file. `night` is the same layout with the bed lowered (bed_state 1): it gives
-    body-inside-night.viewer.json beside the day model (H1)."""
+FIT_SYSTEMS = ("bed", "living", "electrical", "hvac", "wet_room")
+# body solids that hang from the chassis, so the Body page's models, which leave the chassis out, leave them out too:
+# the mud flaps hang from the XT rear shock outriggers
+CHASSIS_HUNG = ("BD-10",)
+
+
+def body_parts(lay: Layout) -> list:
+    """The body's own solids (cad/body_model.py), labelled and coloured, for the Body page's models."""
     from .body_model import body_solids
-    from .export import _viewer_js
     kids = []
     for label, shp, (col, a) in body_solids(lay):
         shp.label, shp.color = label.replace("/", "-"), rgba(col, a)
         kids.append(shp)
-    roof = []
-    for b in lay.blocks:
-        if b.system == "roof" and b.box is not None:
-            s = block_shape(b)
-            s.label, s.color = f"{b.iid} {b.name}".replace("/", "-"), rgba(*COLOURS["roof"])
-            roof.append(s)
-    comp = Compound(label="ASM-BD Body, fixed roof",
-                    children=[Compound(label="Body", children=kids), Compound(label="Solar panels", children=roof)])
-    js = _viewer_js("ASM-BD", comp)
-    (out / "body.viewer.json").write_text(js[js.index("{"): js.rindex("}") + 1])
-    export_step(comp, str(out / "body.step"), timestamp="2026-11-20T00:00:00")
-    # the fit-out inside the body: bed, desk, kitchen, laundry, electrics, HVAC and the wet room, with the walls see-through
+    return kids
+
+
+def _inside(lay, b) -> bool:
+    """A fit-out line inside the body: by its zone, or for a line with only a mass point, by its model's envelope."""
+    if b.keep_clear or b.system not in FIT_SYSTEMS:
+        return False
+    if b.box is not None:
+        return b.zone == "inside"
+    spec = model_specs(lay).get(b.id)
+    if spec is None:
+        return False
+    from .model import products as PR
+    bx = PR.envelope(PR.spec_of(spec), b, lay.P)
+    z = lay.zones["inside"]["box"]
+    return all(bx[i] >= z[i] - 1 and bx[i + 3] <= z[i + 3] + 1 for i in range(3))
+
+
+def fitout_parts(lay: Layout) -> list:
+    """The fit-out inside the body: bed, desk, kitchen, laundry, electrics, HVAC and the wet room."""
+    return [s for b in lay.blocks if _inside(lay, b) and (s := part_shape(b, lay)) is not None]
+
+
+def body_models(lay: Layout, night: Layout | None = None) -> dict:
+    """The Body page's three models, by file name: the body with its fixed roof, and the body with the fit-out, bed up
+    and, with `night`, bed down. Each is root > group > part, the tree the viewer files and the support check read."""
+    kids = [k for k in body_parts(lay) if not k.label.startswith(CHASSIS_HUNG)]
+    roof = [part_shape(b, lay, COLOURS["roof"]) for b in lay.blocks if b.system == "roof" and b.box is not None]
+    out = {"body": Compound(label="ASM-BD Body, fixed roof",
+                            children=[Compound(label="Body", children=kids), Compound(label="Solar panels", children=roof)])}
     for name, ly, title in (("body-inside", lay, "bed up"), ("body-inside-night", night, "bed down")):
         if ly is None:
             continue
-        fit = []
-        for b in ly.blocks:
-            if b.system in ("bed", "living", "electrical", "hvac", "wet_room") and b.box is not None and not b.keep_clear and b.zone == "inside":
-                s = block_shape(b)
-                col, a = OVERRIDE.get(b.id, COLOURS[b.system])
-                s.label, s.color = f"{b.iid} {b.name}".replace("/", "-"), rgba(col, a)
-                fit.append(s)
-        comp = Compound(label=f"ASM-BD Body with the fit-out, {title}",
-                        children=[Compound(label="Body", children=[copy.copy(k) for k in kids]), Compound(label="Fit-out", children=fit)])
+        out[name] = Compound(label=f"ASM-BD Body with the fit-out, {title}",
+                             children=[Compound(label="Body", children=[copy.copy(k) for k in kids]),
+                                       Compound(label="Fit-out", children=fitout_parts(ly))])
+    return out
+
+
+def write_body_outputs(lay: Layout, out: Path, night: Layout | None = None):
+    """The body on its own with its fixed roof, and the body with the bed and the living area fitted, for the Body page
+    (BODY.md), and the body's STEP file. `night` is the same layout with the bed lowered (bed_state 1): it gives
+    body-inside-night.viewer.json beside the day model (H1)."""
+    from .export import _viewer_js
+    for name, comp in body_models(lay, night).items():
         js = _viewer_js("ASM-BD", comp)
         (out / f"{name}.viewer.json").write_text(js[js.index("{"): js.rindex("}") + 1])
+        if name == "body":
+            export_step(comp, str(out / "body.step"), timestamp="2026-11-20T00:00:00")
