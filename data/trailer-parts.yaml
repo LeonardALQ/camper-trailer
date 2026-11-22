@@ -107,10 +107,10 @@ lines:
   - id: STL-08
     group: chassis
     name: Profile-cut plate parts, grade 350, cut and drilled, for the coupling plate, lugs, gussets, pads, cleats, brackets and the 32 body mount nut plates
-    qty: 64
+    qty: 58
     unit: kg
-    covers: [CH-P01, CH-P02, CH-P03, CH-P04, CH-P05, CH-P06, CH-P07, CH-P09, CH-P10, CH-P11, CH-P14]
-    price: {aud_each: 12, basis: estimate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/374-mild-steel-sheet-plates-250gr-as-nzs-3678.html", date: 2026-11-21, note: "55.2 kg of plate in the schedule and eight 150 x 150 x 6 plan-brace gussets of 8.5 kg. Plate is listed at AUD 3.05 to 3.44/kg as sheet. AUD 12/kg covers nesting scrap and laser or plasma cutting and drilling of small thick parts"}
+    covers: [CH-P01, CH-P02, CH-P03, CH-P04, CH-P05, CH-P06, CH-P07, CH-P09, CH-P11, CH-P14]
+    price: {aud_each: 12, basis: estimate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/374-mild-steel-sheet-plates-250gr-as-nzs-3678.html", date: 2026-11-21, note: "49.6 kg of plate in the schedule (ARK's corner steady brackets come with the steadies, CH-B01) and eight 150 x 150 x 6 plan-brace gussets of 8.5 kg. Plate is listed at AUD 3.05 to 3.44/kg as sheet. AUD 12/kg covers nesting scrap and laser or plasma cutting and drilling of small thick parts"}
   - id: GLV-01
     group: chassis
     name: Hot-dip galvanising to AS/NZS 4680 of the welded chassis and drawbar, the stone guard frame and the mud flap hangers

@@ -268,10 +268,24 @@ class TrailerModel:
         return [s for v in self.groups.values() for s in v]
 
 
+def steady_use_shapes(lay) -> list:
+    """The corner steadies locked at 90 degrees for use, each hanging from its head under the bracket, wound down to the
+    ground at design ride height (cad/chassis.py steady_poses), labelled with the steadies' line, for the chassis model."""
+    from .model import products as PR
+    b = next((x for x in lay.blocks if x.id == "CH-B01"), None)
+    if b is None:
+        return []
+    kids = [PR.build({"name": "ark_steady_use"}, b, lay, f"{n}", bx=p["use"]) for n, p in enumerate(lay.chassis.steady_poses(), 1)]
+    return [Compound(label=f"{_label(b)}, at 90 degrees for use", children=kids)]
+
+
 def chassis_compound(tm: TrailerModel) -> Compound:
-    """The chassis and drawbar on their own, for the chassis page and the engineer."""
+    """The chassis and drawbar on their own, for the chassis page and the engineer, with the corner steadies shown both
+    folded for travel and, see-through, at 90 degrees for use."""
+    groups = {g: list(tm.groups[g]) for g in ("chassis", "drawbar") if g in tm.groups}
+    groups.setdefault("chassis", []).extend(steady_use_shapes(tm.lay))
     return Compound(label="ASM-CH Chassis and drawbar",
-                    children=[Compound(label=SYSTEM_LABELS[g], children=tm.groups[g]) for g in ("chassis", "drawbar") if g in tm.groups])
+                    children=[Compound(label=SYSTEM_LABELS[g], children=groups[g]) for g in ("chassis", "drawbar") if g in groups])
 
 
 def write_outputs(tm: TrailerModel, out: Path):

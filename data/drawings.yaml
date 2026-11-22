@@ -39,6 +39,7 @@ drawings:
       - {rev: U, date: 2026-11-22, description: "Notice: the ute at 2,649 and 7,178 kg (TW06 on 4 B&S), fallback 124 L", drawn: Kiro, checked: "", approved: ""}
       - {rev: V, date: 2026-11-22, description: "Notice: front steadies behind the drawbar overlap, axle at X 4,379 (I2-22)", drawn: Kiro, checked: "", approved: ""}
       - {rev: W, date: 2026-11-22, description: "Notice: tare 2,633 kg, the axle at X 4,380.5, 295 L in travel (H21)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: X, date: 2026-11-22, description: "Notice: tare 2,627 kg, the axle at X 4,377.5 and its window (fx4-struct)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-002
     title: Mass and centre of gravity
     subtitle: Every load case with growth, the axle window of H17, the CoG in elevation and across
@@ -58,6 +59,7 @@ drawings:
       - {rev: G, date: 2026-11-22, description: "Memo: labels clear of the lines, revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-22, description: "Notice: the axle at X 4,379, the front steadies at X 3,000 (I2-22)", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-22, description: "Notice: masses with the frames, the duct and the SB120 plugs, 295 L (H21)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: J, date: 2026-11-22, description: "Notice: masses without CH-P10, the steadies folded, axle X 4,377.5", drawn: Kiro, checked: "", approved: ""}
   - number: CT-003
     title: Compliance
     subtitle: VSB1 items and the standards with the design figures, operating limits and the plate
@@ -80,6 +82,7 @@ drawings:
       - {rev: J, date: 2026-11-22, description: "Notice: the ute at 2,649 and 7,178 kg (TW06), fallback 3,222 kg and 124 L", drawn: Kiro, checked: "", approved: ""}
       - {rev: K, date: 2026-11-22, description: "Notice: running clearance 291.5 mm, DIM-06, breakover DIM-07 (I2-22)", drawn: Kiro, checked: "", approved: ""}
       - {rev: L, date: 2026-11-22, description: "Notice: MAS-10 3,398.9 kg at 295 L, fallback 3,222 kg and 118 L (H21)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: M, date: 2026-11-22, description: "Notice: clearance 380 mm at DB-03, breakover 17.4 deg, MAS-10 3,392.7 kg", drawn: Kiro, checked: "", approved: ""}
   - number: CT-010
     title: Floor plan, bed up and bed down
     subtitle: Day and night plans, walkways, door swings, spaces kept clear and the bed positions
@@ -115,6 +118,7 @@ drawings:
       - {rev: H, date: 2026-11-22, description: "Memo: kerb wall title clear of the awning case, labels clear of the lines", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-22, description: "Notice: side marker stations with the axle at X 4,379 (I2-22)", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-22, description: "Notice: side marker stations with the axle at X 4,380.5 (I2-22)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: K, date: 2026-11-22, description: "Notice: side marker stations with the axle at X 4,377.5", drawn: Kiro, checked: "", approved: ""}
   - number: CT-012
     title: Sections
     subtitle: Through the bed by day and night, the plinth and bench, the wet room, well and grey tank
@@ -165,6 +169,7 @@ drawings:
       - {rev: K, date: 2026-11-22, description: "Memo: labels clear of the lines, revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
       - {rev: L, date: 2026-11-22, description: "Notice: front steadies at X 3,000, stations with the axle at X 4,379", drawn: Kiro, checked: "", approved: ""}
       - {rev: M, date: 2026-11-22, description: "Notice: stations 1 mm rearward with the axle at X 4,380.5 (I2-22)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: N, date: 2026-11-22, description: "Notice: steadies folded for travel on ARK's welded brackets, CH-P10 gone", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
@@ -186,6 +191,7 @@ drawings:
       - {rev: I, date: 2026-11-21, description: "Notice: drawbar stresses with the axle at X 4,375", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-21, description: "Notice: stresses with the axle at X 4,373", drawn: Kiro, checked: "", approved: ""}
       - {rev: K, date: 2026-11-22, description: "Memo: labels clear of the lines", drawn: Kiro, checked: "", approved: ""}
+      - {rev: L, date: 2026-11-22, description: "Notice: LOC-06, the corner steady brackets at 90 degrees", drawn: Kiro, checked: "", approved: ""}
   - number: CT-103
     title: Chassis details
     subtitle: Composite rail, outrigger root, crossmember to rail, overlap end, jacking pad, recovery tongue, spare posts
@@ -208,6 +214,7 @@ drawings:
       - {rev: J, date: 2026-11-22, description: "Memo: detail J's title clear of the spare wheel, detail C's strip label lowered", drawn: Kiro, checked: "", approved: ""}
       - {rev: K, date: 2026-11-22, description: "Notice: fatigue ranges with the steadies moved and the axle at X 4,379", drawn: Kiro, checked: "", approved: ""}
       - {rev: L, date: 2026-11-22, description: "Notice: fatigue ranges with the axle at X 4,380.5, FAT-05 16.1 MPa", drawn: Kiro, checked: "", approved: ""}
+      - {rev: M, date: 2026-11-22, description: "Notice: FAT-16, the steady bracket's welds (IIW 513, FAT 71)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads
@@ -226,6 +233,7 @@ drawings:
       - {rev: F, date: 2026-11-22, description: "Memo: labels clear of the lines and the mounts, revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-22, description: "Notice: stations with the axle at X 4,379 (I2-22)", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-22, description: "Notice: stations with the axle at X 4,380.5 (I2-22)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: I, date: 2026-11-22, description: "Notice: stations with the axle at X 4,377.5, mount tension 6.07 kN", drawn: Kiro, checked: "", approved: ""}
   - number: CT-201
     title: Body shell
     subtitle: Kerb, road, front and rear walls, the fixed roof plan, the panels and every opening with its size
@@ -282,6 +290,7 @@ drawings:
       - {rev: G, date: 2026-11-21, description: "Notice: BD-20, the bench's insert strip in the members' rule, self-drilling rail screws", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-22, description: "Memo: labels clear of the lines, revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-22, description: "Notice: mount bolt tension 6.1 kN with the axle at X 4,379 (I2-22)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: J, date: 2026-11-22, description: "Notice: insert stations 3 mm forward with the axle at X 4,377.5", drawn: Kiro, checked: "", approved: ""}
   - number: CT-301
     title: Body to chassis
     subtitle: Mount positions, the bolt and nut-plate detail, isolation and sealing, the twist sharing
@@ -302,6 +311,7 @@ drawings:
       - {rev: H, date: 2026-11-22, description: "Memo: revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-22, description: "Notice: mount stations with the axle at X 4,379 (I2-22)", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-22, description: "Notice: mount stations with the axle at X 4,380.5 (I2-22)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: K, date: 2026-11-22, description: "Notice: mount stations with the axle at X 4,377.5, 6.07 kN", drawn: Kiro, checked: "", approved: ""}
   - number: CT-401
     title: Garage and bed general arrangement
     subtitle: Plan, kerb-side section and section looking forward at partition A
@@ -485,6 +495,7 @@ drawings:
       - {rev: M, date: 2026-11-22, description: "Notice: the ute's masses with TW06's 4 B&S feed (I2-15)", drawn: Kiro, checked: "", approved: ""}
       - {rev: N, date: 2026-11-22, description: "Notice: the ute's masses with the 316.7 kg towball (I2-22)", drawn: Kiro, checked: "", approved: ""}
       - {rev: O, date: 2026-11-22, description: "Notice: TW06 with its SB120 plug, the ute 0.1 kg heavier (I2-25)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: P, date: 2026-11-22, description: "Notice: towball 316 kg, the ute's GVM 3,994.1 kg, rear axle 2,649.0 kg", drawn: Kiro, checked: "", approved: ""}
   - number: CT-702
     title: Ute garage box frame and panels
     subtitle: Kerb-side frame elevation, subframe plan on Toyota's deck mounts, section at the rear axle, member schedule

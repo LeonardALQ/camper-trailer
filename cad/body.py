@@ -489,10 +489,74 @@ class Body:
         q = 3 * (rf.d["kg_m2"] + sol / (V["body_length"] * V["body_width"] / 1e6)) * G / 1e6
         r = rf.uniform(q, V["body_width"] - V["wall_t"])
         row("BDY-07", f"Fixed roof with the {sol:.0f} kg solar array, spanning between the walls", rf, r, "LC2, 3 g")
+        cuts = self.cutouts()
+        if cuts:
+            w26 = max(cuts, key=lambda c: c["util"])
+            out.append(dict(id="BDY-26", what=f"Floor round its {len(cuts)} cut-outs over 60 mm, with their H200 inserts", case="LC2, 3 g",
+                            skin_mpa=w26["skin_mpa"], core_mpa=w26["core_mpa"], util=w26["util"], governing=f"{w26['gland']}, {w26['governing']}",
+                            extra="; ".join(c["text"] for c in cuts), defl_mm=None, cutouts=cuts))
         self.roof_defl = rf.uniform(q / 3, V["body_width"] - V["wall_t"])["defl_mm"]
         self.floor_defl = f.one_way(ft["kg"] * G, min(ft["patch"]), span)["defl_mm"]
         self.wall_defl = w.uniform(ws["kpa"] / 1000, V["interior_h"])["defl_mm"]
         self.wall_defl_bare = Panel("wall", {**w.d, "stiffener": None}).uniform(ws["kpa"] / 1000, V["interior_h"])["defl_mm"]
+        return out
+
+    def cutouts(self) -> list[dict]:
+        """BDY-26 (I2-27): the floor round each cut-out over 60 mm (data/services.yaml `cutouts`), under BDY-03's foot standing
+        beside it and BDY-04's 160 kg/m2, both at 3 g, on the one-way span between the raisers. The strip's effective width
+        loses the cut-out's length, the skins and the H200 insert at its edge carry Kirsch's factor, and the H80 at the
+        insert's outer edge the factor fallen off to there. Where the cut-out takes a raiser's bearer strip away, the floor
+        bridges the gap along the raiser with a foot at its middle and bears on the insert at the gap's two ends."""
+        import yaml
+        from .partsdb import DATA
+        cu = self.d.get("cutouts")
+        rows = yaml.safe_load((DATA / "services.yaml").read_text(encoding="utf-8")).get("cutouts") or []
+        if not cu or not rows:
+            return []
+        f, cr, L, V = self.p["floor"], self.crit, self.d["loads"], self.V
+        ins, kt = cu["insert"], cu["kt"]
+        span, ft = self.raiser_span, L["foot"]
+        t = min(f.t1, f.t2)
+        P = 3 * ft["kg"] * G
+        q = 3 * L["floor_edge_kg_m2"] * G / 1e6
+        r_in, r_out = V["rail_c"] - V["rail_w"] / 2, V["rail_c"] + V["rail_w"] / 2      # the raiser's bearer strip across Y
+        skin_lim = min(cr["skin_factor"] * f.ult, cr["wrinkling_factor"] * f.wrinkling)
+        out = []
+        for c in rows:
+            ya = abs(c["y"])
+            y0, y1 = ya - c["h"] / 2, ya + c["h"] / 2
+            near = min(abs(y0 - V["rail_c"]), abs(y1 - V["rail_c"]), abs(ya - V["rail_c"]))
+            far = min(max(abs(y0 - V["rail_c"]), abs(y1 - V["rail_c"])), span / 2)
+            a = max(abs(ya - V["rail_c"]), min(ft["patch"]) / 2)                       # the foot beside it, from the raiser
+            bn = min(ft["patch"]) + span / 2 - c["w"]
+            M, Vf = P * a * (span - a) / span, P * (span - a) / span
+            m_u, v_u = q * far * (span - far) / 2, q * (span / 2 - min(near, span / 2))
+            rows_u = [("skin, a foot beside it", kt * M / (t * f.dd * bn), skin_lim),
+                      ("skin, 160 kg/m2", kt * m_u / (t * f.dd), skin_lim),
+                      ("insert in shear, a foot beside it", kt * Vf / (f.dd * bn), cr["core_factor"] * ins["shear"]),
+                      ("insert in shear, 160 kg/m2", kt * v_u / f.dd, cr["core_factor"] * ins["shear"])]
+            a_eq = (c["w"] + c["h"]) / 4
+            x2 = (a_eq / (a_eq + ins["width"])) ** 2
+            k_out = 1 + x2 / 2 + 1.5 * x2 ** 2                                         # Kirsch at the insert's outer edge
+            rows_u.append(("H80 beyond the insert", k_out * max(Vf / (f.dd * bn), v_u / f.dd), cr["core_factor"] * f.core["shear"]))
+            over = max(0.0, min(y1, r_out) - max(y0, r_in))
+            if over > 0:
+                R = q * (span / 2 + self.edge_span / 2)                                 # the raiser's line load from the floor
+                bb = min(ft["patch"]) + c["w"] / 2
+                Mb = P * c["w"] / 4 + R * c["w"] ** 2 / 8
+                end = P / 2 + R * c["w"] / 2
+                rows_u += [("skin, bridging the raiser's gap", kt * Mb / (t * f.dd * bb), skin_lim),
+                           ("insert in shear, bridging the gap", kt * end / (f.dd * bb), cr["core_factor"] * ins["shear"]),
+                           ("insert bearing on the strip at the gap's ends", end / (V["rail_w"] * ins["width"]), cr["bearing_factor"] * ins["compression"])]
+            parts = [dict(part=p, mpa=s, limit_mpa=lim, util=s / lim) for p, s, lim in rows_u]
+            g = max(parts, key=lambda p: p["util"])
+            skin = max(p["mpa"] for p in parts if p["part"].startswith("skin"))
+            core = max(p["mpa"] for p in parts if "shear" in p["part"] or "H80" in p["part"])
+            text = (f"{c['gland']} {c['w']:g} x {c['h']:g} mm at X {c['x']:,.0f}, Y {c['y']:+,.0f}: "
+                    + (f"over {over:.0f} mm of the raiser's bearer strip, " if over > 0 else f"{max(0.0, (r_in - y1) if y1 <= r_in else (y0 - r_out)):.0f} mm from the raiser's strip, ")
+                    + f"{g['part']} {g['mpa']:.2f} MPa against {g['limit_mpa']:.2f} MPa ({g['util']:.2f})")
+            out.append(dict(gland=c["gland"], x=c["x"], y=c["y"], w=c["w"], h=c["h"], over_strip_mm=over, parts=parts, util=g["util"],
+                            governing=g["part"], skin_mpa=skin, core_mpa=core, text=text))
         return out
 
     def wind(self) -> tuple[dict, dict]:

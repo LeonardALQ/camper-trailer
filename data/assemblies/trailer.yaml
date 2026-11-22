@@ -192,7 +192,7 @@ build_order:
   - {stage: B1, label: chassis frame, fits: {chassis: Chassis}}
   - {stage: B2, label: galvanising, fits: {CH-G01: Hot-dip}}
   - {stage: B3, label: "running gear, coupling, chains, breakaway kit, jockey wheel, steadies and mud flaps",
-     fits: {running_gear: Suspension, DB-03: coupling, DB-05: jockey, DB-06: chains, DB-07: breakaway kit, CH-B01: steadies, CH-P10: steadies, CH-P11: jockey, DB-08: jockey, BD-10: mud flaps}}
+     fits: {running_gear: Suspension, DB-03: coupling, DB-05: jockey, DB-06: chains, DB-07: breakaway kit, CH-B01: steadies, CH-P11: jockey, DB-08: jockey, BD-10: mud flaps}}
   - {stage: B4, label: "bearer strips, tanks and guards, air box, floor, shower well and wet room tray",
      fits: {underfloor: tanks, CH-S01: Bearer strips, RG-04: air box, BD-01: floor, WR-10: shower well, WR-01: tray}}
   - {stage: B5, label: "walls with their stiffeners and hardpoints, roof, doors and windows", fits: {body: Walls, BD-18: stiffeners, LB-06: hardpoints}}

@@ -44,9 +44,10 @@ params:
   jockey_x: 1000                              # jockey wheel clamp on the kerb-side member. In travel the jockey swings up to lie along
                                               # the drawbar, wheel forward, below the bike box's underside (JK-01, JK-02, DIM-04)
   front_recovery_x: body_x0 + 330             # front recovery lugs, outside the 300 mm root zone
-  steady_front_x: db_end_x + 180              # front corner steadies under the rails behind the drawbar overlap (I2-22), their
-                                              # brackets 80 mm clear of its sniped end (FAT-08), in report 11's X 2,900 to 3,100
+  steady_front_x: db_end_x + 180              # front corner steadies' brackets under the rails behind the drawbar overlap (I2-22),
+                                              # 143 mm clear of its sniped end (FAT-08), in report 11's X 2,900 to 3,100
   steady_rear_x: 6070
+  steady_rear_y: rail_c + 31.25               # the rear steadies 20 mm outboard of the rails' inner faces, clear of UF-09's hangers
   spare_post_y: 120                           # spare carrier posts 240 mm apart
   spare_post_top_z: spare_z + 175             # the posts reach 175 mm above the spare's hub, as before
   pivot_ahead: 23                             # report 11 section 5.1: hinge pivot 23 mm ahead of the hinge
@@ -118,8 +119,6 @@ fittings:
   - {id: CH-P09, plane: yz, name: "Spare carrier cleats and hub plate, 6 mm (posts in the member list)", kind: plate, l: 300, w: 300, t: 6, qty: 1,
      at: ["body_x0 - 40", 0, spare_z], fat: null,
      box: ["body_x0 - spare_bracket_d - tyre_w / 2 - 24", -150, "spare_z - 150", "spare_bracket_d + tyre_w / 2 - 26", 300, 300]}
-  - {id: CH-P10, name: "Corner steady brackets, 6 mm plates under the rails, bolted to the rail with crush tubes", kind: plate, l: 200, w: 150, t: 6, qty: 4,
-     at: [steady_front_x, 0, rail_underside_z - 3], side_y: rail_c, rear_x: steady_rear_x}
   - {id: CH-P14, name: "Body mount nut plate, 10 mm, M12 tapped, welded inside the raiser or outrigger tip under each body bolt (BODY.md)", kind: plate,
      l: 80, w: 44, t: 10, qty: 32, at: ["body_x0 + body_length / 2", 0, raiser_top_z - 13]}
   - {id: CH-P11, plane: xz, name: "Jockey wheel bracket plate, 8 mm, bolted to the kerb-side member", kind: plate, l: 200, w: 160, t: 8, qty: 1,
@@ -150,13 +149,32 @@ fittings:
      price: {aud: 84.01, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/15-shs-mild-steel-square.html", date: 2026-11-20,
              note: "SHS 25 x 25 x 2 at AUD 25.80 a 6.5 m length, 0.30 m2 of 2 mm checker plate at AUD 60.71/m2 (both listings) and AUD 40 of mounts and bolts (est.)"},
      box: ["db_apex_x + 200", -370, rail_underside_z, sg_l, 870, 10]}
-  - {id: CH-B01, size: [120, 80, 300], name: "ARK XO DDS650 drop-down corner steady, 875 kg rating", kind: bought, material: "Steel, zinc plated (est.)", mass_kg: 8.8, qty: 4, maturity: spec,
-     price: {aud: 299.90, basis: listing, url: "https://www.arkcorp.com.au/product/xo-corner-steadies/", date: 2026-11-20, note: "Two pairs at AUD 149.95, SKU XODDS650"},
-     source: "Retailer: 38.9 lb (17.6 kg) for a set of two with the winding handle (report 13 section 6)", at: [steady_front_x, 0, rail_underside_z - 156], side_y: rail_c,
-     rear_x: steady_rear_x}
+  - {id: CH-B01, poses: steadies, name: "ARK XO DDS650 drop-down corner steady, 875 kg rating, on ARK's chassis mount bracket welded under the rail, folded for travel", kind: bought, material: "Steel, zinc plated (est.), the bracket galvanised with the frame", mass_kg: 8.8, qty: 4, maturity: spec,
+     price: {aud: 299.90, basis: listing, url: "https://www.arkcorp.com.au/product/xo-corner-steadies/", date: 2026-11-20, note: "Two pairs at AUD 149.95, SKU XODDS650, each with its chassis mount bracket"},
+     source: "Retailer: 38.9 lb (17.6 kg) for a set of two with the winding handle and the brackets (report 13 section 6)"}
   - {id: CH-B02, size: [60, 40, 42.5], name: "Lashing point, forged 1/2 in weld-on D-ring with its clip under an outrigger's end, 4,000 lb working load limit, welded before galvanising", kind: bought, material: "Forged steel, galvanised with the frame", mass_kg: 0.45, qty: 4, maturity: estimate,
      price: {aud: 1712, basis: estimate, url: "https://www.amazon.com/gp/product/B0B53NL2MB", date: 2026-11-21, note: "Four D-rings at about AUD 15, and the tie-down kit, about AUD 1,652: four 50 mm ratchet straps at about AUD 45 (est.), four Tie Down Engineering 59099 anchors at about USD 45 (AUD 76.73 each, est., converted with GST), four Tie Down 59286 stabilizer plates at USD 28.19 (AUD 48.06 each, converted with GST, https://www.shelllumber.com/collections/tie-down-engineering), Tie Down's 59200 Soil Test Probe Kit at USD 505.99 (AUD 862.71, converted with GST, https://mobilehomeoutfitters.com/tools/soil-test-probe-kit/), a turning bar about AUD 40, and a bag with two 25 mm ratchet straps to lash it in the bike box about AUD 70 (est.). The kit's 45.0 kg rides in the ute while towing (U-TIEDOWN, U-ANCHORS) and stays with the trailer whenever the ute is unhitched for more than a day"},
      source: "Estimate: a 1/2 in forged D-ring with its bracket, about 0.45 kg", at: ["body_x0 + xm_w / 2", 0, "raiser_top_z - 148.25"], side_y: "outrigger_tip_y - 30", rear_x: "body_x1 - xm_w / 2"}
+
+# The corner steadies CH-B01 (ARK's XO fitting guide, RTC614 manual V1 1/21): each comes with a chassis mount bracket that
+# is welded to the chassis, and the steady bolts to it with two 8 mm bolts at 78 mm centres. It folds flat at 0 degrees for
+# travel and locks at 30 and 60 degrees as a steady only and at 90 degrees, the rated and only jacking position. A pair's
+# bracket stands at (x, y) under each rail, its long side along the fold. `fold` is where the leg lies in travel: the front
+# pair folds inboard under the diesel bay, where nothing hangs below the rails, because along the rail the 638 mm between
+# the drawbar overlap's end and the XT front hinge crossmember leaves 19 mm at each end of a 600 mm steady. The rear pair
+# folds forward under the rails, clear of the rear crossmember, of UF-09's hangers (20 mm) and of the grey dump line W-07.
+# Sizes in mm: the bracket from etrailer's photo of ARK's (117 x 72.5 x 35, question 714000, 22 Nov 2026), the bracket
+# heights at 90 degrees from etrailer's listing of the 25 in XO (ARK87FR): 19 in wound in, 25 in at full extension.
+steadies:
+  bracket: [117, 72.5, 35]
+  folded: [600, 72.5, 175]       # (est.) along the fold from the bracket's far end, across, and down from the rail: inside a
+                                 # 610 x 127 x 178 mm share of the pair's 24 x 10.05 x 7 in carton (Amazon, XODDS650BUS)
+  retracted: 482.6               # bracket height at 90 degrees, wound in
+  extended: 635.0                # bracket height at 90 degrees, at full extension: 152.4 mm of lift
+  weld_leg: 5                    # longitudinal fillets along the rail's bottom corners only, no weld across the rail (TB 070)
+  pairs:
+    - {x: steady_front_x, y: rail_c, fold: inboard}
+    - {x: steady_rear_x, y: steady_rear_y, fold: forward}
 
 # Load cases, report 11 section 3.2. Accelerations in g along X (+ rearward), Y (+ road side) and Z (+ up). Every case
 # runs on each trailer case TC1 to TC8 with its masses scaled up to the 3,500 kg plated ATM (water included), except
@@ -206,6 +224,24 @@ fatigue_details:
   - {id: FAT-13, name: "Suspension hinge to the hinge crossmembers, load-carrying fillets", iiw: "Table 3.3-1 no. 6", fat: 90, stress: member_end, member: hinge_crossmember, hot_spot: true}
   - {id: FAT-14, name: "Rear recovery tongue, longitudinal welds to the rail web (L 260 mm)", iiw: "513", fat: 63, stress: rail_extreme, where: [rear_tongue_x]}
   - {id: FAT-15, name: "Front recovery lug on the drawbar member (L 200 mm)", iiw: "513", fat: 63, stress: member_at, x: [front_recovery_x]}
+  - {id: FAT-16, name: "Corner steady's chassis mount bracket under the rail, longitudinal fillets along the rail's bottom corners only (L 72.5 mm at the front pair, 117 mm at the rear)", iiw: "513", fat: 71, stress: rail_extreme, where: steady_x}
+
+# Holes the runs make in the chassis members (data/services.yaml `holes`, the services' list, read here only). A hole is
+# the run's diameter and a bush across, a slot along the member where the run passes on a slant. CHS-09 checks the net
+# section at each hole in LC1 to LC8b against the case's limit (AS 4100 clause 7.2 and section 5, the hole taken out of
+# the section, and 0.85 fu on the net area where that is lower). CHS-10 checks where each hole is and its fatigue:
+# - edge: the hole's centre at least 1.25 d from its face's edge, here the end of the face's flat where the corner radius
+#   starts (AS 4100 Table 9.6.2, a rolled edge), so no hole runs into a tube's corner or its seam weld, and 1.5 d from the
+#   member's sawn end (the same table)
+# - toe: the hole's edge at least one hole diameter from every weld toe, where Kirsch's solution for a hole in a plate
+#   puts the hole's own stress field within 8 % of the nominal stress, so the hole adds nothing to the welds' FAT checks,
+#   and the larger of two holes' diameters between their edges, for the same reason
+# - fatigue: the frequent range at the hole's edge, Kirsch's 3.0 on the net section's range, within the CAFL of IIW-1823-07
+#   Table 3.2-1 no. 121 (machine-cut edge, dressed, FAT 140, m 3): a drilled or hole-sawn hole deburred and dressed,
+#   whose IIW note asks that the edge's shape be counted, and the occasional range's Miner damage at most 0.5
+# The open end of an outrigger under a side marker's cap has no wall, and an outrigger's root face is the raiser's web.
+hole_rules: {edge_factor: 1.25, end_factor: 1.5, toe_factor: 1.0, kt: 3.0, iiw: "121", fat: 140, fu_factor: 0.85,
+             fu: {rail: 500, raiser: 430}}   # AS/NZS 1163 C450L0 and C350L0 tensile strengths
 
 # Local checks of the fittings (CHASSIS.md). Sizes in mm. Plates are AS/NZS 3678 grade 350. The pin is the shackle pin
 # (ARK HLS13 for the chains, a 4.75 t bow shackle for recovery). Bearing is held to 1.5 fy so the hole does not
@@ -216,3 +252,4 @@ local_checks:
   rear_recovery: {fitting: CH-P05, hole: 22, pin: 19, net_w: 120, edge: 40, lever: 50, weld_leg: 6, weld_l: 200}
   jacking_pad: {fitting: CH-P06, span: 44, cup_d: 50}
   spare_posts: {lever_x: 155}
+  steady_bracket: {fitting: CH-B01, steady_kg: 875}   # at 90 degrees, the steady's rating up through its bracket into the rail

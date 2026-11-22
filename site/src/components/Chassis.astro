@@ -70,10 +70,14 @@ const worst = lcs.map((l) => g[l]).reduce((a: any, b: any) => (b.util > a.util ?
     <table data-sheet-sum="off">
       <thead><tr><th>Station</th><th class="num">Centre X</th><th>Crossmember</th></tr></thead>
       <tbody>
-        {r.stations.map((s: any) => (
-          <tr><td>{s.id}</td><td class="num">{n(s.x_centre)}</td>
-            <td>{s.role === 'cm_floor' ? 'RHS 100 x 50 x 3 at raiser height' : 'RHS 150 x 50 x 3, full rail height'}, outrigger RHS 100 x 50 x 3 each side</td></tr>
-        ))}
+        {r.stations.map((s: any) => {
+          const cm = r.members.find((m: any) => m.station === s.id && String(m.role).startsWith('cm_'));
+          const out = r.members.find((m: any) => m.station === s.id && m.role === 'outrigger');
+          return (
+            <tr><td>{s.id}</td><td class="num">{n(s.x_centre)}</td>
+              <td>{cm ? `${cm.section}${cm.role === 'cm_floor' ? ' at raiser height' : ', full rail height'}` : '-'}{out ? `, outrigger ${out.section} each side` : ''}</td></tr>
+          );
+        })}
       </tbody>
     </table>
   </div>
