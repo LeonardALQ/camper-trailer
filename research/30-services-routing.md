@@ -30,8 +30,11 @@ they are threaded through (`inside`).
   so it seals in the glands and in an RM 15 module (3 to 11 mm) (I2-29). AS/NZS 3008.1.1 rates a cable by its
   conductor, insulation and installation, so Prysmian's 0.6/1 kV 2C+E ratings hold for it. 2.5 mm2, 4 mm2 where 2.5 mm2
   is rated under the current or its breaker where it lies (A-02, C1 and C4, SVC-10), within the 5 % drop of AS/NZS
-  3000:2018 clause 3.6.2. A-01 (26 A) needs 10 mm2 in the bunched conduit, over the 450/750 V range's 6 mm2, so it
-  stays 4 mm2 and SVC-10 reports it (section 7).
+  3000:2018 clause 3.6.2. A-01 (26 A) needs 10 mm2 in the bunched conduit (27.2 A, where 4 mm2 gives 16.0 A), over
+  the 450/750 V range's 6 mm2. Prysmian's 0.6/1 kV 10 mm2 2C+E is 16.1 to 16.8 mm across, 0.45 kg/m and bends at
+  70 mm ([Prysmian's 2C+E PVC circular](https://australia.prysmian.com)), so it needs an RM 30, and G15 has no room
+  for one between the aisle ahead of it and the partition behind. A-01 stays 4 mm2 and SVC-10 reports it until it has
+  a conduit of its own or the frames are laid out again (section 7).
 - Ratings, SVC-10 (I2-15 b): no run line names its installation method. Each stretch of a run takes a zone from where
   it lies, in this order: inside a chassis member it is threaded through, crossing a panel's foam core, under the floor,
   on the drawbar, outside the body, in the board cabinet, in the battery box, in a 230 V conduit, in the ceiling's
@@ -76,11 +79,20 @@ they are threaded through (`inside`).
 - The tank guard closes the gaps beside the fresh tanks from below, so the fill reaches the front tank only from the
   front: G12 is in the floor under the bed's rear end, in front of CM-04, and the hose enters the tank's front face.
   The two tanks share a balance hose over CM-05 on dip tubes to their sumps.
-- it2-interior's arm hangers fill the outside of the rails through both wheel bays. The lamp looms run inside the rails
-  there and leave them through the raiser and the outrigger (OR-05). The ute feed D-14, the compressor feed B-16 and
-  the breakaway feed B-18 run inside the kerb raiser RS-K only, clear of its seam with the rail. Each enters through a
+- it2-interior's arm hangers fill the outside of the rails through both wheel bays. The marker lamps' looms K-08 and
+  K-09 rise inboard of the rails behind the grey tank, enter the raisers through their inner webs and run inside them
+  in the inboard lane, then turn square across them into the outriggers OR-05 through a round hole on the outrigger's
+  centre line: a lamp cable bends at 57 mm, so a turn from the outer lane, 10 mm from the web, meets the web on a
+  slant and its slot reaches the outrigger's root weld. The lamp loom K-01 and the brake circuit K-10 leave the road
+  rail through its outer web, never its bottom face (CHS-10). The ute feed D-14, the compressor feed B-16 and the
+  breakaway feed B-18 run inside the kerb raiser RS-K only, clear of its seam with the rail. Each enters through a
   slotted hole in the face it arrives at, ahead of CM-02 (B-16 and B-18 the inner face, D-14 from the drawbar the outer
-  face), and leaves through the raiser's top into the kerb frame G20. Every hole in a chassis member and every floor
+  face, riding 16 mm higher there so B-16 can rise to its exit under it), and leaves through the raiser's top into the
+  kerb frame G20, which CHS-10 reports: the gap beside the rear tank is full, so their cells cannot move inboard.
+  SVC-01 also tests every chassis fitting with no box of its own at each of its positions (cad/chassis.py
+  `fitting_boxes`): the drawbar root gussets, the recovery lugs and tongues, the plates, the D-rings, and each corner
+  steady over the box its leg sweeps from folded to standing. The drawbar's lamp and brake looms pass outboard of the
+  root gussets, clipped to them. Every hole in a chassis member and every floor
   cut-out over 60 mm is listed in `data/services.yaml` (`holes`, `cutouts`) with its member or panel, point and size.
   SVC-01 skips the parts welded to a member while a run is inside it.
 - The desk reaches the floor, so its outlets and USB panel are in a power module in the desk top, fed up the front
