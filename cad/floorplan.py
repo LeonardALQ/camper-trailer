@@ -315,7 +315,8 @@ def plan(lay, res, tm=None, state="day") -> dict:
                 walls.append(dict(iid=iid, id=line, name=name, area="wall", kind="wall", cut=[_r(f) for f in cut],
                                   box=[x0, y0, x1, y1]))
                 continue
-            if x0 < xa or x1 > xb or y0 < ya or y1 > yb or z0 < V["floor_z"] - 1 or z1 > V["ceiling_z"] + 1:
+            cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+            if not (xa < cx < xb and ya < cy < yb) or z0 < V["floor_z"] - 5 or z1 > V["ceiling_z"] + 5:
                 continue                     # outside the room: the walls' fillers, the floor, the roof, the lamps
             area = area_of(blk, (x0 + x1) / 2, (y0 + y1) / 2, V)
             system = blk.system if blk else None
@@ -586,7 +587,9 @@ def _notes(g, p, bx0, bx1, hb, ix0, iy0, ix1, iy1, st):
     # sides and the front
     g.text(bx0 - LEFT + 30, hb + 100, "Road side", T_DIM, "fp-t-side", anchor="start")
     g.text(bx0 - LEFT + 30, -hb - 100 - 0.75 * T_DIM, "Kerb side", T_DIM, "fp-t-side", anchor="start")
-    g.text(bx0 - LEFT + 30, -0.35 * T_DIM, "\u25c0 Front", T_DIM, "fp-t-side", anchor="start")
+    xa = bx0 - LEFT + 20             # an arrow pointing to the front, drawn, since a symbol font may show it in colour
+    g.out.append(f'<path class="fp-arrow" d="{g.d([[(xa, 0.0), (xa + 80, 45.0), (xa + 80, -45.0)]])}"/>')
+    g.text(xa + 105, -0.35 * T_DIM, "Front", T_DIM, "fp-t-side", anchor="start")
     # scale bar, 2 m in 500 mm steps
     x0, y = bx1 - 2000, -hb - 520
     for k in range(4):

@@ -68,6 +68,18 @@ for (const j of jobs) {
       await page.waitForTimeout(1200);
       probe.button = await b.textContent();
       probe.tip = await v.$eval('.cad-tip', (t) => (t.hidden ? null : t.textContent));
+      // click the part for its card, hide it with the card and show it again
+      await page.mouse.click(c.x + c.width * 0.45, c.y + c.height * 0.5);
+      await page.waitForTimeout(800);
+      probe.card = await v.$eval('.cad-card', (t) => (t.hidden ? null : t.querySelector('h4')?.textContent));
+      const hide = await v.$('.cad-card button[data-act="hide"]');
+      if (hide) {
+        await hide.click();
+        await page.waitForTimeout(500);
+        probe.hidden = await v.$eval('.cad-card button[data-act="hide"]', (t) => t.textContent);
+        await (await v.$('.cad-card button[data-act="hide"]')).click();
+        await page.waitForTimeout(800);
+      }
     } else probe.button = null;
   }
   if (j.el) {
