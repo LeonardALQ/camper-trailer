@@ -25,10 +25,12 @@ import pytest
 from build123d import Compound, GeomType, extrude
 
 TOL = 1.0       # mm: a joint's gap or shallow overlap
-W_MIN = 3.0     # mm: the narrowest contact patch that counts as an area
+W_MIN = 2.0     # mm: the narrowest contact patch that counts as an area, under the 2.5 mm sheet welded edge-on in the
+                # ute's box
 A_MIN = 25.0    # mm2
 FIX_W = 12.0    # mm: the land a fixing needs both ways, an M6 flat washer's outside diameter (ISO 7089)
-EMBEDS = ("welded", "bonded", "let in")
+EPS = 0.01      # mm: rounding in the measured widths
+EMBEDS = ("welded", "bonded", "let in", "looped")   # a looped strap or a hook runs through what holds it
 FIXINGS = ("screwed", "bolted", "riveted", "clamped", "hooked", "seated") + EMBEDS
 ROOTS = ("RG-02", "DB-05", "CH-B01")           # tyres, jockey wheel, corner steadies: they stand on the ground
 MODELS = ("trailer", "body", "body-inside", "body-inside-night", "chassis")
@@ -137,7 +139,7 @@ def _face(o, i, side, area=None):
     """A flat contact across axis i with the in-plane overlaps o, or None for an edge or a point."""
     j, k = [m for m in range(3) if m != i]
     area = o[j] * o[k] if area is None else area
-    if min(o[j], o[k]) >= W_MIN and area >= A_MIN:
+    if min(o[j], o[k]) >= W_MIN - EPS and area >= A_MIN:
         return ("face", i, side, min(o[j], o[k]), area)
     return None
 
@@ -255,7 +257,7 @@ def fixed_to(a: Node, b: Node, cs) -> bool:
     hows = _how(a, b)
     if hows & set(EMBEDS):
         return True
-    return bool(hows) and any(c[0] != "embed" and c[3] >= FIX_W and c[4] >= FIX_W ** 2 for c in cs)
+    return bool(hows) and any(c[0] != "embed" and c[3] >= FIX_W - EPS and c[4] >= FIX_W ** 2 for c in cs)
 
 
 # ------------------------------------------------------------------ the graph

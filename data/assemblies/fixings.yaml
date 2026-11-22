@@ -7,8 +7,8 @@
 #   screwed, bolted, riveted, clamped, hooked or seated: the model shows a contact with one of `to` at least 12 mm wide
 #     both ways and 144 mm2 in area, the land an M6 flat washer needs (ISO 7089, 12 mm outside diameter). Seated is a
 #     tyre's beads on its rim
-#   welded, bonded or let in: any contact over an area, or the one solid running into the other, as a weld, a bond or
-#     a sleeve let into a wall does
+#   welded, bonded, let in or looped: any contact over an area, or the one solid running into the other, as a weld, a
+#     bond, a sleeve let into a wall, or a strap's hook through its ring does
 # A deep overlap that no welded, bonded or let-in rule covers holds nothing: it is two parts in one space. A fixing
 # holds both of its sides, so each pair is listed once.
 
@@ -197,3 +197,99 @@ trailer:
     to: ["BD-0*", LG-02, "OR-*", "CM-*"]
     how: screwed
     why: "Each lamp and reflector screws to the body, a cap or the frame where cad/lamps.py places it (ADR 13/00)"
+
+# The ute's models (cad/ute_model.py): the LandCruiser's parts by their node (CAB, FRAME, WH-RK) and the bike box's by
+# their label's first word (data/assemblies/ute-garage.yaml: B5.K-post-1, 12.TU-FL)
+ute:
+  # ---------------------------------------------------------------- the LandCruiser (data/ute/ute.yaml)
+  - lines: [FAXLE, RAXLE]
+    to: ["WH-*"]
+    how: bolted
+    why: "Each wheel bolts to its hub (Toyota)"
+  - lines: [BAR, SPARE, TOWBAR, FRONT]
+    to: [FRAME, CAB]
+    how: bolted
+    why: "The bull bar, the spare's carrier, the towbar and the front guards bolt to the frame and the cab (Toyota, the makers' fitting guides)"
+  - lines: [TANK]
+    to: [FRAME]
+    how: clamped
+    why: "The ARB Frontier tank hangs on its straps between the rails (ARB's fitting guide)"
+  # ---------------------------------------------------------------- the box's body and subframe (UTE-GARAGE.md)
+  - lines: [B1, "B2*", "B3*", "B5*", "B6*", "B7*"]
+    to: [B1, "B2*", "B3*", "B5*", "B6*", "B7*"]
+    how: welded
+    why: "The box's frame, floor, skins, tubs and flares are TIG-welded aluminium (UTE-GARAGE.md, data/ute/parts/body.yaml)"
+  - lines: ["S4*", "S5*", "S6*"]
+    to: ["S1*"]
+    how: welded
+    why: "The subframe's crossmembers and outriggers are welded to its runners (UTE-GARAGE.md)"
+  - lines: ["C1*"]
+    to: [FRAME]
+    how: riveted
+    why: "Toyota's deck mount brackets are riveted to the frame rails at the factory"
+  - lines: ["C7*"]
+    to: ["C7*", "S5*", "S6*"]
+    how: bolted
+    why: "Lovells' mudflap bracket is one bent bar, bolted under the rear outrigger (Lovells' Elite kit)"
+  - lines: ["C6*"]
+    to: ["C7*"]
+    how: bolted
+    why: "Each mudflap bolts to its bracket's downturned flange"
+  # ---------------------------------------------------------------- doors, safety and security
+  - lines: ["D1*", "D2*"]
+    to: ["D5*", "D6*"]
+    how: bolted
+    why: "Each barn door leaf bolts to its hinge"
+  - lines: ["D5*", "D6*", D8]
+    to: ["B5*"]
+    how: bolted
+    why: "The barn door hinges bolt to the rear posts and the lift-up door's hinge to the door head"
+  - lines: [D4]
+    to: [D8]
+    how: hooked
+    why: "The kerb-side door hangs on its top hinge"
+  - lines: [D3, D9, K1]
+    to: ["D1*", "D2*", D4, "B5*"]
+    how: bolted
+    why: "The cam bar's keepers, the latch and the hasp bolt to the doors and the frame"
+  - lines: [D7]
+    to: [D3]
+    how: bolted
+    why: "The cam bar's handle is bolted on the bar"
+  - lines: ["V1*", V2D]
+    to: ["B3*", "B5*"]
+    how: let in
+    why: "The low vents and the fan's inlet duct are let into the walls"
+  - lines: [V2, "V3*", "V4*", V4B, V5B, K3, K3P, "14*"]
+    to: [V2D, B4, "B3*", "B5*", "B6*", V4B, K3P]
+    how: screwed
+    why: "The fan, the LED strips, the fume sensors and their bracket, the extinguisher's rail, the tracker's plate and the winch plates screw or bolt to the walls, the roof bows and the frame"
+  - lines: [V5]
+    to: [V5B]
+    how: clamped
+    why: "The extinguisher sits in its bracket's clamp"
+  # ---------------------------------------------------------------- the restraint (report 24)
+  - lines: ["11*"]
+    to: [B1, "S2*", "S3*", "S9*"]
+    how: let in
+    why: "Each L-track row is let into the floor and bolted through the steel anchor crossmember under it (report 24)"
+  - lines: ["12*"]
+    to: ["11*"]
+    how: clamped
+    why: "Each double-stud fitting locks into its L-track"
+  - lines: ["13*"]
+    to: ["12*", TU, ST]
+    how: looped
+    why: "Each strap's snap hook passes through its fitting's ring and its soft loop round the bike (report 24)"
+  - lines: ["K2*"]
+    to: [B1]
+    how: bolted
+    why: "Each ground anchor bolts through the floor into the subframe"
+  - lines: [R2]
+    to: [B1, "B5*"]
+    how: hooked
+    why: "The ramp hooks on the sill for loading"
+  - lines: [R4]
+    to: [TU, "14*"]
+    how: looped
+    why: "The winch rope runs from the winch to a soft loop round the Tuareg's lower triple clamp"

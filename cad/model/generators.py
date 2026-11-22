@@ -304,10 +304,12 @@ def gen_ramp(prm, spec, P):
     a = math.degrees(math.asin(drop / L))
     place = Pos(spec["sill_x"], spec["centre_y"], 0) * Rot(0, a, 0)
     s = place * box_span(0, L, -W / 2, W / 2, -T, 0)
+    # its top end bevelled to stand against the sill, and its foot cut level where it lies on the ground
+    x0, cy = spec["sill_x"], spec["centre_y"]
+    s = s - box_span(x0 - 500, x0, cy - W, cy + W, -drop - 500, 500) - box_span(x0, x0 + L + 500, cy - W, cy + W, -drop - 500, -drop)
     if prm.get("hook_l"):
         # the hooks at the top end: a plate on the floor inside the sill, bent down onto the ramp's top face
         hl, hw, ht = prm["hook_l"], prm["hook_w"], prm["hook_t"]
-        x0, cy = spec["sill_x"], spec["centre_y"]
         for yo in (W / 2 - hw / 2 - 40, -(W / 2 - hw / 2 - 40)):
             s = s + box_span(x0 - hl, x0 + 10, cy + yo - hw / 2, cy + yo + hw / 2, 0, ht)
             s = s + place * box_span(0, 70, yo - hw / 2, yo + hw / 2, 0, ht)
@@ -315,9 +317,13 @@ def gen_ramp(prm, spec, P):
 
 
 def gen_strap(prm, pts, P):
+    """A ratchet strap through its points, with a snap hook through the track fitting's ring at each anchor: the last
+    point, and the first too for a strap round a rear wheel (four points)."""
     segs = [strap_between(a, b, prm["width"], prm["thickness"]) for a, b in zip(pts, pts[1:])]
+    for x, y, z in [pts[-1]] + ([pts[0]] if len(pts) == 4 else []):
+        segs.append(box_span(x - 6, x + 6, y - 10, y + 10, z - 12, z + 4))
     length = sum(math.dist(a, b) for a, b in zip(pts, pts[1:]))
-    return _fuse(segs) if len(segs) > 1 else segs[0], {"strap_length_mm": length, "top": pts[1] if len(pts) == 4 else pts[0]}
+    return _fuse(segs), {"strap_length_mm": length, "top": pts[1] if len(pts) == 4 else pts[0]}
 
 
 # ------------------------------------------------------------------ context

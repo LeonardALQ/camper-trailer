@@ -468,6 +468,9 @@ items:
     copies:
       - {id: R, at: [mudflap_x - 45, wheel_y - mudflap_w / 2, sub_z0 - 6], params: {dx: 51, dy: half_width + frame_s - wheel_y + mudflap_w / 2, dz: 6}}
       - {id: K, at: [mudflap_x - 45, -half_width - frame_s, sub_z0 - 6], params: {dx: 51, dy: half_width + frame_s - wheel_y + mudflap_w / 2, dz: 6}}
+      # the bracket's downturned flange the flap bolts to (H27)
+      - {id: R-tab, at: [mudflap_x - 6, wheel_y - mudflap_w / 2, sub_z0 - 46], params: {dx: 6, dy: mudflap_w, dz: 40}}
+      - {id: K-tab, at: [mudflap_x - 6, -wheel_y - mudflap_w / 2, sub_z0 - 46], params: {dx: 6, dy: mudflap_w, dz: 40}}
 
   # ---------------------------------------------------------------- vents, light and safety
   - ref: V1
