@@ -6,7 +6,7 @@ Revised 22 Nov 2026 for decision H24 (research report 27): the build buys the up
 
 The truck is a used Toyota LandCruiser VDJ79 single cab V8 diesel, built 01/2017 to 08/2022, a GXL by preference, with about 400,000 km. Each of its seven stages, over a year or more, leaves it registered and drivable. It ends at power level B, about 230 to 250 kW and 850 Nm at the crank and never below 224 kW (300 hp). It carries both bikes in the box on the Lovells 4,495 kg Elite GVM kit, plated at a 4,450 kg GVM and a 2,800 kg rear axle for its shared 1,400 kg wheels (H17, H18), and tows the trailer, plated at 3,500 kg, under Lovells' 7,400 kg GCM revision (H2).
 
-Decision H24 sorts the work into three lists. The build is the upgrades and what makes them legal and able to tow: the engine rebuild, the clutch, upgraded injectors, the turbo, intercooler and exhaust, and the tune with its certificate, then the GVM kit and the GCM revision with their wheels, tyres and inspection, the towing gear and the trailer charging. It comes to AUD 67,678, or AUD 77,749 with one allowance of 10 % on listed prices and 20 % on estimates (AUD 10,071). That is AUD 2,749 over Leonard's AUD 75,000. Cut CUT7, back to the 4,200 kg Platinum kit if the S3 weighing allows it, closes the gap at AUD 63,609, and both cuts give AUD 62,333. Estimates are 48.8 % of the build.
+Decision H24 sorts the work into three lists. The build is the upgrades and what makes them legal and able to tow: the engine rebuild, the clutch, upgraded injectors, the turbo, intercooler and exhaust, and the tune with its certificate, then the GVM kit and the GCM revision with their wheels, tyres and inspection, the towing gear and the trailer charging. It comes to AUD 67,703, or AUD 77,777 with one allowance of 10 % on listed prices and 20 % on estimates (AUD 10,074). That is AUD 2,777 over Leonard's AUD 75,000. Cut CUT7, back to the 4,200 kg Platinum kit if the S3 weighing allows it, closes the gap at AUD 63,609, and both cuts give AUD 62,333. Estimates are 48.8 % of the build.
 
 The upgraded injectors bring one risk the build does not price. The Pro 100 is non-original fuel injection equipment, which report 14 judged makes a laboratory ADR 79 emissions test likely (TL07, AUD 10,000 est., on the check list). The plan assumes the LC4 certifier accepts the free TfNSW test of the finished truck. If its written evidence list at S0 asks for a laboratory test, the build drops the Pro 100 service and its fitting kit (FS01 and FS07, AUD 5,080) and runs level B on the truck's own tested injectors at factory flow, which carry it with about 10 to 25 % in hand (research report 27).
 
@@ -21,9 +21,9 @@ The purchase check list holds what a 400,000 km truck may or may not need: beari
 | S2 | Factory-spec engine rebuild, NPC clutch on the truck's own H152F, new radiator, sealed airbox and pre-filter | 14,450 | 8,298 | Machine shop | 6 to 10 weeks, then a 1,000 km run-in | As after S1, rebuilt |
 | S3 | Gate: build and weigh the box body, confirm the kit | 0 | 0 | None, Leonard builds the box body | None | Unchanged |
 | S4 | Wheels, tyres, front bushes, the Elite GVM kit with its own brakes, the box fitted, towing gear, one LC5 inspection with the GCM revision and the 2,800 kg plate | 30,059 | 3,200 | Lovells fitter, tyre shop, alignment, certifier | 2 to 3 weeks | Carries the bikes and, once certified, tows up to 3,500 kg at stock power |
-| S5 | Gauges, trailer charging, tongue, final weighing | 3,280 | 1,723 | Weighbridge, auto electrician | 1 week | Tows the loaded trailer with charging |
+| S5 | Gauges, trailer charging, tongue, final weighing | 3,305 | 1,723 | Weighbridge, auto electrician | 1 week | Tows the loaded trailer with charging |
 | S6 | Turbo, intercooler, exhaust, the Pro 100 injectors and the DPF clean, then the tune and its certificate | 18,899 | 21,000 | GTurbo, DPF specialist, tuner, emissions test, LC4 certifier | 2 to 4 weeks | Tows the trailer with the box at level B |
-| Total | | 67,678 | 53,956 | | | |
+| Total | | 67,703 | 53,956 | | | |
 
 The check list column is what a stage would cost if every check line fitted in it failed, and it is not counted.
 
@@ -109,7 +109,7 @@ Goal: tow the loaded trailer legally, level and charged.
 - Log the ute's battery voltage on the first hot night tow with both chargers running. If it stays under 13.3 V, run one charger until the upgrade (TC02, on the check list, AUD 1,723): a Jaylec BKS-240LC 240 A alternator and two more chargers, 7.2 kWh on a 5 h drive.
 - Weigh the laden ute alone and coupled to the loaded trailer (CK03). Choose the DO35 tongue's drop from the laden coupling height (TW08). Set tyre pressures from the tyre maker's load table.
 - Make the first long tow at stock power and record the temperatures.
-- AUD 3,280. Measure UTE-01, UTE-03, VEH-14 to VEH-17 and VEH-20 to VEH-24.
+- AUD 3,305. Measure UTE-01, UTE-03, VEH-14 to VEH-17 and VEH-20 to VEH-24.
 - Done when every weighed figure and towing temperature is inside its range.
 
 ### S6 Power, then the tune and its certificate
@@ -145,31 +145,31 @@ AUD including GST. Every line, with its list, priority, reason, stage and depend
 | GVM kit, GCM revision, certificate | 23,475 | 0 | 0 | Elite net extra 12,855, Platinum kit 5,620, GCM revision 1,750 |
 | Brakes | 40 | 0 | 350 | DOT 4 flush. The Elite brings its own brakes |
 | Wheels and tyres, six of each | 4,110 | 3,200 | 0 | Tyres 2,520. Toyota alloys, 3,200, only if needed (WT04) |
-| Towing and trailer charging | 4,024 | 1,723 | 639 | Charging 1,612, towbar 1,160 |
+| Towing and trailer charging | 4,049 | 1,723 | 639 | Charging 1,612, towbar 1,160 |
 | Freight and weighing | 910 | 0 | 0 | Freight 850 |
 | Long-range tank | 0 | 0 | 1,557 | ARB Frontier 180 L, an extra |
 | Bull bar and winch | 0 | 0 | 4,233 | Only if the truck has none |
-| Total | 67,678 | 53,956 | 12,070 | |
+| Total | 67,703 | 53,956 | 12,070 | |
 
 Each figure is rounded to the dollar, so a column can differ from its total by AUD 1.
 
 | Total | AUD |
 |---|---|
-| The build | 67,678 |
-| Allowance, 10 % of listed prices and 20 % of estimates | 10,071 |
-| The build with its allowance | 77,749 |
+| The build | 67,703 |
+| Allowance, 10 % of listed prices and 20 % of estimates | 10,074 |
+| The build with its allowance | 77,777 |
 | Leonard's build figure | 75,000 |
-| Over the build figure, with the allowance | 2,749 |
+| Over the build figure, with the allowance | 2,777 |
 | Less CUT7, with its share of the allowance | -14,140 |
 | The build with CUT7 and the allowance | 63,532 |
 | Less both cuts, CUT6 and CUT7 | -15,416 |
-| The build with both cuts and the allowance | 62,333 |
+| The build with both cuts and the allowance | 62,361 |
 | Purchase check list, if every line failed (not counted) | 53,956 |
 | Optional extras (not counted) | 12,070 |
 
-By priority: P1 (legal, safe and able to tow, or protecting the truck) is AUD 49,379 of the build, and P2 (the 224 kW minimum) is AUD 18,299. The optional extras are AUD 12,070.
+By priority: P1 (legal, safe and able to tow, or protecting the truck) is AUD 49,404 of the build, and P2 (the 224 kW minimum) is AUD 18,299. The optional extras are AUD 12,070.
 
-The allowance follows the trailer's rule: 10 % of the build's listed prices (AUD 34,644) and 20 % of its estimates (AUD 33,035). Research report 27 found no better basis for a one-off build. The check list carries none, because each of its prices is already the price if the line fails, and it is not added to the build.
+The allowance follows the trailer's rule: 10 % of the build's listed prices (AUD 34,669) and 20 % of its estimates (AUD 33,035). Research report 27 found no better basis for a one-off build. The check list carries none, because each of its prices is already the price if the line fails, and it is not added to the build.
 
 The cuts are two. Keep a rated factory towbar if the bought truck has one (CUT6, AUD 1,276 with its share of the allowance), and return to the Platinum kit if the S3 weighing allows it (CUT7, AUD 14,140). CUT7 alone closes the gap. The old cuts that tested and reused the injectors, the supply pump, the oil pump and the gearbox are now the plan itself, because those parts sit on the check list.
 

@@ -223,22 +223,22 @@ bike_box: {parts_list: "data/ute/box-parts.yaml", doc: UTE-GARAGE.md, note: "Leo
 totals_aud:
   build_budget: 75000
   allowance_pct: {listing: 10, estimate: 20}
-  build_by_system: {engine: 10778, fuel_system: 5742, intake_dpf: 2095, turbo_exhaust: 8269, tune_legal: 5710, clutch_gearbox: 2015, steering_suspension: 450, refresh: 60, gvm: 23475, brakes: 40, wheels_tyres: 4110, towing: 4024, freight_weighing: 910}
-  build: 67678
-  build_listed: 34644
+  build_by_system: {engine: 10778, fuel_system: 5742, intake_dpf: 2095, turbo_exhaust: 8269, tune_legal: 5710, clutch_gearbox: 2015, steering_suspension: 450, refresh: 60, gvm: 23475, brakes: 40, wheels_tyres: 4110, towing: 4049, freight_weighing: 910}
+  build: 67703
+  build_listed: 34669
   build_estimated: 33035
-  contingency_allowance: 10071
-  build_plus_contingency: 77749
+  contingency_allowance: 10074
+  build_plus_contingency: 77777
   cuts_with_allowance: 15416
-  build_with_cuts_plus_contingency: 62333
-  against_budget: {build: -7322, build_plus_contingency: 2749, build_with_cuts_plus_contingency: -12667}
+  build_with_cuts_plus_contingency: 62361
+  against_budget: {build: -7297, build_plus_contingency: 2777, build_with_cuts_plus_contingency: -12639}
   check_by_system: {engine: 4340, fuel_system: 2637, intake_dpf: 5000, turbo_exhaust: 250, tune_legal: 10200, clutch_gearbox: 4591, driveline: 14245, steering_suspension: 2200, refresh: 5570, wheels_tyres: 3200, towing: 1723}
   check_if_every_item_failed: 53956
   optional_by_system: {engine: 400, clutch_gearbox: 454, driveline: 2850, steering_suspension: 1200, refresh: 387, brakes: 350, towing: 639, fuel_tank: 1557, bar_winch: 4233}
   optional: 12070
-  every_line: 133704
+  every_line: 133729
   by_priority:
-    P1: {build: 49379, check: 36233, optional: 0}
+    P1: {build: 49404, check: 36233, optional: 0}
     P2: {build: 18299, check: 16000, optional: 0}
     P3: {build: 0, check: 1723, optional: 12070}
   by_stage:
@@ -247,5 +247,5 @@ totals_aud:
     S2: {build: 14450, check: 8298, optional: 554}
     S3: {build: 0, check: 0, optional: 0}
     S4: {build: 30059, check: 3200, optional: 3746}
-    S5: {build: 3280, check: 1723, optional: 300}
+    S5: {build: 3305, check: 1723, optional: 300}
     S6: {build: 18899, check: 21000, optional: 0}
