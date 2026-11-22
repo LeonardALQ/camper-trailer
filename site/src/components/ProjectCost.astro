@@ -2,7 +2,8 @@
 // The whole project's cost on the home page: the truck, the car build, the bike box and the trailer, each with its
 // figure before contingency, its contingency, its total and its parts list. cad/sitedata.py (project_costs) writes
 // project.json from data/project.yaml and the parts lists, so the table follows the data. A part without prices
-// shows "pending" and the total leaves it out.
+// shows "pending" and the total leaves it out. The table has its own Total row, so it is a plain table with no sheet
+// footer to repeat it (data-sheet="off").
 import p from '../data/generated/project.json';
 import { withBase } from '../lib/url';
 
@@ -26,11 +27,11 @@ const note = [
 ].filter(Boolean).join(' ');
 ---
 
-<div class="data-table project-cost">
-  <table data-sheet-sum="sum">
+<div class="data-table project-cost" data-sheet="off">
+  <table>
     <thead>
       <tr>
-        <th>Part</th><th class="num">Before contingency AUD</th><th class="num">Contingency AUD</th><th class="num" data-sheet-sum="off">Total AUD</th>
+        <th>Part</th><th class="num">Before contingency AUD</th><th class="num">Contingency AUD</th><th class="num">Total AUD</th>
         <th>Parts list</th>
       </tr>
     </thead>

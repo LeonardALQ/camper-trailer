@@ -1,6 +1,6 @@
 # Body: design (planning level)
 
-Status: proposal, revision C, 21 Nov 2026. DRAFT, not for construction until the engineer reviews it. This is the body's design basis as report 02 asks: the panels, the load cases with their criteria and sources, the joints, the mounting, the twist sharing, the roof, the openings, the results and what the engineer must check. It starts from research report 12 and changes it only where a check failed or the layout asks for it. The data is `data/body/body.yaml`, the checks `cad/body.py`, the solids `cad/body_model.py`, and the mass lines are in `data/assemblies/trailer.yaml`. Drawings CT-201 (shell), CT-202 (joints), CT-203 (insert map) and CT-301 (body to chassis) show it.
+Status: proposal, revision C of 21 Nov 2026, updated 22 Nov 2026 for the fit-out's supports (H27) and BD-11's routed runs (H28). DRAFT, not for construction until the engineer reviews it. This is the body's design basis as report 02 asks: the panels, the load cases with their criteria and sources, the joints, the mounting, the twist sharing, the roof, the openings, the results and what the engineer must check. It starts from research report 12 and changes it only where a check failed or the layout asks for it. The data is `data/body/body.yaml`, the checks `cad/body.py`, the solids `cad/body_model.py`, and the mass lines are in `data/assemblies/trailer.yaml`. Drawings CT-201 (shell), CT-202 (joints), CT-203 (insert map) and CT-301 (body to chassis) show it.
 
 ## What changed in revision C, 21 Nov 2026
 
@@ -15,7 +15,7 @@ Revision C is the body of the home trailer, TRAILER.md revision J. Revision B, t
 - The split's outdoor unit stands on two stays to the chassis, so the rear wall's skin carries none of its weight (BDY-21).
 - A moulded GRP tray covers the wet room floor, and vinyl covers only the rest.
 - The mounts are checked at the 3,500 kg plate (H2).
-- The body weighs 633.0 kg, 704.6 kg with growth, with both doors and their steps.
+- The body weighs 630.6 kg, 701.8 kg with growth, with both doors and their steps.
 - No check limit changed, and no estimate changed to pass a check.
 
 Terms. A sandwich panel is two thin skins bonded to a light core. D is its bending stiffness per metre width. Wrinkling is a local buckle of a compressed skin into the core. An insert is a dense strip laid into the core where a fixing goes. The body's share of the twist is the part of the bare chassis twist that the body removes when it is bolted on.
@@ -132,7 +132,7 @@ Glands of 60 mm or less are not openings. G2's 310 x 120 mm box of inlets is lar
 |---|---|---|---|---|
 | BD-01 | Floor panel 10.61 m², inserts, vinyl outside the wet room | 109.3 kg | Calculated | 118.9 kg |
 | BD-02 | Fixed roof 10.61 m², no hatches, insert strips | 75.6 kg | Calculated | 81.1 kg |
-| BD-03 | Side walls, less their openings, with inserts | 96.1 kg | Calculated | 103.6 kg |
+| BD-03 | Side walls, less their openings, with inserts | 96.1 kg | Calculated | 103.7 kg |
 | BD-04 | Front and rear walls, less their openings | 52.8 kg | Calculated | 56.7 kg |
 | BD-07, BD-15 | Entry and rear doors, Aussie Traveller DC with pleated blinds | 42.0 kg | Listing, carried as an estimate | 50.4 kg |
 | BD-16 | Two fold-out steps | 30.0 kg | Estimate | 36.0 kg |
@@ -140,9 +140,9 @@ Glands of 60 mm or less are not openings. G2's 310 x 120 mm box of inlets is lar
 | WN-01 to WN-05 | Four S4 windows and two blackout covers | 28.5 kg | Maker, covers estimated | 28.7 kg |
 | BD-14, BD-18 to BD-20 | Rounded front edges, the road wall's stiffener, the entry door's two jamb members | 19.5 kg | Estimate, calculated | 21.6 kg |
 | BD-10, BD-17 | Mud flaps with hangers, cassette door | 10.7 kg | Mostly calculated | 12.2 kg |
-| BD-11 | Wiring, plumbing and hardware, line by line, 17.9 kg of it unassigned (the lamps are LG-01) | 56.0 kg | Estimate, kept until the fit-out | 67.2 kg |
+| BD-11 | Wiring, plumbing and hardware, line by line, with 13.5 kg for the routed runs above their first estimates and 2.0 kg not yet given to a part (the lamps are LG-01) | 53.6 kg | Estimate, kept until the fit-out | 64.3 kg |
 | BD-13 | Fiamma F80s 400 awning on the roof, its brackets, bolts and pads | 36.7 kg | Maker, brackets estimated | 37.2 kg |
-| | Body | 633.0 kg | | 704.6 kg |
+| | Body | 630.6 kg | | 701.8 kg |
 
 The solar panels are in the roof group, the wet room tray in the wet room group, and the 8.8 kg of nut plates in the chassis.
 

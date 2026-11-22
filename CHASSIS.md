@@ -1,6 +1,6 @@
 # Chassis and drawbar: design (planning level)
 
-Status: proposal, revision E, 21 Nov 2026. DRAFT, not for construction until the engineer reviews it. This is the design basis report 02 asks for in LOAD-01: every load case with its factor, direction, combination and source, then the members, joints and protection, the results, and what the engineer must check. It starts from research report 11 and changes a member only where the analysis showed it fails or is oversized. The data is `data/chassis/chassis.yaml` (data revision C) with report 11's section table in `data/chassis/sections.yaml`. The geometry is `cad/chassis.py`, the analysis `cad/chassis_fea.py` and the solver `cad/frame.py`. Drawings CT-101 to CT-104 show it, and the site's Chassis page shows the current build.
+Status: proposal, revision E of 21 Nov 2026, updated 22 Nov 2026 for the welding procedure, the welder's qualification and the welding supervisor that AS/NZS 1554.1 clause 1.7.2 asks of the SP welds (CMP-14), and the department's acceptance of the calculation, now an assumption with its fallback. DRAFT, not for construction until the engineer reviews it. This is the design basis report 02 asks for in LOAD-01: every load case with its factor, direction, combination and source, then the members, joints and protection, the results, and what the engineer must check. It starts from research report 11 and changes a member only where the analysis showed it fails or is oversized. The data is `data/chassis/chassis.yaml` (data revision C) with report 11's section table in `data/chassis/sections.yaml`. The geometry is `cad/chassis.py`, the analysis `cad/chassis_fea.py` and the solver `cad/frame.py`. Drawings CT-101 to CT-104 show it, and the site's Chassis page shows the current build.
 
 ## What changed in revision E, 21 Nov 2026
 
@@ -20,7 +20,7 @@ Terms. A raiser is the second tube welded on top of each main rail to lift the f
 
 - Tube: the rails, full-height crossmembers, drawbar and braces are AS/NZS 1163 C450L0, bought as Austube Mills C450PLUS (fy 450 MPa). The raisers, outriggers and floor crossmembers are C350L0 (fy 350 MPa). Each grade goes on the mill certificate.
 - Plate: AS/NZS 3678 grade 350, checked at fy 350 MPa and fu 450 MPa up to 20 mm (assumption: over 12 mm it is 340 MPa, about 3 % less margin than shown).
-- Welding: every structural weld SP to AS/NZS 1554.1 with E49XX or W50X consumables. The rail-to-raiser and drawbar-to-rail seams are continuous. No weld runs across the width of a rail (Cruisemaster TB 070). Inspection follows report 02 WLD-03.
+- Welding: every structural weld SP to AS/NZS 1554.1 with E49XX or W50X consumables. The rail-to-raiser and drawbar-to-rail seams are continuous. No weld runs across the width of a rail (Cruisemaster TB 070). Inspection follows report 02 WLD-03. Clause 1.7.2 has every weld made to a qualified welding procedure, by a welder qualified for it and under a welding supervisor, so Leonard welds to a procedure qualified on his own test piece, which qualifies him too, and a qualified welding supervisor and inspector checks the fit-up and inspects the finished welds, the WLD-03 joints by penetrant, before galvanising (TRAILER.md, CMP-14).
 - Protection: hot-dip galvanised after fabrication to AS/NZS 4680, vented and drained to report 02 WLD-05. The coupling plate's faces are cleaned flat after dipping.
 
 ## Members
@@ -151,7 +151,7 @@ The hollow-section T-joints are marked HS: the crossmember-to-rail joints, the o
 
 1. The load cases, the factor of 2 on twist, the ±0.5 g frequent fatigue case and the deflection and twist limits (report 11 open question 6).
 2. The hot-spot stresses at every HS detail, above all the outrigger roots (FAT-04, FAT-05), the XT crossmember roots (FAT-03) and the crossmember toes on the rail (FAT-01).
-3. VSB1 9.1 and 9.2.2 evidence at the 3,500 kg plate, by test or by calculation the department accepts. The recovery case reaches 0.91 of yield in the road-side rail.
+3. VSB1 9.1 and 9.2.2 evidence at the 3,500 kg plate, by test or by calculation the department accepts. The recovery case reaches 0.91 of yield in the road-side rail. The plan assumes the department accepts this calculation, which covers strength and fatigue, as VSB1 9.1's approved calculation for the concessional entry. If it does not, the drawbar and chain points are tested at an approved facility to VSB1 chapter 14, about AUD 5,000 (est.).
 4. The rear bays without plan bracing: the RHS 150 x 50 x 4 XT rear shock crossmember carries the rear recovery pull.
 5. The local stability of the 3 mm rail walls at the jacking pad and under the hinge brackets, which a beam model does not see, and the plan bracing's gussets.
 6. SP to AS/NZS 1554.1 for every weld, or AS/NZS 1554.5 for the most fatigue-loaded joints, and the C350L0 and C450L0 grades on the mill certificates.
@@ -164,3 +164,5 @@ The hollow-section T-joints are marked HS: the crossmember-to-rail joints, the o
 - RHS 150 x 50 x 3 XT crossmembers, and 150 x 50 x 4 at the rear shocks, suit the 4,500 kg XT Air build at 900 mm axle spacing.
 - The DO35 under-mounted on its plate puts the coupling point at Z 440, the ute's laden ball height.
 - A galvanising bath takes a frame 6.3 m long and 2.4 m wide across the outriggers.
+- The department accepts the engineer's calculation, which covers strength and fatigue, as VSB1 9.1's approved calculation for the concessional entry. If not, the chapter 14 drawbar and chain-point test at an approved facility, about AUD 5,000 (est.), takes its place.
+- The welds reach SP quality because they are made to the qualified procedure by Leonard, qualified on it, under the supervisor's visits, and pass the inspector's visual and penetrant inspection (CMP-14).

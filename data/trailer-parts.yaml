@@ -166,13 +166,14 @@ lines:
     name: Engineer's review of the chassis, drawbar, coupling, body mounts and the VSB1 and ADR checklist
     qty: 20
     unit: h
-    price: {aud_each: 220, basis: estimate, url: "https://employmenthero.com/career-advice/structural-engineer/salary/", date: 2026-11-20, note: "NSW does not require it for a VSB1 trailer of 4.5 t ATM or less, but CHASSIS.md and BODY.md stay drafts until an engineer reviews them. About three times a median engineer's hourly pay"}
+    price: {aud_each: 220, basis: estimate, url: "https://employmenthero.com/career-advice/structural-engineer/salary/", date: 2026-11-20, note: "NSW does not require it for a VSB1 trailer of 4.5 t ATM or less, but CHASSIS.md and BODY.md stay drafts until an engineer reviews them. About three times a median engineer's hourly pay. The calculation covers strength and fatigue, and the design assumes the department accepts it as VSB1 9.1's approved calculation for the concessional entry. If it does not, the drawbar and chain points are tested at an approved facility to VSB1 chapter 14, about AUD 5,000 (est., a day of the facility's rig and engineer with the report, and the chassis taken there and back), which is not in the total"}
   - id: CMP-04
     group: compliance
     name: Heavy Vehicle Authorised Inspection Station inspection for first registration, with the TfNSW identity approval
     qty: 1
     unit: inspection
     price: {aud: 250, basis: estimate, url: "https://nsw.gov.au/sites/default/files/2021-02/RMS-14.354-Certification-of-new-trailers-Vehicle-Standards-Information-No-52-November-2008.pdf", date: 2026-11-20, note: "A trailer over 2 t GTM goes to an HVAIS. The fee notice could not be read"}
+    note: "A concessional trailer never registered in NSW needs TfNSW's Identity Approval before the examiner can pass it (VIB 78 rule 221.04). The examiner sends the application, form 5703 (https://tfnswforms.transport.nsw.gov.au/45065830-apply-for-identity-approval-concessional-trailer-low-atm.pdf), with clear photos of all four sides and the drawbar, of the vehicle plate and of the VIN stamped in the frame, the weighbridge ticket, and receipts proving the origin of the materials used to build the trailer. Without them it is rejected, so Leonard keeps every receipt from stage B0"
   - id: CMP-05
     group: compliance
     name: Unregistered vehicle permit, to tow the trailer to the inspection and the weighbridge
@@ -211,13 +212,14 @@ lines:
     price: {aud: 400, basis: estimate, date: 2026-11-20, note: "No gas certificate is needed, because there is no LPG"}
   - id: CMP-14
     group: compliance
-    name: Weld evidence for the chassis and drawbar, Leonard's welder qualification test to AS/NZS 1554.1 and dye-penetrant tests of the critical joints
+    name: Weld evidence for the chassis and drawbar to AS/NZS 1554.1, the welding procedure and Leonard's welder qualification on one test piece, a qualified welding supervisor and inspector, and dye-penetrant sets
     qty: 1
     unit: lot
     price:
-      - {item: "Welder qualification test for Leonard to AS/NZS 1554.1 clause 4.12.2.3, a test piece of at least 300 mm welded to the chassis welding procedure, examined visually and by macro, witnessed by a NATA-accredited test house", aud: 1000, basis: estimate, url: "https://www.technoweld.com.au/services/welder-qualification/", date: 2026-11-22, note: "No Australian price is published, and Technoweld quotes on request. About 4 h of a weld inspector's time at about AUD 150 an hour, the macro section and the certificate (est.)"}
-      - {item: "Two CRC Crick 110, 120 and 130 sets of cleaner, red penetrant and developer, for Leonard's tests of the drawbar-to-rail welds, the coupling plate, the XT crossmembers and the chain lugs before galvanising", aud: 143.68, basis: listing, converted_from: "EUR 42.76 a set including VAT", url: "https://www.soldufer.com/producto/kit-soldadura-110120130-crick-ref117073160338-crc/", date: 2026-11-22, note: "No Australian listing was found"}
-    note: "Neither VSB1, the HVAIS inspection nor the concessional RAV entry asks for a qualified welder, a weld certificate or crack tests (research report 27). The RAV entry needs ADR 62/02's drawbar evidence in hand, and the engineer's calculation (CMP-03) is that evidence only for the SP welds to AS/NZS 1554.1 that CHASSIS.md specifies, which the standard has a qualified welder make. Report 02's WLD-03 asks for the dye-penetrant tests"
+      - {item: "Welding procedure and welder qualification to AS/NZS 1554.1 on one test piece: Leonard welds a piece of at least 300 mm to the draft procedure for the chassis joints, examined visually and by macro and witnessed by a NATA-accredited test house, which qualifies the procedure and Leonard together (clause 4.12.2.3)", aud: 1000, basis: estimate, url: "https://www.technoweld.com.au/services/welder-qualification/", date: 2026-11-22, note: "No Australian price is published, and Technoweld quotes on request. About 4 h of a weld inspector's time at about AUD 150 an hour, the macro section and the certificate (est.). The Australian Steel Institute's guide lets a draft procedure be qualified on the welder's own test (https://www.steel.org.au/ASI/media/Australian-Steel-Institute/PDFs/Welder-qualification-journey.pdf)"}
+      - {item: "A qualified welding supervisor and inspector, a day in visits: the procedure and the fit-up of the drawbar, coupling and suspension joints before welding, then a visual inspection of every weld and a penetrant test of the joints report 02's WLD-03 names before galvanising, with signed records for the engineer", aud: 1200, basis: estimate, url: "https://au.indeed.com/career/welding-inspector/salaries/Hunter-Valley-NSW", date: 2026-11-22, note: "8 h at about AUD 150 an hour (est.). Indeed gives a welding inspector in the Hunter Valley AUD 121,900 a year, about AUD 62 an hour, and a consultancy charges about 2.4 times its staff pay (est.). The supervisor is qualified under AS/NZS 1554.1 clause 4.12.1"}
+      - {item: "Two CRC Crick 110, 120 and 130 sets of cleaner, red penetrant and developer, for Leonard's own tests of the drawbar-to-rail welds, the coupling plate, the XT crossmembers and the chain lugs before the inspector's visit", aud: 143.68, basis: listing, converted_from: "EUR 42.76 a set including VAT", url: "https://www.soldufer.com/producto/kit-soldadura-110120130-crick-ref117073160338-crc/", date: 2026-11-22, note: "No Australian listing was found"}
+    note: "Neither VSB1, AIS Notice 41, VIB 78 nor the concessional RAV entry asks for weld evidence (research report 27), so the registration alone needs none. The RAV entry's drawbar evidence is the engineer's calculation (CMP-03), and it assumes SP welds to AS/NZS 1554.1. Clause 1.7.2 of that standard, as WorkSafe WA's Mines Safety Bulletin 180 gives it, has every weld made in accordance with a qualified welding procedure, by a welder suitably qualified for it, under the supervision of a welding supervisor, and to the standard's other requirements. This line provides the procedure, the welder and the supervisor, so the engineer can accept the welds the calculation assumes. Report 02's WLD-03 asks for the penetrant tests, which Leonard runs first and the inspector repeats"
   # ================================================================ freight and consumables
   - id: CON-01
     group: freight
@@ -312,7 +314,7 @@ savings:
     name: No engineer's review
     removes: {lines: [CMP-03]}
     mass_kg: 0
-    costs: "NSW's inspection does not ask for one, but the concessional RAV entry needs ADR 62/02's drawbar evidence in hand, which is then a drawbar test at an approved facility, and the chassis and body designs stay unchecked drafts (research report 27)"
+    costs: "NSW's inspection does not ask for one. The concessional RAV entry still needs ADR 62/02's drawbar evidence in hand, which then rests on Leonard's own calculation of strength and fatigue, and if the department does not accept it as VSB1 9.1's approved calculation, a drawbar and chain-point test at an approved facility follows, about AUD 5,000 (est.). The chassis and body designs stay unchecked drafts (research report 27)"
   - id: SV-08
     name: Square front edges in place of the rounded ones
     removes: {lines: [BD-14]}

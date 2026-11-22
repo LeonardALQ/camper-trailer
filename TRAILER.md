@@ -1,6 +1,6 @@
 # Home trailer
 
-Status: concept, revision J, 21 Nov 2026. DRAFT, not for construction until the engineer reviews it. Data: `data/assemblies/trailer.yaml`, `data/load_cases.yaml`, `data/checks.yaml`, `data/services.yaml`, `data/measurements.yaml` and the parts list `data/trailer-parts.yaml`. Code: `cad/trailer.py`. CHASSIS.md and BODY.md design the frame and the shell, `docs/decisions.md` records the decisions, and research reports 19 to 22 and 25 hold the research. Positions are in mm in the project datum DIM-01: X rearward from the ball, Y positive to the road side, Z up from the ground.
+Status: concept, revision J of 21 Nov 2026, updated 22 Nov 2026 for Leonard building the trailer himself (H26), the parts that stood on nothing (H27), the floor plans and the 3D services plan (H28), and the weld evidence the engineer's calculation needs (CMP-14). DRAFT, not for construction until the engineer reviews it. Data: `data/assemblies/trailer.yaml`, `data/load_cases.yaml`, `data/checks.yaml`, `data/services.yaml`, `data/measurements.yaml` and the parts list `data/trailer-parts.yaml`. Code: `cad/trailer.py`. CHASSIS.md and BODY.md design the frame and the shell, `docs/decisions.md` records the decisions, and research reports 19 to 22 and 25 hold the research. Positions are in mm in the project datum DIM-01: X rearward from the ball, Y positive to the road side, Z up from the ground.
 
 The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a wet bathroom entered from a rear door, a recirculating shower for two 20 min showers a day, an electric kitchen with an oven, a washer and a dryer, filtered fresh air with the windows shut, blackout blinds, and power for a hot day of air-conditioning for at least 12 h, 24 h if possible.
 
@@ -16,7 +16,7 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 | Ute | Rear axle 2,646 kg with growth against its 2,800 kg plate. Combination 7,175 kg against 7,400 kg, the ute with growth plus the plate |
 | Battery | 25.6 kWh. A design hot day runs 25.1 h when new and 17.2 h at end of life |
 | Water | 420 L fresh, at most 300 L in travel, about 41 L a day. 130 L grey |
-| Cost | AUD 192,052 with contingency, built by Leonard (H26) |
+| Cost | AUD 193,492 with contingency, built by Leonard (H26) |
 
 Every fail check passes. The tightest are the fully loaded mass with growth (MAS-10, 3,397.6 kg against the 3,400 kg target), the towball share with the grey tank full (MAS-12, 8.1 % against 8.0 %), the heaviest towball (MAS-13, 316.5 kg against 320 kg) and the recovery pull in the road-side rail (CHS-08A, 0.91 of yield).
 
@@ -148,8 +148,8 @@ Each stage needs the ones before it. Each weighing, TW-01 to TW-03, takes the li
 
 | Stage | Work | Needs first | Check before moving on |
 |---|---|---|---|
-| B0 Approvals | Engineer's review, RAV entry and VIN, Leonard's welder qualification test (CMP-14), orders for the XT kit, panels, tray, windows, doors and imports | The documents and drawings | Review closed, VIN issued, Leonard qualified |
-| B1 Chassis | Cut, jig, weld, stamp the VIN | B0, steel and plate parts | Weld inspection (report 02 WLD-03), with Leonard's dye-penetrant tests of the critical joints (CMP-14) |
+| B0 Approvals | Engineer's review, RAV entry and VIN, the welding procedure and Leonard's welder qualification on one test piece, the welding supervisor and inspector engaged (CMP-14), orders for the XT kit, panels, tray, windows, doors and imports. From here on, keep every receipt for the chassis steel, the running gear, the coupling and the panels, because the Identity Approval asks for them | The documents and drawings | Review closed, VIN issued, procedure and Leonard qualified |
+| B1 Chassis | Cut, jig, weld to the qualified procedure under the supervisor's visits, stamp the VIN | B0, steel and plate parts | Leonard's own dye-penetrant tests of the critical joints, then the inspector's visual and penetrant inspection to report 02 WLD-03 with signed records (CMP-14) |
 | B2 Galvanising | Hot-dip to AS/NZS 4680, touch up | B1, vent and drain holes | Frame flat and square |
 | B3 Rolling chassis | Suspension, brakes, TSC, wheels, mud flaps, coupling, chains, breakaway kit, jockey, steadies, alignment | B2, the XT kit | TW-01 within 2 % of the model |
 | B4 Floor | Bearer strips, tanks, guards, diesel tank, air box, the floor on its 32 mounts, the shower well and the tray | B3, the floor panel with its inserts | Tray fill test, 24 h |
@@ -157,13 +157,13 @@ Each stage needs the ones before it. Each weighing, TW-01 to TW-03, takes the li
 | B6 First fix | Cables, the 230 V bulkhead, glands, water pipes, drains at 1:50, ducts and fan sleeves | B5 closed and dry | Water lines pressure tested |
 | B7 Fit-out | Battery box, board, partition, cabinetry, appliances, lift bed, split, wet room, awning, steps, blackout covers, stone guard, lamps, drawbar box and generators, spare wheel, solar | B6 | Bed locks and safety edge |
 | B8 Commissioning | Electrical test, battery capacity, airflow and pressure, tanks filled and dosed, bed heights, overall width | B7 | AS/NZS 3001.2 certificate, TW-03 to TW-05, TR-01 to TR-11 (TR-11 at most 2,490 mm, DIM-05) |
-| B9 Registration | Permit to move it, HVAIS inspection with the identity approval, plate, NSW registration | B8, the weighbridge tickets | Plate at 3,500 kg ATM |
+| B9 Registration | Permit to move it, photographs of all four sides, the drawbar, the vehicle plate and the VIN in the frame, HVAIS inspection with the Identity Approval on form 5703, plate, NSW registration | B8, the weighbridge ticket with the VIN and the tare, every receipt | Plate at 3,500 kg ATM |
 
 The insert map CT-203 must be final before the panels are ordered, because the maker lays the bed hardpoints, stiffeners and insert strips into the cores. Before then, get an extruder's quote for the wall members' die, its 100 kg minimum run and its lead time, and ask for an existing die near RHS 110 x 19 x 3.5 first (BD-18).
 
 ## Cost and where to save
 
-The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 151 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 167,196 subtotal carries AUD 24,856 (14.9 %), for AUD 192,052.
+The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 151 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 168,396 subtotal carries AUD 25,096 (14.9 %), for AUD 193,492.
 
 | Group | AUD | Group | AUD |
 |---|---|---|---|
@@ -174,18 +174,20 @@ The parts list is `data/trailer-parts.yaml` with the priced lines of the mass sc
 | HVAC and ventilation | 12,667 | Under the floor | 3,162 |
 | Wet room | 11,627 | Roof | 2,926 |
 | Bed | 8,028 | Coupling and drawbar | 1,695 |
-| Compliance and weld evidence | 7,120 | Lamps, reflectors and the number plate | 930 |
-| Subtotal | 167,196 | Spare wheel | 736 |
+| Compliance and weld evidence | 8,320 | Lamps, reflectors and the number plate | 930 |
+| Subtotal | 168,396 | Spare wheel | 736 |
 
-What the registration needs stays: the licensed electrician and the AS/NZS 3001.2 certificate (ELI-01, CMP-13), the refrigeration fitting in AC-03, the wheel alignment (ALN-01), the engineer's review (CMP-03) and the registration lines. One line is new, the weld evidence for the chassis (CMP-14, AUD 1,144). Neither VSB1, the HVAIS inspection nor the concessional RAV entry asks for a qualified welder, a weld certificate or crack tests (research report 27). The RAV entry does need the drawbar's ADR 62/02 evidence in hand, and the engineer's calculation is that evidence only for the SP welds to AS/NZS 1554.1 that CHASSIS.md specifies, which the standard has a qualified welder make. So CMP-14 pays for Leonard's welder qualification test (AUD 1,000, est.) and two dye-penetrant sets for his own tests of the joints report 02's WLD-03 names (AUD 144). A qualified welder hired for the chassis welds alone would cost about AUD 3,100 to 3,400 (28 h at AUD 110 to 120 an hour, est.). Leonard's own time, about 333 h (est.), is outside the figures.
+What the registration needs stays: the licensed electrician and the AS/NZS 3001.2 certificate (ELI-01, CMP-13), the refrigeration fitting in AC-03, the wheel alignment (ALN-01), the engineer's review (CMP-03) and the registration lines. The registration itself also needs papers. A concessional trailer never registered in NSW needs TfNSW's Identity Approval before the examiner can pass it (VIB 78 rule 221.04), and its application, form 5703, is rejected without clear photographs of all four sides and the drawbar, of the vehicle plate and of the VIN stamped in the frame, the weighbridge ticket, and receipts proving the origin of the materials (CMP-04). So keep every receipt for the chassis steel, the running gear, the coupling and the panels from stage B0, and photograph the trailer as AIS Notice 41 and VIB 78 ask.
+
+One line is new, the weld evidence for the chassis (CMP-14, AUD 2,344). Neither VSB1, AIS Notice 41, VIB 78 nor the concessional RAV entry asks for weld evidence (research report 27). The RAV entry does need the drawbar's ADR 62/02 evidence in hand, and that evidence is the engineer's calculation, which assumes SP welds to AS/NZS 1554.1 as CHASSIS.md specifies. Clause 1.7.2 of the standard, as WorkSafe WA's [Mines Safety Bulletin 180](https://www.worksafe.wa.gov.au/system/files/documents/2025-03/MSH_SB_180.pdf) gives it, says a weld shall "be made in accordance with a qualified welding procedure", "be carried out by a welder suitably qualified to carry out such a procedure", "be carried out under the supervision of a welding supervisor" and "comply with the appropriate requirements of this Standard". CMP-14 is the cheapest way to the procedure, the welder and the supervisor. One test piece, welded by Leonard and examined by a test house, qualifies both the procedure and Leonard (AUD 1,000, est.). A qualified welding supervisor and inspector spends a day in visits on the procedure, the fit-up and the finished welds, with the penetrant test of the joints report 02's WLD-03 names (AUD 1,200, est.). Two dye-penetrant sets let Leonard test those joints himself first (AUD 144). A qualified welder hired for the chassis welds alone would cost about AUD 3,100 to 3,400 (28 h at AUD 110 to 120 an hour, est.) and would still need the procedure and the supervisor. Leonard's own time, about 333 h (est.), is outside the figures.
 
 The ten largest savings, with their contingency, their share of the total and what each costs the requirements. The site's parts list works out all thirteen from the lines. Some share lines, so they do not add up.
 
 1. Two self-built EVE MB31 packs in place of the Victron modules: AUD 6,113 (3.2 %). More capacity, but no AS IEC 62619 test, so the electrician may refuse the certificate, and the cell terminals loosen on corrugations.
 2. A plain low-flow shower: AUD 5,779 (3.0 %). Two 20 min showers then use about 240 L a day.
 3. A fixed bed at night height: AUD 5,450 (2.8 %). The desk loses its place under the bed, so H1 fails.
-4. A 230 V water heater and the heat pump in place of the Combi: AUD 5,308 (2.8 %). No heat or hot water without the battery.
-5. No engineer's review: AUD 5,280 (2.8 %). The inspection does not ask for one, but the RAV entry then needs a drawbar test at an approved facility, and the designs stay unchecked.
+4. A 230 V water heater and the heat pump in place of the Combi: AUD 5,308 (2.7 %). No heat or hot water without the battery.
+5. No engineer's review: AUD 5,280 (2.7 %). The inspection does not ask for one. The RAV entry's drawbar evidence then rests on Leonard's own calculation, and if the department does not accept it, on a drawbar and chain-point test at an approved facility, about AUD 5,000 (est.). The designs stay unchecked.
 6. Square front edges: AUD 4,200 (2.2 %). About 3.7 L/100 km more towing, about AUD 1,550 a year.
 7. No generators: AUD 4,085 (2.1 %). Cloud with no drive then needs shore power.
 8. No freezer: AUD 2,455 (1.3 %). Frozen food fits only the fridge's 8.2 L compartment.
@@ -215,14 +217,14 @@ Each is in full in `docs/decisions.md`.
 
 ## Open points and the assumption used
 
-1. Storage is about 0.2 m³ short (est.). Assumption: the footprint stays empty (H16). Question for Leonard: two 500 x 600 x 700 mm cabinets under the bed beside the desk would add 0.42 m³ and about 20 kg, and break his rule that the rest of that area stays empty.
-2. Estimate lines carry 905 kg, 34.4 % of the tare, and estimates set 46.2 % of the price subtotal. Assumption: the growth allowance covers the masses until TW-01 to TW-03 replace them, and the 20 % contingency covers the prices. A towball reading more than 10 % off the model means the centre of gravity estimates are wrong (UTE-03).
+1. Storage is about 0.2 m³ short (est.). Two 500 x 600 x 700 mm cabinets under the bed beside the desk would add 0.42 m³ and about 20 kg, and break Leonard's rule that the rest of that area stays empty. Assumption: the footprint stays empty (H16).
+2. Estimate lines carry 905 kg, 34.4 % of the tare, and estimates set 46.6 % of the price subtotal. MAS-10 has 2.4 kg of margin, 3,397.6 kg against 3,400 kg, and only 2.0 kg of BD-11's 53.6 kg is not yet given to a part, so the next part that is in no line takes travel water off by H21. Assumption: the growth allowance covers the masses until TW-01 to TW-03 replace them, and the 20 % contingency covers the prices. A towball reading more than 10 % off the model means the centre of gravity estimates are wrong (UTE-03).
 3. Assumption: Lovells' 7,400 kg GCM is certified in the ute's LC5 inspection. If not, plate at or below 3,225 kg and tow with at most 127 L (H20).
 4. Assumption: the isolators and the line set keep the split working on corrugations, without a maker's warranty. The fallback is a rooftop unit with a sixth battery module.
 5. The Dometic fridge, freezer, hob and sink carry converted European prices, and the oven, washer, panels and lamps are estimates. Assumption: these prices stand, with their contingency, until an Australian stockist or a quote replaces them.
-6. Assumption: the engineer accepts calculation as VSB1's evidence for the drawbar and chain tests at 3,500 kg (CHASSIS.md).
-7. Assumption: no anti-roll bar is fitted, and the 1,655 mm track (H22) meets the 0.40 g target without one. Question for Cruisemaster: the rate of its optional XT anti-roll bar and whether it clears the fresh tanks in the XT bays, as more margin if TR-01's measured centre of gravity comes out higher than the estimate.
+6. VSB1 9.1 accepts a drawbar test or approved calculations, and approved calculations are those the department approves. Assumption: the department accepts the engineer's calculation, which covers strength and fatigue, as VSB1 9.1's approved calculation for the concessional entry at 3,500 kg (CHASSIS.md). If it does not, the drawbar and chain points are tested at an approved facility to VSB1 chapter 14, about AUD 5,000 (est.), outside the total.
+7. No anti-roll bar is fitted, because the 1,655 mm track (H22) meets the 0.40 g target without one. Cruisemaster's optional XT anti-roll bar is the margin if TR-01's measured centre of gravity comes out higher than the estimate, and Cruisemaster publishes no rate for it. Assumption: it fits the XT build and clears the fresh tanks in the XT bays.
 8. Fiamma publishes no length for the F80s 400's leg, 98667-04, the same part as on the F80L. Assumption: it reaches 2,686 mm like the 320's leg, which ships in the same carton. If it is shorter, the canopy falls more steeply on the same ground (BDY-23).
 9. No published force coefficient fits a box-shaped trailer on its wheels. Assumption: ASCE 7-16's 1.6 for a solid sign of these proportions, the high side, for STB-04's rule. A box's 1.05 would put the overturning speeds about a quarter higher.
-10. RADCO's listing #1349, Table 1, names stabilizer "No 59285" as the M607's minimum device, while Tie Down's anchor chart and plate sheet (manual pp. 5 and 9) give the 59286, 17-1/2 x 13-1/2 in, for the 59099, and the kit takes the 59286. Assumption: the 59286 is the listing's device under its catalogue number. Action: Tie Down's written confirmation before the plates are bought (STB-05).
+10. RADCO's listing #1349, Table 1, names stabilizer "No 59285" as the M607's minimum device, while Tie Down's anchor chart and plate sheet (manual pp. 5 and 9) give the 59286, 17-1/2 x 13-1/2 in, for the 59099, and the kit takes the 59286. Assumption: the 59286 is the listing's device under its catalogue number, as Tie Down's own chart pairs it with the 59099 (STB-05).
 11. The floor glands at the partition's road end, G11, G15, G10 and G14, sit in the corner chase between the landing and the bench with almost no floor between them: 16 mm between G11 and G15, 4 mm between G15 and G10, and G10 touching G14. The road gap beside the fresh tanks is the only way under the floor there, so the holes line up along it. Assumption: the floor maker lays a high-density insert under the four holes, and the next services pass spreads them along the chase with at least 25 mm of floor between holes before the floor panel is ordered.
