@@ -6,7 +6,7 @@ chase behind the plinth, the under-floor runs along the rails and the glands of 
 three expressions over the layout's parameters, the envelope boxes (EL_04.x0 for line EL-04's box) and the ways'
 constants, and "." repeats the previous point's value. resolve() turns the runs into filleted centrelines at the
 cable's or pipe's minimum bend radius, sizes every DC circuit by its current and its voltage drop at the routed length
-(report 20's 2 % limit), and adds up the lengths, masses and prices. checks() measures SVC-01 to SVC-09.
+(report 20's 2 % limit), and adds up the lengths, masses and prices. checks() measures SVC-01 to SVC-12.
 """
 from __future__ import annotations
 
@@ -38,6 +38,14 @@ def key(iid: str) -> str:
     return re.sub(r"[^A-Za-z0-9]", "_", iid)
 
 
+def cell_half(c) -> tuple:
+    """A transit frame's cell [dx, dy, m] or [dx, dy, m, n, axis]: n modules of m side by side along the frame's X or
+    Y (a pair's two cores, each in its own module). Its half-widths in X and Y."""
+    m, n = c[2], (c[3] if len(c) > 3 else 1)
+    along_x = len(c) > 4 and str(c[4]).lower() == "x"
+    return (n * m / 2, m / 2) if along_x else (m / 2, n * m / 2)
+
+
 def load() -> dict:
     return yaml.safe_load(ROUTES.read_text(encoding="utf-8"))
 
@@ -60,8 +68,10 @@ def namespace(V: dict, blocks: list, data: dict, glands: dict | None = None) -> 
         hx, hy = g.get("w", g["d"]) / 2, g.get("h", g["d"]) / 2
         ns[gid] = B((x - hx, y - hy, z - hy, x + hx, y + hy, z + hy)) if g["at"] in ("floor", "roof") else \
             B((x - g["d"] / 2, y - g["d"] / 2, z - g["d"] / 2, x + g["d"] / 2, y + g["d"] / 2, z + g["d"] / 2))
-        for rid, (dx, dy, m) in (g.get("cells") or {}).items():   # a transit frame's module for each run, by its centre
-            ns[f"{gid}_{key(rid)}"] = B((x + dx - m / 2, y + dy - m / 2, z - m / 2, x + dx + m / 2, y + dy + m / 2, z + m / 2))
+        for rid, c in (g.get("cells") or {}).items():   # a transit frame's module for each run, by its centre
+            hx, hy = cell_half(c)                       # a pair's two cores lie in two modules side by side
+            dx, dy, m = c[:3]
+            ns[f"{gid}_{key(rid)}"] = B((x + dx - hx, y + dy - hy, z - m / 2, x + dx + hx, y + dy + hy, z + m / 2))
     for k, v in (data.get("consts") or {}).items():
         ns[k] = _eval(v, ns)
     for f in data.get("fixtures") or []:
@@ -377,9 +387,10 @@ def _label(kind: dict, size) -> str:
     return kind["what"].format(size=f"{size:g}" if isinstance(size, (int, float)) else size)
 
 
-def size_dc(run: dict, length_m: float, kind: dict, limit_pct: float) -> tuple:
+def size_dc(run: dict, length_m: float, kind: dict, limit_pct: float, least: float | None = None) -> tuple:
     """The smallest size of the run's kind whose drop at the design current over the routed length stays within the
-    limit and whose rating carries the current. A run that fixes its size keeps it, and the drop is reported."""
+    limit and whose rating carries the current, and at least `least`, the size SVC-10's rating where the run lies asks
+    for. A run that fixes its size keeps it, and the drop is reported."""
     amps, volts = run["amps"], run["volts"]
     lim = limit_pct / 100 * volts
     up = upstream_v(run)
@@ -388,10 +399,12 @@ def size_dc(run: dict, length_m: float, kind: dict, limit_pct: float) -> tuple:
     for s in ([fixed] if fixed is not None else order):
         k = kind["sizes"][s]
         vd = k["mv_am"] * amps * length_m / 1000 + up
-        if fixed is not None or (vd <= lim and amps <= k["amps"]):
+        if fixed is not None or (vd <= lim and amps <= k["amps"] and s >= (least or 0.0) - 1e-9):
             smaller = [x for x in order if x < s]
             if fixed is not None:
                 why = run.get("size_why") or "Report 20's size"
+            elif least and s <= least + 1e-9 and smaller:
+                why = f"{smaller[-1]:g} mm2 is rated under its current or its fuse where it lies (SVC-10)"
             elif smaller:
                 p = smaller[-1]
                 kp = kind["sizes"][p]
@@ -415,9 +428,24 @@ def upstream_v(run: dict) -> float:
 
 # ------------------------------------------------------------------ the layout's boxes and the glands
 def _blocks_of(lay) -> tuple[dict, list]:
-    """The parameters and the envelope blocks of a Layout (cad/trailer.py), as plain dicts."""
+    """The parameters and the envelope blocks of a Layout (cad/trailer.py), as plain dicts. A chassis fitting with more
+    than one position has no box of its own, so each of its positions is a block (cad/chassis.py fitting_boxes): each
+    D-ring, and each corner steady over the box its leg sweeps from folded for travel to standing at 90 degrees."""
     bl = [dict(iid=b.iid, id=b.id, name=b.name, system=b.system, box=b.box, hollow=b.hollow, keep_clear=b.keep_clear)
           for b in lay.blocks if b.box is not None]
+    ch = getattr(lay, "chassis", None)
+    for b in lay.blocks:
+        f = b.extra.get("fitting") if b.box is None else None
+        if f is None or ch is None:
+            continue
+        spec = next(d for d in ch.data["fittings"] if d["id"] == f.id)
+        if spec.get("poses") == "steadies":
+            boxes = [(f"{b.name.split(',')[0]} {k}, folded to standing", p["sweep"]) for k, p in enumerate(ch.steady_poses(), 1)]
+        else:
+            from .chassis import fitting_boxes
+            boxes = [(f"{b.name.split(',')[0]} {k}", bx) for k, bx in enumerate(fitting_boxes(ch, f), 1)]
+        bl += [dict(iid=f"{b.iid} #{k}", id=b.id, name=name, system=b.system, box=tuple(bx), hollow=False, keep_clear=False)
+               for k, (name, bx) in enumerate(boxes, 1)]
     return dict(lay.V), bl
 
 
@@ -508,9 +536,10 @@ def resolve(lay=None, V: dict | None = None, blocks: list | None = None) -> dict
     members = way_members(data)
     pitch = {w: 0.0 for w in members}
     bend = {}   # a nesting way's lanes turn in one plane side by side, so each bends at the way's largest radius
-    for _ in range(8):
+    least = {}  # a sized run's least size from SVC-10, where its rating where it lies is under its current or its device
+    for _ in range(16):
         bundles = {w: dict(way=v, n=len(members[w]), pitch=pitch[w]) for w, v in data["ways"].items() if isinstance(v, dict) and v.get("path")}
-        runs = [_resolve_run(r, ns, K, data["rules"], fixtures, pitch, bundles, bend.get(r["id"], 0.0)) for r in data["runs"]]
+        runs = [_resolve_run(r, ns, K, data["rules"], fixtures, pitch, bundles, bend.get(r["id"], 0.0), least.get(r["id"])) for r in data["runs"]]
         own = {r["id"]: r["bend_r"] for r in runs}
         nest = {w: ids for w, ids in members.items() if isinstance(data["ways"][w], dict) and data["ways"][w].get("nest")}
         way_r = {w: max((own[i] for i in ids), default=0.0) for w, ids in nest.items()}
@@ -518,17 +547,38 @@ def resolve(lay=None, V: dict | None = None, blocks: list | None = None) -> dict
         od = {r["id"]: r["od"] for r in runs}
         new = {w: max(float(math.ceil(max((od[i] for i in ids), default=0.0) - 1e-6)), _min_pitch(data["ways"][w]))
                for w, ids in members.items()}
-        if new == pitch and new_bend == bend:
+        grow = _rating_sizes(dict(runs=runs, data=data, blocks=blocks, ns=ns, svc=svc, V=V, glands=glands,
+                                  ways={w: dict(runs=ids) for w, ids in members.items()}), K)
+        if new == pitch and new_bend == bend and not grow:
             break
         pitch, bend = new, new_bend
+        least.update(grow)
     ways = {w: dict(what=_way_what(data["ways"][w]), runs=ids, pitch_mm=pitch[w], bundle=w in bundles) for w, ids in members.items()}
     return dict(runs=runs, data=data, kinds=K, V=V, blocks=blocks, glands=glands, fixtures=fixtures, svc=svc, ns=ns, bars=bars,
                 ways=ways)
 
 
-def _resolve_run(r: dict, ns: dict, K: dict, rule: dict, fixtures: dict, pitch: dict, bundles: dict, way_bend: float = 0.0) -> dict:
+def _rating_sizes(res: dict, K: dict) -> dict:
+    """The next size up for each run that sizes itself (no `size` of its own) and whose SVC-10 rating where it lies is
+    under its design current or its device, so resolve() sizes it again."""
+    out = {}
+    runs = {r["id"]: r for r in res["runs"]}
+    fixed = {x["id"] for x in res["data"]["runs"] if x.get("size") is not None}
+    for row in ratings(res)["rows"]:
+        r = runs[row["run"]]
+        if row["spare"] >= -1e-6 or r["id"] in fixed:
+            continue
+        bigger = sorted(s for s in K[r["kind"]]["sizes"] if s is not None and s > r["size"] + 1e-9)
+        if bigger:
+            out[r["id"]] = bigger[0]
+    return out
+
+
+def _resolve_run(r: dict, ns: dict, K: dict, rule: dict, fixtures: dict, pitch: dict, bundles: dict, way_bend: float = 0.0,
+                 least: float | None = None) -> dict:
     """One run on the layout, with its lane offset in each way it shares. A run in a way bends at the way's largest
-    radius (`way_bend`), or its own if larger, so the lanes' bends are concentric enough to keep their pitch."""
+    radius (`way_bend`), or its own if larger, so the lanes' bends are concentric enough to keep their pitch. `least`
+    is the size SVC-10 asks for where the run lies."""
     kind = K[r["kind"]]
     for w, p in pitch.items():
         ns[f"L_{w}"] = lane_of(r, w) * p
@@ -539,7 +589,7 @@ def _resolve_run(r: dict, ns: dict, K: dict, rule: dict, fixtures: dict, pitch: 
     row = dict(r, points=pts, kind_what=kind["what"], group=kind.get("group", r["system"]))
     conductor = any(v["mv_am"] is not None for v in kind["sizes"].values())
     if r.get("amps") is not None and r.get("volts") is not None and conductor:
-        size, vd, why = size_dc(r, raw, kind, rule["drop_pct"] if r["system"] != "ac230" else rule["drop_ac_pct"])
+        size, vd, why = size_dc(r, raw, kind, rule["drop_pct"] if r["system"] != "ac230" else rule["drop_ac_pct"], least)
     else:
         size = float(r["size"]) if r.get("size") is not None else next(iter(kind["sizes"]))
         vd, why = None, r.get("size_why")
@@ -686,7 +736,7 @@ def _bar_gap(segs: list, c: dict, step: float = 15.0) -> float:
     return best
 
 
-# ------------------------------------------------------------------ the checks, SVC-01 to SVC-09
+# ------------------------------------------------------------------ the checks, SVC-01 to SVC-12
 PANELS = ("BD-01", "BD-02", "BD-03", "BD-04")
 
 
@@ -881,9 +931,211 @@ def terminal_face(res: dict) -> dict:
             problems.append(f"{run['id']} ({run['feeds'][:40]}) is {d:.0f} mm from the terminal face")
         if exempt and not run.get("sleeve"):
             problems.append(f"{run['id']} is exempt only in its dielectric sleeve, and has none")
+    cone = drip_cone(res)
+    problems += cone["problems"]
     rows.sort(key=lambda r: r["mm"])
     return dict(ok=not problems, problems=problems, near=rows, limit=tf["mm"], exempt=tf["exempt"],
-                smallest=min((r["mm"] for r in rows if not r["sleeved"]), default=None))
+                smallest=min((r["mm"] for r in rows if not r["sleeved"]), default=None), cone=cone)
+
+
+def drip_cone(res: dict) -> dict:
+    """SVC-04's drip cone (I2-18 c): no water, waste or diesel line over the terminal face inside a cone that widens by
+    the rule's ratio as it rises (the trailer parked off level), but where the drip tray lies between the line and the
+    face, and the tray covers the cone where it lies, so it catches every drip that would reach the face. The sleeved
+    hoses keep their exemption. Each line's depth into the cone is reported."""
+    tf = res["data"]["rules"]["terminal_face"]
+    b = res["ns"][key(tf["line"])]
+    k = float(tf["cone"])
+    tray = tf.get("tray")
+    tz = _eval(tray["z"], res["ns"]) if tray else None
+    tb = tuple(_eval(v, res["ns"]) for v in tray["box"]) if tray else None
+    problems, rows = [], []
+    if tray:
+        spread = (tz - b.z1) * k   # the cone's reach past the face's edges where the tray lies
+        short = max(tb[0] - (b.x0 - spread), tb[1] - (b.y0 - spread), (b.x1 + spread) - tb[2], (b.y1 + spread) - tb[3])
+        if short > 1e-6:
+            problems.append(f"the drip tray {tray['line']} falls {short:.0f} mm short of the cone where it lies")
+    for run in res["runs"]:
+        if run["system"] not in WETS or run["id"] in tf["exempt"]:
+            continue
+        r = run["od"] / 2
+        worst, bare = None, None   # the deepest point in the cone, and the deepest one the tray does not cover from above
+        for p in run["dense"]:
+            h = p[2] - r - b.z1
+            if h <= 0:
+                continue
+            reach = h * k + r
+            depth = min(p[0] - (b.x0 - reach), (b.x1 + reach) - p[0], p[1] - (b.y0 - reach), (b.y1 + reach) - p[1])
+            if depth <= 0:
+                continue
+            if worst is None or depth > worst[0]:
+                worst = (depth, p)
+            if (tray is None or p[2] - r <= tz) and (bare is None or depth > bare[0]):
+                bare = (depth, p)
+        if worst is None:
+            continue
+        rows.append(dict(run=run["id"], depth=round(worst[0]), at=[round(v) for v in worst[1]], caught=bare is None))
+        if bare is not None:
+            problems.append(f"{run['id']} ({run['feeds'][:40]}) is {bare[0]:.0f} mm inside the drip cone over the terminal face at "
+                            f"X {bare[1][0]:.0f} Y {bare[1][1]:.0f} Z {bare[1][2]:.0f}")
+    return dict(ok=not problems, problems=problems, rows=sorted(rows, key=lambda r: -r["depth"]), ratio=k, tray=tray and tray["line"])
+
+
+def _samples(dense: list, step: float = 25.0) -> list[tuple]:
+    """Points along a polyline at most `step` apart, each with its distance along it."""
+    out, s = [(tuple(dense[0]), 0.0)], 0.0
+    for a, b in zip(dense, dense[1:]):
+        ln = math.dist(a, b)
+        n = max(1, int(math.ceil(ln / step)))
+        for k in range(1, n + 1):
+            t = k / n
+            out.append(((a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t), s + ln * t))
+        s += ln
+    return out
+
+
+def supports(res: dict) -> dict:
+    """SVC-12 (I2-18 a): no cable lies unsupported over more than VSB1 7.1's 600 mm. A point is held inside a chassis
+    member the run is threaded through, within the clip's reach of a part in its `along` or of a support fixture
+    (`support: true`, the cleats, trays and saddles the design adds), inside a cabinet's carcass (clipped to its panels),
+    the board cabinet, a 230 V conduit, a box it ends at or a part it passes through, a gland or a frame, or beside a held
+    cable of a way it shares. The longest stretch between held points is each run's unsupported span."""
+    rule = res["data"]["rules"]["supports"]
+    clip, top = float(rule["clip_mm"]), float(rule["max_mm"])
+    ns, V = res["ns"], res["V"]
+    by_id = defaultdict(list)
+    for b in res["blocks"]:
+        if b.get("box"):
+            by_id[b["id"]].append(b["box"])
+            by_id[b["iid"]].append(b["box"])
+    for k, f in res["fixtures"].items():
+        by_id[k].append(f["box"])
+    bars = defaultdict(list)
+    for c in res.get("bars", []):
+        bars[c["id"]].append(c)
+        bars[c["iid"]].append(c)
+    board = ns[key(res["data"]["rules"]["board"])].box
+    zones = [tuple(_eval(v, ns) for v in z["box"]) for z in res["data"]["rules"].get("conduit", [])]
+    gl = res["glands"]
+    panels = [b["box"] for b in res["blocks"] if b.get("box") and b["id"] in PANELS]
+    carcasses = [b["box"] for b in res["blocks"] if b.get("box") and b.get("hollow")]
+    holders = [f["box"] for f in res["fixtures"].values() if f.get("support")]
+    held, pts = {}, {}
+    cables = [r for r in res["runs"] if r["system"] in ELECTRICAL]
+    for r in cables:
+        rad = r["od"] / 2
+        inside = [bx for m in _ids(r, "inside") for bx in by_id.get(m, [])]
+        along = [bx for m in _ids(r, "along") for bx in by_id.get(m, [])]
+        along_bars = [c for m in _ids(r, "along") for c in bars.get(m, [])]
+        ends = [bx for e in _end_lines(r) | _ids(r, "passes") for bx in by_id.get(e, [])]
+        glands = [gl[g] for g in _ids(r, "glands") if g in gl]
+        sm = _samples(r["dense"])
+        pts[r["id"]] = sm
+        h = []
+        for p, _ in sm:
+            ok = (any(_in_box(p, bx, 0.5) for bx in inside) or any(_pt_box(p, bx) - rad <= clip for bx in along)
+                  or any(_bar_gap([(p, p)], c) - rad <= clip for c in along_bars)
+                  or _in_box(p, board, 0.0) or any(_in_box(p, bx, 1.0) for bx in ends)
+                  or any(_pt_box(p, bx) - rad <= clip for bx in carcasses + holders)
+                  or (r["system"] == "ac230" and (p[2] <= V["floor_z"] + 1 or any(_in_box(p, z, 0.0) for z in zones)))
+                  or any(any(_in_box(p, pb, 1.0) for pb in panels) and math.dist(p[:2] if g["at"] in ("floor", "roof") else p, g["p"][:2] if g["at"] in ("floor", "roof") else g["p"])
+                         <= max(g.get("w", g["d"]), g.get("h", g["d"])) for g in glands))
+            h.append(ok)
+        held[r["id"]] = h
+    for _ in range(3):   # a way's lanes share their clips: a cable beside a held cable of its way is held there too
+        for w, v in (res.get("ways") or {}).items():
+            ids = [i for i in v["runs"] if i in held]
+            for i in ids:
+                ri = next(x for x in cables if x["id"] == i)
+                for k, (p, _) in enumerate(pts[i]):
+                    if held[i][k]:
+                        continue
+                    for j in ids:
+                        if j == i:
+                            continue
+                        rj = next(x for x in cables if x["id"] == j)
+                        if any(held[j][m] and math.dist(p, q) - ri["od"] / 2 - rj["od"] / 2 <= clip for m, (q, _) in enumerate(pts[j])
+                               if abs(q[0] - p[0]) < 80 and abs(q[1] - p[1]) < 80 and abs(q[2] - p[2]) < 80):
+                            held[i][k] = True
+                            break
+    problems, rows = [], []
+    for r in cables:
+        sm, h = pts[r["id"]], held[r["id"]]
+        last, worst = 0.0, (0.0, None)
+        for (p, s), ok in zip(sm, h):
+            if ok:
+                if s - last > worst[0]:
+                    worst = (s - last, p)
+                last = s
+        if sm[-1][1] - last > worst[0]:
+            worst = (sm[-1][1] - last, sm[-1][0])
+        rows.append(dict(run=r["id"], span=round(worst[0]), at=worst[1] and [round(v) for v in worst[1]]))
+        if worst[0] > top + 1e-6:
+            problems.append(f"{r['id']} lies {worst[0]:.0f} mm unsupported up to X {worst[1][0]:.0f} Y {worst[1][1]:.0f} Z {worst[1][2]:.0f}, {top:g} mm at most")
+    rows.sort(key=lambda x: -x["span"])
+    return dict(ok=not problems, problems=problems, rows=rows, longest=rows[0]["span"] if rows else None,
+                governing=rows[0]["run"] if rows else None, limit=top, margin=round(top - rows[0]["span"], 1) if rows else None)
+
+
+def heat(res: dict) -> dict:
+    """SVC-11 (I2-18 d): every cable keeps its band's distance from each hot line (rules.heat.lines) everywhere, under
+    the floor too, and every run of the kinds a hot surface names keeps its distance from it (the Combi's exhaust behind
+    it, the floor under its hot base, the oven's case), but the runs that end there. Inside a transit frame both pass,
+    each line is in its own module, so that stretch is not measured."""
+    rule = res["data"]["rules"]["heat"]
+    ns = res["ns"]
+    runs = {r["id"]: r for r in res["runs"]}
+    floor_z = res["V"]["floor_z"]
+    frames = {g: (v["p"][0] - v["w"] / 2, v["p"][1] - v["h"] / 2, floor_z - FRAME_DEPTH, v["p"][0] + v["w"] / 2, v["p"][1] + v["h"] / 2, floor_z)
+              for g, v in res["glands"].items() if v.get("cells")}
+    problems, rows = [], []
+    for hid in rule["lines"]:
+        h = runs[hid]
+        hs = _seg_list(h, h["od"] / 2)
+        hb = _aabb(h["dense"], h["od"] / 2 + max(rule["line_mm"].values()))
+        for c in res["runs"]:
+            if not band(c) or not _hit(hb, _aabb(c["dense"], c["od"] / 2)):
+                continue
+            need = float(rule["line_mm"][band(c)])
+            common = [frames[g] for g in _ids(h, "glands") & _ids(c, "glands") if g in frames]
+            inside = lambda p, q: any(_in_box(p, f, 1.0) and _in_box(q, f, 1.0) for f in common)  # noqa: E731
+            m, at = math.inf, None
+            for p1, q1, b1 in hs:
+                if inside(p1, q1):
+                    continue
+                for p2, q2, b2 in _seg_list(c, c["od"] / 2):
+                    if _hit(_aabb([b1[:3], b1[3:]], need), b2) and not inside(p2, q2):
+                        d = seg_seg(p1, q1, p2, q2) - h["od"] / 2 - c["od"] / 2
+                        if d < m:
+                            m, at = d, p1
+            if at is None:
+                continue
+            rows.append(dict(a=hid, b=c["id"], gap=round(m, 1), need=need))
+            if m < need - 0.05:
+                problems.append(f"{c['id']} passes {m:.0f} mm from the hot line {hid} at X {at[0]:.0f} Y {at[1]:.0f} Z {at[2]:.0f}, {need:g} mm needed")
+    for s in rule["surfaces"]:
+        box = tuple(_eval(v, ns) for v in s["box"])
+        test = set(s["test"])
+        for r in res["runs"]:
+            kind = "cable" if band(r) else ("diesel" if r["system"] == "diesel" else ("wet" if r["system"] in WETS else None))
+            if kind not in test or _ids(r, "ends") & set(s.get("ends") or []) or _end_lines(r) & set(s.get("ends") or []):
+                continue
+            if not _hit(_aabb(r["dense"], r["od"] / 2 + s["mm"]), box):
+                continue
+            within = tuple(_eval(v, ns) for v in s["within"]) if s.get("within") else None
+            segs = [(a, b_) for a, b_ in _segs(r["dense"]) if within is None or _in_box(tuple((a[i] + b_[i]) / 2 for i in range(3)), within, 0.0)]
+            if not segs:
+                continue
+            d, p = min((seg_box(a, b_, box) for a, b_ in segs), key=lambda x: x[0])
+            d -= r["od"] / 2
+            rows.append(dict(a=s["what"][:40], b=r["id"], gap=round(d, 1), need=float(s["mm"])))
+            if d < s["mm"] - 0.05:
+                problems.append(f"{r['id']} {'enters' if d < 0 else 'passes'} {s['what']} {abs(d):.0f} mm "
+                                f"{'deep' if d < 0 else 'clear'} at X {p[0]:.0f} Y {p[1]:.0f} Z {p[2]:.0f}, {s['mm']:g} mm needed")
+    tight = sorted(rows, key=lambda r: r["gap"] - r["need"])
+    return dict(ok=not problems, problems=problems, closest=tight[:10],
+                margin=round(tight[0]["gap"] - tight[0]["need"], 1) if tight else None,
+                governing=f"{tight[0]['b']} to {tight[0]['a']}" if tight else None)
 
 
 def coverage(res: dict) -> dict:
@@ -1240,6 +1492,220 @@ def glands(res: dict) -> dict:
                 governing=f"{tight[0]['a']} to {tight[0]['b']}" if tight else None, limit=fits["spanner_mm"])
 
 
+def _lerp(x: float, xs: list, ys: list) -> float:
+    """ys over xs (rising) at x, straight between the points and held at the ends."""
+    pts = [(float(a), float(b)) for a, b in zip(xs, ys) if b is not None]
+    if x > pts[-1][0] + 1e-9 and len(pts) < len(xs):
+        raise ValueError(f"no rating at {x:g} mm2 for this method")
+    if x <= pts[0][0]:
+        return pts[0][1]
+    for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
+        if x <= x1:
+            return y0 + (x - x0) / (x1 - x0) * (y1 - y0)
+    return pts[-1][1]
+
+
+def _table_amps(table: dict, mm2: float) -> float:
+    """A cable table's rating at a size, by conductor area between its sizes."""
+    xs = sorted(float(k) for k in table)
+    return _lerp(mm2, xs, [table[k] for k in sorted(table, key=float)])
+
+
+def method_factor(rt: dict, method: str, mm2: float) -> float:
+    """AS/NZS 3008.1.1's rating for an installation method over its rating in free air, at the cable's size (Prysmian's
+    table for two single cores, data/routes.yaml rules.ratings.methods)."""
+    m = rt["methods"]
+    return _lerp(mm2, m["sizes"], m[method]) / _lerp(mm2, m["sizes"], m["free"])
+
+
+def ambient_factor(rt: dict, band_: str, t: float) -> float:
+    """The ambient factor at t C: Tycab's table for the DC cables (from 30 C), AS/NZS 3008.1.1's for the 230 V (from 40 C)."""
+    if band_ == "ac230":
+        c = rt["ac"]["conductor_c"]
+        return math.sqrt((c - t) / (c - 40.0))
+    tab = rt["dc"]["ambient"]
+    return _lerp(t, sorted(tab), [tab[k] for k in sorted(tab)])
+
+
+def free_air_amps(rt: dict, run: dict, t: float) -> float | None:
+    """A cable's rating in free air at t C: Tycab's single core times its pair factor for the DC cables, Prysmian's 2C+E
+    unenclosed spaced for the 230 V cables and cords."""
+    if run["system"] == "ac230":
+        return _table_amps(rt["ac"]["amps"], run["size"]) * ambient_factor(rt, "ac230", t)
+    if run["system"] in ("dc48", "dc24", "dc12", "pv"):
+        return _table_amps(rt["dc"]["amps"], run["size"]) * rt["dc"]["pair"] * ambient_factor(rt, "dc", t)
+    return None
+
+
+def rating_zone(p, run: dict, ctx: dict) -> str:
+    """The zone a point of a run lies in (data/routes.yaml rules.ratings), for its method and the air round it."""
+    V = ctx["V"]
+    if any(_in_box(p, b, 0.0) for b in ctx["inside"].get(run["id"], [])):
+        return "member"
+    if any(_in_box(p, b, 0.0) for b in ctx["cores"]):
+        return "core"
+    if ctx["floor"] is not None and _in_box(p, ctx["floor"], 0.0):
+        return "frame" if any(_in_box(p, f, 0.0) for f in ctx["frames"]) else "floor"
+    if p[2] < V["floor_underside_z"]:
+        return "drawbar" if p[0] < V["body_x0"] else "under"
+    if p[0] < V["body_x0"] or p[0] > V["body_x1"] or abs(p[1]) > V["half_bw"] or p[2] > V["roof_top_z"]:
+        return "outside"
+    for name in ("board", "battery"):
+        if ctx[name] is not None and _in_box(p, ctx[name], 0.0):
+            return name
+    if run["system"] == "ac230" and any(_in_box(p, z, 0.0) for z in ctx["conduit"]):
+        return "conduit"
+    return "ceiling" if p[2] >= V["ceiling_z"] - ctx["covers"] else "cabin"
+
+
+def stretches(run: dict, ctx: dict) -> list[dict]:
+    """A run cut where its zone changes: each stretch's zone, method, air and length."""
+    rt, out = ctx["rt"], []
+    for a, b in _segs(run["dense"]):
+        z = rating_zone(tuple((a[k] + b[k]) / 2 for k in range(3)), run, ctx)
+        if out and out[-1]["zone"] == z:
+            out[-1]["mm"] += math.dist(a, b)
+        else:
+            out.append(dict(zone=z, mm=math.dist(a, b), at=a))
+    for s in out:
+        zd = rt["zones"][s["zone"]]
+        s["method"] = zd.get(run["system"], zd["method"])
+        s["crossing"] = s["zone"] in ("core", "floor", "frame") and s["mm"] <= rt["core_max_mm"]
+        s["short"] = 1.0
+        if s["zone"] in ("core", "floor") and not s["crossing"]:
+            s["method"] = "surrounded"
+        elif s["zone"] in ("core", "floor"):
+            tab = rt["short"]
+            s["short"] = _lerp(s["mm"], sorted(tab), [tab[k] for k in sorted(tab)])
+        s["ambient"] = float(zd["ambient"])
+    return [s for s in out if not (s["zone"] == "frame" and s["crossing"])] or out
+
+
+def _group_factor(rt: dict, way: str, n: int, dc: bool, zone: str = "") -> float:
+    """A group's factor for n loaded circuits: AS/NZS 3008.1.1 Table 22 for a single layer of lanes (under the ceiling
+    where the stretch is in the ceiling's covers) and for the 230 V conduits, Tycab's bundling by its loaded cables (two a
+    circuit) over the pair's own factor for DC cables bundled."""
+    g = rt["groups"]
+    if n <= 1:
+        return 1.0
+    if way in (g.get("layer_ways") or []):
+        tab = g["layer_ceiling"] if zone == "ceiling" else g["layer"]
+    elif dc:
+        b = rt["dc"]["bundle"]
+        return b[min(2 * n, len(b)) - 1] / rt["dc"]["pair"]
+    else:
+        tab = g["bunched"]
+    keys = sorted(int(k) for k in tab)
+    return float(tab[next((k for k in keys if k >= n), keys[-1])])
+
+
+def _most_together(ids: set, shed: list, must: str) -> int:
+    """The most circuits of a group, `must` among them, that carry their current at once, where the load shedding never
+    runs a rule's `stops` circuits with its `when` circuits."""
+    rest = sorted(ids - {must})
+    shed = [r for r in shed if (set(r["stops"]) | set(r["when"])) & (ids | {must})]
+    if not shed:
+        return len(rest) + 1
+    best = 1
+    for mask in range(1 << len(rest)):
+        on = {rest[i] for i in range(len(rest)) if mask >> i & 1} | {must}
+        if len(on) > best and not any(on & set(r["stops"]) and on & set(r["when"]) for r in shed):
+            best = len(on)
+    return best
+
+
+def device_of(run: dict, rt: dict) -> tuple[float | None, float | None, int]:
+    """The protective device's rating In from the run's protection text (its first rating in A), or the override in
+    rules.ratings.devices, the circuit's own design current Ib and how many circuits the run carries."""
+    o = (rt.get("devices") or {}).get(run["id"])
+    if o:
+        return float(o["in"]), float(o.get("ib", run.get("amps") or 0.0)), int(o.get("circuits", 1))
+    m = re.match(r"\s*(\d+(?:\.\d+)?) A\b", run.get("protection") or "")
+    return (float(m.group(1)) if m else None), (float(run["amps"]) if run.get("amps") is not None else None), 1
+
+
+def ratings(res: dict) -> dict:
+    """SVC-10 (I2-15 b): every cable that carries a design current, rated where it lies. Each stretch takes its zone's
+    method and air (rules.ratings.zones), the cable's free-air rating (Tycab for DC, Prysmian's 2C+E for 230 V) times the
+    ambient's and the method's factors, and times the group's factor in each shared way the run is in, but at a short
+    crossing of a panel, where each cable has its own gland or module. The least stretch is the run's Iz. The design
+    current Ib must not exceed Iz, and where a device protects the circuit, Ib <= In <= Iz (AS/NZS 3000 clause 2.5.3).
+    A group counts its loaded circuits: not data or control cables, not a circuit at or under 30 % of its grouped
+    rating, and the circuits the load shedding never runs together once."""
+    rt = res["data"]["rules"]["ratings"]
+    blocks = res["blocks"]
+    by_id = defaultdict(list)
+    for b in blocks:
+        if b.get("box"):
+            by_id[b["id"]].append(b["box"])
+            by_id[b["iid"]].append(b["box"])
+    ns = res["ns"]
+    board = key(res["data"]["rules"]["board"])
+    ctx = dict(V=res["V"], rt=rt, covers=rt["covers_mm"],
+               cores=[b["box"] for b in blocks if b.get("box") and b["id"] in PANELS[1:]],
+               floor=next((b["box"] for b in blocks if b.get("box") and b["id"] == PANELS[0]), None),
+               board=ns[board].box if board in ns else None, battery=ns["EL_02"].box if "EL_02" in ns else None,
+               frames=[(g["p"][0] - g["w"] / 2, g["p"][1] - g["h"] / 2, -1e9, g["p"][0] + g["w"] / 2, g["p"][1] + g["h"] / 2, 1e9)
+                       for g in res["glands"].values() if g.get("cells")],
+               conduit=[tuple(_eval(v, ns) for v in z["box"]) for z in res["data"]["rules"].get("conduit", [])],
+               inside={r["id"]: [bx for m in _ids(r, "inside") for bx in by_id.get(m, [])] for r in res["runs"]})
+    circuits = {c["id"] for c in res["svc"]["electrical"]["circuits"]}
+
+    def circuit(r):
+        return r["id"] if r["id"] in circuits else next((t for t in r.get("serves") or [] if t in circuits), r["id"])
+
+    rows = {}
+    for r in res["runs"]:
+        if r.get("amps") is None or free_air_amps(rt, r, 40.0) is None:
+            continue
+        inn, ib, n_own = device_of(r, rt)
+        parts = [dict(s, amps=free_air_amps(rt, r, s["ambient"]) * method_factor(rt, s["method"], r["size"]) * s["short"])
+                 for s in stretches(r, ctx)]
+        rows[r["id"]] = dict(run=r["id"], circuit=circuit(r), ib=ib, device=inn, own=n_own, parts=parts, dc=r["system"] != "ac230", ways=[])
+    for w, v in res.get("ways", {}).items():
+        for i in v["runs"]:
+            if i in rows:
+                rows[i]["ways"].append(w)
+    shed = rt["groups"].get("shed") or []
+    counted = set(rows)
+    for _ in range(12):
+        for row in rows.values():
+            groups = []
+            for w in row["ways"] or [None]:
+                members = [rows[i] for i in (res["ways"][w]["runs"] if w else [row["run"]]) if i in rows]
+                on = {m["circuit"] for m in members if m["run"] in counted}
+                groups.append((w, _most_together(on | {row["circuit"]}, shed, row["circuit"]) + row["own"] - 1))
+            best = None
+            for s in row["parts"]:
+                f, g = 1.0, (None, 1)
+                if not s["crossing"]:
+                    f, g = min(((_group_factor(rt, w or "", n, row["dc"], s["zone"]), (w, n)) for w, n in groups), key=lambda x: x[0])
+                if best is None or s["amps"] * f < best[0]:
+                    best = (s["amps"] * f, f, g, s)
+            row.update(iz=best[0], factor=best[1], group=best[2], worst=best[3])
+        light = {i for i, row in rows.items() if row["ib"] is not None and row["ib"] <= rt["groups"]["light_pct"] / 100 * row["iz"]}
+        new = set(rows) - light
+        if new == counted:
+            break
+        counted = new
+    problems, out = [], []
+    for row in rows.values():
+        ib, inn, iz, w = row["ib"], row["device"], row["iz"], row["worst"]
+        need = max(ib or 0.0, inn or 0.0)
+        out.append(dict(run=row["run"], ib=ib, device=inn, iz=round(iz, 1), margin=round(iz - need, 1), spare=iz - need, zone=w["zone"], method=w["method"],
+                        ambient=w["ambient"], group=row["group"], factor=round(row["factor"], 3), counted=row["run"] in counted))
+        where = f"{w['method']}, {w['zone']}, {w['ambient']:g} C, {row['group'][1]} circuits" + (f" in {row['group'][0]}" if row["group"][0] else "")
+        if ib is not None and ib > iz + 1e-6:
+            problems.append(f"{row['run']} carries {ib:g} A over its {iz:.0f} A ({where})")
+        if inn is not None and ib is not None and ib > inn + 1e-6:
+            problems.append(f"{row['run']}'s {inn:g} A device is under its {ib:g} A design current")
+        if inn is not None and inn > iz + 1e-6:
+            problems.append(f"{row['run']}'s {inn:g} A device is over its {iz:.0f} A rating ({where})")
+    out.sort(key=lambda x: x["margin"])
+    return dict(ok=not problems, problems=problems, rows=out, margin=out[0]["margin"] if out else None,
+                governing=out[0]["run"] if out else None)
+
+
 MEMBERS = ("RL-", "RS-", "CM-", "OR-", "DB-K", "DB-R")   # the chassis members a run may pass through (`inside`)
 FACE_NAMES = {"x0": "front", "x1": "rear", "y0": "kerb side", "y1": "road side", "z0": "bottom", "z1": "top"}
 BUSH_MM = 6.0   # (est.) a hole's bush or grommet round the run, added to its outside diameter
@@ -1280,7 +1746,8 @@ def member_holes(res: dict) -> list[dict]:
 
 
 CHECKS = {"clearance": clearance, "bends": bends, "separation": separation, "terminal_face": terminal_face,
-          "coverage": coverage, "drops": drops, "falls": falls, "spacing": spacing, "glands": glands}
+          "coverage": coverage, "drops": drops, "falls": falls, "spacing": spacing, "glands": glands, "ratings": ratings, "heat": heat,
+          "supports": supports}
 
 
 def evaluate(res: dict) -> dict:

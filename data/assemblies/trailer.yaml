@@ -131,7 +131,7 @@ params:
   axle_x: 4381               # axle group centre from the ball. The build solves it: the middle of the towball window (H17)
   # ---------------------------------------------------------------- water (H13)
   water_full_l: 420          # the fresh tanks' net capacity, filled at camp with the transfer pump, CR45 filter and chlorine (H13)
-  water_travel_l: 295        # most fresh and grey water aboard while towing: H13's 350 L less 30 L by H21 after the final review, 10 L more by H21 after the fix-pass review (MAS-10 7.7 kg over at 320 L), 5 L more after the re-check (MAS-10 1.9 kg over at 310 L), 5 L more after the second re-check (MAS-10 2.5 kg over at 305 L), and 5 L more after the iteration-2 re-check (MAS-10 3.9 kg over at 300 L with the floor's transit frames, the board's duct and the SB120 plug). Less if the 7,400 kg GCM revision is refused (GCM-01, H20)
+  water_travel_l: 280        # most fresh and grey water aboard while towing: H13's 350 L less 70 L by H21 after the services' and the structure's fixes of 22 Nov (MAS-10 15.0 kg over at 295 L, 69.95 kg over at 350 L). Before that: 30 L off by H21 after the final review, 10 L more by H21 after the fix-pass review (MAS-10 7.7 kg over at 320 L), 5 L more after the re-check (MAS-10 1.9 kg over at 310 L), 5 L more after the second re-check (MAS-10 2.5 kg over at 305 L), and 5 L more after the iteration-2 re-check (MAS-10 3.9 kg over at 300 L with the floor's transit frames, the board's duct and the SB120 plug). Less if the 7,400 kg GCM revision is refused (GCM-01, H20)
   water_highway_l: 50        # owner's highway figure
   grey_full_l: 130           # grey tank's net capacity (report 21 section 10)
   tank_z0: rail_underside_z
@@ -557,12 +557,13 @@ items:
     system: body
     price:
       - {item: "12 and 24 V DC wiring, tinned twin core 2.5 to 6 mm2, 150 m at AUD 4.50/m", aud: 675, basis: estimate, date: 2026-11-20}
-      - {item: "230 V wiring: 78 m of 2.5 mm2 TPS and cord, six outlets and the inlet's tails", aud: 436.40, basis: estimate, date: 2026-11-22, note: "Was 40 m at AUD 330. The routes give 77.0 m after SVC-08's reroutes (data/routes.yaml, H28), so 38 m more at AUD 2.80/m"}
+      - {item: "230 V wiring: 78 m of round 2C+E TPS and cord, 25.7 m of it 4 mm2, six outlets and the inlet's tails", aud: 466.30, basis: estimate, date: 2026-11-22, note: "Was 40 m at AUD 330. The routes give 77.0 m after SVC-08's reroutes (data/routes.yaml, H28), so 38 m more at AUD 2.80/m, and A-02, C1 and C4 are 4 mm2 for SVC-10 (I2-15 b), 19.9 m at AUD 1.40/m more (est.). The round cable lists at AUD 2.18/m for 2.5 mm2 (I2-29), and the estimate stands"}
       - {item: "LED lights: ten ceiling, two reading, two outside, at AUD 40", aud: 560, basis: estimate, date: 2026-11-20}
       - {item: "Switches, fuse blocks, fuses, terminals, lugs, heat shrink, conduit, glands and ties", aud: 650, basis: estimate, date: 2026-11-20}
       - {item: "Fresh water pipework: 36 m of 12 mm PEX, 47 push-fit fittings, tank fittings and breathers", aud: 801, basis: estimate, date: 2026-11-22, note: "Was 30 m and 40 fittings at AUD 710. The routes give 35.3 m and 47 fittings (data/routes.yaml, H28): 6 m more at AUD 3.50/m and 7 fittings at AUD 10 (est.)"}
       - {item: "Wastes: 2.9 m of DN40 DWV with its nine bends and 2.5 m of 25 mm waste hose", aud: 62.60, basis: estimate, date: 2026-11-22, note: "As routed (data/routes.yaml, H28): pipe AUD 4.00/m, bends AUD 4 each, hose AUD 6.00/m (est.)"}
       - {item: "General hardware: rivnuts, screws, brackets and P-clips", aud: 400, basis: estimate, date: 2026-11-20}
+      - {item: "The six cable supports SVC-12 adds (data/routes.yaml SP-CH to SP-DK): two 25 x 25 x 3 mm aluminium angles on brackets, a perforated tray, a cable channel, standoff cleats and loom saddles", aud: 135, basis: estimate, date: 2026-11-22, note: "2.8 m of angle at about AUD 10 a metre, the tray AUD 40, the channel AUD 25, twenty cleats and saddles at AUD 2 (est.)"}
     point: [body_x0 + body_length / 2, 0, floor_z + 400]
     parts:
       - {item: "12 and 24 V wiring, about 150 m of tinned twin core, 2.5 to 6 mm2", kg: 15.0, basis: estimate}
@@ -571,8 +572,9 @@ items:
       - {item: "Switches, fuse blocks, terminals, lugs, heat shrink, conduit, glands and ties", kg: 5.0, basis: estimate}
       - {item: "Fresh water pipework: 36 m of 12 mm PEX, 47 push-fit fittings, tank fittings, breathers and the wastes", kg: 4.0, basis: estimate}
       - {item: "General hardware: rivnuts, screws, brackets and P-clips", kg: 6.0, basis: estimate}
-      - {item: "The routed runs priced here above the three items' estimates (the 12 and 24 V wiring, the 230 V wiring and the fresh water pipework): 40.0 kg routed against 25.0 kg (bd11_routed_kg, data/routes.yaml, H28), at the routes' estimated masses a metre", kg: 15.0, basis: estimate}
-      - {item: "Allowance not yet given to a part, kept until the systems design: the rest of the line's 53.6 kg", kg: 0.5, basis: estimate}
+      - {item: "The routed runs priced here above the three items' estimates (the 12 and 24 V wiring, the 230 V wiring and the fresh water pipework): 45.4 kg routed against 25.0 kg (bd11_routed_kg, data/routes.yaml, H28), at the routes' masses a metre, the 230 V in Prysmian's round 2C+E (I2-29)", kg: 20.4, basis: estimate}
+      - {item: "The six cable supports SVC-12 adds (SP-CH to SP-DK): 2.8 m of 25 x 25 x 3 mm aluminium angle at 0.38 kg a metre and its brackets 1.3 kg, the tray 0.55 kg, the channel 0.35 kg, the cleats and saddles 0.3 kg", kg: 2.5, basis: estimate}
+      - {item: "Allowance not yet given to a part, kept until the systems design: none left, the cables SVC-10 sized up (I2-15 b) took the last 0.5 kg and 1.0 kg more", kg: 0.0, basis: estimate}
     note: "The older block model's 60 kg (report 12 section 10), listed line by line (est.). The lamps, about 4 kg, are line LG-01. Reports 20 and 21 leave the house wiring and the fresh water pipework here. The jockey's spacers (DB-08), the diesel tank's cradle (UF-06B) and the side marker mounts (LG-02), 2.4 kg, came out of the allowance (H27)"
   - id: BD-25
     name: Floor transit frames G9, G15 and G20, Roxtec RM modules in 4 mm aluminium frames bonded into the floor's cut-outs (data/services.yaml)
@@ -663,7 +665,7 @@ items:
     box: [tank_r_x0, -tank_w / 2, tank_z0, tank_r_l, tank_w, tank_h]
     tank: true
     mass: {basis: declared, unit_kg: 18.3, maturity: calculated, source: "As UF-01, scaled to 760 mm (report 18 section 1.1)", note: "6 mm HDPE kept (saving 1b, H13)"}
-    note: Between the XT centre and rear shock crossmembers, over the rear axle. About 200 L net. The two tanks hold 420 L net, filled at camp. At most 300 L of fresh and grey water ride in travel (H13, H21).
+    note: Between the XT centre and rear shock crossmembers, over the rear axle. About 200 L net. The two tanks hold 420 L net, filled at camp. At most 280 L of fresh and grey water ride in travel (H13, H21).
   - id: UF-02
     name: Water in the tanks
     system: underfloor
@@ -1170,12 +1172,22 @@ items:
       - {item: "Board panel 800 x 700 mm and the wiring on it", kg: 5.0, basis: estimate, source: "Report 20 E-13"}
       - {item: "Slotted PVC wiring duct 60 x 80 mm, 2.6 m at about 0.55 kg a metre with its cover. Its busiest section, 140 mm over the cabinet's floor, carries 25 control and branch cables of 1,596 mm2 outside area (cad/routes.py on the routed sizes), 73 % of the 2,184 mm2 that Panduit's 50 % fill allows in its 56 x 78 mm inside (est.). The four heavy cables D-06, D-07, D-14 and B-16 are cleated to the panel to their terminals, outside the duct", kg: 1.4, basis: estimate}
   - id: EL-07
-    name: Main DC cables and lugs, bank 70 mm2, inverter 50 mm2, MPPT and converters 10 mm2
+    name: Main DC cables and lugs, bank 70 mm2, inverter 95 mm2, modules and the 12 V pair 25 mm2, MPPT and converters 10 and 4 mm2
     material: "Tinned flexible copper, double insulated"
     system: electrical
-    price: {aud: 450, basis: estimate, date: 2026-11-20, note: "Tinned double-insulated cable: 3 m of 70 mm2, 4 m of 50 mm2, 12 m of 10 mm2, and the lugs"}
+    price:
+      - {item: "Tinned double-insulated pairs as routed (data/routes.yaml D-01 to D-13): 4.47 m of 95 mm2, 1.42 m of 70 mm2, 2.70 m of 25 mm2, 1.02 m of 10 mm2 and 0.55 m of 4 mm2, with 10 % for cut-offs", aud: 598.01, basis: rate, date: 2026-11-22, note: "The pair kind's rate in data/routes.yaml, AUD 0.45 a mm2 and metre of core from solar4rvs.com.au's 2 B&S single at AUD 14.90 a metre. D-07 is 95 mm2 and D-13 25 mm2 for SVC-10 (I2-15 b)"}
+      - {item: "Lugs, heat shrink and the terminal covers", aud: 210, basis: estimate, date: 2026-11-20, note: "The rest of report 20's AUD 450 for 3 m of 70 mm2, 4 m of 50 mm2, 12 m of 10 mm2 and the lugs"}
     point: [rear_x0 - 100, -800, floor_z + 900]
-    mass: {basis: declared, total_kg: 6.0, maturity: estimate, source: "Report 20 E-11 (est.)"}
+    mass: {basis: declared, total_kg: 14.1, maturity: estimate, source: "Calculated: the routed pairs, 13.56 kg at the pair kind's mass a metre (data/routes.yaml, Prysmian's V-90 cores and 10 % for the fine strands and the second sheath, est.), and 0.5 kg of lugs (est.). Was report 20's 6.0 kg for its shorter runs"}
+  - id: EL-09
+    name: Drip tray over the battery box, under the washer and the dryer, 1.5 mm 5052 aluminium with a 20 mm upstand
+    material: "1.5 mm 5052 aluminium sheet, folded, its corners welded and sealed"
+    system: electrical
+    price: {aud: 120, basis: estimate, date: 2026-11-22, note: "0.73 m2 of 1.5 mm 5052 sheet, cut, folded and welded by Leonard, and its sealant (est.)"}
+    point: [plinth_x0 + 450, plinth_y0 + plinth_d / 2, floor_z + bat_box_h + 5]
+    mass: {basis: declared, total_kg: 3.0, maturity: estimate, source: "Calculated: 920 x 720 mm and its 20 mm upstand, 0.73 m2 of 1.5 mm 5052 at 2,680 kg/m3, 2.9 kg, and 0.1 kg of sealant (est.)"}
+    note: "SVC-04's drip cone (I2-18 c): it lies on the battery box's lid under the machine base LA-14F, the washer and the dryer, 10 mm past the box on every side, so it catches every drip from the hoses, the washer's tap and the appliances that a cone widening 1 in 5 over the terminal face would let reach it. Its upstand holds a hose's leak until the washer is stopped (est.)"
   - id: EL-08
     name: Starlink Mini with its pole mount and 15 m cable, stowed in a bench drawer for travel
     system: electrical

@@ -132,7 +132,7 @@ Three cut-outs in the floor are over 60 mm, the services' Roxtec transit frames 
 
 BDY-26 checks the floor round each one with BDY-03's foot standing beside it and BDY-04's 160 kg/m², both at 3 g on the one-way span between the raisers. The strip under the foot loses the cut-out's length from its effective width, and the skins and the insert at the cut-out's edge take Kirsch's 3.0, the factor of a round hole in a plate, a lower bound for a radiused rectangular cut-out that its bonded frame and insert stiffen (est.). The H80 at the insert's outer edge takes the same field fallen off as Kirsch's solution falls, the cut-out taken as a hole of half its mean side. Where G20 takes the bearer strip away, the floor bridges the gap along the raiser with a foot at its middle and bears on the insert at the gap's ends. G20 governs, at 0.67, with the insert in shear while it bridges the gap. G15 works at 0.51 and G9 at 0.31, both on the H80 beyond the insert. The criteria are BDY-03's: skins at half their ultimate and half the wrinkling stress, cores at half their shear strength and bearing at half the compressive strength.
 
-The chassis's holes under G20 (CHASSIS.md, CHS-10) need its raiser-space cables to leave the kerb raiser through its inner web, so the services move the frame's raiser cells inboard of the raiser, which gives the floor its full bearing there again.
+The chassis's holes under G20 (CHASSIS.md, CHS-10) need its raiser-space cables to leave the kerb raiser through a web. Its raiser cells cannot move inboard of the raiser, where the chase's loom fills the gap beside the rear tank, so until they move to a frame of their own outboard of the raiser, BDY-26 checks G20's cut-out over the kerb raiser's bearer strip as it stands.
 
 ## Mass
 
@@ -148,7 +148,7 @@ The chassis's holes under G20 (CHASSIS.md, CHS-10) need its raiser-space cables 
 | WN-01 to WN-05 | Four S4 windows and two blackout covers | 28.5 kg | Maker, covers estimated | 28.7 kg |
 | BD-14, BD-18 to BD-20 | Rounded front edges, the road wall's stiffener, the entry door's two jamb members | 19.5 kg | Estimate, calculated | 21.6 kg |
 | BD-10, BD-17 | Mud flaps with hangers, cassette door | 10.7 kg | Mostly calculated | 12.2 kg |
-| BD-11 | Wiring, plumbing and hardware, line by line, with 15.0 kg for the routed runs above their first estimates and 0.5 kg not yet given to a part (the lamps are LG-01) | 53.6 kg | Estimate, kept until the fit-out | 64.3 kg |
+| BD-11 | Wiring, plumbing and hardware, line by line, with 20.4 kg for the routed runs above their first estimates, 2.5 kg for SVC-12's six cable supports and none left unassigned (the lamps are LG-01) | 61.0 kg | Estimate, kept until the fit-out | 73.2 kg |
 | BD-13 | Fiamma F80s 400 awning on the roof, its brackets, bolts and pads | 36.7 kg | Maker, brackets estimated | 37.2 kg |
 | | Body | 630.6 kg | | 701.8 kg |
 

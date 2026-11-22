@@ -279,7 +279,7 @@ const cases = d.energy.cases;
     <table data-sheet-sum="off">
       <thead><tr><th>Check</th><th>Result</th><th>What it checks</th><th>Measured</th><th>Limit</th><th>Governing</th><th>Source</th></tr></thead>
       <tbody>{rt.checks.map((c: any) => (
-        <tr><td>{c.id}</td><td>{c.ok ? 'Pass' : `Fail: ${c.detail}`}</td><td>{c.title}</td><td>{c.measured == null ? '' : `${c.measured} ${c.unit}`}</td>
+        <tr><td>{c.id}</td><td>{c.ok ? 'Pass' : `${c.severity === 'report' ? 'Reported' : 'Fail'}: ${c.detail}`}</td><td>{c.title}</td><td>{c.measured == null ? '' : `${c.measured} ${c.unit}`}</td>
           <td>{c.limit}</td><td>{c.governing}</td><td>{c.source}</td></tr>))}</tbody>
     </table>
   </div>

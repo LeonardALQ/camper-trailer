@@ -952,7 +952,7 @@ inputs:
     group: Trailer weighbridge
     part: trailer
     title: Weighed mass, fully loaded for travel with 300 L of water, the fuel and the gear
-    how: "Load the trailer as for a trip: 300 L of fresh water, the heater's diesel, the jerry cans, the gear and the food, with the grey tank empty. Weigh the whole trailer on a weighbridge, uncoupled on its jockey wheel, or coupled with only the trailer on the scale and the drawbar at its design height."
+    how: "Load the trailer as for a trip: 280 L of fresh water, the heater's diesel, the jerry cans, the gear and the food, with the grey tank empty. Weigh the whole trailer on a weighbridge, uncoupled on its jockey wheel, or coupled with only the trailer on the scale and the drawbar at its design height."
     unit: kg
     estimate: {v: null, src: "The model's TC2 mass without growth is shown beside it"}
     measured: {v: null, date: null}
