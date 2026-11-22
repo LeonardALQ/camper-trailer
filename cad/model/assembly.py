@@ -1,6 +1,7 @@
 """Build every placed instance of the garage and bed module from the data."""
 from __future__ import annotations
 
+import math
 import time
 from dataclasses import dataclass, field
 
@@ -8,8 +9,8 @@ from build123d import Compound
 
 from ..partsdb import Instance, Project
 from . import generators as G
-from .bike import PlacedBike, bike_compound, build_bike, place_bike, xform
-from .prims import rgba
+from .bike import PlacedBike, bike_compound, build_bike, place_bike, place_on_slope, xform
+from .prims import cyl, rgba
 
 GROUP_LABELS = {
     "bikes": "Bikes", "restraint": "Restraint", "bed": "Bed", "partitions": "Partitions",
@@ -54,7 +55,8 @@ class Model:
         for b in self.built.values():
             part = prj.parts[b.inst.part]
             b.shape.label = b.name
-            b.shape.color = rgba(part.color, part.alpha)
+            if b.bike is None:                   # a bike's pieces carry their own colours (cad/model/vehicles)
+                b.shape.color = rgba(part.color, part.alpha)
         self.timings["build_s"] = round(time.time() - t0, 3)
 
     # ------------------------------------------------------------------
@@ -66,7 +68,10 @@ class Model:
             if k in sp:
                 prm[k] = sp[k]
         model = build_bike(geo05, prm)
-        pb = place_bike(model, sp["centre_y"], sp["front_tyre_x"], prm["front_overhang"], sp["front_rise"])
+        if "on_ramp" in sp:
+            pb = self._on_ramp(model, sp)
+        else:
+            pb = place_bike(model, sp["centre_y"], sp["front_tyre_x"], prm["front_overhang"], sp["front_rise"])
         if sp.get("luggage_only"):
             # check-only copy that holds just the luggage, for checks that must not see the bike itself
             model.solids = {k: v for k, v in model.solids.items() if k.startswith("pannier")}
@@ -83,6 +88,28 @@ class Model:
             bbb = Compound(children=bags).bounding_box()
             info["width_with_bags"] = max(bb.max.X, bbb.max.X) - min(bb.min.X, bbb.min.X)
         return Built(inst, comp, info, bike=pb, cog_override=(c.X, c.Y, c.Z))
+
+    def _on_ramp(self, model, sp) -> PlacedBike:
+        """A bike on the deployed ramp, its front tyre `on_ramp` mm down the ramp from the sill (the loading view)."""
+        r = next(i for i in self.prj.instances if "ramp" in i.special)
+        spec, length = r.special["ramp"], self.prj.parts[r.part].geometry.params["length"]
+        a = math.asin(spec["drop"] / length)
+        d = sp["on_ramp"]
+        return place_on_slope(model, sp["centre_y"], spec["sill_x"] + d * math.cos(a), -d * math.sin(a), math.degrees(a))
+
+    def _rope(self, prm) -> tuple:
+        """The winch rope, straight as the winch pulls it, from inside the winch's drum (on its plate on the front wall,
+        cad/model/generators.py gen_winch) to the winch hook point of the bike on the ramp, 8 mm into the part there."""
+        w = next(b.inst for b in self.built.values() if b.inst.part == "U-WINCH")
+        wp = self.prj.parts[w.part].geometry.params
+        x, y, z = w.at
+        start = (x + wp["plate_t"] + wp["depth"] / 2, y, z + wp["plate_h"] / 2)
+        pb = next(b.bike for b in self.built.values() if b.bike and "on_ramp" in b.inst.special["bike"])
+        e = pb.point(*pb.model.hooks["winch"])
+        d = [e.X - start[0], e.Y - start[1], e.Z - start[2]]
+        n = math.sqrt(sum(v * v for v in d))
+        end = tuple(c + 8 * v / n for c, v in zip((e.X, e.Y, e.Z), d))
+        return cyl(start, end, prm["diameter"] / 2), {"length_mm": math.dist(start, end)}
 
     def _one(self, inst: Instance) -> Built:
         part = self.prj.parts[inst.part]
@@ -106,6 +133,9 @@ class Model:
             if part.cog and part.cog.at:
                 cog = tuple(self.P.eval(part.cog.at, {}))
             return Built(inst, shape, info, cog_override=cog)
+        if gen == "winch_rope":
+            shape, info = self._rope(prm)
+            return Built(inst, shape, info)
         if gen not in G.GENERATORS:
             raise ValueError(f"{inst.iid}: no generator '{gen}'")
         shape, info = G.GENERATORS[gen](prm, inst.at, self.P)

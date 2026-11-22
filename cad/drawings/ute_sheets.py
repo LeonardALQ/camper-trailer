@@ -31,13 +31,39 @@ def ctx() -> dict:
     return _CTX
 
 
+def _drawn(c, b):
+    """What a sheet draws of a built body: a bike as its envelope (cad/model/vehicles/envelope.py), placed as the product
+    model is, because hidden-line removal of the product models inside the box takes minutes a view. Everything else as
+    built."""
+    if b.bike is None:
+        return b.shape
+    cache = c.setdefault("drawn", {})
+    if b.inst.iid not in cache:
+        from ..model.bike import PlacedBike, bike_compound
+        from ..model.vehicles import envelope
+        prm = dict(c["prj"].parts[b.inst.part].geometry.params)
+        for k in ("length", "screen_top_z"):
+            if k in b.inst.special["bike"]:
+                prm[k] = b.inst.special["bike"][k]
+        key = prm["source_key"]
+        model = envelope.BUILDERS[key](c["prj"].bike_geometry["bikes"][key], prm)
+        pb = b.bike
+        cache[b.inst.iid] = bike_compound(PlacedBike(model, pb.rot, pb.move, pb.pitch_deg), b.shape.label)
+    return cache[b.inst.iid]
+
+
 def _gs(c, groups=None, exclude=(), only=None, loading=False):
+    from build123d import Pos
+
+    from ..trailer_model import _moved
     from ..ute_model import garage_solids
+    g = c["ute"].garage
     out = []
     for i, s in garage_solids(c["ute"], c["m"], loading=loading, groups=groups, exclude=exclude):
         if only is not None and i.ref not in only and i.iid not in only:
             continue
-        out.append(s)
+        b = c["m"].built[i.iid]
+        out.append(_moved(_drawn(c, b), Pos(g["module_x0"], 0, g["deck_z"])) if b.bike else s)
     return out
 
 
@@ -52,7 +78,7 @@ def _module(c, groups=None, exclude=(), only=None):
             continue
         if only is not None and i.ref not in only and i.iid not in only:
             continue
-        out.append(b.shape)
+        out.append(_drawn(c, b))
     return out
 
 
@@ -122,7 +148,7 @@ def ct701(prj, model, bom, checks, reg, dwg):
     sh = S.Sheet()
     S.frame(sh)
     sc = 50.0
-    outside = vehicle_solids(ute) + _gs(c, groups=("body", "doors", "subframe", "security"))
+    outside = vehicle_solids(ute, plain=True) + _gs(c, groups=("body", "doors", "subframe", "security"))
     ext = g["box_extent"]
     wb = V["wheelbase"]
 
@@ -148,15 +174,17 @@ def ct701(prj, model, bom, checks, reg, dwg):
                        (ext["z1"], f"{ext['z1']:.0f} ROOF", zr + 13)):
         S.vdim(sh, zr, vE.p(0, 0, 0)[1], zr, vE.p(0, 0, z)[1], xd, lab, size=1.8)
     cz = vE.p(-300, 0, V["cab_height"])
-    S.leader(sh, (cz[0], cz[1] + 0.2), (cz[0] - 8, cz[1] + 7), f"CAB ROOF {V['cab_height']:.0f}", size=1.8)
+    roof = vE.p(V["cab_back_x"] - 360, 0, V["cab_height"])        # the roof's rear half, clear of the snorkel's head
+    S.leader(sh, (roof[0], roof[1] + 0.2), (cz[0] - 8, cz[1] + 7), f"CAB ROOF {V['cab_height']:.0f}", size=1.8)
 
     # ---- loading: doors open, ramp on the sill, bikes in
-    loading = vehicle_solids(ute) + _gs(c, groups=("body", "doors", "subframe", "security", "bikes", "restraint", "context"), loading=True)
+    loading = vehicle_solids(ute, plain=True) + _gs(c, groups=("body", "doors", "subframe", "security", "bikes", "restraint", "context"), loading=True)
     vL = S.View(sh, (0, -1, 0), (0, 0, 1), sc, ox=62.0, oy=152.0)
     vL.draw(loading)
     S.view_label(sh, 100, 139, "ELEVATION FROM THE KERB SIDE, LOADING", sc)
     sill = vL.p(P["module_x0"] + P["x_end"], 0, P["ground_drop"])
-    S.leader(sh, sill, (sill[0] + 16, sill[1] + 12), f"RAMP {g['dims']['ramp_deg']:.1f} DEG FROM A {P['ground_drop']:.0f} SILL", size=1.8)
+    # under the ramp, since the Tuareg stands on it in the loading view
+    S.leader(sh, sill, (sill[0] + 2, sill[1] - 14.5), f"RAMP {g['dims']['ramp_deg']:.1f} DEG FROM A {P['ground_drop']:.0f} SILL", size=1.8)
 
     # ---- plan
     vP = S.View(sh, (0, 0, 1), (0, 1, 0), sc, ox=62.0, oy=100.0)

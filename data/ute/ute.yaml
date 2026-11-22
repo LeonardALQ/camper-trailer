@@ -265,15 +265,19 @@ checks:
   - {id: UTE-15, title: "Box front wall at least 39 mm behind the cab", type: cab, limit: cab_gap_min_mm, severity: fail,
      why: "Toyota BBGJ1007 p. 26, so the cab can move on its mounts without touching the body"}
 
-# Simple solids for the 3D model: [x0, y0, z0, dx, dy, dz] in the ute frame, a colour and an opacity.
+# The LandCruiser's parts in the 3D model (decision H27). cad/model/vehicles/landcruiser.py builds each one from the
+# params above and Toyota's drawing, and research/29 gives every dimension and its source. A name that cites a line
+# takes its mass from that line. The rest are part of the cab chassis, line UT-01.
 solids:
-  - {id: CAB, name: "Cab", box: [-front_overhang + 700, -cab_width / 2, 900, cab_back_x + front_overhang - 700, cab_width, cab_height - 900], color: "#e8e8e8", alpha: 0.9}
-  - {id: BONNET, name: "Bonnet and front guards", box: [-front_overhang, -cab_width / 2, 700, 700, cab_width, 600], color: "#e8e8e8", alpha: 0.9}
-  - {id: BAR, name: "Bull bar (UT-03)", box: [-front_overhang - 80, -cab_width / 2 - 20, 380, 120, cab_width + 40, 650], color: "#2c3e50", alpha: 1.0}
-  - {id: RAIL-R, name: "Frame rail, road side", box: [frame_x0, frame_w / 2 - rail_w, frame_top_z - rail_h, frame_x1 - frame_x0, rail_w, rail_h], color: "#1c2833", alpha: 1.0}
-  - {id: RAIL-K, name: "Frame rail, kerb side", box: [frame_x0, -frame_w / 2, frame_top_z - rail_h, frame_x1 - frame_x0, rail_w, rail_h], color: "#1c2833", alpha: 1.0}
-  - {id: TOWBAR, name: "Towbar and tongue (UT-04)", box: [frame_x1 - 150, -150, coupling_z - 60, ball_x - frame_x1 + 200, 300, 140], color: "#34495e", alpha: 1.0}
-  - {id: SPARE, name: "Spare wheel under the tray (UT-05)", cyl: {c: [wheelbase + 700, 0, 420], r: tyre_d / 2, w: tyre_w, axis: z}, color: "#1c2833", alpha: 1.0}
+  - {id: CAB, name: "Cab: body, roof, doors, windscreen, side and rear glass, A-pillars, mirrors and snorkel"}
+  - {id: FRONT, name: "Bonnet with the V8's scoop, front guards and flares, grille, headlights and indicators"}
+  - {id: BAR, name: "Bull bar and winch (UT-03)"}
+  - {id: FRAME, name: "Chassis frame: rails and crossmembers"}
+  - {id: FAXLE, name: "Front axle, hubs and coil springs"}
+  - {id: RAXLE, name: "Rear axle on the Lovells Elite housing, hubs and leaf springs"}
+  - {id: TANK, name: "Fuel tank, ARB Frontier 180 L, on its straps between the rails"}
+  - {id: TOWBAR, name: "Towbar and tongue (UT-04)"}
+  - {id: SPARE, name: "Spare wheel under the tray (UT-05)"}
 wheels:
   - {id: FR, x: 0, y: track_front / 2}
   - {id: FK, x: 0, y: -track_front / 2}

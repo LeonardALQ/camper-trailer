@@ -174,10 +174,11 @@ def gen_condor_chock(prm, at, P):
         # cross bars under the cradle (clear of the front track row)
         box_span(x - W / 2 + rail, x + W / 2 - rail, y + 100, y + 125, z, z + rise - 6),
         box_span(x - W / 2 + rail, x + W / 2 - rail, y + 420, y + 445, z, z + rise - 6),
-        # cradle plate and cheeks (the tyre sits on the plate, top at the cradle rise)
+        # cradle plate and cheeks (the tyre sits on the plate, top at the cradle rise). The cheeks stand on the plate's
+        # edges, welded along them, so the cradle is one part (decision H27)
         box_span(x - 70, x + 70, y + 60, y + 480, z + rise - 6, z + rise),
-        box_span(x - 76, x - 70, y + 200, y + 480, z + rise, z + rise + 120),
-        box_span(x + 70, x + 76, y + 200, y + 480, z + rise, z + rise + 120),
+        box_span(x - 70, x - 64, y + 200, y + 480, z + rise, z + rise + 120),
+        box_span(x + 64, x + 70, y + 200, y + 480, z + rise, z + rise + 120),
     ]
     yh = y + 12.5
     for s in (1, -1):
@@ -301,7 +302,15 @@ def gen_ramp(prm, spec, P):
     L, W, T = prm["length"], prm["width"], prm["thickness"]
     drop = spec["drop"]
     a = math.degrees(math.asin(drop / L))
-    s = Pos(spec["sill_x"], spec["centre_y"], 0) * Rot(0, a, 0) * box_span(0, L, -W / 2, W / 2, -T, 0)
+    place = Pos(spec["sill_x"], spec["centre_y"], 0) * Rot(0, a, 0)
+    s = place * box_span(0, L, -W / 2, W / 2, -T, 0)
+    if prm.get("hook_l"):
+        # the hooks at the top end: a plate on the floor inside the sill, bent down onto the ramp's top face
+        hl, hw, ht = prm["hook_l"], prm["hook_w"], prm["hook_t"]
+        x0, cy = spec["sill_x"], spec["centre_y"]
+        for yo in (W / 2 - hw / 2 - 40, -(W / 2 - hw / 2 - 40)):
+            s = s + box_span(x0 - hl, x0 + 10, cy + yo - hw / 2, cy + yo + hw / 2, 0, ht)
+            s = s + place * box_span(0, 70, yo - hw / 2, yo + hw / 2, 0, ht)
     return s, {"angle_deg": a, "run_mm": L * math.cos(math.radians(a))}
 
 
