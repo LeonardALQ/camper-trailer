@@ -377,6 +377,7 @@ drawings:
       - {rev: F, date: 2026-11-22, description: "Memo: labels clear of the lines and the glands, G2 named once", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-22, description: "Notice: every cable as routed in data/routes.yaml (H28)", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-22, description: "Notice: runs tagged at their ends and levels, glands to CT-603 (I2-17)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: I, date: 2026-11-22, description: "Notice: the runs with the axle at X 4,379, G19 8 mm rearward (I2-22)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-603
     title: Floor and wall penetrations
     subtitle: Every gland through the floor, walls and roof, its position, hole, fitting and runs
@@ -388,6 +389,7 @@ drawings:
     structural: false
     revisions:
       - {rev: A, date: 2026-11-22, description: "First draft: every gland, its position, hole, fitting and runs (I2-17)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: B, date: 2026-11-22, description: "Notice: G19 8 mm rearward with the axle at X 4,379 (I2-22)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-611
     title: Plumbing schematic
     subtitle: Fill, fresh tanks, pump, filters, cold and hot lines, drains to the grey tank and the dump
@@ -406,6 +408,7 @@ drawings:
       - {rev: F, date: 2026-11-21, description: "Notice: the GCM fallback at 127 L (H20)", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-22, description: "Notice: the GCM fallback at 126 L (H20), the ute's feed on 6 B&S (TW06)", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-22, description: "Notice: the GCM fallback at 124 L (H20), the ute's feed on 4 B&S (TW06)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: I, date: 2026-11-22, description: "Notice: the tanks 8 mm rearward with the axle at X 4,379 (I2-22)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-612
     title: Plumbing layout
     subtitle: Tanks, pump cabinet, drains with their falls, the shower well, fill and dump points
@@ -422,6 +425,7 @@ drawings:
       - {rev: D, date: 2026-11-22, description: "Memo: labels clear of the lines", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-22, description: "Notice: every pipe as routed in data/routes.yaml (H28)", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-22, description: "Notice: runs tagged at their ends and levels, glands to CT-603 (I2-17)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: G, date: 2026-11-22, description: "Notice: the pipes and tanks with the axle at X 4,379 (I2-22)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-621
     title: HVAC and ventilation
     subtitle: Split, heat-recovery pairs, extract, towing pressurisation, relief, hood, Combi ducts

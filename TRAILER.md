@@ -12,13 +12,13 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 | Overall | 6,700 mm long, 2,470 mm wide over the entry door's handle, 3,078 mm high over the awning case |
 | Tare | 2,627 kg, 2,885 kg with the growth allowance |
 | Fully loaded with 300 L of water (TC2) | 3,106 kg, 3,398 kg with growth, against the 3,500 kg plate |
-| Towball | 251 to 292 kg, 8.1 to 10.3 % of the trailer, at most 316.5 kg with growth |
+| Towball | 250 to 292 kg, 8.1 to 10.3 % of the trailer, at most 316.7 kg with growth |
 | Ute | Rear axle 2,649 kg with growth against its 2,800 kg plate. Combination 7,178 kg against 7,400 kg, the ute with growth plus the plate |
 | Battery | 25.6 kWh. A design hot day runs 25.1 h when new and 17.2 h at end of life |
 | Water | 420 L fresh, at most 300 L in travel, about 41 L a day. 130 L grey |
 | Cost | AUD 193,496 with contingency, built by Leonard (H26) |
 
-Every fail check passes. The tightest are the fully loaded mass with growth (MAS-10, 3,397.6 kg against the 3,400 kg target), the towball share with the grey tank full (MAS-12, 8.1 % against 8.0 %), the heaviest towball (MAS-13, 316.5 kg against 320 kg) and the recovery pull in the road-side rail (CHS-08A, 0.91 of yield).
+Every fail check passes. The tightest are the fully loaded mass with growth (MAS-10, 3,397.6 kg against the 3,400 kg target), the towball share with the grey tank full (MAS-12, 8.1 % against 8.0 %), the heaviest towball (MAS-13, 316.7 kg against 320 kg) and the recovery pull in the road-side rail (CHS-08A, 0.91 of yield).
 
 ## Layout
 
@@ -37,27 +37,27 @@ Storage is 0.38 m³ inside and 0.09 m³ in the drawbar box, about 0.2 m³ short 
 
 ## Mass and limits
 
-Masses in kg. The towball comes from moments about the axle group centre at X 4,371 mm. "With growth" adds 20 % to an estimate, 7 % to a calculated mass and nothing to a maker's figure (report 02, MASS-06). CT-002 shows each case's centre of gravity.
+Masses in kg. The towball comes from moments about the axle group centre at X 4,379 mm. "With growth" adds 20 % to an estimate, 7 % to a calculated mass and nothing to a maker's figure (report 02, MASS-06). CT-002 shows each case's centre of gravity.
 
 | Case | Aboard | Mass | Towball | Share | With growth | Towball with growth |
 |---|---|---|---|---|---|---|
-| TC1 Tare | Nothing | 2,627 | 255.1 | 9.7 % | 2,885 | 273.6 |
-| TC2 Fully loaded | 300 L fresh, fuel, 150 kg of gear | 3,106 | 291.8 | 9.4 % | 3,398 | 316.5 |
-| TC3 Highway | 50 L, fuel, gear | 2,856 | 290.1 | 10.2 % | 3,148 | 314.7 |
-| TC4 Water, no gear | 300 L, fuel | 2,956 | 272.6 | 9.2 % | 3,218 | 293.4 |
-| TC5 Gear, no water | Fuel, gear | 2,806 | 289.7 | 10.3 % | 3,098 | 314.4 |
-| TC6 Fuel only | Fuel | 2,656 | 270.5 | 10.2 % | 2,918 | 291.3 |
-| TC7 Grey full | 170 L fresh, 130 L grey, fuel, gear | 3,106 | 251.8 | 8.1 % | 3,398 | 276.5 |
-| TC8 Grey full, fresh empty | 130 L grey, fuel, gear | 2,936 | 250.6 | 8.5 % | 3,228 | 275.3 |
+| TC1 Tare | Nothing | 2,627 | 254.8 | 9.7 % | 2,885 | 273.6 |
+| TC2 Fully loaded | 300 L fresh, fuel, 150 kg of gear | 3,106 | 291.6 | 9.4 % | 3,398 | 316.7 |
+| TC3 Highway | 50 L, fuel, gear | 2,856 | 289.9 | 10.1 % | 3,148 | 314.9 |
+| TC4 Water, no gear | 300 L, fuel | 2,956 | 272.2 | 9.2 % | 3,218 | 293.4 |
+| TC5 Gear, no water | Fuel, gear | 2,806 | 289.5 | 10.3 % | 3,098 | 314.6 |
+| TC6 Fuel only | Fuel | 2,656 | 270.1 | 10.2 % | 2,918 | 291.3 |
+| TC7 Grey full | 170 L fresh, 130 L grey, fuel, gear | 3,106 | 251.6 | 8.1 % | 3,398 | 276.7 |
+| TC8 Grey full, fresh empty | 130 L grey, fuel, gear | 2,936 | 250.4 | 8.5 % | 3,228 | 275.5 |
 
 - Plate: ATM 3,500 kg, the ute's braked towing rating and the limit of the DO35 and the chains (H2). The heaviest case with growth is 3,397.6 kg, 2.4 kg inside H2's 3,400 kg target (MAS-10). The examiner's caps from the tyres, coupling, chains and brakes are 3,500 kg (MAS-07, MAS-08).
 - Water: at most 300 L of fresh and grey water while towing, H13's 350 L less 50 L by H21. The tanks hold 420 L and are filled at camp (H13). The grey tank travels empty, and TC7 and TC8 check the trailer with it full.
-- Towball: at least 7.5 % in every case and at most 350 kg, the 79's, the towbar's and the DO35's rating (MAS-04, H14). While the masses are estimates the axle sits in the middle of a 14.2 mm window between 8.0 % in the lightest case and 320 kg with growth in the heaviest (MAS-12, MAS-13, H17).
+- Towball: at least 7.5 % in every case and at most 350 kg, the 79's, the towbar's and the DO35's rating (MAS-04, H14). While the masses are estimates the axle sits in the middle of a 13.7 mm window between 8.0 % in the lightest case and 320 kg with growth in the heaviest (MAS-12, MAS-13, H17).
 - Ute: the heaviest towball puts the ute's rear axle at 2,649 kg with growth against the Elite kit's 2,800 kg plate (MAS-03, H18). MAS-14 reports the Platinum kit for the car build's cut CUT7.
 - GCM: the ute with growth, 3,678 kg, plus the 3,500 kg plate is 7,178 kg against Lovells' 7,400 kg (GCM-01, UTE-06, H20). If the revision is refused, Toyota's 6,900 kg needs the trailer plated at or below 3,222 kg and at most 124 L of water in travel, so the fully loaded trailer with growth stays under that plate.
 - Balance: the centre of gravity sits at most 34.9 mm to the kerb side against a 50 mm rule (MAS-11), at Z 1,232 to 1,318 mm with growth. The static stability factor is 0.61 to 0.65 on the 1,655 mm track.
 - Roll: with the body rolled onto its bump stops and tyres, the static rollover threshold is about 0.42 g (est., Gillespie's method), over the 0.35 g of PBS level 1 and the 0.40 g target (STB-01, STB-02). Decision H22 widened the track from 1,555 to 1,655 mm for it, through the rails. The ute with the bikes aboard has a static stability factor of 0.89 (UTE-11).
-- Sway: the yaw inertia is about 7,300 kg m² fully loaded with growth, and the towball never falls under 8.1 % of the trailer (STB-03). No snaking speed is estimated, because the published models need tyre and hitch data that are not known. The Bosch TSC brakes the trailer when it senses sway.
+- Sway: the yaw inertia is about 7,315 kg m² fully loaded with growth, and the towball never falls under 8.1 % of the trailer (STB-03). No snaking speed is estimated, because the published models need tyre and hitch data that are not known. The Bosch TSC brakes the trailer when it senses sway.
 - Axles: the XT build carries 3,745 kg with VSB1's 120 % rule against its 4,050 kg, and each wheel 953 kg against its 1,400 kg (MAS-02, MAS-09).
 - Parked in wind: unhitched on its corner steadies, the trailer slides on wet grass in a side gust of about 27 m/s at tare and 29 m/s fully loaded, forecast gusts of about 106 and 115 km/h, before it tips at about 30 and 33 m/s, both with the same force coefficient (STB-04, the friction est.). When a forecast gives gusts of 85 km/h or more, close the awning, and hitch the trailer to the ute, strap it down or move it. 85 km/h is the lower speed, sliding at tare, over the square root of 1.5, rounded down to 5 km/h, so the wind's force keeps a factor of 1.54 against sliding and 1.98 against tipping. A Bureau of Meteorology warning of damaging winds, 90 km/h and more, always meets it ([BoM](https://www.bom.gov.au/resources/learn-and-explore/severe-weather-knowledge-centre/severe-weather-and-coastal-hazard-warning-services)). Four rated lashing points under the outrigger ends take ratchet straps down to four Tie Down Engineering 59099 ground anchors (model M607, 3/4 in rod, 60 in, one 7 in helix), each with a Tie Down 59286 stabilizer plate on the trailer side of its rod and installed as RADCO's listing #1349 tested them, in the steps below. The listing rates the anchor at 3,922 lb (17.4 kN) working and 5,883 lb (26.2 kN) ultimate at a 45 degree pull in HUD's class 4B, "Loose sands", "firm clays" and "alluvial fills", and in the firmer classes ([Tie Down's manual with the RADCO listing](https://irp.cdn-website.com/871418b2/files/uploaded/Tie_Down_Anchor_Installation_Manual.pdf), [24 CFR 3285.202](https://www.law.cornell.edu/cfr/text/24/3285.202)). Strapped down it holds in region B's 500-year gust, 51.9 m/s at 3 m, with 14.5 kN in each windward strap at 55 degrees, 0.83 of the anchor's working load (STB-05). Where the soil reads less than 225 in-lb on the probe (step 1 below), as in class 5, "Uncompacted fill", "peat" and "organic clays", or an anchor will not wind in to its full depth, hitch the trailer or move it. The kit, 45.0 kg, rides in the ute while towing and stays with the trailer whenever the ute is unhitched for more than a day, so it is there with the ute away. No stays in the cyclonic regions C and D in the cyclone season, 1 November to 30 April ([BoM](https://www.bom.gov.au/resources/learn-and-explore/tropical-cyclone-knowledge-centre)). The walls are designed for region B's 25-year wind, which takes in the Queensland coast (H23).
 - Setting each anchor, from Tie Down's manual, pp. 4, 6 and 9:
