@@ -288,16 +288,16 @@ kinds:
     price_basis: "estimate: AUD 4.50 a metre for each single (est.)"
     mass_basis: "EN 50618 6 mm2 cable about 6.4 mm and 85 g a metre (est.)"
     priced_in: RF-02
-  tps:
-    what: "{size} mm2 twin and earth TPS, 7-strand"
+  tps:                          # round, so the glands and the frames' modules seal on it (I2-29)
+    what: "{size} mm2 2C+E orange circular TPS, 450/750 V"
     group: "230 V circuits"
-    sizes: [2.5, 4]
-    od: "9.0 if mm2 < 3 else 10.5"
-    kg_m: "0.14 if mm2 < 3 else 0.20"
-    bend_r: "6 * (5.5 if mm2 < 3 else 6.3)"
-    aud_m: "2.80 if mm2 < 3 else 4.20"
-    price_basis: "estimate: AUD 2.80 (2.5 mm2) and 4.20 (4 mm2) a metre from a 100 m roll (est.)"
-    mass_basis: "Flat 10.4 x 5.5 mm, about 140 g a metre, and 12 x 6.3 mm, 200 g, for 4 mm2 (est.)"
+    sizes: [2.5, 4, 6]
+    od: "9.8 if mm2 < 3 else (10.8 if mm2 < 5 else 11.8)"
+    kg_m: "0.20 if mm2 < 3 else (0.25 if mm2 < 5 else 0.30)"
+    bend_r: "40 if mm2 < 3 else (45 if mm2 < 5 else 50)"
+    aud_m: "0.60 + 0.632 * mm2"
+    price_basis: "listing: 2.5 mm2 2C+E orange circular 450/750 V, AUD 217.98 a 100 m roll (energyeis.com.au, Electra Cables, 22 Nov 2026), so AUD 2.18 a metre, the 4 and 6 mm2 by the copper's area (est.)"
+    mass_basis: "Prysmian's 450/750 V 2C+E orange circular to AS/NZS 5000.2: 9.8, 10.8 and 11.8 mm across, 200, 250 and 300 kg a km, installed bending radius 40, 45 and 50 mm (australia.prysmian.com, AU00_2CE_OC_450V)"
     priced_in: BD-11
   flex:
     what: "Heavy-duty flexible cord H07RN-F, {size} mm2"
@@ -636,6 +636,8 @@ water_outlets: [sink, drinking tap, basin, shower, shower bypass, washer, toilet
 
 runs:
   # ================================================================ 48 V main cables (report 20 section 7), sizes fixed by report 20
+  # but D-07 and D-13, which SVC-10 sized up (I2-15 b). The five modules share D-06's 150 A in parallel, 30 A each and
+  # 25 % more for uneven sharing (est.), so 37.5 A on a 60 A MEGA at the busbar, between Ib and the pair's rating.
   - {id: D-01, system: dc48, kind: pair, size: 25, amps: 37.5, volts: 51.2, lane: 0, sleeve: true, feeds: "Module 1 to the bank busbar", protection: "60 A MEGA at the busbar",
      from: {line: EL-01, at: [EL_01.x0 + 81, EL_01.cy - 70 + L_BAT, EL_01.z1 + 15]}, to: {line: BR-BUS, at: [BR_BUS.x0, ., .]}}
   - {id: D-02, system: dc48, kind: pair, size: 25, amps: 37.5, volts: 51.2, lane: 1, sleeve: true, feeds: "Module 2 to the bank busbar", protection: "60 A MEGA at the busbar",
@@ -650,7 +652,7 @@ runs:
      passes: [BR-ISO], along: [BD-03, WR-03], from: {line: BR-BUS, at: [DCR_X, BR_BUS.y0, BR_BUS.cz]}, path: [[., DCR_Y, .]], to: {line: BR-BMS, at: [., ., BR_BMS.z0]}}
   - {id: D-07, system: dc48, kind: pair, size: 95, amps: 144, volts: 48, feeds: "Lynx Distributor to the MultiPlus-II, down the chase's mid row, through the kerb frame, across over the grey tank's front and up through the road frame", protection: "200 A MEGA in the Lynx Distributor",
      glands: [G20, G15], along: [BD-01, BD-03, RS-K, CM-06, RS-R], from: {line: BR-LYNX, at: [BR_LYNX.cx, BR_LYNX.cy, BR_LYNX.z0]},
-     path: [[., ., LA_11E.z0 + 22], [G20_D_07.cx + 5, DCR_Y, .], [., ., ESZ + 5], [., G20_D_07.cy, .], [G20_D_07.cx, ., .], [., ., UFZ - 26], [5266, ., .], [., G15_D_07.cy, .], [G15_D_07.cx, ., .]],
+     path: [[., ., LA_11E.z0 + 22], [G20_D_07.cx + 10, DCR_Y, .], [., ., ESZ + 25], [., G20_D_07.cy, .], [G20_D_07.cx, ., .], [., ., UFZ - 26], [5266, ., .], [., G15_D_07.cy, .], [G15_D_07.cx, ., .]],
      to: {line: EL-04, at: [., ., EL_04.z0]}}
   - {id: D-08, system: dc48, kind: pair, size: 10, amps: 35, volts: 48, feeds: "MPPT 1 to the Lynx Distributor", protection: "40 A MIDI",
      from: {line: BR-MPPT1, at: [BR_MPPT1.x0, BR_MPPT1.cy, BR_MPPT1.cz]}, path: [[BFX - 0, ., .], [., BR_LYNX.cy + 40, BR_LYNX.cz + 40]], to: {line: BR-LYNX, at: [BR_LYNX.x0, ., .]}}
@@ -678,7 +680,7 @@ runs:
      path: [[G4.cx + 7.5, ., .], [., KB_Y + L_KB, .], [., ., CZ], [KBX, ., .], [., ., ZD], [BR_MPPT2.cx, BR_MPPT2.cy, .]], to: {line: BR-MPPT2, at: [., ., BR_MPPT2.z1]}}
   # ================================================================ 230 V (report 20 section 7): the kerb lane over the dryer, the riser behind the washer,
   # the plinth's end slot and under the floor in conduit, up at G15 into the kitchen and the MultiPlus-II, at G17 to the desk and G19 to the Combi
-  - {id: A-01, system: ac230, kind: tps, amps: 26, volts: 230, ways: [AB], feeds: "MultiPlus-II AC-out-1 to the 230 V board", protection: "The MultiPlus-II's output, the board's main switch",
+  - {id: A-01, system: ac230, kind: tps, size: 4, size_why: "4 mm2 for now: SVC-10 asks 10 mm2 in the bunched AB conduit, over the round TPS's 6 mm2, so A-01 needs a 0.6/1 kV 10 mm2 in RM 30 modules or a conduit of its own (reported)", amps: 26, volts: 230, ways: [AB], feeds: "MultiPlus-II AC-out-1 to the 230 V board", protection: "The MultiPlus-II's output, the board's main switch",
      serves: [inverter], glands: [G20, G15], along: [BD-01, BD-03, RS-K, CM-06, RS-R],
      from: {line: BR-AC, at: [BR_AC.x0, BR_AC.cy - 40, BR_AC.cz]},
      path: [[LA_11E.x0 + 20, -1125, 2340], [4495, ., .], [., ., 1035], [G20_A_01.cx, ., .], [., G20_A_01.cy, .], [., ., UFZ + 9], [5240, ., .], [., G15_A_01.cy, .], [G15_A_01.cx, ., .]],
@@ -715,7 +717,7 @@ runs:
   - {id: C5, system: ac230, kind: tps, size: 2.5, amps: 7.8, volts: 230, ways: [AB], feeds: "Truma Combi D 6 E element, under the floor along the kerb raiser, under the fill hose and up G19", protection: "10 A RCBO, contactor S1",
      serves: [C5], glands: [G20, G19], along: [BD-01, BD-03, RS-K],
      from: {line: BR-AC, at: [BR_AC.x0, BR_AC.cy + 20, BR_AC.cz]},
-     path: [[LA_11E.x0 + 20, -1125, 2385], [4450, ., .], [., ., 990], [G20_C5.cx, ., .], [., G20_C5.cy, .], [., ., UFZ - 75], [UF_06.x1 + 25, ., .], [., G19.cy - 70, .], [G19.cx + 2, G19.cy, .], [., ., floor_z], [., ., floor_z + 290], [., LA_11T.y0 + 35, .], [LA_11T.x0 + 20, ., .], [., LA_03.y1 - 65, .]],
+     path: [[LA_11E.x0 + 20, -1125, 2385], [4450, ., .], [., ., 990], [G20_C5.cx, ., .], [., G20_C5.cy, .], [., ., UFZ - 75], [UF_06.x1 + 25, ., .], [., G19.cy - 75, .], [G19.cx + 2, G19.cy, .], [., ., floor_z], [., ., floor_z + 290], [., LA_11T.y0 + 35, .], [LA_11T.x0 + 20, ., .], [., LA_03.y1 - 65, .]],
      to: {line: LA-03, at: [LA_03.x0, ., .]}}
   - {id: C6, system: ac230, kind: tps, size: 2.5, amps: 1.2, volts: 230, lane: 1, feeds: "Washer, by its outlet on the kerb wall above it", protection: "10 A RCBO, contactor S1",
      serves: [C6, "fixture: PO-06"], along: [BD-03], from: {line: BR-AC, at: [BR_AC.x0, BR_AC.y0 + 20, BR_AC.cz + 40]},
@@ -729,7 +731,7 @@ runs:
   - {id: C9, system: ac230, kind: tps, size: 2.5, amps: 10, volts: 230, ways: [AB], feeds: "Living outlet on the tower's bed-side end, by the kerb raiser, under the fill hose and up G19", protection: "10 A RCBO, the total power rule",
      serves: [C9, "fixture: PO-03"], glands: [G20, G19], along: [BD-01, BD-03, RS-K],
      from: {line: BR-AC, at: [BR_AC.x0, BR_AC.cy + 30, BR_AC.cz]},
-     path: [[LA_11E.x0 + 20, -1140, 2385], [4450, ., .], [., ., 990], [G20_C9.cx, ., .], [., G20_C9.cy, .], [., ., UFZ - 51], [G20_C9.cx - 20.5, RS_K.y1 + 32, UFZ - 75], [UF_06.x1 + 35, ., .], [., G19.cy - 70, .], [G19.cx + 13, G19.cy, .], [., ., floor_z], [., ., PO_03.z0 - 40], [PO_03.cx - 12, PO_03.cy, .]],
+     path: [[LA_11E.x0 + 20, -1140, 2385], [4450, ., .], [., ., 990], [G20_C9.cx, ., .], [., G20_C9.cy, .], [., ., UFZ - 15], [G20_C9.cx - 20.5, RS_K.y1 + 35, UFZ - 75], [UF_06.x1 + 38, ., .], [., G19.cy - 75, .], [G19.cx + 13, G19.cy, .], [., ., floor_z], [., ., PO_03.z0 - 40], [PO_03.cx - 12, PO_03.cy, .]],
      to: {line: PO-03, at: [., ., PO_03.z0]}}
   - {id: C9B, system: ac230, kind: tps, size: 2.5, amps: 10, volts: 230, ways: [AB], feeds: "Living outlet on to the two desk outlets, back down G19, under the floor and the kerb drawbar member, up G17 in the front wall's kerb corner and through the desk's front leg", protection: "10 A RCBO, the total power rule",
      serves: [C9, "fixture: PO-04", "fixture: PO-05"], glands: [G19, G17], along: [BD-01, BD-03, BD-04], passes: [PO-04, LA-09],

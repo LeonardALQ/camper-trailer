@@ -704,8 +704,14 @@ def _frame(sh, pr, g: dict, xy, fits: dict, cells: bool = True):
     sh.rect(*pr.rect3((x - hx - rim, y - hy - rim, 0, x + hx + rim, y + hy + rim, 0)), "thin")
     sh.rect(*pr.rect3((x - hx, y - hy, 0, x + hx, y + hy, 0)), "medium")
     if cells:
-        for dx, dy, m in (g.get("cells") or {}).values():
-            sh.rect(*pr.rect3((x + dx - m / 2, y + dy - m / 2, 0, x + dx + m / 2, y + dy + m / 2, 0)), "thin")
+        from ..routes import cell_half
+        for c in (g.get("cells") or {}).values():
+            dx, dy, m = c[:3]
+            hx, hy = cell_half(c)   # a pair's two cores, each in its own module
+            for k in range(round(max(hx, hy) * 2 / m)):
+                x0 = x + dx - hx + (k * m if hx > hy else 0)
+                y0 = y + dy - hy + (k * m if hy > hx else 0)
+                sh.rect(*pr.rect3((x0, y0, 0, x0 + m, y0 + m, 0)), "thin")
 
 
 def ct603(prj, model, bom, checks, reg, dwg):

@@ -1,7 +1,7 @@
 # 30. Services routing: the 3D wiring and plumbing plans (H28)
 
 Every cable and pipe of the home trailer is a run in `data/routes.yaml`. `cad/routes.py` resolves each run on the
-solved layout, gives it a centreline with real bends, sizes it, measures it and checks it (SVC-01 to SVC-09).
+solved layout, gives it a centreline with real bends, sizes it, measures it and checks it (SVC-01 to SVC-12).
 `cad/routes_model.py` sweeps the runs into the two viewer models, `trailer-electrical` and `trailer-plumbing`, and
 writes the schedules for the Electrical and Plumbing pages. CT-602 and CT-612 draw the same centrelines in plan.
 
@@ -25,8 +25,33 @@ they are threaded through (`inside`).
 - DC sizing: each 12 V, 24 V and 48 V circuit takes the smallest size whose rating carries its design current and whose
   drop at the routed length is at most 2 % (report 20 section 6). That is stricter than AS/NZS 3000:2018's limit for
   extra-low voltage. 1.5 mm2 is the smallest size used, for strength. The 48 V main cables keep report 20's sizes.
-- 230 V: 2.5 mm2 TPS, 4 mm2 where 2.5 mm2 is rated under the current in the bulkhead (A-01, 26 A), within the 5 % drop
-  of AS/NZS 3000:2018 clause 3.6.2.
+- 230 V: round TPS, Prysmian's 450/750 V 2C+E orange circular to AS/NZS 5000.2, 9.8 mm across in 2.5 mm2 and 10.8 mm
+  in 4 mm2, 200 and 250 kg a km, installed bending radius 40 and 45 mm ([Prysmian AU00_2CE_OC_450V](https://australia.prysmian.com/sites/australia.prysmian.com/files/media/products/AU00_2CE_OC_450V_0.pdf)),
+  so it seals in the glands and in an RM 15 module (3 to 11 mm) (I2-29). AS/NZS 3008.1.1 rates a cable by its
+  conductor, insulation and installation, so Prysmian's 0.6/1 kV 2C+E ratings hold for it. 2.5 mm2, 4 mm2 where 2.5 mm2
+  is rated under the current or its breaker where it lies (A-02, C1 and C4, SVC-10), within the 5 % drop of AS/NZS
+  3000:2018 clause 3.6.2. A-01 (26 A) needs 10 mm2 in the bunched conduit, over the 450/750 V range's 6 mm2, so it
+  stays 4 mm2 and SVC-10 reports it (section 7).
+- Ratings, SVC-10 (I2-15 b): no run line names its installation method. Each stretch of a run takes a zone from where
+  it lies, in this order: inside a chassis member it is threaded through, crossing a panel's foam core, under the floor,
+  on the drawbar, outside the body, in the board cabinet, in the battery box, in a 230 V conduit, in the ceiling's
+  cable covers, else in the cabin. The zone gives the method and the air round the cable on the design hot day (report
+  19: 42 C in the shade at 15:00, the split holding 24 C inside): 45 C under the floor and in the members (est.), 50 C
+  in a foam core and on the drawbar (est.), 60 C on the sunlit skin (est.), AS/NZS 3008.1.1's 40 C reference inside.
+  The DC cables take Tycab's tinned V90 ratings to JASO D609 in free air at 30 C, times 0.8 for the circuit's two cores
+  together, Tycab's bundling factors and its ambient table ([Tycab marine cable brochure 2017](https://www.ceca.au/uploads/1/3/7/6/13767324/tycab_marine_brochure_2017_web_23.pdf)).
+  The 230 V take Prysmian's 2C+E circular ratings, unenclosed and spaced in 40 C air, with the ambient factor the square
+  root of (75 - t) over 35 ([Prysmian 2C+E PVC circular](https://nz.prysmian.com/sites/nz.prysmian.com/files/media/documents/2ce-pvc-circular.pdf)). A method's ratio to free air
+  at the same size comes from Prysmian's AS/NZS 3008.1.1 single-core table. Groups take AS/NZS 3008.1.1 Table 22:
+  bunched in the 230 V conduits, a single layer in the DC ways and under the ceiling. A circuit at or under 30 % of its
+  rating is not counted (IEC 60364-5-52), nor data and control cables, and the circuits the load shedding never runs
+  together count once. A short crossing of foam at a gland (100 mm at most) takes BS 7671 Table 52.2's factor (0.88
+  over 50 mm, 0.78 over 100 mm) with no group's factor. Each run's Iz is its least stretch. Ib <= In <= Iz (AS/NZS 3000
+  clause 2.5.3). A run that sizes itself grows until its stretches carry its current and its device.
+- SVC-10's sizes: D-07 (144 A, the MultiPlus-II 48/6k5 at 6 kW) goes from 50 to 95 mm2, because its 200 A MEGA, sized
+  for the inverter's 11 kW minute, must sit under the pair's rating, and 70 mm2 gives 170 A enclosed in the board. D-13
+  goes from 16 to 25 mm2 under its 80 A fuse. The five module pairs D-01 to D-05 share D-06's 150 A, 30 A each and 25 %
+  for uneven sharing (est.), on 60 A MEGAs at the busbar, so their 25 mm2 stays.
 - Mass and price: the routed length times the kind's mass and price per metre, plus 10 % for cut-offs in the price.
   The line that prices each kind is `priced_in` (BD-11 for the house wiring and pipework, EL-07 for the 48 V mains,
   RF-02 for the PV strings, LGT-01 for the lamp loom, AC-03 for the split's line set and condensate hose, UF-06 for the
@@ -75,12 +100,15 @@ they are threaded through (`inside`).
 | SVC-01 | 20 mm from every envelope box but the run's own ends, and from the keep-clear boxes (aisles, landings, the chair space) above the floor up to 60 mm under the ceiling (est., the ceiling's cable covers), over which the cables cross in that zone | the brief (H28), H27, I2-14 |
 | SVC-02 | each bend at or above the least bending radius, or a fitting | makers' tables (sections 2, 3) |
 | SVC-03 | 230 V 50 mm from ELV outside its conduit, 150 mm reach at the board and shared appliances | AS/NZS 3000:2018 clause 3.9.8.3, AS/NZS 3001.2:2022 |
-| SVC-04 | no water, waste or diesel line within 300 mm of the battery's terminal face, but the washer's sleeved hoses (W-02, F-10) | AS/NZS 3001.2:2022 clause 5.4.10.2, CT-602 |
+| SVC-04 | no water, waste or diesel line within 300 mm of the battery's terminal face, but the washer's sleeved hoses (W-02, F-10), and none over the face inside a cone widening 1 in 5 (est., parked up to about 11 degrees off level) unless the drip tray EL-09 lies between | AS/NZS 3001.2:2022 clause 5.4.10.2, CT-602, the cone the design's own (I2-18 c) |
 | SVC-05 | every circuit, DC load, outlet, water outlet and fitting has its run, the runs of each tag join up end to end, and each 230 V circuit runs from the board's AC bar to its load or the outlet it plugs into | data/services.yaml, report 20 section 7 |
 | SVC-06 | DC drop at most 2 % at the design current, the ute's half of the ute feed (TW06) added, 230 V at most 5 % | the design's own 2 %, stricter than AS/NZS 3000, and AS/NZS 3000:2018 clause 3.6.2 for 230 V |
 | SVC-07 | gravity wastes fall at least 1:50 | AS/NZS 3500.2, CT-611, CT-612 |
 | SVC-08 | each run its radius plus 5 mm (est.) from every other, cables of one band in a shared way may touch. Cold water, vents and diesel 25 mm from 230 V, hot water before the mixing valve and wastes 50 mm from 230 V and 25 mm from extra-low-voltage cables above the floor (a solvent-welded DWV waste keeps the gap), and no wet line over a 230 V run within 25 mm in plan | IB 052/2015 for cold water (25 mm), the design's own rule for the rest (IB 052/2015 asks 100 mm for heated water and drains in a building) |
 | SVC-09 | every gland's fitting has room in its panel: 12 mm (est.) of spanner room round a locknut, a 10 mm (est.) web elsewhere, no floor fitting in a keep-clear box or under a part on the floor | CMP Products' locknuts by thread, Roxtec CF 8 for the frames' proportions |
+| SVC-10 | each cable's design current and its protective device at most its rating where it lies, Ib <= In <= Iz, every stretch rated for its zone's method and air and derated for its group (section 2). Reported, not failing, while A-01 waits for its 10 mm2 | AS/NZS 3000:2018 clause 2.5.3, AS/NZS 3008.1.1 (Table 22), Prysmian, Tycab (JASO D609), BS 7671 Table 52.2, IEC 60364-5-52 (I2-15 b) |
+| SVC-11 | every cable 25 mm (ELV) or 50 mm (230 V) from the hot line H-01 before the mixing valve, under the floor too, nothing under the Combi's base, cables and the fuel line 50 mm (est.) from the 100 mm behind it where the exhaust runs to its cowl, cables and pipes 50 mm (est.) from the oven's case inside the tower, but the oven's own lead | Truma Combi D 6 AU installation instructions, IB 052/2015 halved as SVC-08's (I2-18 d) |
+| SVC-12 | no cable unsupported over 600 mm: held inside a member it is threaded through, by a clip within 30 mm (est.) of a part it runs along or a support the design adds (the SP fixtures), in the board, a conduit, a cabinet's carcass, a box it ends at, a gland or a frame, or by its loom in a shared way | VSB1 section 7.1 (I2-18 a) |
 
 The checks are defined in `data/routes.yaml` beside the runs, as the lamps' checks live in `data/services.yaml`,
 because `data/checks.yaml`'s trailer check types are fixed in `cad/partsdb.py`. The build adds their rows to the

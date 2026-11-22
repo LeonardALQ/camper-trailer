@@ -56,5 +56,5 @@ def test_id_lists_write_ranges():
 def test_bd11_unassigned_part_is_its_allowance_item():
     b = services()["bd11"]
     assert b and b["line"] == "BD-11"
-    assert 0 < b["unassigned_kg"] < b["kg"]
+    assert 0 <= b["unassigned_kg"] < b["kg"]   # SVC-10 and SVC-12 used the last of it (I2-15 b, I2-18 a)
     assert b["unassigned_kg"] == round(sum(p["kg"] for p in b["parts"] if p["item"].lower().startswith("allowance")), 1)

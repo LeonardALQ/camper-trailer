@@ -557,12 +557,13 @@ items:
     system: body
     price:
       - {item: "12 and 24 V DC wiring, tinned twin core 2.5 to 6 mm2, 150 m at AUD 4.50/m", aud: 675, basis: estimate, date: 2026-11-20}
-      - {item: "230 V wiring: 78 m of TPS and cord, 25.8 m of it 4 mm2, six outlets and the inlet's tails", aud: 466.30, basis: estimate, date: 2026-11-22, note: "Was 40 m at AUD 330. The routes give 77.0 m after SVC-08's reroutes (data/routes.yaml, H28), so 38 m more at AUD 2.80/m, and A-02, C1 and C4 are 4 mm2 for SVC-10 (I2-15 b), 19.9 m at AUD 1.40/m more (est.)"}
+      - {item: "230 V wiring: 78 m of round 2C+E TPS and cord, 25.7 m of it 4 mm2, six outlets and the inlet's tails", aud: 466.30, basis: estimate, date: 2026-11-22, note: "Was 40 m at AUD 330. The routes give 77.0 m after SVC-08's reroutes (data/routes.yaml, H28), so 38 m more at AUD 2.80/m, and A-02, C1 and C4 are 4 mm2 for SVC-10 (I2-15 b), 19.9 m at AUD 1.40/m more (est.). The round cable lists at AUD 2.18/m for 2.5 mm2 (I2-29), and the estimate stands"}
       - {item: "LED lights: ten ceiling, two reading, two outside, at AUD 40", aud: 560, basis: estimate, date: 2026-11-20}
       - {item: "Switches, fuse blocks, fuses, terminals, lugs, heat shrink, conduit, glands and ties", aud: 650, basis: estimate, date: 2026-11-20}
       - {item: "Fresh water pipework: 36 m of 12 mm PEX, 47 push-fit fittings, tank fittings and breathers", aud: 801, basis: estimate, date: 2026-11-22, note: "Was 30 m and 40 fittings at AUD 710. The routes give 35.3 m and 47 fittings (data/routes.yaml, H28): 6 m more at AUD 3.50/m and 7 fittings at AUD 10 (est.)"}
       - {item: "Wastes: 2.9 m of DN40 DWV with its nine bends and 2.5 m of 25 mm waste hose", aud: 62.60, basis: estimate, date: 2026-11-22, note: "As routed (data/routes.yaml, H28): pipe AUD 4.00/m, bends AUD 4 each, hose AUD 6.00/m (est.)"}
       - {item: "General hardware: rivnuts, screws, brackets and P-clips", aud: 400, basis: estimate, date: 2026-11-20}
+      - {item: "The six cable supports SVC-12 adds (data/routes.yaml SP-CH to SP-DK): two 25 x 25 x 3 mm aluminium angles on brackets, a perforated tray, a cable channel, standoff cleats and loom saddles", aud: 135, basis: estimate, date: 2026-11-22, note: "2.8 m of angle at about AUD 10 a metre, the tray AUD 40, the channel AUD 25, twenty cleats and saddles at AUD 2 (est.)"}
     point: [body_x0 + body_length / 2, 0, floor_z + 400]
     parts:
       - {item: "12 and 24 V wiring, about 150 m of tinned twin core, 2.5 to 6 mm2", kg: 15.0, basis: estimate}
@@ -571,7 +572,8 @@ items:
       - {item: "Switches, fuse blocks, terminals, lugs, heat shrink, conduit, glands and ties", kg: 5.0, basis: estimate}
       - {item: "Fresh water pipework: 36 m of 12 mm PEX, 47 push-fit fittings, tank fittings, breathers and the wastes", kg: 4.0, basis: estimate}
       - {item: "General hardware: rivnuts, screws, brackets and P-clips", kg: 6.0, basis: estimate}
-      - {item: "The routed runs priced here above the three items' estimates (the 12 and 24 V wiring, the 230 V wiring and the fresh water pipework): 41.5 kg routed against 25.0 kg (bd11_routed_kg, data/routes.yaml, H28), at the routes' estimated masses a metre", kg: 16.5, basis: estimate}
+      - {item: "The routed runs priced here above the three items' estimates (the 12 and 24 V wiring, the 230 V wiring and the fresh water pipework): 45.4 kg routed against 25.0 kg (bd11_routed_kg, data/routes.yaml, H28), at the routes' masses a metre, the 230 V in Prysmian's round 2C+E (I2-29)", kg: 20.4, basis: estimate}
+      - {item: "The six cable supports SVC-12 adds (SP-CH to SP-DK): 2.8 m of 25 x 25 x 3 mm aluminium angle at 0.38 kg a metre and its brackets 1.3 kg, the tray 0.55 kg, the channel 0.35 kg, the cleats and saddles 0.3 kg", kg: 2.5, basis: estimate}
       - {item: "Allowance not yet given to a part, kept until the systems design: none left, the cables SVC-10 sized up (I2-15 b) took the last 0.5 kg and 1.0 kg more", kg: 0.0, basis: estimate}
     note: "The older block model's 60 kg (report 12 section 10), listed line by line (est.). The lamps, about 4 kg, are line LG-01. Reports 20 and 21 leave the house wiring and the fresh water pipework here. The jockey's spacers (DB-08), the diesel tank's cradle (UF-06B) and the side marker mounts (LG-02), 2.4 kg, came out of the allowance (H27)"
   - id: BD-25
@@ -1174,7 +1176,7 @@ items:
     material: "Tinned flexible copper, double insulated"
     system: electrical
     price:
-      - {item: "Tinned double-insulated pairs as routed (data/routes.yaml D-01 to D-13): 4.45 m of 95 mm2, 1.42 m of 70 mm2, 2.70 m of 25 mm2, 1.02 m of 10 mm2 and 0.55 m of 4 mm2, with 10 % for cut-offs", aud: 596.41, basis: rate, date: 2026-11-22, note: "The pair kind's rate in data/routes.yaml, AUD 0.45 a mm2 and metre of core from solar4rvs.com.au's 2 B&S single at AUD 14.90 a metre. D-07 is 95 mm2 and D-13 25 mm2 for SVC-10 (I2-15 b)"}
+      - {item: "Tinned double-insulated pairs as routed (data/routes.yaml D-01 to D-13): 4.47 m of 95 mm2, 1.42 m of 70 mm2, 2.70 m of 25 mm2, 1.02 m of 10 mm2 and 0.55 m of 4 mm2, with 10 % for cut-offs", aud: 598.01, basis: rate, date: 2026-11-22, note: "The pair kind's rate in data/routes.yaml, AUD 0.45 a mm2 and metre of core from solar4rvs.com.au's 2 B&S single at AUD 14.90 a metre. D-07 is 95 mm2 and D-13 25 mm2 for SVC-10 (I2-15 b)"}
       - {item: "Lugs, heat shrink and the terminal covers", aud: 210, basis: estimate, date: 2026-11-20, note: "The rest of report 20's AUD 450 for 3 m of 70 mm2, 4 m of 50 mm2, 12 m of 10 mm2 and the lugs"}
     point: [rear_x0 - 100, -800, floor_z + 900]
     mass: {basis: declared, total_kg: 14.1, maturity: estimate, source: "Calculated: the routed pairs, 13.56 kg at the pair kind's mass a metre (data/routes.yaml, Prysmian's V-90 cores and 10 % for the fine strands and the second sheath, est.), and 0.5 kg of lugs (est.). Was report 20's 6.0 kg for its shorter runs"}

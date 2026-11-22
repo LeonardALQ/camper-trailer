@@ -38,6 +38,14 @@ def key(iid: str) -> str:
     return re.sub(r"[^A-Za-z0-9]", "_", iid)
 
 
+def cell_half(c) -> tuple:
+    """A transit frame's cell [dx, dy, m] or [dx, dy, m, n, axis]: n modules of m side by side along the frame's X or
+    Y (a pair's two cores, each in its own module). Its half-widths in X and Y."""
+    m, n = c[2], (c[3] if len(c) > 3 else 1)
+    along_x = len(c) > 4 and str(c[4]).lower() == "x"
+    return (n * m / 2, m / 2) if along_x else (m / 2, n * m / 2)
+
+
 def load() -> dict:
     return yaml.safe_load(ROUTES.read_text(encoding="utf-8"))
 
@@ -60,8 +68,10 @@ def namespace(V: dict, blocks: list, data: dict, glands: dict | None = None) -> 
         hx, hy = g.get("w", g["d"]) / 2, g.get("h", g["d"]) / 2
         ns[gid] = B((x - hx, y - hy, z - hy, x + hx, y + hy, z + hy)) if g["at"] in ("floor", "roof") else \
             B((x - g["d"] / 2, y - g["d"] / 2, z - g["d"] / 2, x + g["d"] / 2, y + g["d"] / 2, z + g["d"] / 2))
-        for rid, (dx, dy, m) in (g.get("cells") or {}).items():   # a transit frame's module for each run, by its centre
-            ns[f"{gid}_{key(rid)}"] = B((x + dx - m / 2, y + dy - m / 2, z - m / 2, x + dx + m / 2, y + dy + m / 2, z + m / 2))
+        for rid, c in (g.get("cells") or {}).items():   # a transit frame's module for each run, by its centre
+            hx, hy = cell_half(c)                       # a pair's two cores lie in two modules side by side
+            dx, dy, m = c[:3]
+            ns[f"{gid}_{key(rid)}"] = B((x + dx - hx, y + dy - hy, z - m / 2, x + dx + hx, y + dy + hy, z + m / 2))
     for k, v in (data.get("consts") or {}).items():
         ns[k] = _eval(v, ns)
     for f in data.get("fixtures") or []:

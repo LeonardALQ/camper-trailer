@@ -6,6 +6,7 @@ description: The home trailer's water system, its daily water budget for two peo
 import Services from '../../components/Services.astro';
 import CadViewer from '../../components/CadViewer.astro';
 import s from '../../data/generated/services.json';
+import t from '../../data/generated/trailer.json';
 import { withBase } from '../../lib/url';
 
 export const W = s.water;
@@ -38,7 +39,7 @@ The routed pipes by the parts-list line that prices them, and the priced quantit
 
 The services checks for every cable and pipe are on the <a href={withBase('/electrical/#services-checks')}>Electrical page</a>.
 
-- Fresh: two welded HDPE tanks between the rails over the axles hold 420 L. At most 295 L ride while towing
+- Fresh: two welded HDPE tanks between the rails over the axles hold 420 L. At most {t.params.water_travel_l} L ride while towing
   (decisions H13 and H21), and the rest goes in at camp through the Puretec CR45 filter, by hose or the creek transfer pump,
   with a chlorine dose.
 - Supply: a Shurflo Trail King 7 at 2.1 bar with an accumulator feeds every outlet. The drinking tap has its own
@@ -48,6 +49,13 @@ The services checks for every cable and pipe are on the <a href={withBase('/elec
   sits in a sealed, insulated well under the shower floor.
 - Grey: every drain falls by gravity to a {W.grey_tank_l} L tank in the rear bay, with a lever valve and a camlock on
   the kerb side. It travels empty, and a 40 L wheeled tote serves longer stays.
+- Over the battery: no water, waste or diesel line passes within 300 mm of the battery's terminal face, but the
+  washer's sleeved hoses (SVC-04, AS/NZS 3001.2). The washer's and the dryer's lines cross over the battery box under
+  their base, so a 1.5 mm aluminium drip tray on the box's lid (EL-09) catches anything they drip into a cone widening
+  1 in 5 over the face, the trailer parked up to about 11 degrees off level (est.).
+- Heat: the Combi's hot outlet, before the mixing valve, keeps 25 mm from every extra-low-voltage cable and 50 mm
+  from the 230 V, and the diesel line keeps 50 mm (est.) from the exhaust behind the Combi (SVC-11, Truma's installation
+  instructions).
 
 ## Drawings
 

@@ -73,14 +73,21 @@ def test_the_ute_feed_holds_its_drop_from_the_chargers_to_the_lynx():
 def test_every_frame_cell_is_inside_its_frame_and_clear_of_the_others():
     """I2-14: a transit frame's modules fit its packing, side by side, each named for the run that passes it."""
     by = {r["id"]: r for r in RES["runs"]}
+    ranges = RES["svc"]["fittings"]["modules"]   # Roxtec's cable range for each RM module (I2-29)
     for g in RES["svc"]["glands"]:
         cells = g.get("cells") or {}
         boxes = []
-        for rid, (dx, dy, m) in cells.items():
+        for rid, c in cells.items():
+            dx, dy, m = c[:3]
+            n = c[3] if len(c) > 3 else 1   # a pair's two cores in two modules side by side
+            hx, hy = R.cell_half(c)
             assert rid in by and g["id"] in (by[rid].get("glands") or []), (g["id"], rid)
-            assert abs(dx) + m / 2 <= g["w"] / 2 + 1e-6 and abs(dy) + m / 2 <= g["h"] / 2 + 1e-6, (g["id"], rid)
-            assert by[rid]["od"] <= m, (g["id"], rid, by[rid]["od"], m)
-            boxes.append((rid, dx - m / 2, dy - m / 2, dx + m / 2, dy + m / 2))
+            assert abs(dx) + hx <= g["w"] / 2 + 1e-6 and abs(dy) + hy <= g["h"] / 2 + 1e-6, (g["id"], rid)
+            assert n == (2 if by[rid]["kind"] == "pair" else 1), (g["id"], rid, "a pair takes a module for each core")
+            core = by[rid]["od"] / n
+            lo, hi = ranges[m]
+            assert lo <= core <= hi, (g["id"], rid, f"{core:.1f} mm outside RM {m}'s {lo} to {hi} mm")
+            boxes.append((rid, dx - hx, dy - hy, dx + hx, dy + hy))
         for i, a in enumerate(boxes):
             for b in boxes[i + 1:]:
                 assert a[3] <= b[1] + 1e-6 or b[3] <= a[1] + 1e-6 or a[4] <= b[2] + 1e-6 or b[4] <= a[2] + 1e-6, (g["id"], a[0], b[0])
@@ -88,7 +95,7 @@ def test_every_frame_cell_is_inside_its_frame_and_clear_of_the_others():
 
 def test_bd11s_routed_item_follows_the_routes_and_the_line_adds_to_its_total():
     """I2-19: BD-11's routed item is the routed runs' mass (bd11_routed_kg) above the three items they price, the
-    allowance not yet given to a part is the rest, and the items add to the line's 53.6 kg."""
+    allowance not yet given to a part is the rest, and the items add to the line's 61.0 kg."""
     import yaml
     items = yaml.safe_load((R.DATA / "assemblies" / "trailer.yaml").read_text(encoding="utf-8"))["items"]
     parts = next(it for it in items if it["id"] == "BD-11")["parts"]
@@ -99,7 +106,7 @@ def test_bd11s_routed_item_follows_the_routes_and_the_line_adds_to_its_total():
     assert priced == pytest.approx(25.0)
     assert item["kg"] == pytest.approx(routed - priced, abs=0.051), (item["kg"], routed)
     assert f"{routed:.1f} kg routed" in item["item"]
-    assert allow["kg"] >= 0 and sum(p["kg"] for p in parts) == pytest.approx(54.6, abs=0.001)   # 53.6 kg until SVC-10 (I2-15 b)
+    assert allow["kg"] >= 0 and sum(p["kg"] for p in parts) == pytest.approx(61.0, abs=0.001)   # 53.6 kg until SVC-10, SVC-12 and the round TPS (I2-15 b, I2-18 a, I2-29)
 
 
 def test_every_hole_in_a_chassis_member_and_every_large_floor_cut_out_is_listed():
