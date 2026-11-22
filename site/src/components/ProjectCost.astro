@@ -20,7 +20,7 @@ const closes = car.gap > 0 && car.closing.length
 const note = [
   "The truck is Leonard's planning figure.",
   `The car build is its required lines with the plan's contingency allowance, AUD ${aud(Math.abs(car.gap))} ${car.gap > 0 ? 'over' : 'under'} Leonard's AUD ${aud(car.budget)} for it${closes}.`,
-  box ? `The bike box is every line of its parts list with ${box.contingency_pct} % contingency, and owner-built leaves out the shop's fabrication labour.` : '',
+  box ? `The bike box is every line of its parts list with ${box.contingency_pct} % contingency. Leonard builds it, so no labour is paid.` : '',
   trailer && tpct ? `The trailer is every line of its parts list with ${tpct.listing} % contingency on listed prices and ${tpct.estimate} % on rates and estimates, and owner-built leaves out the hired labour.` : '',
   d.pending.length ? `The ${d.pending.join(' and ').toLowerCase()} has no prices yet.` : '',
   "Leonard's own labour is outside every figure. Each figure is rounded to the dollar, so a row can differ from its parts by AUD 1.",

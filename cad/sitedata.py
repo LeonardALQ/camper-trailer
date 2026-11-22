@@ -243,7 +243,8 @@ def tow_vehicle_page():
 
 def box_parts() -> dict:
     """The bike box's parts list (data/ute/box-parts.yaml) for the site, with the totals worked out from the lines.
-    cad/tests/test_box_parts.py checks that they equal the totals typed in the file."""
+    Leonard builds the box, so it has one total (decision H25). cad/tests/test_box_parts.py checks that they equal the
+    totals typed in the file."""
     data = yaml.safe_load((ROOT / "data" / "ute" / "box-parts.yaml").read_text(encoding="utf-8"))
     aud, kg = {}, {}
     for ln in data["lines"]:
@@ -255,7 +256,6 @@ def box_parts() -> dict:
     data["totals"] = dict(data["totals"], by_group={g: round(aud[g], 2) for g in data["groups"] if g in aud},
                           kg_by_group={g: round(kg[g], 2) for g in data["groups"] if g in kg},
                           subtotal_aud=round(sub, 2), contingency_aud=round(sub * pct / 100, 2), total_aud=round(total, 2),
-                          owner_built_total_aud=round(total - aud.get("fabrication", 0.0) * (1 + pct / 100), 2),
                           mass_kg_lines=round(sum(kg.values()), 2))
     (GEN / "box-parts.json").write_text(json.dumps(data, indent=1, default=str))
     return data
@@ -306,7 +306,7 @@ def project_costs(box_totals, proj=None) -> dict:
              before=car["required"], contingency=car["allowance"], total=car["with_contingency"], link="/tow-vehicle/#parts-list",
              link_text="Car build parts list"),
         dict(id="box", part="Bike box", basis=p["bike_box"]["basis"], before=bt["subtotal_aud"], contingency=bt["contingency_aud"],
-             total=bt["total_aud"], owner_built=bt["owner_built_total_aud"], contingency_pct=bt["contingency_pct"],
+             total=bt["total_aud"], contingency_pct=bt["contingency_pct"],
              link="/ute-garage/#parts-list", link_text="Bike box parts list"),
     ]
     tr = p["trailer"]

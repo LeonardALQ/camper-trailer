@@ -21,7 +21,6 @@ const host = (u: string) => {
 const LABEL: Record<string, string> = {
   materials: 'Materials', subframe_mounts: 'Subframe and mounts', fasteners_sealants: 'Fasteners and sealants', doors: 'Doors',
   security: 'Security', restraint: 'Restraint', loading: 'Loading', services: 'Services', finish: 'Finish', tools: 'Tool chests',
-  fabrication: 'Shop labour', compliance: 'Engineering review',
 };
 const label = (g: string) => LABEL[g] ?? g.replace(/_/g, ' ');
 ---
@@ -68,8 +67,7 @@ const label = (g: string) => LABEL[g] ?? g.replace(/_/g, ' ');
       <tbody>
         <tr><td>Subtotal</td><td>Every line above, {n(t.mass_kg_lines, 1)} kg</td><td class="num">{n(t.subtotal_aud, 0)}</td></tr>
         <tr><td>Contingency</td><td>{t.contingency_pct} % of the subtotal (est.)</td><td class="num">{n(t.contingency_aud, 0)}</td></tr>
-        <tr class="row-total"><td>Shop-built</td><td>A fabricator builds and fits it</td><td class="num">{n(t.total_aud, 0)}</td></tr>
-        <tr class="row-total"><td>Owner-built</td><td>Without the shop labour line and its contingency</td><td class="num">{n(t.owner_built_total_aud, 0)}</td></tr>
+        <tr class="row-total"><td>Total</td><td>Leonard builds and fits it, so no labour is paid (decision H25)</td><td class="num">{n(t.total_aud, 0)}</td></tr>
       </tbody>
     </table>
   </div>

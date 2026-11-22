@@ -125,7 +125,7 @@ def test_vehicle_md_quotes_the_totals():
     t = TYPED
     for v in (t["required"], t["required_plus_contingency"], t["required_with_cuts_plus_contingency"], t["contingency_allowance"],
               t["build_budget"], t["against_budget"]["required_plus_contingency"], t["cuts"],
-              PROJECT["truck"]["purchase_aud"], BOX["total_aud"], BOX["owner_built_total_aud"]):
+              PROJECT["truck"]["purchase_aud"], BOX["total_aud"]):
         assert any(f in PLAN for f in (f"AUD {_aud(v)}", f"| {_aud(v)} |", f"| -{_aud(v)} |")), f"VEHICLE.md does not quote {_aud(v)}"
     bp = t["by_priority"]
     for v in (bp["P1"]["required"], bp["P2"]["required"], bp["P3"]["optional"]):
@@ -167,13 +167,13 @@ def test_project_cost_table():
     assert rows["car"]["total"] == TYPED["required_plus_contingency"]
     assert rows["car"]["before"] + rows["car"]["contingency"] == rows["car"]["total"]
     assert abs(rows["box"]["before"] + rows["box"]["contingency"] - rows["box"]["total"]) < 0.01
-    assert rows["box"]["total"] == BOX["total_aud"] and rows["box"]["owner_built"] == BOX["owner_built_total_aud"]
+    assert rows["box"]["total"] == BOX["total_aud"] and "owner_built" not in rows["box"]
     tr = rows["trailer"]
     assert not tr.get("pending") and t["pending"] == []
     assert abs(tr["total"] - TRAILER["total_aud"]) < 0.01 and tr["owner_built"] == TRAILER["owner_built_total_aud"]
     known = PROJECT["truck"]["purchase_aud"] + TYPED["required_plus_contingency"] + BOX["total_aud"] + TRAILER["total_aud"]
     assert abs(t["total"] - known) < 0.01
-    owner = known - BOX["total_aud"] + BOX["owner_built_total_aud"] - TRAILER["total_aud"] + TRAILER["owner_built_total_aud"]
+    owner = known - TRAILER["total_aud"] + TRAILER["owner_built_total_aud"]
     assert abs(t["total_owner_built"] - owner) < 0.01
     assert abs(t["before"] + t["contingency"] - t["total"]) < 0.01
 
