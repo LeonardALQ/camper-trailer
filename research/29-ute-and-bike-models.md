@@ -40,7 +40,7 @@ The shapes come from Toyota's LC70 body builder guide for trucks from January 20
 
 The ROH Trak 2 is a white sunraysia steel wheel, mine-site approved, made in 16 x 7 for the 5 x 150 LandCruiser stud pattern and rated up to 1,400 kg ([ROH](https://roh.com.au/wheels/trak-2)). The model gives it a rolled rim with its bead seats, flanges and drop centre, 406.4 mm at the bead seat and 177.8 mm between the flanges, and a pressed centre with eight triangular windows, five stud holes on the 150 mm circle, a 110 mm centre bore (est.), five nuts and a centre cap. ET 0 puts its mounting face 4 mm inboard of the rim's centre plane, on the hub drum.
 
-The LT265/75R16 tyre is 16 x 25.4 + 2 x 0.75 x 265 = 804 mm across, and ute.yaml takes the Yokohama G015's 805 mm and a 268 mm section. The model's carcass has square shoulders and full sidewalls, and five rows of tread blocks 13 mm deep (est.): a centre row, two inner rows half a pitch round from it and two shoulder rows that run onto the sidewall, 44 blocks round (est.). A block sits at the bottom of each tyre.
+The LT265/75R16 tyre is 16 x 25.4 + 2 x 0.75 x 265 = 804 mm across, and ute.yaml takes the Yokohama G015's 805 mm and a 268 mm section. The model's carcass has square shoulders and full sidewalls, and five rows of tread blocks 13 mm deep (est.): a centre row, two inner rows half a pitch round from it and two shoulder rows that run onto the sidewall, 30 blocks round (est.). A block sits at the bottom of each tyre.
 
 ## The Aprilia Tuareg 660 Rally
 

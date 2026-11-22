@@ -47,7 +47,7 @@ class straight:
         SWEEP.pop()
 
 
-def tube(points, r, round_ends=False):
+def tube(points, r, round_ends=False, mitred=False):
     """Round bar through the points: a circle swept along the polyline with round bends, as a bent tube is. If OCCT
     cannot sweep the path, the bar is straight segments with a ball at every bend, the balls 5 % larger than the bar so
     that they cut it cleanly instead of meeting it tangentially. Inside `straight()` it is the straight segments alone."""
@@ -59,7 +59,7 @@ def tube(points, r, round_ends=False):
             from build123d import Circle, Transition, sweep
             path = Wire.make_polygon([Vector(*p) for p in pts], close=False)
             prof = Plane(origin=pts[0], z_dir=Vector(*pts[1]) - Vector(*pts[0])) * Circle(r)
-            s = sweep(prof, path=path, transition=Transition.ROUND)
+            s = sweep(prof, path=path, transition=Transition.RIGHT if mitred else Transition.ROUND)
             solids = s.solids()
             if len(solids) == 1 and solids[0].is_valid and solids[0].volume > 0:
                 return solids[0]
@@ -138,7 +138,7 @@ def moto_tyre(D, W, rim_r, bead_w, knob=0.0, n=40):
 
 
 @lru_cache(maxsize=None)
-def truck_tyre(D, W, rim_r, bead_w, depth=13.0, n=36, tread=True):
+def truck_tyre(D, W, rim_r, bead_w, depth=13.0, n=30, tread=True):
     """Light-truck all-terrain tyre: a square-shouldered carcass with its sidewalls, and five rows of tread blocks, the
     two inner rows and the centre row staggered half a pitch, and shoulder rows that run down onto the sidewall. The
     tread tops reach the overall diameter and a block sits at the bottom. A compound of the carcass and its rows, or with

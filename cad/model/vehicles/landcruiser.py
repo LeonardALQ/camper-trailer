@@ -180,8 +180,8 @@ def _hubs(V, x, track):
 
 def front_axle(V, plain=False):
     """The front beam axle with its diff, hubs and drums, and the two coil springs on their seats, from the axle tube to
-    the rails' bottom flanges. Each coil is a 16 mm wire on a 62 mm radius, eight straight runs a turn with round bends,
-    which draws as a coil at a tenth of a true helix's facets. The drawings take each coil as its outline cylinder."""
+    the rails' bottom flanges. Each coil is a 16 mm wire on a 62 mm radius, eight straight runs a turn with mitred bends,
+    which reads as a coil at a small part of a true helix's facets. The drawings take each coil as its outline cylinder."""
     z, zb = V["tyre_slr"], V["frame_top_z"] - V["rail_h"]
     tube, hubs = _hubs(V, 0.0, V["track_front"])
     diff = cyl((-130, 120, z), (130, 120, z), 125)
@@ -196,7 +196,7 @@ def front_axle(V, plain=False):
             continue
         n = int((z1 - z0) / pitch * 8)
         pts = [(62 * math.cos(math.pi * k / 4), s * yc + 62 * math.sin(math.pi * k / 4), z0 + (z1 - z0) * k / n) for k in range(n + 1)]
-        coils.append(kit.tube(pts, 8))
+        coils.append(kit.tube(pts, 8, mitred=True))
     out += [("coil springs", kit.fuse(coils), "#c0392b", 1.0), ("spring seats", kit.fuse(seats), CHASSIS, 1.0)]
     return out
 

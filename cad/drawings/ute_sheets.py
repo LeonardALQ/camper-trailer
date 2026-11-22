@@ -174,7 +174,8 @@ def ct701(prj, model, bom, checks, reg, dwg):
                        (ext["z1"], f"{ext['z1']:.0f} ROOF", zr + 13)):
         S.vdim(sh, zr, vE.p(0, 0, 0)[1], zr, vE.p(0, 0, z)[1], xd, lab, size=1.8)
     cz = vE.p(-300, 0, V["cab_height"])
-    S.leader(sh, (cz[0], cz[1] + 0.2), (cz[0] - 8, cz[1] + 7), f"CAB ROOF {V['cab_height']:.0f}", size=1.8)
+    roof = vE.p(V["cab_back_x"] - 360, 0, V["cab_height"])        # the roof's rear half, clear of the snorkel's head
+    S.leader(sh, (roof[0], roof[1] + 0.2), (cz[0] - 8, cz[1] + 7), f"CAB ROOF {V['cab_height']:.0f}", size=1.8)
 
     # ---- loading: doors open, ramp on the sill, bikes in
     loading = vehicle_solids(ute, plain=True) + _gs(c, groups=("body", "doors", "subframe", "security", "bikes", "restraint", "context"), loading=True)
@@ -182,7 +183,8 @@ def ct701(prj, model, bom, checks, reg, dwg):
     vL.draw(loading)
     S.view_label(sh, 100, 139, "ELEVATION FROM THE KERB SIDE, LOADING", sc)
     sill = vL.p(P["module_x0"] + P["x_end"], 0, P["ground_drop"])
-    S.leader(sh, sill, (sill[0] + 16, sill[1] + 12), f"RAMP {g['dims']['ramp_deg']:.1f} DEG FROM A {P['ground_drop']:.0f} SILL", size=1.8)
+    # under the ramp, since the Tuareg stands on it in the loading view
+    S.leader(sh, sill, (sill[0] + 2, sill[1] - 14.5), f"RAMP {g['dims']['ramp_deg']:.1f} DEG FROM A {P['ground_drop']:.0f} SILL", size=1.8)
 
     # ---- plan
     vP = S.View(sh, (0, 0, 1), (0, 1, 0), sc, ox=62.0, oy=100.0)
