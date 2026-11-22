@@ -187,7 +187,7 @@ const cases = d.energy.cases;
   .route-legend li { display: flex; align-items: center; gap: 0.4rem; margin: 0; }
   .route-legend .swatch { display: inline-block; width: 1.6rem; height: 0.55rem; border-radius: 2px; }
   .route-legend .swatch.ghost { background: #9aa5ad; opacity: 0.35; }
-  /* The cable schedule and the services checks show their first five columns (I2-21). The table's Wrap, or the All
+  /* The cable, pipe and services check tables show their first five columns (I2-21). The table's Wrap, or the All
      columns button beside it, shows the rest. Without JavaScript the table is plain and shows every column. */
   .svc-cols :global(table.sheet-table:not(.sheet-wrap):not(.svc-all) :is(th, td):nth-child(n + 6)) { display: none; }
 </style>
@@ -241,12 +241,12 @@ const cases = d.energy.cases;
 )}
 
 {kind === 'pipe-schedule' && (
-  <div class="data-table">
+  <div class="data-table svc-cols">
     <table data-sheet-sum="sum">
-      <thead><tr><th>Run</th><th>System</th><th>Feeds</th><th>Pipe or hose</th><th>Length, m</th><th>Fittings</th><th>Mass, kg</th><th>AUD</th><th>Priced in</th></tr></thead>
+      <thead><tr><th>Run</th><th>Feeds</th><th>Pipe or hose</th><th>Length, m</th><th>Fittings</th><th>System</th><th>Mass, kg</th><th>AUD</th><th>Priced in</th></tr></thead>
       <tbody>{wet.map((r: any) => (
-        <tr><td>{r.id}</td><td>{r.system_label}</td><td>{r.feeds}</td><td>{r.cable}</td>
-          <td>{n(r.length_m, 2)}</td><td>{r.fittings}</td><td>{n(r.mass_kg, 2)}</td><td>{n(r.aud, 2)}</td><td>{r.priced_in}</td></tr>))}</tbody>
+        <tr><td>{r.id}</td><td>{r.feeds}</td><td>{r.cable}</td><td>{n(r.length_m, 2)}</td><td>{r.fittings}</td>
+          <td>{r.system_label}</td><td>{n(r.mass_kg, 2)}</td><td>{n(r.aud, 2)}</td><td>{r.priced_in}</td></tr>))}</tbody>
     </table>
   </div>
 )}

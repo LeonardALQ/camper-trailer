@@ -194,8 +194,8 @@ def run_events(run: dict, V: dict) -> list[tuple]:
             real.append([lv, list(pts)])
     p0, p1 = (d[0][0], d[0][1]), (d[-1][0], d[-1][1])
     l0, l1 = level(d[0][2], V), level(d[-1][2], V)
-    if not real:
-        return [(p0, l0), (p1, l1)]
+    if not real:    # a run that only rises or drops: its end tag is the whole change
+        return [(p0, l0), (p1, l1 if l1 == l0 else f"{l0}/{l1}")]
     out = [(p0, l0 if real[0][0] == l0 else f"{l0}/{real[0][0]}")]
     for (la, pa), (lb, _) in zip(real, real[1:]):
         out.append(((pa[-1][0], pa[-1][1]), f"{la}/{lb}"))
@@ -241,9 +241,17 @@ def tag_clusters(runs: list[dict], V: dict, glands: dict, clip_x: float | None =
     ev = []
     for r in runs:
         gl = [(gid, _gland_xy(glands[gid], V)) for gid in r.get("glands") or [] if gid in glands]
+        mine = []
         for k, (p, code) in enumerate(run_events(r, V)):
             near = min(((math.dist(p, q), gid) for gid, q in gl if q[0] is not None and q[1] is not None), default=(1e9, None))
-            ev.append(dict(p=p, code=code, run=r["id"], k=k, gland=near[1] if near[0] < GLAND_MM else None))
+            mine.append(dict(p=p, code=code, run=r["id"], k=k, gland=near[1] if near[0] < GLAND_MM else None))
+        # a gland the run passes with no change of level there still names it, at the level it passes
+        for gid, q in gl:
+            if q[0] is None or q[1] is None or any(e["gland"] == gid for e in mine):
+                continue
+            z = min(r["dense"], key=lambda p: math.dist((p[0], p[1]), q))[2]
+            mine.append(dict(p=q, code=level(z, V), run=r["id"], k=0.5, gland=gid))
+        ev += mine
     clusters: list[dict] = []
     off = [e for e in ev if clip_x is not None and e["p"][0] < clip_x]
     if off:
