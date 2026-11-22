@@ -120,9 +120,9 @@ inputs:
     estimate: {v: 15, src: "Assumed (est.)"}
     measured: {v: null, date: null}
     stage: buy
-    affects: [branch A or B, FS01, cut CUT1]
+    affects: [branch A or B, FS06, FS01]
     thresholds:
-      - {at: 25, rule: "Over 25 %, or a stored injector fault, take branch A, because worn injectors wash the bores. Cut CUT1 is then off", src: "Report 23 estimate (est.). No Denso or Toyota limit for this test was found, so a Denso specialist's bench test overrides it"}
+      - {at: 25, rule: "Over 25 %, or a stored injector fault, take branch A, because worn injectors wash the bores. A new injector replaces each one that fails (FS06) before the run-in", src: "Report 23 estimate (est.). No Denso or Toyota limit for this test was found, so a Denso specialist's bench test overrides it"}
     range: {min: 0, max: 25, src: "Report 23 estimate (est.)"}
   - id: VEH-05
     group: Car build
@@ -146,10 +146,10 @@ inputs:
     estimate: {v: 1, src: "Assumed (est.)"}
     measured: {v: null, date: null}
     stage: buy
-    affects: [branch A or B, FS01]
+    affects: [branch A or B, FS06]
     thresholds:
       - {at: 2, rule: "2 to 4 %: re-sample after 1,000 km and read the regeneration history", src: "Under 2 % is acceptable, 2 to 4 % is watched (Heavy Vehicle Inspection guide, VEH-05)"}
-      - {at: 4, rule: "Over 4 %: an injector or regeneration fault. Take branch A, so the new injectors come forward", src: "Over 4 % is a fault signature (same source)"}
+      - {at: 4, rule: "Over 4 %: an injector or regeneration fault. Take branch A, and replace any injector that fails VEH-04 (FS06)", src: "Over 4 % is a fault signature (same source)"}
     range: {min: 0, max: 4, src: "Heavy Vehicle Inspection guide (VEH-05)"}
   - id: VEH-07
     group: Car build
@@ -188,7 +188,7 @@ inputs:
     stage: buy
     affects: [branch A or B, CG01, CG09]
     thresholds:
-      - {at: 0, rule: "Slip, crunch or whine: take branch A, because the clutch and gearbox come out with the engine in S2", src: "Plan rule (report 23): the gearbox is removed only once"}
+      - {at: 0, rule: "Slip, crunch or whine: take branch A, because the clutch and gearbox come out with the engine in S2. Crunch or whine also buys the new H152F (CG09)", src: "Plan rule (report 23): the gearbox is removed only once"}
     range: {min: 1, max: 1, src: "Plan rule (report 23)"}
   # ================================================================ power, stage S6 (same dyno, same day)
   - id: VEH-10
@@ -275,7 +275,7 @@ inputs:
     group: Car build
     part: car
     title: Gearbox oil temperature, same tow
-    how: Read the gearbox sender (CG11) at the same point as VEH-14. Repeat after the tune.
+    how: "Only with the optional senders (CG11): read the gearbox sender at the same point as VEH-14, and repeat after the tune. Without them, read the gearbox case with an infrared thermometer right after the climb, which reads below the oil (est.)."
     unit: °C
     estimate: {v: 95, src: "Report 23 estimate (est.)"}
     measured: {v: null, date: null}
@@ -288,7 +288,7 @@ inputs:
     group: Car build
     part: car
     title: Rear diff oil temperature, same tow
-    how: Read the rear diff sender (CG11) at the same point as VEH-14.
+    how: "Only with the optional senders (CG11): read the rear diff sender at the same point as VEH-14. Without them, read the diff housing with an infrared thermometer right after the climb, which reads below the oil (est.)."
     unit: °C
     estimate: {v: 100, src: "Report 23 estimate (est.)"}
     measured: {v: null, date: null}
@@ -421,7 +421,7 @@ inputs:
     group: Car build
     part: car
     title: Ride height change from the GVM kit, wheel centre to guard, unladen, largest corner
-    how: "Measure all four corners before the kit (stage S1) and after it (stage S4), same tyres and pressures."
+    how: "Measure all four corners before the kit (stage S0 or S1) and after it (stage S4), same tyres and pressures."
     unit: mm
     estimate: {v: 50, src: "Assumed (est.). Lovells publishes no lift figure for the 79 kit"}
     measured: {v: null, date: null}

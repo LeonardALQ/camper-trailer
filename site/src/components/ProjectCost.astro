@@ -15,10 +15,10 @@ const tpct = trailer?.contingency_pct;
 const car = d.car;
 const list = (a: string[]) => (a.length < 3 ? a.join(' and ') : `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}`);
 const closes = car.gap > 0 && car.closing.length
-  ? `, and ${list(car.closing)} bring it to AUD ${aud(car.with_closing)} if each one's test or weighing allows it` : '';
+  ? `, and ${list(car.closing)} ${car.closing.length > 1 ? 'bring' : 'brings'} it to AUD ${aud(car.with_closing)} if ${car.closing.length > 1 ? 'each one\'s' : 'its'} condition holds` : '';
 const note = [
   "The truck is Leonard's planning figure.",
-  `The car build is its required lines with the plan's contingency allowance, AUD ${aud(Math.abs(car.gap))} ${car.gap > 0 ? 'over' : 'under'} Leonard's AUD ${aud(car.budget)} for it${closes}.`,
+  `The car build is its build list with an allowance of ${car.allowance_pct.listing} % on listed prices and ${car.allowance_pct.estimate} % on estimates, AUD ${aud(Math.abs(car.gap))} ${car.gap > 0 ? 'over' : 'under'} Leonard's AUD ${aud(car.budget)} for it${closes}. Its purchase check list, AUD ${aud(car.check)} if every item failed, and its optional extras are not counted.`,
   box ? `The bike box is every line of its parts list with ${box.contingency_pct} % contingency. Leonard builds it, so no labour is paid.` : '',
   trailer && tpct ? `The trailer is every line of its parts list with ${tpct.listing} % contingency on listed prices and ${tpct.estimate} % on rates and estimates. Leonard builds it, so no labour is hired.` : '',
   d.pending.length ? `The ${d.pending.join(' and ').toLowerCase()} has no prices yet.` : '',
