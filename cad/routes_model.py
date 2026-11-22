@@ -104,6 +104,9 @@ def run_solid(run: dict):
     return Compound(children=cyl)
 
 
+SHELL = ("BD-01", "BD-02", "BD-03", "BD-04")    # the floor, roof and walls: the ghost's boxes that keep their edges
+
+
 def _ghost(res: dict) -> Compound:
     """The body, the chassis and the fit-out as faint boxes, for orientation."""
     kids = []
@@ -175,11 +178,17 @@ def viewer_json(name: str, root: Compound) -> str:
     js = _viewer_js(name, root, deviation=1.5, angular_tolerance=0.7)
     shapes = json.loads(js[js.index("{"): js.rindex("}") + 1])
 
-    def walk(o):
+    def walk(o, ghost=False):
+        ghost = ghost or str(o.get("name", "")).startswith("Ghost")
         for p in o.get("parts") or []:
-            walk(p)
+            walk(p, ghost)
         sh = o.get("shape")
         if isinstance(sh, dict):
+            # the ghost's boxes are faces only, so the runs stand out, and the body shell keeps its outline
+            if ghost and not str(o.get("name", "")).startswith(SHELL):
+                for k in ("edges", "edge_types", "segments_per_edge", "obj_vertices"):
+                    if k in sh:
+                        sh[k] = []
             for k, nd in (("vertices", 1), ("edges", 1), ("obj_vertices", 1), ("normals", 3)):
                 if k in sh:
                     sh[k] = _round(sh[k], nd)
