@@ -318,6 +318,8 @@ def plan(lay, res, tm=None, state="day") -> dict:
             cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
             if not (xa < cx < xb and ya < cy < yb) or z0 < V["floor_z"] - 5 or z1 > V["ceiling_z"] + 5:
                 continue                     # outside the room: the walls' fillers, the floor, the roof, the lamps
+            if blk is not None and blk.system == "body" and blk.zone != "inside":
+                continue                     # the body's own parts, such as the roof-to-wall joiner round the wall tops
             area = area_of(blk, (x0 + x1) / 2, (y0 + y1) / 2, V)
             system = blk.system if blk else None
             if z0 >= zc - TOL:

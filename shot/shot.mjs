@@ -27,6 +27,7 @@ const jobs = [
   { path: '/trailer/', name: 'trailer-floorplan-dark', el: '.fp', theme: 'dark' },
   { path: '/trailer/', name: 'trailer-plan-view', viewer: true, plan: true },
   { path: '/body/', name: 'body-inside-plan-view', viewer: true, nth: 1, plan: true },
+  { path: '/body/', name: 'body-inside-night-plan-view', viewer: true, nth: 2, plan: true },
 ];
 const browser = await chromium.launch({
   args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
@@ -78,6 +79,8 @@ for (const j of jobs) {
         await page.waitForTimeout(500);
         probe.hidden = await v.$eval('.cad-card button[data-act="hide"]', (t) => t.textContent);
         await (await v.$('.cad-card button[data-act="hide"]')).click();
+        await page.waitForTimeout(500);
+        await (await v.$('.cad-card button[data-act="close"]')).click();
         await page.waitForTimeout(800);
       }
     } else probe.button = null;
