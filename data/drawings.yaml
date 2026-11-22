@@ -429,6 +429,7 @@ drawings:
       - {rev: H, date: 2026-11-21, description: "Notice: the ute's masses with the trailer's anchors aboard (T2)", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-21, description: "Notice: the ute's masses with the anchors' kit at 38.6 kg (T2)", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-22, description: "Memo: the latest four revisions listed, clear of the mass table", drawn: Kiro, checked: "", approved: ""}
+      - {rev: K, date: 2026-11-22, description: "Notice: the LandCruiser's outline, owner-built, no engineer (H25, H27)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-702
     title: Ute garage box frame and panels
     subtitle: Kerb-side frame elevation, subframe plan on Toyota's deck mounts, section at the rear axle, member schedule
@@ -446,6 +447,7 @@ drawings:
       - {rev: E, date: 2026-11-21, description: "Notice: box body 189.9 kg with the roof bead (BX-F10)", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-21, description: "Notice: box body 190.2 kg with the roof's rivets (BX-F11)", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-22, description: "Memo: the latest three revisions listed, clear of the section", drawn: Kiro, checked: "", approved: ""}
+      - {rev: H, date: 2026-11-22, description: "Notice: owner-built, no engineer's review, weld note (H25)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-703
     title: Ute garage doors and security
     subtitle: Rear view, kerb-side door, plan section through the barn doors, security layers
@@ -461,6 +463,7 @@ drawings:
       - {rev: C, date: 2026-11-20, description: "Notice: ground anchors at X 450, so the disc lock chain reaches the disc", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-21, description: "Notice: rear tub flares for the Elite's 1555 rear track (H19)", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-22, description: "Memo: the kerb leaf's note and the side labels clear of the lines", drawn: Kiro, checked: "", approved: ""}
+      - {rev: F, date: 2026-11-22, description: "Notice: owner-built, no engineer's review (H25)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-704
     title: Ute garage restraint layout
     subtitle: Plan with the roof off, section at the rear L-track row, strap loads and anchors
@@ -477,3 +480,4 @@ drawings:
       - {rev: D, date: 2026-11-21, description: "Notice: tubs and flares for the Elite's 1555 rear track (H19), road chest 270 wide", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-21, description: "Notice: the bikes' gaps to the anchors' bag at its packed size (UGC-02, F5-05)", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-22, description: "Notice: the anchors' bag 1,760 mm long, the anchors staggered in it (F6-03)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: G, date: 2026-11-22, description: "Notice: the bikes' outlines from their models, no engineer (H25, H27)", drawn: Kiro, checked: "", approved: ""}

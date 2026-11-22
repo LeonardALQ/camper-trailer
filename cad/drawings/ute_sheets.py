@@ -1,5 +1,5 @@
 """Ute garage drawings CT-701 to CT-704 (A3, third angle), from the ute (cad/ute.py) and its bike garage module
-(cad/ute_garage.py, data/assemblies/ute-garage.yaml). Every sheet is DRAFT until the engineer reviews UTE-GARAGE.md.
+(cad/ute_garage.py, data/assemblies/ute-garage.yaml). Every sheet is DRAFT. Leonard builds the box to its own checks, with no engineer's review (H25).
 
 CT-701: the ute with the box, general arrangement: kerb-side elevation, plan, rear view, mass by case and the checks.
 CT-702: box frame and panels: kerb-side frame elevation, subframe plan with the deck mounts, section at the rear axle.
@@ -103,7 +103,7 @@ def _title(sh, dwg, reg, mass_note, scale, c, weld_note=None):
     S.title_block(
         sh, owner=reg["owner"], project=dwg.get("project") or reg["project"], number=dwg["number"], title=dwg["title"],
         subtitle=dwg["subtitle"], rev=rev["rev"], status=dwg["status"], date=str(rev["date"]), drawn=reg["drawn_by"],
-        checked=rev["checked"], approved=rev["approved"], engineer="NOT REVIEWED" if dwg.get("structural") else "N/A",
+        checked=rev["checked"], approved=rev["approved"], engineer="NOT REQUIRED" if dwg.get("structural") else "N/A",
         sheet_no=dwg["sheet"], sheets=reg["sheets_total"], size=dwg["size"], scale=scale, material="SEE TABLE",
         mass_note=mass_note, model_ref=f"ute.step (ASM-UG rev {c['prj'].assembly.revision}, UTE-79 rev {c['ute'].d['revision']})",
         git=git_hash(), weld_note=weld_note)
@@ -114,7 +114,7 @@ def _title(sh, dwg, reg, mass_note, scale, c, weld_note=None):
 
 
 def _stamp(sh, x, y):
-    sh.text(x, y, "DRAFT, NOT FOR CONSTRUCTION UNTIL THE ENGINEER REVIEWS UTE-GARAGE.md", 2.4, bold=True, color="#b00")
+    sh.text(x, y, "DRAFT. OWNER-BUILT TO UTE-GARAGE.md AND ITS CHECKS, NO ENGINEER'S REVIEW (H25)", 2.4, bold=True, color="#b00")
 
 
 def _mass_note(c):
@@ -408,7 +408,7 @@ def ct702(prj, model, bom, checks, reg, dwg):
     S.notes(sh, 230, yb - 9, [
         "MODULE FRAME: X FROM THE FRONT WALL'S INNER FACE (+ REARWARD), Y FROM THE CENTRELINE (+ ROAD SIDE), Z FROM THE FLOOR TOP. "
         f"MODULE X 0 IS AT UTE X {P['module_x0']:.1f}, Z 0 AT UTE Z {P['deck_z']:.0f}.",
-        "ONE-PIECE BODY: TIG-WELDED 5052-H32 SKINS ON A 6061-T6 FRAME. THE ENGINEER DESIGNS THE WELDS TO THE SOFTENED STRENGTH NEXT TO EACH WELD.",
+        "ONE-PIECE BODY: TIG-WELDED 5052-H32 SKINS ON A 6061-T6 FRAME. THE WELDS ARE SIZED TO THE SOFTENED STRENGTH NEXT TO EACH WELD.",
         "STEEL CROSSMEMBERS ARE GALVANISED AND BOLTED, NEVER WELDED, TO THE ALUMINIUM, WITH NYLON SLEEVES AND WASHERS.",
         "FIRM MOUNTS F1 AND F2: TWO M12 8.8 PER BRACKET. COMPLIANT MOUNTS C3 TO C6: ONE M12 8.8 THROUGH TWO RUBBER CUSHIONS AND A SAFETY WASHER.",
         "TOYOTA'S BRACKETS ARE SHOWN AS ENVELOPES. CONFIRM ON THE VEHICLE WHICH ARE DECK MOUNTS AND WHICH ARE SPRING HANGERS.",
@@ -416,7 +416,7 @@ def ct702(prj, model, bom, checks, reg, dwg):
     ], width_chars=96, size=1.6)
     _detail_a(sh, 332, 106)
     _stamp(sh, 22, 282)
-    _title(sh, dwg, reg, _mass_note(c), sc, c, weld_note="WELDS TO AS/NZS 1665 (ALUMINIUM), DETAILS BY THE ENGINEER. ")
+    _title(sh, dwg, reg, _mass_note(c), sc, c, weld_note="WELDS TO AS/NZS 1665 (ALUMINIUM). ")
     from .sheets import OUT
     S.write(sh, OUT / f"{dwg['number']}.svg")
     return time.time() - t0

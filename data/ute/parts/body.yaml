@@ -68,7 +68,7 @@ parts:
     unit: m2
     mass: {basis: per_area, kg_per_m2: 4.29, maturity: calculated, source: "1.6 mm at 2.68 g/cm3"}
     size: 2,590 x 1,850 mm
-    notes: "Not a load-carrying roof. Nothing is carried on it. 1.6 mm in place of revision C's 2.0 mm saves 5.1 kg, so the box stays under UGB-01's 440 kg. The engineer confirms it, with the bows at most 640 mm apart"
+    notes: "Not a load-carrying roof. Nothing is carried on it. 1.6 mm in place of revision C's 2.0 mm saves 5.1 kg, so the box stays under UGB-01's 440 kg. UGF-01 checks it, with the bows at most 640 mm apart"
     geometry: {generator: panel, params: {}}
     color: "#dfe6e9"
     alpha: 0.25
@@ -82,7 +82,7 @@ parts:
     unit: m
     mass: {basis: per_length, kg_per_m: 1.20, maturity: calculated, source: "444 mm2 at 2.70 g/cm3. All Aluminium lists 7.8 kg per 6.5 m (MAT-04)"}
     size: Posts, rails, roof bows and the rear portal
-    notes: The engineer designs the welds to the softened strength next to each weld (report 17 section 2.5).
+    notes: The welds are sized to the softened strength next to each weld (report 17 section 2.5).
     geometry: {generator: tube, params: {wall: 3}}
     color: "#b2bec3"
   U-SEALANT:

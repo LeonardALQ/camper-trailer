@@ -102,7 +102,7 @@ lines:
     x: 2500
     z: 500
     maturity: calculated
-    source: "Report 16 section 7: diesel at 0.835 kg/L, the tank between the rails about 2,500 mm behind the front axle (assumption). FT01 is required from 20 Nov 2026 (VEHICLE.md). The polymer tank's own mass is taken as the factory tank's (est.)"
+    source: "Report 16 section 7: diesel at 0.835 kg/L, the tank between the rails about 2,500 mm behind the front axle (assumption). FT01 is an optional extra from 22 Nov 2026 (research report 27), and the model keeps its extra 50 L as the heavier case. The polymer tank's own mass is taken as the factory tank's (est.)"
     cases: [UC1, UC2, UC3, UC4, UCB]
   - id: UT-03
     item: "Bull bar and winch"
