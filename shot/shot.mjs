@@ -22,7 +22,7 @@ const jobs = [
   { path: '/body/', name: 'body-wet-room', viewer: true, nth: 1,
     look: { hide: ['/ASM-BD/Body'], target: [5700, 0, 1500], from: [3200, -2400, 2200], zoom: 2.4 } },
   { path: '/body/', name: 'body-laundry', viewer: true, nth: 1,
-    look: { hide: ['/ASM-BD/Body'], target: [4650, -600, 1600], from: [-1200, 3400, 1800], zoom: 2.4 } },
+    look: { hide: ['/ASM-BD/Body'], target: [4650, -650, 1500], from: [-600, 2200, 3500], zoom: 2.4 } },
   { path: '/ute-garage/', name: 'ute-garage', viewer: true, full: true, sections: ['checks', 'mass'] },
   { path: '/ute-garage/', name: 'ute-garage-loading', viewer: true, nth: 1 },
   { path: '/tow-vehicle/', name: 'tow-vehicle', full: true },

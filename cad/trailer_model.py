@@ -24,7 +24,8 @@ OVERRIDE = {"BD-01": ("#8c8c8c", 0.6), "RG-01": ("#7b7d7d", 1.0), "LA-11T": ("#5
             "WR-01": ("#76d7c4", 0.6), "EL-02": ("#f5b041", 0.4), "AC-03": ("#aab7b8", 0.35), "UF-08": ("#7f8c8d", 0.9),
             "BD-15": ("#b2bec3", 0.5), "BD-13": ("#27ae60", 0.8), "GS-01": ("#c0392b", 1.0),
             "GS-04": ("#e74c3c", 1.0), "DX-01": ("#aab7b8", 0.45), "LB-04": ("#d4e6f1", 0.25), "LB-01": ("#f8f9f9", 1.0),
-            "BD-07": ("#b2bec3", 0.5), "DB-03": ("#2c3e50", 1.0), "DB-04": ("#aab7b8", 0.8)}
+            "BD-07": ("#b2bec3", 0.5), "DB-03": ("#2c3e50", 1.0), "DB-04": ("#aab7b8", 0.8),
+            "CH-S01": ("#1c2833", 1.0), "CH-P14": ("#7f8c8d", 1.0)}
 LAMP_COLOURS = {"red": "#c0392b", "amber": "#f39c12", "white": "#fdfefe", "red and amber": "#d35400"}
 # the viewer files' tessellation: the product models' round parts at 1.5 mm and 0.6 rad keep each file under 8 MB
 VIEWER_MESH = {"deviation": 1.5, "angular_tolerance": 0.6}
@@ -79,15 +80,14 @@ def part_shape(b, lay, colour: tuple | None = None):
     """The one shape every consumer shows for a block (the viewer models, the STEP and GLB files and the drawings): the
     product model where its line names one (cad/model/products, H27), else its envelope. Labelled with the line's
     instance id and name, so a pointer on any piece of a product names the line."""
-    col = colour or OVERRIDE.get(b.id, COLOURS[b.system])
     spec = model_specs(lay).get(b.id)
     if spec is not None:
         from .model import products as PR
-        return PR.build(spec, b, lay, _label(b), col)
+        return PR.build(spec, b, lay, _label(b))
     s = block_shape(b)
     if s is None:
         return None
-    s.label, s.color = _label(b), rgba(*col)
+    s.label, s.color = _label(b), rgba(*(colour or OVERRIDE.get(b.id, COLOURS[b.system])))
     return s
 
 
@@ -149,8 +149,10 @@ def fitting_shape(b, lay, col: tuple):
         for n, k in enumerate(kids, 1):
             bb = k.bounding_box()
             bx = (bb.min.X, bb.min.Y, bb.min.Z, bb.max.X, bb.max.Y, bb.max.Z)
-            out.append(PR.build(spec, b, lay, f"{n}" if len(kids) > 1 else "", col, bx=bx))
-        kids = out
+            out.append(PR.build(spec, b, lay, f"{n}" if len(kids) > 1 else "", bx=bx))
+        s = out[0] if len(out) == 1 else Compound(children=out)
+        s.label = _label(b)
+        return s
     s = kids[0] if len(kids) == 1 else Compound(children=kids)
     s.label, s.color = _label(b), rgba(*col)
     return s
@@ -200,9 +202,13 @@ def _lamp(label, bx, col, V):
         lens = box(x0 if out_lo else x1 - 3, y0 + 2, z0 + 2, 3, dy - 4, z1 - z0 - 4)
     hs.label, hs.color = "housing", rgba("#2c3e50", 1.0)
     lens.label, lens.color = "lens", rgba(col, 0.9)
-    c = Compound(label=label, children=[hs, lens])
-    c.color = rgba(col, 1.0)
-    return c
+    return Compound(label=label, children=[hs, lens])
+
+
+def _paint(shp, col: tuple):
+    """Colour a plain solid. A product's pieces keep their own colours."""
+    if not (isinstance(shp, Compound) and shp.children):
+        shp.color = rgba(*col)
 
 
 def _moved(shape, loc):
@@ -248,9 +254,9 @@ class TrailerModel:
                 continue
             self.groups.setdefault(b.system, []).append(s)
         if body:
-            for label, shp, (col, a) in body_solids(lay):
+            for label, shp, col in body_solids(lay):
                 shp.label = label.replace("/", "-")
-                shp.color = rgba(col, a)
+                _paint(shp, col)
                 self.groups.setdefault("body", []).append(shp)
             self.groups.setdefault("electrical", []).extend(lamp_shapes(lay))
 
@@ -289,8 +295,9 @@ def body_parts(lay: Layout) -> list:
     """The body's own solids (cad/body_model.py), labelled and coloured, for the Body page's models."""
     from .body_model import body_solids
     kids = []
-    for label, shp, (col, a) in body_solids(lay):
-        shp.label, shp.color = label.replace("/", "-"), rgba(col, a)
+    for label, shp, col in body_solids(lay):
+        shp.label = label.replace("/", "-")
+        _paint(shp, col)
         kids.append(shp)
     return kids
 

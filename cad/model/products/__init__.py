@@ -180,16 +180,12 @@ def pieces(p: dict, bx: tuple, V: dict, block) -> list:
     return kids
 
 
-def build(spec, block, lay, label: str, colour: tuple, bx: tuple | None = None):
-    """The product's pieces as one labelled compound, so pointing at any piece names the line. None if nothing is placed.
-    `bx` gives the envelope directly (a chassis fitting at one of its positions)."""
+def build(spec, block, lay, label: str, bx: tuple | None = None):
+    """The product's pieces as one labelled compound, so pointing at any piece names the line, each piece in its own
+    colour. None if nothing is placed. `bx` gives the envelope directly (a chassis fitting at one of its positions)."""
     if bx is not None:
         p = {k: (v if k in RAW else lay.P.eval(v, {})) for k, v in spec_of(spec).items()}
         kids = pieces(p, bx, lay.V, block)
     else:
         kids = [k for p, b in placements(spec, block, lay) for k in pieces(p, b, lay.V, block)]
-    if not kids:
-        return None
-    out = Compound(label=label, children=kids)
-    out.color = rgba(*colour)
-    return out
+    return Compound(label=label, children=kids) if kids else None

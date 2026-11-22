@@ -79,7 +79,7 @@ def test_fitting_products_stay_on_their_fittings():
             continue
         for k in fitting_solids(lay.chassis, b.extra["fitting"]):
             env = _bb(k)
-            comp = PR.build(PR.FITTING_MODELS[b.id], b, lay, b.iid, ("#000000", 1.0), bx=env)
+            comp = PR.build(PR.FITTING_MODELS[b.id], b, lay, b.iid, bx=env)
             for piece in comp.children:
                 got = _bb(piece)
                 out = max(max(env[i] - got[i], got[i + 3] - env[i + 3]) for i in range(3))
