@@ -324,14 +324,11 @@ class Chassis:
             base = self.ev(f["at"]) if "at" in f else [0.0, 0.0, 0.0]
             at = []
             if "side_y" in f:
-                pairs = [(base[0], self.ev(f["side_y"]), base[2])]
-                if "rear_x" in f:
-                    rear_y = self.ev(f["rear_y"]) if "rear_y" in f else pairs[0][1]
-                    rear_z = self.ev(f["rear_z"]) if "rear_z" in f else base[2]
-                    pairs.append((self.ev(f["rear_x"]), rear_y, rear_z))
-                for x, sy, z in pairs:
+                sy = self.ev(f["side_y"])
+                xs = [base[0]] if "rear_x" not in f else [base[0], self.ev(f["rear_x"])]
+                for x in xs:
                     for s in (-1, 1):
-                        at.append((x, s * sy, z))
+                        at.append((x, s * sy, base[2]))
             else:
                 at = [tuple(base)]
             kind = f["kind"]
@@ -676,14 +673,13 @@ def member_solid(m: Member):
 PLANES = {"xy": (0, 1, 2), "xz": (0, 2, 1), "yz": (1, 2, 0)}   # which axes the plate's length, width and thickness run along
 
 
-def fitting_solids(ch: Chassis, f: Fitting) -> list:
-    """Plates as boxes in their plane at each position, bought parts as their envelope box or a small block."""
-    from .model.prims import box
+def fitting_boxes(ch: Chassis, f: Fitting) -> list[tuple]:
+    """Each position's box (x0, y0, z0, x1, y1, z1): plates in their plane, bought parts as their envelope or a small
+    block. The bearer strips have none of their own (cad/trailer_model.py lays them on the members)."""
     spec = next(d for d in ch.data["fittings"] if d["id"] == f.id)
-    out = []
     if "box" in spec:
         x0, y0, z0, dx, dy, dz = ch.P.eval(spec["box"], {})
-        return [box(x0, y0, z0, dx, dy, dz)]
+        return [(x0, y0, z0, x0 + dx, y0 + dy, z0 + dz)]
     if f.kind == "strip":
         return []
     if f.kind == "plate":
@@ -694,6 +690,11 @@ def fitting_solids(ch: Chassis, f: Fitting) -> list:
         size = [spec["length"], 50.0, 50.0]
     else:
         size = list(spec.get("size", (120, 120, 120)))
-    for p in f.at:
-        out.append(box(p[0] - size[0] / 2, p[1] - size[1] / 2, p[2] - size[2] / 2, *size))
-    return out
+    half = [s / 2 for s in size]
+    return [(p[0] - half[0], p[1] - half[1], p[2] - half[2], p[0] + half[0], p[1] + half[1], p[2] + half[2]) for p in f.at]
+
+
+def fitting_solids(ch: Chassis, f: Fitting) -> list:
+    """The fitting's boxes as solids, for the 3D model."""
+    from .model.prims import box
+    return [box(x0, y0, z0, x1 - x0, y1 - y0, z1 - z0) for x0, y0, z0, x1, y1, z1 in fitting_boxes(ch, f)]

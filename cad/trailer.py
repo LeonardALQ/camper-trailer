@@ -66,6 +66,7 @@ def tow_vehicle(prj: Project) -> dict:
     return dict(name=tv["name"], limits=lim, limit_src=src, gcm_case=tv["gcm_case"], case_name=case["name"],
                 ute_kg=case["nominal"]["mass_kg"], ute_kg_growth=case["growth"]["mass_kg"], sweep=rep["bike_box_sweep"],
                 rear_kg_growth=rear0, rear_kg_nominal=case["nominal"]["rear_kg"], elite_rear_kg=elite, rear_per_ball=per_ball,
+                ball_behind_axle=rep["params"]["ball_behind_axle"],
                 design_ball_kg=tow["growth"]["towball_kg"], tow_case=tow["id"], box_kg=rep["garage"]["box_kg"],
                 ute_checks=[dict(id=c["id"], title=c["title"], status=c["status"], detail=c["detail"], measured=c.get("measured"))
                             for c in rep["checks"]])
@@ -112,6 +113,18 @@ class Block:
 
 def _box(x0, y0, z0, dx, dy, dz):
     return (min(x0, x0 + dx), min(y0, y0 + dy), min(z0, z0 + dz), max(x0, x0 + dx), max(y0, y0 + dy), max(z0, z0 + dz))
+
+
+def _bar_box(bar) -> tuple:
+    """The box round a member that runs at an angle in plan: its plan rectangle's corners and its depth."""
+    (x0, y0, z0), (x1, y1, z1) = bar["p0"], bar["p1"]
+    L = math.hypot(x1 - x0, y1 - y0)
+    nx, ny = -(y1 - y0) / L * bar["w"] / 2, (x1 - x0) / L * bar["w"] / 2
+    xs, ys = [x0 + nx, x0 - nx, x1 + nx, x1 - nx], [y0 + ny, y0 - ny, y1 + ny, y1 - ny]
+    return (min(xs), min(ys), min(z0, z1) - bar["h"] / 2, max(xs), max(ys), max(z0, z1) + bar["h"] / 2)
+
+
+FLEXIBLE = ("DB-06",)   # the safety chains hang and swing, so the ground clearance checks leave them out
 
 
 def _centre(b):
@@ -434,10 +447,50 @@ class Layout:
         hi = max(ys, key=lambda t: t[1])
         return dict(width_mm=hi[1] - lo[0], road=hi[2], kerb=lo[2], road_y=hi[1], kerb_y=lo[0], road_proj=hi[3], kerb_proj=lo[3])
 
+    def sprung_boxes(self) -> list[tuple]:
+        """Every rigid part the suspension carries, as (block, box): each solid block, each angled drawbar member, each
+        chassis fitting at each of its positions and each product's envelope, the spare wheel's included. What rides on
+        the arms (UNSPRUNG) and the parts that bend (FLEXIBLE) are left out."""
+        from .chassis import fitting_boxes
+        from .chassis_fea import UNSPRUNG
+        from .model import products as PR
+        from .trailer_model import model_specs
+        specs = model_specs(self)
+        out = []
+        for b in self.blocks:
+            if b.keep_clear or b.load == "none" or b.id in UNSPRUNG or b.id in FLEXIBLE:
+                continue
+            if "fitting" in b.extra:
+                boxes = fitting_boxes(self.chassis, b.extra["fitting"])
+            elif b.id in specs:
+                boxes = [bx for _, bx in PR.placements(specs[b.id], b, self)]
+            elif b.bar:
+                boxes = [_bar_box(b.bar)]
+            else:
+                boxes = [b.box] if b.box is not None else []
+            out += [(b, bx) for bx in boxes]
+        return out
+
     def ground_clearance(self) -> dict:
-        cand = [b for b in self.blocks if b.solid and b.system in ("drawbar", "chassis", "underfloor", "body")]
-        low = min(cand, key=lambda b: b.box[2])
-        return dict(z_mm=low.box[2], governing=f"{low.name} ({low.iid})")
+        """The lowest rigid part the suspension carries, at design ride height."""
+        b, bx = min(self.sprung_boxes(), key=lambda p: p[1][2])
+        return dict(z_mm=bx[2], governing=f"{b.name} ({b.iid})", line=b.id)
+
+    def breakover(self, x_front: float) -> dict:
+        """The crest angle at which the ground between two contact lines, the ute's rear tyres at X x_front and the
+        trailer's axle group, first touches a rigid sprung part: the sum of the slopes from each line up to the part's
+        underside. For each part the sum is least at the point of its underside nearest the middle of the span."""
+        xa = self.V["axle_x"]
+        mid = (x_front + xa) / 2
+        best = None
+        for b, (x0, _, z0, x1, _, _) in self.sprung_boxes():
+            if x1 <= x_front or x0 >= xa:
+                continue
+            x = min(max(mid, x0, x_front + 1), x1, xa - 1)
+            deg = math.degrees(math.atan2(z0, x - x_front) + math.atan2(z0, xa - x))
+            if best is None or deg < best["deg"]:
+                best = dict(deg=deg, x_mm=x, z_mm=z0, governing=f"{b.name} ({b.iid})")
+        return best
 
     def overall(self) -> dict:
         sol = [b for b in self.blocks if b.solid]
@@ -971,8 +1024,15 @@ class Trailer:
             elif c.type == "clearance_ground":
                 g = lay.ground_clearance()
                 row.update(limit=f">= {c.min:g} mm", measured=round(g["z_mm"], 1), unit="mm", margin=round(g["z_mm"] - c.min, 1),
-                           ok=g["z_mm"] >= c.min, governing=g["governing"],
-                           detail=f"lowest sprung part {g['z_mm']:.0f} mm above the ground at design ride height, {g['governing']}")
+                           ok=g["z_mm"] >= c.min, governing=g["governing"], line=g["line"],
+                           detail=f"lowest rigid sprung part {g['z_mm']:.1f} mm above the ground at design ride height, {g['governing']}")
+            elif c.type == "breakover":
+                ahead = self.tv["ball_behind_axle"]
+                bo = lay.breakover(-ahead)
+                row.update(limit="reported", measured=round(bo["deg"], 1), unit="deg", margin=None, ok=True, governing=bo["governing"],
+                           detail=(f"{bo['deg']:.1f} degrees, a crest under {bo['governing']} at X {bo['x_mm']:,.0f} mm, its underside "
+                                   f"{bo['z_mm']:.1f} mm up, between the ute's rear axle {ahead:,.0f} mm ahead of the ball and the trailer's "
+                                   f"axle group at X {lay.V['axle_x']:,.1f} mm"))
             elif c.type in ("jackknife", "jackknife_height"):
                 sw = self.tv["sweep"]
                 R, under = sw["radius_mm"], sw["underside_z"]

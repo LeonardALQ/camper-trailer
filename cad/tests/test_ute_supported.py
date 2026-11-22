@@ -26,9 +26,10 @@ from build123d import Compound, Location, Plane
 from OCP.BRepExtrema import BRepExtrema_DistShapeShape
 from OCP.Extrema import Extrema_ExtFlag_MIN
 
-from cad.tests.test_supported import A_MIN, EMBEDS, EPS, FIX_W, FIXINGS, W_MIN
+from cad.tests.test_supported import A_MIN, EMBEDS, EPS, FIX_W, FIXINGS
 
 TOL = 1.0          # mm, the gap that still counts as touching
+W_MIN = 2.0        # mm: the narrowest contact patch, under the box's 2.5 mm sheet welded edge-on to its frame (tubs, flares)
 MIN_VOL = 1.0      # mm3: a smaller common volume is no contact at all
 _SHARED: dict[tuple, tuple | None] = {}    # contacts by (path, box) of both solids, shared by the two models' graphs
 

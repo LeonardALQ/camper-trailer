@@ -35,9 +35,9 @@ trailer:
     how: welded
     why: "The nut plates inside the raisers and outrigger tips, and the D-rings' clips under the outriggers' ends (CHASSIS.md)"
   - lines: [CH-P10]
-    to: ["RL-*", DB-KB, DB-RB]
+    to: ["RL-*"]
     how: bolted
-    why: "The corner steady brackets bolt up through the rails, and the front pair through the drawbar members under them, with crush tubes (CHASSIS.md)"
+    why: "The corner steady brackets bolt to the rails with crush tubes, the front pair behind the drawbar overlap (CHASSIS.md)"
   - lines: [DB-07]
     to: [DB-BR]
     how: bolted
