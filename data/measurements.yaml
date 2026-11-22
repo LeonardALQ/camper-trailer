@@ -190,12 +190,12 @@ inputs:
     thresholds:
       - {at: 0, rule: "Slip, crunch or whine: take branch A, because the clutch and gearbox come out with the engine in S2. Crunch or whine also buys the new H152F (CG09)", src: "Plan rule (report 23): the gearbox is removed only once"}
     range: {min: 1, max: 1, src: "Plan rule (report 23)"}
-  # ================================================================ power, stage S6 (same dyno, same day)
+  # ================================================================ power, stage S6 (same dyno and operator)
   - id: VEH-10
     group: Car build
     part: car
     title: Peak power at the wheels before the tune, finished hardware on the factory calibration
-    how: "Chassis dyno, three runs in fourth gear, take the middle run. Same dyno, operator and day as VEH-11. Keep the sheet for the certifier."
+    how: "Chassis dyno, three runs in fourth gear, take the middle run. Same dyno and operator as VEH-11, made before the injectors go to GTurbo for the Pro 100 service (FS01), which the factory calibration cannot run. Keep the sheet for the certifier."
     unit: rwkW
     estimate: {v: 110, src: "GTurbo booklet page 15: stock VDJ79 100 to 120 rwkW (https://cdn.shopify.com/s/files/1/0823/4241/2531/files/1VD-FTV-VDJ70-Booklet-v1_4c.pdf)"}
     measured: {v: null, date: null}
@@ -208,7 +208,7 @@ inputs:
     group: Car build
     part: car
     title: Peak power at the wheels after the tune
-    how: Same dyno and day as VEH-10, with the towing map active.
+    how: Same dyno and operator as VEH-10, after the Pro 100 injectors and the tune, with the towing map active.
     unit: rwkW
     estimate: {v: 177, src: "Plan: 230 to 250 kW at the crank, about 170 to 185 rwkW at report 14's 74 % crank to wheels (decision log 20:15)"}
     measured: {v: null, date: null}
