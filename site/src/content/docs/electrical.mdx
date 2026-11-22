@@ -15,36 +15,6 @@ The trailer runs at 48 V. Research report 20 chose the parts and models every lo
 design days (`research/models/20/energy.py`), and the tables on this page are that model's output. The parts and
 their prices are in the <a href={withBase('/trailer/#parts-list')}>trailer's parts list</a>.
 
-## 3D wiring plan
-
-<CadViewer src={withBase('/models/trailer-electrical.json')} height={560} />
-
-Every cable is drawn at its real outside diameter along its routed path, in its system's colour, with the body, the
-chassis and the fit-out see-through around it. Point at a cable to see its run and routed length, click it for a card
-with what it feeds, its ends, its size and its protection, and use the tree to show one system or circuit at a time.
-
-<Services kind="routes-legend" model="trailer-electrical" />
-
-## Cable schedule
-
-Each run of `data/routes.yaml`, routed on the solved layout by `cad/routes.py`: its length is the routed centreline
-with its bends, each DC circuit is sized by its current and by a 2 % drop at that length, and the price adds 10 % for
-cut-offs. Research report 30 gives the cable data and the rules.
-
-<Services kind="cable-schedule" />
-
-The routed runs by the parts-list line that prices them, and the priced quantities they are compared with:
-
-<Services kind="routes-lines" model="trailer-electrical" />
-
-### Services checks
-
-<Services kind="svc-checks" />
-
-The ten closest approaches of any run to an envelope box, for the fit-out's next changes:
-
-<Services kind="closest" />
-
 - Battery: five Victron Lithium NG 51.2 V 100 Ah modules, 25.6 kWh, upright in a sealed, lined box that forms the
   plinth under the washer and the dryer. The box vents outside and has a heat detector, as AS/NZS 3001.2 asks for a
   battery inside the body.
@@ -61,6 +31,38 @@ The ten closest approaches of any run to an envelope box, for the fit-out's next
   3, which shows the mode. Behind the trailer the wet room's RA 15-60 extract stops too, and off the kerb side fans A and
   B, so the RESPA-CF2 runs alone. Never stand them off the road side, where the RESPA-CF2 and the top-up fan draw their
   air: with the wind toward the road side, stand them ahead or behind. The RESPA-CF2 keeps the cabin above outside. A CO alarm sits in the bed zone.
+
+## 3D wiring plan
+
+<CadViewer src={withBase('/models/trailer-electrical.json')} height={560} />
+
+Every cable is drawn at its real outside diameter along its routed path, in its system's colour, with the body, the
+chassis and the fit-out see-through around it. Point at a cable to see its run and routed length, click it for a card
+with what it feeds, its ends, its size and its protection, and use the tree to show one system or circuit at a time.
+
+<Services kind="routes-legend" model="trailer-electrical" />
+
+## Cable schedule
+
+Each run of `data/routes.yaml`, routed on the solved layout by `cad/routes.py`: its length is the routed centreline
+with its bends, each DC circuit is sized by its current and by a 2 % drop at that length, and the price adds 10 % for
+cut-offs. Research report 30 gives the cable data and the rules. The table shows each run's size, length and drop,
+and Wrap or All columns adds its cable, current, protection, mass and price. It is the page's only cable table, and
+the main cables are its runs D-01 to D-16.
+
+<Services kind="cable-schedule" />
+
+The routed runs by the parts-list line that prices them, and the priced quantities they are compared with:
+
+<Services kind="routes-lines" model="trailer-electrical" />
+
+## Services checks
+
+<Services kind="svc-checks" />
+
+The ten closest approaches of any run to an envelope box, for the fit-out's next changes:
+
+<Services kind="closest" />
 
 ## Drawings
 
@@ -108,10 +110,6 @@ first, so cooking keeps priority, and the split never sheds.
 <Services kind="outlets" />
 
 Loads on the 12 V bus: {s.buses.v12}. Loads on the 24 V bus: {s.buses.v24}.
-
-## Main cables
-
-<Services kind="cables" />
 
 ## Lamps, reflectors and the number plate
 
