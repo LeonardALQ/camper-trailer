@@ -325,7 +325,7 @@ items:
     system: running_gear
     price:
       - {item: "Cruisemaster Level 3 manual air control kit", aud: 1285.00, basis: listing, url: "https://www.diycaravans.com.au/shop/cruisemaster-xt-freestyle-air-suspension-kit-tandem/", date: 2026-11-20, note: "The Level 3 manual variant less the Level 1 kit (AUD 8,727.04 less 7,442.04)"}
-      - {item: "Sealed 1.6 mm aluminium box, access panel and brackets", aud: 150, basis: estimate, date: 2026-11-21, note: "Offcut sheet, seal and fixings. Made with the small fabrications (LAB-05)"}
+      - {item: "Sealed 1.6 mm aluminium box, access panel and brackets", aud: 150, basis: estimate, date: 2026-11-21, note: "Offcut sheet, seal and fixings. Leonard makes it with the small fabrications (H26)"}
     zone: underfloor
     box: [body_x0 + 50, -200, rail_underside_z + 37.5, 360, 400, 220]
     cog: [body_x0 + 235, 0, rail_underside_z + 147.5]
@@ -545,7 +545,7 @@ items:
     system: body
     price:
       - {item: "Rubber mud flap 610 x 455 mm", aud_each: 37.26, basis: listing, url: "https://www.thebossshop.com.au/mudflap-rubber-610mmw-x-455mml-black", date: 2026-11-20}
-      - {item: "Hanger, galvanised steel bracket with a strap and bolts", aud_each: 35.84, basis: estimate, date: 2026-11-20, note: "Strap AUD 5.84 (listing) plus steel and bolts. Made with the small fabrications (LAB-05)"}
+      - {item: "Hanger, galvanised steel bracket with a strap and bolts", aud_each: 35.84, basis: estimate, date: 2026-11-20, note: "Strap AUD 5.84 (listing) plus steel and bolts. Leonard makes it with the small fabrications (H26)"}
     for: {s: [1, -1]}
     point: [axle_x + rear_hub_dx + tyre_d / 2 + 60, s * hub_y, 530]
     parts:
@@ -1186,7 +1186,7 @@ items:
     name: Cradle stays, two RHS 40 x 20 x 3 aluminium posts from the cradle's wall-side corners down the rear wall to brackets on the rear crossmember
     material: "6060-T5 aluminium RHS 40 x 20 x 3 with 5 mm angle feet, stainless bolts and isolating washers"
     system: hvac
-    price: {aud: 150, basis: estimate, date: 2026-11-21, note: "3 m of RHS 40 x 20 x 3, two angle feet and brackets, made with the small fabrications (LAB-05)"}
+    price: {aud: 150, basis: estimate, date: 2026-11-21, note: "3 m of RHS 40 x 20 x 3, two angle feet and brackets, Leonard makes them with the small fabrications (H26)"}
     for: {k: [0, 1]}
     box: [body_x1, "half_bw - 790 + k * 630", floor_underside_z, 40, 20, ceiling_z - 610 - floor_underside_z]
     mass: {basis: declared, unit_kg: 1.5, maturity: estimate, source: "1.45 m at 0.875 kg/m plus a foot and bolts (est.)"}
