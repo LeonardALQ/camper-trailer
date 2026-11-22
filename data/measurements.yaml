@@ -700,7 +700,7 @@ inputs:
     affects: [bolt size BX-F01, mount plates BX-U02, UGM-01]
     range: {min: 12.5, max: 14.5, src: "A hole that takes an M12 bolt with normal to coarse clearance (est.)"}
     thresholds:
-      - {rule: "A hole sized for M10 or M14 changes the bolt in BX-F01 and the engineer re-checks UGM-01", src: "UGM-01"}
+      - {rule: "A hole sized for M10 or M14 changes the bolt in BX-F01, and UGM-01 is run again with it", src: "UGM-01"}
   - id: BOX-06
     group: Bike box
     part: box
