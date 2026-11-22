@@ -160,10 +160,18 @@ def smooth_jogs(pts: list[tuple], r: float) -> list[tuple]:
     return _drop_steps(pts, r)
 
 
-def _drop_steps(pts: list[tuple], r: float, max_deg: float = 3.0) -> list[tuple]:
+def _off_line(p, a, b) -> float:
+    """Distance of p from the segment a-b."""
+    d, ln = _unit(_sub(b, a))
+    t = max(0.0, min(ln, _dot(_sub(p, a), d)))
+    return math.dist(p, (a[0] + d[0] * t, a[1] + d[1] * t, a[2] + d[2] * t))
+
+
+def _drop_steps(pts: list[tuple], r: float, max_deg: float = 3.0, max_mm: float = 12.0) -> list[tuple]:
     """A lane step or a small offset that turns out of the run's plane (up, a few millimetres across, then along)
     is two corners a short leg apart that cannot both take the bend radius. The cable lies on the slant instead: the
-    step's corner is dropped where the straight it merges into turns by no more than `max_deg`."""
+    step's corner is dropped where the straight it merges into turns by no more than `max_deg` and the corner lies
+    within `max_mm` of the slant, so a deliberate offset (out of a rail, round a part) keeps its corners."""
     pts = list(pts)
 
     def turn(j):
@@ -200,7 +208,7 @@ def _drop_steps(pts: list[tuple], r: float, max_deg: float = 3.0) -> list[tuple]
             # dropping k merges the legs k-1 -> k and k -> k+1; the longer one must keep its direction
             long_from = math.dist(pts[k - 1], pts[k]) >= math.dist(pts[k], pts[k + 1])
             dev = angle(pts[k - 1], pts[k], pts[k + 1]) if long_from else angle(pts[k + 1], pts[k], pts[k - 1])
-            if dev > max_deg:
+            if dev > max_deg or _off_line(pts[k], pts[k - 1], pts[k + 1]) > max_mm:
                 continue
             trial = pts[:k] + pts[k + 1:]
             options.append((dev, k, trial))
@@ -533,17 +541,29 @@ def _solids(res: dict) -> list:
     return out
 
 
+def _in_box(p, box, tol: float = 0.5) -> bool:
+    return all(box[k] - tol <= p[k] <= box[k + 3] + tol for k in range(3))
+
+
+def _box_gap(a, b) -> float:
+    return math.sqrt(sum(max(0.0, b[k] - a[k + 3], a[k] - b[k + 3]) ** 2 for k in range(3)))
+
+
 def clearance(res: dict) -> dict:
     """SVC-01: each run keeps the rule's clearance from every envelope box and bar member except its own two ends,
     the parts it passes through by design (`passes`), the parts it is clipped to (`along`, touching allowed but not
-    entering) and the body's panels where it crosses them at one of its glands. Hollow carcasses are the cabinets the
+    entering), the body's panels where it crosses them at one of its glands, and, along the stretches threaded through
+    a closed chassis member (`inside`), the parts welded to that member's faces. Hollow carcasses are the cabinets the
     runs pass inside, so they are not obstacles."""
     clear = res["data"]["rules"]["clear_mm"]
     solids = _solids(res)
     problems, gaps = [], []
     for run in res["runs"]:
         r = run["od"] / 2
-        ends, passes, along = _end_lines(run), _ids(run, "passes"), _ids(run, "along")
+        ends, passes, along = _end_lines(run), _ids(run, "passes") | _ids(run, "inside"), _ids(run, "along")
+        # a run threaded through a closed chassis member (`inside`) is walled off from the parts welded to the
+        # member's faces wherever it lies within the member, so only those stretches skip them
+        members = [m["box"] for m in solids if _matches(m, _ids(run, "inside"))]
         gl = [res["glands"][g]["p"] + (res["glands"][g].get("w", res["glands"][g]["d"]),) for g in _ids(run, "glands")]
         segs = _segs(run["dense"])
         box = _aabb(run["dense"], r + clear)
@@ -553,8 +573,11 @@ def clearance(res: dict) -> dict:
             lim = 0.0 if _matches(b, along) else clear
             panel = b["id"] in PANELS
             worst = (math.inf, None)
+            walled = [m for m in members if _box_gap(m, b["box"]) < 1.0]
             for a, c in segs:
                 if not _hit(_aabb((a, c), r + clear), b["box"]):
+                    continue
+                if walled and any(_in_box(a, m) for m in members) and any(_in_box(c, m) for m in members):
                     continue
                 d, p = seg_box(a, c, b["box"])
                 if panel and any(math.dist(p, g[:3]) <= g[3] / 2 + r + 80 for g in gl):
