@@ -83,10 +83,10 @@ checks:
 # the line is raised with this model as its source; an allowance is never lowered.
 priced:
   - {line: BD-11, item: "12 and 24 V DC wiring, tinned twin core", kinds: [twin, twin8], quantity: 150, unit: m}
-  - {line: BD-11, item: "230 V wiring, 2.5 and 4 mm2 TPS and the appliance cords", kinds: [tps, flex], quantity: 40, unit: m}
-  - {line: BD-11, item: "Fresh water pipework, 12 mm PEX", kinds: [pex12], quantity: 30, unit: m}
-  - {line: BD-11, item: "Fresh water pipework, push-fit fittings", kinds: [pex12], quantity: 40, unit: fittings}
-  - {line: LGT-01, item: "Lamp loom, 7-core trailer cable", kinds: [lamp7], quantity: 25, unit: m}
+  - {line: BD-11, item: "230 V wiring, 2.5 and 4 mm2 TPS and the appliance cords", kinds: [tps, flex], quantity: 77, unit: m}
+  - {line: BD-11, item: "Fresh water pipework, 12 mm PEX", kinds: [pex12], quantity: 36, unit: m}
+  - {line: BD-11, item: "Fresh water pipework, push-fit fittings", kinds: [pex12], quantity: 47, unit: fittings}
+  - {line: LGT-01, item: "Lamp loom, 7-core trailer cable", kinds: [lamp7], quantity: 32, unit: m}
 
 # Copper conductors, PVC insulated: Prysmian's V-90 0.6/1 kV single-core table (outside diameter, mass, least installed
 # bending radius) and its two-single-core table for AS/NZS 3008.1.1 (current enclosed in air, `free` unenclosed and spaced
@@ -206,7 +206,7 @@ kinds:
     kg_m: "0.12"
     bend_r: "6 * od"
     aud_m: "3.50"
-    price_basis: "estimate (est.), in LGT-01's 25 m loom"
+    price_basis: "estimate (est.), in LGT-01's 32 m loom"
     mass_basis: "Seven 1 mm2 cores in a PVC sheath (est.)"
     priced_in: LGT-01
   pex12:
@@ -217,7 +217,7 @@ kinds:
     bend_r: "130"
     elbow_r: 1.5
     aud_m: "3.50"
-    price_basis: "estimate: AUD 3.50 a metre (est.), in BD-11's 30 m with its 40 push-fit fittings"
+    price_basis: "estimate: AUD 3.50 a metre (est.), in BD-11's 36 m with its 47 push-fit fittings"
     mass_basis: "12 x 1.5 mm PEX at 940 kg/m3, 48 g a metre, and the barrier and clips (est.)"
     priced_in: BD-11
   hose20:
@@ -334,7 +334,7 @@ consts:
   KC_Y: -half_in + 25               # the chase behind the plinth: the electrical risers against the kerb wall
   KW_Y: -half_in + 95               # the chase: the water and waste lines, 75 mm inboard of the electrics
   DCR_X: rear_x0 - 25               # the battery's riser behind the dryer, to the isolator and the BMS, clipped to the partition
-  DLX: rear_x0 - 96                 # the Lynx Distributor's riser to the MultiPlus-II, 71 mm forward
+  DLX: rear_x0 - 104                # the Lynx Distributor's riser to the MultiPlus-II, 79 mm forward, so D-07's run to the slot over CM-06 keeps its two 60 mm bends with 6 mm to spare as the tank bay moves with the axle
   UTX: rear_x0 - 140                # the ute feed's riser
   DCR_Y: -half_in + 65              # the risers' centre line in the chase
   DVX: rear_x0 - 125                # the 12 V and 24 V lanes down the chase, against the kerb wall (KC_Y), lanes rearward

@@ -16,7 +16,7 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 | Ute | Rear axle 2,646 kg with growth against its 2,800 kg plate. Combination 7,175 kg against 7,400 kg, the ute with growth plus the plate |
 | Battery | 25.6 kWh. A design hot day runs 25.1 h when new and 17.2 h at end of life |
 | Water | 420 L fresh, at most 300 L in travel, about 41 L a day. 130 L grey |
-| Cost | AUD 191,714 with contingency, built by Leonard (H26) |
+| Cost | AUD 192,052 with contingency, built by Leonard (H26) |
 
 Every fail check passes. The tightest are the fully loaded mass with growth (MAS-10, 3,397.7 kg against the 3,400 kg target), the towball share with the grey tank full (MAS-12, 8.1 % against 8.0 %), the heaviest towball (MAS-13, 316.5 kg against 320 kg) and the recovery pull in the road-side rail (CHS-08A, 0.91 of yield).
 
@@ -163,19 +163,19 @@ The insert map CT-203 must be final before the panels are ordered, because the m
 
 ## Cost and where to save
 
-The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 148 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 166,915 subtotal carries AUD 24,800 (14.9 %), for AUD 191,714.
+The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 151 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 167,196 subtotal carries AUD 24,856 (14.9 %), for AUD 192,052.
 
 | Group | AUD | Group | AUD |
 |---|---|---|---|
-| Body | 37,847 | Chassis | 6,828 |
+| Body | 38,104 | Chassis | 6,828 |
 | Electrical | 23,708 | Freight and consumables | 5,310 |
 | Living area | 21,186 | Licensed electrician | 4,600 |
 | Running gear | 14,181 | Drawbar box | 4,388 |
 | HVAC and ventilation | 12,667 | Under the floor | 3,162 |
 | Wet room | 11,627 | Roof | 2,926 |
 | Bed | 8,028 | Coupling and drawbar | 1,695 |
-| Compliance and weld evidence | 7,120 | Lamps, reflectors and the number plate | 905 |
-| Subtotal | 166,915 | Spare wheel | 736 |
+| Compliance and weld evidence | 7,120 | Lamps, reflectors and the number plate | 930 |
+| Subtotal | 167,196 | Spare wheel | 736 |
 
 What the registration needs stays: the licensed electrician and the AS/NZS 3001.2 certificate (ELI-01, CMP-13), the refrigeration fitting in AC-03, the wheel alignment (ALN-01), the engineer's review (CMP-03) and the registration lines. One line is new, the weld evidence for the chassis (CMP-14, AUD 1,144). Neither VSB1, the HVAIS inspection nor the concessional RAV entry asks for a qualified welder, a weld certificate or crack tests (research report 27). The RAV entry does need the drawbar's ADR 62/02 evidence in hand, and the engineer's calculation is that evidence only for the SP welds to AS/NZS 1554.1 that CHASSIS.md specifies, which the standard has a qualified welder make. So CMP-14 pays for Leonard's welder qualification test (AUD 1,000, est.) and two dye-penetrant sets for his own tests of the joints report 02's WLD-03 names (AUD 144). A qualified welder hired for the chassis welds alone would cost about AUD 3,100 to 3,400 (28 h at AUD 110 to 120 an hour, est.). Leonard's own time, about 333 h (est.), is outside the figures.
 
