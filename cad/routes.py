@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import math
 import re
+from collections import defaultdict
 from pathlib import Path
 
 import yaml
@@ -908,7 +909,50 @@ def coverage(res: dict) -> dict:
         rows.append(dict(need=what, runs=got))
         if not got:
             missing.append(what)
-    return dict(ok=not missing, problems=[f"no run serves {m}" for m in missing], rows=rows, n=len(need))
+    problems = [f"no run serves {m}" for m in missing] + continuity(res)
+    return dict(ok=not problems, problems=problems, rows=rows, n=len(need))
+
+
+def continuity(res: dict) -> list:
+    """SVC-05's second half (I2-18 e): the runs that serve a tag join up end to end, one run's end line the next one's,
+    and each 230 V circuit's runs reach from a source fixture (`needs_run: false`, the board's AC bar) to the circuit's
+    load line or an outlet whose `for` is that line. A run that stops short or starts from the wrong part fails."""
+    data = res["data"]
+    sources = {f["id"] for f in data["fixtures"] if f.get("needs_run") is False}
+    serves_ = defaultdict(set)
+    for f in data["fixtures"]:
+        if f.get("for"):
+            serves_[f["for"]].add(f["id"])
+    tagged = defaultdict(list)
+    for r in res["runs"]:
+        for t in r.get("serves") or []:
+            tagged[t].append(r)
+    problems = []
+    for tag, rs in tagged.items():
+        adj = defaultdict(set)
+        for r in rs:
+            a, b = r["from"]["line"], r["to"]["line"]
+            adj[a].add(b)
+            adj[b].add(a)
+        seen, todo = set(), [next(iter(adj))]
+        while todo:
+            x = todo.pop()
+            if x not in seen:
+                seen.add(x)
+                todo += list(adj[x] - seen)
+        if seen != set(adj):
+            problems.append(f"{tag}'s runs do not join up end to end: " +
+                            ", ".join(f"{r['id']} {r['from']['line']} to {r['to']['line']}" for r in rs))
+    for c in res["svc"]["electrical"]["circuits"]:
+        ends = {e for r in tagged.get(c["id"], []) for e in (r["from"]["line"], r["to"]["line"])}
+        if not ends:
+            continue
+        loads = {c["at"]} | serves_[c["at"]]
+        if not ends & sources:
+            problems.append(f"{c['id']}'s runs start from no source (the board's AC bar)")
+        if not ends & loads:
+            problems.append(f"{c['id']}'s runs reach neither its load {c['at']} nor an outlet for it")
+    return problems
 
 
 def drops(res: dict) -> dict:

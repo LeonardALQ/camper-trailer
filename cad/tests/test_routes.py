@@ -148,6 +148,21 @@ def test_every_gland_has_a_fitting_with_room_round_it():
     assert e["closest"] and all(c["gap"] >= c["need"] - 0.05 for c in e["closest"])
 
 
+def test_svc05_finds_a_circuit_whose_runs_stop_short():
+    """I2-18 (e): the runs of a tag join end to end, and a 230 V circuit runs from the board to its load or the outlet
+    the load plugs into. Moving one end of a run breaks SVC-05."""
+    assert R.coverage(RES)["ok"]
+
+    def moved(rid, end, line):
+        return [dict(r, **{end: dict(r[end], line=line)}) if r["id"] == rid else r for r in RES["runs"]]
+    bad = R.coverage(dict(RES, runs=moved("C9B", "from", "PO-02")))["problems"]
+    assert any(p.startswith("C9's runs do not join up") for p in bad), bad
+    bad = R.coverage(dict(RES, runs=moved("C2", "to", "PO-08")))["problems"]
+    assert any(p.startswith("C2's runs reach neither") for p in bad), bad
+    bad = R.coverage(dict(RES, runs=moved("C5", "from", "LA-11E")))["problems"]
+    assert any(p.startswith("C5's runs start from no source") for p in bad), bad
+
+
 def test_ids_are_unique_and_every_end_is_a_real_line():
     ids = [r["id"] for r in RES["runs"]]
     assert len(ids) == len(set(ids))

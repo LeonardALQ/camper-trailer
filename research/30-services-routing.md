@@ -76,7 +76,7 @@ they are threaded through (`inside`).
 | SVC-02 | each bend at or above the least bending radius, or a fitting | makers' tables (sections 2, 3) |
 | SVC-03 | 230 V 50 mm from ELV outside its conduit, 150 mm reach at the board and shared appliances | AS/NZS 3000:2018 clause 3.9.8.3, AS/NZS 3001.2:2022 |
 | SVC-04 | no water, waste or diesel line within 300 mm of the battery's terminal face, but the washer's sleeved hoses (W-02, F-10) | AS/NZS 3001.2:2022 clause 5.4.10.2, CT-602 |
-| SVC-05 | every circuit, DC load, outlet, water outlet and fitting has its run | data/services.yaml, report 20 section 7 |
+| SVC-05 | every circuit, DC load, outlet, water outlet and fitting has its run, the runs of each tag join up end to end, and each 230 V circuit runs from the board's AC bar to its load or the outlet it plugs into | data/services.yaml, report 20 section 7 |
 | SVC-06 | DC drop at most 2 % at the design current, the ute's half of the ute feed (TW06) added, 230 V at most 5 % | the design's own 2 %, stricter than AS/NZS 3000, and AS/NZS 3000:2018 clause 3.6.2 for 230 V |
 | SVC-07 | gravity wastes fall at least 1:50 | AS/NZS 3500.2, CT-611, CT-612 |
 | SVC-08 | each run its radius plus 5 mm (est.) from every other, cables of one band in a shared way may touch. Cold water, vents and diesel 25 mm from 230 V, hot water before the mixing valve and wastes 50 mm from 230 V and 25 mm from extra-low-voltage cables above the floor (a solvent-welded DWV waste keeps the gap), and no wet line over a 230 V run within 25 mm in plan | IB 052/2015 for cold water (25 mm), the design's own rule for the rest (IB 052/2015 asks 100 mm for heated water and drains in a building) |

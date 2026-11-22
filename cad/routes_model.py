@@ -220,7 +220,7 @@ def check_rows(res: dict, ev: dict) -> list[dict]:
                        margin=None if e["smallest"] is None else round(e["smallest"] - e["limit"], 1),
                        governing=e["near"][0]["run"] if e["near"] else None)
         elif c["kind"] == "coverage":
-            row.update(limit="every load, outlet, water outlet and fixture has its run", measured=e["n"] - len(e["problems"]), unit="served",
+            row.update(limit="every load, outlet, water outlet and fixture has its run, joined up from its source", measured=e["n"] - len(e["problems"]), unit="served",
                        margin=-len(e["problems"]), governing=f"{e['n']} needs")
         elif c["kind"] == "drops":
             row.update(limit="DC 2 % at the design current, 230 V 5 %", measured=round(100 * e["use"], 1), unit="% of the limit",

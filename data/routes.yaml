@@ -85,7 +85,7 @@ checks:
     title: Every load, outlet, DC point, water outlet and fitting has its run from its source
     kind: coverage
     severity: fail
-    why: "The schedules and the models are complete only if every 230 V circuit, every 12 V and 24 V load of data/services.yaml and every water outlet is reached."
+    why: "The schedules and the models are complete only if every 230 V circuit, every 12 V and 24 V load of data/services.yaml and every water outlet is reached. The runs of each tag join up end to end, and each 230 V circuit runs from a source (the board's AC bar) to its load or the outlet the load plugs into."
     source: "data/services.yaml (circuits, buses), report 20 section 7, TRAILER.md (Plumbing and water)"
   - id: SVC-06
     title: Every sized circuit's voltage drop at its design current over its routed length within its limit
@@ -425,7 +425,8 @@ consts:
 # Terminals with no box of their own in the layout: the lights, outlets and DC points (line BD-11), the board's parts
 # (EL-05, EL-06, VE-02), the water supply's parts (WS-01) and the point lines. `at` is the centre, `size` the box.
 # `obstacle: false` for the board's parts inside the cabinet, which every run there passes. `serves` tags what SVC-05
-# looks for, and `needs_run: false` a source.
+# looks for, `needs_run: false` a source, and an outlet's `for` the line of the appliance plugged into it, which
+# SVC-05 takes as the circuit's load.
 fixtures:
   # ---------------------------------------------------------------- the board (LA-11E)
   - {id: BR-BMS, what: "Lynx Smart BMS NG 500 A", line: EL-05, at: [BX, -1060, LA_11E.z0 + 260], size: [90, 160, 190], obstacle: false, needs_run: false}
@@ -467,14 +468,14 @@ fixtures:
   - {id: LT-12, what: "Rear door light over D2, high under the roof's edge", line: BD-11, at: [body_x1 + 15, 0, ceiling_z - 13], size: [30, 200, 40]}
   # ---------------------------------------------------------------- 230 V outlets (report 20 section 7)
   - {id: PO-01, what: "Double outlet on the bench splashback, between the hob and the sink", line: BD-11, at: [LA_07A.x1 + 90, half_in - 8, LA_11B.z1 + 60], size: [120, 16, 70]}
-  - {id: PO-02, what: "Double outlet on the tower's side face over the bench", line: BD-11, at: [LA_11T.x1 + 8, 1000, LA_11B.z1 + 160], size: [16, 120, 70]}
+  - {id: PO-02, what: "Double outlet on the tower's side face over the bench", line: BD-11, at: [LA_11T.x1 + 8, 1000, LA_11B.z1 + 160], size: [16, 120, 70], for: LA-11B}
   - {id: PO-03, what: "Double outlet for the living area, on the tower's bed-side end", line: BD-11, at: [LA_11T.x0 - 8, 700, floor_z + 425], size: [16, 120, 70]}
-  - {id: PO-04, what: "Double outlet at the desk, in the desk top's power module by the front wall, kerb half", line: BD-11, at: [in_x0 + 60, -300, LA_09.z1 - 25], size: [70, 120, 50]}
-  - {id: PO-05, what: "Double outlet at the desk, in the desk top's power module by the front wall, road half", line: BD-11, at: [in_x0 + 60, 300, LA_09.z1 - 25], size: [70, 120, 50]}
-  - {id: PO-06, what: "Single outlet for the washer, kerb wall above it", line: BD-11, at: [LA_02.cx, -half_in + 8, LA_02.z1 + 90], size: [70, 16, 70]}
-  - {id: PO-07, what: "Single outlet for the dryer, kerb wall above it", line: BD-11, at: [LA_14.x0 + 80, -half_in + 8, LA_14.z1 + 80], size: [70, 16, 70]}
+  - {id: PO-04, what: "Double outlet at the desk, in the desk top's power module by the front wall, kerb half", line: BD-11, at: [in_x0 + 60, -300, LA_09.z1 - 25], size: [70, 120, 50], for: LA-09}
+  - {id: PO-05, what: "Double outlet at the desk, in the desk top's power module by the front wall, road half", line: BD-11, at: [in_x0 + 60, 300, LA_09.z1 - 25], size: [70, 120, 50], for: LA-09}
+  - {id: PO-06, what: "Single outlet for the washer, kerb wall above it", line: BD-11, at: [LA_02.cx, -half_in + 8, LA_02.z1 + 90], size: [70, 16, 70], for: LA-02}
+  - {id: PO-07, what: "Single outlet for the dryer, kerb wall above it", line: BD-11, at: [LA_14.x0 + 80, -half_in + 8, LA_14.z1 + 80], size: [70, 16, 70], for: LA-14}
   - {id: PO-08, what: "Single service outlet on the board cabinet", line: BD-11, at: [LA_11E.x0 - 8, -900, LA_11E.z0 + 120], size: [16, 70, 70]}
-  - {id: PO-09, what: "Single outlet for the oven, on the tower's side face over the bench, its lead through the side panel", line: BD-11, at: [LA_11T.x1 + 8, 880, LA_13.z0 + 80], size: [16, 70, 70]}
+  - {id: PO-09, what: "Single outlet for the oven, on the tower's side face over the bench, its lead through the side panel", line: BD-11, at: [LA_11T.x1 + 8, 880, LA_13.z0 + 80], size: [16, 70, 70], for: LA-13}
   # ---------------------------------------------------------------- 24 V USB and DC points (report 20 section 7)
   - {id: US-01, what: "USB-C PD 65 W on the tower's side face over the bench", line: BD-11, at: [LA_11T.x1 + 8, 805, LA_11B.z1 + 160], size: [16, 60, 60]}
   - {id: US-02, what: "Desk USB panel in the desk top's power module: two USB-C PD 100 W and a USB-A", line: BD-11, at: [in_x0 + 190, 0, LA_09.z1 - 25], size: [70, 120, 50]}
@@ -514,7 +515,7 @@ fixtures:
   - {id: LJ-01, what: "Rear lamp junction box under the rear crossmember", line: LG-01, at: [CM_08.x0 + 25, -300, CM_08.z0 - 40], size: [100, 80, 60], needs_run: false}
   # ---------------------------------------------------------------- the side-wall glands as terminals (data/services.yaml)
   - {id: G2-IN, what: "Shore and generator inlets, the 12 V Anderson outlet and the USB-C (G2)", line: BD-11, at: [4700, -half_in + 15, 1150], size: [310, 30, 120], serves: ["12 V: 10 A external outlet", "12 V: transfer pump"]}
-  - {id: G3-PO, what: "Outdoor double outlet, IP56 (G3)", line: BD-11, at: [4355, -half_in + 15, 1150], size: [90, 30, 90]}
+  - {id: G3-PO, what: "Outdoor double outlet, IP56 (G3)", line: BD-11, at: [4355, -half_in + 15, 1150], size: [90, 30, 90], for: G3}
   # ---------------------------------------------------------------- the lamps (data/services.yaml lamps, cad/lamps.py) and the brakes
   - {id: LM-RK, what: "Rear lamps, kerb side: stop, tail, indicator, reversing and the reflector (LP-01, LP-02)", line: LG-01, at: [body_x1 + 10, -1000, 811], size: [20, 260, 90]}
   - {id: LM-RR, what: "Rear lamps, road side (LP-01, LP-02)", line: LG-01, at: [body_x1 + 10, 1000, 811], size: [20, 260, 90]}
