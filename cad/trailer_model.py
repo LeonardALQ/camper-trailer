@@ -26,6 +26,8 @@ OVERRIDE = {"BD-01": ("#8c8c8c", 0.6), "RG-01": ("#7b7d7d", 1.0), "LA-11T": ("#5
             "GS-04": ("#e74c3c", 1.0), "DX-01": ("#aab7b8", 0.45), "LB-04": ("#d4e6f1", 0.25), "LB-01": ("#f8f9f9", 1.0),
             "BD-07": ("#b2bec3", 0.5), "DB-03": ("#2c3e50", 1.0), "DB-04": ("#aab7b8", 0.8)}
 LAMP_COLOURS = {"red": "#c0392b", "amber": "#f39c12", "white": "#fdfefe", "red and amber": "#d35400"}
+# the viewer files' tessellation: the product models' round parts at 1.5 mm and 0.6 rad keep each file under 8 MB
+VIEWER_MESH = {"deviation": 1.5, "angular_tolerance": 0.6}
 ROLE_COLOURS = {"rail": "#566573", "raiser": "#7b8a8b", "drawbar": "#34495e", "brace": "#34495e", "outrigger": "#95a5a6",
                 "cm_xt": "#5d6d7e", "cm_end": "#5d6d7e", "cm_floor": "#839192", "plan_brace": "#a04000", "spare_post": "#5d6d7e"}
 
@@ -264,7 +266,7 @@ def write_outputs(tm: TrailerModel, out: Path):
     from .export import _viewer_js
     out.mkdir(parents=True, exist_ok=True)
     comp = tm.compound()
-    js = _viewer_js("ASM-TR", comp)
+    js = _viewer_js("ASM-TR", comp, **VIEWER_MESH)
     shapes = json.loads(js[js.index("{"): js.rindex("}") + 1])
     (out / "trailer.viewer.json").write_text(json.dumps(shapes, separators=(",", ":")))
     export_step(comp, str(out / "trailer.step"), timestamp="2026-11-18T00:00:00")
@@ -272,7 +274,7 @@ def write_outputs(tm: TrailerModel, out: Path):
     # the chassis and drawbar on their own, for the chassis page and the engineer
     ch = Compound(label="ASM-CH Chassis and drawbar",
                   children=[Compound(label=SYSTEM_LABELS[g], children=tm.groups[g]) for g in ("chassis", "drawbar") if g in tm.groups])
-    js = _viewer_js("ASM-CH", ch)
+    js = _viewer_js("ASM-CH", ch, **VIEWER_MESH)
     (out / "chassis.viewer.json").write_text(js[js.index("{"): js.rindex("}") + 1])
     export_step(ch, str(out / "chassis.step"), timestamp="2026-11-20T00:00:00")
 
@@ -334,7 +336,7 @@ def write_body_outputs(lay: Layout, out: Path, night: Layout | None = None):
     body-inside-night.viewer.json beside the day model (H1)."""
     from .export import _viewer_js
     for name, comp in body_models(lay, night).items():
-        js = _viewer_js("ASM-BD", comp)
+        js = _viewer_js("ASM-BD", comp, **VIEWER_MESH)
         (out / f"{name}.viewer.json").write_text(js[js.index("{"): js.rindex("}") + 1])
         if name == "body":
             export_step(comp, str(out / "body.step"), timestamp="2026-11-20T00:00:00")

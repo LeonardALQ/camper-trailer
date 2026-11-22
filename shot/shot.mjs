@@ -16,6 +16,13 @@ const jobs = [
   { path: '/trailer/', name: 'trailer-dark', viewer: true, full: true, theme: 'dark', sections: ['load-cases', 'checks'] },
   { path: '/body/', name: 'body', viewer: true, full: true, sections: ['checks', 'panels', 'mass'] },
   { path: '/body/', name: 'body-inside', viewer: true, nth: 1 },
+  // the fit-out with the body's panels hidden (H27): bed up and bed down, then into the wet room and the laundry
+  { path: '/body/', name: 'body-fitout-day', viewer: true, nth: 1, look: { hide: ['/ASM-BD/Body'] } },
+  { path: '/body/', name: 'body-fitout-night', viewer: true, nth: 2, look: { hide: ['/ASM-BD/Body'] } },
+  { path: '/body/', name: 'body-wet-room', viewer: true, nth: 1,
+    look: { hide: ['/ASM-BD/Body'], target: [5700, 0, 1500], from: [3200, -2400, 2200], zoom: 2.4 } },
+  { path: '/body/', name: 'body-laundry', viewer: true, nth: 1,
+    look: { hide: ['/ASM-BD/Body'], target: [4650, -600, 1600], from: [-1200, 3400, 1800], zoom: 2.4 } },
   { path: '/ute-garage/', name: 'ute-garage', viewer: true, full: true, sections: ['checks', 'mass'] },
   { path: '/ute-garage/', name: 'ute-garage-loading', viewer: true, nth: 1 },
   { path: '/tow-vehicle/', name: 'tow-vehicle', full: true },
@@ -44,6 +51,19 @@ for (const j of jobs) {
       ready = false;
     }
     await page.waitForTimeout(2500);
+  }
+  if (j.look) {
+    // hide groups and point the camera at a target from an offset, on the job's viewer
+    await page.evaluate((look) => {
+      const v = document.querySelectorAll('cad-viewer')[look.nth].viewer;
+      for (const p of look.hide || []) v.setState(p, [0, 0]);
+      if (look.target) {
+        v.setCameraTarget(look.target);
+        v.setCameraPosition(look.target.map((t, i) => t + look.from[i]));
+        v.setCameraZoom(look.zoom);
+      }
+    }, { ...j.look, nth: j.nth || 0 });
+    await page.waitForTimeout(1500);
   }
   const files = [];
   const shoot = async (file, opts) => {

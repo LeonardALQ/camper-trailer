@@ -31,7 +31,7 @@ From the front: the drawbar with its sealed box, the bed and desk zone, the livi
 | Partition | 5,185 to 5,205 | 48 V board | Inner door | Inverter, split indoor unit |
 | Wet room | 5,205 to 6,205 | Toilet, basin, cassette door | Rear door D2 | Shower over its floor well, W6 |
 
-Under the floor, between the rails, are the fresh tanks over the axles, the grey tank in the rear bay, the heater's diesel tank and the air supply box. The drawbar carries the box with two Honda EU22i and the jerry cans, the jockey wheel, and the spare wheel on the front wall above them. Walkways and landings keep at least 550 mm clear (FIT-01). The air-conditioner's outdoor unit stands high on the rear wall's road half.
+Under the floor, between the rails, are the fresh tanks over the axles, the grey tank in the rear bay, the heater's diesel tank on its cradle across the raisers (UF-06B) and the air supply box. The drawbar carries the box with two Honda EU22i and the jerry cans, the jockey wheel, and the spare wheel on the front wall above them. Walkways and landings keep at least 550 mm clear (FIT-01). The air-conditioner's outdoor unit stands high on the rear wall's road half.
 
 Storage is 0.38 m³ inside and 0.09 m³ in the drawbar box, about 0.2 m³ short of a long-stay home (est.), because the bed's footprint stays empty (H16).
 
@@ -86,7 +86,7 @@ The awning is a Fiamma F80s 400 on the roof's kerb edge, its case 5 mm inside th
 
 ## Lift bed and desk
 
-A Lippert HappiJac four-rail lift carries a 1,550 x 2,290 mm honeycomb platform and a 180 mm queen mattress across the trailer (H1). By day and in travel the platform's underside is 1,600 mm up, so a seated adult clears it. At night it stops at 805 mm, with the mattress top at 1,044 mm, 956 mm clear above it and 75 mm over the desk (BED-01). Index plungers lock it, a safety edge stops it on an obstruction, and a socket at the rail tops lowers it by hand. The lift is rated 272 kg standing and 204 kg moving (Lippert), so at night the bed takes two adults of up to about 208 kg together (BED-02). The desk is 1,200 x 600 mm at 730 mm against the front wall, and nothing else stands under the bed.
+A Lippert HappiJac four-rail lift carries a 1,550 x 2,290 mm honeycomb platform and a 180 mm queen mattress across the trailer (H1). By day and in travel the platform's underside is 1,600 mm up, so a seated adult clears it. At night it stops at 805 mm, with the mattress top at 1,044 mm, 956 mm clear above it and 75 mm over the desk (BED-01). Index plungers lock it, a safety edge stops it on an obstruction, and a socket at the rail tops lowers it by hand. The lift is rated 272 kg standing and 204 kg moving (Lippert), so at night the bed takes two adults of up to about 208 kg together (BED-02). The platform lies on the kit's two support rails, one along each wall from the front carriage to the rear one. The desk is 1,200 x 600 mm at 730 mm, its back edge on an aluminium cleat on the front wall and its front corners on two 40 mm square legs, and nothing else stands under the bed.
 
 ## Kitchen
 
@@ -124,7 +124,7 @@ Research report 19's load calculation gives a design hot day of 37.1 kWh of heat
 - Autonomy (H3): the design hot day, all electric with the air-conditioning, two showers, cooking, a wash and dry, desk work and Starlink, takes 19.6 kWh. With 90 % usable, the battery alone runs it for 25.1 h when new and 17.2 h at end of life. The cold night takes 4.7 kWh on diesel heat or 11.2 kWh on the heat pump.
 - Shedding: the shower heater drops out first when the hob or the oven runs, and the shower stays warm on boiler water. The Combi element, washer and dryer follow. The split never sheds. The worst managed load is 89 % of the inverter's 40 °C rating.
 - Fire: a 2 kg ABE extinguisher stands by each outside door, D1 and D2, with a fire blanket at D1, a smoke alarm and a CO alarm (VSB1 13.2.2). They cover the wet room whether or not it counts as a second compartment. A dry powder unit will not stop a lithium module in thermal runaway, so if the battery box smokes or burns, open the 300 A isolator, get everyone out and call 000. The extinguishers are for a fire that has not reached the box (LA-16).
-- Lamps: the ute drives them at 12 V through the 12-pin plug. The rear lamps and red triangles sit on the rear outriggers, three amber side markers go on each side, and end-outline lamps sit high at both ends. The plate sits on the rear wall's kerb half, its top at 1,224 mm. All 24 checks to ADR 13/00 and VSB1 3.1 pass, the outdoor unit's cradle stays included (CT-003, CT-011).
+- Lamps: the ute drives them at 12 V through the 12-pin plug. The rear lamps and red triangles sit on the rear outriggers, three amber side markers go on each side, each on a 3 mm aluminium cap riveted over its outrigger's open end (LG-02), and end-outline lamps sit high at both ends. The plate sits on the rear wall's kerb half, its top at 1,224 mm. All 24 checks to ADR 13/00 and VSB1 3.1 pass, the outdoor unit's cradle stays included (CT-003, CT-011).
 
 ## Plumbing and water
 
@@ -136,7 +136,7 @@ Research report 19's load calculation gives a design hot day of 37.1 kWh of heat
 
 - Cruisemaster XT Freestyle Air, the 4,500 kg build, axles 900 mm apart on LC5 hubs with 12 inch ABS-enabled electric drums, a Bosch TSC for ABS and sway control, and the Level 3 manual air kit, set from its panel. A spare airbag travels with it.
 - The ute's ROH Trak 2 16 x 7 ET 0 steel wheel, rated 1,400 kg, with LT265/75R16 123/120 tyres, so each vehicle's spare fits both. The 1,655 mm track (H22) runs each tyre 50 mm outside the ute's 1,555 mm ruts, so 215 of its 265 mm tread stays in them.
-- A Cruisemaster DO35 V3Plus at the ute's 440 mm laden ball height, chains to AS 4177.4, a breakaway kit, a 12-pin plug and a grey Anderson SB50 for the 48 V charging feed. The jockey wheel swings up along the drawbar, 157.5 mm under the bike box at a jack-knife (JK-02). Four corner steadies.
+- A Cruisemaster DO35 V3Plus at the ute's 440 mm laden ball height, chains to AS 4177.4, a breakaway kit, a 12-pin plug and a grey Anderson SB50 for the 48 V charging feed. The jockey wheel's bracket plate bolts to the angled drawbar member through four spacer tubes (DB-08), and the jockey swings up along the drawbar, 157.5 mm under the bike box at a jack-knife (JK-02). Four corner steadies.
 
 ## Drawings
 

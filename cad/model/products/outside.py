@@ -105,7 +105,7 @@ def jockey(fr, V, sp, b):
     return [("swivel clamp", fr.box(20, 0, w - 60, 120, 14, 120), GALV, 1.0),
             ("clamp body", fr.box(30, 14, w - 45, 100, 40, 90), GALV, 1.0),
             ("post", fr.cyl_u(D / 2 + 10, w, 32, 10, W - 180), "#7f8c8d", 1.0),
-            ("crank", fr.box(0, D / 2 - 10, w - 15, 15, 40, 140), BLACK, 1.0),
+            ("crank", fr.box(0, D / 2 - 10, w - 70, 15, 40, 140), BLACK, 1.0),
             ("fork", fr.box(W - 200, 30, w - 40, 60, D - 30, 80), "#7f8c8d", 1.0),
             ("wheel", fr.cyl((W - 100, 30, w), (W - 100, 70, w), 99), RUBBER, 1.0),
             ("wheel", fr.cyl((W - 100, D - 40, w), (W - 100, D, w), 99), RUBBER, 1.0),
