@@ -16,6 +16,7 @@ them are drawn as the design intent: the installer fixes each run at fit-out, in
 from __future__ import annotations
 
 import math
+import re
 import time
 
 from . import sheet as S
@@ -117,15 +118,346 @@ def _legend(sh, x, y, items, size=1.3):
     return y - 3.6 - len(items) * 3.2
 
 
+def _glands_of(run: dict) -> set:
+    """The glands a run passes (its `glands`) and the wall glands it starts or ends at (fixtures G2-IN, G3-PO, G1-FL)."""
+    ends = {m[1] for m in (re.match(r"(G\d+)-", run[k]["line"]) for k in ("from", "to") if run.get(k)) if m}
+    return set(run.get("glands") or []) | ends
+
+
+def _gland_runs(rr: dict, gid: str, styles: dict) -> str:
+    return id_list(run["id"] for run in rr["runs"] if run["system"] in styles and gid in _glands_of(run))
+
+
+def _tag_legend(sh, x, y, width=74.0, size=1.15) -> float:
+    """The run tags' key under a legend: a sample tag, what its codes mean and the four levels. Returns the y below."""
+    sh.circle(x + 1.1, y + 0.4, 0.32, "fill")
+    sh.line(x + 1.1, y + 0.4, x + 3.4, y + 0.4, "thin")
+    sh.text(x + 3.7, y + 1.1, "G21", TAG_SIZE, bold=True)
+    sh.text(x + 3.7, y - 0.35, "F/U", TAG_SIZE, bold=True)
+    sh.text(x + 3.7 + S.text_mm("F/U", TAG_SIZE, True) + 0.7, y - 0.35, "C1, C2", TAG_SIZE)
+    text = ("RUN TAG ON A LEADER: THE GLAND IT MARKS, IF ANY, THEN EACH LEVEL CODE IN BOLD WITH ITS RUNS. AT A RUN'S END THE "
+            "CODE IS THE LEVEL THERE. WHERE A RUN RISES OR DROPS IT IS FROM/TO: F/U DROPS FROM THE FLOOR TO UNDER IT. "
+            "LEVELS: " + ", ".join(f"{k} {t}" for k, t in LEVELS) + f" (F UP TO {FLOOR_BAND:.0f} mm OVER THE FLOOR, "
+            f"C THE LAST {CEILING_BAND:.0f} mm UNDER THE CEILING).")
+    yy = y - 3.4
+    for part in S.wrap_mm(text, width, size):
+        sh.text(x, yy, part, size)
+        yy -= size + 0.75
+    return yy
+
+
+# ------------------------------------------------------------------ run tags (I2-17)
+# A run's level along its routed centreline, from its height: under the floor, in the floor's own band (the floor
+# bulkheads, the kick lanes and the plinth's end slot, up to 200 mm over the floor), in the ceiling's band (the
+# bulkheads clipped to the ceiling, the last 200 mm under it), or in a wall, the partition or a cabinet between.
+LEVELS = (("C", "CEILING AND ITS BULKHEADS"), ("W", "WALL, PARTITION, CABINET OR BOARD"),
+          ("F", "FLOOR: KICK LANES, FLOOR BULKHEADS, PLINTH SLOT"), ("U", "UNDER THE FLOOR"))
+FLOOR_BAND, CEILING_BAND = 200.0, 200.0
+RISE_MM = 40.0      # a stretch shorter than this in plan is the run rising or dropping from one level to the next
+CLUSTER_MM = 150.0  # tags closer than this in plan share one tag
+GLAND_MM = 80.0     # a tag this close in plan to a gland its run passes is that gland's tag
+TAG_SIZE, TAG_W = 1.0, 31.0
+
+
+def level(z: float, V: dict) -> str:
+    if z < V["floor_underside_z"]:
+        return "U"
+    if z <= V["floor_z"] + FLOOR_BAND:
+        return "F"
+    if z >= V["ceiling_z"] - CEILING_BAND:
+        return "C"
+    return "W"
+
+
+def _plan_len(pts) -> float:
+    return sum(math.hypot(b[0] - a[0], b[1] - a[1]) for a, b in zip(pts, pts[1:]))
+
+
+def run_events(run: dict, V: dict) -> list[tuple]:
+    """A run's tags as (plan point, code): each end with its level, and every change of level as FROM/TO where the run
+    rises or drops. A rise or a drop at an end goes into that end's code (W/F: starts in the board, drops to the floor)."""
+    d = run["dense"]
+    st: list[list] = []
+    for a, b in zip(d, d[1:]):
+        lv = level((a[2] + b[2]) / 2, V)
+        if st and st[-1][0] == lv:
+            st[-1][1].append(b)
+        else:
+            st.append([lv, [a, b]])
+    real: list[list] = []
+    for lv, pts in st:
+        if _plan_len(pts) < RISE_MM:
+            continue
+        if real and real[-1][0] == lv:
+            real[-1][1] += pts
+        else:
+            real.append([lv, list(pts)])
+    p0, p1 = (d[0][0], d[0][1]), (d[-1][0], d[-1][1])
+    l0, l1 = level(d[0][2], V), level(d[-1][2], V)
+    if not real:
+        return [(p0, l0), (p1, l1)]
+    out = [(p0, l0 if real[0][0] == l0 else f"{l0}/{real[0][0]}")]
+    for (la, pa), (lb, _) in zip(real, real[1:]):
+        out.append(((pa[-1][0], pa[-1][1]), f"{la}/{lb}"))
+    out.append((p1, l1 if real[-1][0] == l1 else f"{real[-1][0]}/{l1}"))
+    return out
+
+
+def _natural(rid: str):
+    m = re.match(r"([A-Z]+)-?(\d+)([A-Z]*)$", rid)
+    return (m[1], int(m[2]), m[3]) if m else (rid, 0, "")
+
+
+def id_list(ids) -> str:
+    """Run ids in order, three or more consecutive ids written as a range (B-04 TO B-06)."""
+    ids = sorted(set(ids), key=_natural)
+    out, i = [], 0
+    while i < len(ids):
+        j = i
+        while j + 1 < len(ids):
+            a, b = _natural(ids[j]), _natural(ids[j + 1])
+            if a[0] != b[0] or a[2] or b[2] or b[1] != a[1] + 1:
+                break
+            j += 1
+        out.append(f"{ids[i]} TO {ids[j]}" if j - i >= 2 else ", ".join(ids[i:j + 1]))
+        i = j + 1
+    return ", ".join(out)
+
+
+def _merged(codes: list[str]) -> str:
+    """One run's codes at one tag, in route order, as one path of levels: W and W/F make W/F."""
+    seq: list[str] = []
+    for c in codes:
+        for lv in c.split("/"):
+            if not seq or seq[-1] != lv:
+                seq.append(lv)
+    return "/".join(seq)
+
+
+def tag_clusters(runs: list[dict], V: dict, glands: dict, clip_x: float | None = None, clip_header: str = "") -> list[dict]:
+    """The runs' tags gathered where they meet. A tag at a gland the run passes is that gland's, anchored on it. The
+    rest gather round the densest points first. Tags ahead of clip_x (on the drawbar, off the plan) share one tag at
+    the cut. Each cluster: anchor (plan, mm), header, and lines of (code, runs)."""
+    ev = []
+    for r in runs:
+        gl = [(gid, _gland_xy(glands[gid], V)) for gid in r.get("glands") or [] if gid in glands]
+        for k, (p, code) in enumerate(run_events(r, V)):
+            near = min(((math.dist(p, q), gid) for gid, q in gl if q[0] is not None and q[1] is not None), default=(1e9, None))
+            ev.append(dict(p=p, code=code, run=r["id"], k=k, gland=near[1] if near[0] < GLAND_MM else None))
+    clusters: list[dict] = []
+    off = [e for e in ev if clip_x is not None and e["p"][0] < clip_x]
+    if off:
+        ys = [e["p"][1] for e in off]
+        clusters.append(dict(anchor=(clip_x, (min(ys) + max(ys)) / 2), header=clip_header, events=off))
+    ev = [e for e in ev if not (clip_x is not None and e["p"][0] < clip_x)]
+    by_gland: dict[str, list] = {}
+    for e in ev:
+        if e["gland"]:
+            by_gland.setdefault(e["gland"], []).append(e)
+    for gid in sorted(by_gland, key=lambda s_: int(s_[1:])):
+        clusters.append(dict(anchor=_gland_xy(glands[gid], V), header=gid, events=by_gland[gid]))
+    rest = [e for e in ev if not e["gland"]]
+    while rest:
+        nb = [[f for f in rest if math.dist(e["p"], f["p"]) < CLUSTER_MM] for e in rest]
+        i = max(range(len(rest)), key=lambda i: (len(nb[i]), -rest[i]["p"][0], -rest[i]["p"][1]))
+        clusters.append(dict(anchor=rest[i]["p"], header=None, events=nb[i]))
+        taken = {id(f) for f in nb[i]}
+        rest = [e for e in rest if id(e) not in taken]
+    order = {k: i for i, (k, _) in enumerate(LEVELS)}
+    for c in clusters:
+        per_run: dict[str, list] = {}
+        for e in sorted(c["events"], key=lambda e: e["k"]):
+            per_run.setdefault(e["run"], []).append(e["code"])
+        codes: dict[str, list] = {}
+        for rid, cs in per_run.items():
+            codes.setdefault(_merged(cs), []).append(rid)
+        c["lines"] = [(code, id_list(ids)) for code, ids in
+                      sorted(codes.items(), key=lambda kv: (kv[0].count("/"), [order.get(x, 9) for x in kv[0].split("/")]))]
+        c["runs"] = sorted(per_run, key=_natural)
+    return clusters
+
+
+def _text_box(t: dict) -> tuple:
+    """A free text's rectangle on the sheet (x0, y0, x1, y1), y up, rotation included."""
+    s = t["s"]
+    w = S.text_mm(t["t"], s, t["bold"])
+    x, y = t["x"], S.Sheet.H - t["y"]
+    x0 = x if t["anchor"] == "start" else x - w / 2 if t["anchor"] == "middle" else x - w
+    pts = [(x0, y - 0.25 * s), (x0 + w, y - 0.25 * s), (x0 + w, y + 0.8 * s), (x0, y + 0.8 * s)]
+    if t["rot"]:
+        a = math.radians(-t["rot"])
+        pts = [(x + (px - x) * math.cos(a) - (py - y) * math.sin(a), y + (px - x) * math.sin(a) + (py - y) * math.cos(a))
+               for px, py in pts]
+    return (min(p[0] for p in pts), min(p[1] for p in pts), max(p[0] for p in pts), max(p[1] for p in pts))
+
+
+def _overlap(a, b, pad=0.0) -> bool:
+    return a[0] - pad < b[2] and b[0] - pad < a[2] and a[1] - pad < b[3] and b[1] - pad < a[3]
+
+
+def _crosses(p, q, b) -> bool:
+    """Liang-Barsky: does the segment p-q enter the box (x0, y0, x1, y1)?"""
+    u0, u1 = 0.0, 1.0
+    dx, dy = q[0] - p[0], q[1] - p[1]
+    for a, c in ((-dx, p[0] - b[0]), (dx, b[2] - p[0]), (-dy, p[1] - b[1]), (dy, b[3] - p[1])):
+        if abs(a) < 1e-12:
+            if c < 0:
+                return False
+        elif a < 0:
+            u0 = max(u0, c / a)
+        else:
+            u1 = min(u1, c / a)
+        if u0 > u1:
+            return False
+    return True
+
+
+class Ink:
+    """Every stroked line on the sheet so far, in a 4 mm grid, to count the lines a tag would cover."""
+    G = 4.0
+
+    def __init__(self, sh):
+        self.segs, self.grid = [], {}
+        for p, q, _, _ in S._segments(sh.el)[0]:
+            self.add((p[0], S.Sheet.H - p[1]), (q[0], S.Sheet.H - q[1]))
+
+    def add(self, a, b):
+        k = len(self.segs)
+        self.segs.append((a, b))
+        for gx in range(int(min(a[0], b[0]) // self.G), int(max(a[0], b[0]) // self.G) + 1):
+            for gy in range(int(min(a[1], b[1]) // self.G), int(max(a[1], b[1]) // self.G) + 1):
+                self.grid.setdefault((gx, gy), []).append(k)
+
+    def count(self, b) -> int:
+        seen = set()
+        for gx in range(int(b[0] // self.G), int(b[2] // self.G) + 1):
+            for gy in range(int(b[1] // self.G), int(b[3] // self.G) + 1):
+                seen.update(self.grid.get((gx, gy), ()))
+        return sum(1 for k in seen if _crosses(*self.segs[k], b))
+
+
+def _symbols(sh) -> list[tuple]:
+    """The boxes of the small circles on the sheet (glands, symbols), which a label must never cover."""
+    out = []
+    for e in sh.el:
+        m = S._CIRCLE.match(e)
+        if m and 'stroke="none"' not in m[4] and float(m[3]) <= S.SYMBOL_R:
+            cx, cy, r = float(m[1]), S.Sheet.H - float(m[2]), float(m[3])
+            out.append((cx - r, cy - r, cx + r, cy + r))
+    return out
+
+
+RINGS = (0.6, 1.5, 2.6, 4.0, 5.6, 7.5, 10.0, 13.0, 16.5, 21.0, 26.0, 32.0, 40.0, 50.0, 62.0)
+
+
+def place_box(anchor, w, h, regions, blocked, taken, ink: Ink, extra_rings: int = 3):
+    """Where a w x h label goes near its anchor (sheet mm): inside one of the regions, clear of every blocked box and
+    every label placed before, and over as few drawn lines as it can. Rings outward in 16 directions. Returns the box
+    or None."""
+    best, best_ring = None, None
+    for ri, d in enumerate(RINGS):
+        if best_ring is not None and ri > best_ring + extra_rings:
+            break
+        for k in range(16):
+            a = math.pi * k / 8
+            ux, uy = math.cos(a), math.sin(a)
+            e = abs(ux) * w / 2 + abs(uy) * h / 2
+            cx, cy = anchor[0] + ux * (d + e), anchor[1] + uy * (d + e)
+            b = (cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2)
+            if not any(b[0] >= r[0] and b[1] >= r[1] and b[2] <= r[2] and b[3] <= r[3] for r in regions):
+                continue
+            if any(_overlap(b, o, 0.25) for o in blocked) or any(_overlap(b, o, 0.5) for o in taken):
+                continue
+            score = d + 3.0 * ink.count(b)
+            if best is None or score < best[0]:
+                best = (score, b)
+                if best_ring is None:
+                    best_ring = ri
+        if best is not None and best[0] <= d:
+            break
+    return best[1] if best else None
+
+
+def _tag_lines(header: str | None, rows: list[tuple], size: float) -> tuple[list, float]:
+    """A tag's lines as [(x offset, text, bold)], the header first, each code in bold with its runs wrapped after it."""
+    lines = [[(0.0, header, True)]] if header else []
+    for code, ids in rows:
+        wc = S.text_mm(code, size, True) + 0.7
+        for i, part in enumerate(S.wrap_mm(ids, TAG_W - wc, size)):
+            lines.append(([(0.0, code, True)] if i == 0 else []) + [(wc, part, False)])
+    width = max(off + S.text_mm(t, size, b) for ln in lines for off, t, b in ln)
+    return lines, width
+
+
+def draw_tags(sh, pr, clusters: list[dict], regions: list[tuple], spill: tuple | None = None, size: float = TAG_SIZE) -> dict:
+    """Each cluster's tag beside its anchor, with a leader and a dot where it points. A tag with no room near its
+    anchor becomes a numbered mark there, and its lines go into a list at `spill` (x, y top, width). Returns counts."""
+    ink = Ink(sh)
+    blocked = [_text_box(t) for t in sh.texts] + _symbols(sh)
+    anchors = [pr.p(*c["anchor"]) for c in clusters]
+    dots = [(a[0] - 0.9, a[1] - 0.9, a[0] + 0.9, a[1] + 0.9) for a in anchors]
+    lh = size * 1.45
+    taken: list = []
+    spilled: list = []
+    built = [_tag_lines(c["header"], c["lines"], size) for c in clusters]
+    order = sorted(range(len(clusters)), key=lambda i: -(len(built[i][0]) * built[i][1]))
+
+    def draw(i, b, lines):
+        a = anchors[i]
+        qx, qy = min(max(a[0], b[0]), b[2]), min(max(a[1], b[1]), b[3])
+        if math.hypot(qx - a[0], qy - a[1]) > 0.7:
+            sh.line(a[0], a[1], qx, qy, "thin")
+            ink.add(a, (qx, qy))
+        sh.circle(a[0], a[1], 0.32, "fill")
+        for j, ln in enumerate(lines):
+            for off, t, bold in ln:
+                sh.text(b[0] + 0.2 + off, b[3] - (j + 1) * lh + 0.32 * size, t, size, bold=bold)
+        taken.append(b)
+
+    for i in order:
+        lines, w = built[i]
+        others = [o for j, o in enumerate(dots) if j != i]
+        b = place_box(anchors[i], w + 0.4, len(lines) * lh, regions, blocked + others, taken, ink)
+        if b is None and spill is not None:
+            spilled.append(i)
+            continue
+        if b is None:
+            raise RuntimeError(f"no room for the run tag at {clusters[i]['anchor']}: {clusters[i]['lines']}")
+        draw(i, b, lines)
+    for n, i in enumerate(spilled, 1):
+        mark = f"T{n}"
+        others = [o for j, o in enumerate(dots) if j != i]
+        b = place_box(anchors[i], S.text_mm(mark, size, True) + 0.4, lh, regions, blocked + others, taken, ink)
+        if b is None:
+            raise RuntimeError(f"no room for the run tag mark {mark} at {clusters[i]['anchor']}")
+        draw(i, b, [[(0.0, mark, True)]])
+    y = spill[1] if spill and spilled else None
+    if spilled:
+        sh.text(spill[0], y, "RUN TAGS THAT DID NOT FIT ON THE PLAN", 1.6, bold=True)
+        y -= 3.2
+        for n, i in enumerate(spilled, 1):
+            c = clusters[i]
+            head = f"T{n}" + (f" {c['header']}" if c["header"] else "")
+            for code, ids in c["lines"]:
+                for part in S.wrap_mm(f"{head}: {code} {ids}", spill[2], 1.2):
+                    sh.text(spill[0], y, part, 1.2)
+                    y -= 1.9
+                    head = "   "
+    return dict(tags=len(clusters), spilled=len(spilled), bottom=y)
+
+
 # ------------------------------------------------------------------ CT-601 electrical single line
 def ct601(prj, model, bom, checks, reg, dwg):
     t0 = time.time()
     C = ctx(prj)
     svc, V = C["svc"]["electrical"], C["V"]
+    # the main cables' sizes, lengths and drops as routed (data/routes.yaml, H28), so the sheet and the cable schedule agree
+    rt = {run["id"]: run for run in _routes(C["day"])["runs"]}
+    mm2 = lambda rid: f"{rt[rid]['size']:g} mm2"  # noqa: E731
     sh = S.Sheet()
     S.frame(sh)
     # sources
-    box(sh, 24, 262, 84, 280, ["PV ARRAY ON THE FIXED ROOF", "4 x SUNMAN eARC 430 W, 1,720 W", "TWO STRINGS OF TWO PANELS", "6 mm2 PV CABLE, ABOUT 6 m (G4)"])
+    box(sh, 24, 262, 84, 280, ["PV ARRAY ON THE FIXED ROOF", "4 x SUNMAN eARC 430 W, 1,720 W", "TWO STRINGS OF TWO PANELS", f"{mm2('D-15')} PV CABLE, {rt['D-15']['length_m']:.2f} AND {rt['D-16']['length_m']:.2f} m (G4)"])
     box(sh, 112, 262, 166, 280, ["THE UTE (CAR BUILD TC01)", "2 x ORION-TR SMART 12/48-8", "ON THE STOCK ALTERNATOR", "48 V TO THE TRAILER WHILE DRIVING"])
     box(sh, 172, 262, 226, 280, ["12-PIN PLUG, AS 4177.5", "LAMPS, BRAKES, BREAKAWAY SWITCH", "TSC POWER FROM THE UTE'S HARNESS", "NOT PART OF THE 48 V SYSTEM"], sty="light")
     box(sh, 172, 238, 226, 256, ["TWO 15 A INLETS (G2): SHORE, AND", "GENERATOR FOR THE TWO EU22i IN PARALLEL", "CHANGEOVER SHORE - OFF - GENERATOR",
@@ -135,7 +467,7 @@ def ct601(prj, model, bom, checks, reg, dwg):
         box(sh, x0, 238, x0 + 26, 254, [f"MPPT {n}", "SMARTSOLAR 150/35", "DC ISOLATOR"])
         wire(sh, [(x0 + 13, 262), (x0 + 13, 254)], "pv", f"STRING {n}", dx=0.8, dy=-0.6)
         wire(sh, [(x0 + 13, 238), (x0 + 13, 233), (100, 233)], "dc")
-        sh.text(x0 + 14, 234.2, "40 A MIDI, 10 mm2", 1.15)
+        sh.text(x0 + 14, 234.2, f"40 A MIDI, {mm2('D-08')}", 1.15)
     # Lynx Distributor, a vertical bus
     sh.fillrect(96, 150, 110, 236, "light")
     sh.rect(96, 150, 110, 236, "thick")
@@ -147,19 +479,20 @@ def ct601(prj, model, bom, checks, reg, dwg):
         wire(sh, [(54, y + 3), (63, y + 3)], "dc")
         sh.rect(57, y + 2.2, 60, y + 3.8, "medium")
     sh.line(63, 167, 63, 201, "thick")
-    sh.text(24, 203.6, "EACH MODULE: 125 A MEGA, 25 mm2", 1.1)
+    sh.text(24, 203.6, f"EACH MODULE: 125 A MEGA, {mm2('D-01')}", 1.1)
     sh.rect(22.5, 159.5, 66, 206.5, "phantom")
-    textblock(sh, 23, 157, ["SEALED BOX EL-02: 5 MODULES IN PARALLEL, 25.6 kWh", "EACH 125 A MEGA, 25 mm2 UNDER 1 m, SLEEVED",
+    textblock(sh, 23, 157, ["SEALED BOX EL-02: 5 MODULES IN PARALLEL, 25.6 kWh", f"EACH 125 A MEGA, {mm2('D-01')}, AT MOST {max(rt[f'D-0{i}']['length_m'] for i in range(1, 6)):.2f} m, SLEEVED",
                             "NEGATIVES ON A NEGATIVE BUSBAR, 6TH HOLDER SPARE", "VENTS G6, G7. HEAT DETECTOR TO THE CERBO GX"], size=1.15, gap=0.6)
     box(sh, 67, 196, 92, 206, ["ISOLATOR", "300 A, 60 V DC"], size=1.2)
     wire(sh, [(63, 201), (67, 201)], "dc")
     box(sh, 24, 210, 92, 230, ["LYNX SMART BMS NG 500 A", "CONTACTOR, SHUNT AND PRE-ALARM", "ATC AND ATD STOP THE CHARGERS AND LOADS FIRST",
-                               "AUX 1.1 A FEEDS THE CERBO GX", "70 mm2, 1.0 m TO THE DISTRIBUTOR"])
+                               "AUX 1.1 A FEEDS THE CERBO GX", f"{mm2('D-06')}, {rt['D-06']['length_m']:.2f} m FROM THE BANK BUSBAR"])
     wire(sh, [(80, 206), (80, 210)], "dc")
     wire(sh, [(92, 220), (96, 220)], "dc")
     # the ute's feed, the MultiPlus and its AC
     wire(sh, [(139, 262), (139, 226), (110, 226)], "dc")
-    textblock(sh, 140, 257, ["GREY ANDERSON SB50 AT", "THE DRAWBAR, 8 B&S TWIN,", "ABOUT 6.5 m (G8), 40 A MEGA", "16 A, 32 A AFTER TC02"], size=1.15, gap=0.55)
+    textblock(sh, 140, 257, ["GREY ANDERSON SB50 AT", f"THE DRAWBAR, {mm2('D-14')} TWIN,", f"{rt['D-14']['length_m']:.2f} m (G8), 40 A MEGA",
+                         "16 A, 32 A AFTER TC02"], size=1.15, gap=0.55)
     box(sh, 148, 196, 226, 230, ["VICTRON MULTIPLUS-II 48/6k5/100-50 230 V", "6.0 kW AT 25 C, 5.7 kW AT 40 C", "AC-IN FROM THE CHANGEOVER THROUGH A 16 A RCBO",
                                  "AC-OUT-1 TO THE 230 V BOARD", "AC-OUT-2 SPARE, LIVE ONLY ON SHORE OR GENERATOR",
                                  "BONDS NEUTRAL TO EARTH WHEN INVERTING"])
@@ -167,8 +500,8 @@ def ct601(prj, model, bom, checks, reg, dwg):
     sh.rect(197.5, 232.5, 200.5, 235.5, "medium")
     sh.text(202, 233.3, "16 A RCBO", 1.15)
     wire(sh, [(110, 210), (148, 210)], "dc")
-    sh.text(112, 211.3, "200 A MEGA, 50 mm2", 1.15)
-    sh.text(112, 207.4, "2 m EACH WAY, 0.2 V DROP", 1.15)
+    sh.text(112, 211.3, f"200 A MEGA, {mm2('D-07')}", 1.15)
+    sh.text(112, 207.4, f"{rt['D-07']['length_m']:.2f} m, {rt['D-07']['vd_v']:.2f} V DROP", 1.15)
     # 230 V board
     wire(sh, [(156, 196), (156, 98)], "ac")
     sh.text(158, 192.5, "230 V BOARD, LABELLED INVERTER-SUPPLIED", 1.3, bold=True)
@@ -186,13 +519,13 @@ def ct601(prj, model, bom, checks, reg, dwg):
         sh.text(173.5, y + 0.4, f"{c['id']} {c['load'].upper()}", 1.2, bold=True)
         sh.text(173.5, y - 2.0, f"{amps}. {c['control'].upper()}"[:86], 1.05)
     # converters and the DC buses
-    box(sh, 114, 168, 146, 182, ["2 x ORION-TR 48/24-16", "IN PARALLEL, 760 W AT 40 C", "15 A INPUT FUSE EACH, 4 mm2"], size=1.15)
+    box(sh, 114, 168, 146, 182, ["2 x ORION-TR 48/24-16", "IN PARALLEL, 760 W AT 40 C", f"15 A INPUT FUSE EACH, {mm2('D-10')}"], size=1.15)
     wire(sh, [(110, 175), (114, 175)], "dc")
-    box(sh, 114, 120, 146, 162, ["24 V FUSE PANEL"] + ["40 A, 10 mm2"] + wrap(svc["bus_24v"].upper(), 30), size=1.1)
+    box(sh, 114, 120, 146, 162, ["24 V FUSE PANEL"] + [f"40 A, {mm2('D-12')}"] + wrap(svc["bus_24v"].upper(), 30), size=1.1)
     wire(sh, [(130, 168), (130, 162)], "bus")
-    box(sh, 24, 132, 58, 146, ["2 x ORION-TR 48/12-30", "IN PARALLEL, 720 W AT 40 C", "15 A INPUT FUSE EACH, 4 mm2"], size=1.15)
+    box(sh, 24, 132, 58, 146, ["2 x ORION-TR 48/12-30", "IN PARALLEL, 720 W AT 40 C", f"15 A INPUT FUSE EACH, {mm2('D-11')}"], size=1.15)
     wire(sh, [(103, 150), (103, 140), (58, 140)], "dc")
-    box(sh, 24, 92, 104, 128, ["12 V FUSE PANEL, 80 A, 16 mm2"] + wrap(svc["bus_12v"].upper(), 66) +
+    box(sh, 24, 92, 104, 128, [f"12 V FUSE PANEL, 80 A, {mm2('D-13')}"] + wrap(svc["bus_12v"].upper(), 66) +
         ["THE BREAKAWAY KIT'S BATTERY FLOATS ON THIS BUS"], size=1.1)
     wire(sh, [(41, 132), (41, 128)], "bus")
     box(sh, 114, 92, 146, 116, ["CERBO GX MK2", "GX TOUCH 50 BESIDE D1", "BMS AUX FEED", "HEAT DETECTOR INPUT", "NODE-RED: TOTAL", "POWER RULE"], size=1.1)
@@ -264,8 +597,11 @@ def ct602(prj, model, bom, checks, reg, dwg):
         top = max(pr.p(x, y, 0)[1] for x, y in cuts)
         sh.text(xs - 0.6, top + 2.5 + tw(t, 1.15) / 2, t, 1.15, "middle", bold=True, rot=-90)
     as_openings = {o["id"] for o in res["openings"]}
+    elec = [run for run in rr["runs"] if run["system"] in ELEC_STYLE]
+    tags = tag_clusters(elec, V, g, clip_x=x_cut, clip_header="ON THE DRAWBAR (CT-102)")
+    tagged = {c["header"] for c in tags}
     for gid in gids:
-        _gland(sh, pr, g[gid], V, label=gid not in as_openings, right=gid == "G7")
+        _gland(sh, pr, g[gid], V, label=gid not in as_openings and gid not in tagged, right=gid == "G7")
     for gid in floor_g:
         _gland(sh, pr, g[gid], V, size=1.0, label=False)   # the floor glands, unlabelled: the note names them
     r = rects["EL-04"]    # the inverter's name in the larger part of its rectangle clear of the floor glands under it
@@ -294,15 +630,21 @@ def ct602(prj, model, bom, checks, reg, dwg):
     sh.rect(34, yl - 1.0, 36.2, yl + 1.2, "medium")
     sh.text(38, yl - 0.4, "OUTLET, 1 SINGLE OR 2 DOUBLE (INDICATIVE POSITION)", 1.3)
     sh.circle(35.1, yl - 4.0, 0.9, "medium")
-    sh.text(38, yl - 4.5, "GLAND (data/services.yaml)", 1.3)
-    gr = [[x["id"], x["at"].upper(), x["what"], x.get("est", "-")] for x in svc["glands"] if x["id"] in ("G2", "G3", "G4", "G5", "G6", "G7", "G8")]
-    wtable(sh, 112, 150, [("GLAND", 12), ("AT", 12), ("WHAT PASSES", 64), ("ASSUMED", 28)], gr, size=1.15, title="ELECTRICAL GLANDS")
+    sh.text(38, yl - 4.5, "GLAND (data/services.yaml), ITS POSITION, SIZE AND FITTING ON CT-603", 1.3)
+    _tag_legend(sh, 34, yl - 8.5)
+    used = {x for run in rr["runs"] if run["system"] in ELEC_STYLE for x in _glands_of(run)}
+    gr = [[x["id"], x["at"].upper(), _gland_runs(rr, x["id"], ELEC_STYLE) or "-"] for x in svc["glands"]
+          if x["id"] in used or x["id"] in gids]
+    wtable(sh, 112, 150, [("GLAND", 12), ("AT", 12), ("RUNS THROUGH IT, TAGGED ON THE PLAN", 92)], gr, size=1.15,
+           title="ELECTRICAL GLANDS (EACH ONE IN FULL ON CT-603)")
     S.notes(sh, 22, 84, [
         "DATUM DIM-01. EVERY CABLE IS DRAWN AS ROUTED IN data/routes.yaml BY cad/routes.py ON THE SOLVED LAYOUT, ITS CENTRELINE IN "
         "PLAN. ITS LENGTH, SIZE, DROP AND PROTECTION ARE IN THE ELECTRICAL PAGE'S CABLE SCHEDULE, AND IN 3D IN trailer-electrical.",
         "THE DC LEAVES THE BOARD BY THE CEILING BULKHEADS AND BY THE CHASE BEHIND THE PLINTH. UNDER THE FLOOR THE RUNS PASS BETWEEN "
-        "THE RAILS, OR INSIDE THEM PAST THE ARM HANGERS, AND UP THE FLOOR GLANDS G14 TO G23 (CIRCLES). THE 230 V RUNS IN CONDUIT UNDER THE FLOOR AND IN THE "
-        "PLINTH'S END SLOT, AND 50 mm FROM EXTRA-LOW VOLTAGE ELSEWHERE (SVC-03, AS/NZS 3000 3.9.8.3).",
+        "THE RAILS, OR INSIDE THEM PAST THE ARM HANGERS, AND UP THE FLOOR GLANDS, EACH TAGGED WITH THE RUNS THROUGH IT. THE 230 V RUNS "
+        "IN CONDUIT UNDER THE FLOOR AND IN THE PLINTH'S END SLOT, AND 50 mm FROM EXTRA-LOW VOLTAGE ELSEWHERE (SVC-03, AS/NZS 3000 3.9.8.3).",
+        "EVERY RUN IS TAGGED AT BOTH ENDS AND WHERE IT CHANGES LEVEL, SO A RUN IS FOLLOWED BY ITS ID FROM TAG TO TAG. A TAG BY A BUNDLE "
+        "NAMES EVERY RUN IN IT.",
         "NO WATER OR DIESEL LINE WITHIN 300 mm OF THE BATTERY'S TERMINAL FACE EXCEPT THE WASHER'S TWO HOSES, WHICH RUN IN A "
         "DIELECTRIC SLEEVE (AS/NZS 3001.2 5.4.10.2).",
         "WIRING SUPPORTED AT LEAST EVERY 600 mm, GROMMETS THROUGH METAL, EVERY PENETRATION THROUGH A SEALED GLAND (VSB1 7.1).",
@@ -315,12 +657,191 @@ def ct602(prj, model, bom, checks, reg, dwg):
     rows = [[o["zone"], o["ac"], o["dc"]] for o in svc["electrical"]["outlets"]]
     y = wtable(sh, 230, y - 7, [("ZONE", 34), ("230 V OUTLETS", 70), ("24 V AND USB POINTS", 76)], rows, size=1.25,
                title="OUTLETS AND DC POINTS BY ZONE (report 20 section 7)")
-    S.notes(sh, 230, y - 6, [
+    yn, _ = S.notes(sh, 230, y - 6, [
         "THE OUTLET SYMBOLS ON THE PLAN SHOW HOW MANY GO IN EACH ZONE. THEIR EXACT POSITIONS ARE SET WITH THE CABINETRY.",
         "THE BATTERY BOX'S TWO VENTS (G6, G7) PASS THROUGH THE FLOOR OUTBOARD OF THE KERB RAIL, AWAY FROM THE COMBI'S COWL ON THE ROAD SIDE.",
     ], size=1.3, width_chars=150)
+    # every run tagged at its two ends and wherever it changes level (I2-17), last, so the tags keep clear of the rest
+    draw_tags(sh, pr, tags, regions=[(21.5, 150.8, 229.0, 266.0)], spill=(230.0, yn - 4.0, 178.0))
     write(sh, dwg)
     return time.time() - t0
+
+
+# ------------------------------------------------------------------ CT-603 floor and wall penetrations
+THROUGH = {"floor": "FLOOR", "roof": "ROOF", "kerb": "KERB WALL", "road": "ROAD WALL", "rear": "REAR WALL", "front": "FRONT WALL"}
+UNDER_FLOOR = ("RL-", "RS-", "CM-", "OR-")   # the chassis members under the floor, drawn hidden under the glands
+
+
+def _fitting(g: dict) -> str:
+    """A gland's fitting as data/services.yaml gives it (`fitting`: a text, or a mapping of its parts), else '-'."""
+    f = g.get("fitting")
+    if isinstance(f, dict):
+        return ", ".join(str(v) if k in ("type", "what") else f"{k.replace('_', ' ')} {v}" for k, v in f.items())
+    return str(f) if f else "-"
+
+
+def _hole(g: dict) -> str:
+    return f"{g['w']:g} x {g['h']:g}" if g.get("w") and g.get("h") else f"{g['d']:g}"
+
+
+def ct603(prj, model, bom, checks, reg, dwg):
+    t0 = time.time()
+    from .. import routes as R
+    C = ctx(prj)
+    V, res, lay = C["V"], C["res"], C["day"]
+    svc = C["svc"]
+    sh = S.Sheet()
+    S.frame(sh)
+    k = dwg["scale"]
+    hb = V["half_bw"]
+    pr = Proj(sh, "plan", k, 34.0, 166.0, ref=(V["body_x0"], -hb, 0))
+    g = {x["id"]: x for x in svc["glands"]}
+    centre = {gid: v["p"] for gid, v in R.gland_points(V, svc["glands"]).items()}
+    rr = _routes(lay)
+    every = {**ELEC_STYLE, **PIPE_STYLE}
+    show = {"EL-02", "LA-11E", "EL-04", "LA-02", "LA-14", "LA-11T", "LA-11B", "LA-09", "WR-06", "WR-08", "WR-09", "WR-10", "LA-03"}
+    body_plan(sh, pr, lay, res, cut=1000.0, show=show, size=1.1, keep=False, swings=False, light=(), open_labels=False,
+              nolabel=("WR-10", "LA-11E", "EL-04", "WR-09", "LA-14", "LA-02"))
+    # under the floor, dashed: the rails, raisers, crossmembers and outriggers, and the tanks
+    for b in lay.blocks:
+        if b.box is not None and (b.id.startswith(UNDER_FLOOR) or b.id in ("UF-01", "UF-01R", "UF-08", "UF-06")):
+            pr.box(b.box, "hidden")
+    for b in lay.blocks:
+        if b.box is not None and b.id.startswith("CM-"):
+            q = pr.p((b.box[0] + b.box[3]) / 2, -hb - 110)
+            sh.text(q[0], q[1], b.id, 1.0, "middle")
+    # every gland: a floor or roof gland at its hole's size where it passes, a wall gland on its wall's outer face
+    labels = []
+    for x in svc["glands"]:
+        xy = _gland_xy(x, V)
+        q = pr.p(*xy, 0)
+        r = max(0.45, x["d"] / 2 / k)
+        if x["at"] in ("floor", "roof"):
+            sh.circle(q[0], q[1], r, "medium" if x["at"] == "floor" else "hidden")
+            sh.line(q[0] - r - 0.4, q[1], q[0] + r + 0.4, q[1], "thin")
+            sh.line(q[0], q[1] - r - 0.4, q[0], q[1] + r + 0.4, "thin")
+        else:
+            sh.circle(q[0], q[1], 0.9, "box")
+            sh.circle(q[0], q[1], 0.9, "medium")
+        labels.append(dict(anchor=xy, header=x["id"], lines=[]))
+    sh.text(34, 166 + 2 * hb / k + 6.0, "PLAN, FRONT LEFT, ROAD SIDE UP: EVERY GLAND. THE CHASSIS AND THE TANKS UNDER THE FLOOR, DASHED",
+            2.0, bold=True)
+    yl = _legend(sh, 34, 150, [("hidden", "UNDER THE FLOOR: RAILS, RAISERS, CROSSMEMBERS, OUTRIGGERS AND TANKS")])
+    for i, (sty, t) in enumerate((("medium", "FLOOR GLAND AT ITS HOLE'S SIZE, CROSSED AT ITS CENTRE"), ("hidden", "ROOF GLAND, DASHED"),
+                                  ("box", "WALL GLAND ON ITS WALL'S OUTER FACE"))):
+        yy = yl - i * 3.2
+        sh.circle(38.0, yy + 0.45, 0.9, sty)
+        if sty == "box":
+            sh.circle(38.0, yy + 0.45, 0.9, "medium")
+        sh.text(43.5, yy, t, 1.3)
+    sh.circle(37.7, yl - 9.6 + 0.4, 0.32, "fill")
+    sh.line(37.7, yl - 9.6 + 0.4, 40.0, yl - 9.6 + 0.4, "thin")
+    sh.text(43.5, yl - 9.6, "A GLAND'S ID, ON A LEADER FROM ITS CENTRE", 1.3)
+    yn, _ = S.notes(sh, 22, yl - 16, [
+        "DATUM DIM-01: X FROM THE BALL REARWARD, Y FROM THE CENTRELINE WITH THE ROAD SIDE POSITIVE, Z UP FROM THE GROUND. EACH POSITION IS "
+        "THE GLAND'S CENTRE IN THE PANEL IT PASSES, FROM data/services.yaml, AND THE RUNS THROUGH IT ARE THOSE data/routes.yaml ROUTES "
+        "THROUGH IT (cad/routes.py). A DASH IN X, Y OR Z IS THE PANEL'S OWN PLANE.",
+        "THE FLOOR GLANDS ARE SET OUT ON THE FLOOR PANEL FROM THIS SHEET BEFORE THE PANEL IS ORDERED (TRAILER.md OPEN POINT 11). "
+        "THE CHASSIS MEMBERS AND THE TANKS UNDER THEM ARE DRAWN DASHED.",
+        f"THE DETAILS ENLARGE THE FLOOR GLANDS THAT STAND UNDER {GROUP_MM:.0f} mm APART, CENTRE TO CENTRE, WITH THE SPACES KEPT CLEAR "
+        "(PHANTOM), AND GIVE THE MATERIAL LEFT BETWEEN EACH PAIR OF HOLES.",
+        "EVERY PENETRATION PASSES A SEALED GLAND OR FITTING (VSB1 7.1), AND A RUN THROUGH METAL PASSES A GROMMET. THE FITTING COLUMN IS "
+        "EACH GLAND'S FITTING IN data/services.yaml.",
+        "THE ASSUMPTION BEHIND EACH POSITION IS THE GLAND'S est IN data/services.yaml. CT-602 AND CT-612 TAG THE RUNS AT EACH GLAND.",
+    ], size=1.42, width_chars=185)
+    # ---- right column: every gland
+    yb = title(sh, dwg, reg, "GLANDS AND FITTINGS IN BD-11 (TB-11).", "SEE THE FITTING COLUMN")
+    rows = []
+    for x in svc["glands"]:
+        p = centre[x["id"]]
+        own = {"floor": 2, "roof": 2, "kerb": 1, "road": 1, "rear": 0, "front": 0}[x["at"]]
+        xyz = ["-" if i == own else f"{v:,.0f}" for i, v in enumerate(p)]
+        rows.append([x["id"], THROUGH[x["at"]], *xyz, _hole(x), _fitting(x), _gland_runs(rr, x["id"], every) or "-", x["what"]])
+    wtable(sh, 230, yb - 6, [("GLAND", 11), ("THROUGH", 14), ("X", 11), ("Y", 11), ("Z", 11), ("HOLE, mm", 13), ("FITTING", 27),
+                             ("RUNS THROUGH IT", 31), ("WHAT PASSES", 51)], rows, size=1.1, gap=0.5,
+           title="EVERY GLAND (data/services.yaml, the runs from data/routes.yaml)")
+    draw_tags(sh, pr, labels, regions=[(21.5, 151.0, 229.0, 266.0)])
+    _gland_details(sh, lay, V, svc["glands"], top=yn - 7.0)
+    write(sh, dwg)
+    return time.time() - t0
+
+
+GROUP_MM = 150.0   # floor glands closer than this, centre to centre, share an enlarged detail on CT-603
+
+
+def _floor_groups(glands: list[dict]) -> list[list[dict]]:
+    """The floor glands closer than GROUP_MM to a neighbour, gathered into groups of two or more, front to rear."""
+    groups: list[list[dict]] = []
+    for x in (g for g in glands if g["at"] == "floor"):
+        hit = [gr for gr in groups if any(math.dist((x["x"], x["y"]), (y["x"], y["y"])) < GROUP_MM for y in gr)]
+        groups = [gr for gr in groups if not any(gr is h for h in hit)] + [[x] + [y for gr in hit for y in gr]]
+    return sorted((sorted(gr, key=lambda g: (g["x"], g["y"])) for gr in groups if len(gr) > 1), key=lambda gr: gr[0]["x"])
+
+
+def _gland_details(sh, lay, V, glands, top: float, x0: float = 24.0, x1: float = 226.0, bottom: float = 13.0):
+    """Each group of close floor glands enlarged: every hole at its size with its centre lines and its id, the chassis
+    members under the floor dashed, the fit-out's parts that stand on the floor thin, the spaces kept clear phantom, and
+    under it the centre and clear distances between the holes."""
+    groups = _floor_groups(glands)
+    if not groups:
+        return
+    margin = 110.0
+    wins = []
+    for gr in groups:
+        xs, ys = [g["x"] for g in gr], [g["y"] for g in gr]
+        r = max(g["d"] for g in gr) / 2
+        wins.append((min(xs) - r - margin, min(ys) - r - margin, max(xs) + r + margin, max(ys) + r + margin))
+    close = [[(a, b) for ia, a in enumerate(gr) for b in gr[ia + 1:] if math.dist((a["x"], a["y"]), (b["x"], b["y"])) < GROUP_MM]
+             for gr in groups]
+    texts = [[f"{a['id']} TO {b['id']}: {math.dist((a['x'], a['y']), (b['x'], b['y'])):.0f} mm CENTRES, "
+              f"{math.dist((a['x'], a['y']), (b['x'], b['y'])) - (a['d'] + b['d']) / 2:.0f} mm BETWEEN THE HOLES" for a, b in c] for c in close]
+    for k in (5.0, 10.0):
+        rows, cur, used = [], [], 0.0
+        for i, w in enumerate(wins):
+            dw = max([(w[2] - w[0]) / k] + [S.text_mm(t, 1.15) for t in texts[i]])
+            if cur and used + dw > x1 - x0:
+                rows.append(cur)
+                cur, used = [], 0.0
+            cur.append(i)
+            used += dw + 8.0
+        rows.append(cur)
+        heights = [max((wins[i][3] - wins[i][1]) / k + 4.0 + 2.0 * len(close[i]) for i in row) for row in rows]
+        if top - bottom >= sum(heights) + 5.0 * len(rows):
+            break
+    y, n = top, 0
+    for row, hgt in zip(rows, heights):
+        x = x0
+        for i in row:
+            n += 1
+            w, gr = wins[i], groups[i]
+            pr = Proj(sh, "plan", k, x, y - 3.0 - (w[3] - w[1]) / k, ref=(w[0], w[1], 0))
+            sx0, sy0 = pr.p(w[0], w[1])
+            sx1, sy1 = pr.p(w[2], w[3])
+            sh.text(sx0, sy1 + 1.2, f"DETAIL {n}: {', '.join(g['id'] for g in gr)}, 1:{k:g}", 1.4, bold=True)
+            for b in lay.blocks:
+                if b.box is None:
+                    continue
+                bx = (max(b.box[0], w[0]), max(b.box[1], w[1]), min(b.box[3], w[2]), min(b.box[4], w[3]))
+                if bx[0] >= bx[2] - 0.5 or bx[1] >= bx[3] - 0.5:
+                    continue
+                under = b.id.startswith(UNDER_FLOOR) or b.box[5] <= V["floor_underside_z"]
+                if b.keep_clear or under or b.box[2] <= V["floor_z"] + 5:
+                    sh.rect(*pr.rect3((bx[0], bx[1], 0, bx[2], bx[3], 0)), "phantom" if b.keep_clear else "hidden" if under else "thin")
+            sh.rect(sx0, sy0, sx1, sy1, "medium")
+            for g in gr:
+                q = pr.p(g["x"], g["y"])
+                r = g["d"] / 2 / k
+                sh.circle(q[0], q[1], r, "medium")
+                sh.line(q[0] - r - 0.8, q[1], q[0] + r + 0.8, q[1], "centre")
+                sh.line(q[0], q[1] - r - 0.8, q[0], q[1] + r + 0.8, "centre")
+            yy = sy0 - 2.6
+            for t in texts[i]:
+                sh.text(sx0, yy, t, 1.15)
+                yy -= 2.0
+            draw_tags(sh, pr, [dict(anchor=(g["x"], g["y"]), header=g["id"], lines=[]) for g in gr],
+                      regions=[(sx0 + 0.3, sy0 + 0.3, sx1 - 0.3, sy1 - 0.3)], size=1.2)
+            x = max([sx1] + [sx0 + S.text_mm(t, 1.15) for t in texts[i]]) + 8.0
+        y -= hgt + 5.0
 
 
 # ------------------------------------------------------------------ CT-611 plumbing schematic
@@ -452,9 +973,12 @@ def ct612(prj, model, bom, checks, reg, dwg):
         if run["system"] in PIPE_STYLE:
             _route(pr, [(p[0], p[1]) for p in run["dense"]], PIPE_STYLE[run["system"]])
     gt = lay.find("UF-08").box
+    wet = [run for run in rr["runs"] if run["system"] in PIPE_STYLE]
+    tags = tag_clusters(wet, V, g)
+    tagged = {c["header"] for c in tags}
     for gid in sorted({x for run in rr["runs"] if run["system"] in PIPE_STYLE for x in run.get("glands") or []} | {"G1"},
                       key=lambda s_: int(s_[1:])):
-        _gland(sh, pr, g[gid], V, label=gid not in ("G5", "G26"),   # G5 and G26 sit beside other labels on the rear wall
+        _gland(sh, pr, g[gid], V, label=gid not in ("G5", "G26") and gid not in tagged,   # G5 and G26 sit beside other labels
                inset=1.4 if gid in ("G5", "G26") else 0.0)
     q = pr.p(gt[0] + 450, gt[1])
     sh.path([(q[0] - 1.2, q[1]), (q[0] + 1.2, q[1]), (q[0], q[1] - 1.8)], "fill", closed=True)
@@ -518,9 +1042,15 @@ def ct612(prj, model, bom, checks, reg, dwg):
             ["Basin, well, floor", "The wet room", "Grey tank, straight down", "G13, the well's valve, G24"],
             ["Dump", "Grey tank, kerb side", "Dump point or the 40 L tote", "Lever valve and camlock"]]
     y = wtable(sh, 230, yb - 6, [("LINE", 24), ("FROM", 40), ("TO", 66), ("HOW", 50)], rows, size=1.25, title="THE RUNS ON THIS SHEET")
-    gr = [[x["id"], x["what"], x.get("est", "-")] for x in svc["glands"] if x["id"] in ("G1", "G10", "G11", "G12", "G13")]
-    y = wtable(sh, 230, y - 7, [("GLAND", 14), ("WHAT PASSES", 126), ("ASSUMED", 40)], gr, size=1.25, title="PLUMBING GLANDS (data/services.yaml)")
-    _legend(sh, 232, y - 7, [("cold", "COLD WATER"), ("hot", "HOT WATER"), ("drain", "DRAIN, FALLING TO THE GREY TANK")])
+    used = {x for run in rr["runs"] if run["system"] in PIPE_STYLE for x in _glands_of(run)}
+    gr = [[x["id"], x["at"].upper(), _gland_runs(rr, x["id"], PIPE_STYLE) or "-", x["what"]] for x in svc["glands"] if x["id"] in used]
+    y = wtable(sh, 230, y - 7, [("GLAND", 13), ("AT", 13), ("RUNS", 34), ("WHAT PASSES", 120)], gr, size=1.15,
+               title="PLUMBING GLANDS (EACH ONE IN FULL ON CT-603)")
+    yl = _legend(sh, 232, y - 7, [("cold", "COLD WATER"), ("hot", "HOT WATER"), ("drain", "DRAIN, FALLING TO THE GREY TANK"),
+                                  ("thin", "BREATHERS, DIESEL AND THE LINE SET")])
+    yl = _tag_legend(sh, 232, yl - 1.0, width=170.0)
+    # every pipe and hose tagged at its two ends and wherever it changes level (I2-17), last, clear of the rest
+    draw_tags(sh, pr, tags, regions=[(21.5, 136.5, 229.0, 266.0)], spill=(232.0, yl - 3.0, 174.0))
     write(sh, dwg)
     return time.time() - t0
 

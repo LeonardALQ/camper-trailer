@@ -4,7 +4,7 @@
 owner: Camper trailer project (owner-builder)
 project: Off-road camper trailer for the LandCruiser 79
 drawn_by: Kiro (AI agent)
-sheets_total: 24
+sheets_total: 25
 drawings:
   - number: CT-001
     title: General arrangement, whole trailer
@@ -344,6 +344,7 @@ drawings:
       - {rev: C, date: 2026-11-21, description: "Notice: second 15 A inlet, SHORE - OFF - GENERATOR changeover (F2-07)", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-21, description: "Notice: on GENERATOR e2 fans C and D off and a neutral-earth bond (F3-07)", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-22, description: "Memo: labels clear of the lines", drawn: Kiro, checked: "", approved: ""}
+      - {rev: F, date: 2026-11-22, description: "Notice: cable sizes, lengths and drops from the routes (I2-16)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-602
     title: Electrical layout
     subtitle: Battery plinth, board, inverter, cable routes, glands, outlets and the cable schedule
@@ -361,11 +362,23 @@ drawings:
       - {rev: E, date: 2026-11-21, description: "Notice: G2 counted as an opening (F4-05)", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-22, description: "Memo: labels clear of the lines and the glands, G2 named once", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-22, description: "Notice: every cable as routed in data/routes.yaml (H28)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: H, date: 2026-11-22, description: "Notice: runs tagged at their ends and levels, glands to CT-603 (I2-17)", drawn: Kiro, checked: "", approved: ""}
+  - number: CT-603
+    title: Floor and wall penetrations
+    subtitle: Every gland through the floor, walls and roof, its position, hole, fitting and runs
+    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    sheet: 18
+    size: A3
+    scale: 25
+    status: DRAFT
+    structural: false
+    revisions:
+      - {rev: A, date: 2026-11-22, description: "First draft: every gland, its position, hole, fitting and runs (I2-17)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-611
     title: Plumbing schematic
     subtitle: Fill, fresh tanks, pump, filters, cold and hot lines, drains to the grey tank and the dump
     project: Off-road camper trailer for the LandCruiser 79, home trailer
-    sheet: 18
+    sheet: 19
     size: A3
     scale: NTS
     status: DRAFT
@@ -381,7 +394,7 @@ drawings:
     title: Plumbing layout
     subtitle: Tanks, pump cabinet, drains with their falls, the shower well, fill and dump points
     project: Off-road camper trailer for the LandCruiser 79, home trailer
-    sheet: 19
+    sheet: 20
     size: A3
     scale: 25
     status: DRAFT
@@ -392,11 +405,12 @@ drawings:
       - {rev: C, date: 2026-11-21, description: "Notice: G1 at X 3,040 under W1, clear of BD-20 (F4-04)", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-22, description: "Memo: labels clear of the lines", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-22, description: "Notice: every pipe as routed in data/routes.yaml (H28)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: F, date: 2026-11-22, description: "Notice: runs tagged at their ends and levels, glands to CT-603 (I2-17)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-621
     title: HVAC and ventilation
     subtitle: Split, heat-recovery pairs, extract, towing pressurisation, relief, hood, Combi ducts
     project: Off-road camper trailer for the LandCruiser 79, home trailer
-    sheet: 20
+    sheet: 21
     size: A3
     scale: 25
     status: DRAFT
@@ -413,7 +427,7 @@ drawings:
     title: Ute with the bike garage, general arrangement
     subtitle: Kerb-side elevations travelling and loading, plan, rear view, mass by case and the ute checks
     project: LandCruiser 79 bike garage (UTE-GARAGE.md)
-    sheet: 21
+    sheet: 22
     size: A3
     scale: 50
     status: DRAFT
@@ -434,7 +448,7 @@ drawings:
     title: Ute garage box frame and panels
     subtitle: Kerb-side frame elevation, subframe plan on Toyota's deck mounts, section at the rear axle, member schedule
     project: LandCruiser 79 bike garage (UTE-GARAGE.md)
-    sheet: 22
+    sheet: 23
     size: A3
     scale: 20
     status: DRAFT
@@ -452,7 +466,7 @@ drawings:
     title: Ute garage doors and security
     subtitle: Rear view, kerb-side door, plan section through the barn doors, security layers
     project: LandCruiser 79 bike garage (UTE-GARAGE.md)
-    sheet: 23
+    sheet: 24
     size: A3
     scale: 20
     status: DRAFT
@@ -468,7 +482,7 @@ drawings:
     title: Ute garage restraint layout
     subtitle: Plan with the roof off, section at the rear L-track row, strap loads and anchors
     project: LandCruiser 79 bike garage (UTE-GARAGE.md)
-    sheet: 24
+    sheet: 25
     size: A3
     scale: 20
     status: DRAFT
