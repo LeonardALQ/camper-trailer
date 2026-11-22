@@ -140,7 +140,7 @@ Glands of 60 mm or less are not openings. G2's 310 x 120 mm box of inlets is lar
 | WN-01 to WN-05 | Four S4 windows and two blackout covers | 28.5 kg | Maker, covers estimated | 28.7 kg |
 | BD-14, BD-18 to BD-20 | Rounded front edges, the road wall's stiffener, the entry door's two jamb members | 19.5 kg | Estimate, calculated | 21.6 kg |
 | BD-10, BD-17 | Mud flaps with hangers, cassette door | 10.7 kg | Mostly calculated | 12.2 kg |
-| BD-11 | Wiring, plumbing and hardware, line by line, with 13.5 kg for the routed runs above their first estimates and 2.0 kg not yet given to a part (the lamps are LG-01) | 53.6 kg | Estimate, kept until the fit-out | 64.3 kg |
+| BD-11 | Wiring, plumbing and hardware, line by line, with 15.0 kg for the routed runs above their first estimates and 0.5 kg not yet given to a part (the lamps are LG-01) | 53.6 kg | Estimate, kept until the fit-out | 64.3 kg |
 | BD-13 | Fiamma F80s 400 awning on the roof, its brackets, bolts and pads | 36.7 kg | Maker, brackets estimated | 37.2 kg |
 | | Body | 630.6 kg | | 701.8 kg |
 
