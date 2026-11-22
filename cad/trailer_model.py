@@ -81,8 +81,7 @@ def part_shape(b, lay, colour: tuple | None = None):
     spec = model_specs(lay).get(b.id)
     if spec is not None:
         from .model import products as PR
-        sp = PR.spec_of(spec)
-        return PR.build(sp, b, lay.V, PR.envelope(sp, b, lay.P), _label(b), col)
+        return PR.build(spec, b, lay, _label(b), col)
     s = block_shape(b)
     if s is None:
         return None
@@ -90,24 +89,118 @@ def part_shape(b, lay, colour: tuple | None = None):
     return s
 
 
+STRIP_ROLES = ("raiser", "outrigger", "cm_floor")   # the members the floor's bearer strips lie on (CH-S01)
+
+
+def bearer_strips(lay) -> list:
+    """The floor's bearer strips (CH-S01): one on the top of every raiser, outrigger and floor crossmember, up to the
+    floor's underside, so the body stands on the chassis in the model as it does on the frame."""
+    top = lay.V["floor_underside_z"]
+    out = []
+    for b in lay.blocks:
+        if b.extra.get("role") in STRIP_ROLES and "member" in b.extra:
+            x0, y0, _, x1, y1, z1 = b.extra["member"].box()
+            if top - z1 > 1:
+                s = box(x0, y0, z1, x1 - x0, y1 - y0, top - z1)
+                s.label = f"strip on {b.iid}"
+                out.append(s)
+    return out
+
+
+def nut_plates(lay) -> list:
+    """The 32 body mount nut plates (CH-P14) where the body's bolts are: one inside each raiser and each outrigger tip at
+    every station (data/body/body.yaml mounts), each spanning the tube's webs, 13 mm under its top. The schedule keeps
+    their mass at one point (data/chassis/chassis.yaml)."""
+    import yaml
+    from .partsdb import DATA
+    tip = yaml.safe_load((DATA / "body" / "body.yaml").read_text())["mounts"]["outrigger_tip_y"]
+    out = []
+    for b in lay.blocks:
+        if b.extra.get("role") == "outrigger" and "member" in b.extra:
+            x0, y0, _, x1, y1, z1 = b.extra["member"].box()
+            s = 1 if y0 + y1 > 0 else -1
+            z = z1 - 13 - 5
+            tip_plate = box(x0 + 3.5, s * tip - 40, z, x1 - x0 - 7, 80, 10)
+            tip_plate.label = f"nut plate in {b.iid}"
+            raiser_plate = box((x0 + x1) / 2 - 40, s * lay.V["rail_c"] - 22, z, 80, 44, 10)
+            raiser_plate.label = "nut plate in the raiser"
+            out += [tip_plate, raiser_plate]
+    return out
+
+
 def fitting_shape(b, lay, col: tuple):
     """A chassis fitting at each of its positions: its product model where FITTING_MODELS names one, else its box."""
     from .chassis import fitting_solids
     from .model import products as PR
-    kids = fitting_solids(lay.chassis, b.extra["fitting"])
+    f = b.extra["fitting"]
+    if f.kind == "strip":
+        kids = bearer_strips(lay)
+    elif b.id == "CH-P14":
+        kids = nut_plates(lay)
+    else:
+        kids = fitting_solids(lay.chassis, f)
     if not kids:
         return None
-    name = PR.FITTING_MODELS.get(b.id)
-    if name:
+    spec = PR.FITTING_MODELS.get(b.id)
+    if spec:
         out = []
         for n, k in enumerate(kids, 1):
             bb = k.bounding_box()
             bx = (bb.min.X, bb.min.Y, bb.min.Z, bb.max.X, bb.max.Y, bb.max.Z)
-            out.append(PR.build({"name": name}, b, lay.V, bx, f"{n}" if len(kids) > 1 else "", col))
+            out.append(PR.build(spec, b, lay, f"{n}" if len(kids) > 1 else "", col, bx=bx))
         kids = out
     s = kids[0] if len(kids) == 1 else Compound(children=kids)
     s.label, s.color = _label(b), rgba(*col)
     return s
+
+
+def lamp_shapes(lay) -> list:
+    """The lamps, reflectors and the number plate at their resolved positions (cad/lamps.py, line LG-01), each a housing
+    with its lens on the outer face. A side marker on an outrigger's open end stands on a cap riveted over the end (LG-02)."""
+    from .lamps import model_parts, resolve
+    caps = [b for b in lay.blocks if b.id == "LG-02"]
+    tips = [b.extra["member"].box() for b in lay.blocks if b.extra.get("role") == "outrigger" and "member" in b.extra]
+    out = []
+    for p in model_parts(lay, resolve(lay)):
+        x0, y0, z0, x1, y1, z1 = p["box"]
+        col = LAMP_COLOURS.get(p["colour"], "#f39c12")
+        label = f"{p['key']} {p['name']}".replace("/", "-")
+        side = abs(abs(y0 + y1) / 2 - lay.V["half_bw"]) < 40 and (y1 - y0) < 40
+        tip = next((t for t in tips if side and t[0] < x1 and t[3] > x0 and t[2] < z1 and t[5] > z0
+                    and (abs(t[1] - y1) < 1 or abs(t[4] - y0) < 1)), None)
+        if tip is not None and caps:
+            inner = y1 if y1 <= 0 else y0                        # the lamp's face against the outrigger's end
+            s = -1 if y1 <= 0 else 1
+            cap = box(tip[0], min(inner, inner + s * 3), tip[2], tip[3] - tip[0], 3, tip[5] - tip[2])
+            cap.label, cap.color = f"LG-02 {caps[0].name}".replace("/", "-"), rgba("#c8cfd2", 1.0)
+            out.append(cap)
+            y0, y1 = (y0, inner - 3) if s < 0 else (inner + 3, y1)
+        if p["key"].endswith("PLATE"):
+            s = box(x0, y0, z0, x1 - x0, y1 - y0, z1 - z0)
+            s.label, s.color = label, rgba(col, 1.0)
+            out.append(s)
+            continue
+        out.append(_lamp(label, (x0, y0, z0, x1, y1, z1), col, lay.V))
+    return out
+
+
+def _lamp(label, bx, col, V):
+    """A lamp: a dark housing on its mounting face and a coloured lens on the outer face, 3 mm thick."""
+    x0, y0, z0, x1, y1, z1 = bx
+    dx, dy = x1 - x0, y1 - y0
+    if dy <= dx and dy < 60:                      # on a side: the outer face is the one away from the centreline
+        out_lo = (y0 + y1) / 2 < 0
+        hs = box(x0, y0 + (3 if out_lo else 0), z0, dx, dy - 3, z1 - z0)
+        lens = box(x0 + 2, y0 if out_lo else y1 - 3, z0 + 2, dx - 4, 3, z1 - z0 - 4)
+    else:                                          # on an end: the outer face is the one away from the body
+        out_lo = (x0 + x1) / 2 < V["body_x0"] + V["body_length"] / 2
+        hs = box(x0 + (3 if out_lo else 0), y0, z0, dx - 3, dy, z1 - z0)
+        lens = box(x0 if out_lo else x1 - 3, y0 + 2, z0 + 2, 3, dy - 4, z1 - z0 - 4)
+    hs.label, hs.color = "housing", rgba("#2c3e50", 1.0)
+    lens.label, lens.color = "lens", rgba(col, 0.9)
+    c = Compound(label=label, children=[hs, lens])
+    c.color = rgba(col, 1.0)
+    return c
 
 
 def _moved(shape, loc):
@@ -157,14 +250,7 @@ class TrailerModel:
                 shp.label = label.replace("/", "-")
                 shp.color = rgba(col, a)
                 self.groups.setdefault("body", []).append(shp)
-            # the lamps, reflectors and the number plate at their resolved positions (cad/lamps.py), line LG-01
-            from .lamps import model_parts, resolve
-            for p in model_parts(lay, resolve(lay)):
-                x0, y0, z0, x1, y1, z1 = p["box"]
-                s = box(x0, y0, z0, x1 - x0, y1 - y0, z1 - z0)
-                s.label = f"{p['key']} {p['name']}".replace("/", "-")
-                s.color = rgba(LAMP_COLOURS.get(p["colour"], "#f39c12"), 1.0)
-                self.groups.setdefault("electrical", []).append(s)
+            self.groups.setdefault("electrical", []).extend(lamp_shapes(lay))
 
     def compound(self, label="ASM-TR"):
         kids = [Compound(label=SYSTEM_LABELS[g], children=self.groups[g]) for g in SYSTEM_ORDER if g in self.groups]
@@ -217,9 +303,8 @@ def _inside(lay, b) -> bool:
     if spec is None:
         return False
     from .model import products as PR
-    bx = PR.envelope(PR.spec_of(spec), b, lay.P)
     z = lay.zones["inside"]["box"]
-    return all(bx[i] >= z[i] - 1 and bx[i + 3] <= z[i + 3] + 1 for i in range(3))
+    return any(all(bx[i] >= z[i] - 1 and bx[i + 3] <= z[i + 3] + 1 for i in range(3)) for _, bx in PR.placements(spec, b, lay))
 
 
 def fitout_parts(lay: Layout) -> list:

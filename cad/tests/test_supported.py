@@ -29,6 +29,8 @@ HANGS = {
     "LA-11L": "overhead lockers screw through their back rail into the kerb wall's insert strips",
     "LA-11E": "the board cabinet screws to the partition and to the kerb wall",
     "EL-04": "the MultiPlus-II hangs on its wall bracket on the partition (Victron's manual)",
+    "EL-05": "the Lynx Smart BMS, the MPPTs and the Orion-Tr converters screw to the board panel",
+    "EL-06": "the board panel screws to the cabinet's back, the Lynx Distributor, Cerbo GX and 230 V board to the panel",
     "AC-01": "the indoor unit hangs on its installation plate on the partition (Mitsubishi Electric's guide)",
     "AC-02": "the outdoor unit bolts to its cradle (AC-03)",
     "AC-03": "the cradle bolts to the rear wall and stands on its stays (AC-04, BDY-21)",
@@ -46,6 +48,7 @@ HANGS = {
     "LB-03": "the platform bolts to the HappiJac carriages on the four rails",
     "LB-01": "the mattress lies on the underlay on the platform",
     "SP-01": "the spare hangs on the carrier posts' hub plate",
+    "LG-02": "each cap is riveted over an outrigger's open end",
     "PL-03A": "the gear lies on the drawbar box's shelf",
 }
 
