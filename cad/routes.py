@@ -56,8 +56,11 @@ def namespace(V: dict, blocks: list, data: dict, glands: dict | None = None) -> 
             ns.setdefault(key(b["id"]), ns[key(b["iid"])])
     for gid, g in (glands or {}).items():
         x, y, z = g["p"]
-        h = g["d"] / 2
-        ns[gid] = B((x - h, y - h, z - h, x + h, y + h, z + h))
+        hx, hy = g.get("w", g["d"]) / 2, g.get("h", g["d"]) / 2
+        ns[gid] = B((x - hx, y - hy, z - hy, x + hx, y + hy, z + hy)) if g["at"] in ("floor", "roof") else \
+            B((x - g["d"] / 2, y - g["d"] / 2, z - g["d"] / 2, x + g["d"] / 2, y + g["d"] / 2, z + g["d"] / 2))
+        for rid, (dx, dy, m) in (g.get("cells") or {}).items():   # a transit frame's module for each run, by its centre
+            ns[f"{gid}_{key(rid)}"] = B((x + dx - m / 2, y + dy - m / 2, z - m / 2, x + dx + m / 2, y + dy + m / 2, z + m / 2))
     for k, v in (data.get("consts") or {}).items():
         ns[k] = _eval(v, ns)
     for f in data.get("fixtures") or []:
@@ -67,13 +70,73 @@ def namespace(V: dict, blocks: list, data: dict, glands: dict | None = None) -> 
     return ns
 
 
-def _points(run: dict, ns: dict) -> list[tuple]:
+def _cross(a, b):
+    return (a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0])
+
+
+def _add(a, b, s=1.0):
+    return (a[0] + b[0] * s, a[1] + b[1] * s, a[2] + b[2] * s)
+
+
+def _spec_points(specs: list, ns: dict, prev=None) -> list[tuple]:
+    out = []
+    for spec in specs:
+        p = tuple(prev[i] if (v == "." and prev) else _eval(v, ns) for i, v in enumerate(spec))
+        out.append(p)
+        prev = p
+    return out
+
+
+def bundle_points(way: dict, k: float, n: int, pitch: float, ns: dict) -> list[tuple]:
+    """A member's centreline through a bundle way: the way's centreline offset by the member's place in the way's grid
+    (`cols` across, rows after, centred), the offset carried through every corner so the inside of a turn stays the
+    inside, each corner the mitre of the two offset legs. The grid's first axis is the way's `side` (a direction across
+    its first leg), the second the first leg crossed with it."""
+    C = _spec_points(way["path"], ns)
+    cols = int(way.get("cols", 1))
+    rows = max(1, math.ceil(n / cols))
+    u = ((k % cols) - (cols - 1) / 2) * pitch
+    v = ((k // cols) - (rows - 1) / 2) * pitch
+    d, _ = _unit(_sub(C[1], C[0]))
+    side = tuple(float(x) for x in way.get("side", (0.0, 0.0, 1.0)))
+    e1, _ = _unit(_add(side, d, -_dot(side, d)))
+    e2 = _cross(d, e1)
+    o = _add(_add((0.0, 0.0, 0.0), e1, u), e2, v)
+    pts = [_add(C[0], o)]
+    for i in range(1, len(C) - 1):
+        d1, _ = _unit(_sub(C[i], C[i - 1]))
+        d2, _ = _unit(_sub(C[i + 1], C[i]))
+        c = _dot(d1, d2)
+        if c > 1 - 1e-9:
+            pts.append(_add(C[i], o))
+            continue
+        a, _ = _unit(_cross(d1, d2))
+        th = math.acos(max(-1.0, min(1.0, c)))
+        o2 = _add(_add(_add((0.0, 0.0, 0.0), o, math.cos(th)), _cross(a, o), math.sin(th)), a, _dot(a, o) * (1 - math.cos(th)))
+        w = _sub(o, o2)
+        t = (_dot(w, d1) - c * _dot(w, d2)) / (c * c - 1)
+        pts.append(_add(_add(C[i], o), d1, t))
+        o = o2
+    pts.append(_add(C[-1], o))
+    return pts
+
+
+def _points(run: dict, ns: dict, bundles: dict | None = None) -> list[tuple]:
+    """The run's points: its ends and path, where a path entry "@<way>" follows that bundle way at the run's place."""
     pts, prev = [], None
     for spec in [run["from"]["at"]] + list(run.get("path") or []) + [run["to"]["at"]]:
-        p = [prev[i] if (v == "." and prev) else _eval(v, ns) for i, v in enumerate(spec)]
-        if prev is None or math.dist(p, prev) > 0.5:
-            pts.append(tuple(p))
-        prev = p
+        if isinstance(spec, str) and spec.startswith("@"):
+            w, *cut = spec[1:].split(":")   # "@W" the whole bundle way, "@W:a:b" its points a to b
+            b = bundles[w]
+            seq = bundle_points(b["way"], lane_of(run, w), b["n"], b["pitch"], ns)
+            if cut:
+                seq = seq[int(cut[0]):int(cut[1]) + 1]
+        else:
+            seq = [tuple(prev[i] if (v == "." and prev) else _eval(v, ns) for i, v in enumerate(spec))]
+        for p in seq:
+            if prev is None or math.dist(p, prev) > 0.5:
+                pts.append(tuple(p))
+            prev = p
     return pts
 
 
@@ -318,11 +381,12 @@ def size_dc(run: dict, length_m: float, kind: dict, limit_pct: float) -> tuple:
     limit and whose rating carries the current. A run that fixes its size keeps it, and the drop is reported."""
     amps, volts = run["amps"], run["volts"]
     lim = limit_pct / 100 * volts
+    up = upstream_v(run)
     order = sorted(s for s in kind["sizes"] if s is not None)
     fixed = float(run["size"]) if run.get("size") is not None else None
     for s in ([fixed] if fixed is not None else order):
         k = kind["sizes"][s]
-        vd = k["mv_am"] * amps * length_m / 1000
+        vd = k["mv_am"] * amps * length_m / 1000 + up
         if fixed is not None or (vd <= lim and amps <= k["amps"]):
             smaller = [x for x in order if x < s]
             if fixed is not None:
@@ -330,15 +394,22 @@ def size_dc(run: dict, length_m: float, kind: dict, limit_pct: float) -> tuple:
             elif smaller:
                 p = smaller[-1]
                 kp = kind["sizes"][p]
-                vdp = kp["mv_am"] * amps * length_m / 1000
-                why = (f"{p:g} mm2 would drop {100 * vdp / volts:.1f} %" if vdp > lim else
+                vdp = kp["mv_am"] * amps * length_m / 1000 + up
+                why = (f"{p:g} mm2 would drop {100 * vdp / volts:.1f} %{' end to end' if up else ''}" if vdp > lim else
                        f"{p:g} mm2 is rated {kp['amps']:.0f} A in the bulkhead")
             else:
                 why = f"The smallest size used, {s:g} mm2, for strength"
             return s, vd, why
     s = order[-1]
     k = kind["sizes"][s]
-    return s, k["mv_am"] * amps * length_m / 1000, "Largest size listed, still over the limit"
+    return s, k["mv_am"] * amps * length_m / 1000 + up, "Largest size listed, still over the limit"
+
+
+def upstream_v(run: dict) -> float:
+    """The drop at the run's design current in the part of its circuit outside the trailer (`upstream`, the ute half
+    of the ute feed), which SVC-06 adds to the run's own, so the limit holds from the source to the load."""
+    u = run.get("upstream")
+    return 0.0 if not u else float(u["mv"]) * run["amps"] * float(u["m"]) / 1000
 
 
 # ------------------------------------------------------------------ the layout's boxes and the glands
@@ -384,9 +455,45 @@ def gland_points(V: dict, glands: list) -> dict:
     return out
 
 
+# ------------------------------------------------------------------ the shared ways and their lanes
+WAY_RE = re.compile(r"\bL_([A-Za-z0-9]+)\b")
+
+
+def way_members(data: dict) -> dict:
+    """Each way of data/routes.yaml `ways` and the runs in it: a run is in a way when its ends or path name the way's
+    lane offset, L_<way>."""
+    out = {w: [] for w in data.get("ways") or {}}
+    for r in data["runs"]:
+        spec = [r["from"]["at"], *(r.get("path") or []), r["to"]["at"]]
+        named = set(WAY_RE.findall(str(spec))) | {s[1:].split(":")[0] for s in spec if isinstance(s, str) and s.startswith("@")}
+        named |= set(r.get("ways") or [])   # a loom the run shares with no lane offset of its own
+        for w in sorted(named):
+            if w not in out:
+                raise KeyError(f"{r['id']} names the way {w}, which data/routes.yaml `ways` does not list")
+            out[w].append(r["id"])
+    return out
+
+
+def _way_what(v) -> str:
+    return v if isinstance(v, str) else v["what"]
+
+
+def _min_pitch(v) -> float:
+    """A way's least pitch, where a fitting sets it (a transit frame's modules), else none."""
+    return 0.0 if isinstance(v, str) else float(v.get("min_pitch", 0.0))
+
+
+def lane_of(run: dict, way: str) -> float:
+    """A run's lane in a way: one number for every way it is in, or a map by way."""
+    v = run.get("lane", 0)
+    return float(v.get(way, 0) if isinstance(v, dict) else v)
+
+
 # ------------------------------------------------------------------ resolve every run
 def resolve(lay=None, V: dict | None = None, blocks: list | None = None) -> dict:
-    """Every run's centreline, length, size, drop, mass and price on the layout."""
+    """Every run's centreline, length, size, drop, mass and price on the layout. A way's lane pitch is the largest
+    outside diameter among its runs, rounded up to the next mm, and a DC run's size follows its routed length, so the
+    two are worked out together until neither changes."""
     bars = []
     if lay is not None:
         V, blocks = _blocks_of(lay)
@@ -396,45 +503,66 @@ def resolve(lay=None, V: dict | None = None, blocks: list | None = None) -> dict
     glands = gland_points(V, svc["glands"])
     ns = namespace(V, blocks, data, glands)
     K = kinds(data)
-    rule = data["rules"]
     fixtures = {f["id"]: dict(f, box=ns[key(f["id"])].box) for f in data.get("fixtures") or []}
-    runs = []
-    for r in data["runs"]:
-        kind = K[r["kind"]]
-        ns["L"] = float(r.get("lane", 0)) * rule["lane_mm"]
-        pts = _points(r, ns)
-        if r["system"] == "waste" and not r.get("pumped"):
-            pts = _apply_fall(pts, rule["fall"])
-        raw = sum(math.dist(pts[i], pts[i + 1]) for i in range(len(pts) - 1)) / 1000
-        row = dict(r, points=pts, kind_what=kind["what"], group=kind.get("group", r["system"]))
-        conductor = any(v["mv_am"] is not None for v in kind["sizes"].values())
-        if r.get("amps") is not None and r.get("volts") is not None and conductor:
-            size, vd, why = size_dc(r, raw, kind, rule["drop_pct"] if r["system"] != "ac230" else rule["drop_ac_pct"])
-        else:
-            size = float(r["size"]) if r.get("size") is not None else next(iter(kind["sizes"]))
-            vd, why = None, r.get("size_why")
-        k = kind["sizes"][size]
-        rigid = bool(kind.get("rigid"))
-        elbow_r = k["od"] * kind["elbow_r"] if kind.get("elbow_r") else None
-        if not rigid:
-            pts = smooth_jogs(pts, k["bend_r"])
-            row["points"] = pts
-        f = fillet(pts, k["bend_r"], elbow_r=elbow_r, rigid=rigid)
-        length_m = f["length"] / 1000
-        if vd is not None:
-            vd = k["mv_am"] * r["amps"] * length_m / 1000
-        cores = kind.get("cores", 1)
-        row.update(size=size, cable=_label(kind, size), od=k["od"], bend_r=k["bend_r"], dense=f["dense"], corners=f["corners"],
-                   length_m=round(length_m, 2), mass_kg=round(k["kg_m"] * length_m, 3),
-                   aud=round(k["aud_m"] * length_m * (1 + rule["waste_pct"] / 100), 2), aud_m=k["aud_m"], kg_m=k["kg_m"],
-                   fittings=sum(1 for c in f["corners"] if c.get("elbow")), rigid=rigid,
-                   vd_v=None if vd is None else round(vd, 3), vd_pct=None if vd is None else round(100 * vd / r["volts"], 2),
-                   size_why=why, cores=cores, price_basis=kind.get("price_basis"), mass_basis=kind.get("mass_basis"),
-                   rating_a=k["amps"], priced_in=r.get("priced_in") or kind.get("priced_in"))
-        ends = {r["from"]["line"], r["to"]["line"]} | _ids(r, "ends_also")
-        row["ends"] = ends | {fixtures[e]["line"] for e in list(ends) if e in fixtures}
-        runs.append(row)
-    return dict(runs=runs, data=data, kinds=K, V=V, blocks=blocks, glands=glands, fixtures=fixtures, svc=svc, ns=ns, bars=bars)
+    members = way_members(data)
+    pitch = {w: 0.0 for w in members}
+    bend = {}   # a nesting way's lanes turn in one plane side by side, so each bends at the way's largest radius
+    for _ in range(8):
+        bundles = {w: dict(way=v, n=len(members[w]), pitch=pitch[w]) for w, v in data["ways"].items() if isinstance(v, dict) and v.get("path")}
+        runs = [_resolve_run(r, ns, K, data["rules"], fixtures, pitch, bundles, bend.get(r["id"], 0.0)) for r in data["runs"]]
+        own = {r["id"]: r["bend_r"] for r in runs}
+        nest = {w: ids for w, ids in members.items() if isinstance(data["ways"][w], dict) and data["ways"][w].get("nest")}
+        way_r = {w: max((own[i] for i in ids), default=0.0) for w, ids in nest.items()}
+        new_bend = {i: max(way_r[w] for w, ids in nest.items() if i in ids) for i in own if any(i in ids for ids in nest.values())}
+        od = {r["id"]: r["od"] for r in runs}
+        new = {w: max(float(math.ceil(max((od[i] for i in ids), default=0.0) - 1e-6)), _min_pitch(data["ways"][w]))
+               for w, ids in members.items()}
+        if new == pitch and new_bend == bend:
+            break
+        pitch, bend = new, new_bend
+    ways = {w: dict(what=_way_what(data["ways"][w]), runs=ids, pitch_mm=pitch[w], bundle=w in bundles) for w, ids in members.items()}
+    return dict(runs=runs, data=data, kinds=K, V=V, blocks=blocks, glands=glands, fixtures=fixtures, svc=svc, ns=ns, bars=bars,
+                ways=ways)
+
+
+def _resolve_run(r: dict, ns: dict, K: dict, rule: dict, fixtures: dict, pitch: dict, bundles: dict, way_bend: float = 0.0) -> dict:
+    """One run on the layout, with its lane offset in each way it shares. A run in a way bends at the way's largest
+    radius (`way_bend`), or its own if larger, so the lanes' bends are concentric enough to keep their pitch."""
+    kind = K[r["kind"]]
+    for w, p in pitch.items():
+        ns[f"L_{w}"] = lane_of(r, w) * p
+    pts = _points(r, ns, bundles)
+    if r["system"] == "waste" and not r.get("pumped"):
+        pts = _apply_fall(pts, rule["fall"])
+    raw = sum(math.dist(pts[i], pts[i + 1]) for i in range(len(pts) - 1)) / 1000
+    row = dict(r, points=pts, kind_what=kind["what"], group=kind.get("group", r["system"]))
+    conductor = any(v["mv_am"] is not None for v in kind["sizes"].values())
+    if r.get("amps") is not None and r.get("volts") is not None and conductor:
+        size, vd, why = size_dc(r, raw, kind, rule["drop_pct"] if r["system"] != "ac230" else rule["drop_ac_pct"])
+    else:
+        size = float(r["size"]) if r.get("size") is not None else next(iter(kind["sizes"]))
+        vd, why = None, r.get("size_why")
+    k = kind["sizes"][size]
+    rigid = bool(kind.get("rigid"))
+    elbow_r = k["od"] * kind["elbow_r"] if kind.get("elbow_r") else None
+    if not rigid:
+        pts = smooth_jogs(pts, k["bend_r"])
+        row["points"] = pts
+    f = fillet(pts, max(k["bend_r"], way_bend), elbow_r=elbow_r, rigid=rigid)
+    length_m = f["length"] / 1000
+    if vd is not None:
+        vd = k["mv_am"] * r["amps"] * length_m / 1000 + upstream_v(r)
+    cores = kind.get("cores", 1)
+    row.update(size=size, cable=_label(kind, size), od=k["od"], bend_r=k["bend_r"], dense=f["dense"], corners=f["corners"],
+               length_m=round(length_m, 2), mass_kg=round(k["kg_m"] * length_m, 3),
+               aud=round(k["aud_m"] * length_m * (1 + rule["waste_pct"] / 100), 2), aud_m=k["aud_m"], kg_m=k["kg_m"],
+               fittings=sum(1 for c in f["corners"] if c.get("elbow")), rigid=rigid,
+               vd_v=None if vd is None else round(vd, 3), vd_pct=None if vd is None else round(100 * vd / r["volts"], 2),
+               size_why=why, cores=cores, price_basis=kind.get("price_basis"), mass_basis=kind.get("mass_basis"),
+               rating_a=k["amps"], priced_in=r.get("priced_in") or kind.get("priced_in"))
+    ends = {r["from"]["line"], r["to"]["line"]} | _ids(r, "ends_also")
+    row["ends"] = ends | {fixtures[e]["line"] for e in list(ends) if e in fixtures}
+    return row
 
 
 # ------------------------------------------------------------------ geometry for the checks
@@ -445,6 +573,13 @@ def _pt_box(p, b) -> float:
     if dx == dy == dz == 0.0:   # inside: the depth to the nearest face, negative
         return -min(p[0] - b[0], b[3] - p[0], p[1] - b[1], b[4] - p[1], p[2] - b[2], b[5] - p[2])
     return math.sqrt(dx * dx + dy * dy + dz * dz)
+
+
+def _walled(p, q, floor_z: float, zones: list) -> bool:
+    """A 230 V stretch in its own conduit: both ends and the middle of segment pq are under the floor or inside one
+    of the rule's conduit zones, so a stretch through a floor gland counts as well."""
+    pts = (p, q, ((p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2))
+    return all(t[2] <= floor_z + 1 or any(_pt_box(t, z) <= 0 for z in zones) for t in pts)
 
 
 def seg_box(a, b, box) -> tuple[float, tuple]:
@@ -652,7 +787,7 @@ def _seg_list(run: dict, pad: float) -> list:
 def separation(res: dict) -> dict:
     """SVC-03: every 230 V run keeps the rule's distance from every extra-low-voltage run, in its own bulkhead or
     conduit, except within the rule's reach of the board and of an appliance both runs feed, where they meet at the
-    appliance's own terminals."""
+    appliance's own terminals, and where the floor panel is between them, a barrier."""
     rule = res["data"]["rules"]
     sep, reach = rule["segregation_mm"], rule["segregation_reach_mm"]
     boxes = {b["id"]: b["box"] for b in res["blocks"] if b.get("box")}
@@ -662,13 +797,19 @@ def separation(res: dict) -> dict:
     elv = [r for r in res["runs"] if r["system"] in ELV]
     floor = res["V"]["floor_z"]
     zones = [tuple(_eval(v, res["ns"]) for v in z["box"]) for z in rule.get("conduit", [])]
-    mid = lambda p, q: ((p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2)  # noqa: E731
-    walled = lambda p, q: max(p[2], q[2]) <= floor + 1 or any(_pt_box(mid(p, q), z) <= 0 for z in zones)  # noqa: E731
+    under = res["V"]["floor_underside_z"]
+
+    def floored(p1, q1, r1, p2, q2, r2):
+        # the floor panel between them, a barrier: one segment wholly under its underside, the other wholly in or above it
+        lo1, hi1 = min(p1[2], q1[2]) - r1["od"] / 2, max(p1[2], q1[2]) + r1["od"] / 2
+        lo2, hi2 = min(p2[2], q2[2]) - r2["od"] / 2, max(p2[2], q2[2]) + r2["od"] / 2
+        return (hi1 <= under + 0.5 and lo2 >= under - 0.5) or (hi2 <= under + 0.5 and lo1 >= under - 0.5)
+
     problems, worst = [], (math.inf, "")
     for a in ac:
         # under the floor, through the floor glands and in the rule's conduit zones every 230 V run is in its own
         # conduit, a separate wiring enclosure, so the distance applies everywhere else
-        sa = [s_ for s_ in _seg_list(a, a["od"] / 2 + sep) if not walled(s_[0], s_[1])]
+        sa = [s_ for s_ in _seg_list(a, a["od"] / 2 + sep) if not _walled(s_[0], s_[1], floor, zones)]
         for e in elv:
             shared = [boxes[k] for k in ({rule["board"]} | (_end_lines(a) & _end_lines(e))) if k in boxes]
             free = lambda p, q: not any(_pt_box(((p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2), s) <= reach for s in shared)  # noqa: E731
@@ -677,7 +818,7 @@ def separation(res: dict) -> dict:
                 if not free(p2, q2):
                     continue
                 for p1, q1, bb1 in sa:
-                    if _hit(bb1, bb2) and free(p1, q1):
+                    if _hit(bb1, bb2) and free(p1, q1) and not floored(p1, q1, a, p2, q2, e):
                         m = min(m, seg_seg(p1, q1, p2, q2) - a["od"] / 2 - e["od"] / 2)
             if m < worst[0]:
                 worst = (m, f"{a['id']} to {e['id']}")
@@ -774,8 +915,125 @@ def falls(res: dict) -> dict:
     return dict(ok=not problems, problems=problems, slope=None if worst == math.inf else round(worst, 4))
 
 
+def band(run: dict) -> str | None:
+    """A cable's voltage band, ELV or 230 V, for the runs it may touch. Pipes and hoses have none."""
+    return "ELV" if run["system"] in ELV else ("ac230" if run["system"] == "ac230" else None)
+
+
+def _shared_ways(res: dict) -> set:
+    """The pairs of runs that share a way, so are lane neighbours there."""
+    out = set()
+    for w in res.get("ways", {}).values():
+        ids = w["runs"]
+        out |= {frozenset((a, b)) for i, a in enumerate(ids) for b in ids[i + 1:]}
+    return out
+
+
+def need_mm(a: dict, b: dict, rule: dict, neighbours: set) -> float:
+    """SVC-08's least gap between two runs' surfaces: none between cables of one band that share a way (one loom),
+    the wet lines' distance between a water, waste or diesel line and a 230 V run, else the rule's gap."""
+    sp = rule["spacing"]
+    if band(a) and band(a) == band(b) and band(a) in sp["touch"] and frozenset((a["id"], b["id"])) in neighbours:
+        return 0.0
+    wet = {a["system"], b["system"]} & set(WETS)
+    if wet and "ac230" in (a["system"], b["system"]):
+        return float(sp["wet_ac_mm"])
+    return float(sp["gap_mm"])
+
+
+def _xy_seg(p, a, b):
+    """The point of segment ab nearest p in plan, and the plan distance."""
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    n = dx * dx + dy * dy
+    t = 0.0 if n < 1e-9 else max(0.0, min(1.0, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / n))
+    q = (a[0] + dx * t, a[1] + dy * t, a[2] + (b[2] - a[2]) * t)
+    if n < 1e-9:   # a vertical leg: its top is what a drip would reach first
+        q = (a[0], a[1], max(a[2], b[2]))
+    return q, math.hypot(p[0] - q[0], p[1] - q[1])
+
+
+def _over(wet: dict, ac: dict, reach: float, floor: tuple, zones: list | None = None, step: float = 10.0):
+    """Where the wet line passes over the 230 V run within `reach` in plan, the floor not between them: the wet point
+    and the cable's point under it, or None. The 230 V's stretches in its own conduit (`zones`, and everywhere under the
+    floor) are sealed from a drip, so they are not tested."""
+    ra, rw = ac["od"] / 2, wet["od"] / 2
+    segs = [(a, b) for a, b in _segs(ac["dense"]) if not _walled(a, b, floor[0], zones or [])]
+    box = _aabb(ac["dense"], ra + rw + reach)
+    for p0, p1 in _segs(wet["dense"]):
+        if not _hit(_aabb((p0, p1), 0.0), (box[0], box[1], -1e9, box[3], box[4], 1e9)):
+            continue
+        n = max(1, int(math.dist(p0, p1) / step))
+        for k in range(n + 1):
+            t = k / n
+            p = (p0[0] + (p1[0] - p0[0]) * t, p0[1] + (p1[1] - p0[1]) * t, p0[2] + (p1[2] - p0[2]) * t)
+            for a, b in segs:
+                q, d = _xy_seg(p, a, b)
+                if d >= ra + rw + reach or p[2] - rw <= q[2] + ra:
+                    continue
+                if q[2] < floor[1] and p[2] > floor[0]:   # the floor panel is between them
+                    continue
+                return p, q
+    return None
+
+
+def spacing(res: dict) -> dict:
+    """SVC-08: every run keeps its own radius plus a gap from every other run, so no two pass through each other and
+    each can be clipped on its own. Cables of one band that share a way are one loom and may touch their lane
+    neighbours. A water, waste or diesel line keeps the wet lines' distance from a 230 V run and never passes over one
+    within that distance in plan, the floor panel aside. The stretches inside a box both runs end at are on its
+    terminals and are not measured."""
+    rule = res["data"]["rules"]
+    sp = rule["spacing"]
+    neighbours = _shared_ways(res)
+    boxes = {b["iid"]: b["box"] for b in res["blocks"] if b.get("box")} | {b["id"]: b["box"] for b in res["blocks"] if b.get("box")}
+    boxes |= {k: f["box"] for k, f in res["fixtures"].items()}
+    runs = res["runs"]
+    segs = {r["id"]: [(p, q, _aabb((p, q), r["od"] / 2)) for p, q in _segs(r["dense"])] for r in runs}
+    hull = {r["id"]: _aabb(r["dense"], r["od"] / 2) for r in runs}
+    floor = (res["V"]["floor_z"], res["V"]["floor_underside_z"])
+    reach = max(sp["gap_mm"], sp["wet_ac_mm"])
+    duct = [boxes[sp["duct"]]] if sp.get("duct") in boxes else []
+    problems, rows, n_pairs, overlaps = [], [], 0, 0
+    for i, a in enumerate(runs):
+        for b in runs[i + 1:]:
+            if not _hit(_aabb([hull[a["id"]][:3], hull[a["id"]][3:]], reach), hull[b["id"]]):
+                continue
+            need = need_mm(a, b, rule, neighbours)
+            common = [boxes[k] for k in _end_lines(a) & _end_lines(b) if k in boxes] + duct
+            inside = lambda p, q: any(_in_box(p, c, 1.0) and _in_box(q, c, 1.0) for c in common)  # noqa: E731
+            m, at = math.inf, None
+            for p1, q1, b1 in segs[a["id"]]:
+                if not _hit(_aabb([b1[:3], b1[3:]], need), hull[b["id"]]) or inside(p1, q1):
+                    continue
+                for p2, q2, b2 in segs[b["id"]]:
+                    if _hit(_aabb([b1[:3], b1[3:]], need), b2) and not inside(p2, q2):
+                        d = seg_seg(p1, q1, p2, q2) - a["od"] / 2 - b["od"] / 2
+                        if d < m:
+                            m, at = d, p1
+            if at is None:
+                continue
+            n_pairs += 1
+            overlaps += m < -0.05
+            rows.append(dict(a=a["id"], b=b["id"], gap=round(m, 1), need=need, at=[round(v) for v in at]))
+            if m < need - 0.05:
+                problems.append(f"{a['id']} and {b['id']} are {'overlapping ' if m < 0 else ''}{abs(m):.0f} mm "
+                                f"{'deep' if m < 0 else 'apart'} at X {at[0]:.0f} Y {at[1]:.0f} Z {at[2]:.0f}, {need:g} mm needed")
+    wet = [r for r in runs if r["system"] in WETS]
+    zones = [tuple(_eval(v, res["ns"]) for v in z["box"]) for z in rule.get("conduit", [])]
+    for w in wet:
+        for c in (r for r in runs if r["system"] == "ac230"):
+            hit = _over(w, c, sp["wet_ac_mm"], floor, zones)
+            if hit:
+                p, q = hit
+                problems.append(f"{w['id']} passes over the 230 V run {c['id']} at X {p[0]:.0f} Y {p[1]:.0f}, {p[2] - q[2]:.0f} mm above it")
+    tight = sorted(rows, key=lambda r: r["gap"] - r["need"])
+    return dict(ok=not problems, problems=problems, closest=tight[:10], pairs=n_pairs, overlaps=overlaps,
+                margin=round(tight[0]["gap"] - tight[0]["need"], 1) if tight else None,
+                governing=f"{tight[0]['a']} to {tight[0]['b']}" if tight else None, limit=sp["gap_mm"])
+
+
 CHECKS = {"clearance": clearance, "bends": bends, "separation": separation, "terminal_face": terminal_face,
-          "coverage": coverage, "drops": drops, "falls": falls}
+          "coverage": coverage, "drops": drops, "falls": falls, "spacing": spacing}
 
 
 def evaluate(res: dict) -> dict:

@@ -19,7 +19,7 @@ ROWS = M.check_rows(RES, EVAL)
 
 def test_every_check_is_defined_once_with_its_source():
     ids = [c["id"] for c in RES["data"]["checks"]]
-    assert ids == [f"SVC-0{i}" for i in range(1, 8)], ids
+    assert ids == [f"SVC-{i:02d}" for i in range(1, len(ids) + 1)] and len(ids) >= 8, ids
     assert {c["kind"] for c in RES["data"]["checks"]} == set(R.CHECKS)
     assert all(c.get("source") and c.get("why") for c in RES["data"]["checks"])
 
@@ -39,6 +39,48 @@ def test_limits_are_the_rules():
     r = RES["data"]["rules"]
     assert (r["clear_mm"], r["segregation_mm"], r["drop_pct"], r["drop_ac_pct"], r["fall"], r["terminal_face"]["mm"]) == (20, 50, 2.0, 5.0, 0.02, 300)
     assert set(r["terminal_face"]["exempt"]) == {"W-02", "F-10"}
+    assert (r["spacing"]["gap_mm"], r["spacing"]["wet_ac_mm"], set(r["spacing"]["touch"])) == (5, 25, {"ELV", "ac230"})
+
+
+def test_a_ways_pitch_is_its_largest_cable_or_pipe():
+    """I2-13: a shared way's lane pitch is the largest outside diameter in it, so lane neighbours touch at most."""
+    od = {r["id"]: r["od"] for r in RES["runs"]}
+    assert RES["ways"], "no shared ways"
+    for w, way in RES["ways"].items():
+        assert way["runs"], w
+        assert way["pitch_mm"] >= max(od[i] for i in way["runs"]) - 1e-6, w
+
+
+def test_no_two_runs_overlap_outside_the_board_duct():
+    """SVC-08's measure in one number: no pair of runs passes through another, wherever both are outside the board."""
+    e = EVAL["spacing"]
+    assert e["overlaps"] == 0, [p for p in e["problems"] if "overlapping" in p][:5]
+
+
+def test_the_ute_feed_holds_its_drop_from_the_chargers_to_the_lynx():
+    """I2-15 (a): SVC-06 adds the ute half (TW06, its `upstream`) to D-14's own drop at the design current."""
+    d14 = next(r for r in RES["runs"] if r["id"] == "D-14")
+    up = d14["upstream"]
+    own = d14["size"] and RES["kinds"]["twin8"]["sizes"][d14["size"]]["mv_am"] * d14["amps"] * d14["length_m"] / 1000
+    assert up["m"] == 7 and d14["amps"] == 32 and "TW06" in up["source"]
+    assert d14["vd_v"] == pytest.approx(own + up["mv"] * d14["amps"] * up["m"] / 1000, abs=0.002)
+    assert d14["vd_pct"] <= RES["data"]["rules"]["drop_pct"]
+
+
+def test_every_frame_cell_is_inside_its_frame_and_clear_of_the_others():
+    """I2-14: a transit frame's modules fit its packing, side by side, each named for the run that passes it."""
+    by = {r["id"]: r for r in RES["runs"]}
+    for g in RES["svc"]["glands"]:
+        cells = g.get("cells") or {}
+        boxes = []
+        for rid, (dx, dy, m) in cells.items():
+            assert rid in by and g["id"] in (by[rid].get("glands") or []), (g["id"], rid)
+            assert abs(dx) + m / 2 <= g["w"] / 2 + 1e-6 and abs(dy) + m / 2 <= g["h"] / 2 + 1e-6, (g["id"], rid)
+            assert by[rid]["od"] <= m, (g["id"], rid, by[rid]["od"], m)
+            boxes.append((rid, dx - m / 2, dy - m / 2, dx + m / 2, dy + m / 2))
+        for i, a in enumerate(boxes):
+            for b in boxes[i + 1:]:
+                assert a[3] <= b[1] + 1e-6 or b[3] <= a[1] + 1e-6 or a[4] <= b[2] + 1e-6 or b[4] <= a[2] + 1e-6, (g["id"], a[0], b[0])
 
 
 def test_ids_are_unique_and_every_end_is_a_real_line():

@@ -228,6 +228,11 @@ def check_rows(res: dict, ev: dict) -> list[dict]:
         elif c["kind"] == "falls":
             row.update(limit=f"at least 1:{1 / res['data']['rules']['fall']:.0f}", measured=e["slope"], unit="fall",
                        margin=None if e["slope"] is None else round(e["slope"] - res["data"]["rules"]["fall"], 4), governing="flattest level leg")
+        elif c["kind"] == "spacing":
+            sp = res["data"]["rules"]["spacing"]
+            row.update(limit=f"each run's radius plus {sp['gap_mm']:g} mm, a wet line {sp['wet_ac_mm']:g} mm from 230 V, lane neighbours may touch",
+                       measured=e["margin"], unit="mm spare", margin=e["margin"],
+                       governing=f"{e['governing']}, {e['pairs']} pairs measured, {e['overlaps']} overlapping")
         row["detail"] = "; ".join(e["problems"][:3]) if e["problems"] else f"{row.get('governing') or ''}".strip()
         row["status"] = ("PASS" if row["ok"] else "FAIL") if c["severity"] == "fail" else ("MEETS LIMIT" if row["ok"] else "REPORTED")
         rows.append(row)
