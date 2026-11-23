@@ -995,10 +995,10 @@ inputs:
     title: Fresh water the tanks hold, from empty to full through a water meter
     how: "Drain both fresh tanks through the pump until it runs dry, then fill through a garden water meter until the breather overflows. Record the meter's reading."
     unit: L
-    estimate: {v: 420, src: "Report 21 section 10 and the model's two tanks (est.)"}
+    estimate: {v: 398, src: "The fresh tanks' 401.5 L net (cad/trailer.py tank_nets, I2-40) less about 1.5 L a tank left under the pump's dip tube in the rear tank's sump and the balance hose's in the front tank's (est.), water the test from a dry pump cannot count"}
     measured: {v: null, date: null}
     stage: trailer built
-    range: {min: 400, max: null, src: "Min: report 21 keeps 400 L, which covers 7 days with three washes. No upper limit: the travel limit (H13) caps what rides"}
+    range: {min: null, max: null, src: "Aim: report 21's 400 L, which covers 7 days with three washes. No limit either way: water_full_l, the water the design carries, follows the reading with the 3 L under the pickups added back, in H21's 5 L steps down, so a reading of 397 L or more keeps 400 L and one under it takes the design to 395 L. The travel limit (H13) caps what rides"}
     affects: [the days of water off-grid]
     thresholds:
       - {at: 400, rule: "Under 400 L a week with three washes needs a refill on the sixth day: plan the fills, or add laundry days less often", src: "Report 21 section 10.1"}
