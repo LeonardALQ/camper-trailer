@@ -950,7 +950,7 @@ inputs:
   - id: TW-04
     group: Trailer weighbridge
     part: trailer
-    title: Weighed mass, fully loaded for travel with 300 L of water, the fuel and the gear
+    title: Weighed mass, fully loaded for travel with 420 L of water, the fuel and the gear
     how: "Load the trailer as for a trip: 420 L of fresh water, the heater's diesel, the jerry cans, the gear and the food, with the grey tank empty. Weigh the whole trailer on a weighbridge, uncoupled on its jockey wheel, or coupled with only the trailer on the scale and the drawbar at its design height."
     unit: kg
     estimate: {v: null, src: "The model's TC2 mass without growth is shown beside it"}
@@ -1068,7 +1068,7 @@ inputs:
     estimate: {v: 5, src: "DauerShower 2.0, maker"}
     measured: {v: null, date: null}
     stage: trailer built
-    range: {min: null, max: 8, src: "Max: at 8 L the water budget rises to 47 L a day and 300 L lasts about 6.4 days (est.). No lower limit"}
+    range: {min: null, max: 8, src: "Max: at 8 L the water budget rises to 47 L a day and 420 L lasts about 8.9 days (est.). No lower limit"}
     affects: [the water budget]
   - id: TR-09
     group: Trailer tests
