@@ -376,10 +376,10 @@ trailer_checks:
     inputs: []
     why: "Review I2-27. Every hole in data/services.yaml `holes`, at its section of the composite rail with the hole taken out of the wall it is in (a seam hole out of both walls): the combined stress at the hole's edge in each of LC1 to LC8b against that case's limit, fy over its factor, or 0.85 fu over it where that is lower (AS 4100 clause 7.2's net-section term, kt 1). The rails take the raiser's 350 MPa, as CHS-01 to CHS-08B do."
   - id: CHS-10
-    title: Holes the runs make in the rails and raisers, placed clear of the tubes' corners and the welds, and their fatigue (reported until the services move them)
+    title: Holes the runs make in the rails and raisers, placed clear of the tubes' corners and the welds, and their fatigue
     type: chassis_local
     item: hole_places
-    severity: report
+    severity: fail
     inputs: []
     why: "Review I2-27. Each hole's centre at least 1.25 d from the end of its face's flat, where the corner radius starts, and 1.5 d from the member's sawn end (AS 4100 Table 9.6.2, a rolled and a sawn edge), and its edge at least one hole diameter from every weld toe and the larger diameter from another hole, where Kirsch's solution for a hole in a plate puts the hole's stress field within 8 % of the nominal stress. The frequent range at the hole's edge, 3.0 times the net section's (Kirsch), within the CAFL of IIW-1823-07 Table 3.2-1 no. 121, a machine-cut edge dressed, FAT 140, 81.9 MPa, and the occasional range's Miner damage at most 0.5 (report 11 section 3.4). Reported, not failed, because the holes are the services' (data/services.yaml) and CHASSIS.md lists the moves they need. It becomes a fail check once they are made."
   - id: DEF-01

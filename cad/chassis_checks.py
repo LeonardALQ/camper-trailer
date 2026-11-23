@@ -39,8 +39,8 @@ def chassis_row(c, res: dict) -> dict:
         top = max(hs, key=lambda h: h["peak_mpa"] / h["cafl"])
         return dict(limit="edge 1.25 d, weld toes 1.0 d, edge range <= CAFL", measured=len(bad), unit=f"of {len(hs)} holes", margin=-len(bad),
                     ok=not bad, governing="; ".join(f"{h['id']} {h['member']}" for h in bad[:4]) or f"{top['id']}, its edge range",
-                    detail=(f"{len(hs) - len(bad)} of {len(hs)} holes meet the three rules. " + ". ".join(why)
-                            + f". The highest range at a hole's edge is {top['peak_mpa']:.1f} MPa at {top['id']}, against {top['cafl']:.1f} MPa"))
+                    detail=(f"{len(hs) - len(bad)} of {len(hs)} holes meet the three rules. " + "".join(f"{w}. " for w in why)
+                            + f"The highest range at a hole's edge is {top['peak_mpa']:.1f} MPa at {top['id']}, against {top['cafl']:.1f} MPa"))
     if c.type == "chassis_local":
         r = res["local"][LOCAL[c.item]]
         return dict(limit="<= 100 % of each part's limit", measured=round(100 * r["util"], 1), unit="%", margin=round(100 * (1 - r["util"]), 1),

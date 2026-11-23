@@ -30,11 +30,15 @@ they are threaded through (`inside`).
   so it seals in the glands and in an RM 15 module (3 to 11 mm) (I2-29). AS/NZS 3008.1.1 rates a cable by its
   conductor, insulation and installation, so Prysmian's 0.6/1 kV 2C+E ratings hold for it. 2.5 mm2, 4 mm2 where 2.5 mm2
   is rated under the current or its breaker where it lies (A-02, C1 and C4, SVC-10), within the 5 % drop of AS/NZS
-  3000:2018 clause 3.6.2. A-01 (26 A) needs 10 mm2 in the bunched conduit (27.2 A, where 4 mm2 gives 16.0 A), over
-  the 450/750 V range's 6 mm2. Prysmian's 0.6/1 kV 10 mm2 2C+E is 16.1 to 16.8 mm across, 0.45 kg/m and bends at
-  70 mm ([Prysmian's 2C+E PVC circular](https://australia.prysmian.com)), so it needs an RM 30, and G15 has no room
-  for one between the aisle ahead of it and the partition behind. A-01 stays 4 mm2 and SVC-10 reports it until it has
-  a conduit of its own or the frames are laid out again (section 7).
+  3000:2018 clause 3.6.2. A-01, the MultiPlus-II's AC-out-1 to the board, runs alone, apart from the 230 V group:
+  clipped down the partition beside the dryer and round the pressure gauge SN-02, across the end slot and through a
+  module of its own in G20 and G15, so it is grouped with no other circuit. Its protection is a 25 A two-pole breaker
+  as the board's main switch, the fuse or breaker in series with AC-out-1 that Victron's installation manual asks for
+  ([MultiPlus-II 4k5/6k5 GX, section 8.4](https://www.victronenergy.com/media/pg/MultiPlus-II_4k5_6k5_GX/en/installation.html)).
+  It is over the board's managed peak, 5,465 W on the all-electric cold day (report 20 section 4), 23.8 A, and its
+  4 mm2 is rated 28.1 A under the floor at 45 C. In the bunched conduit it would need 10 mm2, 16.1 to 16.8 mm across
+  ([Prysmian's 2C+E PVC circular](https://australia.prysmian.com)), an RM 30 that G15 has no room for. 6 mm2 on a 32 A
+  breaker is 11.8 mm across, past an RM 15's 11 mm, and is rated 31 A where it crosses the floor.
 - Ratings, SVC-10 (I2-15 b): no run line names its installation method. Each stretch of a run takes a zone from where
   it lies, in this order: inside a chassis member it is threaded through, crossing a panel's foam core, under the floor,
   on the drawbar, outside the body, in the board cabinet, in the battery box, in a 230 V conduit, in the ceiling's
@@ -85,10 +89,13 @@ they are threaded through (`inside`).
   centre line: a lamp cable bends at 57 mm, so a turn from the outer lane, 10 mm from the web, meets the web on a
   slant and its slot reaches the outrigger's root weld. The lamp loom K-01 and the brake circuit K-10 leave the road
   rail through its outer web, never its bottom face (CHS-10). The ute feed D-14, the compressor feed B-16 and the
-  breakaway feed B-18 run inside the kerb raiser RS-K only, clear of its seam with the rail. Each enters through a
+  breakaway feed B-18 run inside the kerb raiser RS-K, clear of its seam with the rail. Each enters through a
   slotted hole in the face it arrives at, ahead of CM-02 (B-16 and B-18 the inner face, D-14 from the drawbar the outer
-  face, riding 16 mm higher there so B-16 can rise to its exit under it), and leaves through the raiser's top into the
-  kerb frame G20, which CHS-10 reports: the gap beside the rear tank is full, so their cells cannot move inboard.
+  face, riding 16 mm higher there so B-16 can rise to its exit under it). Each leaves through the raiser's inner web
+  on a slant ahead of the kerb frame G20 (CHS-10), runs rearward in the gap between the raiser and the rear tank against
+  the raiser, D-14 lowest at Z 760 for its 110 mm bend, B-16 at Z 800 and B-18 at Z 840, and rises into G20's
+  outboard row. The chase's loom (B-15, E-07, B-04, B-05) rides inboard of them and crosses the end slot at four
+  heights, and the tank senders N-08 and N-09 run forward low beside the rail.
   SVC-01 also tests every chassis fitting with no box of its own at each of its positions (cad/chassis.py
   `fitting_boxes`): the drawbar root gussets, the recovery lugs and tongues, the plates, the D-rings, and each corner
   steady over the box its leg sweeps from folded to standing. The drawbar's lamp and brake looms pass outboard of the
@@ -118,7 +125,7 @@ they are threaded through (`inside`).
 | SVC-07 | gravity wastes fall at least 1:50 | AS/NZS 3500.2, CT-611, CT-612 |
 | SVC-08 | each run its radius plus 5 mm (est.) from every other, cables of one band in a shared way may touch. Cold water, vents and diesel 25 mm from 230 V, hot water before the mixing valve and wastes 50 mm from 230 V and 25 mm from extra-low-voltage cables above the floor (a solvent-welded DWV waste keeps the gap), and no wet line over a 230 V run within 25 mm in plan | IB 052/2015 for cold water (25 mm), the design's own rule for the rest (IB 052/2015 asks 100 mm for heated water and drains in a building) |
 | SVC-09 | every gland's fitting has room in its panel: 12 mm (est.) of spanner room round a locknut, a 10 mm (est.) web elsewhere, no floor fitting in a keep-clear box or under a part on the floor | CMP Products' locknuts by thread, Roxtec CF 8 for the frames' proportions |
-| SVC-10 | each cable's design current and its protective device at most its rating where it lies, Ib <= In <= Iz, every stretch rated for its zone's method and air and derated for its group (section 2). Reported, not failing, while A-01 waits for its 10 mm2 | AS/NZS 3000:2018 clause 2.5.3, AS/NZS 3008.1.1 (Table 22), Prysmian, Tycab (JASO D609), BS 7671 Table 52.2, IEC 60364-5-52 (I2-15 b) |
+| SVC-10 | each cable's design current and its protective device at most its rating where it lies, Ib <= In <= Iz, every stretch rated for its zone's method and air and derated for its group (section 2) | AS/NZS 3000:2018 clause 2.5.3, AS/NZS 3008.1.1 (Table 22), Prysmian, Tycab (JASO D609), BS 7671 Table 52.2, IEC 60364-5-52 (I2-15 b) |
 | SVC-11 | every cable 25 mm (ELV) or 50 mm (230 V) from the hot line H-01 before the mixing valve, under the floor too, nothing under the Combi's base, cables and the fuel line 50 mm (est.) from the 100 mm behind it where the exhaust runs to its cowl, cables and pipes 50 mm (est.) from the oven's case inside the tower, but the oven's own lead | Truma Combi D 6 AU installation instructions, IB 052/2015 halved as SVC-08's (I2-18 d) |
 | SVC-12 | no cable unsupported over 600 mm: held inside a member it is threaded through, by a clip within 30 mm (est.) of a part it runs along or a support the design adds (the SP fixtures), in the board, a conduit, a cabinet's carcass, a box it ends at, a gland or a frame, or by its loom in a shared way | VSB1 section 7.1 (I2-18 a) |
 
@@ -127,7 +134,7 @@ because `data/checks.yaml`'s trailer check types are fixed in `cad/partsdb.py`. 
 trailer's checks (`build/trailer/trailer.json`) and `cad/tests/test_routes.py` fails on any of them.
 
 The floor's multi-cable penetrations are three Roxtec RM transit frames (data/services.yaml, line BD-25): the kerb
-frame G20 under the plinth's end slot, one frame of two packing spaces over the kerb raiser and the gap beside the
+frame G20 under the plinth's end slot, one packing space of 156 x 84 mm over the gap between the kerb raiser and the
 rear tank, the road frame G15 under the MultiPlus-II and the Combi's frame G9 in the 90 mm of floor between the chair
 space and the aisle. Each module is sized to its run (RM 15 for 3 to 11 mm, RM 20 for 4 to 14.5 mm, RM 30, RM 40 and
 RM 60, Roxtec's product page) and the rest of each packing space is filled with solid modules. The frames are
