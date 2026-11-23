@@ -467,8 +467,17 @@ def _blocks_of(lay) -> tuple[dict, list]:
     """The parameters and the envelope blocks of a Layout (cad/trailer.py), as plain dicts. A chassis fitting with more
     than one position has no box of its own, so each of its positions is a block (cad/chassis.py fitting_boxes): each
     D-ring, and each corner steady over the box its leg sweeps from folded for travel to standing at 90 degrees."""
-    bl = [dict(iid=b.iid, id=b.id, name=b.name, system=b.system, box=b.box, hollow=b.hollow, keep_clear=b.keep_clear,
-               role=b.extra.get("role")) for b in lay.blocks if b.box is not None]
+    bl = []
+    for b in lay.blocks:
+        if b.box is None:
+            continue
+        tubes = spacer_tubes(lay, b)
+        if tubes:   # the jockey's spacers as the four tubes they are, so a run may pass between their rows (I2-53)
+            bl += [dict(iid=f"{b.iid} #{k}", id=b.id, name=f"{b.name.split(', ')[0]}, tube {k}", system=b.system, box=bx, hollow=False,
+                        keep_clear=False, role=None) for k, bx in enumerate(tubes, 1)]
+            continue
+        bl.append(dict(iid=b.iid, id=b.id, name=b.name, system=b.system, box=b.box, hollow=b.hollow, keep_clear=b.keep_clear,
+                       role=b.extra.get("role")))
     ch = getattr(lay, "chassis", None)
     for b in lay.blocks:
         f = b.extra.get("fitting") if b.box is None else None
@@ -483,6 +492,24 @@ def _blocks_of(lay) -> tuple[dict, list]:
         bl += [dict(iid=f"{b.iid} #{k}", id=b.id, name=name, system=b.system, box=tuple(bx), hollow=False, keep_clear=False)
                for k, (name, bx) in enumerate(boxes, 1)]
     return dict(lay.V), bl
+
+
+def spacer_tubes(lay, b) -> list[tuple]:
+    """A line modelled as jockey_spacers (DB-08) as its four tubes' boxes, as the product draws them: each 25 mm across on
+    its bolt at its X and height, from the bracket plate's inner face to the drawbar member's outer face (I2-53)."""
+    from .trailer_model import model_specs
+    sp = model_specs(lay).get(b.id)
+    if not sp or sp.get("name") != "jockey_spacers":
+        return []
+    ev = lambda v: float(lay.P.eval(v, {})) if isinstance(v, str) else float(v)  # noqa: E731
+    (xa, ya), (xb, yb) = [(ev(x), ev(y)) for x, y in sp["face"]]
+    plate = ev(sp["plate"])
+    out = []
+    for x in (ev(v) for v in sp["xs"]):
+        yf = ya + (yb - ya) * (x - xa) / (xb - xa)
+        for z in (ev(v) for v in sp["zs"]):
+            out.append((x - 12.5, min(plate, yf), z - 12.5, x + 12.5, max(plate, yf), z + 12.5))
+    return out
 
 
 def bed_travel(V: dict, blocks: list) -> list:
