@@ -256,11 +256,11 @@ hole_rules: {edge_factor: 1.25, end_factor: 1.5, toe_factor: 1.0, kt: 3.0, iiw: 
 
 # Local checks of the fittings (CHASSIS.md). Sizes in mm. Plates are AS/NZS 3678 grade 350. The pin is what bears in the
 # hole: at a chain lug the 10 mm round bow of the pewag CW 8 connecting link (pewag's d), which passes through the 14 mm
-# hole with the lug's 13 mm ligament under it inside the link's eye (pewag's c, 13 mm, takes the 10 mm plate, est.), and
+# hole, and the link's eye, 13 x 18 mm inside (pewag's c and t, est.), takes the 10 mm plate across and its 13 mm under the hole along, and
 # at a recovery point a 4.75 t bow shackle's pin. `edge` runs from the hole's centre to the lug's lower edge, 35 mm under
 # the member with the hole 15 mm under it. Bearing is held to 1.5 fy so the hole does not yield in the elastic VSB1 cases.
 local_checks:
-  chain_lug: {fitting: CH-P02, hole: 14, pin: 10, net_w: 60, edge: 20, weld_leg: 6, weld_l: 120, weld_h: 65, ecc: 55}
+  chain_lug: {fitting: CH-P02, hole: 14, pin: 10, eye: [13, 18], net_w: 60, edge: 20, weld_leg: 6, weld_l: 120, weld_h: 65, ecc: 55}
   front_recovery: {fitting: CH-P04, hole: 22, pin: 19, net_w: 120, edge: 40, lever: 60, weld_leg: 6, weld_l: 200}
   rear_recovery: {fitting: CH-P05, hole: 22, pin: 19, net_w: 120, edge: 40, lever: 50, weld_leg: 6, weld_l: 200}
   jacking_pad: {fitting: CH-P06, span: 44, cup_d: 50}

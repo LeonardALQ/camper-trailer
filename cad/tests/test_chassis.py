@@ -64,3 +64,26 @@ def test_steadies_reach_the_ground_at_90_degrees():
     full extension its bracket height passes the rail's underside, so it reaches the ground with stroke to spare."""
     sd, top = CH.data["steadies"], CH.V["rail_underside_z"]
     assert sd["retracted"] < top < sd["extended"]
+
+
+def test_chain_lug_takes_its_connecting_link():
+    """Each chain hangs from its lug on a pewag CW 8 connecting link, with no shackle at the trailer (I2-46, WA's CI-119C):
+    the link's bow passes the lug's hole, and the link's eye takes the lug's plate across and the plate under the hole
+    along, so the link closes round the lug."""
+    c = CH.data["local_checks"]["chain_lug"]
+    t = next(f for f in CH.data["fittings"] if f["id"] == c["fitting"])["t"]
+    across, along = c["eye"]
+    assert c["pin"] < c["hole"]
+    assert t < across and c["edge"] - c["hole"] / 2 < along
+
+
+def test_drawbar_root_is_read_at_the_gussets_toe():
+    """FAT-07 takes the drawbar member's own stress where the root gusset's radius meets it (IIW 526, I2-47): at the
+    gusset's toe, ahead of the body front, on a node of the frame model, with the gusset reaching back to the body front."""
+    V = CH.V
+    toe = V["root_gusset_toe_x"]
+    g = next(f for f in CH.data["fittings"] if f["id"] == "CH-P03")
+    x0 = CH.ev(g["at"])[0] - g["l"] / 2
+    assert x0 == pytest.approx(toe) and toe + g["l"] > V["body_x0"]
+    f = next(r for r in RES["fatigue"] if r["id"] == "FAT-07")
+    assert f["where"].endswith(f"at X {toe:.0f}")
