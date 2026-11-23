@@ -77,9 +77,18 @@ def test_chain_lug_takes_its_connecting_link():
     assert t < across and c["edge"] - c["hole"] / 2 < along
 
 
+def test_root_gusset_meets_iiw_522():
+    """The root gusset holds IIW 522's FAT 90 (I2-51): its radius over 150 mm, its end at the toe no taller than twice its
+    thickness and 25 mm, the fillets wrapped round that end and the toe ground."""
+    g = next(f for f in CH.data["fittings"] if f["id"] == "CH-P03")
+    assert g["r"] > 150 and g["end_h"] <= min(2 * g["t"], 25)
+    assert g["wrapped"] and g["toe_ground"]
+    assert next(d for d in CH.data["fatigue_details"] if d["id"] == "FAT-07")["iiw"] == "522"
+
+
 def test_drawbar_root_is_read_at_the_gussets_toe():
-    """FAT-07 takes the drawbar member's own stress where the root gusset's radius meets it (IIW 526, I2-47): at the
-    gusset's toe, ahead of the body front, on a node of the frame model, with the gusset reaching back to the body front."""
+    """FAT-07 takes the drawbar member's own stress at the root gusset's end (IIW 522, I2-47, I2-51): at the gusset's
+    toe, ahead of the body front, on a node of the frame model, with the gusset reaching back to the body front."""
     V = CH.V
     toe = V["root_gusset_toe_x"]
     g = next(f for f in CH.data["fittings"] if f["id"] == "CH-P03")
