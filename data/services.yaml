@@ -69,8 +69,8 @@ holes:
   - {member: OR-05R, face: kerb side, run: K-09, x: 4511, y: 638, z: 811, d: 16, length: 16}
   - {member: OR-05R, face: road side, run: K-09, x: 4511, y: 1200, z: 800, d: 16, length: 16}
   - {member: RL-R, face: road side, run: K-01, x: 2360, y: 637, z: 671, d: 16, length: 39}
-  - {member: RL-R, face: road side, run: K-10, x: 2415, y: 637, z: 641, d: 16, length: 34}
-  - {member: RL-R, face: road side, run: K-10, x: 4215, y: 637, z: 652, d: 16, length: 25}
+  - {member: RL-R, face: road side, run: K-10, x: 2446, y: 637, z: 646, d: 27, length: 36}
+  - {member: RL-R, face: road side, run: K-10, x: 3413, y: 637, z: 647, d: 27, length: 56}
   - {member: RL-R, face: road side, run: K-01, x: 6021, y: 637, z: 680, d: 16, length: 25}
   - {member: RS-K, face: road side, run: B-18, x: 2015, y: -587, z: 840, d: 14, length: 54}
   - {member: RS-K, face: road side, run: B-16, x: 2267, y: -587, z: 796, d: 28, length: 103}
