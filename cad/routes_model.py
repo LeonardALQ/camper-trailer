@@ -151,7 +151,7 @@ def _frames(res: dict) -> Compound:
 def meta_of(run: dict, res: dict, drawing: str) -> dict:
     """A run's part metadata: the hover tip shows its id, what it feeds and its length; the card adds the rest."""
     kind = "Cable" if run["system"] in R.ELECTRICAL else ("Hose" if "hose" in run["kind_what"].lower() else "Pipe")
-    size = (f"{run['size']:g} mm2" if run["system"] in R.ELECTRICAL and run["cores"] <= 2 and run["kind"] not in ("utp", "sig", "lamp7")
+    size = (f"{run['size']:g} mm2" if run["system"] in R.ELECTRICAL and run["cores"] <= 2 and run["size"] is not None and run["kind"] not in ("utp", "sig", "lamp7")
             else f"{run['od']:g} mm outside")
     return dict(
         id=run["id"], iid=run["id"], name=run["feeds"], group=SYSTEM_STYLE[run["system"]][1], system=run["system"],

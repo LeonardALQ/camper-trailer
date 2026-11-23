@@ -115,11 +115,26 @@ they are threaded through (`inside`).
   lying on the angle SP-FD, hung 15 mm under the drawbar members' rear ends. The front bay's cables to the kerb corner
   and the front fans (C9B, E-07, B-04, B-05) cross the rails through grommeted holes in both webs, 32 to 48 mm under
   the rails' tops, C9B and B-05 under the XT Air box and E-07 and B-04 behind it, where they used to dip to 400 to
-  430 mm under the drawbar members, and B-18 rides over the drawbar's cross brace, clipped to it (I2-41). The running
+  430 mm under the drawbar members, and B-18 rides over the drawbar's cross brace, clipped to it (I2-41). The ute feed D-14 runs straight along
+  the kerb drawbar member's outer face at Z 523, P-clipped to it inside the jockey's bracket plate CH-P11 between the
+  two rows of the plate's spacer tubes, which the routes take as the four 25 mm tubes they are (DB-08), where it
+  dipped to 430.8 mm under them as one block (I2-53). The running
   clearance and the breakover (DIM-04, DIM-06, DIM-07) take every fixture and run at its outside diameter, as FIT-05
   does. Every hole in a chassis member and every floor
   cut-out over 60 mm is listed in `data/services.yaml` (`holes`, `cutouts`) with its member or panel, point and size.
   SVC-01 skips the parts welded to a member while a run is inside it.
+- The brake circuit (I2-50). Bosch's TSC drives the magnets from its own supply on the truck's brake request
+  (Y265K30237 v4.0, its power harness), and the 12-pin flat's brake pin is a small pin rated 15 A (ARK FPP12, report
+  08), under the four magnets' 16 A. So the supply comes from the truck's battery through an Anderson SB50 beside the
+  plug, as report 08 section 3.5 asks for a stability control's heavy current, and pin 5 carries the brake request
+  only. The SB50's 1.0 m lead K-14 (8 B&S twin, est.) and the 12-pin's own lead K-13 hang between the vehicles
+  (`rides: between`), so the running clearance and SVC-12 leave them out, and SVC-06 adds K-14's drop to K-10's
+  (`follows`): 0.71 % and 1.15 % with K-10 at 25 mm2, 1.86 % against 2 %, in two 30 mm holes in the road rail. Each
+  drum's lead runs from its side's junction under CM-05 out under the tank guard to a P-clip on its XT hanger, 15 mm
+  ahead of the arm's pivot and 52.5 mm inboard of the arm, then in a loop down beside the bush and along the arm's
+  underside to the backing plate. cad/routes.py lays that arm part on the arm at ride height and FIT-05 sweeps it
+  with the arm through its travel (`rides: arm`), 59.6 mm clear at its least. The leads are 2.5 mm2 (est.), so the
+  front drums' 1.6 m keep 2 % from the TSC with Bosch's harness ahead of them.
 - The desk reaches the floor, so its outlets and USB panel are in a power module in the desk top, fed up the front
   wall's kerb corner (G17 for 230 V, G23 for 24 V, 70 mm apart) and through the desk's front leg. The e2 fans C and D
   have their own glands under them (G16, G18).
