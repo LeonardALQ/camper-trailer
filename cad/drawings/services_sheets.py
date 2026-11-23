@@ -704,22 +704,17 @@ def _is_frame(g: dict) -> bool:
 
 def _frame(sh, pr, g: dict, xy, fits: dict, cells: bool = True):
     """A transit frame in plan: its packing space (medium), the rim of its frame (thin) and each run's module (thin)."""
-    from ..routes import WEDGE_SLACK, WEDGE_STACK, frame_room
+    from ..routes import frame_packing, frame_room, frame_wedge
     x, y = xy
-    hx, hy = g["w"] / 2, g["h"] / 2
     rim = float((g.get("fit") or {}).get("rim", fits["frame_rim_mm"]))
-    rx0, ry0, rx1, ry1 = frame_room(dict(g, p=(x, y)))   # the packing and the C wedge's room (I2-33)
+    gp = dict(g, p=(x, y))
+    rx0, ry0, rx1, ry1 = frame_room(gp)   # the packing and the C wedge's room (I2-33)
     sh.rect(*pr.rect3((rx0 - rim, ry0 - rim, 0, rx1 + rim, ry1 + rim, 0)), "thin")
-    sh.rect(*pr.rect3((x - hx, y - hy, 0, x + hx, y + hy, 0)), "medium")
-    if g.get("stack"):
-        far = g.get("wedge_end", "+") == "+"
-        if g["stack"] == "x":
-            a = x + hx + WEDGE_SLACK if far else x - hx - WEDGE_SLACK - WEDGE_STACK
-            wb = (a, y - hy, 0, a + WEDGE_STACK, y + hy, 0)
-        else:
-            a = y + hy + WEDGE_SLACK if far else y - hy - WEDGE_SLACK - WEDGE_STACK
-            wb = (x - hx, a, 0, x + hx, a + WEDGE_STACK, 0)
-        sh.rect(*pr.rect3(wb), "medium")
+    for px0, py0, px1, py1 in frame_packing(gp):   # one packing space, or two either side of a wedge inside the stack
+        sh.rect(*pr.rect3((px0, py0, 0, px1, py1, 0)), "medium")
+    wb = frame_wedge(gp)
+    if wb:
+        sh.rect(*pr.rect3((wb[0], wb[1], 0, wb[2], wb[3], 0)), "medium")
     if cells:
         from ..routes import cell_half
         for c in (g.get("cells") or {}).values():
