@@ -219,7 +219,7 @@ def rear_axle(V):
     tube = cyl((x, -hy, z), (x, hy, z), 55)
     diff = cyl((x - 160, 0, z), (x + 150, 0, z), 150)
     out = [("axle", kit.fuse([tube, diff] + hubs), CHASSIS, 1.0)]
-    yr, half = V["rail_y"], 700.0                       # eye to eye 1,400 mm (est.)
+    yr, half = V["rail_y"] + 20, 700.0                  # under the rails' outer half, clear of the spare; 1,400 mm eye to eye (est.)
     leaves, brackets = [], []
     for s in (1, -1):
         top, bot = [], []

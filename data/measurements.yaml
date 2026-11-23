@@ -330,120 +330,118 @@ inputs:
     title: Rear axle, laden ute towing the loaded trailer
     how: "Line CK03. Two people, both bikes, tools, full fuel, one spare, then the loaded trailer coupled. Weigh the ute's rear axle with the trailer's wheels off the plate."
     unit: kg
-    estimate: {ref: ute_rear_towing, dp: 0, src: "Ute model case UC3 with growth (UTE-03): the bikes aboard, the 180 L tank, the trailer charging and the trailer's heaviest towball with growth (decision H17)"}
+    estimate: {ref: ute_rear_towing, dp: 0, src: "Ute model case UC3 with growth (UTE-03): the bikes aboard, the trailer charging and the trailer's heaviest towball with growth, on the Ranger Super Duty"}
     measured: {v: null, date: null}
     stage: trailer built
-    affects: [UTE-03 check, kit choice, ball load]
+    affects: [UTE-03 check, ball load]
     thresholds:
-      - {at: 2800, rule: "Over 2,800 kg, the Elite's plate: take mass off the box, tray or ball before towing. If cut CUT7 put the Platinum on, the limit is its 2,550 kg", src: "Decision H18: the Elite plated at twice the ROH wheel's 1,400 kg"}
-    range: {min: 0, max: 2800, src: "Decision H18, the Elite's 2,800 kg plate (2,550 kg on the Platinum, cut CUT7)"}
+      - {at: 2800, rule: "Over 2,800 kg, Ford's rear axle rating: take mass off the box or the ball before towing", src: "Ford BEMM p. 33, the Super Duty's rear gross axle weight rating"}
+    range: {min: 0, max: 2800, src: "Ford BEMM p. 33, 2,800 kg"}
   - id: VEH-21
     group: Car build
     part: car
     title: Front axle, laden ute with the bikes and no trailer
     how: Line CK03, the ute alone, loaded as VEH-20.
     unit: kg
-    estimate: {ref: ute_front_bikes, dp: 0, src: "Ute model case UC2 with growth (UTE-02), with the 180 L tank and the trailer charging"}
+    estimate: {ref: ute_front_bikes, dp: 0, src: "Ute model case UC2 with growth (UTE-02), on the Ranger Super Duty"}
     measured: {v: null, date: null}
     stage: weigh
     affects: [UTE-02 check]
     thresholds:
-      - {at: 1650, rule: "Over 1,650 kg: move mass rearward off the front", src: "Lovells TOYKIT080-GVM front axle rating"}
-    range: {min: 0, max: 1650, src: "Lovells sheet, Oct 2026"}
+      - {at: 1900, rule: "Over 1,900 kg: move mass rearward off the front", src: "Ford BEMM p. 33, the front gross axle weight rating"}
+    range: {min: 0, max: 1900, src: "Ford BEMM p. 33, 1,900 kg"}
   - id: VEH-22
     group: Car build
     part: car
-    title: Front axle share of the ute's mass, towing
-    how: From VEH-20's weighing, front axle divided by the ute's total.
-    unit: "%"
-    estimate: {ref: ute_front_share_towing, dp: 1, src: "Ute model case UC3 with growth (UTE-07): the front axle's share with the bikes aboard, the 180 L tank, the trailer charging and the trailer's heaviest towball with growth (decision H17)"}
+    title: Centre of gravity of the box and its cargo along the ute, bikes aboard (Ford's window)
+    how: "Weigh the bare truck's axles at stage S1 and the ute alone loaded as VEH-21. The box and its cargo weigh the difference less the two people, and their centre of gravity is 3,270 mm times the rear axle's gain, less the people's 70 kg share there, over that mass, behind the front axle."
+    unit: mm
+    estimate: {ref: ute_added_cog_x, dp: 0, src: "Ute model case UC2 with growth (UTE-07): the box, the bikes, the tools and the accessories, without the cab's occupants"}
     measured: {v: null, date: null}
-    stage: trailer built
+    stage: weigh
     affects: [UTE-07 check]
     thresholds:
-      - {at: 20, rule: "Under 20 %: the steering and braking share is too small. Cut the ball load", src: "Toyota BBGJ1007 section 1-2"}
-    range: {min: 20, max: 100, src: "Toyota BBGJ1007 section 1-2"}
+      - {at: 3270, rule: "Behind 3,270 mm: move the tools or the anchors' bag forward. Ford's window at the 966 kg the box and its cargo add", src: "Ford BEMM p. 32, interpolated between its 800 kg and GVM rows (est.)"}
+    range: {min: 1965, max: 3270, src: "Ford BEMM p. 32: 1,965 mm at least, and 3,270 mm at 966 kg of added mass (est. interpolation)"}
   - id: VEH-23
     group: Car build
     part: car
     title: Laden ute mass towing, including the ball load (GVM check)
     how: From VEH-20's weighing, the ute's two axles added.
     unit: kg
-    estimate: {ref: ute_gvm_towing, dp: 0, src: "Ute model case UC3 with growth (UTE-01): the bikes aboard, the 180 L tank, the trailer charging and the trailer's heaviest towball with growth (decision H17)"}
+    estimate: {ref: ute_gvm_towing, dp: 0, src: "Ute model case UC3 with growth (UTE-01): the bikes aboard, the trailer charging and the trailer's heaviest towball with growth"}
     measured: {v: null, date: null}
     stage: trailer built
     affects: [UTE-01 check]
     thresholds:
-      - {at: 4450, rule: "Over 4,450 kg, the Elite's plated GVM: unload before driving. 4,200 kg if cut CUT7 put the Platinum on", src: "Decision H18: the Elite plated at 1,650 + 2,800 kg"}
-    range: {min: 0, max: 4450, src: "Decision H18, the Elite plated at 4,450 kg (4,200 kg on the Platinum, cut CUT7)"}
+      - {at: 4500, rule: "Over 4,500 kg, Ford's GVM: unload before driving", src: "Ford BEMM p. 33"}
+    range: {min: 0, max: 4500, src: "Ford BEMM p. 33, the Super Duty's 4,500 kg GVM"}
   - id: VEH-24
     group: Car build
     part: car
     title: Combination mass, laden ute plus loaded trailer (GCM check)
     how: Line CK03. The ute's axles and the trailer's axles weighed coupled, added.
     unit: kg
-    estimate: {ref: combination, dp: 0, src: "Ute model case UC2 with growth plus the trailer fully loaded with growth (case TC2, MAS-10). The plan's limit sum is GCM-01's, the ute plus the 3,500 kg plate (decision H20)"}
+    estimate: {ref: combination, dp: 0, src: "Ute model case UC2 with growth plus the trailer fully loaded with growth (case TC2, MAS-10). The plan's limit sum is GCM-01's, the ute plus the plate (decision H20)"}
     measured: {v: null, date: null}
     stage: trailer built
-    affects: [GV06, decision H2 water limit]
+    affects: [GCM-01 check]
     thresholds:
-      - {at: 6900, rule: "If the GCM revision was refused: over 6,900 kg, drain water (about 1 kg a litre) until under. The trailer is then plated and loaded as CT-003's operating limits give (decision H20)", src: "Decisions H2, H13 and H20, Toyota's 6,900 kg GCM"}
-      - {at: 7400, rule: "Over 7,400 kg: unload before driving", src: "Lovells GCM revision (GV06)"}
-    range: {min: 0, max: 7400, src: "Lovells sheet, Oct 2026 (6,900 kg without GV06)"}
-  # ================================================================ heights (stages S1, S4 and S5)
+      - {at: 8000, rule: "Over 8,000 kg: unload before driving", src: "Ford BEMM p. 33, the Super Duty's GCM"}
+    range: {min: 0, max: 8000, src: "Ford BEMM p. 33, 8,000 kg, with no revision and no fallback"}
+  # ================================================================ heights (the bought truck)
   - id: VEH-25
     group: Car build
     part: car
-    title: Rear frame-rail top above the ground at the rear axle, unladen, after the GVM kit
+    title: Rear frame-rail top above the ground at the rear axle, at kerb, box off
     how: "Level floor, correct tyre pressures, nobody aboard, box off. Measure each rail top straight above the rear axle and average."
     unit: mm
-    estimate: {v: 774, src: "Ute model parameter frame_top_z (UTE-GARAGE.md)"}
+    estimate: {v: 850, src: "Ford BEMM p. 128: 850 mm in the table's other column (est.: kerb), 740 mm at GVM with the rear axle at its rating"}
     measured: {v: null, date: null}
     stage: build
-    affects: [box floor height 834 mm, box subframe, coupling height]
+    affects: [box floor height 851 mm laden at GVM, box mounts, coupling height]
     thresholds:
-      - {rule: "The box subframe packing follows the measured value so the floor stays at 834 mm. Outside the range, re-check the floor and tub heights", src: "Report 17 section 6.4"}
-    range: {min: 750, max: 800, src: "Report 23 estimate (est.), the model value plus or minus about 25 mm"}
+      - {rule: "The mounts' height follows the measured value so the floor stays 111 mm over the rail top. Outside the range, re-check the floor and tub heights", src: "UTE-GARAGE.md section 4"}
+    range: {min: 825, max: 875, src: "Ford's figure plus or minus about 25 mm (est.)"}
   - id: VEH-26
     group: Car build
     part: car
-    title: Rear bump travel, axle to bump stop, after the GVM kit
-    how: Unladen, measure from the axle's bump stop pad to the bump stop on each side and take the larger.
+    title: Rear bump travel from GVM, axle to bump stop
+    how: Unladen, measure from the axle's bump stop pad to the bump stop on each side, take the smaller, and take off the 110 mm the frame falls from kerb to GVM (Ford's 850 and 740 mm).
     unit: mm
-    estimate: {v: 110, src: "Report 17: Lovells kit, estimated"}
+    estimate: {v: 74, src: "Ford's wheelhouse envelope (BEMM p. 122): the guard 195 mm over the tyre's top, taken at kerb, less its 30 mm clearance, carried to GVM (est.)"}
     measured: {v: null, date: null}
     stage: build
     affects: [wheel tub height, box floor]
     thresholds:
-      - {at: 123, rule: "Over 123 mm the tubs stand more than 100 mm above the floor and the lower floor no longer works", src: "Ute model: tubs 86.5 mm at 110 mm of travel. Report 17 section 6.4 limit of 100 mm (calculated)"}
-    range: {min: 0, max: 123, src: "Ute model and report 17 (calculated)"}
+      - {at: 104, rule: "Over 104 mm the tubs stand more than 100 mm above the floor and the lower floor no longer works", src: "Ute model: tubs 70 mm at 74 mm of travel. Report 17 section 6.4 limit of 100 mm (calculated)"}
+    range: {min: 0, max: 104, src: "Ute model and report 17 (calculated)"}
   - id: VEH-27
     group: Car build
     part: car
-    title: Ride height change from the GVM kit, wheel centre to guard, unladen, largest corner
-    how: "Measure all four corners before the kit (stage S0 or S1) and after it (stage S4), same tyres and pressures."
+    title: Rear frame-rail top above the ground at the rear axle, laden and towing
+    how: "Line CK03, loaded as VEH-20 with the trailer coupled. Measure each rail top straight above the rear axle and average."
     unit: mm
-    estimate: {v: 50, src: "Assumed (est.). Lovells publishes no lift figure for the 79 kit"}
+    estimate: {v: 761, src: "Between Ford's 850 mm at kerb and 740 mm at the 2,800 kg rear axle rating (BEMM p. 128), in a straight line at UC3's 2,430 kg (est.). The model takes Ford's 740 mm, the lowest the frame sits laden"}
     measured: {v: null, date: null}
-    stage: build
-    affects: [GV03, coupling height, steering geometry]
+    stage: trailer built
+    affects: [coupling height, box floor height]
     thresholds:
-      - {at: 50, rule: "Over 50 mm needs certification (item 13). Ask the LC5 certifier to include it in GV03", src: "VSI 06 Rev 4 item 13"}
-    range: {min: 0, max: 50, src: "VSI 06 Rev 4 item 13"}
+      - {rule: "Below 740 mm the rear axle is over its rating or the springs have sagged. Check VEH-20", src: "Ford BEMM p. 128"}
+    range: {min: 740, max: 800, src: "Ford's 740 mm at the rear axle's rating to about 40 mm over the estimate (est.)"}
   - id: VEH-28
     group: Car build
     part: car
-    title: Rear track on the Elite's housing, laden, tyre centre to tyre centre
-    how: "Stage S4, the Elite fitted and the ute loaded to the trip mass (or 650 kg of ballast over the rear axle) on level ground. Mark the middle of each rear tyre's tread on the ground in front of and behind the tyre, measure across between the marks and average the two. Before the box's tubs and flares are finished."
+    title: Rear track, laden, tyre centre to tyre centre
+    how: "The ute loaded to the trip mass (or 650 kg of ballast over the rear axle) on level ground. Mark the middle of each rear tyre's tread on the ground in front of and behind the tyre, measure across between the marks and average the two. Before the box's tubs and flares are finished."
     unit: mm
-    estimate: {v: 1555, src: "Report 26: Lovells' housing brings the rear in line with the front, Toyota's 1,555 mm on ET 0 wheels (estimate). Toyota's factory rear track is 1,460 mm"}
+    estimate: {v: 1710, src: "Ford BEMM p. 25: the Super Duty's 1,710 mm track, front and rear"}
     measured: {v: null, date: null}
     stage: build
     affects: [wheel_y, wheel tubs, rear tub flares, UGW-02, UGW-03, UTE-09, UTE-11]
     thresholds:
-      - {rule: "Build the tubs and flares to the measured track: wheel_y in data/assemblies/ute-garage.yaml is half of it, and UGW-02 and UGW-03 run again before the floor is finished", src: "Toyota BBGJ1007 p. 28, UGW-02, UGW-03"}
-      - {at: 1577, rule: "Above 1,577 mm the flares, with Toyota's 30 mm outside the tyre, pass UTE-09's 1,910 mm: a wheel with more positive offset, or a higher floor (report 26 fix B)", src: "UTE-09, decision H19"}
-    range: {min: 1460, max: 1577, src: "Max: the flares stay inside UTE-09's 1,910 mm with 30 mm outside the tyre (942.5 mm inner face at 1,555 mm, 11 mm more each side at 1,577 mm). Min: Toyota's factory 1,460 mm rear track (BBGJ1007). Inside the range the tubs and flares are built to the measured track"}
+      - {rule: "Build the tubs and flares to the measured track: wheel_y in data/assemblies/ute-garage.yaml is half of it, and UGW-02 and UGW-03 run again before the floor is finished", src: "Ford BEMM p. 122, UGW-02, UGW-03"}
+    range: {min: 1690, max: 1730, src: "Ford's 1,710 mm plus or minus 20 mm (est.). Inside the range the tubs and flares are built to the measured track"}
   # ================================================================ wheel and supplier answers (reports 06 and 16)
   - id: WHL-01
     group: Wheel and suppliers

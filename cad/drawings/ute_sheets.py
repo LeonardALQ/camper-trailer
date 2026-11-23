@@ -2,7 +2,7 @@
 (cad/ute_garage.py, data/assemblies/ute-garage.yaml). Every sheet is DRAFT. Leonard builds the box to its own checks, with no engineer's review (H25).
 
 CT-701: the ute with the box, general arrangement: kerb-side elevation, plan, rear view, mass by case and the checks.
-CT-702: box frame and panels: kerb-side frame elevation, subframe plan with the deck mounts, section at the rear axle.
+CT-702: box frame and panels: kerb-side frame elevation, subframe plan with the mounts on Ford's pads, section at the rear axle.
 CT-703: doors and security: rear view, kerb door, plan section through the barn doors, the security layers.
 CT-704: restraint layout: plan with the roof off, section at the rear L-track row, strap loads.
 
@@ -613,7 +613,7 @@ def ct704(prj, model, bom, checks, reg, dwg):
     S.notes(sh, 22, 128, [
         "AS THE TRAILER'S GARAGE (DESIGN.md): CONDOR SC-2000 CHOCK ON EACH BIKE'S CENTRELINE AT THE FRONT WALL, TWO FLUSH L-TRACK ROWS, "
         f"35 mm SPANSET STRAPS OF LC {lc:.0f} kg, A CANYON DANCER HARNESS ON THE STREET TRIPLE AND A REAR-WHEEL STRAP ON EACH BIKE.",
-        "EACH TRACK ROW (PLAIN KINEDYNE FE750) SITS ON A 5 mm 5052 PACKER ON A GALVANISED RHS 65x35x4.0 CROSSMEMBER AT TOYOTA'S FIRST AND LAST DECK MOUNTS, SO THE ANCHOR LOAD REACHES THE FRAME THROUGH STEEL. "
+        "EACH TRACK ROW (PLAIN KINEDYNE FE750) SITS ON A 5 mm 5052 PACKER ON A GALVANISED RHS 65x35x4.0 CROSSMEMBER, THE REAR ONE ON FORD'S REARMOST PADS AND THE FRONT ONE ON STEEL STUBS TO FORD'S FIRST PADS, SO THE ANCHOR LOAD REACHES THE FRAME THROUGH STEEL. "
         f"M6 A4 BOLTS WITH CRUSH TUBES AT 150 PITCH OR LESS. EACH ANCHOR WITHSTANDS ITS STRAP'S BREAKING LOAD, {an['limit'][3:].upper()} (UGR-02, UGR-03).",
         f"THE TUAREG LOADS FIRST TO THE ROAD SIDE AND IS STRAPPED FROM THE EMPTY STREET TRIPLE BAY. THE STREET TRIPLE'S KERB-SIDE FRONT STRAP IS REACHED THROUGH THE KERB DOOR.",
         "THE WINCH CLIPS ONTO THE PLATE IN FRONT OF THE BIKE BEING LOADED, 650 UP, ABOVE THE 500 mm IGNITION-FREE ZONE.",

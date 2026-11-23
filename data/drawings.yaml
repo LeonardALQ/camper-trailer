@@ -485,7 +485,7 @@ drawings:
   - number: CT-701
     title: Ute with the bike garage, general arrangement
     subtitle: Kerb-side elevations travelling and loading, plan, rear view, mass by case and the ute checks
-    project: LandCruiser 79 bike garage (UTE-GARAGE.md)
+    project: Ranger Super Duty bike garage (UTE-GARAGE.md)
     sheet: 22
     size: A3
     scale: 50
@@ -508,10 +508,11 @@ drawings:
       - {rev: N, date: 2026-11-22, description: "Notice: the ute's masses with the 316.7 kg towball (I2-22)", drawn: Kiro, checked: "", approved: ""}
       - {rev: O, date: 2026-11-22, description: "Notice: TW06 with its SB120 plug, the ute 0.1 kg heavier (I2-25)", drawn: Kiro, checked: "", approved: ""}
       - {rev: P, date: 2026-11-22, description: "Notice: towball 316 kg, the ute's GVM 3,994.1 kg, rear axle 2,649.0 kg", drawn: Kiro, checked: "", approved: ""}
+      - {rev: Q, date: 2026-11-23, description: "Notice: the Ranger Super Duty on Ford's ratings, the box on Ford's pads", drawn: Kiro, checked: "", approved: ""}
   - number: CT-702
     title: Ute garage box frame and panels
     subtitle: Kerb-side frame elevation, subframe plan on Toyota's deck mounts, section at the rear axle, member schedule
-    project: LandCruiser 79 bike garage (UTE-GARAGE.md)
+    project: Ranger Super Duty bike garage (UTE-GARAGE.md)
     sheet: 23
     size: A3
     scale: 20
@@ -526,10 +527,11 @@ drawings:
       - {rev: F, date: 2026-11-21, description: "Notice: box body 190.2 kg with the roof's rivets (BX-F11)", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-22, description: "Memo: the latest three revisions listed, clear of the section", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-22, description: "Notice: owner-built, no engineer's review, weld note (H25)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: I, date: 2026-11-23, description: "Notice: Ford's four pad pairs, flexible at the first, steel stubs, detail A", drawn: Kiro, checked: "", approved: ""}
   - number: CT-703
     title: Ute garage doors and security
     subtitle: Rear view, kerb-side door, plan section through the barn doors, security layers
-    project: LandCruiser 79 bike garage (UTE-GARAGE.md)
+    project: Ranger Super Duty bike garage (UTE-GARAGE.md)
     sheet: 24
     size: A3
     scale: 20
@@ -542,10 +544,11 @@ drawings:
       - {rev: D, date: 2026-11-21, description: "Notice: rear tub flares for the Elite's 1555 rear track (H19)", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-22, description: "Memo: the kerb leaf's note and the side labels clear of the lines", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-22, description: "Notice: owner-built, no engineer's review (H25)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: G, date: 2026-11-23, description: "Notice: the box on the Ranger Super Duty, flares on Ford's 1710 track", drawn: Kiro, checked: "", approved: ""}
   - number: CT-704
     title: Ute garage restraint layout
     subtitle: Plan with the roof off, section at the rear L-track row, strap loads and anchors
-    project: LandCruiser 79 bike garage (UTE-GARAGE.md)
+    project: Ranger Super Duty bike garage (UTE-GARAGE.md)
     sheet: 25
     size: A3
     scale: 20
@@ -558,4 +561,5 @@ drawings:
       - {rev: D, date: 2026-11-21, description: "Notice: tubs and flares for the Elite's 1555 rear track (H19), road chest 270 wide", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-21, description: "Notice: the bikes' gaps to the anchors' bag at its packed size (UGC-02, F5-05)", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-22, description: "Notice: the anchors' bag 1,760 mm long, the anchors staggered in it (F6-03)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: G, date: 2026-11-23, description: "Notice: rear track row over Ford's rearmost pads, tool chests 185 wide", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-22, description: "Notice: the bikes' outlines from their models, no engineer (H25, H27)", drawn: Kiro, checked: "", approved: ""}

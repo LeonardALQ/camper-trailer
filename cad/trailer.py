@@ -1364,7 +1364,7 @@ def measurement_refs(tr: Trailer, ev: dict) -> dict:
         cog_z_TC1=cases["TC1"]["nominal"]["cog"][2],
         # the car build's and the bike box's design values on the measurement sheet, from the ute's model (F4-06)
         ute_rear_towing=ute["UTE-03"]["measured"], ute_front_bikes=ute["UTE-02"]["measured"],
-        ute_front_share_towing=ute["UTE-07"]["measured"], ute_gvm_towing=ute["UTE-01"]["measured"],
+        ute_added_cog_x=ute["UTE-07"]["measured"], ute_gvm_towing=ute["UTE-01"]["measured"],
         combination=tr.tv["ute_kg_growth"] + cases["TC2"]["growth"]["mass_kg"],
         box_kg=tr.tv["box_kg"],
     )
