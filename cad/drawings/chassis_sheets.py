@@ -266,7 +266,7 @@ FIT_ITEMS = [("1", "DB-03", "Cruisemaster DO45 Plus, under-mounted, 4 x M14 8.8 
              ("6", "DB-05", "ARK XO750 jockey wheel, 750 kg, swung up in travel"),
              ("7", "DB-04", "Stone guard on the cross brace and member tops, on rubber"),
              ("8", "DB-BR", "Cross brace RHS 75 x 50 x 3 at mid-depth"),
-             ("9", "CH-P03", "Root gusset 10 mm, 160 mm ground radius (FAT 90)"),
+             ("9", "CH-P03", "Root gusset 10 mm, 160 radius ground, toe 270 ahead of the body front"),
              ("10", "CH-P04", "Front recovery lug 20 mm, 22 mm hole, 4.75 t shackle"),
              ("11", "DB-07", "Breakaway kit, switch near the coupling"),
              ("12", "DB-KA", "Drawbar members RHS 150 x 50 x 6 C450L0")]
@@ -385,7 +385,8 @@ def ct102(prj, model, bom, checks, reg, dwg):
             title="LOCAL CHECKS (CHASSIS.md)")
     S.notes(sh, 22, 64, [
         "DRAWBAR MEMBERS RHS 150x50x6 C450L0 FROM THE APEX (X 250, Y +/-60) TO THE RAIL CENTRES AT THE BODY FRONT, THEN 1000 UNDER EACH RAIL. CONTINUOUS 5 mm FILLETS ON BOTH EDGES TO THE RAIL UNDERSIDE, SNIPED TAPER END WITH THE TOE GROUND (CT-103 DETAIL D).",
-        "NO WELD ON THE MEMBERS' TOP OR BOTTOM FACES WITHIN 300 OF THE BODY FRONT EXCEPT THE ROOT GUSSET. THE CROSS BRACE SITS AT MID-DEPTH.",
+        ("NO WELD ON THE MEMBERS' TOP OR BOTTOM FACES WITHIN 300 OF THE BODY FRONT EXCEPT THE ROOT GUSSET (9), 140 HIGH AT ITS HEEL ON THE RAIL'S END "
+         "OVER THE MITRE, ITS 160 RADIUS GROUND SMOOTH WHERE IT MEETS THE MEMBER'S TOP 270 AHEAD OF THE BODY FRONT (FAT-07). THE CROSS BRACE SITS AT MID-DEPTH."),
         ("VSB1 9.1 AT THE {plate:.0f} kg PLATE: {along:.1f} kN ALONG, {across:.1f} kN ACROSS AND {up:.1f} kN UP AND DOWN AT THE COUPLING. VSB1 9.2.2: "
          "{chain:.1f} kN ALONG AND {chain_up:.1f} kN VERTICAL AT EACH CHAIN LUG. EVIDENCE BY TEST OR APPROVED CALCULATION, FOR THE ENGINEER.").format(**_forces()),
         "NEVER USE THE COUPLING OR THE TOW PIN FOR RECOVERY. USE THE RECOVERY LUGS (10) AND THE REAR TONGUES ONLY.",
