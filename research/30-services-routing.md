@@ -110,8 +110,9 @@ they are threaded through (`inside`).
   heights, and the tank senders N-08 and N-09 run forward low beside the rail.
   SVC-01 also tests every chassis fitting with no box of its own at each of its positions (cad/chassis.py
   `fitting_boxes`): the drawbar root gussets, the recovery lugs and tongues, the plates, the D-rings, and each corner
-  steady over the box its leg sweeps from folded to standing. The drawbar's lamp and brake looms pass outboard of the
-  root gussets, clipped to them. The kerb front lamp loom K-07 comes down outboard of K-10 and crosses the A-frame
+  steady over the box its leg sweeps from folded to standing. The drawbar's lamp and brake looms and the ute feed run
+  along the A-frame members' outer faces, clipped to them, under the root gussets that stand on the members' top
+  faces, and leave them for the rails' outer line in the last 260 mm before the body front. The kerb front lamp loom K-07 comes down outboard of K-10 and crosses the A-frame
   lying on the angle SP-FD, hung 15 mm under the drawbar members' rear ends. The front bay's cables to the kerb corner
   and the front fans (C9B, E-07, B-04, B-05) cross the rails through grommeted holes in both webs, 32 to 48 mm under
   the rails' tops, C9B and B-05 under the XT Air box and E-07 and B-04 behind it, where they used to dip to 400 to
