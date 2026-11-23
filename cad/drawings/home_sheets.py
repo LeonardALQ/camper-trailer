@@ -4,7 +4,7 @@ CT-002: mass and centre of gravity: every load case with and without growth, the
         centre of gravity in elevation and across the trailer, the tare by group and by maturity, and the least
         certain lines.
 CT-003: compliance: the trailer's VSB1 items and the standards on one page with the design's figure for each, the
-        operating limits (H13's water in travel and its fallback without the GCM revision, the towball range of H17),
+        operating limits (H13's water in travel, the towball range of H17),
         the vehicle plate and what is not designed yet.
 
 The floor plan CT-010 is drawn from the 3D model's plan cut in cad/drawings/layout_sheets.py (decision H28).
@@ -285,25 +285,30 @@ def ct003(prj, model, bom, checks, reg, dwg):
     uc = {c["id"]: c for c in C["ute"]["checks"]}
     rows = [
         ["ATM", "Builder's rating from the chassis, axles, tyres and stability (VSB1 p. 9). Plate H2", f"{rep['caps']['plated']:,.0f} kg plate. Heaviest case with growth {mv('MAS-01')}", st("MAS-01")],
-        ["Design margin", "Every case with growth at most 3,400 kg (H2, MAS-10)", f"{mv('MAS-10')} (TC2)", st("MAS-10")],
+        ["Design margin", f"Every case with growth at most {chk['MAS-10']['measured'] + chk['MAS-10']['margin']:,.0f} kg (H2, MAS-10)", f"{mv('MAS-10')} (TC2)", st("MAS-10")],
         ["GTM, NSW cap", "Lowest of the tyre, coupling, chain and brake ratings (report 02 section 2.1)", f"Cap {rep['caps']['gtm']:,.0f} kg. Axle group with growth {mv('MAS-07')}", st("MAS-07")],
-        ["Axle kit", "Axles carry 120 % of their share where they do not share load (VSB1)", f"Kit GTM {rep['supplier']['kit_gtm']:,.0f} kg against {mv('MAS-02')}", st("MAS-02")],
+        ["Axle kit", "Close-coupled axles share load, or carry 120 % of their load at ATM (VSB1 axles and suspension)",
+         f"XT Air, load-sharing tandem. Kit GTM {rep['supplier']['kit_gtm']:,.0f} kg against {mv('MAS-02')}, {rep['supplier']['need_kg']:,.0f} kg at the plate", st("MAS-02")],
         ["Tyres", "LT265/75R16 123/120 E, 1,550 kg each, with VSB1's 120 % on the heavier side", f"{mv('MAS-06')} on the heavier side", st("MAS-06")],
         ["Wheels", "ROH Trak 2 rating (WHL-01), with the same 120 % rule", f"{mv('MAS-09')} on the heavier side", st("MAS-09")],
         ["Brakes", "Over 2,000 kg GTM: brakes on every wheel, breakaway held 15 min (VSB1 8.2)", "12 in electric drums on four wheels, Bosch TSC, breakaway kit DB-07", ("ALL WHEELS", "#000")],
-        ["Coupling", "AS 4177.3 50 mm ball, or an off-road coupling with a type approval (VSB1 9.3)", "Cruisemaster DO35 V3Plus, ADR rated 3,500 kg", ("RATED 3,500 kg", "#000")],
-        ["Safety chains", "Two above 2,500 kg ATM to AS 4177.4, 4177-35 (VSB1 9.2.1)", "Two chains DB-06. Lugs at 34.3 kN and 17.2 kN (VSB1 9.2.2)", st("LOC-02")],
-        ["Drawbar", "9.81 x ATM along and 0.5 x 9.81 x ATM down (VSB1 9.1)", f"Peak {chk['CHS-06']['measured']:.0f} MPa at 17.2 kN up, {chk['CHS-06B']['measured']:.0f} MPa down", st("CHS-06")],
+        ["Coupling", "Over 3.5 t ATM: D and V ratings to ADR 62/02, positive locking and an automatic retainer (VSB1 9.3)",
+         f"Cruisemaster DO45 Plus, ADR rated {rep['registration']['ratings']['coupling_kg']['v']:,.0f} kg, D 24.5 kN, V 14.5 kN. Plate and bolts at {mv('LOC-07', '{:.0f}')}", st("LOC-07")],
+        ["Safety chains", "Over 3.5 t ATM two grade T chains to AS 2321, breaking load over the ATM (VSB1 9.2.1, ADR 62/02 14.3.1.3)",
+         f"Two 8 mm grade 80, 8.2 t each (DB-06). Lugs at {9.81 * rep['caps']['plated'] / 1000:.1f} kN and {0.5 * 9.81 * rep['caps']['plated'] / 1000:.1f} kN (VSB1 9.2.2)", st("LOC-01")],
+        ["Drawbar", "1.5 x 9.81 x ATM along and 0.5 x 9.81 x ATM across and up and down (VSB1 9.1)",
+         f"Peak {chk['CHS-06']['measured']:.0f} MPa at {0.5 * 9.81 * rep['caps']['plated'] / 1000:.1f} kN up, chain lugs {chk['CHS-06B']['measured']:.0f} MPa", st("CHS-06")],
         ["Towball height", "Ball 350 to 460 mm loaded, trailer level in it (VSB1 9.3.2)", f"{V['coupling_z']:.0f} mm, plus or minus 20 mm (UTE-01)", st("DIM-03")],
-        ["Towball load", "Every case at least 7.5 % (H2), design at least 8.0 % and 320 kg (H17)", f"{chk['MAS-12']['measured']:.1f} % lowest, {_kg(chk['MAS-13']['measured'])} kg heaviest with growth", st("MAS-12")],
-        ["Running clearance", "At least 100 mm, unladen (VSB1 5.4). Design at least 290 mm (DIM-06)",
+        ["Towball load", f"Every case at least 7.5 % (H2), design at least {rep['solved']['window']['pct_min']:.1f} % and {rep['solved']['window']['ball_max']['kg']:.0f} kg (H17)",
+         f"{chk['MAS-12']['measured']:.1f} % lowest, {_kg(chk['MAS-13']['measured'])} kg heaviest with growth", st("MAS-12")],
+        ["Running clearance", f"At least 100 mm, unladen (VSB1 5.4). Design {chk['DIM-06']['limit'].replace('>=', 'at least')} (DIM-06)",
          f"{mv('DIM-04', '{:.1f}')} at {chk['DIM-04']['line']}, breakover {mv('DIM-07', '{:.1f}')} (DIM-07)", st("DIM-06")],
         ["Width", "Across the body and everything on its sides, at most 2,500 mm, side lamps left out (ADR 43/04 6.2.6.1, VSB1 5.2)", f"{mv('DIM-01')}, design at most 2,490 mm (DIM-05)", st("DIM-05")],
         ["Overhang", "Front load space at least the rear overhang (VSB1 5.1.1)", f"{V['axle_x'] - V['body_x0']:.0f} against {ch['overall_x1'] - V['axle_x']:.0f} mm", st("DIM-02")],
         ["Combination", f"Ute and trailer within Ford's {tv['limits']['gcm_kg']:,.0f} kg GCM (BEMM p. 33)", f"{_kg(gcm['sum'])} kg, the ute with growth plus the plate (H20)", st("GCM-01")],
         ["Ute rear axle", f"Towball keeps the Super Duty's {tv['limits']['rear_axle_kg']:,.0f} kg rear axle with growth (H14)", f"{mv('MAS-03')} at the heaviest ball", st("MAS-03")],
         ["Jack-knife", "Front parts 100 mm outside the bike box's sweep, 50 mm under it (JK-01, JK-02)", f"{chk['JK-01']['measured']:.0f} mm and {chk['JK-02']['measured']:.0f} mm", st("JK-01")],
-        ["Plug", "7 or 12 pin to AS 4177.5 (VSB1 7.2)", "12-pin flat plug, and a grey Anderson SB50 for the 48 V charging feed", ("AS 4177.5", "#000")],
+        ["Plug", "7 or 12 pin to AS 4177.5 up to 3.5 t ATM (VSB1 7.2), kept over it", "12-pin flat plug, and a grey Anderson SB120 for the 48 V charging feed", ("AS 4177.5", "#000")],
         ["Wiring", "Supported every 600 mm, insulated joints, grommets through metal, earth wire (VSB1 7.1)", "Two-wire DC, no chassis return (report 20). Glands on CT-602", ("CT-601, CT-602", "#000")],
         ["230 V", "AS/NZS 3001.2:2022: RCD on the inverter's output, labelled (VSB1 7.3)", "30 mA RCBO on every circuit, board labelled, licensed electrician", ("CT-601", "#000")],
         ["Battery", "Sealed compartment vented outside, BMS, fuse within 1 m sleeved (AS/NZS 3001.2 5.4)", "Sealed 2 mm 5052 box, two 20 mm vents through the floor (G6, G7)", ("CT-602", "#000")],
@@ -336,15 +341,17 @@ def ct003(prj, model, bom, checks, reg, dwg):
     an = td_case["anchors"][0]
     ang, sa, pg = td_case["angles"], an["set_above_mm"], an["plate_gap_mm"]
     lines = [
-        ("WATER IN TRAVEL (H13)", f"AT MOST {V['water_travel_l']:.0f} L OF FRESH AND GREY WATER WHILE TOWING. FILL THE TANKS AT CAMP (420 L NET)."),
+        ("WATER IN TRAVEL (H13)", f"AT MOST {V['water_travel_l']:.0f} L OF FRESH AND GREY WATER WHILE TOWING, THE FRESH TANKS' {V['water_full_l']:.0f} L NET. "
+                                  "FILL THEM AT CAMP THROUGH THE FILTER."),
         ("GCM (GCM-01)", f"FORD'S {lim['gcm_kg']:,.0f} kg. THE UTE WITH GROWTH, {_kg(gcm['ute_kg_growth'])} kg, PLUS THE "
                          f"{gcm['plate']:,.0f} kg PLATE IS {_kg(gcm['sum'])} kg (UTE-06, H20)."),
-        ("ATM AND DESIGN LIMIT", f"PLATE {rep['caps']['plated']:,.0f} kg. EVERY CASE WITH GROWTH AT MOST 3,400 kg (MAS-10)."),
+        ("ATM AND DESIGN LIMIT", f"PLATE {rep['caps']['plated']:,.0f} kg. EVERY CASE WITH GROWTH AT MOST "
+                                 f"{chk['MAS-10']['measured'] + chk['MAS-10']['margin']:,.0f} kg (MAS-10)."),
         ("TOWBALL (H17)", f"AT LEAST {rep['solved']['window']['pct_min']:.1f} % OF THE TRAILER IN EVERY CASE AND AT MOST "
-                          f"{rep['solved']['window']['ball_max']['kg']:.0f} kg WITH GROWTH. THE UTE {lim['towball_rating_kg']:.0f} kg (EST.)."),
+                          f"{rep['solved']['window']['ball_max']['kg']:.0f} kg WITH GROWTH. DO45 450 kg, THE UTE {lim['towball_rating_kg']:.0f} kg (EST.)."),
         ("THE UTE (H14)", f"FORD RANGER SUPER DUTY ON FORD'S RATINGS: {lim['gvm_kg']:,.0f} kg GVM, REAR AXLE {lim['rear_axle_kg']:,.0f} kg "
                           f"({_kg(uc['UTE-03']['measured'])} kg TOWING WITH GROWTH)."),
-        ("COUPLING HEIGHT", f"{V['coupling_z']:.0f} mm LADEN, PLUS OR MINUS 20 mm. SET THE TONGUE'S DROP AT THE FINAL WEIGHING (TW08)."),
+        ("COUPLING HEIGHT", f"{V['coupling_z']:.0f} mm LADEN, PLUS OR MINUS 20 mm. SET THE HITCH'S DROP AT THE FINAL WEIGHING (TW08)."),
         ("GREY WATER", f"EMPTY FOR TRAVEL. A FULL {V['grey_full_l']:.0f} L TANK IS CHECKED IN CASES TC7 AND TC8."),
         ("AWNING (BDY-11, BDY-23)", f"CLOSE THE AWNING IN WIND, LEGS PEGGED: PEG THE LEGS WHENEVER IT IS OUT, AND CLOSE IT BEFORE GUSTS REACH "
                                     f"{aw['close_kmh']:.0f} km/h AND WHENEVER THE TRAILER IS LEFT. SET THE LEGS FOR A {aw['pitch_deg']:.0f} DEGREE FALL."),

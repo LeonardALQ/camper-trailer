@@ -34,6 +34,17 @@ def _chassis():
     return data
 
 
+def _forces() -> dict:
+    """The plate and the load cases' forces in kN (data/chassis/chassis.yaml), for the sheets' notes."""
+    import yaml
+    from ..build import ROOT
+    lcs = {l["id"]: l for l in yaml.safe_load((ROOT / "data/chassis/chassis.yaml").read_text())["load_cases"]}
+    plate = yaml.safe_load((ROOT / "data/load_cases.yaml").read_text())["registration"]["plated_atm_kg"]["v"]
+    top = lambda lc, i: max(abs(f[i]) for f in lcs[lc]["forces_n"]) / 1000  # noqa: E731
+    return dict(plate=plate, along=top("LC6", 0), across=top("LC6", 1), up=top("LC6", 2), chain=top("LC6b", 0), chain_up=top("LC6b", 2),
+                pull=lcs["LC8a"]["force_n"] / 1000, ult=lcs["LC8a"]["ultimate_n"] / 1000, pad=lcs["LC8b"]["pad_n"] / 1000)
+
+
 def _layout(prj, model):
     rep = json.loads((BUILD / "trailer" / "trailer.json").read_text())
     tr = Trailer(prj)
@@ -232,10 +243,10 @@ def ct101(prj, model, bom, checks, reg, dwg):
     ], width_chars=96, size=1.7, title="MASS AND CUT LIST")
     S.notes(sh, 22, 46, [
         "DATUM DIM-01: X FROM THE BALL CENTRE, POSITIVE REARWARD. Y FROM THE CENTRELINE, POSITIVE TO THE ROAD SIDE. Z UP FROM THE GROUND AT DESIGN RIDE HEIGHT.",
-        "RAILS RHS 150x50x3 C450L0 WITH A CONTINUOUS RHS 127x51x3.5 C350L0 RAISER (ONE COMPOSITE SECTION), 20.5 mm FLOOR BEARER STRIP. NO WELD ACROSS THE WIDTH OF A RAIL (TB 070).",
+        "RAILS RHS 150x50x4 C450L0 WITH A CONTINUOUS RHS 127x51x3.5 C350L0 RAISER (ONE COMPOSITE SECTION), 20.5 mm FLOOR BEARER STRIP. NO WELD ACROSS THE WIDTH OF A RAIL (TB 070).",
         (f"REVISION {dwg['revisions'][-1]['rev']}: THE HOME TRAILER. AXLE GROUP CENTRE AT X {lay.V['axle_x']:,.0f} (H17). THE XT REAR SHOCK "
          "CROSSMEMBER IS RHS 150x50x4, A GREY-BAY FLOOR CROSSMEMBER CARRIES THE GREY TANK, NO PLAN BRACES BEHIND THE XT FRONT HINGE, "
-         "EVERY CASE AT THE 3500 kg PLATE. LOAD PATHS ON CT-104."),
+         f"EVERY CASE AT THE {_forces()['plate']:.0f} kg PLATE. LOAD PATHS ON CT-104."),
         "XT CROSSMEMBERS AND BODY END CROSSMEMBERS FULL RAIL HEIGHT, NO HOLES. OTHER CROSSMEMBERS AND ALL OUTRIGGERS AT RAISER HEIGHT, TOPS FLUSH WITH THE RAISER.",
         "BURR-GRIND THE WELD TOES ON THE RAIL AT EVERY FULL-HEIGHT CROSSMEMBER (FAT-01). HOT-DIP GALVANISE THE WHOLE FRAME AFTER WELDING, VENTED TO report 02 WLD-05.",
         "SEE CHASSIS.md FOR THE LOAD CASES, THE RESULTS AND WHAT THE ENGINEER MUST CHECK.",
@@ -247,10 +258,10 @@ def ct101(prj, model, bom, checks, reg, dwg):
 
 
 # ------------------------------------------------------------------ CT-102
-FIT_ITEMS = [("1", "DB-03", "Cruisemaster DO35 V3Plus, under-mounted, 4 x M12 8.8 at 90 Nm, nyloc nuts"),
+FIT_ITEMS = [("1", "DB-03", "Cruisemaster DO45 Plus, under-mounted, 4 x M14 8.8 at 140 Nm, nyloc nuts"),
              ("2", "CH-P01", "Coupling plate 300 x 220 x 12, both faces flat after galvanising (detail A)"),
              ("3", "CH-P02", "Chain lug 10 mm, 18 mm hole, each side (detail B)"),
-             ("4", "DB-06", "Safety chains AS 4177.4 (4177-35), ARK HLS13 shackles"),
+             ("4", "DB-06", "Safety chains 8 mm grade 80 (T) to AS 2321, never welded, 2 t D shackles"),
              ("5", "CH-P11", "Jockey wheel bracket 8 mm, bolted to the kerb-side member"),
              ("6", "DB-05", "ARK XO750 jockey wheel, 750 kg, swung up in travel"),
              ("7", "DB-04", "Stone guard on the cross brace and member tops, on rubber"),
@@ -334,13 +345,16 @@ def ct102(prj, model, bom, checks, reg, dwg):
     sh.text(cx, 262, "DETAIL A: COUPLING PLATE (2)", 2.3, "middle", bold=True)
     sh.text(cx, 258.5, "SCALE 1:5", 1.9, "middle")
     sh.rect(cx - 150 / k, cy - 110 / k, cx + 150 / k, cy + 110 / k, "medium")
-    for dx in (-45, 45):
-        for dy in (-35, 35):
-            sh.circle(cx + dx / k, cy + dy / k, 6.5 / k, "medium")
+    cp = ch.data["local_checks"]["coupling_plate"]
+    ax, ay = cp["row_pitch"] / 2, cp["col_pitch"] / 2
+    for dx in (-ax, ax):
+        for dy in (-ay, ay):
+            sh.circle(cx + dx / k, cy + dy / k, (cp["bolt_d"] + 1) / 2 / k, "medium")
     S.hdim(sh, cx - 150 / k, cy - 110 / k, cx + 150 / k, cy - 110 / k, cy - 110 / k - 4, "300", size=1.6)
     S.vdim(sh, cx + 150 / k, cy - 110 / k, cx + 150 / k, cy + 110 / k, cx + 150 / k + 4, "220", size=1.6)
-    S.hdim(sh, cx - 45 / k, cy + 35 / k, cx + 45 / k, cy + 35 / k, cy + 35 / k + 5, "90", size=1.6)
-    sh.text(cx, cy - 110 / k - 8.5, "4 HOLES 13 (M12), PATTERN TO SUIT THE DO35: MEASURE ONE", 1.5, "middle")
+    S.hdim(sh, cx - ax / k, cy + ay / k, cx + ax / k, cy + ay / k, cy + ay / k + 5, f"{cp['row_pitch']:.0f}", size=1.6)
+    S.vdim(sh, cx - ax / k, cy - ay / k, cx - ax / k, cy + ay / k, cx - ax / k - 5, f"{cp['col_pitch']:.0f}", size=1.6)
+    sh.text(cx, cy - 110 / k - 8.5, "4 HOLES 15 (M14) AT THE DO45 PLUS'S PATTERN (EST.): MEASURE ONE", 1.5, "middle")
     sh.text(cx, cy - 110 / k - 11, "BEFORE DRILLING. 12 mm GR 350.", 1.5, "middle")
     # ---- detail B: chain lug, 1:5
     cx, cy = 362.0, 226.0
@@ -369,7 +383,8 @@ def ct102(prj, model, bom, checks, reg, dwg):
     S.notes(sh, 22, 64, [
         "DRAWBAR MEMBERS RHS 150x50x5 C450L0 FROM THE APEX (X 250, Y +/-60) TO THE RAIL CENTRES AT THE BODY FRONT, THEN 1000 UNDER EACH RAIL. CONTINUOUS 5 mm FILLETS ON BOTH EDGES TO THE RAIL UNDERSIDE, SNIPED TAPER END WITH THE TOE GROUND (CT-103 DETAIL D).",
         "NO WELD ON THE MEMBERS' TOP OR BOTTOM FACES WITHIN 300 OF THE BODY FRONT EXCEPT THE ROOT GUSSET. THE CROSS BRACE SITS AT MID-DEPTH.",
-        "VSB1 9.1 AT THE 3500 kg PLATE: 51.5 kN ALONG, 17.2 kN ACROSS AND 17.2 kN UP AND DOWN AT THE COUPLING. VSB1 9.2.2: 34.3 kN ALONG AND 17.2 kN VERTICAL AT EACH CHAIN LUG. EVIDENCE BY TEST OR APPROVED CALCULATION, FOR THE ENGINEER.",
+        ("VSB1 9.1 AT THE {plate:.0f} kg PLATE: {along:.1f} kN ALONG, {across:.1f} kN ACROSS AND {up:.1f} kN UP AND DOWN AT THE COUPLING. VSB1 9.2.2: "
+         "{chain:.1f} kN ALONG AND {chain_up:.1f} kN VERTICAL AT EACH CHAIN LUG. EVIDENCE BY TEST OR APPROVED CALCULATION, FOR THE ENGINEER.").format(**_forces()),
         "NEVER USE THE COUPLING OR THE TOW PIN FOR RECOVERY. USE THE RECOVERY LUGS (10) AND THE REAR TONGUES ONLY.",
     ], width_chars=118, size=1.7)
     _draft_stamp(sh, 125, 82)
@@ -408,7 +423,7 @@ def ct103(prj, model, bom, checks, reg, dwg):
     S.vdim(sh, cx - 6, zb + 150 / k, cx - 6, zb + 275 / k, cx - 9, "125", size=1.6)
     S.leader(sh, (cx + 25 / k, zb + (275 + P["strip_t"] / 2) / k), (cx + 9, zb + 61), f"{P['strip_t']:.1f} BEARER STRIP", size=1.5)
     weld_symbol(sh, (cx + 25 / k, zb + 150 / k), (cx + 7, zb + 45), "4", both=True, note="CONTINUOUS")
-    for i, t in enumerate((f"RAIL 150x50x3 C450L0 + RAISER 127x51x3.5 C350L0", f"I {comp['I'] / 1e6:.1f} x 10^6 mm4",
+    for i, t in enumerate((f"RAIL 150x50x4 C450L0 + RAISER 127x51x3.5 C350L0", f"I {comp['I'] / 1e6:.1f} x 10^6 mm4",
                            f"Z {comp['Z_bottom'] / 1e3:.1f} (BOTTOM), {comp['Z_top'] / 1e3:.1f} (TOP) x 10^3 mm3", "VENT EACH END OF EACH BAY")):
         sh.text(cx - 26, zb - 6 - 3 * i, t, 1.5)
     # ---- E: outrigger root, section along the outrigger, 1:10
@@ -462,7 +477,8 @@ def ct103(prj, model, bom, checks, reg, dwg):
     m = cx - 25 + 75 / k
     sh.path([(m - 5, zb - 2), (m - 3, zb - 6), (m + 3, zb - 6), (m + 5, zb - 2)], "medium")
     weld_symbol(sh, (cx - 25 + 125 / k, zb), (cx + 4, zb - 10), "5", both=True, length="100", note="ALONG THE CM")
-    for i, t in enumerate(("PAD 100x100x10 WITH A LOCATING CUP, AGAINST", "THE RAIL'S INNER FACE. NO WELD ON THE RAIL'S", "BOTTOM FACE (FAT-11). 38.6 kN ON ONE PAD.")):
+    for i, t in enumerate(("PAD 100x100x10 WITH A LOCATING CUP, AGAINST", "THE RAIL'S INNER FACE. NO WELD ON THE RAIL'S",
+                           f"BOTTOM FACE (FAT-11). {_forces()['pad']:.1f} kN ON ONE PAD.")):
         sh.text(cx - 32, zb - 18 - 3 * i, t, 1.5)
     # ---- H: rear recovery tongue, plan, 1:10
     k = 10.0
@@ -476,7 +492,8 @@ def ct103(prj, model, bom, checks, reg, dwg):
     plate(sh, cx - 16, yb - 20 / k, cx + 10 + 70 / k, yb)
     sh.circle(cx + 10 + 45 / k, yb - 10 / k, 11 / k, "medium")
     weld_symbol(sh, (cx - 8, yb - 2 / k), (cx - 4, yb - 16), "6", both=True, length="200", note="ALONG ONLY")
-    for i, t in enumerate(("TONGUE 20 mm GR 350, 22 HOLE, 4.75 t BOW", "SHACKLE, THROUGH A SLOT IN THE CROSSMEMBER.", "51.5 kN AT 30 deg SIDEWAYS, 78.5 kN ULTIMATE.")):
+    for i, t in enumerate(("TONGUE 20 mm GR 350, 22 HOLE, 4.75 t BOW", "SHACKLE, THROUGH A SLOT IN THE CROSSMEMBER.",
+                           "{pull:.1f} kN AT 30 deg SIDEWAYS, {ult:.1f} kN ULTIMATE.".format(**_forces()))):
         sh.text(cx - 30, yb - 36 - 3 * i, t, 1.5)
     # ---- J: spare carrier posts, side elevation, 1:20 (right column)
     k = 20.0

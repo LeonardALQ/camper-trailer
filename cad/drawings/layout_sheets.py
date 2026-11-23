@@ -283,7 +283,7 @@ def ct011(prj, model, bom, checks, reg, dwg):
 
 # ------------------------------------------------------------------ CT-012 sections
 SECTIONS = [("A", 2300.0, "day", "THROUGH THE DESK AND THE BED, BED UP"), ("B", 2300.0, "night", "THE SAME, BED DOWN"),
-            ("C", 4500.0, "day", "THROUGH THE PLINTH, THE WASHER AND THE BENCH"), ("D", 5600.0, "day", "THROUGH THE WET ROOM, WELL AND GREY TANK")]
+            ("C", 4400.0, "day", "THROUGH THE PLINTH, THE WASHER AND THE BENCH"), ("D", 5600.0, "day", "THROUGH THE WET ROOM, WELL AND GREY TANK")]
 
 
 def _section(sh, C, lay, x, k, ox, oy, letter, what):

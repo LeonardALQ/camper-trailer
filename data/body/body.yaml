@@ -124,14 +124,15 @@ cradle:
 # Terrain category 2 (open country) at the wall's height, no shielding, flat ground, any direction
 # (M_d = M_s = M_t = 1). Net pressure 0.6 V^2 (Cp,e - Cp,i) Pa, with C_dyn and the K factors at 1.0: the side wall's
 # 8.8 m2 is under Table 5.4's 10 m2, and its 2 m span is far larger than the local pressure zones. Strength is checked at
-# 41 m/s: BDY-19's 40 m/s, raised by H23 to STB-04's highest overturning speed, 40.9 m/s with a box's Cf (F3-08).
+# 42 m/s: BDY-19's 40 m/s, raised by H23 to STB-04's highest overturning speed, 41.9 m/s with a box's Cf at the 4,000 kg
+# plate's masses (40.9 m/s before, F3-08).
 # Strapped down on its tie-downs (STB-05) the trailer stands in region B's 500-year gust, so BDY-06 and BDY-25 also give
 # the walls at that gust (F4-07). The operating rule in TRAILER.md and on CT-003 keeps it out of winds near that speed and
 # out of the cyclonic regions C and D in the cyclone season.
 wind:
   V_s: 39            # m/s, serviceability: region B's 25-year regional wind V_25 (Table 3.1), for the wall's deflection
   Mzcat: 0.91        # Table 4.1, terrain category 2 at 3 m or less
-  V_u: 41            # m/s, ultimate for strength: BDY-19's 40 m/s, raised to STB-04's highest overturning speed (H23)
+  V_u: 42            # m/s, ultimate for strength: BDY-19's 40 m/s, raised to STB-04's highest overturning speed (H23), 41.9 m/s at the 4,000 kg plate's masses
   cpe: 0.7           # Table 5.2(A), windward wall
   cpi: -0.3          # Table 5.1(A), all walls equally permeable: -0.3 or 0.0, the more severe with the windward wall
   region: B

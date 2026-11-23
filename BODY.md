@@ -1,6 +1,6 @@
 # Body: design (planning level)
 
-Status: proposal, revision C of 21 Nov 2026, updated 22 Nov 2026 for the fit-out's supports (H27), BD-11's routed runs (H28) and the floor round its cut-outs (BDY-26). DRAFT, not for construction until the engineer reviews it. This is the body's design basis as report 02 asks: the panels, the load cases with their criteria and sources, the joints, the mounting, the twist sharing, the roof, the openings, the results and what the engineer must check. It starts from research report 12 and changes it only where a check failed or the layout asks for it. The data is `data/body/body.yaml`, the checks `cad/body.py`, the solids `cad/body_model.py`, and the mass lines are in `data/assemblies/trailer.yaml`. Drawings CT-201 (shell), CT-202 (joints), CT-203 (insert map) and CT-301 (body to chassis) show it.
+Status: proposal, revision C of 21 Nov 2026, updated 22 Nov 2026 for the fit-out's supports (H27), BD-11's routed runs (H28) and the floor round its cut-outs (BDY-26), and 23 Nov 2026 for the 4,000 kg plate (H2 as amended): the mounts and the twist at the plate's masses and the walls' strength wind at 42 m/s. DRAFT, not for construction until the engineer reviews it. This is the body's design basis as report 02 asks: the panels, the load cases with their criteria and sources, the joints, the mounting, the twist sharing, the roof, the openings, the results and what the engineer must check. It starts from research report 12 and changes it only where a check failed or the layout asks for it. The data is `data/body/body.yaml`, the checks `cad/body.py`, the solids `cad/body_model.py`, and the mass lines are in `data/assemblies/trailer.yaml`. Drawings CT-201 (shell), CT-202 (joints), CT-203 (insert map) and CT-301 (body to chassis) show it.
 
 ## What changed in revision C, 21 Nov 2026
 
@@ -14,7 +14,7 @@ Revision C is the body of the home trailer, TRAILER.md revision J. Revision B, t
 - A stiffener stands behind the kitchen bench on the road side, and two jamb members stand either side of the entry door on the kerb side. They and the four hardpoints are RHS 110 x 19 x 3.5 6060-T5, made to order, bonded to the inner skin with 13 mm of XPS behind them and stood on rigid PVC blocks clear of the joiners' legs, so no metal crosses the core. They hold the wall to 19.7 mm in region B's 25-year wind (AS/NZS 1170.2, H23), against 20.0 mm (BDY-10), and to 18.9 mm as plates with the openings cut out (BDY-24), stand at least 25 mm clear of every opening, gland, insert strip and each other, or share one routed channel with an H200 fill (FIT-07), and keep the inside surface over them and over the joiners at 10.2 °C or more on the design cold night, at ISO 13788's Rsi of 0.25 m²K/W (BDY-22).
 - The split's outdoor unit stands on two stays to the chassis, so the rear wall's skin carries none of its weight (BDY-21).
 - A moulded GRP tray covers the wet room floor, and vinyl covers only the rest.
-- The mounts are checked at the 3,500 kg plate (H2).
+- The mounts are checked at the 4,000 kg plate (H2 as amended 23 Nov 2026).
 - The body weighs 630.6 kg, 701.8 kg with growth, with both doors and their steps.
 - No check limit changed, and no estimate changed to pass a check.
 
@@ -39,10 +39,10 @@ The cases follow report 11 and CHASSIS.md. Each panel is checked as a one-way sp
 |---|---|---|---|
 | LC1, 1 g | A foot of 100 kg on 100 x 150 mm, the roof with the solar array | Deflection: floor span/200, roof span/150 (reported) | Report 12, the engineer sets the limits |
 | LC2, 3 g | A foot, the floor edge at 160 kg/m², the roof with the array | Skins at half their ultimate and half the wrinkling stress, cores at half their shear strength, bearing at half the core's compressive strength | ISO 12215-5 for the skins, report 12 for the rest |
-| Wind, parked | A side wall, floor to the roof joiner. Terrain category 2 at 3 m, Cp,e 0.7 and Cp,i -0.3. Region B's 25-year 39 m/s gives 0.76 kPa net, and 41 m/s, the highest speed that tips the parked trailer, 1.01 kPa | Skins at half their ultimate, members at yield over 1.5 and the XPS behind them at half its compressive strength, at 1.01 kPa. Deflection span/100 at 0.76 kPa (reported) | AS/NZS 1170.2 Tables 3.1, 4.1, 5.1(A), 5.2(A), H23 |
+| Wind, parked | A side wall, floor to the roof joiner. Terrain category 2 at 3 m, Cp,e 0.7 and Cp,i -0.3. Region B's 25-year 39 m/s gives 0.76 kPa net, and 42 m/s, over the highest speed that tips the parked trailer, 1.06 kPa | Skins at half their ultimate, members at yield over 1.5 and the XPS behind them at half its compressive strength, at 1.06 kPa. Deflection span/100 at 0.76 kPa (reported) | AS/NZS 1170.2 Tables 3.1, 4.1, 5.1(A), 5.2(A), H23 |
 | Wind, 40 m/s | 5.06 kN of uplift on the roof | Half the bond's tension strength over the joiner's width | Report 12, scaled to the roof's 10.6 m² |
 | LC3, LC4 | 0.8 g braking, 0.5 g sideways, on the mounts | Mount bolt shear and tension | Report 11 |
-| LC5a | 13.4 kNm of twist between the axles, travelling | Mounts, skins, joints and the rear wall under the body's share | Report 11, report 12 section 4 |
+| LC5a | 15.1 kNm of twist between the axles at the 4,000 kg plate, travelling | Mounts, skins, joints and the rear wall under the body's share | Report 11, report 12 section 4 |
 | LC5b | A corner steady wound to 875 kg at tare, parked | As LC5a | Report 11 |
 | Inserts | The lift bed's rail screws at 1.5 times the 264 kg bed at night, the awning's roof bolts at 3 g and with the canopy open in a 60 km/h gust, the outdoor unit's cradle at 3 g down, 0.8 g along and 0.5 g sideways | Half the rated load, then a pull test (LR-09) | Report 02 MAT-05 |
 | Cold night | -5 °C outside, 20 °C inside, the dew point held at 6 °C, -1.7 °C on the generators | Inside surface over each wall member, to its ends, at least 4 K above the dew point, at ISO 13788's Rsi of 0.25 m²K/W | Research report 19 section 5, ISO 13788 clause 4.4.1 |
@@ -66,8 +66,8 @@ Under the body's share of LC5a the shear flow in a joiner leg's bond is 0.86 N/m
 The body bolts to the chassis through the EPDM-faced HDPE bearer strip at every station: one bolt into each raiser and one into each outrigger tip, 32 mounts at the 8 stations. The body is not bonded to the steel (report 12 option B).
 
 - Each mount is an M12 8.8 hot-dip galvanised bolt into a 10 mm nut plate, 80 x 44 mm, welded inside the raiser or the outrigger tip before galvanising (CH-P14). On the floor it bears on a bonded 100 x 100 x 3 mm aluminium spreader over a high-density PVC insert and a GRP crush tube.
-- The worst bolt carries 6.07 kN of tension under LC5a, with TC2's 1,638 kg of body and contents scaled by 1.129 to the plate, 1,848 kg. The bolt works at 0.26 of a third of its ultimate tension, the plate at 0.14 in bending, its welds at 0.09 and the floor's pull-through at 0.11 (BDY-16). Shear is 0.45 kN per bolt in LC3 braking.
-- Report 12's Lindapter Hollo-Bolt HB10 would work at 0.72 of its 8.5 kN safe load, so the nut plate is the design.
+- The worst bolt carries 6.75 kN of tension under LC5a, with TC2's 1,656 kg of body and contents scaled by 1.223 to the 4,000 kg plate, 2,026 kg. The bolt works at 0.29 of a third of its ultimate tension, the plate at 0.16 in bending, its welds at 0.10 and the floor's pull-through at 0.12 (BDY-16). Shear is 0.50 kN per bolt in LC3 braking.
+- Report 12's Lindapter Hollo-Bolt HB10 would work at 0.79 of its 8.5 kN safe load, so the nut plate is the design.
 
 The tension comes from the body holding the chassis against its own twist, so it is real only while the body stays stiff. A weighed and pull-tested sample replaces these planning numbers.
 
@@ -79,15 +79,15 @@ The frame model takes the body as a torsion box on the centreline, tied at every
 
 | LC5a, TC1, diagonal A | Chassis twist | Body share | Largest body torque | Largest bolt force | Chassis peak stress |
 |---|---|---|---|---|---|
-| Bare chassis (the chassis checks) | 0.377 degree | 0 | | | 75 MPa |
-| Body, roof joint neglected | 0.350 degree | 6 % | 0.1 kNm | 2.9 kN | 69 MPa |
-| Body, bonded roof (the design) | 0.008 degree | 98 % | 8.3 kNm | 6.54 kN, 6.07 kN after its 1 g share of weight | 51 MPa |
+| Bare chassis (the chassis checks) | 0.401 degree | 0 | | | 66 MPa |
+| Body, roof joint neglected | 0.379 degree | 5 % | 0.1 kNm | 3.3 kN | 74 MPa |
+| Body, bonded roof (the design) | 0.009 degree | 98 % | 9.1 kNm | 7.37 kN, 6.75 kN after its 1 g share of weight | 57 MPa |
 
-The bonded body takes almost all the twist. The closed box loads the mounts and joints most, so the body checks use it, and the chassis checks keep the bare frame, which carries 114 MPa at worst in LC5b without the body's help.
+The bonded body takes almost all the twist. The closed box loads the mounts and joints most, so the body checks use it, and the chassis checks keep the bare frame, which carries 102 MPa at worst in LC5b without the body's help.
 
 ## The rear wall as a diaphragm
 
-The rear wall closes the box's rear end and racks in shear under the torque the floor bolts put into the box's rear half. The racking force is T / 2h, with T that torque and h the box's height. The rear door's cut-out leaves 1,335 mm of full panel. The worst case is LC5a with the bonded roof: 11.5 kNm into the rear half, 2.82 kN of racking. The skins carry 0.70 MPa against 22.2 MPa and the joiner 1.21 N/mm against 22.5 N/mm (BDY-20, 0.05), so the door needs no extra posts or header.
+The rear wall closes the box's rear end and racks in shear under the torque the floor bolts put into the box's rear half. The racking force is T / 2h, with T that torque and h the box's height. The rear door's cut-out leaves 1,335 mm of full panel. The worst case is LC5a with the bonded roof: 12.6 kNm into the rear half, 3.09 kN of racking. The skins carry 0.77 MPa against 22.2 MPa and the joiner 1.33 N/mm against 22.5 N/mm (BDY-20, 0.06), so the door needs no extra posts or header.
 
 ## The side walls in wind
 
@@ -95,9 +95,9 @@ Each side wall spans 2,000 mm from the floor joiner to the roof-to-wall joiner. 
 
 Each member stands on a rigid PVC bearing block, 20 mm wide across its depth, that carries the bed's load down to the floor joiner's base. The floor joiner wraps the wall's foot, and its inner leg runs 34 mm up the inner skin with its flange (CT-202 detail F). The block raises the member's foot 54 mm above the wall's bottom edge, 20 mm clear of that leg, so no leg overlaps a member. At its head the member stops 10 mm under the wall's 25 mm top insert strip on a 10 mm rigid PVC pad, 19 mm below the roof joiner's leg. Block and pad each take the member's wind shear into its joiner through a spigot in the member's hollow end.
 
-- The load is AS/NZS 1170.2's for a parked trailer in terrain category 2 at 3 m, with Cp,e 0.7 on the windward wall and Cp,i -0.3 inside. Decision H23 sets region B's 25-year wind, 39 m/s times 0.91, 0.76 kPa net, for the deflection, because region B, the Queensland coast, is non-cyclonic and Leonard will camp there. The strength wind is 41 m/s, 1.01 kPa net: BDY-19's 40 m/s, raised to cover the highest speed that tips the unhitched trailer, 40.9 m/s with a box's force coefficient (STB-04).
-- In a bay of plain panel the wall deflects 19.7 mm against 20.0 mm, and 30.1 mm without the members (BDY-10). The 20 mm is span/100, report 12's planning limit for the engineer to set. The skins reach 10.0 MPa, a quarter of half their ultimate, each member 39 MPa against 73 MPa, 0.53, and the XPS behind it 0.004 MPa against 0.15 MPa (BDY-06).
-- BDY-10 and BDY-06 spread each member over a full bay and leave the openings out, so BDY-24 and BDY-25 take each side wall as a Mindlin plate from the front wall to the rear wall, every opening cut out with its window's or door's wind load on its edges, and each member a beam with its own bending, shear and torsion. The wall between W1 and the entry door needs both the bed's rear hardpoint and BD-20: with the hardpoint alone the door's front edge would deflect 28.8 mm. With both, the kerb wall deflects at most 18.9 mm, at the door's front edge (BDY-24). In the ultimate wind the worst member works at 0.53, the skins at 0.29 and the core at 0.68 of half its shear strength, both read 50 mm or more from the cut-outs' corners, which the model cuts square (F5-02), and the blocks carry 411 N of end shear at 0.12 (BDY-25). The road wall, with the kitchen tower's sides as supports, deflects at most 7.1 mm.
+- The load is AS/NZS 1170.2's for a parked trailer in terrain category 2 at 3 m, with Cp,e 0.7 on the windward wall and Cp,i -0.3 inside. Decision H23 sets region B's 25-year wind, 39 m/s times 0.91, 0.76 kPa net, for the deflection, because region B, the Queensland coast, is non-cyclonic and Leonard will camp there. The strength wind is 42 m/s, 1.06 kPa net: BDY-19's 40 m/s, raised to cover the highest speed that tips the unhitched trailer, 41.9 m/s with a box's force coefficient at the 4,000 kg plate's masses (STB-04, 40.9 m/s before).
+- In a bay of plain panel the wall deflects 19.7 mm against 20.0 mm, and 30.1 mm without the members (BDY-10). The 20 mm is span/100, report 12's planning limit for the engineer to set. The skins reach 10.5 MPa, a quarter of half their ultimate, each member 40 MPa against 73 MPa, 0.55, and the XPS behind it 0.004 MPa against 0.15 MPa (BDY-06).
+- BDY-10 and BDY-06 spread each member over a full bay and leave the openings out, so BDY-24 and BDY-25 take each side wall as a Mindlin plate from the front wall to the rear wall, every opening cut out with its window's or door's wind load on its edges, and each member a beam with its own bending, shear and torsion. The wall between W1 and the entry door needs both the bed's rear hardpoint and BD-20: with the hardpoint alone the door's front edge would deflect 28.8 mm. With both, the kerb wall deflects at most 18.9 mm, at the door's front edge (BDY-24). In the ultimate wind the worst member works at 0.55, the skins at 0.31 and the core at 0.71 of half its shear strength, both read 50 mm or more from the cut-outs' corners, which the model cuts square (F5-02), and the blocks carry 431 N of end shear at 0.13 (BDY-25). The road wall, with the kitchen tower's sides as supports, deflects at most 7.1 mm.
 - Strapped down on its lashing points (STB-05), the trailer stands in stronger winds than tip it unhitched. At region B's 500-year gust at 3 m, STB-05's 51.9 m/s, a plain bay's members work at 0.84 and its skins at 0.63 (BDY-06), and the plates reach 1.08, on the core's shear at the floor just behind the entry door, so the core keeps a factor of 1.85 on its strength there.
 - On research report 19's design cold night, -5 °C outside and 20 °C inside, with ISO 13788's inside surface resistance of 0.25 m²K/W for condensation, which allows for furniture against the wall, a two-dimensional conduction model of the wall at a member puts the inside surface over it at 10.7 °C at mid-length and the member, with the rails screwed to it, at 10.4 °C. Taken across each member as it stands, with W1's and W2's side inserts and the windows beyond them, the doors' insert strips and the doors, and the two members behind the bed 16.5 mm apart with the H200 fill between them, the coldest is 10.5 °C. Along the member its ends lose heat to the joiners, taken at the outside air as a bound: the surface is 10.2 °C at the foot and 10.2 °C at the head, against the dew point of 6 °C plus report 19's 4 K (BDY-22). The plain wall's surface is 14.9 °C. On the generators, ahead of the drawbar or behind the trailer, e2 fans C and D stop, fans A and B and the RESPA-CF2 run, and the dew point falls to -1.7 °C. Off the kerb side fans A and B stop too and the RESPA-CF2 runs alone, -1.2 °C (F5-04).
 - The aluminium joiners run near the outside air. Every joiner's inside face, the floor joiner's flange included, is covered with 15 mm of closed-cell foam under the lining and the skirting, which keeps the surface at 10.8 °C even with the joiner at the outside air (BDY-22). Report 19's 10 mm cover would leave 8.3 °C on the same bound.
@@ -159,21 +159,21 @@ The solar panels are in the roof group, the wet room tray in the wet room group,
 | BDY-03 | Floor under a foot, with bearing | Skin 22.6 MPa, bearing 0.20 of 0.70 MPa | 0.31 |
 | BDY-04 | Floor edge between outriggers 900 mm apart | Core 0.076 MPa | 0.13 |
 | BDY-26 | Floor round its three cut-outs with their H200 inserts, and its bearing on the raisers | G20's insert in shear, 1.07 MPa of 1.60 MPa | 0.67 |
-| BDY-06 | Side wall, 2,000 mm, in the ultimate wind, 1.01 kPa | Skin 10.0 MPa, member 39 MPa of 73 MPa | 0.53 |
+| BDY-06 | Side wall, 2,000 mm, in the ultimate wind, 1.06 kPa | Skin 10.5 MPa, member 40 MPa of 73 MPa | 0.55 |
 | BDY-07 | Fixed roof with the solar array, 3 g | Skin 3.6 MPa | 0.14 |
 | BDY-09 | Roof deflection at 1 g (reported) | 5.5 mm of 15.8 mm | |
 | BDY-10 | Wall deflection in region B's 25-year wind, 0.76 kPa, with the members | 19.7 mm of 20.0 mm | |
 | BDY-11 | Lift-bed rail screws, awning bolts in travel and with the canopy open | 0.12 kN of 1.50 kN, 0.32 kN of 10.0 kN | 0.08 |
-| BDY-13 | Body share of LC5a (reported) | 98 % with the bonded roof, 6 % without | |
-| BDY-14 | Skins and bonded joints in twist | 0.86 N/mm of 22.5 N/mm | 0.04 |
-| BDY-16 | Body mounts, M12 into nut plates | 6.07 kN of 23.3 kN | 0.26 |
+| BDY-13 | Body share of LC5a (reported) | 98 % with the bonded roof, 5 % without | |
+| BDY-14 | Skins and bonded joints in twist | 0.95 N/mm of 22.5 N/mm | 0.04 |
+| BDY-16 | Body mounts, M12 into nut plates | 6.75 kN of 23.3 kN | 0.29 |
 | BDY-18 | Opening spacing, 18 openings | Every rule met, the tightest by 0 mm | |
 | BDY-19 | Roof-to-wall joint in a 40 m/s uplift | 0.37 N/mm of 30 N/mm | 0.01 |
-| BDY-20 | Rear wall with its door, as the rear diaphragm | 1.21 N/mm of 22.5 N/mm | 0.05 |
+| BDY-20 | Rear wall with its door, as the rear diaphragm | 1.33 N/mm of 22.5 N/mm | 0.06 |
 | BDY-21 | Outdoor unit's cradle: stays to the chassis, wall bolts | 0.68 kN a stay of 2.0 kN, 0.37 kN a bolt of 22.6 kN | 0.33 |
 | BDY-22 | Inside surface over the wall members, to their ends, and over the joiners on the cold night, at Rsi 0.25 | 10.2 °C against 10 °C | |
 | BDY-24 | Side walls as plates with their openings, in region B's 25-year wind | 18.9 mm of 20.0 mm | |
-| BDY-25 | Side walls as plates with their openings, in the ultimate wind | Core shear 0.085 MPa of 0.125 MPa, worst member 39 MPa | 0.68 |
+| BDY-25 | Side walls as plates with their openings, in the ultimate wind | Core shear 0.089 MPa of 0.125 MPa, worst member 41 MPa | 0.71 |
 | FIT-07 | Wall members clear of every opening, gland, insert strip and each other, bays within 1,067 mm | 25 mm against 25 mm | |
 | BDY-23 | Awning legs at a 10 degree fall on level ground (reported) | 155 mm of reach left (est.) | |
 

@@ -5,8 +5,9 @@
 # cad/chassis_fea.py analyses them. Sections come from data/chassis/sections.yaml (report 11's table).
 id: ASM-CH
 name: Chassis and drawbar
-revision: C     # C, 21 Nov 2026: the home trailer. RHS 127 x 51 x 3.5 C350L0 raisers, outriggers and floor crossmembers (report 22),
-                # the grey-bay floor crossmember over the grey tank in place of the battery bay, every case at the 3,500 kg plate (H2)
+revision: D     # D, 23 Nov 2026: every case at the 4,000 kg plate (H2 as amended), the DO45 coupling and its plate, grade T chains.
+                # C, 21 Nov 2026: the home trailer. RHS 127 x 51 x 3.5 C350L0 raisers, outriggers and floor crossmembers (report 22),
+                # the grey-bay floor crossmember over the grey tank in place of the battery bay, every case at the 3,500 kg plate
 
 material:
   tube: "AS/NZS 1163 C450L0 RHS and SHS, Austube Mills C450PLUS bought black (fy 450 MPa, fu 500 MPa)"
@@ -58,7 +59,7 @@ params:
   max_element: 250                            # longest frame element
 
 roles:
-  rail: {section: RHS_150x50x3, name: "Main rail"}
+  rail: {section: RHS_150x50x4, name: "Main rail"}   # 4 mm since the 4,000 kg plate (revision D): LC8a reached 1.01 of yield at 3 mm
   raiser: {section: RHS_127x51x3p5, name: "Raiser on the rail, continuous fillet welds to the rail"}
   cm_xt: {section: RHS_150x50x3, name: "XT suspension crossmember, full rail height"}
   cm_end: {section: RHS_150x50x3, name: "Body end crossmember, full rail height"}
@@ -100,7 +101,7 @@ plan_braces:
 # fittings and the bearer strip carry a `price` in the form data/trailer-parts.yaml describes. The members, plates and
 # the galvanising are priced there as stock bought for the whole frame.
 fittings:
-  - {id: CH-P01, name: "Coupling plate under the drawbar apex, flat both faces, 4 x M12 8.8 holes", kind: plate, l: 300, w: 220, t: 12, qty: 1,
+  - {id: CH-P01, name: "Coupling plate under the drawbar apex, flat both faces, 4 x M14 8.8 holes at the DO45's wider pattern", kind: plate, l: 300, w: 220, t: 12, qty: 1,
      at: [plate_x - 40, 0, rail_underside_z - db_depth], fat: null}
   - {id: CH-P02, plane: xz, name: "Chain lug, 10 mm plate on the drawbar member's outer side face, 18 mm hole", kind: plate, l: 120, w: 100, t: 10, qty: 2,
      at: [chain_lug_x, 0, db_z - 60], side_y: "db_apex_y + (rail_c - db_apex_y) * (chain_lug_x - db_apex_x) / (body_x0 - db_apex_x) + rail_w / 2 + 5"}
@@ -127,18 +128,18 @@ fittings:
      maturity: estimate, source: "Estimate: HDPE at 960 kg/m3 for 50 x 22.5 mm, with the EPDM face and fixings",
      price: {aud: 394.20, basis: estimate, date: 2026-11-20, note: "21.9 m at AUD 18/m: HDPE strip about AUD 14/m and 50 mm EPDM tape about AUD 4/m"}}
   # bought parts on the drawbar (they replace the DB-03 block)
-  - {id: DB-03, name: "Cruisemaster DO35 V3Plus coupling, with the integrated handbrake", kind: bought, material: "Cast and machined steel (est.), impact-resistant bumper", mass_kg: 9.5, maturity: estimate,
-     price: {aud: 515, basis: listing, url: "https://cruisemaster.com.au/shop/", date: 2026-11-20},
-     source: "Estimate: Cruisemaster does not publish the mass. Retailers list the DO35 V3 at about 8 to 10 kg", at: [80, 0, "coupling_z + 40"],
-     box: [-60, -90, "coupling_z - 60", "db_apex_x + 60", 180, "rail_underside_z - db_depth - coupling_z + 60"]}
+  - {id: DB-03, name: "Cruisemaster DO45 Plus coupling, with the integrated handbrake, ADR rated 4,500 kg, D-value 24.5 kN, V-value 14.5 kN", kind: bought, material: "Forged steel yoke and rear nut, cast housing, Zn-Ni with e-coat (Cruisemaster)", mass_kg: 13.5, maturity: estimate,
+     price: {aud: 750.00, basis: listing, url: "https://cruisemaster.com.au/do45-plus-with-handbrake/", date: 2026-11-23, note: "Cruisemaster's AUD 875 kit with its cover, C-spanner and fitment bolts, less the 1 1/4 in (32 mm) tow pin, AUD 125, which goes in Ford's 4.5 t hitch and is on the truck's list as TW01"},
+     source: "Estimate: Cruisemaster does not publish the mass. The DO35 V3 is about 8 to 10 kg at retailers, and the DO45 is the same design for 4.5 t with a wider four-bolt base, about 1.4 times the DO35 (est.), without the tow pin, which stays on the truck (TW01)", at: [80, 0, "coupling_z + 40"],
+     box: [-70, -100, "coupling_z - 60", "db_apex_x + 70", 200, "rail_underside_z - db_depth - coupling_z + 60"]}
   - {id: DB-05, size: [760, 120, 200], name: "ARK XO750 jockey wheel, 750 kg, with its swivel clamp, swung up for travel: post along the drawbar, wheel forward", kind: bought, material: "Steel, zinc plated (est.), rubber wheels", mass_kg: 20.0, maturity: spec,
      price: {aud: 449, basis: listing, url: "https://www.arkcorp.com.au/product/xo750-jockey-wheel/", date: 2026-11-20, note: "ARK RRP, SKU ORJW750d"},
      source: "ARK FAQ gives 20 kg, Croft Trailer lists 43.6 lb (19.8 kg) for the XO750 with dual wheels (report 13 section 6)", at: ["jockey_x - 320", "-(db_apex_y + (rail_c - db_apex_y) * (jockey_x - db_apex_x) / (body_x0 - db_apex_x)) - 160", db_z],
      box: ["jockey_x - 700", "-(db_apex_y + (rail_c - db_apex_y) * (jockey_x - db_apex_x) / (body_x0 - db_apex_x)) - 220", "db_z - 100", 760, 126, 200]}
-  - {id: DB-06, size: [60, 400, 30], name: "Safety chains to AS 4177.4 (4177-35), two of about 0.9 m, with ARK HLS13 shackles", kind: bought, material: "Steel chain rated to AS 4177.4, zinc plated (est.), ARK HLS13 shackles", mass_kg: 4.5, maturity: estimate,
-     price: [{item: "Safety chain CHR13Z, 13 mm, rated 3,500 kg, 2 m at AUD 38.92/m, cut and tagged to AS 4177.4", aud: 77.84, basis: rate, url: "https://www.arkcorp.com.au/product/trailer-safety-chain/", date: 2026-11-20},
-             {item: "Two ARK HLS13 hammerlock shackles at AUD 43.44", aud: 86.88, basis: listing, url: "https://www.arkcorp.com.au/product/hammerlock-shackles/", date: 2026-11-20}],
-     source: "Estimate: 3,500 kg grade chain about 2 kg/m, shackles 0.25 kg each", at: [chain_lug_x, 0, db_z - 80]}
+  - {id: DB-06, size: [60, 400, 30], name: "Safety chains, two of about 0.9 m of 8 mm grade 80 (T) chain to AS 2321, non-galvanised and painted, never welded, each on a 2,000 kg AS 2741 D shackle through its lug", kind: bought, material: "Grade 80 (T) alloy steel chain to AS 2321, 8 mm, minimum breaking load 8.2 t, and AS 2741 D shackles", mass_kg: 3.2, maturity: estimate,
+     price: [{item: "8 mm grade 80 (T) chain to AS 2321, 1.8 m, cut, tagged and with the maker's test certificate, from a lifting gear supplier", aud: 66, basis: estimate, date: 2026-11-23, note: "About AUD 20/m and AUD 30 for the tags and certificate (est., no Australian listing read)"},
+             {item: "Two 2,000 kg AS 2741 D shackles, 12 mm with a 16 mm pin (Aline Trading AL00018 class)", aud: 30, basis: estimate, url: "https://www.alinetrading.com.au/product-catalogue/trailer-and-body-equipment/trailer-parts-and-spares-other/trailer-safety-chains-hooks-fittings/", date: 2026-11-23, note: "About AUD 15 each (est.)"}],
+     source: "Estimate: 8 mm grade 80 chain about 1.4 kg/m, so 2.5 kg for the two, and 0.35 kg for each shackle", at: [chain_lug_x, 0, db_z - 80]}
   - {id: DB-07, size: [250, 150, 150], name: "Breakaway kit (battery box, switch, controller) and plugs and cables", kind: bought, mass_kg: 5.1, maturity: estimate,
      price: [{item: "Breakaway kit: 12 V sealed battery in a box, switch with lanyard, charge controller", aud: 250, basis: estimate, date: 2026-11-20, note: "No Australian listing was readable"},
              {item: "12-pin flat plug", aud: 52.62, basis: listing, url: "https://www.arkcorp.com.au/product/12-pin-flat/", date: 2026-11-20},
@@ -177,27 +178,29 @@ steadies:
     - {x: steady_rear_x, y: steady_rear_y, fold: forward}
 
 # Load cases, report 11 section 3.2. Accelerations in g along X (+ rearward), Y (+ road side) and Z (+ up). Every case
-# runs on each trailer case TC1 to TC8 with its masses scaled up to the 3,500 kg plated ATM (water included), except
-# LC5b, which is at tare. `factor` divides fy for the stress criterion. Revision C: the VSB1 drawbar and chain forces
-# follow the 3,500 kg plate (1.5, 0.5 and 1.0 times the ATM's weight, H2).
+# runs on each trailer case TC1 to TC8 with its masses scaled up to the 4,000 kg plated ATM (water included), except
+# LC5b, which is at tare. `factor` divides fy for the stress criterion. Revision D: the VSB1 drawbar and chain forces
+# follow the 4,000 kg plate (1.5, 0.5 and 1.0 times the ATM's weight, H2 as amended 23 Nov 2026), and so do LC5a's wheel,
+# LC8a's pull and LC8b's pad, each at the axle group the plate allows with H2's 7.5 % floor on the ball, 3,700 kg.
 load_cases:
   - {id: LC1, name: "Static at ATM", kind: static, accel: [[0, 0, -1]], factor: 3, source: "ARTSA factor of safety of 3 (report 02 section 2.4)"}
   - {id: LC2, name: "Vertical bump, 3 g on the structure", kind: static, accel: [[0, 0, -3]], factor: 1, source: "Report 11 LC2, ARTSA"}
   - {id: LC3, name: "Braking, 0.8 g forward plus 1 g vertical, braked at the tyres", kind: static, accel: [[-0.8, 0, -1]], factor: 1.5, source: "Report 02, report 11 LC3"}
   - {id: LC4, name: "Cornering, 0.5 g lateral either way plus 1 g vertical", kind: static, accel: [[0, 0.5, -1], [0, -0.5, -1]], factor: 1.5, source: "Report 02, report 11 LC4"}
-  - {id: LC5a, name: "Twist, one wheel in a hole: 13.4 kNm between the axles, plus 1 g", kind: twist_wheel, accel: [[0, 0, -1]], torque_nmm: 13400000, factor: 1.5,
-     source: "Report 11 LC5a: 820 kg x 9.81 x 0.831 m = 6.7 kNm, times 2 for dynamics"}
+  - {id: LC5a, name: "Twist, one wheel in a hole: 15.1 kNm between the axles, plus 1 g", kind: twist_wheel, accel: [[0, 0, -1]], torque_nmm: 15080000, factor: 1.5,
+     source: "Report 11 LC5a at the 4,000 kg plate: 925 kg (a quarter of the 3,700 kg axle group) x 9.81 x 0.831 m = 7.54 kNm, times 2 for dynamics. Report 11 had 820 kg at 3,500 kg"}
   - {id: LC5b, name: "Twist on the corner steadies at tare, one wound to 875 kg", kind: twist_steady, accel: [[0, 0, -1]], steady_kg: 875, factor: 1.5,
      source: "Report 11 LC5b, ARK catalogue 2024 p. 67"}
-  - {id: LC6, name: "Drawbar, VSB1 9.1 at the 3,500 kg plate: 51.5 kN longitudinal, 17.2 kN transverse, 17.2 kN vertical, each way, separately", kind: drawbar,
-     forces_n: [[51500, 0, 0], [-51500, 0, 0], [0, 17200, 0], [0, -17200, 0], [0, 0, 17200], [0, 0, -17200]], factor: 1, source: "VSB1 9.1 and 14.2.1, ADR 62/02 14.2, at 3,500 kg"}
-  - {id: LC6b, name: "Chain points, VSB1 9.2.2 at the 3,500 kg plate: 34.3 kN longitudinal, 17.2 kN vertical, each point separately", kind: chain,
-     forces_n: [[-34300, 0, 0], [0, 0, -17200], [0, 0, 17200]], factor: 1, source: "VSB1 9.2.2 and 14.2.2, ADR 62/02 14.4.2, at 3,500 kg"}
+  - {id: LC6, name: "Drawbar, VSB1 9.1 at the 4,000 kg plate: 58.9 kN longitudinal, 19.6 kN transverse, 19.6 kN vertical, each way, separately", kind: drawbar,
+     forces_n: [[58860, 0, 0], [-58860, 0, 0], [0, 19620, 0], [0, -19620, 0], [0, 0, 19620], [0, 0, -19620]], factor: 1, source: "VSB1 Rev 6 9.1 and 14.2.1, ADR 62/02 14.2: 1.5, 0.5 and 0.5 x 9.81 x 4,000 kg"}
+  - {id: LC6b, name: "Chain points, VSB1 9.2.2 at the 4,000 kg plate: 39.2 kN longitudinal, 19.6 kN vertical, each point separately", kind: chain,
+     forces_n: [[-39240, 0, 0], [0, 0, -19620], [0, 0, 19620]], factor: 1, source: "VSB1 Rev 6 9.2.2 and 14.2.2, ADR 62/02 14.4.2: 1.0 and 0.5 x 9.81 x 4,000 kg"}
   - {id: LC7, name: "Cargo and heavy item fixings: 0.8 g forward, 0.5 g rearward, 0.5 g sideways, 0.2 g up, times 2 off road", kind: fixings,
      accel: [[-1.6, 0, 0], [1.0, 0, 0], [0, 1.0, 0], [0, 0, 0.4]], factor: 1.5, source: "NTC Load Restraint Guide via report 02, factor 2 from report 03"}
-  - {id: LC8a, name: "Recovery points: 51.5 kN within 30 degrees sideways and 15 degrees up or down of the rail axis", kind: recovery,
-     force_n: 51500, ultimate_n: 78500, factor: 1, source: "Report 11 LC8a"}
-  - {id: LC8b, name: "Jacking: one side lifted at its pad, gravity times 2", kind: jack, accel: [[0, 0, -2]], pad_n: 38600, factor: 1, source: "Report 11 LC8b"}
+  - {id: LC8a, name: "Recovery points: 58.9 kN within 30 degrees sideways and 15 degrees up or down of the rail axis", kind: recovery,
+     force_n: 58860, ultimate_n: 78500, factor: 1, source: "Report 11 LC8a: 1.5 x 9.81 x the 4,000 kg plate, as the drawbar case. The ultimate stays TJM's 8 t test load"}
+  - {id: LC8b, name: "Jacking: one side lifted at its pad, gravity times 2", kind: jack, accel: [[0, 0, -2]], pad_n: 43560, factor: 1,
+     source: "Report 11 LC8b at the 4,000 kg plate: 60 % of the 3,700 kg axle group on one pad, times 2 (report 11 had 38.6 kN at 3,500 kg)"}
   - {id: LC10, name: "Fatigue: frequent 0.5 g either way (range 1 g) beyond 10 million cycles, occasional 1.5 g either way for 100,000 cycles",
      kind: fatigue, accel: [[0, 0, -1]], occasional_factor: 3, occasional_cycles: 100000, miner_limit: 0.5,
      source: "Report 11 LC10 and section 3.4, IIW-1823-07"}
@@ -244,7 +247,7 @@ hole_rules: {edge_factor: 1.25, end_factor: 1.5, toe_factor: 1.0, kt: 3.0, iiw: 
              fu: {rail: 500, raiser: 430}}   # AS/NZS 1163 C450L0 and C350L0 tensile strengths
 
 # Local checks of the fittings (CHASSIS.md). Sizes in mm. Plates are AS/NZS 3678 grade 350. The pin is the shackle pin
-# (ARK HLS13 for the chains, a 4.75 t bow shackle for recovery). Bearing is held to 1.5 fy so the hole does not
+# (a 2,000 kg AS 2741 D shackle for the chains, a 4.75 t bow shackle for recovery). Bearing is held to 1.5 fy so the hole does not
 # yield in the elastic VSB1 cases.
 local_checks:
   chain_lug: {fitting: CH-P02, hole: 18, pin: 16, net_w: 60, edge: 30, weld_leg: 6, weld_l: 120, weld_h: 60, ecc: 55}
@@ -253,3 +256,7 @@ local_checks:
   jacking_pad: {fitting: CH-P06, span: 44, cup_d: 50}
   spare_posts: {lever_x: 155}
   steady_bracket: {fitting: CH-B01, steady_kg: 875}   # at 90 degrees, the steady's rating up through its bracket into the rail
+  # the DO45 Plus on four M14 8.8 bolts (Cruisemaster's fitting guide), threads in the shear plane: AS 1275 stress area 115 mm2,
+  # minor diameter area 104.7 mm2, fuf 830 MPa. Its rows 100 mm apart along X, its bolts 80 mm apart across, wider than the
+  # DO35's 90 x 70 mm, and the pin's centre 70 mm below the plate (est., measured off the coupling before drilling, CT-102)
+  coupling_plate: {fitting: CH-P01, bolts: 4, bolt_d: 14, bolt_as: 115, bolt_ac: 104.7, bolt_fuf: 830, row_pitch: 100, col_pitch: 80, lever: 70}

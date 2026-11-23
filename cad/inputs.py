@@ -185,15 +185,19 @@ class Inputs:
         self.note("WHL-01", f"{r:.0f} kg per wheel ({st}). MAS-09 checks it against 1.2 times the axle group load with growth, over four wheels")
         return dict(wheel, rating_kg=r, rating_status=st)
 
-    def supplier(self, atm: float, towball: float) -> dict:
+    def supplier(self, atm: float, towball: float, load_sharing: bool = False) -> dict:
+        """The kit's GTM against the axle group at the plate. VSB1's 120 % rule applies to non-load-sharing close-coupled
+        axles only, so a load-sharing tandem needs the axle group load itself."""
         gtm, incl = self.v("SUP-01"), bool(self.v("SUP-02"))
-        need = 1.2 * (atm - towball)
+        need = (1.0 if load_sharing else 1.2) * (atm - towball)
         margin = f", {need - gtm:.0f} kg short" if gtm < need else f", {gtm - need:.0f} kg to spare"
-        self.note("SUP-01", f"MAS-02 limit {gtm:.0f} kg. The 120 % rule at the ATM needs {need:.0f} kg, {need / 2:.0f} kg per axle{margin}")
+        rule = "The load-sharing tandem at the ATM needs" if load_sharing else "The 120 % rule at the ATM needs"
+        self.note("SUP-01", f"MAS-02 limit {gtm:.0f} kg. {rule} {need:.0f} kg, {need / 2:.0f} kg per axle{margin}")
         answered = self.items["SUP-02"].status == "measured"
-        self.note("SUP-02", "ratings include the 120 % rule, so MAS-02 checks the axle load itself" if incl else
+        self.note("SUP-02", "the tandem is load sharing, so VSB1's 120 % rule does not apply and MAS-02 checks the axle load itself" if load_sharing else
+                  "ratings include the 120 % rule, so MAS-02 checks the axle load itself" if incl else
                   f"{'ratings do not' if answered else 'not known to'} include the 120 % rule, so MAS-02 checks 1.2 times the axle load")
-        return dict(kit_gtm=gtm, includes_120=incl, need_kg=need)
+        return dict(kit_gtm=gtm, includes_120=incl, load_sharing=load_sharing, need_kg=need)
 
     def cf(self, offset: float, tyre_w: float) -> float:
         cf = self.v("SUP-04")

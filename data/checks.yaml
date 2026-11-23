@@ -6,18 +6,19 @@ checks: []
 
 # Whole-trailer checks (TRAILER.md), measured on the block layout in assemblies/trailer.yaml by cad/trailer.py.
 # Masses with growth carry the MASS-06 allowance (estimate +20 %, calculated +7 %, spec 0 %).
-# The tow vehicle is the LandCruiser 79 (data/ute/ute.yaml, research report 16). Its towbar is rated 350 kg. H14
+# The tow vehicle is the Ford Ranger Super Duty single cab chassis on Ford's ratings (data/ute/ute.yaml, research report
+# 31), since 23 Nov 2026 in place of the LandCruiser 79. Its tow ball limit is 450 kg (est.) and the DO45's 450 kg. H14
 # (21 Nov 2026) replaced the plan's 250 kg towball cap with the rule it stood for: in every case the towball keeps the
-# ute's rear axle within its rating with growth, computed from the ute model at that ball load. H17 put the Lovells Elite
-# kit on the ute, and H18 plates its rear axle at 2,800 kg, twice the shared wheel's 1,400 kg. H17 also set the design
-# towball range the axle solve uses: at least 8.0 % in every case and at most 320 kg with growth. H2 sets the 7.5 %
-# floor and the 3,500 kg plate. VSB1 sets no towball share. Limits here are never changed to make a check pass.
+# ute's rear axle within its rating with growth, computed from the ute model at that ball load. H17 also set the design
+# towball range the axle solve uses: at least 9.0 % in every case and at most 420 kg with growth since the DO45 (23 Nov
+# 2026), 8.0 % and 320 kg before. H2 sets the 7.5 %
+# floor and the plate, 4,000 kg since 23 Nov 2026. VSB1 sets no towball share. Limits here are never changed to make a check pass.
 # The services checks SVC-01 to SVC-12 (H28: clearance, bend radii, 230 V segregation, the battery's terminal face,
 # coverage, voltage drop, falls, the runs' spacing, the glands' room, then the cables' ratings, heat and supports) are defined beside the runs in data/routes.yaml `checks`, with their sources, and
 # measured by cad/routes.py. The trailer's build adds their rows to these checks' results (build/trailer/trailer.json).
 trailer_checks:
   - id: MAS-01
-    title: Trailer mass with growth within the 3,500 kg plated ATM
+    title: Trailer mass with growth within the 4,000 kg plated ATM
     type: mass
     quantity: mass
     limit: plated_atm
@@ -25,19 +26,19 @@ trailer_checks:
     cases: all
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: Decision H2 plates the ATM at 3,500 kg, the ute's towing rating and the DO35 and NSW caps, so it covers every case with the growth allowance.
+    why: Decision H2, amended 23 Nov 2026, plates the ATM at 4,000 kg, inside the Ranger Super Duty's 4,500 kg braked towing and the DO45's 4,500 kg, so it covers every case with the growth allowance.
   - id: MAS-10
-    title: Trailer mass with growth at most 3,400 kg in every case (design target)
+    title: Trailer mass with growth at most 3,900 kg in every case (design target)
     type: mass
     quantity: mass
     basis: growth
     cases: all
-    max: 3400
+    max: 3900
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: Decision H2 keeps 100 kg of the 3,500 kg plate in reserve for the estimates. H13 holds it with the travel limit on water, 280 L since H21.
+    why: Decision H2 keeps 100 kg of the 4,000 kg plate in reserve for the estimates. H13 holds it with the travel limit on water, and H21 takes any excess off the water.
   - id: MAS-02
-    title: Axle group load with growth, times 1.2 for VSB1's 120 % rule, within the kit's GTM
+    title: Axle group load with growth within the kit's GTM, times 1.2 for VSB1's 120 % rule unless the tandem shares load
     type: mass
     quantity: axle_vsb1
     limit: kit_gtm
@@ -45,7 +46,7 @@ trailer_checks:
     cases: all
     severity: fail
     inputs: [SUP-01, SUP-02, TW-01, TW-02, TW-03]
-    why: VSB1 asks the axles to carry 120 % of their share where they do not share load, as the XT's do not (report 06). The kit's GTM is Cruisemaster's figure for the 4,500 kg XT Air build.
+    why: "VSB1 Rev 6 (axles and suspension) asks the axles of a close-coupled group that does not share load to carry 120 % of their load at ATM. At the 4,000 kg plate that needs 4,440 kg of the XT Air build's 4,050 kg, so the XT Air is ordered in Cruisemaster's load-sharing tandem configuration (CIS-006, params load_sharing), each side's two bags on one circuit, and the check takes the axle group load itself. The kit's GTM is Cruisemaster's figure for the 4,500 kg XT Air build."
   - id: MAS-03
     title: Towball keeps the ute's rear axle within Ford's 2,800 kg with growth and stays within the Super Duty's tow ball download, in every case
     type: towball_ute
@@ -53,7 +54,7 @@ trailer_checks:
     cases: all
     severity: fail
     inputs: [UTE-02, TW-01, TW-02, TW-03]
-    why: Decision H14, on the Ranger Super Duty's rear axle rating of 2,800 kg (Ford's BEMM p. 33). The ute model gives its rear axle load with the bikes aboard (UC2, with growth) and how much each kilogram on the ball adds to it (UC3 against UC2). The ute's tow ball limit is data/ute/ute.yaml's towball_rating_kg, 450 kg (est.), since Ford's figure is in the owner guide, which was not read. The coupling's own rating is the trailer's (data/load_cases.yaml).
+    why: Decision H14, on the Ranger Super Duty's rear axle rating of 2,800 kg (Ford's BEMM p. 33). The ute model gives its rear axle load with the bikes aboard (UC2, with growth) and how much each kilogram on the ball adds to it (UC3 against UC2). The ute's tow ball limit is data/ute/ute.yaml's towball_rating_kg, 450 kg (est.), since Ford's figure is in the owner guide, which was not read. The trailer's Cruisemaster DO45 Plus allows 450 kg on the ball too (its fitting guide), so neither governs below the other. They replace the 79's, the Hayman Reese bar's and the DO35's 350 kg.
   - id: MAS-03B
     title: The ute's towing cases carry at least the trailer's heaviest towball with growth
     type: towball_ute_input
@@ -78,27 +79,27 @@ trailer_checks:
     min: 0
     severity: fail
     inputs: []
-    why: Decision H17. The axle solve sets the axle in the middle of the window between the position where the lightest case reaches 8.0 % on the ball and the one where the heaviest towball with growth reaches 320 kg (data/load_cases.yaml axle_window). A window under 0 mm means no axle position meets both.
+    why: Decision H17. The axle solve sets the axle in the middle of the window between the position where the lightest case reaches 9.0 % on the ball and the one where the heaviest towball with growth reaches 420 kg (data/load_cases.yaml axle_window). A window under 0 mm means no axle position meets both.
   - id: MAS-12
-    title: Towball load at least 8.0 % of the trailer's mass in every case (H17 design target)
+    title: Towball load at least 9.0 % of the trailer's mass in every case (H17 design target)
     type: mass
     quantity: towball_pct
     basis: both
     cases: all
-    min: 8.0
+    min: 9.0
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: Decision H17 asks for a towball well clear of H2's 7.5 % floor (MAS-04), because the masses are still estimates.
+    why: Decision H17 asks for a towball well clear of H2's 7.5 % floor (MAS-04), because the masses are still estimates. 9.0 % since the 4,000 kg plate (8.0 % before), towards the 10 % Ford's towing guide aims at.
   - id: MAS-13
-    title: Towball load at most 320 kg with growth in every case (H17 design target)
+    title: Towball load at most 420 kg with growth in every case (H17 design target)
     type: mass
     quantity: towball
     basis: growth
     cases: all
-    max: 320
+    max: 420
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: Decision H17. The towbar, the ute's rating and the DO35 allow 350 kg, so 320 kg keeps 30 kg in hand.
+    why: Decision H17 at the DO45 (23 Nov 2026). The DO45 allows 450 kg on the ball and the Ranger Super Duty 450 kg (est., 10 % of its 4,500 kg braked towing), so 420 kg keeps H17's 30 kg in hand. It was 320 kg under the 79's, the towbar's and the DO35's 350 kg.
   # MAS-14 retired (23 Nov 2026): it forecast the LandCruiser's return to the Lovells Platinum kit (cut CUT7). The Ranger
   # Super Duty has no GVM kit, so there is no kit to return to.
   - id: MAS-06
@@ -110,7 +111,7 @@ trailer_checks:
     cases: all
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: LT265/75R16 123/120, 1,550 kg per tyre (report 16, the ute's tyre). 1.2 times the heavier side's share of the axle group load over its two tyres, from the lateral centre of gravity.
+    why: LT265/75R16 123/120, 1,550 kg per tyre (report 16, the LandCruiser's size when chosen; the Super Duty's 8-stud 18 in wheels share nothing with it). 1.2 times the heavier side's share of the axle group load over its two tyres, from the lateral centre of gravity.
   - id: MAS-07
     title: Axle group load with growth within the NSW examiner's GTM cap
     type: mass
@@ -141,6 +142,12 @@ trailer_checks:
     severity: fail
     inputs: [WHL-01, TW-01, TW-02, TW-03]
     why: The ROH Trak 2 16 x 7 ET 0 is rated 1,400 kg (measurements.yaml WHL-01), the ute's wheel.
+  - id: COU-01
+    title: The combination's D-value and V-value within the DO45's 24.5 kN and 14.5 kN (ADR 62/02 12.3.3)
+    type: coupling_dv
+    severity: fail
+    inputs: []
+    why: "Over 3.5 t ATM ADR 62/02 rates a coupling by its D-value and V-value, and the DO45 Plus is marked D 24.5 kN and V 14.5 kN. AS 2213.1 clauses 6 and 7 (and UN R55) give the combination's own values: D = 9.81 T R / (T + R) from the tow vehicle's GVM T and the trailer's ATM R in tonnes, and V = a X2/l2 C for a rigid drawbar trailer, with a = 2.4 m/s2 (ADR 62/02 8.1.2), X the body's length, l the ball to the axle group, X2/l2 at least 1, and C the axle group at the plate in tonnes."
   - id: MAS-11
     title: Lateral centre of gravity within 50 mm of the centreline in every case
     type: lateral
@@ -258,7 +265,7 @@ trailer_checks:
     load_case: LC1
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: Report 11 LC1. The ARTSA factor of safety of 3 on yield (report 02 section 2.4). Every member, every trailer case scaled so the heaviest sits at the 3,500 kg plated ATM.
+    why: Report 11 LC1. The ARTSA factor of safety of 3 on yield (report 02 section 2.4). Every member, every trailer case scaled so the heaviest sits at the plated ATM, 4,000 kg.
   - id: CHS-02
     title: Chassis stress, LC2 vertical bump 3 g, below yield
     type: chassis_stress
@@ -300,21 +307,21 @@ trailer_checks:
     load_case: LC6
     severity: fail
     inputs: []
-    why: VSB1 9.1 and 14. 51.5 kN along, 17.2 kN across and 17.2 kN up and down at the coupling, each way, with the body held at its suspension mounts. No residual deformation, so the check is elastic.
+    why: VSB1 9.1 and 14, ADR 62/02 14.2, at the 4,000 kg plate. 58.9 kN along, 19.6 kN across and 19.6 kN up and down at the coupling (1.5, 0.5 and 0.5 times the ATM's weight), each way, with the body held at its suspension mounts. No residual deformation, so the check is elastic.
   - id: CHS-06B
     title: Drawbar stress, LC6b VSB1 9.2.2 chain point forces, below yield
     type: chassis_stress
     load_case: LC6b
     severity: fail
     inputs: []
-    why: VSB1 9.2.2. 34.3 kN along and 17.2 kN up and down at each chain lug, separately.
+    why: VSB1 9.2.2 and ADR 62/02 14.4.2 at the 4,000 kg plate. 39.2 kN along and 19.6 kN up and down at each chain lug (1.0 and 0.5 times the ATM's weight), separately.
   - id: CHS-08A
-    title: Chassis stress, LC8a recovery at 51.5 kN within 30 degrees sideways and 15 degrees up or down, below yield
+    title: Chassis stress, LC8a recovery at 58.9 kN within 30 degrees sideways and 15 degrees up or down, below yield
     type: chassis_stress
     load_case: LC8a
     severity: fail
     inputs: []
-    why: Report 11 LC8a, at each front and rear recovery point, with the body held at its suspension mounts.
+    why: Report 11 LC8a, 1.5 times the plated ATM's weight (58.9 kN at 4,000 kg), at each front and rear recovery point, with the body held at its suspension mounts.
   - id: CHS-08B
     title: Chassis stress, LC8b one side jacked at its pad with gravity times 2, below yield
     type: chassis_stress
@@ -330,14 +337,14 @@ trailer_checks:
     inputs: []
     why: VSB1 9.2.2. Plate limits are fy (bearing 1.5 fy, tear-out shear 0.6 fy) so the lug does not deform. The weld limit is the SP fillet capacity, 0.8 x 0.6 x 490 MPa.
   - id: LOC-02
-    title: Front recovery lugs hold 51.5 kN without yield and 78.5 kN without fracture
+    title: Front recovery lugs hold 58.9 kN without yield and 78.5 kN without fracture
     type: chassis_local
     item: front_recovery
     severity: fail
     inputs: []
     why: Report 11 LC8a. A 30 degree sideways pull bends the lug out of its plane.
   - id: LOC-03
-    title: Rear recovery tongues hold 51.5 kN without yield and 78.5 kN without fracture
+    title: Rear recovery tongues hold 58.9 kN without yield and 78.5 kN without fracture
     type: chassis_local
     item: rear_recovery
     severity: fail
@@ -349,7 +356,7 @@ trailer_checks:
     item: jacking_pad
     severity: fail
     inputs: []
-    why: Report 11 LC8b, 38.6 kN on one pad, or the larger force the frame analysis gives.
+    why: Report 11 LC8b, 60 % of the axle group at the plate on one pad, times 2, 43.6 kN at 4,000 kg with the 7.5 % ball, or the larger force the frame analysis gives.
   - id: LOC-05
     title: Spare carrier posts carry the spare wheel at 4 g down and 1.6 g forward
     type: chassis_local
@@ -364,6 +371,13 @@ trailer_checks:
     severity: fail
     inputs: []
     why: "ARK's XO fitting guide (RTC614 V1 1/21) rates each steady at 875 kg at 90 degrees, its only jacking position, and has its chassis mount bracket welded to the chassis. The welds run along the rail's bottom corners only (Cruisemaster TB 070), at the SP fillet capacity, 0.8 x 0.6 x 490 MPa, and the rail's two 3 mm webs bear the load over the bracket's length plus 5 t at fy / 1.5, LC5b's criterion."
+  - id: LOC-07
+    title: The coupling plate and the DO45's four M14 8.8 bolts hold VSB1 9.1's drawbar forces at the plate (shear, tension, both, bearing)
+    type: chassis_local
+    item: coupling_plate
+    severity: fail
+    inputs: []
+    why: "VSB1 Rev 6 9.1 and ADR 62/02 14.2 at the 4,000 kg plate, each force separately. AS 4100 9.3.2: a bolt's shear capacity 0.8 x 0.62 fuf on its minor diameter area with the threads in the shear plane, its tension 0.8 fuf on its stress area, and the two together within a circle. The pull's lever from the pin to the plate lifts one row of bolts."
   - id: CHS-09
     title: Holes the runs make in the rails and raisers, net section in LC1 to LC8b within each case's limit
     type: chassis_local

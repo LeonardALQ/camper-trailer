@@ -592,10 +592,10 @@ class Trailer:
         self.target = prj.load.towball_target_kg
         self.aw = prj.load.axle_window
         self.target_why = (f"the axle sits in the middle of the window between {self.aw['towball_pct_min']:.1f} % on the ball in the "
-                           f"lightest case and {self.aw['towball_max_kg']:.0f} kg with growth in the heaviest (H17). The supplier's 120 % "
-                           f"note uses {self.target:.1f} kg, {100 * self.target / self.reg['plated_atm_kg']['v']:.1f} % of the "
+                           f"lightest case and {self.aw['towball_max_kg']:.0f} kg with growth in the heaviest (H17). The supplier's "
+                           f"note on the axle group at the plate uses {self.target:.1f} kg, {100 * self.target / self.reg['plated_atm_kg']['v']:.1f} % of the "
                            f"{self.reg['plated_atm_kg']['v']:,.0f} kg plate")
-        self.supplier = inp.supplier(self.reg["plated_atm_kg"]["v"], self.target)
+        self.supplier = inp.supplier(self.reg["plated_atm_kg"]["v"], self.target, bool(self.td["params"].get("load_sharing", 0)))
         self.wheel = inp.wheel(self.td["wheel"])
         self.base.setdefault("coupling_z", inp.coupling_z())
         offset = self.base.get("wheel_offset", self.td["params"]["wheel_offset"])
@@ -755,7 +755,7 @@ class Trailer:
                 bases = ["nominal", "growth"] if c.basis == "both" else [c.basis]
                 key = {"mass": "mass_kg", "axle": "axle_kg", "axle_vsb1": "axle_kg", "towball": "towball_kg",
                        "towball_pct": "towball_pct", "tyre_load": "tyre_load_kg", "tyre_load_side": "tyre_load_side_kg"}[c.quantity]
-                factor = 1.2 if c.quantity == "axle_vsb1" and not self.supplier["includes_120"] else 1.0
+                factor = 1.2 if c.quantity == "axle_vsb1" and not (self.supplier["includes_120"] or self.supplier["load_sharing"]) else 1.0
                 unit = "%" if c.quantity == "towball_pct" else "kg"
                 cmin, cmax = c.min, c.max
                 caps = self.caps()
@@ -831,6 +831,25 @@ class Trailer:
                     row.update(limit=f"<= {d:.1f} kg, the ute's design towball ({tv['tow_case']})", measured=round(ball, 1), unit="kg",
                                margin=round(d - ball, 1), ok=ball <= d + 1e-6, governing=f"{heavy} {by_id[heavy]['name']} (with growth)",
                                detail=f"heaviest towball {ball:.1f} kg against the {d:.1f} kg the ute model carries in {tv['tow_case']}")
+            elif c.type == "coupling_dv":
+                # ADR 62/02 12.3.3 rates a coupling over 3.5 t by its D-value and V-value. The combination's own values, as
+                # AS 2213.1 clauses 6 and 7 and UN R55 work them out, stay within the coupling's ratings
+                cp, plate = self.reg["coupling"], self.caps()["plated"]
+                T, R = self.tv["limits"]["gvm_kg"] / 1000, plate / 1000
+                d_val = 9.81 * T * R / (T + R)
+                ratio = max(1.0, (lay.V["body_length"] / lay.V["axle_x"]) ** 2)
+                axles_t = (plate - self.reg["ball_floor_pct"] / 100 * plate) / 1000
+                v_val = cp["a"] * ratio * axles_t
+                m_d, m_v = cp["d_kn"] - d_val, cp["v_kn"] - v_val
+                row.update(limit=f"D <= {cp['d_kn']:g} kN and V <= {cp['v_kn']:g} kN", measured=round(max(d_val / cp["d_kn"], v_val / cp["v_kn"]) * 100, 1),
+                           unit="%", margin=round(100 * min(m_d / cp["d_kn"], m_v / cp["v_kn"]), 1), ok=min(m_d, m_v) >= -1e-6,
+                           governing="D-value" if d_val / cp["d_kn"] >= v_val / cp["v_kn"] else "V-value",
+                           detail=(f"D = 9.81 x {T:.3f} t x {R:.3f} t / {T + R:.3f} t = {d_val:.1f} kN against {cp['d_kn']:g} kN, the ute's "
+                                   f"{T * 1000:,.0f} kg GVM with the {plate:,.0f} kg plate. V = {cp['a']:g} m/s2 x {ratio:.2f} x {axles_t:.2f} t = "
+                                   f"{v_val:.1f} kN against {cp['v_kn']:g} kN: X/l is the {lay.V['body_length']:,.0f} mm body over the "
+                                   f"{lay.V['axle_x']:,.0f} mm from the ball to the axle group, squared and at least 1, and C the axle group at the "
+                                   f"plate with {self.reg['ball_floor_pct']:g} % on the ball"),
+                           coupling=dict(d_kn=d_val, v_kn=v_val, d_rating=cp["d_kn"], v_rating=cp["v_kn"]))
             elif c.type == "axle_window":
                 w = (getattr(self, "last_solved", None) or {}).get("window") or self.window()
                 width = w["width_mm"] if w["width_mm"] is not None else -1e9
@@ -1293,7 +1312,7 @@ def chassis_inputs(tr: Trailer, ev: dict) -> dict:
         datum="X from the ball centre, positive rearward. Y from the centreline, positive to the road side. Z up from the ground at design ride height.",
         rail_outer_width=V["rail_outer_w"], rail_inner_width=2 * V["rail_in"], rail_centres=2 * V["rail_c"],
         track=V["track"], cf=V["cf"], wheel_offset=V["wheel_offset"],
-        rail_section="RHS 150 x 50 x 3 C450L0 with a continuous RHS 127 x 51 x 3.5 C350L0 raiser (CHASSIS.md)",
+        rail_section="RHS 150 x 50 x 4 C450L0 with a continuous RHS 127 x 51 x 3.5 C350L0 raiser (CHASSIS.md)",
         rail_x0=V["body_x0"], rail_x1=V["body_x1"], rail_length=V["body_length"],
         rail_underside_z=V["rail_underside_z"], rail_top_z=V["rail_top_z"], raiser_h=V["raiser_h"],
         floor_underside_z=V["floor_underside_z"], floor_z=V["floor_z"], ceiling_z=V["ceiling_z"],
@@ -1355,7 +1374,7 @@ def measurement_refs(tr: Trailer, ev: dict) -> dict:
     cases = {c["id"]: c for c in ev["cases"]}
     refs = dict(
         towball_model=case["nominal"]["towball_kg"],
-        wheel_need=max(chk["MAS-09"]["measured"], ute["UTE-12"]["measured"] or 0),
+        wheel_need=chk["MAS-09"]["measured"],   # the trailer's own wheel since the Super Duty's 8-stud 18 in wheels
         gtm_need=max(chk["MAS-02"]["measured"], tr.supplier["need_kg"]),
         ball_reach_min=tr.inputs.v("UTE-02") - chk["JK-01"]["margin"],
         cf_min=tr.inputs.v("SUP-04") - chk["FIT-05"]["margin"],

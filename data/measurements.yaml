@@ -382,7 +382,7 @@ inputs:
     title: Combination mass, laden ute plus loaded trailer (GCM check)
     how: Line CK03. The ute's axles and the trailer's axles weighed coupled, added.
     unit: kg
-    estimate: {ref: combination, dp: 0, src: "Ute model case UC2 with growth plus the trailer fully loaded with growth (case TC2, MAS-10). The plan's limit sum is GCM-01's, the ute plus the plate (decision H20)"}
+    estimate: {ref: combination, dp: 0, src: "Ute model case UC2 with growth plus the trailer fully loaded with growth (case TC2, MAS-10). The plan's limit sum is GCM-01's, the ute plus the trailer's plate (decision H20)"}
     measured: {v: null, date: null}
     stage: trailer built
     affects: [GCM-01 check]
@@ -446,14 +446,14 @@ inputs:
   - id: WHL-01
     group: Wheel and suppliers
     part: trailer
-    title: Load rating of the shared wheel, ROH Trak 2 16 x 7 ET 0, 5 x 150
+    title: Load rating of the trailer's wheel, ROH Trak 2 16 x 7 ET 0, 5 x 150
     how: Read it from ROH's current table or the stamp on the wheel, and ask ROH whether it holds at the 80 psi of a load range E tyre.
     unit: kg
-    estimate: {v: 1400, basis: maker, src: "ROH's fitment table for the Trak 2 16 x 7 ET 0 5 x 150 (report 16 section 4), the wheel the ute and the trailer share. The maker's figure"}
+    estimate: {v: 1400, basis: maker, src: "ROH's fitment table for the Trak 2 16 x 7 ET 0 5 x 150 (report 16 section 4), the trailer's own wheel since the Super Duty's 8-stud 18 in wheels replaced the shared one. The maker's figure"}
     measured: {v: null, date: null}
     stage: buy
-    range: {min: {ref: wheel_need}, max: null, src: "At least the larger of the trailer's per-wheel load in MAS-09 and the ute's rear wheel load in UTE-12, both with the growth allowance. No maximum: a higher rating only adds margin"}
-    affects: [MAS-09, UTE-12]
+    range: {min: {ref: wheel_need}, max: null, src: "At least the trailer's per-wheel load in MAS-09, with the growth allowance. No maximum: a higher rating only adds margin"}
+    affects: [MAS-09]
     thresholds:
       - {rule: "MAS-09 checks the rating against the per-wheel load MAS-06 uses: 1.2 times the axle group load with the growth allowance, over four wheels. Below it, choose a higher-rated wheel", src: "VSB1 Rev 6 axles and suspension, report 16"}
   - id: SUP-01
@@ -465,10 +465,10 @@ inputs:
     estimate: {v: 4050, src: "Cruisemaster air guide: 4,500 kg ATM XT Air tandem, 4,050 kg GTM (report 06)"}
     measured: {v: null, date: null}
     stage: buy
-    range: {min: {ref: gtm_need}, max: null, src: "At least the larger of MAS-02's 1.2 times the axle group load with growth and VSB1's 120 % rule at the plated ATM (report 06). No maximum: a higher rating only adds margin"}
+    range: {min: {ref: gtm_need}, max: null, src: "At least the larger of MAS-02's axle group load with growth and the axle group at the plated ATM with H2's 7.5 % on the ball, the load-sharing tandem's need (VSB1's 120 % rule applies only if the tandem does not share load, report 06). No maximum: a higher rating only adds margin"}
     affects: [MAS-02]
     thresholds:
-      - {rule: "The axle group load in MAS-02 is checked against this rating. VSB1's 120 % rule at the ATM needs 1.2 x (ATM less the towball target), worked out from the current values", src: "Report 06, VSB1 Rev 6 axles and suspension"}
+      - {rule: "The axle group load in MAS-02 is checked against this rating. The load-sharing tandem at the ATM needs the ATM less the towball target, 3,700 kg at the 4,000 kg plate. Without load sharing VSB1's 120 % rule would need 1.2 times that, 4,440 kg, more than the XT Air's 4,050 kg", src: "Report 06, VSB1 Rev 6 axles and suspension, Cruisemaster CIS-006 rev 25"}
   - id: SUP-02
     group: Wheel and suppliers
     part: trailer
@@ -951,7 +951,7 @@ inputs:
     group: Trailer weighbridge
     part: trailer
     title: Weighed mass, fully loaded for travel with 300 L of water, the fuel and the gear
-    how: "Load the trailer as for a trip: 280 L of fresh water, the heater's diesel, the jerry cans, the gear and the food, with the grey tank empty. Weigh the whole trailer on a weighbridge, uncoupled on its jockey wheel, or coupled with only the trailer on the scale and the drawbar at its design height."
+    how: "Load the trailer as for a trip: 420 L of fresh water, the heater's diesel, the jerry cans, the gear and the food, with the grey tank empty. Weigh the whole trailer on a weighbridge, uncoupled on its jockey wheel, or coupled with only the trailer on the scale and the drawbar at its design height."
     unit: kg
     estimate: {v: null, src: "The model's TC2 mass without growth is shown beside it"}
     measured: {v: null, date: null}
@@ -959,8 +959,8 @@ inputs:
     range: {ref: model_TC2, rel: 0.03, src: "Within 3 % of the model's TC2. A bigger difference means the estimates or the load are wrong, so weigh the parts again"}
     affects: [MAS-01, the travel water limit, GCM-01]
     thresholds:
-      - {at: 3400, rule: "Over 3,400 kg, tow with less water until it is under, because H2 keeps the fully loaded trailer 100 kg under the plate", src: "Decision H2, H13"}
-      - {at: 3500, rule: "Over 3,500 kg the trailer is over its plate: unload before it moves", src: "The plated ATM"}
+      - {at: 3900, rule: "Over 3,900 kg, tow with less water until it is under, because H2 keeps the fully loaded trailer 100 kg under the plate", src: "Decision H2 as amended 23 Nov 2026, H13, H21"}
+      - {at: 4000, rule: "Over 4,000 kg the trailer is over its plate: unload before it moves", src: "The plated ATM"}
   - id: TW-05
     group: Trailer weighbridge
     part: trailer

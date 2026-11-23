@@ -80,7 +80,7 @@ and the rear zone ({n(t.zones.rear)} mm), {n(t.zones.interior)} mm inside in all
   so the towball changes little as the water is used.
 
 The fixed roof carries the solar panels, and the inside is {n(P.interior_h)} mm high. The floor height follows from the
-running gear (report 06) and the ute's tyre (report 16): the tyre is {n(ch.tyre_d)} mm across, the hubs sit at
+running gear (report 06) and the tyre (report 16): the tyre is {n(ch.tyre_d)} mm across, the hubs sit at
 {n(ch.hub_z)} mm and the XT suspension rises 60 mm at full bump, so with {n(ch.tyre_floor_clearance)} mm over the tyre
 the floor underside is at {n(ch.floor_underside_z)} mm and the floor surface at {n(ch.floor_z)} mm. The travel height is
 {n(ch.travel_height)} mm. The <a href={withBase('/decisions/')}>decision record</a> gives the reasons for the layout.
@@ -108,7 +108,7 @@ The trailer and the ute share one wheel and tyre (report 16), so each spare fits
 - Tyre: {t.wheel.tyre}.
 - Hubs: {t.wheel.hub}.
 - Offset and track: C/F {n(ch.cf)} mm with ET {n(ch.wheel_offset)} puts each wheel {n(ch.cf - ch.wheel_offset)} mm outside its rail, inside Cruisemaster's 200 mm limit, for a {n(ch.track)} mm track on the {n(ch.rail_outer_width)} mm rails.
-- Trailer spare: a fifth wheel and tyre on the body's front wall above the drawbar, centred across the trailer. The ute carries its own spare under its tray.
+- Trailer spare: a fifth wheel and tyre on the body's front wall above the drawbar, centred across the trailer. The truck's 8-stud 18 in wheels share nothing with the trailer's, so each carries its own spare.
 
 ## Water and the towball
 
@@ -141,7 +141,7 @@ The ute is the {tv.name}. Its limits come from the ute model on the <a href={wit
 
 The trailer is registered in NSW. The examiner caps GTM at the lowest of the tyre, coupling, chain and brake ratings
 ({n(t.caps.gtm)} kg here) and ATM at the lower of the coupling and chain ratings ({n(t.caps.atm)} kg). The plate is
-{n(t.caps.plated)} kg, the ute's braked towing rating (decision H2). A failed check shows in red. Limits are never
+{n(t.caps.plated)} kg (decision H2, amended 23 Nov 2026 from 3,500 kg), inside the Ranger Super Duty's 4,500 kg braked towing and the DO45's 4,500 kg, and fully loaded with growth the trailer stays at least 100 kg under it (MAS-10). Over 3.5 t the chains are grade 80 to AS 2321 and the coupling is rated by its D and V values (COU-01). A failed check shows in red. Limits are never
 changed to pass a check, and a part that fails is resized.
 
 <Trailer kind="checks" />

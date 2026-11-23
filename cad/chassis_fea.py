@@ -778,26 +778,30 @@ class Analysis:
         t = fit[c["fitting"]]["t"]
         a = 0.7 * c["weld_leg"]
         rows = []
-        for F in (34300.0, 17200.0):
+        f_along = max(abs(f[0]) for f in lcs["LC6b"]["forces_n"])
+        f_up = max(abs(f[2]) for f in lcs["LC6b"]["forces_n"])
+        for F in (f_along, f_up):
             Ip = 2 * (c["weld_l"] ** 3 / 12 + c["weld_l"] * (c["weld_h"] / 2) ** 2)
             rmax = math.hypot(c["weld_l"] / 2, c["weld_h"] / 2)
             q = F / (2 * c["weld_l"]) + F * c["ecc"] * rmax / Ip
             rows += [("net tension", F / ((c["net_w"] - c["hole"]) * t), fyp), ("bearing", F / (c["pin"] * t), 1.5 * fyp),
                      ("tear-out", F / (2 * t * (c["edge"] - c["hole"] / 2)), 0.6 * fyp), ("weld", q / a, wcap)]
-        out["chain_lug"] = _local("Chain lug, 10 mm (CH-P02)", rows, "34.3 kN longitudinal and 17.2 kN vertical, each in the lug's plane")
+        out["chain_lug"] = _local("Chain lug, 10 mm (CH-P02)", rows,
+                                  f"{f_along / 1000:.1f} kN longitudinal and {f_up / 1000:.1f} kN vertical, each in the lug's plane")
         # recovery points, LC8a, the worst direction: 30 degrees sideways is out of the plate's plane
         for key, name in (("front_recovery", "Front recovery lug, 20 mm (CH-P04)"), ("rear_recovery", "Rear recovery tongue, 20 mm (CH-P05)")):
             c = L[key]
             t = fit[c["fitting"]]["t"]
             a = 0.7 * c["weld_leg"]
             rows = []
-            for F, lim_p, lim_w, lab in ((lcs["LC8a"]["force_n"], fyp, wcap, "51.5 kN"), (lcs["LC8a"]["ultimate_n"], fup, 0.6 * mat["weld_fuw"], "78.5 kN ultimate")):
+            pull, ult = lcs["LC8a"]["force_n"], lcs["LC8a"]["ultimate_n"]
+            for F, lim_p, lim_w, lab in ((pull, fyp, wcap, f"{pull / 1000:.1f} kN"), (ult, fup, 0.6 * mat["weld_fuw"], f"{ult / 1000:.1f} kN ultimate")):
                 Fin, Flat = F * math.cos(math.radians(30)), F * math.sin(math.radians(30))
                 sig = Fin / ((c["net_w"] - c["hole"]) * t) + Flat * c["lever"] / (c["net_w"] * t ** 2 / 6)
                 q = math.hypot(Fin, Flat) / (2 * c["weld_l"]) + Flat * c["lever"] / (t + a) / c["weld_l"]
                 rows += [(f"plate, {lab}", sig, lim_p), (f"bearing, {lab}", F / (c["pin"] * t), 1.5 * lim_p),
                          (f"tear-out, {lab}", F / (2 * t * (c["edge"] - c["hole"] / 2)), 0.6 * lim_p), (f"weld, {lab}", q / a, lim_w)]
-            out[key] = _local(name, rows, "51.5 kN within 30 degrees sideways and 15 degrees up or down, 78.5 kN without fracture")
+            out[key] = _local(name, rows, f"{pull / 1000:.1f} kN within 30 degrees sideways and 15 degrees up or down, {ult / 1000:.1f} kN without fracture")
         # jacking pads, LC8b
         c = L["jacking_pad"]
         rail = ch.role_sec["rail"]
@@ -805,7 +809,8 @@ class Analysis:
         F = max(pad_n, lcs["LC8b"]["pad_n"])
         bb = fit[c["fitting"]]["l"] + 5 * rail.t
         rows = [("rail web bearing", F / (2 * rail.t * bb), rail.fy), ("pad bending between the webs", F * c["span"] / 8 / (fit[c["fitting"]]["w"] * t ** 2 / 6), fyp)]
-        out["jacking_pad"] = _local("Jacking pad, 10 mm (CH-P06)", rows, f"{F / 1000:.1f} kN on one pad (the larger of report 11's 38.6 kN and LC8b)")
+        out["jacking_pad"] = _local("Jacking pad, 10 mm (CH-P06)", rows,
+                                    f"{F / 1000:.1f} kN on one pad (the larger of LC8b's {lcs['LC8b']['pad_n'] / 1000:.1f} kN at the plate and the frame analysis)")
         # spare carrier posts, 4 g on the fixing (LC2) and the LC7 forward case
         c = L["spare_posts"]
         post = next(m for m in ch.members if m.role == "spare_post")
@@ -829,7 +834,26 @@ class Analysis:
                      (f"{p['pair']} {'webs' if webs > 1 else 'web'} bearing, {lw:g} mm", F / (webs * rail.t * (lw + 5 * rail.t)), rail.fy / 1.5)]
         out["steady_bracket"] = _local("Corner steady bracket, ARK's (CH-B01)", rows,
                                        f"the steady's {c['steady_kg']:.0f} kg rating at 90 degrees, its bracket welded under the rail")
+        out["coupling_plate"] = self.coupling_plate(lcs, fit, fyp)
         return out
+
+    def coupling_plate(self, lcs: dict, fit: dict, fyp: float) -> dict:
+        """The coupling's bolts and its plate under LC6 (AS 4100 9.3.2): the pull or the thrust shears the bolts and, on its
+        lever down to the plate's face, lifts one row or one side in tension, with the vertical force's share added."""
+        c = self.ch.data["local_checks"]["coupling_plate"]
+        t = fit[c["fitting"]]["t"]
+        along = max(abs(f[0]) for f in lcs["LC6"]["forces_n"])
+        across = max(abs(f[1]) for f in lcs["LC6"]["forces_n"])
+        up = max(abs(f[2]) for f in lcs["LC6"]["forces_n"])
+        n, d = c["bolts"], c["bolt_d"]
+        shear_lim, tension_lim = 0.8 * 0.62 * c["bolt_fuf"], 0.8 * c["bolt_fuf"]
+        v = max(along, across) / n
+        tens = max(along * c["lever"] / c["row_pitch"], across * c["lever"] / c["col_pitch"]) / (n / 2) + up / n
+        inter = math.hypot(v / c["bolt_ac"] / shear_lim, tens / c["bolt_as"] / tension_lim)
+        rows = [("bolt shear, the pull", v / c["bolt_ac"], shear_lim), ("bolt tension, the pull on its lever and the vertical force", tens / c["bolt_as"], tension_lim),
+                ("bolt, shear and tension together", inter * tension_lim, tension_lim), ("plate bearing at a bolt", v / (d * t), 3.2 * 0.9 * fyp)]
+        return _local(f"Coupling plate, {t:g} mm, and {n} x M{d:g} 8.8 bolts (CH-P01)", rows,
+                      f"{along / 1000:.1f} kN along, {across / 1000:.1f} kN across and {up / 1000:.1f} kN vertical at the coupling, separately")
 
     def fixings(self) -> list[dict]:
         """LC7 design forces for the fixings of the heavy items, in the heaviest case of each."""
@@ -863,7 +887,9 @@ class Analysis:
                          at=g[1]["at"], case=g[1]["case"]))
         vert = [lc6[k] for k in lc6 if "Z" in k]
         sig = max(max(self.normal_at(r, f"DB-{s}A", V["body_x0"]), self.normal_at(r, f"DB-{s}B", V["body_x0"])) for r in vert for s in "KR")
-        rows.append(dict(id="drawbar-LC6", what="Drawbar member at the body front, LC6 vertical (report 11 hand figure at 17.2 kN, the model at the plate)", hand_mpa=264.0, model_mpa=sig))
+        f_up = max(abs(f[2]) for f in next(l for l in ch.data["load_cases"] if l["id"] == "LC6")["forces_n"])
+        rows.append(dict(id="drawbar-LC6", what=(f"Drawbar member at the body front, LC6 vertical (report 11's hand figure, 264 MPa at 17.2 kN, "
+                                                 f"scaled to the plate's {f_up / 1000:.1f} kN)"), hand_mpa=264.0 * f_up / 17200, model_mpa=sig))
         o = max(((m, r) for m, r in out["envelope"]["LC2"].items() if m.startswith("OR-")), key=lambda kv: kv[1]["sigma"])
         L = V["outrigger_tip_y"] - V["outrigger_root_y"]
         tip = abs(o[1]["M_strong"]) / (3 * G * L)
