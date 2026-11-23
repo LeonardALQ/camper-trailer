@@ -796,9 +796,9 @@ def ct603(prj, model, bom, checks, reg, dwg):
         "EVERY PENETRATION PASSES A SEALED GLAND OR FITTING (VSB1 7.1), AND A RUN THROUGH METAL PASSES A GROMMET. THE FITTING COLUMN IS "
         "EACH GLAND'S FITTING IN data/services.yaml.",
         "THE ASSUMPTION BEHIND EACH POSITION IS THE GLAND'S est IN data/services.yaml. CT-602 AND CT-612 TAG THE RUNS AT EACH GLAND.",
-        "EACH FRAME IS 60 mm DEEP IN THE 30 mm FLOOR. G9 AND G20 STAND 30 mm ON THE FLOOR, THEIR UNDERSIDES FLUSH WITH ITS UNDERSIDE, "
-        "CLEAR OF THE RAISERS' BEARER STRIPS UNDER THEM. G15 HANGS 30 mm UNDER THE FLOOR, 5 mm FROM THE ROAD RAISER'S STRIP. "
-        "G9'S ROXTEC C WEDGE 60 (84 mm DEEP) STANDS 24 mm PROUD OF ITS FRAME, DRAWN AT THE PACKING'S END (SVC-01 TESTS ALL THREE).",
+        "EACH FRAME IS 60 mm DEEP IN THE 30 mm FLOOR AND STANDS 30 mm ON IT, ITS UNDERSIDE FLUSH WITH THE FLOOR'S UNDERSIDE, CLEAR OF "
+        "THE RAISERS' BEARER STRIPS UNDER IT. EACH ROXTEC C WEDGE (84 mm DEEP) STANDS 24 mm PROUD OF ITS FRAME: G9'S C WEDGE 60 AT THE "
+        "PACKING'S END, G15'S C WEDGE 120 INSIDE ITS STACK BEHIND W-01 AND F-03 (ROXTEC 124037). SVC-01 TESTS ALL THREE FRAMES.",
     ], size=1.42, width_chars=185)
     # ---- right column: every gland
     yb = title(sh, dwg, reg, "GLANDS IN BD-11, TRANSIT FRAMES IN BD-25 (TB-11).", "SEE THE FITTING COLUMN")
@@ -1095,9 +1095,9 @@ def ct612(prj, model, bom, checks, reg, dwg):
     yb = title(sh, dwg, reg, "TANKS AND FITTINGS IN THE MASS SCHEDULE (TB-11).", "6 mm HDPE TANKS, FOOD-GRADE LINES")
     rows = [["Fill", "G1 on the kerb wall", "The front tank, over CM-04", "Under the bed, down G12"],
             ["Tank outlets", "Both tanks, balanced over CM-05", "G15, the strainer and the pump", "From the rear tank"],
-            ["Cold", "Manifold, sink cabinet", "Sink, drinking tap, Combi by G15 and G9", "Push-fit PEX"],
+            ["Cold", "Manifold, sink cabinet", "Sink, drinking tap, Combi along the bench", "Push-fit PEX"],
             ["Wet room", "Manifold, shower corner", "Basin, flush, washer tap, bypass, shower, rinse box", "Over the inner door"],
-            ["Hot", "Combi, by G9 and G15", "Mixing valve at 50 C, then sink and wet room", "PEX"],
+            ["Hot", "Combi, along the bench", "Mixing valve at 50 C, then sink and wet room", "PEX"],
             ["Sink waste", "Sink", "Grey tank's top, by G15", "1:50 under the floor"],
             ["Washer, dryer", "Behind the dryer", "The basin", "Pumped, the washer's sleeved"],
             ["Basin, well, floor", "The wet room", "Grey tank, straight down", "G13, the well's valve, G24"],
