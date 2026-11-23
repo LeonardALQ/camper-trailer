@@ -11,13 +11,13 @@ checks: []
 # ute's rear axle within its rating with growth, computed from the ute model at that ball load. H17 put the Lovells Elite
 # kit on the ute, and H18 plates its rear axle at 2,800 kg, twice the shared wheel's 1,400 kg. H17 also set the design
 # towball range the axle solve uses: at least 8.0 % in every case and at most 320 kg with growth. H2 sets the 7.5 %
-# floor and the 3,500 kg plate. VSB1 sets no towball share. Limits here are never changed to make a check pass.
+# floor and the plate, 4,000 kg since 23 Nov 2026. VSB1 sets no towball share. Limits here are never changed to make a check pass.
 # The services checks SVC-01 to SVC-12 (H28: clearance, bend radii, 230 V segregation, the battery's terminal face,
 # coverage, voltage drop, falls, the runs' spacing, the glands' room, then the cables' ratings, heat and supports) are defined beside the runs in data/routes.yaml `checks`, with their sources, and
 # measured by cad/routes.py. The trailer's build adds their rows to these checks' results (build/trailer/trailer.json).
 trailer_checks:
   - id: MAS-01
-    title: Trailer mass with growth within the 3,500 kg plated ATM
+    title: Trailer mass with growth within the 4,000 kg plated ATM
     type: mass
     quantity: mass
     limit: plated_atm
@@ -25,17 +25,17 @@ trailer_checks:
     cases: all
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: Decision H2 plates the ATM at 3,500 kg, the ute's towing rating and the DO35 and NSW caps, so it covers every case with the growth allowance.
+    why: Decision H2, amended 23 Nov 2026, plates the ATM at 4,000 kg, inside the Ranger Super Duty's 4,500 kg braked towing and the DO45's 4,500 kg, so it covers every case with the growth allowance.
   - id: MAS-10
-    title: Trailer mass with growth at most 3,400 kg in every case (design target)
+    title: Trailer mass with growth at most 3,900 kg in every case (design target)
     type: mass
     quantity: mass
     basis: growth
     cases: all
-    max: 3400
+    max: 3900
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: Decision H2 keeps 100 kg of the 3,500 kg plate in reserve for the estimates. H13 holds it with the travel limit on water, 280 L since H21.
+    why: Decision H2 keeps 100 kg of the 4,000 kg plate in reserve for the estimates. H13 holds it with the travel limit on water, and H21 takes any excess off the water.
   - id: MAS-02
     title: Axle group load with growth, times 1.2 for VSB1's 120 % rule, within the kit's GTM
     type: mass
@@ -262,7 +262,7 @@ trailer_checks:
     load_case: LC1
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: Report 11 LC1. The ARTSA factor of safety of 3 on yield (report 02 section 2.4). Every member, every trailer case scaled so the heaviest sits at the 3,500 kg plated ATM.
+    why: Report 11 LC1. The ARTSA factor of safety of 3 on yield (report 02 section 2.4). Every member, every trailer case scaled so the heaviest sits at the plated ATM, 4,000 kg.
   - id: CHS-02
     title: Chassis stress, LC2 vertical bump 3 g, below yield
     type: chassis_stress
@@ -304,21 +304,21 @@ trailer_checks:
     load_case: LC6
     severity: fail
     inputs: []
-    why: VSB1 9.1 and 14. 51.5 kN along, 17.2 kN across and 17.2 kN up and down at the coupling, each way, with the body held at its suspension mounts. No residual deformation, so the check is elastic.
+    why: VSB1 9.1 and 14, ADR 62/02 14.2, at the 4,000 kg plate. 58.9 kN along, 19.6 kN across and 19.6 kN up and down at the coupling (1.5, 0.5 and 0.5 times the ATM's weight), each way, with the body held at its suspension mounts. No residual deformation, so the check is elastic.
   - id: CHS-06B
     title: Drawbar stress, LC6b VSB1 9.2.2 chain point forces, below yield
     type: chassis_stress
     load_case: LC6b
     severity: fail
     inputs: []
-    why: VSB1 9.2.2. 34.3 kN along and 17.2 kN up and down at each chain lug, separately.
+    why: VSB1 9.2.2 and ADR 62/02 14.4.2 at the 4,000 kg plate. 39.2 kN along and 19.6 kN up and down at each chain lug (1.0 and 0.5 times the ATM's weight), separately.
   - id: CHS-08A
-    title: Chassis stress, LC8a recovery at 51.5 kN within 30 degrees sideways and 15 degrees up or down, below yield
+    title: Chassis stress, LC8a recovery at 58.9 kN within 30 degrees sideways and 15 degrees up or down, below yield
     type: chassis_stress
     load_case: LC8a
     severity: fail
     inputs: []
-    why: Report 11 LC8a, at each front and rear recovery point, with the body held at its suspension mounts.
+    why: Report 11 LC8a, 1.5 times the plated ATM's weight (58.9 kN at 4,000 kg), at each front and rear recovery point, with the body held at its suspension mounts.
   - id: CHS-08B
     title: Chassis stress, LC8b one side jacked at its pad with gravity times 2, below yield
     type: chassis_stress
@@ -334,14 +334,14 @@ trailer_checks:
     inputs: []
     why: VSB1 9.2.2. Plate limits are fy (bearing 1.5 fy, tear-out shear 0.6 fy) so the lug does not deform. The weld limit is the SP fillet capacity, 0.8 x 0.6 x 490 MPa.
   - id: LOC-02
-    title: Front recovery lugs hold 51.5 kN without yield and 78.5 kN without fracture
+    title: Front recovery lugs hold 58.9 kN without yield and 78.5 kN without fracture
     type: chassis_local
     item: front_recovery
     severity: fail
     inputs: []
     why: Report 11 LC8a. A 30 degree sideways pull bends the lug out of its plane.
   - id: LOC-03
-    title: Rear recovery tongues hold 51.5 kN without yield and 78.5 kN without fracture
+    title: Rear recovery tongues hold 58.9 kN without yield and 78.5 kN without fracture
     type: chassis_local
     item: rear_recovery
     severity: fail
@@ -353,7 +353,7 @@ trailer_checks:
     item: jacking_pad
     severity: fail
     inputs: []
-    why: Report 11 LC8b, 38.6 kN on one pad, or the larger force the frame analysis gives.
+    why: Report 11 LC8b, 60 % of the axle group at the plate on one pad, times 2, 43.6 kN at 4,000 kg with the 7.5 % ball, or the larger force the frame analysis gives.
   - id: LOC-05
     title: Spare carrier posts carry the spare wheel at 4 g down and 1.6 g forward
     type: chassis_local

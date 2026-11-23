@@ -3,7 +3,7 @@
 Design data, parametric models, checks, drawings and a static website for a one-off off-road home trailer and its
 tow vehicle. The tow vehicle is a Toyota LandCruiser 79 single cab V8 that carries two motorcycles in an enclosed box
 on its tray. The trailer has a 4,420 mm body with a lift bed across the front, a wet room across the rear and a fixed
-roof, plated at 3,500 kg ATM.
+roof, plated at 4,000 kg ATM.
 
 The site is https://leonardalq.github.io/camper-trailer/. Every push to `main` is built and checked, and the site is
 published from the `live` branch.

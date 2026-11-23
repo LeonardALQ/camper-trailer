@@ -5,8 +5,9 @@
 # cad/chassis_fea.py analyses them. Sections come from data/chassis/sections.yaml (report 11's table).
 id: ASM-CH
 name: Chassis and drawbar
-revision: C     # C, 21 Nov 2026: the home trailer. RHS 127 x 51 x 3.5 C350L0 raisers, outriggers and floor crossmembers (report 22),
-                # the grey-bay floor crossmember over the grey tank in place of the battery bay, every case at the 3,500 kg plate (H2)
+revision: D     # D, 23 Nov 2026: every case at the 4,000 kg plate (H2 as amended), the DO45 coupling and its plate, grade T chains.
+                # C, 21 Nov 2026: the home trailer. RHS 127 x 51 x 3.5 C350L0 raisers, outriggers and floor crossmembers (report 22),
+                # the grey-bay floor crossmember over the grey tank in place of the battery bay, every case at the 3,500 kg plate
 
 material:
   tube: "AS/NZS 1163 C450L0 RHS and SHS, Austube Mills C450PLUS bought black (fy 450 MPa, fu 500 MPa)"
@@ -177,27 +178,29 @@ steadies:
     - {x: steady_rear_x, y: steady_rear_y, fold: forward}
 
 # Load cases, report 11 section 3.2. Accelerations in g along X (+ rearward), Y (+ road side) and Z (+ up). Every case
-# runs on each trailer case TC1 to TC8 with its masses scaled up to the 3,500 kg plated ATM (water included), except
-# LC5b, which is at tare. `factor` divides fy for the stress criterion. Revision C: the VSB1 drawbar and chain forces
-# follow the 3,500 kg plate (1.5, 0.5 and 1.0 times the ATM's weight, H2).
+# runs on each trailer case TC1 to TC8 with its masses scaled up to the 4,000 kg plated ATM (water included), except
+# LC5b, which is at tare. `factor` divides fy for the stress criterion. Revision D: the VSB1 drawbar and chain forces
+# follow the 4,000 kg plate (1.5, 0.5 and 1.0 times the ATM's weight, H2 as amended 23 Nov 2026), and so do LC5a's wheel,
+# LC8a's pull and LC8b's pad, each at the axle group the plate allows with H2's 7.5 % floor on the ball, 3,700 kg.
 load_cases:
   - {id: LC1, name: "Static at ATM", kind: static, accel: [[0, 0, -1]], factor: 3, source: "ARTSA factor of safety of 3 (report 02 section 2.4)"}
   - {id: LC2, name: "Vertical bump, 3 g on the structure", kind: static, accel: [[0, 0, -3]], factor: 1, source: "Report 11 LC2, ARTSA"}
   - {id: LC3, name: "Braking, 0.8 g forward plus 1 g vertical, braked at the tyres", kind: static, accel: [[-0.8, 0, -1]], factor: 1.5, source: "Report 02, report 11 LC3"}
   - {id: LC4, name: "Cornering, 0.5 g lateral either way plus 1 g vertical", kind: static, accel: [[0, 0.5, -1], [0, -0.5, -1]], factor: 1.5, source: "Report 02, report 11 LC4"}
-  - {id: LC5a, name: "Twist, one wheel in a hole: 13.4 kNm between the axles, plus 1 g", kind: twist_wheel, accel: [[0, 0, -1]], torque_nmm: 13400000, factor: 1.5,
-     source: "Report 11 LC5a: 820 kg x 9.81 x 0.831 m = 6.7 kNm, times 2 for dynamics"}
+  - {id: LC5a, name: "Twist, one wheel in a hole: 15.1 kNm between the axles, plus 1 g", kind: twist_wheel, accel: [[0, 0, -1]], torque_nmm: 15080000, factor: 1.5,
+     source: "Report 11 LC5a at the 4,000 kg plate: 925 kg (a quarter of the 3,700 kg axle group) x 9.81 x 0.831 m = 7.54 kNm, times 2 for dynamics. Report 11 had 820 kg at 3,500 kg"}
   - {id: LC5b, name: "Twist on the corner steadies at tare, one wound to 875 kg", kind: twist_steady, accel: [[0, 0, -1]], steady_kg: 875, factor: 1.5,
      source: "Report 11 LC5b, ARK catalogue 2024 p. 67"}
-  - {id: LC6, name: "Drawbar, VSB1 9.1 at the 3,500 kg plate: 51.5 kN longitudinal, 17.2 kN transverse, 17.2 kN vertical, each way, separately", kind: drawbar,
-     forces_n: [[51500, 0, 0], [-51500, 0, 0], [0, 17200, 0], [0, -17200, 0], [0, 0, 17200], [0, 0, -17200]], factor: 1, source: "VSB1 9.1 and 14.2.1, ADR 62/02 14.2, at 3,500 kg"}
-  - {id: LC6b, name: "Chain points, VSB1 9.2.2 at the 3,500 kg plate: 34.3 kN longitudinal, 17.2 kN vertical, each point separately", kind: chain,
-     forces_n: [[-34300, 0, 0], [0, 0, -17200], [0, 0, 17200]], factor: 1, source: "VSB1 9.2.2 and 14.2.2, ADR 62/02 14.4.2, at 3,500 kg"}
+  - {id: LC6, name: "Drawbar, VSB1 9.1 at the 4,000 kg plate: 58.9 kN longitudinal, 19.6 kN transverse, 19.6 kN vertical, each way, separately", kind: drawbar,
+     forces_n: [[58860, 0, 0], [-58860, 0, 0], [0, 19620, 0], [0, -19620, 0], [0, 0, 19620], [0, 0, -19620]], factor: 1, source: "VSB1 Rev 6 9.1 and 14.2.1, ADR 62/02 14.2: 1.5, 0.5 and 0.5 x 9.81 x 4,000 kg"}
+  - {id: LC6b, name: "Chain points, VSB1 9.2.2 at the 4,000 kg plate: 39.2 kN longitudinal, 19.6 kN vertical, each point separately", kind: chain,
+     forces_n: [[-39240, 0, 0], [0, 0, -19620], [0, 0, 19620]], factor: 1, source: "VSB1 Rev 6 9.2.2 and 14.2.2, ADR 62/02 14.4.2: 1.0 and 0.5 x 9.81 x 4,000 kg"}
   - {id: LC7, name: "Cargo and heavy item fixings: 0.8 g forward, 0.5 g rearward, 0.5 g sideways, 0.2 g up, times 2 off road", kind: fixings,
      accel: [[-1.6, 0, 0], [1.0, 0, 0], [0, 1.0, 0], [0, 0, 0.4]], factor: 1.5, source: "NTC Load Restraint Guide via report 02, factor 2 from report 03"}
-  - {id: LC8a, name: "Recovery points: 51.5 kN within 30 degrees sideways and 15 degrees up or down of the rail axis", kind: recovery,
-     force_n: 51500, ultimate_n: 78500, factor: 1, source: "Report 11 LC8a"}
-  - {id: LC8b, name: "Jacking: one side lifted at its pad, gravity times 2", kind: jack, accel: [[0, 0, -2]], pad_n: 38600, factor: 1, source: "Report 11 LC8b"}
+  - {id: LC8a, name: "Recovery points: 58.9 kN within 30 degrees sideways and 15 degrees up or down of the rail axis", kind: recovery,
+     force_n: 58860, ultimate_n: 78500, factor: 1, source: "Report 11 LC8a: 1.5 x 9.81 x the 4,000 kg plate, as the drawbar case. The ultimate stays TJM's 8 t test load"}
+  - {id: LC8b, name: "Jacking: one side lifted at its pad, gravity times 2", kind: jack, accel: [[0, 0, -2]], pad_n: 43560, factor: 1,
+     source: "Report 11 LC8b at the 4,000 kg plate: 60 % of the 3,700 kg axle group on one pad, times 2 (report 11 had 38.6 kN at 3,500 kg)"}
   - {id: LC10, name: "Fatigue: frequent 0.5 g either way (range 1 g) beyond 10 million cycles, occasional 1.5 g either way for 100,000 cycles",
      kind: fatigue, accel: [[0, 0, -1]], occasional_factor: 3, occasional_cycles: 100000, miner_limit: 0.5,
      source: "Report 11 LC10 and section 3.4, IIW-1823-07"}

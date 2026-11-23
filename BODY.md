@@ -14,7 +14,7 @@ Revision C is the body of the home trailer, TRAILER.md revision J. Revision B, t
 - A stiffener stands behind the kitchen bench on the road side, and two jamb members stand either side of the entry door on the kerb side. They and the four hardpoints are RHS 110 x 19 x 3.5 6060-T5, made to order, bonded to the inner skin with 13 mm of XPS behind them and stood on rigid PVC blocks clear of the joiners' legs, so no metal crosses the core. They hold the wall to 19.7 mm in region B's 25-year wind (AS/NZS 1170.2, H23), against 20.0 mm (BDY-10), and to 18.9 mm as plates with the openings cut out (BDY-24), stand at least 25 mm clear of every opening, gland, insert strip and each other, or share one routed channel with an H200 fill (FIT-07), and keep the inside surface over them and over the joiners at 10.2 °C or more on the design cold night, at ISO 13788's Rsi of 0.25 m²K/W (BDY-22).
 - The split's outdoor unit stands on two stays to the chassis, so the rear wall's skin carries none of its weight (BDY-21).
 - A moulded GRP tray covers the wet room floor, and vinyl covers only the rest.
-- The mounts are checked at the 3,500 kg plate (H2).
+- The mounts are checked at the 4,000 kg plate (H2 as amended 23 Nov 2026).
 - The body weighs 630.6 kg, 701.8 kg with growth, with both doors and their steps.
 - No check limit changed, and no estimate changed to pass a check.
 

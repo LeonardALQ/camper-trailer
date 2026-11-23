@@ -382,7 +382,7 @@ inputs:
     title: Combination mass, laden ute plus loaded trailer (GCM check)
     how: Line CK03. The ute's axles and the trailer's axles weighed coupled, added.
     unit: kg
-    estimate: {ref: combination, dp: 0, src: "Ute model case UC2 with growth plus the trailer fully loaded with growth (case TC2, MAS-10). The plan's limit sum is GCM-01's, the ute plus the 3,500 kg plate (decision H20)"}
+    estimate: {ref: combination, dp: 0, src: "Ute model case UC2 with growth plus the trailer fully loaded with growth (case TC2, MAS-10). The plan's limit sum is GCM-01's, the ute plus the trailer's plate (decision H20)"}
     measured: {v: null, date: null}
     stage: trailer built
     affects: [GV06, decision H2 water limit]
@@ -960,8 +960,8 @@ inputs:
     range: {ref: model_TC2, rel: 0.03, src: "Within 3 % of the model's TC2. A bigger difference means the estimates or the load are wrong, so weigh the parts again"}
     affects: [MAS-01, the travel water limit, GCM-01]
     thresholds:
-      - {at: 3400, rule: "Over 3,400 kg, tow with less water until it is under, because H2 keeps the fully loaded trailer 100 kg under the plate", src: "Decision H2, H13"}
-      - {at: 3500, rule: "Over 3,500 kg the trailer is over its plate: unload before it moves", src: "The plated ATM"}
+      - {at: 3900, rule: "Over 3,900 kg, tow with less water until it is under, because H2 keeps the fully loaded trailer 100 kg under the plate", src: "Decision H2 as amended 23 Nov 2026, H13, H21"}
+      - {at: 4000, rule: "Over 4,000 kg the trailer is over its plate: unload before it moves", src: "The plated ATM"}
   - id: TW-05
     group: Trailer weighbridge
     part: trailer

@@ -6,7 +6,7 @@ Status: proposal, revision E of 21 Nov 2026, updated 22 Nov 2026 for the welding
 
 The frame now carries the home trailer of TRAILER.md revision J. Revision D, the LandCruiser 79 trailer at a 3,100 kg plate, is in the git history.
 
-- Every case is checked at the 3,500 kg plate (decision H2), on all eight trailer cases TC1 to TC8, including the grey-full cases. VSB1's drawbar and chain forces follow the plate: 51.5 kN and 17.2 kN at the coupling, 34.3 kN and 17.2 kN at each chain point.
+- Every case is checked at the 4,000 kg plate (decision H2, amended 23 Nov 2026 from 3,500 kg), on all eight trailer cases TC1 to TC8, including the grey-full cases. VSB1's drawbar and chain forces follow the plate: 58.9 kN along and 19.6 kN across and up and down at the coupling, 39.2 kN along and 19.6 kN up and down at each chain point.
 - The raisers, outriggers and floor crossmembers are RHS 127 x 51 x 3.5 C350L0, because RHS 125 x 50 x 3 is not a stocked size (research report 22). Each member is checked at its own grade, so the composite rail is checked at the raiser's 350 MPa.
 - The grey tank fills the rear bay, so a floor crossmember crosses its middle in place of the battery bay's, and the rear bay's plan braces went. The XT rear shock crossmember is RHS 150 x 50 x 4 in place of 150 x 50 x 3, so the rear recovery pull (CHS-08A) passes without them. The tank's 2 mm guard is not counted as a shear plate, because it would buckle at about 4 kN (est.).
 - The axle group sits at X 4,379.8 mm, so the XT stations moved 182.8 mm rearward.
@@ -112,7 +112,7 @@ Every case runs on the eight trailer cases TC1 to TC8, with the water, fuel and 
 | LC4 | Cornering, 0.5 g sideways each way with 1 g down | Together, both ways | Stress ≤ fy / 1.5 | Report 02 |
 | LC5a | Twist, one wheel in a hole: 13.4 kNm between the axles with 1 g down | Together, both diagonals | Stress ≤ fy / 1.5, twist between the front hinge and rear shock crossmembers ≤ 0.5 degree | Report 11: 820 kg x 9.81 x 0.831 m = 6.7 kNm, times 2 |
 | LC5b | Twist at tare, one corner steady wound to 875 kg | With 1 g down | Stress ≤ fy / 1.5 | Report 11, ARK |
-| LC6 | Drawbar, VSB1 9.1 at the 3,500 kg plate: 51.5 kN along, 17.2 kN across, 17.2 kN up and down at the coupling | Each separately, each way | Stress < fy | VSB1 9.1 and 14, ADR 62/02 14.2 |
+| LC6 | Drawbar, VSB1 9.1 at the 4,000 kg plate: 58.9 kN along, 19.6 kN across, 19.6 kN up and down at the coupling | Each separately, each way | Stress < fy | VSB1 9.1 and 14, ADR 62/02 14.2 |
 | LC6b | Chain points, VSB1 9.2.2 at the plate: 34.3 kN along, 17.2 kN up and down | Each lug separately | Stress < fy | VSB1 9.2.2, ADR 62/02 14.4.2 |
 | LC7 | Cargo fixings: 0.8 g forward, 0.5 g rearward, 0.5 g sideways, 0.2 g up, each times 2 off road | Separately | Fixing forces for the body design, fy / 1.5 | NTC guide via report 02 |
 | LC8a | Recovery: 51.5 kN at each front and rear point within 30 degrees sideways and 15 degrees up or down, 78.5 kN ultimate | Separately, nine directions each | No yield at 51.5 kN, no fracture at 78.5 kN | Report 11 |

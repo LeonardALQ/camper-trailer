@@ -285,7 +285,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
     uc = {c["id"]: c for c in C["ute"]["checks"]}
     rows = [
         ["ATM", "Builder's rating from the chassis, axles, tyres and stability (VSB1 p. 9). Plate H2", f"{rep['caps']['plated']:,.0f} kg plate. Heaviest case with growth {mv('MAS-01')}", st("MAS-01")],
-        ["Design margin", "Every case with growth at most 3,400 kg (H2, MAS-10)", f"{mv('MAS-10')} (TC2)", st("MAS-10")],
+        ["Design margin", f"Every case with growth at most {chk['MAS-10']['measured'] + chk['MAS-10']['margin']:,.0f} kg (H2, MAS-10)", f"{mv('MAS-10')} (TC2)", st("MAS-10")],
         ["GTM, NSW cap", "Lowest of the tyre, coupling, chain and brake ratings (report 02 section 2.1)", f"Cap {rep['caps']['gtm']:,.0f} kg. Axle group with growth {mv('MAS-07')}", st("MAS-07")],
         ["Axle kit", "Axles carry 120 % of their share where they do not share load (VSB1)", f"Kit GTM {rep['supplier']['kit_gtm']:,.0f} kg against {mv('MAS-02')}", st("MAS-02")],
         ["Tyres", "LT265/75R16 123/120 E, 1,550 kg each, with VSB1's 120 % on the heavier side", f"{mv('MAS-06')} on the heavier side", st("MAS-06")],
@@ -293,9 +293,11 @@ def ct003(prj, model, bom, checks, reg, dwg):
         ["Brakes", "Over 2,000 kg GTM: brakes on every wheel, breakaway held 15 min (VSB1 8.2)", "12 in electric drums on four wheels, Bosch TSC, breakaway kit DB-07", ("ALL WHEELS", "#000")],
         ["Coupling", "AS 4177.3 50 mm ball, or an off-road coupling with a type approval (VSB1 9.3)", "Cruisemaster DO35 V3Plus, ADR rated 3,500 kg", ("RATED 3,500 kg", "#000")],
         ["Safety chains", "Two above 2,500 kg ATM to AS 4177.4, 4177-35 (VSB1 9.2.1)", "Two chains DB-06. Lugs at 34.3 kN and 17.2 kN (VSB1 9.2.2)", st("LOC-02")],
-        ["Drawbar", "9.81 x ATM along and 0.5 x 9.81 x ATM down (VSB1 9.1)", f"Peak {chk['CHS-06']['measured']:.0f} MPa at 17.2 kN up, {chk['CHS-06B']['measured']:.0f} MPa down", st("CHS-06")],
+        ["Drawbar", "1.5 x 9.81 x ATM along and 0.5 x 9.81 x ATM across and up and down (VSB1 9.1)",
+         f"Peak {chk['CHS-06']['measured']:.0f} MPa at {0.5 * 9.81 * rep['caps']['plated'] / 1000:.1f} kN up, chain lugs {chk['CHS-06B']['measured']:.0f} MPa", st("CHS-06")],
         ["Towball height", "Ball 350 to 460 mm loaded, trailer level in it (VSB1 9.3.2)", f"{V['coupling_z']:.0f} mm, plus or minus 20 mm (UTE-01)", st("DIM-03")],
-        ["Towball load", "Every case at least 7.5 % (H2), design at least 8.0 % and 320 kg (H17)", f"{chk['MAS-12']['measured']:.1f} % lowest, {_kg(chk['MAS-13']['measured'])} kg heaviest with growth", st("MAS-12")],
+        ["Towball load", f"Every case at least 7.5 % (H2), design at least {rep['solved']['window']['pct_min']:.1f} % and {rep['solved']['window']['ball_max']['kg']:.0f} kg (H17)",
+         f"{chk['MAS-12']['measured']:.1f} % lowest, {_kg(chk['MAS-13']['measured'])} kg heaviest with growth", st("MAS-12")],
         ["Running clearance", "At least 100 mm, unladen (VSB1 5.4). Design at least 290 mm (DIM-06)",
          f"{mv('DIM-04', '{:.1f}')} at {chk['DIM-04']['line']}, breakover {mv('DIM-07', '{:.1f}')} (DIM-07)", st("DIM-06")],
         ["Width", "Across the body and everything on its sides, at most 2,500 mm, side lamps left out (ADR 43/04 6.2.6.1, VSB1 5.2)", f"{mv('DIM-01')}, design at most 2,490 mm (DIM-05)", st("DIM-05")],
@@ -343,7 +345,8 @@ def ct003(prj, model, bom, checks, reg, dwg):
                                      f"MOST {water_fb} L OF WATER IN TRAVEL, SO THE FULLY LOADED TRAILER WITH GROWTH STAYS UNDER THAT PLATE (H20)."),
         ("GCM (GCM-01)", f"{lim['gcm_kg']:,.0f} kg WITH THE REVISION. THE UTE WITH GROWTH, {_kg(gcm['ute_kg_growth'])} kg, PLUS THE "
                          f"{gcm['plate']:,.0f} kg PLATE IS {_kg(gcm['sum'])} kg (UTE-06, H20)."),
-        ("ATM AND DESIGN LIMIT", f"PLATE {rep['caps']['plated']:,.0f} kg. EVERY CASE WITH GROWTH AT MOST 3,400 kg (MAS-10)."),
+        ("ATM AND DESIGN LIMIT", f"PLATE {rep['caps']['plated']:,.0f} kg. EVERY CASE WITH GROWTH AT MOST "
+                                 f"{chk['MAS-10']['measured'] + chk['MAS-10']['margin']:,.0f} kg (MAS-10)."),
         ("TOWBALL (H17)", f"AT LEAST {rep['solved']['window']['pct_min']:.1f} % OF THE TRAILER IN EVERY CASE AND AT MOST "
                           f"{rep['solved']['window']['ball_max']['kg']:.0f} kg WITH GROWTH. TOWBAR AND DO35 {lim['towball_rating_kg']:.0f} kg."),
         ("THE UTE (H17, H18)", f"LOVELLS ELITE PLATED AT {lim['gvm_kg']:,.0f} kg GVM, REAR AXLE {lim['rear_axle_kg']:,.0f} kg ({_kg(uc['UTE-03']['measured'])} kg "

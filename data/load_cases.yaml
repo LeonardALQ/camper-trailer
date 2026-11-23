@@ -56,15 +56,16 @@ axle_window:
   towball_pct_min: 8.0
   towball_max_kg: 320
 
-# The towball used only for the supplier's 120 % note (cad/inputs.py): the 7.5 % floor at the 3,500 kg plate (H2).
-towball_target_kg: 262.5
+# The towball used only for the supplier's note on the axle group at the plate (cad/inputs.py): the 7.5 % floor at the
+# 4,000 kg plate (H2 as amended 23 Nov 2026), the lightest ball and so the heaviest axle group the plate allows.
+towball_target_kg: 300
 
 # Registration (report 02 section 2.1). NSW, with Victoria as the fallback. The NSW examiner caps GTM at the
 # lowest of the tyre, coupling, chain and brake ratings and ATM at the lower of the coupling and chain ratings.
 registration:
   state: NSW
   fallback: Victoria
-  plated_atm_kg: {v: 3500, src: "Decision H2 (20 Nov 2026): the ute's 3,500 kg towing rating and the DO35 and NSW caps. Target fully loaded with growth at most 3,400 kg (MAS-10)"}
+  plated_atm_kg: {v: 4000, src: "Decision H2 as amended 23 Nov 2026 (Leonard: 'Yeah we can raise it to 4t that's fine'): the Ranger Super Duty tows 4,500 kg braked (Ford dealer specification sheet, 2026MY) and the DO45's 4,500 kg covers it. Target fully loaded with growth at most 3,900 kg (MAS-10), so H2's 100 kg reserve stays. It replaces 20 Nov's 3,500 kg, which came from the LandCruiser's towing rating and the DO35"}
   ratings:
     tyre_kg: {v: 1550, src: "LT265/75R16 123/120 load range E, load index 123, per tyre, four tyres (report 16, the ute's tyre)"}
     coupling_kg: {v: 3500, src: "Cruisemaster DO35 V3Plus, ADR rated 3,500 kg (report 08)"}
