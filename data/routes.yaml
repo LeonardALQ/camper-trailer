@@ -167,8 +167,10 @@ rules:
       B-04: {in: 3, why: "a LUNOS controller output, behind its supply B-01's 3 A fuse on the 12 V panel"}
       B-05: {in: 3, why: "a LUNOS controller output, behind its supply B-01's 3 A fuse on the 12 V panel"}
       B-06: {in: 3, why: "a LUNOS controller output, behind its supply B-01's 3 A fuse on the 12 V panel"}
+      K-11: {no_device: "a TSC output driving the road side's brake magnets, fixed coils that draw their 4.0 A at most at the battery's voltage, so nothing can overload it, and a short trips K-10's 30 A breaker at the ute's battery (est.)"}
+      K-12: {no_device: "a TSC output driving the kerb side's brake magnets, as K-11"}
     # A run with a design current and no device (no rating in its protection text and none here) fails SVC-10, unless its
-    # line's `no_device` says why it cannot be overloaded (I2-31)
+    # line's `no_device`, or its entry here, says why it cannot be overloaded (I2-31)
 
 # The services' design checks, measured on the routed runs by cad/routes.py and listed with the trailer's checks
 # (build/trailer/trailer.json, the Checks page). They live here beside the routes, as the lamps' checks live in

@@ -1728,7 +1728,7 @@ def device_of(run: dict, rt: dict) -> tuple[float | None, float | None, int]:
     """The protective device's rating In from the run's protection text (its first rating in A), or the override in
     rules.ratings.devices, the circuit's own design current Ib and how many circuits the run carries."""
     o = (rt.get("devices") or {}).get(run["id"])
-    if o:
+    if o and o.get("in") is not None:
         return float(o["in"]), float(o.get("ib", run.get("amps") or 0.0)), int(o.get("circuits", 1))
     m = re.match(r"\s*(\d+(?:\.\d+)?) A\b", run.get("protection") or "")
     return (float(m.group(1)) if m else None), (float(run["amps"]) if run.get("amps") is not None else None), 1
@@ -1809,7 +1809,7 @@ def ratings(res: dict) -> dict:
         where = f"{w['method']}, {w['zone']}, {w['ambient']:g} C, {row['group'][1]} circuits" + (f" in {row['group'][0]}" if row["group"][0] else "")
         if ib is not None and ib > iz + 1e-6:
             problems.append(f"{row['run']} carries {ib:g} A over its {iz:.0f} A ({where})")
-        if ib is not None and inn is None and not runs[row["run"]].get("no_device"):
+        if ib is not None and inn is None and not (runs[row["run"]].get("no_device") or (rt.get("devices") or {}).get(row["run"], {}).get("no_device")):
             problems.append(f"{row['run']} carries {ib:g} A with no protective device, and its line gives no reason it cannot be overloaded")
         if inn is not None and ib is not None and ib > inn + 1e-6:
             problems.append(f"{row['run']}'s {inn:g} A device is under its {ib:g} A design current")
