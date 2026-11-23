@@ -345,13 +345,16 @@ def ct102(prj, model, bom, checks, reg, dwg):
     sh.text(cx, 262, "DETAIL A: COUPLING PLATE (2)", 2.3, "middle", bold=True)
     sh.text(cx, 258.5, "SCALE 1:5", 1.9, "middle")
     sh.rect(cx - 150 / k, cy - 110 / k, cx + 150 / k, cy + 110 / k, "medium")
-    for dx in (-45, 45):
-        for dy in (-35, 35):
-            sh.circle(cx + dx / k, cy + dy / k, 6.5 / k, "medium")
+    cp = ch.data["local_checks"]["coupling_plate"]
+    ax, ay = cp["row_pitch"] / 2, cp["col_pitch"] / 2
+    for dx in (-ax, ax):
+        for dy in (-ay, ay):
+            sh.circle(cx + dx / k, cy + dy / k, (cp["bolt_d"] + 1) / 2 / k, "medium")
     S.hdim(sh, cx - 150 / k, cy - 110 / k, cx + 150 / k, cy - 110 / k, cy - 110 / k - 4, "300", size=1.6)
     S.vdim(sh, cx + 150 / k, cy - 110 / k, cx + 150 / k, cy + 110 / k, cx + 150 / k + 4, "220", size=1.6)
-    S.hdim(sh, cx - 45 / k, cy + 35 / k, cx + 45 / k, cy + 35 / k, cy + 35 / k + 5, "90", size=1.6)
-    sh.text(cx, cy - 110 / k - 8.5, "4 HOLES 15 (M14), PATTERN TO SUIT THE DO45 PLUS: MEASURE ONE", 1.5, "middle")
+    S.hdim(sh, cx - ax / k, cy + ay / k, cx + ax / k, cy + ay / k, cy + ay / k + 5, f"{cp['row_pitch']:.0f}", size=1.6)
+    S.vdim(sh, cx - ax / k, cy - ay / k, cx - ax / k, cy + ay / k, cx - ax / k - 5, f"{cp['col_pitch']:.0f}", size=1.6)
+    sh.text(cx, cy - 110 / k - 8.5, "4 HOLES 15 (M14) AT THE DO45 PLUS'S PATTERN (EST.): MEASURE ONE", 1.5, "middle")
     sh.text(cx, cy - 110 / k - 11, "BEFORE DRILLING. 12 mm GR 350.", 1.5, "middle")
     # ---- detail B: chain lug, 1:5
     cx, cy = 362.0, 226.0

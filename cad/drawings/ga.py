@@ -187,7 +187,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
         ["CoG, fully loaded", f"Z {ch['cog_loaded'][2]:,.0f}", f"Z {ch['cog_loaded_growth'][2]:,.0f} with growth. Across: {chk['MAS-11']['measured']:.1f} mm at worst (MAS-11)"],
         ["Coupling", f"{V['coupling_z']:.0f} mm", "Laden, plus or minus 20 mm (UTE-01). DO45 Plus"],
         ["Water", f"{rep['params']['water_full_l']:.0f} L net", f"At most {rep['params']['water_travel_l']:.0f} L in travel (H13), 130 L grey tank"],
-        ["Wheels and tyres", f"{ch['tyre_d']:.0f} mm", "ROH Trak 2 16x7 ET 0, LT265/75R16, the ute's wheel"],
+        ["Wheels and tyres", f"{ch['tyre_d']:.0f} mm", "ROH Trak 2 16x7 ET 0, LT265/75R16, with the trailer's own spare"],
         ["Fail checks", f"{nf - len(fails)} of {nf} pass", ("FAILING: " + ", ".join(fails)) if fails else "Every fail check passes (CT-003 lists them by item)"],
     ]
     yk = S.table(sh, 230.0, gz - 14.0, [("KEY FIGURE", 34), ("VALUE", 30), ("NOTE", 116)], rows, size=1.5, row_h=3.1, title="KEY FIGURES")
@@ -209,7 +209,8 @@ def ct001(prj, model, bom, checks, reg, dwg):
         "AND RULES OUT THE S4 WINDOWS, STOCK DOORS, THE HAPPIJAC BED AND A FULL-HEIGHT WET ROOM. A CANVAS POP-TOP FAILS H3 AND H7.",
         "THE TWO GENERATORS AND THE JERRY CANS RIDE IN A SEALED, VENTED DRAWBAR BOX BEHIND THE STONE GUARD, OUTSIDE THE BIKE BOX'S SWEEP. "
         "NO PETROL IN THE BODY. THE SPARE WHEEL STANDS ON THE FRONT WALL ABOVE THE BOX.",
-        "XT AIR 4500 kg BUILD ON LC5 M14 HUBS AT 900 mm. THE UTE'S BALL SITS AT 440 mm LADEN, 1300 mm BEHIND ITS REAR AXLE (UTE-01, UTE-02).",
+        (f"XT AIR 4500 kg BUILD, A LOAD-SHARING TANDEM ON LC5 M14 HUBS AT 900 mm. THE UTE'S TOW PIN SITS AT {V['coupling_z']:.0f} mm LADEN, "
+         f"{prj.inputs.v('UTE-02'):,.0f} mm BEHIND ITS REAR AXLE (UTE-01, UTE-02)."),
         "PHANTOM OUTLINES ON THE PLAN ARE FLOOR SPACE KEPT CLEAR (CT-010). THE ARC IS THE BIKE BOX'S SWEEP (JK-01).",
     ], width_chars=150, size=1.5)
     rev = dwg["revisions"][-1]

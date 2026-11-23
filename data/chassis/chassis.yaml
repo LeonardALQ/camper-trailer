@@ -257,5 +257,6 @@ local_checks:
   spare_posts: {lever_x: 155}
   steady_bracket: {fitting: CH-B01, steady_kg: 875}   # at 90 degrees, the steady's rating up through its bracket into the rail
   # the DO45 Plus on four M14 8.8 bolts (Cruisemaster's fitting guide), threads in the shear plane: AS 1275 stress area 115 mm2,
-  # minor diameter area 104.7 mm2, fuf 830 MPa. Its rows 100 mm apart along X and the pin's centre 70 mm below the plate (est.)
-  coupling_plate: {fitting: CH-P01, bolts: 4, bolt_d: 14, bolt_as: 115, bolt_ac: 104.7, bolt_fuf: 830, row_pitch: 100, lever: 70}
+  # minor diameter area 104.7 mm2, fuf 830 MPa. Its rows 100 mm apart along X, its bolts 80 mm apart across, wider than the
+  # DO35's 90 x 70 mm, and the pin's centre 70 mm below the plate (est., measured off the coupling before drilling, CT-102)
+  coupling_plate: {fitting: CH-P01, bolts: 4, bolt_d: 14, bolt_as: 115, bolt_ac: 104.7, bolt_fuf: 830, row_pitch: 100, col_pitch: 80, lever: 70}

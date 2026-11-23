@@ -838,8 +838,8 @@ class Analysis:
         return out
 
     def coupling_plate(self, lcs: dict, fit: dict, fyp: float) -> dict:
-        """The coupling's bolts and its plate under LC6, each force separately (AS 4100 9.3.2): the pull shears the bolts
-        and, on its lever down to the plate's face, lifts one row in tension, and the vertical force bears on the plate."""
+        """The coupling's bolts and its plate under LC6 (AS 4100 9.3.2): the pull or the thrust shears the bolts and, on its
+        lever down to the plate's face, lifts one row or one side in tension, with the vertical force's share added."""
         c = self.ch.data["local_checks"]["coupling_plate"]
         t = fit[c["fitting"]]["t"]
         along = max(abs(f[0]) for f in lcs["LC6"]["forces_n"])
@@ -848,7 +848,7 @@ class Analysis:
         n, d = c["bolts"], c["bolt_d"]
         shear_lim, tension_lim = 0.8 * 0.62 * c["bolt_fuf"], 0.8 * c["bolt_fuf"]
         v = max(along, across) / n
-        tens = along * c["lever"] / c["row_pitch"] / (n / 2) + up / n
+        tens = max(along * c["lever"] / c["row_pitch"], across * c["lever"] / c["col_pitch"]) / (n / 2) + up / n
         inter = math.hypot(v / c["bolt_ac"] / shear_lim, tens / c["bolt_as"] / tension_lim)
         rows = [("bolt shear, the pull", v / c["bolt_ac"], shear_lim), ("bolt tension, the pull on its lever and the vertical force", tens / c["bolt_as"], tension_lim),
                 ("bolt, shear and tension together", inter * tension_lim, tension_lim), ("plate bearing at a bolt", v / (d * t), 3.2 * 0.9 * fyp)]
