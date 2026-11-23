@@ -124,6 +124,23 @@ def _ghost(res: dict) -> Compound:
     return Compound(label="Ghost: body, chassis and fit-out", children=kids)
 
 
+def _box(bx, label: str, colour: str, alpha: float):
+    s = Pos((bx[0] + bx[3]) / 2, (bx[1] + bx[4]) / 2, (bx[2] + bx[5]) / 2) * Box(bx[3] - bx[0], bx[4] - bx[1], bx[5] - bx[2])
+    s.label = label.replace("/", "-")
+    s.color = rgba(colour, alpha)
+    return s
+
+
+def _supports(res: dict) -> Compound:
+    """The cable supports the design adds (the SP fixtures) and the 230 V's conduit zones, above and under the floor,
+    so the model shows what holds a cable where SVC-12 counts it held (I2-36)."""
+    ns = res["ns"]
+    kids = [_box(tuple(R._eval(v, ns) for v in z["box"]), f"Conduit: {z['what']}", "#4d4d4d", 0.35)
+            for z in res["data"]["rules"].get("conduit", [])]
+    kids += [_box(f["box"], f"{k} {f['what']}", "#aab7b8", 0.6) for k, f in res["fixtures"].items() if f.get("support")]
+    return Compound(label="Cable supports and the 230 V conduits", children=kids)
+
+
 def meta_of(run: dict, res: dict, drawing: str) -> dict:
     """A run's part metadata: the hover tip shows its id, what it feeds and its length; the card adds the rest."""
     kind = "Cable" if run["system"] in R.ELECTRICAL else ("Hose" if "hose" in run["kind_what"].lower() else "Pipe")
@@ -159,6 +176,8 @@ def build(res: dict, name: str) -> tuple[Compound, dict]:
             meta[run["id"]] = meta_of(run, res, spec["drawing"])
         kids = [Compound(label=c.replace("/", "-"), children=v) for c, v in circuits.items()]
         systems.append(Compound(label=label.replace("/", "-"), children=kids))
+    if name == "trailer-electrical":
+        systems.append(_supports(res))
     root = Compound(label=name, children=[_ghost(res), *systems])
     return root, meta
 

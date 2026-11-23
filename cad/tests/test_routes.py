@@ -95,7 +95,7 @@ def test_every_frame_cell_is_inside_its_frame_and_clear_of_the_others():
 
 def test_bd11s_routed_item_follows_the_routes_and_the_line_adds_to_its_total():
     """I2-19: BD-11's routed item is the routed runs' mass (bd11_routed_kg) above the three items they price, the
-    allowance not yet given to a part is the rest, and the items add to the line's 61.0 kg."""
+    allowance not yet given to a part is the rest, and the items add to the line's 63.5 kg."""
     import yaml
     items = yaml.safe_load((R.DATA / "assemblies" / "trailer.yaml").read_text(encoding="utf-8"))["items"]
     parts = next(it for it in items if it["id"] == "BD-11")["parts"]
@@ -106,7 +106,7 @@ def test_bd11s_routed_item_follows_the_routes_and_the_line_adds_to_its_total():
     assert priced == pytest.approx(25.0)
     assert item["kg"] == pytest.approx(routed - priced, abs=0.051), (item["kg"], routed)
     assert f"{routed:.1f} kg routed" in item["item"]
-    assert allow["kg"] >= 0 and sum(p["kg"] for p in parts) == pytest.approx(61.0, abs=0.001)   # 53.6 kg until SVC-10, SVC-12 and the round TPS (I2-15 b, I2-18 a, I2-29)
+    assert allow["kg"] >= 0 and sum(p["kg"] for p in parts) == pytest.approx(63.5, abs=0.001)   # 53.6 kg until SVC-10, SVC-12 and the round TPS (I2-15 b, I2-18 a, I2-29), 61.0 until the cabinets' cleats and the under-floor conduits (I2-36)
 
 
 def test_every_hole_in_a_chassis_member_and_every_large_floor_cut_out_is_listed():
@@ -300,6 +300,26 @@ def test_svc12_finds_a_cable_left_hanging():
     runs = [dict(r, along=[], inside=[]) if r["id"] == "K-09" else r for r in RES["runs"]]
     bad = R.supports(dict(RES, runs=runs))["problems"]
     assert any(p.startswith("K-09 lies") for p in bad), bad
+
+
+def test_svc12_holds_a_cable_in_a_cabinet_only_by_a_panel_or_a_cleat_and_the_230v_only_in_its_conduit():
+    """I2-36: a point deep inside a cabinet is held by nothing there, so B-11 without the bench's panels and cleats in
+    its `along` hangs over 600 mm in the bench. Under the floor every 230 V cable lies inside a conduit listed under the
+    floor (SVC-03 and SVC-08 count it as in its own enclosure there), and without those conduits C9B hangs."""
+    fixtures = {k: f for k, f in RES["fixtures"].items() if k not in ("SP-KB", "SP-SK", "SP-SP")}
+    bad = R.supports(dict(RES, fixtures=fixtures))["problems"]
+    assert any(p.startswith("B-11 lies") for p in bad), bad
+    V, ns = RES["V"], RES["ns"]
+    under = [tuple(R._eval(v, ns) for v in z["box"]) for z in RES["data"]["rules"]["conduit"] if z.get("under")]
+    for r in RES["runs"]:
+        if r["system"] != "ac230":
+            continue
+        for p, _ in R._samples(r["dense"], 10.0):
+            if p[2] < V["floor_underside_z"]:
+                assert any(R._in_box(p, z, 0.0) for z in under), (r["id"], p)
+    rules = dict(RES["data"]["rules"], conduit=[z for z in RES["data"]["rules"]["conduit"] if not z.get("under")])
+    bad = R.supports(dict(RES, data=dict(RES["data"], rules=rules)))["problems"]
+    assert any(p.startswith("C9B lies") for p in bad), bad
 
 
 def test_k08_and_k09_pass_into_the_outriggers_clear_of_the_seams():

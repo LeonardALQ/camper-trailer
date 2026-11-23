@@ -222,6 +222,8 @@ const cases = d.energy.cases;
   <ul class="route-legend">
     {rt.legend.filter((l: any) => l.model === (model ?? 'trailer-electrical')).map((l: any) => (
       <li><span class="swatch" style={`background:${l.colour}`}></span>{l.label}</li>))}
+    {(model ?? 'trailer-electrical') === 'trailer-electrical' && (
+      <li><span class="swatch" style="background:#4d4d4d;opacity:0.5"></span>The 230 V conduits and the cable supports, see-through</li>)}
     <li><span class="swatch ghost"></span>Body, chassis and fit-out, see-through</li>
   </ul>
 )}

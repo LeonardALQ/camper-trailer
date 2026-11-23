@@ -76,7 +76,7 @@ def namespace(V: dict, blocks: list, data: dict, glands: dict | None = None) -> 
         ns[k] = _eval(v, ns)
     for f in data.get("fixtures") or []:
         c = [_eval(v, ns) for v in f["at"]]
-        s = f.get("size", [40, 40, 40])
+        s = [_eval(v, ns) for v in f.get("size", [40, 40, 40])]
         ns[key(f["id"])] = B((c[0] - s[0] / 2, c[1] - s[1] / 2, c[2] - s[2] / 2, c[0] + s[0] / 2, c[1] + s[1] / 2, c[2] + s[2] / 2))
     return ns
 
@@ -995,10 +995,11 @@ def _samples(dense: list, step: float = 25.0) -> list[tuple]:
 
 
 def supports(res: dict) -> dict:
-    """SVC-12 (I2-18 a): no cable lies unsupported over more than VSB1 7.1's 600 mm. A point is held inside a chassis
-    member the run is threaded through, within the clip's reach of a part in its `along` or of a support fixture
-    (`support: true`, the cleats, trays and saddles the design adds), inside a cabinet's carcass (clipped to its panels),
-    the board cabinet, a 230 V conduit, a box it ends at or a part it passes through, a gland or a frame, or beside a held
+    """SVC-12 (I2-18 a, I2-36): no cable lies unsupported over more than VSB1 7.1's 600 mm. A point is held inside a
+    chassis member the run is threaded through, within the clip's reach of a part in its `along` (inside a cabinet's
+    carcass, of the carcass's panels), of a support fixture (`support: true`, the cleats, trays and saddles the design
+    adds) or of a cabinet's outer face, inside the board cabinet, a 230 V conduit zone (under the floor, the only hold a
+    230 V cable has but its glands), a box it ends at or a part it passes through, a gland or a frame, or beside a held
     cable of a way it shares. The longest stretch between held points is each run's unsupported span."""
     rule = res["data"]["rules"]["supports"]
     clip, top = float(rule["clip_mm"]), float(rule["max_mm"])
@@ -1020,6 +1021,13 @@ def supports(res: dict) -> dict:
     panels = [b["box"] for b in res["blocks"] if b.get("box") and b["id"] in PANELS]
     carcasses = [b["box"] for b in res["blocks"] if b.get("box") and b.get("hollow")]
     holders = [f["box"] for f in res["fixtures"].values() if f.get("support")]
+
+    def reach(p, bx) -> float:
+        """How far a point lies from a part's face it could be clipped to: outside a box, its gap to the box, inside a
+        cabinet's carcass, its depth to the nearest panel, so a point deep inside a cabinet is held by nothing there."""
+        g = _pt_box(p, bx)
+        return -g if g < 0 and bx in carcasses else g
+
     held, pts = {}, {}
     cables = [r for r in res["runs"] if r["system"] in ELECTRICAL]
     for r in cables:
@@ -1027,17 +1035,18 @@ def supports(res: dict) -> dict:
         inside = [bx for m in _ids(r, "inside") for bx in by_id.get(m, [])]
         along = [bx for m in _ids(r, "along") for bx in by_id.get(m, [])]
         along_bars = [c for m in _ids(r, "along") for c in bars.get(m, [])]
-        ends = [bx for e in _end_lines(r) | _ids(r, "passes") for bx in by_id.get(e, [])]
+        ends = [bx for e in _end_lines(r) | _ids(r, "passes") for bx in by_id.get(e, []) if bx not in carcasses]
         glands = [gl[g] for g in _ids(r, "glands") if g in gl]
         sm = _samples(r["dense"])
         pts[r["id"]] = sm
         h = []
         for p, _ in sm:
-            ok = (any(_in_box(p, bx, 0.5) for bx in inside) or any(_pt_box(p, bx) - rad <= clip for bx in along)
+            ok = (any(_in_box(p, bx, 0.5) for bx in inside) or any(reach(p, bx) - rad <= clip for bx in along)
                   or any(_bar_gap([(p, p)], c) - rad <= clip for c in along_bars)
                   or _in_box(p, board, 0.0) or any(_in_box(p, bx, 1.0) for bx in ends)
-                  or any(_pt_box(p, bx) - rad <= clip for bx in carcasses + holders)
-                  or (r["system"] == "ac230" and (p[2] <= V["floor_z"] + 1 or any(_in_box(p, z, 0.0) for z in zones)))
+                  or any(_pt_box(p, bx) - rad <= clip for bx in holders)
+                  or any(0 <= _pt_box(p, bx) and _pt_box(p, bx) - rad <= clip for bx in carcasses)
+                  or (r["system"] == "ac230" and any(_in_box(p, z, 0.0) for z in zones))
                   or any(any(_in_box(p, pb, 1.0) for pb in panels) and math.dist(p[:2] if g["at"] in ("floor", "roof") else p, g["p"][:2] if g["at"] in ("floor", "roof") else g["p"])
                          <= max(g.get("w", g["d"]), g.get("h", g["d"])) for g in glands))
             h.append(ok)
