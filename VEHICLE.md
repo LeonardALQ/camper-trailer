@@ -1,6 +1,6 @@
 # Ford Ranger Super Duty tow vehicle
 
-Revised 23 Nov 2026 for Leonard's change of plan of 22 Nov 2026 (research report 31): a near-new Ford Ranger Super Duty single cab chassis, bought, in place of the rebuilt LandCruiser VDJ79. The LandCruiser plan of decisions H17, H18, H20 and H24 and research reports 14 to 16, 23, 26 and 27 is kept as the record in the repository's history and in those reports. From 23 Nov 2026 the trailer is plated at 4,000 kg on a DO45-type coupling, which worker plate4t chooses. Every part and paid job is a line in `data/vehicle/vehicle-parts.yaml`, which the site's Tow vehicle page renders as three lists and `cad/tests/test_costs.py` checks against this page.
+Revised 23 Nov 2026 for Leonard's change of plan of 22 Nov 2026 (research report 31): a near-new Ford Ranger Super Duty single cab chassis, bought, in place of the rebuilt LandCruiser VDJ79. The LandCruiser plan of decisions H17, H18, H20 and H24 and research reports 14 to 16, 23, 26 and 27 is kept as the record in the repository's history and in those reports. From 23 Nov 2026 the trailer is plated at 4,000 kg on a Cruisemaster DO45 Plus coupling (decision log 23 Nov 04:59). Every part and paid job is a line in `data/vehicle/vehicle-parts.yaml`, which the site's Tow vehicle page renders as three lists and `cad/tests/test_costs.py` checks against this page.
 
 ## Summary
 
@@ -53,9 +53,9 @@ Goal: buy a sound, untuned truck and know what it weighs.
 
 Goal: carry both bikes and tow the 4,000 kg trailer legally at stock power.
 
-- Fit the box to Ford's body rules (BEMM sections 1.10, 1.13 and 5.6, 03/2026): at most 1,960 mm wide, at least 28 mm behind the cab and 30 mm over it, a rear overhang of at most 50 % of the 3,270 mm wheelbase, bolted at every one of Ford's chassis mounting pads with at least an M12 grade 10.9 bolt, one M14 grade 10.9 at each pad as Ford recommends and as UTE-GARAGE.md section 4 and CT-702 draw it (BEMM p. 124 and section 5.6.5), a cross member at each mounting point, no welding on the frame beyond what the BEMM allows, and no new hole larger than 16.5 mm. The box's own design and checks are `UTE-GARAGE.md` (rsd-ute).
+- Fit the box to Ford's body rules (BEMM sections 1.10, 1.13 and 5.6, 03/2026): at most 1,960 mm wide, at least 28 mm behind the cab and 30 mm over it, a rear overhang of at most 50 % of the 3,270 mm wheelbase, bolted at every one of Ford's chassis mounting pads with at least an M12 grade 10.9 bolt, one M14 grade 10.9 at each pad as Ford recommends and as UTE-GARAGE.md section 4 and CT-702 draw it (BEMM p. 124 and section 5.6.5), a cross member at each mounting point, no welding on the frame beyond what the BEMM allows, and no new hole larger than 16.5 mm. The box's own design and checks are `UTE-GARAGE.md`.
 - Keep Ford's Driver Assistance Technology bar, with the rear lamps, camera and blind spot sensors, at its factory place, and keep the box's overhang to it as Ford's BEMM sets (sections 4.3 and 4.5). Check the rear camera, the 360-degree view, the blind spot monitor and the onboard scales with the box on, and have a Ford dealer calibrate them only if one shows a fault (BF01).
-- Fit Cruisemaster's DO45Plus tow pin, 32 mm shank, in Ford's 4.5 t hitch (TW01). The pin takes the place of a ball, so no ball is bought. The shank must fit the hitch hole firmly, and the hitch must not be drilled (BEMM section 1.13). If it does not fit, or the coupling sits outside its height range laden, fit a 4.5 t tongue with a 32 mm hole and the drop the height needs (TW02). plate4t confirms the coupling and its height.
+- Fit Cruisemaster's DO45Plus tow pin, 32 mm shank, in Ford's 4.5 t hitch (TW01). The pin takes the place of a ball, so no ball is bought. The shank must fit the hitch hole firmly, and the hitch must not be drilled (BEMM section 1.13). If it does not fit, or the coupling sits outside its height range laden, fit a 4.5 t tongue with a 32 mm hole and the drop the height needs (TW02). The laden height is measured at UTE-01.
 - Set up the trailer's profile in SYNC for the integrated trailer brake controller, the blind spot monitor's trailer coverage and Pro Trailer Backup Assist, whose sensor goes on the trailer's drawbar (Ford's towing guide). Set the brake gain on the first tow.
 - Fit the Clearview towing mirrors (TM01), the UHF radio (UH01) and carry the compressor (AC01) and the recovery kit (RK01) in the box.
 - Weigh the laden truck, each axle (CK02).
@@ -147,14 +147,14 @@ Ford's ratings are the limits (dealer specification sheet, 18 Sep 2025, and the 
 | Front axle | At most 1,900 kg | From the ute model |
 | Rear axle | At most 2,800 kg | From the ute model |
 | Truck plus trailer | At most 8,000 kg GCM | 7,599 kg, the truck without its ball load plus the trailer's 4,000 kg plate |
-| Trailer | At most 4,500 kg braked towing, and the coupling's own rating (plate4t) | 4,000 kg plate |
+| Trailer | At most 4,500 kg braked towing, and the DO45 Plus coupling's 4,500 kg | 4,000 kg plate |
 | Ball load | At most 450 kg until the owner's manual is read (est.), and the coupling's vertical rating | 400 kg at 10 % (est.) |
 | Payload | At most 1,982 kg on the minimum kerb weight, ball load included | 1,481 kg |
 | Box | At most 1,960 mm wide, 28 mm behind the cab, 30 mm over it, rear overhang at most 1,635 mm, at every standard mounting location (BEMM 1.10 and 5.6) | UTE-09, UTE-10 and UTE-15 (UTE-GARAGE.md) |
 | Added mass's centre of gravity | At GVM: 1,965 to 3,350 mm behind the front axle, at most 530 mm up and 65 mm off the centre line. At 800 kg added, and below it: to 3,255 mm, 630 mm and 130 mm (BEMM 1.13.2) | UTE-07 and UTE-08, with the ramp forward when the bikes are out (UTE-GARAGE.md section 7) |
 | Trailer width for the blind spot monitor | At most 2.4 m wide and 10 m long behind the truck, on the factory tow bar (Ford's towing guide) | 2,400 mm |
 
-Ford's Smart Hitch reads the ball load within 100 kg and recommends 10 to 15 % of the trailer (towing guide). The trailer's own range is plate4t's and the trailer's.
+Ford's Smart Hitch reads the ball load within 100 kg and recommends 10 to 15 % of the trailer (towing guide). The trailer's own range is decision H17's, 9.0 % of the trailer to 420 kg with growth.
 
 Drive to: Tow/Haul mode on every tow and whenever the truck is heavily loaded (Ford's payload guide), rear tyres at 65 psi near GVM, the trailer's brake gain set on its first tow, and after S3 EGT, boost and the 10-speed's temperature inside the tuner's limits on the gauge, with the 10-speed at most 110 °C sustained (est.). Use low range for steep hill starts and reversing the trailer.
 
@@ -162,7 +162,7 @@ Drive to: Tow/Haul mode on every tow and whenever the truck is heavily loaded (F
 
 NSW registration. VSI 06 Rev 4 applies to light vehicles of 4.5 t GVM or less (page 1), and the Super Duty, at 4,500 kg, is one.
 
-The truck as bought needs nothing. Ford's 4,500 kg GVM, 8,000 kg GCM and 4,500 kg braked towing apply as built, so the trailer's 4,000 kg plate needs no revision of the truck's ratings. The factory tow bar, Ford's 4.5 t hitch and its integrated brake controller are the maker's, and the trailer's own brakes on every wheel and its breakaway system are the trailer's (VSB1, above 2,000 kg ATM). The coupling is plate4t's.
+The truck as bought needs nothing. Ford's 4,500 kg GVM, 8,000 kg GCM and 4,500 kg braked towing apply as built, so the trailer's 4,000 kg plate needs no revision of the truck's ratings. The factory tow bar, Ford's 4.5 t hitch and its integrated brake controller are the maker's, and the trailer's own brakes on every wheel and its breakaway system are the trailer's (VSB1, above 2,000 kg ATM). The coupling, a Cruisemaster DO45 Plus, is the trailer's (TRAILER.md).
 
 The box. Leonard builds it and does not have it certified (H25). It is a body on a cab chassis built to take one, mounted to Ford's own rules (S1), so it adds no ratings. The towing mirrors replace the factory pair with the same functions, and the plan assumes they need no certificate.
 
@@ -191,7 +191,7 @@ Ford's warranty. Ford says an aftermarket part does not by itself void the warra
 
 1. What is the Super Duty's maximum tow ball download? Not in the Ford documents read on 23 Nov 2026, and the BEMM points to the owner's manual. Assumed 450 kg (est.), 10 % of the 4,500 kg rating. Read it at S0.
 2. How does the kerb weight split between the axles? Not published. The ute model estimates it, and CK01 measures it.
-3. Does the DO45Plus pin's 32 mm shank fit Ford's 4.5 t hitch hole firmly? Assumed yes. If not, a 4.5 t tongue with a 32 mm hole (TW02, AUD 350 est.). plate4t confirms the coupling.
+3. Does the DO45Plus pin's 32 mm shank fit Ford's 4.5 t hitch hole firmly? Assumed yes. If not, a 4.5 t tongue with a 32 mm hole (TW02, AUD 350 est.).
 4. Do the Clearview Next Gen mirrors fit the Super Duty? Assumed yes, as it shares the Ranger's cab and doors. Confirm by VIN.
 5. Will an LC4 certifier accept the interim NSW emissions procedure for a heavy-duty Euro VI calibration? Assumed yes. If not, a laboratory test (TL07, AUD 10,000 est.) or the truck stays stock.
 6. Can a tuner write the Super Duty's calibration? Assumed yes, since tuners already calibrate the V6 and its 10-speed in the ordinary Ranger. If none can, S3 waits.
