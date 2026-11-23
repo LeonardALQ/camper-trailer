@@ -79,10 +79,21 @@ parts:
     geometry: {generator: winch_rope, params: {diameter: 4.8}}
     color: "#e17055"
   U-MUDFLAP-BKT:
-    name: Lovells mudflap bracket under the rear outrigger
-    kind: context
+    name: Mudflap bracket under the outrigger behind each rear tub
+    kind: sub_part
     included_in: U-MUDFLAP
-    material: "Steel flat bar, galvanised (est.)"
-    notes: In the Lovells Elite kit (car build line GV05), so its mass is in the kit's extra mass, ute line UT-16.
+    material: "Steel flat bar 50 x 6, galvanised, bent to a downturned flange (est.)"
+    notes: Its mass and price are in U-MUDFLAP.
+    geometry: {generator: box, params: {}}
+    color: "#1c2833"
+  U-MUDFLAP:
+    name: Mudflaps behind the rear tyres
+    material: "Rubber mudflap 300 x 560 x 5 mm, ADR 42/05 (est.)"
+    product: Plain heavy-duty rubber mudflap pair with their galvanised brackets, bolted under the outriggers behind the rear tubs
+    maker: Product to choose
+    qty: 2
+    unit: each
+    mass: {basis: declared, unit_kg: 1.3, maturity: estimate, source: "About 0.9 kg of 5 mm rubber and 0.4 kg of bracket each (est.)"}
+    notes: "The Super Duty is bought as a cab chassis without guards, so the box carries the rear mudguards ADR 42/05 asks for: the flares over the tyres and these flaps behind them. The LandCruiser's came in the Lovells kit. About 300 mm wide, centred on the tyre, the bottom edge about 230 mm above the ground (assumption)"
     geometry: {generator: box, params: {}}
     color: "#1c2833"

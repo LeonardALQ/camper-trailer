@@ -7,7 +7,7 @@ parts:
   U-RUNNER:
     name: Subframe runners
     material: "6061-T6 aluminium RHS 75 x 50 x 3, on a 6 mm rubber strip"
-    product: 6061-T6 RHS 75 x 50 x 3, laid flat on each rail over a 6 mm rubber strip
+    product: 6061-T6 RHS 75 x 50 x 3, laid flat over Ford's body mounting pads, clear of the rail tops
     maker: All Aluminium (stock)
     part_no: RHS 75 x 50 x 3 (MAT-07)
     qty: 5.0
@@ -26,7 +26,7 @@ parts:
     unit: m
     mass: {basis: per_length, kg_per_m: 5.45, maturity: calculated, source: "5.35 kg/m (Southern Steel table, report 24 BX-U01) plus about 2 % for the zinc"}
     size: 65 x 35 x 4.0 mm, 1,845 mm long. RHS 76 x 38 x 3 is not an Australian stock size (report 24)
-    rating: Each sits on the rails and bolts straight to a pair of Toyota's brackets, so a strap's load reaches the frame through steel only
+    rating: The rear one sits on the rigid mounts over Ford's rearmost pads and the front one on the two steel stubs over Ford's first pads, so a strap's load reaches the frame through steel only
     notes: The L-track bolts down through the floor plate and the packer into the crossmember's top wall with M6 A4-70 bolts and crush tubes at 150 mm pitch or less (report 24 BX-F02).
     geometry: {generator: tube, params: {wall: 4}}
     color: "#2c3e50"
@@ -65,29 +65,41 @@ parts:
     geometry: {generator: tube, params: {wall: 3}}
     color: "#636e72"
   U-MOUNT-FIRM:
-    name: Firm mounts, front two pairs
-    material: "Steel angle or spacer, M12 property class 8.8 bolts"
-    product: Mount angle or spacer with two M12 property class 8.8 bolts, hardened washers and nyloc nuts through Toyota's bracket
+    name: Rigid mounts on Ford's pads, stations 2 to 4
+    material: "Galvanised steel spacer 60 x 50 x 45 mm (51 mm at station 4), 3 mm G10 pad, M14 property class 10.9 bolt"
+    product: Hot-dip galvanised steel spacer the size of Ford's pad, a 3 mm G10 isolating pad on top under the aluminium, one M14 10.9 bolt with a steel crush tube through the runner, 50 x 5 mm hardened washers both sides and a locknut
     maker: Owner made
-    qty: 4
+    qty: 6
     unit: each
-    mass: {basis: declared, unit_kg: 1.2, maturity: estimate, source: "6 mm angle, 80 mm long, and two M12 bolt sets (estimate)"}
-    rating: Two M12 8.8 bolts, AS 4100 design capacity 56.0 kN in tension and 31.4 kN in shear each
-    notes: These carry the box's fore and aft load and hold it to the frame at the front.
+    mass: {basis: declared, unit_kg: 1.3, maturity: estimate, source: "Spacer 1.0 kg, bolt, nut, washers and crush tube 0.3 kg (estimate)"}
+    rating: One M14 10.9 bolt, 95.7 kN in tension and 54.2 kN in shear (AS 4100's formulas at ISO 898-1's 1,040 MPa, est.)
+    notes: "Ford's rules (BEMM p. 124): the mount covers the whole pad, no soft finish such as powder coat on the faces, washers at least 50 x 5 mm, and every pad used. The six rigid mounts carry all the box's fore and aft and side load."
     geometry: {generator: box, params: {}}
     color: "#e17055"
   U-MOUNT-SPRING:
-    name: Compliant mounts, rear four pairs
-    material: "Steel angle or spacer, M12 8.8 bolt, rubber body-mount cushions"
-    product: Mount angle or spacer with one M12 8.8 bolt through a stack of two rubber body-mount cushions, a steel sleeve that sets the preload, and an oversize safety washer
+    name: Flexible mounts on Ford's first pads, station 1
+    material: "Two rubber body-mount cushions about 1 kN/mm, steel sleeve, captive M14 10.9 bolt, 60 mm safety washer"
+    product: An upper and a lower rubber body-mount cushion either side of Ford's pad, a steel sleeve that sets the preload and stops the travel at 12 mm, one captive M14 10.9 bolt and a 60 mm safety washer
     maker: Product to choose (body-mount cushions)
-    qty: 8
+    qty: 2
     unit: each
-    mass: {basis: declared, unit_kg: 1.0, maturity: estimate, source: "Estimate"}
-    rating: One M12 8.8 bolt. The safety washer holds the box if a cushion fails
-    notes: The cushions let the frame twist under the box, so the walls and door frames do not take the frame's twist (report 17 section 2.3).
+    mass: {basis: declared, unit_kg: 1.1, maturity: estimate, source: "Estimate"}
+    rating: About 1 kN/mm with the travel stopped at 12 mm each way (Ford's figures, BEMM p. 124). The captive bolt and the safety washer hold the box if a cushion fails
+    notes: "Ford asks an exceptionally rigid body to sit on flexible mounts at the two forward pads only, so the frame can twist under it, and on rigid mounts everywhere else (BEMM p. 124). A welded box on its subframe is one."
     geometry: {generator: box, params: {}}
     color: "#fdcb6e"
+  U-STEEL-STUB:
+    name: Steel stubs from the front anchor crossmember over Ford's first pads
+    material: "C350L0 steel RHS 75 x 50 x 3.0, hot-dip galvanised after welding"
+    product: AS/NZS 1163 C350L0 RHS 75 x 50 x 3.0, laid flat, four pieces welded to the front steel crossmember, two ahead of it over Ford's first pads and two behind it to the first aluminium crossmember
+    maker: Steel merchant (stock size)
+    qty: 0.70
+    unit: m
+    mass: {basis: per_length, kg_per_m: 5.53, maturity: calculated, source: "5.42 kg/m (AS/NZS 1163 RHS 75 x 50 x 3.0, est.) plus about 2 % for the zinc"}
+    rating: Each carries the front crossmember's reaction to the flexible mount on Ford's first pad (UGR-04)
+    notes: Ford's first pads are under the box's front wall, 170 mm ahead of the front track row, so the row's steel reaches them through these stubs and not through the aluminium runners.
+    geometry: {generator: tube, params: {wall: 4}}
+    color: "#2c3e50"
   U-SUB-FIX:
     name: Floor bolts, isolators and sealant
     material: "Steel M8 bolts (est.), nylon sleeves, polyurethane sealant"

@@ -1,6 +1,7 @@
-"""3D model of the ute (cad/ute.py, data/ute/ute.yaml): the LandCruiser 79 as a product model (decision H27,
-cad/model/vehicles/landcruiser.py) with the bike box. Phase U1 shows the box as an envelope. With a built ute garage
-module (phase U2) the module's bodies are moved into the ute frame instead. Exports the three-cad-viewer JSON and STEP."""
+"""3D model of the ute (cad/ute.py, data/ute/ute.yaml): the Ford Ranger Super Duty single cab chassis as a product model
+(decision H27, cad/model/vehicles/ranger_sd.py) with the bike box. Phase U1 shows the box as an envelope. With a built ute
+garage module (phase U2) the module's bodies are moved into the ute frame instead. Exports the three-cad-viewer JSON and
+STEP. The LandCruiser's model, cad/model/vehicles/landcruiser.py, stays in the repo as history and nothing builds it."""
 from __future__ import annotations
 
 import json
@@ -14,15 +15,17 @@ from .model.prims import box, rgba
 from .trailer_model import _moved
 
 # The viewer's tessellation of the ute: 1 mm of chord error and 0.5 rad between facets keep the two product models, the
-# LandCruiser and the bikes with their tyres and spokes, under the site's 8 MB a file (decision H27)
+# Super Duty and the bikes with their tyres and spokes, under the site's 8 MB a file (decision H27)
 TESSELLATION = dict(deviation=1.0, angular_tolerance=0.5)
+LABEL = "UTE-RSD"
+REAR_BAND = 150.0          # mm: the box's rear parts that sweep about the ball when the box ends ahead of it
 
 
 def vehicle_solids(ute, plain=False) -> list:
-    """The LandCruiser in the ute frame (cad/model/vehicles/landcruiser.py): one node per part listed in data/ute/ute.yaml's
+    """The Super Duty in the ute frame (cad/model/vehicles/ranger_sd.py): one node per part listed in data/ute/ute.yaml's
     `solids` and one per wheel, each holding its pieces in their colours. plain=True leaves out the tyres' tread and the
     wheel nuts, for the drawings."""
-    from .model.vehicles import landcruiser as LC
+    from .model.vehicles import ranger_sd as LC
     V = ute.V
     parts = LC.build(V, plain)
     vehicle = []
@@ -40,7 +43,7 @@ def vehicle_solids(ute, plain=False) -> list:
             k = LC.place_wheel(shape, (x, y, V["tyre_slr"]), 1.0 if y > 0 else -1.0)
             k.label, k.color = name, rgba(colour, alpha)
             kids.append(k)
-        vehicle.append(Compound(label=f"WH-{w['id']} Wheel and tyre, {side}, ROH Trak 2 with LT265-75R16", children=kids))
+        vehicle.append(Compound(label=f"WH-{w['id']} Wheel and tyre, {side}, Ford 18 x 8 steel with LT275-70R18", children=kids))
     return vehicle
 
 
@@ -58,7 +61,7 @@ def garage_solids(ute, garage_model, loading=False, groups=None, exclude=()):
     return out
 
 
-def ute_compound(ute, garage_model=None, label="UTE-79", loading=False):
+def ute_compound(ute, garage_model=None, label=LABEL, loading=False):
     V = ute.V
     vehicle = vehicle_solids(ute)
     kids = [Compound(label="Cab chassis and accessories", children=vehicle)]
@@ -108,7 +111,7 @@ def _rounded(v, n):
 
 def _viewer(comp) -> str:
     from .export import _viewer_js
-    js = _viewer_js("UTE-79", comp, **TESSELLATION)
+    js = _viewer_js(LABEL, comp, **TESSELLATION)
     return json.dumps(_compact(json.loads(js[js.index("{"): js.rindex("}") + 1])), separators=(",", ":"))
 
 
@@ -129,11 +132,12 @@ def bike_box_sweep(ute, garage_model) -> dict:
     V = ute.V
     bx = V["ball_x"]
     r, under, who = 0.0, None, ""
-    for i, s in garage_solids(ute, garage_model):
-        if i.group == "context":
-            continue
-        bb = s.bounding_box()
-        if bb.max.X <= bx:
+    solids = [(i, s.bounding_box()) for i, s in garage_solids(ute, garage_model) if i.group != "context"]
+    # the parts at the box's rear: behind the ball, or within REAR_BAND of the box's rear face when the box ends ahead of
+    # the ball, as on the Super Duty. Their rear corners swing behind the ball once the trailer turns a few degrees
+    rear = max(bb.max.X for _, bb in solids)
+    for i, bb in solids:
+        if bb.max.X <= min(bx, rear - REAR_BAND):
             continue
         d = math.hypot(bb.max.X - bx, max(abs(bb.min.Y), abs(bb.max.Y)))
         if d > r:

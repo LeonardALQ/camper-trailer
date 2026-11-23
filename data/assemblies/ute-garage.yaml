@@ -10,45 +10,57 @@ revision: B
 
 params:
   # ---------------------------------------------------------------- placement on the ute (data/ute/ute.yaml)
-  cab_back_x: 2060          # back of the cab behind the front axle (Toyota BBGJ1007)
-  cab_gap: 40               # Toyota: at least 39 mm between the body and the cab at the roof
+  # The Ford Ranger Super Duty single cab chassis (data/ute/ute.yaml, Ford's BEMM of 03/2026 by page) since 23 Nov 2026,
+  # in place of the LandCruiser 79 (revision B, in the git history)
+  cab_back_x: 3270 - (2286 - 1020)  # back of the cab: Ford's 2,286 mm of frame behind it ends 1,020 mm behind the rear axle (BEMM pp. 24, 25)
+  cab_gap: 30               # Ford: at least 28 mm between the cab and any body (BEMM p. 25)
   box_x0: cab_back_x + cab_gap      # outside front face of the box, ute X
   module_x0: box_x0 + front_t       # ute X of module X 0
-  rear_axle_x: 3180         # ute X of the rear axle (the wheelbase)
+  rear_axle_x: 3270         # ute X of the rear axle (the wheelbase)
   axle_m: rear_axle_x - module_x0   # module X of the rear axle
-  frame_top_z: 774          # rear frame top, laden: 724 mm on factory springs plus about 50 mm of Lovells lift (estimate)
-  pad_t: 6                  # rubber strip between the rails and the subframe
+  frame_top_z: 740          # rear frame top at GVM with the rear axle at its rating (BEMM p. 128)
+  frame_top_load: 810       # rear frame top while loading, bikes out and trailer off: about 1,700 kg on the rear axle,
+                            # between Ford's 850 mm at kerb and 740 mm at 2,800 kg (est.)
+  pad_h: 12                 # Ford's body mounting pads stand 12 mm over the rail top, the rearmost pair 6 mm (BEMM p. 128)
+  mount_h: 45               # each mount between its pad and the subframe: the flexible mounts' cushions at station 1 and
+                            # steel spacers at stations 2 to 4, so the subframe clears Ford's protrusions over the rails
   sub_h: 50                 # subframe depth: the runners and crossmembers stand 50 mm
   floor_t: 4                # 5052-H32 floor plate
-  deck_z: frame_top_z + pad_t + sub_h + floor_t   # floor top above the ground: 834 mm (estimate)
+  deck_z: frame_top_z + pad_h + mount_h + sub_h + floor_t   # floor top above the ground: 851 mm laden at GVM (estimate)
   sub_z0: -(floor_t + sub_h)        # subframe underside, module Z
-  rail_y: 493               # frame rail centreline, either side (1,046 mm over the rails, 60 mm flanges, estimate)
-  rail_w: 60
+  pad_z1: sub_z0 - mount_h          # top of Ford's pads at stations 1 to 3, module Z
+  rail_y: 446               # frame rail centreline (BEMM p. 131, est. reading)
+  rail_w: 70
+  pad_y: 622                # Ford's pad holes 1,244 mm apart across the truck (BEMM p. 125, est. reading), the runners over them
   # ---------------------------------------------------------------- the wheels under the box (data/ute/ute.yaml)
-  tyre_d: 805
-  tyre_w: 268
-  tyre_slr: 380             # static loaded radius (estimate)
-  rear_bump: 110            # rear wheel travel to the bump stops (estimate, report 17 section 3.3)
-  wheel_y: 777.5            # half the Elite's 1,555 mm rear track (report 26, estimate, decision H18). 730 on the factory 1,460 mm
+  tyre_d: 842               # LT275/70R18
+  tyre_w: 282
+  tyre_slr: 393             # static loaded radius at GVM (estimate)
+  tyre_slr_kerb: 412        # at kerb (estimate)
+  frame_top_kerb: 850       # BEMM p. 128
+  ford_g: 195               # Ford's wheelhouse envelope: the guard 195 mm over the tyre's top (BEMM p. 122, G, est.: at kerb)
+  # Full bump, laden: Ford's guard height less its 30 mm clearance, carried from kerb to GVM on the frame: 74 mm (est.)
+  rear_bump: tyre_slr_kerb + ford_g - tub_top_gap - frame_top_kerb + frame_top_z - tyre_slr
+  wheel_y: 855              # half Ford's 1,710 mm rear track (BEMM p. 25)
   wheel_z: tyre_slr - deck_z        # module Z of the wheel centre at static
-  tub_top_gap: 25           # Toyota: 25 mm over the tyre at full bump, 40 mm inside it, 30 mm outside it
-  tub_in_gap: 40
-  tub_end_gap: 30           # fore and aft of the tyre (assumption: Toyota's outside figure)
+  tub_top_gap: 30           # Ford: 30 mm between the tyre and the guard, recommended (BEMM p. 122, L), over it, inside it,
+  tub_in_gap: 30            # fore and aft and outside it
+  tub_end_gap: 30
   tub_t: 3
   tub_x0: axle_m - tyre_d / 2 - tub_end_gap   # inner faces of the tub's front and rear walls
   tub_x1: axle_m + tyre_d / 2 + tub_end_gap
   tub_y0: wheel_y - tyre_w / 2 - tub_in_gap  # inner face of the tub's inboard wall
   tub_top: wheel_z + rear_bump + tyre_d / 2 + tub_top_gap + tub_t   # tub top surface above the floor
-  # Rear tub flares (decision H19, report 26 fix A). On the Elite's track the tyre's outer face is 911.5 mm out, 11 mm from the
-  # 1,850 mm body's skin against Toyota's 30 mm. Over each rear tub the skin is cut away up to the top of the side wall's
-  # bottom rail, and a folded 2.5 mm flare closes the opening 20 mm further out, 30 mm past each end of the tub.
-  flare_out: 20             # outer face 20 mm outside the skin: 31 mm outside the tyre
+  # Rear tub flares (decision H19, report 26 fix A, now on Ford's track). The tyre's outer face is 996 mm out, 71 mm outside
+  # the 1,850 mm body's skin. Over each rear tub the skin is cut away up to the top of the side wall's bottom rail, and a
+  # folded 2.5 mm flare closes the opening 30 mm outside the tyre, 30 mm past each end of the tub.
+  flare_out: wheel_y + tyre_w / 2 + tub_in_gap + skin_t - outside_w / 2   # 103.5 mm outside the skin
   flare_x0: tub_x0 - 30
   flare_x1: tub_x1 + 30
   flare_z1: tub_top + frame_s     # flare top, over the bottom rail that sits on the tub
-  flare_w: outside_w + 2 * flare_out   # 1,890 mm over the flares, against UTE-09's 1,910 mm
-  # Lovells' mudflap behind each rear tyre (in the Elite kit), on its bracket under the rear outrigger at module X 1,500
-  mudflap_x: 1525
+  flare_w: outside_w + 2 * flare_out   # 2,057 mm over the flares, against UTE-09's 2,197 mm
+  # The box's own mudflap behind each rear tyre (ADR 42/05), on its bracket under the outrigger behind the tub
+  mudflap_x: 1725
   mudflap_w: 300
   mudflap_h: deck_z + sub_z0 - 230    # bottom edge about 230 mm above the ground (assumption)
   # ---------------------------------------------------------------- the box
@@ -96,8 +108,9 @@ params:
   front_tyre_x: 50          # chock nose allowance (measurements.yaml CHK-01)
   chock_rise: 25
   # ---------------------------------------------------------------- restraint
-  front_row_x: mount1_x    # the front L-track row sits on the steel crossmember at Toyota's first deck mount
-  rear_row_x: mount6_x     # and the rear row on the one at the last deck mount, 1,025 mm behind the axle
+  front_row_x: 158.5       # the front L-track row 240 mm ahead of the Tuareg's front axle, as on the LandCruiser. Ford's first
+                           # pads are under the front wall, so its steel crossmember reaches them through two steel stubs
+  rear_row_x: mount4_x     # the rear row on the steel crossmember over Ford's rearmost pads, 960 mm behind the axle
   tu_strap_dy: 450
   st_strap_dy: 400
   wheel_strap_dy: 250
@@ -106,11 +119,14 @@ params:
   fitting_h: 22
   winch_z0: 650
   # ---------------------------------------------------------------- subframe
-  runner_w: 75              # aluminium RHS 75 x 50 x 3, laid flat on each rail
-  runner_y0: rail_y - runner_w / 2
-  runner_y1: rail_y + runner_w / 2
-  mount_dy: 17.5            # each mount angle's reach beyond the runner, over Toyota's bracket on the rail. The brackets
-                            # stay with the frame, so the angles do not follow the tubs out
+  runner_w: 75              # aluminium RHS 75 x 50 x 3, laid flat over Ford's pads
+  runner_y0: pad_y - runner_w / 2
+  runner_y1: pad_y + runner_w / 2
+  mount_l: 60               # each mount covers its pad, 60 x 50 mm (est., Ford: the mount covers the whole pad, BEMM p. 124)
+  mount_w: 50
+  stub_w: 75                # steel RHS 75 x 50 x 3.0 stubs at the front crossmember, over Ford's first pads
+  stub_t: 3.0
+  stub_x1: 375              # the stubs' rear end at the first aluminium crossmember, where the aluminium runners start (UGR-04)
   steel_w: 65               # galvanised C350L0 RHS 65 x 35 x 4.0, laid flat, under each L-track row (report 24)
   steel_h: 35
   steel_t: 4.0
@@ -120,17 +136,17 @@ params:
   strip_t: -floor_t - track_z            # aluminium strips either side of the track carry the floor plate: 10 mm
   strip_w: 15
   cm_w: 50                  # aluminium SHS 50 x 50 x 3 crossmembers and outriggers
-  cm_x: [-15, 450, 800, 1150, 1500, 1800, 2300, x_end - 25]       # inner crossmembers (centres)
-  out_x: [-15, 450, 1500, 1800, 2300, x_end - 25]                  # outriggers, none over the wheels
-  # Toyota's deck mount brackets on the rails, 879 and 490 mm ahead of the rear axle and 123, 490, 755 and 1,025 mm
-  # behind it (BBGJ1007, report 17 section 1.4). Firm at the front two, compliant at the rear four.
-  mount1_x: rear_axle_x - 879 - module_x0
-  mount2_x: rear_axle_x - 490 - module_x0
-  mount3_x: rear_axle_x + 123 - module_x0
-  mount4_x: rear_axle_x + 490 - module_x0
-  mount5_x: rear_axle_x + 755 - module_x0
-  mount6_x: rear_axle_x + 1025 - module_x0
-  bracket_z1: sub_z0 - pad_t        # top of Toyota's bracket flange, level with the rail top
+  # inner crossmembers (centres): one at each pad station (Ford, BEMM p. 124) and at most 600 mm apart (p. 157), with the
+  # two steel crossmembers under the track rows. Outriggers at most 600 mm apart, none over the wheels
+  cm_x: [-15, 400, mount2_x, 1000, 1400, mount3_x, x_end - 25]
+  out_x: [-15, 400, 1700, x_end - 25]
+  # Ford's body mounting pads for the single cab, four pairs 768, 891 and 506 mm apart (BEMM p. 125), the first 60.5 mm
+  # behind the cab, so the four sit centred on the frame behind it (est.). Flexible mounts at the first pair, rigid at the
+  # other three (BEMM p. 124: an exceptionally rigid body, flexible at the forward pads only)
+  mount1_x: cab_back_x + 60.5 - module_x0
+  mount2_x: mount1_x + 768
+  mount3_x: mount2_x + 891
+  mount4_x: mount3_x + 506
   # ---------------------------------------------------------------- stowage
   ramp_fold_l: 1524         # Black Widow MF-12038 folded, standing on its edge across the back
   ramp_fold_t: 152
@@ -140,12 +156,12 @@ params:
   # the rear straps through the back, so the tubs are the lowest free floor that is forward of the ramp.
   tool_x0: tub_x0 + 45
   tool_l: tub_x1 - tub_x0 - 90
-  tool_w: 270               # road side, beside the Tuareg: on the tub top, 2 mm in from its inboard edge. 300 mm on the
-                            # factory track, before the tubs moved out 47.5 mm
-  tool_wk: 220              # kerb side, narrower: the Street Triple's belly pan reaches 200 mm out from its centreline
+  tool_w: 185               # road side, beside the Tuareg: on the tub top, 2.5 mm in from its inboard edge. Ford's 1,710 mm
+                            # track puts the tubs 80 mm further out than the LandCruiser's, so the chests are narrower
+  tool_wk: 185              # kerb side, the same
   tool_h: 200
   tool_z0: tub_top
-  ground_drop: deck_z + 30  # floor height above the ground while loading, bikes out (report 17: about 30 mm higher empty)
+  ground_drop: deck_z + frame_top_load - frame_top_z   # floor height above the ground while loading, bikes out (est.)
 
 items:
   # ---------------------------------------------------------------- bikes (the trailer's bike models)
@@ -289,14 +305,24 @@ items:
   - ref: S1
     part: U-RUNNER
     group: subframe
-    label: Runner on the frame rail
+    label: Runner over Ford's pads
     copies:
-      - {id: R-front, at: [-frame_s, runner_y0, sub_z0], params: {dx: front_row_x - steel_w / 2 + frame_s, dy: runner_w, dz: sub_h}}
-      - {id: R-mid, at: [front_row_x + steel_w / 2, runner_y0, sub_z0], params: {dx: rear_row_x - front_row_x - steel_w, dy: runner_w, dz: sub_h}}
+      - {id: R-mid, at: [stub_x1, runner_y0, sub_z0], params: {dx: rear_row_x - steel_w / 2 - stub_x1, dy: runner_w, dz: sub_h}}
       - {id: R-rear, at: [rear_row_x + steel_w / 2, runner_y0, sub_z0], params: {dx: x_end - rear_row_x - steel_w / 2, dy: runner_w, dz: sub_h}}
-      - {id: K-front, at: [-frame_s, -runner_y1, sub_z0], params: {dx: front_row_x - steel_w / 2 + frame_s, dy: runner_w, dz: sub_h}}
-      - {id: K-mid, at: [front_row_x + steel_w / 2, -runner_y1, sub_z0], params: {dx: rear_row_x - front_row_x - steel_w, dy: runner_w, dz: sub_h}}
+      - {id: K-mid, at: [stub_x1, -runner_y1, sub_z0], params: {dx: rear_row_x - steel_w / 2 - stub_x1, dy: runner_w, dz: sub_h}}
       - {id: K-rear, at: [rear_row_x + steel_w / 2, -runner_y1, sub_z0], params: {dx: x_end - rear_row_x - steel_w / 2, dy: runner_w, dz: sub_h}}
+  # The front track row's steel crossmember stands 170 mm behind Ford's first pads, so steel stubs welded to it run forward
+  # over those pads and back to the first aluminium crossmember, where the runners start, and carry a strap's load to the
+  # pads through steel (UGR-04)
+  - ref: S10
+    part: U-STEEL-STUB
+    group: subframe
+    label: Steel stub at the front crossmember, over Ford's first pad
+    copies:
+      - {id: R-front, at: [-frame_s, pad_y - stub_w / 2, sub_z0], params: {dx: front_row_x - steel_w / 2 + frame_s, dy: stub_w, dz: sub_h}}
+      - {id: R-back, at: [front_row_x + steel_w / 2, pad_y - stub_w / 2, sub_z0], params: {dx: stub_x1 - front_row_x - steel_w / 2, dy: stub_w, dz: sub_h}}
+      - {id: K-front, at: [-frame_s, -pad_y - stub_w / 2, sub_z0], params: {dx: front_row_x - steel_w / 2 + frame_s, dy: stub_w, dz: sub_h}}
+      - {id: K-back, at: [front_row_x + steel_w / 2, -pad_y - stub_w / 2, sub_z0], params: {dx: stub_x1 - front_row_x - steel_w / 2, dy: stub_w, dz: sub_h}}
   - ref: S2
     part: U-STEEL-CM
     group: subframe
@@ -341,29 +367,26 @@ items:
     for: {x: out_x}
     at: [x - cm_w / 2, -half_width - frame_s, sub_z0]
     params: {dx: cm_w, dy: half_width + frame_s - runner_y1, dz: sub_h}
-  # Mount angles: each hangs off the runner's outer face and bolts down onto Toyota's deck mount bracket.
+  # Mounts: each stands on one of Ford's pads and covers it, one M14 10.9 bolt through it. Rigid at stations 2 to 4 (a
+  # galvanised spacer, the rearmost 6 mm taller for its lower pad), flexible at station 1 (BEMM p. 124)
   - ref: S7
     part: U-MOUNT-FIRM
     group: subframe
-    label: Firm mount, two M12 bolts
+    label: Rigid mount on Ford's pad, one M14 10.9 bolt
     copies:
-      - {id: 1R, at: [mount1_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t}}
-      - {id: 1K, at: [mount1_x - 40, -runner_y1 - mount_dy, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t}}
-      - {id: 2R, at: [mount2_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t + 30}}
-      - {id: 2K, at: [mount2_x - 40, -runner_y1 - mount_dy, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t + 30}}
+      - {id: 2R, at: [mount2_x - mount_l / 2, pad_y - mount_w / 2, pad_z1], params: {dx: mount_l, dy: mount_w, dz: mount_h}}
+      - {id: 2K, at: [mount2_x - mount_l / 2, -pad_y - mount_w / 2, pad_z1], params: {dx: mount_l, dy: mount_w, dz: mount_h}}
+      - {id: 3R, at: [mount3_x - mount_l / 2, pad_y - mount_w / 2, pad_z1], params: {dx: mount_l, dy: mount_w, dz: mount_h}}
+      - {id: 3K, at: [mount3_x - mount_l / 2, -pad_y - mount_w / 2, pad_z1], params: {dx: mount_l, dy: mount_w, dz: mount_h}}
+      - {id: 4R, at: [mount4_x - mount_l / 2, pad_y - mount_w / 2, pad_z1 - 6], params: {dx: mount_l, dy: mount_w, dz: mount_h + 6}}
+      - {id: 4K, at: [mount4_x - mount_l / 2, -pad_y - mount_w / 2, pad_z1 - 6], params: {dx: mount_l, dy: mount_w, dz: mount_h + 6}}
   - ref: S8
     part: U-MOUNT-SPRING
     group: subframe
-    label: Compliant mount, one M12 bolt through rubber
+    label: Flexible mount on Ford's first pad, one captive M14 10.9 bolt through rubber
     copies:
-      - {id: 3R, at: [mount3_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t + 30}}
-      - {id: 3K, at: [mount3_x - 40, -runner_y1 - mount_dy, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t + 30}}
-      - {id: 4R, at: [mount4_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t + 30}}
-      - {id: 4K, at: [mount4_x - 40, -runner_y1 - mount_dy, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t + 30}}
-      - {id: 5R, at: [mount5_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t + 30}}
-      - {id: 5K, at: [mount5_x - 40, -runner_y1 - mount_dy, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t + 30}}
-      - {id: 6R, at: [mount6_x - 40, runner_y1, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t}}
-      - {id: 6K, at: [mount6_x - 40, -runner_y1 - mount_dy, sub_z0 - pad_t], params: {dx: 80, dy: mount_dy, dz: pad_t}}
+      - {id: 1R, at: [mount1_x - mount_l / 2, pad_y - mount_w / 2, pad_z1], params: {dx: mount_l, dy: mount_w, dz: mount_h}}
+      - {id: 1K, at: [mount1_x - mount_l / 2, -pad_y - mount_w / 2, pad_z1], params: {dx: mount_l, dy: mount_w, dz: mount_h}}
 
   # ---------------------------------------------------------------- restraint (the trailer's layout, refs 10 to 14 as there)
   - ref: "10"
@@ -463,8 +486,8 @@ items:
      at: [garage_length - 370, -half_width - frame_s, 650], params: {dx: 80, dy: frame_s + 5, dz: 220}}
   - ref: C7
     part: U-MUDFLAP-BKT
-    group: context
-    label: Lovells mudflap bracket under the rear outrigger
+    group: body
+    label: Mudflap bracket under the outrigger behind the tub
     copies:
       - {id: R, at: [mudflap_x - 45, wheel_y - mudflap_w / 2, sub_z0 - 6], params: {dx: 51, dy: half_width + frame_s - wheel_y + mudflap_w / 2, dz: 6}}
       - {id: K, at: [mudflap_x - 45, -half_width - frame_s, sub_z0 - 6], params: {dx: 51, dy: half_width + frame_s - wheel_y + mudflap_w / 2, dz: 6}}
@@ -529,34 +552,25 @@ items:
      at: [520, (tuareg_y + st_y) / 2 - 162.5, 0], params: {dx: 1760, dy: 345, dz: 230}}
 
   # ---------------------------------------------------------------- context (no mass)
+  # Ford's body mounting pads on their brackets from the rails' outer faces, 12 mm over the rail top and the rearmost 6 mm
+  # (BEMM pp. 125 and 128). Part of the cab chassis, shown as envelopes. The subframe clears the rail tops (BEMM p. 158)
   - ref: C1
     part: U-BRACKET
     group: context
-    label: Toyota deck mount bracket on the rail
+    label: Ford body mounting pad on its bracket
     copies:
-      - {id: 1R, at: [mount1_x - 40, rail_y + rail_w / 2, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
-      - {id: 1K, at: [mount1_x - 40, -rail_y - rail_w / 2 - 60, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
-      - {id: 2R, at: [mount2_x - 40, rail_y + rail_w / 2, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
-      - {id: 2K, at: [mount2_x - 40, -rail_y - rail_w / 2 - 60, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
-      - {id: 3R, at: [mount3_x - 40, rail_y + rail_w / 2, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
-      - {id: 3K, at: [mount3_x - 40, -rail_y - rail_w / 2 - 60, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
-      - {id: 4R, at: [mount4_x - 40, rail_y + rail_w / 2, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
-      - {id: 4K, at: [mount4_x - 40, -rail_y - rail_w / 2 - 60, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
-      - {id: 5R, at: [mount5_x - 40, rail_y + rail_w / 2, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
-      - {id: 5K, at: [mount5_x - 40, -rail_y - rail_w / 2 - 60, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
-      - {id: 6R, at: [mount6_x - 40, rail_y + rail_w / 2, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
-      - {id: 6K, at: [mount6_x - 40, -rail_y - rail_w / 2 - 60, bracket_z1 - 16], params: {dx: 80, dy: 60, dz: 16}}
-  - ref: C2
-    part: U-PAD
-    group: context
-    label: Rubber strip on the rail under the subframe
-    copies:
-      - {id: R, at: [-frame_s, rail_y - rail_w / 2, bracket_z1], params: {dx: x_end + frame_s, dy: rail_w, dz: pad_t}}
-      - {id: K, at: [-frame_s, -rail_y - rail_w / 2, bracket_z1], params: {dx: x_end + frame_s, dy: rail_w, dz: pad_t}}
+      - {id: 1R, at: [mount1_x - mount_l / 2 - 5, rail_y + rail_w / 2, pad_z1 - 60], params: {dx: mount_l + 10, dy: pad_y + mount_w / 2 + 5 - rail_y - rail_w / 2, dz: 60}}
+      - {id: 1K, at: [mount1_x - mount_l / 2 - 5, -pad_y - mount_w / 2 - 5, pad_z1 - 60], params: {dx: mount_l + 10, dy: pad_y + mount_w / 2 + 5 - rail_y - rail_w / 2, dz: 60}}
+      - {id: 2R, at: [mount2_x - mount_l / 2 - 5, rail_y + rail_w / 2, pad_z1 - 60], params: {dx: mount_l + 10, dy: pad_y + mount_w / 2 + 5 - rail_y - rail_w / 2, dz: 60}}
+      - {id: 2K, at: [mount2_x - mount_l / 2 - 5, -pad_y - mount_w / 2 - 5, pad_z1 - 60], params: {dx: mount_l + 10, dy: pad_y + mount_w / 2 + 5 - rail_y - rail_w / 2, dz: 60}}
+      - {id: 3R, at: [mount3_x - mount_l / 2 - 5, rail_y + rail_w / 2, pad_z1 - 60], params: {dx: mount_l + 10, dy: pad_y + mount_w / 2 + 5 - rail_y - rail_w / 2, dz: 60}}
+      - {id: 3K, at: [mount3_x - mount_l / 2 - 5, -pad_y - mount_w / 2 - 5, pad_z1 - 60], params: {dx: mount_l + 10, dy: pad_y + mount_w / 2 + 5 - rail_y - rail_w / 2, dz: 60}}
+      - {id: 4R, at: [mount4_x - mount_l / 2 - 5, rail_y + rail_w / 2, pad_z1 - 66], params: {dx: mount_l + 10, dy: pad_y + mount_w / 2 + 5 - rail_y - rail_w / 2, dz: 60}}
+      - {id: 4K, at: [mount4_x - mount_l / 2 - 5, -pad_y - mount_w / 2 - 5, pad_z1 - 66], params: {dx: mount_l + 10, dy: pad_y + mount_w / 2 + 5 - rail_y - rail_w / 2, dz: 60}}
   - ref: C6
     part: U-MUDFLAP
-    group: context
-    label: Lovells mudflap behind the rear tyre
+    group: body
+    label: Mudflap behind the rear tyre
     copies:
       - {id: R, at: [mudflap_x, wheel_y - mudflap_w / 2, sub_z0 - mudflap_h], params: {dx: 6, dy: mudflap_w, dz: mudflap_h - 6}}
       - {id: K, at: [mudflap_x, -wheel_y - mudflap_w / 2, sub_z0 - mudflap_h], params: {dx: 6, dy: mudflap_w, dz: mudflap_h - 6}}

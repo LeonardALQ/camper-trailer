@@ -9,21 +9,9 @@ parts:
     color: "#c8d6e5"
     alpha: 0.6
   U-BRACKET:
-    name: Toyota deck mount bracket (envelope)
+    name: Ford body mounting pad on its bracket (envelope)
     kind: context
-    notes: Part of the cab chassis. Taken as a flange 60 mm out from the rail's outer face, its top level with the rail top (assumption).
-    geometry: {generator: box, params: {}}
-    color: "#1c2833"
-  U-PAD:
-    name: Rubber strip on the rail
-    kind: context
-    notes: 6 mm under the runners and the steel crossmembers. Its mass is in U-SUB-FIX.
-    geometry: {generator: box, params: {}}
-    color: "#000000"
-  U-MUDFLAP:
-    name: Lovells ADR 42/04 mudflap on its bracket, behind each rear tyre (envelope)
-    kind: context
-    notes: "Supplied in the Lovells Elite kit (car build line GV05), so its mass is in the kit's extra mass, ute line UT-16. Centred on the rear tyre, so it sits 47.5 mm further out than on the factory track (report 26). It hangs on its bracket under the box's rear outrigger at module X 1,500 mm. About 300 mm wide with its bottom edge about 230 mm above the ground (assumption)"
+    notes: "Part of the Super Duty's cab chassis: four pairs on the single cab, 768, 891 and 506 mm apart, the pads' holes 1,244 mm apart across the truck (1,248 mm at the rear pair) and their tops 12 mm over the rail top (6 mm at the rear pair) (BEMM pp. 125 and 128, est. reading of the figures). Taken as a bracket from the rail's outer face out to the pad. Measure on the truck (BOX-04)."
     geometry: {generator: box, params: {}}
     color: "#1c2833"
   U-GROUND:
@@ -35,8 +23,8 @@ parts:
   U-TYRE-SWEEP:
     name: Rear tyre from static to full bump (check only)
     kind: context
-    notes: The LT265/75R16 tyre's 805 x 268 mm envelope from its static position up 110 mm of bump travel (estimate).
-    geometry: {generator: tyre_sweep, params: {radius: 402.5, width: 268, rise: 110}}
+    notes: The LT275/70R18 tyre's 842 x 282 mm envelope from its static position laden at GVM up 74 mm of bump travel (est., from Ford's wheelhouse envelope, data/assemblies/ute-garage.yaml rear_bump).
+    geometry: {generator: tyre_sweep, params: {radius: 421, width: 282, rise: 74}}
     color: "#ff0000"
     alpha: 0.2
   U-SWEEP:

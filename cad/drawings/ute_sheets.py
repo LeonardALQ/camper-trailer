@@ -15,6 +15,7 @@ import time
 from build123d import Keep, Plane
 
 from ..build import git_hash
+from ..ute_garage import STATIONS
 from . import sheet as S
 
 _CTX: dict = {}
@@ -164,11 +165,12 @@ def ct701(prj, model, bom, checks, reg, dwg):
     S.hdim(sh, fa[0], fa[1], ra[0], ra[1], fa[1] - 5, f"{wb:.0f} WHEELBASE", size=2.0)
     rb = vE.p(ext["x1"], 0, 0)
     S.hdim(sh, ra[0], ra[1], rb[0], rb[1], fa[1] - 5, f"{ext['x1'] - wb:.0f}", size=2.0)
-    sh.text(rb[0] + 1, fa[1] - 9, f"REAR OVERHANG, LIMIT 1908", 1.6)
-    bx0, bx1 = vE.p(ext["x0"], 0, ext["z1"]), vE.p(V["box_x0"] + P["outside_l"], 0, ext["z1"])
+    sh.text(rb[0] + 1, fa[1] - 9, f"REAR OVERHANG, LIMIT {ute.limits['rear_overhang_max_mm']:.0f}", 1.6)
+    bx0, bx1 = vE.p(ext["x0"], 0, ext["z1"]), vE.p(P["box_x0"] + P["outside_l"], 0, ext["z1"])
     S.hdim(sh, bx0[0], bx0[1], bx1[0], bx1[1], bx0[1] + 5, f"{P['outside_l']:.0f} BOX", size=2.0)
     cb = vE.p(V["cab_back_x"], 0, V["cab_height"])
-    S.leader(sh, (cb[0] + 0.3, cb[1] - 1), (cb[0] - 12, cb[1] + 8), f"{ext['x0'] - V['cab_back_x']:.0f} TO THE CAB (MIN 39)", size=1.8)
+    S.leader(sh, (cb[0] + 0.3, cb[1] - 1), (cb[0] - 12, cb[1] + 8),
+             f"{ext['x0'] - V['cab_back_x']:.0f} TO THE CAB (MIN {ute.limits['cab_gap_min_mm']:.0f})", size=1.8)
     zr = vE.p(ext["x1"], 0, 0)[0]
     for z, lab, xd in ((V["coupling_z"], f"{V['coupling_z']:.0f} BALL", zr + 4), (g["deck_z"], f"{g['deck_z']:.0f} FLOOR", zr + 8.5),
                        (ext["z1"], f"{ext['z1']:.0f} ROOF", zr + 13)):
@@ -190,9 +192,9 @@ def ct701(prj, model, bom, checks, reg, dwg):
     vP = S.View(sh, (0, 0, 1), (0, 1, 0), sc, ox=62.0, oy=100.0)
     vP.draw(outside)
     S.view_label(sh, 100, 76, "PLAN", sc)
-    for i in range(1, 7):
+    for i in range(1, STATIONS + 1):
         x = P[f"mount{i}_x"] + P["module_x0"]
-        for yy in (P["rail_y"], -P["rail_y"]):
+        for yy in (P["pad_y"], -P["pad_y"]):
             p = vP.p(x, yy, 0)
             sh.circle(p[0], p[1], 0.6, "medium")
     L, body = ute.limits, g["body_extent"]
@@ -205,8 +207,8 @@ def ct701(prj, model, bom, checks, reg, dwg):
     S.vdim(sh, c0[0], c0[1], c1[0], c1[1], c0[0] - 22, f"{V['cab_width']:.0f} CAB", size=1.8)
     sh.text(vP.p(V["ball_x"] + 500, 0, 0)[0], vP.p(0, ext["y1"], 0)[1] + 1, "ROAD SIDE", 1.8)
     sh.text(vP.p(V["ball_x"] + 500, 0, 0)[0], vP.p(0, ext["y0"], 0)[1] - 2.5, "KERB SIDE", 1.8)
-    S.leader(sh, vP.p(P["mount1_x"] + P["module_x0"], -P["rail_y"], 0), (vP.p(0, 0, 0)[0] + 10, vP.p(0, ext["y0"], 0)[1] - 8),
-             "TOYOTA DECK MOUNTS, 6 PAIRS", size=1.8)
+    S.leader(sh, vP.p(P["mount1_x"] + P["module_x0"], -P["pad_y"], 0), (vP.p(0, 0, 0)[0] + 10, vP.p(0, ext["y0"], 0)[1] - 8),
+             "FORD BODY MOUNTING PADS, 4 PAIRS", size=1.8)
 
     # ---- rear view
     vR = S.View(sh, (1, 0, 0), (0, 0, 1), sc, ox=200.0, oy=222.0)
@@ -236,16 +238,17 @@ def ct701(prj, model, bom, checks, reg, dwg):
 
     _, _ = S.notes(sh, 22, 62, [
         "UTE FRAME DIM-U1: X FROM THE FRONT AXLE (+ REARWARD), Y FROM THE CENTRELINE (+ TO THE ROAD SIDE), Z FROM THE GROUND AT LADEN RIDE HEIGHT.",
-        f"TOYOTA LANDCRUISER VDJ79 GXL SINGLE CAB, LOVELLS ELITE GVM KIT PLATED AT {L['gvm_kg']:.0f} kg (FRONT {L['front_axle_kg']:.0f}, REAR "
-        f"{L['rear_axle_kg']:.0f} kg, TWICE THE ROH WHEEL'S {L['wheel_rating_kg']:.0f} kg, H18), REAR TRACK {V['track_rear']:.0f}. GCM {L['gcm_kg']:.0f} kg "
-        f"WITH THE REVISION. TOWBALL {V['towball_design']:.0f} kg WITH GROWTH, AT MOST {L['towball_rating_kg']:.0f} kg.",
-        f"BOX FLOOR {g['deck_z']:.0f} ABOVE THE GROUND ON A 50 mm SUBFRAME ON THE RAILS, WITH WHEEL TUBS {g['dims']['tub_h']:.1f} HIGH (ESTIMATE: FRAME TOP 774, BUMP TRAVEL 110). MEASURE BOTH ON THE VEHICLE.",
-        f"THE REAR-MOST POINT IS THE CAM BAR ON THE BARN DOORS. BOX OUTSIDE {P['outside_l']:.0f} LONG, {P['outside_w']:.0f} WIDE, "
+        f"FORD RANGER SUPER DUTY SINGLE CAB CHASSIS ON FORD'S RATINGS: GVM {L['gvm_kg']:,.0f} kg, FRONT AXLE {L['front_axle_kg']:,.0f} kg, REAR "
+        f"{L['rear_axle_kg']:,.0f} kg, GCM {L['gcm_kg']:,.0f} kg (BEMM p. 33), TRACK {V['track_rear']:,.0f}. TOWBALL {V['towball_design']:.0f} kg WITH "
+        f"GROWTH, AT MOST {L['towball_rating_kg']:.0f} kg (EST.).",
+        f"BOX FLOOR {g['deck_z']:.0f} ABOVE THE GROUND ON A {P['sub_h']:.0f} mm SUBFRAME ON {P['mount_h']:.0f} mm MOUNTS ON FORD'S PADS, WITH WHEEL TUBS "
+        f"{g['dims']['tub_h']:.1f} HIGH (ESTIMATE: FRAME TOP {P['frame_top_z']:.0f} AT GVM, BUMP TRAVEL {P['rear_bump']:.0f}). MEASURE BOTH ON THE VEHICLE.",
+        f"THE REAR-MOST POINT IS THE {ute.rear_most()['governing'].upper()}. BOX OUTSIDE {P['outside_l']:.0f} LONG, {P['outside_w']:.0f} WIDE, "
         f"{P['top_z']:.0f} HIGH ABOVE THE FLOOR AT THE WALLS AND {P['top_z'] + P['roof_crown']:.0f} AT THE ROOF'S CROWN, {P['flare_w']:.0f} WIDE OVER THE REAR TUB FLARES (DETAIL B).",
         f"ROOF: NO STEP, NO KNEELING, ON TWO LABELS ON THE ROOF (BX-C03). {P['roof_t']:g} mm 5052-H32 ON BOWS CROWNED 1:{P['roof_fall']:.0f} TO BOTH "
         "SIDES, WELDED CONTINUOUSLY ALONG THE FRONT EDGE AND THE FIRST BOW BEHIND IT, BONDED ALONG EVERY BOW WITH A SIKAFLEX-252 BEAD AND "
         "STITCHED TO THE OTHER BOWS (UGF-01). A KNEE DENTS THE SHEET.",
-        "NO DRILLING OR WELDING OF THE FRAME. THE SUBFRAME BOLTS TO TOYOTA'S DECK MOUNT BRACKETS (CT-702).",
+        "NO DRILLING OR WELDING OF THE FRAME (BEMM p. 155). THE SUBFRAME BOLTS TO FORD'S EIGHT BODY MOUNTING PADS, FLEXIBLE AT THE FIRST PAIR (CT-702).",
     ], width_chars=100, size=1.75)
     _detail_b(sh, 240, 165, P, V, L)
     _stamp(sh, 22, 282)
@@ -258,8 +261,8 @@ def ct701(prj, model, bom, checks, reg, dwg):
 def _detail_b(sh, x0, ytop, P, V, L):
     """Detail B, the road-side rear tub flare cut at the rear axle, looking forward (the kerb side is its mirror), at 1:2,
     in the free space under the checks. Decision H19, report 26 fix A."""
-    k = 0.5
-    y_lo, y_hi, z_lo, z_hi = 868.0, 952.0, -16.0, 140.0
+    k = 0.25
+    y_lo, y_hi, z_lo, z_hi = 868.0, 1040.0, -16.0, 140.0
     yb = ytop - 12 - (z_hi - z_lo) * k
 
     def X(y):
@@ -275,7 +278,7 @@ def _detail_b(sh, x0, ytop, P, V, L):
     tyre_y = P["wheel_y"] + P["tyre_w"] / 2
     bump = P["wheel_z"] + P["rear_bump"] + P["tyre_d"] / 2
     sh.text(x0 + 33, ytop, "DETAIL B: REAR TUB FLARE, ROAD SIDE (KERB SIDE MIRRORED)", 1.9, "middle", bold=True)
-    sh.text(x0 + 33, ytop - 3.4, "SECTION AT THE REAR AXLE, LOOKING FORWARD. SCALE 1:2", 1.5, "middle")
+    sh.text(x0 + 33, ytop - 3.4, "SECTION AT THE REAR AXLE, LOOKING FORWARD. SCALE 1:4", 1.5, "middle")
     sh.rect(X(skin_in), Z(fl_top), X(skin_out), Z(z_hi), "thick")                    # side skin, cut away below the rail top
     sh.rect(X(hw), Z(tub), X(skin_in), Z(tub + fs), "thick")                           # bottom rail SHS 40 x 40 x 3 on the tub
     sh.rect(X(hw + ft), Z(tub + ft), X(skin_in - ft), Z(tub + fs - ft), "thin")
@@ -288,7 +291,7 @@ def _detail_b(sh, x0, ytop, P, V, L):
     S.hdim(sh, X(tyre_y), Z(20), X(fl_in), Z(20), Z(20), f"{gap:.0f} (MIN 30)", size=1.6, ext=False)
     S.hdim(sh, X(skin_out), Z(z_hi), X(fl_out), Z(fl_top), Z(z_hi) + 3, f"{P['flare_out']:.0f}", size=1.6)
     S.vdim(sh, X(fl_out), Z(-floor_t), X(fl_out), Z(fl_top), X(fl_out) + 5, f"{fl_top + floor_t:.1f}", size=1.6)
-    S.vdim(sh, X(890), Z(bump), X(890), Z(tub - tub_t), X(890), f"{tub - tub_t - bump:.0f}", size=1.6, ext=False)
+    S.vdim(sh, X(950), Z(bump), X(950), Z(tub - tub_t), X(950), f"{tub - tub_t - bump:.0f}", size=1.6, ext=False)
     tx = X(y_hi) + 12
     S.leader(sh, (X(skin_in + 1.2), Z(134)), (tx, Z(134)), "SIDE SKIN 2.5, CUT AWAY OVER THE TUB UP TO THE RAIL TOP", size=1.6)
     S.leader(sh, (X(skin_in - 12), Z(tub + fs - 8)), (tx, Z(112)), "BOTTOM RAIL SHS 40x40x3 ON THE TUB", size=1.6)
@@ -296,10 +299,10 @@ def _detail_b(sh, x0, ytop, P, V, L):
              "TOP WELDED TO THE RAIL", size=1.6)
     S.leader(sh, (X(870), Z(tub - tub_t)), (x0 - 4, Z(40)), "TUB TOP 3.0 5052-H32", size=1.6)
     S.leader(sh, (X(tyre_y), Z(0)), (x0 - 4, Z(10)), "REAR TYRE, STATIC TO FULL BUMP", size=1.6)
-    for i, t in enumerate((f"ON THE ELITE'S {V['track_rear']:.0f} REAR TRACK THE TYRE'S OUTER FACE IS",
-                           f"{tyre_y:.1f} FROM THE CENTRELINE, {skin_in - tyre_y:.0f} FROM THE BODY'S SKIN (RESEARCH REPORT 26).",
-                           "THE FLARE KEEPS TOYOTA'S 30 OUTSIDE THE TYRE (UGW-03).",
-                           f"BOX {2 * fl_out:.0f} OVER THE FLARES, MAX {L['flare_width_max_mm']:.0f}, BODY {P['outside_w']:.0f} (UTE-09, H19).")):
+    for i, t in enumerate((f"ON FORD'S {V['track_rear']:,.0f} REAR TRACK (BEMM p. 25) THE TYRE'S OUTER FACE IS",
+                           f"{tyre_y:.0f} FROM THE CENTRELINE, {tyre_y - skin_out:.0f} OUTSIDE THE BODY'S SKIN.",
+                           "THE FLARE KEEPS FORD'S 30 OUTSIDE THE TYRE (BEMM p. 122, UGW-03).",
+                           f"BOX {2 * fl_out:,.0f} OVER THE FLARES, MAX {L['flare_width_max_mm']:,.0f}, BODY {P['outside_w']:,.0f} (UTE-09, H19).")):
         sh.text(tx + 4, Z(48) - 3 * i, t, 1.6)
 
 
@@ -309,8 +312,8 @@ SCHEDULE = [
     ("U-ROOF", "SHEET 1.6 5052-H32"),
     ("U-FLOOR", "PLATE 4.0 5052-H32"), ("U-TUB", "SHEET 3.0 5052-H32"), ("U-RUNNER", "RHS 75x50x3 6061-T6"),
     ("U-CM", "SHS 50x50x3 6061-T6"), ("U-STEEL-CM", "RHS 65x35x4.0 C350L0 GALV"), ("U-PACKER", "PLATE 5.0x65 5052-H32"),
-    ("U-STRIP", "FLAT 15x10 6060"), ("U-MOUNT-FIRM", "ANGLE + 2 M12 8.8"), ("U-MOUNT-SPRING", "ANGLE + M12 8.8 + RUBBER"),
-    ("U-SUB-FIX", "M8, ISOLATORS, SEALANT"),
+    ("U-STRIP", "FLAT 15x10 6060"), ("U-STEEL-STUB", "RHS 75x50x3.0 C350L0 GALV"), ("U-MOUNT-FIRM", "SPACER GALV + M14 10.9"),
+    ("U-MOUNT-SPRING", "2 CUSHIONS + CAPTIVE M14 10.9"), ("U-SUB-FIX", "M8, ISOLATORS, SEALANT"),
 ]
 
 
@@ -356,20 +359,20 @@ def ct702(prj, model, bom, checks, reg, dwg):
     vP.draw(sub)
     S.view_label(sh, 110, 30, "SUBFRAME PLAN, FLOOR OFF", sc)
     bot = vP.p(0, -hw - fs, 0)[1]
-    stations = [P[f"mount{i}_x"] for i in range(1, 7)]
+    stations = [P[f"mount{i}_x"] for i in range(1, STATIONS + 1)]
     S.ordinate_h(sh, [vP.p(x, 0, 0)[0] for x in stations], bot - 1, bot - 9,
                  [f"{x - P['axle_m']:+.0f}" for x in stations], size=1.7, up=False)
     sh.text(vP.p(-fs, 0, 0)[0] - 1, bot - 5, "MOUNTS FROM", 1.6, "end")
     sh.text(vP.p(-fs, 0, 0)[0] - 1, bot - 7.5, "REAR AXLE", 1.6, "end")
     for i, x in enumerate(stations, 1):
         p = vP.p(x, hw + fs, 0)
-        sh.text(p[0], p[1] + 1.5, ("F" if i <= 2 else "C") + str(i), 1.7, "middle", bold=True)
+        sh.text(p[0], p[1] + 1.5, ("F" if i == 1 else "R") + str(i), 1.7, "middle", bold=True)
     for x, lab in ((P["front_row_x"], "STEEL CM, FRONT TRACK ROW"), (P["rear_row_x"], "STEEL CM, REAR TRACK ROW")):
         p = vP.p(x, 0, 0)
         S.leader(sh, (p[0], p[1]), (p[0] + 10, p[1] + 12 if x < 1000 else p[1] + 12), lab, size=1.6)
-    r0, r1 = vP.p(P["x_end"], P["rail_y"], 0), vP.p(P["x_end"], -P["rail_y"], 0)
-    S.vdim(sh, r0[0], r0[1], r1[0], r1[1], r0[0] + 6, f"{2 * P['rail_y']:.0f} RAIL CL", size=1.7)
-    sh.text(vP.p(P["x_end"], 0, 0)[0] + 12, vP.p(0, hw, 0)[1], "F = FIRM, C = COMPLIANT", 1.6)
+    r0, r1 = vP.p(P["x_end"], P["pad_y"], 0), vP.p(P["x_end"], -P["pad_y"], 0)
+    S.vdim(sh, r0[0], r0[1], r1[0], r1[1], r0[0] + 6, f"{2 * P['pad_y']:.0f} PADS CL", size=1.7)
+    sh.text(vP.p(P["x_end"], 0, 0)[0] + 12, vP.p(0, hw, 0)[1], "F = FLEXIBLE, R = RIGID", 1.6)
 
     # ---- section at the rear axle, looking forward
     xcut = P["axle_m"]
@@ -388,9 +391,9 @@ def ct702(prj, model, bom, checks, reg, dwg):
     i0, i1 = vS.p(0, -hw, 700), vS.p(0, hw, 700)
     S.hdim(sh, i0[0], i0[1], i1[0], i1[1], i0[1], f"{P['interior_width']:.0f} INSIDE", size=1.7, ext=False)
     tb = vS.p(0, P["tub_y0"], P["tub_top"])
-    S.leader(sh, tb, (tb[0] + 8, tb[1] + 14), f"TUB TOP {P['tub_top']:.1f}, 25 OVER THE TYRE AT FULL BUMP", size=1.6)
+    S.leader(sh, tb, (tb[0] + 8, tb[1] + 14), f"TUB TOP {P['tub_top']:.1f}, {P['tub_top_gap']:.0f} OVER THE TYRE AT FULL BUMP", size=1.6)
     ti = vS.p(0, -P["tub_y0"], 20)
-    S.leader(sh, ti, (ti[0] + 6, ti[1] - 10), "40 INSIDE THE TYRE", size=1.6)
+    S.leader(sh, ti, (ti[0] + 6, ti[1] - 10), f"{P['tub_in_gap']:.0f} INSIDE THE TYRE", size=1.6)
 
     # ---- member schedule
     lines = {ln["id"]: ln for ln in g["lines"]}
@@ -410,9 +413,11 @@ def ct702(prj, model, bom, checks, reg, dwg):
         f"MODULE X 0 IS AT UTE X {P['module_x0']:.1f}, Z 0 AT UTE Z {P['deck_z']:.0f}.",
         "ONE-PIECE BODY: TIG-WELDED 5052-H32 SKINS ON A 6061-T6 FRAME. THE WELDS ARE SIZED TO THE SOFTENED STRENGTH NEXT TO EACH WELD.",
         "STEEL CROSSMEMBERS ARE GALVANISED AND BOLTED, NEVER WELDED, TO THE ALUMINIUM, WITH NYLON SLEEVES AND WASHERS.",
-        "FIRM MOUNTS F1 AND F2: TWO M12 8.8 PER BRACKET. COMPLIANT MOUNTS C3 TO C6: ONE M12 8.8 THROUGH TWO RUBBER CUSHIONS AND A SAFETY WASHER.",
-        "TOYOTA'S BRACKETS ARE SHOWN AS ENVELOPES. CONFIRM ON THE VEHICLE WHICH ARE DECK MOUNTS AND WHICH ARE SPRING HANGERS.",
-        "BRACKET BOLTS GO IN HEAD UP FROM INSIDE THE SUBFRAME, NYLOC NUT BELOW TOYOTA'S BRACKET, SO THE BOX COMES OFF ONLY FROM INSIDE IT (DETAIL A).",
+        "FLEXIBLE MOUNTS F1: TWO RUBBER CUSHIONS OF ABOUT 1 kN/mm, TRAVEL STOPPED AT 12 mm, A CAPTIVE M14 10.9 BOLT AND A SAFETY WASHER. "
+        "RIGID MOUNTS R2 TO R4: A GALVANISED SPACER, 6 mm TALLER AT R4, ONE M14 10.9 BOLT AND 50x5 HARDENED WASHERS (FORD BEMM p. 124).",
+        "FORD'S PADS ARE SHOWN AS ENVELOPES AT THE BEMM'S SPACINGS (p. 125). MEASURE THEM ON THE TRUCK (BOX-04) AND KEEP EVERY "
+        "CROSSMEMBER CLEAR OF FORD'S PARTS OVER THE RAIL TOP, UP TO 66 mm AT THE DAMPERS' MOUNTS (p. 128).",
+        "PAD BOLTS GO IN HEAD UP FROM INSIDE THE SUBFRAME, LOCKNUT BELOW FORD'S PAD, SO THE BOX COMES OFF ONLY FROM INSIDE IT (DETAIL A).",
     ], width_chars=96, size=1.6)
     _detail_a(sh, 332, 106)
     _stamp(sh, 22, 282)
@@ -423,31 +428,29 @@ def ct702(prj, model, bom, checks, reg, dwg):
 
 
 def _detail_a(sh, x0, y0):
-    """Detail A, the bracket bolts at stations 1 and 6, looking from the kerb side, in the space right of the notes.
-    Schematic, about 1:5."""
+    """Detail A, the rigid mount under the rear steel crossmember on Ford's rearmost pad, looking from the kerb side, in the
+    space right of the notes. Schematic, about 1:5."""
     k = 0.2                                     # sheet mm per real mm
-    cx, yb = x0 + 20, y0 - 28                   # crossmember centre, bottom of Toyota's bracket flange
-    w_cm, h_cm, w_pl, t_pl, w_br, t_br = 65 * k, 35 * k, 145 * k, 6 * k, 160 * k, 8 * k
-    sh.text(x0 + 38, y0 - 4, "DETAIL A: BRACKET BOLTS AT STATIONS 1 AND 6", 1.8, "middle", bold=True)
+    cx, yb = x0 + 20, y0 - 30                   # crossmember centre, bottom of Ford's pad
+    w_cm, h_cm, w_sp, h_sp, w_br, t_br = 65 * k, 35 * k, 60 * k, 51 * k, 80 * k, 8 * k
+    sh.text(x0 + 38, y0 - 4, "DETAIL A: RIGID MOUNT AT STATION 4", 1.8, "middle", bold=True)
     sh.text(x0 + 38, y0 - 7, "LOOKING FROM THE KERB SIDE, NOT TO SCALE", 1.4, "middle")
-    sh.text(x0 + 38, y0 - 9.5, "STATION 6: ONE BOLT THROUGH THE TWO CUSHIONS", 1.4, "middle")
-    sh.rect(cx - w_br / 2, yb, cx + w_br / 2, yb + t_br, "thick")                       # Toyota's bracket flange
-    sh.rect(cx - w_pl / 2, yb + t_br, cx + w_pl / 2, yb + t_br + t_pl, "thick")          # 145 x 80 x 6 plate
-    y_cm = yb + t_br + t_pl
+    sh.text(x0 + 38, y0 - 9.5, "STATION 1: TWO CUSHIONS IN PLACE OF THE SPACER", 1.4, "middle")
+    sh.rect(cx - w_br / 2, yb, cx + w_br / 2, yb + t_br, "thick")                       # Ford's pad
+    sh.rect(cx - w_sp / 2, yb + t_br, cx + w_sp / 2, yb + t_br + h_sp, "thick")          # galvanised spacer
+    y_cm = yb + t_br + h_sp
     sh.rect(cx - w_cm / 2, y_cm, cx + w_cm / 2, y_cm + h_cm, "thick")                    # RHS 65 x 35 x 4.0, end on
     sh.rect(cx - w_cm / 2 + 4 * k, y_cm + 4 * k, cx + w_cm / 2 - 4 * k, y_cm + h_cm - 4 * k, "thin")
-    for side in (-1, 1):
-        bx = cx + side * (w_cm / 2 + 20 * k)
-        sh.rect(bx - 9 * k, y_cm, bx + 9 * k, y_cm + 8 * k, "thick")                     # hex head on the plate
-        sh.line(bx - 6 * k, yb - 14 * k, bx - 6 * k, y_cm, "thin")
-        sh.line(bx + 6 * k, yb - 14 * k, bx + 6 * k, y_cm, "thin")
-        sh.rect(bx - 12 * k, yb - 3 * k, bx + 12 * k, yb, "thin")                        # hardened washer
-        sh.rect(bx - 9 * k, yb - 13 * k, bx + 9 * k, yb - 3 * k, "thick")                # nyloc nut, below the bracket
+    sh.rect(cx - 9 * k, y_cm + h_cm - 4 * k, cx + 9 * k, y_cm + h_cm + 5 * k, "thick")   # hex head inside the crossmember
+    sh.line(cx - 7 * k, yb - 14 * k, cx - 7 * k, y_cm + h_cm - 4 * k, "thin")
+    sh.line(cx + 7 * k, yb - 14 * k, cx + 7 * k, y_cm + h_cm - 4 * k, "thin")
+    sh.rect(cx - 25 * k, yb - 5 * k, cx + 25 * k, yb, "thin")                            # 50 x 5 hardened washer
+    sh.rect(cx - 11 * k, yb - 15 * k, cx + 11 * k, yb - 5 * k, "thick")                  # locknut, below the pad
     ex = x0 + 40
     S.leader(sh, (cx, y_cm + h_cm), (ex, y_cm + h_cm + 4), "RHS 65x35x4.0 C350L0 GALV", size=1.5)
-    S.leader(sh, (cx + w_pl / 2, yb + t_br + t_pl / 2), (ex, yb + 7), "PLATE 145x80x6 C350, WELDED", size=1.5)
-    S.leader(sh, (cx + w_br / 2, yb + t_br / 2), (ex, yb + 2), "TOYOTA DECK MOUNT BRACKET", size=1.5)
-    S.leader(sh, (cx + w_cm / 2 + 20 * k, yb - 8 * k), (ex, yb - 5), "M12 8.8 HEAD UP, NYLOC BELOW", size=1.5)
+    S.leader(sh, (cx + w_sp / 2, yb + t_br + h_sp / 2), (ex, yb + 9), "SPACER 51 GALV, G10 PAD ON TOP", size=1.5)
+    S.leader(sh, (cx + w_br / 2, yb + t_br / 2), (ex, yb + 2), "FORD BODY MOUNTING PAD", size=1.5)
+    S.leader(sh, (cx + 11 * k, yb - 10 * k), (ex, yb - 5), "M14 10.9 HEAD UP, LOCKNUT BELOW", size=1.5)
 
 
 # ------------------------------------------------------------------ CT-703 doors and security
