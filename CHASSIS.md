@@ -9,7 +9,7 @@ The re-check of 2287128 found the end plates' welds to the rails in no check, an
 - The gusset's heel pulls each 16 mm end plate CH-P15 forward with about 14.1 kN at every cycle, and the plate passes that pull to the rail through its welds. The plate stays flush with the rail's sides but stands 3.5 mm over its top, across the raiser's bottom wall. Its edges on the webs and the top are bevelled, and the walls are welded to it with full penetration from outside, the plate behind each root. Its bottom edge rests on the drawbar member unwelded.
 - FAT-20 reads those welds at IIW 415, FAT 36, as their root inside the tube cannot be inspected: 18.3 MPa on a web's 4 mm against 21.1 MPa, 0.87, with a Miner damage of 0.18, the largest of any detail. The top weld joins 7.5 mm of wall and sees 10.0 MPa.
 - FAT-19 now takes the plate's bottom edge as free: 23.0 MPa against 36.9 MPa, 0.62, where revision I's four supported edges gave 22.8 MPa.
-- The taller plates add 0.04 kg of steel, so the steel is 523.1 kg and the tare 2,696.3 kg. No check limit changed, and no estimate changed to pass a check.
+- The taller plates add 0.04 kg of steel, so the steel is 523.1 kg. No check limit changed, and no estimate changed to pass a check.
 
 ## What changed in revision I, 23 Nov 2026
 

@@ -1001,7 +1001,7 @@ inputs:
     range: {min: null, max: null, src: "Aim: report 21's 400 L, which covers 7 days with three washes. No limit either way: water_full_l, the water the design carries, follows the reading with the 3 L under the pickups added back, in H21's 5 L steps down, so a reading of 397 L or more keeps 400 L and one under it takes the design to 395 L. The travel limit (H13) caps what rides"}
     affects: [the days of water off-grid]
     thresholds:
-      - {at: 400, rule: "Under 400 L a week with three washes runs short by what is missing, at report 21's 57 L a day: the estimate's 399 L lasts 6.98 days, so the week's last wash waits for the next fill", src: "Report 21 section 10.1, 400 L over 7 days"}
+      - {at: 400, rule: "Under 400 L a week with three washes runs short by what is missing, at report 21's 57 L a day: the estimate's 399 L is 6.98 days of water, so the week's last wash waits for the next fill", src: "Report 21 section 10.1, 400 L over 7 days"}
       - {at: 343, rule: "Under 343 L, six days at 57 L a day, a week with three washes needs a refill on the sixth day: plan the fills, or add laundry days less often", src: "Report 21 section 10.1, 400 L over 7 days"}
   - id: TR-03
     group: Trailer tests

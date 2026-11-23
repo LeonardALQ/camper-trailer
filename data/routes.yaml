@@ -1069,11 +1069,11 @@ runs:
   # so no part of it lies in the arms' slot (FIT-05, I2-30). K-11 and K-12 are Bosch's axle harness, clamped at the
   # junctions within its 200 mm.
   - {id: K-13, system: lamps, kind: lamp12, rides: between, cut_m: 1.0, feeds: "The 12-pin flat plug's lead from the truck's socket to the drawbar junction: the lamps, the brake request on pin 5 and the earth returns", protection: "The truck's lamp fuses and its brake controller",
-     serves: [plug lead], from: {line: TB-SK, at: [TB_SK.x1, TB_SK.cy - 40, TB_SK.cz]}, path: [[-60, 120, 540], [260, 115, 612], [380, 150, 560]], to: {line: DB-PL, at: [DB_PL.x0, DB_PL.cy - 5, DB_PL.cz]}}
+     serves: [plug lead], from: {line: TB-SK, at: [TB_SK.x1, TB_SK.cy - 40, TB_SK.cz]}, path: [[-60, 120, 540], [260, 115, 612], [380, 165, 560]], to: {line: DB-PL, at: [DB_PL.x0, DB_PL.cy - 5, DB_PL.cz]}}
   - {id: K-14, system: dc12, kind: sb50, amps: 16, volts: 12, rides: between, cut_m: 1.0, feeds: "The TSC's supply from the truck's Anderson SB50 to the drawbar junction, the four magnets' current, hanging between the vehicles", protection: "30 A circuit breaker at the truck's battery for the TSC's supply (est.), under Bosch's 40 A",
      feed: {line: TW07, what: "the truck's half from its battery to its SB50: 6.7 m of 4 B&S twin and a 0.3 m tail of 6 B&S twin", parts: [[6.7, 2.12], [0.3, 3.38]], limit_pct: 3,
             source: "Car build line TW07 (data/vehicle/vehicle-parts.yaml), 7 m in all (est.), at the conductor table's 4 B&S and 6 B&S rows. 3 % of its own, so the chain from the battery to the TSC holds AS/NZS 3000's 5 %"},
-     serves: [brakes], from: {line: TB-SK, at: [TB_SK.x1, TB_SK.cy + 40, TB_SK.cz]}, path: [[-60, 200, 545], [260, 135, 615], [380, 175, 565]], to: {line: DB-PL, at: [DB_PL.x0, DB_PL.cy + 20, DB_PL.cz]}}
+     serves: [brakes], from: {line: TB-SK, at: [TB_SK.x1, TB_SK.cy + 40, TB_SK.cz]}, path: [[-60, 200, 545], [260, 135, 615], [380, 190, 570]], to: {line: DB-PL, at: [DB_PL.x0, DB_PL.cy + 20, DB_PL.cz]}}
   - {id: K-10, system: dc12, kind: brake, amps: 16, volts: 12, follows: [K-14], feeds: "The TSC's supply from the drawbar junction to the Bosch TSC: the four magnets' current and its return, with the brake request and the breakaway switch's pair", inside: [RL-R], passes: [], protection: "30 A circuit breaker at the truck's battery for the TSC's supply (est.), under Bosch's 40 A",
      serves: [brakes], along: [DB-RA, DB-RB, CH-P04, RL-R, RS-R, CM-04, UF-03, CM-05], from: {line: DB-PL, at: [DB_PL.x1, DB_PL.cy + 23, DB_PL.z0 + 10.5]},
      path: [[560, 238.5, 470], [700, 261, .], [1430, 516.7, .], [1700, 611.8, .], [1790, 662, .], [2030, 690, .], [2270, ., .], [2400, 668, 648.5], [2452, 630, 649.5], [2495, 605, 650],
