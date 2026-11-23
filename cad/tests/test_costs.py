@@ -1,8 +1,8 @@
-"""The car build's parts list (data/vehicle/vehicle-parts.yaml): its lines are consistent and sorted into the build, the
-purchase check list and the optional extras (decision H24), the totals typed in the file add up from the lines, the Car
-build page's figures are the same, and VEHICLE.md quotes them. The truck's price and the build budget come from
-data/project.yaml, the bike box's total from data/ute/box-parts.yaml (test_box_parts.py) and the trailer's from its
-parts list (test_trailer_parts.py)."""
+"""The Ranger Super Duty's parts list (data/vehicle/vehicle-parts.yaml, research report 31): its lines are consistent and
+sorted into the build, the check list and the optional extras, the totals typed in the file add up from the lines, the
+Car build page's figures are the same, and VEHICLE.md quotes them, with the purchase and the upgrades set against the
+LandCruiser plan they replace. The truck's price and the build budget come from data/project.yaml, the bike box's total
+from data/ute/box-parts.yaml (test_box_parts.py) and the trailer's from its parts list (test_trailer_parts.py)."""
 import re
 from collections import defaultdict
 
@@ -21,6 +21,7 @@ ITEMS = CAR["items"]
 TYPED = CAR["totals_aud"]
 STAGES = [st["id"] for st in CAR["stages"]]
 STATUSES = ("build", "check", "optional")
+LANDCRUISER = {"truck": 50000, "build": 77777}  # the plan the Super Duty replaces (VEHICLE.md to 22 Nov 2026)
 CHECK_FIELDS = ("check", "pass_mark", "checked_at")
 
 
@@ -77,17 +78,35 @@ def test_check_lines_say_what_to_check():
             assert not set(CHECK_FIELDS) & set(it), f"{it['id']} is not a check line but has check fields"
 
 
-def test_the_build_holds_the_upgrades_and_leaves_the_wear_items_out():
-    """Decision H24: the engine rebuild, the injectors, the clutch, the power parts, the tune and its certificate, the GVM
-    kit, the GCM revision, their wheels and tyres and the towing gear are built and counted. Wear items such as bearings,
-    hoses, the alternator and the starter are on the check list, and the lockers, bar and winch are optional."""
+def test_the_build_holds_what_the_truck_needs():
+    """The Super Duty comes with Ford's 4,500 kg GVM, 8,000 kg GCM, 4.5 t tow bar and hitch, trailer brake controller and
+    12-pin socket, so the build is the purchase inspection, the coupling's tow pin, the trailer charging, the mirrors,
+    radio, compressor and recovery kit, and the power stage with its certificate. Lines that wait on a check are on the
+    check list, the bar, winch, sliders and lights are optional, and nothing of the LandCruiser build is left."""
     status = {it["id"]: it["status"] for it in ITEMS}
-    for i in ("EN01", "EN14", "FS01", "CG01", "TX01", "TX04", "TX05", "TL01", "TL05", "GV05", "GV06", "WT01", "WT02", "TW01", "TC01"):
+    for i in ("BI01", "TW01", "TC01", "TW06", "TM01", "UH01", "AC01", "RK01", "PW01", "PW02", "TL01", "TL04", "TL05"):
         assert status[i] == "build", f"{i} is {status[i]}"
-    for i in ("DL06", "DL08", "EN18", "RF04", "RF05", "SS01", "CG09", "FS03", "ID03", "WT04"):
+    for i in ("TW02", "TC02", "TL07", "TX01", "BF01"):
         assert status[i] == "check", f"{i} is {status[i]}"
-    for i in ("DL14", "BW01", "BW02", "TW07"):
+    for i in ("OP01", "OP02", "OP03"):
         assert status[i] == "optional", f"{i} is {status[i]}"
+    for i in ("EN01", "CG01", "GV05", "GV06", "WT01", "TW08", "TX04"):
+        assert i not in status, f"{i} is a LandCruiser line"
+    assert not any("70 mm ball" in it["name"] for it in ITEMS), "the coupling's tow pin takes the place of a ball"
+
+
+def test_super_duty_against_the_landcruiser():
+    """The purchase and the upgrades with their allowance, shown apart in VEHICLE.md and set against the LandCruiser plan
+    they replace: AUD 50,000 for that truck and AUD 77,777 for its build with the allowance."""
+    truck, car = PROJECT["truck"]["purchase_aud"], TYPED["build_plus_contingency"]
+    assert (truck, car) == (92690, 20550), "the purchase and the upgrades changed: update this test and VEHICLE.md"
+    rows = {r[0]: r for r in _rows(_section("The truck against the LandCruiser plan"))}
+    want = {"Truck": (truck, LANDCRUISER["truck"]), "Upgrades with the allowance": (car, LANDCRUISER["build"]),
+            "Together": (truck + car, LANDCRUISER["truck"] + LANDCRUISER["build"])}
+    for name, (sd, lc) in want.items():
+        assert name in rows, f"VEHICLE.md's comparison has no {name!r} row"
+        got = [_num(c) for c in rows[name][1:4]]
+        assert got == [sd, lc, sd - lc], f"VEHICLE.md's {name!r} row is {got}, the data give {[sd, lc, sd - lc]}"
 
 
 def test_cut_savings_are_the_replaced_line_less_the_job():
@@ -160,8 +179,9 @@ def test_vehicle_md_quotes_the_totals():
     bp = t["by_priority"]
     for v in (bp["P1"]["build"], bp["P2"]["build"], t["optional"]):
         assert f"AUD {_aud(v)}" in PLAN, f"VEHICLE.md does not quote the total {_aud(v)}"
-    for word in ("placeholder", "pending R20", "30,000", "required work", "Contingency lines"):
+    for word in ("placeholder", "pending R20", "30,000", "required work", "Contingency lines", "VDJ79 single cab built"):
         assert word not in PLAN, f"VEHICLE.md still has {word!r}"
+    assert "Ranger Super Duty" in PLAN.split("\n", 1)[0], "VEHICLE.md's title names the truck"
 
 
 def test_vehicle_md_stage_table():

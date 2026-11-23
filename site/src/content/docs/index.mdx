@@ -1,6 +1,6 @@
 ---
 title: Camper trailer design
-description: The design of a one-off off-road camper trailer and its tow vehicle, a LandCruiser 79 that carries two motorcycles in an enclosed box.
+description: The design of a one-off off-road camper trailer and its tow vehicle, a Ford Ranger Super Duty that carries two motorcycles in an enclosed box.
 ---
 
 import ProjectCost from '../../components/ProjectCost.astro';
@@ -9,16 +9,18 @@ import Ute from '../../components/Ute.astro';
 import box from '../../data/generated/box-parts.json';
 import car from '../../data/generated/vehicle.json';
 import t from '../../data/generated/trailer.json';
+import proj from '../../data/generated/project.json';
 import { withBase } from '../../lib/url';
 
 export const aud = (v) => Math.round(v).toLocaleString('en-AU');
 export const gcm = t.checks.find((c) => c.id === 'GCM-01');
+export const truck = proj.rows.find((r) => r.id === 'truck');
 
-The design of a one-off off-road home trailer and the LandCruiser 79 that tows it, both to be built in Australia.
+The design of a one-off off-road home trailer and the Ford Ranger Super Duty that tows it, in Australia.
 It has three parts:
 
-- Car build: a used Toyota LandCruiser 79 single cab V8, rebuilt in stages into a reliable tow vehicle.
-- Bike box: an enclosed, lockable box on the ute's tray for the two motorcycles and the tools.
+- Tow vehicle: a near-new Ford Ranger Super Duty single cab chassis, bought and fitted out in stages.
+- Bike box: an enclosed, lockable box on the truck's chassis for the two motorcycles and the tools.
 - Trailer: a 4,420 mm body with a lift bed over the desk across the front, a wet room across the rear, a fixed roof,
   and the generators and fuel in a box on the drawbar. It is built to VSB1, the Australian guide for light trailers,
   inspected for registration and reviewed by an engineer. Most of its life is highway towing, with grass, desert
@@ -31,28 +33,29 @@ checks, mass schedules, drawings, parts lists and costs are all generated from o
 
 <ProjectCost />
 
-## Car build (LandCruiser 79)
+## Tow vehicle (Ranger Super Duty)
 
-<a href={withBase('/tow-vehicle/')}><img src={withBase('/drawings/CT-701-preview.png')} alt="Drawing CT-701: the LandCruiser 79 with the bike box, kerb-side elevations, plan and rear view" loading="lazy" /></a>
+<a href={withBase('/tow-vehicle/')}><img src={withBase('/drawings/CT-701-preview.png')} alt="Drawing CT-701: the tow vehicle with the bike box, kerb-side elevations, plan and rear view" loading="lazy" /></a>
 
-A VDJ79 built 01/2017 to 08/2022 with about 400,000 km, rebuilt in {car.stages.length} stages from buying and testing
-it to the power stage at about 230 to 250 kW. Every stage leaves it registered and drivable. The build, the upgrades
-and what makes them legal and able to tow, is AUD {aud(car.computed.build)}, or AUD {aud(car.computed.with_contingency)}
-with its allowance, against Leonard's AUD {aud(car.computed.budget)} for it (decision H24). The purchase check list
-prices the worn parts the inspection may find, outside that total.
+A near-new Ford Ranger Super Duty single cab chassis, which Ford rates at a 4,500 kg GVM, 4,500 kg braked towing and an
+8,000 kg GCM, so it carries the bike box and tows the trailer with no GVM kit and no engine work. It costs
+AUD {aud(truck.total)} to buy. Its upgrades come in {car.stages.length} stages, from the towing kit, mirrors and trailer
+charging to a certified power stage of about 205 kW, and are AUD {aud(car.computed.build)}, or
+AUD {aud(car.computed.with_contingency)} with their allowance, against Leonard's AUD {aud(car.computed.budget)} for them
+(research report 31). The check list prices the lines bought only if a check calls for them, outside that total.
 
 <Ute kind="summary" />
 
 - <a href={withBase('/tow-vehicle/')}>Plan and stages</a>: the summary, the stage plan, the limits, the legal path and the open points (`VEHICLE.md`)
-- <a href={withBase('/tow-vehicle/#parts-list')}>Parts list and totals</a>: the build's {car.items.filter((x) => x.status === 'build').length} lines, the purchase check list's {car.items.filter((x) => x.status === 'check').length} and the optional extras' {car.items.filter((x) => x.status === 'optional').length}, each with its price, reason and stage
-- <a href={withBase('/ute-garage/#3d-model')}>3D model</a> of the ute with its box, and drawing <a href={withBase('/drawings/#ct-701')}>CT-701</a>
-- <a href={withBase('/measurements/?part=car')}>Measurements</a> for the car build
+- <a href={withBase('/tow-vehicle/#parts-list')}>Parts list and totals</a>: the build's {car.items.filter((x) => x.status === 'build').length} lines, the check list's {car.items.filter((x) => x.status === 'check').length} and the optional extras' {car.items.filter((x) => x.status === 'optional').length}, each with its price, reason and stage
+- <a href={withBase('/ute-garage/#3d-model')}>3D model</a> of the truck with its box, and drawing <a href={withBase('/drawings/#ct-701')}>CT-701</a>
+- <a href={withBase('/measurements/?part=car')}>Measurements</a> for the tow vehicle
 
 ## Bike box
 
 <a href={withBase('/ute-garage/')}><img src={withBase('/drawings/CT-702-preview.png')} alt="Drawing CT-702: the bike box's frame and panels" loading="lazy" /></a>
 
-A welded aluminium box on the ute's deck-mount stations, {aud(box.totals.mass_kg_lines)} kg empty, with rear barn
+A welded aluminium box on the truck's body mounts, {aud(box.totals.mass_kg_lines)} kg empty, with rear barn
 doors, a kerb-side door, a ramp, a winch, a chock and five straps per bike, and locks. Leonard builds it himself
 (decision H25), and its parts come to AUD {aud(box.totals.total_aud)} with contingency.
 
@@ -75,25 +78,25 @@ doors, a kerb-side door, a ramp, a winch, a chock and five straps per bike, and 
 ## The constraints
 
 - The trailer body is at most 2,400 mm wide, so 2,330 mm inside with 35 mm walls.
-- The trailer is plated at 3,500 kg ATM (decision H2). The ute with growth plus that plate is {aud(gcm.measured)} kg, inside the 7,400 kg GCM of Lovells' revision (decision H20). If the revision is refused, Toyota's 6,900 kg applies and the trailer is plated lower.
-- The towball carries at least 8.0 % of the trailer's mass in every case and at most 320 kg with growth (decision H17), inside the towbar's 350 kg. The ute's Lovells Elite kit, plated at a 2,800 kg rear axle for its 1,400 kg wheels (decision H18), keeps its rear axle within that plate at this ball.
-- The ute's ball sits 440 mm above the ground laden, plus or minus 20 mm, so the coupling stays inside VSB1's 460 mm.
-- The bike box's body is 1,850 mm wide outside at most, its rear tub flares at most 1,910 mm (decision H19), and it weighs less than 440 kg empty.
+- The trailer's plate goes from 3,500 kg to 4,000 kg ATM (23 Nov 2026), inside the Ranger Super Duty's 4,500 kg braked towing. The truck with growth plus the trailer's plate stays inside Ford's 8,000 kg GCM, {aud(gcm.measured)} kg in the current model (GCM-01).
+- The towball carries at least 8.0 % of the trailer's mass in every case (decision H17), within the coupling's and the truck's ratings, and the truck's rear axle stays within Ford's 2,800 kg at that ball.
+- The truck's tow pin sits 440 mm above the ground laden, plus or minus 20 mm, so the coupling stays inside VSB1's 460 mm.
+- The bike box stays inside Ford's 1,960 mm body width for the single cab chassis (Ford's body equipment mounting manual) and weighs less than 440 kg empty.
 
 ## Where the design stands
 
-- Car build (`VEHICLE.md`): seven stages from buying and inspecting the truck to the level B tune, the build, the purchase check list and the optional extras with a price, reason and stage on every line, the limits and the legal path.
+- Tow vehicle (`VEHICLE.md`): the Ranger Super Duty in four stages from buying it to the certified power stage, the build, the check list and the optional extras with a price, reason and stage on every line, the comparison with the LandCruiser plan it replaced, the limits and the legal path.
 - Bike box (`UTE-GARAGE.md` revision E): the 3D model, the checks, the priced parts list and drawings CT-701 to CT-704.
-- Trailer (`TRAILER.md` revision J, `CHASSIS.md` revision E, `BODY.md` revision C): plated at 3,500 kg and checked against the ute on its Lovells Elite kit, with the priced parts list, the 3D model with the bed up and down, and the H11 drawing set from CT-001 to CT-621.
-- Research reports 01 to 27 are under Reference in the menu, with an index. Reports 01 to 11 are the archived record of the Porsche Cayenne plan and the trailer with its own garage (decision H9).
+- Trailer (`TRAILER.md` revision J, `CHASSIS.md` revision E, `BODY.md` revision C): plated at 3,500 kg and checked against the tow vehicle, with the priced parts list, the 3D model with the bed up and down, and the H11 drawing set from CT-001 to CT-621.
+- Research reports are under Reference in the menu, with an index, report 31 being the Ranger Super Duty. Reports 01 to 11 are the archived record of the Porsche Cayenne plan and the trailer with its own garage (decision H9).
 
 ## What is next
 
-- Buy the truck, inspect it with the purchase check list and weigh it, then build and weigh the bike box body and confirm the GVM kit: the Elite, or the Platinum if the weighing allows cut CUT7 (`VEHICLE.md`, stages S0 to S3).
+- Buy the truck, have a Ford dealer inspect it and weigh it, then fit the bike box, the tow pin, the towing mirrors and the trailer charging (`VEHICLE.md`, stages S0 to S2).
 - Have the engineer check the trailer's chassis and body, starting with the lists at the end of `CHASSIS.md` and `BODY.md`. Leonard builds the bike box to its own checks and does not certify it (decision H25).
 
 ## How products are chosen
 
 In this order: reliability and a record of hard use (race trailers, toy haulers, boats, overland caravans), then
 parts and service in Australia, then field serviceability, then mass, so the lightest product that passes the first
-three wins. Price is recorded and decides only between two otherwise equal products. The car build has a budget.
+three wins. Price is recorded and decides only between two otherwise equal products. The truck's upgrades have a budget.

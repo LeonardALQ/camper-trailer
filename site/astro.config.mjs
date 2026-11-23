@@ -11,17 +11,17 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'Camper trailer design',
-      description: 'Design, model and drawings for a one-off off-road camper trailer and its tow vehicle, a LandCruiser 79.',
+      description: 'Design, model and drawings for a one-off off-road camper trailer and its tow vehicle, a Ford Ranger Super Duty.',
       customCss: ['./src/styles/site.css', './src/styles/sheet.css'],
       components: { Footer: './src/components/Footer.astro' },
       sidebar: [
         { label: 'Home', link: '/' },
         {
-          label: 'Car build (LandCruiser 79)',
+          label: 'Tow vehicle (Ranger Super Duty)',
           items: [
             { label: 'Plan and stages', link: '/tow-vehicle/' },
             { label: 'Parts list and totals', link: '/tow-vehicle/#parts-list' },
-            { label: '3D model, ute and box', link: '/ute-garage/#3d-model' },
+            { label: '3D model, truck and box', link: '/ute-garage/#3d-model' },
             { label: 'Drawing CT-701', link: '/drawings/#ct-701' },
             { label: 'Measurements', link: '/measurements/?part=car' },
           ],
