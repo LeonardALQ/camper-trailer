@@ -470,7 +470,7 @@ trailer_checks:
     inputs: []
     why: "Report 11 LC10 and section 3.4. IIW 323, FAT 90. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
   - id: FAT-07
-    title: "Fatigue, Drawbar root gusset's toe, its 160 mm radius ground, fillets round its 10 mm end"
+    title: "Fatigue, Drawbar root gusset's toe, radius ground, weld round its end"
     type: chassis_fatigue
     item: FAT-07
     severity: report
@@ -539,6 +539,27 @@ trailer_checks:
     severity: report
     inputs: []
     why: "Report 11 LC10 and section 3.4. IIW 513, FAT 71, a non-load-carrying pad 50 to 150 mm long (72.5 mm of weld along the rail at the front pair, 117 mm at the rear), on the composite rail's extreme fibre at the brackets. ARK's guide welds the bracket to the chassis, so it is a longitudinal attachment on the rail's bottom flange. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+  - id: FAT-17
+    title: "Fatigue, Drawbar mitred butt splice at the body front, one side, no NDT"
+    type: chassis_fatigue
+    item: FAT-17
+    severity: report
+    inputs: []
+    why: "Report 11 LC10 and section 3.4. IIW-1823-07 detail 234, a transverse butt weld splice in a rectangular hollow section, full penetration welded from one side in the flat position: FAT 56 with its root inspected by NDT, FAT 36 without. The design takes FAT 36, so it needs no NDT of the root. The A-frame member's mitre lies under the root gusset's heel, whose fillets join it to the rail's end plate, so the range is the member's far face on the section of the member and the gusset's 140 mm heel together, from the member's end actions at the body front. On the member alone the range would be about twice this splice's CAFL. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+  - id: FAT-18
+    title: "Fatigue, Root gusset's heel to the rail's end plate, 8 mm fillets, root"
+    type: chassis_fatigue
+    item: FAT-18
+    severity: report
+    inputs: []
+    why: "Report 11 LC10 and section 3.4. IIW 414, FAT 36, a load-carrying fillet welded T-joint whose root can crack, on the stress in the weld throat. The gusset's heel carries its share of the drawbar's moment into the rail's end plate through two 8 mm fillets, one each side of the 10 mm plate, so the range is the gusset's stress at its top on the joint section times its thickness over the two throats. The sheets' default 5 mm fillets would carry 1.6 times this range, over the CAFL. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+  - id: FAT-19
+    title: "Fatigue, Rail's end plate in bending under the gusset's heel, weld toe"
+    type: chassis_fatigue
+    item: FAT-19
+    severity: report
+    inputs: []
+    why: "Report 11 LC10 and section 3.4. IIW 413, FAT 63, the toe of a fillet welded T-joint, here the toes of the heel's fillets on the 16 mm end plate CH-P15 that closes each rail's front end. The heel's line load, the gusset's stress times its thickness from its foot to its top, bends the plate across the rail's 46 mm between its webs. The range is the plate's largest bending stress, the plate taken as simply supported on the rail's four walls, which its 4 mm walls hardly restrain, and solved as a Kirchhoff plate by finite differences. The engineer checks it by the hot-spot method. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
   - id: DIM-01
     title: Overall width within the 2,500 mm of ADR 43/04 and VSB1 5.2
     type: width

@@ -482,7 +482,8 @@ class Chassis:
                 out.append(("airbag top bracket's weld", (x - 80, lo, zs - 6, x + 80, hi, zs + 6)))
             lo, hi = sorted((y_in, y_in - s * 6))
             out.append(("rear recovery tongue's welds", (V["body_x1"] - 200, lo, z0 + 15, V["body_x1"], hi, z0 + 135)))
-            out.append(("drawbar root gusset's weld", (V["body_x0"], s * V["rail_c"] - 10, z0 - 5, V["body_x0"] + 30, s * V["rail_c"] + 10, z0 + 5)))
+            lo, hi = sorted((s * (V["rail_c"] - rail.b / 2 - 5), s * (V["rail_c"] + rail.b / 2 + 5)))
+            out.append(("rail's end plate's fillets", (V["body_x0"], lo, z0, V["body_x0"] + 5, hi, zs + 5)))   # webs and top flange
         for p in self.steady_poses():                                  # ARK's brackets, welded along the rail's bottom corners
             bx, yc = p["bracket"], p["side"] * V["rail_c"]
             out.append(("corner steady bracket's welds", (bx[0], max(bx[1], yc - rail.b / 2), z0 - 5, bx[3], min(bx[4], yc + rail.b / 2), z0 + 5)))

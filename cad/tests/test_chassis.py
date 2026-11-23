@@ -1,7 +1,10 @@
 """The chassis frame analysis (cad/chassis_fea.py): the load mapping balances, and the composite rail matches hand
 arithmetic."""
+import math
+
 import pytest
 
+from cad.chassis_fea import end_plate_moment
 from cad.tests.test_trailer import EV, TRAILER
 
 RES = TRAILER.chassis_results(EV["layout"])
@@ -91,8 +94,39 @@ def test_drawbar_root_is_read_at_the_gussets_toe():
     toe, ahead of the body front, on a node of the frame model, with the gusset reaching back to the body front."""
     V = CH.V
     toe = V["root_gusset_toe_x"]
-    g = next(f for f in CH.data["fittings"] if f["id"] == "CH-P03")
+    fit = {f["id"]: f for f in CH.data["fittings"]}
+    g, ep = fit["CH-P03"], fit["CH-P15"]
     x0 = CH.ev(g["at"])[0] - g["l"] / 2
-    assert x0 == pytest.approx(toe) and toe + g["l"] > V["body_x0"]
+    assert x0 == pytest.approx(toe) and toe + g["l"] == pytest.approx(V["body_x0"] - ep["t"])
     f = next(r for r in RES["fatigue"] if r["id"] == "FAT-07")
     assert f["where"].endswith(f"at X {toe:.0f}")
+
+
+def test_root_gusset_area_follows_its_profile():
+    """CH-P03's mass is its profile's area: the radius from its end up to its heel's height, then flat to the heel."""
+    g = next(f for f in CH.data["fittings"] if f["id"] == "CH-P03")
+    r, c, h, length = g["r"], g["end_h"], g["w"], g["l"]
+    u1, u2 = math.sqrt(r ** 2 - (r - c) ** 2), math.sqrt(r ** 2 - (r - h) ** 2)
+
+    def under(u):
+        return r * u - (u / 2 * math.sqrt(r ** 2 - u ** 2) + r ** 2 / 2 * math.asin(u / r))
+    area = under(u2) - under(u1) + (length - (u2 - u1)) * h
+    assert g["area_factor"] == pytest.approx(area / (length * h), abs=0.001)
+
+
+def test_body_front_is_read_under_the_gussets_heel():
+    """The body front's three rows (I2-51) are read at the A-frame member's end there, and the heel's fillets are the
+    ones the data gives CH-P03, on the rail's end plate CH-P15 that closes the rail's front end."""
+    rows = {r["id"]: r for r in RES["fatigue"]}
+    assert rows["FAT-17"]["where"].endswith(f"at X {CH.V['body_x0']:.0f}")
+    assert rows["FAT-18"]["where"].startswith("CH-P03") and rows["FAT-19"]["where"].startswith("CH-P15")
+    ep = CH.ev(next(f for f in CH.data["fittings"] if f["id"] == "CH-P15")["at"])
+    assert ep[0] < CH.V["body_x0"] and abs(ep[2] - (CH.V["rail_underside_z"] + CH.role_sec["rail"].d / 2)) < 1e-6
+
+
+def test_end_plate_solver_matches_a_strip():
+    """Far from its short edges a long plate under a uniform line load bends as a strip simply supported on its long
+    edges: half the load times half the span less a quarter of the load's width."""
+    q, span, foot = 100.0, 46.0, 26.0
+    m = end_plate_moment(span, 600.0, 0.0, 600.0, q, q, foot)
+    assert m == pytest.approx(q / 2 * (span / 2 - foot / 4), rel=0.03)
