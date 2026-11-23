@@ -152,6 +152,9 @@ params:
   ramp_fold_t: 152
   ramp_fold_w: 965
   ramp_x0: garage_length - 8 - ramp_fold_t
+  # With the bikes out the ramp travels forward, on its edge along the Tuareg's bay, 15 mm behind the Tuareg's 635 mm
+  # chock, so the empty box's added mass stays inside Ford's centre of gravity window (UTE-07, review I2-42)
+  ramp_fwd_x0: 650
   # Tool chests on the wheel tubs, beside each bike's middle. The outer front straps run through the front corners and
   # the rear straps through the back, so the tubs are the lowest free floor that is forward of the ramp.
   tool_x0: tub_x0 + 45
@@ -447,6 +450,8 @@ items:
      at: [0, st_y, winch_z0], params: {face: x}}
   - {ref: R1, part: U-RAMP, group: restraint, label: "Ramp, folded on its edge across the back", display: closed_only,
      at: [ramp_x0, -ramp_fold_l / 2, 0], params: {dx: ramp_fold_t, dy: ramp_fold_l, dz: ramp_fold_w}}
+  - {ref: R3, part: U-RAMP-FWD, group: restraint, label: "Ramp, folded on its edge along the Tuareg's bay, with the bikes out", check_only: true,
+     at: [ramp_fwd_x0, tuareg_y - ramp_fold_t / 2, 0], params: {dx: ramp_fold_l, dy: ramp_fold_t, dz: ramp_fold_w}}
   - {ref: R2, part: U-RAMP-OPEN, group: restraint, label: "Ramp hooked on the sill (loading)", display: loading_only,
      ramp: {centre_y: tuareg_y, sill_x: x_end, drop: ground_drop}, params: {hook_l: 60, hook_w: 100, hook_t: 6}}
   - {ref: R4, part: U-ROPE, group: restraint, label: "Winch rope to the Tuareg on the ramp", display: loading_only}

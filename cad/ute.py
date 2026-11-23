@@ -65,16 +65,23 @@ class Ute:
             ln["kg_growth"] = ln["kg"] * (1 + GROWTH[ln["maturity"]])
 
     # ------------------------------------------------------------------ cases
+    @staticmethod
+    def at(ln: dict, cid: str) -> dict:
+        """Where a line's mass sits in a case: its stowed place in the cases it moves in (the ramp, forward with the bikes
+        out), else its own place."""
+        st = ln.get("stowed")
+        return st if st and cid in st["cases"] else ln
+
     def case(self, cid: str, growth: bool = False) -> dict:
         wb = self.V["wheelbase"]
-        items = [(ln["kg_growth"] if growth else ln["kg"], ln) for ln in self.lines if cid in ln["cases"]]
-        M = sum(m for m, _ in items)
-        rear = sum(m * ln["x"] for m, ln in items) / wb
+        items = [(ln["kg_growth"] if growth else ln["kg"], ln, self.at(ln, cid)) for ln in self.lines if cid in ln["cases"]]
+        M = sum(m for m, _, _ in items)
+        rear = sum(m * p["x"] for m, _, p in items) / wb
         front = M - rear
-        cog = [sum(m * ln[k] for m, ln in items) / M for k in ("x", "y", "z")]
+        cog = [sum(m * p[k] for m, _, p in items) / M for k in ("x", "y", "z")]
         half_track = (self.V["track_front"] + self.V["track_rear"]) / 4
         return dict(id=cid, mass_kg=M, front_kg=front, rear_kg=rear, front_share_pct=100 * front / M, cog=cog,
-                    ssf=half_track / cog[2], towball_kg=sum(m for m, ln in items if ln["id"] == "UT-11"))
+                    ssf=half_track / cog[2], towball_kg=sum(m for m, ln, _ in items if ln["id"] == "UT-11"))
 
     def cases(self) -> list[dict]:
         out = []
@@ -85,9 +92,9 @@ class Ute:
     def added(self, cid: str, growth: bool = False) -> dict:
         """Ford's added mass in a case (BEMM p. 32): every line but the kerb truck, its seated occupants and the towball,
         with its centre of gravity, the height above the rear frame top (est. datum)."""
-        items = [(ln["kg_growth"] if growth else ln["kg"], ln) for ln in self.lines if cid in ln["cases"] and ln["added"]]
+        items = [(ln["kg_growth"] if growth else ln["kg"], self.at(ln, cid)) for ln in self.lines if cid in ln["cases"] and ln["added"]]
         M = sum(m for m, _ in items)
-        x, y, z = (sum(m * ln[k] for m, ln in items) / M for k in ("x", "y", "z"))
+        x, y, z = (sum(m * p[k] for m, p in items) / M for k in ("x", "y", "z"))
         return dict(kg=M, x=x, y=y, z_frame=z - self.V["frame_top_z"])
 
     def cog_window(self, kg: float) -> dict:
@@ -163,8 +170,8 @@ class Ute:
                            detail=(f"{v:.1f} kg on the ball, the trailer's heaviest towball with growth, against the Super Duty's {lim:.0f} kg (est.). "
                                    "The rear axle at this ball is UTE-03 (H14)"))
             elif t == "ford_cog":
-                # Ford's table starts at 800 kg of added mass. A lighter case is measured against the 800 kg row and
-                # reported in the detail, and the check passes or fails on the cases inside Ford's table
+                # Ford's table starts at 800 kg of added mass. A lighter case is held to the 800 kg row, the lightest Ford
+                # gives, and counts like any other (review I2-42)
                 bases = ["nominal", "growth"] if c.get("basis", "nominal") == "both" else [c.get("basis", "nominal")]
                 worst, rows = None, []
                 for cid in c["cases"]:
@@ -181,8 +188,8 @@ class Ute:
                             what = (f"X {a['x']:,.0f} mm against {w['x_min']:,.0f} to {w['x_max']:,.0f} mm, {abs(a['y']):.0f} mm off the "
                                     f"centreline against {w['y_max']:.0f} mm, nearest {side}")
                         rows.append(f"{cid} {'with growth' if bs == 'growth' else 'no growth'}: {a['kg']:,.0f} kg added, {what}, "
-                                    f"margin {m:.1f} mm" + (", below Ford's lowest row, reported" if below else ""))
-                        if not below and (worst is None or m < worst[0]):
+                                    f"margin {m:.1f} mm" + (", below Ford's lowest row, so held to its 800 kg row" if below else ""))
+                        if worst is None or m < worst[0]:
                             worst = (m, a, w, cid, bs, what)
                 m, a, w, cid, bs, what = worst
                 name = next(x["name"] for x in self.d["cases"] if x["id"] == cid)

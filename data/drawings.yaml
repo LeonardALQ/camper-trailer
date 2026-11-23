@@ -576,6 +576,7 @@ drawings:
       - {rev: Q, date: 2026-11-23, description: "Notice: the Ranger Super Duty on Ford's ratings, the box on Ford's pads", drawn: Kiro, checked: "", approved: ""}
       - {rev: R, date: 2026-11-23, description: "Notice: the trailer's 391.6 kg towball at its 4,000 kg plate", drawn: Kiro, checked: "", approved: ""}
       - {rev: S, date: 2026-11-23, description: "Notice: the ute's masses with the trailer after I2-31 to I2-36", drawn: Kiro, checked: "", approved: ""}
+      - {rev: T, date: 2026-11-23, description: "Notice: UC1 and UC4 with the ramp forward, in Ford's 800 kg row (I2-42)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-702
     title: Ute garage box frame and panels
     subtitle: Kerb-side frame elevation, subframe plan on Ford's pads, section at the rear axle, member schedule
@@ -630,3 +631,4 @@ drawings:
       - {rev: F, date: 2026-11-22, description: "Notice: the anchors' bag 1,760 mm long, the anchors staggered in it (F6-03)", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-22, description: "Notice: the bikes' outlines from their models, no engineer (H25, H27)", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-23, description: "Notice: rear track row over Ford's rearmost pads, tool chests 185 wide", drawn: Kiro, checked: "", approved: ""}
+      - {rev: I, date: 2026-11-23, description: "Notice: the ramp's place in the Tuareg's bay with the bikes out (UGC-07)", drawn: Kiro, checked: "", approved: ""}

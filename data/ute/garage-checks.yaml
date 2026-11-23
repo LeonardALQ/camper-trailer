@@ -81,6 +81,15 @@ checks:
     severity: report
     inputs: [TU-05, TU-06]
     why: As the trailer's CLR-08. A strap must not pass through a bag. No limit is set, so the gap is reported.
+  - id: UGC-07
+    title: The ramp stowed forward with the bikes out clears the chocks, the tubs, the tool chests, the chain anchors, the fittings and the anchors' bag
+    type: clearance
+    a: [R3]
+    b: ["10", "12", B2, B5, T1, K2, T2, V4]
+    min_gap_mm: 10
+    severity: fail
+    inputs: [CHK-01]
+    why: "With the bikes out the ramp travels on its edge along the Tuareg's bay, its front end behind the Tuareg's chock, so its 34 kg sits about 1,020 mm further forward than across the back and the empty box keeps its added mass inside Ford's centre of gravity window (UTE-07, review I2-42). It must stand clear of what stays in the box, the trailer's ground anchors' bag included, which rides between the bays when the truck tows with the bikes out (UC4)."
   - id: UGW-01
     title: Rear tyres at full bump to the wheel tubs, the flares and the floor structure
     type: clearance
