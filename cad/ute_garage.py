@@ -323,6 +323,12 @@ def build_garage(prj: Project | None = None, limits: dict | None = None):
     lines.append(dict(id="U-ANCHORS", item=ap.name, kg=ap.mass.total_kg, x=bag.center().X + x0, y=bag.center().Y, z=bag.center().Z + dz,
                       maturity=ap.mass.maturity, source=ap.mass.source + ". In their bag on the box floor between the bikes",
                       cases=list(TOOL_CASES), group="tools"))
+    # With the bikes out the ramp travels forward on its edge along the Tuareg's bay (R3, UGC-07), so in the cases without
+    # the bikes its mass sits there, inside Ford's centre of gravity window (UTE-07, review I2-42)
+    fwd = model.built["R3"].shape.bounding_box().center()
+    ramp = next(ln for ln in lines if ln["id"] == "U-RAMP")
+    ramp["stowed"] = dict(cases=[c for c in BOX_CASES if c not in BIKE_CASES], x=fwd.X + x0, y=fwd.Y, z=fwd.Z + dz,
+                          where="folded on its edge along the Tuareg's bay, behind its chock (R3)")
     box_lines = [ln for ln in lines if ln["cases"] == BOX_CASES]
     box_kg = sum(ln["kg"] for ln in box_lines)
     box_kg_g = sum(ln["kg"] * (1 + GROWTH[ln["maturity"]]) for ln in box_lines)
