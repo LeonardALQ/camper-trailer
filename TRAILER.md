@@ -10,7 +10,7 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 |---|---|
 | Body | 4,420 x 2,400 mm outside, X 1,820 to 6,240. Inside 4,350 x 2,330 x 2,000 mm, floor at Z 925 |
 | Overall | 6,700 mm long, 2,470 mm wide over the entry door's handle, 3,078 mm high over the awning case |
-| Tare | 2,692 kg, 2,958 kg with the growth allowance |
+| Tare | 2,693 kg, 2,958 kg with the growth allowance |
 | Fully loaded with 400 L of water (TC2) | 3,272 kg, 3,571 kg with growth, against the 4,000 kg plate |
 | Towball | 317 to 360 kg, 9.8 to 12.3 % of the trailer, at most 391.7 kg with growth |
 | Ute | Ford Ranger Super Duty single cab chassis. Rear axle 2,538 kg with growth against Ford's 2,800 kg. Combination 7,743 kg against Ford's 8,000 kg, the ute with growth plus the plate |
@@ -41,7 +41,7 @@ Masses in kg. The towball comes from moments about the axle group centre at X 4,
 
 | Case | Aboard | Mass | Towball | Share | With growth | Towball with growth |
 |---|---|---|---|---|---|---|
-| TC1 Tare | Nothing | 2,692 | 314.9 | 11.7 % | 2,958 | 339.3 |
+| TC1 Tare | Nothing | 2,693 | 314.9 | 11.7 % | 2,958 | 339.3 |
 | TC2 Fully loaded | 400 L fresh, fuel, 150 kg of gear | 3,272 | 360.4 | 11.0 % | 3,571 | 391.7 |
 | TC3 Highway | 50 L, fuel, gear | 2,922 | 354.0 | 12.1 % | 3,221 | 385.4 |
 | TC4 Water, no gear | 400 L, fuel | 3,122 | 337.9 | 10.8 % | 3,391 | 364.7 |
