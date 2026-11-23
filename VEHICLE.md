@@ -79,7 +79,6 @@ Goal: charge the trailer's 48 V battery from the truck on travel days.
 Goal: about 205 kW and 650 Nm at the crank, or about 220 kW if Leonard takes the 250 hp option below, certified, with every emission control working. Needs S2 done and a long tow logged at stock power.
 
 - Read the part number on Ford's turbo (BI01 at S0). The PowerMax replaces Ford's MB3Q-6K682-AB, and the plan assumes the Super Duty carries it (open point 11). If the tag shows another part, the stage runs as CUT1 on Ford's turbo.
-
 - Get the LC4 certifier's written evidence list before buying anything (TL05). If it asks for a laboratory emissions test rather than the interim NSW procedure, that is AUD 10,000 (TL07, est.), and the stage waits for Leonard's decision.
 - Book the tuner's dyno and run the truck stock first, the first of the same-dyno runs the certifier compares (TL01).
 - Leonard fits the Garrett PowerMax turbo 930592-5001S (PW01) and the PowerMax intercooler (PW02), with new gaskets and fluids and Garrett's shaft speed sensor (PW03). Ford's turbo is kept for a return to stock.
@@ -97,7 +96,7 @@ Leonard's lower figure, 250 hp at the wheels, is about 186 kW at the wheels and 
 
 The margin is the case against it. Garrett gives the PowerMax 27 % more compressor flow than Ford's turbo. Taking Ford's turbo as flat out at the ordinary Ranger's 184 kW, the PowerMax supplies air for about 234 kW (est.), so 205 kW keeps about 14 % in hand and 220 kW about 6 %. Both figures are estimates, and no tuner has published a Super Duty at either power.
 
-- The engine: about 7 % more fuel at full load than the plan (est.), so higher exhaust temperatures, the turbo nearer Garrett's 186.2 krpm for longer on a climb with the 4,000 kg trailer, and more soot for the DPF to burn. The sensor (PW03) and the gauge (TL02) show all three, and the tuner stops below Ford's EGT limits and Garrett's shaft speed.
+- The engine: about 7 % more fuel at full load than the plan (est.), so higher exhaust temperatures, the turbo nearer Garrett's 186.2 krpm for longer on a climb with the 4,000 kg trailer, and more soot for the DPF to burn. The speed sensor (PW03) and the gauge (TL02) show the shaft speed and the exhaust temperature, and the tuner stops below Ford's EGT limits and Garrett's shaft speed.
 - The 10-speed: Ford publishes no torque rating for it, and the option keeps the plan's 650 Nm cap and Ford's 600 Nm in low range, first and reverse, so its peak torque is the plan's. The extra 15 kW is heat in its fluid on a long climb, which the 110 °C check of TX01 settles.
 - The warranty: the same as the plan. Ford pays for no failure the parts or the tune cause, and a turbo with less in hand is likelier to fail (est.).
 - The certificate: the same LC4 certificate under VSI 06 Rev 4 items 2 and 6, at 43 % over the 154 kW in place of 33 %. The emissions test decides the power. The interim NSW procedure is run on the calibration as it will be registered, and if 220 kW fails it on soot or NOx with the DPF, SCR and EGR working, the tuner steps back towards 205 kW and the test is run again (TL04).
