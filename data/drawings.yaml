@@ -408,6 +408,7 @@ drawings:
       - {rev: H, date: 2026-11-22, description: "Notice: SVC-10's sizes, D-07 95 mm2, D-13 25 mm2, A-02, C1 and C4 4 mm2", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-22, description: "Notice: D-14 7.08 m through the kerb raiser's inner web (CHS-10)", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-23, description: "Notice: the cable lengths with the axle at X 4,505.3", drawn: Kiro, checked: "", approved: ""}
+      - {rev: K, date: 2026-11-23, description: "Notice: D-06 95 mm2 on its own 200 A MEGA, the modules' 60 A MEGAs", drawn: Kiro, checked: "", approved: ""}
   - number: CT-602
     title: Electrical layout
     subtitle: Battery plinth, board, inverter, cable routes, glands, outlets and the cable schedule
@@ -433,6 +434,7 @@ drawings:
       - {rev: M, date: 2026-11-22, description: "Notice: K-01, K-08 to K-10 through webs (CHS-10), clear of the fittings", drawn: Kiro, checked: "", approved: ""}
       - {rev: N, date: 2026-11-22, description: "Notice: G20's three down beside RS-K into its inner web, A-01 alone", drawn: Kiro, checked: "", approved: ""}
       - {rev: O, date: 2026-11-23, description: "Notice: G20 to G15 behind the rear tank, the axle at X 4,505.3", drawn: Kiro, checked: "", approved: ""}
+      - {rev: P, date: 2026-11-23, description: "Notice: drip tray EL-09 on the machine base, its drain W-09 (I2-35)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-603
     title: Floor and wall penetrations
     subtitle: Every gland through the floor, walls and roof, its position, hole, fitting and runs
@@ -451,6 +453,7 @@ drawings:
       - {rev: F, date: 2026-11-22, description: "Notice: holes in the webs, round into OR-05, axle X 4,379.9 (CHS-10)", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-22, description: "Notice: G20 one packing space, 156 x 84 at Y -549 (CHS-10, SVC-10)", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-23, description: "Notice: the penetrations with the axle at X 4,505.3", drawn: Kiro, checked: "", approved: ""}
+      - {rev: I, date: 2026-11-23, description: "Notice: G9 at 60 x 120 with a C wedge, each frame's depth and side", drawn: Kiro, checked: "", approved: ""}
   - number: CT-611
     title: Plumbing schematic
     subtitle: Fill, fresh tanks, pump, filters, cold and hot lines, drains to the grey tank and the dump
@@ -473,6 +476,7 @@ drawings:
       - {rev: J, date: 2026-11-22, description: "Notice: the tanks with the axle at X 4,380.5 (I2-22)", drawn: Kiro, checked: "", approved: ""}
       - {rev: K, date: 2026-11-22, description: "Notice: the tanks with the axle at X 4,379.9", drawn: Kiro, checked: "", approved: ""}
       - {rev: L, date: 2026-11-23, description: "Notice: 420 L in travel (H13), the tanks with the axle at X 4,505.3", drawn: Kiro, checked: "", approved: ""}
+      - {rev: M, date: 2026-11-23, description: "Notice: tare 2,675.9 kg, axle X 4,505.8 (D-06, BD-11, BD-25, EL-09)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-612
     title: Plumbing layout
     subtitle: Tanks, pump cabinet, drains with their falls, the shower well, fill and dump points
@@ -494,6 +498,7 @@ drawings:
       - {rev: I, date: 2026-11-22, description: "Notice: W-01 on the shock plate, the tanks at axle X 4,379.9", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-22, description: "Notice: the tanks with the axle at X 4,379.8", drawn: Kiro, checked: "", approved: ""}
       - {rev: K, date: 2026-11-23, description: "Notice: the tanks and the wastes with the axle at X 4,505.3", drawn: Kiro, checked: "", approved: ""}
+      - {rev: L, date: 2026-11-23, description: "Notice: tray drain W-09 to the basin's waste, G9 at 60 x 120 (I2-35)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-621
     title: HVAC and ventilation
     subtitle: Split, heat-recovery pairs, extract, towing pressurisation, relief, hood, Combi ducts
