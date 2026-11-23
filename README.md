@@ -1,8 +1,8 @@
 # Camper trailer design
 
 Design data, parametric models, checks, drawings and a static website for a one-off off-road home trailer and its
-tow vehicle. The tow vehicle is a Toyota LandCruiser 79 single cab V8 that carries two motorcycles in an enclosed box
-on its tray. The trailer has a 4,420 mm body with a lift bed across the front, a wet room across the rear and a fixed
+tow vehicle. The tow vehicle is a near-new Ford Ranger Super Duty single cab chassis that carries two motorcycles in an
+enclosed box on its chassis. The trailer has a 4,420 mm body with a lift bed across the front, a wet room across the rear and a fixed
 roof, plated at 4,000 kg ATM.
 
 The site is https://leonardalq.github.io/camper-trailer/. Every push to `main` is built and checked, and the site is
@@ -13,8 +13,8 @@ The design documents:
 - `TRAILER.md`: the whole trailer, its load cases, checks, build order, cost, assumptions and open points.
 - `CHASSIS.md`: the chassis and drawbar.
 - `BODY.md`: the body and its fixed roof.
-- `UTE-GARAGE.md`: the bike box on the LandCruiser 79.
-- `VEHICLE.md`: the car build (engine, driveline, GVM kit, brakes, wheels, towing, legal path, budget and stages), with its parts list in `data/vehicle/vehicle-parts.yaml`.
+- `UTE-GARAGE.md`: the bike box on the Ranger Super Duty.
+- `VEHICLE.md`: the Ranger Super Duty's purchase and upgrades (inspection, the box's mounting, towing, trailer charging, the power stage and its legal path, budget and stages), with its parts list in `data/vehicle/vehicle-parts.yaml`.
 - `docs/decisions.md`: the decision record, by time, that the documents cite.
 - `research/`: research reports 01 to 22, 25 and 26 with their data files, and the models of reports 19, 20 and 25 in `research/models/`. Reports 23 and 24 are `VEHICLE.md` and `UTE-GARAGE.md`.
 - `DESIGN.md` and `garage-bed/BOM.md`: the retired garage and bed module, kept for the record.
@@ -30,7 +30,7 @@ data/                   the single source of truth
   parts/bikes.yaml      the two bikes, for the ute's bike box
   chassis/              chassis.yaml: members, fittings, load cases and fatigue details (CHASSIS.md), and sections.yaml
   body/body.yaml        panels, loads, joints, mounts and openings (BODY.md)
-  ute/                  ute.yaml: the LandCruiser 79, its limits and checks, garage-checks.yaml, box-parts.yaml (the
+  ute/                  ute.yaml: the Ranger Super Duty, its limits and checks, garage-checks.yaml, box-parts.yaml (the
                         bike box's parts list) and parts/*.yaml for the box
   vehicle/              vehicle-parts.yaml: every part and job in VEHICLE.md, with the totals
   checks.yaml           the whole-trailer checks

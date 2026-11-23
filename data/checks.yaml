@@ -593,7 +593,7 @@ trailer_checks:
     min_gap_mm: 100
     severity: fail
     inputs: [UTE-02]
-    why: The ute's bike box overhangs the ball, so its rear corners sweep a circle about the ball as the trailer swings (build/ute/ute.json, from the U2 model). Any trailer part higher than the box's underside must stay outside that circle. 100 mm allows for the ball position, which is not yet measured (UTE-02).
+    why: The bike box's rear corners sweep a circle about the ball as the trailer swings (build/ute/ute.json, from the U2 model). Any trailer part higher than the box's underside must stay outside that circle. 100 mm allows for the ball position, which is not yet measured (UTE-02).
   - id: JK-02
     title: Everything inside the bike box's sweep stays 50 mm below its underside
     type: jackknife_height
