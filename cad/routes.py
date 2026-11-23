@@ -1415,10 +1415,20 @@ def continuity(res: dict) -> list:
     return problems
 
 
+def feed_pct(run: dict) -> float:
+    """The drop at the run's design current along the truck's half of its circuit (`feed`, the truck's own wiring to
+    the socket the run plugs into, which keeps a limit of its own), % of the circuit's voltage."""
+    f = run["feed"]
+    return 100 * sum(m * mv for m, mv in f["parts"]) * run["amps"] / 1000 / run["volts"]
+
+
 def drops(res: dict) -> dict:
-    """SVC-06: every sized circuit's voltage drop at its design current over its routed length within the limit."""
+    """SVC-06: every sized circuit's voltage drop at its design current over its routed length within the limit. A
+    circuit the truck feeds through a socket of its own (`feed`, the TSC's supply, I2-50) splits its budget there: the
+    trailer's runs from the socket to the load hold the limit, and the truck's feed holds its own, so the two together
+    are what the load sees from the truck's battery."""
     lim = res["data"]["rules"]
-    problems, worst = [], (-math.inf, "")
+    problems, worst, feeds = [], (-math.inf, ""), []
     for r in res["runs"]:
         if r["vd_pct"] is None:
             continue
@@ -1429,7 +1439,16 @@ def drops(res: dict) -> dict:
             problems.append(f"{r['id']} drops {r['vd_pct']:.2f} %, over {cap:g} %")
         if r.get("amps") and r.get("rating_a") and r["amps"] > r["rating_a"] + 1e-6:
             problems.append(f"{r['id']} carries {r['amps']:g} A over its {r['rating_a']:.0f} A rating")
-    return dict(ok=not problems, problems=problems, governing=worst[1], use=round(worst[0], 3))
+    for r in (r for r in res["runs"] if r.get("feed") and r["vd_pct"] is not None):
+        f, pct = r["feed"], feed_pct(r)
+        chain = max([x["vd_pct"] for x in res["runs"] if r["id"] in (x.get("follows") or []) and x["vd_pct"] is not None] + [r["vd_pct"]])
+        feeds.append(dict(run=r["id"], line=f["line"], pct=round(pct, 2), limit_pct=f["limit_pct"], trailer_pct=chain,
+                          battery_pct=round(pct + chain, 2), volts_at_load=round(r["volts"] * (1 - (pct + chain) / 100), 2)))
+        if pct / f["limit_pct"] > worst[0]:
+            worst = (pct / f["limit_pct"], f"{f['line']}, the truck's feed to {r['id']}, {pct:.2f} % of its own {f['limit_pct']:g} %")
+        if pct > f["limit_pct"] + 1e-6:
+            problems.append(f"{f['line']}, the truck's feed to {r['id']}, drops {pct:.2f} %, over its own {f['limit_pct']:g} %")
+    return dict(ok=not problems, problems=problems, governing=worst[1], use=round(worst[0], 3), feeds=feeds)
 
 
 def falls(res: dict) -> dict:

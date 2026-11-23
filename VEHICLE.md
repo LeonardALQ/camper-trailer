@@ -8,7 +8,7 @@ The truck is a Ford Ranger Super Duty single cab chassis, built 2025 or 2026, wi
 
 The truck costs AUD 92,690: the one near-new listing found, a 2025 truck with 13,343 km at AUD 89,990, and AUD 2,700 of NSW duty. A new one costs about the same drive-away, with no tray to sell and Ford's conditional 7-year warranty (report 31 section 4).
 
-Four stages follow, each leaving the truck registered and drivable. The build is AUD 16,834, or AUD 19,988 with one allowance of 10 % on listed prices and 20 % on estimates (AUD 3,154), against Leonard's AUD 75,000 for the car work. Estimates are 87 % of it, because most lines have no published price. P1, what makes the truck legal, safe and able to tow, is AUD 5,882: the purchase inspection, the coupling's tow pin, the trailer charging, towing mirrors, a UHF radio, a compressor, a recovery kit and three weighings. P2, the power stage with its certificate, is AUD 10,951.
+Four stages follow, each leaving the truck registered and drivable. The build is AUD 17,108, or AUD 20,289 with one allowance of 10 % on listed prices and 20 % on estimates (AUD 3,181), against Leonard's AUD 75,000 for the car work. Estimates are 86 % of it, because most lines have no published price. P1, what makes the truck legal, safe and able to tow, is AUD 6,156: the purchase inspection, the coupling's tow pin, the supply for the trailer's brakes, the trailer charging, towing mirrors, a UHF radio, a compressor, a recovery kit and three weighings. P2, the power stage with its certificate, is AUD 10,951.
 
 Leonard asked for about 250 to 300 hp at the wheels from a turbo upgrade. The plan registers about 205 kW and 650 Nm at the crank, about 232 hp at the wheels (est.), on Garrett's PowerMax turbo and intercooler with a calibration of the engine and the 10-speed, the DPF, SCR and EGR untouched, under one LC4 certificate. 250 hp at the wheels is an option for Leonard to weigh beside it, set out after stage S3 below: about 220 kW and 646 Nm at the crank (est.), on the same parts and inside the same 650 Nm cap, with about 6 % of the PowerMax's flow in hand (est.) where the plan keeps about 14 %, and no published record of a Super Duty at that power. 300 hp at the wheels is not planned, because it needs a hybrid turbo and injectors nobody sells for this engine here. Ford's warranty will not pay for a failure the stage causes, so either level waits until Leonard accepts that or the warranty ends.
 
@@ -19,20 +19,20 @@ The check list holds the lines bought only if a check calls for them, AUD 12,478
 | | Super Duty AUD | LandCruiser plan AUD | Difference AUD |
 |---|---|---|---|
 | Truck | 92,690 | 50,000 | 42,690 |
-| Upgrades with the allowance | 19,988 | 77,777 | -57,789 |
-| Together | 112,678 | 127,777 | -15,099 |
+| Upgrades with the allowance | 20,289 | 77,777 | -57,488 |
+| Together | 112,979 | 127,777 | -14,798 |
 
-The LandCruiser figures are Leonard's AUD 50,000 for a used VDJ79 and that build's AUD 77,777 with its allowance (this file to 22 Nov 2026). The Super Duty costs AUD 42,690 more to buy and AUD 57,789 less to make ready, AUD 15,099 less in all, and it starts with a new engine under warranty in place of a 400,000 km one. Its AUD 19,988 includes the AUD 13,142 power stage with its allowance, so the truck alone, legal and able to tow with the trailer charging, is AUD 6,846 with the allowance.
+The LandCruiser figures are Leonard's AUD 50,000 for a used VDJ79 and that build's AUD 77,777 with its allowance (this file to 22 Nov 2026). The Super Duty costs AUD 42,690 more to buy and AUD 57,488 less to make ready, AUD 14,798 less in all, and it starts with a new engine under warranty in place of a 400,000 km one. Its AUD 20,289 includes the AUD 13,142 power stage with its allowance, so the truck alone, legal and able to tow with the trailer charging, is AUD 7,147 with the allowance.
 
 ## Stage plan
 
 | Stage | Work | Build AUD | Check list AUD | Paid labour | Downtime (est.) | The truck can then |
 |---|---|---|---|---|---|---|
 | S0 | Choose, inspect, buy and weigh the truck | 482 | 0 | Ford dealer, weighbridge | None | Drive, and tow within Ford's ratings once the tow pin is in |
-| S1 | The box on Ford's body mounts, the tow pin, towing mirrors, UHF radio, compressor, recovery kit, the trailer's profile, a laden weighing | 3,505 | 650 | None, Leonard fits them | 1 to 2 weeks | Carry both bikes in the box and tow the 4,000 kg trailer at stock power |
+| S1 | The box on Ford's body mounts, the tow pin, the supply for the trailer's brakes, towing mirrors, UHF radio, compressor, recovery kit, the trailer's profile, a laden weighing | 3,779 | 650 | None, Leonard fits them | 1 to 2 weeks | Carry both bikes in the box and tow the 4,000 kg trailer at stock power |
 | S2 | The trailer charging and the coupled weighing | 1,895 | 928 | Auto electrician, weighbridge | 1 day | Tow the loaded trailer and charge it while driving |
 | S3 | PowerMax turbo and intercooler, the calibration, the emissions test and the LC4 certificate | 10,951 | 10,900 | Tuner, emissions test, LC4 certifier | 1 to 2 weeks | Tow at about 205 kW and 650 Nm at the crank (est.), or about 220 kW with the 250 hp option, certified |
-| Total | | 16,834 | 12,478 | | | |
+| Total | | 17,108 | 12,478 | | | |
 
 The check list column is what a stage would cost if every check line fitted in it were bought, and it is not counted. S0 to S2 are the truck Leonard needs, in that order. S3 comes when Leonard accepts the warranty risk or when Ford's warranty ends, and nothing before it depends on it.
 
@@ -56,10 +56,11 @@ Goal: carry both bikes and tow the 4,000 kg trailer legally at stock power.
 - Fit the box to Ford's body rules (BEMM sections 1.10, 1.13 and 5.6, 03/2026): at most 1,960 mm wide, at least 28 mm behind the cab and 30 mm over it, a rear overhang of at most 50 % of the 3,270 mm wheelbase, bolted at every one of Ford's chassis mounting pads with at least an M12 grade 10.9 bolt, one M14 grade 10.9 at each pad as Ford recommends and as UTE-GARAGE.md section 4 and CT-702 draw it (BEMM p. 124 and section 5.6.5), a cross member at each mounting point, no welding on the frame beyond what the BEMM allows, and no new hole larger than 16.5 mm. The box's own design and checks are `UTE-GARAGE.md`.
 - Keep Ford's Driver Assistance Technology bar, with the rear lamps, camera and blind spot sensors, at its factory place, and keep the box's overhang to it as Ford's BEMM sets (sections 4.3 and 4.5). Check the rear camera, the 360-degree view, the blind spot monitor and the onboard scales with the box on, and have a Ford dealer calibrate them only if one shows a fault (BF01).
 - Fit Cruisemaster's DO45Plus tow pin, 32 mm shank, in Ford's 4.5 t hitch (TW01). The pin takes the place of a ball, so no ball is bought. The shank must fit the hitch hole firmly, and the hitch must not be drilled (BEMM section 1.13). If it does not fit, or the coupling sits outside its height range laden, fit a 4.5 t tongue with a 32 mm hole and the drop the height needs (TW02). The laden height is measured at UTE-01.
+- Run the supply for the trailer's brakes to a red Anderson SB50 on a bracket beside Ford's 12-pin socket (TW07, 4.0 kg): from the battery through a 30 A auto-reset circuit breaker on 4 B&S twin to a junction on the bracket, then a short tail of 6 B&S twin into the SB50, whose contacts take 6 AWG at the most. The trailer's Bosch TSC drives its four brake magnets from this supply, 16 A in all, on the brake request the integrated controller puts on the 12-pin plug's pin 5. The feed drops 2.0 % at 16 A against a limit of its own of 3 %, and the trailer's leads hold their 2 % from the socket to the TSC (SVC-06), so the chain keeps AS/NZS 3000's 5 % from the battery to the TSC. With the battery at 12.0 V the TSC sees 11.5 V and the front magnets 11.4 V. Bosch publishes no supply range for the TSC, so the design takes 10.5 V as its least (est.), the low end of ISO 16750-2's narrowest range for 12 V parts, and keeps 1.0 V over it. Bosch lists Ford's integrated controllers at high confidence with the TSC (user manual F005EP0085, appendix A), the TSC's own load simulator gives the controller the load it looks for, and the installation guideline (Y265K30237 v4.0) asks for a gain of 3 or more so the controller's output is a valid brake request. The SB50's negative and the 12-pin plug's earth are joined in the trailer's drawbar junction, as the guideline asks.
 - Set up the trailer's profile in SYNC for the integrated trailer brake controller, the blind spot monitor's trailer coverage and Pro Trailer Backup Assist, whose sensor goes on the trailer's drawbar (Ford's towing guide). Set the brake gain on the first tow.
 - Fit the Clearview towing mirrors (TM01), the UHF radio (UH01) and carry the compressor (AC01) and the recovery kit (RK01) in the box.
 - Weigh the laden truck, each axle (CK02).
-- AUD 3,505. Check lines AUD 650.
+- AUD 3,779. Check lines AUD 650.
 - Done when the weighed axles and GVM are inside Ford's ratings with the box, bikes, tools and two people aboard.
 
 ### S2 Trailer charging
@@ -111,31 +112,31 @@ AUD including GST. Every line, with its list, priority, reason, stage and depend
 |---|---|---|---|---|
 | Purchase inspection | 452 | 0 | 0 | Ford dealer inspection 450 |
 | Freight and weighing | 210 | 0 | 0 | Freight 120, three weighings 90 |
-| Towing and trailer charging | 1,990 | 1,278 | 0 | Charging 1,612, 48 V feed 254, DO45Plus tow pin 125 |
+| Towing and trailer charging | 2,264 | 1,278 | 0 | Charging 1,612, TSC supply 274, 48 V feed 254 |
 | Mirrors, radio, compressor and recovery | 3,350 | 300 | 0 | Towing mirrors 1,750, UHF 650 |
 | Turbo and intercooler | 5,181 | 900 | 0 | PowerMax turbo 2,831, intercooler 1,900 |
 | Tune, gauge, emissions test and certificate | 5,650 | 10,000 | 0 | Calibration 2,800, certificate 2,000 |
 | Bar, winch, sliders and lights | 0 | 0 | 7,400 | None. Every line is an extra |
-| Total | 16,834 | 12,478 | 7,400 | |
+| Total | 17,108 | 12,478 | 7,400 | |
 
 Each figure is rounded to the dollar, so a column can differ from its total by AUD 1.
 
 | Total | AUD |
 |---|---|
-| The build | 16,834 |
-| Allowance, 10 % of listed prices and 20 % of estimates | 3,154 |
-| The build with its allowance | 19,988 |
+| The build | 17,108 |
+| Allowance, 10 % of listed prices and 20 % of estimates | 3,181 |
+| The build with its allowance | 20,289 |
 | Leonard's figure for the car work | 75,000 |
-| Under that figure, with the allowance | 55,012 |
+| Under that figure, with the allowance | 54,711 |
 | Less CUT1, with its share of the allowance | -3,398 |
-| The build with CUT1 and the allowance | 16,590 |
+| The build with CUT1 and the allowance | 16,891 |
 | Check list, if every line were bought (not counted) | 12,478 |
 | Optional extras (not counted) | 7,400 |
 | The truck, bought (data/project.yaml) | 92,690 |
 
-By priority: P1 (legal, safe and able to tow, or protecting the truck) is AUD 5,882 of the build, and P2 (the power stage) is AUD 10,951. The optional extras are AUD 7,400.
+By priority: P1 (legal, safe and able to tow, or protecting the truck) is AUD 6,156 of the build, and P2 (the power stage) is AUD 10,951. The optional extras are AUD 7,400.
 
-The allowance follows the trailer's rule: 10 % of the build's listed prices (AUD 2,129) and 20 % of its estimates (AUD 14,705). The check list carries none, because each of its prices is already the price if the line is bought, and it is not added to the build. The one cut, CUT1, is there in case the PowerMax turbo cannot be had, does not fit the Super Duty's engine (open point 11) or the certifier balks at its power: the calibration then runs on Ford's turbo. The PowerMax's AUD 2,831 is an estimate from Falcon Turbos' hybrid for the same engine, GBP 1,300 before UK VAT, which an export does not carry, at 1 GBP = 1.98 AUD and with Australia's 10 % GST on import.
+The allowance follows the trailer's rule: 10 % of the build's listed prices (AUD 2,403) and 20 % of its estimates (AUD 14,705). The check list carries none, because each of its prices is already the price if the line is bought, and it is not added to the build. The one cut, CUT1, is there in case the PowerMax turbo cannot be had, does not fit the Super Duty's engine (open point 11) or the certifier balks at its power: the calibration then runs on Ford's turbo. The PowerMax's AUD 2,831 is an estimate from Falcon Turbos' hybrid for the same engine, GBP 1,300 before UK VAT, which an export does not carry, at 1 GBP = 1.98 AUD and with Australia's 10 % GST on import.
 
 ## Limits to build and drive to
 
@@ -162,7 +163,7 @@ Drive to: Tow/Haul mode on every tow and whenever the truck is heavily loaded (F
 
 NSW registration. VSI 06 Rev 4 applies to light vehicles of 4.5 t GVM or less (page 1), and the Super Duty, at 4,500 kg, is one.
 
-The truck as bought needs nothing. Ford's 4,500 kg GVM, 8,000 kg GCM and 4,500 kg braked towing apply as built, so the trailer's 4,000 kg plate needs no revision of the truck's ratings. The factory tow bar, Ford's 4.5 t hitch and its integrated brake controller are the maker's, and the trailer's own brakes on every wheel and its breakaway system are the trailer's (VSB1, above 2,000 kg ATM). The coupling, a Cruisemaster DO45 Plus, is the trailer's (TRAILER.md).
+The truck as bought needs no change to its ratings. Its one addition for the trailer is the supply for the trailer's brakes, an accessory circuit from the battery to an SB50 at the tow bar (TW07). Ford's 4,500 kg GVM, 8,000 kg GCM and 4,500 kg braked towing apply as built, so the trailer's 4,000 kg plate needs no revision of the truck's ratings. The factory tow bar, Ford's 4.5 t hitch and its integrated brake controller are the maker's, and the trailer's own brakes on every wheel and its breakaway system are the trailer's (VSB1, above 2,000 kg ATM). The coupling, a Cruisemaster DO45 Plus, is the trailer's (TRAILER.md).
 
 The box. Leonard builds it and does not have it certified (H25). It is a body on a cab chassis built to take one, mounted to Ford's own rules (S1), so it adds no ratings. The towing mirrors replace the factory pair with the same functions, and the plan assumes they need no certificate.
 

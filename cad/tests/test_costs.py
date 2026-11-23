@@ -80,11 +80,11 @@ def test_check_lines_say_what_to_check():
 
 def test_the_build_holds_what_the_truck_needs():
     """The Super Duty comes with Ford's 4,500 kg GVM, 8,000 kg GCM, 4.5 t tow bar and hitch, trailer brake controller and
-    12-pin socket, so the build is the purchase inspection, the coupling's tow pin, the trailer charging, the mirrors,
+    12-pin socket, so the build is the purchase inspection, the coupling's tow pin, the supply for the trailer's TSC, the trailer charging, the mirrors,
     radio, compressor and recovery kit, and the power stage with its certificate. Lines that wait on a check are on the
     check list, the bar, winch, sliders and lights are optional, and nothing of the LandCruiser build is left."""
     status = {it["id"]: it["status"] for it in ITEMS}
-    for i in ("BI01", "TW01", "TC01", "TW06", "TM01", "UH01", "AC01", "RK01", "PW01", "PW02", "TL01", "TL04", "TL05"):
+    for i in ("BI01", "TW01", "TW07", "TC01", "TW06", "TM01", "UH01", "AC01", "RK01", "PW01", "PW02", "TL01", "TL04", "TL05"):
         assert status[i] == "build", f"{i} is {status[i]}"
     for i in ("TW02", "TC02", "TL07", "TX01", "BF01"):
         assert status[i] == "check", f"{i} is {status[i]}"
@@ -99,7 +99,7 @@ def test_super_duty_against_the_landcruiser():
     """The purchase and the upgrades with their allowance, shown apart in VEHICLE.md and set against the LandCruiser plan
     they replace: AUD 50,000 for that truck and AUD 77,777 for its build with the allowance."""
     truck, car = PROJECT["truck"]["purchase_aud"], TYPED["build_plus_contingency"]
-    assert (truck, car) == (92690, 19988), "the purchase and the upgrades changed: update this test and VEHICLE.md"
+    assert (truck, car) == (92690, 20289), "the purchase and the upgrades changed: update this test and VEHICLE.md"
     rows = {r[0]: r for r in _rows(_section("The truck against the LandCruiser plan"))}
     want = {"Truck": (truck, LANDCRUISER["truck"]), "Upgrades with the allowance": (car, LANDCRUISER["build"]),
             "Together": (truck + car, LANDCRUISER["truck"] + LANDCRUISER["build"])}
