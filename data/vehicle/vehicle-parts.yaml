@@ -49,7 +49,7 @@ items:
   - {id: BF01, name: "Ford dealer calibration of the rear camera, 360-degree view, parking aid and onboard scales after the box is fitted, if the check after fitting finds a fault", part_number: null, supplier: "Ford dealer", price_aud: 300, price_basis: estimate, link: null, status: check, system: touring, source: "Ford's BEMM (03/2026) sections 4.3 to 4.5", priority: P1, why: "Bought only if the box upsets the driver assistance sensors, which the BEMM says must stay at their factory places.", check: "The rear camera's image and guidelines, the 360-degree view, reverse brake assist, the blind spot monitor and the onboard scales, with the box on", pass_mark: "No warnings, and the onboard scales within Ford's 100 kg of the weighed payload", checked_at: S1, stage: S1, depends_on: [CK02]}
 
   # Turbo and intercooler (system power)
-  - {id: PW01, name: "Garrett PowerMax direct-fit turbo for the 2022+ Ranger 3.0 V6 diesel, with its calibrated electric actuator, self-fitted", part_number: "930592-5001S (replaces MB3Q-6K682-AB)", supplier: "HD Automotive, Brisbane, authorised Garrett distributor", price_aud: 3300, price_basis: estimate, link: "https://www.garrettmotion.com/racing-and-performance/performance-catalog/turbo/2022-ford-ranger-3-0l-v6-diesel/", status: build, system: power, source: "research report 31 section 5", note: "No Australian price published (23 Nov 2026). Estimated from Falcon Turbos' hybrid for the same engine, GBP 1,560 with VAT, AUD 3,089, and Garrett's PowerMax for the older 3.2 L Ranger at about AUD 2,557. 27 % more compressor flow than Ford's turbo, ball bearing, turbine housing rated to 830 °C, shaft limit 186.2 krpm. Keep Ford's turbo for a return to stock", priority: P2, why: "The turbo for the power stage: Garrett, Ford's own turbo maker, with flow in hand at about 205 kW.", stage: S3, depends_on: [S2]}
+  - {id: PW01, name: "Garrett PowerMax direct-fit turbo for the 2022+ Ranger 3.0 V6 diesel, with its calibrated electric actuator, self-fitted", part_number: "930592-5001S (replaces MB3Q-6K682-AB)", supplier: "HD Automotive, Brisbane, authorised Garrett distributor", price_aud: 2831.40, price_basis: estimate, link: "https://www.garrettmotion.com/racing-and-performance/performance-catalog/turbo/2022-ford-ranger-3-0l-v6-diesel/", status: build, system: power, source: "research report 31 section 5", note: "No Australian price published (23 Nov 2026). Estimated from Falcon Turbos' hybrid for the same engine, GBP 1,300 before UK VAT, which an export does not carry: AUD 2,574 at 1 GBP = 1.98 AUD and AUD 2,831.40 with Australia's 10 % GST on import (est.). Garrett's PowerMax for the older 3.2 L Ranger sells at about AUD 2,557. 27 % more compressor flow than Ford's turbo, ball bearing, turbine housing rated to 830 °C, shaft limit 186.2 krpm. Garrett lists it as the replacement for Ford's turbo MB3Q-6K682-AB, which the Super Duty is assumed to carry (VEHICLE.md open point 11). Keep Ford's turbo for a return to stock", priority: P2, why: "The turbo for the power stage: Garrett, Ford's own turbo maker, with flow in hand at about 205 kW.", stage: S3, depends_on: [S2]}
   - {id: PW02, name: "Garrett PowerMax intercooler for the 2022+ Ranger and Everest 3.0 diesel, self-fitted", part_number: "Garrett PowerMax intercooler, 2022+ Ranger 3.0 diesel", supplier: "HD Automotive, Brisbane", price_aud: 1900, price_basis: estimate, link: "https://www.garrettmotion.com/racing-and-performance/performance-catalog/intercoolers/2022-ford-ranger-everest-3-0l-2-0l-diesel-2022-ranger-bronco-3-0l-gasoline/", status: build, system: power, source: "research report 31 section 5", note: "No Australian price published (est.). An intercooler that keeps the emission controls needs no certificate of its own (VSI 06 Rev 4 item 5)", priority: P2, why: "Cooler intake air under sustained towing at the higher power, which keeps EGT and soot down.", stage: S3, depends_on: [PW01]}
   - {id: PW03, name: "Turbo swap parts: gaskets, bolts, oil and coolant, and Garrett's shaft speed sensor", part_number: "Garrett 781328-0004 speed sensor", supplier: "HD Automotive, Ford dealer", price_aud: 450, price_basis: estimate, link: null, status: build, system: power, source: "research report 31", note: "Gaskets, bolts and fluids 200 and the sensor 250 (both est.)", priority: P2, why: "The parts for Leonard's turbo swap, and the sensor that proves on the dyno that the turbo stays under its speed limit.", stage: S3, depends_on: [PW01]}
 
@@ -78,7 +78,7 @@ removed:
 # Cuts that keep it reliable. Each applies only if its condition holds. A cut saves its line and that line's
 # share of the allowance.
 cuts:
-  - {id: CUT1, name: "Tune on Ford's turbo to about 184 kW, the ordinary Ranger's rating, keeping the PowerMax intercooler", replaces: PW01, saving_aud: 3300, risk: "Low for the engine, as Ford rates it at 184 kW in the ordinary Ranger. About 155 kW at the wheels, 208 hp (est.), in place of about 173 kW. Still needs the certificate (VSI 06 Rev 4 item 6)", source: "research report 31 section 8"}
+  - {id: CUT1, name: "Tune on Ford's turbo to about 184 kW, the ordinary Ranger's rating, keeping the PowerMax intercooler", replaces: PW01, saving_aud: 2831.40, risk: "Low for the engine, as Ford rates it at 184 kW in the ordinary Ranger. About 155 kW at the wheels, 208 hp (est.), in place of about 173 kW. Still needs the certificate (VSI 06 Rev 4 item 6). Also the fallback if the Super Duty's turbo is not the MB3Q-6K682-AB the PowerMax replaces (VEHICLE.md open point 11)", source: "research report 31 section 8"}
 
 # Outside the vehicle work. The box has its own priced parts list, so its total is not typed here.
 bike_box: {parts_list: "data/ute/box-parts.yaml", doc: UTE-GARAGE.md, note: "Leonard builds the box, so it has one total, worked out from its parts list. It is not certified (decision H25)"}
@@ -89,26 +89,26 @@ bike_box: {parts_list: "data/ute/box-parts.yaml", doc: UTE-GARAGE.md, note: "Leo
 totals_aud:
   build_budget: 75000
   allowance_pct: {listing: 10, estimate: 20}
-  build_by_system: {purchase: 452, freight_weighing: 210, towing: 1990, touring: 3350, power: 5650, tune_legal: 5650}
-  build: 17302
+  build_by_system: {purchase: 452, freight_weighing: 210, towing: 1990, touring: 3350, power: 5181, tune_legal: 5650}
+  build: 16834
   build_listed: 2129
-  build_estimated: 15174
-  contingency_allowance: 3248
-  build_plus_contingency: 20550
-  cuts_with_allowance: 3960
+  build_estimated: 14705
+  contingency_allowance: 3154
+  build_plus_contingency: 19988
+  cuts_with_allowance: 3398
   build_with_cuts_plus_contingency: 16590
-  against_budget: {build: -57698, build_plus_contingency: -54450, build_with_cuts_plus_contingency: -58410}
+  against_budget: {build: -58166, build_plus_contingency: -55012, build_with_cuts_plus_contingency: -58410}
   check_by_system: {towing: 1278, touring: 300, tune_legal: 10000, power: 900}
   check_if_every_item_failed: 12478
   optional_by_system: {protection: 7400}
   optional: 7400
-  every_line: 37180
+  every_line: 36711
   by_priority:
     P1: {build: 5882, check: 650, optional: 0}
-    P2: {build: 11420, check: 10900, optional: 0}
+    P2: {build: 10951, check: 10900, optional: 0}
     P3: {build: 0, check: 928, optional: 7400}
   by_stage:
     S0: {build: 482, check: 0, optional: 0}
     S1: {build: 3505, check: 650, optional: 7400}
     S2: {build: 1895, check: 928, optional: 0}
-    S3: {build: 11420, check: 10900, optional: 0}
+    S3: {build: 10951, check: 10900, optional: 0}
