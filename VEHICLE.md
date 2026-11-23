@@ -140,19 +140,19 @@ The allowance follows the trailer's rule: 10 % of the build's listed prices (AUD
 
 ## Limits to build and drive to
 
-Ford's ratings are the limits (dealer specification sheet, 18 Sep 2025, and the BEMM, 03/2026). The estimates below are this plan's base masses: Ford's minimum kerb weight of 2,518 kg with a full tank and no tray, the 437 kg box, both bikes at 390 kg with the Tuareg's panniers, 60 kg of tools with the compressor and recovery kit, two people at 160 kg, and the truck's added lines at 32.6 kg (the tow pin and hitch 9.5, charging 12.6, mirrors 4.0, radio 1.5 and the power stage 5.0, all est.), 3,598 kg in all (est.). The ute model (`build/ute/ute.json`, rsd-ute) carries growth and the axle split and supersedes these figures once it models the Super Duty.
+Ford's ratings are the limits (dealer specification sheet, 18 Sep 2025, and the BEMM, 03/2026). The estimates below are this plan's base masses: Ford's minimum kerb weight of 2,518 kg with a full tank and no tray, the 438.2 kg box (UTE-GARAGE.md), both bikes at 390 kg with the Tuareg's panniers, 60 kg of tools with the compressor and recovery kit, two people at 160 kg, and the truck's added lines at 32.6 kg (the tow pin and hitch 9.5, charging 12.6, mirrors 4.0, radio 1.5 and the power stage 5.0, all est.), 3,599 kg in all (est.). The ute model (`build/ute/ute.json`) carries growth and the axle split, and its checks UTE-01 to UTE-15 govern over these figures.
 
 | Limit | Value | Estimate, base masses |
 |---|---|---|
-| Truck, laden, ball load included | At most 4,500 kg GVM | 3,998 kg with a 400 kg ball, 10 % of the trailer's 4,000 kg plate |
+| Truck, laden, ball load included | At most 4,500 kg GVM | 3,999 kg with a 400 kg ball, 10 % of the trailer's 4,000 kg plate |
 | Front axle | At most 1,900 kg | From the ute model |
 | Rear axle | At most 2,800 kg | From the ute model |
-| Truck plus trailer | At most 8,000 kg GCM | 7,598 kg, the truck without its ball load plus the trailer's 4,000 kg plate |
+| Truck plus trailer | At most 8,000 kg GCM | 7,599 kg, the truck without its ball load plus the trailer's 4,000 kg plate |
 | Trailer | At most 4,500 kg braked towing, and the coupling's own rating (plate4t) | 4,000 kg plate |
 | Ball load | At most 450 kg until the owner's manual is read (est.), and the coupling's vertical rating | 400 kg at 10 % (est.) |
-| Payload | At most 1,982 kg on the minimum kerb weight, ball load included | 1,480 kg |
-| Box | At most 1,960 mm wide, 28 mm behind the cab, 30 mm over it, rear overhang at most 1,635 mm, at every standard mounting location (BEMM 1.10 and 5.6) | rsd-ute |
-| Added mass's centre of gravity | At GVM: 1,965 to 3,350 mm behind the front axle, at most 530 mm up and 65 mm off the centre line. At 800 kg added: to 3,255 mm, 630 mm and 130 mm (BEMM 1.13.2) | rsd-ute |
+| Payload | At most 1,982 kg on the minimum kerb weight, ball load included | 1,481 kg |
+| Box | At most 1,960 mm wide, 28 mm behind the cab, 30 mm over it, rear overhang at most 1,635 mm, at every standard mounting location (BEMM 1.10 and 5.6) | UTE-09, UTE-10 and UTE-15 (UTE-GARAGE.md) |
+| Added mass's centre of gravity | At GVM: 1,965 to 3,350 mm behind the front axle, at most 530 mm up and 65 mm off the centre line. At 800 kg added, and below it: to 3,255 mm, 630 mm and 130 mm (BEMM 1.13.2) | UTE-07 and UTE-08, with the ramp forward when the bikes are out (UTE-GARAGE.md section 7) |
 | Trailer width for the blind spot monitor | At most 2.4 m wide and 10 m long behind the truck, on the factory tow bar (Ford's towing guide) | 2,400 mm |
 
 Ford's Smart Hitch reads the ball load within 100 kg and recommends 10 to 15 % of the trailer (towing guide). The trailer's own range is plate4t's and the trailer's.

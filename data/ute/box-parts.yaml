@@ -81,7 +81,7 @@ lines:
     spec: 5052-H32, 5.0 mm. Two packers 1,845 x 65 mm under the L-track, two winch plates 340 x 160 mm, two chock backing plates 300 x 150 mm, two hasp shrouds
     qty: 1
     unit: sheet
-    mass: {kg: 3.2, basis: calculated, src: "Packers 2 x 1.845 x 0.065 m at 13.4 kg/m2 (5.0 mm at 2.68 g/cm3). Winch plates are in BX-L02, shrouds in BX-D08, backing plates in BX-F05"}
+    mass: {kg: 3.21, basis: calculated, src: "Packers 2 x 1.845 x 0.065 m at 13.4 kg/m2 (5.0 mm at 2.68 g/cm3), the model's U-PACKER. Winch plates are in BX-L02, shrouds in BX-D08, backing plates in BX-F05"}
     price: {aud_each: 520.73, aud: 520.73, url: "https://store.allaluminium.com.au/collections/marine-sheet-aluminium", date: 2026-11-20, basis: listing}
     model_part: U-PACKER
     note: Replaces the model's 2 mm galvanised steel packer. The 35 mm steel crossmember (BX-U01) needs 5 mm to bring the 13.7 mm track to 0.3 mm under the floor top
@@ -136,7 +136,7 @@ lines:
     spec: 6060-T5 flat bar 20 x 10, ripped to 15 x 10 mm. Four strips of 1,845 mm on the packers' edges
     qty: 2
     unit: length
-    mass: {kg: 3.0, basis: calculated, src: "4 x 1.845 m x 0.015 x 0.010 m at 2.70 g/cm3"}
+    mass: {kg: 2.99, basis: calculated, src: "4 x 1.845 m x 0.015 x 0.010 m at 2.70 g/cm3, the model's U-STRIP"}
     price: {aud_each: 41.57, aud: 83.14, url: "https://store.allaluminium.com.au/products/aluminium-flat-bar-10mm-x-20mm-mill-finish", date: 2026-11-20, basis: listing}
     model_part: U-STRIP
     note: The model's strips are 20 mm wide on a 76 mm crossmember. On the 65 mm crossmember they are 15 mm wide
@@ -159,7 +159,7 @@ lines:
     spec: AS/NZS 1163 C350L0 RHS 65 x 35 x 4.0, laid flat, two pieces of 1,845 mm. Bought black and hot-dip galvanised after the mount plates and cleats are welded on (BX-U04)
     qty: 1
     unit: length
-    mass: {kg: 20.1, basis: calculated, src: "3.69 m at 5.35 kg/m (Southern Steel table) plus 2 % zinc"}
+    mass: {kg: 20.11, basis: calculated, src: "3.69 m at 5.45 kg/m, the Southern Steel table's 5.35 kg/m plus about 2 % zinc, the model's U-STEEL-CM"}
     price: {aud_each: 180.00, aud: 180.00, url: "https://www.southernsteel.com.au/wp-content/uploads/2025/07/Southern-Steel-Supplies-Structural-Tube-Pipe-Reference-Guide-RHS-1.pdf", date: 2026-11-20, basis: estimate}
     model_part: U-STEEL-CM
     note: "Replaces RHS 76 x 38 x 3, which is not an Australian stock size (the AS/NZS 1163 range runs 65 x 35, 75 x 25, 75 x 50). Price est.: 42.8 kg at about AUD 4.20/kg for black RHS"
@@ -481,7 +481,7 @@ lines:
     spec: Plain track 34.5 wide x 13.7 high, pre-drilled at 101.6 mm. Two rows cut to 1,765 mm, recessed in the floor on the packers
     qty: 2
     unit: length
-    mass: {kg: 3.2, basis: maker, src: "Kinedyne: 2.3 kg per 100 in, 0.91 kg/m x 3.53 m (https://kinedyne.com/100-in-series-l-medium-duty-aluminum-track)"}
+    mass: {kg: 3.21, basis: maker, src: "Kinedyne: 2.3 kg per 100 in, 0.91 kg/m x 3.53 m (https://kinedyne.com/100-in-series-l-medium-duty-aluminum-track), the model's U-TRACK"}
     price: {aud_each: 107.31, aud: 214.62, url: "https://liftingequipmentstore.us/products/kinedyne-100-series-l-medium-duty-aluminum-track", date: 2026-11-20, basis: converted}
     model_part: U-TRACK
     note: "USD 62.94 each converted. The model's geometry is this plain track. Its product text names the flanged FE751, which is 49.8 x 15.7 mm and does not fit the slot"
@@ -844,7 +844,7 @@ totals:
   contingency_pct: 10
   contingency_aud: 2498.06
   total_aud: 27478.67
-  mass_kg_lines: 438.14
+  mass_kg_lines: 438.16
   not_in_total:
     - {name: "Monimoto 9 subscriptions", aud_per_year: 158, src: "AUD 79 a year each (report 17)"}
     - {name: "FMC130 tracking platform", aud_per_year: 120, src: "Estimate"}
