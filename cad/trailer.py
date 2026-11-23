@@ -1000,7 +1000,7 @@ class Trailer:
                            sub=lay.zones[c.zone]["name"])
             elif c.type == "tyre":
                 t = self.tyre_arc(lay)
-                row.update(limit=f">= {c.min_gap_mm:g} mm to every rigid part, fixture and run", measured=round(t["gap_mm"], 1), unit="mm",
+                row.update(limit=f">= {c.min_gap_mm:g} mm from every rigid part, fixture and run", measured=round(t["gap_mm"], 1), unit="mm",
                            margin=round(t["gap_mm"] - c.min_gap_mm, 1), ok=t["gap_mm"] >= c.min_gap_mm - 1e-6, governing=t["governing"],
                            detail=t["detail"], tyre=dict(t, members_margin=round(t["members_gap_mm"] - c.min_gap_mm, 1)))
             elif c.type.startswith("body_"):
