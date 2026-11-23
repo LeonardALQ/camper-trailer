@@ -6,7 +6,7 @@ Research report 31, 23 Nov 2026, for Leonard's change of plan of 22 Nov 2026: a 
 
 The Super Duty needs none of the LandCruiser build's big jobs. Ford rates it at a 4,500 kg GVM, 4,500 kg braked towing and an 8,000 kg GCM, with 1,900 kg on the front axle and 2,800 kg on the rear, and it comes with front and rear lockers, a 130 L tank, a 4.5 t tow bar, an integrated trailer brake controller, a 12-pin socket, a snorkel and light truck tyres. So there is no GVM kit, no GCM revision, no engine rebuild, no clutch and no brake upgrade. Leonard wrote 4,495 kg for the GVM. Ford's figure is 4,500 kg, and this report uses it.
 
-What the truck still needs is small: the 3.5 t hitch for the DO35's tow pin, towing mirrors for the 2,400 mm trailer, the 48 V trailer charging, a UHF radio and a recovery kit, and the box mounted to Ford's body rules. Those come to about AUD 5,800 before the power stage (VEHICLE.md has the figures).
+What the truck still needs is small: the tow pin of the trailer's DO45-type coupling in Ford's own 4.5 t hitch (the trailer is plated at 4,000 kg from 23 Nov 2026), towing mirrors for the 2,400 mm trailer, the 48 V trailer charging, a UHF radio, a compressor and a recovery kit, and the box mounted to Ford's body rules. With the purchase inspection and three weighings they come to AUD 5,882 before the power stage, AUD 6,846 with the allowance (VEHICLE.md).
 
 A near-new single cab chassis costs about AUD 90,000. The one listing found, a 2025 truck with 13,343 km, asks AUD 89,990 with a steel tray, and a new one is AUD 82,990 before on-road costs, so new and near-new cost about the same drive-away.
 

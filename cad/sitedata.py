@@ -247,6 +247,7 @@ def tow_vehicle_page():
            "[Bike box](../ute-garage/#3d-model) page and the general arrangement is drawing [CT-701](../drawings/#ct-701).\n\n"]
     secs = dict(zip(VEHICLE_TOP + VEHICLE_END, _sections(plan, VEHICLE_TOP + VEHICLE_END)))
     out.append(secs["Summary"] + "\n")
+    out.append(secs["The truck against the LandCruiser plan"] + "\n")
     rows = ("| Stage | Work | Build AUD | Check list AUD | Optional AUD | Paid labour | Downtime (est.) | "
             "The truck can then |\n|---|---|---|---|---|---|---|---|\n")
     for st in data["stages"]:
