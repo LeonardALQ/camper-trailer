@@ -391,6 +391,6 @@ def test_d14_runs_between_the_jockey_spacer_tubes():
     tubes = [b for b in RES["blocks"] if b["id"] == "DB-08"]
     assert len(tubes) == 4
     d14 = next(r for r in RES["runs"] if r["id"] == "D-14")
-    near = [p for p in d14["dense"] if 880 <= p[0] <= 1120]
+    near = [p for p, _ in R._samples(d14["dense"], 10.0) if 880 <= p[0] <= 1120]
     rows = sorted({round(b["box"][2]) for b in tubes})
     assert near and all(rows[0] + 25 + d14["od"] / 2 <= p[2] <= rows[1] - d14["od"] / 2 for p in near), (rows, near[:3])
