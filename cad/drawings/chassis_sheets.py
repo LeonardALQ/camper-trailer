@@ -260,8 +260,8 @@ def ct101(prj, model, bom, checks, reg, dwg):
 # ------------------------------------------------------------------ CT-102
 FIT_ITEMS = [("1", "DB-03", "Cruisemaster DO45 Plus, under-mounted, 4 x M14 8.8 at 140 Nm, nyloc nuts"),
              ("2", "CH-P01", "Coupling plate 300 x 220 x 12, both faces flat after galvanising (detail A)"),
-             ("3", "CH-P02", "Chain lug 10 mm, 18 mm hole, each side (detail B)"),
-             ("4", "DB-06", "Safety chains 8 mm grade 80 (T) to AS 2321, never welded, 2 t D shackles"),
+             ("3", "CH-P02", "Chain lug 10 mm, 14 mm hole, each side (detail B)"),
+             ("4", "DB-06", "Chains 8 mm grade 80 (T), pewag CW 8 links at the lugs, never welded"),
              ("5", "CH-P11", "Jockey wheel bracket 8 mm, bolted to the kerb-side member"),
              ("6", "DB-05", "ARK XO750 jockey wheel, 750 kg, swung up in travel"),
              ("7", "DB-04", "Stone guard on the cross brace and member tops, on rubber"),
@@ -362,12 +362,15 @@ def ct102(prj, model, bom, checks, reg, dwg):
     sh.text(cx, 258.5, "SCALE 1:5", 1.9, "middle")
     sh.rect(cx - 90 / k, cy, cx + 90 / k, cy + 150 / k, "thin")
     sh.text(cx - 90 / k + 1, cy + 150 / k - 3, "MEMBER, OUTER FACE", 1.4)
-    plate(sh, cx - 60 / k, cy - 40 / k, cx + 60 / k, cy + 60 / k)
-    sh.circle(cx, cy - 15 / k, 9 / k, "medium")
-    S.hdim(sh, cx - 60 / k, cy - 40 / k, cx + 60 / k, cy - 40 / k, cy - 40 / k - 4, "120", size=1.6)
-    weld_symbol(sh, (cx + 60 / k, cy + 60 / k), (cx + 22, cy + 20), "6", both=True, length="120")
-    sh.text(cx, cy - 40 / k - 9, "10 mm GR 350, HOLE 18 FOR THE 16 mm PIN,", 1.5, "middle")
-    sh.text(cx, cy - 40 / k - 11.5, "15 BELOW THE MEMBER. WELD TOP AND BOTTOM EDGES.", 1.5, "middle")
+    lug = ch.data["local_checks"]["chain_lug"]
+    low = 15 + lug["edge"]                      # the lug's lower edge under the member, the hole 15 under it
+    plate(sh, cx - 60 / k, cy - low / k, cx + 60 / k, cy + (100 - low) / k)
+    sh.circle(cx, cy - 15 / k, lug["hole"] / 2 / k, "medium")
+    S.hdim(sh, cx - 60 / k, cy - low / k, cx + 60 / k, cy - low / k, cy - low / k - 4, "120", size=1.6)
+    weld_symbol(sh, (cx + 60 / k, cy + (100 - low) / k), (cx + 22, cy + 20), "6", both=True, length="120")
+    sh.text(cx, cy - low / k - 9, f"10 mm GR 350, HOLE {lug['hole']:g} FOR THE CW 8 LINK,", 1.5, "middle")
+    sh.text(cx, cy - low / k - 11.5, f"15 BELOW THE MEMBER, {lug['edge'] - lug['hole'] / 2:g} OF PLATE UNDER IT.", 1.5, "middle")
+    sh.text(cx, cy - low / k - 14, "WELD TOP AND BOTTOM EDGES. NO SHACKLE HERE.", 1.5, "middle")
     # ---- fittings table and local checks
     rows = []
     for item, fid, desc in FIT_ITEMS:

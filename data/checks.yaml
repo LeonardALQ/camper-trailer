@@ -335,7 +335,7 @@ trailer_checks:
     item: chain_lug
     severity: fail
     inputs: []
-    why: VSB1 9.2.2. Plate limits are fy (bearing 1.5 fy, tear-out shear 0.6 fy) so the lug does not deform. The weld limit is the SP fillet capacity, 0.8 x 0.6 x 490 MPa.
+    why: VSB1 9.2.2. Each chain hangs from its lug on a grade 100 connecting link, a pewag CW 8, whose 10 mm bow bears in the lug's 14 mm hole, so the chain is fixed to the trailer for good with no shackle, as WA's CI-119C asks over 3.5 t ATM. Plate limits are fy (bearing 1.5 fy, tear-out shear 0.6 fy) so the lug does not deform. The weld limit is the SP fillet capacity, 0.8 x 0.6 x 490 MPa.
   - id: LOC-02
     title: Front recovery lugs hold 58.9 kN without yield and 78.5 kN without fracture
     type: chassis_local
