@@ -2,7 +2,7 @@
 # ballast. `water_l` is the fresh water in the tanks, an expression over the trailer parameters. `load` lists the
 # payload tags carried (assemblies/trailer.yaml): fuel (the heater's diesel and the jerry cans in the drawbar box),
 # gear (food, clothes and other gear, 150 kg) and grey (130 L in the grey tank). H13 and H21 as amended 23 Nov 2026: at
-# most 395 L of fresh and grey water ride while towing, the fresh tanks' whole net with the grey tank empty (I2-40), or less fresh
+# most 400 L of fresh and grey water ride while towing, the fresh tanks' whole net with the grey tank empty (I2-40), or less fresh
 # water with grey water aboard. The grey tank is empty for travel except in TC7 and TC8, which must still pass every limit. Every case here is one the trailer may be towed in, so every one
 # is a travel case for the towball checks.
 trailer_cases:
@@ -13,7 +13,7 @@ trailer_cases:
     load: []
   - id: TC2
     name: Travel fully loaded
-    aboard: 395 L of fresh water, the full tanks and the travel limit (H13 and H21), fuel and gear
+    aboard: 400 L of fresh water, the full tanks and the travel limit (H13 and H21), fuel and gear
     water_l: water_travel_l
     load: [fuel, gear]
     towball_target: true
@@ -24,7 +24,7 @@ trailer_cases:
     load: [fuel, gear]
   - id: TC4
     name: Water at the travel limit, no gear
-    aboard: 395 L of fresh water and fuel, no gear
+    aboard: 400 L of fresh water and fuel, no gear
     water_l: water_travel_l
     load: [fuel]
   - id: TC5
@@ -39,7 +39,7 @@ trailer_cases:
     load: [fuel]
   - id: TC7
     name: Grey tank full, at the travel limit
-    aboard: 130 L of grey water and 265 L of fresh water (395 L in all, H13 and H21), fuel and gear
+    aboard: 130 L of grey water and 270 L of fresh water (400 L in all, H13 and H21), fuel and gear
     water_l: water_travel_l - grey_full_l
     load: [fuel, gear, grey]
   - id: TC8
@@ -53,9 +53,9 @@ trailer_cases:
 # has 420 kg on it with growth. The floor was 8.0 % until the 4,000 kg plate. Ford's towing guide aims at about 10 % and
 # Smart Hitch recommends 10 to 15 %. At 9.0 % every case with the grey tank empty has at least 10.8 % on the ball and the
 # lowest, TC7 with a full grey tank, about 9.9 % (I2-40, 23 Nov 2026). A 10 % floor would move the axle about 32 mm
-# further back, which shortens the rear tank and the grey tank with it: the fresh tanks would drop from 397 to 388 L net,
-# the grey tank from 132 to 127 L net, under report 21's 130 L with no room to deepen it in the underfloor zone, and the
-# window from 109 to 45 mm, for half a point on TC7 alone. The ceiling is the lower of the DO45's 450 kg (its fitting guide) and the Ranger Super
+# further back, which shortens the rear tank and the grey tank with it: the fresh tanks would drop from 401 to 393 L net,
+# the grey tank from 135 to 129.5 L net, under report 21's 130 L with no room to deepen it in the underfloor zone, and the
+# window from 104 to 41 mm, for half a point on TC7 alone. The ceiling is the lower of the DO45's 450 kg (its fitting guide) and the Ranger Super
 # Duty's tow ball limit, 450 kg (est.: Ford's published sheets and BEMM give none, and 10 % of its 4,500 kg is what the
 # standard Ranger allows at 3,500 kg and what Ford's towing guide aims at), less H17's 30 kg in hand, in place of 350 kg
 # less 30 kg for the 79, its towbar and the DO35. The hard limits sit outside: 7.5 % (MAS-04, H2) and the ute's towbar
