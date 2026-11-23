@@ -1,7 +1,7 @@
 """Whole-trailer checks from data/checks.yaml (trailer_checks), measured on the block layout (cad/trailer.py).
 
 A `fail` check that misses its limit fails the test. A `report` check is marked xfail when it misses. The trailer is
-the home trailer for the LandCruiser 79 (revision J): it reads the ute's model from build/ute/ute.json, so the ute builds first.
+the home trailer for the Ford Ranger Super Duty (revision J): it reads the ute's model from build/ute/ute.json, so the ute builds first.
 """
 import pytest
 

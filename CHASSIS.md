@@ -178,9 +178,9 @@ CHS-10 says where a hole may go and checks its fatigue, with three rules. Its ce
 |---|---|---|---|---|---|---|---|---|
 | H-01 | K-08 | Kerb raiser's outer web inside OR-05K's root weld, 4,511 | 16 | 279 of 350 MPa, LC8a | 39.8, 20 | 17.5, 16 | 38.7 of 81.9 MPa | meets |
 | H-03 | K-09 | Road raiser's outer web inside OR-05R's root weld, 4,511 | 16 | 269 of 350 MPa, LC8a | 54.8, 20 | 17.5, 16 | 40.5 of 81.9 MPa | meets |
-| H-05 | K-01 | Road rail's outer web, 2,360 | 16 x 39 slot | 67 of 233 MPa, LC5b | 63.5, 20 | 23.2, 16, H-06 | 20.5 of 81.9 MPa | meets |
-| H-06 | K-10 | Road rail's outer web, 2,415 | 16 x 34 slot | 108 of 350 MPa, LC6 | 33.5, 20 | 23.2, 16, H-05 | 24.7 of 81.9 MPa | meets |
-| H-07 | K-10 | Road rail's outer web, 4,215 | 16 x 25 slot | 113 of 350 MPa, LC8a | 44.5, 20 | 83.5, 16 | 43.1 of 81.9 MPa | meets |
+| H-05 | K-01 | Road rail's outer web, 2,360 | 16 x 39 slot | 67 of 233 MPa, LC5b | 63.5, 20 | 48.6, 27, H-06 | 20.5 of 81.9 MPa | meets |
+| H-06 | K-10 | Road rail's outer web, 2,446 | 27 x 36 slot | 111 of 350 MPa, LC6 | 38.5, 33.8 | 30.0, 27, drawbar overlap's fillet | 25.3 of 81.9 MPa | meets |
+| H-07 | K-10 | Road rail's outer web, 3,413 | 27 x 56 slot | 197 of 350 MPa, LC6 | 39.5, 33.8 | 83.0, 27 | 19.1 of 81.9 MPa | meets |
 | H-08 | K-01 | Road rail's outer web, 6,021 | 16 x 25 slot | 137 of 350 MPa, LC8a | 57.5, 20 | 48.9, 16 | 4.3 of 81.9 MPa | meets |
 | H-09 | B-18 | Kerb raiser's inner web, 2,015 | 14 x 54 slot | 93 of 350 MPa, LC6 | 25.8, 17.5 | 81.5, 14 | 35.4 of 81.9 MPa | meets |
 | H-10 | B-16 | Kerb raiser's inner web, 2,267 | 28 x 103 slot | 88 of 350 MPa, LC6 | 39.8, 35 | 30.5, 28 | 32.4 of 81.9 MPa | meets |
@@ -194,7 +194,7 @@ CHS-10 says where a hole may go and checks its fatigue, with three rules. Its ce
 All 14 meet every rule. The services moved twelve of them off the rails' and raisers' 50 mm faces and the welds:
 
 - K-08 and K-09 rise inboard of the rails behind the grey tank, enter the raisers through their inner webs at 78 and 64 mm above the seam (H-15, H-16), and run forward inside them in the inboard lane, K-08 between D-14 and B-18. At the XT centre station each turns square across its raiser into OR-05 through a round 16 mm hole on the outrigger's centre line, tied to it, its edge 17.5 mm from the root weld's toes either side (H-01, H-03). A lamp cable bends at 57 mm, so only a turn that starts in the inboard lane meets the outer web square.
-- K-10 leaves the road rail through its outer web at Z 652 beside X 4,215, where the range at its edge is 43.1 MPa, and drops outside the rail to pass under it to the TSC (H-07, was the rail's bottom face).
+- K-10 is the brake circuit's 16 mm2 pair, so its holes are 27 mm (I2-32). It leaves the road rail through its outer web at Z 647 beside X 3,413, ahead of the front arms' hinge and outside FIT-05's sweep, where the range at its edge is 19.1 MPa, drops outside the rail, passes under it and runs back under CM-04 and the tank guard to the TSC (H-07, was beside X 4,215 in the front tyre's path, I2-30).
 - K-01 leaves the road rail through its outer web at Z 680 beside X 6,021, ahead of the rear steady's swing, and drops behind it (H-08, was the rail's bottom face 14 mm from K-09's hole).
 - B-16 leaves the kerb raiser at Z 796, 30.5 mm from the seam's fillet, under D-14, which rides 16 mm higher from X 2,560 forward (H-10).
 - B-18, B-16 and D-14 leave G20's outboard row and come down into the 79.5 mm between the kerb raiser and the rear tank's 20 mm. They run forward against the raiser and enter it on slants through its inner web, B-18 at Z 840, B-16 at Z 800 and D-14 at Z 806, after it runs at Z 760 for its 110 mm bend (H-12 to H-14, were the raiser's top face). G20 became one packing space over the gap with the chase's loom inboard of the three, so they add no hole and no frame. A frame outboard of the raiser would sit within FIT-05's 50 mm of the rear tyre at full travel and in its spray, and a reinforced opening in the top face would put its collar's welds across the composite rail's top flange (TB 070).
