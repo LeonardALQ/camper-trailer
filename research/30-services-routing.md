@@ -111,7 +111,13 @@ they are threaded through (`inside`).
   SVC-01 also tests every chassis fitting with no box of its own at each of its positions (cad/chassis.py
   `fitting_boxes`): the drawbar root gussets, the recovery lugs and tongues, the plates, the D-rings, and each corner
   steady over the box its leg sweeps from folded to standing. The drawbar's lamp and brake looms pass outboard of the
-  root gussets, clipped to them. Every hole in a chassis member and every floor
+  root gussets, clipped to them. The kerb front lamp loom K-07 comes down outboard of K-10 and crosses the A-frame
+  lying on the angle SP-FD, hung 15 mm under the drawbar members' rear ends. The front bay's cables to the kerb corner
+  and the front fans (C9B, E-07, B-04, B-05) cross the rails through grommeted holes in both webs, 32 to 48 mm under
+  the rails' tops, C9B and B-05 under the XT Air box and E-07 and B-04 behind it, where they used to dip to 400 to
+  430 mm under the drawbar members, and B-18 rides over the drawbar's cross brace, clipped to it (I2-41). The running
+  clearance and the breakover (DIM-04, DIM-06, DIM-07) take every fixture and run at its outside diameter, as FIT-05
+  does. Every hole in a chassis member and every floor
   cut-out over 60 mm is listed in `data/services.yaml` (`holes`, `cutouts`) with its member or panel, point and size.
   SVC-01 skips the parts welded to a member while a run is inside it.
 - The desk reaches the floor, so its outlets and USB panel are in a power module in the desk top, fed up the front
@@ -121,6 +127,11 @@ they are threaded through (`inside`).
   D-07. So the wet room's kerb-half fittings (basin, flush, washer tap) are fed from a manifold in the shower's road
   corner (WT-MAN) across the wet room's ceiling over the inner door. The washer's and the dryer's pumped drains
   discharge into the basin. The basin, the shower well and the floor waste drop straight into the grey tank's top.
+  The drip tray's drain W-09 joins the basin's waste below its trap, so it passes a Wavin HepvO 32 mm waterless trap
+  valve standing upright on the partition's wet face right behind the tray's outlet, with a reducer to the 25 mm hose
+  at each end. Its membrane seals with no water to dry out, and Wavin asks for it as close to the appliance as
+  practicable ([HepvO in recreational vehicles](https://mediahub.wavin.com/m/1684dc1cbc414752/original/Data-Sheet-HepvO-in-recreational-vehicles.pdf),
+  read 23 Nov 2026), so the grey tank's air stops there (I2-45).
 - The road frame G15 stands in the corner between the aisle LA-K4's end and the partition, X 4,978 to 5,161 and Y 450
   to 594 with its rim, clear of the aisle (SVC-09) and inboard of the road raiser. The bench's plinth is notched over
   its front edge (see section 7).
@@ -147,8 +158,8 @@ because `data/checks.yaml`'s trailer check types are fixed in `cad/partsdb.py`. 
 trailer's checks (`build/trailer/trailer.json`) and `cad/tests/test_routes.py` fails on any of them.
 
 The floor's multi-cable penetrations are three Roxtec RM transit frames (data/services.yaml, line BD-25): the kerb
-frame G20 under the plinth's end slot, one packing space of 156 x 84 mm over the gap between the kerb raiser and the
-rear tank, the road frame G15 under the MultiPlus-II and the Combi's frame G9 in the 90 mm of floor between the chair
+frame G20 in the plinth's end slot, over the 135.5 mm gap between the kerb raiser and the rear tank, whose kerb side
+stands 36 mm inboard of the front tank's for it, the road frame G15 under the MultiPlus-II and the Combi's frame G9 in the 90 mm of floor between the chair
 space and the aisle. Roxtec's C wedge, which compresses the modules, fits packing spaces 60 and 120 mm wide only,
 takes 34 mm of the stack and is 84 mm deep, and Roxtec's S frames come with packing spaces 60 or 120 mm wide and 60,
 120, 180 or 240 mm long ([Roxtec C wedge](https://www.roxtec.com/de/produkte/systemkomponenten/dichtkomponenten/roxtec-keildichtung-und-keildichtungskit-c/),
@@ -156,7 +167,12 @@ Roxtec's S frame tables, read 23 Nov 2026). G9 has the S 3x1's 60 x 120 mm with 
 and G15 the S 4x1's 120 x 120 mm with a C wedge 120 inside its stack, behind the sink waste W-01 and the pump feed
 F-03 and ahead of D-07 and the six 230 V cables. Roxtec allows the wedge anywhere in the frame and asks for a
 stayplate on every finished row and two before the last ([installation instructions 124037 rev A](https://varaldur-prod.fra1.cdn.digitaloceanspaces.com/varaldur-prod/media/pim_files/11DF0BD2-D507-46A0-921F-78A5E1448020.pdf),
-read 23 Nov 2026). G20's 120 x 120 mm is open (TRAILER.md open point 11). Each frame is modelled at its real depth
+read 23 Nov 2026). G20 has the S 4x1's 120 x 120 mm too, its stack across the trailer and its C wedge 120 at the
+inboard end over the rear tank. In each row the cables that run forward under the floor lie at the front and the ones
+that run back to the crossing behind the tank at the rear: the raiser cables along the raiser, the 12 V and 24 V loom
+and D-07 at the front, the 230 V group and A-01 at the rear, and the three tank senders in the inboard row. In each
+column a cable that crosses the end slot lower lies further outboard, so none passes under another's turn (I2-33,
+I2-40). Each frame is modelled at its real depth
 (cad/routes.py frame_solids) and stands 30 mm on the floor, and SVC-01 keeps every other run 20 mm from each body and
 wedge and no frame inside a part or a bearer strip (I2-33, I2-34). SVC-08, SVC-10 and SVC-11 take each frame's whole
 room, its wedge's included, so a module behind the wedge is inside the frame. Each module is sized to its run (RM 15 for 3 to 11 mm, RM 20 for 4 to 14.5 mm, RM 30, RM 40 and
