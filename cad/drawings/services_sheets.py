@@ -628,8 +628,8 @@ def ct602(prj, model, bom, checks, reg, dwg):
         sh.rect(q[0] - 1.1, q[1] - 1.1, q[0] + 1.1, q[1] + 1.1, "medium")
         sh.text(q[0], q[1] - 0.45, t, 1.0, "middle", bold=True)
     tb = lay.find("EL-09").box   # the drip tray over the plinth, dashed (I2-35)
-    t0, t1 = pr.p(tb[0] + 6, tb[1] + 6), pr.p(tb[3] - 6, tb[4] - 6)
-    sh.rect(min(t0[0], t1[0]), min(t0[1], t1[1]), max(t0[0], t1[0]), max(t0[1], t1[1]), "phantom")
+    q0, q1 = pr.p(tb[0] + 6, tb[1] + 6), pr.p(tb[3] - 6, tb[4] - 6)
+    sh.rect(min(q0[0], q1[0]), min(q0[1], q1[1]), max(q0[0], q1[0]), max(q0[1], q1[1]), "phantom")
     for iid, t, dy in (("EL-02", "BATTERY PLINTH", -250), ("LA-11E", "BOARD", 0), ("EL-04", "INVERTER", 0)):
         b = lay.find(iid).box
         if iid == "EL-02":
@@ -704,11 +704,22 @@ def _is_frame(g: dict) -> bool:
 
 def _frame(sh, pr, g: dict, xy, fits: dict, cells: bool = True):
     """A transit frame in plan: its packing space (medium), the rim of its frame (thin) and each run's module (thin)."""
+    from ..routes import WEDGE_SLACK, WEDGE_STACK, frame_room
     x, y = xy
     hx, hy = g["w"] / 2, g["h"] / 2
     rim = float((g.get("fit") or {}).get("rim", fits["frame_rim_mm"]))
-    sh.rect(*pr.rect3((x - hx - rim, y - hy - rim, 0, x + hx + rim, y + hy + rim, 0)), "thin")
+    rx0, ry0, rx1, ry1 = frame_room(dict(g, p=(x, y)))   # the packing and the C wedge's room (I2-33)
+    sh.rect(*pr.rect3((rx0 - rim, ry0 - rim, 0, rx1 + rim, ry1 + rim, 0)), "thin")
     sh.rect(*pr.rect3((x - hx, y - hy, 0, x + hx, y + hy, 0)), "medium")
+    if g.get("stack"):
+        far = g.get("wedge_end", "+") == "+"
+        if g["stack"] == "x":
+            a = x + hx + WEDGE_SLACK if far else x - hx - WEDGE_SLACK - WEDGE_STACK
+            wb = (a, y - hy, 0, a + WEDGE_STACK, y + hy, 0)
+        else:
+            a = y + hy + WEDGE_SLACK if far else y - hy - WEDGE_SLACK - WEDGE_STACK
+            wb = (x - hx, a, 0, x + hx, a + WEDGE_STACK, 0)
+        sh.rect(*pr.rect3(wb), "medium")
     if cells:
         from ..routes import cell_half
         for c in (g.get("cells") or {}).values():
@@ -790,6 +801,9 @@ def ct603(prj, model, bom, checks, reg, dwg):
         "EVERY PENETRATION PASSES A SEALED GLAND OR FITTING (VSB1 7.1), AND A RUN THROUGH METAL PASSES A GROMMET. THE FITTING COLUMN IS "
         "EACH GLAND'S FITTING IN data/services.yaml.",
         "THE ASSUMPTION BEHIND EACH POSITION IS THE GLAND'S est IN data/services.yaml. CT-602 AND CT-612 TAG THE RUNS AT EACH GLAND.",
+        "EACH FRAME IS 60 mm DEEP IN THE 30 mm FLOOR. G9 AND G20 STAND 30 mm ON THE FLOOR, THEIR UNDERSIDES FLUSH WITH ITS UNDERSIDE, "
+        "CLEAR OF THE RAISERS' BEARER STRIPS UNDER THEM. G15 HANGS 30 mm UNDER THE FLOOR, 5 mm FROM THE ROAD RAISER'S STRIP. "
+        "G9'S ROXTEC C WEDGE 60 (84 mm DEEP) STANDS 24 mm PROUD OF ITS FRAME, DRAWN AT THE PACKING'S END (SVC-01 TESTS ALL THREE).",
     ], size=1.42, width_chars=185)
     # ---- right column: every gland
     yb = title(sh, dwg, reg, "GLANDS IN BD-11, TRANSIT FRAMES IN BD-25 (TB-11).", "SEE THE FITTING COLUMN")
