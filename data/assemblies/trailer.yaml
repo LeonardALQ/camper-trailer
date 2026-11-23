@@ -133,6 +133,7 @@ params:
   water_full_l: 420          # the fresh tanks' net capacity, filled at camp with the transfer pump, CR45 filter and chlorine (H13)
   water_travel_l: 420        # most fresh and grey water aboard while towing: the full 420 L since the 4,000 kg plate and its 3,900 kg target (H2 and H13 as amended 23 Nov 2026), so fresh and grey together never pass what the fresh tanks hold. H21 still takes any excess over the target off it in 5 L steps. Before: 280 L, H13's 350 L at the 3,500 kg plate less 70 L by H21
   water_highway_l: 50        # owner's highway figure
+  load_sharing: 1            # the XT Air tandem in Cruisemaster's load-sharing configuration, each side's two bags on one circuit (CIS-006 rev 25, RG-01, RG-04). VSB1's 120 % rule is for non-load-sharing close-coupled axles, so MAS-02 checks the axle group load itself (H2 as amended 23 Nov 2026)
   grey_full_l: 130           # grey tank's net capacity (report 21 section 10)
   tank_z0: rail_underside_z - 20   # 20 mm below the rails since the 4,000 kg plate, on the guard below them, so the shorter rear tank keeps the 420 L
   tank_h: floor_underside_z - 10 - tank_z0
@@ -209,7 +210,6 @@ build_order:
 # the body roll until the outer bump stops land and squash, and the tyres add their own roll and their lateral give.
 stability:
   bump_gap_mm: 85            # bump stop to the chassis at ride height with the style 26 air spring (Cruisemaster XT Air guide CIS-006 rev 25)
-  load_sharing: 1            # the XT Air tandem in Cruisemaster's load-sharing configuration, each side's two bags on one circuit (CIS-006 rev 25, RG-01, RG-04). VSB1's 120 % rule is for non-load-sharing close-coupled axles, so MAS-02 checks the axle group load itself (H2 as amended 23 Nov 2026)
   bump_squash_mm: 10         # the rubber stop's own give at the overturning load (est.)
   air_spring_rate: 88        # N/mm, each air spring at its ride pressure, about 1.8 Hz on its wheel's load (est.)
   tyre_rate: 300             # N/mm, the LT265/75R16 123/120's vertical rate at trailer pressure (est.)
@@ -574,9 +574,9 @@ items:
       - {item: "Switches, fuse blocks, terminals, lugs, heat shrink, conduit, glands and ties", kg: 5.0, basis: estimate}
       - {item: "Fresh water pipework: 36 m of 12 mm PEX, 47 push-fit fittings, tank fittings, breathers and the wastes", kg: 4.0, basis: estimate}
       - {item: "General hardware: rivnuts, screws, brackets and P-clips", kg: 6.0, basis: estimate}
-      - {item: "The routed runs priced here above the three items' estimates (the 12 and 24 V wiring, the 230 V wiring and the fresh water pipework): 45.0 kg routed against 25.0 kg (bd11_routed_kg, data/routes.yaml, H28), at the routes' masses a metre, the 230 V in Prysmian's round 2C+E (I2-29)", kg: 20.0, basis: estimate}
+      - {item: "The routed runs priced here above the three items' estimates (the 12 and 24 V wiring, the 230 V wiring and the fresh water pipework): 45.1 kg routed against 25.0 kg (bd11_routed_kg, data/routes.yaml, H28), at the routes' masses a metre, the 230 V in Prysmian's round 2C+E (I2-29)", kg: 20.1, basis: estimate}
       - {item: "The six cable supports SVC-12 adds (SP-CH to SP-DK): 2.8 m of 25 x 25 x 3 mm aluminium angle at 0.38 kg a metre and its brackets 1.3 kg, the tray 0.55 kg, the channel 0.35 kg, the cleats and saddles 0.3 kg", kg: 2.5, basis: estimate}
-      - {item: "Allowance not yet given to a part, kept until the systems design: 0.4 kg, the shorter A-01 down the partition and the three raiser cables beside the raiser gave back what the cables SVC-10 sized up (I2-15 b) had taken", kg: 0.4, basis: estimate}
+      - {item: "Allowance not yet given to a part, kept until the systems design: 0.3 kg, the shorter A-01 down the partition and the three raiser cables beside the raiser gave back what the cables SVC-10 sized up (I2-15 b) had taken, and the runs tied to the parts they clear at the 4,000 kg plate's axle took 0.1 kg", kg: 0.3, basis: estimate}
     note: "The older block model's 60 kg (report 12 section 10), listed line by line (est.). The lamps, about 4 kg, are line LG-01. Reports 20 and 21 leave the house wiring and the fresh water pipework here. The jockey's spacers (DB-08), the diesel tank's cradle (UF-06B) and the side marker mounts (LG-02), 2.4 kg, came out of the allowance (H27)"
   - id: BD-25
     name: Floor transit frames G9, G15 and G20, Roxtec RM modules in 4 mm aluminium frames bonded into the floor's cut-outs (data/services.yaml)

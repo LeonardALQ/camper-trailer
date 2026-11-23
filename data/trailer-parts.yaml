@@ -114,10 +114,10 @@ lines:
   - id: GLV-01
     group: chassis
     name: Hot-dip galvanising to AS/NZS 4680 of the welded chassis and drawbar, the stone guard frame and the mud flap hangers
-    qty: 510
+    qty: 531
     unit: kg galvanised
     covers: [CH-G01]
-    price: {aud_each: 2.75, basis: estimate, url: "https://www.steel.org.au/getattachment/2f694ebb-98a7-4273-be94-e0f61bd74328/Cost-factors-for-hot-dip-galvanised-coatings_INGALSM3.pdf", date: 2026-11-21, note: "487.7 kg of steel, 15.3 kg of zinc and 7.2 kg of guard frame and hangers. Galvanisers charge by the galvanised mass. The industry's AUD 1.20/kg for light fabrications is an older figure, so AUD 2.75/kg allows for rises and a one-off frame (research report 22). The bath must take a 6.3 x 2.4 m frame"}
+    price: {aud_each: 2.75, basis: estimate, url: "https://www.steel.org.au/getattachment/2f694ebb-98a7-4273-be94-e0f61bd74328/Cost-factors-for-hot-dip-galvanised-coatings_INGALSM3.pdf", date: 2026-11-21, note: "507.7 kg of steel with the 4 mm rails (CHS-08A at the 4,000 kg plate), 15.9 kg of zinc and 7.2 kg of guard frame and hangers. Galvanisers charge by the galvanised mass. The industry's AUD 1.20/kg for light fabrications is an older figure, so AUD 2.75/kg allows for rises and a one-off frame (research report 22). The bath must take a 6.3 x 2.4 m frame"}
   # ================================================================ running gear service
   - id: ALN-01
     group: running_gear
