@@ -106,11 +106,11 @@ lines:
     price: {aud_each: 95.65, basis: listing, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/15-shs-mild-steel-square.html", date: 2026-11-20, note: "SKU SHS25. 0.8 m needed"}
   - id: STL-08
     group: chassis
-    name: Profile-cut plate parts, grade 350, cut and drilled, for the coupling plate, lugs, gussets, pads, cleats, brackets and the 32 body mount nut plates
-    qty: 58
+    name: Profile-cut plate parts, grade 350, cut and drilled, for the coupling plate, lugs, gussets, pads, cleats, brackets, the rails' end plates and the 32 body mount nut plates
+    qty: 60
     unit: kg
-    covers: [CH-P01, CH-P02, CH-P03, CH-P04, CH-P05, CH-P06, CH-P07, CH-P09, CH-P11, CH-P14]
-    price: {aud_each: 12, basis: estimate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/374-mild-steel-sheet-plates-250gr-as-nzs-3678.html", date: 2026-11-21, note: "49.6 kg of plate in the schedule (ARK's corner steady brackets come with the steadies, CH-B01) and eight 150 x 150 x 6 plan-brace gussets of 8.5 kg. Plate is listed at AUD 3.05 to 3.44/kg as sheet. AUD 12/kg covers nesting scrap and laser or plasma cutting and drilling of small thick parts"}
+    covers: [CH-P01, CH-P02, CH-P03, CH-P04, CH-P05, CH-P06, CH-P07, CH-P09, CH-P11, CH-P14, CH-P15]
+    price: {aud_each: 12, basis: estimate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/374-mild-steel-sheet-plates-250gr-as-nzs-3678.html", date: 2026-11-21, note: "51.6 kg of plate in the schedule with the rails' 16 mm end plates CH-P15 (ARK's corner steady brackets come with the steadies, CH-B01) and eight 150 x 150 x 6 plan-brace gussets of 8.5 kg, so 60 kg where it was 58 kg before CH-P15 (I2-51). Plate is listed at AUD 3.05 to 3.44/kg as sheet. AUD 12/kg covers nesting scrap and laser or plasma cutting and drilling of small thick parts"}
   - id: GLV-01
     group: chassis
     name: Hot-dip galvanising to AS/NZS 4680 of the welded chassis and drawbar, the stone guard frame and the mud flap hangers
@@ -140,7 +140,8 @@ lines:
       - {item: "Six amber side marker lamps with built-in reflectors", aud: 150, basis: estimate, date: 2026-11-21}
       - {item: "Hooded number plate lamp, and the plate's bracket and rivnuts", aud: 65, basis: estimate, date: 2026-11-21}
       - {item: "Lamp loom: 32 m of 7-core trailer cable, a junction box at the front, glands, grommets and heat shrink", aud: 194.50, basis: estimate, date: 2026-11-22, note: "Was 25 m at AUD 170. The routes give 31.9 m (data/routes.yaml, H28), so 7 m more at AUD 3.50/m"}
-      - {item: "Brake circuit K-10: 4.8 m of 16 mm2 red and black tinned singles with the brake request and breakaway pair taped to them, and two 80 mm junction boxes under CM-05", aud: 143, basis: estimate, url: "https://www.solar4rvs.com.au", date: 2026-11-23, note: "The routed AUD 83 (data/routes.yaml kind brake, AUD 0.45 a mm2 and metre with 10 % waste) and AUD 30 a junction box with its glands (est.). Bosch's axle harness K-11 and K-12 is in the TSC kit (RG-03)"}
+      - {item: "Brake circuit K-10: 4.8 m of 25 mm2 red and black tinned singles for the TSC's supply with the brake request and breakaway pair taped to them, and two 80 mm junction boxes under CM-05", aud: 186, basis: estimate, url: "https://www.solar4rvs.com.au", date: 2026-11-23, note: "The routed AUD 126 (data/routes.yaml kind brake, AUD 0.45 a mm2 and metre with 10 % waste) and AUD 30 a junction box with its glands (est.). 25 mm2 so that it and the SB50's lead K-14 hold the TSC's supply within 2 % (I2-50). Bosch's axle harness K-11 and K-12 is in the TSC kit (RG-03), the drums' leads K-15 to K-18A with the drums (RG-01)"}
+      - {item: "The leads between the vehicles: the 12-pin flat plug on 1.0 m of 12-core trailer cable (K-13), and an Anderson SB50 plug with 8 AWG contacts on 1.0 m of 8 B&S twin for the TSC's supply (K-14)", aud: 58, basis: estimate, date: 2026-11-23, note: "ARK's FPP12 plug about AUD 25 (est.), its small pins rated 15 A and its large pins 30 A (ARK catalogue 2024, page 20), the SB50 plug about AUD 15 (est.), and the routed AUD 18 for the two cables (data/routes.yaml kinds lamp12 and sb50, with 10 % waste) (I2-50)"}
     note: Its mass is line LG-01 of the mass schedule, about 5.3 kg (est.) with the brake circuit's pair, taken out of BD-11's allowance. Leonard fits it.
   # ================================================================ licensed trades
   - id: ELI-01

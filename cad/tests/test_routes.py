@@ -346,3 +346,51 @@ def test_k08_and_k09_pass_into_the_outriggers_clear_of_the_seams():
             x0, _, z0, x1, _, _ = boxes[h["member"]]
             assert min(h["x"] - h["length"] / 2 - x0, x1 - h["x"] - h["length"] / 2) >= 10, h
             assert h["z"] - h["d"] / 2 - z0 >= 20, h
+
+
+def test_the_trap_valve_lies_along_the_wet_face_at_its_real_size():
+    """I2-52: TV-09 is the HepvO 32 mm with its knuckle adaptor, its outlet bend and hose tail, lying along the wet face
+    (its long side across the trailer), at least Wavin's 181 mm valve and 64 mm inlet nut, clear of the partition, and
+    W-09 runs through it along that face and falls all the way."""
+    tv = RES["fixtures"]["TV-09"]["box"]
+    wet = RES["V"]["wet_x0"]
+    assert tv[4] - tv[1] >= 181 + 69 and min(tv[3] - tv[0], tv[5] - tv[2]) >= 64, tv
+    assert tv[0] >= wet, (tv, wet)
+    w09 = next(r for r in RES["runs"] if r["id"] == "W-09")
+    along = [(a, b) for a, b in zip(w09["points"], w09["points"][1:]) if abs(b[1] - a[1]) > 200]
+    assert along and all(tv[0] <= a[0] <= tv[3] and b[2] < a[2] for a, b in along), w09["points"]
+
+
+def test_the_brake_supply_counts_its_lead_and_the_leads_ride():
+    """I2-50: K-10's drop includes the SB50's lead K-14 ahead of it (`follows`) within the 2 %, the two leads between the
+    vehicles ride there, and every drum lead's arm part rides its arm and joins its sprung part at its clip."""
+    by = {r["id"]: r for r in RES["runs"]}
+    k10, k14 = by["K-10"], by["K-14"]
+    mv = lambda r: RES["kinds"][r["kind"]]["sizes"][r["size"]]["mv_am"]  # noqa: E731
+    want = (mv(k10) * k10["length_m"] + mv(k14) * k14["length_m"]) * k10["amps"] / 1000
+    assert k10["follows"] == ["K-14"] and k10["vd_v"] == pytest.approx(want, abs=0.002)
+    assert k10["vd_pct"] <= RES["data"]["rules"]["drop_pct"]
+    assert by["K-13"]["rides"] == by["K-14"]["rides"] == "between"
+    arms = [r for r in RES["runs"] if r.get("rides") == "arm"]
+    assert len(arms) == 4
+    for r in arms:
+        sprung = by[r["joins"]]
+        assert math.dist(r["points"][0], sprung["points"][-1]) < 1.0, r["id"]
+        assert r["vd_pct"] <= RES["data"]["rules"]["drop_pct"], r["id"]
+
+
+def test_the_drum_leads_arm_parts_clear_fit05():
+    """I2-50: FIT-05 sweeps the drum leads' arm parts with the arms and they keep its 50 mm."""
+    from cad.tests.test_trailer import TRAILER
+    t = TRAILER.tyre_arc(LAY)
+    assert t["lead_gap_mm"] is not None and t["lead_gap_mm"] >= 50.0, t["detail"]
+
+
+def test_d14_runs_between_the_jockey_spacer_tubes():
+    """I2-53: the routes take DB-08 as its four tubes, and D-14 runs level between their rows beside the jockey."""
+    tubes = [b for b in RES["blocks"] if b["id"] == "DB-08"]
+    assert len(tubes) == 4
+    d14 = next(r for r in RES["runs"] if r["id"] == "D-14")
+    near = [p for p, _ in R._samples(d14["dense"], 10.0) if 880 <= p[0] <= 1120]
+    rows = sorted({round(b["box"][2]) for b in tubes})
+    assert near and all(rows[0] + 25 + d14["od"] / 2 <= p[2] <= rows[1] - d14["od"] / 2 for p in near), (rows, near[:3])

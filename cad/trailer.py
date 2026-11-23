@@ -112,6 +112,11 @@ def _box(x0, y0, z0, dx, dy, dz):
     return (min(x0, x0 + dx), min(y0, y0 + dy), min(z0, z0 + dz), max(x0, x0 + dx), max(y0, y0 + dy), max(z0, z0 + dz))
 
 
+def _short(name: str) -> str:
+    """A part's or fixture's name up to its first comma and space, so a figure such as "X 1,790" stays whole (I2-56)."""
+    return name.split(", ")[0]
+
+
 def _bar_box(bar) -> tuple:
     """The box round a member that runs at an angle in plan: its plan rectangle's corners and its depth."""
     (x0, y0, z0), (x1, y1, z1) = bar["p0"], bar["p1"]
@@ -673,17 +678,66 @@ class Trailer:
         w = lay.V["tyre_w"]
         members = tyre_clearance(ch, [(m.id + " " + m.name, m.box()) for m in ch.members], w)
         res = self.routes(lay)
-        boxes = [(f"{b.name.split(',')[0]} ({b.iid})", bx) for b, bx in lay.sprung_boxes()]
-        boxes += [(f"{f['what'].split(',')[0]} ({k})", tuple(f["box"])) for k, f in res["fixtures"].items() if f.get("box")]
-        points = [(f"run {r['id']}", p, r["od"] / 2) for r in res["runs"] for p, _ in R._samples(r["dense"], 10.0)]
+        boxes = [(f"{_short(b.name)} ({b.iid})", bx) for b, bx in lay.sprung_boxes()]
+        boxes += [(f"{_short(f['what'])} ({k})", tuple(f["box"])) for k, f in res["fixtures"].items() if f.get("box") and not f.get("rides")]
+        points = [(f"run {r['id']}", p, r["od"] / 2) for r in res["runs"] if not r.get("rides") for p, _ in R._samples(r["dense"], 10.0)]
         s = wheel_sweep(ch, w, boxes, points)
+        lead = self._lead_sweep(ch, w, res, boxes, points)
         who = lambda b: f"the {b['part']} {b['wheel']} at {b['travel_mm']:+.0f} mm travel to {b['what']}"  # noqa: E731
         t, a = s["tyre"], s["arm"]
-        return dict(gap_mm=s["gap_mm"], governing=who(s), tyre_gap_mm=t["gap_mm"], arm_gap_mm=a["gap_mm"],
+        worst = s if lead is None or s["gap_mm"] <= lead["gap_mm"] else lead
+        leads = "" if lead is None else f", and the drum leads' arm parts {lead['gap_mm']:.1f} mm ({who(lead)})"
+        return dict(gap_mm=worst["gap_mm"], governing=who(worst), tyre_gap_mm=t["gap_mm"], arm_gap_mm=a["gap_mm"],
+                    lead_gap_mm=None if lead is None else lead["gap_mm"],
                     members_gap_mm=members["gap_mm"], members_governing=f"tyre {members['tyre']} to {members['member']}",
                     near=s["near"][:8], parts=len(boxes), run_points=len(points),
-                    detail=(f"{s['gap_mm']:.1f} mm, {who(s)}. The tyres' least is {t['gap_mm']:.1f} mm ({who(t)}) and the arms' "
-                            f"{a['gap_mm']:.1f} mm ({who(a)}), over {len(boxes)} rigid parts and fixtures and every run"))
+                    detail=(f"{worst['gap_mm']:.1f} mm, {who(worst)}. The tyres' least is {t['gap_mm']:.1f} mm ({who(t)}), the arms' "
+                            f"{a['gap_mm']:.1f} mm ({who(a)}){leads}, over {len(boxes)} rigid parts and fixtures and every run"))
+
+    def _lead_sweep(self, ch, tyre_w: float, res: dict, boxes: list, points: list, steps: int = 25, reach: float = 150.0) -> dict | None:
+        """FIT-05 for the drum leads' arm parts (`rides: arm`, I2-50): each point of the part turns with its wheel's arm
+        about the pivot through the arm's travel, against the rigid parts and fixtures and every run, as the arm does,
+        but its own clip and its own sprung part (`joins`), which it is one cable with."""
+        from . import routes as R
+        from .chassis import swept_parts
+        riders = [r for r in res["runs"] if r.get("rides") == "arm"]
+        if not riders:
+            return None
+        travel = ch.V["travel"]
+        travels = [-travel + 2 * travel * k / steps for k in range(steps + 1)]
+
+        def arm_at(s):
+            return {p["wheel"]: p for p in swept_parts(ch, tyre_w, s) if p["part"] == "arm"}
+
+        angle = lambda p: math.atan2(p["hub"][1] - p["pivot"][1], p["hub"][0] - p["pivot"][0])  # noqa: E731
+        rest = arm_at(0.0)
+        turns = {s: {wid: angle(p) - angle(rest[wid]) for wid, p in arm_at(s).items()} for s in travels}
+        best = None
+        for r in riders:
+            (px, pz), rq = rest[r["wheel"]]["pivot"], r["od"] / 2
+            own = {f"run {r['id']}", f"run {r.get('joins')}"}
+            ends = {r["from"]["line"], r["to"]["line"]}
+            pts = [p for p, _ in R._samples(r["dense"], 10.0)]
+            lo = [min(p[i] for p in pts) - reach for i in range(3)]
+            hi = [max(p[i] for p in pts) + reach for i in range(3)]
+            nb = [(n, b) for n, b in boxes if not any(n.endswith(f"({e})") for e in ends)
+                  and all(b[i] <= hi[i] and b[i + 3] >= lo[i] for i in range(3))]
+            nq = [(n, q, rr) for n, q, rr in points if n not in own and all(lo[i] <= q[i] <= hi[i] for i in range(3))]
+            for s in travels:
+                da = turns[s][r["wheel"]]
+                c, sn = math.cos(da), math.sin(da)
+                for q in pts:
+                    dx, dz = q[0] - px, q[2] - pz
+                    p = (px + dx * c - dz * sn, q[1], pz + dx * sn + dz * c)
+                    for n, b in nb:
+                        g = R._pt_box(p, b) - rq
+                        if best is None or g < best["gap_mm"]:
+                            best = dict(gap_mm=g, part=f"lead {r['id']}", wheel=r["wheel"], travel_mm=s, what=n)
+                    for n, q2, r2 in nq:
+                        g = math.dist(p, q2) - rq - r2
+                        if best is None or g < best["gap_mm"]:
+                            best = dict(gap_mm=g, part=f"lead {r['id']}", wheel=r["wheel"], travel_mm=s, what=n)
+        return best
 
     def underside_items(self, lay) -> list[tuple]:
         """I2-41: what the running clearance (DIM-04, DIM-06) and the breakover (DIM-07) look at, as (name, line, box):
@@ -693,7 +747,7 @@ class Trailer:
         from . import routes as R
         res = self.routes(lay)
         out = lay.underside_items()
-        out += [(f"{f['what'].split(',')[0]} ({k})", k, tuple(f["box"])) for k, f in res["fixtures"].items() if f.get("box")]
+        out += [(f"{_short(f['what'])} ({k})", k, tuple(f["box"])) for k, f in res["fixtures"].items() if f.get("box") and not f.get("rides")]
         for r in res["runs"]:
             if r.get("rides"):
                 continue

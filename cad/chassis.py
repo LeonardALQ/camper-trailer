@@ -890,6 +890,8 @@ def fitting_boxes(ch: Chassis, f: Fitting) -> list[tuple]:
     if "box" in spec:
         x0, y0, z0, dx, dy, dz = ch.P.eval(spec["box"], {})
         return [(x0, y0, z0, x0 + dx, y0 + dy, z0 + dz)]
+    if "boxes" in spec:   # a plate along a slanted member as axis-aligned boxes stepping along its line (CH-P03)
+        return [(x0, y0, z0, x0 + dx, y0 + dy, z0 + dz) for x0, y0, z0, dx, dy, dz in (ch.P.eval(b, {}) for b in spec["boxes"])]
     if spec.get("poses") == "steadies":
         return [p["travel"] for p in ch.steady_poses()]
     if f.kind == "strip":

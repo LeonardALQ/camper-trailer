@@ -1,7 +1,7 @@
 """I2-38: every live text that names the water the trailer tows with names `water_travel_l` (data/assemblies/trailer.yaml),
 and the days it says the water lasts follow from it.
 
-The live texts are the measurement sheet, the parts list, the load cases' other texts, TRAILER.md but its decision list,
+The live texts are the measurement sheet, the parts list, the load cases' other texts, TRAILER.md with its decision list (I2-56),
 and the Trailer and Measurements pages. A sentence about an earlier plate or an earlier figure ("was", "before", "until",
 "the 3,500 kg plate") is history and is left alone. Each load case's own text names that case's water instead: its fresh
 water `water_l`, its grey water if it carries the grey tank, and the two together.
@@ -44,8 +44,7 @@ def _live_texts():
         yield from _strings(yaml.safe_load((ROOT / "data" / name).read_text(encoding="utf-8")), name)
     yield from _strings({k: v for k, v in CASES.items() if k != "trailer_cases"}, "load_cases.yaml")
     for s in re.split(r"(?m)^## ", (ROOT / "TRAILER.md").read_text(encoding="utf-8")):
-        if not s.startswith("Decisions"):
-            yield f"TRAILER.md ## {s.splitlines()[0] if s else ''}", s
+        yield f"TRAILER.md ## {s.splitlines()[0] if s else ''}", s
     for p in PAGES:
         if (ROOT / p).exists():
             yield p, (ROOT / p).read_text(encoding="utf-8")

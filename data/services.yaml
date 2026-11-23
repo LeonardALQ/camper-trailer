@@ -67,10 +67,10 @@ fittings:
 # members (I2-41): C9B and B-05 under the XT Air box and out through the rails 35 mm behind CM-01, E-07 and B-04
 # behind the box and ahead of CM-02 and the plan braces.
 holes:
-  - {member: OR-05K, face: road side, run: K-08, x: 4493, y: -638, z: 826, d: 16, length: 16}
-  - {member: OR-05K, face: kerb side, run: K-08, x: 4493, y: -1200, z: 800, d: 16, length: 16}
-  - {member: OR-05R, face: kerb side, run: K-09, x: 4493, y: 638, z: 811, d: 16, length: 16}
-  - {member: OR-05R, face: road side, run: K-09, x: 4493, y: 1200, z: 800, d: 16, length: 16}
+  - {member: OR-05K, face: road side, run: K-08, x: 4491, y: -638, z: 826, d: 16, length: 16}
+  - {member: OR-05K, face: kerb side, run: K-08, x: 4491, y: -1200, z: 800, d: 16, length: 16}
+  - {member: OR-05R, face: kerb side, run: K-09, x: 4491, y: 638, z: 811, d: 16, length: 16}
+  - {member: OR-05R, face: road side, run: K-09, x: 4491, y: 1200, z: 800, d: 16, length: 16}
   - {member: RL-K, face: road side, run: C9B, x: 1915, y: -588, z: 704, d: 16, length: 16}
   - {member: RL-K, face: kerb side, run: C9B, x: 1915, y: -637, z: 704, d: 16, length: 16}
   - {member: RL-K, face: kerb side, run: E-07, x: 2241, y: -637, z: 700, d: 20, length: 23}
@@ -80,18 +80,18 @@ holes:
   - {member: RL-R, face: kerb side, run: B-05, x: 1905, y: 588, z: 704, d: 14, length: 14}
   - {member: RL-R, face: road side, run: B-05, x: 1905, y: 637, z: 704, d: 14, length: 14}
   - {member: RL-R, face: road side, run: K-01, x: 2360, y: 637, z: 671, d: 16, length: 39}
-  - {member: RL-R, face: road side, run: K-10, x: 2446, y: 637, z: 646, d: 27, length: 36}
-  - {member: RL-R, face: road side, run: K-10, x: 3395, y: 637, z: 647, d: 27, length: 56}
+  - {member: RL-R, face: road side, run: K-10, x: 2442, y: 637, z: 649, d: 30, length: 51}
+  - {member: RL-R, face: road side, run: K-10, x: 3423, y: 637, z: 647, d: 30, length: 47}
   - {member: RL-R, face: road side, run: K-01, x: 6021, y: 637, z: 680, d: 16, length: 25}
   - {member: RS-K, face: road side, run: B-18, x: 2015, y: -587, z: 840, d: 14, length: 54}
   - {member: RS-K, face: road side, run: B-16, x: 2267, y: -587, z: 796, d: 28, length: 103}
   - {member: RS-K, face: kerb side, run: D-14, x: 2291, y: -638, z: 822, d: 24, length: 74}
-  - {member: RS-K, face: kerb side, run: K-08, x: 4493, y: -638, z: 826, d: 16, length: 16}
+  - {member: RS-K, face: kerb side, run: K-08, x: 4491, y: -638, z: 826, d: 16, length: 16}
   - {member: RS-K, face: road side, run: D-14, x: 4669, y: -587, z: 806, d: 24, length: 58}
   - {member: RS-K, face: road side, run: B-16, x: 4840, y: -587, z: 800, d: 28, length: 66}
   - {member: RS-K, face: road side, run: B-18, x: 4952, y: -587, z: 840, d: 14, length: 31}
   - {member: RS-K, face: road side, run: K-08, x: 5996, y: -587, z: 826, d: 16, length: 23}
-  - {member: RS-R, face: road side, run: K-09, x: 4493, y: 638, z: 811, d: 16, length: 16}
+  - {member: RS-R, face: road side, run: K-09, x: 4491, y: 638, z: 811, d: 16, length: 16}
   - {member: RS-R, face: kerb side, run: K-09, x: 5988, y: 587, z: 811, d: 16, length: 33}
 cutouts:
   - {panel: BD-01, gland: G9, x: 3400, y: 535, w: 68, h: 167}
