@@ -469,9 +469,9 @@ def _blocks_of(lay) -> tuple[dict, list]:
     D-ring, and each corner steady over the box its leg sweeps from folded for travel to standing at 90 degrees."""
     bl = []
     for b in lay.blocks:
-        if b.box is None:
-            continue
         tubes = spacer_tubes(lay, b)
+        if b.box is None and not tubes:
+            continue
         if tubes:   # the jockey's spacers as the four tubes they are, so a run may pass between their rows (I2-53)
             bl += [dict(iid=f"{b.iid} #{k}", id=b.id, name=f"{b.name.split(', ')[0]}, tube {k}", system=b.system, box=bx, hollow=False,
                         keep_clear=False, role=None) for k, bx in enumerate(tubes, 1)]

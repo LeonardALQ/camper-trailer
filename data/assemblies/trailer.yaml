@@ -130,7 +130,7 @@ params:
   # ---------------------------------------------------------------- axle (solved)
   axle_x: 4381               # axle group centre from the ball. The build solves it: the middle of the towball window (H17)
   # ---------------------------------------------------------------- water (H13)
-  water_full_l: 400          # the fresh tanks' net capacity, filled at camp with the transfer pump, CR45 filter and chlorine (H13): 401.5 L net (est.) by the grey tank's rule, Layout.tank_nets, in H21's 5 L steps (I2-40). It was 420 L, more than the tanks' 416.6 L inside
+  water_full_l: 400          # the fresh tanks' net capacity, filled at camp with the transfer pump, CR45 filter and chlorine (H13): 401.4 L net (est.) by the grey tank's rule, Layout.tank_nets, in H21's 5 L steps (I2-40). It was 420 L, more than the tanks' 416.6 L inside
   water_travel_l: 400        # most fresh and grey water aboard while towing: the fresh tanks' whole net, 400 L (I2-40), since the 4,000 kg plate and its 3,900 kg target (H2 and H13 as amended 23 Nov 2026), so fresh and grey together never pass what the fresh tanks hold. H21 still takes any excess over the target off it in 5 L steps. Before: 280 L, H13's 350 L at the 3,500 kg plate less 70 L by H21
   water_highway_l: 50        # owner's highway figure
   load_sharing: 1            # the XT Air tandem in Cruisemaster's load-sharing configuration, each side's two bags on one circuit (CIS-006 rev 25, RG-01, RG-04). VSB1's 120 % rule is for non-load-sharing close-coupled axles, so MAS-02 checks the axle group load itself (H2 as amended 23 Nov 2026)
@@ -142,12 +142,12 @@ params:
   tank_f_x0: axle_x + xt_front_hinge_rear + 10
   tank_f_l: xt_centre_front - 10 - (xt_front_hinge_rear + 10)          # 830 mm
   tank_r_x0: axle_x + xt_centre_front + xm_w + 10
-  tank_r_l: min(xt_rear_shock_front - 10, wet_x0 - axle_x) - (xt_centre_front + xm_w + 10)   # to 10 mm ahead of the XT rear shock crossmember, or to the wet room's front (145 mm ahead of the shower well WR-10) if that is nearer, so the board's 230 V and 48 V runs from G20 cross to G15 behind it, ahead of G13's waste (I2-22): 676.8 mm at X 4,487.2 (760 mm before the 4,000 kg plate)
+  tank_r_l: min(xt_rear_shock_front - 10, wet_x0 - axle_x) - (xt_centre_front + xm_w + 10)   # to 10 mm ahead of the XT rear shock crossmember, or to the wet room's front (145 mm ahead of the shower well WR-10) if that is nearer, so the board's 230 V and 48 V runs from G20 cross to G15 behind it, ahead of G13's waste (I2-22): 676.5 mm at X 4,487.5 (760 mm before the 4,000 kg plate)
   grey_x0: axle_x + xt_rear_shock_front + xm_w + 10   # grey tank in the rear bay, behind the XT rear shock crossmember
-  grey_l: body_x1 - xm_w - 50 - grey_x0   # to 50 mm ahead of the rear crossmember, where the lamp looms K-01, K-08 and K-09 rise, so it follows the axle: 781.8 mm at X 4,487.2 (890 mm at X 4,379.9 before the 4,000 kg plate)
+  grey_l: body_x1 - xm_w - 50 - grey_x0   # to 50 mm ahead of the rear crossmember, where the lamp looms K-01, K-08 and K-09 rise, so it follows the axle: 781.5 mm at X 4,487.5 (890 mm at X 4,379.9 before the 4,000 kg plate)
   grey_w: 1040               # wider than the fresh tanks: the rear bay has no airbag or shock mount, and the rear recovery tongues stand 22 mm outboard of it
   grey_z0: rail_underside_z - 44   # 44 mm below the rails, so the grey-bay floor crossmember crosses its middle above it and the guard stays inside the underfloor zone
-  grey_h: 194                # 769.8 x 1,028 x 182 mm inside at X 4,487.2, 135.1 L net with its baffle and a 10 mm air gap (report 21 asks 130 L). Wider and 4 mm deeper than before the 4,000 kg plate, for the bay 126 mm shorter
+  grey_h: 194                # 769.5 x 1,028 x 182 mm inside at X 4,487.5, 135.0 L net with its baffle and a 10 mm air gap (report 21 asks 130 L). Wider and 4 mm deeper than before the 4,000 kg plate, for the bay 126 mm shorter
   # ---------------------------------------------------------------- equipment (report 13)
   diesel_l: 15               # heater fuel tank (report 13 open question 6)
   diesel_tank_l: 440         # 440 x 400 x 100 mm HDPE tank, 17.6 L gross (estimate)
@@ -576,10 +576,10 @@ items:
       - {item: "Switches, fuse blocks, terminals, lugs, heat shrink, conduit, glands and ties", kg: 5.0, basis: estimate}
       - {item: "Fresh water pipework: 36 m of 12 mm PEX, 47 push-fit fittings, tank fittings, breathers and the wastes", kg: 4.0, basis: estimate}
       - {item: "General hardware: rivnuts, screws, brackets and P-clips", kg: 6.0, basis: estimate}
-      - {item: "The routed runs priced here above the three items' estimates (the 12 and 24 V wiring, the 230 V wiring and the fresh water pipework): 44.7 kg routed against 25.0 kg (bd11_routed_kg, data/routes.yaml, H28), at the routes' masses a metre, the 230 V in Prysmian's round 2C+E (I2-29)", kg: 19.7, basis: estimate}
+      - {item: "The routed runs priced here above the three items' estimates (the 12 and 24 V wiring, the 230 V wiring and the fresh water pipework): 44.8 kg routed against 25.0 kg (bd11_routed_kg, data/routes.yaml, H28), at the routes' masses a metre, the 230 V in Prysmian's round 2C+E (I2-29)", kg: 19.8, basis: estimate}
       - {item: "The six cable supports SVC-12 adds (SP-CH to SP-DK): 2.8 m of 25 x 25 x 3 mm aluminium angle at 0.38 kg a metre and its brackets 1.3 kg, the tray 0.55 kg, the channel 0.35 kg, the cleats and saddles 0.3 kg", kg: 2.5, basis: estimate}
       - {item: "The supports SVC-12 adds inside the bench and the 230 V's conduits under the floor (I2-36): 2.2 m of angle at 0.38 kg a metre with its standoffs, brackets and clips 1.06 kg, 9.7 m of corrugated conduit at 0.09 to 0.22 kg a metre 1.16 kg, the saddles and adaptors 0.24 kg", kg: 2.5, basis: estimate}
-      - {item: "Allowance not yet given to a part, kept until the systems design: 0.7 kg, the shorter A-01 down the partition and the three raiser cables beside the raiser gave back what the cables SVC-10 sized up (I2-15 b) had taken, and the runs tied to the parts they clear at the 4,000 kg plate's axle took 0.1 kg. The Combi's water lines above the floor, 1.2 m shorter, gave 0.1 kg back (I2-33). G20's runs re-laid for its 120 mm packing and the front bay's cables through the rails gave 0.3 kg back (I2-33, I2-41)", kg: 0.7, basis: estimate}
+      - {item: "Allowance not yet given to a part, kept until the systems design: 0.6 kg, the shorter A-01 down the partition and the three raiser cables beside the raiser gave back what the cables SVC-10 sized up (I2-15 b) had taken, and the runs tied to the parts they clear at the 4,000 kg plate's axle took 0.1 kg. The Combi's water lines above the floor, 1.2 m shorter, gave 0.1 kg back (I2-33). G20's runs re-laid for its 120 mm packing and the front bay's cables through the rails gave 0.3 kg back (I2-33, I2-41), and the tray's drain along the wet face took 0.1 kg (I2-52)", kg: 0.6, basis: estimate}
     note: "The older block model's 60 kg (report 12 section 10), listed line by line (est.). The lamps, about 4 kg, are line LG-01. Reports 20 and 21 leave the house wiring and the fresh water pipework here. The jockey's spacers (DB-08), the diesel tank's cradle (UF-06B) and the side marker mounts (LG-02), 2.4 kg, came out of the allowance (H27)"
   - id: BD-25
     name: Floor transit frames G9, G15 and G20, Roxtec RM modules in 4 mm aluminium frames bonded into the floor's cut-outs (data/services.yaml)
