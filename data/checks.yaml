@@ -470,12 +470,12 @@ trailer_checks:
     inputs: []
     why: "Report 11 LC10 and section 3.4. IIW 323, FAT 90. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
   - id: FAT-07
-    title: "Fatigue, Drawbar root at the body front, profiled gusset with a ground radius"
+    title: "Fatigue, Drawbar root gusset's toe with its ground radius"
     type: chassis_fatigue
     item: FAT-07
     severity: report
     inputs: []
-    why: "Report 11 LC10 and section 3.4. IIW 526, FAT 90. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+    why: "Report 11 LC10 and section 3.4. IIW 526, FAT 90, a profiled gusset with a ground 160 mm radius, whose nominal stress is the drawbar member's own where the radius meets it, 270 mm ahead of the body front. Behind the toe the gusset deepens the section over the mitred butt weld at the body front, and CHASSIS.md gives the member's range there for the engineer. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
   - id: FAT-08
     title: "Fatigue, End of the drawbar overlap under the rail, sniped taper, toe ground"
     type: chassis_fatigue
