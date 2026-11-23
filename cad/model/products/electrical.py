@@ -2,7 +2,7 @@
 on the partition and the Victron gear on its back board, and the GX Touch 50 on the cabinet's door."""
 from __future__ import annotations
 
-from . import BLACK, DARK, GREY, PLY, STEEL, WHITE, product
+from . import ALU, BLACK, DARK, GREY, PLY, STEEL, WHITE, product
 
 VICTRON, VGREY = "#2f5d9e", "#d0d3d4"
 # each unit's size on the board: width along the board, height, depth off the board (mm, Victron's datasheets, est.)
@@ -78,3 +78,38 @@ def gx_touch(fr, V, sp, b):
 def board_panel(fr, V, sp, b):
     """The 12 mm ply board panel on the board cabinet's back, which the Victron gear screws to."""
     return [("board panel", fr.box(0, 0, 0, fr.W, fr.D, fr.H), "#f5eedc", 1.0)]
+
+
+@product("transit_frames")
+def transit_frames(fr, V, sp, b):
+    """The floor's three transit frames G9, G15 and G20 at their real depth (I2-34): each frame's 4 mm walls round its
+    packing space and its C wedge's room, 60 mm deep like its Roxtec RM modules, the modules filling the packing, its
+    rim on the floor's top face and its C wedge, 84 mm deep. They are the same solids SVC-01 tests (cad/routes.py
+    frame_solids), placed from data/services.yaml, inside the line's envelope."""
+    import yaml
+    from build123d import Box, Pos
+
+    from ... import routes as R
+
+    def solid(bx):
+        return Pos((bx[0] + bx[3]) / 2, (bx[1] + bx[4]) / 2, (bx[2] + bx[5]) / 2) * Box(bx[3] - bx[0], bx[4] - bx[1], bx[5] - bx[2])
+
+    svc = yaml.safe_load((R.DATA / "services.yaml").read_text(encoding="utf-8"))
+    res = dict(V=V, svc=svc, glands=R.gland_points(V, svc["glands"]))
+    wall = float(svc["fittings"]["frame_wall_mm"])
+    parts = R.frame_solids(res)
+    out = []
+    for f in parts:
+        x0, y0, z0, x1, y1, z1 = f["box"]
+        if f["part"] == "body":
+            room = (x0 + wall, y0 + wall, z0 - 1, x1 - wall, y1 - wall, z1 + 1)
+            out.append((f"{f['gland']} frame walls, 4 mm aluminium", solid(f["box"]) - solid(room), ALU, 1.0))
+            mods = solid((room[0], room[1], z0, room[3], room[4], z1))
+            for w in (p for p in parts if p["gland"] == f["gland"] and p["part"] == "C wedge"):
+                mods = mods - solid((w["box"][0], w["box"][1], z0 - 1, w["box"][3], w["box"][4], z1 + 1))
+            out.append((f"{f['gland']} Roxtec RM modules", mods, BLACK, 1.0))
+        elif f["part"] == "rim":
+            out.append((f"{f['gland']} frame rim on the floor", solid(f["box"]), ALU, 1.0))
+        else:
+            out.append((f"{f['gland']} Roxtec C wedge", solid(f["box"]), STEEL, 1.0))
+    return out

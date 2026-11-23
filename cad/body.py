@@ -494,7 +494,7 @@ class Body:
             w26 = max(cuts, key=lambda c: c["util"])
             out.append(dict(id="BDY-26", what=f"Floor round its {len(cuts)} cut-outs over 60 mm, with their H200 inserts", case="LC2, 3 g",
                             skin_mpa=w26["skin_mpa"], core_mpa=w26["core_mpa"], util=w26["util"], governing=f"{w26['gland']}, {w26['governing']}",
-                            extra="; ".join(c["text"] for c in cuts), defl_mm=None, cutouts=cuts))
+                            extra=". ".join(c["text"] for c in cuts), defl_mm=None, cutouts=cuts))
         self.roof_defl = rf.uniform(q / 3, V["body_width"] - V["wall_t"])["defl_mm"]
         self.floor_defl = f.one_way(ft["kg"] * G, min(ft["patch"]), span)["defl_mm"]
         self.wall_defl = w.uniform(ws["kpa"] / 1000, V["interior_h"])["defl_mm"]

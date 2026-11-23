@@ -38,7 +38,8 @@ def test_limits_are_the_rules():
     """Never move a limit to make a check pass: these are the brief's and the standards' values."""
     r = RES["data"]["rules"]
     assert (r["clear_mm"], r["segregation_mm"], r["drop_pct"], r["drop_ac_pct"], r["fall"], r["terminal_face"]["mm"]) == (20, 50, 2.0, 5.0, 0.02, 300)
-    assert set(r["terminal_face"]["exempt"]) == {"W-02", "F-10"}
+    assert set(r["terminal_face"]["exempt"]) == {"W-02", "F-10", "W-09"}   # the washer's two hoses and the drip tray's drain (I2-35), each sleeved
+    assert all(x.get("sleeve") for x in RES["runs"] if x["id"] in r["terminal_face"]["exempt"])
     sp = r["spacing"]
     assert (sp["gap_mm"], sp["over_mm"], set(sp["touch"])) == (5, 25, {"ELV", "ac230"})
     assert sp["wet"]["fresh"]["ac230"] == 25   # IB 052/2015, cold water above ground
@@ -95,7 +96,7 @@ def test_every_frame_cell_is_inside_its_frame_and_clear_of_the_others():
 
 def test_bd11s_routed_item_follows_the_routes_and_the_line_adds_to_its_total():
     """I2-19: BD-11's routed item is the routed runs' mass (bd11_routed_kg) above the three items they price, the
-    allowance not yet given to a part is the rest, and the items add to the line's 61.0 kg."""
+    allowance not yet given to a part is the rest, and the items add to the line's 63.5 kg."""
     import yaml
     items = yaml.safe_load((R.DATA / "assemblies" / "trailer.yaml").read_text(encoding="utf-8"))["items"]
     parts = next(it for it in items if it["id"] == "BD-11")["parts"]
@@ -106,7 +107,7 @@ def test_bd11s_routed_item_follows_the_routes_and_the_line_adds_to_its_total():
     assert priced == pytest.approx(25.0)
     assert item["kg"] == pytest.approx(routed - priced, abs=0.051), (item["kg"], routed)
     assert f"{routed:.1f} kg routed" in item["item"]
-    assert allow["kg"] >= 0 and sum(p["kg"] for p in parts) == pytest.approx(61.0, abs=0.001)   # 53.6 kg until SVC-10, SVC-12 and the round TPS (I2-15 b, I2-18 a, I2-29)
+    assert allow["kg"] >= 0 and sum(p["kg"] for p in parts) == pytest.approx(63.5, abs=0.001)   # 53.6 kg until SVC-10, SVC-12 and the round TPS (I2-15 b, I2-18 a, I2-29), 61.0 until the cabinets' cleats and the under-floor conduits (I2-36)
 
 
 def test_every_hole_in_a_chassis_member_and_every_large_floor_cut_out_is_listed():
@@ -123,10 +124,12 @@ def test_every_hole_in_a_chassis_member_and_every_large_floor_cut_out_is_listed(
     cuts = {c["gland"]: c for c in RES["svc"]["cutouts"]}
     for g in RES["svc"]["glands"]:
         if g["at"] == "floor":
-            w, h = (g["w"] + 8, g["h"] + 8) if g.get("w") and g.get("h") else (g["d"], g["d"])
+            room = R.frame_room(RES["glands"][g["id"]]) if g.get("w") and g.get("h") else None   # its packing and the wedge's room (I2-33)
+            w, h = (room[2] - room[0] + 8, room[3] - room[1] + 8) if room else (g["d"], g["d"])
             assert (max(w, h) > 60) == (g["id"] in cuts), g["id"]
             if g["id"] in cuts:
-                assert (cuts[g["id"]]["w"], cuts[g["id"]]["h"]) == (w, h), g["id"]
+                c = cuts[g["id"]]
+                assert (c["w"], c["h"]) == (w, h) and (c["x"], c["y"]) == ((room[0] + room[2]) / 2, (room[1] + room[3]) / 2), g["id"]
     # the kerb frame's three raiser cables stay in the raiser, clear of its seam with the rail (I2-27)
     assert not [h for h in got if h["run"] in ("B-16", "B-18", "D-14") and h["member"] == "RL-K"]
 
@@ -253,6 +256,22 @@ def test_svc10_holds_each_fuse_between_its_current_and_the_cables_rating():
     assert any(p.startswith("D-07's 200 A device is over") for p in bad), bad
 
 
+def test_svc10_fails_a_loaded_cable_with_no_device_and_d06_has_its_fuse():
+    """I2-31: D-06 carries the bank's 150 A under its own 200 A MEGA, within its pair's rating where it lies. A run with
+    a design current and no device fails unless its line says why it cannot be overloaded, as D-06 did on the module
+    fuses alone, and every DC rating in the table has a Tycab code or is marked an estimate."""
+    row = {x["run"]: x for x in EVAL["ratings"]["rows"]}
+    d06 = row["D-06"]
+    assert d06["device"] == 200 and d06["ib"] <= d06["device"] <= d06["iz"], d06
+    runs = [dict(r, protection="The module fuses and the BMS's contactor") if r["id"] == "D-06" else r for r in RES["runs"]]
+    bad = R.ratings(dict(RES, runs=runs))["problems"]
+    assert any(p.startswith("D-06 carries 150 A with no protective device") for p in bad), bad
+    text = R.ROUTES.read_text(encoding="utf-8")
+    block = text[text.index("      amps:\n        1.5:"):text.index("      pair: 0.8")]
+    for line in block.splitlines()[1:]:
+        assert "# FVK" in line or "# MBS" in line or "(est.)" in line, line
+
+
 def test_svc11_finds_a_cable_beside_the_hot_line():
     """I2-18 d: a cable laid 10 mm over H-01 (and through its risers) is closer than SVC-08's 25 mm for heated water."""
     h01 = next(r for r in RES["runs"] if r["id"] == "H-01")
@@ -267,7 +286,9 @@ def test_svc04s_cone_spares_a_line_over_the_tray_and_catches_one_under_it():
     """I2-18 c: a line straight over the terminal face is caught by the tray EL-09 above it, never below it."""
     tf = RES["data"]["rules"]["terminal_face"]
     face = RES["ns"][R.key(tf["line"])]
-    tz = R._eval(tf["tray"]["z"], RES["ns"])
+    tz, tb = R.tray_plane(RES)
+    tray = RES["ns"][R.key(tf["tray"]["line"])]
+    assert tray.box[2] >= RES["ns"]["LA_14F"].z1 - 0.5, "the tray stands on the machine base's deck, clear of its rails and cross members"
     f12 = next(r for r in RES["runs"] if r["id"] == "F-12")
 
     def at(z):
@@ -284,6 +305,26 @@ def test_svc12_finds_a_cable_left_hanging():
     runs = [dict(r, along=[], inside=[]) if r["id"] == "K-09" else r for r in RES["runs"]]
     bad = R.supports(dict(RES, runs=runs))["problems"]
     assert any(p.startswith("K-09 lies") for p in bad), bad
+
+
+def test_svc12_holds_a_cable_in_a_cabinet_only_by_a_panel_or_a_cleat_and_the_230v_only_in_its_conduit():
+    """I2-36: a point deep inside a cabinet is held by nothing there, so B-11 without the bench's panels and cleats in
+    its `along` hangs over 600 mm in the bench. Under the floor every 230 V cable lies inside a conduit listed under the
+    floor (SVC-03 and SVC-08 count it as in its own enclosure there), and without those conduits C9B hangs."""
+    fixtures = {k: f for k, f in RES["fixtures"].items() if k not in ("SP-KB", "SP-SK", "SP-SP")}
+    bad = R.supports(dict(RES, fixtures=fixtures))["problems"]
+    assert any(p.startswith("B-11 lies") for p in bad), bad
+    V, ns = RES["V"], RES["ns"]
+    under = [tuple(R._eval(v, ns) for v in z["box"]) for z in RES["data"]["rules"]["conduit"] if z.get("under")]
+    for r in RES["runs"]:
+        if r["system"] != "ac230":
+            continue
+        for p, _ in R._samples(r["dense"], 10.0):
+            if p[2] < V["floor_underside_z"]:
+                assert any(R._in_box(p, z, 0.0) for z in under), (r["id"], p)
+    rules = dict(RES["data"]["rules"], conduit=[z for z in RES["data"]["rules"]["conduit"] if not z.get("under")])
+    bad = R.supports(dict(RES, data=dict(RES["data"], rules=rules)))["problems"]
+    assert any(p.startswith("C9B lies") for p in bad), bad
 
 
 def test_k08_and_k09_pass_into_the_outriggers_clear_of_the_seams():

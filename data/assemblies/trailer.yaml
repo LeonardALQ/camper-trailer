@@ -566,6 +566,7 @@ items:
       - {item: "Wastes: 2.9 m of DN40 DWV with its nine bends and 2.5 m of 25 mm waste hose", aud: 62.60, basis: estimate, date: 2026-11-22, note: "As routed (data/routes.yaml, H28): pipe AUD 4.00/m, bends AUD 4 each, hose AUD 6.00/m (est.)"}
       - {item: "General hardware: rivnuts, screws, brackets and P-clips", aud: 400, basis: estimate, date: 2026-11-20}
       - {item: "The six cable supports SVC-12 adds (data/routes.yaml SP-CH to SP-DK): two 25 x 25 x 3 mm aluminium angles on brackets, a perforated tray, a cable channel, standoff cleats and loom saddles", aud: 135, basis: estimate, date: 2026-11-22, note: "2.8 m of angle at about AUD 10 a metre, the tray AUD 40, the channel AUD 25, twenty cleats and saddles at AUD 2 (est.)"}
+      - {item: "The supports SVC-12 adds inside the bench (SP-KB, SP-SK, SP-SP) and the 230 V's conduits under the floor (I2-36): 2.2 m of 25 x 25 x 3 mm aluminium angle on standoffs and brackets with P-clips, 5.3 m of 20 mm, 2.9 m of 25 mm and 1.5 m of 40 mm corrugated conduit, 24 saddles and six adaptors", aud: 88, basis: estimate, date: 2026-11-23, note: "Angle at about AUD 10 a metre and AUD 25 of standoffs, brackets and clips. Conduit at about AUD 1.20, 1.70 and 3.50 a metre, saddles AUD 0.50, adaptors AUD 2 (est.). The conduit runs as routed under the floor (data/routes.yaml rules.conduit), each saddled at 500 mm at most"}
     point: [body_x0 + body_length / 2, 0, floor_z + 400]
     parts:
       - {item: "12 and 24 V wiring, about 150 m of tinned twin core, 2.5 to 6 mm2", kg: 15.0, basis: estimate}
@@ -576,21 +577,23 @@ items:
       - {item: "General hardware: rivnuts, screws, brackets and P-clips", kg: 6.0, basis: estimate}
       - {item: "The routed runs priced here above the three items' estimates (the 12 and 24 V wiring, the 230 V wiring and the fresh water pipework): 45.1 kg routed against 25.0 kg (bd11_routed_kg, data/routes.yaml, H28), at the routes' masses a metre, the 230 V in Prysmian's round 2C+E (I2-29)", kg: 20.1, basis: estimate}
       - {item: "The six cable supports SVC-12 adds (SP-CH to SP-DK): 2.8 m of 25 x 25 x 3 mm aluminium angle at 0.38 kg a metre and its brackets 1.3 kg, the tray 0.55 kg, the channel 0.35 kg, the cleats and saddles 0.3 kg", kg: 2.5, basis: estimate}
+      - {item: "The supports SVC-12 adds inside the bench and the 230 V's conduits under the floor (I2-36): 2.2 m of angle at 0.38 kg a metre with its standoffs, brackets and clips 1.06 kg, 9.7 m of corrugated conduit at 0.09 to 0.22 kg a metre 1.16 kg, the saddles and adaptors 0.24 kg", kg: 2.5, basis: estimate}
       - {item: "Allowance not yet given to a part, kept until the systems design: 0.3 kg, the shorter A-01 down the partition and the three raiser cables beside the raiser gave back what the cables SVC-10 sized up (I2-15 b) had taken, and the runs tied to the parts they clear at the 4,000 kg plate's axle took 0.1 kg", kg: 0.3, basis: estimate}
     note: "The older block model's 60 kg (report 12 section 10), listed line by line (est.). The lamps, about 4 kg, are line LG-01. Reports 20 and 21 leave the house wiring and the fresh water pipework here. The jockey's spacers (DB-08), the diesel tank's cradle (UF-06B) and the side marker mounts (LG-02), 2.4 kg, came out of the allowance (H27)"
   - id: BD-25
     name: Floor transit frames G9, G15 and G20, Roxtec RM modules in 4 mm aluminium frames bonded into the floor's cut-outs (data/services.yaml)
     material: "Roxtec RM Multidiameter modules (EPDM rubber) and solid modules, 4 mm 5052 aluminium frames with an 8 mm rim, stayplates, compression wedges and Roxtec's lubricant"
+    model: {name: transit_frames, box: [3350, -615, floor_z - 65, 1840, 1245, 120]}   # the three frames at their real depth, from data/services.yaml (I2-34)
     system: electrical
     price:
-      - {item: "Roxtec RM modules for the runs and solid modules to fill the packing spaces: 23 RM 15 and 7 RM 20 at about AUD 25, 13 RM 30 and 2 RM 40 at about AUD 35, 1 RM 60 at about AUD 60", aud: 1335, basis: estimate, date: 2026-11-22, note: "From RS Components' listing of the RM 20 at EUR 14.92 (read 22 Nov 2026) at about AUD 1.65 a euro, the other sizes scaled (est.). G20's one packing space of 156 x 84 mm needs about 4,050 mm2 less filling than its two of 156 x 110 did, four RM 30 and two RM 15 (est.)"}
-      - {item: "Three 4 mm aluminium frames made to the packing spaces, 156 x 84, 180 x 60 and 30 x 90 mm, with their rims", aud: 360, basis: estimate, date: 2026-11-22}
-      - {item: "Three compression wedges, eight stayplates and the assembly lubricant", aud: 350, basis: estimate, date: 2026-11-22}
+      - {item: "Roxtec RM modules for the runs and solid modules to fill the packing spaces: 27 RM 15 and 7 RM 20 at about AUD 25, 13 RM 30 and 2 RM 40 at about AUD 35, 2 RM 60 at about AUD 60", aud: 1495, basis: estimate, date: 2026-11-23, note: "From RS Components' listing of the RM 20 at EUR 14.92 (read 22 Nov 2026) at about AUD 1.65 a euro, the other sizes scaled (est.). G9's packing at Roxtec's 60 x 120 mm needs 4,500 mm2 more filling than its 30 x 90 did, an RM 60 and four RM 15 (I2-33, est.)"}
+      - {item: "Three 4 mm aluminium frames made to the packing spaces and the wedges' room, 156 x 84, 180 x 60 and 60 x 120 mm, with their rims", aud: 360, basis: estimate, date: 2026-11-23}
+      - {item: "Three Roxtec C wedges (two C WEDGE 60 GALV, 243425, and one C WEDGE 120 GALV, 242571, for G20 at its 120 mm packing), eight stayplates and the assembly lubricant", aud: 350, basis: estimate, date: 2026-11-23, note: "No Australian listing of the C wedge found on 23 Nov 2026, so the estimate of 22 Nov stands"}
     point: [4830, 44, floor_z - 15]
     parts:
-      - {item: "Roxtec RM modules, 46: 23 RM 15 at 0.02 kg, 7 RM 20 at 0.04, 13 RM 30 at 0.08, 2 RM 40 at 0.14 and 1 RM 60 at 0.32, as supplied", kg: 2.38, basis: maker, source: "Roxtec RM module with Multidiameter, product page (www.roxtec.com), read 22 Nov 2026"}
-      - {item: "Three frames, 4 mm 5052 aluminium, 60 mm deep, with an 8 mm rim: 0.36, 0.36 and 0.18 kg at 2.68 t/m3", kg: 0.90, basis: calculated}
-      - {item: "Three compression wedges at about 0.15 kg", kg: 0.45, basis: estimate}
+      - {item: "Roxtec RM modules, 51: 27 RM 15 at 0.02 kg, 7 RM 20 at 0.04, 13 RM 30 at 0.08, 2 RM 40 at 0.14 and 2 RM 60 at 0.32, as supplied", kg: 2.78, basis: maker, source: "Roxtec RM module with Multidiameter, product page (www.roxtec.com), read 22 Nov 2026"}
+      - {item: "Three frames, 4 mm 5052 aluminium, 60 mm deep, with an 8 mm rim: 0.36, 0.36 and 0.33 kg at 2.68 t/m3, G9's with its wedge's room", kg: 1.05, basis: calculated}
+      - {item: "Three Roxtec C wedges, galvanised: two C WEDGE 60 at 0.30 kg and one C WEDGE 120 at 0.53 kg", kg: 1.13, basis: maker, source: "Roxtec, Roxtec-Keildichtung und Keildichtungskit C (www.roxtec.com/de), read 23 Nov 2026"}
       - {item: "Eight stayplates and the lubricant", kg: 0.21, basis: estimate}
     note: "The floor's three multi-cable penetrations (I2-14, I2-24): the kerb frame G20 under the plinth's end slot, the road frame G15 under the MultiPlus-II and the Combi's frame G9 at the tower's bed-side end, each module round its run and the rest of each packing space filled with solid modules, compressed from above, so nothing is turned under the floor. The round glands they replace were in BD-11's glands and ties item, which keeps them as a margin (est.). The point is the frames' mass-weighted centre (est.)"
   - id: LG-02
@@ -1065,14 +1068,15 @@ items:
     mass: {basis: declared, total_kg: 185, maturity: spec, source: "https://cdn.shopify.com/s/files/1/0497/4749/3026/files/Datasheet-Lithium-NG-batteries-12_8V-25_6V-51_2V-EN.pdf?v=1739576641", note: "37 kg each (Victron datasheet, marked est. by Victron, report 20 E-01)"}
     note: Five modules of 235 x 648 x 162 mm, terminals up, side by side along X with 10 mm gaps. 25.1 h of the design hot day when new, 17.2 h at end of life (H3, report 20).
   - id: EL-03
-    name: Battery fuses, one 125 A MEGA per module in a 6-way holder, and the bank busbars, in the plinth's end slot
+    name: Battery fuses, one 60 A MEGA per module and D-06's 200 A MEGA in the sixth way of a 6-way holder, and the bank busbars, in the plinth's end slot
     system: electrical
     price:
-      - {item: "Five 125 A MEGA fuses, 80 V range, at AUD 52", aud: 260, basis: listing, url: "https://energyconnections.net.au/products/mega-fuse-80v-range-1pc", date: 2026-11-20}
+      - {item: "Five 60 A MEGA fuses for the modules and one 200 A MEGA fuse for D-06, the bank's cable to the BMS, 80 V range, at AUD 52", aud: 312, basis: listing, url: "https://energyconnections.net.au/products/mega-fuse-80v-range-1pc", date: 2026-11-23, note: "Victron's 80 V MEGA range, 40 to 500 A at one price. D-06's fuse is SVC-10's (I2-31). Was five 125 A fuses at AUD 260"}
       - {item: "6-way MEGA fuse holder", aud: 40, basis: listing, url: "https://energyconnections.net.au/products/victron-fuse-holder-fully-assembled-6-way-for-mega-fuse", date: 2026-11-20}
       - {item: "Bank busbars", aud: 60, basis: estimate, date: 2026-11-20}
     point: [plinth_x0 + 987, plinth_y0 + plinth_d / 2, floor_z + 200]
-    mass: {basis: declared, total_kg: 1.5, maturity: estimate, source: "Report 20 E-09 (est.)"}
+    mass: {basis: declared, total_kg: 1.52, maturity: estimate, source: "Report 20 E-09 (est.), and D-06's fuse, about 20 g (est.)"}
+    note: "The six-way holder's sixth way, kept for a sixth module (report 20 open point 3), carries D-06's fuse, so a sixth module adds a single MEGA holder on the busbar (I2-31)"
   - id: LA-14F
     name: Machine base over the battery box, aluminium frame with rubber-isolated bases and ratchet straps for the washer and the dryer
     model: {name: machine_base, front: "+y"}
@@ -1138,7 +1142,7 @@ items:
     box: [rear_x0 - 155, 345, floor_z + 920, 155, 320, 644]
     cog: [rear_x0 - 80, 505, floor_z + 1242]
     mass: {basis: declared, total_kg: 29.0, maturity: spec, source: "https://www.victronenergy.com/upload/documents/Datasheet-MultiPlus-II-inverter-charger-4k-4k5-6k5-10k-EN-.pdf"}
-    note: 6.0 kW at 25 C, 5.7 kW at 40 C. On the road side to balance the plinth (MAS-11), 2 m of 50 mm2 from the Lynx Distributor across the door head. The shower heater sheds first when the hob or the oven runs (CT-601).
+    note: 6.0 kW at 25 C, 5.7 kW at 40 C. On the road side to balance the plinth (MAS-11), fed by D-07, 95 mm2 from the Lynx Distributor down the chase and under the floor through G20 and G15 (data/routes.yaml). The shower heater sheds first when the hob or the oven runs (CT-601).
   - id: EL-05
     name: Lynx Smart BMS NG, two SmartSolar MPPT 150/35, two Orion-Tr 48/24-16 and two Orion-Tr 48/12-30 on the board
     model: {name: victron_unit, kind: lynx, front: "-x", box: [rear_x0 - 110, -half_in + 615, ceiling_z - 280, 80, 180, 190], extras: [{name: victron_unit, kind: mppt, front: "-x", box: [rear_x0 - 100, -half_in + 665, ceiling_z - 500, 70, 130, 186]}, {name: victron_unit, kind: mppt, front: "-x", box: [rear_x0 - 100, -half_in + 525, ceiling_z - 500, 70, 130, 186]}, {name: victron_unit, kind: orion, front: "-x", box: [rear_x0 - 110, -half_in + 375, ceiling_z - 500, 80, 130, 186]}, {name: victron_unit, kind: orion, front: "-x", box: [rear_x0 - 110, -half_in + 235, ceiling_z - 500, 80, 130, 186]}, {name: victron_unit, kind: orion, front: "-x", box: [rear_x0 - 110, -half_in + 665, ceiling_z - 730, 80, 130, 186]}, {name: victron_unit, kind: orion, front: "-x", box: [rear_x0 - 110, -half_in + 525, ceiling_z - 730, 80, 130, 186]}]}
@@ -1174,22 +1178,24 @@ items:
       - {item: "Board panel 800 x 700 mm and the wiring on it", kg: 5.0, basis: estimate, source: "Report 20 E-13"}
       - {item: "Slotted PVC wiring duct 60 x 80 mm, 2.6 m at about 0.55 kg a metre with its cover. Its busiest section, 140 mm over the cabinet's floor, carries 25 control and branch cables of 1,596 mm2 outside area (cad/routes.py on the routed sizes), 73 % of the 2,184 mm2 that Panduit's 50 % fill allows in its 56 x 78 mm inside (est.). The four heavy cables D-06, D-07, D-14 and B-16 are cleated to the panel to their terminals, outside the duct", kg: 1.4, basis: estimate}
   - id: EL-07
-    name: Main DC cables and lugs, bank 70 mm2, inverter 95 mm2, modules and the 12 V pair 25 mm2, MPPT and converters 10 and 4 mm2
+    name: Main DC cables and lugs, bank and inverter 95 mm2, modules and the 12 V pair 25 mm2, MPPT and converters 10 and 4 mm2
     material: "Tinned flexible copper, double insulated"
     system: electrical
     price:
-      - {item: "Tinned double-insulated pairs as routed (data/routes.yaml D-01 to D-13): 4.47 m of 95 mm2, 1.42 m of 70 mm2, 2.70 m of 25 mm2, 1.02 m of 10 mm2 and 0.55 m of 4 mm2, with 10 % for cut-offs", aud: 598.01, basis: rate, date: 2026-11-22, note: "The pair kind's rate in data/routes.yaml, AUD 0.45 a mm2 and metre of core from solar4rvs.com.au's 2 B&S single at AUD 14.90 a metre. D-07 is 95 mm2 and D-13 25 mm2 for SVC-10 (I2-15 b)"}
+      - {item: "Tinned double-insulated pairs as routed (data/routes.yaml D-01 to D-13): 5.91 m of 95 mm2, 2.70 m of 25 mm2, 1.02 m of 10 mm2 and 0.55 m of 4 mm2, with 10 % for cut-offs", aud: 635.22, basis: rate, date: 2026-11-23, note: "The pair kind's rate in data/routes.yaml, AUD 0.45 a mm2 and metre of core from solar4rvs.com.au's 2 B&S single at AUD 14.90 a metre. D-07 is 95 mm2 and D-13 25 mm2 for SVC-10 (I2-15 b), and D-06 95 mm2 for its 200 A fuse (I2-31)"}
       - {item: "Lugs, heat shrink and the terminal covers", aud: 210, basis: estimate, date: 2026-11-20, note: "The rest of report 20's AUD 450 for 3 m of 70 mm2, 4 m of 50 mm2, 12 m of 10 mm2 and the lugs"}
     point: [rear_x0 - 100, -800, floor_z + 900]
-    mass: {basis: declared, total_kg: 14.1, maturity: estimate, source: "Calculated: the routed pairs, 13.56 kg at the pair kind's mass a metre (data/routes.yaml, Prysmian's V-90 cores and 10 % for the fine strands and the second sheath, est.), and 0.5 kg of lugs (est.). Was report 20's 6.0 kg for its shorter runs"}
+    mass: {basis: declared, total_kg: 15.0, maturity: estimate, source: "Calculated: the routed pairs, 14.49 kg at the pair kind's mass a metre (data/routes.yaml, Prysmian's V-90 cores and 10 % for the fine strands and the second sheath, est.), and 0.5 kg of lugs (est.). Was report 20's 6.0 kg for its shorter runs"}
   - id: EL-09
-    name: Drip tray over the battery box, under the washer and the dryer, 1.5 mm 5052 aluminium with a 20 mm upstand
-    material: "1.5 mm 5052 aluminium sheet, folded, its corners welded and sealed"
+    name: Drip tray on the machine base's deck, under the washer and the dryer, 1.5 mm 5052 aluminium with a 30 mm upstand and a 25 mm drain to the basin's waste
+    material: "1.5 mm 5052 aluminium sheet, folded, its corners welded and sealed, a welded 25 mm drain spigot"
     system: electrical
-    price: {aud: 120, basis: estimate, date: 2026-11-22, note: "0.73 m2 of 1.5 mm 5052 sheet, cut, folded and welded by Leonard, and its sealant (est.)"}
-    point: [plinth_x0 + 450, plinth_y0 + plinth_d / 2, floor_z + bat_box_h + 5]
-    mass: {basis: declared, total_kg: 3.0, maturity: estimate, source: "Calculated: 920 x 720 mm and its 20 mm upstand, 0.73 m2 of 1.5 mm 5052 at 2,680 kg/m3, 2.9 kg, and 0.1 kg of sealant (est.)"}
-    note: "SVC-04's drip cone (I2-18 c): it lies on the battery box's lid under the machine base LA-14F, the washer and the dryer, 10 mm past the box on every side, so it catches every drip from the hoses, the washer's tap and the appliances that a cone widening 1 in 5 over the terminal face would let reach it. Its upstand holds a hose's leak until the washer is stopped (est.)"
+    price: {aud: 150, basis: estimate, date: 2026-11-23, note: "0.85 m2 of 1.5 mm 5052 sheet, cut, folded and welded by Leonard, its sealant and the drain spigot (est.). The drain hose W-09 and its Y junction are in BD-11 (data/routes.yaml)"}
+    zone: inside
+    hollow: true
+    box: [plinth_x0, plinth_y0, floor_z + plinth_h, plinth_l, plinth_d, 30]
+    mass: {basis: declared, total_kg: 3.6, maturity: estimate, source: "Calculated: 1,075 x 700 mm and its 30 mm upstand, 0.85 m2 of 1.5 mm 5052 at 2,680 kg/m3, 3.4 kg, the spigot 0.1 kg and 0.1 kg of sealant (est.)"}
+    note: "SVC-04's drip cone (I2-18 c, I2-35): the machine base's whole deck, over the battery box and the end slot, so its upstand keeps any spill off the end slot. The washer and the dryer stand in it on their rubber feet, clear of the base's rails and cross members under the deck, and it covers the cone widening 1 in 5 from the terminal face where it lies. A burst fill hose runs at the Shurflo Trail King 7's 7 L/min (Shurflo, open flow), and the 25 mm drain in the rear upstand, its invert at the tray's floor, carries about 10 L/min with 30 mm of water in the tray (est., an orifice of 0.6 at the drain's mid-height). W-09 takes it through the partition into a Y junction on the basin's waste W-04, so it leaves the trailer through the grey tank's valve"
   - id: EL-08
     name: Starlink Mini with its pole mount and 15 m cable, stowed in a bench drawer for travel
     system: electrical

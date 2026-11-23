@@ -76,7 +76,7 @@ def namespace(V: dict, blocks: list, data: dict, glands: dict | None = None) -> 
         ns[k] = _eval(v, ns)
     for f in data.get("fixtures") or []:
         c = [_eval(v, ns) for v in f["at"]]
-        s = f.get("size", [40, 40, 40])
+        s = [_eval(v, ns) for v in f.get("size", [40, 40, 40])]
         ns[key(f["id"])] = B((c[0] - s[0] / 2, c[1] - s[1] / 2, c[2] - s[2] / 2, c[0] + s[0] / 2, c[1] + s[1] / 2, c[2] + s[2] / 2))
     return ns
 
@@ -431,8 +431,8 @@ def _blocks_of(lay) -> tuple[dict, list]:
     """The parameters and the envelope blocks of a Layout (cad/trailer.py), as plain dicts. A chassis fitting with more
     than one position has no box of its own, so each of its positions is a block (cad/chassis.py fitting_boxes): each
     D-ring, and each corner steady over the box its leg sweeps from folded for travel to standing at 90 degrees."""
-    bl = [dict(iid=b.iid, id=b.id, name=b.name, system=b.system, box=b.box, hollow=b.hollow, keep_clear=b.keep_clear)
-          for b in lay.blocks if b.box is not None]
+    bl = [dict(iid=b.iid, id=b.id, name=b.name, system=b.system, box=b.box, hollow=b.hollow, keep_clear=b.keep_clear,
+               role=b.extra.get("role")) for b in lay.blocks if b.box is not None]
     ch = getattr(lay, "chassis", None)
     for b in lay.blocks:
         f = b.extra.get("fitting") if b.box is None else None
@@ -751,6 +751,61 @@ def _solids(res: dict) -> list:
     return out
 
 
+STRIP_ROLES = ("raiser", "outrigger", "cm_floor")   # the members whose bearer strips carry the floor (CH-S01)
+WEDGE_STACK, WEDGE_SLACK, WEDGE_DEPTH = 34.0, 5.0, 84.0   # Roxtec's C wedge: 34 mm of the stack, 84 mm deep, and 5 mm of slack (est.)
+
+
+def bearer_strips(res: dict) -> list[dict]:
+    """The floor's bearer strips (CH-S01) as boxes: on the top of every raiser, outrigger and floor crossmember, up to
+    the floor's underside, as cad/trailer_model.py draws them."""
+    top = res["V"]["floor_underside_z"]
+    return [dict(iid=f"strip on {b['iid']}", id="CH-S01", name=f"Bearer strip on {b['name'].split(',')[0]}",
+                 box=(b["box"][0], b["box"][1], b["box"][5], b["box"][3], b["box"][4], top))
+            for b in res["blocks"] if b.get("role") in STRIP_ROLES and b.get("box") and top - b["box"][5] > 1]
+
+
+def frame_room(g: dict) -> tuple:
+    """A transit frame's room inside its walls, (x0, y0, x1, y1): its packing space (`w` along X, `h` along Y about
+    the gland's point) and, where it names its `stack`, the C wedge's 34 mm and 5 mm of slack past the packing at the
+    stack's `wedge_end` (I2-33)."""
+    x, y = g["p"][0], g["p"][1]
+    x0, y0, x1, y1 = x - g["w"] / 2, y - g["h"] / 2, x + g["w"] / 2, y + g["h"] / 2
+    add = WEDGE_STACK + WEDGE_SLACK if g.get("stack") else 0.0
+    if g.get("stack") == "x":
+        x0, x1 = (x0 - add, x1) if g.get("wedge_end", "+") == "-" else (x0, x1 + add)
+    elif g.get("stack") == "y":
+        y0, y1 = (y0 - add, y1) if g.get("wedge_end", "+") == "-" else (y0, y1 + add)
+    return x0, y0, x1, y1
+
+
+def frame_solids(res: dict) -> list[dict]:
+    """Each floor transit frame as solids at its real depth (I2-34): its body, the 4 mm walls round its room, 60 mm deep
+    like its modules, flush with the floor's top face and 30 mm under its underside, or standing 30 mm on the floor
+    where its `side` is above; its rim, 8 mm past the walls on the floor's top face; and the C wedge, 84 mm deep, so
+    it stands 24 mm proud of the frame's top where it is driven from above."""
+    V, fits = res["V"], res["svc"]["fittings"]
+    wall, rim = float(fits["frame_wall_mm"]), float(fits["frame_rim_mm"]) - float(fits["frame_wall_mm"])
+    out = []
+    for gid, g in res["glands"].items():
+        if not g.get("cells") or g["at"] != "floor":
+            continue
+        x0, y0, x1, y1 = frame_room(g)
+        z0, z1 = (V["floor_underside_z"], V["floor_underside_z"] + FRAME_DEPTH) if g.get("side") == "above" else (V["floor_z"] - FRAME_DEPTH, V["floor_z"])
+        out.append(dict(gland=gid, part="body", box=(x0 - wall, y0 - wall, z0, x1 + wall, y1 + wall, z1)))
+        out.append(dict(gland=gid, part="rim", box=(x0 - wall - rim, y0 - wall - rim, V["floor_z"], x1 + wall + rim, y1 + wall + rim, V["floor_z"] + 3)))
+        if g.get("stack"):
+            px0, py0, px1, py1 = g["p"][0] - g["w"] / 2, g["p"][1] - g["h"] / 2, g["p"][0] + g["w"] / 2, g["p"][1] + g["h"] / 2
+            far = g.get("wedge_end", "+") == "+"
+            if g["stack"] == "x":
+                a = px1 + WEDGE_SLACK if far else px0 - WEDGE_SLACK - WEDGE_STACK
+                wb = (a, py0, a + WEDGE_STACK, py1)
+            else:
+                a = py1 + WEDGE_SLACK if far else py0 - WEDGE_SLACK - WEDGE_STACK
+                wb = (px0, a, px1, a + WEDGE_STACK)
+            out.append(dict(gland=gid, part="C wedge", box=(wb[0], wb[1], z0, wb[2], wb[3], z0 + WEDGE_DEPTH)))
+    return out
+
+
 def _in_box(p, box, tol: float = 0.5) -> bool:
     return all(box[k] - tol <= p[k] <= box[k + 3] + tol for k in range(3))
 
@@ -836,8 +891,36 @@ def clearance(res: dict) -> dict:
             if worst[0] < worst[2] - 0.05:
                 problems.append(f"{run['id']} {'enters' if worst[0] < 0 else 'passes'} the keep-clear {b['iid']} ({b['name'][:40]}) "
                                 f"{abs(worst[0]):.0f} mm {'deep' if worst[0] < 0 else 'clear'} at X {worst[1][0]:.0f} Y {worst[1][1]:.0f} Z {worst[1][2]:.0f}")
+    # the floor's transit frames at their real depth (I2-34): every run but those through a frame keeps the clearance from
+    # its body and its wedge, and no frame enters a part, a bearer strip or another part's box
+    frames = frame_solids(res)
+    for run in res["runs"]:
+        r, own = run["od"] / 2, _ids(run, "glands")
+        segs, box = _segs(run["dense"]), _aabb(run["dense"], run["od"] / 2 + clear)
+        for f in frames:
+            if f["gland"] in own or f["part"] == "rim" or not _hit(box, f["box"]):
+                continue
+            d, p = min((seg_box(a, c, f["box"]) for a, c in segs), key=lambda t: t[0])
+            gaps.append(dict(run=run["id"], part=f"{f['gland']} {f['part']}", name=f"transit frame {f['gland']}", gap=round(d - r, 1), limit=clear,
+                             at=[round(v) for v in p]))
+            if d - r < clear - 0.05:
+                problems.append(f"{run['id']} {'enters' if d < r else 'passes'} {f['gland']}'s {f['part']} {abs(d - r):.0f} mm "
+                                f"{'deep' if d < r else 'clear'} at X {p[0]:.0f} Y {p[1]:.0f} Z {p[2]:.0f}")
+    parts = [b for b in solids if b["id"] not in PANELS] + bearer_strips(res)
+    frame_gaps = []
+    for f in (x for x in frames if x["part"] != "rim"):
+        for b in parts:
+            g = _box_gap(f["box"], b["box"])
+            if g > 50:
+                continue
+            depth = min(min(f["box"][k + 3], b["box"][k + 3]) - max(f["box"][k], b["box"][k]) for k in range(3))
+            frame_gaps.append(dict(frame=f"{f['gland']} {f['part']}", part=b["iid"], gap=round(g if g > 0 else -depth, 1)))
+            if g <= 0 and depth > 0.05:
+                problems.append(f"{f['gland']}'s {f['part']} enters {b['iid']} ({b['name'][:40]}) by {depth:.0f} mm")
+    frame_gaps.sort(key=lambda x: x["gap"])
     tested = sorted((g for g in gaps if g["limit"] > 0), key=lambda g: g["gap"])
-    return dict(ok=not problems, problems=problems, closest=tested[:10], smallest=tested[0]["gap"] if tested else None, limit=clear)
+    return dict(ok=not problems, problems=problems, closest=tested[:10], smallest=tested[0]["gap"] if tested else None, limit=clear,
+                frames=frame_gaps[:10])
 
 
 def keep_clear_boxes(res: dict) -> list:
@@ -938,6 +1021,14 @@ def terminal_face(res: dict) -> dict:
                 smallest=min((r["mm"] for r in rows if not r["sleeved"]), default=None), cone=cone)
 
 
+def tray_plane(res: dict) -> tuple:
+    """The drip tray's floor height and its footprint (x0, y0, x1, y1), read from the tray line's own box in the layout
+    (I2-35), so SVC-04 tests the tray that is modelled."""
+    tray = res["data"]["rules"]["terminal_face"]["tray"]
+    b = res["ns"][key(tray["line"])]
+    return b.z0 + float(tray.get("floor_mm", 0.0)), (b.x0, b.y0, b.x1, b.y1)
+
+
 def drip_cone(res: dict) -> dict:
     """SVC-04's drip cone (I2-18 c): no water, waste or diesel line over the terminal face inside a cone that widens by
     the rule's ratio as it rises (the trailer parked off level), but where the drip tray lies between the line and the
@@ -947,8 +1038,7 @@ def drip_cone(res: dict) -> dict:
     b = res["ns"][key(tf["line"])]
     k = float(tf["cone"])
     tray = tf.get("tray")
-    tz = _eval(tray["z"], res["ns"]) if tray else None
-    tb = tuple(_eval(v, res["ns"]) for v in tray["box"]) if tray else None
+    tz, tb = tray_plane(res) if tray else (None, None)
     problems, rows = [], []
     if tray:
         spread = (tz - b.z1) * k   # the cone's reach past the face's edges where the tray lies
@@ -995,10 +1085,11 @@ def _samples(dense: list, step: float = 25.0) -> list[tuple]:
 
 
 def supports(res: dict) -> dict:
-    """SVC-12 (I2-18 a): no cable lies unsupported over more than VSB1 7.1's 600 mm. A point is held inside a chassis
-    member the run is threaded through, within the clip's reach of a part in its `along` or of a support fixture
-    (`support: true`, the cleats, trays and saddles the design adds), inside a cabinet's carcass (clipped to its panels),
-    the board cabinet, a 230 V conduit, a box it ends at or a part it passes through, a gland or a frame, or beside a held
+    """SVC-12 (I2-18 a, I2-36): no cable lies unsupported over more than VSB1 7.1's 600 mm. A point is held inside a
+    chassis member the run is threaded through, within the clip's reach of a part in its `along` (inside a cabinet's
+    carcass, of the carcass's panels), of a support fixture (`support: true`, the cleats, trays and saddles the design
+    adds) or of a cabinet's outer face, inside the board cabinet, a 230 V conduit zone (under the floor, the only hold a
+    230 V cable has but its glands), a box it ends at or a part it passes through, a gland or a frame, or beside a held
     cable of a way it shares. The longest stretch between held points is each run's unsupported span."""
     rule = res["data"]["rules"]["supports"]
     clip, top = float(rule["clip_mm"]), float(rule["max_mm"])
@@ -1020,6 +1111,13 @@ def supports(res: dict) -> dict:
     panels = [b["box"] for b in res["blocks"] if b.get("box") and b["id"] in PANELS]
     carcasses = [b["box"] for b in res["blocks"] if b.get("box") and b.get("hollow")]
     holders = [f["box"] for f in res["fixtures"].values() if f.get("support")]
+
+    def reach(p, bx) -> float:
+        """How far a point lies from a part's face it could be clipped to: outside a box, its gap to the box, inside a
+        cabinet's carcass, its depth to the nearest panel, so a point deep inside a cabinet is held by nothing there."""
+        g = _pt_box(p, bx)
+        return -g if g < 0 and bx in carcasses else g
+
     held, pts = {}, {}
     cables = [r for r in res["runs"] if r["system"] in ELECTRICAL]
     for r in cables:
@@ -1027,17 +1125,18 @@ def supports(res: dict) -> dict:
         inside = [bx for m in _ids(r, "inside") for bx in by_id.get(m, [])]
         along = [bx for m in _ids(r, "along") for bx in by_id.get(m, [])]
         along_bars = [c for m in _ids(r, "along") for c in bars.get(m, [])]
-        ends = [bx for e in _end_lines(r) | _ids(r, "passes") for bx in by_id.get(e, [])]
+        ends = [bx for e in _end_lines(r) | _ids(r, "passes") for bx in by_id.get(e, []) if bx not in carcasses]
         glands = [gl[g] for g in _ids(r, "glands") if g in gl]
         sm = _samples(r["dense"])
         pts[r["id"]] = sm
         h = []
         for p, _ in sm:
-            ok = (any(_in_box(p, bx, 0.5) for bx in inside) or any(_pt_box(p, bx) - rad <= clip for bx in along)
+            ok = (any(_in_box(p, bx, 0.5) for bx in inside) or any(reach(p, bx) - rad <= clip for bx in along)
                   or any(_bar_gap([(p, p)], c) - rad <= clip for c in along_bars)
                   or _in_box(p, board, 0.0) or any(_in_box(p, bx, 1.0) for bx in ends)
-                  or any(_pt_box(p, bx) - rad <= clip for bx in carcasses + holders)
-                  or (r["system"] == "ac230" and (p[2] <= V["floor_z"] + 1 or any(_in_box(p, z, 0.0) for z in zones)))
+                  or any(_pt_box(p, bx) - rad <= clip for bx in holders)
+                  or any(0 <= _pt_box(p, bx) and _pt_box(p, bx) - rad <= clip for bx in carcasses)
+                  or (r["system"] == "ac230" and any(_in_box(p, z, 0.0) for z in zones))
                   or any(any(_in_box(p, pb, 1.0) for pb in panels) and math.dist(p[:2] if g["at"] in ("floor", "roof") else p, g["p"][:2] if g["at"] in ("floor", "roof") else g["p"])
                          <= max(g.get("w", g["d"]), g.get("h", g["d"])) for g in glands))
             h.append(ok)
@@ -1404,9 +1503,11 @@ def fitting(g: dict, fits: dict) -> dict:
         return dict(kind=kind, inner=dict(r=r), outer=dict(r=r), turned=True, what=f"M{int(f.get('thread', g['d']))} gland and locknut")
     if kind == "frame":
         rim = float(f.get("rim", fits["frame_rim_mm"]))
-        hx, hy = g["w"] / 2, g["h"] / 2
+        x0, y0, x1, y1 = frame_room(dict(g, p=(0.0, 0.0)))   # the packing space and the wedge's room, about the gland's point
+        hx, hy = (x1 - x0) / 2, (y1 - y0) / 2
+        wedge = f", C wedge {g['wedge']:g}" if g.get("wedge") else ""
         return dict(kind=kind, inner=dict(hx=hx + rim, hy=hy + rim), outer=dict(hx=hx + fits["frame_wall_mm"], hy=hy + fits["frame_wall_mm"]),
-                    turned=False, what=f"transit frame {g['w']:g} x {g['h']:g} packing, {rim:g} mm rim")
+                    off=((x0 + x1) / 2, (y0 + y1) / 2), turned=False, what=f"transit frame {g['w']:g} x {g['h']:g} packing{wedge}, {rim:g} mm rim")
     if kind == "grommet":
         r = g["d"] / 2 + float(f.get("lip", fits["grommet_lip_mm"]))
         return dict(kind=kind, inner=dict(r=r), outer=dict(r=r), turned=False, what=f"grommet, {g['d']:g} mm hole")
@@ -1460,6 +1561,8 @@ def glands(res: dict) -> dict:
             if a["at"] != b["at"]:
                 continue
             ca, cb = _plane_xy(a, pts[a["id"]]["p"]), _plane_xy(b, pts[b["id"]]["p"])
+            ca = (ca[0] + fit[a["id"]].get("off", (0, 0))[0], ca[1] + fit[a["id"]].get("off", (0, 0))[1])
+            cb = (cb[0] + fit[b["id"]].get("off", (0, 0))[0], cb[1] + fit[b["id"]].get("off", (0, 0))[1])
             if math.dist(ca, cb) > 400:
                 continue
             for face in ("inner", "outer"):
@@ -1472,6 +1575,7 @@ def glands(res: dict) -> dict:
     standing = [s for s in _solids(res) if s["box"][2] <= floor_z + 5 and s["box"][5] > floor_z + 5 and s["id"] not in PANELS]
     for g in (x for x in gl if x["at"] == "floor"):
         c, f = _plane_xy(g, pts[g["id"]]["p"]), fit[g["id"]]["inner"]
+        c = (c[0] + fit[g["id"]].get("off", (0, 0))[0], c[1] + fit[g["id"]].get("off", (0, 0))[1])
         under = set(g.get("under") or [])
         flush = bool((g.get("fit") or {}).get("flush"))
         for b, kb in ([] if flush else keep_clear_boxes(res)):
@@ -1519,8 +1623,9 @@ def method_factor(rt: dict, method: str, mm2: float) -> float:
 
 
 def ambient_factor(rt: dict, band_: str, t: float) -> float:
-    """The ambient factor at t C: Tycab's table for the DC cables (from 30 C), AS/NZS 3008.1.1's for the 230 V (from 40 C)."""
-    if band_ == "ac230":
+    """The ambient factor at t C: Tycab's table for its DC cables (from 30 C), AS/NZS 3008.1.1's for the 230 V cables and
+    the 48 V pairs (from 40 C)."""
+    if band_ in ("ac230", "as3008"):
         c = rt["ac"]["conductor_c"]
         return math.sqrt((c - t) / (c - 40.0))
     tab = rt["dc"]["ambient"]
@@ -1528,10 +1633,14 @@ def ambient_factor(rt: dict, band_: str, t: float) -> float:
 
 
 def free_air_amps(rt: dict, run: dict, t: float) -> float | None:
-    """A cable's rating in free air at t C: Tycab's single core times its pair factor for the DC cables, Prysmian's 2C+E
-    unenclosed spaced for the 230 V cables and cords."""
+    """A cable's rating in free air at t C: Prysmian's 2C+E unenclosed spaced for the 230 V cables and cords, AS/NZS
+    3008.1.1's two single cores by Prysmian's table for the 48 V double-insulated pairs (I2-31), and Tycab's single core
+    times its pair factor for the other DC cables."""
     if run["system"] == "ac230":
         return _table_amps(rt["ac"]["amps"], run["size"]) * ambient_factor(rt, "ac230", t)
+    if run.get("kind") in (rt.get("pairs") or {}).get("kinds", []):
+        m = rt["methods"]
+        return _lerp(run["size"], m["sizes"], m["free"]) * ambient_factor(rt, "as3008", t)
     if run["system"] in ("dc48", "dc24", "dc12", "pv"):
         return _table_amps(rt["dc"]["amps"], run["size"]) * rt["dc"]["pair"] * ambient_factor(rt, "dc", t)
     return None
@@ -1559,9 +1668,10 @@ def rating_zone(p, run: dict, ctx: dict) -> str:
 
 
 def stretches(run: dict, ctx: dict) -> list[dict]:
-    """A run cut where its zone changes: each stretch's zone, method, air and length."""
+    """A run cut where its zone changes, the centreline taken every 10 mm so a zone is found inside a long straight too
+    (D-06's last 165 mm in the board cabinet): each stretch's zone, method, air and length."""
     rt, out = ctx["rt"], []
-    for a, b in _segs(run["dense"]):
+    for a, b in _segs([p for p, _ in _samples(run["dense"], 10.0)]):
         z = rating_zone(tuple((a[k] + b[k]) / 2 for k in range(3)), run, ctx)
         if out and out[-1]["zone"] == z:
             out[-1]["mm"] += math.dist(a, b)
@@ -1618,7 +1728,7 @@ def device_of(run: dict, rt: dict) -> tuple[float | None, float | None, int]:
     """The protective device's rating In from the run's protection text (its first rating in A), or the override in
     rules.ratings.devices, the circuit's own design current Ib and how many circuits the run carries."""
     o = (rt.get("devices") or {}).get(run["id"])
-    if o:
+    if o and o.get("in") is not None:
         return float(o["in"]), float(o.get("ib", run.get("amps") or 0.0)), int(o.get("circuits", 1))
     m = re.match(r"\s*(\d+(?:\.\d+)?) A\b", run.get("protection") or "")
     return (float(m.group(1)) if m else None), (float(run["amps"]) if run.get("amps") is not None else None), 1
@@ -1629,9 +1739,10 @@ def ratings(res: dict) -> dict:
     method and air (rules.ratings.zones), the cable's free-air rating (Tycab for DC, Prysmian's 2C+E for 230 V) times the
     ambient's and the method's factors, and times the group's factor in each shared way the run is in, but at a short
     crossing of a panel, where each cable has its own gland or module. The least stretch is the run's Iz. The design
-    current Ib must not exceed Iz, and where a device protects the circuit, Ib <= In <= Iz (AS/NZS 3000 clause 2.5.3).
-    A group counts its loaded circuits: not data or control cables, not a circuit at or under 30 % of its grouped
-    rating, and the circuits the load shedding never runs together once."""
+    current Ib must not exceed Iz, and Ib <= In <= Iz against the device that protects the circuit (AS/NZS 3000 clause
+    2.5.3). A run with a design current and no device fails, unless its line's `no_device` says why it cannot be
+    overloaded (I2-31). A group counts its loaded circuits: not data or control cables, not a circuit at or under 30 %
+    of its grouped rating, and the circuits the load shedding never runs together once."""
     rt = res["data"]["rules"]["ratings"]
     blocks = res["blocks"]
     by_id = defaultdict(list)
@@ -1667,6 +1778,7 @@ def ratings(res: dict) -> dict:
             if i in rows:
                 rows[i]["ways"].append(w)
     shed = rt["groups"].get("shed") or []
+    runs = {r["id"]: r for r in res["runs"]}
     counted = set(rows)
     for _ in range(12):
         for row in rows.values():
@@ -1697,6 +1809,8 @@ def ratings(res: dict) -> dict:
         where = f"{w['method']}, {w['zone']}, {w['ambient']:g} C, {row['group'][1]} circuits" + (f" in {row['group'][0]}" if row["group"][0] else "")
         if ib is not None and ib > iz + 1e-6:
             problems.append(f"{row['run']} carries {ib:g} A over its {iz:.0f} A ({where})")
+        if ib is not None and inn is None and not (runs[row["run"]].get("no_device") or (rt.get("devices") or {}).get(row["run"], {}).get("no_device")):
+            problems.append(f"{row['run']} carries {ib:g} A with no protective device, and its line gives no reason it cannot be overloaded")
         if inn is not None and ib is not None and ib > inn + 1e-6:
             problems.append(f"{row['run']}'s {inn:g} A device is under its {ib:g} A design current")
         if inn is not None and inn > iz + 1e-6:

@@ -45,20 +45,32 @@ they are threaded through (`inside`).
   cable covers, else in the cabin. The zone gives the method and the air round the cable on the design hot day (report
   19: 42 C in the shade at 15:00, the split holding 24 C inside): 45 C under the floor and in the members (est.), 50 C
   in a foam core and on the drawbar (est.), 60 C on the sunlit skin (est.), AS/NZS 3008.1.1's 40 C reference inside.
-  The DC cables take Tycab's tinned V90 ratings to JASO D609 in free air at 30 C, times 0.8 for the circuit's two cores
-  together, Tycab's bundling factors and its ambient table ([Tycab marine cable brochure 2017](https://www.ceca.au/uploads/1/3/7/6/13767324/tycab_marine_brochure_2017_web_23.pdf)).
+  The twin DC cables take Tycab's tinned V90 ratings to JASO D609 in free air at 30 C, times 0.8 for the circuit's two
+  cores together, Tycab's bundling factors and its ambient table ([Tycab marine cable brochure 2017](https://www.ceca.au/uploads/1/3/7/6/13767324/tycab_marine_brochure_2017_web_23.pdf)).
+  Each size has its Tycab code in data/routes.yaml: the 0.6/1 kV single core FVK up to 6 mm2 and the battery cable MBS
+  from 8 B&S, so 10 mm2 takes MBS132002's 84 A and the table rises with size. Only 25 mm2 is an estimate, between
+  MBS128703 at 20.26 mm2 and MBS136403 at 25.7 mm2 by area. Tycab's twin battery cables are 0.8 of its single cores
+  (59 A at 7.7 mm2, 82 A at 13.5 mm2), which is the pair factor. Tycab gives its double-insulated range ZDT no rating,
+  so the 48 V double-insulated pairs take AS/NZS 3008.1.1's ratings for two V-90 insulated and sheathed single cores, a
+  circuit, from Prysmian's table at every size from 4 to 95 mm2, with the standard's own ambient factor (I2-31).
   The 230 V take Prysmian's 2C+E circular ratings, unenclosed and spaced in 40 C air, with the ambient factor the square
   root of (75 - t) over 35 ([Prysmian 2C+E PVC circular](https://nz.prysmian.com/sites/nz.prysmian.com/files/media/documents/2ce-pvc-circular.pdf)). A method's ratio to free air
   at the same size comes from Prysmian's AS/NZS 3008.1.1 single-core table. Groups take AS/NZS 3008.1.1 Table 22:
   bunched in the 230 V conduits, a single layer in the DC ways and under the ceiling. A circuit at or under 30 % of its
   rating is not counted (IEC 60364-5-52), nor data and control cables, and the circuits the load shedding never runs
   together count once. A short crossing of foam at a gland (100 mm at most) takes BS 7671 Table 52.2's factor (0.88
-  over 50 mm, 0.78 over 100 mm) with no group's factor. Each run's Iz is its least stretch. Ib <= In <= Iz (AS/NZS 3000
-  clause 2.5.3). A run that sizes itself grows until its stretches carry its current and its device.
+  over 50 mm, 0.78 over 100 mm) with no group's factor. Each run's Iz is its least stretch, its zones read every 10 mm
+  along it. Ib <= In <= Iz (AS/NZS 3000 clause 2.5.3), and a run with a design current and no device fails unless its
+  line says why it cannot be overloaded (I2-31). The LUNOS controller's fan leads take B-01's 3 A fuse ahead of it, and
+  the split's indoor-outdoor link A-05 carries only the indoor unit's own load. A run that sizes itself grows until its
+  stretches carry its current and its device.
 - SVC-10's sizes: D-07 (144 A, the MultiPlus-II 48/6k5 at 6 kW) goes from 50 to 95 mm2, because its 200 A MEGA, sized
   for the inverter's 11 kW minute, must sit under the pair's rating, and 70 mm2 gives 170 A enclosed in the board. D-13
   goes from 16 to 25 mm2 under its 80 A fuse. The five module pairs D-01 to D-05 share D-06's 150 A, 30 A each and 25 %
-  for uneven sharing (est.), on 60 A MEGAs at the busbar, so their 25 mm2 stays.
+  for uneven sharing (est.), on 60 A MEGAs at the busbar, so their 25 mm2 stays. Those five fuses add to 300 A, so D-06,
+  the bank's cable through the isolator to the BMS, has its own 200 A MEGA in the six-way holder's sixth way, as large
+  as D-07's so the bank's fuse is never the smaller of the two, and goes from 70 to 95 mm2, since 70 mm2 is rated 170 A
+  where it is cleated in the board cabinet (I2-31). A sixth module then adds a single MEGA holder on the busbar.
 - Mass and price: the routed length times the kind's mass and price per metre, plus 10 % for cut-offs in the price.
   The line that prices each kind is `priced_in` (BD-11 for the house wiring and pipework, EL-07 for the 48 V mains,
   RF-02 for the PV strings, LGT-01 for the lamp loom, AC-03 for the split's line set and condensate hose, UF-06 for the
@@ -119,7 +131,7 @@ they are threaded through (`inside`).
 | SVC-01 | 20 mm from every envelope box but the run's own ends, and from the keep-clear boxes (aisles, landings, the chair space) above the floor up to 60 mm under the ceiling (est., the ceiling's cable covers), over which the cables cross in that zone | the brief (H28), H27, I2-14 |
 | SVC-02 | each bend at or above the least bending radius, or a fitting | makers' tables (sections 2, 3) |
 | SVC-03 | 230 V 50 mm from ELV outside its conduit, 150 mm reach at the board and shared appliances | AS/NZS 3000:2018 clause 3.9.8.3, AS/NZS 3001.2:2022 |
-| SVC-04 | no water, waste or diesel line within 300 mm of the battery's terminal face, but the washer's sleeved hoses (W-02, F-10), and none over the face inside a cone widening 1 in 5 (est., parked up to about 11 degrees off level) unless the drip tray EL-09 lies between | AS/NZS 3001.2:2022 clause 5.4.10.2, CT-602, the cone the design's own (I2-18 c) |
+| SVC-04 | no water, waste or diesel line within 300 mm of the battery's terminal face, but the washer's sleeved hoses (W-02, F-10) and the tray's sleeved drain (W-09), and none over the face inside a cone widening 1 in 5 (est., parked up to about 11 degrees off level) unless the drip tray EL-09 lies between, read from the tray's own box | AS/NZS 3001.2:2022 clause 5.4.10.2, CT-602, the cone the design's own (I2-18 c, I2-35) |
 | SVC-05 | every circuit, DC load, outlet, water outlet and fitting has its run, the runs of each tag join up end to end, and each 230 V circuit runs from the board's AC bar to its load or the outlet it plugs into | data/services.yaml, report 20 section 7 |
 | SVC-06 | DC drop at most 2 % at the design current, the ute's half of the ute feed (TW06) added, 230 V at most 5 % | the design's own 2 %, stricter than AS/NZS 3000, and AS/NZS 3000:2018 clause 3.6.2 for 230 V |
 | SVC-07 | gravity wastes fall at least 1:50 | AS/NZS 3500.2, CT-611, CT-612 |
@@ -127,7 +139,7 @@ they are threaded through (`inside`).
 | SVC-09 | every gland's fitting has room in its panel: 12 mm (est.) of spanner room round a locknut, a 10 mm (est.) web elsewhere, no floor fitting in a keep-clear box or under a part on the floor | CMP Products' locknuts by thread, Roxtec CF 8 for the frames' proportions |
 | SVC-10 | each cable's design current and its protective device at most its rating where it lies, Ib <= In <= Iz, every stretch rated for its zone's method and air and derated for its group (section 2) | AS/NZS 3000:2018 clause 2.5.3, AS/NZS 3008.1.1 (Table 22), Prysmian, Tycab (JASO D609), BS 7671 Table 52.2, IEC 60364-5-52 (I2-15 b) |
 | SVC-11 | every cable 25 mm (ELV) or 50 mm (230 V) from the hot line H-01 before the mixing valve, under the floor too, nothing under the Combi's base, cables and the fuel line 50 mm (est.) from the 100 mm behind it where the exhaust runs to its cowl, cables and pipes 50 mm (est.) from the oven's case inside the tower, but the oven's own lead | Truma Combi D 6 AU installation instructions, IB 052/2015 halved as SVC-08's (I2-18 d) |
-| SVC-12 | no cable unsupported over 600 mm: held inside a member it is threaded through, by a clip within 30 mm (est.) of a part it runs along or a support the design adds (the SP fixtures), in the board, a conduit, a cabinet's carcass, a box it ends at, a gland or a frame, or by its loom in a shared way | VSB1 section 7.1 (I2-18 a) |
+| SVC-12 | no cable unsupported over 600 mm: held inside a member it is threaded through, by a clip within 30 mm (est.) of a part it runs along or a support the design adds (the SP fixtures), in the board, a conduit, a box it ends at, a gland or a frame, or by its loom in a shared way. Inside a cabinet only within 30 mm of a panel it is clipped to, and under the floor a 230 V cable only inside its modelled conduit | VSB1 section 7.1 (I2-18 a, I2-36) |
 
 The checks are defined in `data/routes.yaml` beside the runs, as the lamps' checks live in `data/services.yaml`,
 because `data/checks.yaml`'s trailer check types are fixed in `cad/partsdb.py`. The build adds their rows to the
@@ -136,7 +148,13 @@ trailer's checks (`build/trailer/trailer.json`) and `cad/tests/test_routes.py` f
 The floor's multi-cable penetrations are three Roxtec RM transit frames (data/services.yaml, line BD-25): the kerb
 frame G20 under the plinth's end slot, one packing space of 156 x 84 mm over the gap between the kerb raiser and the
 rear tank, the road frame G15 under the MultiPlus-II and the Combi's frame G9 in the 90 mm of floor between the chair
-space and the aisle. Each module is sized to its run (RM 15 for 3 to 11 mm, RM 20 for 4 to 14.5 mm, RM 30, RM 40 and
+space and the aisle. Roxtec's C wedge, which compresses the modules, fits packing spaces 60 and 120 mm wide only,
+takes 34 mm of the stack and is 84 mm deep, and Roxtec's S frames come with packing spaces 60 or 120 mm wide and 60,
+120, 180 or 240 mm long ([Roxtec C wedge](https://www.roxtec.com/de/produkte/systemkomponenten/dichtkomponenten/roxtec-keildichtung-und-keildichtungskit-c/),
+Roxtec's S frame tables, read 23 Nov 2026). G9 has the S 3x1's 60 x 120 mm with a C wedge 60, and G15's 180 x 60 mm
+is the S 5x1's. G15's wedge room and G20's 120 x 120 mm are open (TRAILER.md open point 11). Each frame is modelled
+at its real depth (cad/routes.py frame_solids): G9 and G20 stand 30 mm on the floor, G15 hangs 30 mm under it, and
+SVC-01 keeps every other run 20 mm from each body and wedge and no frame inside a part or a bearer strip (I2-33, I2-34). Each module is sized to its run (RM 15 for 3 to 11 mm, RM 20 for 4 to 14.5 mm, RM 30, RM 40 and
 RM 60, Roxtec's product page) and the rest of each packing space is filled with solid modules. The frames are
 compressed from above, so nothing is turned under the floor, and stayplates part the 230 V rows from the rest. The
 modules seal round cable only, so every run through a frame or a gland is round. SVC-08 does not measure two runs
