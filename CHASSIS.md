@@ -216,33 +216,33 @@ CHS-10 says where a hole may go and checks its fatigue, with three rules. Its ce
 
 | Hole | Run | Wall, at X | Size, mm | Net section, worst case | Edge to the flat's end, need | Clear to a weld toe or hole, need | Range at the edge | CHS-10 |
 |---|---|---|---|---|---|---|---|---|
-| H-01 | K-08 | Kerb raiser's outer web inside OR-05K's root weld, 4,493 | 16 | 280 of 350 MPa, LC8a | 39.8, 20 | 16.5, 16 | 40.8 of 81.9 MPa | meets |
-| H-03 | K-09 | Road raiser's outer web inside OR-05R's root weld, 4,493 | 16 | 270 of 350 MPa, LC8a | 54.8, 20 | 16.5, 16 | 41.4 of 81.9 MPa | meets |
+| H-01 | K-08 | Kerb raiser's outer web inside OR-05K's root weld, 4,491 | 16 | 280 of 350 MPa, LC8a | 39.8, 20 | 17.5, 16 | 41.1 of 81.9 MPa | meets |
+| H-03 | K-09 | Road raiser's outer web inside OR-05R's root weld, 4,491 | 16 | 270 of 350 MPa, LC8a | 54.8, 20 | 17.5, 16 | 41.6 of 81.9 MPa | meets |
 | H-05 | C9B | Kerb rail's inner web, 1,915 | 16 | 76 of 350 MPa, LC6 | 33.5, 20 | 31.5, 16 | 26.6 of 81.9 MPa | meets |
 | H-06 | C9B | Kerb rail's outer web, 1,915 | 16 | 76 of 350 MPa, LC6 | 33.5, 20 | 31.5, 16 | 26.6 of 81.9 MPa | meets |
-| H-07 | E-07 | Kerb rail's outer web, 2,241 | 20 x 23 slot | 77 of 350 MPa, LC6 | 37.5, 25 | 33.5, 20 | 27.3 of 81.9 MPa | meets |
-| H-08 | E-07 | Kerb rail's inner web, 2,266 | 20 x 23 slot | 77 of 350 MPa, LC6 | 37.5, 25 | 33.5, 20 | 27.3 of 81.9 MPa | meets |
-| H-09 | B-04 | Kerb rail's outer web, 2,310 | 14 x 21 slot | 84 of 350 MPa, LC6 | 31.5, 17.5 | 30.5, 14 | 16.5 of 81.9 MPa | meets |
-| H-10 | B-04 | Kerb rail's inner web, 2,359 | 14 x 21 slot | 81 of 350 MPa, LC6 | 21.5, 17.5 | 19.5, 14, CM-02's end weld | 15.3 of 81.9 MPa | meets |
+| H-07 | E-07 | Kerb rail's outer web, 2,241 | 20 x 23 slot | 77 of 350 MPa, LC6 | 37.5, 25 | 33.5, 20 | 27.2 of 81.9 MPa | meets |
+| H-08 | E-07 | Kerb rail's inner web, 2,266 | 20 x 23 slot | 77 of 350 MPa, LC6 | 37.5, 25 | 33.5, 20 | 27.2 of 81.9 MPa | meets |
+| H-09 | B-04 | Kerb rail's outer web, 2,310 | 14 x 21 slot | 84 of 350 MPa, LC6 | 31.5, 17.5 | 30.5, 14 | 16.4 of 81.9 MPa | meets |
+| H-10 | B-04 | Kerb rail's inner web, 2,359 | 14 x 21 slot | 81 of 350 MPa, LC6 | 21.5, 17.5 | 19.5, 14, CM-02's end weld | 15.2 of 81.9 MPa | meets |
 | H-11 | B-05 | Road rail's inner web, 1,905 | 14 | 76 of 350 MPa, LC6 | 33.5, 17.5 | 23.0, 14, CM-01's end weld | 25.4 of 81.9 MPa | meets |
 | H-12 | B-05 | Road rail's outer web, 1,905 | 14 | 76 of 350 MPa, LC6 | 33.5, 17.5 | 32.5, 14 | 25.4 of 81.9 MPa | meets |
-| H-13 | K-01 | Road rail's outer web, 2,360 | 16 x 39 slot | 66 of 233 MPa, LC5b | 63.5, 20 | 37.0, 30, H-14 | 19.9 of 81.9 MPa | meets |
-| H-14 | K-10 | Road rail's outer web, 2,442 | 30 x 51 slot | 109 of 350 MPa, LC6 | 41.5, 37.5 | 31.5, 30, drawbar overlap's fillet | 24.3 of 81.9 MPa | meets |
-| H-15 | K-10 | Road rail's outer web, 3,425 | 30 x 47 slot | 202 of 350 MPa, LC6 | 39.5, 37.5 | 81.5, 30 | 17.6 of 81.9 MPa | meets |
+| H-13 | K-01 | Road rail's outer web, 2,360 | 16 x 39 slot | 66 of 233 MPa, LC5b | 63.5, 20 | 37.0, 30, H-14 | 19.8 of 81.9 MPa | meets |
+| H-14 | K-10 | Road rail's outer web, 2,442 | 30 x 51 slot | 109 of 350 MPa, LC6 | 41.5, 37.5 | 31.5, 30, drawbar overlap's fillet | 24.2 of 81.9 MPa | meets |
+| H-15 | K-10 | Road rail's outer web, 3,423 | 30 x 47 slot | 201 of 350 MPa, LC6 | 39.5, 37.5 | 81.5, 30 | 17.3 of 81.9 MPa | meets |
 | H-16 | K-01 | Road rail's outer web, 6,021 | 16 x 25 slot | 138 of 350 MPa, LC8a | 57.5, 20 | 48.9, 16 | 4.2 of 81.9 MPa | meets |
-| H-17 | B-18 | Kerb raiser's inner web, 2,015 | 14 x 54 slot | 91 of 350 MPa, LC6 | 25.8, 17.5 | 81.5, 14 | 34.3 of 81.9 MPa | meets |
-| H-18 | B-16 | Kerb raiser's inner web, 2,267 | 28 x 103 slot | 88 of 350 MPa, LC6 | 39.8, 35 | 30.5, 28 | 31.7 of 81.9 MPa | meets |
-| H-19 | D-14 | Kerb raiser's outer web, 2,291 | 24 x 74 slot | 108 of 350 MPa, LC6 | 43.8, 30 | 24.4, 24, nut plate | 25.1 of 81.9 MPa | meets |
-| H-20 | D-14 | Kerb raiser's inner web, 4,669 | 24 x 58 slot | 187 of 350 MPa, LC8a | 49.8, 30 | 42.5, 24 | 38.6 of 81.9 MPa | meets |
-| H-21 | B-16 | Kerb raiser's inner web, 4,840 | 28 x 66 slot | 151 of 350 MPa, LC8a | 43.8, 35 | 32.5, 28, airbag bracket | 46.0 of 81.9 MPa | meets |
-| H-22 | B-18 | Kerb raiser's inner web, 4,952 | 14 x 31 slot | 183 of 350 MPa, LC8a | 25.8, 17.5 | 66.3, 28, H-18 | 63.6 of 81.9 MPa | meets |
-| H-23 | K-08 | Kerb raiser's inner web, 5,996 | 16 x 23 slot | 145 of 350 MPa, LC8a | 39.8, 20 | 66.5, 16 | 3.1 of 81.9 MPa | meets |
+| H-17 | B-18 | Kerb raiser's inner web, 2,015 | 14 x 54 slot | 91 of 350 MPa, LC6 | 25.8, 17.5 | 81.5, 14 | 34.2 of 81.9 MPa | meets |
+| H-18 | B-16 | Kerb raiser's inner web, 2,267 | 28 x 103 slot | 88 of 350 MPa, LC6 | 39.8, 35 | 30.5, 28 | 31.6 of 81.9 MPa | meets |
+| H-19 | D-14 | Kerb raiser's outer web, 2,291 | 24 x 74 slot | 108 of 350 MPa, LC6 | 43.8, 30 | 24.4, 24, nut plate | 24.9 of 81.9 MPa | meets |
+| H-20 | D-14 | Kerb raiser's inner web, 4,669 | 24 x 58 slot | 187 of 350 MPa, LC8a | 49.8, 30 | 42.5, 24 | 38.8 of 81.9 MPa | meets |
+| H-21 | B-16 | Kerb raiser's inner web, 4,840 | 28 x 66 slot | 152 of 350 MPa, LC8a | 43.8, 35 | 32.5, 28, airbag bracket | 46.2 of 81.9 MPa | meets |
+| H-22 | B-18 | Kerb raiser's inner web, 4,952 | 14 x 31 slot | 183 of 350 MPa, LC8a | 25.8, 17.5 | 66.3, 28, H-18 | 63.8 of 81.9 MPa | meets |
+| H-23 | K-08 | Kerb raiser's inner web, 5,996 | 16 x 23 slot | 146 of 350 MPa, LC8a | 39.8, 20 | 66.5, 16 | 3.1 of 81.9 MPa | meets |
 | H-24 | K-09 | Road raiser's inner web, 5,988 | 16 x 33 slot | 91 of 350 MPa, LC8a | 54.8, 20 | 51.5, 16 | 11.0 of 81.9 MPa | meets |
 
 All 22 meet every rule. The services moved twelve of them off the rails' and raisers' 50 mm faces and the welds:
 
 - K-08 and K-09 rise inboard of the rails behind the grey tank, enter the raisers through their inner webs at 78 and 64 mm above the seam (H-23, H-24), and run forward inside them in the inboard lane, K-08 between D-14 and B-18. At the XT centre station each turns square across its raiser into OR-05 through a round 16 mm hole on the outrigger's centre line, tied to it, its edge 17.5 mm from the root weld's toes either side (H-01, H-03). A lamp cable bends at 57 mm, so only a turn that starts in the inboard lane meets the outer web square.
-- K-10 is the brake circuit's 16 mm2 pair, so its holes are 27 mm (I2-32). It leaves the road rail through its outer web at Z 647 beside X 3,395, ahead of the front arms' hinge and outside FIT-05's sweep, where the range at its edge is 17.1 MPa, drops outside the rail, passes under it and runs back under CM-04 and the tank guard to the TSC (H-15, was beside X 4,215 in the front tyre's path, I2-30).
+- K-10 is the TSC's supply, a 25 mm2 pair since the SB50's lead between the vehicles counts in its 2 % (I2-50), so its holes are 30 mm. It enters the road rail through its outer web at Z 649 beside X 2,442, 31.5 mm from the drawbar overlap's fillet (H-14), and leaves it at Z 647 beside X 3,423, ahead of the front arms' hinge and outside FIT-05's sweep, where the range at its edge is 17.3 MPa, drops outside the rail, passes under it and runs back under CM-04 and the tank guard to the TSC (H-15, was beside X 4,215 in the front tyre's path, I2-30).
 - K-01 leaves the road rail through its outer web at Z 680 beside X 6,021, ahead of the rear steady's swing, and drops behind it (H-16, was the rail's bottom face 14 mm from K-09's hole).
 - B-16 leaves the kerb raiser at Z 796, 30.5 mm from the seam's fillet, under D-14, which rides 16 mm higher from X 2,560 forward (H-18).
 - B-18, B-16 and D-14 leave G20's outboard row and come down into the 115.5 mm between the kerb raiser and the rear tank's 20 mm, the tank's kerb side 36 mm inboard for G20. They run forward against the raiser and enter it on slants through its inner web, B-18 at Z 840, B-16 at Z 800 and D-14 at Z 806, after it runs at Z 760 for its 110 mm bend (H-20 to H-22, were the raiser's top face). G20, Roxtec's S 4x1, stands over the gap with the chase's loom inboard of the three, so they add no hole and no frame. A frame outboard of the raiser would sit within FIT-05's 50 mm of the rear tyre at full travel and in its spray, and a reinforced opening in the top face would put its collar's welds across the composite rail's top flange (TB 070).
