@@ -243,7 +243,7 @@ def ct101(prj, model, bom, checks, reg, dwg):
     ], width_chars=96, size=1.7, title="MASS AND CUT LIST")
     S.notes(sh, 22, 46, [
         "DATUM DIM-01: X FROM THE BALL CENTRE, POSITIVE REARWARD. Y FROM THE CENTRELINE, POSITIVE TO THE ROAD SIDE. Z UP FROM THE GROUND AT DESIGN RIDE HEIGHT.",
-        "RAILS RHS 150x50x3 C450L0 WITH A CONTINUOUS RHS 127x51x3.5 C350L0 RAISER (ONE COMPOSITE SECTION), 20.5 mm FLOOR BEARER STRIP. NO WELD ACROSS THE WIDTH OF A RAIL (TB 070).",
+        "RAILS RHS 150x50x4 C450L0 WITH A CONTINUOUS RHS 127x51x3.5 C350L0 RAISER (ONE COMPOSITE SECTION), 20.5 mm FLOOR BEARER STRIP. NO WELD ACROSS THE WIDTH OF A RAIL (TB 070).",
         (f"REVISION {dwg['revisions'][-1]['rev']}: THE HOME TRAILER. AXLE GROUP CENTRE AT X {lay.V['axle_x']:,.0f} (H17). THE XT REAR SHOCK "
          "CROSSMEMBER IS RHS 150x50x4, A GREY-BAY FLOOR CROSSMEMBER CARRIES THE GREY TANK, NO PLAN BRACES BEHIND THE XT FRONT HINGE, "
          f"EVERY CASE AT THE {_forces()['plate']:.0f} kg PLATE. LOAD PATHS ON CT-104."),
@@ -420,7 +420,7 @@ def ct103(prj, model, bom, checks, reg, dwg):
     S.vdim(sh, cx - 6, zb + 150 / k, cx - 6, zb + 275 / k, cx - 9, "125", size=1.6)
     S.leader(sh, (cx + 25 / k, zb + (275 + P["strip_t"] / 2) / k), (cx + 9, zb + 61), f"{P['strip_t']:.1f} BEARER STRIP", size=1.5)
     weld_symbol(sh, (cx + 25 / k, zb + 150 / k), (cx + 7, zb + 45), "4", both=True, note="CONTINUOUS")
-    for i, t in enumerate((f"RAIL 150x50x3 C450L0 + RAISER 127x51x3.5 C350L0", f"I {comp['I'] / 1e6:.1f} x 10^6 mm4",
+    for i, t in enumerate((f"RAIL 150x50x4 C450L0 + RAISER 127x51x3.5 C350L0", f"I {comp['I'] / 1e6:.1f} x 10^6 mm4",
                            f"Z {comp['Z_bottom'] / 1e3:.1f} (BOTTOM), {comp['Z_top'] / 1e3:.1f} (TOP) x 10^3 mm3", "VENT EACH END OF EACH BAY")):
         sh.text(cx - 26, zb - 6 - 3 * i, t, 1.5)
     # ---- E: outrigger root, section along the outrigger, 1:10

@@ -59,7 +59,7 @@ params:
   max_element: 250                            # longest frame element
 
 roles:
-  rail: {section: RHS_150x50x3, name: "Main rail"}
+  rail: {section: RHS_150x50x4, name: "Main rail"}   # 4 mm since the 4,000 kg plate (revision D): LC8a reached 1.01 of yield at 3 mm
   raiser: {section: RHS_127x51x3p5, name: "Raiser on the rail, continuous fillet welds to the rail"}
   cm_xt: {section: RHS_150x50x3, name: "XT suspension crossmember, full rail height"}
   cm_end: {section: RHS_150x50x3, name: "Body end crossmember, full rail height"}
@@ -129,8 +129,8 @@ fittings:
      price: {aud: 394.20, basis: estimate, date: 2026-11-20, note: "21.9 m at AUD 18/m: HDPE strip about AUD 14/m and 50 mm EPDM tape about AUD 4/m"}}
   # bought parts on the drawbar (they replace the DB-03 block)
   - {id: DB-03, name: "Cruisemaster DO45 Plus coupling, with the integrated handbrake, ADR rated 4,500 kg, D-value 24.5 kN, V-value 14.5 kN", kind: bought, material: "Forged steel yoke and rear nut, cast housing, Zn-Ni with e-coat (Cruisemaster)", mass_kg: 13.5, maturity: estimate,
-     price: {aud: 875.00, basis: listing, url: "https://cruisemaster.com.au/do45-plus-with-handbrake/", date: 2026-11-23, note: "Cruisemaster's shop, with the 1 1/4 in tow pin, its cover, the C-spanner and the fitment bolts"},
-     source: "Estimate: Cruisemaster does not publish the mass. The DO35 V3 is about 8 to 10 kg at retailers, and the DO45 is the same design for 4.5 t with a wider four-bolt base and a 1 1/4 in pin, about 1.4 times the DO35 (est.)", at: [80, 0, "coupling_z + 40"],
+     price: {aud: 750.00, basis: listing, url: "https://cruisemaster.com.au/do45-plus-with-handbrake/", date: 2026-11-23, note: "Cruisemaster's AUD 875 kit with its cover, C-spanner and fitment bolts, less the 1 1/4 in (32 mm) tow pin, AUD 125, which goes in Ford's 4.5 t hitch and is on the truck's list as TW01"},
+     source: "Estimate: Cruisemaster does not publish the mass. The DO35 V3 is about 8 to 10 kg at retailers, and the DO45 is the same design for 4.5 t with a wider four-bolt base, about 1.4 times the DO35 (est.), without the tow pin, which stays on the truck (TW01)", at: [80, 0, "coupling_z + 40"],
      box: [-70, -100, "coupling_z - 60", "db_apex_x + 70", 200, "rail_underside_z - db_depth - coupling_z + 60"]}
   - {id: DB-05, size: [760, 120, 200], name: "ARK XO750 jockey wheel, 750 kg, with its swivel clamp, swung up for travel: post along the drawbar, wheel forward", kind: bought, material: "Steel, zinc plated (est.), rubber wheels", mass_kg: 20.0, maturity: spec,
      price: {aud: 449, basis: listing, url: "https://www.arkcorp.com.au/product/xo750-jockey-wheel/", date: 2026-11-20, note: "ARK RRP, SKU ORJW750d"},

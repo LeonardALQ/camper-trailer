@@ -10,8 +10,8 @@ checks: []
 # (21 Nov 2026) replaced the plan's 250 kg towball cap with the rule it stood for: in every case the towball keeps the
 # ute's rear axle within its rating with growth, computed from the ute model at that ball load. H17 put the Lovells Elite
 # kit on the ute, and H18 plates its rear axle at 2,800 kg, twice the shared wheel's 1,400 kg. H17 also set the design
-# towball range the axle solve uses: at least 8.0 % in every case and at most 420 kg with growth since the DO45 (23 Nov
-# 2026), 320 kg before. H2 sets the 7.5 %
+# towball range the axle solve uses: at least 9.0 % in every case and at most 420 kg with growth since the DO45 (23 Nov
+# 2026), 8.0 % and 320 kg before. H2 sets the 7.5 %
 # floor and the plate, 4,000 kg since 23 Nov 2026. VSB1 sets no towball share. Limits here are never changed to make a check pass.
 # The services checks SVC-01 to SVC-12 (H28: clearance, bend radii, 230 V segregation, the battery's terminal face,
 # coverage, voltage drop, falls, the runs' spacing, the glands' room, then the cables' ratings, heat and supports) are defined beside the runs in data/routes.yaml `checks`, with their sources, and
@@ -38,7 +38,7 @@ trailer_checks:
     inputs: [TW-01, TW-02, TW-03]
     why: Decision H2 keeps 100 kg of the 4,000 kg plate in reserve for the estimates. H13 holds it with the travel limit on water, and H21 takes any excess off the water.
   - id: MAS-02
-    title: Axle group load with growth, times 1.2 for VSB1's 120 % rule, within the kit's GTM
+    title: Axle group load with growth within the kit's GTM, times 1.2 for VSB1's 120 % rule unless the tandem shares load
     type: mass
     quantity: axle_vsb1
     limit: kit_gtm
@@ -46,7 +46,7 @@ trailer_checks:
     cases: all
     severity: fail
     inputs: [SUP-01, SUP-02, TW-01, TW-02, TW-03]
-    why: VSB1 asks the axles to carry 120 % of their share where they do not share load, as the XT's do not (report 06). The kit's GTM is Cruisemaster's figure for the 4,500 kg XT Air build.
+    why: "VSB1 Rev 6 (axles and suspension) asks the axles of a close-coupled group that does not share load to carry 120 % of their load at ATM. At the 4,000 kg plate that needs 4,440 kg of the XT Air build's 4,050 kg, so the XT Air is ordered in Cruisemaster's load-sharing tandem configuration (CIS-006, params load_sharing), each side's two bags on one circuit, and the check takes the axle group load itself. The kit's GTM is Cruisemaster's figure for the 4,500 kg XT Air build."
   - id: MAS-03
     title: Towball keeps the ute's rear axle within its 2,800 kg plate with growth and stays within the 350 kg towbar, in every case
     type: towball_ute
@@ -79,17 +79,17 @@ trailer_checks:
     min: 0
     severity: fail
     inputs: []
-    why: Decision H17. The axle solve sets the axle in the middle of the window between the position where the lightest case reaches 8.0 % on the ball and the one where the heaviest towball with growth reaches 420 kg (data/load_cases.yaml axle_window). A window under 0 mm means no axle position meets both.
+    why: Decision H17. The axle solve sets the axle in the middle of the window between the position where the lightest case reaches 9.0 % on the ball and the one where the heaviest towball with growth reaches 420 kg (data/load_cases.yaml axle_window). A window under 0 mm means no axle position meets both.
   - id: MAS-12
-    title: Towball load at least 8.0 % of the trailer's mass in every case (H17 design target)
+    title: Towball load at least 9.0 % of the trailer's mass in every case (H17 design target)
     type: mass
     quantity: towball_pct
     basis: both
     cases: all
-    min: 8.0
+    min: 9.0
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: Decision H17 asks for a towball well clear of H2's 7.5 % floor (MAS-04), because the masses are still estimates.
+    why: Decision H17 asks for a towball well clear of H2's 7.5 % floor (MAS-04), because the masses are still estimates. 9.0 % since the 4,000 kg plate (8.0 % before), towards the 10 % Ford's towing guide aims at.
   - id: MAS-13
     title: Towball load at most 420 kg with growth in every case (H17 design target)
     type: mass
@@ -115,7 +115,7 @@ trailer_checks:
     cases: all
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: LT265/75R16 123/120, 1,550 kg per tyre (report 16, the ute's tyre). 1.2 times the heavier side's share of the axle group load over its two tyres, from the lateral centre of gravity.
+    why: LT265/75R16 123/120, 1,550 kg per tyre (report 16, the LandCruiser's size when chosen; the Super Duty's 8-stud 18 in wheels share nothing with it). 1.2 times the heavier side's share of the axle group load over its two tyres, from the lateral centre of gravity.
   - id: MAS-07
     title: Axle group load with growth within the NSW examiner's GTM cap
     type: mass

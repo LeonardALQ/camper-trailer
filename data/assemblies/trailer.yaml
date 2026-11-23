@@ -38,7 +38,7 @@ params:
   roof_front_r: 150          # rounded front edges (H12, report 25 option A+): roof to front wall
   front_vert_r: 250          # and both front vertical edges, in bonded GRP corner pieces
   # ---------------------------------------------------------------- running gear (reports 06 and 16, report 18 section 3.4)
-  tyre_d: 805                # LT265/75R16 123/120, the ute's tyre (report 16, Yokohama G015)
+  tyre_d: 805                # LT265/75R16 123/120 (report 16, Yokohama G015), the LandCruiser's size when chosen. The Super Duty's 8-stud 18 in wheels share nothing with the trailer's
   tyre_w: 272                # tyre envelope width (estimate, report 18 open question 9)
   slr_deflection: 20         # static loaded radius = free radius less 20 mm (estimate, report 06 section 7)
   hub_z: tyre_d / 2 - slr_deflection
@@ -134,21 +134,22 @@ params:
   water_travel_l: 420        # most fresh and grey water aboard while towing: the full 420 L since the 4,000 kg plate and its 3,900 kg target (H2 and H13 as amended 23 Nov 2026), so fresh and grey together never pass what the fresh tanks hold. H21 still takes any excess over the target off it in 5 L steps. Before: 280 L, H13's 350 L at the 3,500 kg plate less 70 L by H21
   water_highway_l: 50        # owner's highway figure
   grey_full_l: 130           # grey tank's net capacity (report 21 section 10)
-  tank_z0: rail_underside_z
-  tank_h: floor_underside_z - 10 - rail_underside_z
+  tank_z0: rail_underside_z - 20   # 20 mm below the rails since the 4,000 kg plate, on the guard below them, so the shorter rear tank keeps the 420 L
+  tank_h: floor_underside_z - 10 - tank_z0
   tank_w: 975                # the tanks keep their size on the wider rails (H22): 100 mm each side to the rails for the airbag and shock mounts (est.)
   tank_f_x0: axle_x + xt_front_hinge_rear + 10
   tank_f_l: xt_centre_front - 10 - (xt_front_hinge_rear + 10)          # 830 mm
   tank_r_x0: axle_x + xt_centre_front + xm_w + 10
-  tank_r_l: xt_rear_shock_front - 10 - (xt_centre_front + xm_w + 10)   # 760 mm
+  tank_r_l: min(xt_rear_shock_front - 10, wet_x0 - axle_x) - (xt_centre_front + xm_w + 10)   # to 10 mm ahead of the XT rear shock crossmember, or to the wet room's front (145 mm ahead of the shower well WR-10) if that is nearer, so the board's 230 V and 48 V runs from G20 cross to G15 behind it, ahead of G13's waste (I2-22): 690 mm at X 4,474 (760 mm before the 4,000 kg plate)
   grey_x0: axle_x + xt_rear_shock_front + xm_w + 10   # grey tank in the rear bay, behind the XT rear shock crossmember
-  grey_l: 890                # to 50 mm ahead of the rear crossmember at the solved axle
-  grey_z0: rail_underside_z - 40   # 40 mm below the rails, so the grey-bay floor crossmember crosses its middle above it
-  grey_h: 190                # 878 x 963 x 178 mm inside, about 140 L net with its baffle (report 21 asks 130 L)
+  grey_l: body_x1 - xm_w - 50 - grey_x0   # to 50 mm ahead of the rear crossmember, where the lamp looms K-01, K-08 and K-09 rise, so it follows the axle: 778.5 mm at X 4,486 (890 mm at X 4,379.9 before the 4,000 kg plate)
+  grey_w: 1040               # wider than the fresh tanks: the rear bay has no airbag or shock mount, and the rear recovery tongues stand 22 mm outboard of it
+  grey_z0: rail_underside_z - 44   # 44 mm below the rails, so the grey-bay floor crossmember crosses its middle above it and the guard stays inside the underfloor zone
+  grey_h: 194                # 766 x 1,028 x 182 mm inside at X 4,486, about 134 L net with its baffle and a 10 mm air gap (report 21 asks 130 L). Wider and 4 mm deeper than before the 4,000 kg plate, for the bay 112 mm shorter
   # ---------------------------------------------------------------- equipment (report 13)
   diesel_l: 15               # heater fuel tank (report 13 open question 6)
   diesel_tank_l: 440         # 440 x 400 x 100 mm HDPE tank, 17.6 L gross (estimate)
-  diesel_tank_x0: axle_x + xt_front_hinge_rear - xm_w - 60 - diesel_tank_l   # ahead of the XT front hinge crossmember, in the braced bay
+  diesel_tank_x0: min(axle_x + xt_front_hinge_rear - xm_w - 60, 3401) - diesel_tank_l   # ahead of the XT front hinge crossmember, in the braced bay, its rear end no further back than X 3,401, so the runs to G9 and G19 at X 3,392 pass behind it (I2-22). Since the 4,000 kg plate moved the axle back, the bay behind it is longer
   solar_l: 2054              # Sunman eArc SMF430F-12X12UW, 2,054 x 1,084 x 2 mm, bonded to the roof (report 13 section 4)
   solar_w: 1084
   solar_x0: body_x0 + 156    # array 4,108 x 2,168 mm, centred on the 4,420 mm roof, no roof hatches (report 18 section 1.2)
@@ -208,6 +209,7 @@ build_order:
 # the body roll until the outer bump stops land and squash, and the tyres add their own roll and their lateral give.
 stability:
   bump_gap_mm: 85            # bump stop to the chassis at ride height with the style 26 air spring (Cruisemaster XT Air guide CIS-006 rev 25)
+  load_sharing: 1            # the XT Air tandem in Cruisemaster's load-sharing configuration, each side's two bags on one circuit (CIS-006 rev 25, RG-01, RG-04). VSB1's 120 % rule is for non-load-sharing close-coupled axles, so MAS-02 checks the axle group load itself (H2 as amended 23 Nov 2026)
   bump_squash_mm: 10         # the rubber stop's own give at the overturning load (est.)
   air_spring_rate: 88        # N/mm, each air spring at its ride pressure, about 1.8 Hz on its wheel's load (est.)
   tyre_rate: 300             # N/mm, the LT265/75R16 123/120's vertical rate at trailer pressure (est.)
@@ -276,10 +278,10 @@ zones:
 items:
   # ================================================================ running gear (reports 06 and 16)
   - id: RG-01
-    name: Cruisemaster XT Freestyle Air (4,500 kg build), arm, Firestone style 26 airbag, LC5 M14 hub drum and 12 inch ABS-enabled electric brake
+    name: Cruisemaster XT Freestyle Air (4,500 kg build) in its load-sharing tandem configuration, arm, Firestone style 26 airbag, LC5 M14 hub drum and 12 inch ABS-enabled electric brake
     model: {name: xt_arm, front: in_y, hub: 419, hub_w: 60, top: rail_underside_z - hub_z + 60, slot: hub_y - tyre_w / 2 - rail_outer_w / 2, extras: [{name: xt_hub, front: in_y, box: [axle_x + h - 154, s * hub_y - (s + 1) / 2 * 95, hub_z - 154, 308, 95, 308]}]}
     material: "Steel arm, galvanised (est.), rubber airbag, cast iron brake drum (est.)"
-    note: "Hub: Cruisemaster LC5, 5 x 150 with M14 studs and a 110 mm spigot, the ute's pattern, on the 12 inch ABS-enabled A/T electric drum (decision log 11:25)."
+    note: "Hub: Cruisemaster LC5, 5 x 150 with M14 studs and a 110 mm spigot, the LandCruiser's pattern when chosen, on the 12 inch ABS-enabled A/T electric drum (decision log 11:25). Load sharing (Cruisemaster CIS-006 rev 25 lists single and load-sharing tandem configurations): each side's front and rear bags are on one air circuit with no valve between them, so the two axles of a side carry the same load at any wheel travel, as VSB1 Rev 6 asks of a load-sharing group, and its 120 % rule for non-load-sharing close-coupled axles does not apply (params load_sharing)."
     system: running_gear
     price: {aud: 7442.04, basis: listing, url: "https://www.diycaravans.com.au/shop/cruisemaster-xt-freestyle-air-suspension-kit-tandem/", date: 2026-11-20, note: "One tandem kit for all four arms: 4,500 kg build, 12 in ABS-enabled A/T electric drums, LC5 M14 studs, Level 1 (SKU 8015 ABS). Research report 22"}
     for: {h: [front_hub_dx, rear_hub_dx], s: [1, -1]}
@@ -293,11 +295,11 @@ items:
     system: running_gear
     price:
       - {item: "Yokohama Geolandar A/T G015 LT265/75R16 123/120R", aud_each: 471.18, basis: listing, converted_from: "USD 303.99", url: "https://www.tiremart.com/yokohama-geolandar-a-t-g015-lt-265-75r16-123-120r-e-10-ply-at-all-terrain-tire-dc", date: 2026-11-20, note: "No Australian listing for this size could be read (research report 22)"}
-      - {item: "Fitting and balancing", aud_each: 35, basis: estimate, date: 2026-11-20, note: "As the ute's tyre fitting"}
+      - {item: "Fitting and balancing", aud_each: 35, basis: estimate, date: 2026-11-20, note: "As a light-truck tyre fitting (est.)"}
     for: {h: [front_hub_dx, rear_hub_dx], s: [1, -1]}
     cyl: {c: [axle_x + h, s * hub_y, hub_z], r: tyre_d / 2, w: tyre_w}
     mass: {basis: declared, unit_kg: 22.6, maturity: spec, source: "Yokohama's size table, 22.6 kg (report 16 section 4)"}
-    note: Rated 1,550 kg (load index 123), 80 psi maximum. The ute's tyre. The cylinder is the wheel and tyre envelope.
+    note: Rated 1,550 kg (load index 123), 80 psi maximum. The trailer's own size, with its own spare. The cylinder is the wheel and tyre envelope.
   - id: RG-06
     name: Wheel, ROH Trak 2 16 x 7 ET 0 steel, 5 x 150
     model: {name: steel_wheel, front: in_y, hub_side: low, box: [axle_x + h - 216, s * hub_y - 89, hub_z - 216, 432, 178, 432]}
@@ -321,7 +323,7 @@ items:
   - id: RG-04
     name: XT Air supply, Cruisemaster Level 3 manual kit, 12 V compressor, 11 litre tank, gauges, pressure switch and air lines, in a sealed box under the floor's front bay
     material: "Compressor, steel air tank (est.) and nylon air lines (est.), in a sealed 1.6 mm aluminium box"
-    note: "The Level 3 kit has no height valves, so the bags are set by hand from the panel (research report 22 finding 9). The box hangs between the rails ahead of the first floor crossmember, reached from below, out of the cabin. The lines run along the rails to the four bags."
+    note: "The Level 3 kit has no height valves, so the bags are set by hand from the panel (research report 22 finding 9). Its two gauges are the two sides: each side's line tees to its front and rear bag with nothing between them, the load-sharing configuration (RG-01). The box hangs between the rails ahead of the first floor crossmember, reached from below, out of the cabin. The lines run along the rails to the four bags."
     system: running_gear
     price:
       - {item: "Cruisemaster Level 3 manual air control kit", aud: 1285.00, basis: listing, url: "https://www.diycaravans.com.au/shop/cruisemaster-xt-freestyle-air-suspension-kit-tandem/", date: 2026-11-20, note: "The Level 3 manual variant less the Level 1 kit (AUD 8,727.04 less 7,442.04)"}
@@ -665,7 +667,7 @@ items:
     box: [tank_r_x0, -tank_w / 2, tank_z0, tank_r_l, tank_w, tank_h]
     tank: true
     mass: {basis: declared, unit_kg: 18.3, maturity: calculated, source: "As UF-01, scaled to 760 mm (report 18 section 1.1)", note: "6 mm HDPE kept (saving 1b, H13)"}
-    note: Between the XT centre and rear shock crossmembers, over the rear axle. About 200 L net. The two tanks hold 420 L net, filled at camp. At most 280 L of fresh and grey water ride in travel (H13, H21).
+    note: Between the XT centre and rear shock crossmembers, over the rear axle, its rear end 145 mm ahead of the shower well so the board's runs cross behind it. About 189 L net. The two tanks hold 420 L net, filled at camp, and all of it may ride in travel (H13, H21).
   - id: UF-02
     name: Water in the tanks
     system: underfloor
@@ -683,9 +685,9 @@ items:
                       at: [60, (xt_centre_front + xm_w / 2 - 50 - xt_front_hinge_rear) / 2, xt_centre_front + xm_w / 2 - 110 - xt_front_hinge_rear,
                            xt_centre_front + xm_w / 2 + 110 - xt_front_hinge_rear, (xt_centre_front + xm_w / 2 + 50 + xt_rear_shock_front) / 2 - xt_front_hinge_rear,
                            xt_rear_shock_front - xt_front_hinge_rear - 60],
-                      box: [axle_x + xt_front_hinge_rear, -rail_in, rail_underside_z - 9, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 50]}]}
+                      box: [axle_x + xt_front_hinge_rear, -rail_in, tank_z0 - 9, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 50 + rail_underside_z - tank_z0]}]}
     price: {aud: 341.75, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/107-aluminium-5-bar-checker-plate-tread.html", date: 2026-11-20, note: "One 1200 x 2400 sheet of 3 mm aluminium checker plate, AUD 261.75 (listing), plus angle and fixings AUD 80 (est.)"}
-    box: [axle_x + xt_front_hinge_rear, -rail_in, rail_underside_z - 6, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 6]
+    box: [axle_x + xt_front_hinge_rear, -rail_in, tank_z0 - 6, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 6]
     parts:
       - {item: "3 mm five-bar aluminium treadplate, the XT bays' length by the width between the rails", kg: "(xt_rear_shock_front - xt_front_hinge_rear) * 2 * rail_in * 9.375e-6", basis: estimate, source: "At about 9.4 kg/m2, Austral Wright's approximate 27 kg for a 3 x 1,200 x 2,400 mm five-bar sheet (https://www.australwright.com.au/wp-content/uploads/2012/07/AluminiumTreadplate1.pdf)"}
       - {item: "Aluminium angle, rubber strip and fixings", kg: 3.1, basis: estimate, source: "The older block model's 20 kg less the plate at the 1,175 mm rails"}
@@ -722,10 +724,10 @@ items:
     system: underfloor
     price: {aud: 900, basis: estimate, url: "https://www.plasticonline.com.au/services/plastic-tank-fabrication/", date: 2026-11-20, note: "Welded by a plastic fabricator to the bay's size, with its fittings (research report 21)"}
     zone: underfloor
-    box: [grey_x0, -tank_w / 2, grey_z0, grey_l, tank_w, grey_h]
+    box: [grey_x0, -grey_w / 2, grey_z0, grey_l, grey_w, grey_h]
     parts:
-      - {item: "Shell, 2.44 m2 of 6 mm HDPE at 950 kg/m3", kg: 13.9, basis: calculated, source: "Research report 21 section 10 build, resized to the bay"}
-      - {item: "Baffle, 0.19 m2 of 6 mm HDPE", kg: 1.0, basis: calculated}
+      - {item: "Shell of 6 mm HDPE at 950 kg/m3, 5.7 kg/m2, the bay's size", kg: "2 * (grey_l * grey_w + grey_l * grey_h + grey_w * grey_h) * 5.7e-6", basis: calculated, source: "Research report 21 section 10 build, resized to the bay"}
+      - {item: "Baffle of 6 mm HDPE, the tank's section", kg: "grey_w * grey_h * 5.7e-6", basis: calculated}
       - {item: "40 mm inlets, vent, level sender, 40 mm outlet with a lever valve and camlock", kg: 0.8, basis: estimate}
     note: Every drain falls to it by gravity, so its top stays at the rails' top, under the shower well. It sits on two aluminium angle bearers between the XT rear shock and rear crossmembers on 10 mm rubber, strapped up to the grey-bay crossmember. Vent to the road side, outlet and camlock on the kerb side. Empty for travel except in TC7 and TC8.
   - id: UF-08W
@@ -733,15 +735,15 @@ items:
     system: underfloor
     load: grey
     hollow: true
-    box: [grey_x0 + 6, -tank_w / 2 + 6, grey_z0 + 6, grey_l - 12, tank_w - 12, grey_full_l * 1e6 / ((grey_l - 12) * (tank_w - 12))]
+    box: [grey_x0 + 6, -grey_w / 2 + 6, grey_z0 + 6, grey_l - 12, grey_w - 12, grey_full_l * 1e6 / ((grey_l - 12) * (grey_w - 12))]
     mass: {basis: declared, total_kg: 130, maturity: spec, source: "grey_full_l at 1 kg per litre (research report 21 section 10)"}
   - id: UF-09
     name: Grey tank guard, 2 mm aluminium on rubber, bolted to the rails
     material: "2 mm aluminium sheet on rubber strips"
     system: underfloor
-    # model: hung 40 mm under the rails on three pairs of 50 mm angles bolted to the rails' inner faces, clear of the dump
-    # line at X 5,450 and of the rear steadies (H27)
-    model: {name: tank_guard, extras: [{name: guard_hangers, foot: 47.5, at: [5300 - grey_x0, 5620 - grey_x0, 5940 - grey_x0],
+    # model: hung 44 mm under the rails on three pairs of 50 mm angles bolted to the rails' inner faces, 200 mm ahead of the
+    # bay's middle, 60 mm behind it and 40 mm from its rear end, clear of the dump line at X 5,450 and of the rear steadies (H27)
+    model: {name: tank_guard, extras: [{name: guard_hangers, foot: 47.5, at: [grey_l / 2 - 200, grey_l / 2 + 60, grey_l - 40],
                                         box: [grey_x0, -rail_in, grey_z0 - 9, grey_l, 2 * rail_in, rail_underside_z + 25 - grey_z0 + 9]}]}
     price: {aud: 250, basis: estimate, url: "https://store.allaluminium.com.au/collections/marine-sheet-aluminium", date: 2026-11-21, note: "One 1200 x 2400 sheet of 2 mm 5052, between the listed 1.6 and 2.5 mm sheets (AUD 166.62 and 260.37), plus rubber strip and bolts"}
     zone: underfloor

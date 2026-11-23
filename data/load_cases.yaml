@@ -49,14 +49,16 @@ trailer_cases:
     load: [fuel, gear, grey]
 
 # The axle solve's design targets (decision H17, cad/trailer.py). The axle sits in the middle of the window between the
-# position where the lightest case has 8.0 % of its mass on the ball (both bases) and the one where the heaviest case
-# has 420 kg on it with growth. The ceiling is the lower of the DO45's 450 kg (its fitting guide) and the Ranger Super
+# position where the lightest case has 9.0 % of its mass on the ball (both bases) and the one where the heaviest case
+# has 420 kg on it with growth. The floor was 8.0 % until the 4,000 kg plate: Ford's towing guide aims at about 10 % and
+# Smart Hitch recommends 10 to 15 %, and 9.0 % puts the lowest case at about 10 % at the solved axle while the rear bays
+# still hold the 420 L and the 130 L grey tank (a 10 % floor moves the axle about 50 mm further back, where they do not). The ceiling is the lower of the DO45's 450 kg (its fitting guide) and the Ranger Super
 # Duty's tow ball limit, 450 kg (est.: Ford's published sheets and BEMM give none, and 10 % of its 4,500 kg is what the
 # standard Ranger allows at 3,500 kg and what Ford's towing guide aims at), less H17's 30 kg in hand, in place of 350 kg
 # less 30 kg for the 79, its towbar and the DO35. The hard limits sit outside: 7.5 % (MAS-04, H2) and the ute's towbar
 # and rear axle (MAS-03, H14).
 axle_window:
-  towball_pct_min: 8.0
+  towball_pct_min: 9.0
   towball_max_kg: 420
 
 # The towball used only for the supplier's note on the axle group at the plate (cad/inputs.py): the 7.5 % floor at the
@@ -70,7 +72,7 @@ registration:
   fallback: Victoria
   plated_atm_kg: {v: 4000, src: "Decision H2 as amended 23 Nov 2026 (Leonard: 'Yeah we can raise it to 4t that's fine'): the Ranger Super Duty tows 4,500 kg braked (Ford dealer specification sheet, 2026MY) and the DO45's 4,500 kg covers it. Target fully loaded with growth at most 3,900 kg (MAS-10), so H2's 100 kg reserve stays. It replaces 20 Nov's 3,500 kg, which came from the LandCruiser's towing rating and the DO35"}
   ratings:
-    tyre_kg: {v: 1550, src: "LT265/75R16 123/120 load range E, load index 123, per tyre, four tyres (report 16, the ute's tyre)"}
+    tyre_kg: {v: 1550, src: "LT265/75R16 123/120 load range E, load index 123, per tyre, four tyres (report 16, the LandCruiser's tyre when chosen)"}
     coupling_kg: {v: 4500, src: "Cruisemaster DO45 Plus, ADR rated 4,500 kg, D-value 24.5 kN, V-value 14.5 kN, 50 to 450 kg on the ball (Cruisemaster's DO45 Plus fitting guide and its DO45 page, read 23 Nov 2026). It replaces the DO35's 3,500 kg"}
     chains_kg: {v: 8000, src: "Two 8 mm grade 80 (T) chains to AS 2321, minimum breaking load 8.2 t each, which ADR 62/02 clause 14.3.1.3 and Table 1 allow up to 8.0 t ATM (over 3.5 t a trailer's chains are grade T with a breaking load over the ATM, VSB1 Rev 6 9.2.1). They replace the 4177-35 chains, which AS 4177.4 caps at 3,500 kg"}
     brakes_kg: {v: 4500, src: "Cruisemaster A/T 12 inch electric drums, 4.5 t tandem capacity (report 06)"}

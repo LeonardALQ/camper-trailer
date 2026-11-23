@@ -50,11 +50,11 @@ lines:
   # ================================================================ chassis stock, shared over the members and plates it covers
   - id: STL-01
     group: chassis
-    name: RHS 150 x 50 x 3.0, 8 m lengths, for the rails and the full-height crossmembers
-    qty: 2
+    name: RHS 150 x 50 x 3.0, one 8 m length, for the full-height crossmembers but the XT rear shock's
+    qty: 1
     unit: 8 m length
-    covers: [RL-K, RL-R, CM-01, CM-04, CM-05, CM-08]
-    price: {aud_each: 205.65, basis: listing, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-20, note: "SKU RHS36. 13.1 m needed. Ask for C450L0 (Austube C450PLUS) on the mill certificate"}
+    covers: [CM-01, CM-04, CM-05, CM-08]
+    price: {aud_each: 205.65, basis: listing, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-20, note: "SKU RHS36. 4.3 m needed. Ask for C450L0 (Austube C450PLUS) on the mill certificate"}
   - id: STL-02
     group: chassis
     name: RHS 127 x 51 x 3.5, 8 m lengths, for the raisers, outriggers and floor crossmembers
@@ -64,11 +64,11 @@ lines:
     price: {aud_each: 294.75, basis: listing, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-20, note: "SKU RHS1275135. 21.9 m needed. RHS 125 x 50 x 3.0 is not a stocked size (research report 22)"}
   - id: STL-09
     group: chassis
-    name: RHS 150 x 50 x 4.0, one 8 m length, for the XT rear shock crossmember
-    qty: 1
+    name: RHS 150 x 50 x 4.0, 8 m lengths, for the rails and the XT rear shock crossmember
+    qty: 2
     unit: 8 m length
-    covers: [CM-06]
-    price: {aud_each: 267.84, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-21, note: "93.0 kg at AUD 2.88/kg, the rate of the listed 150 x 50 x 3.0 and 150 x 50 x 5.0 lengths. 1.1 m needed, so an offcut would do"}
+    covers: [RL-K, RL-R, CM-06]
+    price: {aud_each: 267.84, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-21, note: "93.0 kg at AUD 2.88/kg, the rate of the listed 150 x 50 x 3.0 and 150 x 50 x 5.0 lengths. 9.9 m needed since the rails went to 4 mm for the 4,000 kg plate (CHS-08A). Ask for C450L0 (Austube C450PLUS) on the mill certificate"}
   - id: STL-03
     group: chassis
     name: RHS 150 x 50 x 5.0, one 8 m length, for the drawbar members
