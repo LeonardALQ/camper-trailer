@@ -135,6 +135,14 @@ lines:
     maturity: estimate
     source: "rsd-plan line TW06: 3.5 kg of cable at 0.501 kg a metre for the twin (data/routes.yaml), 0.6 kg of holders, fuses and the Anderson panel and 0.1 kg more for the SB120 and its bracket (est.). The cable's centre is taken halfway from the box front to the tow pin (assumption)"
     cases: [UC1, UC2, UC3, UC4, UCB]
+  - id: UT-21
+    item: "TSC supply at the tow bar (TW07): a 30 A auto-reset breaker at the battery, 6.7 m of 4 B&S twin, a 0.3 m tail of 6 B&S twin and a red Anderson SB50 on a bracket beside the 12-pin socket"
+    kg: 4.0
+    x: (ball_x - 300) / 2
+    z: frame_top_z - 100
+    maturity: estimate
+    source: "Car build line TW07: 3.4 kg of 4 B&S twin at 0.501 kg a metre and 0.1 kg of the 6 B&S tail (data/routes.yaml), 0.5 kg of the breaker, junction, SB50, bracket, lugs and clips (est.). The cable's centre is taken halfway from the battery, about 300 mm ahead of the front axle (est.), to the tow pin"
+    cases: [UC1, UC2, UC3, UC4, UCB]
   - id: UT-18
     item: "Towing mirrors over the factory mirrors (TM01), net"
     kg: 4.0

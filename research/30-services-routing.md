@@ -207,10 +207,15 @@ Round glands take nylon cable glands of their hole's thread with CMP's locknut s
 
 ## 6. Results on the solved layout
 
-All seven checks pass: the closest approach to any envelope box is 20.3 mm, the tightest bend has 0.1 mm to spare,
-the 230 V keeps 56.8 mm from extra-low voltage, the nearest wet line is 344 mm from the terminal face, every one of
-the 101 needs is served, the governing drop is 1.93 % of 2 % (E-13) and the flattest waste falls 1:50. The routed
-cables are 284 m and 47 kg, the pipes and hoses 50 m and 5.8 kg with 64 fittings.
+All twelve checks pass. The closest approach of a run to any envelope box is 20.4 mm (SVC-01), the tightest bend
+keeps its least radius with 0.0 mm to spare (SVC-02), the 230 V keeps 61.8 mm from extra-low voltage (SVC-03), the
+nearest wet line is 344 mm from the terminal face (SVC-04) and every one of the 101 needs is served (SVC-05). The
+governing drop is D-14's 1.98 % of 2 % (SVC-06). The TSC's supply holds its 2 % from the truck's socket to the TSC,
+1.86 %, and the truck's own feed to that socket, car build line TW07, 2.03 % of its own 3 %. The flattest waste falls
+1:50 (SVC-07), no two of the 64 pairs measured overlap (SVC-08), the gland fittings keep 23.4 mm over their spacing
+(SVC-09), the closest cable to its rating keeps 0.1 A (SVC-10), the cables keep 133.4 mm over their distance from the
+hot surfaces (SVC-11) and the longest unsupported span is 597 mm against 600 mm (SVC-12). The routed cables are
+285.2 m and 62.4 kg, the pipes and hoses 50.9 m and 6.0 kg with 71 fittings.
 
 ## 7. Open items
 

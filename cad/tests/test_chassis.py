@@ -4,7 +4,7 @@ import math
 
 import pytest
 
-from cad.chassis_fea import end_plate_moment
+from cad.chassis_fea import end_plate
 from cad.tests.test_trailer import EV, TRAILER
 
 RES = TRAILER.chassis_results(EV["layout"])
@@ -115,18 +115,33 @@ def test_root_gusset_area_follows_its_profile():
 
 
 def test_body_front_is_read_under_the_gussets_heel():
-    """The body front's three rows (I2-51) are read at the A-frame member's end there, and the heel's fillets are the
-    ones the data gives CH-P03, on the rail's end plate CH-P15 that closes the rail's front end."""
+    """The body front's four rows (I2-51, I2-57) are read at the A-frame member's end there, and the heel's fillets are
+    the ones the data gives CH-P03, on the rail's end plate CH-P15 that closes the rail's front end. The plate is flush
+    with the rail's underside and stands over the raiser's bottom wall, so its top weld joins both walls."""
     rows = {r["id"]: r for r in RES["fatigue"]}
     assert rows["FAT-17"]["where"].endswith(f"at X {CH.V['body_x0']:.0f}")
     assert rows["FAT-18"]["where"].startswith("CH-P03") and rows["FAT-19"]["where"].startswith("CH-P15")
-    ep = CH.ev(next(f for f in CH.data["fittings"] if f["id"] == "CH-P15")["at"])
-    assert ep[0] < CH.V["body_x0"] and abs(ep[2] - (CH.V["rail_underside_z"] + CH.role_sec["rail"].d / 2)) < 1e-6
+    assert rows["FAT-20"]["where"].startswith("CH-P15") and rows["FAT-20"]["iiw"] == "415"
+    plate = next(f for f in CH.data["fittings"] if f["id"] == "CH-P15")
+    ep = CH.ev(plate["at"])
+    assert plate["w"] == pytest.approx(CH.role_sec["rail"].d + CH.role_sec["raiser"].t)
+    assert ep[0] < CH.V["body_x0"] and abs(ep[2] - (CH.V["rail_underside_z"] + plate["w"] / 2)) < 1e-6
 
 
 def test_end_plate_solver_matches_a_strip():
     """Far from its short edges a long plate under a uniform line load bends as a strip simply supported on its long
     edges: half the load times half the span less a quarter of the load's width."""
     q, span, foot = 100.0, 46.0, 26.0
-    m = end_plate_moment(span, 600.0, 0.0, 600.0, q, q, foot)
+    m = end_plate(span, 600.0, 0.0, 600.0, q, q, foot, free_bottom=False)["moment"]
     assert m == pytest.approx(q / 2 * (span / 2 - foot / 4), rel=0.03)
+
+
+def test_end_plate_with_a_free_edge_balances_and_bends_as_a_strip():
+    """With Poisson's ratio at zero a tall plate under a line load down its whole height bends as a strip near its free
+    edge, each web taking half the load. Under the heel's rising load the webs, the top and the corners carry it all."""
+    q, span, foot = 100.0, 46.0, 26.0
+    c = end_plate(span, 400.0, 0.0, 400.0, q, q, foot, nu=0.0)
+    assert c["web"][:20] == pytest.approx(q / 2, rel=0.01)
+    r = end_plate(span, 147.75, 0.0, 138.0, 20.0, 183.0, foot)
+    carried = (2 * r["web"].sum() + r["top"].sum()) * r["h"] + 2 * (r["corner_top"] + r["corner_bottom"])
+    assert carried == pytest.approx(r["load"], rel=0.01) and r["corner_top"] < 0

@@ -189,21 +189,38 @@ def short(b) -> str:
     return " ".join(b.name.split(",")[0].split()[:2]).upper()
 
 
-def label_in(sh, r, text, size=1.4, min_size=1.0, pad=0.6, rot_ok=True) -> bool:
+def label_in(sh, r, text, size=1.4, min_size=1.0, pad=0.6, rot_ok=True, avoid=()) -> bool:
     """Write text centred in the sheet rectangle r = (x0, y0, x1, y1) if it fits, shrinking to min_size, or rotated in a
-    tall narrow box. Returns whether it was written."""
+    tall narrow box. A label that would cover a sheet point in `avoid` (a mark drawn later, such as a run tag's dot)
+    slides along its length to the nearest place in the rectangle clear of it. Returns whether it was written."""
     x0, y0, x1, y1 = r
     w, h = x1 - x0, y1 - y0
     s = size
     while s >= min_size - 1e-9:
         if tw(text, s) + 2 * pad <= w and s + pad <= h:
-            sh.text((x0 + x1) / 2, (y0 + y1) / 2 - 0.36 * s, text, s, "middle")
+            cy = (y0 + y1) / 2
+            near = [p[0] for p in avoid if abs(p[1] - cy) < s / 2 + 0.4]
+            sh.text(_slide((x0 + x1) / 2, tw(text, s), x0 + pad, x1 - pad, near), cy - 0.36 * s, text, s, "middle")
             return True
         if rot_ok and tw(text, s) + 2 * pad <= h and s + pad <= w:
-            sh.text((x0 + x1) / 2 + 0.36 * s, (y0 + y1) / 2, text, s, "middle", rot=-90)
+            cx = (x0 + x1) / 2
+            near = [p[1] for p in avoid if abs(p[0] - cx) < s / 2 + 0.4]
+            sh.text(cx + 0.36 * s, _slide((y0 + y1) / 2, tw(text, s), y0 + pad, y1 - pad, near), text, s, "middle", rot=-90)
             return True
         s -= 0.1
     return False
+
+
+def _slide(c: float, length: float, lo: float, hi: float, pts: list, clear: float = 0.4) -> float:
+    """The middle nearest c, from lo to hi, of a label `length` long whose span keeps `clear` mm from the points (each
+    point given along the label's length). Where no place clears them all, the label stays at c."""
+    def free(m):
+        return all(abs(p - m) > length / 2 + clear for p in pts)
+    for k in range(int((hi - lo) / 0.25) + 1):
+        for m in ((c,) if k == 0 else (c - 0.25 * k, c + 0.25 * k)):
+            if lo + length / 2 - 1e-9 <= m <= hi - length / 2 + 1e-9 and free(m):
+                return m
+    return c
 
 
 def cog_symbol(sh, x, y, r=1.4):
@@ -320,7 +337,7 @@ def body_plan(sh, pr, lay, res, cut=1000.0, show=None, labels=True, size=1.35, k
         out[b.iid] = r
     for b in picked:
         if labels and b.iid not in nolabel and b.id not in nolabel:
-            label_in(sh, out[b.iid], short(b), size)
+            label_in(sh, out[b.iid], short(b), size, avoid=avoid)
     if keep:
         for b in (b for b in lay.blocks if b.keep_clear):
             r = pr.rect3(b.box)

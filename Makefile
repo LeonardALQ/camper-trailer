@@ -4,6 +4,7 @@
 #   make strict     the same, but fail if any design check fails
 #   make serve      serve site/dist on 127.0.0.1:8791
 #   make shots      headless screenshots and scroll checks (Playwright image, --network host, loopback server only)
+#   make overrun    the label overrun check alone on the built sheets (it also runs after every drawings step)
 IMAGE   ?= camper-trailer:0.1
 PORT    ?= 8791
 UIDGID  := $(shell id -u):$(shell id -g)
@@ -12,7 +13,7 @@ GIT_REV := $(shell git rev-parse --short HEAD 2>/dev/null || echo uncommitted)$(
 DOCKER  := docker run --rm --user $(UIDGID) -e HOME=/work/.home -e ASTRO_TELEMETRY_DISABLED=1 -e npm_config_cache=/work/.home/.npm -e GIT_REV=$(GIT_REV) -e SITE_URL -e SITE_BASE -v $(CURDIR):/work -w /work $(IMAGE)
 T       := timeout
 
-.PHONY: all image data model trailer ute check strict drawings site serve shots clean
+.PHONY: all image data model trailer ute check strict drawings overrun site serve shots clean
 
 all: image data model ute trailer check drawings site
 	@cat build/checks/summary.txt
@@ -43,9 +44,19 @@ check: trailer ute
 
 strict: all
 	@test "$$(cat build/checks/pytest.exit)" = "0" || (echo "design checks failed"; exit 1)
+	@test "$$(cat build/checks/overrun.exit)" = "0" || (echo "labels overrun on the sheets (build/checks/overrun.txt)"; exit 1)
 
+# After the sheets, the label overrun check reads every one of them (cad/tools/overrun.py): the text a line shows
+# through and the texts on each other. Its exit code is recorded and its count added to the summary, as pytest's are.
 drawings: check
 	$(T) 1800 $(DOCKER) python -m cad.build drawings
+	-$(T) 300 $(DOCKER) sh -c 'python -m cad.tools.overrun build/drawings build/checks/overrun.json > build/checks/overrun.txt 2>&1; echo $$? > build/checks/overrun.exit'
+	@tail -n 1 build/checks/overrun.txt
+	@printf 'overrun exit code %s: %s\n' "$$(cat build/checks/overrun.exit)" "$$(tail -n 1 build/checks/overrun.txt)" >> build/checks/summary.txt
+
+# the overrun check alone on the sheets already built, failing when a sheet has an overrun
+overrun:
+	$(T) 300 $(DOCKER) python -m cad.tools.overrun build/drawings build/checks/overrun.json
 
 site: drawings check
 	$(T) 300 $(DOCKER) python -m cad.sitedata

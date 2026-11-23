@@ -20,7 +20,6 @@ hold the frame at its suspension mounts, as the VSB1 14 test holds the body.
 """
 from __future__ import annotations
 
-import functools
 import math
 from dataclasses import dataclass
 
@@ -38,7 +37,7 @@ RAILS = {"BD-10", "RG-03", "RG-04", "RG-05"}   # hung from the rails: mud flaps,
 CELL = 200.0
 ROOT_GUSSET, ROOT_END_PLATE = "CH-P03", "CH-P15"   # the drawbar root's gusset and the rail's end plate its heel is welded to
 ROOT_PLACES = {"root_splice": "DB-{side}A's mitre at X {x:.0f}", "root_heel_weld": "CH-P03's heel, DB-{side}",
-               "root_end_plate": "CH-P15 on RL-{side}"}
+               "root_end_plate": "CH-P15 on RL-{side}", "root_end_plate_weld": "CH-P15's welds to RL-{side}"}
 NU = 0.3
 
 
@@ -653,9 +652,26 @@ class Analysis:
             return n / area + my * y / i_s
         g_bot, g_top = at(sp.d / 2 - e), at(sp.d / 2 + hg - e)
         throat = g["heel_leg"] / math.sqrt(2)
-        m = end_plate_moment(rail.b - rail.t, rail.d - rail.t, 0.0, hg - rail.t / 2, g_bot * tg, g_top * tg, tg + 2 * g["heel_leg"])
+        plate = self.end_plate_under_heel(g_bot * tg, g_top * tg)
         return dict(root_splice=at(sp.d / 2 + e) + mz * (sp.b / 2) / i_w, root_heel_weld=g_top * tg / (2 * throat),
-                    root_end_plate=6 * m / ep["t"] ** 2)
+                    root_end_plate=6 * plate["moment"] / ep["t"] ** 2,
+                    root_end_plate_weld=max(plate["web"].max() / rail.t, plate["top"].max() / plate["top_t"]))
+
+    def end_plate_under_heel(self, q_foot: float, q_top: float) -> dict:
+        """The rail's end plate CH-P15 under the gusset heel's line load, q_foot at the heel's foot rising to q_top N/mm
+        at its top (FAT-19, FAT-20, I2-57). The plate's bottom edge rests on the drawbar member unwelded, so it is free.
+        Its sides and top are welded to the rail's webs and top flange with full penetration single bevel welds made from
+        outside, the plate behind each wall's end as the backing, and the plate stands up over the raiser's bottom wall,
+        so its top weld joins both walls (`top_t`). The plate spans between the webs' mid-planes and from the bottom
+        wall's mid-plane up to the middle of the walls its top weld joins, as end_plate takes it."""
+        ch = self.ch
+        ep = next(f for f in ch.data["fittings"] if f["id"] == ROOT_END_PLATE)
+        g = next(f for f in ch.data["fittings"] if f["id"] == ROOT_GUSSET)
+        rail = ch.role_sec["rail"]
+        top_t = rail.t + ep["w"] - rail.d          # the rail's top flange and the raiser's bottom wall the plate covers
+        height = rail.d - 1.5 * rail.t + top_t / 2
+        out = end_plate(rail.b - rail.t, height, 0.0, g["w"] - rail.t / 2, q_foot, q_top, g["t"] + 2 * g["heel_leg"])
+        return dict(out, top_t=top_t)
 
     def end_actions_at(self, res, member: str, x: float) -> dict:
         """A member's end actions at its element end nearest X."""
@@ -954,34 +970,90 @@ def _box_gap(a, b) -> float:
     return math.sqrt(sum(max(0.0, b[k] - a[k + 3], a[k] - b[k + 3]) ** 2 for k in range(3)))
 
 
-@functools.lru_cache(maxsize=4)
-def _plate_lu(nx: int, nz: int, h: float):
-    """The factorised five-point Laplacian of an nx x nz grid of interior points h apart, zero on the edges."""
+PLATE_STENCIL = ((0, 0, 20.0), (1, 0, -8.0), (-1, 0, -8.0), (0, 1, -8.0), (0, -1, -8.0), (1, 1, 2.0), (1, -1, 2.0),
+                 (-1, 1, 2.0), (-1, -1, 2.0), (2, 0, 1.0), (-2, 0, 1.0), (0, 2, 1.0), (0, -2, 1.0))
+
+
+def end_plate(span: float, height: float, z0: float, z1: float, q0: float, q1: float, foot: float, h: float = 1.0,
+              free_bottom: bool = True, nu: float = NU) -> dict:
+    """The rail's end plate under the gusset heel's line load (FAT-19, FAT-20, I2-57): a Kirchhoff plate `span` mm between
+    the rail's webs and `height` mm from its bottom edge to the rail's top flange, simply supported on the webs and the
+    top flange it is welded to, and free along its bottom edge, which rests unwelded on the drawbar member (or simply
+    supported there too). The load runs down its middle from z0 to z1 mm above the bottom edge, rising from q0 to q1 N/mm
+    and spread over `foot` mm across. Biharmonic finite differences on a grid h mm apart, the free edge's moment and
+    Kirchhoff shear held at zero by two rows of ghost points (Timoshenko and Woinowsky-Krieger, Theory of plates and
+    shells, 1959, chapters 4 and 5). Returns the largest moment across the span (N mm per mm), the Kirchhoff edge shear
+    a web carries along its height and the top along its width (N/mm, positive where the wall holds the plate back
+    against the load, so its weld is pulled), a top and a bottom corner's force (N, negative where it presses the plate
+    onto the walls' ends) and the load (N). Two webs, the top and the four corners carry the load."""
     import scipy.sparse as sp
-    from scipy.sparse.linalg import splu
-    lx = sp.diags([1.0, -2.0, 1.0], [-1, 0, 1], shape=(nx, nx)) / h ** 2
-    lz = sp.diags([1.0, -2.0, 1.0], [-1, 0, 1], shape=(nz, nz)) / h ** 2
-    return splu((sp.kron(sp.identity(nz), lx) + sp.kron(lz, sp.identity(nx))).tocsc())
+    from scipy.sparse.linalg import spsolve
+    nx, nz = round(span / h), round(height / h)
+    j0 = 0 if free_bottom else 1
+    index = {(i, j): n for n, (i, j) in enumerate((i, j) for j in range(j0, nz) for i in range(1, nx))}
+    memo: dict = {}
 
+    def comb(*terms):
+        out: dict = {}
+        for c, d in terms:
+            for k, v in d.items():
+                out[k] = out.get(k, 0.0) + c * v
+        return out
 
-def end_plate_moment(span: float, height: float, z0: float, z1: float, q0: float, q1: float, foot: float, h: float = 1.0) -> float:
-    """Largest bending moment across a plate simply supported on its four edges, `span` mm between its long edges and
-    `height` mm between its short ones, under a line load down its middle from z0 to z1 mm above its lower edge, rising
-    from q0 to q1 N/mm and spread over `foot` mm across. A Kirchhoff plate, its equation split into two Poisson problems,
-    the moment sum and then the deflection, as simply supported edges allow, solved by finite differences on a grid h mm
-    apart (Timoshenko and Woinowsky-Krieger, Theory of plates and shells, 1959, chapter 5). N mm per mm."""
-    nx, nz = round(span / h) - 1, round(height / h) - 1
-    xs = (np.arange(nx) + 1) * h - span / 2
-    zs = (np.arange(nz) + 1) * h
-    cols = np.abs(xs) <= foot / 2 + 1e-9
-    q = np.where((zs >= z0) & (zs <= z1), q0 + (q1 - q0) * (zs - z0) / (z1 - z0), 0.0)
-    p = np.outer(q, cols) / (cols.sum() * h)
-    lu = _plate_lu(nx, nz, h)
-    msum = lu.solve(-p.ravel())
-    w = np.pad(lu.solve(-msum).reshape(nz, nx), 1)
-    wxx = (w[1:-1, 2:] - 2 * w[1:-1, 1:-1] + w[1:-1, :-2]) / h ** 2
-    wzz = (w[2:, 1:-1] - 2 * w[1:-1, 1:-1] + w[:-2, 1:-1]) / h ** 2
-    return float(np.max(np.abs(wxx + NU * wzz)))
+    def w(i, j):
+        if (i, j) not in memo:
+            memo[i, j] = ghost(i, j)
+        return memo[i, j]
+
+    def ghost(i, j):
+        """Point (i, j) as a sum over the unknowns: zero on a supported edge, odd across it beyond, and below the free
+        edge the two rows that make its moment and Kirchhoff shear vanish."""
+        if i in (0, nx) or j == nz or (j == 0 and not free_bottom):
+            return {}
+        if i < 0 or i > nx:
+            return comb((-1.0, w(-i if i < 0 else 2 * nx - i, j)))
+        if j > nz or (j < 0 and not free_bottom):
+            return comb((-1.0, w(i, 2 * nz - j if j > nz else -j)))
+        if j == -1:
+            return comb((2 + 2 * nu, w(i, 0)), (-1.0, w(i, 1)), (-nu, w(i + 1, 0)), (-nu, w(i - 1, 0)))
+        if j == -2:
+            k = 2 - nu
+            return comb((1.0, w(i, 2)), (-2.0 - 2 * k, w(i, 1)), (2.0 + 2 * k, w(i, -1)), (k, w(i + 1, 1)), (k, w(i - 1, 1)),
+                        (-k, w(i + 1, -1)), (-k, w(i - 1, -1)))
+        return {index[i, j]: 1.0}
+
+    ncol = sum(1 for i in range(1, nx) if abs(i * h - span / 2) <= foot / 2 + 1e-9)
+
+    def load(i, j):
+        z = j * h
+        if abs(i * h - span / 2) > foot / 2 + 1e-9 or not z0 <= z <= z1:
+            return 0.0
+        return (q0 + (q1 - q0) * (z - z0) / (z1 - z0)) / (ncol * h)
+
+    rows, cols, vals, rhs = [], [], [], np.zeros(len(index))
+    for (i, j), n in index.items():
+        for k, v in comb(*((c, w(i + di, j + dj)) for di, dj, c in PLATE_STENCIL)).items():
+            rows.append(n), cols.append(k), vals.append(v)
+        rhs[n] = load(i, j) * h ** 4
+    sol = spsolve(sp.csr_matrix((vals, (rows, cols)), shape=(len(index), len(index))), rhs)
+
+    def at(i, j):
+        return sum(v * sol[k] for k, v in w(i, j).items())
+
+    def d2(i, j, di, dj):
+        return (at(i + di, j + dj) - 2 * at(i, j) + at(i - di, j - dj)) / h ** 2
+
+    def twist(i, j):
+        return 2 * (1 - nu) * (at(i + 1, j + 1) - at(i + 1, j - 1) - at(i - 1, j + 1) + at(i - 1, j - 1)) / (4 * h ** 2)
+    mx = max(abs(d2(i, j, 1, 0) + nu * d2(i, j, 0, 1)) for i, j in index)
+    web = [-((at(2, j) - 2 * at(1, j) + 2 * at(-1, j) - at(-2, j)) / (2 * h ** 3)
+             + (2 - nu) * (d2(1, j, 0, 1) - d2(-1, j, 0, 1)) / (2 * h)) for j in range(1, nz)]
+    top = [(at(i, nz + 2) - 2 * at(i, nz + 1) + 2 * at(i, nz - 1) - at(i, nz - 2)) / (2 * h ** 3)
+           + (2 - nu) * (d2(i, nz + 1, 1, 0) - d2(i, nz - 1, 1, 0)) / (2 * h) for i in range(1, nx)]
+    total = sum(load(i, j) for i, j in index) * h ** 2
+    # the corner forces of the plate's twist (2 M_xz), negative where they press the plate onto the walls' ends
+    return dict(moment=mx, web=np.array(web), top=np.array(top), corner_top=twist(0, nz), corner_bottom=-twist(0, 0),
+                load=total, h=h)
 
 
 def _miner(fat: float, ds_o: float, lc: dict) -> float:

@@ -589,12 +589,15 @@ def ct602(prj, model, bom, checks, reg, dwg):
     floor_g = sorted({x for run in rr["runs"] if run["system"] in ELEC_STYLE for x in run.get("glands") or []} - set(gids),
                      key=lambda s_: int(s_[1:]))
     fp = {i: pr.p(*_gland_xy(g[i], V), 0) for i in floor_g}
+    x_cut = V["body_x0"] - 250.0    # the runs to the drawbar stop 250 mm ahead of the body, inside the frame
+    elec = [run for run in rr["runs"] if run["system"] in ELEC_STYLE]
+    tags = tag_clusters(elec, V, g, clip_x=x_cut, clip_header="ON THE DRAWBAR (CT-102)")
+    dots = [pr.p(*c["anchor"]) for c in tags]   # the tags' dots, drawn last, which the items' names keep clear of
     rects = body_plan(sh, pr, lay, res, cut=1000.0, show=show, size=1.2, keep=False, swings=False, light=("EL-02", "LA-11E", "EL-04"),
-                      nolabel=("EL-02", "LA-03", "LA-11B", "LA-02", "EL-04"), avoid=list(gp.values()) + list(fp.values()))
+                      nolabel=("EL-02", "LA-03", "LA-11B", "LA-02", "EL-04"), avoid=list(gp.values()) + list(fp.values()) + dots)
     f = lambda iid: _centre(lay.find(iid))  # noqa: E731
     bd = lay.find("LA-11E").box
     wa, dr = f("LA-02"), f("LA-14")
-    x_cut = V["body_x0"] - 250.0    # the runs to the drawbar stop 250 mm ahead of the body, inside the frame
     cuts = []
     for run in rr["runs"]:
         if run["system"] in ELEC_STYLE:
@@ -606,8 +609,6 @@ def ct602(prj, model, bom, checks, reg, dwg):
         top = max(pr.p(x, y, 0)[1] for x, y in cuts)
         sh.text(xs - 0.6, top + 2.5 + tw(t, 1.15) / 2, t, 1.15, "middle", bold=True, rot=-90)
     as_openings = {o["id"] for o in res["openings"]}
-    elec = [run for run in rr["runs"] if run["system"] in ELEC_STYLE]
-    tags = tag_clusters(elec, V, g, clip_x=x_cut, clip_header="ON THE DRAWBAR (CT-102)")
     tagged = {c["header"] for c in tags}
     for gid in gids:
         _gland(sh, pr, g[gid], V, label=gid not in as_openings and gid not in tagged, right=gid == "G7")
