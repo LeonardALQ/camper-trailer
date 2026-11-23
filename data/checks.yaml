@@ -252,12 +252,12 @@ trailer_checks:
     inputs: []
     why: "Lippert's manual ccd-0002668 rates the HappiJac at 272 kg static and 204 kg while it moves (research report 21). At night it holds the 64 kg moving bed and two sleepers taken at 100 kg each (data/body/body.yaml). It moves with nobody on it."
   - id: FIT-05
-    title: Tyres swung through their full travel keep 50 mm from every chassis member
+    title: Tyres and arms swung through their full travel keep 50 mm from every rigid part, fixture and run
     type: tyre
     min_gap_mm: 50
     severity: fail
     inputs: []
-    why: Report 06 open question 9 and report 11 section 5. The arc follows the XT arm about its pivot.
+    why: "Report 06 open question 9, report 11 section 5 and review I2-30. Each tyre and each XT trailing arm swings about the arm's pivot through 60 mm up and down, the tyre as a cylinder of its published size and the arm as a bar 90 mm deep (est.) across the slot from the rail's outer face to the tyre's inner face. It is tested against every rigid part the suspension carries at its true size (the chassis members and fittings, the solid blocks and the products' envelopes), every fixture of the services and every run at its outside diameter. What rides on the arms is left out, and so are the safety chains, which hang and swing. At full bump the floor is the design's 50 mm tyre clearance above the tyre (est.)."
   # ---------------------------------------------------------------- chassis and drawbar (CHASSIS.md, report 11)
   - id: CHS-01
     title: Chassis stress, LC1 static at ATM, within fy / 3
