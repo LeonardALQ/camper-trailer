@@ -616,7 +616,8 @@ def ct602(prj, model, bom, checks, reg, dwg):
     r = rects["EL-04"]    # the inverter's name in the larger part of its rectangle clear of the floor glands under it
     ys = sorted(q[1] for q in fp.values() if r[0] - 1 <= q[0] <= r[2] + 1 and r[1] - 1 <= q[1] <= r[3] + 1)
     lo, hi = max(((r[1], ys[0] - 1.5), (ys[-1] + 1.5, r[3])), key=lambda s_: s_[1] - s_[0]) if ys else (r[1], r[3])
-    label_in(sh, (r[0], lo, r[2], hi), short(lay.find("EL-04")), 1.2)
+    name = short(lay.find("EL-04"))    # G15 under its middle since I2-33 leaves too little for the usual pad
+    label_in(sh, (r[0], lo, r[2], hi), name, 1.2) or label_in(sh, (r[0], lo, r[2], hi), name, 1.2, min_size=0.9, pad=0.3)
     r = rects["LA-02"]    # the washer's name over G6, its floor gland, and the gland's id
     label_in(sh, (r[0], gp["G6"][1] + 2.4, r[2], r[3]), short(lay.find("LA-02")), 1.2)
     # outlets, indicative: one symbol for each outlet in its zone (report 20 section 7)
