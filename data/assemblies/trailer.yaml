@@ -611,7 +611,7 @@ items:
     system: electrical
     price: {aud: 0, basis: estimate, included_in: LGT-01, date: 2026-11-21, note: "In LGT-01's price for the set (data/trailer-parts.yaml)"}
     point: [body_x0 + 2900, -150, 1100]
-    mass: {basis: declared, total_kg: 6.8, maturity: estimate, source: "The decision log's 08:20 estimate for the set, about 4 kg, taken out of BD-11's allowance, 2.4 kg more for the brake circuit's 25 mm2 pair, K-10's routed 3.12 kg less the 0.75 kg of 7-core it replaces (I2-32, I2-50), and 0.4 kg for the two leads between the vehicles, K-13 and K-14, counted on the trailer (est.). The centre of gravity is about the devices' and the loom's (est.)"}
+    mass: {basis: declared, total_kg: 6.9, maturity: estimate, source: "The decision log's 08:20 estimate for the set, about 4 kg, taken out of BD-11's allowance, 2.4 kg more for the brake circuit's 25 mm2 pair, K-10's routed 3.12 kg less the 0.75 kg of 7-core it replaces (I2-32, I2-50), 0.4 kg for the two leads between the vehicles, K-13 and K-14, counted on the trailer, and 0.1 kg for the hook they lie over (I2-58) (est.). The centre of gravity is about the devices' and the loom's (est.)"}
     note: The lamps stand at their data/services.yaml positions in the 3D model, each named (cad/lamps.py).
   - id: BD-13
     name: Awning, Fiamma F80s 400, on the roof's kerb edge, inside the body width

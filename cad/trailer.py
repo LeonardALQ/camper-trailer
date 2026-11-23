@@ -742,14 +742,15 @@ class Trailer:
     def underside_items(self, lay) -> list[tuple]:
         """I2-41: what the running clearance (DIM-04, DIM-06) and the breakover (DIM-07) look at, as (name, line, box):
         every rigid part the suspension carries, every fixture of the services (data/routes.yaml) and every run's points
-        at its outside diameter, as FIT-05 has them. A run that rides on the arms or hangs free between the vehicles
-        (its `rides`) is left out, as the arms and the chains are."""
+        at its outside diameter, as FIT-05 has them. A run that rides on the arms is left out, as the arms and the chains
+        are, and so is the truck's socket. The leads between the vehicles are read as drawn, lying over their hook with
+        their slack hanging there (I2-58)."""
         from . import routes as R
         res = self.routes(lay)
         out = lay.underside_items()
         out += [(f"{_short(f['what'])} ({k})", k, tuple(f["box"])) for k, f in res["fixtures"].items() if f.get("box") and not f.get("rides")]
         for r in res["runs"]:
-            if r.get("rides"):
+            if r.get("rides") == "arm":
                 continue
             h = r["od"] / 2
             out += [(f"run {r['id']}", r["id"], (p[0] - h, p[1] - h, p[2] - h, p[0] + h, p[1] + h, p[2] + h))

@@ -353,6 +353,8 @@ def ct003(prj, model, bom, checks, reg, dwg):
                           f"({_kg(uc['UTE-03']['measured'])} kg TOWING WITH GROWTH)."),
         ("COUPLING HEIGHT", f"{V['coupling_z']:.0f} mm LADEN, PLUS OR MINUS 20 mm. SET THE HITCH'S DROP AT THE FINAL WEIGHING (TW08)."),
         ("GREY WATER", f"EMPTY FOR TRAVEL. A FULL {V['grey_full_l']:.0f} L TANK IS CHECKED IN CASES TC7 AND TC8."),
+        ("LEADS (DIM-04)", "LAY THE 12-PIN AND SB50 LEADS OVER THE HOOK ON THE ROAD-SIDE DRAWBAR MEMBER WHEN COUPLING, THEIR SLACK HANGING "
+                           "THERE, SO NO PART OF THEM HANGS BELOW ABOUT 470 mm (EST.), OVER THE COUPLING'S UNDERSIDE."),
         ("AWNING (BDY-11, BDY-23)", f"CLOSE THE AWNING IN WIND, LEGS PEGGED: PEG THE LEGS WHENEVER IT IS OUT, AND CLOSE IT BEFORE GUSTS REACH "
                                     f"{aw['close_kmh']:.0f} km/h AND WHENEVER THE TRAILER IS LEFT. SET THE LEGS FOR A {aw['pitch_deg']:.0f} DEGREE FALL."),
         ("PARKED IN WIND (H23, STB-04, STB-05)", f"AT A FORECAST GUST OF {ot['act_kmh']:.0f} km/h OR MORE (A BUREAU WARNING OF DAMAGING WINDS, "

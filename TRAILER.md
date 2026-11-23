@@ -18,7 +18,7 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 | Water | 400 L fresh, the tanks' net, all of it in travel, about 41 L a day. 130 L grey |
 | Cost | AUD 198,948 with contingency, built by Leonard (H26) |
 
-Every fail check passes. The tightest are the tyres' 50 mm under the floor at full bump (FIT-05, 50.0 mm against 50 mm), the towball share with the grey tank full (MAS-12, 9.8 % against 9.0 %), the heaviest towball (MAS-13, 391.9 kg against 420 kg), a lamp loom's gap to a drawbar plate (SVC-01, 20.4 mm against 20 mm) and the recovery pull in the road-side rail (CHS-08A, 0.85 of yield). Fully loaded with growth the trailer weighs 3,575.4 kg, 324.6 kg inside the 3,900 kg target (MAS-10).
+Every fail check passes. The tightest are the tyres' 50 mm under the floor at full bump (FIT-05, 50.0 mm against 50 mm), the towball share with the grey tank full (MAS-12, 9.8 % against 9.0 %), the heaviest towball (MAS-13, 391.9 kg against 420 kg), a lamp loom's gap to a drawbar plate (SVC-01, 20.4 mm against 20 mm) and the recovery pull in the kerb-side rail (CHS-08A, 0.85 of yield). Fully loaded with growth the trailer weighs 3,575.4 kg, 324.6 kg inside the 3,900 kg target (MAS-10).
 
 ## Layout
 
