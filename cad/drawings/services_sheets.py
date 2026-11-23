@@ -799,7 +799,8 @@ def ct603(prj, model, bom, checks, reg, dwg):
         "THE ASSUMPTION BEHIND EACH POSITION IS THE GLAND'S est IN data/services.yaml. CT-602 AND CT-612 TAG THE RUNS AT EACH GLAND.",
         "EACH FRAME IS 60 mm DEEP IN THE 30 mm FLOOR AND STANDS 30 mm ON IT, ITS UNDERSIDE FLUSH WITH THE FLOOR'S UNDERSIDE, CLEAR OF "
         "THE RAISERS' BEARER STRIPS UNDER IT. EACH ROXTEC C WEDGE (84 mm DEEP) STANDS 24 mm PROUD OF ITS FRAME: G9'S C WEDGE 60 AT THE "
-        "PACKING'S END, G15'S C WEDGE 120 INSIDE ITS STACK BEHIND W-01 AND F-03 (ROXTEC 124037). SVC-01 TESTS ALL THREE FRAMES.",
+        "PACKING'S END, G15'S C WEDGE 120 INSIDE ITS STACK BEHIND W-01 AND F-03 (ROXTEC 124037) AND G20'S C WEDGE 120 AT ITS INBOARD END OVER THE "
+        "REAR TANK. SVC-01 TESTS ALL THREE FRAMES.",
     ], size=1.42, width_chars=185)
     # ---- right column: every gland
     yb = title(sh, dwg, reg, "GLANDS IN BD-11, TRANSIT FRAMES IN BD-25 (TB-11).", "SEE THE FITTING COLUMN")
@@ -926,7 +927,7 @@ def ct611(prj, model, bom, checks, reg, dwg):
     box(sh, 98, 222, 152, 242, ["FRESH TANK, REAR BAY (UF-01R)", "6 mm HDPE, BAFFLED", "VENTED TO THE ROAD SIDE"])
     wire(sh, [(86, 209), (92, 209), (92, 260), (98, 260)], "cold", arrow=True)
     wire(sh, [(92, 232), (98, 232)], "cold", arrow=True)
-    sh.text(99, 246.2, f"420 L NET. AT MOST {V['water_travel_l']:.0f} L IN TRAVEL (H13)", 1.15)
+    sh.text(99, 246.2, f"{V['water_full_l']:.0f} L NET. AT MOST {V['water_travel_l']:.0f} L IN TRAVEL (H13)", 1.15)
     # tank outlets to the pump chain
     wire(sh, [(152, 256), (157, 256), (157, 215), (125, 215), (125, 212)], "cold")
     wire(sh, [(125, 222), (125, 212)], "cold", arrow=True)
@@ -1092,6 +1093,8 @@ def ct612(prj, model, bom, checks, reg, dwg):
         "THE FRESH TANKS BREATHE THROUGH G12 TO THE FILL CAP AT G1, THE GREY TANK UP THE REAR WALL TO A MESHED OUTLET (G25, G26). "
         "THE GREY TANK'S OUTLET, LEVER VALVE AND CAMLOCK ARE ON THE KERB SIDE FOR THE DUMP HOSE.",
         "THE COMBI'S DIESEL LINE COMES UP FROM THE HEATER FUEL TANK (UF-06) THROUGH G9. NO WATER LINE PASSES THE BATTERY'S TERMINAL FACE UNSLEEVED.",
+        "THE DRIP TRAY'S DRAIN W-09 JOINS THE BASIN'S WASTE BELOW ITS TRAP, SO IT PASSES A WAVIN HEPVO 32 mm WATERLESS TRAP VALVE (TV-09) UPRIGHT "
+        "ON THE PARTITION'S WET FACE RIGHT BEHIND THE TRAY'S OUTLET, A 32 TO 25 mm REDUCER AT EACH END (I2-45).",
     ], size=1.42, width_chars=185)
     yb = title(sh, dwg, reg, "TANKS AND FITTINGS IN THE MASS SCHEDULE (TB-11).", "6 mm HDPE TANKS, FOOD-GRADE LINES")
     rows = [["Fill", "G1 on the kerb wall", "The front tank, over CM-04", "Under the bed, down G12"],

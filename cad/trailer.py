@@ -173,7 +173,7 @@ class Layout:
     # -- expansion -------------------------------------------------------
     def _expand(self, it: dict) -> list[Block]:
         known = {"id", "name", "system", "zone", "for", "box", "cyl", "bar", "point", "cog", "mass", "note",
-                 "load", "keep_clear", "hollow", "tank", "water", "when", "parts", "material", "price", "model"}
+                 "load", "keep_clear", "hollow", "tank", "water", "when", "parts", "material", "price", "model", "net"}
         extra = set(it) - known
         if extra:
             raise ValueError(f"trailer item {it.get('id')}: unknown keys {sorted(extra)}")
@@ -217,6 +217,8 @@ class Layout:
                 b.cog = tuple((p + q) / 2 for p, q in zip(b.bar["p0"], b.bar["p1"]))
             if it.get("tank"):
                 b.extra["tank"] = True
+            if it.get("net"):
+                b.extra["net"] = dict(it["net"])
             if it.get("water"):
                 b.load = "water"
             if mass is not None:
@@ -356,6 +358,28 @@ class Layout:
     def tank_capacity_l(self) -> float:
         return sum((t.box[3] - t.box[0]) * (t.box[4] - t.box[1]) * (t.box[5] - t.box[2]) for t in self.tanks()) / 1e6
 
+    def tank_nets(self) -> dict:
+        """Each water tank's net capacity (review I2-40), by the grey tank's rule: the inside of its walls less a 10 mm air
+        gap under its top and its baffles, each a sheet of the wall's thickness across the tank (`cross`) or along it
+        (`along`), for the inside's height less the air gap. The fresh tanks' sum is what `water_full_l` may be."""
+        out = {}
+        for b in self.blocks:
+            n = b.extra.get("net")
+            if not n or b.box is None:
+                continue
+            t, gap = float(n["wall"]), float(n["air_gap"])
+            lx, ly, lz = (b.box[3] - b.box[0] - 2 * t, b.box[4] - b.box[1] - 2 * t, b.box[5] - b.box[2] - 2 * t)
+            h = lz - gap
+            cross, along = int(n.get("cross", 0)), int(n.get("along", 0))
+            baffles = (cross * ly + along * lx - cross * along * t) * t * h
+            out[b.id] = dict(inside_mm=[round(lx, 1), round(ly, 1), round(lz, 1)], inside_l=lx * ly * lz / 1e6,
+                             water_h_mm=h, baffles_l=baffles / 1e6, net_l=(lx * ly * h - baffles) / 1e6,
+                             cross=cross, along=along, wall_mm=t, air_gap_mm=gap, fresh=bool(b.extra.get("tank")))
+        return out
+
+    def fresh_net_l(self) -> float:
+        return sum(v["net_l"] for v in self.tank_nets().values() if v["fresh"])
+
     def water_cog(self, litres: float):
         ts = self.tanks()
         area = sum((t.box[3] - t.box[0]) * (t.box[4] - t.box[1]) for t in ts)
@@ -468,25 +492,30 @@ class Layout:
             out += [(b, bx) for bx in boxes]
         return out
 
-    def ground_clearance(self) -> dict:
-        """The lowest rigid part the suspension carries, at design ride height."""
-        b, bx = min(self.sprung_boxes(), key=lambda p: p[1][2])
-        return dict(z_mm=bx[2], governing=f"{b.name} ({b.iid})", line=b.id)
+    def underside_items(self) -> list[tuple]:
+        """The parts the running clearance and the breakover look at, as (name, line, box): each rigid part the
+        suspension carries (sprung_boxes). The trailer adds the services' fixtures and runs (Trailer.underside_items)."""
+        return [(f"{b.name} ({b.iid})", b.id, bx) for b, bx in self.sprung_boxes()]
 
-    def breakover(self, x_front: float) -> dict:
+    def ground_clearance(self, items: list[tuple] | None = None) -> dict:
+        """The lowest rigid part the suspension carries, at design ride height."""
+        name, line, bx = min(items or self.underside_items(), key=lambda p: p[2][2])
+        return dict(z_mm=bx[2], governing=name, line=line)
+
+    def breakover(self, x_front: float, items: list[tuple] | None = None) -> dict:
         """The crest angle at which the ground between two contact lines, the ute's rear tyres at X x_front and the
         trailer's axle group, first touches a rigid sprung part: the sum of the slopes from each line up to the part's
         underside. For each part the sum is least at the point of its underside nearest the middle of the span."""
         xa = self.V["axle_x"]
         mid = (x_front + xa) / 2
         best = None
-        for b, (x0, _, z0, x1, _, _) in self.sprung_boxes():
+        for name, _, (x0, _, z0, x1, _, _) in items or self.underside_items():
             if x1 <= x_front or x0 >= xa:
                 continue
             x = min(max(mid, x0, x_front + 1), x1, xa - 1)
             deg = math.degrees(math.atan2(z0, x - x_front) + math.atan2(z0, xa - x))
             if best is None or deg < best["deg"]:
-                best = dict(deg=deg, x_mm=x, z_mm=z0, governing=f"{b.name} ({b.iid})")
+                best = dict(deg=deg, x_mm=x, z_mm=z0, governing=name)
         return best
 
     def overall(self) -> dict:
@@ -655,6 +684,23 @@ class Trailer:
                     near=s["near"][:8], parts=len(boxes), run_points=len(points),
                     detail=(f"{s['gap_mm']:.1f} mm, {who(s)}. The tyres' least is {t['gap_mm']:.1f} mm ({who(t)}) and the arms' "
                             f"{a['gap_mm']:.1f} mm ({who(a)}), over {len(boxes)} rigid parts and fixtures and every run"))
+
+    def underside_items(self, lay) -> list[tuple]:
+        """I2-41: what the running clearance (DIM-04, DIM-06) and the breakover (DIM-07) look at, as (name, line, box):
+        every rigid part the suspension carries, every fixture of the services (data/routes.yaml) and every run's points
+        at its outside diameter, as FIT-05 has them. A run that rides on the arms or hangs free between the vehicles
+        (its `rides`) is left out, as the arms and the chains are."""
+        from . import routes as R
+        res = self.routes(lay)
+        out = lay.underside_items()
+        out += [(f"{f['what'].split(',')[0]} ({k})", k, tuple(f["box"])) for k, f in res["fixtures"].items() if f.get("box")]
+        for r in res["runs"]:
+            if r.get("rides"):
+                continue
+            h = r["od"] / 2
+            out += [(f"run {r['id']}", r["id"], (p[0] - h, p[1] - h, p[2] - h, p[0] + h, p[1] + h, p[2] + h))
+                    for p, _ in R._samples(r["dense"], 10.0)]
+        return out
 
     def layout(self, **over) -> Layout:
         lay = Layout(self.td, self.prj, {**self.base, **over})
@@ -1036,13 +1082,13 @@ class Trailer:
                 row.update(limit=f"{c.min:g} to {c.max:g} mm", measured=z, unit="mm", margin=m, ok=m >= -1e-6,
                            governing="coupling point 440 +/- 20 mm", detail=f"{lo_z:.0f} to {hi_z:.0f} mm")
             elif c.type == "clearance_ground":
-                g = lay.ground_clearance()
+                g = lay.ground_clearance(self.underside_items(lay))
                 row.update(limit=f">= {c.min:g} mm", measured=round(g["z_mm"], 1), unit="mm", margin=round(g["z_mm"] - c.min, 1),
                            ok=g["z_mm"] >= c.min, governing=g["governing"], line=g["line"],
                            detail=f"lowest rigid sprung part {g['z_mm']:.1f} mm above the ground at design ride height, {g['governing']}")
             elif c.type == "breakover":
                 ahead = self.tv["ball_behind_axle"]
-                bo = lay.breakover(-ahead)
+                bo = lay.breakover(-ahead, self.underside_items(lay))
                 row.update(limit="reported", measured=round(bo["deg"], 1), unit="deg", margin=None, ok=True, governing=bo["governing"],
                            detail=(f"{bo['deg']:.1f} degrees, a crest under {bo['governing']} at X {bo['x_mm']:,.0f} mm, its underside "
                                    f"{bo['z_mm']:.1f} mm up, between the ute's rear axle {ahead:,.0f} mm ahead of the ball and the trailer's "
@@ -1286,7 +1332,7 @@ def _r(v, n=1):
     if isinstance(v, (list, tuple)):
         return [_r(x, n) for x in v]
     if isinstance(v, dict):
-        return {k: _r(x, 3 if k in ("util", "measured", "margin") else 2 if k == "price_aud" else n) for k, x in v.items()}
+        return {k: _r(x, 3 if k in ("util", "measured", "margin", "damage") else 2 if k == "price_aud" else n) for k, x in v.items()}
     return v
 
 
@@ -1462,5 +1508,5 @@ def report(tr: Trailer) -> dict:
         target_why=tr.target_why, wheel=tr.wheel, supplier=tr.supplier, caps=tr.caps(), registration=tr.reg,
         weighed=tr.weighed_rows, spacing=dict(rule=ute_prj.inputs.rule_spacing, solved=ute_prj.inputs.solved,
                                               in_use=ute_prj.P.values["bike_spacing"], fits=ute_prj.inputs.spacing_fits),
-        measurements=measurements,
+        measurements=measurements, tanks=dict(nets=lay.tank_nets(), fresh_net_l=lay.fresh_net_l()),
     ))
