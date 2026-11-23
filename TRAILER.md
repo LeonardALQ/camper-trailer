@@ -10,15 +10,15 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 |---|---|
 | Body | 4,420 x 2,400 mm outside, X 1,820 to 6,240. Inside 4,350 x 2,330 x 2,000 mm, floor at Z 925 |
 | Overall | 6,700 mm long, 2,470 mm wide over the entry door's handle, 3,078 mm high over the awning case |
-| Tare | 2,678 kg, 2,943 kg with the growth allowance |
-| Fully loaded with 400 L of water (TC2) | 3,253 kg, 3,551 kg with growth, against the 4,000 kg plate |
-| Towball | 315 to 360 kg, 9.9 to 12.3 % of the trailer, at most 390.8 kg with growth |
-| Ute | Ford Ranger Super Duty single cab chassis. Rear axle 2,537 kg with growth against Ford's 2,800 kg. Combination 7,743 kg against Ford's 8,000 kg, the ute with growth plus the plate |
+| Tare | 2,692 kg, 2,958 kg with the growth allowance |
+| Fully loaded with 400 L of water (TC2) | 3,272 kg, 3,571 kg with growth, against the 4,000 kg plate |
+| Towball | 317 to 360 kg, 9.8 to 12.3 % of the trailer, at most 391.7 kg with growth |
+| Ute | Ford Ranger Super Duty single cab chassis. Rear axle 2,538 kg with growth against Ford's 2,800 kg. Combination 7,743 kg against Ford's 8,000 kg, the ute with growth plus the plate |
 | Battery | 25.6 kWh. A design hot day runs 25.1 h when new and 17.2 h at end of life |
 | Water | 400 L fresh, the tanks' net, all of it in travel, about 41 L a day. 130 L grey |
-| Cost | AUD 198,515 with contingency, built by Leonard (H26) |
+| Cost | AUD 198,772 with contingency, built by Leonard (H26) |
 
-Every fail check passes. The tightest are the tyres' 50 mm under the floor at full bump (FIT-05, 50.0 mm against 50 mm), the towball share with the grey tank full (MAS-12, 9.9 % against 9.0 %), the heaviest towball (MAS-13, 390.8 kg against 420 kg), a lamp loom's gap to a drawbar plate (SVC-01, 20.4 mm against 20 mm) and the recovery pull in the road-side rail (CHS-08A, 0.84 of yield). Fully loaded with growth the trailer weighs 3,551.1 kg, 348.9 kg inside the 3,900 kg target (MAS-10).
+Every fail check passes. The tightest are the tyres' 50 mm under the floor at full bump (FIT-05, 50.0 mm against 50 mm), the towball share with the grey tank full (MAS-12, 9.8 % against 9.0 %), the heaviest towball (MAS-13, 391.7 kg against 420 kg), a lamp loom's gap to a drawbar plate (SVC-01, 20.4 mm against 20 mm) and the recovery pull in the road-side rail (CHS-08A, 0.85 of yield). Fully loaded with growth the trailer weighs 3,571.2 kg, 328.8 kg inside the 3,900 kg target (MAS-10).
 
 ## Layout
 
@@ -37,28 +37,28 @@ Storage is 0.38 m³ inside and 0.09 m³ in the drawbar box, about 0.2 m³ short 
 
 ## Mass and limits
 
-Masses in kg. The towball comes from moments about the axle group centre at X 4,504.0 mm. "With growth" adds 20 % to an estimate, 7 % to a calculated mass and nothing to a maker's figure (report 02, MASS-06). CT-002 shows each case's centre of gravity.
+Masses in kg. The towball comes from moments about the axle group centre at X 4,487.2 mm. "With growth" adds 20 % to an estimate, 7 % to a calculated mass and nothing to a maker's figure (report 02, MASS-06). CT-002 shows each case's centre of gravity.
 
 | Case | Aboard | Mass | Towball | Share | With growth | Towball with growth |
 |---|---|---|---|---|---|---|
-| TC1 Tare | Nothing | 2,678 | 312.8 | 11.7 % | 2,943 | 337.1 |
-| TC2 Fully loaded | 400 L fresh, fuel, 150 kg of gear | 3,253 | 359.5 | 11.0 % | 3,551 | 390.8 |
-| TC3 Highway | 50 L, fuel, gear | 2,908 | 352.5 | 12.1 % | 3,206 | 383.9 |
-| TC4 Water, no gear | 400 L, fuel | 3,103 | 336.4 | 10.8 % | 3,371 | 363.2 |
-| TC5 Gear, no water | Fuel, gear | 2,858 | 351.5 | 12.3 % | 3,156 | 382.9 |
-| TC6 Fuel only | Fuel | 2,708 | 328.5 | 12.1 % | 2,976 | 355.3 |
-| TC7 Grey full | 270 L fresh, 130 L grey, fuel, gear | 3,253 | 320.7 | 9.9 % | 3,551 | 352.0 |
-| TC8 Grey full, fresh empty | 130 L grey, fuel, gear | 2,988 | 315.3 | 10.6 % | 3,286 | 346.7 |
+| TC1 Tare | Nothing | 2,692 | 314.9 | 11.7 % | 2,958 | 339.3 |
+| TC2 Fully loaded | 400 L fresh, fuel, 150 kg of gear | 3,272 | 360.4 | 11.0 % | 3,571 | 391.7 |
+| TC3 Highway | 50 L, fuel, gear | 2,922 | 354.0 | 12.1 % | 3,221 | 385.4 |
+| TC4 Water, no gear | 400 L, fuel | 3,122 | 337.9 | 10.8 % | 3,391 | 364.7 |
+| TC5 Gear, no water | Fuel, gear | 2,872 | 353.1 | 12.3 % | 3,171 | 384.5 |
+| TC6 Fuel only | Fuel | 2,722 | 330.6 | 12.1 % | 2,991 | 357.4 |
+| TC7 Grey full | 270 L fresh, 130 L grey, fuel, gear | 3,272 | 321.5 | 9.8 % | 3,571 | 352.8 |
+| TC8 Grey full, fresh empty | 130 L grey, fuel, gear | 3,002 | 316.6 | 10.5 % | 3,301 | 347.9 |
 
-- Plate: ATM 4,000 kg (H2, amended 23 Nov 2026 from 3,500 kg), inside the Super Duty's 4,500 kg braked towing and the 4,500 kg of the DO45 and the brakes. The heaviest case with growth is 3,551.1 kg, 348.9 kg inside H2's 3,900 kg target (MAS-10), so H21 takes nothing off the water. The examiner caps GTM at 4,500 kg, from the coupling and the brakes, and ATM at 4,500 kg, from the coupling (MAS-07, MAS-08). Over 3.5 t the trailer is ADR category TC, and VSB1 Rev 6 still covers it, as it does every trailer to 4.5 t ATM. NSW registers it as a light vehicle, a trailer of 4.5 t ATM or less, with a yearly safety check once it is five years old ([TfNSW](https://www.nsw.gov.au/driving-boating-and-transport/vehicle-registration/renewing-vehicle-registration/safety-checks-and-vehicle-inspections)), and the concessional RAV entry still takes it as a low-ATM trailer.
+- Plate: ATM 4,000 kg (H2, amended 23 Nov 2026 from 3,500 kg), inside the Super Duty's 4,500 kg braked towing and the 4,500 kg of the DO45 and the brakes. The heaviest case with growth is 3,571.2 kg, 328.8 kg inside H2's 3,900 kg target (MAS-10), so H21 takes nothing off the water. The examiner caps GTM at 4,500 kg, from the coupling and the brakes, and ATM at 4,500 kg, from the coupling (MAS-07, MAS-08). Over 3.5 t the trailer is ADR category TC, and VSB1 Rev 6 still covers it, as it does every trailer to 4.5 t ATM. NSW registers it as a light vehicle, a trailer of 4.5 t ATM or less, with a yearly safety check once it is five years old ([TfNSW](https://www.nsw.gov.au/driving-boating-and-transport/vehicle-registration/renewing-vehicle-registration/safety-checks-and-vehicle-inspections)), and the concessional RAV entry still takes it as a low-ATM trailer.
 - Water: all 400 L of fresh and grey water may ride while towing (H13 as amended), so fresh and grey together never pass what the fresh tanks hold, and H21 still takes any excess over the target off the water in 5 L steps. The tanks are filled at camp. The grey tank travels empty, and TC7 and TC8 check the trailer with it full.
-- Towball: at least 7.5 % in every case (MAS-04, H2) and at most the DO45's 450 kg and the Super Duty's 450 kg (est., no Ford document gives it). While the masses are estimates the axle sits in the middle of a 108.7 mm window between 9.0 % in the lightest case and 420 kg with growth in the heaviest (MAS-12, MAS-13, H17 as amended). Ford's towing guide aims at about 10 % and Smart Hitch recommends 10 to 15 %: TC2 has 11.0 % and the lowest case, TC7 with a full grey tank, 9.9 %. The 9.0 % floor stays now that the tanks hold 401 L net, not 420 L, because a 10 % floor would move the axle 32 mm back, take the fresh tanks to 393 L net and the grey tank to 129.5 L, under its 130 L, and close the window to 41 mm, for half a point on TC7 alone.
-- Ute: the Ford Ranger Super Duty single cab chassis on Ford's ratings (`data/ute/ute.yaml`, UTE-GARAGE.md). The heaviest towball, 390.8 kg with growth, puts its rear axle at 2,537 kg with growth against Ford's 2,800 kg (MAS-03, H14), and stays 59.2 kg under the Super Duty's 450 kg (est., Ford's figure is in the owner guide) and the DO45's 450 kg. MAS-14, the LandCruiser's return to the Platinum kit, is retired with the kit.
+- Towball: at least 7.5 % in every case (MAS-04, H2) and at most the DO45's 450 kg and the Super Duty's 450 kg (est., no Ford document gives it). While the masses are estimates the axle sits in the middle of a 104.2 mm window between 9.0 % in the lightest case and 420 kg with growth in the heaviest (MAS-12, MAS-13, H17 as amended). Ford's towing guide aims at about 10 % and Smart Hitch recommends 10 to 15 %: TC2 has 11.0 % and the lowest case, TC7 with a full grey tank, 9.8 %. The 9.0 % floor stays now that the tanks hold 401 L net, not 420 L, because a 10 % floor would move the axle 32 mm back, take the fresh tanks to 393 L net and the grey tank to 129.5 L, under its 130 L, and close the window to 41 mm, for half a point on TC7 alone.
+- Ute: the Ford Ranger Super Duty single cab chassis on Ford's ratings (`data/ute/ute.yaml`, UTE-GARAGE.md). The heaviest towball, 391.7 kg with growth, puts its rear axle at 2,538 kg with growth against Ford's 2,800 kg (MAS-03, H14), and stays 58.3 kg under the Super Duty's 450 kg (est., Ford's figure is in the owner guide) and the DO45's 450 kg. MAS-14, the LandCruiser's return to the Platinum kit, is retired with the kit.
 - GCM: the ute with growth, 3,743 kg, plus the 4,000 kg plate is 7,743 kg against Ford's 8,000 kg (GCM-01, UTE-06, H20). Ford's GCM needs no revision, so there is no fallback plate or water limit. GCM-01 reads the plate from `data/load_cases.yaml`.
-- Balance: the centre of gravity sits at most 38.2 mm to the kerb side against a 50 mm rule (MAS-11), at Z 1,215 to 1,315 mm with growth. The static stability factor is at least 0.61 on the 1,655 mm track.
+- Balance: the centre of gravity sits at most 38.0 mm to the kerb side against a 50 mm rule (MAS-11), at Z 1,215 to 1,315 mm with growth. The static stability factor is at least 0.61 on the 1,655 mm track.
 - Roll: with the body rolled onto its bump stops and tyres, the static rollover threshold is about 0.41 g (est., Gillespie's method), over the 0.35 g of PBS level 1 and the 0.40 g target (STB-01, STB-02). Decision H22 widened the track from 1,555 to 1,655 mm for it, through the rails. The ute with the bikes aboard has a static stability factor of 0.95 (UTE-11).
-- Sway: the yaw inertia is about 7,535 kg m² fully loaded with growth, and the towball never falls under 9.9 % of the trailer (STB-03). No snaking speed is estimated, because the published models need tyre and hitch data that are not known. The Bosch TSC brakes the trailer when it senses sway.
-- Axles: the XT Air is ordered in Cruisemaster's load-sharing tandem configuration, each side's two bags on one circuit (CIS-006), so VSB1's 120 % rule for close-coupled axles that do not share load does not apply. Without it the rule would need 4,440 kg at the plate against the 4,500 kg build's 4,050 kg. The axle group carries 3,199 kg with growth and 3,700 kg at the plate with the 7.5 % ball (MAS-02). Each wheel and tyre takes 980 kg on the heavier side with the 120 % rule kept as margin, against 1,400 kg and 1,550 kg (MAS-09, MAS-06).
+- Sway: the yaw inertia is about 7,630 kg m² fully loaded with growth, and the towball never falls under 9.8 % of the trailer (STB-03). No snaking speed is estimated, because the published models need tyre and hitch data that are not known. The Bosch TSC brakes the trailer when it senses sway.
+- Axles: the XT Air is ordered in Cruisemaster's load-sharing tandem configuration, each side's two bags on one circuit (CIS-006), so VSB1's 120 % rule for close-coupled axles that do not share load does not apply. Without it the rule would need 4,440 kg at the plate against the 4,500 kg build's 4,050 kg. The axle group carries 3,218 kg with growth and 3,700 kg at the plate with the 7.5 % ball (MAS-02). Each wheel and tyre takes 986 kg on the heavier side with the 120 % rule kept as margin, against 1,400 kg and 1,550 kg (MAS-09, MAS-06).
 - Parked in wind: unhitched on its corner steadies, the trailer slides on wet grass in a side gust of about 27 m/s at tare and 30 m/s fully loaded, forecast gusts of about 107 and 118 km/h, before it tips at about 30 and 34 m/s, both with the same force coefficient (STB-04, the friction est.). When a forecast gives gusts of 85 km/h or more, close the awning, and hitch the trailer to the ute, strap it down or move it. 85 km/h is the lower speed, sliding at tare, over the square root of 1.5, rounded down to 5 km/h, so the wind's force keeps a factor of 1.57 against sliding and 2.00 against tipping. A Bureau of Meteorology warning of damaging winds, 90 km/h and more, always meets it ([BoM](https://www.bom.gov.au/resources/learn-and-explore/severe-weather-knowledge-centre/severe-weather-and-coastal-hazard-warning-services)). Four rated lashing points under the outrigger ends take ratchet straps down to four Tie Down Engineering 59099 ground anchors (model M607, 3/4 in rod, 60 in, one 7 in helix), each with a Tie Down 59286 stabilizer plate on the trailer side of its rod and installed as RADCO's listing #1349 tested them, in the steps below. The listing rates the anchor at 3,922 lb (17.4 kN) working and 5,883 lb (26.2 kN) ultimate at a 45 degree pull in HUD's class 4B, "Loose sands", "firm clays" and "alluvial fills", and in the firmer classes ([Tie Down's manual with the RADCO listing](https://irp.cdn-website.com/871418b2/files/uploaded/Tie_Down_Anchor_Installation_Manual.pdf), [24 CFR 3285.202](https://www.law.cornell.edu/cfr/text/24/3285.202)). Strapped down it holds in region B's 500-year gust, 51.9 m/s at 3 m, with 14.4 kN in each windward strap at 55 degrees, 0.83 of the anchor's working load (STB-05). Where the soil reads less than 225 in-lb on the probe (step 1 below), as in class 5, "Uncompacted fill", "peat" and "organic clays", or an anchor will not wind in to its full depth, hitch the trailer or move it. The kit, 45.0 kg, rides in the ute while towing and stays with the trailer whenever the ute is unhitched for more than a day, so it is there with the ute away. No stays in the cyclonic regions C and D in the cyclone season, 1 November to 30 April ([BoM](https://www.bom.gov.au/resources/learn-and-explore/tropical-cyclone-knowledge-centre)). The walls are designed for region B's 25-year wind, which takes in the Queensland coast (H23).
 - Setting each anchor, from Tie Down's manual, pp. 4, 6 and 9:
   1. Mark the anchor's place 502 to 646 mm out from the point under its lashing point on level ground, so that the strap runs at 48 to 55 degrees to the ground. 48 degrees stays 3 degrees clear of the listing's 45 degree minimum, so ground slope and the trailer's ride height cannot take the pull under it. Probe the soil there: Tie Down's 59200 soil test probe, driven to the helix depth, about 1.50 m, must read at least 225 in-lb, the Missouri Public Service Commission's figure for the M607 ([Missouri PSC](https://psc.mo.gov/CMSInternetData/ManufacturedHousing/Anchoring%20Companies%20and%20Systems/Tie%20Down%20Engineering.pdf)).
@@ -72,7 +72,7 @@ Masses in kg. The towball comes from moments about the axle group centre at X 4,
 
 ## Structure
 
-The chassis is a galvanised ladder frame (CHASSIS.md revision H, CT-101 to CT-104). Two RHS 150 x 50 x 4 C450L0 rails, 4 mm since the 4,000 kg plate, each carry a continuous RHS 127 x 51 x 3.5 C350L0 raiser, so the floor clears the 805 mm tyres. Eight stations carry crossmembers and outriggers, and the drawbar is RHS 150 x 50 x 6. The rails are 1,275 mm over their outsides for the 1,655 mm track (H22). Steel and zinc weigh 537 kg. Checked at the 4,000 kg plate, the recovery pull governs at 0.84 of yield, VSB1's drawbar tests reach 0.78 and the travel cases 0.55. The frame twists 0.395 degree against 0.5, and every fatigue detail stays below its endurance limit. Heavy items bolt through the floor into the raisers and outriggers (CT-104).
+The chassis is a galvanised ladder frame (CHASSIS.md revision H, CT-101 to CT-104). Two RHS 150 x 50 x 4 C450L0 rails, 4 mm since the 4,000 kg plate, each carry a continuous RHS 127 x 51 x 3.5 C350L0 raiser, so the floor clears the 805 mm tyres. Eight stations carry crossmembers and outriggers, and the drawbar is RHS 150 x 50 x 6. The rails are 1,275 mm over their outsides for the 1,655 mm track (H22). Steel and zinc weigh 537 kg. Checked at the 4,000 kg plate, the recovery pull governs at 0.85 of yield, VSB1's drawbar tests reach 0.78 and the travel cases 0.55. The frame twists 0.395 degree against 0.5, and every fatigue detail stays below its endurance limit. Heavy items bolt through the floor into the raisers and outriggers (CT-104).
 
 ## Body and roof
 
@@ -166,19 +166,19 @@ The insert map CT-203 must be final before the panels are ordered, because the m
 
 ## Cost and where to save
 
-The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 153 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 172,581 subtotal carries AUD 25,934 (15.0 %), for AUD 198,515.
+The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 153 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 172,768 subtotal carries AUD 26,004 (15.1 %), for AUD 198,772.
 
 | Group | AUD | Group | AUD |
 |---|---|---|---|
-| Body | 38,360 | Chassis | 6,876 |
+| Body | 38,360 | Chassis | 6,973 |
 | Electrical | 27,270 | Freight and consumables | 5,310 |
 | Living area | 21,186 | Licensed electrician | 4,600 |
 | Running gear | 14,181 | Drawbar box | 4,388 |
 | HVAC and ventilation | 12,667 | Under the floor | 3,162 |
 | Wet room | 11,627 | Roof | 2,926 |
-| Bed | 8,028 | Coupling and drawbar | 1,872 |
+| Bed | 8,028 | Coupling and drawbar | 1,962 |
 | Compliance and weld evidence | 8,320 | Lamps, reflectors, the number plate and the brake circuit | 1,072 |
-| Subtotal | 172,581 | Spare wheel | 736 |
+| Subtotal | 172,768 | Spare wheel | 736 |
 
 What the registration needs stays: the licensed electrician and the AS/NZS 3001.2 certificate (ELI-01, CMP-13), the refrigeration fitting in AC-03, the wheel alignment (ALN-01), the engineer's review (CMP-03) and the registration lines. The registration itself also needs papers. A concessional trailer never registered in NSW needs TfNSW's Identity Approval before the examiner can pass it (VIB 78 rule 221.04), and its application, form 5703, is rejected without clear photographs of all four sides and the drawbar, of the vehicle plate and of the VIN stamped in the frame, the weighbridge ticket, and receipts proving the origin of the materials (CMP-04). So keep every receipt for the chassis steel, the running gear, the coupling and the panels from stage B0, and photograph the trailer as AIS Notice 41 and VIB 78 ask.
 
@@ -221,7 +221,7 @@ Each is in full in `docs/decisions.md`.
 ## Open points and the assumption used
 
 1. Storage is about 0.2 m³ short (est.). Two 500 x 600 x 700 mm cabinets under the bed beside the desk would add 0.42 m³ and about 20 kg, and break Leonard's rule that the rest of that area stays empty. Assumption: the footprint stays empty (H16).
-2. Estimate lines carry 931.7 kg, 34.8 % of the tare, and estimates set 47.5 % of the price subtotal. MAS-10 has 348.9 kg of margin, 3,551.1 kg against 3,900 kg with the full 400 L aboard, and 0.7 kg of BD-11's 63.5 kg is left unassigned. Assumption: the growth allowance covers the masses until TW-01 to TW-03 replace them, and the 20 % contingency covers the prices. A towball reading more than 10 % off the model means the centre of gravity estimates are wrong (UTE-03).
+2. Estimate lines carry 932.3 kg, 34.6 % of the tare, and estimates set 47.5 % of the price subtotal. MAS-10 has 328.8 kg of margin, 3,571.2 kg against 3,900 kg with the full 400 L aboard, and 0.7 kg of BD-11's 63.5 kg is left unassigned. Assumption: the growth allowance covers the masses until TW-01 to TW-03 replace them, and the 20 % contingency covers the prices. A towball reading more than 10 % off the model means the centre of gravity estimates are wrong (UTE-03).
 3. The Super Duty's maximum tow ball download is in Ford's owner guide, which was not read (the body equipment mounting manual, p. 34, refers to it). Assumption: 450 kg, 10 % of Ford's 4,500 kg braked rating, the share Ford's towing guide says a trailer's nose weight typically aims at. The trailer's heaviest towball at the 4,000 kg plate, 391.9 kg with growth, stays under it, and H17's 420 kg ceiling keeps 30 kg in hand under it and the DO45's 450 kg.
 4. Assumption: the isolators and the line set keep the split working on corrugations, without a maker's warranty. The fallback is a rooftop unit with a sixth battery module.
 5. The Dometic fridge, freezer, hob and sink carry converted European prices, and the oven, washer, panels and lamps are estimates. Assumption: these prices stand, with their contingency, until an Australian stockist or a quote replaces them.

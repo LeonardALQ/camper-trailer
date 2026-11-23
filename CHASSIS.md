@@ -1,6 +1,15 @@
 # Chassis and drawbar: design (planning level)
 
-Status: proposal, revision E of 21 Nov 2026, updated 22 Nov 2026 for the welding procedure, the welder's qualification and the welding supervisor that AS/NZS 1554.1 clause 1.7.2 asks of the SP welds (CMP-14), and the department's acceptance of the calculation, now an assumption with its fallback, and later that day for the corner steadies folded for travel on ARK's welded brackets and the holes the services make in the rails and raisers, and on 23 Nov 2026 as revision F for the 4,000 kg plate and as revision G for the chains' trailer end and the drawbar root's fatigue (review I2-46 and I2-47). DRAFT, not for construction until the engineer reviews it. This is the design basis report 02 asks for in LOAD-01: every load case with its factor, direction, combination and source, then the members, joints and protection, the results, and what the engineer must check. It starts from research report 11 and changes a member only where the analysis showed it fails or is oversized. The data is `data/chassis/chassis.yaml` (data revision E) with report 11's section table in `data/chassis/sections.yaml`. The geometry is `cad/chassis.py`, the analysis `cad/chassis_fea.py` and the solver `cad/frame.py`. Drawings CT-101 to CT-104 show it, and the site's Chassis page shows the current build.
+Status: proposal, revision E of 21 Nov 2026, updated 22 Nov 2026 for the welding procedure, the welder's qualification and the welding supervisor that AS/NZS 1554.1 clause 1.7.2 asks of the SP welds (CMP-14), and the department's acceptance of the calculation, now an assumption with its fallback, and later that day for the corner steadies folded for travel on ARK's welded brackets and the holes the services make in the rails and raisers, and on 23 Nov 2026 as revision F for the 4,000 kg plate as revision G for the chains' trailer end and the drawbar root's fatigue (review I2-46 and I2-47), and as revision H for the tanks under the kerb frame G20 and the eight holes the front bay's cables make in the rails (review I2-40 and I2-41). DRAFT, not for construction until the engineer reviews it. This is the design basis report 02 asks for in LOAD-01: every load case with its factor, direction, combination and source, then the members, joints and protection, the results, and what the engineer must check. It starts from research report 11 and changes a member only where the analysis showed it fails or is oversized. The data is `data/chassis/chassis.yaml` (data revision E) with report 11's section table in `data/chassis/sections.yaml`. The geometry is `cad/chassis.py`, the analysis `cad/chassis_fea.py` and the solver `cad/frame.py`. Drawings CT-101 to CT-104 show it, and the site's Chassis page shows the current build.
+
+## What changed in revision H, 23 Nov 2026
+
+The review of de67789 found the tanks holding less water than the design carried and cables hanging under the drawbar members (I2-40, I2-41). Revision H also takes revision G's 6 mm drawbar into the figures.
+
+- The front bay's cables to the kerb corner and the front fans, C9B, E-07, B-04 and B-05, cross the rails through both webs, 32 to 48 mm under the rails' tops, where they dipped under the drawbar members to 400 to 430 mm off the ground. They make eight new holes, H-05 to H-12, so the table runs to H-24. Each meets CHS-10's rules, the nearest weld toes being CM-01's and CM-02's end welds, and the highest range at their edges is 27.3 MPa against the 81.9 MPa CAFL.
+- The rear fresh tank's kerb side stands 36 mm inboard of the front tank's, so the kerb frame G20's packing lies over the gap beside the kerb raiser, and both fresh tanks and their guard sit 5 mm lower, 25 mm under the rails, so the tanks keep their water. They still sit on their bearers between the XT crossmembers.
+- With the 6 mm drawbar and 400 L of water the axle group sits at X 4,487.2, the middle of H17's window, 2.1 mm forward of revision G's. Fully loaded with growth the trailer weighs 3,571.2 kg, 328.8 kg under the 3,900 kg target (MAS-10). FAT-07 at the gusset's toe is 40.3 MPa, 0.77 of the CAFL, and the recovery pull LC8a 296 MPa, 0.85 of yield.
+- No check limit changed, and no estimate changed to pass a check.
 
 ## What changed in revision G, 23 Nov 2026
 
@@ -54,11 +63,11 @@ A ladder of two composite rails with crossmembers at eight stations, outriggers 
 | Main rails | RHS 150 x 50 x 4 C450L0 | X 1,820 to 6,240, 1,275 mm over their outsides (H22), Z 597.5 to 747.5 | 2 | 102.5 kg |
 | Raisers | RHS 127 x 51 x 3.5 C350L0, continuous fillets | On each rail, Z 747.5 to 874.5, with a 20.5 mm bearer strip up to the floor at Z 895 | 2 | 80.2 kg |
 | Body end crossmembers | RHS 150 x 50 x 3, full height, 1,175 mm | X 1,820 and 6,190 | 2 | 21.0 kg |
-| XT crossmembers | RHS 150 x 50 x 3, full height, no holes | Front hinge X 3,570, centre X 4,470 | 2 | 21.0 kg |
+| XT crossmembers | RHS 150 x 50 x 3, full height, no holes | Front hinge X 3,568, centre X 4,468 | 2 | 21.0 kg |
 | XT rear shock crossmember | RHS 150 x 50 x 4, with a 5 mm shock plate | X 5,300 | 1 | 13.6 kg |
 | Floor crossmembers | RHS 127 x 51 x 3.5, top flush with the raisers | X 2,360, the diesel bay at X 2,901 and the grey bay at X 5,725 | 3 | 32.0 kg |
 | Outriggers | RHS 127 x 51 x 3.5, top flush, 562 mm out to the body edge | Every station, each side | 16 | 81.6 kg |
-| Plan bracing | SHS 40 x 40 x 2.5, an X at rail height | Bays X 2,360 to 2,901 and 2,901 to 3,570 | 4 | 14.7 kg |
+| Plan bracing | SHS 40 x 40 x 2.5, an X at rail height | Bays X 2,360 to 2,901 and 2,901 to 3,568 | 4 | 14.7 kg |
 | Drawbar members | RHS 150 x 50 x 6 | Apex X 250 at Y ±60, to the rails at X 1,820, then 1,000 mm on under them | 2 (4 lengths) | 89.0 kg |
 | Drawbar cross brace | RHS 75 x 50 x 3 | X 900 | 1 | 2.9 kg |
 | Spare carrier posts | SHS 50 x 50 x 2.5 | X 1,795, Y ±120, up to Z 1,915 | 2 | 9.5 kg |
@@ -159,31 +168,31 @@ Each mass goes onto the frame by its load path, with its resultant and the momen
 | LC1 | Road-side drawbar member | At the body front, TC2 | 44 MPa | 150 MPa | 0.29 |
 | LC2 | Road-side drawbar member | At the body front, TC2 | 132 MPa | 450 MPa | 0.29 |
 | LC3 | Kerb-side drawbar member | At the body front, TC2 | 164 MPa | 300 MPa | 0.55 |
-| LC4 | XT centre crossmember | Its kerb end, X 4,495, TC2 cornering towards the kerb side | 125 MPa | 300 MPa | 0.42 |
-| LC5a | Kerb-side rail | X 4,038, TC7, diagonal B | 67 MPa | 233 MPa | 0.29 |
+| LC4 | XT centre crossmember | Its kerb end, X 4,493, TC2 cornering towards the kerb side | 126 MPa | 300 MPa | 0.42 |
+| LC5a | Road-side rail | X 4,036, TC7, diagonal A | 67 MPa | 233 MPa | 0.29 |
 | LC5b | Road-side rail | X 3,000, at tare, one steady wound to 875 kg | 102 MPa | 233 MPa | 0.44 |
-| LC6 | Kerb-side rail | X 3,595, 19.6 kN up at the coupling | 271 MPa | 350 MPa | 0.77 |
-| LC6b | Kerb-side rail | X 3,595, kerb-side lug, 19.6 kN down | 263 MPa | 350 MPa | 0.75 |
-| LC8a | Kerb-side rail | X 4,495, the rear kerb-side point pulled 30 degrees sideways and 15 degrees down | 296 MPa | 350 MPa | 0.84 |
-| LC8b | Road-side rail | X 4,495, TC7, road side jacked | 106 MPa | 350 MPa | 0.30 |
+| LC6 | Kerb-side rail | X 3,593, 19.6 kN up at the coupling | 271 MPa | 350 MPa | 0.77 |
+| LC6b | Kerb-side rail | X 3,593, kerb-side lug, 19.6 kN down | 263 MPa | 350 MPa | 0.75 |
+| LC8a | Road-side rail | X 4,493, the rear road-side point pulled 30 degrees sideways and 15 degrees down | 296 MPa | 350 MPa | 0.85 |
+| LC8b | Road-side rail | X 4,493, TC7, road side jacked | 107 MPa | 350 MPa | 0.31 |
 
 The rear recovery pull governs, then VSB1's drawbar tests. The rails' checks use the raiser's 350 MPa, which is where the margin went.
 
-Deflection and twist (LC1, at the plate): the rail between the drawbar root and the front hub deflects 0.16 mm against 4.4 mm, the rear overhang tip 0.96 mm against 5.8 mm, and the worst outrigger tip 0.41 mm against 2.0 mm. Under LC5a the frame twists 0.395 degree against 0.5 degree, a 21 % margin.
+Deflection and twist (LC1, at the plate): the rail between the drawbar root and the front hub deflects 0.16 mm against 4.4 mm, the rear overhang tip 0.97 mm against 5.8 mm, and the worst outrigger tip 0.41 mm against 2.0 mm. Under LC5a the frame twists 0.395 degree against 0.5 degree, a 21 % margin.
 
 Fittings: the chain lugs reach 75 % of their limit (the connecting link's 10 mm bow bearing in the 14 mm hole), the front recovery lugs 73 % (plate bending at 78.5 kN), the rear tongues 62 %, the jacking pads 41 % under 43.9 kN, the spare carrier posts 16 %, the corner steady brackets 7 % (LOC-06), and the coupling plate's four M14 bolts 48 % in shear and tension together under the 58.9 kN pull on its 70 mm lever (LOC-07). Swung through their travel, the tyres keep 50.0 mm from the floor at full bump, the design's own tyre clearance, and the XT arms 54.0 mm from the kerb-side rail (FIT-05).
 
 ### Fatigue (LC10)
 
-Every detail passes its frequent check at the 4,000 kg plate, and the largest Miner damage from the occasional case is 0.14, at the outrigger roots (FAT-05). The tightest are FAT-05 at the outrigger roots (16.8 against 21.1 MPa, 0.80) and FAT-03 at the XT crossmember roots (16.6 against 21.1 MPa, 0.79), then the drawbar root (FAT-07, 40.1 against 52.6 MPa, 0.76). CT-103 and the Chassis page list every detail.
+Every detail passes its frequent check at the 4,000 kg plate, and the largest Miner damage from the occasional case is 0.14, at the outrigger roots (FAT-05). The tightest are FAT-05 at the outrigger roots (16.9 against 21.1 MPa, 0.80) and FAT-03 at the XT crossmember roots (16.6 against 21.1 MPa, 0.79), then the drawbar root (FAT-07, 40.3 against 52.6 MPa, 0.77). CT-103 and the Chassis page list every detail.
 
-The drawbar root's detail is the profiled gusset CH-P03, a 10 mm plate standing on each drawbar member's top face. Its heel sits on the rail's front end over the mitred butt weld, and its free edge is cut to a 160 mm radius that meets the member 270 mm ahead of the body front, ground smooth there (IIW 526, FAT 90 for a radius over 150 mm). IIW takes the member's own nominal stress where the radius meets it, so FAT-07 reads the drawbar member at the toe, X 1,550, where the range, which follows the towball, is 40.1 MPa, 24 % under the CAFL. Behind the toe the gusset deepens the section. On the member alone at the body front, the bound if the gusset is given no credit, the range is 43.3 MPa, 0.82 of the CAFL. The mitred butt weld lies under the gusset's heel, inside its section, and the engineer checks it with the gusset's welds to the rail's end (open point 10).
+The drawbar root's detail is the profiled gusset CH-P03, a 10 mm plate standing on each drawbar member's top face. Its heel sits on the rail's front end over the mitred butt weld, and its free edge is cut to a 160 mm radius that meets the member 270 mm ahead of the body front, ground smooth there (IIW 526, FAT 90 for a radius over 150 mm). IIW takes the member's own nominal stress where the radius meets it, so FAT-07 reads the drawbar member at the toe, X 1,550, where the range, which follows the towball, is 40.3 MPa, 23 % under the CAFL. Behind the toe the gusset deepens the section. On the member alone at the body front, the bound if the gusset is given no credit, the range is 43.5 MPa, 0.83 of the CAFL. The mitred butt weld lies under the gusset's heel, inside its section, and the engineer checks it with the gusset's welds to the rail's end (open point 10).
 
 The hollow-section T-joints are marked HS: the crossmember-to-rail joints, the outrigger roots, the cross brace and the brackets on the rail. Their nominal stress understates the stress at the weld toe, often by a factor of two to four, so the engineer checks them by the hot-spot method or CIDECT design guide 8.
 
 ## Holes in the members
 
-The services' runs pass through the rails and raisers in 18 places (data/services.yaml `holes`, review I2-27). Counted once, an outrigger's root face is the raiser's outer web, so they make 14 holes in the steel. The two at the outriggers' open tips pass through the side markers' caps, not through steel. Each hole is the run's diameter and a 6 mm bush across (est.), a slot along the member where the run crosses the wall on a slant.
+The services' runs pass through the rails and raisers in 26 places (data/services.yaml `holes`, review I2-27). Counted once, an outrigger's root face is the raiser's outer web, so they make 22 holes in the steel. Eight of them, H-05 to H-12, take the front bay's cables to the kerb corner and the front fans through both webs of a rail, 32 to 48 mm under its top, where they used to pass under the drawbar members (review I2-41). The two at the outriggers' open tips pass through the side markers' caps, not through steel. Each hole is the run's diameter and a 6 mm bush across (est.), a slot along the member where the run crosses the wall on a slant.
 
 CHS-09 takes each hole out of the composite rail's section and checks the combined stress at the hole's edge in every case from LC1 to LC8b against that case's limit, the raiser's fy over its factor. AS 4100 clause 7.2's 0.85 fu on the net area is higher for both grades, so yield governs. Every hole passes, the worst H-01 at 280 MPa against 350 MPa in the rear recovery pull, 0.80.
 
@@ -191,28 +200,36 @@ CHS-10 says where a hole may go and checks its fatigue, with three rules. Its ce
 
 | Hole | Run | Wall, at X | Size, mm | Net section, worst case | Edge to the flat's end, need | Clear to a weld toe or hole, need | Range at the edge | CHS-10 |
 |---|---|---|---|---|---|---|---|---|
-| H-01 | K-08 | Kerb raiser's outer web inside OR-05K's root weld, 4,495 | 16 | 280 of 350 MPa, LC8a | 39.8, 20 | 17.5, 16 | 40.5 of 81.9 MPa | meets |
-| H-03 | K-09 | Road raiser's outer web inside OR-05R's root weld, 4,495 | 16 | 270 of 350 MPa, LC8a | 54.8, 20 | 17.5, 16 | 41.1 of 81.9 MPa | meets |
-| H-05 | K-01 | Road rail's outer web, 2,360 | 16 x 39 slot | 66 of 233 MPa, LC5b | 63.5, 20 | 48.6, 27, H-06 | 19.8 of 81.9 MPa | meets |
-| H-06 | K-10 | Road rail's outer web, 2,446 | 27 x 36 slot | 109 of 350 MPa, LC6 | 38.5, 33.8 | 30.0, 27, drawbar overlap's fillet | 24.3 of 81.9 MPa | meets |
-| H-07 | K-10 | Road rail's outer web, 3,397 | 27 x 56 slot | 197 of 350 MPa, LC6 | 39.5, 33.8 | 83.0, 27 | 17.3 of 81.9 MPa | meets |
-| H-08 | K-01 | Road rail's outer web, 6,021 | 16 x 25 slot | 138 of 350 MPa, LC8a | 57.5, 20 | 48.9, 16 | 4.2 of 81.9 MPa | meets |
-| H-09 | B-18 | Kerb raiser's inner web, 2,015 | 14 x 54 slot | 91 of 350 MPa, LC6 | 25.8, 17.5 | 81.5, 14 | 34.0 of 81.9 MPa | meets |
-| H-10 | B-16 | Kerb raiser's inner web, 2,267 | 28 x 103 slot | 87 of 350 MPa, LC6 | 39.8, 35 | 30.5, 28 | 31.5 of 81.9 MPa | meets |
-| H-11 | D-14 | Kerb raiser's outer web, 2,291 | 24 x 74 slot | 108 of 350 MPa, LC6 | 43.8, 30 | 24.4, 24, nut plate | 24.9 of 81.9 MPa | meets |
-| H-12 | D-14 | Kerb raiser's inner web, 4,669 | 24 x 58 slot | 187 of 350 MPa, LC8a | 49.8, 30 | 42.5, 24 | 38.3 of 81.9 MPa | meets |
-| H-13 | B-16 | Kerb raiser's inner web, 4,840 | 28 x 66 slot | 151 of 350 MPa, LC8a | 43.8, 35 | 32.5, 28, airbag bracket | 45.7 of 81.9 MPa | meets |
-| H-14 | B-18 | Kerb raiser's inner web, 4,952 | 14 x 31 slot | 183 of 350 MPa, LC8a | 25.8, 17.5 | 66.3, 28, H-13 | 63.2 of 81.9 MPa | meets |
-| H-15 | K-08 | Kerb raiser's inner web, 5,996 | 16 x 23 slot | 145 of 350 MPa, LC8a | 39.8, 20 | 66.5, 16 | 3.1 of 81.9 MPa | meets |
-| H-16 | K-09 | Road raiser's inner web, 5,988 | 16 x 33 slot | 91 of 350 MPa, LC8a | 54.8, 20 | 51.5, 16 | 11.0 of 81.9 MPa | meets |
+| H-01 | K-08 | Kerb raiser's outer web inside OR-05K's root weld, 4,493 | 16 | 280 of 350 MPa, LC8a | 39.8, 20 | 17.5, 16 | 40.9 of 81.9 MPa | meets |
+| H-03 | K-09 | Road raiser's outer web inside OR-05R's root weld, 4,493 | 16 | 270 of 350 MPa, LC8a | 54.8, 20 | 17.5, 16 | 41.5 of 81.9 MPa | meets |
+| H-05 | C9B | Kerb rail's inner web, 1,915 | 16 | 76 of 350 MPa, LC6 | 33.5, 20 | 31.5, 16 | 26.6 of 81.9 MPa | meets |
+| H-06 | C9B | Kerb rail's outer web, 1,915 | 16 | 76 of 350 MPa, LC6 | 33.5, 20 | 31.5, 16 | 26.6 of 81.9 MPa | meets |
+| H-07 | E-07 | Kerb rail's outer web, 2,241 | 20 x 23 slot | 77 of 350 MPa, LC6 | 37.5, 25 | 33.5, 20 | 27.3 of 81.9 MPa | meets |
+| H-08 | E-07 | Kerb rail's inner web, 2,266 | 20 x 23 slot | 77 of 350 MPa, LC6 | 37.5, 25 | 33.5, 20 | 27.3 of 81.9 MPa | meets |
+| H-09 | B-04 | Kerb rail's outer web, 2,310 | 14 x 21 slot | 84 of 350 MPa, LC6 | 31.5, 17.5 | 30.5, 14 | 16.4 of 81.9 MPa | meets |
+| H-10 | B-04 | Kerb rail's inner web, 2,359 | 14 x 21 slot | 81 of 350 MPa, LC6 | 21.5, 17.5 | 19.5, 14, CM-02's end weld | 15.3 of 81.9 MPa | meets |
+| H-11 | B-05 | Road rail's inner web, 1,905 | 14 | 76 of 350 MPa, LC6 | 33.5, 17.5 | 23.0, 14, CM-01's end weld | 25.4 of 81.9 MPa | meets |
+| H-12 | B-05 | Road rail's outer web, 1,905 | 14 | 76 of 350 MPa, LC6 | 33.5, 17.5 | 32.5, 14 | 25.4 of 81.9 MPa | meets |
+| H-13 | K-01 | Road rail's outer web, 2,360 | 16 x 39 slot | 66 of 233 MPa, LC5b | 63.5, 20 | 48.6, 27, H-14 | 19.8 of 81.9 MPa | meets |
+| H-14 | K-10 | Road rail's outer web, 2,446 | 27 x 36 slot | 109 of 350 MPa, LC6 | 38.5, 33.8 | 30.0, 27, drawbar overlap's fillet | 24.3 of 81.9 MPa | meets |
+| H-15 | K-10 | Road rail's outer web, 3,395 | 27 x 56 slot | 197 of 350 MPa, LC6 | 39.5, 33.8 | 83.0, 27 | 17.1 of 81.9 MPa | meets |
+| H-16 | K-01 | Road rail's outer web, 6,021 | 16 x 25 slot | 138 of 350 MPa, LC8a | 57.5, 20 | 48.9, 16 | 4.2 of 81.9 MPa | meets |
+| H-17 | B-18 | Kerb raiser's inner web, 2,015 | 14 x 54 slot | 91 of 350 MPa, LC6 | 25.8, 17.5 | 81.5, 14 | 34.2 of 81.9 MPa | meets |
+| H-18 | B-16 | Kerb raiser's inner web, 2,267 | 28 x 103 slot | 88 of 350 MPa, LC6 | 39.8, 35 | 30.5, 28 | 31.7 of 81.9 MPa | meets |
+| H-19 | D-14 | Kerb raiser's outer web, 2,291 | 24 x 74 slot | 108 of 350 MPa, LC6 | 43.8, 30 | 24.4, 24, nut plate | 25.0 of 81.9 MPa | meets |
+| H-20 | D-14 | Kerb raiser's inner web, 4,669 | 24 x 58 slot | 187 of 350 MPa, LC8a | 49.8, 30 | 42.5, 24 | 38.7 of 81.9 MPa | meets |
+| H-21 | B-16 | Kerb raiser's inner web, 4,840 | 28 x 66 slot | 152 of 350 MPa, LC8a | 43.8, 35 | 32.5, 28, airbag bracket | 46.1 of 81.9 MPa | meets |
+| H-22 | B-18 | Kerb raiser's inner web, 4,952 | 14 x 31 slot | 183 of 350 MPa, LC8a | 25.8, 17.5 | 66.3, 28, H-18 | 63.7 of 81.9 MPa | meets |
+| H-23 | K-08 | Kerb raiser's inner web, 5,996 | 16 x 23 slot | 146 of 350 MPa, LC8a | 39.8, 20 | 66.5, 16 | 3.1 of 81.9 MPa | meets |
+| H-24 | K-09 | Road raiser's inner web, 5,988 | 16 x 33 slot | 91 of 350 MPa, LC8a | 54.8, 20 | 51.5, 16 | 11.0 of 81.9 MPa | meets |
 
-All 14 meet every rule. The services moved twelve of them off the rails' and raisers' 50 mm faces and the welds:
+All 22 meet every rule. The services moved twelve of them off the rails' and raisers' 50 mm faces and the welds:
 
-- K-08 and K-09 rise inboard of the rails behind the grey tank, enter the raisers through their inner webs at 78 and 64 mm above the seam (H-15, H-16), and run forward inside them in the inboard lane, K-08 between D-14 and B-18. At the XT centre station each turns square across its raiser into OR-05 through a round 16 mm hole on the outrigger's centre line, tied to it, its edge 17.5 mm from the root weld's toes either side (H-01, H-03). A lamp cable bends at 57 mm, so only a turn that starts in the inboard lane meets the outer web square.
-- K-10 is the brake circuit's 16 mm2 pair, so its holes are 27 mm (I2-32). It leaves the road rail through its outer web at Z 647 beside X 3,397, ahead of the front arms' hinge and outside FIT-05's sweep, where the range at its edge is 17.3 MPa, drops outside the rail, passes under it and runs back under CM-04 and the tank guard to the TSC (H-07, was beside X 4,215 in the front tyre's path, I2-30).
-- K-01 leaves the road rail through its outer web at Z 680 beside X 6,021, ahead of the rear steady's swing, and drops behind it (H-08, was the rail's bottom face 14 mm from K-09's hole).
-- B-16 leaves the kerb raiser at Z 796, 30.5 mm from the seam's fillet, under D-14, which rides 16 mm higher from X 2,560 forward (H-10).
-- B-18, B-16 and D-14 leave G20's outboard row and come down into the 79.5 mm between the kerb raiser and the rear tank's 20 mm. They run forward against the raiser and enter it on slants through its inner web, B-18 at Z 840, B-16 at Z 800 and D-14 at Z 806, after it runs at Z 760 for its 110 mm bend (H-12 to H-14, were the raiser's top face). G20 became one packing space over the gap with the chase's loom inboard of the three, so they add no hole and no frame. A frame outboard of the raiser would sit within FIT-05's 50 mm of the rear tyre at full travel and in its spray, and a reinforced opening in the top face would put its collar's welds across the composite rail's top flange (TB 070).
+- K-08 and K-09 rise inboard of the rails behind the grey tank, enter the raisers through their inner webs at 78 and 64 mm above the seam (H-23, H-24), and run forward inside them in the inboard lane, K-08 between D-14 and B-18. At the XT centre station each turns square across its raiser into OR-05 through a round 16 mm hole on the outrigger's centre line, tied to it, its edge 17.5 mm from the root weld's toes either side (H-01, H-03). A lamp cable bends at 57 mm, so only a turn that starts in the inboard lane meets the outer web square.
+- K-10 is the brake circuit's 16 mm2 pair, so its holes are 27 mm (I2-32). It leaves the road rail through its outer web at Z 647 beside X 3,395, ahead of the front arms' hinge and outside FIT-05's sweep, where the range at its edge is 17.1 MPa, drops outside the rail, passes under it and runs back under CM-04 and the tank guard to the TSC (H-15, was beside X 4,215 in the front tyre's path, I2-30).
+- K-01 leaves the road rail through its outer web at Z 680 beside X 6,021, ahead of the rear steady's swing, and drops behind it (H-16, was the rail's bottom face 14 mm from K-09's hole).
+- B-16 leaves the kerb raiser at Z 796, 30.5 mm from the seam's fillet, under D-14, which rides 16 mm higher from X 2,560 forward (H-18).
+- B-18, B-16 and D-14 leave G20's outboard row and come down into the 115.5 mm between the kerb raiser and the rear tank's 20 mm, the tank's kerb side 36 mm inboard for G20. They run forward against the raiser and enter it on slants through its inner web, B-18 at Z 840, B-16 at Z 800 and D-14 at Z 806, after it runs at Z 760 for its 110 mm bend (H-20 to H-22, were the raiser's top face). G20, Roxtec's S 4x1, stands over the gap with the chase's loom inboard of the three, so they add no hole and no frame. A frame outboard of the raiser would sit within FIT-05's 50 mm of the rear tyre at full travel and in its spray, and a reinforced opening in the top face would put its collar's welds across the composite rail's top flange (TB 070).
 
 ## What the engineer must check
 
@@ -225,7 +242,7 @@ All 14 meet every rule. The services moved twelve of them off the rails' and rai
 7. The floor panel spanning from the raiser to the body edge between outriggers at most 900 mm apart, with no edge member (BODY.md, BDY-04).
 8. ARK's corner steady brackets welded under the rails along the rails' bottom corners only (FAT-16, LOC-06), and the steadies' jacking loads through them into the rails' 4 mm webs.
 9. The holes the services make in the rails and raisers (CHS-09, CHS-10), above all the two in the raisers' outer webs inside OR-05's root welds (H-01, H-03), which the hot-spot check of that joint must count.
-10. The coupling plate and the DO45 Plus's four M14 8.8 bolts (LOC-07), with the bolt rows' pitch and the pin's lever read from the coupling itself, and the drawbar root's fatigue at the plate. FAT-07, at the root gusset's toe 270 mm ahead of the body front, has a frequent range of 40.1 MPa against the CAFL's 52.6 MPa, 0.76 or 12.5 MPa in hand, and a Miner damage of 0.12. On the member alone at the body front, the bound if the gusset is given no credit, it is 43.3 MPa, 0.82. The mitred butt weld under the gusset's heel and the gusset's welds to the rail's end are for the hot-spot check.
+10. The coupling plate and the DO45 Plus's four M14 8.8 bolts (LOC-07), with the bolt rows' pitch and the pin's lever read from the coupling itself, and the drawbar root's fatigue at the plate. FAT-07, at the root gusset's toe 270 mm ahead of the body front, has a frequent range of 40.3 MPa against the CAFL's 52.6 MPa, 0.77 or 12.4 MPa in hand, and a Miner damage of 0.12. On the member alone at the body front, the bound if the gusset is given no credit, it is 43.5 MPa, 0.83. The mitred butt weld under the gusset's heel and the gusset's welds to the rail's end are for the hot-spot check.
 11. The chain lugs and their pewag CW 8 connecting links (LOC-01, 75 %, the link's bow bearing in the hole). The 13 mm of plate under each 14 mm hole must pass inside the link's eye, so each hole is marked from a link before drilling, and the attachment follows WA's CI-119C, since NSW states no rule for the chain's trailer end.
 
 ## Assumptions made for the design
