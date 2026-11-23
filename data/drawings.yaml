@@ -206,6 +206,7 @@ drawings:
       - {rev: R, date: 2026-11-23, description: "Notice: the stations with the axle at X 4,506.0 (I2-31 to I2-36)", drawn: Kiro, checked: "", approved: ""}
       - {rev: S, date: 2026-11-23, description: "Notice: RHS 150 x 50 x 6 drawbar members, stations at the axle X 4,489.3", drawn: Kiro, checked: "", approved: ""}
       - {rev: T, date: 2026-11-23, description: "Notice: the stations at the axle X 4,487.2, the tanks 5 mm lower (I2-40)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: U, date: 2026-11-23, description: "Notice: rail end plates CH-P15, the stations at the axle X 4,484.9 (I2-51)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
@@ -231,6 +232,7 @@ drawings:
       - {rev: M, date: 2026-11-22, description: "Notice: stations with the axle at X 4,379.9", drawn: Kiro, checked: "", approved: ""}
       - {rev: N, date: 2026-11-23, description: "Notice: the DO45 Plus on four M14 bolts, grade 80 chains, 4,000 kg", drawn: Kiro, checked: "", approved: ""}
       - {rev: O, date: 2026-11-23, description: "Notice: chains held at the lugs by pewag CW 8 links, 150 x 50 x 6 members", drawn: Kiro, checked: "", approved: ""}
+      - {rev: P, date: 2026-11-23, description: "Notice: detail C, the root gusset at IIW 522, the rail end plates (I2-51)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-103
     title: Chassis details
     subtitle: Composite rail, outrigger root, crossmember to rail, overlap end, jacking pad, recovery tongue, spare posts
@@ -260,6 +262,7 @@ drawings:
       - {rev: Q, date: 2026-11-23, description: "Notice: the fatigue figures after the services' masses (I2-31 to I2-36)", drawn: Kiro, checked: "", approved: ""}
       - {rev: R, date: 2026-11-23, description: "Notice: FAT-07 at the root gusset's toe, 0.76 of its CAFL (I2-47)", drawn: Kiro, checked: "", approved: ""}
       - {rev: S, date: 2026-11-23, description: "Notice: Miner damage to three decimals, the axle at X 4,487.2 (I2-40)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: T, date: 2026-11-23, description: "Notice: FAT-07 at IIW 522, FAT-17 to FAT-19 at the body front (I2-51)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads
@@ -287,6 +290,7 @@ drawings:
       - {rev: O, date: 2026-11-23, description: "Notice: the stations at the axle X 4,506.2 with BD-25 (I2-33)", drawn: Kiro, checked: "", approved: ""}
       - {rev: P, date: 2026-11-23, description: "Notice: the stations and load paths with the axle at X 4,489.3 (I2-47)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Q, date: 2026-11-23, description: "Notice: the stations and load paths with the axle at X 4,487.2 (I2-40)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: R, date: 2026-11-23, description: "Notice: the stations and load paths with the axle at X 4,484.9 (I2-51)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-201
     title: Body shell
     subtitle: Kerb, road, front and rear walls, the fixed roof plan, the panels and every opening with its size

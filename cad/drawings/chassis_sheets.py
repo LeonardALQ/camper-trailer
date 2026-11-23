@@ -269,7 +269,47 @@ FIT_ITEMS = [("1", "DB-03", "Cruisemaster DO45 Plus, under-mounted, 4 x M14 8.8 
              ("9", "CH-P03", "Root gusset 10 mm, 160 radius ground, toe 270 ahead of the body front"),
              ("10", "CH-P04", "Front recovery lug 20 mm, 22 mm hole, 4.75 t shackle"),
              ("11", "DB-07", "Breakaway kit, switch near the coupling"),
-             ("12", "DB-KA", "Drawbar members RHS 150 x 50 x 6 C450L0")]
+             ("12", "DB-KA", "Drawbar members RHS 150 x 50 x 6 C450L0"),
+             ("13", "CH-P15", "Rail end plate 16 mm on each rail's front end, the gusset's heel on it (detail C)")]
+
+
+def _root_detail(sh, ch, x0, y0, k=10.0):
+    """Detail C on CT-102: the drawbar root in the root gusset's plane (I2-51), its lower left corner at sheet (x0, y0):
+    the A-frame member's top, the gusset with its radius down to its end, the rail's end plate under its heel, the rail
+    and the mitre, with the IIW details that hold them."""
+    V = ch.V
+    fit = {f["id"]: f for f in ch.data["fittings"]}
+    g, ep, rail = fit["CH-P03"], fit["CH-P15"], ch.role_sec["rail"]
+    xa, zt = V["root_gusset_toe_x"] - 30, V["rail_underside_z"]
+
+    def p(x, z):
+        return x0 + (x - xa) / k, y0 + 50 / k + (z - zt) / k
+
+    x_end, x_front = V["body_x0"] - ep["t"], V["body_x0"] + 80
+    _detail_title(sh, x0 + 80, y0 + 29, "DETAIL C: DRAWBAR ROOT IN THE GUSSET'S PLANE (9, 13)", k)
+    a, b = p(xa, zt - 50), p(x_front, zt)
+    sh.rect(a[0], a[1], b[0], b[1], "medium")
+    sh.text(a[0] + 0.6, a[1] + 1.4, "MEMBER 150x50x6 (12), ITS TOP 50", 1.3)
+    r, c, h, toe = g["r"], g["end_h"], g["w"], V["root_gusset_toe_x"]
+    u1, u2 = math.sqrt(r ** 2 - (r - c) ** 2), math.sqrt(r ** 2 - (r - h) ** 2)
+    arc = [p(toe - u1 + u, zt + r - math.sqrt(r ** 2 - u ** 2)) for u in (u1 + (u2 - u1) * j / 12 for j in range(13))]
+    sh.path([p(toe, zt), p(toe, zt + c)] + arc + [p(x_end, zt + h), p(x_end, zt)], "medium", closed=True)
+    plate(sh, *p(x_end, zt), *p(V["body_x0"], zt + rail.d))
+    a, b = p(V["body_x0"], zt), p(x_front, zt + rail.d)
+    sh.rect(a[0], a[1], b[0], b[1], "medium")
+    sh.text(a[0] + 0.8, a[1] + 2.4, "RAIL", 1.3)
+    m0, m1 = p(V["body_x0"], zt - 50), p(V["body_x0"], zt)
+    sh.line(m0[0], m0[1], m1[0], m1[1], "thick")
+    S.hdim(sh, p(toe, 0)[0], y0, p(V["body_x0"], 0)[0], y0, y0 - 3, f"{V['body_x0'] - toe:.0f} TO THE BODY FRONT", size=1.4)
+    ex = p(x_front, 0)[0] + 6
+    S.leader(sh, p(toe + 45, zt + r - math.sqrt(r ** 2 - (u1 + 45) ** 2)), (ex, y0 + 22.5),
+             f"GUSSET {g['t']:g} GR 350 (9), {h:g} HIGH AT ITS HEEL: R{r:g} GROUND, END {c:g} HIGH (2t = {2 * g['t']:g} AT MOST),",
+             ["5 FILLETS BOTH SIDES WRAPPED ROUND THAT END, TOE GROUND (IIW 522, FAT-07)"], size=1.4)
+    weld_symbol(sh, p(x_end, zt + 0.7 * h), (ex, y0 + 16.5), f"{g['heel_leg']:g}", both=True, note="HEEL TO THE END PLATE (FAT-18)")
+    S.leader(sh, p(V["body_x0"] - ep["t"] / 2, zt + 0.3 * rail.d), (ex, y0 + 11.0),
+             f"END PLATE {ep['t']:g} GR 350 (13) CLOSING THE RAIL, 5 FILLETS TO ITS WEBS AND TOP (FAT-19)", size=1.4)
+    S.leader(sh, (m0[0], (m0[1] + m1[1]) / 2), (ex, y0 + 5.5), "MITRE: FULL PENETRATION FROM ONE SIDE, WELDED FLAT,",
+             ["IIW 234 AT FAT 36, SO ITS ROOT NEEDS NO NDT (FAT-17)"], size=1.4)
 
 
 def ct102(prj, model, bom, checks, reg, dwg):
@@ -290,7 +330,7 @@ def ct102(prj, model, bom, checks, reg, dwg):
                 mm.p1 = (V["db_end_x"] + 200, m.p1[1], m.p1[2])
             shapes.append(member_solid(mm))
     for f in ch.fittings:
-        if f.id.startswith("DB-") or f.id in ("CH-P01", "CH-P02", "CH-P03", "CH-P04", "CH-P11"):
+        if f.id.startswith("DB-") or f.id in ("CH-P01", "CH-P02", "CH-P03", "CH-P04", "CH-P11", "CH-P15"):
             shapes.extend(fitting_solids(ch, f))
     x0 = -100.0
     # ---- plan, X to the right, kerb side at the bottom
@@ -325,9 +365,10 @@ def ct102(prj, model, bom, checks, reg, dwg):
     spots = {"DB-03": (-40, 0), "CH-P01": (V["plate_x"] - 40, 60), "CH-P02": (V["chain_lug_x"], -ch.db_y(V["chain_lug_x"]) - 30),
              "DB-06": (V["chain_lug_x"], 0), "CH-P11": (V["jockey_x"], -ch.db_y(V["jockey_x"]) - 90), "DB-05": (V["jockey_x"] - 320, -ch.db_y(V["jockey_x"]) - 160),
              "DB-04": (600, 250), "DB-BR": (V["brace_x"], 120), "CH-P03": (V["body_x0"] - 120, V["rail_c"]),
-             "CH-P04": (V["front_recovery_x"], -V["rail_c"] - 35), "DB-07": (700, -60), "DB-KA": (1300, -ch.db_y(1300))}
+             "CH-P04": (V["front_recovery_x"], -V["rail_c"] - 35), "DB-07": (700, -60), "DB-KA": (1300, -ch.db_y(1300)),
+             "CH-P15": (V["body_x0"] - 8, -V["rail_c"])}
     up = {"DB-03": 1, "CH-P01": 1, "CH-P02": -1, "DB-06": 1, "CH-P11": -1, "DB-05": -1, "DB-04": 1, "DB-BR": 1, "CH-P03": 1, "CH-P04": -1,
-          "DB-07": -1, "DB-KA": -1}
+          "DB-07": -1, "DB-KA": -1, "CH-P15": -1}
     used = {1: [], -1: []}
     for item, fid, _ in FIT_ITEMS:
         x, y = spots[fid]
@@ -383,10 +424,15 @@ def ct102(prj, model, bom, checks, reg, dwg):
     rows = [[v["name"][:42], v["governing"][:32], f"{v['mpa']:.0f} / {v['limit_mpa']:.0f}", f"{100 * v['util']:.0f} %"] for v in loc.values()]
     S.table(sh, 232.0, yt - 6, [("FITTING", 70), ("GOVERNING PART", 56), ("MPa / LIMIT", 30), ("USE", 20)], rows, size=1.6, row_h=3.0,
             title="LOCAL CHECKS (CHASSIS.md)")
+    _root_detail(sh, ch, 240.0, 80.0)
     S.notes(sh, 22, 64, [
         "DRAWBAR MEMBERS RHS 150x50x6 C450L0 FROM THE APEX (X 250, Y +/-60) TO THE RAIL CENTRES AT THE BODY FRONT, THEN 1000 UNDER EACH RAIL. CONTINUOUS 5 mm FILLETS ON BOTH EDGES TO THE RAIL UNDERSIDE, SNIPED TAPER END WITH THE TOE GROUND (CT-103 DETAIL D).",
-        ("NO WELD ON THE MEMBERS' TOP OR BOTTOM FACES WITHIN 300 OF THE BODY FRONT EXCEPT THE ROOT GUSSET (9), 140 HIGH AT ITS HEEL ON THE RAIL'S END "
-         "OVER THE MITRE, ITS 160 RADIUS GROUND SMOOTH WHERE IT MEETS THE MEMBER'S TOP 270 AHEAD OF THE BODY FRONT (FAT-07). THE CROSS BRACE SITS AT MID-DEPTH."),
+        ("NO WELD ON THE MEMBERS' TOP OR BOTTOM FACES WITHIN 300 OF THE BODY FRONT EXCEPT THE ROOT GUSSET (9) AND THE MITRE (DETAIL C). THE GUSSET IS IIW 522, "
+         "FAT 90 (FAT-07): ITS 160 RADIUS GROUND SMOOTH DOWN TO AN END 10 HIGH, AT MOST TWICE ITS 10 mm, 270 AHEAD OF THE BODY FRONT, ITS FILLETS WRAPPED "
+         "ROUND THAT END AND THE TOE GROUND. THE CROSS BRACE SITS AT MID-DEPTH."),
+        ("A 16 mm END PLATE (13) CLOSES EACH RAIL'S FRONT END AND TAKES THE GUSSET'S HEEL ON 8 mm FILLETS BOTH SIDES (FAT-18, FAT-19). THE MITRE UNDER IT "
+         "IS A FULL PENETRATION BUTT WELD MADE FROM ONE SIDE ON THE BENCH, EACH FACE WELDED FLAT, BEFORE THE MEMBER GOES UNDER THE RAIL. IT IS CLASSED AT IIW 234 "
+         "FAT 36, SO ITS ROOT NEEDS NO NDT (FAT-17)."),
         ("VSB1 9.1 AT THE {plate:.0f} kg PLATE: {along:.1f} kN ALONG, {across:.1f} kN ACROSS AND {up:.1f} kN UP AND DOWN AT THE COUPLING. VSB1 9.2.2: "
          "{chain:.1f} kN ALONG AND {chain_up:.1f} kN VERTICAL AT EACH CHAIN LUG. EVIDENCE BY TEST OR APPROVED CALCULATION, FOR THE ENGINEER.").format(**_forces()),
         "NEVER USE THE COUPLING OR THE TOW PIN FOR RECOVERY. USE THE RECOVERY LUGS (10) AND THE REAR TONGUES ONLY.",
@@ -453,7 +499,7 @@ def ct103(prj, model, bom, checks, reg, dwg):
     rhs(sh, cx, zb + 75 / k, 50, 150, 3, 6, k)
     sh.line(cx - 5, zb + 0.4, cx + 5, zb + 0.4, "thick")
     weld_symbol(sh, (cx + 25 / k, zb + 20), (cx - 8, zb + 40), "6", all_round=True, note="ALL ROUND")
-    S.leader(sh, (cx, zb + 0.6), (cx + 10, zb - 6), "GRIND THE TOE ON THE RAIL", ["OVER THE BOTTOM 40 mm (FAT-01)"], size=1.5)
+    S.leader(sh, (cx, zb + 0.6), (cx - 10, zb - 6), "GRIND THE TOE ON THE RAIL", ["OVER THE BOTTOM 40 mm (FAT-01)"], size=1.5)   # clear of the fatigue table
     for i, t in enumerate(("RHS 150x50x3, FULL RAIL HEIGHT, END SQUARE,", "NO HOLES (TB 070). HOT-SPOT CHECK BY THE", "ENGINEER (CIDECT DESIGN GUIDE 8).")):
         sh.text(cx - 26, zb - 16 - 3 * i, t, 1.5)
     # ---- D: end of the drawbar overlap, elevation, 1:10
