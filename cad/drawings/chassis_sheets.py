@@ -297,7 +297,7 @@ def _root_detail(sh, ch, x0, y0, k=10.0):
     plate(sh, *p(x_end, zt), *p(V["body_x0"], zt + rail.d))
     a, b = p(V["body_x0"], zt), p(x_front, zt + rail.d)
     sh.rect(a[0], a[1], b[0], b[1], "medium")
-    sh.text(a[0] + 0.8, b[1] - 2.2, "RAIL", 1.3)
+    sh.text(a[0] + 0.8, a[1] + 2.4, "RAIL", 1.3)
     m0, m1 = p(V["body_x0"], zt - 50), p(V["body_x0"], zt)
     sh.line(m0[0], m0[1], m1[0], m1[1], "thick")
     S.hdim(sh, p(toe, 0)[0], y0, p(V["body_x0"], 0)[0], y0, y0 - 3, f"{V['body_x0'] - toe:.0f} TO THE BODY FRONT", size=1.4)
@@ -499,7 +499,7 @@ def ct103(prj, model, bom, checks, reg, dwg):
     rhs(sh, cx, zb + 75 / k, 50, 150, 3, 6, k)
     sh.line(cx - 5, zb + 0.4, cx + 5, zb + 0.4, "thick")
     weld_symbol(sh, (cx + 25 / k, zb + 20), (cx - 8, zb + 40), "6", all_round=True, note="ALL ROUND")
-    S.leader(sh, (cx, zb + 0.6), (cx + 10, zb - 6), "GRIND THE TOE ON THE RAIL", ["OVER THE BOTTOM 40 mm (FAT-01)"], size=1.5)
+    S.leader(sh, (cx, zb + 0.6), (cx - 10, zb - 6), "GRIND THE TOE ON THE RAIL", ["OVER THE BOTTOM 40 mm (FAT-01)"], size=1.5)   # clear of the fatigue table
     for i, t in enumerate(("RHS 150x50x3, FULL RAIL HEIGHT, END SQUARE,", "NO HOLES (TB 070). HOT-SPOT CHECK BY THE", "ENGINEER (CIDECT DESIGN GUIDE 8).")):
         sh.text(cx - 26, zb - 16 - 3 * i, t, 1.5)
     # ---- D: end of the drawbar overlap, elevation, 1:10
