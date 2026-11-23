@@ -4,7 +4,7 @@ CT-002: mass and centre of gravity: every load case with and without growth, the
         centre of gravity in elevation and across the trailer, the tare by group and by maturity, and the least
         certain lines.
 CT-003: compliance: the trailer's VSB1 items and the standards on one page with the design's figure for each, the
-        operating limits (H13's water in travel and its fallback without the GCM revision, the towball range of H17),
+        operating limits (H13's water in travel, the towball range of H17),
         the vehicle plate and what is not designed yet.
 
 The floor plan CT-010 is drawn from the 3D model's plan cut in cad/drawings/layout_sheets.py (decision H28).
@@ -341,7 +341,8 @@ def ct003(prj, model, bom, checks, reg, dwg):
     an = td_case["anchors"][0]
     ang, sa, pg = td_case["angles"], an["set_above_mm"], an["plate_gap_mm"]
     lines = [
-        ("WATER IN TRAVEL (H13)", f"AT MOST {V['water_travel_l']:.0f} L OF FRESH AND GREY WATER WHILE TOWING. FILL THE TANKS AT CAMP (420 L NET)."),
+        ("WATER IN TRAVEL (H13)", f"AT MOST {V['water_travel_l']:.0f} L OF FRESH AND GREY WATER WHILE TOWING, THE FRESH TANKS' {V['water_full_l']:.0f} L NET. "
+                                  "FILL THEM AT CAMP THROUGH THE FILTER."),
         ("GCM (GCM-01)", f"FORD'S {lim['gcm_kg']:,.0f} kg. THE UTE WITH GROWTH, {_kg(gcm['ute_kg_growth'])} kg, PLUS THE "
                          f"{gcm['plate']:,.0f} kg PLATE IS {_kg(gcm['sum'])} kg (UTE-06, H20)."),
         ("ATM AND DESIGN LIMIT", f"PLATE {rep['caps']['plated']:,.0f} kg. EVERY CASE WITH GROWTH AT MOST "
@@ -350,7 +351,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
                           f"{rep['solved']['window']['ball_max']['kg']:.0f} kg WITH GROWTH. DO45 450 kg, THE UTE {lim['towball_rating_kg']:.0f} kg (EST.)."),
         ("THE UTE (H14)", f"FORD RANGER SUPER DUTY ON FORD'S RATINGS: {lim['gvm_kg']:,.0f} kg GVM, REAR AXLE {lim['rear_axle_kg']:,.0f} kg "
                           f"({_kg(uc['UTE-03']['measured'])} kg TOWING WITH GROWTH)."),
-        ("COUPLING HEIGHT", f"{V['coupling_z']:.0f} mm LADEN, PLUS OR MINUS 20 mm. SET THE TONGUE'S DROP AT THE FINAL WEIGHING (TW08)."),
+        ("COUPLING HEIGHT", f"{V['coupling_z']:.0f} mm LADEN, PLUS OR MINUS 20 mm. SET THE HITCH'S DROP AT THE FINAL WEIGHING (TW08)."),
         ("GREY WATER", f"EMPTY FOR TRAVEL. A FULL {V['grey_full_l']:.0f} L TANK IS CHECKED IN CASES TC7 AND TC8."),
         ("AWNING (BDY-11, BDY-23)", f"CLOSE THE AWNING IN WIND, LEGS PEGGED: PEG THE LEGS WHENEVER IT IS OUT, AND CLOSE IT BEFORE GUSTS REACH "
                                     f"{aw['close_kmh']:.0f} km/h AND WHENEVER THE TRAILER IS LEFT. SET THE LEGS FOR A {aw['pitch_deg']:.0f} DEGREE FALL."),

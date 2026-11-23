@@ -2,7 +2,7 @@
 # Retired sheets stay in the register with `retired` saying why and what replaces them. They are no longer drawn.
 # Revision changes are classed per REV-04: memo, notice (configuration change) or rework bulletin.
 owner: Camper trailer project (owner-builder)
-project: Off-road camper trailer for the LandCruiser 79
+project: Off-road camper trailer for the Ford Ranger Super Duty
 drawn_by: Kiro (AI agent)
 sheets_total: 25
 drawings:
@@ -42,10 +42,11 @@ drawings:
       - {rev: X, date: 2026-11-22, description: "Notice: tare 2,627 kg, the axle at X 4,377.5 and its window (fx4-struct)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Y, date: 2026-11-22, description: "Notice: tare 2,645 kg, the axle at X 4,379.9, 280 L in travel (H21)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Z, date: 2026-11-22, description: "Notice: CHS-10 and SVC-10 at fail, 82 of 82 pass, MAS-11 38.3 mm", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AA, date: 2026-11-23, description: "Notice: the 4,000 kg plate, DO45, 4 mm rails, axle X 4,505.3, 420 L", drawn: Kiro, checked: "", approved: ""}
   - number: CT-002
     title: Mass and centre of gravity
     subtitle: Every load case with growth, the axle window of H17, the CoG in elevation and across
-    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    project: Off-road camper trailer for the Ranger Super Duty, home trailer
     sheet: 2
     size: A3
     scale: NTS
@@ -64,10 +65,11 @@ drawings:
       - {rev: J, date: 2026-11-22, description: "Notice: masses without CH-P10, the steadies folded, axle X 4,377.5", drawn: Kiro, checked: "", approved: ""}
       - {rev: K, date: 2026-11-22, description: "Notice: masses at the merged branch, axle X 4,379.9, 280 L (H21)", drawn: Kiro, checked: "", approved: ""}
       - {rev: L, date: 2026-11-22, description: "Notice: tare 2,645.1 kg, axle X 4,379.8 in a 14.3 mm window (BD-25)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: M, date: 2026-11-23, description: "Notice: the 4,000 kg plate, H17's 9.0 % to 420 kg, axle X 4,505.3", drawn: Kiro, checked: "", approved: ""}
   - number: CT-003
     title: Compliance
     subtitle: VSB1 items and the standards with the design figures, operating limits and the plate
-    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    project: Off-road camper trailer for the Ranger Super Duty, home trailer
     sheet: 3
     size: A3
     scale: 60
@@ -89,10 +91,11 @@ drawings:
       - {rev: M, date: 2026-11-22, description: "Notice: clearance 380 mm at DB-03, breakover 17.4 deg, MAS-10 3,392.7 kg", drawn: Kiro, checked: "", approved: ""}
       - {rev: N, date: 2026-11-22, description: "Notice: MAS-10 3,399.95 kg at 280 L, fallback 3,222 kg and 102 L", drawn: Kiro, checked: "", approved: ""}
       - {rev: O, date: 2026-11-22, description: "Notice: each wheel 957 kg on the heavier side, axle X 4,379.8 (MAS-09)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: P, date: 2026-11-23, description: "Notice: the 4,000 kg plate, the DO45, grade 80 chains, load sharing", drawn: Kiro, checked: "", approved: ""}
   - number: CT-010
     title: Floor plan, bed up and bed down
     subtitle: Day and night plans, walkways, door swings, spaces kept clear and the bed positions
-    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    project: Off-road camper trailer for the Ranger Super Duty, home trailer
     sheet: 4
     size: A3
     scale: 40
@@ -104,10 +107,11 @@ drawings:
       - {rev: C, date: 2026-11-22, description: "Memo: labels clear of the lines", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-22, description: "Memo: drawn from the 3D model cut 1000 above the floor (H28)", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-22, description: "Memo: night plan's bed note from the bed, labels clear of dashes (I2-12)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: F, date: 2026-11-23, description: "Memo: the project line names the Ranger Super Duty", drawn: Kiro, checked: "", approved: ""}
   - number: CT-011
     title: Elevations and openings
     subtitle: Kerb, road, front and rear walls with every opening, its position and margins, and the lamps
-    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    project: Off-road camper trailer for the Ranger Super Duty, home trailer
     sheet: 5
     size: A3
     scale: 40
@@ -125,10 +129,11 @@ drawings:
       - {rev: I, date: 2026-11-22, description: "Notice: side marker stations with the axle at X 4,379 (I2-22)", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-22, description: "Notice: side marker stations with the axle at X 4,380.5 (I2-22)", drawn: Kiro, checked: "", approved: ""}
       - {rev: K, date: 2026-11-22, description: "Notice: side marker stations with the axle at X 4,377.5", drawn: Kiro, checked: "", approved: ""}
+      - {rev: L, date: 2026-11-23, description: "Notice: side marker stations with the axle at X 4,505.3", drawn: Kiro, checked: "", approved: ""}
   - number: CT-012
     title: Sections
     subtitle: Through the bed by day and night, the plinth and bench, the wet room, well and grey tank
-    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    project: Off-road camper trailer for the Ranger Super Duty, home trailer
     sheet: 6
     size: A3
     scale: 40
@@ -138,10 +143,11 @@ drawings:
       - {rev: A, date: 2026-11-21, description: "First draft for the home trailer (TRAILER.md revision J, H11 set)", drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-21, description: "Notice: 1,275 mm rails for the 1,655 mm track (H22), full-depth members, roof awning", drawn: Kiro, checked: "", approved: ""}
       - {rev: C, date: 2026-11-22, description: "Memo: labels clear of the lines, revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
+      - {rev: D, date: 2026-11-23, description: "Notice: section C at X 4,400 through the front tank (axle X 4,505.3)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-013
     title: Window, door and hatch schedule
     subtitle: Every opening with its product, cut-out, clear opening, operation, blind and position
-    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    project: Off-road camper trailer for the Ranger Super Duty, home trailer
     sheet: 7
     size: A3
     scale: 100
@@ -152,6 +158,7 @@ drawings:
       - {rev: B, date: 2026-11-21, description: "Notice: G2 drawn and scheduled as an opening, 310 x 120 mm (F4-05)", drawn: Kiro, checked: "", approved: ""}
       - {rev: C, date: 2026-11-21, description: "Notice: the title block's opening count dropped (F5-06)", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-22, description: "Memo: labels clear of the lines", drawn: Kiro, checked: "", approved: ""}
+      - {rev: E, date: 2026-11-23, description: "Memo: the project line names the Ranger Super Duty", drawn: Kiro, checked: "", approved: ""}
   - number: CT-101
     title: Chassis general arrangement
     subtitle: Plan, kerb-side elevation, end views, member schedule and frame analysis summary
@@ -177,6 +184,7 @@ drawings:
       - {rev: M, date: 2026-11-22, description: "Notice: stations 1 mm rearward with the axle at X 4,380.5 (I2-22)", drawn: Kiro, checked: "", approved: ""}
       - {rev: N, date: 2026-11-22, description: "Notice: steadies folded for travel on ARK's welded brackets, CH-P10 gone", drawn: Kiro, checked: "", approved: ""}
       - {rev: O, date: 2026-11-22, description: "Notice: stations with the axle at X 4,379.9", drawn: Kiro, checked: "", approved: ""}
+      - {rev: P, date: 2026-11-23, description: "Notice: the 4,000 kg plate, RHS 150 x 50 x 4 rails, axle X 4,505.3", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
@@ -200,6 +208,7 @@ drawings:
       - {rev: K, date: 2026-11-22, description: "Memo: labels clear of the lines", drawn: Kiro, checked: "", approved: ""}
       - {rev: L, date: 2026-11-22, description: "Notice: LOC-06, the corner steady brackets at 90 degrees", drawn: Kiro, checked: "", approved: ""}
       - {rev: M, date: 2026-11-22, description: "Notice: stations with the axle at X 4,379.9", drawn: Kiro, checked: "", approved: ""}
+      - {rev: N, date: 2026-11-23, description: "Notice: the DO45 Plus on four M14 bolts, grade 80 chains, 4,000 kg", drawn: Kiro, checked: "", approved: ""}
   - number: CT-103
     title: Chassis details
     subtitle: Composite rail, outrigger root, crossmember to rail, overlap end, jacking pad, recovery tongue, spare posts
@@ -224,10 +233,11 @@ drawings:
       - {rev: L, date: 2026-11-22, description: "Notice: fatigue ranges with the axle at X 4,380.5, FAT-05 16.1 MPa", drawn: Kiro, checked: "", approved: ""}
       - {rev: M, date: 2026-11-22, description: "Notice: FAT-16, the steady bracket's welds (IIW 513, FAT 71)", drawn: Kiro, checked: "", approved: ""}
       - {rev: N, date: 2026-11-22, description: "Notice: stations and stresses with the axle at X 4,379.9", drawn: Kiro, checked: "", approved: ""}
+      - {rev: O, date: 2026-11-23, description: "Notice: 4 mm rails, the pad and the tongue at the 4,000 kg plate", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads
-    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    project: Off-road camper trailer for the Ranger Super Duty, home trailer
     sheet: 11
     size: A3
     scale: 40
@@ -245,10 +255,11 @@ drawings:
       - {rev: I, date: 2026-11-22, description: "Notice: stations with the axle at X 4,377.5, mount tension 6.07 kN", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-22, description: "Notice: stations with the axle at X 4,379.9", drawn: Kiro, checked: "", approved: ""}
       - {rev: K, date: 2026-11-22, description: "Notice: LC5a's raiser bolt force 5.97 kN with the axle at X 4,379.8", drawn: Kiro, checked: "", approved: ""}
+      - {rev: L, date: 2026-11-23, description: "Notice: the load paths at the 4,000 kg plate, axle X 4,505.3", drawn: Kiro, checked: "", approved: ""}
   - number: CT-201
     title: Body shell
     subtitle: Kerb, road, front and rear walls, the fixed roof plan, the panels and every opening with its size
-    project: Off-road camper trailer for the LandCruiser 79, body
+    project: Off-road camper trailer for the Ranger Super Duty, body
     sheet: 12
     size: A3
     scale: 50
@@ -264,10 +275,11 @@ drawings:
       - {rev: G, date: 2026-11-21, description: "Notice: BD-20 behind the bed's rear kerb-side hardpoint, G2 an opening, body 633 kg", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-21, description: "Notice: note 4 from the members' data, BD-20 and the hardpoint in one channel (F5-03)", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-22, description: "Memo: BD-18's label clear of OP-08, labels clear of the lines, rows fit", drawn: Kiro, checked: "", approved: ""}
+      - {rev: J, date: 2026-11-23, description: "Notice: the rear wall's racking at the 4,000 kg plate (BDY-20)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-202
     title: Body joint details
     subtitle: Floor joiner, corner joiner, roof-to-wall joiner, lift bed rail hardpoint and a floor insert with its crush tube
-    project: Off-road camper trailer for the LandCruiser 79, body
+    project: Off-road camper trailer for the Ranger Super Duty, body
     sheet: 13
     size: A3
     scale: 2
@@ -282,10 +294,11 @@ drawings:
       - {rev: F, date: 2026-11-21, description: "Notice: detail F, a member's foot on its PVC pad (BDY-22), APLN-1016 nuts on pads", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-21, description: "Notice: detail F's bearing blocks and joiner foam, detail D's 16 mm rail screws", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-22, description: "Memo: labels clear of the lines, revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
+      - {rev: I, date: 2026-11-23, description: "Memo: the project line names the Ranger Super Duty", drawn: Kiro, checked: "", approved: ""}
   - number: CT-203
     title: Body insert map
     subtitle: Every fixing line in the floor, the walls and the roof, the mount inserts and the furniture fixings
-    project: Off-road camper trailer for the LandCruiser 79, body
+    project: Off-road camper trailer for the Ranger Super Duty, body
     sheet: 14
     size: A3
     scale: 50
@@ -302,10 +315,11 @@ drawings:
       - {rev: H, date: 2026-11-22, description: "Memo: labels clear of the lines, revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-22, description: "Notice: mount bolt tension 6.1 kN with the axle at X 4,379 (I2-22)", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-22, description: "Notice: insert stations 3 mm forward with the axle at X 4,377.5", drawn: Kiro, checked: "", approved: ""}
+      - {rev: K, date: 2026-11-23, description: "Notice: the mounts at the 4,000 kg plate, 6.7 kN tension (BDY-16)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-301
     title: Body to chassis
     subtitle: Mount positions, the bolt and nut-plate detail, isolation and sealing, the twist sharing
-    project: Off-road camper trailer for the LandCruiser 79, body
+    project: Off-road camper trailer for the Ranger Super Duty, body
     sheet: 15
     size: A3
     scale: 50
@@ -324,6 +338,7 @@ drawings:
       - {rev: J, date: 2026-11-22, description: "Notice: mount stations with the axle at X 4,380.5 (I2-22)", drawn: Kiro, checked: "", approved: ""}
       - {rev: K, date: 2026-11-22, description: "Notice: mount stations with the axle at X 4,377.5, 6.07 kN", drawn: Kiro, checked: "", approved: ""}
       - {rev: L, date: 2026-11-22, description: "Notice: LC5a's raiser bolt force 5.97 kN with the axle at X 4,379.8", drawn: Kiro, checked: "", approved: ""}
+      - {rev: M, date: 2026-11-23, description: "Notice: the mounts and the twist at the 4,000 kg plate (BDY-16)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-401
     title: Garage and bed general arrangement
     subtitle: Plan, kerb-side section and section looking forward at partition A
@@ -376,7 +391,7 @@ drawings:
   - number: CT-601
     title: Electrical single-line diagram
     subtitle: 48 V battery, BMS, inverter, solar, converters, ute feed, 230 V circuits, load shedding
-    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    project: Off-road camper trailer for the Ranger Super Duty, home trailer
     sheet: 16
     size: A3
     scale: NTS
@@ -392,10 +407,11 @@ drawings:
       - {rev: G, date: 2026-11-22, description: "Notice: the ute feed through the kerb frame G20, G8 merged into it (I2-14)", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-22, description: "Notice: SVC-10's sizes, D-07 95 mm2, D-13 25 mm2, A-02, C1 and C4 4 mm2", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-22, description: "Notice: D-14 7.08 m through the kerb raiser's inner web (CHS-10)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: J, date: 2026-11-23, description: "Notice: the cable lengths with the axle at X 4,505.3", drawn: Kiro, checked: "", approved: ""}
   - number: CT-602
     title: Electrical layout
     subtitle: Battery plinth, board, inverter, cable routes, glands, outlets and the cable schedule
-    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    project: Off-road camper trailer for the Ranger Super Duty, home trailer
     sheet: 17
     size: A3
     scale: 25
@@ -416,10 +432,11 @@ drawings:
       - {rev: L, date: 2026-11-22, description: "Notice: C5, C9, K-01 and K-09 clear of the tanks at axle X 4,380.5 (I2-22)", drawn: Kiro, checked: "", approved: ""}
       - {rev: M, date: 2026-11-22, description: "Notice: K-01, K-08 to K-10 through webs (CHS-10), clear of the fittings", drawn: Kiro, checked: "", approved: ""}
       - {rev: N, date: 2026-11-22, description: "Notice: G20's three down beside RS-K into its inner web, A-01 alone", drawn: Kiro, checked: "", approved: ""}
+      - {rev: O, date: 2026-11-23, description: "Notice: G20 to G15 behind the rear tank, the axle at X 4,505.3", drawn: Kiro, checked: "", approved: ""}
   - number: CT-603
     title: Floor and wall penetrations
     subtitle: Every gland through the floor, walls and roof, its position, hole, fitting and runs
-    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    project: Off-road camper trailer for the Ranger Super Duty, home trailer
     sheet: 18
     size: A3
     scale: 25
@@ -433,10 +450,11 @@ drawings:
       - {rev: E, date: 2026-11-22, description: "Notice: the chassis and tanks dashed with the axle at X 4,380.5 (I2-22)", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-22, description: "Notice: holes in the webs, round into OR-05, axle X 4,379.9 (CHS-10)", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-22, description: "Notice: G20 one packing space, 156 x 84 at Y -549 (CHS-10, SVC-10)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: H, date: 2026-11-23, description: "Notice: the penetrations with the axle at X 4,505.3", drawn: Kiro, checked: "", approved: ""}
   - number: CT-611
     title: Plumbing schematic
     subtitle: Fill, fresh tanks, pump, filters, cold and hot lines, drains to the grey tank and the dump
-    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    project: Off-road camper trailer for the Ranger Super Duty, home trailer
     sheet: 19
     size: A3
     scale: NTS
@@ -454,10 +472,11 @@ drawings:
       - {rev: I, date: 2026-11-22, description: "Notice: the tanks 8 mm rearward with the axle at X 4,379 (I2-22)", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-22, description: "Notice: the tanks with the axle at X 4,380.5 (I2-22)", drawn: Kiro, checked: "", approved: ""}
       - {rev: K, date: 2026-11-22, description: "Notice: the tanks with the axle at X 4,379.9", drawn: Kiro, checked: "", approved: ""}
+      - {rev: L, date: 2026-11-23, description: "Notice: 420 L in travel (H13), the tanks with the axle at X 4,505.3", drawn: Kiro, checked: "", approved: ""}
   - number: CT-612
     title: Plumbing layout
     subtitle: Tanks, pump cabinet, drains with their falls, the shower well, fill and dump points
-    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    project: Off-road camper trailer for the Ranger Super Duty, home trailer
     sheet: 20
     size: A3
     scale: 25
@@ -474,10 +493,11 @@ drawings:
       - {rev: H, date: 2026-11-22, description: "Notice: Q-01 clear of C9B, the tanks with the axle at X 4,380.5 (I2-22)", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-22, description: "Notice: W-01 on the shock plate, the tanks at axle X 4,379.9", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-22, description: "Notice: the tanks with the axle at X 4,379.8", drawn: Kiro, checked: "", approved: ""}
+      - {rev: K, date: 2026-11-23, description: "Notice: the tanks and the wastes with the axle at X 4,505.3", drawn: Kiro, checked: "", approved: ""}
   - number: CT-621
     title: HVAC and ventilation
     subtitle: Split, heat-recovery pairs, extract, towing pressurisation, relief, hood, Combi ducts
-    project: Off-road camper trailer for the LandCruiser 79, home trailer
+    project: Off-road camper trailer for the Ranger Super Duty, home trailer
     sheet: 21
     size: A3
     scale: 25
@@ -491,6 +511,7 @@ drawings:
       - {rev: E, date: 2026-11-21, description: "Notice: G2 drawn as an opening (F4-05)", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-21, description: "Notice: the generators downwind in any wind, never off the road side (F5-04)", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-22, description: "Memo: labels clear of the lines, revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
+      - {rev: H, date: 2026-11-23, description: "Memo: the project line names the Ranger Super Duty", drawn: Kiro, checked: "", approved: ""}
   - number: CT-701
     title: Ute with the bike garage, general arrangement
     subtitle: Kerb-side elevations travelling and loading, plan, rear view, mass by case and the ute checks
@@ -518,6 +539,7 @@ drawings:
       - {rev: O, date: 2026-11-22, description: "Notice: TW06 with its SB120 plug, the ute 0.1 kg heavier (I2-25)", drawn: Kiro, checked: "", approved: ""}
       - {rev: P, date: 2026-11-22, description: "Notice: towball 316 kg, the ute's GVM 3,994.1 kg, rear axle 2,649.0 kg", drawn: Kiro, checked: "", approved: ""}
       - {rev: Q, date: 2026-11-23, description: "Notice: the Ranger Super Duty on Ford's ratings, the box on Ford's pads", drawn: Kiro, checked: "", approved: ""}
+      - {rev: R, date: 2026-11-23, description: "Notice: the trailer's 391.6 kg towball at its 4,000 kg plate", drawn: Kiro, checked: "", approved: ""}
   - number: CT-702
     title: Ute garage box frame and panels
     subtitle: Kerb-side frame elevation, subframe plan on Ford's pads, section at the rear axle, member schedule

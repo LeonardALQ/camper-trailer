@@ -6,10 +6,10 @@ checks: []
 
 # Whole-trailer checks (TRAILER.md), measured on the block layout in assemblies/trailer.yaml by cad/trailer.py.
 # Masses with growth carry the MASS-06 allowance (estimate +20 %, calculated +7 %, spec 0 %).
-# The tow vehicle is the LandCruiser 79 (data/ute/ute.yaml, research report 16). Its towbar is rated 350 kg. H14
+# The tow vehicle is the Ford Ranger Super Duty single cab chassis on Ford's ratings (data/ute/ute.yaml, research report
+# 31), since 23 Nov 2026 in place of the LandCruiser 79. Its tow ball limit is 450 kg (est.) and the DO45's 450 kg. H14
 # (21 Nov 2026) replaced the plan's 250 kg towball cap with the rule it stood for: in every case the towball keeps the
-# ute's rear axle within its rating with growth, computed from the ute model at that ball load. H17 put the Lovells Elite
-# kit on the ute, and H18 plates its rear axle at 2,800 kg, twice the shared wheel's 1,400 kg. H17 also set the design
+# ute's rear axle within its rating with growth, computed from the ute model at that ball load. H17 also set the design
 # towball range the axle solve uses: at least 9.0 % in every case and at most 420 kg with growth since the DO45 (23 Nov
 # 2026), 8.0 % and 320 kg before. H2 sets the 7.5 %
 # floor and the plate, 4,000 kg since 23 Nov 2026. VSB1 sets no towball share. Limits here are never changed to make a check pass.
@@ -54,7 +54,7 @@ trailer_checks:
     cases: all
     severity: fail
     inputs: [UTE-02, TW-01, TW-02, TW-03]
-    why: Decision H14, on the Ranger Super Duty's rear axle rating of 2,800 kg (Ford's BEMM p. 33). The ute model gives its rear axle load with the bikes aboard (UC2, with growth) and how much each kilogram on the ball adds to it (UC3 against UC2). The ute's tow ball limit is data/ute/ute.yaml's towball_rating_kg, 450 kg (est.), since Ford's figure is in the owner guide, which was not read. The coupling's own rating is the trailer's (data/load_cases.yaml).
+    why: Decision H14, on the Ranger Super Duty's rear axle rating of 2,800 kg (Ford's BEMM p. 33). The ute model gives its rear axle load with the bikes aboard (UC2, with growth) and how much each kilogram on the ball adds to it (UC3 against UC2). The ute's tow ball limit is data/ute/ute.yaml's towball_rating_kg, 450 kg (est.), since Ford's figure is in the owner guide, which was not read. The trailer's Cruisemaster DO45 Plus allows 450 kg on the ball too (its fitting guide), so neither governs below the other. They replace the 79's, the Hayman Reese bar's and the DO35's 350 kg.
   - id: MAS-03B
     title: The ute's towing cases carry at least the trailer's heaviest towball with growth
     type: towball_ute_input
