@@ -109,7 +109,7 @@ lines:
     z: 720
     maturity: spec
     added: false
-    source: "Ford: minimum kerb weight 2,518 kg without a tray, with the 130 L tank full and the standard steel front bar, underbody protection, tow bar and full-size spare (dealer sheet 2026MY). Ford publishes no axle split. The rear axle's 853 kg is what Ford's centre of gravity table implies (BEMM p. 32, est.): its GVM row puts 1,832 kg of added mass at 3,350 mm with the rear axle at its 2,800 kg rating, so the kerb truck and the two 75 kg occupants' 70 kg share (p. 29) carry 2,800 - 1,877 kg on the rear axle. The LandCruiser's 41 % rear share would put Ford's own table 179 kg over the rear axle rating. Centre of gravity 720 mm up (est.)"
+    source: "Ford: minimum kerb weight 2,518 kg without a tray, with the 130 L tank full and the standard steel front bar, underbody protection, tow bar and full-size spare (dealer sheet 2026MY). Ford publishes no axle split. The rear axle's 853 kg is an assumption (est.), taken from Ford's centre of gravity table (BEMM p. 32): its GVM row puts 1,832 kg of added mass at 3,350 mm with the rear axle at its 2,800 kg rating, so the kerb truck and the two 75 kg occupants' 70 kg share (p. 29) would carry 2,800 - 1,877 kg on the rear axle. The table covers all three cab styles, so it bounds the split rather than giving it. UTE-02 and UTE-03 both pass while the rear axle carries 28.7 to 44.3 % of the kerb mass (est., review I2-43), and CK01's weighing at stage S0 sets the split before the box is built. Centre of gravity 720 mm up (est.)"
     cases: [UC1, UC2, UC3, UC4, UCB]
   - id: UT-17
     item: "Hitch for the DO45-type coupling (TW01): Ford's 4.5 t hitch in the receiver and Cruisemaster's DO45 tow pin kit"

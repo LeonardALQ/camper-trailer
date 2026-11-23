@@ -46,7 +46,7 @@ params:
   bump_travel: 60            # XT bump travel (spec)
   tyre_clearance: 50         # tyre at full bump to the floor underside (estimate, report 06 open question 9)
   axle_spacing: 900          # LC5 M14 hubs at 900 mm (decision log 11:25), 95 mm between the 805 mm tyres
-  wheel_offset: 0            # ET 0 on the ROH Trak 2 16 x 7, the ute's wheel (report 16)
+  wheel_offset: 0            # ET 0 on the ROH Trak 2 16 x 7, the trailer's own wheel (report 16)
   cf: 190                    # hub face from the rail outside face, C/F (measurements.yaml SUP-04). Effective C/F at most 200 mm
   rail_outer_w: 1275         # rail outer width, set for the 1,655 mm track (H22). Report 18 section 3.4 had 1,175 mm for 1,555 mm
   track: rail_outer_w + 2 * (cf - wheel_offset)   # 1,655 mm (H22), 100 mm over the ute's 1,555 mm, so 215 of each tyre's 265 mm tread runs in its ruts
@@ -159,7 +159,7 @@ params:
 # The trailer's wheel and hub, shared with the ute (report 16). WHL-01 in measurements.yaml is the wheel's load rating,
 # and MAS-09 checks it against the per-wheel load MAS-06 uses.
 wheel:
-  name: "ROH Trak 2 16 x 7 ET 0 steel, 5 x 150, the ute's wheel"
+  name: "ROH Trak 2 16 x 7 ET 0 steel, 5 x 150, the trailer's own wheel"
   offset_mm: 0
   pcd: "5 x 150"
   spigot_mm: 110

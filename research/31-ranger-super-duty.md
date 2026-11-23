@@ -54,7 +54,7 @@ The LandCruiser build bought these, and the Super Duty has them from Ford.
 | Sealed airbox (ID01) | 1,645 | Sealed snorkel with a water separator, standard |
 | Bull bar (if the truck had none) | Not counted | Frame-mounted steel front bar and steel underbody protection, standard |
 
-The trailer's wheels no longer match the truck. The Super Duty runs 8-stud 18 in wheels, and the trailer keeps its 6-stud 16 in ROH wheels (H18), so the two spares are no longer shared.
+The trailer's wheels no longer match the truck. The Super Duty runs 8-stud 18 in wheels, and the trailer keeps its 5 x 150 16 in ROH wheels (H18), so the two spares are no longer shared.
 
 ## 4 The near-new price in Australia
 

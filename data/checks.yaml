@@ -111,7 +111,7 @@ trailer_checks:
     cases: all
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: LT265/75R16 123/120, 1,550 kg per tyre (report 16, the LandCruiser's size when chosen; the Super Duty's 8-stud 18 in wheels share nothing with it). 1.2 times the heavier side's share of the axle group load over its two tyres, from the lateral centre of gravity.
+    why: LT265/75R16 123/120, 1,550 kg per tyre (report 16), the size chosen when the trailer shared the LandCruiser's wheels. The Super Duty's 8-stud 18 in wheels share nothing with it. 1.2 times the heavier side's share of the axle group load over its two tyres, from the lateral centre of gravity.
   - id: MAS-07
     title: Axle group load with growth within the NSW examiner's GTM cap
     type: mass
@@ -141,7 +141,7 @@ trailer_checks:
     cases: all
     severity: fail
     inputs: [WHL-01, TW-01, TW-02, TW-03]
-    why: The ROH Trak 2 16 x 7 ET 0 is rated 1,400 kg (measurements.yaml WHL-01), the ute's wheel.
+    why: The ROH Trak 2 16 x 7 ET 0 is rated 1,400 kg (measurements.yaml WHL-01), the trailer's own wheel since the Super Duty replaced the LandCruiser whose wheel it shared.
   - id: COU-01
     title: The combination's D-value and V-value within the DO45's 24.5 kN and 14.5 kN (ADR 62/02 12.3.3)
     type: coupling_dv

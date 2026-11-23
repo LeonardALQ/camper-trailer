@@ -975,7 +975,7 @@ inputs:
     range: {ref: axle_TC2, rel: 0.03, src: "Within 3 % of the model's TC2 axle group load"}
     affects: [MAS-02, MAS-06, MAS-09, the towball]
     thresholds:
-      - {at: 3375, rule: "Over 3,375 kg the axle group passes the XT build's 4,050 kg under VSB1's 120 % rule: take load off", src: "MAS-02, Cruisemaster's 4,050 kg build and VSB1"}
+      - {at: 4050, rule: "Over 4,050 kg the axle group passes the XT build's rating, which the load-sharing tandem carries without VSB1's 120 % factor: take load off", src: "MAS-02, Cruisemaster's 4,050 kg build in its load-sharing configuration and VSB1"}
   - id: TR-01
     group: Trailer tests
     part: trailer
