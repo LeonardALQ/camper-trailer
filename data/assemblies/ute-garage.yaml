@@ -486,7 +486,7 @@ items:
      at: [garage_length - 370, -half_width - frame_s, 650], params: {dx: 80, dy: frame_s + 5, dz: 220}}
   - ref: C7
     part: U-MUDFLAP-BKT
-    group: body
+    group: context
     label: Mudflap bracket under the outrigger behind the tub
     copies:
       - {id: R, at: [mudflap_x - 45, wheel_y - mudflap_w / 2, sub_z0 - 6], params: {dx: 51, dy: half_width + frame_s - wheel_y + mudflap_w / 2, dz: 6}}
@@ -569,7 +569,7 @@ items:
       - {id: 4K, at: [mount4_x - mount_l / 2 - 5, -pad_y - mount_w / 2 - 5, pad_z1 - 66], params: {dx: mount_l + 10, dy: pad_y + mount_w / 2 + 5 - rail_y - rail_w / 2, dz: 60}}
   - ref: C6
     part: U-MUDFLAP
-    group: body
+    group: context
     label: Mudflap behind the rear tyre
     copies:
       - {id: R, at: [mudflap_x, wheel_y - mudflap_w / 2, sub_z0 - mudflap_h], params: {dx: 6, dy: mudflap_w, dz: mudflap_h - 6}}

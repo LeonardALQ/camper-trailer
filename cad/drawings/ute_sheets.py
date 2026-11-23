@@ -106,7 +106,7 @@ def _title(sh, dwg, reg, mass_note, scale, c, weld_note=None):
         subtitle=dwg["subtitle"], rev=rev["rev"], status=dwg["status"], date=str(rev["date"]), drawn=reg["drawn_by"],
         checked=rev["checked"], approved=rev["approved"], engineer="NOT REQUIRED" if dwg.get("structural") else "N/A",
         sheet_no=dwg["sheet"], sheets=reg["sheets_total"], size=dwg["size"], scale=scale, material="SEE TABLE",
-        mass_note=mass_note, model_ref=f"ute.step (ASM-UG rev {c['prj'].assembly.revision}, UTE-79 rev {c['ute'].d['revision']})",
+        mass_note=mass_note, model_ref=f"ute.step (ASM-UG rev {c['prj'].assembly.revision}, {c['ute'].d['id']} rev {c['ute'].d['revision']})",
         git=git_hash(), weld_note=weld_note)
     # the sheet's own layout leaves room for this many revision rows. The register (and the site's Drawings page) keeps every one
     rows = {"CT-701": 4, "CT-702": 3, "CT-703": 4, "CT-704": 3}.get(dwg["number"], 7)
@@ -413,11 +413,10 @@ def ct702(prj, model, bom, checks, reg, dwg):
         f"MODULE X 0 IS AT UTE X {P['module_x0']:.1f}, Z 0 AT UTE Z {P['deck_z']:.0f}.",
         "ONE-PIECE BODY: TIG-WELDED 5052-H32 SKINS ON A 6061-T6 FRAME. THE WELDS ARE SIZED TO THE SOFTENED STRENGTH NEXT TO EACH WELD.",
         "STEEL CROSSMEMBERS ARE GALVANISED AND BOLTED, NEVER WELDED, TO THE ALUMINIUM, WITH NYLON SLEEVES AND WASHERS.",
-        "FLEXIBLE MOUNTS F1: TWO RUBBER CUSHIONS OF ABOUT 1 kN/mm, TRAVEL STOPPED AT 12 mm, A CAPTIVE M14 10.9 BOLT AND A SAFETY WASHER. "
-        "RIGID MOUNTS R2 TO R4: A GALVANISED SPACER, 6 mm TALLER AT R4, ONE M14 10.9 BOLT AND 50x5 HARDENED WASHERS (FORD BEMM p. 124).",
-        "FORD'S PADS ARE SHOWN AS ENVELOPES AT THE BEMM'S SPACINGS (p. 125). MEASURE THEM ON THE TRUCK (BOX-04) AND KEEP EVERY "
-        "CROSSMEMBER CLEAR OF FORD'S PARTS OVER THE RAIL TOP, UP TO 66 mm AT THE DAMPERS' MOUNTS (p. 128).",
-        "PAD BOLTS GO IN HEAD UP FROM INSIDE THE SUBFRAME, LOCKNUT BELOW FORD'S PAD, SO THE BOX COMES OFF ONLY FROM INSIDE IT (DETAIL A).",
+        "F1: TWO RUBBER CUSHIONS, ABOUT 1 kN/mm, STOPPED AT 12 mm, CAPTIVE M14 10.9. R2 TO R4: GALVANISED SPACERS AND ONE M14 10.9 "
+        "WITH 50x5 WASHERS (FORD BEMM p. 124).",
+        "FORD'S PADS SHOWN AS ENVELOPES (BEMM p. 125). MEASURE THEM (BOX-04). CROSSMEMBERS CLEAR OF THE DAMPERS' MOUNTS (p. 128).",
+        "PAD BOLTS HEAD UP FROM INSIDE, LOCKNUT BELOW THE PAD: THE BOX COMES OFF ONLY FROM INSIDE (DETAIL A).",
     ], width_chars=96, size=1.6)
     _detail_a(sh, 332, 106)
     _stamp(sh, 22, 282)
@@ -431,7 +430,7 @@ def _detail_a(sh, x0, y0):
     """Detail A, the rigid mount under the rear steel crossmember on Ford's rearmost pad, looking from the kerb side, in the
     space right of the notes. Schematic, about 1:5."""
     k = 0.2                                     # sheet mm per real mm
-    cx, yb = x0 + 20, y0 - 30                   # crossmember centre, bottom of Ford's pad
+    cx, yb = x0 + 20, y0 - 31                   # crossmember centre, bottom of Ford's pad
     w_cm, h_cm, w_sp, h_sp, w_br, t_br = 65 * k, 35 * k, 60 * k, 51 * k, 80 * k, 8 * k
     sh.text(x0 + 38, y0 - 4, "DETAIL A: RIGID MOUNT AT STATION 4", 1.8, "middle", bold=True)
     sh.text(x0 + 38, y0 - 7, "LOOKING FROM THE KERB SIDE, NOT TO SCALE", 1.4, "middle")
@@ -447,10 +446,10 @@ def _detail_a(sh, x0, y0):
     sh.rect(cx - 25 * k, yb - 5 * k, cx + 25 * k, yb, "thin")                            # 50 x 5 hardened washer
     sh.rect(cx - 11 * k, yb - 15 * k, cx + 11 * k, yb - 5 * k, "thick")                  # locknut, below the pad
     ex = x0 + 40
-    S.leader(sh, (cx, y_cm + h_cm), (ex, y_cm + h_cm + 4), "RHS 65x35x4.0 C350L0 GALV", size=1.5)
+    S.leader(sh, (cx + w_cm / 2, y_cm + h_cm / 2), (ex, y_cm + h_cm / 2 + 1), "RHS 65x35x4.0 C350L0 GALV", size=1.5)
     S.leader(sh, (cx + w_sp / 2, yb + t_br + h_sp / 2), (ex, yb + 9), "SPACER 51 GALV, G10 PAD ON TOP", size=1.5)
     S.leader(sh, (cx + w_br / 2, yb + t_br / 2), (ex, yb + 2), "FORD BODY MOUNTING PAD", size=1.5)
-    S.leader(sh, (cx + 11 * k, yb - 10 * k), (ex, yb - 5), "M14 10.9 HEAD UP, LOCKNUT BELOW", size=1.5)
+    S.leader(sh, (cx + 11 * k, yb - 10 * k), (ex, yb - 4.5), "M14 10.9 HEAD UP, LOCKNUT BELOW", size=1.5)
 
 
 # ------------------------------------------------------------------ CT-703 doors and security
