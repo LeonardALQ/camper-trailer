@@ -244,7 +244,7 @@ inputs:
     stage: build
     affects: [TL05, H30]
     thresholds:
-      - {at: 186, rule: "Over 186 kW at the wheels, about 220 kW at the crank, the PowerMax keeps only about 6 % of its flow in hand: have the tuner hold 205 kW at the crank", src: "Report 31 section 8 and decision H30"}
+      - {at: 186, rule: "Over 186 kW at the wheels, about 220 kW at the crank, the PowerMax keeps only about 6 % of its flow in hand (est.). Hold 205 kW at the crank unless Leonard has taken the 250 hp option (VEHICLE.md), and never more than 186 kW at the wheels", src: "Report 31 section 8, VEHICLE.md's 250 hp option and decision H30"}
     range: {min: 165, max: 186, src: "H30's 205 kW at the crank less about 5 % (est.), and report 31's 220 kW at the crank, the most the PowerMax carries with a margin"}
   - id: VEH-14
     group: Car build
