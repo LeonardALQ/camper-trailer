@@ -12,7 +12,7 @@ Four stages follow, each leaving the truck registered and drivable. The build is
 
 Leonard asked for about 250 to 300 hp at the wheels from a turbo upgrade. That cannot be planned as registrable and reliable. 250 hp at the wheels needs about 220 kW at the crank (est.), 43 % over the Super Duty's 154 kW, which leaves the only turbo sold here with a maker's record, Garrett's PowerMax, no flow in hand, and 300 hp needs parts nobody sells for this engine. The plan registers about 205 kW and 650 Nm at the crank, about 232 hp at the wheels (est.), on the PowerMax turbo and intercooler with a calibration of the engine and the 10-speed, the DPF, SCR and EGR untouched, under one LC4 certificate. Ford's warranty will not pay for a failure the stage causes, so it waits until Leonard accepts that or the warranty ends.
 
-The check list holds the lines bought only if a check calls for them, AUD 12,478 if every one were bought, which is a note and not a total. The optional extras, a bar and winch, rock sliders and driving lights, come to AUD 7,400. The bike box (AUD 27,870, built by Leonard, `data/ute/box-parts.yaml`), the trailer and Leonard's labour are outside these figures.
+The check list holds the lines bought only if a check calls for them, AUD 12,478 if every one were bought, which is a note and not a total. The optional extras, a bar and winch, rock sliders and driving lights, come to AUD 7,400. The bike box (AUD 27,479, built by Leonard, `data/ute/box-parts.yaml`), the trailer and Leonard's labour are outside these figures.
 
 ## The truck against the LandCruiser plan
 

@@ -1,158 +1,163 @@
-# The tow vehicle: a Toyota LandCruiser 79 single cab chassis, V8 (VDJ79R, GXL, built 01/2017 to 08/2022), with the
-# Lovells 4,495 kg Elite GVM kit (decision H17, VEHICLE.md, research report 16, `docs/decisions.md`), plated at a 4,450 kg
-# GVM and a 2,800 kg rear axle so the shared 1,400 kg ROH wheels carry it (decision H18). Cut CUT7 returns to the 4,200 kg
-# Platinum kit if the S3 weighing leaves at least 30 kg under its 2,550 kg rear axle.
+# The tow vehicle: a near-new Ford Ranger Super Duty single cab chassis (P703 RA, 2026MY), bought and not rebuilt, with
+# Ford's factory ratings and no GVM kit or GCM revision (Leonard, 22 Nov 2026). It replaces the LandCruiser 79 with the
+# Lovells Elite kit of decisions H17 and H18, whose revision B of this file is in the git history.
+# Sources: Ford's body equipment mounting manual for the Super Duty (BEMM, E455418, 03/2026, pages as printed, read
+# 23 Nov 2026 as text, so a lettered dimension's meaning is read from its label and marked est. where the label is not
+# enough) and Ford's dealer specification sheet (2026MY cab-chassis). RSD-UTE-PROGRESS.md lists each figure.
 # Ute frame (DIM-U1): X along the ute from the front axle centre, positive rearward. Y from the centreline, positive to
-# the road (right) side. Z up from the ground, ute level at its laden ride height. mm and kg.
+# the road (right) side. Z up from the ground, the ute level at GVM with the rear axle at its rating. mm and kg.
 # Any number may be an expression over `params`. Masses carry a maturity as in report 02 MASS-06: spec (a maker's
 # figure, 0 % growth), calculated (7 %) and estimate (20 %).
-id: UTE-79
-name: Toyota LandCruiser 79 single cab V8, GXL, with the bike garage
-revision: B
+id: UTE-RSD
+name: Ford Ranger Super Duty single cab chassis with the bike box
+revision: C
 
 params:
-  # ---------------------------------------------------------------- the cab chassis (Toyota BBGJ1007, report 16)
-  wheelbase: 3180
-  front_overhang: 860          # bumper to the front axle, GXL
-  rear_overhang_cc: 1190       # cab chassis as delivered, to the lamp bracket
-  cab_back_x: 2060             # back of the cab behind the front axle
-  cab_width: 1790              # cab, mirrors excluded (WorkMate overall width)
-  cab_height: 1955             # roof, with 265 tyres
-  frame_x0: -625               # frame front ahead of the front axle
-  frame_x1: wheelbase + 1075   # frame end behind the rear axle
-  frame_w: 1046                # over the rails at the rear (assumption: 1,046 over the rails, 1,090 over the brackets)
-  rail_w: 60                   # rail flange width (estimate)
-  rail_h: 160                  # rail depth at the rear (estimate)
-  frame_top_z: 774             # rear frame top: about 724 mm on the factory springs (BBGJ1007 pp. 55 and 62) plus the
-                               # Lovells kit's lift of about 50 mm (estimate). The 805 mm tyre matches the 7.50R16's diameter
-  track_front: 1555            # with 265/70R16 tyres (BBGJ1007 p. 76). ET 0 wheels keep it
-  track_rear: 1555             # the Elite's wide-track housing brings the rear in line with the front (report 26, estimate).
-                               # Toyota's factory rear track is 1,460 mm. measurements.yaml VEH-28 checks it
-  tyre_d: 805                  # LT265/75R16 123/120, Yokohama G015 (report 09) or Toyo AT III (804)
-  tyre_w: 268                  # section width (estimate)
-  tyre_slr: 380                # static loaded radius (estimate, about 22 mm of deflection)
-  rear_bump: 110               # rear wheel travel to the bump stops (estimate, report 17 section 3.3). Measure on the vehicle
-  # deck-mount stations from the rear axle, negative ahead (BBGJ1007)
-  mount_dx: [-879, -490, 123, 490, 755, 1025]
-  # ---------------------------------------------------------------- the towbar and the coupling (report 16 section 5)
-  ball_behind_axle: 1300       # ball centre behind the rear axle (report 16, decision log 12:45). measurements.yaml UTE-02 sets it
+  # ---------------------------------------------------------------- the cab chassis (BEMM, dealer sheet)
+  wheelbase: 3270              # BEMM p. 25
+  front_overhang: 945          # front axle to the steel bar's face (dealer sheet)
+  cab_back_x: 3270 - (2286 - 1020)   # 2,004 mm: the 2,286 mm of frame behind the cab (BEMM p. 24) ends 1,020 mm behind
+                               # the rear axle (p. 25). Ford's 1,265 mm from a body's front to the axle (p. 24) puts the body
+                               # 1 mm behind this, so the model takes the later cab back, the safe side for UTE-15 (est.)
+  cab_width: 1860              # cab body without its wheel flares (est.). Ford's 2,032 mm is over the flares (p. 25)
+  cab_height: 1885             # roof laden: Ford's 1,900 mm at GVM to the antenna base (p. 19) less 15 mm of base (est.)
+  frame_x0: -760               # frame front behind the steel bar (est.)
+  frame_x1: wheelbase + 1020   # frame end, the rails' top edge 1,020 mm behind the rear axle (BEMM p. 25)
+  rail_y: 446                  # rail centreline from the truck's centreline (BEMM p. 131 frame feature, est. reading)
+  rail_w: 70                   # flange width (est.)
+  rail_h: 160                  # rail depth over the rear axle (est.)
+  frame_top_z: 740             # rear frame top at GVM with the rear axle at its rating (BEMM p. 128). 850 mm in the
+                               # table's other column (est.: kerb), so about 16 kg a millimetre on the rear springs
+  frame_top_kerb: 850
+  frame_front_z: frame_top_z   # the model keeps the frame level (est.)
+  track_front: 1710            # BEMM p. 25, front and rear
+  track_rear: 1710
+  tyre_d: 842                  # LT275/70R18: 18 x 25.4 + 2 x 0.70 x 275 mm (Ford fits the General Grabber A/T)
+  tyre_w: 282                  # section width (est.)
+  tyre_slr: 393                # static loaded radius at 1,400 kg a rear tyre (est., 28 mm of deflection)
+  wheel_offset: 0              # Ford's 18 x 8 steel wheel, mounting face on its centre plane (est.)
+  towbar_behind_axle: 1255     # the tow bar's receiver end behind the rear axle, without the hitch (dealer sheet)
+  spare_x: wheelbase + 600     # the full-size spare face down on Ford's winch carrier (est.)
+  spare_z: 420
+  # ---------------------------------------------------------------- the hitch and the coupling (RSD-PLAN line TW01)
+  ball_behind_axle: 1455       # tow pin behind the rear axle (rsd-plan, est.). measurements.yaml UTE-02 sets it
   ball_x: wheelbase + ball_behind_axle
-  coupling_z: 440              # laden, +/- 20 mm (decision log 12:10, in place of 450 mm). measurements.yaml UTE-01 sets it
+  coupling_z: 440              # laden, +/- 20 mm (decision log 12:10). measurements.yaml UTE-01 sets it
   coupling_tol: 20
-  # ---------------------------------------------------------------- the bike box, until phase U2 designs it
-  box_gap_cab: 40              # body front wall to the back of the cab (Toyota: at least 39 mm at the roof)
+  # ---------------------------------------------------------------- the bike box, when no garage module is built
+  box_gap_cab: 30              # body front wall to the back of the cab (Ford: at least 28 mm, BEMM p. 25)
   box_x0: cab_back_x + box_gap_cab
   box_l: 2590                  # outside length (report 17 section 6.2)
-  box_w: 1850                  # body outside width (UTE-09). The rear tub flares reach 1,890 mm (decision H19)
+  box_w: 1850                  # body outside width (UTE-09). The rear tub flares are wider (data/assemblies/ute-garage.yaml)
   box_x1: box_x0 + box_l
-  deck_z: 834                  # box floor top: frame top + 6 mm pad + 50 mm subframe + 4 mm floor. The garage module
-                               # (data/assemblies/ute-garage.yaml) sets it. This copy places the U1 block when no module is built
+  deck_z: 851                  # box floor top: frame top + 12 mm pad + 20 mm mount + 75 mm runner + 4 mm floor. The garage
+                               # module (data/assemblies/ute-garage.yaml) sets it. This copy places the block when no module is built
   box_h: 1502                  # floor top to the roof top: 1,460 inside, 40 mm roof bows, 2 mm roof skin
-  # ---------------------------------------------------------------- the trailer behind it (decision log targets)
-  trailer_atm: 3500            # the home trailer's plated ATM (decision H2)
-  towball_design: null         # set by the build to the trailer's heaviest towball with growth (cad/towball.py). MAS-03B and a test check it
+  # ---------------------------------------------------------------- the trailer behind it
+  trailer_atm: null            # set by the build to the trailer's plate, data/load_cases.yaml registration.plated_atm_kg
+  towball_design: null         # set by the build to the trailer's heaviest towball with growth (cad/towball.py). MAS-03B checks it
   # ---------------------------------------------------------------- people and tools
-  people_x: 1660               # two adults, 400 mm ahead of the cab back (report 16)
-  people_z: 1000               # (estimate, report 17)
+  people_x: 1544               # the front seats, 1,544 mm behind the front axle (BEMM p. 29)
+  people_z: 1000               # (estimate)
 
-# Limits. `src` is the source and `basis` its kind.
+# Limits. `src` is the source and `basis` its kind. Ford's ratings are the limits (COMMON-RULES-4).
 limits:
-  gvm_kg: {v: 4450, src: "Decision H18: the Lovells 4,495 kg Elite kit (report 16 section 2.3, decision H17, car build line GV05) plated at the sum of its axle plates, 1,650 + 2,800 kg, in the LC5 inspection (GV03). An assumption: Lovells publishes a derate only for its 4,200 kg kit (report 26), so its written yes comes in stage S0", basis: plan}
-  front_axle_kg: {v: 1650, src: "Lovells Elite front axle rating, as the Platinum's (report 16)", basis: installer}
-  rear_axle_kg: {v: 2800, src: "Decision H18: the Elite's 2,850 kg rear axle (wide-track housing and chrome-moly axles, report 16, decision H17) plated at 2,800 kg, twice the ROH Trak 2's 1,400 kg rating, because no 16 inch wheel that fits the ute and the trailer is rated 1,425 kg (report 26)", basis: plan}
-  platinum_rear_axle_kg: {v: 2550, src: "Lovells TOYKIT080-GVM rear axle rating, the kit cut CUT7 returns to", basis: installer}
-  platinum_return_margin_kg: {v: 30, src: "Decision H17: CUT7 applies only if the S3 weighing leaves at least 30 kg under the Platinum's rear axle at the trailer's weighed towball", basis: plan}
-  toyota_gcm_kg: {v: 6900, src: "Toyota's GCM for a single cab from 01/2017 (Lovells Campbellfield sheet, https://www.lovellscampbellfield.com.au/_files/ugd/a7ab81_cd324b9c9e354c4da0d3ab9103620a6d.pdf). It holds if Lovells' revision is refused, and then sets the trailer's plate and travel water (decision H20, GCM-01)", basis: maker}
-  gcm_kg: {v: 7400, src: "Lovells' 7,400 kg GCM revision, which Lovells rates for both the 4,200 kg and the 4,495 kg kits (report 16), certified in the same NSW inspection (decision H2, car build lines GV03 and GV06). Toyota's 6,900 kg applies if it is refused", basis: installer}
-  braked_towing_kg: {v: 3500, src: "Toyota LC70 spec data, June 2021", basis: maker}
-  towball_rating_kg: {v: 350, src: "Hayman Reese 03186RW, 3,500 kg and 350 kg (ARB)", basis: maker}
-  front_share_min_pct: {v: 20, src: "Toyota BBGJ1007 section 1-2 (extracted text)", basis: maker}
-  cog_unladen_max_mm: {v: 1000, src: "Toyota BBGJ1007 section 1-2: unladen centre of gravity after body building", basis: maker}
-  box_width_max_mm: {v: 1850, src: 'Toyota BBGJ1007 section 1-2, quoted at flare_width_max_mm. The decision log read the 60 mm as a total on the 1,790 mm cab, and decision H19 keeps that 1,850 mm for the body', basis: plan}
-  flare_width_max_mm: {v: 1910, src: 'Toyota BBGJ1007 section 1-2: "the width of a mounted part should be 60 mm maximum as measured from the outermost point of the cab of the base vehicle (not including the outside mirror)". Measured on each side: 1,790 + 2 x 60 = 1,910 mm. Decision H19 lets the rear tub flares use it', basis: maker}
-  rear_overhang_max_mm: {v: 1908, src: "ADR 43/04 clause 6.1.2.1: 60 % of the 3,180 mm wheelbase", basis: law}
-  wheel_rating_kg: {v: 1400, src: "ROH Trak 2 16 x 7 ET 0 5 x 150 (ROH fitment table). The Elite is plated at twice it, 2,800 kg (decision H18)", basis: maker}
-  tyre_rating_kg: {v: 1550, src: "LT265/75R16 123/120 load range E at 80 psi (report 09)", basis: maker}
+  gvm_kg: {v: 4500, src: "Ford: GVM 4,500 kg (BEMM p. 33, dealer specification sheet 2026MY, Ford's Super Duty payload guide). Leonard wrote 4,495 kg, and Ford's figure is the one used", basis: maker}
+  front_axle_kg: {v: 1900, src: "Ford: front gross axle weight rating 1,900 kg (BEMM p. 33, dealer sheet)", basis: maker}
+  rear_axle_kg: {v: 2800, src: "Ford: rear gross axle weight rating 2,800 kg (BEMM p. 33, dealer sheet)", basis: maker}
+  gcm_kg: {v: 8000, src: "Ford: GCM 8,000 kg (BEMM p. 33, dealer sheet). No revision and no fallback", basis: maker}
+  braked_towing_kg: {v: 4500, src: "Ford: braked towing 4,500 kg with the standard tow bar (dealer sheet)", basis: maker}
+  towball_rating_kg: {v: 450, src: "Estimate: Ford's documents read here give no maximum tow ball download (BEMM p. 34 refers to the owner guide, which this machine cannot reach). Ford's towing guide says the nose weight typically aims at about 10 % of the loaded trailer and Smart Hitch recommends 10 to 15 %, so 10 % of the 4,500 kg braked rating. The coupling's own rating is the trailer's (data/load_cases.yaml)", basis: plan}
+  cog_x_min_mm: {v: 1965, src: "Ford BEMM p. 32: the added mass's centre of gravity at least 1,965 mm behind the front axle (A), at 800 kg and at GVM", basis: maker}
+  cog_added_ref_kg: {v: 800, src: "Ford BEMM p. 32: the first row of the centre of gravity window is for 800 kg of added mass", basis: maker}
+  cog_added_gvm_kg: {v: 1832, src: "Ford BEMM p. 32: the second row is at GVM with the rear axle at its rating. Taken as the added mass that brings the 2,518 kg minimum kerb truck with its two 75 kg front occupants (p. 29) to the 4,500 kg GVM, 1,832 kg (est.), and the window is interpolated in a straight line between the two rows (est.)", basis: maker}
+  cog_x_max_800_mm: {v: 3255, src: "Ford BEMM p. 32: B, at most 3,255 mm behind the front axle at 800 kg", basis: maker}
+  cog_x_max_gvm_mm: {v: 3350, src: "Ford BEMM p. 32: B, at most 3,350 mm at GVM with the rear axle at its rating", basis: maker}
+  cog_z_max_800_mm: {v: 630, src: "Ford BEMM p. 32: C, at most 630 mm high at 800 kg. The datum is in the drawing, taken as the rear frame top (est.)", basis: maker}
+  cog_z_max_gvm_mm: {v: 530, src: "Ford BEMM p. 32: C, at most 530 mm high at GVM, from the rear frame top (est.)", basis: maker}
+  cog_y_max_800_mm: {v: 130, src: "Ford BEMM p. 32: D, at most 130 mm off the centreline at 800 kg", basis: maker}
+  cog_y_max_gvm_mm: {v: 65, src: "Ford BEMM p. 32: D, at most 65 mm off the centreline at GVM", basis: maker}
+  box_width_max_mm: {v: 1960, src: "Ford BEMM p. 18 and p. 24 (J): a body at most 1,960 mm wide on the single cab with the standard mirrors, beyond which extended mirrors may be needed (ADR 14)", basis: maker}
+  flare_width_max_mm: {v: 2197, src: "Plan rule: the rear tub flares stay inside the 2,197 mm span of the truck's own mirrors, extended (BEMM p. 17), so the mirrors and the towing mirrors (rsd-plan line TM01) see past them. ADR 43/04 allows 2,500 mm", basis: plan}
+  rear_overhang_max_mm: {v: 1635, src: "Ford BEMM p. 22 and p. 24 (E): rear overhang at most 50 % of the 3,270 mm wheelbase. ADR 43/04's 60 %, 1,962 mm, is wider", basis: maker}
+  wheel_rating_kg: {v: 1400, src: "Estimate: Ford fits its 18 x 8 steel wheel to the 2,800 kg rear axle rating, so at least half of it on each wheel. Ford publishes no wheel rating", basis: plan}
+  tyre_rating_kg: {v: 1650, src: "LT275/70R18 load range E, load index 125, 1,650 kg single (the General Grabber A/T Ford fits, est. for the load index)", basis: maker}
   coupling_window_mm: {v: [350, 460], src: "VSB1 towball height, vehicle fully loaded (report 08)", basis: law}
   ssf_reference: {v: 1.02, src: "Report 17 section 5.2, case B: the bikes in the trailer, a plain tray and the tools", basis: calculated}
-  cab_gap_min_mm: {v: 39, src: "Toyota BBGJ1007 p. 26: the body's front wall at least 39 mm off the cab at the roof", basis: maker}
+  cab_gap_min_mm: {v: 28, src: "Ford BEMM p. 24 and p. 25: at least 28 mm between the cab and any body", basis: maker}
   box_mass_max_kg: {v: 440, src: "Report 17 section 6.7 total, empty. The decision log asks for a lighter box", basis: plan}
   tub_height_max_mm: {v: 100, src: "Report 17 section 6.4: the lower floor works if the tubs stand no more than 100 mm above it", basis: plan}
   ramp_angle_max_deg: {v: 20, src: "Report 03 section 10: the steepest ramp for walking a bike up beside it", basis: plan}
-  anchor_design_kn: {v: 9.8, src: "Report 24 (UTE-GARAGE.md revision C section 6): an anchor withstands its strap's breaking load (NTC Load Restraint Guide 2018 p. 201, report 03), about 9.8 kN for the LC 500 kg straps. Was 20 kN with LC 1,000 kg straps", basis: plan}
-  m12_tension_kn: {v: 56.0, src: "AS 4100 clause 9.3.2.2: 0.8 x 84.3 mm2 x 830 MPa for an M12 property class 8.8 bolt", basis: law}
-  m12_shear_kn: {v: 31.4, src: "AS 4100 clause 9.3.2.1: 0.8 x 0.62 x 830 MPa x 76.2 mm2, threads in the shear plane", basis: law}
-  bracket_proof_factor: {v: 1.25, src: "Estimate: build step 9 proof-loads each deck mount bracket to UGM-02's loads times this. Those loads are report 03's factored cases, which already carry its off-road factor of 2 and 1.0 g up, so the test adds only a margin, the 25 % over the rated load that a crane's proof test applies (OSHA 29 CFR 1919.71, https://www.osha.gov/pls/oshaweb/owadisp.show_document?p_id=10542&p_table=STANDARDS)", basis: plan}
+  anchor_design_kn: {v: 9.8, src: "Report 24 (UTE-GARAGE.md section 6): an anchor withstands its strap's breaking load (NTC Load Restraint Guide 2018 p. 201, report 03), about 9.8 kN for the LC 500 kg straps", basis: plan}
+  mount_g: {v: 2.0, src: "Ford BEMM p. 124: road-load inputs of up to 2 g in x, y and z at each chassis mounting position, which the body's mounts must withstand", basis: maker}
+  bolt_tension_kn: {v: 95.7, src: "M14 property class 10.9, Ford's recommended bolt at each pad (BEMM p. 124 and p. 158): AS 4100 clause 9.3.2.2's 0.8 x 115 mm2 x 1,040 MPa, with ISO 898-1's tensile strength for 10.9 (est.: AS 4100 itself lists 4.6 and 8.8)", basis: law}
+  bolt_shear_kn: {v: 54.2, src: "M14 property class 10.9: AS 4100 clause 9.3.2.1's 0.8 x 0.62 x 1,040 MPa x 105 mm2, threads in the shear plane (est., as bolt_tension_kn)", basis: law}
+  bracket_proof_factor: {v: 1.25, src: "Estimate: build step 9 proof-loads each of Ford's body mounting pads to UGM-02's loads times this. Those loads are Ford's 2 g inputs at each pad, so the test adds only a margin, the 25 % over the rated load that a crane's proof test applies (OSHA 29 CFR 1919.71)", basis: plan}
 
 # The mass budget. `x`, `y`, `z` place each line's centre of gravity in the ute frame. `cases` lists the cases that
-# carry it (UC1 as built unladen, UC2 bikes aboard, UC3 towing with the bikes, UC4 towing with the bikes out,
-# UCB the report 17 reference with the bikes in the trailer). `box: true` lines are replaced by the designed bike
-# garage when phase U2's module is built.
+# carry it (UC1 as built unladen, UC2 bikes aboard, UC3 towing with the bikes, UC4 towing with the bikes out, UCB the
+# report 17 reference with the bikes in the trailer). `box: true` lines are replaced by the designed bike garage when
+# phase U2's module is built. `added: false` marks the lines Ford's centre of gravity window leaves out (UTE-07, UTE-08):
+# the kerb truck, its seated occupants and the towball. The LandCruiser's UT-02 (the 180 L tank's extra fuel), UT-03 (bull
+# bar and winch), UT-04 (towbar), UT-05 (spare) and UT-16 (the Elite kit) are gone: the Super Duty's 130 L tank, steel
+# front bar, tow bar and spare are in Ford's kerb mass, and it has no GVM kit (rsd-plan, RSD-PLAN-PROGRESS.md).
 lines:
   - id: UT-01
-    item: "Cab chassis, VDJ79R GXL (TJMNYQ3), kerb with a full 130 L fuel tank, no tray"
-    kg: 2202.5
-    x: wheelbase * 922.5 / 2202.5
-    z: 700
+    item: "Cab chassis, Ranger Super Duty single cab (P703 RA), minimum kerb with a full 130 L tank, no tray"
+    kg: 2518
+    x: wheelbase * 853 / 2518
+    z: 720
     maturity: spec
-    source: "Toyota BBGJ1007 (September 2017, for trucks from then): kerb 2,175 to 2,230 kg, rear axle 910 to 935 kg (GXL), centre of gravity 700 mm up for the VDJ79R-TJMNYQ3 (p. 3). Mid-range figures. The 2017 edition was read from a copy that was online when research report 16 was written and is no longer online. Toyota's own LC70 guide for trucks from January 2007, LC70BBG (https://myfleet.toyota.com.au/customer/userfiles/LC70BBG.pdf), is online and gives 740 mm for the older trucks, so the 2017 edition's 700 mm stays for this truck. At 740 mm UTE-11 would read about 0.86 in place of 0.89 and UTE-08 would keep about 189 mm (est., the fix-pass review)"
+    added: false
+    source: "Ford: minimum kerb weight 2,518 kg without a tray, with the 130 L tank full and the standard steel front bar, underbody protection, tow bar and full-size spare (dealer sheet 2026MY). Ford publishes no axle split. The rear axle's 853 kg is what Ford's centre of gravity table implies (BEMM p. 32, est.): its GVM row puts 1,832 kg of added mass at 3,350 mm with the rear axle at its 2,800 kg rating, so the kerb truck and the two 75 kg occupants' 70 kg share (p. 29) carry 2,800 - 1,877 kg on the rear axle. The LandCruiser's 41 % rear share would put Ford's own table 179 kg over the rear axle rating. Centre of gravity 720 mm up (est.)"
     cases: [UC1, UC2, UC3, UC4, UCB]
-  - id: UT-02
-    item: "Fuel, 180 L of diesel in the ARB Frontier tank (FT01): 130 L is in Toyota's kerb mass, so this line carries the other 50 L"
-    kg: 50 * 0.835
-    x: 2500
-    z: 500
-    maturity: calculated
-    source: "Report 16 section 7: diesel at 0.835 kg/L, the tank between the rails about 2,500 mm behind the front axle (assumption). FT01 is an optional extra from 22 Nov 2026 (research report 27), and the model keeps its extra 50 L as the heavier case. The polymer tank's own mass is taken as the factory tank's (est.)"
-    cases: [UC1, UC2, UC3, UC4, UCB]
-  - id: UT-03
-    item: "Bull bar and winch"
-    kg: 110
-    x: -800
-    z: 600
+  - id: UT-17
+    item: "Hitch for the DO45-type coupling (TW01): Ford's 4.5 t hitch in the receiver and Cruisemaster's DO45 tow pin kit"
+    kg: 9.5
+    x: ball_x
+    z: coupling_z
     maturity: estimate
-    source: "Report 16 section 2.3 (estimate)"
+    source: "rsd-plan line TW01 (RSD-PLAN-PROGRESS.md, 23 Nov 2026): about 7 kg of hitch and 2.5 kg of pin, nut and washer (est.), counted in full although Ford's standard hitch may be in the kerb mass. At the tow pin"
     cases: [UC1, UC2, UC3, UC4, UCB]
-  - id: UT-04
-    item: "Towbar, Hayman Reese 03186RW, with the tongue and the DO35 coupling's ute half"
-    kg: 35
-    x: wheelbase + 1200
-    z: 450
-    maturity: estimate
-    source: "Report 16 section 2.3 (estimate)"
-    cases: [UC1, UC2, UC3, UC4, UCB]
-  - id: UT-05
-    item: "Spare wheel and tyre, ROH Trak 2 with LT265/75R16, under the tray"
-    kg: 37.1
-    x: wheelbase + 700
-    z: 420
-    maturity: estimate
-    source: "Report 16 section 4: wheel 14.5 kg (estimate) and tyre 22.6 kg (G015, report 09). One spare on the ute (decision log)"
-    cases: [UC1, UC2, UC3, UC4, UCB]
-  - id: UT-16
-    item: "Lovells Elite kit (GV05) over the Platinum: wide-track rear housing, chrome-moly axles, exchange diff and brake upgrade, net extra"
-    kg: 10
-    x: wheelbase
-    z: 400
-    maturity: estimate
-    elite: true
-    source: "Estimate: Lovells publishes no mass for the Elite. A housing about 95 mm wider and the larger brake parts, taken on the rear axle (decision H17). The factory 1,460 mm rear track is kept in this model until the kit's drawing gives the new one"
-    cases: [UC1, UC2, UC3, UC4]
   - id: UT-14
     item: "Trailer charging (TC01): two Victron Orion-Tr Smart 12/48-8 chargers in a vented cover low in the box front, with their 12 V cables and the 100 A fuse"
     kg: 8.4
     x: box_x0 + 100
     z: deck_z + 300
     maturity: estimate
-    source: "Report 20, the trailer's electrical research of 20 Nov 2026 (VEHICLE.md stage S5). The position low on the box's front wall is an assumption"
+    source: "Report 20 and rsd-plan line TC01. The position low on the box's front wall is an assumption"
     cases: [UC1, UC2, UC3, UC4, UCB]
   - id: UT-15
-    item: "48 V feed to the towbar (TW06): 7 m of 4 B&S twin cable and a grey Anderson SB120 on a bracket"
+    item: "48 V feed to the tow bar (TW06): 7 m of 4 B&S twin cable and a grey Anderson SB120 on a bracket"
     kg: 4.2
     x: (box_x0 + ball_x) / 2
     z: frame_top_z - 100
     maturity: estimate
-    source: "Report 20 (VEHICLE.md stage S5), with 4 B&S in place of 8 B&S since 22 Nov 2026 so the whole feed holds 2 % at TC02's 32 A: 3.5 kg of cable at 0.501 kg a metre for the twin (data/routes.yaml) and 0.6 kg of holders, fuses and the Anderson panel, as before, and 0.1 kg more for the SB120 and its bracket in place of the SB50, since the SB50 takes 6 AWG at most (est.). The cable's centre is taken halfway from the box front to the ball (assumption)"
+    source: "rsd-plan line TW06: 3.5 kg of cable at 0.501 kg a metre for the twin (data/routes.yaml), 0.6 kg of holders, fuses and the Anderson panel and 0.1 kg more for the SB120 and its bracket (est.). The cable's centre is taken halfway from the box front to the tow pin (assumption)"
+    cases: [UC1, UC2, UC3, UC4, UCB]
+  - id: UT-18
+    item: "Towing mirrors over the factory mirrors (TM01), net"
+    kg: 4.0
+    x: 1140
+    z: 1360
+    maturity: estimate
+    source: "rsd-plan line TM01 (est.), on the doors at the mirrors"
+    cases: [UC1, UC2, UC3, UC4, UCB]
+  - id: UT-19
+    item: "UHF CB radio with its antenna and cable (UH01)"
+    kg: 1.5
+    x: 900
+    z: 1150
+    maturity: estimate
+    source: "rsd-plan line UH01 (est.), in the cab with its antenna on the front bar"
+    cases: [UC1, UC2, UC3, UC4, UCB]
+  - id: UT-20
+    item: "Turbo stage, net over the factory parts: turbo, larger intercooler and pipes (PW01)"
+    kg: 5.0
+    x: 0
+    z: 900
+    maturity: estimate
+    source: "rsd-plan line PW01 (est.), in the engine bay over the front axle"
     cases: [UC1, UC2, UC3, UC4, UCB]
   - id: UT-06
     item: "Two people"
@@ -160,7 +165,8 @@ lines:
     x: people_x
     z: people_z
     maturity: estimate
-    source: "Report 16 (two adults of 80 kg, estimate)"
+    added: false
+    source: "Two adults of 80 kg (estimate, Ford's table takes 75 kg) on the front seats, 1,544 mm behind the front axle (BEMM p. 29)"
     cases: [UC2, UC3, UC4, UCB]
   - id: UT-07
     item: "Tools, low and forward"
@@ -183,21 +189,21 @@ lines:
   - id: UT-09
     item: "Aprilia Tuareg 660 Rally with its panniers"
     kg: 215
-    x: wheelbase + 123
+    x: box_x0 + 1200
     y: 335
     z: deck_z + 700
     maturity: spec
-    source: "206 kg fuelled (owner) and 9 kg of panniers (estimate). Report 17 section 5.1 position, report 03's design CoG height"
+    source: "206 kg fuelled (owner) and 9 kg of panniers (estimate). Report 03's design CoG height"
     cases: [UC2, UC3]
     box: true
   - id: UT-10
     item: "Triumph Street Triple 765"
     kg: 175
-    x: wheelbase + 5
+    x: box_x0 + 1100
     y: -425
     z: deck_z + 600
     maturity: spec
-    source: "175 kg fuelled (owner). Report 17 section 5.1 position, report 03's design CoG height"
+    source: "175 kg fuelled (owner). Report 03's design CoG height"
     cases: [UC2, UC3]
     box: true
   - id: UT-11
@@ -206,6 +212,7 @@ lines:
     x: ball_x
     z: coupling_z
     maturity: spec
+    added: false
     source: "The trailer's heaviest towball with growth at its solved axle, rounded up to 0.1 kg (cad/towball.py). Carries no growth here: the trailer's figure has it"
     cases: [UC3, UC4]
   - id: UT-13
@@ -226,59 +233,59 @@ lines:
     cases: [UCB]
 
 cases:
-  - {id: UC1, name: "As built, unladen", note: "Kerb, accessories and the empty bike box. Toyota's 1,000 mm centre of gravity rule applies here"}
+  - {id: UC1, name: "As built, unladen", note: "Kerb, accessories and the empty bike box"}
   - {id: UC2, name: "Bikes aboard, no trailer", note: "Two people, tools and both bikes"}
   - {id: UC3, name: "Towing with the bikes aboard", note: "As UC2 with the trailer's heaviest towball with growth on the ball. The heaviest case"}
   - {id: UC4, name: "Towing with the bikes out", note: "As UC3 without the bikes"}
   - {id: UCB, name: "Reference: bikes in the trailer", note: "Report 17 case B: a plain tray and the tools, no towball"}
 
-# Checks. basis `both` checks the base masses and the masses with the growth allowance.
+# Checks. basis `both` checks the base masses and the masses with the growth allowance. UTE-04 was retired by H20 and
+# stays retired. UTE-07 and UTE-08 were Toyota's 20 % front axle share and 1,000 mm unladen centre of gravity, and are
+# Ford's centre of gravity window for added mass since the Super Duty (BEMM p. 32).
 checks:
-  - {id: UTE-01, title: "Ute mass within the 4,450 kg GVM", type: mass, quantity: mass, limit: gvm_kg, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
-     why: "The Lovells Elite kit plated at 4,450 kg, its front and rear axles as plated, once the NSW certifier has inspected it (report 16, decisions H17 and H18)"}
-  - {id: UTE-02, title: "Front axle within its 1,650 kg rating", type: mass, quantity: front, limit: front_axle_kg, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
-     why: "Lovells' front axle rating, the same for the Elite and the Platinum"}
-  - {id: UTE-03, title: "Rear axle within its 2,800 kg plate", type: mass, quantity: rear, limit: rear_axle_kg, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
-     why: "The Elite plated at twice the ROH wheel's 1,400 kg (decisions H17 and H18). The bikes, the box and the towball all sit over or behind the rear axle. The trailer's MAS-14 reports the Platinum's return (cut CUT7)"}
-  # UTE-04 retired (decision H20, 21 Nov 2026). The plan's 3,850 kg weighed target stood for the Platinum's rear axle
-  # margin (decision log 11:25). UTE-03 now checks the rear axle itself, with growth, against the Elite's 2,800 kg plate,
-  # as H14 replaced the 250 kg towball cap with the rule it stood for. The combination is UTE-06's sum.
-  - {id: UTE-05, title: "Design towball within the towbar's 350 kg", type: towball, severity: fail,
-     why: "The towbar is rated 350 kg. H14 replaced the plan's 250 kg cap with the rule it stood for, the rear axle (UTE-03 at this ball, and the trailer's MAS-03 in every case). Each kilogram on the ball adds about 1.4 kg to the rear axle"}
-  - {id: UTE-06, title: "Combination with the 3,500 kg plated trailer within the 7,400 kg GCM", type: gcm, basis: both, cases: [UC3, UC4], severity: fail,
-     why: "GCM is the ute's mass plus the trailer's less the towball, which the ute already carries (report 16 section 2.4). Decision H20 makes this the plan's one combination figure, and the trailer's GCM-01 takes the same sum"}
-  - {id: UTE-07, title: "Front axle carries at least 20 % of the ute's mass", type: mass, quantity: front_share, limit: front_share_min_pct, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
-     why: "Toyota's minimum front axle share, so the ute steers and brakes"}
-  - {id: UTE-08, title: "Unladen centre of gravity under 1,000 mm with the body fitted", type: mass, quantity: cog_z, limit: cog_unladen_max_mm, basis: nominal, cases: [UC1], severity: fail,
-     why: "Toyota BBGJ1007 section 1-2"}
-  - {id: UTE-09, title: "Bike box body no wider than 1,850 mm, and its rear tub flares no wider than 1,910 mm", type: width, limit: box_width_max_mm, limit_flares: flare_width_max_mm, severity: fail,
-     why: "Toyota allows a mounted part 60 mm beyond the cab's outermost point, measured on each side (BBGJ1007 section 1-2), so 1,910 mm on the 1,790 mm cab. The body keeps the decision log's 1,850 mm, and only the flares over the rear tubs, which the Elite's wider rear track needs, go beyond it (decision H19). The factory GXL is already 1,870 mm over its own wheel flares (report 16)"}
-  - {id: UTE-10, title: "Rear overhang no more than 1,908 mm behind the rear axle", type: overhang, limit: rear_overhang_max_mm, severity: fail,
-     why: "ADR 43/04, including any equipment. The towbar and its tongue count too"}
+  - {id: UTE-01, title: "Ute mass within Ford's 4,500 kg GVM", type: mass, quantity: mass, limit: gvm_kg, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
+     why: "Ford's GVM, which includes the towball's download when towing (BEMM p. 33)"}
+  - {id: UTE-02, title: "Front axle within Ford's 1,900 kg rating", type: mass, quantity: front, limit: front_axle_kg, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
+     why: "Ford's front gross axle weight rating (BEMM p. 33)"}
+  - {id: UTE-03, title: "Rear axle within Ford's 2,800 kg rating", type: mass, quantity: rear, limit: rear_axle_kg, basis: both, cases: [UC1, UC2, UC3, UC4], severity: fail,
+     why: "Ford's rear gross axle weight rating (BEMM p. 33). The bikes, the box and the towball all sit over or behind the rear axle"}
+  - {id: UTE-05, title: "Design towball within the Super Duty's 450 kg (est.)", type: towball, severity: fail,
+     why: "Ford's maximum tow ball download is in the owner guide (BEMM p. 34), which was not read, so 10 % of the 4,500 kg braked rating (est.). H14's rule stays: the rear axle at this ball is UTE-03, and the trailer's MAS-03 checks every case. Each kilogram on the ball adds about 1.4 kg to the rear axle"}
+  - {id: UTE-06, title: "Combination with the plated trailer within Ford's 8,000 kg GCM", type: gcm, basis: both, cases: [UC3, UC4], severity: fail,
+     why: "GCM is the ute's mass plus the trailer's less the towball, which the ute already carries (Ford's payload guide). The trailer's plate comes from data/load_cases.yaml, and the trailer's GCM-01 takes the same sum (H20)"}
+  - {id: UTE-07, title: "Added mass's centre of gravity inside Ford's window along and across", type: ford_cog, quantity: plan, basis: both, cases: [UC1, UC2], severity: fail,
+     why: "Ford BEMM p. 32: everything added to the kerb truck but the cab's occupants and the towball keeps its centre of gravity between 1,965 mm behind the front axle and B, and within D of the centreline, B and D interpolated between Ford's 800 kg row and its GVM row (est.). Ford gives no row under 800 kg, so the empty box (UC1) is measured against the 800 kg row and reported in the detail"}
+  - {id: UTE-08, title: "Added mass's centre of gravity no higher than Ford's limit", type: ford_cog, quantity: height, basis: both, cases: [UC1, UC2], severity: fail,
+     why: "Ford BEMM p. 32: C, at most 630 mm at 800 kg and 530 mm at GVM, interpolated (est.), measured from the rear frame top (est.)"}
+  - {id: UTE-09, title: "Bike box body no wider than Ford's 1,960 mm, and its rear tub flares inside the mirrors' 2,197 mm", type: width, limit: box_width_max_mm, limit_flares: flare_width_max_mm, severity: fail,
+     why: "Ford allows a body 1,960 mm wide on the single cab with the standard mirrors (BEMM p. 18). The flares over the rear tubs keep Ford's 30 mm outside the tyres on the 1,710 mm track (BEMM p. 122), so they reach past the body, inside the mirrors' span"}
+  - {id: UTE-10, title: "Rear overhang within Ford's 50 % of the wheelbase, 1,635 mm", type: overhang, limit: rear_overhang_max_mm, severity: fail,
+     why: "Ford BEMM p. 22. The tow pin and its tongue count too, so ADR 43/04's 60 % is also met"}
   - {id: UTE-11, title: "Static stability factor with the bikes aboard (reported against 1.02 with the bikes in the trailer)", type: ssf, cases: [UC2, UC3], severity: report,
-     why: "Half the mean track over the centre of gravity height (NHTSA), with the Elite's 1,555 mm rear track (report 26). Report 17 found 1.02 with the bikes in the trailer and about 0.80 to 0.82 on the ute, both on the factory 1,460 mm rear track"}
+     why: "Half the mean track over the centre of gravity height (NHTSA), on Ford's 1,710 mm track. Report 17 found 1.02 with the bikes in the trailer on the LandCruiser"}
   - {id: UTE-12, title: "Each rear wheel and tyre within its rating", type: wheel, basis: both, cases: [UC3], severity: fail,
-     why: "Half the rear axle load on each rear wheel. ROH rates the Trak 2 at 1,400 kg, which sets the Elite's 2,800 kg plate (decision H18), and the tyre carries 1,550 kg"}
+     why: "Half the rear axle load on each rear wheel, against Ford's wheel (est.) and the LT275/70R18's 1,650 kg"}
   - {id: UTE-13, title: "Coupling point window laden inside VSB1's 350 to 460 mm", type: coupling, severity: fail,
-     why: "The decision log sets 440 mm, plus or minus 20 mm, laden (12:10 UTC, in place of 450 mm, which reached 470 mm). VSB1 asks for 350 to 460 mm with the vehicle fully loaded"}
-  - {id: UTE-14, title: "Trailer within the 3,500 kg braked towing capacity", type: towing, severity: fail,
-     why: "Toyota's braked towing capacity, and the towbar's rating"}
-  - {id: UTE-15, title: "Box front wall at least 39 mm behind the cab", type: cab, limit: cab_gap_min_mm, severity: fail,
-     why: "Toyota BBGJ1007 p. 26, so the cab can move on its mounts without touching the body"}
+     why: "The decision log sets 440 mm, plus or minus 20 mm, laden (12:10 UTC). VSB1 asks for 350 to 460 mm with the vehicle fully loaded. The hitch's drop is chosen at the measurement UTE-01"}
+  - {id: UTE-14, title: "Trailer's plate within Ford's 4,500 kg braked towing", type: towing, severity: fail,
+     why: "Ford's braked towing capacity with its standard tow bar and hitch (dealer sheet)"}
+  - {id: UTE-15, title: "Box front wall at least 28 mm behind the cab", type: cab, limit: cab_gap_min_mm, severity: fail,
+     why: "Ford BEMM p. 25: 28 mm between the cab's sheet metal and any body, so the cab can move on its mounts without touching the box"}
 
-# The LandCruiser's parts in the 3D model (decision H27). cad/model/vehicles/landcruiser.py builds each one from the
-# params above and Toyota's drawing, and research/29 gives every dimension and its source. A name that cites a line
-# takes its mass from that line. The rest are part of the cab chassis, line UT-01.
+# The Super Duty's parts in the 3D model (decision H27). cad/model/vehicles/ranger_sd.py builds each one from the params
+# above, and research/29 gives every dimension and its source. A name that cites a line takes its mass from that line.
+# The rest are part of the cab chassis, line UT-01.
 solids:
-  - {id: CAB, name: "Cab: body, roof, doors, windscreen, side and rear glass, A-pillars, mirrors and snorkel"}
-  - {id: FRONT, name: "Bonnet with the V8's scoop, front guards and flares, grille, headlights and indicators"}
-  - {id: BAR, name: "Bull bar and winch (UT-03)"}
+  - {id: CAB, name: "Cab: body, roof, doors, windscreen, side and rear glass, mirrors and the sealed snorkel"}
+  - {id: FRONT, name: "Bonnet, front guards and flares, grille, headlights and indicators"}
+  - {id: BAR, name: "Ford's frame-mounted steel front bar"}
   - {id: FRAME, name: "Chassis frame: rails and crossmembers"}
-  - {id: FAXLE, name: "Front axle, hubs and coil springs"}
-  - {id: RAXLE, name: "Rear axle on the Lovells Elite housing, hubs and leaf springs"}
-  - {id: TANK, name: "Fuel tank, ARB Frontier 180 L, on its straps between the rails"}
-  - {id: TOWBAR, name: "Towbar and tongue (UT-04)"}
-  - {id: SPARE, name: "Spare wheel under the tray (UT-05)"}
+  - {id: FAXLE, name: "Independent front suspension, hubs, coil-over dampers and the front differential"}
+  - {id: RAXLE, name: "Rear axle, hubs and leaf springs"}
+  - {id: TANK, name: "Fuel tank, 130 L, on its straps between the rails"}
+  - {id: UREA, name: "Diesel exhaust fluid tank on its bracket"}
+  - {id: TOWBAR, name: "Tow bar, receiver, hitch and the DO45-type tow pin (UT-17)"}
+  - {id: SPARE, name: "Full-size spare under the rear of the frame"}
 wheels:
   - {id: FR, x: 0, y: track_front / 2}
   - {id: FK, x: 0, y: -track_front / 2}

@@ -13,7 +13,6 @@ from ..build import BUILD, git_hash
 from ..trailer import Trailer, _kg
 from ..trailer_model import TrailerModel
 from . import sheet as S
-from .home_common import water_without_gcm_revision
 from .sheets import _leaves
 
 HEIGHT_AT = {"BD-13": "the awning case", "RF-01": "the solar panels"}   # what sets the travel height, by line
@@ -183,8 +182,8 @@ def ct001(prj, model, bom, checks, reg, dwg):
         ["Tare", f"{rep['tare_kg']:,.0f} kg", f"{cases['TC1']['growth']['mass_kg']:,.0f} kg with growth"],
         ["Fully loaded, TC2", f"{tc2['nominal']['mass_kg']:,.0f} kg", f"{tc2['growth']['mass_kg']:,.0f} kg with growth, ATM plate {plate:,.0f} kg"],
         ["Towball", f"{lo_ball:.0f} to {hi_ball:.0f} kg", f"{chk['MAS-12']['measured']:.1f} % lowest (TC7), {_kg(chk['MAS-13']['measured'])} kg heaviest with growth"],
-        ["Ute rear axle", f"{_kg(chk['MAS-03']['measured'])} kg", f"Against the Elite kit's {rep['tow_vehicle']['limits']['rear_axle_kg']:,.0f} kg with growth (MAS-03)"],
-        ["Combination", f"{_kg(chk['GCM-01']['measured'])} kg", f"Against Lovells' {rep['tow_vehicle']['limits']['gcm_kg']:,.0f} kg GCM revision (GCM-01)"],
+        ["Ute rear axle", f"{_kg(chk['MAS-03']['measured'])} kg", f"Against the Super Duty's {rep['tow_vehicle']['limits']['rear_axle_kg']:,.0f} kg with growth (MAS-03)"],
+        ["Combination", f"{_kg(chk['GCM-01']['measured'])} kg", f"Against Ford's {rep['tow_vehicle']['limits']['gcm_kg']:,.0f} kg GCM (GCM-01)"],
         ["CoG, fully loaded", f"Z {ch['cog_loaded'][2]:,.0f}", f"Z {ch['cog_loaded_growth'][2]:,.0f} with growth. Across: {chk['MAS-11']['measured']:.1f} mm at worst (MAS-11)"],
         ["Coupling", f"{V['coupling_z']:.0f} mm", "Laden, plus or minus 20 mm (UTE-01). DO35 V3Plus"],
         ["Water", f"{rep['params']['water_full_l']:.0f} L net", f"At most {rep['params']['water_travel_l']:.0f} L in travel (H13), 130 L grey tank"],
@@ -201,11 +200,10 @@ def ct001(prj, model, bom, checks, reg, dwg):
         "TRAILER LEVEL AT DESIGN RIDE HEIGHT. A RIGHT-HANDED FRAME, SO THE 3D MODEL AND THESE VIEWS SHOW THE TRAILER AS IT IS.",
         (f"AXLE IN THE MIDDLE OF THE TOWBALL WINDOW, X {w['x_lo']:,.0f} TO {w['x_hi']:,.0f}: EVERY CASE KEEPS {w['pct_min']:.1f} % ON THE BALL AND "
          f"THE HEAVIEST TOWBALL WITH GROWTH STAYS AT OR UNDER {w['ball_max']['kg']:.0f} kg (H17, MAS-12, MAS-13). THE UTE'S REAR AXLE STAYS "
-         f"WITHIN THE ELITE KIT'S {rep['tow_vehicle']['limits']['rear_axle_kg']:.0f} kg (MAS-03). NO BALLAST IN ANY CASE."),
+         f"WITHIN THE SUPER DUTY'S {rep['tow_vehicle']['limits']['rear_axle_kg']:.0f} kg (MAS-03). NO BALLAST IN ANY CASE."),
         "REVISION " + dwg["revisions"][-1]["rev"] + ": THE HOME TRAILER. THE BIKES RIDE IN THE UTE'S BIKE BOX. THE LIFT BED OVER THE DESK ACROSS "
         f"THE FRONT, THE KITCHEN ON THE ROAD SIDE, THE BATTERY PLINTH ON THE KERB SIDE, THE WET ROOM ACROSS THE REAR. AT MOST "
-        f"{rep['params']['water_travel_l']:.0f} L OF WATER IN TRAVEL (H13), {water_without_gcm_revision(rep)} L IF LOVELLS' GCM REVISION IS "
-        "REFUSED (CT-003).",
+        f"{rep['params']['water_travel_l']:.0f} L OF WATER IN TRAVEL (H13).",
         "ROOF (H12): FIXED, WITH ROUNDED FRONT EDGES (ABOUT +6 kg AND AUD 3,500, RESEARCH REPORT 25). TOWING FUEL IS ABOUT 21.3 L/100 km AT "
         "90 km/h AGAINST 25.0 FOR A SQUARE FRONT. A HARD-WALLED TELESCOPING ROOF GIVES 20.6 BUT COSTS +117 kg AND ABOUT AUD 32,900 MORE "
         "AND RULES OUT THE S4 WINDOWS, STOCK DOORS, THE HAPPIJAC BED AND A FULL-HEIGHT WET ROOM. A CANVAS POP-TOP FAILS H3 AND H7.",

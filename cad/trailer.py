@@ -44,7 +44,7 @@ WEIGH_LABELS = {s["stage"]: f"{s['label']} ({s['stage']})" for s in BUILD_ORDER}
 
 # ------------------------------------------------------------------ the tow vehicle
 def tow_vehicle(prj: Project) -> dict:
-    """The LandCruiser 79 (data/ute/ute.yaml) and what the ute model gives the trailer (build/ute/ute.json): the ute's
+    """The Ranger Super Duty (data/ute/ute.yaml) and what the ute model gives the trailer (build/ute/ute.json): the ute's
     mass with the bikes aboard for the GCM, and the bike box's sweep about the ball for the jack-knife checks."""
     tv = prj.load.tow_vehicle
     d = yaml.safe_load((ROOT / tv["data"]).read_text())
@@ -60,12 +60,9 @@ def tow_vehicle(prj: Project) -> dict:
     tow = next(c for c in rep["cases"] if c["growth"].get("towball_kg"))
     rear0 = case["growth"]["rear_kg"]
     per_ball = (tow["growth"]["rear_kg"] - rear0) / tow["growth"]["towball_kg"]
-    # what the Elite kit adds over the Platinum on the rear axle, so the Platinum's return (cut CUT7) can be read off
-    wb = rep["params"]["wheelbase"]
-    elite = sum(ln["kg"] * ln["x"] / wb for ln in rep["lines"] if ln.get("elite") and tv["gcm_case"] in ln["cases"])
     return dict(name=tv["name"], limits=lim, limit_src=src, gcm_case=tv["gcm_case"], case_name=case["name"],
                 ute_kg=case["nominal"]["mass_kg"], ute_kg_growth=case["growth"]["mass_kg"], sweep=rep["bike_box_sweep"],
-                rear_kg_growth=rear0, rear_kg_nominal=case["nominal"]["rear_kg"], elite_rear_kg=elite, rear_per_ball=per_ball,
+                rear_kg_growth=rear0, rear_kg_nominal=case["nominal"]["rear_kg"], rear_per_ball=per_ball,
                 ball_behind_axle=rep["params"]["ball_behind_axle"],
                 design_ball_kg=tow["growth"]["towball_kg"], tow_case=tow["id"], box_kg=rep["garage"]["box_kg"],
                 ute_checks=[dict(id=c["id"], title=c["title"], status=c["status"], detail=c["detail"], measured=c.get("measured"))
@@ -799,25 +796,20 @@ class Trailer:
                            governing=f"{cid} {by_id[cid]['name']} ({'with growth' if bs == 'growth' else 'no growth'})",
                            detail=f"worst case {cid} {by_id[cid]['name']}, {'with growth' if bs == 'growth' else 'no growth'}: {v:.1f} {unit}, margin {m:.1f} {unit}")
             elif c.type == "gcm":
-                # H20: the ute with growth, ball off, plus the trailer's plate, UTE-06's sum. Without Lovells' revision,
-                # Toyota's GCM sets the plate and the travel water keeps the heaviest case with growth under that plate
+                # H20's one sum: the ute with growth, ball off, plus the trailer's plate (UTE-06), against Ford's GCM. There
+                # is no revision to be refused, so no fallback plate and no water limit hang on it. `water_without` stays
+                # the travel water for the drawings that still quote it
                 tv, lim = self.tv, self.tv["limits"]
                 plate = self.caps()["plated"]
                 total = tv["ute_kg_growth"] + plate
                 heavy = max(cases, key=lambda x: x["growth"]["mass_kg"])
-                toyota = lim["toyota_gcm_kg"]
-                plate_fb = math.floor(toyota - tv["ute_kg_growth"])
-                water_fb = math.floor(lay.V["water_travel_l"] - max(0.0, heavy["growth"]["mass_kg"] - plate_fb))
                 row.update(limit=f"<= {lim['gcm_kg']:,.0f} kg", measured=round(total, 1), unit="kg", margin=round(lim["gcm_kg"] - total, 1),
                            ok=total <= lim["gcm_kg"] + 1e-6, governing="the ute with growth plus the trailer's plate (UTE-06)",
                            detail=(f"the ute with the bikes aboard ({tv['gcm_case']}, {_kg(tv['ute_kg_growth'])} kg with growth) plus the "
-                                   f"{plate:,.0f} kg plate is {_kg(total)} kg. Without Lovells' revision, Toyota's {toyota:,.0f} kg needs the trailer "
-                                   f"plated at or below {plate_fb:,.0f} kg and at most {water_fb:.0f} L of water in travel: at {water_fb:.0f} L "
-                                   f"{heavy['id']} with growth weighs "
-                                   f"{heavy['growth']['mass_kg'] - (lay.V['water_travel_l'] - water_fb):,.0f} kg, under that plate, and at "
-                                   f"{lay.V['water_travel_l']:.0f} L it weighs {heavy['growth']['mass_kg']:,.0f} kg"),
-                           gcm=dict(sum=total, ute_kg_growth=tv["ute_kg_growth"], plate=plate, toyota_kg=toyota, plate_without=plate_fb,
-                                    water_without=water_fb, trailer_case=heavy["id"], trailer_kg_growth=heavy["growth"]["mass_kg"]))
+                                   f"{plate:,.0f} kg plate is {_kg(total)} kg against Ford's {lim['gcm_kg']:,.0f} kg. The heaviest trailer case "
+                                   f"with growth, {heavy['id']}, weighs {heavy['growth']['mass_kg']:,.0f} kg, under the plate"),
+                           gcm=dict(sum=total, ute_kg_growth=tv["ute_kg_growth"], plate=plate, water_without=math.floor(lay.V["water_travel_l"]),
+                                    trailer_case=heavy["id"], trailer_kg_growth=heavy["growth"]["mass_kg"]))
             elif c.type in ("towball_ute", "towball_ute_input"):
                 tv, ids = self.tv, ([x["id"] for x in cases] if c.cases == "all" else c.cases)
                 bs = "growth" if c.basis != "nominal" else "nominal"
@@ -839,19 +831,6 @@ class Trailer:
                     row.update(limit=f"<= {d:.1f} kg, the ute's design towball ({tv['tow_case']})", measured=round(ball, 1), unit="kg",
                                margin=round(d - ball, 1), ok=ball <= d + 1e-6, governing=f"{heavy} {by_id[heavy]['name']} (with growth)",
                                detail=f"heaviest towball {ball:.1f} kg against the {d:.1f} kg the ute model carries in {tv['tow_case']}")
-            elif c.type == "platinum_return":
-                tv, lim = self.tv, self.tv["limits"]
-                heavy = max((x["id"] for x in cases), key=lambda i: by_id[i]["nominal"]["towball_kg"])
-                ball = by_id[heavy]["nominal"]["towball_kg"]
-                plat = tv["rear_kg_nominal"] - tv["elite_rear_kg"]
-                rear = plat + tv["rear_per_ball"] * ball
-                cap = lim["platinum_rear_axle_kg"] - lim["platinum_return_margin_kg"]
-                row.update(limit=(f"<= {cap:,.0f} kg, the Platinum's {lim['platinum_rear_axle_kg']:,.0f} kg less "
-                                  f"{lim['platinum_return_margin_kg']:.0f} kg"), measured=round(rear, 1), unit="kg",
-                           margin=round(cap - rear, 1), ok=rear <= cap + 1e-6, governing=f"{heavy} {by_id[heavy]['name']} (no growth)",
-                           detail=(f"on the model without growth the ute's rear axle on the Platinum is {plat:,.1f} kg with the bikes aboard "
-                                   f"({tv['gcm_case']}), plus {tv['rear_per_ball']:.3f} kg per kg of the trailer's heaviest towball "
-                                   f"({ball:.1f} kg, {heavy}): {rear:,.1f} kg. The S3 weighing decides cut CUT7"))
             elif c.type == "axle_window":
                 w = (getattr(self, "last_solved", None) or {}).get("window") or self.window()
                 width = w["width_mm"] if w["width_mm"] is not None else -1e9
@@ -1385,7 +1364,7 @@ def measurement_refs(tr: Trailer, ev: dict) -> dict:
         cog_z_TC1=cases["TC1"]["nominal"]["cog"][2],
         # the car build's and the bike box's design values on the measurement sheet, from the ute's model (F4-06)
         ute_rear_towing=ute["UTE-03"]["measured"], ute_front_bikes=ute["UTE-02"]["measured"],
-        ute_front_share_towing=ute["UTE-07"]["measured"], ute_gvm_towing=ute["UTE-01"]["measured"],
+        ute_added_cog_x=ute["UTE-07"]["measured"], ute_gvm_towing=ute["UTE-01"]["measured"],
         combination=tr.tv["ute_kg_growth"] + cases["TC2"]["growth"]["mass_kg"],
         box_kg=tr.tv["box_kg"],
     )

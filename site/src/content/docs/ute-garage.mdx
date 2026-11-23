@@ -1,6 +1,6 @@
 ---
 title: Bike box
-description: The enclosed aluminium box on the LandCruiser 79 that carries both motorbikes, with its 3D model, materials, priced parts list, checks, mass and drawings.
+description: The enclosed aluminium box on the Ford Ranger Super Duty that carries both motorbikes, with its 3D model, materials, priced parts list, checks, mass and drawings.
 ---
 
 import CadViewer from '../../components/CadViewer.astro';
@@ -9,16 +9,16 @@ import BoxParts from '../../components/BoxParts.astro';
 import { withBase } from '../../lib/url';
 
 The bike box carries the Aprilia Tuareg 660 Rally and the Triumph Street Triple 765 side by side, noses forward, with
-about 60 kg of tools. It is a welded aluminium body on its own subframe, bolted to Toyota's deck mount brackets on the
-<a href={withBase('/tow-vehicle/')}>LandCruiser 79</a>, locked, sealed against dust and vented for fuelled bikes. The
-build document is `UTE-GARAGE.md` revision E and the parts list `data/ute/box-parts.yaml`. Leonard builds it himself to
+about 60 kg of tools. It is a welded aluminium body on its own subframe, bolted to Ford's body mounting pads on the
+<a href={withBase('/tow-vehicle/')}>Ranger Super Duty</a>, locked, sealed against dust and vented for fuelled bikes. The
+build document is `UTE-GARAGE.md` revision F and the parts list `data/ute/box-parts.yaml`. Leonard builds it himself to
 its own checks and does not have it certified (decision H25).
 
 <Ute kind="summary" />
 
 ## 3D model
 
-The ute as it travels, with the box closed. The LandCruiser 79 and both bikes are modelled as the real vehicles at their
+The ute as it travels, with the box closed. The Ranger Super Duty and both bikes are modelled as the real vehicles at their
 makers' dimensions. Every part stands on, hangs from or is fixed to another, down to the tyres, and the trailer's
 support check (H27) tests the ute's two models the same way. Research report 29
 gives each dimension and its source. The repo's own code builds them from those published dimensions, with no maker's
@@ -46,12 +46,16 @@ The 3D model is also a <a href={withBase('/downloads/ute.step')}>STEP file</a>.
 - Body: walls, front and door skins in 5052-H32 2.5 mm, the roof in 1.6 mm, the floor in 4.0 mm, the wheel tubs in
   3.0 mm and a folded 2.5 mm flare over each rear tub, TIG-welded with ER5356 to a 6061-T6 frame of SHS 40 x 40 x 3.
   Buy the 6061-T6 with mill certificates, because the common stock tube is 6060-T5, which is weaker when welded.
-- Subframe: 6061-T6 runners on a 6 mm rubber strip on the rails, with crossmembers and outriggers between and outside
-  them. Under each track row a hot-dip galvanised C350L0 RHS 65 x 35 x 4.0 runs the full width and bolts to a pair of
-  Toyota's brackets, so a strap's load reaches the frame through steel. Nothing is drilled or welded on the frame.
-- Mounting: firm mounts at the front two stations with two M12 8.8 bolts each, compliant mounts at the rear four with
-  one bolt through two cab cushions. Every bracket bolt goes in head up from inside the subframe with a nyloc nut
-  below, so the box comes off only from inside it (CT-702 detail A).
+- Subframe: 6061-T6 runners over Ford's body mounting pads and clear of the rail tops, with a crossmember at every pad
+  station and outriggers outside them. Under each track row a hot-dip galvanised C350L0 RHS 65 x 35 x 4.0 runs the full
+  width. The rear one stands on the mounts over Ford's rearmost pads and the front one on steel stubs that reach Ford's
+  first pads, so a strap's load reaches the frame through steel. Nothing is drilled or welded on the frame (Ford's body
+  equipment mounting manual, BEMM p. 155).
+- Mounting: Ford asks an exceptionally rigid body, as a welded box is, to sit on flexible mounts at its two forward pads
+  and rigid mounts at all the others (BEMM p. 124). So the first pair has two rubber cushions of about 1 kN/mm with the
+  travel stopped at 12 mm and a captive bolt, and the other three pairs have galvanised steel spacers. Each of the eight
+  pads takes one M14 10.9 bolt, head up from inside the subframe with a locknut below, so the box comes off only from
+  inside it (CT-702 detail A).
 - Doors and security: barn doors on continuous stainless hinges with dog bolts, a cam bar on the road leaf and an
   ABLOY PL362 padlock in a welded shroud. Inside, an alarmed ABUS disc lock on each front disc closes a 12 mm chain to a
   floor anchor at X 450 mm. A Teltonika tracker with door switches and a siren, and a Monimoto 9 in each bike.
@@ -71,7 +75,7 @@ to the fitted box, and it adds up to the model's box mass. Select rows to total 
 ### Totals
 
 Leonard builds the box himself and does not have it certified (decision H25), so the list pays no labour and no review,
-and the box has one total. The car build's LC5 inspection (GV03) covers the GVM kit and the GCM revision only. The
+and the box has one total. The Ranger Super Duty needs no GVM or GCM certification. The
 design checks below and the build's tests in `UTE-GARAGE.md` are what make the box safe to carry the two bikes.
 
 <BoxParts kind="groups" />
@@ -91,18 +95,18 @@ height, and a lower SSF means a higher risk of rolling over.
 ## Checks
 
 Clearance and contact checks measured on the 3D model. The clearance limits come from the retired trailer garage's
-design and the tyre clearances from Toyota. A fail check that misses its limit fails the build, and a reported check
+design and the tyre clearances from Ford's wheelhouse envelope (BEMM p. 122). A fail check that misses its limit fails the build, and a reported check
 never does.
 
 <Ute kind="garage-checks" />
 
-### Deck mount loads
+### Loads on Ford's pads
 
-Report 03's load cases with its off-road factor of 2: braking at 1.6 g, cornering at 1.0 g and a net 1.0 g upward, on
-the box and its contents with the growth allowance. Toyota publishes no capacity for its brackets, so Leonard
-proof-loads each one to 1.25 times the largest loads below before the box goes on (`UTE-GARAGE.md` step 9). Those loads
-already carry the off-road factor, so the 1.25 is only the test's margin. The rough-road drive and dye-penetrant test of
-step 11 check them in use.
+Ford's road-load inputs of up to 2 g in each direction at each pad (BEMM p. 124): braking and cornering at 2 g with
+gravity, a 2 g bump on top of gravity and a net 1 g upward, on the box and its contents with the growth allowance. Ford
+gives the inputs but no capacity for its pads, so Leonard proof-loads each one to 1.25 times the largest loads below
+before the box goes on (`UTE-GARAGE.md` step 9), and the rough-road drive and dye-penetrant test of step 11 check them
+in use.
 
 <Ute kind="mounts" />
 
