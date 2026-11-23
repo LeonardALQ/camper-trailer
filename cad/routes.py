@@ -431,8 +431,8 @@ def _blocks_of(lay) -> tuple[dict, list]:
     """The parameters and the envelope blocks of a Layout (cad/trailer.py), as plain dicts. A chassis fitting with more
     than one position has no box of its own, so each of its positions is a block (cad/chassis.py fitting_boxes): each
     D-ring, and each corner steady over the box its leg sweeps from folded for travel to standing at 90 degrees."""
-    bl = [dict(iid=b.iid, id=b.id, name=b.name, system=b.system, box=b.box, hollow=b.hollow, keep_clear=b.keep_clear)
-          for b in lay.blocks if b.box is not None]
+    bl = [dict(iid=b.iid, id=b.id, name=b.name, system=b.system, box=b.box, hollow=b.hollow, keep_clear=b.keep_clear,
+               role=b.extra.get("role")) for b in lay.blocks if b.box is not None]
     ch = getattr(lay, "chassis", None)
     for b in lay.blocks:
         f = b.extra.get("fitting") if b.box is None else None
@@ -751,6 +751,61 @@ def _solids(res: dict) -> list:
     return out
 
 
+STRIP_ROLES = ("raiser", "outrigger", "cm_floor")   # the members whose bearer strips carry the floor (CH-S01)
+WEDGE_STACK, WEDGE_SLACK, WEDGE_DEPTH = 34.0, 5.0, 84.0   # Roxtec's C wedge: 34 mm of the stack, 84 mm deep, and 5 mm of slack (est.)
+
+
+def bearer_strips(res: dict) -> list[dict]:
+    """The floor's bearer strips (CH-S01) as boxes: on the top of every raiser, outrigger and floor crossmember, up to
+    the floor's underside, as cad/trailer_model.py draws them."""
+    top = res["V"]["floor_underside_z"]
+    return [dict(iid=f"strip on {b['iid']}", id="CH-S01", name=f"Bearer strip on {b['name'].split(',')[0]}",
+                 box=(b["box"][0], b["box"][1], b["box"][5], b["box"][3], b["box"][4], top))
+            for b in res["blocks"] if b.get("role") in STRIP_ROLES and b.get("box") and top - b["box"][5] > 1]
+
+
+def frame_room(g: dict) -> tuple:
+    """A transit frame's room inside its walls, (x0, y0, x1, y1): its packing space (`w` along X, `h` along Y about
+    the gland's point) and, where it names its `stack`, the C wedge's 34 mm and 5 mm of slack past the packing at the
+    stack's `wedge_end` (I2-33)."""
+    x, y = g["p"][0], g["p"][1]
+    x0, y0, x1, y1 = x - g["w"] / 2, y - g["h"] / 2, x + g["w"] / 2, y + g["h"] / 2
+    add = WEDGE_STACK + WEDGE_SLACK if g.get("stack") else 0.0
+    if g.get("stack") == "x":
+        x0, x1 = (x0 - add, x1) if g.get("wedge_end", "+") == "-" else (x0, x1 + add)
+    elif g.get("stack") == "y":
+        y0, y1 = (y0 - add, y1) if g.get("wedge_end", "+") == "-" else (y0, y1 + add)
+    return x0, y0, x1, y1
+
+
+def frame_solids(res: dict) -> list[dict]:
+    """Each floor transit frame as solids at its real depth (I2-34): its body, the 4 mm walls round its room, 60 mm deep
+    like its modules, flush with the floor's top face and 30 mm under its underside, or standing 30 mm on the floor
+    where its `side` is above; its rim, 8 mm past the walls on the floor's top face; and the C wedge, 84 mm deep, so
+    it stands 24 mm proud of the frame's top where it is driven from above."""
+    V, fits = res["V"], res["svc"]["fittings"]
+    wall, rim = float(fits["frame_wall_mm"]), float(fits["frame_rim_mm"]) - float(fits["frame_wall_mm"])
+    out = []
+    for gid, g in res["glands"].items():
+        if not g.get("cells") or g["at"] != "floor":
+            continue
+        x0, y0, x1, y1 = frame_room(g)
+        z0, z1 = (V["floor_underside_z"], V["floor_underside_z"] + FRAME_DEPTH) if g.get("side") == "above" else (V["floor_z"] - FRAME_DEPTH, V["floor_z"])
+        out.append(dict(gland=gid, part="body", box=(x0 - wall, y0 - wall, z0, x1 + wall, y1 + wall, z1)))
+        out.append(dict(gland=gid, part="rim", box=(x0 - wall - rim, y0 - wall - rim, V["floor_z"], x1 + wall + rim, y1 + wall + rim, V["floor_z"] + 3)))
+        if g.get("stack"):
+            px0, py0, px1, py1 = g["p"][0] - g["w"] / 2, g["p"][1] - g["h"] / 2, g["p"][0] + g["w"] / 2, g["p"][1] + g["h"] / 2
+            far = g.get("wedge_end", "+") == "+"
+            if g["stack"] == "x":
+                a = px1 + WEDGE_SLACK if far else px0 - WEDGE_SLACK - WEDGE_STACK
+                wb = (a, py0, a + WEDGE_STACK, py1)
+            else:
+                a = py1 + WEDGE_SLACK if far else py0 - WEDGE_SLACK - WEDGE_STACK
+                wb = (px0, a, px1, a + WEDGE_STACK)
+            out.append(dict(gland=gid, part="C wedge", box=(wb[0], wb[1], z0, wb[2], wb[3], z0 + WEDGE_DEPTH)))
+    return out
+
+
 def _in_box(p, box, tol: float = 0.5) -> bool:
     return all(box[k] - tol <= p[k] <= box[k + 3] + tol for k in range(3))
 
@@ -836,8 +891,36 @@ def clearance(res: dict) -> dict:
             if worst[0] < worst[2] - 0.05:
                 problems.append(f"{run['id']} {'enters' if worst[0] < 0 else 'passes'} the keep-clear {b['iid']} ({b['name'][:40]}) "
                                 f"{abs(worst[0]):.0f} mm {'deep' if worst[0] < 0 else 'clear'} at X {worst[1][0]:.0f} Y {worst[1][1]:.0f} Z {worst[1][2]:.0f}")
+    # the floor's transit frames at their real depth (I2-34): every run but those through a frame keeps the clearance from
+    # its body and its wedge, and no frame enters a part, a bearer strip or another part's box
+    frames = frame_solids(res)
+    for run in res["runs"]:
+        r, own = run["od"] / 2, _ids(run, "glands")
+        segs, box = _segs(run["dense"]), _aabb(run["dense"], run["od"] / 2 + clear)
+        for f in frames:
+            if f["gland"] in own or f["part"] == "rim" or not _hit(box, f["box"]):
+                continue
+            d, p = min((seg_box(a, c, f["box"]) for a, c in segs), key=lambda t: t[0])
+            gaps.append(dict(run=run["id"], part=f"{f['gland']} {f['part']}", name=f"transit frame {f['gland']}", gap=round(d - r, 1), limit=clear,
+                             at=[round(v) for v in p]))
+            if d - r < clear - 0.05:
+                problems.append(f"{run['id']} {'enters' if d < r else 'passes'} {f['gland']}'s {f['part']} {abs(d - r):.0f} mm "
+                                f"{'deep' if d < r else 'clear'} at X {p[0]:.0f} Y {p[1]:.0f} Z {p[2]:.0f}")
+    parts = [b for b in solids if b["id"] not in PANELS] + bearer_strips(res)
+    frame_gaps = []
+    for f in (x for x in frames if x["part"] != "rim"):
+        for b in parts:
+            g = _box_gap(f["box"], b["box"])
+            if g > 50:
+                continue
+            depth = min(min(f["box"][k + 3], b["box"][k + 3]) - max(f["box"][k], b["box"][k]) for k in range(3))
+            frame_gaps.append(dict(frame=f"{f['gland']} {f['part']}", part=b["iid"], gap=round(g if g > 0 else -depth, 1)))
+            if g <= 0 and depth > 0.05:
+                problems.append(f"{f['gland']}'s {f['part']} enters {b['iid']} ({b['name'][:40]}) by {depth:.0f} mm")
+    frame_gaps.sort(key=lambda x: x["gap"])
     tested = sorted((g for g in gaps if g["limit"] > 0), key=lambda g: g["gap"])
-    return dict(ok=not problems, problems=problems, closest=tested[:10], smallest=tested[0]["gap"] if tested else None, limit=clear)
+    return dict(ok=not problems, problems=problems, closest=tested[:10], smallest=tested[0]["gap"] if tested else None, limit=clear,
+                frames=frame_gaps[:10])
 
 
 def keep_clear_boxes(res: dict) -> list:
@@ -1420,9 +1503,11 @@ def fitting(g: dict, fits: dict) -> dict:
         return dict(kind=kind, inner=dict(r=r), outer=dict(r=r), turned=True, what=f"M{int(f.get('thread', g['d']))} gland and locknut")
     if kind == "frame":
         rim = float(f.get("rim", fits["frame_rim_mm"]))
-        hx, hy = g["w"] / 2, g["h"] / 2
+        x0, y0, x1, y1 = frame_room(dict(g, p=(0.0, 0.0)))   # the packing space and the wedge's room, about the gland's point
+        hx, hy = (x1 - x0) / 2, (y1 - y0) / 2
+        wedge = f", C wedge {g['wedge']:g}" if g.get("wedge") else ""
         return dict(kind=kind, inner=dict(hx=hx + rim, hy=hy + rim), outer=dict(hx=hx + fits["frame_wall_mm"], hy=hy + fits["frame_wall_mm"]),
-                    turned=False, what=f"transit frame {g['w']:g} x {g['h']:g} packing, {rim:g} mm rim")
+                    off=((x0 + x1) / 2, (y0 + y1) / 2), turned=False, what=f"transit frame {g['w']:g} x {g['h']:g} packing{wedge}, {rim:g} mm rim")
     if kind == "grommet":
         r = g["d"] / 2 + float(f.get("lip", fits["grommet_lip_mm"]))
         return dict(kind=kind, inner=dict(r=r), outer=dict(r=r), turned=False, what=f"grommet, {g['d']:g} mm hole")
@@ -1476,6 +1561,8 @@ def glands(res: dict) -> dict:
             if a["at"] != b["at"]:
                 continue
             ca, cb = _plane_xy(a, pts[a["id"]]["p"]), _plane_xy(b, pts[b["id"]]["p"])
+            ca = (ca[0] + fit[a["id"]].get("off", (0, 0))[0], ca[1] + fit[a["id"]].get("off", (0, 0))[1])
+            cb = (cb[0] + fit[b["id"]].get("off", (0, 0))[0], cb[1] + fit[b["id"]].get("off", (0, 0))[1])
             if math.dist(ca, cb) > 400:
                 continue
             for face in ("inner", "outer"):
@@ -1488,6 +1575,7 @@ def glands(res: dict) -> dict:
     standing = [s for s in _solids(res) if s["box"][2] <= floor_z + 5 and s["box"][5] > floor_z + 5 and s["id"] not in PANELS]
     for g in (x for x in gl if x["at"] == "floor"):
         c, f = _plane_xy(g, pts[g["id"]]["p"]), fit[g["id"]]["inner"]
+        c = (c[0] + fit[g["id"]].get("off", (0, 0))[0], c[1] + fit[g["id"]].get("off", (0, 0))[1])
         under = set(g.get("under") or [])
         flush = bool((g.get("fit") or {}).get("flush"))
         for b, kb in ([] if flush else keep_clear_boxes(res)):

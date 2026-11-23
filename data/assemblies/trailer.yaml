@@ -583,6 +583,7 @@ items:
   - id: BD-25
     name: Floor transit frames G9, G15 and G20, Roxtec RM modules in 4 mm aluminium frames bonded into the floor's cut-outs (data/services.yaml)
     material: "Roxtec RM Multidiameter modules (EPDM rubber) and solid modules, 4 mm 5052 aluminium frames with an 8 mm rim, stayplates, compression wedges and Roxtec's lubricant"
+    model: {name: transit_frames, box: [3350, -615, floor_z - 65, 1840, 1245, 120]}   # the three frames at their real depth, from data/services.yaml (I2-34)
     system: electrical
     price:
       - {item: "Roxtec RM modules for the runs and solid modules to fill the packing spaces: 23 RM 15 and 7 RM 20 at about AUD 25, 13 RM 30 and 2 RM 40 at about AUD 35, 1 RM 60 at about AUD 60", aud: 1335, basis: estimate, date: 2026-11-22, note: "From RS Components' listing of the RM 20 at EUR 14.92 (read 22 Nov 2026) at about AUD 1.65 a euro, the other sizes scaled (est.). G20's one packing space of 156 x 84 mm needs about 4,050 mm2 less filling than its two of 156 x 110 did, four RM 30 and two RM 15 (est.)"}

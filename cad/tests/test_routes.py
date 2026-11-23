@@ -124,10 +124,12 @@ def test_every_hole_in_a_chassis_member_and_every_large_floor_cut_out_is_listed(
     cuts = {c["gland"]: c for c in RES["svc"]["cutouts"]}
     for g in RES["svc"]["glands"]:
         if g["at"] == "floor":
-            w, h = (g["w"] + 8, g["h"] + 8) if g.get("w") and g.get("h") else (g["d"], g["d"])
+            room = R.frame_room(RES["glands"][g["id"]]) if g.get("w") and g.get("h") else None   # its packing and the wedge's room (I2-33)
+            w, h = (room[2] - room[0] + 8, room[3] - room[1] + 8) if room else (g["d"], g["d"])
             assert (max(w, h) > 60) == (g["id"] in cuts), g["id"]
             if g["id"] in cuts:
-                assert (cuts[g["id"]]["w"], cuts[g["id"]]["h"]) == (w, h), g["id"]
+                c = cuts[g["id"]]
+                assert (c["w"], c["h"]) == (w, h) and (c["x"], c["y"]) == ((room[0] + room[2]) / 2, (room[1] + room[3]) / 2), g["id"]
     # the kerb frame's three raiser cables stay in the raiser, clear of its seam with the rail (I2-27)
     assert not [h for h in got if h["run"] in ("B-16", "B-18", "D-14") and h["member"] == "RL-K"]
 

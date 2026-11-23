@@ -141,6 +141,13 @@ def _supports(res: dict) -> Compound:
     return Compound(label="Cable supports and the 230 V conduits", children=kids)
 
 
+def _frames(res: dict) -> Compound:
+    """The floor's transit frames at their real depth (I2-34): each frame's body, its rim on the floor and its C wedge."""
+    colours = {"body": ("#9aa5ad", 0.85), "rim": ("#c8cfd2", 0.85), "C wedge": ("#566573", 1.0)}
+    kids = [_box(f["box"], f"{f['gland']} transit frame, {f['part']}", *colours[f["part"]]) for f in R.frame_solids(res)]
+    return Compound(label="Floor transit frames G9, G15 and G20", children=kids)
+
+
 def meta_of(run: dict, res: dict, drawing: str) -> dict:
     """A run's part metadata: the hover tip shows its id, what it feeds and its length; the card adds the rest."""
     kind = "Cable" if run["system"] in R.ELECTRICAL else ("Hose" if "hose" in run["kind_what"].lower() else "Pipe")
@@ -178,6 +185,7 @@ def build(res: dict, name: str) -> tuple[Compound, dict]:
         systems.append(Compound(label=label.replace("/", "-"), children=kids))
     if name == "trailer-electrical":
         systems.append(_supports(res))
+    systems.append(_frames(res))
     root = Compound(label=name, children=[_ghost(res), *systems])
     return root, meta
 
