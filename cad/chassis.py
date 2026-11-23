@@ -740,6 +740,131 @@ def tyre_clearance(ch: Chassis, boxes: list[tuple[str, tuple]], tyre_w: float, s
     return best
 
 
+def _pt_rect(p, r) -> float:
+    """Least distance in a plane from the point p (u, v) to the rectangle r (u0, v0, u1, v1), 0 inside it."""
+    return math.hypot(max(r[0] - p[0], 0.0, p[0] - r[2]), max(r[1] - p[1], 0.0, p[1] - r[3]))
+
+
+def _seg_pt(a, b, p) -> float:
+    """Least distance in a plane from the segment a-b to the point p."""
+    ux, uv = b[0] - a[0], b[1] - a[1]
+    n = ux * ux + uv * uv
+    k = 0.0 if n == 0 else max(0.0, min(1.0, ((p[0] - a[0]) * ux + (p[1] - a[1]) * uv) / n))
+    return math.hypot(a[0] + k * ux - p[0], a[1] + k * uv - p[1])
+
+
+def _seg_meets_rect(a, b, r) -> bool:
+    """Whether the segment a-b crosses or lies in the rectangle r, by clipping it to the rectangle's two slabs."""
+    t0, t1 = 0.0, 1.0
+    for k, lo, hi in ((0, r[0], r[2]), (1, r[1], r[3])):
+        d = b[k] - a[k]
+        if abs(d) < 1e-12:
+            if not lo <= a[k] <= hi:
+                return False
+            continue
+        u0, u1 = sorted(((lo - a[k]) / d, (hi - a[k]) / d))
+        t0, t1 = max(t0, u0), min(t1, u1)
+        if t0 > t1:
+            return False
+    return True
+
+
+def _seg_rect(a, b, r) -> float:
+    """Least distance in a plane from the segment a-b to the rectangle r, 0 where they meet."""
+    if _seg_meets_rect(a, b, r):
+        return 0.0
+    corners = ((r[0], r[1]), (r[0], r[3]), (r[2], r[1]), (r[2], r[3]))
+    return min(_pt_rect(a, r), _pt_rect(b, r), *(_seg_pt(a, b, c) for c in corners))
+
+
+def _beside(d_plane: float, dy: float) -> float:
+    """The gap between two shapes that are each a plane figure stretched across the trailer: the gap in their plane where
+    their spans across overlap, the gap across where their figures overlap, else the two combined."""
+    if dy <= 0:
+        return d_plane
+    if d_plane <= 0:
+        return dy
+    return math.hypot(d_plane, dy)
+
+
+def _span_gap(a0: float, a1: float, b0: float, b1: float) -> float:
+    return max(b0 - a1, a0 - b1, 0.0)
+
+
+def swept_parts(ch: Chassis, tyre_w: float, s: float) -> list[dict]:
+    """Each wheel's tyre and trailing arm at travel s (mm, up positive) about the arm's pivot (report 11 section 5.1).
+    The tyre is a cylinder of the published diameter in its own plane. The arm is a bar `arm_depth` deep from the pivot
+    to the hub, across the slot from the rail's outer face to the tyre's inner face, where the XT's hanger, bush and
+    arm lie (cad/model/products/outside.py)."""
+    V = ch.V
+    rail_out = V["rail_c"] + ch.role_sec["rail"].b / 2
+    out = []
+    for w in ch.suspension:
+        px, _, pz = w["pivot"]
+        dz = V["arm_drop"] - s
+        hub = (px + math.sqrt(V["arm_r"] ** 2 - dz ** 2), pz - dz)
+        yc, side = w["hub"][1], w["side"]
+        arm_y = sorted((side * rail_out, side * (abs(yc) - tyre_w / 2)))
+        out.append(dict(wheel=w["id"], part="tyre", hub=hub, r=V["tyre_d"] / 2, y=(yc - tyre_w / 2, yc + tyre_w / 2)))
+        out.append(dict(wheel=w["id"], part="arm", hub=hub, pivot=(px, pz), r=V["arm_depth"] / 2, y=tuple(arm_y)))
+    return out
+
+
+def _part_bbox(p: dict) -> tuple:
+    (hx, hz), r = p["hub"], p["r"]
+    if p["part"] == "tyre":
+        return (hx - r, p["y"][0], hz - r, hx + r, p["y"][1], hz + r)
+    (px, pz) = p["pivot"]
+    return (min(px, hx) - r, p["y"][0], min(pz, hz) - r, max(px, hx) + r, p["y"][1], max(pz, hz) + r)
+
+
+def wheel_sweep(ch: Chassis, tyre_w: float, boxes: list[tuple[str, tuple]], points: list[tuple[str, tuple, float]],
+                steps: int = 25, reach: float = 150.0) -> dict:
+    """FIT-05: the least gap from each tyre and each trailing arm, swung through +/- travel, to the rigid boxes
+    (name, box) and to the points along the runs (name, (x, y, z), radius). Only what lies within `reach` of a wheel's
+    swept tyre and arm is measured. Returns the least gap overall, the least for the tyres and for the arms, and each
+    part found within `reach` with its least gap, closest first."""
+    V = ch.V
+    travels = [-V["travel"] + 2 * V["travel"] * k / steps for k in range(steps + 1)]
+    sweeps = {}
+    for s in travels:
+        for p in swept_parts(ch, tyre_w, s):
+            bb = _part_bbox(p)
+            key = (p["wheel"], p["part"])
+            old = sweeps.get(key)
+            sweeps[key] = bb if old is None else tuple(min(a, b) for a, b in zip(old[:3], bb[:3])) + tuple(max(a, b) for a, b in zip(old[3:], bb[3:]))
+    near_of = {}
+    for key, bb in sweeps.items():
+        lo, hi = [v - reach for v in bb[:3]], [v + reach for v in bb[3:]]
+        near_of[key] = ([(n, b) for n, b in boxes if all(b[i] <= hi[i] and b[i + 3] >= lo[i] for i in range(3))],
+                        [(n, q, r) for n, q, r in points if all(lo[i] - r <= q[i] <= hi[i] + r for i in range(3))])
+    best: dict[str, dict] = {}
+    least: dict[str, float] = {}
+    for s in travels:
+        for p in swept_parts(ch, tyre_w, s):
+            hub, r, (y0, y1) = p["hub"], p["r"], p["y"]
+            nb, npts = near_of[(p["wheel"], p["part"])]
+            for name, b in nb:
+                rect = (b[0], b[2], b[3], b[5])
+                d = (_pt_rect(hub, rect) if p["part"] == "tyre" else _seg_rect(p["pivot"], hub, rect)) - r
+                g = _beside(d, _span_gap(y0, y1, b[1], b[4]))
+                if g < least.get(name, math.inf):
+                    least[name] = g
+                if g < best.get(p["part"], {}).get("gap_mm", math.inf):
+                    best[p["part"]] = dict(gap_mm=g, part=p["part"], wheel=p["wheel"], travel_mm=s, what=name, hub=hub)
+            for name, q, rq in npts:
+                c = (q[0], q[2])
+                d = (math.dist(hub, c) if p["part"] == "tyre" else _seg_pt(p["pivot"], hub, c)) - r
+                g = _beside(d, _span_gap(y0, y1, q[1], q[1])) - rq
+                if g < least.get(name, math.inf):
+                    least[name] = g
+                if g < best.get(p["part"], {}).get("gap_mm", math.inf):
+                    best[p["part"]] = dict(gap_mm=g, part=p["part"], wheel=p["wheel"], travel_mm=s, what=name, hub=hub)
+    overall = min(best.values(), key=lambda b: b["gap_mm"])
+    near = sorted(least.items(), key=lambda kv: kv[1])
+    return dict(overall, tyre=best.get("tyre"), arm=best.get("arm"), near=[dict(what=n, gap_mm=round(g, 1)) for n, g in near])
+
+
 # ------------------------------------------------------------------ solids for the 3D model
 def member_solid(m: Member):
     """The member as a hollow tube with its true outer size and corner radii, on its centroid axis."""
