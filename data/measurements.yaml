@@ -33,7 +33,7 @@ inputs:
     group: Ute
     part: car
     title: Ute's towball pin height, laden, with the loaded trailer's ball load and the bikes aboard
-    how: "Line CK03's visit. Ute loaded as for the trip, the loaded trailer coupled on level ground. Measure from the ground to the centre of the DO35 pin hole. Choose the tongue drop (TW08) from it."
+    how: "Line CK03's visit. Ute loaded as for the trip, the loaded trailer coupled on level ground. Measure from the ground to the centre of the DO45 pin hole. Choose the tongue drop (TW08) from it."
     unit: mm
     estimate: {v: 440, src: "Decision log 12:10: 440 mm laden, plus or minus 20 mm, so the coupling stays inside VSB1's 460 mm"}
     measured: {v: null, date: null}
@@ -952,7 +952,7 @@ inputs:
     group: Trailer weighbridge
     part: trailer
     title: Weighed mass, fully loaded for travel with 300 L of water, the fuel and the gear
-    how: "Load the trailer as for a trip: 280 L of fresh water, the heater's diesel, the jerry cans, the gear and the food, with the grey tank empty. Weigh the whole trailer on a weighbridge, uncoupled on its jockey wheel, or coupled with only the trailer on the scale and the drawbar at its design height."
+    how: "Load the trailer as for a trip: 420 L of fresh water, the heater's diesel, the jerry cans, the gear and the food, with the grey tank empty. Weigh the whole trailer on a weighbridge, uncoupled on its jockey wheel, or coupled with only the trailer on the scale and the drawbar at its design height."
     unit: kg
     estimate: {v: null, src: "The model's TC2 mass without growth is shown beside it"}
     measured: {v: null, date: null}

@@ -834,7 +834,26 @@ class Analysis:
                      (f"{p['pair']} {'webs' if webs > 1 else 'web'} bearing, {lw:g} mm", F / (webs * rail.t * (lw + 5 * rail.t)), rail.fy / 1.5)]
         out["steady_bracket"] = _local("Corner steady bracket, ARK's (CH-B01)", rows,
                                        f"the steady's {c['steady_kg']:.0f} kg rating at 90 degrees, its bracket welded under the rail")
+        out["coupling_plate"] = self.coupling_plate(lcs, fit, fyp)
         return out
+
+    def coupling_plate(self, lcs: dict, fit: dict, fyp: float) -> dict:
+        """The coupling's bolts and its plate under LC6, each force separately (AS 4100 9.3.2): the pull shears the bolts
+        and, on its lever down to the plate's face, lifts one row in tension, and the vertical force bears on the plate."""
+        c = self.ch.data["local_checks"]["coupling_plate"]
+        t = fit[c["fitting"]]["t"]
+        along = max(abs(f[0]) for f in lcs["LC6"]["forces_n"])
+        across = max(abs(f[1]) for f in lcs["LC6"]["forces_n"])
+        up = max(abs(f[2]) for f in lcs["LC6"]["forces_n"])
+        n, d = c["bolts"], c["bolt_d"]
+        shear_lim, tension_lim = 0.8 * 0.62 * c["bolt_fuf"], 0.8 * c["bolt_fuf"]
+        v = max(along, across) / n
+        tens = along * c["lever"] / c["row_pitch"] / (n / 2) + up / n
+        inter = math.hypot(v / c["bolt_ac"] / shear_lim, tens / c["bolt_as"] / tension_lim)
+        rows = [("bolt shear, the pull", v / c["bolt_ac"], shear_lim), ("bolt tension, the pull on its lever and the vertical force", tens / c["bolt_as"], tension_lim),
+                ("bolt, shear and tension together", inter * tension_lim, tension_lim), ("plate bearing at a bolt", v / (d * t), 3.2 * 0.9 * fyp)]
+        return _local(f"Coupling plate, {t:g} mm, and {n} x M{d:g} 8.8 bolts (CH-P01)", rows,
+                      f"{along / 1000:.1f} kN along, {across / 1000:.1f} kN across and {up / 1000:.1f} kN vertical at the coupling, separately")
 
     def fixings(self) -> list[dict]:
         """LC7 design forces for the fixings of the heavy items, in the heaviest case of each."""

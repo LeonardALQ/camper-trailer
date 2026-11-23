@@ -258,10 +258,10 @@ def ct101(prj, model, bom, checks, reg, dwg):
 
 
 # ------------------------------------------------------------------ CT-102
-FIT_ITEMS = [("1", "DB-03", "Cruisemaster DO35 V3Plus, under-mounted, 4 x M12 8.8 at 90 Nm, nyloc nuts"),
+FIT_ITEMS = [("1", "DB-03", "Cruisemaster DO45 Plus, under-mounted, 4 x M14 8.8 at 140 Nm, nyloc nuts"),
              ("2", "CH-P01", "Coupling plate 300 x 220 x 12, both faces flat after galvanising (detail A)"),
              ("3", "CH-P02", "Chain lug 10 mm, 18 mm hole, each side (detail B)"),
-             ("4", "DB-06", "Safety chains AS 4177.4 (4177-35), ARK HLS13 shackles"),
+             ("4", "DB-06", "Safety chains 8 mm grade 80 (T) to AS 2321, never welded, 2 t D shackles"),
              ("5", "CH-P11", "Jockey wheel bracket 8 mm, bolted to the kerb-side member"),
              ("6", "DB-05", "ARK XO750 jockey wheel, 750 kg, swung up in travel"),
              ("7", "DB-04", "Stone guard on the cross brace and member tops, on rubber"),
@@ -351,7 +351,7 @@ def ct102(prj, model, bom, checks, reg, dwg):
     S.hdim(sh, cx - 150 / k, cy - 110 / k, cx + 150 / k, cy - 110 / k, cy - 110 / k - 4, "300", size=1.6)
     S.vdim(sh, cx + 150 / k, cy - 110 / k, cx + 150 / k, cy + 110 / k, cx + 150 / k + 4, "220", size=1.6)
     S.hdim(sh, cx - 45 / k, cy + 35 / k, cx + 45 / k, cy + 35 / k, cy + 35 / k + 5, "90", size=1.6)
-    sh.text(cx, cy - 110 / k - 8.5, "4 HOLES 13 (M12), PATTERN TO SUIT THE DO35: MEASURE ONE", 1.5, "middle")
+    sh.text(cx, cy - 110 / k - 8.5, "4 HOLES 15 (M14), PATTERN TO SUIT THE DO45 PLUS: MEASURE ONE", 1.5, "middle")
     sh.text(cx, cy - 110 / k - 11, "BEFORE DRILLING. 12 mm GR 350.", 1.5, "middle")
     # ---- detail B: chain lug, 1:5
     cx, cy = 362.0, 226.0

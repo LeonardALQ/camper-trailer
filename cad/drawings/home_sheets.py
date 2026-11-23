@@ -291,8 +291,10 @@ def ct003(prj, model, bom, checks, reg, dwg):
         ["Tyres", "LT265/75R16 123/120 E, 1,550 kg each, with VSB1's 120 % on the heavier side", f"{mv('MAS-06')} on the heavier side", st("MAS-06")],
         ["Wheels", "ROH Trak 2 rating (WHL-01), with the same 120 % rule", f"{mv('MAS-09')} on the heavier side", st("MAS-09")],
         ["Brakes", "Over 2,000 kg GTM: brakes on every wheel, breakaway held 15 min (VSB1 8.2)", "12 in electric drums on four wheels, Bosch TSC, breakaway kit DB-07", ("ALL WHEELS", "#000")],
-        ["Coupling", "AS 4177.3 50 mm ball, or an off-road coupling with a type approval (VSB1 9.3)", "Cruisemaster DO35 V3Plus, ADR rated 3,500 kg", ("RATED 3,500 kg", "#000")],
-        ["Safety chains", "Two above 2,500 kg ATM to AS 4177.4, 4177-35 (VSB1 9.2.1)", "Two chains DB-06. Lugs at 34.3 kN and 17.2 kN (VSB1 9.2.2)", st("LOC-02")],
+        ["Coupling", "Over 3.5 t ATM, an ADR 62/02 coupling rated by its D and V values, positive locking with a separate automatic retainer (VSB1 9.3)",
+         f"Cruisemaster DO45 Plus, ADR rated {rep['registration']['ratings']['coupling_kg']['v']:,.0f} kg, D 24.5 kN, V 14.5 kN. Plate and bolts at {mv('LOC-07', '{:.0f}')}", st("LOC-07")],
+        ["Safety chains", "Over 3.5 t ATM two grade T chains to AS 2321, breaking load over the ATM (VSB1 9.2.1, ADR 62/02 14.3.1.3)",
+         f"Two 8 mm grade 80, 8.2 t each (DB-06). Lugs at {9.81 * rep['caps']['plated'] / 1000:.1f} kN and {0.5 * 9.81 * rep['caps']['plated'] / 1000:.1f} kN (VSB1 9.2.2)", st("LOC-01")],
         ["Drawbar", "1.5 x 9.81 x ATM along and 0.5 x 9.81 x ATM across and up and down (VSB1 9.1)",
          f"Peak {chk['CHS-06']['measured']:.0f} MPa at {0.5 * 9.81 * rep['caps']['plated'] / 1000:.1f} kN up, chain lugs {chk['CHS-06B']['measured']:.0f} MPa", st("CHS-06")],
         ["Towball height", "Ball 350 to 460 mm loaded, trailer level in it (VSB1 9.3.2)", f"{V['coupling_z']:.0f} mm, plus or minus 20 mm (UTE-01)", st("DIM-03")],
@@ -305,7 +307,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
         ["Combination", "Ute and trailer within Lovells' 7,400 kg GCM revision (H2, GV06)", f"{_kg(gcm['sum'])} kg, the ute with growth plus the plate (H20)", st("GCM-01")],
         ["Ute rear axle", f"Towball keeps the Elite kit's {tv['limits']['rear_axle_kg']:,.0f} kg rear axle plate with growth (H14, H17, H18)", f"{mv('MAS-03')} at the heaviest ball", st("MAS-03")],
         ["Jack-knife", "Front parts 100 mm outside the bike box's sweep, 50 mm under it (JK-01, JK-02)", f"{chk['JK-01']['measured']:.0f} mm and {chk['JK-02']['measured']:.0f} mm", st("JK-01")],
-        ["Plug", "7 or 12 pin to AS 4177.5 (VSB1 7.2)", "12-pin flat plug, and a grey Anderson SB50 for the 48 V charging feed", ("AS 4177.5", "#000")],
+        ["Plug", "7 or 12 pin to AS 4177.5 up to 3.5 t ATM (VSB1 7.2), kept over it", "12-pin flat plug, and a grey Anderson SB120 for the 48 V charging feed", ("AS 4177.5", "#000")],
         ["Wiring", "Supported every 600 mm, insulated joints, grommets through metal, earth wire (VSB1 7.1)", "Two-wire DC, no chassis return (report 20). Glands on CT-602", ("CT-601, CT-602", "#000")],
         ["230 V", "AS/NZS 3001.2:2022: RCD on the inverter's output, labelled (VSB1 7.3)", "30 mA RCBO on every circuit, board labelled, licensed electrician", ("CT-601", "#000")],
         ["Battery", "Sealed compartment vented outside, BMS, fuse within 1 m sleeved (AS/NZS 3001.2 5.4)", "Sealed 2 mm 5052 box, two 20 mm vents through the floor (G6, G7)", ("CT-602", "#000")],
@@ -348,7 +350,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
         ("ATM AND DESIGN LIMIT", f"PLATE {rep['caps']['plated']:,.0f} kg. EVERY CASE WITH GROWTH AT MOST "
                                  f"{chk['MAS-10']['measured'] + chk['MAS-10']['margin']:,.0f} kg (MAS-10)."),
         ("TOWBALL (H17)", f"AT LEAST {rep['solved']['window']['pct_min']:.1f} % OF THE TRAILER IN EVERY CASE AND AT MOST "
-                          f"{rep['solved']['window']['ball_max']['kg']:.0f} kg WITH GROWTH. TOWBAR AND DO35 {lim['towball_rating_kg']:.0f} kg."),
+                          f"{rep['solved']['window']['ball_max']['kg']:.0f} kg WITH GROWTH. DO45 450 kg, TOWBAR {lim['towball_rating_kg']:.0f} kg."),
         ("THE UTE (H17, H18)", f"LOVELLS ELITE PLATED AT {lim['gvm_kg']:,.0f} kg GVM, REAR AXLE {lim['rear_axle_kg']:,.0f} kg ({_kg(uc['UTE-03']['measured'])} kg "
                           f"TOWING WITH GROWTH). {lim['platinum_rear_axle_kg']:,.0f} kg IF CUT CUT7 RETURNS TO THE PLATINUM."),
         ("COUPLING HEIGHT", f"{V['coupling_z']:.0f} mm LADEN, PLUS OR MINUS 20 mm. SET THE TONGUE'S DROP AT THE FINAL WEIGHING (TW08)."),

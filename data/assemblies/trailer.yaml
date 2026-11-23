@@ -131,7 +131,7 @@ params:
   axle_x: 4381               # axle group centre from the ball. The build solves it: the middle of the towball window (H17)
   # ---------------------------------------------------------------- water (H13)
   water_full_l: 420          # the fresh tanks' net capacity, filled at camp with the transfer pump, CR45 filter and chlorine (H13)
-  water_travel_l: 280        # most fresh and grey water aboard while towing: H13's 350 L less 70 L by H21 after the services' and the structure's fixes of 22 Nov (MAS-10 15.0 kg over at 295 L, 69.95 kg over at 350 L). Before that: 30 L off by H21 after the final review, 10 L more by H21 after the fix-pass review (MAS-10 7.7 kg over at 320 L), 5 L more after the re-check (MAS-10 1.9 kg over at 310 L), 5 L more after the second re-check (MAS-10 2.5 kg over at 305 L), and 5 L more after the iteration-2 re-check (MAS-10 3.9 kg over at 300 L with the floor's transit frames, the board's duct and the SB120 plug). Less if the 7,400 kg GCM revision is refused (GCM-01, H20)
+  water_travel_l: 420        # most fresh and grey water aboard while towing: the full 420 L since the 4,000 kg plate and its 3,900 kg target (H2 and H13 as amended 23 Nov 2026), so fresh and grey together never pass what the fresh tanks hold. H21 still takes any excess over the target off it in 5 L steps. Before: 280 L, H13's 350 L at the 3,500 kg plate less 70 L by H21
   water_highway_l: 50        # owner's highway figure
   grey_full_l: 130           # grey tank's net capacity (report 21 section 10)
   tank_z0: rail_underside_z

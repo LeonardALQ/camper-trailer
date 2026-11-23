@@ -159,7 +159,7 @@ class TrailerCheck(Strict):
     title: str
     type: Literal["mass", "gcm", "fit", "tyre", "width", "overhang", "coupling", "clearance_ground", "breakover",
                   "jackknife", "jackknife_height", "wheel", "towball_scale",
-                  "towball_ute", "towball_ute_input", "axle_window", "lateral", "bed", "platinum_return",
+                  "towball_ute", "towball_ute_input", "axle_window", "coupling_dv", "lateral", "bed", "platinum_return",
                   "chassis_stress", "chassis_local", "chassis_deflection", "chassis_twist", "chassis_fatigue",
                   "body_panel", "body_deflection", "body_insert", "body_roof", "body_twist", "body_joint",
                   "body_mount", "body_end_wall", "body_openings", "body_cradle", "body_thermal", "body_awning", "body_members", "body_plate_defl", "body_plate_strength", "bed_load",

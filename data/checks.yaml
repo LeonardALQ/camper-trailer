@@ -10,7 +10,8 @@ checks: []
 # (21 Nov 2026) replaced the plan's 250 kg towball cap with the rule it stood for: in every case the towball keeps the
 # ute's rear axle within its rating with growth, computed from the ute model at that ball load. H17 put the Lovells Elite
 # kit on the ute, and H18 plates its rear axle at 2,800 kg, twice the shared wheel's 1,400 kg. H17 also set the design
-# towball range the axle solve uses: at least 8.0 % in every case and at most 320 kg with growth. H2 sets the 7.5 %
+# towball range the axle solve uses: at least 8.0 % in every case and at most 420 kg with growth since the DO45 (23 Nov
+# 2026), 320 kg before. H2 sets the 7.5 %
 # floor and the plate, 4,000 kg since 23 Nov 2026. VSB1 sets no towball share. Limits here are never changed to make a check pass.
 # The services checks SVC-01 to SVC-12 (H28: clearance, bend radii, 230 V segregation, the battery's terminal face,
 # coverage, voltage drop, falls, the runs' spacing, the glands' room, then the cables' ratings, heat and supports) are defined beside the runs in data/routes.yaml `checks`, with their sources, and
@@ -78,7 +79,7 @@ trailer_checks:
     min: 0
     severity: fail
     inputs: []
-    why: Decision H17. The axle solve sets the axle in the middle of the window between the position where the lightest case reaches 8.0 % on the ball and the one where the heaviest towball with growth reaches 320 kg (data/load_cases.yaml axle_window). A window under 0 mm means no axle position meets both.
+    why: Decision H17. The axle solve sets the axle in the middle of the window between the position where the lightest case reaches 8.0 % on the ball and the one where the heaviest towball with growth reaches 420 kg (data/load_cases.yaml axle_window). A window under 0 mm means no axle position meets both.
   - id: MAS-12
     title: Towball load at least 8.0 % of the trailer's mass in every case (H17 design target)
     type: mass
@@ -90,15 +91,15 @@ trailer_checks:
     inputs: [TW-01, TW-02, TW-03]
     why: Decision H17 asks for a towball well clear of H2's 7.5 % floor (MAS-04), because the masses are still estimates.
   - id: MAS-13
-    title: Towball load at most 320 kg with growth in every case (H17 design target)
+    title: Towball load at most 420 kg with growth in every case (H17 design target)
     type: mass
     quantity: towball
     basis: growth
     cases: all
-    max: 320
+    max: 420
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: Decision H17. The towbar, the ute's rating and the DO35 allow 350 kg, so 320 kg keeps 30 kg in hand.
+    why: Decision H17 at the DO45 (23 Nov 2026). The DO45 allows 450 kg on the ball and the Ranger Super Duty 450 kg (est., 10 % of its 4,500 kg braked towing), so 420 kg keeps H17's 30 kg in hand. It was 320 kg under the 79's, the towbar's and the DO35's 350 kg.
   - id: MAS-14
     title: Platinum return, cut CUT7. The ute's rear axle without growth at the trailer's heaviest towball, on the Platinum, at least 30 kg under 2,550 kg (reported)
     type: platinum_return
@@ -145,6 +146,12 @@ trailer_checks:
     severity: fail
     inputs: [WHL-01, TW-01, TW-02, TW-03]
     why: The ROH Trak 2 16 x 7 ET 0 is rated 1,400 kg (measurements.yaml WHL-01), the ute's wheel.
+  - id: COU-01
+    title: The combination's D-value and V-value within the DO45's 24.5 kN and 14.5 kN (ADR 62/02 12.3.3)
+    type: coupling_dv
+    severity: fail
+    inputs: []
+    why: "Over 3.5 t ATM ADR 62/02 rates a coupling by its D-value and V-value, and the DO45 Plus is marked D 24.5 kN and V 14.5 kN. AS 2213.1 clauses 6 and 7 (and UN R55) give the combination's own values: D = 9.81 T R / (T + R) from the tow vehicle's GVM T and the trailer's ATM R in tonnes, and V = a X2/l2 C for a rigid drawbar trailer, with a = 2.4 m/s2 (ADR 62/02 8.1.2), X the body's length, l the ball to the axle group, X2/l2 at least 1, and C the axle group at the plate in tonnes."
   - id: MAS-11
     title: Lateral centre of gravity within 50 mm of the centreline in every case
     type: lateral
@@ -368,6 +375,13 @@ trailer_checks:
     severity: fail
     inputs: []
     why: "ARK's XO fitting guide (RTC614 V1 1/21) rates each steady at 875 kg at 90 degrees, its only jacking position, and has its chassis mount bracket welded to the chassis. The welds run along the rail's bottom corners only (Cruisemaster TB 070), at the SP fillet capacity, 0.8 x 0.6 x 490 MPa, and the rail's two 3 mm webs bear the load over the bracket's length plus 5 t at fy / 1.5, LC5b's criterion."
+  - id: LOC-07
+    title: The coupling plate and the DO45's four M14 8.8 bolts hold VSB1 9.1's drawbar forces at the plate (shear, tension, both, bearing)
+    type: chassis_local
+    item: coupling_plate
+    severity: fail
+    inputs: []
+    why: "VSB1 Rev 6 9.1 and ADR 62/02 14.2 at the 4,000 kg plate, each force separately. AS 4100 9.3.2: a bolt's shear capacity 0.8 x 0.62 fuf on its minor diameter area with the threads in the shear plane, its tension 0.8 fuf on its stress area, and the two together within a circle. The pull's lever from the pin to the plate lifts one row of bolts."
   - id: CHS-09
     title: Holes the runs make in the rails and raisers, net section in LC1 to LC8b within each case's limit
     type: chassis_local

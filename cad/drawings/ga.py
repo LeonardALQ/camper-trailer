@@ -186,7 +186,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
         ["Ute rear axle", f"{_kg(chk['MAS-03']['measured'])} kg", f"Against the Elite kit's {rep['tow_vehicle']['limits']['rear_axle_kg']:,.0f} kg with growth (MAS-03)"],
         ["Combination", f"{_kg(chk['GCM-01']['measured'])} kg", f"Against Lovells' {rep['tow_vehicle']['limits']['gcm_kg']:,.0f} kg GCM revision (GCM-01)"],
         ["CoG, fully loaded", f"Z {ch['cog_loaded'][2]:,.0f}", f"Z {ch['cog_loaded_growth'][2]:,.0f} with growth. Across: {chk['MAS-11']['measured']:.1f} mm at worst (MAS-11)"],
-        ["Coupling", f"{V['coupling_z']:.0f} mm", "Laden, plus or minus 20 mm (UTE-01). DO35 V3Plus"],
+        ["Coupling", f"{V['coupling_z']:.0f} mm", "Laden, plus or minus 20 mm (UTE-01). DO45 Plus"],
         ["Water", f"{rep['params']['water_full_l']:.0f} L net", f"At most {rep['params']['water_travel_l']:.0f} L in travel (H13), 130 L grey tank"],
         ["Wheels and tyres", f"{ch['tyre_d']:.0f} mm", "ROH Trak 2 16x7 ET 0, LT265/75R16, the ute's wheel"],
         ["Fail checks", f"{nf - len(fails)} of {nf} pass", ("FAILING: " + ", ".join(fails)) if fails else "Every fail check passes (CT-003 lists them by item)"],

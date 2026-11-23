@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 LOCAL = {"chain_lug": "chain_lug", "front_recovery": "front_recovery", "rear_recovery": "rear_recovery",
-         "jacking_pad": "jacking_pad", "spare_posts": "spare_posts", "steady_bracket": "steady_bracket"}
+         "jacking_pad": "jacking_pad", "spare_posts": "spare_posts", "steady_bracket": "steady_bracket", "coupling_plate": "coupling_plate"}
 DEFLECTION = {"span": "rail between the drawbar root and the front hub, against the chord", "tip": "rear overhang tip, against the line "
               "through the two hubs", "outrigger": "outrigger tip, against the rail at its root"}
 

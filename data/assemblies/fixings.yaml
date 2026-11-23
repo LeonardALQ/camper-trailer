@@ -53,11 +53,11 @@ trailer:
   - lines: [DB-03]
     to: [CH-P01]
     how: bolted
-    why: "The Cruisemaster DO35 bolts under the coupling plate with 4 x M12 8.8 bolts (Cruisemaster's fitting guide)"
+    why: "The Cruisemaster DO45 Plus bolts under the coupling plate with 4 x M14 8.8 bolts at 140 Nm, nyloc nuts or spring washers, both faces flat (Cruisemaster's DO45 Plus fitting guide)"
   - lines: [DB-06]
     to: [CH-P02]
     how: hooked
-    why: "Each safety chain's shackle passes through its chain lug (AS 4177.4)"
+    why: "Each safety chain's D shackle passes through its chain lug, and the grade 80 chain is never welded (VSB1 Rev 6 9.2)"
   # ---------------------------------------------------------------- running gear and the spare wheel
   - lines: ["RG-01*"]
     to: ["RL-*", "CM-*"]

@@ -839,6 +839,25 @@ class Trailer:
                     row.update(limit=f"<= {d:.1f} kg, the ute's design towball ({tv['tow_case']})", measured=round(ball, 1), unit="kg",
                                margin=round(d - ball, 1), ok=ball <= d + 1e-6, governing=f"{heavy} {by_id[heavy]['name']} (with growth)",
                                detail=f"heaviest towball {ball:.1f} kg against the {d:.1f} kg the ute model carries in {tv['tow_case']}")
+            elif c.type == "coupling_dv":
+                # ADR 62/02 12.3.3 rates a coupling over 3.5 t by its D-value and V-value. The combination's own values, as
+                # AS 2213.1 clauses 6 and 7 and UN R55 work them out, stay within the coupling's ratings
+                cp, plate = self.reg["coupling"], self.caps()["plated"]
+                T, R = self.tv["limits"]["gvm_kg"] / 1000, plate / 1000
+                d_val = 9.81 * T * R / (T + R)
+                ratio = max(1.0, (lay.V["body_length"] / lay.V["axle_x"]) ** 2)
+                axles_t = (plate - self.reg["ball_floor_pct"] / 100 * plate) / 1000
+                v_val = cp["a"] * ratio * axles_t
+                m_d, m_v = cp["d_kn"] - d_val, cp["v_kn"] - v_val
+                row.update(limit=f"D <= {cp['d_kn']:g} kN and V <= {cp['v_kn']:g} kN", measured=round(max(d_val / cp["d_kn"], v_val / cp["v_kn"]) * 100, 1),
+                           unit="%", margin=round(100 * min(m_d / cp["d_kn"], m_v / cp["v_kn"]), 1), ok=min(m_d, m_v) >= -1e-6,
+                           governing="D-value" if d_val / cp["d_kn"] >= v_val / cp["v_kn"] else "V-value",
+                           detail=(f"D = 9.81 x {T:.3f} t x {R:.3f} t / {T + R:.3f} t = {d_val:.1f} kN against {cp['d_kn']:g} kN, the ute's "
+                                   f"{T * 1000:,.0f} kg GVM with the {plate:,.0f} kg plate. V = {cp['a']:g} m/s2 x {ratio:.2f} x {axles_t:.2f} t = "
+                                   f"{v_val:.1f} kN against {cp['v_kn']:g} kN: X/l is the {lay.V['body_length']:,.0f} mm body over the "
+                                   f"{lay.V['axle_x']:,.0f} mm from the ball to the axle group, squared and at least 1, and C the axle group at the "
+                                   f"plate with {self.reg['ball_floor_pct']:g} % on the ball"),
+                           coupling=dict(d_kn=d_val, v_kn=v_val, d_rating=cp["d_kn"], v_rating=cp["v_kn"]))
             elif c.type == "platinum_return":
                 tv, lim = self.tv, self.tv["limits"]
                 heavy = max((x["id"] for x in cases), key=lambda i: by_id[i]["nominal"]["towball_kg"])
