@@ -107,11 +107,28 @@ rules:
       enclosed:   [13, 18, 24, 32, 41, 54, 70, 94, 112, 138, 170, 212, 242]
       partial:    [11, 14, 20, 25, 33, 44, 56, 75, 90, 110, 136, 169, 193]
       surrounded: [6, 8, 12, 16, 20, 27, 36, 48, 59, null, null, null, null]   # Prysmian gives none from 50 mm2
-    dc:                         # the DC cables: Tycab's tinned copper V90 cables, one single core in free air at 30 C to JASO D609, A
-      amps: {1.5: 18, 2.5: 26, 4: 40, 6: 51, 8.4: 74, 10: 69, 13.3: 103, 16: 110, 21.2: 135, 25: 164, 35: 210, 50: 246, 70: 310, 95: 383, 120: 446}
-      pair: 0.8                 # the circuit's two cores together, Tycab's factor for two cables, as its twin cables' own ratings are
+    dc:                         # the twin DC cables: Tycab's tinned copper V90 cables, one single core in free air at 30 C to JASO D609, A,
+                                # by the code in Tycab's marine cable brochure: its 0.6/1 kV single core FVK to 6 mm2, its battery cable MBS from 8 B&S
+      amps:
+        1.5: 18                 # FVK130025
+        2.5: 26                 # FVK150025
+        4: 40                   # FVK15603
+        6: 51                   # FVK18403
+        8.4: 74                 # MBS111203, 8 B&S
+        10: 84                  # MBS132002 (FVK132202 gives 69 A, the MBS range is kept from 8 B&S up so the table rises with size)
+        13.3: 103               # MBS119203, 6 B&S
+        16: 110                 # MBS122403
+        21.2: 135               # MBS128703, 4 B&S
+        25: 164                 # (est.) by area between MBS128703 (20.26 mm2, 135 A) and MBS136403 (25.7 mm2, 168 A)
+        35: 210                 # MBS149403
+        50: 246                 # MBS172803, the brochure's largest
+      pair: 0.8                 # the circuit's two cores together, Tycab's factor for two cables, as its twin cables' own ratings are (MWS296032 59 A
+                                # at 7.7 mm2, MWS2168032 82 A at 13.5 mm2 and MWS2399032 150 A at 32 mm2, each 0.8 of the single core)
       bundle: [1.0, 0.8, 0.7, 0.6, 0.55, 0.5, 0.5, 0.45, 0.45, 0.45, 0.4, 0.4]   # by the number of loaded cables bundled, 1 to 12, and 0.4 beyond (est.)
       ambient: {30: 1.00, 40: 0.90, 50: 0.76, 60: 0.60, 70: 0.45}
+    pairs:                      # the 48 V double-insulated pairs (kind pair): Tycab gives its double-insulated range ZDT no rating, so they take
+      kinds: [pair]             # AS/NZS 3008.1.1's for two V-90 insulated and sheathed single cores, a circuit, by Prysmian's table (methods.free,
+                                # 40 C air), and AS/NZS 3008.1.1's ambient factor at 75 C, as the 230 V cables do
     ac:                         # the 230 V cables: Prysmian's 2C+E PVC circular, V-90 at 75 C, unenclosed spaced in 40 C air (AS/NZS 3008.1), A
       amps: {1.5: 19, 2.5: 27, 4: 37, 6: 46, 10: 64, 16: 85}
       conductor_c: 75           # its ambient factor is the square root of (75 - t) over (75 - 40), the basis of AS/NZS 3008.1.1's ambient table
@@ -129,6 +146,13 @@ rules:
     devices:                    # a protective device's rating In where the run's protection text does not give it alone, and the circuit's own Ib
       D-10: {in: 15, ib: 9, circuits: 2, why: "the two Orion-Tr 48/24-16 inputs, each on its own 15 A fuse (report 20 section 7), in one run"}
       D-11: {in: 15, ib: 9, circuits: 2, why: "the two Orion-Tr 48/12-30 inputs, each on its own 15 A fuse (report 20 section 7), in one run"}
+      B-02: {in: 3, why: "a LUNOS controller output, behind its supply B-01's 3 A fuse on the 12 V panel, which all of the controller's current passes"}
+      B-03: {in: 3, why: "a LUNOS controller output, behind its supply B-01's 3 A fuse on the 12 V panel"}
+      B-04: {in: 3, why: "a LUNOS controller output, behind its supply B-01's 3 A fuse on the 12 V panel"}
+      B-05: {in: 3, why: "a LUNOS controller output, behind its supply B-01's 3 A fuse on the 12 V panel"}
+      B-06: {in: 3, why: "a LUNOS controller output, behind its supply B-01's 3 A fuse on the 12 V panel"}
+    # A run with a design current and no device (no rating in its protection text and none here) fails SVC-10, unless its
+    # line's `no_device` says why it cannot be overloaded (I2-31)
 
 # The services' design checks, measured on the routed runs by cad/routes.py and listed with the trailer's checks
 # (build/trailer/trailer.json, the Checks page). They live here beside the routes, as the lamps' checks live in
@@ -193,8 +217,8 @@ checks:
     title: Every cable's design current and its protective device within its rating where it lies, Ib at most In at most Iz
     kind: ratings
     severity: fail
-    why: "A cable carries its current without overheating only at the rating of the way it is installed, in the air round it and beside the other loaded cables. Each stretch of a run is rated for its installation method and the design hot day's air there, and derated for its group, and the least stretch is the run's rating Iz. The design current must not exceed it, and a fuse or circuit breaker must be rated between the two, so it carries the load and opens before the cable overheats (rules.ratings)."
-    source: "AS/NZS 3000:2018 clause 2.5.3, and for A-01 Victron's MultiPlus-II 4k5/6k5 GX installation manual section 8.4 (a fuse or circuit breaker rated for the expected load in series with AC-out-1). AS/NZS 3008.1.1 for the 230 V (Prysmian's 2C+E PVC circular ratings, its two single-core table for the methods, Table 22 for groups), Tycab's marine cable brochure (JASO D609, its bundling and ambient factors) for the DC cables, BS 7671 Table 52.2 for a short crossing of insulation, IEC 60364-5-52's 30 % rule for lightly loaded circuits, and the zones' air (est.) from report 19's design hot day"
+    why: "A cable carries its current without overheating only at the rating of the way it is installed, in the air round it and beside the other loaded cables. Each stretch of a run is rated for its installation method and the design hot day's air there, and derated for its group, and the least stretch is the run's rating Iz. The design current must not exceed it, and a fuse or circuit breaker must be rated between the two, so it carries the load and opens before the cable overheats (rules.ratings). A run that carries a design current with no device fails, unless its line says why it cannot be overloaded."
+    source: "AS/NZS 3000:2018 clause 2.5.3, and for A-01 Victron's MultiPlus-II 4k5/6k5 GX installation manual section 8.4 (a fuse or circuit breaker rated for the expected load in series with AC-out-1). AS/NZS 3008.1.1 for the 230 V (Prysmian's 2C+E PVC circular ratings, its two single-core table for the methods, Table 22 for groups) and for the 48 V double-insulated pairs (Prysmian's two single-core table), Tycab's marine cable brochure (JASO D609, each size by its code, its bundling and ambient factors) for the twin DC cables, BS 7671 Table 52.2 for a short crossing of insulation, IEC 60364-5-52's 30 % rule for lightly loaded circuits, and the zones' air (est.) from report 19's design hot day"
   - id: SVC-11
     title: Every cable keeps clear of the Combi's hot outlet before the mixing valve, and every cable and the fuel line of the Combi's exhaust, its hot base and the oven's case
     kind: heat
@@ -646,8 +670,10 @@ water_outlets: [sink, drinking tap, basin, shower, shower bypass, washer, toilet
 
 runs:
   # ================================================================ 48 V main cables (report 20 section 7), sizes fixed by report 20
-  # but D-07 and D-13, which SVC-10 sized up (I2-15 b). The five modules share D-06's 150 A in parallel, 30 A each and
-  # 25 % more for uneven sharing (est.), so 37.5 A on a 60 A MEGA at the busbar, between Ib and the pair's rating.
+  # but D-06, D-07 and D-13, which SVC-10 sized up (I2-15 b, I2-31). The five modules share D-06's 150 A in parallel, 30 A each and
+  # 25 % more for uneven sharing (est.), so 37.5 A on a 60 A MEGA at the busbar, between Ib and the pair's rating. D-06 leaves
+  # the busbar through a 200 A MEGA in the six-way holder's sixth way, so a load between its rating and the module fuses' 300 A
+  # opens it, and it matches D-07's 200 A, so the bank's fuse is never the smaller of the two (I2-31).
   - {id: D-01, system: dc48, kind: pair, size: 25, amps: 37.5, volts: 51.2, lane: 0, sleeve: true, feeds: "Module 1 to the bank busbar", protection: "60 A MEGA at the busbar",
      from: {line: EL-01, at: [EL_01.x0 + 81, EL_01.cy - 70 + L_BAT, EL_01.z1 + 15]}, to: {line: BR-BUS, at: [BR_BUS.x0, ., .]}}
   - {id: D-02, system: dc48, kind: pair, size: 25, amps: 37.5, volts: 51.2, lane: 1, sleeve: true, feeds: "Module 2 to the bank busbar", protection: "60 A MEGA at the busbar",
@@ -658,7 +684,8 @@ runs:
      from: {line: EL-01, at: [EL_01.x0 + 597, EL_01.cy - 70 + L_BAT, EL_01.z1 + 15]}, to: {line: BR-BUS, at: [BR_BUS.x0, ., .]}}
   - {id: D-05, system: dc48, kind: pair, size: 25, amps: 37.5, volts: 51.2, lane: 4, sleeve: true, feeds: "Module 5 to the bank busbar", protection: "60 A MEGA at the busbar",
      from: {line: EL-01, at: [EL_01.x0 + 769, EL_01.cy - 70 + L_BAT, EL_01.z1 + 15]}, to: {line: BR-BUS, at: [BR_BUS.x0, ., .]}}
-  - {id: D-06, system: dc48, kind: pair, size: 70, amps: 150, volts: 51.2, feeds: "Bank busbar up the chase behind the dryer, through the 300 A isolator, to the Lynx Smart BMS NG", protection: "The module fuses and the BMS's contactor",
+  - {id: D-06, system: dc48, kind: pair, size: 95, amps: 150, volts: 51.2, feeds: "Bank busbar up the chase behind the dryer, through the 300 A isolator, to the Lynx Smart BMS NG", protection: "200 A MEGA in the six-way holder's sixth way at the bank busbar, the BMS's contactor after it",
+     size_why: "A 70 mm2 pair is rated 170 A where it is cleated in the board cabinet, under the 200 A fuse D-06 needs so it is not the smaller of its own and D-07's (SVC-10, I2-31)",
      passes: [BR-ISO], along: [BD-03, WR-03], from: {line: BR-BUS, at: [DCR_X, BR_BUS.y0, BR_BUS.cz]}, path: [[., DCR_Y, .]], to: {line: BR-BMS, at: [., ., BR_BMS.z0]}}
   - {id: D-07, system: dc48, kind: pair, size: 95, amps: 144, volts: 48, feeds: "Lynx Distributor to the MultiPlus-II, down the chase's mid row, through the kerb frame, across over the grey tank's front and up through the road frame", protection: "200 A MEGA in the Lynx Distributor",
      glands: [G20, G15], along: [BD-01, BD-03, RS-K, CM-06, RS-R], from: {line: BR-LYNX, at: [BR_LYNX.cx, BR_LYNX.cy, BR_LYNX.z0]},
@@ -758,6 +785,7 @@ runs:
      serves: [generator inlet], along: [BD-03], from: {line: G2-IN, at: [G2_IN.x0 + 80, G2_IN.cy, G2_IN.z1]},
      path: [[., KAY + L_AK, KAZ + 20], [LA_11E.x0 + 30, ., .], [., BR_AC.y0 + 76, BR_AC.cz]], to: {line: BR-AC, at: [BR_AC.x0, ., .]}}
   - {id: A-05, system: ac230, kind: flex, size: 1.5, amps: 3, volts: 230, ways: [SP], feeds: "Split's indoor-outdoor link, 4 cores, from the indoor unit's kerb end with C8 out through G22", protection: "From the outdoor unit's C8 supply",
+     no_device: "It joins the outdoor unit's terminals S1 to S3 to the indoor unit's and carries only that unit's fan, louvres and controls, about 3 A at most (est.), so no other load can reach it",
      serves: [split link], glands: [G22], passes: [WR-03], along: [BD-02, BD-04], from: {line: AC-01, at: [AC_01.x1, AC_01.y0 + 15, AC_01.z0 + 60]},
      path: [[wet_x0 + 40, ., .], [., ., CZ], [., 270, .], [5420, ., .], [5520, ., G22.cz], [G22.cx - 80, ., .], [., G22.cy + 12, .], [AC_02.x0 + 60, ., .]], to: {line: AC-02, at: [., AC_02.y0, .]}}
   # ================================================================ 12 V and 24 V circuits (report 20 section 7), sized at 2 % at their routed length.

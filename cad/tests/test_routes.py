@@ -253,6 +253,22 @@ def test_svc10_holds_each_fuse_between_its_current_and_the_cables_rating():
     assert any(p.startswith("D-07's 200 A device is over") for p in bad), bad
 
 
+def test_svc10_fails_a_loaded_cable_with_no_device_and_d06_has_its_fuse():
+    """I2-31: D-06 carries the bank's 150 A under its own 200 A MEGA, within its pair's rating where it lies. A run with
+    a design current and no device fails unless its line says why it cannot be overloaded, as D-06 did on the module
+    fuses alone, and every DC rating in the table has a Tycab code or is marked an estimate."""
+    row = {x["run"]: x for x in EVAL["ratings"]["rows"]}
+    d06 = row["D-06"]
+    assert d06["device"] == 200 and d06["ib"] <= d06["device"] <= d06["iz"], d06
+    runs = [dict(r, protection="The module fuses and the BMS's contactor") if r["id"] == "D-06" else r for r in RES["runs"]]
+    bad = R.ratings(dict(RES, runs=runs))["problems"]
+    assert any(p.startswith("D-06 carries 150 A with no protective device") for p in bad), bad
+    text = R.ROUTES.read_text(encoding="utf-8")
+    block = text[text.index("      amps:\n        1.5:"):text.index("      pair: 0.8")]
+    for line in block.splitlines()[1:]:
+        assert "# FVK" in line or "# MBS" in line or "(est.)" in line, line
+
+
 def test_svc11_finds_a_cable_beside_the_hot_line():
     """I2-18 d: a cable laid 10 mm over H-01 (and through its risers) is closer than SVC-08's 25 mm for heated water."""
     h01 = next(r for r in RES["runs"] if r["id"] == "H-01")

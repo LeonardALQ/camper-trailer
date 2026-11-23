@@ -487,14 +487,15 @@ def ct601(prj, model, bom, checks, reg, dwg):
         wire(sh, [(54, y + 3), (63, y + 3)], "dc")
         sh.rect(57, y + 2.2, 60, y + 3.8, "medium")
     sh.line(63, 167, 63, 201, "thick")
-    sh.text(24, 203.6, f"EACH MODULE: 125 A MEGA, {mm2('D-01')}", 1.1)
+    sh.text(24, 203.6, f"EACH MODULE: 60 A MEGA, {mm2('D-01')}", 1.1)
     sh.rect(22.5, 159.5, 66, 206.5, "phantom")
-    textblock(sh, 23, 157, ["SEALED BOX EL-02: 5 MODULES IN PARALLEL, 25.6 kWh", f"EACH 125 A MEGA, {mm2('D-01')}, AT MOST {max(rt[f'D-0{i}']['length_m'] for i in range(1, 6)):.2f} m, SLEEVED",
-                            "NEGATIVES ON A NEGATIVE BUSBAR, 6TH HOLDER SPARE", "VENTS G6, G7. HEAT DETECTOR TO THE CERBO GX"], size=1.15, gap=0.6)
+    textblock(sh, 23, 157, ["SEALED BOX EL-02: 5 MODULES IN PARALLEL, 25.6 kWh", f"EACH 60 A MEGA, {mm2('D-01')}, AT MOST {max(rt[f'D-0{i}']['length_m'] for i in range(1, 6)):.2f} m, SLEEVED",
+                            "NEGATIVES ON A NEGATIVE BUSBAR, 6TH WAY D-06'S 200 A", "VENTS G6, G7. HEAT DETECTOR TO THE CERBO GX"], size=1.15, gap=0.6)
     box(sh, 67, 196, 92, 206, ["ISOLATOR", "300 A, 60 V DC"], size=1.2)
     wire(sh, [(63, 201), (67, 201)], "dc")
+    sh.rect(64, 200.2, 66, 201.8, "medium")
     box(sh, 24, 210, 92, 230, ["LYNX SMART BMS NG 500 A", "CONTACTOR, SHUNT AND PRE-ALARM", "ATC AND ATD STOP THE CHARGERS AND LOADS FIRST",
-                               "AUX 1.1 A FEEDS THE CERBO GX", f"{mm2('D-06')}, {rt['D-06']['length_m']:.2f} m FROM THE BANK BUSBAR"])
+                               "AUX 1.1 A FEEDS THE CERBO GX", f"200 A MEGA, {mm2('D-06')}, {rt['D-06']['length_m']:.2f} m FROM THE BUSBAR"])
     wire(sh, [(80, 206), (80, 210)], "dc")
     wire(sh, [(92, 220), (96, 220)], "dc")
     # the ute's feed, the MultiPlus and its AC

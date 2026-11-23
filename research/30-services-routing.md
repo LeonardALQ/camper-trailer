@@ -45,20 +45,32 @@ they are threaded through (`inside`).
   cable covers, else in the cabin. The zone gives the method and the air round the cable on the design hot day (report
   19: 42 C in the shade at 15:00, the split holding 24 C inside): 45 C under the floor and in the members (est.), 50 C
   in a foam core and on the drawbar (est.), 60 C on the sunlit skin (est.), AS/NZS 3008.1.1's 40 C reference inside.
-  The DC cables take Tycab's tinned V90 ratings to JASO D609 in free air at 30 C, times 0.8 for the circuit's two cores
-  together, Tycab's bundling factors and its ambient table ([Tycab marine cable brochure 2017](https://www.ceca.au/uploads/1/3/7/6/13767324/tycab_marine_brochure_2017_web_23.pdf)).
+  The twin DC cables take Tycab's tinned V90 ratings to JASO D609 in free air at 30 C, times 0.8 for the circuit's two
+  cores together, Tycab's bundling factors and its ambient table ([Tycab marine cable brochure 2017](https://www.ceca.au/uploads/1/3/7/6/13767324/tycab_marine_brochure_2017_web_23.pdf)).
+  Each size has its Tycab code in data/routes.yaml: the 0.6/1 kV single core FVK up to 6 mm2 and the battery cable MBS
+  from 8 B&S, so 10 mm2 takes MBS132002's 84 A and the table rises with size. Only 25 mm2 is an estimate, between
+  MBS128703 at 20.26 mm2 and MBS136403 at 25.7 mm2 by area. Tycab's twin battery cables are 0.8 of its single cores
+  (59 A at 7.7 mm2, 82 A at 13.5 mm2), which is the pair factor. Tycab gives its double-insulated range ZDT no rating,
+  so the 48 V double-insulated pairs take AS/NZS 3008.1.1's ratings for two V-90 insulated and sheathed single cores, a
+  circuit, from Prysmian's table at every size from 4 to 95 mm2, with the standard's own ambient factor (I2-31).
   The 230 V take Prysmian's 2C+E circular ratings, unenclosed and spaced in 40 C air, with the ambient factor the square
   root of (75 - t) over 35 ([Prysmian 2C+E PVC circular](https://nz.prysmian.com/sites/nz.prysmian.com/files/media/documents/2ce-pvc-circular.pdf)). A method's ratio to free air
   at the same size comes from Prysmian's AS/NZS 3008.1.1 single-core table. Groups take AS/NZS 3008.1.1 Table 22:
   bunched in the 230 V conduits, a single layer in the DC ways and under the ceiling. A circuit at or under 30 % of its
   rating is not counted (IEC 60364-5-52), nor data and control cables, and the circuits the load shedding never runs
   together count once. A short crossing of foam at a gland (100 mm at most) takes BS 7671 Table 52.2's factor (0.88
-  over 50 mm, 0.78 over 100 mm) with no group's factor. Each run's Iz is its least stretch. Ib <= In <= Iz (AS/NZS 3000
-  clause 2.5.3). A run that sizes itself grows until its stretches carry its current and its device.
+  over 50 mm, 0.78 over 100 mm) with no group's factor. Each run's Iz is its least stretch, its zones read every 10 mm
+  along it. Ib <= In <= Iz (AS/NZS 3000 clause 2.5.3), and a run with a design current and no device fails unless its
+  line says why it cannot be overloaded (I2-31). The LUNOS controller's fan leads take B-01's 3 A fuse ahead of it, and
+  the split's indoor-outdoor link A-05 carries only the indoor unit's own load. A run that sizes itself grows until its
+  stretches carry its current and its device.
 - SVC-10's sizes: D-07 (144 A, the MultiPlus-II 48/6k5 at 6 kW) goes from 50 to 95 mm2, because its 200 A MEGA, sized
   for the inverter's 11 kW minute, must sit under the pair's rating, and 70 mm2 gives 170 A enclosed in the board. D-13
   goes from 16 to 25 mm2 under its 80 A fuse. The five module pairs D-01 to D-05 share D-06's 150 A, 30 A each and 25 %
-  for uneven sharing (est.), on 60 A MEGAs at the busbar, so their 25 mm2 stays.
+  for uneven sharing (est.), on 60 A MEGAs at the busbar, so their 25 mm2 stays. Those five fuses add to 300 A, so D-06,
+  the bank's cable through the isolator to the BMS, has its own 200 A MEGA in the six-way holder's sixth way, as large
+  as D-07's so the bank's fuse is never the smaller of the two, and goes from 70 to 95 mm2, since 70 mm2 is rated 170 A
+  where it is cleated in the board cabinet (I2-31). A sixth module then adds a single MEGA holder on the busbar.
 - Mass and price: the routed length times the kind's mass and price per metre, plus 10 % for cut-offs in the price.
   The line that prices each kind is `priced_in` (BD-11 for the house wiring and pipework, EL-07 for the 48 V mains,
   RF-02 for the PV strings, LGT-01 for the lamp loom, AC-03 for the split's line set and condensate hose, UF-06 for the

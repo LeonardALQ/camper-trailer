@@ -1065,14 +1065,15 @@ items:
     mass: {basis: declared, total_kg: 185, maturity: spec, source: "https://cdn.shopify.com/s/files/1/0497/4749/3026/files/Datasheet-Lithium-NG-batteries-12_8V-25_6V-51_2V-EN.pdf?v=1739576641", note: "37 kg each (Victron datasheet, marked est. by Victron, report 20 E-01)"}
     note: Five modules of 235 x 648 x 162 mm, terminals up, side by side along X with 10 mm gaps. 25.1 h of the design hot day when new, 17.2 h at end of life (H3, report 20).
   - id: EL-03
-    name: Battery fuses, one 125 A MEGA per module in a 6-way holder, and the bank busbars, in the plinth's end slot
+    name: Battery fuses, one 60 A MEGA per module and D-06's 200 A MEGA in the sixth way of a 6-way holder, and the bank busbars, in the plinth's end slot
     system: electrical
     price:
-      - {item: "Five 125 A MEGA fuses, 80 V range, at AUD 52", aud: 260, basis: listing, url: "https://energyconnections.net.au/products/mega-fuse-80v-range-1pc", date: 2026-11-20}
+      - {item: "Five 60 A MEGA fuses for the modules and one 200 A MEGA fuse for D-06, the bank's cable to the BMS, 80 V range, at AUD 52", aud: 312, basis: listing, url: "https://energyconnections.net.au/products/mega-fuse-80v-range-1pc", date: 2026-11-23, note: "Victron's 80 V MEGA range, 40 to 500 A at one price. D-06's fuse is SVC-10's (I2-31). Was five 125 A fuses at AUD 260"}
       - {item: "6-way MEGA fuse holder", aud: 40, basis: listing, url: "https://energyconnections.net.au/products/victron-fuse-holder-fully-assembled-6-way-for-mega-fuse", date: 2026-11-20}
       - {item: "Bank busbars", aud: 60, basis: estimate, date: 2026-11-20}
     point: [plinth_x0 + 987, plinth_y0 + plinth_d / 2, floor_z + 200]
-    mass: {basis: declared, total_kg: 1.5, maturity: estimate, source: "Report 20 E-09 (est.)"}
+    mass: {basis: declared, total_kg: 1.52, maturity: estimate, source: "Report 20 E-09 (est.), and D-06's fuse, about 20 g (est.)"}
+    note: "The six-way holder's sixth way, kept for a sixth module (report 20 open point 3), carries D-06's fuse, so a sixth module adds a single MEGA holder on the busbar (I2-31)"
   - id: LA-14F
     name: Machine base over the battery box, aluminium frame with rubber-isolated bases and ratchet straps for the washer and the dryer
     model: {name: machine_base, front: "+y"}
@@ -1138,7 +1139,7 @@ items:
     box: [rear_x0 - 155, 345, floor_z + 920, 155, 320, 644]
     cog: [rear_x0 - 80, 505, floor_z + 1242]
     mass: {basis: declared, total_kg: 29.0, maturity: spec, source: "https://www.victronenergy.com/upload/documents/Datasheet-MultiPlus-II-inverter-charger-4k-4k5-6k5-10k-EN-.pdf"}
-    note: 6.0 kW at 25 C, 5.7 kW at 40 C. On the road side to balance the plinth (MAS-11), 2 m of 50 mm2 from the Lynx Distributor across the door head. The shower heater sheds first when the hob or the oven runs (CT-601).
+    note: 6.0 kW at 25 C, 5.7 kW at 40 C. On the road side to balance the plinth (MAS-11), fed by D-07, 95 mm2 from the Lynx Distributor down the chase and under the floor through G20 and G15 (data/routes.yaml). The shower heater sheds first when the hob or the oven runs (CT-601).
   - id: EL-05
     name: Lynx Smart BMS NG, two SmartSolar MPPT 150/35, two Orion-Tr 48/24-16 and two Orion-Tr 48/12-30 on the board
     model: {name: victron_unit, kind: lynx, front: "-x", box: [rear_x0 - 110, -half_in + 615, ceiling_z - 280, 80, 180, 190], extras: [{name: victron_unit, kind: mppt, front: "-x", box: [rear_x0 - 100, -half_in + 665, ceiling_z - 500, 70, 130, 186]}, {name: victron_unit, kind: mppt, front: "-x", box: [rear_x0 - 100, -half_in + 525, ceiling_z - 500, 70, 130, 186]}, {name: victron_unit, kind: orion, front: "-x", box: [rear_x0 - 110, -half_in + 375, ceiling_z - 500, 80, 130, 186]}, {name: victron_unit, kind: orion, front: "-x", box: [rear_x0 - 110, -half_in + 235, ceiling_z - 500, 80, 130, 186]}, {name: victron_unit, kind: orion, front: "-x", box: [rear_x0 - 110, -half_in + 665, ceiling_z - 730, 80, 130, 186]}, {name: victron_unit, kind: orion, front: "-x", box: [rear_x0 - 110, -half_in + 525, ceiling_z - 730, 80, 130, 186]}]}
@@ -1174,14 +1175,14 @@ items:
       - {item: "Board panel 800 x 700 mm and the wiring on it", kg: 5.0, basis: estimate, source: "Report 20 E-13"}
       - {item: "Slotted PVC wiring duct 60 x 80 mm, 2.6 m at about 0.55 kg a metre with its cover. Its busiest section, 140 mm over the cabinet's floor, carries 25 control and branch cables of 1,596 mm2 outside area (cad/routes.py on the routed sizes), 73 % of the 2,184 mm2 that Panduit's 50 % fill allows in its 56 x 78 mm inside (est.). The four heavy cables D-06, D-07, D-14 and B-16 are cleated to the panel to their terminals, outside the duct", kg: 1.4, basis: estimate}
   - id: EL-07
-    name: Main DC cables and lugs, bank 70 mm2, inverter 95 mm2, modules and the 12 V pair 25 mm2, MPPT and converters 10 and 4 mm2
+    name: Main DC cables and lugs, bank and inverter 95 mm2, modules and the 12 V pair 25 mm2, MPPT and converters 10 and 4 mm2
     material: "Tinned flexible copper, double insulated"
     system: electrical
     price:
-      - {item: "Tinned double-insulated pairs as routed (data/routes.yaml D-01 to D-13): 4.47 m of 95 mm2, 1.42 m of 70 mm2, 2.70 m of 25 mm2, 1.02 m of 10 mm2 and 0.55 m of 4 mm2, with 10 % for cut-offs", aud: 598.01, basis: rate, date: 2026-11-22, note: "The pair kind's rate in data/routes.yaml, AUD 0.45 a mm2 and metre of core from solar4rvs.com.au's 2 B&S single at AUD 14.90 a metre. D-07 is 95 mm2 and D-13 25 mm2 for SVC-10 (I2-15 b)"}
+      - {item: "Tinned double-insulated pairs as routed (data/routes.yaml D-01 to D-13): 5.91 m of 95 mm2, 2.70 m of 25 mm2, 1.02 m of 10 mm2 and 0.55 m of 4 mm2, with 10 % for cut-offs", aud: 635.22, basis: rate, date: 2026-11-23, note: "The pair kind's rate in data/routes.yaml, AUD 0.45 a mm2 and metre of core from solar4rvs.com.au's 2 B&S single at AUD 14.90 a metre. D-07 is 95 mm2 and D-13 25 mm2 for SVC-10 (I2-15 b), and D-06 95 mm2 for its 200 A fuse (I2-31)"}
       - {item: "Lugs, heat shrink and the terminal covers", aud: 210, basis: estimate, date: 2026-11-20, note: "The rest of report 20's AUD 450 for 3 m of 70 mm2, 4 m of 50 mm2, 12 m of 10 mm2 and the lugs"}
     point: [rear_x0 - 100, -800, floor_z + 900]
-    mass: {basis: declared, total_kg: 14.1, maturity: estimate, source: "Calculated: the routed pairs, 13.56 kg at the pair kind's mass a metre (data/routes.yaml, Prysmian's V-90 cores and 10 % for the fine strands and the second sheath, est.), and 0.5 kg of lugs (est.). Was report 20's 6.0 kg for its shorter runs"}
+    mass: {basis: declared, total_kg: 15.0, maturity: estimate, source: "Calculated: the routed pairs, 14.49 kg at the pair kind's mass a metre (data/routes.yaml, Prysmian's V-90 cores and 10 % for the fine strands and the second sheath, est.), and 0.5 kg of lugs (est.). Was report 20's 6.0 kg for its shorter runs"}
   - id: EL-09
     name: Drip tray over the battery box, under the washer and the dryer, 1.5 mm 5052 aluminium with a 20 mm upstand
     material: "1.5 mm 5052 aluminium sheet, folded, its corners welded and sealed"

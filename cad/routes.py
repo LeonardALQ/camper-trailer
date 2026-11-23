@@ -1519,8 +1519,9 @@ def method_factor(rt: dict, method: str, mm2: float) -> float:
 
 
 def ambient_factor(rt: dict, band_: str, t: float) -> float:
-    """The ambient factor at t C: Tycab's table for the DC cables (from 30 C), AS/NZS 3008.1.1's for the 230 V (from 40 C)."""
-    if band_ == "ac230":
+    """The ambient factor at t C: Tycab's table for its DC cables (from 30 C), AS/NZS 3008.1.1's for the 230 V cables and
+    the 48 V pairs (from 40 C)."""
+    if band_ in ("ac230", "as3008"):
         c = rt["ac"]["conductor_c"]
         return math.sqrt((c - t) / (c - 40.0))
     tab = rt["dc"]["ambient"]
@@ -1528,10 +1529,14 @@ def ambient_factor(rt: dict, band_: str, t: float) -> float:
 
 
 def free_air_amps(rt: dict, run: dict, t: float) -> float | None:
-    """A cable's rating in free air at t C: Tycab's single core times its pair factor for the DC cables, Prysmian's 2C+E
-    unenclosed spaced for the 230 V cables and cords."""
+    """A cable's rating in free air at t C: Prysmian's 2C+E unenclosed spaced for the 230 V cables and cords, AS/NZS
+    3008.1.1's two single cores by Prysmian's table for the 48 V double-insulated pairs (I2-31), and Tycab's single core
+    times its pair factor for the other DC cables."""
     if run["system"] == "ac230":
         return _table_amps(rt["ac"]["amps"], run["size"]) * ambient_factor(rt, "ac230", t)
+    if run.get("kind") in (rt.get("pairs") or {}).get("kinds", []):
+        m = rt["methods"]
+        return _lerp(run["size"], m["sizes"], m["free"]) * ambient_factor(rt, "as3008", t)
     if run["system"] in ("dc48", "dc24", "dc12", "pv"):
         return _table_amps(rt["dc"]["amps"], run["size"]) * rt["dc"]["pair"] * ambient_factor(rt, "dc", t)
     return None
@@ -1559,9 +1564,10 @@ def rating_zone(p, run: dict, ctx: dict) -> str:
 
 
 def stretches(run: dict, ctx: dict) -> list[dict]:
-    """A run cut where its zone changes: each stretch's zone, method, air and length."""
+    """A run cut where its zone changes, the centreline taken every 10 mm so a zone is found inside a long straight too
+    (D-06's last 165 mm in the board cabinet): each stretch's zone, method, air and length."""
     rt, out = ctx["rt"], []
-    for a, b in _segs(run["dense"]):
+    for a, b in _segs([p for p, _ in _samples(run["dense"], 10.0)]):
         z = rating_zone(tuple((a[k] + b[k]) / 2 for k in range(3)), run, ctx)
         if out and out[-1]["zone"] == z:
             out[-1]["mm"] += math.dist(a, b)
@@ -1629,9 +1635,10 @@ def ratings(res: dict) -> dict:
     method and air (rules.ratings.zones), the cable's free-air rating (Tycab for DC, Prysmian's 2C+E for 230 V) times the
     ambient's and the method's factors, and times the group's factor in each shared way the run is in, but at a short
     crossing of a panel, where each cable has its own gland or module. The least stretch is the run's Iz. The design
-    current Ib must not exceed Iz, and where a device protects the circuit, Ib <= In <= Iz (AS/NZS 3000 clause 2.5.3).
-    A group counts its loaded circuits: not data or control cables, not a circuit at or under 30 % of its grouped
-    rating, and the circuits the load shedding never runs together once."""
+    current Ib must not exceed Iz, and Ib <= In <= Iz against the device that protects the circuit (AS/NZS 3000 clause
+    2.5.3). A run with a design current and no device fails, unless its line's `no_device` says why it cannot be
+    overloaded (I2-31). A group counts its loaded circuits: not data or control cables, not a circuit at or under 30 %
+    of its grouped rating, and the circuits the load shedding never runs together once."""
     rt = res["data"]["rules"]["ratings"]
     blocks = res["blocks"]
     by_id = defaultdict(list)
@@ -1667,6 +1674,7 @@ def ratings(res: dict) -> dict:
             if i in rows:
                 rows[i]["ways"].append(w)
     shed = rt["groups"].get("shed") or []
+    runs = {r["id"]: r for r in res["runs"]}
     counted = set(rows)
     for _ in range(12):
         for row in rows.values():
@@ -1697,6 +1705,8 @@ def ratings(res: dict) -> dict:
         where = f"{w['method']}, {w['zone']}, {w['ambient']:g} C, {row['group'][1]} circuits" + (f" in {row['group'][0]}" if row["group"][0] else "")
         if ib is not None and ib > iz + 1e-6:
             problems.append(f"{row['run']} carries {ib:g} A over its {iz:.0f} A ({where})")
+        if ib is not None and inn is None and not runs[row["run"]].get("no_device"):
+            problems.append(f"{row['run']} carries {ib:g} A with no protective device, and its line gives no reason it cannot be overloaded")
         if inn is not None and ib is not None and ib > inn + 1e-6:
             problems.append(f"{row['run']}'s {inn:g} A device is under its {ib:g} A design current")
         if inn is not None and inn > iz + 1e-6:
