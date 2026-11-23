@@ -210,11 +210,11 @@ Each is in full in `docs/decisions.md`.
 - H5, H6: an electric kitchen with a convection microwave as the oven, a washer and a heat-pump dryer. No LPG and no vent.
 - H7, H8, H15: an inverter split with diesel backup, filtered heat-recovery fresh air, four windows and two door glasses with blackout blinds.
 - H12: a fixed roof with rounded front edges. Most of a raising roof's fuel saving without its mass, cost and losses.
-- H13: at most 350 L of water in travel with both generators at the 3,500 kg plate, the full 420 L since the 4,000 kg plate. It holds the 3,900 kg target.
+- H13: at most 350 L of water in travel with both generators at the 3,500 kg plate. Since the 4,000 kg plate all the fresh tanks hold rides, 400 L of fresh water at their 401.5 L net (I2-40), and it holds the 3,900 kg target.
 - H14, H17: towball limits from the ute's rear axle and the ratings, the axle centred in a 9.0 % to 420 kg window since the DO45 (8.0 % to 320 kg before). Margin while the masses are estimates.
 - H16: the bed's footprint stays empty, as Leonard asked.
 - H20: one combination figure, the ute with growth plus the plate, and UTE-04's weighed target retired. UTE-03 checks the rear axle itself.
-- H21: mass added after H13 comes off the travel water in 5 L steps, so the target and the plate stay. At the 3,500 kg plate the fixes took 70 L off H13's 350 L. At the 4,000 kg plate nothing comes off the 420 L until TC2 with growth passes 3,900 kg.
+- H21: mass added after H13 comes off the travel water in 5 L steps, so the target and the plate stay. At the 3,500 kg plate the fixes took 70 L off H13's 350 L. At the 4,000 kg plate nothing comes off the 400 L until TC2 with growth passes 3,900 kg.
 - H22: a 1,655 mm track on 1,275 mm rails lifts the rollover threshold from 0.37 g to 0.42 g, and costs 50 mm of each tyre's 265 mm tread outside the ute's ruts.
 - H23: the walls serviceable in region B's 25-year wind and strong at 42 m/s, the highest speed that tips the parked trailer, an operating rule for the parked trailer in wind at the lower of its sliding and tipping speeds over the square root of 1.5 (STB-04), and tie-downs with rated anchors for when the ute is away (STB-05). Leonard will camp on the Queensland coast, which is region B and non-cyclonic.
 
