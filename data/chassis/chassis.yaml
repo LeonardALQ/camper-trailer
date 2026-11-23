@@ -56,6 +56,7 @@ params:
   arm_r: 456                                  # pivot to hub at ride: 441 mm along X, 116 mm down
   arm_drop: 116
   travel: 60
+  arm_depth: 90                               # the XT arm's depth in its plane, pivot to hub (est., as the model draws it at the hub), for FIT-05's sweep
   max_element: 250                            # longest frame element
 
 roles:

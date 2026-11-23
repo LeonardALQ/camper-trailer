@@ -140,7 +140,8 @@ lines:
       - {item: "Six amber side marker lamps with built-in reflectors", aud: 150, basis: estimate, date: 2026-11-21}
       - {item: "Hooded number plate lamp, and the plate's bracket and rivnuts", aud: 65, basis: estimate, date: 2026-11-21}
       - {item: "Lamp loom: 32 m of 7-core trailer cable, a junction box at the front, glands, grommets and heat shrink", aud: 194.50, basis: estimate, date: 2026-11-22, note: "Was 25 m at AUD 170. The routes give 31.9 m (data/routes.yaml, H28), so 7 m more at AUD 3.50/m"}
-    note: Its mass is line LG-01 of the mass schedule, about 4 kg (est.), taken out of BD-11's allowance. Leonard fits it.
+      - {item: "Brake circuit K-10: 4.8 m of 16 mm2 red and black tinned singles with the brake request and breakaway pair taped to them, and two 80 mm junction boxes under CM-05", aud: 143, basis: estimate, url: "https://www.solar4rvs.com.au", date: 2026-11-23, note: "The routed AUD 83 (data/routes.yaml kind brake, AUD 0.45 a mm2 and metre with 10 % waste) and AUD 30 a junction box with its glands (est.). Bosch's axle harness K-11 and K-12 is in the TSC kit (RG-03)"}
+    note: Its mass is line LG-01 of the mass schedule, about 5.3 kg (est.) with the brake circuit's pair, taken out of BD-11's allowance. Leonard fits it.
   # ================================================================ licensed trades
   - id: ELI-01
     group: installation
@@ -297,7 +298,7 @@ savings:
     name: A plain low-flow shower in place of the DauerShower 2.0
     removes: {lines: [WR-09, WR-10]}
     mass_kg: -9
-    costs: "Two 20 min showers at 6 L/min use about 240 L a day in place of about 10 L, so the 300 L aboard lasts about 1.2 days. The shower requirement (two hot 20 min showers a day) fails"
+    costs: "Two 20 min showers at 6 L/min use about 240 L a day in place of about 10 L, so the budget rises to 271 L a day and the 420 L aboard lasts about 1.5 days. The shower requirement (two hot 20 min showers a day) fails"
   - id: SV-05
     name: A fixed bed at the night height in place of the lift bed
     removes: {lines: [LB-04, LB-04M, LB-05, LB-06], parts: [{line: CON-09, item: "Lippert HappiJac kit"}]}

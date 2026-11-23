@@ -252,12 +252,12 @@ trailer_checks:
     inputs: []
     why: "Lippert's manual ccd-0002668 rates the HappiJac at 272 kg static and 204 kg while it moves (research report 21). At night it holds the 64 kg moving bed and two sleepers taken at 100 kg each (data/body/body.yaml). It moves with nobody on it."
   - id: FIT-05
-    title: Tyres swung through their full travel keep 50 mm from every chassis member
+    title: Tyres and arms swung through their full travel keep 50 mm from every rigid part, fixture and run
     type: tyre
     min_gap_mm: 50
     severity: fail
     inputs: []
-    why: Report 06 open question 9 and report 11 section 5. The arc follows the XT arm about its pivot.
+    why: "Report 06 open question 9, report 11 section 5 and review I2-30. Each tyre and each XT trailing arm swings about the arm's pivot through 60 mm up and down, the tyre as a cylinder of its published size and the arm as a bar 90 mm deep (est.) across the slot from the rail's outer face to the tyre's inner face. It is tested against every rigid part the suspension carries at its true size (the chassis members and fittings, the solid blocks and the products' envelopes), every fixture of the services and every run at its outside diameter. What rides on the arms is left out, and so are the safety chains, which hang and swing. At full bump the floor is the design's 50 mm tyre clearance above the tyre (est.)."
   # ---------------------------------------------------------------- chassis and drawbar (CHASSIS.md, report 11)
   - id: CHS-01
     title: Chassis stress, LC1 static at ATM, within fy / 3
@@ -566,7 +566,7 @@ trailer_checks:
     max: 460
     severity: fail
     inputs: [UTE-01]
-    why: VSB1 9.3.2. The decision log sets the coupling point at 440 mm laden, plus or minus 20 mm, so it stays under 460 mm. On the Super Duty the tow pin sits in Ford's 4.5 t hitch in the receiver about 510 mm up laden (est.), and the hitch's drop is chosen at the measurement UTE-01 to put the pin at 440 mm.
+    why: "VSB1 9.3.2. The decision log sets the coupling point at 440 mm laden, plus or minus 20 mm, so it stays under 460 mm. On the Super Duty the tow pin sits in Ford's 4.5 t hitch, whose receiver's centre is about 510 mm up laden in the truck's model (est., 160 mm of rail and 70 mm under Ford's frame top at 740 mm at GVM, BEMM p. 128, cad/model/vehicles/ranger_sd.py), and the hitch's drop is chosen at the measurement UTE-01 to put the pin at 440 mm."
   - id: DIM-04
     title: Running clearance at least 100 mm, unladen (VSB1 5.4)
     type: clearance_ground
@@ -575,18 +575,18 @@ trailer_checks:
     inputs: [UTE-01]
     why: Every part carried by the suspension needs 100 mm of running clearance, the chassis fittings in their travel positions (the corner steadies folded, the jockey wheel swung up) and the spare wheel included. The arms, hubs and wheels are not carried by it, and the safety chains and the rubber mud flaps bend, so they are left out.
   - id: DIM-06
-    title: Lowest rigid sprung part at least the ute's own 235 mm running clearance, unladen, for the tracks the trailer is built for
+    title: Lowest rigid sprung part at least the 200 mm running clearance of an off-road vehicle, unladen, for the tracks the trailer is built for
     type: clearance_ground
-    min: 235
+    min: 200
     severity: fail
     inputs: [UTE-01]
-    why: "The trailer is built for off-road tracks (the drawing set's title, report 11's off-road load cases), where drainage berms, creek banks and ruts stand well above VSB1 5.4's 100 mm road minimum (review I2-22). The ute leads it over them, so no rigid part the trailer's suspension carries may hang lower than the ute's own running clearance, 235 mm unladen (Toyota's LC70 specification sheets of 2014 and 2021, report 16 section 6.1). That is above the 200 mm that ADR's off-road passenger vehicle category (MC) and 49 CFR 523.6 ask of an off-road vehicle, where 49 CFR 523.2 measures running clearance to the lowest point excluding unsprung weight, as this check does. Measured on the same parts as DIM-04."
+    why: "The trailer is built for off-road tracks (the drawing set's title, report 11's off-road load cases), where drainage berms, creek banks and ruts stand well above VSB1 5.4's 100 mm road minimum (review I2-22). Ford gives the Ranger Super Duty up to 299 mm of ground clearance (ford.com.au, the Super Duty's features page, read 23 Nov 2026) without saying where it is measured, and on its live rear axle the lowest point is the axle housing (est.), which a running clearance leaves out, so no Ford figure compares with this check (review I2-37). The limit is the published rule for a vehicle built for off-road use: a running clearance of at least 20 cm, one of the characteristics in 49 CFR 523.5(b)(2) and the same 200 mm as ADR's off-road passenger vehicle category (MC), with running clearance measured as 49 CFR 523.2 defines it, to the lowest point excluding unsprung weight, as this check does. It replaces the LandCruiser 70's 235 mm, measured under its axle housings. Measured on the same parts as DIM-04."
   - id: DIM-07
     title: Breakover between the ute's rear axle and the trailer's axle group (reported)
     type: breakover
     severity: report
     inputs: [UTE-01, UTE-02]
-    why: "The crest the ute and the trailer can straddle before the ground touches a rigid sprung part between the ute's rear wheels and the trailer's axle group: for each part, the slope up from the ute's rear axle, UTE-02's 1,300 mm (est.) ahead of the ball, plus the slope up from the axle group's centre, both to the part's underside at design ride height with both vehicles level (est.). The least of these is reported. No rule sets a limit for a combination (review I2-22). For one vehicle between its own axles, 49 CFR 523.6 asks 14 degrees of an off-road vehicle."
+    why: "The crest the ute and the trailer can straddle before the ground touches a rigid sprung part between the ute's rear wheels and the trailer's axle group: for each part, the slope up from the Super Duty's rear axle, UTE-02's 1,455 mm (est.) ahead of the ball, plus the slope up from the axle group's centre, both to the part's underside at design ride height with both vehicles level (est.). The least of these is reported. No rule sets a limit for a combination (review I2-22). For one vehicle between its own axles, 49 CFR 523.5(b)(2) counts a breakover angle of at least 14 degrees among an off-road vehicle's characteristics."
   - id: JK-01
     title: Everything that stands above the bike box's underside clears its sweep by 100 mm at any jack-knife angle
     type: jackknife

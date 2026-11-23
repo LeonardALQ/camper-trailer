@@ -606,6 +606,7 @@ class Trailer:
         self.analyse_chassis = True
         self._chassis = None
         self._body = None
+        self._routes = None
 
     def chassis_model(self, lay):
         return lay.chassis
@@ -625,20 +626,35 @@ class Trailer:
             self._body = (lay, Body(lay, self).results())
         return self._body[1]
 
+    def routes(self, lay) -> dict:
+        """The services' runs and fixtures resolved on this layout (cad/routes.py), once."""
+        if self._routes is None or self._routes[0] is not lay:
+            from . import routes as R
+            self._routes = (lay, R.resolve(lay))
+        return self._routes[1]
+
     def tyre_arc(self, lay) -> dict:
-        """FIT-05: each tyre swung about its arm pivot through its travel (report 11 section 5), against every chassis
-        member at its true outer size. The gap to the floor underside and the rest of the body is reported too."""
-        from .chassis import tyre_clearance
+        """FIT-05: each tyre and each XT arm swung about the arm's pivot through its travel (report 11 section 5), against
+        every rigid part the suspension carries (Layout.sprung_boxes: each solid block, chassis member, fitting and
+        product envelope at its true size), every fixture of the services (data/routes.yaml) and every run at its outside
+        diameter. The tyres' least gap to the chassis members alone is kept too: it is the one a smaller C/F closes (SUP-04)."""
+        from . import routes as R
+        from .chassis import tyre_clearance, wheel_sweep
         ch = self.chassis_model(lay)
         w = lay.V["tyre_w"]
-        t = tyre_clearance(ch, [(m.id + " " + m.name, m.box()) for m in ch.members], w)
-        others = [(f"{b.name} ({b.iid})", b.box) for b in lay.blocks
-                  if b.solid and not b.hollow and b.system not in ("running_gear", "chassis", "drawbar")]
-        o = tyre_clearance(ch, others, w)
-        who = f"tyre {t['tyre']} at {t['travel_mm']:+.0f} mm travel to {t['member']}"
-        return dict(gap_mm=t["gap_mm"], governing=who, body_gap_mm=o["gap_mm"], body_governing=o["member"],
-                    detail=(f"{t['gap_mm']:.1f} mm, {who}. The {lay.V['tyre_d']:.0f} mm tyre comes {o['gap_mm']:.1f} mm from the "
-                            f"{o['member']} at {o['travel_mm']:+.0f} mm travel"))
+        members = tyre_clearance(ch, [(m.id + " " + m.name, m.box()) for m in ch.members], w)
+        res = self.routes(lay)
+        boxes = [(f"{b.name.split(',')[0]} ({b.iid})", bx) for b, bx in lay.sprung_boxes()]
+        boxes += [(f"{f['what'].split(',')[0]} ({k})", tuple(f["box"])) for k, f in res["fixtures"].items() if f.get("box")]
+        points = [(f"run {r['id']}", p, r["od"] / 2) for r in res["runs"] for p, _ in R._samples(r["dense"], 10.0)]
+        s = wheel_sweep(ch, w, boxes, points)
+        who = lambda b: f"the {b['part']} {b['wheel']} at {b['travel_mm']:+.0f} mm travel to {b['what']}"  # noqa: E731
+        t, a = s["tyre"], s["arm"]
+        return dict(gap_mm=s["gap_mm"], governing=who(s), tyre_gap_mm=t["gap_mm"], arm_gap_mm=a["gap_mm"],
+                    members_gap_mm=members["gap_mm"], members_governing=f"tyre {members['tyre']} to {members['member']}",
+                    near=s["near"][:8], parts=len(boxes), run_points=len(points),
+                    detail=(f"{s['gap_mm']:.1f} mm, {who(s)}. The tyres' least is {t['gap_mm']:.1f} mm ({who(t)}) and the arms' "
+                            f"{a['gap_mm']:.1f} mm ({who(a)}), over {len(boxes)} rigid parts and fixtures and every run"))
 
     def layout(self, **over) -> Layout:
         lay = Layout(self.td, self.prj, {**self.base, **over})
@@ -984,9 +1000,9 @@ class Trailer:
                            sub=lay.zones[c.zone]["name"])
             elif c.type == "tyre":
                 t = self.tyre_arc(lay)
-                row.update(limit=f">= {c.min_gap_mm:g} mm to every chassis member", measured=round(t["gap_mm"], 1), unit="mm",
+                row.update(limit=f">= {c.min_gap_mm:g} mm from every rigid part, fixture and run", measured=round(t["gap_mm"], 1), unit="mm",
                            margin=round(t["gap_mm"] - c.min_gap_mm, 1), ok=t["gap_mm"] >= c.min_gap_mm - 1e-6, governing=t["governing"],
-                           detail=t["detail"], tyre=t)
+                           detail=t["detail"], tyre=dict(t, members_margin=round(t["members_gap_mm"] - c.min_gap_mm, 1)))
             elif c.type.startswith("body_"):
                 if not self.analyse_chassis:
                     continue
@@ -1377,7 +1393,11 @@ def measurement_refs(tr: Trailer, ev: dict) -> dict:
         wheel_need=chk["MAS-09"]["measured"],   # the trailer's own wheel since the Super Duty's 8-stud 18 in wheels
         gtm_need=max(chk["MAS-02"]["measured"], tr.supplier["need_kg"]),
         ball_reach_min=tr.inputs.v("UTE-02") - chk["JK-01"]["margin"],
-        cf_min=tr.inputs.v("SUP-04") - chk["FIT-05"]["margin"],
+        # the least tow ball download the truck's label may give with the axle where it is: the heaviest towball with
+        # growth plus what H17 keeps in hand under the truck's limit (VEH-08)
+        towball_label_min=max(c["growth"]["towball_kg"] for c in ev["cases"])
+        + tr.tv["limits"]["towball_rating_kg"] - tr.aw["towball_max_kg"],
+        cf_min=tr.inputs.v("SUP-04") - chk["FIT-05"]["tyre"]["members_margin"],
         # the fully loaded weighing (TW-04, TW-05) and the tare centre of gravity height (TR-01), without growth
         model_TC2=cases["TC2"]["nominal"]["mass_kg"], axle_TC2=cases["TC2"]["nominal"]["axle_kg"],
         cog_z_TC1=cases["TC1"]["nominal"]["cog"][2],
