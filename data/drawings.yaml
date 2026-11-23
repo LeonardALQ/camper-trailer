@@ -199,6 +199,7 @@ drawings:
       - {rev: P, date: 2026-11-23, description: "Notice: the 4,000 kg plate, RHS 150 x 50 x 4 rails, axle X 4,505.3", drawn: Kiro, checked: "", approved: ""}
       - {rev: Q, date: 2026-11-23, description: "Notice: axle X 4,505.6 with the brake circuit's pair (I2-32)", drawn: Kiro, checked: "", approved: ""}
       - {rev: R, date: 2026-11-23, description: "Notice: the stations with the axle at X 4,506.0 (I2-31 to I2-36)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: S, date: 2026-11-23, description: "Notice: RHS 150 x 50 x 6 drawbar members, stations at the axle X 4,489.3", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
@@ -223,6 +224,7 @@ drawings:
       - {rev: L, date: 2026-11-22, description: "Notice: LOC-06, the corner steady brackets at 90 degrees", drawn: Kiro, checked: "", approved: ""}
       - {rev: M, date: 2026-11-22, description: "Notice: stations with the axle at X 4,379.9", drawn: Kiro, checked: "", approved: ""}
       - {rev: N, date: 2026-11-23, description: "Notice: the DO45 Plus on four M14 bolts, grade 80 chains, 4,000 kg", drawn: Kiro, checked: "", approved: ""}
+      - {rev: O, date: 2026-11-23, description: "Notice: chains held at the lugs by pewag CW 8 links, 150 x 50 x 6 members", drawn: Kiro, checked: "", approved: ""}
   - number: CT-103
     title: Chassis details
     subtitle: Composite rail, outrigger root, crossmember to rail, overlap end, jacking pad, recovery tongue, spare posts
@@ -250,6 +252,7 @@ drawings:
       - {rev: O, date: 2026-11-23, description: "Notice: 4 mm rails, the pad and the tongue at the 4,000 kg plate", drawn: Kiro, checked: "", approved: ""}
       - {rev: P, date: 2026-11-23, description: "Notice: the details with the axle at X 4,505.6", drawn: Kiro, checked: "", approved: ""}
       - {rev: Q, date: 2026-11-23, description: "Notice: the fatigue figures after the services' masses (I2-31 to I2-36)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: R, date: 2026-11-23, description: "Notice: FAT-07 at the root gusset's toe, 0.76 of its CAFL (I2-47)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads
@@ -275,6 +278,7 @@ drawings:
       - {rev: M, date: 2026-11-23, description: "Notice: the load paths with the axle at X 4,505.6", drawn: Kiro, checked: "", approved: ""}
       - {rev: N, date: 2026-11-23, description: "Notice: the stations and the body mounts' load after I2-31 to I2-36", drawn: Kiro, checked: "", approved: ""}
       - {rev: O, date: 2026-11-23, description: "Notice: the stations at the axle X 4,506.2 with BD-25 (I2-33)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: P, date: 2026-11-23, description: "Notice: the stations and load paths with the axle at X 4,489.3 (I2-47)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-201
     title: Body shell
     subtitle: Kerb, road, front and rear walls, the fixed roof plan, the panels and every opening with its size
@@ -363,6 +367,7 @@ drawings:
       - {rev: M, date: 2026-11-23, description: "Notice: the mounts and the twist at the 4,000 kg plate (BDY-16)", drawn: Kiro, checked: "", approved: ""}
       - {rev: N, date: 2026-11-23, description: "Notice: the mounts with the axle at X 4,505.6 (I2-30)", drawn: Kiro, checked: "", approved: ""}
       - {rev: O, date: 2026-11-23, description: "Notice: body 640 kg on 32 mounts, the stations at X 4,506.0", drawn: Kiro, checked: "", approved: ""}
+      - {rev: P, date: 2026-11-23, description: "Notice: the body mounts and the stations with the axle at X 4,489.3", drawn: Kiro, checked: "", approved: ""}
   - number: CT-401
     title: Garage and bed general arrangement
     subtitle: Plan, kerb-side section and section looking forward at partition A

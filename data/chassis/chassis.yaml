@@ -5,7 +5,9 @@
 # cad/chassis_fea.py analyses them. Sections come from data/chassis/sections.yaml (report 11's table).
 id: ASM-CH
 name: Chassis and drawbar
-revision: D     # D, 23 Nov 2026: every case at the 4,000 kg plate (H2 as amended), the DO45 coupling and its plate, grade T chains.
+revision: E     # E, 23 Nov 2026: the chains held at their lugs by grade 100 connecting links (I2-46), the drawbar members
+                # RHS 150 x 50 x 6 and FAT-07 read at the root gusset's toe (I2-47).
+                # D, 23 Nov 2026: every case at the 4,000 kg plate (H2 as amended), the DO45 coupling and its plate, grade T chains.
                 # C, 21 Nov 2026: the home trailer. RHS 127 x 51 x 3.5 C350L0 raisers, outriggers and floor crossmembers (report 22),
                 # the grey-bay floor crossmember over the grey tank in place of the battery bay, every case at the 3,500 kg plate
 
@@ -45,6 +47,8 @@ params:
   jockey_x: 1000                              # jockey wheel clamp on the kerb-side member. In travel the jockey swings up to lie along
                                               # the drawbar, wheel forward, below the bike box's underside (JK-01, JK-02, DIM-04)
   front_recovery_x: body_x0 + 330             # front recovery lugs, outside the 300 mm root zone
+  root_gusset_toe_x: body_x0 - 270            # the root gusset's toe, where its ground 160 mm radius meets the drawbar member's top
+                                              # face (FAT-07, IIW 526), 80 mm behind the drawbar box. Its heel is on the rail's end
   steady_front_x: db_end_x + 180              # front corner steadies' brackets under the rails behind the drawbar overlap (I2-22),
                                               # 143 mm clear of its sniped end (FAT-08), in report 11's X 2,900 to 3,100
   steady_rear_x: 6070
@@ -66,7 +70,7 @@ roles:
   cm_end: {section: RHS_150x50x3, name: "Body end crossmember, full rail height"}
   cm_floor: {section: RHS_127x51x3p5, name: "Floor crossmember at raiser height, top flush with the raisers"}
   outrigger: {section: RHS_127x51x3p5, name: "Outrigger at raiser height, the raiser's section, top flush with the raiser, bottom at the rail top"}
-  drawbar: {section: RHS_150x50x5, name: "Drawbar member, A-frame"}
+  drawbar: {section: RHS_150x50x6, name: "Drawbar member, A-frame"}   # 6 mm since revision E: FAT-07 was at 0.96 of its CAFL at 5 mm
   brace: {section: RHS_75x50x3, name: "Drawbar cross brace"}
   spare_post: {section: SHS_50x50x2p5, name: "Spare wheel carrier post"}
 
@@ -104,10 +108,10 @@ plan_braces:
 fittings:
   - {id: CH-P01, name: "Coupling plate under the drawbar apex, flat both faces, 4 x M14 8.8 holes at the DO45's wider pattern", kind: plate, l: 300, w: 220, t: 12, qty: 1,
      at: [plate_x - 40, 0, rail_underside_z - db_depth], fat: null}
-  - {id: CH-P02, plane: xz, name: "Chain lug, 10 mm plate on the drawbar member's outer side face, 18 mm hole", kind: plate, l: 120, w: 100, t: 10, qty: 2,
+  - {id: CH-P02, plane: xz, name: "Chain lug, 10 mm plate on the drawbar member's outer side face, 14 mm hole for the chain's connecting link", kind: plate, l: 120, w: 100, t: 10, qty: 2,
      at: [chain_lug_x, 0, db_z - 60], side_y: "db_apex_y + (rail_c - db_apex_y) * (chain_lug_x - db_apex_x) / (body_x0 - db_apex_x) + rail_w / 2 + 5"}
-  - {id: CH-P03, plane: xz, name: "Drawbar root gusset, profiled with a ground 160 mm radius (FAT 90, IIW 526)", kind: plate, l: 300, w: 140, t: 10, qty: 2, area_factor: 0.6,
-     at: [body_x0 - 120, 0, rail_underside_z - 30], side_y: rail_c}
+  - {id: CH-P03, plane: xz, name: "Drawbar root gusset, profiled with a ground 160 mm radius (FAT 90, IIW 526), its toe 270 mm ahead of the body front and its heel over the mitre on the rail's end", kind: plate, l: 300, w: 140, t: 10, qty: 2, area_factor: 0.6,
+     at: [root_gusset_toe_x + 150, 0, rail_underside_z - 30], side_y: rail_c}
   - {id: CH-P04, plane: xz, name: "Front recovery lug, 20 mm plate on the drawbar member's outer side face, 22 mm hole", kind: plate, l: 200, w: 120, t: 20, qty: 2,
      at: [front_recovery_x, 0, db_z - 30], side_y: "rail_c + rail_w / 2 + 10"}
   - {id: CH-P05, plane: xz, name: "Rear recovery tongue, 20 mm plate through a slot in the rear crossmember, 22 mm hole", kind: plate, l: 260, w: 120, t: 20, qty: 2,
@@ -137,10 +141,11 @@ fittings:
      price: {aud: 449, basis: listing, url: "https://www.arkcorp.com.au/product/xo750-jockey-wheel/", date: 2026-11-20, note: "ARK RRP, SKU ORJW750d"},
      source: "ARK FAQ gives 20 kg, Croft Trailer lists 43.6 lb (19.8 kg) for the XO750 with dual wheels (report 13 section 6)", at: ["jockey_x - 320", "-(db_apex_y + (rail_c - db_apex_y) * (jockey_x - db_apex_x) / (body_x0 - db_apex_x)) - 160", db_z],
      box: ["jockey_x - 700", "-(db_apex_y + (rail_c - db_apex_y) * (jockey_x - db_apex_x) / (body_x0 - db_apex_x)) - 220", "db_z - 100", 760, 126, 200]}
-  - {id: DB-06, size: [60, 400, 30], name: "Safety chains, two of about 0.9 m of 8 mm grade 80 (T) chain to AS 2321, non-galvanised and painted, never welded, each on a 2,000 kg AS 2741 D shackle through its lug", kind: bought, material: "Grade 80 (T) alloy steel chain to AS 2321, 8 mm, minimum breaking load 8.2 t, and AS 2741 D shackles", mass_kg: 3.2, maturity: estimate,
+  - {id: DB-06, size: [60, 400, 30], name: "Safety chains, two of about 0.9 m of 8 mm grade 80 (T) chain to AS 2321, non-galvanised and painted, never welded, each held for good at its lug by a pewag CW 8 Connex connecting link, and on a 2,000 kg AS 2741 D shackle at the truck", kind: bought, material: "Grade 80 (T) alloy steel chain to AS 2321, 8 mm, minimum breaking load 8.2 t, grade 100 connecting links to EN 1677-1 (2.5 t working load, 10 t breaking) and AS 2741 D shackles", mass_kg: 3.7, maturity: estimate,
      price: [{item: "8 mm grade 80 (T) chain to AS 2321, 1.8 m, cut, tagged and with the maker's test certificate, from a lifting gear supplier", aud: 66, basis: estimate, date: 2026-11-23, note: "About AUD 20/m and AUD 30 for the tags and certificate (est., no Australian listing read)"},
-             {item: "Two 2,000 kg AS 2741 D shackles, 12 mm with a 16 mm pin (Aline Trading AL00018 class)", aud: 30, basis: estimate, url: "https://www.alinetrading.com.au/product-catalogue/trailer-and-body-equipment/trailer-parts-and-spares-other/trailer-safety-chains-hooks-fittings/", date: 2026-11-23, note: "About AUD 15 each (est.)"}],
-     source: "Estimate: 8 mm grade 80 chain about 1.4 kg/m, so 2.5 kg for the two, and 0.35 kg for each shackle", at: [chain_lug_x, 0, db_z - 80]}
+             {item: "Two pewag CW 8 Connex connecting links, grade 100 to EN 1677-1, 2.5 t working load limit and 10 t breaking, one through each chain lug", aud: 90, basis: estimate, url: "https://lets-doit.at/de/produkt/1118882-connexglied-cw-7-zugkraft-1-9t", date: 2026-11-23, note: "About AUD 45 each (est.). The smaller CW 7 is EUR 22.59 with Austria's 20 % VAT at LET'S DOIT, AUD 37.95 converted at 1 EUR = 1.68 AUD, and the CW 8 about a fifth more. No Australian listing read"},
+             {item: "Two 2,000 kg AS 2741 D shackles for the truck's chain points, 12 mm with a 16 mm pin (Aline Trading AL00018 class)", aud: 30, basis: estimate, url: "https://www.alinetrading.com.au/product-catalogue/trailer-and-body-equipment/trailer-parts-and-spares-other/trailer-safety-chains-hooks-fittings/", date: 2026-11-23, note: "About AUD 15 each (est.)"}],
+     source: "Estimate: 8 mm grade 80 chain about 1.4 kg/m, so 2.5 kg for the two, 0.24 kg for each pewag CW 8 (pewag's table) and 0.35 kg for each shackle", at: [chain_lug_x, 0, db_z - 80]}
   - {id: DB-07, size: [250, 150, 150], name: "Breakaway kit (battery box, switch, controller) and plugs and cables", kind: bought, mass_kg: 5.1, maturity: estimate,
      price: [{item: "Breakaway kit: 12 V sealed battery in a box, switch with lanyard, charge controller", aud: 250, basis: estimate, date: 2026-11-20, note: "No Australian listing was readable"},
              {item: "12-pin flat plug", aud: 52.62, basis: listing, url: "https://www.arkcorp.com.au/product/12-pin-flat/", date: 2026-11-20},
@@ -219,7 +224,9 @@ fatigue_details:
   - {id: FAT-04, name: "Outrigger to raiser, toe in the outrigger", iiw: "413", fat: 63, stress: member_end, member: outrigger, hot_spot: true}
   - {id: FAT-05, name: "Outrigger to raiser, weld root (6 mm fillets)", iiw: "414", fat: 36, stress: weld_root, member: outrigger, hot_spot: true}
   - {id: FAT-06, name: "Rail to raiser, continuous manual fillets along the seam", iiw: "323", fat: 90, stress: rail_level, z: rail_top_z, where: all}
-  - {id: FAT-07, name: "Drawbar root at the body front, profiled gusset with a ground radius", iiw: "526", fat: 90, stress: member_at, x: [body_x0]}
+  # FAT-07: IIW 526's nominal stress is the member's own where the gusset's radius meets it, at the toe. Behind the toe
+  # the gusset deepens the section, so the mitred butt weld at the body front, at the gusset's heel, sees less
+  - {id: FAT-07, name: "Drawbar root gusset's toe with its ground radius", iiw: "526", fat: 90, stress: member_at, x: [root_gusset_toe_x]}
   - {id: FAT-08, name: "End of the drawbar overlap under the rail, sniped taper, toe ground", iiw: "712", fat: 56, stress: rail_extreme, where: [db_end_x]}
   - {id: FAT-09, name: "Cross brace to drawbar member, toe in the brace", iiw: "413", fat: 63, stress: member_end, member: brace, hot_spot: true}
   - {id: FAT-10, name: "Chain lug on the drawbar member (pad, L 120 mm)", iiw: "513", fat: 71, stress: member_at, x: [chain_lug_x]}
@@ -247,11 +254,13 @@ fatigue_details:
 hole_rules: {edge_factor: 1.25, end_factor: 1.5, toe_factor: 1.0, kt: 3.0, iiw: "121", fat: 140, fu_factor: 0.85,
              fu: {rail: 500, raiser: 430}}   # AS/NZS 1163 C450L0 and C350L0 tensile strengths
 
-# Local checks of the fittings (CHASSIS.md). Sizes in mm. Plates are AS/NZS 3678 grade 350. The pin is the shackle pin
-# (a 2,000 kg AS 2741 D shackle for the chains, a 4.75 t bow shackle for recovery). Bearing is held to 1.5 fy so the hole does not
-# yield in the elastic VSB1 cases.
+# Local checks of the fittings (CHASSIS.md). Sizes in mm. Plates are AS/NZS 3678 grade 350. The pin is what bears in the
+# hole: at a chain lug the 10 mm round bow of the pewag CW 8 connecting link (pewag's d), which passes through the 14 mm
+# hole, and the link's eye, 13 x 18 mm inside (pewag's c and t, est.), takes the 10 mm plate across and its 13 mm under the hole along, and
+# at a recovery point a 4.75 t bow shackle's pin. `edge` runs from the hole's centre to the lug's lower edge, 35 mm under
+# the member with the hole 15 mm under it. Bearing is held to 1.5 fy so the hole does not yield in the elastic VSB1 cases.
 local_checks:
-  chain_lug: {fitting: CH-P02, hole: 18, pin: 16, net_w: 60, edge: 30, weld_leg: 6, weld_l: 120, weld_h: 60, ecc: 55}
+  chain_lug: {fitting: CH-P02, hole: 14, pin: 10, eye: [13, 18], net_w: 60, edge: 20, weld_leg: 6, weld_l: 120, weld_h: 65, ecc: 55}
   front_recovery: {fitting: CH-P04, hole: 22, pin: 19, net_w: 120, edge: 40, lever: 60, weld_leg: 6, weld_l: 200}
   rear_recovery: {fitting: CH-P05, hole: 22, pin: 19, net_w: 120, edge: 40, lever: 50, weld_leg: 6, weld_l: 200}
   jacking_pad: {fitting: CH-P06, span: 44, cup_d: 50}

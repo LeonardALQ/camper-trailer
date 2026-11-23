@@ -145,6 +145,33 @@ sections:
       mass_kg_per_m: 14.2
       result: match to published rounding
     use: "Drawbar members (recommended start), coupling head to 1,000 mm under the rails."
+  - id: RHS_150x50x6
+    designation: "RHS 150x50x6"
+    shape: RHS
+    d: 150
+    b: 50
+    t: 6
+    ro: 15.0
+    mass_kg_per_m: 16.7
+    A_mm2: 2130.0
+    Ix_e6mm4: 5.06
+    Zx_e3mm3: 67.5
+    Sx_e3mm3: 91.2
+    Iy_e6mm4: 0.860
+    Zy_e3mm3: 34.4
+    Sy_e3mm3: 40.9
+    J_e6mm4: 2.63
+    C_e3mm3: 64.3
+    Ze_x_e3mm3_C450: 91.2
+    Ze_y_e3mm3_C450: 40.4
+    compact_x_C450: C
+    compact_y_C450: N
+    grade: C450L0
+    fy_mpa: 450
+    alt_grade: C350L0
+    alt_fy_mpa: 350
+    source: "Austube Mills DCT Aug 2013, page 3-12 (the same table as the 5.0 mm), read 23 Nov 2026. Not computed by sect.py: the published values are used as they stand, and the corner radius is the method's 2.5 t"
+    use: "Drawbar members since 23 Nov 2026 (FAT-07, review I2-47), from the coupling plate to 1,000 mm under the rails."
   - id: RHS_127x51x3p5
     designation: "RHS 127x51x3.5"
     shape: RHS
