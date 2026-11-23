@@ -938,6 +938,14 @@ def terminal_face(res: dict) -> dict:
                 smallest=min((r["mm"] for r in rows if not r["sleeved"]), default=None), cone=cone)
 
 
+def tray_plane(res: dict) -> tuple:
+    """The drip tray's floor height and its footprint (x0, y0, x1, y1), read from the tray line's own box in the layout
+    (I2-35), so SVC-04 tests the tray that is modelled."""
+    tray = res["data"]["rules"]["terminal_face"]["tray"]
+    b = res["ns"][key(tray["line"])]
+    return b.z0 + float(tray.get("floor_mm", 0.0)), (b.x0, b.y0, b.x1, b.y1)
+
+
 def drip_cone(res: dict) -> dict:
     """SVC-04's drip cone (I2-18 c): no water, waste or diesel line over the terminal face inside a cone that widens by
     the rule's ratio as it rises (the trailer parked off level), but where the drip tray lies between the line and the
@@ -947,8 +955,7 @@ def drip_cone(res: dict) -> dict:
     b = res["ns"][key(tf["line"])]
     k = float(tf["cone"])
     tray = tf.get("tray")
-    tz = _eval(tray["z"], res["ns"]) if tray else None
-    tb = tuple(_eval(v, res["ns"]) for v in tray["box"]) if tray else None
+    tz, tb = tray_plane(res) if tray else (None, None)
     problems, rows = [], []
     if tray:
         spread = (tz - b.z1) * k   # the cone's reach past the face's edges where the tray lies

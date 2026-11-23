@@ -38,7 +38,8 @@ def test_limits_are_the_rules():
     """Never move a limit to make a check pass: these are the brief's and the standards' values."""
     r = RES["data"]["rules"]
     assert (r["clear_mm"], r["segregation_mm"], r["drop_pct"], r["drop_ac_pct"], r["fall"], r["terminal_face"]["mm"]) == (20, 50, 2.0, 5.0, 0.02, 300)
-    assert set(r["terminal_face"]["exempt"]) == {"W-02", "F-10"}
+    assert set(r["terminal_face"]["exempt"]) == {"W-02", "F-10", "W-09"}   # the washer's two hoses and the drip tray's drain (I2-35), each sleeved
+    assert all(x.get("sleeve") for x in RES["runs"] if x["id"] in r["terminal_face"]["exempt"])
     sp = r["spacing"]
     assert (sp["gap_mm"], sp["over_mm"], set(sp["touch"])) == (5, 25, {"ELV", "ac230"})
     assert sp["wet"]["fresh"]["ac230"] == 25   # IB 052/2015, cold water above ground
@@ -283,7 +284,9 @@ def test_svc04s_cone_spares_a_line_over_the_tray_and_catches_one_under_it():
     """I2-18 c: a line straight over the terminal face is caught by the tray EL-09 above it, never below it."""
     tf = RES["data"]["rules"]["terminal_face"]
     face = RES["ns"][R.key(tf["line"])]
-    tz = R._eval(tf["tray"]["z"], RES["ns"])
+    tz, tb = R.tray_plane(RES)
+    tray = RES["ns"][R.key(tf["tray"]["line"])]
+    assert tray.box[2] >= RES["ns"]["LA_14F"].z1 - 0.5, "the tray stands on the machine base's deck, clear of its rails and cross members"
     f12 = next(r for r in RES["runs"] if r["id"] == "F-12")
 
     def at(z):

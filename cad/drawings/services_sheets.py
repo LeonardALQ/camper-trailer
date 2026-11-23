@@ -627,6 +627,9 @@ def ct602(prj, model, bom, checks, reg, dwg):
         sh.fillrect(q[0] - 1.1, q[1] - 1.1, q[0] + 1.1, q[1] + 1.1, "box")
         sh.rect(q[0] - 1.1, q[1] - 1.1, q[0] + 1.1, q[1] + 1.1, "medium")
         sh.text(q[0], q[1] - 0.45, t, 1.0, "middle", bold=True)
+    tb = lay.find("EL-09").box   # the drip tray over the plinth, dashed (I2-35)
+    t0, t1 = pr.p(tb[0] + 6, tb[1] + 6), pr.p(tb[3] - 6, tb[4] - 6)
+    sh.rect(min(t0[0], t1[0]), min(t0[1], t1[1]), max(t0[0], t1[0]), max(t0[1], t1[1]), "phantom")
     for iid, t, dy in (("EL-02", "BATTERY PLINTH", -250), ("LA-11E", "BOARD", 0), ("EL-04", "INVERTER", 0)):
         b = lay.find(iid).box
         if iid == "EL-02":
@@ -654,8 +657,10 @@ def ct602(prj, model, bom, checks, reg, dwg):
         "IN CONDUIT UNDER THE FLOOR AND IN THE PLINTH'S END SLOT, AND 50 mm FROM EXTRA-LOW VOLTAGE ELSEWHERE (SVC-03, AS/NZS 3000 3.9.8.3).",
         "EVERY RUN IS TAGGED AT BOTH ENDS AND WHERE IT CHANGES LEVEL, SO A RUN IS FOLLOWED BY ITS ID FROM TAG TO TAG. A TAG BY A BUNDLE "
         "NAMES EVERY RUN IN IT.",
-        "NO WATER OR DIESEL LINE WITHIN 300 mm OF THE BATTERY'S TERMINAL FACE EXCEPT THE WASHER'S TWO HOSES, WHICH RUN IN A "
-        "DIELECTRIC SLEEVE (AS/NZS 3001.2 5.4.10.2).",
+        "NO WATER OR DIESEL LINE WITHIN 300 mm OF THE BATTERY'S TERMINAL FACE EXCEPT THE WASHER'S TWO HOSES AND THE TRAY'S DRAIN, "
+        "WHICH RUN IN A DIELECTRIC SLEEVE (AS/NZS 3001.2 5.4.10.2).",
+        "DRIP TRAY EL-09 (DASHED) ON THE MACHINE BASE'S DECK UNDER THE WASHER AND THE DRYER, OVER THE BATTERY BOX AND THE END SLOT, "
+        "30 mm UPSTAND. ITS 25 mm DRAIN W-09 LEAVES THE REAR UPSTAND THROUGH THE PARTITION TO A Y JUNCTION ON THE BASIN'S WASTE.",
         "WIRING SUPPORTED AT LEAST EVERY 600 mm, GROMMETS THROUGH METAL, EVERY PENETRATION THROUGH A SEALED GLAND (VSB1 7.1).",
         "THE GX TOUCH 50 SITS BESIDE THE ENTRY DOOR. LIGHTS: CEILING STRIPS, TWO BED READING LIGHTS, AN IP65 WET ROOM LIGHT AND AN AWNING LIGHT.",
     ], size=1.42, width_chars=185)
