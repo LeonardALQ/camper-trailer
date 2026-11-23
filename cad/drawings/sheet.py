@@ -241,10 +241,11 @@ def _arc(p0, rx, ry, phi, large, sweep, p1, n=16):
             for t in (t0 + dt * i / n for i in range(1, n + 1))]
 
 
-def _segments(el) -> tuple[list, list]:
+def _segments(el, every: bool = False) -> tuple[list, list]:
     """Every stroked straight piece on the sheet in SVG coordinates as (p, q, element index, half its stroke width), arcs
     and circles as chords, the frame's left out, and the boxes of the white fills (the title block's, the tables') as
-    (box, element index)."""
+    (box, element index). `every` keeps the frame, the symbol circles and the outlines of the black fills too (the
+    arrowheads), for the overrun check (cad/tools/overrun.py), which finds every mark that shows through a text."""
     out, fills = [], []
     for n, e in enumerate(el):
         if e.startswith("<path"):
@@ -254,10 +255,11 @@ def _segments(el) -> tuple[list, list]:
             if 'fill="#fff" stroke="none"' in m[2]:
                 xs, ys = [float(v) for v in re.findall(r"([-\d.]+),", m[1])], [float(v) for v in re.findall(r",([-\d.]+)", m[1])]
                 fills.append(((min(xs), max(xs), min(ys), max(ys)), n))
-            if 'stroke="none"' in m[2] or "stroke=" not in m[2] or 'class="frame"' in m[2]:
+            black = every and 'fill="#000" stroke="none"' in m[2]
+            if not black and ('stroke="none"' in m[2] or "stroke=" not in m[2] or ('class="frame"' in m[2] and not every)):
                 continue
             sw = re.search(r'stroke-width="([\d.]+)"', m[2])
-            hw = float(sw[1]) / 2 if sw else 0.5
+            hw = 0.0 if black else float(sw[1]) / 2 if sw else 0.5
             tok = re.findall(r"[MLAZ]|[-\d.]+", m[1])
             pts, start, cmd, i = [], None, "M", 0
             while i < len(tok):
@@ -284,7 +286,7 @@ def _segments(el) -> tuple[list, list]:
             out += [(p, q, n, hw) for p, q in zip(pts, pts[1:])]
         elif e.startswith("<circle"):
             m = _CIRCLE.match(e)
-            if not m or 'stroke="none"' in m[4] or float(m[3]) <= SYMBOL_R:
+            if not m or (('stroke="none"' in m[4] or float(m[3]) <= SYMBOL_R) and not every):
                 continue
             sw = re.search(r'stroke-width="([\d.]+)"', m[4])
             cx, cy, r = float(m[1]), float(m[2]), float(m[3])
@@ -310,6 +312,20 @@ def _enters(p, q, box) -> bool:
     return True
 
 
+def text_core(t: dict) -> tuple[float, float, tuple]:
+    """A text's start and its letters' advance on the sheet, and the box the cores of its letters fill, in its own
+    unrotated frame in SVG coordinates (x0, x1, y0, y1): 0.12 of its size in from each end, from 0.62 to 0.06 of its
+    size above the baseline, so a line that only grazes an ascender, a descender or the space round it is not counted.
+    `t` holds the text (t), its anchor point (x, y), size (s), anchor and weight (bold)."""
+    s, txt = t["s"], t["t"]
+    lead = len(txt) - len(txt.lstrip())
+    w = text_mm(txt.strip(), s, t["bold"])
+    full = text_mm(txt, s, t["bold"])
+    x0 = t["x"] if t["anchor"] == "start" else t["x"] - full / 2 if t["anchor"] == "middle" else t["x"] - full
+    x0 += text_mm(" " * lead, s, t["bold"]) if lead else 0.0
+    return x0, w, (x0 + 0.12 * s, x0 + w - 0.12 * s, t["y"] - 0.62 * s, t["y"] - 0.06 * s)
+
+
 def knockouts(sh) -> list[str]:
     """The sheet's elements with a white mask behind every text that a stroked line crosses, the text and its mask moved
     to just after the last line that crosses it, so the line breaks at the lettering. Cell texts, the frame and a text
@@ -323,13 +339,8 @@ def knockouts(sh) -> list[str]:
                 grid.setdefault((gx, gy), []).append(k)
     masked = {}
     for t in sh.texts:
-        s, txt = t["s"], t["t"]
-        lead, trail = len(txt) - len(txt.lstrip()), len(txt) - len(txt.rstrip())
-        w = text_mm(txt.strip(), s, t["bold"])
-        full = text_mm(txt, s, t["bold"])
-        x0 = t["x"] if t["anchor"] == "start" else t["x"] - full / 2 if t["anchor"] == "middle" else t["x"] - full
-        x0 += text_mm(" " * lead, s, t["bold"]) if lead else 0.0
-        core = (x0 + 0.12 * s, x0 + w - 0.12 * s, t["y"] - 0.62 * s, t["y"] - 0.06 * s)
+        s = t["s"]
+        x0, w, core = text_core(t)
         a = math.radians(t["rot"])
         ca, sa = math.cos(a), math.sin(a)
 

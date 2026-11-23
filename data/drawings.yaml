@@ -318,6 +318,7 @@ drawings:
       - {rev: I, date: 2026-11-22, description: "Memo: BD-18's label clear of OP-08, labels clear of the lines, rows fit", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-23, description: "Notice: the rear wall's racking at the 4,000 kg plate (BDY-20)", drawn: Kiro, checked: "", approved: ""}
       - {rev: K, date: 2026-11-23, description: "Notice: body 640 kg, 714 kg with growth, after I2-31 to I2-36", drawn: Kiro, checked: "", approved: ""}
+      - {rev: L, date: 2026-11-23, description: "Notice: DAY and NIGHT clear of the roof's front radius (overrun check)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-202
     title: Body joint details
     subtitle: Floor joiner, corner joiner, roof-to-wall joiner, lift bed rail hardpoint and a floor insert with its crush tube
@@ -361,6 +362,7 @@ drawings:
       - {rev: K, date: 2026-11-23, description: "Notice: the mounts at the 4,000 kg plate, 6.7 kN tension (BDY-16)", drawn: Kiro, checked: "", approved: ""}
       - {rev: L, date: 2026-11-23, description: "Notice: body 640 kg, 714 kg with growth, after I2-31 to I2-36", drawn: Kiro, checked: "", approved: ""}
       - {rev: M, date: 2026-11-23, description: "Notice: the floor's insert round G20's cut-out at S 4x1 (I2-33)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: N, date: 2026-11-23, description: "Notice: jamb member BD-20's name clear of the strip (overrun check)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-301
     title: Body to chassis
     subtitle: Mount positions, the bolt and nut-plate detail, isolation and sealing, the twist sharing
@@ -490,6 +492,7 @@ drawings:
       - {rev: R, date: 2026-11-23, description: "Notice: G15 at Roxtec's S 4x1, 120 x 120, its tags (I2-33)", drawn: Kiro, checked: "", approved: ""}
       - {rev: S, date: 2026-11-23, description: "Notice: G20 at S 4x1, K-07 on SP-FD, cables through the rails (I2-41)", drawn: Kiro, checked: "", approved: ""}
       - {rev: T, date: 2026-11-23, description: "Notice: brake leads K-13 to K-18A, D-14 between the tubes (I2-50, I2-53)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: U, date: 2026-11-23, description: "Notice: SHOWER UNIT clear of B-10's tag dot (overrun check)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-603
     title: Floor and wall penetrations
     subtitle: Every gland through the floor, walls and roof, its position, hole, fitting and runs

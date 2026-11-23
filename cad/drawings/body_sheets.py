@@ -110,9 +110,9 @@ def ct201(prj, model, bom, checks, reg, dwg):
     sh.rect(ox, oy + H / k, ox + L / k, oy + (H + V["roof_t"]) / k, "medium")
     zb = V["mattress_z"] + V["mattress_t"] - V["floor_z"]
     zn = V["bed_night_h"] + V["deck_t"] + V["underlay_t"] + V["mattress_t"]
-    for z, t in ((zb, "DAY"), (zn, "NIGHT")):
+    for z, t in ((zb, "DAY"), (zn, "NIGHT")):   # the names start past the roof's front radius, whose white fill comes later
         sh.line(ox + V["end_wall_t"] / k, oy + z / k, ox + V["bed_u1"] / k, oy + z / k, "phantom")
-        sh.text(ox + V["end_wall_t"] / k + 0.6, oy + z / k + 0.7, t, 1.25)
+        sh.text(ox + max(V["end_wall_t"], V["roof_front_r"]) / k + 0.6, oy + z / k + 0.7, t, 1.25)
     # the side-wall stiffener in the living-zone bay (BD-18, BDY-10) and the H12 radius at the roof's front edge
     us = lay.find("BD-20").cog[0] - V["body_x0"]                                     # the door's front jamb member (F4-04)
     sh.line(ox + us / k, oy, ox + us / k, oy + H / k, "phantom")
@@ -392,7 +392,7 @@ def ct203(prj, model, bom, checks, reg, dwg):
         if wall == "kerb":
             sh.rect(ox + (L - (c - V["body_x0"])) / k, oy2 + (lk[5] - fz - 60) / k, ox + (L - (a - V["body_x0"])) / k, oy2 + (lk[5] - fz - 25) / k, "fill")
     sh.text(ox + (L - (lk[3] - V["body_x0"])) / k, oy2 + (lk[2] - fz) / k - 2.6, "LOCKERS' INSERT STRIP", 1.3)
-    for iid, dy_t in (("BD-19", 3.0), ("BD-20", 7.0)):   # the entry door's jamb members
+    for iid, dy_t in (("BD-19", 3.0), ("BD-20", 5.0)):   # the entry door's jamb members, BD-20's name under the strip's end
         us = lay.find(iid).cog[0] - V["body_x0"]
         sh.line(ox + (L - us) / k, oy2, ox + (L - us) / k, oy2 + H / k, "phantom")
         sh.text(ox + (L - us) / k + 0.8, oy2 + dy_t, f"JAMB MEMBER {iid}", 1.3)
