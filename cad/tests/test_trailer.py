@@ -85,3 +85,20 @@ def test_the_ute_cases_carry_the_trailers_heaviest_towball():
                 assert c[bs]["towball_kg"] >= ball - 1e-6, (
                     f"{src} {c['id']} ({bs}) carries {c[bs]['towball_kg']:.1f} kg on the ball, less than the trailer's "
                     f"{ball:.1f} kg ({heavy['id']} with growth)")
+
+
+def test_the_tanks_hold_the_water_the_design_carries():
+    """I2-40: each tank's net capacity worked out from its inside by the grey tank's rule (Layout.tank_nets: the inside
+    of its 6 mm walls less a 10 mm air gap under its top and its baffles). The fresh tanks hold `water_full_l`, and it
+    is their net in H21's 5 L steps, so a change to a tank or the axle that the water does not follow fails here. The
+    travel water never passes it, and the grey tank holds `grey_full_l`."""
+    lay = EV["layout"]
+    V, nets = lay.V, lay.tank_nets()
+    fresh = lay.fresh_net_l()
+    assert {"UF-01", "UF-01R", "UF-08"} <= set(nets)
+    assert V["water_full_l"] <= fresh + 1e-9, f"water_full_l {V['water_full_l']:g} L, the fresh tanks hold {fresh:.1f} L net"
+    assert fresh - V["water_full_l"] < 5.0, f"the fresh tanks hold {fresh:.1f} L net, water_full_l is {V['water_full_l']:g} L"
+    assert V["water_travel_l"] <= V["water_full_l"] + 1e-9
+    assert V["grey_full_l"] <= nets["UF-08"]["net_l"] + 1e-9, f"grey_full_l {V['grey_full_l']:g} L, the grey tank holds {nets['UF-08']['net_l']:.1f} L net"
+    for k, n in nets.items():
+        assert n["net_l"] < n["inside_l"], f"{k}: its net {n['net_l']:.1f} L is not less than its inside {n['inside_l']:.1f} L"

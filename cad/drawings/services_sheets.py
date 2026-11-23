@@ -926,7 +926,7 @@ def ct611(prj, model, bom, checks, reg, dwg):
     box(sh, 98, 222, 152, 242, ["FRESH TANK, REAR BAY (UF-01R)", "6 mm HDPE, BAFFLED", "VENTED TO THE ROAD SIDE"])
     wire(sh, [(86, 209), (92, 209), (92, 260), (98, 260)], "cold", arrow=True)
     wire(sh, [(92, 232), (98, 232)], "cold", arrow=True)
-    sh.text(99, 246.2, f"420 L NET. AT MOST {V['water_travel_l']:.0f} L IN TRAVEL (H13)", 1.15)
+    sh.text(99, 246.2, f"{V['water_full_l']:.0f} L NET. AT MOST {V['water_travel_l']:.0f} L IN TRAVEL (H13)", 1.15)
     # tank outlets to the pump chain
     wire(sh, [(152, 256), (157, 256), (157, 215), (125, 215), (125, 212)], "cold")
     wire(sh, [(125, 222), (125, 212)], "cold", arrow=True)

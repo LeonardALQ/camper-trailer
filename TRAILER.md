@@ -1,6 +1,6 @@
 # Home trailer
 
-Status: concept, revision J of 21 Nov 2026, updated 22 Nov 2026 for Leonard building the trailer himself (H26), the parts that stood on nothing (H27), the floor plans and the 3D services plan (H28), and the weld evidence the engineer's calculation needs (CMP-14), and 23 Nov 2026 for the 4,000 kg plate behind the Ranger Super Duty (H2 as amended): the DO45 coupling, grade T chains, the load-sharing XT Air, 4 mm rails and the full 420 L in travel. DRAFT, not for construction until the engineer reviews it. Data: `data/assemblies/trailer.yaml`, `data/load_cases.yaml`, `data/checks.yaml`, `data/services.yaml`, `data/measurements.yaml` and the parts list `data/trailer-parts.yaml`. Code: `cad/trailer.py`. CHASSIS.md and BODY.md design the frame and the shell, `docs/decisions.md` records the decisions, and research reports 19 to 22 and 25 hold the research. Positions are in mm in the project datum DIM-01: X rearward from the ball, Y positive to the road side, Z up from the ground.
+Status: concept, revision J of 21 Nov 2026, updated 22 Nov 2026 for Leonard building the trailer himself (H26), the parts that stood on nothing (H27), the floor plans and the 3D services plan (H28), and the weld evidence the engineer's calculation needs (CMP-14), and 23 Nov 2026 for the 4,000 kg plate behind the Ranger Super Duty (H2 as amended): the DO45 coupling, grade T chains, the load-sharing XT Air, 4 mm rails and the fresh tanks' whole 395 L net in travel. DRAFT, not for construction until the engineer reviews it. Data: `data/assemblies/trailer.yaml`, `data/load_cases.yaml`, `data/checks.yaml`, `data/services.yaml`, `data/measurements.yaml` and the parts list `data/trailer-parts.yaml`. Code: `cad/trailer.py`. CHASSIS.md and BODY.md design the frame and the shell, `docs/decisions.md` records the decisions, and research reports 19 to 22 and 25 hold the research. Positions are in mm in the project datum DIM-01: X rearward from the ball, Y positive to the road side, Z up from the ground.
 
 The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a wet bathroom entered from a rear door, a recirculating shower for two 20 min showers a day, an electric kitchen with an oven, a washer and a dryer, filtered fresh air with the windows shut, blackout blinds, and power for a hot day of air-conditioning for at least 12 h, 24 h if possible.
 
@@ -11,11 +11,11 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 | Body | 4,420 x 2,400 mm outside, X 1,820 to 6,240. Inside 4,350 x 2,330 x 2,000 mm, floor at Z 925 |
 | Overall | 6,700 mm long, 2,470 mm wide over the entry door's handle, 3,078 mm high over the awning case |
 | Tare | 2,678 kg, 2,943 kg with the growth allowance |
-| Fully loaded with 420 L of water (TC2) | 3,278 kg, 3,576 kg with growth, against the 4,000 kg plate |
+| Fully loaded with 395 L of water (TC2) | 3,278 kg, 3,576 kg with growth, against the 4,000 kg plate |
 | Towball | 316 to 360 kg, 9.8 to 12.3 % of the trailer, at most 391.9 kg with growth |
 | Ute | Ford Ranger Super Duty single cab chassis. Rear axle 2,538 kg with growth against Ford's 2,800 kg. Combination 7,743 kg against Ford's 8,000 kg, the ute with growth plus the plate |
 | Battery | 25.6 kWh. A design hot day runs 25.1 h when new and 17.2 h at end of life |
-| Water | 420 L fresh, all of it in travel, about 41 L a day. 130 L grey |
+| Water | 395 L fresh, the tanks' net, all of it in travel, about 41 L a day. 130 L grey |
 | Cost | AUD 198,407 with contingency, built by Leonard (H26) |
 
 Every fail check passes. The tightest are the tyres' 50 mm under the floor at full bump (FIT-05, 50.0 mm against 50 mm), the towball share with the grey tank full (MAS-12, 9.8 % against 9.0 %), the heaviest towball (MAS-13, 391.9 kg against 420 kg), a cable's gap to a plan brace (SVC-01, 20.1 mm against 20 mm) and the recovery pull in the road-side rail (CHS-08A, 0.84 of yield). Fully loaded with growth the trailer weighs 3,575.6 kg, 324.4 kg inside the 3,900 kg target (MAS-10).
@@ -42,16 +42,16 @@ Masses in kg. The towball comes from moments about the axle group centre at X 4,
 | Case | Aboard | Mass | Towball | Share | With growth | Towball with growth |
 |---|---|---|---|---|---|---|
 | TC1 Tare | Nothing | 2,678 | 313.7 | 11.7 % | 2,943 | 338.2 |
-| TC2 Fully loaded | 420 L fresh, fuel, 150 kg of gear | 3,278 | 360.4 | 11.0 % | 3,576 | 391.9 |
+| TC2 Fully loaded | 395 L fresh, fuel, 150 kg of gear | 3,278 | 360.4 | 11.0 % | 3,576 | 391.9 |
 | TC3 Highway | 50 L, fuel, gear | 2,908 | 353.5 | 12.2 % | 3,206 | 385.0 |
-| TC4 Water, no gear | 420 L, fuel | 3,128 | 337.3 | 10.8 % | 3,396 | 364.2 |
+| TC4 Water, no gear | 395 L, fuel | 3,128 | 337.3 | 10.8 % | 3,396 | 364.2 |
 | TC5 Gear, no water | Fuel, gear | 2,858 | 352.6 | 12.3 % | 3,156 | 384.0 |
 | TC6 Fuel only | Fuel | 2,708 | 329.5 | 12.2 % | 2,976 | 356.4 |
-| TC7 Grey full | 290 L fresh, 130 L grey, fuel, gear | 3,278 | 321.8 | 9.8 % | 3,576 | 353.3 |
+| TC7 Grey full | 265 L fresh, 130 L grey, fuel, gear | 3,278 | 321.8 | 9.8 % | 3,576 | 353.3 |
 | TC8 Grey full, fresh empty | 130 L grey, fuel, gear | 2,988 | 316.4 | 10.6 % | 3,286 | 347.9 |
 
 - Plate: ATM 4,000 kg (H2, amended 23 Nov 2026 from 3,500 kg), inside the Super Duty's 4,500 kg braked towing and the 4,500 kg of the DO45 and the brakes. The heaviest case with growth is 3,575.6 kg, 324.4 kg inside H2's 3,900 kg target (MAS-10), so H21 takes nothing off the water. The examiner caps GTM at 4,500 kg, from the coupling and the brakes, and ATM at 4,500 kg, from the coupling (MAS-07, MAS-08). Over 3.5 t the trailer is ADR category TC, and VSB1 Rev 6 still covers it, as it does every trailer to 4.5 t ATM. NSW registers it as a light vehicle, a trailer of 4.5 t ATM or less, with a yearly safety check once it is five years old ([TfNSW](https://www.nsw.gov.au/driving-boating-and-transport/vehicle-registration/renewing-vehicle-registration/safety-checks-and-vehicle-inspections)), and the concessional RAV entry still takes it as a low-ATM trailer.
-- Water: all 420 L of fresh and grey water may ride while towing (H13 as amended), so fresh and grey together never pass what the fresh tanks hold, and H21 still takes any excess over the target off the water in 5 L steps. The tanks are filled at camp. The grey tank travels empty, and TC7 and TC8 check the trailer with it full.
+- Water: all 395 L of fresh and grey water may ride while towing (H13 as amended), so fresh and grey together never pass what the fresh tanks hold, and H21 still takes any excess over the target off the water in 5 L steps. The tanks are filled at camp. The grey tank travels empty, and TC7 and TC8 check the trailer with it full.
 - Towball: at least 7.5 % in every case (MAS-04, H2) and at most the DO45's 450 kg and the Super Duty's 450 kg (est., no Ford document gives it). While the masses are estimates the axle sits in the middle of a 104.2 mm window between 9.0 % in the lightest case and 420 kg with growth in the heaviest (MAS-12, MAS-13, H17 as amended). Ford's towing guide aims at about 10 % and Smart Hitch recommends 10 to 15 %: TC2 has 11.0 % and the lowest case, TC7 with a full grey tank, 9.8 %.
 - Ute: the Ford Ranger Super Duty single cab chassis on Ford's ratings (`data/ute/ute.yaml`, UTE-GARAGE.md). The heaviest towball, 391.9 kg with growth, puts its rear axle at 2,538 kg with growth against Ford's 2,800 kg (MAS-03, H14), and stays 58.1 kg under the Super Duty's 450 kg (est., Ford's figure is in the owner guide) and the DO45's 450 kg. MAS-14, the LandCruiser's return to the Platinum kit, is retired with the kit.
 - GCM: the ute with growth, 3,743 kg, plus the 4,000 kg plate is 7,743 kg against Ford's 8,000 kg (GCM-01, UTE-06, H20). Ford's GCM needs no revision, so there is no fallback plate or water limit. GCM-01 reads the plate from `data/load_cases.yaml`.
@@ -129,10 +129,10 @@ Research report 19's load calculation gives a design hot day of 37.1 kWh of heat
 
 ## Plumbing and water
 
-- Fresh: two welded HDPE tanks over the axles hold 420 L, filled at camp through a Puretec CR45 filter by hose or the creek transfer pump, with a chlorine dose. A Shurflo Trail King 7 at 2.1 bar feeds every outlet, the drinking tap through a CR-Z2 filter and a UV purifier. The Combi's 10 L boiler gives hot water through a 50 °C mixing valve (CT-611, CT-612).
+- Fresh: two welded HDPE tanks over the axles hold 395 L net, filled at camp through a Puretec CR45 filter by hose or the creek transfer pump, with a chlorine dose. A Shurflo Trail King 7 at 2.1 bar feeds every outlet, the drinking tap through a CR-Z2 filter and a UV purifier. The Combi's 10 L boiler gives hot water through a 50 °C mixing valve (CT-611, CT-612).
 - Battery: no water, waste or diesel line passes within 300 mm of the battery's terminal face (AS/NZS 3001.2 clause 5.4.10.2), but the washer's hoses and the drip tray's drain, each in a sleeve. The drip tray EL-09, 1.5 mm aluminium with a 30 mm upstand (3.6 kg, AUD 150, est.), is the machine base's whole deck under the washer and the dryer, so it clears the base's rails and cross members and keeps a spill off the end slot. It catches what the washer's tap and its lines could drip into a cone widening 1 in 5 over the face, the trailer parked up to about 11 degrees off level (SVC-04, est.). A burst fill hose runs at the Trail King 7's 7 L/min, and the tray's 25 mm drain carries about 10 L/min (est.) through the partition into the basin's waste, so to the grey tank (I2-35).
 - Grey: every drain falls by gravity to a 130 L tank in the rear bay, with a valve and a camlock on the kerb side. It travels empty (CT-003's operating limits), TC7 and TC8 check the trailer with it full, and a 40 L tote serves longer stays.
-- Budget for two a day: showers 10 L, dishes 8, drinking 6, basin 6, outdoor rinse 4, cooking 3, flush 2 and cleaning 2, so 41 L, 27 L of it to grey. A wash adds 44 L. The 420 L aboard lasts about 10 days without laundry and 7 days with three washes, and since the 4,000 kg plate the full tanks are also the travel limit. The grey tank holds 72 h with one wash.
+- Budget for two a day: showers 10 L, dishes 8, drinking 6, basin 6, outdoor rinse 4, cooking 3, flush 2 and cleaning 2, so 41 L, 27 L of it to grey. A wash adds 44 L. The 395 L aboard lasts about 10 days without laundry and 7 days with three washes, and since the 4,000 kg plate the full tanks are also the travel limit. The grey tank holds 72 h with one wash.
 
 ## Running gear and coupling
 
@@ -221,7 +221,7 @@ Each is in full in `docs/decisions.md`.
 ## Open points and the assumption used
 
 1. Storage is about 0.2 m³ short (est.). Two 500 x 600 x 700 mm cabinets under the bed beside the desk would add 0.42 m³ and about 20 kg, and break Leonard's rule that the rest of that area stays empty. Assumption: the footprint stays empty (H16).
-2. Estimate lines carry 931.5 kg, 34.8 % of the tare, and estimates set 47.4 % of the price subtotal. MAS-10 has 324.4 kg of margin, 3,575.6 kg against 3,900 kg with the full 420 L aboard, and 0.4 kg of BD-11's 63.5 kg is left unassigned. Assumption: the growth allowance covers the masses until TW-01 to TW-03 replace them, and the 20 % contingency covers the prices. A towball reading more than 10 % off the model means the centre of gravity estimates are wrong (UTE-03).
+2. Estimate lines carry 931.5 kg, 34.8 % of the tare, and estimates set 47.4 % of the price subtotal. MAS-10 has 324.4 kg of margin, 3,575.6 kg against 3,900 kg with the full 395 L aboard, and 0.4 kg of BD-11's 63.5 kg is left unassigned. Assumption: the growth allowance covers the masses until TW-01 to TW-03 replace them, and the 20 % contingency covers the prices. A towball reading more than 10 % off the model means the centre of gravity estimates are wrong (UTE-03).
 3. The Super Duty's maximum tow ball download is in Ford's owner guide, which was not read (the body equipment mounting manual, p. 34, refers to it). Assumption: 450 kg, 10 % of Ford's 4,500 kg braked rating, the share Ford's towing guide says a trailer's nose weight typically aims at. The trailer's heaviest towball at the 4,000 kg plate, 391.9 kg with growth, stays under it, and H17's 420 kg ceiling keeps 30 kg in hand under it and the DO45's 450 kg.
 4. Assumption: the isolators and the line set keep the split working on corrugations, without a maker's warranty. The fallback is a rooftop unit with a sixth battery module.
 5. The Dometic fridge, freezer, hob and sink carry converted European prices, and the oven, washer, panels and lamps are estimates. Assumption: these prices stand, with their contingency, until an Australian stockist or a quote replaces them.

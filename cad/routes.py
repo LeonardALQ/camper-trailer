@@ -1865,7 +1865,10 @@ def member_holes(res: dict) -> list[dict]:
     out = []
     for r in res["runs"]:
         inn = _ids(r, "inside")
-        pts = r["dense"]
+        if not inn:
+            continue
+        # every 5 mm, so a straight stretch that crosses a 50 mm member between two path points is caught (I2-41)
+        pts = [p for p, _ in _samples(r["dense"], 5.0)]
         for b in (m for m in mem if _matches(m, inn)):
             box = b["box"]
             inside = lambda p: all(box[k] + 0.5 < p[k] < box[k + 3] - 0.5 for k in range(3))  # noqa: E731

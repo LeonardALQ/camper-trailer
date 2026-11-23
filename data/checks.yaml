@@ -573,7 +573,7 @@ trailer_checks:
     min: 100
     severity: fail
     inputs: [UTE-01]
-    why: Every part carried by the suspension needs 100 mm of running clearance, the chassis fittings in their travel positions (the corner steadies folded, the jockey wheel swung up) and the spare wheel included. The arms, hubs and wheels are not carried by it, and the safety chains and the rubber mud flaps bend, so they are left out.
+    why: Every part carried by the suspension needs 100 mm of running clearance, the chassis fittings in their travel positions (the corner steadies folded, the jockey wheel swung up), the spare wheel, and every fixture and run of the services at its outside diameter, as FIT-05 has them (review I2-41), included. The arms, hubs and wheels are not carried by it, and the safety chains, the rubber mud flaps and the leads that hang between the two vehicles or ride on the arms bend or move with them, so they are left out.
   - id: DIM-06
     title: Lowest rigid sprung part at least the 200 mm running clearance of an off-road vehicle, unladen, for the tracks the trailer is built for
     type: clearance_ground
@@ -586,7 +586,7 @@ trailer_checks:
     type: breakover
     severity: report
     inputs: [UTE-01, UTE-02]
-    why: "The crest the ute and the trailer can straddle before the ground touches a rigid sprung part between the ute's rear wheels and the trailer's axle group: for each part, the slope up from the Super Duty's rear axle, UTE-02's 1,455 mm (est.) ahead of the ball, plus the slope up from the axle group's centre, both to the part's underside at design ride height with both vehicles level (est.). The least of these is reported. No rule sets a limit for a combination (review I2-22). For one vehicle between its own axles, 49 CFR 523.5(b)(2) counts a breakover angle of at least 14 degrees among an off-road vehicle's characteristics."
+    why: "The crest the ute and the trailer can straddle before the ground touches a rigid sprung part between the ute's rear wheels and the trailer's axle group: for each part, the slope up from the Super Duty's rear axle, UTE-02's 1,455 mm (est.) ahead of the ball, plus the slope up from the axle group's centre, both to the part's underside at design ride height with both vehicles level (est.), over DIM-04's parts, the services' fixtures and runs included (I2-41). The least of these is reported. No rule sets a limit for a combination (review I2-22). For one vehicle between its own axles, 49 CFR 523.5(b)(2) counts a breakover angle of at least 14 degrees among an off-road vehicle's characteristics."
   - id: JK-01
     title: Everything that stands above the bike box's underside clears its sweep by 100 mm at any jack-knife angle
     type: jackknife
