@@ -1039,7 +1039,7 @@ runs:
      from: {line: WS-MAN, at: [WS_MAN.x1 - 20, WS_MAN.y0, WS_MAN.cz]}, path: [[., WS_TMV.cy, .], [WS_TMV.cx, ., .]], to: {line: WS-TMV, at: [., ., WS_TMV.z0]}}
   - {id: F-09, system: fresh, kind: pex12, feeds: "Cold to the Combi D 6 E, over the pump to the bench's aisle-side strip, forward along it and the tower's beside the Combi, above the floor (I2-33)", protection: "The Combi's safety and drain valve",
      serves: ["water: Combi"], along: [LA-11B, LA-11T], from: {line: WS-MAN, at: [WS_MAN.x0 + 15, WS_MAN.y0, WS_MAN.cz]},
-     path: [[., WS_MAN.y0 - 125, .], [., ., WS_PMP.z1 + 90], [LA_06.x1 + 26, ., .], [., LA_11B.y0 + 32, .], [., ., floor_z + 95], [LA_03.x0 - 17, ., .], [., LA_03.y0 + 60, .], [., ., floor_z + 115]],
+     path: [[., WS_MAN.y0 - 125, .], [., ., WS_PMP.z1 + 90], [LA_06.x1 + 28, ., .], [., LA_11B.y0 + 32, .], [., ., floor_z + 95], [LA_03.x0 - 17, ., .], [., LA_03.y0 + 60, .], [., ., floor_z + 115]],
      to: {line: LA-03, at: [LA_03.x0, ., .]}}
   - {id: H-01, system: hot, kind: pex12, feeds: "Combi D 6 E's hot outlet back along the tower's and the bench's aisle-side strip under the cold feed, above the floor, and up at the aisle's end to the mixing valve (I2-33)", protection: "The Combi's safety valve",
      serves: ["water: Combi"], along: [LA-11T, LA-11B], from: {line: LA-03, at: [LA_03.x0, LA_03.y0 + 105, floor_z + 195]},
