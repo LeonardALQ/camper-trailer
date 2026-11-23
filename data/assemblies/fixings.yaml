@@ -57,7 +57,7 @@ trailer:
   - lines: [DB-06]
     to: [CH-P02]
     how: hooked
-    why: "Each safety chain's D shackle passes through its chain lug, and the grade 80 chain is never welded (VSB1 Rev 6 9.2)"
+    why: "Each safety chain's pewag CW 8 connecting link passes through its chain lug's hole, so the chain is fixed to the trailer for good with no shackle, and the grade 80 chain is never welded (VSB1 Rev 6 9.2, WA's CI-119C over 3.5 t)"
   # ---------------------------------------------------------------- running gear and the spare wheel
   - lines: ["RG-01*"]
     to: ["RL-*", "CM-*"]

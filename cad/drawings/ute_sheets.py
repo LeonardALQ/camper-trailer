@@ -584,6 +584,12 @@ def ct704(prj, model, bom, checks, reg, dwg):
         bb = c["m"].built[iid].shape.bounding_box()
         p = vP.p(bb.center().X + dxy[0], bb.center().Y, 0)
         S.leader(sh, p, (p[0] + 12, top + 3), lab, size=1.6)
+    # the ramp's place with the bikes out (R3, UGC-07), in phantom over the Tuareg's bay
+    rb = c["m"].built["R3"].shape.bounding_box()
+    r0, r1 = vP.p(rb.min.X, rb.min.Y, 0), vP.p(rb.max.X, rb.max.Y, 0)
+    sh.rect(min(r0[0], r1[0]), min(r0[1], r1[1]), max(r0[0], r1[0]), max(r0[1], r1[1]), "phantom")
+    rp = vP.p(rb.max.X - 100, rb.max.Y, 0)
+    S.leader(sh, rp, (vP.p(P["x_end"] + 60, 0, 0)[0], vP.p(0, P["tuareg_y"] + 270, 0)[1]), "RAMP, BIKES OUT (NOTE 7)", size=1.6)
 
     # ---- section at the rear row, looking forward
     xcut = P["rear_row_x"] + 60
@@ -618,6 +624,9 @@ def ct704(prj, model, bom, checks, reg, dwg):
         "THE WINCH CLIPS ONTO THE PLATE IN FRONT OF THE BIKE BEING LOADED, 650 UP, ABOVE THE 500 mm IGNITION-FREE ZONE.",
         "TOOLS RIDE IN THE TWO CHESTS ON THE WHEEL TUBS. THE OUTER FRONT STRAPS RUN THROUGH THE FRONT CORNERS, SO THE CHESTS CANNOT GO THERE.",
         "BIKES ARE ENVELOPES FROM research/05 SCALED TO THE OWNER'S FIGURES, MIRRORS FOLDED, FRONT WHEEL 25 UP IN THE CHOCK.",
+        f"WITH THE BIKES OUT THE RAMP STANDS ON ITS EDGE IN THE TUAREG'S BAY, X {rb.min.X:.0f} TO {rb.max.X:.0f}, "
+        f"{rb.min.X - c['m'].built['10.TU'].shape.bounding_box().max.X:.0f} BEHIND ITS CHOCK, HELD BY THE TUAREG'S FOUR STRAPS (PHANTOM, UGC-07). "
+        "ITS 34 kg FORWARD KEEPS THE EMPTY BOX INSIDE FORD'S CENTRE OF GRAVITY WINDOW (UTE-07). IT GOES ACROSS THE BACK BEFORE THE BIKES GO IN.",
     ], width_chars=100, size=1.7)
     _stamp(sh, 22, 282)
     _title(sh, dwg, reg, _mass_note(c), sc, c)

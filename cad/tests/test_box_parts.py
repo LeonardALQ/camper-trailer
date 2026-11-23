@@ -65,3 +65,5 @@ def test_list_mass_is_the_model_box():
     assert not set(box) - named, f"model box parts not on the list: {sorted(set(box) - named)}"
     listed = sum(ln["mass"]["kg"] for ln in LINES)
     assert abs(listed - GARAGE["box_kg"]) <= 0.1, f"list {listed:.2f} kg, model {GARAGE['box_kg']:.2f} kg"
+    # one figure for the box everywhere (review I2-49): the list's sum and the model's UGB-01 give the same 0.1 kg
+    assert f"{listed:.1f}" == f"{GARAGE['box_kg']:.1f}", f"the list quotes {listed:.1f} kg and the model {GARAGE['box_kg']:.1f} kg"

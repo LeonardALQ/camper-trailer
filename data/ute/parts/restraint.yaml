@@ -115,6 +115,12 @@ parts:
     notes: Shown in the loading view. Its mass is U-RAMP.
     geometry: {generator: ramp, params: {length: 3048, width: 965, thickness: 60}}
     color: "#2d3436"
+  U-RAMP-FWD:
+    name: Loading ramp, stowed forward with the bikes out
+    kind: context
+    notes: "Folded on its edge along the Tuareg's bay, 15 mm behind its chock, held by the Tuareg's four straps to the fittings in the front and rear track rows. Its mass is U-RAMP, which cad/ute_garage.py places here in the cases without the bikes (UC1, UC4) for Ford's centre of gravity window (UTE-07, UTE-08)."
+    geometry: {generator: box, params: {}}
+    color: "#2d3436"
   U-VENT:
     name: Low vents with flap valves
     material: "Plastic vents with flap valves (est.)"

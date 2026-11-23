@@ -99,7 +99,7 @@ def test_super_duty_against_the_landcruiser():
     """The purchase and the upgrades with their allowance, shown apart in VEHICLE.md and set against the LandCruiser plan
     they replace: AUD 50,000 for that truck and AUD 77,777 for its build with the allowance."""
     truck, car = PROJECT["truck"]["purchase_aud"], TYPED["build_plus_contingency"]
-    assert (truck, car) == (92690, 20550), "the purchase and the upgrades changed: update this test and VEHICLE.md"
+    assert (truck, car) == (92690, 19988), "the purchase and the upgrades changed: update this test and VEHICLE.md"
     rows = {r[0]: r for r in _rows(_section("The truck against the LandCruiser plan"))}
     want = {"Truck": (truck, LANDCRUISER["truck"]), "Upgrades with the allowance": (car, LANDCRUISER["build"]),
             "Together": (truck + car, LANDCRUISER["truck"] + LANDCRUISER["build"])}

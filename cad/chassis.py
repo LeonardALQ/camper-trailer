@@ -494,7 +494,7 @@ class Chassis:
         jack = next(st for st in self.stations if st["id"] == "XT centre")
         return dict(crossmember_stations=[self.station_x(st) for st in self.stations], body_x0=V["body_x0"], db_end_x=V["db_end_x"],
                     chain_lug_x=V["chain_lug_x"], jack_x=self.station_x(jack), hub_front_x=self.hub_x("front"), hub_rear_x=self.hub_x("rear"),
-                    rear_tongue_x=V["body_x1"] - 70, front_recovery_x=V["front_recovery_x"],
+                    rear_tongue_x=V["body_x1"] - 70, front_recovery_x=V["front_recovery_x"], root_gusset_toe_x=V["root_gusset_toe_x"],
                     steady_x=sorted({p["x"] for p in self.steady_poses()}))
 
     # -- the frame model ----------------------------------------------
@@ -560,7 +560,7 @@ class FrameModel:
         dsec = ch.role_sec["drawbar"]
         self.db_nodes = {}
         for s in (-1, 1):
-            xa = [V["db_apex_x"], V["chain_lug_x"], V["jockey_x"], V["brace_x"]]
+            xa = [V["db_apex_x"], V["chain_lug_x"], V["jockey_x"], V["brace_x"], V["root_gusset_toe_x"]]
             n = math.ceil((V["body_x0"] - V["db_apex_x"]) / V["max_element"])
             xa = sorted(set(xa) | {V["db_apex_x"] + (V["body_x0"] - V["db_apex_x"]) * k / n for k in range(n + 1)})
             xa = [x for k, x in enumerate(xa) if k == 0 or x - xa[k - 1] > 5.0]
