@@ -87,10 +87,11 @@ def _draft_stamp(sh, x, y):
     sh.text(x, y - 1.7, "DRAFT, NOT FOR CONSTRUCTION UNTIL THE ENGINEER REVIEWS CHASSIS.md", 2.0, "middle", bold=True, color="#c00")
 
 
-def weld_symbol(sh, tip, elbow, size: str, other_side=False, both=False, all_round=False, length: str = "", note: str = ""):
+def weld_symbol(sh, tip, elbow, size: str, other_side=False, both=False, all_round=False, length: str = "", note: str = "",
+                bevel=False):
     """AS 1101.3 fillet weld symbol: arrow to the joint, reference line, the triangle below the line for the arrow
     side (above for the other side, both for both sides), the leg size on the left and the length on the right, a
-    circle at the elbow for all round."""
+    circle at the elbow for all round. `bevel` draws the single bevel butt weld's symbol in place of the triangle."""
     (tx, ty), (ex, ey) = tip, elbow
     sh.line(tx, ty, ex, ey, "thin")
     L = math.hypot(tx - ex, ty - ey) or 1
@@ -105,7 +106,10 @@ def weld_symbol(sh, tip, elbow, size: str, other_side=False, both=False, all_rou
     if other_side or both:
         tri.append(1)
     for d in tri:
-        sh.path([(xm - 1.3, ey), (xm - 1.3, ey + d * 2.6), (xm + 1.3, ey)], "medium", closed=True)
+        if bevel:
+            sh.path([(xm - 1.3, ey + d * 2.6), (xm - 1.3, ey), (xm + 1.3, ey + d * 2.6)], "medium")
+        else:
+            sh.path([(xm - 1.3, ey), (xm - 1.3, ey + d * 2.6), (xm + 1.3, ey)], "medium", closed=True)
     sh.text(xm - 2.2, ey - 2.4 if not other_side else ey + 1.0, size, 1.8, "end")
     if length:
         sh.text(xm + 2.0, ey - 2.4 if not other_side else ey + 1.0, length, 1.8)
@@ -270,7 +274,7 @@ FIT_ITEMS = [("1", "DB-03", "Cruisemaster DO45 Plus, under-mounted, 4 x M14 8.8 
              ("10", "CH-P04", "Front recovery lug 20 mm, 22 mm hole, 4.75 t shackle"),
              ("11", "DB-07", "Breakaway kit, switch near the coupling"),
              ("12", "DB-KA", "Drawbar members RHS 150 x 50 x 6 C450L0"),
-             ("13", "CH-P15", "Rail end plate 16 mm on each rail's front end, the gusset's heel on it (detail C)")]
+             ("13", "CH-P15", "Rail end plate 16 mm, full penetration to the rail's walls, the heel on it (detail C)")]
 
 
 def _root_detail(sh, ch, x0, y0, k=10.0):
@@ -294,7 +298,7 @@ def _root_detail(sh, ch, x0, y0, k=10.0):
     u1, u2 = math.sqrt(r ** 2 - (r - c) ** 2), math.sqrt(r ** 2 - (r - h) ** 2)
     arc = [p(toe - u1 + u, zt + r - math.sqrt(r ** 2 - u ** 2)) for u in (u1 + (u2 - u1) * j / 12 for j in range(13))]
     sh.path([p(toe, zt), p(toe, zt + c)] + arc + [p(x_end, zt + h), p(x_end, zt)], "medium", closed=True)
-    plate(sh, *p(x_end, zt), *p(V["body_x0"], zt + rail.d))
+    plate(sh, *p(x_end, zt), *p(V["body_x0"], zt + ep["w"]))
     a, b = p(V["body_x0"], zt), p(x_front, zt + rail.d)
     sh.rect(a[0], a[1], b[0], b[1], "medium")
     sh.text(a[0] + 0.8, a[1] + 2.4, "RAIL", 1.3)
@@ -307,8 +311,10 @@ def _root_detail(sh, ch, x0, y0, k=10.0):
              ["5 FILLETS BOTH SIDES WRAPPED ROUND THAT END, TOE GROUND (IIW 522, FAT-07)"], size=1.4)
     weld_symbol(sh, p(x_end, zt + 0.7 * h), (ex, y0 + 16.5), f"{g['heel_leg']:g}", both=True, note="HEEL TO THE END PLATE (FAT-18)")
     S.leader(sh, p(V["body_x0"] - ep["t"] / 2, zt + 0.3 * rail.d), (ex, y0 + 11.0),
-             f"END PLATE {ep['t']:g} GR 350 (13) CLOSING THE RAIL, 5 FILLETS TO ITS WEBS AND TOP (FAT-19)", size=1.4)
-    S.leader(sh, (m0[0], (m0[1] + m1[1]) / 2), (ex, y0 + 5.5), "MITRE: FULL PENETRATION FROM ONE SIDE, WELDED FLAT,",
+             f"END PLATE {ep['t']:g} GR 350 (13) OVER THE RAIL AND THE RAISER'S BOTTOM WALL, ITS BOTTOM EDGE FREE (FAT-19)", size=1.4)
+    weld_symbol(sh, p(V["body_x0"], zt + 0.85 * rail.d), (ex, y0 + 5.5), "", bevel=True,
+                note="PLATE TO THE WEBS AND TOP: FULL PENETRATION FROM OUTSIDE (FAT-20)")
+    S.leader(sh, (m0[0], (m0[1] + m1[1]) / 2), (ex, y0 - 0.5), "MITRE: FULL PENETRATION FROM ONE SIDE, WELDED FLAT,",
              ["IIW 234 AT FAT 36, SO ITS ROOT NEEDS NO NDT (FAT-17)"], size=1.4)
 
 
@@ -430,7 +436,9 @@ def ct102(prj, model, bom, checks, reg, dwg):
         ("NO WELD ON THE MEMBERS' TOP OR BOTTOM FACES WITHIN 300 OF THE BODY FRONT EXCEPT THE ROOT GUSSET (9) AND THE MITRE (DETAIL C). THE GUSSET IS IIW 522, "
          "FAT 90 (FAT-07): ITS 160 RADIUS GROUND SMOOTH DOWN TO AN END 10 HIGH, AT MOST TWICE ITS 10 mm, 270 AHEAD OF THE BODY FRONT, ITS FILLETS WRAPPED "
          "ROUND THAT END AND THE TOE GROUND. THE CROSS BRACE SITS AT MID-DEPTH."),
-        ("A 16 mm END PLATE (13) CLOSES EACH RAIL'S FRONT END AND TAKES THE GUSSET'S HEEL ON 8 mm FILLETS BOTH SIDES (FAT-18, FAT-19). THE MITRE UNDER IT "
+        ("A 16 mm END PLATE (13) CLOSES EACH RAIL'S FRONT END AND THE RAISER'S BOTTOM WALL OVER IT AND TAKES THE GUSSET'S HEEL ON 8 mm FILLETS BOTH SIDES "
+         "(FAT-18, FAT-19). ITS EDGES ON THE WEBS AND THE TOP ARE BEVELLED, AND THE WALLS ARE WELDED TO IT WITH FULL PENETRATION FROM OUTSIDE, THE INBOARD "
+         "WEB FROM AHEAD OF THE FRONT CROSSMEMBER, THE PLATE BEHIND EACH ROOT (IIW 415, FAT-20). ITS BOTTOM EDGE IS NOT WELDED. THE MITRE UNDER IT "
          "IS A FULL PENETRATION BUTT WELD MADE FROM ONE SIDE ON THE BENCH, EACH FACE WELDED FLAT, BEFORE THE MEMBER GOES UNDER THE RAIL. IT IS CLASSED AT IIW 234 "
          "FAT 36, SO ITS ROOT NEEDS NO NDT (FAT-17)."),
         ("VSB1 9.1 AT THE {plate:.0f} kg PLATE: {along:.1f} kN ALONG, {across:.1f} kN ACROSS AND {up:.1f} kN UP AND DOWN AT THE COUPLING. VSB1 9.2.2: "
