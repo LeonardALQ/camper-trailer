@@ -21,12 +21,15 @@
 # Revision of 20 Nov 2026: the tow vehicle is the LandCruiser 79 (research report 16), so the Cayenne's inputs
 # (CAR-01 to CAR-07) are gone. The bike, chock and pannier inputs now set the ute's bike box (UTE-GARAGE.md).
 #
-# `part` is the part of the project the input belongs to: car (the LandCruiser 79 car build, VEHICLE.md), box (the bike
-# box, UTE-GARAGE.md) or trailer. The Measurements page filters by it, for example /measurements/?part=car.
+# `part` is the part of the project the input belongs to: car (the Ranger Super Duty and its stages, VEHICLE.md), box
+# (the bike box, UTE-GARAGE.md) or trailer. The Measurements page filters by it, for example /measurements/?part=car.
 #
 # Revision of 20 Nov 2026, later: report 23's car build inputs (VEH-01 to VEH-27, group Car build) and report 24's bike box
-# inputs (BOX-01 to BOX-19, group Bike box) are merged in, and report 23's UTE-01 replaces the earlier one. Their design
-# values come from the model with the 180 L tank, the trailer charging and the 1.6 mm box roof.
+# inputs (BOX-01 to BOX-19, group Bike box) are merged in, and report 23's UTE-01 replaces the earlier one.
+#
+# Revision of 23 Nov 2026: the tow vehicle is a near-new Ford Ranger Super Duty (H29, research report 31). VEH-01 to
+# VEH-19 are its checks for VEHICLE.md's stages: the purchase in S0, the weighing as bought, the power stage S3's dyno,
+# boost and temperatures, and the charging voltage of S2. VEH-20 to VEH-28 are its laden weighings and heights.
 inputs:
   # ================================================================ the ute (report 16, data/ute/ute.yaml)
   - id: UTE-01
@@ -70,260 +73,259 @@ inputs:
     thresholds:
       - {at: 0.10, rule: "More than 10 % away from the model's fully loaded towball means the centre of gravity estimates are wrong: weigh the parts again before relying on the axle position", src: "Report 02 MASS-07 asks for differences over 2 % in mass to be explained. 10 % on the towball is this layout's rule"}
 
-  # ================================================================ the car build (report 23, VEHICLE.md), group Car build
-  # ================================================================ engine and driveline health, stage S0 (the branch switch)
+  # ================================================================ the car build (report 31, VEHICLE.md), group Car build
+  # ================================================================ stage S0: the near-new truck before it is bought (lines BI01 and BI02)
   - id: VEH-01
     group: Car build
     part: car
-    title: Compression spread across the eight cylinders, warm engine, cranking
-    how: "Diesel workshop, line BI01. Warm engine, injection disabled, all eight glow plugs out, a diesel compression gauge on each cylinder at the same cranking speed. Write all eight readings in kPa in a note. Value is (highest less lowest) divided by highest, in %."
-    unit: "%"
-    estimate: {v: 5, src: "Assumed for a sound 400,000 km engine (est.). No Toyota figure for the 1VD-FTV was found"}
+    title: "Ford's service record complete: every scheduled service done at a Ford dealer, on time, 1 for yes, 0 for no"
+    how: "Line BI01's visit. The Ford dealer reads the truck's service record against the schedule in its owner's manual, with the dates and odometer readings. Note any service done elsewhere, late or missing."
+    unit: yes or no
+    estimate: {v: 1, src: "Assumed complete for a 2025 truck with 13,343 km (est.)"}
     measured: {v: null, date: null}
     stage: buy
-    affects: [branch A or B, stage S2 timing]
+    affects: [buy or walk away, Ford's warranty, S3 timing]
     thresholds:
-      - {at: 10, rule: "Over 10 %, or one cylinder clearly low, take branch A: rebuild in S2 straight after S1", src: "Diesel cylinders within about 10 % of each other are treated as healthy (https://www.apexinds.com/blog/commercial-diesel-cylinder-compression-testing-procedure-guide.html)"}
-    range: {min: 0, max: 10, src: "Apex Industries diesel compression guide (link above)"}
+      - {at: 0, rule: "A missing, late or outside service: get the dealer's written answer that Ford's warranty still stands, or walk away", src: "Ford's 7-year cover holds only for trucks serviced at Ford dealers (Ford specification sheet, 29 Oct 2026, report 31 sections 4 and 7)"}
+    range: {min: 1, max: 1, src: "Ford specification sheet, 29 Oct 2026 (report 31 sections 4 and 7)"}
   - id: VEH-02
     group: Car build
     part: car
-    title: Leak-down, worst cylinder
-    how: "Same visit. Each cylinder at top dead centre on compression, crank locked, tester calibrated and set to 100 psi. Listen at the oil filler (rings), intake (inlet valve), exhaust (exhaust valve) and coolant tank (head gasket). Write all eight results and the leak path in a note."
-    unit: "%"
-    estimate: {v: 10, src: "Assumed (est.)"}
+    title: Ford's new vehicle warranty left on the truck
+    how: "Same visit. The dealer reads the warranty start date from Ford's system. Value is the years left on the day of purchase, to one decimal."
+    unit: years
+    estimate: {v: 3.1, src: "The listing found on 23 Nov 2026: about 3 years and 1 month of Ford's 5-year warranty left (report 31 section 4)"}
     measured: {v: null, date: null}
     stage: buy
-    affects: [branch A or B]
+    affects: [S3 timing (H30)]
     thresholds:
-      - {at: 20, rule: "Over 20 % on any cylinder, or bubbles in the coolant tank, take branch A", src: "Shop guidance treats up to about 20 % as acceptable (https://blog.nationwideheavytruckparts.com/blog/diesel-leak-down-test)"}
-    range: {min: 0, max: 20, src: "Nationwide Heavy Truck Parts leak-down guide (link above)"}
+      - {at: 0, rule: "The power stage S3 waits until this runs out or Leonard accepts the warranty risk, so it sets the stage's earliest date without the risk", src: "Decision H30: Ford does not pay for a failure an aftermarket part causes"}
+    range: {min: 0, max: 7, src: "Ford's 5-year warranty, or 7 years for new and demonstrator trucks whose cover starts on or after 1 Sep 2026 and that are serviced only at Ford dealers (Ford specification sheet, 29 Oct 2026, report 31 section 7)"}
   - id: VEH-03
     group: Car build
     part: car
-    title: Blow-by at the oil filler, hot, 2,000 rpm, no load
-    how: "Same visit. Blow-by flow meter on the oil filler with the breather outlet blocked, engine at working temperature. Hold 2,000 rpm for 30 s and read the flow. This is also the baseline for later checks."
-    unit: L/min
-    estimate: {v: 50, src: "Report 23 estimate (est.): about 1 % of the intake flow at 2,000 rpm (4.5 L x 1,000 intake cycles a minute, 4,500 L/min). No Toyota figure was found"}
-    measured: {v: null, date: null}
-    stage: buy
-    affects: [branch A or B]
-    thresholds:
-      - {at: 100, rule: "Over 100 L/min, or the filler cap lifting off at idle, take branch A", src: "Twice the estimate (est.)"}
-    range: {min: 0, max: 100, src: "Report 23 estimate (est.)"}
-  - id: VEH-04
-    group: Car build
-    part: car
-    title: Injector back-leak, largest deviation of one injector from the mean of eight
-    how: "Same visit. Return-flow kit on the injector leak-off connections, warm idle, 2 min. Write each injector's volume in mL in a note. Read the eight injector correction values and any stored injector faults by scan tool and note them too."
-    unit: "%"
-    estimate: {v: 15, src: "Assumed (est.)"}
-    measured: {v: null, date: null}
-    stage: buy
-    affects: [branch A or B, FS06, FS01]
-    thresholds:
-      - {at: 25, rule: "Over 25 %, or a stored injector fault, take branch A, because worn injectors wash the bores. A new injector replaces each one that fails (FS06) before the run-in", src: "Report 23 estimate (est.). No Denso or Toyota limit for this test was found, so a Denso specialist's bench test overrides it"}
-    range: {min: 0, max: 25, src: "Report 23 estimate (est.)"}
-  - id: VEH-05
-    group: Car build
-    part: car
-    title: Oil analysis, silicon (dust in the oil)
-    how: "Hot sample taken mid-drain from the engine as bought, before any oil change, sent to an oil lab with the BI01 kit. Note iron, chromium, aluminium, copper, lead, sodium, potassium and soot as well."
-    unit: ppm
-    estimate: {v: 10, src: "Assumed (est.)"}
-    measured: {v: null, date: null}
-    stage: buy
-    affects: [branch A or B, ID01]
-    thresholds:
-      - {at: 20, rule: "Over 20 ppm means dust got past the air filter seal. Inspect the intake. If iron and chromium are high too, take branch A", src: "Silicon should sit low, and any rise with iron and chromium points to an air filter seal failure (https://heavyvehicleinspection.com/blog/post/diesel-engine-oil-analysis-reading-results). The 20 ppm figure is an estimate (est.)"}
-    range: {min: 0, max: 20, src: "Heavy Vehicle Inspection guide (link above) and report 23 estimate"}
-  - id: VEH-06
-    group: Car build
-    part: car
-    title: Oil analysis, fuel dilution
-    how: Same sample as VEH-05.
-    unit: "%"
-    estimate: {v: 1, src: "Assumed (est.)"}
-    measured: {v: null, date: null}
-    stage: buy
-    affects: [branch A or B, FS06]
-    thresholds:
-      - {at: 2, rule: "2 to 4 %: re-sample after 1,000 km and read the regeneration history", src: "Under 2 % is acceptable, 2 to 4 % is watched (Heavy Vehicle Inspection guide, VEH-05)"}
-      - {at: 4, rule: "Over 4 %: an injector or regeneration fault. Take branch A, and replace any injector that fails VEH-04 (FS06)", src: "Over 4 % is a fault signature (same source)"}
-    range: {min: 0, max: 4, src: "Heavy Vehicle Inspection guide (VEH-05)"}
-  - id: VEH-07
-    group: Car build
-    part: car
-    title: "Oil analysis, glycol (coolant in the oil): 1 for found, 0 for none"
-    how: Same sample as VEH-05. Glycol test, plus sodium and potassium against the lab's limits.
-    unit: yes or no
+    title: Stored fault codes in Ford's diagnostic scan of every module
+    how: "Same visit. The dealer scans every module with Ford's diagnostic tool, the engine, the 10-speed, the brakes and the trailer module included. Write each code and its module in a note."
+    unit: codes
     estimate: {v: 0, src: "Assumed none (est.)"}
     measured: {v: null, date: null}
     stage: buy
-    affects: [branch A or B, EN22, EN21]
+    affects: [buy or walk away]
     thresholds:
-      - {at: 1, rule: "Any glycol: stop driving, pressure-test the cooling system, the oil cooler (EN22) and the head gaskets, then take branch A", src: "Glycol in the oil corrodes bearings fast (Heavy Vehicle Inspection guide, VEH-05)"}
-    range: {min: 0, max: 0, src: "Heavy Vehicle Inspection guide (VEH-05)"}
+      - {at: 1, rule: "Any stored fault: the dealer finds and fixes it under warranty before the truck is bought, or walk away", src: "VEHICLE.md stage S0"}
+    range: {min: 0, max: 0, src: "VEHICLE.md stage S0: the truck is bought with no fault stored"}
+  - id: VEH-04
+    group: Car build
+    part: car
+    title: "The engine and the 10-speed on Ford's own calibration, unmodified: 1 for yes, 0 for no"
+    how: "Same scan. The dealer compares the engine and the 10-speed's calibration numbers with Ford's latest, and looks for a non-Ford flash and for aftermarket intake, exhaust or turbo parts."
+    unit: yes or no
+    estimate: {v: 1, src: "Assumed untuned (est.)"}
+    measured: {v: null, date: null}
+    stage: buy
+    affects: [buy or walk away, the stock dyno run (VEH-12)]
+    thresholds:
+      - {at: 0, rule: "A non-Ford flash or a modified engine: walk away", src: "VEHICLE.md stage S0"}
+    range: {min: 1, max: 1, src: "VEHICLE.md stage S0"}
+  - id: VEH-05
+    group: Car build
+    part: car
+    title: DPF soot load from the scan, as a share of the load at which it regenerates
+    how: "Same scan, warm engine, after the road test. Read the DPF's soot load and the load at which the engine starts a regeneration, and note the ash load and the AdBlue system's readings with them."
+    unit: "%"
+    estimate: {v: 30, src: "Assumed for a truck driven on the open road (est.). Ford publishes no soot figure"}
+    measured: {v: null, date: null}
+    stage: buy
+    affects: [buy or walk away, the DPF]
+    thresholds:
+      - {at: 100, rule: "At or over the regeneration load with no regeneration running: the dealer checks the DPF, its pressure sensor and the injectors before the truck is bought", src: "A full filter regenerates on its own when driven (est.), so one that stays full has a fault"}
+    range: {min: 0, max: 100, src: "The engine regenerates at the full load (est.)"}
+  - id: VEH-06
+    group: Car build
+    part: car
+    title: Mean distance between the last completed DPF regenerations
+    how: "Same scan. Read the regeneration history, the odometer at each completed regeneration, and take the mean distance between the last five."
+    unit: km
+    estimate: {v: 500, src: "Assumed for a truck driven on the open road (est.). Ford publishes no interval"}
+    measured: {v: null, date: null}
+    stage: buy
+    affects: [buy or walk away, the DPF]
+    thresholds:
+      - {at: 200, rule: "Under 200 km between regenerations: short trips, or an injector or sensor fault filling the filter. The dealer checks it before the truck is bought", src: "Assumed (est.)"}
+    range: {min: 200, max: null, src: "Assumed (est.). No upper limit: a longer interval means less soot"}
+  - id: VEH-07
+    group: Car build
+    part: car
+    title: DPF regenerations started but not completed, in the history the scan holds
+    how: Same scan. Count the regenerations the history shows as stopped before they finished.
+    unit: regenerations
+    estimate: {v: 1, src: "Assumed (est.): a stop in town can end one"}
+    measured: {v: null, date: null}
+    stage: buy
+    affects: [buy or walk away, the DPF]
+    thresholds:
+      - {at: 3, rule: "Three or more: the truck has lived on short trips. Have the dealer run a service regeneration and read the soot load again (VEH-05) before buying", src: "Assumed (est.)"}
+    range: {min: 0, max: 3, src: "Assumed (est.)"}
   - id: VEH-08
     group: Car build
     part: car
-    title: "DPF flow test after the off-car clean: 1 for pass, 0 for fail"
-    how: "Before removing the DPF, read its differential pressure, soot and ash values and the regeneration history by scan tool and note them. After the specialist's clean (line ID02), record the flow test result."
-    unit: pass or fail
-    estimate: {v: 1, src: "Assumed pass (est.)"}
+    title: "Maximum tow ball download, from the owner's manual or the label on Ford's 4.5 t hitch"
+    how: "Line BI01's visit. Read the figure for the 4,500 kg braked rating from the truck's owner's manual, and the load printed on the hitch's label. Take the lower of the two."
+    unit: kg
+    estimate: {v: 450, src: "Decision H29 (est.): 10 % of the 4,500 kg braked rating, as the ordinary Ranger allows 350 kg at 3,500 kg. No Ford document read on 23 Nov 2026 gives it"}
     measured: {v: null, date: null}
     stage: buy
-    affects: [ID03, TL04, TL05]
+    affects: [UTE-05, MAS-03, H17's ceiling, the axle window]
     thresholds:
-      - {at: 0, rule: "Fail (cracked, melted or flow not restored): buy a new DPF (ID03) before the emissions test", src: "The specialist replaces a filter only when it is cracked or melted (line ID02, https://dpfcleaningservices.com.au/)"}
-    range: {min: 1, max: 1, src: "Line ID02"}
+      - {at: 450, rule: "Under 450 kg: H17's ceiling becomes this figure less 30 kg (data/load_cases.yaml axle_window), so the axle re-solves and the towball checks read the new limit", src: "Decision H17 as amended 23 Nov 2026"}
+    range: {min: {ref: towball_label_min}, max: null, src: "Min: the trailer's heaviest towball with growth plus the 30 kg H17 keeps in hand, so the axle stays where it is. No upper limit: the DO45 Plus's own 450 kg caps the window too"}
   - id: VEH-09
     group: Car build
     part: car
-    title: "Clutch and gearbox check: 1 for pass, 0 for fail"
-    how: "Warm, on a quiet road, fifth gear at 60 km/h, full throttle: engine speed must not rise faster than road speed. Then shift through every gear up and down, listening for synchro crunch and bearing whine. Note the gearbox oil's colour and any metal on the drain plug."
-    unit: pass or fail
-    estimate: {v: 1, src: "Assumed pass (est.)"}
+    title: Bore of the tow pin's hole in Ford's 4.5 t hitch
+    how: "Line BI01's visit, hitch out of the receiver. Measure the hole across two diameters at right angles with a vernier and take the larger."
+    unit: mm
+    estimate: {v: 32, src: "Assumed to take a 1 1/4 in shank (est.), as Cruisemaster's DO45 Plus tow pin has (rsd-plan line TW01)"}
     measured: {v: null, date: null}
     stage: buy
-    affects: [branch A or B, CG01, CG09]
+    affects: [TW01, TW02]
     thresholds:
-      - {at: 0, rule: "Slip, crunch or whine: take branch A, because the clutch and gearbox come out with the engine in S2. Crunch or whine also buys the new H152F (CG09)", src: "Plan rule (report 23): the gearbox is removed only once"}
-    range: {min: 1, max: 1, src: "Plan rule (report 23)"}
-  # ================================================================ power, stage S6 (same dyno and operator)
+      - {at: 32.5, rule: "Over 32.5 mm the pin's shank does not fit firmly: fit a 4.5 t tongue with a 32 mm hole and the drop the coupling height needs (TW02), and never drill or bush Ford's hitch", src: "Ford's body equipment mounting manual section 1.13: a shank fits the hitch hole firmly and the hitch is not drilled or modified"}
+    range: {min: 31.8, max: 32.5, src: "Cruisemaster's 1 1/4 in (31.75 mm) shank and Ford's firm fit (BEMM section 1.13). The 0.75 mm of play is an estimate (est.)"}
+  # ================================================================ stage S0: the truck as bought on a public weighbridge (line CK01)
   - id: VEH-10
     group: Car build
     part: car
-    title: Peak power at the wheels before the tune, finished hardware on the factory calibration
-    how: "Chassis dyno, three runs in fourth gear, take the middle run. Same dyno and operator as VEH-11, made before the injectors go to GTurbo for the Pro 100 service (FS01), which the factory calibration cannot run. Keep the sheet for the certifier."
-    unit: rwkW
-    estimate: {v: 110, src: "GTurbo booklet page 15: stock VDJ79 100 to 120 rwkW (https://cdn.shopify.com/s/files/1/0823/4241/2531/files/1VD-FTV-VDJ70-Booklet-v1_4c.pdf)"}
+    title: Front axle as bought, full tank, nobody aboard, no tray
+    how: "Line CK01. Take the tray off if one is fitted, fill the tank, nobody aboard, and weigh each axle on a public weighbridge. Note what is fitted beyond Ford's standard equipment, the dual battery system for example, with its mass if listed."
+    unit: kg
+    estimate: {v: 1665, src: "Ute model line UT-01: Ford's minimum kerb weight of 2,518 kg (dealer sheet, 2026MY) less the 853 kg on the rear axle that Ford's centre of gravity table implies (est.)"}
     measured: {v: null, date: null}
-    stage: build
-    affects: [TL01, TL05]
+    stage: weigh
+    affects: [UT-01, UTE-02, UTE-07, Ford's centre of gravity window]
     thresholds:
-      - {at: 96, rule: "Under 96 rwkW: find the fault (boost leak, injector, DPF) before the tuner starts", src: "Report 14's published stock range, 96 to 120 rwkW"}
-    range: {min: 96, max: 120, src: "Report 14 and the GTurbo booklet"}
+      - {rule: "Enter the two axles' split in UT-01 (data/ute/ute.yaml) and rebuild: the front axle check, the rear axle check and Ford's centre of gravity window re-solve on the weighed truck", src: "Decision of 23 Nov 04:59 on the kerb mass on each axle: Ford publishes no split"}
+    range: {min: 1625, max: 1705, src: "The model's split of Ford's 2,518 kg, plus or minus 40 kg for options and the split's estimate (est.)"}
   - id: VEH-11
     group: Car build
     part: car
-    title: Peak power at the wheels after the tune
-    how: Same dyno and operator as VEH-10, after the Pro 100 injectors and the tune, with the towing map active.
-    unit: rwkW
-    estimate: {v: 177, src: "Plan: 230 to 250 kW at the crank, about 170 to 185 rwkW at report 14's 74 % crank to wheels (decision log 20:15)"}
+    title: Rear axle as bought, full tank, nobody aboard, no tray
+    how: Same weighing as VEH-10.
+    unit: kg
+    estimate: {v: 853, src: "Ute model line UT-01 (est.): the split Ford's centre of gravity table implies, its GVM row of 1,832 kg added at 3,350 mm holding with the rear axle at its 2,800 kg rating"}
     measured: {v: null, date: null}
-    stage: build
-    affects: [TL05, the 224 kW minimum]
+    stage: weigh
+    affects: [UT-01, UTE-03, UTE-05, the ball load]
     thresholds:
-      - {at: 166, rule: "Under 166 rwkW (224 kW at the crank) the build misses its minimum. The tuner checks boost and fuelling. Never raise the EGT limit to reach it", src: "Leonard's 300 hp minimum (decision log 20:15)"}
-    range: {min: 166, max: 185, src: "Decision log 20:15 and report 14 section 3.9"}
+      - {rule: "Enter it in UT-01 and rebuild. Each kg more on the rear axle here is about 0.7 kg less of tow ball download before the rear axle reaches 2,800 kg (1.447 kg on the axle for each kg on the ball)", src: "The ute model (RSD-UTE, 23 Nov 2026): the rear axle carries 1.447 kg more for each kg on the ball"}
+    range: {min: 813, max: 893, src: "The model's split, plus or minus 40 kg (est.)"}
+  # ================================================================ stage S3: the power stage on one dyno, before and after (lines TL01 and TL02)
   - id: VEH-12
     group: Car build
     part: car
-    title: Boost at full load, steady, 2,500 rpm, after the tune
-    how: Read the boost gauge (TL02) or the tuner's log on the dyno and on a long towing grade.
-    unit: psi
-    estimate: {v: 24, src: "GTurbo booklet page 15: VD-G333 design target 24 psi, efficient from 16 to 33 psi"}
+    title: Peak power at the wheels on the stock truck, before the power stage
+    how: "Line TL01. The tuner's chassis dyno, Tow/Haul off, three runs, take the middle one. The certifier compares it with VEH-13 on the same dyno with the same operator, so keep the sheet."
+    unit: kW at the wheels
+    estimate: {v: 130, src: "Report 31: Ford's 154 kW at the crank (dealer sheet) at a wheel-to-crank ratio of about 0.845 through the 10-speed and full-time 4WD (est.)"}
     measured: {v: null, date: null}
     stage: build
-    affects: [TL01, EGT]
+    affects: [TL01, TL05, the stage's starting point]
     thresholds:
-      - {at: 18, rule: "Under 18 psi at full load: look for a boost leak or a vane fault before towing hard", src: "Report 23 estimate (est.)"}
-      - {at: 24, rule: "Over 24 psi steady: ask the tuner to hold the design target", src: "GTurbo design target"}
-    range: {min: 18, max: 24, src: "GTurbo booklet page 15 and report 23 estimate"}
+      - {at: 120, rule: "Under 120 kW at the wheels: find the fault (a boost leak, an injector, the DPF) with the dealer before the stage starts", src: "About 8 % under the estimate (est.)"}
+    range: {min: 120, max: 140, src: "Report 31's 130 kW, plus or minus about 8 % for the dyno (est.)"}
   - id: VEH-13
     group: Car build
     part: car
-    title: Exhaust temperature before the turbo, sustained full load while towing
-    how: "Read the EGT gauge (TL02, probe in the manifold before the turbo) on the longest steep grade with the loaded trailer, after the tune."
-    unit: °C
-    estimate: {v: 650, src: "Plan tune setting: fuel pulled from 650 °C (report 14)"}
+    title: Peak power at the wheels after the PowerMax turbo, the intercooler and the calibration
+    how: Same dyno and operator as VEH-12, the towing calibration active, three runs, the middle one.
+    unit: kW at the wheels
+    estimate: {v: 173, src: "Decision H30: about 205 kW at the crank, about 173 kW at the wheels (est.)"}
     measured: {v: null, date: null}
-    stage: trailer built
-    affects: [TL01]
+    stage: build
+    affects: [TL05, H30]
     thresholds:
-      - {at: 700, rule: "Over 700 °C: lift off and have the tuner lower the fuel limit", src: "Plan tune setting: never more than 700 °C (report 14)"}
-    range: {min: 0, max: 700, src: "Report 14 tune settings"}
-  # ================================================================ towing temperatures, stage S5 at stock power, repeated after S6
+      - {at: 186, rule: "Over 186 kW at the wheels, about 220 kW at the crank, the PowerMax keeps only about 6 % of its flow in hand: have the tuner hold 205 kW at the crank", src: "Report 31 section 8 and decision H30"}
+    range: {min: 165, max: 186, src: "H30's 205 kW at the crank less about 5 % (est.), and report 31's 220 kW at the crank, the most the PowerMax carries with a margin"}
   - id: VEH-14
     group: Car build
     part: car
-    title: Coolant temperature on a long grade, towing the loaded trailer in heat
-    how: "Read the water temperature gauge (TL02) at the top of the longest grade of the first long tow, air at 30 °C or more. Repeat after the tune."
-    unit: °C
-    estimate: {v: 100, src: "Report 14: 90 to 104 °C towing (general diesel figures, not 1VD data)"}
+    title: Boost under the tuner's target at full load, steady at 2,500 rpm, after the stage
+    how: "Line TL02's OBD gauge or the tuner's log, on the dyno and on the first long towing grade. Value is the target less the boost read, in kPa."
+    unit: kPa
+    estimate: {v: 0, src: "On target (est.)"}
     measured: {v: null, date: null}
-    stage: trailer built
-    affects: [EN14, TX04, fan kit]
+    stage: build
+    affects: [TL01, VEH-15, VEH-16]
     thresholds:
-      - {at: 107, rule: "Over 107 °C for long means an airflow problem: check the intercooler's effect and add GTurbo's AUD 1,895 fan kit (report 14)", src: "Report 14"}
-    range: {min: 85, max: 104, src: "Report 14"}
+      - {at: 15, rule: "More than 15 kPa under the target: look for a boost leak at the intercooler's joints before towing hard", src: "Assumed (est.). No Ford or Garrett boost figure for this engine was found"}
+    range: {min: 0, max: 15, src: "Assumed (est.)"}
   - id: VEH-15
     group: Car build
     part: car
-    title: Engine oil temperature, same tow
-    how: Read the oil temperature gauge (TL03) at the same point as VEH-14.
-    unit: °C
-    estimate: {v: 110, src: "Report 14: 99 to 116 °C towing"}
+    title: Turbo shaft speed at full load on the longest towing grade, after the stage
+    how: "Read Garrett's shaft speed sensor (PW03) on the OBD gauge (TL02) at the top of the longest grade with the loaded trailer."
+    unit: krpm
+    estimate: {v: 170, src: "The calibration keeps the turbo under Garrett's limit (decision H30), about 9 % under it (est.)"}
     measured: {v: null, date: null}
     stage: trailer built
-    affects: [EN22, oil cooling]
+    affects: [PW01, PW03, the calibration]
     thresholds:
-      - {at: 121, rule: "Over 121 °C sustained: review oil cooling before the next long tow", src: "Report 14"}
-    range: {min: 90, max: 116, src: "Report 14 (90 °C lower bound est.)"}
+      - {at: 186.2, rule: "Over 186.2 krpm: stop towing hard and have the tuner pull boost", src: "Garrett PowerMax 930592-5001S, shaft speed limit 186.2 krpm (Garrett's catalogue, report 31 section 5)"}
+    range: {min: 0, max: 186.2, src: "Garrett's catalogue (report 31 section 5)"}
   - id: VEH-16
     group: Car build
     part: car
-    title: Gearbox oil temperature, same tow
-    how: "Only with the optional senders (CG11): read the gearbox sender at the same point as VEH-14, and repeat after the tune. Without them, read the gearbox case with an infrared thermometer right after the climb, which reads below the oil (est.)."
+    title: Exhaust temperature before the turbo, sustained full load towing, after the stage
+    how: "Read the EGT on the OBD gauge (TL02) on the longest steep grade with the loaded trailer, air at 30 °C or more."
     unit: °C
-    estimate: {v: 95, src: "Report 23 estimate (est.)"}
+    estimate: {v: 750, src: "Assumed under Ford's own EGT limits, which the calibration keeps (decision H30, est.)"}
     measured: {v: null, date: null}
     stage: trailer built
-    affects: [gearbox cooler, CG09]
+    affects: [PW01, the calibration]
     thresholds:
-      - {at: 110, rule: "Over 110 °C sustained: fit a gearbox oil cooler before the next long tow", src: "Report 23 estimate (est.). No Toyota limit for the H152F was found, and report 15 plans no cooler until the senders show one is needed"}
-    range: {min: 0, max: 110, src: "Report 23 estimate (est.)"}
+      - {at: 830, rule: "Over 830 °C: lift off, and have the tuner lower the fuel at that load", src: "Garrett PowerMax 930592-5001S, ductile iron turbine housing rated to 830 °C (report 31 section 5)"}
+    range: {min: 0, max: 830, src: "Garrett's turbine housing rating (report 31 section 5)"}
+  # ================================================================ towing at stock power in S2, and again after S3 (line TL02)
   - id: VEH-17
     group: Car build
     part: car
-    title: Rear diff oil temperature, same tow
-    how: "Only with the optional senders (CG11): read the rear diff sender at the same point as VEH-14. Without them, read the diff housing with an infrared thermometer right after the climb, which reads below the oil (est.)."
+    title: Coolant temperature on a long grade, towing the loaded trailer in heat
+    how: "Log the coolant temperature with an OBD logger at the top of the longest grade of the first long tow, air at 30 °C or more, at stock power: the long tow S3 needs first. Repeat on the OBD gauge (TL02) after the stage."
     unit: °C
-    estimate: {v: 100, src: "Report 23 estimate (est.)"}
+    estimate: {v: 100, src: "Assumed for a diesel towing near its rating in heat (est.). Ford publishes no figure"}
     measured: {v: null, date: null}
     stage: trailer built
-    affects: [rear diff, ball load]
+    affects: [S3, the calibration]
     thresholds:
-      - {at: 120, rule: "Over 120 °C sustained: check the diff oil and backlash (DL10) and consider a diff cooler", src: "Report 23 estimate (est.). No Toyota limit was found"}
-    range: {min: 0, max: 120, src: "Report 23 estimate (est.)"}
-  # ================================================================ weights on a public weighbridge (stages S0 and S5)
+      - {at: 110, rule: "Over 110 °C for long: an airflow fault. Have the dealer check the cooling system before the stage, or the tuner the stage's fuelling after it", src: "Assumed (est.)"}
+    range: {min: 85, max: 110, src: "Assumed (est.)"}
   - id: VEH-18
     group: Car build
     part: car
-    title: Front axle of the bare cab chassis, from the as-bought weighing
-    how: "Line CK01. Full fuel, nobody aboard, weigh each axle. Subtract the tray, bar, winch and other fitted parts by their weighed or listed masses, split by their positions."
-    unit: kg
-    estimate: {v: 1280, src: "Ute model line UT-01: GXL cab chassis 2,202.5 kg kerb, 922.5 kg on the rear axle (Toyota BBGJ1007, mid-range)"}
+    title: The 10-speed's fluid temperature, same tow
+    how: Log the transmission temperature at the same point as VEH-17, in Tow/Haul, and again on the OBD gauge (TL02) after the stage.
+    unit: °C
+    estimate: {v: 95, src: "Assumed (est.)"}
     measured: {v: null, date: null}
-    stage: weigh
-    affects: [UT-01, the S3 gate sum, front axle checks]
+    stage: trailer built
+    affects: [TX01]
     thresholds:
-      - {rule: "Replaces UT-01's front share. The gate sum and the ute checks re-solve", src: "Report 16, decision log 12:45"}
-    range: {min: 1240, max: 1320, src: "Toyota BBGJ1007 GXL range: kerb 2,175 to 2,230 kg, rear axle 910 to 935 kg"}
+      - {at: 110, rule: "Over 110 °C sustained: fit the larger transmission cooler (TX01) before the next long tow", src: "VEHICLE.md stage S3 and report 31 section 6 (est.)"}
+    range: {min: 0, max: 110, src: "VEHICLE.md stage S3 and report 31 section 6 (est.)"}
   - id: VEH-19
     group: Car build
     part: car
-    title: Rear axle of the bare cab chassis, from the as-bought weighing
-    how: Same weighing as VEH-18.
-    unit: kg
-    estimate: {v: 922.5, src: "Ute model line UT-01 (Toyota BBGJ1007, mid-range)"}
+    title: The truck's battery voltage with both trailer chargers running, first hot night tow
+    how: "Line TC01's first long tow at night with the headlights, the air-conditioner and the fan on, air at 25 °C or more. Log the battery voltage with an OBD logger at highway speed and take the lowest steady reading."
+    unit: V
+    estimate: {v: 14.0, src: "Ford's 250 A alternator against the chargers' 62 A and the truck's own loads (est.)"}
     measured: {v: null, date: null}
-    stage: weigh
-    affects: [UT-01, the S3 gate sum, UTE-03]
+    stage: trailer built
+    affects: [TC01, TC02]
     thresholds:
-      - {rule: "Replaces UT-01's rear share. Each extra kg on the rear axle here is a kg less for the ball load at the gate", src: "Report 16"}
-    range: {min: 910, max: 935, src: "Toyota BBGJ1007 GXL range"}
+      - {at: 13.5, rule: "Two more chargers (TC02) go in only if the trailer ends travel days short and the voltage holds at 13.5 V or more", src: "VEHICLE.md stage S2"}
+    range: {min: 13.5, max: null, src: "VEHICLE.md stage S2. No upper limit: the truck's own charging regulates it"}
+  # ================================================================ stages S1 and S2: the laden truck on a public weighbridge (lines CK02 and CK03)
   - id: VEH-20
     group: Car build
     part: car

@@ -1393,6 +1393,10 @@ def measurement_refs(tr: Trailer, ev: dict) -> dict:
         wheel_need=chk["MAS-09"]["measured"],   # the trailer's own wheel since the Super Duty's 8-stud 18 in wheels
         gtm_need=max(chk["MAS-02"]["measured"], tr.supplier["need_kg"]),
         ball_reach_min=tr.inputs.v("UTE-02") - chk["JK-01"]["margin"],
+        # the least tow ball download the truck's label may give with the axle where it is: the heaviest towball with
+        # growth plus what H17 keeps in hand under the truck's limit (VEH-08)
+        towball_label_min=max(c["growth"]["towball_kg"] for c in ev["cases"])
+        + tr.tv["limits"]["towball_rating_kg"] - tr.aw["towball_max_kg"],
         cf_min=tr.inputs.v("SUP-04") - chk["FIT-05"]["tyre"]["members_margin"],
         # the fully loaded weighing (TW-04, TW-05) and the tare centre of gravity height (TR-01), without growth
         model_TC2=cases["TC2"]["nominal"]["mass_kg"], axle_TC2=cases["TC2"]["nominal"]["axle_kg"],
