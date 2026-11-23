@@ -83,7 +83,9 @@ def test_every_frame_cell_is_inside_its_frame_and_clear_of_the_others():
             n = c[3] if len(c) > 3 else 1   # a pair's two cores in two modules side by side
             hx, hy = R.cell_half(c)
             assert rid in by and g["id"] in (by[rid].get("glands") or []), (g["id"], rid)
-            assert abs(dx) + hx <= g["w"] / 2 + 1e-6 and abs(dy) + hy <= g["h"] / 2 + 1e-6, (g["id"], rid)
+            # inside the packing, or one of its two parts either side of a wedge set inside the stack (I2-33)
+            assert any(px0 - 1e-6 <= dx - hx and dx + hx <= px1 + 1e-6 and py0 - 1e-6 <= dy - hy and dy + hy <= py1 + 1e-6
+                       for px0, py0, px1, py1 in R.frame_packing(dict(g, p=(0.0, 0.0)))), (g["id"], rid)
             assert n == (2 if by[rid]["kind"] == "pair" else 1), (g["id"], rid, "a pair takes a module for each core")
             core = by[rid]["od"] / n
             lo, hi = ranges[m]
@@ -152,8 +154,10 @@ def test_every_gland_has_a_fitting_with_room_round_it():
         f = R.fitting(g, fits)
         assert f["inner"] and f["outer"], g["id"]
         if g.get("cells"):
+            x0, y0, x1, y1 = R.frame_room(dict(g, p=(0.0, 0.0)))   # the packing and the C wedge's room (I2-33)
             assert f["kind"] == "frame" and not f["turned"], g["id"]
-            assert f["inner"]["hx"] == pytest.approx(g["w"] / 2 + fits["frame_rim_mm"]), g["id"]
+            assert f["inner"]["hx"] == pytest.approx((x1 - x0) / 2 + fits["frame_rim_mm"]), g["id"]
+            assert f["inner"]["hy"] == pytest.approx((y1 - y0) / 2 + fits["frame_rim_mm"]), g["id"]
     e = EVAL["glands"]
     assert e["ok"], e["problems"][:5]
     assert e["closest"] and all(c["gap"] >= c["need"] - 0.05 for c in e["closest"])

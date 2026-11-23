@@ -767,15 +767,57 @@ def bearer_strips(res: dict) -> list[dict]:
 def frame_room(g: dict) -> tuple:
     """A transit frame's room inside its walls, (x0, y0, x1, y1): its packing space (`w` along X, `h` along Y about
     the gland's point) and, where it names its `stack`, the C wedge's 34 mm and 5 mm of slack past the packing at the
-    stack's `wedge_end` (I2-33)."""
+    stack's `wedge_end` (I2-33). A frame whose wedge sits inside the stack (`wedge_at`) has the same room, the
+    wedge's slot taken out of the packing there."""
     x, y = g["p"][0], g["p"][1]
     x0, y0, x1, y1 = x - g["w"] / 2, y - g["h"] / 2, x + g["w"] / 2, y + g["h"] / 2
     add = WEDGE_STACK + WEDGE_SLACK if g.get("stack") else 0.0
+    end = "+" if g.get("wedge_at") is not None else g.get("wedge_end", "+")
     if g.get("stack") == "x":
-        x0, x1 = (x0 - add, x1) if g.get("wedge_end", "+") == "-" else (x0, x1 + add)
+        x0, x1 = (x0 - add, x1) if end == "-" else (x0, x1 + add)
     elif g.get("stack") == "y":
-        y0, y1 = (y0 - add, y1) if g.get("wedge_end", "+") == "-" else (y0, y1 + add)
+        y0, y1 = (y0 - add, y1) if end == "-" else (y0, y1 + add)
     return x0, y0, x1, y1
+
+
+def frame_wedge(g: dict) -> tuple | None:
+    """The C wedge's footprint in plan, (x0, y0, x1, y1): 34 mm along the stack and the packing's width across it, at
+    the stack's `wedge_end` past 5 mm of slack, or `wedge_at` mm along the stack from the packing's start with the slack
+    ahead of it (Roxtec 124037: the wedge may sit anywhere in the frame)."""
+    if not g.get("stack"):
+        return None
+    rx0, ry0, rx1, ry1 = frame_room(g)
+    along = g["stack"] == "x"
+    s0, s1 = (rx0, rx1) if along else (ry0, ry1)
+    if g.get("wedge_at") is not None:
+        a = s0 + float(g["wedge_at"]) + WEDGE_SLACK
+    elif g.get("wedge_end", "+") == "+":
+        a = s1 - WEDGE_STACK
+    else:
+        a = s0
+    return (a, ry0, a + WEDGE_STACK, ry1) if along else (rx0, a, rx1, a + WEDGE_STACK)
+
+
+def frame_packing(g: dict) -> list[tuple]:
+    """The packing space in plan, one rectangle or the two either side of a wedge inside the stack (`wedge_at`)."""
+    rx0, ry0, rx1, ry1 = frame_room(g)
+    if not g.get("stack"):
+        return [(rx0, ry0, rx1, ry1)]
+    along = g["stack"] == "x"
+    s0, s1 = (rx0, rx1) if along else (ry0, ry1)
+    if g.get("wedge_at") is not None:
+        cuts = [(s0, s0 + float(g["wedge_at"])), (s0 + float(g["wedge_at"]) + WEDGE_STACK + WEDGE_SLACK, s1)]
+    elif g.get("wedge_end", "+") == "+":
+        cuts = [(s0, s1 - WEDGE_STACK - WEDGE_SLACK)]
+    else:
+        cuts = [(s0 + WEDGE_STACK + WEDGE_SLACK, s1)]
+    return [(a, ry0, b, ry1) if along else (rx0, a, rx1, b) for a, b in cuts]
+
+
+def _frame_column(g: dict, z0: float, z1: float) -> tuple:
+    """A frame's room in plan between two heights, where its modules lie: the packing and its wedge's room."""
+    x0, y0, x1, y1 = frame_room(g)
+    return (x0, y0, z0, x1, y1, z1)
 
 
 def frame_solids(res: dict) -> list[dict]:
@@ -793,15 +835,8 @@ def frame_solids(res: dict) -> list[dict]:
         z0, z1 = (V["floor_underside_z"], V["floor_underside_z"] + FRAME_DEPTH) if g.get("side") == "above" else (V["floor_z"] - FRAME_DEPTH, V["floor_z"])
         out.append(dict(gland=gid, part="body", box=(x0 - wall, y0 - wall, z0, x1 + wall, y1 + wall, z1)))
         out.append(dict(gland=gid, part="rim", box=(x0 - wall - rim, y0 - wall - rim, V["floor_z"], x1 + wall + rim, y1 + wall + rim, V["floor_z"] + 3)))
-        if g.get("stack"):
-            px0, py0, px1, py1 = g["p"][0] - g["w"] / 2, g["p"][1] - g["h"] / 2, g["p"][0] + g["w"] / 2, g["p"][1] + g["h"] / 2
-            far = g.get("wedge_end", "+") == "+"
-            if g["stack"] == "x":
-                a = px1 + WEDGE_SLACK if far else px0 - WEDGE_SLACK - WEDGE_STACK
-                wb = (a, py0, a + WEDGE_STACK, py1)
-            else:
-                a = py1 + WEDGE_SLACK if far else py0 - WEDGE_SLACK - WEDGE_STACK
-                wb = (px0, a, px1, a + WEDGE_STACK)
+        wb = frame_wedge(g)
+        if wb:
             out.append(dict(gland=gid, part="C wedge", box=(wb[0], wb[1], z0, wb[2], wb[3], z0 + WEDGE_DEPTH)))
     return out
 
@@ -1185,8 +1220,7 @@ def heat(res: dict) -> dict:
     ns = res["ns"]
     runs = {r["id"]: r for r in res["runs"]}
     floor_z = res["V"]["floor_z"]
-    frames = {g: (v["p"][0] - v["w"] / 2, v["p"][1] - v["h"] / 2, floor_z - FRAME_DEPTH, v["p"][0] + v["w"] / 2, v["p"][1] + v["h"] / 2, floor_z)
-              for g, v in res["glands"].items() if v.get("cells")}
+    frames = {g: _frame_column(v, floor_z - FRAME_DEPTH, floor_z) for g, v in res["glands"].items() if v.get("cells")}
     problems, rows = [], []
     for hid in rule["lines"]:
         h = runs[hid]
@@ -1440,8 +1474,7 @@ def spacing(res: dict) -> dict:
     planes = (floor[1], floor[0], floor[0] - FRAME_DEPTH)
     segs = {r["id"]: [(p, q, _aabb((p, q), r["od"] / 2)) for p, q in _segs(_split_z(r["dense"], planes))] for r in runs}
     hull = {r["id"]: _aabb(r["dense"], r["od"] / 2) for r in runs}
-    frames = {g: (v["p"][0] - v["w"] / 2, v["p"][1] - v["h"] / 2, floor[0] - FRAME_DEPTH, v["p"][0] + v["w"] / 2, v["p"][1] + v["h"] / 2, floor[0])
-              for g, v in res["glands"].items() if v.get("cells")}
+    frames = {g: _frame_column(v, floor[0] - FRAME_DEPTH, floor[0]) for g, v in res["glands"].items() if v.get("cells")}
     reach = max([sp["gap_mm"], sp["over_mm"]] + [v for d in sp["wet"].values() for v in (d or {}).values()])
     duct = [boxes[sp["duct"]]] if sp.get("duct") in boxes else []
     problems, rows, n_pairs, overlaps = [], [], 0, 0
@@ -1756,8 +1789,7 @@ def ratings(res: dict) -> dict:
                cores=[b["box"] for b in blocks if b.get("box") and b["id"] in PANELS[1:]],
                floor=next((b["box"] for b in blocks if b.get("box") and b["id"] == PANELS[0]), None),
                board=ns[board].box if board in ns else None, battery=ns["EL_02"].box if "EL_02" in ns else None,
-               frames=[(g["p"][0] - g["w"] / 2, g["p"][1] - g["h"] / 2, -1e9, g["p"][0] + g["w"] / 2, g["p"][1] + g["h"] / 2, 1e9)
-                       for g in res["glands"].values() if g.get("cells")],
+               frames=[_frame_column(g, -1e9, 1e9) for g in res["glands"].values() if g.get("cells")],
                conduit=[tuple(_eval(v, ns) for v in z["box"]) for z in res["data"]["rules"].get("conduit", [])],
                inside={r["id"]: [bx for m in _ids(r, "inside") for bx in by_id.get(m, [])] for r in res["runs"]})
     circuits = {c["id"] for c in res["svc"]["electrical"]["circuits"]}

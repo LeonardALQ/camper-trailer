@@ -42,13 +42,13 @@ rules:
     - {what: "The same conduit down the chase behind the washer", box: [4425, -half_in, floor_z, 4520, -1115, KAZ + 95]}
     - {what: "The same conduit along the chase's foot to the end slot", box: [4425, -half_in, floor_z, rear_x0, -1115, floor_z + 120]}
     - {what: "Its turn from the chase's foot into the end slot", box: [EL_02.x1, -half_in, floor_z, rear_x0, EL_02.y0, floor_z + 120]}
-    - {what: "The 230 V's conduit up from the road frame under the MultiPlus-II, to it and into the bench, its elbow into the bench's conduit, clear of D-07", box: [5129, 500, floor_z, 5160, 620, EL_04.z0]}
+    - {what: "The 230 V's conduit up from the road frame under the MultiPlus-II, to it and into the bench, its elbow into the bench's conduit, clear of D-07", box: [G15_A_02.x0, 500, floor_z, G15_C1.x1, 620, EL_04.z0]}
     - {what: "The bench's 230 V conduit from the road frame along its back, under the sink and the hob", box: [4030, 500, BKZ + 5, 5160, half_in, BKZ + 55]}
     # Under the floor every 230 V cable runs in one of these corrugated conduits, saddled to the floor's underside or the
     # chassis members it passes at 500 mm at most (I2-36, est.), and nowhere else, so SVC-12 holds it only inside them
     - {what: "The 230 V group's 40 mm conduit under the floor from G20 to G15 behind the rear tank, its kerb leg", under: true, box: [G20.cx + 35, G20.cy - 12, UFZ + 5, wet_x0 + 70, G20_A_01.cy - 4, floor_underside_z]}
-    - {what: "The 230 V group's 40 mm conduit, across the frame ahead of CM-06, over A-01's", under: true, box: [wet_x0 + 15, G20.cy - 12, UFZ + 5, wet_x0 + 70, G15.cy + 30, floor_underside_z]}
-    - {what: "The 230 V group's 40 mm conduit, its road leg up to G15", under: true, box: [G15.cx + 61, G15_A_01.cy + 8, UFZ + 5, wet_x0 + 70, G15.cy + 30, floor_underside_z]}
+    - {what: "The 230 V group's 40 mm conduit, across the frame ahead of CM-06, over A-01's", under: true, box: [wet_x0 + 15, G20.cy - 12, UFZ + 5, wet_x0 + 70, G15_C1.cy + 8, floor_underside_z]}
+    - {what: "The 230 V group's 40 mm conduit, its road leg up to G15", under: true, box: [G15_A_02.x0 - 3, G15_A_02.cy - 8, UFZ + 5, wet_x0 + 70, G15_C1.cy + 8, floor_underside_z]}
     - {what: "A-01's own 20 mm conduit under the floor from G20, its kerb leg", under: true, box: [G20_A_01.cx - 6, G20_A_01.cy - 4, UFZ - 4, wet_x0 + 39.5, G20_A_01.cy + 4, floor_underside_z]}
     - {what: "A-01's own 20 mm conduit across the frame, between the rear tank and the group's conduit, under it", under: true, box: [wet_x0 - 15, G20_A_01.cy - 4, UFZ - 4, wet_x0 + 39.5, G15_A_01.cy + 4, UFZ + 4]}
     - {what: "A-01's own 20 mm conduit, its road leg up to G15", under: true, box: [G15_A_01.cx - 6, G15_A_01.cy - 4, UFZ - 4, wet_x0 + 39.5, G15_A_01.cy + 4, floor_underside_z]}
@@ -624,7 +624,7 @@ fixtures:
   - {id: SP-SP, what: "A second angle across the sink cabinet under the pump's lead B-11, beside the pump (I2-36, est.)", line: BD-11, at: [LA_07B.cx + 135, (LA_11B.y0 + BKY) / 2, BDZ - 6 * 17 - 22], size: [25, BKY - LA_11B.y0 - 20, 25], obstacle: false, needs_run: false, support: true}
   - {id: SP-KB, what: "Standoff cable cleats on the road wall along the bench's back, under the 230 V conduit, holding the kitchen loom 75 mm off the wall from the tower to the partition (I2-36, est.)", line: BD-11, at: [(LA_11B.x0 + rear_x0) / 2, BKY - 6, (LA_06.z1 + BKZ) / 2], size: [1130, 52, 160], obstacle: false, needs_run: false, support: true}
   # ---------------------------------------------------------------- the water supply in the sink cabinet (WS-01)
-  - {id: WS-STR, what: "40-mesh strainer", line: WS-01, at: [G15_F_03.cx, LA_11B.y0 + 35, floor_z + 75], size: [80, 60, 60], obstacle: false, needs_run: false}
+  - {id: WS-STR, what: "40-mesh strainer", line: WS-01, at: [G15_F_03.cx + 22, LA_11B.y0 + 35, floor_z + 75], size: [80, 60, 60], obstacle: false, needs_run: false}
   - {id: WS-PMP, what: "Shurflo Trail King 7 pump", line: WS-01, at: [LA_07B.cx + 30, LA_11B.y0 + 135, floor_z + 75], size: [220, 120, 120], needs_run: false}
   - {id: WS-ACC, what: "Accumulator, 0.75 L", line: WS-01, at: [LA_07B.cx + 30, LA_11B.y0 + 315, floor_z + 85], size: [110, 110, 170]}
   - {id: WS-MAN, what: "Cold manifold on the cabinet's back", line: WS-01, at: [LA_07B.cx + 55, half_in - 55, floor_z + 65], size: [160, 40, 40], obstacle: false, needs_run: false}
@@ -799,7 +799,7 @@ runs:
      serves: [C4], glands: [G20, G15], along: [BD-01, BD-03, RS-K, CM-06, RS-R, WR-03],
      from: {line: BR-AC, at: [BR_AC.x0, BR_AC.cy + 10, BR_AC.cz]},
      path: [[LA_11E.x0 + 20, -1125, 2355], [4480, ., .], [., ., 1020], [G20_C4.cx, ., .], [., G20_C4.cy, .], [., ., UFZ + 9], [wet_x0 + 52.5, ., .], [., G15_C4.cy, .], [G15_C4.cx, ., .],
-            [., ., BKZ + 30], [., WR_09.y0 + 60, .]],
+            [., ., BKZ + 45], [., WR_09.y0 + 60, .]],
      to: {line: WR-09, at: [., ., WR_09.z0]}}
   - {id: C5, system: ac230, kind: tps, size: 2.5, amps: 7.8, volts: 230, ways: [AB], feeds: "Truma Combi D 6 E element, under the floor along the kerb raiser, under the fill hose and up G19", protection: "10 A RCBO, contactor S1",
      serves: [C5], glands: [G20, G19], along: [BD-01, BD-03, RS-K],
@@ -1025,7 +1025,7 @@ runs:
      serves: [tank balance], along: [CM-05], from: {line: UF-01, at: [UF_01.x1, 0, UFZ - 35]}, to: {line: UF-01R, at: [UF_01R.x0, ., .]}}
   - {id: F-03, system: fresh, kind: hose12, feeds: "Rear tank's outlet up the road frame through the strainer to the pump", protection: "40-mesh strainer",
      serves: [pump feed], glands: [G15], passes: [WS-STR], along: [BD-01, RL-R, RS-R], from: {line: UF-01R, at: [G15_F_03.cx, UF_01R.y1, UFZ - 90]},
-     path: [[., G15_F_03.cy, .], [., ., WS_STR.cz]], to: {line: WS-PMP, at: [., WS_PMP.y0, .]}}
+     path: [[., G15_F_03.cy, .], [., ., WS_STR.cz], [WS_STR.cx, ., .]], to: {line: WS-PMP, at: [., WS_PMP.y0, .]}}
   - {id: F-04, system: fresh, kind: hose12, feeds: "Pump to the accumulator", protection: "The pump's pressure switch",
      from: {line: WS-PMP, at: [WS_ACC.cx, WS_PMP.y1, WS_PMP.cz]}, to: {line: WS-ACC, at: [., WS_ACC.y0, .]}}
   - {id: F-05, system: fresh, kind: pex12, feeds: "Accumulator to the cold manifold", protection: "-",
@@ -1037,13 +1037,13 @@ runs:
      path: [[WS_CRZ.cx, ., .], [., ., WS_CRZ.cz], [., WS_UV.cy, .], [., ., WS_UV.z1 + 80], [SK_01.cx - 22, ., .], [., SK_01.cy, .]], to: {line: SK-01, at: [., ., SK_01.z0]}}
   - {id: F-08, system: fresh, kind: pex12, feeds: "Cold to the thermostatic mixing valve", protection: "-",
      from: {line: WS-MAN, at: [WS_MAN.x1 - 20, WS_MAN.y0, WS_MAN.cz]}, path: [[., WS_TMV.cy, .], [WS_TMV.cx, ., .]], to: {line: WS-TMV, at: [., ., WS_TMV.z0]}}
-  - {id: F-09, system: fresh, kind: pex12, feeds: "Cold to the Combi D 6 E, down the road frame, forward beside the road raiser and up G9", protection: "The Combi's safety and drain valve",
-     serves: ["water: Combi"], glands: [G15, G9], along: [BD-01, RL-R, RS-R], from: {line: WS-MAN, at: [WS_MAN.x0 + 15, WS_MAN.y0, WS_MAN.cz]},
-     path: [[., WS_MAN.y0 - 125, .], [., ., WS_PMP.z1 + 62], [G15_F_09.cx, ., .], [., G15_F_09.cy, .], [., ., 810], [G9_F_09.cx + 80, ., .], [G9_F_09.cx, G9_F_09.cy, .], [., ., floor_z + 115], [., LA_03.y0 + 60, .]],
+  - {id: F-09, system: fresh, kind: pex12, feeds: "Cold to the Combi D 6 E, over the pump to the bench's aisle-side strip, forward along it and the tower's beside the Combi, above the floor (I2-33)", protection: "The Combi's safety and drain valve",
+     serves: ["water: Combi"], along: [LA-11B, LA-11T], from: {line: WS-MAN, at: [WS_MAN.x0 + 15, WS_MAN.y0, WS_MAN.cz]},
+     path: [[., WS_MAN.y0 - 125, .], [., ., WS_PMP.z1 + 90], [LA_06.x1 + 28, ., .], [., LA_11B.y0 + 32, .], [., ., floor_z + 95], [LA_03.x0 - 17, ., .], [., LA_03.y0 + 60, .], [., ., floor_z + 115]],
      to: {line: LA-03, at: [LA_03.x0, ., .]}}
-  - {id: H-01, system: hot, kind: pex12, feeds: "Combi D 6 E's hot outlet down G9, back beside the road raiser and up the road frame to the mixing valve", protection: "The Combi's safety valve",
-     serves: ["water: Combi"], glands: [G9, G15], along: [BD-01, RL-R, RS-R], from: {line: LA-03, at: [LA_03.x0, LA_03.y0 + 105, floor_z + 195]},
-     path: [[G9_H_01.cx, ., .], [., G9_H_01.cy, .], [., ., 800], [G9_H_01.cx + 80, G15_H_01.cy, .], [G15_H_01.cx, ., .], [., ., WS_TMV.cz], [., WS_TMV.cy, .]],
+  - {id: H-01, system: hot, kind: pex12, feeds: "Combi D 6 E's hot outlet back along the tower's and the bench's aisle-side strip under the cold feed, above the floor, and up at the aisle's end to the mixing valve (I2-33)", protection: "The Combi's safety valve",
+     serves: ["water: Combi"], along: [LA-11T, LA-11B], from: {line: LA-03, at: [LA_03.x0, LA_03.y0 + 105, floor_z + 195]},
+     path: [[LA_03.x0 - 17, ., .], [., ., floor_z + 75], [., LA_11T.y0 + 32, .], [LA_K4.x1 + 2, ., .], [., ., WS_TMV.cz], [., WS_TMV.cy, .]],
      to: {line: WS-TMV, at: [WS_TMV.x0, ., .]}}
   - {id: H-02, system: hot, kind: pex12, feeds: "Tempered hot to the sink mixer", protection: "Thermostatic mixing valve at 50 C (AS/NZS 3500.4)", serves: ["water: sink"],
      from: {line: WS-TMV, at: [WS_TMV.cx, WS_TMV.cy, WS_TMV.z1]}, path: [[., ., LA_07B.z0 - 230], [SK_01.cx + 15, ., .], [., SK_01.cy, .]],

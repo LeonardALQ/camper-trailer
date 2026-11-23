@@ -37,7 +37,7 @@ they are threaded through (`inside`).
   ([MultiPlus-II 4k5/6k5 GX, section 8.4](https://www.victronenergy.com/media/pg/MultiPlus-II_4k5_6k5_GX/en/installation.html)).
   It is over the board's managed peak, 5,465 W on the all-electric cold day (report 20 section 4), 23.8 A, and its
   4 mm2 is rated 28.1 A under the floor at 45 C. In the bunched conduit it would need 10 mm2, 16.1 to 16.8 mm across
-  ([Prysmian's 2C+E PVC circular](https://australia.prysmian.com)), an RM 30 that G15 has no room for. 6 mm2 on a 32 A
+  ([Prysmian's 2C+E PVC circular](https://australia.prysmian.com)), an RM 30 in each frame in place of an RM 15. 6 mm2 on a 32 A
   breaker is 11.8 mm across, past an RM 15's 11 mm, and is rated 31 A where it crosses the floor.
 - Ratings, SVC-10 (I2-15 b): no run line names its installation method. Each stretch of a run takes a zone from where
   it lies, in this order: inside a chassis member it is threaded through, crossing a panel's foam core, under the floor,
@@ -121,8 +121,9 @@ they are threaded through (`inside`).
   D-07. So the wet room's kerb-half fittings (basin, flush, washer tap) are fed from a manifold in the shower's road
   corner (WT-MAN) across the wet room's ceiling over the inner door. The washer's and the dryer's pumped drains
   discharge into the basin. The basin, the shower well and the floor waste drop straight into the grey tank's top.
-- The road frame G15 sits at the bench's front edge (Y 505 to 590 with its rim), the only floor inboard of the road rail
-  there, clear of the aisle LA-K4 (SVC-09). The bench's plinth is notched over its rim (see section 7).
+- The road frame G15 stands in the corner between the aisle LA-K4's end and the partition, X 4,978 to 5,161 and Y 450
+  to 594 with its rim, clear of the aisle (SVC-09) and inboard of the road raiser. The bench's plinth is notched over
+  its front edge (see section 7).
 
 ## 5. Checks and their limits
 
@@ -151,10 +152,14 @@ rear tank, the road frame G15 under the MultiPlus-II and the Combi's frame G9 in
 space and the aisle. Roxtec's C wedge, which compresses the modules, fits packing spaces 60 and 120 mm wide only,
 takes 34 mm of the stack and is 84 mm deep, and Roxtec's S frames come with packing spaces 60 or 120 mm wide and 60,
 120, 180 or 240 mm long ([Roxtec C wedge](https://www.roxtec.com/de/produkte/systemkomponenten/dichtkomponenten/roxtec-keildichtung-und-keildichtungskit-c/),
-Roxtec's S frame tables, read 23 Nov 2026). G9 has the S 3x1's 60 x 120 mm with a C wedge 60, and G15's 180 x 60 mm
-is the S 5x1's. G15's wedge room and G20's 120 x 120 mm are open (TRAILER.md open point 11). Each frame is modelled
-at its real depth (cad/routes.py frame_solids): G9 and G20 stand 30 mm on the floor, G15 hangs 30 mm under it, and
-SVC-01 keeps every other run 20 mm from each body and wedge and no frame inside a part or a bearer strip (I2-33, I2-34). Each module is sized to its run (RM 15 for 3 to 11 mm, RM 20 for 4 to 14.5 mm, RM 30, RM 40 and
+Roxtec's S frame tables, read 23 Nov 2026). G9 has the S 3x1's 60 x 120 mm with a C wedge 60 at the packing's end,
+and G15 the S 4x1's 120 x 120 mm with a C wedge 120 inside its stack, behind the sink waste W-01 and the pump feed
+F-03 and ahead of D-07 and the six 230 V cables. Roxtec allows the wedge anywhere in the frame and asks for a
+stayplate on every finished row and two before the last ([installation instructions 124037 rev A](https://varaldur-prod.fra1.cdn.digitaloceanspaces.com/varaldur-prod/media/pim_files/11DF0BD2-D507-46A0-921F-78A5E1448020.pdf),
+read 23 Nov 2026). G20's 120 x 120 mm is open (TRAILER.md open point 11). Each frame is modelled at its real depth
+(cad/routes.py frame_solids) and stands 30 mm on the floor, and SVC-01 keeps every other run 20 mm from each body and
+wedge and no frame inside a part or a bearer strip (I2-33, I2-34). SVC-08, SVC-10 and SVC-11 take each frame's whole
+room, its wedge's included, so a module behind the wedge is inside the frame. Each module is sized to its run (RM 15 for 3 to 11 mm, RM 20 for 4 to 14.5 mm, RM 30, RM 40 and
 RM 60, Roxtec's product page) and the rest of each packing space is filled with solid modules. The frames are
 compressed from above, so nothing is turned under the floor, and stayplates part the 230 V rows from the rest. The
 modules seal round cable only, so every run through a frame or a gland is round. SVC-08 does not measure two runs
@@ -174,6 +179,7 @@ cables are 284 m and 47 kg, the pipes and hoses 50 m and 5.8 kg with 64 fittings
 - The routed 230 V TPS and cords (76 m) are longer than BD-11's 40 m, the PEX (35 m) longer than its 30 m, and its 47
   fittings more than 40. BD-11's price items are in `data/assemblies/trailer.yaml` and are to be raised with this
   model as their source. The wastes (2.9 m of DWV with 9 bends, 2.5 m of drain hose) are not priced yet.
-- The bench's plinth is notched over G15's rim, which stands about 4 mm proud of the floor (est.).
+- The bench's plinth is notched over G15's front edge, where the frame stands 30 mm proud of the floor and its C wedge
+  54 mm.
 - Moving the SVC checks into `data/checks.yaml` needs a `services` type in `cad/partsdb.py` and one branch in
   `Trailer.checks` that calls `cad/routes_model.check_rows`.
