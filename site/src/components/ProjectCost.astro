@@ -1,5 +1,5 @@
 ---
-// The whole project's cost on the home page: the truck, the car build, the bike box and the trailer, each with its
+// The whole project's cost on the home page: the truck, its upgrades, the bike box and the trailer, each with its
 // figure before contingency, its contingency, its total and its parts list. cad/sitedata.py (project_costs) writes
 // project.json from data/project.yaml and the parts lists, so the table follows the data. A part without prices
 // shows "pending" and the total leaves it out. The table has its own Total row, so it is a plain table with no sheet
@@ -18,8 +18,8 @@ const list = (a: string[]) => (a.length < 3 ? a.join(' and ') : `${a.slice(0, -1
 const closes = car.gap > 0 && car.closing.length
   ? `, and ${list(car.closing)} ${car.closing.length > 1 ? 'bring' : 'brings'} it to AUD ${aud(car.with_closing)} if ${car.closing.length > 1 ? 'each one\'s' : 'its'} condition holds` : '';
 const note = [
-  "The truck is Leonard's planning figure.",
-  `The car build is its build list with an allowance of ${car.allowance_pct.listing} % on listed prices and ${car.allowance_pct.estimate} % on estimates, AUD ${aud(Math.abs(car.gap))} ${car.gap > 0 ? 'over' : 'under'} Leonard's AUD ${aud(car.budget)} for it${closes}. Its purchase check list, AUD ${aud(car.check)} if every item failed, and its optional extras are not counted.`,
+  "The truck is a near-new listing with NSW duty (research report 31).",
+  `The truck's upgrades are their build list with an allowance of ${car.allowance_pct.listing} % on listed prices and ${car.allowance_pct.estimate} % on estimates, AUD ${aud(Math.abs(car.gap))} ${car.gap > 0 ? 'over' : 'under'} Leonard's AUD ${aud(car.budget)} for them${closes}. Their check list, AUD ${aud(car.check)} if every line were bought, and their optional extras are not counted.`,
   box ? `The bike box is every line of its parts list with ${box.contingency_pct} % contingency. Leonard builds it, so no labour is paid.` : '',
   trailer && tpct ? `The trailer is every line of its parts list with ${tpct.listing} % contingency on listed prices and ${tpct.estimate} % on rates and estimates. Leonard builds it, so no labour is hired.` : '',
   d.pending.length ? `The ${d.pending.join(' and ').toLowerCase()} has no prices yet.` : '',
