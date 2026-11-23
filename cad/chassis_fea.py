@@ -20,6 +20,7 @@ hold the frame at its suspension mounts, as the VSB1 14 test holds the body.
 """
 from __future__ import annotations
 
+import functools
 import math
 from dataclasses import dataclass
 
@@ -35,6 +36,10 @@ UNSPRUNG = {"RG-01", "RG-02", "RG-06"}
 ROOF = {"BD-02", "BD-08", "RF-01"}
 RAILS = {"BD-10", "RG-03", "RG-04", "RG-05"}   # hung from the rails: mud flaps, the TSC unit and the XT Air box under the floor
 CELL = 200.0
+ROOT_GUSSET, ROOT_END_PLATE = "CH-P03", "CH-P15"   # the drawbar root's gusset and the rail's end plate its heel is welded to
+ROOT_PLACES = {"root_splice": "DB-{side}A's mitre at X {x:.0f}", "root_heel_weld": "CH-P03's heel, DB-{side}",
+               "root_end_plate": "CH-P15 on RL-{side}"}
+NU = 0.3
 
 
 @dataclass
@@ -593,6 +598,9 @@ class Analysis:
                         else:
                             mems = [f"DB-{SIDES[s]}A" if x < V["body_x0"] else f"DB-{SIDES[s]}B"]
                         out.append((max(self.normal_at(res, m, x) for m in mems), f"DB-{SIDES[s]} at X {x:.0f}"))
+            elif k in ROOT_PLACES:
+                for s in (-1, 1):
+                    out.append((self.root_stresses(res, s)[k], ROOT_PLACES[k].format(side=SIDES[s], x=V["body_x0"])))
             else:
                 for m in groups[d["member"]]:
                     sig = self.member_end_stress(res, m.id)
@@ -622,6 +630,44 @@ class Analysis:
                             occasional_range_mpa=ds_o, damage=D, ok=ds <= cafl and D <= lc["miner_limit"],
                             hot_spot=bool(d.get("hot_spot"))))
         return out
+
+    def root_stresses(self, res, s: int) -> dict:
+        """The body front under the root gusset's heel (FAT-17 to FAT-19, I2-51), from the A-frame member's end actions
+        there, on the section of the member and the gusset's heel together, as the heel is welded to the rail's end plate:
+        the mitred splice at the member's far face, the heel's two fillets on their throat at the gusset's top, and the end
+        plate in bending under the heel's line load, simply supported on the rail's walls."""
+        ch, V = self.ch, self.ch.V
+        fit = {f["id"]: f for f in ch.data["fittings"]}
+        g, ep, rail = fit[ROOT_GUSSET], fit[ROOT_END_PLATE], ch.role_sec["rail"]
+        sp = self.fm.sec_props[f"DB-{SIDES[s]}A"]
+        act = self.end_actions_at(res, f"DB-{SIDES[s]}A", V["body_x0"])
+        n, my, mz = abs(act["N"]), abs(act["My"]), abs(act["Mz"])
+        tg, hg = g["t"], g["w"]
+        ag, yg = tg * hg, sp.d / 2 + hg / 2
+        area = sp.A + ag
+        e = ag * yg / area                                   # the joint section's centroid above the member's
+        i_s = sp.I_strong + sp.A * e ** 2 + tg * hg ** 3 / 12 + ag * (yg - e) ** 2
+        i_w = sp.I_weak + hg * tg ** 3 / 12
+
+        def at(y):
+            return n / area + my * y / i_s
+        g_bot, g_top = at(sp.d / 2 - e), at(sp.d / 2 + hg - e)
+        throat = g["heel_leg"] / math.sqrt(2)
+        m = end_plate_moment(rail.b - rail.t, rail.d - rail.t, 0.0, hg - rail.t / 2, g_bot * tg, g_top * tg, tg + 2 * g["heel_leg"])
+        return dict(root_splice=at(sp.d / 2 + e) + mz * (sp.b / 2) / i_w, root_heel_weld=g_top * tg / (2 * throat),
+                    root_end_plate=6 * m / ep["t"] ** 2)
+
+    def end_actions_at(self, res, member: str, x: float) -> dict:
+        """A member's end actions at its element end nearest X."""
+        best, bd = None, math.inf
+        for el, fl in zip(self.f.elements, res.forces):
+            if el.member != member:
+                continue
+            for nd, act in zip((el.i, el.j), end_actions(fl)):
+                d = abs(self.f.nodes[nd][0] - x)
+                if d < bd:
+                    best, bd = act, d
+        return best
 
     # ------------------------------------------------------------------ holes in the members (CHS-09, CHS-10)
     def hole_sites(self) -> list[dict]:
@@ -906,6 +952,36 @@ def _dir(F) -> str:
 def _box_gap(a, b) -> float:
     """The clear distance between two boxes (x0, y0, z0, x1, y1, z1), 0 where they meet or overlap."""
     return math.sqrt(sum(max(0.0, b[k] - a[k + 3], a[k] - b[k + 3]) ** 2 for k in range(3)))
+
+
+@functools.lru_cache(maxsize=4)
+def _plate_lu(nx: int, nz: int, h: float):
+    """The factorised five-point Laplacian of an nx x nz grid of interior points h apart, zero on the edges."""
+    import scipy.sparse as sp
+    from scipy.sparse.linalg import splu
+    lx = sp.diags([1.0, -2.0, 1.0], [-1, 0, 1], shape=(nx, nx)) / h ** 2
+    lz = sp.diags([1.0, -2.0, 1.0], [-1, 0, 1], shape=(nz, nz)) / h ** 2
+    return splu((sp.kron(sp.identity(nz), lx) + sp.kron(lz, sp.identity(nx))).tocsc())
+
+
+def end_plate_moment(span: float, height: float, z0: float, z1: float, q0: float, q1: float, foot: float, h: float = 1.0) -> float:
+    """Largest bending moment across a plate simply supported on its four edges, `span` mm between its long edges and
+    `height` mm between its short ones, under a line load down its middle from z0 to z1 mm above its lower edge, rising
+    from q0 to q1 N/mm and spread over `foot` mm across. A Kirchhoff plate, its equation split into two Poisson problems,
+    the moment sum and then the deflection, as simply supported edges allow, solved by finite differences on a grid h mm
+    apart (Timoshenko and Woinowsky-Krieger, Theory of plates and shells, 1959, chapter 5). N mm per mm."""
+    nx, nz = round(span / h) - 1, round(height / h) - 1
+    xs = (np.arange(nx) + 1) * h - span / 2
+    zs = (np.arange(nz) + 1) * h
+    cols = np.abs(xs) <= foot / 2 + 1e-9
+    q = np.where((zs >= z0) & (zs <= z1), q0 + (q1 - q0) * (zs - z0) / (z1 - z0), 0.0)
+    p = np.outer(q, cols) / (cols.sum() * h)
+    lu = _plate_lu(nx, nz, h)
+    msum = lu.solve(-p.ravel())
+    w = np.pad(lu.solve(-msum).reshape(nz, nx), 1)
+    wxx = (w[1:-1, 2:] - 2 * w[1:-1, 1:-1] + w[1:-1, :-2]) / h ** 2
+    wzz = (w[2:, 1:-1] - 2 * w[1:-1, 1:-1] + w[:-2, 1:-1]) / h ** 2
+    return float(np.max(np.abs(wxx + NU * wzz)))
 
 
 def _miner(fat: float, ds_o: float, lc: dict) -> float:

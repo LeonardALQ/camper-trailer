@@ -5,7 +5,9 @@
 # cad/chassis_fea.py analyses them. Sections come from data/chassis/sections.yaml (report 11's table).
 id: ASM-CH
 name: Chassis and drawbar
-revision: E     # E, 23 Nov 2026: the chains held at their lugs by grade 100 connecting links (I2-46), the drawbar members
+revision: F     # F, 23 Nov 2026: FAT-07 at IIW 522, the rails' end plates CH-P15 under the root gusset's 8 mm heel fillets, and
+                # the body front's splice, heel and end plate in FAT-17 to FAT-19 (I2-51).
+                # E, 23 Nov 2026: the chains held at their lugs by grade 100 connecting links (I2-46), the drawbar members
                 # RHS 150 x 50 x 6 and FAT-07 read at the root gusset's toe (I2-47).
                 # D, 23 Nov 2026: every case at the 4,000 kg plate (H2 as amended), the DO45 coupling and its plate, grade T chains.
                 # C, 21 Nov 2026: the home trailer. RHS 127 x 51 x 3.5 C350L0 raisers, outriggers and floor crossmembers (report 22),
@@ -47,8 +49,8 @@ params:
   jockey_x: 1000                              # jockey wheel clamp on the kerb-side member. In travel the jockey swings up to lie along
                                               # the drawbar, wheel forward, below the bike box's underside (JK-01, JK-02, DIM-04)
   front_recovery_x: body_x0 + 330             # front recovery lugs, outside the 300 mm root zone
-  root_gusset_toe_x: body_x0 - 270            # the root gusset's toe, where its ground 160 mm radius meets the drawbar member's top
-                                              # face (FAT-07, IIW 526), 80 mm behind the drawbar box. Its heel is on the rail's end
+  root_gusset_toe_x: body_x0 - 270            # the root gusset's toe, where its ground 160 mm radius comes down to the drawbar member's
+                                              # top face (FAT-07, IIW 522), 80 mm behind the drawbar box. Its heel is on the rail's end
   steady_front_x: db_end_x + 180              # front corner steadies' brackets under the rails behind the drawbar overlap (I2-22),
                                               # 143 mm clear of its sniped end (FAT-08), in report 11's X 2,900 to 3,100
   steady_rear_x: 6070
@@ -110,8 +112,17 @@ fittings:
      at: [plate_x - 40, 0, rail_underside_z - db_depth], fat: null}
   - {id: CH-P02, plane: xz, name: "Chain lug, 10 mm plate on the drawbar member's outer side face, 14 mm hole for the chain's connecting link", kind: plate, l: 120, w: 100, t: 10, qty: 2,
      at: [chain_lug_x, 0, db_z - 60], side_y: "db_apex_y + (rail_c - db_apex_y) * (chain_lug_x - db_apex_x) / (body_x0 - db_apex_x) + rail_w / 2 + 5"}
-  - {id: CH-P03, plane: xz, name: "Drawbar root gusset, profiled with a ground 160 mm radius (FAT 90, IIW 526), its toe 270 mm ahead of the body front and its heel over the mitre on the rail's end", kind: plate, l: 300, w: 140, t: 10, qty: 2, area_factor: 0.6,
-     at: [root_gusset_toe_x + 150, 0, rail_underside_z - 30], side_y: rail_c}
+  # CH-P03 stands on the drawbar member's top face, IIW 522 (FAT 90): its free edge a radius r over 150 mm down to an end
+  # end_h high, at most twice its thickness and 25 mm, its fillets wrapped round that end and the toe ground there. It runs
+  # l from its toe to its heel, w high there, on the rail's end plate CH-P15 with heel_leg fillets both sides (FAT-18). Its
+  # area is the radius's 5,124 mm2 from 10 to 140 mm high over 103.1 mm and 150.9 mm at the full 140 mm, 26,255 mm2, 0.738
+  # of l x w. Its box still stands where earlier revisions put it, on the rail's line and 100 mm low, because the services'
+  # runs at the drawbar root are clipped to that box. It moves onto the A-frame member's top face with those runs
+  - {id: CH-P03, plane: xz, name: "Drawbar root gusset, profiled with a ground 160 mm radius down to an end 10 mm high (FAT 90, IIW 522), its toe 270 mm ahead of the body front and its heel on the rail's end plate over the mitre", kind: plate, l: 254, w: 140, t: 10, qty: 2, area_factor: 0.738,
+     r: 160, end_h: 10, wrapped: true, toe_ground: true, heel_leg: 8,
+     at: [root_gusset_toe_x + 127, 0, rail_underside_z - 30], side_y: rail_c}
+  - {id: CH-P15, plane: yz, name: "Rail end plate, 16 mm, closing each rail's front end, fillet welded to the rail's webs and top flange, the root gusset's heel welded to it, a 10 mm vent low on its outer side", kind: plate, l: 50, w: 150, t: 16, qty: 2,
+     at: [body_x0 - 8, 0, rail_underside_z + 75], side_y: rail_c}
   - {id: CH-P04, plane: xz, name: "Front recovery lug, 20 mm plate on the drawbar member's outer side face, 22 mm hole", kind: plate, l: 200, w: 120, t: 20, qty: 2,
      at: [front_recovery_x, 0, db_z - 30], side_y: "rail_c + rail_w / 2 + 10"}
   - {id: CH-P05, plane: xz, name: "Rear recovery tongue, 20 mm plate through a slot in the rear crossmember, 22 mm hole", kind: plate, l: 260, w: 120, t: 20, qty: 2,
@@ -224,9 +235,9 @@ fatigue_details:
   - {id: FAT-04, name: "Outrigger to raiser, toe in the outrigger", iiw: "413", fat: 63, stress: member_end, member: outrigger, hot_spot: true}
   - {id: FAT-05, name: "Outrigger to raiser, weld root (6 mm fillets)", iiw: "414", fat: 36, stress: weld_root, member: outrigger, hot_spot: true}
   - {id: FAT-06, name: "Rail to raiser, continuous manual fillets along the seam", iiw: "323", fat: 90, stress: rail_level, z: rail_top_z, where: all}
-  # FAT-07: IIW 526's nominal stress is the member's own where the gusset's radius meets it, at the toe. Behind the toe
-  # the gusset deepens the section, so the mitred butt weld at the body front, at the gusset's heel, sees less
-  - {id: FAT-07, name: "Drawbar root gusset's toe with its ground radius", iiw: "526", fat: 90, stress: member_at, x: [root_gusset_toe_x]}
+  # FAT-07: IIW 522, a longitudinal gusset on the member's top face with a radius transition, reads the member's own nominal
+  # stress at the gusset's end, its toe. Behind the toe the gusset deepens the section
+  - {id: FAT-07, name: "Drawbar root gusset's toe, radius ground, weld round its end", iiw: "522", fat: 90, stress: member_at, x: [root_gusset_toe_x]}
   - {id: FAT-08, name: "End of the drawbar overlap under the rail, sniped taper, toe ground", iiw: "712", fat: 56, stress: rail_extreme, where: [db_end_x]}
   - {id: FAT-09, name: "Cross brace to drawbar member, toe in the brace", iiw: "413", fat: 63, stress: member_end, member: brace, hot_spot: true}
   - {id: FAT-10, name: "Chain lug on the drawbar member (pad, L 120 mm)", iiw: "513", fat: 71, stress: member_at, x: [chain_lug_x]}
@@ -236,6 +247,14 @@ fatigue_details:
   - {id: FAT-14, name: "Rear recovery tongue, longitudinal welds to the rail web (L 260 mm)", iiw: "513", fat: 63, stress: rail_extreme, where: [rear_tongue_x]}
   - {id: FAT-15, name: "Front recovery lug on the drawbar member (L 200 mm)", iiw: "513", fat: 63, stress: member_at, x: [front_recovery_x]}
   - {id: FAT-16, name: "Corner steady's chassis mount bracket under the rail, longitudinal fillets along the rail's bottom corners only (L 72.5 mm at the front pair, 117 mm at the rear)", iiw: "513", fat: 71, stress: rail_extreme, where: steady_x}
+  # The body front, where the drawbar's moment is largest (I2-51), from the A-frame member's end actions there on the
+  # section of the member and the gusset's heel (cad/chassis_fea.py root_stresses). FAT-17: the mitred butt splice, IIW
+  # 234, an RHS splice welded from one side, FAT 36 as its root is not inspected (FAT 56 would need NDT of the root).
+  # FAT-18: the heel's fillets to the rail's end plate, IIW 414, on their throat at the gusset's top. FAT-19: the end
+  # plate in bending under the heel, at the toe of the heel's fillets, IIW 413, simply supported on the rail's walls
+  - {id: FAT-17, name: "Drawbar mitred butt splice at the body front, one side, no NDT", iiw: "234", fat: 36, stress: root_splice}
+  - {id: FAT-18, name: "Root gusset's heel to the rail's end plate, 8 mm fillets, root", iiw: "414", fat: 36, stress: root_heel_weld}
+  - {id: FAT-19, name: "Rail's end plate in bending under the gusset's heel, weld toe", iiw: "413", fat: 63, stress: root_end_plate, hot_spot: true}
 
 # Holes the runs make in the chassis members (data/services.yaml `holes`, the services' list, read here only). A hole is
 # the run's diameter and a bush across, a slot along the member where the run passes on a slant. CHS-09 checks the net
