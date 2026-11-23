@@ -128,10 +128,16 @@ they are threaded through (`inside`).
   corner (WT-MAN) across the wet room's ceiling over the inner door. The washer's and the dryer's pumped drains
   discharge into the basin. The basin, the shower well and the floor waste drop straight into the grey tank's top.
   The drip tray's drain W-09 joins the basin's waste below its trap, so it passes a Wavin HepvO 32 mm waterless trap
-  valve standing upright on the partition's wet face right behind the tray's outlet, with a reducer to the 25 mm hose
-  at each end. Its membrane seals with no water to dry out, and Wavin asks for it as close to the appliance as
-  practicable ([HepvO in recreational vehicles](https://mediahub.wavin.com/m/1684dc1cbc414752/original/Data-Sheet-HepvO-in-recreational-vehicles.pdf),
-  read 23 Nov 2026), so the grey tank's air stops there (I2-45).
+  valve. Its membrane seals with no water to dry out, and Wavin asks for it as close to the appliance as practicable
+  ([HepvO in recreational vehicles](https://mediahub.wavin.com/m/1684dc1cbc414752/original/Data-Sheet-HepvO-in-recreational-vehicles.pdf),
+  read 23 Nov 2026), so the grey tank's air stops there (I2-45). The valve BV1 is 181 mm long and 64 mm across its
+  inlet nut, and with its 87.5 degree knuckle adaptor BV11 it reaches 217 mm from the knuckle's inlet axis (Wavin
+  Osma's HepvO product and installation guide), about 275 mm with a 32 mm bend and a hose tail at its outlet (est.),
+  where W-09 could drop only 217 mm over the wet room's floor tray. So W-09 comes through the partition 70 mm in from
+  the tray's road side corner, clear of A-01, and the knuckle turns the valve along the wet face under the basin, its
+  axis 45 mm off the face, arrows underneath and falling at the knuckle's 2.5 degrees, as Wavin allows for a
+  horizontal valve. The bend turns the hose down beside the cassette bin, 37 mm clear of it, and it runs
+  back to the Y junction (I2-52).
 - The road frame G15 stands in the corner between the aisle LA-K4's end and the partition, X 4,978 to 5,161 and Y 450
   to 594 with its rim, clear of the aisle (SVC-09) and inboard of the road raiser. The bench's plinth is notched over
   its front edge (see section 7).

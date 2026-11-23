@@ -582,6 +582,8 @@ consts:
   FWX: in_x0 + 25                   # the bed zone's floor bulkhead along the front wall, under the desk
   FWZ: floor_z + 30
   WFX: wet_x0 + 20                  # the partition's wet face, in the wet room
+  TVX: wet_x0 + 45                  # the trap valve TV-09's axis, along the wet face, its 64 mm inlet nut 13 mm off it (I2-52)
+  TVY: EL_09.y1 - 70                # the tray's drain W-09 through the partition, 70 mm in from the tray's road side corner, clear of A-01
   BKY: half_in - 35                 # the bench's back lane, above the freezer and under the hob
   BKZ: LA_06.z1 + 160
   KKY: LA_11B.y0 + 30               # the bench's and the tower's kick lane, along their front panels
@@ -678,7 +680,12 @@ fixtures:
   - {id: BS-01, what: "Basin mixer (WR-08)", line: WR-08, at: [WR_08.cx, WR_08.y0 + 50, WR_08.z1 + 60], size: [60, 60, 100], serves: ["water: basin"]}
   - {id: BS-02, what: "Basin waste and its trap (WR-08)", line: WR-08, at: [WR_08.cx, -440, WR_08.z0 - 120], size: [90, 90, 200], needs_run: false}
   - {id: WJ-01, what: "A 40 x 25 mm Y junction on the basin's waste W-04 below its trap, for the drip tray's drain W-09 (I2-35)", line: BD-11, at: [BS_02.cx, BS_02.cy, floor_z + 150], size: [100, 80, 100], obstacle: false, needs_run: false}
-  - {id: TV-09, what: "Waterless trap valve on the drip tray's drain W-09, a Wavin HepvO 32 mm standing upright on the partition's wet face right behind the tray's outlet, with a 32 to 25 mm reducer at each end, so the grey tank's air stops there (I2-45, est.)", line: EL-09, at: [wet_x0 + 25, EL_09.y1 - 70, EL_09.z0 - 95], size: [48, 48, 200], obstacle: false, needs_run: false}
+  # The HepvO lies along the wet face under the basin, arrows underneath, falling at its knuckle adaptor's 2.5 degrees:
+  # the knuckle (BV11, 69 mm across) on the hose tail where W-09 comes through the partition, then the valve (BV1, 181
+  # mm long, 64 mm across its inlet nut) and a 32 mm bend turning down to a 32 to 25 mm hose tail, the bend's centre
+  # 252 mm from the knuckle's inlet axis (Wavin's 217 mm and 35 mm, est.), so W-09 drops beside the cassette bin
+  # to WJ-01 (I2-52). The box runs from the knuckle's edge to the bend's and down its leg
+  - {id: TV-09, what: "Waterless trap valve on the drip tray's drain W-09, a Wavin HepvO 32 mm lying along the partition's wet face under the basin on its 87.5 degree knuckle adaptor, arrows underneath, a 32 mm bend and a hose tail at its outlet, so the grey tank's air stops there (I2-45, I2-52, est.)", line: EL-09, at: [TVX, TVY - 119.5, EL_09.z0 + 2.5], size: [64, 309, 102], needs_run: false}
   - {id: SH-01, what: "DauerShower head and rail on the partition's wet face", line: WR-09, at: [wet_x0 + 25, 860, floor_z + 1900], size: [50, 120, 120], serves: ["water: shower"]}
   - {id: SH-02, what: "Shower bypass mixer and hand shower (WR-08)", line: WR-08, at: [wet_x0 + 25, 1000, floor_z + 1150], size: [50, 120, 120], serves: ["water: shower bypass"]}
   - {id: SH-03, what: "Shower zone drain over the well", line: WR-01, at: [WR_10.cx, WR_10.cy, floor_z + 15], size: [110, 110, 30], needs_run: false}
@@ -1114,8 +1121,8 @@ runs:
      to: {line: VT-02, at: [VT_02.x0, ., .]}}
   - {id: W-08, system: waste, kind: drain16, feeds: "Split's condensate from the indoor unit's road end out through the road wall", protection: "The unit's trap", serves: [condensate],
      glands: [G27], from: {line: AC-DR, at: [AC_DR.cx, AC_DR.y1, AC_DR.cz]}, to: {line: AC-DO, at: [., AC_DO.y0, AC_DO.cz]}}
-  - {id: W-09, system: waste, kind: waste25, sleeve: true, feeds: "The drip tray's drain from its rear upstand, through the partition, down its wet face through the waterless trap valve TV-09 and into the Y junction on the basin's waste, so to the grey tank through G13 (I2-35, I2-45)", protection: "The tray's 30 mm upstand, and the valve TV-09 as its trap",
-     serves: [tray drain], passes: [WR-03, TV-09], along: [WR-03, LA-14F], from: {line: EL-09, at: [EL_09.x1, EL_09.y1 - 70, EL_09.z0 + 17.5]},
-     path: [[wet_x0 + 25, ., .], [., ., WJ_01.cz + 10], [WJ_01.x0, WJ_01.cy, .]], to: {line: WJ-01, at: [WJ_01.cx, ., WJ_01.cz]}}
+  - {id: W-09, system: waste, kind: waste25, sleeve: true, feeds: "The drip tray's drain from its rear upstand, through the partition, along its wet face under the basin through the waterless trap valve TV-09, down beside the cassette bin and back into the Y junction on the basin's waste, so to the grey tank through G13 (I2-35, I2-45, I2-52)", protection: "The tray's 30 mm upstand, and the valve TV-09 as its trap",
+     serves: [tray drain], passes: [WR-03, TV-09], along: [WR-03, LA-14F], from: {line: EL-09, at: [EL_09.x1, TVY, EL_09.z0 + 17.5]},
+     path: [[TVX, ., .], [., TVY - 252, EL_09.z0 + 6.5], [., ., WJ_01.cz + 10], [WJ_01.x0, WJ_01.cy, .]], to: {line: WJ-01, at: [WJ_01.cx, ., WJ_01.cz]}}
   - {id: R-01, system: refrigerant, kind: lineset, feeds: "Split line set from the indoor unit through the partition, over the shower and out G5 to the outdoor unit", protection: "Flared joints at the units",
      serves: [line set], glands: [G5], passes: [WR-03, AC-03], from: {line: AC-01, at: [AC_01.x1, 730, 2760]}, to: {line: AC-02, at: [AC_02.x0, ., .]}}
