@@ -48,6 +48,7 @@ drawings:
       - {rev: AD, date: 2026-11-23, description: "Notice: tare 2,678 kg and the axle at X 4,506.2 with G15's S 4x1 (I2-33)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AE, date: 2026-11-23, description: "Notice: 400 L, the tanks' net, the axle at X 4,487.2 (I2-40, I2-47)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AF, date: 2026-11-23, description: "Notice: tare 2,696 kg rounded half up, the axle at X 4,485.2 (I2-50, I2-56)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AG, date: 2026-11-23, description: "Notice: TC2 3,576 kg, the ute's rear axle 2,542 kg, GCM 7,748 kg (I2-50)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-002
     title: Mass and centre of gravity
     subtitle: Every load case with growth, the axle window of H17, the CoG in elevation and across
@@ -76,6 +77,7 @@ drawings:
       - {rev: P, date: 2026-11-23, description: "Notice: the masses with BD-25 at G15's S 4x1, TC2 3,576 kg with growth", drawn: Kiro, checked: "", approved: ""}
       - {rev: Q, date: 2026-11-23, description: "Notice: the masses at 400 L of water, TC2 3,571 kg with growth (I2-40)", drawn: Kiro, checked: "", approved: ""}
       - {rev: R, date: 2026-11-23, description: "Notice: the masses with the brake leads, TC2 3,575 kg with growth (I2-50)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: S, date: 2026-11-23, description: "Notice: the masses with the end plates and the leads' hook (I2-57, I2-58)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-003
     title: Compliance
     subtitle: VSB1 items and the standards with the design figures, operating limits and the plate
@@ -107,6 +109,7 @@ drawings:
       - {rev: S, date: 2026-11-23, description: "Notice: MAS-10 at 3,575.6 kg with BD-25 at G15's S 4x1 (I2-33)", drawn: Kiro, checked: "", approved: ""}
       - {rev: T, date: 2026-11-23, description: "Notice: the fresh tanks' 400 L net, MAS-10 at 3,571.2 kg (I2-40)", drawn: Kiro, checked: "", approved: ""}
       - {rev: U, date: 2026-11-23, description: "Notice: the axle at X 4,485.2, TC2 3,575 kg, the tanks 402.0 L net (I2-50)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: V, date: 2026-11-23, description: "Notice: the leads over their hook, TC2 3,576 kg, GCM 7,748 kg (I2-58)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-010
     title: Floor plan, bed up and bed down
     subtitle: Day and night plans, walkways, door swings, spaces kept clear and the bed positions
@@ -211,6 +214,7 @@ drawings:
       - {rev: T, date: 2026-11-23, description: "Notice: the stations at the axle X 4,487.2, the tanks 5 mm lower (I2-40)", drawn: Kiro, checked: "", approved: ""}
       - {rev: U, date: 2026-11-23, description: "Notice: rail end plates CH-P15, the stations at the axle X 4,484.9 (I2-51)", drawn: Kiro, checked: "", approved: ""}
       - {rev: V, date: 2026-11-23, description: "Notice: the root gussets on the A-frame members' top faces (I2-51)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: W, date: 2026-11-23, description: "Notice: the rail end plates over the raisers' bottom walls (I2-57)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
@@ -619,6 +623,7 @@ drawings:
       - {rev: T, date: 2026-11-23, description: "Notice: UC1 and UC4 with the ramp forward, in Ford's 800 kg row (I2-42)", drawn: Kiro, checked: "", approved: ""}
       - {rev: U, date: 2026-11-23, description: "Notice: the ute's cases with the trailer's 391.8 kg towball (I2-40)", drawn: Kiro, checked: "", approved: ""}
       - {rev: V, date: 2026-11-23, description: "Notice: the ute's cases with the trailer's 392.0 kg towball (I2-50)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: W, date: 2026-11-23, description: "Notice: the truck's TSC supply TW07, 4.0 kg, in the ute's cases (I2-50)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-702
     title: Ute garage box frame and panels
     subtitle: Kerb-side frame elevation, subframe plan on Ford's pads, section at the rear axle, member schedule
