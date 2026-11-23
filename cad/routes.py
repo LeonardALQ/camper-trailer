@@ -387,13 +387,14 @@ def _label(kind: dict, size) -> str:
     return kind["what"].format(size=f"{size:g}" if isinstance(size, (int, float)) else size)
 
 
-def size_dc(run: dict, length_m: float, kind: dict, limit_pct: float, least: float | None = None) -> tuple:
+def size_dc(run: dict, length_m: float, kind: dict, limit_pct: float, least: float | None = None, ahead_v: float = 0.0) -> tuple:
     """The smallest size of the run's kind whose drop at the design current over the routed length stays within the
     limit and whose rating carries the current, and at least `least`, the size SVC-10's rating where the run lies asks
-    for. A run that fixes its size keeps it, and the drop is reported."""
+    for. `ahead_v` is the drop of the runs ahead of it in its circuit (`follows`). A run that fixes its size keeps it,
+    and the drop is reported."""
     amps, volts = run["amps"], run["volts"]
     lim = limit_pct / 100 * volts
-    up = upstream_v(run)
+    up = upstream_v(run) + ahead_v
     order = sorted(s for s in kind["sizes"] if s is not None)
     fixed = float(run["size"]) if run.get("size") is not None else None
     for s in ([fixed] if fixed is not None else order):
@@ -424,6 +425,41 @@ def upstream_v(run: dict) -> float:
     of the ute feed), which SVC-06 adds to the run's own, so the limit holds from the source to the load."""
     u = run.get("upstream")
     return 0.0 if not u else float(u["mv"]) * run["amps"] * float(u["m"]) / 1000
+
+
+def arms_of(lay) -> dict:
+    """Each wheel's trailing arm at ride height (cad/chassis.py swept_parts at no travel): its pivot and hub in the side
+    view, its span across the trailer and its half depth, for the drum leads laid along the arms (I2-50)."""
+    ch = getattr(lay, "chassis", None) if lay is not None else None
+    if ch is None:
+        return {}
+    from .chassis import swept_parts
+    return {p["wheel"]: p for p in swept_parts(ch, lay.V["tyre_w"], 0.0) if p["part"] == "arm"}
+
+
+def arm_lead(arm: dict, start: tuple, od: float) -> list[tuple]:
+    """A drum lead's arm part at ride height (I2-50): from its clip on the hanger (`start`) in a loop down beside the
+    pivot's bush to the arm's underside, then along the underside at the slot's middle to the brake's backing plate,
+    45 mm short of the hub. FIT-05 sweeps it with the arm (cad/trailer.py tyre_arc)."""
+    (px, pz), (hx, hz) = arm["pivot"], arm["hub"]
+    y = (arm["y"][0] + arm["y"][1]) / 2
+    n = math.hypot(hx - px, hz - pz)
+    ux, uz = (hx - px) / n, (hz - pz) / n
+    off = arm["r"] + od / 2 + 1.0
+    under = lambda t: (px + t * ux + off * uz, y, pz + t * uz - off * ux)  # noqa: E731
+    return [tuple(start), under(0.0), under(n - 45.0)]
+
+
+def ahead_v(run: dict, done: dict, K: dict) -> float:
+    """The drop at the run's design current along the runs ahead of it in its circuit (`follows`, resolved before it):
+    the SB50's lead ahead of K-10, the TSC's harness and a drum lead's sprung part ahead of its arm part (I2-50)."""
+    v = 0.0
+    for i in run.get("follows") or []:
+        if i not in done:
+            raise ValueError(f"{run['id']} follows {i}, which data/routes.yaml must list before it")
+        d = done[i]
+        v += K[d["kind"]]["sizes"][d["size"]]["mv_am"] * run["amps"] * d["length_m"] / 1000
+    return v
 
 
 # ------------------------------------------------------------------ the layout's boxes and the glands
@@ -531,6 +567,7 @@ def resolve(lay=None, V: dict | None = None, blocks: list | None = None) -> dict
     svc = yaml.safe_load((DATA / "services.yaml").read_text(encoding="utf-8"))
     glands = gland_points(V, svc["glands"])
     ns = namespace(V, blocks, data, glands)
+    ns["_arms"] = arms_of(lay)
     K = kinds(data)
     fixtures = {f["id"]: dict(f, box=ns[key(f["id"])].box) for f in data.get("fixtures") or []}
     members = way_members(data)
@@ -539,7 +576,10 @@ def resolve(lay=None, V: dict | None = None, blocks: list | None = None) -> dict
     least = {}  # a sized run's least size from SVC-10, where its rating where it lies is under its current or its device
     for _ in range(16):
         bundles = {w: dict(way=v, n=len(members[w]), pitch=pitch[w]) for w, v in data["ways"].items() if isinstance(v, dict) and v.get("path")}
-        runs = [_resolve_run(r, ns, K, data["rules"], fixtures, pitch, bundles, bend.get(r["id"], 0.0), least.get(r["id"])) for r in data["runs"]]
+        done: dict = {}
+        for r in data["runs"]:
+            done[r["id"]] = _resolve_run(r, ns, K, data["rules"], fixtures, pitch, bundles, bend.get(r["id"], 0.0), least.get(r["id"]), done)
+        runs = list(done.values())
         own = {r["id"]: r["bend_r"] for r in runs}
         nest = {w: ids for w, ids in members.items() if isinstance(data["ways"][w], dict) and data["ways"][w].get("nest")}
         way_r = {w: max((own[i] for i in ids), default=0.0) for w, ids in nest.items()}
@@ -575,21 +615,28 @@ def _rating_sizes(res: dict, K: dict) -> dict:
 
 
 def _resolve_run(r: dict, ns: dict, K: dict, rule: dict, fixtures: dict, pitch: dict, bundles: dict, way_bend: float = 0.0,
-                 least: float | None = None) -> dict:
+                 least: float | None = None, done: dict | None = None) -> dict:
     """One run on the layout, with its lane offset in each way it shares. A run in a way bends at the way's largest
     radius (`way_bend`), or its own if larger, so the lanes' bends are concentric enough to keep their pitch. `least`
-    is the size SVC-10 asks for where the run lies."""
+    is the size SVC-10 asks for where the run lies, and `done` the runs resolved before it, for its `follows`. A lead
+    that hangs in a loop is priced, weighed and its drop taken at its cut length (`cut_m`), not its shape at rest."""
     kind = K[r["kind"]]
     for w, p in pitch.items():
         ns[f"L_{w}"] = lane_of(r, w) * p
     pts = _points(r, ns, bundles)
+    if r.get("rides") == "arm" and r.get("wheel") in ns.get("_arms", {}):
+        size0 = float(r["size"]) if r.get("size") is not None else max(s for s in kind["sizes"] if s is not None)
+        pts = arm_lead(ns["_arms"][r["wheel"]], pts[0], kind["sizes"][size0]["od"])
     if r["system"] == "waste" and not r.get("pumped"):
         pts = _apply_fall(pts, rule["fall"])
     raw = sum(math.dist(pts[i], pts[i + 1]) for i in range(len(pts) - 1)) / 1000
+    if r.get("cut_m"):
+        raw = float(r["cut_m"])
     row = dict(r, points=pts, kind_what=kind["what"], group=kind.get("group", r["system"]))
     conductor = any(v["mv_am"] is not None for v in kind["sizes"].values())
+    ahead = ahead_v(r, done or {}, K) if r.get("amps") is not None else 0.0
     if r.get("amps") is not None and r.get("volts") is not None and conductor:
-        size, vd, why = size_dc(r, raw, kind, rule["drop_pct"] if r["system"] != "ac230" else rule["drop_ac_pct"], least)
+        size, vd, why = size_dc(r, raw, kind, rule["drop_pct"] if r["system"] != "ac230" else rule["drop_ac_pct"], least, ahead)
     else:
         size = float(r["size"]) if r.get("size") is not None else next(iter(kind["sizes"]))
         vd, why = None, r.get("size_why")
@@ -600,9 +647,9 @@ def _resolve_run(r: dict, ns: dict, K: dict, rule: dict, fixtures: dict, pitch: 
         pts = smooth_jogs(pts, k["bend_r"])
         row["points"] = pts
     f = fillet(pts, max(k["bend_r"], way_bend), elbow_r=elbow_r, rigid=rigid)
-    length_m = f["length"] / 1000
+    length_m = float(r["cut_m"]) if r.get("cut_m") else f["length"] / 1000
     if vd is not None:
-        vd = k["mv_am"] * r["amps"] * length_m / 1000 + upstream_v(r)
+        vd = k["mv_am"] * r["amps"] * length_m / 1000 + upstream_v(r) + ahead
     cores = kind.get("cores", 1)
     row.update(size=size, cable=_label(kind, size), od=k["od"], bend_r=k["bend_r"], dense=f["dense"], corners=f["corners"],
                length_m=round(length_m, 2), mass_kg=round(k["kg_m"] * length_m, 3),
@@ -1154,7 +1201,8 @@ def supports(res: dict) -> dict:
         return -g if g < 0 and bx in carcasses else g
 
     held, pts = {}, {}
-    cables = [r for r in res["runs"] if r["system"] in ELECTRICAL]
+    # a lead that hangs between the vehicles (`rides: between`) is held at its two plugs, as a coupling lead is (I2-50)
+    cables = [r for r in res["runs"] if r["system"] in ELECTRICAL and r.get("rides") != "between"]
     for r in cables:
         rad = r["od"] / 2
         inside = [bx for m in _ids(r, "inside") for bx in by_id.get(m, [])]
@@ -1482,6 +1530,8 @@ def spacing(res: dict) -> dict:
         for b in runs[i + 1:]:
             if not _hit(_aabb([hull[a["id"]][:3], hull[a["id"]][3:]], reach), hull[b["id"]]):
                 continue
+            if a.get("joins") == b["id"] or b.get("joins") == a["id"]:
+                continue   # a drum lead's arm part and its sprung part are one cable, joined at its clip (I2-50)
             need = need_mm(a, b, rule, neighbours)
             # a hot line's or a waste's distance from the extra-low-voltage cables holds inside the trailer: under the
             # floor every run is open to the road's spray and a waste's drip falls to the road, so the gap holds there
