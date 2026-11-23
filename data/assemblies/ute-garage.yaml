@@ -1,4 +1,4 @@
-# Ute bike garage: the enclosed box on the LandCruiser 79 (UTE-GARAGE.md, research report 17).
+# Ute bike garage: the enclosed box on the Ford Ranger Super Duty single cab chassis (UTE-GARAGE.md, research report 17).
 # Module frame: origin on the floor top at the front wall's inner face, on the ute's centreline. X rearward towards
 # the barn doors, Y to the road side, Z up. mm. The axes are the ute frame's (DIM-U1), so the module only moves:
 # module X 0 sits at ute X module_x0 and Z 0 at the deck height deck_z (data/ute/ute.yaml reads both from here).
@@ -6,7 +6,7 @@
 # trailer's garage. Any number may be an expression over `params`.
 id: ASM-UG
 name: Ute bike garage
-revision: B
+revision: C
 
 params:
   # ---------------------------------------------------------------- placement on the ute (data/ute/ute.yaml)

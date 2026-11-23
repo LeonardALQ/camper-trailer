@@ -128,8 +128,9 @@ def rhs_plastic_modulus(b: float, d: float, t: float) -> float:
 
 def crossmember_check(prj, model, P) -> dict:
     """UGR-03: a steel crossmember under a track row carries a strap's breaking load at any of its anchors (report 24). The
-    crossmember spans between Toyota's two brackets at its station and runs on outboard of them to the walls. The
-    vertical part of the breaking load bends it: simply supported between the brackets, or as a cantilever outboard.
+    crossmember bears on the runners or the steel stubs over Ford's two pads at its station and runs on outboard of them
+    to the walls. The vertical part of the breaking load bends it: simply supported between the pads, or as a cantilever
+    outboard.
     The capacity is AS 4100's 0.9 fy Ze, with Ze the plastic modulus of the compact RHS laid flat."""
     worst = None
     yb = P.get("pad_y")                               # the crossmember bears on the runners or stubs over Ford's pads
@@ -147,7 +148,7 @@ def crossmember_check(prj, model, P) -> dict:
     u = worst["m"] / cap
     where = "outboard of" if worst["outboard"] else "between"
     return _row("UGR-03", "Steel crossmember carries a strap's breaking load at its worst anchor", "fail", "<= 1.00",
-                round(u, 3), round(1 - u, 3), u <= 1.0, f"{worst['strap']} anchor at Y {worst['y']:.0f}, {where} the brackets",
+                round(u, 3), round(1 - u, 3), u <= 1.0, f"{worst['strap']} anchor at Y {worst['y']:.0f}, {where} Ford's pads",
                 f"{f_kn:.1f} kN breaking load x {worst['cz']:.2f} vertical x {worst['lever']:.0f} mm = {worst['m']:.2f} kN m, against "
                 f"0.9 x {fy:.0f} MPa x {s_mm3:,.0f} mm3 = {cap:.2f} kN m for the RHS {b:g} x {h:g} x {t:g} laid flat. Supports at Y +/-{yb:.0f}, "
                 "over Ford's pads",
@@ -251,8 +252,8 @@ def mount_loads(lines: list[dict], P, limits: dict) -> dict:
         b = (Wz * (xc - xb) - Fx * h) / S
         return [a + b * (x - xb) for x in xs]
 
-    # Each case: station reactions R, horizontal loads, and the roll couple's vertical force per bracket (cornering,
-    # shared equally by the six stations, plus on the leeward side and minus on the windward side).
+    # Each case: station reactions R, horizontal loads, and the roll couple's vertical force per pad (cornering,
+    # shared equally by the four stations, plus on the leeward side and minus on the windward side).
     cases = {}
     fb = g * W
     cases["braking"] = dict(R=vertical(W, fb), shear_x=fb, shear_y=0.0, roll=0.0, sides=(("each", 0),))
@@ -262,7 +263,7 @@ def mount_loads(lines: list[dict], P, limits: dict) -> dict:
     cases["bump"] = dict(R=vertical((1 + g) * W, 0.0), shear_x=0.0, shear_y=0.0, roll=0.0, sides=(("each", 0),))
     cases["upward"] = dict(R=[-r for r in vertical((g - 1) * W, 0.0)], shear_x=0.0, shear_y=0.0, roll=0.0, sides=(("each", 0),))
     nt, vf = limits["bolt_tension_kn"], limits["bolt_shear_kn"]
-    firm_bolts = 2 * sum(b for b, f in zip(bolts, firm) if f)       # two brackets per station
+    firm_bolts = 2 * sum(b for b, f in zip(bolts, firm) if f)       # two pads per station
     rows, worst = [], None
     for cname, c in cases.items():
         V = math.hypot(c["shear_x"], c["shear_y"]) / firm_bolts          # per firm bolt

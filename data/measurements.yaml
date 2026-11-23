@@ -636,82 +636,82 @@ inputs:
   - id: BOX-01
     group: Bike box
     part: box
-    title: Rear frame rail top above the ground, laden, at the last deck mount
-    how: Ute with its GVM kit, tyres at road pressure, loaded to the trip mass (both bikes and the tools, or 650 kg of ballast over the rear axle) on level ground. Measure from the ground to the top of each rail at the last deck mount bracket and average the two.
+    title: Rear frame rail top above the ground, laden, at Ford's rearmost pads
+    how: Tyres at road pressure, the ute loaded to the trip mass (both bikes and the tools, or 650 kg of ballast over the rear axle) on level ground. Measure from the ground to the top of each rail at the rearmost pad and average the two.
     unit: mm
-    estimate: {v: 774, src: "UTE-GARAGE.md assumption 6: Toyota's 724 mm (BBGJ1007 pp. 55 and 62) plus about 50 mm of Lovells lift (estimate)"}
+    estimate: {v: 740, src: "Ford BEMM p. 128: 740 mm at GVM with the rear axle at its rating, the lowest the frame sits laden, which the model takes"}
     measured: {v: null, date: null}
     stage: build
-    affects: [floor height, tub height, ramp angle, UGD-01, UGW-01, UGL-01, JK-02]
-    range: {min: 760.5, max: 952, src: "Below 760.5 mm the floor drops 13.5 mm and the tubs pass 100 mm (UGD-01 measures 86.5 mm). Above 952 mm the empty sill passes 1,042 mm and the 3,048 mm ramp passes 20 degrees (report 03)"}
+    affects: [floor height, ramp angle, UGL-01, JK-02, coupling height]
+    range: {min: 700, max: 850, src: "Ford's 740 mm at the rear axle's rating to 850 mm at kerb (BEMM p. 128). Below 700 mm the rear springs are overloaded (est.)"}
     thresholds:
-      - {at: 760.5, rule: "Below this the wheel tubs stand more than 100 mm above the floor and the box goes to the flat deck at about 1,080 mm (report 17 section 6.4)", src: "UTE-GARAGE.md, UGD-01"}
+      - {rule: "The floor stands 111 mm over the rail top, so the sill and the ramp's angle follow the measured value (UGL-01)", src: "UTE-GARAGE.md section 4"}
   - id: BOX-02
     group: Bike box
     part: box
-    title: Rear wheel travel from laden ride height to the bump stop, compressed
-    how: Box off. Ute laden as BOX-01. Measure the gap from the bump stop to its striker on the axle, then add the bump stop's crush (its height less its fully compressed height, from the Lovells kit sheet or by test).
+    title: Rear tyre's top at full bump above the rail top
+    how: "Box off, at kerb. Measure the rail top and the rear tyre's top above the ground over the axle, and the gap from the bump stop to its striker plus the bump stop's crush. The tyre's top at full bump is the tyre's top plus that travel, less the rail top."
     unit: mm
-    estimate: {v: 110, src: "UTE-GARAGE.md assumption 7, report 17 section 3.3 (estimate)"}
+    estimate: {v: 148, src: "Ford's wheelhouse envelope (BEMM p. 122): the guard 195 mm over the tyre's top, taken at kerb, less its 30 mm clearance, with the 850 mm rail top at kerb (p. 128) and a 412 mm loaded radius (est.)"}
     measured: {v: null, date: null}
     stage: build
     affects: [tub height, UGD-01, UGW-01]
-    range: {min: null, max: 123.5, src: "Each extra mm raises the tub top 1 mm. 86.5 mm tubs reach the 100 mm limit at 123.5 mm of travel (UGD-01)"}
+    range: {min: null, max: 178, src: "The tub top stands 30 mm and its 3 mm plate over this, and the floor 111 mm over the rail top, so the tubs reach UGD-01's 100 mm at 178 mm (calculated)"}
     thresholds:
-      - {at: 123.5, rule: "Above this the tubs pass 100 mm above the floor: flat deck, or Leonard accepts taller tubs and UGC-02 runs again", src: "Report 17 section 3.3, UGD-01"}
+      - {at: 178, rule: "Above this the tubs pass 100 mm above the floor: taller mounts, or Leonard accepts taller tubs and UGC-02 runs again", src: "Report 17 section 6.4, UGD-01"}
   - id: BOX-03
     group: Bike box
     part: box
     title: Rear tyre static loaded radius, laden
     how: Ute laden as BOX-01, tyres at the placard pressure. Measure from the ground to the centre of each rear hub and average.
     unit: mm
-    estimate: {v: 380, src: "UTE-GARAGE.md assumption 5 (estimate, about 22 mm deflection on the 805 mm tyre)"}
+    estimate: {v: 393, src: "Estimate: the LT275/70R18's 421 mm radius less about 28 mm of deflection at 1,400 kg a tyre"}
     measured: {v: null, date: null}
     stage: build
-    affects: [tub height, UGD-01]
-    range: {min: 360, max: 393.5, src: "Each mm above 380 raises the tyre 1 mm against the fixed floor, so the tubs reach 100 mm at 393.5 mm. Below 360 mm the tyre is under-inflated or overloaded (est.)"}
+    affects: [the model's laden ride height, the coupling height]
+    range: {min: 370, max: 410, src: "Under-inflated or overloaded below 370 mm, unladen above 410 mm (est.)"}
     thresholds:
-      - {at: 393.5, rule: "The tubs pass 100 mm. Treat as BOX-02", src: "UGD-01"}
+      - {rule: "The model's wheel centre follows the measured value. The tubs follow BOX-02", src: "UTE-GARAGE.md section 4"}
   - id: BOX-04
     group: Bike box
     part: box
-    title: Deck mount bracket positions from the rear axle centre
-    how: Plumb lines from the rear hub centre and from each bracket's bolt hole, marked on the floor. Measure along the rail, minus ahead of the axle and plus behind it. Both rails.
+    title: Ford's body mounting pad positions from the rear axle centre
+    how: Plumb lines from the rear hub centre and from each pad's bolt hole, marked on the floor. Measure along the rail, minus ahead of the axle and plus behind it. Both sides. Note each pad's height over the rail top, and the faces of the rear parking sensors on Ford's Driver Assistance Technology bar from the axle and above the ground (UTE-GARAGE.md open point 12).
     unit: mm
-    estimate: {v: [-879, -490, 123, 490, 755, 1025], src: "Toyota BBGJ1007, report 17 section 1.4"}
+    estimate: {v: [-1205.5, -437.5, 453.5, 959.5], src: "Ford BEMM p. 125: four stations 768, 891 and 506 mm apart, taken centred on the 2,286 mm of frame behind the cab, the first 60.5 mm behind it (est.)"}
     measured: {v: null, date: null}
     stage: build
-    order: [station 1, station 2, station 3, station 4, station 5, station 6]
-    affects: [subframe drawing CT-702, track rows, strap geometry, UGR-01, UGM-01]
-    range: {min: [-904, -515, 98, 465, 730, 1000], max: [-854, -465, 148, 515, 780, 1050], src: "Each station within 25 mm of the estimate. The L-track rows sit on stations 1 and 6 and report 03 holds anchor X within 50 mm, so half of that is kept for build tolerance (est.)"}
+    order: [station 1, station 2, station 3, station 4]
+    affects: [subframe drawing CT-702, the rear track row, the steel stubs, UGR-01, UGR-04, UGM-01, the box's overhang past the parking sensors]
+    range: {min: [-1230.5, -462.5, 428.5, 934.5], max: [-1180.5, -412.5, 478.5, 984.5], src: "Each station within 25 mm of the estimate. The rear L-track row sits on station 4 and report 03 holds anchor X within 50 mm, so half of that is kept for build tolerance (est.)"}
     thresholds:
-      - {rule: "Any station more than 25 mm off: redraw the subframe and re-run UGR-01 with the new track rows", src: "Report 03 section 4"}
+      - {rule: "Any station more than 25 mm off: redraw the subframe, move the stubs and the rear track row and re-run UGR-01 and UGR-04", src: "Report 03 section 4"}
   - id: BOX-05
     group: Bike box
     part: box
-    title: Deck mount bracket hole diameter
-    how: Vernier on each bolt hole. Note the flange width from the rail's outer face to its edge as well (about 60 mm expected).
+    title: Ford's body mounting pad hole diameter
+    how: Vernier on each bolt hole. Note the pad's size as well.
     unit: mm
-    estimate: {v: 13, src: "UTE-GARAGE.md assumption 9: an M12 clearance hole in a flange about 60 mm out from the rail (estimate)"}
+    estimate: {v: 15, src: "An M14 clearance hole, Ford's recommended bolt (BEMM p. 124). Ford's figure on p. 125 labels 20, 26 and 20 mm round the hole (est. reading)"}
     measured: {v: null, date: null}
     stage: build
-    affects: [bolt size BX-F01, mount plates BX-U02, UGM-01]
-    range: {min: 12.5, max: 14.5, src: "A hole that takes an M12 bolt with normal to coarse clearance (est.)"}
+    affects: [bolt size BX-F01, mounts BX-U02 and BX-U03, UGM-01]
+    range: {min: 12.5, max: 21, src: "A hole that takes Ford's minimum M12 or its recommended M14, with the 50 x 5 mm washers over it (est.)"}
     thresholds:
-      - {rule: "A hole sized for M10 or M14 changes the bolt in BX-F01, and UGM-01 is run again with it", src: "UGM-01"}
+      - {rule: "A hole sized for M12 changes the bolt in BX-F01 to M12 10.9, Ford's minimum, and UGM-01 is run again with it", src: "UGM-01, BEMM p. 124"}
   - id: BOX-06
     group: Bike box
     part: box
-    title: Frame rail width over the outsides, at stations 1 and 6
-    how: Straight edges against the outer faces of both rails, measured square across.
+    title: Ford's pads across the truck, hole centre to hole centre
+    how: Straight edge and tape across the truck between each pair's bolt holes, at every station.
     unit: mm
-    estimate: {v: 1046, src: "UTE-GARAGE.md assumption 4 (estimate from the frame drawing)"}
+    estimate: {v: 1244, src: "Ford BEMM p. 125: 1,244 mm, 1,248 mm at the rearmost pair (est. reading of the figure)"}
     measured: {v: null, date: null}
     stage: build
-    affects: [runner positions, mount plates, UGW-02]
-    range: {min: 1036, max: 1056, src: "Plus or minus 10 mm (est.): the 75 mm runners still bear on the 60 mm rail tops, and the mount angles keep their 5 mm to the tub walls, which the tyres set (UGW-02)"}
+    affects: [runner positions, mounts, UGW-02, UGR-03]
+    range: {min: 1224, max: 1264, src: "Plus or minus 20 mm (est.): the 75 mm runners still cover the 50 mm mounts, and the tubs keep Ford's 30 mm to the tyres (UGW-02)"}
     thresholds:
-      - {rule: "Outside the range, move the runners to the measured rails, re-draw the mount angles and re-run UGW-02", src: "UGW-02"}
+      - {rule: "Outside the range, move the runners over the measured pads and re-run UGW-02 and UGR-03", src: "UGW-02, UGR-03"}
   # ================================================================ the built box, before it goes on
   - id: BOX-07
     group: Bike box
@@ -726,21 +726,22 @@ inputs:
     range: {min: 392, max: 440, src: "Max: UGB-01's 440 kg limit (report 17, data/ute/garage-checks.yaml). Min: 10 % under the list, below which a part is missing (est.)"}
     thresholds:
       - {at: 0.02, rule: "A difference over 2 % from the line sum is explained before the box is fitted", src: "Report 02 MASS-07"}
-      - {at: 440, rule: "UGB-01 asks for less than report 17's 440 kg. The list is 3.9 kg under it with the 1.6 mm roof (UTE-GARAGE.md). Over it, take mass out of the box before it goes on the ute", src: "data/ute/garage-checks.yaml via cad/ute_garage.py"}
+      - {at: 440, rule: "UGB-01 asks for less than report 17's 440 kg. The list is 1.8 kg under it with the 1.6 mm roof, the flares, the stubs and the mudflaps (UTE-GARAGE.md). Over it, take mass out of the box before it goes on the ute", src: "data/ute/garage-checks.yaml via cad/ute_garage.py"}
   - id: BOX-08
     group: Bike box
     part: box
     title: Box centre of gravity along the box and its height above the floor, empty
     how: "Along: from the four scale readings of BOX-07, the mass-weighted X of the front and rear pairs. Height: raise the front pair of mounts a known height (about 300 mm) on blocks, weigh again, and compute the height from the shift of load to the rear pair (tilt method)."
     unit: mm
-    estimate: {v: [1262, 487], src: "Model line sum, build/ute/ute.json: X 1,262 mm from the front wall's inner face (225 mm behind the rear axle), 487 mm above the floor top"}
+    estimate: {v: [1260, 483], src: "Model line sum, build/ute/ute.json: X 1,260 mm from the front wall's inner face (67 mm behind the rear axle), 483 mm above the floor top"}
     measured: {v: null, date: null}
     stage: weigh
     order: [X from the front wall, height above the floor]
-    affects: [ute axle loads, SSF, UGM-01]
-    range: {min: [1162, 387], max: [1362, 587], src: "Each value within 100 mm of the estimate. 100 mm along moves about 14 kg between the axles. The unladen 1,000 mm limit (Toyota) has about 1.4 m in hand (est.)"}
+    affects: [ute axle loads, UTE-07, UTE-08, SSF, UGM-01]
+    range: {min: [1160, 383], max: [1289, 488], src: "Min: 100 mm under the estimate (est.). Max: the box is 438 kg of the 966 kg of added mass with the bikes aboard, so 29 mm further back or 5 mm higher takes the added mass out of Ford's window, where UTE-07 has 13.2 mm and UTE-08 2.5 mm in hand (calculated). 100 mm along moves about 13 kg between the axles"}
     thresholds:
       - {rule: "The measured values replace the model's for the box lines and the ute checks run again", src: "Report 02 MASS-07"}
+      - {rule: "Past the maximum the added mass leaves Ford's window (UTE-07, UTE-08): move mass in the box forward or lower and run the ute checks again before the box goes on", src: "Ford BEMM p. 32, UTE-07, UTE-08"}
   - id: BOX-09
     group: Bike box
     part: box
@@ -787,33 +788,33 @@ inputs:
     title: Cab back to the box front wall, at the roof
     how: Measure the gap at the cab's roof line and at its lower corners after the mounts are torqued.
     unit: mm
-    estimate: {v: 40, src: "Model cab_gap (data/assemblies/ute-garage.yaml)"}
+    estimate: {v: 30, src: "Model cab_gap (data/assemblies/ute-garage.yaml)"}
     measured: {v: null, date: null}
     stage: build
     affects: [UTE-15, rear overhang, box overhang behind the ball, JK-01]
-    range: {min: 39, max: 60, src: "Min: Toyota BBGJ1007 (UTE-15). Max: each mm more adds 1 mm of overhang behind the ball, and JK-01's 100 mm allowance is for the unmeasured ball position (est.)"}
+    range: {min: 28, max: 60, src: "Min: Ford BEMM p. 25, at least 28 mm between the cab and the body (UTE-15). Max: each mm more adds 1 mm of overhang behind the ball, and JK-01's 100 mm allowance is for the unmeasured ball position (est.)"}
     thresholds:
-      - {at: 39, rule: "Below 39 mm UTE-15 fails: move the box back on its mounts", src: "Toyota BBGJ1007"}
+      - {at: 28, rule: "Below 28 mm UTE-15 fails: move the box back on its mounts", src: "Ford BEMM p. 25"}
   - id: BOX-13
     group: Bike box
     part: box
     title: Static gap from each rear tyre's top to the tub roof above it, laden
     how: Ute laden as BOX-01, box fitted. Reach in from beside the wheel with a rule from the tyre's highest point to the tub's underside.
     unit: mm
-    estimate: {v: 135, src: "Bump travel 110 mm plus Toyota's 25 mm at full bump (UGW-01)"}
+    estimate: {v: 104, src: "74 mm of bump travel from GVM (est., UTE-GARAGE.md section 4) plus Ford's 30 mm at full bump (BEMM p. 122, UGW-01)"}
     measured: {v: null, date: null}
     stage: build
     affects: [UGW-01]
-    range: {min: 135, max: null, src: "Min: BOX-02's measured travel plus 25 mm (Toyota BBGJ1007 p. 28). 135 mm with the estimated travel"}
+    range: {min: 104, max: null, src: "Min: the laden travel to full bump (the bump stop's gap plus its crush, as in BOX-02) plus Ford's 30 mm (BEMM p. 122, UGW-01). 104 mm with the estimated 74 mm of travel"}
     thresholds:
-      - {rule: "Less than the travel plus 25 mm: the tyre can strike the tub at full bump. Fit a taller bump stop or raise the tubs", src: "UGW-01"}
+      - {rule: "Less than the travel plus 30 mm: the tyre comes inside Ford's 30 mm of the tub at full bump. Fit a taller bump stop or raise the tubs", src: "UGW-01, Ford BEMM p. 122"}
   - id: BOX-14
     group: Bike box
     part: box
-    title: Clearance from the box's rear underside to the highest part of the coupled trailer within 600 mm of the ball
-    how: Ute laden and coupled to the loaded trailer on level ground. Measure from the underside of the box's rear crossmember straight down to the highest part of the coupling, handbrake, jockey wheel clamp, chains or drawbar box lid within 600 mm behind the ball.
+    title: Clearance from the box's rear underside to the highest part of the coupled trailer within the box's sweep about the ball
+    how: Ute laden and coupled to the loaded trailer on level ground. Measure from the underside of the box's rear crossmember straight down to the highest part of the coupling, handbrake, jockey wheel and its clamp, chains or drawbar box lid within 1,030 mm behind the ball (the box's corner sweep and JK-01's 100 mm).
     unit: mm
-    estimate: {v: 130, src: "Box underside about 780 mm up, coupling and handbrake tops about 650 mm (est.)"}
+    estimate: {v: 174.5, src: "Model check JK-02: the jockey wheel's top, swung up for travel, 622 mm up, the highest part within 1,030 mm of the ball, under the box's underside at 797 mm"}
     measured: {v: null, date: null}
     stage: trailer built
     affects: [JK-01, JK-02]
@@ -826,7 +827,7 @@ inputs:
     title: Sill height above the ground with the bikes out
     how: Ute unladen except the empty box and two people's mass in the cab (or the people in it), level ground. Measure from the ground to the top of the sill angle.
     unit: mm
-    estimate: {v: 864, src: "UTE-GARAGE.md: the laden floor at 834 mm rises about 30 mm with the bikes out (report 17)"}
+    estimate: {v: 921, src: "UGL-01: the floor 111 mm over the rail top, which stands about 810 mm up with the bikes out and the trailer off, between Ford's 850 mm at kerb and 740 mm at the rear axle's rating (est., BEMM p. 128)"}
     measured: {v: null, date: null}
     stage: build
     affects: [ramp angle, UGL-01]
@@ -866,12 +867,12 @@ inputs:
     title: Track rows from the Tuareg's front axle, chocked
     how: Tuareg in its chock. Plumb from the front axle centre to the floor and measure along the box to the centre of each L-track row.
     unit: mm
-    estimate: {v: [240, -1665], src: "UTE-GARAGE.md section 4: front row 240 mm ahead, rear row 1,665 mm behind the front axle"}
+    estimate: {v: [240, -1754.5], src: "UTE-GARAGE.md section 6: front row 240 mm ahead, rear row 1,754.5 mm behind the front axle, over Ford's rearmost pads"}
     measured: {v: null, date: null}
     stage: build
     order: [front row, rear row]
     affects: [strap angles, UGR-01]
-    range: {min: [190, -1715], max: [290, -1615], src: "Each row within 50 mm of the estimate (report 03 section 4: hold anchor X within 50 mm)"}
+    range: {min: [190, -1804.5], max: [290, -1704.5], src: "Each row within 50 mm of the estimate (report 03 section 4: hold anchor X within 50 mm)"}
     thresholds:
       - {rule: "More than 50 mm off: re-run UGR-01 with the measured rows", src: "Report 03 section 4"}
   - id: BOX-19
@@ -894,13 +895,13 @@ inputs:
     title: Rear tyre's outer face to the flare's inner face, the smaller side
     how: "Box fitted, ute laden as BOX-01. On each side, measure square from the rear tyre's outer sidewall at its widest point to the inner face of the flare beside it, then jack the axle up to the bump stop and measure again. Record the smaller of the readings."
     unit: mm
-    estimate: {v: 31, src: "Model check UGW-03: the flare's inner face 942.5 mm from the centreline, the tyre's outer face 911.5 mm on the Elite's 1,555 mm rear track (decision H19)"}
+    estimate: {v: 30, src: "Model check UGW-03: the flare's inner face 1,026 mm from the centreline, the tyre's outer face 996 mm on Ford's 1,710 mm rear track (BEMM p. 25)"}
     measured: {v: null, date: null}
     stage: build
     affects: [UGW-03, rear tub flares, UTE-09]
     thresholds:
-      - {at: 30, rule: "Under 30 mm the tyre can rub the flare at full bump: move the flare out, up to UTE-09's 1,910 mm, or fit wheels with more positive offset", src: "Toyota BBGJ1007 p. 28, UGW-03"}
-    range: {min: 30, max: null, src: "Min: Toyota BBGJ1007 p. 28, 30 mm outside the tyre (UGW-03). No upper limit here: a larger gap means a narrower track, which VEH-28 and the tubs' 40 mm inside the tyre (UGW-02) check"}
+      - {at: 30, rule: "Under 30 mm the tyre comes inside Ford's 30 mm of the flare at full bump: move the flare out, up to UTE-09's 2,197 mm over the flares, or fit wheels with more positive offset", src: "Ford BEMM p. 122, UGW-03"}
+    range: {min: 30, max: null, src: "Min: Ford BEMM p. 122, 30 mm between the tyre and its guard (UGW-03). No upper limit here: a larger gap means a narrower track, which VEH-28 and the tubs' 30 mm inside the tyre (UGW-02) check"}
   # ================================================================ the trailer, later (report 02 MASS-07)
   - id: TW-01
     group: Trailer weighbridge
