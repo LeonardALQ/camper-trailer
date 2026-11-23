@@ -53,8 +53,8 @@ const gGrowth = lr(groupRows.map(([, g]) => g.growth_kg));
     {n(full.nominal.towball_kg)} kg on the ball fully loaded, {n(full.nominal.towball_pct, 1)} % of its {n(full.nominal.mass_kg)} kg.
     Its tare is {n(r.tare_kg)} kg, or {n(tc('TC1').growth.mass_kg)} kg with the growth allowance. The heaviest case with growth,{' '}
     {heaviest.id}, is {n(heaviest.growth.mass_kg)} kg against the {n(plate)} kg plated ATM, with {n(heaviest.growth.towball_kg)} kg
-    on the ball against the towbar's {n(tv.limits.towball_rating_kg)} kg. At the heaviest towball the ute's rear axle carries{' '}
-    {n(chk('MAS-03').measured)} kg of its {n(tv.limits.rear_axle_kg)} kg plate (MAS-03). The combination is {n(chk('GCM-01').measured)} kg against the
+    on the ball against the ute's {n(tv.limits.towball_rating_kg)} kg (est.). At the heaviest towball the ute's rear axle carries{' '}
+    {n(chk('MAS-03').measured)} kg of Ford's {n(tv.limits.rear_axle_kg)} kg rating (MAS-03). The combination is {n(chk('GCM-01').measured)} kg against the
     ute's {n(tv.limits.gcm_kg)} kg GCM. No ballast is needed. {fails.length === 0
       ? 'Every whole-trailer check passes.'
       : `${fails.length} whole-trailer checks fail: ${fails.map((c: any) => `${c.id} (${c.title.toLowerCase()}, ${measured(c)})`).join(', ')}.`}

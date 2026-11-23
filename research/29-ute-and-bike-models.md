@@ -1,6 +1,6 @@
 # 29 The ute and bike models: dimensions and sources
 
-Decision H27 asks for the real vehicles in the 3D models, every part held by something. This report records each dimension the LandCruiser, the Aprilia Tuareg 660 Rally and the Triumph Street Triple 765 RS models use and where it comes from. Checked 22 Nov 2026. Estimates are marked (est.).
+Decision H27 asks for the real vehicles in the 3D models, every part held by something. This report records each dimension the Ford Ranger Super Duty (since 23 Nov 2026, in place of the LandCruiser 79), the Aprilia Tuareg 660 Rally and the Triumph Street Triple 765 RS models use and where it comes from. Checked 22 and 23 Nov 2026. Estimates are marked (est.).
 
 ## How the models keep the checks
 
@@ -8,7 +8,29 @@ Every ute and bike box check reads either a parameter in `data/ute/ute.yaml` and
 
 The test `cad/tests/test_ute_supported.py` builds a contact graph of both viewer models. Two solids are joined when they come within 1 mm over a real area, which it measures by pushing them 1 mm further together and asking for 1 mm3 of common volume. Every solid must reach the ute's tyres, or in the loading view the ground under the ramp.
 
-## The LandCruiser 79 single cab V8
+## The Ford Ranger Super Duty single cab chassis (23 Nov 2026)
+
+Leonard changed the tow vehicle to a near-new Ranger Super Duty single cab chassis on 22 Nov 2026, so `cad/model/vehicles/ranger_sd.py` builds the ute and `landcruiser.py` stays as history. The envelope comes from Ford's body equipment mounting manual for the Super Duty (BEMM, E455418, 03/2026, read 23 Nov 2026 as text, so a lettered dimension's meaning is read from its label) and Ford's dealer specification sheet (2026MY cab-chassis): wheelbase 3,270 mm and track 1,710 mm front and rear (BEMM p. 25), 945 mm front overhang and 1,255 mm to the tow bar's end (dealer sheet), the frame's rails 1,020 mm behind the rear axle (p. 25) and 2,286 mm long behind the cab (p. 24), so the cab's back at X 2,004 mm, the rear frame top 740 mm up at GVM with the rear axle at its rating (p. 128), the roof 1,900 mm up at GVM to the antenna base (p. 19), the truck 2,032 mm over its flares and 2,197 mm over its mirrors (p. 25), and the LT275/70R18 on 18 in steel wheels with eight studs (dealer sheet), 842 mm across.
+
+| Part | Model | Source |
+|---|---|---|
+| Cab | body 1,860 mm wide, roof at Z 1,885 mm, doors X 985 to 1,925 mm, windscreen from X 905 mm | Ford's images, estimate |
+| Front | bonnet from Z 1,145 to 1,250 mm, C-clamp headlights, grille, flares to Ford's 2,032 mm | Ford's images, estimate |
+| Steel front bar | face at Ford's 945 mm, bash plate, lugs on the rails | dealer sheet, estimate |
+| Frame | C rails on centrelines 446 mm out (BEMM p. 131, est. reading), 70 by 160 mm (est.), level | BEMM, estimate |
+| Front suspension | knuckles, two arms a side, coil-over dampers under the rails, the front differential | estimate |
+| Rear axle | 110 mm tube, 300 mm differential, leaf springs over the axle, 1,400 mm eye to eye | estimate |
+| Fuel tank | 130 L between the rails, X 2,100 to 2,850 mm | dealer sheet, estimate |
+| Diesel exhaust fluid tank | outside the kerb rail behind the cab, its top 47 mm over the rail | BEMM p. 128, estimate |
+| Tow bar | receiver end at 1,255 mm, Ford's 4.5 t hitch and the DO45-type tow pin at 1,455 mm | dealer sheet, rsd-plan TW01 |
+| Spare | 18 in steel, face down at X 3,870 mm, Z 420 mm, on its winch carrier | estimate |
+| Snorkel | Ford's sealed snorkel up the kerb-side A-pillar | Ford's images, estimate |
+
+Ford's body mounting pads, which the box bolts to, belong to the box's module (`data/assemblies/ute-garage.yaml`, part C1): four pairs 768, 891 and 506 mm apart (p. 125), their holes 1,244 mm apart across (1,248 mm at the rear pair, est. reading), 12 mm over the rail top and the rearmost 6 mm (p. 128).
+
+Ford's rules for a body on the single cab, which the box follows (UTE-GARAGE.md revision F): ratings GVM 4,500, front axle 1,900, rear axle 2,800 and GCM 8,000 kg (p. 33). The added mass's centre of gravity 1,965 to 3,350 mm behind the front axle, at most 530 mm high and 65 mm off the centreline at GVM, and to 3,255, 630 and 130 mm at 800 kg (p. 32). The body at most 1,960 mm wide with the standard mirrors (p. 18), 2,400 mm over the frame, 28 mm from the cab's back and 30 mm over its roof, its front at most 1,265 mm ahead of the rear axle, and the rear overhang at most half the wheelbase (pp. 22 and 24). Every pad used, mounts flush on them, rigid mounts, but flexible ones of about 1 kN/mm snubbed to 12 mm at the forward pads only under an exceptionally rigid body, crossmembers at each pad pair, 50 x 5 mm hardened washers, 2 g in x, y and z at each pad, no soft finish on the faces, M12 10.9 at least and M14 10.9 recommended (pp. 124 and 158). No welding on the frame, holes at most 16.5 mm and no more than two in a vertical line (p. 155). 30 mm between a tyre and its guard (p. 122). The fuel filler at least 250 mm above the tank's inlet with 2 degrees of fall, a conductive bracket at least 180 mm wide, 9 mm from the body and clear of the exhaust (pp. 48 to 53). The tailpipe kept clear of any sealed compartment (p. 158). The hitch not drilled, welded or modified, and the maximum tow ball download in the owner guide (p. 34).
+
+## The LandCruiser 79 single cab V8 (to 22 Nov 2026, history)
 
 The 2017 body builder guide BBGJ1007 is no longer online. Its figures in `data/ute/ute.yaml` (report 16) set the envelope: wheelbase 3,180 mm, bumper 860 mm ahead of the front axle, cab back 2,060 mm behind it, cab 1,790 mm wide with its roof at 1,955 mm on 265 tyres, tracks 1,555 mm, frame rails 1,046 mm over and 60 by 160 mm (est.), rear frame top 774 mm laden with the Lovells lift.
 

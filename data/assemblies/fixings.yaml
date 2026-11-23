@@ -197,36 +197,44 @@ trailer:
 # The ute's models (cad/ute_model.py): the LandCruiser's parts by their node (CAB, FRAME, WH-RK) and the bike box's by
 # their label's first word (data/assemblies/ute-garage.yaml: B5.K-post-1, 12.TU-FL)
 ute:
-  # ---------------------------------------------------------------- the LandCruiser (data/ute/ute.yaml)
+  # ---------------------------------------------------------------- the Ranger Super Duty (data/ute/ute.yaml)
   - lines: [FAXLE, RAXLE]
     to: ["WH-*"]
     how: bolted
-    why: "Each wheel bolts to its hub (Toyota)"
-  - lines: [BAR, SPARE, TOWBAR, FRONT]
+    why: "Each wheel bolts to its hub on eight studs (Ford)"
+  - lines: [BAR, SPARE, TOWBAR, FRONT, UREA]
     to: [FRAME, CAB]
     how: bolted
-    why: "The bull bar, the spare's carrier, the towbar and the front guards bolt to the frame and the cab (Toyota, the makers' fitting guides)"
+    why: "The steel front bar, the spare's winch carrier, the tow bar, the diesel exhaust fluid tank's bracket and the front guards bolt to the frame and the cab (Ford)"
   - lines: [TANK]
     to: [FRAME]
     how: clamped
-    why: "The ARB Frontier tank hangs on its straps between the rails (ARB's fitting guide)"
+    why: "The fuel tank hangs on its straps between the rails (Ford)"
   # ---------------------------------------------------------------- the box's body and subframe (UTE-GARAGE.md)
   - lines: [B1, "B2*", "B3*", "B5*", "B6*", "B7*"]
     to: [B1, "B2*", "B3*", "B5*", "B6*", "B7*"]
     how: welded
     why: "The box's frame, floor, skins, tubs and flares are TIG-welded aluminium (UTE-GARAGE.md, data/ute/parts/body.yaml)"
   - lines: ["S4*", "S5*", "S6*"]
-    to: ["S1*"]
+    to: ["S1*", "S10*"]
     how: welded
-    why: "The subframe's crossmembers and outriggers are welded to its runners (UTE-GARAGE.md)"
+    why: "The subframe's crossmembers and outriggers are welded to its runners and to the front steel stubs (UTE-GARAGE.md)"
+  - lines: ["S10*"]
+    to: ["S2*"]
+    how: welded
+    why: "The two steel stubs are welded to the front steel crossmember before it is galvanised (UTE-GARAGE.md)"
+  - lines: ["S1*"]
+    to: ["S2*"]
+    how: bolted
+    why: "The aluminium runners bolt to the steel crossmembers through steel cleats with G10 sleeves (UTE-GARAGE.md)"
   - lines: ["C1*"]
     to: [FRAME]
-    how: riveted
-    why: "Toyota's deck mount brackets are riveted to the frame rails at the factory"
+    how: welded
+    why: "Ford's body mounting pads' brackets are part of the cab chassis, fixed to the rails at the factory (BEMM p. 125)"
   - lines: ["C7*"]
     to: ["C7*", "S5*", "S6*"]
     how: bolted
-    why: "Lovells' mudflap bracket is one bent bar, bolted under the rear outrigger (Lovells' Elite kit)"
+    why: "Each mudflap bracket is one bent bar, bolted under the outrigger behind the rear tub"
   - lines: ["C6*"]
     to: ["C7*"]
     how: bolted

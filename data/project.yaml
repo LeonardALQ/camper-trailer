@@ -3,12 +3,12 @@
 # from here and from the parts lists (cad/sitedata.py, project_costs). cad/tests/test_costs.py checks that
 # data/vehicle/vehicle-parts.yaml and VEHICLE.md quote the same figures and that the cost table adds up.
 truck:
-  name: "Used Toyota LandCruiser VDJ79 single cab V8, built 01/2017 to 08/2022, about 400,000 km"
-  purchase_aud: 50000
-  basis: "Leonard's planning figure for buying the truck"
+  name: "Ford Ranger Super Duty single cab chassis, 2025 or 2026, under about 20,000 km"
+  purchase_aud: 92690
+  basis: "The near-new listing of 23 Nov 2026, a 2025 truck with 13,343 km at AUD 89,990 (Drive listing 970470638), and NSW duty at AUD 3 per AUD 100, AUD 2,700 (research report 31). It replaces the LandCruiser's AUD 50,000"
 car_build:
   budget_aud: 75000
-  basis: "Leonard's planning figure for the car build, without the truck, the bike box, the trailer or his own labour"
+  basis: "Leonard's planning figure for the car work, set for the LandCruiser build on 20 Nov 2026 and kept for the Super Duty's upgrades, without the truck, the bike box, the trailer or his own labour"
   parts_list: data/vehicle/vehicle-parts.yaml
 bike_box:
   parts_list: data/ute/box-parts.yaml

@@ -48,13 +48,13 @@ trailer_checks:
     inputs: [SUP-01, SUP-02, TW-01, TW-02, TW-03]
     why: "VSB1 Rev 6 (axles and suspension) asks the axles of a close-coupled group that does not share load to carry 120 % of their load at ATM. At the 4,000 kg plate that needs 4,440 kg of the XT Air build's 4,050 kg, so the XT Air is ordered in Cruisemaster's load-sharing tandem configuration (CIS-006, params load_sharing), each side's two bags on one circuit, and the check takes the axle group load itself. The kit's GTM is Cruisemaster's figure for the 4,500 kg XT Air build."
   - id: MAS-03
-    title: Towball keeps the ute's rear axle within its 2,800 kg plate with growth and stays within the 350 kg towbar, in every case
+    title: Towball keeps the ute's rear axle within Ford's 2,800 kg with growth and stays within the Super Duty's tow ball download, in every case
     type: towball_ute
     basis: growth
     cases: all
     severity: fail
     inputs: [UTE-02, TW-01, TW-02, TW-03]
-    why: Decision H14, with the Elite kit's rear axle (H17). The ute model gives its rear axle load with the bikes aboard (UC2, with growth) and how much each kilogram on the ball adds to it (UC3 against UC2). The Hayman Reese bar, the 79's rating and the DO35 allow 350 kg.
+    why: Decision H14, on the Ranger Super Duty's rear axle rating of 2,800 kg (Ford's BEMM p. 33). The ute model gives its rear axle load with the bikes aboard (UC2, with growth) and how much each kilogram on the ball adds to it (UC3 against UC2). The ute's tow ball limit is data/ute/ute.yaml's towball_rating_kg, 450 kg (est.), since Ford's figure is in the owner guide, which was not read. The coupling's own rating is the trailer's (data/load_cases.yaml).
   - id: MAS-03B
     title: The ute's towing cases carry at least the trailer's heaviest towball with growth
     type: towball_ute_input
@@ -100,12 +100,8 @@ trailer_checks:
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
     why: Decision H17 at the DO45 (23 Nov 2026). The DO45 allows 450 kg on the ball and the Ranger Super Duty 450 kg (est., 10 % of its 4,500 kg braked towing), so 420 kg keeps H17's 30 kg in hand. It was 320 kg under the 79's, the towbar's and the DO35's 350 kg.
-  - id: MAS-14
-    title: Platinum return, cut CUT7. The ute's rear axle without growth at the trailer's heaviest towball, on the Platinum, at least 30 kg under 2,550 kg (reported)
-    type: platinum_return
-    severity: report
-    inputs: [UTE-03]
-    why: Decision H17. The plan buys the Elite kit. Cut CUT7 takes the Platinum back if the S3 weighing leaves at least 30 kg under its 2,550 kg rear axle at the trailer's weighed towball. This row is the model's forecast of that weighing.
+  # MAS-14 retired (23 Nov 2026): it forecast the LandCruiser's return to the Lovells Platinum kit (cut CUT7). The Ranger
+  # Super Duty has no GVM kit, so there is no kit to return to.
   - id: MAS-06
     title: Tyre load on the heavier side, with VSB1's 120 % rule, within the tyre's rating
     type: mass
@@ -196,11 +192,11 @@ trailer_checks:
     inputs: [TR-01]
     why: "Decision H23, F3-03 and F4-03. With the ute away the trailer can be neither hitched nor moved, so four rated lashing points under the outrigger ends (CH-B02) take 50 mm ratchet straps down and out at 48 to 55 degrees, 3 degrees clear of the listing's 45 degree minimum (F6-02), to ground anchors installed as their listing tested them, each with a stabilizer plate on the trailer side of its rod (24 CFR 3285.402, F5-01). The kit rides in the ute while towing and stays with the trailer whenever the ute is unhitched for more than a day. The windward pair holds the trailer against tipping and, with the tyres' friction on wet grass, against sliding, in region B's 500-year gust at 3 m in terrain category 2, 57 m/s times 0.91, 51.9 m/s, with STB-04's Cf of 1.6. Each strap's tension is checked against the strap's lashing capacity, the D-ring's working load limit, the outrigger in bending at its yield over 1.5, and the anchor at its listed working load in the listed installation, which carries a factor of 1.5 to its ultimate load. A torque probe at the helix depth measures the soil at each anchor's place against the anchor's minimum probe value. There is no pull test: the probe measures the soil class the listing rates the anchor in, and a pull to its working load needs a test rig the kit does not carry. So each anchor is wound into undisturbed soil, never dug in and backfilled, because Tie Down warns that loose soil may then need a test of the anchor's holding power (F6-01)"
   - id: GCM-01
-    title: Ute and trailer within the 7,400 kg GCM with Lovells' revision
+    title: Ute and trailer within Ford's 8,000 kg GCM
     type: gcm
     severity: fail
     inputs: [TW-01, TW-02, TW-03]
-    why: GCM is the ute's mass plus the trailer's (report 16 section 2.4). Decision H2 takes Lovells' 7,400 kg GCM revision, which Lovells rates for the 4,495 kg Elite kit of H17 too. Decision H20 sets the one sum, UTE-06's, the ute with the bikes aboard and growth (UC2) plus the trailer's plate. If the revision is refused, Toyota's 6,900 kg less that ute sets the trailer's plate, and the travel water is cut so the heaviest case with growth stays under it.
+    why: GCM is the ute's mass plus the trailer's (Ford's payload guide). The Ranger Super Duty's GCM is 8,000 kg from the factory (BEMM p. 33), so no revision and no fallback plate or water limit. Decision H20 sets the one sum, UTE-06's, the ute with the bikes aboard and growth (UC2) plus the trailer's plate from data/load_cases.yaml.
   - id: TBS-01
     title: Towball scale reading within 10 % of the model, fully loaded (reported)
     type: towball_scale
@@ -570,7 +566,7 @@ trailer_checks:
     max: 460
     severity: fail
     inputs: [UTE-01]
-    why: VSB1 9.3.2. The decision log sets the ute's ball at 440 mm laden, plus or minus 20 mm, so the coupling stays under 460 mm.
+    why: VSB1 9.3.2. The decision log sets the coupling point at 440 mm laden, plus or minus 20 mm, so it stays under 460 mm. On the Super Duty the tow pin sits in Ford's 4.5 t hitch in the receiver about 510 mm up laden (est.), and the hitch's drop is chosen at the measurement UTE-01 to put the pin at 440 mm.
   - id: DIM-04
     title: Running clearance at least 100 mm, unladen (VSB1 5.4)
     type: clearance_ground

@@ -128,14 +128,40 @@ def rhs_plastic_modulus(b: float, d: float, t: float) -> float:
 
 def crossmember_check(prj, model, P) -> dict:
     """UGR-03: a steel crossmember under a track row carries a strap's breaking load at any of its anchors (report 24). The
-    crossmember spans between Toyota's two brackets at its station and runs on outboard of them to the walls. The
-    vertical part of the breaking load bends it: simply supported between the brackets, or as a cantilever outboard.
+    crossmember bears on the runners or the steel stubs over Ford's two pads at its station and runs on outboard of them
+    to the walls. The vertical part of the breaking load bends it: simply supported between the pads, or as a cantilever
+    outboard.
     The capacity is AS 4100's 0.9 fy Ze, with Ze the plastic modulus of the compact RHS laid flat."""
-    lc = next(c for c in prj.checks if c.id == "UGR-01").restraint["lc_kg"]
-    f_kn = 2 * lc * G / 1000                          # AS/NZS 4380: a strap's breaking force is at least twice its LC
-    brackets = [bb for bb in (b.shape.bounding_box() for i, b in model.built.items() if b.inst.ref == "C1" and i[3] in "16")]
-    yb = sum(abs(bb.center().Y) for bb in brackets) / len(brackets)
     worst = None
+    yb = P.get("pad_y")                               # the crossmember bears on the runners or stubs over Ford's pads
+    loads = anchor_loads(prj, model)
+    for a in loads:
+        y = abs(a["y"])
+        lever = y - yb if y > yb else (yb - a["y"]) * (yb + a["y"]) / (2 * yb)
+        m = a["f_kn"] * a["cz"] * lever / 1000            # kN m
+        if worst is None or m > worst["m"]:
+            worst = dict(m=m, strap=a["strap"], y=a["y"], cz=a["cz"], lever=lever, outboard=y > yb)
+    f_kn = loads[0]["f_kn"]
+    b, h, t, fy = P.get("steel_w"), P.get("steel_h"), P.get("steel_t"), P.get("steel_fy")
+    s_mm3 = rhs_plastic_modulus(b, h, t)
+    cap = 0.9 * fy * s_mm3 / 1e6                          # kN m
+    u = worst["m"] / cap
+    where = "outboard of" if worst["outboard"] else "between"
+    return _row("UGR-03", "Steel crossmember carries a strap's breaking load at its worst anchor", "fail", "<= 1.00",
+                round(u, 3), round(1 - u, 3), u <= 1.0, f"{worst['strap']} anchor at Y {worst['y']:.0f}, {where} Ford's pads",
+                f"{f_kn:.1f} kN breaking load x {worst['cz']:.2f} vertical x {worst['lever']:.0f} mm = {worst['m']:.2f} kN m, against "
+                f"0.9 x {fy:.0f} MPa x {s_mm3:,.0f} mm3 = {cap:.2f} kN m for the RHS {b:g} x {h:g} x {t:g} laid flat. Supports at Y +/-{yb:.0f}, "
+                "over Ford's pads",
+                "Research report 24: an anchor withstands its strap's breaking load (NTC guide p. 201), so the crossmember under it must too. "
+                "AS 4100 clause 5.1: the section is compact, so Ze is the plastic modulus.", unit="")
+
+
+def anchor_loads(prj, model) -> list[dict]:
+    """Every strap's anchor in the module frame with its breaking load (twice its LC, AS/NZS 4380) and the vertical
+    cosine of its pull."""
+    lc = next(c for c in prj.checks if c.id == "UGR-01").restraint["lc_kg"]
+    f_kn = 2 * lc * G / 1000
+    out = []
     for iid, s in model.built.items():
         sp = s.inst.special.get("strap")
         if not sp:
@@ -144,23 +170,41 @@ def crossmember_check(prj, model, P) -> dict:
         ends = [(pts[0], pts[1]), (pts[-1], pts[-2])] if sp["point"] == "rear_wheel" else [(pts[1], pts[0])]
         for anchor, towards in ends:
             d = [towards[i] - anchor[i] for i in range(3)]
-            cz = abs(d[2]) / math.sqrt(sum(v * v for v in d))
-            y = abs(anchor[1])
-            lever = y - yb if y > yb else (yb - anchor[1]) * (yb + anchor[1]) / (2 * yb)
-            m = f_kn * cz * lever / 1000                  # kN m
-            if worst is None or m > worst["m"]:
-                worst = dict(m=m, strap=iid, y=anchor[1], cz=cz, lever=lever, outboard=y > yb)
-    b, h, t, fy = P.get("steel_w"), P.get("steel_h"), P.get("steel_t"), P.get("steel_fy")
-    s_mm3 = rhs_plastic_modulus(b, h, t)
-    cap = 0.9 * fy * s_mm3 / 1e6                          # kN m
-    u = worst["m"] / cap
-    where = "outboard of" if worst["outboard"] else "between"
-    return _row("UGR-03", "Steel crossmember carries a strap's breaking load at its worst anchor", "fail", "<= 1.00",
-                round(u, 3), round(1 - u, 3), u <= 1.0, f"{worst['strap']} anchor at Y {worst['y']:.0f}, {where} the brackets",
-                f"{f_kn:.1f} kN breaking load x {worst['cz']:.2f} vertical x {worst['lever']:.0f} mm = {worst['m']:.2f} kN m, against "
-                f"0.9 x {fy:.0f} MPa x {s_mm3:,.0f} mm3 = {cap:.2f} kN m for the RHS {b:g} x {h:g} x {t:g} laid flat. Brackets at Y +/-{yb:.0f}",
-                "Research report 24: an anchor withstands its strap's breaking load (NTC guide p. 201), so the crossmember under it must too. "
-                "AS 4100 clause 5.1: the section is compact, so Ze is the plastic modulus.", unit="")
+            out.append(dict(strap=iid, x=anchor[0], y=anchor[1], f_kn=f_kn, cz=abs(d[2]) / math.sqrt(sum(v * v for v in d))))
+    return out
+
+
+def stub_check(prj, model, P) -> dict:
+    """UGR-04: Ford's first pads are under the front wall, so the front track row's steel crossmember reaches them through
+    two steel stubs, and the aluminium runners start where the stubs end. A strap's breaking load at the front row is
+    taken as a point load on the line from the first pad to the second, simply supported at both (est.): the steel at the
+    row and the aluminium runner at the joint are each checked in bending. Steel: AS 4100's 0.9 fy Ze. Aluminium: welded
+    6061-T6's 103 MPa yield times 0.85 (est., AS/NZS 1664.1) on the plastic modulus."""
+    yb, xr = P.get("pad_y"), P.get("front_row_x")
+    x1, x2, xj = P.get("mount1_x"), P.get("mount2_x"), P.get("stub_x1")
+    L, a = x2 - x1, xr - x1
+    worst = None
+    for an in anchor_loads(prj, model):
+        if abs(an["x"] - xr) > 1.0:
+            continue
+        r = an["f_kn"] * an["cz"] * (yb + abs(an["y"])) / (2 * yb)       # the nearer support's share
+        if worst is None or r > worst["r"]:
+            worst = dict(r=r, strap=an["strap"], y=an["y"], cz=an["cz"])
+    m_row = worst["r"] * a * (L - a) / L / 1000                          # kN m under the row, in the steel
+    m_joint = worst["r"] * a * (L - (xj - x1)) / L / 1000                 # at the joint, in the aluminium
+    zs = rhs_plastic_modulus(P.get("stub_w"), P.get("sub_h"), P.get("stub_t"))
+    za = rhs_plastic_modulus(P.get("runner_w"), P.get("sub_h"), 3.0)
+    cap_s, cap_a = 0.9 * P.get("steel_fy") * zs / 1e6, 0.85 * 103 * za / 1e6
+    u = max(m_row / cap_s, m_joint / cap_a)
+    gov = "the steel at the row" if m_row / cap_s >= m_joint / cap_a else "the aluminium runner at the joint"
+    return _row("UGR-04", "Steel stubs and runners carry a strap's breaking load at the front row to Ford's first two pads", "fail",
+                "<= 1.00", round(u, 3), round(1 - u, 3), u <= 1.0, f"{worst['strap']}, {gov}",
+                (f"{worst['r']:.1f} kN on the nearer stub ({worst['strap']}, Y {worst['y']:.0f}), {a:.0f} mm behind the first pad on the "
+                 f"{L:.0f} mm between the first two: {m_row:.2f} kN m in the steel RHS {P.get('stub_w'):g} x {P.get('sub_h'):g} x "
+                 f"{P.get('stub_t'):g} against {cap_s:.2f} kN m, and {m_joint:.2f} kN m in the aluminium runner at the joint "
+                 f"{xj - x1:.0f} mm behind the first pad against {cap_a:.2f} kN m"),
+                "Research report 24's rule, that an anchor withstands its strap's breaking load, carried from the front row to Ford's pads.",
+                unit="")
 
 
 def _extent(model, P, x0, dz, skip_parts=()) -> dict:
@@ -173,30 +217,34 @@ def _extent(model, P, x0, dz, skip_parts=()) -> dict:
     return dict(x0=bb.min.X + x0, x1=bb.max.X + x0, y0=bb.min.Y, y1=bb.max.Y, z0=bb.min.Z + dz, z1=bb.max.Z + dz)
 
 
-def mount_loads(lines: list[dict], P, limits: dict) -> dict:
-    """Vertical and horizontal loads on Toyota's deck mount brackets from the box and everything in it, with growth.
+STATIONS = 4                               # Ford's body mounting pad pairs on the single cab (BEMM p. 125)
 
-    The box is taken as rigid on six pairs of brackets. Vertical reactions vary linearly along the ute (the least
-    squares share of a rigid body on equal supports). Report 03's factored cases: braking 1.6 g forward, cornering
-    1.0 g sideways, each with gravity, and a net 1.0 g upward. The firm front pairs carry all of the horizontal load,
-    two M12 8.8 bolts per bracket. Each compliant rear bracket has one M12 8.8 bolt.
+
+def mount_loads(lines: list[dict], P, limits: dict) -> dict:
+    """Vertical and horizontal loads on Ford's body mounting pads from the box and everything in it, with growth.
+
+    The box is taken as rigid on Ford's four pairs of pads. Vertical reactions vary linearly along the ute (the least
+    squares share of a rigid body on equal supports). Ford's road-load inputs of up to 2 g in x, y and z at each pad
+    (BEMM p. 124, limit `mount_g`): braking 2 g forward and cornering 2 g sideways, each with gravity, a bump of 2 g
+    down on top of gravity, and a net 1 g upward. The flexible mounts at the first pair take no horizontal load, so the
+    six rigid mounts carry it all. One M14 10.9 bolt per pad.
     """
     x0 = P.get("module_x0")
-    xs = [P.get(f"mount{i}_x") + x0 for i in range(1, 7)]
-    firm = [True, True, False, False, False, False]
-    bolts = [2 if f else 1 for f in firm]
+    xs = [P.get(f"mount{i}_x") + x0 for i in range(1, STATIONS + 1)]
+    firm = [False] + [True] * (STATIONS - 1)
+    bolts = [1] * STATIONS
     carried = [ln for ln in lines if set(ln["cases"]) & {"UC2"}]
     M = sum(ln["kg"] * (1 + GROWTH[ln["maturity"]]) for ln in carried)
     xc = sum(ln["kg"] * (1 + GROWTH[ln["maturity"]]) * ln["x"] for ln in carried) / M
     zc = sum(ln["kg"] * (1 + GROWTH[ln["maturity"]]) * ln["z"] for ln in carried) / M
-    z_if = P.get("frame_top_z")                         # bracket flange top, level with the rail top
+    z_if = P.get("frame_top_z") + P.get("pad_h")        # the pads' top
     h = zc - z_if
     W = M * G / 1000                                    # kN
+    g = limits["mount_g"]
     n = len(xs)
     xb = sum(xs) / n
     S = sum((x - xb) ** 2 for x in xs)
-    # bolt line to bolt line across the ute: the mounts' centres either side, on Toyota's brackets
-    b_track = 2 * P.get("runner_y1") + P.get("mount_dy")
+    b_track = 2 * P.get("pad_y")                        # bolt line to bolt line across the ute, over Ford's pads
 
     def vertical(Wz, Fx):
         """Upward reaction per station (kN) for a downward load Wz at xc and a forward force Fx at height h."""
@@ -204,17 +252,18 @@ def mount_loads(lines: list[dict], P, limits: dict) -> dict:
         b = (Wz * (xc - xb) - Fx * h) / S
         return [a + b * (x - xb) for x in xs]
 
-    # Each case: station reactions R, horizontal loads, and the roll couple's vertical force per bracket (cornering,
-    # shared equally by the six stations, plus on the leeward side and minus on the windward side).
+    # Each case: station reactions R, horizontal loads, and the roll couple's vertical force per pad (cornering,
+    # shared equally by the four stations, plus on the leeward side and minus on the windward side).
     cases = {}
-    fb = 0.8 * 2.0 * W
+    fb = g * W
     cases["braking"] = dict(R=vertical(W, fb), shear_x=fb, shear_y=0.0, roll=0.0, sides=(("each", 0),))
-    fl = 0.5 * 2.0 * W
+    fl = g * W
     cases["cornering"] = dict(R=vertical(W, 0.0), shear_x=0.0, shear_y=fl, roll=fl * h / b_track / n,
                               sides=(("windward", -1), ("leeward", 1)))
-    cases["upward"] = dict(R=[-r for r in vertical(W, 0.0)], shear_x=0.0, shear_y=0.0, roll=0.0, sides=(("each", 0),))
-    nt, vf = limits["m12_tension_kn"], limits["m12_shear_kn"]
-    firm_bolts = 2 * sum(b for b, f in zip(bolts, firm) if f)       # two brackets per station
+    cases["bump"] = dict(R=vertical((1 + g) * W, 0.0), shear_x=0.0, shear_y=0.0, roll=0.0, sides=(("each", 0),))
+    cases["upward"] = dict(R=[-r for r in vertical((g - 1) * W, 0.0)], shear_x=0.0, shear_y=0.0, roll=0.0, sides=(("each", 0),))
+    nt, vf = limits["bolt_tension_kn"], limits["bolt_shear_kn"]
+    firm_bolts = 2 * sum(b for b, f in zip(bolts, firm) if f)       # two pads per station
     rows, worst = [], None
     for cname, c in cases.items():
         V = math.hypot(c["shear_x"], c["shear_y"]) / firm_bolts          # per firm bolt
@@ -225,7 +274,7 @@ def mount_loads(lines: list[dict], P, limits: dict) -> dict:
                 Nb = tension / bolts[i]
                 Vb = V if firm[i] else 0.0
                 u = (Vb / vf) ** 2 + (Nb / nt) ** 2
-                r = dict(case=cname, station=i + 1, x=round(x), dx_axle=round(x - P.get("rear_axle_x")), mount="firm" if firm[i] else "compliant",
+                r = dict(case=cname, station=i + 1, x=round(x), dx_axle=round(x - P.get("rear_axle_x")), mount="rigid" if firm[i] else "flexible",
                          side=side, bracket_kn=round(Rb, 2), tension_kn=round(tension, 2), bolt_tension_kn=round(Nb, 2),
                          bolt_shear_kn=round(Vb, 2), interaction=round(u, 4))
                 rows.append(r)
@@ -286,15 +335,15 @@ def build_garage(prj: Project | None = None, limits: dict | None = None):
 
     # ---------------------------------------------------------------- computed checks
     ext = _extent(model, P, x0, dz)
-    body_ext = _extent(model, P, x0, dz, skip_parts=("U-FLARE",))
+    body_ext = _extent(model, P, x0, dz, skip_parts=("U-FLARE", "U-MUDFLAP", "U-MUDFLAP-BKT"))
     tub_h = P.get("tub_top")
     checks.append(_row("UGD-01", "Wheel tubs no more than 100 mm above the floor, so the lower floor works", "fail",
                        f"<= {lim['tub_height_max_mm']:.0f} mm", round(tub_h, 1), round(lim["tub_height_max_mm"] - tub_h, 1),
                        tub_h <= lim["tub_height_max_mm"], "tub top over the tyre at full bump",
                        f"tub top {tub_h:.1f} mm above the floor: tyre top at full bump {P.get('wheel_z') + P.get('rear_bump') + P.get('tyre_d') / 2 + dz:.1f} mm "
-                       f"above the ground, plus 25 mm and the 3 mm plate, against the floor at {dz:.0f} mm",
-                       "Report 17 section 6.4: take the lower floor if the Lovells kit's bump travel keeps the tubs at or under 100 mm, "
-                       "otherwise the flat deck at about 1,080 mm.", unit="mm"))
+                       f"above the ground, plus {P.get('tub_top_gap'):.0f} mm and the 3 mm plate, against the floor at {dz:.0f} mm",
+                       "Report 17 section 6.4: take the lower floor if the bump travel keeps the tubs at or under 100 mm. On the Super "
+                       "Duty the tubs follow Ford's wheelhouse envelope (BEMM p. 122).", unit="mm"))
     mass_lim = lim["box_mass_max_kg"]
     checks.append(_row("UGB-01", "Box empty, with its restraint, ramp, winch and security, lighter than report 17's 440 kg", "fail",
                        f"< {mass_lim:.0f} kg", round(box_kg, 1), round(mass_lim - box_kg, 1), box_kg < mass_lim, "box mass, no growth",
@@ -303,21 +352,21 @@ def build_garage(prj: Project | None = None, limits: dict | None = None):
     ml = mount_loads(lines, P, lim)
     proof = lim["bracket_proof_factor"]
     w = ml["worst"]
-    checks.append(_row("UGM-01", "Deck mount bolts within M12 8.8 design capacity, combined tension and shear", "fail",
+    checks.append(_row("UGM-01", "Mount bolts on Ford's pads within M14 10.9 design capacity, combined tension and shear", "fail",
                        "<= 1.00", w["interaction"], round(1 - w["interaction"], 4), w["interaction"] <= 1.0,
                        f"station {w['station']} ({w['mount']}, {w['dx_axle']:+d} mm from the rear axle), {w['case']}",
                        f"worst {w['interaction']:.3f}: {w['bolt_tension_kn']:.1f} kN tension and {w['bolt_shear_kn']:.1f} kN shear per bolt "
-                       f"against {lim['m12_tension_kn']:.1f} kN and {lim['m12_shear_kn']:.1f} kN. {ml['mass_kg']:.0f} kg with growth, "
-                       f"centre of gravity {ml['h_mm']:.0f} mm above the brackets",
-                       "AS 4100 clause 9.3 design capacities for one M12 property class 8.8 bolt with the threads in the shear plane. "
-                       "Report 03's factored cases. Toyota's bracket capacity is not published, so UGM-02 reports the loads and build step 9 proof-loads the brackets.",
-                       mounts=ml))
-    checks.append(_row("UGM-02", "Deck mount bracket loads (reported)", "report", "reported",
-                       ml["max_tension_kn"], None, True, "largest uplift and largest downward load on one bracket",
+                       f"against {lim['bolt_tension_kn']:.1f} kN and {lim['bolt_shear_kn']:.1f} kN. {ml['mass_kg']:.0f} kg with growth, "
+                       f"centre of gravity {ml['h_mm']:.0f} mm above the pads",
+                       "One M14 property class 10.9 bolt at each of Ford's eight pads (BEMM pp. 124 and 158), at AS 4100 clause 9.3's design "
+                       f"capacities with the threads in the shear plane, under Ford's {lim['mount_g']:g} g in x, y and z (BEMM p. 124). "
+                       "The flexible mounts at the first pads carry no horizontal load.", mounts=ml))
+    checks.append(_row("UGM-02", "Loads on Ford's body mounting pads (reported)", "report", "reported",
+                       ml["max_tension_kn"], None, True, "largest uplift and largest downward load on one pad",
                        f"largest uplift {ml['max_tension_kn']:.2f} kN, largest downward load {ml['max_down_kn']:.2f} kN, "
-                       f"fore and aft shear {ml['firm_bolt_shear_kn']:.1f} kN per firm bolt in braking",
-                       "Toyota publishes no capacity for its deck mount brackets. These loads already carry report 03's off-road "
-                       f"factor, so build step 9 proof-loads each bracket to {proof:g} times them (est.), "
+                       f"fore and aft shear {ml['firm_bolt_shear_kn']:.1f} kN per rigid mount's bolt in braking",
+                       f"Ford gives the {lim['mount_g']:g} g inputs a body must withstand at each pad but no pad capacity, so build step 9 "
+                       f"proof-loads each pad to {proof:g} times these loads (est.), "
                        f"{proof * ml['max_tension_kn']:.2f} kN up and {proof * ml['max_down_kn']:.2f} kN down, "
                        "held 10 s with no permanent set at a dial gauge, and step 11 crack-tests them after the rough-road drive.", unit="kN"))
     res = next(c for c in checks if c["id"] == "UGR-01")["restraint"]
@@ -330,6 +379,7 @@ def build_garage(prj: Project | None = None, limits: dict | None = None):
                        "An anchor withstands its strap's breaking load (NTC Load Restraint Guide 2018 p. 201, report 03): "
                        f"{ad:g} kN for the LC 500 kg straps (report 24).", unit="kN"))
     checks.append(crossmember_check(prj, model, P))
+    checks.append(stub_check(prj, model, P))
     drop, L = P.get("ground_drop"), 3048.0
     ang = math.degrees(math.asin(drop / L))
     ang_l = math.degrees(math.asin(dz / L))

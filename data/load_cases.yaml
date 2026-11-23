@@ -82,12 +82,12 @@ registration:
   coupling: {d_kn: 24.5, v_kn: 14.5, vertical_kg: 450, a: 2.4, src: "Cruisemaster DO45 Plus fitting guide: ADR rated to 4,500 kg, D-value 24.5 kN, V-value 14.5 kN, 50 to 450 kg on the ball"}
   ball_floor_pct: 7.5
 
-# The tow vehicle: the LandCruiser 79 single cab V8 with the Lovells Elite 4,495 kg GVM kit plated at 4,450 kg
-# (decisions H17 and H18) and its bike box. Its limits are
+# The tow vehicle: the Ford Ranger Super Duty single cab chassis on Ford's ratings (GVM 4,500 kg, GCM 8,000 kg), with its
+# bike box, since 23 Nov 2026 in place of the LandCruiser 79 with the Lovells Elite kit. Its limits are
 # in data/ute/ute.yaml and its masses and the bike box's sweep come from the ute model (build/ute/ute.json, cad/ute.py
-# and cad/ute_garage.py). The Cayenne of report 07 is no longer the tow vehicle (reports 14 to 16 replace 07 and 10).
+# and cad/ute_garage.py). The ute reads the plate below from `registration` and the towball from the trailer's solve.
 tow_vehicle:
-  name: Toyota LandCruiser VDJ79 GXL single cab V8, Lovells Elite GVM kit plated at 4,450 kg (decisions H17 and H18), with the bike box
+  name: Ford Ranger Super Duty single cab chassis, Ford's 4,500 kg GVM and 8,000 kg GCM, with the bike box
   data: data/ute/ute.yaml
   model: build/ute/ute.json
   gcm_case: UC2          # the ute with the bikes aboard and no towball, added to the trailer's own mass

@@ -19,7 +19,7 @@ from ..lamps import resolve as resolve_lamps
 from ..trailer import _kg
 from ..trailer_model import TrailerModel
 from . import sheet as S
-from .home_common import (MARK, cog_symbol, ctx, label_in, stamp, textblock, title, tw, water_without_gcm_revision,
+from .home_common import (MARK, cog_symbol, ctx, label_in, stamp, textblock, title, tw,
                           write)
 from .sheets import _leaves
 
@@ -192,7 +192,7 @@ def ct002(prj, model, bom, checks, reg, dwg):
         f"WATER: AT MOST {V['water_travel_l']:.0f} L OF FRESH AND GREY WATER IN TRAVEL (H13). TC7 CARRIES A FULL GREY TANK AND THE REST AS "
         "FRESH WATER, SO IT HAS THE LOWEST TOWBALL SHARE. TC8 CARRIES ONLY GREY WATER.",
         f"H17 SETS THE AXLE IN THE MIDDLE OF THE WINDOW BETWEEN {w['pct_min']:.1f} % IN THE LOWEST CASE AND {w['ball_max']['kg']:.0f} kg WITH "
-        "GROWTH IN THE HEAVIEST. THE HARD LIMITS SIT OUTSIDE IT: 7.5 % (MAS-04, H2), THE TOWBAR'S 350 kg AND THE UTE'S REAR AXLE (MAS-03).",
+        "GROWTH IN THE HEAVIEST. THE HARD LIMITS SIT OUTSIDE IT: 7.5 % (MAS-04, H2), THE UTE'S TOW BALL LIMIT AND ITS REAR AXLE (MAS-03).",
         f"SSF IS HALF THE {track:.0f} mm TRACK LESS THE CoG'S OFFSET, OVER THE CoG HEIGHT, WITH GROWTH. THE LOWEST IS "
         f"{min(_ssf(c['growth'], track) for c in rep['cases']):.3f}. WITH THE BODY ROLLED ONTO ITS BUMP STOPS AND TYRES THE STATIC ROLLOVER "
         f"THRESHOLD IS {next(c for c in rep['checks'] if c['id'] == 'STB-01')['measured']:.2f} g (EST.), AGAINST PBS LEVEL 1'S 0.35 g (STB-01) "
@@ -305,8 +305,8 @@ def ct003(prj, model, bom, checks, reg, dwg):
          f"{mv('DIM-04', '{:.1f}')} at {chk['DIM-04']['line']}, breakover {mv('DIM-07', '{:.1f}')} (DIM-07)", st("DIM-06")],
         ["Width", "Across the body and everything on its sides, at most 2,500 mm, side lamps left out (ADR 43/04 6.2.6.1, VSB1 5.2)", f"{mv('DIM-01')}, design at most 2,490 mm (DIM-05)", st("DIM-05")],
         ["Overhang", "Front load space at least the rear overhang (VSB1 5.1.1)", f"{V['axle_x'] - V['body_x0']:.0f} against {ch['overall_x1'] - V['axle_x']:.0f} mm", st("DIM-02")],
-        ["Combination", "Ute and trailer within Lovells' 7,400 kg GCM revision (H2, GV06)", f"{_kg(gcm['sum'])} kg, the ute with growth plus the plate (H20)", st("GCM-01")],
-        ["Ute rear axle", f"Towball keeps the Elite kit's {tv['limits']['rear_axle_kg']:,.0f} kg rear axle plate with growth (H14, H17, H18)", f"{mv('MAS-03')} at the heaviest ball", st("MAS-03")],
+        ["Combination", f"Ute and trailer within Ford's {tv['limits']['gcm_kg']:,.0f} kg GCM (BEMM p. 33)", f"{_kg(gcm['sum'])} kg, the ute with growth plus the plate (H20)", st("GCM-01")],
+        ["Ute rear axle", f"Towball keeps the Super Duty's {tv['limits']['rear_axle_kg']:,.0f} kg rear axle with growth (H14)", f"{mv('MAS-03')} at the heaviest ball", st("MAS-03")],
         ["Jack-knife", "Front parts 100 mm outside the bike box's sweep, 50 mm under it (JK-01, JK-02)", f"{chk['JK-01']['measured']:.0f} mm and {chk['JK-02']['measured']:.0f} mm", st("JK-01")],
         ["Plug", "7 or 12 pin to AS 4177.5 up to 3.5 t ATM (VSB1 7.2), kept over it", "12-pin flat plug, and a grey Anderson SB120 for the 48 V charging feed", ("AS 4177.5", "#000")],
         ["Wiring", "Supported every 600 mm, insulated joints, grommets through metal, earth wire (VSB1 7.1)", "Two-wire DC, no chassis return (report 20). Glands on CT-602", ("CT-601, CT-602", "#000")],
@@ -335,7 +335,6 @@ def ct003(prj, model, bom, checks, reg, dwg):
     yb = title(sh, dwg, reg, f"ATM PLATE {rep['caps']['plated']:,.0f} kg. TARE ON THE PLATE FROM THE WEIGHBRIDGE (TW-03) (TB-11).",
                "AS NOTED, SEE THE SHEETS NAMED")
     lim = tv["limits"]
-    water_fb = water_without_gcm_revision(rep)
     aw = C["res"]["awning"]
     ot = chk["STB-04"]["overturn"]
     td_case = chk["STB-05"]["tie_down"]["cases"][0]
@@ -343,17 +342,14 @@ def ct003(prj, model, bom, checks, reg, dwg):
     ang, sa, pg = td_case["angles"], an["set_above_mm"], an["plate_gap_mm"]
     lines = [
         ("WATER IN TRAVEL (H13)", f"AT MOST {V['water_travel_l']:.0f} L OF FRESH AND GREY WATER WHILE TOWING. FILL THE TANKS AT CAMP (420 L NET)."),
-        ("WITHOUT THE GCM REVISION", f"IF LOVELLS' {lim['gcm_kg']:,.0f} kg GCM REVISION (GV06) IS REFUSED, TOYOTA'S {gcm['toyota_kg']:,.0f} kg HOLDS WITH THE "
-                                     f"TRAILER PLATED AT OR BELOW {gcm['plate_without']:,.0f} kg, {gcm['toyota_kg']:,.0f} kg LESS THE UTE WITH GROWTH, AND AT "
-                                     f"MOST {water_fb} L OF WATER IN TRAVEL, SO THE FULLY LOADED TRAILER WITH GROWTH STAYS UNDER THAT PLATE (H20)."),
-        ("GCM (GCM-01)", f"{lim['gcm_kg']:,.0f} kg WITH THE REVISION. THE UTE WITH GROWTH, {_kg(gcm['ute_kg_growth'])} kg, PLUS THE "
+        ("GCM (GCM-01)", f"FORD'S {lim['gcm_kg']:,.0f} kg. THE UTE WITH GROWTH, {_kg(gcm['ute_kg_growth'])} kg, PLUS THE "
                          f"{gcm['plate']:,.0f} kg PLATE IS {_kg(gcm['sum'])} kg (UTE-06, H20)."),
         ("ATM AND DESIGN LIMIT", f"PLATE {rep['caps']['plated']:,.0f} kg. EVERY CASE WITH GROWTH AT MOST "
                                  f"{chk['MAS-10']['measured'] + chk['MAS-10']['margin']:,.0f} kg (MAS-10)."),
         ("TOWBALL (H17)", f"AT LEAST {rep['solved']['window']['pct_min']:.1f} % OF THE TRAILER IN EVERY CASE AND AT MOST "
-                          f"{rep['solved']['window']['ball_max']['kg']:.0f} kg WITH GROWTH. DO45 450 kg, TOWBAR {lim['towball_rating_kg']:.0f} kg."),
-        ("THE UTE (H17, H18)", f"LOVELLS ELITE PLATED AT {lim['gvm_kg']:,.0f} kg GVM, REAR AXLE {lim['rear_axle_kg']:,.0f} kg ({_kg(uc['UTE-03']['measured'])} kg "
-                          f"TOWING WITH GROWTH). {lim['platinum_rear_axle_kg']:,.0f} kg IF CUT CUT7 RETURNS TO THE PLATINUM."),
+                          f"{rep['solved']['window']['ball_max']['kg']:.0f} kg WITH GROWTH. DO45 450 kg, THE UTE {lim['towball_rating_kg']:.0f} kg (EST.)."),
+        ("THE UTE (H14)", f"FORD RANGER SUPER DUTY ON FORD'S RATINGS: {lim['gvm_kg']:,.0f} kg GVM, REAR AXLE {lim['rear_axle_kg']:,.0f} kg "
+                          f"({_kg(uc['UTE-03']['measured'])} kg TOWING WITH GROWTH)."),
         ("COUPLING HEIGHT", f"{V['coupling_z']:.0f} mm LADEN, PLUS OR MINUS 20 mm. SET THE TONGUE'S DROP AT THE FINAL WEIGHING (TW08)."),
         ("GREY WATER", f"EMPTY FOR TRAVEL. A FULL {V['grey_full_l']:.0f} L TANK IS CHECKED IN CASES TC7 AND TC8."),
         ("AWNING (BDY-11, BDY-23)", f"CLOSE THE AWNING IN WIND, LEGS PEGGED: PEG THE LEGS WHENEVER IT IS OUT, AND CLOSE IT BEFORE GUSTS REACH "

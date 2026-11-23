@@ -43,16 +43,18 @@ RESEARCH = [
     ("25-roof.md", "Roof study, fixed roof against a raising roof", 25),
     ("26-elite-wheels.md", "What the Lovells Elite kit needs from the wheels, track and brakes", 26),
     ("27-car-build-scope.md", "The car build’s scope, the injectors, the driveline for level B and the trailer’s weld evidence", 27),
+    ("31-ranger-super-duty.md", "The Ford Ranger Super Duty: ratings, price, power and the NSW path", 31),
 ]
 # research reports 23 and 24 are the car build and bike box plans themselves, so the index points at their pages
-RESEARCH_PLANS = [("23", "The car build plan", "`VEHICLE.md`, the Car build page", "../tow-vehicle/"),
+RESEARCH_PLANS = [("23", "The tow vehicle plan", "`VEHICLE.md`, the Tow vehicle page", "../tow-vehicle/"),
                   ("24", "The bike box design", "`UTE-GARAGE.md`, the Bike box page", "../ute-garage/")]
-# sections of VEHICLE.md shown on the Car build page, in order. The stage table, the three lists and every total are
+# sections of VEHICLE.md shown on the Tow vehicle page, in order. The stage table, the three lists and every total are
 # rendered from data/vehicle/vehicle-parts.yaml instead, so the page types no figure itself.
-VEHICLE_TOP = ("Summary", "Stage plan")
+VEHICLE_TOP = ("Summary", "The truck against the LandCruiser plan", "Stage plan")
 VEHICLE_END = ("Limits to build and drive to", "Legal path", "Decisions", "Open points and the assumption used")
 SYSTEMS = {
-    "engine": "Engine rebuild, cooling and baseline tests", "fuel_system": "Fuel system", "intake_dpf": "Sealed airbox and DPF service",
+    "purchase": "Purchase inspection", "touring": "Mirrors, radio, compressor and recovery", "power": "Turbo and intercooler",
+    "protection": "Bar, winch, sliders and lights", "engine": "Engine rebuild, cooling and baseline tests", "fuel_system": "Fuel system", "intake_dpf": "Sealed airbox and DPF service",
     "turbo_exhaust": "Turbo, intercooler and exhaust", "tune_legal": "Tune, gauges and engine certificate",
     "clutch_gearbox": "Clutch and gearbox", "driveline": "Transfer case, tailshafts, diffs and hubs",
     "steering_suspension": "Steering and front suspension",
@@ -63,7 +65,7 @@ SYSTEMS = {
 }
 STATUSES = ("build", "check", "optional")
 LISTS = {"build": "Build", "check": "Check list", "optional": "Optional"}
-PRIORITIES = {"P1": "Legal, safe and able to tow, or protecting the truck", "P2": "The 224 kW minimum",
+PRIORITIES = {"P1": "Legal, safe and able to tow, or protecting the truck", "P2": "The power stage",
               "P3": "Optional or comfort"}
 
 # the sheet's footer sums every number column of the tables wrapped in these (site/src/scripts/sheet.ts)
@@ -172,17 +174,16 @@ def _car_lists(data, T):
         out.append(f"| {it['id']} | {link(it)} | {_cell(it.get('part_number'))} | {_cell(it.get('supplier'))} | "
                    f"{it['price_aud']:,.2f} | {it['price_basis']} | {it['priority']} | {_cell(it['why'])} | {it['stage']} | "
                    f"{deps(it)} | {_cell(it.get('note'))} |\n")
-    out.append(SUMS_CLOSE + "### Purchase check list\n\nWear and age items that may still be good or already replaced, and every line "
-               "bought only if a test, an inspection or a certifier calls for it. Each is checked at the stage in the When column, "
-               "most at the S0 inspection, and bought only if it fails, in the stage shown. Not counted, and the check list carries "
+    out.append(SUMS_CLOSE + "### Check list\n\nLines bought only if a check, a test or a certifier calls for them. Each is checked at "
+               "the stage in the When column and bought only if it fails, in the stage shown. Not counted, and the check list carries "
                "no allowance.\n\n" + SUMS_OPEN +
                "| ID | Item | AUD if it fails | Basis | When | Check | Pass mark | Why | Fitted in | Note |\n"
                "|---|---|---|---|---|---|---|---|---|---|\n")
     for it in rows["check"]:
         out.append(f"| {it['id']} | {link(it)} | {it['price_aud']:,.2f} | {it['price_basis']} | {it['checked_at']} | "
                    f"{_cell(it['check'])} | {_cell(it.get('pass_mark'))} | {_cell(it['why'])} | {it['stage']} | {_cell(it.get('note'))} |\n")
-    out.append(SUMS_CLOSE + f"If every item on the check list failed, it would come to AUD {_aud(T['check'])}. That is a note, not a "
-               "total: several lines are alternatives or only-if steps, and they are priced as if each one were needed.\n\n"
+    out.append(SUMS_CLOSE + f"If every line on the check list were bought, it would come to AUD {_aud(T['check'])}. That is a note, not a "
+               "total: each line is an only-if step, priced as if it were needed.\n\n"
                "### Optional extras\n\nExtras the plan does not need. Not counted.\n\n" + SUMS_OPEN +
                "| ID | Item | Part number | Supplier | AUD | Basis | Why | Stage | Note |\n|---|---|---|---|---|---|---|---|---|\n")
     for it in rows["optional"]:
@@ -208,7 +209,7 @@ def _car_totals_table(data, T):
            f"| {over} that figure, with the allowance | {_aud(abs(T['gap']))} |\n" + closing_rows +
            f"| Less every cut, with its share of the allowance | -{_aud(T['cuts'])} |\n"
            f"| The build with every cut and the allowance | {_aud(T['with_cuts'])} |\n"
-           f"| Purchase check list, if every item failed (not counted) | {_aud(T['check'])} |\n"
+           f"| Check list, if every line were bought (not counted) | {_aud(T['check'])} |\n"
            f"| Optional extras (not counted) | {_aud(T['optional'])} |\n\n</div>\n\n"]
     if T["gap"] > 0:
         one = len(T["closing"]) == 1
@@ -218,16 +219,16 @@ def _car_totals_table(data, T):
                    + " (see the cuts below). ")
     else:
         out.append(f"The build with its allowance is under Leonard's AUD {_aud(T['budget'])}, so it needs no cut. ")
-    out.append("The truck, the bike box, the trailer and Leonard's labour are outside these figures (see the cost table on the "
-               "[home page](../)).\n\n")
+    out.append("The truck's purchase, the bike box, the trailer and Leonard's labour are outside these figures (see the cost table on "
+               "the [home page](../)).\n\n")
     return out
 
 
 def tow_vehicle_page():
-    """The Car build page: VEHICLE.md's summary and stage plan with the stage table, then the build, the purchase check
-    list and the optional extras as three spreadsheets with the totals, all from data/vehicle/vehicle-parts.yaml, then
-    VEHICLE.md's limits, legal path, decisions and open points. The URL stays /tow-vehicle/ so earlier links still
-    work."""
+    """The Tow vehicle page: VEHICLE.md's summary, its comparison with the LandCruiser plan and its stage plan with the
+    stage table, then the build, the check list and the optional extras as three spreadsheets with the totals, all from
+    data/vehicle/vehicle-parts.yaml, then VEHICLE.md's limits, legal path, decisions and open points. The URL stays
+    /tow-vehicle/ so earlier links still work."""
     plan = (ROOT / "VEHICLE.md").read_text(encoding="utf-8")
     data = yaml.safe_load((ROOT / "data" / "vehicle" / "vehicle-parts.yaml").read_text(encoding="utf-8"))
     T = car_totals(data, project()["car_build"]["budget_aud"])
@@ -235,28 +236,29 @@ def tow_vehicle_page():
     (GEN / "vehicle.json").write_text(json.dumps(data, indent=1, default=str))
     S = T["sums"]
     get = lambda *k: S.get(k, 0.0)
-    out = ["---\ntitle: Car build\ndescription: 'The LandCruiser 79 car build: stages, the build with its price, reason and stage "
-           "on every line, the purchase check list, the optional extras, the totals, the limits and the legal path.'\n---\n\n",
-           "The car build turns a used Toyota LandCruiser 79 single cab V8 (VDJ79) into the trailer's tow vehicle, with both "
-           "motorbikes in the [bike box](../ute-garage/) on its tray. The plan is `VEHICLE.md`, and every part and paid job is a line "
-           "in `data/vehicle/vehicle-parts.yaml` on one of three lists (decision H24): the build, which is priced and counted, the "
-           "purchase check list of parts that may still be good, and the optional extras. The 3D model of the ute with its box is on "
-           "the [Bike box](../ute-garage/#3d-model) page, the general arrangement is drawing [CT-701](../drawings/#ct-701), and VEH-01 "
-           "to VEH-28 are on the [Measurements](../measurements/?part=car) page.\n\n"]
+    out = ["---\ntitle: Tow vehicle\ndescription: 'The Ford Ranger Super Duty single cab chassis that tows the trailer: the purchase, "
+           "the stages, every line with its price, reason and stage, the totals against the LandCruiser plan it replaces, the "
+           "limits, the power stage and its legal path.'\n---\n\n",
+           "The tow vehicle is a near-new Ford Ranger Super Duty single cab chassis, bought rather than rebuilt, with both "
+           "motorbikes in the [bike box](../ute-garage/) on its chassis. It replaced the LandCruiser VDJ79 build on 22 Nov 2026 "
+           "(research report 31). The plan is `VEHICLE.md`, and every part and paid job is a line in "
+           "`data/vehicle/vehicle-parts.yaml` on one of three lists: the build, which is priced and counted, the check list of lines "
+           "bought only if a check calls for them, and the optional extras. The 3D model of the truck with its box is on the "
+           "[Bike box](../ute-garage/#3d-model) page and the general arrangement is drawing [CT-701](../drawings/#ct-701).\n\n"]
     secs = dict(zip(VEHICLE_TOP + VEHICLE_END, _sections(plan, VEHICLE_TOP + VEHICLE_END)))
     out.append(secs["Summary"] + "\n")
+    out.append(secs["The truck against the LandCruiser plan"] + "\n")
     rows = ("| Stage | Work | Build AUD | Check list AUD | Optional AUD | Paid labour | Downtime (est.) | "
-            "Place in branch A, B | The ute can then |\n|---|---|---|---|---|---|---|---|---|\n")
+            "The truck can then |\n|---|---|---|---|---|---|---|---|\n")
     for st in data["stages"]:
         rows += (f"| {st['id']} | {_cell(st.get('work'))} | " +
                  " | ".join(_cents(get("stage", st["id"], s)) for s in STATUSES) +
-                 f" | {_cell(st.get('labour'))} | {_cell(st.get('downtime'))} | A {st['order_a'] + 1}, B {st['order_b'] + 1} | "
-                 f"{_cell(st['can_do'])} |\n")
+                 f" | {_cell(st.get('labour'))} | {_cell(st.get('downtime'))} | {_cell(st['can_do'])} |\n")
     head, rest = secs["Stage plan"].split("\n", 1)
     out.append(head + "\n\nEach stage's lines added up by list, from the YAML. The sheet's footer gives the totals.\n\n" + _sums(rows) +
                _drop_first_table(rest) + "\n")
     out.append("## Parts list\n\nEvery line of `data/vehicle/vehicle-parts.yaml`, AUD including GST, the line total, sorted into three "
-               "lists by decision H24 and research report 27. Basis is listing (read from a supplier or regulator page) or estimate. "
+               "lists by research report 31. Basis is listing (read from a supplier or regulator page) or estimate. "
                "Priority: " + ", ".join(f"{p} {d[0].lower() + d[1:]}" for p, d in PRIORITIES.items()) + ". Select rows to total them "
                "in the footer, or sort and filter by stage or priority.\n\n")
     out += _car_lists(data, T)
@@ -347,12 +349,12 @@ def project_costs(box_totals, proj=None) -> dict:
                      p["car_build"]["budget_aud"])
     bt = box_totals
     rows = [
-        dict(id="truck", part="Truck purchase", basis=p["truck"]["basis"], before=p["truck"]["purchase_aud"], contingency=0,
-             total=p["truck"]["purchase_aud"], link="/tow-vehicle/#s0-buy-inspect-and-baseline",
-             link_text="Stage S0, buy, inspect and baseline"),
-        dict(id="car", part="Car build (LandCruiser 79)", basis="The build list with its allowance (decision H24)",
+        dict(id="truck", part="Truck purchase (Ranger Super Duty)", basis=p["truck"]["basis"], before=p["truck"]["purchase_aud"],
+             contingency=0, total=p["truck"]["purchase_aud"], link="/tow-vehicle/#s0-buy-inspect-and-weigh",
+             link_text="Stage S0, buy, inspect and weigh"),
+        dict(id="car", part="Truck upgrades", basis="The build list with its allowance (research report 31)",
              before=car["build"], contingency=car["allowance"], total=car["with_contingency"], link="/tow-vehicle/#the-build",
-             link_text="Car build list"),
+             link_text="Upgrade list"),
         dict(id="box", part="Bike box", basis=p["bike_box"]["basis"], before=bt["subtotal_aud"], contingency=bt["contingency_aud"],
              total=bt["total_aud"], contingency_pct=bt["contingency_pct"],
              link="/ute-garage/#parts-list", link_text="Bike box parts list"),
@@ -380,9 +382,9 @@ def project_costs(box_totals, proj=None) -> dict:
 RESEARCH_STATUS = {
     12: "Record. The body's design basis, behind `BODY.md`",
     13: "Record. The appliances and equipment, partly replaced by reports 19 to 21",
-    14: "Record. The engine plan behind `VEHICLE.md`",
-    15: "Record. The driveline plan behind `VEHICLE.md`",
-    16: "Record. The ute's limits behind the ute model",
+    14: "Record. The LandCruiser engine plan, replaced by report 31",
+    15: "Record. The LandCruiser driveline plan, replaced by report 31",
+    16: "Record. The LandCruiser's limits, replaced by report 31",
     17: "Record. The bike box study behind `UTE-GARAGE.md`",
     18: "Record. The trailer's layout study before the home trailer",
     19: "Record, 20 Nov 2026. HVAC, fresh air, windows, doors and the wet room shell, for decisions H4, H7 and H8",
@@ -392,6 +394,7 @@ RESEARCH_STATUS = {
     25: "Record, 20 Nov 2026. The fixed roof with rounded front edges, decision H12",
     26: "Record, 21 Nov 2026. The Elite kit's wheels, rear track and brakes, decisions H18 and H19",
     27: "Record, 22 Nov 2026. The car build's three lists, the injectors, the gearbox and the trailer's weld evidence, decisions H24 and H26",
+    31: "Current, 23 Nov 2026. The Ranger Super Duty behind `VEHICLE.md`, which replaced the LandCruiser plan of reports 14 to 16, 26 and 27",
 }
 
 
@@ -461,10 +464,10 @@ def main():
     # the decision record, from docs/decisions.md, with its first heading moved into the title
     text = (ROOT / "docs" / "decisions.md").read_text(encoding="utf-8")
     text = re.sub(r"\A#\s+[^\n]*\n", "", text, count=1)
-    (DOCS / "decisions.md").write_text("---\ntitle: 'Decisions for the LandCruiser 79 plan'\n---\n\n"
+    (DOCS / "decisions.md").write_text("---\ntitle: 'Decisions'\n---\n\n"
                                        "Copied from `docs/decisions.md` in the repository.\n" + text, encoding="utf-8")
 
-    # the car build page (URL /tow-vehicle/) and the bike box's parts list
+    # the tow vehicle page (URL /tow-vehicle/) and the bike box's parts list
     n_parts = tow_vehicle_page()
     box = box_parts()
     # the trailer's priced parts list, the services' budgets, and the whole project's cost on the home page
@@ -491,7 +494,7 @@ def main():
         (DOCS / "research" / fname).write_text(body, encoding="utf-8")
     research_index()
     print(f"site data written: {len(RESEARCH)} research pages, {len(live)} live drawings "
-          f"({len(reg['drawings']) - len(live)} retired), car build page with {n_parts} parts, box parts list with {len(box['lines'])} lines, "
+          f"({len(reg['drawings']) - len(live)} retired), tow vehicle page with {n_parts} parts, box parts list with {len(box['lines'])} lines, "
           f"trailer parts list with {len(trailer['lines'])} lines")
 
 

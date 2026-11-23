@@ -1,9 +1,10 @@
-# Bike box parts list (report 24, 20 Nov 2026, UTE-GARAGE.md revision C, and revision D of 21 Nov 2026: the rear tub flares
-# for the Elite's 1,555 mm rear track, decision H19). The enclosed welded aluminium box on the LandCruiser VDJ79's frame.
+# Bike box parts list (report 24, 20 Nov 2026, UTE-GARAGE.md revision C, revision D of 21 Nov 2026: the rear tub flares,
+# decision H19, and revision F of 23 Nov 2026: the box on the Ford Ranger Super Duty's body mounting pads in place of the
+# LandCruiser VDJ79's deck mount brackets). The enclosed welded aluminium box on the Super Duty's frame.
 # Decision H25, 22 Nov 2026: Leonard builds the box himself and it is not certified, so the shop labour (was BX-X01) and
 # the engineer's review (was BX-E01) are gone and the box has one total. The design checks stay. The welding group
 # (BX-W01 to BX-W08, 22 Nov 2026) prices what the shop's line used to cover and the box's own proof: Leonard's gas,
-# filler, tungsten and abrasives, the laboratory tests of his weld coupons and the gauges for the bracket proof load.
+# filler, tungsten and abrasives, the laboratory tests of his weld coupons and the gauges for the proof load on Ford's pads.
 # The ute-garage page renders it (cad/sitedata.py), and cad/tests/test_box_parts.py checks that the lines add up to the
 # totals below and to the model's box mass (UGB-01).
 # One entry per line. mass.kg is the mass the line adds to the fitted box, not the mass of stock bought. model_part
@@ -29,7 +30,7 @@ groups:
   services: Ventilation, fume detection, light, power, lamps, extinguisher
   finish: Floor coating and roof coating
   tools: Tool chests on the wheel tubs
-  welding: Leonard's welding gas, filler, tungsten and abrasives, the laboratory tests of his weld coupons and the gauges for the bracket proof load
+  welding: Leonard's welding gas, filler, tungsten and abrasives, the laboratory tests of his weld coupons and the gauges for the proof load on Ford's pads
 lines:
   # ================================================================ materials
   - id: BX-M01
@@ -50,7 +51,7 @@ lines:
     spec: 5052-H32, 2.5 mm, 2,400 x 1,200 mm. Sheets stand on end so every vertical joint lands on a post. 12.9 m2 fitted, 9 sheets with nesting losses (est.)
     qty: 9
     unit: sheet
-    mass: {kg: 86.2, basis: calculated, src: "Model U-SKIN 61.1 kg with the notches over the rear tubs for the flares (BX-M12), the two leaf skins 17.0 kg and the kerb door skin 8.0 kg, at 6.70 kg/m2"}
+    mass: {kg: 86.28, basis: calculated, src: "Model U-SKIN 61.3 kg with the notches over the rear tubs for the flares (BX-M12), the two leaf skins 17.0 kg and the kerb door skin 8.0 kg, at 6.70 kg/m2"}
     price: {aud_each: 260.37, aud: 2343.33, url: "https://store.allaluminium.com.au/products/aluminium-marine-sheet-5052-h32-2-5mm-1200x2400", date: 2026-11-20, basis: listing}
     model_part: [U-SKIN, U-LEAF, U-KDOOR]
   - id: BX-M03
@@ -60,7 +61,7 @@ lines:
     spec: 5052-H32, 3.0 mm. Both tubs, folded and welded
     qty: 1
     unit: sheet
-    mass: {kg: 6.6, basis: calculated, src: "Model U-TUB, 0.83 m2 at 8.04 kg/m2. The tubs follow the Elite's rear track 47.5 mm outward, so their tops are 322 mm wide in place of 369.5 mm"}
+    mass: {kg: 5.11, basis: calculated, src: "Model U-TUB at 8.04 kg/m2. On Ford's 1,710 mm rear track the tubs' tops are 241.5 mm wide from 681 mm out to the wall, and 70 mm high"}
     price: {aud_each: 312.39, aud: 312.39, url: "https://store.allaluminium.com.au/collections/marine-sheet-aluminium", date: 2026-11-20, basis: listing}
     model_part: U-TUB
   - id: BX-M04
@@ -70,7 +71,7 @@ lines:
     spec: 5052-H32, 4.0 mm. Three pieces 1,845 mm across, butt welded over the crossmembers at module X 1,150 and 2,300 mm
     qty: 3
     unit: sheet
-    mass: {kg: 43.9, basis: calculated, src: "Model U-FLOOR, 4.09 m2 at 10.72 kg/m2. With the tubs 47.5 mm further out, the floor between them is 1,201 mm wide"}
+    mass: {kg: 45.17, basis: calculated, src: "Model U-FLOOR at 10.72 kg/m2. With the tubs on Ford's track, the floor between them is 1,362 mm wide"}
     price: {aud_each: 416.59, aud: 1249.77, url: "https://store.allaluminium.com.au/collections/marine-sheet-aluminium", date: 2026-11-20, basis: listing}
     model_part: U-FLOOR
   - id: BX-M05
@@ -84,16 +85,6 @@ lines:
     price: {aud_each: 520.73, aud: 520.73, url: "https://store.allaluminium.com.au/collections/marine-sheet-aluminium", date: 2026-11-20, basis: listing}
     model_part: U-PACKER
     note: Replaces the model's 2 mm galvanised steel packer. The 35 mm steel crossmember (BX-U01) needs 5 mm to bring the 13.7 mm track to 0.3 mm under the floor top
-  - id: BX-M06
-    group: materials
-    name: Mount angles, stations 2 to 6
-    part_number: "Angle 50 x 50 x 6, 3.25 m half length"
-    spec: 6061-T6 equal angle 50 x 50 x 6, welded to the runners' outer faces
-    qty: 1
-    unit: length
-    mass: {kg: 0.0, basis: estimate, src: "In BX-U02 and BX-U03 (model U-MOUNT-FIRM and U-MOUNT-SPRING)"}
-    price: {aud_each: 140.53, aud: 140.53, url: "https://store.allaluminium.com.au/products/aluminium-angle-50mm-x-50mm-x-6mm", date: 2026-11-20, basis: estimate}
-    note: "Estimate: the 6060-T5 listing (AUD 112.42) plus 25 % for 6061-T6"
   - id: BX-M07
     group: materials
     name: Body frame tube
@@ -101,7 +92,7 @@ lines:
     spec: 6061-T6 square hollow section 40 x 40 x 3. 44.4 m fitted plus 15 % for cutting
     qty: 8
     unit: length
-    mass: {kg: 53.3, basis: calculated, src: "Model U-FRAME, 44.4 m at 1.20 kg/m"}
+    mass: {kg: 53.35, basis: calculated, src: "Model U-FRAME, 44.4 m at 1.20 kg/m"}
     price: {aud_each: 185.33, aud: 1482.64, url: "https://store.allaluminium.com.au/products/aluminium-square-tube-40mm-x-40mm-x-3mm", date: 2026-11-20, basis: estimate}
     model_part: U-FRAME
     note: "Estimate: the 6060-T5 listing (AUD 148.26) plus 25 % for 6061-T6. Do not substitute 6060-T5: its welded strength is lower and the checks use 6061-T6"
@@ -120,10 +111,10 @@ lines:
     group: materials
     name: Subframe runners
     part_number: "RHS 75 x 50 x 3, 6.5 m"
-    spec: 6061-T6 RHS 75 x 50 x 3, laid flat. Six pieces, 4.92 m fitted
+    spec: 6061-T6 RHS 75 x 50 x 3, laid flat over Ford's pads. Four pieces, from the front steel stubs to the rear steel crossmember and on to the rear, 4.21 m fitted
     qty: 1
     unit: length
-    mass: {kg: 9.49, basis: calculated, src: "Model U-RUNNER, 4.92 m at 1.93 kg/m"}
+    mass: {kg: 8.13, basis: calculated, src: "Model U-RUNNER, 4.21 m at 1.93 kg/m"}
     price: {aud_each: 301.51, aud: 301.51, url: "https://store.allaluminium.com.au/collections/aluminium-rectangular-hollow", date: 2026-11-20, basis: estimate}
     model_part: U-RUNNER
     note: "Estimate: 6060-T5 listing AUD 241.21 plus 25 %"
@@ -131,10 +122,10 @@ lines:
     group: materials
     name: Subframe crossmembers and outriggers
     part_number: "SHS 50 x 50 x 3, 6.5 m"
-    spec: 6061-T6 SHS 50 x 50 x 3. Eight crossmembers of 911 mm and twelve outriggers of 392 mm, 12.0 m, cut from two lengths
+    spec: 6061-T6 SHS 50 x 50 x 3. Seven crossmembers of 1,169 mm between the runners, one at each of Ford's pad stations, and eight outriggers of 263 mm, 10.3 m, cut from two lengths
     qty: 2
     unit: length
-    mass: {kg: 18.2, basis: calculated, src: "Model U-CM, 12.0 m at 1.52 kg/m"}
+    mass: {kg: 15.64, basis: calculated, src: "Model U-CM, 10.3 m at 1.52 kg/m"}
     price: {aud_each: 228.33, aud: 456.66, url: "https://store.allaluminium.com.au/products/aluminium-square-tube-50mm-x-50mm-x-3mm", date: 2026-11-20, basis: estimate}
     model_part: U-CM
     note: "Estimate: 6060-T5 listing AUD 182.66 plus 25 %"
@@ -153,10 +144,10 @@ lines:
     group: materials
     name: Rear tub flare sheet
     part_number: "Aluminium Marine Sheet 5052 H32 2.5mm 1200x2400"
-    spec: "5052-H32, 2.5 mm. Two flares, each folded from a blank about 925 x 150 mm into a channel 20 mm deep and 130.5 mm high, with welded ends, set into a notch over the rear tub in each side wall (decision H19, report 26 fix A). The box is 1,890 mm over the flares"
+    spec: "5052-H32, 2.5 mm. Two flares, each folded from a blank about 1,000 x 230 mm into a channel 103.5 mm deep and 114 mm high, 962 mm long, with welded ends, set into a notch over the rear tub in each side wall (decision H19, on Ford's 1,710 mm track). The box is 2,057 mm over the flares"
     qty: 1
     unit: sheet
-    mass: {kg: 1.9, basis: calculated, src: "Model U-FLARE, 0.29 m2 at 6.70 kg/m2. The notches take 1.6 kg off the skins (BX-M02), so the box gains 0.3 kg"}
+    mass: {kg: 3.11, basis: calculated, src: "Model U-FLARE at 6.70 kg/m2"}
     price: {aud_each: 260.37, aud: 260.37, url: "https://store.allaluminium.com.au/products/aluminium-marine-sheet-5052-h32-2-5mm-1200x2400", date: 2026-11-21, basis: listing}
     model_part: U-FLARE
     note: "A sheet of its own (est.). BX-M02's offcuts, about 1,200 x 896 mm each, may cover both blanks and save it. Leonard folds and welds them"
@@ -174,26 +165,37 @@ lines:
     note: "Replaces RHS 76 x 38 x 3, which is not an Australian stock size (the AS/NZS 1163 range runs 65 x 35, 75 x 25, 75 x 50). Price est.: 42.8 kg at about AUD 4.20/kg for black RHS"
   - id: BX-U02
     group: subframe_mounts
-    name: Firm mount plates (stations 1 and 2) and runner cleats
+    name: Rigid mounts on Ford's pads (stations 2 to 4) and runner cleats
     part_number: Fabricated
-    spec: "Station 1: 6 mm C350 plate 145 x 80 mm welded under each front steel crossmember end, one M12 bolt ahead of and one behind the crossmember. Station 2: BX-M06 angle on the runner. Eight 50 x 50 x 5 steel angle cleats welded to the crossmembers for the runner joints"
+    spec: "Six steel spacers 60 x 50 mm, 45 mm tall (51 mm at station 4 for its lower pad), each covering its pad, with a 3 mm G10 pad on top under the aluminium and a steel crush tube through the runner. Eight 50 x 50 x 5 steel angle cleats welded to the crossmembers and stubs for the runner joints. Galvanised with BX-U04, no powder coat on the faces (Ford BEMM p. 124)"
     qty: 1
     unit: set
-    mass: {kg: 4.8, basis: estimate, src: "Model U-MOUNT-FIRM (4 x 1.2 kg, estimate), with their bolts"}
-    price: {aud_each: 80.00, aud: 80.00, url: null, date: 2026-11-20, basis: estimate}
+    mass: {kg: 7.8, basis: estimate, src: "Model U-MOUNT-FIRM (6 x 1.3 kg, estimate), with their bolts"}
+    price: {aud_each: 90.00, aud: 90.00, url: null, date: 2026-11-23, basis: estimate}
     model_part: U-MOUNT-FIRM
-    note: "Est.: about 6 kg of 6 mm plate and 5 mm angle offcuts from a steel merchant"
+    note: "Est.: about 7 kg of 50 x 50 bar, plate and 5 mm angle offcuts from a steel merchant"
   - id: BX-U03
     group: subframe_mounts
-    name: Compliant mount cushions, stations 3 to 6
-    part_number: "Toyota 70 Series cab mounting cushion, upper and lower, by VIN"
-    spec: One M12 8.8 bolt per bracket through an upper and a lower rubber cushion, a steel sleeve that sets the preload and a 50 mm safety washer. Eight mounts. Station 6 sits under the rear steel crossmember on a 6 mm plate as station 1
-    qty: 8
+    name: Flexible mounts on Ford's first pads, station 1
+    part_number: "Rubber body-mount cushions, upper and lower, about 1 kN/mm (product to choose)"
+    spec: "One captive M14 10.9 bolt per pad through an upper and a lower rubber cushion either side of Ford's pad, a steel sleeve that sets the preload and stops the travel at 12 mm, and a 60 mm safety washer. Two mounts, under the front steel stubs (Ford BEMM p. 124: flexible at the forward pads only)"
+    qty: 2
     unit: mount
-    mass: {kg: 8.0, basis: estimate, src: "Model U-MOUNT-SPRING (8 x 1.0 kg, estimate)"}
-    price: {aud_each: 60.00, aud: 480.00, url: null, date: 2026-11-20, basis: estimate}
+    mass: {kg: 2.2, basis: estimate, src: "Model U-MOUNT-SPRING (2 x 1.1 kg, estimate)"}
+    price: {aud_each: 60.00, aud: 120.00, url: null, date: 2026-11-23, basis: estimate}
     model_part: U-MOUNT-SPRING
-    note: "Toyota's own cab cushions are made for the 70 Series frame's twist and are stocked by every Toyota dealer. Est. AUD 60 a pair. Their steel sleeves set the preload, and the 20 km rough-road drive of build step 11 shows any knock or bottoming (open point 3)"
+    note: "Est. AUD 60 a pair of cushions with the sleeve. Pick cushions of about 1 kN/mm (Ford's figure). The 20 km rough-road drive of build step 11 shows any knock or bottoming (open point 3)"
+  - id: BX-U05
+    group: subframe_mounts
+    name: Steel stubs at the front anchor crossmember
+    part_number: "RHS 75 x 50 x 3.0, C350L0, offcut"
+    spec: AS/NZS 1163 C350L0 RHS 75 x 50 x 3.0, laid flat, four pieces welded to the front steel crossmember, two forward over Ford's first pads and two back to the first aluminium crossmember, 0.70 m. Galvanised with it (BX-U04)
+    qty: 1
+    unit: length
+    mass: {kg: 3.87, basis: calculated, src: "Model U-STEEL-STUB, 0.70 m at 5.53 kg/m with the zinc"}
+    price: {aud_each: 45.00, aud: 45.00, url: null, date: 2026-11-23, basis: estimate}
+    model_part: U-STEEL-STUB
+    note: "Est.: a 1 m offcut from a steel merchant. They carry a strap's breaking load at the front track row to Ford's first two pads (UGR-04)"
   - id: BX-U04
     group: subframe_mounts
     name: Hot-dip galvanising of the steel parts
@@ -207,13 +209,13 @@ lines:
   # ================================================================ fasteners, isolation, sealant
   - id: BX-F01
     group: fasteners_sealants
-    name: Bracket bolts
-    part_number: "M12 x 1.75, property class 8.8, hot-dip galvanised, hardened washers, nyloc nuts"
-    spec: "Sixteen sets: two per firm bracket (8), one per compliant bracket (8). Head up inside the subframe under the floor, nut below Toyota's bracket. Lengths to suit each stack"
-    qty: 16
+    name: Pad bolts
+    part_number: "M14 x 2.0, property class 10.9, zinc flake, two 50 x 5 mm hardened washers, locknuts"
+    spec: "Eight sets, one per Ford pad, Ford's recommended size (BEMM pp. 124 and 158). Head up inside the subframe under the floor, locknut below Ford's pad, torqued to Ford's 150 to 200 Nm for M14 10.9 (p. 27). Lengths to suit each stack"
+    qty: 8
     unit: set
     mass: {kg: 0.0, basis: estimate, src: "In BX-U02 and BX-U03"}
-    price: {aud_each: 6.00, aud: 96.00, url: null, date: 2026-11-20, basis: estimate}
+    price: {aud_each: 12.00, aud: 96.00, url: null, date: 2026-11-23, basis: estimate}
   - id: BX-F02
     group: fasteners_sealants
     name: L-track bolts
@@ -264,9 +266,9 @@ lines:
     model_part: U-RIVETS
   - id: BX-F07
     group: fasteners_sealants
-    name: Isolation materials and rail strip
-    part_number: "G10 sheet 3 mm, PVC isolating tape, EPDM strip 6 x 75 mm"
-    spec: "G10 pads at every steel to aluminium faying face, isolating tape under the packers and strips, 5.4 m of 6 mm EPDM strip under the runners and steel crossmembers on the rails"
+    name: Isolation materials
+    part_number: "G10 sheet 3 mm, PVC isolating tape"
+    spec: "G10 pads at every steel to aluminium faying face and on the six rigid mounts, isolating tape under the packers and strips. No strip on the rails: the subframe stands on Ford's pads clear of the rail tops (BEMM p. 158)"
     qty: 1
     unit: set
     mass: {kg: 2.5, basis: estimate, src: "Model U-SUB-FIX (estimate)"}
@@ -720,12 +722,22 @@ lines:
     unit: decal
     mass: {kg: 0.0, basis: estimate, src: "Negligible"}
     price: {aud_each: 15.00, aud: 30.00, url: null, date: 2026-11-21, basis: estimate}
+  - id: BX-C04
+    group: finish
+    name: Rear mudflaps with their brackets
+    part_number: "Heavy-duty rubber mudflap 300 x 560 x 5 mm, pair, with galvanised 50 x 6 flat bar brackets"
+    spec: "Behind each rear tyre, bolted under the outrigger behind the tub, the bottom edge about 230 mm above the ground. The Super Duty is bought as a cab chassis without guards, so the box's flares and these flaps are its rear mudguards (ADR 42/05). The LandCruiser's came in the Lovells kit"
+    qty: 2
+    unit: each
+    mass: {kg: 2.6, basis: estimate, src: "Model U-MUDFLAP (2 x 1.3 kg, estimate)"}
+    price: {aud_each: 45.00, aud: 90.00, url: null, date: 2026-11-23, basis: estimate}
+    model_part: U-MUDFLAP
   # ================================================================ tools
   - id: BX-T01
     group: tools
     name: Tool chest sheet
     part_number: "Aluminium Marine Sheet 5052 H32 1.6mm 1200x2400"
-    spec: Two chests, 780 x 270 x 200 mm and 780 x 220 x 200 mm, bolted to the wheel tubs. The road-side chest is 30 mm narrower than before, so it stays on its tub on the Elite's rear track
+    spec: Two chests, 812 x 185 x 200 mm, bolted to the wheel tubs. Ford's 1,710 mm rear track puts the tubs further out and narrower than on the LandCruiser, so both chests are 185 mm wide
     qty: 1
     unit: sheet
     mass: {kg: 9.0, basis: estimate, src: "Model U-TOOLBOX share"}
@@ -814,7 +826,7 @@ lines:
     note: "No NATA-accredited laboratory publishes its prices. About an hour of a technician's time with the section, the etch or the pull and the report, AUD 200 a test (est.)"
   - id: BX-W08
     group: welding
-    name: Gauges for the deck mount bracket proof load
+    name: Gauges for the proof load on Ford's body mounting pads
     part_number: "1 t digital crane scale, 300 kg platform scale, and a 0.01 mm dial gauge on a magnetic base"
     spec: "UTE-GARAGE.md build step 9. The platform scale reads the jack's push for the uplift and the crane scale the chain's pull for the downward load. Leonard's own bottle jack, lever hoist and chain do the loading"
     qty: 1
@@ -822,18 +834,19 @@ lines:
     mass: {kg: 0.0, basis: estimate, src: "Tools, not on the box"}
     price: {aud_each: 230.00, aud: 230.00, url: null, date: 2026-11-22, basis: estimate}
     note: "About AUD 80 each for the two scales and AUD 70 for the dial gauge and base (est.)"
-# Totals from the lines, 22 Nov 2026 (cad/tests/test_box_parts.py checks them): every aud is qty x aud_each, and converted
+# Totals from the lines, 23 Nov 2026 (cad/tests/test_box_parts.py checks them): every aud is qty x aud_each, and converted
 # prices match the stated rates. Contingency 10 % (est.). Leonard builds the box, so it has one total (H25).
-# mass_kg_lines is the fitted box as listed, which is the model's box mass (UGB-01).
+# mass_kg_lines is the fitted box as listed, which is the model's box mass (UGB-01). On the Ranger Super Duty since
+# 23 Nov 2026: Ford's pads in place of Toyota's brackets, the steel stubs and the mudflaps in, the angles and cushions out.
 totals:
-  by_group: {materials: 7975.62, subframe_mounts: 990.0, fasteners_sealants: 1096.9, doors: 1200.15, security: 3797.36, restraint: 1852.09, loading: 2972.61, services: 1771.42, finish: 674.42, tools: 246.62, welding: 2758.95}
-  subtotal_aud: 25336.14
+  by_group: {materials: 7835.09, subframe_mounts: 685.0, fasteners_sealants: 1096.9, doors: 1200.15, security: 3797.36, restraint: 1852.09, loading: 2972.61, services: 1771.42, finish: 764.42, tools: 246.62, welding: 2758.95}
+  subtotal_aud: 24980.61
   contingency_pct: 10
-  contingency_aud: 2533.61
-  total_aud: 27869.75
-  mass_kg_lines: 437.27
+  contingency_aud: 2498.06
+  total_aud: 27478.67
+  mass_kg_lines: 438.14
   not_in_total:
     - {name: "Monimoto 9 subscriptions", aud_per_year: 158, src: "AUD 79 a year each (report 17)"}
     - {name: "FMC130 tracking platform", aud_per_year: 120, src: "Estimate"}
     - {name: "Full exterior powder coat (option to BX-C02)", aud: 4000, src: "https://tongmetal.com.au/ (from AUD 4,000)"}
-    - {name: "Certification of the box, its winch and its mountings", aud: 0, src: "None. Leonard builds the box and does not certify it (decision H25). The car build's LC5 inspection (GV03) covers the GVM kit and the GCM revision"}
+    - {name: "Certification of the box, its winch and its mountings", aud: 0, src: "None. Leonard builds the box and does not certify it (decision H25). The Ranger Super Duty needs no GVM or GCM certification"}

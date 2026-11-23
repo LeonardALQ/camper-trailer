@@ -17,8 +17,8 @@ from ..trailer import Trailer
 from . import sheet as S
 
 def water_without_gcm_revision(rep) -> int:
-    """The most water in travel if Lovells' GCM revision is refused (decision H20, GCM-01): what keeps the heaviest case
-    with growth at or under the plate Toyota's GCM leaves, at 1 kg a litre, rounded down."""
+    """The LandCruiser's fallback water limit if Lovells' GCM revision was refused (decision H20). The Ranger Super Duty
+    has Ford's 8,000 kg GCM and no fallback, so GCM-01 gives the travel water itself here. No sheet calls this any more."""
     return next(c for c in rep["checks"] if c["id"] == "GCM-01")["gcm"]["water_without"]
 
 OUT = BUILD / "drawings"
