@@ -625,7 +625,7 @@ def ct601(prj, model, bom, checks, reg, dwg):
     rows = [[s["step"], s["sheds"], s["when"], s["after"]] for s in svc["shedding"]]
     y = wtable(sh, 230, y - 7, [("ORDER", 13), ("WHAT SHEDS", 45), ("WHEN", 54), ("THEN", 68)], rows, size=1.25,
                title="LOAD SHEDDING, IN ORDER")
-    S.notes(sh, 230, y - 6, [
+    yn, _ = S.notes(sh, 230, y - 6, [
         "THE MULTIPLUS-II 48/6k5 STAYS: WITH THE SHOWER HEATER SHED, THE HOB, THE OVEN AND THE SPLIT RUN TOGETHER INSIDE ITS RATING, "
         "SO THE 48/10000 IS NOT NEEDED.",
         "K2, K4 AND S1 ARE CONTACTORS ON THE BOARD, DRIVEN BY CURRENT RELAYS ON C1, C2 AND C4. THE CERBO GX'S TOTAL POWER RULE "
@@ -633,8 +633,66 @@ def ct601(prj, model, bom, checks, reg, dwg):
         "RECHARGE ORDER: THE SUN, THEN THE DRIVE (THE UTE'S CHARGERS), THEN THE TWO EU22i (8.4 h FOR A DESIGN HOT DAY WITH THE "
         "HOUSEHOLD RUNNING, 6.3 h WITH THE LOADS OFF).",
     ], size=1.3, width_chars=150)
+    _arm_detail(sh, C, rt, yn - 7)
     write(sh, dwg)
     return time.time() - t0
+
+
+def _arm_detail(sh, C, rt, top):
+    """CT-601's detail of the leads' sprung arms on the leads' bracket DB-HK (I2-78, I2-83), side view from the road side
+    at 1:5, front to the right: the hinge, the clamp, the arm where the strap stands at its seat's top, the seat's arc
+    from the strap and the stops on the arm's swing, and beside it each arm's figures from the routes and DIM-08."""
+    k14 = rt["K-14"]
+    lift = k14["lift"]
+    lead = {x["run"]: x for x in C["chk"]["DIM-08"]["leads"]}
+    sh.text(232, top, "THE LEADS' SPRUNG ARMS ON DB-HK (I2-83): SIDE VIEW FROM THE ROAD SIDE, FRONT TO THE RIGHT, 1:5", 2.0, bold=True)
+    k, (d0, d1), ts = 0.2, lift["deg"], float(lift["strap_deg"])
+    arm, R = k * float(lift["arm_mm"]), k * float(lift.get("seat_mm", k14["bend_r"]))
+    ox, oy = 262.0, top - 37.0
+
+    def at(deg, r):
+        return (ox + r * math.cos(math.radians(deg)), oy + r * math.sin(math.radians(deg)))
+    sh.line(ox - 22, oy, ox + arm + R + 2, oy, "centre")
+    sh.path([at(d0 + (d1 - d0) * i / 40, 30.0) for i in range(41)], "phantom")
+    for d in (d0, d1):
+        sh.line(*at(d, 27.0), *at(d, 33.0), "thin")
+    sh.text(ox + 9.5, oy + 30.5, f"TOP STOP, {d1:g} DEGREES ABOVE LEVEL", 1.2)
+    sh.text(ox + 1.0, oy - 17.5, "BOTTOM STOP,", 1.2)
+    sh.text(ox + 1.0, oy - 19.7, f"{-d0:g} DEGREES BELOW LEVEL", 1.2)
+    c = at(ts, arm)
+    n, h = (-math.sin(math.radians(ts)), math.cos(math.radians(ts))), k * 25.0 / 2
+    sh.path([(ox + n[0] * h, oy + n[1] * h), (c[0] + n[0] * h, c[1] + n[1] * h), (c[0] - n[0] * h, c[1] - n[1] * h),
+             (ox - n[0] * h, oy - n[1] * h)], "medium", closed=True)
+    lo, hi = (float(v) for v in lift["seat_deg"])
+    # drawn where the strap stands at the seat's top, its angles from the top towards the rear, the rear to the left
+    sh.path([(c[0] - R * math.sin(math.radians(a)), c[1] + R * math.cos(math.radians(a))) for a in
+             (lo + (hi - lo) * i / 48 for i in range(49))], "thick")
+    sh.line(c[0], c[1] + R - 1.6, c[0], c[1] + R + 1.6, "thick")
+    sh.circle(ox, oy, 1.2, "medium")
+    sh.rect(ox - 5.0, oy - 2.0, ox - 1.0, oy + 2.0, "thin")
+    sh.text(ox - 24, oy + 4.2, "M8 SHOULDER BOLT,", 1.2)
+    sh.text(ox - 24, oy + 2.0, "THE ARM'S HINGE", 1.2)
+    sh.text(ox - 24, oy - 4.6, "THE LEAD'S CLAMP,", 1.2)
+    sh.text(ox - 24, oy - 6.8, "15 mm BEHIND IT", 1.2)
+    sh.text(c[0] - 13.0, c[1] + R + 6.6, "STRAP AT ITS MARK, AT THE SEAT'S TOP", 1.2)
+    sh.text(c[0] - 13.0, c[1] + R + 4.4, f"WITH THE ARM {-ts:g} DEGREES BELOW LEVEL", 1.2)
+    paras = []
+    for r in (rt["K-13"], k14):
+        x, lf = lead[r["id"]], r["lift"]
+        paras.append(f"{r['id']}, THE {'12-PIN' if r['id'] == 'K-13' else 'SB50'} LEAD: SEAT R {float(lf.get('seat_mm', r['bend_r'])):g} mm AT THE "
+                     f"LEAD'S CENTRELINE, STRAP {lf['clip_mm']:g} mm FROM THE PLUG, SPRING {lf['torque_nmm'][0] / 1000:.1f} N m ON THE BOTTOM "
+                     f"STOP TO {lf['torque_nmm'][1] / 1000:.1f} N m ON THE TOP (EST.). DRIVING STRAIGHT THE ARM STANDS "
+                     f"{x['straight']['arm_deg']:.0f} DEGREES UP, AND IN ANY TURN THE LEAD HANGS NO LOWER THAN {x['turn_low_mm']:.0f} mm, "
+                     f"{x['low_ball']['turn_low_mm']:.0f} mm WITH THE BALL LOW (DIM-08, EST.).")
+    paras.append(f"EACH ARM IS 300 x 25 x 3 mm 316 STRIP, ITS TORSION SPRING LIFTING IT BETWEEN THE STOPS. ITS SEAT, A LINED CHANNEL BENT "
+                 f"ROUND THE TIP TO THE LEAD'S BEND RADIUS, RUNS {-lo:g} DEGREES AHEAD OF THE STRAP AND {hi:g} BEHIND IT, FIXED ON THE "
+                 "ARM, SO THE STRAP TURNS WITH IT. DRAWN FOR K-14. KEEP BOTH ARMS FREE TO SWING.")
+    x0, y = c[0] + R + 6.0, top - 5.0
+    for t in paras:
+        for line in S.wrap_mm(t, 410 - 1.5 - x0, 1.2):
+            sh.text(x0, y, line, 1.2)
+            y -= 2.2
+        y -= 1.0
 
 
 # ------------------------------------------------------------------ CT-602 electrical layout
@@ -1000,7 +1058,8 @@ def ct611(prj, model, bom, checks, reg, dwg):
     wire(sh, [(92, 232), (98, 232)], "cold", arrow=True)
     sh.text(99, 246.2, f"{V['water_full_l']:.0f} L NET. AT MOST {V['water_travel_l']:.0f} L IN TRAVEL (H13)", 1.15)
     # tank outlets to the pump chain
-    wire(sh, [(152, 256), (157, 256), (157, 215), (125, 215), (125, 212)], "cold")
+    wire(sh, [(152, 256), (157, 256), (157, 215), (125, 215)], "cold")
+    S.mark_flow(sh)       # the front tank's outlet joins the rear tank's at a tee, read with the arrows (I2-85)
     wire(sh, [(125, 222), (125, 212)], "cold", arrow=True)
     sh.text(158.5, 236, "OUTLETS JOINED", 1.15, rot=-90)
     box(sh, 98, 202, 152, 212, ["40-MESH STRAINER"], size=1.25)

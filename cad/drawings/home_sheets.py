@@ -359,7 +359,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
         ("COUPLING HEIGHT", f"{V['coupling_z']:.0f} mm LADEN, PLUS OR MINUS 20 mm. SET THE HITCH'S DROP AT THE FINAL WEIGHING (TW08)."),
         ("GREY WATER", f"EMPTY FOR TRAVEL. A FULL {V['grey_full_l']:.0f} L TANK IS CHECKED IN CASES TC7 AND TC8."),
         ("LEADS (DIM-04, DIM-08)", "PLUG IN THE SB50 LEAD AND THE 12-PIN LEAD. EACH STAYS CLAMPED ON THE LEADS' BRACKET AHEAD OF THE STONE GUARD "
-                                   "AND STRAPPED AT ITS MARK TO THE SEAT ON ITS SPRUNG ARM, WHICH LIFTS ITS SLACK. KEEP BOTH ARMS FREE TO SWING. "
+                                   "AND STRAPPED AT ITS MARK TO THE SEAT ON ITS SPRUNG ARM (CT-601), WHICH LIFTS ITS SLACK. KEEP BOTH ARMS FREE TO SWING. "
                                    f"DRIVING STRAIGHT NO PART OF THEM HANGS BELOW ABOUT {leads_low:.0f} mm (EST.), OVER THE COUPLING'S UNDERSIDE, "
                                    f"AND IN A FULL 70 DEGREE TURN WITH A 20 DEGREE PITCH ABOUT {turn_low:.0f} mm, {turn_ball:.0f} mm WITH THE BALL "
                                    f"AT ITS LOW {V['coupling_z'] - C['tr'].tv['coupling_tol']:.0f} mm (EST., TR-13)."),

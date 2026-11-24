@@ -776,14 +776,14 @@ class Trailer:
         cases = [(x["turn_low_mm"], x["run"], z, x["turn_yaw"], x["turn_pitch"]) for x in rows]
         cases += [(x["low_ball"]["turn_low_mm"], x["run"], z - tol, x["low_ball"]["turn_yaw"], x["low_ball"]["turn_pitch"]) for x in rows]
         v, run, ball, yaw, pitch = min(cases)
-        each = "; ".join(f"{x['run']}, {x['turn_model']}, {x['turn_low_mm']:.1f} mm at the {z:.0f} mm ball and "
-                         f"{x['low_ball']['turn_low_mm']:.1f} mm at {z - tol:.0f} mm" for x in rows)
+        each = ". ".join(f"{x['run']} {x['turn_low_mm']:.1f} mm at the {z:.0f} mm ball and {x['low_ball']['turn_low_mm']:.1f} mm at "
+                         f"{z - tol:.0f} mm, {x['turn_model']}" for x in rows)
         taut = sum(x.get("taut", 0) + x["low_ball"].get("taut", 0) for x in rows)
         ok = v >= low - 1e-6 and taut == 0
         return dict(limit=f">= {low:g} mm", measured=v, unit="mm", margin=round(v - low, 1), ok=ok,
                     governing=f"{run} with the ball at {ball:.0f} mm", leads=[_no_pts(x) for x in rows],
                     detail=(f"lowest {v:.1f} mm, {run} turned {abs(yaw)} degrees with a {abs(pitch)} degree pitch, the ball at {ball:.0f} mm. "
-                            f"Each lead's lowest in any turn: {each}. Positions whose cut, less its margin, would pull a span taut: {taut}"))
+                            f"Each lead's lowest in any turn: {each}. Positions whose cut, less its margin, would pull a span taut: {taut}."))
 
     def leads_rows(self, lay) -> list:
         """The leads between the vehicles over every turn and pitch at both ball heights (cad/routes.py between_reach),
@@ -1204,7 +1204,7 @@ class Trailer:
                 items += [(x["governing"], x["run"], (x["x_mm"] - 1, 0.0, x["z_mm"], x["x_mm"] + 1, 0.0, x["z_mm"]))
                           for x in leads if x["ball"] == "the design ball"]
                 bo = lay.breakover(-ahead, items)
-                each = "; ".join(f"{x['run']} {x['deg']:.1f} degrees with {x['ball']}" for x in leads)
+                each = ", ".join(f"{x['run']} {x['deg']:.1f} degrees with {x['ball']}" for x in leads)
                 row.update(limit="reported", measured=round(bo["deg"], 1), unit="deg", margin=None, ok=True, governing=bo["governing"],
                            detail=(f"{bo['deg']:.1f} degrees, a crest under {bo['governing']} at X {bo['x_mm']:,.0f} mm, its underside "
                                    f"{bo['z_mm']:.1f} mm up, between the ute's rear axle {ahead:,.0f} mm ahead of the ball and the trailer's "

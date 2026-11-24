@@ -306,6 +306,15 @@ def mark_arrow(el: list, tip) -> int | None:
     return None
 
 
+def mark_flow(sh, level=None) -> None:
+    """Mark the line drawn last as a flow's line (I2-85): a flow drawn with no head of its own that joins another flow
+    at a tee, as CT-611's joined tank outlets meet the rear tank's line, so the overrun check reads it with the arrows,
+    at its `level` where one is given."""
+    e = sh.el[-1]
+    if e.startswith("<path") and not is_leader(e):
+        sh.el[-1] = e[:-2] + ' class="arrow"' + (f' data-level="{level}"' if level else "") + "/>"
+
+
 _SYM_IN = re.compile(r'data-in="(\d+)"')
 _SYM_OF = re.compile(r'data-sym="(\d+)"')
 

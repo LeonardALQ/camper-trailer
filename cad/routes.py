@@ -1576,49 +1576,82 @@ def _end_dir(p: tuple, q: tuple, c: dict, at: str) -> tuple:
 
 
 def lift_rest(P: tuple, A: tuple, O: tuple, lift: dict, w: float, seat_r: float) -> dict | None:
-    """A lead's span held up by its sprung arm (`lift`, I2-78), the truck's plug at P. The lead runs from the plug
-    up over a lined seat of radius seat_r at the arm's tip C, strapped to it at the seat's top, `clip_mm` along it
-    from the plug, and on to its clamp A on the bracket, `rest_mm` from the strap. The arm is hinged at O and swings
-    in the vertical plane along X between its stops (`deg`, from forward and level), its torsion spring lifting it
-    with a torque falling from `torque_nmm[0]` on the bottom stop to `torque_nmm[1]` on the top one, against the
-    weight of the arm and its clip (`arm_kg`, `clip_kg`). Each part of the span is a flexible catenary of its own
-    length from where it leaves the seat, tangent to it (no bending stiffness, est.), and pulls the seat with its
-    horizontal pull plus the weight under it along its tangent. The arm rests where the spring's torque balances
-    those pulls, or on a stop. None if the span is pulled taut at every place of the arm. Returns the arm's angle,
-    the seat's centre, the two parts and where they leave the seat, the lowest point of the lead's centreline and
-    the pull at the plug (N)."""
+    """A lead's span held up by its sprung arm (`lift`, I2-78, I2-83), the truck's plug at P. The lead runs from the
+    plug up over a lined seat of radius seat_r at the arm's tip C, strapped to it `clip_mm` along it from the plug, and
+    on to its clamp A on the bracket, `rest_mm` from the strap. The seat is fixed on the arm, so the strap turns with
+    it: it stands at the seat's top when the arm stands at `strap_deg`, and that much further round towards the rear
+    for every degree the arm stands higher. The arm is hinged at O and swings in the vertical plane along X between its
+    stops (`deg`, from forward and level), its torsion spring lifting it with a torque falling from `torque_nmm[0]` on
+    the bottom stop to `torque_nmm[1]` on the top one, against the weight of the arm and its seat (`arm_kg`,
+    `clip_kg`). The seat runs from `seat_deg[0]` to `seat_deg[1]` round its centre from the strap, forward negative.
+    Each part of the span is a flexible catenary of its own length (no bending stiffness, est.) that wraps the seat
+    from the strap and leaves it tangent to it, or leaves at the strap or at the seat's end where its tangent point
+    lies beyond them (a kink the lead's stiffness rounds), and pulls the arm with its horizontal pull plus the weight
+    under it along its tangent there. The arm rests where the spring's torque balances those pulls, or on a stop. As a
+    part nears taut its pull grows without bound, and turning the arm the way that would pull it taut takes lead from
+    it, so its pull turns the arm back: the spring can hold a span nearly straight, its pull then the spring's excess
+    over that span's lever. None if the span is taut at every place of the arm between its stops. Returns the arm's
+    angle, how it rests, the seat's centre, the strap, the two parts and where they leave the seat (angles from its
+    top towards the rear), the largest kink, the lowest point of the lead's centreline and the pull at the plug (N)."""
     rho, (d0, d1), (m0, m1) = float(lift["arm_mm"]), lift["deg"], lift["torque_nmm"]
     l1, l2, R = float(lift["clip_mm"]), float(lift["rest_mm"]), float(seat_r)
+    t_s = float(lift["strap_deg"])
+    front, rear = (math.radians(float(v)) for v in lift.get("seat_deg", (-180.0, 180.0)))
     g_arm = 9.81 * (float(lift.get("arm_kg", 0.0)) / 2 + float(lift.get("clip_kg", 0.0))) * rho
 
+    def on_seat(C, f):
+        return (C[0] + R * math.sin(f), C[1], C[2] + R * math.cos(f))
+
     def at(deg):
-        t = math.radians(deg)
+        t, phi = math.radians(deg), math.radians(deg - t_s)
         C = (O[0] - rho * math.cos(t), O[1], O[2] + rho * math.sin(t))
-        top = (C[0], C[1], C[2] + R)
+        S = on_seat(C, phi)
         d1_, d2_ = _xz(_sub(C, P)), _xz(_sub(A, C))
-        c1 = c2 = None
-        for _ in range(4):        # where each part leaves the seat, tangent to it, from its end's direction
-            n1, n2 = (-d1_[1], d1_[0]), (-d2_[1], d2_[0])
-            f1, f2 = max(0.0, math.atan2(-n1[0], n1[1])), max(0.0, math.atan2(n2[0], n2[1]))
-            n1 = (-math.sin(f1), math.cos(f1)) if f1 > 0 else (0.0, 1.0)
-            n2 = (math.sin(f2), math.cos(f2)) if f2 > 0 else (0.0, 1.0)
-            T1, T2 = (C[0] + R * n1[0], C[1], C[2] + R * n1[1]), (C[0] + R * n2[0], C[1], C[2] + R * n2[1])
-            c1, c2 = catenary(P, T1, l1 - R * f1), catenary(T2, A, l2 - R * f2)
-            if c1 is None or c2 is None:
-                return None
-            d1_, d2_ = _xz(_end_dir(P, T1, c1, "q")), _xz(_end_dir(T2, A, c2, "p"))
+        for _ in range(6):        # where each part leaves the seat, from its end's direction: its climb in, its fall out
+            f1, f2 = math.atan2(d1_[1], d1_[0]), math.atan2(-d2_[1], d2_[0])
+            e1, e2 = max(phi + front, min(phi, -f1)), min(phi + rear, max(phi, f2))
+            T1, T2 = on_seat(C, e1), on_seat(C, e2)
+            c1, c2 = catenary(P, T1, l1 - R * (phi - e1)), catenary(T2, A, l2 - R * (e2 - phi))
+            d1_ = _xz(_end_dir(P, T1, c1, "q") if c1 else _sub(T1, P))     # a taut part's direction is its chord's
+            d2_ = _xz(_end_dir(T2, A, c2, "p") if c2 else _sub(A, T2))
+        if c1 is None or c2 is None:
+            return None
+        f1, f2 = math.atan2(d1_[1], d1_[0]), math.atan2(-d2_[1], d2_[0])
+        kink = math.degrees(max(0.0, e1 + f1, f2 - e2, -(phi + f1), phi - f2))
         F1, F2 = _cat_pull(P, T1, c1, w, "q"), _cat_pull(T2, A, c2, w, "p")
         lever = sum(F[0] * (Q[2] - O[2]) - F[2] * (Q[0] - O[0]) for F, Q in ((F1, T1), (F2, T2)))
         torque = m1 + (m0 - m1) * (d1 - deg) / (d1 - d0) + lever - g_arm * math.cos(t)
-        return dict(deg=deg, C=C, top=top, T1=T1, T2=T2, f1=f1, f2=f2, c1=c1, c2=c2, torque=torque)
+        return dict(deg=deg, C=C, strap=S, T1=T1, T2=T2, e1=e1, e2=e2, c1=c1, c2=c2, torque=torque, kink_deg=kink)
 
-    rows = [at(d0 + 0.5 * i) for i in range(int(round((d1 - d0) / 0.5)) + 1)]
-    ok = [r for r in rows if r is not None]
-    if not ok:
-        return None
-    x = next((a for a, b in zip(rows, rows[1:]) if a is not None and b is not None and a["torque"] >= 0 > b["torque"]), None)
+    def settle(lo, hi, a, b):
+        """The balance between lo, where the spring lifts the arm (row a) or the span is taut below, and hi, where the
+        pulls hold it down (row b) or the span is taut above."""
+        taut_lo, taut_hi = a is None, b is None
+        for _ in range(20):
+            mid = (lo + hi) / 2
+            x = at(mid)
+            if x is None:
+                lo, hi = (mid, hi) if taut_lo else (lo, mid)
+            elif x["torque"] >= 0:
+                lo, a = mid, x
+            else:
+                hi, b = mid, x
+        return dict(a or b, rest="near taut" if taut_lo or taut_hi else "balance")
+
+    n = int(round((d1 - d0) / 0.5))
+    degs = [d0 + (d1 - d0) * i / n for i in range(n + 1)]
+    rows = [at(d) for d in degs]
+    x = None
+    for i, (a, b) in enumerate(zip(rows, rows[1:])):
+        if (a is not None and a["torque"] >= 0 and (b is None or b["torque"] < 0)) or (a is None and b is not None and b["torque"] < 0):
+            x = settle(degs[i], degs[i + 1], a, b)
+            break
+    if x is None and rows[-1] is not None and rows[-1]["torque"] >= 0:
+        x = dict(rows[-1], rest="top stop")
+    if x is None and rows[0] is not None and rows[0]["torque"] < 0:
+        x = dict(rows[0], rest="bottom stop")
     if x is None:
-        x = ok[-1] if ok[-1]["torque"] >= 0 else ok[0]
+        return None
     return dict(x, low=min(x["c1"]["low"], x["c2"]["low"]), pull_n=w * x["c1"]["y_p"])
 
 
@@ -1634,22 +1667,26 @@ def _lift_ends(r: dict, points: list, V: dict, ball_drop: float) -> tuple:
 
 
 def lifted(r: dict, rule: dict, V: dict, ball_drop: float = 0.0) -> dict:
-    """I2-78: a lead between the vehicles held up by its sprung arm (`lift`) over every turn and pitch of
-    rules.between, the truck turned about the coupling's pin: where the arm rests in each, the lead's lowest point and
-    the pull at the truck's plug. `taut` counts the positions in which the cut, less rules.between's margin, would pull
-    the span taut with the arm on its bottom stop, which the cut must leave at none, and `on_top` those in which the
-    arm rests on its top stop. Straight ahead, the lowest point, the arm's angle and the seat's top."""
+    """I2-78, I2-83: a lead between the vehicles held up by its sprung arm (`lift`), the strap carried round by the
+    seat, over every turn and pitch of rules.between, the truck turned about the coupling's pin: where the arm rests in
+    each, the lead's lowest point and the pull at the truck's plug. `taut` counts the positions in which the cut, less
+    rules.between's margin, would leave no place of the arm where the span hangs slack, which the cut must leave at
+    none. `rests` counts how the arm rests (a balance, near taut with the spring holding a span nearly straight, or a
+    stop), `arm_deg` gives its range, `kink_deg` the largest kink, at the strap or a seat's end, with the plug's pull there
+    (`kink_pull_n`), and `seat_deg` the arc of the seat the
+    lead lies on, from the strap, forward negative. Straight ahead, the lowest point, the arm's angle and the strap."""
     P0, A, O = _lift_ends(r, r["points"], V, ball_drop)
     pivot = (0.0, 0.0, float(V["coupling_z"]) - float(ball_drop))
     w, od = r["kg_m"] * 9.81 / 1000.0, r["od"]
+    lift, seat = r["lift"], float(r["lift"].get("seat_mm", r["bend_r"]))
     m = float(rule["margin_mm"]) / 2
-    short = dict(r["lift"], clip_mm=float(r["lift"]["clip_mm"]) - m, rest_mm=float(r["lift"]["rest_mm"]) - m)
-    best, taut, top, pull, straight, pts = (math.inf, 0, 0), 0, 0, 0.0, None, None
+    short = dict(lift, clip_mm=float(lift["clip_mm"]) - m, rest_mm=float(lift["rest_mm"]) - m)
+    best, taut, top, pull, kink, straight, pts = (math.inf, 0, 0), 0, 0, 0.0, (0.0, 0.0), None, None
+    rests, degs, arc = {}, [], [0.0, 0.0]
     for ph in range(-int(rule["pitch_deg"]), int(rule["pitch_deg"]) + 1, 5):
         for yw in range(-int(rule["yaw_deg"]), int(rule["yaw_deg"]) + 1, 5):
             P = _turn(P0, pivot, yw, ph)
-            seat = float(r["lift"].get("seat_mm", r["bend_r"]))
-            x = lift_rest(P, A, O, r["lift"], w, seat)
+            x = lift_rest(P, A, O, lift, w, seat)
             if x is None or lift_rest(P, A, O, short, w, seat) is None:
                 taut += 1
             if x is None:
@@ -1657,18 +1694,26 @@ def lifted(r: dict, rule: dict, V: dict, ball_drop: float = 0.0) -> dict:
             low = x["low"] - od / 2
             best = min(best, (low, yw, ph))
             pull = max(pull, x["pull_n"])
-            top += x["deg"] >= float(r["lift"]["deg"][1])
+            if x["kink_deg"] > kink[0]:
+                kink = (round(x["kink_deg"], 1), round(x["pull_n"], 1))
+            rests[x["rest"]] = rests.get(x["rest"], 0) + 1
+            top += x["rest"] == "top stop"
+            degs.append(x["deg"])
+            turned = x["deg"] - float(lift["strap_deg"])
+            arc = [min(arc[0], math.degrees(x["e1"]) - turned), max(arc[1], math.degrees(x["e2"]) - turned)]
             if yw == 0 and ph == 0:
-                pts = [P] + _cat_points(P, x["T1"], x["c1"], 20.0) + [x["T1"], x["top"], x["T2"]] + _cat_points(x["T2"], A, x["c2"], 20.0) + [A]
-                straight = dict(low_mm=round(low, 1), arm_deg=x["deg"], seat_top=[round(v) for v in x["top"]])
+                pts = [P] + _cat_points(P, x["T1"], x["c1"], 20.0) + [x["T1"], x["strap"], x["T2"]] + _cat_points(x["T2"], A, x["c2"], 20.0) + [A]
+                straight = dict(low_mm=round(low, 1), arm_deg=round(x["deg"], 1), rest=x["rest"], strap=[round(v) for v in x["strap"]],
+                                kink_deg=round(x["kink_deg"], 1), pull_n=round(x["pull_n"], 2))
     return dict(turn_low_mm=round(best[0], 1), turn_yaw=best[1], turn_pitch=best[2], taut=taut, on_top=top, pull_n=round(pull, 1),
-                straight=straight, straight_pts=pts, od=od, turn_model="held up by its sprung arm")
+                rests=rests, arm_deg=[round(min(degs), 1), round(max(degs), 1)] if degs else None, kink_deg=kink[0], kink_pull_n=kink[1],
+                seat_deg=[round(v, 1) for v in arc], straight=straight, straight_pts=pts, od=od, turn_model="held up by its sprung arm")
 
 
 def lift_drawn(r: dict, pts: list, w: float, seat_r: float) -> list:
-    """The points a held-up lead is drawn through (I2-78): its span as the arm holds it straight ahead, from the plug
-    up over the seat at the arm's tip, round the seat between where the two parts leave it, and down to the clamp,
-    then its path along the drawbar to the junction."""
+    """The points a held-up lead is drawn through (I2-78, I2-83): its span as the arm holds it straight ahead, from
+    the plug up over the seat at the arm's tip, round the seat between where the two parts leave it, the strap among
+    them, and down to the clamp, then its path along the drawbar to the junction."""
     i = next(j for j, q in enumerate(pts) if math.dist(q, r["clamp"]) < 1e-6)
     A = pts[i]
     O = _add(A, (float(r["lift"]["pivot"][0]), 0.0, float(r["lift"]["pivot"][1])))
@@ -1677,7 +1722,7 @@ def lift_drawn(r: dict, pts: list, w: float, seat_r: float) -> list:
         return pts
     C, R = x["C"], float(seat_r) + 1.0     # drawn 1 mm outside the seat, so its polyline keeps the bend radius
     arc = [(C[0] + R * math.sin(f), C[1], C[2] + R * math.cos(f)) for f in
-           [-x["f1"] + (x["f1"] + x["f2"]) * k / 12 for k in range(13)]]
+           [x["e1"] + (x["e2"] - x["e1"]) * k / 12 for k in range(13)]]
     near = lambda q: min(math.dist(q, x["T1"]), math.dist(q, x["T2"]), math.dist(q, A)) < 30.0     # noqa: E731
     span = [q for q in _cat_points(pts[0], x["T1"], x["c1"], 140.0) if not near(q)] + arc
     span += [q for q in _cat_points(x["T2"], A, x["c2"], 90.0) if not near(q)]

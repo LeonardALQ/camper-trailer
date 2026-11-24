@@ -426,7 +426,8 @@ def test_the_leads_are_cut_to_their_spans_and_no_turn_pulls_them_taut():
 def test_the_leads_hang_clear_of_dim06_in_any_turn_at_both_ball_heights():
     """I2-70, I2-78: in any turn and pitch of rules.between, at the design's coupling height and with the truck's ball
     at UTE-13's low end, each lead between the vehicles hangs at least DIM-06's 200 mm up where its sprung arm holds
-    it, which DIM-08 holds it to, and pulls its plug with under half the SB50's 44 N (10 lbf) disconnect force."""
+    it, which DIM-08 holds it to, and pulls its plug with under half the SB50's 44 N (10 lbf) disconnect force. Its seat
+    runs far enough round the arm's tip that the lead leaves it at a kink only where its span hangs slack (I2-83)."""
     import yaml
     checks = {c["id"]: c for c in yaml.safe_load((R.DATA / "checks.yaml").read_text())["trailer_checks"]}
     assert checks["DIM-08"]["min"] == checks["DIM-06"]["min"]
@@ -435,6 +436,8 @@ def test_the_leads_hang_clear_of_dim06_in_any_turn_at_both_ball_heights():
         assert x["low_ball"]["turn_low_mm"] < x["turn_low_mm"], x
         assert x["low_ball"]["turn_low_mm"] >= checks["DIM-08"]["min"], f"{x['run']} hangs to {x['low_ball']['turn_low_mm']} mm"
         assert max(x["pull_n"], x["low_ball"]["pull_n"]) < 22.0
+        for y in (x, x["low_ball"]):
+            assert y["kink_deg"] < 1.0 or y["kink_pull_n"] < 1.0, y
 
 
 def test_the_catenary_against_the_parabola_worked_by_hand():
@@ -446,6 +449,33 @@ def test_the_catenary_against_the_parabola_worked_by_hand():
     assert c["y_p"] - c["a"] == pytest.approx(86.6, rel=0.01) and -c["low"] == pytest.approx(86.6, rel=0.01)
     assert c["y_p"] == pytest.approx(1530.0, rel=0.01) and c["y_q"] == pytest.approx(c["y_p"])
     assert R.catenary((0.0, 0.0, 0.0), (1000.0, 0.0, 0.0), 999.0) is None
+
+
+def test_the_strap_turns_with_the_seat_and_the_arm_balances_by_hand():
+    """I2-83: the seat is fixed on the arm, so the strap stands at the seat's top when the arm stands at `strap_deg`
+    and as far round towards the rear as the arm stands higher. Worked by hand for K-13 straight ahead at the design
+    ball, where its plug's span hangs nearly straight: the spring's torque at the arm's angle, less the arm's weight and
+    the clamp's span's moment about the hinge, over the plug's span's lever as a straight line, is that span's pull at
+    the seat within 3 %, and its pull at the plug is that less the weight of the lead it rises by. Pulled straight, the
+    plug's span holds the arm down, so the spring cannot lift it past the point where that span goes taut."""
+    r = next(x for x in RES["runs"] if x["id"] == "K-13")
+    lift, V = r["lift"], RES["V"]
+    P, A, O = R._lift_ends(r, r["points"], V, 0.0)
+    w = r["kg_m"] * 9.81 / 1000.0
+    x = R.lift_rest(P, A, O, lift, w, float(lift.get("seat_mm", r["bend_r"])))
+    turned = math.degrees(math.atan2(x["strap"][0] - x["C"][0], x["strap"][2] - x["C"][2]))
+    assert turned == pytest.approx(x["deg"] - lift["strap_deg"], abs=1e-6)
+    (d0, d1), (m0, m1) = lift["deg"], lift["torque_nmm"]
+    spring = m1 + (m0 - m1) * (d1 - x["deg"]) / (d1 - d0)
+    weight = 9.81 * (lift["arm_kg"] / 2 + lift["clip_kg"]) * lift["arm_mm"] * math.cos(math.radians(x["deg"]))
+    F2 = R._cat_pull(x["T2"], A, x["c2"], w, "p")
+    clamp = F2[0] * (x["T2"][2] - O[2]) - F2[2] * (x["T2"][0] - O[0])
+    u = R._unit(R._sub(P, x["T1"]))[0]
+    lever = u[0] * (x["T1"][2] - O[2]) - u[2] * (x["T1"][0] - O[0])
+    assert lever < -100.0, "the plug's span pulled straight holds the arm down"
+    at_seat = w * x["c1"]["y_q"]
+    assert (spring - weight + clamp) / -lever == pytest.approx(at_seat, rel=0.03), (spring, weight, clamp, lever, at_seat)
+    assert x["pull_n"] == pytest.approx(at_seat - w * (x["T1"][2] - P[2]), rel=1e-6)
 
 
 def test_over_a_free_support_the_long_span_takes_the_slack_and_the_arm_holds_it_up():
