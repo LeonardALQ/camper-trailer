@@ -303,6 +303,7 @@ drawings:
       - {rev: W, date: 2026-11-24, description: "Notice: FAT-20 on the principal stress at FAT 71, FAT-18's smaller throat", drawn: Kiro, checked: "", approved: ""}
       - {rev: X, date: 2026-11-24, description: "Notice: detail K vents and drains the rails' front ends, FAT-20 at FAT 45", drawn: Kiro, checked: "", approved: ""}
       - {rev: Y, date: 2026-11-24, description: "Notice: one rolled dip, K drains both webs, no vent, C, E, F true (I2-79)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: Z, date: 2026-11-24, description: "Notice: every closed section drained and vented, the snipes open (I2-84)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads

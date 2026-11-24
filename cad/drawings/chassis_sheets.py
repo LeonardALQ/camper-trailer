@@ -282,7 +282,7 @@ FIT_ITEMS = [("1", "DB-03", "Cruisemaster DO45 Plus, under-mounted, 4 x M14 8.8 
              ("11", "DB-07", "Breakaway kit, switch near the coupling"),
              ("12", "DB-KA", "Drawbar members RHS 150 x 50 x 6 C450L0"),
              ("13", "CH-P15", "Rail end plate 16 mm, full penetration to the rail's walls, the heel on it (detail C)")]
-GALV_USES = {"vent", "drain"}       # the galvanising holes' uses among the holes' runs (CT-103 detail K)
+GALV_USES = {"vent", "drain", "drain and vent", "check"}       # the galvanising holes' uses among the holes' runs (CT-103 note 2, detail K)
 
 
 def lift_slot(ch) -> float:
@@ -492,7 +492,7 @@ def ct102(prj, model, bom, checks, reg, dwg):
     g_legs = next(f for f in ch.data["fittings"] if f["id"] == "CH-P03")["heel_legs"]
     g_throat = min(heel_throats(g_legs, math.atan(V["root_gusset_slope"])))
     ep_lift = next(f for f in ch.data["fittings"] if f["id"] == "CH-P15").get("lift", 0)
-    gaps = [h["x"] - V["body_x0"] for h in chs["results"]["holes"] if h.get("frame", "").startswith("RL-")
+    gaps = [h["x"] - V["body_x0"] for h in chs["results"]["holes"] if (h.get("frame") or "").startswith("RL-")
             and h["wall"].startswith("the rail's") and 0 < h["x"] - V["body_x0"] <= 150 and not set(h["runs"]) & GALV_USES]
     hole_gap = (min(gaps), max(gaps))      # the front cable holes the videoscope goes in by (FAT-20)
     fat20 = next(f for f in chs["results"]["fatigue"] if f["id"] == "FAT-20")
@@ -669,7 +669,7 @@ def ct103(prj, model, bom, checks, reg, dwg):
     sh.line(cx - 5, zb + 0.4, cx + 5, zb + 0.4, "thick")
     weld_symbol(sh, (cx + xt.b / 2 / k, zb + 20), (cx - 8, zb + 40), "6", all_round=True, note="ALL ROUND")
     S.leader(sh, (cx, zb + 0.6), (cx - 10, zb - 6), "GRIND THE TOE ON THE RAIL", ["OVER THE BOTTOM 40 mm (FAT-01)"], size=1.5)   # clear of the fatigue table
-    for i, t in enumerate((f"RHS {xt.d:g}x{xt.b:g}x{xt.t:g}, FULL RAIL HEIGHT, END SQUARE,", "NO HOLES (TB 070). HOT-SPOT CHECK BY THE", "ENGINEER (CIDECT DESIGN GUIDE 8).")):
+    for i, t in enumerate((f"RHS {xt.d:g}x{xt.b:g}x{xt.t:g}, FULL RAIL HEIGHT, END SQUARE,", "ONLY ITS DRAINS AND VENTS (NOTE 2, TB 070,", "CHS-09, CHS-10). HOT-SPOT CHECK BY THE ENGINEER.")):
         sh.text(cx - 26, zb - 16 - 3 * i, t, 1.5)
     # ---- D: end of the drawbar overlap, elevation, 1:10, the lap opened 2.5 and stitch welded (FAT-21)
     k = 10.0
@@ -680,7 +680,7 @@ def ct103(prj, model, bom, checks, reg, dwg):
     sh.rect(xs, zb, xs + 60, zb + rl.d / k, "medium")
     sh.text(xs + 0.5, zb + rl.d / k + 1, "MAIN RAIL", 1.5)
     sh.path([(xs, zb - gap), (xs + 25, zb - gap), (xs + 25 + 300 / k, zb - gap), (xs + 25, zb - gap - 150 / k), (xs, zb - gap - 150 / k)], "medium", closed=True)
-    sh.text(xs + 0.5, zb - gap - 150 / k - 3, "DRAWBAR RHS 150x50x6, SNIPED OVER 300, CAPPED", 1.5)
+    sh.text(xs + 0.5, zb - gap - 150 / k - 3, "DRAWBAR RHS 150x50x6, SNIPED OVER 300, OPEN", 1.5)
     weld_symbol(sh, (xs + 12, zb), (xs + 20, zb + 26), "8", both=True, length="50-100", note="STITCH, LAP OPEN 2.5")
     S.leader(sh, (xs + 25 + 300 / k, zb), (xs + 62, zb - 6), "WELD ENDS HERE,", ["TOE GROUND (IIW 712)"], size=1.5)
     sh.text(xs + 0.5, zb - gap - 150 / k - 6, "NO TRANSVERSE WELD. ENDS AT X 2,820,", 1.5)
@@ -749,7 +749,7 @@ def ct103(prj, model, bom, checks, reg, dwg):
             size=1.5, row_h=2.95, title="FATIGUE AT EACH WELDED DETAIL, LC10 (HS = HOT-SPOT CHECK)")
     S.notes(sh, 22, 64, [
         "WELDS SP TO AS/NZS 1554.1, E49XX OR W50X. VISUAL ON EVERY WELD, DYE PENETRANT OR MPI ON THE DRAWBAR TO CHASSIS JOINT, THE COUPLING MOUNT AND THE SUSPENSION BRACKETS (report 02 WLD-03). THE RAIL END PLATES' WELD ROOTS BY VIDEOSCOPE FROM INSIDE THE RAILS, RECORDED AS CT-102 NOTE 3 ASKS (FAT-20).",
-        "HOT-DIP GALVANISE AFTER FABRICATION TO AS/NZS 4680 IN ONE DIP, THE FRAME HUNG DRAWBAR END DOWN AND ROLLED ACROSS AS DETAIL K SAYS, THE SPARE CARRIER POSTS OFF. VENT AND DRAIN EVERY CLOSED SECTION AT ITS HIGH AND LOW POINTS IN THAT HANG, EITHER SIDE DOWN, BEFORE WELDING (report 02 WLD-05): THE RAILS' FRONT ENDS AS DETAIL K, AND EACH DRAWBAR MEMBER BY A 20 DRAIN IN EACH WEB 40 BEHIND ITS APEX END AND 40 OVER ITS UNDERSIDE (H-33 TO H-36) AND TWO 10 VENTS IN ITS SNIPE'S CAP, ONE BY EACH WEB, 25 FROM THE TOE.",
+        "HOT-DIP GALVANISE TO AS/NZS 4680 IN ONE DIP, HUNG AS DETAIL K SAYS, THE SPARE CARRIER POSTS OFF. DRILL BEFORE WELDING (report 02 WLD-05, CHS-11): THE RAILS' FRONT ENDS AS DETAIL K, EACH DRAWBAR MEMBER 20 IN BOTH WEBS 40 BEHIND ITS APEX END, 40 OVER ITS UNDERSIDE AND 40 UNDER ITS TOP, AND 40 BEHIND THE BODY FRONT, 40 OVER ITS UNDERSIDE, ITS SNIPE LEFT OPEN, AND AT EVERY OTHER CLOSED END 20 IN BOTH WEBS BY ITS FLOOR AND ITS TOP, 13 IN THE CROSS BRACE, ONE 10 OR 13 IN EACH WEB OF A PLAN BRACE OR HINGE GUSSET, BUT THE XT REAR SHOCK CROSSMEMBER 25 IN ITS REAR WEB AND 16 THROUGH THE RAILS' INNER WEBS AT ITS FRONT CORNERS, A 10 CHECK HOLE IN EACH RAIL'S OUTER WEB OPPOSITE (CHASSIS.md).",
         "FILLET SIZES ARE LEGS: 5 mm UNLESS STATED, 6 mm ON THE XT CROSSMEMBER ENDS, THE OUTRIGGER ROOTS, THE LUGS AND THE TONGUES.",
     ], width_chars=118, size=1.7)
     _draft_stamp(sh, 125, 75)

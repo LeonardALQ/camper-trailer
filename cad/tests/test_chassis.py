@@ -249,6 +249,18 @@ def test_each_rails_front_end_drains_for_galvanising():
         assert area >= 4 * math.pi * 20 ** 2 / 4, side
 
 
+def test_every_closed_section_drains_and_vents_in_the_dip():
+    """CHS-11 (I2-84): in both rolls and at every pitch of the dip, each closed section's low points reach a drain or an
+    open end and its high points a vent or an open end within 50 mm, each closed end's holes give the guide's table
+    area, and the lower drawbar member, whose mitre is its low point, drains there."""
+    g = RES["galvanising"]
+    assert g["sections"] and all(r["ok"] for r in g["sections"])
+    assert {"RL-K", "DB-K", "DB-R", "CM-04", "DB-BR"} <= {r["id"] for r in g["sections"]}
+    mitre = [h for h in g["holes"] if h["tube"] in ("DB-KB", "DB-RB") and h["use"] == "drain"]
+    assert len(mitre) == 4 and all(abs(h["x"] - CH.V["body_x0"] - 40) < 10 for h in mitre)
+    assert max(r["low_depth"] for r in g["sections"] if r["id"].startswith("DB-") and r["id"] != "DB-BR") <= g["max_depth"]
+
+
 def test_the_laps_are_opened_and_stitched():
     """The drawbar members' laps under the rails are opened to 2.5 mm and stitch welded, as the guide asks of an overlap
     that is not sealed (I2-79), and FAT-21 reads the stitches' ends at IIW 324's floor along the whole lap."""
