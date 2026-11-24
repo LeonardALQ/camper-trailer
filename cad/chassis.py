@@ -270,7 +270,7 @@ class Chassis:
                        (V["db_apex_x"], s * V["db_apex_y"], V["db_z"]), (x0, s * V["rail_c"], V["db_z"]), side=s))
             add(Member(f"DB-{SIDES[s]}B", "drawbar", f"Drawbar member, {SIDE_WORDS[s]}, under the rail to X {V['db_end_x']:.0f}", dsec,
                        (x0, s * V["rail_c"], V["db_z"]), (V["db_end_x"], s * V["rail_c"], V["db_z"]), side=s,
-                       note="Continuous longitudinal fillets to the rail underside, sniped taper end, no transverse weld"))
+                       note="Stitch fillets to the rail underside across a 2.5 mm gap, sniped taper end, no transverse weld"))
         yb = self.db_y(V["brace_x"]) - dsec.b / 2
         add(Member("DB-BR", "brace", self.role_name["brace"], rs["brace"], (V["brace_x"], -yb, V["db_z"]), (V["brace_x"], yb, V["db_z"]),
                    note="Welded at the drawbar members' mid-depth"))
@@ -308,7 +308,7 @@ class Chassis:
             J(Joint(f"J-RS-{s}", f"Raiser to main rail, {SIDE_WORDS[-1 if s == 'K' else 1]}", (f"RS-{s}", f"RL-{s}"),
                     "Continuous 4 mm fillets along both edges, SP, vented at each end of each bay", "FAT-06"))
             J(Joint(f"J-DB-{s}", f"Drawbar member under the rail, {SIDE_WORDS[-1 if s == 'K' else 1]}", (f"DB-{s}B", f"RL-{s}"),
-                    "Continuous 5 mm fillets along both edges, profiled root gusset at the body front, sniped taper end, toe ground",
+                    "The lap 2.5 mm open, 8 mm stitch fillets 50 long at 100 along both edges, profiled root gusset at the body front, sniped taper end, toe ground",
                     "FAT-07, FAT-08"))
             J(Joint(f"J-DB-{s}A", f"Drawbar member, A-frame part to its overlap part, {SIDE_WORDS[-1 if s == 'K' else 1]}",
                     (f"DB-{s}A", f"DB-{s}B"), "Mitred full penetration butt weld at the body front, ground flush, SP", "FAT-07"))

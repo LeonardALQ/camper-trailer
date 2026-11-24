@@ -222,27 +222,40 @@ def test_fat20_reads_the_principal_stress_with_its_roots_inspected():
     assert rail.t < 8 and rail.t + plate["lift"] + plate["w"] - rail.d < 8
 
 
-def test_each_rails_front_end_vents_and_drains_for_galvanising():
-    """Each rail's closed front end has a vent near its top and drains near its floor in its outer web, close behind
-    the end plate, placed by CHS-10's rules (I2-75), and with the slot the plate's bottom edge leaves over the rail's
-    floor and the front bay's cable holes it opens at least the four 20 mm holes the GAA's guide asks of an RHS 150 x 50
-    (Table 3). The plate's bottom edge stands at least the guide's 2.5 mm over the rail's floor."""
+def test_each_rails_front_end_drains_for_galvanising():
+    """Hung drawbar end down and rolled either side down (galvanising_dip, I2-79), each rail's closed front end is its
+    low end, so it drains in both webs near its floor, close behind the end plate, placed by CHS-10's rules, and through
+    the slot the plate's bottom edge leaves over the floor, at least the guide's least hole of 10 mm. With the front bay's
+    cable holes it opens at least the four 20 mm holes the GAA's guide asks of an RHS 150 x 50 (Table 3). No hole stands
+    near the rail's top within 150 mm of the plate but the cable holes, out of the peak of the plate's line force (I2-80),
+    and each drain is read in that field (CHS-10)."""
     V, rail = CH.V, CH.role_sec["rail"]
     plate = next(f for f in CH.data["fittings"] if f["id"] == "CH-P15")
     slot = plate["lift"] - rail.t
-    assert slot >= 2.5
+    assert slot >= 10
+    dip = CH.data["galvanising_dip"]
+    assert all(e + 2 * dip["clearance"] <= lim for e, lim in zip(dip["envelope"], dip["dip"][1:]))
     for side in ("K", "R"):
         front = [h for h in RES["holes"] if h.get("frame") == f"RL-{side}" and h["wall"].startswith("the rail's")
                  and 0 < h["x"] - V["body_x0"] <= 150]
         galv = [h for h in front if set(h["runs"]) & {"vent", "drain"}]
-        vents = [h for h in galv if h["runs"] == ["vent"] and h["wall"] == "the rail's outer web"]
-        drains = [h for h in galv if h["runs"] == ["drain"] and h["wall"] == "the rail's outer web"]
-        assert vents and drains and all(h["ok"] for h in galv), side
-        assert max(h["z"] + h["d"] / 2 for h in vents) >= V["rail_top_z"] - rail.t - 25, side
-        assert min(h["z"] - h["d"] / 2 for h in drains) <= V["rail_underside_z"] + rail.t + 25, side
+        assert galv and all(h["ok"] and h["runs"] == ["drain"] and h["field"] for h in galv), side
+        for web in ("the rail's outer web", "the rail's inner web"):
+            drains = [h for h in galv if h["wall"] == web]
+            assert len(drains) >= 2 and min(h["z"] - h["d"] / 2 for h in drains) <= V["rail_underside_z"] + rail.t + 25, (side, web)
         assert min(h["x"] for h in galv) - V["body_x0"] <= 40, side
+        assert all(h["z"] < V["rail_underside_z"] + rail.d / 2 for h in galv), side
         area = sum(math.pi * h["d"] ** 2 / 4 for h in front) + slot * (rail.b - 2 * rail.t - 2 * (rail.ro - rail.t))
         assert area >= 4 * math.pi * 20 ** 2 / 4, side
+
+
+def test_the_laps_are_opened_and_stitched():
+    """The drawbar members' laps under the rails are opened to 2.5 mm and stitch welded, as the guide asks of an overlap
+    that is not sealed (I2-79), and FAT-21 reads the stitches' ends at IIW 324's floor along the whole lap."""
+    row = next(r for r in RES["fatigue"] if r["id"] == "FAT-21")
+    assert row["iiw"] == "324" and row["fat"] == 36 and row["ok"]
+    x = float(re.search(r"at X (\d+)", row["where"]).group(1))
+    assert CH.V["body_x0"] - 1 <= x <= CH.V["db_end_x"] + 1
 
 
 def test_the_videoscope_reaches_each_end_plates_weld_roots():

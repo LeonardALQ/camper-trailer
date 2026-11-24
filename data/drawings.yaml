@@ -84,6 +84,7 @@ drawings:
       - {rev: S, date: 2026-11-23, description: "Notice: the masses with the end plates and the leads' hook (I2-57, I2-58)", drawn: Kiro, checked: "", approved: ""}
       - {rev: T, date: 2026-11-24, description: "Notice: the masses with the saddle and the fuse, axle at X 4,485.3 (I2-63)", drawn: Kiro, checked: "", approved: ""}
       - {rev: U, date: 2026-11-24, description: "Notice: the masses with the end plates 7 mm shorter, axle X 4,485.5 (I2-75)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: V, date: 2026-11-24, description: "Notice: the masses with the end plates' 10 mm slot, axle X 4,485.6 (I2-79)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-003
     title: Compliance
     subtitle: VSB1 items and the standards with the design figures, operating limits and the plate
@@ -120,6 +121,7 @@ drawings:
       - {rev: X, date: 2026-11-24, description: "The 12-pin lead over its sheave, lowest 248 mm in any turn (DIM-08, I2-70)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Y, date: 2026-11-24, description: "Notice: TC2 3,576 kg with growth, the axle group's 3,223 kg (I2-75)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Z, date: 2026-11-24, description: "Leads from the data: SB50 lead slides on its saddle, lowest 217 mm (DIM-08)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AA, date: 2026-11-24, description: "Notice: the side markers' gaps with the axle at X 4,485.6 (I2-79)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-010
     title: Floor plan, bed up and bed down
     subtitle: Day and night plans, walkways, door swings, spaces kept clear and the bed positions
@@ -163,6 +165,7 @@ drawings:
       - {rev: L, date: 2026-11-23, description: "Notice: side marker stations with the axle at X 4,505.3", drawn: Kiro, checked: "", approved: ""}
       - {rev: M, date: 2026-11-23, description: "Notice: side marker stations with the axle at X 4,505.6", drawn: Kiro, checked: "", approved: ""}
       - {rev: N, date: 2026-11-23, description: "Notice: side marker stations with the axle at X 4,487.2", drawn: Kiro, checked: "", approved: ""}
+      - {rev: O, date: 2026-11-24, description: "Notice: side marker stations with the axle at X 4,485.6 (I2-79)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-012
     title: Sections
     subtitle: Through the bed by day and night, the plinth and bench, the wet room, well and grey tank
@@ -230,6 +233,7 @@ drawings:
       - {rev: X, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Y, date: 2026-11-24, description: "Memo: the chassis data's revision I in the title block (I2-67, I2-72)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Z, date: 2026-11-24, description: "Notice: end plates 7 mm clear of the drawbar, data revision J (I2-75)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AA, date: 2026-11-24, description: "Notice: end plates 14 mm up, laps 2.5 open, data revision K (I2-79)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
@@ -261,6 +265,7 @@ drawings:
       - {rev: S, date: 2026-11-24, description: "Notice: the root gusset's heel 3 mm inboard of mid-plate, view C1 (I2-60)", drawn: Kiro, checked: "", approved: ""}
       - {rev: T, date: 2026-11-24, description: "Notice: heel fillets 7 and 10 mm on the skewed joint, roots by videoscope", drawn: Kiro, checked: "", approved: ""}
       - {rev: U, date: 2026-11-24, description: "Notice: FAT-20 at IIW 424, its root record, plate 7 clear, detail C relaid", drawn: Kiro, checked: "", approved: ""}
+      - {rev: V, date: 2026-11-24, description: "Notice: laps open 2.5 and stitched, end plates 14 mm up (I2-79)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-103
     title: Chassis details
     subtitle: Composite rail, outrigger root, crossmember to rail, overlap end, jacking pad, recovery tongue, spare posts
@@ -295,6 +300,7 @@ drawings:
       - {rev: V, date: 2026-11-24, description: "Notice: FAT-17 to FAT-20 on the heel's place and its pull's line (I2-60)", drawn: Kiro, checked: "", approved: ""}
       - {rev: W, date: 2026-11-24, description: "Notice: FAT-20 on the principal stress at FAT 71, FAT-18's smaller throat", drawn: Kiro, checked: "", approved: ""}
       - {rev: X, date: 2026-11-24, description: "Notice: detail K vents and drains the rails' front ends, FAT-20 at FAT 45", drawn: Kiro, checked: "", approved: ""}
+      - {rev: Y, date: 2026-11-24, description: "Notice: one rolled dip, K drains both webs, no vent, C, E, F true (I2-79)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads
@@ -326,6 +332,7 @@ drawings:
       - {rev: S, date: 2026-11-23, description: "Notice: the body mounts with the brake leads aboard, 2,034 kg (I2-50)", drawn: Kiro, checked: "", approved: ""}
       - {rev: T, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
       - {rev: U, date: 2026-11-24, description: "Memo: the outdoor unit's leader ends inside the unit (I2-69)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: V, date: 2026-11-24, description: "Notice: the stations and the body mounts with the axle at X 4,485.6 (I2-79)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-201
     title: Body shell
     subtitle: Kerb, road, front and rear walls, the fixed roof plan, the panels and every opening with its size
@@ -423,6 +430,7 @@ drawings:
       - {rev: O, date: 2026-11-23, description: "Notice: body 640 kg on 32 mounts, the stations at X 4,506.0", drawn: Kiro, checked: "", approved: ""}
       - {rev: P, date: 2026-11-23, description: "Notice: the body mounts and the stations with the axle at X 4,489.3", drawn: Kiro, checked: "", approved: ""}
       - {rev: Q, date: 2026-11-23, description: "Notice: the body mounts and the stations with the axle at X 4,487.2", drawn: Kiro, checked: "", approved: ""}
+      - {rev: R, date: 2026-11-24, description: "Notice: the body mounts and the stations with the axle at X 4,485.6 (I2-79)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-401
     title: Garage and bed general arrangement
     subtitle: Plan, kerb-side section and section looking forward at partition A
