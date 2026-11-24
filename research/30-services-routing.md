@@ -142,8 +142,8 @@ they are threaded through (`inside`).
   reads each span as two flexible catenaries of fixed length, from the plug to the seat and from the seat to the
   clamp, each pulling with its horizontal pull plus the weight under it, the strap turning with the seat as the arm
   swings (I2-83), and rests the arm where its torsion spring's torque balances them, over every turn and pitch of
-  rules.between (est.). The strap stands at the seat's top with the arm 15 degrees below level, the seat runs 150
-  degrees ahead of it and 55 behind, and both arms take one spring of 1.5 to 1.0 N m (CT-601). A lead lying loose
+  rules.between (est.). The strap stands at the seat's top with the arm 15 degrees below level, the seat runs 155
+  degrees ahead of it and 40 behind, and both arms take one spring of 1.5 to 1.0 N m (CT-601). A lead lying loose
   over a saddle or a free sheave gives its slack to the long span from the truck, which pulls hardest, which is why
   the friction band and the sheave's one height were dropped. The cuts, 1.34 m for K-13 and 1.28 m for K-14, leave no
   position taut with 30 mm taken off. In any turn and pitch each lead hangs lowest at its plug, K-13
