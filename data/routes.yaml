@@ -62,7 +62,7 @@ rules:
   waste_pct: 10                 # cut-off and waste added to each run's price (est.)
   between:                      # I2-63: what a lead hanging between the vehicles must reach (cad/routes.py between_reach, test_routes)
     yaw_deg: 70                 # the truck turned either way about the pin: the DO45's articulation, at least 70 degrees (report 08)
-    pitch_deg: 20               # the two pitched either way at once, a crest past DIM-07's 16.1 degrees or a dip as steep (est.)
+    pitch_deg: 20               # the two pitched either way at once, a crest past DIM-07's 15.9 degrees or a dip as steep (est.)
     margin_mm: 30               # for the plugs' strain reliefs and the leads' stiffness at the saddle (est.)
   terminal_face:                # SVC-04: AS/NZS 3001.2 clause 5.4.10.2, the rule on CT-602
     line: EL-01                 # the modules stand terminals up, so the face is the top of EL-01's box
@@ -1088,7 +1088,8 @@ runs:
   # The leads hang between the vehicles (`rides`). Coupled, the SB50's lead K-14 lies over the saddle DB-HK behind the
   # chain lug, its slack hanging from it straight ahead as one bight to the junction, and pays out over the saddle as the
   # truck turns (I2-63). The 12-pin lead K-13 lies over its own free-turning sheave DB-HR beside the saddle, so its slack
-  # shares between its bight and its span from the socket (`rolls`, I2-70). Each is cut to the length the worst turn and pitch need with a margin (rules.between, est.), and
+  # shares between its bight and its span from the socket (`rolls`, I2-70), though it is drawn, as K-14 is, with all its
+  # slack in its bight, which hangs lower. Each is cut to the length the worst turn and pitch need with a margin (rules.between, est.), and
   # drawn at that length (`cut_m`), its bight hanging at the height that makes it so (`bight`), so DIM-04 to DIM-07
   # read it. The SB50 sits on the bracket's inboard side, nearer the pin, so its stiffer lead needs less slack. K-10
   # leaves the drawbar loom's stack beside it, enters the road rail and leaves it through its inner web ahead of the XT

@@ -694,7 +694,8 @@ def _resolve_run(r: dict, ns: dict, K: dict, rule: dict, fixtures: dict, pitch: 
     elbow_r = k["od"] * kind["elbow_r"] if kind.get("elbow_r") else None
     if r.get("bight") and r.get("cut_m"):
         pts, row["bight_z"] = hang_bight(pts, [i + 1 for i in r["bight"]], float(r["cut_m"]) * 1000, max(k["bend_r"], way_bend))
-        row["points"], row["reach_pts"] = pts, (pts[0], pts[1], pts[-1])
+        first = next(i for i in range(1, len(pts)) if i - 1 not in r["bight"])    # the saddle or the sheave it lies over
+        row["points"], row["reach_pts"] = pts, (pts[0], pts[first], pts[-1])
     if not rigid:
         pts = smooth_jogs(pts, k["bend_r"])
         row["points"] = pts
@@ -1568,7 +1569,8 @@ def _shared(r: dict, rule: dict, points: list, pivot: tuple) -> tuple:
     between its span from the plug and its bight, which hang to one height, as a lead over a pulley does with the same
     pull either side (est.). The lowest point over them all, at the cut length, and its yaw and pitch."""
     br, od, cut = r["bend_r"], r["od"], 1000 * r["length_m"]
-    p, a, rest = points[0], points[1], points[2:]
+    k = next(i for i in range(1, len(points)) if i - 1 not in r["bight"])     # the sheave, after any sag ahead of it
+    p, a, rest = points[0], points[k], [q for i, q in enumerate(points) if i > k]
     x = (1.0, 0.0, 0.0)
     best = (math.inf, 0, 0)
     for ph in range(-int(rule["pitch_deg"]), int(rule["pitch_deg"]) + 1, 5):
