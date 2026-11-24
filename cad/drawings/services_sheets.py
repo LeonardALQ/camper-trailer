@@ -1217,13 +1217,14 @@ def ct621(prj, model, bom, checks, reg, dwg):
     # towing: the RESPA's supply through the cabin, out through the relief valve
     r4 = f("VE-04")
     rv = f("VE-06")
-    _route(pr, [(r4[0], r4[1] - 300), (4300, 200), (V["rear_x0"] - 200, 0), (V["wet_x0"] + 400, -200), (V["in_x1"] - 60, rv[1] + 50)], "airx", arrow=True)
+    ex = f("VE-03")
+    vents = (V["in_x1"] - 60, (rv[1] + ex[1]) / 2)     # V8 low and V9 high on the rear wall, one place in plan
+    _route(pr, [(r4[0], r4[1] - 300), (4300, 200), (V["rear_x0"] - 200, 0), (V["wet_x0"] + 400, -200), vents], "airx", arrow=True)
     q = pr.p(4300, 230)
     sh.text(q[0], q[1] + 0.8, "TOWING: RESPA SUPPLY TO THE RELIEF VALVE", 1.15, "middle", color="#8a5a00", names=pr.p(4300, 200))
-    # the wet room extract and the range hood, the extract's arrow to the kerb-side half of the vents' place in plan and
-    # the relief path's to the road-side half, so the two arrows do not cross (I2-76)
-    ex = f("VE-03")
-    _route(pr, [(V["in_x1"] - 500, -700), (V["in_x1"], ex[1] - 50)], "airx", arrow=True)
+    # the wet room extract and the range hood. The extract's arrow ends where the relief path's does, at V8 and V9's one
+    # place in plan, so the two arrows meet there and do not cross (I2-76)
+    _route(pr, [(V["in_x1"] - 500, -700), vents], "airx", arrow=True)
     hood = f("VE-07")
     _route(pr, [(hood[0], hood[1]), (hood[0] + 30, hb)], "airx", arrow=True)
     # the split: indoor unit blowing forward, its arrow ending short of the Combi duct's outlet ahead of it (I2-76), the

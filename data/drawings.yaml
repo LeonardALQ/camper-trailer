@@ -623,7 +623,7 @@ drawings:
       - {rev: H, date: 2026-11-23, description: "Memo: the project line names the Ranger Super Duty", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-24, description: "Memo: fan letters A to D back in their circles, notes beside routes (I2-69)", drawn: Kiro, checked: "", approved: ""}
-      - {rev: K, date: 2026-11-24, description: "Memo: the extract, relief and split arrows clear of each other (I2-76)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: K, date: 2026-11-24, description: "Memo: the extract and relief arrows meet at V8 and V9, none cross (I2-76)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-701
     title: Ute with the bike garage, general arrangement
     subtitle: Kerb-side elevations travelling and loading, plan, rear view, mass by case and the ute checks
