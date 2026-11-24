@@ -1121,3 +1121,17 @@ inputs:
     affects: [the trailer's brakes with the TSC, the external simulated load (the fallback outside the total)]
     thresholds:
       - {at: 0, rule: "A fault on Ford's display, no green lamp at a gain of 3, or a magnet that does not pull in: do not tow. Have a Bosch dealer fit and enable the TSC's external simulated load (the fallback in the parts list, outside the total) and repeat the test until all three pass", src: "Bosch F005EP0085.01 page 18 and Y265K30237 v4.0 page 10"}
+  - id: TR-13
+    group: Trailer tests
+    part: trailer
+    title: "The lowest point of each lead between the vehicles on the coupled truck at full lock over a ramp, the least reading"
+    how: "Couple the trailer to the truck at its laden coupling height, both leads plugged in, each clamped on the leads' bracket and strapped at its mark to the seat on its sprung arm. Stand the truck's rear wheels on a ramp at least 300 mm high (est.) so the coupling pitches, and reverse at full lock one way until the trailer stands at its tightest angle to the truck. Measure from the ground to the underside of each lead at its lowest point. Repeat at full lock the other way, then with the trailer's wheels on the ramp instead. Record the least of the readings in mm, and note which lead and position gave it."
+    unit: mm
+    estimate: {v: 298.6, src: "DIM-08 in the model with the truck's ball at UTE-13's low end: each span two flexible catenaries held up by its sprung arm, no bending stiffness (cad/routes.py lifted, est.)"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    range: {min: 200, max: null, src: "DIM-06's 200 mm, the running clearance of a vehicle built for off-road use, which DIM-08 holds the leads to"}
+    affects: [DIM-08, the leads' sprung arms and their springs, the leads' cut lengths]
+    thresholds:
+      - {at: 250, rule: "Under 250 mm, check that the arm swings freely to both stops and that the lead is strapped at its mark, then measure again. If it is still under, move the strap 20 mm towards the plug and repeat, because the model leaves out the leads' stiffness and the springs' spread (est.)", src: "DIM-08"}
+      - {at: 200, rule: "Under 200 mm, do not tow off the road until the arm and its spring are fixed, because a lead that hangs that low can snag and pull out its plug", src: "DIM-06 and DIM-08"}

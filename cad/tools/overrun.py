@@ -17,7 +17,10 @@ leaders that go wrong, sheet by sheet.
   arrowhead ends, a weld symbol's arrow among them, sheet.Sheet.arrow) that ends off what its label names, where the
   sheet says what that is (data-names: a point, a box or a symbol's circle, sheet.Sheet.text), two of them that cross or
   come within sheet.LEAD_GAP of each other, or one through a symbol (a circle of sheet.SYMBOL_R or less, a dot) other
-  than the one its named end is in. A text drawn in a symbol (data-in, sheet.mark_inside: a contactor's circle, a
+  than the one its named end is in. Two flows' lines marked at different levels (data-level: a duct under the floor,
+  the air in the cabin) may cross, and pass a symbol marked at another level, as ducts at different heights do in plan,
+  where two at one level, or a flow and an unmarked line, may not, and a flow may branch off another at a tee, an end
+  of one on the other's run with neither crossing the other through (I2-81). A text drawn in a symbol (data-in, sheet.mark_inside: a contactor's circle, a
   balloon, a revision triangle) whose letters' middle ends up outside that symbol is one too (I2-76).
 
     python -m cad.tools.overrun build/drawings [report.json]
@@ -32,7 +35,7 @@ import re
 import sys
 from pathlib import Path
 
-from cad.drawings.sheet import (_SYM_IN, _SYM_OF, CAPS, HEAVY, _crossing, _enters, _path_pts, _seg_dist, _segments, _symbol_circles,
+from cad.drawings.sheet import (_SYM_IN, _SYM_OF, CAPS, HEAVY, LEAD_GAP, _crossing, _enters, _path_pts, _seg_dist, _segments, _symbol_circles,
                                 in_shape, is_leader, on_target, read_target, symbol_shape, text_core)
 
 _TEXT = re.compile(r"<text ([^>]*)>(.*)</text>")
@@ -90,10 +93,43 @@ def read_sheet(svg: str) -> dict:
             covers.append(_cover(n, (x, x + w, y, y + h), *(map(float, rot.groups()) if rot else (0.0, 0.0, 0.0)), mask=True))
     segs, fills = _segments(el, every=True)
     covers += [_cover(f.n, f.box, 0.0, 0.0, 0.0, circle=f.circle) for f in fills]
-    leaders = [dict(i=n, pts=_path_pts(e), names=read_target(e)) for n, e in enumerate(el) if is_leader(e)]
+    leaders = [dict(i=n, pts=_path_pts(e), names=read_target(e), level=_level(e)) for n, e in enumerate(el) if is_leader(e)]
     syms = {m[1]: symbol_shape(e) for e in el for m in [_SYM_OF.search(e)] if m}
     held = [(t, syms.get(m[1])) for t in texts for m in [_SYM_IN.search(el[t["i"]])] if m]
     return dict(el=el, texts=texts, segs=segs, covers=covers, leaders=leaders, symbols=_symbol_circles(el), held=held)
+
+
+_LEVEL = re.compile(r'data-level="([\w-]+)"')
+
+
+def _level(e: str):
+    """The level a flow's line or a symbol is marked at (data-level, sheet.Sheet.arrow), or None."""
+    m = _LEVEL.search(e)
+    return m[1] if m else None
+
+
+def _apart_levels(a, b) -> bool:
+    """Two marked levels that differ: a duct under the floor and the air in the cabin may cross in plan."""
+    return a is not None and b is not None and a != b
+
+
+def _strict(p, q, a, b) -> bool:
+    """Do segments p-q and a-b cross each other through, not just touch?"""
+    def side(u, v, w):
+        return (v[0] - u[0]) * (w[1] - u[1]) - (v[1] - u[1]) * (w[0] - u[0])
+    return side(a, b, p) * side(a, b, q) < 0 and side(p, q, a) * side(p, q, b) < 0
+
+
+def _branch(a: dict, b: dict, el: list) -> bool:
+    """A flow that branches off another, as a schematic's tee does: both are arrows' lines, an end of one lies on the
+    other's run, and no piece of either crosses the other through (I2-81)."""
+    if 'class="arrow"' not in el[a["i"]] or 'class="arrow"' not in el[b["i"]]:
+        return False
+    A, B = a["pts"], b["pts"]
+    if any(_strict(p, q, u, v) for p, q in zip(A, A[1:]) for u, v in zip(B, B[1:])):
+        return False
+    return any(_seg_dist(e, u, v) < LEAD_GAP for e in (A[0], A[-1]) for u, v in zip(B, B[1:])) or \
+        any(_seg_dist(e, u, v) < LEAD_GAP for e in (B[0], B[-1]) for u, v in zip(A, A[1:]))
 
 
 def _bounds(ring: list) -> tuple:
@@ -237,13 +273,15 @@ def leader_faults(sh: dict) -> list[dict]:
                 out.append(dict(kind="off what it names", at=[round(v, 2) for v in pts[-1]], names=" ".join(str(v) for v in tgt), line=el[ld["i"]][:80]))
                 continue
         for cx, cy, r, n in sh["symbols"]:
-            if any(math.hypot(p[0] - cx, p[1] - cy) <= r + 0.05 for p in ends):
+            if any(math.hypot(p[0] - cx, p[1] - cy) <= r + 0.05 for p in ends) or _apart_levels(ld["level"], _level(el[n])):
                 continue
             if any(_seg_dist((cx, cy), a, b) < r - 0.05 for a, b in zip(pts, pts[1:])):
                 out.append(dict(kind="through a symbol", at=[round(cx, 2), round(cy, 2)], names=f"r {r:g}", line=el[ld["i"]][:80]))
                 break
     for k, a in enumerate(leaders):
         for b in leaders[k + 1:]:
+            if _apart_levels(a["level"], b["level"]) or _branch(a, b, el):
+                continue
             if any(_crossing(p, q, u, v) for p, q in zip(a["pts"], a["pts"][1:]) for u, v in zip(b["pts"], b["pts"][1:])):
                 out.append(dict(kind="crosses or touches a leader", at=[round(v, 2) for v in a["pts"][-1]], names=el[b["i"]][:60], line=el[a["i"]][:80]))
     return out

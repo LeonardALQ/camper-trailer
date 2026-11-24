@@ -56,11 +56,15 @@ def _centre(b):
     return ((bb[0] + bb[3]) / 2, (bb[1] + bb[4]) / 2, (bb[2] + bb[5]) / 2)
 
 
-def _route(pr, pts, sty, arrow=False):
+def _route(pr, pts, sty, arrow=False, level=None):
+    """A flow or a run in plan through pts, with an arrowhead at its end on the line itself, so the overrun check reads
+    the whole line as the arrow's, at its `level` where flows at other levels may cross it in plan (I2-81)."""
     q = [pr.p(x, y, 0) for x, y in pts]
     pr.sh.path(q, sty)
     if arrow and len(q) > 1:
-        arrow_line(pr.sh, q[-2], q[-1], sty, 1.6)
+        (a, b), (c, d) = q[-2], q[-1]
+        L = math.hypot(c - a, d - b) or 1
+        pr.sh.arrow((c, d), ((c - a) / L, (d - b) / L), 1.6, 0.45, level=level)
 
 
 def _clip_x(pts, x_min):
@@ -1111,9 +1115,9 @@ def ct612(prj, model, bom, checks, reg, dwg):
         _gland(sh, pr, g[gid], V, label=gid not in ("G5", "G26") and gid not in tagged,   # G5 and G26 sit beside other labels
                inset=1.4 if gid in ("G5", "G26") else 0.0)
     q = pr.p(gt[0] + 450, gt[1])
-    sh.path([(q[0] - 1.2, q[1]), (q[0] + 1.2, q[1]), (q[0], q[1] - 1.8)], "fill", closed=True)
     q2 = pr.p(gt[0] + 450, -hb - 330)
     sh.line(q[0], q[1] - 1.8, q2[0], q2[1] + 1.2, "thin")
+    sh.arrow((q[0], q[1] - 1.8), (0.0, -1.0), 1.8, 1.2)      # the dump's arrow, on its line so the check reads it (I2-81)
     sh.text(q2[0], q2[1] - 0.4, "DUMP UNDER THE FLOOR: LEVER VALVE AND CAMLOCK, KERB SIDE", 1.1, "middle")
     q = pr.p(ws[0], ws[1])
     sh.circle(q[0], q[1], 1.0, "fill")
@@ -1211,7 +1215,8 @@ def ct621(prj, model, bom, checks, reg, dwg):
         sh.line(pa[0], pa[1], pb[0], pb[1], "air")
         for p_, q_ in ((pa, pb), (pb, pa)):
             L = math.hypot(q_[0] - p_[0], q_[1] - p_[1]) or 1
-            sh.arrow((q_[0] - (q_[0] - p_[0]) * 0.08, q_[1] - (q_[1] - p_[1]) * 0.08), ((q_[0] - p_[0]) / L, (q_[1] - p_[1]) / L), 1.6, 0.45)
+            sh.arrow((q_[0] - (q_[0] - p_[0]) * 0.08, q_[1] - (q_[1] - p_[1]) * 0.08), ((q_[0] - p_[0]) / L, (q_[1] - p_[1]) / L), 1.6, 0.45,
+                     level="cabin")
         m = (pa[0] + 0.22 * (pb[0] - pa[0]), pa[1] + 0.22 * (pb[1] - pa[1]))
         sh.text(m[0], m[1] + 1.0, t, 1.15, "middle", color="#1a7a3a")
     # towing: the RESPA's supply through the cabin, out through the relief valve
@@ -1219,30 +1224,32 @@ def ct621(prj, model, bom, checks, reg, dwg):
     rv = f("VE-06")
     ex = f("VE-03")
     vents = (V["in_x1"] - 60, (rv[1] + ex[1]) / 2)     # V8 low and V9 high on the rear wall, one place in plan
-    _route(pr, [(r4[0], r4[1] - 300), (4300, 200), (V["rear_x0"] - 200, 0), (V["wet_x0"] + 400, -200), vents], "airx", arrow=True)
+    _route(pr, [(r4[0], r4[1] - 300), (4300, 200), (V["rear_x0"] - 200, 0), (V["wet_x0"] + 400, -200), vents], "airx", arrow=True, level="cabin")
     q = pr.p(4300, 230)
     sh.text(q[0], q[1] + 0.8, "TOWING: RESPA SUPPLY TO THE RELIEF VALVE", 1.15, "middle", color="#8a5a00", names=pr.p(4300, 200))
     # the wet room extract and the range hood. The extract's arrow ends where the relief path's does, at V8 and V9's one
     # place in plan, so the two arrows meet there and do not cross (I2-76)
-    _route(pr, [(V["in_x1"] - 500, -700), vents], "airx", arrow=True)
+    _route(pr, [(V["in_x1"] - 500, -700), vents], "airx", arrow=True, level="cabin")
     hood = f("VE-07")
-    _route(pr, [(hood[0], hood[1]), (hood[0] + 30, hb)], "airx", arrow=True)
+    _route(pr, [(hood[0], hood[1]), (hood[0] + 30, hb)], "airx", arrow=True, level="cabin")
     # the split: indoor unit blowing forward, its arrow ending short of the Combi duct's outlet ahead of it (I2-76), the
     # line set to the outdoor unit through G5
     ai = f("AC-01")
-    _route(pr, [(ai[0] - 150, ai[1] - 200), (ai[0] - 560, ai[1] - 265)], "air", arrow=True)
+    _route(pr, [(ai[0] - 150, ai[1] - 200), (ai[0] - 560, ai[1] - 265)], "air", arrow=True, level="cabin")
     g5 = next(x for x in svc["glands"] if x["id"] == "G5")
     _route(pr, [(V["wet_x0"], g5["y"]), (V["in_x1"], g5["y"])], "thin")
     q = pr.p(V["wet_x0"] + 500, g5["y"] + 60)
     sh.text(q[0], q[1], "LINE SET, WET ROOM CEILING", 1.05, "middle")
-    # the Combi's four warm-air ducts (outlets indicative)
+    # the Combi's four warm-air ducts (outlets indicative), under the floor's level where the cabin's air paths cross
+    # them in plan. The two running forward share a bulkhead without crossing: the one that turns off first rises
+    # nearer the Combi and runs on the inner track (I2-81)
     cb = f("LA-03")
     yr_ = hi - 60
-    for pts in (((cb[0] - 120, cb[1]), (cb[0] - 120, yr_), (V["in_x0"] + 500, yr_), (V["in_x0"] + 500, yr_ - 250)),
-                ((cb[0] - 160, cb[1]), (cb[0] - 160, yr_ - 40), (V["in_x0"] + 60, yr_ - 40), (V["in_x0"] + 60, -800), (V["in_x0"] + 300, -800)),
+    for pts in (((cb[0] - 160, cb[1]), (cb[0] - 160, yr_ - 40), (V["in_x0"] + 500, yr_ - 40), (V["in_x0"] + 500, yr_ - 250)),
+                ((cb[0] - 120, cb[1]), (cb[0] - 120, yr_), (V["in_x0"] + 60, yr_), (V["in_x0"] + 60, -800), (V["in_x0"] + 300, -800)),
                 ((cb[0] + 120, cb[1] - 200), (cb[0] + 120, 600), (4450, 600), (4450, 420)),
                 ((cb[0] + 160, cb[1]), (cb[0] + 160, yr_), (V["wet_x0"] + 300, yr_), (V["wet_x0"] + 300, yr_ - 200))):
-        _route(pr, pts, "hot", arrow=True)
+        _route(pr, pts, "hot", arrow=True, level="floor")
     q = pr.p(cb[0], cb[1] - 330)
     sh.text(q[0], q[1], "COMBI DUCTS, IN FLOOR-LEVEL BULKHEADS", 1.1, "middle", color="#c00000", names=pr.p(cb[0] + 120, 600))
     for gid, t in (("VE-01A", "A"), ("VE-01B", "B"), ("VE-01C", "C"), ("VE-01D", "D")):    # each fan's letter in its symbol
@@ -1251,6 +1258,7 @@ def ct621(prj, model, bom, checks, reg, dwg):
         n0 = len(sh.el)
         sh.circle(q[0], q[1], 1.3, "box")
         sh.circle(q[0], q[1], 1.3, "air")
+        sh.el[-2:] = [e[:-2] + ' data-level="cabin"/>' for e in sh.el[-2:]]      # the fans stand in the cabin's walls
         sh.leads[len(sh.el)] = [(n0, ("circle", 1.3)), (n0 + 1, ("circle", 1.3))]
         sh.text(q[0], q[1] - 0.45, t, 1.1, "middle", bold=True, names=q)
     sh.text(34, 166 + 2 * hb / k + 6.0, "PLAN, FRONT LEFT, ROAD SIDE UP: UNITS, FANS, VENTS, AIR PATHS AND THE COMBI'S DUCTS", 2.0, bold=True)

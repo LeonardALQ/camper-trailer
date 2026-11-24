@@ -395,65 +395,84 @@ def test_svc06_holds_the_tsc_at_its_floor():
     assert not worse["ok"] and any("under its" in p for p in worse["problems"]), worse["problems"]
 
 
-def test_the_leads_hang_at_their_cut_length_and_reach_every_turn():
-    """I2-63: each lead between the vehicles is drawn at its cut length, its bight hanging from the saddle, and the cut
-    length covers the worst turn and pitch of rules.between with the margin, rounded up to the next 10 mm and no more."""
-    reach = {x["run"]: x for x in R.between_reach(RES)}
-    assert set(reach) == {"K-13", "K-14"}
+def _reach_rows():
+    import yaml
+    ute = yaml.safe_load((R.DATA / "ute" / "ute.yaml").read_text())["params"]
+    return {x["run"]: x for x in R.between_reach(RES, ball_drop=float(ute["coupling_tol"]))}
+
+
+def test_the_leads_are_cut_to_their_spans_and_no_turn_pulls_them_taut():
+    """I2-63, I2-78: each lead between the vehicles is clamped on the leads' bracket ahead of the stone guard and held
+    up by its sprung arm. Its cut is its span from the plug to the strap on the arm's seat, from the strap to the clamp
+    and its path to the junction, and with rules.between's margin taken off no turn or pitch pulls its span taut at
+    either ball height. Straight ahead it hangs over the coupling's 380 mm, as drawn and where the arm holds it."""
+    rows = _reach_rows()
+    assert set(rows) == {"K-13", "K-14"}
+    guard = next(b["box"] for b in RES["blocks"] if b["id"] == "DB-04")
+    plate = next(b["box"] for b in RES["blocks"] if b["id"] == "CH-P01")
     for r in RES["runs"]:
-        if r["id"] not in reach:
+        if r["id"] not in rows:
             continue
-        drawn = R.fillet(r["points"], r["bend_r"])["length"]
-        assert drawn == pytest.approx(1000 * r["cut_m"], abs=2.0), f"{r['id']} is drawn {drawn:.0f} mm long, cut {1000 * r['cut_m']:.0f} mm"
-        x = reach[r["id"]]
-        assert x["need_mm"] <= x["cut_mm"] <= x["need_mm"] + 10, x
-        assert x["low_mm"] > 380.0, f"{r['id']}'s bight hangs to {x['low_mm']} mm, under the coupling"
-    sad = RES["fixtures"]["DB-HK"]["box"]
-    chs = {b["id"]: b["box"] for b in RES["blocks"] if b.get("box") and b["id"] in ("CH-P01", "CH-P02")}
-    assert sad[0] > chs["CH-P01"][3] and sad[0] > chs["CH-P02"][3], "the saddle stands behind the coupling plate and the chain lug"
+        i = next(j for j, q in enumerate(r["points"]) if math.dist(q, r["clamp"]) < 1e-6)
+        fixed = R.fillet(r["points"][i:], r["bend_r"])["length"]
+        assert r["lift"]["clip_mm"] + r["lift"]["rest_mm"] + fixed == pytest.approx(1000 * r["cut_m"], abs=1.0)
+        x = rows[r["id"]]
+        assert x["taut"] == 0 and x["low_ball"]["taut"] == 0, x
+        assert x["low_mm"] > 380.0 and x["straight"]["low_mm"] > 380.0, x
+        assert plate[3] < r["clamp"][0] < guard[0], "the clamp stands behind the coupling plate and ahead of the stone guard"
+        assert r["clamp"][2] + r["od"] / 2 <= guard[2] - 20.0, "and keeps SVC-01's 20 mm under the stone guard"
 
 
-def test_the_leads_hang_clear_of_dim06_in_the_tightest_turn_at_both_ball_heights():
-    """I2-70: in any turn and pitch of rules.between, at the design's coupling height and with the truck's ball at
-    UTE-13's low end, each lead between the vehicles hangs at least DIM-06's 200 mm up, which DIM-08 holds it to: K-14
-    sliding over its saddle's UHMW-PE lining within its friction, K-13 with its slack shared over its free-turning
-    sheave, whose groove bends it no tighter than its radius."""
+def test_the_leads_hang_clear_of_dim06_in_any_turn_at_both_ball_heights():
+    """I2-70, I2-78: in any turn and pitch of rules.between, at the design's coupling height and with the truck's ball
+    at UTE-13's low end, each lead between the vehicles hangs at least DIM-06's 200 mm up where its sprung arm holds
+    it, which DIM-08 holds it to, and pulls its plug with under half the SB50's 44 N (10 lbf) disconnect force."""
     import yaml
     checks = {c["id"]: c for c in yaml.safe_load((R.DATA / "checks.yaml").read_text())["trailer_checks"]}
     assert checks["DIM-08"]["min"] == checks["DIM-06"]["min"]
-    ute = yaml.safe_load((R.DATA / "ute" / "ute.yaml").read_text())["params"]
-    rows = R.between_reach(RES, ball_drop=float(ute["coupling_tol"]))
-    for x in rows:
-        assert x["low_ball"]["turn_low_mm"] < x["turn_low_mm"] and x["low_ball"]["tight_low_mm"] < x["tight_low_mm"] < x["low_mm"], x
+    for x in _reach_rows().values():
+        assert x["turn_model"] == "held up by its sprung arm"
+        assert x["low_ball"]["turn_low_mm"] < x["turn_low_mm"], x
         assert x["low_ball"]["turn_low_mm"] >= checks["DIM-08"]["min"], f"{x['run']} hangs to {x['low_ball']['turn_low_mm']} mm"
-    k13 = next(r for r in RES["runs"] if r["id"] == "K-13")
-    sheave = RES["fixtures"]["DB-HR"]["box"]
-    groove = (sheave[5] - sheave[2]) / 2 - 9.0
-    assert k13["rolls"] and "DB-HR" in k13["passes"] and groove + k13["od"] / 2 >= k13["bend_r"]
-    models = {x["run"]: x["turn_model"] for x in rows}
-    assert models["K-13"] == "shared over its sheave" and models["K-14"].startswith("sliding over its saddle's lining")
+        assert max(x["pull_n"], x["low_ball"]["pull_n"]) < 22.0
 
 
-def test_the_sb50_lead_slides_on_its_saddle_where_a_rubber_lining_would_hold_it_low():
-    """I2-70: K-14 lies over the saddle DB-HK, whose lining is UHMW-PE so that the lead slides on it. Over a lining of
-    friction mu the side holding more slack can hang e^(mu theta) times as deep as the other before the lead slides
-    (est.), so DIM-08 reads K-14 at both ends of that band. A rubber lining (mu 0.8, est.) would let the span from the
-    truck's socket keep the slack a tight turn gives it and hang under DIM-06's 200 mm with the ball low, and a free
-    sheave (mu 0) would share the slack at one height, higher than the lining's band allows."""
+def test_the_catenary_against_the_parabola_worked_by_hand():
+    """I2-78: level supports 1,000 mm apart with 1,020 mm of lead. By hand the parabola gives s - c = 8 d^2 / (3 c),
+    so a sag d of 86.6 mm, a = H / w = c^2 / (8 d) = 1,443 mm and a pull at each support of w (a + d), the weight of
+    1,530 mm of lead. The catenary agrees within 1 %, and its pull is its horizontal pull plus the weight under it."""
+    c = R.catenary((0.0, 0.0, 0.0), (1000.0, 0.0, 0.0), 1020.0)
+    assert c["a"] == pytest.approx(1443.0, rel=0.01)
+    assert c["y_p"] - c["a"] == pytest.approx(86.6, rel=0.01) and -c["low"] == pytest.approx(86.6, rel=0.01)
+    assert c["y_p"] == pytest.approx(1530.0, rel=0.01) and c["y_q"] == pytest.approx(c["y_p"])
+    assert R.catenary((0.0, 0.0, 0.0), (1000.0, 0.0, 0.0), 999.0) is None
+
+
+def test_over_a_free_support_the_long_span_takes_the_slack_and_the_arm_holds_it_up():
+    """I2-78, the old friction band's order reversed: each side's pull at a support is its horizontal pull plus the
+    weight under it, so over a free support a long span from the plug takes the slack from a short bight and hangs
+    deeper than it, where the band took the side with more slack to pull less. And K-14 with its arm's spring taken
+    away, the arm on its bottom stop, hangs over 100 mm lower in the tightest turn than with it."""
+    S, P, J, total = (0.0, 0.0, 0.0), (-700.0, 0.0, -100.0), (270.0, 0.0, -20.0), 1300.0
+
+    def pulls(s):
+        a, b = R.catenary(P, S, s), R.catenary(S, J, total - s)
+        return None if a is None or b is None else (a["y_q"] - b["y_p"], a, b)
+
+    lo, hi = math.dist(P, S) + 1.0, total - math.dist(S, J) - 1.0
+    for _ in range(60):
+        mid = (lo + hi) / 2
+        lo, hi = (mid, hi) if pulls(mid)[0] > 0 else (lo, mid)
+    _, span, bight = pulls((lo + hi) / 2)
+    assert span["low"] < bight["low"] - 100.0, (span["low"], bight["low"])
     import copy
-    r = next(r for r in RES["runs"] if r["id"] == "K-14")
-    assert "DB-HK" in r["passes"] and "UHMW-PE" in RES["fixtures"]["DB-HK"]["what"] and r["slides"]["wrap_deg"] == 180
-    rule = RES["data"]["rules"]["between"]
-    V = RES["V"]
-    down = (0.0, 0.0, -20.0)
-    pts = [R._add(r["points"][0], down)] + [R._nose_down(q, V, 20.0) for q in r["points"][1:]]
-    pivot = (0.0, 0.0, float(V["coupling_z"]) - 20.0)
-    lows = {}
-    for mu in (0.0, r["slides"]["mu"], 0.8):
-        k = copy.deepcopy(r)
-        k["slides"]["mu"] = mu
-        lows[mu] = R._turned(k, rule, pts, pivot, {})["turn_low_mm"]
-    assert lows[0.0] > lows[r["slides"]["mu"]] >= 200.0 > lows[0.8], lows
+    r = next(x for x in RES["runs"] if x["id"] == "K-14")
+    rule, V = RES["data"]["rules"]["between"], RES["V"]
+    held = R.lifted(r, rule, V)["turn_low_mm"]
+    weak = copy.deepcopy(r)
+    weak["lift"]["torque_nmm"] = [0.0, 0.0]
+    limp = R.lifted(weak, rule, V)["turn_low_mm"]
+    assert limp < held - 100.0 and held >= 200.0, (limp, held)
 
 
 def test_the_drum_leads_arm_parts_clear_fit05():

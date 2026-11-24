@@ -696,6 +696,12 @@ def _resolve_run(r: dict, ns: dict, K: dict, rule: dict, fixtures: dict, pitch: 
         pts, row["bight_z"] = hang_bight(pts, [i + 1 for i in r["bight"]], float(r["cut_m"]) * 1000, max(k["bend_r"], way_bend))
         first = next(i for i in range(1, len(pts)) if i - 1 not in r["bight"])    # the saddle or the sheave it lies over
         row["points"], row["reach_pts"] = pts, (pts[0], pts[first], pts[-1])
+    if r.get("lift"):
+        row["clamp"] = pts[1]     # its first path point, where the bracket clamps it (I2-78)
+        rest = float(r["cut_m"]) * 1000 - float(r["lift"]["clip_mm"]) - fillet(pts[1:], k["bend_r"])["length"]
+        row["lift"] = dict(r["lift"], rest_mm=round(rest, 1))     # the part from the strap to the clamp is what the cut leaves
+        pts = lift_drawn(row, pts, k["kg_m"] * 9.81 / 1000.0, float(r["lift"].get("seat_mm", k["bend_r"])))
+        row["points"] = pts
     if not rigid:
         pts = smooth_jogs(pts, k["bend_r"])
         row["points"] = pts
@@ -1516,99 +1522,212 @@ def _nose_down(q: tuple, V: dict, drop: float) -> tuple:
     return (V["axle_x"] + dx * math.cos(th) - dz * math.sin(th), q[1], V["hub_z"] + dz * math.cos(th) + dx * math.sin(th))
 
 
+def catenary(p: tuple, q: tuple, s: float) -> dict | None:
+    """A flexible lead of length s (mm) hanging between p and q (mm) in the vertical plane through them (I2-78): its
+    parameter a = H / w (mm), x0 the vertex's place along the plan chord from p, the lowest point's height on the lead
+    between its ends (the vertex, or the lower end when the vertex lies outside), and each end's height over the
+    directrix, so that the lead's pull there is w times that height: its horizontal pull H = w a plus the weight of
+    lead hanging under it. None when s is no more than the chord, a lead pulled taut."""
+    h = math.hypot(q[0] - p[0], q[1] - p[1])
+    v = q[2] - p[2]
+    if h < 1e-6 or s <= math.hypot(h, v) + 1e-6:
+        return None
+    lo, hi, target = 1e-3, 1e9, math.sqrt(s * s - v * v)
+    for _ in range(100):
+        a = math.sqrt(lo * hi)
+        lo, hi = (lo, a) if 2 * a * math.sinh(h / (2 * a)) < target else (a, hi)
+    a = math.sqrt(lo * hi)
+    x0 = h / 2 - a * math.asinh(v / (2 * a * math.sinh(h / (2 * a))))
+    y_p, y_q = a * math.cosh(x0 / a), a * math.cosh((h - x0) / a)
+    low = p[2] - (y_p - a) if 0.0 <= x0 <= h else min(p[2], q[2])
+    return dict(a=a, x0=x0, h=h, v=v, y_p=y_p, y_q=y_q, low=low)
+
+
+def _cat_pull(p: tuple, q: tuple, c: dict, w: float, at: str) -> tuple:
+    """The pull (N) a hanging lead `c` between p and q puts on its end `at` ('p' or 'q'): along its tangent there,
+    its horizontal part w a towards the other end in plan and its vertical part down towards the vertex."""
+    ux, uy = (q[0] - p[0]) / c["h"], (q[1] - p[1]) / c["h"]
+    H = w * c["a"]
+    if at == "q":
+        return (-H * ux, -H * uy, -H * math.sinh((c["h"] - c["x0"]) / c["a"]))
+    return (H * ux, H * uy, -H * math.sinh(c["x0"] / c["a"]))
+
+
+def _cat_points(p: tuple, q: tuple, c: dict, step: float = 60.0) -> list[tuple]:
+    """Points along a hanging lead between p and q, its two ends left out."""
+    n = max(2, int(math.ceil(c["h"] / step)))
+    ux, uy = (q[0] - p[0]) / c["h"], (q[1] - p[1]) / c["h"]
+    y0 = c["a"] * math.cosh(c["x0"] / c["a"])
+    return [(p[0] + ux * x, p[1] + uy * x, p[2] + c["a"] * math.cosh((x - c["x0"]) / c["a"]) - y0)
+            for x in (c["h"] * i / n for i in range(1, n))]
+
+
+def _xz(v: tuple) -> tuple:
+    """A direction's part in the vertical plane along X, as a unit (x, z)."""
+    n = math.hypot(v[0], v[2])
+    return (v[0] / n, v[2] / n)
+
+
+def _end_dir(p: tuple, q: tuple, c: dict, at: str) -> tuple:
+    """A hanging lead's direction of travel from p towards q at its end `at`, in 3D."""
+    ux, uy = (q[0] - p[0]) / c["h"], (q[1] - p[1]) / c["h"]
+    s = math.sinh((c["h"] - c["x0"]) / c["a"]) if at == "q" else -math.sinh(c["x0"] / c["a"])
+    return _unit((ux, uy, s))[0]
+
+
+def lift_rest(P: tuple, A: tuple, O: tuple, lift: dict, w: float, seat_r: float) -> dict | None:
+    """A lead's span held up by its sprung arm (`lift`, I2-78), the truck's plug at P. The lead runs from the plug
+    up over a lined seat of radius seat_r at the arm's tip C, strapped to it at the seat's top, `clip_mm` along it
+    from the plug, and on to its clamp A on the bracket, `rest_mm` from the strap. The arm is hinged at O and swings
+    in the vertical plane along X between its stops (`deg`, from forward and level), its torsion spring lifting it
+    with a torque falling from `torque_nmm[0]` on the bottom stop to `torque_nmm[1]` on the top one, against the
+    weight of the arm and its clip (`arm_kg`, `clip_kg`). Each part of the span is a flexible catenary of its own
+    length from where it leaves the seat, tangent to it (no bending stiffness, est.), and pulls the seat with its
+    horizontal pull plus the weight under it along its tangent. The arm rests where the spring's torque balances
+    those pulls, or on a stop. None if the span is pulled taut at every place of the arm. Returns the arm's angle,
+    the seat's centre, the two parts and where they leave the seat, the lowest point of the lead's centreline and
+    the pull at the plug (N)."""
+    rho, (d0, d1), (m0, m1) = float(lift["arm_mm"]), lift["deg"], lift["torque_nmm"]
+    l1, l2, R = float(lift["clip_mm"]), float(lift["rest_mm"]), float(seat_r)
+    g_arm = 9.81 * (float(lift.get("arm_kg", 0.0)) / 2 + float(lift.get("clip_kg", 0.0))) * rho
+
+    def at(deg):
+        t = math.radians(deg)
+        C = (O[0] - rho * math.cos(t), O[1], O[2] + rho * math.sin(t))
+        top = (C[0], C[1], C[2] + R)
+        d1_, d2_ = _xz(_sub(C, P)), _xz(_sub(A, C))
+        c1 = c2 = None
+        for _ in range(4):        # where each part leaves the seat, tangent to it, from its end's direction
+            n1, n2 = (-d1_[1], d1_[0]), (-d2_[1], d2_[0])
+            f1, f2 = max(0.0, math.atan2(-n1[0], n1[1])), max(0.0, math.atan2(n2[0], n2[1]))
+            n1 = (-math.sin(f1), math.cos(f1)) if f1 > 0 else (0.0, 1.0)
+            n2 = (math.sin(f2), math.cos(f2)) if f2 > 0 else (0.0, 1.0)
+            T1, T2 = (C[0] + R * n1[0], C[1], C[2] + R * n1[1]), (C[0] + R * n2[0], C[1], C[2] + R * n2[1])
+            c1, c2 = catenary(P, T1, l1 - R * f1), catenary(T2, A, l2 - R * f2)
+            if c1 is None or c2 is None:
+                return None
+            d1_, d2_ = _xz(_end_dir(P, T1, c1, "q")), _xz(_end_dir(T2, A, c2, "p"))
+        F1, F2 = _cat_pull(P, T1, c1, w, "q"), _cat_pull(T2, A, c2, w, "p")
+        lever = sum(F[0] * (Q[2] - O[2]) - F[2] * (Q[0] - O[0]) for F, Q in ((F1, T1), (F2, T2)))
+        torque = m1 + (m0 - m1) * (d1 - deg) / (d1 - d0) + lever - g_arm * math.cos(t)
+        return dict(deg=deg, C=C, top=top, T1=T1, T2=T2, f1=f1, f2=f2, c1=c1, c2=c2, torque=torque)
+
+    rows = [at(d0 + 0.5 * i) for i in range(int(round((d1 - d0) / 0.5)) + 1)]
+    ok = [r for r in rows if r is not None]
+    if not ok:
+        return None
+    x = next((a for a, b in zip(rows, rows[1:]) if a is not None and b is not None and a["torque"] >= 0 > b["torque"]), None)
+    if x is None:
+        x = ok[-1] if ok[-1]["torque"] >= 0 else ok[0]
+    return dict(x, low=min(x["c1"]["low"], x["c2"]["low"]), pull_n=w * x["c1"]["y_p"])
+
+
+def _lift_ends(r: dict, points: list, V: dict, ball_drop: float) -> tuple:
+    """A held-up lead's plug, clamp and its arm's hinge, with the truck's ball `ball_drop` low: the truck and its plug
+    lowered with it and the trailer turned nose down about its axle group."""
+    P, A = points[0], next(q for q in points if math.dist(q, r["clamp"]) < 1e-6)
+    O = _add(A, (float(r["lift"]["pivot"][0]), 0.0, float(r["lift"]["pivot"][1])))
+    if ball_drop:
+        P = _add(P, (0.0, 0.0, -float(ball_drop)))
+        A, O = _nose_down(A, V, ball_drop), _nose_down(O, V, ball_drop)
+    return P, A, O
+
+
+def lifted(r: dict, rule: dict, V: dict, ball_drop: float = 0.0) -> dict:
+    """I2-78: a lead between the vehicles held up by its sprung arm (`lift`) over every turn and pitch of
+    rules.between, the truck turned about the coupling's pin: where the arm rests in each, the lead's lowest point and
+    the pull at the truck's plug. `taut` counts the positions in which the cut, less rules.between's margin, would pull
+    the span taut with the arm on its bottom stop, which the cut must leave at none, and `on_top` those in which the
+    arm rests on its top stop. Straight ahead, the lowest point, the arm's angle and the seat's top."""
+    P0, A, O = _lift_ends(r, r["points"], V, ball_drop)
+    pivot = (0.0, 0.0, float(V["coupling_z"]) - float(ball_drop))
+    w, od = r["kg_m"] * 9.81 / 1000.0, r["od"]
+    m = float(rule["margin_mm"]) / 2
+    short = dict(r["lift"], clip_mm=float(r["lift"]["clip_mm"]) - m, rest_mm=float(r["lift"]["rest_mm"]) - m)
+    best, taut, top, pull, straight, pts = (math.inf, 0, 0), 0, 0, 0.0, None, None
+    for ph in range(-int(rule["pitch_deg"]), int(rule["pitch_deg"]) + 1, 5):
+        for yw in range(-int(rule["yaw_deg"]), int(rule["yaw_deg"]) + 1, 5):
+            P = _turn(P0, pivot, yw, ph)
+            seat = float(r["lift"].get("seat_mm", r["bend_r"]))
+            x = lift_rest(P, A, O, r["lift"], w, seat)
+            if x is None or lift_rest(P, A, O, short, w, seat) is None:
+                taut += 1
+            if x is None:
+                continue
+            low = x["low"] - od / 2
+            best = min(best, (low, yw, ph))
+            pull = max(pull, x["pull_n"])
+            top += x["deg"] >= float(r["lift"]["deg"][1])
+            if yw == 0 and ph == 0:
+                pts = [P] + _cat_points(P, x["T1"], x["c1"], 20.0) + [x["T1"], x["top"], x["T2"]] + _cat_points(x["T2"], A, x["c2"], 20.0) + [A]
+                straight = dict(low_mm=round(low, 1), arm_deg=x["deg"], seat_top=[round(v) for v in x["top"]])
+    return dict(turn_low_mm=round(best[0], 1), turn_yaw=best[1], turn_pitch=best[2], taut=taut, on_top=top, pull_n=round(pull, 1),
+                straight=straight, straight_pts=pts, od=od, turn_model="held up by its sprung arm")
+
+
+def lift_drawn(r: dict, pts: list, w: float, seat_r: float) -> list:
+    """The points a held-up lead is drawn through (I2-78): its span as the arm holds it straight ahead, from the plug
+    up over the seat at the arm's tip, round the seat between where the two parts leave it, and down to the clamp,
+    then its path along the drawbar to the junction."""
+    i = next(j for j, q in enumerate(pts) if math.dist(q, r["clamp"]) < 1e-6)
+    A = pts[i]
+    O = _add(A, (float(r["lift"]["pivot"][0]), 0.0, float(r["lift"]["pivot"][1])))
+    x = lift_rest(pts[0], A, O, r["lift"], w, seat_r)
+    if x is None:
+        return pts
+    C, R = x["C"], float(seat_r) + 1.0     # drawn 1 mm outside the seat, so its polyline keeps the bend radius
+    arc = [(C[0] + R * math.sin(f), C[1], C[2] + R * math.cos(f)) for f in
+           [-x["f1"] + (x["f1"] + x["f2"]) * k / 12 for k in range(13)]]
+    near = lambda q: min(math.dist(q, x["T1"]), math.dist(q, x["T2"]), math.dist(q, A)) < 30.0     # noqa: E731
+    span = [q for q in _cat_points(pts[0], x["T1"], x["c1"], 140.0) if not near(q)] + arc
+    span += [q for q in _cat_points(x["T2"], A, x["c2"], 90.0) if not near(q)]
+    return [pts[0]] + span + pts[i:]
+
+
 def between_reach(res: dict, ball_drop: float = 0.0) -> list[dict]:
-    """I2-63: each lead that hangs between the vehicles with a bight (`rides: between`, `bight`) against the turns
-    and the pitch it must follow (rules.between). The truck turns about the coupling's pin, up to the coupling's
-    yaw either way and the relative pitch either way, and the lead leaves its plug along the socket's axis and bends
-    no tighter than its radius to the point it lies over (its first path point, the saddle). Its cut length must
-    cover the path pulled taut from the plug over the saddle and any roller to the junction, plus what the worst of those positions
-    adds to the span, plus the margin. The shortest span sets how far the bight hangs in the tightest turn
-    (`tight_low_mm`, I2-70). A lead that lies over a free-turning sheave (`rolls`) shares its slack between its span
-    from the plug and its bight, one that slides over its saddle's lining (`slides`) shares it within the lining's
-    friction, and its lowest point is taken over every turn and pitch (`_shared`). `turn_low_mm`
-    is each lead's lowest in any turn, by the model its support takes, with its yaw and pitch. With `ball_drop`, the same again with the truck's ball that far under the design's
-    coupling height, the truck and its plug lowered with it and the trailer turned nose down about its axle group
-    (`low_ball`): UTE-13's low end of 420 mm takes the 440 mm ball 20 mm down."""
+    """I2-63, I2-78: each lead that hangs between the vehicles (`rides: between`) against the turns and the pitch it
+    must follow (rules.between), the truck turned about the coupling's pin up to the coupling's yaw either way and the
+    relative pitch either way. A lead held up by its sprung arm (`lift`) is read where the arm holds it in each
+    position (`lifted`): its lowest point in any turn (`turn_low_mm`, with its yaw and pitch), the positions its cut
+    would pull taut (`taut`), the largest pull at the truck's plug and its rest straight ahead. A lead with a bight
+    (`bight`) that only hangs from its saddle is read with all its slack in the bight (`_reach`). With `ball_drop`, the
+    same again with the truck's ball that far under the design's coupling height, the truck and its plug lowered with
+    it and the trailer turned nose down about its axle group (`low_ball`): UTE-13's low end of 420 mm takes the 440 mm
+    ball 20 mm down."""
     rule = res["data"]["rules"]["between"]
     V = res["V"]
     out = []
     for r in res["runs"]:
-        if r.get("rides") != "between" or not r.get("bight"):
+        if r.get("rides") != "between":
+            continue
+        low_mm = round(min(t[2] for t in r["dense"]) - r["od"] / 2, 1)
+        if r.get("lift"):
+            row = dict(run=r["id"], cut_mm=round(1000 * r["length_m"]), low_mm=low_mm, **lifted(r, rule, V))
+            if ball_drop:
+                row["low_ball"] = dict(ball_z=float(V["coupling_z"]) - ball_drop, **lifted(r, rule, V, ball_drop))
+            out.append(row)
+            continue
+        if not r.get("bight"):
             continue
         pivot = (0.0, 0.0, float(V["coupling_z"]))
         row = _reach(r, rule, r["points"], r["reach_pts"], pivot)
-        row.update(_turned(r, rule, r["points"], pivot, row))
-        held = [q for i, q in enumerate(r["points"]) if i - 1 not in r["bight"]]    # the plug, the saddle, a roller, the junction
+        row.update(turn_low_mm=row["tight_low_mm"], turn_yaw=row["shortest_yaw"], turn_pitch=row["shortest_pitch"], turn_model="its bight")
+        held = [q for i, q in enumerate(r["points"]) if i - 1 not in r["bight"]]    # the plug, the saddle, the junction
         taut = fillet(held, r["bend_r"])["length"]
         raw = row.pop("raw")
         row.update(run=r["id"], cut_mm=round(1000 * r["length_m"]), need_mm=round(taut + raw[1] - raw[0] + float(rule["margin_mm"])),
-                   taut_mm=round(taut), margin_mm=float(rule["margin_mm"]), low_mm=round(min(t[2] for t in r["dense"]) - r["od"] / 2, 1))
+                   taut_mm=round(taut), margin_mm=float(rule["margin_mm"]), low_mm=low_mm)
         if ball_drop:
             p, a, e = r["reach_pts"]
             down = (0.0, 0.0, -float(ball_drop))
             pts = [_add(r["points"][0], down)] + [_nose_down(q, V, ball_drop) for q in r["points"][1:]]
             pivot = (0.0, 0.0, float(V["coupling_z"]) - ball_drop)
             low = _reach(r, rule, pts, (_add(p, down), _nose_down(a, V, ball_drop), _nose_down(e, V, ball_drop)), pivot)
-            low.update(_turned(r, rule, pts, pivot, low))
+            low.update(turn_low_mm=low["tight_low_mm"], turn_yaw=low["shortest_yaw"], turn_pitch=low["shortest_pitch"])
             row["low_ball"] = dict(ball_z=float(V["coupling_z"]) - ball_drop,
                                    **{k: v for k, v in low.items() if k.startswith(("tight", "shortest", "straight", "turn"))})
         out.append(row)
     return out
-
-
-def _turned(r: dict, rule: dict, points: list, pivot: tuple, row: dict) -> dict:
-    """A lead's lowest point in any turn and pitch: over every one with its slack shared over its sheave where it
-    `rolls`, between the ends of its lining's friction band where it `slides` over its saddle, else its bight's in the
-    tightest turn."""
-    if r.get("rolls") and len(points) == len(r["path"]) + 2:
-        low, yw, ph = _shared(r, rule, points, pivot)
-        return dict(turn_low_mm=round(low, 1), turn_yaw=yw, turn_pitch=ph, turn_model="shared over its sheave")
-    if r.get("slides") and len(points) == len(r["path"]) + 2:
-        s = r["slides"]
-        k = math.exp(float(s["mu"]) * math.radians(float(s["wrap_deg"])))
-        low, yw, ph = _shared(r, rule, points, pivot, k)
-        return dict(turn_low_mm=round(low, 1), turn_yaw=yw, turn_pitch=ph, turn_ratio=round(k, 2),
-                    turn_model=f"sliding over its saddle's lining at mu {float(s['mu']):g}")
-    return dict(turn_low_mm=row["tight_low_mm"], turn_yaw=row["shortest_yaw"], turn_pitch=row["shortest_pitch"], turn_model="its bight")
-
-
-def _shared(r: dict, rule: dict, points: list, pivot: tuple, k: float = 1.0) -> tuple:
-    """A lead over a free-turning sheave (`rolls`, I2-70) or sliding over its saddle's lining (`slides`, I2-70): at each
-    turn and pitch of rules.between its slack shares between its span from the plug and its bight. Over a free sheave
-    they hang to one height, as a lead over a pulley does with the same pull either side (est.). Over a lining whose
-    friction holds a pull k = e^(mu theta) times the other side's (the capstan rule, theta the wrap), the side holding
-    more slack hangs at most k times as deep under the saddle as the other, each side's pull at the saddle taken as the
-    weight of lead hanging under it (est.), so the lead lies anywhere between those two ends and k = 1 is the sheave's
-    one height. The lowest point over them all, at the cut length, and its yaw and pitch."""
-    br, od, cut = r["bend_r"], r["od"], 1000 * r["length_m"]
-    k_ = next(i for i in range(1, len(points)) if i - 1 not in r["bight"])     # the sheave or saddle, after any sag ahead of it
-    p, a, rest = points[0], points[k_], [q for i, q in enumerate(points) if i > k_]
-    x = (1.0, 0.0, 0.0)
-    best = (math.inf, 0, 0)
-    for deep in ((1.0, 1.0),) if k == 1.0 else ((1.0, 1.0 / k), (1.0 / k, 1.0)):     # (span, bight) depth for a unit
-        for ph in range(-int(rule["pitch_deg"]), int(rule["pitch_deg"]) + 1, 5):
-            for yw in range(-int(rule["yaw_deg"]), int(rule["yaw_deg"]) + 1, 5):
-                q = _turn(p, pivot, yw, ph)
-                q1 = _add(q, tuple(40.0 * c for c in _sub(_turn(_add(p, x), pivot, yw, ph), q)))
-                mid = [tuple(q1[i] + (a[i] - q1[i]) * f for i in range(3)) for f in (1 / 3, 2 / 3)]
-                zs_top, zb_top = min(q1[2], a[2]) - 1.0, min(a[2], rest[-1][2]) - 1.0
-
-                def shape(d, q=q, q1=q1, mid=mid, zs_top=zs_top, zb_top=zb_top):
-                    zs, zb = min(a[2] - d * deep[0], zs_top), min(a[2] - d * deep[1], zb_top)
-                    return ([q, q1] + [(c[0], c[1], zs) for c in mid] + [a], [a] + [(c[0], c[1], zb) for c in rest[:-1]] + [rest[-1]])
-
-                def drawn(d):
-                    return sum(fillet(smooth_jogs(s, br), br)["length"] for s in shape(d))
-                lo, hi = 0.0, a[2]
-                if drawn(lo) >= cut:
-                    continue       # pulled straight in this position: nothing hangs
-                for _ in range(40):
-                    d = (lo + hi) / 2
-                    lo, hi = (lo, d) if drawn(d) > cut else (d, hi)
-                low = min(min(t[2] for t in fillet(smooth_jogs(s, br), br)["dense"]) for s in shape((lo + hi) / 2)) - od / 2
-                if low < best[0]:
-                    best = (low, yw, ph)
-    return best
 
 
 def _reach(r: dict, rule: dict, points: list, reach_pts: tuple, pivot: tuple) -> dict:
