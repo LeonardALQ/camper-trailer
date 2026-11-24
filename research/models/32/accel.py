@@ -1,12 +1,13 @@
 """Research report 32's acceleration model: the Ranger Super Duty single cab chassis towing the trailer from rest to
-100 km/h and from 80 to 100 km/h, on a flat road in still air, at four power levels and four combination masses.
+100 km/h and from 80 to 100 km/h, on a flat road in still air, at six power levels and four combination masses.
 
     python3 research/models/32/accel.py > research/models/32/accel.out
 
 The truck and trailer move forward in steps of 10 ms through the 10-speed's gears. Each step takes the engine's
 full-load torque at its speed, under the gear's torque cap, times the turbo's spool and, in first, the torque
 converter's multiplication, through the gearbox, transfer case and axles to the tyres. Rolling resistance and report
-25's drag act against it, and every upshift loses drive for a set time. Every input not taken from a cited source is
+25's drag act against it, and every upshift loses drive for a set time. One factor on the force at the tyres is
+fitted to a stock Super Duty's unladen timed runs (calibration()). Every input not taken from a cited source is
 marked (est.). Standard library only.
 """
 import math
@@ -33,16 +34,20 @@ CRR = 0.011  # rolling resistance, the truck's LT tyres and the trailer's (est.)
 CDA = 4.55  # m2, report 25's option A+: the ute, the bike box and the trailer with its radiused front
 WHEELS_EQ = 0.6 * 48.0 * 4 + 0.6 * 35.0 * 4  # kg, four 48 kg truck wheels and four 35 kg trailer wheels, I/r2 of 0.6 m (est.)
 FIRST_CAP = 600.0  # Nm, Ford's figure, kept in first, reverse and low range at every level
-# One factor on the force at the tyres, fitted on 24 Nov 2026 to three measurements of stock Super Duties (calibration()
-# below). It stands for what the model cannot separate: the real crank to road efficiency, each engine's real output
-# against its rating and how the tests read speed. It applies to every level, as the tuned figures are crank ratings
-# like Ford's. 1.00 is the model as first built.
-CALIB = 1.08  # (est., fitted)
+# One factor on the force at the tyres, fitted to the two unladen timed runs of a stock Super Duty, the only
+# measurements whose method is known (calibration() below). It stands for what the model cannot separate: the real
+# crank to road efficiency, the engine's real output against Ford's rating and how the test read its speed. The
+# tuned levels are a tuner's targets, which need not share any margin in Ford's 154 kW, so their central case runs
+# from 1.00, the model as first built, to CALIB. SPREAD holds the factors of 24 Nov 2026's first calibration (1.08)
+# and of Leonard's 28 s read as a caravan (1.18), kept as the spread.
+CALIB = 1.04  # (est., fitted to the unladen runs at 3,150 kg)
+CENTRAL = (1.00, CALIB)
+SPREAD = (1.08, 1.18)
 
-# The combination's masses, kg. UTE-06's GCM case is the ute with growth (3,748 kg) and the trailer at its 4,000 kg
-# plate. TC2 with growth is the trailer fully loaded with 400 L of water and growth (3,575.6 kg, TRAILER.md).
-# 7,450 and 7,200 kg are the two lighter masses the plan asked for. The truck's tyres carry the ute and the towball,
-# about 4,140 kg with growth (est.), which sets the grip.
+# The combination's masses, kg. UTE-06's GCM case is the ute with growth (3,747.7 kg) and the trailer at its 4,000 kg
+# plate, 7,747.7 kg. TC2 with growth is the trailer fully loaded with 400 L of water and growth (3,575.9 kg, TRAILER.md
+# at 8e7e9bb), so the ute and that trailer are 7,323.6 kg. 7,450 and 7,200 kg are the two lighter masses the plan asked
+# for. The truck's tyres carry the ute and the towball, about 4,140 kg with growth (est.), which sets the grip.
 MASSES = (("GCM case, the trailer at its plate", 7750.0), ("Lighter, about 300 kg less", 7450.0),
           ("TC2 with growth behind the ute with growth", 7324.0), ("Lighter, about 550 kg less", 7200.0))
 N_DRIVE_KG = 4140.0  # (est.)
@@ -190,42 +195,53 @@ def power_for(rig, target_s, lo=180.0, hi=263.0):
     return hi
 
 
+def implied_factor(figure, target):
+    """The factor at which a model figure meets its measurement. A time falls as the factor rises, a speed rises."""
+    lo, hi = 0.70, 1.50
+    rising = figure(1.2) > figure(1.0)
+    for _ in range(25):
+        mid = (lo + hi) / 2
+        if (figure(mid) < target) == rising:
+            lo = mid
+        else:
+            hi = mid
+    return (lo + hi) / 2
+
+
 def calibration():
-    """The three measurements of stock Super Duties, the model's figure for each as first built (factor 1.00) and as
-    calibrated (CALIB), and the factor each measurement alone implies. Plus the ordinary Ranger V6 as a check."""
+    """The fit to the two unladen timed runs, and the other measurements as checks: the model's figure for each at
+    1.00 and at CALIB, and the factor each would imply alone."""
     stock = curve(LEVELS["stock"][1])
-    # CarExpert's dual cab chassis: Ford's 2,675 kg kerb (sheet of 29 Oct 2026), a heavy-duty tray, a toolbox, the
-    # crew and the gear, 3,150 kg (est., 3,050 to 3,300). Leonard's figure: a stock Super Duty with a tray towing 4 t,
-    # about 7,000 kg in all with about 3,300 kg on the truck's tyres (est.), behind a flat deck (CdA 2.5 m2, est.) or a
-    # caravan (4.5 m2, est.).
+    # CarExpert's dual cab chassis: Ford's 2,675 kg kerb (sheet of 29 Oct 2026), the heavy-duty steel tray, a toolbox,
+    # the driver and the test gear, 3,150 kg (est., 3,050 to 3,300). On its trailer dynamometer it also pulls the
+    # dynamometer trailer, 1,600 kg (CarExpert's 21-ute test), with about 0.6 m2 more drag area (est.). Leonard's
+    # figure: a stock Super Duty with a tray towing 4 t, about 7,000 kg in all with about 3,300 kg on the truck's tyres
+    # (est.), behind a flat deck (CdA 2.5 m2, est.) or a caravan (4.5 m2, est.).
     cab = lambda c, m=3150.0: Rig(m, m, cda=1.85, wheels_eq=0.6 * 48.0 * 4, calib=c)
+    dyno = lambda c: Rig(3150.0 + 1600.0, 3150.0, cda=1.85 + 0.6, calib=c)
     tow = lambda c, cda: Rig(7000.0, 3300.0, cda=cda, calib=c)
-    figures = [
+    fitted = [
         ("CarExpert, unladen 0 to 100 km/h, s", 13.23, lambda c: run(cab(c), stock, 0, 100)),
         ("CarExpert, unladen 80 to 120 km/h, s", 11.99, lambda c: run(cab(c), stock, 80, 120)),
-        ("CarExpert, 6.0 kN trailer dyno, cool, km/h", 78.0, lambda c: steady_speed(cab(c), stock, 6000)),
-        ("CarExpert, 6.0 kN trailer dyno, hot, km/h", 68.0, lambda c: steady_speed(cab(c), stock, 6000)),
+    ]
+    checks = [
+        ("CarExpert, 6.0 kN trailer dyno, at first, km/h", 78.0, lambda c: steady_speed(dyno(c), stock, 6000)),
+        ("CarExpert, 6.0 kN trailer dyno, once hot, km/h", 68.0, lambda c: steady_speed(dyno(c), stock, 6000)),
         ("Leonard, 4 t, 0 to 100 km/h, flat deck, s", 28.0, lambda c: run(tow(c, 2.5), stock, 0, 100)),
         ("Leonard, 4 t, 0 to 100 km/h, caravan, s", 28.0, lambda c: run(tow(c, 4.5), stock, 0, 100)),
     ]
-    print(f"Calibration: three measurements of stock Super Duties, the model at factor 1.00 and at {CALIB:.2f}, and the "
-          "factor each alone implies")
     implied = {}
-    for label, target, fn in figures:
-        lo, hi = 0.70, 1.50
-        rising = fn(1.2) > fn(1.0)  # a steady speed rises with the factor, a time falls
-        for _ in range(25):
-            mid = (lo + hi) / 2
-            if (fn(mid) < target) == rising:
-                lo = mid
-            else:
-                hi = mid
-        implied[label] = (lo + hi) / 2
-        print(f"  {label:44s} tested {target:6.2f}, model {fn(1.0):6.2f} at 1.00, {fn(CALIB):6.2f} at {CALIB:.2f}, "
-              f"implies {implied[label]:.3f}")
-    for m in (3050.0, 3300.0):
-        print(f"  The unladen runs at {m:,.0f} kg: {run(cab(1.0, m), stock, 0, 100):.2f} s and {run(cab(1.0, m), stock, 80, 120):.2f} s "
-              f"at 1.00, {run(cab(CALIB, m), stock, 0, 100):.2f} s and {run(cab(CALIB, m), stock, 80, 120):.2f} s at {CALIB:.2f}")
+    for title, rows in (("Fitted: CarExpert's unladen timed runs of a stock Super Duty dual cab chassis, 3,150 kg (est.)",
+                         fitted), ("Checks, not fitted", checks)):
+        print(f"{title}. The model at factor 1.00 and at {CALIB:.2f}, and the factor each implies alone")
+        for label, target, figure in rows:
+            implied[label] = implied_factor(figure, target)
+            print(f"  {label:48s} tested {target:6.2f}, model {figure(1.0):6.2f} at 1.00, {figure(CALIB):6.2f} at "
+                  f"{CALIB:.2f}, implies {implied[label]:.3f}")
+    for m in (3050.0, 3150.0, 3300.0):
+        both = [implied_factor(lambda c: run(cab(c, m), stock, 0, 100), 13.23),
+                implied_factor(lambda c: run(cab(c, m), stock, 80, 120), 11.99)]
+        print(f"  The unladen runs at {m:,.0f} kg imply {both[0]:.3f} and {both[1]:.3f}")
     for c in (1.0, CALIB):
         ranger = Rig(2415.0, 2415.0, cda=1.45, crr=0.010, wheels_eq=0.6 * 40.0 * 4, tyre_r=0.38, calib=c)
         print(f"  Check, ordinary Ranger V6, 2,415 kg with the driver (est.): 0 to 100 km/h "
@@ -256,14 +272,15 @@ def results(calib):
 
 
 def bracket(factors):
-    print("0 to 100 km/h / 80 to 100 km/h at 7,750 kg under each factor: " + ", ".join(f"{label} {c:.3f}" for label, c in factors))
+    print("0 to 100 km/h / 80 to 100 km/h at 7,750 and 7,324 kg under factors " + ", ".join(f"{c:.2f}" for c in factors))
     for key in TABLE:
         torque = curve(LEVELS[key][1])
         cells = []
-        for _, c in factors:
-            rig = Rig(7750.0, N_DRIVE_KG, calib=c)
-            cells.append(f"{run(rig, torque, 0, 100):5.1f}/{run(rig, torque, 80, 100):4.1f}")
-        print(f"  {LEVELS[key][0]:38s} " + " ".join(f"{x:>11s}" for x in cells))
+        for m in (7750.0, 7324.0):
+            rigs = [Rig(m, N_DRIVE_KG, calib=c) for c in factors]
+            cells.append(f"{m:,.0f} kg " + " ".join(f"{run(r, torque, 0, 100):4.1f}/{run(r, torque, 80, 100):4.1f}"
+                                                     for r in rigs))
+        print(f"  {LEVELS[key][0]:38s} " + " | ".join(cells))
     print()
 
 
@@ -272,9 +289,9 @@ def power_for_22(factors):
           "3,600 rpm). Wheel figures are crank x 0.85")
     for label, m in MASSES:
         parts = []
-        for flabel, c in factors:
+        for c in factors:
             p = power_for(Rig(m, N_DRIVE_KG, calib=c), 22.0, lo=120.0)
-            parts.append(f"{flabel}: " + ("over 263 kW" if p is None else f"{p:.0f} kW ({p * ETA:.0f} kW, {p * ETA / 0.7457:.0f} hp)"))
+            parts.append(f"{c:.2f}: " + ("over 263 kW" if p is None else f"{p:.0f} kW ({p * ETA:.0f} kW, {p * ETA / 0.7457:.0f} hp)"))
         print(f"  {int(m):,} kg, {label}: " + ", ".join(parts))
     for target in (24.0, 25.0):
         p = power_for(Rig(7750.0, N_DRIVE_KG), target, lo=120.0)
@@ -301,11 +318,12 @@ def sensitivity():
     cases = [("as above", {}), ("final drive 4.10 (est.)", dict(final=4.10)), ("final drive 3.55 (est.)", dict(final=3.55)),
              ("0.4 s lost at each upshift", dict(shift_lost=0.40)), ("no time lost at upshifts", dict(shift_lost=0.0)),
              ("spool time constant 1.2 s", dict(tau=1.2)), ("converter stall ratio 1.5", dict(tr0=1.5)),
-             ("factor 1.00, as first built", dict(calib=1.0)), ("factor 1.19", dict(calib=1.19)),
+             ("factor 1.00, as first built", dict(calib=1.0)), ("factor 1.08, the first calibration", dict(calib=1.08)),
+             ("factor 1.18, Leonard's 28 s as a caravan", dict(calib=1.18)),
              ("Crr 0.013", dict(crr=0.013)), ("CdA 15 % more", dict(cda=CDA * 1.15)), ("CdA 15 % less", dict(cda=CDA * 0.85))]
     for label, kwargs in cases:
         t = run(Rig(7750.0, N_DRIVE_KG, **kwargs), torque, 0, 100)
-        print(f"  {label:32s} {t:5.1f} s ({t - base:+.1f})")
+        print(f"  {label:40s} {t:5.1f} s ({t - base:+.1f})")
     print()
 
 
@@ -337,12 +355,13 @@ def climbs():
 
 
 if __name__ == "__main__":
-    implied = calibration()
-    caravan = implied["Leonard, 4 t, 0 to 100 km/h, caravan, s"]
-    results(CALIB)
-    bracket([("as first built", 1.0), ("calibrated", CALIB), ("Leonard's 28 s as a caravan", caravan)])
+    calibration()
+    factors = CENTRAL + SPREAD
+    for c in CENTRAL:
+        results(c)
+    bracket(factors)
     bands()
     caps()
-    power_for_22([("1.00", 1.0), (f"{CALIB:.2f}", CALIB), (f"{caravan:.2f}", caravan)])
+    power_for_22(factors)
     sensitivity()
     climbs()
