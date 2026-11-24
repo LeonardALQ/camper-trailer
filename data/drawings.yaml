@@ -243,6 +243,7 @@ drawings:
       - {rev: P, date: 2026-11-23, description: "Notice: detail C, the root gusset at IIW 522, the rail end plates (I2-51)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Q, date: 2026-11-23, description: "Notice: the root gussets on the A-frame members' top faces (I2-51)", drawn: Kiro, checked: "", approved: ""}
       - {rev: R, date: 2026-11-23, description: "Notice: end plates welded full penetration from outside, FAT-20 (I2-57)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: S, date: 2026-11-24, description: "Notice: the root gusset's heel 3 mm inboard of mid-plate, view C1 (I2-60)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-103
     title: Chassis details
     subtitle: Composite rail, outrigger root, crossmember to rail, overlap end, jacking pad, recovery tongue, spare posts
@@ -274,6 +275,7 @@ drawings:
       - {rev: S, date: 2026-11-23, description: "Notice: Miner damage to three decimals, the axle at X 4,487.2 (I2-40)", drawn: Kiro, checked: "", approved: ""}
       - {rev: T, date: 2026-11-23, description: "Notice: FAT-07 at IIW 522, FAT-17 to FAT-19 at the body front (I2-51)", drawn: Kiro, checked: "", approved: ""}
       - {rev: U, date: 2026-11-23, description: "Notice: FAT-20, the end plates' welds, FAT-19's free bottom edge (I2-57)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: V, date: 2026-11-24, description: "Notice: FAT-17 to FAT-20 on the heel's place and its pull's line (I2-60)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads

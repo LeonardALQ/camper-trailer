@@ -309,13 +309,46 @@ def _root_detail(sh, ch, x0, y0, k=10.0):
     S.leader(sh, p(toe + 45, zt + r - math.sqrt(r ** 2 - (u1 + 45) ** 2)), (ex, y0 + 22.5),
              f"GUSSET {g['t']:g} GR 350 (9), {h:g} HIGH AT ITS HEEL: R{r:g} GROUND, END {c:g} HIGH (2t = {2 * g['t']:g} AT MOST),",
              ["5 FILLETS BOTH SIDES WRAPPED ROUND THAT END, TOE GROUND (IIW 522, FAT-07)"], size=1.4)
-    weld_symbol(sh, p(x_end, zt + 0.7 * h), (ex, y0 + 16.5), f"{g['heel_leg']:g}", both=True, note="HEEL TO THE END PLATE (FAT-18)")
+    weld_symbol(sh, p(x_end, zt + 0.7 * h), (ex, y0 + 16.5), f"{g['heel_leg']:g}", both=True, note="HEEL TO THE END PLATE (FAT-18), PLACED AS VIEW C1")
     S.leader(sh, p(V["body_x0"] - ep["t"] / 2, zt + 0.3 * rail.d), (ex, y0 + 11.0),
              f"END PLATE {ep['t']:g} GR 350 (13) OVER THE RAIL AND THE RAISER'S BOTTOM WALL, ITS BOTTOM EDGE FREE (FAT-19)", size=1.4)
     weld_symbol(sh, p(V["body_x0"], zt + 0.85 * rail.d), (ex, y0 + 5.5), "", bevel=True,
                 note="PLATE TO THE WEBS AND TOP: FULL PENETRATION FROM OUTSIDE (FAT-20)")
     S.leader(sh, (m0[0], (m0[1] + m1[1]) / 2), (ex, y0 - 0.5), "MITRE: FULL PENETRATION FROM ONE SIDE, WELDED FLAT,",
              ["IIW 234 AT FAT 36, SO ITS ROOT NEEDS NO NDT (FAT-17)"], size=1.4)
+
+
+def _heel_view(sh, ch, x0, y0, k=2.0):
+    """View C1 on CT-102: the kerb side's end plate CH-P15 from ahead, its inboard edge on the left at sheet x0 and its
+    bottom edge at y0, with the root gusset's heel cut just ahead of it (I2-60): where the data puts the heel's centre
+    across the plate (root_gusset_heel_y), dimensioned from the plate's inboard edge, and the member's line there."""
+    V = ch.V
+    fit = {f["id"]: f for f in ch.data["fittings"]}
+    g, ep, rail = fit["CH-P03"], fit["CH-P15"], ch.role_sec["rail"]
+    edge = V["rail_c"] - rail.b / 2
+    heel = V["root_gusset_heel_y"] - edge
+    member = ch.db_y(V["root_gusset_toe_x"] + g["l"]) - edge
+    half = g["t"] / 2 / math.cos(math.atan(V["root_gusset_slope"]))
+
+    def p(u, z):
+        return x0 + u / k, y0 + z / k
+    cx = p(rail.b / 2, 0)[0]
+    sh.text(cx, y0 + ep["w"] / k + 7.5, "VIEW C1: END PLATE FROM AHEAD (13)", 1.7, "middle", bold=True)
+    sh.text(cx, y0 + ep["w"] / k + 4.8, f"SCALE 1:{k:g}, KERB SIDE, ROAD SIDE MIRRORED", 1.4, "middle")
+    sh.rect(*p(0, 0), *p(rail.b, ep["w"]), "medium")
+    plate(sh, *p(heel - half, 0), *p(heel + half, g["w"]))
+    a, b = p(member, -3), p(member, g["w"] + 6)
+    sh.line(a[0], a[1], b[0], b[1], "centre")
+    sh.text(x0 - 1.2, y0 + 1.0, "INBOARD", 1.3, rot=-90)
+    sh.text(p(rail.b, 0)[0] + 2.3, y0 + 1.0, "OUTBOARD", 1.3, rot=-90)
+    S.hdim(sh, x0, y0, p(heel, 0)[0], y0, y0 - 4.5, f"{heel:.0f}", size=1.4)
+    S.hdim(sh, x0, y0, p(rail.b, 0)[0], y0, y0 - 9.5, f"{rail.b:.0f}", size=1.4)
+    S.leader(sh, p(heel, 0.5 * g["w"]), (x0 - 4.0, y0 + 0.4 * ep["w"] / k), "GUSSET (9),", ["CUT AHEAD"], size=1.3)
+    note = (f"THE GUSSET'S HEEL STANDS WITH ITS CENTRE {heel:.0f} FROM THE PLATE'S INBOARD EDGE, {rail.b / 2 - heel:.0f} INBOARD OF ITS "
+            f"MIDDLE AND {heel - member:.1f} OUTBOARD OF THE MEMBER'S LINE (CENTRE LINE). ITS TOE STAYS ON THE MEMBER'S CENTRE. "
+            "THE WEBS' WELDS THEN SHARE ITS PULL (FAT-20).")
+    for i, t in enumerate(S.wrap_mm(note, 42.0, 1.3)):
+        sh.text(x0 - 16.0, y0 - 14.5 - 2.2 * i, t, 1.3)
 
 
 def ct102(prj, model, bom, checks, reg, dwg):
@@ -431,6 +464,7 @@ def ct102(prj, model, bom, checks, reg, dwg):
     S.table(sh, 232.0, yt - 6, [("FITTING", 70), ("GOVERNING PART", 56), ("MPa / LIMIT", 30), ("USE", 20)], rows, size=1.6, row_h=3.0,
             title="LOCAL CHECKS (CHASSIS.md)")
     _root_detail(sh, ch, 240.0, 80.0)
+    _heel_view(sh, ch, 202.0, 36.0)
     S.notes(sh, 22, 64, [
         "DRAWBAR MEMBERS RHS 150x50x6 C450L0 FROM THE APEX (X 250, Y +/-60) TO THE RAIL CENTRES AT THE BODY FRONT, THEN 1000 UNDER EACH RAIL. CONTINUOUS 5 mm FILLETS ON BOTH EDGES TO THE RAIL UNDERSIDE, SNIPED TAPER END WITH THE TOE GROUND (CT-103 DETAIL D).",
         ("NO WELD ON THE MEMBERS' TOP OR BOTTOM FACES WITHIN 300 OF THE BODY FRONT EXCEPT THE ROOT GUSSET (9) AND THE MITRE (DETAIL C). THE GUSSET IS IIW 522, "

@@ -5,7 +5,9 @@
 # cad/chassis_fea.py analyses them. Sections come from data/chassis/sections.yaml (report 11's table).
 id: ASM-CH
 name: Chassis and drawbar
-revision: G     # G, 23 Nov 2026: the end plates' welds to the rails at full penetration from outside, over the raisers' bottom
+revision: H     # H, 24 Nov 2026: the root gusset's heel 3 mm inboard of the end plate's middle, the gusset's line from the member's
+                # line at its toe, and FAT-20 on the heel's place and the pull's direction (I2-60).
+                # G, 23 Nov 2026: the end plates' welds to the rails at full penetration from outside, over the raisers' bottom
                 # walls, their bottom edges free, FAT-20 (I2-57).
                 # F, 23 Nov 2026: FAT-07 at IIW 522, the rails' end plates CH-P15 under the root gusset's 8 mm heel fillets, and
                 # the body front's splice, heel and end plate in FAT-17 to FAT-19 (I2-51).
@@ -53,6 +55,10 @@ params:
   front_recovery_x: body_x0 + 330             # front recovery lugs, outside the 300 mm root zone
   root_gusset_toe_x: body_x0 - 270            # the root gusset's toe, where its ground 160 mm radius comes down to the drawbar member's
                                               # top face (FAT-07, IIW 522), 80 mm behind the drawbar box. Its heel is on the rail's end
+  root_gusset_toe_y: db_apex_y + (rail_c - db_apex_y) * (root_gusset_toe_x - db_apex_x) / (body_x0 - db_apex_x)   # on the member's line
+  root_gusset_heel_y: rail_c - 3              # the heel's centre 3 mm inboard of the end plate's middle, where the two webs' welds
+                                              # share the heel's pull (FAT-20, I2-60). The member's line meets the plate 5.6 mm inboard
+  root_gusset_slope: (root_gusset_heel_y - root_gusset_toe_y) / 254   # the gusset's line in plan, toe to heel over its 254 mm
   steady_front_x: db_end_x + 180              # front corner steadies' brackets under the rails behind the drawbar overlap (I2-22),
                                               # 143 mm clear of its sniped end (FAT-08), in report 11's X 2,900 to 3,100
   steady_rear_x: 6070
@@ -118,19 +124,21 @@ fittings:
   # end_h high, at most twice its thickness and 25 mm, its fillets wrapped round that end and the toe ground there. It runs
   # l from its toe to its heel, w high there, on the rail's end plate CH-P15 with heel_leg fillets both sides (FAT-18). Its
   # area is the radius's 5,124 mm2 from 10 to 140 mm high over 103.1 mm and 150.9 mm at the full 140 mm, 26,255 mm2, 0.738
-  # of l x w. Its `boxes` stand on the A-frame member's top face along its line, as CT-102's detail C draws it: four
-  # axis-aligned boxes a side stepping along the member, the first 54 mm high where the radius rises from the 10 mm end
+  # of l x w. Its line in plan runs from the member's line at its toe to its heel's centre on CH-P15, root_gusset_heel_y,
+  # 2.6 mm outboard of the member's line there and 3 mm inboard of the plate's middle (I2-60). Its `boxes` stand on the
+  # A-frame member's top face along that line, as CT-102's detail C draws it: four axis-aligned boxes a side stepping
+  # along it, the first 54 mm high where the radius rises from the 10 mm end
   - {id: CH-P03, plane: xz, name: "Drawbar root gusset, profiled with a ground 160 mm radius down to an end 10 mm high (FAT 90, IIW 522), its toe 270 mm ahead of the body front and its heel on the rail's end plate over the mitre", kind: plate, l: 254, w: 140, t: 10, qty: 2, area_factor: 0.738,
      r: 160, end_h: 10, wrapped: true, toe_ground: true, heel_leg: 8,
-     at: [root_gusset_toe_x + 127, 0, rail_underside_z + 60], side_y: "(db_apex_y + (rail_c - db_apex_y) * ((root_gusset_toe_x + 127) - db_apex_x) / (body_x0 - db_apex_x))",
-     boxes: [["root_gusset_toe_x + 0", "(db_apex_y + (rail_c - db_apex_y) * (root_gusset_toe_x + 0 - db_apex_x) / (body_x0 - db_apex_x)) - 5", rail_underside_z, 63.5, "(rail_c - db_apex_y) * 63.5 / (body_x0 - db_apex_x) + 10", 54],
-             ["root_gusset_toe_x + 63.5", "(db_apex_y + (rail_c - db_apex_y) * (root_gusset_toe_x + 63.5 - db_apex_x) / (body_x0 - db_apex_x)) - 5", rail_underside_z, 63.5, "(rail_c - db_apex_y) * 63.5 / (body_x0 - db_apex_x) + 10", 140],
-             ["root_gusset_toe_x + 127", "(db_apex_y + (rail_c - db_apex_y) * (root_gusset_toe_x + 127 - db_apex_x) / (body_x0 - db_apex_x)) - 5", rail_underside_z, 63.5, "(rail_c - db_apex_y) * 63.5 / (body_x0 - db_apex_x) + 10", 140],
-             ["root_gusset_toe_x + 190.5", "(db_apex_y + (rail_c - db_apex_y) * (root_gusset_toe_x + 190.5 - db_apex_x) / (body_x0 - db_apex_x)) - 5", rail_underside_z, 63.5, "(rail_c - db_apex_y) * 63.5 / (body_x0 - db_apex_x) + 10", 140],
-             ["root_gusset_toe_x + 0", "-(db_apex_y + (rail_c - db_apex_y) * (root_gusset_toe_x + 63.5 - db_apex_x) / (body_x0 - db_apex_x)) - 5", rail_underside_z, 63.5, "(rail_c - db_apex_y) * 63.5 / (body_x0 - db_apex_x) + 10", 54],
-             ["root_gusset_toe_x + 63.5", "-(db_apex_y + (rail_c - db_apex_y) * (root_gusset_toe_x + 127 - db_apex_x) / (body_x0 - db_apex_x)) - 5", rail_underside_z, 63.5, "(rail_c - db_apex_y) * 63.5 / (body_x0 - db_apex_x) + 10", 140],
-             ["root_gusset_toe_x + 127", "-(db_apex_y + (rail_c - db_apex_y) * (root_gusset_toe_x + 190.5 - db_apex_x) / (body_x0 - db_apex_x)) - 5", rail_underside_z, 63.5, "(rail_c - db_apex_y) * 63.5 / (body_x0 - db_apex_x) + 10", 140],
-             ["root_gusset_toe_x + 190.5", "-(db_apex_y + (rail_c - db_apex_y) * (root_gusset_toe_x + 254 - db_apex_x) / (body_x0 - db_apex_x)) - 5", rail_underside_z, 63.5, "(rail_c - db_apex_y) * 63.5 / (body_x0 - db_apex_x) + 10", 140]]}
+     at: [root_gusset_toe_x + 127, 0, rail_underside_z + 60], side_y: "root_gusset_toe_y + root_gusset_slope * 127",
+     boxes: [["root_gusset_toe_x + 0", "root_gusset_toe_y + root_gusset_slope * 0 - 5", rail_underside_z, 63.5, "root_gusset_slope * 63.5 + 10", 54],
+             ["root_gusset_toe_x + 63.5", "root_gusset_toe_y + root_gusset_slope * 63.5 - 5", rail_underside_z, 63.5, "root_gusset_slope * 63.5 + 10", 140],
+             ["root_gusset_toe_x + 127", "root_gusset_toe_y + root_gusset_slope * 127 - 5", rail_underside_z, 63.5, "root_gusset_slope * 63.5 + 10", 140],
+             ["root_gusset_toe_x + 190.5", "root_gusset_toe_y + root_gusset_slope * 190.5 - 5", rail_underside_z, 63.5, "root_gusset_slope * 63.5 + 10", 140],
+             ["root_gusset_toe_x + 0", "-(root_gusset_toe_y + root_gusset_slope * 63.5) - 5", rail_underside_z, 63.5, "root_gusset_slope * 63.5 + 10", 54],
+             ["root_gusset_toe_x + 63.5", "-(root_gusset_toe_y + root_gusset_slope * 127) - 5", rail_underside_z, 63.5, "root_gusset_slope * 63.5 + 10", 140],
+             ["root_gusset_toe_x + 127", "-(root_gusset_toe_y + root_gusset_slope * 190.5) - 5", rail_underside_z, 63.5, "root_gusset_slope * 63.5 + 10", 140],
+             ["root_gusset_toe_x + 190.5", "-(root_gusset_toe_y + root_gusset_slope * 254) - 5", rail_underside_z, 63.5, "root_gusset_slope * 63.5 + 10", 140]]}
   # CH-P15 is flush with the rail's sides and stands 3.5 mm over its top, across the raiser's bottom wall (I2-57). Its
   # rear edges on the webs and the top are bevelled, so the webs, the top flange and the raiser's bottom wall are welded
   # to it with full penetration single bevel welds from outside, the plate behind each wall's end as the backing (IIW
@@ -269,11 +277,15 @@ fatigue_details:
   - {id: FAT-17, name: "Drawbar mitred butt splice at the body front, one side, no NDT", iiw: "234", fat: 36, stress: root_splice}
   - {id: FAT-18, name: "Root gusset's heel to the rail's end plate, 8 mm fillets, root", iiw: "414", fat: 36, stress: root_heel_weld}
   - {id: FAT-19, name: "Rail's end plate in bending under the gusset's heel, weld toe", iiw: "413", fat: 63, stress: root_end_plate, hot_spot: true}
-  # FAT-20 (I2-57): the end plate's welds to the rail, IIW 415, T-joints welded from one side with full penetration on the
-  # plate as backing, FAT 36 as their root is not inspected, on the wall's section at the weld: a web's 4 mm, or the
-  # 7.5 mm of the rail's top flange and the raiser's bottom wall at the top. The line force is the plate's Kirchhoff edge
-  # shear with its bottom edge free (cad/chassis_fea.py end_plate)
-  - {id: FAT-20, name: "Rail's end plate to the rail's webs and top, full penetration single bevel from outside, root not inspected", iiw: "415", fat: 36, stress: root_end_plate_weld, hot_spot: true}
+  # FAT-20 (I2-57, I2-60): the end plate's welds to the rail, IIW 415, T-joints welded from one side with full penetration
+  # on the plate as backing, FAT 36 as their root is not inspected, on the wall's section at the weld: a web's 4 mm, or
+  # the 7.5 mm of the rail's top flange and the raiser's bottom wall at the top. The normal line force is the plate's
+  # Kirchhoff edge shear with its bottom edge free under the pull's part normal to the plate, the heel where CH-P03's
+  # data puts it (cad/chassis_fea.py end_plate). The pull's part along the plate is shear along the top weld and, by its
+  # moment, along the webs' welds, at IIW Table 3.2-2 no. 2's FAT 80 (an uninspected root as a partial penetration
+  # weld, m 5, its knee at 10^8 cycles), with IIW 4.3's interaction for in-phase stresses, CV 1.0 (Table 4.3-1)
+  - {id: FAT-20, name: "Rail's end plate to the rail's webs and top, full penetration single bevel from outside, root not inspected", iiw: "415", fat: 36, stress: root_end_plate_weld, hot_spot: true,
+     fat_shear: 80, cv: 1.0}
 
 # Holes the runs make in the chassis members (data/services.yaml `holes`, the services' list, read here only). A hole is
 # the run's diameter and a bush across, a slot along the member where the run passes on a slant. CHS-09 checks the net
