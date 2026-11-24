@@ -752,7 +752,7 @@ fixtures:
   # under the member to X 360 and the chain lug CH-P02 on its outer face to X 460, so it stands just behind the lug, its
   # two thin bands passing under the stone guard between the guard's rubber mounts (est.). Its seat is R 95 mm, no tighter
   # than K-14's 94.8 mm bend radius, 552 mm up, so the leads on it keep 20 mm under the stone guard (SVC-01)
-  - {id: DB-HK, what: "Saddle the leads between the vehicles lie over: a rubber-lined 3 mm aluminium saddle bent to R 95 mm, 46 mm wide between 12 mm lips, on a 5 mm stainless bracket held to the road-side drawbar member's outer face by two 19 mm stainless band clamps behind the chain lug (est.)", line: LG-01, at: [505, 206, 533.5], size: [70, 68, 37], needs_run: false}
+  - {id: DB-HK, what: "Saddle the leads between the vehicles lie over: a rubber-lined 3 mm aluminium saddle bent to R 95 mm, 46 mm wide between 12 mm lips, on a 5 mm stainless bracket held to the road-side drawbar member's outer face by two 19 mm stainless band clamps behind the chain lug (est.)", line: LG-01, at: [505, 206, 533.5], size: [70, 68, 37], needs_run: false, support: true}
   # The truck's end of the two leads that ride between the vehicles (I2-50): its 12-pin flat socket and, beside it, the
   # Anderson SB50 for the TSC's supply from its battery, on the towbar's socket bracket ahead of the pin (est.). It is
   # on the truck, so it `rides` and no trailer check measures it as part of the trailer
