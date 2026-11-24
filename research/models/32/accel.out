@@ -58,6 +58,7 @@ The new level, 250 kW, 700 Nm at 7,750 kg, one input changed at a time (0 to 100
   0.4 s lost at each upshift        23.4 s (+1.0)
   no time lost at upshifts          21.5 s (-1.0)
   spool time constant 1.2 s         22.7 s (+0.3)
+  converter stall ratio 1.5         22.6 s (+0.2)
   crank to wheel 0.82               23.4 s (+1.0)
   crank to wheel 0.88               21.5 s (-0.9)
   Crr 0.013                         22.8 s (+0.4)

@@ -20,7 +20,7 @@ RHO = 1.2  # kg/m3, air at about 20 °C at sea level
 RATIOS = (4.696, 2.985, 2.146, 1.769, 1.520, 1.275, 1.000, 0.854, 0.689, 0.636)
 FINAL_DRIVE = 3.73  # (est.) the ordinary Ranger V6's. No Ford document read gives the Super Duty's
 TYRE_R = 0.406  # m, LT 275/70 R18 (842 mm across) loaded to 0.965 of its free radius (est.)
-ETA = 0.85  # crank to wheels (est.). CarExpert measured 158.4 kW at the wheels of an ordinary 184 kW Ranger V6, 0.86
+ETA = 0.85  # crank to wheels (est.). CarExpert measured 158.4 kW at the rear wheels of an ordinary 184 kW Ranger V6, 0.86
 N_MAX = 4000  # rpm, the latest upshift at full throttle (est.)
 SHIFT_LOST = 0.20  # s with no drive at each upshift (est.)
 SPOOL_F0, SPOOL_TAU = 0.50, 0.70  # share of full-load torque when the throttle opens, and the time constant in s (est.)
@@ -100,10 +100,10 @@ class Rig:
     """A vehicle or a combination: its mass, the mass on its driven tyres, drag, rolling resistance, wheels and gearing."""
 
     def __init__(self, mass, n_drive_kg, cda=CDA, crr=CRR, wheels_eq=WHEELS_EQ, tyre_r=TYRE_R, final=FINAL_DRIVE,
-                 eta=ETA, shift_lost=SHIFT_LOST, tau=SPOOL_TAU):
+                 eta=ETA, shift_lost=SHIFT_LOST, tau=SPOOL_TAU, tr0=TR0):
         self.mass, self.n_drive, self.cda, self.crr = mass, n_drive_kg * G, cda, crr
         self.wheels_eq, self.r, self.final, self.eta = wheels_eq, tyre_r, final, eta
-        self.shift_lost, self.tau = shift_lost, tau
+        self.shift_lost, self.tau, self.tr0 = shift_lost, tau, tr0
 
     def rpm(self, v, gear):
         return v / self.r * RATIOS[gear] * self.final * 60 / (2 * math.pi)
@@ -122,7 +122,7 @@ class Rig:
         n_t = self.rpm(v, gear)
         if gear == 0:
             n_e = max(STALL_RPM, n_t / SR_COUPLE)
-            tr = TR0 - (TR0 - 1.0) * min(1.0, n_t / n_e / SR_COUPLE)
+            tr = self.tr0 - (self.tr0 - 1.0) * min(1.0, n_t / n_e / SR_COUPLE)
             t_e = min(FIRST_CAP, torque(n_e))
         else:
             n_e, tr, t_e = n_t, 1.0, torque(n_t)
@@ -258,7 +258,8 @@ def sensitivity():
     base = run(Rig(7750.0, N_DRIVE_KG), torque, 0, 100)
     cases = [("as above", {}), ("final drive 4.10 (est.)", dict(final=4.10)), ("final drive 3.55 (est.)", dict(final=3.55)),
              ("0.4 s lost at each upshift", dict(shift_lost=0.40)), ("no time lost at upshifts", dict(shift_lost=0.0)),
-             ("spool time constant 1.2 s", dict(tau=1.2)), ("crank to wheel 0.82", dict(eta=0.82)),
+             ("spool time constant 1.2 s", dict(tau=1.2)), ("converter stall ratio 1.5", dict(tr0=1.5)),
+             ("crank to wheel 0.82", dict(eta=0.82)),
              ("crank to wheel 0.88", dict(eta=0.88)), ("Crr 0.013", dict(crr=0.013)), ("CdA 15 % more", dict(cda=CDA * 1.15)),
              ("CdA 15 % less", dict(cda=CDA * 0.85))]
     for label, kwargs in cases:
