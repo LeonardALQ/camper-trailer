@@ -113,6 +113,14 @@ def _box(x0, y0, z0, dx, dy, dz):
     return (min(x0, x0 + dx), min(y0, y0 + dy), min(z0, z0 + dz), max(x0, x0 + dx), max(y0, y0 + dy), max(z0, z0 + dz))
 
 
+def _no_pts(x: dict) -> dict:
+    """A lead's row from between_reach without its drawn points, for the checks' output."""
+    out = {k: v for k, v in x.items() if k != "straight_pts"}
+    if isinstance(out.get("low_ball"), dict):
+        out["low_ball"] = {k: v for k, v in out["low_ball"].items() if k != "straight_pts"}
+    return out
+
+
 def _short(name: str) -> str:
     """A part's or fixture's name up to its first comma and space, so a figure such as "X 1,790" stays whole (I2-56)."""
     return name.split(", ")[0]
@@ -759,22 +767,48 @@ class Trailer:
         return out
 
     def leads_turned(self, lay, low: float) -> dict:
-        """DIM-08 (I2-70): the leads between the vehicles in the tightest turn and pitch of rules.between, each lead's
-        lowest point at the design's coupling height and with the truck's ball at UTE-13's low end, its tolerance
-        under it, the trailer turned nose down about its axle group (cad/routes.py between_reach)."""
-        from . import routes as R
+        """DIM-08 (I2-70, I2-78): the leads between the vehicles in every turn and pitch of rules.between, each lead's
+        lowest point where its sprung arm holds it, at the design's coupling height and with the truck's ball at UTE-13's
+        low end, its tolerance under it, the trailer turned nose down about its axle group (cad/routes.py between_reach)."""
         tol = self.tv["coupling_tol"]
-        rows = R.between_reach(self.routes(lay), ball_drop=tol)
+        rows = self.leads_rows(lay)
         z = lay.V["coupling_z"]
         cases = [(x["turn_low_mm"], x["run"], z, x["turn_yaw"], x["turn_pitch"]) for x in rows]
         cases += [(x["low_ball"]["turn_low_mm"], x["run"], z - tol, x["low_ball"]["turn_yaw"], x["low_ball"]["turn_pitch"]) for x in rows]
         v, run, ball, yaw, pitch = min(cases)
         each = "; ".join(f"{x['run']}, {x['turn_model']}, {x['turn_low_mm']:.1f} mm at the {z:.0f} mm ball and "
                          f"{x['low_ball']['turn_low_mm']:.1f} mm at {z - tol:.0f} mm" for x in rows)
-        return dict(limit=f">= {low:g} mm", measured=v, unit="mm", margin=round(v - low, 1), ok=v >= low - 1e-6,
-                    governing=f"{run} with the ball at {ball:.0f} mm", leads=rows,
+        taut = sum(x.get("taut", 0) + x["low_ball"].get("taut", 0) for x in rows)
+        ok = v >= low - 1e-6 and taut == 0
+        return dict(limit=f">= {low:g} mm", measured=v, unit="mm", margin=round(v - low, 1), ok=ok,
+                    governing=f"{run} with the ball at {ball:.0f} mm", leads=[_no_pts(x) for x in rows],
                     detail=(f"lowest {v:.1f} mm, {run} turned {abs(yaw)} degrees with a {abs(pitch)} degree pitch, the ball at {ball:.0f} mm. "
-                            f"Each lead's lowest in any turn: {each}"))
+                            f"Each lead's lowest in any turn: {each}. Positions whose cut, less its margin, would pull a span taut: {taut}"))
+
+    def leads_rows(self, lay) -> list:
+        """The leads between the vehicles over every turn and pitch at both ball heights (cad/routes.py between_reach),
+        worked once for each layout and shared by DIM-07 and DIM-08."""
+        from . import routes as R
+        key = id(lay)
+        if getattr(self, "_leads", (None,))[0] != key:
+            self._leads = (key, R.between_reach(self.routes(lay), ball_drop=self.tv["coupling_tol"]))
+        return self._leads[1]
+
+    def leads_breakover(self, lay, ahead: float) -> list:
+        """DIM-07's look at the leads between the vehicles (I2-78): each as its sprung arm holds it straight ahead, by
+        the model, at the design ball and with the ball at UTE-13's low end, as breakover rows."""
+        out = []
+        for x in self.leads_rows(lay):
+            for ball, pts in (("the design ball", x.get("straight_pts")), ("the ball low", (x.get("low_ball") or {}).get("straight_pts"))):
+                if not pts:
+                    continue
+                h = x["od"] / 2
+                items = [(f"lead {x['run']} held up by its arm straight ahead", x["run"], (p[0] - h, p[1] - h, p[2] - h, p[0] + h, p[1] + h, p[2] + h))
+                         for p in pts]
+                bo = lay.breakover(-ahead, items)
+                if bo:
+                    out.append(dict(bo, run=x["run"], ball=ball))
+        return out
 
     def layout(self, **over) -> Layout:
         lay = Layout(self.td, self.prj, {**self.base, **over})
@@ -1164,11 +1198,18 @@ class Trailer:
                 row.update(self.leads_turned(lay, c.min))
             elif c.type == "breakover":
                 ahead = self.tv["ball_behind_axle"]
-                bo = lay.breakover(-ahead, self.underside_items(lay))
+                leads = self.leads_breakover(lay, ahead)
+                held = {x["run"] for x in leads}
+                items = [i for i in self.underside_items(lay) if i[1] not in held]
+                items += [(x["governing"], x["run"], (x["x_mm"] - 1, 0.0, x["z_mm"], x["x_mm"] + 1, 0.0, x["z_mm"]))
+                          for x in leads if x["ball"] == "the design ball"]
+                bo = lay.breakover(-ahead, items)
+                each = "; ".join(f"{x['run']} {x['deg']:.1f} degrees with {x['ball']}" for x in leads)
                 row.update(limit="reported", measured=round(bo["deg"], 1), unit="deg", margin=None, ok=True, governing=bo["governing"],
                            detail=(f"{bo['deg']:.1f} degrees, a crest under {bo['governing']} at X {bo['x_mm']:,.0f} mm, its underside "
                                    f"{bo['z_mm']:.1f} mm up, between the ute's rear axle {ahead:,.0f} mm ahead of the ball and the trailer's "
-                                   f"axle group at X {lay.V['axle_x']:,.1f} mm"))
+                                   f"axle group at X {lay.V['axle_x']:,.1f} mm. The leads between the vehicles as their sprung arms hold "
+                                   f"them straight ahead (cad/routes.py lifted): {each}"))
             elif c.type in ("jackknife", "jackknife_height"):
                 sw = self.tv["sweep"]
                 R, under = sw["radius_mm"], sw["underside_z"]
