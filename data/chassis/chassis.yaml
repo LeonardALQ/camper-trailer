@@ -322,7 +322,7 @@ fatigue_details:
   # not under 36. The seam lies near the joint's neutral axis, where the shear is high and the normal range low, so the
   # row takes the floor, FAT 36, on the rail's bottom wall's normal range along the lap (est.). The member's top wall at
   # the same stitch ends carries less (fx14-chs lap.py, 11.4 MPa)
-  - {id: FAT-21, name: "Drawbar member's lap under the rail, opened to 2.5 mm, stitch welded both sides, the rail's bottom wall at the stitches' ends", iiw: "324", fat: 36, stress: rail_level, z: rail_underside_z, where: {from: body_x0, to: db_end_x}}
+  - {id: FAT-21, name: "Drawbar member's lap under the rail, opened to 2.5 mm and stitch welded, the rail's bottom wall at the stitch ends", iiw: "324", fat: 36, stress: rail_level, z: rail_underside_z, where: {from: body_x0, to: db_end_x}}
 
 # Holes the runs make in the chassis members (data/services.yaml `holes`, the services' list, read here only). A hole is
 # the run's diameter and a bush across, a slot along the member where the run passes on a slant. CHS-09 checks the net

@@ -664,8 +664,8 @@ def ct103(prj, model, bom, checks, reg, dwg):
     sh.rect(cx - 25, zb, cx + 25, zb + rl.d / k, "medium")
     for z in (rl.ro, rl.d - rl.ro):
         sh.line(cx - 25, zb + z / k, cx + 25, zb + z / k, "thin")
-    sh.text(cx - 24.5, zb + rl.d / k + 1, f"RAIL {rl.d:g}x{rl.b:g}x{rl.t:g}, R{rl.ro:g},", 1.5)    # clear of the weld symbol's arrow
-    sh.text(cx - 24.5, zb + rl.d / k + 3.8, "ITS INNER FACE", 1.5)
+    sh.text(cx - 24.5, zb + rl.d / k + 3.8, f"RAIL {rl.d:g}x{rl.b:g}x{rl.t:g}, R{rl.ro:g},", 1.5)    # clear of the weld symbol's arrow
+    sh.text(cx - 24.5, zb + rl.d / k + 1, "ITS INNER FACE", 1.5)
     rhs(sh, cx, zb + xt.d / 2 / k, xt.b, xt.d, xt.t, xt.ro, k)
     sh.line(cx - 5, zb + 0.4, cx + 5, zb + 0.4, "thick")
     weld_symbol(sh, (cx + xt.b / 2 / k, zb + 20), (cx - 8, zb + 40), "6", all_round=True, note="ALL ROUND")
