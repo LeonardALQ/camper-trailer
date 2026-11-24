@@ -272,13 +272,14 @@ def results(calib):
 
 
 def bracket(factors):
-    print("0 to 100 km/h at 7,750 and 7,324 kg under factors " + ", ".join(f"{c:.2f}" for c in factors))
+    print("0 to 100 km/h / 80 to 100 km/h at 7,750 and 7,324 kg under factors " + ", ".join(f"{c:.2f}" for c in factors))
     for key in TABLE:
         torque = curve(LEVELS[key][1])
         cells = []
         for m in (7750.0, 7324.0):
-            times = [run(Rig(m, N_DRIVE_KG, calib=c), torque, 0, 100) for c in factors]
-            cells.append(f"{m:,.0f} kg " + " ".join(f"{t:5.1f}" for t in times))
+            rigs = [Rig(m, N_DRIVE_KG, calib=c) for c in factors]
+            cells.append(f"{m:,.0f} kg " + " ".join(f"{run(r, torque, 0, 100):4.1f}/{run(r, torque, 80, 100):4.1f}"
+                                                     for r in rigs))
         print(f"  {LEVELS[key][0]:38s} " + " | ".join(cells))
     print()
 
