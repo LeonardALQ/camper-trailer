@@ -184,7 +184,10 @@ fittings:
              {item: "12-pin flat plug", aud: 52.62, basis: listing, url: "https://www.arkcorp.com.au/product/12-pin-flat/", date: 2026-11-20},
              {item: "12-core trailer cable, the grey Anderson SB120 plug with 4 AWG contacts for the 48 V charging feed (DB-AN, AUD 22 at The 12 Volt Shop, 22 Nov 2026, in place of a 50 A plug about AUD 12), charge cable, glands and loom", aud: 190, basis: estimate, date: 2026-11-22}],
      source: "Estimate (report 11: breakaway kit mass not found)", at: [750, 0, rail_underside_z - 75]}   # bolted to the cross brace's front face, under the stone guard (H27)
-  - {id: DB-04, name: "Stone guard: 25 x 25 x 2 SHS frame with 2 mm aluminium checker plate on rubber mounts, on the cross brace, trimmed on the kerb side round the swung-up jockey wheel", kind: bought, material: "Steel SHS 25 x 25 x 2 frame, 2 mm aluminium checker plate, rubber mounts", mass_kg: 6.5, maturity: calculated,
+  # The saddle DB-HK for the leads between the vehicles hangs on the road-side member's outer face at X 470 to 540, held by
+  # two thin stainless bands that cross the member's top at about X 490 and 530 under the stone guard (data/routes.yaml).
+  # No mount of the stone guard sits on that member from X 475 to 555, so the guard bears on neither band
+  - {id: DB-04, name: "Stone guard: 25 x 25 x 2 SHS frame with 2 mm aluminium checker plate on rubber mounts, on the cross brace, trimmed on the kerb side round the swung-up jockey wheel, no mount on the road-side member from X 475 to 555, where the saddle DB-HK's bands cross its top", kind: bought, material: "Steel SHS 25 x 25 x 2 frame, 2 mm aluminium checker plate, rubber mounts", mass_kg: 6.5, maturity: calculated,
      source: "Calculated: 2.2 m of 25 x 25 x 2 SHS at 1.36 kg/m, 0.30 m2 of 2 mm aluminium at 5.4 kg/m2, 1.9 kg of mounts and bolts. Kerb side trimmed to Y -370, 30 mm clear of the jockey wheel", at: [735, 65, rail_underside_z + 10],
      price: {aud: 84.01, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/15-shs-mild-steel-square.html", date: 2026-11-20,
              note: "SHS 25 x 25 x 2 at AUD 25.80 a 6.5 m length, 0.30 m2 of 2 mm checker plate at AUD 60.71/m2 (both listings) and AUD 40 of mounts and bolts (est.)"},

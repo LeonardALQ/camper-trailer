@@ -268,7 +268,7 @@ FIT_ITEMS = [("1", "DB-03", "Cruisemaster DO45 Plus, under-mounted, 4 x M14 8.8 
              ("4", "DB-06", "Chains 8 mm grade 80 (T), pewag CW 8 links at the lugs, never welded"),
              ("5", "CH-P11", "Jockey wheel bracket 8 mm, bolted to the kerb-side member"),
              ("6", "DB-05", "ARK XO750 jockey wheel, 750 kg, swung up in travel"),
-             ("7", "DB-04", "Stone guard on the cross brace and member tops, on rubber"),
+             ("7", "DB-04", "Stone guard on rubber, no mount at X 475 to 555 road side (DB-HK)"),
              ("8", "DB-BR", "Cross brace RHS 75 x 50 x 3 at mid-depth"),
              ("9", "CH-P03", "Root gusset 10 mm, 160 radius ground, toe 270 ahead of the body front"),
              ("10", "CH-P04", "Front recovery lug 20 mm, 22 mm hole, 4.75 t shackle"),

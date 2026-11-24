@@ -140,7 +140,7 @@ CT-101 and CT-102 carry the member and plate lists, and the site's Downloads pag
 | Cruisemaster DO45 Plus with its handbrake, under a 12 mm plate at the apex on four M14 8.8 bolts at 140 Nm. Its 32 mm tow pin stays on the truck | DO45 Plus guide | 13.5 kg (est.) |
 | Chain lugs, 10 mm with a 14 mm hole, at X 400, and 8 mm grade 80 (T) chains to AS 2321, never welded, each held for good at its lug by a pewag CW 8 Connex connecting link (grade 100, 10 t breaking) and shackled only at the truck, on a 2,000 kg AS 2741 D shackle | VSB1 9.2, ADR 62/02 14.3, WA's CI-119C | 1.9 kg and 3.7 kg (est.) |
 | ARK XO750 jockey wheel on an 8 mm bracket at X 1,000, swung up along the drawbar for travel | Report 11 section 6.4 | 20.0 kg (maker) |
-| Stone guard on the cross brace, trimmed on the kerb side round the jockey wheel | Report 11 section 6.4 | 6.5 kg (calculated) |
+| Stone guard on the cross brace, trimmed on the kerb side round the jockey wheel, on rubber mounts, none on the road-side member from X 475 to 555, where the two bands of the leads' saddle DB-HK cross its top at about X 490 and 530 | Report 11 section 6.4 | 6.5 kg (calculated) |
 | Breakaway kit | VSB1 8 | 5.0 kg (est.) |
 | Front recovery lugs, 20 mm, at X 2,150, and rear tongues, 20 mm, through the rear crossmember at X 6,170 | LC8a | 7.5 kg and 9.8 kg |
 | Jacking pads, 100 x 100 x 10 with a locating cup, on the XT centre crossmember | LC8b | 1.6 kg |
