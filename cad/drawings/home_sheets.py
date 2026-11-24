@@ -345,7 +345,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
     leads = [r for r in C["tr"].routes(C["day"])["runs"] if r.get("rides") == "between"]
     leads_low = min(min(p[2] for p in r["dense"]) - r["od"] / 2 for r in leads)
     turned = chk["DIM-08"]["leads"]
-    turn_low, turn_ball = min(x["tight_low_mm"] for x in turned), min(x["low_ball"]["tight_low_mm"] for x in turned)
+    turn_low, turn_ball = min(x["turn_low_mm"] for x in turned), min(x["low_ball"]["turn_low_mm"] for x in turned)
     lines = [
         ("WATER IN TRAVEL (H13)", f"AT MOST {V['water_travel_l']:.0f} L OF FRESH AND GREY WATER WHILE TOWING, THE FRESH TANKS' {V['water_full_l']:.0f} L NET. "
                                   "FILL THEM AT CAMP THROUGH THE FILTER."),

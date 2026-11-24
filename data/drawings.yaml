@@ -51,6 +51,7 @@ drawings:
       - {rev: AG, date: 2026-11-23, description: "Notice: TC2 3,576 kg, the ute's rear axle 2,542 kg, GCM 7,748 kg (I2-50)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AH, date: 2026-11-24, description: "Notice: tare 2,697 kg with the leads' saddle and the TSC's fuse (I2-63)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AI, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AJ, date: 2026-11-24, description: "Axle spacing dimensioned under the ground, labels name their zones (I2-69)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-002
     title: Mass and centre of gravity
     subtitle: Every load case with growth, the axle window of H17, the CoG in elevation and across
@@ -114,6 +115,7 @@ drawings:
       - {rev: U, date: 2026-11-23, description: "Notice: the axle at X 4,485.2, TC2 3,575 kg, the tanks 402.0 L net (I2-50)", drawn: Kiro, checked: "", approved: ""}
       - {rev: V, date: 2026-11-23, description: "Notice: the leads over their hook, TC2 3,576 kg, GCM 7,748 kg (I2-58)", drawn: Kiro, checked: "", approved: ""}
       - {rev: W, date: 2026-11-24, description: "The leads over the saddle behind the chain lug, lowest at 389 mm (I2-63)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: X, date: 2026-11-24, description: "The 12-pin lead over its sheave, lowest 248 mm in any turn (DIM-08, I2-70)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-010
     title: Floor plan, bed up and bed down
     subtitle: Day and night plans, walkways, door swings, spaces kept clear and the bed positions
@@ -132,6 +134,7 @@ drawings:
       - {rev: F, date: 2026-11-23, description: "Memo: the project line names the Ranger Super Duty", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-23, description: "Notice: the plan after the services' fixes (I2-34 to I2-36)", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: I, date: 2026-11-24, description: "Memo: part names back in their parts, the fills hide the lines (I2-69)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-011
     title: Elevations and openings
     subtitle: Kerb, road, front and rear walls with every opening, its position and margins, and the lamps
@@ -312,6 +315,7 @@ drawings:
       - {rev: R, date: 2026-11-23, description: "Notice: the stations and load paths with the axle at X 4,484.9 (I2-51)", drawn: Kiro, checked: "", approved: ""}
       - {rev: S, date: 2026-11-23, description: "Notice: the body mounts with the brake leads aboard, 2,034 kg (I2-50)", drawn: Kiro, checked: "", approved: ""}
       - {rev: T, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: U, date: 2026-11-24, description: "Memo: the outdoor unit's leader ends inside the unit (I2-69)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-201
     title: Body shell
     subtitle: Kerb, road, front and rear walls, the fixed roof plan, the panels and every opening with its size
@@ -381,6 +385,7 @@ drawings:
       - {rev: M, date: 2026-11-23, description: "Notice: the floor's insert round G20's cut-out at S 4x1 (I2-33)", drawn: Kiro, checked: "", approved: ""}
       - {rev: N, date: 2026-11-23, description: "Notice: jamb member BD-20's name clear of the strip (overrun check)", drawn: Kiro, checked: "", approved: ""}
       - {rev: O, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: P, date: 2026-11-24, description: "Memo: hardpoints note between the two hardpoints it names (I2-69)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-301
     title: Body to chassis
     subtitle: Mount positions, the bolt and nut-plate detail, isolation and sealing, the twist sharing
@@ -515,6 +520,7 @@ drawings:
       - {rev: U, date: 2026-11-23, description: "Notice: SHOWER UNIT clear of B-10's tag dot (overrun check)", drawn: Kiro, checked: "", approved: ""}
       - {rev: V, date: 2026-11-24, description: "Notice: cable totals with the leads' cut lengths and DB-PL moved (I2-63)", drawn: Kiro, checked: "", approved: ""}
       - {rev: W, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: X, date: 2026-11-24, description: "Memo: leaders end at what they name, tags' leaders uncrossed (I2-69)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-603
     title: Floor and wall penetrations
     subtitle: Every gland through the floor, walls and roof, its position, hole, fitting and runs
@@ -591,6 +597,7 @@ drawings:
       - {rev: N, date: 2026-11-23, description: "Notice: the HepvO valve on W-09, the tanks 5 mm lower (I2-40, I2-45)", drawn: Kiro, checked: "", approved: ""}
       - {rev: O, date: 2026-11-23, description: "Notice: the HepvO along the wet face under the basin (I2-52)", drawn: Kiro, checked: "", approved: ""}
       - {rev: P, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: Q, date: 2026-11-24, description: "Memo: the shower unit's leader ends inside the unit (I2-69)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-621
     title: HVAC and ventilation
     subtitle: Split, heat-recovery pairs, extract, towing pressurisation, relief, hood, Combi ducts
@@ -610,6 +617,7 @@ drawings:
       - {rev: G, date: 2026-11-22, description: "Memo: labels clear of the lines, revision rows fit their cell", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-23, description: "Memo: the project line names the Ranger Super Duty", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: J, date: 2026-11-24, description: "Memo: fan letters A to D back in their circles, notes beside routes (I2-69)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-701
     title: Ute with the bike garage, general arrangement
     subtitle: Kerb-side elevations travelling and loading, plan, rear view, mass by case and the ute checks
