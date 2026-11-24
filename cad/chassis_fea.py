@@ -676,8 +676,8 @@ class Analysis:
 
     def end_plate_under_heel(self, q_foot: float, q_top: float) -> dict:
         """The rail's end plate CH-P15 under the gusset heel's pull, q_foot at the heel's foot rising to q_top N/mm at its
-        top along the gusset's line (FAT-19, FAT-20, I2-57, I2-60). The plate's bottom edge rests on the drawbar member
-        unwelded, so it is free. Its sides and top are welded to the rail's webs and top flange with full penetration
+        top along the gusset's line (FAT-19, FAT-20, I2-57, I2-60). The plate's bottom edge stands `lift` over the rail's
+        underside, 7 mm clear of the drawbar member and unwelded (I2-75), so it is free, and the plate spans up from it. Its sides and top are welded to the rail's webs and top flange with full penetration
         single bevel welds made from outside, the plate behind each wall's end as the backing, and the plate stands up
         over the raiser's bottom wall, so its top weld joins both walls (`top_t`). The plate spans between the webs'
         mid-planes and from the bottom wall's mid-plane up to the middle of the walls its top weld joins, as end_plate
@@ -694,18 +694,24 @@ class Analysis:
         ep = next(f for f in ch.data["fittings"] if f["id"] == ROOT_END_PLATE)
         g = next(f for f in ch.data["fittings"] if f["id"] == ROOT_GUSSET)
         rail = ch.role_sec["rail"]
-        top_t = rail.t + ep["w"] - rail.d          # the rail's top flange and the raiser's bottom wall the plate covers
+        lift = ep.get("lift", 0.0)                 # the plate's bottom edge over the rail's underside (I2-75)
+        top_t = rail.t + lift + ep["w"] - rail.d   # the rail's top flange and the raiser's bottom wall the plate covers
         height = rail.d - 1.5 * rail.t + top_t / 2
         span, z1 = rail.b - rail.t, g["w"] - rail.t / 2
+        edge = max(lift - rail.t / 2, 0.0)         # the plate's free bottom edge over the bottom wall's mid-plane
         centre = span / 2 - (V["rail_c"] - V["root_gusset_heel_y"])     # from the inboard web
         angle = math.atan2(V["root_gusset_heel_y"] - V["root_gusset_toe_y"], g["l"])
         cn, sn = math.cos(angle), math.sin(angle)
         foot = g["t"] / cn + sum(g["heel_legs"])      # the gusset's cut across the plate and its two fillets' legs on it
-        out = end_plate(span, height, 0.0, z1, q_foot * cn, q_top * cn, foot, centre=centre, km=math.tan(angle) * ep["t"] / 2)
+        # the heel's pull below the plate's bottom edge goes into the plate at that edge, on the safe side: the load over
+        # the plate keeps its top and the whole pull
+        q_edge = (q_foot + q_top) * z1 / (z1 - edge) - q_top
+        out = end_plate(span, height - edge, 0.0, z1 - edge, q_edge * cn, q_top * cn, foot, centre=centre,
+                        km=math.tan(angle) * ep["t"] / 2)
         along = (q_foot + q_top) / 2 * z1 * sn
         zc = z1 * (q_foot + 2 * q_top) / (3 * (q_foot + q_top))
         return dict(out, top_t=top_t, centre=centre, angle=angle, along=along, tau_top=along / (span * top_t),
-                    tau_web=along * (height - zc) / (span * height * rail.t))
+                    tau_web=along * (height - zc) / (span * (height - edge) * rail.t), edge=edge)
 
     def end_actions_at(self, res, member: str, x: float) -> dict:
         """A member's end actions at its element end nearest X."""
@@ -724,13 +730,19 @@ class Analysis:
         """Each hole a run makes in a rail or a raiser (data/services.yaml `holes`), once: a hole through the seam of a rail
         and its raiser is one hole in two walls, and an outrigger's root face is the raiser's outer web. Each carries its
         wall, its net section in the composite rail, its edge distance and its clear distance to the nearest weld toe.
-        An outrigger's open end under a side marker's cap has no wall."""
+        An outrigger's open end under a side marker's cap has no wall. The vent and drain holes for galvanising at each
+        rail's front end (galvanising_holes, I2-75) follow the services' holes, on both rails, their use as their run."""
         import yaml
         from .partsdb import DATA
         ch, V, comp = self.ch, self.ch.V, self.ch.comp
         rail, raiser = comp.rail, comp.raiser
         rules = ch.data["hole_rules"]
         rows = yaml.safe_load((DATA / "services.yaml").read_text(encoding="utf-8")).get("holes") or []
+        for s in (-1, 1):
+            for g in ch.data.get("galvanising_holes") or []:
+                d = float(g["d"])
+                rows.append(dict(member=f"RL-{SIDES[s]}", face="road side" if s > 0 else "kerb side", run=g["use"],
+                                 x=ch.ev(g["x"]), y=s * (V["rail_c"] + rail.b / 2 - 0.5), z=ch.ev(g["z"]), d=d, length=d))
         toes = ch.weld_toes()
         z0, zs, z1 = V["rail_underside_z"], V["rail_top_z"], V["raiser_top_z"]
         sites: list[dict] = []

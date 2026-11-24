@@ -118,16 +118,17 @@ def test_root_gusset_area_follows_its_profile():
 
 def test_body_front_is_read_under_the_gussets_heel():
     """The body front's four rows (I2-51, I2-57) are read at the A-frame member's end there, and the heel's fillets are
-    the ones the data gives CH-P03, on the rail's end plate CH-P15 that closes the rail's front end. The plate is flush
-    with the rail's underside and stands over the raiser's bottom wall, so its top weld joins both walls."""
+    the ones the data gives CH-P03, on the rail's end plate CH-P15 that closes the rail's front end. The plate stands
+    over the raiser's bottom wall, so its top weld joins both walls, and its bottom edge stands `lift` clear of the
+    drawbar member (I2-75)."""
     rows = {r["id"]: r for r in RES["fatigue"]}
     assert rows["FAT-17"]["where"].endswith(f"at X {CH.V['body_x0']:.0f}")
     assert rows["FAT-18"]["where"].startswith("CH-P03") and rows["FAT-19"]["where"].startswith("CH-P15")
-    assert rows["FAT-20"]["where"].startswith("CH-P15") and rows["FAT-20"]["iiw"] == "415"
+    assert rows["FAT-20"]["where"].startswith("CH-P15") and rows["FAT-20"]["iiw"] == "424"
     plate = next(f for f in CH.data["fittings"] if f["id"] == "CH-P15")
     ep = CH.ev(plate["at"])
-    assert plate["w"] == pytest.approx(CH.role_sec["rail"].d + CH.role_sec["raiser"].t)
-    assert ep[0] < CH.V["body_x0"] and abs(ep[2] - (CH.V["rail_underside_z"] + plate["w"] / 2)) < 1e-6
+    assert plate["lift"] + plate["w"] == pytest.approx(CH.role_sec["rail"].d + CH.role_sec["raiser"].t)
+    assert ep[0] < CH.V["body_x0"] and abs(ep[2] - (CH.V["rail_underside_z"] + plate["lift"] + plate["w"] / 2)) < 1e-6
 
 
 def test_end_plate_solver_matches_a_strip():
@@ -209,12 +210,39 @@ def test_principal_range_of_a_weld():
 
 
 def test_fat20_reads_the_principal_stress_with_its_roots_inspected():
-    """FAT-20 is IIW 415 at FAT 71, as the end plates' weld roots are inspected by videoscope, and its range is the
-    governing weld's maximum principal stress range, its direction inside the 60 degrees off the weld's normal to which
-    IIW 4.3 holds the principal stress (I2-67)."""
+    """FAT-20 is IIW 424 at FAT 45, a single-sided butt weld of a rectangular hollow section's walls under 8 mm to an
+    intermediate plate with its root checked by NDT (I2-74), as the end plates' weld roots are inspected by videoscope,
+    and its range is the governing weld's maximum principal stress range, its direction inside the 60 degrees off the
+    weld's normal to which IIW 4.3 holds the principal stress (I2-67). The walls it reads are under 8 mm."""
     row = next(r for r in RES["fatigue"] if r["id"] == "FAT-20")
-    assert row["iiw"] == "415" and row["fat"] == 71 and row["cafl"] == pytest.approx(0.585 * 71)
+    assert row["iiw"] == "424" and row["fat"] == 45 and row["cafl"] == pytest.approx(0.585 * 45)
     assert int(re.search(r"its principal stress (\d+) degrees off", row["where"]).group(1)) <= 60
+    plate = next(f for f in CH.data["fittings"] if f["id"] == "CH-P15")
+    rail = CH.role_sec["rail"]
+    assert rail.t < 8 and rail.t + plate["lift"] + plate["w"] - rail.d < 8
+
+
+def test_each_rails_front_end_vents_and_drains_for_galvanising():
+    """Each rail's closed front end has a vent near its top and drains near its floor in its outer web, close behind
+    the end plate, placed by CHS-10's rules (I2-75), and with the slot the plate's bottom edge leaves over the rail's
+    floor and the front bay's cable holes it opens at least the four 20 mm holes the GAA's guide asks of an RHS 150 x 50
+    (Table 3). The plate's bottom edge stands at least the guide's 2.5 mm over the rail's floor."""
+    V, rail = CH.V, CH.role_sec["rail"]
+    plate = next(f for f in CH.data["fittings"] if f["id"] == "CH-P15")
+    slot = plate["lift"] - rail.t
+    assert slot >= 2.5
+    for side in ("K", "R"):
+        front = [h for h in RES["holes"] if h.get("frame") == f"RL-{side}" and h["wall"].startswith("the rail's")
+                 and 0 < h["x"] - V["body_x0"] <= 150]
+        galv = [h for h in front if set(h["runs"]) & {"vent", "drain"}]
+        vents = [h for h in galv if h["runs"] == ["vent"] and h["wall"] == "the rail's outer web"]
+        drains = [h for h in galv if h["runs"] == ["drain"] and h["wall"] == "the rail's outer web"]
+        assert vents and drains and all(h["ok"] for h in galv), side
+        assert max(h["z"] + h["d"] / 2 for h in vents) >= V["rail_top_z"] - rail.t - 25, side
+        assert min(h["z"] - h["d"] / 2 for h in drains) <= V["rail_underside_z"] + rail.t + 25, side
+        assert min(h["x"] for h in galv) - V["body_x0"] <= 40, side
+        area = sum(math.pi * h["d"] ** 2 / 4 for h in front) + slot * (rail.b - 2 * rail.t - 2 * (rail.ro - rail.t))
+        assert area >= 4 * math.pi * 20 ** 2 / 4, side
 
 
 def test_the_videoscope_reaches_each_end_plates_weld_roots():
