@@ -374,7 +374,7 @@ galvanising_dip:
 # that web's drains stand 85 and 125 mm behind it. Each centre is 1.25 d from the web's flat, its edge a diameter from
 # the end plate's weld toe, CM-01's end weld and the drawbar overlap's fillet. No vent: in that hang the front end has no
 # high point, and a vent near the top would stand where the end plate's line force into the web peaks (I2-80). With the
-# slot and the cable holes each end opens about 1,850 to 1,960 mm2 against Table 3's four 20 mm holes' 1,257 mm2
+# slot and the cable holes each end opens about 1,860 to 1,960 mm2 against Table 3's four 20 mm holes' 1,257 mm2
 galvanising_holes:
   - {use: drain, web: outer, x: body_x0 + 35, z: rail_underside_z + 35, d: 20}
   - {use: drain, web: outer, x: body_x0 + 75, z: rail_underside_z + 35, d: 20}
