@@ -475,9 +475,10 @@ def _fp_free(placed, b, pad=0.4) -> bool:
     return not any(b[0] < q[2] + pad and q[0] < b[2] + pad and b[1] < q[3] + pad and q[1] < b[3] + pad for q in placed)
 
 
-def _fp_text(sh, placed, x, y, s, size, anchor="middle", rot=0, bold=False, color="#000", inside=None, avoid=()) -> bool:
+def _fp_text(sh, placed, x, y, s, size, anchor="middle", rot=0, bold=False, color="#000", inside=None, avoid=(), names=None) -> bool:
     """Write a text where its box is clear of the texts already placed and of the dashed lines `avoid`, and, if
-    `inside` is given, within that sheet rectangle. Records the box and returns whether it was written."""
+    `inside` is given, within that sheet rectangle, which it then names unless `names` says what it names (Sheet.text).
+    Records the box and returns whether it was written."""
     w = S.text_mm(s, size, bold)
     if rot:                          # turned to read upward: the letters lie to the left of (x, y)
         b = (x - 0.75 * size, y - w / 2, x + 0.2 * size, y + w / 2)
@@ -490,7 +491,7 @@ def _fp_text(sh, placed, x, y, s, size, anchor="middle", rot=0, bold=False, colo
         return False
     if avoid and _crossed(b, avoid, pad=0.3):
         return False
-    sh.text(x, y, s, size, anchor, rot=rot, bold=bold, color=color)
+    sh.text(x, y, s, size, anchor, rot=rot, bold=bold, color=color, names=names if names is not None else inside)
     placed.append(b)
     return True
 
@@ -583,13 +584,13 @@ def _fp_rect(pr, q):
     return pr.rect3((x0, y0, 0, x1, y1, 0))
 
 
-def _fp_slide(sh, placed, x, y, s, sizes, avoid, bold=False, span=20.0):
+def _fp_slide(sh, placed, x, y, s, sizes, avoid, bold=False, span=20.0, names=None):
     """Write a text at the first X from x outward, up to span mm either way on the sheet, and the first of the sizes,
-    where it is clear of the other texts and the dashed lines."""
+    where it is clear of the other texts and the dashed lines. `names` is what it names (Sheet.text)."""
     for size in sizes:
         for k in range(0, int(span) * 2 + 1):
             dx = (k + 1) // 2 * (1 if k % 2 else -1) * 0.5
-            if _fp_text(sh, placed, x + dx, y, s, size, bold=bold, avoid=avoid):
+            if _fp_text(sh, placed, x + dx, y, s, size, bold=bold, avoid=avoid, names=names):
                 return True
     return False
 
@@ -605,17 +606,17 @@ def _fp_labels(sh, P, pr, lay, placed):
                       ("lau", 4400.0, P["aisle"][1] + 120), ("wet", (st[2] + st[3]) / 2, V["half_in"] - 218)):
         q = pr.p(x, y)
         _fp_slide(sh, placed, q[0], q[1], FP_AREAS[key], (1.7, 1.45), dashes, bold=True)
-    notes = [("BED ABOVE, DASHED", (st[0] + st[1]) / 2 + 300, 760.0)] if bed_above(P) else []
+    notes = [("BED ABOVE, DASHED", (st[0] + st[1]) / 2 + 300, 760.0, None)] if bed_above(P) else []
     if P.get("shower"):
-        notes.append(("SHOWER", (P["shower"][0] + P["shower"][2]) / 2, 430.0))
+        notes.append(("SHOWER", (P["shower"][0] + P["shower"][2]) / 2, 430.0, pr.rect3((*P["shower"][:2], 0, *P["shower"][2:4], 0))))
     for b, t in (("LA-11B", "BENCH"), ("LA-14F", "PLINTH")):
         q = next((q for q in P["parts"] if q["iid"] == b), None)
         if q:
             x0, y0, x1, y1 = q["box"]
-            notes.append((t, (x0 + x1) / 2 + 60, y0 + 70 if b == "LA-11B" else y1 - 200))
-    for t, x, y in notes:
+            notes.append((t, (x0 + x1) / 2 + 60, y0 + 70 if b == "LA-11B" else y1 - 200, _fp_rect(pr, q)))
+    for t, x, y, r in notes:
         q = pr.p(x, y)
-        _fp_slide(sh, placed, q[0], q[1], t, (1.25,), dashes, span=8.0)
+        _fp_slide(sh, placed, q[0], q[1], t, (1.25,), dashes, span=8.0, names=r)
     solid = [_fp_rect(pr, q) for q in P["parts"] if q["kind"] != "above" and q["top"] > P["floor_z"] + FLOOR_TOP]
     for c in P["clear"]:                 # each mark in the first corner of its space clear of the parts and the texts
         r = _fp_rect(pr, c)

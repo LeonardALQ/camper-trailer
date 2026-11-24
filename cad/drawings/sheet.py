@@ -146,18 +146,42 @@ class Sheet:
     def circle(self, cx, cy, r, sty="thin"):
         self.el.append(f'<circle cx="{cx:.2f}" cy="{self._y(cy):.2f}" r="{r:.2f}" {self.STY[sty]}/>')
 
-    def text(self, x, y, s, size=2.5, anchor="start", rot=0.0, bold=False, color="#000", cell=False):
+    def text(self, x, y, s, size=2.5, anchor="start", rot=0.0, bold=False, color="#000", cell=False, names=None):
         """`cell`: the text sits in a table's or the title block's cell, so a line through it is a layout fault, never
-        broken for it. Any other text breaks the lines that cross its letters (`knockouts`)."""
+        broken for it. Any other text breaks the lines that cross its letters (`knockouts`). `names` is what the label
+        names on the sheet, where the sheet knows it: a point (x, y) on it, its box (x0, y0, x1, y1) or a symbol's circle
+        (cx, cy, r). A label that clear_labels moves off its place gets a leader to it, and one with no `names` stays."""
         raw = str(s)
         s = raw.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
         tr = f' transform="rotate({rot:.1f} {x:.2f} {self._y(y):.2f})"' if rot else ""
         w = ' font-weight="bold"' if bold else ""
         c = f' fill="{color}"' if color != "#000" else ""
         if not cell and raw.strip():
-            self.texts.append(dict(i=len(self.el), x=x, y=self._y(y), s=size, anchor=anchor, rot=rot, bold=bold, t=raw, tr=tr))
+            self.texts.append(dict(i=len(self.el), x=x, y=self._y(y), s=size, anchor=anchor, rot=rot, bold=bold, t=raw, tr=tr,
+                                   names=self.target(names)))
         self.el.append(f'<text x="{x:.2f}" y="{self._y(y):.2f}" font-size="{size}" text-anchor="{anchor}" '
                        f'font-family="DejaVu Sans, Arial, sans-serif"{w}{c}{tr}>{s}</text>')
+
+    def target(self, names):
+        """What a label names, from sheet coordinates (y up) to the sheet's SVG ones: ("point", x, y), ("box", x0, x1,
+        y0, y1) or ("circle", cx, cy, r), or None."""
+        if names is None:
+            return None
+        if len(names) == 2:
+            return ("point", float(names[0]), self._y(names[1]))
+        if len(names) == 3:
+            return ("circle", float(names[0]), self._y(names[1]), float(names[2]))
+        x0, y0, x1, y1 = names
+        return ("box", min(x0, x1), max(x0, x1), self._y(max(y0, y1)), self._y(min(y0, y1)))
+
+    def lead(self, pts, names=None):
+        """A thin leader through sheet points `pts`, from its label to what it names: marked as a leader in the SVG, with
+        what it names (`names`, as Sheet.text takes it) for the overrun check, which finds a leader that ends off what
+        its label names, two leaders that cross and a leader through a symbol."""
+        if len(pts) < 2:
+            return
+        self.path(pts, "thin")
+        self.el[-1] = self.el[-1][:-2] + lead_attr(self.target(names)) + "/>"
 
     def arrow(self, tip, direction, length=2.5, half=0.45):
         (x, y), (dx, dy) = tip, direction
@@ -221,6 +245,80 @@ def rev_room(col: str) -> float:
 
 _PATH = re.compile(r'<path d="([^"]+)"([^>]*)/>')
 _CIRCLE = re.compile(r'<circle cx="([-\d.]+)" cy="([-\d.]+)" r="([\d.]+)"([^>]*)/>')
+_RECT_D = re.compile(r"M([-\d.]+),([-\d.]+) L([-\d.]+),([-\d.]+) L([-\d.]+),([-\d.]+) L([-\d.]+),([-\d.]+) Z$")
+_NAMES = re.compile(r'data-names="(\w+) ([-\d. ]+)"')
+LEAD_TOL = 0.3     # mm: a leader's end this near what its label names is on it
+
+
+def lead_attr(target) -> str:
+    """The attributes that mark a path as a leader in the SVG, with what its label names (Sheet.target) where known."""
+    if target is None:
+        return ' class="leader"'
+    return f' class="leader" data-names="{target[0]} ' + " ".join(f"{v:.2f}" for v in target[1:]) + '"'
+
+
+def read_target(e: str):
+    """What a leader element names, as Sheet.target gives it, or None."""
+    m = _NAMES.search(e)
+    return (m[1], *map(float, m[2].split())) if m else None
+
+
+def on_target(p, target, tol: float = LEAD_TOL) -> bool:
+    """Is sheet point p (SVG mm) on what a label names: at its point, in its box or on its symbol's circle?"""
+    kind = target[0]
+    if kind == "point":
+        return math.hypot(p[0] - target[1], p[1] - target[2]) <= tol
+    if kind == "box":
+        return target[1] - tol <= p[0] <= target[2] + tol and target[3] - tol <= p[1] <= target[4] + tol
+    return abs(math.hypot(p[0] - target[1], p[1] - target[2]) - target[3]) <= tol
+
+
+@dataclass(frozen=True)
+class Fill:
+    """A white fill drawn at element n: its bounds (x0, x1, y0, y1) and, for a disc, its circle (cx, cy, r)."""
+    box: tuple
+    n: int
+    circle: tuple | None = None
+
+    def holds(self, pts) -> bool:
+        """Does the fill paint over every one of the points?"""
+        if self.circle:
+            cx, cy, r = self.circle
+            return all(math.hypot(p[0] - cx, p[1] - cy) <= r + 1e-6 for p in pts)
+        b = self.box
+        return all(b[0] - 1e-6 <= p[0] <= b[1] + 1e-6 and b[2] - 1e-6 <= p[1] <= b[3] + 1e-6 for p in pts)
+
+    def meets(self, b) -> bool:
+        """Does the fill overlap the box b (x0, x1, y0, y1)?"""
+        f = self.box
+        if not (b[0] < f[1] and f[0] < b[1] and b[2] < f[3] and f[2] < b[3]):
+            return False
+        if self.circle:
+            cx, cy, r = self.circle
+            return math.hypot(max(b[0] - cx, 0.0, cx - b[1]), max(b[2] - cy, 0.0, cy - b[3])) < r
+        return True
+
+
+def _white_fill(n: int, d: str, attrs: str) -> Fill | None:
+    """A path's white fill as a cover: any white fill with no stroke, by its bounds, and a stroked one when it is a
+    rectangle (a symbol's or a box's background, CT-602's outlets)."""
+    if 'fill="#fff"' not in attrs:
+        return None
+    xs, ys = [float(v) for v in re.findall(r"([-\d.]+),", d)], [float(v) for v in re.findall(r",([-\d.]+)", d)]
+    if 'stroke="none"' not in attrs:
+        m = _RECT_D.match(d.strip())
+        if not m:
+            return None
+        p = [(float(m[k]), float(m[k + 1])) for k in (1, 3, 5, 7)]
+        if not all(abs(a[0] - b[0]) < 1e-6 or abs(a[1] - b[1]) < 1e-6 for a, b in zip(p, p[1:] + p[:1])):
+            return None
+    return Fill((min(xs), max(xs), min(ys), max(ys)), n)
+
+
+def _hidden(n: int, pts, fills: list, before: int) -> bool:
+    """Is a mark drawn at element n hidden at the points `pts` by a white fill drawn after it and before element
+    `before`, a symbol's or a box's background under a text?"""
+    return any(n < f.n < before and f.holds(pts) for f in fills)
 
 
 def _arc(p0, rx, ry, phi, large, sweep, p1, n=16):
@@ -251,8 +349,8 @@ def _arc(p0, rx, ry, phi, large, sweep, p1, n=16):
 
 def _segments(el, every: bool = False) -> tuple[list, list]:
     """Every stroked straight piece on the sheet in SVG coordinates as (p, q, element index, half its stroke width), arcs
-    and circles as chords, the frame's left out, and the boxes of the white fills (the title block's, the tables') as
-    (box, element index). `every` keeps the frame, the symbol circles and the outlines of the black fills too (the
+    and circles as chords, the frame's left out, and the white fills (the title block's, the tables', a symbol's
+    background) as Fill. `every` keeps the frame, the symbol circles and the outlines of the black fills too (the
     arrowheads), for the overrun check (cad/tools/overrun.py), which finds every mark that shows through a text."""
     out, fills = [], []
     for n, e in enumerate(el):
@@ -260,9 +358,9 @@ def _segments(el, every: bool = False) -> tuple[list, list]:
             m = _PATH.match(e)
             if not m:
                 continue
-            if 'fill="#fff" stroke="none"' in m[2]:
-                xs, ys = [float(v) for v in re.findall(r"([-\d.]+),", m[1])], [float(v) for v in re.findall(r",([-\d.]+)", m[1])]
-                fills.append(((min(xs), max(xs), min(ys), max(ys)), n))
+            f = _white_fill(n, m[1], m[2])
+            if f:
+                fills.append(f)
             black = every and 'fill="#000" stroke="none"' in m[2]
             if not black and ('stroke="none"' in m[2] or "stroke=" not in m[2] or ('class="frame"' in m[2] and not every)):
                 continue
@@ -294,6 +392,9 @@ def _segments(el, every: bool = False) -> tuple[list, list]:
             out += [(p, q, n, hw) for p, q in zip(pts, pts[1:])]
         elif e.startswith("<circle"):
             m = _CIRCLE.match(e)
+            if m and 'fill="#fff"' in m[4]:
+                cx, cy, r = float(m[1]), float(m[2]), float(m[3])
+                fills.append(Fill((cx - r, cx + r, cy - r, cy + r), n, (cx, cy, r)))
             if not m or (('stroke="none"' in m[4] or float(m[3]) <= SYMBOL_R) and not every):
                 continue
             sw = re.search(r'stroke-width="([\d.]+)"', m[4])
@@ -360,14 +461,15 @@ def knockouts(sh) -> list[str]:
             return (t["x"] + (p[0] - t["x"]) * ca + (p[1] - t["y"]) * sa, t["y"] - (p[0] - t["x"]) * sa + (p[1] - t["y"]) * ca)
         cs = [to_sheet(u, v) for u in core[:2] for v in core[2:]]
         bx = (min(c[0] for c in cs), max(c[0] for c in cs), min(c[1] for c in cs), max(c[1] for c in cs))
-        if any(n > t["i"] and f[0] < bx[1] and bx[0] < f[1] and f[2] < bx[3] and bx[2] < f[3] for f, n in fills):
+        if any(f.n > t["i"] and f.meets(bx) for f in fills):
             continue
         cand = set()
         for gx in range(int((bx[0] - 0.5) // G), int((bx[1] + 0.5) // G) + 1):
             for gy in range(int((bx[2] - 0.5) // G), int((bx[3] + 0.5) // G) + 1):
                 cand.update(grid.get((gx, gy), ()))
         hits = [n for p, q, n, hw in (segs[k] for k in cand)
-                if _enters(to_local(p), to_local(q), (core[0] - hw, core[1] + hw, core[2] - hw, core[3] + hw))]
+                if _enters(to_local(p), to_local(q), (core[0] - hw, core[1] + hw, core[2] - hw, core[3] + hw))
+                and not _hidden(n, cs, fills, t["i"])]
         if hits:
             masked[t["i"]] = (max(max(hits), t["i"]), f'<rect x="{x0 - 0.3:.2f}" y="{t["y"] - 0.78 * s - 0.2:.2f}" '
                               f'width="{w + 0.6:.2f}" height="{1.02 * s + 0.4:.2f}" fill="#fff"{t["tr"]}/>')
@@ -503,68 +605,176 @@ def _seg_in(fr, p, q, box, du=0.0, dv=0.0, pad=0.0) -> bool:
 
 
 def clear_labels(sh) -> list[dict]:
-    """Free labels clear of the heavy lines (I2-64). A free text, or a run of lines that reads as one label, whose mask
-    would break a line of HEAVY mm or more, or that a mark the masks never take (the frame, a symbol, a dot or an
+    """Free labels clear of the heavy lines (I2-64, I2-69). A free text, or a run of lines that reads as one label, whose
+    mask would break a line of HEAVY mm or more, or that a mark the masks never take (the frame, a symbol, a dot or an
     arrowhead) crosses, moves to the nearest place along its baseline, or failing that round it within REACH mm, where
     its masks would cover only thin lines and no mark, clear of every other text, every white fill and the frame. A
-    leader that ends at the label moves its end with it, and a label that leaves its own place with no leader gets a
-    thin one back to that place, with a dot there. A label with no such place stays, for the overrun check to report.
-    Returns the moves."""
-    segs, fills = _segments(sh.el, every=True)
-    plain = {n for _, _, n, _ in _segments(sh.el)[0]}
-    items = _text_items(sh)
-    heavy, marks, thin = _Grid(), _Grid(), _Grid()
-    seg_of: dict = {}
-    for k, (p, q, n, hw) in enumerate(segs):
-        b = (min(p[0], q[0]) - hw, max(p[0], q[0]) + hw, min(p[1], q[1]) - hw, max(p[1], q[1]) + hw)
-        (heavy if 2 * hw >= HEAVY - 1e-9 else thin if n in plain else marks).add(k, b)
-        seg_of.setdefault(n, []).append(k)
-    if not any(n not in plain for _, _, n, _ in segs) and not heavy.cells:
+    line hidden under a white fill drawn before the text (a symbol's or a box's background) does not cross it. A leader
+    drawn with the label (Sheet.leads) follows it, its arrowhead turned, and a symbol drawn round it (a balloon's circle,
+    an outlet's square) moves whole with it. A label that leaves its place and is no longer at what it names (Sheet.text
+    `names`) gets a thin leader to that, with a dot in it or on its symbol's circle. One whose sheet does not say what it
+    names moves only as far as it still reads at its place. No leader may cross another leader, a text or a symbol. A
+    label with no such place stays, for the overrun check to report. Returns the moves."""
+    sh.moves = []
+    B = _Board(sh)
+    if not B.any_fault_possible():
         return []
-    tgrid = _Grid()
-    for k, it in enumerate(items):
-        tgrid.add(k, _bnds(it["fr"].ring(it["mask"])))
-    moves, dead = [], set()
-    for block in _blocks(items):
-        if not _faulty(block, segs, heavy, marks, thin, plain, dead):
+    moves = []
+    for block in _blocks(B.items):
+        if not B.faulty(block):
             continue
-        mv = _move_block(sh, block, items, tgrid, segs, fills, heavy, marks, thin, dead, seg_of, plain)
+        mv = _move_block(B, block)
         if mv:
             moves.append(mv)
     sh.moves = moves
     return moves
 
 
-def _faulty(block, segs, heavy, marks, thin, plain, dead) -> bool:
-    """Would the block's mask break a heavy line, or does a mark the masks never take cross its letters, where it is?"""
-    for it in block:
-        fr, core, mask = it["fr"], it["core"], it["mask"]
-        bc, bm = _bnds(fr.ring(core)), _bnds(fr.ring(mask))
-        near = thin.near(bc) | heavy.near(bc) | marks.near(bc)
-        hit = [segs[k][2] for k in near if k not in dead and _seg_in(fr, segs[k][0], segs[k][1], core, pad=segs[k][3])]
-        if any(n not in plain for n in hit):
-            return True
-        cross = [n for n in hit if n in plain]
-        if cross:
-            place = max(max(cross), it["n"])
-            if any(k not in dead and segs[k][2] <= place and _seg_in(fr, segs[k][0], segs[k][1], mask) for k in heavy.near(bm)):
+class _Board:
+    """A sheet's lines, marks, fills, texts, leaders and symbols, in grids, as clear_labels moves its labels."""
+
+    def __init__(self, sh):
+        self.sh = sh
+        self.segs, self.fills = _segments(sh.el, every=True)
+        self.plain = {n for _, _, n, _ in _segments(sh.el)[0]}
+        self.items = _text_items(sh)
+        self.heavy, self.marks, self.thin = _Grid(), _Grid(), _Grid()
+        self.seg_of: dict = {}
+        self.dead: set = set()
+        for k, (p, q, n, hw) in enumerate(self.segs):
+            self._file(k, p, q, n, hw, n in self.plain)
+            self.seg_of.setdefault(n, []).append(k)
+        self.tgrid = _Grid()
+        for k, it in enumerate(self.items):
+            self.tgrid.add(k, _bnds(it["fr"].ring(it["mask"])))
+        self.leaders = {n: _path_pts(e) for n, e in enumerate(sh.el) if e.startswith("<path") and 'class="leader"' in e}
+        self.symbols = _symbol_circles(sh.el)
+
+    def _file(self, k, p, q, n, hw, plain):
+        b = (min(p[0], q[0]) - hw, max(p[0], q[0]) + hw, min(p[1], q[1]) - hw, max(p[1], q[1]) + hw)
+        (self.heavy if 2 * hw >= HEAVY - 1e-9 else self.thin if plain else self.marks).add(k, b)
+
+    def any_fault_possible(self) -> bool:
+        return any(n not in self.plain for _, _, n, _ in self.segs) or bool(self.heavy.cells)
+
+    def faulty(self, block) -> bool:
+        """Would the block's mask break a heavy line, or does a mark the masks never take cross its letters, where it is?
+        A line hidden at the letters under a white fill drawn before them does not count."""
+        segs, plain = self.segs, self.plain
+        for it in block:
+            fr, core, mask = it["fr"], it["core"], it["mask"]
+            bc, bm = _bnds(fr.ring(core)), _bnds(fr.ring(mask))
+            corners = fr.ring(core)
+            near = self.thin.near(bc) | self.heavy.near(bc) | self.marks.near(bc)
+            hit = [segs[k][2] for k in near if k not in self.dead and _seg_in(fr, segs[k][0], segs[k][1], core, pad=segs[k][3])
+                   and not _hidden(segs[k][2], corners, self.fills, it["n"])]
+            if any(n not in plain for n in hit):
                 return True
-    return False
+            cross = [n for n in hit if n in plain]
+            if cross:
+                place = max(max(cross), it["n"])
+                mring = fr.ring(mask)
+                if any(k not in self.dead and segs[k][2] <= place and _seg_in(fr, segs[k][0], segs[k][1], mask)
+                       and not _hidden(segs[k][2], mring, self.fills, place + 1) for k in self.heavy.near(bm)):
+                    return True
+        return False
+
+    def reseg(self, n, e):
+        """Element n drawn anew as e: its old pieces out of the obstacles, its new ones in."""
+        self.dead.update(self.seg_of.get(n, ()))
+        self.seg_of[n] = []
+        plain = bool(_segments([e])[0])
+        if plain:
+            self.plain.add(n)
+        for p, q, _, hw in _segments([e], every=True)[0]:
+            k = len(self.segs)
+            self.segs.append((p, q, n, hw))
+            self.seg_of[n].append(k)
+            self._file(k, p, q, n, hw, plain)
+        if e.startswith("<path") and 'class="leader"' in e:
+            self.leaders[n] = _path_pts(e)
+        if e.startswith("<circle"):
+            self.symbols = [s for s in self.symbols if s[3] != n] + _symbol_circles([e], n)
+
+    def add(self, e):
+        self.sh.el.append(e)
+        self.reseg(len(self.sh.el) - 1, e)
+
+    def crosses_leader(self, p, q, skip) -> bool:
+        """Does the leader piece p-q cross a leader drawn on the sheet but those in `skip`?"""
+        return any(n not in skip and any(_crossing(p, q, a, b) for a, b in zip(pts, pts[1:])) for n, pts in self.leaders.items())
+
+    def through_symbol(self, p, q, named, skip) -> bool:
+        """Does the leader piece p-q pass through a symbol (a circle of SYMBOL_R or less, a dot) but one its named end
+        `named` is in (its tag's dot, the gland it points into) and those in `skip`?"""
+        for cx, cy, r, n in self.symbols:
+            if n in skip or (named is not None and math.hypot(named[0] - cx, named[1] - cy) <= r + 0.05):
+                continue
+            if _seg_dist((cx, cy), p, q) < r - 0.05:
+                return True
+        return False
+
+
+def _path_pts(e: str) -> list:
+    m = _PATH.match(e)
+    return [(float(a), float(b)) for a, b in re.findall(r"([-\d.]+),([-\d.]+)", m[1])] if m else []
+
+
+def _symbol_circles(el, n0: int = 0) -> list[tuple]:
+    """Every circle of SYMBOL_R or less on the sheet, stroked (a gland, a mount, a balloon, a fan) or filled (a dot), as
+    (cx, cy, r, element index)."""
+    out = []
+    for n, e in enumerate(el, n0):
+        m = _CIRCLE.match(e) if e.startswith("<circle") else None
+        if m and float(m[3]) <= SYMBOL_R:
+            out.append((float(m[1]), float(m[2]), float(m[3]), n))
+    return out
+
+
+def _seg_dist(c, p, q) -> float:
+    """The least distance from point c to the segment p-q."""
+    dx, dy = q[0] - p[0], q[1] - p[1]
+    L2 = dx * dx + dy * dy
+    t = 0.0 if L2 < 1e-12 else max(0.0, min(1.0, ((c[0] - p[0]) * dx + (c[1] - p[1]) * dy) / L2))
+    return math.hypot(p[0] + t * dx - c[0], p[1] + t * dy - c[1])
+
+
+def _crossing(p, q, a, b, tol: float = 0.05) -> bool:
+    """Do the segments p-q and a-b cross, other than where one ends on or at the other?"""
+    def side(u, v, w):
+        return (v[0] - u[0]) * (w[1] - u[1]) - (v[1] - u[1]) * (w[0] - u[0])
+    if min(math.dist(e, f) for e in (p, q) for f in (a, b)) < tol:
+        return False
+    d1, d2, d3, d4 = side(a, b, p), side(a, b, q), side(p, q, a), side(p, q, b)
+    if not (d1 * d2 < 0 and d3 * d4 < 0):
+        return False
+    return min(_seg_dist(p, a, b), _seg_dist(q, a, b), _seg_dist(a, p, q), _seg_dist(b, p, q)) > tol
 
 
 def _dist(p, b) -> float:
     return math.hypot(max(b[0] - p[0], 0.0, p[0] - b[1]), max(b[2] - p[1], 0.0, p[1] - b[3]))
 
 
+def _gap(a, b) -> float:
+    """The distance between two boxes (x0, x1, y0, y1), 0 where they overlap."""
+    return math.hypot(max(a[0] - b[1], b[0] - a[1], 0.0), max(a[2] - b[3], b[2] - a[3], 0.0))
+
+
 def _leads(sh, block) -> list[tuple]:
     """The leader parts drawn with the block's texts (Sheet.leads): (element, the moving ends) for a line, the elbow's
-    end of a leader and a shoulder whole, and (element, ("arrow", length, half)) for an arrowhead that turns with them."""
+    end of a leader and a shoulder whole, (element, ("arrow", length, half)) for an arrowhead that turns with them, and a
+    symbol drawn round the text that moves whole with it, (element, ("circle", r)) or (element, ("path",))."""
     out = []
     for it in block:
         for part in sh.leads.get(it["n"], ()):
             if part not in out:
                 out.append(part)
     return out
+
+
+def _own_leader(leads) -> bool:
+    """Has the label a leader of its own (a leader's line, a tag's line, a balloon's), not only a symbol round it?"""
+    return any(not how or how[0] not in ("circle", "path", "arrow") for _, how in leads)
 
 
 def _shift_line(e: str, ends: tuple, dx: float, dy: float) -> tuple:
@@ -619,88 +829,172 @@ def _moved_leads(sh, leads, dx, dy) -> list[tuple]:
     return out
 
 
-def _move_block(sh, block, items, tgrid, segs, fills, heavy, marks, thin, dead, seg_of, plains) -> dict | None:
+def _named_end(how, pts):
+    """The end of a moved leader piece that stays on what its label names: a leader's tip, a tag's dot, a balloon's
+    tip. A shoulder moves whole and names nothing."""
+    if how == (1,) or (how and how[0] == "balloon"):
+        return pts[0]
+    if how == (0,):
+        return pts[1]
+    return None
+
+
+def _symbol_bounds(sh, leads):
+    """The bounds of the symbols drawn round a label (its leads' circles and paths) where they stand, or None."""
+    out = []
+    for n, how in leads:
+        if how and how[0] == "circle":
+            m = _CIRCLE.match(sh.el[n])
+            cx, cy, r = float(m[1]), float(m[2]), float(m[3])
+            out.append((cx - r, cx + r, cy - r, cy + r))
+        elif how and how[0] == "path":
+            xy = _path_pts(sh.el[n])
+            out.append((min(x for x, _ in xy), max(x for x, _ in xy), min(y for _, y in xy), max(y for _, y in xy)))
+    return _union(*out) if out else None
+
+
+def _union(*boxes):
+    bs = [b for b in boxes if b is not None]
+    return (min(b[0] for b in bs), max(b[1] for b in bs), min(b[2] for b in bs), max(b[3] for b in bs))
+
+
+def _clamp(p, b):
+    return (min(max(p[0], b[0]), b[1]), min(max(p[1], b[2]), b[3]))
+
+
+def _off(orig, body, target, s) -> bool:
+    """Has a label, its bounds with its symbol's `body` against `orig` where it stood, moved so far that it no longer
+    reads at its place, and off what it names (`target`): out of its box, or more than 1.5 of its size from its point
+    or its symbol's circle?"""
+    if _gap(orig, body) <= 1.5 * s:
+        return False
+    if target is None:
+        return True
+    kind = target[0]
+    if kind == "box":
+        t = target
+        return not (t[1] - 0.05 <= body[0] and body[1] <= t[2] + 0.05 and t[3] - 0.05 <= body[2] and body[3] <= t[4] + 0.05)
+    if kind == "point":
+        return _dist((target[1], target[2]), body) > 1.5 * s
+    return _dist((target[1], target[2]), body) - target[3] > 1.5 * s
+
+
+def _fallback(B, body, target, centre, shapes):
+    """The leader from a moved label, its bounds with its symbol `body`, to what it names: (start, end, dot), the end
+    at its point, in its box clear of the lines there, or on its symbol's circle (no dot), the start on the label's
+    margin or on the symbol moved with it. None where the label stands too near it for a leader."""
+    g = (body[0] - 0.6, body[1] + 0.6, body[2] - 0.6, body[3] + 0.6)
+    kind = target[0]
+    if kind == "point":
+        end, dot = (target[1], target[2]), True
+    elif kind == "box":
+        end, dot = _box_end(B, target, centre, g), True
+    else:
+        cx, cy, r = target[1:]
+        aim = _clamp((cx, cy), g)
+        L = math.hypot(aim[0] - cx, aim[1] - cy) or 1.0
+        end, dot = (cx + (aim[0] - cx) * r / L, cy + (aim[1] - cy) * r / L), False
+    start = _clamp(end, g)
+    for c in shapes:
+        if c[0] == "circle":
+            L = math.hypot(end[0] - c[1], end[1] - c[2]) or 1.0
+            start = (c[1] + (end[0] - c[1]) * c[3] / L, c[2] + (end[1] - c[2]) * c[3] / L)
+    if math.dist(start, end) < 1.0:
+        return None
+    return start, end, dot
+
+
+def _box_end(B, box, centre, g):
+    """Where a leader into a box ends: inside it, in from its outline, at least 1 mm from the label's margin `g`, clear
+    of the lines and the texts there, nearest the label; failing that, the label's old middle brought into the box."""
+    _, x0, x1, y0, y1 = box
+    inset = min(0.8, (x1 - x0) / 4, (y1 - y0) / 4)
+    inner = (x0 + inset, x1 - inset, y0 + inset, y1 - inset)
+    pts = [(inner[0] + 0.5 * i, inner[2] + 0.5 * j) for i in range(int((inner[1] - inner[0]) / 0.5) + 1)
+           for j in range(int((inner[3] - inner[2]) / 0.5) + 1)]
+    for p in sorted((p for p in pts if _dist(p, g) >= 1.0), key=lambda p: _dist(p, g)):
+        b = (p[0] - 0.45, p[0] + 0.45, p[1] - 0.45, p[1] + 0.45)
+        if any(k not in B.dead and _enters(B.segs[k][0], B.segs[k][1], b) for k in B.thin.near(b) | B.heavy.near(b) | B.marks.near(b)):
+            continue
+        if any(_dist(p, _bnds(B.items[k]["fr"].ring(B.items[k]["mask"]))) < 0.3 for k in B.tgrid.near(b)):
+            continue
+        return p
+    return _clamp(centre, inner)
+
+
+def _move_block(B, block) -> dict | None:
     """The block's nearest place in STEPS where it is clear, applied to the sheet, or None."""
+    sh = B.sh
     fr0 = block[0]["fr"]
     own = {id(it) for it in block}
     b0 = _bnds([p for it in block for p in it["fr"].ring(it["letters"])])
     centre = ((b0[0] + b0[1]) / 2, (b0[2] + b0[3]) / 2)
-    walls = [f for f, _ in fills if not (f[0] <= b0[0] and b0[1] <= f[1] and f[2] <= b0[2] and b0[3] <= f[3])]
+    corners = [(b0[0], b0[2]), (b0[1], b0[2]), (b0[1], b0[3]), (b0[0], b0[3])]
+    walls = [f for f in B.fills if not f.holds(corners)]
+    target = next((it["t"]["names"] for it in block if it["t"].get("names")), None)
     leads = _leads(sh, block)
+    tied = _own_leader(leads)
     skip = {n for n, _ in leads} | {it["n"] for it in block}
+    size = block[0]["t"]["s"]
+    orig = _union(b0, _symbol_bounds(sh, leads))
     for du, dv in STEPS:
         dx, dy = du * fr0.c - dv * fr0.s, du * fr0.s + dv * fr0.c
-        if not all(_clear_at(it, du, dv, own, items, tgrid, segs, walls, heavy, marks, skip, dead) for it in block):
+        if not all(_clear_at(B, it, du, dv, own, walls, skip) for it in block):
             continue
         moved = _bnds([p for it in block for p in it["fr"].ring(it["letters"], du, dv)])
-        gap = math.hypot(max(moved[0] - b0[1], b0[0] - moved[1], 0.0), max(moved[2] - b0[3], b0[2] - moved[3], 0.0))
-        off = gap > 1.5 * block[0]["t"]["s"]       # a label this far from its place needs a leader back to it
-        new = []
-        if leads:
-            new = _moved_leads(sh, leads, dx, dy)
-            lines = [tuple(p) for _, _, p in new if len(p) == 2 and not isinstance(p[0][0], str)]
-            boxes = [(c[1] - c[3], c[1] + c[3], c[2] - c[3], c[2] + c[3]) if c[0] == "circle" else c[1:]
-                     for _, _, pts in new if pts and isinstance(pts[0][0], str) for c in pts[:1]]
-            if not all(_symbol_clear(b, own, items, tgrid, segs, walls, heavy, marks, thin, skip, dead) for b in boxes):
+        new = _moved_leads(sh, leads, dx, dy) if leads else []
+        shapes = [pts[0] for _, _, pts in new if pts and isinstance(pts[0][0], str)]
+        boxes = [(c[1] - c[3], c[1] + c[3], c[2] - c[3], c[2] + c[3]) if c[0] == "circle" else c[1:] for c in shapes]
+        if not all(_symbol_clear(B, b, own, walls, skip) for b in boxes):
+            continue
+        body = _union(moved, *boxes)
+        lines = [(pts[0], pts[1], _named_end(how, pts)) for (_, how), (_, _, pts) in zip(leads, new)
+                 if len(pts) == 2 and not isinstance(pts[0][0], str)]
+        extra = None
+        if not tied and _off(orig, body, target, size):
+            extra = _fallback(B, body, target, centre, shapes) if target else None
+            if extra is None:
                 continue
-        elif off:
-            g = (moved[0] - 0.6, moved[1] + 0.6, moved[2] - 0.6, moved[3] + 0.6)
-            start = (min(max(centre[0], g[0]), g[1]), min(max(centre[1], g[2]), g[3]))
-            lines = [(start, centre)]
-        else:
-            lines = []
-        if any(_crosses_text(p, q, items, tgrid, own) for p, q in lines):
+            lines = [(extra[0], extra[1], extra[1])]
+        if any(_crosses_text(B, p, q, own) or B.crosses_leader(p, q, skip) or B.through_symbol(p, q, named, skip)
+               for p, q, named in lines):
             continue
         for it in block:
             _shift_text(sh, it, dx, dy)
-            tgrid.add(items.index(it), _bnds(it["fr"].ring(it["mask"])))
-        if leads:
-            for n, e, _ in new:
-                sh.el[n] = e
-                _reseg(n, e, segs, heavy, marks, thin, dead, seg_of, plains)
-        elif off:
-            (sx, sy), (cx, cy) = lines[0]
-            for e in (f'<path d="M{sx:.2f},{sy:.2f} L{cx:.2f},{cy:.2f}" {Sheet.STY["thin"]}/>',
-                      f'<circle cx="{cx:.2f}" cy="{cy:.2f}" r="0.30" {Sheet.STY["fill"]}/>'):
-                sh.el.append(e)
-                _reseg(len(sh.el) - 1, e, segs, heavy, marks, thin, dead, seg_of, plains)
-        return dict(text=" / ".join(it["t"]["t"] for it in block), by=(round(dx, 2), round(dy, 2)), leader=bool(leads or off),
+            B.tgrid.add(B.items.index(it), _bnds(it["fr"].ring(it["mask"])))
+        for n, e, _ in new:
+            sh.el[n] = e
+            B.reseg(n, e)
+        how = "with its leader" if tied else "with its symbol" if leads else ""
+        if extra:
+            (sx, sy), (ex, ey), dot = extra
+            B.add(f'<path d="M{sx:.2f},{sy:.2f} L{ex:.2f},{ey:.2f}" {Sheet.STY["thin"]}{lead_attr(target)}/>')
+            if dot:
+                B.add(f'<circle cx="{ex:.2f}" cy="{ey:.2f}" r="0.30" {Sheet.STY["fill"]}/>')
+            how = "with a leader to what it names"
+        return dict(text=" / ".join(it["t"]["t"] for it in block), by=(round(dx, 2), round(dy, 2)), leader=how,
                     at=(round(block[0]["t"]["x"], 1), round(block[0]["t"]["y"], 1)))
     return None
 
 
-def _reseg(n, e, segs, heavy, marks, thin, dead, seg_of, plains):
-    """Element n drawn anew as e: its old pieces out of the obstacles, its new ones in."""
-    dead.update(seg_of.get(n, ()))
-    seg_of[n] = []
-    plain = bool(_segments([e])[0])
-    if plain:
-        plains.add(n)
-    for p, q, _, hw in _segments([e], every=True)[0]:
-        k = len(segs)
-        segs.append((p, q, n, hw))
-        seg_of[n].append(k)
-        b = (min(p[0], q[0]) - hw, max(p[0], q[0]) + hw, min(p[1], q[1]) - hw, max(p[1], q[1]) + hw)
-        (heavy if 2 * hw >= HEAVY - 1e-9 else thin if plain else marks).add(k, b)
-
-
-def _symbol_clear(box, own, items, tgrid, segs, walls, heavy, marks, thin, skip, dead) -> bool:
+def _symbol_clear(B, box, own, walls, skip) -> bool:
     """Is a symbol that moves with its label (a balloon's circle, an outlet's square), its bounds `box`, clear of every
     line and mark but its own, so no line crosses its letters and no mask is drawn there, every white fill and every
     other text?"""
     b = (box[0] - 0.2, box[1] + 0.2, box[2] - 0.2, box[3] + 0.2)
     if not (DRAW_AREA[0] <= b[0] and b[1] <= DRAW_AREA[1] and DRAW_AREA[2] <= b[2] and b[3] <= DRAW_AREA[3]):
         return False
-    if any(k not in dead and segs[k][2] not in skip and _enters(segs[k][0], segs[k][1], b)
-           for k in heavy.near(b) | marks.near(b) | thin.near(b)):
+    segs = B.segs
+    if any(k not in B.dead and segs[k][2] not in skip and _enters(segs[k][0], segs[k][1], b)
+           for k in B.heavy.near(b) | B.marks.near(b) | B.thin.near(b)):
         return False
-    if any(b[0] < f[1] and f[0] < b[1] and b[2] < f[3] and f[2] < b[3] for f in walls):
+    if any(f.meets(b) for f in walls):
         return False
     ring = [(b[0], b[2]), (b[1], b[2]), (b[1], b[3]), (b[0], b[3])]
-    return all(id(items[k]) in own or _sep(ring, items[k]["fr"].ring(items[k]["mask"])) for k in tgrid.near(b))
+    return all(id(B.items[k]) in own or _sep(ring, B.items[k]["fr"].ring(B.items[k]["mask"])) for k in B.tgrid.near(b))
 
 
-def _clear_at(it, du, dv, own, items, tgrid, segs, walls, heavy, marks, skip=frozenset(), dead=frozenset()) -> bool:
+def _clear_at(B, it, du, dv, own, walls, skip=frozenset()) -> bool:
     """Is a text clear moved (du, dv) in its own frame: its mask over no heavy line and no mark but its own parts',
     inside the frame, off every white fill but its own background, and its letters and mask off every other text's?"""
     fr = it["fr"]
@@ -708,14 +1002,15 @@ def _clear_at(it, du, dv, own, items, tgrid, segs, walls, heavy, marks, skip=fro
     mb = _bnds(mring)
     if not (DRAW_AREA[0] <= mb[0] and mb[1] <= DRAW_AREA[1] and DRAW_AREA[2] <= mb[2] and mb[3] <= DRAW_AREA[3]):
         return False
-    if any(k not in dead and segs[k][2] not in skip and _seg_in(fr, segs[k][0], segs[k][1], it["mask"], du, dv)
-           for k in heavy.near(mb) | marks.near(mb)):
+    segs = B.segs
+    if any(k not in B.dead and segs[k][2] not in skip and _seg_in(fr, segs[k][0], segs[k][1], it["mask"], du, dv)
+           for k in B.heavy.near(mb) | B.marks.near(mb)):
         return False
-    if any(mb[0] < f[1] and f[0] < mb[1] and mb[2] < f[3] and f[2] < mb[3] for f in walls):
+    if any(f.meets(mb) for f in walls):
         return False
     lring = fr.ring(it["letters"], du, dv)
-    for k in tgrid.near(mb):
-        o = items[k]
+    for k in B.tgrid.near(mb):
+        o = B.items[k]
         if id(o) in own:
             continue
         if not _sep(mring, o["fr"].ring(o["letters"])) or not _sep(lring, o["fr"].ring(o["mask"])):
@@ -723,9 +1018,9 @@ def _clear_at(it, du, dv, own, items, tgrid, segs, walls, heavy, marks, skip=fro
     return True
 
 
-def _crosses_text(p, q, items, tgrid, own) -> bool:
+def _crosses_text(B, p, q, own) -> bool:
     b = (min(p[0], q[0]), max(p[0], q[0]), min(p[1], q[1]), max(p[1], q[1]))
-    return any(id(items[k]) not in own and _seg_in(items[k]["fr"], p, q, items[k]["core"], pad=0.1) for k in tgrid.near(b))
+    return any(id(B.items[k]) not in own and _seg_in(B.items[k]["fr"], p, q, B.items[k]["core"], pad=0.1) for k in B.tgrid.near(b))
 
 
 def _shift_text(sh, it, dx: float, dy: float):
@@ -834,11 +1129,11 @@ def ordinate_h(sh, xs, y_feat, y_line, labels, size=TXT, up=True):
 def leader(sh, tip, elbow, text, lines=None, size=2.2):
     (tx, ty), (ex, ey) = tip, elbow
     n0 = len(sh.el)
-    sh.line(tx, ty, ex, ey)
+    sh.lead([(tx, ty), (ex, ey)], names=tip)
     L = math.hypot(tx - ex, ty - ey) or 1
     sh.arrow((tx, ty), ((tx - ex) / L, (ty - ey) / L), 2.0, 0.4)
     side = 1 if ex >= tx else -1
-    sh.line(ex, ey, ex + 3 * side, ey)
+    sh.lead([(ex, ey), (ex + 3 * side, ey)])
     parts = [(n0, (1,)), (n0 + 1, ("arrow", 2.0, 0.4)), (n0 + 2, (0, 1))]
     for i, t in enumerate([text] + (lines or [])):
         sh.leads[len(sh.el)] = parts
@@ -850,7 +1145,7 @@ def balloon(sh, tip, centre, label, r=3.2):
     L = math.hypot(cx - tx, cy - ty) or 1
     ux, uy = (cx - tx) / L, (cy - ty) / L
     n0 = len(sh.el)
-    sh.line(tx, ty, cx - ux * r, cy - uy * r)
+    sh.lead([(tx, ty), (cx - ux * r, cy - uy * r)], names=tip)
     sh.circle(tx, ty, 0.45, "fill")
     sh.circle(cx, cy, r, "medium")
     sh.leads[len(sh.el)] = [(n0 + 2, ("circle", r)), (n0, ("balloon", r, n0 + 2))]
@@ -1106,7 +1401,7 @@ def write(sh, out_svg):
     import cairosvg
     svg = sh.svg()
     for m in getattr(sh, "moves", []):
-        print(f"  {out_svg.stem}: moved {m['text'][:48]!r} by {m['by']} to {m['at']}" + (" with a leader" if m["leader"] else ""))
+        print(f"  {out_svg.stem}: moved {m['text'][:48]!r} by {m['by']} to {m['at']}" + (f" {m['leader']}" if m["leader"] else ""))
     out_svg.parent.mkdir(parents=True, exist_ok=True)
     out_svg.write_text(svg, encoding="utf-8")
     cairosvg.svg2pdf(bytestring=svg.encode("utf-8"), write_to=str(out_svg.with_suffix(".pdf")))

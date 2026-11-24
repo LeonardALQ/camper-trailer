@@ -1,20 +1,25 @@
-"""The label overrun check on the built sheets (F6-04, fx10, I2-64): every sheet SVG in a folder, read in its drawing order,
-for the text a mark shows through, the texts whose letters overlap and the masks that break a heavy line, sheet by sheet.
+"""The label overrun check on the built sheets (F6-04, fx10, I2-64, I2-69): every sheet SVG in a folder, read in its drawing
+order, for the text a mark shows through, the texts whose letters overlap, the masks that break a heavy line and the
+leaders that go wrong, sheet by sheet.
 
 - A line hit is a stroked line, an arrowhead, a symbol circle or the frame that crosses the cores of a text's letters
   (cad/drawings/sheet.py text_core, each text measured in DejaVu Sans as CairoSVG draws it, up to its capitals' height,
   each line at its stroke's width) and shows: drawn after the text, or before it with no white mask or fill between
   them. A free label that a line crosses is masked by the sheet (sheet.knockouts), so the line breaks at its letters and
-  is not a hit. A table cell's text is never masked, so a line through one is.
+  is not a hit, nor is a line under a white fill (a symbol's or a box's background) drawn between it and the text. A
+  table cell's text is never masked, so a line through one is.
 - A text overlap is two texts whose letters overlap, or a text that another text's mask or a white fill (a table, the
   title block) drawn after it covers. Here a text's letters run from its baseline up to its capitals' height.
 - A mask break is a text's white mask drawn over a heavy line, one of sheet.HEAVY's 0.35 mm or more (medium, symbol,
   thick, cut, frame and the red fail line), so the mask cuts a gap in an outline or a run. A mask may break the thin
   lines under 0.35 mm (thin, hidden, centre, phantom, hatch, grey), as dimension text does.
+- A leader fault is a leader (a path the sheet marks class="leader") that ends off what its label names, where the sheet
+  says what that is (data-names: a point, a box or a symbol's circle, sheet.Sheet.text), two leaders that cross, or a
+  leader through a symbol (a circle of sheet.SYMBOL_R or less, a dot) other than the one its named end is in.
 
     python -m cad.tools.overrun build/drawings [report.json]
 
-prints each sheet's counts and the places, writes them to the report, and exits 1 when any sheet has any of the three."""
+prints each sheet's counts and the places, writes them to the report, and exits 1 when any sheet has any of the four."""
 from __future__ import annotations
 
 import html
@@ -24,13 +29,14 @@ import re
 import sys
 from pathlib import Path
 
-from cad.drawings.sheet import CAPS, HEAVY, _enters, _segments, text_core
+from cad.drawings.sheet import (CAPS, HEAVY, _crossing, _enters, _path_pts, _seg_dist, _segments, _symbol_circles, on_target,
+                                read_target, text_core)
 
 _TEXT = re.compile(r"<text ([^>]*)>(.*)</text>")
 _RECT = re.compile(r'<rect x="([-\d.]+)" y="([-\d.]+)" width="([\d.]+)" height="([\d.]+)" fill="#fff"([^>]*)/>')
 _ROT = re.compile(r'rotate\(([-\d.]+) ([-\d.]+) ([-\d.]+)\)')
 G = 5.0
-CLASSES = ("line_hits", "text_overlaps", "mask_breaks")
+CLASSES = ("line_hits", "text_overlaps", "mask_breaks", "leader_faults")
 
 
 def _attr(a: str, name: str, default=None):
@@ -80,20 +86,21 @@ def read_sheet(svg: str) -> dict:
             rot = _ROT.search(m[5])
             covers.append(_cover(n, (x, x + w, y, y + h), *(map(float, rot.groups()) if rot else (0.0, 0.0, 0.0)), mask=True))
     segs, fills = _segments(el, every=True)
-    covers += [_cover(n, b, 0.0, 0.0, 0.0) for b, n in fills]
-    return dict(el=el, texts=texts, segs=segs, covers=covers)
+    covers += [_cover(f.n, f.box, 0.0, 0.0, 0.0, circle=f.circle) for f in fills]
+    leaders = [dict(i=n, pts=_path_pts(e), names=read_target(e)) for n, e in enumerate(el) if e.startswith("<path") and 'class="leader"' in e]
+    return dict(el=el, texts=texts, segs=segs, covers=covers, leaders=leaders, symbols=_symbol_circles(el))
 
 
 def _bounds(ring: list) -> tuple:
     return (min(p[0] for p in ring), max(p[0] for p in ring), min(p[1] for p in ring), max(p[1] for p in ring))
 
 
-def _cover(i: int, box: tuple, rot: float, cx: float, cy: float, mask: bool = False) -> dict:
+def _cover(i: int, box: tuple, rot: float, cx: float, cy: float, mask: bool = False, circle: tuple | None = None) -> dict:
     """A white mask or fill drawn at element i: its box in its own frame, rotated by `rot` about (cx, cy), its corners
-    on the sheet and their bounds."""
+    on the sheet and their bounds, and for a disc its circle (cx, cy, r)."""
     to_sheet, to_local = _frame(rot, cx, cy)
     ring = [to_sheet(p) for p in ((box[0], box[2]), (box[1], box[2]), (box[1], box[3]), (box[0], box[3]))]
-    return dict(i=i, box=box, to_local=to_local, ring=ring, bbox=_bounds(ring), mask=mask)
+    return dict(i=i, box=box, to_local=to_local, ring=ring, bbox=_bounds(ring), mask=mask, circle=circle)
 
 
 def _near(a: tuple, b: tuple) -> bool:
@@ -102,8 +109,30 @@ def _near(a: tuple, b: tuple) -> bool:
 
 def _covers(c: dict, t: dict) -> bool:
     """Does white cover c hide the whole of text t's letters' cores?"""
+    if c["circle"]:
+        cx, cy, r = c["circle"]
+        return all(math.hypot(q[0] - cx, q[1] - cy) <= r + 1e-6 for q in t["corners"])
     x0, x1, y0, y1 = c["box"]
     return all(x0 - 1e-6 <= p[0] <= x1 + 1e-6 and y0 - 1e-6 <= p[1] <= y1 + 1e-6 for p in (c["to_local"](q) for q in t["corners"]))
+
+
+def _holds(c: dict, pts: list) -> bool:
+    """Does white fill c paint over every one of the sheet points?"""
+    if c["circle"]:
+        cx, cy, r = c["circle"]
+        return all(math.hypot(q[0] - cx, q[1] - cy) <= r + 1e-6 for q in pts)
+    x0, x1, y0, y1 = c["box"]
+    return all(x0 - 1e-6 <= u <= x1 + 1e-6 and y0 - 1e-6 <= v <= y1 + 1e-6 for u, v in map(c["to_local"], pts))
+
+
+def _touches(c: dict, t: dict) -> bool:
+    """Does white cover c reach text t's letters?"""
+    if c["circle"]:
+        cx, cy, r = c["circle"]
+        u, v = t["to_local"]((cx, cy))
+        core = t["core"]
+        return math.hypot(max(core[0] - u, 0.0, u - core[1]), max(t["y"] - CAPS * t["s"] - v, 0.0, v - t["y"])) < r
+    return not _apart(c["ring"], t["letters"])
 
 
 def _apart(a: list, b: list) -> bool:
@@ -156,7 +185,7 @@ def check(svg: str) -> dict:
     hits, overlaps, breaks = [], [], []
     for t in texts:
         bx, core = t["bbox"], t["core"]
-        hidden = [c for c in covers if c["i"] > t["i"] and _near(c["bbox"], bx) and not _apart(c["ring"], t["letters"])]
+        hidden = [c for c in covers if c["i"] > t["i"] and _near(c["bbox"], bx) and _touches(c, t)]
         if hidden:
             overlaps.append(dict(_place(t), under=el[hidden[0]["i"]][:80]))
             continue
@@ -173,14 +202,41 @@ def check(svg: str) -> dict:
             if _near(t["bbox"], u["bbox"]) and not _apart(t["letters"], u["letters"]):
                 overlaps.append(dict(_place(t), other=u["t"], other_at=[round(u["x"], 2), round(u["y"], 2)]))
     by_index = {t["i"]: t for t in texts}
+    fills = [c for c in covers if not c["mask"]]
     for c in (c for c in covers if c["mask"]):
         t = by_index.get(c["i"] + 1)
         for k in _near_segs(grid, c["bbox"], 0.0):
             p, q, n, hw = segs[k]
-            if n < c["i"] and 2 * hw >= HEAVY - 1e-9 and _enters(c["to_local"](p), c["to_local"](q), c["box"]):
+            if n < c["i"] and 2 * hw >= HEAVY - 1e-9 and _enters(c["to_local"](p), c["to_local"](q), c["box"]) \
+                    and not any(n < f["i"] < c["i"] and _holds(f, c["ring"]) for f in fills):
                 breaks.append(dict(_place(t) if t else dict(text="", at=[]), line=el[n][:80]))
                 break
-    return dict(line_hits=hits, text_overlaps=overlaps, mask_breaks=breaks)
+    return dict(line_hits=hits, text_overlaps=overlaps, mask_breaks=breaks, leader_faults=leader_faults(sh))
+
+
+def leader_faults(sh: dict) -> list[dict]:
+    """The sheet's leaders that end off what their labels name, that cross another leader, or that pass through a
+    symbol other than the one their named end is in (I2-69)."""
+    out, leaders, el = [], sh["leaders"], sh["el"]
+    for ld in leaders:
+        pts, tgt = ld["pts"], ld["names"]
+        ends = [pts[0], pts[-1]]
+        if tgt:
+            ends = [p for p in ends if on_target(p, tgt)]
+            if not ends:
+                out.append(dict(kind="off what it names", at=[round(v, 2) for v in pts[-1]], names=" ".join(str(v) for v in tgt), line=el[ld["i"]][:80]))
+                continue
+        for cx, cy, r, n in sh["symbols"]:
+            if any(math.hypot(p[0] - cx, p[1] - cy) <= r + 0.05 for p in ends):
+                continue
+            if any(_seg_dist((cx, cy), a, b) < r - 0.05 for a, b in zip(pts, pts[1:])):
+                out.append(dict(kind="through a symbol", at=[round(cx, 2), round(cy, 2)], names=f"r {r:g}", line=el[ld["i"]][:80]))
+                break
+    for k, a in enumerate(leaders):
+        for b in leaders[k + 1:]:
+            if any(_crossing(p, q, u, v) for p, q in zip(a["pts"], a["pts"][1:]) for u, v in zip(b["pts"], b["pts"][1:])):
+                out.append(dict(kind="crosses a leader", at=[round(v, 2) for v in a["pts"][-1]], names=el[b["i"]][:60], line=el[a["i"]][:80]))
+    return out
 
 
 def main(argv: list[str]) -> int:
@@ -193,20 +249,22 @@ def main(argv: list[str]) -> int:
     for f in sheets:
         r = check(f.read_text(encoding="utf-8"))
         report[f.stem] = r
-        nh, no, nm = (len(r[k]) for k in CLASSES)
-        bad += bool(nh or no or nm)
-        print(f"{f.stem}: {nh} line hits, {no} text overlaps, {nm} mask breaks")
+        nh, no, nm, nl = (len(r[k]) for k in CLASSES)
+        bad += bool(nh or no or nm or nl)
+        print(f"{f.stem}: {nh} line hits, {no} text overlaps, {nm} mask breaks, {nl} leader faults")
         for h in r["line_hits"]:
             print(f"  line hit: {h['text']!r} at {h['at']} by {h['line']}")
         for o in r["text_overlaps"]:
             print(f"  text overlap: {o['text']!r} at {o['at']} with " + (f"{o['other']!r} at {o['other_at']}" if "other" in o else f"a cover {o['under']}"))
         for m in r["mask_breaks"]:
             print(f"  mask break: {m['text']!r} at {m['at']} over {m['line']}")
+        for x in r["leader_faults"]:
+            print(f"  leader fault: {x['kind']} at {x['at']} ({x['names']}): {x['line']}")
     if len(argv) > 1:
         Path(argv[1]).write_text(json.dumps(report, indent=1), encoding="utf-8")
     n = {k: sum(len(r[k]) for r in report.values()) for k in CLASSES}
-    print(f"overrun: {n['line_hits']} line hits, {n['text_overlaps']} text overlaps and {n['mask_breaks']} mask breaks "
-          f"on {len(sheets)} sheets, {bad} with any")
+    print(f"overrun: {n['line_hits']} line hits, {n['text_overlaps']} text overlaps, {n['mask_breaks']} mask breaks and "
+          f"{n['leader_faults']} leader faults on {len(sheets)} sheets, {bad} with any")
     return 1 if bad else 0
 
 
