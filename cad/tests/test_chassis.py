@@ -1,11 +1,12 @@
 """The chassis frame analysis (cad/chassis_fea.py): the load mapping balances, and the composite rail matches hand
 arithmetic."""
 import math
+import re
 
 import pytest
 
 from cad.chassis import fitting_boxes
-from cad.chassis_fea import end_plate
+from cad.chassis_fea import end_plate, principal_range
 from cad.tests.test_trailer import EV, TRAILER
 
 RES = TRAILER.chassis_results(EV["layout"])
@@ -182,3 +183,45 @@ def test_fat20_reads_the_heel_where_the_gusset_stands():
     assert p["centre"] == pytest.approx(span / 2 - (V["rail_c"] - V["root_gusset_heel_y"]))
     assert math.tan(p["angle"]) == pytest.approx((V["root_gusset_heel_y"] - CH.db_y(V["root_gusset_toe_x"])) / g["l"])
     assert abs(p["webs"][0].max() - p["webs"][1].max()) < 0.05 * p["webs"][0].max()
+
+
+def test_heel_fillets_on_their_skewed_joint():
+    """The gusset meets the end plate about 20 degrees off its normal in plan, so its heel's inboard fillet lies in the
+    acute dihedral angle and the outboard one in the obtuse (I2-72): 8 mm legs both sides give throats of 6.55 and
+    4.59 mm there and 5.66 mm on a square joint, and the data's legs give both throats at least that 5.66 mm."""
+    from cad.chassis_fea import Analysis, heel_throats
+    assert heel_throats((8, 8), 0.0) == pytest.approx((8 / math.sqrt(2), 8 / math.sqrt(2)))
+    assert heel_throats((8, 8), math.radians(19.91)) == pytest.approx((6.55, 4.59), abs=0.01)
+    lay, ch, _ = TRAILER._chassis
+    g = next(f for f in CH.data["fittings"] if f["id"] == "CH-P03")
+    p = Analysis(lay, TRAILER, ch).end_plate_under_heel(20.0, 180.0)
+    assert min(heel_throats(g["heel_legs"], p["angle"])) >= 8 / math.sqrt(2)
+
+
+def test_principal_range_of_a_weld():
+    """FAT-20 reads a weld's normal and shear ranges, in phase, as their maximum principal stress range (IIW 4.2 b,
+    I2-67): the normal range alone with no shear, the shear range at 45 degrees with no normal range, and the inboard
+    web's 17.47 MPa normal and 10.76 MPa shear of 8e7e9bb as 22.59 MPa, 25.5 degrees off the weld's normal."""
+    assert principal_range(17.5, 0.0) == pytest.approx((17.5, 0.0))
+    assert principal_range(0.0, 10.0) == pytest.approx((10.0, 45.0))
+    rng, angle = principal_range(17.47, 10.76)
+    assert rng == pytest.approx(22.59, abs=0.01) and angle == pytest.approx(25.5, abs=0.05)
+
+
+def test_fat20_reads_the_principal_stress_with_its_roots_inspected():
+    """FAT-20 is IIW 415 at FAT 71, as the end plates' weld roots are inspected by videoscope, and its range is the
+    governing weld's maximum principal stress range, its direction inside the 60 degrees off the weld's normal to which
+    IIW 4.3 holds the principal stress (I2-67)."""
+    row = next(r for r in RES["fatigue"] if r["id"] == "FAT-20")
+    assert row["iiw"] == "415" and row["fat"] == 71 and row["cafl"] == pytest.approx(0.585 * 71)
+    assert int(re.search(r"its principal stress (\d+) degrees off", row["where"]).group(1)) <= 60
+
+
+def test_the_videoscope_reaches_each_end_plates_weld_roots():
+    """FAT-20's class rests on viewing each end plate's weld roots from inside the rail (I2-67), and the videoscope goes
+    in through a hole in the rail's web: each rail has one of at least 10 mm, room for a 6 mm probe, within 150 mm
+    behind its end plate."""
+    for side in ("K", "R"):
+        near = [h for h in RES["holes"] if h.get("frame") == f"RL-{side}" and h["wall"].startswith("the rail's")
+                and 0 < h["x"] - CH.V["body_x0"] <= 150 and h["d"] >= 10]
+        assert near, side

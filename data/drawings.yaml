@@ -224,6 +224,7 @@ drawings:
       - {rev: V, date: 2026-11-23, description: "Notice: the root gussets on the A-frame members' top faces (I2-51)", drawn: Kiro, checked: "", approved: ""}
       - {rev: W, date: 2026-11-23, description: "Notice: the rail end plates over the raisers' bottom walls (I2-57)", drawn: Kiro, checked: "", approved: ""}
       - {rev: X, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: Y, date: 2026-11-24, description: "Memo: the chassis data's revision I in the title block (I2-67, I2-72)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
@@ -253,6 +254,7 @@ drawings:
       - {rev: Q, date: 2026-11-23, description: "Notice: the root gussets on the A-frame members' top faces (I2-51)", drawn: Kiro, checked: "", approved: ""}
       - {rev: R, date: 2026-11-23, description: "Notice: end plates welded full penetration from outside, FAT-20 (I2-57)", drawn: Kiro, checked: "", approved: ""}
       - {rev: S, date: 2026-11-24, description: "Notice: the root gusset's heel 3 mm inboard of mid-plate, view C1 (I2-60)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: T, date: 2026-11-24, description: "Notice: heel fillets 7 and 10 mm on the skewed joint, roots by videoscope", drawn: Kiro, checked: "", approved: ""}
   - number: CT-103
     title: Chassis details
     subtitle: Composite rail, outrigger root, crossmember to rail, overlap end, jacking pad, recovery tongue, spare posts
@@ -285,6 +287,7 @@ drawings:
       - {rev: T, date: 2026-11-23, description: "Notice: FAT-07 at IIW 522, FAT-17 to FAT-19 at the body front (I2-51)", drawn: Kiro, checked: "", approved: ""}
       - {rev: U, date: 2026-11-23, description: "Notice: FAT-20, the end plates' welds, FAT-19's free bottom edge (I2-57)", drawn: Kiro, checked: "", approved: ""}
       - {rev: V, date: 2026-11-24, description: "Notice: FAT-17 to FAT-20 on the heel's place and its pull's line (I2-60)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: W, date: 2026-11-24, description: "Notice: FAT-20 on the principal stress at FAT 71, FAT-18's smaller throat", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads
