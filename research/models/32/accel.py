@@ -33,6 +33,11 @@ CRR = 0.011  # rolling resistance, the truck's LT tyres and the trailer's (est.)
 CDA = 4.55  # m2, report 25's option A+: the ute, the bike box and the trailer with its radiused front
 WHEELS_EQ = 0.6 * 48.0 * 4 + 0.6 * 35.0 * 4  # kg, four 48 kg truck wheels and four 35 kg trailer wheels, I/r2 of 0.6 m (est.)
 FIRST_CAP = 600.0  # Nm, Ford's figure, kept in first, reverse and low range at every level
+# One factor on the force at the tyres, fitted on 24 Nov 2026 to three measurements of stock Super Duties (calibration()
+# below). It stands for what the model cannot separate: the real crank to road efficiency, each engine's real output
+# against its rating and how the tests read speed. It applies to every level, as the tuned figures are crank ratings
+# like Ford's. 1.00 is the model as first built.
+CALIB = 1.08  # (est., fitted)
 
 # The combination's masses, kg. UTE-06's GCM case is the ute with growth (3,748 kg) and the trailer at its 4,000 kg
 # plate. TC2 with growth is the trailer fully loaded with 400 L of water and growth (3,575.6 kg, TRAILER.md).
@@ -100,10 +105,10 @@ class Rig:
     """A vehicle or a combination: its mass, the mass on its driven tyres, drag, rolling resistance, wheels and gearing."""
 
     def __init__(self, mass, n_drive_kg, cda=CDA, crr=CRR, wheels_eq=WHEELS_EQ, tyre_r=TYRE_R, final=FINAL_DRIVE,
-                 eta=ETA, shift_lost=SHIFT_LOST, tau=SPOOL_TAU, tr0=TR0):
+                 eta=ETA, shift_lost=SHIFT_LOST, tau=SPOOL_TAU, tr0=TR0, calib=CALIB):
         self.mass, self.n_drive, self.cda, self.crr = mass, n_drive_kg * G, cda, crr
         self.wheels_eq, self.r, self.final, self.eta = wheels_eq, tyre_r, final, eta
-        self.shift_lost, self.tau, self.tr0 = shift_lost, tau, tr0
+        self.shift_lost, self.tau, self.tr0, self.calib = shift_lost, tau, tr0, calib
 
     def rpm(self, v, gear):
         return v / self.r * RATIOS[gear] * self.final * 60 / (2 * math.pi)
@@ -126,7 +131,7 @@ class Rig:
             t_e = min(FIRST_CAP, torque(n_e))
         else:
             n_e, tr, t_e = n_t, 1.0, torque(n_t)
-        f = t_e * spool * tr * RATIOS[gear] * self.final * self.eta / self.r
+        f = t_e * spool * tr * RATIOS[gear] * self.final * self.eta * self.calib / self.r
         return min(f, MU * self.n_drive), n_e
 
 
@@ -162,13 +167,13 @@ def run(rig, torque, v_from, v_to, dt=0.01):
 
 
 def steady_speed(rig, torque, extra_n):
-    """The highest steady speed in km/h at full power against the road load and extra_n of drawbar pull."""
-    best = 0
-    for kmh in range(20, 181):
-        v = kmh / 3.6
+    """The highest steady speed in km/h, to 0.25 km/h, at full power against the road load and extra_n of pull."""
+    best = 0.0
+    for step in range(80, 721):
+        v = step / 4 / 3.6
         forces = [rig.drive(torque, g, v, 1.0)[0] for g in range(1, len(RATIOS)) if 1200 <= rig.rpm(v, g) <= N_MAX]
         if forces and max(forces) >= rig.road(v) + extra_n:
-            best = kmh
+            best = step / 4
     return best
 
 
@@ -185,28 +190,53 @@ def power_for(rig, target_s, lo=180.0, hi=263.0):
     return hi
 
 
-def checks():
-    """The model against CarExpert's VBox runs of unladen trucks, with 0.2 s and with no time lost at each upshift."""
-    print("Checks against published tests, unladen (0.2 s lost at each upshift / none lost)")
+def calibration():
+    """The three measurements of stock Super Duties, the model's figure for each as first built (factor 1.00) and as
+    calibrated (CALIB), and the factor each measurement alone implies. Plus the ordinary Ranger V6 as a check."""
     stock = curve(LEVELS["stock"][1])
-    for lost in (SHIFT_LOST, 0.0):
-        ranger = Rig(2415.0, 2415.0, cda=1.45, crr=0.010, wheels_eq=0.6 * 40.0 * 4, tyre_r=0.38, shift_lost=lost)
-        print(f"  {lost:.1f} s: ordinary Ranger V6, 2,415 kg with the driver (est.), 255/65 R18 (est.): 0 to 100 km/h "
-              f"{run(ranger, curve(LEVELS['ranger'][1]), 0, 100):.1f} s, tested 8.2 to 8.5 s")
-        for m in (3050.0, 3300.0):
-            sd = Rig(m, m, cda=1.85, wheels_eq=0.6 * 48.0 * 4, shift_lost=lost)
-            print(f"  {lost:.1f} s: Super Duty dual cab chassis with its tray at {m:,.0f} kg (est.): 0 to 100 km/h "
-                  f"{run(sd, stock, 0, 100):.1f} s, tested 13.23 s, 80 to 120 km/h {run(sd, stock, 80, 120):.1f} s, tested 11.99 s")
-    sd = Rig(3050.0, 3050.0, cda=1.85, wheels_eq=0.6 * 48.0 * 4)
-    print(f"  The same truck at full power against CarExpert's 6.0 kN trailer dynamometer: steady "
-          f"{steady_speed(sd, stock, 6000):d} km/h, tested about 78 km/h at first, then about 10 km/h less as the engine's "
-          "temperature rose")
+    # CarExpert's dual cab chassis: Ford's 2,675 kg kerb (sheet of 29 Oct 2026), a heavy-duty tray, a toolbox, the
+    # crew and the gear, 3,150 kg (est., 3,050 to 3,300). Leonard's figure: a stock Super Duty with a tray towing 4 t,
+    # about 7,000 kg in all with about 3,300 kg on the truck's tyres (est.), behind a flat deck (CdA 2.5 m2, est.) or a
+    # caravan (4.5 m2, est.).
+    cab = lambda c, m=3150.0: Rig(m, m, cda=1.85, wheels_eq=0.6 * 48.0 * 4, calib=c)
+    tow = lambda c, cda: Rig(7000.0, 3300.0, cda=cda, calib=c)
+    figures = [
+        ("CarExpert, unladen 0 to 100 km/h, s", 13.23, lambda c: run(cab(c), stock, 0, 100)),
+        ("CarExpert, unladen 80 to 120 km/h, s", 11.99, lambda c: run(cab(c), stock, 80, 120)),
+        ("CarExpert, 6.0 kN trailer dyno, cool, km/h", 78.0, lambda c: steady_speed(cab(c), stock, 6000)),
+        ("CarExpert, 6.0 kN trailer dyno, hot, km/h", 68.0, lambda c: steady_speed(cab(c), stock, 6000)),
+        ("Leonard, 4 t, 0 to 100 km/h, flat deck, s", 28.0, lambda c: run(tow(c, 2.5), stock, 0, 100)),
+        ("Leonard, 4 t, 0 to 100 km/h, caravan, s", 28.0, lambda c: run(tow(c, 4.5), stock, 0, 100)),
+    ]
+    print(f"Calibration: three measurements of stock Super Duties, the model at factor 1.00 and at {CALIB:.2f}, and the "
+          "factor each alone implies")
+    implied = {}
+    for label, target, fn in figures:
+        lo, hi = 0.70, 1.50
+        rising = fn(1.2) > fn(1.0)  # a steady speed rises with the factor, a time falls
+        for _ in range(25):
+            mid = (lo + hi) / 2
+            if (fn(mid) < target) == rising:
+                lo = mid
+            else:
+                hi = mid
+        implied[label] = (lo + hi) / 2
+        print(f"  {label:44s} tested {target:6.2f}, model {fn(1.0):6.2f} at 1.00, {fn(CALIB):6.2f} at {CALIB:.2f}, "
+              f"implies {implied[label]:.3f}")
+    for m in (3050.0, 3300.0):
+        print(f"  The unladen runs at {m:,.0f} kg: {run(cab(1.0, m), stock, 0, 100):.2f} s and {run(cab(1.0, m), stock, 80, 120):.2f} s "
+              f"at 1.00, {run(cab(CALIB, m), stock, 0, 100):.2f} s and {run(cab(CALIB, m), stock, 80, 120):.2f} s at {CALIB:.2f}")
+    for c in (1.0, CALIB):
+        ranger = Rig(2415.0, 2415.0, cda=1.45, crr=0.010, wheels_eq=0.6 * 40.0 * 4, tyre_r=0.38, calib=c)
+        print(f"  Check, ordinary Ranger V6, 2,415 kg with the driver (est.): 0 to 100 km/h "
+              f"{run(ranger, curve(LEVELS['ranger'][1]), 0, 100):.1f} s at {c:.2f}, tested 8.2 to 8.5 s")
     print()
+    return implied
 
 
-def results(lost):
+def results(calib):
     print(f"Towing on a flat road in still air, CdA 4.55 m2, Crr 0.011 (est.), the 10R80's ratios on a 3.73 final drive "
-          f"(est.), {lost:.1f} s lost at each upshift")
+          f"(est.), {SHIFT_LOST:.1f} s lost at each upshift, factor {calib:.2f}. Wheel figures are crank x {ETA:.2f}, the plan's convention")
     print(f"{'Level':38s} {'Crank kW':>8s} {'Wheel kW':>8s} {'Wheel hp':>8s} " +
           " ".join(f"{int(m):>7d} kg" for _, m in MASSES))
     for key in TABLE:
@@ -215,28 +245,40 @@ def results(lost):
         peak = max(kw(torque(n), n) for n in range(1000, 4200, 10))
         cells = []
         for _, m in MASSES:
-            rig = Rig(m, N_DRIVE_KG, shift_lost=lost)
+            rig = Rig(m, N_DRIVE_KG, calib=calib)
             cells.append(f"{run(rig, torque, 0, 100):5.1f}/{run(rig, torque, 80, 100):4.1f}")
         print(f"{name:38s} {peak:8.0f} {peak * ETA:8.0f} {peak * ETA / 0.7457:8.0f} " + " ".join(f"{c:>10s}" for c in cells))
     print("Each cell: 0 to 100 km/h s / 80 to 100 km/h s")
     print("0 to 80 km/h at 7,750 kg: " + ", ".join(
-        f"{LEVELS[k][0].split(',')[1].strip()} {run(Rig(7750.0, N_DRIVE_KG, shift_lost=lost), curve(LEVELS[k][1]), 0, 80):.1f} s"
+        f"{LEVELS[k][0].split(',')[1].strip()} {run(Rig(7750.0, N_DRIVE_KG, calib=calib), curve(LEVELS[k][1]), 0, 80):.1f} s"
         for k in TABLE))
     print()
 
 
-def power_for_22():
-    print("Peak crank power on the 700 Nm family for 0 to 100 km/h in 22.0 s, 0.2 s / no time lost at each upshift "
-          "(the cap reaches 264 kW at 3,600 rpm)")
+def bracket(factors):
+    print("0 to 100 km/h / 80 to 100 km/h at 7,750 kg under each factor: " + ", ".join(f"{label} {c:.3f}" for label, c in factors))
+    for key in TABLE:
+        torque = curve(LEVELS[key][1])
+        cells = []
+        for _, c in factors:
+            rig = Rig(7750.0, N_DRIVE_KG, calib=c)
+            cells.append(f"{run(rig, torque, 0, 100):5.1f}/{run(rig, torque, 80, 100):4.1f}")
+        print(f"  {LEVELS[key][0]:38s} " + " ".join(f"{x:>11s}" for x in cells))
+    print()
+
+
+def power_for_22(factors):
+    print("Peak crank power on the 700 Nm family for 0 to 100 km/h in 22.0 s, under each factor (the cap reaches 264 kW at "
+          "3,600 rpm). Wheel figures are crank x 0.85")
     for label, m in MASSES:
         parts = []
-        for lost in (SHIFT_LOST, 0.0):
-            p = power_for(Rig(m, N_DRIVE_KG, shift_lost=lost), 22.0)
-            parts.append("over 263 kW" if p is None else f"{p:.0f} kW at the crank, {p * ETA:.0f} kW ({p * ETA / 0.7457:.0f} hp) at the wheels")
-        print(f"  {int(m):,} kg, {label}: " + " / ".join(parts))
+        for flabel, c in factors:
+            p = power_for(Rig(m, N_DRIVE_KG, calib=c), 22.0, lo=120.0)
+            parts.append(f"{flabel}: " + ("over 263 kW" if p is None else f"{p:.0f} kW ({p * ETA:.0f} kW, {p * ETA / 0.7457:.0f} hp)"))
+        print(f"  {int(m):,} kg, {label}: " + ", ".join(parts))
     for target in (24.0, 25.0):
-        p = power_for(Rig(7750.0, N_DRIVE_KG), target)
-        print(f"  7,750 kg for {target:.0f} s with 0.2 s lost at each upshift: " + ("over 263 kW" if p is None else f"{p:.0f} kW at the crank"))
+        p = power_for(Rig(7750.0, N_DRIVE_KG), target, lo=120.0)
+        print(f"  7,750 kg for {target:.0f} s at {CALIB:.2f}: " + ("over 263 kW" if p is None else f"{p:.0f} kW at the crank"))
     print()
 
 
@@ -253,15 +295,14 @@ def caps():
 
 
 def sensitivity():
-    print(f"{LEVELS['new'][0]} at 7,750 kg, one input changed at a time (0 to 100 km/h s)")
+    print(f"{LEVELS['new'][0]} at 7,750 kg and factor {CALIB:.2f}, one input changed at a time (0 to 100 km/h s)")
     torque = curve(LEVELS["new"][1])
     base = run(Rig(7750.0, N_DRIVE_KG), torque, 0, 100)
     cases = [("as above", {}), ("final drive 4.10 (est.)", dict(final=4.10)), ("final drive 3.55 (est.)", dict(final=3.55)),
              ("0.4 s lost at each upshift", dict(shift_lost=0.40)), ("no time lost at upshifts", dict(shift_lost=0.0)),
              ("spool time constant 1.2 s", dict(tau=1.2)), ("converter stall ratio 1.5", dict(tr0=1.5)),
-             ("crank to wheel 0.82", dict(eta=0.82)),
-             ("crank to wheel 0.88", dict(eta=0.88)), ("Crr 0.013", dict(crr=0.013)), ("CdA 15 % more", dict(cda=CDA * 1.15)),
-             ("CdA 15 % less", dict(cda=CDA * 0.85))]
+             ("factor 1.00, as first built", dict(calib=1.0)), ("factor 1.19", dict(calib=1.19)),
+             ("Crr 0.013", dict(crr=0.013)), ("CdA 15 % more", dict(cda=CDA * 1.15)), ("CdA 15 % less", dict(cda=CDA * 0.85))]
     for label, kwargs in cases:
         t = run(Rig(7750.0, N_DRIVE_KG, **kwargs), torque, 0, 100)
         print(f"  {label:32s} {t:5.1f} s ({t - base:+.1f})")
@@ -283,23 +324,25 @@ def bands():
 
 def climbs():
     """Speeds held on long grades at 7,750 kg, and the crank power a speed needs there: the heat the cooling must reject."""
-    print("Long climbs at 7,750 kg: the steady speed at full power, km/h, and the crank power to hold 80 and 100 km/h")
+    print(f"Long climbs at 7,750 kg and factor {CALIB:.2f}: the steady speed at full power, km/h, and the crank power to "
+          "hold 80 and 100 km/h")
     rig = Rig(7750.0, N_DRIVE_KG)
     for grade in (0.04, 0.06, 0.08):
         pull = rig.mass * G * math.sin(math.atan(grade))
-        speeds = ", ".join(f"{LEVELS[k][0].split(',')[1].strip()} {steady_speed(rig, curve(LEVELS[k][1]), pull)}"
+        speeds = ", ".join(f"{LEVELS[k][0].split(',')[1].strip()} {steady_speed(rig, curve(LEVELS[k][1]), pull):.0f}"
                            for k in TABLE)
-        need = [(rig.road(v / 3.6) + pull) * v / 3.6 / ETA / 1000 for v in (80, 100)]
+        need = [(rig.road(v / 3.6) + pull) * v / 3.6 / (ETA * CALIB) / 1000 for v in (80, 100)]
         print(f"  {grade * 100:.0f} %: {speeds}. Holding 80 km/h takes {need[0]:.0f} kW at the crank, 100 km/h {need[1]:.0f} kW")
     print()
 
 
 if __name__ == "__main__":
-    checks()
-    results(SHIFT_LOST)
-    results(0.0)
+    implied = calibration()
+    caravan = implied["Leonard, 4 t, 0 to 100 km/h, caravan, s"]
+    results(CALIB)
+    bracket([("as first built", 1.0), ("calibrated", CALIB), ("Leonard's 28 s as a caravan", caravan)])
     bands()
     caps()
-    power_for_22()
+    power_for_22([("1.00", 1.0), (f"{CALIB:.2f}", CALIB), (f"{caravan:.2f}", caravan)])
     sensitivity()
     climbs()
