@@ -700,7 +700,7 @@ def _resolve_run(r: dict, ns: dict, K: dict, rule: dict, fixtures: dict, pitch: 
         row["clamp"] = pts[1]     # its first path point, where the bracket clamps it (I2-78)
         rest = float(r["cut_m"]) * 1000 - float(r["lift"]["clip_mm"]) - fillet(pts[1:], k["bend_r"])["length"]
         row["lift"] = dict(r["lift"], rest_mm=round(rest, 1))     # the part from the strap to the clamp is what the cut leaves
-        pts = lift_drawn(row, pts, k["kg_m"] * 9.81 / 1000.0, k["bend_r"])
+        pts = lift_drawn(row, pts, k["kg_m"] * 9.81 / 1000.0, float(r["lift"].get("seat_mm", k["bend_r"])))
         row["points"] = pts
     if not rigid:
         pts = smooth_jogs(pts, k["bend_r"])
@@ -1648,8 +1648,9 @@ def lifted(r: dict, rule: dict, V: dict, ball_drop: float = 0.0) -> dict:
     for ph in range(-int(rule["pitch_deg"]), int(rule["pitch_deg"]) + 1, 5):
         for yw in range(-int(rule["yaw_deg"]), int(rule["yaw_deg"]) + 1, 5):
             P = _turn(P0, pivot, yw, ph)
-            x = lift_rest(P, A, O, r["lift"], w, r["bend_r"])
-            if x is None or lift_rest(P, A, O, short, w, r["bend_r"]) is None:
+            seat = float(r["lift"].get("seat_mm", r["bend_r"]))
+            x = lift_rest(P, A, O, r["lift"], w, seat)
+            if x is None or lift_rest(P, A, O, short, w, seat) is None:
                 taut += 1
             if x is None:
                 continue
@@ -1674,7 +1675,7 @@ def lift_drawn(r: dict, pts: list, w: float, seat_r: float) -> list:
     x = lift_rest(pts[0], A, O, r["lift"], w, seat_r)
     if x is None:
         return pts
-    C, R = x["C"], float(seat_r)
+    C, R = x["C"], float(seat_r) + 1.0     # drawn 1 mm outside the seat, so its polyline keeps the bend radius
     arc = [(C[0] + R * math.sin(f), C[1], C[2] + R * math.cos(f)) for f in
            [-x["f1"] + (x["f1"] + x["f2"]) * k / 12 for k in range(13)]]
     near = lambda q: min(math.dist(q, x["T1"]), math.dist(q, x["T2"]), math.dist(q, A)) < 30.0     # noqa: E731

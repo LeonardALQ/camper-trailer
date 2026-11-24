@@ -120,6 +120,7 @@ drawings:
       - {rev: X, date: 2026-11-24, description: "The 12-pin lead over its sheave, lowest 248 mm in any turn (DIM-08, I2-70)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Y, date: 2026-11-24, description: "Notice: TC2 3,576 kg with growth, the axle group's 3,223 kg (I2-75)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Z, date: 2026-11-24, description: "Leads from the data: SB50 lead slides on its saddle, lowest 217 mm (DIM-08)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AA, date: 2026-11-24, description: "Leads held up by sprung arms, lowest 283 mm in any turn (DIM-08, I2-78)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-010
     title: Floor plan, bed up and bed down
     subtitle: Day and night plans, walkways, door swings, spaces kept clear and the bed positions
@@ -326,6 +327,7 @@ drawings:
       - {rev: S, date: 2026-11-23, description: "Notice: the body mounts with the brake leads aboard, 2,034 kg (I2-50)", drawn: Kiro, checked: "", approved: ""}
       - {rev: T, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
       - {rev: U, date: 2026-11-24, description: "Memo: the outdoor unit's leader ends inside the unit (I2-69)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: V, date: 2026-11-24, description: "Memo: hardpoint triangles marked as marks for the label check (I2-81)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-201
     title: Body shell
     subtitle: Kerb, road, front and rear walls, the fixed roof plan, the panels and every opening with its size
@@ -498,6 +500,7 @@ drawings:
       - {rev: N, date: 2026-11-24, description: "The TSC's supply with its 30 A MIDI fuse in DB-PL, D-14's SB120 (I2-61)", drawn: Kiro, checked: "", approved: ""}
       - {rev: O, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
       - {rev: P, date: 2026-11-24, description: "Memo: contactor letters K2, K4 and S1 kept in their circles (I2-69)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: Q, date: 2026-11-24, description: "Notice: SB50 lead K-14 1.28 m, the TSC's supply drops 1.96 % (I2-78)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-602
     title: Electrical layout
     subtitle: Battery plinth, board, inverter, cable routes, glands, outlets and the cable schedule
@@ -583,6 +586,7 @@ drawings:
       - {rev: P, date: 2026-11-23, description: "Notice: 400 L net, the HepvO trap valve TV-09 on the tray's drain (I2-45)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Q, date: 2026-11-23, description: "Notice: the centres at the axle X 4,485.2 with the brake leads (I2-50)", drawn: Kiro, checked: "", approved: ""}
       - {rev: R, date: 2026-11-24, description: "Notice: the centres at the axle X 4,485.5 with the end plates (I2-75)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: S, date: 2026-11-24, description: "Memo: flow arrows' polylines marked for the label check (I2-81)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-612
     title: Plumbing layout
     subtitle: Tanks, pump cabinet, drains with their falls, the shower well, fill and dump points
@@ -610,6 +614,7 @@ drawings:
       - {rev: O, date: 2026-11-23, description: "Notice: the HepvO along the wet face under the basin (I2-52)", drawn: Kiro, checked: "", approved: ""}
       - {rev: P, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Q, date: 2026-11-24, description: "Memo: the shower unit's leader ends inside the unit (I2-69)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: R, date: 2026-11-24, description: "Memo: the dump arrow drawn on its line for the label check (I2-81)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-621
     title: HVAC and ventilation
     subtitle: Split, heat-recovery pairs, extract, towing pressurisation, relief, hood, Combi ducts
@@ -631,6 +636,7 @@ drawings:
       - {rev: I, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-24, description: "Memo: fan letters A to D back in their circles, notes beside routes (I2-69)", drawn: Kiro, checked: "", approved: ""}
       - {rev: K, date: 2026-11-24, description: "Memo: the extract and relief arrows meet at V8 and V9, none cross (I2-76)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: L, date: 2026-11-24, description: "Notice: forward Combi ducts no longer cross, flows marked by level (I2-81)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-701
     title: Ute with the bike garage, general arrangement
     subtitle: Kerb-side elevations travelling and loading, plan, rear view, mass by case and the ute checks
@@ -685,6 +691,7 @@ drawings:
       - {rev: H, date: 2026-11-22, description: "Notice: owner-built, no engineer's review, weld note (H25)", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-23, description: "Notice: Ford's four pad pairs, flexible at the first, steel stubs, detail A", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: K, date: 2026-11-24, description: "Memo: the arrow's line marked for the label check (I2-81)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-703
     title: Ute garage doors and security
     subtitle: Rear view, kerb-side door, plan section through the barn doors, security layers
