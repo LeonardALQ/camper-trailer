@@ -677,11 +677,13 @@ class Analysis:
     def end_plate_under_heel(self, q_foot: float, q_top: float) -> dict:
         """The rail's end plate CH-P15 under the gusset heel's pull, q_foot at the heel's foot rising to q_top N/mm at its
         top along the gusset's line (FAT-19, FAT-20, I2-57, I2-60). The plate's bottom edge stands `lift` over the rail's
-        underside, 7 mm clear of the drawbar member and unwelded (I2-75), so it is free, and the plate spans up from it. Its sides and top are welded to the rail's webs and top flange with full penetration
+        underside, clear of the drawbar member and unwelded (I2-75), so it is free. Its sides and top are welded to the
+        rail's webs and top flange with full penetration
         single bevel welds made from outside, the plate behind each wall's end as the backing, and the plate stands up
         over the raiser's bottom wall, so its top weld joins both walls (`top_t`). The plate spans between the webs'
-        mid-planes and from the bottom wall's mid-plane up to the middle of the walls its top weld joins, as end_plate
-        takes it. The heel stands where the gusset's data puts it (root_gusset_heel_y), and the gusset's line runs from
+        mid-planes and from its free bottom edge (`edge` over the bottom wall's mid-plane) up to the middle of the walls
+        its top weld joins, as end_plate takes it, and the heel's pull below that edge goes into the plate there, on the
+        safe side. The heel stands where the gusset's data puts it (root_gusset_heel_y), and the gusset's line runs from
         the member's line at its toe to there, `angle` off the plate's normal in plan. The pull's part normal to the
         plate bends it (end_plate), spread across the heel's foot: the gusset's cut across the plate, its thickness over
         the cosine of that angle, and its two fillets' legs on the plate (I2-72). Its part along the plate, inboard, is
