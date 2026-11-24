@@ -1000,7 +1000,8 @@ def ct611(prj, model, bom, checks, reg, dwg):
     wire(sh, [(92, 232), (98, 232)], "cold", arrow=True)
     sh.text(99, 246.2, f"{V['water_full_l']:.0f} L NET. AT MOST {V['water_travel_l']:.0f} L IN TRAVEL (H13)", 1.15)
     # tank outlets to the pump chain
-    wire(sh, [(152, 256), (157, 256), (157, 215), (125, 215), (125, 212)], "cold")
+    wire(sh, [(152, 256), (157, 256), (157, 215), (125, 215)], "cold")
+    S.mark_flow(sh)       # the front tank's outlet joins the rear tank's at a tee, read with the arrows (I2-85)
     wire(sh, [(125, 222), (125, 212)], "cold", arrow=True)
     sh.text(158.5, 236, "OUTLETS JOINED", 1.15, rot=-90)
     box(sh, 98, 202, 152, 212, ["40-MESH STRAINER"], size=1.25)

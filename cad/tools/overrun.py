@@ -20,7 +20,9 @@ leaders that go wrong, sheet by sheet.
   than the one its named end is in. Two flows' lines marked at different levels (data-level: a duct under the floor,
   the air in the cabin) may cross, and pass a symbol marked at another level, as ducts at different heights do in plan,
   where two at one level, or a flow and an unmarked line, may not, and a flow may branch off another at a tee, an end
-  of one on the other's run with neither crossing the other through (I2-81). A text drawn in a symbol (data-in, sheet.mark_inside: a contactor's circle, a
+  of one on the other's run that meets it at TEE_DEG or more, with neither crossing the other through (I2-81, I2-85).
+  Two marked lines that run within LEAD_GAP of each other for more than ALONG_MM are drawn over each other, at any
+  level and at a tee (I2-85). A text drawn in a symbol (data-in, sheet.mark_inside: a contactor's circle, a
   balloon, a revision triangle) whose letters' middle ends up outside that symbol is one too (I2-76).
 
     python -m cad.tools.overrun build/drawings [report.json]
@@ -35,13 +37,15 @@ import re
 import sys
 from pathlib import Path
 
-from cad.drawings.sheet import (_SYM_IN, _SYM_OF, CAPS, HEAVY, LEAD_GAP, _crossing, _enters, _path_pts, _seg_dist, _segments, _symbol_circles,
-                                in_shape, is_leader, on_target, read_target, symbol_shape, text_core)
+from cad.drawings.sheet import (_SYM_IN, _SYM_OF, CAPS, HEAVY, LEAD_GAP, _crossing, _enters, _gap, _path_pts, _seg_dist, _seg_gap, _segments,
+                                _symbol_circles, in_shape, is_leader, on_target, read_target, symbol_shape, text_core)
 
 _TEXT = re.compile(r"<text ([^>]*)>(.*)</text>")
 _RECT = re.compile(r'<rect x="([-\d.]+)" y="([-\d.]+)" width="([\d.]+)" height="([\d.]+)" fill="#fff"([^>]*)/>')
 _ROT = re.compile(r'rotate\(([-\d.]+) ([-\d.]+) ([-\d.]+)\)')
 G = 5.0
+TEE_DEG = 20.0     # degrees: a tee's end meets the other flow's run at least this steeply (I2-85)
+ALONG_MM = 3.0     # mm: two marked lines that run within LEAD_GAP of each other further than this lie along each other (I2-85)
 CLASSES = ("line_hits", "text_overlaps", "mask_breaks", "leader_faults")
 
 
@@ -120,16 +124,48 @@ def _strict(p, q, a, b) -> bool:
     return side(a, b, p) * side(a, b, q) < 0 and side(p, q, a) * side(p, q, b) < 0
 
 
+def _meets(d, e) -> float:
+    """The angle in degrees between the lines along d and e, 0 to 90."""
+    n = math.hypot(*d) * math.hypot(*e)
+    return 0.0 if n < 1e-12 else math.degrees(math.acos(min(1.0, abs(d[0] * e[0] + d[1] * e[1]) / n)))
+
+
 def _branch(a: dict, b: dict, el: list) -> bool:
     """A flow that branches off another, as a schematic's tee does: both are arrows' lines, an end of one lies on the
-    other's run, and no piece of either crosses the other through (I2-81)."""
+    other's run and meets it at TEE_DEG or more, and no piece of either crosses the other through (I2-81, I2-85). An end
+    that lies along the other's run is no tee: the two are drawn over each other."""
     if 'class="arrow"' not in el[a["i"]] or 'class="arrow"' not in el[b["i"]]:
         return False
     A, B = a["pts"], b["pts"]
     if any(_strict(p, q, u, v) for p, q in zip(A, A[1:]) for u, v in zip(B, B[1:])):
         return False
-    return any(_seg_dist(e, u, v) < LEAD_GAP for e in (A[0], A[-1]) for u, v in zip(B, B[1:])) or \
-        any(_seg_dist(e, u, v) < LEAD_GAP for e in (B[0], B[-1]) for u, v in zip(A, A[1:]))
+    ends = [(A[0], A[1], B), (A[-1], A[-2], B), (B[0], B[1], A), (B[-1], B[-2], A)]
+    return any(_seg_dist(e, u, v) < LEAD_GAP and _meets((e[0] - f[0], e[1] - f[1]), (v[0] - u[0], v[1] - u[1])) >= TEE_DEG
+               for e, f, run in ends for u, v in zip(run, run[1:]))
+
+
+def _along(A: list, B: list, step: float = 0.1) -> float:
+    """The length (mm) of polyline A that lies within LEAD_GAP of polyline B, sampled every `step` mm along it."""
+    out = 0.0
+    for p, q in zip(A, A[1:]):
+        near = [(u, v) for u, v in zip(B, B[1:]) if _seg_gap(p, q, u, v) < LEAD_GAP]
+        if not near:
+            continue
+        L = math.dist(p, q)
+        n = max(1, int(math.ceil(L / step)))
+        for i in range(n):
+            t = (i + 0.5) / n
+            c = (p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t)
+            if any(_seg_dist(c, u, v) < LEAD_GAP for u, v in near):
+                out += L / n
+    return out
+
+
+def run_along(A: list, B: list) -> float:
+    """How far two marked lines run along each other within LEAD_GAP, mm: the longer of each one's length near the
+    other. A crossing at a right angle reads 1 mm and a tee at TEE_DEG under 3 mm, so more than ALONG_MM is two lines
+    drawn over each other, at any level and whether or not they share an end (I2-85)."""
+    return max(_along(A, B), _along(B, A))
 
 
 def _bounds(ring: list) -> tuple:
@@ -280,6 +316,13 @@ def leader_faults(sh: dict) -> list[dict]:
                 break
     for k, a in enumerate(leaders):
         for b in leaders[k + 1:]:
+            if _gap(_bounds(a["pts"]), _bounds(b["pts"])) >= LEAD_GAP:
+                continue
+            run = run_along(a["pts"], b["pts"])
+            if run > ALONG_MM:
+                out.append(dict(kind=f"runs along a leader for {run:.1f} mm", at=[round(v, 2) for v in a["pts"][-1]], names=el[b["i"]][:60],
+                                line=el[a["i"]][:80]))
+                continue
             if _apart_levels(a["level"], b["level"]) or _branch(a, b, el):
                 continue
             if any(_crossing(p, q, u, v) for p, q in zip(a["pts"], a["pts"][1:]) for u, v in zip(b["pts"], b["pts"][1:])):

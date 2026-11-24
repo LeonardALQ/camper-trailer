@@ -326,3 +326,43 @@ def test_a_leader_through_a_hardpoints_mark_is_a_leader_fault():
     sh.text(240, 160, "TAG", 2.0)
     sh.lead([(244, 159), (276, 140)], names=(276, 140))
     assert _counts(sh.svg(clear=False)) == (0, 0, 0, 1)
+
+
+def test_two_flows_drawn_over_each_other_are_no_tee_at_any_level():
+    """I2-85: two flows on one line, one lying 10 mm along the other, are drawn over each other, not a tee, so they
+    fail at one level and at two levels apart. A branch that meets the other's run at a right angle still passes."""
+    for lv in (("floor", "floor"), ("floor", "cabin"), (None, None)):
+        sh = _sheet()
+        _flow(sh, [(240, 150), (240, 170)], lv[0])
+        _flow(sh, [(240, 160), (240, 190)], lv[1])
+        r = check(sh.svg(clear=False))
+        assert len(r["leader_faults"]) == 1 and "runs along" in r["leader_faults"][0]["kind"], (lv, r["leader_faults"])
+    sh = _sheet()
+    _flow(sh, [(240, 150), (240, 190)], "floor")
+    _flow(sh, [(240, 170), (262, 170)], "floor")
+    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 0)
+
+
+def test_an_end_that_joins_a_run_along_it_is_no_tee():
+    """I2-85: a flow whose last segment comes in along the other's run, 6 degrees off it, meets it at no angle a tee
+    has, so it fails as a crossing, where the same end turned to meet the run square passes."""
+    sh = _sheet()
+    _flow(sh, [(240, 150), (240, 190)])
+    sh.path([(242.7, 140), (240.3, 165)], "thin")
+    S.mark_flow(sh)
+    sh2 = _sheet()
+    _flow(sh2, [(240, 150), (240, 190)])
+    sh2.path([(262, 165), (240, 165)], "thin")
+    S.mark_flow(sh2)
+    assert _counts(sh.svg(clear=False))[3] == 1 and _counts(sh2.svg(clear=False)) == (0, 0, 0, 0)
+
+
+def test_a_flow_line_without_a_head_is_read_with_the_arrows():
+    """I2-81, I2-85: a flow drawn with no head of its own, as CT-611's joined tank outlets meet the rear tank's line, is
+    marked as a flow's line, so a crossing on it fails and its tee passes."""
+    sh = _sheet()
+    sh.path([(230, 165), (260, 165)], "thin")
+    S.mark_flow(sh)
+    _flow(sh, [(240, 150), (240, 180), (280, 180)])
+    svg = sh.svg(clear=False)
+    assert svg.count('class="arrow"') == 2 and _counts(svg) == (0, 0, 0, 1)
