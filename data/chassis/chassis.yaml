@@ -381,16 +381,50 @@ galvanising_holes:
   - {use: drain, web: inner, x: body_x0 + 85, z: rail_underside_z + 35, d: 20}
   - {use: drain, web: inner, x: body_x0 + 125, z: rail_underside_z + 35, d: 20}
 
-# The drawbar members' own holes for the dip (galvanising_dip, task 3 of fx14-chs). Each member, its A-frame length and
-# its lap length joined by the open mitre, is one closed tube from its capped apex end to its capped snipe. Hung
-# drawbar end down, the apex end is its low end and the snipe's toe its high end, and rolled either side down its low
-# corner is the bottom corner on the lower side. So it drains in both webs near its floor 40 mm behind its apex end,
-# each centre 1.25 d over the web's flat, its edge more than a diameter from the coupling plate's fillets and the chain
-# lug's welds, and it vents through its snipe's cap plate by each web, as near the toe as the cap's welds let them. The
-# drains are read by hand (CHASSIS.md, est.): CHS-09 and CHS-10 read the rails' and raisers' holes only
+# The drawbar members' own holes for the dip (galvanising_dip, task 3 of fx14-chs, I2-84). Each member, its A-frame
+# length and its lap length joined by the open mitre, is one tube from its capped apex end to its sniped rear end, which
+# is left open (fx15-chs). Rolled either side down, the lower member's low point is its mitre and its apex end a high
+# point, and the upper member's low point is its apex end, so each drains in both webs 40 mm behind its apex end and
+# 40 mm behind the body front, 40 mm over its underside, and vents in both webs 40 mm behind its apex end, 40 mm under
+# its top (member_galvanising_holes drawbar). The apex drains below are H-33 to H-36, the rest follow the services'
+# holes in CHS-09 and CHS-10, read on the member's own section
 drawbar_galvanising_holes:
   - {use: drain, web: both, x: db_apex_x + 40, z: db_z - db_depth / 2 + 15 + 25, d: 20, where: "each web, 40 behind the apex end"}
-  - {use: vent, web: both, d: 10, where: "the snipe's cap plate, by each web, its centre 25 along the cap from the toe"}
+
+# The galvanising check, CHS-11 (cad/chassis_dip.py, I2-84). Every closed section of the welded frame is read on its
+# members' axes in the dip galvanising_dip gives, rolled either side down and pitched drawbar end down at every whole
+# degree from level to the most the dip takes. Each low point must reach a drain, the rails' slot or an open end whose
+# lowest edge stands at most max_depth over it, and each high point a vent or an open end whose top edge stands at most
+# max_depth under it: the guide asks the holes as near the high and low points as they can go (pages 8 and 14), and its
+# shop detail puts a hollow section's holes 50 mm from its connection (Figure 16, est.). Each closed end's holes within
+# end_zone of it give at least the area of the one hole the guide's Tables 1 to 3 give the section (page 13, its equal
+# area for several holes), and each hole is at least 10 mm and its wall's thickness (pages 8 and 13)
+galvanising_check: {pitch_deg: [0, 9], step_deg: 1, max_depth: 50, end_zone: 150, slice: 5}
+
+# The holes CHS-11 asks of every other closed section, each at the least distances CHS-10 lets it stand: its centre
+# 1.25 d from the end of its web's flat, or `z_bottom_leg` plus 1.5 d over the underside where fillets run along the
+# bottom edges (the XT hinges and the jacking pads, 6 mm, est.), and its edge a diameter from the end weld's toe, `leg`
+# (plus `clear`) from the end. `corners` drains by the floor and vents by the top of both webs, the faces in the frame's
+# plane (page 8), `middle` puts one hole in each web at mid-depth where a small SHS's flat takes no more. Each end so has
+# four holes, or two in an SHS, as Tables 1 to 3 count them. The drawbar members drain at their mitres as at their apex
+# ends, 40 mm behind the body front and 40 mm over the underside in both webs, and vent at the apex end's top corners,
+# and each lap's sniped rear end is left open, the guide's preferred end (page 13, I2-84). CM-06's front web carries the
+# shock support plates from 26 mm to 326 mm from each end (CH-P07), so its front corners drain and vent through 16 mm
+# holes in the rail's inner web inside the crossmember's end, the largest CHS-10's toe rule lets stand in its 50 mm, with
+# its rear web's holes at 25 mm. CM-08's ends are its rear recovery tongues' faces, 20 mm inside the rails (CH-P05)
+member_galvanising_holes:
+  drawbar: {d: 20, leg: 6, clear: 4, holes: corners, snipe: open}
+  cm_end: {d: 20, leg: 5, holes: corners}
+  cm_floor: {d: 20, leg: 5, holes: corners}
+  cm_xt: {d: 20, leg: 6, holes: corners, z_bottom_leg: 6}
+  outrigger: {d: 20, leg: 6, holes: corners}
+  brace: {d: 13, leg: 5, holes: corners}
+  plan_brace: {d: 10, leg: 5, holes: middle}
+  hinge_gusset: {d: 13, leg: 5, holes: middle, behind: 80, inboard: 100, length: 200}
+  blocked_webs:
+    - {member: CM-06, web: front, fitting: CH-P07, free_d: 25, internal_d: 16, internal_z: [-45, 45]}
+  cut_ends:
+    - {member: CM-08, cut: 20, leg: 6}
 
 # Local checks of the fittings (CHASSIS.md). Sizes in mm. Plates are AS/NZS 3678 grade 350. The pin is what bears in the
 # hole: at a chain lug the 10 mm round bow of the pewag CW 8 connecting link (pewag's d), which passes through the 14 mm

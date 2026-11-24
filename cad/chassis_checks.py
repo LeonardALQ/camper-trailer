@@ -21,7 +21,7 @@ def chassis_row(c, res: dict) -> dict:
         return dict(limit="<= each case's limit on the net section", measured=round(100 * w["util"], 1), unit="%",
                     margin=round(100 * (1 - w["util"]), 1), ok=all(h["static_ok"] for h in hs),
                     governing=f"{w['id']} in {w['wall']} at X {w['x']:,.0f} ({', '.join(w['runs'])}), {s['lc']}",
-                    detail=(f"{len(hs)} holes in the rails, the raisers and the drawbar members. The worst, {w['id']}, {w['d']:g} mm across in {w['wall']} at X "
+                    detail=(f"{len(hs)} holes in the rails, the raisers, the drawbar members, the crossmembers, outriggers and braces. The worst, {w['id']}, {w['d']:g} mm across in {w['wall']} at X "
                             f"{w['x']:,.0f} mm: {s['mpa']:.0f} MPa on the net section against {s['limit']:.0f} MPa in {s['lc']}, {s['case']}"))
     if c.type == "chassis_local" and c.item == "hole_places":
         hs = [h for h in res["holes"] if not h["open"]]
@@ -42,6 +42,23 @@ def chassis_row(c, res: dict) -> dict:
                     ok=not bad, governing=" and ".join([", ".join(names[:-1]), names[-1]] if len(names) > 1 else names) or f"{top['id']}, its edge range",
                     detail=(f"{len(hs) - len(bad)} of {len(hs)} holes meet the three rules. " + "".join(f"{w}. " for w in why)
                             + f"The highest range at a hole's edge is {top['peak_mpa']:.1f} MPa at {top['id']}, against {top['cafl']:.1f} MPa"))
+    if c.type == "chassis_local" and c.item == "galvanising":
+        g = res["galvanising"]
+        rows = g["sections"]
+        bad = [r for r in rows if not r["ok"]]
+        w = max(rows, key=lambda r: max(r["low_depth"], r["high_depth"]))
+        why = [f"{r['id']}: {'its low point ' + format(r['low_depth'], '.0f') + ' mm under its lowest opening, ' if r['low_depth'] > g['max_depth'] else ''}"
+               f"{'its high point ' + format(r['high_depth'], '.0f') + ' mm over its highest, ' if r['high_depth'] > g['max_depth'] else ''}"
+               f"{'its holes short of the table' if not r['size_ok'] else ''}".rstrip(", ") for r in bad]
+        deep = max(w["low_depth"], w["high_depth"])
+        return dict(limit=f"each low and high point within {g['max_depth']:g} mm of an opening, each closed end's holes to the table",
+                    measured=len(bad), unit=f"of {len(rows)} closed sections", margin=-len(bad), ok=not bad,
+                    governing=(", ".join(r["id"] for r in bad[:4]) if bad else f"{w['id']}, {deep:.1f} mm"),
+                    detail=(f"{len(rows) - len(bad)} of {len(rows)} closed sections drain and vent in every hang: rolled {g['roll']:g} deg either side down "
+                            f"and pitched {g['pitches'][0]:g} to {g['pitches'][-1]:g} deg drawbar end down, {len(g['holes'])} holes for galvanising among them. "
+                            + "".join(f"{x}. " for x in why)
+                            + f"The deepest is {w['id']}'s {'low' if w['low_depth'] >= w['high_depth'] else 'high'} point, {deep:.1f} mm from its opening's edge, "
+                            f"{w['low_hang'] if w['low_depth'] >= w['high_depth'] else w['high_hang']}"))
     if c.type == "chassis_local":
         r = res["local"][LOCAL[c.item]]
         return dict(limit="<= 100 % of each part's limit", measured=round(100 * r["util"], 1), unit="%", margin=round(100 * (1 - r["util"]), 1),

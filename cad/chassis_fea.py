@@ -420,7 +420,7 @@ class Analysis:
                     e[mem] = dict(r, case=label, **(extra or {}))
             he = hole_env.setdefault(lc_id, {})
             for k, h in enumerate(sites):
-                if h.get("open"):
+                if h.get("open") or h.get("placement_only"):
                     continue
                 eq = self.hole_stress(res, h)["eq"]
                 if k not in he or eq > he[k]["eq"]:
@@ -501,6 +501,8 @@ class Analysis:
         out["deflections"] = self._worst_deflections(defl)
         out["fatigue"] = self.fatigue(lc1)
         out["holes"] = self.holes(hole_env, lc1, sites)
+        from .chassis_dip import check as galvanising_check
+        out["galvanising"] = galvanising_check(ch)
         out["local"] = self.local_checks(out["pad_n"]["pad_n"])
         out["fixings"] = self.fixings()
         out["cross_checks"] = self.cross_checks(out, lc6)
@@ -764,6 +766,20 @@ class Analysis:
                 y = s * (V["rail_c"] - rail.b / 2 + 0.5) if inner else s * (V["rail_c"] + rail.b / 2 - 0.5)
                 rows.append(dict(member=f"RL-{SIDES[s]}", face=face, run=g["use"], x=ch.ev(g["x"]), y=y, z=ch.ev(g["z"]),
                                  d=d, length=d, plate_field=True))
+        # the holes CHS-11 puts in the rails' inner webs inside a crossmember's end, where a fitting covers that web of the
+        # crossmember (member_galvanising_holes blocked_webs), each location with its 10 mm check hole in the rail's
+        # outer web opposite (the guide's page 19)
+        from .chassis_dip import frame_sections
+        for h in frame_sections(ch)[1]:
+            if h["via"] != "host":
+                continue
+            s = -1 if h["host"].endswith("K") else 1
+            c = h["centre"]
+            rows.append(dict(member=h["host"], face="kerb side" if s > 0 else "road side", run=h["use"], x=float(c[0]),
+                             y=s * (V["rail_c"] - rail.b / 2 + 0.5), z=float(c[2]), d=float(h["d"]), length=float(h["d"]), new=True))
+            if h["use"] == "drain":
+                rows.append(dict(member=h["host"], face="road side" if s > 0 else "kerb side", run="check", x=float(c[0]),
+                                 y=s * (V["rail_c"] + rail.b / 2 - 0.5), z=V["rail_underside_z"] + rail.d / 2, d=10.0, length=10.0, new=True))
         toes = ch.weld_toes()
         z0, zs, z1 = V["rail_underside_z"], V["rail_top_z"], V["raiser_top_z"]
         sites: list[dict] = []
@@ -835,7 +851,8 @@ class Analysis:
                 need = rules["toe_factor"] * max(h["d"], o["d"])
                 if g - need < h["toe_mm"] - h["toe_need"]:
                     h["toe_mm"], h["toe_need"], h["toe_weld"] = g, need, f"hole for {', '.join(o['runs'])}"
-        sites += self._drawbar_hole_sites(rules)
+        sites = [h for h in sites if not h.get("new")] + self._drawbar_hole_sites(rules) + [h for h in sites if h.get("new")]
+        sites += self._member_hole_sites(rules)
         for k, h in enumerate(sites, 1):
             h["id"] = f"H-{k:02d}"
         return sites
@@ -891,6 +908,70 @@ class Analysis:
                                              base=dict(Z_weak=sec.Z_weak, I_weak=sec.I_weak, C=sec.C, y_max=sec.b / 2))))
         return out
 
+    def _member_hole_sites(self, rules) -> list[dict]:
+        """The holes for galvanising CHS-11 asks of the frame's other closed sections (cad/chassis_dip.py, I2-84), each in
+        its member's own web: its net section, its edge distance to the web's flat and to the member's end, and its clear
+        distance to the end weld's toe, to fillets along the member's bottom edges, to the fittings welded on it and to
+        the member's other holes, in the web's own plane (u along the member, z across it). A hole in a rail's inner web
+        inside a crossmember's end is read with the rails' holes (hole_sites). The drawbar members' apex drains are
+        H-33 to H-36 already. A hinge gusset carries no frame load in the model, so its holes are placed by CHS-10's edge
+        and toe rules only, as the snipe caps' vents were."""
+        from .chassis import fitting_boxes
+        from .chassis_dip import frame_sections
+        ch, V = self.ch, self.ch.V
+        mem = {m.id: m for m in ch.members}
+        gr = ch.data["member_galvanising_holes"]
+        _, holes = frame_sections(ch)
+        attach = {"CM-05": ["CH-P06"], "CM-06": ["CH-P07"], "CM-08": ["CH-P05"]}
+        boxes = {fid: [b for f in ch.fittings if f.id == fid for b in fitting_boxes(ch, f)] for fids in attach.values() for fid in fids}
+        own = [h for h in holes if h["via"] == "own" and not (h["tube"].endswith("A") and h["tube"].startswith("DB-") and h["use"] == "drain")]
+        out = []
+        for h in own:
+            m = mem.get(h["member"])
+            role = m.role if m else "hinge_gusset"
+            sec = m.sec if m else ch.sections["SHS_50x50x3"]
+            r = gr.get(role, gr["drawbar"]) if role != "drawbar" else gr["drawbar"]
+            d, z = h["d"], h["z_l"]
+            u_end = min(h["u"], h["tube_L"] - h["u"])
+            edge = min((sec.d / 2 - sec.ro) - z, z + (sec.d / 2 - sec.ro))
+            edge_need = rules["edge_factor"] * d
+            if u_end / rules["end_factor"] < edge / rules["edge_factor"]:
+                edge, edge_need = u_end, rules["end_factor"] * d
+            leg = r["leg"] + r.get("clear", 0.0)
+            toes = [(u_end - d / 2 - leg, "end weld" if not h["tube"].endswith("B") else "mitre's butt weld")]
+            if r.get("z_bottom_leg"):
+                toes.append(((z - d / 2) - (-sec.d / 2 + r["z_bottom_leg"]), "XT hinges' and jacking pads' fillets"))
+            cen = np.array(h["centre"], float)
+            hb = (cen[0] - d / 2, cen[1] - d / 2, cen[2] - d / 2, cen[0] + d / 2, cen[1] + d / 2, cen[2] + d / 2)
+            for fid in attach.get(h["member"], []):
+                for bx in boxes[fid]:
+                    gb = (bx[0] - 6, bx[1] - 6, bx[2] - 6, bx[3] + 6, bx[4] + 6, bx[5] + 6)
+                    toes.append((_box_gap(hb, gb), f"{fid}'s fillets"))
+            for o in own:
+                if o is not h and o["tube"] == h["tube"] and o["web"] == h["web"]:
+                    g = math.hypot(o["u"] - h["u"], o["z_l"] - z) - (o["d"] + d) / 2
+                    toes.append((g - (max(o["d"], d) - d), f"hole for {o['use']}"))
+            gap, weld = min(toes, key=lambda t: t[0])
+            names = {el.member for el in self.f.elements}
+            frame = h["tube"] if h["tube"] in names else (m.id if m and m.id in names else None)
+            strip = sec.t * d
+            A = sec.A - strip
+            zc = -strip * z / A
+            I = sec.I_strong + sec.A * zc ** 2 - (sec.t * d ** 3 / 12 + strip * (z - zc) ** 2)
+            Iw = sec.I_weak - (d * sec.t ** 3 / 12 + strip * ((sec.b - sec.t) / 2) ** 2)
+            word = {"drawbar": "the drawbar member's", "cm_end": "the crossmember's", "cm_floor": "the crossmember's",
+                    "cm_xt": "the XT crossmember's", "outrigger": "the outrigger's", "brace": "the cross brace's",
+                    "plan_brace": "the plan brace's", "hinge_gusset": "the hinge gusset's"}[role]
+            out.append(dict(member=h["member"], face=f"{h['use']}", run=h["use"], x=float(cen[0]), y=float(cen[1]), z=float(cen[2]), d=d,
+                            length=d, runs=[h["use"]], rows=[f"{h['member']} {h['use']}"], frame=frame, wall=f"{word} web",
+                            open=False, fu=rules["fu"]["raiser" if sec.fy < 400 else "rail"], fy=sec.fy, box=hb, edge_mm=edge, edge_need=edge_need,
+                            toe_mm=gap, toe_need=rules["toe_factor"] * d, toe_weld=weld, galv=True, placement_only=frame is None,
+                            net=dict(A=A, I=I, I_weak=Iw, Aw=sec.Aw_depth - strip, Aw_width=sec.Aw_width,
+                                     z_lever=max(abs(z - d / 2 - zc), abs(z + d / 2 - zc)), y_lever=sec.b / 2,
+                                     k_torsion=(sec.d - sec.t) / max(sec.d - sec.t - d, 1.0),
+                                     base=dict(Z_weak=sec.Z_weak, I_weak=sec.I_weak, C=sec.C, y_max=sec.b / 2))))
+        return out
+
     def hole_stress(self, res, h) -> dict:
         """Normal and combined stress at a hole's edge on the composite rail's net section, at the element end nearest it."""
         best, bd = None, math.inf
@@ -898,7 +979,7 @@ class Analysis:
             if el.member != h["frame"]:
                 continue
             for nd, act in zip((el.i, el.j), end_actions(fl)):
-                dist = abs(self.f.nodes[nd][0] - h["x"])
+                dist = math.dist(self.f.nodes[nd], (h["x"], h["y"], h["z"])) if h.get("galv") else abs(self.f.nodes[nd][0] - h["x"])
                 if dist < bd - 1e-6 or (abs(dist - bd) < 1e-6 and abs(act["My"]) > abs(best["My"])):
                     best, bd = act, dist
         n, comp = h["net"], self.ch.comp
@@ -922,12 +1003,20 @@ class Analysis:
             if h.get("open"):
                 out.append(dict(row, ok=True, static_ok=True, place_ok=True, util=0.0))
                 continue
+            if h.get("placement_only"):
+                # a hinge gusset's holes: no frame load in the model, so CHS-10's edge and toe rules only
+                edge_ok, toe_ok = h["edge_mm"] >= h["edge_need"] - 1e-6, h["toe_mm"] >= h["toe_need"] - 1e-6
+                out.append(dict(row, rows=h["rows"], frame=None, static=None, static_ok=True, util=0.0, range_mpa=0.0, peak_mpa=0.0,
+                                field=None, cafl=0.585 * rules["fat"], damage=0.0, fat_case=None, fat_ok=True, edge_mm=h["edge_mm"],
+                                edge_need=h["edge_need"], edge_ok=edge_ok, toe_mm=h["toe_mm"], toe_need=h["toe_need"], toe_weld=h["toe_weld"],
+                                toe_ok=toe_ok, place_ok=edge_ok and toe_ok, ok=edge_ok and toe_ok, placement_only=True))
+                continue
             worst = None
             for lc_id, e in env.items():
                 r = e.get(k)
                 if r is None:
                     continue
-                lim = min(fy, rules["fu_factor"] * h["fu"]) / lcs[lc_id]["factor"]
+                lim = min(h.get("fy", fy), rules["fu_factor"] * h["fu"]) / lcs[lc_id]["factor"]
                 u = r["eq"] / lim
                 if worst is None or u > worst["util"]:
                     worst = dict(util=u, mpa=r["eq"], limit=lim, lc=lc_id, case=r["case"])
