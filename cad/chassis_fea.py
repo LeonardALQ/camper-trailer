@@ -601,7 +601,9 @@ class Analysis:
                             mems = [f"DB-{SIDES[s]}A", f"DB-{SIDES[s]}B"]
                         else:
                             mems = [f"DB-{SIDES[s]}A" if x < V["body_x0"] else f"DB-{SIDES[s]}B"]
-                        out.append((max(self.normal_at(res, m, x) for m in mems), f"DB-{SIDES[s]} at X {x:.0f}"))
+                        dz = ch.role_sec["drawbar"].d / 2
+                        out.append((max(self.normal_at(res, m, x) for m in mems) * max(self.hole_field(s, x, z) for z in (-dz, dz)),
+                                    f"DB-{SIDES[s]} at X {x:.0f}"))
             elif k in ROOT_PLACES:
                 for s in (-1, 1):
                     r = self.root_stresses(res, s)
@@ -676,7 +678,7 @@ class Analysis:
                 rng, angle = principal_range(np.abs(q).max() / wall, tau)
                 yield rng, f"{name}, its principal stress {angle:.0f} degrees off the weld's normal"
         weld, where = max(welds())
-        return dict(root_splice=at(sp.d / 2 + e, sp.b / 2 + ez), root_heel_weld=g_top * tg / (2 * throat),
+        return dict(root_splice=at(sp.d / 2 + e, sp.b / 2 + ez) * self.hole_field(s, V["body_x0"], -sp.d / 2), root_heel_weld=g_top * tg / (2 * throat),
                     root_end_plate=6 * plate["moment"] / ep["t"] ** 2, root_end_plate_weld=weld, weld=where, plate=plate)
 
     def plate_field(self, res, h) -> tuple[float, float]:
@@ -690,6 +692,23 @@ class Analysis:
         lift = next(f for f in self.ch.data["fittings"] if f["id"] == ROOT_END_PLATE).get("lift", 0.0)
         j = min(max(int(round((h["z"] - V["rail_underside_z"] - lift) / p["h"])) - 1, 0), len(web) - 1)
         return abs(float(web[j])) / rail.t, p["tau_web"]
+
+    def hole_field(self, s: int, x: float, z_l: float) -> float:
+        """Kirsch's field from the drawbar member's holes for galvanising at a point on its web, X along the frame and
+        z_l over its axis: the largest factor on the stress along the member that any hole on that side puts there, 1
+        where none stands near (I2-84). FAT-07 and FAT-17 read their nominal ranges with it at the drawbar root."""
+        from .chassis_dip import frame_sections
+        if not hasattr(self, "_db_holes"):
+            self._db_holes = [h for h in frame_sections(self.ch)[1] if h["tube"].startswith("DB-") and h["tube"] != "DB-BR"]
+        side = SIDES[s]
+        k = 1.0
+        ang = math.atan2(self.ch.V["rail_c"] - self.ch.V["db_apex_y"], self.ch.V["body_x0"] - self.ch.V["db_apex_x"])
+        for h in self._db_holes:
+            if h["tube"][3] != side:
+                continue
+            dx = abs(float(h["centre"][0]) - x) / (math.cos(ang) if h["tube"].endswith("A") else 1.0)
+            k = max(k, kirsch_along(h["d"] / 2, dx, h["z_l"] - z_l))
+        return k
 
     def end_plate_under_heel(self, q_foot: float, q_top: float) -> dict:
         """The rail's end plate CH-P15 under the gusset heel's pull, q_foot at the heel's foot rising to q_top N/mm at its
@@ -900,7 +919,7 @@ class Analysis:
                     member = f"DB-{SIDES[s]}A"
                     out.append(dict(member=member, face=f"{web} web", run=g["use"], x=x, y=y, z=z, d=d, length=d, runs=[g["use"]],
                                     rows=[f"{member} {web} web"], frame=member, wall=f"the drawbar member's {web} web", open=False,
-                                    fu=rules["fu"]["rail"], box=(x - d / 2, y - 1, z - d / 2, x + d / 2, y + 1, z + d / 2),
+                                    fu=rules["fu"]["rail"], fy=sec.fy, box=(x - d / 2, y - 1, z - d / 2, x + d / 2, y + 1, z + d / 2),
                                     edge_mm=edge, edge_need=edge_need, toe_mm=gap, toe_need=rules["toe_factor"] * d, toe_weld=weld,
                                     net=dict(A=A, I=I, I_weak=Iw, Aw=sec.Aw_depth - strip, Aw_width=sec.Aw_width,
                                              z_lever=max(abs(z - d / 2 - zc), abs(z + d / 2 - zc)), y_lever=sec.b / 2,
@@ -1296,6 +1315,22 @@ def heel_throats(legs, angle: float) -> tuple[float, float]:
     a throat of its leg times cos(psi / 2)."""
     inboard, outboard = legs
     return inboard * math.cos(math.pi / 4 - angle / 2), outboard * math.cos(math.pi / 4 + angle / 2)
+
+
+def kirsch_along(a: float, dx: float, dz: float) -> float:
+    """Kirsch's stress along the load at a point dx along it and dz across it from the centre of a hole of radius a in a
+    plate under a uniaxial stress, over that stress: 3 at the hole's side, under 1 ahead of it, and within 8 % at one
+    diameter from its edge."""
+    r = math.hypot(dx, dz)
+    if r <= a:
+        return 3.0
+    th = math.atan2(dz, dx)
+    q2, q4 = (a / r) ** 2, (a / r) ** 4
+    srr = 0.5 * (1 - q2) + 0.5 * (1 - 4 * q2 + 3 * q4) * math.cos(2 * th)
+    stt = 0.5 * (1 + q2) - 0.5 * (1 + 3 * q4) * math.cos(2 * th)
+    trt = -0.5 * (1 + 2 * q2 - 3 * q4) * math.sin(2 * th)
+    c, s = math.cos(th), math.sin(th)
+    return srr * c * c + stt * s * s - 2 * trt * s * c
 
 
 def principal_range(sigma: float, tau: float) -> tuple[float, float]:

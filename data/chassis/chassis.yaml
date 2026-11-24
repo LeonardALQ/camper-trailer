@@ -5,7 +5,11 @@
 # cad/chassis_fea.py analyses them. Sections come from data/chassis/sections.yaml (report 11's table).
 id: ASM-CH
 name: Chassis and drawbar
-revision: K     # K, 24 Nov 2026: the frame galvanised in one dip at Valmont Coatings Hexham, rolled 46 degrees across and
+revision: L     # L, 24 Nov 2026: every closed section of the frame drained at its low points and vented at its high points in
+                # the rolled dip, read by CHS-11 (member_galvanising_holes, I2-84): the drawbar members drain at their mitres
+                # and vent at their apex ends' top corners, their snipes left open, and every crossmember, outrigger, brace and
+                # hinge gusset drains and vents at its closed ends, all read in CHS-09 and CHS-10.
+                # K, 24 Nov 2026: the frame galvanised in one dip at Valmont Coatings Hexham, rolled 46 degrees across and
                 # pitched drawbar end down (galvanising_dip, I2-79): each rail's front end drains in both webs and through a
                 # 10 mm slot under its end plate, with no vent in the end plate's field (I2-80), the drawbar members drain at
                 # their apex ends and vent at their snipes, and the drawbar's laps opened to 2.5 mm and stitch welded (FAT-21).
