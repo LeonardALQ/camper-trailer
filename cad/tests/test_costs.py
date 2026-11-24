@@ -86,7 +86,7 @@ def test_the_build_holds_what_the_truck_needs():
     status = {it["id"]: it["status"] for it in ITEMS}
     for i in ("BI01", "TW01", "TW07", "TC01", "TW06", "TM01", "UH01", "AC01", "RK01", "PW01", "PW02", "TL01", "TL04", "TL05"):
         assert status[i] == "build", f"{i} is {status[i]}"
-    for i in ("TW02", "TC02", "TL07", "TX01", "BF01"):
+    for i in ("TW02", "TC02", "TL07", "TL08", "TX01", "BF01"):
         assert status[i] == "check", f"{i} is {status[i]}"
     for i in ("OP01", "OP02", "OP03"):
         assert status[i] == "optional", f"{i} is {status[i]}"
@@ -95,11 +95,25 @@ def test_the_build_holds_what_the_truck_needs():
     assert not any("70 mm ball" in it["name"] for it in ITEMS), "the coupling's tow pin takes the place of a ball"
 
 
+def test_the_emissions_evidence_is_the_certifiers():
+    """The interim NSW procedure does not apply to diesel engines (Gazette No 253 of 9 June 2023, Part B section 1), so
+    the power stage's emissions evidence is the stock and tuned pair the LC4 certifier names, built, and the engine-out
+    heavy-duty test is a check line that stops the stage for Leonard's decision (research report 32 section 7)."""
+    line = {it["id"]: it for it in ITEMS}
+    assert "interim" not in line["TL04"]["name"].lower(), "TL04 still tests to the interim NSW procedure"
+    assert "certifier names" in line["TL04"]["name"] and line["TL04"]["status"] == "build"
+    assert line["TL07"]["status"] == "check" and "engine out" in line["TL07"]["name"]
+    assert "not apply to diesel engines" in _section("Legal path"), "VEHICLE.md's legal path still leans on it"
+    for name in ("Stage plan", "Open points and the assumption used"):
+        for words in ("Test to the interim", "accept the interim"):
+            assert words not in _section(name), f"VEHICLE.md's {name!r} still has {words!r}"
+
+
 def test_super_duty_against_the_landcruiser():
     """The purchase and the upgrades with their allowance, shown apart in VEHICLE.md and set against the LandCruiser plan
     they replace: AUD 50,000 for that truck and AUD 77,777 for its build with the allowance."""
     truck, car = PROJECT["truck"]["purchase_aud"], TYPED["build_plus_contingency"]
-    assert (truck, car) == (92690, 20289), "the purchase and the upgrades changed: update this test and VEHICLE.md"
+    assert (truck, car) == (92690, 37689), "the purchase and the upgrades changed: update this test and VEHICLE.md"
     rows = {r[0]: r for r in _rows(_section("The truck against the LandCruiser plan"))}
     want = {"Truck": (truck, LANDCRUISER["truck"]), "Upgrades with the allowance": (car, LANDCRUISER["build"]),
             "Together": (truck + car, LANDCRUISER["truck"] + LANDCRUISER["build"])}

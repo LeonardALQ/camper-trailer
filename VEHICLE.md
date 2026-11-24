@@ -1,6 +1,6 @@
 # Ford Ranger Super Duty tow vehicle
 
-Revised 23 Nov 2026 for Leonard's change of plan of 22 Nov 2026 (research report 31): a near-new Ford Ranger Super Duty single cab chassis, bought, in place of the rebuilt LandCruiser VDJ79. The LandCruiser plan of decisions H17, H18, H20 and H24 and research reports 14 to 16, 23, 26 and 27 is kept as the record in the repository's history and in those reports. From 23 Nov 2026 the trailer is plated at 4,000 kg on a Cruisemaster DO45 Plus coupling (decision log 23 Nov 04:59). Every part and paid job is a line in `data/vehicle/vehicle-parts.yaml`, which the site's Tow vehicle page renders as three lists and `cad/tests/test_costs.py` checks against this page.
+Revised 23 Nov 2026 for Leonard's change of plan of 22 Nov 2026 (research report 31): a near-new Ford Ranger Super Duty single cab chassis, bought, in place of the rebuilt LandCruiser VDJ79. The LandCruiser plan of decisions H17, H18, H20 and H24 and research reports 14 to 16, 23, 26 and 27 is kept as the record in the repository's history and in those reports. From 23 Nov 2026 the trailer is plated at 4,000 kg on a Cruisemaster DO45 Plus coupling (decision log 23 Nov 04:59). Revised on 24 Nov 2026 for the power stage's emissions evidence: the interim NSW emissions procedure does not apply to diesel engines, so the LC4 certifier names the tests (research report 32 section 7). Every part and paid job is a line in `data/vehicle/vehicle-parts.yaml`, which the site's Tow vehicle page renders as three lists and `cad/tests/test_costs.py` checks against this page.
 
 ## Summary
 
@@ -8,21 +8,23 @@ The truck is a Ford Ranger Super Duty single cab chassis, built 2025 or 2026, wi
 
 The truck costs AUD 92,690: the one near-new listing found, a 2025 truck with 13,343 km at AUD 89,990, and AUD 2,700 of NSW duty. A new one costs about the same drive-away, with no tray to sell and Ford's conditional 7-year warranty (report 31 section 4).
 
-Four stages follow, each leaving the truck registered and drivable. The build is AUD 17,108, or AUD 20,289 with one allowance of 10 % on listed prices and 20 % on estimates (AUD 3,181), against Leonard's AUD 75,000 for the car work. Estimates are 86 % of it, because most lines have no published price. P1, what makes the truck legal, safe and able to tow, is AUD 6,156: the purchase inspection, the coupling's tow pin, the supply for the trailer's brakes, the trailer charging, towing mirrors, a UHF radio, a compressor, a recovery kit and three weighings. P2, the power stage with its certificate, is AUD 10,951.
+Four stages follow, each leaving the truck registered and drivable. The build is AUD 31,608, or AUD 37,689 with one allowance of 10 % on listed prices and 20 % on estimates (AUD 6,081), against Leonard's AUD 75,000 for the car work. Estimates are 92 % of it, because most lines have no published price. P1, what makes the truck legal, safe and able to tow, is AUD 6,156: the purchase inspection, the coupling's tow pin, the supply for the trailer's brakes, the trailer charging, towing mirrors, a UHF radio, a compressor, a recovery kit and three weighings. P2, the power stage with its certificate, is AUD 25,451, and AUD 15,000 of that is the stock and tuned emissions tests the LC4 certifier names (est.).
 
-Leonard asked for about 250 to 300 hp at the wheels from a turbo upgrade. The plan registers about 205 kW and 650 Nm at the crank, about 232 hp at the wheels (est.), on Garrett's PowerMax turbo and intercooler with a calibration of the engine and the 10-speed, the DPF, SCR and EGR untouched, under one LC4 certificate. 250 hp at the wheels is an option for Leonard to weigh beside it, set out after stage S3 below: about 220 kW and 646 Nm at the crank (est.), on the same parts and inside the same 650 Nm cap, with about 6 % of the PowerMax's flow in hand (est.) where the plan keeps about 14 %, and no published record of a Super Duty at that power. 300 hp at the wheels is not planned, because it needs a hybrid turbo and injectors nobody sells for this engine here. Ford's warranty will not pay for a failure the stage causes, so either level waits until Leonard accepts that or the warranty ends.
+Leonard asked for about 250 to 300 hp at the wheels from a turbo upgrade. The plan registers about 205 kW and 650 Nm at the crank, about 232 hp at the wheels (est.), on Garrett's PowerMax turbo and intercooler with a calibration of the engine and the 10-speed, the DPF, SCR and EGR untouched, under one LC4 certificate on the emissions tests the certifier names. 250 hp at the wheels is an option for Leonard to weigh beside it, set out after stage S3 below: about 220 kW and 646 Nm at the crank (est.), on the same parts and inside the same 650 Nm cap, with about 6 % of the PowerMax's flow in hand (est.) where the plan keeps about 14 %, and no published record of a Super Duty at that power. 300 hp at the wheels is not planned, because it needs a hybrid turbo and injectors nobody sells for this engine here. Research report 32 revises the turbo's margins and sets out a third level, about 250 kW and 700 Nm, with the time each level takes to 100 km/h towing, and the plan stays at 205 kW until Leonard chooses. Ford's warranty will not pay for a failure the stage causes, so any level waits until Leonard accepts that or the warranty ends.
 
-The check list holds the lines bought only if a check calls for them, AUD 12,478 if every one were bought, which is a note and not a total. The optional extras, a bar and winch, rock sliders and driving lights, come to AUD 7,400. The bike box (AUD 27,479, built by Leonard, `data/ute/box-parts.yaml`), the trailer and Leonard's labour are outside these figures.
+The check list holds the lines bought only if a check calls for them, AUD 53,078 if every one were bought, which is a note and not a total. Most of it is the engine-out emissions test (TL07, AUD 50,000 est.), which would stop the power stage for Leonard's decision. The optional extras, a bar and winch, rock sliders and driving lights, come to AUD 7,400. The bike box (AUD 27,479, built by Leonard, `data/ute/box-parts.yaml`), the trailer and Leonard's labour are outside these figures.
 
 ## The truck against the LandCruiser plan
 
 | | Super Duty AUD | LandCruiser plan AUD | Difference AUD |
 |---|---|---|---|
 | Truck | 92,690 | 50,000 | 42,690 |
-| Upgrades with the allowance | 20,289 | 77,777 | -57,488 |
-| Together | 112,979 | 127,777 | -14,798 |
+| Upgrades with the allowance | 37,689 | 77,777 | -40,088 |
+| Together | 130,379 | 127,777 | 2,602 |
 
-The LandCruiser figures are Leonard's AUD 50,000 for a used VDJ79 and that build's AUD 77,777 with its allowance (this file to 22 Nov 2026). The Super Duty costs AUD 42,690 more to buy and AUD 57,488 less to make ready, AUD 14,798 less in all, and it starts with a new engine under warranty in place of a 400,000 km one. Its AUD 20,289 includes the AUD 13,142 power stage with its allowance, so the truck alone, legal and able to tow with the trailer charging, is AUD 7,147 with the allowance.
+The LandCruiser figures are Leonard's AUD 50,000 for a used VDJ79 and that build's AUD 77,777 with its allowance (this file to 22 Nov 2026). The Super Duty costs AUD 42,690 more to buy and AUD 40,088 less to make ready, AUD 2,602 more in all, and it starts with a new engine under warranty in place of a 400,000 km one. Its AUD 37,689 includes the AUD 30,542 power stage with its allowance, so the truck alone, legal and able to tow with the trailer charging, is AUD 7,147 with the allowance.
+
+Until 24 Nov 2026 the Super Duty came out AUD 14,798 less in all. What changed is the emissions evidence. The LandCruiser plan counted a free TfNSW IM240 test (est.), whose Botany facility closed in 2023, and this plan the interim NSW procedure that stands in for that test, at AUD 500 (est.), which does not cover a diesel. With tests at the same AUD 15,000 (est.) and their allowance counted in the LandCruiser's figure too, the Super Duty would cost about AUD 15,400 less in all.
 
 ## Stage plan
 
@@ -31,8 +33,8 @@ The LandCruiser figures are Leonard's AUD 50,000 for a used VDJ79 and that build
 | S0 | Choose, inspect, buy and weigh the truck | 482 | 0 | Ford dealer, weighbridge | None | Drive, and tow within Ford's ratings once the tow pin is in |
 | S1 | The box on Ford's body mounts, the tow pin, the supply for the trailer's brakes, towing mirrors, UHF radio, compressor, recovery kit, the trailer's profile, a laden weighing | 3,779 | 650 | None, Leonard fits them | 1 to 2 weeks | Carry both bikes in the box and tow the 4,000 kg trailer at stock power |
 | S2 | The trailer charging and the coupled weighing | 1,895 | 928 | Auto electrician, weighbridge | 1 day | Tow the loaded trailer and charge it while driving |
-| S3 | PowerMax turbo and intercooler, the calibration, the emissions test and the LC4 certificate | 10,951 | 10,900 | Tuner, emissions test, LC4 certifier | 1 to 2 weeks | Tow at about 205 kW and 650 Nm at the crank (est.), or about 220 kW with the 250 hp option, certified |
-| Total | | 17,108 | 12,478 | | | |
+| S3 | PowerMax turbo and intercooler, the calibration, the emissions tests the certifier names and the LC4 certificate | 25,451 | 51,500 | Tuner, NATA-accredited emissions facility, LC4 certifier | 1 to 2 weeks | Tow at about 205 kW and 650 Nm at the crank (est.), or about 220 kW with the 250 hp option, certified |
+| Total | | 31,608 | 53,078 | | | |
 
 The check list column is what a stage would cost if every check line fitted in it were bought, and it is not counted. S0 to S2 are the truck Leonard needs, in that order. S3 comes when Leonard accepts the warranty risk or when Ford's warranty ends, and nothing before it depends on it.
 
@@ -80,29 +82,31 @@ Goal: charge the trailer's 48 V battery from the truck on travel days.
 Goal: about 205 kW and 650 Nm at the crank, or about 220 kW if Leonard takes the 250 hp option below, certified, with every emission control working. Needs S2 done and a long tow logged at stock power.
 
 - Read the part number on Ford's turbo (BI01 at S0). The PowerMax replaces Ford's MB3Q-6K682-AB, and the plan assumes the Super Duty carries it (open point 11). If the tag shows another part, the stage runs as CUT1 on Ford's turbo.
-- Get the LC4 certifier's written evidence list before buying anything (TL05). If it asks for a laboratory emissions test rather than the interim NSW procedure, that is AUD 10,000 (TL07, est.), and the stage waits for Leonard's decision.
-- Book the tuner's dyno and run the truck stock first, the first of the same-dyno runs the certifier compares (TL01).
+- Get the LC4 certifier's written evidence list before buying anything (TL05), with the emissions test it names. The interim NSW procedure that VSI 06 offers does not apply to diesel engines, so the plan assumes a stock and tuned pair at a NATA-accredited facility, on a chassis dynamometer or on the road with portable emissions measuring equipment (TL04, AUD 15,000 est.). If the list asks for the engine out and tested to the heavy-duty Euro VI cycles in a laboratory (TL07, AUD 50,000 est.), the stage stops for Leonard's decision and the truck stays stock. If it asks for a brake test as well as Ford's ratings, that is TL08 (AUD 600 est.).
+- Book the tuner's dyno and run the truck stock first, the first of the same-dyno runs the certifier compares (TL01), and have the stock emissions test made before any part goes on (TL04).
 - Leonard fits the Garrett PowerMax turbo 930592-5001S (PW01) and the PowerMax intercooler (PW02), with new gaskets and fluids and Garrett's shaft speed sensor (PW03). Ford's turbo is kept for a return to stock.
 - The tuner calibrates the engine and the 10-speed together and keeps Ford's files: about 205 kW at the crank (220 kW for the 250 hp option), at most 650 Nm in high range, Ford's 600 Nm in low range, first and reverse, Ford's EGT limits, the turbo under Garrett's 186.2 krpm on the sensor, and the DPF, SCR, EGR and crankcase ventilation untouched.
 - Fit the OBD gauge (TL02) for EGT, boost, the 10-speed's temperature and coolant temperature.
-- Drive the uncertified calibration only to the emissions test and the certifier. Test to the interim NSW procedure with no stored faults (TL04), then get the certificate (TL05). If it is refused, refit Ford's turbo and flash Ford's files back, and the truck is as bought.
+- Drive the uncertified calibration only to the emissions facility and the certifier. Make the tuned emissions test on the calibration as it will be registered, with every emission control working and no stored faults (TL04), then get the certificate (TL05). If it is refused, refit Ford's turbo and flash Ford's files back, and the truck is as bought.
 - Tow the trailer up a long grade and watch the 10-speed's temperature. A larger cooler goes in only if it stays above 110 °C (TX01, est.).
 - Cut CUT1 tunes on Ford's turbo to the ordinary Ranger's 184 kW instead, about 208 hp at the wheels (est.), saving AUD 3,398 with its share of the allowance.
-- AUD 10,951. Check lines AUD 10,900.
+- AUD 25,451. Check lines AUD 51,500.
 - Done when the certificate is endorsed on the registration and a long tow stays inside the temperature limits.
 
 ### The 250 hp option
 
-Leonard's lower figure, 250 hp at the wheels, is about 186 kW at the wheels and about 220 kW at the crank (est., at the 0.845 wheel-to-crank ratio report 31 uses). At 3,250 rpm that is 646 Nm, inside the plan's 650 Nm cap, so it needs no part the plan does not already buy: the same PowerMax turbo and intercooler, the same swap parts and gauge, and a calibration aimed about 7 % higher. The price is the stage's AUD 10,951 (est.), and the 10-speed's larger cooler (TX01, AUD 900) becomes more likely.
+Leonard's lower figure, 250 hp at the wheels, is about 186 kW at the wheels and about 220 kW at the crank (est., at the 0.845 wheel-to-crank ratio report 31 uses). At 3,250 rpm that is 646 Nm, inside the plan's 650 Nm cap, so it needs no part the plan does not already buy: the same PowerMax turbo and intercooler, the same swap parts and gauge, and a calibration aimed about 7 % higher. The price is the stage's AUD 25,451 (est.), and the 10-speed's larger cooler (TX01, AUD 900) becomes more likely.
 
 The margin is the case against it. Garrett gives the PowerMax 27 % more compressor flow than Ford's turbo. Taking Ford's turbo as flat out at the ordinary Ranger's 184 kW, the PowerMax supplies air for about 234 kW (est.), so 205 kW keeps about 14 % in hand and 220 kW about 6 %. Both figures are estimates, and no tuner has published a Super Duty at either power.
 
 - The engine: about 7 % more fuel at full load than the plan (est.), so higher exhaust temperatures, the turbo nearer Garrett's 186.2 krpm for longer on a climb with the 4,000 kg trailer, and more soot for the DPF to burn. The speed sensor (PW03) and the gauge (TL02) show the shaft speed and the exhaust temperature, and the tuner stops below Ford's EGT limits and Garrett's shaft speed.
 - The 10-speed: Ford publishes no torque rating for it, and the option keeps the plan's 650 Nm cap and Ford's 600 Nm in low range, first and reverse, so its peak torque is the plan's. The extra 15 kW is heat in its fluid on a long climb, which the 110 °C check of TX01 settles.
 - The warranty: the same as the plan. Ford pays for no failure the parts or the tune cause, and a turbo with less in hand is likelier to fail (est.).
-- The certificate: the same LC4 certificate under VSI 06 Rev 4 items 2 and 6, at 43 % over the 154 kW in place of 33 %. The emissions test decides the power. The interim NSW procedure is run on the calibration as it will be registered, and if 220 kW fails it on soot or NOx with the DPF, SCR and EGR working, the tuner steps back towards 205 kW and the test is run again (TL04).
+- The certificate: the same LC4 certificate under VSI 06 Rev 4 items 2 and 6, at 43 % over the 154 kW in place of 33 %. The emissions test decides the power. The tuned test (TL04) is made on the calibration as it will be registered, and if 220 kW fails it on soot or NOx with the DPF, SCR and EGR working, the tuner steps back towards 205 kW and the tuned test is made again, about half the pair's price once more (est.).
 
 So the choice is Leonard's: about 15 kW more at the crank for the same price, against a smaller margin with no record behind it. The plan keeps 205 kW until he chooses, and the choice is made before the calibration (TL01).
+
+Research report 32 (24 Nov 2026) adds to this choice. On a UK tuner's figures for Ford's own turbo, it puts the PowerMax's air at about 275 kW (est.) in place of the 234 kW above, which would leave about 34 % in hand at 205 kW and 25 % at 220 kW, though only by scaling Ford's turbo by Garrett's 27 %. It sets out a third level, about 250 kW and at most 700 Nm, and gives each level's time to 100 km/h with the trailer: at the 7,750 kg GCM case about 26.0 to 27.4 s at 205 kW, 24.7 to 25.9 s at 220 kW and 21.4 to 22.4 s at 250 kW (est.), and stock 37.4 to 39.7 s. None of this changes the plan until Leonard chooses.
 
 ## Parts list by system
 
@@ -115,28 +119,28 @@ AUD including GST. Every line, with its list, priority, reason, stage and depend
 | Towing and trailer charging | 2,264 | 1,278 | 0 | Charging 1,612, TSC supply 274, 48 V feed 254 |
 | Mirrors, radio, compressor and recovery | 3,350 | 300 | 0 | Towing mirrors 1,750, UHF 650 |
 | Turbo and intercooler | 5,181 | 900 | 0 | PowerMax turbo 2,831, intercooler 1,900 |
-| Tune, gauge, emissions test and certificate | 5,650 | 10,000 | 0 | Calibration 2,800, certificate 2,000 |
+| Tune, gauge, emissions tests and certificate | 20,150 | 50,600 | 0 | Emissions tests 15,000, calibration 2,800, certificate 2,000 |
 | Bar, winch, sliders and lights | 0 | 0 | 7,400 | None. Every line is an extra |
-| Total | 17,108 | 12,478 | 7,400 | |
+| Total | 31,608 | 53,078 | 7,400 | |
 
 Each figure is rounded to the dollar, so a column can differ from its total by AUD 1.
 
 | Total | AUD |
 |---|---|
-| The build | 17,108 |
-| Allowance, 10 % of listed prices and 20 % of estimates | 3,181 |
-| The build with its allowance | 20,289 |
+| The build | 31,608 |
+| Allowance, 10 % of listed prices and 20 % of estimates | 6,081 |
+| The build with its allowance | 37,689 |
 | Leonard's figure for the car work | 75,000 |
-| Under that figure, with the allowance | 54,711 |
+| Under that figure, with the allowance | 37,311 |
 | Less CUT1, with its share of the allowance | -3,398 |
-| The build with CUT1 and the allowance | 16,891 |
-| Check list, if every line were bought (not counted) | 12,478 |
+| The build with CUT1 and the allowance | 34,291 |
+| Check list, if every line were bought (not counted) | 53,078 |
 | Optional extras (not counted) | 7,400 |
 | The truck, bought (data/project.yaml) | 92,690 |
 
-By priority: P1 (legal, safe and able to tow, or protecting the truck) is AUD 6,156 of the build, and P2 (the power stage) is AUD 10,951. The optional extras are AUD 7,400.
+By priority: P1 (legal, safe and able to tow, or protecting the truck) is AUD 6,156 of the build, and P2 (the power stage) is AUD 25,451. The optional extras are AUD 7,400.
 
-The allowance follows the trailer's rule: 10 % of the build's listed prices (AUD 2,403) and 20 % of its estimates (AUD 14,705). The check list carries none, because each of its prices is already the price if the line is bought, and it is not added to the build. The one cut, CUT1, is there in case the PowerMax turbo cannot be had, does not fit the Super Duty's engine (open point 11) or the certifier balks at its power: the calibration then runs on Ford's turbo. The PowerMax's AUD 2,831 is an estimate from Falcon Turbos' hybrid for the same engine, GBP 1,300 before UK VAT, which an export does not carry, at 1 GBP = 1.98 AUD and with Australia's 10 % GST on import.
+The allowance follows the trailer's rule: 10 % of the build's listed prices (AUD 2,403) and 20 % of its estimates (AUD 29,205). The check list carries none, because each of its prices is already the price if the line is bought, and it is not added to the build. The one cut, CUT1, is there in case the PowerMax turbo cannot be had, does not fit the Super Duty's engine (open point 11) or the certifier balks at its power: the calibration then runs on Ford's turbo. The PowerMax's AUD 2,831 is an estimate from Falcon Turbos' hybrid for the same engine, GBP 1,300 before UK VAT, which an export does not carry, at 1 GBP = 1.98 AUD and with Australia's 10 % GST on import.
 
 ## Limits to build and drive to
 
@@ -167,7 +171,7 @@ The truck as bought needs no change to its ratings. Its one addition for the tra
 
 The box. Leonard builds it and does not have it certified (H25). It is a body on a cab chassis built to take one, mounted to Ford's own rules (S1), so it adds no ratings. The towing mirrors replace the factory pair with the same functions, and the plan assumes they need no certificate.
 
-The power stage (S3). Every tune of this truck needs a VSCCS certificate: VSI 06 Rev 4 item 6 for flashing the engine management system so that it alters emissions output, and item 2 because about 205 kW is more than 20 % over the original 154 kW, the line being 184.8 kW. VSB 14 files it under LA4, modifying the original engine, and treats it like a performance engine conversion: emissions, brakes, installation and noise (report 14 section 4.2). Ford certified the truck to the heavy-duty Euro VI standard, tested on an engine dyno, and VSI 06 lets the Interim NSW Vehicle Emissions Test Procedure for Modified and Individually Constructed Vehicles (May 2023) stand in for testing to the standard (note to item 5). The plan assumes the LC4 certifier accepts it. Keep the same-dyno sheets, the emissions result, the parts invoices, the tuner's description of the calibration and a fault-free scan. The PowerMax intercooler needs no certificate of its own (item 5's examples). Nothing in the plan touches the DPF, the SCR or the EGR.
+The power stage (S3). Every tune of this truck needs a VSCCS certificate: VSI 06 Rev 4 item 6 for flashing the engine management system so that it alters emissions output, and item 2 because about 205 kW is more than 20 % over the original 154 kW, the line being 184.8 kW. VSB 14 files it under LA4, modifying the original engine, and treats it like a performance engine conversion: emissions, brakes, installation and noise (report 14 section 4.2). Ford certified the truck to the heavy-duty Euro VI standard, tested on an engine dynamometer. VSI 06 offers the Interim NSW Vehicle Emissions Test Procedure for Modified and Individually Constructed Vehicles (May 2023) in place of testing to the standards (note to item 5), but the procedure's test requirements do not apply to diesel engines (NSW Government Gazette No 253 of 9 June 2023, Part B section 1), and the NHVR's road test with portable emissions measuring equipment covers only vehicles built to ADR 70 or to ADR 80/03 and earlier. So no simplified procedure covers this truck at any power, and the LC4 certifier names the test. The plan assumes a stock and tuned pair at a NATA-accredited facility, on a chassis dynamometer or on the road with the portable equipment, with NOx and particles no worse than stock and every emission control working (TL04, AUD 15,000 est.). If the certifier asks for the engine out and tested to the heavy-duty cycles in a laboratory (TL07, AUD 50,000 est.), the stage stops for Leonard's decision and the truck stays stock (research report 32 section 7). Keep the same-dyno sheets, both emissions results, the parts invoices, the tuner's description of the calibration and fault-free scans before and after. For the brakes the plan offers Ford's ratings for an 8,000 kg combination, with a brake test only if the certifier asks (TL08). The PowerMax intercooler needs no certificate of its own (item 5's examples). Nothing in the plan touches the DPF, the SCR or the EGR.
 
 Ford's warranty. Ford says an aftermarket part does not by itself void the warranty, but a failure it causes is not covered ([Ford Australia](https://www.ford.com.au/support/how-tos/warranty/warranties-and-coverage/do-aftermarket-accessories-affect-the-warranty)). After S3 a failed engine, turbo, 10-speed or transfer case is where a claim would be refused. That is the stage's real cost, and why it waits for Leonard's go or the warranty's end. Declare every change to the insurer.
 
@@ -175,7 +179,7 @@ Ford's warranty. Ford says an aftermarket part does not by itself void the warra
 
 | Decision | Reason |
 |---|---|
-| A near-new Ranger Super Duty single cab chassis, bought, in place of the LandCruiser build | Leonard's change of 22 Nov 2026. Ford's ratings carry the box and the trailer with no GVM kit or GCM revision, and it costs AUD 15,099 less than the LandCruiser plan in all |
+| A near-new Ranger Super Duty single cab chassis, bought, in place of the LandCruiser build | Leonard's change of 22 Nov 2026. Ford's ratings carry the box and the trailer with no GVM kit or GCM revision. With the emissions tests the certifier names it costs AUD 2,602 more than the LandCruiser plan in all, and about AUD 15,400 less with the same tests counted in both (est.) |
 | Ford's 4,500 kg GVM, not 4,495 kg | Ford's dealer specification sheet and payload guide give 4,500 kg |
 | Near-new or new at the same drive-away price | The one near-new listing and a new truck land within about AUD 3,000 of each other, and a new one has no tray to sell and Ford's longer warranty |
 | Cruisemaster's DO45Plus tow pin in Ford's own 4.5 t hitch, no 70 mm ball | The trailer's plate went to 4,000 kg on a DO45-type coupling (conductor, 23 Nov 2026), and the BEMM forbids drilling the hitch or fitting a ball that does not fit its hole |
@@ -186,6 +190,7 @@ Ford's warranty. Ford says an aftermarket part does not by itself void the warra
 | Garrett PowerMax turbo and intercooler with a calibration of the engine and 10-speed | Garrett makes Ford's turbo, and its 27 % more flow keeps about 14 % in hand at 205 kW |
 | Torque at most 650 Nm, Ford's 600 Nm in low range, first and reverse | Ford rates the engine at 600 Nm and publishes no torque rating for the 10-speed, so power comes from holding torque higher up the rev range |
 | The DPF, SCR and EGR untouched | Removing them is unlawful (VSI 06 Rev 4 item 5) and Leonard asked for nothing that needs it |
+| The LC4 certifier names the emissions test: a stock and tuned pair in the build (TL04), the engine-out heavy-duty test a check line that stops the stage (TL07) | The interim NSW procedure does not apply to diesel engines, and the NHVR's PEMS procedure covers only vehicles built to ADR 80/03 or earlier, so nothing simplified covers a heavy-duty Euro VI diesel at any power (report 32 section 7) |
 | The power stage last, when Leonard accepts the warranty risk or the warranty ends | Ford does not pay for failures a tune or turbo causes, and every earlier stage stands without it |
 
 ## Open points and the assumption used
@@ -194,7 +199,7 @@ Ford's warranty. Ford says an aftermarket part does not by itself void the warra
 2. How does the kerb weight split between the axles? Not published. The ute model estimates it, and CK01 measures it.
 3. Does the DO45Plus pin's 32 mm shank fit Ford's 4.5 t hitch hole firmly? Assumed yes. If not, a 4.5 t tongue with a 32 mm hole (TW02, AUD 350 est.).
 4. Do the Clearview Next Gen mirrors fit the Super Duty? Assumed yes, as it shares the Ranger's cab and doors. Confirm by VIN.
-5. Will an LC4 certifier accept the interim NSW emissions procedure for a heavy-duty Euro VI calibration? Assumed yes. If not, a laboratory test (TL07, AUD 10,000 est.) or the truck stays stock.
+5. Which emissions test will the LC4 certifier name? The interim NSW procedure does not apply to diesel engines, and no simplified procedure covers a heavy-duty Euro VI truck. Assumed a stock and tuned pair at a NATA-accredited facility, on a chassis dynamometer or with portable emissions measuring equipment (TL04, AUD 15,000 est.). If the certifier asks for the engine out and tested in a laboratory (TL07, AUD 50,000 est.), the stage stops for Leonard's decision and the truck stays stock.
 6. Can a tuner write the Super Duty's calibration? Assumed yes, since tuners already calibrate the V6 and its 10-speed in the ordinary Ranger. If none can, S3 waits.
 7. What do the PowerMax turbo and intercooler cost here? No price is published. Assumed AUD 2,831 (est., Falcon Turbos' hybrid for the same engine at GBP 1,300 before UK VAT, converted at 1.98 with 10 % GST) and AUD 1,900 (est.).
 8. Is the single cab chassis a non-passenger vehicle for NSW duty? Assumed yes, AUD 3 per AUD 100.

@@ -259,7 +259,7 @@ def tow_vehicle_page():
     out.append(head + "\n\nEach stage's lines added up by list, from the YAML. The sheet's footer gives the totals.\n\n" + _sums(rows) +
                _drop_first_table(rest) + "\n")
     out.append("## Parts list\n\nEvery line of `data/vehicle/vehicle-parts.yaml`, AUD including GST, the line total, sorted into three "
-               "lists by research report 31. Basis is listing (read from a supplier or regulator page) or estimate. "
+               "lists by research report 31, with the power stage's emissions tests from report 32. Basis is listing (read from a supplier or regulator page) or estimate. "
                "Priority: " + ", ".join(f"{p} {d[0].lower() + d[1:]}" for p, d in PRIORITIES.items()) + ". Select rows to total them "
                "in the footer, or sort and filter by stage or priority.\n\n")
     out += _car_lists(data, T)
@@ -395,8 +395,8 @@ RESEARCH_STATUS = {
     25: "Record, 20 Nov 2026. The fixed roof with rounded front edges, decision H12",
     26: "Record, 21 Nov 2026. The Elite kit's wheels, rear track and brakes, decisions H18 and H19",
     27: "Record, 22 Nov 2026. The car build's three lists, the injectors, the gearbox and the trailer's weld evidence, decisions H24 and H26",
-    31: "Current, 23 Nov 2026. The Ranger Super Duty behind `VEHICLE.md`, which replaced the LandCruiser plan of reports 14 to 16, 26 and 27",
-    32: "Current, 24 Nov 2026. The power stage at about 250 kW and the time to 100 km/h towing, for stage S3 of `VEHICLE.md`",
+    31: "Current, 23 Nov 2026, with a note of 24 Nov 2026. The Ranger Super Duty behind `VEHICLE.md`, which replaced the LandCruiser plan of reports 14 to 16, 26 and 27. Report 32 replaces its emissions path and its turbo's ceiling",
+    32: "Current, 24 Nov 2026, recalibrated the same day. The power stage at about 250 kW and the time to 100 km/h towing, for Leonard's choice of level, and the emissions tests `VEHICLE.md` now prices for stage S3",
 }
 
 
