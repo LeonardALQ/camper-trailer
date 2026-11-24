@@ -44,6 +44,7 @@ RESEARCH = [
     ("26-elite-wheels.md", "What the Lovells Elite kit needs from the wheels, track and brakes", 26),
     ("27-car-build-scope.md", "The car build’s scope, the injectors, the driveline for level B and the trailer’s weld evidence", 27),
     ("31-ranger-super-duty.md", "The Ford Ranger Super Duty: ratings, price, power and the NSW path", 31),
+    ("32-super-duty-power.md", "The Super Duty at about 250 kW: turbo, fuel, the 10-speed, heat, the certificate and the time to 100 km/h", 32),
 ]
 # research reports 23 and 24 are the car build and bike box plans themselves, so the index points at their pages
 RESEARCH_PLANS = [("23", "The tow vehicle plan", "`VEHICLE.md`, the Tow vehicle page", "../tow-vehicle/"),
@@ -395,6 +396,7 @@ RESEARCH_STATUS = {
     26: "Record, 21 Nov 2026. The Elite kit's wheels, rear track and brakes, decisions H18 and H19",
     27: "Record, 22 Nov 2026. The car build's three lists, the injectors, the gearbox and the trailer's weld evidence, decisions H24 and H26",
     31: "Current, 23 Nov 2026. The Ranger Super Duty behind `VEHICLE.md`, which replaced the LandCruiser plan of reports 14 to 16, 26 and 27",
+    32: "Current, 24 Nov 2026. The power stage at about 250 kW and the time to 100 km/h towing, for stage S3 of `VEHICLE.md`",
 }
 
 
