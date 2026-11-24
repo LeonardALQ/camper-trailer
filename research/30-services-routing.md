@@ -138,14 +138,17 @@ they are threaded through (`inside`).
   extra-low voltage, and SVC-06 holds the TSC at its 10.5 V floor (est.) at 16 A from 12.0 V (I2-62). Coupled, each
   lead is clamped on the leads' bracket DB-HK, whose top plate reaches ahead of the stone guard, and its span from the
   truck's socket runs up over a lined seat at the tip of its own sprung arm, strapped there, and down to the clamp
-  (`lift`, I2-78). From the clamp it runs clipped along the drawbar member to the junction. cad/routes.py lifted reads
-  each span as two flexible catenaries of fixed length, from the plug to the seat and from the seat to the clamp, each
-  pulling with its horizontal pull plus the weight under it, and rests the arm where its torsion spring's torque
-  balances them, over every turn and pitch of rules.between (est.). A lead lying loose over a saddle or a free sheave
-  gives its slack to the long span from the truck, which pulls hardest, which is why the friction band and the sheave's
-  one height were dropped. The cuts, 1.34 m for K-13 and 1.28 m for K-14, leave no position taut with 30 mm taken off.
-  In any turn and pitch K-13 hangs no lower than 303 mm and K-14 318 mm, 283 and 299 mm with the truck's
-  ball at its low 420 mm, so DIM-08 holds both to DIM-06's 200 mm, and TR-13 measures them coupled. Each
+  (`lift`, I2-78). From the clamp it runs clipped along the drawbar member to the junction. cad/routes.py lifted
+  reads each span as two flexible catenaries of fixed length, from the plug to the seat and from the seat to the
+  clamp, each pulling with its horizontal pull plus the weight under it, the strap turning with the seat as the arm
+  swings (I2-83), and rests the arm where its torsion spring's torque balances them, over every turn and pitch of
+  rules.between (est.). The strap stands at the seat's top with the arm 15 degrees below level, the seat runs 150
+  degrees ahead of it and 55 behind, and both arms take one spring of 1.5 to 1.0 N m (CT-601). A lead lying loose
+  over a saddle or a free sheave gives its slack to the long span from the truck, which pulls hardest, which is why
+  the friction band and the sheave's one height were dropped. The cuts, 1.34 m for K-13 and 1.28 m for K-14, leave no
+  position taut with 30 mm taken off. In any turn and pitch each lead hangs lowest at its plug, K-13
+  no lower than 397 mm and K-14 394 mm, 377 and 374 mm with the truck's ball at its low 420 mm, so DIM-08 holds both
+  to DIM-06's 200 mm, and TR-13 measures them coupled. Each
   drum's lead runs from its side's junction under CM-05 out under the tank guard to a P-clip on its XT hanger, 15 mm
   ahead of the arm's pivot and 52.5 mm inboard of the arm, then in a loop down beside the bush and along the arm's
   underside to the backing plate. cad/routes.py lays that arm part on the arm at ride height and FIT-05 sweeps it
