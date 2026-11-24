@@ -45,8 +45,8 @@ CENTRAL = (1.00, CALIB)
 SPREAD = (1.08, 1.18)
 
 # The combination's masses, kg. UTE-06's GCM case is the ute with growth (3,747.7 kg) and the trailer at its 4,000 kg
-# plate, 7,747.7 kg. TC2 with growth is the trailer fully loaded with 400 L of water and growth (3,575.9 kg, TRAILER.md
-# at 8e7e9bb), so the ute and that trailer are 7,323.6 kg. 7,450 and 7,200 kg are the two lighter masses the plan asked
+# plate, 7,747.7 kg. TC2 with growth is the trailer fully loaded with 400 L of water and growth (3,576.5 kg, TRAILER.md
+# at 1dc2c24), so the ute and that trailer are 7,324.2 kg. 7,450 and 7,200 kg are the two lighter masses the plan asked
 # for. The truck's tyres carry the ute and the towball, about 4,140 kg with growth (est.), which sets the grip.
 MASSES = (("GCM case, the trailer at its plate", 7750.0), ("Lighter, about 300 kg less", 7450.0),
           ("TC2 with growth behind the ute with growth", 7324.0), ("Lighter, about 550 kg less", 7200.0))
@@ -252,7 +252,8 @@ def calibration():
 
 def results(calib):
     print(f"Towing on a flat road in still air, CdA 4.55 m2, Crr 0.011 (est.), the 10R80's ratios on a 3.73 final drive "
-          f"(est.), {SHIFT_LOST:.1f} s lost at each upshift, factor {calib:.2f}. Wheel figures are crank x {ETA:.2f}, the plan's convention")
+          f"(est.), {SHIFT_LOST:.1f} s lost at each upshift, factor {calib:.2f}. Wheel figures are crank x {ETA:.2f}, the model's own (est.), "
+          f"where report 31 and VEHICLE.md quote wheel figures at 0.845")
     print(f"{'Level':38s} {'Crank kW':>8s} {'Wheel kW':>8s} {'Wheel hp':>8s} " +
           " ".join(f"{int(m):>7d} kg" for _, m in MASSES))
     for key in TABLE:

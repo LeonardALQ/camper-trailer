@@ -342,8 +342,10 @@ def ct003(prj, model, bom, checks, reg, dwg):
     ang, sa, pg = td_case["angles"], an["set_above_mm"], an["plate_gap_mm"]
     # the leads between the vehicles as routed and drawn at their cut length, their bights' lowest point (I2-63), and in
     # the tightest turn at the design ball and at UTE-13's low end (DIM-08, I2-70)
-    leads = [r for r in C["tr"].routes(C["day"])["runs"] if r.get("rides") == "between"]
+    rr = C["tr"].routes(C["day"])
+    leads = [r for r in rr["runs"] if r.get("rides") == "between"]
     leads_low = min(min(p[2] for p in r["dense"]) - r["od"] / 2 for r in leads)
+    beside = rr["fixtures"]["DB-HR"]["box"][1] - rr["fixtures"]["DB-HK"]["box"][4]      # the sheave's inner face outboard of the saddle's (I2-77)
     turned = chk["DIM-08"]["leads"]
     turn_low, turn_ball = min(x["turn_low_mm"] for x in turned), min(x["low_ball"]["turn_low_mm"] for x in turned)
     lines = [
@@ -359,8 +361,9 @@ def ct003(prj, model, bom, checks, reg, dwg):
                           f"({_kg(uc['UTE-03']['measured'])} kg TOWING WITH GROWTH)."),
         ("COUPLING HEIGHT", f"{V['coupling_z']:.0f} mm LADEN, PLUS OR MINUS 20 mm. SET THE HITCH'S DROP AT THE FINAL WEIGHING (TW08)."),
         ("GREY WATER", f"EMPTY FOR TRAVEL. A FULL {V['grey_full_l']:.0f} L TANK IS CHECKED IN CASES TC7 AND TC8."),
-        ("LEADS (DIM-04, DIM-08)", "LAY THE 12-PIN AND SB50 LEADS OVER THE SADDLE BEHIND THE ROAD-SIDE CHAIN LUG WHEN COUPLING, AND THE 12-PIN "
-                                   "LEAD OVER THE ROLLER BEHIND IT, THEIR SLACK HANGING TO THE JUNCTION. DRIVING STRAIGHT NO PART OF THEM HANGS "
+        ("LEADS (DIM-04, DIM-08)", "LAY THE SB50 LEAD OVER THE SADDLE BEHIND THE ROAD-SIDE CHAIN LUG WHEN COUPLING, AND THE 12-PIN LEAD OVER ITS "
+                                   f"SHEAVE BESIDE THE SADDLE, {beside:.0f} mm OUTBOARD OF IT, THEIR SLACK HANGING TO THE JUNCTION. KEEP MUD OFF THE "
+                                   "SADDLE'S LINING SO THE SB50 LEAD SLIDES ON IT. DRIVING STRAIGHT NO PART OF THEM HANGS "
                                    f"BELOW ABOUT {leads_low:.0f} mm (EST.), OVER THE COUPLING'S UNDERSIDE, AND IN A FULL 70 DEGREE TURN WITH A 20 "
                                    f"DEGREE PITCH ABOUT {turn_low:.0f} mm, {turn_ball:.0f} mm WITH THE BALL AT ITS LOW "
                                    f"{V['coupling_z'] - C['tr'].tv['coupling_tol']:.0f} mm (EST.)."),
