@@ -183,14 +183,23 @@ class Sheet:
         self.path(pts, "thin")
         self.el[-1] = self.el[-1][:-2] + lead_attr(self.target(names)) + "/>"
 
-    def arrow(self, tip, direction, length=2.5, half=0.45):
+    def arrow(self, tip, direction, length=2.5, half=0.45, line=True):
+        """A filled arrowhead at `tip` pointing along `direction`. The straight line drawn just before it with an end at
+        the tip is its arrow's line (a weld symbol's, a load's, a cut's view arrow), and is marked so the overrun check
+        reads it with the leaders (I2-76), unless `line` is False: a dimension line's arrowheads."""
+        if line and self.el:
+            mark_arrow(self.el, (tip[0], self._y(tip[1])))
         (x, y), (dx, dy) = tip, direction
         bx, by = x - dx * length, y - dy * length
         px, py = -dy * half, dx * half
         self.path([(x, y), (bx + px, by + py), (bx - px, by - py)], "fill", closed=True)
 
     def svg(self, clear: bool = True) -> str:
-        """The sheet as SVG, its labels first moved clear of the heavy lines (clear_labels) unless `clear` is False."""
+        """The sheet as SVG, its labels first moved clear of the heavy lines (clear_labels) unless `clear` is False. Each
+        text drawn in a symbol is first marked with it (mark_inside), so the overrun check finds one that leaves it."""
+        if not getattr(self, "_marked", False):
+            mark_inside(self)
+            self._marked = True
         if clear and not getattr(self, "_cleared", False):
             clear_labels(self)
             self._cleared = True
@@ -262,6 +271,94 @@ def read_target(e: str):
     """What a leader element names, as Sheet.target gives it, or None."""
     m = _NAMES.search(e)
     return (m[1], *map(float, m[2].split())) if m else None
+
+
+def is_leader(e: str) -> bool:
+    """Is the element a leader or an arrow's line, as the sheets mark them?"""
+    return e.startswith("<path") and ('class="leader"' in e or 'class="arrow"' in e)
+
+
+def mark_arrow(el: list, tip) -> None:
+    """Mark the last element as an arrow's line (I2-76) when it is a stroked straight line with an end at the arrowhead's
+    tip (SVG mm) and is not already a leader."""
+    m = _PATH.match(el[-1])
+    if not m or 'class="' in m[2] or "stroke=" not in m[2] or 'stroke="none"' in m[2]:
+        return
+    pts = _path_pts(el[-1])
+    if len(pts) == 2 and min(math.dist(tip, pts[0]), math.dist(tip, pts[1])) < 0.05:
+        el[-1] = el[-1][:-2] + ' class="arrow"/>'
+
+
+_SYM_IN = re.compile(r'data-in="(\d+)"')
+_SYM_OF = re.compile(r'data-sym="(\d+)"')
+
+
+def symbol_shape(e: str):
+    """A symbol a letter can be drawn in, from its element: ("circle", cx, cy, r) for a circle of 0.5 to SYMBOL_R mm that
+    is not a black dot, ("poly", points) for a closed straight-sided outline no more than 2 SYMBOL_R across in either
+    direction (a revision triangle, an outlet's square), or None."""
+    if e.startswith("<circle"):
+        m = _CIRCLE.match(e)
+        if m and 0.5 <= float(m[3]) <= SYMBOL_R and 'fill="#000"' not in m[4]:
+            return ("circle", float(m[1]), float(m[2]), float(m[3]))
+        return None
+    m = _PATH.match(e) if e.startswith("<path") else None
+    if not m or "Z" not in m[1] or "A" in m[1] or 'fill="#000"' in m[2] or "stroke=" not in m[2] or 'stroke="none"' in m[2]:
+        return None
+    pts = _path_pts(e)
+    b = _bnds(pts) if len(pts) >= 3 else None
+    return ("poly", pts) if b and b[1] - b[0] <= 2 * SYMBOL_R and b[3] - b[2] <= 2 * SYMBOL_R else None
+
+
+def in_shape(p, shape, tol: float = 0.05) -> bool:
+    """Is sheet point p inside a symbol's shape (symbol_shape), or within `tol` of its outline?"""
+    if shape[0] == "circle":
+        return math.hypot(p[0] - shape[1], p[1] - shape[2]) <= shape[3] + tol
+    pts = shape[1]
+    ring = pts if pts[0] != pts[-1] else pts[:-1]
+    inside = False
+    for a, b in zip(ring, ring[1:] + ring[:1]):
+        if (a[1] > p[1]) != (b[1] > p[1]) and p[0] < a[0] + (p[1] - a[1]) * (b[0] - a[0]) / (b[1] - a[1]):
+            inside = not inside
+    return inside or any(_seg_dist(p, a, b) <= tol for a, b in zip(ring, ring[1:] + ring[:1]))
+
+
+def letters_middle(t: dict) -> tuple:
+    """The middle of a text's letters' cores on the sheet (SVG mm)."""
+    c = text_core(t)[2]
+    return _Frame(t).sheet((c[0] + c[1]) / 2, (c[2] + c[3]) / 2)
+
+
+def mark_inside(sh) -> None:
+    """Each free text drawn in a symbol (I2-76): its letters' middle inside a symbol drawn before it (symbol_shape), such
+    as a contactor's or a fan's circle, a balloon, a revision triangle or an outlet's square, when the text is registered
+    with that symbol (Sheet.leads) or names nothing. A label that names what it marks, a part's outline or a gland, gets
+    a leader to it if it has to leave its place, and a tag on a leader of its own is in no symbol but one registered with
+    it, so neither is marked. The symbol's element gets `data-sym` and the text `data-in` with the symbol's element
+    index, so the overrun check can fail a letter that ends up outside its symbol, wherever clear_labels moves either."""
+    grid, shapes = _Grid(), {}
+    for n, e in enumerate(sh.el):
+        s = symbol_shape(e)
+        if s:
+            shapes[n] = s
+            grid.add(n, (s[1] - s[3], s[1] + s[3], s[2] - s[3], s[2] + s[3]) if s[0] == "circle" else _bnds(s[1]))
+    if not shapes:
+        return
+    for t in sh.texts:
+        parts = sh.leads.get(t["i"], ())
+        own = {n for n, _ in parts}
+        if not own and t.get("names"):
+            continue       # a label that names what it marks gets a leader to it if it has to leave its place
+        p = letters_middle(t)
+        held = sorted((n for n in grid.near((p[0], p[0], p[1], p[1])) if n < t["i"] and in_shape(p, shapes[n], 0.0)
+                       and (n in own or not _own_leader(parts))), reverse=True)    # a tag on its leader is not in a cell it overlies
+        if not held:
+            continue
+        n = held[0]
+        if "data-sym=" not in sh.el[n]:
+            sh.el[n] = sh.el[n][:-2] + f' data-sym="{n}"/>'
+        sh.el[t["i"]] = sh.el[t["i"]].replace(">", f' data-in="{n}">', 1)
+        t["inside"] = n
 
 
 def on_target(p, target, tol: float = LEAD_TOL) -> bool:
@@ -650,7 +747,7 @@ class _Board:
         self.tgrid = _Grid()
         for k, it in enumerate(self.items):
             self.tgrid.add(k, _bnds(it["fr"].ring(it["mask"])))
-        self.leaders = {n: _path_pts(e) for n, e in enumerate(sh.el) if e.startswith("<path") and 'class="leader"' in e}
+        self.leaders = {n: _path_pts(e) for n, e in enumerate(sh.el) if is_leader(e)}
         self.symbols = _symbol_circles(sh.el)
 
     def _file(self, k, p, q, n, hw, plain):
@@ -694,7 +791,7 @@ class _Board:
             self.segs.append((p, q, n, hw))
             self.seg_of[n].append(k)
             self._file(k, p, q, n, hw, plain)
-        if e.startswith("<path") and 'class="leader"' in e:
+        if is_leader(e):
             self.leaders[n] = _path_pts(e)
         if e.startswith("<circle"):
             self.symbols = [s for s in self.symbols if s[3] != n] + _symbol_circles([e], n)
@@ -1130,12 +1227,12 @@ def hdim(sh, x1, y1, x2, y2, yd, text, size=TXT, ext=True):
     sh.line(x1, yd, x2, yd)
     lo, hi = min(x1, x2), max(x1, x2)
     if hi - lo > 7:
-        sh.arrow((lo, yd), (-1, 0))
-        sh.arrow((hi, yd), (1, 0))
+        sh.arrow((lo, yd), (-1, 0), line=False)
+        sh.arrow((hi, yd), (1, 0), line=False)
     else:  # arrows outside for short dimensions
         sh.line(lo - 5, yd, hi + 5, yd)
-        sh.arrow((lo, yd), (1, 0))
-        sh.arrow((hi, yd), (-1, 0))
+        sh.arrow((lo, yd), (1, 0), line=False)
+        sh.arrow((hi, yd), (-1, 0), line=False)
     sh.text((x1 + x2) / 2, yd + 0.8, text, size, "middle")
 
 
@@ -1147,12 +1244,12 @@ def vdim(sh, x1, y1, x2, y2, xd, text, size=TXT, ext=True):
     sh.line(xd, y1, xd, y2)
     lo, hi = min(y1, y2), max(y1, y2)
     if hi - lo > 7:
-        sh.arrow((xd, lo), (0, -1))
-        sh.arrow((xd, hi), (0, 1))
+        sh.arrow((xd, lo), (0, -1), line=False)
+        sh.arrow((xd, hi), (0, 1), line=False)
     else:
         sh.line(xd, lo - 5, xd, hi + 5)
-        sh.arrow((xd, lo), (0, 1))
-        sh.arrow((xd, hi), (0, -1))
+        sh.arrow((xd, lo), (0, 1), line=False)
+        sh.arrow((xd, hi), (0, -1), line=False)
     sh.text(xd - 0.8, (lo + hi) / 2, text, size, "middle", rot=-90)
 
 
@@ -1416,9 +1513,12 @@ def notes(sh, x, y, lines, title="NOTES", size=2.0, width_chars=95):
 
 
 def rev_tag(sh, x, y, rev, size=5.0):
-    """Revision triangle (REV-03): an equilateral triangle centred on (x, y) with the revision letter."""
+    """Revision triangle (REV-03): an equilateral triangle centred on (x, y) with the revision letter, which moves with
+    its triangle if clear_labels moves it."""
     h = size * math.sqrt(3) / 2
+    n0 = len(sh.el)
     sh.path([(x - size / 2, y - h / 3), (x + size / 2, y - h / 3), (x, y + 2 * h / 3)], "medium", closed=True)
+    sh.leads[len(sh.el)] = [(n0, ("path",))]
     sh.text(x, y - h / 3 + 0.7, rev, 2.3, "middle", bold=True)
 
 

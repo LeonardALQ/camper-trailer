@@ -583,9 +583,11 @@ def ct601(prj, model, bom, checks, reg, dwg):
         wire(sh, [(156, y), (172, y)], "ac")
         sh.rect(159, y - 1.3, 162, y + 1.3, "medium")
         sh.text(160.5, y + 2.0, f"{c['rcbo']} A", 1.05, "middle")
-        if c["id"] in ctl:
-            sh.circle(167, y, 1.4, "medium")
-            sh.text(167, y - 0.45, ctl[c["id"]], 0.95, "middle", bold=True)
+        if c["id"] in ctl:     # the contactor's letter on its white disc over the circuit's line, moving with it (I2-69)
+            n0 = len(sh.el)
+            sh.circle(167, y, 1.4, "box")
+            sh.leads[len(sh.el)] = [(n0, ("circle", 1.4))]
+            sh.text(167, y - 0.45, ctl[c["id"]], 0.95, "middle", bold=True, names=(167, y, 1.4))
         amps = f"{c['amps']:.1f} A" if c["amps"] is not None else "USER"
         sh.text(173.5, y + 0.4, f"{c['id']} {c['load'].upper()}", 1.2, bold=True)
         sh.text(173.5, y - 2.0, f"{amps}. {c['control'].upper()}"[:86], 1.05)
@@ -1215,17 +1217,19 @@ def ct621(prj, model, bom, checks, reg, dwg):
     # towing: the RESPA's supply through the cabin, out through the relief valve
     r4 = f("VE-04")
     rv = f("VE-06")
-    _route(pr, [(r4[0], r4[1] - 300), (4300, 200), (V["rear_x0"] - 200, 0), (V["wet_x0"] + 400, -200), (V["in_x1"] - 60, rv[1])], "airx", arrow=True)
+    _route(pr, [(r4[0], r4[1] - 300), (4300, 200), (V["rear_x0"] - 200, 0), (V["wet_x0"] + 400, -200), (V["in_x1"] - 60, rv[1] + 50)], "airx", arrow=True)
     q = pr.p(4300, 230)
     sh.text(q[0], q[1] + 0.8, "TOWING: RESPA SUPPLY TO THE RELIEF VALVE", 1.15, "middle", color="#8a5a00", names=pr.p(4300, 200))
-    # the wet room extract and the range hood
+    # the wet room extract and the range hood, the extract's arrow to the kerb-side half of the vents' place in plan and
+    # the relief path's to the road-side half, so the two arrows do not cross (I2-76)
     ex = f("VE-03")
-    _route(pr, [(V["in_x1"] - 500, -700), (V["in_x1"], ex[1])], "airx", arrow=True)
+    _route(pr, [(V["in_x1"] - 500, -700), (V["in_x1"], ex[1] - 50)], "airx", arrow=True)
     hood = f("VE-07")
     _route(pr, [(hood[0], hood[1]), (hood[0] + 30, hb)], "airx", arrow=True)
-    # the split: indoor unit blowing forward, the line set to the outdoor unit through G5
+    # the split: indoor unit blowing forward, its arrow ending short of the Combi duct's outlet ahead of it (I2-76), the
+    # line set to the outdoor unit through G5
     ai = f("AC-01")
-    _route(pr, [(ai[0] - 150, ai[1] - 200), (ai[0] - 1100, ai[1] - 350)], "air", arrow=True)
+    _route(pr, [(ai[0] - 150, ai[1] - 200), (ai[0] - 560, ai[1] - 265)], "air", arrow=True)
     g5 = next(x for x in svc["glands"] if x["id"] == "G5")
     _route(pr, [(V["wet_x0"], g5["y"]), (V["in_x1"], g5["y"])], "thin")
     q = pr.p(V["wet_x0"] + 500, g5["y"] + 60)

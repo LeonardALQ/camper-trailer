@@ -180,3 +180,78 @@ def test_a_letter_on_its_symbols_white_disc_passes():
     sh.text(300, 250 - 0.45, "A", 1.1, "middle", bold=True)
     svg = sh.svg(clear=False)
     assert not re.search(r'<text class="masked"[^>]*>A</text>', svg) and _counts(svg) == (0, 0, 0, 0)
+
+
+def _weld_arrow(sh, tip, elbow):
+    """A weld symbol's arrow as cad/drawings/chassis_sheets.weld_symbol draws it: a thin line from the joint to the
+    elbow, then the arrowhead at the joint."""
+    sh.line(tip[0], tip[1], elbow[0], elbow[1], "thin")
+    L = ((tip[0] - elbow[0]) ** 2 + (tip[1] - elbow[1]) ** 2) ** 0.5
+    sh.arrow(tip, ((tip[0] - elbow[0]) / L, (tip[1] - elbow[1]) / L), 2.0, 0.4)
+
+
+def test_a_weld_symbols_arrow_across_a_leader_is_a_leader_fault():
+    """A weld symbol's arrow is marked as an arrow's line, so the fourth class reads it with the leaders: one that
+    crosses a part's leader fails, as CT-102's detail C showed (I2-76)."""
+    sh = _sheet()
+    _weld_arrow(sh, (250, 150), (262, 140))
+    sh.lead([(262, 150), (250, 140)], names=(262, 150))
+    svg = sh.svg(clear=False)
+    assert svg.count('class="arrow"') == 1 and _counts(svg) == (0, 0, 0, 1)
+    assert check(svg)["leader_faults"][0]["kind"] == "crosses or touches a leader"
+
+
+def test_two_arrows_that_cross_are_a_leader_fault():
+    sh = _sheet()
+    _weld_arrow(sh, (250, 150), (262, 140))
+    _weld_arrow(sh, (262, 150), (250, 140))
+    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 1)
+
+
+def test_a_dimension_lines_arrowheads_mark_no_arrow():
+    """A dimension line ends in arrowheads too, but it is no arrow pointing at a part, so it is not marked."""
+    sh = _sheet()
+    S.hdim(sh, 240, 230, 300, 230, 222, "60", size=2.0)
+    S.vdim(sh, 320, 200, 320, 240, 326, "40", size=2.0)
+    assert 'class="arrow"' not in sh.svg()
+
+
+def _letter_on_a_line(sh, registered: bool):
+    """A contactor's letter in its circle on a 0.4 mm circuit line through it, as CT-601 draws K2, K4 and S1."""
+    sh.line(280, 250, 320, 250, "medium")
+    n0 = len(sh.el)
+    if registered:      # the circle a white disc over the line, the letter registered with it
+        sh.el.append(f'<circle cx="300.00" cy="{S.Sheet.H - 250:.2f}" r="1.40" fill="#fff" stroke="#000" stroke-width="0.35"/>')
+        sh.leads[len(sh.el)] = [(n0, ("circle", 1.4))]
+        sh.text(300, 250 - 0.45, "K2", 0.95, "middle", bold=True, names=(300, 250, 1.4))
+    else:
+        sh.circle(300, 250, 1.4, "medium")
+        sh.text(300, 250 - 0.45, "K2", 0.95, "middle", bold=True)
+
+
+def test_a_letter_that_leaves_its_symbol_is_a_leader_fault():
+    """A letter drawn in its symbol but not registered with it, with a heavy line through both, is moved off the line by
+    clear_labels and out of its circle, as CT-601's contactor letters were by 2.0 mm (I2-69, I2-76)."""
+    sh = _sheet()
+    _letter_on_a_line(sh, registered=False)
+    svg = sh.svg()
+    assert 'data-in="' in svg and 'data-sym="' in svg
+    r = check(svg)["leader_faults"]
+    assert [x["kind"] for x in r] == ["out of its symbol"] and r[0]["names"] == "K2"
+
+
+def test_a_letter_registered_on_its_white_disc_stays_in_its_symbol():
+    """The same letter on its circle's white disc, drawn over the line, and registered with it, stays and passes."""
+    sh = _sheet()
+    _letter_on_a_line(sh, registered=True)
+    svg = sh.svg()
+    assert not sh.moves and 'data-in="' in svg and _counts(svg) == (0, 0, 0, 0)
+
+
+def test_a_letter_moved_out_of_its_symbol_in_the_code_is_a_leader_fault():
+    """A revision triangle's letter set 3 mm off its triangle, as a slip in a sheet's code would put it."""
+    sh = _sheet()
+    S.rev_tag(sh, 340, 120, "B")
+    svg = sh.svg(clear=False)
+    assert _counts(svg) == (0, 0, 0, 0)
+    assert _counts(_move(svg, "B", 343.5, S.Sheet.H - 120.0 + 0.7)) == (0, 0, 0, 1)
