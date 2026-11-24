@@ -467,7 +467,25 @@ def ct601(prj, model, bom, checks, reg, dwg):
     # sources
     box(sh, 24, 262, 84, 280, ["PV ARRAY ON THE FIXED ROOF", "4 x SUNMAN eARC 430 W, 1,720 W", "TWO STRINGS OF TWO PANELS", f"{mm2('D-15')} PV CABLE, {rt['D-15']['length_m']:.2f} AND {rt['D-16']['length_m']:.2f} m (G4)"])
     box(sh, 112, 262, 166, 280, ["THE UTE (CAR BUILD TC01)", "2 x ORION-TR SMART 12/48-8", "ON THE STOCK ALTERNATOR", "48 V TO THE TRAILER WHILE DRIVING"])
-    box(sh, 172, 262, 226, 280, ["12-PIN PLUG, AS 4177.5", "LAMPS, BRAKES, BREAKAWAY SWITCH", "TSC POWER FROM THE UTE'S HARNESS", "NOT PART OF THE 48 V SYSTEM"], sty="light")
+    box(sh, 172, 271, 226, 280, ["12-PIN PLUG (K-13), AS 4177.5", "LAMPS, BRAKE REQUEST, BREAKAWAY SWITCH", "12 V FROM THE TRUCK, NOT PART OF THE 48 V SYSTEM"],
+        size=1.2, sty="light")
+    # the TSC's own 12 V supply from the truck (I2-50, I2-61): the truck's breaker, its SB50, the lead, the 30 A MIDI fuse
+    # in the drawbar junction and K-10 to the TSC, with SVC-06's drop
+    sh.text(172, 268.8, "TSC SUPPLY FROM THE TRUCK, 12 V, 16 A", 1.2, bold=True)
+    wire(sh, [(172, 265.2), (215.5, 265.2)], "bus")
+    for x, top, bottom in ((176.0, "30 A", "BREAKER"), (204.5, "30 A MIDI", "IN DB-PL")):
+        sh.rect(x - 1.5, 264.4, x + 1.5, 266.0, "medium")
+        sh.text(x, 262.9, top, 1.0, "middle")
+        sh.text(x, 261.5, bottom, 1.0, "middle")
+    sh.line(189.4, 264.2, 189.4, 266.2, "medium")
+    sh.line(190.6, 264.2, 190.6, 266.2, "medium")
+    sh.text(190, 262.9, "SB50", 1.0, "middle")
+    box(sh, 215.5, 263.6, 226, 266.8, ["TSC"], size=1.1)
+    k10, k14 = rt["K-10"], rt["K-14"]
+    sh.text(183, 266.4, "TW07", 1.0, "middle")
+    sh.text(197.5, 266.4, f"K-14 {k14['length_m']:.2f} m", 1.0, "middle")
+    sh.text(210, 266.4, f"K-10 {k10['size']:g} mm2", 1.0, "middle")
+    sh.text(172, 258.6, f"{k10['vd_pct']:.2f} % FROM THE TRUCK'S SB50, {mm2('K-14')} LEAD, FUSE AND K-10 (SVC-06)", 1.0)
     box(sh, 172, 238, 226, 256, ["TWO 15 A INLETS (G2): SHORE, AND", "GENERATOR FOR THE TWO EU22i IN PARALLEL", "CHANGEOVER SHORE - OFF - GENERATOR",
                                  "ON GEN: e2 C, D OFF, CERBO IN 3, N-E BOND"])
     # MPPTs
@@ -500,7 +518,7 @@ def ct601(prj, model, bom, checks, reg, dwg):
     wire(sh, [(92, 220), (96, 220)], "dc")
     # the ute's feed, the MultiPlus and its AC
     wire(sh, [(139, 262), (139, 226), (110, 226)], "dc")
-    textblock(sh, 140, 257, ["GREY ANDERSON SB50 AT", f"THE DRAWBAR, {mm2('D-14')} TWIN,", f"{rt['D-14']['length_m']:.2f} m (G20), 40 A MEGA",
+    textblock(sh, 140, 257, ["GREY ANDERSON SB120 AT", f"THE DRAWBAR, {mm2('D-14')} TWIN,", f"{rt['D-14']['length_m']:.2f} m (G20), 40 A MEGA",
                          "16 A, 32 A AFTER TC02"], size=1.15, gap=0.55)
     box(sh, 148, 196, 226, 230, ["VICTRON MULTIPLUS-II 48/6k5/100-50 230 V", "6.0 kW AT 25 C, 5.7 kW AT 40 C", "AC-IN FROM THE CHANGEOVER THROUGH A 16 A RCBO",
                                  "AC-OUT-1 TO THE 230 V BOARD", "AC-OUT-2 SPARE, LIVE ONLY ON SHORE OR GENERATOR",

@@ -998,11 +998,11 @@ inputs:
     estimate: {v: 399, src: "The fresh tanks' 402.0 L net (cad/trailer.py tank_nets, I2-40) less about 1.5 L a tank left under the pump's dip tube in the rear tank's sump and the balance hose's in the front tank's (est.), water the test from a dry pump cannot count"}
     measured: {v: null, date: null}
     stage: trailer built
-    range: {min: null, max: null, src: "Aim: report 21's 400 L, which covers 7 days with three washes. No limit either way: water_full_l, the water the design carries, follows the reading with the 3 L under the pickups added back, in H21's 5 L steps down, so a reading of 397 L or more keeps 400 L and one under it takes the design to 395 L. The travel limit (H13) caps what rides"}
+    range: {min: null, max: null, src: "Aim: report 21's 400 L. On its table, 41 L a day and 44 L a wash, a week with two washes needs 375 L and a week with three 419 L, so the estimate's 399 L is about 6.7 days of water with three washes a week, and a week with two washes with 24 L to spare. No limit either way: water_full_l, the water the design carries, follows the reading with the 3 L under the pickups added back, in H21's 5 L steps down, so a reading of 397 L or more keeps 400 L and one under it takes the design to 395 L. The travel limit (H13) caps what rides"}
     affects: [the days of water off-grid]
     thresholds:
-      - {at: 400, rule: "Under 400 L a week with three washes runs short by what is missing, at report 21's 57 L a day: the estimate's 399 L is 6.98 days of water, so the week's last wash waits for the next fill", src: "Report 21 section 10.1, 400 L over 7 days"}
-      - {at: 343, rule: "Under 343 L, six days at 57 L a day, a week with three washes needs a refill on the sixth day: plan the fills, or add laundry days less often", src: "Report 21 section 10.1, 400 L over 7 days"}
+      - {at: 375, rule: "Under 375 L even a week with two washes, at report 21's 41 L a day and 44 L a wash, needs a fill before it ends: plan the fills, or wash less often", src: "Report 21 section 10.1's table: 7 days of 41 L and two washes of 44 L"}
+      - {at: 359, rule: "Under 359 L a week with three washes needs its fill on the sixth day, a day earlier than with the estimate's 399 L, at the week's 59.9 L a day: plan the fills, or wash less often", src: "Report 21 section 10.1's table: 7 days of 41 L and three washes of 44 L, 419 L"}
   - id: TR-03
     group: Trailer tests
     part: trailer
@@ -1071,7 +1071,7 @@ inputs:
     estimate: {v: 5, src: "DauerShower 2.0, maker"}
     measured: {v: null, date: null}
     stage: trailer built
-    range: {min: null, max: 8, src: "Max: at 8 L the water budget rises to 47 L a day and 400 L lasts about 8.5 days (est.). No lower limit"}
+    range: {min: null, max: 8, src: "Max: at 8 L the water budget rises to 47 L a day and 400 L lasts about 8.5 days without laundry (est.). No lower limit"}
     affects: [the water budget]
   - id: TR-09
     group: Trailer tests
@@ -1108,3 +1108,16 @@ inputs:
     affects: [DIM-01, DIM-05, registration]
     thresholds:
       - {at: 2490, rule: "Over 2,490 mm, find the part that stands out and fit a lower one before the HVAIS inspection, because the design keeps 10 mm in hand (DIM-05)", src: "DIM-05"}
+  - id: TR-12
+    group: Trailer tests
+    part: trailer
+    title: "The TSC coupled to the truck's own brake controller at its commissioning: Ford's display shows the trailer with no fault, the TSC wakes green at a gain of 3, and a manual application reaches the magnets, 1 for yes, 0 for no"
+    how: "After the TSC is configured, couple the trailer to the truck with both leads plugged in and the SB50 live, and set the gain of Ford's integrated controller to 3. With the ignition on, check that Ford's display shows the trailer connected with no trailer brake fault. Press the brake pedal for more than 2 seconds: the TSC's lamp must turn green. Then hold the controller's manual lever with the truck parked and feel at each drum that its magnet pulls in (Bosch's verification start-up, Y265K30237 v4.0 page 10). Record 1 only if all three pass."
+    unit: yes or no
+    estimate: {v: 1, src: "Bosch's user manual lists Ford's integrated controller at High Confidence, the rating it gives the integrated controllers it has not tested, where the aftermarket ones it tested read Yes (F005EP0085.01 page 18). Assumed to pass (est.)"}
+    measured: {v: null, date: null}
+    stage: trailer built
+    range: {min: 1, max: 1, src: "Bosch's user manual page 18: an end user whose controller the guideline does not verify is responsible for verifying compatibility, and the installation guideline page 10 asks for a gain of 3 or more so that the controller's signal at standstill passes the TSC's wake-up threshold"}
+    affects: [the trailer's brakes with the TSC, the external simulated load (the fallback outside the total)]
+    thresholds:
+      - {at: 0, rule: "A fault on Ford's display, no green lamp at a gain of 3, or a magnet that does not pull in: do not tow. Have a Bosch dealer fit and enable the TSC's external simulated load (the fallback in the parts list, outside the total) and repeat the test until all three pass", src: "Bosch F005EP0085.01 page 18 and Y265K30237 v4.0 page 10"}
