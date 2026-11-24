@@ -92,7 +92,8 @@ def capped(p_kw, cap=700.0, top=3600.0):
 
 LEVELS["new"] = ("The new level, 250 kW, 700 Nm", capped(250.0))
 LEVELS["350bhp"] = ("About 350 bhp, 260 kW, 700 Nm", capped(260.0))
-TABLE = ("stock", "plan", "option", "new", "350bhp")
+LEVELS["cut1"] = ("CUT1 on Ford's turbo, 184 kW, 600 Nm", LEVELS["ranger"][1])
+TABLE = ("stock", "cut1", "plan", "option", "new", "350bhp")
 
 
 class Rig:

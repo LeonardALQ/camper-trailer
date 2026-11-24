@@ -1,0 +1,232 @@
+# 32 The Super Duty at about 250 kW: turbo, fuel, the 10-speed, calibration, heat, the certificate and the time to 100 km/h towing
+
+Research report 32, 24 Nov 2026, for Leonard's aim of reaching 100 km/h from rest in the low 20s of seconds with the trailer behind. Report 31 set the power stage at about 205 kW at the crank, with about 220 kW as the 250 hp option, and judged 300 hp at the wheels out of reach. A UK tuner's guide of 27 Oct 2026 says the engine carries much more on the same Garrett turbo, so this report checks the air, the fuel, the gearbox, the calibration, the heat and the NSW certificate at about 250 to 260 kW, and rebuilds the time to 100 km/h with the engine's curve and the 10-speed's ratios. Every figure of this report's own is marked (est.). The model is `research/models/32/accel.py` and its output `research/models/32/accel.out`.
+
+## 1 Findings
+
+The air is there. Darkside Developments, who tune this 3.0 V6 in the Ranger and the Amarok, put Ford's own Garrett GTD2056V at about 290 bhp (216 kW) with stock hardware and a custom tune, and Garrett's PowerMax GTD2060V at 350 bhp and more with supporting modifications. Their list of those modifications includes a DPF and EGR delete worth up to 20 bhp by their own figure, so with every emission control kept the evidence supports about 330 to 350 bhp, 246 to 261 kW at the crank (est.). Garrett's 27 % more compressor flow on Darkside's 216 kW gives air for about 275 kW (est.), 10 % more than 250 kW and 6 % more than 260 kW. Report 31's ceiling of 234 kW took Ford's turbo as flat out at 184 kW and is replaced.
+
+The fuel is there too. Darkside lists no injector or pump change at 350 bhp, nobody sells other injectors for this engine in Australia, and making the power at 3,400 to 3,600 rpm keeps the fuel per stroke about 25 % over the ordinary Ranger's at its rated power (est.).
+
+The 10-speed sets the torque. Everything read points to Ford's 10R80, whose name stands for 800 Nm, and Ford took it past that only in the F-150 Raptor R with a heavier output assembly, carrier and converter. This report caps torque at 700 Nm from second gear up in high range and keeps Ford's 600 Nm in first, reverse and low range. Under that cap 250 kW comes from about 3,400 to 3,600 rpm (est.), and the model shows 50 Nm more would save only 0.2 s.
+
+Two things stand in the way. The first is the emissions evidence. The interim NSW emissions procedure, which the plan's test line and report 31 rely on, does not apply to diesel engines at all, and the heavy vehicle regulator's road test procedure covers only trucks built before Euro VI. So the certifier must accept a before-and-after test on a chassis dynamometer or on the road with portable equipment, about AUD 15,000 (est.), or ask for the engine out on a laboratory dynamometer, about AUD 50,000 or more (est.). This holds at the plan's 205 kW as much as at 250 kW. The second is heat. CarExpert's stock Super Duty pulled its power back on engine temperature against a steady 6.0 kN trailer load, so the cooling, not the tune, decides what the truck holds on a long climb.
+
+The time. On a flat road the model takes the combination at its 7,750 kg GCM case to 100 km/h in 39.7 s stock, 27.4 s at the plan's 205 kW, 25.9 s at 220 kW and 22.4 s at 250 kW, and about 1 s less if the 10-speed's upshifts cost no time, which the ordinary Ranger's unladen test suggests. At the trailer's heaviest real case, 7,324 kg, 250 kW takes 21.2 s, and 80 to 100 km/h takes 9.0 s at 7,750 kg. Reaching 22.0 s at 7,750 kg needs about 260 kW at the crank, 221 kW or 297 hp at the wheels (est.).
+
+This report recommends 250 kW and 700 Nm at the crank, about 213 kW or 285 hp at the wheels (est.), on the PowerMax turbo and intercooler with Garrett's speed sensor and gauge, a custom calibration of the engine and the 10-speed with every emission control working, and one LC4 certificate on the emissions test the certifier names. Stage S3 then costs about AUD 27,300 (est.) in place of AUD 10,951, almost all of it the emissions test. Ford's warranty will not pay for a failure the stage causes, and at 62 % over Ford's 154 kW the engine, the turbo, the 10-speed and the transfer case all carry more than Ford designed them for.
+
+## 2 The air: what the two turbos carry on this engine
+
+Sources read on 24 Nov 2026: [Darkside's tuning guide for the 3.0 V6 in the Ranger and the Amarok](https://www.darksidedevelopments.co.uk/blog/2023-30-v6-vw-amarok-ford-ranger-tuning-guide/) (27 Oct 2026), [Darkside's PowerMax listing](https://www.darksidedevelopments.co.uk/products/garrett-powermax-turbo-upgrade-for-amarok-ranger-2023-3-0-tdi-v6.html) and [Garrett's PowerMax page](https://www.garrettmotion.com/racing-and-performance/performance-catalog/turbo/2022-ford-ranger-3-0l-v6-diesel/).
+
+| Turbo | What it is | What it carries on this engine | Source |
+|---|---|---|---|
+| Ford's, Garrett GTD2056V | Garrett OEM 903552-5002S, Ford MB3Q-6K682-AB, variable geometry with an electric actuator | About 280 to 290 bhp, 209 to 216 kW at the crank, on the stock hardware with a custom tune. "Limited to around 290 bhp" | Darkside's guide |
+| Garrett PowerMax GTD2060V | 930592-5001S, a direct replacement with new compressor geometry, 27 % more compressor flow, ball bearing, ductile iron turbine housing rated to 830 °C, shaft limit 186.2 krpm, speed sensor port | "350bhp+ with supporting modifications", about 261 kW at the crank, and 895 Nm | Darkside's listing and guide, Garrett |
+
+The 350 bhp needs reading closely. Darkside writes that the PowerMax can replace Ford's turbo with nothing else changed, but that "the above modifications" get the most from it. Those are the larger intercooler, the intake, and the DPF and EGR delete, for which Darkside expects "up to +20 BHP with the DPF removed and a front mount intercooler". Removing an emission control is not an option here. So the evidence with the DPF, the SCR and the EGR kept is about 330 to 350 bhp, 246 to 261 kW at the crank (est.). Darkside's figures are its own, at its own rig, and no other tuner's PowerMax result on this engine was found.
+
+Garrett gives no flow figure in kg/s, so the margin is worked from Darkside's ceiling. Ford's turbo flat out at about 216 kW, times Garrett's 27 % more flow, is air for about 275 kW (est.), if power follows the air at the same air-fuel ratio. Darkside's 261 kW is 95 % of that, which fits. Against the levels in this report, 275 kW is 34 % more than the plan's 205 kW, 25 % more than 220 kW, 10 % more than 250 kW and 6 % more than 260 kW (est.). Report 31 took Ford's turbo as flat out at the ordinary Ranger's 184 kW, gave the PowerMax 234 kW and the 250 hp option 6 % in hand. Darkside's ceiling is direct evidence and replaces it.
+
+What holds the margin in service is shaft speed, not air on the dyno. The turbo turns faster for the same air in thin air, so a calibration that sits at 175 krpm at sea level can pass Garrett's 186.2 krpm on a climb at 1,500 m (est.). The calibration's boost and vane limits, with the ambient pressure correction Ford's calibration already carries, are therefore set so that the shaft stays under about 175 krpm everywhere. Garrett's 781328-0003 kit, the sensor with its own gauge, proves it on the dyno and on a high climb and shows it to the driver.
+
+One open point from report 31 stays. Garrett lists the PowerMax for the 2022 and later Ranger and Amarok 3.0 V6 as the replacement for Ford's MB3Q-6K682-AB, and Darkside names the Ranger's engine code BF2X. No document read gives the Super Duty's own turbo, so its tag is read at stage S0 (section 11, point 1).
+
+## 3 The fuel: the factory injectors and pump
+
+The evidence that the factory injectors and pump carry about 250 to 260 kW is Darkside's. It reaches 350 bhp on the PowerMax and lists the intercooler, the intake, the exhaust, the DPF and EGR delete and the turbo, and no injector, pump or rail change ([guide](https://www.darksidedevelopments.co.uk/blog/2023-30-v6-vw-amarok-ford-ranger-tuning-guide/)). Diesel Tuning Brisbane's stage 1 on the ordinary V6 adds up to 30 kW and 120 Nm on the stock hardware, which takes the fuel system to about 214 kW and 720 Nm ([page](https://dieseltuningbrisbane.com.au/vehicle/ford-ranger-3-0-v6-2022-2025/)). Report 31 found no other injectors on sale for this engine in Australia, and none was found on 24 Nov 2026. Nothing has to be sold if the factory parts carry the level.
+
+The size of the job. At 230 g/kWh at full load (est.), 250 kW burns about 57.5 kg of diesel an hour, 36 % more than 184 kW. Made at 3,500 rpm, that is about 91 mg or 109 mm3 per injection, against about 87 mm3 for the ordinary Ranger's 184 kW at 3,250 rpm, so each injection is about 25 % longer or at higher pressure (est.). Making the power higher up the rev range is what keeps that rise small. The 700 Nm cap does the same lower down: 700 Nm needs about 17 % more fuel per stroke than Ford's 600 Nm (est.).
+
+So the fuel needs no part, and the check is in the tuner's logs. At full load on the dyno and on a long climb the rail pressure follows its target with the pump's metering valve short of its limit, the injection ends inside the crank angle the calibration allows, and the smoke stays clean, which the DPF's soot loading rate shows between regenerations. If the logs show the rail pressure falling away at the top of the band, the calibration's power comes down to where it holds. No high-flow injector goes in, because VSI 06 Rev 4 item 5 names non-original fuel injection equipment as a modification that affects emissions, and item 49 adds fuel system changes. That would only make the certificate harder.
+
+## 4 The torque and the 10-speed
+
+Which gearbox. Ford's documents for the Super Duty name only a "10-Speed Automatic Transmission" (dealer sheets of 18 Sep 2025 and 29 Oct 2026). Wikipedia's list of the Ford and GM 10-speeds puts the 10R80 in the Ranger from 2019, the Everest and the Amarok from 2023, and the lighter 10R60, which it rates at 600 Nm, in the Ranger from 2024 ([Wikipedia](https://en.wikipedia.org/wiki/Ford%E2%80%93GM_10-speed_automatic_transmission)). The Amarok shares the Ranger's V6 diesel, and BPT Motorsport in Perth sells calibrations for the "10R80 Automatic transmission as found on the Ranger and Everest" ([BPT](https://bptmotorsport.com.au/product/flash-tuner-ranger-everest-10r80-tcm-calibration/)). This report takes the Super Duty's gearbox as a 10R80 with its own calibration (est.). If its tag at S0 shows a 10R60, every newton metre over Ford's 600 Nm is over that gearbox's rating, and the stage stops at a power the 600 Nm cap allows (section 11, point 2).
+
+What Ford runs through the family. The 10R80's name stands for ten speeds, rear and four-wheel drive and 800 Nm, and Ford fits it to the F-150 Raptor R's 5.2 L supercharged V8 of 640 lb-ft, 868 Nm, only with a heavy-duty rear output assembly with PTFE washers, a four-pinion carrier, a 260 mm converter with a heavy-duty turbine damper and its own calibration ([autoevolution, 2022](https://www.autoevolution.com/news/2023-ford-f-150-raptor-r-10-speed-automatic-transmission-detailed-exterior-colors-leaked-191348.html), [Ford](https://www.fromtheroad.ford.com/ca/en/articles/2022/700-horsepower-new-ford-f-150-raptor-r)). The heavier 10R100 and 10R140 are Ford's Super Duty truck gearboxes, at 1,000 and 1,400 Nm in Wikipedia's table. The ordinary Ranger V6 runs its 10R80 at 600 Nm, as the Super Duty runs its 10-speed.
+
+What is known inside. The 10R80 has four planetary gearsets, six friction elements and a one-way clutch, shifted clutch to clutch ([Next Gen Diesel](https://nextgendiesel.com/blogs/transmissions-101/building-a-10r80-for-700-hp-next-gen-drivetrain)). Its known faults are harsh or erratic shifts, converter shudder and the CDF drum, whose hub sleeve Ford redesigned after service bulletins and several class actions ([Wikipedia](https://en.wikipedia.org/wiki/Ford%E2%80%93GM_10-speed_automatic_transmission), [Monster Transmission](https://monstertransmission.com/blogs/news/10r80-transmission-problems-the-most-common-failures-and-solutions)). Raybestos sells E and F clutch packs with more plates than Ford's ([Raybestos](https://www.raybestospowertrain.com/friction-clutch-packs/rtk-10r85)), which says where builders find the limit. No Ford figure for the Super Duty's converter or clutch capacity was found.
+
+Who calibrates it in Australia. Diesel Tuning Brisbane calibrates the ordinary V6's engine and 10-speed together, with shift strategy, torque management and heat protection, on Ford's IDS and FDRS ([page](https://dieseltuningbrisbane.com.au/vehicle/ford-ranger-3-0-v6-2022-2025/)). BPT Motorsport calibrates the 10R80's control module on the earlier Ranger and Everest through its nGauge, and lists a MyCalibrator package for the 3.0 L Next-Gen ([BPT](https://bptmotorsport.com.au/product/flash-tuner-ranger-everest-10r80-tcm-calibration/)). Darkside cannot tune these gearboxes yet, so its 895 Nm, 12 % over the family's 800 Nm, runs through Ford's own shift calibration.
+
+The torque cap this report recommends: at most 700 Nm from second gear up in high range, and Ford's 600 Nm in first, reverse and every gear of low range, as the plan already keeps. Three reasons.
+
+- It keeps 100 Nm, 12.5 %, under the 800 Nm the family is named for, and far under the 868 Nm for which Ford needed the Raptor R's heavier parts. 700 Nm is 17 % over the 600 Nm Ford calibrated and tested this gearbox at, and about what the ordinary V6's stage 1 tunes already put through it (about 720 Nm).
+- It costs almost no time. With 250 kW held to 3,600 rpm, the model gives 23.7 s to 100 km/h at 7,750 kg under a 650 Nm cap, which can make only 245 kW by 3,600 rpm, 22.4 s under 700 Nm, 22.2 s under 750 Nm and 21.8 s under 800 Nm (accel.out). The 10-speed's close ratios keep the engine near its top band, so the gain from torque lower down is small.
+- First gear is where the gearbox sees the most. The converter multiplies the engine's torque by up to about 1.9 at stall (est.) before the clutches, and first, reverse and low range are where the transfer case, the front differential and the CV joints carry the highest loads. Ford's 600 Nm stays there.
+
+Under the 700 Nm cap, 250 kW is made from about 3,410 to 3,600 rpm, and 260 kW only from about 3,550 to 3,600 rpm (est., the model's curves in accel.py). That is one more reason to stop at 250 kW. The power band then sits just above Ford's rated 3,250 rpm, and the 10-speed's steps of about 1.25 between gears bring the engine back to about 3,100 rpm after each upshift (est.).
+
+## 5 The calibration
+
+No calibration written for the Super Duty, and no dyno sheet of a tuned one, was found on 24 Nov 2026, from any tuner in Australia or elsewhere. What changed in 2026 is access. AutoTuner, a tool maker, added reading and writing of the Super Duty's Bosch MD1CP062 engine control unit over the OBD port for the international-market truck ([AutoTuner](https://us.autotuner.com/blogs/news/ford-coverages-expands-ranger-super-duty-3-0l-v6-diesel-now-supported-bosch-md1cp062)), so a tuner with that tool can read Ford's heavy-duty calibration and write a modified one.
+
+The shop most likely to write it is Diesel Tuning Brisbane (est.). It calibrates the ordinary V6's engine and 10-speed together on its own chassis dyno, updates Ford's software on Ford's IDS and FDRS before it starts, sells the PowerMax turbo and intercooler, and says it has done calibration development for Garrett ([page](https://dieseltuningbrisbane.com.au/vehicle/ford-ranger-3-0-v6-2022-2025/)). Diesel Tuning Australia in Sydney tunes Rangers on its own dyno and is nearer for the certificate ([site](https://dieseltuningaustralia.com.au/)), but nothing read shows it calibrating the 10-speed. The heavy-duty calibration differs from the ordinary Ranger's in its emission strategy, so the first one is development work, not a file from the shelf.
+
+What the calibration must do with every emission control working:
+
+- The EGR keeps Ford's rates across the map, so engine-out NOx rises only with the extra fuel.
+- The SCR's AdBlue dosing follows the higher NOx. Euro VI's on-board diagnostics watch tailpipe NOx with their own sensors, and a calibration that lets NOx through sets a fault and, past Ford's limits, cuts power (est., the Euro VI inducement scheme). So the truck itself polices the calibration.
+- The DPF keeps Ford's soot model and regeneration logic, including the Super Duty's delayed and manual regeneration. More fuel means more soot and more frequent regenerations (est.).
+- Ford's protections stay: exhaust gas temperature, coolant temperature, the 10-speed's temperature and the 600 Nm limit in first, reverse and low range, with boost and vane limits that keep the turbo under about 175 krpm on Garrett's sensor.
+- Ford's files are kept, so the truck can go back to stock.
+
+Price. Report 31 estimated AUD 2,800 for the calibration of the engine and the 10-speed with dyno runs. A first heavy-duty Euro VI calibration at 250 kW, with logging on a long climb and a second session after the emissions test, is about AUD 4,500 (est.).
+
+## 6 The heat on a long climb
+
+The stock truck is already at its cooling limit under a long pull. CarExpert ran a Super Duty dual cab chassis for five laps against its trailer dynamometer at 6.0 kN, twice its usual load. It held about 78 km/h at first, then lost about 10 km/h as rising engine temperatures cut its power, and recovered as they eased. Its transmission temperatures stayed fine ([CarExpert, Feb 2026](https://www.carexpert.com.au/car-videos/watch/DoMF7Zxm)). The model gives the same truck 69 km/h steady at its full 154 kW against that load, so the engine was working at its rated power when the cooling ran out (est.). Ford gave the Super Duty 25 % more cooling capacity than the ordinary Ranger (report 31), and even that did not hold a sustained full-power pull.
+
+The trailer asks for more than that test. At 7,750 kg, holding 80 km/h up a 6 % grade takes about 176 kW at the crank and 100 km/h about 245 kW, and 80 km/h up 8 % about 216 kW (accel.out). At full power the plan's 205 kW holds about 89 km/h on 6 % and 250 kW about 99 km/h. A diesel at full load sends roughly as much heat to its coolant and charge air as it delivers at the crank (est.), so a long climb at 250 kW asks the radiator and the intercooler for about 60 % more than stock does. The calibration keeps Ford's coolant temperature derate, so the engine protects itself, and on a long hot climb the truck will hold what its cooling allows, not its peak power. That is the honest limit of any tune of this truck.
+
+What goes in, and how each is checked on a long climb with the full trailer:
+
+- Intercooler. Darkside finds Ford's intercooler "stretched" already at the stock-turbo tune and sells one with 69 % more volume. Garrett's PowerMax intercooler for the Ranger and Everest is a direct fit with lower pressure drop and better cooling, with no figures published ([Garrett](https://www.garrettmotion.com/racing-and-performance/performance-catalog/intercoolers/2022-ford-ranger-everest-3-0l-2-0l-diesel-2022-ranger-bronco-3-0l-gasoline/)). The plan's PowerMax unit stays, sold in Australia with the turbo. Check: the air after the intercooler at most 25 °C over the outside air at full load at the top of the climb (est.). If it fails, a larger core such as Darkside's (about AUD 2,200, est.).
+- Gearbox cooler. CarExpert found the 10-speed's temperatures fine at 6.0 kN. Most of its heat comes from converter slip, which the cap does not change once the converter locks, and each upshift at 700 Nm puts more energy into the clutches (est.). The plan's check stays: a larger cooler (TX01) only if the 10-speed runs above 110 °C sustained (est.).
+- Exhaust gas temperature. Garrett rates the PowerMax's ductile iron turbine housing to 830 °C. Ford publishes no exhaust temperature limit for this engine, so the calibration keeps Ford's protection and never lets the turbine inlet pass 830 °C (est.).
+- Turbo speed. Garrett's limit is 186.2 krpm. The calibration's boost and vane limits keep the shaft under about 175 krpm, 94 % of the limit (est.), checked on Garrett's sensor at the top of a high climb, so the margin holds in thin air.
+- Gauges. The plan's OBD gauge (TL02) shows exhaust gas temperature, boost, the air after the intercooler, coolant temperature, the 10-speed's temperature and the DPF's soot load from Ford's own sensors. Garrett's 781328-0003 kit adds the turbo speed with its own gauge.
+
+The protections the calibration keeps are those of section 5: Ford's exhaust gas and coolant temperature derates, turbo speed, the 10-speed's temperature protection, the DPF regeneration and the SCR's dosing and inducement, the EGR and the 600 Nm limit in first, reverse and low range.
+
+## 7 The certificate in NSW
+
+VSI 06 Rev 4's items. The truck is a light vehicle under VSI 06 Rev 4, at 4,500 kg GVM ([TfNSW](https://www.nsw.gov.au/sites/default/files/noindex/2026-03/vsi-06-light-vehicle-modification-july-2026.pdf), page 1). Item 2 needs a certificate for more than 20 % over the original power, so over 184.8 kW, and 250 kW is 62 % over Ford's 154 kW. Item 6 needs one for flashing the engine management system so that it alters emissions. Item 5 covers anything that adversely affects emissions, and its note says that where a non-original engine control module or similar is fitted it must be shown that emission levels are retained. An intercooler that keeps the emission controls needs no certificate of its own under item 5. Item 49, fuel system changes, is not touched while the injectors and pump stay Ford's.
+
+The interim procedure does not cover this truck. VSI 06 offers the Interim NSW Vehicle Emissions Test Procedure for Modified and Individually Constructed Vehicles (May 2023) as an alternative to testing to the standards, and the plan's test line TL04 and report 31 rest on it. The procedure itself, gazetted on 9 June 2023, is an alternative to the IM240 test until VSB 14 gains its own procedures, and its Part B section 1 says its test requirements "do not apply to vehicles fitted with two-stroke engines or diesel-fuelled, Compression Ignition (CI) engines" ([Gazette No 253, copy](https://nswstreetrodders.com.au/wp-content/uploads/2025/08/Interim-NSW-Vehicle-Emissions-Test-Procedure.pdf)). Its tests are a visual inspection, a smoke check, an OBD check and a two-speed idle, lambda, RG240 or IM240 test, all written for petrol and gas engines. So it cannot be the Super Duty's evidence at any power, the plan's 205 kW included. VSCCS Bulletin 2 v4 adds it beside ADR 79/04 ([TfNSW, search extract](https://www.transport.nsw.gov.au/system/files/media/documents/2024/VSCCS-Notice-19-VSCCS-Bulletin-No.2-v4.pdf)), and the 2017 bulletin named an IM240 test at TfNSW's facility or an equivalent NATA facility (report 27). TfNSW's IM240 facility at Botany has closed ([Drive, winter 2023](https://issuu.com/insights_and_engagement/docs/drivewinter2023/s/28935556)).
+
+The heavy-duty standard makes it harder. Ford certified the Super Duty to the heavy-duty Euro VI standard (dealer sheet), which ADR 80/04 adopts, and Euro VI is tested on an engine dynamometer. The National Heavy Vehicle Regulator says that for an ADR 80 vehicle the full test means removing the engine for a laboratory, "an arduous and expensive process", and since 1 Feb 2019 it accepts a road test with portable emissions measuring equipment, PEMS, for heavy vehicles modified under VSB 6 ([VSG-28](https://vehiclecompliance.net/wp-content/uploads/2023/10/VSG28-In-Service-Emission-Testing-POrtable-Emissions-Measuring-System-Equipment.pdf)). Its procedure applies only to ADR 70 and ADR 80/03 or earlier vehicles, so not to Euro VI. It runs a baseline and a modified test on one route at a NATA, RVCS, ISO 17025 or NHVR-approved facility, with all of the maker's emission equipment working, and passes NOx up to 1.1 times the baseline ([NHVR procedure](https://wp2.nhvr.gov.au/files/201901-0982-simplified-emissions-test-procedure-pems.pdf)). Euro VI uses PEMS for its own in-service checks, so that method is the closest fit.
+
+So the evidence is the LC4 certifier's call, and the plan should price it as such:
+
+| Route | What | Price (est.) |
+|---|---|---|
+| Likely | Stock and tuned emissions tests at a NATA facility, on a chassis dynamometer or on the road with PEMS by the NHVR's method, NOx and particles no worse than stock with every control working | About AUD 15,000 for the pair (est.). No price is published, and ABMARC brought the first PEMS into Australia in 2015 ([NSW EPA](https://www.epa.nsw.gov.au/sites/default/files/diesel-locomotive-emissions-upgrade-kit.pdf)) |
+| Fallback | The engine out, tested to the heavy-duty Euro VI cycles in a laboratory, and refitted | About AUD 50,000 or more (est.). At that price the stage stops for Leonard's decision |
+
+The LC4 certifier's evidence. From VSB 14 code LA4 (report 14 section 4.2) and the evidence list TfNSW sets for emissions work in the interim procedure: the stock and tuned runs on one dyno, the emissions results, a bill of materials with the Garrett invoices and Garrett's documents, photographs of the work, the tuner's description of the calibration with its torque limits by gear and range, fault-free scans before and after, the noise test, an installation to VSB 14, and the brake and driveline evidence. The written list comes first, before anything is bought (TL05).
+
+Brakes and driveline at 62 % over Ford's 154 kW. VSB 14 asks for any necessary upgrade of equipment such as brakes when an engine gains power (report 14). More power adds no mass, and Ford rates the Super Duty's brakes, which are upgraded over the Ranger's, for an 8,000 kg combination ([CarExpert](https://www.carexpert.com.au/car-videos/watch/DoMF7Zxm)). CarExpert stopped it from 100 km/h in 45.63 m unladen. The evidence offered is Ford's ratings, the brake specification and a brake test if the certifier asks, about AUD 600 (est.). For the driveline: the 700 Nm cap and Ford's 600 Nm in first, reverse and low range, the 10R80 family's 800 Nm, and Ford's heavier Super Duty parts, its stronger front and rear driveshafts, the larger rear differential and the transfer case with the F-Series Super Duty's low range gearset ([Ford, 4 Apr 2025](https://www.fromtheroad.ford.com/img/en/articles/2025/ford-ranger-super-duty-revealed-sets-new-heavy-duty-benchmark)).
+
+Cost. The certificate is about AUD 2,000 (est., report 14), so the likely route is about AUD 17,600 with the test pair and a brake test (est.), and the fallback about AUD 52,600 or more (est.).
+
+## 8 The warranty and durability risk
+
+Ford's warranty is 5 years with unlimited kilometres, or 7 years for a new truck serviced at Ford dealers. Ford says an aftermarket part does not by itself void it, but a failure the part causes is not covered ([Ford Australia](https://www.ford.com.au/support/how-tos/warranty/warranties-and-coverage/do-aftermarket-accessories-affect-the-warranty)). A calibration is such a part. Ford's own diagnostic tool reads the calibration, the plan's purchase scan uses it to look for one, and flashing Ford's files back need not hide that the unit was written to (est.). So from the day of the calibration, Leonard pays for any failure of the engine, the turbo, the 10-speed, the transfer case or the axles that Ford can tie to it.
+
+The risk is real at this level. 250 kW is 62 % over the 154 kW Ford calibrated, tested and rated this engine at for the Super Duty, and 36 % over the ordinary Ranger's 184 kW. In plain terms (est.):
+
+- Engine. About 36 % more fuel at full power than the ordinary Ranger and 17 % more peak torque than Ford's 600 Nm mean higher cylinder pressures, more heat into the pistons, the head and the EGR cooler, and more soot, so more DPF regenerations. A long hot climb is where this shows, and Ford's derates are what protect it.
+- Turbo. The PowerMax runs with about 10 % of its estimated air in hand, nearer its shaft limit for longer on every climb. It is the part most likely to fail first, and at about AUD 2,831 (est.) also the cheapest.
+- 10-speed. 700 Nm is 17 % over the torque Ford validated this gearbox for, inside the family's 800 Nm. The 10R80's known weak points, the CDF drum and converter shudder, are what more torque and heat find. A rebuilt 10R80 with a converter sells for USD 4,799, about AUD 7,440 at 1 USD = 1.55 AUD before freight and fitting ([Monster Transmission](https://monstertransmission.com/products/streetmonster-ford-10r80e-transmission-torque-converter)), so about AUD 10,000 fitted (est.).
+- Transfer case and axles. Ford's 600 Nm stays in first, reverse and low range, where they see the most torque, so the stage changes them least.
+
+The costs of a failure are Leonard's, the likelihood rises with every step of power, and none of it is known until the truck has run some years at the level. The plan's rule stands: stage S3 waits until Leonard accepts this or Ford's warranty ends, and Ford's turbo and files are kept for a return to stock.
+
+## 9 The time to 100 km/h with the trailer
+
+The model (`research/models/32/accel.py`) steps the combination forward every 10 ms on a flat road in still air. Its inputs:
+
+- Engine. Full-load torque curves through Ford's two points for each stock engine, 154 kW at 3,250 rpm and 600 Nm at 1,750 rpm for the Super Duty (dealer sheet, BEMM) and 184 kW at 3,250 rpm for the ordinary Ranger, with the rest of each curve estimated. Each tuned curve holds its cap, then its power to 3,500 or 3,600 rpm, then falls away to 4,000 rpm (est.). First gear is held to 600 Nm at every level.
+- Gearbox. The 10R80's ratios, 4.696 to 0.636 ([Wikipedia](https://en.wikipedia.org/wiki/Ford%E2%80%93GM_10-speed_automatic_transmission)), on an assumed 3.73 final drive (est., the ordinary Ranger V6's, as no Ford document read gives the Super Duty's), through the LT 275/70 R18 tyres at a 406 mm rolling radius (est.). Crank to wheels 0.85 (est.), as CarExpert measured 158.4 kW at the wheels of an ordinary 184 kW Ranger, 0.86 ([CarExpert](https://www.carexpert.com.au/car-news/on-the-dyno-ranger-raptor-v6-and-four-cylinder-power-figures)).
+- Launch and shifts. The converter holds the engine at 2,000 rpm and multiplies its torque by up to 1.9 in first (est.), and locks from second. The turbo starts at half its full-load torque and spools with a 0.7 s time constant (est.). Each upshift loses all drive for 0.2 s (est.), and the 10-speed shifts up where the next gear pulls harder, or at 4,000 rpm. From 80 km/h the kickdown takes 0.6 s (est.).
+- Combination. Report 25's CdA of 4.55 m2 for the ute, the box and the trailer with its radiused front, rolling resistance 0.011 (est.), the wheels' and the driveline's inertia, and grip of 0.8 on the truck's four driven tyres (est.).
+- Masses. 7,750 kg is UTE-06's GCM case, the ute with growth (3,748 kg) and the trailer at its 4,000 kg plate. 7,324 kg is the trailer fully loaded with 400 L of water and growth (TC2, 3,575.6 kg, TRAILER.md) behind the same ute, the heaviest case the design expects to run. 7,450 and 7,200 kg bracket it.
+
+Seconds from rest to 100 km/h with 0.2 s lost at each upshift, and in brackets with none lost (accel.out):
+
+| Level | Crank (est.) | Wheels (est.) | 7,750 kg | 7,450 kg | 7,324 kg | 7,200 kg |
+|---|---|---|---|---|---|---|
+| Stock Super Duty | 154 kW, 600 Nm | 131 kW, 176 hp | 39.7 (38.3) | 38.0 (36.6) | 37.3 (35.9) | 36.6 (35.2) |
+| CUT1 on Ford's turbo | 184 kW, 600 Nm | 157 kW, 210 hp | 32.4 (30.9) | 31.0 (29.6) | 30.5 (29.1) | 30.0 (28.6) |
+| The plan | 205 kW, 650 Nm | 175 kW, 235 hp | 27.4 (26.0) | 26.3 (25.0) | 25.9 (24.5) | 25.4 (24.1) |
+| The 250 hp option | 220 kW, 650 Nm | 187 kW, 251 hp | 25.9 (24.6) | 24.9 (23.6) | 24.5 (23.2) | 24.1 (22.8) |
+| The new level | 250 kW, 700 Nm | 213 kW, 285 hp | 22.4 (21.5) | 21.6 (20.6) | 21.2 (20.3) | 20.9 (19.9) |
+| About 350 bhp | 260 kW, 700 Nm | 221 kW, 296 hp | 22.0 (21.0) | 21.2 (20.2) | 20.8 (19.9) | 20.5 (19.5) |
+
+Seconds from 80 to 100 km/h, kickdown included, the same way:
+
+| Level | 7,750 kg | 7,450 kg | 7,324 kg | 7,200 kg |
+|---|---|---|---|---|
+| Stock Super Duty | 18.8 (18.4) | 18.0 (17.6) | 17.6 (17.2) | 17.2 (16.9) |
+| CUT1 on Ford's turbo | 14.7 (14.0) | 14.1 (13.4) | 13.8 (13.1) | 13.6 (12.9) |
+| The plan | 11.9 (11.3) | 11.4 (10.8) | 11.2 (10.7) | 11.1 (10.5) |
+| The 250 hp option | 11.1 (10.5) | 10.7 (10.0) | 10.5 (9.9) | 10.3 (9.7) |
+| The new level | 9.0 (8.7) | 8.7 (8.4) | 8.5 (8.3) | 8.4 (8.1) |
+| About 350 bhp | 8.7 (8.5) | 8.4 (8.1) | 8.3 (8.0) | 8.2 (7.9) |
+
+The power for 22 s. Under the 700 Nm cap, 0 to 100 km/h in 22.0 s at 7,750 kg needs about 260 kW at the crank, 221 kW or 297 hp at the wheels, or about 241 kW if the upshifts lose no time (est.). At 7,450, 7,324 and 7,200 kg it needs about 242, 237 and 235 kW (229, 224 and 220 kW with none lost). For 24 s at 7,750 kg about 232 kW is enough, and for 25 s about 221 kW. The steps between these figures are uneven because one more upshift before 100 km/h adds its 0.2 s.
+
+Checks against published tests. No published 0 to 100 km/h time for a Ranger V6 or a Super Duty towing near 7.7 t was found. CarExpert's 21-ute towing test sprints with a 1,600 kg trailer against 3 kN, and its summary names only the two fastest, and its Super Duty at the 8,000 kg GCM is "painfully slow" up a 15 % climb with no time given ([CarExpert, June 2026](https://www.carexpert.com.au/car-videos/watch/zaBcDtKj), [Feb 2026](https://www.carexpert.com.au/car-videos/watch/DoMF7Zxm)). So the model is checked against unladen VBox runs:
+
+| Test | Tested | Model, 0.2 s lost per upshift | Model, none lost |
+|---|---|---|---|
+| Super Duty dual cab chassis with its tray, 0 to 100 km/h ([CarExpert](https://www.carexpert.com.au/car-videos/watch/DoMF7Zxm)) | 13.23 s | 13.4 s at 3,050 kg (est.), 14.3 s at 3,300 kg (est.) | 12.3 s at 3,050 kg, 13.2 s at 3,300 kg |
+| The same, 80 to 120 km/h | 11.99 s | 12.1 s at 3,050 kg, 13.1 s at 3,300 kg | 11.6 s at 3,050 kg, 12.5 s at 3,300 kg |
+| Ordinary Ranger V6, 0 to 100 km/h, about 2,415 kg with the driver (est.) ([CarExpert](https://www.carexpert.com.au/car-videos/watch/li6TMRh8), [4X4 Australia](https://www.4x4australia.com.au/news/how-fast-is-the-2023-ford-ranger)) | 8.2 to 8.5 s | 9.6 s | 8.5 s |
+| Super Duty at full power against CarExpert's 6.0 kN trailer dynamometer | About 78 km/h at first, about 68 km/h once hot | 69 km/h steady | |
+
+The model is slow on the light Ranger by about 1 s with 0.2 s lost per upshift and matches it with none lost. On the Super Duty it matches either way, depending on the tested truck's mass, which CarExpert did not give. So the central times above are on the slow side if anything, by up to about 1 s on a towing run (the bracketed figures), and the model is not optimistic on sustained power.
+
+How sure. For the new level at 7,750 kg, one input at a time (accel.out): a 4.10 final drive gives 22.5 s and 3.55 gives 22.7 s, 0.4 s per upshift 23.4 s and none 21.5 s, a 1.2 s spool 22.7 s, 0.82 crank to wheel 23.4 s and 0.88 gives 21.5 s, rolling resistance of 0.013 gives 22.8 s, and 15 % more or less drag 23.0 or 21.9 s. So 250 kW reaches 100 km/h at the GCM case in about 21.5 to 23.5 s (est.), and in about 20.3 to 22.3 s at the trailer's heaviest real case.
+
+Against the first estimate of 24 Nov 2026, which held 85 % of peak wheel power from launch to 100 km/h, this model is quicker at every level: 27.4 s in place of about 32 s at the plan and 25.9 s in place of about 29 s at 220 kW. The 10-speed's steps of about 1.25 keep the engine near its peak for most of the run, and the converter's multiplication in first gets the truck moving. The first estimate's 220 to 230 kW at the wheels for the low 20s becomes about 205 to 221 kW at the wheels for 22 s at 7,750 kg, 241 to 260 kW at the crank (est.).
+
+## 10 The level this report recommends, and stage S3 with it
+
+The level: about 250 kW and at most 700 Nm at the crank from second gear up in high range, Ford's 600 Nm in first, reverse and low range, about 213 kW or 285 hp at the wheels (est.). It takes the combination to 100 km/h in about 22.4 s at the 7,750 kg GCM case and 21.2 s at the trailer's heaviest real case, 80 to 100 km/h in about 9.0 s, and holds about 99 km/h up a 6 % grade while the cooling keeps up (est., section 9).
+
+Why 250 kW and not Darkside's 350 bhp. 260 kW gains only 0.4 s at 7,750 kg. It leaves the PowerMax air for only about 6 % more (est.), it is at the top of what Darkside's evidence supports with the DPF kept, and under the 700 Nm cap it is made only between about 3,550 and 3,600 rpm. 250 kW keeps air for about 10 % more, sits inside Darkside's range with the controls kept, and holds its power over about 200 rpm. The emissions test may still set the registered power lower, and the plan steps back towards 205 kW if 250 kW fails it.
+
+What stands in its way, in order:
+
+1. The emissions evidence. The interim NSW procedure does not cover diesels, and no simplified procedure covers a Euro VI truck, so the certifier names the test. The likely pair costs about AUD 15,000 (est.), and an engine-out laboratory test about AUD 50,000 or more (est.) would end the stage. This is true at the plan's 205 kW as well.
+2. The calibration. Nobody has published one for the Super Duty. The tools now read and write its control unit, and the shop most likely to write it already calibrates the ordinary V6 and its 10-speed.
+3. Heat. The stock truck already pulls power back on a long full-power pull, so on long hot climbs the truck holds what its cooling allows.
+4. The warranty. Ford pays for no failure the stage causes, so S3 still waits for Leonard's go or the warranty's end.
+5. The parts. The Super Duty's turbo must be the MB3Q-6K682-AB that the PowerMax replaces, and its gearbox a 10R80, which their tags at S0 show.
+
+Stage S3 at this level (AUD including GST, all estimates):
+
+| Line | Work | AUD (est.) | Change from the plan |
+|---|---|---|---|
+| PW01 | Garrett PowerMax turbo 930592-5001S, self-fitted | 2,831 | None |
+| PW02 | Garrett PowerMax intercooler, self-fitted | 1,900 | None |
+| PW03 | Swap parts and Garrett's 781328-0003 speed sensor with its gauge | 600 | The kit with the gauge, AUD 150 more |
+| PW04 | Freight from Brisbane | 120 | None |
+| TL01 | Calibration of the engine and the 10-speed to 250 kW and 700 Nm, with every emission control working | 4,500 | First heavy-duty calibration, AUD 1,700 more |
+| TL02 | OBD gauge, with the air after the intercooler and the DPF's soot load added | 350 | None |
+| TL04 | Stock and tuned emissions tests at a NATA facility, on a chassis dynamometer or with PEMS, as the certifier names | 15,000 | In place of the interim procedure, AUD 14,500 more |
+| TL05 | LC4 certificate under VSB 14 LA4 with its noise test | 2,000 | None |
+| Build | | 27,301 | AUD 16,350 more than AUD 10,951 |
+| TL07 (check) | The engine out and tested to the heavy-duty Euro VI cycles, if the certifier asks | 50,000 | In place of AUD 10,000 |
+| TL08 (check) | Brake test, if the certifier asks | 600 | New |
+| PW05 (check) | A larger intercooler core, if the air after the PowerMax unit runs over 25 °C above the outside air on a climb | 2,200 | New |
+| TX01 (check) | A larger 10-speed cooler, if it runs over 110 °C sustained | 900 | None |
+
+CUT1, the calibration on Ford's turbo, stays as the fallback. Darkside's 280 to 290 bhp on the stock hardware says Ford's turbo carries about 209 to 216 kW (est.), so CUT1 could reach the plan's 205 kW, but with only about 5 % of its air in hand. It stays at about 184 kW, about 32.4 s to 100 km/h at 7,750 kg (est., section 9).
+
+## 11 Open points and the assumption used
+
+1. Is the Super Duty's turbo Ford's MB3Q-6K682-AB, the Garrett GTD2056V the PowerMax replaces? Assumed yes, as in report 31. Read its tag at S0. If it is another part, the stage runs as CUT1 on Ford's turbo.
+2. Is the Super Duty's gearbox a 10R80? Assumed yes (est.), as the Ranger's, the Everest's and the Amarok's. Read its tag at S0. If it is a 10R60, rated at 600 Nm, the cap stays at 600 Nm and the stage stops at about 226 kW, what 600 Nm makes at 3,600 rpm (est.).
+3. What is the Super Duty's final drive? Assumed 3.73 (est.), the ordinary Ranger V6's. Read it at S0. Between 3.55 and 4.10 the time to 100 km/h changes by at most 0.3 s.
+4. Which emissions test will the LC4 certifier name? Assumed the stock and tuned pair at a NATA facility, on a chassis dynamometer or with PEMS, about AUD 15,000 (est.). If it names the engine-out test, about AUD 50,000 or more (est.), the stage stops for Leonard's decision.
+5. Will a tuner write the Super Duty's heavy-duty calibration at 250 kW with every emission control working? Assumed yes, most likely Diesel Tuning Brisbane. If none will, S3 waits.
+6. Does the PowerMax hold 250 kW with the DPF in place? Assumed yes, with air for about 10 % more on Darkside's evidence (est.). The dyno run shows the shaft speed, and the level comes down if it needs more than about 175 krpm.
+7. Do Ford's injectors and pump carry 250 kW? Assumed yes, on Darkside's 350 bhp with no fuel parts listed. The tuner's logs of rail pressure at full load show it.
+8. How much does the cooling hold on a long climb? Assumed Ford's radiator stays and Ford's coolant temperature derate sets the power on long hot climbs. The climb check after the calibration measures it.
+9. What did CarExpert's tested Super Duty weigh? Not published. The model's check takes 3,050 to 3,300 kg (est.).
+
+## Sources
+
+All read on 24 Nov 2026 unless dated otherwise.
+
+- Tuners and parts: Darkside Developments, the [3.0 V6 tuning guide](https://www.darksidedevelopments.co.uk/blog/2023-30-v6-vw-amarok-ford-ranger-tuning-guide/) (27 Oct 2026) and the [PowerMax listing](https://www.darksidedevelopments.co.uk/products/garrett-powermax-turbo-upgrade-for-amarok-ranger-2023-3-0-tdi-v6.html). Garrett, the [PowerMax turbo](https://www.garrettmotion.com/racing-and-performance/performance-catalog/turbo/2022-ford-ranger-3-0l-v6-diesel/) and [intercooler](https://www.garrettmotion.com/racing-and-performance/performance-catalog/intercoolers/2022-ford-ranger-everest-3-0l-2-0l-diesel-2022-ranger-bronco-3-0l-gasoline/). [Diesel Tuning Brisbane](https://dieseltuningbrisbane.com.au/vehicle/ford-ranger-3-0-v6-2022-2025/), [Diesel Tuning Australia](https://dieseltuningaustralia.com.au/), [BPT Motorsport](https://bptmotorsport.com.au/product/flash-tuner-ranger-everest-10r80-tcm-calibration/) and [AutoTuner](https://us.autotuner.com/blogs/news/ford-coverages-expands-ranger-super-duty-3-0l-v6-diesel-now-supported-bosch-md1cp062).
+- The 10-speed: [Wikipedia](https://en.wikipedia.org/wiki/Ford%E2%80%93GM_10-speed_automatic_transmission), [autoevolution on the Raptor R's 10R80](https://www.autoevolution.com/news/2023-ford-f-150-raptor-r-10-speed-automatic-transmission-detailed-exterior-colors-leaked-191348.html), [Ford on the Raptor R](https://www.fromtheroad.ford.com/ca/en/articles/2022/700-horsepower-new-ford-f-150-raptor-r), [Next Gen Diesel](https://nextgendiesel.com/blogs/transmissions-101/building-a-10r80-for-700-hp-next-gen-drivetrain), [Monster Transmission's faults guide](https://monstertransmission.com/blogs/news/10r80-transmission-problems-the-most-common-failures-and-solutions) and [rebuilt unit](https://monstertransmission.com/products/streetmonster-ford-10r80e-transmission-torque-converter), [Raybestos](https://www.raybestospowertrain.com/friction-clutch-packs/rtk-10r85).
+- Ford: the Super Duty dealer sheets of 18 Sep 2025 and 29 Oct 2026 and the BEMM (report 31), the [Super Duty release](https://www.fromtheroad.ford.com/img/en/articles/2025/ford-ranger-super-duty-revealed-sets-new-heavy-duty-benchmark) (4 Apr 2025) and the [warranty page](https://www.ford.com.au/support/how-tos/warranty/warranties-and-coverage/do-aftermarket-accessories-affect-the-warranty).
+- Tests: CarExpert's [Super Duty towing review](https://www.carexpert.com.au/car-videos/watch/DoMF7Zxm) (Feb 2026), [21-ute towing test](https://www.carexpert.com.au/car-videos/watch/zaBcDtKj) (June 2026), [Ranger V6 runs](https://www.carexpert.com.au/car-videos/watch/li6TMRh8) and [dyno figures](https://www.carexpert.com.au/car-news/on-the-dyno-ranger-raptor-v6-and-four-cylinder-power-figures), and [4X4 Australia](https://www.4x4australia.com.au/news/how-fast-is-the-2023-ford-ranger).
+- Law: Transport for NSW's [VSI 06 Rev 4](https://www.nsw.gov.au/sites/default/files/noindex/2026-03/vsi-06-light-vehicle-modification-july-2026.pdf), the [interim emissions procedure in Gazette No 253](https://nswstreetrodders.com.au/wp-content/uploads/2025/08/Interim-NSW-Vehicle-Emissions-Test-Procedure.pdf) (9 June 2023), [VSCCS Bulletin 2 v4](https://www.transport.nsw.gov.au/system/files/media/documents/2024/VSCCS-Notice-19-VSCCS-Bulletin-No.2-v4.pdf) as a search extract, [Drive magazine on IM240](https://issuu.com/insights_and_engagement/docs/drivewinter2023/s/28935556) as a search extract, the NHVR's [VSG-28](https://vehiclecompliance.net/wp-content/uploads/2023/10/VSG28-In-Service-Emission-Testing-POrtable-Emissions-Measuring-System-Equipment.pdf) and [PEMS procedure](https://wp2.nhvr.gov.au/files/201901-0982-simplified-emissions-test-procedure-pems.pdf), and the [NSW EPA's ABMARC project](https://www.epa.nsw.gov.au/sites/default/files/diesel-locomotive-emissions-upgrade-kit.pdf).
+- Earlier reports: 14 (VSB 14 LA4, the certificate's price), 25 (the drag), 27 (VSCCS Bulletin 2 of 2017) and 31 (the truck and the plan's power stage).

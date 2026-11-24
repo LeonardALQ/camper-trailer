@@ -10,25 +10,28 @@ Checks against published tests, unladen (0.2 s lost at each upshift / none lost)
 Towing on a flat road in still air, CdA 4.55 m2, Crr 0.011 (est.), the 10R80's ratios on a 3.73 final drive (est.), 0.2 s lost at each upshift
 Level                                  Crank kW Wheel kW Wheel hp    7750 kg    7450 kg    7324 kg    7200 kg
 Stock Super Duty, 154 kW, 600 Nm            154      131      176  39.7/18.8  38.0/18.0  37.3/17.6  36.6/17.2
+CUT1 on Ford's turbo, 184 kW, 600 Nm        184      157      210  32.4/14.7  31.0/14.1  30.5/13.8  30.0/13.6
 The plan, 205 kW, 650 Nm                    206      175      235  27.4/11.9  26.3/11.4  25.9/11.2  25.4/11.1
 The 250 hp option, 220 kW, 650 Nm           220      187      251  25.9/11.1  24.9/10.7  24.5/10.5  24.1/10.3
 The new level, 250 kW, 700 Nm               250      213      285  22.4/ 9.0  21.6/ 8.7  21.2/ 8.5  20.9/ 8.4
 About 350 bhp, 260 kW, 700 Nm               260      221      296  22.0/ 8.7  21.2/ 8.4  20.8/ 8.3  20.5/ 8.2
 Each cell: 0 to 100 km/h s / 80 to 100 km/h s
-0 to 80 km/h at 7,750 kg: 154 kW 22.0 s, 205 kW 16.4 s, 220 kW 15.8 s, 250 kW 14.4 s, 260 kW 14.2 s
+0 to 80 km/h at 7,750 kg: 154 kW 22.0 s, 184 kW 18.7 s, 205 kW 16.4 s, 220 kW 15.8 s, 250 kW 14.4 s, 260 kW 14.2 s
 
 Towing on a flat road in still air, CdA 4.55 m2, Crr 0.011 (est.), the 10R80's ratios on a 3.73 final drive (est.), 0.0 s lost at each upshift
 Level                                  Crank kW Wheel kW Wheel hp    7750 kg    7450 kg    7324 kg    7200 kg
 Stock Super Duty, 154 kW, 600 Nm            154      131      176  38.3/18.4  36.6/17.6  35.9/17.2  35.2/16.9
+CUT1 on Ford's turbo, 184 kW, 600 Nm        184      157      210  30.9/14.0  29.6/13.4  29.1/13.1  28.6/12.9
 The plan, 205 kW, 650 Nm                    206      175      235  26.0/11.3  25.0/10.8  24.5/10.7  24.1/10.5
 The 250 hp option, 220 kW, 650 Nm           220      187      251  24.6/10.5  23.6/10.0  23.2/ 9.9  22.8/ 9.7
 The new level, 250 kW, 700 Nm               250      213      285  21.5/ 8.7  20.6/ 8.4  20.3/ 8.3  19.9/ 8.1
 About 350 bhp, 260 kW, 700 Nm               260      221      296  21.0/ 8.5  20.2/ 8.1  19.9/ 8.0  19.5/ 7.9
 Each cell: 0 to 100 km/h s / 80 to 100 km/h s
-0 to 80 km/h at 7,750 kg: 154 kW 21.0 s, 205 kW 15.7 s, 220 kW 15.1 s, 250 kW 13.7 s, 260 kW 13.5 s
+0 to 80 km/h at 7,750 kg: 154 kW 21.0 s, 184 kW 18.0 s, 205 kW 15.7 s, 220 kW 15.1 s, 250 kW 13.7 s, 260 kW 13.5 s
 
 Engine speed band of each level's peak power (within 1 %)
   Stock Super Duty, 154 kW, 600 Nm         154 kW from 2,840 to 3,330 rpm, at most 600 Nm from second gear up, 600 Nm in first
+  CUT1 on Ford's turbo, 184 kW, 600 Nm     184 kW from 3,210 to 3,330 rpm, at most 600 Nm from second gear up, 600 Nm in first
   The plan, 205 kW, 650 Nm                 206 kW from 3,000 to 3,520 rpm, at most 650 Nm from second gear up, 600 Nm in first
   The 250 hp option, 220 kW, 650 Nm        220 kW from 3,210 to 3,520 rpm, at most 650 Nm from second gear up, 600 Nm in first
   The new level, 250 kW, 700 Nm            250 kW from 3,380 to 3,630 rpm, at most 700 Nm from second gear up, 600 Nm in first
@@ -62,7 +65,7 @@ The new level, 250 kW, 700 Nm at 7,750 kg, one input changed at a time (0 to 100
   CdA 15 % less                     21.9 s (-0.5)
 
 Long climbs at 7,750 kg: the steady speed at full power, km/h, and the crank power to hold 80 and 100 km/h
-  4 %: 154 kW 86, 205 kW 102, 220 kW 107, 250 kW 114, 260 kW 116. Holding 80 km/h takes 137 kW at the crank, 100 km/h 195 kW
-  6 %: 154 kW 72, 205 kW 89, 220 kW 93, 250 kW 99, 260 kW 100. Holding 80 km/h takes 176 kW at the crank, 100 km/h 245 kW
-  8 %: 154 kW 61, 205 kW 77, 220 kW 81, 250 kW 86, 260 kW 87. Holding 80 km/h takes 216 kW at the crank, 100 km/h 294 kW
+  4 %: 154 kW 86, 184 kW 94, 205 kW 102, 220 kW 107, 250 kW 114, 260 kW 116. Holding 80 km/h takes 137 kW at the crank, 100 km/h 195 kW
+  6 %: 154 kW 72, 184 kW 80, 205 kW 89, 220 kW 93, 250 kW 99, 260 kW 100. Holding 80 km/h takes 176 kW at the crank, 100 km/h 245 kW
+  8 %: 154 kW 61, 184 kW 68, 205 kW 77, 220 kW 81, 250 kW 86, 260 kW 87. Holding 80 km/h takes 216 kW at the crank, 100 km/h 294 kW
 
