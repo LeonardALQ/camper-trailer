@@ -77,12 +77,14 @@ def ct001(prj, model, bom, checks, reg, dwg):
     for x in (V["axle_x"] + V["front_hub_dx"], xh):
         p0, p1 = P(x, hb + 60), P(x, -hb - 60)
         sh.line(p0[0], p0[1], p1[0], p1[1], "centre")
-    db = ch["drawbar_box"]
-    for x, y, t in (((V["in_x0"] + V["bed_x1"]) / 2, 400, "LIFT BED OVER"), ((V["in_x0"] + V["bed_x1"]) / 2, 250, "DESK UNDER IT"),
-                    ((V["bed_x1"] + V["rear_x0"]) / 2, -150, "LIVING"), ((V["rear_x0"] + V["in_x1"]) / 2, 640, "WET ROOM"),
-                    ((db[0] + db[3]) / 2, -620, "DRAWBAR BOX"), ((ch["spare_box"][0] + ch["spare_box"][3]) / 2, 520, "SPARE")):
+    db, sp, hi = ch["drawbar_box"], ch["spare_box"], V["half_in"]
+    bed, liv, wet = (V["in_x0"], -hi, V["bed_x1"], hi), (V["bed_x1"], -hi, V["rear_x0"], hi), (V["rear_x0"], -hi, V["in_x1"], hi)
+    for x, y, t, (x0, y0, x1, y1) in (((V["in_x0"] + V["bed_x1"]) / 2, 400, "LIFT BED OVER", bed), ((V["in_x0"] + V["bed_x1"]) / 2, 250, "DESK UNDER IT", bed),
+                                      ((V["bed_x1"] + V["rear_x0"]) / 2, -150, "LIVING", liv), ((V["rear_x0"] + V["in_x1"]) / 2, 640, "WET ROOM", wet),
+                                      ((db[0] + db[3]) / 2, -620, "DRAWBAR BOX", (db[0], db[1], db[3], db[4])),
+                                      ((sp[0] + sp[3]) / 2, 520, "SPARE", (sp[0], sp[1], sp[3], sp[4]))):
         p = P(x, y)
-        sh.text(p[0], p[1] - 0.8, t, 1.6, "middle")
+        sh.text(p[0], p[1] - 0.8, t, 1.6, "middle", names=(*P(x0, y0), *P(x1, y1)))
     for k in (b for b in lay.blocks if b.keep_clear):
         x0, y0, _, x1, y1, _ = k.box
         p0, p1 = P(x0, y1), P(x1, y0)
@@ -110,9 +112,14 @@ def ct001(prj, model, bom, checks, reg, dwg):
     S.hdim(sh, E(0, 0)[0], E(0, 0)[1], E(V["axle_x"], 0)[0], E(0, 0)[1], yb - 6, f"{V['axle_x']:.0f} BALL TO AXLE GROUP CENTRE", size=1.9)
     S.hdim(sh, E(ch["overall_x0"], 0)[0], E(0, 0)[1], E(ch["overall_x1"], 0)[0], E(0, 0)[1], yb - 12,
            f"{ch['overall_length']:.0f} OVERALL", size=1.9)
+    # the axle spacing between the hubs' centre lines just under the ground, its figure in the half ahead of the axle
+    # group's centre line, clear of the tyres and of that line (I2-69)
     hx = ch["hubs_x"]
-    S.hdim(sh, E(hx[0], V["hub_z"])[0], E(0, V["hub_z"])[1], E(hx[1], V["hub_z"])[0], E(0, V["hub_z"])[1], E(0, V["hub_z"])[1] - 2.0,
-           f"{V['axle_spacing']:.0f}", size=1.7, ext=False)
+    ya, xa0, xa1 = E(0, -150)[1], E(hx[0], 0)[0], E(hx[1], 0)[0]
+    sh.line(xa0, ya, xa1, ya)
+    sh.arrow((xa0, ya), (-1, 0))
+    sh.arrow((xa1, ya), (1, 0))
+    sh.text((xa0 + E(V["axle_x"], 0)[0]) / 2, ya + 0.8, f"{V['axle_spacing']:.0f}", 1.7, "middle")
     for x in (*hx, V["axle_x"]):
         p0, p1 = E(x, -150), E(x, V["hub_z"] + 420)
         sh.line(p0[0], p0[1], p1[0], p1[1], "centre")

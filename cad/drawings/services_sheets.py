@@ -103,9 +103,9 @@ def _gland(sh, pr, g, V, size=1.15, label=True, right=False, inset=0.0):
     sh.circle(p[0], p[1], 0.9, "box")
     sh.circle(p[0], p[1], 0.9, "medium")
     if right:
-        sh.text(p[0] + 1.4, p[1] - 0.4, g["id"], size, bold=True)
+        sh.text(p[0] + 1.4, p[1] - 0.4, g["id"], size, bold=True, names=(p[0], p[1], 0.9))
     elif label:
-        sh.text(p[0], p[1] + (-2.6 if at == "kerb" else 1.3), g["id"], size, "middle", bold=True)
+        sh.text(p[0], p[1] + (-2.6 if at == "kerb" else 1.3), g["id"], size, "middle", bold=True, names=(p[0], p[1], 0.9))
     return p
 
 
@@ -362,10 +362,12 @@ TAG_REACH = 13.0   # mm: a tag that finds no place clear of the heavy lines this
 
 
 def place_box(anchor, w, h, regions, blocked, taken, ink: Ink, extra_rings: int = 3, heavy: Ink | None = None,
-              reach: float = RINGS[-1]):
+              reach: float = RINGS[-1], leads=(), circles=(), texts=()):
     """Where a w x h label goes near its anchor (sheet mm), within `reach` of it: inside one of the regions, clear of
-    every blocked box, every label placed before and, with its mask's margin, every heavy line, and over as few drawn
-    lines as it can. Rings outward in 16 directions. Returns the box or None."""
+    every blocked box, every label placed before and, with its mask's margin, every heavy line, its leader from the
+    anchor crossing or touching none of the leaders `leads` (sheet points), passing through none of the symbols
+    `circles` (cx, cy, r) but the one at its anchor and through none of the texts' boxes `texts` or the labels placed
+    before, and over as few drawn lines as it can. Rings outward in 16 directions. Returns the box or None."""
     best, best_ring = None, None
     for ri, d in enumerate(r for r in RINGS if r <= reach):
         if best_ring is not None and ri > best_ring + extra_rings:
@@ -382,6 +384,8 @@ def place_box(anchor, w, h, regions, blocked, taken, ink: Ink, extra_rings: int 
                 continue
             if heavy is not None and heavy.count((b[0] - 0.5, b[1] - 0.5, b[2] + 0.5, b[3] + 0.5)):
                 continue
+            if (leads or circles or texts) and not _leader_free(anchor, b, leads, circles, list(texts) + list(taken)):
+                continue
             score = d + 3.0 * ink.count(b)
             if best is None or score < best[0]:
                 best = (score, b)
@@ -390,6 +394,24 @@ def place_box(anchor, w, h, regions, blocked, taken, ink: Ink, extra_rings: int 
         if best is not None and best[0] <= d:
             break
     return best[1] if best else None
+
+
+def _leader_end(a, b) -> tuple:
+    """Where a tag's leader from its anchor a meets its box b (x0, y0, x1, y1): the box's nearest point."""
+    return min(max(a[0], b[0]), b[2]), min(max(a[1], b[1]), b[3])
+
+
+def _leader_free(a, b, leads, circles, boxes=()) -> bool:
+    """Does the leader from anchor a to box b cross or touch none of the leaders and pass through none of the symbols
+    but the one at its anchor and none of the boxes (other texts) but its own?"""
+    q = _leader_end(a, b)
+    if math.hypot(q[0] - a[0], q[1] - a[1]) <= 0.7:
+        return True
+    if any(S._crossing(a, q, u, v) for u, v in leads):
+        return False
+    if any(_crosses(a, q, (o[0] + 0.1, o[1] + 0.1, o[2] - 0.1, o[3] - 0.1)) for o in boxes if o != b):
+        return False
+    return not any(math.hypot(a[0] - c[0], a[1] - c[1]) > c[2] + 0.05 and S._seg_dist(c[:2], a, q) < c[2] - 0.05 for c in circles)
 
 
 def _tag_lines(header: str | None, rows: list[tuple], size: float) -> tuple[list, float]:
@@ -408,8 +430,12 @@ def draw_tags(sh, pr, clusters: list[dict], regions: list[tuple], spill: tuple |
     anchor becomes a numbered mark there, and its lines go into a list at `spill` (x, y top, width). Returns counts."""
     ink = Ink(sh)
     heavy = Ink(sh, heavy=True)
-    blocked = [_text_box(t) for t in sh.texts] + _symbols(sh)
+    words = [_text_box(t) for t in sh.texts]
+    blocked = words + _symbols(sh)
     anchors = [pr.p(*c["anchor"]) for c in clusters]
+    circles = [(float(m[1]), S.Sheet.H - float(m[2]), float(m[3])) for m in map(S._CIRCLE.match, sh.el) if m and float(m[3]) <= S.SYMBOL_R]
+    circles += [(a[0], a[1], 0.32) for a in anchors]    # every tag's dot, drawn with its tag
+    leads: list = []
     dots = [(a[0] - 0.9, a[1] - 0.9, a[0] + 0.9, a[1] + 0.9) for a in anchors]
     lh = size * 1.45
     taken: list = []
@@ -419,29 +445,31 @@ def draw_tags(sh, pr, clusters: list[dict], regions: list[tuple], spill: tuple |
 
     def draw(i, b, lines):
         a = anchors[i]
-        qx, qy = min(max(a[0], b[0]), b[2]), min(max(a[1], b[1]), b[3])
+        qx, qy = _leader_end(a, b)
         parts = []
         if math.hypot(qx - a[0], qy - a[1]) > 0.7:
             parts = [(len(sh.el), (1,))]
-            sh.line(a[0], a[1], qx, qy, "thin")
+            sh.lead([a, (qx, qy)], names=a)
             ink.add(a, (qx, qy))
+            leads.append((a, (qx, qy)))
         sh.circle(a[0], a[1], 0.32, "fill")
         for j, ln in enumerate(lines):
             for off, t, bold in ln:
                 sh.leads[len(sh.el)] = parts
-                sh.text(b[0] + 0.2 + off, b[3] - (j + 1) * lh + 0.32 * size, t, size, bold=bold)
+                sh.text(b[0] + 0.2 + off, b[3] - (j + 1) * lh + 0.32 * size, t, size, bold=bold, names=a)
         taken.append(b)
 
     for i in order:
         lines, w = built[i]
         others = [o for j, o in enumerate(dots) if j != i]
         b = place_box(anchors[i], w + 0.4, len(lines) * lh, regions, blocked + others, taken, ink, heavy=heavy,
-                      reach=TAG_REACH if spill is not None else RINGS[-1])
+                      reach=TAG_REACH if spill is not None else RINGS[-1], leads=leads, circles=circles, texts=words)
         if b is None and spill is not None:
             spilled.append(i)
             continue
         if b is None:
-            b = place_box(anchors[i], w + 0.4, len(lines) * lh, regions, blocked + others, taken, ink)
+            b = (place_box(anchors[i], w + 0.4, len(lines) * lh, regions, blocked + others, taken, ink, leads=leads, circles=circles, texts=words)
+                 or place_box(anchors[i], w + 0.4, len(lines) * lh, regions, blocked + others, taken, ink))
         if b is None:
             raise RuntimeError(f"no room for the run tag at {clusters[i]['anchor']}: {clusters[i]['lines']}")
         draw(i, b, lines)
@@ -449,7 +477,8 @@ def draw_tags(sh, pr, clusters: list[dict], regions: list[tuple], spill: tuple |
         mark = f"T{n}"
         others = [o for j, o in enumerate(dots) if j != i]
         w = S.text_mm(mark, size, True) + 0.4
-        b = (place_box(anchors[i], w, lh, regions, blocked + others, taken, ink, heavy=heavy)
+        b = (place_box(anchors[i], w, lh, regions, blocked + others, taken, ink, heavy=heavy, leads=leads, circles=circles, texts=words)
+             or place_box(anchors[i], w, lh, regions, blocked + others, taken, ink, heavy=heavy)
              or place_box(anchors[i], w, lh, regions, blocked + others, taken, ink))
         if b is None:
             raise RuntimeError(f"no room for the run tag mark {mark} at {clusters[i]['anchor']}")
@@ -1172,7 +1201,7 @@ def ct621(prj, model, bom, checks, reg, dwg):
               nolabel=("LA-11T", "LA-11B", "EL-02", "VE-05", "AC-03"))
     f = lambda iid: _centre(lay.find(iid))  # noqa: E731
     pl = lay.find("EL-02").box
-    pr.text(((pl[0] + pl[3]) / 2, (pl[1] + pl[4]) / 2), "PLINTH", 1.2)
+    pr.text(((pl[0] + pl[3]) / 2, (pl[1] + pl[4]) / 2), "PLINTH", 1.2, names=pr.rect3(pl))
     fa, fb, fc, fd = f("VE-01A"), f("VE-01B"), f("VE-01C"), f("VE-01D")
     # the e2 pairs, each sweeping across the trailer
     for a, b, t in ((fc, fa, "PAIR 1, C AND A"), (fd, fb, "PAIR 2, D AND B")):
@@ -1188,7 +1217,7 @@ def ct621(prj, model, bom, checks, reg, dwg):
     rv = f("VE-06")
     _route(pr, [(r4[0], r4[1] - 300), (4300, 200), (V["rear_x0"] - 200, 0), (V["wet_x0"] + 400, -200), (V["in_x1"] - 60, rv[1])], "airx", arrow=True)
     q = pr.p(4300, 230)
-    sh.text(q[0], q[1] + 0.8, "TOWING: RESPA SUPPLY TO THE RELIEF VALVE", 1.15, "middle", color="#8a5a00")
+    sh.text(q[0], q[1] + 0.8, "TOWING: RESPA SUPPLY TO THE RELIEF VALVE", 1.15, "middle", color="#8a5a00", names=pr.p(4300, 200))
     # the wet room extract and the range hood
     ex = f("VE-03")
     _route(pr, [(V["in_x1"] - 500, -700), (V["in_x1"], ex[1])], "airx", arrow=True)
@@ -1210,13 +1239,15 @@ def ct621(prj, model, bom, checks, reg, dwg):
                 ((cb[0] + 160, cb[1]), (cb[0] + 160, yr_), (V["wet_x0"] + 300, yr_), (V["wet_x0"] + 300, yr_ - 200))):
         _route(pr, pts, "hot", arrow=True)
     q = pr.p(cb[0], cb[1] - 330)
-    sh.text(q[0], q[1], "COMBI DUCTS, IN FLOOR-LEVEL BULKHEADS", 1.1, "middle", color="#c00000")
-    for gid, t in (("VE-01A", "A"), ("VE-01B", "B"), ("VE-01C", "C"), ("VE-01D", "D")):
+    sh.text(q[0], q[1], "COMBI DUCTS, IN FLOOR-LEVEL BULKHEADS", 1.1, "middle", color="#c00000", names=pr.p(cb[0] + 120, 600))
+    for gid, t in (("VE-01A", "A"), ("VE-01B", "B"), ("VE-01C", "C"), ("VE-01D", "D")):    # each fan's letter in its symbol
         c = f(gid)
         q = pr.p(c[0], c[1])
+        n0 = len(sh.el)
         sh.circle(q[0], q[1], 1.3, "box")
         sh.circle(q[0], q[1], 1.3, "air")
-        sh.text(q[0], q[1] - 0.45, t, 1.1, "middle", bold=True)
+        sh.leads[len(sh.el)] = [(n0, ("circle", 1.3)), (n0 + 1, ("circle", 1.3))]
+        sh.text(q[0], q[1] - 0.45, t, 1.1, "middle", bold=True, names=q)
     sh.text(34, 166 + 2 * hb / k + 6.0, "PLAN, FRONT LEFT, ROAD SIDE UP: UNITS, FANS, VENTS, AIR PATHS AND THE COMBI'S DUCTS", 2.0, bold=True)
     _legend(sh, 34, 150, [("air", "HEAT-RECOVERY PAIRS AND THE SPLIT"), ("airx", "EXHAUST AND THE TOWING SUPPLY"), ("hot", "COMBI WARM-AIR DUCTS (INDICATIVE)")])
     rows = [["V1 e2 A", "Kerb wall high over the dryer", "Pair 1 with C"], ["V5 e2 B", "Road wall low in the sink cabinet", "Pair 2 with D"],

@@ -615,6 +615,13 @@ trailer_checks:
     severity: report
     inputs: [UTE-01, UTE-02]
     why: "The crest the ute and the trailer can straddle before the ground touches a rigid sprung part between the ute's rear wheels and the trailer's axle group: for each part, the slope up from the Super Duty's rear axle, UTE-02's 1,455 mm (est.) ahead of the ball, plus the slope up from the axle group's centre, both to the part's underside at design ride height with both vehicles level (est.), over DIM-04's parts, the services' fixtures and runs included (I2-41). The least of these is reported. No rule sets a limit for a combination (review I2-22). For one vehicle between its own axles, 49 CFR 523.5(b)(2) counts a breakover angle of at least 14 degrees among an off-road vehicle's characteristics."
+  - id: DIM-08
+    title: Leads between the vehicles at least DIM-06's 200 mm up in the tightest turn, at the design ball and at UTE-13's low end
+    type: clearance_leads
+    min: 200
+    severity: fail
+    inputs: [UTE-01]
+    why: "The leads between the vehicles, the 12-pin flat plug's K-13 and the TSC's supply K-14, carry the brake request and the four magnets' current, so a lead that snags in a tight off-road turn can pull its plug out or tear (review I2-70). They bend and move, so DIM-04 and DIM-06 read them only as drawn, straight ahead. This check reads each where it hangs lowest: in the tightest turn and pitch of data/routes.yaml rules.between, the shortest span from the truck's socket to the saddle, at a 70 degree turn with a 20 degree pitch (est.), which drops the most slack into the bights (cad/routes.py between_reach), at the design's 440 mm coupling height and with the truck's ball at UTE-13's low end, its 20 mm tolerance lower, the trailer turned nose down about its axle group. The limit is DIM-06's 200 mm, the running clearance of a vehicle built for off-road use, as the leads hang where that vehicle's parts do."
   - id: JK-01
     title: Everything that stands above the bike box's underside clears its sweep by 100 mm at any jack-knife angle
     type: jackknife

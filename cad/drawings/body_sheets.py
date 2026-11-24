@@ -381,12 +381,18 @@ def ct203(prj, model, bom, checks, reg, dwg):
     L, H = V["body_length"], V["interior_h"]
     sh.rect(ox, oy2, ox + L / k, oy2 + H / k, "thick")
     fz = V["floor_z"]
+    bars = []
     for iid in ("LB-04.2", "LB-04.4"):          # the lift bed's hardpoints behind the kerb-side rails (LB-06)
         rb = lay.find(iid).box
         x0, x1 = ox + (L - (rb[3] - V["body_x0"])) / k, ox + (L - (rb[0] - V["body_x0"])) / k
         sh.rect(x0, oy2 + (rb[2] - fz) / k, x1, oy2 + (rb[5] - fz) / k, "fill")
-    rb = lay.find("LB-04.2").box
-    sh.text(ox + (L - (rb[3] - V["body_x0"])) / k - 1, oy2 + (rb[2] - fz) / k + 1.0, f"LIFT BED HARDPOINTS LB-06, {_member(b)} ON THE INNER SKIN", 1.4, "end")
+        bars.append((x0, oy2 + (rb[2] - fz) / k, x1, oy2 + (rb[5] - fz) / k))
+    # the note between the two hardpoints it names, each line centred between them, the lowest just over their feet
+    near, far = sorted(bars)
+    room = far[0] - near[2] - 2.0
+    lines = S.wrap_mm("LIFT BED HARDPOINTS LB-06,", room, 1.4) + S.wrap_mm(_member(b), room, 1.4) + S.wrap_mm("ON THE INNER SKIN", room, 1.4)
+    for i, t in enumerate(lines):
+        sh.text((near[2] + far[0]) / 2, near[1] + 1.0 + (len(lines) - 1 - i) * 2.2, t, 1.4, "middle", names=far)
     lk = lay.find("LA-11L").box                  # the lockers over the plinth hang on an insert strip
     for wall, a, c, _ in res["members"]["strips"]:   # the lockers' strip, stopped 25 mm short of the member it meets (FIT-07)
         if wall == "kerb":

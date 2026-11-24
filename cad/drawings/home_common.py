@@ -192,7 +192,8 @@ def short(b) -> str:
 def label_in(sh, r, text, size=1.4, min_size=1.0, pad=0.6, rot_ok=True, avoid=()) -> bool:
     """Write text centred in the sheet rectangle r = (x0, y0, x1, y1) if it fits, shrinking to min_size, or rotated in a
     tall narrow box. A label that would cover a sheet point in `avoid` (a mark drawn later, such as a run tag's dot)
-    slides along its length to the nearest place in the rectangle clear of it. Returns whether it was written."""
+    slides along its length to the nearest place in the rectangle clear of it. The label names the rectangle, so one
+    that clear_labels moves out of it gets a leader into it. Returns whether it was written."""
     x0, y0, x1, y1 = r
     w, h = x1 - x0, y1 - y0
     s = size
@@ -200,12 +201,12 @@ def label_in(sh, r, text, size=1.4, min_size=1.0, pad=0.6, rot_ok=True, avoid=()
         if tw(text, s) + 2 * pad <= w and s + pad <= h:
             cy = (y0 + y1) / 2
             near = [p[0] for p in avoid if abs(p[1] - cy) < s / 2 + 0.4]
-            sh.text(_slide((x0 + x1) / 2, tw(text, s), x0 + pad, x1 - pad, near), cy - 0.36 * s, text, s, "middle")
+            sh.text(_slide((x0 + x1) / 2, tw(text, s), x0 + pad, x1 - pad, near), cy - 0.36 * s, text, s, "middle", names=r)
             return True
         if rot_ok and tw(text, s) + 2 * pad <= h and s + pad <= w:
             cx = (x0 + x1) / 2
             near = [p[1] for p in avoid if abs(p[0] - cx) < s / 2 + 0.4]
-            sh.text(cx + 0.36 * s, _slide((y0 + y1) / 2, tw(text, s), y0 + pad, y1 - pad, near), text, s, "middle", rot=-90)
+            sh.text(cx + 0.36 * s, _slide((y0 + y1) / 2, tw(text, s), y0 + pad, y1 - pad, near), text, s, "middle", rot=-90, names=r)
             return True
         s -= 0.1
     return False
