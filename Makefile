@@ -47,7 +47,8 @@ strict: all
 	@test "$$(cat build/checks/overrun.exit)" = "0" || (echo "labels overrun on the sheets (build/checks/overrun.txt)"; exit 1)
 
 # After the sheets, the label overrun check reads every one of them (cad/tools/overrun.py): the text a line shows
-# through and the texts on each other. Its exit code is recorded and its count added to the summary, as pytest's are.
+# through, the texts on each other and the masks that break a heavy line. Its exit code is recorded and its counts
+# added to the summary, as pytest's are.
 drawings: check
 	$(T) 1800 $(DOCKER) python -m cad.build drawings
 	-$(T) 300 $(DOCKER) sh -c 'python -m cad.tools.overrun build/drawings build/checks/overrun.json > build/checks/overrun.txt 2>&1; echo $$? > build/checks/overrun.exit'

@@ -37,7 +37,7 @@ RAILS = {"BD-10", "RG-03", "RG-04", "RG-05"}   # hung from the rails: mud flaps,
 CELL = 200.0
 ROOT_GUSSET, ROOT_END_PLATE = "CH-P03", "CH-P15"   # the drawbar root's gusset and the rail's end plate its heel is welded to
 ROOT_PLACES = {"root_splice": "DB-{side}A's mitre at X {x:.0f}", "root_heel_weld": "CH-P03's heel, DB-{side}",
-               "root_end_plate": "CH-P15 on RL-{side}", "root_end_plate_weld": "CH-P15's welds to RL-{side}"}
+               "root_end_plate": "CH-P15 on RL-{side}", "root_end_plate_weld": "CH-P15's welds to RL-{side}, {weld}"}
 NU = 0.3
 
 
@@ -599,7 +599,8 @@ class Analysis:
                         out.append((max(self.normal_at(res, m, x) for m in mems), f"DB-{SIDES[s]} at X {x:.0f}"))
             elif k in ROOT_PLACES:
                 for s in (-1, 1):
-                    out.append((self.root_stresses(res, s)[k], ROOT_PLACES[k].format(side=SIDES[s], x=V["body_x0"])))
+                    r = self.root_stresses(res, s)
+                    out.append((r[k], ROOT_PLACES[k].format(side=SIDES[s], x=V["body_x0"], weld=r["weld"])))
             else:
                 for m in groups[d["member"]]:
                     sig = self.member_end_stress(res, m.id)
@@ -631,10 +632,12 @@ class Analysis:
         return out
 
     def root_stresses(self, res, s: int) -> dict:
-        """The body front under the root gusset's heel (FAT-17 to FAT-19, I2-51), from the A-frame member's end actions
-        there, on the section of the member and the gusset's heel together, as the heel is welded to the rail's end plate:
-        the mitred splice at the member's far face, the heel's two fillets on their throat at the gusset's top, and the end
-        plate in bending under the heel's line load, simply supported on the rail's walls."""
+        """The body front under the root gusset's heel (FAT-17 to FAT-20, I2-51, I2-60), from the A-frame member's end
+        actions there, on the section of the member and the gusset's heel together, as the heel is welded to the rail's
+        end plate: the mitred splice at the member's far corner, the heel's two fillets on their throat at the gusset's
+        top, the end plate in bending under the heel's line load, simply supported on the rail's walls, and its welds to
+        the rail. The heel stands `zg` off the member's axis (root_gusset_heel_y), so the section is unsymmetric, and its
+        product of inertia adds each moment's coupling to the other axis, taken on the safe side."""
         ch, V = self.ch, self.ch.V
         fit = {f["id"]: f for f in ch.data["fittings"]}
         g, ep, rail = fit[ROOT_GUSSET], fit[ROOT_END_PLATE], ch.role_sec["rail"]
@@ -643,35 +646,63 @@ class Analysis:
         n, my, mz = abs(act["N"]), abs(act["My"]), abs(act["Mz"])
         tg, hg = g["t"], g["w"]
         ag, yg = tg * hg, sp.d / 2 + hg / 2
+        member = math.atan2(V["rail_c"] - V["db_apex_y"], V["body_x0"] - V["db_apex_x"])
+        zg = (V["root_gusset_heel_y"] - ch.db_y(V["root_gusset_toe_x"] + g["l"])) * math.cos(member)
         area = sp.A + ag
-        e = ag * yg / area                                   # the joint section's centroid above the member's
+        e, ez = ag * yg / area, ag * zg / area               # the joint section's centroid above and across from the member's
         i_s = sp.I_strong + sp.A * e ** 2 + tg * hg ** 3 / 12 + ag * (yg - e) ** 2
-        i_w = sp.I_weak + hg * tg ** 3 / 12
+        i_w = sp.I_weak + sp.A * ez ** 2 + hg * tg ** 3 / 12 + ag * (zg - ez) ** 2
+        i_sw = ag * (yg - e) * (zg - ez) + sp.A * e * ez
+        den = i_s * i_w - i_sw ** 2
 
-        def at(y):
-            return n / area + my * y / i_s
-        g_bot, g_top = at(sp.d / 2 - e), at(sp.d / 2 + hg - e)
+        def at(y, z):
+            return n / area + (my * (abs(y) * i_w + abs(z) * i_sw) + mz * (abs(z) * i_s + abs(y) * i_sw)) / den
+        g_bot, g_top = at(sp.d / 2 - e, zg - ez), at(sp.d / 2 + hg - e, zg - ez)
         throat = g["heel_leg"] / math.sqrt(2)
         plate = self.end_plate_under_heel(g_bot * tg, g_top * tg)
-        return dict(root_splice=at(sp.d / 2 + e) + mz * (sp.b / 2) / i_w, root_heel_weld=g_top * tg / (2 * throat),
-                    root_end_plate=6 * plate["moment"] / ep["t"] ** 2,
-                    root_end_plate_weld=max(plate["web"].max() / rail.t, plate["top"].max() / plate["top_t"]))
+        d = next(f for f in ch.data["fatigue_details"] if f["id"] == "FAT-20")
+        ratio = 0.585 * d["fat"] / (d["fat_shear"] * (2e6 / 1e8) ** (1 / 5))
+
+        def welds():
+            """Each weld's normal range with its shear by IIW's interaction, as the normal range of the same use."""
+            for name, q, wall, tau in (("the inboard web", plate["webs"][0], rail.t, plate["tau_web"]),
+                                       ("the outboard web", plate["webs"][1], rail.t, plate["tau_web"]),
+                                       ("the top", plate["top"], plate["top_t"], plate["tau_top"])):
+                yield math.hypot(q.max() / wall, ratio * tau) / math.sqrt(d["cv"]), name
+        weld, where = max(welds())
+        return dict(root_splice=at(sp.d / 2 + e, sp.b / 2 + ez), root_heel_weld=g_top * tg / (2 * throat),
+                    root_end_plate=6 * plate["moment"] / ep["t"] ** 2, root_end_plate_weld=weld, weld=where)
 
     def end_plate_under_heel(self, q_foot: float, q_top: float) -> dict:
-        """The rail's end plate CH-P15 under the gusset heel's line load, q_foot at the heel's foot rising to q_top N/mm
-        at its top (FAT-19, FAT-20, I2-57). The plate's bottom edge rests on the drawbar member unwelded, so it is free.
-        Its sides and top are welded to the rail's webs and top flange with full penetration single bevel welds made from
-        outside, the plate behind each wall's end as the backing, and the plate stands up over the raiser's bottom wall,
-        so its top weld joins both walls (`top_t`). The plate spans between the webs' mid-planes and from the bottom
-        wall's mid-plane up to the middle of the walls its top weld joins, as end_plate takes it."""
-        ch = self.ch
+        """The rail's end plate CH-P15 under the gusset heel's pull, q_foot at the heel's foot rising to q_top N/mm at its
+        top along the gusset's line (FAT-19, FAT-20, I2-57, I2-60). The plate's bottom edge rests on the drawbar member
+        unwelded, so it is free. Its sides and top are welded to the rail's webs and top flange with full penetration
+        single bevel welds made from outside, the plate behind each wall's end as the backing, and the plate stands up
+        over the raiser's bottom wall, so its top weld joins both walls (`top_t`). The plate spans between the webs'
+        mid-planes and from the bottom wall's mid-plane up to the middle of the walls its top weld joins, as end_plate
+        takes it. The heel stands where the gusset's data puts it (root_gusset_heel_y), and the gusset's line runs from
+        the member's line at its toe to there, `angle` off the plate's normal in plan. The pull's part normal to the
+        plate bends it (end_plate). Its part along the plate, inboard, is applied at the plate's front face: half the
+        plate's thickness off its mid-plane, so it is a line moment on the plate as well (km), which pulls the outboard
+        web harder. The top weld takes that part as shear along its length (`tau_top`), and its moment about the plate's
+        normal, from the heel's centroid up to the top weld, goes into the two webs as shear along their welds, a couple
+        across the span (`tau_web`, est.: the plate taken as rigid in its plane, the shear even along the webs)."""
+        ch, V = self.ch, self.ch.V
         ep = next(f for f in ch.data["fittings"] if f["id"] == ROOT_END_PLATE)
         g = next(f for f in ch.data["fittings"] if f["id"] == ROOT_GUSSET)
         rail = ch.role_sec["rail"]
         top_t = rail.t + ep["w"] - rail.d          # the rail's top flange and the raiser's bottom wall the plate covers
         height = rail.d - 1.5 * rail.t + top_t / 2
-        out = end_plate(rail.b - rail.t, height, 0.0, g["w"] - rail.t / 2, q_foot, q_top, g["t"] + 2 * g["heel_leg"])
-        return dict(out, top_t=top_t)
+        span, z1 = rail.b - rail.t, g["w"] - rail.t / 2
+        centre = span / 2 - (V["rail_c"] - V["root_gusset_heel_y"])     # from the inboard web
+        angle = math.atan2(V["root_gusset_heel_y"] - V["root_gusset_toe_y"], g["l"])
+        cn, sn = math.cos(angle), math.sin(angle)
+        out = end_plate(span, height, 0.0, z1, q_foot * cn, q_top * cn, g["t"] + 2 * g["heel_leg"], centre=centre,
+                        km=math.tan(angle) * ep["t"] / 2)
+        along = (q_foot + q_top) / 2 * z1 * sn
+        zc = z1 * (q_foot + 2 * q_top) / (3 * (q_foot + q_top))
+        return dict(out, top_t=top_t, centre=centre, angle=angle, along=along, tau_top=along / (span * top_t),
+                    tau_web=along * (height - zc) / (span * height * rail.t))
 
     def end_actions_at(self, res, member: str, x: float) -> dict:
         """A member's end actions at its element end nearest X."""
@@ -975,17 +1006,20 @@ PLATE_STENCIL = ((0, 0, 20.0), (1, 0, -8.0), (-1, 0, -8.0), (0, 1, -8.0), (0, -1
 
 
 def end_plate(span: float, height: float, z0: float, z1: float, q0: float, q1: float, foot: float, h: float = 1.0,
-              free_bottom: bool = True, nu: float = NU) -> dict:
-    """The rail's end plate under the gusset heel's line load (FAT-19, FAT-20, I2-57): a Kirchhoff plate `span` mm between
-    the rail's webs and `height` mm from its bottom edge to the rail's top flange, simply supported on the webs and the
-    top flange it is welded to, and free along its bottom edge, which rests unwelded on the drawbar member (or simply
-    supported there too). The load runs down its middle from z0 to z1 mm above the bottom edge, rising from q0 to q1 N/mm
-    and spread over `foot` mm across. Biharmonic finite differences on a grid h mm apart, the free edge's moment and
-    Kirchhoff shear held at zero by two rows of ghost points (Timoshenko and Woinowsky-Krieger, Theory of plates and
-    shells, 1959, chapters 4 and 5). Returns the largest moment across the span (N mm per mm), the Kirchhoff edge shear
-    a web carries along its height and the top along its width (N/mm, positive where the wall holds the plate back
-    against the load, so its weld is pulled), a top and a bottom corner's force (N, negative where it presses the plate
-    onto the walls' ends) and the load (N). Two webs, the top and the four corners carry the load."""
+              free_bottom: bool = True, nu: float = NU, centre: float | None = None, km: float = 0.0) -> dict:
+    """The rail's end plate under the gusset heel's line load (FAT-19, FAT-20, I2-57, I2-60): a Kirchhoff plate `span` mm
+    between the rail's webs and `height` mm from its bottom edge to the rail's top flange, simply supported on the webs
+    and the top flange it is welded to, and free along its bottom edge, which rests unwelded on the drawbar member (or
+    simply supported there too). The load runs up the plate `centre` mm from the first web (its middle by default) from
+    z0 to z1 mm above the bottom edge, rising from q0 to q1 N/mm and spread over `foot` mm across. With it goes a line
+    moment of km times the line load (N mm per mm), its axis up the plate, which pulls harder towards the second web: the
+    moment of a force along the plate applied at its face. Biharmonic finite differences on a grid h mm apart, the free
+    edge's moment and Kirchhoff shear held at zero by two rows of ghost points (Timoshenko and Woinowsky-Krieger, Theory
+    of plates and shells, 1959, chapters 4 and 5). Returns the largest moment across the span (N mm per mm), the
+    Kirchhoff edge shear each web carries along its height (`webs`, the first web's and the second's) and the top along
+    its width (N/mm, positive where the wall holds the plate back against the load, so its weld is pulled), each corner's
+    force (N, negative where it presses the plate onto the walls' ends, `_far` at the second web) and the load (N). Two
+    webs, the top and the four corners carry the load."""
     import scipy.sparse as sp
     from scipy.sparse.linalg import spsolve
     nx, nz = round(span / h), round(height / h)
@@ -1022,13 +1056,17 @@ def end_plate(span: float, height: float, z0: float, z1: float, q0: float, q1: f
                         (-k, w(i + 1, -1)), (-k, w(i - 1, -1)))
         return {index[i, j]: 1.0}
 
-    ncol = sum(1 for i in range(1, nx) if abs(i * h - span / 2) <= foot / 2 + 1e-9)
+    uc = span / 2 if centre is None else centre
+    feet = [i * h - uc for i in range(1, nx) if abs(i * h - uc) <= foot / 2 + 1e-9]
+    ubar = sum(feet) / len(feet)
+    lever = sum((u - ubar) ** 2 for u in feet) * h    # spreads the line moment over the foot as a linear pull across it
 
     def load(i, j):
-        z = j * h
-        if abs(i * h - span / 2) > foot / 2 + 1e-9 or not z0 <= z <= z1:
+        z, u = j * h, i * h - uc
+        if abs(u) > foot / 2 + 1e-9 or not z0 <= z <= z1:
             return 0.0
-        return (q0 + (q1 - q0) * (z - z0) / (z1 - z0)) / (ncol * h)
+        q = q0 + (q1 - q0) * (z - z0) / (z1 - z0)
+        return q / (len(feet) * h) + km * q * (u - ubar) / lever
 
     rows, cols, vals, rhs = [], [], [], np.zeros(len(index))
     for (i, j), n in index.items():
@@ -1046,13 +1084,17 @@ def end_plate(span: float, height: float, z0: float, z1: float, q0: float, q1: f
     def twist(i, j):
         return 2 * (1 - nu) * (at(i + 1, j + 1) - at(i + 1, j - 1) - at(i - 1, j + 1) + at(i - 1, j - 1)) / (4 * h ** 2)
     mx = max(abs(d2(i, j, 1, 0) + nu * d2(i, j, 0, 1)) for i, j in index)
-    web = [-((at(2, j) - 2 * at(1, j) + 2 * at(-1, j) - at(-2, j)) / (2 * h ** 3)
-             + (2 - nu) * (d2(1, j, 0, 1) - d2(-1, j, 0, 1)) / (2 * h)) for j in range(1, nz)]
+
+    def edge(i0, di):
+        """The Kirchhoff edge shear along the web at column i0, the plate lying on the side di of it."""
+        return [-((at(i0 + 2 * di, j) - 2 * at(i0 + di, j) + 2 * at(i0 - di, j) - at(i0 - 2 * di, j)) / (2 * h ** 3)
+                  + (2 - nu) * (d2(i0 + di, j, 0, 1) - d2(i0 - di, j, 0, 1)) / (2 * h)) for j in range(1, nz)]
     top = [(at(i, nz + 2) - 2 * at(i, nz + 1) + 2 * at(i, nz - 1) - at(i, nz - 2)) / (2 * h ** 3)
            + (2 - nu) * (d2(i, nz + 1, 1, 0) - d2(i, nz - 1, 1, 0)) / (2 * h) for i in range(1, nx)]
     total = sum(load(i, j) for i, j in index) * h ** 2
     # the corner forces of the plate's twist (2 M_xz), negative where they press the plate onto the walls' ends
-    return dict(moment=mx, web=np.array(web), top=np.array(top), corner_top=twist(0, nz), corner_bottom=-twist(0, 0),
+    return dict(moment=mx, webs=(np.array(edge(0, 1)), np.array(edge(nx, -1))), top=np.array(top),
+                corner_top=twist(0, nz), corner_bottom=-twist(0, 0), corner_top_far=-twist(nx, nz), corner_bottom_far=twist(nx, 0),
                 load=total, h=h)
 
 

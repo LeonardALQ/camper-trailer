@@ -321,13 +321,15 @@ def _crosses(p, q, b) -> bool:
 
 
 class Ink:
-    """Every stroked line on the sheet so far, in a 4 mm grid, to count the lines a tag would cover."""
+    """Every stroked line on the sheet so far, in a 4 mm grid, to count the lines a tag would cover. heavy=True keeps
+    only the heavy ones (sheet.HEAVY, 0.35 mm or more), which a tag's mask must never break (I2-64)."""
     G = 4.0
 
-    def __init__(self, sh):
+    def __init__(self, sh, heavy: bool = False):
         self.segs, self.grid = [], {}
-        for p, q, _, _ in S._segments(sh.el)[0]:
-            self.add((p[0], S.Sheet.H - p[1]), (q[0], S.Sheet.H - q[1]))
+        for p, q, _, hw in S._segments(sh.el, every=heavy)[0]:
+            if not heavy or 2 * hw >= S.HEAVY - 1e-9:
+                self.add((p[0], S.Sheet.H - p[1]), (q[0], S.Sheet.H - q[1]))
 
     def add(self, a, b):
         k = len(self.segs)
@@ -356,14 +358,16 @@ def _symbols(sh) -> list[tuple]:
 
 
 RINGS = (0.6, 1.5, 2.6, 4.0, 5.6, 7.5, 10.0, 13.0, 16.5, 21.0, 26.0, 32.0, 40.0, 50.0, 62.0)
+TAG_REACH = 13.0   # mm: a tag that finds no place clear of the heavy lines this near its anchor goes to the sheet's list
 
 
-def place_box(anchor, w, h, regions, blocked, taken, ink: Ink, extra_rings: int = 3):
-    """Where a w x h label goes near its anchor (sheet mm): inside one of the regions, clear of every blocked box and
-    every label placed before, and over as few drawn lines as it can. Rings outward in 16 directions. Returns the box
-    or None."""
+def place_box(anchor, w, h, regions, blocked, taken, ink: Ink, extra_rings: int = 3, heavy: Ink | None = None,
+              reach: float = RINGS[-1]):
+    """Where a w x h label goes near its anchor (sheet mm), within `reach` of it: inside one of the regions, clear of
+    every blocked box, every label placed before and, with its mask's margin, every heavy line, and over as few drawn
+    lines as it can. Rings outward in 16 directions. Returns the box or None."""
     best, best_ring = None, None
-    for ri, d in enumerate(RINGS):
+    for ri, d in enumerate(r for r in RINGS if r <= reach):
         if best_ring is not None and ri > best_ring + extra_rings:
             break
         for k in range(16):
@@ -375,6 +379,8 @@ def place_box(anchor, w, h, regions, blocked, taken, ink: Ink, extra_rings: int 
             if not any(b[0] >= r[0] and b[1] >= r[1] and b[2] <= r[2] and b[3] <= r[3] for r in regions):
                 continue
             if any(_overlap(b, o, 0.25) for o in blocked) or any(_overlap(b, o, 0.5) for o in taken):
+                continue
+            if heavy is not None and heavy.count((b[0] - 0.5, b[1] - 0.5, b[2] + 0.5, b[3] + 0.5)):
                 continue
             score = d + 3.0 * ink.count(b)
             if best is None or score < best[0]:
@@ -401,6 +407,7 @@ def draw_tags(sh, pr, clusters: list[dict], regions: list[tuple], spill: tuple |
     """Each cluster's tag beside its anchor, with a leader and a dot where it points. A tag with no room near its
     anchor becomes a numbered mark there, and its lines go into a list at `spill` (x, y top, width). Returns counts."""
     ink = Ink(sh)
+    heavy = Ink(sh, heavy=True)
     blocked = [_text_box(t) for t in sh.texts] + _symbols(sh)
     anchors = [pr.p(*c["anchor"]) for c in clusters]
     dots = [(a[0] - 0.9, a[1] - 0.9, a[0] + 0.9, a[1] + 0.9) for a in anchors]
@@ -413,29 +420,37 @@ def draw_tags(sh, pr, clusters: list[dict], regions: list[tuple], spill: tuple |
     def draw(i, b, lines):
         a = anchors[i]
         qx, qy = min(max(a[0], b[0]), b[2]), min(max(a[1], b[1]), b[3])
+        parts = []
         if math.hypot(qx - a[0], qy - a[1]) > 0.7:
+            parts = [(len(sh.el), (1,))]
             sh.line(a[0], a[1], qx, qy, "thin")
             ink.add(a, (qx, qy))
         sh.circle(a[0], a[1], 0.32, "fill")
         for j, ln in enumerate(lines):
             for off, t, bold in ln:
+                sh.leads[len(sh.el)] = parts
                 sh.text(b[0] + 0.2 + off, b[3] - (j + 1) * lh + 0.32 * size, t, size, bold=bold)
         taken.append(b)
 
     for i in order:
         lines, w = built[i]
         others = [o for j, o in enumerate(dots) if j != i]
-        b = place_box(anchors[i], w + 0.4, len(lines) * lh, regions, blocked + others, taken, ink)
+        b = place_box(anchors[i], w + 0.4, len(lines) * lh, regions, blocked + others, taken, ink, heavy=heavy,
+                      reach=TAG_REACH if spill is not None else RINGS[-1])
         if b is None and spill is not None:
             spilled.append(i)
             continue
+        if b is None:
+            b = place_box(anchors[i], w + 0.4, len(lines) * lh, regions, blocked + others, taken, ink)
         if b is None:
             raise RuntimeError(f"no room for the run tag at {clusters[i]['anchor']}: {clusters[i]['lines']}")
         draw(i, b, lines)
     for n, i in enumerate(spilled, 1):
         mark = f"T{n}"
         others = [o for j, o in enumerate(dots) if j != i]
-        b = place_box(anchors[i], S.text_mm(mark, size, True) + 0.4, lh, regions, blocked + others, taken, ink)
+        w = S.text_mm(mark, size, True) + 0.4
+        b = (place_box(anchors[i], w, lh, regions, blocked + others, taken, ink, heavy=heavy)
+             or place_box(anchors[i], w, lh, regions, blocked + others, taken, ink))
         if b is None:
             raise RuntimeError(f"no room for the run tag mark {mark} at {clusters[i]['anchor']}")
         draw(i, b, [[(0.0, mark, True)]])
@@ -644,8 +659,10 @@ def ct602(prj, model, bom, checks, reg, dwg):
             (3300, -hi + 25, "2"), (wa[0], -hi + 25, "1"), (dr[0], -hi + 25, "1"), (bd[0] + 60, -hi + 25, "1")]
     for x, y, t in outs:
         q = pr.p(x, y)
+        n0 = len(sh.el)
         sh.fillrect(q[0] - 1.1, q[1] - 1.1, q[0] + 1.1, q[1] + 1.1, "box")
         sh.rect(q[0] - 1.1, q[1] - 1.1, q[0] + 1.1, q[1] + 1.1, "medium")
+        sh.leads[len(sh.el)] = [(n0, ("path",)), (n0 + 1, ("path",))]    # the symbol moves whole with its count
         sh.text(q[0], q[1] - 0.45, t, 1.0, "middle", bold=True)
     tb = lay.find("EL-09").box   # the drip tray over the plinth, dashed (I2-35)
     q0, q1 = pr.p(tb[0] + 6, tb[1] + 6), pr.p(tb[3] - 6, tb[4] - 6)

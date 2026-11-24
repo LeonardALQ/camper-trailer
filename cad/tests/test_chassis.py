@@ -4,6 +4,7 @@ import math
 
 import pytest
 
+from cad.chassis import fitting_boxes
 from cad.chassis_fea import end_plate
 from cad.tests.test_trailer import EV, TRAILER
 
@@ -141,7 +142,43 @@ def test_end_plate_with_a_free_edge_balances_and_bends_as_a_strip():
     edge, each web taking half the load. Under the heel's rising load the webs, the top and the corners carry it all."""
     q, span, foot = 100.0, 46.0, 26.0
     c = end_plate(span, 400.0, 0.0, 400.0, q, q, foot, nu=0.0)
-    assert c["web"][:20] == pytest.approx(q / 2, rel=0.01)
-    r = end_plate(span, 147.75, 0.0, 138.0, 20.0, 183.0, foot)
-    carried = (2 * r["web"].sum() + r["top"].sum()) * r["h"] + 2 * (r["corner_top"] + r["corner_bottom"])
+    assert c["webs"][0][:20] == pytest.approx(q / 2, rel=0.01) and c["webs"][1][:20] == pytest.approx(q / 2, rel=0.01)
+    r = end_plate(span, 147.75, 0.0, 138.0, 20.0, 183.0, foot, centre=span / 2 - 4.0, km=2.9)
+    corners = r["corner_top"] + r["corner_bottom"] + r["corner_top_far"] + r["corner_bottom_far"]
+    carried = (r["webs"][0].sum() + r["webs"][1].sum() + r["top"].sum()) * r["h"] + corners
     assert carried == pytest.approx(r["load"], rel=0.01) and r["corner_top"] < 0
+
+
+def test_moving_the_heel_off_the_middle_raises_the_near_web():
+    """The heel's pull moved towards one web loads that web's weld harder and the far one's less (I2-60), and a line
+    moment, the moment of the pull's part along the plate applied at its face, adds to one web what it takes from the
+    other: on a long strip, the moment over the span."""
+    span, foot = 46.0, 26.0
+    mid = end_plate(span, 147.75, 0.0, 138.0, 20.0, 183.0, foot)
+    off = end_plate(span, 147.75, 0.0, 138.0, 20.0, 183.0, foot, centre=span / 2 - 5.6)
+    assert mid["webs"][0].max() == pytest.approx(mid["webs"][1].max(), rel=1e-6)
+    assert off["webs"][0].max() > 1.2 * mid["webs"][0].max() and off["webs"][1].max() < mid["webs"][1].max()
+    m = 100.0
+    strip = end_plate(span, 600.0, 0.0, 600.0, 1.0, 1.0, foot, free_bottom=False, km=m)
+    assert strip["webs"][0][300] == pytest.approx(0.5 - m / span, rel=0.01)
+    assert strip["webs"][1][300] == pytest.approx(0.5 + m / span, rel=0.01)
+
+
+def test_fat20_reads_the_heel_where_the_gusset_stands():
+    """FAT-20 takes the heel's place across CH-P15 and the pull's direction from CH-P03's data (I2-60): the gusset's boxes
+    run from the member's line at its toe to root_gusset_heel_y at the plate's front face, and end_plate_under_heel
+    puts the heel there, its pull along that line."""
+    from cad.chassis_fea import Analysis
+    V = CH.V
+    g = next(f for f in CH.data["fittings"] if f["id"] == "CH-P03")
+    ch_f = next(f for f in CH.fittings if f.id == "CH-P03")
+    road = [b for b in fitting_boxes(CH, ch_f) if b[1] > 0]
+    first, last = min(road), max(road)
+    assert (first[1] + 5) == pytest.approx(CH.db_y(V["root_gusset_toe_x"]))
+    assert (last[4] - 5) == pytest.approx(V["root_gusset_heel_y"]) and last[3] == pytest.approx(V["body_x0"] - 16)
+    lay, ch, _ = TRAILER._chassis
+    p = Analysis(lay, TRAILER, ch).end_plate_under_heel(20.0, 180.0)
+    span = CH.role_sec["rail"].b - CH.role_sec["rail"].t
+    assert p["centre"] == pytest.approx(span / 2 - (V["rail_c"] - V["root_gusset_heel_y"]))
+    assert math.tan(p["angle"]) == pytest.approx((V["root_gusset_heel_y"] - CH.db_y(V["root_gusset_toe_x"])) / g["l"])
+    assert abs(p["webs"][0].max() - p["webs"][1].max()) < 0.05 * p["webs"][0].max()

@@ -367,9 +367,10 @@ def ct702(prj, model, bom, checks, reg, dwg):
     for i, x in enumerate(stations, 1):
         p = vP.p(x, hw + fs, 0)
         sh.text(p[0], p[1] + 1.5, ("F" if i == 1 else "R") + str(i), 1.7, "middle", bold=True)
-    for x, lab in ((P["front_row_x"], "STEEL CM, FRONT TRACK ROW"), (P["rear_row_x"], "STEEL CM, REAR TRACK ROW")):
+    for x, lab, more in ((P["front_row_x"], "STEEL CM,", ["FRONT TRACK ROW"]), (P["rear_row_x"], "STEEL CM, REAR TRACK ROW", [])):
         p = vP.p(x, 0, 0)
-        S.leader(sh, (p[0], p[1]), (p[0] + 10, p[1] + 12 if x < 1000 else p[1] + 12), lab, size=1.6)
+        elbow = (vP.p(-fs, 0, 0)[0] - 3, p[1] + 12) if x < 1000 else (p[0] + 10, p[1] + 12)
+        S.leader(sh, (p[0], p[1]), elbow, lab, more, size=1.6)
     r0, r1 = vP.p(P["x_end"], P["pad_y"], 0), vP.p(P["x_end"], -P["pad_y"], 0)
     S.vdim(sh, r0[0], r0[1], r1[0], r1[1], r0[0] + 6, f"{2 * P['pad_y']:.0f} PADS CL", size=1.7)
     sh.text(vP.p(P["x_end"], 0, 0)[0] + 12, vP.p(0, hw, 0)[1], "F = FLEXIBLE, R = RIGID", 1.6)
