@@ -493,7 +493,7 @@ _LINE_EL = re.compile(r'<path d="M([-\d.]+),([-\d.]+) L([-\d.]+),([-\d.]+)" stro
 DRAW_AREA = (21.0, 409.0, 11.0, 286.0)       # inside the frame, SVG mm
 ATTACH, REACH = 1.2, 15.0                     # a leader's end this near a label moves with it; the farthest a label moves
 PREFER = 8.0      # mm of cost: a place that needs no leader is taken over a nearer one that needs a leader to what it names
-SPACE = 1.0       # of the size: a moved label keeps this far from another text along its line, so the two never read as one
+SPACE = 1.0       # of the size: a moved label keeps this far from every text that runs the same way, so the two never read as one
 
 
 def _steps() -> list[tuple]:
@@ -887,47 +887,58 @@ def _off(orig, body, target, s) -> bool:
     return _dist((target[1], target[2]), body) - target[3] > 1.5 * s
 
 
-def _fallback(B, body, target, centre, shapes):
+def _fallback(B, body, target, centre, shapes, own, skip):
     """The leader from a moved label, its bounds with its symbol `body`, to what it names: (start, end, dot), the end
-    at its point, in its box clear of the lines there, or on its symbol's circle (no dot), the start on the label's
-    margin or on the symbol moved with it. None where the label stands too near it for a leader."""
+    at its point, in its box at the nearest place that is clear, or on its symbol's circle (no dot), the start on the
+    label's margin or on the symbol moved with it, the leader at least 1 mm long and crossing no text, no other leader
+    and no symbol. None where no such leader exists."""
     g = (body[0] - 0.6, body[1] + 0.6, body[2] - 0.6, body[3] + 0.6)
     kind = target[0]
     if kind == "point":
-        end, dot = (target[1], target[2]), True
+        ends = [((target[1], target[2]), True)]
     elif kind == "box":
-        end, dot = _box_end(B, target, centre, g), True
+        ends = [(p, True) for p in _box_ends(B, target, centre, g)]
     else:
         cx, cy, r = target[1:]
         aim = _clamp((cx, cy), g)
         L = math.hypot(aim[0] - cx, aim[1] - cy) or 1.0
-        end, dot = (cx + (aim[0] - cx) * r / L, cy + (aim[1] - cy) * r / L), False
-    start = _clamp(end, g)
-    for c in shapes:
-        if c[0] == "circle":
-            L = math.hypot(end[0] - c[1], end[1] - c[2]) or 1.0
-            start = (c[1] + (end[0] - c[1]) * c[3] / L, c[2] + (end[1] - c[2]) * c[3] / L)
-    if math.dist(start, end) < 1.0:
-        return None
-    return start, end, dot
+        ends = [((cx + (aim[0] - cx) * r / L, cy + (aim[1] - cy) * r / L), False)]
+    for end, dot in ends:
+        start = _clamp(end, g)
+        for c in shapes:
+            if c[0] == "circle":
+                L = math.hypot(end[0] - c[1], end[1] - c[2]) or 1.0
+                start = (c[1] + (end[0] - c[1]) * c[3] / L, c[2] + (end[1] - c[2]) * c[3] / L)
+        if math.dist(start, end) < 1.0:
+            continue
+        if _crosses_text(B, start, end, own) or B.crosses_leader(start, end, skip) or B.through_symbol(start, end, end, skip):
+            continue
+        return start, end, dot
+    return None
 
 
-def _box_end(B, box, centre, g):
-    """Where a leader into a box ends: inside it, in from its outline, at least 1 mm from the label's margin `g`, clear
-    of the lines and the texts there, nearest the label; failing that, the label's old middle brought into the box."""
+def _box_ends(B, box, centre, g, most: int = 40) -> list:
+    """Where a leader into a box may end, nearest the label first: inside the box, in from its outline, at least 1.5 mm
+    from the label's margin `g`, clear of the lines, the texts and the other leaders' dots there; failing every one, the
+    label's old middle brought into the box."""
     _, x0, x1, y0, y1 = box
-    inset = min(0.8, (x1 - x0) / 4, (y1 - y0) / 4)
+    inset = min(1.5, (x1 - x0) / 4, (y1 - y0) / 4)
     inner = (x0 + inset, x1 - inset, y0 + inset, y1 - inset)
     pts = [(inner[0] + 0.5 * i, inner[2] + 0.5 * j) for i in range(int((inner[1] - inner[0]) / 0.5) + 1)
            for j in range(int((inner[3] - inner[2]) / 0.5) + 1)]
-    for p in sorted((p for p in pts if _dist(p, g) >= 1.0), key=lambda p: _dist(p, g)):
+    out = []
+    for p in sorted((p for p in pts if _dist(p, g) >= 1.5), key=lambda p: _dist(p, g)):
         b = (p[0] - 0.45, p[0] + 0.45, p[1] - 0.45, p[1] + 0.45)
         if any(k not in B.dead and _enters(B.segs[k][0], B.segs[k][1], b) for k in B.thin.near(b) | B.heavy.near(b) | B.marks.near(b)):
             continue
         if any(_dist(p, _bnds(B.items[k]["fr"].ring(B.items[k]["mask"]))) < 0.3 for k in B.tgrid.near(b)):
             continue
-        return p
-    return _clamp(centre, inner)
+        if any(r <= 0.5 and math.hypot(p[0] - cx, p[1] - cy) < r + 1.5 for cx, cy, r, _ in B.symbols):
+            continue
+        out.append(p)
+        if len(out) >= most:
+            break
+    return out or [_clamp(centre, inner)]
 
 
 def _move_block(B, block) -> dict | None:
@@ -974,10 +985,10 @@ def _place(B, block, ctx, du, dv) -> dict | None:
              if len(pts) == 2 and not isinstance(pts[0][0], str)]
     extra = None
     if not ctx["tied"] and _off(ctx["orig"], body, ctx["target"], block[0]["t"]["s"]):
-        extra = _fallback(B, body, ctx["target"], ctx["centre"], shapes) if ctx["target"] else None
+        extra = _fallback(B, body, ctx["target"], ctx["centre"], shapes, own, skip) if ctx["target"] else None
         if extra is None:
             return None
-        lines = [(extra[0], extra[1], extra[1])]
+        lines = []
     if any(_crosses_text(B, p, q, own) or B.crosses_leader(p, q, skip) or B.through_symbol(p, q, named, skip)
            for p, q, named in lines):
         return None
@@ -1024,7 +1035,7 @@ def _symbol_clear(B, box, own, walls, skip) -> bool:
 def _clear_at(B, it, du, dv, own, walls, skip=frozenset()) -> bool:
     """Is a text clear moved (du, dv) in its own frame: its mask over no heavy line and no mark but its own parts',
     inside the frame, off every white fill but its own background, its letters and mask off every other text's, and
-    SPACE of its size along its line from any other text, so the two never read as one?"""
+    SPACE of its size from any other text that runs the same way, so the two never read as one label?"""
     fr = it["fr"]
     mring = fr.ring(it["mask"], du, dv)
     mb = _bnds(mring)
@@ -1039,13 +1050,13 @@ def _clear_at(B, it, du, dv, own, walls, skip=frozenset()) -> bool:
     lring = fr.ring(it["letters"], du, dv)
     g = SPACE * it["t"]["s"]
     let = it["letters"]
-    wide = fr.ring((let[0] - g, let[1] + g, let[2], let[3]), du, dv)
+    wide = fr.ring((let[0] - g, let[1] + g, let[2] - g, let[3] + g), du, dv)
     for k in B.tgrid.near(_bnds(wide)):
         o = B.items[k]
         if id(o) in own:
             continue
         oring = o["fr"].ring(o["letters"])
-        if not _sep(mring, oring) or not _sep(lring, o["fr"].ring(o["mask"])) or not _sep(wide, oring):
+        if not _sep(mring, oring) or not _sep(lring, o["fr"].ring(o["mask"])) or (o["t"]["rot"] == it["t"]["rot"] and not _sep(wide, oring)):
             return False
     return True
 
