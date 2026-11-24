@@ -24,7 +24,7 @@ The check list holds the lines bought only if a check calls for them, AUD 53,078
 
 The LandCruiser figures are Leonard's AUD 50,000 for a used VDJ79 and that build's AUD 77,777 with its allowance (this file to 22 Nov 2026). The Super Duty costs AUD 42,690 more to buy and AUD 40,088 less to make ready, AUD 2,602 more in all, and it starts with a new engine under warranty in place of a 400,000 km one. Its AUD 37,689 includes the AUD 30,542 power stage with its allowance, so the truck alone, legal and able to tow with the trailer charging, is AUD 7,147 with the allowance.
 
-Until 24 Nov 2026 the Super Duty came out AUD 14,798 less in all. What changed is the emissions evidence. The LandCruiser plan counted a free TfNSW test (est.), at a Botany facility that closed in 2023, and this plan the interim NSW procedure that stands in for that test, at AUD 500 (est.), which does not cover a diesel. With tests at the same AUD 15,000 (est.) and their allowance counted in the LandCruiser's figure too, the Super Duty would cost about AUD 15,400 less in all.
+Until 24 Nov 2026 the Super Duty came out AUD 14,798 less in all. What changed is the emissions evidence. The LandCruiser plan counted a free TfNSW IM240 test (est.), whose Botany facility closed in 2023, and this plan the interim NSW procedure that stands in for that test, at AUD 500 (est.), which does not cover a diesel. With tests at the same AUD 15,000 (est.) and their allowance counted in the LandCruiser's figure too, the Super Duty would cost about AUD 15,400 less in all.
 
 ## Stage plan
 
