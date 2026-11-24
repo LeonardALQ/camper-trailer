@@ -240,7 +240,7 @@ Each mass goes onto the frame by its load path, with its resultant and the momen
 | LC5a | Road-side rail | X 4,035, TC7, diagonal A | 67 MPa | 233 MPa | 0.29 |
 | LC5b | Road-side rail | X 3,000, at tare, one steady wound to 875 kg | 102 MPa | 233 MPa | 0.44 |
 | LC6 | Kerb-side rail | X 3,592, 19.6 kN up at the coupling | 271 MPa | 350 MPa | 0.77 |
-| LC6b | Kerb-side rail | X 3,592, kerb-side lug, 19.6 kN down | 262 MPa | 350 MPa | 0.75 |
+| LC6b | Kerb-side rail | X 3,592, kerb-side lug, 19.6 kN down | 263 MPa | 350 MPa | 0.75 |
 | LC8a | Kerb-side rail | X 4,492, the rear kerb-side point pulled 30 degrees sideways and 15 degrees down | 296 MPa | 350 MPa | 0.85 |
 | LC8b | Road-side rail | X 4,492, TC7, road side jacked | 107 MPa | 350 MPa | 0.31 |
 
