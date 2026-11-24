@@ -743,8 +743,8 @@ class Trailer:
         """I2-41: what the running clearance (DIM-04, DIM-06) and the breakover (DIM-07) look at, as (name, line, box):
         every rigid part the suspension carries, every fixture of the services (data/routes.yaml) and every run's points
         at its outside diameter, as FIT-05 has them. A run that rides on the arms is left out, as the arms and the chains
-        are, and so is the truck's socket. The leads between the vehicles are read as drawn, lying over their hook with
-        their slack hanging there (I2-58)."""
+        are, and so is the truck's socket. The leads between the vehicles are read as drawn, over their saddle with their
+        bight hanging at their cut length (I2-63)."""
         from . import routes as R
         res = self.routes(lay)
         out = lay.underside_items()

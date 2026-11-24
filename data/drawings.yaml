@@ -49,7 +49,8 @@ drawings:
       - {rev: AE, date: 2026-11-23, description: "Notice: 400 L, the tanks' net, the axle at X 4,487.2 (I2-40, I2-47)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AF, date: 2026-11-23, description: "Notice: tare 2,696 kg rounded half up, the axle at X 4,485.2 (I2-50, I2-56)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AG, date: 2026-11-23, description: "Notice: TC2 3,576 kg, the ute's rear axle 2,542 kg, GCM 7,748 kg (I2-50)", drawn: Kiro, checked: "", approved: ""}
-      - {rev: AH, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AH, date: 2026-11-24, description: "Notice: tare 2,697 kg with the leads' saddle and the TSC's fuse (I2-63)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AI, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-002
     title: Mass and centre of gravity
     subtitle: Every load case with growth, the axle window of H17, the CoG in elevation and across
@@ -79,6 +80,7 @@ drawings:
       - {rev: Q, date: 2026-11-23, description: "Notice: the masses at 400 L of water, TC2 3,571 kg with growth (I2-40)", drawn: Kiro, checked: "", approved: ""}
       - {rev: R, date: 2026-11-23, description: "Notice: the masses with the brake leads, TC2 3,575 kg with growth (I2-50)", drawn: Kiro, checked: "", approved: ""}
       - {rev: S, date: 2026-11-23, description: "Notice: the masses with the end plates and the leads' hook (I2-57, I2-58)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: T, date: 2026-11-24, description: "Notice: the masses with the saddle and the fuse, axle at X 4,485.3 (I2-63)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-003
     title: Compliance
     subtitle: VSB1 items and the standards with the design figures, operating limits and the plate
@@ -111,6 +113,7 @@ drawings:
       - {rev: T, date: 2026-11-23, description: "Notice: the fresh tanks' 400 L net, MAS-10 at 3,571.2 kg (I2-40)", drawn: Kiro, checked: "", approved: ""}
       - {rev: U, date: 2026-11-23, description: "Notice: the axle at X 4,485.2, TC2 3,575 kg, the tanks 402.0 L net (I2-50)", drawn: Kiro, checked: "", approved: ""}
       - {rev: V, date: 2026-11-23, description: "Notice: the leads over their hook, TC2 3,576 kg, GCM 7,748 kg (I2-58)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: W, date: 2026-11-24, description: "The leads over the saddle behind the chain lug, lowest at 389 mm (I2-63)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-010
     title: Floor plan, bed up and bed down
     subtitle: Day and night plans, walkways, door swings, spaces kept clear and the bed positions
@@ -477,7 +480,8 @@ drawings:
       - {rev: K, date: 2026-11-23, description: "Notice: D-06 95 mm2 on its own 200 A MEGA, the modules' 60 A MEGAs", drawn: Kiro, checked: "", approved: ""}
       - {rev: L, date: 2026-11-23, description: "Notice: D-07 at 4.54 m with G20 at Roxtec's S 4x1 (I2-33)", drawn: Kiro, checked: "", approved: ""}
       - {rev: M, date: 2026-11-23, description: "Notice: D-14 at 7.01 m, straight between the jockey's spacers (I2-53)", drawn: Kiro, checked: "", approved: ""}
-      - {rev: N, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: N, date: 2026-11-24, description: "The TSC's supply with its 30 A MIDI fuse in DB-PL, D-14's SB120 (I2-61)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: O, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-602
     title: Electrical layout
     subtitle: Battery plinth, board, inverter, cable routes, glands, outlets and the cable schedule
@@ -509,7 +513,8 @@ drawings:
       - {rev: S, date: 2026-11-23, description: "Notice: G20 at S 4x1, K-07 on SP-FD, cables through the rails (I2-41)", drawn: Kiro, checked: "", approved: ""}
       - {rev: T, date: 2026-11-23, description: "Notice: brake leads K-13 to K-18A, D-14 between the tubes (I2-50, I2-53)", drawn: Kiro, checked: "", approved: ""}
       - {rev: U, date: 2026-11-23, description: "Notice: SHOWER UNIT clear of B-10's tag dot (overrun check)", drawn: Kiro, checked: "", approved: ""}
-      - {rev: V, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: V, date: 2026-11-24, description: "Notice: cable totals with the leads' cut lengths and DB-PL moved (I2-63)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: W, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-603
     title: Floor and wall penetrations
     subtitle: Every gland through the floor, walls and roof, its position, hole, fitting and runs
