@@ -124,13 +124,21 @@ they are threaded through (`inside`).
   does. Every hole in a chassis member and every floor
   cut-out over 60 mm is listed in `data/services.yaml` (`holes`, `cutouts`) with its member or panel, point and size.
   SVC-01 skips the parts welded to a member while a run is inside it.
-- The brake circuit (I2-50). Bosch's TSC drives the magnets from its own supply on the truck's brake request
+- The brake circuit (I2-50, I2-61). Bosch's TSC drives the magnets from its own supply on the truck's brake request
   (Y265K30237 v4.0, its power harness), and the 12-pin flat's brake pin is a small pin rated 15 A (ARK FPP12, report
   08), under the four magnets' 16 A. So the supply comes from the truck's battery through an Anderson SB50 beside the
   plug, as report 08 section 3.5 asks for a stability control's heavy current, and pin 5 carries the brake request
-  only. The SB50's 1.0 m lead K-14 (8 B&S twin, est.) and the 12-pin's own lead K-13 hang between the vehicles
-  (`rides: between`), so the running clearance and SVC-12 leave them out, and SVC-06 adds K-14's drop to K-10's
-  (`follows`): 0.71 % and 1.15 % with K-10 at 25 mm2, 1.86 % against 2 %, in two 30 mm holes in the road rail. Each
+  only. Bosch's guideline puts a fuse of 40 A at most between the trailer's supply terminal and the TSC harness's
+  supply wire (page 6), so a 30 A MIDI fuse stands in the drawbar junction between K-14 and K-10, and its 2.4 milliohm
+  with its lugs (est.) is counted in the drop (`inline`). The SB50's 1.14 m lead K-14 (6 B&S twin) and the 12-pin's
+  own 1.20 m lead K-13 hang between the vehicles (`rides: between`), so SVC-12 leaves them out, and SVC-06 adds K-14's
+  drop and the fuse's to K-10's (`follows`): 0.51 %, 0.32 % and 1.06 % with K-10 at 25 mm2, 1.90 % against 2 %, in two
+  30 mm holes in the road rail. An 8 B&S lead would take them to 2.2 %. The 5 % from the truck's battery to the TSC,
+  the truck feed's 3 % and the trailer's 2 %, is the design's own, half the 10 % of AS/NZS 3000:2018 clause 7.5.7 for
+  extra-low voltage, and SVC-06 holds the TSC at its 10.5 V floor (est.) at 16 A from 12.0 V (I2-62). Coupled, the leads
+  lie over the saddle DB-HK behind the road-side chain lug, their slack hanging from it as one bight to the junction,
+  each drawn at its cut length with its bight's height solved to it (`bight`), so the running clearance and the
+  breakover read it (I2-63). Each
   drum's lead runs from its side's junction under CM-05 out under the tank guard to a P-clip on its XT hanger, 15 mm
   ahead of the arm's pivot and 52.5 mm inboard of the arm, then in a loop down beside the bush and along the arm's
   underside to the backing plate. cad/routes.py lays that arm part on the arm at ride height and FIT-05 sweeps it
@@ -167,7 +175,7 @@ they are threaded through (`inside`).
 | SVC-03 | 230 V 50 mm from ELV outside its conduit, 150 mm reach at the board and shared appliances | AS/NZS 3000:2018 clause 3.9.8.3, AS/NZS 3001.2:2022 |
 | SVC-04 | no water, waste or diesel line within 300 mm of the battery's terminal face, but the washer's sleeved hoses (W-02, F-10) and the tray's sleeved drain (W-09), and none over the face inside a cone widening 1 in 5 (est., parked up to about 11 degrees off level) unless the drip tray EL-09 lies between, read from the tray's own box | AS/NZS 3001.2:2022 clause 5.4.10.2, CT-602, the cone the design's own (I2-18 c, I2-35) |
 | SVC-05 | every circuit, DC load, outlet, water outlet and fitting has its run, the runs of each tag join up end to end, and each 230 V circuit runs from the board's AC bar to its load or the outlet it plugs into | data/services.yaml, report 20 section 7 |
-| SVC-06 | DC drop at most 2 % at the design current, the ute's half of the ute feed (TW06) added, 230 V at most 5 % | the design's own 2 %, stricter than AS/NZS 3000, and AS/NZS 3000:2018 clause 3.6.2 for 230 V |
+| SVC-06 | DC drop at most 2 % at the design current, the ute's half of the ute feed (TW06) added, 230 V at most 5 %, the TSC's supply 2 % from the truck's socket and TW07 3 % of its own, the TSC at least 10.5 V (est.) | the design's own 2 %, stricter than AS/NZS 3000, and AS/NZS 3000:2018 clause 3.6.2 for 230 V. The TSC's 5 % from the truck's battery is the design's own, half of clause 7.5.7's 10 % for extra-low voltage |
 | SVC-07 | gravity wastes fall at least 1:50 | AS/NZS 3500.2, CT-611, CT-612 |
 | SVC-08 | each run its radius plus 5 mm (est.) from every other, cables of one band in a shared way may touch. Cold water, vents and diesel 25 mm from 230 V, hot water before the mixing valve and wastes 50 mm from 230 V and 25 mm from extra-low-voltage cables above the floor (a solvent-welded DWV waste keeps the gap), and no wet line over a 230 V run within 25 mm in plan | IB 052/2015 for cold water (25 mm), the design's own rule for the rest (IB 052/2015 asks 100 mm for heated water and drains in a building) |
 | SVC-09 | every gland's fitting has room in its panel: 12 mm (est.) of spanner room round a locknut, a 10 mm (est.) web elsewhere, no floor fitting in a keep-clear box or under a part on the floor | CMP Products' locknuts by thread, Roxtec CF 8 for the frames' proportions |
@@ -207,15 +215,16 @@ Round glands take nylon cable glands of their hole's thread with CMP's locknut s
 
 ## 6. Results on the solved layout
 
-All twelve checks pass. The closest approach of a run to any envelope box is 20.4 mm (SVC-01), the tightest bend
-keeps its least radius with 0.0 mm to spare (SVC-02), the 230 V keeps 61.8 mm from extra-low voltage (SVC-03), the
+All twelve checks pass. The closest approach of a run to any envelope box is 20.4 mm (SVC-01), the tightest bend,
+K-17's under K-10, comes within 0.1 mm of its least radius (SVC-02), the 230 V keeps 61.8 mm from extra-low voltage (SVC-03), the
 nearest wet line is 344 mm from the terminal face (SVC-04) and every one of the 101 needs is served (SVC-05). The
 governing drop is D-14's 1.98 % of 2 % (SVC-06). The TSC's supply holds its 2 % from the truck's socket to the TSC,
-1.86 %, and the truck's own feed to that socket, car build line TW07, 2.03 % of its own 3 %. The flattest waste falls
-1:50 (SVC-07), no two of the 64 pairs measured overlap (SVC-08), the gland fittings keep 23.4 mm over their spacing
+1.90 % with its fuse, and the truck's own feed to that socket, car build line TW07, 2.03 % of its own 3 %, so the TSC
+sees 11.53 V from a 12.0 V battery, over its 10.5 V floor. The flattest waste falls
+1:50 (SVC-07), no two of the 67 pairs measured overlap (SVC-08), the gland fittings keep 23.4 mm over their spacing
 (SVC-09), the closest cable to its rating keeps 0.1 A (SVC-10), the cables keep 133.4 mm over their distance from the
 hot surfaces (SVC-11) and the longest unsupported span is 597 mm against 600 mm (SVC-12). The routed cables are
-285.2 m and 62.4 kg, the pipes and hoses 50.9 m and 6.0 kg with 71 fittings.
+284.1 m and 62.2 kg, the pipes and hoses 50.9 m and 6.0 kg with 71 fittings.
 
 ## 7. Open items
 
