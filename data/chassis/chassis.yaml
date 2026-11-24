@@ -34,7 +34,7 @@ material:
   plate_fu: 450
   weld_fuw: 490                      # E49XX / W50X consumables
   weld_phi: 0.8                      # SP category fillet welds, AS/NZS 1554.1
-  welding: "Every structural weld SP to AS/NZS 1554.1. Rail-to-raiser and drawbar-to-rail seams continuous. No weld across the width of a rail"
+  welding: "Every structural weld SP to AS/NZS 1554.1. Rail-to-raiser seams continuous, drawbar-to-rail seams stitched across a 2.5 mm gap. No weld across the width of a rail"
   protection: "Hot-dip galvanised after fabrication to AS/NZS 4680, vented and drained to report 02 WLD-05"
   E: 200000
   G: 80000

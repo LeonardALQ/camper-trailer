@@ -118,7 +118,7 @@ lines:
     qty: 545
     unit: kg galvanised
     covers: [CH-G01]
-    price: {aud_each: 2.75, basis: estimate, url: "https://www.steel.org.au/getattachment/2f694ebb-98a7-4273-be94-e0f61bd74328/Cost-factors-for-hot-dip-galvanised-coatings_INGALSM3.pdf", date: 2026-11-23, note: "521.0 kg of steel with the 4 mm rails (CHS-08A at the 4,000 kg plate) and the 6 mm drawbar (FAT-07), 15.9 kg of zinc and 7.2 kg of guard frame and hangers. Galvanisers charge by the galvanised mass. The industry's AUD 1.20/kg for light fabrications is an older figure, so AUD 2.75/kg allows for rises and a one-off frame (research report 22). The bath must take a 6.3 x 2.4 m frame"}
+    price: {aud_each: 2.75, basis: estimate, url: "https://www.steel.org.au/getattachment/2f694ebb-98a7-4273-be94-e0f61bd74328/Cost-factors-for-hot-dip-galvanised-coatings_INGALSM3.pdf", date: 2026-11-23, note: "521.0 kg of steel with the 4 mm rails (CHS-08A at the 4,000 kg plate) and the 6 mm drawbar (FAT-07), 15.9 kg of zinc and 7.2 kg of guard frame and hangers. Galvanisers charge by the galvanised mass. The industry's AUD 1.20/kg for light fabrications is an older figure, so AUD 2.75/kg allows for rises and a one-off frame (research report 22). No NSW bath takes the 2.4 m frame level across, so it goes in one dip at Valmont Coatings Hexham, rolled about 46 degrees across (CHASSIS.md revision N)"}
   # ================================================================ running gear service
   - id: ALN-01
     group: running_gear
@@ -257,10 +257,10 @@ lines:
     price: {aud: 110, basis: estimate, date: 2026-11-20}
   - id: CON-06
     group: freight
-    name: Transport of the welded frame to the galvaniser and back
+    name: Transport of the welded frame to the galvaniser at Hexham and back, two trips
     qty: 1
     unit: return trip
-    price: {aud: 400, basis: estimate, date: 2026-11-20}
+    price: {aud: 520, basis: estimate, date: 2026-11-24, note: "Valmont Coatings Hexham, the one NSW plant whose dip takes the frame (CHASSIS.md revision N), about 165 km from Sydney each way. Two return trips, to drop it off and to fetch it, with the frame on a hired 6 m flat-deck trailer behind the Ranger: two days' hire at about AUD 150 a day, AUD 300 (est.), about 660 km at 14 L/100 km and AUD 2.00/L, AUD 185, and the M1's tolls, about AUD 35 (est.). AUD 400 was the estimate for a Sydney plant"}
   - id: CON-07
     group: freight
     name: Parcel freight for the smaller parts bought in Australia

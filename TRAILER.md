@@ -16,7 +16,7 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 | Ute | Ford Ranger Super Duty single cab chassis. Rear axle 2,542 kg with growth against Ford's 2,800 kg. Combination 7,748 kg against Ford's 8,000 kg, the ute with growth plus the plate |
 | Battery | 25.6 kWh. A design hot day runs 25.1 h when new and 17.2 h at end of life |
 | Water | 400 L fresh, the tanks' net, all of it in travel, about 41 L a day. 130 L grey |
-| Cost | AUD 199,078 with contingency, built by Leonard (H26) |
+| Cost | AUD 199,222 with contingency, built by Leonard (H26) |
 
 Every fail check passes. The tightest are the tyres' 50 mm under the floor at full bump (FIT-05, 50.0 mm against 50 mm), the towball share with the grey tank full (MAS-12, 9.8 % against 9.0 %), the heaviest towball (MAS-13, 392.0 kg against 420 kg), a lamp loom's gap to a drawbar plate (SVC-01, 20.4 mm against 20 mm) and the recovery pull in the kerb-side rail (CHS-08A, 0.85 of yield). Fully loaded with growth the trailer weighs 3,576.4 kg, 323.6 kg inside the 3,900 kg target (MAS-10).
 
@@ -72,7 +72,7 @@ Masses in kg. The towball comes from moments about the axle group centre at X 4,
 
 ## Structure
 
-The chassis is a galvanised ladder frame (CHASSIS.md revision M, CT-101 to CT-104). Two RHS 150 x 50 x 4 C450L0 rails, 4 mm since the 4,000 kg plate, each carry a continuous RHS 127 x 51 x 3.5 C350L0 raiser, so the floor clears the 805 mm tyres. Eight stations carry crossmembers and outriggers, and the drawbar is RHS 150 x 50 x 6. The rails are 1,275 mm over their outsides for the 1,655 mm track (H22). Steel and zinc weigh 539 kg. Checked at the 4,000 kg plate, the recovery pull governs at 0.85 of yield, VSB1's drawbar tests reach 0.78 and the travel cases 0.55. The frame twists 0.395 degree against 0.5, and every fatigue detail stays below its endurance limit. Heavy items bolt through the floor into the raisers and outriggers (CT-104).
+The chassis is a galvanised ladder frame (CHASSIS.md revision N, CT-101 to CT-104). Two RHS 150 x 50 x 4 C450L0 rails, 4 mm since the 4,000 kg plate, each carry a continuous RHS 127 x 51 x 3.5 C350L0 raiser, so the floor clears the 805 mm tyres. Eight stations carry crossmembers and outriggers, and the drawbar is RHS 150 x 50 x 6. The rails are 1,275 mm over their outsides for the 1,655 mm track (H22). Steel and zinc weigh 539 kg. Checked at the 4,000 kg plate, the recovery pull governs at 0.85 of yield, VSB1's drawbar tests reach 0.78 and the travel cases 0.55. The frame twists 0.395 degree against 0.5, and every fatigue detail stays below its endurance limit. Heavy items bolt through the floor into the raisers and outriggers (CT-104).
 
 ## Body and roof
 
@@ -153,7 +153,7 @@ Each stage needs the ones before it. Each weighing, TW-01 to TW-03, takes the li
 |---|---|---|---|
 | B0 Approvals | Engineer's review, RAV entry and VIN, the welding procedure and Leonard's welder qualification on one test piece, the welding supervisor and inspector engaged (CMP-14), orders for the XT kit, panels, tray, windows, doors and imports. From here on, keep every receipt for the chassis steel, the running gear, the coupling and the panels, because the Identity Approval asks for them | The documents and drawings | Review closed, VIN issued, procedure and Leonard qualified |
 | B1 Chassis | Cut, jig, weld to the qualified procedure under the supervisor's visits, stamp the VIN | B0, steel and plate parts | Leonard's own dye-penetrant tests of the critical joints, then the inspector's visual and penetrant inspection to report 02 WLD-03, the rail end plates' weld roots by videoscope from inside the rails to a written remote visual procedure, the record showing complete root fusion and no crack (FAT-20, CT-102 note 3), with signed records (CMP-14) |
-| B2 Galvanising | Hot-dip to AS/NZS 4680, the frame hung drawbar end down about 15 degrees and level across, touch up, seal the ends of the drawbar's laps under the rails | B1, vent and drain holes (CT-103 detail K) | Frame flat and square |
+| B2 Galvanising | Hot-dip to AS/NZS 4680 in one dip at Valmont Coatings Hexham, the frame hung drawbar end down at up to 9 degrees and rolled about 46 degrees across, either side down, the spare carrier posts dipped apart, touch up | B1, vent and drain holes (CT-103 detail K) | Frame flat and square |
 | B3 Rolling chassis | Suspension, brakes, TSC, wheels, mud flaps, coupling, chains, breakaway kit, jockey, steadies, alignment | B2, the XT kit | TW-01 within 2 % of the model |
 | B4 Floor | Bearer strips, tanks, guards, diesel tank, air box, the floor on its 32 mounts, the shower well and the tray | B3, the floor panel with its inserts | Tray fill test, 24 h |
 | B5 Shell | Walls with their stiffeners, rounded corners and roof bonded into the joiners, doors and windows | B4, panels with their hardpoints laid in | Hose test, TW-02 within 2 % |
@@ -166,19 +166,19 @@ The insert map CT-203 must be final before the panels are ordered, because the m
 
 ## Cost and where to save
 
-The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 153 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 173,025 subtotal carries AUD 26,054 (15.1 %), for AUD 199,078.
+The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 153 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 173,145 subtotal carries AUD 26,078 (15.1 %), for AUD 199,222.
 
 | Group | AUD | Group | AUD |
 |---|---|---|---|
 | Body | 38,360 | Chassis | 6,997 |
-| Electrical | 27,292 | Freight and consumables | 5,310 |
+| Electrical | 27,292 | Freight and consumables | 5,430 |
 | Living area | 21,186 | Licensed electrician | 4,600 |
 | Running gear | 14,181 | Drawbar box | 4,388 |
 | HVAC and ventilation | 12,667 | Under the floor | 3,162 |
 | Wet room | 11,627 | Roof | 2,926 |
 | Bed | 8,028 | Coupling and drawbar | 1,962 |
 | Compliance and weld evidence | 8,320 | Lamps, reflectors, the number plate and the brake circuit | 1,283 |
-| Subtotal | 173,025 | Spare wheel | 736 |
+| Subtotal | 173,145 | Spare wheel | 736 |
 
 What the registration needs stays: the licensed electrician and the AS/NZS 3001.2 certificate (ELI-01, CMP-13), the refrigeration fitting in AC-03, the wheel alignment (ALN-01), the engineer's review (CMP-03) and the registration lines. The registration itself also needs papers. A concessional trailer never registered in NSW needs TfNSW's Identity Approval before the examiner can pass it (VIB 78 rule 221.04), and its application, form 5703, is rejected without clear photographs of all four sides and the drawbar, of the vehicle plate and of the VIN stamped in the frame, the weighbridge ticket, and receipts proving the origin of the materials (CMP-04). So keep every receipt for the chassis steel, the running gear, the coupling and the panels from stage B0, and photograph the trailer as AIS Notice 41 and VIB 78 ask.
 
