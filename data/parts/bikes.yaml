@@ -27,16 +27,16 @@ parts:
         source_key: tuareg_660_rally
         owner: {length: 2220, width: 965, height: 1370, width_with_bags: 980}
         front_overhang: 348
-        # Values used from 05 (copied here so the model is traceable; the generator also reads 05 directly)
-        screen_top: {x: 250, z: 1370, src: "x from 05; z set to the owner's 1,370 overall height (05 image gives 1,390)"}
+        # Values used from 05 (copied here so the model is traceable, and the generator also reads 05 directly)
+        screen_top: {x: 250, z: 1370, src: "x from 05, z set to the owner's 1,370 overall height (05 image gives 1,390)"}
         estimates:
           fairing_half_width: {v: 300, z: [900, 1100], src: "design estimate, to be measured (DESIGN.md range 280 to 350)"}
           fairing_front_half_width: {v: 180, src: estimate}
           peg_tip_y: {v: 320, src: "design estimate, to be measured"}
           peg_root_y: {v: 220, src: estimate}
           screen_half_width: {v: 160, src: estimate}
-          mirror_folded: {x: [533, 616], y: [230, 330], z: [1290, 1365], src: "x from 05; y and folded z are estimates, top kept below the screen"}
-          handguard: {x: [385, 590], y: [330, 483], z: [1150, 1222], src: "tip and outer end from 05; inner edge and depth estimated"}
+          mirror_folded: {x: [533, 616], y: [230, 330], z: [1290, 1365], src: "x from 05. y and folded z are estimates, top kept below the screen"}
+          handguard: {x: [385, 590], y: [330, 483], z: [1150, 1222], src: "tip and outer end from 05, inner edge and depth estimated"}
           bar_clamp: {x: 470, z: 1140, src: estimate}
           bar_end_y: {v: 483, src: "owner width 965 / 2 (05 bar_ends_handguards)"}
           fork: {half_spacing: 105, stanchion: 43, outer: 56, top_z: 1080, src: "Aprilia: KYB 43 mm upside-down fork. Spacing, outer tube and top clamp height estimated"}
@@ -46,9 +46,9 @@ parts:
           engine_half_width: {v: 200, src: estimate}
           mudguard_half_width: {v: 65, src: estimate}
           swingarm_pivot: {x: 930, z: 420, src: estimate}
-          silencer: {start: [1380, 175, 560], end: [1780, 175, 750], diameter: 110, src: "x and z range from 05; y centre +175 and diameter are estimates"}
+          silencer: {start: [1380, 175, 560], end: [1780, 175, 750], diameter: 110, src: "x and z range from 05. y centre +175 and diameter are estimates"}
           side_stand: {pivot: [850, -110, 330], foot: [1100, -140, 290], src: "estimate (05 says TODO)"}
-          plate: {half_width: 115, z: [590, 742], src: "estimate; 05 puts the rear-most hanger point at z 645"}
+          plate: {half_width: 115, z: [590, 742], src: "estimate, 05 puts the rear-most hanger point at z 645"}
           rims: {front: 1.85, rear: 4.00, src: "Aprilia Rally specification (report 05): 1.85 x 21 and 4.00 x 18 spoked rims, width in inches"}
           wheels: {spokes: 36, knob_front: 8, knob_rear: 10, hub_front: [32, 150, 42], hub_rear: [45, 150, 56],
                    src: "Estimate from Aprilia's image: 36 spokes a wheel, Scorpion Rally STR knob depth, hub radius, width and spoke flange radius"}
@@ -63,7 +63,7 @@ parts:
           # they sit much lower than the Street Triple's bar end. Their top comes from measurements.yaml (TU-09).
           crash_bars: {half_width: 482.5, bar_half_width: 360, x: [180, 600], z: [550, 900], src: "The bars' tubes stand 360 mm out from the centreline (est.), 60 mm outside the 300 mm shrouds, inside the 965 mm the bike measures at its handlebars, the most the bars can be. Top from the owner's report (much lower than the Street Triple's bar end, TU-09)"}
           panniers: {outer_y: 490, thickness: 203, x: [1300, 1757], z: [425, 933],
-                     src: "outer width owner's measurement (980 mm with bags); size Mosko Moto Backcountry 30L spec; position estimate"}
+                     src: "outer width owner's measurement (980 mm with bags), size Mosko Moto Backcountry 30L spec, position estimate"}
         tie_down_y:
           handlebar_inboard: {v: 300, src: "research/03 section 3 (estimate)"}
           pillion_peg_hangers: {v: 150, src: "research/03 section 3 (estimate)"}
@@ -101,9 +101,9 @@ parts:
           tail_half_width: {v: 110, src: estimate}
           engine_half_width: {v: 200, src: estimate}
           mudguard_half_width: {v: 70, src: estimate}
-          reservoir: {x: [280, 320], y: [40, 80], src: "top point from 05; size estimated"}
+          reservoir: {x: [280, 320], y: [40, 80], src: "top point from 05, size estimated"}
           side_stand_y: {pivot: -100, foot: -120, src: "estimate (05 says TODO)"}
-          plate: {half_width: 110, z: [560, 680], src: "estimate; 05 puts the hanger rear at z 585 to 635"}
+          plate: {half_width: 110, z: [560, 680], src: "estimate, 05 puts the hanger rear at z 585 to 635"}
           rims: {front: 3.5, rear: 5.5, src: "Triumph specification (report 05): 17 x 3.5 and 17 x 5.5 cast aluminium wheels, width in inches"}
           wheels: {hub_front: [40, 130], hub_rear: [55, 150], src: "Estimate: hub radius and width"}
           discs: {front: 310, rear: 220, src: "Triumph Street Triple 765 RS specification: twin 310 mm floating front discs, 220 mm rear disc"}
