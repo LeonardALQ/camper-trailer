@@ -208,9 +208,9 @@ def _web_hole(t: Tube, member: str, end: int, web: int, z_l: float, d: float, u_
 
 def end_holes(t: Tube, member: str, end: int, rule: dict, webs=(-1, 1), d=None) -> list[dict]:
     """The holes at one closed end, each at the least distances CHS-10 lets it stand: its centre 1.25 d from the end of
-    its web's flat (or `z_bottom` over the underside where fillets run along the bottom edges) and its edge a diameter
-    from the end weld's toe. `corners` puts a drain by the floor and a vent by the top of each web, `middle` one hole at
-    mid-depth in each web, where a small section's flat takes no more."""
+    its web's flat, or 1.5 d over `z_bottom_leg` where fillets of that leg run along the bottom edges, and its edge a
+    diameter from the end weld's toe. `corners` puts a drain by the floor and a vent by the top of each web, `middle` one
+    hole at mid-depth in each web, where a small section's flat takes no more."""
     d = float(d or rule["d"])
     u = rule["leg"] + rule.get("clear", 0.0) + 1.5 * d
     if rule["holes"] == "middle":

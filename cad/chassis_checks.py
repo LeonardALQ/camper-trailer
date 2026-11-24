@@ -51,11 +51,13 @@ def chassis_row(c, res: dict) -> dict:
                f"{'its high point ' + format(r['high_depth'], '.0f') + ' mm over its highest, ' if r['high_depth'] > g['max_depth'] else ''}"
                f"{'its holes short of the table' if not r['size_ok'] else ''}".rstrip(", ") for r in bad]
         deep = max(w["low_depth"], w["high_depth"])
+        n_holes = sum(r["holes"] for r in rows)
         return dict(limit=f"each low and high point within {g['max_depth']:g} mm of an opening, each closed end's holes to the table",
                     measured=len(bad), unit=f"of {len(rows)} closed sections", margin=-len(bad), ok=not bad,
                     governing=(", ".join(r["id"] for r in bad[:4]) if bad else f"{w['id']}, {deep:.1f} mm"),
-                    detail=(f"{len(rows) - len(bad)} of {len(rows)} closed sections drain and vent in every hang: rolled {g['roll']:g} deg either side down "
-                            f"and pitched {g['pitches'][0]:g} to {g['pitches'][-1]:g} deg drawbar end down, {len(g['holes'])} holes for galvanising among them. "
+                    detail=(f"{len(rows) - len(bad)} of {len(rows)} closed sections drain and vent in every hang, rolled {g['roll']:g} deg either side down "
+                            f"and pitched {g['pitches'][0]:g} to {g['pitches'][-1]:g} deg drawbar end down, through their {n_holes} holes for galvanising, "
+                            f"the rails' slots and their open ends. "
                             + "".join(f"{x}. " for x in why)
                             + f"The deepest is {w['id']}'s {'low' if w['low_depth'] >= w['high_depth'] else 'high'} point, {deep:.1f} mm from its opening's edge, "
                             f"{w['low_hang'] if w['low_depth'] >= w['high_depth'] else w['high_hang']}"))

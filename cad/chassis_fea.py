@@ -948,8 +948,8 @@ class Analysis:
         for h in own:
             m = mem.get(h["member"])
             role = m.role if m else "hinge_gusset"
-            sec = m.sec if m else ch.sections["SHS_50x50x3"]
-            r = gr.get(role, gr["drawbar"]) if role != "drawbar" else gr["drawbar"]
+            sec = m.sec if m else ch.sections[next(f for f in ch.data["fittings"] if f["id"] == "CH-P08")["section"]]
+            r = gr[role]
             d, z = h["d"], h["z_l"]
             u_end = min(h["u"], h["tube_L"] - h["u"])
             edge = min((sec.d / 2 - sec.ro) - z, z + (sec.d / 2 - sec.ro))
