@@ -3,7 +3,8 @@
 # Truck: a near-new Ranger Super Duty single cab chassis, bought (data/project.yaml), rated by Ford at 4,500 kg GVM,
 # 1,900 kg front and 2,800 kg rear axle, 4,500 kg braked towing and 8,000 kg GCM. It carries the bike box (H25) and
 # tows the trailer, plated at 4,000 kg from 23 Nov 2026 on a DO45-type coupling. Power stage: about 205 kW and 650 Nm
-# at the crank (est.), certified, with the DPF, SCR and EGR untouched.
+# at the crank (est.), certified on the emissions tests the LC4 certifier names (research report 32 section 7), with
+# the DPF, SCR and EGR untouched.
 # The site's Car build page renders the three lists and the totals from this file (cad/sitedata.py), and
 # cad/tests/test_costs.py checks that the totals below and VEHICLE.md match the lines.
 # status, the list a line is on:
@@ -24,7 +25,7 @@ stages:
   - {id: S0, name: "Buy, inspect and weigh", can_do: "Drives and tows within Ford's ratings at stock power, once the towing kit is on", work: "Choose the truck, inspect it at a Ford dealer, search the PPSR, buy it, weigh it as bought, take off a tray if one is fitted", labour: "Ford dealer, weighbridge", downtime: "None"}
   - {id: S1, name: "Box, towing kit, mirrors and touring gear", can_do: "Carries both bikes in the box and tows the 4,000 kg trailer within Ford's ratings at stock power", work: "Fit the box on Ford's body mounts, the DO45-type tow pin, the supply for the trailer's brakes to an SB50 at the tow bar, the towing mirrors, the UHF radio, the compressor and the recovery kit, set up the trailer's profile, weigh laden", labour: "None, Leonard fits them. Weighbridge", downtime: "1 to 2 weeks while the box goes on (est.)"}
   - {id: S2, name: "Trailer charging", can_do: "Tows the loaded trailer and charges its 48 V battery while driving", work: "Fit the two 12/48 V chargers and the 48 V feed to the tow bar, log the voltage on the first hot night tow, weigh coupled", labour: "Auto electrician, weighbridge", downtime: "1 day"}
-  - {id: S3, name: "Power stage and its certificate", can_do: "Tows at about 205 kW and 650 Nm at the crank (est.), certified", work: "Garrett PowerMax turbo and intercooler, the engine and 10-speed calibration on a dyno, the interim NSW emissions test and the LC4 certificate", labour: "Tuner with a chassis dyno, emissions test, LC4 certifier. Leonard fits the turbo and intercooler", downtime: "1 to 2 weeks (est.)"}
+  - {id: S3, name: "Power stage and its certificate", can_do: "Tows at about 205 kW and 650 Nm at the crank (est.), certified", work: "Garrett PowerMax turbo and intercooler, the engine and 10-speed calibration on a dyno, the stock and tuned emissions tests the LC4 certifier names, and the LC4 certificate", labour: "Tuner with a chassis dyno, NATA-accredited emissions facility, LC4 certifier. Leonard fits the turbo and intercooler", downtime: "1 to 2 weeks (est.)"}
 
 items:
   # Purchase inspection and weighing (system purchase)
@@ -57,9 +58,10 @@ items:
   # Calibration, gauge, emissions test and certificate (system tune_legal)
   - {id: TL01, name: "Custom calibration of the engine and the 10-speed on a chassis dyno, with stock and tuned runs on the same dyno and the factory files kept", part_number: null, supplier: "Diesel tuner with a chassis dyno, for example Diesel Tuning Brisbane or Diesel Tuning Australia", price_aud: 2800, price_basis: estimate, link: "https://dieseltuningbrisbane.com.au/vehicle/ford-ranger-3-0-v6-2022-2025/", status: build, system: tune_legal, source: "research report 31 sections 5 and 8", note: "No price published (est.). Target about 205 kW at the crank, torque at most 650 Nm in high range and Ford's 600 Nm in low range, first and reverse, Ford's EGT limits, the DPF, SCR and EGR untouched", priority: P2, why: "The calibration that makes the power, with the 10-speed's shifts and torque limits set to match.", stage: S3, depends_on: [PW02, PW03]}
   - {id: TL02, name: "OBD gauge for EGT, boost, the 10-speed's temperature and coolant temperature", part_number: null, supplier: "Auto electrical or 4WD store", price_aud: 350, price_basis: estimate, link: null, status: build, system: tune_legal, source: "research report 31", note: "Reads Ford's own sensors, so nothing is drilled", priority: P2, why: "Shows the temperatures the calibration must hold on a long tow, so the driver backs off before heat does damage.", stage: S3, depends_on: [S2]}
-  - {id: TL04, name: "Emissions test to the Interim NSW Vehicle Emissions Test Procedure for Modified and Individually Constructed Vehicles (May 2023)", part_number: null, supplier: "TfNSW emission testing facility or a NATA facility", price_aud: 500, price_basis: estimate, link: "https://www.nsw.gov.au/sites/default/files/noindex/2026-03/vsi-06-light-vehicle-modification-july-2026.pdf", status: build, system: tune_legal, source: "VSI 06 Rev 4 item 5 note, research report 31 section 7", note: "Report 14 read the 2013 VSI 06 as a free TfNSW test, and Rev 4 names no fee, so AUD 500 is assumed (est.)", priority: P2, why: "The emissions evidence VSI 06 Rev 4 accepts in place of testing to the standard.", stage: S3, depends_on: [TL01]}
+  - {id: TL04, name: "Stock and tuned emissions tests that the LC4 certifier names, at a NATA-accredited facility, on a chassis dynamometer or on the road with portable emissions measuring equipment (PEMS)", part_number: null, supplier: "NATA-accredited emissions facility, for example ABMARC", price_aud: 15000, price_basis: estimate, link: "https://gazette.nsw.gov.au/gazette/2023/6/2023-253.pdf", status: build, system: tune_legal, source: "research report 32 section 7, VSI 06 Rev 4 item 5 note, NSW Government Gazette No 253 of 9 June 2023 (notice n2023-0939) Part B section 1", note: "About AUD 15,000 for the pair (est.). No price is published. VSI 06 Rev 4 offers the Interim NSW Vehicle Emissions Test Procedure for Modified and Individually Constructed Vehicles (May 2023) in place of testing to the standards, but the procedure's test requirements do not apply to diesel engines (Gazette No 253, Part B section 1), and the NHVR's PEMS procedure covers only ADR 70 and ADR 80/03 and earlier heavy vehicles. So no simplified procedure covers the Super Duty's heavy-duty Euro VI diesel, at any power, and the LC4 certifier names the test. The stock test is made before any part goes on, and the tuned test on the calibration as it will be registered, with the DPF, SCR and EGR working and no stored faults. ABMARC brought the first PEMS into Australia in 2015 (NSW EPA)", priority: P2, why: "The emissions evidence the certificate needs for a heavy-duty Euro VI diesel, which no simplified NSW procedure covers.", stage: S3, depends_on: [TL01]}
   - {id: TL05, name: "VSCCS certificate for the engine modification (VSB 14 code LA4) from an LC4 certifier, with its noise test", part_number: null, supplier: "LC4 licensed certifier", price_aud: 2000, price_basis: estimate, link: "https://nsw.gov.au/sites/default/files/2025-01/vsccs-bulletin-01-licensed-certifiers.pdf", status: build, system: tune_legal, source: "VSI 06 Rev 4 items 2 and 6, report 14 section 4.2", note: "Certifiers publish no fees (est., report 14). The written evidence list comes first, before the parts are bought", priority: P2, why: "Every tune of this truck needs a certificate in NSW (VSI 06 Rev 4 item 6), and this one also raises power over 20 % (item 2).", stage: S3, depends_on: [TL04]}
-  - {id: TL07, name: "Laboratory emissions test to the standard the truck was built to, if the certifier asks for one", part_number: null, supplier: "NATA laboratory", price_aud: 10000, price_basis: estimate, link: null, status: check, system: tune_legal, source: "report 14, research report 31 section 7", priority: P2, why: "Bought only if the LC4 certifier will not take the interim NSW procedure for a heavy-duty Euro VI calibration.", check: "The LC4 certifier's written evidence list", pass_mark: "The list accepts the interim NSW procedure (TL04)", checked_at: S3, stage: S3, depends_on: [TL01]}
+  - {id: TL07, name: "The engine out and tested to the heavy-duty Euro VI cycles in a laboratory, and refitted, if the LC4 certifier asks for it", part_number: null, supplier: "NATA-accredited engine emissions laboratory", price_aud: 50000, price_basis: estimate, link: null, status: check, system: tune_legal, source: "research report 32 section 7, the NHVR's VSG-28", note: "AUD 50,000 or more (est.). No price is published. Ford certified the Super Duty to the heavy-duty Euro VI standard, which is tested on an engine dynamometer, and the NHVR calls the engine-out test arduous and expensive. At that price the stage stops for Leonard's decision, and the truck stays stock", priority: P2, why: "Bought only if the LC4 certifier will not take the stock and tuned pair (TL04), and then only on Leonard's decision.", check: "The LC4 certifier's written evidence list, before any part of the stage is bought", pass_mark: "The list takes the stock and tuned pair (TL04)", checked_at: S3, stage: S3, depends_on: [TL01]}
+  - {id: TL08, name: "Brake performance test, if the LC4 certifier asks for one", part_number: null, supplier: "LC4 certifier or a brake testing station", price_aud: 600, price_basis: estimate, link: null, status: check, system: tune_legal, source: "research report 32 section 7, VSB 14 (report 14 section 4.2)", note: "About AUD 600 (est.). VSB 14 asks for any necessary upgrade of equipment such as brakes when an engine gains power. More power adds no mass, and Ford rates the Super Duty's brakes for an 8,000 kg combination, so the plan offers Ford's ratings and the brake specification first", priority: P2, why: "Bought only if the LC4 certifier wants a brake test as well as Ford's ratings for the engine's extra power.", check: "The LC4 certifier's written evidence list, before any part of the stage is bought", pass_mark: "The list takes Ford's brake ratings with no brake test", checked_at: S3, stage: S3, depends_on: [TL01]}
   - {id: TX01, name: "Larger cooler for the 10-speed, fitted, if it runs hot on a tow after the power stage", part_number: null, supplier: "Transmission or 4WD workshop", price_aud: 900, price_basis: estimate, link: null, status: check, system: power, source: "research report 31 section 6", priority: P2, why: "Bought only if the 10-speed runs hot at the higher power.", check: "The 10-speed's temperature on the OBD gauge (TL02) on a long tow up a grade", pass_mark: "At most 110 °C sustained (est.)", checked_at: S3, stage: S3, depends_on: [TL02]}
 
   # Optional extras (not counted)
@@ -84,32 +86,32 @@ cuts:
 # Outside the vehicle work. The box has its own priced parts list, so its total is not typed here.
 bike_box: {parts_list: "data/ute/box-parts.yaml", doc: UTE-GARAGE.md, note: "Leonard builds the box, so it has one total, worked out from its parts list. It is not certified (decision H25)"}
 
-# Totals, AUD rounded to the dollar, worked out from the lines on 23 Nov 2026. They match VEHICLE.md
+# Totals, AUD rounded to the dollar, worked out from the lines on 24 Nov 2026. They match VEHICLE.md
 # (cad/tests/test_costs.py checks both). build_budget is Leonard's planning figure for the car work (data/project.yaml).
 # allowance_pct is the build's one allowance, by price basis. The check list carries none and is not a total.
 totals_aud:
   build_budget: 75000
   allowance_pct: {listing: 10, estimate: 20}
-  build_by_system: {purchase: 452, freight_weighing: 210, towing: 2264, touring: 3350, power: 5181, tune_legal: 5650}
-  build: 17108
+  build_by_system: {purchase: 452, freight_weighing: 210, towing: 2264, touring: 3350, power: 5181, tune_legal: 20150}
+  build: 31608
   build_listed: 2403
-  build_estimated: 14705
-  contingency_allowance: 3181
-  build_plus_contingency: 20289
+  build_estimated: 29205
+  contingency_allowance: 6081
+  build_plus_contingency: 37689
   cuts_with_allowance: 3398
-  build_with_cuts_plus_contingency: 16891
-  against_budget: {build: -57892, build_plus_contingency: -54711, build_with_cuts_plus_contingency: -58109}
-  check_by_system: {towing: 1278, touring: 300, tune_legal: 10000, power: 900}
-  check_if_every_item_failed: 12478
+  build_with_cuts_plus_contingency: 34291
+  against_budget: {build: -43392, build_plus_contingency: -37311, build_with_cuts_plus_contingency: -40709}
+  check_by_system: {towing: 1278, touring: 300, tune_legal: 50600, power: 900}
+  check_if_every_item_failed: 53078
   optional_by_system: {protection: 7400}
   optional: 7400
-  every_line: 36985
+  every_line: 92085
   by_priority:
     P1: {build: 6156, check: 650, optional: 0}
-    P2: {build: 10951, check: 10900, optional: 0}
+    P2: {build: 25451, check: 51500, optional: 0}
     P3: {build: 0, check: 928, optional: 7400}
   by_stage:
     S0: {build: 482, check: 0, optional: 0}
     S1: {build: 3779, check: 650, optional: 7400}
     S2: {build: 1895, check: 928, optional: 0}
-    S3: {build: 10951, check: 10900, optional: 0}
+    S3: {build: 25451, check: 51500, optional: 0}
