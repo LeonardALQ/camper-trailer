@@ -563,6 +563,9 @@ class Analysis:
         def xs_of(where):
             if where == "all":
                 return [None]
+            if isinstance(where, dict):          # a stretch of the member, read every 50 mm (FAT-21's lap)
+                x0, x1 = ch.ev(where["from"]), ch.ev(where["to"])
+                return [x0 + (x1 - x0) * k / max(round((x1 - x0) / 50), 1) for k in range(max(round((x1 - x0) / 50), 1) + 1)]
             if isinstance(where, str):
                 v = pos[where]
                 return list(v) if isinstance(v, list) else [v]
@@ -672,7 +675,19 @@ class Analysis:
                 yield rng, f"{name}, its principal stress {angle:.0f} degrees off the weld's normal"
         weld, where = max(welds())
         return dict(root_splice=at(sp.d / 2 + e, sp.b / 2 + ez), root_heel_weld=g_top * tg / (2 * throat),
-                    root_end_plate=6 * plate["moment"] / ep["t"] ** 2, root_end_plate_weld=weld, weld=where)
+                    root_end_plate=6 * plate["moment"] / ep["t"] ** 2, root_end_plate_weld=weld, weld=where, plate=plate)
+
+    def plate_field(self, res, h) -> tuple[float, float]:
+        """The end plate's own field in the rail's web at a hole close behind it (I2-80): the normal line force the plate's
+        weld puts into that web at the hole's height (root_stresses' Kirchhoff edge shear), over the wall, and the shear
+        along the weld, taken undiminished at the hole, on the safe side (est.: it spreads into the web behind the weld)."""
+        V, rail = self.ch.V, self.ch.role_sec["rail"]
+        s = 1 if h["y"] > 0 else -1
+        p = self.root_stresses(res, s)["plate"]
+        web = p["webs"][1 if h["wall"] == "the rail's outer web" else 0]
+        lift = next(f for f in self.ch.data["fittings"] if f["id"] == ROOT_END_PLATE).get("lift", 0.0)
+        j = min(max(int(round((h["z"] - V["rail_underside_z"] - lift) / p["h"])) - 1, 0), len(web) - 1)
+        return abs(float(web[j])) / rail.t, p["tau_web"]
 
     def end_plate_under_heel(self, q_foot: float, q_top: float) -> dict:
         """The rail's end plate CH-P15 under the gusset heel's pull, q_foot at the heel's foot rising to q_top N/mm at its
@@ -743,8 +758,12 @@ class Analysis:
         for s in (-1, 1):
             for g in ch.data.get("galvanising_holes") or []:
                 d = float(g["d"])
-                rows.append(dict(member=f"RL-{SIDES[s]}", face="road side" if s > 0 else "kerb side", run=g["use"],
-                                 x=ch.ev(g["x"]), y=s * (V["rail_c"] + rail.b / 2 - 0.5), z=ch.ev(g["z"]), d=d, length=d))
+                inner = g.get("web") == "inner"
+                outer_face = "road side" if s > 0 else "kerb side"
+                face = ("kerb side" if s > 0 else "road side") if inner else outer_face
+                y = s * (V["rail_c"] - rail.b / 2 + 0.5) if inner else s * (V["rail_c"] + rail.b / 2 - 0.5)
+                rows.append(dict(member=f"RL-{SIDES[s]}", face=face, run=g["use"], x=ch.ev(g["x"]), y=y, z=ch.ev(g["z"]),
+                                 d=d, length=d, plate_field=True))
         toes = ch.weld_toes()
         z0, zs, z1 = V["rail_underside_z"], V["rail_top_z"], V["raiser_top_z"]
         sites: list[dict] = []
@@ -816,9 +835,61 @@ class Analysis:
                 need = rules["toe_factor"] * max(h["d"], o["d"])
                 if g - need < h["toe_mm"] - h["toe_need"]:
                     h["toe_mm"], h["toe_need"], h["toe_weld"] = g, need, f"hole for {', '.join(o['runs'])}"
+        sites += self._drawbar_hole_sites(rules)
         for k, h in enumerate(sites, 1):
             h["id"] = f"H-{k:02d}"
         return sites
+
+    def _drawbar_hole_sites(self, rules) -> list[dict]:
+        """The drawbar members' drains for galvanising (drawbar_galvanising_holes, I2-79), in both webs near the apex end,
+        each a hole in the A-frame member's own section: its net section, its edge distance to the web's flat and to the
+        member's sawn end along its line, and its clear distance to the coupling plate's fillets and the chain lug's
+        welds, on the member's web in its own plane (u along the member from its apex end, z up)."""
+        ch, V = self.ch, self.ch.V
+        sec = ch.role_sec["drawbar"]
+        out = []
+        ang = math.atan2(V["rail_c"] - V["db_apex_y"], V["body_x0"] - V["db_apex_x"])
+        zb, zt = V["db_z"] - sec.d / 2, V["db_z"] + sec.d / 2
+        lug = next(f for f in ch.data["fittings"] if f["id"] == "CH-P02")
+        plate = next(f for f in ch.data["fittings"] if f["id"] == "CH-P01")
+        plate_x1 = ch.ev(plate["at"][0]) + plate["l"] / 2
+        lug_top = ch.ev(lug["at"][2]) + lug["w"] / 2
+        for g in ch.data.get("drawbar_galvanising_holes") or []:
+            if "x" not in g:
+                continue
+            d, x, z = float(g["d"]), ch.ev(g["x"]), ch.ev(g["z"])
+            u = (x - V["db_apex_x"]) / math.cos(ang)
+            for s in (-1, 1):
+                for web in ("inner", "outer"):
+                    off = (sec.b / 2 - 0.5) * (1 if web == "outer" else -1)
+                    y = s * (ch.db_y(x) + off / math.cos(ang))
+                    toes = [("coupling plate's fillets", (0.0, zb, (plate_x1 - V["db_apex_x"]) / math.cos(ang), zb + 6)),
+                            ("member's capped apex end", (0.0, zb, 6.0, zt))]
+                    if web == "outer":
+                        u0 = (ch.ev(lug["at"][0]) - lug["l"] / 2 - V["db_apex_x"]) / math.cos(ang)
+                        toes.append(("chain lug's welds", (u0 - 6, lug_top - 6, u0 + lug["l"] + 6, lug_top + 6)))
+                    box = (u - d / 2, z - d / 2, u + d / 2, z + d / 2)
+                    gap, weld = min(((math.hypot(max(b[0] - box[2], box[0] - b[2], 0.0), max(b[1] - box[3], box[1] - b[3], 0.0)), what)
+                                     for what, b in toes), key=lambda t: t[0])
+                    strip = sec.t * d
+                    A = sec.A - strip
+                    zc = (sec.A * V["db_z"] - strip * z) / A
+                    I = sec.I_strong + sec.A * (zc - V["db_z"]) ** 2 - (sec.t * d ** 3 / 12 + strip * (z - zc) ** 2)
+                    Iw = sec.I_weak - (d * sec.t ** 3 / 12 + strip * ((sec.b - sec.t) / 2) ** 2)
+                    edge = min(z - (zb + sec.ro), (zt - sec.ro) - z)
+                    edge_need = rules["edge_factor"] * d
+                    if u / rules["end_factor"] < edge / rules["edge_factor"]:      # the member's sawn end, 1.5 d (Table 9.6.2)
+                        edge, edge_need = u, rules["end_factor"] * d
+                    member = f"DB-{SIDES[s]}A"
+                    out.append(dict(member=member, face=f"{web} web", run=g["use"], x=x, y=y, z=z, d=d, length=d, runs=[g["use"]],
+                                    rows=[f"{member} {web} web"], frame=member, wall=f"the drawbar member's {web} web", open=False,
+                                    fu=rules["fu"]["rail"], box=(x - d / 2, y - 1, z - d / 2, x + d / 2, y + 1, z + d / 2),
+                                    edge_mm=edge, edge_need=edge_need, toe_mm=gap, toe_need=rules["toe_factor"] * d, toe_weld=weld,
+                                    net=dict(A=A, I=I, I_weak=Iw, Aw=sec.Aw_depth - strip, Aw_width=sec.Aw_width,
+                                             z_lever=max(abs(z - d / 2 - zc), abs(z + d / 2 - zc)), y_lever=sec.b / 2,
+                                             k_torsion=(sec.d - sec.t) / max(sec.d - sec.t - d, 1.0),
+                                             base=dict(Z_weak=sec.Z_weak, I_weak=sec.I_weak, C=sec.C, y_max=sec.b / 2))))
+        return out
 
     def hole_stress(self, res, h) -> dict:
         """Normal and combined stress at a hole's edge on the composite rail's net section, at the element end nearest it."""
@@ -831,10 +902,10 @@ class Analysis:
                 if dist < bd - 1e-6 or (abs(dist - bd) < 1e-6 and abs(act["My"]) > abs(best["My"])):
                     best, bd = act, dist
         n, comp = h["net"], self.ch.comp
-        y_max = max(comp.rail.b, comp.raiser.b) / 2
+        base = n.get("base") or dict(Z_weak=comp.Z_weak, I_weak=comp.I_weak, C=comp.C, y_max=max(comp.rail.b, comp.raiser.b) / 2)
         sig = (abs(best["N"]) / n["A"] + abs(best["My"]) * n["z_lever"] / n["I"]
-               + abs(best["Mz"]) / comp.Z_weak * (comp.I_weak / n["I_weak"]) * (n["y_lever"] / y_max))
-        tau = abs(best["T"]) / comp.C * n["k_torsion"] + max(abs(best["Vz"]) / n["Aw"], abs(best["Vy"]) / n["Aw_width"])
+               + abs(best["Mz"]) / base["Z_weak"] * (base["I_weak"] / n["I_weak"]) * (n["y_lever"] / base["y_max"]))
+        tau = abs(best["T"]) / base["C"] * n["k_torsion"] + max(abs(best["Vz"]) / n["Aw"], abs(best["Vy"]) / n["Aw_width"])
         return dict(sigma=sig, eq=math.sqrt(sig ** 2 + 3 * tau ** 2))
 
     def holes(self, env: dict, lc1: dict, sites: list[dict]) -> list[dict]:
@@ -862,12 +933,25 @@ class Analysis:
                     worst = dict(util=u, mpa=r["eq"], limit=lim, lc=lc_id, case=r["case"])
             ds, cid = max(((self.hole_stress(res, h)["sigma"], c) for c, res in lc1.items()), key=lambda t: t[0])
             peak = rules["kt"] * ds
+            field = None
+            if h.get("plate_field"):
+                # a drain close behind the end plate stands in the field of the plate's weld into the web (I2-80): its
+                # normal range across the weld adds to the beam's along the rail, with the shear along the weld, and
+                # Kirsch's largest hoop stress in that biaxial field is 3 s1 - s2 (est., the field undiminished)
+                for c, res in lc1.items():
+                    sb = self.hole_stress(res, h)["sigma"]
+                    sp_, tp = self.plate_field(res, h)
+                    sx = sb + sp_
+                    r = math.hypot(sx / 2, tp)
+                    hoop = 3 * (sx / 2 + r) - (sx / 2 - r)
+                    if hoop > peak:
+                        peak, ds, cid, field = hoop, sb, c, dict(beam=sb, plate=sp_, shear=tp)
             cafl = 0.585 * rules["fat"]
             dmg = _miner(rules["fat"], lc10["occasional_factor"] * peak, lc10)
             fat_ok = peak <= cafl and dmg <= lc10["miner_limit"]
             edge_ok, toe_ok = h["edge_mm"] >= h["edge_need"] - 1e-6, h["toe_mm"] >= h["toe_need"] - 1e-6
             out.append(dict(row, rows=h["rows"], frame=h["frame"], static=worst, static_ok=worst["util"] <= 1 + 1e-9, util=worst["util"],
-                            range_mpa=ds, peak_mpa=peak, cafl=cafl, damage=dmg, fat_case=cid, fat_ok=fat_ok,
+                            range_mpa=ds, peak_mpa=peak, field=field, cafl=cafl, damage=dmg, fat_case=cid, fat_ok=fat_ok,
                             edge_mm=h["edge_mm"], edge_need=h["edge_need"], edge_ok=edge_ok, toe_mm=h["toe_mm"], toe_need=h["toe_need"],
                             toe_weld=h["toe_weld"], toe_ok=toe_ok, place_ok=edge_ok and toe_ok and fat_ok,
                             ok=worst["util"] <= 1 + 1e-9 and edge_ok and toe_ok and fat_ok))

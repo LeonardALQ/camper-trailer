@@ -5,7 +5,11 @@
 # cad/chassis_fea.py analyses them. Sections come from data/chassis/sections.yaml (report 11's table).
 id: ASM-CH
 name: Chassis and drawbar
-revision: J     # J, 24 Nov 2026: FAT-20 at IIW 424, an RHS's walls under 8 mm, FAT 45, and the root record CT-102 asks
+revision: K     # K, 24 Nov 2026: the frame galvanised in one dip at Valmont Coatings Hexham, rolled 46 degrees across and
+                # pitched drawbar end down (galvanising_dip, I2-79): each rail's front end drains in both webs and through a
+                # 10 mm slot under its end plate, with no vent in the end plate's field (I2-80), the drawbar members drain at
+                # their apex ends and vent at their snipes, and the drawbar's laps opened to 2.5 mm and stitch welded (FAT-21).
+                # J, 24 Nov 2026: FAT-20 at IIW 424, an RHS's walls under 8 mm, FAT 45, and the root record CT-102 asks
                 # for (I2-74), each rail's front end vented and drained for galvanising and its end plate's bottom edge held
                 # clear of the drawbar member (I2-75).
                 # I, 24 Nov 2026: FAT-20 on the end plates' welds' maximum principal stress range, their roots inspected by
@@ -152,14 +156,16 @@ fittings:
   # rear edges on the webs and the top are bevelled, so the webs, the top flange and the raiser's bottom wall are welded
   # to it with full penetration single bevel welds from outside, the plate behind each wall's end as the backing (IIW
   # 424, FAT-20), and each weld's root is viewed by videoscope before galvanising (I2-67, I2-74). Its bottom edge stands
-  # `lift` over the rail's underside, 3 mm over the rail's floor and 7 mm clear of the drawbar member, unwelded, so the
-  # galvaniser's zinc runs under it and coats both faces, and the rail's floor drains through the 3 mm slot it leaves at
-  # the plate (GAA's guide asks a gap of at least 2.5 mm, I2-75). The webs' welds end there, and the rail's bottom wall
-  # and corners end under it free. The inboard web's weld is made from ahead of CM-01. It has no vent: the heel and its fillets
+  # `lift` over the rail's underside, unwelded, so the galvaniser's zinc runs under it and coats both faces, and the
+  # rail's floor drains through the slot it leaves at the plate (the guide's gap of at least 2.5 mm, I2-75, and its least
+  # hole of 10 mm, I2-79). The webs' welds end there, and the rail's bottom wall and corners end under it free. The inboard
+  # web's weld is made from ahead of CM-01. It has no vent: the heel and its fillets
   # cover its face from 9.7 to 37.3 mm off its inboard edge over the heel's 140 mm, leaving 5.7 and 8.7 mm to the walls'
-  # inner faces, so the rail's front end vents and drains through its own holes in the outer web (galvanising_holes)
-  - {id: CH-P15, plane: yz, name: "Rail end plate, 16 mm, closing each rail's front end and the raiser's bottom wall over it, full penetration single bevel welds from outside to the rail's webs and top flange and that wall, their roots inspected by videoscope, the root gusset's heel welded to it, its bottom edge 7 mm clear of the drawbar member", kind: plate, l: 50, w: 146.5, t: 16, qty: 2, lift: 7,
-     at: [body_x0 - 8, 0, rail_underside_z + 7 + 73.25], side_y: rail_c}
+  # inner faces, so the rail's front end drains through its own holes in both webs (galvanising_holes)
+  # Since revision K its bottom edge stands 14 mm over the rail's underside, so the slot over the rail's floor is 10 mm,
+  # the guide's least hole (page 8), and drains each rail's low front corner in the rolled dip (galvanising_dip, I2-79)
+  - {id: CH-P15, plane: yz, name: "Rail end plate, 16 mm, closing each rail's front end and the raiser's bottom wall over it, full penetration single bevel welds from outside to the rail's webs and top flange and that wall, their roots inspected by videoscope, the root gusset's heel welded to it, its bottom edge 14 mm over the rail's underside, a 10 mm slot over the floor", kind: plate, l: 50, w: 139.5, t: 16, qty: 2, lift: 14,
+     at: [body_x0 - 8, 0, rail_underside_z + 14 + 69.75], side_y: rail_c}
   - {id: CH-P04, plane: xz, name: "Front recovery lug, 20 mm plate on the drawbar member's outer side face, 22 mm hole", kind: plate, l: 200, w: 120, t: 20, qty: 2,
      at: [front_recovery_x, 0, db_z - 30], side_y: "rail_c + rail_w / 2 + 10"}
   - {id: CH-P05, plane: xz, name: "Rear recovery tongue, 20 mm plate through a slot in the rear crossmember, 22 mm hole", kind: plate, l: 260, w: 120, t: 20, qty: 2,
@@ -309,6 +315,14 @@ fatigue_details:
   # the webs' welds. Both come from the heel's one pull, in phase, so each weld's range is its maximum principal stress
   # range (IIW 4.2 b and 4.3)
   - {id: FAT-20, name: "Rail's end plate to the RHS rail's walls, full penetration single bevel from outside, root inspected by videoscope", iiw: "424", fat: 45, stress: root_end_plate_weld, hot_spot: true}
+  # FAT-21 (I2-79): the drawbar members' 1,000 mm laps under the rails are opened to 2.5 mm, as the GAA's guide asks of
+  # an overlap that is not sealed (pages 29 to 31), and stitch welded along both sides, 50 mm stitches at 100 mm centres,
+  # so the zinc coats both faces. Sealing them would need a weld across the rail's bottom face at the snipe's toe, which
+  # Cruisemaster's TB 070 rules out. IIW 324 classes an intermittent fillet's ends at FAT 80 (1 - shear / normal range),
+  # not under 36. The seam lies near the joint's neutral axis, where the shear is high and the normal range low, so the
+  # row takes the floor, FAT 36, on the rail's bottom wall's normal range along the lap (est.). The member's top wall at
+  # the same stitch ends carries less (fx14-chs lap.py, 11.4 MPa)
+  - {id: FAT-21, name: "Drawbar member's lap under the rail, opened to 2.5 mm, stitch welded both sides, the rail's bottom wall at the stitches' ends", iiw: "324", fat: 36, stress: rail_level, z: rail_underside_z, where: {from: body_x0, to: db_end_x}}
 
 # Holes the runs make in the chassis members (data/services.yaml `holes`, the services' list, read here only). A hole is
 # the run's diameter and a bush across, a slot along the member where the run passes on a slant. CHS-09 checks the net
@@ -327,23 +341,56 @@ fatigue_details:
 hole_rules: {edge_factor: 1.25, end_factor: 1.5, toe_factor: 1.0, kt: 3.0, iiw: "121", fat: 140, fu_factor: 0.85,
              fu: {rail: 500, raiser: 430}}   # AS/NZS 1163 C450L0 and C350L0 tensile strengths
 
-# Vent and drain holes for hot-dip galvanising at each rail's closed front end (report 02 WLD-05, I2-75), the same on
-# both rails, in the rail's outer web, and checked with the services' holes (CHS-09, CHS-10). The GAA's Design Guide for
-# Hot Dip Galvanizing (best practice for venting and draining) asks one 40 mm, two 30 mm or four 20 mm holes in each
-# otherwise closed end of an RHS 150 x 50 (Table 3, page 15), as near as possible to its high and low points when hung
-# (page 14). The frame is hung drawbar end down, pitched about 15 degrees along its length and level across (est., page
-# 7: long items come out of the bath at a shallow angle), so each rail's front end is its low end and its open rear end
-# its high end. The inboard web is under CM-01's end weld for its first 50 mm, so the holes go in the outer web, as near
-# the plate, the top and the floor as CHS-10 lets them: each centre 1.25 d from the web's flat, its edge one diameter
-# from the end plate's weld toe 5 mm behind the plate, from the drawbar overlap's fillet and from the body front
-# outrigger OR-01's root fillet, whose toe runs 6 mm down the rail's web, so the hole adds nothing to FAT-20, and the
-# drains 40 mm apart. A 30 mm hole would sit 10 mm further from the floor, and a 30 mm vent would come
-# within 30 mm of the front bay's cable hole. The 3 mm slot under the end plate (CH-P15 `lift`) drains the floor itself.
-# With the cable holes, each end opens about 1,360 to 1,450 mm2 against Table 3's four 20 mm holes' 1,257 mm2 (CHASSIS.md)
+# The galvanising dip (I2-79). No NSW bath takes the frame's 2,400 mm across the outriggers level (the GAA's New South
+# Wales members, gaa.com.au/new-south-wales, read 24 Nov 2026), and none in Australia does: the widest is Sandvik's at
+# Kewdale WA, 2.2 m. Valmont Coatings at Hexham takes it in one dip rolled about 46 degrees across, either side down, and
+# pitched drawbar end down: fx14-chs's envelope of the welded frame, its outriggers, lugs and steadies' brackets included
+# and the spare carrier posts, which bolt on after (CT-103 detail J), left out, is 1,782 mm wide and 2,500 mm deep at a
+# 9 degree pitch, 50 mm inside the plant's largest dip each way (est.). Rolled that way the cross members and outriggers
+# drain along their length at 46 degrees, the guide's preferred hang (page 6), and the long members at the pitch. The
+# other NSW baths take it only near 90 degrees or under 6 degrees of pitch, and the same roll fits Sandvik's bath at
+# Narangba QLD and GB Galvanizing's at Dandenong South VIC at about 13 degrees. `holes_for` is the hang every hole below
+# is placed for: either side down, so the galvaniser may roll it either way.
+galvanising_dip:
+  plant: "Valmont Coatings (Industrial Galvanizers), 312 Pacific Highway, Hexham NSW"
+  dip: [14000, 1900, 2600]          # the plant's largest dip, L x W x D, mm (bath 14.5 x 2.0 x 2.85 m)
+  roll_deg: 46
+  pitch_deg: 9                      # drawbar end down, at most (est.)
+  envelope: [1782, 2500]            # the frame's width and depth in the bath at that roll and pitch (est.)
+  clearance: 50                     # mm each way inside the largest dip
+  holes_for: "rolled 46 degrees across, either side down, drawbar end down"
+  fallback: "Sandvik at Narangba QLD (13.0 x 1.8 x 3.0 m) or GB Galvanizing at Dandenong South VIC (13.7 x 1.8 x 2.95 m), rolled about 49 degrees at about 13 degrees of pitch (est.)"
+  source: "https://gaa.com.au/new-south-wales/"
+
+# Vent and drain holes for hot-dip galvanising at each rail's closed front end (report 02 WLD-05, I2-75, I2-79), the
+# same on both rails, checked with the services' holes (CHS-09, CHS-10). The GAA's Design Guide for Hot Dip Galvanizing
+# (best practice for venting and draining) asks one 40 mm, two 30 mm or four 20 mm holes in each otherwise closed end of
+# an RHS 150 x 50 (Table 3, page 15), as near as possible to its high and low points when hung (page 14), and two at
+# least, opposite each other (page 13). Hung drawbar end down (galvanising_dip), each rail's closed front end is its low
+# end and its open rear end its high end, so its air leaves along its top to the rear in any roll and the front end only
+# drains. Rolled either side down, its low corner is the bottom corner on the lower side, so it drains in both webs as
+# near the floor as CHS-10 lets it, and through the 10 mm slot under the end plate (CH-P15 `lift`) at the floor itself.
+# The outer web's drains stand 35 and 75 mm behind the plate. CM-01's end weld covers the inboard web's first 50 mm, so
+# that web's drains stand 85 and 125 mm behind it. Each centre is 1.25 d from the web's flat, its edge a diameter from
+# the end plate's weld toe, CM-01's end weld and the drawbar overlap's fillet. No vent: in that hang the front end has no
+# high point, and a vent near the top would stand where the end plate's line force into the web peaks (I2-80). With the
+# slot and the cable holes each end opens about 1,850 to 1,960 mm2 against Table 3's four 20 mm holes' 1,257 mm2
 galvanising_holes:
-  - {use: vent, x: body_x0 + 35, z: rail_top_z - 36, d: 20}
-  - {use: drain, x: body_x0 + 35, z: rail_underside_z + 35, d: 20}
-  - {use: drain, x: body_x0 + 75, z: rail_underside_z + 35, d: 20}
+  - {use: drain, web: outer, x: body_x0 + 35, z: rail_underside_z + 35, d: 20}
+  - {use: drain, web: outer, x: body_x0 + 75, z: rail_underside_z + 35, d: 20}
+  - {use: drain, web: inner, x: body_x0 + 85, z: rail_underside_z + 35, d: 20}
+  - {use: drain, web: inner, x: body_x0 + 125, z: rail_underside_z + 35, d: 20}
+
+# The drawbar members' own holes for the dip (galvanising_dip, task 3 of fx14-chs). Each member, its A-frame length and
+# its lap length joined by the open mitre, is one closed tube from its capped apex end to its capped snipe. Hung
+# drawbar end down, the apex end is its low end and the snipe's toe its high end, and rolled either side down its low
+# corner is the bottom corner on the lower side. So it drains in both webs near its floor 40 mm behind its apex end,
+# each centre 1.25 d over the web's flat, its edge more than a diameter from the coupling plate's fillets and the chain
+# lug's welds, and it vents through its snipe's cap plate by each web, as near the toe as the cap's welds let them. The
+# drains are read by hand (CHASSIS.md, est.): CHS-09 and CHS-10 read the rails' and raisers' holes only
+drawbar_galvanising_holes:
+  - {use: drain, web: both, x: db_apex_x + 40, z: db_z - db_depth / 2 + 15 + 25, d: 20, where: "each web, 40 behind the apex end"}
+  - {use: vent, web: both, d: 10, where: "the snipe's cap plate, by each web, its centre 25 along the cap from the toe"}
 
 # Local checks of the fittings (CHASSIS.md). Sizes in mm. Plates are AS/NZS 3678 grade 350. The pin is what bears in the
 # hole: at a chain lug the 10 mm round bow of the pewag CW 8 connecting link (pewag's d), which passes through the 14 mm

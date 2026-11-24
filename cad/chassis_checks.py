@@ -21,7 +21,7 @@ def chassis_row(c, res: dict) -> dict:
         return dict(limit="<= each case's limit on the net section", measured=round(100 * w["util"], 1), unit="%",
                     margin=round(100 * (1 - w["util"]), 1), ok=all(h["static_ok"] for h in hs),
                     governing=f"{w['id']} in {w['wall']} at X {w['x']:,.0f} ({', '.join(w['runs'])}), {s['lc']}",
-                    detail=(f"{len(hs)} holes in the rails and raisers. The worst, {w['id']}, {w['d']:g} mm across in {w['wall']} at X "
+                    detail=(f"{len(hs)} holes in the rails, the raisers and the drawbar members. The worst, {w['id']}, {w['d']:g} mm across in {w['wall']} at X "
                             f"{w['x']:,.0f} mm: {s['mpa']:.0f} MPa on the net section against {s['limit']:.0f} MPa in {s['lc']}, {s['case']}"))
     if c.type == "chassis_local" and c.item == "hole_places":
         hs = [h for h in res["holes"] if not h["open"]]

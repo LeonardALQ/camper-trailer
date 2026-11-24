@@ -285,6 +285,11 @@ FIT_ITEMS = [("1", "DB-03", "Cruisemaster DO45 Plus, under-mounted, 4 x M14 8.8 
 GALV_USES = {"vent", "drain"}       # the galvanising holes' uses among the holes' runs (CT-103 detail K)
 
 
+def lift_slot(ch) -> float:
+    """The slot over the rail's floor under its end plate CH-P15, mm (I2-79)."""
+    return next(f for f in ch.data["fittings"] if f["id"] == "CH-P15").get("lift", 0.0) - ch.role_sec["rail"].t
+
+
 def _root_detail(sh, ch, x0, y0, k=10.0):
     """Detail C on CT-102: the drawbar root in the root gusset's plane (I2-51), its lower left corner at sheet (x0, y0):
     the A-frame member's top, the gusset with its radius down to its end, the rail's end plate under its heel, the rail
@@ -492,15 +497,18 @@ def ct102(prj, model, bom, checks, reg, dwg):
     hole_gap = (min(gaps), max(gaps))      # the front cable holes the videoscope goes in by (FAT-20)
     fat20 = next(f for f in chs["results"]["fatigue"] if f["id"] == "FAT-20")
     S.notes(sh, 22, 72, [
-        "DRAWBAR MEMBERS RHS 150x50x6 C450L0 FROM THE APEX (X 250, Y +/-60) TO THE RAIL CENTRES AT THE BODY FRONT, THEN 1000 UNDER EACH RAIL. CONTINUOUS 5 mm FILLETS ON BOTH EDGES TO THE RAIL UNDERSIDE, SNIPED TAPER END WITH THE TOE GROUND (CT-103 DETAIL D).",
+        ("DRAWBAR MEMBERS RHS 150x50x6 C450L0 FROM THE APEX (X 250, Y +/-60) TO THE RAIL CENTRES AT THE BODY FRONT, THEN 1000 UNDER EACH RAIL, "
+         "THE LAP 2.5 OPEN, 8 mm STITCH FILLETS 50 LONG AT 100 CENTRES ON BOTH EDGES (FAT-21), SNIPED TAPER END WITH THE TOE GROUND (CT-103 DETAIL D). "
+         "FOR GALVANISING EACH MEMBER DRAINS BY A 20 HOLE IN EACH WEB 40 BEHIND ITS APEX END, 40 OVER ITS UNDERSIDE, AND VENTS BY TWO 10 HOLES IN ITS "
+         "SNIPE'S CAP, ONE BY EACH WEB, 25 FROM THE TOE (CT-103 NOTE 2)."),
         ("NO WELD ON THE MEMBERS' TOP OR BOTTOM FACES WITHIN 300 OF THE BODY FRONT EXCEPT THE ROOT GUSSET (9) AND THE MITRE (DETAIL C). THE GUSSET IS IIW 522, "
          "FAT 90 (FAT-07): ITS 160 RADIUS GROUND SMOOTH DOWN TO AN END 10 HIGH, AT MOST TWICE ITS 10 mm, 270 AHEAD OF THE BODY FRONT, ITS FILLETS WRAPPED "
          "ROUND THAT END AND THE TOE GROUND. THE CROSS BRACE SITS AT MID-DEPTH."),
         ("A 16 mm END PLATE (13) CLOSES EACH RAIL'S FRONT END AND THE RAISER'S BOTTOM WALL OVER IT AND TAKES THE GUSSET'S HEEL ON FILLETS "
          f"{g_legs[0]:g} INBOARD AND {g_legs[1]:g} OUTBOARD, THROAT {g_throat:.1f} (VIEW C1, FAT-18, FAT-19). ITS EDGES ON THE WEBS AND THE TOP ARE BEVELLED, "
          "AND THE WALLS ARE WELDED TO IT WITH FULL PENETRATION FROM OUTSIDE, THE INBOARD WEB FROM AHEAD OF THE FRONT CROSSMEMBER, THE PLATE BEHIND EACH "
-         f"ROOT. ITS BOTTOM EDGE STANDS {ep_lift:g} CLEAR OF THE MEMBER, UNWELDED (CT-103 DETAIL K). BEFORE GALVANISING THE INSPECTOR VIEWS EACH ROOT "
-         f"ALONG ITS WHOLE LENGTH BY VIDEOSCOPE THROUGH THE FRONT CABLE HOLES, {hole_gap[0]:.0f} TO {hole_gap[1]:.0f} BEHIND THE PLATE, OR THE VENT AND "
+         f"ROOT. ITS BOTTOM EDGE STANDS {ep_lift:g} OVER THE RAIL'S UNDERSIDE, UNWELDED, A {ep_lift - ch.role_sec['rail'].t:g} SLOT OVER THE FLOOR (CT-103 DETAIL K). BEFORE GALVANISING THE INSPECTOR VIEWS EACH ROOT "
+         f"ALONG ITS WHOLE LENGTH BY VIDEOSCOPE THROUGH THE FRONT CABLE HOLES, {hole_gap[0]:.0f} TO {hole_gap[1]:.0f} BEHIND THE PLATE, OR THE "
          "DRAINS, TO A WRITTEN REMOTE VISUAL PROCEDURE (AS 3978) IN WHICH THE SCOPE IS SHOWN TO RESOLVE THE ROOT AT ITS WORKING DISTANCE, AND RECORDS IT. "
          "THE RECORD PASSES ONLY IF IT SHOWS COMPLETE ROOT FUSION ALONG EACH ROOT'S WHOLE LENGTH, THE TOP CORNERS AND THE WEBS' BOTTOM ENDS INCLUDED, "
          f"AND NO CRACK (IIW {fat20['iiw']} AT FAT {fat20['fat']:g}, FAT-20). THE MITRE UNDER IT IS A FULL PENETRATION BUTT WELD MADE FROM ONE SIDE ON "
@@ -534,8 +542,9 @@ def _clip(text: str, n: int) -> str:
 
 def _galv_detail(sh, ch, holes, x0, y0, k=5.0):
     """Detail K on CT-103: the kerb-side rail's front end from outside, at 1:5, its lower left corner at sheet (x0, y0),
-    X to the right as CT-102's elevation: the outer web with its vent and drains for galvanising and the front bay's
-    cable hole, the end plate and the gap under it, the drawbar member under the rail and the raiser over it (I2-75)."""
+    X to the right as CT-102's elevation: the outer web with its drains for galvanising and the front bay's cable hole,
+    the inner web's drains beyond it, hidden, the end plate and the slot under it, the drawbar member under the rail and
+    the raiser over it (I2-75, I2-79)."""
     V = ch.V
     ep = next(f for f in ch.data["fittings"] if f["id"] == "CH-P15")
     rail = ch.role_sec["rail"]
@@ -544,13 +553,18 @@ def _galv_detail(sh, ch, holes, x0, y0, k=5.0):
 
     def p(x, z):
         return x0 + (x - xa) / k, y0 + (z - za) / k
-    kerb = [h for h in holes if h.get("frame") == "RL-K" and h["wall"] == "the rail's outer web" and h["x"] < V["body_x0"] + 150]
-    galv = sorted((h for h in kerb if set(h["runs"]) & GALV_USES), key=lambda h: (-h["z"], h["x"]))
-    cable = [h for h in kerb if not set(h["runs"]) & GALV_USES]
-    road = [h["id"] for h in holes if h.get("frame") == "RL-R" and set(h.get("runs", [])) & GALV_USES]
+    kerb = [h for h in holes if h.get("frame") == "RL-K" and h["wall"] in ("the rail's outer web", "the rail's inner web")
+            and h["x"] < V["body_x0"] + 150]
+    galv = sorted((h for h in kerb if set(h["runs"]) & GALV_USES), key=lambda h: h["x"])
+    outer = [h for h in galv if h["wall"] == "the rail's outer web"]
+    inner = [h for h in galv if h["wall"] == "the rail's inner web"]
+    cable = [h for h in kerb if not set(h["runs"]) & GALV_USES and h["wall"] == "the rail's outer web"]
+    road = next(h for h in holes if h.get("frame") == "RL-R" and h["wall"] == "the rail's outer web" and h["x"] < V["body_x0"] + 150
+                and not set(h.get("runs", [])) & GALV_USES)
     _detail_title(sh, p((xa + xb) / 2, 0)[0], y0 + (zb - za) / k + 15.0, "K: RAIL'S FRONT END FOR GALVANISING", k)
-    sh.text(p((xa + xb) / 2, 0)[0], y0 + (zb - za) / k + 8.0,
-            f"FROM OUTSIDE, KERB SIDE, ROAD SIDE MIRRORED ({road[0]} TO {road[-1]})", 1.4, "middle")
+    sh.text(p((xa + xb) / 2, 0)[0], y0 + (zb - za) / k + 8.0, "FROM OUTSIDE, KERB SIDE. ROAD SIDE MIRRORED, ITS CABLE", 1.4, "middle")
+    sh.text(p((xa + xb) / 2, 0)[0], y0 + (zb - za) / k + 5.6,
+            f"HOLE {road['runs'][0]}'S {road['d']:.0f} AT {road['x'] - V['body_x0']:.0f} BEHIND THE PLATE ({road['id']})", 1.4, "middle")
     gw = next(f for f in ch.data["fittings"] if f["id"] == "CH-P03")["w"]
     for (x_0, z_0), (x_1, z_1), sty in (((V["body_x0"], z0), (V["body_x0"], zb), "medium"), ((V["body_x0"], z0), (xb, z0), "medium"),
                                         ((V["body_x0"], zs), (xb, zs), "medium"), ((xa, z0), (V["body_x0"], z0), "medium"),
@@ -567,11 +581,14 @@ def _galv_detail(sh, ch, holes, x0, y0, k=5.0):
     sh.rect(a[0], a[1], b[0], b[1], "medium")
     sh.text(p(V["body_x0"] + 100, 0)[0], p(0, za)[1] + 1.0, "MEMBER (CT-102, 12)", 1.3, "middle")      # clear of the plate's leader
     sh.text(p(V["body_x0"], 0)[0] + 0.8, p(0, zb)[1] - 2.4, "RAISER", 1.3)
-    for h in galv + cable:
+    for h in outer + cable:
         c = p(h["x"], h["z"])
         sh.circle(c[0], c[1], h["d"] / 2 / k, "medium")
         sh.line(c[0] - h["d"] / k, c[1], c[0] + h["d"] / k, c[1], "centre")
         sh.line(c[0], c[1] - h["d"] / k, c[0], c[1] + h["d"] / k, "centre")
+    for h in inner:                              # in the inner web, beyond: hidden
+        c = p(h["x"], h["z"])
+        sh.circle(c[0], c[1], h["d"] / 2 / k, "hidden")
     ex = p(xb, 0)[0] + 7.0
 
     def edge_towards(h, elbow):
@@ -579,21 +596,16 @@ def _galv_detail(sh, ch, holes, x0, y0, k=5.0):
         L = math.hypot(elbow[0] - c[0], elbow[1] - c[1])
         r = h["d"] / 2 / k
         return c[0] + (elbow[0] - c[0]) / L * r, c[1] + (elbow[1] - c[1]) / L * r
-    vents = [h for h in galv if "vent" in h["runs"]]
-    drains = [h for h in galv if "drain" in h["runs"]]
-    elbow = (ex, p(0, zb)[1] - 1.0)
-    S.leader(sh, edge_towards(vents[0], elbow), elbow, f"VENT {vents[0]['d']:.0f} ({vents[0]['id']}),",
-             [f"{vents[0]['x'] - V['body_x0']:.0f} BEHIND THE PLATE,", f"{zs - vents[0]['z']:.0f} UNDER THE RAIL'S TOP"], size=1.5)
     if cable:
         elbow = (ex, p(0, cable[0]["z"])[1] - 1.5)
         S.leader(sh, edge_towards(cable[0], elbow), elbow, f"{cable[0]['runs'][0]}'S CABLE HOLE {cable[0]['d']:.0f}",
                  [f"({cable[0]['id']}, CHS-10)"], size=1.5)
     elbow = (ex, p(0, z0)[1] + 4.0)
-    S.leader(sh, edge_towards(drains[-1], elbow), elbow, f"{len(drains)} DRAINS {drains[0]['d']:.0f} ({', '.join(h['id'] for h in drains)}),",
-             [f"{drains[0]['x'] - V['body_x0']:.0f} AND {drains[-1]['x'] - V['body_x0']:.0f} BEHIND THE PLATE,",
-              f"{drains[0]['z'] - z0:.0f} OVER THE RAIL'S UNDERSIDE"], size=1.5)
+    S.leader(sh, edge_towards(inner[-1], elbow), elbow, f"{len(galv)} DRAINS {galv[0]['d']:.0f}, {galv[0]['z'] - z0:.0f} OVER THE UNDERSIDE:",
+             [f"OUTER WEB {outer[0]['x'] - V['body_x0']:.0f} AND {outer[-1]['x'] - V['body_x0']:.0f} BEHIND THE PLATE ({outer[0]['id']}, {outer[-1]['id']}),",
+              f"INNER WEB {inner[0]['x'] - V['body_x0']:.0f} AND {inner[-1]['x'] - V['body_x0']:.0f}, HIDDEN ({inner[0]['id']}, {inner[-1]['id']})"], size=1.5)
     tip = p(V["body_x0"] - ep["t"] / 2, z0 + lift)
-    S.leader(sh, tip, (tip[0] + 6.0, y0 - 4.0), f"END PLATE (CT-102, 13), ITS BOTTOM EDGE {lift:g} CLEAR OF THE MEMBER", size=1.5)
+    S.leader(sh, tip, (tip[0] + 6.0, y0 - 4.0), f"END PLATE (CT-102, 13), ITS BOTTOM EDGE {lift:g} UP: A {lift - rail.t:g} SLOT OVER THE FLOOR", size=1.5)
 
 
 def ct103(prj, model, bom, checks, reg, dwg):
@@ -602,25 +614,31 @@ def ct103(prj, model, bom, checks, reg, dwg):
     P = chs["params"]
     comp = chs["composite"]
     rail_c = next(m["p0"][1] for m in chs["members"] if m["id"] == "RL-R")
+    lay, _ = _layout(prj, model)
+    sec = lay.chassis.role_sec
+    rl, rs, xt = sec["rail"], sec["raiser"], sec["cm_xt"]
     sh = S.Sheet()
     S.frame(sh)
     cols, top1, top2 = (56.0, 124.0, 192.0), 270.0, 168.0
-    # ---- C: composite rail, section, 1:5
+    # ---- C: composite rail, section, 1:5, the rail and the raiser at their true sizes and corner radii
     k = 5.0
     cx = cols[0]
     _detail_title(sh, cx, top1, "C: COMPOSITE RAIL", k)
     zb = 205.0
-    rhs(sh, cx, zb + 75 / k, 50, 150, 3, 6, k)
-    rhs(sh, cx, zb + 212.5 / k, 50, 125, 3, 6, k)
-    sh.rect(cx - 25 / k, zb + 275 / k, cx + 25 / k, zb + (275 + P["strip_t"]) / k, "medium")
+    h_rl, h_all = rl.d / k, (rl.d + rs.d) / k
+    rhs(sh, cx, zb + rl.d / 2 / k, rl.b, rl.d, rl.t, rl.ro, k)
+    rhs(sh, cx, zb + (rl.d + rs.d / 2) / k, rs.b, rs.d, rs.t, rs.ro, k)
+    sh.rect(cx - rs.b / 2 / k, zb + h_all, cx + rs.b / 2 / k, zb + h_all + P["strip_t"] / k, "medium")
     zc = zb + (comp["z_centroid"] - comp["z_bottom"]) / k
     sh.line(cx - 9, zc, cx + 9, zc, "centre")
     sh.text(cx + 9.5, zc - 0.6, "CENTROID", 1.5)
-    S.vdim(sh, cx - 6, zb, cx - 6, zb + 150 / k, cx - 9, "150", size=1.6)
-    S.vdim(sh, cx - 6, zb + 150 / k, cx - 6, zb + 275 / k, cx - 9, "125", size=1.6)
-    S.leader(sh, (cx + 25 / k, zb + (275 + P["strip_t"] / 2) / k), (cx + 9, zb + 61), f"{P['strip_t']:.1f} BEARER STRIP", size=1.5)
-    weld_symbol(sh, (cx + 25 / k, zb + 150 / k), (cx + 7, zb + 45), "4", both=True, note="CONTINUOUS")
-    for i, t in enumerate((f"RAIL 150x50x4 C450L0 + RAISER 127x51x3.5 C350L0", f"I {comp['I'] / 1e6:.1f} x 10^6 mm4",
+    S.vdim(sh, cx - 6, zb, cx - 6, zb + h_rl, cx - 9, f"{rl.d:g}", size=1.6)
+    S.vdim(sh, cx - 6, zb + h_rl, cx - 6, zb + h_all, cx - 9, f"{rs.d:g}", size=1.6)
+    S.leader(sh, (cx + rs.b / 2 / k, zb + h_all + P["strip_t"] / 2 / k), (cx + 9, zb + 61), f"{P['strip_t']:.1f} BEARER STRIP", size=1.5)
+    weld_symbol(sh, (cx + rl.b / 2 / k, zb + h_rl), (cx + 7, zb + 45), "4", both=True, note="CONTINUOUS")
+    for i, t in enumerate((f"RAIL {rl.d:g}x{rl.b:g}x{rl.t:g} C450L0, CORNERS R{rl.ro:g}",
+                           f"+ RAISER {rs.d:g}x{rs.b:g}x{rs.t:g} C350L0, CORNERS R{rs.ro:g}",
+                           f"I {comp['I'] / 1e6:.1f} x 10^6 mm4",
                            f"Z {comp['Z_bottom'] / 1e3:.1f} (BOTTOM), {comp['Z_top'] / 1e3:.1f} (TOP) x 10^3 mm3", "VENT EACH END OF EACH BAY")):
         sh.text(cx - 26, zb - 6 - 3 * i, t, 1.5)
     # ---- E: outrigger root, section along the outrigger, 1:10
@@ -628,40 +646,45 @@ def ct103(prj, model, bom, checks, reg, dwg):
     cx = cols[1]
     _detail_title(sh, cx, top1, "E: OUTRIGGER ROOT", k)
     x0, zb = cx - 30.0, 205.0
-    rhs(sh, x0, zb + 75 / k, 50, 150, 3, 6, k, sty="medium")
-    rhs(sh, x0, zb + 212.5 / k, 50, 125, 3, 6, k)
+    h_rl, h_all = rl.d / k, (rl.d + rs.d) / k
+    rhs(sh, x0, zb + rl.d / 2 / k, rl.b, rl.d, rl.t, rl.ro, k, sty="medium")
+    rhs(sh, x0, zb + (rl.d + rs.d / 2) / k, rs.b, rs.d, rs.t, rs.ro, k)
     L = (P["outrigger_tip_y"] - P["outrigger_root_y"]) / k
-    sh.rect(x0 + 2.5, zb + 150 / k, x0 + 2.5 + L, zb + 275 / k, "medium")
-    S.hdim(sh, x0 + 2.5, zb + 275 / k, x0 + 2.5 + L, zb + 275 / k, zb + 275 / k + 5, f"{P['outrigger_tip_y'] - P['outrigger_root_y']:.0f} TO THE BODY EDGE", size=1.6)
-    weld_symbol(sh, (x0 + 2.5, zb + 150 / k), (x0 + 10, zb - 6), "6", all_round=True, note="ALL ROUND")
+    xr = x0 + rs.b / 2 / k
+    sh.rect(xr, zb + h_rl, xr + L, zb + h_all, "medium")
+    S.hdim(sh, xr, zb + h_all, xr + L, zb + h_all, zb + h_all + 5, f"{P['outrigger_tip_y'] - P['outrigger_root_y']:.0f} TO THE BODY EDGE", size=1.6)
+    weld_symbol(sh, (xr, zb + h_rl), (x0 + 10, zb - 6), "6", all_round=True, note="ALL ROUND")
     for i, t in enumerate(("OUTRIGGER RHS 127x51x3.5, THE RAISER'S SECTION,", "TOP FLUSH WITH THE RAISER, BOTTOM AT THE", "RAIL TOP. THE ROOT CLASS (FAT 36) GOVERNS (FAT-05).")):
         sh.text(cx - 32, zb - 14 - 3 * i, t, 1.5)
-    # ---- F: crossmember to rail, elevation on the rail's inner face, 1:5
+    # ---- F: crossmember to rail, elevation on the rail's inner face, 1:5, the rail's flat between its corner radii
     k = 5.0
     cx = cols[2]
     _detail_title(sh, cx, top1, "F: XT CROSSMEMBER TO RAIL", k)
     zb = 210.0
-    sh.rect(cx - 25, zb, cx + 25, zb + 150 / k, "medium")
-    sh.text(cx - 24.5, zb + 150 / k + 1, "RAIL, INNER FACE", 1.5)
-    rhs(sh, cx, zb + 75 / k, 50, 150, 3, 6, k)
+    sh.rect(cx - 25, zb, cx + 25, zb + rl.d / k, "medium")
+    for z in (rl.ro, rl.d - rl.ro):
+        sh.line(cx - 25, zb + z / k, cx + 25, zb + z / k, "thin")
+    sh.text(cx - 24.5, zb + rl.d / k + 1, f"RAIL {rl.d:g}x{rl.b:g}x{rl.t:g}, INNER FACE, R{rl.ro:g}", 1.5)
+    rhs(sh, cx, zb + xt.d / 2 / k, xt.b, xt.d, xt.t, xt.ro, k)
     sh.line(cx - 5, zb + 0.4, cx + 5, zb + 0.4, "thick")
-    weld_symbol(sh, (cx + 25 / k, zb + 20), (cx - 8, zb + 40), "6", all_round=True, note="ALL ROUND")
+    weld_symbol(sh, (cx + xt.b / 2 / k, zb + 20), (cx - 8, zb + 40), "6", all_round=True, note="ALL ROUND")
     S.leader(sh, (cx, zb + 0.6), (cx - 10, zb - 6), "GRIND THE TOE ON THE RAIL", ["OVER THE BOTTOM 40 mm (FAT-01)"], size=1.5)   # clear of the fatigue table
-    for i, t in enumerate(("RHS 150x50x3, FULL RAIL HEIGHT, END SQUARE,", "NO HOLES (TB 070). HOT-SPOT CHECK BY THE", "ENGINEER (CIDECT DESIGN GUIDE 8).")):
+    for i, t in enumerate((f"RHS {xt.d:g}x{xt.b:g}x{xt.t:g}, FULL RAIL HEIGHT, END SQUARE,", "NO HOLES (TB 070). HOT-SPOT CHECK BY THE", "ENGINEER (CIDECT DESIGN GUIDE 8).")):
         sh.text(cx - 26, zb - 16 - 3 * i, t, 1.5)
-    # ---- D: end of the drawbar overlap, elevation, 1:10
+    # ---- D: end of the drawbar overlap, elevation, 1:10, the lap opened 2.5 and stitch welded (FAT-21)
     k = 10.0
     cx = cols[0]
     _detail_title(sh, cx, top2, "D: END OF THE DRAWBAR OVERLAP", k)
     xs, zb = cx - 30.0, 120.0
-    sh.rect(xs, zb, xs + 60, zb + 150 / k, "medium")
-    sh.text(xs + 0.5, zb + 150 / k + 1, "MAIN RAIL", 1.5)
-    sh.path([(xs, zb), (xs + 25, zb), (xs + 25 + 300 / k, zb), (xs + 25, zb - 150 / k), (xs, zb - 150 / k)], "medium", closed=True)
-    sh.text(xs + 0.5, zb - 150 / k - 3, "DRAWBAR RHS 150x50x6, SNIPED OVER 300, CAPPED", 1.5)
-    weld_symbol(sh, (xs + 12, zb), (xs + 20, zb + 26), "5", both=True, note="CONTINUOUS")
-    S.leader(sh, (xs + 25 + 300 / k, zb), (xs + 62, zb - 6), "WELD ENDS HERE,", ["TOE GROUND (IIW 712)"], size=1.5)
-    sh.text(xs + 0.5, zb - 150 / k - 6, "NO TRANSVERSE WELD. ENDS AT X 2,820,", 1.5)
-    sh.text(xs + 0.5, zb - 150 / k - 9, "BETWEEN CROSSMEMBERS.", 1.5)
+    gap = 2.5 / k
+    sh.rect(xs, zb, xs + 60, zb + rl.d / k, "medium")
+    sh.text(xs + 0.5, zb + rl.d / k + 1, "MAIN RAIL", 1.5)
+    sh.path([(xs, zb - gap), (xs + 25, zb - gap), (xs + 25 + 300 / k, zb - gap), (xs + 25, zb - gap - 150 / k), (xs, zb - gap - 150 / k)], "medium", closed=True)
+    sh.text(xs + 0.5, zb - gap - 150 / k - 3, "DRAWBAR RHS 150x50x6, SNIPED OVER 300, CAPPED", 1.5)
+    weld_symbol(sh, (xs + 12, zb), (xs + 20, zb + 26), "8", both=True, length="50-100", note="STITCH, LAP OPEN 2.5")
+    S.leader(sh, (xs + 25 + 300 / k, zb), (xs + 62, zb - 6), "LAST STITCH ENDS HERE,", ["TOE GROUND (IIW 712)"], size=1.5)
+    sh.text(xs + 0.5, zb - gap - 150 / k - 6, "NO TRANSVERSE WELD. ENDS AT X 2,820,", 1.5)
+    sh.text(xs + 0.5, zb - gap - 150 / k - 9, "BETWEEN CROSSMEMBERS (FAT-08, FAT-21).", 1.5)
     # ---- G: jacking pad, section across the rail at the XT centre crossmember, 1:5
     k = 5.0
     cx = cols[1]
@@ -705,13 +728,15 @@ def ct103(prj, model, bom, checks, reg, dwg):
     sh.text(cx + 4, zb + h - 2, "SHS 50x50x2.5 x 2", 1.5)
     for i, t in enumerate(("POSTS BOLTED (M12) TO CLEATS ON THE FRONT", "CROSSMEMBER, TIED TO THE WALL AT THE TOP.", "NOTHING ON THE DRAWBAR (LOC-05).")):
         sh.text(cx - 55, zb - 12 - 3 * i, t, 1.5)
-    # ---- K: the rails' front ends for galvanising, from outside, 1:5 (I2-75)
-    lay, _ = _layout(prj, model)
+    # ---- K: the rails' front ends for galvanising, from outside, 1:5 (I2-75, I2-79)
     _galv_detail(sh, lay.chassis, chs["results"]["holes"], 234.0, 120.0)
-    galv = ("DRILL OR HOLE-SAW AND DEBURR THE VENT AND DRAINS BEFORE GALVANISING (report 02 WLD-05). THE GAA'S DESIGN GUIDE ASKS FOUR "
-            "20 IN EACH CLOSED END OF AN RHS 150x50 (TABLE 3), AS NEAR ITS HIGH AND LOW POINTS AS CAN BE: WITH THE CABLE HOLES AND THE 3 SLOT "
-            "THE PLATE LEAVES OVER THE RAIL'S FLOOR EACH END OPENS MORE. HANG THE FRAME DRAWBAR END DOWN, ABOUT 15 deg ALONG ITS LENGTH AND "
-            "LEVEL ACROSS. THE MEMBER'S LAP UNDER THE RAIL STAYS FLUSH, WELDED ALONG BOTH SIDES ONLY (TB 070): SEAL ITS TWO ENDS AFTER GALVANISING.")
+    dip = lay.chassis.data["galvanising_dip"]
+    galv = ("DRILL OR HOLE-SAW AND DEBURR THE DRAINS BEFORE GALVANISING (report 02 WLD-05). THE GAA'S DESIGN GUIDE ASKS FOUR "
+            "20 IN EACH CLOSED END OF AN RHS 150x50 (TABLE 3), AS NEAR ITS LOW AND HIGH POINTS AS CAN BE: THE FOUR DRAINS, THE CABLE HOLES AND "
+            f"THE {lift_slot(lay.chassis):g} SLOT UNDER THE PLATE OPEN MORE. ONE DIP AT VALMONT COATINGS HEXHAM ({dip['dip'][0] / 1000:.1f} x "
+            f"{dip['dip'][1] / 1000:.1f} x {dip['dip'][2] / 1000:.1f} m): HANG THE FRAME DRAWBAR END DOWN AT UP TO {dip['pitch_deg']:g} deg, ROLLED "
+            f"{dip['roll_deg']:g} deg ACROSS, EITHER SIDE DOWN. THE RAILS VENT AT THEIR OPEN REAR ENDS. THE MEMBER'S LAP UNDER THE RAIL STANDS 2.5 "
+            "OPEN, STITCH WELDED BOTH SIDES (DETAIL D, FAT-21), SO ITS FACES GALVANISE.")
     for i, t in enumerate(S.wrap_mm(galv, 80.0, 1.5)):
         sh.text(234.0, 109.0 - 2.6 * i, t, 1.5)
     # ---- fatigue table (right column)
@@ -724,7 +749,7 @@ def ct103(prj, model, bom, checks, reg, dwg):
             size=1.5, row_h=2.95, title="FATIGUE AT EACH WELDED DETAIL, LC10 (HS = HOT-SPOT CHECK)")
     S.notes(sh, 22, 64, [
         "WELDS SP TO AS/NZS 1554.1, E49XX OR W50X. VISUAL ON EVERY WELD, DYE PENETRANT OR MPI ON THE DRAWBAR TO CHASSIS JOINT, THE COUPLING MOUNT AND THE SUSPENSION BRACKETS (report 02 WLD-03). THE RAIL END PLATES' WELD ROOTS BY VIDEOSCOPE FROM INSIDE THE RAILS, RECORDED AS CT-102 NOTE 3 ASKS (FAT-20).",
-        "HOT-DIP GALVANISE AFTER FABRICATION TO AS/NZS 4680, THE FRAME HUNG DRAWBAR END DOWN ABOUT 15 deg AND LEVEL ACROSS. VENT AND DRAIN EVERY CLOSED SECTION AND SEALED SEAM BEFORE WELDING (report 02 WLD-05), THE RAILS' FRONT ENDS AS DETAIL K.",
+        "HOT-DIP GALVANISE AFTER FABRICATION TO AS/NZS 4680 IN ONE DIP, THE FRAME HUNG DRAWBAR END DOWN AND ROLLED ACROSS AS DETAIL K SAYS, THE SPARE CARRIER POSTS OFF. VENT AND DRAIN EVERY CLOSED SECTION AT ITS HIGH AND LOW POINTS IN THAT HANG, EITHER SIDE DOWN, BEFORE WELDING (report 02 WLD-05): THE RAILS' FRONT ENDS AS DETAIL K, THE DRAWBAR MEMBERS AS CT-102.",
         "FILLET SIZES ARE LEGS: 5 mm UNLESS STATED, 6 mm ON THE XT CROSSMEMBER ENDS, THE OUTRIGGER ROOTS, THE LUGS AND THE TONGUES.",
     ], width_chars=118, size=1.7)
     _draft_stamp(sh, 125, 75)
