@@ -213,6 +213,7 @@ Stage S3 at this level (AUD including GST, all estimates):
 | TL08 (check) | Brake test, if the certifier asks | 600 | New |
 | PW05 (check) | A larger intercooler core, if the air after the PowerMax unit runs over 25 °C above the outside air on a climb | 2,200 | New |
 | TX01 (check) | A larger 10-speed cooler, if it runs over 110 °C sustained | 900 | None |
+| CK04 (check) | Timed 0 to 100 and 80 to 100 km/h with the loaded trailer, three runs each way with a GPS logger, at most the calibrated time for the weighed mass plus 10 % (est.), 21.3 s at 7,324 kg | 0 | New |
 
 CUT1, the calibration on Ford's turbo, stays as the fallback. Darkside's 280 to 290 bhp on the stock hardware says Ford's turbo carries about 209 to 216 kW (est.), so CUT1 could reach the plan's 205 kW, but with only about 5 % of its air in hand. It stays at about 184 kW, about 29.2 s to 100 km/h at 7,750 kg (est., calibrated, section 9).
 
