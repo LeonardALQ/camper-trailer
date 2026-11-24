@@ -256,3 +256,17 @@ def test_a_letter_moved_out_of_its_symbol_in_the_code_is_a_leader_fault():
     svg = sh.svg(clear=False)
     assert _counts(svg) == (0, 0, 0, 0)
     assert _counts(_move(svg, "B", 343.5, S.Sheet.H - 120.0 + 0.7)) == (0, 0, 0, 1)
+
+
+def test_a_weld_arrow_drawn_as_a_leader_counts_once_and_ends_on_its_all_round_circle():
+    """chassis_sheets.weld_symbol draws its arrow as a leader to the joint, ending on the elbow's circle when the weld is
+    all round: the arrowhead after it marks no second line, and the circle it ends on is no symbol it passes through."""
+    sh = _sheet()
+    tip, elbow, r = (250.0, 150.0), (262.0, 158.0), 1.2
+    L = ((elbow[0] - tip[0]) ** 2 + (elbow[1] - tip[1]) ** 2) ** 0.5
+    sh.lead([tip, (elbow[0] + (tip[0] - elbow[0]) / L * r, elbow[1] + (tip[1] - elbow[1]) / L * r)], names=tip)
+    sh.arrow(tip, ((tip[0] - elbow[0]) / L, (tip[1] - elbow[1]) / L), 2.0, 0.4)
+    sh.line(elbow[0], elbow[1], elbow[0] + 16, elbow[1], "medium")
+    sh.circle(elbow[0], elbow[1], r, "thin")
+    svg = sh.svg(clear=False)
+    assert svg.count('class="leader"') == 1 and 'class="arrow"' not in svg and _counts(svg) == (0, 0, 0, 0)
