@@ -1,33 +1,46 @@
-Calibration: three measurements of stock Super Duties, the model at factor 1.00 and at 1.08, and the factor each alone implies
-  CarExpert, unladen 0 to 100 km/h, s          tested  13.23, model  13.76 at 1.00,  12.73 at 1.08, implies 1.039
-  CarExpert, unladen 80 to 120 km/h, s         tested  11.99, model  12.51 at 1.00,  11.38 at 1.08, implies 1.034
-  CarExpert, 6.0 kN trailer dyno, cool, km/h   tested  78.00, model  69.50 at 1.00,  74.50 at 1.08, implies 1.144
-  CarExpert, 6.0 kN trailer dyno, hot, km/h    tested  68.00, model  69.50 at 1.00,  74.50 at 1.08, implies 0.977
-  Leonard, 4 t, 0 to 100 km/h, flat deck, s    tested  28.00, model  30.76 at 1.00,  28.04 at 1.08, implies 1.081
-  Leonard, 4 t, 0 to 100 km/h, caravan, s      tested  28.00, model  35.35 at 1.00,  31.61 at 1.08, implies 1.181
-  The unladen runs at 3,050 kg: 13.39 s and 12.14 s at 1.00, 12.39 s and 11.05 s at 1.08
-  The unladen runs at 3,300 kg: 14.33 s and 13.06 s at 1.00, 13.24 s and 11.87 s at 1.08
+Fitted: CarExpert's unladen timed runs of a stock Super Duty dual cab chassis, 3,150 kg (est.). The model at factor 1.00 and at 1.04, and the factor each implies alone
+  CarExpert, unladen 0 to 100 km/h, s              tested  13.23, model  13.76 at 1.00,  13.22 at 1.04, implies 1.039
+  CarExpert, unladen 80 to 120 km/h, s             tested  11.99, model  12.51 at 1.00,  11.91 at 1.04, implies 1.034
+Checks, not fitted. The model at factor 1.00 and at 1.04, and the factor each implies alone
+  CarExpert, 6.0 kN trailer dyno, at first, km/h   tested  78.00, model  66.50 at 1.00,  69.00 at 1.04, implies 1.201
+  CarExpert, 6.0 kN trailer dyno, once hot, km/h   tested  68.00, model  66.50 at 1.00,  69.00 at 1.04, implies 1.021
+  Leonard, 4 t, 0 to 100 km/h, flat deck, s        tested  28.00, model  30.76 at 1.00,  29.33 at 1.04, implies 1.081
+  Leonard, 4 t, 0 to 100 km/h, caravan, s          tested  28.00, model  35.35 at 1.00,  33.36 at 1.04, implies 1.181
+  The unladen runs at 3,050 kg imply 1.011 and 1.010
+  The unladen runs at 3,150 kg imply 1.039 and 1.034
+  The unladen runs at 3,300 kg imply 1.080 and 1.071
   Check, ordinary Ranger V6, 2,415 kg with the driver (est.): 0 to 100 km/h 9.6 s at 1.00, tested 8.2 to 8.5 s
-  Check, ordinary Ranger V6, 2,415 kg with the driver (est.): 0 to 100 km/h 9.0 s at 1.08, tested 8.2 to 8.5 s
+  Check, ordinary Ranger V6, 2,415 kg with the driver (est.): 0 to 100 km/h 9.3 s at 1.04, tested 8.2 to 8.5 s
 
-Towing on a flat road in still air, CdA 4.55 m2, Crr 0.011 (est.), the 10R80's ratios on a 3.73 final drive (est.), 0.2 s lost at each upshift, factor 1.08. Wheel figures are crank x 0.85, the plan's convention
+Towing on a flat road in still air, CdA 4.55 m2, Crr 0.011 (est.), the 10R80's ratios on a 3.73 final drive (est.), 0.2 s lost at each upshift, factor 1.00. Wheel figures are crank x 0.85, the plan's convention
 Level                                  Crank kW Wheel kW Wheel hp    7750 kg    7450 kg    7324 kg    7200 kg
-Stock Super Duty, 154 kW, 600 Nm            154      131      176  35.4/16.3  33.9/15.6  33.3/15.3  32.7/15.0
-CUT1 on Ford's turbo, 184 kW, 600 Nm        184      157      210  29.2/13.0  28.0/12.5  27.5/12.3  27.0/12.1
-The plan, 205 kW, 650 Nm                    206      175      235  24.8/10.7  23.9/10.3  23.5/10.1  23.1/ 9.9
-The 250 hp option, 220 kW, 650 Nm           220      187      251  23.6/10.0  22.7/ 9.6  22.3/ 9.5  21.9/ 9.3
-The new level, 250 kW, 700 Nm               250      213      285  20.5/ 8.2  19.7/ 7.9  19.4/ 7.8  19.1/ 7.7
-About 350 bhp, 260 kW, 700 Nm               260      221      296  20.1/ 7.9  19.4/ 7.7  19.1/ 7.5  18.8/ 7.4
+Stock Super Duty, 154 kW, 600 Nm            154      131      176  39.7/18.8  38.0/18.0  37.3/17.6  36.6/17.2
+CUT1 on Ford's turbo, 184 kW, 600 Nm        184      157      210  32.4/14.7  31.0/14.1  30.5/13.8  30.0/13.6
+The plan, 205 kW, 650 Nm                    206      175      235  27.4/11.9  26.3/11.4  25.9/11.2  25.4/11.1
+The 250 hp option, 220 kW, 650 Nm           220      187      251  25.9/11.1  24.9/10.7  24.5/10.5  24.1/10.3
+The new level, 250 kW, 700 Nm               250      213      285  22.4/ 9.0  21.6/ 8.7  21.2/ 8.5  20.9/ 8.4
+About 350 bhp, 260 kW, 700 Nm               260      221      296  22.0/ 8.7  21.2/ 8.4  20.8/ 8.3  20.5/ 8.2
 Each cell: 0 to 100 km/h s / 80 to 100 km/h s
-0 to 80 km/h at 7,750 kg: 154 kW 20.1 s, 184 kW 17.1 s, 205 kW 15.1 s, 220 kW 14.5 s, 250 kW 13.3 s, 260 kW 13.1 s
+0 to 80 km/h at 7,750 kg: 154 kW 22.0 s, 184 kW 18.7 s, 205 kW 16.4 s, 220 kW 15.8 s, 250 kW 14.4 s, 260 kW 14.2 s
 
-0 to 100 km/h / 80 to 100 km/h at 7,750 kg under each factor: as first built 1.000, calibrated 1.080, Leonard's 28 s as a caravan 1.181
-  Stock Super Duty, 154 kW, 600 Nm         39.7/18.8   35.4/16.3   31.1/14.0
-  CUT1 on Ford's turbo, 184 kW, 600 Nm     32.4/14.7   29.2/13.0   26.0/11.4
-  The plan, 205 kW, 650 Nm                 27.4/11.9   24.8/10.7   22.3/ 9.5
-  The 250 hp option, 220 kW, 650 Nm        25.9/11.1   23.6/10.0   21.2/ 8.9
-  The new level, 250 kW, 700 Nm            22.4/ 9.0   20.5/ 8.2   18.5/ 7.4
-  About 350 bhp, 260 kW, 700 Nm            22.0/ 8.7   20.1/ 7.9   18.2/ 7.2
+Towing on a flat road in still air, CdA 4.55 m2, Crr 0.011 (est.), the 10R80's ratios on a 3.73 final drive (est.), 0.2 s lost at each upshift, factor 1.04. Wheel figures are crank x 0.85, the plan's convention
+Level                                  Crank kW Wheel kW Wheel hp    7750 kg    7450 kg    7324 kg    7200 kg
+Stock Super Duty, 154 kW, 600 Nm            154      131      176  37.4/17.5  35.8/16.7  35.2/16.4  34.5/16.0
+CUT1 on Ford's turbo, 184 kW, 600 Nm        184      157      210  30.7/13.8  29.4/13.2  28.9/13.0  28.4/12.8
+The plan, 205 kW, 650 Nm                    206      175      235  26.0/11.3  25.0/10.8  24.6/10.6  24.2/10.5
+The 250 hp option, 220 kW, 650 Nm           220      187      251  24.7/10.5  23.7/10.1  23.4/10.0  23.0/ 9.8
+The new level, 250 kW, 700 Nm               250      213      285  21.4/ 8.6  20.6/ 8.3  20.3/ 8.1  20.0/ 8.0
+About 350 bhp, 260 kW, 700 Nm               260      221      296  21.0/ 8.3  20.2/ 8.0  19.9/ 7.9  19.6/ 7.8
+Each cell: 0 to 100 km/h s / 80 to 100 km/h s
+0 to 80 km/h at 7,750 kg: 154 kW 21.0 s, 184 kW 17.9 s, 205 kW 15.7 s, 220 kW 15.1 s, 250 kW 13.8 s, 260 kW 13.7 s
+
+0 to 100 km/h at 7,750 and 7,324 kg under factors 1.00, 1.04, 1.08, 1.18
+  Stock Super Duty, 154 kW, 600 Nm       7,750 kg  39.7  37.4  35.4  31.2 | 7,324 kg  37.3  35.2  33.3  29.4
+  CUT1 on Ford's turbo, 184 kW, 600 Nm   7,750 kg  32.4  30.7  29.2  26.0 | 7,324 kg  30.5  28.9  27.5  24.6
+  The plan, 205 kW, 650 Nm               7,750 kg  27.4  26.0  24.8  22.3 | 7,324 kg  25.9  24.6  23.5  21.1
+  The 250 hp option, 220 kW, 650 Nm      7,750 kg  25.9  24.7  23.6  21.2 | 7,324 kg  24.5  23.4  22.3  20.1
+  The new level, 250 kW, 700 Nm          7,750 kg  22.4  21.4  20.5  18.5 | 7,324 kg  21.2  20.3  19.4  17.6
+  About 350 bhp, 260 kW, 700 Nm          7,750 kg  22.0  21.0  20.1  18.2 | 7,324 kg  20.8  19.9  19.1  17.3
 
 Engine speed band of each level's peak power (within 1 %)
   Stock Super Duty, 154 kW, 600 Nm         154 kW from 2,840 to 3,330 rpm, at most 600 Nm from second gear up, 600 Nm in first
@@ -38,35 +51,36 @@ Engine speed band of each level's peak power (within 1 %)
   About 350 bhp, 260 kW, 700 Nm            260 kW from 3,520 to 3,630 rpm, at most 700 Nm from second gear up, 600 Nm in first
 
 The torque cap from second gear up, 250 kW or the most the cap makes by 3,600 rpm, at 7,750 kg
-  650 Nm: 245 kW from 3,596 to 3,600 rpm, 0 to 100 km/h 21.6 s, 80 to 100 km/h 8.6 s
-  700 Nm: 250 kW from 3,410 to 3,600 rpm, 0 to 100 km/h 20.5 s, 80 to 100 km/h 8.2 s
-  750 Nm: 250 kW from 3,183 to 3,600 rpm, 0 to 100 km/h 20.3 s, 80 to 100 km/h 8.4 s
-  800 Nm: 250 kW from 2,984 to 3,600 rpm, 0 to 100 km/h 19.9 s, 80 to 100 km/h 8.3 s
+  650 Nm: 245 kW from 3,596 to 3,600 rpm, 0 to 100 km/h 22.6 s, 80 to 100 km/h 9.1 s
+  700 Nm: 250 kW from 3,410 to 3,600 rpm, 0 to 100 km/h 21.4 s, 80 to 100 km/h 8.6 s
+  750 Nm: 250 kW from 3,183 to 3,600 rpm, 0 to 100 km/h 21.2 s, 80 to 100 km/h 8.8 s
+  800 Nm: 250 kW from 2,984 to 3,600 rpm, 0 to 100 km/h 20.8 s, 80 to 100 km/h 8.6 s
 
 Peak crank power on the 700 Nm family for 0 to 100 km/h in 22.0 s, under each factor (the cap reaches 264 kW at 3,600 rpm). Wheel figures are crank x 0.85
-  7,750 kg, GCM case, the trailer at its plate: 1.00: 260 kW (221 kW, 297 hp), 1.08: 230 kW (196 kW, 263 hp), 1.18: 203 kW (172 kW, 231 hp)
-  7,450 kg, Lighter, about 300 kg less: 1.00: 242 kW (206 kW, 276 hp), 1.08: 220 kW (187 kW, 250 hp), 1.18: 194 kW (165 kW, 221 hp)
-  7,324 kg, TC2 with growth behind the ute with growth: 1.00: 237 kW (201 kW, 270 hp), 1.08: 215 kW (183 kW, 245 hp), 1.18: 190 kW (162 kW, 217 hp)
-  7,200 kg, Lighter, about 550 kg less: 1.00: 235 kW (200 kW, 268 hp), 1.08: 211 kW (179 kW, 241 hp), 1.18: 187 kW (159 kW, 213 hp)
-  7,750 kg for 24 s at 1.08: 208 kW at the crank
-  7,750 kg for 25 s at 1.08: 198 kW at the crank
+  7,750 kg, GCM case, the trailer at its plate: 1.00: 260 kW (221 kW, 297 hp), 1.04: 240 kW (204 kW, 273 hp), 1.08: 230 kW (196 kW, 263 hp), 1.18: 203 kW (173 kW, 231 hp)
+  7,450 kg, Lighter, about 300 kg less: 1.00: 242 kW (206 kW, 276 hp), 1.04: 232 kW (198 kW, 265 hp), 1.08: 220 kW (187 kW, 250 hp), 1.18: 194 kW (165 kW, 221 hp)
+  7,324 kg, TC2 with growth behind the ute with growth: 1.00: 237 kW (201 kW, 270 hp), 1.04: 227 kW (193 kW, 259 hp), 1.08: 215 kW (183 kW, 245 hp), 1.18: 190 kW (162 kW, 217 hp)
+  7,200 kg, Lighter, about 550 kg less: 1.00: 235 kW (200 kW, 268 hp), 1.04: 223 kW (189 kW, 254 hp), 1.08: 211 kW (179 kW, 241 hp), 1.18: 187 kW (159 kW, 213 hp)
+  7,750 kg for 24 s at 1.04: 219 kW at the crank
+  7,750 kg for 25 s at 1.04: 209 kW at the crank
 
-The new level, 250 kW, 700 Nm at 7,750 kg and factor 1.08, one input changed at a time (0 to 100 km/h s)
-  as above                          20.5 s (+0.0)
-  final drive 4.10 (est.)           20.6 s (+0.1)
-  final drive 3.55 (est.)           20.7 s (+0.2)
-  0.4 s lost at each upshift        21.5 s (+1.0)
-  no time lost at upshifts          19.5 s (-1.0)
-  spool time constant 1.2 s         20.8 s (+0.3)
-  converter stall ratio 1.5         20.7 s (+0.2)
-  factor 1.00, as first built       22.4 s (+1.9)
-  factor 1.19                       18.4 s (-2.1)
-  Crr 0.013                         20.8 s (+0.3)
-  CdA 15 % more                     20.9 s (+0.4)
-  CdA 15 % less                     20.1 s (-0.4)
+The new level, 250 kW, 700 Nm at 7,750 kg and factor 1.04, one input changed at a time (0 to 100 km/h s)
+  as above                                  21.4 s (+0.0)
+  final drive 4.10 (est.)                   21.5 s (+0.1)
+  final drive 3.55 (est.)                   21.7 s (+0.3)
+  0.4 s lost at each upshift                22.4 s (+1.0)
+  no time lost at upshifts                  20.5 s (-1.0)
+  spool time constant 1.2 s                 21.7 s (+0.3)
+  converter stall ratio 1.5                 21.6 s (+0.2)
+  factor 1.00, as first built               22.4 s (+1.0)
+  factor 1.08, the first calibration        20.5 s (-0.9)
+  factor 1.18, Leonard's 28 s as a caravan  18.5 s (-2.9)
+  Crr 0.013                                 21.8 s (+0.4)
+  CdA 15 % more                             21.9 s (+0.5)
+  CdA 15 % less                             21.0 s (-0.4)
 
-Long climbs at 7,750 kg and factor 1.08: the steady speed at full power, km/h, and the crank power to hold 80 and 100 km/h
-  4 %: 154 kW 90, 184 kW 99, 205 kW 108, 220 kW 112, 250 kW 118, 260 kW 120. Holding 80 km/h takes 126 kW at the crank, 100 km/h 181 kW
-  6 %: 154 kW 76, 184 kW 86, 205 kW 94, 220 kW 96, 250 kW 102, 260 kW 104. Holding 80 km/h takes 163 kW at the crank, 100 km/h 227 kW
-  8 %: 154 kW 64, 184 kW 75, 205 kW 81, 220 kW 84, 250 kW 94, 260 kW 97. Holding 80 km/h takes 200 kW at the crank, 100 km/h 273 kW
+Long climbs at 7,750 kg and factor 1.04: the steady speed at full power, km/h, and the crank power to hold 80 and 100 km/h
+  4 %: 154 kW 88, 184 kW 96, 205 kW 105, 220 kW 110, 250 kW 117, 260 kW 118. Holding 80 km/h takes 131 kW at the crank, 100 km/h 188 kW
+  6 %: 154 kW 74, 184 kW 82, 205 kW 91, 220 kW 95, 250 kW 101, 260 kW 102. Holding 80 km/h takes 169 kW at the crank, 100 km/h 236 kW
+  8 %: 154 kW 63, 184 kW 70, 205 kW 79, 220 kW 82, 250 kW 91, 260 kW 91. Holding 80 km/h takes 207 kW at the crank, 100 km/h 283 kW
 
