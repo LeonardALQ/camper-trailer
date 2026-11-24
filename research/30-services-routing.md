@@ -227,7 +227,7 @@ K-17's under K-10, comes within 0.1 mm of its least radius (SVC-02), the 230 V k
 nearest wet line is 344 mm from the terminal face (SVC-04) and every one of the 101 needs is served (SVC-05). The
 governing drop is D-14's 1.98 % of 2 % (SVC-06). The TSC's supply holds its 2 % from the truck's socket to the TSC,
 1.96 % with its fuse, and the truck's own feed to that socket, car build line TW07, 2.03 % of its own 3 %, so the TSC
-sees 11.53 V from a 12.0 V battery, over its 10.5 V floor. The flattest waste falls
+sees 11.52 V from a 12.0 V battery, over its 10.5 V floor. The flattest waste falls
 1:50 (SVC-07), no two of the 67 pairs measured overlap (SVC-08), the gland fittings keep 23.4 mm over their spacing
 (SVC-09), the closest cable to its rating keeps 0.1 A (SVC-10), the cables keep 133.4 mm over their distance from the
 hot surfaces (SVC-11) and the longest unsupported span is 597 mm against 600 mm (SVC-12). The routed cables are
