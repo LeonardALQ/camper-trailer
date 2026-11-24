@@ -5,7 +5,9 @@
 # cad/chassis_fea.py analyses them. Sections come from data/chassis/sections.yaml (report 11's table).
 id: ASM-CH
 name: Chassis and drawbar
-revision: H     # H, 24 Nov 2026: the root gusset's heel 3 mm inboard of the end plate's middle, the gusset's line from the member's
+revision: I     # I, 24 Nov 2026: FAT-20 on the end plates' welds' maximum principal stress range, their roots inspected by
+                # videoscope so IIW 415 classes them at FAT 71 (I2-67).
+                # H, 24 Nov 2026: the root gusset's heel 3 mm inboard of the end plate's middle, the gusset's line from the member's
                 # line at its toe, and FAT-20 on the heel's place and the pull's direction (I2-60).
                 # G, 23 Nov 2026: the end plates' welds to the rails at full penetration from outside, over the raisers' bottom
                 # walls, their bottom edges free, FAT-20 (I2-57).
@@ -142,8 +144,9 @@ fittings:
   # CH-P15 is flush with the rail's sides and stands 3.5 mm over its top, across the raiser's bottom wall (I2-57). Its
   # rear edges on the webs and the top are bevelled, so the webs, the top flange and the raiser's bottom wall are welded
   # to it with full penetration single bevel welds from outside, the plate behind each wall's end as the backing (IIW
-  # 415, FAT-20). Its bottom edge rests on the drawbar member unwelded. The inboard web's weld is made from ahead of CM-01
-  - {id: CH-P15, plane: yz, name: "Rail end plate, 16 mm, closing each rail's front end and the raiser's bottom wall over it, full penetration single bevel welds from outside to the rail's webs and top flange and that wall, the root gusset's heel welded to it, a 10 mm vent low on its outer side", kind: plate, l: 50, w: 153.5, t: 16, qty: 2,
+  # 415, FAT-20), and each weld's root is viewed by videoscope before galvanising (I2-67). Its bottom edge rests on the
+  # drawbar member unwelded. The inboard web's weld is made from ahead of CM-01
+  - {id: CH-P15, plane: yz, name: "Rail end plate, 16 mm, closing each rail's front end and the raiser's bottom wall over it, full penetration single bevel welds from outside to the rail's webs and top flange and that wall, their roots inspected by videoscope, the root gusset's heel welded to it, a 10 mm vent low on its outer side", kind: plate, l: 50, w: 153.5, t: 16, qty: 2,
      at: [body_x0 - 8, 0, rail_underside_z + 76.75], side_y: rail_c}
   - {id: CH-P04, plane: xz, name: "Front recovery lug, 20 mm plate on the drawbar member's outer side face, 22 mm hole", kind: plate, l: 200, w: 120, t: 20, qty: 2,
      at: [front_recovery_x, 0, db_z - 30], side_y: "rail_c + rail_w / 2 + 10"}
@@ -280,15 +283,16 @@ fatigue_details:
   - {id: FAT-17, name: "Drawbar mitred butt splice at the body front, one side, no NDT", iiw: "234", fat: 36, stress: root_splice}
   - {id: FAT-18, name: "Root gusset's heel to the rail's end plate, 8 mm fillets, root", iiw: "414", fat: 36, stress: root_heel_weld}
   - {id: FAT-19, name: "Rail's end plate in bending under the gusset's heel, weld toe", iiw: "413", fat: 63, stress: root_end_plate, hot_spot: true}
-  # FAT-20 (I2-57, I2-60): the end plate's welds to the rail, IIW 415, T-joints welded from one side with full penetration
-  # on the plate as backing, FAT 36 as their root is not inspected, on the wall's section at the weld: a web's 4 mm, or
-  # the 7.5 mm of the rail's top flange and the raiser's bottom wall at the top. The normal line force is the plate's
-  # Kirchhoff edge shear with its bottom edge free under the pull's part normal to the plate, the heel where CH-P03's
-  # data puts it (cad/chassis_fea.py end_plate). The pull's part along the plate is shear along the top weld and, by its
-  # moment, along the webs' welds, at IIW Table 3.2-2 no. 2's FAT 80 (an uninspected root as a partial penetration
-  # weld, m 5, its knee at 10^8 cycles), with IIW 4.3's interaction for in-phase stresses, CV 1.0 (Table 4.3-1)
-  - {id: FAT-20, name: "Rail's end plate to the rail's webs and top, full penetration single bevel from outside, root not inspected", iiw: "415", fat: 36, stress: root_end_plate_weld, hot_spot: true,
-     fat_shear: 80, cv: 1.0}
+  # FAT-20 (I2-57, I2-60, I2-67): the end plate's welds to the rail, IIW 415, T-joints welded from one side with full
+  # penetration on the plate as backing, on the wall's section at the weld: a web's 4 mm, or the 7.5 mm of the rail's top
+  # flange and the raiser's bottom wall at the top. Before galvanising each weld's root is viewed along its whole length
+  # with a videoscope through the front bay's cable hole in the rail's web, 85 to 95 mm behind the plate, so IIW 415
+  # classes the welds at FAT 71 at their toe (CHASSIS.md). The normal line force is the plate's Kirchhoff edge shear with
+  # its bottom edge free under the pull's part normal to the plate, the heel where CH-P03's data puts it
+  # (cad/chassis_fea.py end_plate). The pull's part along the plate is shear along the top weld and, by its moment, along
+  # the webs' welds. Both come from the heel's one pull, in phase, so each weld's range is its maximum principal stress
+  # range (IIW 4.2 b and 4.3)
+  - {id: FAT-20, name: "Rail's end plate to the rail's webs and top, full penetration single bevel from outside, root inspected by videoscope", iiw: "415", fat: 71, stress: root_end_plate_weld, hot_spot: true}
 
 # Holes the runs make in the chassis members (data/services.yaml `holes`, the services' list, read here only). A hole is
 # the run's diameter and a bush across, a slot along the member where the run passes on a slant. CHS-09 checks the net

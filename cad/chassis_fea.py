@@ -636,8 +636,9 @@ class Analysis:
         actions there, on the section of the member and the gusset's heel together, as the heel is welded to the rail's
         end plate: the mitred splice at the member's far corner, the heel's two fillets on their throat at the gusset's
         top, the end plate in bending under the heel's line load, simply supported on the rail's walls, and its welds to
-        the rail. The heel stands `zg` off the member's axis (root_gusset_heel_y), so the section is unsymmetric, and its
-        product of inertia adds each moment's coupling to the other axis, taken on the safe side."""
+        the rail on their maximum principal stress range (I2-67). The heel stands `zg` off the member's axis
+        (root_gusset_heel_y), so the section is unsymmetric, and its product of inertia adds each moment's coupling to the
+        other axis, taken on the safe side."""
         ch, V = self.ch, self.ch.V
         fit = {f["id"]: f for f in ch.data["fittings"]}
         g, ep, rail = fit[ROOT_GUSSET], fit[ROOT_END_PLATE], ch.role_sec["rail"]
@@ -660,15 +661,15 @@ class Analysis:
         g_bot, g_top = at(sp.d / 2 - e, zg - ez), at(sp.d / 2 + hg - e, zg - ez)
         throat = g["heel_leg"] / math.sqrt(2)
         plate = self.end_plate_under_heel(g_bot * tg, g_top * tg)
-        d = next(f for f in ch.data["fatigue_details"] if f["id"] == "FAT-20")
-        ratio = 0.585 * d["fat"] / (d["fat_shear"] * (2e6 / 1e8) ** (1 / 5))
 
         def welds():
-            """Each weld's normal range with its shear by IIW's interaction, as the normal range of the same use."""
+            """Each weld's normal range across its wall and its shear range along it come from the heel's one pull, so
+            they vary in phase, and IIW 4.2 b) and 4.3 read their maximum principal stress range."""
             for name, q, wall, tau in (("the inboard web", plate["webs"][0], rail.t, plate["tau_web"]),
                                        ("the outboard web", plate["webs"][1], rail.t, plate["tau_web"]),
                                        ("the top", plate["top"], plate["top_t"], plate["tau_top"])):
-                yield math.hypot(q.max() / wall, ratio * tau) / math.sqrt(d["cv"]), name
+                rng, angle = principal_range(np.abs(q).max() / wall, tau)
+                yield rng, f"{name}, its principal stress {angle:.0f} degrees off the weld's normal"
         weld, where = max(welds())
         return dict(root_splice=at(sp.d / 2 + e, sp.b / 2 + ez), root_heel_weld=g_top * tg / (2 * throat),
                     root_end_plate=6 * plate["moment"] / ep["t"] ** 2, root_end_plate_weld=weld, weld=where)
@@ -1096,6 +1097,16 @@ def end_plate(span: float, height: float, z0: float, z1: float, q0: float, q1: f
     return dict(moment=mx, webs=(np.array(edge(0, 1)), np.array(edge(nx, -1))), top=np.array(top),
                 corner_top=twist(0, nz), corner_bottom=-twist(0, 0), corner_top_far=-twist(nx, nz), corner_bottom_far=twist(nx, 0),
                 load=total, h=h)
+
+
+def principal_range(sigma: float, tau: float) -> tuple[float, float]:
+    """A weld's maximum principal stress range from its normal range `sigma` across it and its shear range `tau` along
+    it, the two in phase (IIW-1823-07 section 4.2 b), MPa, and the angle of its direction off the weld's normal,
+    degrees. With no stress along the weld that direction lies within 45 degrees of the normal, inside the 60 degrees
+    to which IIW 4.3 holds the principal stress, so IIW's interaction of normal and shear, which it keeps for stresses
+    out of phase and for directions further off the normal (Table 4.3-1), never applies to such a weld."""
+    half = abs(sigma) / 2
+    return half + math.hypot(half, tau), math.degrees(math.atan2(2 * abs(tau), abs(sigma))) / 2
 
 
 def _miner(fat: float, ds_o: float, lc: dict) -> float:
