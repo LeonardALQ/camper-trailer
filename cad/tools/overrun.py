@@ -14,8 +14,9 @@ leaders that go wrong, sheet by sheet.
   thick, cut, frame and the red fail line), so the mask cuts a gap in an outline or a run. A mask may break the thin
   lines under 0.35 mm (thin, hidden, centre, phantom, hatch, grey), as dimension text does.
 - A leader fault is a leader (a path the sheet marks class="leader") that ends off what its label names, where the sheet
-  says what that is (data-names: a point, a box or a symbol's circle, sheet.Sheet.text), two leaders that cross, or a
-  leader through a symbol (a circle of sheet.SYMBOL_R or less, a dot) other than the one its named end is in.
+  says what that is (data-names: a point, a box or a symbol's circle, sheet.Sheet.text), two leaders that cross or come
+  within sheet.LEAD_GAP of each other, or a leader through a symbol (a circle of sheet.SYMBOL_R or less, a dot) other
+  than the one its named end is in.
 
     python -m cad.tools.overrun build/drawings [report.json]
 
@@ -235,7 +236,7 @@ def leader_faults(sh: dict) -> list[dict]:
     for k, a in enumerate(leaders):
         for b in leaders[k + 1:]:
             if any(_crossing(p, q, u, v) for p, q in zip(a["pts"], a["pts"][1:]) for u, v in zip(b["pts"], b["pts"][1:])):
-                out.append(dict(kind="crosses a leader", at=[round(v, 2) for v in a["pts"][-1]], names=el[b["i"]][:60], line=el[a["i"]][:80]))
+                out.append(dict(kind="crosses or touches a leader", at=[round(v, 2) for v in a["pts"][-1]], names=el[b["i"]][:60], line=el[a["i"]][:80]))
     return out
 
 

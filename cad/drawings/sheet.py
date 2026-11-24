@@ -248,6 +248,7 @@ _CIRCLE = re.compile(r'<circle cx="([-\d.]+)" cy="([-\d.]+)" r="([\d.]+)"([^>]*)
 _RECT_D = re.compile(r"M([-\d.]+),([-\d.]+) L([-\d.]+),([-\d.]+) L([-\d.]+),([-\d.]+) L([-\d.]+),([-\d.]+) Z$")
 _NAMES = re.compile(r'data-names="(\w+) ([-\d. ]+)"')
 LEAD_TOL = 0.3     # mm: a leader's end this near what its label names is on it
+LEAD_GAP = 0.5     # mm: two leaders nearer each other than this read as crossing or joining, unless they share an end
 
 
 def lead_attr(target) -> str:
@@ -491,17 +492,19 @@ _TEXT_EL = re.compile(r'<text x="([-\d.]+)" y="([-\d.]+)" font-size="([\d.]+)" t
 _LINE_EL = re.compile(r'<path d="M([-\d.]+),([-\d.]+) L([-\d.]+),([-\d.]+)" stroke="#[0-9a-f]+" stroke-width="([\d.]+)"')
 DRAW_AREA = (21.0, 409.0, 11.0, 286.0)       # inside the frame, SVG mm
 ATTACH, REACH = 1.2, 15.0                     # a leader's end this near a label moves with it; the farthest a label moves
+PREFER = 8.0      # mm of cost: a place that needs no leader is taken over a nearer one that needs a leader to what it names
+SPACE = 1.0       # of the size: a moved label keeps this far from another text along its line, so the two never read as one
 
 
 def _steps() -> list[tuple]:
-    """The moves a label tries, nearest first: along its baseline before across it, out to REACH mm."""
+    """The moves a label tries, nearest first, as (cost, du, dv): along its baseline before across it, out to REACH mm."""
     out = []
     ds = [0.25 * k for k in range(1, 13)] + [3.0 + 0.5 * k for k in range(1, 15)] + [10.0 + k for k in range(1, int(REACH) - 9)]
     for d in ds:
         for k in range(24):
             a = math.pi * k / 12
             out.append((d * (1.0 if k in (0, 12) else 1.5), d * math.cos(a), d * math.sin(a)))
-    return [(u, v) for _, u, v in sorted(out)]
+    return sorted(out)
 
 
 STEPS = _steps()
@@ -701,7 +704,7 @@ class _Board:
         self.reseg(len(self.sh.el) - 1, e)
 
     def crosses_leader(self, p, q, skip) -> bool:
-        """Does the leader piece p-q cross a leader drawn on the sheet but those in `skip`?"""
+        """Does the leader piece p-q cross or touch (LEAD_GAP) a leader drawn on the sheet but those in `skip`?"""
         return any(n not in skip and any(_crossing(p, q, a, b) for a, b in zip(pts, pts[1:])) for n, pts in self.leaders.items())
 
     def through_symbol(self, p, q, named, skip) -> bool:
@@ -739,16 +742,21 @@ def _seg_dist(c, p, q) -> float:
     return math.hypot(p[0] + t * dx - c[0], p[1] + t * dy - c[1])
 
 
-def _crossing(p, q, a, b, tol: float = 0.05) -> bool:
-    """Do the segments p-q and a-b cross, other than where one ends on or at the other?"""
+def _seg_gap(p, q, a, b) -> float:
+    """The least distance between the segments p-q and a-b, 0 where they cross."""
     def side(u, v, w):
         return (v[0] - u[0]) * (w[1] - u[1]) - (v[1] - u[1]) * (w[0] - u[0])
-    if min(math.dist(e, f) for e in (p, q) for f in (a, b)) < tol:
+    if side(a, b, p) * side(a, b, q) < 0 and side(p, q, a) * side(p, q, b) < 0:
+        return 0.0
+    return min(_seg_dist(p, a, b), _seg_dist(q, a, b), _seg_dist(a, p, q), _seg_dist(b, p, q))
+
+
+def _crossing(p, q, a, b, gap: float = LEAD_GAP) -> bool:
+    """Do two leader pieces p-q and a-b cross, or come nearer each other than `gap`, so they read as crossing or as
+    joining? Two pieces that share an end (a leader's line and its shoulder) do not."""
+    if min(math.dist(e, f) for e in (p, q) for f in (a, b)) < 0.05:
         return False
-    d1, d2, d3, d4 = side(a, b, p), side(a, b, q), side(p, q, a), side(p, q, b)
-    if not (d1 * d2 < 0 and d3 * d4 < 0):
-        return False
-    return min(_seg_dist(p, a, b), _seg_dist(q, a, b), _seg_dist(a, p, q), _seg_dist(b, p, q)) > tol
+    return _seg_gap(p, q, a, b) < gap
 
 
 def _dist(p, b) -> float:
@@ -923,58 +931,77 @@ def _box_end(B, box, centre, g):
 
 
 def _move_block(B, block) -> dict | None:
-    """The block's nearest place in STEPS where it is clear, applied to the sheet, or None."""
+    """The block's nearest place in STEPS where it is clear, preferring one that needs no leader to one up to PREFER
+    nearer that does, applied to the sheet, or None."""
     sh = B.sh
-    fr0 = block[0]["fr"]
-    own = {id(it) for it in block}
     b0 = _bnds([p for it in block for p in it["fr"].ring(it["letters"])])
-    centre = ((b0[0] + b0[1]) / 2, (b0[2] + b0[3]) / 2)
     corners = [(b0[0], b0[2]), (b0[1], b0[2]), (b0[1], b0[3]), (b0[0], b0[3])]
-    walls = [f for f in B.fills if not f.holds(corners)]
-    target = next((it["t"]["names"] for it in block if it["t"].get("names")), None)
     leads = _leads(sh, block)
-    tied = _own_leader(leads)
-    skip = {n for n, _ in leads} | {it["n"] for it in block}
-    size = block[0]["t"]["s"]
-    orig = _union(b0, _symbol_bounds(sh, leads))
-    for du, dv in STEPS:
-        dx, dy = du * fr0.c - dv * fr0.s, du * fr0.s + dv * fr0.c
-        if not all(_clear_at(B, it, du, dv, own, walls, skip) for it in block):
+    ctx = dict(own={id(it) for it in block}, centre=((b0[0] + b0[1]) / 2, (b0[2] + b0[3]) / 2),
+               walls=[f for f in B.fills if not f.holds(corners)], leads=leads, tied=_own_leader(leads),
+               target=next((it["t"]["names"] for it in block if it["t"].get("names")), None),
+               skip={n for n, _ in leads} | {it["n"] for it in block}, orig=_union(b0, _symbol_bounds(sh, leads)))
+    led = None
+    for cost, du, dv in STEPS:
+        if led is not None and cost > led[0] + PREFER:
+            break
+        plan = _place(B, block, ctx, du, dv)
+        if plan is None:
             continue
-        moved = _bnds([p for it in block for p in it["fr"].ring(it["letters"], du, dv)])
-        new = _moved_leads(sh, leads, dx, dy) if leads else []
-        shapes = [pts[0] for _, _, pts in new if pts and isinstance(pts[0][0], str)]
-        boxes = [(c[1] - c[3], c[1] + c[3], c[2] - c[3], c[2] + c[3]) if c[0] == "circle" else c[1:] for c in shapes]
-        if not all(_symbol_clear(B, b, own, walls, skip) for b in boxes):
-            continue
-        body = _union(moved, *boxes)
-        lines = [(pts[0], pts[1], _named_end(how, pts)) for (_, how), (_, _, pts) in zip(leads, new)
-                 if len(pts) == 2 and not isinstance(pts[0][0], str)]
-        extra = None
-        if not tied and _off(orig, body, target, size):
-            extra = _fallback(B, body, target, centre, shapes) if target else None
-            if extra is None:
-                continue
-            lines = [(extra[0], extra[1], extra[1])]
-        if any(_crosses_text(B, p, q, own) or B.crosses_leader(p, q, skip) or B.through_symbol(p, q, named, skip)
-               for p, q, named in lines):
-            continue
-        for it in block:
-            _shift_text(sh, it, dx, dy)
-            B.tgrid.add(B.items.index(it), _bnds(it["fr"].ring(it["mask"])))
-        for n, e, _ in new:
-            sh.el[n] = e
-            B.reseg(n, e)
-        how = "with its leader" if tied else "with its symbol" if leads else ""
-        if extra:
-            (sx, sy), (ex, ey), dot = extra
-            B.add(f'<path d="M{sx:.2f},{sy:.2f} L{ex:.2f},{ey:.2f}" {Sheet.STY["thin"]}{lead_attr(target)}/>')
-            if dot:
-                B.add(f'<circle cx="{ex:.2f}" cy="{ey:.2f}" r="0.30" {Sheet.STY["fill"]}/>')
-            how = "with a leader to what it names"
-        return dict(text=" / ".join(it["t"]["t"] for it in block), by=(round(dx, 2), round(dy, 2)), leader=how,
-                    at=(round(block[0]["t"]["x"], 1), round(block[0]["t"]["y"], 1)))
-    return None
+        if plan["extra"] is None:
+            return _apply(B, block, ctx, plan)
+        if led is None:
+            led = (cost, plan)
+    return _apply(B, block, ctx, led[1]) if led else None
+
+
+def _place(B, block, ctx, du, dv) -> dict | None:
+    """The block moved (du, dv) in its own frame, if it is clear there with its leader: its moved leader parts and the
+    leader to what it names it then needs (`extra`), or None."""
+    sh, fr0 = B.sh, block[0]["fr"]
+    dx, dy = du * fr0.c - dv * fr0.s, du * fr0.s + dv * fr0.c
+    own, walls, skip, leads = ctx["own"], ctx["walls"], ctx["skip"], ctx["leads"]
+    if not all(_clear_at(B, it, du, dv, own, walls, skip) for it in block):
+        return None
+    moved = _bnds([p for it in block for p in it["fr"].ring(it["letters"], du, dv)])
+    new = _moved_leads(sh, leads, dx, dy) if leads else []
+    shapes = [pts[0] for _, _, pts in new if pts and isinstance(pts[0][0], str)]
+    boxes = [(c[1] - c[3], c[1] + c[3], c[2] - c[3], c[2] + c[3]) if c[0] == "circle" else c[1:] for c in shapes]
+    if not all(_symbol_clear(B, b, own, walls, skip) for b in boxes):
+        return None
+    body = _union(moved, *boxes)
+    lines = [(pts[0], pts[1], _named_end(how, pts)) for (_, how), (_, _, pts) in zip(leads, new)
+             if len(pts) == 2 and not isinstance(pts[0][0], str)]
+    extra = None
+    if not ctx["tied"] and _off(ctx["orig"], body, ctx["target"], block[0]["t"]["s"]):
+        extra = _fallback(B, body, ctx["target"], ctx["centre"], shapes) if ctx["target"] else None
+        if extra is None:
+            return None
+        lines = [(extra[0], extra[1], extra[1])]
+    if any(_crosses_text(B, p, q, own) or B.crosses_leader(p, q, skip) or B.through_symbol(p, q, named, skip)
+           for p, q, named in lines):
+        return None
+    return dict(dx=dx, dy=dy, new=new, extra=extra)
+
+
+def _apply(B, block, ctx, plan) -> dict:
+    """Move the block as planned: its texts, its leader parts and symbols, and the leader to what it names."""
+    sh, dx, dy, extra = B.sh, plan["dx"], plan["dy"], plan["extra"]
+    for it in block:
+        _shift_text(sh, it, dx, dy)
+        B.tgrid.add(B.items.index(it), _bnds(it["fr"].ring(it["mask"])))
+    for n, e, _ in plan["new"]:
+        sh.el[n] = e
+        B.reseg(n, e)
+    how = "with its leader" if ctx["tied"] else "with its symbol" if ctx["leads"] else ""
+    if extra:
+        (sx, sy), (ex, ey), dot = extra
+        B.add(f'<path d="M{sx:.2f},{sy:.2f} L{ex:.2f},{ey:.2f}" {Sheet.STY["thin"]}{lead_attr(ctx["target"])}/>')
+        if dot:
+            B.add(f'<circle cx="{ex:.2f}" cy="{ey:.2f}" r="0.30" {Sheet.STY["fill"]}/>')
+        how = "with a leader to what it names"
+    return dict(text=" / ".join(it["t"]["t"] for it in block), by=(round(dx, 2), round(dy, 2)), leader=how,
+                at=(round(block[0]["t"]["x"], 1), round(block[0]["t"]["y"], 1)))
 
 
 def _symbol_clear(B, box, own, walls, skip) -> bool:
@@ -996,7 +1023,8 @@ def _symbol_clear(B, box, own, walls, skip) -> bool:
 
 def _clear_at(B, it, du, dv, own, walls, skip=frozenset()) -> bool:
     """Is a text clear moved (du, dv) in its own frame: its mask over no heavy line and no mark but its own parts',
-    inside the frame, off every white fill but its own background, and its letters and mask off every other text's?"""
+    inside the frame, off every white fill but its own background, its letters and mask off every other text's, and
+    SPACE of its size along its line from any other text, so the two never read as one?"""
     fr = it["fr"]
     mring = fr.ring(it["mask"], du, dv)
     mb = _bnds(mring)
@@ -1009,11 +1037,15 @@ def _clear_at(B, it, du, dv, own, walls, skip=frozenset()) -> bool:
     if any(f.meets(mb) for f in walls):
         return False
     lring = fr.ring(it["letters"], du, dv)
-    for k in B.tgrid.near(mb):
+    g = SPACE * it["t"]["s"]
+    let = it["letters"]
+    wide = fr.ring((let[0] - g, let[1] + g, let[2], let[3]), du, dv)
+    for k in B.tgrid.near(_bnds(wide)):
         o = B.items[k]
         if id(o) in own:
             continue
-        if not _sep(mring, o["fr"].ring(o["letters"])) or not _sep(lring, o["fr"].ring(o["mask"])):
+        oring = o["fr"].ring(o["letters"])
+        if not _sep(mring, oring) or not _sep(lring, o["fr"].ring(o["mask"])) or not _sep(wide, oring):
             return False
     return True
 

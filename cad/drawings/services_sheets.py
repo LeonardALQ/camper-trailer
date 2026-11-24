@@ -362,12 +362,12 @@ TAG_REACH = 13.0   # mm: a tag that finds no place clear of the heavy lines this
 
 
 def place_box(anchor, w, h, regions, blocked, taken, ink: Ink, extra_rings: int = 3, heavy: Ink | None = None,
-              reach: float = RINGS[-1], leads=(), circles=()):
+              reach: float = RINGS[-1], leads=(), circles=(), texts=()):
     """Where a w x h label goes near its anchor (sheet mm), within `reach` of it: inside one of the regions, clear of
     every blocked box, every label placed before and, with its mask's margin, every heavy line, its leader from the
-    anchor crossing none of the leaders `leads` (sheet points) and passing through none of the symbols `circles`
-    (cx, cy, r) but the one at its anchor, and over as few drawn lines as it can. Rings outward in 16 directions.
-    Returns the box or None."""
+    anchor crossing or touching none of the leaders `leads` (sheet points), passing through none of the symbols
+    `circles` (cx, cy, r) but the one at its anchor and through none of the texts' boxes `texts` or the labels placed
+    before, and over as few drawn lines as it can. Rings outward in 16 directions. Returns the box or None."""
     best, best_ring = None, None
     for ri, d in enumerate(r for r in RINGS if r <= reach):
         if best_ring is not None and ri > best_ring + extra_rings:
@@ -384,7 +384,7 @@ def place_box(anchor, w, h, regions, blocked, taken, ink: Ink, extra_rings: int 
                 continue
             if heavy is not None and heavy.count((b[0] - 0.5, b[1] - 0.5, b[2] + 0.5, b[3] + 0.5)):
                 continue
-            if (leads or circles) and not _leader_free(anchor, b, leads, circles):
+            if (leads or circles or texts) and not _leader_free(anchor, b, leads, circles, list(texts) + list(taken)):
                 continue
             score = d + 3.0 * ink.count(b)
             if best is None or score < best[0]:
@@ -401,13 +401,15 @@ def _leader_end(a, b) -> tuple:
     return min(max(a[0], b[0]), b[2]), min(max(a[1], b[1]), b[3])
 
 
-def _leader_free(a, b, leads, circles) -> bool:
-    """Does the leader from anchor a to box b cross none of the leaders and pass through none of the symbols but the
-    one at its anchor?"""
+def _leader_free(a, b, leads, circles, boxes=()) -> bool:
+    """Does the leader from anchor a to box b cross or touch none of the leaders and pass through none of the symbols
+    but the one at its anchor and none of the boxes (other texts) but its own?"""
     q = _leader_end(a, b)
     if math.hypot(q[0] - a[0], q[1] - a[1]) <= 0.7:
         return True
     if any(S._crossing(a, q, u, v) for u, v in leads):
+        return False
+    if any(_crosses(a, q, (o[0] + 0.1, o[1] + 0.1, o[2] - 0.1, o[3] - 0.1)) for o in boxes if o != b):
         return False
     return not any(math.hypot(a[0] - c[0], a[1] - c[1]) > c[2] + 0.05 and S._seg_dist(c[:2], a, q) < c[2] - 0.05 for c in circles)
 
@@ -428,7 +430,8 @@ def draw_tags(sh, pr, clusters: list[dict], regions: list[tuple], spill: tuple |
     anchor becomes a numbered mark there, and its lines go into a list at `spill` (x, y top, width). Returns counts."""
     ink = Ink(sh)
     heavy = Ink(sh, heavy=True)
-    blocked = [_text_box(t) for t in sh.texts] + _symbols(sh)
+    words = [_text_box(t) for t in sh.texts]
+    blocked = words + _symbols(sh)
     anchors = [pr.p(*c["anchor"]) for c in clusters]
     circles = [(float(m[1]), S.Sheet.H - float(m[2]), float(m[3])) for m in map(S._CIRCLE.match, sh.el) if m and float(m[3]) <= S.SYMBOL_R]
     circles += [(a[0], a[1], 0.32) for a in anchors]    # every tag's dot, drawn with its tag
@@ -460,12 +463,12 @@ def draw_tags(sh, pr, clusters: list[dict], regions: list[tuple], spill: tuple |
         lines, w = built[i]
         others = [o for j, o in enumerate(dots) if j != i]
         b = place_box(anchors[i], w + 0.4, len(lines) * lh, regions, blocked + others, taken, ink, heavy=heavy,
-                      reach=TAG_REACH if spill is not None else RINGS[-1], leads=leads, circles=circles)
+                      reach=TAG_REACH if spill is not None else RINGS[-1], leads=leads, circles=circles, texts=words)
         if b is None and spill is not None:
             spilled.append(i)
             continue
         if b is None:
-            b = (place_box(anchors[i], w + 0.4, len(lines) * lh, regions, blocked + others, taken, ink, leads=leads, circles=circles)
+            b = (place_box(anchors[i], w + 0.4, len(lines) * lh, regions, blocked + others, taken, ink, leads=leads, circles=circles, texts=words)
                  or place_box(anchors[i], w + 0.4, len(lines) * lh, regions, blocked + others, taken, ink))
         if b is None:
             raise RuntimeError(f"no room for the run tag at {clusters[i]['anchor']}: {clusters[i]['lines']}")
@@ -474,7 +477,7 @@ def draw_tags(sh, pr, clusters: list[dict], regions: list[tuple], spill: tuple |
         mark = f"T{n}"
         others = [o for j, o in enumerate(dots) if j != i]
         w = S.text_mm(mark, size, True) + 0.4
-        b = (place_box(anchors[i], w, lh, regions, blocked + others, taken, ink, heavy=heavy, leads=leads, circles=circles)
+        b = (place_box(anchors[i], w, lh, regions, blocked + others, taken, ink, heavy=heavy, leads=leads, circles=circles, texts=words)
              or place_box(anchors[i], w, lh, regions, blocked + others, taken, ink, heavy=heavy)
              or place_box(anchors[i], w, lh, regions, blocked + others, taken, ink))
         if b is None:

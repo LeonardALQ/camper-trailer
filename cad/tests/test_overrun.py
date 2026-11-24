@@ -142,7 +142,15 @@ def test_two_leaders_that_cross_are_a_leader_fault():
     sh.lead([(250, 150), (262, 140)], names=(250, 150))
     sh.lead([(262, 150), (250, 140)], names=(262, 150))
     svg = sh.svg(clear=False)
-    assert _counts(svg) == (0, 0, 0, 1) and check(svg)["leader_faults"][0]["kind"] == "crosses a leader"
+    assert _counts(svg) == (0, 0, 0, 1) and check(svg)["leader_faults"][0]["kind"] == "crosses or touches a leader"
+
+
+def test_a_leader_ending_on_another_is_a_leader_fault():
+    """A tag's leader that stops 0.1 mm short of another tag's leader reads as joining it."""
+    sh = _sheet()
+    sh.lead([(250, 150), (262, 140)], names=(250, 150))
+    sh.lead([(262, 150), (256.1, 145.1)], names=(262, 150))
+    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 1)
 
 
 def test_a_leader_through_a_symbol_is_a_leader_fault():
