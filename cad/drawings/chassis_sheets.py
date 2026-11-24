@@ -259,7 +259,7 @@ def ct101(prj, model, bom, checks, reg, dwg):
          "CROSSMEMBER IS RHS 150x50x4, A GREY-BAY FLOOR CROSSMEMBER CARRIES THE GREY TANK, NO PLAN BRACES BEHIND THE XT FRONT HINGE, "
          f"EVERY CASE AT THE {_forces()['plate']:.0f} kg PLATE. LOAD PATHS ON CT-104."),
         "XT CROSSMEMBERS AND BODY END CROSSMEMBERS FULL RAIL HEIGHT, NO HOLES. OTHER CROSSMEMBERS AND ALL OUTRIGGERS AT RAISER HEIGHT, TOPS FLUSH WITH THE RAISER.",
-        "BURR-GRIND THE WELD TOES ON THE RAIL AT EVERY FULL-HEIGHT CROSSMEMBER (FAT-01). HOT-DIP GALVANISE THE WHOLE FRAME AFTER WELDING, VENTED TO report 02 WLD-05.",
+        "BURR-GRIND THE WELD TOES ON THE RAIL AT EVERY FULL-HEIGHT CROSSMEMBER (FAT-01). HOT-DIP GALVANISE THE WHOLE FRAME IN ONE DIP AFTER WELDING, HUNG AS CT-103 DETAIL K SAYS, VENTED TO report 02 WLD-05.",
         "SEE CHASSIS.md FOR THE LOAD CASES, THE RESULTS AND WHAT THE ENGINEER MUST CHECK.",
     ], width_chars=118, size=1.7)
     _draft_stamp(sh, 120, 124)
@@ -326,7 +326,7 @@ def _root_detail(sh, ch, x0, y0, k=10.0):
     sh.text(ex + 19, y0 + 19.5, "EACH ROOT INSPECTED BY VIDEOSCOPE FROM INSIDE THE RAIL (NOTE 3)", 1.7)
     weld_symbol(sh, p(x_end, zt + 0.7 * h), (ex, y0 + 16.5), "", both=True, note="HEEL TO THE END PLATE (FAT-18), SIZED AND PLACED AS VIEW C1")
     S.leader(sh, p(V["body_x0"] - ep["t"] / 2, zt + 0.3 * rail.d), (ex, y0 + 11.0),
-             f"END PLATE {ep['t']:g} GR 350 (13) OVER THE RAIL AND THE RAISER'S BOTTOM WALL, ITS BOTTOM EDGE {lift:g} CLEAR AND FREE (FAT-19)", size=1.4)
+             f"END PLATE {ep['t']:g} GR 350 (13) OVER THE RAIL AND THE RAISER'S BOTTOM WALL, ITS BOTTOM EDGE {lift:g} UP AND FREE (FAT-19)", size=1.4)
     S.leader(sh, p(toe + 45, zt + r - math.sqrt(r ** 2 - (u1 + 45) ** 2)), (ex, y0 + 7.0),
              f"GUSSET {g['t']:g} GR 350 (9), {h:g} HIGH AT ITS HEEL: R{r:g} GROUND, END {c:g} HIGH (2t = {2 * g['t']:g} AT MOST),",
              ["5 FILLETS BOTH SIDES WRAPPED ROUND THAT END, TOE GROUND (IIW 522, FAT-07)"], size=1.4)
@@ -348,7 +348,7 @@ def _heel_view(sh, ch, x0, y0, k=2.0):
 
     def p(u, z):
         return x0 + u / k, y0 + z / k
-    lift = ep.get("lift", 0.0)              # the plate's bottom edge over the member's top, where the gusset stands
+    lift = ep.get("lift", 0.0)              # the plate's bottom edge over the rail's underside, where the gusset stands (the lap's 2.5 mm not drawn)
     yb = p(0, lift)[1]
     cx = p(rail.b / 2, 0)[0]
     sh.text(cx, y0 + (lift + ep["w"]) / k + 7.5, "VIEW C1: END PLATE FROM AHEAD (13)", 1.7, "middle", bold=True)
@@ -370,7 +370,7 @@ def _heel_view(sh, ch, x0, y0, k=2.0):
     S.leader(sh, p(heel, 0.5 * g["w"]), (x0 - 4.0, y0 + 0.4 * (lift + ep["w"]) / k), "GUSSET (9),", ["CUT AHEAD"], size=1.3)
     note = (f"THE GUSSET'S HEEL STANDS WITH ITS CENTRE {heel:.0f} FROM THE PLATE'S INBOARD EDGE, {rail.b / 2 - heel:.0f} INBOARD OF ITS "
             f"MIDDLE AND {heel - member:.1f} OUTBOARD OF THE MEMBER'S LINE (CENTRE LINE). ITS TOE STAYS ON THE MEMBER'S CENTRE. "
-            f"THE WEBS' WELDS THEN SHARE ITS PULL (FAT-20). THE PLATE'S BOTTOM EDGE STANDS {lift:g} OVER THE MEMBER, UNWELDED.")
+            f"THE WEBS' WELDS THEN SHARE ITS PULL (FAT-20). THE PLATE'S BOTTOM EDGE STANDS {lift:g} OVER THE RAIL'S UNDERSIDE.")
     for i, t in enumerate(S.wrap_mm(note, 42.0, 1.3)):
         sh.text(x0 - 16.0, y0 - 13.0 - 2.2 * i, t, 1.3)
 
@@ -664,7 +664,8 @@ def ct103(prj, model, bom, checks, reg, dwg):
     sh.rect(cx - 25, zb, cx + 25, zb + rl.d / k, "medium")
     for z in (rl.ro, rl.d - rl.ro):
         sh.line(cx - 25, zb + z / k, cx + 25, zb + z / k, "thin")
-    sh.text(cx - 24.5, zb + rl.d / k + 1, f"RAIL {rl.d:g}x{rl.b:g}x{rl.t:g}, INNER FACE, R{rl.ro:g}", 1.5)
+    sh.text(cx - 24.5, zb + rl.d / k + 1, f"RAIL {rl.d:g}x{rl.b:g}x{rl.t:g}, R{rl.ro:g},", 1.5)    # clear of the weld symbol's arrow
+    sh.text(cx - 24.5, zb + rl.d / k + 3.8, "ITS INNER FACE", 1.5)
     rhs(sh, cx, zb + xt.d / 2 / k, xt.b, xt.d, xt.t, xt.ro, k)
     sh.line(cx - 5, zb + 0.4, cx + 5, zb + 0.4, "thick")
     weld_symbol(sh, (cx + xt.b / 2 / k, zb + 20), (cx - 8, zb + 40), "6", all_round=True, note="ALL ROUND")
