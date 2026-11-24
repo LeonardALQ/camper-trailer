@@ -1524,7 +1524,8 @@ def between_reach(res: dict, ball_drop: float = 0.0) -> list[dict]:
     cover the path pulled taut from the plug over the saddle and any roller to the junction, plus what the worst of those positions
     adds to the span, plus the margin. The shortest span sets how far the bight hangs in the tightest turn
     (`tight_low_mm`, I2-70). A lead that lies over a free-turning sheave (`rolls`) shares its slack between its span
-    from the plug and its bight, and its lowest point is taken over every turn and pitch (`_shared`). `turn_low_mm`
+    from the plug and its bight, one that slides over its saddle's lining (`slides`) shares it within the lining's
+    friction, and its lowest point is taken over every turn and pitch (`_shared`). `turn_low_mm`
     is each lead's lowest in any turn, by the model its support takes, with its yaw and pitch. With `ball_drop`, the same again with the truck's ball that far under the design's
     coupling height, the truck and its plug lowered with it and the trailer turned nose down about its axle group
     (`low_ball`): UTE-13's low end of 420 mm takes the 440 mm ball 20 mm down."""
@@ -1557,42 +1558,56 @@ def between_reach(res: dict, ball_drop: float = 0.0) -> list[dict]:
 
 def _turned(r: dict, rule: dict, points: list, pivot: tuple, row: dict) -> dict:
     """A lead's lowest point in any turn and pitch: over every one with its slack shared over its sheave where it
-    `rolls`, else its bight's in the tightest turn."""
+    `rolls`, between the ends of its lining's friction band where it `slides` over its saddle, else its bight's in the
+    tightest turn."""
     if r.get("rolls") and len(points) == len(r["path"]) + 2:
         low, yw, ph = _shared(r, rule, points, pivot)
         return dict(turn_low_mm=round(low, 1), turn_yaw=yw, turn_pitch=ph, turn_model="shared over its sheave")
+    if r.get("slides") and len(points) == len(r["path"]) + 2:
+        s = r["slides"]
+        k = math.exp(float(s["mu"]) * math.radians(float(s["wrap_deg"])))
+        low, yw, ph = _shared(r, rule, points, pivot, k)
+        return dict(turn_low_mm=round(low, 1), turn_yaw=yw, turn_pitch=ph, turn_ratio=round(k, 2),
+                    turn_model=f"sliding over its saddle's lining at mu {float(s['mu']):g}")
     return dict(turn_low_mm=row["tight_low_mm"], turn_yaw=row["shortest_yaw"], turn_pitch=row["shortest_pitch"], turn_model="its bight")
 
 
-def _shared(r: dict, rule: dict, points: list, pivot: tuple) -> tuple:
-    """A lead over a free-turning sheave (`rolls`, I2-70): at each turn and pitch of rules.between its slack shares
-    between its span from the plug and its bight, which hang to one height, as a lead over a pulley does with the same
-    pull either side (est.). The lowest point over them all, at the cut length, and its yaw and pitch."""
+def _shared(r: dict, rule: dict, points: list, pivot: tuple, k: float = 1.0) -> tuple:
+    """A lead over a free-turning sheave (`rolls`, I2-70) or sliding over its saddle's lining (`slides`, I2-70): at each
+    turn and pitch of rules.between its slack shares between its span from the plug and its bight. Over a free sheave
+    they hang to one height, as a lead over a pulley does with the same pull either side (est.). Over a lining whose
+    friction holds a pull k = e^(mu theta) times the other side's (the capstan rule, theta the wrap), the side holding
+    more slack hangs at most k times as deep under the saddle as the other, each side's pull at the saddle taken as the
+    weight of lead hanging under it (est.), so the lead lies anywhere between those two ends and k = 1 is the sheave's
+    one height. The lowest point over them all, at the cut length, and its yaw and pitch."""
     br, od, cut = r["bend_r"], r["od"], 1000 * r["length_m"]
-    k = next(i for i in range(1, len(points)) if i - 1 not in r["bight"])     # the sheave, after any sag ahead of it
-    p, a, rest = points[0], points[k], [q for i, q in enumerate(points) if i > k]
+    k_ = next(i for i in range(1, len(points)) if i - 1 not in r["bight"])     # the sheave or saddle, after any sag ahead of it
+    p, a, rest = points[0], points[k_], [q for i, q in enumerate(points) if i > k_]
     x = (1.0, 0.0, 0.0)
     best = (math.inf, 0, 0)
-    for ph in range(-int(rule["pitch_deg"]), int(rule["pitch_deg"]) + 1, 5):
-        for yw in range(-int(rule["yaw_deg"]), int(rule["yaw_deg"]) + 1, 5):
-            q = _turn(p, pivot, yw, ph)
-            q1 = _add(q, tuple(40.0 * c for c in _sub(_turn(_add(p, x), pivot, yw, ph), q)))
-            mid = [tuple(q1[i] + (a[i] - q1[i]) * f for i in range(3)) for f in (1 / 3, 2 / 3)]
+    for deep in ((1.0, 1.0),) if k == 1.0 else ((1.0, 1.0 / k), (1.0 / k, 1.0)):     # (span, bight) depth for a unit
+        for ph in range(-int(rule["pitch_deg"]), int(rule["pitch_deg"]) + 1, 5):
+            for yw in range(-int(rule["yaw_deg"]), int(rule["yaw_deg"]) + 1, 5):
+                q = _turn(p, pivot, yw, ph)
+                q1 = _add(q, tuple(40.0 * c for c in _sub(_turn(_add(p, x), pivot, yw, ph), q)))
+                mid = [tuple(q1[i] + (a[i] - q1[i]) * f for i in range(3)) for f in (1 / 3, 2 / 3)]
+                zs_top, zb_top = min(q1[2], a[2]) - 1.0, min(a[2], rest[-1][2]) - 1.0
 
-            def shape(z, q=q, q1=q1, mid=mid):
-                return ([q, q1] + [(c[0], c[1], z) for c in mid] + [a], [a] + [(c[0], c[1], z) for c in rest[:-1]] + [rest[-1]])
+                def shape(d, q=q, q1=q1, mid=mid, zs_top=zs_top, zb_top=zb_top):
+                    zs, zb = min(a[2] - d * deep[0], zs_top), min(a[2] - d * deep[1], zb_top)
+                    return ([q, q1] + [(c[0], c[1], zs) for c in mid] + [a], [a] + [(c[0], c[1], zb) for c in rest[:-1]] + [rest[-1]])
 
-            def drawn(z):
-                return sum(fillet(smooth_jogs(s, br), br)["length"] for s in shape(z))
-            lo, hi = 0.0, min(q1[2], a[2], rest[-1][2]) - 1.0
-            if drawn(hi) >= cut:
-                continue       # pulled straight in this position: nothing hangs
-            for _ in range(40):
-                z = (lo + hi) / 2
-                lo, hi = (z, hi) if drawn(z) > cut else (lo, z)
-            low = min(min(t[2] for t in fillet(smooth_jogs(s, br), br)["dense"]) for s in shape((lo + hi) / 2)) - od / 2
-            if low < best[0]:
-                best = (low, yw, ph)
+                def drawn(d):
+                    return sum(fillet(smooth_jogs(s, br), br)["length"] for s in shape(d))
+                lo, hi = 0.0, a[2]
+                if drawn(lo) >= cut:
+                    continue       # pulled straight in this position: nothing hangs
+                for _ in range(40):
+                    d = (lo + hi) / 2
+                    lo, hi = (lo, d) if drawn(d) > cut else (d, hi)
+                low = min(min(t[2] for t in fillet(smooth_jogs(s, br), br)["dense"]) for s in shape((lo + hi) / 2)) - od / 2
+                if low < best[0]:
+                    best = (low, yw, ph)
     return best
 
 

@@ -1,4 +1,4 @@
-"""The label overrun check on the built sheets (F6-04, fx10, I2-64, I2-69): every sheet SVG in a folder, read in its drawing
+"""The label overrun check on the built sheets (F6-04, fx10, I2-64, I2-69, I2-76): every sheet SVG in a folder, read in its drawing
 order, for the text a mark shows through, the texts whose letters overlap, the masks that break a heavy line and the
 leaders that go wrong, sheet by sheet.
 
@@ -13,10 +13,12 @@ leaders that go wrong, sheet by sheet.
 - A mask break is a text's white mask drawn over a heavy line, one of sheet.HEAVY's 0.35 mm or more (medium, symbol,
   thick, cut, frame and the red fail line), so the mask cuts a gap in an outline or a run. A mask may break the thin
   lines under 0.35 mm (thin, hidden, centre, phantom, hatch, grey), as dimension text does.
-- A leader fault is a leader (a path the sheet marks class="leader") that ends off what its label names, where the sheet
-  says what that is (data-names: a point, a box or a symbol's circle, sheet.Sheet.text), two leaders that cross or come
-  within sheet.LEAD_GAP of each other, or a leader through a symbol (a circle of sheet.SYMBOL_R or less, a dot) other
-  than the one its named end is in.
+- A leader fault is a leader or an arrow's line (a path the sheet marks class="leader", or class="arrow" for the line an
+  arrowhead ends, a weld symbol's arrow among them, sheet.Sheet.arrow) that ends off what its label names, where the
+  sheet says what that is (data-names: a point, a box or a symbol's circle, sheet.Sheet.text), two of them that cross or
+  come within sheet.LEAD_GAP of each other, or one through a symbol (a circle of sheet.SYMBOL_R or less, a dot) other
+  than the one its named end is in. A text drawn in a symbol (data-in, sheet.mark_inside: a contactor's circle, a
+  balloon, a revision triangle) whose letters' middle ends up outside that symbol is one too (I2-76).
 
     python -m cad.tools.overrun build/drawings [report.json]
 
@@ -30,8 +32,8 @@ import re
 import sys
 from pathlib import Path
 
-from cad.drawings.sheet import (CAPS, HEAVY, _crossing, _enters, _path_pts, _seg_dist, _segments, _symbol_circles, on_target,
-                                read_target, text_core)
+from cad.drawings.sheet import (_SYM_IN, _SYM_OF, CAPS, HEAVY, _crossing, _enters, _path_pts, _seg_dist, _segments, _symbol_circles,
+                                in_shape, is_leader, on_target, read_target, symbol_shape, text_core)
 
 _TEXT = re.compile(r"<text ([^>]*)>(.*)</text>")
 _RECT = re.compile(r'<rect x="([-\d.]+)" y="([-\d.]+)" width="([\d.]+)" height="([\d.]+)" fill="#fff"([^>]*)/>')
@@ -88,8 +90,10 @@ def read_sheet(svg: str) -> dict:
             covers.append(_cover(n, (x, x + w, y, y + h), *(map(float, rot.groups()) if rot else (0.0, 0.0, 0.0)), mask=True))
     segs, fills = _segments(el, every=True)
     covers += [_cover(f.n, f.box, 0.0, 0.0, 0.0, circle=f.circle) for f in fills]
-    leaders = [dict(i=n, pts=_path_pts(e), names=read_target(e)) for n, e in enumerate(el) if e.startswith("<path") and 'class="leader"' in e]
-    return dict(el=el, texts=texts, segs=segs, covers=covers, leaders=leaders, symbols=_symbol_circles(el))
+    leaders = [dict(i=n, pts=_path_pts(e), names=read_target(e)) for n, e in enumerate(el) if is_leader(e)]
+    syms = {m[1]: symbol_shape(e) for e in el for m in [_SYM_OF.search(e)] if m}
+    held = [(t, syms.get(m[1])) for t in texts for m in [_SYM_IN.search(el[t["i"]])] if m]
+    return dict(el=el, texts=texts, segs=segs, covers=covers, leaders=leaders, symbols=_symbol_circles(el), held=held)
 
 
 def _bounds(ring: list) -> tuple:
@@ -216,9 +220,14 @@ def check(svg: str) -> dict:
 
 
 def leader_faults(sh: dict) -> list[dict]:
-    """The sheet's leaders that end off what their labels name, that cross another leader, or that pass through a
-    symbol other than the one their named end is in (I2-69)."""
+    """The sheet's leaders and arrows' lines that end off what their labels name, that cross another leader or arrow, or
+    that pass through a symbol other than the one their named end is in (I2-69, I2-76), and the letters drawn in a
+    symbol that end up outside it (I2-76)."""
     out, leaders, el = [], sh["leaders"], sh["el"]
+    for t, shape in sh["held"]:
+        p = t["to_sheet"](((t["core"][0] + t["core"][1]) / 2, (t["core"][2] + t["core"][3]) / 2))
+        if shape is None or not in_shape(p, shape):
+            out.append(dict(kind="out of its symbol", at=[round(t["x"], 2), round(t["y"], 2)], names=t["t"], line=el[t["i"]][:80]))
     for ld in leaders:
         pts, tgt = ld["pts"], ld["names"]
         ends = [pts[0], pts[-1]]

@@ -135,10 +135,14 @@ they are threaded through (`inside`).
   drop and the fuse's to K-10's (`follows`): 0.51 %, 0.32 % and 1.06 % with K-10 at 25 mm2, 1.90 % against 2 %, in two
   30 mm holes in the road rail. An 8 B&S lead would take them to 2.2 %. The 5 % from the truck's battery to the TSC,
   the truck feed's 3 % and the trailer's 2 %, is the design's own, half the 10 % of AS/NZS 3000:2018 clause 7.5.7 for
-  extra-low voltage, and SVC-06 holds the TSC at its 10.5 V floor (est.) at 16 A from 12.0 V (I2-62). Coupled, the leads
-  lie over the saddle DB-HK behind the road-side chain lug, their slack hanging from it as one bight to the junction,
-  each drawn at its cut length with its bight's height solved to it (`bight`), so the running clearance and the
-  breakover read it (I2-63). Each
+  extra-low voltage, and SVC-06 holds the TSC at its 10.5 V floor (est.) at 16 A from 12.0 V (I2-62). Coupled, the SB50's
+  lead K-14 lies over the saddle DB-HK behind the road-side chain lug and slides on its UHMW-PE lining, and the 12-pin
+  lead K-13 over its own free-turning sheave DB-HR beside the saddle, 35 mm outboard of it. Each lead's slack hangs
+  from its support as a bight to the junction, drawn at its cut length with its bight's height solved to it (`bight`),
+  so the running clearance and the breakover read it (I2-63), and in a turn it shares between that bight and the span
+  from the truck's socket, at one height over the sheave and within the lining's friction over the saddle (`rolls`,
+  `slides`, est.). In any turn and pitch K-13 hangs no lower than 307 mm and K-14 235 mm, 289 and 217 mm with the
+  truck's ball at its low 420 mm, so DIM-08 holds both to DIM-06's 200 mm (I2-70). Each
   drum's lead runs from its side's junction under CM-05 out under the tank guard to a P-clip on its XT hanger, 15 mm
   ahead of the arm's pivot and 52.5 mm inboard of the arm, then in a loop down beside the bush and along the arm's
   underside to the backing plate. cad/routes.py lays that arm part on the arm at ride height and FIT-05 sweeps it

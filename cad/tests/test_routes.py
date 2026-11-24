@@ -415,9 +415,9 @@ def test_the_leads_hang_at_their_cut_length_and_reach_every_turn():
 
 def test_the_leads_hang_clear_of_dim06_in_the_tightest_turn_at_both_ball_heights():
     """I2-70: in any turn and pitch of rules.between, at the design's coupling height and with the truck's ball at
-    UTE-13's low end, each lead between the vehicles hangs at least DIM-06's 200 mm up, which DIM-08 holds it to: K-14 in
-    its bight in the tightest turn, K-13 with its slack shared over its free-turning sheave, whose groove bends it no
-    tighter than its radius."""
+    UTE-13's low end, each lead between the vehicles hangs at least DIM-06's 200 mm up, which DIM-08 holds it to: K-14
+    sliding over its saddle's UHMW-PE lining within its friction, K-13 with its slack shared over its free-turning
+    sheave, whose groove bends it no tighter than its radius."""
     import yaml
     checks = {c["id"]: c for c in yaml.safe_load((R.DATA / "checks.yaml").read_text())["trailer_checks"]}
     assert checks["DIM-08"]["min"] == checks["DIM-06"]["min"]
@@ -430,7 +430,30 @@ def test_the_leads_hang_clear_of_dim06_in_the_tightest_turn_at_both_ball_heights
     sheave = RES["fixtures"]["DB-HR"]["box"]
     groove = (sheave[5] - sheave[2]) / 2 - 9.0
     assert k13["rolls"] and "DB-HR" in k13["passes"] and groove + k13["od"] / 2 >= k13["bend_r"]
-    assert next(x for x in rows if x["run"] == "K-13")["turn_model"] == "shared over its sheave"
+    models = {x["run"]: x["turn_model"] for x in rows}
+    assert models["K-13"] == "shared over its sheave" and models["K-14"].startswith("sliding over its saddle's lining")
+
+
+def test_the_sb50_lead_slides_on_its_saddle_where_a_rubber_lining_would_hold_it_low():
+    """I2-70: K-14 lies over the saddle DB-HK, whose lining is UHMW-PE so that the lead slides on it. Over a lining of
+    friction mu the side holding more slack can hang e^(mu theta) times as deep as the other before the lead slides
+    (est.), so DIM-08 reads K-14 at both ends of that band. A rubber lining (mu 0.8, est.) would let the span from the
+    truck's socket keep the slack a tight turn gives it and hang under DIM-06's 200 mm with the ball low, and a free
+    sheave (mu 0) would share the slack at one height, higher than the lining's band allows."""
+    import copy
+    r = next(r for r in RES["runs"] if r["id"] == "K-14")
+    assert "DB-HK" in r["passes"] and "UHMW-PE" in RES["fixtures"]["DB-HK"]["what"] and r["slides"]["wrap_deg"] == 180
+    rule = RES["data"]["rules"]["between"]
+    V = RES["V"]
+    down = (0.0, 0.0, -20.0)
+    pts = [R._add(r["points"][0], down)] + [R._nose_down(q, V, 20.0) for q in r["points"][1:]]
+    pivot = (0.0, 0.0, float(V["coupling_z"]) - 20.0)
+    lows = {}
+    for mu in (0.0, r["slides"]["mu"], 0.8):
+        k = copy.deepcopy(r)
+        k["slides"]["mu"] = mu
+        lows[mu] = R._turned(k, rule, pts, pivot, {})["turn_low_mm"]
+    assert lows[0.0] > lows[r["slides"]["mu"]] >= 200.0 > lows[0.8], lows
 
 
 def test_the_drum_leads_arm_parts_clear_fit05():

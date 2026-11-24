@@ -751,8 +751,10 @@ fixtures:
   # The leads' saddle (I2-63): a clamp round the drawbar member has nowhere to go ahead of it, with the coupling plate CH-P01
   # under the member to X 360 and the chain lug CH-P02 on its outer face to X 460, so it stands just behind the lug, its
   # two thin bands passing under the stone guard between the guard's rubber mounts (est.). Its seat is R 95 mm, no tighter
-  # than K-14's 94.8 mm bend radius, 552 mm up, so the leads on it keep 20 mm under the stone guard (SVC-01)
-  - {id: DB-HK, what: "Saddle the SB50's lead lies over: a rubber-lined 3 mm aluminium saddle bent to R 95 mm, 46 mm wide between 12 mm lips, on a 5 mm stainless bracket held to the road-side drawbar member's outer face by two 19 mm stainless band clamps behind the chain lug (est.)", line: LG-01, at: [505, 206, 533.5], size: [70, 68, 37], needs_run: false, support: true}
+  # than K-14's 94.8 mm bend radius, 552 mm up, so the leads on it keep 20 mm under the stone guard (SVC-01). Its lining
+  # is UHMW-PE, not rubber, so K-14 slides over it as the truck turns (I2-70): a rubber lining would hold the slack a
+  # tight turn gives back to the span from the truck's socket, and the span would hang under DIM-06's 200 mm
+  - {id: DB-HK, what: "Saddle the SB50's lead lies over and slides on: a 3 mm aluminium saddle bent to R 95 mm at its 3 mm UHMW-PE lining's face, the lining riveted in with countersunk aluminium rivets, 46 mm wide between 12 mm lips, on a 5 mm stainless bracket held to the road-side drawbar member's outer face by two 19 mm stainless band clamps behind the chain lug (est.)", line: LG-01, at: [505, 206, 533.5], size: [70, 68, 37], needs_run: false, support: true}
   # The 12-pin lead's sheave (I2-70): K-13's span from the truck's socket is shortest in the tightest turn, and with all
   # the slack that drops into its bight there it would hang about 202 mm up, and 185 mm with the ball at UTE-13's low
   # 420 mm, under DIM-06's 200 mm. So K-13 lies over a free-turning sheave beside the saddle instead, outboard of the
@@ -1086,10 +1088,11 @@ runs:
   # are 5 % from the battery to the TSC, the design's own budget, half the 10 % AS/NZS 3000:2018 clause 7.5.7 allows
   # an extra-low voltage installation (I2-62), and SVC-06 holds the TSC at its 10.5 V floor (est.) or over (`floor_v`).
   # The leads hang between the vehicles (`rides`). Coupled, the SB50's lead K-14 lies over the saddle DB-HK behind the
-  # chain lug, its slack hanging from it straight ahead as one bight to the junction, and pays out over the saddle as the
-  # truck turns (I2-63). The 12-pin lead K-13 lies over its own free-turning sheave DB-HR beside the saddle, so its slack
-  # shares between its bight and its span from the socket (`rolls`, I2-70), though it is drawn, as K-14 is, with all its
-  # slack in its bight, which hangs lower. Each is cut to the length the worst turn and pitch need with a margin (rules.between, est.), and
+  # chain lug, its slack hanging from it straight ahead as one bight to the junction, and slides over the saddle's
+  # UHMW-PE lining as the truck turns (I2-63, I2-70): at each turn its slack shares between its bight and its span from
+  # the socket within the lining's friction (`slides`, est.). The 12-pin lead K-13 lies over its own free-turning sheave
+  # DB-HR beside the saddle, so its slack shares between its bight and its span from the socket (`rolls`, I2-70), though
+  # both are drawn with all their slack in their bights, which hang lower. Each is cut to the length the worst turn and pitch need with a margin (rules.between, est.), and
   # drawn at that length (`cut_m`), its bight hanging at the height that makes it so (`bight`), so DIM-04 to DIM-07
   # read it. The SB50 sits on the bracket's inboard side, nearer the pin, so its stiffer lead needs less slack. K-10
   # leaves the drawbar loom's stack beside it, enters the road rail and leaves it through its inner web ahead of the XT
@@ -1098,6 +1101,7 @@ runs:
   - {id: K-13, system: lamps, kind: lamp12, rides: between, rolls: true, cut_m: 1.20, bight: [1, 2], passes: [DB-HR], feeds: "The 12-pin flat plug's lead from the truck's socket over its sheave beside the saddle to the drawbar junction: the lamps, the brake request on pin 5 and the earth returns", protection: "The truck's lamp fuses and its brake controller",
      serves: [plug lead], from: {line: TB-SK, at: [TB_SK.x1, TB_SK.cy + 40, TB_SK.cz]}, path: [[DB_HR.cx, DB_HR.cy, DB_HR.cz + 72.75], [559, 297, 420], [706, 333, 420]], to: {line: DB-PL, at: [DB_PL.x0, DB_PL.cy + 20, DB_PL.cz]}}
   - {id: K-14, system: dc12, kind: sb50, size: 13.3, size_why: "6 B&S, so that K-14, the fuse and K-10 hold 2 % from the truck's socket to the TSC (8 B&S would drop 2.2 %)", amps: 16, volts: 12, rides: between, cut_m: 1.14, bight: [1, 2], passes: [DB-HK],
+     slides: {mu: 0.3, wrap_deg: 180, why: "K-14's PVC sheath on the saddle's UHMW-PE lining with road dust on it, 0.3 (est.), over UHMW-PE's own 0.15 to 0.20 static on steel (Interstate Plastics' UHMW spec sheet, interstateplastics.com/docs/search/Anti-Static-UHMW-Spec-Sheet.pdf, read 24 Nov 2026). The lead wraps the saddle at most a half turn, both sides hanging straight down from it, which holds the most (est.)"},
      feeds: "The TSC's supply from the truck's Anderson SB50 over the saddle to the drawbar junction, the four magnets' current, hanging between the vehicles", protection: "30 A circuit breaker at the truck's battery for the TSC's supply (TW07)",
      feed: {line: TW07, what: "the truck's half from its battery to its SB50: 6.7 m of 4 B&S twin and a 0.3 m tail of 6 B&S twin", parts: [[6.7, 2.12], [0.3, 3.38]], limit_pct: 3,
             floor_v: 10.5, floor_of: "the TSC",

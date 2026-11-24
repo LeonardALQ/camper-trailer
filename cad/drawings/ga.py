@@ -117,8 +117,8 @@ def ct001(prj, model, bom, checks, reg, dwg):
     hx = ch["hubs_x"]
     ya, xa0, xa1 = E(0, -150)[1], E(hx[0], 0)[0], E(hx[1], 0)[0]
     sh.line(xa0, ya, xa1, ya)
-    sh.arrow((xa0, ya), (-1, 0))
-    sh.arrow((xa1, ya), (1, 0))
+    sh.arrow((xa0, ya), (-1, 0), line=False)
+    sh.arrow((xa1, ya), (1, 0), line=False)
     sh.text((xa0 + E(V["axle_x"], 0)[0]) / 2, ya + 0.8, f"{V['axle_spacing']:.0f}", 1.7, "middle")
     for x in (*hx, V["axle_x"]):
         p0, p1 = E(x, -150), E(x, V["hub_z"] + 420)

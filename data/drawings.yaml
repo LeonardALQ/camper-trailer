@@ -119,6 +119,7 @@ drawings:
       - {rev: W, date: 2026-11-24, description: "The leads over the saddle behind the chain lug, lowest at 389 mm (I2-63)", drawn: Kiro, checked: "", approved: ""}
       - {rev: X, date: 2026-11-24, description: "The 12-pin lead over its sheave, lowest 248 mm in any turn (DIM-08, I2-70)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Y, date: 2026-11-24, description: "Notice: TC2 3,576 kg with growth, the axle group's 3,223 kg (I2-75)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: Z, date: 2026-11-24, description: "Leads from the data: SB50 lead slides on its saddle, lowest 217 mm (DIM-08)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-010
     title: Floor plan, bed up and bed down
     subtitle: Day and night plans, walkways, door swings, spaces kept clear and the bed positions
@@ -496,6 +497,7 @@ drawings:
       - {rev: M, date: 2026-11-23, description: "Notice: D-14 at 7.01 m, straight between the jockey's spacers (I2-53)", drawn: Kiro, checked: "", approved: ""}
       - {rev: N, date: 2026-11-24, description: "The TSC's supply with its 30 A MIDI fuse in DB-PL, D-14's SB120 (I2-61)", drawn: Kiro, checked: "", approved: ""}
       - {rev: O, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: P, date: 2026-11-24, description: "Memo: contactor letters K2, K4 and S1 kept in their circles (I2-69)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-602
     title: Electrical layout
     subtitle: Battery plinth, board, inverter, cable routes, glands, outlets and the cable schedule
@@ -628,6 +630,7 @@ drawings:
       - {rev: H, date: 2026-11-23, description: "Memo: the project line names the Ranger Super Duty", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-24, description: "Memo: fan letters A to D back in their circles, notes beside routes (I2-69)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: K, date: 2026-11-24, description: "Memo: the extract and relief arrows meet at V8 and V9, none cross (I2-76)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-701
     title: Ute with the bike garage, general arrangement
     subtitle: Kerb-side elevations travelling and loading, plan, rear view, mass by case and the ute checks
