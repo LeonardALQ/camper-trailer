@@ -99,6 +99,7 @@ def ct104(prj, model, bom, checks, reg, dwg):
     for x, y, t in hp:
         p = pr.p(x, y)
         sh.path([(p[0], p[1] + 1.4), (p[0] - 1.2, p[1] - 0.8), (p[0] + 1.2, p[1] - 0.8)], "fill", closed=True)
+        sh.el[-1] = sh.el[-1][:-2] + ' class="mark"/>'      # a hardpoint's mark, not an arrowhead, read as a symbol (I2-81)
         hp_label(p, t)
     # the plinth's fourth foot: no member under it (open point)
     xo = V["plinth_x0"] + V["plinth_l"] - 25

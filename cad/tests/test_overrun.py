@@ -270,3 +270,59 @@ def test_a_weld_arrow_drawn_as_a_leader_counts_once_and_ends_on_its_all_round_ci
     sh.circle(elbow[0], elbow[1], r, "thin")
     svg = sh.svg(clear=False)
     assert svg.count('class="leader"') == 1 and 'class="arrow"' not in svg and _counts(svg) == (0, 0, 0, 0)
+
+
+def _flow(sh, pts, level=None):
+    """A flow drawn as the services sheets draw one: its polyline, then its arrowhead at its end (I2-81)."""
+    sh.path(pts, "thin")
+    (a, b), (c, d) = pts[-2], pts[-1]
+    L = ((c - a) ** 2 + (d - b) ** 2) ** 0.5
+    sh.arrow((c, d), ((c - a) / L, (d - b) / L), 1.6, 0.45, level=level)
+
+
+def test_a_polyline_flow_is_read_as_an_arrow_and_its_crossing_fails():
+    """I2-81: a flow's polyline with its head at the end is marked as the arrow's line, so a crossing on its first
+    segments, far from the head, is a leader fault."""
+    sh = _sheet()
+    _flow(sh, [(240, 150), (240, 180), (280, 180)])
+    _flow(sh, [(230, 165), (260, 165)])
+    svg = sh.svg(clear=False)
+    assert svg.count('class="arrow"') == 2 and _counts(svg) == (0, 0, 0, 1)
+
+
+def test_flows_at_different_levels_may_cross_and_one_level_may_not():
+    """I2-81: a duct under the floor and the air in the cabin cross in plan without meeting, so two flows marked at
+    different levels pass, and two at one level, or a level and none, fail."""
+    for lv, faults in ((("floor", "cabin"), 0), (("floor", "floor"), 1), (("floor", None), 1)):
+        sh = _sheet()
+        _flow(sh, [(240, 150), (240, 180), (280, 180)], lv[0])
+        _flow(sh, [(230, 165), (260, 165)], lv[1])
+        assert _counts(sh.svg(clear=False)) == (0, 0, 0, faults), lv
+
+
+def test_a_flow_branching_off_another_at_a_tee_passes():
+    """I2-81: a schematic's branch starts on the main line's run, which is a tee, not a crossing."""
+    sh = _sheet()
+    _flow(sh, [(240, 150), (240, 180), (260, 180)])
+    _flow(sh, [(240, 165), (260, 165)])
+    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 0)
+
+
+def test_a_head_set_along_its_line_marks_the_line():
+    """I2-81: the heat-recovery pairs set a head inside each end of one line, and the line is marked once."""
+    sh = _sheet()
+    sh.line(240, 150, 300, 150, "thin")
+    sh.arrow((295, 150), (1, 0), 1.6, 0.45)
+    sh.arrow((245, 150), (-1, 0), 1.6, 0.45)
+    assert sh.svg(clear=False).count('class="arrow"') == 1
+
+
+def test_a_leader_through_a_hardpoints_mark_is_a_leader_fault():
+    """I2-81: CT-104's hardpoints are filled triangles, marks rather than arrowheads, and a leader may not pass
+    through one, as through any symbol."""
+    sh = _sheet()
+    sh.path([(260, 151.4), (258.8, 149.2), (261.2, 149.2)], "fill", closed=True)
+    sh.el[-1] = sh.el[-1][:-2] + ' class="mark"/>'
+    sh.text(240, 160, "TAG", 2.0)
+    sh.lead([(244, 159), (276, 140)], names=(276, 140))
+    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 1)

@@ -183,12 +183,16 @@ class Sheet:
         self.path(pts, "thin")
         self.el[-1] = self.el[-1][:-2] + lead_attr(self.target(names)) + "/>"
 
-    def arrow(self, tip, direction, length=2.5, half=0.45, line=True):
-        """A filled arrowhead at `tip` pointing along `direction`. The straight line drawn just before it with an end at
-        the tip is its arrow's line (a weld symbol's, a load's, a cut's view arrow), and is marked so the overrun check
-        reads it with the leaders (I2-76), unless `line` is False: a dimension line's arrowheads."""
+    def arrow(self, tip, direction, length=2.5, half=0.45, line=True, level=None):
+        """A filled arrowhead at `tip` pointing along `direction`. The line drawn just before it with an end at the tip,
+        straight or a polyline, or the one it is set along, is its arrow's line (a weld symbol's, a load's, a cut's view
+        arrow, a flow), and is marked so the overrun check reads it with the leaders (I2-76, I2-81), unless `line` is
+        False: a dimension line's arrowheads. A flow's `level` (a duct under the floor, the air in the cabin) is marked
+        on its line, so the check lets two flows at different levels cross in plan, as ducts at different heights do."""
         if line and self.el:
-            mark_arrow(self.el, (tip[0], self._y(tip[1])))
+            k = mark_arrow(self.el, (tip[0], self._y(tip[1])))
+            if k is not None and level and "data-level" not in self.el[k]:
+                self.el[k] = self.el[k][:-2] + f' data-level="{level}"/>'
         (x, y), (dx, dy) = tip, direction
         bx, by = x - dx * length, y - dy * length
         px, py = -dy * half, dx * half
@@ -278,15 +282,28 @@ def is_leader(e: str) -> bool:
     return e.startswith("<path") and ('class="leader"' in e or 'class="arrow"' in e)
 
 
-def mark_arrow(el: list, tip) -> None:
-    """Mark the last element as an arrow's line (I2-76) when it is a stroked straight line with an end at the arrowhead's
-    tip (SVG mm) and is not already a leader."""
-    m = _PATH.match(el[-1])
-    if not m or 'class="' in m[2] or "stroke=" not in m[2] or 'stroke="none"' in m[2]:
-        return
-    pts = _path_pts(el[-1])
-    if len(pts) == 2 and min(math.dist(tip, pts[0]), math.dist(tip, pts[1])) < 0.05:
-        el[-1] = el[-1][:-2] + ' class="arrow"/>'
+def mark_arrow(el: list, tip) -> int | None:
+    """Mark an arrow's line (I2-76, I2-81): the stroked open line, straight or a polyline, drawn just before the
+    arrowhead (no more than three elements back, past the heads already drawn on it) with an end at the head's tip
+    (SVG mm), or the last element drawn when its run passes through the tip, a head set along its line. A line that is
+    already a leader or an arrow's line is left as it is. Returns the line's index, or None."""
+    for k in range(len(el) - 1, max(-1, len(el) - 4), -1):
+        m = _PATH.match(el[k])
+        if not m or "stroke=" not in m[2] or 'stroke="none"' in m[2] or "Z" in m[1] or "A" in m[1]:
+            continue
+        pts = _path_pts(el[k])
+        if is_leader(el[k]):
+            if any(_seg_dist(tip, a, b) < 0.05 for a, b in zip(pts, pts[1:])):
+                return k
+            continue
+        if 'class="' in m[2] or len(pts) < 2:
+            continue
+        at_end = min(math.dist(tip, pts[0]), math.dist(tip, pts[-1])) < 0.05
+        along = k == len(el) - 1 and any(_seg_dist(tip, a, b) < 0.05 for a, b in zip(pts, pts[1:]))
+        if at_end or along:
+            el[k] = el[k][:-2] + ' class="arrow"/>'
+            return k
+    return None
 
 
 _SYM_IN = re.compile(r'data-in="(\d+)"')
@@ -821,13 +838,17 @@ def _path_pts(e: str) -> list:
 
 
 def _symbol_circles(el, n0: int = 0) -> list[tuple]:
-    """Every circle of SYMBOL_R or less on the sheet, stroked (a gland, a mount, a balloon, a fan) or filled (a dot), as
-    (cx, cy, r, element index)."""
+    """Every circle of SYMBOL_R or less on the sheet, stroked (a gland, a mount, a balloon, a fan) or filled (a dot), and
+    every filled mark (class="mark", a hardpoint's triangle) by the circle round it, as (cx, cy, r, element index)."""
     out = []
     for n, e in enumerate(el, n0):
         m = _CIRCLE.match(e) if e.startswith("<circle") else None
         if m and float(m[3]) <= SYMBOL_R:
             out.append((float(m[1]), float(m[2]), float(m[3]), n))
+        elif e.startswith("<path") and 'class="mark"' in e:      # a filled mark, a hardpoint's triangle (I2-81)
+            pts = _path_pts(e)
+            cx, cy = sum(p[0] for p in pts) / len(pts), sum(p[1] for p in pts) / len(pts)
+            out.append((cx, cy, max(math.dist((cx, cy), p) for p in pts), n))
     return out
 
 
