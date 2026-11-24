@@ -17,6 +17,7 @@ import time
 
 from ..build import BUILD, git_hash
 from ..chassis import fitting_solids, member_solid
+from ..chassis_fea import heel_throats
 from ..trailer import Trailer
 from . import sheet as S
 
@@ -88,10 +89,11 @@ def _draft_stamp(sh, x, y):
 
 
 def weld_symbol(sh, tip, elbow, size: str, other_side=False, both=False, all_round=False, length: str = "", note: str = "",
-                bevel=False):
+                bevel=False, size_other: str = ""):
     """AS 1101.3 fillet weld symbol: arrow to the joint, reference line, the triangle below the line for the arrow
     side (above for the other side, both for both sides), the leg size on the left and the length on the right, a
-    circle at the elbow for all round. `bevel` draws the single bevel butt weld's symbol in place of the triangle."""
+    circle at the elbow for all round. `bevel` draws the single bevel butt weld's symbol in place of the triangle.
+    `size_other` gives the other side's leg above the line where both sides are welded to different sizes."""
     (tx, ty), (ex, ey) = tip, elbow
     sh.line(tx, ty, ex, ey, "thin")
     L = math.hypot(tx - ex, ty - ey) or 1
@@ -111,6 +113,8 @@ def weld_symbol(sh, tip, elbow, size: str, other_side=False, both=False, all_rou
         else:
             sh.path([(xm - 1.3, ey), (xm - 1.3, ey + d * 2.6), (xm + 1.3, ey)], "medium", closed=True)
     sh.text(xm - 2.2, ey - 2.4 if not other_side else ey + 1.0, size, 1.8, "end")
+    if size_other:
+        sh.text(xm - 2.2, ey + 1.0, size_other, 1.8, "end")
     if length:
         sh.text(xm + 2.0, ey - 2.4 if not other_side else ey + 1.0, length, 1.8)
     if all_round:
@@ -309,11 +313,12 @@ def _root_detail(sh, ch, x0, y0, k=10.0):
     S.leader(sh, p(toe + 45, zt + r - math.sqrt(r ** 2 - (u1 + 45) ** 2)), (ex, y0 + 22.5),
              f"GUSSET {g['t']:g} GR 350 (9), {h:g} HIGH AT ITS HEEL: R{r:g} GROUND, END {c:g} HIGH (2t = {2 * g['t']:g} AT MOST),",
              ["5 FILLETS BOTH SIDES WRAPPED ROUND THAT END, TOE GROUND (IIW 522, FAT-07)"], size=1.4)
-    weld_symbol(sh, p(x_end, zt + 0.7 * h), (ex, y0 + 16.5), f"{g['heel_leg']:g}", both=True, note="HEEL TO THE END PLATE (FAT-18), PLACED AS VIEW C1")
+    weld_symbol(sh, p(x_end, zt + 0.7 * h), (ex, y0 + 16.5), "", both=True, note="HEEL TO THE END PLATE (FAT-18), SIZED AND PLACED AS VIEW C1")
     S.leader(sh, p(V["body_x0"] - ep["t"] / 2, zt + 0.3 * rail.d), (ex, y0 + 11.0),
              f"END PLATE {ep['t']:g} GR 350 (13) OVER THE RAIL AND THE RAISER'S BOTTOM WALL, ITS BOTTOM EDGE FREE (FAT-19)", size=1.4)
     weld_symbol(sh, p(V["body_x0"], zt + 0.85 * rail.d), (ex, y0 + 5.5), "", bevel=True,
-                note="PLATE TO THE WEBS AND TOP: FULL PENETRATION FROM OUTSIDE (FAT-20)")
+                note="PLATE TO THE WEBS AND TOP: FULL PENETRATION FROM OUTSIDE (FAT-20),")
+    sh.text(ex + 19, y0 + 2.5, "EACH ROOT INSPECTED BY VIDEOSCOPE FROM INSIDE THE RAIL (NOTE 3)", 1.7)
     S.leader(sh, (m0[0], (m0[1] + m1[1]) / 2), (ex, y0 - 0.5), "MITRE: FULL PENETRATION FROM ONE SIDE, WELDED FLAT,",
              ["IIW 234 AT FAT 36, SO ITS ROOT NEEDS NO NDT (FAT-17)"], size=1.4)
 
@@ -337,6 +342,12 @@ def _heel_view(sh, ch, x0, y0, k=2.0):
     sh.text(cx, y0 + ep["w"] / k + 4.8, f"SCALE 1:{k:g}, KERB SIDE, ROAD SIDE MIRRORED", 1.4, "middle")
     sh.rect(*p(0, 0), *p(rail.b, ep["w"]), "medium")
     plate(sh, *p(heel - half, 0), *p(heel + half, g["w"]))
+    legs = g["heel_legs"]
+    for u0, u1 in ((heel - half - legs[0], heel - half), (heel + half, heel + half + legs[1])):
+        sh.rect(*p(u0, 0), *p(u1, g["w"]), "thin")
+    throat = min(heel_throats(legs, math.atan(V["root_gusset_slope"])))
+    weld_symbol(sh, p(heel - half - legs[0] / 2, 120.0), (x0 - 6.0, y0 + 60.0), f"{legs[0]:g}", both=True, size_other=f"{legs[1]:g}",
+                note=f"LEGS {legs[0]:g} INBOARD AND {legs[1]:g} OUTBOARD, THROAT {throat:.1f} BOTH SIDES")
     a, b = p(member, -3), p(member, g["w"] + 6)
     sh.line(a[0], a[1], b[0], b[1], "centre")
     sh.text(x0 - 1.2, y0 + 1.0, "INBOARD", 1.3, rot=-90)
@@ -465,16 +476,23 @@ def ct102(prj, model, bom, checks, reg, dwg):
             title="LOCAL CHECKS (CHASSIS.md)")
     _root_detail(sh, ch, 240.0, 80.0)
     _heel_view(sh, ch, 202.0, 36.0)
+    g_legs = next(f for f in ch.data["fittings"] if f["id"] == "CH-P03")["heel_legs"]
+    g_throat = min(heel_throats(g_legs, math.atan(V["root_gusset_slope"])))
+    gaps = [h["x"] - V["body_x0"] for h in chs["results"]["holes"] if h.get("frame", "").startswith("RL-")
+            and h["wall"].startswith("the rail's") and 0 < h["x"] - V["body_x0"] <= 150]
+    hole_gap = (min(gaps), max(gaps))      # the front cable holes the videoscope goes in by (FAT-20)
     S.notes(sh, 22, 64, [
         "DRAWBAR MEMBERS RHS 150x50x6 C450L0 FROM THE APEX (X 250, Y +/-60) TO THE RAIL CENTRES AT THE BODY FRONT, THEN 1000 UNDER EACH RAIL. CONTINUOUS 5 mm FILLETS ON BOTH EDGES TO THE RAIL UNDERSIDE, SNIPED TAPER END WITH THE TOE GROUND (CT-103 DETAIL D).",
         ("NO WELD ON THE MEMBERS' TOP OR BOTTOM FACES WITHIN 300 OF THE BODY FRONT EXCEPT THE ROOT GUSSET (9) AND THE MITRE (DETAIL C). THE GUSSET IS IIW 522, "
          "FAT 90 (FAT-07): ITS 160 RADIUS GROUND SMOOTH DOWN TO AN END 10 HIGH, AT MOST TWICE ITS 10 mm, 270 AHEAD OF THE BODY FRONT, ITS FILLETS WRAPPED "
          "ROUND THAT END AND THE TOE GROUND. THE CROSS BRACE SITS AT MID-DEPTH."),
-        ("A 16 mm END PLATE (13) CLOSES EACH RAIL'S FRONT END AND THE RAISER'S BOTTOM WALL OVER IT AND TAKES THE GUSSET'S HEEL ON 8 mm FILLETS BOTH SIDES "
-         "(FAT-18, FAT-19). ITS EDGES ON THE WEBS AND THE TOP ARE BEVELLED, AND THE WALLS ARE WELDED TO IT WITH FULL PENETRATION FROM OUTSIDE, THE INBOARD "
-         "WEB FROM AHEAD OF THE FRONT CROSSMEMBER, THE PLATE BEHIND EACH ROOT (IIW 415, FAT-20). ITS BOTTOM EDGE IS NOT WELDED. THE MITRE UNDER IT "
-         "IS A FULL PENETRATION BUTT WELD MADE FROM ONE SIDE ON THE BENCH, EACH FACE WELDED FLAT, BEFORE THE MEMBER GOES UNDER THE RAIL. IT IS CLASSED AT IIW 234 "
-         "FAT 36, SO ITS ROOT NEEDS NO NDT (FAT-17)."),
+        ("A 16 mm END PLATE (13) CLOSES EACH RAIL'S FRONT END AND THE RAISER'S BOTTOM WALL OVER IT AND TAKES THE GUSSET'S HEEL ON FILLETS "
+         f"{g_legs[0]:g} INBOARD AND {g_legs[1]:g} OUTBOARD, THROAT {g_throat:.1f} (VIEW C1, FAT-18, FAT-19). ITS EDGES ON THE WEBS AND THE TOP ARE BEVELLED, "
+         "AND THE WALLS ARE WELDED TO IT WITH FULL PENETRATION FROM OUTSIDE, THE INBOARD WEB FROM AHEAD OF THE FRONT CROSSMEMBER, THE PLATE BEHIND EACH "
+         "ROOT. BEFORE GALVANISING THE INSPECTOR VIEWS EACH ROOT ALONG ITS LENGTH BY VIDEOSCOPE THROUGH THE FRONT CABLE HOLES IN THE RAIL'S WEBS, "
+         f"{hole_gap[0]:.0f} TO {hole_gap[1]:.0f} BEHIND THE PLATE, AND RECORDS IT (IIW 415 AT FAT 71, FAT-20). THE PLATE HAS NO VENT AND ITS BOTTOM EDGE "
+         "IS NOT WELDED. THE MITRE UNDER IT IS A FULL PENETRATION BUTT WELD MADE FROM ONE SIDE ON THE BENCH, EACH FACE WELDED FLAT, BEFORE THE MEMBER "
+         "GOES UNDER THE RAIL. IT IS CLASSED AT IIW 234 FAT 36, SO ITS ROOT NEEDS NO NDT (FAT-17)."),
         ("VSB1 9.1 AT THE {plate:.0f} kg PLATE: {along:.1f} kN ALONG, {across:.1f} kN ACROSS AND {up:.1f} kN UP AND DOWN AT THE COUPLING. VSB1 9.2.2: "
          "{chain:.1f} kN ALONG AND {chain_up:.1f} kN VERTICAL AT EACH CHAIN LUG. EVIDENCE BY TEST OR APPROVED CALCULATION, FOR THE ENGINEER.").format(**_forces()),
         "NEVER USE THE COUPLING OR THE TOW PIN FOR RECOVERY. USE THE RECOVERY LUGS (10) AND THE REAR TONGUES ONLY.",
@@ -489,6 +507,17 @@ def ct102(prj, model, bom, checks, reg, dwg):
 def _detail_title(sh, cx, top, title, scale):
     sh.text(cx, top, title, 2.2, "middle", bold=True)
     sh.text(cx, top - 3.5, f"SCALE 1:{scale:g}", 1.9, "middle")
+
+
+def _clip(text: str, n: int) -> str:
+    """The text cut at its last whole word within n characters, before a bracket it would leave open, its trailing
+    comma dropped."""
+    if len(text) <= n:
+        return text
+    out = text[:n + 1].rsplit(" ", 1)[0]
+    if out.count("(") > out.count(")"):
+        out = out[:out.rfind(" (")]
+    return out.rstrip(",")
 
 
 def ct103(prj, model, bom, checks, reg, dwg):
@@ -604,12 +633,12 @@ def ct103(prj, model, bom, checks, reg, dwg):
     rows = []
     for f in chs["results"]["fatigue"]:
         col = "#000" if f["ok"] else "#c00"
-        rows.append([f["id"], f["name"][:62], f"{f['fat']:g}", (f"{f['range_mpa']:.0f} / {f['cafl']:.0f}", col), (f"{f['damage']:.2f}", col),
+        rows.append([f["id"], _clip(f["name"], 118), f"{f['fat']:g}", (f"{f['range_mpa']:.0f} / {f['cafl']:.0f}", col), (f"{f['damage']:.2f}", col),
                      "HS" if f["hot_spot"] else ""])
     S.table(sh, 230.0, 262.0, [("DETAIL", 13), ("JOINT", 103), ("FAT", 10), ("RANGE/CAFL", 24), ("MINER", 14), ("", 14)], rows,
             size=1.5, row_h=2.95, title="FATIGUE AT EACH WELDED DETAIL, LC10 (HS = HOT-SPOT CHECK)")
     S.notes(sh, 22, 64, [
-        "WELDS SP TO AS/NZS 1554.1, E49XX OR W50X. VISUAL ON EVERY WELD, DYE PENETRANT OR MPI ON THE DRAWBAR TO CHASSIS JOINT, THE COUPLING MOUNT AND THE SUSPENSION BRACKETS (report 02 WLD-03).",
+        "WELDS SP TO AS/NZS 1554.1, E49XX OR W50X. VISUAL ON EVERY WELD, DYE PENETRANT OR MPI ON THE DRAWBAR TO CHASSIS JOINT, THE COUPLING MOUNT AND THE SUSPENSION BRACKETS (report 02 WLD-03). THE RAIL END PLATES' WELD ROOTS BY VIDEOSCOPE FROM INSIDE THE RAILS (CT-102, FAT-20).",
         "HOT-DIP GALVANISE AFTER FABRICATION TO AS/NZS 4680. VENT EVERY CLOSED SECTION AND SEALED SEAM BEFORE WELDING, HOLES AGREED WITH THE GALVANISER (report 02 WLD-05).",
         "FILLET SIZES ARE LEGS: 5 mm UNLESS STATED, 6 mm ON THE XT CROSSMEMBER ENDS, THE OUTRIGGER ROOTS, THE LUGS AND THE TONGUES.",
     ], width_chars=118, size=1.7)
