@@ -63,7 +63,8 @@ def tow_vehicle(prj: Project) -> dict:
     return dict(name=tv["name"], limits=lim, limit_src=src, gcm_case=tv["gcm_case"], case_name=case["name"],
                 ute_kg=case["nominal"]["mass_kg"], ute_kg_growth=case["growth"]["mass_kg"], sweep=rep["bike_box_sweep"],
                 rear_kg_growth=rear0, rear_kg_nominal=case["nominal"]["rear_kg"], rear_per_ball=per_ball,
-                ball_behind_axle=rep["params"]["ball_behind_axle"],
+                ball_behind_axle=rep["params"]["ball_behind_axle"], coupling_z=rep["params"]["coupling_z"],
+                coupling_tol=rep["params"]["coupling_tol"],
                 design_ball_kg=tow["growth"]["towball_kg"], tow_case=tow["id"], box_kg=rep["garage"]["box_kg"],
                 ute_checks=[dict(id=c["id"], title=c["title"], status=c["status"], detail=c["detail"], measured=c.get("measured"))
                             for c in rep["checks"]])
@@ -757,6 +758,24 @@ class Trailer:
                     for p, _ in R._samples(r["dense"], 10.0)]
         return out
 
+    def leads_turned(self, lay, low: float) -> dict:
+        """DIM-08 (I2-70): the leads between the vehicles in the tightest turn and pitch of rules.between, each lead's
+        lowest point at the design's coupling height and with the truck's ball at UTE-13's low end, its tolerance
+        under it, the trailer turned nose down about its axle group (cad/routes.py between_reach)."""
+        from . import routes as R
+        tol = self.tv["coupling_tol"]
+        rows = R.between_reach(self.routes(lay), ball_drop=tol)
+        z = lay.V["coupling_z"]
+        cases = [(x["turn_low_mm"], x["run"], z, x["turn_yaw"], x["turn_pitch"]) for x in rows]
+        cases += [(x["low_ball"]["turn_low_mm"], x["run"], z - tol, x["low_ball"]["turn_yaw"], x["low_ball"]["turn_pitch"]) for x in rows]
+        v, run, ball, yaw, pitch = min(cases)
+        each = "; ".join(f"{x['run']}, {x['turn_model']}, {x['turn_low_mm']:.1f} mm at the {z:.0f} mm ball and "
+                         f"{x['low_ball']['turn_low_mm']:.1f} mm at {z - tol:.0f} mm" for x in rows)
+        return dict(limit=f">= {low:g} mm", measured=v, unit="mm", margin=round(v - low, 1), ok=v >= low - 1e-6,
+                    governing=f"{run} with the ball at {ball:.0f} mm", leads=rows,
+                    detail=(f"lowest {v:.1f} mm, {run} turned {abs(yaw)} degrees with a {abs(pitch)} degree pitch, the ball at {ball:.0f} mm. "
+                            f"Each lead's lowest in any turn: {each}"))
+
     def layout(self, **over) -> Layout:
         lay = Layout(self.td, self.prj, {**self.base, **over})
         self.weighed_rows = lay.apply_weighed(self.weighed)
@@ -1141,6 +1160,8 @@ class Trailer:
                 row.update(limit=f">= {c.min:g} mm", measured=round(g["z_mm"], 1), unit="mm", margin=round(g["z_mm"] - c.min, 1),
                            ok=g["z_mm"] >= c.min, governing=g["governing"], line=g["line"],
                            detail=f"lowest rigid sprung part {g['z_mm']:.1f} mm above the ground at design ride height, {g['governing']}")
+            elif c.type == "clearance_leads":
+                row.update(self.leads_turned(lay, c.min))
             elif c.type == "breakover":
                 ahead = self.tv["ball_behind_axle"]
                 bo = lay.breakover(-ahead, self.underside_items(lay))

@@ -1507,41 +1507,117 @@ def _turn(p: tuple, pivot: tuple, yaw: float, pitch: float) -> tuple:
     return _add(pivot, (x, y, z))
 
 
-def between_reach(res: dict) -> list[dict]:
+def _nose_down(q: tuple, V: dict, drop: float) -> tuple:
+    """A point on the trailer with its coupling `drop` mm lower and its axle group still on the ground: the trailer
+    turned nose down about the axle group's hub line, by the angle that lowers the pin at X 0 by `drop`."""
+    th = math.asin(drop / V["axle_x"])
+    dx, dz = q[0] - V["axle_x"], q[2] - V["hub_z"]
+    return (V["axle_x"] + dx * math.cos(th) - dz * math.sin(th), q[1], V["hub_z"] + dz * math.cos(th) + dx * math.sin(th))
+
+
+def between_reach(res: dict, ball_drop: float = 0.0) -> list[dict]:
     """I2-63: each lead that hangs between the vehicles with a bight (`rides: between`, `bight`) against the turns
     and the pitch it must follow (rules.between). The truck turns about the coupling's pin, up to the coupling's
     yaw either way and the relative pitch either way, and the lead leaves its plug along the socket's axis and bends
     no tighter than its radius to the point it lies over (its first path point, the saddle). Its cut length must
-    cover the path pulled taut from the plug over the saddle to the junction, plus what the worst of those positions
-    adds to the span, plus the margin. The shortest span sets how far the bight hangs in the tightest turn."""
+    cover the path pulled taut from the plug over the saddle and any roller to the junction, plus what the worst of those positions
+    adds to the span, plus the margin. The shortest span sets how far the bight hangs in the tightest turn
+    (`tight_low_mm`, I2-70). A lead that lies over a free-turning sheave (`rolls`) shares its slack between its span
+    from the plug and its bight, and its lowest point is taken over every turn and pitch (`_shared`). `turn_low_mm`
+    is each lead's lowest in any turn, by the model its support takes, with its yaw and pitch. With `ball_drop`, the same again with the truck's ball that far under the design's
+    coupling height, the truck and its plug lowered with it and the trailer turned nose down about its axle group
+    (`low_ball`): UTE-13's low end of 420 mm takes the 440 mm ball 20 mm down."""
     rule = res["data"]["rules"]["between"]
-    pivot = (0.0, 0.0, float(res["V"]["coupling_z"]))
+    V = res["V"]
     out = []
     for r in res["runs"]:
         if r.get("rides") != "between" or not r.get("bight"):
             continue
-        p, a, e = r["reach_pts"]
-        x = (1.0, 0.0, 0.0)
-        s0 = _span(p, x, a, r["bend_r"])
-        spans = []
-        for ph in range(-int(rule["pitch_deg"]), int(rule["pitch_deg"]) + 1, 5):
-            for yw in range(-int(rule["yaw_deg"]), int(rule["yaw_deg"]) + 1, 2):
-                q = _turn(p, pivot, yw, ph)
-                u = _sub(_turn(_add(p, x), pivot, yw, ph), q)
-                spans.append((_span(q, u, a, r["bend_r"]), yw, ph))
-        far, near = max(spans), min(spans)
-        taut = fillet([p, a, e], r["bend_r"])["length"]
-        need = taut + (far[0] - s0) + float(rule["margin_mm"])
-        idx = [i + 1 for i in r["bight"]]
-        tight = None
-        if len(r["points"]) == len(r["path"]) + 2:
-            q, _ = hang_bight(r["points"], idx, 1000 * r["length_m"] + s0 - near[0], r["bend_r"])
-            tight = min(t[2] for t in fillet(smooth_jogs(q, r["bend_r"]), r["bend_r"])["dense"]) - r["od"] / 2
-        out.append(dict(run=r["id"], cut_mm=round(1000 * r["length_m"]), need_mm=round(need), taut_mm=round(taut), span_mm=round(s0),
-                        worst_mm=round(far[0]), worst_yaw=far[1], worst_pitch=far[2], shortest_mm=round(near[0]),
-                        shortest_yaw=near[1], shortest_pitch=near[2], margin_mm=float(rule["margin_mm"]),
-                        low_mm=round(min(t[2] for t in r["dense"]) - r["od"] / 2, 1), tight_low_mm=None if tight is None else round(tight, 1)))
+        pivot = (0.0, 0.0, float(V["coupling_z"]))
+        row = _reach(r, rule, r["points"], r["reach_pts"], pivot)
+        row.update(_turned(r, rule, r["points"], pivot, row))
+        held = [q for i, q in enumerate(r["points"]) if i - 1 not in r["bight"]]    # the plug, the saddle, a roller, the junction
+        taut = fillet(held, r["bend_r"])["length"]
+        raw = row.pop("raw")
+        row.update(run=r["id"], cut_mm=round(1000 * r["length_m"]), need_mm=round(taut + raw[1] - raw[0] + float(rule["margin_mm"])),
+                   taut_mm=round(taut), margin_mm=float(rule["margin_mm"]), low_mm=round(min(t[2] for t in r["dense"]) - r["od"] / 2, 1))
+        if ball_drop:
+            p, a, e = r["reach_pts"]
+            down = (0.0, 0.0, -float(ball_drop))
+            pts = [_add(r["points"][0], down)] + [_nose_down(q, V, ball_drop) for q in r["points"][1:]]
+            pivot = (0.0, 0.0, float(V["coupling_z"]) - ball_drop)
+            low = _reach(r, rule, pts, (_add(p, down), _nose_down(a, V, ball_drop), _nose_down(e, V, ball_drop)), pivot)
+            low.update(_turned(r, rule, pts, pivot, low))
+            row["low_ball"] = dict(ball_z=float(V["coupling_z"]) - ball_drop,
+                                   **{k: v for k, v in low.items() if k.startswith(("tight", "shortest", "straight", "turn"))})
+        out.append(row)
     return out
+
+
+def _turned(r: dict, rule: dict, points: list, pivot: tuple, row: dict) -> dict:
+    """A lead's lowest point in any turn and pitch: over every one with its slack shared over its sheave where it
+    `rolls`, else its bight's in the tightest turn."""
+    if r.get("rolls") and len(points) == len(r["path"]) + 2:
+        low, yw, ph = _shared(r, rule, points, pivot)
+        return dict(turn_low_mm=round(low, 1), turn_yaw=yw, turn_pitch=ph, turn_model="shared over its sheave")
+    return dict(turn_low_mm=row["tight_low_mm"], turn_yaw=row["shortest_yaw"], turn_pitch=row["shortest_pitch"], turn_model="its bight")
+
+
+def _shared(r: dict, rule: dict, points: list, pivot: tuple) -> tuple:
+    """A lead over a free-turning sheave (`rolls`, I2-70): at each turn and pitch of rules.between its slack shares
+    between its span from the plug and its bight, which hang to one height, as a lead over a pulley does with the same
+    pull either side (est.). The lowest point over them all, at the cut length, and its yaw and pitch."""
+    br, od, cut = r["bend_r"], r["od"], 1000 * r["length_m"]
+    p, a, rest = points[0], points[1], points[2:]
+    x = (1.0, 0.0, 0.0)
+    best = (math.inf, 0, 0)
+    for ph in range(-int(rule["pitch_deg"]), int(rule["pitch_deg"]) + 1, 5):
+        for yw in range(-int(rule["yaw_deg"]), int(rule["yaw_deg"]) + 1, 5):
+            q = _turn(p, pivot, yw, ph)
+            q1 = _add(q, tuple(40.0 * c for c in _sub(_turn(_add(p, x), pivot, yw, ph), q)))
+            mid = [tuple(q1[i] + (a[i] - q1[i]) * f for i in range(3)) for f in (1 / 3, 2 / 3)]
+
+            def shape(z, q=q, q1=q1, mid=mid):
+                return ([q, q1] + [(c[0], c[1], z) for c in mid] + [a], [a] + [(c[0], c[1], z) for c in rest[:-1]] + [rest[-1]])
+
+            def drawn(z):
+                return sum(fillet(smooth_jogs(s, br), br)["length"] for s in shape(z))
+            lo, hi = 0.0, min(q1[2], a[2], rest[-1][2]) - 1.0
+            if drawn(hi) >= cut:
+                continue       # pulled straight in this position: nothing hangs
+            for _ in range(40):
+                z = (lo + hi) / 2
+                lo, hi = (z, hi) if drawn(z) > cut else (lo, z)
+            low = min(min(t[2] for t in fillet(smooth_jogs(s, br), br)["dense"]) for s in shape((lo + hi) / 2)) - od / 2
+            if low < best[0]:
+                best = (low, yw, ph)
+    return best
+
+
+def _reach(r: dict, rule: dict, points: list, reach_pts: tuple, pivot: tuple) -> dict:
+    """One lead's spans over the turns and pitches of rules.between, the truck's plug and the pin at `pivot`: the span
+    straight ahead, the worst and the shortest, and where its bight hangs straight ahead and in the tightest turn."""
+    p, a, e = reach_pts
+    x = (1.0, 0.0, 0.0)
+    s0 = _span(p, x, a, r["bend_r"])
+    spans = []
+    for ph in range(-int(rule["pitch_deg"]), int(rule["pitch_deg"]) + 1, 5):
+        for yw in range(-int(rule["yaw_deg"]), int(rule["yaw_deg"]) + 1, 2):
+            q = _turn(p, pivot, yw, ph)
+            u = _sub(_turn(_add(p, x), pivot, yw, ph), q)
+            spans.append((_span(q, u, a, r["bend_r"]), yw, ph))
+    far, near = max(spans), min(spans)
+    idx = [i + 1 for i in r["bight"]]
+    straight = tight = None
+    if len(points) == len(r["path"]) + 2:
+        cut = 1000 * r["length_m"]
+        q, _ = hang_bight(points, idx, cut, r["bend_r"])
+        straight = min(t[2] for t in fillet(smooth_jogs(q, r["bend_r"]), r["bend_r"])["dense"]) - r["od"] / 2
+        q, _ = hang_bight(points, idx, cut + s0 - near[0], r["bend_r"])
+        tight = min(t[2] for t in fillet(smooth_jogs(q, r["bend_r"]), r["bend_r"])["dense"]) - r["od"] / 2
+    return dict(raw=(s0, far[0], near[0]), span_mm=round(s0), worst_mm=round(far[0]), worst_yaw=far[1], worst_pitch=far[2], shortest_mm=round(near[0]),
+                shortest_yaw=near[1], shortest_pitch=near[2], straight_low_mm=None if straight is None else round(straight, 1),
+                tight_low_mm=None if tight is None else round(tight, 1))
 
 
 def falls(res: dict) -> dict:

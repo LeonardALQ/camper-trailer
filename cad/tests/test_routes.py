@@ -413,6 +413,26 @@ def test_the_leads_hang_at_their_cut_length_and_reach_every_turn():
     assert sad[0] > chs["CH-P01"][3] and sad[0] > chs["CH-P02"][3], "the saddle stands behind the coupling plate and the chain lug"
 
 
+def test_the_leads_hang_clear_of_dim06_in_the_tightest_turn_at_both_ball_heights():
+    """I2-70: in any turn and pitch of rules.between, at the design's coupling height and with the truck's ball at
+    UTE-13's low end, each lead between the vehicles hangs at least DIM-06's 200 mm up, which DIM-08 holds it to: K-14 in
+    its bight in the tightest turn, K-13 with its slack shared over its free-turning sheave, whose groove bends it no
+    tighter than its radius."""
+    import yaml
+    checks = {c["id"]: c for c in yaml.safe_load((R.DATA / "checks.yaml").read_text())["trailer_checks"]}
+    assert checks["DIM-08"]["min"] == checks["DIM-06"]["min"]
+    ute = yaml.safe_load((R.DATA / "ute" / "ute.yaml").read_text())["params"]
+    rows = R.between_reach(RES, ball_drop=float(ute["coupling_tol"]))
+    for x in rows:
+        assert x["low_ball"]["turn_low_mm"] < x["turn_low_mm"] and x["low_ball"]["tight_low_mm"] < x["tight_low_mm"] < x["low_mm"], x
+        assert x["low_ball"]["turn_low_mm"] >= checks["DIM-08"]["min"], f"{x['run']} hangs to {x['low_ball']['turn_low_mm']} mm"
+    k13 = next(r for r in RES["runs"] if r["id"] == "K-13")
+    sheave = RES["fixtures"]["DB-HR"]["box"]
+    groove = (sheave[5] - sheave[2]) / 2 - 9.0
+    assert k13["rolls"] and "DB-HR" in k13["passes"] and groove + k13["od"] / 2 >= k13["bend_r"]
+    assert next(x for x in rows if x["run"] == "K-13")["turn_model"] == "shared over its sheave"
+
+
 def test_the_drum_leads_arm_parts_clear_fit05():
     """I2-50: FIT-05 sweeps the drum leads' arm parts with the arms and they keep its 50 mm."""
     from cad.tests.test_trailer import TRAILER

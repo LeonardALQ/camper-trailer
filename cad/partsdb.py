@@ -157,7 +157,7 @@ class TrailerCheck(Strict):
     """A whole-trailer check, measured on the block layout (cad/trailer.py)."""
     id: str
     title: str
-    type: Literal["mass", "gcm", "fit", "tyre", "width", "overhang", "coupling", "clearance_ground", "breakover",
+    type: Literal["mass", "gcm", "fit", "tyre", "width", "overhang", "coupling", "clearance_ground", "clearance_leads", "breakover",
                   "jackknife", "jackknife_height", "wheel", "towball_scale",
                   "towball_ute", "towball_ute_input", "axle_window", "coupling_dv", "lateral", "bed", "platinum_return",
                   "chassis_stress", "chassis_local", "chassis_deflection", "chassis_twist", "chassis_fatigue",
