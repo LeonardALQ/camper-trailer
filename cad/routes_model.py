@@ -250,7 +250,8 @@ def check_rows(res: dict, ev: dict) -> list[dict]:
             row.update(limit="every load, outlet, water outlet and fixture has its run, joined up from its source", measured=e["n"] - len(e["problems"]), unit="served",
                        margin=-len(e["problems"]), governing=f"{e['n']} needs")
         elif c["kind"] == "drops":
-            fd = "".join(f", the truck's feed {f['line']} {f['limit_pct']:g} % of its own" for f in e["feeds"])
+            fd = "".join(f", the truck's feed {f['line']} {f['limit_pct']:g} % of its own" +
+                         (f" and {f.get('floor_of', 'the load')} at least {f['floor_v']:g} V" if f.get("floor_v") is not None else "") for f in e["feeds"])
             row.update(limit=f"DC 2 % at the design current, 230 V 5 %{fd}", measured=round(100 * e["use"], 1), unit="% of the limit",
                        margin=round(100 * (1 - e["use"]), 1), governing=e["governing"])
         elif c["kind"] == "falls":

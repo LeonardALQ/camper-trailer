@@ -394,7 +394,7 @@ def size_dc(run: dict, length_m: float, kind: dict, limit_pct: float, least: flo
     and the drop is reported."""
     amps, volts = run["amps"], run["volts"]
     lim = limit_pct / 100 * volts
-    up = upstream_v(run) + ahead_v
+    up = upstream_v(run) + ahead_v + inline_v(run)
     order = sorted(s for s in kind["sizes"] if s is not None)
     fixed = float(run["size"]) if run.get("size") is not None else None
     for s in ([fixed] if fixed is not None else order):
@@ -425,6 +425,27 @@ def upstream_v(run: dict) -> float:
     of the ute feed), which SVC-06 adds to the run's own, so the limit holds from the source to the load."""
     u = run.get("upstream")
     return 0.0 if not u else float(u["mv"]) * run["amps"] * float(u["m"]) / 1000
+
+
+def inline_v(run: dict) -> float:
+    """The drop at the run's design current across the parts in series at its start (`inline`, each its resistance in
+    milliohms): the TSC's fuse in the drawbar junction ahead of K-10 (I2-61), which SVC-06 counts in the circuit's drop."""
+    return sum(float(p["mohm"]) for p in run.get("inline") or []) * float(run["amps"]) / 1000
+
+
+def hang_bight(pts: list[tuple], idx: list[int], length_mm: float, r: float) -> tuple[list[tuple], float]:
+    """A lead that hangs between the vehicles drawn at its cut length (I2-63): the points of its bight (`bight`, their
+    places in the path) hang at the one height at which the drawn centreline, bends and all, is the cut length, so the
+    drawing and the checks under it see its slack where it hangs. Returns the points and that height."""
+    def drawn(z):
+        p = [(q[0], q[1], z) if i in idx else q for i, q in enumerate(pts)]
+        return p, fillet(smooth_jogs(p, r), r)["length"]
+    lo, hi = 0.0, min(pts[idx[0] - 1][2], pts[idx[-1] + 1][2]) - 1.0
+    for _ in range(50):
+        mid = (lo + hi) / 2
+        lo, hi = (mid, hi) if drawn(mid)[1] > length_mm else (lo, mid)
+    z = (lo + hi) / 2
+    return drawn(z)[0], z
 
 
 def arms_of(lay) -> dict:
@@ -646,7 +667,8 @@ def _resolve_run(r: dict, ns: dict, K: dict, rule: dict, fixtures: dict, pitch: 
     """One run on the layout, with its lane offset in each way it shares. A run in a way bends at the way's largest
     radius (`way_bend`), or its own if larger, so the lanes' bends are concentric enough to keep their pitch. `least`
     is the size SVC-10 asks for where the run lies, and `done` the runs resolved before it, for its `follows`. A lead
-    that hangs in a loop is priced, weighed and its drop taken at its cut length (`cut_m`), not its shape at rest."""
+    that hangs between the vehicles is priced, weighed and its drop taken at its cut length (`cut_m`), and drawn at
+    that length with its bight hanging (`bight`, I2-63)."""
     kind = K[r["kind"]]
     for w, p in pitch.items():
         ns[f"L_{w}"] = lane_of(r, w) * p
@@ -670,13 +692,16 @@ def _resolve_run(r: dict, ns: dict, K: dict, rule: dict, fixtures: dict, pitch: 
     k = kind["sizes"][size]
     rigid = bool(kind.get("rigid"))
     elbow_r = k["od"] * kind["elbow_r"] if kind.get("elbow_r") else None
+    if r.get("bight") and r.get("cut_m"):
+        pts, row["bight_z"] = hang_bight(pts, [i + 1 for i in r["bight"]], float(r["cut_m"]) * 1000, max(k["bend_r"], way_bend))
+        row["points"], row["reach_pts"] = pts, (pts[0], pts[1], pts[-1])
     if not rigid:
         pts = smooth_jogs(pts, k["bend_r"])
         row["points"] = pts
     f = fillet(pts, max(k["bend_r"], way_bend), elbow_r=elbow_r, rigid=rigid)
     length_m = float(r["cut_m"]) if r.get("cut_m") else f["length"] / 1000
     if vd is not None:
-        vd = k["mv_am"] * r["amps"] * length_m / 1000 + upstream_v(r) + ahead
+        vd = k["mv_am"] * r["amps"] * length_m / 1000 + upstream_v(r) + ahead + inline_v(r)
     cores = kind.get("cores", 1)
     row.update(size=size, cable=_label(kind, size), od=k["od"], bend_r=k["bend_r"], dense=f["dense"], corners=f["corners"],
                length_m=round(length_m, 2), mass_kg=round(k["kg_m"] * length_m, 3),
@@ -1426,7 +1451,8 @@ def drops(res: dict) -> dict:
     """SVC-06: every sized circuit's voltage drop at its design current over its routed length within the limit. A
     circuit the truck feeds through a socket of its own (`feed`, the TSC's supply, I2-50) splits its budget there: the
     trailer's runs from the socket to the load hold the limit, and the truck's feed holds its own, so the two together
-    are what the load sees from the truck's battery."""
+    are what the load sees from the truck's battery. Where the feed names the load's least voltage (`floor_v`, the
+    TSC's 10.5 V, I2-62), the voltage at the load from the battery's nominal must not fall under it."""
     lim = res["data"]["rules"]
     problems, worst, feeds = [], (-math.inf, ""), []
     for r in res["runs"]:
@@ -1442,13 +1468,80 @@ def drops(res: dict) -> dict:
     for r in (r for r in res["runs"] if r.get("feed") and r["vd_pct"] is not None):
         f, pct = r["feed"], feed_pct(r)
         chain = max([x["vd_pct"] for x in res["runs"] if r["id"] in (x.get("follows") or []) and x["vd_pct"] is not None] + [r["vd_pct"]])
+        at_load = round(r["volts"] * (1 - (pct + chain) / 100), 2)
         feeds.append(dict(run=r["id"], line=f["line"], pct=round(pct, 2), limit_pct=f["limit_pct"], trailer_pct=chain,
-                          battery_pct=round(pct + chain, 2), volts_at_load=round(r["volts"] * (1 - (pct + chain) / 100), 2)))
+                          battery_pct=round(pct + chain, 2), volts_at_load=at_load, floor_v=f.get("floor_v")))
         if pct / f["limit_pct"] > worst[0]:
             worst = (pct / f["limit_pct"], f"{f['line']}, the truck's feed to {r['id']}, {pct:.2f} % of its own {f['limit_pct']:g} %")
         if pct > f["limit_pct"] + 1e-6:
             problems.append(f"{f['line']}, the truck's feed to {r['id']}, drops {pct:.2f} %, over its own {f['limit_pct']:g} %")
+        if f.get("floor_v") is not None:
+            use = (r["volts"] - at_load) / (r["volts"] - float(f["floor_v"]))
+            who = f.get("floor_of", "the load")
+            if use > worst[0]:
+                worst = (use, f"{who} at {at_load:.2f} V from the battery's {r['volts']:g} V, over its {f['floor_v']:g} V")
+            if at_load < float(f["floor_v"]) - 1e-6:
+                problems.append(f"{who} sees {at_load:.2f} V from the battery's {r['volts']:g} V, under its {f['floor_v']:g} V")
     return dict(ok=not problems, problems=problems, governing=worst[1], use=round(worst[0], 3), feeds=feeds)
+
+
+def _span(p: tuple, u: tuple, a: tuple, r: float) -> float:
+    """The shortest centreline from p, leaving along the unit vector u, to a with no bend tighter than r: an arc in
+    the plane of u and a, then a straight tangent to a (or the straight line where a is inside the arc's circle)."""
+    d = _sub(a, p)
+    a1 = _dot(d, u)
+    a2 = math.sqrt(max(0.0, _dot(d, d) - a1 * a1))
+    m = math.hypot(a1, a2 - r)
+    if m <= r:
+        return math.dist(p, a)
+    th = math.atan2(a2 - r, a1) - math.acos(r / m)
+    return r * ((th + math.pi / 2) % (2 * math.pi)) + math.sqrt(m * m - r * r)
+
+
+def _turn(p: tuple, pivot: tuple, yaw: float, pitch: float) -> tuple:
+    """A point on the truck in the trailer's axes when the truck has turned by yaw and pitched by pitch about the pin."""
+    x, y, z = _sub(p, pivot)
+    a, b = math.radians(pitch), math.radians(yaw)
+    x, z = x * math.cos(a) + z * math.sin(a), -x * math.sin(a) + z * math.cos(a)
+    x, y = x * math.cos(b) - y * math.sin(b), x * math.sin(b) + y * math.cos(b)
+    return _add(pivot, (x, y, z))
+
+
+def between_reach(res: dict) -> list[dict]:
+    """I2-63: each lead that hangs between the vehicles with a bight (`rides: between`, `bight`) against the turns
+    and the pitch it must follow (rules.between). The truck turns about the coupling's pin, up to the coupling's
+    yaw either way and the relative pitch either way, and the lead leaves its plug along the socket's axis and bends
+    no tighter than its radius to the point it lies over (its first path point, the saddle). Its cut length must
+    cover the path pulled taut from the plug over the saddle to the junction, plus what the worst of those positions
+    adds to the span, plus the margin. The shortest span sets how far the bight hangs in the tightest turn."""
+    rule = res["data"]["rules"]["between"]
+    pivot = (0.0, 0.0, float(res["V"]["coupling_z"]))
+    out = []
+    for r in res["runs"]:
+        if r.get("rides") != "between" or not r.get("bight"):
+            continue
+        p, a, e = r["reach_pts"]
+        x = (1.0, 0.0, 0.0)
+        s0 = _span(p, x, a, r["bend_r"])
+        spans = []
+        for ph in range(-int(rule["pitch_deg"]), int(rule["pitch_deg"]) + 1, 5):
+            for yw in range(-int(rule["yaw_deg"]), int(rule["yaw_deg"]) + 1, 2):
+                q = _turn(p, pivot, yw, ph)
+                u = _sub(_turn(_add(p, x), pivot, yw, ph), q)
+                spans.append((_span(q, u, a, r["bend_r"]), yw, ph))
+        far, near = max(spans), min(spans)
+        taut = fillet([p, a, e], r["bend_r"])["length"]
+        need = taut + (far[0] - s0) + float(rule["margin_mm"])
+        idx = [i + 1 for i in r["bight"]]
+        tight = None
+        if len(r["points"]) == len(r["path"]) + 2:
+            q, _ = hang_bight(r["points"], idx, 1000 * r["length_m"] + s0 - near[0], r["bend_r"])
+            tight = min(t[2] for t in fillet(smooth_jogs(q, r["bend_r"]), r["bend_r"])["dense"]) - r["od"] / 2
+        out.append(dict(run=r["id"], cut_mm=round(1000 * r["length_m"]), need_mm=round(need), taut_mm=round(taut), span_mm=round(s0),
+                        worst_mm=round(far[0]), worst_yaw=far[1], worst_pitch=far[2], shortest_mm=round(near[0]),
+                        shortest_yaw=near[1], shortest_pitch=near[2], margin_mm=float(rule["margin_mm"]),
+                        low_mm=round(min(t[2] for t in r["dense"]) - r["od"] / 2, 1), tight_low_mm=None if tight is None else round(tight, 1)))
+    return out
 
 
 def falls(res: dict) -> dict:

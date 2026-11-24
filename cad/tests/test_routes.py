@@ -362,14 +362,18 @@ def test_the_trap_valve_lies_along_the_wet_face_at_its_real_size():
 
 
 def test_the_brake_supply_counts_its_lead_and_the_leads_ride():
-    """I2-50: K-10's drop includes the SB50's lead K-14 ahead of it (`follows`) within the 2 %, the two leads between the
-    vehicles ride there, and every drum lead's arm part rides its arm and joins its sprung part at its clip."""
+    """I2-50, I2-61: K-10's drop includes the SB50's lead K-14 ahead of it (`follows`) and the TSC's fuse in the drawbar
+    junction (`inline`) within the 2 %, the two leads between the vehicles ride there, and every drum lead's arm part
+    rides its arm and joins its sprung part at its clip."""
     by = {r["id"]: r for r in RES["runs"]}
     k10, k14 = by["K-10"], by["K-14"]
     mv = lambda r: RES["kinds"][r["kind"]]["sizes"][r["size"]]["mv_am"]  # noqa: E731
-    want = (mv(k10) * k10["length_m"] + mv(k14) * k14["length_m"]) * k10["amps"] / 1000
+    fuse = sum(p["mohm"] for p in k10["inline"]) * k10["amps"] / 1000
+    assert fuse > 0.03, "the TSC's fuse is in K-10's drop"
+    want = (mv(k10) * k10["length_m"] + mv(k14) * k14["length_m"]) * k10["amps"] / 1000 + fuse
     assert k10["follows"] == ["K-14"] and k10["vd_v"] == pytest.approx(want, abs=0.002)
     assert k10["vd_pct"] <= RES["data"]["rules"]["drop_pct"]
+    assert k10["protection"].startswith("30 A MIDI fuse in the drawbar junction") and R.device_of(k10, RES["data"]["rules"]["ratings"])[0] <= 40
     assert by["K-13"]["rides"] == by["K-14"]["rides"] == "between"
     arms = [r for r in RES["runs"] if r.get("rides") == "arm"]
     assert len(arms) == 4
@@ -377,6 +381,36 @@ def test_the_brake_supply_counts_its_lead_and_the_leads_ride():
         sprung = by[r["joins"]]
         assert math.dist(r["points"][0], sprung["points"][-1]) < 1.0, r["id"]
         assert r["vd_pct"] <= RES["data"]["rules"]["drop_pct"], r["id"]
+
+
+def test_svc06_holds_the_tsc_at_its_floor():
+    """I2-62: SVC-06 tests the TSC's 10.5 V (est.) as a floor from the battery's 12.0 V, and fails a supply under it."""
+    import copy
+    feed = EVAL["drops"]["feeds"][0]
+    assert feed["floor_v"] == 10.5 and feed["volts_at_load"] >= feed["floor_v"]
+    res = dict(data=RES["data"], runs=copy.deepcopy(RES["runs"]))
+    k14 = next(r for r in res["runs"] if r["id"] == "K-14")
+    k14["feed"]["floor_v"] = feed["volts_at_load"] + 0.05
+    worse = R.drops(res)
+    assert not worse["ok"] and any("under its" in p for p in worse["problems"]), worse["problems"]
+
+
+def test_the_leads_hang_at_their_cut_length_and_reach_every_turn():
+    """I2-63: each lead between the vehicles is drawn at its cut length, its bight hanging from the saddle, and the cut
+    length covers the worst turn and pitch of rules.between with the margin, rounded up to the next 10 mm and no more."""
+    reach = {x["run"]: x for x in R.between_reach(RES)}
+    assert set(reach) == {"K-13", "K-14"}
+    for r in RES["runs"]:
+        if r["id"] not in reach:
+            continue
+        drawn = R.fillet(r["points"], r["bend_r"])["length"]
+        assert drawn == pytest.approx(1000 * r["cut_m"], abs=2.0), f"{r['id']} is drawn {drawn:.0f} mm long, cut {1000 * r['cut_m']:.0f} mm"
+        x = reach[r["id"]]
+        assert x["need_mm"] <= x["cut_mm"] <= x["need_mm"] + 10, x
+        assert x["low_mm"] > 380.0, f"{r['id']}'s bight hangs to {x['low_mm']} mm, under the coupling"
+    sad = RES["fixtures"]["DB-HK"]["box"]
+    chs = {b["id"]: b["box"] for b in RES["blocks"] if b.get("box") and b["id"] in ("CH-P01", "CH-P02")}
+    assert sad[0] > chs["CH-P01"][3] and sad[0] > chs["CH-P02"][3], "the saddle stands behind the coupling plate and the chain lug"
 
 
 def test_the_drum_leads_arm_parts_clear_fit05():

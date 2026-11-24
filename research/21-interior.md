@@ -31,7 +31,7 @@ Product rules: reliability and a record of hard use first, then parts and servic
 
 Design day energy for these items: 5.4 kWh at the appliances (showers 1.3, hot water 0.7 if electric, hob 1.2, oven 0.6, washer 0.2, dryer 1.4, pump and UV 0.03). Peaks: shower heater 2,400 W, hob 2,300 W, oven 1,440 W, dryer about 1,000 W (est.). Report 20 adds inverter loss and sets the load sequence.
 
-Water: 41 L a day without laundry, 85 L with one wash. Seven days with three washes need 419 L, so 400 L of fresh water is right. Grey: 27 L a day plus 44 L a wash, held in a 130 L tank (72 h).
+Water: 41 L a day without laundry, 85 L with one wash. Seven days with three washes need 419 L, so 400 L of fresh water covers a week with two washes (375 L) and about 6.7 days with three. Grey: 27 L a day plus 44 L a wash, held in a 130 L tank (72 h).
 
 Mass: the changes add about 119 kg to the trailer (est.), most of it the dryer (40 kg), the bed (+31.5 kg), the oven (18.5 kg) and the grey tank (13.2 kg). The bed's day height needs the interior raised from 1,950 to 2,000 mm (section 1.4).
 
@@ -289,7 +289,7 @@ Membrane odour traps hold no water, so they cannot slosh dry on corrugations or 
 
 Seven days off-grid with three washes uses 419 L of fresh water and makes 321 L of grey. With two washes it uses 375 L. With a wash every day it would use 595 L.
 
-Fresh: keep 400 L. It covers 7 days with three washes, and the model's tanks hold about 420 L net (TRAILER.md). Daily washing for a week needs a refill.
+Fresh: keep 400 L. It covers 7 days with two washes, which use 375 L, and a week with three washes needs about 20 L more, so with three washes a week it lasts about 6.7 days (correction of 24 Nov 2026, I2-65: this line said 400 L covered the three-wash week). The model's tanks hold about 420 L net (TRAILER.md). Daily washing for a week needs a refill.
 
 Grey: fit a 130 L tank. A tank for a full week (about 320 L) has no room under the floor beside 420 L of fresh. 130 L holds 72 h with one wash (125 L, calc.), which matches the shut-off-valve and on-board-tank rules of self-contained sites ([Dundas policy](https://www.dundas.wa.gov.au/documents/1958/t15-designated-rv-parking-areas), [Geelong](https://app.geelongcity.vic.gov.au/common/public/APA/572026-operationalmatters-pp-849-2025.PDF)). Beyond 72 h, empty it at a dump point or into a 40 L tote (CMCA accepts a tote connected through a sealed hose and a shut-off valve), or disperse it where the site allows. The full grey tank moves water mass from the fresh bays to its own bay, so the layout must check the ball load with grey full and fresh low.
 
