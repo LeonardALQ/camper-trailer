@@ -52,6 +52,7 @@ drawings:
       - {rev: AH, date: 2026-11-24, description: "Notice: tare 2,697 kg with the leads' saddle and the TSC's fuse (I2-63)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AI, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AJ, date: 2026-11-24, description: "Axle spacing dimensioned under the ground, labels name their zones (I2-69)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AK, date: 2026-11-24, description: "Notice: tare 2,963 kg with growth, the axle at X 4,486 (I2-75)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-002
     title: Mass and centre of gravity
     subtitle: Every load case with growth, the axle window of H17, the CoG in elevation and across
@@ -82,6 +83,7 @@ drawings:
       - {rev: R, date: 2026-11-23, description: "Notice: the masses with the brake leads, TC2 3,575 kg with growth (I2-50)", drawn: Kiro, checked: "", approved: ""}
       - {rev: S, date: 2026-11-23, description: "Notice: the masses with the end plates and the leads' hook (I2-57, I2-58)", drawn: Kiro, checked: "", approved: ""}
       - {rev: T, date: 2026-11-24, description: "Notice: the masses with the saddle and the fuse, axle at X 4,485.3 (I2-63)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: U, date: 2026-11-24, description: "Notice: the masses with the end plates 7 mm shorter, axle X 4,485.5 (I2-75)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-003
     title: Compliance
     subtitle: VSB1 items and the standards with the design figures, operating limits and the plate
@@ -116,7 +118,8 @@ drawings:
       - {rev: V, date: 2026-11-23, description: "Notice: the leads over their hook, TC2 3,576 kg, GCM 7,748 kg (I2-58)", drawn: Kiro, checked: "", approved: ""}
       - {rev: W, date: 2026-11-24, description: "The leads over the saddle behind the chain lug, lowest at 389 mm (I2-63)", drawn: Kiro, checked: "", approved: ""}
       - {rev: X, date: 2026-11-24, description: "The 12-pin lead over its sheave, lowest 248 mm in any turn (DIM-08, I2-70)", drawn: Kiro, checked: "", approved: ""}
-      - {rev: Y, date: 2026-11-24, description: "Leads from the data: SB50 lead slides on its saddle, lowest 217 mm (DIM-08)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: Y, date: 2026-11-24, description: "Notice: TC2 3,576 kg with growth, the axle group's 3,223 kg (I2-75)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: Z, date: 2026-11-24, description: "Leads from the data: SB50 lead slides on its saddle, lowest 217 mm (DIM-08)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-010
     title: Floor plan, bed up and bed down
     subtitle: Day and night plans, walkways, door swings, spaces kept clear and the bed positions
@@ -226,6 +229,7 @@ drawings:
       - {rev: W, date: 2026-11-23, description: "Notice: the rail end plates over the raisers' bottom walls (I2-57)", drawn: Kiro, checked: "", approved: ""}
       - {rev: X, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Y, date: 2026-11-24, description: "Memo: the chassis data's revision I in the title block (I2-67, I2-72)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: Z, date: 2026-11-24, description: "Notice: end plates 7 mm clear of the drawbar, data revision J (I2-75)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
@@ -256,6 +260,7 @@ drawings:
       - {rev: R, date: 2026-11-23, description: "Notice: end plates welded full penetration from outside, FAT-20 (I2-57)", drawn: Kiro, checked: "", approved: ""}
       - {rev: S, date: 2026-11-24, description: "Notice: the root gusset's heel 3 mm inboard of mid-plate, view C1 (I2-60)", drawn: Kiro, checked: "", approved: ""}
       - {rev: T, date: 2026-11-24, description: "Notice: heel fillets 7 and 10 mm on the skewed joint, roots by videoscope", drawn: Kiro, checked: "", approved: ""}
+      - {rev: U, date: 2026-11-24, description: "Notice: FAT-20 at IIW 424, its root record, plate 7 clear, detail C relaid", drawn: Kiro, checked: "", approved: ""}
   - number: CT-103
     title: Chassis details
     subtitle: Composite rail, outrigger root, crossmember to rail, overlap end, jacking pad, recovery tongue, spare posts
@@ -289,6 +294,7 @@ drawings:
       - {rev: U, date: 2026-11-23, description: "Notice: FAT-20, the end plates' welds, FAT-19's free bottom edge (I2-57)", drawn: Kiro, checked: "", approved: ""}
       - {rev: V, date: 2026-11-24, description: "Notice: FAT-17 to FAT-20 on the heel's place and its pull's line (I2-60)", drawn: Kiro, checked: "", approved: ""}
       - {rev: W, date: 2026-11-24, description: "Notice: FAT-20 on the principal stress at FAT 71, FAT-18's smaller throat", drawn: Kiro, checked: "", approved: ""}
+      - {rev: X, date: 2026-11-24, description: "Notice: detail K vents and drains the rails' front ends, FAT-20 at FAT 45", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads
@@ -576,6 +582,7 @@ drawings:
       - {rev: O, date: 2026-11-23, description: "Notice: the grey tank at X 5,759 with the axle at X 4,506.2 (I2-33)", drawn: Kiro, checked: "", approved: ""}
       - {rev: P, date: 2026-11-23, description: "Notice: 400 L net, the HepvO trap valve TV-09 on the tray's drain (I2-45)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Q, date: 2026-11-23, description: "Notice: the centres at the axle X 4,485.2 with the brake leads (I2-50)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: R, date: 2026-11-24, description: "Notice: the centres at the axle X 4,485.5 with the end plates (I2-75)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-612
     title: Plumbing layout
     subtitle: Tanks, pump cabinet, drains with their falls, the shower well, fill and dump points
