@@ -185,6 +185,19 @@ def test_fat20_reads_the_heel_where_the_gusset_stands():
     assert abs(p["webs"][0].max() - p["webs"][1].max()) < 0.05 * p["webs"][0].max()
 
 
+def test_heel_fillets_on_their_skewed_joint():
+    """The gusset meets the end plate about 20 degrees off its normal in plan, so its heel's inboard fillet lies in the
+    acute dihedral angle and the outboard one in the obtuse (I2-72): 8 mm legs both sides give throats of 6.55 and
+    4.59 mm there and 5.66 mm on a square joint, and the data's legs give both throats at least that 5.66 mm."""
+    from cad.chassis_fea import Analysis, heel_throats
+    assert heel_throats((8, 8), 0.0) == pytest.approx((8 / math.sqrt(2), 8 / math.sqrt(2)))
+    assert heel_throats((8, 8), math.radians(19.91)) == pytest.approx((6.55, 4.59), abs=0.01)
+    lay, ch, _ = TRAILER._chassis
+    g = next(f for f in CH.data["fittings"] if f["id"] == "CH-P03")
+    p = Analysis(lay, TRAILER, ch).end_plate_under_heel(20.0, 180.0)
+    assert min(heel_throats(g["heel_legs"], p["angle"])) >= 8 / math.sqrt(2)
+
+
 def test_principal_range_of_a_weld():
     """FAT-20 reads a weld's normal and shear ranges, in phase, as their maximum principal stress range (IIW 4.2 b,
     I2-67): the normal range alone with no shear, the shear range at 45 degrees with no normal range, and the inboard
