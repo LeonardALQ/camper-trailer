@@ -4,7 +4,8 @@ moved onto a line, a table cell's text across a line, a mark on a label, two lab
 fill drawn after it, a fill over the tops of a word's capitals, lines of capitals set too close, and a label's mask over a
 heavy line (I2-64), while a mask over a thin dimension line passes. Its fourth class finds a leader that ends off what
 its label names, two leaders that cross and a leader through a symbol (I2-69), and a letter on its symbol's white disc
-passes over the line under the disc."""
+passes over the line under the disc. It reads a weld symbol's and every other arrow's line with the leaders, but no
+dimension line, and finds a letter drawn in its symbol that ends up outside it (I2-76)."""
 import re
 
 import pytest
