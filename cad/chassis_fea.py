@@ -268,10 +268,25 @@ class Analysis:
             contact[k] = np.array([w_h[k] * Fxw, w_h[k] * Fyw, fz[k] + dz])
         return dict(ball=np.array([0.0, Fby, Fbz]), contact=contact)
 
-    def arm_loads(self, items: list[Item], acc, contact: dict, q: np.ndarray, hub: dict | None = None) -> dict:
-        """Solve each arm as a free body about its hinge and put the hinge and airbag forces on the frame. `hub` adds a
-        force at a wheel's hub, where an obstacle holds the wheel in LC8a."""
+    def airbag_force(self, w: dict, items: list[Item], acc, C: np.ndarray, hub_f: np.ndarray | None = None) -> float:
+        """The force an arm's airbag must push the chassis up with (+) for the arm to balance about its hinge's Y axis,
+        under its tyre's contact force C, its unsprung weight and any force at its hub."""
         a = np.asarray(acc, float) * G
+        P = np.asarray(w["pivot"], float)
+        m_y = np.cross(np.asarray(w["contact"]) - P, C)[1]
+        m_y += sum(np.cross(np.asarray(it.p, float) - P, it.m * a)[1] for it in items if it.rule == "unsprung" and it.wheel == w["id"])
+        if hub_f is not None:
+            m_y += np.cross(np.asarray(w["hub"], float) - P, hub_f)[1]
+        return -m_y / (w["airbag"][0] - P[0])
+
+    def arm_loads(self, items: list[Item], acc, contact: dict, q: np.ndarray, hub: dict | None = None, bag_min: dict | None = None) -> dict:
+        """Solve each arm as a free body about its hinge and put the hinge, airbag and droop limit forces on the frame.
+        `hub` adds a force at a wheel's hub, where an obstacle holds the wheel in LC8a. `bag_min` gives each airbag's force
+        with its arm on its droop limit (LC8a, I2-94): an airbag cannot pull, so where the arm's balance asks less of it the
+        arm drops onto its droop limit (droop_limits), the airbag pushes with that force and the limit takes the rest of
+        the arm's moment, pulling the frame down at its bracket."""
+        a = np.asarray(acc, float) * G
+        limits = self.droop_limits() if bag_min else {}
         out = {}
         for w in self.ch.suspension:
             P = np.asarray(w["pivot"], float)
@@ -285,13 +300,45 @@ class Analysis:
             rB = np.asarray(w["airbag"]) - P
             m_y = np.cross(rC, C)[1] + Mu[1]
             Fb = -m_y / rB[0]                         # airbag force on the chassis, + up
+            T, F_lim = 0.0, np.zeros(3)
+            if bag_min and Fb < bag_min[w["id"]]:
+                lim = limits[w["id"]]
+                Fb = bag_min[w["id"]]
+                T = -(m_y + rB[0] * Fb) / lim["lever"]                   # the limit's tension along its line, N
+                F_lim = T * lim["u"]                                     # its pull on the arm, toward its bracket
             Fbag_arm = np.array([0.0, 0.0, -Fb])
-            H_arm = -(C + Wu + Fbag_arm)
-            M_arm = -(np.cross(rC, C) + Mu + np.cross(rB, Fbag_arm))
+            H_arm = -(C + Wu + Fbag_arm + F_lim)
+            M_arm = -(np.cross(rC, C) + Mu + np.cross(rB, Fbag_arm) + (np.cross(limits[w["id"]]["arm"] - P, F_lim) if T else 0.0))
             M_arm[1] = 0.0
             self._apply(-H_arm, P, [(self.fm.pivot_nodes[w["id"]], 1.0)], q, M=-M_arm)
             self._apply(np.array([0.0, 0.0, Fb]), w["airbag"], self.fm.rail_fractions(w["side"], w["airbag"][0]), q)
-            out[w["id"]] = dict(contact=C, airbag=Fb, hinge=-H_arm, hinge_moment=-M_arm)
+            if T:
+                lim = limits[w["id"]]
+                self._apply(-F_lim, lim["frame"], self.fm.crossmember_fractions(lim["cm"], lim["frame"][1]), q)
+            out[w["id"]] = dict(contact=C, airbag=Fb, hinge=-H_arm, hinge_moment=-M_arm, droop_n=T)
+        return out
+
+    def droop_limits(self) -> dict:
+        """Each XT arm's droop limit (xt_arms `droop`): its shock absorber at full extension (est., Cruisemaster's XT kit
+        has no droop strap), from its eye on the arm at the hub to its bracket on the next crossmember's front face, the
+        front arms' on the XT centre crossmember and the rear arms' on the XT rear shock crossmember, at the crossmember's
+        mid-height and the shock support plate's Y. `u` is the unit vector from the arm's eye to the bracket and `lever`
+        the moment about the pivot's Y axis of a unit pull along it, negative for a pull that lifts the hub."""
+        if getattr(self, "_droop", None):
+            return self._droop
+        ch, V = self.ch, self.ch.V
+        d = ch.data["xt_arms"]["droop"]
+        cms = {m.station: m for m in ch.members if m.role.startswith("cm")}
+        out = {}
+        for w in ch.suspension:
+            cm = cms[d["to"][w["axle"]]]
+            y = w["side"] * ch.ev(d["y"])
+            arm = np.array([w["hub"][0], y, w["hub"][2]])
+            frame = np.array([cm.p0[0] - cm.sec.b / 2, y, V["rail_underside_z"] + d["z_over_underside"]])
+            u = (frame - arm) / np.linalg.norm(frame - arm)
+            lever = np.cross(arm - np.asarray(w["pivot"], float), u)[1]
+            out[w["id"]] = dict(arm=arm, frame=frame, u=u, lever=lever, cm=cm.id, length=float(np.linalg.norm(frame - arm)))
+        self._droop = out
         return out
 
     # ------------------------------------------------------------------ cases
@@ -329,49 +376,171 @@ class Analysis:
         resid = max(abs(v) for v in res.reactions.values())
         return res, dict(ball=R["ball"], arms=arms, residual_n=resid, pad=R.get("pad", [None])[0])
 
-    def recovery_reactions(self, F, p, held: str | None = None) -> dict:
+    def recovery_reactions(self, F, p, held: str | None = None, base: dict | None = None, nose: dict | None = None) -> dict:
         """LC8a's reaction, which report 11 does not give: the ground at the four tyres, the trailer a rigid body on each
         wheel's support stiffness, its tyre and arm in series (LC8a's reaction, est.). The wheels are unbraked, so the
         ground's force on each passes through its hub: along the trailer every wheel takes its share there, or with `held`
         that wheel is held fast against an obstacle at its hub's height and the other three roll free. Across and up every
-        tyre works at its lateral and vertical rate at its contact. Returns the force the ground puts on each tyre at its
-        contact and on each wheel at its hub."""
+        tyre works at its lateral and vertical rate at its contact. The forces along and across hold the pull in plan, as
+        they always have, and the forces up hold what that leaves, its lift and its moments in roll and pitch.
+
+        `base` is the trailer's weight as the static case reacts it (reactions, 1 g down): each tyre and the nose start
+        from that load (I2-94). No tyre can pull the ground, so one that would leaves it and the trailer pitches or rolls
+        onto the supports that remain, the `nose` at the ball among them: on its jockey wheel, which cannot pull either, or
+        held both ways by the coupled truck (LC8a `reaction` `nose`, est.). A bogged tyre that lifts is taken to stay in its
+        rut, which holds it along and across at its rates (est.). The set of supports in contact is iterated until every
+        one in contact pushes and none off the ground would. Where no set holds the trailer at the whole pull, it tips
+        first, so the pull is taken at the largest share of it that the trailer holds (`scale`). Without `base` no support
+        lifts. Returns the force the ground puts on each tyre at its contact and on each wheel at its hub, the nose's force,
+        the tyres off the ground, their rise on the rates (`lift`) and the scale."""
         r = next(lc for lc in self.ch.data["load_cases"] if lc["id"] == "LC8a")["reaction"]
         springs = []
         for w in self.ch.suspension:
+            pre = float(base["contact"][w["id"]][2]) if base else 0.0
             for d, k in ((0, r["kx"]), (1, r["ky"]), (2, r["kz"])):
                 at = w["hub"] if d == 0 else w["contact"]
+                obstacle = held is not None and w["id"] == held and d < 2
                 if held is not None and d < 2:
-                    k = r["held_k"] if w["id"] == held else (0.0 if d == 0 else k)
-                    at = w["hub"] if w["id"] == held else at
+                    k = r["held_k"] if obstacle else (0.0 if d == 0 else k)
+                    at = w["hub"] if obstacle else at
                 if k:
-                    springs.append((w["id"], d, k, np.eye(3)[d], np.asarray(at, float)))
-        K = np.zeros((6, 6))
-        for _, _, k, e, at in springs:
-            g = np.r_[e, np.cross(at, e)]
-            K += k * np.outer(g, g)
+                    springs.append(dict(w=w["id"], d=d, k=k, e=np.eye(3)[d], at=np.asarray(at, float), pre=pre if d == 2 else 0.0,
+                                        on="hub" if obstacle or d == 0 else "contact", contact=w["id"] if d == 2 else None))
+        if base and nose:
+            springs.append(dict(w="nose", d=2, k=nose["kz"], e=np.eye(3)[2], at=np.array([0.0, 0.0, self.ch.V["coupling_z"]]),
+                                pre=float(base["ball"][2]), on="nose", contact=None if nose.get("holds_down") else "nose"))
+        for s in springs:
+            s["g"] = np.r_[s["e"], np.cross(s["at"], s["e"])]
         F = np.asarray(F, float)
-        move = np.linalg.solve(K, np.r_[F, np.cross(np.asarray(p, float), F)])
-        contact = {w["id"]: np.zeros(3) for w in self.ch.suspension}
-        hub = {}
-        for wid, d, k, e, at in springs:
-            f = -k * (np.r_[e, np.cross(at, e)] @ move) * e
-            if d == 0 or (held is not None and wid == held and d == 1):
-                hub[wid] = hub.get(wid, np.zeros(3)) + f
-            else:
-                contact[wid] = contact[wid] + f
-        return dict(contact=contact, hub=hub)
+        load = np.r_[F, np.cross(np.asarray(p, float), F)]
+        # in plan: X, Y and yaw on the forces along and across
+        plan, up = [0, 1, 5], [2, 3, 4]
+        flat = [s for s in springs if s["d"] < 2]
+        Kh = sum(s["k"] * np.outer(s["g"][plan], s["g"][plan]) for s in flat)
+        uh = np.linalg.solve(Kh, load[plan])
+        fh = {id(s): -s["k"] * (s["g"][plan] @ uh) for s in flat}
+        left = load + sum((fh[id(s)] * s["g"] for s in flat), np.zeros(6))      # what the plan leaves, up, in roll and in pitch
+        vert = [s for s in springs if s["d"] == 2]
+        ground = [s for s in vert if s["contact"]] if base else []              # the supports that can only push, with the weight
+        sc = np.array([1.0, 1e-3, 1e-3])                                          # rotations as mm at 1 m
 
-    def run_recovery(self, F, p, fractions, held: str | None = None):
-        """LC8a: the pull at its recovery point, the tyres' reactions through each arm as a free body about its hinge, the
-        airbag taking its moment, and the frame held only by the six kinematic supports."""
+        def solve(lam: float):
+            off: set[str] = set()
+            for _ in range(40):
+                act = [s for s in vert if s["contact"] not in off]
+                K = sum((s["k"] * np.outer(s["g"][up], s["g"][up]) for s in act), np.zeros((3, 3)))
+                ev = np.linalg.eigvalsh(K * sc[:, None] * sc[None, :])
+                if ev[0] < 1e-6 * ev[-1]:
+                    return None
+                rhs = lam * left[up] - sum((s["pre"] * s["g"][up] for s in vert if s["contact"] in off), np.zeros(3))
+                u = np.linalg.solve(K, rhs)
+                f = {id(s): s["pre"] - s["k"] * (s["g"][up] @ u) for s in vert}
+                neg = [s for s in ground if s["contact"] not in off and f[id(s)] < -1e-6]
+                back = [s for s in ground if s["contact"] in off and f[id(s)] > 1e-6]
+                if neg:
+                    off.add(min(neg, key=lambda s: f[id(s)])["contact"])
+                elif back:
+                    off.discard(max(back, key=lambda s: f[id(s)])["contact"])
+                else:
+                    return f, off, {s["contact"]: -f[id(s)] / s["k"] for s in ground if s["contact"] in off}
+            return None
+
+        lam, got = 1.0, solve(1.0)
+        if got is None:
+            lo, hi, got = 0.0, 1.0, solve(0.0)
+            for _ in range(14):
+                mid = (lo + hi) / 2
+                trial = solve(mid)
+                if trial is None:
+                    hi = mid
+                else:
+                    lo, got = mid, trial
+            lam = lo
+        f, off, lift = got
+        contact = {w["id"]: np.zeros(3) for w in self.ch.suspension}
+        hub, nose_f = {}, np.zeros(3)
+        for s in springs:
+            if s["contact"] in off:
+                continue
+            v = (lam * fh[id(s)] if s["d"] < 2 else f[id(s)]) * s["e"]
+            if s["on"] == "nose":
+                nose_f = nose_f + v
+            elif s["on"] == "hub":
+                hub[s["w"]] = hub.get(s["w"], np.zeros(3)) + v
+            else:
+                contact[s["w"]] = contact[s["w"]] + v
+        return dict(contact=contact, hub=hub, nose=nose_f, off=sorted(off), scale=lam, lift=lift)
+
+    def run_recovery(self, F, p, fractions, held: str | None = None, support: dict | None = None):
+        """LC8a: the pull at its recovery point with the trailer's weight and its nose's support (`support`, I2-94), the
+        tyres' and the nose's reactions through supports that cannot pull (recovery_reactions), each arm a free body about
+        its hinge, its airbag taking its moment or its droop limit the part its airbag cannot (arm_loads), and the frame
+        held only by the six kinematic supports."""
         q = np.zeros(self.n)
-        self._apply(np.asarray(F, float), p, fractions, q)
-        R = self.recovery_reactions(F, p, held)
-        arms = self.arm_loads([], (0.0, 0.0, 0.0), R["contact"], q, hub=R["hub"])
+        acc = (0.0, 0.0, -1.0) if support else (0.0, 0.0, 0.0)
+        items = support["items"] if support else []
+        base = support["base"] if support else None
+        R = self.recovery_reactions(F, p, held, base, support["nose"] if support else None)
+        self._apply(R["scale"] * np.asarray(F, float), p, fractions, q)
+        bag_min = None
+        if support:
+            q += support["q"]
+            self._apply(R["nose"], (0.0, 0.0, self.ch.V["coupling_z"]), [(self.fm.ball, 1.0)], q)
+            bag_min = support["bag_min"]
+        arms = self.arm_loads(items, acc, R["contact"], q, hub=R["hub"], bag_min=bag_min)
         res = self.kinematic.solve(q)
         self.resid = max(self.resid, max(abs(v) for v in res.reactions.values()))
-        return res, arms
+        return res, dict(R, arms=arms, bag_min=bag_min)
+
+    def recovery_supports(self, cases) -> list[dict]:
+        """The weights and nose supports LC8a is read with (LC8a `reaction` `weight` and `nose`): each trailer case at
+        tare, as the layout gives it, or at the plate, scaled as the other cases are, on each nose support. Each carries its
+        weight's frame loads and static reactions, and each airbag's force with its arm at full droop, its force at ride
+        less the air spring's rate (stability `air_spring_rate`, est.) over the droop limit's travel."""
+        r = next(lc for lc in self.ch.data["load_cases"] if lc["id"] == "LC8a")["reaction"]
+        rate, travel = self.tr.td["stability"]["air_spring_rate"], self.ch.data["xt_arms"]["droop"]["travel"]
+        acc = (0.0, 0.0, -1.0)
+        out = []
+        for wd in r["weight"]:
+            if wd["at"] == "tare":
+                c = next(c for c in self.tr.cases if c.id == wd["case"])
+                label, items = f"{c.id} at tare", self.items(c)
+            else:
+                c, items, _, _ = next(x for x in cases if x[0].id == wd["case"])
+                label = f"{c.id} at the plate"
+            base = self.reactions(items, acc)
+            q = self.sprung_loads(items, acc)
+            bag_min = {w["id"]: max(0.0, self.airbag_force(w, items, acc, base["contact"][w["id"]]) - rate * travel) for w in self.ch.suspension}
+            for nose in r["nose"]:
+                out.append(dict(label=f"{label}, {'coupled' if nose.get('holds_down') else 'uncoupled'}", items=items, base=base, q=q,
+                                bag_min=bag_min, nose=nose))
+        return out
+
+    def _recovery_envelope(self, lc_id: str, label: str, info: dict, held: str | None):
+        """LC8a's supports in each case (I2-94): the largest force on each arm's droop limit and airbag, the tyres off the
+        ground, the pulls the trailer tips under before they reach their full size, and each held hinge's force."""
+        e = self.lc8_arms.setdefault(lc_id, dict(cases=0, lifted=0, nose_off=0, tipped=[], droop={}, bag={}, hinge={}, lift=dict(mm=0.0),
+                                                 nose=dict(up=0.0, down=0.0)))
+        e["cases"] += 1
+        e["nose"]["up"] = max(e["nose"]["up"], float(info["nose"][2]))
+        e["nose"]["down"] = max(e["nose"]["down"], -float(info["nose"][2]))
+        off = info["off"]
+        for k, mm in info["lift"].items():
+            if k != "nose" and mm > e["lift"]["mm"]:
+                e["lift"] = dict(mm=mm, wheel=k, case=label)
+        e["lifted"] += sum(1 for o in off if o != "nose")
+        e["nose_off"] += "nose" in off
+        if info["scale"] < 1.0 - 1e-9:
+            e["tipped"].append(dict(case=label, scale=info["scale"]))
+        for wid, a in info["arms"].items():
+            if a["droop_n"] > e["droop"].get(wid, {}).get("n", 0.0):
+                e["droop"][wid] = dict(n=a["droop_n"], case=label, airbag_n=a["airbag"], off=off)
+            if a["airbag"] > e["bag"].get(wid, {}).get("n", -math.inf):
+                e["bag"][wid] = dict(n=a["airbag"], case=label, off=off)
+            if held == wid:
+                h = np.asarray(a["hinge"], float)
+                if abs(h[0]) > abs(e["hinge"].get(wid, {}).get("f", np.zeros(3))[0]):
+                    e["hinge"][wid] = dict(f=h, case=label, droop_n=a["droop_n"])
 
     def run_body(self, F, p, fractions):
         q = np.zeros(self.n)
@@ -540,6 +709,9 @@ class Analysis:
         # tongue's pull acts at its shackle hole and enters the frame at the rear crossmember's end, where the tongue is
         # welded through the crossmember and along the rail's web (rear_recovery_point, I2-87)
         lc8 = lcs["LC8a"]
+        supports = self.recovery_supports(cases)
+        self.lc8_arms: dict[str, dict] = {}
+        self.cheek_env: dict[str, dict] = {}
         for lc_id, Fr in (("LC8a", lc8["force_n"]), ("LC8u", lc8["ultimate_n"])):
             for where in ("front", "rear"):
                 for s in (-1, 1):
@@ -559,9 +731,14 @@ class Analysis:
                         for v in (-15, 0, 15):
                             F = Fr * np.array([sx * math.cos(hdg) * math.cos(math.radians(v)), math.sin(hdg) * math.cos(math.radians(v)),
                                                math.sin(math.radians(v))])
-                            res, _ = self.run_recovery(F, p, fr, held)
-                            take(lc_id, res, f"{where} {'kerb' if s < 0 else 'road'}-side point, {lab}, {v:+d} deg up"
-                                 + (f", {Fr / 1000:.1f} kN" if lc_id == "LC8u" else ""), ultimate=lc_id == "LC8u")
+                            for sup in supports:
+                                res, info = self.run_recovery(F, p, fr, held, sup)
+                                label = (f"{where} {'kerb' if s < 0 else 'road'}-side point, {lab}, {v:+d} deg up, {sup['label']}"
+                                         + (f", {Fr / 1000:.1f} kN" if lc_id == "LC8u" else "")
+                                         + (f", tipping at {info['scale'] * Fr / 1000:.1f} kN" if info["scale"] < 1.0 - 1e-9 else ""))
+                                take(lc_id, res, label, ultimate=lc_id == "LC8u")
+                                self._recovery_envelope(lc_id, label, info, held)
+                                self._cheek_envelope(lc_id, label, res)
         out = dict(envelope={}, governing={}, deflections={}, twist=twist, balls=balls, residual_n=self.resid,
                    frame=dict(nodes=len(self.f.nodes), elements=sum(1 for e in self.f.elements if not e.sec.rigid),
                               rigid_links=sum(1 for e in self.f.elements if e.sec.rigid)))
@@ -579,7 +756,8 @@ class Analysis:
         from .chassis_dip import check as galvanising_check
         out["galvanising"] = galvanising_check(ch)
         out["local"] = self.local_checks(out["pad_n"]["pad_n"])
-        out["local"].update(self.panel_checks(), hinge_cheeks=self.cheek_check())
+        out["local"].update(self.panel_checks(), hinge_cheeks=self.cheek_check(), arm_limits=self.arm_limits())
+        out["recovery"] = self.recovery_summary()
         out["fixings"] = self.fixings()
         out["cross_checks"] = self.cross_checks(out, lc6)
         out["lc1_ball"] = balls
@@ -645,21 +823,111 @@ class Analysis:
             out["shear_panel"] = res
         return out
 
+    def cheek_welds(self, F) -> dict:
+        """The stresses in one hinge cheek's welds (CH-P16, xt_hinges `cheek`, I2-92) under the force F (N, along, across and
+        up) that its pin passes from the hinge bar, at the middle of its `bar_leg` fillets each side down the bar's front or
+        rear face over the bar's top `bar_d` (est.), which pass a force but no moment, at the cheek's end. Its two lines on
+        the rail's inner web, the `leg` fillet along its top edge and the flare-bevel weld along the rail's bottom corner,
+        are one weld group, read by the elastic vector method with the force's moments about the group's centroid, each
+        line on its throat: the fillet's 0.7 leg and the flare bevel's `corner` share of the rail's outside radius, AISC 360
+        Table J2.2's 5/16 R for a manual metal arc weld. The components add at the worst corner whatever their signs."""
+        ck = self.ch.data["xt_hinges"]["cheek"]
+        fx, fy_, fz_ = (abs(float(v)) for v in F)
+        out = {"to the hinge bar": math.sqrt(fx ** 2 + fy_ ** 2 + fz_ ** 2) / (2 * ck["bar_d"] * 0.7 * ck["bar_leg"])}
+        l, ro = ck["l"], self.ch.role_sec["rail"].ro
+        lines = [("its top edge's fillet", ck["h"] - ck["below"], 0.7 * ck["leg"]),
+                 ("the flare-bevel weld at the rail's bottom corner", 0.0, ck["corner"] * ro)]
+        A = sum(a * l for _, _, a in lines)
+        zc = sum(a * l * z for _, z, a in lines) / A
+        Ix = sum(a * l * (z - zc) ** 2 for _, z, a in lines)
+        Iz = sum(a * l ** 3 / 12 for _, _, a in lines)
+        lever = zc + ck["bar_d"] / 2                     # the pin under the group's centroid, at the cheek's end
+        M_in = fx * lever + fz_ * l / 2                  # in the web's plane
+        M_x, M_z = fy_ * lever, fy_ * l / 2              # out of it
+        for name, z, a in lines:
+            dz = abs(z - zc)
+            t_x = fx / A + M_in * dz / (Ix + Iz)
+            t_z = fz_ / A + M_in * (l / 2) / (Ix + Iz)
+            s_n = fy_ / A + M_x * dz / Ix + M_z * (l / 2) / Iz
+            out[f"to the rail's web, {name}"] = math.sqrt(t_x ** 2 + t_z ** 2 + s_n ** 2)
+        return out
+
+    def _cheek_envelope(self, lc_id: str, label: str, res):
+        """Each hinge's pin force in one LC8a case, the force its cheeks take from the hinge bar, and the largest stress in
+        each of their welds over the case's hinges (cheek_welds, CHS-14)."""
+        xyz = np.asarray(self.f.nodes)
+        e = self.cheek_env.setdefault(lc_id, {})
+        for wid, k in self.fm.cheek_pins.items():
+            el = self.f.elements[k]
+            R, _ = el.axes(xyz)
+            F = -R.T @ np.asarray(res.forces[k][6:9])
+            n = sum(1 for c in self.ch.hinge_cheeks() if c["wheel"] == wid)
+            for part, mpa in self.cheek_welds(F / n).items():
+                if mpa > e.get(part, {}).get("mpa", 0.0):
+                    e[part] = dict(mpa=mpa, case=label, wheel=wid, f=[float(v) for v in F / n])
+
     def cheek_check(self) -> dict:
-        """The hinge cheeks' welds (CH-P16) at the 78.5 kN ultimate pull, all of it along the trailer through one cheek, as a
-        held wheel puts it through a front hinge, which has one: the `bar_leg` fillets each side of the cheek
-        down the hinge bar's front or rear face over the bar's top `bar_d` (est.), and the two `leg` fillets along the rail's
-        web, which also take the pull's moment about the pivot's depth as a couple."""
+        """CHS-14 (I2-92): the hinge cheeks' welds (CH-P16) in every LC8a case at 58.9 kN and at the 78.5 kN ultimate, each
+        under the force the frame model's pin passes from the hinge bar into the hinge's cheeks, shared equally where a
+        hinge has two (cheek_welds), against AS 4100 9.7.3's 0.8 x 0.6 fuw."""
+        mat = self.ch.data["material"]
+        wcap = mat["weld_phi"] * 0.6 * mat["weld_fuw"]
+        rows = [(f"{part}, {lc_id}", r["mpa"], wcap) for lc_id in ("LC8a", "LC8u") for part, r in self.cheek_env[lc_id].items()]
+        w = max(((lc_id, part, r) for lc_id in ("LC8a", "LC8u") for part, r in self.cheek_env[lc_id].items()), key=lambda t: t[2]["mpa"])
+        lc_id, part, r = w
+        return _local("Hinge cheeks' welds (CH-P16)", rows,
+                      f"the pin's force from the hinge bar into one cheek, {r['f'][0] / 1000:+.1f} kN along, {r['f'][1] / 1000:+.1f} kN across and "
+                      f"{r['f'][2] / 1000:+.1f} kN up, at {r['wheel']} in {r['case']}")
+
+    def arm_limits(self) -> dict:
+        """CHS-15 (I2-94): what LC8a's arms put on their limits and mounts, the worst over every LC8a case at 58.9 kN and
+        at the 78.5 kN ultimate: the droop limit's tension on its M12 eye bolts in double shear (AS 4100 9.3.2.1, threads
+        in a shear plane) and on its bracket's fillets to the crossmember's face as a weld group, the eye `e` off the face,
+        and the airbag's push with its bump stop, its bump load, on its top bracket's fillets along the rail's web."""
         ch = self.ch
         mat = ch.data["material"]
         wcap = mat["weld_phi"] * 0.6 * mat["weld_fuw"]
-        ck = ch.data["xt_hinges"]["cheek"]
-        F = next(lc for lc in ch.data["load_cases"] if lc["id"] == "LC8a")["ultimate_n"]
-        bar = F / (2 * ck["bar_d"] * 0.7 * ck["bar_leg"])
-        a = 0.7 * ck["leg"]
-        web = F / (2 * ck["l"] * a) + F * ch.V["pivot_below"] / (ck["h"] - ck["below"]) / (ck["l"] * a)
-        return _local("Hinge cheeks' welds (CH-P16)", [("to the hinge bar", bar, wcap), ("to the rail's web", web, wcap)],
-                      f"the {F / 1000:.1f} kN ultimate pull along the trailer through one cheek")
+        d, ab = ch.data["xt_arms"]["droop"], ch.data["xt_arms"]["airbag"]["bracket"]
+        b, br = d["bolt"], d["bracket"]
+        lim = self.droop_limits()
+        rows = []
+        for lc_id in ("LC8a", "LC8u"):
+            e = self.lc8_arms[lc_id]
+            wid, dr = max(e["droop"].items(), key=lambda kv: kv[1]["n"], default=(None, dict(n=0.0)))
+            T = dr["n"]
+            u = lim[wid]["u"] if wid else np.array([1.0, 0.0, 0.0])
+            a = 0.7 * br["leg"]
+            A = 2 * br["l"] * a
+            I = 2 * a * br["l"] ** 3 / 12
+            n_ = abs(T * u[0]) / A + abs(T * u[2]) * br["e"] * (br["l"] / 2) / I
+            rows += [(f"droop limit's {b['size']} eye bolt, {lc_id}", T / (b["planes"] * b["a_c"]), 0.8 * 0.62 * b["fuf"]),
+                     (f"droop limit's bracket fillets, {lc_id}", math.hypot(n_, abs(T * u[2]) / A), wcap)]
+            bag = max((x["n"] for x in e["bag"].values()), default=0.0)
+            rows.append((f"airbag's top bracket fillets under its bump load, {lc_id}", bag / ((ab["l"] + 2 * ab["returns"]) * 0.7 * ab["leg"]), wcap))
+        u8 = self.lc8_arms["LC8u"]
+        wid, dr = max(u8["droop"].items(), key=lambda kv: kv[1]["n"])
+        return _local("XT arms' droop limits and airbag brackets", rows,
+                      f"LC8a's arms, the worst droop limit {dr['n'] / 1000:.1f} kN at {wid} in {dr['case']}")
+
+    def recovery_summary(self) -> dict:
+        """LC8a's supports over its cases (I2-94), for CHASSIS.md and Cruisemaster's items: the cases read, the tyres off the
+        ground, the pulls the trailer tips under and the least share of the pull it holds, each droop limit's and airbag's
+        largest force, and the held hinges' largest force along the trailer with the hinge bar's moment from the pivot up to
+        the cheek's pin."""
+        ck = self.ch.data["xt_hinges"]["cheek"]
+        depth = self.ch.V["pivot_below"] - ck["bar_d"] / 2
+        out = {}
+        for lc_id, e in self.lc8_arms.items():
+            dw, dr = max(e["droop"].items(), key=lambda kv: kv[1]["n"])
+            bw, bg = max(e["bag"].items(), key=lambda kv: kv[1]["n"])
+            hw, hg = max(e["hinge"].items(), key=lambda kv: abs(kv[1]["f"][0]))
+            least = min(e["tipped"], key=lambda t: t["scale"]) if e["tipped"] else None
+            out[lc_id] = dict(cases=e["cases"], lifted=e["lifted"], nose_off=e["nose_off"], tipped=len(e["tipped"]), least=least, lift=e["lift"], nose=e["nose"],
+                              droop=dict(wheel=dw, n=dr["n"], case=dr["case"], airbag_n=dr["airbag_n"], off=dr["off"]),
+                              droop_by_wheel={k: v["n"] for k, v in e["droop"].items()},
+                              bag=dict(wheel=bw, n=bg["n"], case=bg["case"]),
+                              hinge=dict(wheel=hw, f=[float(x) for x in hg["f"]], case=hg["case"], bar_moment_nmm=abs(float(hg["f"][0])) * depth))
+        return out
 
     def fy_of_part(self, member: str) -> float:
         """The yield stress of a frame part that is not a member (a hinge gusset), from its section."""
