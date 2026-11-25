@@ -72,18 +72,11 @@ lines:
     price: {aud_each: 267.84, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-21, note: "93.0 kg at AUD 2.88/kg, the rate of the listed 150 x 50 x 3.0 and 150 x 50 x 5.0 lengths. 8.8 m needed since the rails went to 4 mm for the 4,000 kg plate (CHS-08A), the XT rear shock crossmember now on the 6 mm length (CHS-08U). Ask for C450L0 (Austube C450PLUS) on the mill certificate"}
   - id: STL-03
     group: chassis
-    name: RHS 150 x 50 x 6.0, two 8 m lengths, for the drawbar members, the XT front hinge, rear shock and rear crossmembers
+    name: RHS 150 x 50 x 6.0, two 8 m lengths, for the drawbar members, the XT front hinge, XT centre, rear shock and rear crossmembers
     qty: 2
     unit: 8 m length
-    covers: [DB-KA, DB-KB, DB-RA, DB-RB, CM-04, CM-06, CM-08]
-    price: {aud_each: 384.77, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-23, note: "133.6 kg at AUD 2.88/kg, the rate of the listed 150 x 50 x 3.0 and 150 x 50 x 5.0 lengths (the 5.0 mm, SKU RHS40, is AUD 326.65). 7.7 m needed: 5.3 m since the drawbar went to 6 mm for its root's fatigue (FAT-07) and 2.4 m since the two rear crossmembers did for the recovery pull's ultimate (CHS-08U). Ask for C450L0 (Austube C450PLUS) on the mill certificate"}
-  - id: STL-10
-    group: chassis
-    name: RHS 150 x 50 x 5.0, one 8 m length, for the XT centre crossmember
-    qty: 1
-    unit: 8 m length
-    covers: [CM-05]
-    price: {aud_each: 326.65, basis: listing, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-23, note: "SKU RHS40. 1.2 m needed since the hinge joints were redesigned for a held wheel's recovery pull (CHS-12). Ask for C450L0 (Austube C450PLUS) on the mill certificate"}
+    covers: [DB-KA, DB-KB, DB-RA, DB-RB, CM-04, CM-05, CM-06, CM-08]
+    price: {aud_each: 384.77, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-23, note: "133.6 kg at AUD 2.88/kg, the rate of the listed 150 x 50 x 3.0 and 150 x 50 x 5.0 lengths (the 5.0 mm, SKU RHS40, is AUD 326.65). 7.7 m needed: 5.3 m since the drawbar went to 6 mm for its root's fatigue (FAT-07) and 2.4 m since the two rear crossmembers did for the recovery pull's ultimate (CHS-08U), and the hinge crossmembers' 2.4 m, the XT centre's 6 mm since its hinge bars' weld runs stand where Cruisemaster's sheet 3 draws them (I2-101). Ask for C450L0 (Austube C450PLUS) on the mill certificate"}
   - id: STL-04
     group: chassis
     name: RHS 75 x 50 x 3.0, one 8 m length, for the drawbar cross brace
@@ -122,10 +115,10 @@ lines:
   - id: GLV-01
     group: chassis
     name: Hot-dip galvanising to AS/NZS 4680 of the welded chassis and drawbar, the stone guard frame and the mud flap hangers
-    qty: 590
+    qty: 595
     unit: kg galvanised
     covers: [CH-G01]
-    price: {aud_each: 2.75, basis: estimate, url: "https://www.steel.org.au/getattachment/2f694ebb-98a7-4273-be94-e0f61bd74328/Cost-factors-for-hot-dip-galvanised-coatings_INGALSM3.pdf", date: 2026-11-23, note: "570.2 kg of steel with the 4 mm rails (CHS-08A at the 4,000 kg plate), the 6 mm drawbar (FAT-07), the two 6 mm rear crossmembers (CHS-08U), the 6 and 5 mm hinge crossmembers, their cheeks and the rear tank bay's angles (CHS-12, CHS-13), 16.5 kg of zinc and the guard frame and hangers. Galvanisers charge by the galvanised mass. The industry's AUD 1.20/kg for light fabrications is an older figure, so AUD 2.75/kg allows for rises and a one-off frame (research report 22). No NSW bath takes the 2.4 m frame level across, so it goes in one dip at Valmont Coatings Hexham, rolled about 46 degrees across (CHASSIS.md revision N)"}
+    price: {aud_each: 2.75, basis: estimate, url: "https://www.steel.org.au/getattachment/2f694ebb-98a7-4273-be94-e0f61bd74328/Cost-factors-for-hot-dip-galvanised-coatings_INGALSM3.pdf", date: 2026-11-23, note: "579.8 kg of steel with the 4 mm rails (CHS-08A at the 4,000 kg plate), the 6 mm drawbar (FAT-07), the two 6 mm rear crossmembers (CHS-08U), the two 6 mm hinge crossmembers (I2-101), their cheeks and the rear tank bay's angles (CHS-12, CHS-13), 16.5 kg of zinc and the guard frame and hangers. Galvanisers charge by the galvanised mass. The industry's AUD 1.20/kg for light fabrications is an older figure, so AUD 2.75/kg allows for rises and a one-off frame (research report 22). No NSW bath takes the 2.4 m frame level across, so it goes in one dip at Valmont Coatings Hexham, rolled about 46 degrees across (CHASSIS.md revision N)"}
   # ================================================================ running gear service
   - id: ALN-01
     group: running_gear
