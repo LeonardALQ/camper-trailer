@@ -166,7 +166,7 @@ A ladder of two composite rails with crossmembers at eight stations, outriggers 
 | Main rails | RHS 150 x 50 x 4 C450L0 | X 1,820 to 6,240, 1,275 mm over their outsides (H22), Z 597.5 to 747.5 | 2 | 102.5 kg |
 | Raisers | RHS 127 x 51 x 3.5 C350L0, continuous fillets | On each rail, Z 747.5 to 874.5, with a 20.5 mm bearer strip up to the floor at Z 895 | 2 | 80.2 kg |
 | Body end crossmembers | RHS 150 x 50 x 3 at the front, 150 x 50 x 6 at the rear (CHS-08U), full height, 1,175 mm | X 1,820 and 6,190 | 2 | 30.1 kg |
-| XT crossmembers | RHS 150 x 50 x 6 at the front hinge and 150 x 50 x 5 at the centre (revision Q), full height, no holes but their drains and vents, 8 mm fillets at their ends, two 10 mm cheeks at each hinge but the front road-side one | Front hinge X 3,578, centre X 4,478 | 2 | 36.3 kg |
+| XT crossmembers | RHS 150 x 50 x 6 at the front hinge and 150 x 50 x 5 at the centre (revision Q), full height, no holes but their drains and vents, 8 mm fillets at their ends, 10 mm cheeks either side of the centre crossmember's hinges and behind the front ones | Front hinge X 3,578, centre X 4,478 | 2 | 36.3 kg |
 | XT rear shock crossmember | RHS 150 x 50 x 6, with a 5 mm shock plate each side (CHS-08U) | X 5,308 | 1 | 19.6 kg |
 | Floor crossmembers | RHS 127 x 51 x 3.5, top flush with the raisers | X 2,360, the diesel bay at X 2,901 and the grey bay at X 5,723 | 3 | 32.0 kg |
 | Outriggers | RHS 127 x 51 x 3.5, top flush, 562 mm out to the body edge | Every station, each side | 16 | 81.6 kg |
@@ -230,7 +230,7 @@ CT-101 and CT-102 carry the member and plate lists, and the site's Downloads pag
 | 32 body mount nut plates, 10 mm, M12 tapped | BODY.md | 8.8 kg |
 | Spare carrier cleats and hub plate | LC2, LC7 | 4.2 kg |
 | Floor bearer strip, HDPE with an EPDM face | Report 11 section 2 | 22.9 kg (est.) |
-| Galvanising, 33.1 m² inside and out at AS/NZS 4680's minimum coating masses | Report 11 section 1.4 | 15.9 kg (calculated) |
+| Galvanising, 33.6 m² inside and out at AS/NZS 4680's minimum coating masses | Report 11 section 1.4 | 16.5 kg (calculated) |
 
 ### The corner steadies
 
@@ -265,7 +265,7 @@ Every case runs on the eight trailer cases TC1 to TC8, with the water, fuel and 
 
 ## Analysis
 
-The frame is a 3D beam model on the members' centroid axes, solved by the direct stiffness method in `cad/frame.py`, with 239 nodes, 205 beam elements and 60 rigid links. `cad/tests/test_frame.py` checks the solver against closed forms: cantilevers in bending and torsion, a simply supported beam and the equilibrium of a 3D portal frame.
+The frame is a 3D beam model on the members' centroid axes, solved by the direct stiffness method in `cad/frame.py`, with 269 nodes, 229 beam elements, the shear panel's two diagonals and 84 rigid links. `cad/tests/test_frame.py` checks the solver against closed forms: cantilevers in bending and torsion, a simply supported beam and the equilibrium of a 3D portal frame.
 
 - The composite rail is one beam with the combined section: centroid at Z 733, I = 18.4 x 10⁶ mm⁴, Z = 135.5 x 10³ mm³ at the bottom and 130.1 x 10³ mm³ at the top, with the 4 mm rail. `cad/tests/test_chassis.py` pins it.
 - Crossmembers, outriggers, braces and the drawbar members are beams on their own axes, joined to the rail through rigid links, so every joint is rigid. The drawbar's overlap is linked to the rail at every node along its 1,000 mm.
