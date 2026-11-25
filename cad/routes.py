@@ -699,8 +699,10 @@ def _resolve_run(r: dict, ns: dict, K: dict, rule: dict, fixtures: dict, pitch: 
     if r.get("lift"):
         row["clamp"] = pts[1]     # its first path point, where the bracket clamps it (I2-78)
         rest = float(r["cut_m"]) * 1000 - float(r["lift"]["clip_mm"]) - fillet(pts[1:], k["bend_r"])["length"]
-        row["lift"] = dict(r["lift"], rest_mm=round(rest, 1))     # the part from the strap to the clamp is what the cut leaves
-        pts = lift_drawn(row, pts, k["kg_m"] * 9.81 / 1000.0, float(r["lift"].get("seat_mm", k["bend_r"])))
+        seat_r = float(r["lift"].get("seat_mm", k["bend_r"]))
+        row["seat"] = seat_parts(rule["between"]["seat"], r["lift"], k["od"], seat_r)
+        row["lift"] = dict(r["lift"], rest_mm=round(rest, 1), seat_kg=row["seat"]["kg"])
+        pts = lift_drawn(row, pts, k["kg_m"] * 9.81 / 1000.0, seat_r)
         row["points"] = pts
     if not rigid:
         pts = smooth_jogs(pts, k["bend_r"])
@@ -1582,8 +1584,8 @@ def lift_rest(P: tuple, A: tuple, O: tuple, lift: dict, w: float, seat_r: float)
     it: it stands at the seat's top when the arm stands at `strap_deg`, and that much further round towards the rear
     for every degree the arm stands higher. The arm is hinged at O and swings in the vertical plane along X between its
     stops (`deg`, from forward and level), its torsion spring lifting it with a torque falling from `torque_nmm[0]` on
-    the bottom stop to `torque_nmm[1]` on the top one, against the weight of the arm and its seat (`arm_kg`,
-    `clip_kg`). The seat runs from `seat_deg[0]` to `seat_deg[1]` round its centre from the strap, forward negative.
+    the bottom stop to `torque_nmm[1]` on the top one, against the weight of the arm and its seat (`arm_kg`, and
+    `seat_kg` from seat_parts, taken at the tip). The seat runs from `seat_deg[0]` to `seat_deg[1]` round its centre from the strap, forward negative.
     Each part of the span is a flexible catenary of its own length (no bending stiffness, est.) that wraps the seat
     from the strap and leaves it tangent to it, or leaves at the strap or at the seat's end where its tangent point
     lies beyond them (a kink the lead's stiffness rounds), and pulls the arm with its horizontal pull plus the weight
@@ -1599,7 +1601,7 @@ def lift_rest(P: tuple, A: tuple, O: tuple, lift: dict, w: float, seat_r: float)
     l1, l2, R = float(lift["clip_mm"]), float(lift["rest_mm"]), float(seat_r)
     t_s = float(lift["strap_deg"])
     front, rear = (math.radians(float(v)) for v in lift.get("seat_deg", (-180.0, 180.0)))
-    g_arm = 9.81 * (float(lift.get("arm_kg", 0.0)) / 2 + float(lift.get("clip_kg", 0.0))) * rho
+    g_arm = 9.81 * (float(lift.get("arm_kg", 0.0)) / 2 + float(lift.get("seat_kg", 0.0))) * rho
 
     def on_seat(C, f):
         return (C[0] + R * math.sin(f), C[1], C[2] + R * math.cos(f))
@@ -1656,6 +1658,74 @@ def lift_rest(P: tuple, A: tuple, O: tuple, lift: dict, w: float, seat_r: float)
         return None
     low = min(x["c1"]["low"], x["c2"]["low"])
     return dict(x, low=low, low_part=_low_part(P[2], x["c1"]["low"], x["c2"]["low"]), pull_n=w * x["c1"]["y_p"])
+
+
+def seat_parts(seat: dict, lift: dict, od: float, seat_r: float) -> dict:
+    """A sprung arm's seat and its web (I2-91, CT-601's detail), from rules.between.seat, in the seat's own axes: x
+    towards the rear and z up when the arm stands at `strap_deg`, so the strap stands on +z, in mm from the arm's tip,
+    the seat's centre. The lead lies on a lining in a channel folded from sheet, its base to the inside and its flanges
+    reaching the lead's centreline, bent round the tip to the lead's centreline radius `seat_r` from `seat_deg[0]` to
+    `seat_deg[1]` round it from the strap. The web, cut from sheet, lies behind the arm: a hub on the arm's last
+    `hub[1]` mm, its front edge a half disc of the arm's half width `hub[0]` ahead of the tip, bolted through the arm at
+    each of `bolts_mm` from the tip, and a spoke `spoke_w` wide to the channel's base at each of `spokes_deg` from the
+    strap, its end folded into a tab `spoke_w` long riveted to the base. Returns the channel's radii (the base's inside
+    face `r0`, the face under the lining `r1` and the flanges' rim), the seat's data (`spec`), the web's outline as
+    polylines (`front`, the hub's half disc where no spoke leaves it, `spokes`, each spoke's sides from the hub to the
+    base, and `back`, the hub's back edge across the arm), the bolts' centres, and the seat's mass by part and in all
+    (`kg`, est.)."""
+    t_c, t_l, t_w, w = (float(seat[k]) for k in ("channel_t", "lining_t", "web_t", "spoke_w"))
+    h, L = (float(v) for v in seat["hub"])
+    r1 = seat_r - od / 2 - t_l
+    r0, rim = r1 - t_c, r1 + od / 2
+    f0, f1 = (math.radians(float(v)) for v in lift["seat_deg"])
+    fa = math.radians(90.0 + float(lift["strap_deg"]))
+    a, n = (math.sin(fa), math.cos(fa)), (math.cos(fa), -math.sin(fa))
+    spokes = [(math.sin(math.radians(f)), math.cos(math.radians(f))) for f in seat["spokes_deg"]]
+
+    def along(p, d):
+        return p[0] * d[0] + p[1] * d[1]
+
+    def in_hub(p):
+        u, v = along(p, a), along(p, n)
+        return (u <= 0.0 and math.hypot(*p) <= h + 1e-9) or (0.0 <= u <= L and abs(v) <= h + 1e-9)
+
+    def in_spoke(p):
+        return any(along(p, d) > 0.0 and abs(p[0] * d[1] - p[1] * d[0]) < w / 2 for d in spokes)
+
+    front, run = [], []
+    for i in range(61):
+        th = math.radians(90.0 + 3.0 * i)
+        p = (h * (math.cos(th) * a[0] + math.sin(th) * n[0]), h * (math.cos(th) * a[1] + math.sin(th) * n[1]))
+        if in_spoke(p):
+            if len(run) > 1:
+                front.append(run)
+            run = []
+        else:
+            run.append(p)
+    if len(run) > 1:
+        front.append(run)
+    sides, area = [], math.pi * h * h / 2 + 2 * h * L
+    for d in spokes:
+        q, lengths = (d[1], -d[0]), []
+        for o in (-w / 2, w / 2):
+            s = 0.0
+            while in_hub((s * d[0] + o * q[0], s * d[1] + o * q[1])):
+                s += 0.1
+            end = math.sqrt(r0 * r0 - o * o)
+            sides.append([(s * d[0] + o * q[0], s * d[1] + o * q[1]), (end * d[0] + o * q[0], end * d[1] + o * q[1])])
+            lengths.append(end - s)
+        area += w * (sum(lengths) / 2 + w)
+    back = [(L * a[0] + h * n[0], L * a[1] + h * n[1]), (L * a[0] - h * n[0], L * a[1] - h * n[1])]
+    span, al, ep = f1 - f0, float(seat["density"]["alu"]) * 1e-6, float(seat["density"]["epdm"]) * 1e-6
+    channel = t_c * span * ((od + 2 * t_l + 2 * t_c) * (r0 + r1) / 2 + od * (r1 + od / 4)) * al
+    lining = t_l * span * od * (2 * r1 + od / 4) * ep
+    web = t_w * area * al
+    kg = seat["kg"]
+    fixings = len(seat["bolts_mm"]) * kg["bolt"] + 2 * len(spokes) * kg["rivet"] + kg["strap"]
+    parts = dict(channel=channel, lining=lining, web=web, fixings=fixings)
+    return dict(spec=dict(seat), r0=r0, r1=r1, rim=rim, deg=[math.degrees(f0), math.degrees(f1)], front=front, spokes=sides, back=back,
+                bolts=[(b * a[0], b * a[1]) for b in seat["bolts_mm"]], web_mm2=round(area), kg_by={k: round(v, 4) for k, v in parts.items()},
+                kg=round(sum(parts.values()), 3))
 
 
 AT_PLUG_MM = 2.0

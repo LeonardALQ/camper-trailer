@@ -639,9 +639,10 @@ def ct601(prj, model, bom, checks, reg, dwg):
 
 
 def _arm_detail(sh, C, rt, top):
-    """CT-601's detail of the leads' sprung arms on the leads' bracket DB-HK (I2-78, I2-83), side view from the road side
-    at 1:5, front to the right: the hinge, the clamp, the arm where the strap stands at its seat's top, the seat's arc
-    from the strap and the stops on the arm's swing, and beside it each arm's figures from the routes and DIM-08."""
+    """CT-601's detail of the leads' sprung arms on the leads' bracket DB-HK (I2-78, I2-83, I2-91), side view from the
+    road side at 1:5, front to the right: the hinge, the clamp, the arm where the strap stands at its seat's top, the
+    seat's channel from the strap, its web behind the arm with the web's two bolts through it (cad/routes.py
+    seat_parts), the stops on the arm's swing, and beside it each arm's figures from the routes and DIM-08."""
     k14 = rt["K-14"]
     lift = k14["lift"]
     lead = {x["run"]: x for x in C["chk"]["DIM-08"]["leads"]}
@@ -664,9 +665,22 @@ def _arm_detail(sh, C, rt, top):
     sh.path([(ox + n[0] * h, oy + n[1] * h), (c[0] + n[0] * h, c[1] + n[1] * h), (c[0] - n[0] * h, c[1] - n[1] * h),
              (ox - n[0] * h, oy - n[1] * h)], "medium", closed=True)
     lo, hi = (float(v) for v in lift["seat_deg"])
-    # drawn where the strap stands at the seat's top, its angles from the top towards the rear, the rear to the left
-    sh.path([(c[0] - R * math.sin(math.radians(a)), c[1] + R * math.cos(math.radians(a))) for a in
-             (lo + (hi - lo) * i / 48 for i in range(49))], "thick")
+    seat = k14["seat"]
+
+    def on(q):      # the seat's axes, the strap at its top and the rear to the left, at the arm's tip
+        return (c[0] - k * q[0], c[1] + k * q[1])
+
+    def polar(r, a):
+        return on((r * math.sin(math.radians(a)), r * math.cos(math.radians(a))))
+    sh.path([polar(seat["r0"], lo + (hi - lo) * i / 48) for i in range(49)], "thick")
+    sh.path([polar(seat["rim"], lo + (hi - lo) * i / 48) for i in range(49)], "medium")
+    for a in (lo, hi):
+        sh.line(*polar(seat["r0"], a), *polar(seat["rim"], a), "medium")
+    for part in seat["front"] + seat["spokes"]:
+        sh.path([on(q) for q in part], "medium")
+    sh.path([on(q) for q in seat["back"]], "hidden")
+    for q in seat["bolts"]:
+        sh.circle(*on(q), k * 5.0, "medium")
     sh.line(c[0], c[1] + R - 1.6, c[0], c[1] + R + 1.6, "thick")
     sh.circle(ox, oy, 1.2, "medium")
     sh.rect(ox - 5.0, oy - 2.0, ox - 1.0, oy + 2.0, "thin")
@@ -684,12 +698,19 @@ def _arm_detail(sh, C, rt, top):
                      f"STOP TO {lf['torque_nmm'][1] / 1000:.1f} N m ON THE TOP (EST.). DRIVING STRAIGHT THE ARM STANDS "
                      f"{x['straight']['arm_deg']:.0f} DEGREES UP, AND IN ANY TURN THE LEAD HANGS NO LOWER THAN {x['turn_low_mm']:.0f} mm, "
                      f"{x['low_ball']['turn_low_mm']:.0f} mm WITH THE BALL LOW (DIM-08, EST.).")
-    paras.append(f"EACH ARM IS 300 x 25 x 3 mm 316 STRIP, ITS TORSION SPRING LIFTING IT BETWEEN THE STOPS. ITS SEAT, A LINED CHANNEL BENT "
-                 f"ROUND THE TIP TO THE LEAD'S BEND RADIUS, RUNS {-lo:g} DEGREES AHEAD OF THE STRAP AND {hi:g} BEHIND IT, FIXED ON THE "
-                 "ARM, SO THE STRAP TURNS WITH IT. DRAWN FOR K-14. KEEP BOTH ARMS FREE TO SWING.")
+    sd = k14["seat"]["spec"]
+    spokes = ", ".join(f"{-v:g}" for v in sd["spokes_deg"][:-1]) + f" AND {-sd['spokes_deg'][-1]:g}"
+    paras.append(f"EACH ARM IS 300 x 25 x 3 mm 316 STRIP, ITS TORSION SPRING LIFTING IT BETWEEN THE STOPS. ITS SEAT IS A CHANNEL FOLDED "
+                 f"FROM {sd['channel_t']:g} mm 5052 SHEET AND LINED WITH {sd['lining_t']:g} mm EPDM, BENT ROUND THE TIP TO THE LEAD'S BEND "
+                 f"RADIUS FROM {-lo:g} DEGREES AHEAD OF THE STRAP TO {hi:g} BEHIND IT. ITS WEB, CUT FROM {sd['web_t']:g} mm 5052 SHEET AND "
+                 f"FITTED BEHIND THE ARM, IS A HUB ON THE ARM'S LAST {sd['hub'][1]:g} mm, BOLTED THROUGH IT WITH TWO M5 316 BOLTS "
+                 f"{sd['bolts_mm'][0]:g} AND {sd['bolts_mm'][1]:g} mm FROM THE TIP, AND {sd['spoke_w']:g} mm SPOKES {spokes} DEGREES AHEAD "
+                 f"OF THE STRAP, EACH FOLDED INTO A TAB UNDER THE CHANNEL'S BASE AND HELD BY TWO 3.2 mm RIVETS, SO THE STRAP TURNS WITH THE "
+                 f"ARM. THE SEAT WEIGHS {rt['K-13']['seat']['kg']:.3f} kg ON K-13 AND {k14['seat']['kg']:.3f} kg ON K-14 (EST.). DRAWN FOR "
+                 "K-14. KEEP BOTH ARMS FREE TO SWING.")
     x0, y = c[0] + R + 6.0, top - 5.0
     for t in paras:
-        for line in S.wrap_mm(t, 410 - 1.5 - x0, 1.2):
+        for line in S.wrap_mm(t, 410 - 4.0 - x0, 1.2):
             sh.text(x0, y, line, 1.2)
             y -= 2.2
         y -= 1.0

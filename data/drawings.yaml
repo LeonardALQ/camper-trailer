@@ -512,6 +512,7 @@ drawings:
       - {rev: P, date: 2026-11-24, description: "Memo: contactor letters K2, K4 and S1 kept in their circles (I2-69)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Q, date: 2026-11-24, description: "Notice: SB50 lead K-14 1.28 m, the TSC's supply drops 1.96 % (I2-78)", drawn: Kiro, checked: "", approved: ""}
       - {rev: R, date: 2026-11-24, description: "Notice: detail of the leads' sprung arms, seat, strap and stops (I2-83)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: S, date: 2026-11-25, description: "Notice: each seat's web and its bolts to the arm drawn, its mass (I2-91)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-602
     title: Electrical layout
     subtitle: Battery plinth, board, inverter, cable routes, glands, outlets and the cable schedule
