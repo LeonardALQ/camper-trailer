@@ -676,7 +676,7 @@ class Chassis:
                 if gusset:                              # the step where the gusset lands, centred on its footprint (I2-99)
                     xc = face + e * (self.ev(g["length"]) / math.sqrt(2) - ck["t"])
                     za, zb = V["rail_underside_z"] + big["z0"], V["rail_underside_z"] + big["z1"]
-                    ls = big["l"][cm.id] if isinstance(big["l"], dict) else big["l"]
+                    ls = big["l"][cm.station] if isinstance(big["l"], dict) else big["l"]
                     step = (xc - ls / 2, y0, za, xc + ls / 2, y0 + ck["t"], zb)
                     boxes.append(step)
                     over = max(0.0, min(box[3], step[3]) - max(box[0], step[0])) * max(0.0, min(box[5], step[5]) - max(box[2], step[2]))
@@ -798,7 +798,8 @@ class Chassis:
                     chain_lug_x=V["chain_lug_x"], jack_x=self.station_x(jack), hub_front_x=self.hub_x("front"), hub_rear_x=self.hub_x("rear"),
                     rear_tongue_x=V["body_x1"] - 70, front_recovery_x=V["front_recovery_x"], root_gusset_toe_x=V["root_gusset_toe_x"],
                     steady_x=sorted({p["x"] for p in self.steady_poses()}),
-                    cheek_ends_x=sorted({x for c in self.hinge_cheeks() for b in c["boxes"] for x in (b[0], b[3])}),
+                    cheek_ends_x=sorted({x for c in self.hinge_cheeks() if c["l"] <= 300.0 for b in c["boxes"] for x in (b[0], b[3])}),
+                    long_cheek_ends_x=sorted({x for c in self.hinge_cheeks() if c["l"] > 300.0 for b in c["boxes"] for x in (b[0], b[3])}),
                     panel_angle_ends_x=sorted({x for p in self.panel_pieces() if p["use"] == "rail" for x in (p["x0"], p["x1"])}))
 
     # -- the frame model ----------------------------------------------

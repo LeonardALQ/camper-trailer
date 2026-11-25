@@ -415,7 +415,7 @@ def _notes(J: Joint) -> list[str]:
         f"ACROSS THE RAIL (TB 070), AND {_n(J.ck['bar_leg'])} FILLETS BOTH SIDES DOWN THE HINGE BAR'S FACE OVER ITS TOP "
         f"{_n(J.ck['bar_d'])} (CHS-14). OVER THE WEB EACH CHEEK'S END IS COPED {_n(J.ck['cope'])} x 45 DEG CLEAR OF {J.cm.id}'S "
         f"{_n(J.cm_leg)} END FILLET, ITS WEB WELDS STOPPED THERE. A CHEEK BESIDE A GUSSET CARRIES A STEP "
-        f"{' AND '.join(f'{_n(v)} LONG AT {k}' for k, v in J.ck['under_gusset']['l'].items())} "
+        f"{' AND '.join(f'{_n(v)} LONG AT THE {k.upper()}' for k, v in J.ck['under_gusset']['l'].items())} "
         f"CENTRED ON THE GUSSET, {_n(J.ck['under_gusset']['z0'])} TO {_n(J.ck['under_gusset']['z1'])} OVER THE RAIL, {_n(J.ck['leg'])} FILLETS "
         f"ALONG ITS TOP AND LOWER EDGES, THE GUSSET LANDING ON IT (CHS-16).",
         f"PANEL ANGLES CH-P17: EA 50x50x5, THE FLAT LEG {_n(pw['drop'])} UNDER THE MEMBER. A {_n(pw['weld']['leg'])} FILLET ALONG THE UPRIGHT "

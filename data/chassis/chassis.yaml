@@ -202,7 +202,7 @@ fittings:
      at: ["axle_x + xt_rear_shock_front - 3", 0, "rail_underside_z + 75"], side_y: "rail_c - 200"}
   - {id: CH-P08, name: "Hinge crossmember gusset, SHS 50 x 50 x 3 at 45 degrees (TB 070), its ends cut at 45 degrees to bear on the crossmember's face and on the face of the hinge cheek beside it, welded all round, two behind each hinge crossmember and two ahead of the centre's", kind: tube, section: SHS_50x50x3, length: hinge_gusset_l, qty: 6,
      poses: hinge_gussets, fat: null}
-  - {id: CH-P16, name: "Hinge cheek, 10 mm, 150 x 108.5 beside each XT hinge crossmember on the rail's inner face, with a 300 mm step where a hinge gusset lands on it, welded to the web and the hinge bar", kind: plate, l: 150, w: 108.5, t: 10, qty: 8,
+  - {id: CH-P16, name: "Hinge cheek, 10 mm, 150 x 108.5 beside each XT hinge crossmember on the rail's inner face, with a step where a hinge gusset lands on it, 300 mm at the front hinge and 140 mm at the XT centre, welded to the web and the hinge bar", kind: plate, l: 150, w: 108.5, t: 10, qty: 8,
      poses: hinge_cheeks, plane: xz, fat: FAT-22}
   # CH-P17, the shear panel PNL-1's pieces (I2-87, fx18-det): EA 50 x 50 x 5 angles, each with its upright leg on a member's
   # web and its flat leg `drop` under the member's underside, level with the tanks' guard, where the 3 mm sheet bolts up
@@ -375,11 +375,13 @@ fatigue_details:
   - {id: FAT-21, name: "Drawbar member's lap under the rail, opened to 2.5 mm and stitch welded, the rail's bottom wall at the stitch ends", iiw: "324", fat: 36, stress: rail_level, z: rail_underside_z, where: {from: body_x0, to: db_end_x}}
   # FAT-22 and FAT-23 (I2-95): the hinge cheeks CH-P16 and the shear panel's angles CH-P17 are welded along the rail's inner
   # web and its bottom corner, never across it, so each end of their welds is the end of a longitudinal attachment on the
-  # rail, IIW 521 by its length along the rail: FAT 63 for a cheek's 150 mm and FAT 50 over 300 mm for an angle's 595 mm,
+  # rail, IIW 521 by its length along the rail: FAT 63 for a cheek's 150 to 300 mm, FAT 50 over 300 mm for the front
+  # hinge's stepped cheeks' 340 mm (FAT-24, I2-99) and for an angle's 595 mm,
   # read on the composite rail's extreme fibre at each end, as FAT-16 reads the steadies' brackets. The weld along the
   # rail's corner is a flare bevel weld, classed here as the fillet it replaces (est.). The angles start 25 mm behind the
   # XT centre's rear cheeks, a set gap, so the two parts' welds end apart and each end is read on its own
-  - {id: FAT-22, name: "Hinge cheek's welds along the rail's inner web and bottom corner, their ends (l 150 mm)", iiw: "521", fat: 63, stress: rail_extreme, where: cheek_ends_x}
+  - {id: FAT-22, name: "Hinge cheek's welds along the rail's inner web and bottom corner, their ends (l 150 to 300 mm)", iiw: "521", fat: 63, stress: rail_extreme, where: cheek_ends_x}
+  - {id: FAT-24, name: "Hinge cheek with its step at the front hinge, its welds' ends along the rail's inner web (l over 300 mm)", iiw: "521", fat: 50, stress: rail_extreme, where: long_cheek_ends_x}
   - {id: FAT-23, name: "Shear panel angle's welds along the rail's inner web and bottom corner, their ends (l over 300 mm)", iiw: "521", fat: 50, stress: rail_extreme, where: panel_angle_ends_x}
 
 # Holes the runs make in the chassis members (data/services.yaml `holes`, the services' list, read here only). A hole is
@@ -541,7 +543,7 @@ xt_hinges:
   bar: {leg: 6, run: 80, runs: [50, 150, 250]}
   gusset: {length: hinge_gusset_l, faces: [1, -1], omit: [CM-04KF, CM-04RF], z_over_underside: 69, weld: {leg: 5, acute_leg: 5, obtuse_throat: 3}}
   cheek: {t: 10, l: 150, h: 108.5, below: 26, leg: 6, bar_d: 26, bar_leg: 10, corner: 0.3125, cope: 12, omit: [],
-          under_gusset: {l: {CM-04: 300, CM-05: 140}, z0: 39, z1: 99.5}}
+          under_gusset: {l: {XT front hinge: 300, XT centre: 140}, z0: 39, z1: 99.5}}
 
 # The XT arms' limits in LC8a (I2-94). An airbag cannot pull. Where an arm's balance about its hinge asks less of its
 # airbag than the airbag gives with the arm at full droop, its force at ride (the weight's) less the air spring's rate

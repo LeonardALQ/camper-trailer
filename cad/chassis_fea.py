@@ -1094,7 +1094,7 @@ class Analysis:
         n1 = abs(float(res.forces[k][6]))
         if g.get("on_cheek"):                            # the step spreads it: a rigid patch on the web, its push normal to it
             ug = ck["under_gusset"]
-            ls = ug["l"][g["cm"]] if isinstance(ug["l"], dict) else ug["l"]
+            ls = ug["l"][next(m.station for m in self.ch.members if m.id == g["cm"])] if isinstance(ug["l"], dict) else ug["l"]
             bb, ee = (ug["z1"] - ug["z0"]) / b0, ls / b0
             qf = (1 - n) ** (0.6 - 0.5 * bb)
             cap = fy0 * t0 ** 2 / (1 - bb) * (2 * ee + 4 * math.sqrt(1 - bb)) * qf / math.sin(th)

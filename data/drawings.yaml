@@ -342,6 +342,7 @@ drawings:
       - {rev: AF, date: 2026-11-25, description: "Notice: the hinge cheeks' welds, the corner a flare-bevel weld (I2-92)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AG, date: 2026-11-25, description: "Memo: the fatigue table gains FAT-22 and FAT-23, the cheeks and angles", drawn: Kiro, checked: "", approved: ""}
       - {rev: AH, date: 2026-11-25, description: "Memo: detail G gives LOC-04's 44.2 kN on one pad, the fatigue table re-read", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AI, date: 2026-11-25, description: "Memo: the fatigue table gains FAT-24, the stepped cheeks, on 2.85 mm rows", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads
