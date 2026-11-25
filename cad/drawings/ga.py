@@ -72,7 +72,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
     S.vdim(sh, xr, P(0, hb)[1], xr, P(0, -hb)[1], xr + 6, f"{V['body_width']:.0f} BODY", size=1.9)
     S.vdim(sh, xr, P(0, ch["width_road_y"])[1], xr, P(0, ch["width_kerb_y"])[1], xr + 12, f"{ch['overall_width']:.0f} OVERALL", size=1.9)
     xh = V["axle_x"] + V["rear_hub_dx"]
-    S.vdim(sh, P(xh, V["hub_y"])[0], P(0, V["hub_y"])[1], P(xh, -V["hub_y"])[0], P(0, -V["hub_y"])[1], P(xh + 420, 0)[0],
+    S.vdim(sh, P(xh, V["hub_y"])[0], P(0, V["hub_y"])[1], P(xh, -V["hub_y"])[0], P(0, -V["hub_y"])[1], P(xh + 400, 0)[0],
            f"{V['track']:.0f} TRACK", size=1.8, ext=False)
     for x in (V["axle_x"] + V["front_hub_dx"], xh):
         p0, p1 = P(x, hb + 60), P(x, -hb - 60)
@@ -199,7 +199,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
     ]
     yk = S.table(sh, 230.0, gz - 14.0, [("KEY FIGURE", 34), ("VALUE", 30), ("NOTE", 116)], rows, size=1.5, row_h=3.1, title="KEY FIGURES")
     S.notes(sh, 230.0, yk - 6.0, [
-        "THE SET: CT-002 MASS AND CoG, CT-003 COMPLIANCE, CT-010 TO CT-013 LAYOUT, CT-101 TO CT-104 CHASSIS AND LOAD PATHS, CT-201 TO "
+        "THE SET: CT-002 MASS AND CoG, CT-003 COMPLIANCE, CT-010 TO CT-013 LAYOUT, CT-101 TO CT-105 CHASSIS, LOAD PATHS AND HOLES, CT-201 TO "
         "CT-301 BODY, CT-601 TO CT-621 SERVICES, CT-701 TO CT-704 THE UTE'S BIKE BOX.",
     ], title="", size=1.4, width_chars=150)
     S.notes(sh, 22, 76, [

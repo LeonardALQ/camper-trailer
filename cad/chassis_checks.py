@@ -2,7 +2,8 @@
 from __future__ import annotations
 
 LOCAL = {"chain_lug": "chain_lug", "front_recovery": "front_recovery", "rear_recovery": "rear_recovery",
-         "jacking_pad": "jacking_pad", "spare_posts": "spare_posts", "steady_bracket": "steady_bracket", "coupling_plate": "coupling_plate"}
+         "jacking_pad": "jacking_pad", "spare_posts": "spare_posts", "steady_bracket": "steady_bracket", "coupling_plate": "coupling_plate",
+         "shear_panel": "shear_panel", "hinge_cheeks": "hinge_cheeks"}
 DEFLECTION = {"span": "rail between the drawbar root and the front hub, against the chord", "tip": "rear overhang tip, against the line "
               "through the two hubs", "outrigger": "outrigger tip, against the rail at its root"}
 
@@ -52,15 +53,44 @@ def chassis_row(c, res: dict) -> dict:
                f"{'its holes short of the table' if not r['size_ok'] else ''}".rstrip(", ") for r in bad]
         deep = max(w["low_depth"], w["high_depth"])
         n_holes = sum(r["holes"] for r in rows)
-        return dict(limit=f"each low and high point within {g['max_depth']:g} mm of an opening, each closed end's holes to the table",
-                    measured=len(bad), unit=f"of {len(rows)} closed sections", margin=-len(bad), ok=not bad,
-                    governing=(", ".join(r["id"] for r in bad[:4]) if bad else f"{w['id']}, {deep:.1f} mm"),
+        ov = g.get("overlaps") or []
+        ov_bad = [o for o in ov if not o["ok"]]
+        ov_text = " ".join(f"{o['id']}, {o['qty']} of {o['area']:,.0f} mm2, vents {' and '.join(format(d, 'g') for d in o['vents'])} mm against "
+                           f"{o['need_n']} of {o['need_d']:g} mm{' (fails)' if not o['ok'] else ''}." for o in ov)
+        return dict(limit=f"each low and high point within {g['max_depth']:g} mm of an opening, each closed end's holes to the table, each sealed overlap vented",
+                    measured=len(bad) + len(ov_bad), unit=f"of {len(rows)} closed sections and {len(ov)} sealed overlaps", margin=-len(bad) - len(ov_bad),
+                    ok=not bad and not ov_bad,
+                    governing=(", ".join([r["id"] for r in bad[:4]] + [o["id"] for o in ov_bad]) if bad or ov_bad else f"{w['id']}, {deep:.1f} mm"),
                     detail=(f"{len(rows) - len(bad)} of {len(rows)} closed sections drain and vent in every hang, rolled {g['roll']:g} deg either side down "
                             f"and pitched {g['pitches'][0]:g} to {g['pitches'][-1]:g} deg drawbar end down, through their {n_holes} holes for galvanising, "
                             f"the rails' slots and their open ends. "
                             + "".join(f"{x}. " for x in why)
                             + f"The deepest is {w['id']}'s {'low' if w['low_depth'] >= w['high_depth'] else 'high'} point, {deep:.1f} mm from its opening's edge, "
-                            f"{w['low_hang'] if w['low_depth'] >= w['high_depth'] else w['high_hang']}"))
+                            f"{w['low_hang'] if w['low_depth'] >= w['high_depth'] else w['high_hang']}. Sealed overlaps against the guide's pages 29 and 30: {ov_text}"))
+    if c.type == "chassis_local" and c.item == "ultimate":
+        g = res["governing"]["LC8u"]
+        hs = [h for h in res["holes"] if not h["open"] and h.get("ultimate")]
+        wh = max(hs, key=lambda h: h["ultimate"]["util"])
+        u = wh["ultimate"]
+        over = sorted({m for m, r in res["envelope"]["LC8u"].items() if r["util"] > 1 + 1e-9}
+                      | {f"{h['id']}" for h in hs if h["ultimate"]["util"] > 1 + 1e-9})
+        worst = max(g["util"], u["util"])
+        return dict(limit="members <= fy on Ze, holes <= 0.85 fu on the net section, at 78.5 kN", measured=round(100 * worst, 1), unit="%",
+                    margin=round(100 * (1 - worst), 1), ok=worst <= 1 + 1e-9,
+                    governing=(f"{g['member']}, {g['case']}" if g["util"] >= u["util"] else f"{wh['id']} in {wh['wall']}, {u['case']}"),
+                    detail=(f"At the 78.5 kN ultimate the worst member is {g['member']}, {g['eq']:.0f} MPa on its effective section against its "
+                            f"{g['limit']:.0f} MPa fy at X {g['at'][0]}, {g['case']}, {g['util']:.2f}, and the worst hole {wh['id']} in {wh['wall']} at X "
+                            f"{wh['x']:,.0f}, {u['mpa']:.0f} MPa on its net section against 0.85 fu, {u['limit']:.1f} MPa, {u['util']:.2f}. "
+                            + (f"Over their limits: {', '.join(over)}." if over else "Every member and hole holds the ultimate pull.")))
+    if c.type == "chassis_local" and c.item == "hinge_joints":
+        hp = res["hinge_joints"]
+        w = hp["worst"]
+        fat = ", ".join(f"{f['id']} {f['range_mpa']:.1f} of {f['cafl']:.1f} MPa" for f in hp["fatigue"])
+        return dict(limit="each case's limit, FAT-03 and FAT-13 within their CAFL", measured=round(100 * w["util"], 1), unit="%",
+                    margin=round(100 * (1 - w["util"]), 1), ok=hp["ok"], governing=f"{w['part']}, {w['lc']}, {w['case']}",
+                    detail=(f"With each hinge tied to its crossmember at the hinge bar's welds and to the rail by its cheeks, and the gussets either "
+                            f"side carrying load, the worst is {w['part']}, "
+                            f"{w['mpa']:.0f} MPa against {w['limit']:.0f} MPa in {w['lc']}, {w['case']}, {w['util']:.2f}. At the roots and hinges: {fat}."))
     if c.type == "chassis_local":
         r = res["local"][LOCAL[c.item]]
         return dict(limit="<= 100 % of each part's limit", measured=round(100 * r["util"], 1), unit="%", margin=round(100 * (1 - r["util"]), 1),

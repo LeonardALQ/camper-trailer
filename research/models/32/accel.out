@@ -13,34 +13,34 @@ Checks, not fitted. The model at factor 1.00 and at 1.04, and the factor each im
   Check, ordinary Ranger V6, 2,415 kg with the driver (est.): 0 to 100 km/h 9.3 s at 1.04, tested 8.2 to 8.5 s
 
 Towing on a flat road in still air, CdA 4.55 m2, Crr 0.011 (est.), the 10R80's ratios on a 3.73 final drive (est.), 0.2 s lost at each upshift, factor 1.00. Wheel figures are crank x 0.85, the model's own (est.), where report 31 and VEHICLE.md quote wheel figures at 0.845
-Level                                  Crank kW Wheel kW Wheel hp    7750 kg    7450 kg    7324 kg    7200 kg
-Stock Super Duty, 154 kW, 600 Nm            154      131      176  39.7/18.8  38.0/18.0  37.3/17.6  36.6/17.2
-CUT1 on Ford's turbo, 184 kW, 600 Nm        184      157      210  32.4/14.7  31.0/14.1  30.5/13.8  30.0/13.6
-The plan, 205 kW, 650 Nm                    206      175      235  27.4/11.9  26.3/11.4  25.9/11.2  25.4/11.1
-The 250 hp option, 220 kW, 650 Nm           220      187      251  25.9/11.1  24.9/10.7  24.5/10.5  24.1/10.3
-The new level, 250 kW, 700 Nm               250      213      285  22.4/ 9.0  21.6/ 8.7  21.2/ 8.5  20.9/ 8.4
-About 350 bhp, 260 kW, 700 Nm               260      221      296  22.0/ 8.7  21.2/ 8.4  20.8/ 8.3  20.5/ 8.2
+Level                                  Crank kW Wheel kW Wheel hp    7750 kg    7450 kg    7387 kg    7200 kg
+Stock Super Duty, 154 kW, 600 Nm            154      131      176  39.7/18.8  38.0/18.0  37.7/17.8  36.6/17.2
+CUT1 on Ford's turbo, 184 kW, 600 Nm        184      157      210  32.4/14.7  31.0/14.1  30.8/13.9  30.0/13.6
+The plan, 205 kW, 650 Nm                    206      175      235  27.4/11.9  26.3/11.4  26.1/11.3  25.4/11.1
+The 250 hp option, 220 kW, 650 Nm           220      187      251  25.9/11.1  24.9/10.7  24.7/10.6  24.1/10.3
+The new level, 250 kW, 700 Nm               250      213      285  22.4/ 9.0  21.6/ 8.7  21.4/ 8.6  20.9/ 8.4
+About 350 bhp, 260 kW, 700 Nm               260      221      296  22.0/ 8.7  21.2/ 8.4  21.0/ 8.3  20.5/ 8.2
 Each cell: 0 to 100 km/h s / 80 to 100 km/h s
 0 to 80 km/h at 7,750 kg: 154 kW 22.0 s, 184 kW 18.7 s, 205 kW 16.4 s, 220 kW 15.8 s, 250 kW 14.4 s, 260 kW 14.2 s
 
 Towing on a flat road in still air, CdA 4.55 m2, Crr 0.011 (est.), the 10R80's ratios on a 3.73 final drive (est.), 0.2 s lost at each upshift, factor 1.04. Wheel figures are crank x 0.85, the model's own (est.), where report 31 and VEHICLE.md quote wheel figures at 0.845
-Level                                  Crank kW Wheel kW Wheel hp    7750 kg    7450 kg    7324 kg    7200 kg
-Stock Super Duty, 154 kW, 600 Nm            154      131      176  37.4/17.5  35.8/16.7  35.2/16.4  34.5/16.0
-CUT1 on Ford's turbo, 184 kW, 600 Nm        184      157      210  30.7/13.8  29.4/13.2  28.9/13.0  28.4/12.8
-The plan, 205 kW, 650 Nm                    206      175      235  26.0/11.3  25.0/10.8  24.6/10.6  24.2/10.5
-The 250 hp option, 220 kW, 650 Nm           220      187      251  24.7/10.5  23.7/10.1  23.4/10.0  23.0/ 9.8
-The new level, 250 kW, 700 Nm               250      213      285  21.4/ 8.6  20.6/ 8.3  20.3/ 8.1  20.0/ 8.0
-About 350 bhp, 260 kW, 700 Nm               260      221      296  21.0/ 8.3  20.2/ 8.0  19.9/ 7.9  19.6/ 7.8
+Level                                  Crank kW Wheel kW Wheel hp    7750 kg    7450 kg    7387 kg    7200 kg
+Stock Super Duty, 154 kW, 600 Nm            154      131      176  37.4/17.5  35.8/16.7  35.5/16.5  34.5/16.0
+CUT1 on Ford's turbo, 184 kW, 600 Nm        184      157      210  30.7/13.8  29.4/13.2  29.2/13.1  28.4/12.8
+The plan, 205 kW, 650 Nm                    206      175      235  26.0/11.3  25.0/10.8  24.8/10.7  24.2/10.5
+The 250 hp option, 220 kW, 650 Nm           220      187      251  24.7/10.5  23.7/10.1  23.5/10.0  23.0/ 9.8
+The new level, 250 kW, 700 Nm               250      213      285  21.4/ 8.6  20.6/ 8.3  20.5/ 8.2  20.0/ 8.0
+About 350 bhp, 260 kW, 700 Nm               260      221      296  21.0/ 8.3  20.2/ 8.0  20.1/ 8.0  19.6/ 7.8
 Each cell: 0 to 100 km/h s / 80 to 100 km/h s
 0 to 80 km/h at 7,750 kg: 154 kW 21.0 s, 184 kW 17.9 s, 205 kW 15.7 s, 220 kW 15.1 s, 250 kW 13.8 s, 260 kW 13.7 s
 
-0 to 100 km/h / 80 to 100 km/h at 7,750 and 7,324 kg under factors 1.00, 1.04, 1.08, 1.18
-  Stock Super Duty, 154 kW, 600 Nm       7,750 kg 39.7/18.8 37.4/17.5 35.4/16.3 31.2/14.0 | 7,324 kg 37.3/17.6 35.2/16.4 33.3/15.3 29.4/13.2
-  CUT1 on Ford's turbo, 184 kW, 600 Nm   7,750 kg 32.4/14.7 30.7/13.8 29.2/13.0 26.0/11.4 | 7,324 kg 30.5/13.8 28.9/13.0 27.5/12.3 24.6/10.8
-  The plan, 205 kW, 650 Nm               7,750 kg 27.4/11.9 26.0/11.3 24.8/10.7 22.3/ 9.5 | 7,324 kg 25.9/11.2 24.6/10.6 23.5/10.1 21.1/ 9.0
-  The 250 hp option, 220 kW, 650 Nm      7,750 kg 25.9/11.1 24.7/10.5 23.6/10.0 21.2/ 8.9 | 7,324 kg 24.5/10.5 23.4/10.0 22.3/ 9.5 20.1/ 8.5
-  The new level, 250 kW, 700 Nm          7,750 kg 22.4/ 9.0 21.4/ 8.6 20.5/ 8.2 18.5/ 7.4 | 7,324 kg 21.2/ 8.5 20.3/ 8.1 19.4/ 7.8 17.6/ 7.0
-  About 350 bhp, 260 kW, 700 Nm          7,750 kg 22.0/ 8.7 21.0/ 8.3 20.1/ 7.9 18.2/ 7.2 | 7,324 kg 20.8/ 8.3 19.9/ 7.9 19.1/ 7.5 17.3/ 6.8
+0 to 100 km/h / 80 to 100 km/h at 7,750 and 7,387 kg under factors 1.00, 1.04, 1.08, 1.18
+  Stock Super Duty, 154 kW, 600 Nm       7,750 kg 39.7/18.8 37.4/17.5 35.4/16.3 31.2/14.0 | 7,387 kg 37.7/17.8 35.5/16.5 33.6/15.4 29.6/13.3
+  CUT1 on Ford's turbo, 184 kW, 600 Nm   7,750 kg 32.4/14.7 30.7/13.8 29.2/13.0 26.0/11.4 | 7,387 kg 30.8/13.9 29.2/13.1 27.8/12.4 24.8/10.9
+  The plan, 205 kW, 650 Nm               7,750 kg 27.4/11.9 26.0/11.3 24.8/10.7 22.3/ 9.5 | 7,387 kg 26.1/11.3 24.8/10.7 23.7/10.2 21.3/ 9.1
+  The 250 hp option, 220 kW, 650 Nm      7,750 kg 25.9/11.1 24.7/10.5 23.6/10.0 21.2/ 8.9 | 7,387 kg 24.7/10.6 23.5/10.0 22.5/ 9.6 20.3/ 8.6
+  The new level, 250 kW, 700 Nm          7,750 kg 22.4/ 9.0 21.4/ 8.6 20.5/ 8.2 18.5/ 7.4 | 7,387 kg 21.4/ 8.6 20.5/ 8.2 19.6/ 7.8 17.7/ 7.1
+  About 350 bhp, 260 kW, 700 Nm          7,750 kg 22.0/ 8.7 21.0/ 8.3 20.1/ 7.9 18.2/ 7.2 | 7,387 kg 21.0/ 8.3 20.1/ 8.0 19.2/ 7.6 17.4/ 6.9
 
 Engine speed band of each level's peak power (within 1 %)
   Stock Super Duty, 154 kW, 600 Nm         154 kW from 2,840 to 3,330 rpm, at most 600 Nm from second gear up, 600 Nm in first
@@ -59,7 +59,7 @@ The torque cap from second gear up, 250 kW or the most the cap makes by 3,600 rp
 Peak crank power on the 700 Nm family for 0 to 100 km/h in 22.0 s, under each factor (the cap reaches 264 kW at 3,600 rpm). Wheel figures are crank x 0.85
   7,750 kg, GCM case, the trailer at its plate: 1.00: 260 kW (221 kW, 297 hp), 1.04: 240 kW (204 kW, 273 hp), 1.08: 230 kW (196 kW, 263 hp), 1.18: 203 kW (173 kW, 231 hp)
   7,450 kg, Lighter, about 300 kg less: 1.00: 242 kW (206 kW, 276 hp), 1.04: 232 kW (198 kW, 265 hp), 1.08: 220 kW (187 kW, 250 hp), 1.18: 194 kW (165 kW, 221 hp)
-  7,324 kg, TC2 with growth behind the ute with growth: 1.00: 237 kW (201 kW, 270 hp), 1.04: 227 kW (193 kW, 259 hp), 1.08: 215 kW (183 kW, 245 hp), 1.18: 190 kW (162 kW, 217 hp)
+  7,387 kg, TC2 with growth behind the ute with growth: 1.00: 240 kW (204 kW, 273 hp), 1.04: 230 kW (195 kW, 262 hp), 1.08: 217 kW (185 kW, 248 hp), 1.18: 192 kW (163 kW, 219 hp)
   7,200 kg, Lighter, about 550 kg less: 1.00: 235 kW (200 kW, 268 hp), 1.04: 223 kW (189 kW, 254 hp), 1.08: 211 kW (179 kW, 241 hp), 1.18: 187 kW (159 kW, 213 hp)
   7,750 kg for 24 s at 1.04: 219 kW at the crank
   7,750 kg for 25 s at 1.04: 209 kW at the crank

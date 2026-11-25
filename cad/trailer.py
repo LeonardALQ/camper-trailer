@@ -1126,6 +1126,7 @@ class Trailer:
                 w, hv = min(rs, key=lambda q: q["v_low"]), max(rs, key=lambda q: q["v"])
                 o = st["overturn"]
                 act = min(q["act_kmh"] for q in rs)
+                vu = strength_wind(lay, self)
                 v_act = act / 3.6 * wd["Mzcat"]
                 f_slide, f_tip = (w["v_slide"] / v_act) ** 2, (w["v"] / v_act) ** 2
                 how = "slides" if w["v_slide"] <= w["v"] else "tips"
@@ -1140,9 +1141,9 @@ class Trailer:
                                    f"5 km/h, so in the lightest case the wind's force has a factor of {f_slide:.2f} against sliding and {f_tip:.2f} "
                                    f"against tipping. The Bureau warns of damaging winds from {o['warning_kmh']:.0f} km/h gusts, so a warning always "
                                    f"meets the rule. Strapped down it holds to region B's 500-year gust (STB-05). The walls' strength wind, "
-                                   f"{wd['V_u']:g} m/s, covers the highest overturning speed, {max(hv['v'], hv['v_box']):.1f} m/s with a box's Cf (H23)"),
+                                   f"{vu['V']:g} m/s, covers the highest overturning speed, {max(hv['v'], hv['v_box']):.1f} m/s with a box's Cf (H23)"),
                            overturn=dict(cases=rs, silhouette=sil, act_kmh=act, warning_kmh=o["warning_kmh"], v_low=w["v_low"], low_case=w["case"],
-                                         how=how, v_u=wd["V_u"], cf=o["cf"], cf_box=o["cf_box"], factor=o["moment_factor"], friction=o["friction"],
+                                         how=how, v_u=vu["V"], cf=o["cf"], cf_box=o["cf_box"], factor=o["moment_factor"], friction=o["friction"],
                                          slide_factor=f_slide, tip_factor=f_tip))
             elif c.type == "tie_down":
                 from .body import load_data
@@ -1380,6 +1381,25 @@ def overturn(lay: Layout, ev: dict, st: dict, sil: dict, mzcat: float, basis: st
     out["v_low"] = min(out["v"], out["v_slide"])
     out["v_act"] = out["v_low"] / math.sqrt(o["moment_factor"])
     out["act_kmh"] = 5 * math.floor(out["v_act"] / mzcat * 3.6 / 5)
+    return out
+
+
+def strength_wind(lay: Layout, tr) -> dict:
+    """The walls' strength wind by decision H23, for BDY-06 and BDY-25: BDY-19's 40 m/s (`V_u_min`), or STB-04's highest
+    overturning speed with either Cf where that is higher, rounded up to 0.1 m/s, so the walls are always checked at a
+    wind that tips the parked trailer. Worked out once for each layout."""
+    held = getattr(tr, "_strength_wind", None)
+    if held and held[0] is lay:
+        return held[1]
+    from .body import load_data
+    st, wd = tr.td["stability"], load_data()["wind"]
+    c = next(c for c in tr.prj.trailer_checks if c.id == "STB-04")
+    sil = side_silhouette(lay, st["overturn"]["cell_mm"])
+    rs = [overturn(lay, lay.evaluate_case(k), st, sil, wd["Mzcat"]) for k in tr.cases if c.cases == "all" or k.id in c.cases]
+    w = max(rs, key=lambda q: max(q["v"], q["v_box"]))
+    v = max(w["v"], w["v_box"])
+    out = dict(V=max(wd["V_u_min"], math.ceil(10 * v - 1e-9) / 10), v_tip=v, case=w["case"], v_min=wd["V_u_min"])
+    tr._strength_wind = (lay, out)
     return out
 
 

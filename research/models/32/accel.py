@@ -45,11 +45,13 @@ CENTRAL = (1.00, CALIB)
 SPREAD = (1.08, 1.18)
 
 # The combination's masses, kg. UTE-06's GCM case is the ute with growth (3,747.7 kg) and the trailer at its 4,000 kg
-# plate, 7,747.7 kg. TC2 with growth is the trailer fully loaded with 400 L of water and growth (3,576.6 kg, TRAILER.md
-# on 24 Nov 2026 at 17:11), so the ute and that trailer are 7,324.3 kg. 7,450 and 7,200 kg are the two lighter masses the plan asked
-# for. The truck's tyres carry the ute and the towball, about 4,140 kg with growth (est.), which sets the grip.
+# plate, 7,747.7 kg. TC2 with growth is the trailer fully loaded with 400 L of water and growth (3,638.9 kg, the build of
+# 25 Nov 2026 with the hinge cheeks and the rear bay's panel), so the ute and that trailer are 7,386.6 kg. 7,450 and 7,200 kg
+# are the two lighter masses the plan asked for. The truck's tyres carry the ute and the towball, about 4,140 kg with
+# growth (est.), which sets the grip.
+TC2_KG = 7387.0
 MASSES = (("GCM case, the trailer at its plate", 7750.0), ("Lighter, about 300 kg less", 7450.0),
-          ("TC2 with growth behind the ute with growth", 7324.0), ("Lighter, about 550 kg less", 7200.0))
+          ("TC2 with growth behind the ute with growth", TC2_KG), ("Lighter, about 550 kg less", 7200.0))
 N_DRIVE_KG = 4140.0  # (est.)
 
 
@@ -273,11 +275,11 @@ def results(calib):
 
 
 def bracket(factors):
-    print("0 to 100 km/h / 80 to 100 km/h at 7,750 and 7,324 kg under factors " + ", ".join(f"{c:.2f}" for c in factors))
+    print(f"0 to 100 km/h / 80 to 100 km/h at 7,750 and {TC2_KG:,.0f} kg under factors " + ", ".join(f"{c:.2f}" for c in factors))
     for key in TABLE:
         torque = curve(LEVELS[key][1])
         cells = []
-        for m in (7750.0, 7324.0):
+        for m in (7750.0, TC2_KG):
             rigs = [Rig(m, N_DRIVE_KG, calib=c) for c in factors]
             cells.append(f"{m:,.0f} kg " + " ".join(f"{run(r, torque, 0, 100):4.1f}/{run(r, torque, 80, 100):4.1f}"
                                                      for r in rigs))
