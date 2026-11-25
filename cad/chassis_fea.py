@@ -1075,31 +1075,35 @@ class Analysis:
 
     def gusset_web(self, res, k: int, g: dict) -> dict:
         """I2-99: the rail's 4 mm inner web under hinge gusset g's rail end, frame element k, read as CIDECT Design Guide 3's
-        chord face plastification of an RHS T or Y joint (2nd edition, Table 3.1), the gusset an SHS branch at 45 degrees:
-        N1* = fy t squared / ((1 - beta) sin theta) (2 eta / sin theta + 4 sqrt(1 - beta)) Qf, beta and eta the branch's
-        sides over the face's width. Where the gusset lands on its cheek, the cheek is the face's reinforcing plate (DG3
-        section 8), its 10 mm, grade 350 and its height on the web in place of the web's, at least the plate's least length
-        long. Qf = (1 - |n|) to the power 0.6 - 0.5 beta, n the rail's own normal stress at the gusset's height over its fy,
-        taken as compression whatever its sign (est.). Returns the gusset's axial force at that end `n1`, the capacity
-        `cap`, n, Qf, the plate's least length `lp` and the cheek's two web welds' stress under the gusset's pull."""
+        chord face plastification of an RHS T or Y joint (2nd edition, Table 3.1): N* = fy t squared / (1 - beta) (2 eta +
+        4 sqrt(1 - beta)) Qf for a branch square to the face, beta and eta its sides over the face's width, and for the
+        gusset at 45 degrees on the bare web N1* = fy t squared / ((1 - beta) sin theta) (2 eta / sin theta + 4 sqrt(1 -
+        beta)) Qf. Where the gusset lands on its cheek's step, the 10 mm step is taken as a rigid patch on the web, its
+        height and length the branch's sides, and the gusset's push normal to the web against it (est.: the patch is not
+        the guide's full-width reinforcing plate). Qf = (1 - |n|) to the power 0.6 - 0.5 beta, n the rail's own normal
+        stress at the gusset's height over its fy, taken as compression whatever its sign (est.). Returns the gusset's
+        axial force at that end `n1`, the capacity in the gusset's axis `cap`, n, Qf and the step's two welds' stress under
+        the gusset's pull."""
         rail = self.ch.role_sec["rail"]
         sec = self.ch.sections[next(f for f in self.ch.data["fittings"] if f["id"] == "CH-P08")["section"]]
         ck = self.ch.data["xt_hinges"]["cheek"]
         b0, t0, fy0 = rail.d, rail.t, rail.fy
-        beta, th = sec.b / b0, math.radians(45.0)
+        th = math.radians(45.0)
         sig = self.normal_at_level(res, f"RL-{SIDES[g['side']]}", g["p1"][0], g["p1"][2])
         n = min(0.99, sig / fy0)
-        qf = (1 - n) ** (0.6 - 0.5 * beta)
-        if g.get("on_cheek"):                            # on the cheek's face, the cheek a reinforcing plate (DG3 section 8)
-            bp, tp, fp = ck["under_gusset"]["h"] - ck["below"] - ck["under_gusset"]["step"], ck["t"], 350.0
-        else:
-            bp, tp, fp = b0, t0, fy0
-        bb, ee = sec.d / bp, sec.b / bp
-        cap = fp * tp ** 2 / ((1 - bb) * math.sin(th)) * (2 * ee / math.sin(th) + 4 * math.sqrt(1 - bb)) * qf
-        lp = sec.b / math.sin(th) + math.sqrt(bp * (bp - sec.d))          # the plate's least length, centred on the footprint
         n1 = abs(float(res.forces[k][6]))
-        welds = n1 * math.sin(th) / (lp * (0.7 * ck["leg"] + ck["corner"] * rail.ro)) if g.get("on_cheek") else 0.0
-        return dict(n1=n1, cap=cap, n=n, qf=qf, sigma=sig, lp=lp, welds=welds)
+        if g.get("on_cheek"):                            # the step spreads it: a rigid patch on the web, its push normal to it
+            ug = ck["under_gusset"]
+            bb, ee = (ug["z1"] - ug["z0"]) / b0, ug["l"] / b0
+            qf = (1 - n) ** (0.6 - 0.5 * bb)
+            cap = fy0 * t0 ** 2 / (1 - bb) * (2 * ee + 4 * math.sqrt(1 - bb)) * qf / math.sin(th)
+            welds = n1 * math.sin(th) / (2 * ug["l"] * 0.7 * ck["leg"])
+        else:
+            bb, ee = sec.d / b0, sec.b / b0
+            qf = (1 - n) ** (0.6 - 0.5 * bb)
+            cap = fy0 * t0 ** 2 / ((1 - bb) * math.sin(th)) * (2 * ee / math.sin(th) + 4 * math.sqrt(1 - bb)) * qf
+            welds = 0.0
+        return dict(n1=n1, cap=cap, n=n, qf=qf, sigma=sig, welds=welds)
 
     def gusset_welds(self) -> dict:
         """CHS-16: the hinge gussets' end welds in every load case, the largest throat stress round either cut end of any
@@ -1114,7 +1118,7 @@ class Analysis:
         rows = [(f"end welds, {lc_id}", e["mpa"], wcap / fac[lc_id]) for lc_id, e in self.gusset_env.items()]
         rows += [(f"rail's web under the rail end, chord face plastification, {lc_id}", e["n1"] / A1, e["cap"] / A1 / fac[lc_id])
                  for lc_id, e in self.gusset_web_env.items()]
-        rows += [(f"cheek's two web welds under a gusset's pull, {lc_id}", e["welds_max"], wcap / fac[lc_id])
+        rows += [(f"its step's two welds to the web under a gusset's pull, {lc_id}", e["welds_max"], wcap / fac[lc_id])
                  for lc_id, e in self.gusset_web_env.items() if e["welds_max"] > 0]
         lc_id, e = max(self.gusset_env.items(), key=lambda kv: kv[1]["mpa"] * fac[kv[0]])
         wl, we = max(self.gusset_web_env.items(), key=lambda kv: kv[1]["util"] * fac[kv[0]])

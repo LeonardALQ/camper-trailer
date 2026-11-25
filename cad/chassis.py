@@ -431,12 +431,12 @@ class Chassis:
             kind = f["kind"]
             if kind == "plate" and f.get("poses") == "hinge_cheeks":   # each cheek at its own size (xt_hinges `cheek`, I2-99)
                 cs = self.hinge_cheeks()
-                area = [sum((b[3] - b[0]) * (b[5] - b[2]) for b in c["boxes"]) for c in cs]
-                kinds = sorted({(c["l"], c["h"], len(c["boxes"])) for c in cs})
+                area = [c["area"] for c in cs]
+                kinds = sorted({(round(c["l"], 1), round(c["h"], 1), len(c["boxes"])) for c in cs})
                 m = sum(area) * f["t"] * dens / 1e9 / len(cs)
                 out.append(Fitting(f["id"], f["name"], kind, len(cs), at, m, "calculated",
-                                   "Calculated: " + " and ".join(f"{sum(1 for c in cs if (c['l'], c['h'], len(c['boxes'])) == k_)} x {k_[0]:g} x {k_[1]:g}"
-                                                                 + (" stepped" if k_[2] > 1 else "") for k_ in kinds)
+                                   "Calculated: " + " and ".join(f"{sum(1 for c in cs if (round(c['l'], 1), round(c['h'], 1), len(c['boxes'])) == k_)} x {k_[0]:g} x {k_[1]:g}"
+                                                                 + (" with its step" if k_[2] > 1 else "") for k_ in kinds)
                                    + f" x {f['t']} mm plate at {dens} kg/m3", t=f["t"], dims=(f["l"], f["w"], f["t"]),
                                    area_m2_each=2 * sum(area) / 1e6 / len(cs)))
             elif kind == "plate":
@@ -668,19 +668,25 @@ class Chassis:
             for e, tag in ((-1, "F"), (1, "B")):
                 gid = f"{cm.id}{SIDES[w['side']]}" + ("" if e > 0 else "F")
                 gusset = big is not None and e in g.get("faces", [1]) and gid not in g.get("omit", [])
-                l, h = (big["l"], big["h"]) if gusset else (ck["l"], ck["h"])
                 face = w["station_x"] + e * V["xm_w"] / 2
                 x0 = face if e > 0 else face - ck["l"]
                 y0 = w["side"] * y_in - (ck["t"] if w["side"] > 0 else 0.0)
-                box = (x0, y0, z0, x0 + ck["l"], y0 + ck["t"], z0 + h)
-                boxes = [box]
-                if gusset:                              # its stepped part on beyond its `l`, where the gusset lands
-                    xa, xb = sorted((face + e * ck["l"], face + e * l))
-                    boxes.append((xa, y0, V["rail_underside_z"] + big["step"], xb, y0 + ck["t"], z0 + h))
+                box = (x0, y0, z0, x0 + ck["l"], y0 + ck["t"], z0 + ck["h"])
+                boxes, area = [box], ck["l"] * ck["h"]
+                if gusset:                              # the step where the gusset lands, centred on its footprint (I2-99)
+                    xc = face + e * (self.ev(g["length"]) / math.sqrt(2) - ck["t"])
+                    za, zb = V["rail_underside_z"] + big["z0"], V["rail_underside_z"] + big["z1"]
+                    step = (xc - big["l"] / 2, y0, za, xc + big["l"] / 2, y0 + ck["t"], zb)
+                    boxes.append(step)
+                    over = max(0.0, min(box[3], step[3]) - max(box[0], step[0])) * max(0.0, min(box[5], step[5]) - max(box[2], step[2]))
+                    area += big["l"] * (zb - za) - over
+                ends = [b_[0] for b_ in boxes] + [b_[3] for b_ in boxes]
+                l = (max(ends) - face) if e > 0 else (face - min(ends))
+                h = max(b_[5] for b_ in boxes) - z0
                 if f"{w['id']}{tag}" in ck.get("omit", []):
                     continue
                 out.append(dict(id=f"CH-P16-{w['id']}{tag}", member=f"CH-P16-{w['id']}", wheel=w["id"], side=w["side"], box=box,
-                                centre=tuple((box[i] + box[i + 3]) / 2 for i in range(3)), l=l, h=h, boxes=boxes, face=face, way=e,
+                                centre=tuple((box[i] + box[i + 3]) / 2 for i in range(3)), l=l, h=h, boxes=boxes, area=area, face=face, way=e,
                                 gusset=f"CH-P08-{gid}" if gusset else None))
         return out
 

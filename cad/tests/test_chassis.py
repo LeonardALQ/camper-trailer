@@ -281,19 +281,19 @@ def test_the_videoscope_reaches_each_end_plates_weld_roots():
 
 
 def test_each_hinge_gusset_is_cut_to_bear_on_both_faces():
-    """CH-P08 as made (xt_hinges `gusset`): each gusset's axis runs at 45 degrees from the crossmember's face to the rail's
-    inner face, `length` between them, its long side 25 mm beyond each end and its short side 25 mm inside, and its short
-    side meets the web behind the hinge cheek's end, its fillet's toe clear of the cheek. The frame model ties it where its
-    axis meets the two faces, the centres of its welds."""
+    """CH-P08 as made (xt_hinges `gusset`): each gusset's axis runs at 45 degrees from the crossmember's face to the step of
+    the cheek beside it, 10 mm inboard of the rail's inner face (I2-99), its long side 25 mm beyond each end and its short
+    side 25 mm inside, its end on the crossmember where the data's length to the web puts it. The frame model ties it where
+    its axis meets the two faces, the centres of its welds."""
     g = CH.data["xt_hinges"]["gusset"]
     length = CH.ev(g["length"])
     y_in = CH.V["rail_c"] - CH.role_sec["rail"].b / 2
     cheek = CH.data["xt_hinges"]["cheek"]
     for hg in CH.hinge_gussets():
-        assert math.dist(hg["p0"], hg["p1"]) == pytest.approx(length, abs=1e-6)
-        assert hg["p0"][0] == pytest.approx(hg["rear_x"]) and abs(hg["p1"][1]) == pytest.approx(y_in)
-        short_on_web = min(abs(x - hg["rear_x"]) for x, y in hg["outline"] if abs(abs(y) - y_in) < 1e-6)
-        assert short_on_web - g["weld"]["acute_leg"] >= cheek["l"] + 5.0, hg["id"]
+        assert hg["on_cheek"]
+        assert math.dist(hg["p0"], hg["p1"]) == pytest.approx(length - cheek["t"] * math.sqrt(2), abs=1e-6)
+        assert hg["p0"][0] == pytest.approx(hg["rear_x"]) and abs(hg["p1"][1]) == pytest.approx(y_in - cheek["t"])
+        assert abs(hg["p0"][1]) == pytest.approx(y_in - length / math.sqrt(2))
     fm = TRAILER._chassis[1].frame()
     for hg in CH.hinge_gussets():
         el = next(e for e in fm.f.elements if e.member == hg["id"])
@@ -360,21 +360,22 @@ def test_the_panel_reads_its_tongues_roots_and_its_held_points():
     assert r["util"] <= 1.0
 
 
-def test_every_gusset_lands_on_a_cheek_long_enough_for_cidect():
-    """I2-99: each hinge gusset's rail end lands on its cheek's stepped part, which reaches CIDECT's least length for a
-    reinforcing plate either side of the gusset's footprint, and CHS-16 reads the web under it."""
+def test_every_gusset_lands_on_its_cheeks_step():
+    """I2-99: each hinge gusset's rail end lands on the step of the cheek beside it, its footprint and its welds inside
+    the step, and CHS-16 reads the web under the step and the step's welds."""
     ck = CH.data["xt_hinges"]["cheek"]
     sec = CH.sections[next(f for f in CH.data["fittings"] if f["id"] == "CH-P08")["section"]]
-    bp = ck["under_gusset"]["h"] - ck["below"] - ck["under_gusset"]["step"]
-    lp = sec.b / math.sin(math.radians(45)) + math.sqrt(bp * (bp - sec.d))
+    leg = CH.data["xt_hinges"]["gusset"]["weld"]["leg"]
     cheeks = {c["gusset"]: c for c in CH.hinge_cheeks() if c["gusset"]}
+    half = sec.b / 2 * math.sqrt(2)
     for g in CH.hinge_gussets():
         step = cheeks[g["id"]]["boxes"][1]
         assert g["on_cheek"]
-        assert step[0] <= g["rail_x"] - lp / 2 + 1e-6 and g["rail_x"] + lp / 2 <= step[3] + 1e-6
-        assert step[2] <= g["z"] - sec.d / 2 and g["z"] + sec.d / 2 <= step[5]
+        assert step[0] <= g["rail_x"] - half - leg and g["rail_x"] + half + leg <= step[3]
+        assert step[2] <= g["z"] - sec.d / 2 - leg and g["z"] + sec.d / 2 + leg <= step[5]
     parts = " ".join(p["part"] for p in RES["local"]["hinge_gussets"]["parts"])
-    assert "chord face plastification, LC8u" in parts and RES["local"]["hinge_gussets"]["util"] <= 1.0
+    assert "chord face plastification, LC8u" in parts and "its step's two welds" in parts
+    assert RES["local"]["hinge_gussets"]["util"] <= 1.0
 
 
 def test_lc8a_reads_both_wheels_of_an_axle_held_at_the_recovery_limit():
