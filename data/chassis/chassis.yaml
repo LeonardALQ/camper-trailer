@@ -208,7 +208,7 @@ fittings:
   # member. The stiffener is an EA 25 x 25 x 3 DuraGal angle under the sheet's front edge at the jacking pads' rear edges,
   # its upright leg down, bolted with the sheet, so it gathers the edge's shear to the tongue under the XT centre
   # crossmember. It is bought galvanised and is not in the frame's dip
-  - {id: CH-P17, name: "Shear panel pieces, EA 50 x 50 x 5 angles welded along both rails' inner webs and to the two crossmembers' webs facing the rear tank's bay, their flat legs 26 mm under the members where the 3 mm sheet bolts up to them, and an EA 25 x 25 x 3 stiffener under the sheet's front edge", kind: angles, fat: null,
+  - {id: CH-P17, name: "Shear panel pieces, EA 50 x 50 x 5 angles welded along both rails' inner webs and to the two crossmembers' webs facing the rear tank's bay, their flat legs 26 mm under the members where the 3 mm sheet bolts up to them, and an EA 25 x 25 x 3 stiffener under the sheet's front edge", kind: angles, fat: FAT-23,
      drop: 26, gauge: 28, weld: {leg: 5, corner_throat: 3},
      material: "EA 50 x 50 x 5 angles, AS/NZS 3679.1 300PLUS or C450L0 DuraGal, hot-dip galvanised with the frame, and an EA 25 x 25 x 3 C450L0 DuraGal angle bought galvanised and bolted with the sheet",
      rails: {section: EA_50x50x5, gap: 25, end: 10},
@@ -363,6 +363,14 @@ fatigue_details:
   # row takes the floor, FAT 36, on the rail's bottom wall's normal range along the lap (est.). The member's top wall at
   # the same stitch ends carries less (fx14-chs lap.py, 11.4 MPa)
   - {id: FAT-21, name: "Drawbar member's lap under the rail, opened to 2.5 mm and stitch welded, the rail's bottom wall at the stitch ends", iiw: "324", fat: 36, stress: rail_level, z: rail_underside_z, where: {from: body_x0, to: db_end_x}}
+  # FAT-22 and FAT-23 (I2-95): the hinge cheeks CH-P16 and the shear panel's angles CH-P17 are welded along the rail's inner
+  # web and its bottom corner, never across it, so each end of their welds is the end of a longitudinal attachment on the
+  # rail, IIW 521 by its length along the rail: FAT 63 for a cheek's 150 mm and FAT 50 over 300 mm for an angle's 595 mm,
+  # read on the composite rail's extreme fibre at each end, as FAT-16 reads the steadies' brackets. The weld along the
+  # rail's corner is a flare bevel weld, classed here as the fillet it replaces (est.). The angles start 25 mm behind the
+  # XT centre's rear cheeks, a set gap, so the two parts' welds end apart and each end is read on its own
+  - {id: FAT-22, name: "Hinge cheek's welds along the rail's inner web and bottom corner, their ends (l 150 mm)", iiw: "521", fat: 63, stress: rail_extreme, where: cheek_ends_x}
+  - {id: FAT-23, name: "Shear panel angle's welds along the rail's inner web and bottom corner, their ends (l over 300 mm)", iiw: "521", fat: 50, stress: rail_extreme, where: panel_angle_ends_x}
 
 # Holes the runs make in the chassis members (data/services.yaml `holes`, the services' list, read here only). A hole is
 # the run's diameter and a bush across, a slot along the member where the run passes on a slant. CHS-09 checks the net

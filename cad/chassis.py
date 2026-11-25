@@ -759,7 +759,9 @@ class Chassis:
         return dict(crossmember_stations=[self.station_x(st) for st in self.stations], body_x0=V["body_x0"], db_end_x=V["db_end_x"],
                     chain_lug_x=V["chain_lug_x"], jack_x=self.station_x(jack), hub_front_x=self.hub_x("front"), hub_rear_x=self.hub_x("rear"),
                     rear_tongue_x=V["body_x1"] - 70, front_recovery_x=V["front_recovery_x"], root_gusset_toe_x=V["root_gusset_toe_x"],
-                    steady_x=sorted({p["x"] for p in self.steady_poses()}))
+                    steady_x=sorted({p["x"] for p in self.steady_poses()}),
+                    cheek_ends_x=sorted({x for c in self.hinge_cheeks() for x in (c["box"][0], c["box"][3])}),
+                    panel_angle_ends_x=sorted({x for p in self.panel_pieces() if p["use"] == "rail" for x in (p["x0"], p["x1"])}))
 
     # -- the frame model ----------------------------------------------
     def frame(self, body: list[tuple[float, float, float]] | None = None, hinges: str = "crossmember") -> "FrameModel":

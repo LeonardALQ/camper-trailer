@@ -278,3 +278,61 @@ def test_the_videoscope_reaches_each_end_plates_weld_roots():
         near = [h for h in RES["holes"] if h.get("frame") == f"RL-{side}" and h["wall"].startswith("the rail's")
                 and 0 < h["x"] - CH.V["body_x0"] <= 150 and h["d"] >= 10]
         assert near, side
+
+
+def test_each_hinge_gusset_is_cut_to_bear_on_both_faces():
+    """CH-P08 as made (xt_hinges `gusset`): each gusset's axis runs at 45 degrees from the crossmember's face to the rail's
+    inner face, `length` between them, its long side 25 mm beyond each end and its short side 25 mm inside, and its short
+    side meets the web behind the hinge cheek's end, its fillet's toe clear of the cheek. The frame model ties it where its
+    axis meets the two faces, the centres of its welds."""
+    g = CH.data["xt_hinges"]["gusset"]
+    length = CH.ev(g["length"])
+    y_in = CH.V["rail_c"] - CH.role_sec["rail"].b / 2
+    cheek = CH.data["xt_hinges"]["cheek"]
+    for hg in CH.hinge_gussets():
+        assert math.dist(hg["p0"], hg["p1"]) == pytest.approx(length, abs=1e-6)
+        assert hg["p0"][0] == pytest.approx(hg["rear_x"]) and abs(hg["p1"][1]) == pytest.approx(y_in)
+        short_on_web = min(abs(x - hg["rear_x"]) for x, y in hg["outline"] if abs(abs(y) - y_in) < 1e-6)
+        assert short_on_web - g["weld"]["acute_leg"] >= cheek["l"] + 5.0, hg["id"]
+    fm = TRAILER._chassis[1].frame()
+    for hg in CH.hinge_gussets():
+        el = next(e for e in fm.f.elements if e.member == hg["id"])
+        ends = {tuple(round(v, 3) for v in fm.f.nodes[n]) for n in (el.i, el.j)}
+        assert ends == {tuple(round(v, 3) for v in hg["p0"]), tuple(round(v, 3) for v in hg["p1"])}
+
+
+def test_the_hinge_gussets_welds_hold():
+    """CHS-15: the gussets' end welds, read round each cut face by the elastic vector method in every case."""
+    r = RES["local"]["hinge_gussets"]
+    assert r["util"] <= 1.0 and any("LC8u" in p["part"] for p in r["parts"])
+
+
+def test_the_shear_panels_bolts_stand_clear_of_the_sheets_edges():
+    """CHS-13's bolts (shear_panels, CH-P17): every bolt's centre stands at least 1.75 d from the sheet's sheared edges
+    (AS 4100 Table 9.6.2) and its neighbours at least 3 d away (AS/NZS 4600 5.3.1), the four under the XT centre
+    crossmember take the whole racking shear, and the sheet's bearing and tear-out there are read by both standards."""
+    sp = CH.shear_panels()[0]
+    d = sp["fixing"]["d"]
+    groups = {g["group"]: g for g in RES["local"]["shear_panel"]["bolt_groups"]}
+    assert min(g["edge"] for g in groups.values()) >= 1.75 * d - 1e-6
+    assert groups["front"]["n"] == 4 and groups["front"]["share"] == pytest.approx(0.25)
+    for a in sp["bolts"]:
+        for b in sp["bolts"]:
+            if a is not b:
+                assert math.hypot(a["x"] - b["x"], a["y"] - b["y"]) >= 3 * d - 1e-6
+    parts = " ".join(p["part"] for p in RES["local"]["shear_panel"]["parts"])
+    for what in ("bearing at a bolt, AS 4100", "bearing at a bolt, AS/NZS 4600", "tear-out at a bolt, AS 4100", "tear-out at a bolt, AS/NZS 4600"):
+        assert what in parts
+
+
+def test_the_panels_angles_and_the_cheeks_end_apart():
+    """I2-95: the shear panel's angles along the rails start a set gap behind the XT centre's rear hinge cheeks, and
+    FAT-22 and FAT-23 read both parts' weld ends on the rail."""
+    spec = next(f for f in CH.data["fittings"] if f["id"] == "CH-P17")
+    rails = [p for p in CH.panel_pieces() if p["use"] == "rail"]
+    cheek_ends = [c["box"][3] for c in CH.hinge_cheeks() if c["id"].endswith("B") and c["wheel"].startswith("R")]
+    assert rails and cheek_ends
+    for p in rails:
+        assert p["x0"] - max(cheek_ends) == pytest.approx(spec["rails"]["gap"])
+    fat = {f["id"]: f for f in RES["fatigue"]}
+    assert fat["FAT-22"]["fat"] == 63 and fat["FAT-23"]["fat"] == 50
