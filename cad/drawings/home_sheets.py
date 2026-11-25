@@ -357,6 +357,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
         ("THE UTE (H14)", f"FORD RANGER SUPER DUTY ON FORD'S RATINGS: {lim['gvm_kg']:,.0f} kg GVM, REAR AXLE {lim['rear_axle_kg']:,.0f} kg "
                           f"({_kg(uc['UTE-03']['measured'])} kg TOWING WITH GROWTH)."),
         ("COUPLING HEIGHT", f"{V['coupling_z']:.0f} mm LADEN, PLUS OR MINUS 20 mm. SET THE HITCH'S DROP AT THE FINAL WEIGHING (TW08)."),
+        ("RECOVERY (LC8a, I2-93)", _recovery_line()),
         ("GREY WATER", f"EMPTY FOR TRAVEL. A FULL {V['grey_full_l']:.0f} L TANK IS CHECKED IN CASES TC7 AND TC8."),
         ("LEADS (DIM-04, DIM-08)", "PLUG IN THE SB50 LEAD AND THE 12-PIN LEAD. EACH STAYS CLAMPED ON THE LEADS' BRACKET AHEAD OF THE STONE GUARD "
                                    "AND STRAPPED AT ITS MARK TO THE SEAT ON ITS SPRUNG ARM (CT-601), WHICH LIFTS ITS SLACK. KEEP BOTH ARMS FREE TO SWING. "
@@ -395,20 +396,36 @@ def ct003(prj, model, bom, checks, reg, dwg):
             sh.text(270, yy - i * 2.2, t, 1.4)
         yy -= 2.2 * max(1, len(wl)) + 1.2
     sh.rect(230, yy + 0.4, 410, top, "thick")
-    yp = yy - 6
+    yp = yy - 5
     sh.text(232, yp, "VEHICLE PLATE (VSB1 13.1.1)", 2.2, bold=True)
     yq = textblock(sh, 232, yp - 4, S.wrap_mm(
         "MAKE (CONCESSIONAL TRAILER), VIN, ATM, GTM AND TARE, EMBOSSED, ETCHED OR ENGRAVED IN BLOCK LETTERS AT LEAST 2.5 mm HIGH, "
         "MATCHING THE RAV ENTRY. NSW ALSO LOOKS FOR THE MODEL AND THE DATE OF MANUFACTURE (VIB 78). THE GTM TO PLATE IS SET WITH THE "
         f"ENGINEER, AT MOST THE NSW CAP OF {rep['caps']['gtm']:,.0f} kg. THE PLATE AND VIN POSITIONS ARE NOT DESIGNED YET. PHOTOGRAPH "
         "THE VIN STAMPING BEFORE AND AFTER GALVANISING (REG-02).", 410 - 2 - 232, 1.4), size=1.4, gap=0.85)
-    yn, _ = S.notes(sh, 232, yq - 4, [
+    yn, _ = S.notes(sh, 232, yq - 3, [
         "EVERY FIGURE ON THIS SHEET COMES FROM THE MODEL'S CHECKS (data/checks.yaml, data/ute/ute.yaml) AT THE SOLVED AXLE.",
         "A RESULT IN AMBER IS A QUESTION FOR THE INSPECTOR. NO CHECK FAILS.",
     ], size=1.4, width_chars=150)
-    _lamp_checks(sh, LM, yn - 5)
+    _lamp_checks(sh, LM, yn - 3.5)
     write(sh, dwg)
     return time.time() - t0
+
+
+def _recovery_line() -> str:
+    """CT-003's recovery rule (I2-93, I2-100), from LC8a's data and the frame analysis (chassis_fea.recovery_rule)."""
+    import json
+
+    from ..build import BUILD
+    from ..chassis_fea import recovery_rule
+    cj = json.loads((BUILD / "chassis" / "chassis.json").read_text())
+    r = recovery_rule(cj["results"], next(lc for lc in cj["load_cases"] if lc["id"] == "LC8a"))
+    side = min(x for x in (r["sideways_up_kn"], r["sideways_down_kn"]) if x is not None)
+    along = min(x for x in (r["along_up_kn"], r["along_down_kn"]) if x is not None)
+    return (f"FRONT LUGS OR REAR TONGUES ONLY, WITHIN {r['sideways_deg']:g} DEGREES SIDEWAYS AND {r['vertical_deg']:g} DEGREES UP OR DOWN: "
+            f"{r['rated_kn']:.1f} kN, OR {r['held_axle_kn']:g} kN WITH BOTH WHEELS OF ONE AXLE HELD FAST. PULL LEVEL: PULLED "
+            f"{r['vertical_deg']:g} DEGREES UP OR DOWN THE EMPTY TRAILER CAN TIP FROM {side:.1f} kN AT {r['sideways_deg']:g} DEGREES SIDEWAYS "
+            f"AND {along:.1f} kN ALONG ITS LINE." + ("" if r["level_tips"] else ""))
 
 
 def _lamp_checks(sh, LM, y):
@@ -416,4 +433,4 @@ def _lamp_checks(sh, LM, y):
     rows = [[c["id"], c["what"], c["clause"], c["measured"], c["limit"],
              ("PASS" if c["ok"] else "FAIL", "#000" if c["ok"] else "#c00")] for c in LM["checks"]]
     S.table(sh, 230, y, [("ID", 13), ("CHECK", 45), ("CLAUSE", 14), ("THE DESIGN, mm", 58), ("THE LIMIT, mm", 36), ("RESULT", 14)],
-            rows, size=1.2, row_h=2.7, title="LAMPS, REFLECTORS AND THE NUMBER PLATE (ADR 13/00 APPENDIX A, VSB1 3.1)")
+            rows, size=1.2, row_h=2.55, title="LAMPS, REFLECTORS AND THE NUMBER PLATE (ADR 13/00 APPENDIX A, VSB1 3.1)")
