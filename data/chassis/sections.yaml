@@ -765,7 +765,7 @@ sections:
     fy_mpa: 450
     source: "Computed with square corners and no root fillet, A = (2 x 25 - 3) x 3. Not checked against a published table."
     published_check: null
-    use: "The shear panel PNL-1's front edge stiffener under the 3 mm sheet (CH-P17), bolted with the sheet, not welded to the frame."
+    use: "None since the shear panel PNL-1 lost its front edge stiffener (I2-98). It was that stiffener under the 3 mm sheet."
   - id: EA_40x40x4
     designation: "EA 40x40x4"
     shape: equal angle

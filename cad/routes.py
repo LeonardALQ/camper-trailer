@@ -619,6 +619,8 @@ def resolve(lay=None, V: dict | None = None, blocks: list | None = None) -> dict
     glands = gland_points(V, svc["glands"])
     ns = namespace(V, blocks, data, glands)
     ns["_arms"] = arms_of(lay)
+    from .chassis import hole_x
+    svc["holes"] = [dict(h, x=hole_x(h, lambda m: ns[key(m)].cx)) for h in svc.get("holes") or []]   # a hole tied to a member, at its place
     K = kinds(data)
     fixtures = {f["id"]: dict(f, box=ns[key(f["id"])].box) for f in data.get("fixtures") or []}
     members = way_members(data)

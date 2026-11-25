@@ -45,12 +45,12 @@ CENTRAL = (1.00, CALIB)
 SPREAD = (1.08, 1.18)
 
 # The combination's masses, kg. UTE-06's GCM case is the ute with growth (3,747.7 kg) and the trailer at its 4,000 kg
-# plate, 7,747.7 kg. TC2 with growth is the trailer fully loaded with 395 L of water and growth (3,638.4 kg, the build of
-# 25 Nov 2026 with both cheeks at every hinge and the tanks notched round the gussets), so the ute and that trailer are
-# 7,386.1 kg. 7,450 and 7,200 kg
+# plate, 7,747.7 kg. TC2 with growth is the trailer fully loaded with 385 L of water and growth (3,640.1 kg, the build of
+# 25 Nov 2026 with the XT kit's parts between the rails, the gussets on stepped cheeks and the 4 mm shear panel), so the
+# ute and that trailer are 7,387.8 kg. 7,450 and 7,200 kg
 # are the two lighter masses the plan asked for. The truck's tyres carry the ute and the towball, about 4,140 kg with
 # growth (est.), which sets the grip.
-TC2_KG = 7386.0
+TC2_KG = 7388.0
 MASSES = (("GCM case, the trailer at its plate", 7750.0), ("Lighter, about 300 kg less", 7450.0),
           ("TC2 with growth behind the ute with growth", TC2_KG), ("Lighter, about 550 kg less", 7200.0))
 N_DRIVE_KG = 4140.0  # (est.)

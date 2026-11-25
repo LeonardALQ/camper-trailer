@@ -124,3 +124,19 @@ def test_the_fresh_tanks_keep_their_clearance_to_every_fitting_they_are_notched_
                     continue
                 g = min(shape_gap(piece, s) for piece in lay.tank_pieces(t))
                 assert g >= notches[0]["clear"] - 1e-6, f"{t.iid}: {fid} at {[round(v) for v in s[0]]} stands {g:.1f} mm from it"
+
+
+def test_the_rear_tank_guard_is_the_shear_panels_sheet_as_the_chassis_data_gives_it():
+    """UF-03's rear piece is the shear panel PNL-1's sheet (I2-98): its part line takes its mass and its item from the
+    chassis data (Chassis.panel_mass), its price line and its note name the same thickness and grade, and the 3D model
+    draws the sheet at that thickness with no stiffener."""
+    lay = EV["layout"]
+    uf = next(b for b in lay.blocks if b.id == "UF-03")
+    m = lay.chassis.panel_mass("PNL-1")
+    part = next(p for p in uf.extra["parts"] if "shear panel" in p["item"])
+    assert part["kg"] == pytest.approx(m["kg"]) and part["item"].startswith(f"{m['t']:g} mm {m['material']}")
+    item = next(it for it in TRAILER.td["items"] if it["id"] == "UF-03")
+    grade = m["material"].split(" hot-rolled")[0].split()[-1]
+    price = next(p for p in item["price"] if "shear panel" in p["item"])
+    assert f"{m['t']:g} mm {grade}" in price["item"] and f"{m['t']:g} mm" in item["note"] and grade in item["note"]
+    assert uf.extra["panel"]["t"] == m["t"] and set(uf.extra["panel"]) == {"sheet", "t", "z_top"}

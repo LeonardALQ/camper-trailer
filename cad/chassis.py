@@ -572,6 +572,23 @@ class Chassis:
                             sheet=self.panel_sheet(d, x1, pieces), bolts=[b for p in pieces for b in p["bolts"]]))
         return out
 
+    def panel_mass(self, pid: str) -> dict:
+        """Shear panel pid's sheet as cut and drilled (panel_sheet): its area in plan with its tongues and the fillets
+        their radiused roots add, less its bolt holes, its steel at the frame's density, its zinc on both faces at
+        AS/NZS 4680's rate for its thickness, and the two together, for the line that carries it (UF-03)."""
+        d = next(p for p in self.data["shear_panels"] if p["id"] == pid)
+        pn = next(p for p in self.shear_panels() if p["id"] == pid)
+        sh, r = pn["sheet"], pn["sheet"]["root_r"]
+        x0, y0, x1, y1 = sh["rect"]
+        tongues = sum(abs((b[2] - b[0]) * (b[3] - b[1])) for b in sh["tongues"])
+        fillets = 2 * len(sh["tongues"]) * r * r * (1 - math.pi / 4)
+        holes = len(pn["bolts"]) * math.pi * d["fixing"]["hole"] ** 2 / 4
+        area = abs((x1 - x0) * (y1 - y0)) + tongues + fillets - holes
+        steel = area * d["t"] * self.data["material"]["density"] / 1e9
+        zinc = 2 * area / 1e6 * self.galv_rate(d["t"])
+        return dict(id=pid, area_m2=area / 1e6, steel_kg=steel, zinc_kg=zinc, kg=steel + zinc, t=d["t"], material=d["material"],
+                    density=self.data["material"]["density"], zinc_kg_m2=self.galv_rate(d["t"]), holes=len(pn["bolts"]))
+
     def panel_sheet(self, d: dict, x_rear: float, pieces: list[dict]) -> dict:
         """The panel's sheet in plan: its front edge at the jacking pads' rear edges, its rear edge at the next crossmember's
         face, its sides `edge` inside the rails' inner faces, and a tongue under each crossmember's angle, as wide as the
@@ -1355,6 +1372,16 @@ def gusset_solid(ch: Chassis, g: dict, name: str):
 
 
 PLANES = {"xy": (0, 1, 2), "xz": (0, 2, 1), "yz": (1, 2, 0)}   # which axes the plate's length, width and thickness run along
+
+
+def hole_x(row: dict, member_x) -> float:
+    """A services hole's X (data/services.yaml `holes`): its own figure, or for a hole tied to a member that moves with
+    the axle's solve, `x: {from: member, dx: mm}`, that member's X from member_x plus dx, so the hole keeps its place on
+    the member wherever the axle's window puts it (CHS-10)."""
+    x = row["x"]
+    if isinstance(x, dict):
+        return member_x(x["from"]) + float(x.get("dx", 0.0))
+    return float(x)
 
 
 def fitting_boxes(ch: Chassis, f: Fitting) -> list[tuple]:

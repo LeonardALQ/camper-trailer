@@ -253,6 +253,9 @@ class Layout:
         self.P = Params(raw)
         self.V = self.P.values
         self.blocks: list[Block] = []
+        from .chassis import Chassis
+        self.stations = self._stations()
+        self.chassis = Chassis(self.V, self.stations)   # first, so a part line can read the chassis data (UF-03's shear panel)
         for it in td["items"]:
             self.blocks.extend(self._expand(it))
         self.blocks.extend(self._crossmembers())
@@ -268,9 +271,7 @@ class Layout:
                 pn = self.chassis.shear_panels()
                 if pn:
                     spec = next(f for f in self.chassis.data["fittings"] if f["id"] == "CH-P17")
-                    stiff = next(p for p in self.chassis.panel_pieces() if p["use"] == "stiffener")
-                    b.extra["panel"] = dict(sheet=pn[0]["sheet"], t=pn[0]["t"], z_top=self.V["rail_underside_z"] - spec["drop"],
-                                            stiffener=stiff["boxes"])
+                    b.extra["panel"] = dict(sheet=pn[0]["sheet"], t=pn[0]["t"], z_top=self.V["rail_underside_z"] - spec["drop"])
         ids = [b.iid for b in self.blocks]
         dup = {i for i in ids if ids.count(i) > 1}
         if dup:
@@ -330,9 +331,21 @@ class Layout:
             if mass is not None:
                 self._mass(b, mass, it, dims, local)
             if "parts" in it:
-                self._parts(b, [dict(p, kg=self.P.eval(p["kg"], local)) for p in it["parts"]])
+                self._parts(b, [self._part(p, local) for p in it["parts"]])
             out.append(b)
         return out
+
+    def _part(self, p: dict, local: dict) -> dict:
+        """A part of a line with its mass: its own `kg`, or for a shear panel's sheet (`panel`) the sheet as the chassis
+        data cuts it (Chassis.panel_mass), its item naming the sheet's thickness and material from that data."""
+        if "panel" not in p:
+            return dict(p, kg=self.P.eval(p["kg"], local))
+        m = self.chassis.panel_mass(p["panel"])
+        return dict(p, item=p["item"].format(t=m["t"], material=m["material"]), kg=m["kg"],
+                    source=(f"Calculated: {m['area_m2']:.3f} m2 as cut, its tongues and their roots' fillets in, its "
+                            f"{m['holes']} bolt holes out, {m['t']:g} mm at {m['density']:g} kg/m3, {m['steel_kg']:.1f} kg, and "
+                            f"{m['zinc_kg']:.1f} kg of zinc on both faces at AS/NZS 4680's {1000 * m['zinc_kg_m2']:g} g/m2 "
+                            f"(Chassis.panel_mass)"))
 
     @staticmethod
     def _parts(b: Block, parts: list[dict]):
@@ -396,9 +409,7 @@ class Layout:
     def _crossmembers(self) -> list[Block]:
         """The designed chassis and drawbar (cad/chassis.py, CHASSIS.md) as mass lines and envelopes: every member,
         fitting and the galvanising."""
-        from .chassis import Chassis
-        self.stations = self._stations()
-        ch = self.chassis = Chassis(self.V, self.stations)
+        ch = self.chassis
         galv = "hot-dip galvanised after fabrication"
         plate = ch.data["material"]["plate"].split(" (")[0]
         out = []

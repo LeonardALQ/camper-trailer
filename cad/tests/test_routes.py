@@ -137,6 +137,33 @@ def test_every_hole_in_a_chassis_member_and_every_large_floor_cut_out_is_listed(
     assert not [h for h in got if h["run"] in ("B-16", "B-18", "D-14") and h["member"] == "RL-K"]
 
 
+def test_a_hole_tied_to_a_moving_member_keeps_its_place_on_it_across_the_axle_window():
+    """A hole whose run follows a member that moves with the axle's solve takes its X from that member (cad/chassis.py
+    hole_x, data/services.yaml `x: {from: member, dx: mm}`): at both ends of H17's axle window every listed hole stands
+    where its run makes it, within a millimetre, and CHS-10 reads K-08's and K-09's holes in OR-05's roots at the same
+    distances from its root weld as at the solved axle."""
+    from cad import chassis_fea as Fm
+    from cad.tests.test_trailer import TRAILER
+    w = EV["solved"]["window"]
+    def roots(lay):
+        an = Fm.Analysis(lay, TRAILER, TRAILER.chassis_model(lay))
+        return {h["id"]: (h["toe_mm"], h["edge_mm"]) for h in an.hole_sites() if h.get("run") in ("K-08", "K-09") and not h.get("open")
+                and h["wall"] == "the raiser's outer web"}
+    at_solve = roots(LAY)
+    assert set(at_solve) == {"H-01", "H-03"} and all(t >= 16.0 for t, _ in at_solve.values()), at_solve
+    for x in (w["x_lo"], w["x_hi"]):
+        lay = TRAILER.layout(axle_x=x)
+        res = R.resolve(lay)
+        got = R.member_holes(res)
+        for h in res["svc"]["holes"]:
+            same = [g for g in got if (g["member"], g["run"], g["face"]) == (h["member"], h["run"], h["face"])]
+            assert min(abs(g["x"] - h["x"]) for g in same) <= 1.0, (x, h)
+        moved = roots(lay)
+        assert set(moved) == set(at_solve), x
+        for hid, (toe, edge) in at_solve.items():
+            assert moved[hid][0] == pytest.approx(toe, abs=0.01) and moved[hid][1] == pytest.approx(edge, abs=0.01), (x, hid, moved[hid])
+
+
 def test_svc01_tests_the_keep_clear_boxes_up_to_the_ceilings_services_zone():
     """I2-14: the aisles, landings and the chair space are obstacles to SVC-01 from the floor up, under the ceiling's
     services zone, so no run or riser stands in them."""

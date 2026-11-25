@@ -323,7 +323,7 @@ def tank_guard(fr, V, sp, b):
 @product("shear_panel")
 def shear_panel(fr, V, sp, b):
     """The rear tank bay's shear panel as the chassis data cuts it, which the guards' line carries (Chassis.shear_panels):
-    the 3 mm galvanised sheet, its tongues under the crossmembers' angles and the stiffener under its front edge."""
+    the galvanised sheet at the data's thickness and its tongues under the crossmembers' angles."""
     pn = (b.extra.get("panel") if b is not None else None)
     if not pn:
         return []
@@ -332,7 +332,6 @@ def shear_panel(fr, V, sp, b):
     sh = pn["sheet"]
     out = [("shear panel sheet", wbox((sh["rect"][0], sh["rect"][1], zb, sh["rect"][2], sh["rect"][3], zt)), GALV, 1.0)]
     out += [("shear panel tongue", wbox((x0, y0, zb, x1, y1, zt)), GALV, 1.0) for x0, y0, x1, y1 in sh["tongues"]]
-    out += [("shear panel stiffener", wbox(q), GALV, 1.0) for q in pn["stiffener"]]
     return out
 
 

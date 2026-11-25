@@ -25,7 +25,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .chassis import SIDES, Chassis, Composite
+from .chassis import SIDES, Chassis, Composite, hole_x
 from .frame import end_actions
 
 G = 9.81
@@ -1479,6 +1479,8 @@ class Analysis:
         rail, raiser = comp.rail, comp.raiser
         rules = ch.data["hole_rules"]
         rows = yaml.safe_load((DATA / "services.yaml").read_text(encoding="utf-8")).get("holes") or []
+        at = {m.id: m.p0[0] for m in ch.members}
+        rows = [dict(r, x=hole_x(r, at.__getitem__)) for r in rows]
         for s in (-1, 1):
             for g in ch.data.get("galvanising_holes") or []:
                 d = float(g["d"])
