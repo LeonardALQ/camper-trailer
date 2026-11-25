@@ -357,6 +357,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
         ("THE UTE (H14)", f"FORD RANGER SUPER DUTY ON FORD'S RATINGS: {lim['gvm_kg']:,.0f} kg GVM, REAR AXLE {lim['rear_axle_kg']:,.0f} kg "
                           f"({_kg(uc['UTE-03']['measured'])} kg TOWING WITH GROWTH)."),
         ("COUPLING HEIGHT", f"{V['coupling_z']:.0f} mm LADEN, PLUS OR MINUS 20 mm. SET THE HITCH'S DROP AT THE FINAL WEIGHING (TW08)."),
+        ("RECOVERY (LC8a, I2-93)", _recovery_line()),
         ("GREY WATER", f"EMPTY FOR TRAVEL. A FULL {V['grey_full_l']:.0f} L TANK IS CHECKED IN CASES TC7 AND TC8."),
         ("LEADS (DIM-04, DIM-08)", "PLUG IN THE SB50 LEAD AND THE 12-PIN LEAD. EACH STAYS CLAMPED ON THE LEADS' BRACKET AHEAD OF THE STONE GUARD "
                                    "AND STRAPPED AT ITS MARK TO THE SEAT ON ITS SPRUNG ARM (CT-601), WHICH LIFTS ITS SLACK. KEEP BOTH ARMS FREE TO SWING. "
@@ -409,6 +410,23 @@ def ct003(prj, model, bom, checks, reg, dwg):
     _lamp_checks(sh, LM, yn - 5)
     write(sh, dwg)
     return time.time() - t0
+
+
+def _recovery_line() -> str:
+    """CT-003's recovery rule (I2-93, I2-100), from LC8a's data and the frame analysis (chassis_fea.recovery_rule)."""
+    import json
+
+    from ..build import BUILD
+    from ..chassis_fea import recovery_rule
+    cj = json.loads((BUILD / "chassis" / "chassis.json").read_text())
+    r = recovery_rule(cj["results"], next(lc for lc in cj["load_cases"] if lc["id"] == "LC8a"))
+    side = min(x for x in (r["sideways_up_kn"], r["sideways_down_kn"]) if x is not None)
+    along = min(x for x in (r["along_up_kn"], r["along_down_kn"]) if x is not None)
+    return (f"PULL ONLY FROM THE TWO FRONT LUGS OR THE TWO REAR TONGUES, WITHIN {r['sideways_deg']:g} DEGREES OF THE TRAILER'S LINE "
+            f"SIDEWAYS AND {r['vertical_deg']:g} DEGREES UP OR DOWN: {r['rated_kn']:.1f} kN WITH EVERY WHEEL FREE OR ONE WHEEL HELD FAST, "
+            f"{r['held_axle_kn']:g} kN WITH BOTH WHEELS OF ONE AXLE HELD FAST. PULL LEVEL: PULLED {r['vertical_deg']:g} DEGREES UP OR DOWN "
+            f"THE EMPTY TRAILER CAN TIP BEFORE THE RATED PULL, FROM {side:.1f} kN AT {r['sideways_deg']:g} DEGREES SIDEWAYS AND FROM "
+            f"{along:.1f} kN ALONG ITS LINE." + ("" if r["level_tips"] else " A LEVEL PULL HOLDS THE RATING."))
 
 
 def _lamp_checks(sh, LM, y):

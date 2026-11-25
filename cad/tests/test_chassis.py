@@ -336,3 +336,67 @@ def test_the_panels_angles_and_the_cheeks_end_apart():
         assert p["x0"] - max(cheek_ends) == pytest.approx(spec["rails"]["gap"])
     fat = {f["id"]: f for f in RES["fatigue"]}
     assert fat["FAT-22"]["fat"] == 63 and fat["FAT-23"]["fat"] == 50
+
+
+def test_the_plate_buckling_reads_the_closed_form_on_four_held_edges():
+    """I2-98: chassis_fea.plate_shear_buckling, held at points every 15 mm round all four edges, gives the closed form's
+    k = 5.35 + 4 (a / b) squared for a plate in shear within 1 %, the check its reading on the held points rests on."""
+    from cad.chassis_fea import NU, plate_shear_buckling
+    a, b, t = 755.0, 1169.0, 3.0
+    pts = [(x, b * j / 78) for x in (0.0, a) for j in range(79)] + [(a * j / 50, y) for y in (0.0, b) for j in range(1, 50)]
+    k = 5.35 + 4 * (a / b) ** 2
+    closed = k * math.pi ** 2 * 200_000.0 * t ** 2 / (12 * (1 - NU ** 2) * a ** 2)
+    assert plate_shear_buckling(0.0, a, 0.0, b, t, pts, deg=14) == pytest.approx(closed, rel=0.01)
+
+
+def test_the_panel_reads_its_tongues_roots_and_its_held_points():
+    """I2-98: CHS-13 reads every tongue's root, by von Mises in the working cases and by its plastic interaction at the
+    ultimate, and the sheet's buckling on the points its bolts and tongues hold, and the sheet has no stiffener."""
+    r = RES["local"]["shear_panel"]
+    parts = " ".join(p["part"] for p in r["parts"])
+    assert "tongue's root, von Mises, LC8a" in parts and "tongue's root, plastic interaction times fy, LC8u" in parts
+    assert len(r["tongues"]) == len(CH.shear_panels()[0]["sheet"]["tongues"])
+    assert all(p["use"] in ("rail", "crossmember") for p in CH.panel_pieces())
+    assert r["util"] <= 1.0
+
+
+def test_every_gusset_lands_on_a_cheek_long_enough_for_cidect():
+    """I2-99: each hinge gusset's rail end lands on its cheek's stepped part, which reaches CIDECT's least length for a
+    reinforcing plate either side of the gusset's footprint, and CHS-16 reads the web under it."""
+    ck = CH.data["xt_hinges"]["cheek"]
+    sec = CH.sections[next(f for f in CH.data["fittings"] if f["id"] == "CH-P08")["section"]]
+    bp = ck["under_gusset"]["h"] - ck["below"] - ck["under_gusset"]["step"]
+    lp = sec.b / math.sin(math.radians(45)) + math.sqrt(bp * (bp - sec.d))
+    cheeks = {c["gusset"]: c for c in CH.hinge_cheeks() if c["gusset"]}
+    for g in CH.hinge_gussets():
+        step = cheeks[g["id"]]["boxes"][1]
+        assert g["on_cheek"]
+        assert step[0] <= g["rail_x"] - lp / 2 + 1e-6 and g["rail_x"] + lp / 2 <= step[3] + 1e-6
+        assert step[2] <= g["z"] - sec.d / 2 and g["z"] + sec.d / 2 <= step[5]
+    parts = " ".join(p["part"] for p in RES["local"]["hinge_gussets"]["parts"])
+    assert "chord face plastification, LC8u" in parts and RES["local"]["hinge_gussets"]["util"] <= 1.0
+
+
+def test_lc8a_reads_both_wheels_of_an_axle_held_at_the_recovery_limit():
+    """I2-93: LC8a reads every recovery point with both wheels of the front or the rear axle held fast at the data's
+    held-axle limit, its ultimate in LC8a's ratio, and the recovery summary keeps those pulls apart from the rated ones."""
+    rec = RES["recovery"]["LC8a"]
+    assert rec["cases"] == 264 and rec["axle"]["cases"] > 0
+    lc8 = next(lc for lc in CH.data["load_cases"] if lc["id"] == "LC8a")
+    assert lc8["held_axle_n"] % 5000 == 0 and lc8["held_axle_n"] < lc8["force_n"]
+
+
+def test_trailer_md_gives_the_recovery_rule():
+    """I2-93 and I2-100: TRAILER.md's recovery rule quotes LC8a's rating and directions, the held-axle limit and the least
+    pulls that tip the trailer, from the data and the frame analysis (chassis_fea.recovery_rule), as CT-003 does."""
+    from pathlib import Path
+
+    from cad.chassis_fea import recovery_rule
+    r = recovery_rule(RES, next(lc for lc in CH.data["load_cases"] if lc["id"] == "LC8a"))
+    text = (Path(__file__).resolve().parents[2] / "TRAILER.md").read_text()
+    line = next(x for x in text.splitlines() if x.startswith("- Recovery:"))
+    side = min(x for x in (r["sideways_up_kn"], r["sideways_down_kn"]) if x is not None)
+    along = min(x for x in (r["along_up_kn"], r["along_down_kn"]) if x is not None)
+    for figure in (f"{r['rated_kn']:.1f} kN", f"{r['held_axle_kn']:g} kN", f"{side:.1f} kN", f"{along:.1f} kN",
+                   f"{r['sideways_deg']:g} degrees", f"{r['vertical_deg']:g} degrees"):
+        assert figure in line, figure

@@ -69,6 +69,7 @@ Masses in kg. The towball comes from moments about the axle group centre at X 4,
 
   Never dig a hole and backfill it. Tie Down's manual installation digs a hole to 2/3 of the anchor's length and backfills it, and Tie Down warns that loose soil may then need a test of the anchor's holding power (p. 6), which the kit cannot do.
 - Awning: close the awning in wind, legs pegged. Peg the legs whenever it is out, and close it before gusts reach 40 km/h, Beaufort force 5, and whenever the trailer is left. Fiamma gives no speed. Its roof bolts are checked with the canopy open in a 60 km/h gust (BDY-11), a check of the fixing only: the 40 km/h rule is what protects the canopy, its arms and its legs.
+- Recovery: pull only from the two front lugs or the two rear tongues, within 30 degrees of the trailer's line sideways and 15 degrees up or down (LC8a). Each point is rated 58.9 kN with every wheel free or one wheel held fast, and 50 kN with both wheels of one axle held fast, the largest pull at which every check holds with that pair held, rounded down to 5 kN (I2-93's working default, one figure in the data). Keep the pull level. Pulled 15 degrees up or down, the empty trailer can tip before the rated pull, from 27.9 kN at 30 degrees sideways and from 42.2 kN along its line, while a level pull holds the rating. CT-003's operating limits give the same rule.
 
 ## Structure
 

@@ -380,7 +380,8 @@ class Analysis:
         """LC8a's reaction, which report 11 does not give: the ground at the four tyres, the trailer a rigid body on each
         wheel's support stiffness, its tyre and arm in series (LC8a's reaction, est.). The wheels are unbraked, so the
         ground's force on each passes through its hub: along the trailer every wheel takes its share there, or with `held`
-        that wheel is held fast against an obstacle at its hub's height and the other three roll free. Across and up every
+        that wheel is held fast against an obstacle at its hub's height and the other three roll free, or with `held` a pair,
+        both wheels of one axle are (I2-93). Across and up every
         tyre works at its lateral and vertical rate at its contact. The forces along and across hold the pull in plan, as
         they always have, and the forces up hold what that leaves, its lift and its moments in roll and pitch.
 
@@ -394,12 +395,13 @@ class Analysis:
         lifts. Returns the force the ground puts on each tyre at its contact and on each wheel at its hub, the nose's force,
         the tyres off the ground, their rise on the rates (`lift`) and the scale."""
         r = next(lc for lc in self.ch.data["load_cases"] if lc["id"] == "LC8a")["reaction"]
+        held_ids = () if held is None else (held if isinstance(held, tuple) else (held,))
         springs = []
         for w in self.ch.suspension:
             pre = float(base["contact"][w["id"]][2]) if base else 0.0
             for d, k in ((0, r["kx"]), (1, r["ky"]), (2, r["kz"])):
                 at = w["hub"] if d == 0 else w["contact"]
-                obstacle = held is not None and w["id"] == held and d < 2
+                obstacle = w["id"] in held_ids and d < 2
                 if held is not None and d < 2:
                     k = r["held_k"] if obstacle else (0.0 if d == 0 else k)
                     at = w["hub"] if obstacle else at
@@ -516,28 +518,36 @@ class Analysis:
                                 bag_min=bag_min, nose=nose))
         return out
 
-    def _recovery_envelope(self, lc_id: str, label: str, info: dict, held: str | None):
+    def _recovery_envelope(self, lc_id: str, label: str, info: dict, held, pull: dict | None = None):
         """LC8a's supports in each case (I2-94): the largest force on each arm's droop limit and airbag, the tyres off the
-        ground, the pulls the trailer tips under before they reach their full size, and each held hinge's force."""
-        e = self.lc8_arms.setdefault(lc_id, dict(cases=0, lifted=0, nose_off=0, tipped=[], droop={}, bag={}, hinge={}, lift=dict(mm=0.0),
-                                                 nose=dict(up=0.0, down=0.0)))
-        e["cases"] += 1
-        e["nose"]["up"] = max(e["nose"]["up"], float(info["nose"][2]))
-        e["nose"]["down"] = max(e["nose"]["down"], -float(info["nose"][2]))
+        ground, the pulls the trailer tips under before they reach their full size, and each held hinge's force. The counts
+        and the tipping pulls are the rated pulls' (every wheel free or one held); `pull` gives the pull's direction, its
+        size and whether both wheels of an axle are held, whose tipping pulls are kept apart (`axle_tipped`)."""
+        e = self.lc8_arms.setdefault(lc_id, dict(cases=0, lifted=0, nose_off=0, tipped=[], axle_tipped=[], axle_cases=0, droop={}, bag={},
+                                                 hinge={}, lift=dict(mm=0.0), nose=dict(up=0.0, down=0.0)))
         off = info["off"]
-        for k, mm in info["lift"].items():
-            if k != "nose" and mm > e["lift"]["mm"]:
-                e["lift"] = dict(mm=mm, wheel=k, case=label)
-        e["lifted"] += sum(1 for o in off if o != "nose")
-        e["nose_off"] += "nose" in off
-        if info["scale"] < 1.0 - 1e-9:
-            e["tipped"].append(dict(case=label, scale=info["scale"]))
+        pull = pull or {}
+        if pull.get("axle"):
+            e["axle_cases"] += 1
+            if info["scale"] < 1.0 - 1e-9:
+                e["axle_tipped"].append(dict(pull, case=label, scale=info["scale"], kn=info["scale"] * pull["kn"]))
+        else:
+            e["cases"] += 1
+            e["nose"]["up"] = max(e["nose"]["up"], float(info["nose"][2]))
+            e["nose"]["down"] = max(e["nose"]["down"], -float(info["nose"][2]))
+            for k, mm in info["lift"].items():
+                if k != "nose" and mm > e["lift"]["mm"]:
+                    e["lift"] = dict(mm=mm, wheel=k, case=label)
+            e["lifted"] += sum(1 for o in off if o != "nose")
+            e["nose_off"] += "nose" in off
+            if info["scale"] < 1.0 - 1e-9:
+                e["tipped"].append(dict(pull, case=label, scale=info["scale"], kn=info["scale"] * pull.get("kn", 0.0)))
         for wid, a in info["arms"].items():
             if a["droop_n"] > e["droop"].get(wid, {}).get("n", 0.0):
                 e["droop"][wid] = dict(n=a["droop_n"], case=label, airbag_n=a["airbag"], off=off)
             if a["airbag"] > e["bag"].get(wid, {}).get("n", -math.inf):
                 e["bag"][wid] = dict(n=a["airbag"], case=label, off=off)
-            if held == wid:
+            if held is not None and (wid in held if isinstance(held, tuple) else held == wid):
                 h = np.asarray(a["hinge"], float)
                 if abs(h[0]) > abs(e["hinge"].get(wid, {}).get("f", np.zeros(3))[0]):
                     e["hinge"][wid] = dict(f=h, case=label, droop_n=a["droop_n"])
@@ -636,6 +646,7 @@ class Analysis:
         hole_env: dict[str, dict] = {}
         self.panel_env: dict[str, dict] = {}
         self.gusset_env: dict[str, dict] = {}
+        self.gusset_web_env: dict[str, dict] = {}
 
         def take(lc_id, res, label, extra=None, ultimate=False):
             for mem, r in self.stresses(res, ultimate).items():
@@ -648,6 +659,11 @@ class Analysis:
                 if sp["id"] not in pe or v > pe[sp["id"]]["v_n"]:
                     pe[sp["id"]] = dict(v_n=v, case=label)
             for k, g in self.gusset_elements():
+                web = self.gusset_web(res, k, g)
+                we = self.gusset_web_env.setdefault(lc_id, dict(util=-1.0, welds_max=0.0))
+                we["welds_max"] = max(we["welds_max"], web["welds"])
+                if web["n1"] / web["cap"] > we["util"]:
+                    we.update(web, util=web["n1"] / web["cap"], case=label, gusset=g["id"])
                 w = self.gusset_weld_stress(res, k, g)
                 ge = self.gusset_env.setdefault(lc_id, dict(mpa=-1.0))
                 if w > ge["mpa"]:
@@ -728,22 +744,30 @@ class Analysis:
                         sx = 1
                         p, cm = self.rear_recovery_point(s)
                         fr = [(self.fm.cm_node(cm, s * V["rail_c"]), 1.0)]
-                    pulls = [(f"{h:+d} deg sideways", None, math.radians(h)) for h in (-30, 0, 30)]
+                    sd, vd = lc8["sideways_deg"], lc8["vertical_deg"]
+                    pulls = [(f"{h:+d} deg sideways", None, math.radians(h), 1.0) for h in (-sd, 0, sd)]
                     for w in ch.suspension:
                         hdg = math.atan2(p[1] - w["hub"][1], sx * (p[0] - w["hub"][0]))
-                        if abs(hdg) <= math.radians(30) + 1e-9:
-                            pulls.append((f"{math.degrees(hdg):+.1f} deg sideways through wheel {w['id']}, held", w["id"], hdg))
-                    for lab, held, hdg in pulls:
-                        for v in (-15, 0, 15):
-                            F = Fr * np.array([sx * math.cos(hdg) * math.cos(math.radians(v)), math.sin(hdg) * math.cos(math.radians(v)),
-                                               math.sin(math.radians(v))])
+                        if abs(hdg) <= math.radians(sd) + 1e-9:
+                            pulls.append((f"{math.degrees(hdg):+.1f} deg sideways through wheel {w['id']}, held", w["id"], hdg, 1.0))
+                    # both wheels of one axle held fast at their hubs, at the recovery limit that case takes (I2-93)
+                    for axle in ("front", "rear"):
+                        pair = tuple(w["id"] for w in ch.suspension if w["axle"] == axle)
+                        pulls += [(f"{h:+d} deg sideways, both {axle} wheels held, at the {lc8['held_axle_n'] / 1000:g} kN limit", pair,
+                                   math.radians(h), lc8["held_axle_n"] / lc8["force_n"]) for h in (-sd, -sd // 2, 0, sd // 2, sd)]
+                    for lab, held, hdg, k in pulls:
+                        for v in (-vd, 0, vd):
+                            F = k * Fr * np.array([sx * math.cos(hdg) * math.cos(math.radians(v)), math.sin(hdg) * math.cos(math.radians(v)),
+                                                   math.sin(math.radians(v))])
                             for sup in supports:
                                 res, info = self.run_recovery(F, p, fr, held, sup)
                                 label = (f"{where} {'kerb' if s < 0 else 'road'}-side point, {lab}, {v:+d} deg up, {sup['label']}"
-                                         + (f", {Fr / 1000:.1f} kN" if lc_id == "LC8u" else "")
-                                         + (f", tipping at {info['scale'] * Fr / 1000:.1f} kN" if info["scale"] < 1.0 - 1e-9 else ""))
+                                         + (f", {k * Fr / 1000:.1f} kN" if lc_id == "LC8u" else "")
+                                         + (f", tipping at {info['scale'] * k * Fr / 1000:.1f} kN" if info["scale"] < 1.0 - 1e-9 else ""))
                                 take(lc_id, res, label, ultimate=lc_id == "LC8u")
-                                self._recovery_envelope(lc_id, label, info, held)
+                                self._recovery_envelope(lc_id, label, info, held, dict(
+                                    where=where, side=s, h=round(math.degrees(hdg), 1), v=v, kn=k * Fr / 1000, axle=isinstance(held, tuple),
+                                    weight=sup["label"].split(",")[0], coupled=bool(sup["nose"].get("holds_down"))))
                                 self._cheek_envelope(lc_id, label, res)
         out = dict(envelope={}, governing={}, deflections={}, twist=twist, balls=balls, residual_n=self.resid,
                    frame=dict(nodes=len(self.f.nodes), elements=sum(1 for e in self.f.elements if not e.sec.rigid),
@@ -843,9 +867,58 @@ class Analysis:
             out.append(dict(group=group, n=len(bolts), share=share, e=e_min, a_e=ae_min, edge=edge))
         return out
 
+    def panel_holds(self, sp: dict) -> list[tuple[float, float]]:
+        """The points that hold shear panel sp's sheet out of its plane (I2-98): every bolt along the rails' angles, and each
+        tongue's root over its straight width every 10 mm, where the tongue joins the sheet's edge. Nothing holds the edges
+        between them, since the rear tank sits on the sheet along its front edge."""
+        pts = [(b["x"], b["y"]) for b in sp["bolts"] if b["group"] == "rail"]
+        for r in sp["sheet"]["roots"]:
+            n = max(1, int(round((r["y1"] - r["y0"]) / 10.0)))
+            pts += [(r["x"], r["y0"] + (r["y1"] - r["y0"]) * j / n) for j in range(n + 1)]
+        return pts
+
+    def tongue_roots(self, sp: dict) -> list[dict]:
+        """Each tongue of shear panel sp's sheet as a free body (I2-98): its bolts' share of the panel's racking shear V,
+        each bolt of its crossmember's group an equal share as panel_bolts takes it, acts along the crossmember at its bolt
+        line and reaches the sheet through the tongue's root in shear and in-plane bending. The root's corners are
+        radiused `root_r`, so each section from the start of the radius to the sheet's edge is read, its width growing
+        from the tongue's own to that plus twice the radius as its lever to the bolt line grows."""
+        sh, out = sp["sheet"], []
+        R = sh["root_r"]
+        for r in sh["roots"]:
+            bolts = [b for b in sp["bolts"] if b["group"] in ("front", "rear") and r["y0"] - 1e-6 <= b["y"] <= r["y1"] + 1e-6
+                     and r["way"] * (b["x"] - r["x"]) > 0]
+            group = [b for b in sp["bolts"] if b["group"] == bolts[0]["group"]]
+            lever = abs(sum(b["x"] for b in bolts) / len(bolts) - r["x"])
+            w0 = r["y1"] - r["y0"]
+            sections = []
+            for j in range(21):
+                e = min(R, lever) * j / 20                   # back from the sheet's edge toward the bolts
+                w = w0 + 2 * (R - math.sqrt(max(0.0, R ** 2 - (R - e) ** 2))) if R else w0
+                sections.append((w, lever - e))
+            out.append(dict(piece=r["piece"], group=bolts[0]["group"], share=len(bolts) / len(group), lever=lever, w=w0, sections=sections))
+        return out
+
+    @staticmethod
+    def tongue_root_reading(F: float, t: float, fy: float, sections) -> tuple[float, float]:
+        """A tongue's root under its share F (N) of the racking: the largest von Mises stress over its sections and their
+        fibres, the bending stress M y / I with the shear 1.5 F / (w t) (1 - (2 y / w) squared) by beam theory (est., the
+        tongue is short), and the largest plastic interaction M / Mp + (V / Vp) squared, Mp = fy t w squared / 4 and
+        Vp = fy t w / sqrt 3."""
+        eta = np.linspace(0.0, 1.0, 41)
+        vm = pl = 0.0
+        for w, arm in sections:
+            M = F * max(0.0, arm)
+            sb, tp = 6 * M / (t * w ** 2), 1.5 * F / (t * w)
+            vm = max(vm, float(np.max(np.sqrt((sb * eta) ** 2 + 3 * (tp * (1 - eta ** 2)) ** 2))))
+            pl = max(pl, M / (fy * t * w ** 2 / 4) + (F / (fy * t * w / math.sqrt(3))) ** 2)
+        return vm, pl
+
     def panel_checks(self) -> dict:
         """Each shear panel (shear_panels) in its worst case of every load case: the plate's shear stress V / (b t) against
-        its shear yield over the case's factor and its elastic shear buckling stress, the M10 bolts to its angles in shear,
+        its shear yield over the case's factor and its elastic shear buckling stress on the points that hold it
+        (panel_holds, plate_shear_buckling), each tongue's root (tongue_roots) by its von Mises stress against fy over the
+        case's factor and at the ultimate by its plastic interaction against 1, the M10 bolts to its angles in shear,
         each taking its group's share of V (panel_bolts) against AS 4100 9.3.2's 0.8 x 0.62 fuf on its minor diameter
         area, and the sheet at the most loaded bolt in bearing, by AS 4100 9.3.2.4 (0.9 x 3.2 fu on d t) and AS/NZS 4600
         5.3.4.2 (0.6 x alpha C fu, C 3.0 for d / t under 10, alpha 1.0 in single shear with a washer under the head and
@@ -857,9 +930,8 @@ class Analysis:
         for sp in ch.shear_panels():
             d = next(x for x in ch.data["shear_panels"] if x["id"] == sp["id"])
             a, b, t = sp["x1"] - sp["x0"], sp["b"], sp["t"]
-            lo, hi = sorted((a, b))
-            k = 5.35 + 4.0 * (lo / hi) ** 2
-            tau_cr = k * math.pi ** 2 * 200_000.0 / (12 * (1 - NU ** 2)) * (t / lo) ** 2
+            rect = sp["sheet"]["rect"]
+            tau_cr = plate_shear_buckling(rect[0], rect[2], rect[1], rect[3], t, self.panel_holds(sp))
             bolt = d["fixing"]
             cap = 0.8 * 0.62 * bolt["fuf"]                     # MPa on the bolt's minor diameter area
             size = bolt["bolt"].split()[0]
@@ -870,13 +942,19 @@ class Analysis:
             worst = max(g["share"] for g in groups)
             most = [g for g in groups if g["share"] >= worst - 1e-9]
             e, a_e = min(g["e"] for g in most), min(g["a_e"] for g in most)
+            roots = self.tongue_roots(sp)
             rows = []
             for lc_id, env in self.panel_env.items():
                 r = env[sp["id"]]
                 fac = lcs[lc_id]["factor"] if lc_id in lcs else 1
                 fb = r["v_n"] * worst
-                rows += [(f"plate shear, {lc_id}", r["v_n"] / (b * t), min(0.6 * d["fy"], tau_cr) / fac),
-                         (f"{size} bolt to its angles, {lc_id}", fb / bolt["a_c"], cap / fac),
+                read = [self.tongue_root_reading(r["v_n"] * q["share"], t, d["fy"], q["sections"]) for q in roots]
+                rows.append((f"plate shear, {lc_id}", r["v_n"] / (b * t), min(0.6 * d["fy"], tau_cr) / fac))
+                if lc_id == "LC8u":                            # no fracture at the ultimate: the root's plastic interaction
+                    rows.append((f"tongue's root, plastic interaction times fy, {lc_id}", max(x[1] for x in read) * d["fy"], d["fy"]))
+                else:                                          # no yield at the working loads: its von Mises stress
+                    rows.append((f"tongue's root, von Mises, {lc_id}", max(x[0] for x in read), d["fy"] / fac))
+                rows += [(f"{size} bolt to its angles, {lc_id}", fb / bolt["a_c"], cap / fac),
                          (f"sheet in bearing at a bolt, AS 4100, {lc_id}", fb / (bolt["d"] * t), 0.9 * 3.2 * fu / fac),
                          (f"sheet in bearing at a bolt, AS/NZS 4600, {lc_id}", fb / (bolt["d"] * t), 0.6 * c_4600 * fu / fac),
                          (f"sheet's tear-out at a bolt, AS 4100, {lc_id}", fb / (a_e * t), 0.9 * fu / fac),
@@ -884,10 +962,13 @@ class Analysis:
             w = max(self.panel_env.items(), key=lambda kv: kv[1][sp["id"]]["v_n"])
             edge = min(g["edge"] for g in groups)
             n_front = next(g["n"] for g in groups if g["group"] == "front")
+            front = next(q for q in roots if q["group"] == "front")
             res = _local(f"Shear panel {sp['id']}, {t:g} mm steel, {a:,.0f} x {b:,.0f} mm", rows,
                          f"its worst racking shear, {w[1][sp['id']]['v_n'] / 1000:.1f} kN in {w[0]}, {w[1][sp['id']]['case']}, 1/{n_front} of it "
-                         f"on each bolt under the XT centre crossmember, e {e:.1f} mm, the least bolt edge distance {edge:.1f} mm")
-            res.update(tau_cr=tau_cr, v_n=w[1][sp["id"]]["v_n"], lc=w[0], bolt_groups=groups)
+                         f"on each bolt under the XT centre crossmember, e {e:.1f} mm, the least bolt edge distance {edge:.1f} mm, "
+                         f"the front tongue {front['w']:.0f} mm wide at its root {front['lever']:.1f} mm behind its bolts with R{sp['sheet']['root_r']:g} corners, "
+                         f"the sheet buckling at {tau_cr:.1f} MPa on the points that hold it")
+            res.update(tau_cr=tau_cr, v_n=w[1][sp["id"]]["v_n"], lc=w[0], bolt_groups=groups, tongues=roots)
             out["shear_panel"] = res
         return out
 
@@ -902,7 +983,8 @@ class Analysis:
         ck = self.ch.data["xt_hinges"]["cheek"]
         fx, fy_, fz_ = (abs(float(v)) for v in F)
         out = {"to the hinge bar": math.sqrt(fx ** 2 + fy_ ** 2 + fz_ ** 2) / (2 * ck["bar_d"] * 0.7 * ck["bar_leg"])}
-        l, ro = ck["l"], self.ch.role_sec["rail"].ro
+        cope = ck.get("cope", 0.0)                      # the cheek's end coped round the crossmember's end fillet (I2-100)
+        l, ro = ck["l"] - cope, self.ch.role_sec["rail"].ro
         lines = [("its top edge's fillet", ck["h"] - ck["below"], 0.7 * ck["leg"]),
                  ("the flare-bevel weld at the rail's bottom corner", 0.0, ck["corner"] * ro)]
         A = sum(a * l for _, _, a in lines)
@@ -910,8 +992,9 @@ class Analysis:
         Ix = sum(a * l * (z - zc) ** 2 for _, z, a in lines)
         Iz = sum(a * l ** 3 / 12 for _, _, a in lines)
         lever = zc + ck["bar_d"] / 2                     # the pin under the group's centroid, at the cheek's end
-        M_in = fx * lever + fz_ * l / 2                  # in the web's plane
-        M_x, M_z = fy_ * lever, fy_ * l / 2              # out of it
+        along = cope + l / 2                             # and the group's centroid that far along the rail from it
+        M_in = fx * lever + fz_ * along                  # in the web's plane
+        M_x, M_z = fy_ * lever, fy_ * along              # out of it
         for name, z, a in lines:
             dz = abs(z - zc)
             t_x = fx / A + M_in * dz / (Ix + Iz)
@@ -990,16 +1073,54 @@ class Analysis:
             worst = max(worst, float(np.max(np.sqrt(sig ** 2 + np.sum(tau ** 2, axis=1)))))
         return worst
 
+    def gusset_web(self, res, k: int, g: dict) -> dict:
+        """I2-99: the rail's 4 mm inner web under hinge gusset g's rail end, frame element k, read as CIDECT Design Guide 3's
+        chord face plastification of an RHS T or Y joint (2nd edition, Table 3.1), the gusset an SHS branch at 45 degrees:
+        N1* = fy t squared / ((1 - beta) sin theta) (2 eta / sin theta + 4 sqrt(1 - beta)) Qf, beta and eta the branch's
+        sides over the face's width. Where the gusset lands on its cheek, the cheek is the face's reinforcing plate (DG3
+        section 8), its 10 mm, grade 350 and its height on the web in place of the web's, at least the plate's least length
+        long. Qf = (1 - |n|) to the power 0.6 - 0.5 beta, n the rail's own normal stress at the gusset's height over its fy,
+        taken as compression whatever its sign (est.). Returns the gusset's axial force at that end `n1`, the capacity
+        `cap`, n, Qf, the plate's least length `lp` and the cheek's two web welds' stress under the gusset's pull."""
+        rail = self.ch.role_sec["rail"]
+        sec = self.ch.sections[next(f for f in self.ch.data["fittings"] if f["id"] == "CH-P08")["section"]]
+        ck = self.ch.data["xt_hinges"]["cheek"]
+        b0, t0, fy0 = rail.d, rail.t, rail.fy
+        beta, th = sec.b / b0, math.radians(45.0)
+        sig = self.normal_at_level(res, f"RL-{SIDES[g['side']]}", g["p1"][0], g["p1"][2])
+        n = min(0.99, sig / fy0)
+        qf = (1 - n) ** (0.6 - 0.5 * beta)
+        if g.get("on_cheek"):                            # on the cheek's face, the cheek a reinforcing plate (DG3 section 8)
+            bp, tp, fp = ck["under_gusset"]["h"] - ck["below"] - ck["under_gusset"]["step"], ck["t"], 350.0
+        else:
+            bp, tp, fp = b0, t0, fy0
+        bb, ee = sec.d / bp, sec.b / bp
+        cap = fp * tp ** 2 / ((1 - bb) * math.sin(th)) * (2 * ee / math.sin(th) + 4 * math.sqrt(1 - bb)) * qf
+        lp = sec.b / math.sin(th) + math.sqrt(bp * (bp - sec.d))          # the plate's least length, centred on the footprint
+        n1 = abs(float(res.forces[k][6]))
+        welds = n1 * math.sin(th) / (lp * (0.7 * ck["leg"] + ck["corner"] * rail.ro)) if g.get("on_cheek") else 0.0
+        return dict(n1=n1, cap=cap, n=n, qf=qf, sigma=sig, lp=lp, welds=welds)
+
     def gusset_welds(self) -> dict:
         """CHS-16: the hinge gussets' end welds in every load case, the largest throat stress round either cut end of any
-        gusset (gusset_weld_stress) against AS 4100 9.7.3's 0.8 x 0.6 fuw over the case's factor."""
+        gusset (gusset_weld_stress) against AS 4100 9.7.3's 0.8 x 0.6 fuw over the case's factor, and the rail's web under
+        each gusset's rail end (gusset_web), the gusset's axial stress against the stress at which the web plastifies under
+        it, over the case's factor (I2-99)."""
         mat = self.ch.data["material"]
         wcap = mat["weld_phi"] * 0.6 * mat["weld_fuw"]
         lcs = {lc["id"]: lc for lc in self.ch.data["load_cases"]}
         fac = {lc_id: (lcs[lc_id]["factor"] if lc_id in lcs else 1) for lc_id in self.gusset_env}
+        A1 = self.ch.sections[next(f for f in self.ch.data["fittings"] if f["id"] == "CH-P08")["section"]].A
         rows = [(f"end welds, {lc_id}", e["mpa"], wcap / fac[lc_id]) for lc_id, e in self.gusset_env.items()]
+        rows += [(f"rail's web under the rail end, chord face plastification, {lc_id}", e["n1"] / A1, e["cap"] / A1 / fac[lc_id])
+                 for lc_id, e in self.gusset_web_env.items()]
+        rows += [(f"cheek's two web welds under a gusset's pull, {lc_id}", e["welds_max"], wcap / fac[lc_id])
+                 for lc_id, e in self.gusset_web_env.items() if e["welds_max"] > 0]
         lc_id, e = max(self.gusset_env.items(), key=lambda kv: kv[1]["mpa"] * fac[kv[0]])
-        return _local("Hinge gussets' end welds (CH-P08)", rows, f"{e['gusset']} in {lc_id}, {e['case']}")
+        wl, we = max(self.gusset_web_env.items(), key=lambda kv: kv[1]["util"] * fac[kv[0]])
+        return _local("Hinge gussets' end welds and the rail's web under them (CH-P08)", rows,
+                      f"{e['gusset']} in {lc_id}, {e['case']}, and on the web {we['n1'] / 1000:.1f} kN along {we['gusset']} against "
+                      f"{we['cap'] / 1000:.1f} kN, Qf {we['qf']:.2f} for the rail's {we['sigma']:.0f} MPa, in {wl}, {we['case']}")
 
     def cheek_check(self) -> dict:
         """CHS-14 (I2-92): the hinge cheeks' welds (CH-P16) in every LC8a case at 58.9 kN and at the 78.5 kN ultimate, each
@@ -1056,8 +1177,15 @@ class Analysis:
             dw, dr = max(e["droop"].items(), key=lambda kv: kv[1]["n"])
             bw, bg = max(e["bag"].items(), key=lambda kv: kv[1]["n"])
             hw, hg = max(e["hinge"].items(), key=lambda kv: abs(kv[1]["f"][0]))
-            least = min(e["tipped"], key=lambda t: t["scale"]) if e["tipped"] else None
+            least = min(e["tipped"], key=lambda t: t["kn"]) if e["tipped"] else None
+            classes = {}
+            for t in e["tipped"]:
+                key = f"{'sideways' if abs(t['h']) >= 20 else 'along'} {t['v']:+d}"
+                if key not in classes or t["kn"] < classes[key]["kn"]:
+                    classes[key] = dict(kn=t["kn"], case=t["case"], weight=t["weight"], coupled=t["coupled"])
+            axle_least = min(e["axle_tipped"], key=lambda t: t["kn"]) if e["axle_tipped"] else None
             out[lc_id] = dict(cases=e["cases"], lifted=e["lifted"], nose_off=e["nose_off"], tipped=len(e["tipped"]), least=least, lift=e["lift"], nose=e["nose"],
+                              tip_classes=classes, axle=dict(cases=e["axle_cases"], tipped=len(e["axle_tipped"]), least=axle_least),
                               droop=dict(wheel=dw, n=dr["n"], case=dr["case"], airbag_n=dr["airbag_n"], off=dr["off"]),
                               droop_by_wheel={k: v["n"] for k, v in e["droop"].items()},
                               bag=dict(wheel=bw, n=bg["n"], case=bg["case"]),
@@ -1912,6 +2040,56 @@ def heel_throats(legs, angle: float) -> tuple[float, float]:
     a throat of its leg times cos(psi / 2)."""
     inboard, outboard = legs
     return inboard * math.cos(math.pi / 4 - angle / 2), outboard * math.cos(math.pi / 4 + angle / 2)
+
+
+def plate_shear_buckling(x0: float, x1: float, y0: float, y1: float, t: float, holds, deg: int = 28, E: float = 200_000.0) -> float:
+    """The least uniform shear stress (MPa) at which a flat plate x0 to x1 by y0 to y1 and t thick buckles, held out of its
+    plane only at the points `holds` (x, y) and free elsewhere (I2-98), by the Rayleigh-Ritz method on a Legendre basis
+    to `deg` in each direction, each point a stiff spring. The shear is taken uniform over the whole plate, its free edges
+    too, which overstates what reaches them (est., on the safe side). Held along every edge it gives the closed form's
+    k = 5.35 + 4 (a / b) squared within 1 % (cad/tests/test_chassis.py)."""
+    from numpy.polynomial import legendre as leg
+    a, b = x1 - x0, y1 - y0
+    D = E * t ** 3 / (12 * (1 - NU ** 2))
+    g, wq = leg.leggauss(2 * deg + 4)
+    n = deg + 1
+    eye = np.eye(n)
+    P = np.array([leg.legval(g, eye[i]) for i in range(n)])
+    dP = np.array([leg.legval(g, leg.legder(eye[i])) for i in range(n)])
+    d2P = np.array([leg.legval(g, leg.legder(eye[i], 2)) for i in range(n)])
+    sx, sy, jac = 2 / a, 2 / b, a * b / 4
+
+    def integral(A, B):
+        return (A * wq) @ B.T
+
+    X00, X11, X22, X02, X01 = integral(P, P), integral(dP, dP), integral(d2P, d2P), integral(P, d2P), integral(P, dP)
+    K = D * jac * (sx ** 4 * np.kron(X22, X00) + sy ** 4 * np.kron(X00, X22) + NU * sx ** 2 * sy ** 2 * (np.kron(X02.T, X02) + np.kron(X02, X02.T))
+                   + 2 * (1 - NU) * sx ** 2 * sy ** 2 * np.kron(X11, X11))
+    G = t * jac * sx * sy * (np.kron(X01.T, X01) + np.kron(X01, X01.T))
+    k = 1e4 * float(np.max(np.diag(K)))
+    for px, py in holds:
+        v = np.kron(leg.legval(2 * (px - x0) / a - 1, eye), leg.legval(2 * (py - y0) / b - 1, eye))
+        K = K + k * np.outer(v, v)
+    mu = np.linalg.eigvals(np.linalg.solve(K, G))
+    mu = mu[np.abs(mu.imag) <= 1e-9 * np.max(np.abs(mu))].real
+    return float(1.0 / np.max(np.abs(mu)))
+
+
+def recovery_rule(results: dict, lc8: dict) -> dict:
+    """The user's recovery rule (I2-93, I2-100), from LC8a's data and the frame analysis's recovery summary: the pull each
+    point is rated for and the directions it holds within, the limit with both wheels of one axle held fast, and the least
+    pull, in kN, that tips the trailer before the rated pull when it is pulled up or down, sideways and along its line,
+    and whether any level pull does."""
+    tc = results["recovery"]["LC8a"]["tip_classes"]
+    vd = lc8["vertical_deg"]
+
+    def least(prefix: str):
+        ks = [v["kn"] for k, v in tc.items() if k.startswith(prefix)]
+        return min(ks) if ks else None
+    return dict(rated_kn=lc8["force_n"] / 1000, sideways_deg=lc8["sideways_deg"], vertical_deg=vd, held_axle_kn=lc8["held_axle_n"] / 1000,
+                sideways_up_kn=least(f"sideways +{vd}"), sideways_down_kn=least(f"sideways -{vd}"),
+                along_up_kn=least(f"along +{vd}"), along_down_kn=least(f"along -{vd}"),
+                level_tips=any(k.endswith(" +0") for k in tc))
 
 
 def kirsch_along(a: float, dx: float, dz: float) -> float:
