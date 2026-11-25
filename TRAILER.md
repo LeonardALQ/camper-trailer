@@ -18,7 +18,7 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 | Water | 385 L fresh, the tanks' net in H21's 5 L steps, all of it in travel, about 41 L a day. 130 L grey |
 | Cost | AUD 200,882 with contingency, built by Leonard (H26) |
 
-Every fail check passes. The tightest are the tyres' 50 mm under the floor at full bump (FIT-05, 50.0 mm against 50 mm), the towball share with the grey tank full (MAS-12, 9.7 % against 9.0 %), the heaviest towball (MAS-13, 394.8 kg against 420 kg), a run's gap to a hinge gusset (SVC-01, 20.0 mm against 20 mm) and the recovery pull with both wheels of one axle held at the 50 kN limit, in the road-side rail (CHS-08U, 0.97 of its section's capacity at the 66.7 kN ultimate) and in the rail's web under a hinge gusset (CHS-16, 0.96). Fully loaded with growth the trailer weighs 3,640.1 kg, 259.9 kg inside the 3,900 kg target (MAS-10).
+Every fail check passes. The tightest are the tyres' 50 mm under the floor at full bump (FIT-05, 50.0 mm against 50 mm), the towball share with the grey tank full (MAS-12, 9.7 % against 9.0 %), the heaviest towball (MAS-13, 394.8 kg against 420 kg), a run's gap to a front recovery lug (SVC-01, 20.4 mm against 20 mm, K-01 by CH-P04) and the recovery pull with both wheels of one axle held at the 50 kN limit, in the road-side rail (CHS-08U, 0.97 of its section's capacity at the 66.7 kN ultimate) and in the rail's web under a hinge gusset (CHS-16, 0.96). Fully loaded with growth the trailer weighs 3,640.1 kg, 259.9 kg inside the 3,900 kg target (MAS-10).
 
 ## Layout
 
