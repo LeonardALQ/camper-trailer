@@ -309,13 +309,14 @@ def test_the_hinge_gussets_welds_hold():
 
 def test_the_shear_panels_bolts_stand_clear_of_the_sheets_edges():
     """CHS-13's bolts (shear_panels, CH-P17): every bolt's centre stands at least 1.75 d from the sheet's sheared edges
-    (AS 4100 Table 9.6.2) and its neighbours at least 3 d away (AS/NZS 4600 5.3.1), the four under the XT centre
-    crossmember take the whole racking shear, and the sheet's bearing and tear-out there are read by both standards."""
+    and cuts (AS 4100 Table 9.6.2) and its neighbours at least 3 d away (AS/NZS 4600 5.3.1), each rail's angle ahead of
+    the rear airbag's bracket carries two, which take its diagonal's force, and the sheet's bearing and tear-out at the
+    most loaded bolt are read by both standards (fx22-rear)."""
     sp = CH.shear_panels()[0]
     d = sp["fixing"]["d"]
     groups = {g["group"]: g for g in RES["local"]["shear_panel"]["bolt_groups"]}
     assert min(g["edge"] for g in groups.values()) >= 1.75 * d - 1e-6
-    assert groups["front"]["n"] == 4 and groups["front"]["share"] == pytest.approx(0.25)
+    assert groups["rail"]["n_side"] == 2 and set(groups) == {"rail", "rear"}
     for a in sp["bolts"]:
         for b in sp["bolts"]:
             if a is not b:
@@ -354,7 +355,7 @@ def test_the_panel_reads_its_tongues_roots_and_its_held_points():
     ultimate, and the sheet's buckling on the points its bolts and tongues hold, and the sheet has no stiffener."""
     r = RES["local"]["shear_panel"]
     parts = " ".join(p["part"] for p in r["parts"])
-    assert "tongue's root, von Mises, LC8a" in parts and "tongue's root, plastic interaction times fy, LC8u" in parts
+    assert "tongue's and wing's roots, von Mises, LC8a" in parts and "tongue's and wing's roots, plastic interaction times fy, LC8u" in parts
     assert len(r["tongues"]) == len(CH.shear_panels()[0]["sheet"]["tongues"])
     assert all(p["use"] in ("rail", "crossmember") for p in CH.panel_pieces())
     assert r["util"] <= 1.0

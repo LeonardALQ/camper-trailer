@@ -330,7 +330,7 @@ def shear_panel(fr, V, sp, b):
     wbox, _ = _world(fr)
     zt, zb = pn["z_top"], pn["z_top"] - pn["t"]
     sh = pn["sheet"]
-    out = [("shear panel sheet", wbox((sh["rect"][0], sh["rect"][1], zb, sh["rect"][2], sh["rect"][3], zt)), GALV, 1.0)]
+    out = [("shear panel sheet", wbox((x0, y0, zb, x1, y1, zt)), GALV, 1.0) for x0, y0, x1, y1 in sh["parts"]]
     out += [("shear panel tongue", wbox((x0, y0, zb, x1, y1, zt)), GALV, 1.0) for x0, y0, x1, y1 in sh["tongues"]]
     return out
 

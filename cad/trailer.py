@@ -759,6 +759,68 @@ class Layout:
         return [Block(iid=p["id"], id="RG-01", name=f"Cruisemaster XT, {p['what']} ({p['wheel']})", system="running_gear",
                       box=p["boxes"][0], load="none", extra=dict(boxes=p["boxes"], part=p)) for p in self.xt_parts()]
 
+    def fitting_parts(self) -> list[tuple[str, tuple]]:
+        """Every chassis fitting at every place it stands, each (name, shape) as shape_gap reads it (shapes): a hinge
+        gusset as the prism of its cut outline under its own id, a hinge cheek's plate and its step under the cheek's id,
+        the shear panel's angles under each piece's id and any other fitting under its id at each of its places."""
+        ch, out = self.chassis, []
+        for b in self.blocks:
+            if "fitting" not in b.extra:
+                continue
+            f = b.extra["fitting"]
+            spec = next(d for d in ch.data["fittings"] if d["id"] == f.id)
+            shapes = self.shapes(b)
+            if spec.get("poses") == "hinge_gussets":
+                names = [g["id"] for g in ch.hinge_gussets()]
+            elif spec.get("poses") == "hinge_cheeks":
+                names = [c["id"] + ("'s step" if k else "") for c in ch.hinge_cheeks() for k, _ in enumerate(c["boxes"])]
+            elif f.kind == "angles":
+                names = [p["id"] for p in ch.panel_pieces() if p["galvanised"] for _ in p["boxes"]]
+            else:
+                names = [f.id if len(shapes) == 1 else f"{f.id} at X {s[0][0] / 2 + s[0][3] / 2:,.0f}, Y {s[0][1] / 2 + s[0][4] / 2:+,.0f}" for s in shapes]
+            out += list(zip(names, shapes))
+        return out
+
+    def guard_pieces(self) -> list[tuple[str, tuple]]:
+        """The tanks' guard UF-03 as the 3D model draws it, each (name, box): the front tank's plate in the pieces its
+        model's `gaps` leave between the rails, `half` either side of the centreline over the guard's depth (tank_guard),
+        the piece behind the last gap being the rear bay's shear panel where the line carries it, and that panel's sheet
+        as the chassis data cuts it, each of its parts and tongues at the sheet's thickness under its angles' flat legs
+        (shear_panel)."""
+        from .model import products as PR
+        from .trailer_model import model_specs
+        b = next(b for b in self.blocks if b.id == "UF-03")
+        opts, bx = PR.placements(model_specs(self)["UF-03"], b, self)[0]
+        W, yc = bx[3] - bx[0], (bx[1] + bx[4]) / 2
+        half = opts.get("half", (bx[4] - bx[1]) / 2)
+        cuts = [0.0] + [u for g in sorted(opts.get("gaps", [])) for u in g] + [W]
+        pieces = list(zip(cuts[::2], cuts[1::2]))
+        pn = b.extra.get("panel")
+        out = [("UF-03's front piece", (bx[0] + u0, yc - half, bx[2], bx[0] + u1, yc + half, bx[5])) for u0, u1 in (pieces[:-1] if pn else pieces)]
+        if pn:
+            zt, sh = pn["z_top"], pn["sheet"]
+            out += [("UF-03's rear piece, the shear panel's sheet", (x0, y0, zt - pn["t"], x1, y1, zt)) for x0, y0, x1, y1 in sh["parts"] + sh["tongues"]]
+        return out
+
+    def kit_fit(self) -> dict:
+        """FIT-08 (fx22-rear): every chassis fitting at every place it stands (fitting_parts) and both pieces of the tanks'
+        guard UF-03 (guard_pieces) against the XT kit's parts between the rails (xt_parts), the airbags over their travel
+        and the shocks over the arms'. Each fitting and guard is welded or bolted to the frame, so it may touch a part of
+        the kit, as FIT-03 lets two rigid parts touch, and an overlap past TOL is a clash. Every pair that clashes, with
+        how far it overlaps."""
+        kit = [(p, bx) for p in self.xt_parts() for bx in p["boxes"]]
+        ours = self.fitting_parts() + [(n, (bx, None)) for n, bx in self.guard_pieces()]
+        found, worst, worst_pair = {}, math.inf, ""
+        for name, s in ours:
+            for p, bx in kit:
+                g = shape_gap(s, (bx, None))
+                if g < worst:
+                    worst, worst_pair = g, f"{name} to {p['id']}"
+                if g < -TOL:
+                    found[(name, p["id"], p["what"])] = max(found.get((name, p["id"], p["what"]), 0.0), -g)
+        pairs = [dict(part=k[0], kit=k[1], what=k[2], mm=round(v, 1)) for k, v in sorted(found.items(), key=lambda kv: -kv[1])]
+        return dict(ok=not pairs, pairs=pairs, smallest_gap_mm=round(worst, 1), governing=worst_pair, parts=len(ours), kit=len(kit))
+
     def fit(self, zone: str, skip: tuple = ()) -> dict:
         z = self.zones[zone]["box"]
         items = [b for b in self.blocks if b.zone == zone and b.box is not None and b.id not in skip]
@@ -1481,6 +1543,12 @@ class Trailer:
                            ok=f["ok"], governing=f["governing"], problems=f["problems"],
                            detail=("all fit" if f["ok"] else ". ".join(f["problems"][:4])) + f", {f['items']} items, {f['keep_clear']} keep-clear spaces",
                            sub=lay.zones[c.zone]["name"])
+            elif c.type == "kit_fit":
+                f = lay.kit_fit()
+                said = [f"{p['part']} overlaps {p['kit']} ({p['what']}) by {p['mm']:.0f} mm" for p in f["pairs"]]
+                row.update(limit="no overlap with the kit's parts, touching allowed", measured=f["smallest_gap_mm"], unit="mm",
+                           margin=f["smallest_gap_mm"], ok=f["ok"], governing=f["governing"], problems=said, pairs=f["pairs"],
+                           detail=(". ".join(said) if said else "all clear") + f", {f['parts']} fitting and guard places against {f['kit']} places of the kit's parts")
             elif c.type == "tyre":
                 t = self.tyre_arc(lay)
                 row.update(limit=f">= {c.min_gap_mm:g} mm from every rigid part, fixture and run", measured=round(t["gap_mm"], 1), unit="mm",

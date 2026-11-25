@@ -199,31 +199,29 @@ fittings:
      at: [front_recovery_x, 0, db_z - 30], side_y: "rail_c + rail_w / 2 + 10"}
   - {id: CH-P05, plane: xz, name: "Rear recovery tongue, 20 mm plate through a slot in the rear crossmember, 22 mm hole", kind: plate, l: 260, w: 120, t: 20, qty: 2,
      at: [body_x1 - 70, 0, rail_underside_z + 75], side_y: "rail_c - rail_w / 2 - 10"}
-  - {id: CH-P06, name: "Jacking pad, 100 x 100 x 10 with a locating cup, on the XT centre crossmember's underside 11 mm off the rail's inner face, clear of the hinge cheek", kind: plate, l: 100, w: 100, t: 10, qty: 2,
-     at: ["axle_x + xt_centre_front + xm_w / 2", 0, rail_underside_z - 5], side_y: "rail_c - rail_w / 2 - 61"}
   - {id: CH-P07, plane: yz, name: "Shock support plate, 5 mm, full height on the XT rear shock crossmember", kind: plate, l: 300, w: 150, t: 5, qty: 2,
      at: ["axle_x + xt_rear_shock_front - 3", 0, "rail_underside_z + 75"], side_y: "rail_c - 200"}
   - {id: CH-P08, name: "Hinge crossmember gusset, SHS 50 x 50 x 3 at 45 degrees (TB 070), its ends cut at 45 degrees to bear on the crossmember's face and on the face of the hinge cheek beside it, welded all round, two behind each hinge crossmember and two ahead of the centre's", kind: tube, section: SHS_50x50x3, length: hinge_gusset_l, qty: 6,
      poses: hinge_gussets, fat: null}
   - {id: CH-P16, name: "Hinge cheek, 10 mm, 150 x 108.5 beside each XT hinge crossmember on the rail's inner face, with a step where a hinge gusset lands on it, 300 mm at the front hinge and 140 mm at the XT centre, welded to the web and the hinge bar", kind: plate, l: 150, w: 108.5, t: 10, qty: 8,
      poses: hinge_cheeks, plane: xz, fat: FAT-22}
-  # CH-P17, the shear panel PNL-1's pieces (I2-87, fx18-det): EA 50 x 50 x 5 angles, each with its upright leg on a member's
-  # web and its flat leg `drop` under the member's underside, level with the tanks' guard, where the 4 mm sheet bolts up
-  # to it on the leg's `gauge` from the heel. Along each rail's inner web the angle's back is on the web and its flat leg
-  # points inboard, from `gap` behind the XT centre's rear hinge cheek's end, a set gap so the two parts' welds end apart,
-  # to `end` ahead of the XT rear shock crossmember. Under each crossmember the angle's upright leg is on the web facing the
-  # bay and its flat leg points under the crossmember, under the Y ranges `ys` the runs K-11 and K-12 leave clear at the
-  # XT centre, and the sheet's tongues reach under them (shear_panels). Each angle is welded by a `leg` mm fillet along its
+  # CH-P17, the shear panel PNL-1's pieces (I2-87, fx18-det, fx22-rear): EA 50 x 50 x 5 angles, each with its upright leg on
+  # a member's web and its flat leg `drop` under the member's underside, level with the tanks' guard, where the sheet bolts
+  # up to it on the leg's `gauge` from the heel. Along each rail's inner web the angle's back is on the web and its flat leg
+  # points inboard, from `gap` behind the XT centre's rear hinge cheek's end to `before` ahead of the rear airbag's top
+  # bracket 33SA 013 (xt_arms `parts`), so its welds end apart from the cheek's and from the bracket's, and its bolts stand
+  # `pitch` apart, `end` from its ends. Behind the bracket the rear airbag and the rear shock fill the rail's side of the
+  # bay over their travel, so the rail has no angle there. Under the XT rear shock crossmember the angle's upright leg is on
+  # its front web facing the bay and its flat leg points under it, under the Y ranges `ys` clear of the shock support
+  # plates, and the sheet's tongues reach under them (shear_panels). Each angle is welded by a `leg` mm fillet along its
   # upright leg's top edge on the web and by a flare bevel weld along the member's bottom corner, where the web's corner
-  # radius meets the flat leg's back, its throat `corner_throat` (est., 0.3 of the 10 mm radius), never across the
-  # member. The sheet's front edge has no stiffener (I2-98): the rear tank sits on the sheet along the whole edge, so no
-  # bolt head has room there, and an angle under the edge with no fastening would hold nothing
-  - {id: CH-P17, name: "Shear panel pieces, EA 50 x 50 x 5 angles welded along both rails' inner webs and to the two crossmembers' webs facing the rear tank's bay, their flat legs 26 mm under the members where the 4 mm sheet bolts up to them", kind: angles, fat: FAT-23,
+  # radius meets the flat leg's back, its throat `corner_throat` (est., 0.3 of the 10 mm radius), never across the member.
+  # The sheet's front edge has no angle: the rear tank sits on it, and no bolt head has room there
+  - {id: CH-P17, name: "Shear panel pieces, EA 50 x 50 x 5 angles welded to both rails' inner webs ahead of the rear airbags' top brackets and to the XT rear shock crossmember's front web, their flat legs 26 mm under the members where the 6 mm sheet bolts up to them", kind: angles, fat: FAT-23,
      drop: 26, gauge: 28, weld: {leg: 5, corner_throat: 3},
      material: "EA 50 x 50 x 5 angles, AS/NZS 3679.1 300PLUS or C450L0 DuraGal, hot-dip galvanised with the frame",
-     rails: {section: EA_50x50x5, gap: 25, end: 10},
-     crossmembers: [{station: XT centre, face: 1, section: EA_50x50x5, ys: [[-70, 70]]},
-                    {station: XT rear shock, face: -1, section: EA_50x50x5, ys: [[-225, -130], [-70, 70], [130, 225]]}]}
+     rails: {section: EA_50x50x5, gap: 25, before: 25, pitch: 36, end: 19},
+     crossmembers: [{station: XT rear shock, face: -1, section: EA_50x50x5, pitch: 36, end: 23, ys: [[-225, -130], [-70, 70], [130, 225]]}]}
   - {id: CH-P09, plane: yz, name: "Spare carrier cleats and hub plate, 6 mm (posts in the member list)", kind: plate, l: 300, w: 300, t: 6, qty: 1,
      at: ["body_x0 - 40", 0, spare_z], fat: null,
      box: ["body_x0 - spare_bracket_d - tyre_w / 2 - 24", -150, "spare_z - 150", "spare_bracket_d + tyre_w / 2 - 26", 300, 300]}
@@ -315,8 +313,8 @@ load_cases:
      reaction: {kx: 600, ky: 300, kz: 300, held_k: 10000000,
                 weight: [{case: TC1, at: tare}, {case: TC2, at: plate}], nose: [{kz: 300, holds_down: false}, {kz: 300, holds_down: true}],
                 source: "Report 11 gives the pull, not what holds the trailer. The ground holds it at its four unbraked wheels, each force along the trailer through its hub, each tyre on its longitudinal, lateral and vertical rate with its arm (est., 600, 300 and 300 N/mm), or one wheel held fast against an obstacle at its hub's height, the others rolling free, the trailer turned until the pull passes through that hub. held_k is the obstacle's rate, rigid. The trailer's weight acts with the pull (I2-94), at tare and fully loaded at the plate, from the static case's reactions at the tyres and the nose, and no support can pull: a tyre that would leaves the ground and the trailer pitches or rolls onto the supports that remain. The nose stands at the coupling at a tyre's rate (est.), uncoupled on its jockey wheel, which pushes up only, or coupled to the truck, whose ball holds it both ways"}}
-  - {id: LC8b, name: "Jacking: one side lifted at its pad, gravity times 2", kind: jack, accel: [[0, 0, -2]], pad_n: 43560, factor: 1,
-     source: "Report 11 LC8b at the 4,000 kg plate: 60 % of the 3,700 kg axle group on one pad, times 2 (report 11 had 38.6 kN at 3,500 kg)"}
+  - {id: LC8b, name: "Jacking: one side lifted at the jacking point under one of its arms, the air released, gravity times 2", kind: jack, accel: [[0, 0, -2]], pad_n: 43560, factor: 1,
+     source: "Report 11 LC8b at the 4,000 kg plate: 60 % of the 3,700 kg axle group on one jack, times 2 (report 11 had 38.6 kN at 3,500 kg). The jack stands under Cruisemaster's jacking point under the arm by the hub (its XT user guide 85-USERGUIDE-XT), the air released from the springs first, so the frame takes it through the arm's bump stop and hinge"}
   - {id: LC10, name: "Fatigue: frequent 0.5 g either way (range 1 g) beyond 10 million cycles, occasional 1.5 g either way for 100,000 cycles",
      kind: fatigue, accel: [[0, 0, -1]], occasional_factor: 3, occasional_cycles: 100000, miner_limit: 0.5,
      source: "Report 11 LC10 and section 3.4, IIW-1823-07"}
@@ -340,7 +338,6 @@ fatigue_details:
   - {id: FAT-08, name: "End of the drawbar overlap under the rail, sniped taper, toe ground", iiw: "712", fat: 56, stress: rail_extreme, where: [db_end_x]}
   - {id: FAT-09, name: "Cross brace to drawbar member, toe in the brace", iiw: "413", fat: 63, stress: member_end, member: brace, hot_spot: true}
   - {id: FAT-10, name: "Chain lug on the drawbar member (pad, L 120 mm)", iiw: "513", fat: 71, stress: member_at, x: [chain_lug_x]}
-  - {id: FAT-11, name: "Jacking pad on the XT centre crossmember's underside beside the rail, edges welded along the crossmember (L 100 mm)", iiw: "513", fat: 71, stress: member_end, member: jack_crossmember}
   - {id: FAT-12, name: "Airbag top bracket on the rail's inner face, welded along the rail's top edge", iiw: "Table 3.3-1 no. 3", fat: 100, stress: rail_level, z: rail_top_z, where: [hub_front_x, hub_rear_x], hot_spot: true}
   - {id: FAT-13, name: "Suspension hinge to the hinge crossmembers, load-carrying fillets", iiw: "Table 3.3-1 no. 6", fat: 90, stress: member_end, member: hinge_crossmember, hot_spot: true}
   - {id: FAT-14, name: "Rear recovery tongue, longitudinal welds to the rail web (L 260 mm)", iiw: "513", fat: 63, stress: rail_extreme, where: [rear_tongue_x]}
@@ -379,13 +376,13 @@ fatigue_details:
   # FAT-22 and FAT-23 (I2-95): the hinge cheeks CH-P16 and the shear panel's angles CH-P17 are welded along the rail's inner
   # web and its bottom corner, never across it, so each end of their welds is the end of a longitudinal attachment on the
   # rail, IIW 521 by its length along the rail: FAT 63 for a cheek's 150 to 300 mm, FAT 50 over 300 mm for the front
-  # hinge's stepped cheeks' 340 mm (FAT-24, I2-99) and for an angle's 595 mm,
+  # hinge's stepped cheeks' 340 mm (FAT-24, I2-99), and the shear panel's angles keep FAT 50 at 75.6 mm, on the safe side,
   # read on the composite rail's extreme fibre at each end, as FAT-16 reads the steadies' brackets. The weld along the
   # rail's corner is a flare bevel weld, classed here as the fillet it replaces (est.). The angles start 25 mm behind the
   # XT centre's rear cheeks, a set gap, so the two parts' welds end apart and each end is read on its own
   - {id: FAT-22, name: "Hinge cheek's welds along the rail's inner web and bottom corner, their ends (l 150 to 300 mm)", iiw: "521", fat: 63, stress: rail_extreme, where: cheek_ends_x}
   - {id: FAT-24, name: "Hinge cheek with its step at the front hinge, its welds' ends along the rail's inner web (l over 300 mm)", iiw: "521", fat: 50, stress: rail_extreme, where: long_cheek_ends_x}
-  - {id: FAT-23, name: "Shear panel angle's welds along the rail's inner web and bottom corner, their ends (l over 300 mm)", iiw: "521", fat: 50, stress: rail_extreme, where: panel_angle_ends_x}
+  - {id: FAT-23, name: "Shear panel angle's welds along the rail's inner web and bottom corner, their ends (l 75.6 mm, read at FAT 50 on the safe side)", iiw: "521", fat: 50, stress: rail_extreme, where: panel_angle_ends_x}
 
 # Holes the runs make in the chassis members (data/services.yaml `holes`, the services' list, read here only). A hole is
 # the run's diameter and a bush across, a slot along the member where the run passes on a slant. CHS-09 checks the net
@@ -461,7 +458,7 @@ galvanising_check: {pitch_deg: [0, 9], step_deg: 1, max_depth: 50, end_zone: 150
 
 # The holes CHS-11 asks of every other closed section, each at the least distances CHS-10 lets it stand: its centre
 # 1.25 d from the end of its web's flat, or `z_bottom_leg` plus 1.5 d over the underside where fillets run along the
-# bottom edges (the XT hinges and the jacking pads, 6 mm, est.), and its edge a diameter from the end weld's toe, `leg`
+# bottom edges (the XT hinges, 6 mm, est.), and its edge a diameter from the end weld's toe, `leg`
 # (plus `clear`) from the end. `corners` drains by the floor and vents by the top of both webs, the faces in the frame's
 # plane (page 8), `middle` puts one hole in each web at mid-depth where a small SHS's flat takes no more. Each end so has
 # four holes, or two in an SHS, as Tables 1 to 3 count them. The drawbar members drain at their mitres as at their apex
@@ -541,7 +538,7 @@ sealed_overlaps:
 # the step keeps its clearances, and their ends on the crossmembers stay where they were, so the tanks' notches keep
 # their size. The front hinge's front cheeks have no gusset and no step. The gussets
 # ahead of the front hinge crossmember are left out for the runs B-04 and K-10, so that crossmember is RHS 150 x 50 x 6.
-# The gussets' rail ends land behind the cheeks, and the jacking pads stand 61 mm inboard of the rail's inner face.
+# The gussets' rail ends land behind the cheeks.
 xt_hinges:
   bar: {leg: 6, run: 80, runs: [50, 150, 250]}
   gusset: {length: hinge_gusset_l, faces: [1, -1], omit: [CM-04KF, CM-04RF], z_over_underside: 69, weld: {leg: 5, acute_leg: 5, obtuse_throat: 3}}
@@ -584,33 +581,34 @@ xt_arms:
     bar: {d: 44, inboard: 450}
     plates: {y_in: [34, 151, 311, 427], t: 8, l: 82, below: 134}
     hinge: {y_in: [30, 431]}
-    airbag: {dx: 8, y_in: 89, d: 190, h: 152}
+    airbag: {dx: 8, y_in: 58, d: 194, h: 152}
     bag_bracket: {l: 300, reach: 100}
     shock: {d: 70, eye: [67, -13], e: 40}
     shock_bracket: {w: 123, y_in: 39, out: 50, z: 32, h: 77}
 
-# Shear panels (I2-87, I2-98): the rear fresh tank's guard is a 4 mm hot-rolled steel sheet (AS/NZS 1594 HA250, fy 250 and
-# fu 350 MPa), hot-dip galvanised, its sides `edge` inside the rails' webs, bolted by M10 8.8 bolts in 11 mm holes to the
-# angles CH-P17 welded along both rails' inner webs and under the XT rear shock crossmember in three pieces and under the
-# XT centre crossmember's middle 140 mm, clear of the runs K-11 and K-12 that cross under it and of the hinge bars beyond
-# them, so the bay between the two crossmembers carries the recovery pull's racking as a shear panel. The sheet reaches
-# under each crossmember's angles in tongues as wide as each angle, to `tongue` mm short of the flat leg's toe, each
-# tongue's corners at its root radiused `tongue_r` (est.), so its least section stands that much nearer its bolts. Its
-# bolts stand at `pitch` along the rails' angles and the XT rear shock crossmember's, `end` from each angle's ends, and
-# four at `front_pitch` under the XT centre crossmember, centred, where the panel's whole racking shear enters the
-# crossmember. The rear tank sits on the sheet along its front edge, which is held at the tongue only. The frame model
-# carries each panel as two diagonals of the same shear stiffness, and chassis_fea's panel_checks reads the plate's
-# shear against its yield and its elastic buckling stress on the points the bolts and the tongues hold, each tongue's
-# root in bending and shear, the bolts' shear, and the sheet's bearing and tear-out at the most loaded bolt by AS 4100
-# 9.3.2.4 and AS/NZS 4600 5.3.2 and 5.3.4.2, and test_chassis holds every bolt's centre to the sheet's edges and the
-# other holes by AS 4100 Table 9.6.2 and AS/NZS 4600 5.3.1 and 5.3.2. A 3 mm sheet, read on those points, buckles under
-# the ultimate's racking (I2-98).
+# Shear panels (I2-87, I2-98, fx22-rear): the rear fresh tank's guard is a hot-rolled steel sheet `t` thick (AS/NZS 1594
+# HA250, fy 250 and fu 350 MPa), hot-dip galvanised, from `front_gap` behind the XT centre crossmember's rear face to the XT
+# rear shock crossmember's front face, its sides `edge` inside the rails' inner webs. Cruisemaster's rear airbags and rear
+# shocks stand at the rails' sides of the bay and pass through the sheet's plane over their travel, and each airbag's top
+# bracket fills the rail's web beside its airbag, so the sheet is cut `cut` `clear` mm clear of them from the
+# first one's front back to the rear crossmember, inboard to the innermost one's inboard side, each inner corner radiused
+# `cut` `r` (est.). It is bolted by M12 8.8 bolts in 13 mm holes to the rails' short angles CH-P17 ahead of the airbags'
+# brackets and to the three angles under the XT rear shock crossmember, where it reaches under them in tongues as wide as
+# each angle, to `tongue` mm short of the flat leg's toe, each tongue's corners at its root radiused `tongue_r` (est.). So the
+# sheet ties the rails ahead of the airbags to the XT rear shock crossmember's middle and the bay carries the recovery
+# pull's racking through it. The frame model carries it as two diagonals from each rail's angle to the far side's bolts
+# under the crossmember, of the sheet's shear stiffness over its net width (est.), and chassis_fea's panel_checks reads its
+# net section's shear against its yield and its elastic buckling stress on the points the bolts and the tongues hold over
+# the sheet as cut, each tongue's root and each wing's root, the bolts' shear in each group, the rails' angles' welds and
+# the sheet's bearing and tear-out at the most loaded bolt by AS 4100 9.3.2.4 and AS/NZS 4600 5.3.2 and 5.3.4.2.
+# test_chassis holds every bolt's centre to the sheet's edges and the other holes by AS 4100 Table 9.6.2 and AS/NZS 4600
+# 5.3.1 and 5.3.2. The rear tank sits on the sheet, which holds nothing along its free edges
 shear_panels:
-  - {id: PNL-1, from: XT centre, to: XT rear shock, t: 4, fy: 250, fu: 350, edge: 3,
+  - {id: PNL-1, from: XT centre, to: XT rear shock, t: 8, fy: 250, fu: 350, edge: 3, front_gap: 5,
      material: "AS/NZS 1594 HA250 hot-rolled steel sheet, hot-dip galvanised to AS/NZS 4680 after cutting and drilling",
-     fixing: {bolt: "M10 8.8 to the angles, at 50 mm along the rails and under the XT rear shock crossmember and four at 30 mm under the XT centre crossmember's middle",
-              d: 10, hole: 11, pitch: 50, front_pitch: 30, end: 25, fuf: 830, a_c: 52.3},
-     tongue: 2, tongue_r: 25}
+     fixing: {bolt: "M12 8.8 to the angles, two at 36 mm on each rail's angle ahead of the rear airbag's bracket and at 36 mm under the XT rear shock crossmember",
+              d: 12, hole: 13, fuf: 830, a_c: 76.2},
+     tongue: 0, tongue_r: 25, cut: {clear: 10, r: 25, parts: [XT-BAG, XT-SHOCK]}}
 
 # Local checks of the fittings (CHASSIS.md). Sizes in mm. Plates are AS/NZS 3678 grade 350. The pin is what bears in the
 # hole: at a chain lug the 10 mm round bow of the pewag CW 8 connecting link (pewag's d), which passes through the 14 mm
@@ -621,7 +619,6 @@ local_checks:
   chain_lug: {fitting: CH-P02, hole: 14, pin: 10, eye: [13, 18], net_w: 60, edge: 20, weld_leg: 6, weld_l: 120, weld_h: 65, ecc: 55}
   front_recovery: {fitting: CH-P04, hole: 22, pin: 19, net_w: 120, edge: 40, lever: 60, weld_leg: 6, weld_l: 200}
   rear_recovery: {fitting: CH-P05, hole: 22, pin: 19, net_w: 120, edge: 40, lever: 50, weld_leg: 6, weld_l: 200}
-  jacking_pad: {fitting: CH-P06, span: 44, cup_d: 50}
   spare_posts: {lever_x: 155}
   steady_bracket: {fitting: CH-B01, steady_kg: 875}   # at 90 degrees, the steady's rating up through its bracket into the rail
   # the DO45 Plus on four M14 8.8 bolts (Cruisemaster's fitting guide), threads in the shear plane: AS 1275 stress area 115 mm2,

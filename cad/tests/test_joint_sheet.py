@@ -47,5 +47,6 @@ def test_ct106_gives_the_datas_figures():
     rail = next(p for p in ch.panel_pieces() if p["use"] == "rail")
     assert f"{round(rail['length'], 1):g} ANGLE" in words
     sp = ch.shear_panels()[0]
-    front = sum(1 for b in sp["bolts"] if b["group"] == "front")
-    assert f"{front} M{sp['fixing']['d']:g} AT {sp['fixing']['front_pitch']:g}" in words
+    rails = next(f for f in ch.data["fittings"] if f["id"] == "CH-P17")["rails"]
+    side = sum(1 for b in sp["bolts"] if b["group"] == "rail" and b["y"] > 0)
+    assert f"{side} M{sp['fixing']['d']:g} AT {rails['pitch']:g}" in words
