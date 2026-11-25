@@ -385,7 +385,7 @@ drawings:
     structural: true
     revisions:
       - {rev: A, date: 2026-11-25, description: "First draft: every hole for galvanising from the build's records (I2-89)", drawn: Kiro, checked: "", approved: ""}
-      - {rev: B, date: 2026-11-25, description: "Memo: the holes' distances with the axle at X 4,496.2 and PB-2 moved", drawn: Kiro, checked: "", approved: ""}
+      - {rev: B, date: 2026-11-25, description: "Memo: the holes at axle X 4,496.2 and PB-2's ends, details A and B lower", drawn: Kiro, checked: "", approved: ""}
   - number: CT-106
     title: XT hinge joint and rear bay shear panel
     subtitle: The kerb-side XT centre joint in plan and section, the rear bay's shear panel and a rail section
