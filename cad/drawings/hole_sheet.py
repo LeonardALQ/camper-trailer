@@ -101,9 +101,9 @@ def section_names(chs: dict, ch) -> dict:
         if m["id"].startswith("PB-"):
             side = "KERB" if m["id"].endswith("K") else "ROAD"
             what = f"PLAN BRACE {m['id'][3]} FROM THE {side} SIDE RAIL"
-            if side == "ROAD":
-                for k in (1, 2):
-                    out[f"{m['id']}.{k}"] = f"{m['id']}.{k} {what}, HALF {k} TO THE CROSSING, {sec}"
+            if side == "ROAD":                   # cut at the crossing, from the road side rail to the kerb side rail
+                out[f"{m['id']}.1"] = f"{m['id']}.1 PLAN BRACE {m['id'][3]}, ROAD SIDE RAIL TO THE CROSSING, {sec}"
+                out[f"{m['id']}.2"] = f"{m['id']}.2 PLAN BRACE {m['id'][3]}, CROSSING TO THE KERB SIDE RAIL, {sec}"
                 continue
         else:
             what = m["name"].upper()
