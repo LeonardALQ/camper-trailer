@@ -1,13 +1,14 @@
-"""The label overrun check on the built sheets (F6-04, fx10, I2-64, I2-69, I2-76): every sheet SVG in a folder, read in its drawing
-order, for the text a mark shows through, the texts whose letters overlap, the masks that break a heavy line and the
-leaders that go wrong, sheet by sheet.
+"""The label overrun check on the built sheets (F6-04, fx10, I2-64, I2-69, I2-76, fx18-ovr): every sheet SVG in a folder, read
+in its drawing order, for the text a mark shows through, the texts whose letters overlap, the masks that break a heavy
+line, the leaders that go wrong and the texts that leave the frame, sheet by sheet.
 
 - A line hit is a stroked line, an arrowhead, a symbol circle or the frame that crosses the cores of a text's letters
-  (cad/drawings/sheet.py text_core, each text measured in DejaVu Sans as CairoSVG draws it, up to its capitals' height,
-  each line at its stroke's width) and shows: drawn after the text, or before it with no white mask or fill between
-  them. A free label that a line crosses is masked by the sheet (sheet.knockouts), so the line breaks at its letters and
-  is not a hit, nor is a line under a white fill (a symbol's or a box's background) drawn between it and the text. A
-  table cell's text is never masked, so a line through one is.
+  (cad/drawings/sheet.py text_core, each text placed and measured in DejaVu Sans as CairoSVG draws it, from its first
+  letter's ink to its last one's, up to its capitals' height, each line at its stroke's width) and shows: drawn after
+  the text, or before it with no white mask or fill between them. A free label that a line crosses is masked by the
+  sheet (sheet.knockouts), so the line breaks at its letters and is not a hit, nor is a line under a white fill (a
+  symbol's or a box's background) drawn between it and the text. A table cell's text is never masked, so a line
+  through one is.
 - A text overlap is two texts whose letters overlap, or a text that another text's mask or a white fill (a table, the
   title block) drawn after it covers. Here a text's letters run from its baseline up to its capitals' height.
 - A mask break is a text's white mask drawn over a heavy line, one of sheet.HEAVY's 0.35 mm or more (medium, symbol,
@@ -24,10 +25,15 @@ leaders that go wrong, sheet by sheet.
   Two marked lines that run within LEAD_GAP of each other for more than ALONG_MM are drawn over each other, at any
   level and at a tee (I2-85). A text drawn in a symbol (data-in, sheet.mark_inside: a contactor's circle, a
   balloon, a revision triangle) whose letters' middle ends up outside that symbol is one too (I2-76).
+- A frame overrun is a text whose letters' ink, descenders and accents with it (sheet.text_ink, where CairoSVG draws
+  them), reaches past the inner edge of the frame's line into the margin, or reaches into the title block from outside
+  it, past the outer edge of the title block's line (fx18-ovr). The frame and the title block are the rectangles the
+  sheet draws in the frame's line (class="frame", sheet.frame and sheet.title_block), the largest the frame, and a text
+  whose letters lie wholly inside the title block's line is the title block's own.
 
     python -m cad.tools.overrun build/drawings [report.json]
 
-prints each sheet's counts and the places, writes them to the report, and exits 1 when any sheet has any of the four."""
+prints each sheet's counts and the places, writes them to the report, and exits 1 when any sheet has any of the five."""
 from __future__ import annotations
 
 import html
@@ -38,7 +44,7 @@ import sys
 from pathlib import Path
 
 from cad.drawings.sheet import (_SYM_IN, _SYM_OF, CAPS, HEAVY, LEAD_GAP, _crossing, _enters, _gap, _path_pts, _seg_dist, _seg_gap, _segments,
-                                _symbol_circles, in_shape, is_leader, on_target, read_target, symbol_shape, text_core)
+                                _symbol_circles, in_shape, is_leader, on_target, read_target, symbol_shape, text_core, text_ink)
 
 _TEXT = re.compile(r"<text ([^>]*)>(.*)</text>")
 _RECT = re.compile(r'<rect x="([-\d.]+)" y="([-\d.]+)" width="([\d.]+)" height="([\d.]+)" fill="#fff"([^>]*)/>')
@@ -46,7 +52,7 @@ _ROT = re.compile(r'rotate\(([-\d.]+) ([-\d.]+) ([-\d.]+)\)')
 G = 5.0
 TEE_DEG = 20.0     # degrees: a tee's end meets the other flow's run at least this steeply (I2-85)
 ALONG_MM = 3.0     # mm: two marked lines that run within LEAD_GAP of each other further than this lie along each other (I2-85)
-CLASSES = ("line_hits", "text_overlaps", "mask_breaks", "leader_faults")
+CLASSES = ("line_hits", "text_overlaps", "mask_breaks", "leader_faults", "frame_overruns")
 
 
 def _attr(a: str, name: str, default=None):
@@ -88,6 +94,8 @@ def read_sheet(svg: str) -> dict:
             t["corners"] = _ring(t)
             t["letters"] = _ring(t, t["y"] - CAPS * t["s"], t["y"])
             t["bbox"] = _bounds(t["letters"])
+            ink = text_ink(t)
+            t["ink"] = [t["to_sheet"](p) for p in ((ink[0], ink[2]), (ink[1], ink[2]), (ink[1], ink[3]), (ink[0], ink[3]))]
             texts.append(t)
             continue
         m = _RECT.match(e)
@@ -100,7 +108,44 @@ def read_sheet(svg: str) -> dict:
     leaders = [dict(i=n, pts=_path_pts(e), names=read_target(e), level=_level(e)) for n, e in enumerate(el) if is_leader(e)]
     syms = {m[1]: symbol_shape(e) for e in el for m in [_SYM_OF.search(e)] if m}
     held = [(t, syms.get(m[1])) for t in texts for m in [_SYM_IN.search(el[t["i"]])] if m]
-    return dict(el=el, texts=texts, segs=segs, covers=covers, leaders=leaders, symbols=_symbol_circles(el), held=held)
+    inside, blocks = frames(el)
+    return dict(el=el, texts=texts, segs=segs, covers=covers, leaders=leaders, symbols=_symbol_circles(el), held=held,
+                inside=inside, blocks=blocks)
+
+
+def frames(el: list) -> tuple:
+    """The sheet's frame and title block, from the rectangles it draws in the frame's line (class="frame", sheet.frame
+    and sheet.title_block): the area inside the largest one's line, and each other one's box out to its line's outer
+    edge and in to its inner edge, as (x0, x1, y0, y1) in SVG mm. (None, []) on a sheet with no frame."""
+    boxes = [(_bounds(_path_pts(e)), float(_attr(e, "stroke-width", "0")) / 2) for e in el if e.startswith("<path") and 'class="frame"' in e]
+    if not boxes:
+        return None, []
+    boxes.sort(key=lambda bh: (bh[0][1] - bh[0][0]) * (bh[0][3] - bh[0][2]), reverse=True)
+    (f, hw), rest = boxes[0], boxes[1:]
+    return (f[0] + hw, f[1] - hw, f[2] + hw, f[3] - hw), [((b[0] - h, b[1] + h, b[2] - h, b[3] + h), (b[0] + h, b[1] - h, b[2] + h, b[3] - h))
+                                                         for b, h in rest]
+
+
+def frame_overruns(sh: dict) -> list[dict]:
+    """The texts whose letters' ink reaches past the inner edge of the frame's line, or reaches into the title block
+    from outside it, past the outer edge of its line (fx18-ovr). A text whose ink lies wholly inside the title block's
+    line is its own, its places in the block held by the other classes."""
+    inside, out = sh["inside"], []
+    if inside is None:
+        return out
+    for t in sh["texts"]:
+        ink = t["ink"]
+        if not all(inside[0] - 1e-6 <= x <= inside[1] + 1e-6 and inside[2] - 1e-6 <= y <= inside[3] + 1e-6 for x, y in ink):
+            b = _bounds(ink)
+            past = max(inside[0] - b[0], b[1] - inside[1], inside[2] - b[2], b[3] - inside[3])
+            out.append(dict(_place(t), kind=f"past the frame by {past:.2f} mm"))
+            continue
+        for outer, inner in sh["blocks"]:
+            own = all(inner[0] - 1e-6 <= x <= inner[1] + 1e-6 and inner[2] - 1e-6 <= y <= inner[3] + 1e-6 for x, y in ink)
+            if not own and not _apart(ink, [(outer[0], outer[2]), (outer[1], outer[2]), (outer[1], outer[3]), (outer[0], outer[3])]):
+                out.append(dict(_place(t), kind="into the title block"))
+                break
+    return out
 
 
 _LEVEL = re.compile(r'data-level="([\w-]+)"')
@@ -255,7 +300,8 @@ def _place(t: dict) -> dict:
 
 
 def check(svg: str) -> dict:
-    """A sheet's line hits, text overlaps and mask breaks, each with the text and what crosses, covers or lies under it."""
+    """A sheet's line hits, text overlaps, mask breaks, leader faults and frame overruns, each with the text and what
+    crosses, covers or lies under it, or where it goes wrong."""
     sh = read_sheet(svg)
     texts, segs, covers, el = sh["texts"], sh["segs"], sh["covers"], sh["el"]
     grid = _grid(segs)
@@ -288,7 +334,7 @@ def check(svg: str) -> dict:
                     and not any(n < f["i"] < c["i"] and _holds(f, c["ring"]) for f in fills):
                 breaks.append(dict(_place(t) if t else dict(text="", at=[]), line=el[n][:80]))
                 break
-    return dict(line_hits=hits, text_overlaps=overlaps, mask_breaks=breaks, leader_faults=leader_faults(sh))
+    return dict(line_hits=hits, text_overlaps=overlaps, mask_breaks=breaks, leader_faults=leader_faults(sh), frame_overruns=frame_overruns(sh))
 
 
 def leader_faults(sh: dict) -> list[dict]:
@@ -340,9 +386,9 @@ def main(argv: list[str]) -> int:
     for f in sheets:
         r = check(f.read_text(encoding="utf-8"))
         report[f.stem] = r
-        nh, no, nm, nl = (len(r[k]) for k in CLASSES)
-        bad += bool(nh or no or nm or nl)
-        print(f"{f.stem}: {nh} line hits, {no} text overlaps, {nm} mask breaks, {nl} leader faults")
+        nh, no, nm, nl, nf = (len(r[k]) for k in CLASSES)
+        bad += bool(nh or no or nm or nl or nf)
+        print(f"{f.stem}: {nh} line hits, {no} text overlaps, {nm} mask breaks, {nl} leader faults, {nf} frame overruns")
         for h in r["line_hits"]:
             print(f"  line hit: {h['text']!r} at {h['at']} by {h['line']}")
         for o in r["text_overlaps"]:
@@ -351,11 +397,13 @@ def main(argv: list[str]) -> int:
             print(f"  mask break: {m['text']!r} at {m['at']} over {m['line']}")
         for x in r["leader_faults"]:
             print(f"  leader fault: {x['kind']} at {x['at']} ({x['names']}): {x['line']}")
+        for x in r["frame_overruns"]:
+            print(f"  frame overrun: {x['text']!r} at {x['at']} {x['kind']}")
     if len(argv) > 1:
         Path(argv[1]).write_text(json.dumps(report, indent=1), encoding="utf-8")
     n = {k: sum(len(r[k]) for r in report.values()) for k in CLASSES}
-    print(f"overrun: {n['line_hits']} line hits, {n['text_overlaps']} text overlaps, {n['mask_breaks']} mask breaks and "
-          f"{n['leader_faults']} leader faults on {len(sheets)} sheets, {bad} with any")
+    print(f"overrun: {n['line_hits']} line hits, {n['text_overlaps']} text overlaps, {n['mask_breaks']} mask breaks, "
+          f"{n['leader_faults']} leader faults and {n['frame_overruns']} frame overruns on {len(sheets)} sheets, {bad} with any")
     return 1 if bad else 0
 
 

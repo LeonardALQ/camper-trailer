@@ -3,6 +3,7 @@ revision table (REV-01), parts list (BOM-01, compact), third-angle symbol, dimen
 hidden-line views from build123d / OCCT HLR. Output is SVG with real text, then PDF and PNG via CairoSVG."""
 from __future__ import annotations
 
+import functools
 import html
 import math
 import re
@@ -150,16 +151,19 @@ class Sheet:
         """`cell`: the text sits in a table's or the title block's cell, so a line through it is a layout fault, never
         broken for it. Any other text breaks the lines that cross its letters (`knockouts`). `names` is what the label
         names on the sheet, where the sheet knows it: a point (x, y) on it, its box (x0, y0, x1, y1) or a symbol's circle
-        (cx, cy, r). A label that clear_labels moves off its place gets a leader to it, and one with no `names` stays."""
+        (cx, cy, r). A label that clear_labels moves off its place gets a leader to it, and one with no `names` stays. The
+        text is kept at the place it is written at, to 0.01 mm and its turn to 0.1 degree, so the masks, clear_labels
+        and the overrun check, which reads the SVG, all measure it at one place (fx18-ovr)."""
         raw = str(s)
         s = raw.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-        tr = f' transform="rotate({rot:.1f} {x:.2f} {self._y(y):.2f})"' if rot else ""
+        x, y, rot = round(float(x), 2), round(self._y(y), 2), round(float(rot), 1)
+        tr = f' transform="rotate({rot:.1f} {x:.2f} {y:.2f})"' if rot else ""
         w = ' font-weight="bold"' if bold else ""
         c = f' fill="{color}"' if color != "#000" else ""
         if not cell and raw.strip():
-            self.texts.append(dict(i=len(self.el), x=x, y=self._y(y), s=size, anchor=anchor, rot=rot, bold=bold, t=raw, tr=tr,
+            self.texts.append(dict(i=len(self.el), x=x, y=y, s=size, anchor=anchor, rot=rot, bold=bold, t=raw, tr=tr,
                                    names=self.target(names)))
-        self.el.append(f'<text x="{x:.2f}" y="{self._y(y):.2f}" font-size="{size}" text-anchor="{anchor}" '
+        self.el.append(f'<text x="{x:.2f}" y="{y:.2f}" font-size="{size}" text-anchor="{anchor}" '
                        f'font-family="DejaVu Sans, Arial, sans-serif"{w}{c}{tr}>{s}</text>')
 
     def target(self, names):
@@ -217,24 +221,67 @@ class Sheet:
 _METRICS: dict = {}
 
 
-def text_mm(s, size, bold=False) -> float:
-    """A text's advance on the sheet, mm, in the font CairoSVG draws it with: the wider of the PDF's unhinted metrics and
-    the PNG's at its pixel size."""
+def drawn(s) -> str:
+    """The letters CairoSVG draws for a text element: each run of spaces as one space and none at either end, as
+    cairosvg.parser reads a text without xml:space (handle_white_spaces, text_children). A note's continuation line
+    that starts with spaces is drawn from its anchor, not indented by them."""
+    return re.sub(" +", " ", str(s)).strip(" ")
+
+
+def _metrics(png: bool, bold: bool):
+    """A cairo context in the font CairoSVG draws with: the PNG's at its pixel size, hinted, or the PDF's, unhinted."""
     import cairocffi
-    out = 0.0
+    c = _METRICS.get((png, bold))
+    if c is None:
+        if png:
+            c = cairocffi.Context(cairocffi.ImageSurface(cairocffi.FORMAT_ARGB32, 1, 1))
+            c.scale(PNG_PX / Sheet.W, PNG_PX / Sheet.W)
+        else:
+            c = cairocffi.Context(cairocffi.RecordingSurface(cairocffi.CONTENT_COLOR_ALPHA, None))
+        c.select_font_face(FONT, cairocffi.FONT_SLANT_NORMAL, cairocffi.FONT_WEIGHT_BOLD if bold else cairocffi.FONT_WEIGHT_NORMAL)
+        _METRICS[(png, bold)] = c
+    return c
+
+
+@dataclass(frozen=True)
+class Extent:
+    """Where CairoSVG draws a text, mm from its anchor along its baseline and down from it (SVG's way): its pen from the
+    first letter's start to the last one's advance, and its letters' ink from left to right and top to bottom."""
+    start: float
+    end: float
+    left: float
+    right: float
+    top: float
+    bottom: float
+
+
+@functools.lru_cache(maxsize=None)
+def text_extent(s: str, size: float, bold: bool = False, anchor: str = "start") -> Extent:
+    """A text's place as CairoSVG draws it (fx18-ovr): the letters it draws (`drawn`), each one its own advance on from
+    the last, from its anchor for a start, or with the middle or the end of its letters' ink on the anchor for a middle
+    or an end anchor (cairosvg.text). Each edge is the outer of the PDF's, in unhinted metrics, and the PNG's, in the
+    metrics hinted at its pixel size, where each letter's advance is rounded to whole pixels, so the box holds the
+    letters in both. Rendered and read back at 1.2 to 5 mm, the PNG's ink lies inside it and within a pixel of its
+    right and left edges."""
+    s = drawn(s)
+    out = None
     for png in (False, True):
-        c = _METRICS.get((png, bold))
-        if c is None:
-            if png:
-                c = cairocffi.Context(cairocffi.ImageSurface(cairocffi.FORMAT_ARGB32, 1, 1))
-                c.scale(PNG_PX / Sheet.W, PNG_PX / Sheet.W)
-            else:
-                c = cairocffi.Context(cairocffi.RecordingSurface(cairocffi.CONTENT_COLOR_ALPHA, None))
-            c.select_font_face(FONT, cairocffi.FONT_SLANT_NORMAL, cairocffi.FONT_WEIGHT_BOLD if bold else cairocffi.FONT_WEIGHT_NORMAL)
-            _METRICS[(png, bold)] = c
+        c = _metrics(png, bold)
         c.set_font_size(size if png else 100.0)
-        out = max(out, c.text_extents(str(s))[4] * (1.0 if png else size / 100.0))
+        k = 1.0 if png else size / 100.0
+        xb, yb, wi, hi, adv = (v * k for v in c.text_extents(s)[:5])
+        pen = 0.0 if anchor == "start" else -(wi / 2 + xb) if anchor == "middle" else -(wi + xb)
+        e = Extent(pen, pen + adv, pen + xb, pen + xb + wi, yb, yb + hi)
+        out = e if out is None else Extent(min(out.start, e.start), max(out.end, e.end), min(out.left, e.left),
+                                           max(out.right, e.right), min(out.top, e.top), max(out.bottom, e.bottom))
     return out
+
+
+def text_mm(s, size, bold=False) -> float:
+    """A text's advance on the sheet, mm, as CairoSVG draws it (`text_extent`): the wider of the PDF's unhinted metrics
+    and the PNG's hinted ones."""
+    e = text_extent(str(s), float(size), bool(bold))
+    return e.end - e.start
 
 
 def wrap_mm(s, width, size, bold=False) -> list[str]:
@@ -547,17 +594,20 @@ def _enters(p, q, box) -> bool:
 
 def text_core(t: dict) -> tuple[float, float, tuple]:
     """A text's start and its letters' advance on the sheet, and the box the cores of its letters fill, in its own
-    unrotated frame in SVG coordinates (x0, x1, y0, y1): 0.12 of its size in from each end, from 0.06 of its size above
-    the baseline up to CAPS, the capitals' height, so a line that only grazes a descender, the baseline or the space
-    round the text is not counted, and one through the capitals' tops is. `t` holds the text (t), its anchor point
-    (x, y), size (s), anchor and weight (bold)."""
-    s, txt = t["s"], t["t"]
-    lead = len(txt) - len(txt.lstrip())
-    w = text_mm(txt.strip(), s, t["bold"])
-    full = text_mm(txt, s, t["bold"])
-    x0 = t["x"] if t["anchor"] == "start" else t["x"] - full / 2 if t["anchor"] == "middle" else t["x"] - full
-    x0 += text_mm(" " * lead, s, t["bold"]) if lead else 0.0
-    return x0, w, (x0 + 0.12 * s, x0 + w - 0.12 * s, t["y"] - CAPS * s, t["y"] - 0.06 * s)
+    unrotated frame in SVG coordinates (x0, x1, y0, y1), all where CairoSVG draws it (`text_extent`): from its first
+    letter's ink to its last one's, from 0.06 of its size above the baseline up to CAPS, the capitals' height, so a line
+    that only grazes a descender, the baseline or the space round the text is not counted, and one through the ends of
+    its first and last letters or the capitals' tops is. `t` holds the text (t), its anchor point (x, y), size (s),
+    anchor and weight (bold)."""
+    s, e = t["s"], text_extent(t["t"], t["s"], t["bold"], t["anchor"])
+    return t["x"] + e.start, e.end - e.start, (t["x"] + e.left, t["x"] + e.right, t["y"] - CAPS * s, t["y"] - 0.06 * s)
+
+
+def text_ink(t: dict) -> tuple:
+    """The box a text's letters' ink fills where CairoSVG draws it, descenders and accents with it, in its own unrotated
+    frame in SVG coordinates (x0, x1, y0, y1), for the overrun check's frame rule."""
+    e = text_extent(t["t"], t["s"], t["bold"], t["anchor"])
+    return (t["x"] + e.left, t["x"] + e.right, t["y"] + e.top, t["y"] + e.bottom)
 
 
 def knockouts(sh) -> list[str]:
@@ -1194,9 +1244,12 @@ def _crosses_text(B, p, q, own) -> bool:
 
 
 def _shift_text(sh, it, dx: float, dy: float):
-    """Move a text on the sheet by (dx, dy), SVG mm: its element, its entry in sh.texts and its boxes."""
+    """Move a text on the sheet by (dx, dy), SVG mm, to the place it is written at (Sheet.text): its element, its entry in
+    sh.texts and its boxes."""
     t = it["t"]
-    t["x"], t["y"] = t["x"] + dx, t["y"] + dy
+    x, y = round(t["x"] + dx, 2), round(t["y"] + dy, 2)
+    dx, dy = x - t["x"], y - t["y"]
+    t["x"], t["y"] = x, y
     e = re.sub(r'^<text x="[-\d.]+" y="[-\d.]+"', f'<text x="{t["x"]:.2f}" y="{t["y"]:.2f}"', sh.el[it["n"]])
     if t["rot"]:
         e = re.sub(r'rotate\(([-\d.]+) [-\d.]+ [-\d.]+\)', rf'rotate(\g<1> {t["x"]:.2f} {t["y"]:.2f})', e)
