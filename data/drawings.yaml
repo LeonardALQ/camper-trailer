@@ -136,6 +136,7 @@ drawings:
       - {rev: AD, date: 2026-11-25, description: "Memo: the frame's holes for galvanising show in the views (I2-89)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AE, date: 2026-11-25, description: "Notice: the masses with the hinge gussets cut to bear, +2.0 kg (I2-95)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AF, date: 2026-11-25, description: "Notice: the heaviest case 3,638 kg and the axle group 3,283 kg (MAS-10)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AG, date: 2026-11-25, description: "Notice: the recovery rule, 58.9 kN rated and 50 kN with an axle held", drawn: Kiro, checked: "", approved: ""}
   - number: CT-010
     title: Floor plan, bed up and bed down
     subtitle: Day and night plans, walkways, door swings, spaces kept clear and the bed positions
@@ -259,6 +260,7 @@ drawings:
       - {rev: AF, date: 2026-11-25, description: "Notice: LC8a with the trailer's weight on supports that cannot pull (I2-94)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AG, date: 2026-11-25, description: "Notice: the hinge gussets cut to bear, 283 mm, and the panel's angles (I2-95)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AH, date: 2026-11-25, description: "Notice: the front hinges' front cheeks, PB-2's rear ends 200 ahead of CM-04", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AI, date: 2026-11-25, description: "Notice: stepped cheeks, gussets on them, LC8a with an axle held at 50 kN", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
@@ -295,6 +297,7 @@ drawings:
       - {rev: X, date: 2026-11-25, description: "Notice: the local checks with CHS-15 and the cheeks' welds (I2-92, I2-94)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Y, date: 2026-11-25, description: "Memo: the checks table gains CHS-16 and CHS-13's bearing at the bolts", drawn: Kiro, checked: "", approved: ""}
       - {rev: Z, date: 2026-11-25, description: "Memo: CHS-14 with every hinge's two cheeks, the tables on 2.8 mm rows", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AA, date: 2026-11-25, description: "Memo: CHS-13 the tongues' roots and held-points buckling, CHS-16 the web", drawn: Kiro, checked: "", approved: ""}
   - number: CT-103
     title: Chassis details
     subtitle: Composite rail, outrigger root, crossmember to rail, overlap end, jacking pad, recovery tongue, spare posts
@@ -398,6 +401,7 @@ drawings:
     revisions:
       - {rev: A, date: 2026-11-25, description: "First draft: the XT hinge joint and the rear bay's shear panel (I2-95)", drawn: Kiro, checked: "", approved: ""}
       - {rev: B, date: 2026-11-25, description: "Notice: note 5, the front hinge now has both cheeks and its rear gussets", drawn: Kiro, checked: "", approved: ""}
+      - {rev: C, date: 2026-11-25, description: "Notice: 4 mm sheet, R25 tongue roots, no stiffener, stepped coped cheeks", drawn: Kiro, checked: "", approved: ""}
   - number: CT-201
     title: Body shell
     subtitle: Kerb, road, front and rear walls, the fixed roof plan, the panels and every opening with its size

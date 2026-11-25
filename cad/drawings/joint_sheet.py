@@ -440,7 +440,7 @@ def ct106(prj, model, bom, checks, reg, dwg):
     _title_of(sh, 196.0, 279.0, "C: REAR TANK BAY, SHEAR PANEL, PLAN", 10)
     p0, p1, _ = _bay_c(sh, J, 166.0, 132.0)
     S.cut_marker(sh, p0, p1, (1.0, 0.0), "D")
-    _title_of(sh, 318.0, 262.0, "D-D: ACROSS THE RAIL AT THE PANEL", 2.5, "LOOKING REARWARD")
+    _title_of(sh, 318.0, 257.0, "D-D: ACROSS THE RAIL AT THE PANEL", 2.5, "LOOKING REARWARD")
     _section_d(sh, J, 284.0, 160.0)
     _parts(sh, J, 24.0, 96.0)
     S.notes(sh, 276.0, 146.0, _notes(J), width_chars=74, size=1.5)
