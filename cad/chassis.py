@@ -19,6 +19,10 @@ from .frame import G_STEEL, RIGID, Frame, Section
 from .partsdb import DATA, Params
 
 CHASSIS_YAML = DATA / "chassis" / "chassis.yaml"
+
+# a pin between two nodes 1 mm apart: it passes a force each way and almost no moment (the hinge cheeks' fillets to the
+# hinge bar, I2-92). Marked rigid so the stress readings skip it
+PIN = Section("pin", A=1.0e5, I_strong=1.0, I_weak=1.0, J=1.0, rigid=True)
 SECTIONS_YAML = DATA / "chassis" / "sections.yaml"
 SIDES = {-1: "K", 1: "R"}            # kerb side is negative Y, road side positive Y (DIM-01)
 SIDE_WORDS = {-1: "kerb side", 1: "road side"}
@@ -766,13 +770,21 @@ class FrameModel:
                 self._link(nd, self.rail_node(w["side"], w["station_x"]), f"hinge {w['id']}")
             self.pivot_nodes[w["id"]] = nd
             if hinges == "crossmember":
-                # the hinge's two cheeks (CH-P16) as one member from the pivot to the rail's underside, held there by their
-                # welds along the rail's inner web
+                # the hinge's cheeks (CH-P16) as they are welded (I2-92): the hinge bar rigid from the pivot up to the middle of
+                # the cheeks' fillets to it, `bar_d` under the rail, a pin there, since those short fillets pass a force but no
+                # moment, and the cheeks as one member from the pin to the rail's underside, held there by their welds along
+                # the rail's inner web. So the arm's moment stays in the bar and goes to the crossmember by its weld runs
+                ck = ch.data["xt_hinges"]["cheek"]
                 n = sum(1 for c in ch.hinge_cheeks() if c["wheel"] == w["id"])
-                sp = cheek_props(ch.data["xt_hinges"]["cheek"], ch.xm_w, n)
+                sp = cheek_props(ck, ch.xm_w, n)
+                z_pin = V["rail_underside_z"] - ck["bar_d"] / 2
+                bar = f.node((w["pivot"][0], w["pivot"][1], z_pin - 1.0))
+                pin = f.node((w["pivot"][0], w["pivot"][1], z_pin))
                 top = f.node((w["pivot"][0], w["pivot"][1], V["rail_underside_z"]))
+                self._link(nd, bar, f"hinge bar {w['id']}")
+                f.add(bar, pin, PIN, (1, 0, 0), f"cheek pin {w['id']}")
                 self._link(top, self.rail_node(w["side"], w["station_x"]), f"cheek welds {w['id']}")
-                f.add(nd, top, sp.frame_section(), (1, 0, 0), f"CH-P16-{w['id']}")
+                f.add(pin, top, sp.frame_section(), (1, 0, 0), f"CH-P16-{w['id']}")
                 self.sec_props[f"CH-P16-{w['id']}"] = sp
         for g in (ch.hinge_gussets() if hinges == "crossmember" else []):
             gsec = ch.sections[next(fd for fd in ch.data["fittings"] if fd["id"] == "CH-P08")["section"]]
