@@ -111,7 +111,7 @@ lines:
     qty: 1
     unit: 8 m length
     covers: [CH-P08]
-    price: {aud_each: 95.65, basis: listing, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/15-shs-mild-steel-square.html", date: 2026-11-20, note: "SKU SHS25. 0.8 m needed"}
+    price: {aud_each: 95.65, basis: listing, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/15-shs-mild-steel-square.html", date: 2026-11-20, note: "SKU SHS25. 1.7 m needed, six gussets of 283 mm on their axes cut at 45 degrees at both ends"}
   - id: STL-08
     group: chassis
     name: Profile-cut plate parts, grade 350, cut and drilled, for the coupling plate, lugs, gussets, pads, cleats, brackets, the rails' end plates and the 32 body mount nut plates

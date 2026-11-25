@@ -94,6 +94,7 @@ params:
   travel: 60
   arm_depth: 90                               # the XT arm's depth in its plane, pivot to hub (est., as the model draws it at the hub), for FIT-05's sweep
   max_element: 250                            # longest frame element
+  hinge_gusset_l: 283                         # each hinge gusset CH-P08 on its axis between its two cut faces (xt_hinges `gusset`)
 
 roles:
   rail: {section: RHS_150x50x4, name: "Main rail"}   # 4 mm since the 4,000 kg plate (revision D): LC8a reached 1.01 of yield at 3 mm
@@ -191,7 +192,7 @@ fittings:
      at: ["axle_x + xt_centre_front + xm_w / 2", 0, rail_underside_z - 5], side_y: "rail_c - rail_w / 2 - 61"}
   - {id: CH-P07, plane: yz, name: "Shock support plate, 5 mm, full height on the XT rear shock crossmember", kind: plate, l: 300, w: 150, t: 5, qty: 2,
      at: ["axle_x + xt_rear_shock_front - 3", 0, "rail_underside_z + 75"], side_y: "rail_c - 200"}
-  - {id: CH-P08, name: "Hinge crossmember gusset, RHS 50 x 50 x 3 at 45 degrees (TB 070), 200 mm, two behind each hinge crossmember and two ahead of the centre's", kind: tube, section: SHS_50x50x3, length: 200, qty: 6,
+  - {id: CH-P08, name: "Hinge crossmember gusset, SHS 50 x 50 x 3 at 45 degrees (TB 070), 283 mm on its axis, its ends cut at 45 degrees to bear on the crossmember's face and on the rail's inner web behind the hinge cheek, welded all round, two behind each hinge crossmember and two ahead of the centre's", kind: tube, section: SHS_50x50x3, length: hinge_gusset_l, qty: 6,
      poses: hinge_gussets, fat: null}
   - {id: CH-P16, name: "Hinge cheek, 10 mm, 150 x 108.5, beside each XT hinge crossmember on the rail's inner face, welded to the web and the hinge bar", kind: plate, l: 150, w: 108.5, t: 10, qty: 6,
      poses: hinge_cheeks, plane: xz, fat: null}
@@ -470,9 +471,17 @@ sealed_overlaps:
 # report 11 line 111), and "Weld should not continue under main chassis rail". `runs` are the runs' centres from the
 # rail's inner face (est., 80 mm runs at 100 mm centres from 10 mm inboard). The frame model ties each hinge's pivot to
 # its crossmember at those runs, so the hinge's force and moment reach the rail through the crossmember's end, beside its
-# holes, and through the gussets. The gussets CH-P08 are SHS 50 x 50 x 3 at 45 degrees in plan from the crossmember's rear
-# face to the rail's inner face, inside sheet 2's 250 mm of the rail, each centred `behind` the crossmember's rear face
-# and `inboard` of the rail's centreline, and carried in the frame model as members
+# holes, and through the gussets. The gussets CH-P08 are SHS 50 x 50 x 3 at 45 degrees in plan across the corner between
+# the crossmember's face and the rail's inner face, inside sheet 2's 250 mm of the rail, their axes at the rail's
+# mid-depth, carried in the frame model as members. Each end is cut at 45 degrees to the tube to bear on its face: on the
+# crossmember's face, and on the rail's inner web behind the hinge cheek, where the gusset's load stays out of the cheek's
+# welds. `length` is the axis's length between the two cut faces, so the axis meets each face length / sqrt 2 from the
+# corner, there the centre of that end's weld and of the frame model's link, and each side wall ends 25 mm inside or beyond
+# the axis's end. At 283 mm the short side meets the web 14.8 mm behind the cheek's end, so its fillet's toe stands 9.8 mm
+# clear of the cheek. `weld` gives each cut end's welds all round: `leg` mm fillets along the top and bottom walls' 70.7 mm
+# edges in their 90 degree angle, a fillet of `acute_leg` in the 45 degree angle on the short side, its throat the leg times
+# cos 22.5 degrees and its procedure qualified to AS/NZS 1554.1 as the angle is under 60 degrees, and on the long side, in
+# the 135 degree angle, the wall's edge bevelled and butt welded to `obtuse_throat`, the wall's 3 mm (CHS-15)
 # The hinge cheeks CH-P16 (I2-88): at each XT hinge 10 mm plates on the rail's inner face, one either side of the hinge
 # crossmember, `l` along the rail and `h` tall, standing `below` under the rail's underside beside the hinge bar, their
 # tops 82.5 mm up the web. Each is welded to the rail's web by 6 mm fillets along its top edge and along the rail's bottom
@@ -483,11 +492,11 @@ sealed_overlaps:
 # keeps 20 mm from the services' runs (SVC-01) and 50 mm from the
 # arms and their leads (FIT-05). The frame model carries the cheeks at one hinge as one member from the pivot to the
 # rail's underside, held to the rail by their welds above it. The gussets ahead of the front hinge crossmember are left
-# out for the runs B-04 and K-10, so that crossmember is RHS 150 x 50 x 6. The gussets stand 125 mm inboard of the rail's
-# centreline so their rail ends clear the cheeks, and the jacking pads stand 61 mm inboard of the rail's inner face.
+# out for the runs B-04 and K-10, so that crossmember is RHS 150 x 50 x 6. The gussets' rail ends land behind the cheeks,
+# and the jacking pads stand 61 mm inboard of the rail's inner face.
 xt_hinges:
   bar: {leg: 6, run: 80, runs: [50, 150, 250]}
-  gusset: {behind: 80, inboard: 125, length: 200, faces: [1, -1], omit: [CM-04KF, CM-04RF]}
+  gusset: {length: hinge_gusset_l, faces: [1, -1], omit: [CM-04KF, CM-04RF], weld: {leg: 5, acute_leg: 5, obtuse_throat: 3}}
   cheek: {t: 10, l: 150, h: 108.5, below: 26, leg: 6, bar_d: 26, bar_leg: 10, omit: [FRF, FKF]}
 
 # Shear panels (I2-87): the rear fresh tank's guard is a 3 mm galvanised steel sheet (AS 1397 G300, fy 300 MPa), bolted

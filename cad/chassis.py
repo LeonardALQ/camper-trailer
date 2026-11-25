@@ -423,10 +423,11 @@ class Chassis:
                                    area_m2_each=2 * f["l"] * f["w"] * af / 1e6))
             elif kind == "tube":
                 sec = self.sections[f["section"]]
-                m = sec.kg_m * f["length"] / 1000
+                L = self.ev(f["length"])
+                m = sec.kg_m * L / 1000
                 out.append(Fitting(f["id"], f["name"], kind, qty, at, m, "calculated",
-                                   f"Calculated: {f['length']} mm of {sec.name} at {sec.kg_m} kg/m", t=sec.t,
-                                   area_m2_each=sec.area_m2_per_m * f["length"] / 1000))
+                                   f"Calculated: {L:g} mm of {sec.name} at {sec.kg_m} kg/m", t=sec.t,
+                                   area_m2_each=sec.area_m2_per_m * L / 1000))
             elif kind == "strip":
                 L = self.strip_length()
                 out.append(Fitting(f["id"], f["name"], kind, 1, [(self.V["body_x0"] + self.V["body_length"] / 2, 0.0, self.V["floor_underside_z"] - 10)],
@@ -484,29 +485,38 @@ class Chassis:
         return [next(m for m in self.members if m.station == st and m.role == "cm_xt") for st in ("XT front hinge", "XT centre")]
 
     def hinge_gussets(self) -> list[dict]:
-        """The four hinge gussets CH-P08 (xt_hinges `gusset`), the one place the dip, the frame model and the 3D model read
-        them from: each an SHS on the 45 degree line in plan between its hinge crossmember's rear face and the rail's inner
-        face, at the rail's mid-depth. `cm_y` is where its axis meets the crossmember's rear face and `rail_x` where it
-        meets the rail's inner face, `p0` and `p1` the ends of its `length`."""
+        """The six hinge gussets CH-P08 (xt_hinges `gusset`), the one place the dip, the frame model, the 3D model and the
+        sheets read them from: each an SHS on the 45 degree line in plan across the corner between its hinge crossmember's
+        face and the rail's inner face, at the rail's mid-depth, both ends cut on those faces. Its axis meets each face
+        `leg` = length / sqrt 2 from the corner, `p0` at `cm_y` on the crossmember's face and `p1` at `rail_x` on the rail's,
+        the centres of its two end welds. Each side wall ends `b` / 2 inside the axis's ends on the short side, the web
+        `short` across the tube, and as far beyond them on the long side (`offsets`, as the dip reads a mitre), and
+        `outline` is its plan at the two faces: short and long side on the crossmember, long and short side on the rail."""
         V, g = self.V, self.data["xt_hinges"]["gusset"]
         rail = self.role_sec["rail"]
+        sec = self.sections[next(f for f in self.data["fittings"] if f["id"] == "CH-P08")["section"]]
         y_in = V["rail_c"] - rail.b / 2
         z = V["rail_underside_z"] + g.get("z_over_underside", rail.d / 2)
+        length = self.ev(g["length"])
+        leg = length / math.sqrt(2)
+        side = sec.b / 2 * math.sqrt(2)                # each side wall's offset from the axis along either face
         out = []
         for cm in self.hinge_crossmembers():
             for e in g.get("faces", [1]):              # 1 behind the crossmember's rear face, -1 ahead of its front face
                 face = cm.p0[0] + e * cm.sec.b / 2
                 for s in (-1, 1):
-                    c = (face + e * g["behind"], s * (V["rail_c"] - g["inboard"]), z)
-                    d = (e / math.sqrt(2), s / math.sqrt(2), 0.0)
-                    half = g["length"] / 2
                     gid = f"{cm.id}{SIDES[s]}" + ("" if e > 0 else "F")
                     if gid in g.get("omit", []):
                         continue
-                    out.append(dict(id=f"CH-P08-{gid}", cm=cm.id, side=s, rear_x=face, centre=c, dir=d,
-                                    p0=tuple(a - half * b for a, b in zip(c, d)), p1=tuple(a + half * b for a, b in zip(c, d)),
-                                    cm_y=s * (V["rail_c"] - g["inboard"] - g["behind"]), rail_x=face + e * (g["behind"] + g["inboard"] - rail.b / 2),
-                                    y_in=s * y_in, z=z))
+                    p0 = (face, s * (y_in - leg), z)
+                    p1 = (face + e * leg, s * y_in, z)
+                    short = 1 if e * s > 0 else -1     # the web on the corner's side, across the tube's width (cad/chassis_dip.py axes)
+                    out.append(dict(id=f"CH-P08-{gid}", cm=cm.id, side=s, face=e, rear_x=face, length=length, leg=leg,
+                                    centre=tuple((a + b) / 2 for a, b in zip(p0, p1)), dir=(e / math.sqrt(2), s / math.sqrt(2), 0.0),
+                                    p0=p0, p1=p1, cm_y=p0[1], rail_x=p1[0], y_in=s * y_in, z=z, short=short,
+                                    offsets={short: sec.b / 2, -short: -sec.b / 2},
+                                    outline=[(face, s * (y_in - leg + side)), (face, s * (y_in - leg - side)),
+                                             (face + e * (leg + side), s * y_in), (face + e * (leg - side), s * y_in)]))
         return out
 
     def shear_panels(self) -> list[dict]:
@@ -1088,6 +1098,22 @@ def member_solid(m: Member):
     return cut_member(m, extrude(pl * prof, amount=m.length))
 
 
+def gusset_solid(ch: Chassis, g: dict, name: str):
+    """A hinge gusset as made: its tube run on past both ends of its axis as far as its long side reaches, and cut off on
+    the crossmember's face and the rail's inner face (Chassis.hinge_gussets)."""
+    from .model.prims import box
+    sec = ch.sections[next(f for f in ch.data["fittings"] if f["id"] == "CH-P08")["section"]]
+    run = sec.b / 2
+    p0 = tuple(a - run * d for a, d in zip(g["p0"], g["dir"]))
+    p1 = tuple(a + run * d for a, d in zip(g["p1"], g["dir"]))
+    tube = member_solid(Member(g["id"], "hinge_gusset", name, sec, p0, p1))
+    e, s, z, big = g["face"], g["side"], g["z"], 400.0
+    x_cm, y_rail = g["rear_x"], g["y_in"]
+    beyond_cm = box(x_cm - big if e > 0 else x_cm, min(p0[1], p1[1]) - big, z - big, big, 2 * big + 2 * g["leg"], 2 * big)
+    beyond_rail = box(min(p0[0], p1[0]) - big, y_rail if s > 0 else y_rail - big, z - big, 2 * big + 2 * g["leg"], big, 2 * big)
+    return tube - beyond_cm - beyond_rail
+
+
 PLANES = {"xy": (0, 1, 2), "xz": (0, 2, 1), "yz": (1, 2, 0)}   # which axes the plate's length, width and thickness run along
 
 
@@ -1102,10 +1128,10 @@ def fitting_boxes(ch: Chassis, f: Fitting) -> list[tuple]:
         return [(x0, y0, z0, x0 + dx, y0 + dy, z0 + dz) for x0, y0, z0, dx, dy, dz in (ch.P.eval(b, {}) for b in spec["boxes"])]
     if spec.get("poses") == "steadies":
         return [p["travel"] for p in ch.steady_poses()]
-    if spec.get("poses") == "hinge_gussets":                  # each 45 degree gusset's envelope (xt_hinges, I2-88)
-        h = ch.sections[spec["section"]].b / 2
-        return [tuple(min(g["p0"][i], g["p1"][i]) - h for i in range(3)) + tuple(max(g["p0"][i], g["p1"][i]) + h for i in range(3))
-                for g in ch.hinge_gussets()]
+    if spec.get("poses") == "hinge_gussets":                  # each 45 degree gusset's plan between its two cut faces
+        h = ch.sections[spec["section"]].d / 2
+        return [(min(x for x, _ in g["outline"]), min(y for _, y in g["outline"]), g["z"] - h,
+                 max(x for x, _ in g["outline"]), max(y for _, y in g["outline"]), g["z"] + h) for g in ch.hinge_gussets()]
     if spec.get("poses") == "hinge_cheeks":                   # each hinge cheek's plate (xt_hinges)
         return [c["box"] for c in ch.hinge_cheeks()]
     if f.kind == "strip":
@@ -1127,7 +1153,6 @@ def fitting_solids(ch: Chassis, f: Fitting) -> list:
     from .model.prims import box
     spec = next(d for d in ch.data["fittings"] if d["id"] == f.id)
     if spec.get("poses") == "hinge_gussets":
-        sec = ch.sections[spec["section"]]
-        return [member_solid(Member(g["id"], "hinge_gusset", f.name, sec, g["p0"], g["p1"])) for g in ch.hinge_gussets()]
+        return [gusset_solid(ch, g, f.name) for g in ch.hinge_gussets()]
     from .chassis_holes import cut_plates
     return cut_plates(ch, f, [box(x0, y0, z0, x1 - x0, y1 - y0, z1 - z0) for x0, y0, z0, x1, y1, z1 in fitting_boxes(ch, f)])

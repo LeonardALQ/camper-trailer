@@ -466,6 +466,7 @@ class Analysis:
         sites = self.hole_sites()
         hole_env: dict[str, dict] = {}
         self.panel_env: dict[str, dict] = {}
+        self.gusset_env: dict[str, dict] = {}
 
         def take(lc_id, res, label, extra=None, ultimate=False):
             for mem, r in self.stresses(res, ultimate).items():
@@ -477,6 +478,11 @@ class Analysis:
                 pe = self.panel_env.setdefault(lc_id, {})
                 if sp["id"] not in pe or v > pe[sp["id"]]["v_n"]:
                     pe[sp["id"]] = dict(v_n=v, case=label)
+            for k, g in self.gusset_elements():
+                w = self.gusset_weld_stress(res, k, g)
+                ge = self.gusset_env.setdefault(lc_id, dict(mpa=-1.0))
+                if w > ge["mpa"]:
+                    ge.update(mpa=w, case=label, gusset=g["id"])
             he = hole_env.setdefault(lc_id, {})
             for k, h in enumerate(sites):
                 if h.get("open") or h.get("placement_only"):
@@ -580,6 +586,7 @@ class Analysis:
         out["galvanising"] = galvanising_check(ch)
         out["local"] = self.local_checks(out["pad_n"]["pad_n"])
         out["local"].update(self.panel_checks(), hinge_cheeks=self.cheek_check())
+        out["local"]["hinge_gussets"] = self.gusset_welds()
         out["fixings"] = self.fixings()
         out["cross_checks"] = self.cross_checks(out, lc6)
         out["lc1_ball"] = balls
@@ -644,6 +651,73 @@ class Analysis:
             res.update(tau_cr=tau_cr, v_n=w[1][sp["id"]]["v_n"], lc=w[0])
             out["shear_panel"] = res
         return out
+
+    def gusset_elements(self) -> list[tuple[int, dict]]:
+        """Each hinge gusset's frame element with the gusset (Chassis.hinge_gussets), its i end on the crossmember's face."""
+        if not hasattr(self, "_gussets"):
+            by_id = {g["id"]: g for g in self.ch.hinge_gussets()}
+            self._gussets = [(k, by_id[el.member]) for k, el in enumerate(self.f.elements) if el.member in by_id]
+        return self._gussets
+
+    def gusset_weld_group(self, g: dict, end: int) -> dict:
+        """The weld round one cut end of hinge gusset g (xt_hinges `gusset` `weld`), end 0 on the crossmember's face and 1 on
+        the rail's inner web: the face's normal and its horizontal direction, and the weld's pieces as points along the face
+        from the axis's point on it, each with its throat and length. The top and bottom walls' edges run 70.7 mm along the
+        face in a 90 degree angle, the short side's wall meets it at 45 degrees and the long side's at 135 degrees."""
+        w = self.ch.data["xt_hinges"]["gusset"]["weld"]
+        sec = self.ch.sections[next(f for f in self.ch.data["fittings"] if f["id"] == "CH-P08")["section"]]
+        half, h = sec.b / 2 * math.sqrt(2), sec.d / 2
+        e, s = g["face"], g["side"]
+        if end == 0:
+            n, along, short = np.array((e, 0.0, 0.0)), np.array((0.0, 1.0, 0.0)), s * half
+        else:
+            n, along, short = np.array((0.0, -s, 0.0)), np.array((1.0, 0.0, 0.0)), -e * half
+        throats = dict(edge=w["leg"] * math.cos(math.pi / 4), acute=w["acute_leg"] * math.cos(math.pi / 8), obtuse=w["obtuse_throat"])
+        pts = []
+        k = 12
+        for j in range(k):
+            a = -half + (j + 0.5) * 2 * half / k
+            pts += [(a, h, throats["edge"], 2 * half / k), (a, -h, throats["edge"], 2 * half / k)]
+            b = -h + (j + 0.5) * 2 * h / k
+            pts += [(short, b, throats["acute"], 2 * h / k), (-short, b, throats["obtuse"], 2 * h / k)]
+        return dict(n=n, along=along, pts=np.array(pts), throats=throats)
+
+    def gusset_weld_stress(self, res, k: int, g: dict) -> float:
+        """The largest throat stress round either cut end of hinge gusset g, frame element k, by the elastic vector method:
+        the end's force and moment from the element, moved to the weld's centroid, its normal force and its two moments in
+        the face's plane over the weld's throat area and second moments, and its two shears in that plane and its twist
+        about the normal over the area and the polar moment, all on the throats (AS 4100 9.7.3.10)."""
+        el = self.f.elements[k]
+        xyz = np.asarray(self.f.nodes, float)
+        R, _ = el.axes(xyz)
+        fl = np.asarray(res.forces[k], float)
+        worst = 0.0
+        for end, node in ((0, el.i), (1, el.j)):
+            F, M = R.T @ fl[6 * end:6 * end + 3], R.T @ fl[6 * end + 3:6 * end + 6]
+            grp = self.gusset_weld_group(g, end)
+            n, along, up = grp["n"], grp["along"], np.array((0.0, 0.0, 1.0))
+            a, b, t, ds = grp["pts"].T
+            A = t * ds
+            ac, bc = float(np.sum(A * a) / A.sum()), float(np.sum(A * b) / A.sum())
+            Iaa, Ibb = float(np.sum(A * (a - ac) ** 2)), float(np.sum(A * (b - bc) ** 2))
+            Mc = M + np.cross(xyz[node] - (xyz[node] + ac * along + bc * up), F)
+            nm = np.cross(n, Mc)
+            sig = F @ n / A.sum() + (nm @ up) * (b - bc) / Ibb + (nm @ along) * (a - ac) / Iaa
+            r = np.outer(a - ac, along) + np.outer(b - bc, up)
+            tau = (F - (F @ n) * n) / A.sum() + (Mc @ n) * np.cross(n, r) / (Iaa + Ibb)
+            worst = max(worst, float(np.max(np.sqrt(sig ** 2 + np.sum(tau ** 2, axis=1)))))
+        return worst
+
+    def gusset_welds(self) -> dict:
+        """CHS-15: the hinge gussets' end welds in every load case, the largest throat stress round either cut end of any
+        gusset (gusset_weld_stress) against AS 4100 9.7.3's 0.8 x 0.6 fuw over the case's factor."""
+        mat = self.ch.data["material"]
+        wcap = mat["weld_phi"] * 0.6 * mat["weld_fuw"]
+        lcs = {lc["id"]: lc for lc in self.ch.data["load_cases"]}
+        fac = {lc_id: (lcs[lc_id]["factor"] if lc_id in lcs else 1) for lc_id in self.gusset_env}
+        rows = [(f"end welds, {lc_id}", e["mpa"], wcap / fac[lc_id]) for lc_id, e in self.gusset_env.items()]
+        lc_id, e = max(self.gusset_env.items(), key=lambda kv: kv[1]["mpa"] * fac[kv[0]])
+        return _local("Hinge gussets' end welds (CH-P08)", rows, f"{e['gusset']} in {lc_id}, {e['case']}")
 
     def cheek_check(self) -> dict:
         """The hinge cheeks' welds (CH-P16) at the 78.5 kN ultimate pull, all of it along the trailer through one cheek, as a
@@ -1108,8 +1182,8 @@ class Analysis:
         distance to the end weld's toe, to fillets along the member's bottom edges, to the fittings welded on it and to
         the member's other holes, in the web's own plane (u along the member, z across it). A hole in a rail's inner web
         inside a crossmember's end is read with the rails' holes (hole_sites). The drawbar members' apex drains are
-        H-33 to H-36 already. A hinge gusset carries no frame load in the model, so its holes are placed by CHS-10's edge
-        and toe rules only, as the snipe caps' vents were."""
+        H-33 to H-36 already. The hinge gussets are members of the frame model, so their holes are read on their net
+        sections as the members' are."""
         from .chassis import fitting_boxes
         from .chassis_dip import frame_sections
         ch, V = self.ch, self.ch.V
