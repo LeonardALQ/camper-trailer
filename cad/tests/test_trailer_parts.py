@@ -83,7 +83,7 @@ def test_totals_add_up():
         by[ln["group"]] += ln["price"]["aud"]
         c = sum(p["aud"] * PCT[p["basis"]] / 100 for p in _parts(ln))
         assert abs(c - ln["contingency_aud"]) < 0.011, f"{ln['id']}: contingency {ln['contingency_aud']}, its parts give {c:.2f}"
-        cont[ln["group"]] += c
+        cont[ln["group"]] += ln["contingency_aud"]      # the group's as the list gives each line, its cent rounded once
     assert set(by) == set(TOT["by_group"])
     for g, v in by.items():
         assert abs(TOT["by_group"][g] - v) < 0.011, f"group {g}: totals {TOT['by_group'][g]}, lines {v:.2f}"
