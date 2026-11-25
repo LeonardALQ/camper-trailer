@@ -64,6 +64,7 @@ rules:
     yaw_deg: 70                 # the truck turned either way about the pin: the DO45's articulation, at least 70 degrees (report 08)
     pitch_deg: 20               # the two pitched either way at once, a crest past DIM-07's 15.9 degrees or a dip as steep (est.)
     margin_mm: 30               # for the plugs' strain reliefs and the leads' stiffness at the clip and the clamp (est.)
+    ramp_mm: 300                # TR-13: the truck's rear wheels on ramps this high for the coupled test (cad/routes.py on_ramps, est.)
   terminal_face:                # SVC-04: AS/NZS 3001.2 clause 5.4.10.2, the rule on CT-602
     line: EL-01                 # the modules stand terminals up, so the face is the top of EL-01's box
     mm: 300

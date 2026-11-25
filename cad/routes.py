@@ -1592,7 +1592,9 @@ def lift_rest(P: tuple, A: tuple, O: tuple, lift: dict, w: float, seat_r: float)
     it, so its pull turns the arm back: the spring can hold a span nearly straight, its pull then the spring's excess
     over that span's lever. None if the span is taut at every place of the arm between its stops. Returns the arm's
     angle, how it rests, the seat's centre, the strap, the two parts and where they leave the seat (angles from its
-    top towards the rear), the largest kink, the lowest point of the lead's centreline and the pull at the plug (N)."""
+    top towards the rear), the largest kink, the lowest point of the lead's centreline between the plug and the clamp,
+    the part it lies in (`low_part`: the plug, the plug's span or the clamp's span, a point within AT_PLUG_MM of the
+    plug's height counting as the plug) and the pull at the plug (N)."""
     rho, (d0, d1), (m0, m1) = float(lift["arm_mm"]), lift["deg"], lift["torque_nmm"]
     l1, l2, R = float(lift["clip_mm"]), float(lift["rest_mm"]), float(seat_r)
     t_s = float(lift["strap_deg"])
@@ -1652,7 +1654,19 @@ def lift_rest(P: tuple, A: tuple, O: tuple, lift: dict, w: float, seat_r: float)
         x = dict(rows[0], rest="bottom stop")
     if x is None:
         return None
-    return dict(x, low=min(x["c1"]["low"], x["c2"]["low"]), pull_n=w * x["c1"]["y_p"])
+    low = min(x["c1"]["low"], x["c2"]["low"])
+    return dict(x, low=low, low_part=_low_part(P[2], x["c1"]["low"], x["c2"]["low"]), pull_n=w * x["c1"]["y_p"])
+
+
+AT_PLUG_MM = 2.0
+
+
+def _low_part(plug_z: float, span_low: float, clamp_low: float) -> str:
+    """Which part of a held-up lead holds its lowest point: the plug, where no part hangs more than AT_PLUG_MM under
+    it, or else the plug's span or the clamp's span, whichever hangs lower."""
+    if min(span_low, clamp_low) >= plug_z - AT_PLUG_MM:
+        return "the plug"
+    return "the clamp's span" if clamp_low < span_low else "the plug's span"
 
 
 def _lift_ends(r: dict, points: list, V: dict, ball_drop: float) -> tuple:
@@ -1666,23 +1680,35 @@ def _lift_ends(r: dict, points: list, V: dict, ball_drop: float) -> tuple:
     return P, A, O
 
 
+def _clamped_run(r: dict, V: dict, ball_drop: float) -> list[tuple]:
+    """A held-up lead's run from its clamp along the drawbar to the junction, which the truck's turns leave where it
+    is, the trailer turned nose down about its axle group when the truck's ball stands `ball_drop` low."""
+    i = next(j for j, q in enumerate(r["points"]) if math.dist(q, r["clamp"]) < 1e-6)
+    run = fillet(r["points"][i:], r["bend_r"])["dense"]
+    return [_nose_down(q, V, ball_drop) for q in run] if ball_drop else run
+
+
 def lifted(r: dict, rule: dict, V: dict, ball_drop: float = 0.0) -> dict:
-    """I2-78, I2-83: a lead between the vehicles held up by its sprung arm (`lift`), the strap carried round by the
-    seat, over every turn and pitch of rules.between, the truck turned about the coupling's pin: where the arm rests in
-    each, the lead's lowest point and the pull at the truck's plug. `taut` counts the positions in which the cut, less
-    rules.between's margin, would leave no place of the arm where the span hangs slack, which the cut must leave at
-    none. `rests` counts how the arm rests (a balance, near taut with the spring holding a span nearly straight, or a
-    stop), `arm_deg` gives its range, `kink_deg` the largest kink, at the strap or a seat's end, with the plug's pull there
-    (`kink_pull_n`), and `seat_deg` the arc of the seat the
-    lead lies on, from the strap, forward negative. Straight ahead, the lowest point, the arm's angle and the strap."""
+    """I2-78, I2-83, I2-91: a lead between the vehicles held up by its sprung arm (`lift`), the strap carried round by
+    the seat, over every turn and pitch of rules.between, the truck turned about the coupling's pin: where the arm rests
+    in each, the lowest point of every part of the lead, from the plug over the seat to the clamp and along the drawbar
+    to the junction, and the pull at the truck's plug. `turn_low_mm` is the least of them with its yaw, pitch and part
+    (`turn_part`), and `under_plug` gives, for each of the two spans, the positions in which it hangs more than
+    AT_PLUG_MM under the plug, the deepest with its yaw and pitch, and the least height among them. `taut` counts the
+    positions in which the cut, less rules.between's margin, would leave no place of the arm where the span hangs
+    slack, which the cut must leave at none. `rests` counts how the arm rests (a balance, near taut with the spring
+    holding a span nearly straight, or a stop), `arm_deg` gives its range, `kink_deg` the largest kink, at the strap or
+    a seat's end, with the plug's pull there (`kink_pull_n`), and `seat_deg` the arc of the seat the lead lies on, from
+    the strap, forward negative. Straight ahead, the lowest point, the arm's angle and the strap."""
     P0, A, O = _lift_ends(r, r["points"], V, ball_drop)
     pivot = (0.0, 0.0, float(V["coupling_z"]) - float(ball_drop))
     w, od = r["kg_m"] * 9.81 / 1000.0, r["od"]
     lift, seat = r["lift"], float(r["lift"].get("seat_mm", r["bend_r"]))
     m = float(rule["margin_mm"]) / 2
     short = dict(lift, clip_mm=float(lift["clip_mm"]) - m, rest_mm=float(lift["rest_mm"]) - m)
-    best, taut, top, pull, kink, straight, pts = (math.inf, 0, 0), 0, 0, 0.0, (0.0, 0.0), None, None
-    rests, degs, arc = {}, [], [0.0, 0.0]
+    run_low = min(q[2] for q in _clamped_run(r, V, ball_drop)) - od / 2
+    best, taut, top, pull, kink, straight, pts = (math.inf, 0, 0, ""), 0, 0, 0.0, (0.0, 0.0), None, None
+    rests, degs, arc, n, under = {}, [], [0.0, 0.0], 0, []
     for ph in range(-int(rule["pitch_deg"]), int(rule["pitch_deg"]) + 1, 5):
         for yw in range(-int(rule["yaw_deg"]), int(rule["yaw_deg"]) + 1, 5):
             P = _turn(P0, pivot, yw, ph)
@@ -1691,8 +1717,15 @@ def lifted(r: dict, rule: dict, V: dict, ball_drop: float = 0.0) -> dict:
                 taut += 1
             if x is None:
                 continue
-            low = x["low"] - od / 2
-            best = min(best, (low, yw, ph))
+            n += 1
+            low, part = x["low"] - od / 2, x["low_part"]
+            if run_low < low:
+                low, part = run_low, "the run along the drawbar"
+            best = min(best, (low, yw, ph, part))
+            sags = [(name, P[2] - c["low"], c["low"] - od / 2) for name, c in (("the plug's span", x["c1"]), ("the clamp's span", x["c2"]))
+                    if c["low"] < P[2] - AT_PLUG_MM]
+            if sags:
+                under.append((yw, ph, sags))
             pull = max(pull, x["pull_n"])
             if x["kink_deg"] > kink[0]:
                 kink = (round(x["kink_deg"], 1), round(x["pull_n"], 1))
@@ -1705,9 +1738,74 @@ def lifted(r: dict, rule: dict, V: dict, ball_drop: float = 0.0) -> dict:
                 pts = [P] + _cat_points(P, x["T1"], x["c1"], 20.0) + [x["T1"], x["strap"], x["T2"]] + _cat_points(x["T2"], A, x["c2"], 20.0) + [A]
                 straight = dict(low_mm=round(low, 1), arm_deg=round(x["deg"], 1), rest=x["rest"], strap=[round(v) for v in x["strap"]],
                                 kink_deg=round(x["kink_deg"], 1), pull_n=round(x["pull_n"], 2))
-    return dict(turn_low_mm=round(best[0], 1), turn_yaw=best[1], turn_pitch=best[2], taut=taut, on_top=top, pull_n=round(pull, 1),
+    return dict(turn_low_mm=round(best[0], 1), turn_yaw=best[1], turn_pitch=best[2], turn_part=best[3], positions=n, under_plug=_sag(under),
+                run_low_mm=round(run_low, 1), taut=taut, on_top=top, pull_n=round(pull, 1),
                 rests=rests, arm_deg=[round(min(degs), 1), round(max(degs), 1)] if degs else None, kink_deg=kink[0], kink_pull_n=kink[1],
                 seat_deg=[round(v, 1) for v in arc], straight=straight, straight_pts=pts, od=od, turn_model="held up by its sprung arm")
+
+
+def _sag(under: list) -> dict:
+    """The positions in which a held-up lead's spans hang more than AT_PLUG_MM under its plug (lifted), each given as
+    (yaw, pitch, [(span, mm under the plug, the lead's underside there)]): how many, the least height of the lead's
+    underside among them with its yaw and pitch, and for each span how many and the deepest with its yaw and pitch."""
+    out = dict(n=len(under), spans={})
+    if not under:
+        return out
+    least = min((s[2], yw, ph) for yw, ph, sags in under for s in sags)
+    out.update(least_mm=round(least[0], 1), least_yaw=least[1], least_pitch=least[2])
+    for name in ("the plug's span", "the clamp's span"):
+        rows = [(s[1], yw, ph) for yw, ph, sags in under for s in sags if s[0] == name]
+        if rows:
+            deep = max(rows)
+            out["spans"][name] = dict(n=len(rows), deepest_mm=round(deep[0], 1), deepest_yaw=deep[1], deepest_pitch=deep[2])
+    return out
+
+
+def on_ramps(res: dict, wheelbase: float, ball_behind: float) -> dict:
+    """TR-13 (I2-91): the leads between the vehicles as the coupled test reads them. The truck's rear wheels stand on
+    rules.between's ramps (`ramp_mm`) and its front wheels on the ground, so it stands nose down by asin(ramp over the
+    wheelbase), and its ball, `ball_behind` behind the rear axle, rises by the ramp plus that overhang times the angle's
+    sine. The trailer, its axle group on the ground, stands nose up by the angle that lifts its pin as far. Each
+    vehicle keeps its own attitude whatever the angle between them, so in the ground's axes the truck's plug is pitched
+    nose down about the pin and then turned with the truck, and the trailer's clamp, hinge and run along the drawbar
+    are pitched nose up about it, each arm's stops with them. Each lead then hangs under true gravity (lift_rest). The
+    reading is the test's: the lowest point of the lead's underside, in any part of it, less the underside of the
+    coupling's body directly under the pin, plus that underside's height with the trailer level at the design ball. The
+    yaw is read every 5 degrees to rules.between's either way and at every whole degree within 4 of each lead's least.
+    Returns the angles, the least reading with its lead, part, yaw and where its plug then stands along X from the pin
+    (behind it positive), and each lead's least reading with its yaw and part."""
+    V, rule = res["V"], res["data"]["rules"]["between"]
+    ramp, yaw_max = float(rule["ramp_mm"]), int(rule["yaw_deg"])
+    truck = math.degrees(math.asin(ramp / wheelbase))
+    rise = ramp + ball_behind * math.sin(math.radians(truck))
+    tilt = math.degrees(math.asin(rise / float(V["axle_x"])))
+    pivot = (0.0, 0.0, float(V["coupling_z"]))
+    under = next(b["box"][2] for b in res["blocks"] if b["id"] == "DB-03")
+    under_ground = pivot[2] - (pivot[2] - under) / math.cos(math.radians(tilt))
+    leads = {}
+    for r in (x for x in res["runs"] if x.get("lift")):
+        P0, A, O = _lift_ends(r, r["points"], V, 0.0)
+        A, O = _turn(A, pivot, 0.0, tilt), _turn(O, pivot, 0.0, tilt)
+        lift = dict(r["lift"], deg=[float(d) + tilt for d in r["lift"]["deg"]])
+        run_low = min(_turn(q, pivot, 0.0, tilt)[2] for q in _clamped_run(r, V, 0.0))
+        w, od, seat = r["kg_m"] * 9.81 / 1000.0, r["od"], float(r["lift"].get("seat_mm", r["bend_r"]))
+
+        def reading(yw):
+            P = _turn(P0, pivot, yw, -truck)
+            x = lift_rest(P, A, O, lift, w, seat)
+            if x is None:
+                return None
+            low, part = (x["low"], x["low_part"]) if x["low"] <= run_low else (run_low, "the run along the drawbar")
+            return (round(low - od / 2 - under_ground + under, 1), yw, part, round(P[0] - pivot[0]))
+
+        rows = [x for x in map(reading, range(-yaw_max, yaw_max + 1, 5)) if x]
+        near = min(rows)[1]
+        rows += [x for x in map(reading, range(max(-yaw_max, near - 4), min(yaw_max, near + 4) + 1)) if x]
+        leads[r["id"]] = min(rows)
+    run, best = min(leads.items(), key=lambda kv: kv[1])
+    return dict(ramp_mm=ramp, truck_deg=round(truck, 2), trailer_deg=round(tilt, 2), apart_deg=round(truck + tilt, 2),
+                rise_mm=round(rise, 1), least_mm=best[0], run=run, yaw=best[1], part=best[2], plug_x_mm=best[3],
+                leads={k: dict(least_mm=v[0], yaw=v[1], part=v[2]) for k, v in sorted(leads.items())})
 
 
 def lift_drawn(r: dict, pts: list, w: float, seat_r: float) -> list:
