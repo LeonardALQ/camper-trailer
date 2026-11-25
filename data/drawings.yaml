@@ -315,6 +315,7 @@ drawings:
       - {rev: AA, date: 2026-11-25, description: "Notice: note 2's apex cut, mitre lines, vents and approval (I2-89 to I2-91)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AB, date: 2026-11-25, description: "Notice: 8 mm fillets on the XT crossmember ends, hinge cheeks (I2-88)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AC, date: 2026-11-25, description: "Notice: note 2 points to the hole schedule CT-105 (I2-89)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AD, date: 2026-11-25, description: "Notice: detail G's pad drawn 11 mm off the rail, clear of the hinge cheek", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads

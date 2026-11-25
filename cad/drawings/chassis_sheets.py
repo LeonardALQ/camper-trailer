@@ -689,16 +689,23 @@ def ct103(prj, model, bom, checks, reg, dwg):
     k = 5.0
     cx = cols[1]
     _detail_title(sh, cx, top2, "G: JACKING PAD", k)
-    zb = 120.0
-    rhs(sh, cx - 25, zb + 75 / k, 50, 150, 3, 6, k, sty="medium")
-    sh.rect(cx - 25 + 25 / k, zb, cx + 25, zb + 150 / k, "medium")
+    zb = 124.0
+    pad = next(f for f in lay.chassis.data["fittings"] if f["id"] == "CH-P06")
+    cheek = lay.chassis.data["xt_hinges"]["cheek"]
+    face = cx - 25 + rl.b / 2 / k
+    off = round(lay.chassis.V["rail_c"] - rl.b / 2 - lay.chassis.ev(pad["side_y"]) - pad["w"] / 2, 1)
+    x0, x1 = face + off / k, face + (off + pad["w"]) / k
+    rhs(sh, cx - 25, zb + rl.d / 2 / k, rl.b, rl.d, rl.t, rl.ro, k, sty="medium")
+    sh.rect(face, zb, cx + 25, zb + 150 / k, "medium")
     sh.text(cx + 1, zb + 150 / k + 1, "XT CENTRE CROSSMEMBER", 1.5, "middle")
-    plate(sh, cx - 25 + 25 / k, zb - 10 / k, cx - 25 + 125 / k, zb)
-    m = cx - 25 + 75 / k
+    sh.rect(face, zb - cheek["below"] / k, face + cheek["t"] / k, zb, "medium")
+    plate(sh, x0, zb - pad["t"] / k, x1, zb)
+    m = (x0 + x1) / 2
     sh.path([(m - 5, zb - 2), (m - 3, zb - 6), (m + 3, zb - 6), (m + 5, zb - 2)], "medium")
-    weld_symbol(sh, (cx - 25 + 125 / k, zb), (cx + 4, zb - 10), "5", both=True, length="100", note="ALONG THE CM")
-    for i, t in enumerate(("PAD 100x100x10 WITH A LOCATING CUP, AGAINST", "THE RAIL'S INNER FACE. NO WELD ON THE RAIL'S",
-                           f"BOTTOM FACE (FAT-11). {_forces()['pad']:.1f} kN ON ONE PAD.")):
+    weld_symbol(sh, (x1, zb), (cx + 4, zb - 10), "5", both=True, length="100", note="ALONG THE CM")
+    note = (f"PAD {pad['l']:g}x{pad['w']:g}x{pad['t']:g} WITH A LOCATING CUP, {off:g} mm OFF THE RAIL'S INNER FACE, CLEAR OF "
+            f"THE HINGE CHEEK BEYOND IT. NO WELD ON THE RAIL'S BOTTOM FACE (FAT-11). {_forces()['pad']:.1f} kN ON ONE PAD.")
+    for i, t in enumerate(S.wrap_mm(note, 44.0, 1.5)):
         sh.text(cx - 32, zb - 18 - 3 * i, t, 1.5)
     # ---- H: rear recovery tongue, plan, 1:10
     k = 10.0
