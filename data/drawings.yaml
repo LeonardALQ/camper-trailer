@@ -4,7 +4,7 @@
 owner: Camper trailer project (owner-builder)
 project: Off-road camper trailer for the Ford Ranger Super Duty
 drawn_by: Kiro (AI agent)
-sheets_total: 26
+sheets_total: 27
 drawings:
   - number: CT-001
     title: General arrangement, whole trailer
@@ -56,6 +56,7 @@ drawings:
       - {rev: AL, date: 2026-11-25, description: "Notice: the masses with the hinge cheeks and the rear bay's panel (I2-88)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AM, date: 2026-11-25, description: "Memo: the frame's holes for galvanising show in the views (I2-89)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AN, date: 2026-11-25, description: "Memo: the arrow's line breaks at the WET ROOM label it ran into", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AO, date: 2026-11-25, description: "Notice: the hinge gussets cut to bear, +2.0 kg, the set note to CT-106", drawn: Kiro, checked: "", approved: ""}
   - number: CT-002
     title: Mass and centre of gravity
     subtitle: Every load case with growth, the axle window of H17, the CoG in elevation and across
@@ -90,6 +91,7 @@ drawings:
       - {rev: V, date: 2026-11-24, description: "Notice: the masses with the end plates' 10 mm slot, axle X 4,485.6 (I2-79)", drawn: Kiro, checked: "", approved: ""}
       - {rev: W, date: 2026-11-25, description: "Notice: the masses with the hinge cheeks and the rear bay's panel (I2-88)", drawn: Kiro, checked: "", approved: ""}
       - {rev: X, date: 2026-11-25, description: "Memo: the grid line breaks at the TC6 label it touched", drawn: Kiro, checked: "", approved: ""}
+      - {rev: Y, date: 2026-11-25, description: "Notice: the masses with the hinge gussets cut to bear, +2.0 kg (I2-95)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-003
     title: Compliance
     subtitle: VSB1 items and the standards with the design figures, operating limits and the plate
@@ -130,6 +132,7 @@ drawings:
       - {rev: AB, date: 2026-11-24, description: "Leads held up by sprung arms, lowest 283 mm in any turn (DIM-08, I2-78)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AC, date: 2026-11-24, description: "Strap carried by the arms' seats, leads lowest 374 mm (DIM-08, I2-83)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AD, date: 2026-11-25, description: "Memo: the frame's holes for galvanising show in the views (I2-89)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AE, date: 2026-11-25, description: "Notice: the masses with the hinge gussets cut to bear, +2.0 kg (I2-95)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-010
     title: Floor plan, bed up and bed down
     subtitle: Day and night plans, walkways, door swings, spaces kept clear and the bed positions
@@ -250,6 +253,7 @@ drawings:
       - {rev: AD, date: 2026-11-25, description: "Memo: the frame's holes for galvanising show in the views (I2-89)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AE, date: 2026-11-25, description: "Memo: balloons sized to clear their letters, DATUM moved off its line", drawn: Kiro, checked: "", approved: ""}
       - {rev: AF, date: 2026-11-25, description: "Notice: LC8a with the trailer's weight on supports that cannot pull (I2-94)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AG, date: 2026-11-25, description: "Notice: the hinge gussets cut to bear, 283 mm, and the panel's angles (I2-95)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
@@ -284,6 +288,7 @@ drawings:
       - {rev: V, date: 2026-11-24, description: "Notice: laps open 2.5 and stitched, end plates 14 mm up (I2-79)", drawn: Kiro, checked: "", approved: ""}
       - {rev: W, date: 2026-11-25, description: "Memo: the holes for galvanising show in the views, dimensioned on CT-105", drawn: Kiro, checked: "", approved: ""}
       - {rev: X, date: 2026-11-25, description: "Notice: the local checks with CHS-15 and the cheeks' welds (I2-92, I2-94)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: Y, date: 2026-11-25, description: "Memo: the checks table gains CHS-16 and CHS-13's bearing at the bolts", drawn: Kiro, checked: "", approved: ""}
   - number: CT-103
     title: Chassis details
     subtitle: Composite rail, outrigger root, crossmember to rail, overlap end, jacking pad, recovery tongue, spare posts
@@ -326,6 +331,7 @@ drawings:
       - {rev: AD, date: 2026-11-25, description: "Notice: detail G's pad drawn 11 mm off the rail, clear of the hinge cheek", drawn: Kiro, checked: "", approved: ""}
       - {rev: AE, date: 2026-11-25, description: "Memo: the 200 dimension's text moved off the line it touched", drawn: Kiro, checked: "", approved: ""}
       - {rev: AF, date: 2026-11-25, description: "Notice: the hinge cheeks' welds, the corner a flare-bevel weld (I2-92)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AG, date: 2026-11-25, description: "Memo: the fatigue table gains FAT-22 and FAT-23, the cheeks and angles", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads
@@ -359,6 +365,7 @@ drawings:
       - {rev: U, date: 2026-11-24, description: "Memo: the outdoor unit's leader ends inside the unit (I2-69)", drawn: Kiro, checked: "", approved: ""}
       - {rev: V, date: 2026-11-24, description: "Notice: the stations and the body mounts with the axle at X 4,485.6 (I2-79)", drawn: Kiro, checked: "", approved: ""}
       - {rev: W, date: 2026-11-24, description: "Memo: hardpoint triangles marked as marks for the label check (I2-81)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: X, date: 2026-11-25, description: "Notice: the load paths with the hinge gussets cut to bear (I2-95)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-105
     title: Holes for galvanising
     subtitle: Every drain, vent and check hole by section, the apex cut, the mitre lines and the overlaps' vents
@@ -370,11 +377,22 @@ drawings:
     structural: true
     revisions:
       - {rev: A, date: 2026-11-25, description: "First draft: every hole for galvanising from the build's records (I2-89)", drawn: Kiro, checked: "", approved: ""}
+  - number: CT-106
+    title: XT hinge joint and rear bay shear panel
+    subtitle: The kerb-side XT centre joint in plan and section, the rear bay's shear panel and a rail section
+    project: Off-road camper trailer, chassis and drawbar
+    sheet: 13
+    size: A3
+    scale: 5
+    status: DRAFT
+    structural: true
+    revisions:
+      - {rev: A, date: 2026-11-25, description: "First draft: the XT hinge joint and the rear bay's shear panel (I2-95)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-201
     title: Body shell
     subtitle: Kerb, road, front and rear walls, the fixed roof plan, the panels and every opening with its size
     project: Off-road camper trailer for the Ranger Super Duty, body
-    sheet: 13
+    sheet: 14
     size: A3
     scale: 50
     status: DRAFT
@@ -397,7 +415,7 @@ drawings:
     title: Body joint details
     subtitle: Floor joiner, corner joiner, roof-to-wall joiner, lift bed rail hardpoint and a floor insert with its crush tube
     project: Off-road camper trailer for the Ranger Super Duty, body
-    sheet: 14
+    sheet: 15
     size: A3
     scale: 2
     status: DRAFT
@@ -418,7 +436,7 @@ drawings:
     title: Body insert map
     subtitle: Every fixing line in the floor, the walls and the roof, the mount inserts and the furniture fixings
     project: Off-road camper trailer for the Ranger Super Duty, body
-    sheet: 15
+    sheet: 16
     size: A3
     scale: 50
     status: DRAFT
@@ -444,7 +462,7 @@ drawings:
     title: Body to chassis
     subtitle: Mount positions, the bolt and nut-plate detail, isolation and sealing, the twist sharing
     project: Off-road camper trailer for the Ranger Super Duty, body
-    sheet: 16
+    sheet: 17
     size: A3
     scale: 50
     status: DRAFT
@@ -468,6 +486,7 @@ drawings:
       - {rev: P, date: 2026-11-23, description: "Notice: the body mounts and the stations with the axle at X 4,489.3", drawn: Kiro, checked: "", approved: ""}
       - {rev: Q, date: 2026-11-23, description: "Notice: the body mounts and the stations with the axle at X 4,487.2", drawn: Kiro, checked: "", approved: ""}
       - {rev: R, date: 2026-11-24, description: "Notice: the body mounts and the stations with the axle at X 4,485.6 (I2-79)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: S, date: 2026-11-25, description: "Notice: the twist with the hinge gussets cut to bear (I2-95)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-401
     title: Garage and bed general arrangement
     subtitle: Plan, kerb-side section and section looking forward at partition A
@@ -521,7 +540,7 @@ drawings:
     title: Electrical single-line diagram
     subtitle: 48 V battery, BMS, inverter, solar, converters, ute feed, 230 V circuits, load shedding
     project: Off-road camper trailer for the Ranger Super Duty, home trailer
-    sheet: 17
+    sheet: 18
     size: A3
     scale: NTS
     status: DRAFT
@@ -550,7 +569,7 @@ drawings:
     title: Electrical layout
     subtitle: Battery plinth, board, inverter, cable routes, glands, outlets and the cable schedule
     project: Off-road camper trailer for the Ranger Super Duty, home trailer
-    sheet: 18
+    sheet: 19
     size: A3
     scale: 25
     status: DRAFT
@@ -581,11 +600,12 @@ drawings:
       - {rev: W, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
       - {rev: X, date: 2026-11-24, description: "Memo: leaders end at what they name, tags' leaders uncrossed (I2-69)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Y, date: 2026-11-25, description: "Memo: G7 beside its gland, BOARD, DRYER and R1 moved off the lines", drawn: Kiro, checked: "", approved: ""}
+      - {rev: Z, date: 2026-11-25, description: "Memo: the hinge gussets drawn cut to bear on their faces (I2-95)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-603
     title: Floor and wall penetrations
     subtitle: Every gland through the floor, walls and roof, its position, hole, fitting and runs
     project: Off-road camper trailer for the Ranger Super Duty, home trailer
-    sheet: 19
+    sheet: 20
     size: A3
     scale: 25
     status: DRAFT
@@ -604,11 +624,12 @@ drawings:
       - {rev: K, date: 2026-11-23, description: "Notice: G20 at S 4x1, 120 x 120, the eight rail holes (I2-33, I2-41)", drawn: Kiro, checked: "", approved: ""}
       - {rev: L, date: 2026-11-23, description: "Notice: K-10's rail holes at 30 mm, the holes at the merged axle (I2-50)", drawn: Kiro, checked: "", approved: ""}
       - {rev: M, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: N, date: 2026-11-25, description: "Memo: the hinge gussets drawn cut to bear on their faces (I2-95)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-611
     title: Plumbing schematic
     subtitle: Fill, fresh tanks, pump, filters, cold and hot lines, drains to the grey tank and the dump
     project: Off-road camper trailer for the Ranger Super Duty, home trailer
-    sheet: 20
+    sheet: 21
     size: A3
     scale: NTS
     status: DRAFT
@@ -638,7 +659,7 @@ drawings:
     title: Plumbing layout
     subtitle: Tanks, pump cabinet, drains with their falls, the shower well, fill and dump points
     project: Off-road camper trailer for the Ranger Super Duty, home trailer
-    sheet: 21
+    sheet: 22
     size: A3
     scale: 25
     status: DRAFT
@@ -663,11 +684,12 @@ drawings:
       - {rev: Q, date: 2026-11-24, description: "Memo: the shower unit's leader ends inside the unit (I2-69)", drawn: Kiro, checked: "", approved: ""}
       - {rev: R, date: 2026-11-24, description: "Memo: the dump arrow drawn on its line for the label check (I2-81)", drawn: Kiro, checked: "", approved: ""}
       - {rev: S, date: 2026-11-25, description: "Memo: the well's label moved off the pipe it touched", drawn: Kiro, checked: "", approved: ""}
+      - {rev: T, date: 2026-11-25, description: "Memo: the hinge gussets drawn cut to bear on their faces (I2-95)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-621
     title: HVAC and ventilation
     subtitle: Split, heat-recovery pairs, extract, towing pressurisation, relief, hood, Combi ducts
     project: Off-road camper trailer for the Ranger Super Duty, home trailer
-    sheet: 22
+    sheet: 23
     size: A3
     scale: 25
     status: DRAFT
@@ -689,7 +711,7 @@ drawings:
     title: Ute with the bike garage, general arrangement
     subtitle: Kerb-side elevations travelling and loading, plan, rear view, mass by case and the ute checks
     project: Ranger Super Duty bike garage (UTE-GARAGE.md)
-    sheet: 23
+    sheet: 24
     size: A3
     scale: 50
     status: DRAFT
@@ -719,11 +741,12 @@ drawings:
       - {rev: V, date: 2026-11-23, description: "Notice: the ute's cases with the trailer's 392.0 kg towball (I2-50)", drawn: Kiro, checked: "", approved: ""}
       - {rev: W, date: 2026-11-23, description: "Notice: the truck's TSC supply TW07, 4.0 kg, in the ute's cases (I2-50)", drawn: Kiro, checked: "", approved: ""}
       - {rev: X, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: Y, date: 2026-11-25, description: "Notice: the towball with the trailer's hinge gussets cut to bear (I2-95)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-702
     title: Ute garage box frame and panels
     subtitle: Kerb-side frame elevation, subframe plan on Ford's pads, section at the rear axle, member schedule
     project: Ranger Super Duty bike garage (UTE-GARAGE.md)
-    sheet: 24
+    sheet: 25
     size: A3
     scale: 20
     status: DRAFT
@@ -744,7 +767,7 @@ drawings:
     title: Ute garage doors and security
     subtitle: Rear view, kerb-side door, plan section through the barn doors, security layers
     project: Ranger Super Duty bike garage (UTE-GARAGE.md)
-    sheet: 25
+    sheet: 26
     size: A3
     scale: 20
     status: DRAFT
@@ -762,7 +785,7 @@ drawings:
     title: Ute garage restraint layout
     subtitle: Plan with the roof off, section at the rear L-track row, strap loads and anchors
     project: Ranger Super Duty bike garage (UTE-GARAGE.md)
-    sheet: 26
+    sheet: 27
     size: A3
     scale: 20
     status: DRAFT

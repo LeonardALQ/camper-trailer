@@ -635,6 +635,7 @@ class Analysis:
         sites = self.hole_sites()
         hole_env: dict[str, dict] = {}
         self.panel_env: dict[str, dict] = {}
+        self.gusset_env: dict[str, dict] = {}
 
         def take(lc_id, res, label, extra=None, ultimate=False):
             for mem, r in self.stresses(res, ultimate).items():
@@ -646,6 +647,11 @@ class Analysis:
                 pe = self.panel_env.setdefault(lc_id, {})
                 if sp["id"] not in pe or v > pe[sp["id"]]["v_n"]:
                     pe[sp["id"]] = dict(v_n=v, case=label)
+            for k, g in self.gusset_elements():
+                w = self.gusset_weld_stress(res, k, g)
+                ge = self.gusset_env.setdefault(lc_id, dict(mpa=-1.0))
+                if w > ge["mpa"]:
+                    ge.update(mpa=w, case=label, gusset=g["id"])
             he = hole_env.setdefault(lc_id, {})
             for k, h in enumerate(sites):
                 if h.get("open") or h.get("placement_only"):
@@ -757,6 +763,7 @@ class Analysis:
         out["galvanising"] = galvanising_check(ch)
         out["local"] = self.local_checks(out["pad_n"]["pad_n"])
         out["local"].update(self.panel_checks(), hinge_cheeks=self.cheek_check(), arm_limits=self.arm_limits())
+        out["local"]["hinge_gussets"] = self.gusset_welds()
         out["recovery"] = self.recovery_summary()
         out["fixings"] = self.fixings()
         out["cross_checks"] = self.cross_checks(out, lc6)
@@ -792,11 +799,58 @@ class Analysis:
         n1, n2 = (float(res.forces[e][6]) for e in sp["elements"])
         return abs(n1 - n2) * 2 * self.ch.V["rail_c"] / sp["L"]
 
+    def panel_bolts(self, sp: dict) -> list[dict]:
+        """Each group of the shear panel's bolts (Chassis.shear_panels): its bolts, the share of the panel's racking shear V
+        each bolt takes, the axis of that force in plan, and for its worst bolt AS/NZS 4600 5.3.2's e and AS 4100 9.3.2.4's
+        a_e in that axis, either way along it, and the least distance from any bolt's centre to the sheet's edges. The
+        whole of V enters each crossmember through its tongues' bolts, and the rails' bolts take the side edges' shear
+        flow, V a / b on each side."""
+        fix = sp["fixing"]
+        dh, df = fix["hole"], fix["d"]
+        rects = [sp["sheet"]["rect"]] + sp["sheet"]["tongues"]
+
+        def reach(c: float, other: float, axis: int, sign: int) -> float:
+            """How far the sheet runs from c along `axis` (0 is X, 1 is Y) one way, at `other` across it."""
+            spans = []
+            for a, b in sorted((r[axis], r[axis + 2]) for r in rects if r[1 - axis] - 1e-6 <= other <= r[3 - axis] + 1e-6):
+                if spans and a <= spans[-1][1] + 1e-6:
+                    spans[-1][1] = max(spans[-1][1], b)
+                else:
+                    spans.append([a, b])
+            a, b = next(s for s in spans if s[0] - 1e-6 <= c <= s[1] + 1e-6)
+            return (b - c) if sign > 0 else (c - a)
+
+        out = []
+        a_len = sp["x1"] - sp["x0"]
+        for group in ("front", "rear", "rail"):
+            bolts = [b for b in sp["bolts"] if b["group"] == group]
+            if not bolts:
+                continue
+            axis = 0 if bolts[0]["along"] == "x" else 1
+            share = a_len / sp["b"] / (len(bolts) / 2) if group == "rail" else 1.0 / len(bolts)
+            e_min = ae_min = edge = math.inf
+            for b in bolts:
+                at = (b["x"], b["y"])
+                c, other = at[axis], at[1 - axis]
+                line = [(q["x"], q["y"])[axis] for q in bolts if abs((q["x"], q["y"])[1 - axis] - other) < 1.0]
+                for sign in (1, -1):
+                    to_edge = reach(c, other, axis, sign)
+                    ahead = [sign * (q - c) for q in line if sign * (q - c) > 0]
+                    to_hole = min(ahead) if ahead else math.inf
+                    e_min = min(e_min, to_edge, to_hole - dh / 2)
+                    ae_min = min(ae_min, to_edge - dh / 2 + df / 2, to_hole - dh + df / 2)
+                edge = min(edge, *(reach(at[ax], at[1 - ax], ax, sg) for ax in (0, 1) for sg in (1, -1)))
+            out.append(dict(group=group, n=len(bolts), share=share, e=e_min, a_e=ae_min, edge=edge))
+        return out
+
     def panel_checks(self) -> dict:
         """Each shear panel (shear_panels) in its worst case of every load case: the plate's shear stress V / (b t) against
-        its shear yield over the case's factor and its elastic shear buckling stress, and the M8 bolts to its angles, each
-        taking the panel's shear V over the angles' `transverse` length under each crossmember times their pitch, against
-        AS 4100 9.3.2's bolt shear capacity with the threads in the plane."""
+        its shear yield over the case's factor and its elastic shear buckling stress, the M10 bolts to its angles in shear,
+        each taking its group's share of V (panel_bolts) against AS 4100 9.3.2's 0.8 x 0.62 fuf on its minor diameter
+        area, and the sheet at the most loaded bolt in bearing, by AS 4100 9.3.2.4 (0.9 x 3.2 fu on d t) and AS/NZS 4600
+        5.3.4.2 (0.6 x alpha C fu, C 3.0 for d / t under 10, alpha 1.0 in single shear with a washer under the head and
+        the nut), and in tear-out along its force, by AS 4100 9.3.2.4 (0.9 fu on a_e t) and AS/NZS 4600 5.3.2 (0.7 fu on
+        e t, fu / fy over 1.08)."""
         ch = self.ch
         lcs = {lc["id"]: lc for lc in ch.data["load_cases"]}
         out = {}
@@ -809,17 +863,31 @@ class Analysis:
             bolt = d["fixing"]
             cap = 0.8 * 0.62 * bolt["fuf"]                     # MPa on the bolt's minor diameter area
             size = bolt["bolt"].split()[0]
+            fu = d["fu"]
+            c_4600 = 3.0 if bolt["d"] / t < 10 else max(1.8, 4.0 - 0.1 * bolt["d"] / t)
+            phi_f = 0.70 if fu / d["fy"] >= 1.08 else 0.60
+            groups = self.panel_bolts(sp)
+            worst = max(g["share"] for g in groups)
+            most = [g for g in groups if g["share"] >= worst - 1e-9]
+            e, a_e = min(g["e"] for g in most), min(g["a_e"] for g in most)
             rows = []
-            for lc_id, e in self.panel_env.items():
-                r = e[sp["id"]]
+            for lc_id, env in self.panel_env.items():
+                r = env[sp["id"]]
                 fac = lcs[lc_id]["factor"] if lc_id in lcs else 1
-                tau = r["v_n"] / (b * t)
-                rows += [(f"plate shear, {lc_id}", tau, min(0.6 * d["fy"], tau_cr) / fac),
-                         (f"{size} bolt to its angles, {lc_id}", r["v_n"] / bolt.get("transverse", b) * bolt["pitch"] / bolt["a_c"], cap / fac)]
+                fb = r["v_n"] * worst
+                rows += [(f"plate shear, {lc_id}", r["v_n"] / (b * t), min(0.6 * d["fy"], tau_cr) / fac),
+                         (f"{size} bolt to its angles, {lc_id}", fb / bolt["a_c"], cap / fac),
+                         (f"sheet in bearing at a bolt, AS 4100, {lc_id}", fb / (bolt["d"] * t), 0.9 * 3.2 * fu / fac),
+                         (f"sheet in bearing at a bolt, AS/NZS 4600, {lc_id}", fb / (bolt["d"] * t), 0.6 * c_4600 * fu / fac),
+                         (f"sheet's tear-out at a bolt, AS 4100, {lc_id}", fb / (a_e * t), 0.9 * fu / fac),
+                         (f"sheet's tear-out at a bolt, AS/NZS 4600, {lc_id}", fb / (e * t), phi_f * fu / fac)]
             w = max(self.panel_env.items(), key=lambda kv: kv[1][sp["id"]]["v_n"])
-            res = _local(f"Shear panel {sp['id']}, {t:g} mm steel, {a:,.0f} x {b:,.0f} mm", [(p, s_, l) for p, s_, l in rows],
-                         f"its worst racking shear, {w[1][sp['id']]['v_n'] / 1000:.1f} kN in {w[0]}, {w[1][sp['id']]['case']}")
-            res.update(tau_cr=tau_cr, v_n=w[1][sp["id"]]["v_n"], lc=w[0])
+            edge = min(g["edge"] for g in groups)
+            n_front = next(g["n"] for g in groups if g["group"] == "front")
+            res = _local(f"Shear panel {sp['id']}, {t:g} mm steel, {a:,.0f} x {b:,.0f} mm", rows,
+                         f"its worst racking shear, {w[1][sp['id']]['v_n'] / 1000:.1f} kN in {w[0]}, {w[1][sp['id']]['case']}, 1/{n_front} of it "
+                         f"on each bolt under the XT centre crossmember, e {e:.1f} mm, the least bolt edge distance {edge:.1f} mm")
+            res.update(tau_cr=tau_cr, v_n=w[1][sp["id"]]["v_n"], lc=w[0], bolt_groups=groups)
             out["shear_panel"] = res
         return out
 
@@ -865,6 +933,73 @@ class Analysis:
             for part, mpa in self.cheek_welds(F / n).items():
                 if mpa > e.get(part, {}).get("mpa", 0.0):
                     e[part] = dict(mpa=mpa, case=label, wheel=wid, f=[float(v) for v in F / n])
+
+    def gusset_elements(self) -> list[tuple[int, dict]]:
+        """Each hinge gusset's frame element with the gusset (Chassis.hinge_gussets), its i end on the crossmember's face."""
+        if not hasattr(self, "_gussets"):
+            by_id = {g["id"]: g for g in self.ch.hinge_gussets()}
+            self._gussets = [(k, by_id[el.member]) for k, el in enumerate(self.f.elements) if el.member in by_id]
+        return self._gussets
+
+    def gusset_weld_group(self, g: dict, end: int) -> dict:
+        """The weld round one cut end of hinge gusset g (xt_hinges `gusset` `weld`), end 0 on the crossmember's face and 1 on
+        the rail's inner web: the face's normal and its horizontal direction, and the weld's pieces as points along the face
+        from the axis's point on it, each with its throat and length. The top and bottom walls' edges run 70.7 mm along the
+        face in a 90 degree angle, the short side's wall meets it at 45 degrees and the long side's at 135 degrees."""
+        w = self.ch.data["xt_hinges"]["gusset"]["weld"]
+        sec = self.ch.sections[next(f for f in self.ch.data["fittings"] if f["id"] == "CH-P08")["section"]]
+        half, h = sec.b / 2 * math.sqrt(2), sec.d / 2
+        e, s = g["face"], g["side"]
+        if end == 0:
+            n, along, short = np.array((e, 0.0, 0.0)), np.array((0.0, 1.0, 0.0)), s * half
+        else:
+            n, along, short = np.array((0.0, -s, 0.0)), np.array((1.0, 0.0, 0.0)), -e * half
+        throats = dict(edge=w["leg"] * math.cos(math.pi / 4), acute=w["acute_leg"] * math.cos(math.pi / 8), obtuse=w["obtuse_throat"])
+        pts = []
+        k = 12
+        for j in range(k):
+            a = -half + (j + 0.5) * 2 * half / k
+            pts += [(a, h, throats["edge"], 2 * half / k), (a, -h, throats["edge"], 2 * half / k)]
+            b = -h + (j + 0.5) * 2 * h / k
+            pts += [(short, b, throats["acute"], 2 * h / k), (-short, b, throats["obtuse"], 2 * h / k)]
+        return dict(n=n, along=along, pts=np.array(pts), throats=throats)
+
+    def gusset_weld_stress(self, res, k: int, g: dict) -> float:
+        """The largest throat stress round either cut end of hinge gusset g, frame element k, by the elastic vector method:
+        the end's force and moment from the element, moved to the weld's centroid, its normal force and its two moments in
+        the face's plane over the weld's throat area and second moments, and its two shears in that plane and its twist
+        about the normal over the area and the polar moment, all on the throats (AS 4100 9.7.3.10)."""
+        el = self.f.elements[k]
+        xyz = np.asarray(self.f.nodes, float)
+        R, _ = el.axes(xyz)
+        fl = np.asarray(res.forces[k], float)
+        worst = 0.0
+        for end, node in ((0, el.i), (1, el.j)):
+            F, M = R.T @ fl[6 * end:6 * end + 3], R.T @ fl[6 * end + 3:6 * end + 6]
+            grp = self.gusset_weld_group(g, end)
+            n, along, up = grp["n"], grp["along"], np.array((0.0, 0.0, 1.0))
+            a, b, t, ds = grp["pts"].T
+            A = t * ds
+            ac, bc = float(np.sum(A * a) / A.sum()), float(np.sum(A * b) / A.sum())
+            Iaa, Ibb = float(np.sum(A * (a - ac) ** 2)), float(np.sum(A * (b - bc) ** 2))
+            Mc = M + np.cross(xyz[node] - (xyz[node] + ac * along + bc * up), F)
+            nm = np.cross(n, Mc)
+            sig = F @ n / A.sum() + (nm @ up) * (b - bc) / Ibb + (nm @ along) * (a - ac) / Iaa
+            r = np.outer(a - ac, along) + np.outer(b - bc, up)
+            tau = (F - (F @ n) * n) / A.sum() + (Mc @ n) * np.cross(n, r) / (Iaa + Ibb)
+            worst = max(worst, float(np.max(np.sqrt(sig ** 2 + np.sum(tau ** 2, axis=1)))))
+        return worst
+
+    def gusset_welds(self) -> dict:
+        """CHS-16: the hinge gussets' end welds in every load case, the largest throat stress round either cut end of any
+        gusset (gusset_weld_stress) against AS 4100 9.7.3's 0.8 x 0.6 fuw over the case's factor."""
+        mat = self.ch.data["material"]
+        wcap = mat["weld_phi"] * 0.6 * mat["weld_fuw"]
+        lcs = {lc["id"]: lc for lc in self.ch.data["load_cases"]}
+        fac = {lc_id: (lcs[lc_id]["factor"] if lc_id in lcs else 1) for lc_id in self.gusset_env}
+        rows = [(f"end welds, {lc_id}", e["mpa"], wcap / fac[lc_id]) for lc_id, e in self.gusset_env.items()]
+        lc_id, e = max(self.gusset_env.items(), key=lambda kv: kv[1]["mpa"] * fac[kv[0]])
+        return _local("Hinge gussets' end welds (CH-P08)", rows, f"{e['gusset']} in {lc_id}, {e['case']}")
 
     def cheek_check(self) -> dict:
         """CHS-14 (I2-92): the hinge cheeks' welds (CH-P16) in every LC8a case at 58.9 kN and at the 78.5 kN ultimate, each
@@ -1376,8 +1511,8 @@ class Analysis:
         distance to the end weld's toe, to fillets along the member's bottom edges, to the fittings welded on it and to
         the member's other holes, in the web's own plane (u along the member, z across it). A hole in a rail's inner web
         inside a crossmember's end is read with the rails' holes (hole_sites). The drawbar members' apex drains are
-        H-33 to H-36 already. A hinge gusset carries no frame load in the model, so its holes are placed by CHS-10's edge
-        and toe rules only, as the snipe caps' vents were."""
+        H-33 to H-36 already. The hinge gussets are members of the frame model, so their holes are read on their net
+        sections as the members' are."""
         from .chassis import fitting_boxes
         from .chassis_dip import frame_sections
         ch, V = self.ch, self.ch.V

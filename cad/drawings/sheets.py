@@ -92,12 +92,13 @@ def main(only: list[str] | None = None):
     from .ga import ct001
     from .hole_sheet import ct105
     from .home_sheets import ct002, ct003
+    from .joint_sheet import ct106
     from .layout_sheets import ct010, ct011, ct012, ct013
     from .services_sheets import ct601, ct602, ct603, ct611, ct612, ct621
     from .structure_sheets import ct104
     from .ute_sheets import ct701, ct702, ct703, ct704
     fns = {"CT-001": ct001, "CT-002": ct002, "CT-003": ct003, "CT-010": ct010, "CT-011": ct011, "CT-012": ct012, "CT-013": ct013,
-           "CT-101": ct101, "CT-102": ct102, "CT-103": ct103, "CT-104": ct104, "CT-105": ct105,
+           "CT-101": ct101, "CT-102": ct102, "CT-103": ct103, "CT-104": ct104, "CT-105": ct105, "CT-106": ct106,
            "CT-201": ct201, "CT-202": ct202, "CT-203": ct203,
            "CT-301": ct301, "CT-601": ct601, "CT-602": ct602, "CT-603": ct603, "CT-611": ct611, "CT-612": ct612, "CT-621": ct621,
            "CT-701": ct701, "CT-702": ct702, "CT-703": ct703, "CT-704": ct704}

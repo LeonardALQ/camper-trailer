@@ -362,7 +362,7 @@ class Layout:
             out.append(b)
         g = ch.galvanising()
         zinc = [(m.area_m2 * ch.galv_rate(m.sec.t), m.cog) for m in ch.members] + \
-            [(f.area_m2_each * ch.galv_rate(f.t) / len(f.at) * f.qty, p) for f in ch.fittings if f.kind in ("plate", "tube") for p in f.at]
+            [(f.area_m2_each * ch.galv_rate(f.t) / len(f.at) * f.qty, p) for f in ch.fittings if f.kind in ("plate", "tube", "angles") for p in f.at]
         tot = sum(m for m, _ in zinc)
         cog = tuple(sum(m * c[i] for m, c in zinc) / tot for i in range(3))
         out.append(Block(iid="CH-G01", id="CH-G01", name="Hot-dip galvanising to AS/NZS 4680 after fabrication, inside and out",

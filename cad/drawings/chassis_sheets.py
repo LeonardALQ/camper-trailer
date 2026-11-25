@@ -90,10 +90,11 @@ def _draft_stamp(sh, x, y):
 
 
 def weld_symbol(sh, tip, elbow, size: str, other_side=False, both=False, all_round=False, length: str = "", note: str = "",
-                bevel=False, size_other: str = ""):
+                bevel=False, size_other: str = "", flare=False):
     """AS 1101.3 fillet weld symbol: arrow to the joint, reference line, the triangle below the line for the arrow
     side (above for the other side, both for both sides), the leg size on the left and the length on the right, a
-    circle at the elbow for all round. `bevel` draws the single bevel butt weld's symbol in place of the triangle.
+    circle at the elbow for all round. `bevel` draws the single bevel butt weld's symbol in place of the triangle, and
+    `flare` the flare-bevel weld's, its upright line and an arc bowed toward it, with the effective throat as its size.
     `size_other` gives the other side's leg above the line where both sides are welded to different sizes. The arrow is
     marked as a leader to the joint it points at, so the overrun check sees it (I2-76). With `all_round` it ends on the
     elbow's circle."""
@@ -112,7 +113,11 @@ def weld_symbol(sh, tip, elbow, size: str, other_side=False, both=False, all_rou
     if other_side or both:
         tri.append(1)
     for d in tri:
-        if bevel:
+        if flare:
+            sh.line(xm - 1.3, ey, xm - 1.3, ey + d * 2.6, "medium")
+            arc = [math.radians(-104.9 - k * 150.2 / 6) for k in range(7)]
+            sh.path([(xm + 1.645 + 1.345 * math.cos(a), ey + d * (1.3 + 1.345 * math.sin(a))) for a in arc], "medium")
+        elif bevel:
             sh.path([(xm - 1.3, ey + d * 2.6), (xm - 1.3, ey), (xm + 1.3, ey + d * 2.6)], "medium")
         else:
             sh.path([(xm - 1.3, ey), (xm - 1.3, ey + d * 2.6), (xm + 1.3, ey)], "medium", closed=True)
@@ -238,8 +243,8 @@ def ct101(prj, model, bom, checks, reg, dwg):
     rows = []
     for r in chs["schedule"]:
         rows.append([r["section"], SHORT.get(r["role"], r["name"])[:46], f"{r['qty']}", f"{r['length_mm'] / 1000:.2f}", f"{r['mass_kg']:.1f}"])
-    plates = sum(f["mass_kg"] for f in chs["fittings"] if f["kind"] in ("plate", "tube"))
-    rows.append(["PLATE", "Plates, lugs, pads, gussets (CT-102, CT-103)", f"{sum(f['qty'] for f in chs['fittings'] if f['kind'] in ('plate', 'tube'))}",
+    plates = sum(f["mass_kg"] for f in chs["fittings"] if f["kind"] in ("plate", "tube", "angles"))
+    rows.append(["PLATE", "Plates, lugs, pads, gussets (CT-102, CT-103)", f"{sum(f['qty'] for f in chs['fittings'] if f['kind'] in ('plate', 'tube', 'angles'))}",
                  "-", f"{plates:.1f}"])
     rows.append(["HDG", "Galvanising, inside and out", "-", f"{chs['galvanising']['area_m2']:.1f} m2", f"{chs['galvanising']['mass_kg']:.1f}"])
     yt = S.table(sh, 230.0, 247.0, [("SECTION", 30), ("MEMBERS", 84), ("QTY", 12), ("TOTAL m", 26), ("kg", 28)], rows, size=1.7, row_h=3.2,
