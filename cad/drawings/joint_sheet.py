@@ -369,15 +369,19 @@ def _parts(sh, J: Joint, x: float, y: float) -> float:
     and mass."""
     ch = J.ch
     fit = {f.id: f for f in ch.fittings}
-    stepped = next(c for c in ch.hinge_cheeks() if c["gusset"])
     g = J.gussets[0]
     sec = ch.sections[next(f for f in ch.data["fittings"] if f["id"] == "CH-P08")["section"]]
     rows = [["CH-P08", "HINGE GUSSET, BOTH ENDS CUT AT 45 DEG", sec.name.replace(" x ", "x"), _n(g["length"]), str(fit["CH-P08"].qty),
              f"{fit['CH-P08'].mass_each:.2f}"],
             ["CH-P16", "HINGE CHEEK, SHORT, FRONT HINGE'S FRONT", f"PL {_n(J.ck['l'])}x{_n(J.ck['h'])}x{_n(J.ck['t'])}", "",
-             str(sum(1 for c in ch.hinge_cheeks() if not c["gusset"])), f"{J.ck['l'] * J.ck['h'] * J.ck['t'] * 7.85e-6:.2f}"],
-            ["CH-P16", "HINGE CHEEK WITH ITS STEP, A GUSSET LANDS ON IT", f"PL {_n(stepped['l'])}x{_n(stepped['h'])}x{_n(J.ck['t'])}", "",
-             str(sum(1 for c in ch.hinge_cheeks() if c["gusset"])), f"{stepped['area'] * J.ck['t'] * 7.85e-6:.2f}"]]
+             str(sum(1 for c in ch.hinge_cheeks() if not c["gusset"])), f"{J.ck['l'] * J.ck['h'] * J.ck['t'] * 7.85e-6:.2f}"]]
+    sizes = {}
+    for c in ch.hinge_cheeks():
+        if c["gusset"]:
+            sizes.setdefault((round(c["l"], 1), round(c["h"], 1)), []).append(c)
+    for (l_, h_), cs in sizes.items():
+        rows.append(["CH-P16", f"HINGE CHEEK WITH ITS STEP AT {cs[0]['gusset'][7:12]}", f"PL {_n(l_)}x{_n(h_)}x{_n(J.ck['t'])}", "",
+                     str(len(cs)), f"{cs[0]['area'] * J.ck['t'] * 7.85e-6:.2f}"])
     seen = {}
     for p in ch.panel_pieces():
         key = (p["use"], p["section"], round(p["length"]))
@@ -410,7 +414,8 @@ def _notes(J: Joint) -> list[str]:
         f"RAIL'S R{_n(J.rail.ro)} BOTTOM CORNER, EFFECTIVE THROAT {_n(J.ck['corner'] * J.rail.ro)} (5/16 R, AISC 360 TABLE J2.2), NONE "
         f"ACROSS THE RAIL (TB 070), AND {_n(J.ck['bar_leg'])} FILLETS BOTH SIDES DOWN THE HINGE BAR'S FACE OVER ITS TOP "
         f"{_n(J.ck['bar_d'])} (CHS-14). OVER THE WEB EACH CHEEK'S END IS COPED {_n(J.ck['cope'])} x 45 DEG CLEAR OF {J.cm.id}'S "
-        f"{_n(J.cm_leg)} END FILLET, ITS WEB WELDS STOPPED THERE. A CHEEK BESIDE A GUSSET CARRIES A STEP {_n(J.ck['under_gusset']['l'])} LONG "
+        f"{_n(J.cm_leg)} END FILLET, ITS WEB WELDS STOPPED THERE. A CHEEK BESIDE A GUSSET CARRIES A STEP "
+        f"{' AND '.join(f'{_n(v)} LONG AT {k}' for k, v in J.ck['under_gusset']['l'].items())} "
         f"CENTRED ON THE GUSSET, {_n(J.ck['under_gusset']['z0'])} TO {_n(J.ck['under_gusset']['z1'])} OVER THE RAIL, {_n(J.ck['leg'])} FILLETS "
         f"ALONG ITS TOP AND LOWER EDGES, THE GUSSET LANDING ON IT (CHS-16).",
         f"PANEL ANGLES CH-P17: EA 50x50x5, THE FLAT LEG {_n(pw['drop'])} UNDER THE MEMBER. A {_n(pw['weld']['leg'])} FILLET ALONG THE UPRIGHT "

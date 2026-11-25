@@ -541,7 +541,7 @@ xt_hinges:
   bar: {leg: 6, run: 80, runs: [50, 150, 250]}
   gusset: {length: hinge_gusset_l, faces: [1, -1], omit: [CM-04KF, CM-04RF], z_over_underside: 69, weld: {leg: 5, acute_leg: 5, obtuse_throat: 3}}
   cheek: {t: 10, l: 150, h: 108.5, below: 26, leg: 6, bar_d: 26, bar_leg: 10, corner: 0.3125, cope: 12, omit: [],
-          under_gusset: {l: 300, z0: 39, z1: 99.5}}
+          under_gusset: {l: {CM-04: 300, CM-05: 140}, z0: 39, z1: 99.5}}
 
 # The XT arms' limits in LC8a (I2-94). An airbag cannot pull. Where an arm's balance about its hinge asks less of its
 # airbag than the airbag gives with the arm at full droop, its force at ride (the weight's) less the air spring's rate

@@ -676,10 +676,11 @@ class Chassis:
                 if gusset:                              # the step where the gusset lands, centred on its footprint (I2-99)
                     xc = face + e * (self.ev(g["length"]) / math.sqrt(2) - ck["t"])
                     za, zb = V["rail_underside_z"] + big["z0"], V["rail_underside_z"] + big["z1"]
-                    step = (xc - big["l"] / 2, y0, za, xc + big["l"] / 2, y0 + ck["t"], zb)
+                    ls = big["l"][cm.id] if isinstance(big["l"], dict) else big["l"]
+                    step = (xc - ls / 2, y0, za, xc + ls / 2, y0 + ck["t"], zb)
                     boxes.append(step)
                     over = max(0.0, min(box[3], step[3]) - max(box[0], step[0])) * max(0.0, min(box[5], step[5]) - max(box[2], step[2]))
-                    area += big["l"] * (zb - za) - over
+                    area += ls * (zb - za) - over
                 ends = [b_[0] for b_ in boxes] + [b_[3] for b_ in boxes]
                 l = (max(ends) - face) if e > 0 else (face - min(ends))
                 h = max(b_[5] for b_ in boxes) - z0
