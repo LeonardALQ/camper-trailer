@@ -1363,8 +1363,17 @@ def leader(sh, tip, elbow, text, lines=None, size=2.2):
         sh.text(ex + 4 * side, ey - 0.8 - i * (size + 0.8), t, size, "start" if side > 0 else "end")
 
 
+BALLOON_GAP = 0.2   # mm: a balloon's letters keep this clear of its circle's line (fx18-ovr)
+
+
 def balloon(sh, tip, centre, label, r=3.2):
+    """A leader from `tip` to a circle round `label` at `centre`, the circle at least r, and grown where the label's
+    letters would come within BALLOON_GAP of its 0.35 mm line, measured where CairoSVG draws them (text_extent)."""
     (tx, ty), (cx, cy) = tip, centre
+    size = 2.8 if len(label) < 3 else 2.2
+    e = text_extent(label, size, False, "middle")
+    corner = math.hypot(max(-e.left, e.right), max(1.0 + e.bottom, -1.0 - e.top, CAPS * size - 1.0))
+    r = max(r, corner + BALLOON_GAP + 0.175)
     L = math.hypot(cx - tx, cy - ty) or 1
     ux, uy = (cx - tx) / L, (cy - ty) / L
     n0 = len(sh.el)
@@ -1372,7 +1381,7 @@ def balloon(sh, tip, centre, label, r=3.2):
     sh.circle(tx, ty, 0.45, "fill")
     sh.circle(cx, cy, r, "medium")
     sh.leads[len(sh.el)] = [(n0 + 2, ("circle", r)), (n0, ("balloon", r, n0 + 2))]
-    sh.text(cx, cy - 1.0, label, 2.8 if len(label) < 3 else 2.2, "middle")
+    sh.text(cx, cy - 1.0, label, size, "middle")
 
 
 def third_angle_symbol(sh, x, y, h=8.0):

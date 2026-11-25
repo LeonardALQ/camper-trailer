@@ -5,11 +5,12 @@ fill drawn after it, a fill over the tops of a word's capitals, lines of capital
 heavy line (I2-64), while a mask over a thin dimension line passes. Its fourth class finds a leader that ends off what
 its label names, two leaders that cross and a leader through a symbol (I2-69), and a letter on its symbol's white disc
 passes over the line under the disc. It reads a weld symbol's and every other arrow's line with the leaders, but no
-dimension line, and finds a letter drawn in its symbol that ends up outside it (I2-76). Its fifth class finds a text whose
-letters run past the frame, 2 mm past it among them, or into the title block, while the title block's own texts pass.
-Each text is measured where CairoSVG draws it: its letters' box holds the ink the PNG shows, for capitals, lower case,
-digits and mixed runs at the sheets' sizes, at each anchor, a line through a word's last letter is a hit, and a line
-of a note that starts with spaces is drawn and checked from its anchor (fx18-ovr)."""
+dimension line, and finds a letter drawn in its symbol that ends up outside it (I2-76), while a balloon grows to clear its
+letters. Its fifth class finds a text whose letters run past the frame, 2 mm past it among them, or into the title
+block, while the title block's own texts pass. Each text is measured where CairoSVG draws it: its letters' box holds
+the ink the PNG shows, for capitals, lower case, digits and mixed runs at the sheets' sizes, at each anchor, a line
+through a word's last letter is a hit, and a line of a note that starts with spaces is drawn and checked from its
+anchor (fx18-ovr)."""
 import io
 import re
 
@@ -479,3 +480,13 @@ def test_each_texts_letters_lie_where_cairosvg_draws_them(anchor, x, bold):
         if ink[0] < box[0] - 1 / px or ink[1] > box[1] + 1 / px or ink[2] < box[2] - 1 / px or ink[3] > box[3] + 1 / px:
             out.append(f"{t['t'][:24]!r} at {t['s']} mm: ink {', '.join(f'{v:.2f}' for v in ink)} outside {', '.join(f'{v:.2f}' for v in box)}")
     assert not out, out
+
+
+def test_a_balloon_too_small_for_its_letters_grows_to_clear_them():
+    """CT-101's equipment balloons asked for a 2.4 mm circle round 2.8 mm letters, which touched it: the circle grows
+    until the letters keep sheet.BALLOON_GAP clear of its line, its leader ends on it, and the check passes."""
+    sh = _sheet()
+    S.balloon(sh, (250, 150), (262, 160), "CM", 2.4)
+    svg = sh.svg(clear=False)
+    r = float(re.search(r'<circle cx="262.00" cy="[-\d.]+" r="([\d.]+)"', svg)[1])
+    assert 2.4 < r < 3.0 and _counts(svg) == (0, 0, 0, 0, 0)
