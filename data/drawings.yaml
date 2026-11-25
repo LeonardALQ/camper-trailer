@@ -58,6 +58,7 @@ drawings:
       - {rev: AN, date: 2026-11-25, description: "Memo: the arrow's line breaks at the WET ROOM label it ran into", drawn: Kiro, checked: "", approved: ""}
       - {rev: AO, date: 2026-11-25, description: "Notice: the hinge gussets cut to bear, +2.0 kg, the set note to CT-106", drawn: Kiro, checked: "", approved: ""}
       - {rev: AP, date: 2026-11-25, description: "Notice: the masses with both front cheeks and 395 L of water, axle X 4,496", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AQ, date: 2026-11-25, description: "Notice: the masses with 385 L of water, axle X 4,495.6 (I2-97)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-002
     title: Mass and centre of gravity
     subtitle: Every load case with growth, the axle window of H17, the CoG in elevation and across
@@ -94,6 +95,7 @@ drawings:
       - {rev: X, date: 2026-11-25, description: "Memo: the grid line breaks at the TC6 label it touched", drawn: Kiro, checked: "", approved: ""}
       - {rev: Y, date: 2026-11-25, description: "Notice: the masses with the hinge gussets cut to bear, +2.0 kg (I2-95)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Z, date: 2026-11-25, description: "Notice: the masses, the cases and the axle window with 395 L of water", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AA, date: 2026-11-25, description: "Notice: the masses, the cases and the axle window with 385 L of water", drawn: Kiro, checked: "", approved: ""}
   - number: CT-003
     title: Compliance
     subtitle: VSB1 items and the standards with the design figures, operating limits and the plate
@@ -638,6 +640,7 @@ drawings:
       - {rev: L, date: 2026-11-23, description: "Notice: K-10's rail holes at 30 mm, the holes at the merged axle (I2-50)", drawn: Kiro, checked: "", approved: ""}
       - {rev: M, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
       - {rev: N, date: 2026-11-25, description: "Memo: the hinge gussets drawn cut to bear on their faces (I2-95)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: O, date: 2026-11-25, description: "Notice: the fresh tanks' notches and pockets round the XT kit (I2-97)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-611
     title: Plumbing schematic
     subtitle: Fill, fresh tanks, pump, filters, cold and hot lines, drains to the grey tank and the dump
@@ -669,6 +672,7 @@ drawings:
       - {rev: S, date: 2026-11-24, description: "Memo: flow arrows' polylines marked for the label check (I2-81)", drawn: Kiro, checked: "", approved: ""}
       - {rev: T, date: 2026-11-24, description: "Memo: joined tank outlets meet the rear tank's line at a tee (I2-85)", drawn: Kiro, checked: "", approved: ""}
       - {rev: U, date: 2026-11-25, description: "Notice: 395 L of fresh water, the tanks notched round the hinge gussets", drawn: Kiro, checked: "", approved: ""}
+      - {rev: V, date: 2026-11-25, description: "Notice: 385 L of fresh water, the tanks pocketed round the XT kit (I2-97)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-612
     title: Plumbing layout
     subtitle: Tanks, pump cabinet, drains with their falls, the shower well, fill and dump points
@@ -699,6 +703,7 @@ drawings:
       - {rev: R, date: 2026-11-24, description: "Memo: the dump arrow drawn on its line for the label check (I2-81)", drawn: Kiro, checked: "", approved: ""}
       - {rev: S, date: 2026-11-25, description: "Memo: the well's label moved off the pipe it touched", drawn: Kiro, checked: "", approved: ""}
       - {rev: T, date: 2026-11-25, description: "Memo: the hinge gussets drawn cut to bear on their faces (I2-95)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: U, date: 2026-11-25, description: "Notice: the fresh tanks' notches and pockets round the XT kit (I2-97)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-621
     title: HVAC and ventilation
     subtitle: Split, heat-recovery pairs, extract, towing pressurisation, relief, hood, Combi ducts
@@ -757,6 +762,7 @@ drawings:
       - {rev: X, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Y, date: 2026-11-25, description: "Notice: the towball with the trailer's hinge gussets cut to bear (I2-95)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Z, date: 2026-11-25, description: "Memo: the ute's towing figures with the trailer's 395 L of water", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AA, date: 2026-11-25, description: "Memo: the ute's towing figures with the trailer's 385 L of water", drawn: Kiro, checked: "", approved: ""}
   - number: CT-702
     title: Ute garage box frame and panels
     subtitle: Kerb-side frame elevation, subframe plan on Ford's pads, section at the rear axle, member schedule

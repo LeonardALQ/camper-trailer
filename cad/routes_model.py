@@ -225,13 +225,13 @@ def viewer_json(name: str, root: Compound) -> str:
 
 # ------------------------------------------------------------------ check rows and the pages' data
 def check_rows(res: dict, ev: dict) -> list[dict]:
-    """SVC-01 to SVC-12 as check rows (data/routes.yaml `checks`), each with its limit, measured value and governing run."""
+    """SVC-01 to SVC-13 as check rows (data/routes.yaml `checks`), each with its limit, measured value and governing run."""
     rows = []
     for c in res["data"].get("checks") or []:
         e = ev[c["kind"]]
         row = dict(id=c["id"], title=c["title"], type="services", severity=c["severity"], why=c["why"], source=c.get("source"),
                    ok=e["ok"], problems=e["problems"][:20], sub="")
-        if c["kind"] == "clearance":
+        if c["kind"] in ("clearance", "kit_clearance"):
             g = e["closest"][0] if e["closest"] else None
             row.update(limit=f"at least {e['limit']:g} mm", measured=e["smallest"], unit="mm",
                        margin=None if e["smallest"] is None else round(e["smallest"] - e["limit"], 1),

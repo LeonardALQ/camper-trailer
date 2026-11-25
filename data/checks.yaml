@@ -13,8 +13,9 @@ checks: []
 # towball range the axle solve uses: at least 9.0 % in every case and at most 420 kg with growth since the DO45 (23 Nov
 # 2026), 8.0 % and 320 kg before. H2 sets the 7.5 %
 # floor and the plate, 4,000 kg since 23 Nov 2026. VSB1 sets no towball share. Limits here are never changed to make a check pass.
-# The services checks SVC-01 to SVC-12 (H28: clearance, bend radii, 230 V segregation, the battery's terminal face,
-# coverage, voltage drop, falls, the runs' spacing, the glands' room, then the cables' ratings, heat and supports) are defined beside the runs in data/routes.yaml `checks`, with their sources, and
+# The services checks SVC-01 to SVC-13 (H28: clearance, bend radii, 230 V segregation, the battery's terminal face,
+# coverage, voltage drop, falls, the runs' spacing, the glands' room, then the cables' ratings, heat and supports, and the
+# runs against the XT kit's parts, reported) are defined beside the runs in data/routes.yaml `checks`, with their sources, and
 # measured by cad/routes.py. The trailer's build adds their rows to these checks' results (build/trailer/trailer.json).
 trailer_checks:
   - id: MAS-01

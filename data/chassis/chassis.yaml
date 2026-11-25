@@ -543,10 +543,34 @@ xt_hinges:
 # off the face (est., sheet 3's 150 mm bracket with its clevises 123 mm apart). The airbag pushes the frame up with its
 # force, its bump stop with it past the bump gap, through its top bracket, Cruisemaster's 33SA 013 for a 150 x 50 rail,
 # welded to the rail's inner face along its top by 6 mm fillets continued 20 mm round both ends (sheet 3), `l` long (est.).
+# The droop line stands where Cruisemaster puts the shock: a single shock goes in the inboard clevis of its bracket
+# (sheet 4, step 6), its axis `y` from the centreline, 138 mm inboard of the rail's inner face, and its top eye
+# `z_over_underside` over the rail's underside, the bracket's foot 32 mm over it (sheet 2, scaled, est.).
+# `parts` are the kit's parts between the rails, each place scaled from 33XT AIR sheet 2's plan and side views (rev 3,
+# 27 Jul 2021, marked do not scale, so each is est. to about 10 mm, as report 11 scaled the pivot), sheet 3's shock mount
+# detail and sheet 4's assembly, in mm. `y_in` is measured inboard from the rail's inner face. The hinge `bar` runs
+# under its crossmember, flush with its faces, from the rail's outer face (its long end, sheet 2) to `inboard` past the
+# rail's inner face, `d` deep, with the arm's four hinge `plates`, `t` thick and `l` along the trailer on the pivot,
+# hanging from the bar to `below` under the rail's underside, the arm's bushes and pivot tube between them (`hinge`
+# is their envelope). The `airbag` stands over the hub, `dx` behind it, `d` across and `h` tall at ride under its top
+# bracket 33SA 013 (`bag_bracket`), which is welded to the rail's inner face over the rail's full height, flush with its
+# top (sheet 3), `l` long and reaching `reach` inboard. The `shock` is `d` across its body (sheet 2's plan, the G40's
+# bulged body), its lower eye `eye` behind and under the hub at ride on the arm, so it turns with the arm about the
+# pivot, its top eye in the inboard clevis `e` off the support plate's face. Its `bracket` is the clevis pair, `w`
+# across between the clevis plates' outer faces, from `y_in` (sheet 2's 39 mm), standing `out` off the plate and from
+# `z` over the rail's underside (sheet 2's 32 mm) to `h` over it. `cog` is not given: the kit's mass is RG-01's.
 xt_arms:
-  droop: {travel: 60, to: {front: XT centre, rear: XT rear shock}, y: "rail_c - 200", z_over_underside: 75,
+  droop: {travel: 60, to: {front: XT centre, rear: XT rear shock}, y: "rail_c - rail_w / 2 - 138", z_over_underside: 51,
           bolt: {size: M12, a_c: 76.2, fuf: 830, planes: 2}, bracket: {leg: 6, l: 100, gap: 135, e: 40}}
   airbag: {bracket: {leg: 6, l: 200, returns: 20}}
+  parts:
+    bar: {d: 44, inboard: 450}
+    plates: {y_in: [34, 151, 311, 427], t: 8, l: 82, below: 134}
+    hinge: {y_in: [30, 431]}
+    airbag: {dx: 8, y_in: 89, d: 190, h: 152}
+    bag_bracket: {l: 300, reach: 100}
+    shock: {d: 70, eye: [67, -13], e: 40}
+    shock_bracket: {w: 123, y_in: 39, out: 50, z: 32, h: 77}
 
 # Shear panels (I2-87): the rear fresh tank's guard is a 3 mm galvanised steel sheet (AS 1397 G300, fy 300 and fu 340 MPa),
 # bolted by M10 8.8 bolts in 11 mm holes to the angles CH-P17 welded along both rails' inner webs and under the XT rear

@@ -64,9 +64,9 @@ trailer:
     why: "Each safety chain's pewag CW 8 connecting link passes through its chain lug's hole, so the chain is fixed to the trailer for good with no shackle, and the grade 80 chain is never welded (VSB1 Rev 6 9.2, WA's CI-119C over 3.5 t)"
   # ---------------------------------------------------------------- running gear and the spare wheel
   - lines: ["RG-01*"]
-    to: ["RL-*", "CM-*"]
+    to: ["RL-*", "CM-*", "CH-P07"]
     how: welded
-    why: "Each XT arm's pivot hanger and shock bracket are welded to the rail's outer face (Cruisemaster's XT fitting guide)"
+    why: "Each XT arm's hinge bar is welded under its crossmember, its airbag's top bracket 33SA 013 to the rail's inner face and its shock's bracket to the next crossmember's support plate, or to its face where the data has no plate yet (Cruisemaster's 33XT AIR sheet 3)"
   - lines: ["RG-06*"]
     to: ["RG-01*"]
     how: bolted

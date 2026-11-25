@@ -182,6 +182,11 @@ def inside(a, z) -> bool:
     return all(a[i] >= z[i] - TOL and a[i + 3] <= z[i + 3] + TOL for i in range(3))
 
 
+def _area(poly: list) -> float:
+    """The area of a plan polygon by the shoelace rule."""
+    return abs(sum(p[0] * q[1] - q[0] * p[1] for p, q in zip(poly, poly[1:] + poly[:1]))) / 2
+
+
 def _clip(poly: list, nx: float, ny: float, c: float) -> list:
     """The convex plan polygon poly cut to the half-plane nx x + ny y >= c."""
     out = []
@@ -254,6 +259,18 @@ class Layout:
         self.zones = {k: dict(name=z["name"], box=_box(*self.P.eval(z["box"], {}))) for k, z in td["zones"].items()}
         for b in self.tanks():          # each fresh tank's corners notched round the hinge gussets, for its model
             b.extra["notches"] = self.tank_notches(b)
+        for b in self.blocks:           # each XT arm's line carries its wheel's parts between the rails, for its model
+            if b.id == "RG-01" and b.box is not None:
+                w = next(w for w in self.chassis.suspension if b.box[0] <= w["hub"][0] <= b.box[3]
+                         and w["side"] * (b.box[1] + b.box[4]) > 0)
+                b.extra["xt"] = [p for p in self.xt_parts() if p["wheel"] == w["id"]]
+            elif b.id == "UF-03":       # the guards' line carries the rear bay's shear panel as the chassis cuts it, for its model
+                pn = self.chassis.shear_panels()
+                if pn:
+                    spec = next(f for f in self.chassis.data["fittings"] if f["id"] == "CH-P17")
+                    stiff = next(p for p in self.chassis.panel_pieces() if p["use"] == "stiffener")
+                    b.extra["panel"] = dict(sheet=pn[0]["sheet"], t=pn[0]["t"], z_top=self.V["rail_underside_z"] - spec["drop"],
+                                            stiffener=stiff["boxes"])
         ids = [b.iid for b in self.blocks]
         dup = {i for i in ids if ids.count(i) > 1}
         if dup:
@@ -465,12 +482,37 @@ class Layout:
             baffles = (cross * ly + along * lx - cross * along * t) * t * h
             w0, w1 = b.box[2] + t, b.box[2] + t + h          # the water's column inside the walls
             notches = self.tank_notches(b)
-            notched = sum(nt["inner_area"] * max(0.0, min(w1, nt["inner_z"][1]) - max(w0, nt["inner_z"][0])) for nt in notches)
+            inside = self._inside_volume(b, notches, t, w0, w1)
+            notched = lx * ly * h - inside
             out[b.id] = dict(inside_mm=[round(lx, 1), round(ly, 1), round(lz, 1)], inside_l=lx * ly * lz / 1e6,
                              water_h_mm=h, baffles_l=baffles / 1e6, notches_l=notched / 1e6, notches=len(notches),
-                             net_l=(lx * ly * h - baffles - notched) / 1e6,
+                             pockets=sum(1 for nt in notches if nt.get("kind") == "box"),
+                             net_l=(inside - baffles) / 1e6,
                              cross=cross, along=along, wall_mm=t, air_gap_mm=gap, fresh=bool(b.extra.get("tank")))
         return out
+
+    def _inside_volume(self, b, notches: list, t: float, w0: float, w1: float) -> float:
+        """The volume inside tank b's walls from w0 to w1 (mm3), less every notch grown by the walls round it, read in slabs
+        at each notch's inner top and bottom: in each the inside's plan cut by the corner notches' inner faces, less the
+        pockets' inner boxes (_minus_boxes), so a place two notches share is taken once."""
+        x0, y0, _, x1, y1, _ = b.box
+        zs = sorted({w0, w1} | {v for nt in notches for v in nt["inner_z"] if w0 < v < w1})
+        vol = 0.0
+        for za, zb in zip(zs, zs[1:]):
+            zm = (za + zb) / 2
+            poly = [(x0 + t, y0 + t), (x1 - t, y0 + t), (x1 - t, y1 - t), (x0 + t, y1 - t)]
+            rects = []
+            for nt in notches:
+                if not nt["inner_z"][0] <= zm <= nt["inner_z"][1]:
+                    continue
+                if nt.get("kind") == "box":
+                    r = nt["inner"]
+                    rects.append((r[0], r[1], r[3], r[4]))
+                    continue
+                (nx, ny), (cx, cy) = nt["normal"], nt["corner"]
+                poly = _clip(poly, nx, ny, nx * cx + ny * cy + nt["keep"] + t * math.hypot(nx, ny))
+            vol += sum(_area(pc) for pc in self._minus_boxes(poly, rects)) * (zb - za)
+        return vol
 
     def fresh_net_l(self) -> float:
         return sum(v["net_l"] for v in self.tank_nets().values() if v["fresh"])
@@ -513,6 +555,65 @@ class Layout:
                             z0=max(gz0, z0), z1=min(gz1, z1), normal=(e, -s), corner=(xf, yw), keep=reach, clear=clear,
                             inner_area=max(0.0, inner) ** 2 / 2, inner_z=(gz0 - t, gz1 + t)))
         out += self._corner_chamfers(b, clear, t)
+        out += self._part_notches(b, clear, t)
+        return out
+
+    def xt_parts(self) -> list[dict]:
+        """The XT kit's parts between the rails at Cruisemaster's places (Chassis.xt_parts), once."""
+        if getattr(self, "_xt_parts", None) is None:
+            self._xt_parts = self.chassis.xt_parts()
+        return self._xt_parts
+
+    def _part_notches(self, b, clear: float, t: float) -> list[dict]:
+        """The pockets in tank b round the XT kit's parts that reach into its box (Chassis.xt_parts): the airbags and their
+        top brackets, the shock absorbers over the arm's whole travel and their brackets. Each pocket is the part's box
+        grown by `clear`, cut from the side of the tank it reaches, and from the bottom or top where it would leave less
+        than two walls, so the tank keeps that clearance to the part. Inside, the tank's `t` walls go round the pocket."""
+        x0, y0, z0, x1, y1, z1 = b.box
+        out = []
+        for p in self.xt_parts():
+            for bx in p["boxes"]:
+                g = (bx[0] - clear, bx[1] - clear, bx[2] - clear, bx[3] + clear, bx[4] + clear, bx[5] + clear)
+                if overlap(g, b.box) <= 0:
+                    continue
+                c = [max(g[0], x0), max(g[1], y0), max(g[2], z0), min(g[3], x1), min(g[4], y1), min(g[5], z1)]
+                c[2] = z0 if c[2] - z0 < 2 * t else c[2]
+                c[5] = z1 if z1 - c[5] < 2 * t else c[5]
+                if not (c[0] <= x0 or c[3] >= x1 or c[1] <= y0 or c[4] >= y1 or c[2] <= z0 or c[5] >= z1):
+                    near = c[1] - y0 < y1 - c[4]          # open to the nearer side, so the pocket can be made
+                    c[1 if near else 4] = y0 if near else y1
+                inner = (c[0] - t, c[1] - t, c[2] - (t if c[2] > z0 else 0.0), c[3] + t, c[4] + t, c[5] + (t if c[5] < z1 else 0.0))
+                out.append(dict(fitting=p["id"], gusset=None, kind="box", box=tuple(c), z0=c[2], z1=c[5], clear=clear,
+                                inner=inner, inner_z=(inner[2], inner[5])))
+        return out
+
+    @staticmethod
+    def _minus_boxes(poly: list, rects: list) -> list[list]:
+        """The convex plan polygon poly less the plan rectangles `rects` (x0, y0, x1, y1), as convex pieces: poly cut in
+        strips along X at every rectangle's ends, and each strip across at the sides of the rectangles that cover it."""
+        if len(poly) < 3:
+            return []
+        if not rects:
+            return [poly]
+        lo, hi = min(p[0] for p in poly), max(p[0] for p in poly)
+        xs = sorted({lo, hi} | {v for r in rects for v in (r[0], r[2]) if lo < v < hi})
+        out = []
+        for xa, xb in zip(xs, xs[1:]):
+            strip = _clip(_clip(poly, 1, 0, xa), -1, 0, -xb)
+            if len(strip) < 3 or xb - xa < 1e-6:
+                continue
+            ylo, yhi = min(p[1] for p in strip), max(p[1] for p in strip)
+            y, free = ylo, []
+            for a, c in sorted((r[1], r[3]) for r in rects if r[0] <= xa + 1e-6 and r[2] >= xb - 1e-6):
+                if a > y:
+                    free.append((y, min(a, yhi)))
+                y = max(y, c)
+            if y < yhi:
+                free.append((y, yhi))
+            for a, c in free:
+                piece = _clip(_clip(strip, 0, 1, a), 0, -1, -c)
+                if len(piece) >= 3 and c - a > 1e-6:
+                    out.append(piece)
         return out
 
     def _corner_chamfers(self, b, clear: float, t: float) -> list[dict]:
@@ -548,19 +649,29 @@ class Layout:
         return out
 
     def tank_pieces(self, b) -> list[tuple]:
-        """Tank b notched round the gussets as convex slabs, each (box, poly): its box cut at every notch's top and bottom,
-        and in each slab the plan's rectangle less the notches' corners there."""
+        """Tank b notched round the gussets, the fittings and the XT kit's parts as convex slabs, each (box, poly): its box
+        cut at every notch's top and bottom, in each slab the plan's rectangle less the notches' corners there, and that
+        less the pockets round the kit's parts in convex pieces (_minus_boxes)."""
         x0, y0, z0, x1, y1, z1 = b.box
         notches = b.extra.get("notches") or self.tank_notches(b)
         zs = sorted({z0, z1} | {v for nt in notches for v in (nt["z0"], nt["z1"])})
         out = []
         for za, zb in zip(zs, zs[1:]):
             poly = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+            rects = []
             for nt in notches:
                 if nt["z0"] <= za + 1e-9 and zb <= nt["z1"] + 1e-9:
+                    if nt.get("kind") == "box":
+                        r = nt["box"]
+                        rects.append((r[0], r[1], r[3], r[4]))
+                        continue
                     (nx, ny), (cx, cy) = nt["normal"], nt["corner"]
                     poly = _clip(poly, nx, ny, nx * cx + ny * cy + nt["keep"])
-            out.append(((x0, y0, za, x1, y1, zb), poly if len(poly) != 4 else None))
+            if not rects:
+                out.append(((x0, y0, za, x1, y1, zb), poly if len(poly) != 4 else None))
+                continue
+            for pc in self._minus_boxes(poly, rects):
+                out.append(((min(p[0] for p in pc), min(p[1] for p in pc), za, max(p[0] for p in pc), max(p[1] for p in pc), zb), pc))
         return out
 
     def water_cog(self, litres: float):
@@ -631,6 +742,12 @@ class Layout:
             return self.tank_pieces(b)
         return [(b.box, None)] if b.box is not None else []
 
+    def xt_blocks(self) -> list[Block]:
+        """The XT kit's parts between the rails (xt_parts) as blocks the fit checks and the services' clearance read, each
+        with its boxes in `extra`. Their mass is the kit's line RG-01's, so they are no line of their own."""
+        return [Block(iid=p["id"], id="RG-01", name=f"Cruisemaster XT, {p['what']} ({p['wheel']})", system="running_gear",
+                      box=p["boxes"][0], load="none", extra=dict(boxes=p["boxes"], part=p)) for p in self.xt_parts()]
+
     def fit(self, zone: str, skip: tuple = ()) -> dict:
         z = self.zones[zone]["box"]
         items = [b for b in self.blocks if b.zone == zone and b.box is not None and b.id not in skip]
@@ -638,6 +755,7 @@ class Layout:
         keep = [b for b in items if b.keep_clear]
         others = [(b, s) for b in self.blocks if b.zone != zone and not b.keep_clear and not b.hollow
                   for s in self.shapes(b) if overlap(s[0], z) > 0]
+        others += [(b, (bx, None)) for b in self.xt_blocks() for bx in b.extra["boxes"] if overlap(bx, z) > 0]
         problems, worst = [], math.inf
         worst_pair = ""
         for b in solids:

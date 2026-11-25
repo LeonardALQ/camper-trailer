@@ -6,7 +6,7 @@ chase behind the plinth, the under-floor runs along the rails and the glands of 
 three expressions over the layout's parameters, the envelope boxes (EL_04.x0 for line EL-04's box) and the ways'
 constants, and "." repeats the previous point's value. resolve() turns the runs into filleted centrelines at the
 cable's or pipe's minimum bend radius, sizes every DC circuit by its current and its voltage drop at the routed length
-(report 20's 2 % limit), and adds up the lengths, masses and prices. checks() measures SVC-01 to SVC-12.
+(report 20's 2 % limit), and adds up the lengths, masses and prices. checks() measures SVC-01 to SVC-13.
 """
 from __future__ import annotations
 
@@ -512,6 +512,9 @@ def _blocks_of(lay) -> tuple[dict, list]:
             boxes = [(f"{b.name.split(',')[0]} {k}", bx) for k, bx in enumerate(fitting_boxes(ch, f), 1)]
         bl += [dict(iid=f"{b.iid} #{k}", id=b.id, name=name, system=b.system, box=tuple(bx), hollow=False, keep_clear=False)
                for k, (name, bx) in enumerate(boxes, 1)]
+    for b in (lay.xt_blocks() if hasattr(lay, "xt_blocks") else []):   # the XT kit's parts between the rails (Chassis.xt_parts)
+        bl += [dict(iid=f"{b.iid} #{k}", id=b.iid, name=b.name, system=b.system, box=tuple(bx), hollow=False, keep_clear=False, kit=True)
+               for k, bx in enumerate(b.extra["boxes"], 1)]
     return dict(lay.V), bl
 
 
@@ -844,14 +847,14 @@ def _bar_gap(segs: list, c: dict, step: float = 15.0) -> float:
     return best
 
 
-# ------------------------------------------------------------------ the checks, SVC-01 to SVC-12
+# ------------------------------------------------------------------ the checks, SVC-01 to SVC-13
 PANELS = ("BD-01", "BD-02", "BD-03", "BD-04")
 
 
 def _solids(res: dict) -> list:
     skip = set(res["data"]["rules"].get("not_tested", []))
     bars = {c["iid"] for c in res.get("bars", [])}
-    out = [b for b in res["blocks"] if b.get("box") and not b.get("hollow") and not b.get("keep_clear")
+    out = [b for b in res["blocks"] if b.get("box") and not b.get("hollow") and not b.get("keep_clear") and not b.get("kit")
            and b["id"] not in skip and b["iid"] not in bars]
     out += bed_travel(res["V"], res["blocks"])
     out += [dict(iid=k, id=k, name=f["what"], system="fixture", box=f["box"]) for k, f in res["fixtures"].items()
@@ -1064,6 +1067,38 @@ def clearance(res: dict) -> dict:
     tested = sorted((g for g in gaps if g["limit"] > 0), key=lambda g: g["gap"])
     return dict(ok=not problems, problems=problems, closest=tested[:10], smallest=tested[0]["gap"] if tested else None, limit=clear,
                 frames=frame_gaps[:10])
+
+
+def kit_clearance(res: dict) -> dict:
+    """SVC-13: SVC-01's clearance from every run to the XT kit's parts between the rails at Cruisemaster's places (33XT AIR
+    sheets 2 to 4, est., Chassis.xt_parts): the hinge bars and the arms' hinge plates, the airbags over their travel and
+    their top brackets, the shocks over the arm's travel and their brackets. The runs were laid round an arm drawn
+    outboard of the rail, so this row is reported until they are laid round the kit as Cruisemaster places it (I2-97).
+    A lead's part that rides on its arm is FIT-05's."""
+    clear = res["data"]["rules"]["clear_mm"]
+    kit = [b for b in res["blocks"] if b.get("kit")]
+    problems, gaps = [], []
+    for run in res["runs"]:
+        if run.get("rides"):
+            continue
+        r = run["od"] / 2
+        segs, box = _segs(run["dense"]), _aabb(run["dense"], r + clear)
+        worst = {}
+        for b in kit:
+            if not _hit(box, b["box"]):
+                continue
+            d, p = min((seg_box(a, c, b["box"]) for a, c in segs), key=lambda t: t[0])
+            part = b["id"]
+            if d - r < worst.get(part, (math.inf,))[0]:
+                worst[part] = (d - r, p, b["name"])
+        for part, (g, p, name) in worst.items():
+            gaps.append(dict(run=run["id"], part=part, name=name, gap=round(g, 1), limit=clear, at=[round(v) for v in p]))
+            if g < clear - 0.05:
+                problems.append(f"{run['id']} {'enters' if g < 0 else 'passes'} {part} ({name}) {abs(g):.0f} mm "
+                                f"{'deep' if g < 0 else 'clear'} at X {p[0]:.0f} Y {p[1]:.0f} Z {p[2]:.0f}")
+    tested = sorted(gaps, key=lambda g: g["gap"])
+    return dict(ok=not problems, problems=problems, closest=tested[:10], smallest=tested[0]["gap"] if tested else None, limit=clear,
+                runs=sorted({p.split()[0] for p in problems}))
 
 
 def keep_clear_boxes(res: dict) -> list:
@@ -2511,7 +2546,7 @@ def member_holes(res: dict) -> list[dict]:
 
 CHECKS = {"clearance": clearance, "bends": bends, "separation": separation, "terminal_face": terminal_face,
           "coverage": coverage, "drops": drops, "falls": falls, "spacing": spacing, "glands": glands, "ratings": ratings, "heat": heat,
-          "supports": supports}
+          "supports": supports, "kit_clearance": kit_clearance}
 
 
 def evaluate(res: dict) -> dict:
