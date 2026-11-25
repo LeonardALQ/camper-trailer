@@ -144,7 +144,7 @@ def report(tr, lay) -> dict:
                        J=comp.J, Z_bottom=comp.Z_bottom, Z_top=comp.Z_top, Z_weak=comp.Z_weak),
         members=members, joints=[j.__dict__ for j in ch.joints], fittings=fittings, schedule=list(schedule.values()),
         steel_kg=ch.steel_mass(), galvanising=ch.galvanising(),
-        bought_kg=sum(f.mass_kg for f in ch.fittings if f.kind not in ("plate", "tube")),
+        bought_kg=sum(f.mass_kg for f in ch.fittings if f.kind not in ("plate", "tube", "angles")),
         suspension=ch.suspension, stations=[dict(st, x_centre=ch.station_x(st), role=ch.role_of(st)) for st in ch.stations],
         load_cases=ch.data["load_cases"],
         results={k: v for k, v in res.items() if k != "envelope"},

@@ -115,6 +115,13 @@ def load_sections() -> dict[str, Props]:
     return out
 
 
+@functools.lru_cache(maxsize=1)
+def load_angles() -> dict[str, dict]:
+    """The equal angles of data/chassis/sections.yaml as their rows: leg `d`, thickness `t` and `mass_kg_per_m`."""
+    raw = yaml.safe_load(SECTIONS_YAML.read_text())
+    return {s["id"]: s for s in raw["sections"] if s["shape"] == "equal angle"}
+
+
 def cheek_props(ck: dict, gap: float, n: int = 2) -> Props:
     """The hinge cheeks at one hinge as one member's section: `n` plates `t` thick and `l` long along X, two either side of
     the hinge crossmember, `gap` wide, their centres gap / 2 + l / 2 from its centre, or one alone on its own axis
@@ -428,6 +435,12 @@ class Chassis:
                 out.append(Fitting(f["id"], f["name"], kind, qty, at, m, "calculated",
                                    f"Calculated: {L:g} mm of {sec.name} at {sec.kg_m} kg/m", t=sec.t,
                                    area_m2_each=sec.area_m2_per_m * L / 1000))
+            elif kind == "angles":                  # the shear panel's pieces, each at its own centre (panel_pieces)
+                ps = self.panel_pieces()
+                ctr = [tuple((p["boxes"][0][i] + p["boxes"][0][i + 3]) / 2 for i in range(3)) for p in ps]
+                parts = ", ".join(f"{p['length']:.0f} mm of {load_angles()[p['section']]['designation'].replace('x', ' x ')}" for p in ps)
+                out.append(Fitting(f["id"], f["name"], kind, 1, ctr, sum(p["mass_kg"] for p in ps), "calculated",
+                                   f"Calculated: {parts}, at each section's kg/m", t=5.0, area_m2_each=sum(p["area_m2"] for p in ps)))
             elif kind == "strip":
                 L = self.strip_length()
                 out.append(Fitting(f["id"], f["name"], kind, 1, [(self.V["body_x0"] + self.V["body_length"] / 2, 0.0, self.V["floor_underside_z"] - 10)],
@@ -521,13 +534,98 @@ class Chassis:
 
     def shear_panels(self) -> list[dict]:
         """The steel shear panels under the tanks (shear_panels): each spans its bay from the rear face of one station's
-        crossmember to the front face of the next, between the rails' inner faces."""
+        crossmember to the front face of the next, between the rails' inner faces, as the frame model carries it. `sheet`
+        is the 3 mm sheet as cut (panel_sheet) and `bolts` its bolts, each with its group (panel_pieces)."""
         V, out = self.V, []
         st = {m.station: m for m in self.members if m.role.startswith("cm")}
         for d in self.data.get("shear_panels", []):
             m0, m1 = st[d["from"]], st[d["to"]]
             x0, x1 = m0.p0[0] + m0.sec.b / 2, m1.p0[0] - m1.sec.b / 2
-            out.append(dict(id=d["id"], x0=x0, x1=x1, b=2 * (V["rail_c"] - self.role_sec["rail"].b / 2), t=d["t"], fixing=d.get("fixing")))
+            pieces = self.panel_pieces()
+            out.append(dict(id=d["id"], x0=x0, x1=x1, b=2 * (V["rail_c"] - self.role_sec["rail"].b / 2), t=d["t"], fixing=d.get("fixing"),
+                            sheet=self.panel_sheet(d, x1, pieces), bolts=[b for p in pieces for b in p["bolts"]]))
+        return out
+
+    def panel_sheet(self, d: dict, x_rear: float, pieces: list[dict]) -> dict:
+        """The panel's sheet in plan: its front edge at the jacking pads' rear edges, its rear edge at the next crossmember's
+        face, its sides the stiffener's `edge` inside the rails' inner faces, and a tongue under each crossmember's angle,
+        as wide as the angle and `tongue` short of its flat leg's toe. Each as (x0, y0, x1, y1)."""
+        V = self.V
+        pad = next(f for f in self.data["fittings"] if f["id"] == "CH-P06")
+        stiff = next(f for f in self.data["fittings"] if f["id"] == "CH-P17")["stiffener"]
+        half = V["rail_c"] - self.role_sec["rail"].b / 2 - stiff["edge"]
+        front = self.ev(pad["at"])[0] + pad["l"] / 2
+        tongues = []
+        for p in (p for p in pieces if p["use"] == "crossmember"):
+            toe = p["toe_x"] + p["face"] * d.get("tongue", 0.0)
+            xa, xb = sorted((toe, front if p["face"] > 0 else x_rear))
+            tongues.append((xa, p["y0"], xb, p["y1"]))
+        return dict(rect=(front, -half, x_rear, half), tongues=tongues, front=front, half=half)
+
+    def panel_pieces(self) -> list[dict]:
+        """The shear panel's pieces CH-P17: each angle with its use (rail, crossmember or stiffener), its section, its ends,
+        its legs' boxes, its mass, its galvanised area, its welds as lines (what, from, to) and its bolts (x, y, group).
+        The rails' angles run from `gap` behind the XT centre's rear hinge cheeks' ends to `end` ahead of the XT rear
+        shock crossmember, and each crossmember's angles under their Y ranges, their bolts on the flat leg's `gauge`."""
+        V, spec = self.V, next(f for f in self.data["fittings"] if f["id"] == "CH-P17")
+        ang, rail = load_angles(), self.role_sec["rail"]
+        fix = self.data["shear_panels"][0]["fixing"]
+        y_in = V["rail_c"] - rail.b / 2
+        z_flat = V["rail_underside_z"] - spec["drop"]
+        st = {m.station: m for m in self.members if m.role.startswith("cm")}
+        centre, shock = st["XT centre"], st["XT rear shock"]
+        ck = self.data["xt_hinges"]["cheek"]
+        out = []
+
+        def spaced(a0: float, a1: float, pitch: float, end: float) -> list[float]:
+            n = int(math.floor((a1 - a0 - 2 * end) / pitch + 1e-9)) + 1
+            first = a0 + (a1 - a0 - (n - 1) * pitch) / 2
+            return [first + k * pitch for k in range(n)]
+
+        r = spec["rails"]
+        a = ang[r["section"]]
+        x0 = centre.p0[0] + centre.sec.b / 2 + ck["l"] + r["gap"]
+        x1 = shock.p0[0] - shock.sec.b / 2 - r["end"]
+        for s in (-1, 1):
+            y_web = s * y_in
+            up = (x0, min(y_web, y_web - s * a["t"]), z_flat, x1, max(y_web, y_web - s * a["t"]), z_flat + a["d"])
+            flat = (x0, min(y_web, y_web - s * a["d"]), z_flat, x1, max(y_web, y_web - s * a["d"]), z_flat + a["t"])
+            yb = y_web - s * spec["gauge"]
+            out.append(dict(id=f"CH-P17-R{SIDES[s]}", use="rail", side=s, section=r["section"], x0=x0, x1=x1, length=x1 - x0,
+                            boxes=[up, flat], galvanised=True,
+                            welds=[("top edge", (x0, y_web, z_flat + a["d"]), (x1, y_web, z_flat + a["d"])),
+                                   ("rail's bottom corner", (x0, y_web, V["rail_underside_z"]), (x1, y_web, V["rail_underside_z"]))],
+                            bolts=[dict(x=x, y=yb, group="rail", along="x") for x in spaced(x0, x1, fix["pitch"], fix["end"])]))
+        for c in spec["crossmembers"]:
+            a, m = ang[c["section"]], st[c["station"]]
+            f = c["face"]                       # 1 on the crossmember's rear face, -1 on its front face, the flat leg under it
+            x_web = m.p0[0] + f * m.sec.b / 2
+            heel = x_web + f * a["t"]
+            toe = heel - f * a["d"]
+            front = c["station"] == "XT centre"
+            for k, (y0, y1) in enumerate(c["ys"], 1):
+                up = (min(x_web, heel), y0, z_flat, max(x_web, heel), y1, z_flat + a["d"])
+                flat = (min(toe, heel), y0, z_flat, max(toe, heel), y1, z_flat + a["t"])
+                n = 4 if front else None
+                ys = [(y0 + y1) / 2 + (j - (n - 1) / 2) * fix["front_pitch"] for j in range(n)] if front else spaced(y0, y1, fix["pitch"], fix["end"])
+                out.append(dict(id=f"CH-P17-{m.id}-{k}", use="crossmember", member=m.id, station=c["station"], face=f, section=c["section"],
+                                y0=y0, y1=y1, length=y1 - y0, x_web=x_web, heel_x=heel, toe_x=toe, boxes=[up, flat], galvanised=True,
+                                welds=[("top edge", (x_web, y0, z_flat + a["d"]), (x_web, y1, z_flat + a["d"])),
+                                       ("crossmember's bottom corner", (x_web, y0, V["rail_underside_z"]), (x_web, y1, V["rail_underside_z"]))],
+                                bolts=[dict(x=heel - f * spec["gauge"], y=y, group="front" if front else "rear", along="y") for y in ys]))
+        sk = spec["stiffener"]
+        a = ang[sk["section"]]
+        pad = next(f for f in self.data["fittings"] if f["id"] == "CH-P06")
+        xs = self.ev(pad["at"])[0] + pad["l"] / 2
+        half = y_in - sk["edge"]
+        z_sheet = z_flat - self.data["shear_panels"][0]["t"]
+        out.append(dict(id="CH-P17-S", use="stiffener", section=sk["section"], x0=xs, y0=-half, y1=half, length=2 * half, welds=[], bolts=[],
+                        boxes=[(xs, -half, z_sheet - a["t"], xs + a["d"], half, z_sheet), (xs, -half, z_sheet - a["d"], xs + a["t"], half, z_sheet)],
+                        galvanised=False))
+        for p in out:
+            a = ang[p["section"]]
+            p["mass_kg"] = a["mass_kg_per_m"] * p["length"] / 1000
+            p["area_m2"] = (4 * a["d"] - 2 * a["t"]) * p["length"] / 1e6 if p["galvanised"] else 0.0
         return out
 
     @property
@@ -575,7 +673,7 @@ class Chassis:
             r = rows.setdefault(m.sec.t, dict(t=m.sec.t, area_m2=0.0, kg_per_m2=rate(m.sec.t)))
             r["area_m2"] += m.area_m2
         for f in self.fittings:
-            if f.kind in ("plate", "tube"):
+            if f.kind in ("plate", "tube", "angles"):
                 r = rows.setdefault(f.t, dict(t=f.t, area_m2=0.0, kg_per_m2=rate(f.t)))
                 r["area_m2"] += f.area_m2_each * f.qty
         for r in rows.values():
@@ -585,7 +683,7 @@ class Chassis:
         return dict(rows=sorted(rows.values(), key=lambda r: r["t"]), area_m2=tot_a, mass_kg=tot_m)
 
     def steel_mass(self) -> float:
-        return sum(m.mass_kg for m in self.members) + sum(f.mass_kg for f in self.fittings if f.kind in ("plate", "tube"))
+        return sum(m.mass_kg for m in self.members) + sum(f.mass_kg for f in self.fittings if f.kind in ("plate", "tube", "angles"))
 
     # -- suspension geometry (report 11 section 5.1) -------------------
     def _suspension(self) -> list[dict]:
@@ -1134,6 +1232,8 @@ def fitting_boxes(ch: Chassis, f: Fitting) -> list[tuple]:
                  max(x for x, _ in g["outline"]), max(y for _, y in g["outline"]), g["z"] + h) for g in ch.hinge_gussets()]
     if spec.get("poses") == "hinge_cheeks":                   # each hinge cheek's plate (xt_hinges)
         return [c["box"] for c in ch.hinge_cheeks()]
+    if f.kind == "angles":                                    # the shear panel's welded angles, each leg (panel_pieces)
+        return [b for p in ch.panel_pieces() if p["galvanised"] for b in p["boxes"]]
     if f.kind == "strip":
         return []
     if f.kind == "plate":

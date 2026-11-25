@@ -238,8 +238,8 @@ def ct101(prj, model, bom, checks, reg, dwg):
     rows = []
     for r in chs["schedule"]:
         rows.append([r["section"], SHORT.get(r["role"], r["name"])[:46], f"{r['qty']}", f"{r['length_mm'] / 1000:.2f}", f"{r['mass_kg']:.1f}"])
-    plates = sum(f["mass_kg"] for f in chs["fittings"] if f["kind"] in ("plate", "tube"))
-    rows.append(["PLATE", "Plates, lugs, pads, gussets (CT-102, CT-103)", f"{sum(f['qty'] for f in chs['fittings'] if f['kind'] in ('plate', 'tube'))}",
+    plates = sum(f["mass_kg"] for f in chs["fittings"] if f["kind"] in ("plate", "tube", "angles"))
+    rows.append(["PLATE", "Plates, lugs, pads, gussets (CT-102, CT-103)", f"{sum(f['qty'] for f in chs['fittings'] if f['kind'] in ('plate', 'tube', 'angles'))}",
                  "-", f"{plates:.1f}"])
     rows.append(["HDG", "Galvanising, inside and out", "-", f"{chs['galvanising']['area_m2']:.1f} m2", f"{chs['galvanising']['mass_kg']:.1f}"])
     yt = S.table(sh, 230.0, 247.0, [("SECTION", 30), ("MEMBERS", 84), ("QTY", 12), ("TOTAL m", 26), ("kg", 28)], rows, size=1.7, row_h=3.2,

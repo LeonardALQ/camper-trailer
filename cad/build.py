@@ -117,7 +117,7 @@ def _cut_list(chs: dict, path: Path):
             w.writerow([m["id"], m["name"], m["section"], round(m["length_mm"]), 1, round(m["mass_kg"], 2), round(m["mass_kg"], 2),
                         m["note"] or ""])
         for f in chs["fittings"]:
-            if f["kind"] in ("plate", "tube"):
+            if f["kind"] in ("plate", "tube", "angles"):
                 size = " x ".join(f"{v:g}" for v in f["dims"]) + " plate" if f["dims"] else f["name"].split(",")[1].strip()
                 w.writerow([f["id"], f["name"], size, "", f["qty"], round(f["mass_each_kg"], 2), round(f["mass_kg"], 2), f["source"]])
         w.writerow(["", "DRAFT, NOT FOR CONSTRUCTION until the engineer reviews CHASSIS.md", "", "", "", "", "", ""])

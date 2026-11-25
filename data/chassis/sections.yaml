@@ -752,6 +752,20 @@ sections:
     source: "Computed with square corners and no root fillet (x and y are the axes parallel to the legs through the centroid; Zx to the leg tip; J = sum of b t^3 / 3). A hot-rolled angle has a root radius that adds about 1 to 3 percent to A and I. Not checked against a published table."
     published_check: null
     use: "Floor edge trim, mudguard and stone guard brackets, cable trays. Not for primary members: an open section has almost no torsional stiffness (J 0.00396 e6 mm4 against 1.50 e6 for RHS 150x50x3)."
+  - id: EA_25x25x3
+    designation: "EA 25x25x3"
+    shape: equal angle
+    d: 25
+    b: 25
+    t: 3
+    ro: 0
+    mass_kg_per_m: 1.107
+    A_mm2: 141
+    grade: C450L0 cold-formed DuraGal angle, in-line galvanised
+    fy_mpa: 450
+    source: "Computed with square corners and no root fillet, A = (2 x 25 - 3) x 3. Not checked against a published table."
+    published_check: null
+    use: "The shear panel PNL-1's front edge stiffener under the 3 mm sheet (CH-P17), bolted with the sheet, not welded to the frame."
   - id: EA_40x40x4
     designation: "EA 40x40x4"
     shape: equal angle
