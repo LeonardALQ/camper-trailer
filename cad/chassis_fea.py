@@ -1053,6 +1053,7 @@ class Analysis:
                             length=d, runs=[h["use"]], rows=[f"{h['member']} {h['use']}"], frame=frame, wall=f"{word} web",
                             open=False, fu=rules["fu"]["raiser" if sec.fy < 400 else "rail"], fy=sec.fy, box=hb, edge_mm=edge, edge_need=edge_need,
                             toe_mm=gap, toe_need=rules["toe_factor"] * d, toe_weld=weld, galv=True, placement_only=frame is None,
+                            u_web=u_end, z_under=float(h.get("z_under", z + sec.d / 2)),
                             net=dict(A=A, I=I, I_weak=Iw, Aw=sec.Aw_depth - strip, Aw_width=sec.Aw_width,
                                      z_lever=max(abs(z - d / 2 - zc), abs(z + d / 2 - zc)), y_lever=sec.b / 2,
                                      k_torsion=(sec.d - sec.t) / max(sec.d - sec.t - d, 1.0),
@@ -1098,7 +1099,7 @@ class Analysis:
         fy = min(ch.role_sec["rail"].fy, ch.role_sec["raiser"].fy)          # the composite rail's checks use the raiser's fy
         out = []
         for k, h in enumerate(sites):
-            row = {key: h[key] for key in ("id", "member", "face", "x", "y", "z", "d", "length", "runs", "wall", "open") if key in h}
+            row = {key: h[key] for key in ("id", "member", "face", "x", "y", "z", "d", "length", "runs", "wall", "open", "u_web", "z_under") if key in h}
             if h.get("open"):
                 out.append(dict(row, ok=True, static_ok=True, place_ok=True, util=0.0))
                 continue
