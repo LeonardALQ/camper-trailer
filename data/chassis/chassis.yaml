@@ -187,7 +187,7 @@ fittings:
      at: [front_recovery_x, 0, db_z - 30], side_y: "rail_c + rail_w / 2 + 10"}
   - {id: CH-P05, plane: xz, name: "Rear recovery tongue, 20 mm plate through a slot in the rear crossmember, 22 mm hole", kind: plate, l: 260, w: 120, t: 20, qty: 2,
      at: [body_x1 - 70, 0, rail_underside_z + 75], side_y: "rail_c - rail_w / 2 - 10"}
-  - {id: CH-P06, name: "Jacking pad, 100 x 100 x 10 with a locating cup, on the XT centre crossmember's underside against the rail's inner face", kind: plate, l: 100, w: 100, t: 10, qty: 2,
+  - {id: CH-P06, name: "Jacking pad, 100 x 100 x 10 with a locating cup, on the XT centre crossmember's underside 11 mm off the rail's inner face, clear of the hinge cheek", kind: plate, l: 100, w: 100, t: 10, qty: 2,
      at: ["axle_x + xt_centre_front + xm_w / 2", 0, rail_underside_z - 5], side_y: "rail_c - rail_w / 2 - 61"}
   - {id: CH-P07, plane: yz, name: "Shock support plate, 5 mm, full height on the XT rear shock crossmember", kind: plate, l: 300, w: 150, t: 5, qty: 2,
      at: ["axle_x + xt_rear_shock_front - 3", 0, "rail_underside_z + 75"], side_y: "rail_c - 200"}
