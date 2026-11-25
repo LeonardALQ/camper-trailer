@@ -317,7 +317,13 @@ def tank_guard(fr, V, sp, b):
     cuts = [0.0] + [u for g in sorted(sp.get("gaps", [])) for u in g] + [W]
     pieces = list(zip(cuts[::2], cuts[1::2]))
     pn = (b.extra.get("panel") if b is not None else None)
-    return [("guard plate", fr.box(u0, D / 2 - half, 0, u1 - u0, 2 * half, H), ALU, 1.0) for u0, u1 in (pieces[:-1] if pn else pieces)]
+    plates = [fr.box(u0, D / 2 - half, 0, u1 - u0, 2 * half, H) for u0, u1 in (pieces[:-1] if pn else pieces)]
+    openings = (b.extra.get("openings") or []) if b is not None else []
+    if openings and plates:                  # the front piece cut round the airbags and shocks over their travel (Layout.guard_openings)
+        wbox, _ = _world(fr)
+        z0 = fr.bx[2]
+        plates[0] = plates[0].cut(*[wbox((x0, y0, z0 - 1, x1, y1, z0 + H + 1)) for x0, y0, x1, y1 in openings])
+    return [("guard plate", p, ALU, 1.0) for p in plates]
 
 
 @product("shear_panel")

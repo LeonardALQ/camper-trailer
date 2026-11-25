@@ -132,7 +132,7 @@ station_roles:
 # (CHS-08U, I2-87): at 4 mm and 3 mm their webs' holes read 1.14 and 1.19 of 0.85 fu there
 station_sections:
   XT front hinge: RHS_150x50x6     # revision N (I2-88): with the hinge cheeks, for a held wheel's pull through its hinges
-  XT centre: RHS_150x50x5          # and the rear tank bay's shear panel at the 78.5 kN ultimate
+  XT centre: RHS_150x50x6          # and the rear tank bay's shear panel at the 78.5 kN ultimate, 6 mm since the hinge bars' weld runs stand where sheet 3 draws them (I2-101)
   XT rear shock: RHS_150x50x6
   rear: RHS_150x50x6
 
@@ -201,8 +201,11 @@ fittings:
      at: [body_x1 - 70, 0, rail_underside_z + 75], side_y: "rail_c - rail_w / 2 - 10"}
   - {id: CH-P06, name: "Jacking pad, 100 x 100 x 10 with a locating cup, on the XT centre crossmember's underside 11 mm off the rail's inner face, clear of the hinge cheek", kind: plate, l: 100, w: 100, t: 10, qty: 2,
      at: ["axle_x + xt_centre_front + xm_w / 2", 0, rail_underside_z - 5], side_y: "rail_c - rail_w / 2 - 61"}
+  # CH-P07 stands flush on the front face of each crossmember `stations` names (Chassis.shock_plates), `side_y` its middle from
+  # the centreline, so each shock's bracket stands on its face (FX21-MRG found the rear brackets 0.9 mm into them, a
+  # rounding of the plate's place against the member's rounded station)
   - {id: CH-P07, plane: yz, name: "Shock support plate, 5 mm, full height on the XT rear shock crossmember", kind: plate, l: 300, w: 150, t: 5, qty: 2,
-     at: ["axle_x + xt_rear_shock_front - 3", 0, "rail_underside_z + 75"], side_y: "rail_c - 200"}
+     poses: shock_plates, stations: [XT rear shock], side_y: "rail_c - 200"}
   - {id: CH-P08, name: "Hinge crossmember gusset, SHS 50 x 50 x 3 at 45 degrees (TB 070), its ends cut at 45 degrees to bear on the crossmember's face and on the face of the hinge cheek beside it, welded all round, two behind each hinge crossmember and two ahead of the centre's", kind: tube, section: SHS_50x50x3, length: hinge_gusset_l, qty: 6,
      poses: hinge_gussets, fat: null}
   - {id: CH-P16, name: "Hinge cheek, 10 mm, 150 x 108.5 beside each XT hinge crossmember on the rail's inner face, with a step where a hinge gusset lands on it, 300 mm at the front hinge and 140 mm at the XT centre, welded to the web and the hinge bar", kind: plate, l: 150, w: 108.5, t: 10, qty: 8,
@@ -378,13 +381,13 @@ fatigue_details:
   - {id: FAT-21, name: "Drawbar member's lap under the rail, opened to 2.5 mm and stitch welded, the rail's bottom wall at the stitch ends", iiw: "324", fat: 36, stress: rail_level, z: rail_underside_z, where: {from: body_x0, to: db_end_x}}
   # FAT-22 and FAT-23 (I2-95): the hinge cheeks CH-P16 and the shear panel's angles CH-P17 are welded along the rail's inner
   # web and its bottom corner, never across it, so each end of their welds is the end of a longitudinal attachment on the
-  # rail, IIW 521 by its length along the rail: FAT 63 for a cheek's 150 to 300 mm, FAT 50 over 300 mm for the front
-  # hinge's stepped cheeks' 340 mm (FAT-24, I2-99) and for an angle's 595 mm,
+  # rail, IIW 521 by its length along the rail: FAT 63 for a cheek's 150 to 300 mm, its step's included (the front
+  # hinge's stepped cheeks 265 mm since their steps stand clear of the airbags' brackets, so FAT-24 went), FAT 50 over
+  # 300 mm for an angle's 595 mm,
   # read on the composite rail's extreme fibre at each end, as FAT-16 reads the steadies' brackets. The weld along the
   # rail's corner is a flare bevel weld, classed here as the fillet it replaces (est.). The angles start 25 mm behind the
   # XT centre's rear cheeks, a set gap, so the two parts' welds end apart and each end is read on its own
   - {id: FAT-22, name: "Hinge cheek's welds along the rail's inner web and bottom corner, their ends (l 150 to 300 mm)", iiw: "521", fat: 63, stress: rail_extreme, where: cheek_ends_x}
-  - {id: FAT-24, name: "Hinge cheek with its step at the front hinge, its welds' ends along the rail's inner web (l over 300 mm)", iiw: "521", fat: 50, stress: rail_extreme, where: long_cheek_ends_x}
   - {id: FAT-23, name: "Shear panel angle's welds along the rail's inner web and bottom corner, their ends (l over 300 mm)", iiw: "521", fat: 50, stress: rail_extreme, where: panel_angle_ends_x}
 
 # Holes the runs make in the chassis members (data/services.yaml `holes`, the services' list, read here only). A hole is
@@ -504,7 +507,8 @@ sealed_overlaps:
 # Cruisemaster's 33XT AIR sheets 2 and 3: each hinge bar lies square to the rail under its hinge crossmember, its long end
 # flush with the rail's outside, welded to the crossmember only, with 6 mm fillets in three 80 mm runs a side ("3-80",
 # report 11 line 111), and "Weld should not continue under main chassis rail". `runs` are the runs' centres from the
-# rail's inner face (est., 80 mm runs at 100 mm centres from 10 mm inboard). The frame model ties each hinge's pivot to
+# rail's inner face where sheet 3's isometric view draws them, the first from that face and the last to the bar's inboard
+# end (est., scaled at the runs' own 80 mm, I2-101). The frame model ties each hinge's pivot to
 # its crossmember at those runs, so the hinge's force and moment reach the rail through the crossmember's end, beside its
 # holes, and through the gussets. The gussets CH-P08 are SHS 50 x 50 x 3 at 45 degrees in plan across the corner between
 # the crossmember's face and the rail's inner face, inside sheet 2's 250 mm of the rail, their axes `z_over_underside`
@@ -543,10 +547,10 @@ sealed_overlaps:
 # ahead of the front hinge crossmember are left out for the runs B-04 and K-10, so that crossmember is RHS 150 x 50 x 6.
 # The gussets' rail ends land behind the cheeks, and the jacking pads stand 61 mm inboard of the rail's inner face.
 xt_hinges:
-  bar: {leg: 6, run: 80, runs: [50, 150, 250]}
+  bar: {leg: 6, run: 80, runs: [40, 221, 400]}
   gusset: {length: hinge_gusset_l, faces: [1, -1], omit: [CM-04KF, CM-04RF], z_over_underside: 69, weld: {leg: 5, acute_leg: 5, obtuse_throat: 3}}
   cheek: {t: 10, l: 150, h: 108.5, below: 26, leg: 6, bar_d: 26, bar_leg: 10, corner: 0.3125, cope: 12, omit: [],
-          under_gusset: {l: {XT front hinge: 300, XT centre: 140}, z0: 39, z1: 99.5}}
+          under_gusset: {l: {XT front hinge: 150, XT centre: 140}, z0: {XT front hinge: 22.5, XT centre: 39}, z1: {XT front hinge: 115.5, XT centre: 99.5}}}
 
 # The XT arms' limits in LC8a (I2-94). An airbag cannot pull. Where an arm's balance about its hinge asks less of its
 # airbag than the airbag gives with the arm at full droop, its force at ride (the weight's) less the air spring's rate
@@ -584,7 +588,7 @@ xt_arms:
     bar: {d: 44, inboard: 450}
     plates: {y_in: [34, 151, 311, 427], t: 8, l: 82, below: 134}
     hinge: {y_in: [30, 431]}
-    airbag: {dx: 8, y_in: 89, d: 190, h: 152}
+    airbag: {dx: 8, y_in: 58, d: 194, h: 152}
     bag_bracket: {l: 300, reach: 100}
     shock: {d: 70, eye: [67, -13], e: 40}
     shock_bracket: {w: 123, y_in: 39, out: 50, z: 32, h: 77}

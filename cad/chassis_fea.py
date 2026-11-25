@@ -320,21 +320,21 @@ class Analysis:
 
     def droop_limits(self) -> dict:
         """Each XT arm's droop limit (xt_arms `droop`): its shock absorber at full extension (est., Cruisemaster's XT kit
-        has no droop strap), from its eye on the arm at the hub to its bracket on the next crossmember's front face, the
-        front arms' on the XT centre crossmember and the rear arms' on the XT rear shock crossmember, at the crossmember's
-        mid-height and the shock support plate's Y. `u` is the unit vector from the arm's eye to the bracket and `lever`
-        the moment about the pivot's Y axis of a unit pull along it, negative for a pull that lifts the hub."""
+        has no droop strap), along the shock's own line at ride (Chassis.shock_line), from its lower eye on the arm, 67 mm
+        behind and 13 mm under the hub, to its top eye in its bracket's inboard clevis 40 mm off the support plate CH-P07,
+        the front arms' on the front shocks' own crossmember and the rear arms' on the XT rear shock crossmember. `u` is the
+        unit vector from the arm's eye to the bracket and `lever` the moment about the pivot's Y axis of a unit pull along
+        it, negative for a pull that lifts the hub. The pull reaches the frame at the top eye, its moment about the
+        crossmember's nodes kept (_apply)."""
         if getattr(self, "_droop", None):
             return self._droop
-        ch, V = self.ch, self.ch.V
+        ch = self.ch
         d = ch.data["xt_arms"]["droop"]
         cms = {m.station: m for m in ch.members if m.role.startswith("cm")}
         out = {}
         for w in ch.suspension:
             cm = cms[d["to"][w["axle"]]]
-            y = w["side"] * ch.ev(d["y"])
-            arm = np.array([w["hub"][0], y, w["hub"][2]])
-            frame = np.array([cm.p0[0] - cm.sec.b / 2, y, V["rail_underside_z"] + d["z_over_underside"]])
+            arm, frame = (np.array(p, float) for p in ch.shock_line(w))
             u = (frame - arm) / np.linalg.norm(frame - arm)
             lever = np.cross(arm - np.asarray(w["pivot"], float), u)[1]
             out[w["id"]] = dict(arm=arm, frame=frame, u=u, lever=lever, cm=cm.id, length=float(np.linalg.norm(frame - arm)))
@@ -1078,12 +1078,14 @@ class Analysis:
         chord face plastification of an RHS T or Y joint (2nd edition, Table 3.1): N* = fy t squared / (1 - beta) (2 eta +
         4 sqrt(1 - beta)) Qf for a branch square to the face, beta and eta its sides over the face's width, and for the
         gusset at 45 degrees on the bare web N1* = fy t squared / ((1 - beta) sin theta) (2 eta / sin theta + 4 sqrt(1 -
-        beta)) Qf. Where the gusset lands on its cheek's step, the 10 mm step is taken as a rigid patch on the web, its
-        height and length the branch's sides, and the gusset's push normal to the web against it (est.: the patch is not
-        the guide's full-width reinforcing plate). Qf = (1 - |n|) to the power 0.6 - 0.5 beta, n the rail's own normal
-        stress at the gusset's height over its fy, taken as compression whatever its sign (est.). Returns the gusset's
-        axial force at that end `n1`, the capacity in the gusset's axis `cap`, n, Qf and the step's two welds' stress under
-        the gusset's pull."""
+        beta)) Qf. Where the gusset lands on its cheek's step, the step is read as the plate it is (I2-102): a patch on the
+        web of the step's height and of the length its own bending spreads the gusset's push normal to the web over, the
+        gusset's cut face along the web, a = its width times root 2, and a cantilever c each side, the web's reaction
+        uniform under it, so N c squared = 2 Mp (a + 2 c) with the step's plastic moment Mp = fy t squared h / 4, and at
+        most the step's own length (est.: the patch is not the guide's full-width reinforcing plate). Qf = (1 - |n|) to
+        the power 0.6 - 0.5 beta, n the rail's own normal stress at the gusset's height over its fy, taken as compression
+        whatever its sign (est.). Returns the gusset's axial force at that end `n1`, the capacity in the gusset's axis
+        `cap`, n, Qf, the patch's length `patch` and the step's two welds' stress under the gusset's pull over it."""
         rail = self.ch.role_sec["rail"]
         sec = self.ch.sections[next(f for f in self.ch.data["fittings"] if f["id"] == "CH-P08")["section"]]
         ck = self.ch.data["xt_hinges"]["cheek"]
@@ -1092,19 +1094,24 @@ class Analysis:
         sig = self.normal_at_level(res, f"RL-{SIDES[g['side']]}", g["p1"][0], g["p1"][2])
         n = min(0.99, sig / fy0)
         n1 = abs(float(res.forces[k][6]))
-        if g.get("on_cheek"):                            # the step spreads it: a rigid patch on the web, its push normal to it
-            ug = ck["under_gusset"]
-            ls = ug["l"][next(m.station for m in self.ch.members if m.id == g["cm"])] if isinstance(ug["l"], dict) else ug["l"]
-            bb, ee = (ug["z1"] - ug["z0"]) / b0, ls / b0
+        if g.get("on_cheek"):                            # the step spreads it as far as its own bending lets it (I2-102)
+            station = next(m.station for m in self.ch.members if m.id == g["cm"])
+            ls, z0, z1 = (self.ch.step_size(station, k) for k in ("l", "z0", "z1"))
+            a = sec.b * math.sqrt(2)                     # the gusset's cut face along the web
+            mp = self.ch.data["material"]["plate_fy"] * ck["t"] ** 2 * (z1 - z0) / 4
+            push = max(n1 * math.sin(th), 1.0)
+            c = (4 * mp + math.sqrt(16 * mp ** 2 + 8 * push * mp * a)) / (2 * push)
+            patch = min(ls, a + 2 * c)
+            bb, ee = (z1 - z0) / b0, patch / b0
             qf = (1 - n) ** (0.6 - 0.5 * bb)
             cap = fy0 * t0 ** 2 / (1 - bb) * (2 * ee + 4 * math.sqrt(1 - bb)) * qf / math.sin(th)
-            welds = n1 * math.sin(th) / (2 * ls * 0.7 * ck["leg"])
+            welds = n1 * math.sin(th) / (2 * patch * 0.7 * ck["leg"])
         else:
             bb, ee = sec.d / b0, sec.b / b0
             qf = (1 - n) ** (0.6 - 0.5 * bb)
             cap = fy0 * t0 ** 2 / ((1 - bb) * math.sin(th)) * (2 * ee / math.sin(th) + 4 * math.sqrt(1 - bb)) * qf
-            welds = 0.0
-        return dict(n1=n1, cap=cap, n=n, qf=qf, sigma=sig, welds=welds)
+            welds, patch = 0.0, None
+        return dict(n1=n1, cap=cap, n=n, qf=qf, sigma=sig, welds=welds, patch=patch)
 
     def gusset_welds(self) -> dict:
         """CHS-16: the hinge gussets' end welds in every load case, the largest throat stress round either cut end of any
@@ -1125,7 +1132,8 @@ class Analysis:
         wl, we = max(self.gusset_web_env.items(), key=lambda kv: kv[1]["util"] * fac[kv[0]])
         return _local("Hinge gussets' end welds and the rail's web under them (CH-P08)", rows,
                       f"{e['gusset']} in {lc_id}, {e['case']}, and on the web {we['n1'] / 1000:.1f} kN along {we['gusset']} against "
-                      f"{we['cap'] / 1000:.1f} kN, Qf {we['qf']:.2f} for the rail's {we['sigma']:.0f} MPa, in {wl}, {we['case']}")
+                      f"{we['cap'] / 1000:.1f} kN" + (f" over its step's {we['patch']:.0f} mm" if we.get("patch") else "") +
+                      f", Qf {we['qf']:.2f} for the rail's {we['sigma']:.0f} MPa, in {wl}, {we['case']}")
 
     def cheek_check(self) -> dict:
         """CHS-14 (I2-92): the hinge cheeks' welds (CH-P16) in every LC8a case at 58.9 kN and at the 78.5 kN ultimate, each

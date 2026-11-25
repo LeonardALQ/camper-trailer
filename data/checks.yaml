@@ -631,13 +631,6 @@ trailer_checks:
     severity: report
     inputs: []
     why: "Review I2-95. Report 11 LC10 and section 3.4. IIW-1823-07 detail 521, a longitudinal attachment fillet welded along the member: FAT 63 for 150 to 300 mm along it. Each 10 mm hinge cheek CH-P16 is welded to the rail's inner web along its top edge and along the rail's bottom corner, never across the rail, so each end of its welds is the end of such an attachment, read on the composite rail's extreme fibre at the cheek's ends as FAT-16 reads the steadies' brackets, its step's ends among them where it has one (I2-99). The weld along the corner is a flare bevel weld, classed here as the fillet it replaces (est.). The shear panel's angles start 25 mm behind the XT centre's rear cheeks, so their welds end apart from the cheeks' (FAT-23). The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
-  - id: FAT-24
-    title: "Fatigue, Hinge cheek with its step at the front hinge, its welds' ends along the rail's inner web (l over 300 mm)"
-    type: chassis_fatigue
-    item: FAT-24
-    severity: report
-    inputs: []
-    why: "Review I2-99. IIW-1823-07 detail 521 by the attachment's length: the front hinge's rear cheeks carry a 300 mm step where the gussets behind the front hinge crossmember land, so each runs 340 mm along the rail and falls in FAT 50 over 300 mm, read on the composite rail's extreme fibre at its ends and its step's ends, as FAT-22 reads the shorter cheeks. The frequent range must stay under the CAFL, 0.585 FAT, and the occasional range must give a Miner damage of 0.5 or less (report 11 section 3.4). Planning method, for the engineer to accept."
   - id: FAT-23
     title: "Fatigue, Shear panel angle's welds along the rail's inner web and bottom corner, their ends (l over 300 mm)"
     type: chassis_fatigue

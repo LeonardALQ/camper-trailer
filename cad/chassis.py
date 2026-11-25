@@ -420,6 +420,8 @@ class Chassis:
                 at = [g["centre"] for g in self.hinge_gussets()]
             elif f.get("poses") == "hinge_cheeks":    # each cheek's mass at its centre (xt_hinges)
                 at = [c["centre"] for c in self.hinge_cheeks()]
+            elif f.get("poses") == "shock_plates":    # each shock support plate flush on its crossmember's front face
+                at = [p["centre"] for p in self.shock_plates()]
             elif "side_y" in f:
                 sy = self.ev(f["side_y"])
                 xs = [base[0]] if "rear_x" not in f else [base[0], self.ev(f["rear_x"])]
@@ -692,8 +694,8 @@ class Chassis:
                 boxes, area = [box], ck["l"] * ck["h"]
                 if gusset:                              # the step where the gusset lands, centred on its footprint (I2-99)
                     xc = face + e * (self.ev(g["length"]) / math.sqrt(2) - ck["t"])
-                    za, zb = V["rail_underside_z"] + big["z0"], V["rail_underside_z"] + big["z1"]
-                    ls = big["l"][cm.station] if isinstance(big["l"], dict) else big["l"]
+                    ls, z0s, z1s = (self.step_size(cm.station, k) for k in ("l", "z0", "z1"))
+                    za, zb = V["rail_underside_z"] + z0s, V["rail_underside_z"] + z1s
                     step = (xc - ls / 2, y0, za, xc + ls / 2, y0 + ck["t"], zb)
                     boxes.append(step)
                     over = max(0.0, min(box[3], step[3]) - max(box[0], step[0])) * max(0.0, min(box[5], step[5]) - max(box[2], step[2]))
@@ -707,6 +709,12 @@ class Chassis:
                                 centre=tuple((box[i] + box[i + 3]) / 2 for i in range(3)), l=l, h=h, boxes=boxes, area=area, face=face, way=e,
                                 gusset=f"CH-P08-{gid}" if gusset else None))
         return out
+
+    def step_size(self, station: str, key: str) -> float:
+        """A hinge cheek's step at a hinge crossmember's station (xt_hinges `cheek` `under_gusset`): its length `l` along
+        the rail, or its lower and upper edges `z0` and `z1` over the rail's underside, each one figure or one per station."""
+        v = self.data["xt_hinges"]["cheek"]["under_gusset"][key]
+        return float(v[station] if isinstance(v, dict) else v)
 
     def hinge_weld_ys(self, cm: Member) -> list[float]:
         """The Y of each run of a hinge bar's welds to its crossmember (xt_hinges `bar`), both sides, centres measured from
@@ -782,11 +790,24 @@ class Chassis:
         upper = (cm.p0[0] - cm.sec.b / 2 - plate - sh["e"], y, V["rail_underside_z"] + d["z_over_underside"])
         return lower, upper
 
+    def shock_plates(self) -> list[dict]:
+        """The shock support plates CH-P07, a pair flush on the front face of each crossmember the data's `stations` names,
+        `side_y` their middles from the centreline, full crossmember height: each with its member, side, box and centre."""
+        spec = next(f for f in self.data["fittings"] if f["id"] == "CH-P07")
+        sy, out = self.ev(spec["side_y"]), []
+        for station in spec["stations"]:
+            cm = next(m for m in self.members if m.station == station and m.role.startswith("cm"))
+            face, (_, _, z0, _, _, z1) = cm.p0[0] - cm.sec.b / 2, cm.box()
+            for s in (-1, 1):
+                box = (face - spec["t"], s * sy - spec["l"] / 2, z0, face, s * sy + spec["l"] / 2, z1)
+                out.append(dict(id=f"CH-P07-{cm.id}{SIDES[s]}", member=cm.id, side=s, box=box, face=face,
+                                centre=tuple((box[i] + box[i + 3]) / 2 for i in range(3))))
+        return out
+
     def shock_plate_t(self, cm) -> float:
         """The thickness of the shock support plate CH-P07 on crossmember cm's front face, 0 where the data puts none."""
-        f = next(f for f in self.fittings if f.id == "CH-P07")
-        face = cm.p0[0] - cm.sec.b / 2
-        return f.t if any(abs(p[0] + f.t / 2 - face) < f.t for p in f.at) else 0.0
+        f = next(f for f in self.data["fittings"] if f["id"] == "CH-P07")
+        return float(f["t"]) if any(p["member"] == cm.id for p in self.shock_plates()) else 0.0
 
     def xt_parts(self, steps: int = 12, slab: float = 20.0) -> list[dict]:
         """The XT kit's parts between the rails at their places in 33XT AIR sheets 2 to 4 (xt_arms `parts`, est.), the one
@@ -904,7 +925,6 @@ class Chassis:
                     rear_tongue_x=V["body_x1"] - 70, front_recovery_x=V["front_recovery_x"], root_gusset_toe_x=V["root_gusset_toe_x"],
                     steady_x=sorted({p["x"] for p in self.steady_poses()}),
                     cheek_ends_x=sorted({x for c in self.hinge_cheeks() if c["l"] <= 300.0 for b in c["boxes"] for x in (b[0], b[3])}),
-                    long_cheek_ends_x=sorted({x for c in self.hinge_cheeks() if c["l"] > 300.0 for b in c["boxes"] for x in (b[0], b[3])}),
                     panel_angle_ends_x=sorted({x for p in self.panel_pieces() if p["use"] == "rail" for x in (p["x0"], p["x1"])}))
 
     # -- the frame model ----------------------------------------------
@@ -1401,6 +1421,8 @@ def fitting_boxes(ch: Chassis, f: Fitting) -> list[tuple]:
                  max(x for x, _ in g["outline"]), max(y for _, y in g["outline"]), g["z"] + h) for g in ch.hinge_gussets()]
     if spec.get("poses") == "hinge_cheeks":                   # each hinge cheek's plate (xt_hinges)
         return [b for c in ch.hinge_cheeks() for b in c["boxes"]]
+    if spec.get("poses") == "shock_plates":                   # flush on their crossmembers' front faces
+        return [p["box"] for p in ch.shock_plates()]
     if f.kind == "angles":                                    # the shear panel's welded angles, each leg (panel_pieces)
         return [b for p in ch.panel_pieces() if p["galvanised"] for b in p["boxes"]]
     if f.kind == "strip":

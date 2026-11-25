@@ -272,6 +272,7 @@ class Layout:
                 if pn:
                     spec = next(f for f in self.chassis.data["fittings"] if f["id"] == "CH-P17")
                     b.extra["panel"] = dict(sheet=pn[0]["sheet"], t=pn[0]["t"], z_top=self.V["rail_underside_z"] - spec["drop"])
+                b.extra["openings"] = self.guard_openings(b)   # the front piece's openings round the kit, for its model
         ids = [b.iid for b in self.blocks]
         dup = {i for i in ids if ids.count(i) > 1}
         if dup:
@@ -567,6 +568,27 @@ class Layout:
                             inner_area=max(0.0, inner) ** 2 / 2, inner_z=(gz0 - t, gz1 + t)))
         out += self._corner_chamfers(b, clear, t)
         out += self._part_notches(b, clear, t)
+        return out
+
+    def guard_openings(self, b, clear: float = 10.0) -> list[tuple]:
+        """The openings in the front tank's guard, UF-03's piece ahead of its first gap, round the XT kit's parts that pass
+        through its sheet over the arms' travel (Chassis.xt_parts): the front airbags and the front shocks. Each opening is
+        a part's boxes where they cross the sheet's height, grown by `clear`, FIT-03's 10 mm, in plan and cut to the piece,
+        (x0, y0, x1, y1). A part box that reaches the piece's side opens it to that edge."""
+        it = next(i for i in self.td["items"] if i["id"] == "UF-03")
+        gaps = sorted(self.P.eval(it["model"].get("gaps", []), {}))
+        half = self.P.eval(it["model"].get("half", "rail_in"), {})
+        x0, _, z0, x1, _, z1 = b.box
+        px1 = x0 + gaps[0][0] if gaps else x1
+        out = []
+        for p in (p for p in self.xt_parts() if p["id"].startswith(("XT-BAG-", "XT-SHOCK-"))):   # the parts that move through it
+            rects = [(bx[0] - clear, bx[1] - clear, bx[3] + clear, bx[4] + clear) for bx in p["boxes"] if bx[2] < z1 and bx[5] > z0]
+            if not rects:
+                continue
+            r = (max(min(q[0] for q in rects), x0), max(min(q[1] for q in rects), -half), min(max(q[2] for q in rects), px1),
+                 min(max(q[3] for q in rects), half))
+            if r[0] < r[2] and r[1] < r[3]:
+                out.append(tuple(round(v, 1) for v in r))
         return out
 
     def xt_parts(self) -> list[dict]:

@@ -403,6 +403,8 @@ def _notes(J: Joint) -> list[str]:
     sp = ch.shear_panels()[0]
     fix = sp["fixing"]
     groups = {}
+    steps = " AND ".join(f"{_n(ch.step_size(k, 'l'))} LONG AND {_n(ch.step_size(k, 'z0'))} TO {_n(ch.step_size(k, 'z1'))} OVER THE RAIL "
+                         f"AT THE {k.upper()}" for k in J.ck["under_gusset"]["l"])
     for b in sp["bolts"]:
         groups[b["group"]] = groups.get(b["group"], 0) + 1
     return [
@@ -414,10 +416,10 @@ def _notes(J: Joint) -> list[str]:
         f"RAIL'S R{_n(J.rail.ro)} BOTTOM CORNER, EFFECTIVE THROAT {_n(J.ck['corner'] * J.rail.ro)} (5/16 R, AISC 360 TABLE J2.2), NONE "
         f"ACROSS THE RAIL (TB 070), AND {_n(J.ck['bar_leg'])} FILLETS BOTH SIDES DOWN THE HINGE BAR'S FACE OVER ITS TOP "
         f"{_n(J.ck['bar_d'])} (CHS-14). OVER THE WEB EACH CHEEK'S END IS COPED {_n(J.ck['cope'])} x 45 DEG CLEAR OF {J.cm.id}'S "
-        f"{_n(J.cm_leg)} END FILLET, ITS WEB WELDS STOPPED THERE. A CHEEK BESIDE A GUSSET CARRIES A STEP "
-        f"{' AND '.join(f'{_n(v)} LONG AT THE {k.upper()}' for k, v in J.ck['under_gusset']['l'].items())} "
-        f"CENTRED ON THE GUSSET, {_n(J.ck['under_gusset']['z0'])} TO {_n(J.ck['under_gusset']['z1'])} OVER THE RAIL, {_n(J.ck['leg'])} FILLETS "
-        f"ALONG ITS TOP AND LOWER EDGES, THE GUSSET LANDING ON IT (CHS-16).",
+        f"{_n(J.cm_leg)} END FILLET, ITS WEB WELDS STOPPED THERE. A CHEEK BESIDE A GUSSET CARRIES A STEP CENTRED ON THE GUSSET, "
+        f"{steps}, "
+        f"{_n(J.ck['leg'])} FILLETS ALONG ITS TOP AND LOWER EDGES, THE GUSSET LANDING ON IT (CHS-16). THE FRONT HINGE'S STEPS END CLEAR OF "
+        f"THE FRONT AIRBAGS' TOP BRACKETS.",
         f"PANEL ANGLES CH-P17: EA 50x50x5, THE FLAT LEG {_n(pw['drop'])} UNDER THE MEMBER. A {_n(pw['weld']['leg'])} FILLET ALONG THE UPRIGHT "
         f"LEG'S TOP EDGE AND A FLARE BEVEL WELD ALONG THE MEMBER'S BOTTOM CORNER, THROAT {_n(pw['weld']['corner_throat'])} (est.). THE RAILS' "
         f"ANGLES START {_n(pw['rails']['gap'])} BEHIND THE CHEEKS SO THE WELDS END APART (FAT-22, FAT-23).",

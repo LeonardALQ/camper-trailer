@@ -360,6 +360,7 @@ drawings:
       - {rev: AH, date: 2026-11-25, description: "Memo: detail G gives LOC-04's 44.2 kN on one pad, the fatigue table re-read", drawn: Kiro, checked: "", approved: ""}
       - {rev: AI, date: 2026-11-25, description: "Memo: the notes' continuation lines hang under their text, wrapped by width", drawn: Kiro, checked: "", approved: ""}
       - {rev: AJ, date: 2026-11-25, description: "Memo: the fatigue table gains FAT-24, the stepped cheeks, on 2.85 mm rows", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AK, date: 2026-11-25, description: "Notice: FAT-24 gone, the front hinge's shorter stepped cheeks in FAT-22", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads
@@ -424,6 +425,7 @@ drawings:
       - {rev: B, date: 2026-11-25, description: "Notice: note 5, the front hinge now has both cheeks and its rear gussets", drawn: Kiro, checked: "", approved: ""}
       - {rev: C, date: 2026-11-25, description: "Memo: the notes' continuation lines hang under their text, wrapped by width", drawn: Kiro, checked: "", approved: ""}
       - {rev: D, date: 2026-11-25, description: "Notice: 4 mm sheet, R25 tongue roots, no stiffener, stepped coped cheeks", drawn: Kiro, checked: "", approved: ""}
+      - {rev: E, date: 2026-11-25, description: "Notice: the front hinge's steps 150 x 93, clear of the airbags' brackets", drawn: Kiro, checked: "", approved: ""}
   - number: CT-201
     title: Body shell
     subtitle: Kerb, road, front and rear walls, the fixed roof plan, the panels and every opening with its size
