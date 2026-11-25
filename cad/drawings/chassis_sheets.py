@@ -79,7 +79,7 @@ def _title(sh, dwg, reg, mass_note, scale, rev_model):
         size=dwg["size"], scale=scale, material="C450L0 RHS/SHS, PLATE GR 350, HDG", mass_note=mass_note,
         model_ref=f"chassis.step (ASM-CH rev {rev_model})", git=git_hash(), weld_note=WELD_NOTE)
     # the sheet's own layout leaves room for this many revision rows. The register (and the site's Drawings page) keeps every one
-    rows = {"CT-101": 5, "CT-102": 2, "CT-103": 2}.get(dwg["number"], 7)
+    rows = {"CT-101": 5, "CT-102": 2, "CT-103": 2, "CT-105": 2, "CT-106": 2}.get(dwg["number"], 7)
     S.revision_table(sh, [dict(rev=r["rev"], date=str(r["date"]), description=r["description"], drawn=r["drawn"],
                                checked=r["checked"], approved=r["approved"]) for r in dwg["revisions"]], max_rows=rows)
 
