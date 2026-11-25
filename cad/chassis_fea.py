@@ -647,7 +647,7 @@ class Analysis:
 
     def cheek_check(self) -> dict:
         """The hinge cheeks' welds (CH-P16) at the 78.5 kN ultimate pull, all of it along the trailer through one cheek, as a
-        held wheel puts it through the front road-side hinge, which has one: the `bar_leg` fillets each side of the cheek
+        held wheel puts it through a front hinge, which has one: the `bar_leg` fillets each side of the cheek
         down the hinge bar's front or rear face over the bar's top `bar_d` (est.), and the two `leg` fillets along the rail's
         web, which also take the pull's moment about the pivot's depth as a couple."""
         ch = self.ch

@@ -53,6 +53,7 @@ drawings:
       - {rev: AI, date: 2026-11-24, description: "Memo: labels clear of the medium and heavier lines, leaders added (I2-64)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AJ, date: 2026-11-24, description: "Axle spacing dimensioned under the ground, labels name their zones (I2-69)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AK, date: 2026-11-24, description: "Notice: tare 2,963 kg with growth, the axle at X 4,486 (I2-75)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AL, date: 2026-11-25, description: "Notice: the masses with the hinge cheeks and the rear bay's panel (I2-88)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-002
     title: Mass and centre of gravity
     subtitle: Every load case with growth, the axle window of H17, the CoG in elevation and across
@@ -85,6 +86,7 @@ drawings:
       - {rev: T, date: 2026-11-24, description: "Notice: the masses with the saddle and the fuse, axle at X 4,485.3 (I2-63)", drawn: Kiro, checked: "", approved: ""}
       - {rev: U, date: 2026-11-24, description: "Notice: the masses with the end plates 7 mm shorter, axle X 4,485.5 (I2-75)", drawn: Kiro, checked: "", approved: ""}
       - {rev: V, date: 2026-11-24, description: "Notice: the masses with the end plates' 10 mm slot, axle X 4,485.6 (I2-79)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: W, date: 2026-11-25, description: "Notice: the masses with the hinge cheeks and the rear bay's panel (I2-88)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-003
     title: Compliance
     subtitle: VSB1 items and the standards with the design figures, operating limits and the plate
@@ -237,6 +239,7 @@ drawings:
       - {rev: Z, date: 2026-11-24, description: "Notice: end plates 7 mm clear of the drawbar, data revision J (I2-75)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AA, date: 2026-11-24, description: "Notice: end plates 14 mm up, laps 2.5 open, data revision K (I2-79)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AB, date: 2026-11-25, description: "Notice: CM-06 and CM-08 RHS 150x50x6, LC8a at its 78.5 kN ultimate (I2-87)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AC, date: 2026-11-25, description: "Notice: hinge cheeks, CM-04 x6, CM-05 x5, rear bay shear panel (I2-88)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
@@ -306,6 +309,7 @@ drawings:
       - {rev: Y, date: 2026-11-24, description: "Notice: one rolled dip, K drains both webs, no vent, C, E, F true (I2-79)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Z, date: 2026-11-24, description: "Notice: every closed section drained and vented, the snipes open (I2-84)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AA, date: 2026-11-25, description: "Notice: note 2's apex cut, mitre lines, vents and approval (I2-89 to I2-91)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AB, date: 2026-11-25, description: "Notice: 8 mm fillets on the XT crossmember ends, hinge cheeks (I2-88)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads

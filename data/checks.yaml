@@ -391,7 +391,7 @@ trailer_checks:
     item: hinge_joints
     severity: fail
     inputs: []
-    why: "Review I2-88. Cruisemaster's 33XT AIR sheets weld each hinge bar to its hinge crossmember only, 6 mm fillets in three 80 mm runs a side, and not under the rail. The frame model ties each pivot to its crossmember at those runs (est., 80 mm runs at 100 mm centres from 10 mm inboard of the rail), and to the rail through the hinge's two 10 mm cheeks (CH-P16), with the 45 degree gussets TB 070 recommends either side of each hinge crossmember as members (CH-P08). This row reads the hinge crossmembers, the gussets, the cheeks and their holes in every case against that case's limit, LC8a at 58.9 kN and at 78.5 kN with one wheel held fast included, and FAT-03 and FAT-13 within their CAFL. TB 070 page 2 lets suspension crossmembers take holes only where their strength can be ensured, which this row reads, and Cruisemaster accepts the joint in writing before fabrication (CHASSIS.md, open point 15)."
+    why: "Review I2-88. Cruisemaster's 33XT AIR sheets weld each hinge bar to its hinge crossmember only, 6 mm fillets in three 80 mm runs a side, and not under the rail. The frame model ties each pivot to its crossmember at those runs (est., 80 mm runs at 100 mm centres from 10 mm inboard of the rail), and to the rail through the hinge's 10 mm cheeks (CH-P16), with the 45 degree gussets TB 070 recommends either side of each hinge crossmember as members (CH-P08). This row reads the hinge crossmembers, the gussets, the cheeks and their holes in every case against that case's limit, LC8a at 58.9 kN and at 78.5 kN with one wheel held fast included, and FAT-03 and FAT-13 within their CAFL. TB 070 page 2 lets suspension crossmembers take holes only where their strength can be ensured, which this row reads, and Cruisemaster accepts the joint in writing before fabrication (CHASSIS.md, open point 15)."
   - id: CHS-13
     title: The rear tank's bay as a shear panel, its 3 mm steel guard's shear and buckling and its bolts, in every case
     type: chassis_local
@@ -405,7 +405,7 @@ trailer_checks:
     item: hinge_cheeks
     severity: fail
     inputs: []
-    why: "Review I2-88. With one wheel held fast the whole pull along the trailer reaches one hinge. Each cheek is welded down the hinge bar's front or rear face by an 8 mm fillet each side over the bar's top 30 mm (est.), and to the rail's inner web by 6 mm fillets along its top edge and the rail's bottom corner, which also take the cheek's shear's moment about the pivot's 99 mm depth as a couple 82.5 mm apart. Each cheek takes its share of the largest shear the frame puts through its hinge's cheeks in LC8u, the front road-side hinge's one cheek all of its own. Each fillet's throat stress is held to AS 4100 9.7.3's 0.8 x 0.6 fuw."
+    why: "Review I2-88. With one wheel held fast the whole pull along the trailer reaches one hinge. Each cheek is welded down the hinge bar's front or rear face by a 10 mm fillet each side over the bar's top 26 mm (est.), and to the rail's inner web by 6 mm fillets along its top edge and the rail's bottom corner, which also take the cheek's shear's moment about the pivot's 99 mm depth as a couple 82.5 mm apart. The row takes the whole pull on one cheek, as at the two front hinges, which have their rear cheeks only. Each fillet's throat stress is held to AS 4100 9.7.3's 0.8 x 0.6 fuw."
   - id: CHS-09
     title: Holes the runs and the galvanising make in the frame's members, net section in LC1 to LC8b within each case's limit
     type: chassis_local
