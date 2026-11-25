@@ -261,8 +261,8 @@ def text_extent(s: str, size: float, bold: bool = False, anchor: str = "start") 
     the last, from its anchor for a start, or with the middle or the end of its letters' ink on the anchor for a middle
     or an end anchor (cairosvg.text). Each edge is the outer of the PDF's, in unhinted metrics, and the PNG's, in the
     metrics hinted at its pixel size, where each letter's advance is rounded to whole pixels, so the box holds the
-    letters in both. Rendered and read back at 1.2 to 5 mm, the PNG's ink lies inside it and within a pixel of its
-    right and left edges."""
+    letters in both. Rendered and read back at 0.95 to 5 mm, the PNG's ink never reaches more than half a pixel past
+    it (cad/tests/test_overrun.py)."""
     s = drawn(s)
     out = None
     for png in (False, True):
