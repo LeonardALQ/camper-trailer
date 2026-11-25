@@ -804,11 +804,12 @@ class Layout:
         return out
 
     def guard_pieces(self) -> list[tuple[str, tuple]]:
-        """The tanks' guard UF-03 as the 3D model draws it, each (name, box): the front tank's plate in the pieces its
-        model's `gaps` leave between the rails, `half` either side of the centreline over the guard's depth (tank_guard),
-        the piece behind the last gap being the rear bay's shear panel where the line carries it, and that panel's sheet
-        as the chassis data cuts it, each of its parts and tongues at the sheet's thickness under its angles' flat legs
-        (shear_panel)."""
+        """The tanks' guard UF-03 as the 3D model draws it, each (name, shape) as shape_gap reads it: the front tank's
+        plate in the pieces its model's `gaps` leave between the rails, `half` either side of the centreline over the
+        guard's depth (tank_guard), the first piece less the openings round the front airbags and shocks that the line
+        carries for its model (Layout.guard_openings) in convex pieces, the piece behind the last gap being the rear bay's
+        shear panel where the line carries it, and that panel's sheet as the chassis data cuts it, each of its parts and
+        tongues at the sheet's thickness under its angles' flat legs (shear_panel)."""
         from .model import products as PR
         from .trailer_model import model_specs
         b = next(b for b in self.blocks if b.id == "UF-03")
@@ -818,10 +819,16 @@ class Layout:
         cuts = [0.0] + [u for g in sorted(opts.get("gaps", [])) for u in g] + [W]
         pieces = list(zip(cuts[::2], cuts[1::2]))
         pn = b.extra.get("panel")
-        out = [("UF-03's front piece", (bx[0] + u0, yc - half, bx[2], bx[0] + u1, yc + half, bx[5])) for u0, u1 in (pieces[:-1] if pn else pieces)]
+        fronts = [(bx[0] + u0, yc - half, bx[2], bx[0] + u1, yc + half, bx[5]) for u0, u1 in (pieces[:-1] if pn else pieces)]
+        out = [("UF-03's front piece", (f, None)) for f in fronts[1:]]
+        if fronts:
+            f = fronts[0]
+            plan = [(f[0], f[1]), (f[3], f[1]), (f[3], f[4]), (f[0], f[4])]
+            out[:0] = [("UF-03's front piece", ((min(p[0] for p in pc), min(p[1] for p in pc), f[2], max(p[0] for p in pc), max(p[1] for p in pc), f[5]), pc))
+                       for pc in self._minus_boxes(plan, b.extra.get("openings") or [])]
         if pn:
             zt, sh = pn["z_top"], pn["sheet"]
-            out += [("UF-03's rear piece, the shear panel's sheet", (x0, y0, zt - pn["t"], x1, y1, zt)) for x0, y0, x1, y1 in sh["parts"] + sh["tongues"]]
+            out += [("UF-03's rear piece, the shear panel's sheet", ((x0, y0, zt - pn["t"], x1, y1, zt), None)) for x0, y0, x1, y1 in sh["parts"] + sh["tongues"]]
         return out
 
     def kit_fit(self) -> dict:
@@ -831,7 +838,7 @@ class Layout:
         the kit, as FIT-03 lets two rigid parts touch, and an overlap past TOL is a clash. Every pair that clashes, with
         how far it overlaps."""
         kit = [(p, bx) for p in self.xt_parts() for bx in p["boxes"]]
-        ours = self.fitting_parts() + [(n, (bx, None)) for n, bx in self.guard_pieces()]
+        ours = self.fitting_parts() + self.guard_pieces()
         found, worst, worst_pair = {}, math.inf, ""
         for name, s in ours:
             for p, bx in kit:
