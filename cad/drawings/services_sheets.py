@@ -698,7 +698,7 @@ def _arm_detail(sh, C, rt, top):
                      f"STOP TO {lf['torque_nmm'][1] / 1000:.1f} N m ON THE TOP (EST.). DRIVING STRAIGHT THE ARM STANDS "
                      f"{x['straight']['arm_deg']:.0f} DEGREES UP, AND IN ANY TURN THE LEAD HANGS NO LOWER THAN {x['turn_low_mm']:.0f} mm, "
                      f"{x['low_ball']['turn_low_mm']:.0f} mm WITH THE BALL LOW (DIM-08, EST.).")
-    sd = k14["seat"]["spec"]
+    sd = seat["spec"]
     spokes = ", ".join(f"{-v:g}" for v in sd["spokes_deg"][:-1]) + f" AND {-sd['spokes_deg'][-1]:g}"
     paras.append(f"EACH ARM IS 300 x 25 x 3 mm 316 STRIP, ITS TORSION SPRING LIFTING IT BETWEEN THE STOPS. ITS SEAT IS A CHANNEL FOLDED "
                  f"FROM {sd['channel_t']:g} mm 5052 SHEET AND LINED WITH {sd['lining_t']:g} mm EPDM, BENT ROUND THE TIP TO THE LEAD'S BEND "

@@ -1585,7 +1585,8 @@ def lift_rest(P: tuple, A: tuple, O: tuple, lift: dict, w: float, seat_r: float)
     for every degree the arm stands higher. The arm is hinged at O and swings in the vertical plane along X between its
     stops (`deg`, from forward and level), its torsion spring lifting it with a torque falling from `torque_nmm[0]` on
     the bottom stop to `torque_nmm[1]` on the top one, against the weight of the arm and its seat (`arm_kg`, and
-    `seat_kg` from seat_parts, taken at the tip). The seat runs from `seat_deg[0]` to `seat_deg[1]` round its centre from the strap, forward negative.
+    `seat_kg` from seat_parts, taken at the tip). The seat runs from `seat_deg[0]` to `seat_deg[1]` round its centre
+    from the strap, forward negative.
     Each part of the span is a flexible catenary of its own length (no bending stiffness, est.) that wraps the seat
     from the strap and leaves it tangent to it, or leaves at the strap or at the seat's end where its tangent point
     lies beyond them (a kink the lead's stiffness rounds), and pulls the arm with its horizontal pull plus the weight
@@ -1763,10 +1764,10 @@ def lifted(r: dict, rule: dict, V: dict, ball_drop: float = 0.0) -> dict:
     the seat, over every turn and pitch of rules.between, the truck turned about the coupling's pin: where the arm rests
     in each, the lowest point of every part of the lead, from the plug over the seat to the clamp and along the drawbar
     to the junction, and the pull at the truck's plug. `turn_low_mm` is the least of them with its yaw, pitch and part
-    (`turn_part`), and `under_plug` gives, for each of the two spans, the positions in which it hangs more than
-    AT_PLUG_MM under the plug, the deepest with its yaw and pitch, and the least height among them. `taut` counts the
-    positions in which the cut, less rules.between's margin, would leave no place of the arm where the span hangs
-    slack, which the cut must leave at none. `rests` counts how the arm rests (a balance, near taut with the spring
+    (`turn_part`), and `under_plug` gives the positions in which either span hangs more than AT_PLUG_MM under the plug,
+    the lead's least height among them, and for each span how many and the deepest with its yaw and pitch. `taut`
+    counts the positions in which the cut, less rules.between's margin, would leave no place of the arm where the span
+    hangs slack, which the cut must leave at none. `rests` counts how the arm rests (a balance, near taut with the spring
     holding a span nearly straight, or a stop), `arm_deg` gives its range, `kink_deg` the largest kink, at the strap or
     a seat's end, with the plug's pull there (`kink_pull_n`), and `seat_deg` the arc of the seat the lead lies on, from
     the strap, forward negative. Straight ahead, the lowest point, the arm's angle and the strap."""
