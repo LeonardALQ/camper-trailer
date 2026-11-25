@@ -64,7 +64,7 @@ def tow_vehicle(prj: Project) -> dict:
                 ute_kg=case["nominal"]["mass_kg"], ute_kg_growth=case["growth"]["mass_kg"], sweep=rep["bike_box_sweep"],
                 rear_kg_growth=rear0, rear_kg_nominal=case["nominal"]["rear_kg"], rear_per_ball=per_ball,
                 ball_behind_axle=rep["params"]["ball_behind_axle"], coupling_z=rep["params"]["coupling_z"],
-                coupling_tol=rep["params"]["coupling_tol"],
+                coupling_tol=rep["params"]["coupling_tol"], wheelbase=rep["params"]["wheelbase"],
                 design_ball_kg=tow["growth"]["towball_kg"], tow_case=tow["id"], box_kg=rep["garage"]["box_kg"],
                 ute_checks=[dict(id=c["id"], title=c["title"], status=c["status"], detail=c["detail"], measured=c.get("measured"))
                             for c in rep["checks"]])
@@ -119,6 +119,28 @@ def _no_pts(x: dict) -> dict:
     if isinstance(out.get("low_ball"), dict):
         out["low_ball"] = {k: v for k, v in out["low_ball"].items() if k != "straight_pts"}
     return out
+
+
+SPAN_WORDS = {"the plug's span": "span from its plug to its seat", "the clamp's span": "span from its seat to its clamp"}
+
+
+def _under_plug(x: dict, z: float, tol: float) -> str:
+    """DIM-08's words for one held-up lead's spans that hang more than AT_PLUG_MM under its plug (cad/routes.py lifted,
+    under_plug), at the design ball and with the ball low: in how many positions, which span, how far under the plug
+    at most and where, and how low the lead then hangs."""
+    hi, lo = x["under_plug"], x["low_ball"]["under_plug"]
+    if not hi["n"] and not lo["n"]:
+        return ""
+    spans = []
+    for span, words in SPAN_WORDS.items():
+        rows = [s["spans"][span] for s in (hi, lo) if span in s["spans"]]
+        if rows:
+            deep = max(rows, key=lambda s: s["deepest_mm"])
+            spans.append(f"its {words} up to {deep['deepest_mm']:.1f} mm under the plug, turned {abs(deep['deepest_yaw'])} degrees with "
+                         f"the truck {abs(deep['deepest_pitch'])} degrees nose {'down' if deep['deepest_pitch'] < 0 else 'up'} relative to the trailer")
+    least = min(s["least_mm"] for s in (hi, lo) if s["n"])
+    return (f"{x['run']} in {hi['n']} of {x['positions']} positions at the {z:.0f} mm ball and {lo['n']} at {z - tol:.0f} mm, "
+            + " and ".join(spans) + f", the lead no lower than {least:.1f} mm in those positions")
 
 
 def _short(name: str) -> str:
@@ -767,23 +789,32 @@ class Trailer:
         return out
 
     def leads_turned(self, lay, low: float) -> dict:
-        """DIM-08 (I2-70, I2-78): the leads between the vehicles in every turn and pitch of rules.between, each lead's
-        lowest point where its sprung arm holds it, at the design's coupling height and with the truck's ball at UTE-13's
-        low end, its tolerance under it, the trailer turned nose down about its axle group (cad/routes.py between_reach)."""
+        """DIM-08 (I2-70, I2-78, I2-91): the leads between the vehicles in every turn and pitch of rules.between, the
+        lowest point of every part of each lead, from its plug over its arm's seat to its clamp and along the drawbar to
+        the junction, where its sprung arm holds it, at the design's coupling height and with the truck's ball at
+        UTE-13's low end, its tolerance under it, the trailer turned nose down about its axle group (cad/routes.py
+        between_reach). The detail names the part that hangs lowest and the spans that hang under their plugs, and the
+        result carries TR-13's reading of the model on its ramps (cad/routes.py on_ramps)."""
+        from . import routes as R
         tol = self.tv["coupling_tol"]
         rows = self.leads_rows(lay)
         z = lay.V["coupling_z"]
-        cases = [(x["turn_low_mm"], x["run"], z, x["turn_yaw"], x["turn_pitch"]) for x in rows]
-        cases += [(x["low_ball"]["turn_low_mm"], x["run"], z - tol, x["low_ball"]["turn_yaw"], x["low_ball"]["turn_pitch"]) for x in rows]
-        v, run, ball, yaw, pitch = min(cases)
-        each = ". ".join(f"{x['run']} {x['turn_low_mm']:.1f} mm at the {z:.0f} mm ball and {x['low_ball']['turn_low_mm']:.1f} mm at "
-                         f"{z - tol:.0f} mm, {x['turn_model']}" for x in rows)
+        cases = [(x["turn_low_mm"], x["run"], z, x["turn_yaw"], x["turn_pitch"], x["turn_part"]) for x in rows]
+        cases += [(x["low_ball"]["turn_low_mm"], x["run"], z - tol, x["low_ball"]["turn_yaw"], x["low_ball"]["turn_pitch"],
+                   x["low_ball"]["turn_part"]) for x in rows]
+        v, run, ball, yaw, pitch, part = min(cases)
+        each = ". ".join(f"{x['run']} {x['turn_low_mm']:.1f} mm at the {z:.0f} mm ball, {x['turn_part']}, and {x['low_ball']['turn_low_mm']:.1f} mm "
+                         f"at {z - tol:.0f} mm, {x['low_ball']['turn_part']}, {x['turn_model']}" for x in rows)
+        under = ". ".join(u for u in (_under_plug(x, z, tol) for x in rows) if u) or "none"
         taut = sum(x.get("taut", 0) + x["low_ball"].get("taut", 0) for x in rows)
         ok = v >= low - 1e-6 and taut == 0
+        ramps = R.on_ramps(self.routes(lay), self.tv["wheelbase"], self.tv["ball_behind_axle"])
         return dict(limit=f">= {low:g} mm", measured=v, unit="mm", margin=round(v - low, 1), ok=ok,
-                    governing=f"{run} with the ball at {ball:.0f} mm", leads=[_no_pts(x) for x in rows],
-                    detail=(f"lowest {v:.1f} mm, {run} turned {abs(yaw)} degrees with a {abs(pitch)} degree pitch, the ball at {ball:.0f} mm. "
-                            f"Each lead's lowest in any turn: {each}. Positions whose cut, less its margin, would pull a span taut: {taut}."))
+                    governing=f"{run} with the ball at {ball:.0f} mm", leads=[_no_pts(x) for x in rows], ramps=ramps,
+                    detail=(f"lowest {v:.1f} mm, {run} at {part}, turned {abs(yaw)} degrees with the truck {abs(pitch)} degrees nose "
+                            f"{'down' if pitch < 0 else 'up'} relative to the trailer, the ball at {ball:.0f} mm. Each lead's lowest in any turn, "
+                            f"over every part from its plug to the junction: {each}. Spans that hang more than {R.AT_PLUG_MM:g} mm under "
+                            f"their plugs: {under}. Positions whose cut, less its margin, would pull a span taut: {taut}."))
 
     def leads_rows(self, lay) -> list:
         """The leads between the vehicles over every turn and pitch at both ball heights (cad/routes.py between_reach),

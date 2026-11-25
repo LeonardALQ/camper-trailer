@@ -3,6 +3,7 @@ every run ends on a real line at the points the data names, its length is at lea
 bends are tangent arcs, and the services models (cad/routes_model.py) carry every run with its routing facts."""
 from __future__ import annotations
 
+import functools
 import math
 
 import pytest
@@ -395,6 +396,7 @@ def test_svc06_holds_the_tsc_at_its_floor():
     assert not worse["ok"] and any("under its" in p for p in worse["problems"]), worse["problems"]
 
 
+@functools.lru_cache(maxsize=1)
 def _reach_rows():
     import yaml
     ute = yaml.safe_load((R.DATA / "ute" / "ute.yaml").read_text())["params"]
@@ -440,6 +442,83 @@ def test_the_leads_hang_clear_of_dim06_in_any_turn_at_both_ball_heights():
             assert y["kink_deg"] < 1.0 or y["kink_pull_n"] < 1.0, y
 
 
+def test_dim08_reads_every_part_of_each_lead():
+    """I2-91: DIM-08 reads the lowest point of every part of each lead, not only its plug. K-13 turned 70 degrees with
+    the truck 20 degrees nose up relative to the trailer, at the design ball, hangs lowest in its span from the plug,
+    whose catenary's vertex lies between its ends more than 30 mm under the plug, and the least in any turn is no
+    higher than that sag or than the run from the clamp along the drawbar. The seat stops short of its bottom at every
+    place of the arm, so the lead's wrap on it never hangs under the ends of the two spans."""
+    V = RES["V"]
+    r = next(x for x in RES["runs"] if x["id"] == "K-13")
+    lift, w, od = r["lift"], r["kg_m"] * 9.81 / 1000.0, r["od"]
+    P0, A, O = R._lift_ends(r, r["points"], V, 0.0)
+    P = R._turn(P0, (0.0, 0.0, float(V["coupling_z"])), -70, 20)
+    x = R.lift_rest(P, A, O, lift, w, float(lift.get("seat_mm", r["bend_r"])))
+    c = x["c1"]
+    assert x["low_part"] == "the plug's span" and 0.0 < c["x0"] < c["h"] and c["low"] < P[2] - 30.0, x["low_part"]
+    row = _reach_rows()["K-13"]
+    assert row["under_plug"]["n"] > 0 and "the plug's span" in row["under_plug"]["spans"]
+    assert row["turn_low_mm"] <= min(x["low"] - od / 2, row["run_low_mm"])
+    for q in RES["runs"]:
+        if q.get("lift"):
+            lf = q["lift"]
+            assert lf["deg"][0] - lf["strap_deg"] + lf["seat_deg"][0] > -180.0 and lf["deg"][1] - lf["strap_deg"] + lf["seat_deg"][1] < 180.0
+
+
+def test_tr13_reads_the_model_on_its_ramps_as_the_test_does():
+    """I2-91: TR-13's ramps stand the truck nose down by asin(300 / 3,270), its ball rising 300 x (3,270 + 1,455) /
+    3,270 = 433.5 mm, and the trailer nose up by asin(433.5 / the axle group's X), each vehicle at its own attitude as
+    the trailer swings round. The truck's plug then stands where the truck's own pitch puts it at every lock, so K-14's
+    reading, at its plug, is worked by hand from the plug's place ahead of and above the pin. TR-13's estimate is the
+    model's least over every lock, its source names the lead it comes from and its procedure names the ramps' height."""
+    import yaml
+    ute = yaml.safe_load((R.DATA / "ute" / "ute.yaml").read_text())["params"]
+    wb, bb, V = float(ute["wheelbase"]), float(ute["ball_behind_axle"]), RES["V"]
+    x = R.on_ramps(RES, wb, bb)
+    a = math.asin(300.0 / wb)
+    rise = 300.0 * (wb + bb) / wb
+    b = math.asin(rise / V["axle_x"])
+    assert x["truck_deg"] == pytest.approx(math.degrees(a), abs=0.01) and x["rise_mm"] == pytest.approx(rise, abs=0.1)
+    assert x["trailer_deg"] == pytest.approx(math.degrees(b), abs=0.01)
+    r = next(q for q in RES["runs"] if q["id"] == "K-14")
+    plug = r["points"][0]
+    up = (plug[2] - V["coupling_z"]) * math.cos(a) + plug[0] * math.sin(a)
+    under = next(q["box"][2] for q in RES["blocks"] if q["id"] == "DB-03")
+    hand = up - r["od"] / 2 + (V["coupling_z"] - under) / math.cos(b) + under
+    assert x["leads"]["K-14"]["part"] == "the plug" and x["leads"]["K-14"]["least_mm"] == pytest.approx(hand, abs=0.1)
+    tr13 = next(m for m in yaml.safe_load((R.DATA / "measurements.yaml").read_text())["inputs"] if m["id"] == "TR-13")
+    assert tr13["estimate"]["v"] == pytest.approx(x["least_mm"], abs=0.05) and x["run"] in tr13["estimate"]["src"]
+    assert f"ramps {x['ramp_mm']:.0f} mm high" in tr13["how"]
+
+
+def test_each_seat_is_joined_to_its_arm_by_its_web():
+    """I2-91: each arm's seat is held on its arm by its web (cad/routes.py seat_parts, CT-601's detail). Every spoke's
+    sides run from the hub's edge out to the channel's base, both bolts stand on the arm's centreline inside the hub at
+    least two diameters from the tip and from the hub's back edge, and the seat's mass, which the model takes at the
+    arm's tip, agrees within 3 % with a hand sum: the channel and its lining as strips of their developed widths round
+    the base's radius, the web as the hub and three strips, and the bolts, rivets and strap."""
+    sd = RES["data"]["rules"]["between"]["seat"]
+    h, L = sd["hub"]
+    for r in (x for x in RES["runs"] if x.get("lift")):
+        s, lift, od = r["seat"], r["lift"], r["od"]
+        assert lift["seat_kg"] == s["kg"]
+        fa = math.radians(90.0 + lift["strap_deg"])
+        a, n = (math.sin(fa), math.cos(fa)), (math.cos(fa), -math.sin(fa))
+        for p0, p1 in s["spokes"]:
+            u, v = p0[0] * a[0] + p0[1] * a[1], p0[0] * n[0] + p0[1] * n[1]
+            assert (u <= 0.2 and math.hypot(*p0) <= h + 0.2) or (abs(v) <= h + 0.2 and -0.2 <= u <= L), (r["id"], p0)
+            assert math.hypot(*p1) == pytest.approx(s["r0"], abs=1e-6)
+        for b, q in zip(sd["bolts_mm"], s["bolts"]):
+            assert q[0] * n[0] + q[1] * n[1] == pytest.approx(0.0, abs=1e-9) and 10.0 <= b <= L - 10.0
+        base = float(lift.get("seat_mm", r["bend_r"])) - od / 2 - sd["lining_t"]
+        span = math.radians(lift["seat_deg"][1] - lift["seat_deg"][0])
+        channel = sd["channel_t"] * (2 * od + 2 * sd["lining_t"] + 2 * sd["channel_t"]) * base * span * 2.68e-6
+        lining = sd["lining_t"] * 2 * od * base * span * 1.3e-6
+        web = sd["web_t"] * (math.pi * h * h / 2 + 2 * h * L + 3 * sd["spoke_w"] * (base - sd["channel_t"] - h + sd["spoke_w"])) * 2.68e-6
+        fixings = 2 * sd["kg"]["bolt"] + 6 * sd["kg"]["rivet"] + sd["kg"]["strap"]
+        assert s["kg"] == pytest.approx(channel + lining + web + fixings, rel=0.03), (r["id"], s["kg_by"])
+
+
 def test_the_catenary_against_the_parabola_worked_by_hand():
     """I2-78: level supports 1,000 mm apart with 1,020 mm of lead. By hand the parabola gives s - c = 8 d^2 / (3 c),
     so a sag d of 86.6 mm, a = H / w = c^2 / (8 d) = 1,443 mm and a pull at each support of w (a + d), the weight of
@@ -467,7 +546,7 @@ def test_the_strap_turns_with_the_seat_and_the_arm_balances_by_hand():
     assert turned == pytest.approx(x["deg"] - lift["strap_deg"], abs=1e-6)
     (d0, d1), (m0, m1) = lift["deg"], lift["torque_nmm"]
     spring = m1 + (m0 - m1) * (d1 - x["deg"]) / (d1 - d0)
-    weight = 9.81 * (lift["arm_kg"] / 2 + lift["clip_kg"]) * lift["arm_mm"] * math.cos(math.radians(x["deg"]))
+    weight = 9.81 * (lift["arm_kg"] / 2 + lift["seat_kg"]) * lift["arm_mm"] * math.cos(math.radians(x["deg"]))
     F2 = R._cat_pull(x["T2"], A, x["c2"], w, "p")
     clamp = F2[0] * (x["T2"][2] - O[2]) - F2[2] * (x["T2"][0] - O[0])
     u = R._unit(R._sub(P, x["T1"]))[0]

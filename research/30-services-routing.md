@@ -146,9 +146,16 @@ they are threaded through (`inside`).
   degrees ahead of it and 40 behind, and both arms take one spring of 1.5 to 1.0 N m (CT-601). A lead lying loose
   over a saddle or a free sheave gives its slack to the long span from the truck, which pulls hardest, which is why
   the friction band and the sheave's one height were dropped. The cuts, 1.34 m for K-13 and 1.28 m for K-14, leave no
-  position taut with 30 mm taken off. In any turn and pitch each lead hangs lowest at its plug, K-13
-  no lower than 397 mm and K-14 394 mm, 377 and 374 mm with the truck's ball at its low 420 mm, so DIM-08 holds both
-  to DIM-06's 200 mm, and TR-13 measures them coupled. Each
+  position taut with 30 mm taken off. DIM-08 reads the lowest point of every part of each lead, from the plug
+  over the seat to the clamp and along the drawbar. The least in any turn is at a plug, K-13 no lower than 397 mm
+  and K-14 394 mm, 377 and 374 mm with the truck's ball at its low 420 mm, so DIM-08 holds both to DIM-06's 200 mm.
+  The spans can sag under their plugs, though. With the truck pitched up relative to the trailer, K-13's span from
+  its plug to its seat hangs up to 62 mm under the plug, and in 41 of its 261 positions at the design ball one of
+  its spans hangs under the plug, the lead no lower than 432 mm there (est.). Each seat is held on its arm by a web
+  cut from 1.6 mm 5052 sheet, a hub bolted through the arm's tip with two M5 bolts and three spokes riveted to the
+  channel, and weighs 0.057 kg on K-13's arm and 0.085 kg on K-14's (`seat`, cad/routes.py seat_parts, est.).
+  TR-13 measures the leads coupled on 300 mm ramps, each vehicle at its own attitude, where cad/routes.py on_ramps
+  reads 439 mm at the least, K-13's span from its plug at full lock (I2-91). Each
   drum's lead runs from its side's junction under CM-05 out under the tank guard to a P-clip on its XT hanger, 15 mm
   ahead of the arm's pivot and 52.5 mm inboard of the arm, then in a loop down beside the bush and along the arm's
   underside to the backing plate. cad/routes.py lays that arm part on the arm at ride height and FIT-05 sweeps it
