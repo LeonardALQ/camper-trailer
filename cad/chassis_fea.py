@@ -649,18 +649,19 @@ class Analysis:
             if not bolts:
                 continue
             axis = 0 if bolts[0]["along"] == "x" else 1
-            share = (a_len / sp["b"] / (len(bolts) / 2)) if group == "rail" else 1.0 / len(bolts)
-            e_min, ae_min, edge = math.inf, math.inf, math.inf
+            share = a_len / sp["b"] / (len(bolts) / 2) if group == "rail" else 1.0 / len(bolts)
+            e_min = ae_min = edge = math.inf
             for b in bolts:
-                c, other = (b["x"], b["y"]) if axis == 0 else (b["y"], b["x"])
+                at = (b["x"], b["y"])
+                c, other = at[axis], at[1 - axis]
+                line = [(q["x"], q["y"])[axis] for q in bolts if abs((q["x"], q["y"])[1 - axis] - other) < 1.0]
                 for sign in (1, -1):
-                    e_edge = reach(c, other, axis, sign)
-                    nxt = [sign * ((q["x"], q["y"])[axis] - c) for q in bolts if q is not b
-                           and abs((q["x"], q["y"])[1 - axis] - other) < 1.0 and sign * ((q["x"], q["y"])[axis] - c) > 0]
-                    e_hole = min(nxt) - dh / 2 if nxt else math.inf
-                    e_min = min(e_min, e_edge, e_hole)
-                    ae_min = min(ae_min, e_edge - dh / 2 + df / 2, (min(nxt) - dh + df / 2) if nxt else math.inf)
-                edge = min(edge, *(reach(v, o, ax, sg) for ax, (v, o) in ((0, (b["x"], b["y"])), (1, (b["y"], b["x"]))) for sg in (1, -1)))
+                    to_edge = reach(c, other, axis, sign)
+                    ahead = [sign * (q - c) for q in line if sign * (q - c) > 0]
+                    to_hole = min(ahead) if ahead else math.inf
+                    e_min = min(e_min, to_edge, to_hole - dh / 2)
+                    ae_min = min(ae_min, to_edge - dh / 2 + df / 2, to_hole - dh + df / 2)
+                edge = min(edge, *(reach(at[ax], at[1 - ax], ax, sg) for ax in (0, 1) for sg in (1, -1)))
             out.append(dict(group=group, n=len(bolts), share=share, e=e_min, a_e=ae_min, edge=edge))
         return out
 
@@ -688,13 +689,14 @@ class Analysis:
             c_4600 = 3.0 if bolt["d"] / t < 10 else max(1.8, 4.0 - 0.1 * bolt["d"] / t)
             phi_f = 0.70 if fu / d["fy"] >= 1.08 else 0.60
             groups = self.panel_bolts(sp)
-            worst = max(groups, key=lambda g: g["share"])
-            e, a_e = min(g["e"] for g in groups if g["share"] >= worst["share"] - 1e-9), min(g["a_e"] for g in groups if g["share"] >= worst["share"] - 1e-9)
+            worst = max(g["share"] for g in groups)
+            most = [g for g in groups if g["share"] >= worst - 1e-9]
+            e, a_e = min(g["e"] for g in most), min(g["a_e"] for g in most)
             rows = []
             for lc_id, env in self.panel_env.items():
                 r = env[sp["id"]]
                 fac = lcs[lc_id]["factor"] if lc_id in lcs else 1
-                fb = r["v_n"] * worst["share"]
+                fb = r["v_n"] * worst
                 rows += [(f"plate shear, {lc_id}", r["v_n"] / (b * t), min(0.6 * d["fy"], tau_cr) / fac),
                          (f"{size} bolt to its angles, {lc_id}", fb / bolt["a_c"], cap / fac),
                          (f"sheet in bearing at a bolt, AS 4100, {lc_id}", fb / (bolt["d"] * t), 0.9 * 3.2 * fu / fac),
@@ -703,9 +705,10 @@ class Analysis:
                          (f"sheet's tear-out at a bolt, AS/NZS 4600, {lc_id}", fb / (e * t), phi_f * fu / fac)]
             w = max(self.panel_env.items(), key=lambda kv: kv[1][sp["id"]]["v_n"])
             edge = min(g["edge"] for g in groups)
+            n_front = next(g["n"] for g in groups if g["group"] == "front")
             res = _local(f"Shear panel {sp['id']}, {t:g} mm steel, {a:,.0f} x {b:,.0f} mm", rows,
-                         f"its worst racking shear, {w[1][sp['id']]['v_n'] / 1000:.1f} kN in {w[0]}, {w[1][sp['id']]['case']}, a quarter of it on "
-                         f"each of the four bolts under the XT centre crossmember, e {e:.1f} mm, the least bolt edge distance {edge:.1f} mm")
+                         f"its worst racking shear, {w[1][sp['id']]['v_n'] / 1000:.1f} kN in {w[0]}, {w[1][sp['id']]['case']}, 1/{n_front} of it "
+                         f"on each bolt under the XT centre crossmember, e {e:.1f} mm, the least bolt edge distance {edge:.1f} mm")
             res.update(tau_cr=tau_cr, v_n=w[1][sp["id"]]["v_n"], lc=w[0], bolt_groups=groups)
             out["shear_panel"] = res
         return out
