@@ -323,16 +323,10 @@ def frame_sections(ch: Chassis) -> tuple[list[Section], list[dict]]:
                 sections.append(add(Section(m.id, m.name, [t], ("closed", "closed")), end_holes(t, m.id, 0, r) + end_holes(t, m.id, 1, r)))
     g = rules["hinge_gusset"]
     gsec = ch.sections[next(f for f in data["fittings"] if f["id"] == "CH-P08")["section"]]
-    for st in ("XT front hinge", "XT centre"):
-        cm = next(m for m in ch.members if m.station == st and m.role == "cm_xt")
-        xc = cm.p0[0] + cm.sec.b / 2 + g["behind"]
-        for s in (-1, 1):
-            c = np.array([xc, s * (V["rail_c"] - g["inboard"]), V["rail_underside_z"] + ch.role_sec["rail"].d / 2])
-            dvec = np.array([1.0, s * 1.0, 0.0]) / math.sqrt(2)
-            gid = f"CH-P08-{cm.id}{'K' if s < 0 else 'R'}"
-            t = Tube(gid, c - dvec * g["length"] / 2, c + dvec * g["length"] / 2, gsec, (0, 0, 1), ds)
-            sections.append(add(Section(gid, f"Hinge crossmember gusset behind {cm.id}, {'kerb' if s < 0 else 'road'} side", [t],
-                                        ("closed", "closed")), end_holes(t, gid, 0, g) + end_holes(t, gid, 1, g)))
+    for hg in ch.hinge_gussets():
+        t = Tube(hg["id"], hg["p0"], hg["p1"], gsec, (0, 0, 1), ds)
+        sections.append(add(Section(hg["id"], f"Hinge crossmember gusset behind {hg['cm']}, {'kerb' if hg['side'] < 0 else 'road'} side", [t],
+                                    ("closed", "closed")), end_holes(t, hg["id"], 0, g) + end_holes(t, hg["id"], 1, g)))
     return sections, holes
 
 

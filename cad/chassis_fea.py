@@ -52,9 +52,10 @@ class Item:
 
 
 class Analysis:
-    def __init__(self, lay, tr, ch: Chassis, body=None):
+    def __init__(self, lay, tr, ch: Chassis, body=None, hinges: str = "rail"):
         self.lay, self.tr, self.ch = lay, tr, ch
-        self.fm = ch.frame(body)
+        self.hinges = hinges
+        self.fm = ch.frame(body, hinges)
         self.f = self.fm.f
         self.n = 6 * len(self.f.nodes)
         V = ch.V
@@ -331,9 +332,10 @@ class Analysis:
         return self.body.solve(q)
 
     # ------------------------------------------------------------------ stress
-    def stresses(self, res) -> dict[str, dict]:
+    def stresses(self, res, ultimate: bool = False) -> dict[str, dict]:
         """Peak stress in each member: normal stress (axial plus both bending axes at a corner), shear from torsion
-        and the wall shear, combined as sqrt(sigma^2 + 3 tau^2)."""
+        and the wall shear, combined as sqrt(sigma^2 + 3 tau^2). `ultimate` reads each axis's bending on the AS 4100 5.2
+        effective section, Ze, so the stress against fy is the section capacity's linear interaction (AS 4100 8.3.4)."""
         out = {}
         nodes = self.f.nodes
         for el, fl in zip(self.f.elements, res.forces):
@@ -343,8 +345,12 @@ class Analysis:
             for end, act in zip((el.i, el.j), end_actions(fl)):
                 if isinstance(sp, Composite):
                     A, Zs, Zw, C, Awd, Aww = sp.A, sp.Z_strong, sp.Z_weak, sp.C, sp.Aw, sp.rail.Aw_width + sp.raiser.Aw_width
+                    if ultimate:
+                        Zs, Zw = min(sp.Ze_strong, 1.5 * sp.Z_strong), sp.Ze_weak
                 else:
                     A, Zs, Zw, C, Awd, Aww = sp.A, sp.Z_strong, sp.Z_weak, sp.C, sp.Aw_depth, sp.Aw_width
+                    if ultimate:
+                        Zs, Zw = sp.Ze_strong, sp.Ze_weak
                 sig = abs(act["N"]) / A + abs(act["My"]) / Zs + abs(act["Mz"]) / Zw
                 tau = abs(act["T"]) / C + max(abs(act["Vz"]) / Awd, abs(act["Vy"]) / Aww)
                 eq = math.sqrt(sig ** 2 + 3 * tau ** 2)
@@ -413,8 +419,8 @@ class Analysis:
         sites = self.hole_sites()
         hole_env: dict[str, dict] = {}
 
-        def take(lc_id, res, label, extra=None):
-            for mem, r in self.stresses(res).items():
+        def take(lc_id, res, label, extra=None, ultimate=False):
+            for mem, r in self.stresses(res, ultimate).items():
                 e = env.setdefault(lc_id, {})
                 if mem not in e or r["eq"] > e[mem]["eq"]:
                     e[mem] = dict(r, case=label, **(extra or {}))
@@ -476,24 +482,35 @@ class Analysis:
             for F in lcs["LC6b"]["forces_n"]:
                 res = self.run_body(F, lug, [(self.fm.db_node(s, V["chain_lug_x"]), 1.0)])
                 take("LC6b", res, f"{'kerb' if s < 0 else 'road'}-side lug, {_dir(F)} {max(abs(v) for v in F) / 1000:.1f} kN")
-        Fr = lcs["LC8a"]["force_n"]
-        for where, x, sx in (("front", V["front_recovery_x"], -1), ("rear", V["body_x1"] - 70, 1)):
-            for s in (-1, 1):
-                y = s * (V["rail_c"] + 35) if where == "front" else s * (V["rail_c"] - 35)
-                p = (x, y, V["db_z"] if where == "front" else V["rail_underside_z"] + 75)
-                fr = [(self.fm.db_node(s, x), 1.0)] if where == "front" else self.fm.rail_fractions(s, x)
-                for h in (-30, 0, 30):
-                    for v in (-15, 0, 15):
-                        F = Fr * np.array([sx * math.cos(math.radians(h)) * math.cos(math.radians(v)),
-                                           math.sin(math.radians(h)) * math.cos(math.radians(v)), math.sin(math.radians(v))])
-                        res = self.run_body(F, p, fr)
-                        take("LC8a", res, f"{where} {'kerb' if s < 0 else 'road'}-side point, {h:+d} deg sideways, {v:+d} deg up")
+        # LC8a at each recovery point, at the 58.9 kN pull (no yield) and at the 78.5 kN ultimate (no fracture, LC8u): the
+        # members on their AS 4100 effective sections against fy, the holes on their net sections against 0.85 fu. A rear
+        # tongue's pull acts at its shackle hole and enters the frame at the rear crossmember's end, where the tongue is
+        # welded through the crossmember and along the rail's web (rear_recovery_point, I2-87)
+        lc8 = lcs["LC8a"]
+        for lc_id, Fr in (("LC8a", lc8["force_n"]), ("LC8u", lc8["ultimate_n"])):
+            for where in ("front", "rear"):
+                for s in (-1, 1):
+                    if where == "front":
+                        x, sx = V["front_recovery_x"], -1
+                        p, fr = (x, s * (V["rail_c"] + 35), V["db_z"]), [(self.fm.db_node(s, x), 1.0)]
+                    else:
+                        sx = 1
+                        p, cm = self.rear_recovery_point(s)
+                        fr = [(self.fm.cm_node(cm, s * V["rail_c"]), 1.0)]
+                    for h in (-30, 0, 30):
+                        for v in (-15, 0, 15):
+                            F = Fr * np.array([sx * math.cos(math.radians(h)) * math.cos(math.radians(v)),
+                                               math.sin(math.radians(h)) * math.cos(math.radians(v)), math.sin(math.radians(v))])
+                            res = self.run_body(F, p, fr)
+                            take(lc_id, res, f"{where} {'kerb' if s < 0 else 'road'}-side point, {h:+d} deg sideways, {v:+d} deg up"
+                                 + (f", {Fr / 1000:.1f} kN" if lc_id == "LC8u" else ""), ultimate=lc_id == "LC8u")
         out = dict(envelope={}, governing={}, deflections={}, twist=twist, balls=balls, residual_n=self.resid,
                    frame=dict(nodes=len(self.f.nodes), elements=sum(1 for e in self.f.elements if not e.sec.rigid),
                               rigid_links=sum(1 for e in self.f.elements if e.sec.rigid)))
         for lc_id, e in env.items():
-            fac = lcs[lc_id]["factor"]
-            rows = {m: dict(r, util=r["eq"] / (fy_of.get(m, fy) / fac), fy=fy_of.get(m, fy)) for m, r in e.items() if not m.startswith("_")}
+            fac = lcs[lc_id]["factor"] if lc_id in lcs else 1
+            rows = {m: dict(r, util=r["eq"] / (fy_of.get(m, self.fy_of_part(m)) / fac), fy=fy_of.get(m, self.fy_of_part(m)))
+                    for m, r in e.items() if not m.startswith("_")}
             out["envelope"][lc_id] = rows
             g = max(rows.items(), key=lambda kv: kv[1]["util"])
             out["governing"][lc_id] = dict(member=g[0], **g[1], limit=g[1]["fy"] / fac, factor=fac)
@@ -507,7 +524,50 @@ class Analysis:
         out["fixings"] = self.fixings()
         out["cross_checks"] = self.cross_checks(out, lc6)
         out["lc1_ball"] = balls
+        if self.hinges == "rail":
+            out["hinge_path"] = self.hinge_path_study()
         return out
+
+    def hinge_path_study(self) -> dict:
+        """CHS-12 (I2-88): the whole analysis again with each XT pivot tied to its hinge crossmember at the hinge bar's
+        weld runs and the gussets as members, as Cruisemaster's sheets build the joint, read at the hinge crossmembers,
+        their gussets and their holes in every case, and FAT-03 and FAT-13 at their roots and hinges."""
+        ch = self.ch
+        cms = [m.id for m in ch.hinge_crossmembers()]
+        parts = set(cms) | {g["id"] for g in ch.hinge_gussets()}
+        res = Analysis(self.lay, self.tr, ch, hinges="crossmember").run()
+        rows = []
+        for lc_id, env in res["envelope"].items():
+            for m, r in env.items():
+                if m in parts:
+                    rows.append(dict(part=m, lc=lc_id, mpa=r["eq"], limit=r["eq"] / r["util"] if r["util"] else r["fy"],
+                                     util=r["util"], case=r["case"], at=r["at"]))
+        holes = [h for h in res["holes"] if not h.get("open") and (h.get("member") in parts) and h.get("static")]
+        for h in holes:
+            for key in ("static", "ultimate"):
+                s = h.get(key)
+                if s:
+                    rows.append(dict(part=f"{h['id']} in {h['member']}", lc=s["lc"], mpa=s["mpa"], limit=s["limit"], util=s["util"], case=s["case"]))
+        fat = [dict(id=f["id"], range_mpa=f["range_mpa"], cafl=f["cafl"], util=f["range_mpa"] / f["cafl"], where=f["where"])
+               for f in res["fatigue"] if f["id"] in ("FAT-03", "FAT-13")]
+        worst = max(rows, key=lambda r: r["util"])
+        return dict(rows=sorted(rows, key=lambda r: -r["util"])[:12], worst=worst, fatigue=fat,
+                    ok=worst["util"] <= 1 + 1e-9 and all(f["util"] <= 1 + 1e-9 for f in fat))
+
+    def fy_of_part(self, member: str) -> float:
+        """The yield stress of a frame part that is not a member (a hinge gusset), from its section."""
+        sp = self.fm.sec_props.get(member)
+        return getattr(sp, "fy", None) or self.ch.fy
+
+    def rear_recovery_point(self, s: int) -> tuple[tuple[float, float, float], str]:
+        """A rear recovery tongue's shackle hole (CH-P05 and local_checks rear_recovery's edge from the hole to the
+        tongue's rear edge) and the rear crossmember the tongue is welded through, on side s."""
+        ch, V = self.ch, self.ch.V
+        f = next(d for d in ch.data["fittings"] if d["id"] == "CH-P05")
+        at = ch.ev(f["at"])
+        x = at[0] + f["l"] / 2 - ch.data["local_checks"]["rear_recovery"]["edge"]
+        cm = next(m.id for m in ch.members if m.station == "rear" and m.role.startswith("cm"))
+        return (x, s * ch.ev(f["side_y"]), at[2]), cm
 
     # ------------------------------------------------------------------ deflection and twist
     def _w(self, res, node):
@@ -992,15 +1052,27 @@ class Analysis:
         return out
 
     def hole_stress(self, res, h) -> dict:
-        """Normal and combined stress at a hole's edge on the composite rail's net section, at the element end nearest it."""
+        """Normal and combined stress at a hole's edge on the composite rail's net section, at the element end nearest it.
+        A hole for galvanising is read on the element whose span holds it, at that element's end nearer the hole, so a
+        load that enters the member between the hole and the next node (a hinge's welds) is counted where it passes."""
         best, bd = None, math.inf
-        for el, fl in zip(self.f.elements, res.forces):
-            if el.member != h["frame"]:
-                continue
-            for nd, act in zip((el.i, el.j), end_actions(fl)):
-                dist = math.dist(self.f.nodes[nd], (h["x"], h["y"], h["z"])) if h.get("galv") else abs(self.f.nodes[nd][0] - h["x"])
-                if dist < bd - 1e-6 or (abs(dist - bd) < 1e-6 and abs(act["My"]) > abs(best["My"])):
-                    best, bd = act, dist
+        p = np.asarray((h["x"], h["y"], h["z"]), float)
+        for span in ((True, False) if h.get("galv") else (False,)):
+            for el, fl in zip(self.f.elements, res.forces):
+                if el.member != h["frame"]:
+                    continue
+                if span:
+                    a, b = np.asarray(self.f.nodes[el.i], float), np.asarray(self.f.nodes[el.j], float)
+                    L2 = float(np.dot(b - a, b - a))
+                    t = float(np.dot(p - a, b - a)) / L2 if L2 > 0 else 0.0
+                    if not -1e-6 <= t <= 1 + 1e-6:
+                        continue
+                for nd, act in zip((el.i, el.j), end_actions(fl)):
+                    dist = math.dist(self.f.nodes[nd], (h["x"], h["y"], h["z"])) if h.get("galv") else abs(self.f.nodes[nd][0] - h["x"])
+                    if dist < bd - 1e-6 or (abs(dist - bd) < 1e-6 and abs(act["My"]) > abs(best["My"])):
+                        best, bd = act, dist
+            if best is not None:
+                break
         n, comp = h["net"], self.ch.comp
         base = n.get("base") or dict(Z_weak=comp.Z_weak, I_weak=comp.I_weak, C=comp.C, y_max=max(comp.rail.b, comp.raiser.b) / 2)
         sig = (abs(best["N"]) / n["A"] + abs(best["My"]) * n["z_lever"] / n["I"]
@@ -1031,9 +1103,14 @@ class Analysis:
                                 toe_ok=toe_ok, place_ok=edge_ok and toe_ok, ok=edge_ok and toe_ok, placement_only=True))
                 continue
             worst = None
+            ult = None
             for lc_id, e in env.items():
                 r = e.get(k)
                 if r is None:
+                    continue
+                if lc_id == "LC8u":       # the ultimate pull: no fracture of the net section (AS 4100 7.2, 0.85 fu), CHS-08U
+                    lim = rules["fu_factor"] * h["fu"]
+                    ult = dict(util=r["eq"] / lim, mpa=r["eq"], limit=lim, lc=lc_id, case=r["case"])
                     continue
                 lim = min(h.get("fy", fy), rules["fu_factor"] * h["fu"]) / lcs[lc_id]["factor"]
                 u = r["eq"] / lim
@@ -1059,6 +1136,7 @@ class Analysis:
             fat_ok = peak <= cafl and dmg <= lc10["miner_limit"]
             edge_ok, toe_ok = h["edge_mm"] >= h["edge_need"] - 1e-6, h["toe_mm"] >= h["toe_need"] - 1e-6
             out.append(dict(row, rows=h["rows"], frame=h["frame"], static=worst, static_ok=worst["util"] <= 1 + 1e-9, util=worst["util"],
+                            ultimate=ult,
                             range_mpa=ds, peak_mpa=peak, field=field, cafl=cafl, damage=dmg, fat_case=cid, fat_ok=fat_ok,
                             edge_mm=h["edge_mm"], edge_need=h["edge_need"], edge_ok=edge_ok, toe_mm=h["toe_mm"], toe_need=h["toe_need"],
                             toe_weld=h["toe_weld"], toe_ok=toe_ok, place_ok=edge_ok and toe_ok and fat_ok,

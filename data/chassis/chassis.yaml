@@ -111,9 +111,12 @@ station_roles:
   generated: cm_floor
 
 # Stations whose crossmember needs more than its role's section. The XT rear shock crossmember carries the rear recovery
-# points' sideways load (LC8a at 30 degrees) without the PB-3 braces the grey tank's bay cannot hold (revision C).
+# points' sideways load (LC8a at 30 degrees) without the PB-3 braces the grey tank's bay cannot hold (revision C). Since
+# revision M it and the rear crossmember are RHS 150 x 50 x 6, so the ladder's rear bays carry the 78.5 kN ultimate pull
+# (CHS-08U, I2-87): at 4 mm and 3 mm their webs' holes read 1.14 and 1.19 of 0.85 fu there
 station_sections:
-  XT rear shock: RHS_150x50x4
+  XT rear shock: RHS_150x50x6
+  rear: RHS_150x50x6
 
 # Plan bracing: an X of two diagonals at rail height in free bays between the rails, so the ladder frame carries
 # sideways loads (LC8a recovery at 30 degrees) by truss action. The tanks fill the other bays. The rear bay's braces (PB-3)
@@ -178,8 +181,8 @@ fittings:
      at: ["axle_x + xt_centre_front + xm_w / 2", 0, rail_underside_z - 5], side_y: "rail_c - rail_w / 2 - 50"}
   - {id: CH-P07, plane: yz, name: "Shock support plate, 5 mm, full height on the XT rear shock crossmember", kind: plate, l: 300, w: 150, t: 5, qty: 2,
      at: ["axle_x + xt_rear_shock_front - 3", 0, "rail_underside_z + 75"], side_y: "rail_c - 200"}
-  - {id: CH-P08, name: "Hinge crossmember gusset, RHS 50 x 50 x 3 at 45 degrees (TB 070), 200 mm", kind: tube, section: SHS_50x50x3, length: 200, qty: 4,
-     at: ["axle_x + xt_front_hinge_rear + 80", 0, "rail_underside_z + 75"], side_y: "rail_c - 100", fat: null}
+  - {id: CH-P08, name: "Hinge crossmember gusset, RHS 50 x 50 x 3 at 45 degrees (TB 070), 200 mm, two behind each hinge crossmember", kind: tube, section: SHS_50x50x3, length: 200, qty: 4,
+     poses: hinge_gussets, fat: null}
   - {id: CH-P09, plane: yz, name: "Spare carrier cleats and hub plate, 6 mm (posts in the member list)", kind: plate, l: 300, w: 300, t: 6, qty: 1,
      at: ["body_x0 - 40", 0, spare_z], fat: null,
      box: ["body_x0 - spare_bracket_d - tyre_w / 2 - 24", -150, "spare_z - 150", "spare_bracket_d + tyre_w / 2 - 26", 300, 300]}
@@ -424,11 +427,24 @@ member_galvanising_holes:
   outrigger: {d: 20, leg: 6, holes: corners}
   brace: {d: 13, leg: 5, holes: corners}
   plan_brace: {d: 10, leg: 5, holes: middle}
-  hinge_gusset: {d: 13, leg: 5, holes: middle, behind: 80, inboard: 100, length: 200}
+  hinge_gusset: {d: 13, leg: 5, holes: middle}
   blocked_webs:
     - {member: CM-06, web: front, fitting: CH-P07, free_d: 25, internal_d: 16, internal_z: [-45, 45]}
   cut_ends:
     - {member: CM-08, cut: 20, leg: 6}
+
+# The XT hinges and their gussets (I2-88), the one place the frame model, the dip and the 3D model read them from.
+# Cruisemaster's 33XT AIR sheets 2 and 3: each hinge bar lies square to the rail under its hinge crossmember, its long end
+# flush with the rail's outside, welded to the crossmember only, with 6 mm fillets in three 80 mm runs a side ("3-80",
+# report 11 line 111), and "Weld should not continue under main chassis rail". `runs` are the runs' centres from the
+# rail's inner face (est., 80 mm runs at 100 mm centres from 10 mm inboard). The frame model ties each hinge's pivot to
+# its crossmember at those runs, so the hinge's force and moment reach the rail through the crossmember's end, beside its
+# holes, and through the gussets. The gussets CH-P08 are SHS 50 x 50 x 3 at 45 degrees in plan from the crossmember's rear
+# face to the rail's inner face, inside sheet 2's 250 mm of the rail, each centred `behind` the crossmember's rear face
+# and `inboard` of the rail's centreline, and carried in the frame model as members
+xt_hinges:
+  bar: {leg: 6, run: 80, runs: [50, 150, 250]}
+  gusset: {behind: 80, inboard: 100, length: 200}
 
 # Local checks of the fittings (CHASSIS.md). Sizes in mm. Plates are AS/NZS 3678 grade 350. The pin is what bears in the
 # hole: at a chain lug the 10 mm round bow of the pewag CW 8 connecting link (pewag's d), which passes through the 14 mm

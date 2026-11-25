@@ -61,6 +61,29 @@ def chassis_row(c, res: dict) -> dict:
                             + "".join(f"{x}. " for x in why)
                             + f"The deepest is {w['id']}'s {'low' if w['low_depth'] >= w['high_depth'] else 'high'} point, {deep:.1f} mm from its opening's edge, "
                             f"{w['low_hang'] if w['low_depth'] >= w['high_depth'] else w['high_hang']}"))
+    if c.type == "chassis_local" and c.item == "ultimate":
+        g = res["governing"]["LC8u"]
+        hs = [h for h in res["holes"] if not h["open"] and h.get("ultimate")]
+        wh = max(hs, key=lambda h: h["ultimate"]["util"])
+        u = wh["ultimate"]
+        over = sorted({r["member"] for r in res["envelope"]["LC8u"].values() if r["util"] > 1 + 1e-9}
+                      | {f"{h['id']}" for h in hs if h["ultimate"]["util"] > 1 + 1e-9})
+        worst = max(g["util"], u["util"])
+        return dict(limit="members <= fy on Ze, holes <= 0.85 fu on the net section, at 78.5 kN", measured=round(100 * worst, 1), unit="%",
+                    margin=round(100 * (1 - worst), 1), ok=worst <= 1 + 1e-9,
+                    governing=(f"{g['member']}, {g['case']}" if g["util"] >= u["util"] else f"{wh['id']} in {wh['wall']}, {u['case']}"),
+                    detail=(f"At the 78.5 kN ultimate the worst member is {g['member']}, {g['eq']:.0f} MPa on its effective section against its "
+                            f"{g['limit']:.0f} MPa fy at X {g['at'][0]}, {g['case']}, {g['util']:.2f}, and the worst hole {wh['id']} in {wh['wall']} at X "
+                            f"{wh['x']:,.0f}, {u['mpa']:.0f} MPa on its net section against 0.85 fu, {u['limit']:.1f} MPa, {u['util']:.2f}. "
+                            + (f"Over their limits: {', '.join(over)}." if over else "Every member and hole holds the ultimate pull.")))
+    if c.type == "chassis_local" and c.item == "hinge_path":
+        hp = res["hinge_path"]
+        w = hp["worst"]
+        fat = ", ".join(f"{f['id']} {f['range_mpa']:.1f} of {f['cafl']:.1f} MPa" for f in hp["fatigue"])
+        return dict(limit="each case's limit, FAT-03 and FAT-13 within their CAFL", measured=round(100 * w["util"], 1), unit="%",
+                    margin=round(100 * (1 - w["util"]), 1), ok=hp["ok"], governing=f"{w['part']}, {w['lc']}, {w['case']}",
+                    detail=(f"With each hinge tied to its crossmember at the hinge bar's welds and the gussets carrying load, the worst is {w['part']}, "
+                            f"{w['mpa']:.0f} MPa against {w['limit']:.0f} MPa in {w['lc']}, {w['case']}, {w['util']:.2f}. At the roots and hinges: {fat}."))
     if c.type == "chassis_local":
         r = res["local"][LOCAL[c.item]]
         return dict(limit="<= 100 % of each part's limit", measured=round(100 * r["util"], 1), unit="%", margin=round(100 * (1 - r["util"]), 1),
