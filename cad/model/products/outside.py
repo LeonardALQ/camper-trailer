@@ -27,20 +27,8 @@ def _from_front(fr):
     return bx, cy, (lambda u: fr.W - u) if flip else (lambda u: u)
 
 
-@product("xt_arm")
-def xt_arm(fr, V, sp, b):
-    """One Cruisemaster XT Freestyle trailing arm: the arm in the slot between the rail and the wheel down to the stub
-    axle, and the kit's parts between the rails at their places in 33XT AIR sheets 2 to 4 (Chassis.xt_parts, est.): the
-    hinge bar under its crossmember with the arm's four hinge plates and its pivot tube, the airbag at ride under its top
-    bracket on the rail's inner face, and the shock absorber from its eye on the arm to its bracket on the next
-    crossmember's support plate. `hub` and `hub_w` place the hub centre in the envelope, `top` is the rail's underside
-    and `slot` the clear width between the rail and the tyre."""
-    _, cy, mu = _from_front(fr)
-    hu, hw, top, slot = sp["hub"], sp["hub_w"], sp["top"], sp["slot"]
-    pw = top - 110                                  # the pivot, 110 mm under the rail
-    profile = [(mu(55), pw + 40), (mu(hu + 30), hw + 45), (mu(hu + 30), hw - 45), (mu(55), pw - 40)]
-    out = [("trailing arm", fr.prism_uw(profile, 14, slot - 4), "#7b7d7d", 1.0),
-           ("stub axle", cy((hu, 14, hw), (hu, fr.D - 90, hw), 35), STEEL, 1.0)]
+def _world(fr):
+    """Box and cylinder makers in the model's own coordinates (x, y, z), for parts placed from the chassis data."""
     z0 = fr.bx[2]
 
     def wbox(q):
@@ -49,7 +37,30 @@ def xt_arm(fr, V, sp, b):
 
     def wcyl(p, q, r):
         return fr.cyl((*fr.uv(p[0], p[1]), p[2] - z0), (*fr.uv(q[0], q[1]), q[2] - z0), r)
+    return wbox, wcyl
 
+
+@product("xt_arm")
+def xt_arm(fr, V, sp, b):
+    """One Cruisemaster XT Freestyle trailing arm in the slot between the rail and the wheel, down to the stub axle.
+    `hub` and `hub_w` place the hub centre in the envelope, `top` is the rail's underside and `slot` the clear width
+    between the rail and the tyre. The kit's parts between the rails are xt_kit's."""
+    _, cy, mu = _from_front(fr)
+    hu, hw, top, slot = sp["hub"], sp["hub_w"], sp["top"], sp["slot"]
+    pw = top - 110                                  # the arm's front end, 110 mm under the rail, where its front leg meets it
+    profile = [(mu(0), pw + 40), (mu(hu + 30), hw + 45), (mu(hu + 30), hw - 45), (mu(0), pw - 40)]
+    return [("trailing arm", fr.prism_uw(profile, 14, slot - 4), "#7b7d7d", 1.0),
+            ("stub axle", cy((hu, 14, hw), (hu, fr.D - 90, hw), 35), STEEL, 1.0)]
+
+
+@product("xt_kit")
+def xt_kit(fr, V, sp, b):
+    """One XT arm's parts between the rails at their places in Cruisemaster's 33XT AIR sheets 2 to 4 (Chassis.xt_parts,
+    est.), which its line carries: the hinge bar under its crossmember with the arm's four hinge plates and its pivot
+    tube, the airbag at ride under its top bracket 33SA 013 on the rail's inner face, and the shock absorber at ride from
+    its eye on the arm to its bracket on the next crossmember."""
+    wbox, wcyl = _world(fr)
+    out = []
     for p in (b.extra.get("xt") or []) if b is not None else []:
         kind = p["id"].rsplit("-", 1)[0]
         if kind == "XT-BAR":
@@ -57,9 +68,10 @@ def xt_arm(fr, V, sp, b):
         elif kind == "XT-HINGE":
             out += [("hinge plate", wbox(q), GALV, 1.0) for q in p["plates"]]
             out.append(("pivot tube and bushes", wcyl(*p["tube"], 32), BLACK, 1.0))
+            out.append(("arm's front leg from its outer bush under the rail", wcyl(*p["leg"], 32), "#7b7d7d", 1.0))
         elif kind == "XT-BAG":
-            (cx, cy_), (za, zb) = p["centre"], p["z"]
-            out.append(("airbag", wcyl((cx, cy_, za), (cx, cy_, zb), p["d"] / 2), BLACK, 1.0))
+            (cx, cy), (za, zb) = p["centre"], p["z"]
+            out.append(("airbag", wcyl((cx, cy, za), (cx, cy, zb), p["d"] / 2), BLACK, 1.0))
         elif kind == "XT-BAGBKT":
             out.append(("airbag top bracket", wbox(p["boxes"][0]), GALV, 1.0))
         elif kind == "XT-SHKBKT":
@@ -266,8 +278,13 @@ def tank(fr, V, sp, b):
                 inner = inner - prism
             else:
                 outer = outer - prism
+    def walled(u):                                  # the outlet's place on the front wall is not cut by a pocket
+        x, y, z = fr.pt(u, t / 2, 40)
+        return not any(nt.get("kind") == "box" and all(nt["inner"][i] - 20 <= (x, y, z)[i] <= nt["inner"][i + 3] + 20 for i in range(3))
+                       for nt in ((b.extra.get("notches") or []) if b is not None else []))
+    u_out = next((u for u in (W - 60, 60, W / 2) if walled(u)), W - 60)
     out = [("tank", outer - inner, HDPE, 0.9),
-           ("outlet fitting", fr.cyl_v(W - 60, 40, 20, 0, t), GREY, 1.0)]
+           ("outlet fitting", fr.cyl_v(u_out, 40, 20, 0, t), GREY, 1.0)]
     for u0 in (W * 0.2, W * 0.8 - 40):
         out.append(("strap", fr.box(u0, 0, H - 2, 40, D, 2), STEEL, 1.0))
     return out
@@ -294,25 +311,28 @@ def tank_guard(fr, V, sp, b):
     """A tank guard plate between the rails, in pieces round the `gaps` (u ranges kept open), `half` wide either side of
     the envelope's centre (the envelope's own half width if not given). Frame front -y: u runs rearward along X. Where
     the line carries the rear bay's shear panel (Chassis.shear_panels, UF-03), the piece behind the last gap is the
-    panel's 3 mm galvanised sheet as cut, with its tongues under the crossmembers' angles, and its stiffener under the
-    front edge, read from the chassis data."""
+    panel, which shear_panel draws."""
     W, D, H = fr.W, fr.D, fr.H
     half = sp.get("half", D / 2)
     cuts = [0.0] + [u for g in sorted(sp.get("gaps", [])) for u in g] + [W]
     pieces = list(zip(cuts[::2], cuts[1::2]))
     pn = (b.extra.get("panel") if b is not None else None)
-    out = [("guard plate", fr.box(u0, D / 2 - half, 0, u1 - u0, 2 * half, H), ALU, 1.0) for u0, u1 in (pieces[:-1] if pn else pieces)]
-    if pn:
-        z0 = fr.bx[2]
+    return [("guard plate", fr.box(u0, D / 2 - half, 0, u1 - u0, 2 * half, H), ALU, 1.0) for u0, u1 in (pieces[:-1] if pn else pieces)]
 
-        def wbox(q):
-            (ua, va), (ub, vb) = fr.uv(q[0], q[1]), fr.uv(q[3], q[4])
-            return fr.box(ua, va, q[2] - z0, ub - ua, vb - va, q[5] - q[2])
-        zt, zb = pn["z_top"], pn["z_top"] - pn["t"]
-        sh = pn["sheet"]
-        out.append(("shear panel sheet", wbox((sh["rect"][0], sh["rect"][1], zb, sh["rect"][2], sh["rect"][3], zt)), GALV, 1.0))
-        out += [("shear panel tongue", wbox((x0, y0, zb, x1, y1, zt)), GALV, 1.0) for x0, y0, x1, y1 in sh["tongues"]]
-        out += [("shear panel stiffener", wbox(q), GALV, 1.0) for q in pn["stiffener"]]
+
+@product("shear_panel")
+def shear_panel(fr, V, sp, b):
+    """The rear tank bay's shear panel as the chassis data cuts it, which the guards' line carries (Chassis.shear_panels):
+    the 3 mm galvanised sheet, its tongues under the crossmembers' angles and the stiffener under its front edge."""
+    pn = (b.extra.get("panel") if b is not None else None)
+    if not pn:
+        return []
+    wbox, _ = _world(fr)
+    zt, zb = pn["z_top"], pn["z_top"] - pn["t"]
+    sh = pn["sheet"]
+    out = [("shear panel sheet", wbox((sh["rect"][0], sh["rect"][1], zb, sh["rect"][2], sh["rect"][3], zt)), GALV, 1.0)]
+    out += [("shear panel tongue", wbox((x0, y0, zb, x1, y1, zt)), GALV, 1.0) for x0, y0, x1, y1 in sh["tongues"]]
+    out += [("shear panel stiffener", wbox(q), GALV, 1.0) for q in pn["stiffener"]]
     return out
 
 

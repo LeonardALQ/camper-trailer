@@ -1096,6 +1096,14 @@ def kit_clearance(res: dict) -> dict:
             if g < clear - 0.05:
                 problems.append(f"{run['id']} {'enters' if g < 0 else 'passes'} {part} ({name}) {abs(g):.0f} mm "
                                 f"{'deep' if g < 0 else 'clear'} at X {p[0]:.0f} Y {p[1]:.0f} Z {p[2]:.0f}")
+    for k, f in res["fixtures"].items():          # and no fixture of the services stands in a part of the kit
+        if not f.get("box") or f.get("rides"):
+            continue
+        for b in kit:
+            depth = min(min(f["box"][i + 3], b["box"][i + 3]) - max(f["box"][i], b["box"][i]) for i in range(3))
+            if depth > 0.05:
+                problems.append(f"the fixture {k} stands {depth:.0f} mm inside {b['id']} ({b['name']})")
+                break
     tested = sorted(gaps, key=lambda g: g["gap"])
     return dict(ok=not problems, problems=problems, closest=tested[:10], smallest=tested[0]["gap"] if tested else None, limit=clear,
                 runs=sorted({p.split()[0] for p in problems}))

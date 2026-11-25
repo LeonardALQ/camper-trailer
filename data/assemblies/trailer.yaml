@@ -280,7 +280,8 @@ items:
   # ================================================================ running gear (reports 06 and 16)
   - id: RG-01
     name: Cruisemaster XT Freestyle Air (4,500 kg build) in its load-sharing tandem configuration, arm, Firestone style 26 airbag, LC5 M14 hub drum and 12 inch ABS-enabled electric brake
-    model: {name: xt_arm, front: in_y, hub: 419, hub_w: 60, top: rail_underside_z - hub_z + 60, slot: hub_y - tyre_w / 2 - rail_outer_w / 2, extras: [{name: xt_hub, front: in_y, box: [axle_x + h - 154, s * hub_y - (s + 1) / 2 * 95, hub_z - 154, 308, 95, 308]}]}
+    model: {name: xt_arm, front: in_y, hub: 419, hub_w: 60, top: rail_underside_z - hub_z + 60, slot: hub_y - tyre_w / 2 - rail_outer_w / 2, extras: [{name: xt_hub, front: in_y, box: [axle_x + h - 154, s * hub_y - (s + 1) / 2 * 95, hub_z - 154, 308, 95, 308]},
+                                                                                                                                                {name: xt_kit, front: in_y, box: [axle_x + h - 490, (s + 1) / 2 * (rail_in - 455) - (1 - s) / 2 * (rail_outer_w / 2 + 30), hub_z - 60, 926, rail_outer_w / 2 + 30 - rail_in + 455, rail_top_z - hub_z + 60]}]}
     material: "Steel arm, galvanised (est.), rubber airbag, cast iron brake drum (est.)"
     note: "Hub: Cruisemaster LC5, 5 x 150 with M14 studs and a 110 mm spigot, the LandCruiser's pattern when chosen, on the 12 inch ABS-enabled A/T electric drum (decision log 11:25). Load sharing (Cruisemaster CIS-006 rev 25 lists single and load-sharing tandem configurations): each side's front and rear bags are on one air circuit with no valve between them, so the two axles of a side carry the same load at any wheel travel, as VSB1 Rev 6 asks of a load-sharing group, and its 120 % rule for non-load-sharing close-coupled axles does not apply (params load_sharing)."
     system: running_gear
@@ -688,7 +689,8 @@ items:
     # panel, its sheet, tongues and stiffener read from the chassis data (Chassis.shear_panels), bolted up to CH-P17
     model: {name: tank_guard, half: rail_in - 3,
             gaps: [[xt_centre_front + xm_w / 2 - 50 - xt_front_hinge_rear, xt_centre_front + xm_w / 2 + 50 - xt_front_hinge_rear]],
-            extras: [{name: guard_hangers, foot: 23,
+            extras: [{name: shear_panel, box: [axle_x + xt_centre_front + xm_w - 60, -rail_in, tank_z0 - 31, xt_rear_shock_front - xt_centre_front - xm_w + 120, 2 * rail_in, 31]},
+                     {name: guard_hangers, foot: 23,
                       at: [60, (xt_centre_front + xm_w / 2 - 50 - xt_front_hinge_rear) / 2, xt_centre_front + xm_w / 2 - 110 - xt_front_hinge_rear],
                       box: [axle_x + xt_front_hinge_rear, -rail_in, tank_z0 - 9, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 50 + rail_underside_z - tank_z0]}]}
     price:

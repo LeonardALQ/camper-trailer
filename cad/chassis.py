@@ -767,6 +767,7 @@ class Chassis:
                        px + pl["l"] / 2, max(ys(u - pl["t"] / 2, u + pl["t"] / 2)), zu - pr["bar"]["d"]) for u in pl["y_in"]]
             out.append(dict(id=f"XT-HINGE-{wid}", what="the arm's hinge plates, bushes and pivot tube", wheel=wid, plates=plates,
                             tube=((px, s * (y_in - pl["y_in"][0]), w["pivot"][2]), (px, s * (y_in - pl["y_in"][-1]), w["pivot"][2])),
+                            leg=((px, s * (y_in - pl["y_in"][0]), w["pivot"][2]), (px, s * (y_out + 24.0), w["pivot"][2])),
                             boxes=[(px - pl["l"] / 2, hy[0], zu - pl["below"], px + pl["l"] / 2, hy[1], zu - pr["bar"]["d"])]))
             ab, bb = pr["airbag"], pr["bag_bracket"]
             bx, by = w["hub"][0] + ab["dx"], s * (y_in - ab["y_in"])

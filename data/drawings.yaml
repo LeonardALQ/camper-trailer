@@ -616,6 +616,7 @@ drawings:
       - {rev: Y, date: 2026-11-25, description: "Memo: G7 beside its gland, BOARD, DRYER and R1 moved off the lines", drawn: Kiro, checked: "", approved: ""}
       - {rev: Z, date: 2026-11-25, description: "Memo: the hinge gussets drawn cut to bear on their faces (I2-95)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AA, date: 2026-11-25, description: "Notice: K-10 crosses under the road rail ahead of the front hinge's cheek", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AB, date: 2026-11-25, description: "Notice: K-10 along CM-04's front face to the centreline, clear of the kit", drawn: Kiro, checked: "", approved: ""}
   - number: CT-603
     title: Floor and wall penetrations
     subtitle: Every gland through the floor, walls and roof, its position, hole, fitting and runs
