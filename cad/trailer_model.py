@@ -288,18 +288,34 @@ def chassis_compound(tm: TrailerModel) -> Compound:
                     children=[Compound(label=SYSTEM_LABELS[g], children=groups[g]) for g in ("chassis", "drawbar") if g in groups])
 
 
+def _compact(o):
+    """A viewer tree with its points to 0.01 mm and its normals to 0.001, which the viewer's Float32Array draws the same,
+    so the trailer's and the chassis's files stay under 8 MB with the frame's holes for galvanising cut (I2-89)."""
+    if isinstance(o, dict):
+        for k, v in o.items():
+            places = {"vertices": 2, "edges": 2, "obj_vertices": 2, "normals": 3}.get(k)
+            o[k] = _rounded(v, places) if places and isinstance(v, list) else _compact(v)
+    elif isinstance(o, list):
+        return [_compact(v) for v in o]
+    return o
+
+
+def _rounded(v: list, places: int) -> list:
+    return [_rounded(x, places) if isinstance(x, list) else round(x, places) + 0.0 if isinstance(x, float) else x for x in v]
+
+
 def write_outputs(tm: TrailerModel, out: Path):
     from .export import _viewer_js
     out.mkdir(parents=True, exist_ok=True)
     comp = tm.compound()
     js = _viewer_js("ASM-TR", comp, **VIEWER_MESH)
-    shapes = json.loads(js[js.index("{"): js.rindex("}") + 1])
+    shapes = _compact(json.loads(js[js.index("{"): js.rindex("}") + 1]))
     (out / "trailer.viewer.json").write_text(json.dumps(shapes, separators=(",", ":")))
     export_step(comp, str(out / "trailer.step"), timestamp="2026-11-18T00:00:00")
     export_gltf(comp, str(out / "trailer.glb"), binary=True, linear_deflection=0.8, angular_deflection=0.5)
     ch = chassis_compound(tm)
     js = _viewer_js("ASM-CH", ch, **VIEWER_MESH)
-    (out / "chassis.viewer.json").write_text(js[js.index("{"): js.rindex("}") + 1])
+    (out / "chassis.viewer.json").write_text(json.dumps(_compact(json.loads(js[js.index("{"): js.rindex("}") + 1])), separators=(",", ":")))
     export_step(ch, str(out / "chassis.step"), timestamp="2026-11-20T00:00:00")
 
 
