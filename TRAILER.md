@@ -16,7 +16,7 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 | Ute | Ford Ranger Super Duty single cab chassis. Rear axle 2,542 kg with growth against Ford's 2,800 kg. Combination 7,748 kg against Ford's 8,000 kg, the ute with growth plus the plate |
 | Battery | 25.6 kWh. A design hot day runs 25.1 h when new and 17.2 h at end of life |
 | Water | 400 L fresh, the tanks' net, all of it in travel, about 41 L a day. 130 L grey |
-| Cost | AUD 199,307 with contingency, built by Leonard (H26) |
+| Cost | AUD 200,695 with contingency, built by Leonard (H26) |
 
 Every fail check passes. The tightest are the tyres' 50 mm under the floor at full bump (FIT-05, 50.0 mm against 50 mm), the towball share with the grey tank full (MAS-12, 9.8 % against 9.0 %), the heaviest towball (MAS-13, 392.7 kg against 420 kg), a lamp loom's gap to a drawbar plate (SVC-01, 20.4 mm against 20 mm) and the recovery pull in the kerb-side rail (CHS-08A, 0.83 of yield). Fully loaded with growth the trailer weighs 3,592.6 kg, 307.4 kg inside the 3,900 kg target (MAS-10).
 
@@ -166,19 +166,19 @@ The insert map CT-203 must be final before the panels are ordered, because the m
 
 ## Cost and where to save
 
-The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 153 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 173,215 subtotal carries AUD 26,092 (15.1 %), for AUD 199,307.
+The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 154 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 174,399 subtotal carries AUD 26,296 (15.1 %), for AUD 200,695.
 
 | Group | AUD | Group | AUD |
 |---|---|---|---|
-| Body | 38,360 | Chassis | 7,024 |
+| Body | 38,360 | Chassis | 8,048 |
 | Electrical | 27,292 | Freight and consumables | 5,430 |
 | Living area | 21,186 | Licensed electrician | 4,600 |
 | Running gear | 14,181 | Drawbar box | 4,388 |
-| HVAC and ventilation | 12,667 | Under the floor | 3,162 |
+| HVAC and ventilation | 12,667 | Under the floor | 3,322 |
 | Wet room | 11,627 | Roof | 2,926 |
 | Bed | 8,028 | Coupling and drawbar | 1,962 |
 | Compliance and weld evidence | 8,320 | Lamps, reflectors, the number plate and the brake circuit | 1,326 |
-| Subtotal | 173,215 | Spare wheel | 736 |
+| Subtotal | 174,399 | Spare wheel | 736 |
 
 What the registration needs stays: the licensed electrician and the AS/NZS 3001.2 certificate (ELI-01, CMP-13), the refrigeration fitting in AC-03, the wheel alignment (ALN-01), the engineer's review (CMP-03) and the registration lines. The registration itself also needs papers. A concessional trailer never registered in NSW needs TfNSW's Identity Approval before the examiner can pass it (VIB 78 rule 221.04), and its application, form 5703, is rejected without clear photographs of all four sides and the drawbar, of the vehicle plate and of the VIN stamped in the frame, the weighbridge ticket, and receipts proving the origin of the materials (CMP-04). So keep every receipt for the chassis steel, the running gear, the coupling and the panels from stage B0, and photograph the trailer as AIS Notice 41 and VIB 78 ask.
 
@@ -186,13 +186,13 @@ One line is new, the weld evidence for the chassis (CMP-14, AUD 2,344). Neither 
 
 The ten largest savings, with their contingency, their share of the total and what each costs the requirements. The site's parts list works out all thirteen from the lines. Some share lines, so they do not add up.
 
-1. Two self-built EVE MB31 packs in place of the Victron modules: AUD 6,113 (3.1 %). More capacity, but no AS IEC 62619 test, so the electrician may refuse the certificate, and the cell terminals loosen on corrugations.
+1. Two self-built EVE MB31 packs in place of the Victron modules: AUD 6,113 (3.0 %). More capacity, but no AS IEC 62619 test, so the electrician may refuse the certificate, and the cell terminals loosen on corrugations.
 2. A plain low-flow shower: AUD 5,779 (2.9 %). Two 20 min showers then use about 240 L a day.
-3. A fixed bed at night height: AUD 5,450 (2.8 %). The desk loses its place under the bed, so H1 fails.
-4. A 230 V water heater and the heat pump in place of the Combi: AUD 5,308 (2.7 %). No heat or hot water without the battery.
-5. No engineer's review: AUD 5,280 (2.7 %). The inspection does not ask for one. The RAV entry's drawbar evidence then rests on Leonard's own calculation, and if the department does not accept it, on a drawbar and chain-point test at an approved facility, about AUD 5,000 (est.). The designs stay unchecked.
+3. A fixed bed at night height: AUD 5,450 (2.7 %). The desk loses its place under the bed, so H1 fails.
+4. A 230 V water heater and the heat pump in place of the Combi: AUD 5,308 (2.6 %). No heat or hot water without the battery.
+5. No engineer's review: AUD 5,280 (2.6 %). The inspection does not ask for one. The RAV entry's drawbar evidence then rests on Leonard's own calculation, and if the department does not accept it, on a drawbar and chain-point test at an approved facility, about AUD 5,000 (est.). The designs stay unchecked.
 6. Square front edges: AUD 4,200 (2.1 %). About 3.7 L/100 km more towing, about AUD 1,550 a year.
-7. No generators: AUD 4,085 (2.1 %). Cloud with no drive then needs shore power.
+7. No generators: AUD 4,085 (2.0 %). Cloud with no drive then needs shore power.
 8. No freezer: AUD 2,455 (1.2 %). Frozen food fits only the fridge's 8.2 L compartment.
 9. A Carafan fan in place of the RESPA: AUD 1,521 (0.8 %). No powered precleaner, so the filter loads faster in dust.
 10. One generator in place of two: AUD 1,336 (0.7 %). A design hot day then takes 24.7 h of running to put back.

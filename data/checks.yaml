@@ -382,16 +382,30 @@ trailer_checks:
     title: LC8a recovery at the 78.5 kN ultimate, no fracture, the members on their effective sections and the holes on their net sections
     type: chassis_local
     item: ultimate
-    severity: report
+    severity: fail
     inputs: []
-    why: "Review I2-87. Report 11's LC8a asks no yield at 58.9 kN (CHS-08A, CHS-09) and no fracture at the 78.5 kN ultimate, TJM's 8 t test load, at each front and rear recovery point within 30 degrees sideways and 15 degrees up or down, the body held at its suspension mounts. Each member is read on its AS 4100 5.2 effective section, Ze about each axis (Austube's tabled values for C450L0, AS 4100 Table 5.2's limits for a cold-formed RHS otherwise, the rail and its raiser on their pair's plastic modulus, compact that way, and the sum of their slender weak-axis moduli), the axial and both bending stresses added as AS 4100 8.3.4's linear interaction and combined with the shear, against fy, the rails at the raiser's 350 MPa. Each hole is read on its net section against 0.85 fu, AS 4100 clause 7.2's fracture term. A rear tongue's pull acts at its shackle hole and enters the frame at the rear crossmember's end, where the tongue is welded through it and along the rail's web. Reported, not a build failure, while the grey bay's floor crossmember, its holes and the rails at the XT centre station stand up to 2 % over and the services' H-01 at its limit: the rear bays need a shear path the grey tank leaves no room for as a plan brace (CHASSIS.md, open point 14)."
+    why: "Review I2-87. Report 11's LC8a asks no yield at 58.9 kN (CHS-08A, CHS-09) and no fracture at the 78.5 kN ultimate, TJM's 8 t test load, at each front and rear recovery point within 30 degrees sideways and 15 degrees up or down. Report 11 gives no reaction, so the ground holds the trailer as it would: at its four unbraked wheels, each wheel's force along the trailer through its hub and each tyre on its rates with its arm (est.), and with one wheel held fast against an obstacle at its hub's height, the trailer turned until the pull passes through that hub, the others rolling free (CHASSIS.md, the analysis). Each member is read on its AS 4100 5.2 effective section, Ze about each axis (Austube's tabled values for C450L0, AS 4100 Table 5.2's limits for a cold-formed RHS otherwise, the rail and its raiser on their pair's plastic modulus, compact that way, and the sum of their slender weak-axis moduli), the axial and both bending stresses added as AS 4100 8.3.4's linear interaction and combined with the shear, against fy, the rails at the raiser's 350 MPa. Each hole is read on its net section against 0.85 fu, AS 4100 clause 7.2's fracture term. A rear tongue's pull acts at its shackle hole and enters the frame at the rear crossmember's end, where the tongue is welded through it and along the rail's web. The rear tank's bay carries the pull's racking as a shear panel (CHS-13)."
   - id: CHS-12
-    title: XT hinge crossmembers with each hinge tied to its crossmember at the hinge bar's welds, as Cruisemaster builds it
+    title: XT hinge joints as built, each hinge welded to its crossmember and held to the rail by its cheeks, in every case
     type: chassis_local
-    item: hinge_path
-    severity: report
+    item: hinge_joints
+    severity: fail
     inputs: []
-    why: "Review I2-88. Cruisemaster's 33XT AIR sheets weld each hinge bar to its hinge crossmember only, 6 mm fillets in three 80 mm runs a side, and not under the rail, so a hinge's force and moment reach the rail through the crossmember's end, beside its holes, and through the 45 degree gussets TB 070 recommends. The frame model behind CHS-01 to CHS-11 ties each pivot to the rail. This row runs the whole analysis again with each pivot tied to its crossmember at the weld runs (est., 80 mm runs at 100 mm centres from 10 mm inboard of the rail) and the gussets as members, and reads the hinge crossmembers, the gussets and their holes in every case against the same limits, and FAT-03 and FAT-13. Reported, not a build failure, until the hinge joints are redesigned: with the frame held at its pivots in LC8a, as VSB1 14 holds it, the recovery pull's reactions pass through the crossmembers' ends (CHASSIS.md, open point 15)."
+    why: "Review I2-88. Cruisemaster's 33XT AIR sheets weld each hinge bar to its hinge crossmember only, 6 mm fillets in three 80 mm runs a side, and not under the rail. The frame model ties each pivot to its crossmember at those runs (est., 80 mm runs at 100 mm centres from 10 mm inboard of the rail), and to the rail through the hinge's two 10 mm cheeks (CH-P16), with the 45 degree gussets TB 070 recommends either side of each hinge crossmember as members (CH-P08). This row reads the hinge crossmembers, the gussets, the cheeks and their holes in every case against that case's limit, LC8a at 58.9 kN and at 78.5 kN with one wheel held fast included, and FAT-03 and FAT-13 within their CAFL. TB 070 page 2 lets suspension crossmembers take holes only where their strength can be ensured, which this row reads, and Cruisemaster accepts the joint in writing before fabrication (CHASSIS.md, open point 15)."
+  - id: CHS-13
+    title: The rear tank's bay as a shear panel, its 3 mm steel guard's shear and buckling and its bolts, in every case
+    type: chassis_local
+    item: shear_panel
+    severity: fail
+    inputs: []
+    why: "Review I2-87. The rear fresh tank fills its bay, so the bay has no plan brace, and the recovery pull's racking at the 78.5 kN ultimate bent the rails behind the XT centre crossmember past their limit through that bay. Its tank guard is a 3 mm galvanised steel sheet (AS 1397 G300) bolted by M10 8.8 bolts at 50 mm to angles welded along both rails' inner webs, under the XT rear shock crossmember and under the XT centre crossmember's middle 140 mm, clear of the runs that cross under it, so the bay works as a shear panel, modelled as two diagonals of the panel's shear stiffness. The plate's shear stress V / (b t) is held to the lower of 0.6 fy and its elastic shear buckling stress, simply supported on its four edges, over each case's factor, and each bolt's share of the whole shear V over that 140 mm to AS 4100 9.3.2's 0.8 x 0.62 fuf on its minor diameter area."
+  - id: CHS-14
+    title: The hinge cheeks' welds hold their share of the 78.5 kN ultimate pull, a held wheel's included
+    type: chassis_local
+    item: hinge_cheeks
+    severity: fail
+    inputs: []
+    why: "Review I2-88. With one wheel held fast the whole pull along the trailer reaches one hinge. Each cheek is welded down the hinge bar's front or rear face by an 8 mm fillet each side over the bar's top 30 mm (est.), and to the rail's inner web by 6 mm fillets along its top edge and the rail's bottom corner, which also take the cheek's shear's moment about the pivot's 99 mm depth as a couple 82.5 mm apart. Each cheek takes its share of the largest shear the frame puts through its hinge's cheeks in LC8u, the front road-side hinge's one cheek all of its own. Each fillet's throat stress is held to AS 4100 9.7.3's 0.8 x 0.6 fuw."
   - id: CHS-09
     title: Holes the runs and the galvanising make in the frame's members, net section in LC1 to LC8b within each case's limit
     type: chassis_local

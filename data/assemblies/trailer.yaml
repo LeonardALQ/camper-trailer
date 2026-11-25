@@ -692,12 +692,15 @@ items:
                            xt_centre_front + xm_w / 2 + 110 - xt_front_hinge_rear, (xt_centre_front + xm_w / 2 + 50 + xt_rear_shock_front) / 2 - xt_front_hinge_rear,
                            xt_rear_shock_front - xt_front_hinge_rear - 60],
                       box: [axle_x + xt_front_hinge_rear, -rail_in, tank_z0 - 9, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 50 + rail_underside_z - tank_z0]}]}
-    price: {aud: 341.75, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/107-aluminium-5-bar-checker-plate-tread.html", date: 2026-11-20, note: "One 1200 x 2400 sheet of 3 mm aluminium checker plate, AUD 261.75 (listing), plus angle and fixings AUD 80 (est.)"}
+    price:
+      - {item: "3 mm aluminium checker plate for the front tank's guard", aud: 341.75, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/107-aluminium-5-bar-checker-plate-tread.html", date: 2026-11-20, note: "One 1200 x 2400 sheet of 3 mm aluminium checker plate, AUD 261.75 (listing), plus angle and fixings AUD 80 (est.)"}
+      - {item: "3 mm galvanised steel sheet for the rear tank's guard, the bay's shear panel, and its M10 8.8 bolts", aud: 160, basis: estimate, date: 2026-11-25, note: "A 1200 x 1200 mm piece of 3 mm Z275 galvanised steel sheet, about 34 kg at about AUD 4 a kg, and 50 M10 8.8 bolts with nyloc nuts (est.)"}
     box: [axle_x + xt_front_hinge_rear, -rail_in, tank_z0 - 6, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 6]
     parts:
-      - {item: "3 mm five-bar aluminium treadplate, the XT bays' length by the width between the rails", kg: "(xt_rear_shock_front - xt_front_hinge_rear) * 2 * rail_in * 9.375e-6", basis: estimate, source: "At about 9.4 kg/m2, Austral Wright's approximate 27 kg for a 3 x 1,200 x 2,400 mm five-bar sheet (https://www.australwright.com.au/wp-content/uploads/2012/07/AluminiumTreadplate1.pdf)"}
+      - {item: "3 mm five-bar aluminium treadplate, the front tank's bay by the width between the rails", kg: "(xt_centre_front + xm_w / 2 - 50 - xt_front_hinge_rear) * 2 * rail_in * 9.375e-6", basis: estimate, source: "At about 9.4 kg/m2, Austral Wright's approximate 27 kg for a 3 x 1,200 x 2,400 mm five-bar sheet (https://www.australwright.com.au/wp-content/uploads/2012/07/AluminiumTreadplate1.pdf)"}
+      - {item: "3 mm Z275 galvanised steel sheet, the rear tank's bay by the width between the rails, bolted as the bay's shear panel (CHS-13)", kg: "(xt_rear_shock_front - xt_centre_front - xm_w / 2 - 50) * 2 * rail_in * 23.83e-6", basis: calculated, source: "3 mm at 7,850 kg/m3, 23.55 kg/m2, and Z275's 0.275 kg/m2 of zinc"}
       - {item: "Aluminium angle, rubber strip and fixings", kg: 3.1, basis: estimate, source: "The older block model's 20 kg less the plate at the 1,175 mm rails"}
-    note: One sheet under both fresh tanks, as wide as the space between the rails (H22's 1,275 mm rails make it 1,175 mm), so it still comes from one 1,200 x 2,400 mm sheet.
+    note: One guard under each fresh tank, as wide as the space between the rails (H22's 1,275 mm rails make it 1,175 mm). The front one is aluminium treadplate on its hangers. The rear one is 3 mm galvanised steel bolted to the angles welded along the rails' inner webs and under the two crossmembers (CH-P17), so the rear tank's bay carries the recovery pull's racking as a shear panel (CHS-13, I2-87).
   - id: UF-06
     name: Heater fuel tank, 15 L HDPE, with line and filter
     model: {name: hdpe_tank, wall: 5}

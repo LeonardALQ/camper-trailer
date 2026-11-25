@@ -52,7 +52,7 @@ class Item:
 
 
 class Analysis:
-    def __init__(self, lay, tr, ch: Chassis, body=None, hinges: str = "rail"):
+    def __init__(self, lay, tr, ch: Chassis, body=None, hinges: str = "crossmember"):
         self.lay, self.tr, self.ch = lay, tr, ch
         self.hinges = hinges
         self.fm = ch.frame(body, hinges)
@@ -268,13 +268,16 @@ class Analysis:
             contact[k] = np.array([w_h[k] * Fxw, w_h[k] * Fyw, fz[k] + dz])
         return dict(ball=np.array([0.0, Fby, Fbz]), contact=contact)
 
-    def arm_loads(self, items: list[Item], acc, contact: dict, q: np.ndarray) -> dict:
-        """Solve each arm as a free body about its hinge and put the hinge and airbag forces on the frame."""
+    def arm_loads(self, items: list[Item], acc, contact: dict, q: np.ndarray, hub: dict | None = None) -> dict:
+        """Solve each arm as a free body about its hinge and put the hinge and airbag forces on the frame. `hub` adds a
+        force at a wheel's hub, where an obstacle holds the wheel in LC8a."""
         a = np.asarray(acc, float) * G
         out = {}
         for w in self.ch.suspension:
             P = np.asarray(w["pivot"], float)
             un = [(it.m * a, np.asarray(it.p, float) - P) for it in items if it.rule == "unsprung" and it.wheel == w["id"]]
+            if hub and w["id"] in hub:
+                un.append((np.asarray(hub[w["id"]], float), np.asarray(w["hub"], float) - P))
             Wu = sum((F for F, _ in un), np.zeros(3))
             Mu = sum((np.cross(r, F) for F, r in un), np.zeros(3))
             C = contact[w["id"]]
@@ -326,6 +329,50 @@ class Analysis:
         resid = max(abs(v) for v in res.reactions.values())
         return res, dict(ball=R["ball"], arms=arms, residual_n=resid, pad=R.get("pad", [None])[0])
 
+    def recovery_reactions(self, F, p, held: str | None = None) -> dict:
+        """LC8a's reaction, which report 11 does not give: the ground at the four tyres, the trailer a rigid body on each
+        wheel's support stiffness, its tyre and arm in series (LC8a's reaction, est.). The wheels are unbraked, so the
+        ground's force on each passes through its hub: along the trailer every wheel takes its share there, or with `held`
+        that wheel is held fast against an obstacle at its hub's height and the other three roll free. Across and up every
+        tyre works at its lateral and vertical rate at its contact. Returns the force the ground puts on each tyre at its
+        contact and on each wheel at its hub."""
+        r = next(lc for lc in self.ch.data["load_cases"] if lc["id"] == "LC8a")["reaction"]
+        springs = []
+        for w in self.ch.suspension:
+            for d, k in ((0, r["kx"]), (1, r["ky"]), (2, r["kz"])):
+                at = w["hub"] if d == 0 else w["contact"]
+                if held is not None and d < 2:
+                    k = r["held_k"] if w["id"] == held else (0.0 if d == 0 else k)
+                    at = w["hub"] if w["id"] == held else at
+                if k:
+                    springs.append((w["id"], d, k, np.eye(3)[d], np.asarray(at, float)))
+        K = np.zeros((6, 6))
+        for _, _, k, e, at in springs:
+            g = np.r_[e, np.cross(at, e)]
+            K += k * np.outer(g, g)
+        F = np.asarray(F, float)
+        move = np.linalg.solve(K, np.r_[F, np.cross(np.asarray(p, float), F)])
+        contact = {w["id"]: np.zeros(3) for w in self.ch.suspension}
+        hub = {}
+        for wid, d, k, e, at in springs:
+            f = -k * (np.r_[e, np.cross(at, e)] @ move) * e
+            if d == 0 or (held is not None and wid == held and d == 1):
+                hub[wid] = hub.get(wid, np.zeros(3)) + f
+            else:
+                contact[wid] = contact[wid] + f
+        return dict(contact=contact, hub=hub)
+
+    def run_recovery(self, F, p, fractions, held: str | None = None):
+        """LC8a: the pull at its recovery point, the tyres' reactions through each arm as a free body about its hinge, the
+        airbag taking its moment, and the frame held only by the six kinematic supports."""
+        q = np.zeros(self.n)
+        self._apply(np.asarray(F, float), p, fractions, q)
+        R = self.recovery_reactions(F, p, held)
+        arms = self.arm_loads([], (0.0, 0.0, 0.0), R["contact"], q, hub=R["hub"])
+        res = self.kinematic.solve(q)
+        self.resid = max(self.resid, max(abs(v) for v in res.reactions.values()))
+        return res, arms
+
     def run_body(self, F, p, fractions):
         q = np.zeros(self.n)
         self._apply(np.asarray(F, float), p, fractions, q)
@@ -339,7 +386,7 @@ class Analysis:
         out = {}
         nodes = self.f.nodes
         for el, fl in zip(self.f.elements, res.forces):
-            if el.sec.rigid or el.member in ("BODY", "BODY-MOUNT"):
+            if el.sec.rigid or el.member in ("BODY", "BODY-MOUNT") or el.member.startswith("PNL-"):
                 continue
             sp = self.fm.sec_props[el.member]
             for end, act in zip((el.i, el.j), end_actions(fl)):
@@ -418,12 +465,18 @@ class Analysis:
         self.resid = 0.0
         sites = self.hole_sites()
         hole_env: dict[str, dict] = {}
+        self.panel_env: dict[str, dict] = {}
 
         def take(lc_id, res, label, extra=None, ultimate=False):
             for mem, r in self.stresses(res, ultimate).items():
                 e = env.setdefault(lc_id, {})
                 if mem not in e or r["eq"] > e[mem]["eq"]:
                     e[mem] = dict(r, case=label, **(extra or {}))
+            for sp in self.fm.panels_by_id().values():
+                v = self.panel_shear(res, sp)
+                pe = self.panel_env.setdefault(lc_id, {})
+                if sp["id"] not in pe or v > pe[sp["id"]]["v_n"]:
+                    pe[sp["id"]] = dict(v_n=v, case=label)
             he = hole_env.setdefault(lc_id, {})
             for k, h in enumerate(sites):
                 if h.get("open") or h.get("placement_only"):
@@ -497,12 +550,17 @@ class Analysis:
                         sx = 1
                         p, cm = self.rear_recovery_point(s)
                         fr = [(self.fm.cm_node(cm, s * V["rail_c"]), 1.0)]
-                    for h in (-30, 0, 30):
+                    pulls = [(f"{h:+d} deg sideways", None, math.radians(h)) for h in (-30, 0, 30)]
+                    for w in ch.suspension:
+                        hdg = math.atan2(p[1] - w["hub"][1], sx * (p[0] - w["hub"][0]))
+                        if abs(hdg) <= math.radians(30) + 1e-9:
+                            pulls.append((f"{math.degrees(hdg):+.1f} deg sideways through wheel {w['id']}, held", w["id"], hdg))
+                    for lab, held, hdg in pulls:
                         for v in (-15, 0, 15):
-                            F = Fr * np.array([sx * math.cos(math.radians(h)) * math.cos(math.radians(v)),
-                                               math.sin(math.radians(h)) * math.cos(math.radians(v)), math.sin(math.radians(v))])
-                            res = self.run_body(F, p, fr)
-                            take(lc_id, res, f"{where} {'kerb' if s < 0 else 'road'}-side point, {h:+d} deg sideways, {v:+d} deg up"
+                            F = Fr * np.array([sx * math.cos(hdg) * math.cos(math.radians(v)), math.sin(hdg) * math.cos(math.radians(v)),
+                                               math.sin(math.radians(v))])
+                            res, _ = self.run_recovery(F, p, fr, held)
+                            take(lc_id, res, f"{where} {'kerb' if s < 0 else 'road'}-side point, {lab}, {v:+d} deg up"
                                  + (f", {Fr / 1000:.1f} kN" if lc_id == "LC8u" else ""), ultimate=lc_id == "LC8u")
         out = dict(envelope={}, governing={}, deflections={}, twist=twist, balls=balls, residual_n=self.resid,
                    frame=dict(nodes=len(self.f.nodes), elements=sum(1 for e in self.f.elements if not e.sec.rigid),
@@ -521,38 +579,87 @@ class Analysis:
         from .chassis_dip import check as galvanising_check
         out["galvanising"] = galvanising_check(ch)
         out["local"] = self.local_checks(out["pad_n"]["pad_n"])
+        out["local"].update(self.panel_checks(), hinge_cheeks=self.cheek_check())
         out["fixings"] = self.fixings()
         out["cross_checks"] = self.cross_checks(out, lc6)
         out["lc1_ball"] = balls
-        if self.hinges == "rail":
-            out["hinge_path"] = self.hinge_path_study()
+        out["hinge_joints"] = self.hinge_joints(out)
         return out
 
-    def hinge_path_study(self) -> dict:
-        """CHS-12 (I2-88): the whole analysis again with each XT pivot tied to its hinge crossmember at the hinge bar's
-        weld runs and the gussets as members, as Cruisemaster's sheets build the joint, read at the hinge crossmembers,
-        their gussets and their holes in every case, and FAT-03 and FAT-13 at their roots and hinges."""
+    def hinge_joints(self, out: dict) -> dict:
+        """CHS-12 (I2-88): the XT hinge joints as built, each pivot tied to its crossmember at the hinge bar's weld runs and
+        to the rail through the hinge's two cheeks, with the gussets either side: the hinge crossmembers, the gussets, the
+        cheeks and the crossmembers' holes in every case against that case's limit, and FAT-03 and FAT-13."""
         ch = self.ch
-        cms = [m.id for m in ch.hinge_crossmembers()]
-        parts = set(cms) | {g["id"] for g in ch.hinge_gussets()}
-        res = Analysis(self.lay, self.tr, ch, hinges="crossmember").run()
+        parts = {m.id for m in ch.hinge_crossmembers()} | {g["id"] for g in ch.hinge_gussets()} | {c["member"] for c in ch.hinge_cheeks()}
         rows = []
-        for lc_id, env in res["envelope"].items():
+        for lc_id, env in out["envelope"].items():
             for m, r in env.items():
                 if m in parts:
                     rows.append(dict(part=m, lc=lc_id, mpa=r["eq"], limit=r["eq"] / r["util"] if r["util"] else r["fy"],
                                      util=r["util"], case=r["case"], at=r["at"]))
-        holes = [h for h in res["holes"] if not h.get("open") and (h.get("member") in parts) and h.get("static")]
-        for h in holes:
+        for h in (h for h in out["holes"] if not h.get("open") and h.get("member") in parts):
             for key in ("static", "ultimate"):
-                s = h.get(key)
-                if s:
-                    rows.append(dict(part=f"{h['id']} in {h['member']}", lc=s["lc"], mpa=s["mpa"], limit=s["limit"], util=s["util"], case=s["case"]))
+                v = h.get(key)
+                if v:
+                    rows.append(dict(part=f"{h['id']} in {h['member']}", lc=v["lc"], mpa=v["mpa"], limit=v["limit"], util=v["util"], case=v["case"]))
         fat = [dict(id=f["id"], range_mpa=f["range_mpa"], cafl=f["cafl"], util=f["range_mpa"] / f["cafl"], where=f["where"])
-               for f in res["fatigue"] if f["id"] in ("FAT-03", "FAT-13")]
+               for f in out["fatigue"] if f["id"] in ("FAT-03", "FAT-13")]
         worst = max(rows, key=lambda r: r["util"])
         return dict(rows=sorted(rows, key=lambda r: -r["util"])[:12], worst=worst, fatigue=fat,
                     ok=worst["util"] <= 1 + 1e-9 and all(f["util"] <= 1 + 1e-9 for f in fat))
+
+    def panel_shear(self, res, sp: dict) -> float:
+        """The racking shear a shear panel carries, from its two diagonals' axial forces: V = (N1 - N2) b / L, in N."""
+        n1, n2 = (float(res.forces[e][6]) for e in sp["elements"])
+        return abs(n1 - n2) * 2 * self.ch.V["rail_c"] / sp["L"]
+
+    def panel_checks(self) -> dict:
+        """Each shear panel (shear_panels) in its worst case of every load case: the plate's shear stress V / (b t) against
+        its shear yield over the case's factor and its elastic shear buckling stress, and the M8 bolts to its angles, each
+        taking the panel's shear V over the angles' `transverse` length under each crossmember times their pitch, against
+        AS 4100 9.3.2's bolt shear capacity with the threads in the plane."""
+        ch = self.ch
+        lcs = {lc["id"]: lc for lc in ch.data["load_cases"]}
+        out = {}
+        for sp in ch.shear_panels():
+            d = next(x for x in ch.data["shear_panels"] if x["id"] == sp["id"])
+            a, b, t = sp["x1"] - sp["x0"], sp["b"], sp["t"]
+            lo, hi = sorted((a, b))
+            k = 5.35 + 4.0 * (lo / hi) ** 2
+            tau_cr = k * math.pi ** 2 * 200_000.0 / (12 * (1 - NU ** 2)) * (t / lo) ** 2
+            bolt = d["fixing"]
+            cap = 0.8 * 0.62 * bolt["fuf"]                     # MPa on the bolt's minor diameter area
+            size = bolt["bolt"].split()[0]
+            rows = []
+            for lc_id, e in self.panel_env.items():
+                r = e[sp["id"]]
+                fac = lcs[lc_id]["factor"] if lc_id in lcs else 1
+                tau = r["v_n"] / (b * t)
+                rows += [(f"plate shear, {lc_id}", tau, min(0.6 * d["fy"], tau_cr) / fac),
+                         (f"{size} bolt to its angles, {lc_id}", r["v_n"] / bolt.get("transverse", b) * bolt["pitch"] / bolt["a_c"], cap / fac)]
+            w = max(self.panel_env.items(), key=lambda kv: kv[1][sp["id"]]["v_n"])
+            res = _local(f"Shear panel {sp['id']}, {t:g} mm steel, {a:,.0f} x {b:,.0f} mm", [(p, s_, l) for p, s_, l in rows],
+                         f"its worst racking shear, {w[1][sp['id']]['v_n'] / 1000:.1f} kN in {w[0]}, {w[1][sp['id']]['case']}")
+            res.update(tau_cr=tau_cr, v_n=w[1][sp["id"]]["v_n"], lc=w[0])
+            out["shear_panel"] = res
+        return out
+
+    def cheek_check(self) -> dict:
+        """The hinge cheeks' welds (CH-P16) at the 78.5 kN ultimate pull, all of it along the trailer through one cheek, as a
+        held wheel puts it through the front road-side hinge, which has one: the `bar_leg` fillets each side of the cheek
+        down the hinge bar's front or rear face over the bar's top `bar_d` (est.), and the two `leg` fillets along the rail's
+        web, which also take the pull's moment about the pivot's depth as a couple."""
+        ch = self.ch
+        mat = ch.data["material"]
+        wcap = mat["weld_phi"] * 0.6 * mat["weld_fuw"]
+        ck = ch.data["xt_hinges"]["cheek"]
+        F = next(lc for lc in ch.data["load_cases"] if lc["id"] == "LC8a")["ultimate_n"]
+        bar = F / (2 * ck["bar_d"] * 0.7 * ck["bar_leg"])
+        a = 0.7 * ck["leg"]
+        web = F / (2 * ck["l"] * a) + F * ch.V["pivot_below"] / (ck["h"] - ck["below"]) / (ck["l"] * a)
+        return _local("Hinge cheeks' welds (CH-P16)", [("to the hinge bar", bar, wcap), ("to the rail's web", web, wcap)],
+                      f"the {F / 1000:.1f} kN ultimate pull along the trailer through one cheek")
 
     def fy_of_part(self, member: str) -> float:
         """The yield stress of a frame part that is not a member (a hinge gusset), from its section."""

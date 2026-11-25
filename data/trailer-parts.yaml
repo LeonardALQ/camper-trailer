@@ -51,10 +51,10 @@ lines:
   # ================================================================ chassis stock, shared over the members and plates it covers
   - id: STL-01
     group: chassis
-    name: RHS 150 x 50 x 3.0, one 8 m length, for the body front and XT hinge crossmembers
+    name: RHS 150 x 50 x 3.0, one 8 m length, for the body front crossmember
     qty: 1
     unit: 8 m length
-    covers: [CM-01, CM-04, CM-05]
+    covers: [CM-01]
     price: {aud_each: 205.65, basis: listing, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-20, note: "SKU RHS36. 3.5 m needed since the rear crossmember went to 6 mm (CHS-08U). Ask for C450L0 (Austube C450PLUS) on the mill certificate"}
   - id: STL-02
     group: chassis
@@ -72,11 +72,18 @@ lines:
     price: {aud_each: 267.84, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-21, note: "93.0 kg at AUD 2.88/kg, the rate of the listed 150 x 50 x 3.0 and 150 x 50 x 5.0 lengths. 8.8 m needed since the rails went to 4 mm for the 4,000 kg plate (CHS-08A), the XT rear shock crossmember now on the 6 mm length (CHS-08U). Ask for C450L0 (Austube C450PLUS) on the mill certificate"}
   - id: STL-03
     group: chassis
-    name: RHS 150 x 50 x 6.0, one 8 m length, for the drawbar members, the XT rear shock crossmember and the rear crossmember
+    name: RHS 150 x 50 x 6.0, two 8 m lengths, for the drawbar members, the XT front hinge, rear shock and rear crossmembers
+    qty: 2
+    unit: 8 m length
+    covers: [DB-KA, DB-KB, DB-RA, DB-RB, CM-04, CM-06, CM-08]
+    price: {aud_each: 384.77, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-23, note: "133.6 kg at AUD 2.88/kg, the rate of the listed 150 x 50 x 3.0 and 150 x 50 x 5.0 lengths (the 5.0 mm, SKU RHS40, is AUD 326.65). 7.7 m needed: 5.3 m since the drawbar went to 6 mm for its root's fatigue (FAT-07) and 2.4 m since the two rear crossmembers did for the recovery pull's ultimate (CHS-08U). Ask for C450L0 (Austube C450PLUS) on the mill certificate"}
+  - id: STL-10
+    group: chassis
+    name: RHS 150 x 50 x 5.0, one 8 m length, for the XT centre crossmember
     qty: 1
     unit: 8 m length
-    covers: [DB-KA, DB-KB, DB-RA, DB-RB, CM-06, CM-08]
-    price: {aud_each: 384.77, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-23, note: "133.6 kg at AUD 2.88/kg, the rate of the listed 150 x 50 x 3.0 and 150 x 50 x 5.0 lengths (the 5.0 mm, SKU RHS40, is AUD 326.65). 7.7 m needed: 5.3 m since the drawbar went to 6 mm for its root's fatigue (FAT-07) and 2.4 m since the two rear crossmembers did for the recovery pull's ultimate (CHS-08U). Ask for C450L0 (Austube C450PLUS) on the mill certificate"}
+    covers: [CM-05]
+    price: {aud_each: 326.65, basis: listing, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-23, note: "SKU RHS40. 1.2 m needed since the hinge joints were redesigned for a held wheel's recovery pull (CHS-12). Ask for C450L0 (Austube C450PLUS) on the mill certificate"}
   - id: STL-04
     group: chassis
     name: RHS 75 x 50 x 3.0, one 8 m length, for the drawbar cross brace
@@ -100,7 +107,7 @@ lines:
     price: {aud_each: 80.25, basis: listing, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/15-shs-mild-steel-square.html", date: 2026-11-20, note: "SKU SHS24. 2.6 m needed"}
   - id: STL-07
     group: chassis
-    name: SHS 50 x 50 x 3.0, one 8 m length, for the four hinge crossmember gussets
+    name: SHS 50 x 50 x 3.0, one 8 m length, for the six hinge crossmember gussets
     qty: 1
     unit: 8 m length
     covers: [CH-P08]
@@ -108,17 +115,17 @@ lines:
   - id: STL-08
     group: chassis
     name: Profile-cut plate parts, grade 350, cut and drilled, for the coupling plate, lugs, gussets, pads, cleats, brackets, the rails' end plates and the 32 body mount nut plates
-    qty: 60
+    qty: 78
     unit: kg
-    covers: [CH-P01, CH-P02, CH-P03, CH-P04, CH-P05, CH-P06, CH-P07, CH-P09, CH-P11, CH-P14, CH-P15]
-    price: {aud_each: 12, basis: estimate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/374-mild-steel-sheet-plates-250gr-as-nzs-3678.html", date: 2026-11-21, note: "51.6 kg of plate in the schedule with the rails' 16 mm end plates CH-P15 (ARK's corner steady brackets come with the steadies, CH-B01) and eight 150 x 150 x 6 plan-brace gussets of 8.5 kg, so 60 kg where it was 58 kg before CH-P15 (I2-51). Plate is listed at AUD 3.05 to 3.44/kg as sheet. AUD 12/kg covers nesting scrap and laser or plasma cutting and drilling of small thick parts"}
+    covers: [CH-P01, CH-P02, CH-P03, CH-P04, CH-P05, CH-P06, CH-P07, CH-P09, CH-P11, CH-P14, CH-P15, CH-P16, CH-P17]
+    price: {aud_each: 12, basis: estimate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/374-mild-steel-sheet-plates-250gr-as-nzs-3678.html", date: 2026-11-21, note: "69.4 kg of plate and angle in the schedule with the rails' 16 mm end plates CH-P15, the seven 10 mm hinge cheeks CH-P16 (9.3 kg) and the shear panel's angles CH-P17 (8.7 kg) (ARK's corner steady brackets come with the steadies, CH-B01), and eight 150 x 150 x 6 plan-brace gussets of 8.5 kg, so 78 kg where it was 60 kg before the hinge cheeks and the panel (CHS-12, CHS-13). Plate is listed at AUD 3.05 to 3.44/kg as sheet. AUD 12/kg covers nesting scrap and laser or plasma cutting and drilling of small thick parts"}
   - id: GLV-01
     group: chassis
     name: Hot-dip galvanising to AS/NZS 4680 of the welded chassis and drawbar, the stone guard frame and the mud flap hangers
-    qty: 555
+    qty: 590
     unit: kg galvanised
     covers: [CH-G01]
-    price: {aud_each: 2.75, basis: estimate, url: "https://www.steel.org.au/getattachment/2f694ebb-98a7-4273-be94-e0f61bd74328/Cost-factors-for-hot-dip-galvanised-coatings_INGALSM3.pdf", date: 2026-11-23, note: "538.0 kg of steel with the 4 mm rails (CHS-08A at the 4,000 kg plate), the 6 mm drawbar (FAT-07) and the two 6 mm rear crossmembers (CHS-08U), 16.0 kg of zinc and the guard frame and hangers. Galvanisers charge by the galvanised mass. The industry's AUD 1.20/kg for light fabrications is an older figure, so AUD 2.75/kg allows for rises and a one-off frame (research report 22). No NSW bath takes the 2.4 m frame level across, so it goes in one dip at Valmont Coatings Hexham, rolled about 46 degrees across (CHASSIS.md revision N)"}
+    price: {aud_each: 2.75, basis: estimate, url: "https://www.steel.org.au/getattachment/2f694ebb-98a7-4273-be94-e0f61bd74328/Cost-factors-for-hot-dip-galvanised-coatings_INGALSM3.pdf", date: 2026-11-23, note: "573.0 kg of steel with the 4 mm rails (CHS-08A at the 4,000 kg plate), the 6 mm drawbar (FAT-07), the two 6 mm rear crossmembers (CHS-08U), the 6 and 5 mm hinge crossmembers, their cheeks and the rear tank bay's angles (CHS-12, CHS-13), 16.5 kg of zinc and the guard frame and hangers. Galvanisers charge by the galvanised mass. The industry's AUD 1.20/kg for light fabrications is an older figure, so AUD 2.75/kg allows for rises and a one-off frame (research report 22). No NSW bath takes the 2.4 m frame level across, so it goes in one dip at Valmont Coatings Hexham, rolled about 46 degrees across (CHASSIS.md revision N)"}
   # ================================================================ running gear service
   - id: ALN-01
     group: running_gear

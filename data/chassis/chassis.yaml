@@ -5,7 +5,11 @@
 # cad/chassis_fea.py analyses them. Sections come from data/chassis/sections.yaml (report 11's table).
 id: ASM-CH
 name: Chassis and drawbar
-revision: M     # M, 25 Nov 2026: LC8a read at its 78.5 kN ultimate (CHS-08U), the tongues' pull at their holes, the XT rear shock
+revision: N     # N, 25 Nov 2026: LC8a reacted by the ground at the tyres, or with one wheel held fast (LC8a reaction), the XT
+                # hinges tied to their crossmembers in the one frame model with two hinge cheeks each (CH-P16) and the gussets
+                # either side (CH-P08), the hinge crossmembers RHS 150 x 50 x 4 and 5 with 8 mm fillets at the XT crossmembers'
+                # ends (I2-88), and the rear tank's bay a 3 mm steel shear panel on welded angles (shear_panels, CH-P17, I2-87).
+                # M, 25 Nov 2026: LC8a read at its 78.5 kN ultimate (CHS-08U), the tongues' pull at their holes, the XT rear shock
                 # and rear crossmembers RHS 150 x 50 x 6 (station_sections, I2-87), the hinge path study (xt_hinges, CHS-12,
                 # I2-88), every hole for galvanising placed by cad/chassis_dip.py alone, the apex end cut square and the
                 # mitre drains from each web's mitre line (I2-89), and the sealed overlaps' vents (sealed_overlaps, I2-90).
@@ -119,6 +123,8 @@ station_roles:
 # revision M it and the rear crossmember are RHS 150 x 50 x 6, so the ladder's rear bays carry the 78.5 kN ultimate pull
 # (CHS-08U, I2-87): at 4 mm and 3 mm their webs' holes read 1.14 and 1.19 of 0.85 fu there
 station_sections:
+  XT front hinge: RHS_150x50x6     # revision N (I2-88): with the hinge cheeks, for a held wheel's pull through its hinges
+  XT centre: RHS_150x50x5          # and the rear tank bay's shear panel at the 78.5 kN ultimate
   XT rear shock: RHS_150x50x6
   rear: RHS_150x50x6
 
@@ -185,8 +191,17 @@ fittings:
      at: ["axle_x + xt_centre_front + xm_w / 2", 0, rail_underside_z - 5], side_y: "rail_c - rail_w / 2 - 50"}
   - {id: CH-P07, plane: yz, name: "Shock support plate, 5 mm, full height on the XT rear shock crossmember", kind: plate, l: 300, w: 150, t: 5, qty: 2,
      at: ["axle_x + xt_rear_shock_front - 3", 0, "rail_underside_z + 75"], side_y: "rail_c - 200"}
-  - {id: CH-P08, name: "Hinge crossmember gusset, RHS 50 x 50 x 3 at 45 degrees (TB 070), 200 mm, two behind each hinge crossmember", kind: tube, section: SHS_50x50x3, length: 200, qty: 4,
+  - {id: CH-P08, name: "Hinge crossmember gusset, RHS 50 x 50 x 3 at 45 degrees (TB 070), 200 mm, two behind each hinge crossmember and two ahead of the centre's", kind: tube, section: SHS_50x50x3, length: 200, qty: 6,
      poses: hinge_gussets, fat: null}
+  - {id: CH-P16, name: "Hinge cheek, 10 mm, 150 x 112.5, either side of each XT hinge crossmember on the rail's inner face, welded to the web and the hinge bar", kind: plate, l: 150, w: 112.5, t: 10, qty: 7,
+     poses: hinge_cheeks, plane: xz, fat: null}
+  - {id: CH-P17, name: "Shear panel angles, EA 50 x 50 x 5, welded along both rails' inner webs and under the two crossmembers of the rear tank's bay", kind: plate,
+     l: 2330, w: 95, t: 5, qty: 1, at: ["axle_x + xt_centre_front + xm_w + 390", 0, rail_underside_z - 10], fat: null,
+     boxes: [["axle_x + xt_centre_front + xm_w", "-rail_in", rail_underside_z - 26, "xt_rear_shock_front - xt_centre_front - xm_w", 50, 50],
+             ["axle_x + xt_centre_front + xm_w", "rail_in - 50", rail_underside_z - 26, "xt_rear_shock_front - xt_centre_front - xm_w", 50, 50],
+             ["axle_x + xt_centre_front", -70, rail_underside_z - 26, xm_w, 140, 21],
+             ["axle_x + xt_rear_shock_front", -225, rail_underside_z - 26, xm_w, 95, 21], ["axle_x + xt_rear_shock_front", -70, rail_underside_z - 26, xm_w, 140, 21],
+             ["axle_x + xt_rear_shock_front", 130, rail_underside_z - 26, xm_w, 95, 21]]}
   - {id: CH-P09, plane: yz, name: "Spare carrier cleats and hub plate, 6 mm (posts in the member list)", kind: plate, l: 300, w: 300, t: 6, qty: 1,
      at: ["body_x0 - 40", 0, spare_z], fat: null,
      box: ["body_x0 - spare_bracket_d - tyre_w / 2 - 24", -150, "spare_z - 150", "spare_bracket_d + tyre_w / 2 - 26", 300, 300]}
@@ -272,7 +287,8 @@ load_cases:
   - {id: LC7, name: "Cargo and heavy item fixings: 0.8 g forward, 0.5 g rearward, 0.5 g sideways, 0.2 g up, times 2 off road", kind: fixings,
      accel: [[-1.6, 0, 0], [1.0, 0, 0], [0, 1.0, 0], [0, 0, 0.4]], factor: 1.5, source: "NTC Load Restraint Guide via report 02, factor 2 from report 03"}
   - {id: LC8a, name: "Recovery points: 58.9 kN within 30 degrees sideways and 15 degrees up or down of the rail axis", kind: recovery,
-     force_n: 58860, ultimate_n: 78500, factor: 1, source: "Report 11 LC8a: 1.5 x 9.81 x the 4,000 kg plate, as the drawbar case. The ultimate stays TJM's 8 t test load"}
+     force_n: 58860, ultimate_n: 78500, factor: 1, source: "Report 11 LC8a: 1.5 x 9.81 x the 4,000 kg plate, as the drawbar case. The ultimate stays TJM's 8 t test load",
+     reaction: {kx: 600, ky: 300, kz: 300, held_k: 10000000, source: "Report 11 gives the pull, not what holds the trailer. The ground holds it at its four unbraked wheels, each force along the trailer through its hub, each tyre on its longitudinal, lateral and vertical rate with its arm (est., 600, 300 and 300 N/mm), or one wheel held fast against an obstacle at its hub's height, the others rolling free, the trailer turned until the pull passes through that hub. held_k is the obstacle's rate, rigid"}}
   - {id: LC8b, name: "Jacking: one side lifted at its pad, gravity times 2", kind: jack, accel: [[0, 0, -2]], pad_n: 43560, factor: 1,
      source: "Report 11 LC8b at the 4,000 kg plate: 60 % of the 3,700 kg axle group on one pad, times 2 (report 11 had 38.6 kN at 3,500 kg)"}
   - {id: LC10, name: "Fatigue: frequent 0.5 g either way (range 1 g) beyond 10 million cycles, occasional 1.5 g either way for 100,000 cycles",
@@ -283,12 +299,12 @@ load_cases:
 #   member_end: the nominal normal stress range in `member` at the joint, `weld_root` the same times t / a on a fillet
 #   of throat a, `rail_at`: the composite rail's flange stress range at the stations listed, `member_at`: a member's
 #   stress range at X positions. `hot_spot` marks the hollow-section joints the engineer checks by the hot-spot method.
-fillet_throat: {default: 3.5, outrigger: 4.2, cm_xt: 4.2}   # 5 mm fillets on 3 mm walls, 6 mm on the outrigger roots and the XT crossmember ends
+fillet_throat: {default: 3.5, outrigger: 4.2, cm_xt: 5.6}   # 5 mm fillets on 3 mm walls, 6 mm on the outrigger roots, 8 mm on the XT crossmembers' ends (FAT-03)
 fatigue_details:
   - {id: FAT-01, name: "Full-height crossmember to rail, toe in the rail just above its bottom corner, toe burr-ground (IIW 6.2, 1.3 x FAT 80)", iiw: "512, ground", fat: 104, stress: cm_toe_in_rail, roles: [cm_xt, cm_end], hot_spot: true}
   - {id: FAT-01b, name: "Raiser-height crossmember to the raiser, toe in the raiser near its top corner, as welded", iiw: "512", fat: 80, stress: cm_toe_in_rail, roles: [cm_floor], hot_spot: true}
   - {id: FAT-02, name: "Crossmember to rail, toe in the crossmember", iiw: "413", fat: 63, stress: member_end, member: crossmember, hot_spot: true}
-  - {id: FAT-03, name: "Crossmember to rail, weld root (6 mm fillets at the XT crossmembers)", iiw: "414", fat: 36, stress: weld_root, member: crossmember, hot_spot: true}
+  - {id: FAT-03, name: "Crossmember to rail, weld root (8 mm fillets at the XT crossmembers)", iiw: "414", fat: 36, stress: weld_root, member: crossmember, hot_spot: true}
   - {id: FAT-04, name: "Outrigger to raiser, toe in the outrigger", iiw: "413", fat: 63, stress: member_end, member: outrigger, hot_spot: true}
   - {id: FAT-05, name: "Outrigger to raiser, weld root (6 mm fillets)", iiw: "414", fat: 36, stress: weld_root, member: outrigger, hot_spot: true}
   - {id: FAT-06, name: "Rail to raiser, continuous manual fillets along the seam", iiw: "323", fat: 90, stress: rail_level, z: rail_top_z, where: all}
@@ -422,7 +438,7 @@ member_galvanising_holes:
   drawbar: {d: 20, leg: 6, clear: 4, holes: corners, snipe: open}
   cm_end: {d: 20, leg: 5, holes: corners}
   cm_floor: {d: 20, leg: 5, holes: corners}
-  cm_xt: {d: 20, leg: 6, holes: corners, z_bottom_leg: 6}
+  cm_xt: {d: 20, leg: 8, holes: corners, z_bottom_leg: 6}
   outrigger: {d: 20, leg: 6, holes: corners}
   brace: {d: 13, leg: 5, holes: corners}
   plan_brace: {d: 10, leg: 5, holes: middle}
@@ -457,9 +473,31 @@ sealed_overlaps:
 # holes, and through the gussets. The gussets CH-P08 are SHS 50 x 50 x 3 at 45 degrees in plan from the crossmember's rear
 # face to the rail's inner face, inside sheet 2's 250 mm of the rail, each centred `behind` the crossmember's rear face
 # and `inboard` of the rail's centreline, and carried in the frame model as members
+# The hinge cheeks CH-P16 (I2-88): at each XT hinge 10 mm plates on the rail's inner face, one either side of the hinge
+# crossmember, `l` along the rail and `h` tall, standing `below` under the rail's underside beside the hinge bar, their
+# tops 82.5 mm up the web. Each is welded to the rail's web by 6 mm fillets along its top edge and along the rail's bottom
+# corner, never across the rail, and down the hinge bar's front or rear face over the bar's top `bar_d` (est.), so the
+# hinge's pull along the trailer and its moment about the pivot's depth reach the rail through them, not through the
+# crossmember's end. The front road-side hinge has its rear cheek only (`omit`), because the services' run K-10 passes
+# under the rail ahead of it, and every cheek's size keeps 20 mm from the services' runs (SVC-01) and 50 mm from the
+# arms and their leads (FIT-05). The frame model carries the cheeks at one hinge as one member from the pivot to the
+# rail's underside, held to the rail by their welds above it. The gussets ahead of the front hinge crossmember are left
+# out for the runs B-04 and K-10, so that crossmember is RHS 150 x 50 x 6.
 xt_hinges:
   bar: {leg: 6, run: 80, runs: [50, 150, 250]}
-  gusset: {behind: 80, inboard: 100, length: 200}
+  gusset: {behind: 80, inboard: 100, length: 200, faces: [1, -1], omit: [CM-04KF, CM-04RF]}
+  cheek: {t: 10, l: 150, h: 112.5, below: 30, leg: 6, bar_d: 30, bar_leg: 10, omit: [FRF]}
+
+# Shear panels (I2-87): the rear fresh tank's guard is a 3 mm galvanised steel sheet (AS 1397 G300, fy 300 MPa), bolted
+# by M10 8.8 bolts at 50 mm to EA 50 x 50 x 5 angles (CH-P17) welded along both rails' inner webs, under the XT rear shock
+# crossmember in three pieces and under the XT centre crossmember's middle 140 mm, clear of the runs K-11 and K-12 that
+# cross under it, with an EA 25 x 25 x 3 stiffener along the panel's front edge to gather its shear to that piece and to
+# the rails' angles, so the bay between the two crossmembers carries the recovery pull's racking as a shear panel.
+# The frame model carries each panel as two diagonals of the same shear stiffness, and chassis_fea's panel_checks reads the
+# plate's shear against its yield and its elastic buckling stress, and the bolts against their shear capacity.
+shear_panels:
+  - {id: PNL-1, from: XT centre, to: XT rear shock, t: 3, fy: 300,
+     fixing: {bolt: "M10 8.8 at 50 mm to the angles", pitch: 50, fuf: 830, a_c: 52.3, transverse: 140}}
 
 # Local checks of the fittings (CHASSIS.md). Sizes in mm. Plates are AS/NZS 3678 grade 350. The pin is what bears in the
 # hole: at a chain lug the 10 mm round bow of the pewag CW 8 connecting link (pewag's d), which passes through the 14 mm
