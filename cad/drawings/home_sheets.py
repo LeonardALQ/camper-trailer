@@ -396,18 +396,18 @@ def ct003(prj, model, bom, checks, reg, dwg):
             sh.text(270, yy - i * 2.2, t, 1.4)
         yy -= 2.2 * max(1, len(wl)) + 1.2
     sh.rect(230, yy + 0.4, 410, top, "thick")
-    yp = yy - 6
+    yp = yy - 5
     sh.text(232, yp, "VEHICLE PLATE (VSB1 13.1.1)", 2.2, bold=True)
     yq = textblock(sh, 232, yp - 4, S.wrap_mm(
         "MAKE (CONCESSIONAL TRAILER), VIN, ATM, GTM AND TARE, EMBOSSED, ETCHED OR ENGRAVED IN BLOCK LETTERS AT LEAST 2.5 mm HIGH, "
         "MATCHING THE RAV ENTRY. NSW ALSO LOOKS FOR THE MODEL AND THE DATE OF MANUFACTURE (VIB 78). THE GTM TO PLATE IS SET WITH THE "
         f"ENGINEER, AT MOST THE NSW CAP OF {rep['caps']['gtm']:,.0f} kg. THE PLATE AND VIN POSITIONS ARE NOT DESIGNED YET. PHOTOGRAPH "
         "THE VIN STAMPING BEFORE AND AFTER GALVANISING (REG-02).", 410 - 2 - 232, 1.4), size=1.4, gap=0.85)
-    yn, _ = S.notes(sh, 232, yq - 4, [
+    yn, _ = S.notes(sh, 232, yq - 3, [
         "EVERY FIGURE ON THIS SHEET COMES FROM THE MODEL'S CHECKS (data/checks.yaml, data/ute/ute.yaml) AT THE SOLVED AXLE.",
         "A RESULT IN AMBER IS A QUESTION FOR THE INSPECTOR. NO CHECK FAILS.",
     ], size=1.4, width_chars=150)
-    _lamp_checks(sh, LM, yn - 5)
+    _lamp_checks(sh, LM, yn - 3.5)
     write(sh, dwg)
     return time.time() - t0
 
@@ -422,11 +422,10 @@ def _recovery_line() -> str:
     r = recovery_rule(cj["results"], next(lc for lc in cj["load_cases"] if lc["id"] == "LC8a"))
     side = min(x for x in (r["sideways_up_kn"], r["sideways_down_kn"]) if x is not None)
     along = min(x for x in (r["along_up_kn"], r["along_down_kn"]) if x is not None)
-    return (f"PULL ONLY FROM THE TWO FRONT LUGS OR THE TWO REAR TONGUES, WITHIN {r['sideways_deg']:g} DEGREES OF THE TRAILER'S LINE "
-            f"SIDEWAYS AND {r['vertical_deg']:g} DEGREES UP OR DOWN: {r['rated_kn']:.1f} kN WITH EVERY WHEEL FREE OR ONE WHEEL HELD FAST, "
-            f"{r['held_axle_kn']:g} kN WITH BOTH WHEELS OF ONE AXLE HELD FAST. PULL LEVEL: PULLED {r['vertical_deg']:g} DEGREES UP OR DOWN "
-            f"THE EMPTY TRAILER CAN TIP BEFORE THE RATED PULL, FROM {side:.1f} kN AT {r['sideways_deg']:g} DEGREES SIDEWAYS AND FROM "
-            f"{along:.1f} kN ALONG ITS LINE." + ("" if r["level_tips"] else " A LEVEL PULL HOLDS THE RATING."))
+    return (f"FRONT LUGS OR REAR TONGUES ONLY, WITHIN {r['sideways_deg']:g} DEGREES SIDEWAYS AND {r['vertical_deg']:g} DEGREES UP OR DOWN: "
+            f"{r['rated_kn']:.1f} kN, OR {r['held_axle_kn']:g} kN WITH BOTH WHEELS OF ONE AXLE HELD FAST. PULL LEVEL: PULLED "
+            f"{r['vertical_deg']:g} DEGREES UP OR DOWN THE EMPTY TRAILER CAN TIP FROM {side:.1f} kN AT {r['sideways_deg']:g} DEGREES SIDEWAYS "
+            f"AND {along:.1f} kN ALONG ITS LINE." + ("" if r["level_tips"] else ""))
 
 
 def _lamp_checks(sh, LM, y):
@@ -434,4 +433,4 @@ def _lamp_checks(sh, LM, y):
     rows = [[c["id"], c["what"], c["clause"], c["measured"], c["limit"],
              ("PASS" if c["ok"] else "FAIL", "#000" if c["ok"] else "#c00")] for c in LM["checks"]]
     S.table(sh, 230, y, [("ID", 13), ("CHECK", 45), ("CLAUSE", 14), ("THE DESIGN, mm", 58), ("THE LIMIT, mm", 36), ("RESULT", 14)],
-            rows, size=1.2, row_h=2.7, title="LAMPS, REFLECTORS AND THE NUMBER PLATE (ADR 13/00 APPENDIX A, VSB1 3.1)")
+            rows, size=1.2, row_h=2.55, title="LAMPS, REFLECTORS AND THE NUMBER PLATE (ADR 13/00 APPENDIX A, VSB1 3.1)")
