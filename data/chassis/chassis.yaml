@@ -202,7 +202,7 @@ fittings:
      at: ["axle_x + xt_rear_shock_front - 3", 0, "rail_underside_z + 75"], side_y: "rail_c - 200"}
   - {id: CH-P08, name: "Hinge crossmember gusset, SHS 50 x 50 x 3 at 45 degrees (TB 070), its ends cut at 45 degrees to bear on the crossmember's face and on the face of the hinge cheek beside it, welded all round, two behind each hinge crossmember and two ahead of the centre's", kind: tube, section: SHS_50x50x3, length: hinge_gusset_l, qty: 6,
      poses: hinge_gussets, fat: null}
-  - {id: CH-P16, name: "Hinge cheek, 10 mm, 280 x 155.5 where a hinge gusset lands on it and 150 x 108.5 at the front hinge's front faces, beside each XT hinge crossmember on the rail's inner face, welded to the web and the hinge bar", kind: plate, l: 150, w: 108.5, t: 10, qty: 8,
+  - {id: CH-P16, name: "Hinge cheek, 10 mm, 150 x 108.5 beside each XT hinge crossmember on the rail's inner face, with a 300 mm step where a hinge gusset lands on it, welded to the web and the hinge bar", kind: plate, l: 150, w: 108.5, t: 10, qty: 8,
      poses: hinge_cheeks, plane: xz, fat: FAT-22}
   # CH-P17, the shear panel PNL-1's pieces (I2-87, fx18-det): EA 50 x 50 x 5 angles, each with its upright leg on a member's
   # web and its flat leg `drop` under the member's underside, level with the tanks' guard, where the 3 mm sheet bolts up
@@ -502,9 +502,9 @@ sealed_overlaps:
 # rail's inner face (est., 80 mm runs at 100 mm centres from 10 mm inboard). The frame model ties each hinge's pivot to
 # its crossmember at those runs, so the hinge's force and moment reach the rail through the crossmember's end, beside its
 # holes, and through the gussets. The gussets CH-P08 are SHS 50 x 50 x 3 at 45 degrees in plan across the corner between
-# the crossmember's face and the rail's inner face, inside sheet 2's 250 mm of the rail, their axes at the rail's
-# mid-depth, carried in the frame model as members. Each end is cut at 45 degrees to the tube to bear on its face: on the
-# crossmember's face, and on the inboard face of the long hinge cheek beside it, which doubles the rail's 4 mm web there
+# the crossmember's face and the rail's inner face, inside sheet 2's 250 mm of the rail, their axes `z_over_underside`
+# over the rail's underside, carried in the frame model as members. Each end is cut at 45 degrees to the tube to bear on its face: on the
+# crossmember's face, and on the inboard face of the step of the hinge cheek beside it, which spreads its load over the rail's 4 mm web
 # (I2-99, xt_hinges `cheek` `under_gusset`). `length` is the axis's length from the crossmember's face to the rail's web,
 # so the axis meets the crossmember's face length / sqrt 2 from the corner, and the cheek's face 10 mm sooner, at each the
 # centre of that end's weld and of the frame model's link, and each side wall ends 25 mm inside or beyond the axis's end.
