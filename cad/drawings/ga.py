@@ -199,7 +199,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
     ]
     yk = S.table(sh, 230.0, gz - 14.0, [("KEY FIGURE", 34), ("VALUE", 30), ("NOTE", 116)], rows, size=1.5, row_h=3.1, title="KEY FIGURES")
     S.notes(sh, 230.0, yk - 6.0, [
-        "THE SET: CT-002 MASS AND CoG, CT-003 COMPLIANCE, CT-010 TO CT-013 LAYOUT, CT-101 TO CT-104 CHASSIS AND LOAD PATHS, CT-201 TO "
+        "THE SET: CT-002 MASS AND CoG, CT-003 COMPLIANCE, CT-010 TO CT-013 LAYOUT, CT-101 TO CT-105 CHASSIS, LOAD PATHS AND HOLES, CT-201 TO "
         "CT-301 BODY, CT-601 TO CT-621 SERVICES, CT-701 TO CT-704 THE UTE'S BIKE BOX.",
     ], title="", size=1.4, width_chars=150)
     S.notes(sh, 22, 76, [

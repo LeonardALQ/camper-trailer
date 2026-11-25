@@ -27,6 +27,8 @@ const jobs = [
   { path: '/ute-garage/', name: 'ute-garage-loading', viewer: true, nth: 1 },
   { path: '/electrical/', name: 'electrical', viewer: true, full: true, sections: ['cable-schedule', 'services-checks'] },
   { path: '/plumbing/', name: 'plumbing', viewer: true, full: true, sections: ['pipe-schedule'] },
+  // the frame's holes for galvanising in the Chassis page's viewer, close on the XT rear shock crossmember's plate vents (I2-89)
+  { path: '/chassis/', name: 'chassis-holes', viewer: true, look: { target: [5300, -560, 670], from: [-900, 500, 700], zoom: 7 } },
   // each bike on its own, close (decision H27): the Tuareg on the ramp in the loading view, the Street Triple in its bay
   { path: '/ute-garage/', name: 'ute-garage-tuareg', viewer: true, nth: 1, only: 'TU Aprilia', zoom: 2.8 },
   { path: '/ute-garage/', name: 'ute-garage-street-triple', viewer: true, nth: 0, only: 'ST Triumph', zoom: 2.8 },

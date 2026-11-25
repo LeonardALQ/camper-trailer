@@ -1084,7 +1084,8 @@ def member_solid(m: Member):
     s = m.sec
     pl = Plane(origin=p0, x_dir=dz.cross(ax), z_dir=ax)
     prof = RectangleRounded(s.b, s.d, s.ro) - RectangleRounded(s.b - 2 * s.t, s.d - 2 * s.t, max(s.ro - s.t, 0.2))
-    return extrude(pl * prof, amount=m.length)
+    from .chassis_holes import cut_member
+    return cut_member(m, extrude(pl * prof, amount=m.length))
 
 
 PLANES = {"xy": (0, 1, 2), "xz": (0, 2, 1), "yz": (1, 2, 0)}   # which axes the plate's length, width and thickness run along
@@ -1128,4 +1129,5 @@ def fitting_solids(ch: Chassis, f: Fitting) -> list:
     if spec.get("poses") == "hinge_gussets":
         sec = ch.sections[spec["section"]]
         return [member_solid(Member(g["id"], "hinge_gusset", f.name, sec, g["p0"], g["p1"])) for g in ch.hinge_gussets()]
-    return [box(x0, y0, z0, x1 - x0, y1 - y0, z1 - z0) for x0, y0, z0, x1, y1, z1 in fitting_boxes(ch, f)]
+    from .chassis_holes import cut_plates
+    return cut_plates(ch, f, [box(x0, y0, z0, x1 - x0, y1 - y0, z1 - z0) for x0, y0, z0, x1, y1, z1 in fitting_boxes(ch, f)])
