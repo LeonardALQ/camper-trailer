@@ -476,7 +476,7 @@ class Body:
         v500 = v_r * self.d["wind"]["Mzcat"]
         f500 = (v500 / wu["V"]) ** 2
         a_xps = cr["core_factor"] * w.core["compression"]
-        row("BDY-06", f"Side wall in the ultimate wind, {wu['kpa']:.2f} kPa net at {wu['V']:.0f} m/s, floor to the roof joiner ({V['interior_h']:.0f} mm)",
+        row("BDY-06", f"Side wall in the ultimate wind, {wu['kpa']:.2f} kPa net at {wu['V']:g} m/s, floor to the roof joiner ({V['interior_h']:.0f} mm)",
             w, r, "Wind, ultimate", extra=(f"the member takes {100 * share:.0f} % of its bay's load, {s_st:.0f} MPa against {st['fy'] / cr['metal_factor']:.0f} MPa, "
                                           f"utilisation {u_st:.2f}. The {st['break']:g} mm of XPS behind it carries {s_xps:.3f} MPa against "
                                           f"{a_xps:.2f} MPa. Strapped down, at STB-05's gust, region B's 500-year wind at 3 m, {v_r:g} m/s "
@@ -560,11 +560,14 @@ class Body:
         return out
 
     def wind(self) -> tuple[dict, dict]:
-        """The ultimate and serviceability net pressures on a side wall, kPa (data/body/body.yaml `wind`, AS/NZS 1170.2)."""
+        """The ultimate and serviceability net pressures on a side wall, kPa (data/body/body.yaml `wind`, AS/NZS 1170.2). The
+        ultimate wind is the walls' strength wind by H23 (cad/trailer.py strength_wind)."""
         wd = self.d["wind"]
         c = wd["cpe"] - wd["cpi"]
         vs = wd["V_s"] * wd["Mzcat"]
-        return (dict(V=wd["V_u"], kpa=0.6 * wd["V_u"] ** 2 * c / 1000), dict(V=vs, kpa=0.6 * vs ** 2 * c / 1000))
+        from .trailer import strength_wind
+        vu = strength_wind(self.lay, self.tr)["V"] if self.tr else wd["V_u_min"]
+        return (dict(V=vu, kpa=0.6 * vu ** 2 * c / 1000), dict(V=vs, kpa=0.6 * vs ** 2 * c / 1000))
 
     def deflections(self) -> list[dict]:
         cr, V = self.crit, self.V
@@ -1304,7 +1307,7 @@ def check_row(c, res: dict) -> dict:
         k, v = max(p["strength"].items(), key=lambda kv: kv[1]["util"])
         return dict(limit="<= 1.00 utilisation", measured=round(v["util"], 3), unit="", margin=round(1 - v["util"], 3), ok=v["util"] <= 1.0,
                     governing=f"the {k} wall, {v['governing']}",
-                    detail=(f"the plates of BDY-24 at {p['wu']['kpa']:.2f} kPa net, {p['wu']['V']:.0f} m/s. The skins and the core are read "
+                    detail=(f"the plates of BDY-24 at {p['wu']['kpa']:.2f} kPa net, {p['wu']['V']:g} m/s. The skins and the core are read "
                             f"{p['corner']:g} mm or more from the cut-outs' corners (F5-02): the model cuts each corner square, where the stress grows "
                             f"without limit as the mesh is refined, and the cut-outs' real corners are radiused (CT-201). "
                             + ". ".join(f"The {w2} wall: the worst member {q['s_member']:.0f} MPa ({q['utils']['member']:.2f}), skins {q['s_skin']:.1f} MPa "
@@ -1315,7 +1318,7 @@ def check_row(c, res: dict) -> dict:
                             + f". Strapped down, at STB-05's {p['v500']:.1f} m/s gust, the {k} wall's "
                             f"{dict(member='worst member', skins='skins', core='core shear', xps='XPS behind a member', blocks='end blocks')[v['governing']]} "
                             f"works at {v['at500']['util']:.2f}, a factor of {v['at500']['factor']:.2f} on its {v['at500']['on']}. H23 checks the walls' "
-                            f"strength at {p['wu']['V']:.0f} m/s, so this figure is reported"))
+                            f"strength at {p['wu']['V']:g} m/s, so this figure is reported"))
     if c.type == "body_awning":
         a = res["awning"]
         return dict(limit="reported", measured=round(a["reach_mm"], 0), unit="mm", margin=None, ok=a["reach_mm"] >= 0,

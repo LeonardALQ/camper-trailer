@@ -10,7 +10,7 @@ import { withBase } from '../../lib/url';
 
 export const n = (v) => Math.round(v).toLocaleString('en-AU');
 
-A galvanised ladder frame of two composite rails, set out in `CHASSIS.md` revision O from research report 11. Each
+A galvanised ladder frame of two composite rails, set out in `CHASSIS.md` revision Q from research report 11. Each
 composite rail is an RHS 150 x 50 x 4 C450L0 main rail, 4 mm since the 4,000 kg plate, with an RHS 127 x 51 x 3.5 C350L0 raiser welded along its whole
 length, so the two bend as one 277 mm deep section and lift the floor above the tyres. The rails run the full
 {n(t.body_length)} mm of the body. Crossmembers join them at eight stations, an outrigger runs to the body edge at every
@@ -42,7 +42,22 @@ plate and a 10 mm slot under the plate, and vents along the rail to its open rea
 member drains at its apex end and at its mitre, vents at its apex end's top corners and is open at its snipe, and every
 other closed end drains by its floor and vents by its top (CT-103 note 2). CHS-11 reads every closed section in that dip,
 either side down and at every pitch from level to 9 degrees, and fails the build if a low point stands more than 50 mm
-under its nearest drain or a high point more than 50 mm over its nearest vent.
+under its nearest drain or a high point more than 50 mm over its nearest vent. Each shock support plate and each
+rail-to-raiser seam is a seal welded overlap the guide asks to be vented, so each has two 12 mm vents, which CHS-11 reads too.
+
+The recovery case asks no yield at 58.9 kN and no fracture at the 78.5 kN ultimate. Report 11 gives the pull but not
+what holds the trailer, so the ground holds it: on its four tyres at their rates (est.), or with one wheel held fast
+against an obstacle, the trailer turned until the pull passes through that wheel, which then takes all of it. CHS-08A
+and CHS-08U read both, every member on its effective section against its yield stress and every hole on its net section
+against 0.85 of its tensile strength at the ultimate. A held wheel puts the whole pull through its XT hinge, which no
+50 mm wide crossmember end carries, so each hinge now has a 10 mm cheek either side of its crossmember on the rail's
+inner face, welded to the rail's web and down the hinge bar, and the frame model ties each hinge to its crossmember and
+its cheeks as built (CHS-12, CHS-14). The two front hinges have their rear cheeks only, clear of a services run and a
+plan brace. The
+front hinge crossmember is RHS 150 x 50 x 6 and the XT centre's 150 x 50 x 5, both with 8 mm fillets at their ends, and
+the rear tank's guard is a 3 mm galvanised steel sheet bolted to angles welded along the rails and under the
+crossmembers, so the rear tank's bay carries the pull's sideways part as a shear panel (CHS-13). All of them pass, and
+Cruisemaster accepts the hinge joints and the holes in its crossmembers in writing before they are built.
 
 A planning-level proposal for the engineer to check. The drawings are drafts, not for construction.
 

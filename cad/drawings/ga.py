@@ -72,7 +72,7 @@ def ct001(prj, model, bom, checks, reg, dwg):
     S.vdim(sh, xr, P(0, hb)[1], xr, P(0, -hb)[1], xr + 6, f"{V['body_width']:.0f} BODY", size=1.9)
     S.vdim(sh, xr, P(0, ch["width_road_y"])[1], xr, P(0, ch["width_kerb_y"])[1], xr + 12, f"{ch['overall_width']:.0f} OVERALL", size=1.9)
     xh = V["axle_x"] + V["rear_hub_dx"]
-    S.vdim(sh, P(xh, V["hub_y"])[0], P(0, V["hub_y"])[1], P(xh, -V["hub_y"])[0], P(0, -V["hub_y"])[1], P(xh + 420, 0)[0],
+    S.vdim(sh, P(xh, V["hub_y"])[0], P(0, V["hub_y"])[1], P(xh, -V["hub_y"])[0], P(0, -V["hub_y"])[1], P(xh + 400, 0)[0],
            f"{V['track']:.0f} TRACK", size=1.8, ext=False)
     for x in (V["axle_x"] + V["front_hub_dx"], xh):
         p0, p1 = P(x, hb + 60), P(x, -hb - 60)
