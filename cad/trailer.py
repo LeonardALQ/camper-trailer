@@ -575,9 +575,9 @@ class Layout:
         through its sheet over the arms' travel (Chassis.xt_parts): the front airbags and the front shocks. Each opening is
         a part's boxes where they cross the sheet's height, grown by `clear`, FIT-03's 10 mm, in plan and cut to the piece,
         (x0, y0, x1, y1). A part box that reaches the piece's side opens it to that edge."""
-        it = next(i for i in self.td["items"] if i["id"] == "UF-03")
-        gaps = sorted(self.P.eval(it["model"].get("gaps", []), {}))
-        half = self.P.eval(it["model"].get("half", "rail_in"), {})
+        model = next(i for i in self.td["items"] if i["id"] == "UF-03").get("model") or {}   # none when the models are taken out
+        gaps = sorted(self.P.eval(model.get("gaps", []), {}))
+        half = self.P.eval(model.get("half", "rail_in"), {})
         x0, _, z0, x1, _, z1 = b.box
         px1 = x0 + gaps[0][0] if gaps else x1
         out = []
