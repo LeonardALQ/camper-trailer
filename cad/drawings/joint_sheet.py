@@ -2,8 +2,8 @@
 
 Detail A draws the XT centre crossmember's kerb-side joint in plan and detail B in section on the rail's inner face,
 both at 1:5: the rail, the crossmember's end, the two hinge cheeks, the two gussets on their 45 degree lines with their
-cut ends on the crossmember and the rail, their welds and the jacking pad. Detail C draws the rear tank's bay in plan at
-1:10 with the shear panel's angles, the 4 mm sheet and its tongues with their radiused roots and its bolts, and detail D a section
+cut ends on the crossmember and the rail and their welds. Detail C draws the rear tank's bay in plan at
+1:10 with the shear panel's angles, the sheet cut clear of the rear airbags and shocks, its tongues with their radiused roots and its bolts, and detail D a section
 across the rail at the panel at 1:2.5. Nothing here places a part: every line is read from Chassis.hinge_gussets,
 hinge_cheeks, panel_pieces and shear_panels and the data they read, so a part the chassis code moves moves here.
 Cruisemaster's hinge bar is drawn phantom, its size estimated.
@@ -68,7 +68,7 @@ def _brk(sh, p, q):
 
 class Joint:
     """The XT centre crossmember's kerb-side hinge joint as the data has it: the rail, the crossmember, the cheeks
-    either side, the gussets either side, the jacking pad and the shear panel's angle along the rail behind it."""
+    either side, the gussets either side and the shear panel's angle along the rail behind it."""
 
     def __init__(self, ch):
         self.ch, V = ch, ch.V
@@ -85,10 +85,6 @@ class Joint:
         self.gdata = ch.data["xt_hinges"]["gusset"]
         self.ck = ch.data["xt_hinges"]["cheek"]
         self.bar = ch.data["xt_hinges"]["bar"]
-        pad = next(f for f in ch.data["fittings"] if f["id"] == "CH-P06")
-        at = ch.ev(pad["at"])
-        self.pad = (at[0] - pad["l"] / 2, -ch.ev(pad["side_y"]) - pad["w"] / 2, at[2] - pad["t"] / 2,
-                    at[0] + pad["l"] / 2, -ch.ev(pad["side_y"]) + pad["w"] / 2, at[2] + pad["t"] / 2)
         self.pivot = next(w for w in ch.suspension if w["id"] == "RK")["pivot"]
         self.angle = next(p for p in ch.panel_pieces() if p["use"] == "rail" and p["side"] < 0)
         self.cm_leg = ch.data["member_galvanising_holes"]["cm_xt"]["leg"]
@@ -108,8 +104,8 @@ def _cheek_plan(J: Joint, c: dict) -> list[tuple[float, float]]:
 
 def _plan_a(sh, J: Joint, x0: float, y0: float, k: float = 5.0):
     """Detail A: the joint in plan from above, X rearward to the right and the kerb rail at the foot, its lower left
-    corner at sheet (x0, y0): the rail, the crossmember's end, the cheeks, the gussets with their axes, the jacking pad
-    under the crossmember and the shear panel's angle along the web behind the cheek, hidden under the gusset."""
+    corner at sheet (x0, y0): the rail, the crossmember's end, the cheeks, the gussets with their axes and the shear
+    panel's angle along the web behind the cheek, hidden under the gusset."""
     lo, hi = J.front - 250.0, J.rear + 280.0
     v = View(x0, y0, lo, -J.y_out - 17.5, k)
     y_in, y_out = -J.y_in, -J.y_out
@@ -127,11 +123,11 @@ def _plan_a(sh, J: Joint, x0: float, y0: float, k: float = 5.0):
         v.poly(sh, g["outline"])
         d = g["dir"]
         v.line(sh, g["p0"][0] - 8 * d[0], g["p0"][1] - 8 * d[1], g["p1"][0] + 8 * d[0], g["p1"][1] + 8 * d[1], "centre")
-    p = J.pad
-    v.box(sh, p[0], p[1], p[3], p[4], "hidden")
     a = J.angle
-    v.line(sh, a["x0"], y_in + 50, hi, y_in + 50, "hidden")
-    v.line(sh, a["x0"], y_in, a["x0"], y_in + 50, "hidden")
+    v.line(sh, a["x0"], y_in + 50, min(hi, a["x1"]), y_in + 50, "hidden")
+    for x in (a["x0"], a["x1"]):
+        if x <= hi:
+            v.line(sh, x, y_in, x, y_in + 50, "hidden")
     rear = next(g for g in J.gussets if g["face"] > 0)
     # the rail side's dimensions, under the rail: the cheek, the panel's angle beyond it, and the gusset's axis on the
     # cheek's face, where its rail end lands (I2-99)
@@ -157,8 +153,6 @@ def _plan_a(sh, J: Joint, x0: float, y0: float, k: float = 5.0):
     fc = next(cc for cc in J.cheeks if cc["id"].endswith("F"))
     tip = v.p(0.5 * (fc["box"][0] + fc["box"][3]), fc["box"][4])
     S.leader(sh, tip, (tip[0] - 14.0, yb - 6.0), f"CHEEK {_n(fc['l'])}x{_n(fc['h'])}x{_n(J.ck['t'])}", size=LABEL)
-    tip = v.p(p[0], 0.5 * (p[1] + p[4]))
-    S.leader(sh, tip, (tip[0] - 14.0, tip[1] + 18.0), "JACKING PAD UNDER", ["CT-103 DETAIL G"], size=LABEL)
     sh.text(v.p(lo + 75.0, 0)[0], v.p(0, 0.5 * (y_in + y_out))[1] - 0.6, f"RAIL {_n(J.rail.d)}x{_n(J.rail.b)}x{_n(J.rail.t)}", LABEL, "middle")
 
 
@@ -204,8 +198,8 @@ def _section_b(sh, J: Joint, x0: float, y0: float, k: float = 5.0):
             v.solid(sh, min(xe, xe + e * w), g["z"] - half, max(xe, xe + e * w), g["z"] + half)
     a = J.angle
     zf = a["boxes"][1][2]
-    v.box(sh, a["x0"], zf, hi, zf + 50.0)
-    v.solid(sh, a["x0"], zf, hi, zf + 5.0)
+    v.box(sh, a["x0"], zf, min(hi, a["x1"]), zf + 50.0)
+    v.solid(sh, a["x0"], zf, min(hi, a["x1"]), zf + 5.0)
     panel = J.ch.shear_panels()[0]
     v.solid(sh, panel["sheet"]["front"], zf - panel["t"], hi, zf)
     # the cheeks' and the gussets' welds and dimensions, from the data
@@ -231,8 +225,9 @@ def _section_b(sh, J: Joint, x0: float, y0: float, k: float = 5.0):
 
 
 def _sheet_outline(sheet: dict, steps: int = 6) -> list[tuple[float, float]]:
-    """The shear panel's sheet in plan as one outline (Chassis.panel_sheet): its front edge with the front tongues, its
-    side, its rear edge with the rear tongues, each tongue's two root corners radiused `root_r`."""
+    """The shear panel's sheet in plan as one outline (Chassis.panel_sheet): its front edge with any front tongues, its
+    sides, the cuts clear of the rear airbags and shocks with their inner corners radiused `cut_r`, and its rear edge with
+    the rear tongues, each tongue's two root corners radiused `root_r`."""
     x0, y0, x1, y1 = sheet["rect"]
     R = sheet["root_r"]
 
@@ -247,7 +242,14 @@ def _sheet_outline(sheet: dict, steps: int = 6) -> list[tuple[float, float]]:
             pts += (arc0 if R else [(x, r["y0"])]) + [(toe, r["y0"]), (toe, r["y1"])] + (arc1 if R else [(x, r["y1"])])
         return pts
 
-    return [(x0, y0)] + along(x0, -1) + [(x0, y1), (x1, y1)] + list(reversed(along(x1, 1))) + [(x1, y0)]
+    if not sheet.get("cut"):
+        return [(x0, y0)] + along(x0, -1) + [(x0, y1), (x1, y1)] + list(reversed(along(x1, 1))) + [(x1, y0)]
+    xc, yc = sheet["cut"]
+    rc = sheet["cut_r"]
+    road = [(xc + rc - rc * math.cos(math.radians(a)), yc + rc - rc * math.sin(math.radians(a))) for a in range(0, 91, 90 // steps)]
+    kerb = [(xc + rc - rc * math.sin(math.radians(a)), -yc - rc + rc * math.cos(math.radians(a))) for a in range(0, 91, 90 // steps)]
+    return ([(x0, y0)] + along(x0, -1) + [(x0, y1), (xc, y1)] + road + [(x1, yc)] + list(reversed(along(x1, 1)))
+            + [(x1, -yc)] + kerb + [(xc, y0)])
 
 
 def _bay_c(sh, J: Joint, x0: float, y0: float, k: float = 10.0) -> tuple:
@@ -297,18 +299,18 @@ def _bay_c(sh, J: Joint, x0: float, y0: float, k: float = 10.0) -> tuple:
     rail_angle = next(p for p in pieces if p["use"] == "rail" and p["side"] > 0)
     S.hdim(sh, *v.p(rail_angle["x0"], J.y_out), *v.p(rail_angle["x1"], J.y_out), ytop + 8.5, f"{_n(rail_angle['length'])} ANGLE", size=LABEL)
     xr = v.p(hi, 0)[0]
-    S.vdim(sh, *v.p(r[2], r[1]), *v.p(r[2], r[3]), xr + 5.0, f"{r[3] - r[1]:,.0f} SHEET", size=LABEL)
+    yc = sp["sheet"]["cut"][1] if sp["sheet"]["cut"] else r[3]
+    S.vdim(sh, *v.p(r[2], -yc), *v.p(r[2], yc), xr + 5.0, f"{2 * yc:,.0f} SHEET", size=LABEL)
     fix = sp["fixing"]
-    front = [b for b in sp["bolts"] if b["group"] == "front"]
-    q = v.p(front[0]["x"], front[-1]["y"])
-    S.leader(sh, q, (q[0] - 9.0, q[1] + 12.0), f"{len(front)} M{_n(fix['d'])} AT {_n(fix['front_pitch'])}", size=LABEL)
-    rb = next(b for b in sp["bolts"] if b["group"] == "rail" and b["y"] < 0)
-    q = v.p(rb["x"], rb["y"])
-    S.leader(sh, q, (q[0] + 6.0, q[1] + 16.0), f"M{_n(fix['d'])} AT {_n(fix['pitch'])}", size=LABEL)
-    front_root = next(q for q in sp["sheet"]["roots"] if q["way"] < 0)
-    R = sp["sheet"]["root_r"]
-    q = v.p(front_root["x"] - R + R / math.sqrt(2), front_root["y1"] + R - R / math.sqrt(2))
-    S.leader(sh, q, (q[0] + 7.0, q[1] + 8.0), f"R{_n(R)} AT EACH TONGUE'S ROOT", size=LABEL)
+    rails = next(f for f in ch.data["fittings"] if f["id"] == "CH-P17")["rails"]
+    side = [b for b in sp["bolts"] if b["group"] == "rail" and b["y"] < 0]
+    q = v.p(side[0]["x"], side[0]["y"])
+    S.leader(sh, q, (q[0] + 1.9, q[1] + 13.25), f"{len(side)} M{_n(fix['d'])} AT {_n(rails['pitch'])}", size=LABEL)
+    if sp["sheet"]["cut"]:
+        xc, yc = sp["sheet"]["cut"]
+        rc = sp["sheet"]["cut_r"]
+        q = v.p(xc + rc - rc / math.sqrt(2), -yc - rc + rc / math.sqrt(2))
+        S.leader(sh, q, (q[0] + 5.0, q[1] - 7.0), f"CUT {_n(sp['cut_clear'])} CLEAR OF THE AIRBAG AND SHOCK, R{_n(rc)}", size=LABEL)
     q = v.p(0.5 * (r[0] + r[2]) + 120.0, -200.0)
     sh.text(q[0], q[1], f"{_n(sp['t'])} SHEET {sp['id']}", LABEL, "middle")
     x_cut = rail_angle["x0"] + 0.5 * rail_angle["length"]
@@ -389,9 +391,6 @@ def _parts(sh, J: Joint, x: float, y: float) -> float:
     words = {"rail": "PANEL ANGLE ALONG A RAIL", "crossmember": "PANEL ANGLE UNDER A CROSSMEMBER"}
     for (use, sid, _), (p, n) in seen.items():
         rows.append(["CH-P17", words[use], sid.replace("_", " ").replace("EA ", "EA "), _n(p["length"]), str(n), f"{p['mass_kg']:.2f}"])
-    pad = next(f for f in ch.data["fittings"] if f["id"] == "CH-P06")
-    rows.append(["CH-P06", "JACKING PAD, CT-103 DETAIL G", f"PL {_n(pad['l'])}x{_n(pad['w'])}x{_n(pad['t'])}", "", str(fit["CH-P06"].qty),
-                 f"{fit['CH-P06'].mass_each:.2f}"])
     cols = [("MARK", 13.0), ("PART", 58.0), ("SECTION OR PLATE", 28.0), ("mm", 11.0), ("QTY", 9.0), ("kg EACH", 13.0)]
     return S.table(sh, x, y, cols, rows, size=1.5, row_h=3.0, title="PARTS DETAILED HERE (CHASSIS.md, CT-101)")
 
@@ -420,11 +419,13 @@ def _notes(J: Joint) -> list[str]:
         f"{steps}, WITH {_n(J.ck['leg'])} FILLETS ALONG ITS TOP AND LOWER EDGES (CHS-16).",
         f"PANEL ANGLES CH-P17: EA 50x50x5, THE FLAT LEG {_n(pw['drop'])} UNDER THE MEMBER. A {_n(pw['weld']['leg'])} FILLET ALONG THE UPRIGHT "
         f"LEG'S TOP EDGE AND A FLARE BEVEL WELD ALONG THE MEMBER'S BOTTOM CORNER, THROAT {_n(pw['weld']['corner_throat'])} (est.). THE RAILS' "
-        f"ANGLES START {_n(pw['rails']['gap'])} BEHIND THE CHEEKS SO THE WELDS END APART (FAT-22, FAT-23).",
+        f"ANGLES START {_n(pw['rails']['gap'])} BEHIND THE CHEEKS AND STOP {_n(pw['rails']['before'])} SHORT OF THE AIRBAGS' BRACKETS, "
+        f"SO THE WELDS END APART (FAT-22, FAT-23).",
         f"SHEET {sp['id']}: {_n(sp['t'])} HA250 STEEL, HOT-DIP GALVANISED, M{_n(fix['d'])} 8.8 IN {_n(fix['hole'])} HOLES ON THE ANGLES' "
-        f"{_n(pw['gauge'])} GAUGE: {groups.get('rail', 0)} ALONG THE RAILS AT {_n(fix['pitch'])}, {groups.get('front', 0)} AT "
-        f"{_n(fix['front_pitch'])} UNDER {J.cm.id}, {groups.get('rear', 0)} UNDER THE XT REAR SHOCK CROSSMEMBER. ITS TONGUES REACH UNDER "
-        f"THE CROSSMEMBERS' ANGLES, THEIR ROOT CORNERS R{_n(sp['sheet']['root_r'])}. NO STIFFENER: THE REAR TANK SITS ON THE FRONT EDGE (CHS-13).",
+        f"{_n(pw['gauge'])} GAUGE: {groups.get('rail', 0) // 2} ON EACH RAIL'S ANGLE AT {_n(pw['rails']['pitch'])}, {groups.get('rear', 0)} AT "
+        f"{_n(pw['crossmembers'][0]['pitch'])} UNDER THE XT REAR SHOCK CROSSMEMBER, WHERE ITS TONGUES REACH UNDER THE ANGLES, THEIR ROOT "
+        f"CORNERS R{_n(sp['sheet']['root_r'])}. CUT {_n(sp['cut_clear'])} CLEAR OF THE REAR AIRBAGS AND SHOCKS OVER THEIR TRAVEL, THE INNER "
+        f"CORNERS R{_n(sp['sheet']['cut_r'])}. NO STIFFENER: THE REAR TANK SITS ON IT (CHS-13).",
         "THE HINGE BAR IS CRUISEMASTER'S, DRAWN PHANTOM (est.): TAKE ITS SIZE FROM ITS DRAWING 33XT AIR BEFORE CUTTING THE CHEEKS. THE ROAD "
         "SIDE MIRRORS THE KERB SIDE. THE FRONT HINGE HAS ITS REAR GUSSETS ONLY (CT-101).",
     ]

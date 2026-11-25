@@ -212,8 +212,9 @@ class Analysis:
     def reactions(self, items: list[Item], acc, twist_n: float = 0.0, lifted: int | None = None):
         """Ball force and the four wheel contact forces that balance the case. Equal vertical loads on the two axles
         of a side. Horizontal tyre forces in proportion to the vertical ones (the ball takes none along X, the brakes
-        do it all). `twist_n` adds the diagonal pattern of one wheel in a hole. `lifted` (a side) is the jacking case:
-        that side's wheels carry nothing and a pad under its rail at the XT centre crossmember takes the load."""
+        do it all). `twist_n` adds the diagonal pattern of one wheel in a hole. `lifted` (a side and an axle) is the
+        jacking case (LC8b): that side's wheels carry nothing and a jack under that axle's arm on that side, at
+        Cruisemaster's jacking point under the arm by the hub, takes the load, the air released from the springs."""
         ch, V = self.ch, self.ch.V
         a = np.asarray(acc, float) * G
         Fa = np.zeros(3)
@@ -225,17 +226,17 @@ class Analysis:
         B = np.array([0.0, 0.0, V["coupling_z"]])
         wheels = ch.suspension
         if lifted is not None:
-            far = [w for w in wheels if w["side"] != lifted]
-            pad = next(f for f in ch.fittings if f.id == "CH-P06")
-            jx = ch.positions()["jack_x"]
-            jy = lifted * abs(pad.at[0][1])
-            # unknowns: ball Fz, far wheel Fz (each), pad Fz. Fz, Mx, My
+            side, axle = lifted
+            far = [w for w in wheels if w["side"] != side]
+            jw = next(w for w in wheels if w["side"] == side and w["axle"] == axle)
+            jx, jy = jw["hub"][0], jw["hub"][1]
+            # unknowns: ball Fz, far wheel Fz (each), the jack's Fz. Fz, Mx, My
             A = np.array([[1, 2, 1],
                           [0, 2 * far[0]["contact"][1], jy],
                           [0, -(far[0]["contact"][0] + far[1]["contact"][0]), -jx]])
             sol = np.linalg.solve(A, -np.array([Fa[2], Ma[0], Ma[1]]))
-            contact = {w["id"]: np.array([0, 0, sol[1]]) if w["side"] != lifted else np.zeros(3) for w in wheels}
-            return dict(ball=np.array([0, 0, sol[0]]), contact=contact, pad=(np.array([0, 0, sol[2]]), (jx, jy, V["rail_underside_z"])))
+            contact = {w["id"]: np.array([0, 0, sol[1]]) if w["side"] != side else np.zeros(3) for w in wheels}
+            return dict(ball=np.array([0, 0, sol[0]]), contact=contact, jack=(np.array([0, 0, sol[2]]), jw["id"]))
         w_h = {w["id"]: 0.25 for w in wheels}
         for _ in range(6):
             sx = sum(w_h[w["id"]] * w["contact"][0] for w in wheels)
@@ -358,11 +359,9 @@ class Analysis:
         q = self.sprung_loads(items, acc)
         R = self.reactions(items, acc, twist_n=twist_n, lifted=lifted)
         self._apply(R["ball"], (0.0, 0.0, self.ch.V["coupling_z"]), [(self.fm.ball, 1.0)], q)
-        arms = self.arm_loads(items, acc, R["contact"], q)
-        if lifted is not None:
-            F, p = R["pad"]
-            cm = next(m.id for m in self.ch.members if m.station == "XT centre" and m.role.startswith("cm"))
-            self._apply(F, p, self.fm.crossmember_fractions(cm, p[1]), q)
+        # the jack pushes up under its arm by the hub, so its force reaches the frame through the arm's airbag, its bump
+        # stop with the air released, and its hinge, as an obstacle's force at a hub does in LC8a
+        arms = self.arm_loads(items, acc, R["contact"], q, hub={R["jack"][1]: R["jack"][0]} if lifted is not None else None)
         if steady_n:
             V = self.ch.V
             # each steady at 90 degrees under its bracket, one diagonal up and one down. The couple balances in roll, so a
@@ -374,7 +373,7 @@ class Analysis:
                 self._apply(F, (p["x"], p["y"], V["rail_underside_z"]), self.fm.rail_fractions(p["side"], p["x"]), q)
         res = self.kinematic.solve(q)
         resid = max(abs(v) for v in res.reactions.values())
-        return res, dict(ball=R["ball"], arms=arms, residual_n=resid, pad=R.get("pad", [None])[0])
+        return res, dict(ball=R["ball"], arms=arms, residual_n=resid, jack=R.get("jack", [None, None]))
 
     def recovery_reactions(self, F, p, held: str | None = None, base: dict | None = None, nose: dict | None = None) -> dict:
         """LC8a's reaction, which report 11 does not give: the ground at the four tyres, the trailer a rigid body on each
@@ -654,10 +653,12 @@ class Analysis:
                 if mem not in e or r["eq"] > e[mem]["eq"]:
                     e[mem] = dict(r, case=label, **(extra or {}))
             for sp in self.fm.panels_by_id().values():
-                v = self.panel_shear(res, sp)
+                v, n = self.panel_shear(res, sp), self.panel_tie(res, sp)
                 pe = self.panel_env.setdefault(lc_id, {})
+                tie = max(n, pe.get(sp["id"], {}).get("tie_n", 0.0))
                 if sp["id"] not in pe or v > pe[sp["id"]]["v_n"]:
                     pe[sp["id"]] = dict(v_n=v, case=label)
+                pe[sp["id"]]["tie_n"] = tie
             for k, g in self.gusset_elements():
                 web = self.gusset_web(res, k, g)
                 we = self.gusset_web_env.setdefault(lc_id, dict(util=-1.0, welds_max=0.0))
@@ -700,13 +701,18 @@ class Analysis:
                 if t > twist.get("deg", -1):
                     twist = dict(deg=t, case=f"{c.id} (diagonal {'A' if sgn > 0 else 'B'})")
             for side in (-1, 1):
-                res, info = self.run_static(items, lcs["LC8b"]["accel"][0], lifted=side)
-                self.resid = max(self.resid, info["residual_n"])
-                pad = float(info["pad"][2])
-                take("LC8b", res, f"{c.id}, {'kerb' if side < 0 else 'road'} side jacked", dict(pad_n=pad))
-                env["LC8b"].setdefault("_pad", dict(eq=0.0))
-                if pad > env["LC8b"]["_pad"].get("pad_n", 0):
-                    env["LC8b"]["_pad"] = dict(eq=0.0, pad_n=pad, case=f"{c.id}, {'kerb' if side < 0 else 'road'} side")
+                for axle in ("front", "rear"):
+                    res, info = self.run_static(items, lcs["LC8b"]["accel"][0], lifted=(side, axle))
+                    self.resid = max(self.resid, info["residual_n"])
+                    jack, wid = float(info["jack"][0][2]), info["jack"][1]
+                    bag = float(info["arms"][wid]["airbag"])
+                    label = f"{c.id}, {'kerb' if side < 0 else 'road'} side jacked under its {axle} arm"
+                    take("LC8b", res, label, dict(pad_n=jack))
+                    e8 = env["LC8b"].setdefault("_pad", dict(eq=0.0, pad_n=0.0, bag_n=0.0))
+                    if jack > e8["pad_n"]:
+                        e8.update(pad_n=jack, case=label, bag_at=bag)
+                    if bag > e8["bag_n"]:
+                        e8.update(bag_n=bag, bag_case=label, jack_at=jack)
         # LC5b at tare, unscaled
         tc1 = next(c for c in self.tr.cases if c.id == "TC1")
         lc = lcs["LC5b"]
@@ -785,7 +791,7 @@ class Analysis:
         out["holes"] = self.holes(hole_env, lc1, sites)
         from .chassis_dip import check as galvanising_check
         out["galvanising"] = galvanising_check(ch)
-        out["local"] = self.local_checks(out["pad_n"]["pad_n"])
+        out["local"] = self.local_checks(out["pad_n"])
         out["local"].update(self.panel_checks(), hinge_cheeks=self.cheek_check(), arm_limits=self.arm_limits())
         out["local"]["hinge_gussets"] = self.gusset_welds()
         out["recovery"] = self.recovery_summary()
@@ -819,19 +825,22 @@ class Analysis:
                     ok=worst["util"] <= 1 + 1e-9 and all(f["util"] <= 1 + 1e-9 for f in fat))
 
     def panel_shear(self, res, sp: dict) -> float:
-        """The racking shear a shear panel carries, from its two diagonals' axial forces: V = (N1 - N2) b / L, in N."""
+        """The racking shear a shear panel carries across its bay, from its two diagonals' axial forces:
+        V = (N1 - N2) dy / L, in N."""
         n1, n2 = (float(res.forces[e][6]) for e in sp["elements"])
-        return abs(n1 - n2) * 2 * self.ch.V["rail_c"] / sp["L"]
+        return abs(n1 - n2) * sp["dy"] / sp["L"]
+
+    def panel_tie(self, res, sp: dict) -> float:
+        """The larger of a shear panel's two diagonals' axial forces, in N: what each rail's angle passes to the sheet."""
+        return max(abs(float(res.forces[e][6])) for e in sp["elements"])
 
     def panel_bolts(self, sp: dict) -> list[dict]:
-        """Each group of the shear panel's bolts (Chassis.shear_panels): its bolts, the share of the panel's racking shear V
-        each bolt takes, the axis of that force in plan, and for its worst bolt AS/NZS 4600 5.3.2's e and AS 4100 9.3.2.4's
-        a_e in that axis, either way along it, and the least distance from any bolt's centre to the sheet's edges. The
-        whole of V enters each crossmember through its tongues' bolts, and the rails' bolts take the side edges' shear
-        flow, V a / b on each side."""
+        """Each group of the shear panel's bolts (Chassis.shear_panels): its bolts, how many stand on one side, and for
+        its worst bolt AS/NZS 4600 5.3.2's e and AS 4100 9.3.2.4's a_e along its angle, either way, and the least distance
+        from any bolt's centre to the sheet's edges and cuts in any direction."""
         fix = sp["fixing"]
         dh, df = fix["hole"], fix["d"]
-        rects = [sp["sheet"]["rect"]] + sp["sheet"]["tongues"]
+        rects = sp["sheet"]["parts"] + sp["sheet"]["tongues"]
 
         def reach(c: float, other: float, axis: int, sign: int) -> float:
             """How far the sheet runs from c along `axis` (0 is X, 1 is Y) one way, at `other` across it."""
@@ -845,13 +854,11 @@ class Analysis:
             return (b - c) if sign > 0 else (c - a)
 
         out = []
-        a_len = sp["x1"] - sp["x0"]
-        for group in ("front", "rear", "rail"):
+        for group in ("rail", "rear"):
             bolts = [b for b in sp["bolts"] if b["group"] == group]
             if not bolts:
                 continue
             axis = 0 if bolts[0]["along"] == "x" else 1
-            share = a_len / sp["b"] / (len(bolts) / 2) if group == "rail" else 1.0 / len(bolts)
             e_min = ae_min = edge = math.inf
             for b in bolts:
                 at = (b["x"], b["y"])
@@ -864,31 +871,45 @@ class Analysis:
                     e_min = min(e_min, to_edge, to_hole - dh / 2)
                     ae_min = min(ae_min, to_edge - dh / 2 + df / 2, to_hole - dh + df / 2)
                 edge = min(edge, *(reach(at[ax], at[1 - ax], ax, sg) for ax in (0, 1) for sg in (1, -1)))
-            out.append(dict(group=group, n=len(bolts), share=share, e=e_min, a_e=ae_min, edge=edge))
+            out.append(dict(group=group, n=len(bolts), n_side=sum(1 for b in bolts if b["y"] > 0) if group == "rail" else len(bolts),
+                            e=e_min, a_e=ae_min, edge=edge, e_any=min(e_min, edge), a_e_any=min(ae_min, edge - dh / 2 + df / 2)))
         return out
 
     def panel_holds(self, sp: dict) -> list[tuple[float, float]]:
         """The points that hold shear panel sp's sheet out of its plane (I2-98): every bolt along the rails' angles, and each
         tongue's root over its straight width every 10 mm, where the tongue joins the sheet's edge. Nothing holds the edges
-        between them, since the rear tank sits on the sheet along its front edge."""
+        between them, since the rear tank sits on the sheet."""
         pts = [(b["x"], b["y"]) for b in sp["bolts"] if b["group"] == "rail"]
         for r in sp["sheet"]["roots"]:
             n = max(1, int(round((r["y1"] - r["y0"]) / 10.0)))
             pts += [(r["x"], r["y0"] + (r["y1"] - r["y0"]) * j / n) for j in range(n + 1)]
         return pts
 
+    def panel_rear_bolts(self, sp: dict, V: float, N: float) -> tuple[float, float]:
+        """The rear group's bolts under the next crossmember (fx22-rear): the racking shear V along the crossmember shared
+        equally, and the couple of the two diagonals' forces along the trailer, N dx / L at each diagonal's end, shared
+        over the group in proportion to each bolt's Y, an elastic bolt group. The force on the outermost bolt along the
+        crossmember and along the trailer, in N."""
+        rear = [b for b in sp["bolts"] if b["group"] == "rear"]
+        dx = math.sqrt(max(0.0, sp["L"] ** 2 - sp["dy"] ** 2))
+        M = 2 * N * dx / sp["L"] * abs(sp["ties"][0]["cm_y"])
+        y_max, sy2 = max(abs(b["y"]) for b in rear), sum(b["y"] ** 2 for b in rear)
+        return V / len(rear), M * y_max / sy2
+
     def tongue_roots(self, sp: dict) -> list[dict]:
         """Each tongue of shear panel sp's sheet as a free body (I2-98): its bolts' share of the panel's racking shear V,
-        each bolt of its crossmember's group an equal share as panel_bolts takes it, acts along the crossmember at its bolt
-        line and reaches the sheet through the tongue's root in shear and in-plane bending. The root's corners are
-        radiused `root_r`, so each section from the start of the radius to the sheet's edge is read, its width growing
-        from the tongue's own to that plus twice the radius as its lever to the bolt line grows."""
+        each bolt of its crossmember's group an equal share, acts along the crossmember at its bolt line and reaches the
+        sheet through the tongue's root in shear and in-plane bending, with the couple's force along the trailer on its
+        bolts (panel_rear_bolts) along the tongue. The root's corners are radiused `root_r`, so each section from the start
+        of the radius to the sheet's edge is read, its width growing from the tongue's own to that plus twice the radius as
+        its lever to the bolt line grows. `axial` is the couple's force on the tongue per unit of that on its outermost bolt."""
         sh, out = sp["sheet"], []
         R = sh["root_r"]
+        rear = [b for b in sp["bolts"] if b["group"] == "rear"]
+        y_max = max(abs(b["y"]) for b in rear)
         for r in sh["roots"]:
-            bolts = [b for b in sp["bolts"] if b["group"] in ("front", "rear") and r["y0"] - 1e-6 <= b["y"] <= r["y1"] + 1e-6
+            bolts = [b for b in sp["bolts"] if b["group"] == "rear" and r["y0"] - 1e-6 <= b["y"] <= r["y1"] + 1e-6
                      and r["way"] * (b["x"] - r["x"]) > 0]
-            group = [b for b in sp["bolts"] if b["group"] == bolts[0]["group"]]
             lever = abs(sum(b["x"] for b in bolts) / len(bolts) - r["x"])
             w0 = r["y1"] - r["y0"]
             sections = []
@@ -896,79 +917,117 @@ class Analysis:
                 e = min(R, lever) * j / 20                   # back from the sheet's edge toward the bolts
                 w = w0 + 2 * (R - math.sqrt(max(0.0, R ** 2 - (R - e) ** 2))) if R else w0
                 sections.append((w, lever - e))
-            out.append(dict(piece=r["piece"], group=bolts[0]["group"], share=len(bolts) / len(group), lever=lever, w=w0, sections=sections))
+            out.append(dict(piece=r["piece"], group="rear", share=len(bolts) / len(rear), lever=lever, w=w0, sections=sections,
+                            axial=abs(sum(b["y"] for b in bolts)) / y_max))
         return out
 
     @staticmethod
-    def tongue_root_reading(F: float, t: float, fy: float, sections) -> tuple[float, float]:
-        """A tongue's root under its share F (N) of the racking: the largest von Mises stress over its sections and their
-        fibres, the bending stress M y / I with the shear 1.5 F / (w t) (1 - (2 y / w) squared) by beam theory (est., the
-        tongue is short), and the largest plastic interaction M / Mp + (V / Vp) squared, Mp = fy t w squared / 4 and
-        Vp = fy t w / sqrt 3."""
+    def tongue_root_reading(F: float, t: float, fy: float, sections, P: float = 0.0) -> tuple[float, float]:
+        """A tongue's or a wing's root under its share F (N) across it and P along it: the largest von Mises stress over
+        its sections and their fibres, the bending stress M y / I and P / (w t) with the shear 1.5 F / (w t) (1 - (2 y / w)
+        squared) by beam theory (est., the part is short), and the largest plastic interaction
+        M / Mp + P / Pp + (V / Vp) squared, Mp = fy t w squared / 4, Pp = fy t w and Vp = fy t w / sqrt 3."""
         eta = np.linspace(0.0, 1.0, 41)
         vm = pl = 0.0
         for w, arm in sections:
             M = F * max(0.0, arm)
-            sb, tp = 6 * M / (t * w ** 2), 1.5 * F / (t * w)
-            vm = max(vm, float(np.max(np.sqrt((sb * eta) ** 2 + 3 * (tp * (1 - eta ** 2)) ** 2))))
-            pl = max(pl, M / (fy * t * w ** 2 / 4) + (F / (fy * t * w / math.sqrt(3))) ** 2)
+            sb, sa, tp = 6 * M / (t * w ** 2), P / (t * w), 1.5 * F / (t * w)
+            vm = max(vm, float(np.max(np.sqrt((sb * eta + sa) ** 2 + 3 * (tp * (1 - eta ** 2)) ** 2))))
+            pl = max(pl, M / (fy * t * w ** 2 / 4) + P / (fy * t * w) + (F / (fy * t * w / math.sqrt(3))) ** 2)
+        return vm, pl
+
+    def wing_roots(self, sp: dict) -> list[dict]:
+        """Each wing of shear panel sp's sheet, the part outboard of the cut ahead of it, as a free body (fx22-rear): its
+        rail's diagonal's force N reaches the sheet at its bolts' middle and passes into the main part through the wing's
+        root, the line where it meets the main part's side, the force's component along the root in shear, its component
+        across it in tension or compression, and both their moments about the root's middle in in-plane bending (est.,
+        each moment taken the worst way). `ux` and `uy` are the diagonal's direction along and across the trailer."""
+        out = []
+        dx = math.sqrt(max(0.0, sp["L"] ** 2 - sp["dy"] ** 2))
+        ux, uy = dx / sp["L"], sp["dy"] / sp["L"]
+        for wg in sp["sheet"]["wings"]:
+            x0, x1, yr = wg["root"]
+            near = [b for b in sp["bolts"] if b["group"] == "rail" and b["y"] * wg["side"] > 0]
+            bx, by = sum(b["x"] for b in near) / len(near), sum(b["y"] for b in near) / len(near)
+            out.append(dict(side=wg["side"], l=x1 - x0, ux=ux, uy=uy, arm_x=abs(bx - (x0 + x1) / 2), arm_y=abs(by - yr)))
+        return out
+
+    def wing_reading(self, wg: dict, N: float, t: float, fy: float) -> tuple[float, float]:
+        """A wing's root (wing_roots) under its diagonal's force N (N): its von Mises stress and its plastic interaction, as
+        tongue_root_reading reads a root of the wing's length with the force across it and along it and their moments."""
+        across, along = N * wg["uy"], N * wg["ux"]
+        M = across * wg["arm_x"] + along * wg["arm_y"]
+        w = wg["l"]
+        sb, sa, tp = 6 * M / (t * w ** 2), across / (t * w), 1.5 * along / (t * w)
+        vm = max(abs(sb + sa), math.sqrt(sa ** 2 + 3 * tp ** 2))      # at the root's outer fibre, and at its middle
+        pl = M / (fy * t * w ** 2 / 4) + across / (fy * t * w) + (along / (fy * t * w / math.sqrt(3))) ** 2
         return vm, pl
 
     def panel_checks(self) -> dict:
-        """Each shear panel (shear_panels) in its worst case of every load case: the plate's shear stress V / (b t) against
-        its shear yield over the case's factor and its elastic shear buckling stress on the points that hold it
-        (panel_holds, plate_shear_buckling), each tongue's root (tongue_roots) by its von Mises stress against fy over the
-        case's factor and at the ultimate by its plastic interaction against 1, the M10 bolts to its angles in shear,
-        each taking its group's share of V (panel_bolts) against AS 4100 9.3.2's 0.8 x 0.62 fuf on its minor diameter
-        area, and the sheet at the most loaded bolt in bearing, by AS 4100 9.3.2.4 (0.9 x 3.2 fu on d t) and AS/NZS 4600
-        5.3.4.2 (0.6 x alpha C fu, C 3.0 for d / t under 10, alpha 1.0 in single shear with a washer under the head and
-        the nut), and in tear-out along its force, by AS 4100 9.3.2.4 (0.9 fu on a_e t) and AS/NZS 4600 5.3.2 (0.7 fu on
-        e t, fu / fy over 1.08)."""
+        """Each shear panel (shear_panels) in its worst case of every load case (fx22-rear): the racking shear V over the
+        sheet's net width between its cuts, V / (b_n t), against its shear yield over the case's factor and its elastic
+        shear buckling stress on the points that hold it over the sheet as cut (panel_holds, plate_shear_buckling), each
+        tongue's root (tongue_roots) and each wing's root (wing_roots) by its von Mises stress against fy over the case's
+        factor and at the ultimate by its plastic interaction against 1, the M10 bolts in each group against AS 4100
+        9.3.2's 0.8 x 0.62 fuf on their minor diameter area, each rail's two taking its diagonal's force and the rear
+        group V and the diagonals' couple (panel_rear_bolts), the rails' angles' welds under the diagonal's force, and the
+        sheet at the most loaded bolt in bearing, by AS 4100 9.3.2.4 (0.9 x 3.2 fu on d t) and AS/NZS 4600 5.3.4.2
+        (0.6 x alpha C fu, C 3.0 for d / t under 10, alpha 1.0 in single shear with a washer under the head and the nut),
+        and in tear-out to its nearest edge in any direction, by AS 4100 9.3.2.4 (0.9 fu on a_e t) and AS/NZS 4600 5.3.2
+        (0.7 fu on e t, fu / fy over 1.08)."""
         ch = self.ch
         lcs = {lc["id"]: lc for lc in ch.data["load_cases"]}
+        mat = ch.data["material"]
+        wcap = mat["weld_phi"] * 0.6 * mat["weld_fuw"]
+        spec = next(f for f in ch.data["fittings"] if f["id"] == "CH-P17")
         out = {}
-        for sp in ch.shear_panels():
+        for sp in self.fm.panels_by_id().values():
             d = next(x for x in ch.data["shear_panels"] if x["id"] == sp["id"])
-            a, b, t = sp["x1"] - sp["x0"], sp["b"], sp["t"]
-            rect = sp["sheet"]["rect"]
-            tau_cr = plate_shear_buckling(rect[0], rect[2], rect[1], rect[3], t, self.panel_holds(sp))
+            t, sh, b_n = sp["t"], sp["sheet"], sp["b_n"]
+            rect = sh["rect"]
+            tau_cr = plate_shear_buckling(rect[0], rect[2], rect[1], rect[3], t, self.panel_holds(sp), holes=sh["holes"])
             bolt = d["fixing"]
             cap = 0.8 * 0.62 * bolt["fuf"]                     # MPa on the bolt's minor diameter area
             size = bolt["bolt"].split()[0]
             fu = d["fu"]
             c_4600 = 3.0 if bolt["d"] / t < 10 else max(1.8, 4.0 - 0.1 * bolt["d"] / t)
             phi_f = 0.70 if fu / d["fy"] >= 1.08 else 0.60
-            groups = self.panel_bolts(sp)
-            worst = max(g["share"] for g in groups)
-            most = [g for g in groups if g["share"] >= worst - 1e-9]
-            e, a_e = min(g["e"] for g in most), min(g["a_e"] for g in most)
-            roots = self.tongue_roots(sp)
+            groups = {g["group"]: g for g in self.panel_bolts(sp)}
+            e, a_e = min(g["e_any"] for g in groups.values()), min(g["a_e_any"] for g in groups.values())
+            roots, wings = self.tongue_roots(sp), self.wing_roots(sp)
+            rail = next(p for p in ch.panel_pieces() if p["use"] == "rail")
+            weld = rail["length"] * (0.7 * spec["weld"]["leg"] + spec["weld"]["corner_throat"])
             rows = []
             for lc_id, env in self.panel_env.items():
                 r = env[sp["id"]]
                 fac = lcs[lc_id]["factor"] if lc_id in lcs else 1
-                fb = r["v_n"] * worst
-                read = [self.tongue_root_reading(r["v_n"] * q["share"], t, d["fy"], q["sections"]) for q in roots]
-                rows.append((f"plate shear, {lc_id}", r["v_n"] / (b * t), min(0.6 * d["fy"], tau_cr) / fac))
-                if lc_id == "LC8u":                            # no fracture at the ultimate: the root's plastic interaction
-                    rows.append((f"tongue's root, plastic interaction times fy, {lc_id}", max(x[1] for x in read) * d["fy"], d["fy"]))
-                else:                                          # no yield at the working loads: its von Mises stress
-                    rows.append((f"tongue's root, von Mises, {lc_id}", max(x[0] for x in read), d["fy"] / fac))
-                rows += [(f"{size} bolt to its angles, {lc_id}", fb / bolt["a_c"], cap / fac),
+                V, N = r["v_n"], r["tie_n"]
+                f_rail = N / groups["rail"]["n_side"]
+                fy_rear, fx_rear = self.panel_rear_bolts(sp, V, N)
+                fb = max(f_rail, math.hypot(fy_rear, fx_rear))
+                read = [self.tongue_root_reading(V * q["share"], t, d["fy"], q["sections"], P=fx_rear * q["axial"]) for q in roots]
+                read += [self.wing_reading(wg, N, t, d["fy"]) for wg in wings]
+                rows.append((f"plate shear on its net width, {lc_id}", V / (b_n * t), min(0.6 * d["fy"], tau_cr) / fac))
+                if lc_id == "LC8u":                            # no fracture at the ultimate: the roots' plastic interaction
+                    rows.append((f"tongue's and wing's roots, plastic interaction times fy, {lc_id}", max(x[1] for x in read) * d["fy"], d["fy"]))
+                else:                                          # no yield at the working loads: their von Mises stress
+                    rows.append((f"tongue's and wing's roots, von Mises, {lc_id}", max(x[0] for x in read), d["fy"] / fac))
+                rows += [(f"{size} bolt on a rail's angle, {lc_id}", f_rail / bolt["a_c"], cap / fac),
+                         (f"{size} bolt under the {sp['ties'][0]['cm']} crossmember, {lc_id}", math.hypot(fy_rear, fx_rear) / bolt["a_c"], cap / fac),
+                         (f"rail's angle's welds to the rail, {lc_id}", N / weld, (wcap if lc_id != "LC8u" else 0.6 * mat["weld_fuw"]) / fac),
                          (f"sheet in bearing at a bolt, AS 4100, {lc_id}", fb / (bolt["d"] * t), 0.9 * 3.2 * fu / fac),
                          (f"sheet in bearing at a bolt, AS/NZS 4600, {lc_id}", fb / (bolt["d"] * t), 0.6 * c_4600 * fu / fac),
                          (f"sheet's tear-out at a bolt, AS 4100, {lc_id}", fb / (a_e * t), 0.9 * fu / fac),
                          (f"sheet's tear-out at a bolt, AS/NZS 4600, {lc_id}", fb / (e * t), phi_f * fu / fac)]
             w = max(self.panel_env.items(), key=lambda kv: kv[1][sp["id"]]["v_n"])
-            edge = min(g["edge"] for g in groups)
-            n_front = next(g["n"] for g in groups if g["group"] == "front")
-            front = next(q for q in roots if q["group"] == "front")
-            res = _local(f"Shear panel {sp['id']}, {t:g} mm steel, {a:,.0f} x {b:,.0f} mm", rows,
-                         f"its worst racking shear, {w[1][sp['id']]['v_n'] / 1000:.1f} kN in {w[0]}, {w[1][sp['id']]['case']}, 1/{n_front} of it "
-                         f"on each bolt under the XT centre crossmember, e {e:.1f} mm, the least bolt edge distance {edge:.1f} mm, "
-                         f"the front tongue {front['w']:.0f} mm wide at its root {front['lever']:.1f} mm behind its bolts with R{sp['sheet']['root_r']:g} corners, "
-                         f"the sheet buckling at {tau_cr:.1f} MPa on the points that hold it")
-            res.update(tau_cr=tau_cr, v_n=w[1][sp["id"]]["v_n"], lc=w[0], bolt_groups=groups, tongues=roots)
+            edge = min(g["edge"] for g in groups.values())
+            n_tie = max(env[sp["id"]]["tie_n"] for env in self.panel_env.values())
+            res = _local(f"Shear panel {sp['id']}, {t:g} mm steel, {sp['x1'] - sp['x0']:,.0f} x {sp['b']:,.0f} mm, cut to {b_n:,.0f} mm wide at the rear airbags", rows,
+                         f"its worst racking shear, {w[1][sp['id']]['v_n'] / 1000:.1f} kN in {w[0]}, {w[1][sp['id']]['case']}, and up to "
+                         f"{n_tie / 1000:.1f} kN on each rail's {groups['rail']['n_side']} bolts, the sheet {b_n:,.0f} mm wide between its cuts, "
+                         f"e {e:.1f} mm, the least bolt edge distance {edge:.1f} mm, the sheet buckling at {tau_cr:.1f} MPa on the points that hold it")
+            res.update(tau_cr=tau_cr, v_n=w[1][sp["id"]]["v_n"], tie_n=n_tie, lc=w[0], bolt_groups=list(groups.values()), tongues=roots,
+                       wings=wings, b_n=b_n, weld_mm2=weld)
             out["shear_panel"] = res
         return out
 
@@ -1270,8 +1329,7 @@ class Analysis:
         cms = [m for m in ch.members if m.role.startswith("cm")]
         groups = {"crossmember": cms, "outrigger": [m for m in ch.members if m.role == "outrigger"],
                   "brace": [m for m in ch.members if m.role == "brace"],
-                  "hinge_crossmember": [m for m in cms if m.station in ("XT front hinge", "XT centre")],
-                  "jack_crossmember": [m for m in cms if m.station == "XT centre"]}
+                  "hinge_crossmember": [m for m in cms if m.station in ("XT front hinge", "XT centre")]}
 
         def xs_of(where):
             if where == "all":
@@ -1662,7 +1720,7 @@ class Analysis:
         mem = {m.id: m for m in ch.members}
         gr = ch.data["member_galvanising_holes"]
         _, holes = frame_sections(ch)
-        attach = {"CM-05": ["CH-P06"], "CM-06": ["CH-P07"], "CM-08": ["CH-P05"]}
+        attach = {"CM-06": ["CH-P07"], "CM-08": ["CH-P05"]}
         boxes = {fid: [b for f in ch.fittings if f.id == fid for b in fitting_boxes(ch, f)] for fids in attach.values() for fid in fids}
         own = [h for h in holes if h["via"] == "own" and not (h["tube"].endswith("A") and h["tube"].startswith("DB-") and h["use"] == "drain")]
         out = []
@@ -1680,7 +1738,7 @@ class Analysis:
             leg = r["leg"] + r.get("clear", 0.0)
             toes = [(u_end - d / 2 - leg, "end weld" if not h["tube"].endswith("B") else "mitre's butt weld")]
             if r.get("z_bottom_leg"):
-                toes.append(((z - d / 2) - (-sec.d / 2 + r["z_bottom_leg"]), "XT hinges' and jacking pads' fillets"))
+                toes.append(((z - d / 2) - (-sec.d / 2 + r["z_bottom_leg"]), "XT hinges' fillets"))
             cen = np.array(h["centre"], float)
             hb = (cen[0] - d / 2, cen[1] - d / 2, cen[2] - d / 2, cen[0] + d / 2, cen[1] + d / 2, cen[2] + d / 2)
             for fid in attach.get(h["member"], []):
@@ -1806,7 +1864,7 @@ class Analysis:
         return out
 
     # ------------------------------------------------------------------ fittings
-    def local_checks(self, pad_n: float) -> dict:
+    def local_checks(self, jack: dict) -> dict:
         ch, V = self.ch, self.ch.V
         mat = ch.data["material"]
         fyp, fup = mat["plate_fy"], mat["plate_fu"]
@@ -1844,15 +1902,21 @@ class Analysis:
                 rows += [(f"plate, {lab}", sig, lim_p), (f"bearing, {lab}", F / (c["pin"] * t), 1.5 * lim_p),
                          (f"tear-out, {lab}", F / (2 * t * (c["edge"] - c["hole"] / 2)), 0.6 * lim_p), (f"weld, {lab}", q / a, lim_w)]
             out[key] = _local(name, rows, f"{pull / 1000:.1f} kN within 30 degrees sideways and 15 degrees up or down, {ult / 1000:.1f} kN without fracture")
-        # jacking pads, LC8b
-        c = L["jacking_pad"]
+        # the jacking points, LC8b: Cruisemaster's, under each arm by its hub (its XT user guide), the air released from
+        # the springs first, so the jack's push reaches the frame through the arm's bump stop on its airbag's top bracket,
+        # welded along the rail's inner web, and the little left through its hinge. The bump stop's push at the frame
+        # analysis's jack force is scaled to the larger of that and LC8b's force, and read on the bracket's fillets along
+        # the rail's web, the bracket's length and its returns, and on the web in shear along them
         rail = ch.role_sec["rail"]
-        t = fit[c["fitting"]]["t"]
-        F = max(pad_n, lcs["LC8b"]["pad_n"])
-        bb = fit[c["fitting"]]["l"] + 5 * rail.t
-        rows = [("rail web bearing", F / (2 * rail.t * bb), rail.fy), ("pad bending between the webs", F * c["span"] / 8 / (fit[c["fitting"]]["w"] * t ** 2 / 6), fyp)]
-        out["jacking_pad"] = _local("Jacking pad, 10 mm (CH-P06)", rows,
-                                    f"{F / 1000:.1f} kN on one pad (the larger of LC8b's {lcs['LC8b']['pad_n'] / 1000:.1f} kN at the plate and the frame analysis)")
+        ab = ch.data["xt_arms"]["airbag"]["bracket"]
+        F = max(jack["pad_n"], lcs["LC8b"]["pad_n"])
+        Fb = max(jack["bag_n"] * F / jack["jack_at"], jack["bag_at"] * F / jack["pad_n"])
+        lw = ab["l"] + 2 * ab["returns"]
+        rows = [("airbag's top bracket fillets under the bump stop's push", Fb / (lw * 0.7 * ab["leg"]), wcap),
+                ("rail's web in shear along the bracket's fillets", Fb / (rail.t * lw), 0.6 * rail.fy)]
+        out["jacking_point"] = _local("Jacking point under each XT arm, Cruisemaster's", rows,
+                                      f"{F / 1000:.1f} kN at one arm's jacking point by its hub (the larger of LC8b's {lcs['LC8b']['pad_n'] / 1000:.1f} kN "
+                                      f"at the plate and the frame analysis), {Fb / 1000:.1f} kN of it through the arm's bump stop onto its airbag's top bracket")
         # spare carrier posts, 4 g on the fixing (LC2) and the LC7 forward case
         c = L["spare_posts"]
         post = next(m for m in ch.members if m.role == "spare_post")
@@ -2057,12 +2121,15 @@ def heel_throats(legs, angle: float) -> tuple[float, float]:
     return inboard * math.cos(math.pi / 4 - angle / 2), outboard * math.cos(math.pi / 4 + angle / 2)
 
 
-def plate_shear_buckling(x0: float, x1: float, y0: float, y1: float, t: float, holds, deg: int = 28, E: float = 200_000.0) -> float:
+def plate_shear_buckling(x0: float, x1: float, y0: float, y1: float, t: float, holds, deg: int = 28, E: float = 200_000.0,
+                         holes=()) -> float:
     """The least uniform shear stress (MPa) at which a flat plate x0 to x1 by y0 to y1 and t thick buckles, held out of its
     plane only at the points `holds` (x, y) and free elsewhere (I2-98), by the Rayleigh-Ritz method on a Legendre basis
     to `deg` in each direction, each point a stiff spring. The shear is taken uniform over the whole plate, its free edges
     too, which overstates what reaches them (est., on the safe side). Held along every edge it gives the closed form's
-    k = 5.35 + 4 (a / b) squared within 1 % (cad/tests/test_chassis.py)."""
+    k = 5.35 + 4 (a / b) squared within 1 % (cad/tests/test_chassis.py). `holes` are rectangles (x0, y0, x1, y1) cut out
+    of the plate: its strain energy and the shear's work are then taken over what is left, on the quadrature's points
+    outside them (fx22-rear)."""
     from numpy.polynomial import legendre as leg
     a, b = x1 - x0, y1 - y0
     D = E * t ** 3 / (12 * (1 - NU ** 2))
@@ -2077,10 +2144,29 @@ def plate_shear_buckling(x0: float, x1: float, y0: float, y1: float, t: float, h
     def integral(A, B):
         return (A * wq) @ B.T
 
-    X00, X11, X22, X02, X01 = integral(P, P), integral(dP, dP), integral(d2P, d2P), integral(P, d2P), integral(P, dP)
-    K = D * jac * (sx ** 4 * np.kron(X22, X00) + sy ** 4 * np.kron(X00, X22) + NU * sx ** 2 * sy ** 2 * (np.kron(X02.T, X02) + np.kron(X02, X02.T))
-                   + 2 * (1 - NU) * sx ** 2 * sy ** 2 * np.kron(X11, X11))
-    G = t * jac * sx * sy * (np.kron(X01.T, X01) + np.kron(X01, X01.T))
+    if holes:
+        xs, ys = x0 + (g + 1) * a / 2, y0 + (g + 1) * b / 2
+        keep = np.ones((len(g), len(g)))
+        for hx0, hy0, hx1, hy1 in holes:
+            keep[np.ix_((xs > hx0) & (xs < hx1), (ys > hy0) & (ys < hy1))] = 0.0
+        w2 = (np.outer(wq, wq) * keep).ravel()
+
+        def basis(A, B):                 # each basis function A_i(xi) B_j(eta) at every point, (points, n * n)
+            return np.einsum("ip,jq->pqij", A, B).reshape(len(g) ** 2, n * n)
+
+        def integral2(U, W):
+            return (U * w2[:, None]).T @ W
+
+        Bxx, Byy, Bxy, Bx, By = basis(d2P, P), basis(P, d2P), basis(dP, dP), basis(dP, P), basis(P, dP)
+        K = D * jac * (sx ** 4 * integral2(Bxx, Bxx) + sy ** 4 * integral2(Byy, Byy)
+                       + NU * sx ** 2 * sy ** 2 * (integral2(Bxx, Byy) + integral2(Byy, Bxx))
+                       + 2 * (1 - NU) * sx ** 2 * sy ** 2 * integral2(Bxy, Bxy))
+        G = t * jac * sx * sy * (integral2(Bx, By) + integral2(By, Bx))
+    else:
+        X00, X11, X22, X02, X01 = integral(P, P), integral(dP, dP), integral(d2P, d2P), integral(P, d2P), integral(P, dP)
+        K = D * jac * (sx ** 4 * np.kron(X22, X00) + sy ** 4 * np.kron(X00, X22) + NU * sx ** 2 * sy ** 2 * (np.kron(X02.T, X02) + np.kron(X02, X02.T))
+                       + 2 * (1 - NU) * sx ** 2 * sy ** 2 * np.kron(X11, X11))
+        G = t * jac * sx * sy * (np.kron(X01.T, X01) + np.kron(X01, X01.T))
     k = 1e4 * float(np.max(np.diag(K)))
     for px, py in holds:
         v = np.kron(leg.legval(2 * (px - x0) / a - 1, eye), leg.legval(2 * (py - y0) / b - 1, eye))

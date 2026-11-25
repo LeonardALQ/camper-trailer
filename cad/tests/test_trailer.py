@@ -126,6 +126,24 @@ def test_the_fresh_tanks_keep_their_clearance_to_every_fitting_they_are_notched_
                 assert g >= notches[0]["clear"] - 1e-6, f"{t.iid}: {fid} at {[round(v) for v in s[0]]} stands {g:.1f} mm from it"
 
 
+def test_the_rear_bay_clears_the_rear_airbags_their_brackets_and_the_rear_shocks():
+    """FX20-FIT item 4 (fx22-rear): the shear panel's sheet, its angles and the rest of the rear bay's fittings clear the
+    rear airbags over their travel, their top brackets and the rear shocks over the arms' travel, by FIT-08's rule, and
+    the sheet stands 10 mm clear of the airbags and shocks."""
+    lay = EV["layout"]
+    f = lay.kit_fit()
+    rear = [p for p in f["pairs"] if p["part"].startswith("CH-P17") or "rear piece" in p["part"]]
+    assert not rear, rear
+    pn = next(b for b in lay.blocks if b.id == "UF-03").extra["panel"]
+    zt, t = pn["z_top"], pn["t"]
+    for p in lay.xt_parts():
+        if p["id"].startswith(("XT-BAG-R", "XT-SHOCK-R")):
+            for bx in p["boxes"]:
+                for x0, y0, x1, y1 in pn["sheet"]["parts"] + pn["sheet"]["tongues"]:
+                    d = max(bx[0] - x1, x0 - bx[3], bx[1] - y1, y0 - bx[4], bx[2] - zt, zt - t - bx[5])
+                    assert d >= 10.0 - 1e-6, (p["id"], bx, (x0, y0, x1, y1))
+
+
 def test_the_rear_tank_guard_is_the_shear_panels_sheet_as_the_chassis_data_gives_it():
     """UF-03's rear piece is the shear panel PNL-1's sheet (I2-98): its part line takes its mass and its item from the
     chassis data (Chassis.panel_mass), its price line and its note name the same thickness and grade, and the 3D model

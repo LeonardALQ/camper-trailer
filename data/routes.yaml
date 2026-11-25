@@ -793,11 +793,13 @@ fixtures:
   - {id: LM-SR, what: "Road side marker lamps on the outrigger end caps (SM-01)", line: LG-01, at: [OR_05R.cx, half_bw + 10, 811], size: [40, 20, 80]}
   - {id: BR-TSC, what: "Bosch TSC module on the XT centre crossmember (RG-03)", line: RG-03, at: [RG_03.cx, RG_03.cy, RG_03.cz], size: [50, 200, 46], obstacle: false, needs_run: false}
   # The junctions where each side's two drums' extended brake lines (magnet and ABS sensor, Cruisemaster's quick connects)
-  # meet the TSC's axle harness: under the XT centre crossmember, in the guard's gap, midway between the TSC and the
-  # jacking pad and level with the guard's underside, far inboard of the tyres' and the arms' sweep (FIT-05, I2-30).
+  # meet the TSC's axle harness: under the XT centre crossmember, in the guard's gap, midway between the TSC and a point
+  # 111 mm inboard of the rail's inner face, where the jacking pads' inner edges stood until the pads gave way to
+  # Cruisemaster's jacking points under the arms (fx22-rear), so the junctions keep their places for the services' pass,
+  # level with the guard's underside, far inboard of the tyres' and the arms' sweep (FIT-05, I2-30).
   # The lines run along each arm to its pivot, looped there for the arm's 120 mm of travel, and in under the rail.
-  - {id: BR-DK, what: "Brake magnets and ABS sensors of the kerb side drums, their junction with the TSC harness under CM-05", line: RG-03, at: [CM_05.cx, (BR_TSC.y0 + CH_P06.y1) / 2, UF_03.z0 - 40], size: [80, 80, 80]}
-  - {id: BR-DR, what: "Brake magnets and ABS sensors of the road side drums, their junction with the TSC harness under CM-05", line: RG-03, at: [CM_05.cx, -(BR_TSC.y0 + CH_P06.y1) / 2, UF_03.z0 - 40], size: [80, 80, 80]}
+  - {id: BR-DK, what: "Brake magnets and ABS sensors of the kerb side drums, their junction with the TSC harness under CM-05", line: RG-03, at: [CM_05.cx, (BR_TSC.y0 - (rail_c - rail_w / 2 - 111)) / 2, UF_03.z0 - 40], size: [80, 80, 80]}
+  - {id: BR-DR, what: "Brake magnets and ABS sensors of the road side drums, their junction with the TSC harness under CM-05", line: RG-03, at: [CM_05.cx, -(BR_TSC.y0 - (rail_c - rail_w / 2 - 111)) / 2, UF_03.z0 - 40], size: [80, 80, 80]}
 # Every water outlet SVC-05 looks for, with its cold and hot runs tagged "water: <name>".
 water_outlets: [sink, drinking tap, basin, shower, shower bypass, washer, toilet flush, rinse box, Combi]
 

@@ -107,11 +107,11 @@ lines:
     price: {aud_each: 95.65, basis: listing, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/15-shs-mild-steel-square.html", date: 2026-11-20, note: "SKU SHS25. 1.6 m needed, six gussets of 268.9 mm on their axes, each landing on its cheek's step, cut at 45 degrees at both ends"}
   - id: STL-08
     group: chassis
-    name: Profile-cut plate parts, grade 350, cut and drilled, for the coupling plate, lugs, gussets, pads, cleats, brackets, the rails' end plates and the 32 body mount nut plates
-    qty: 81
+    name: Profile-cut plate parts, grade 350, cut and drilled, for the coupling plate, lugs, gussets, cleats, brackets, the rails' end plates and the 32 body mount nut plates
+    qty: 75
     unit: kg
-    covers: [CH-P01, CH-P02, CH-P03, CH-P04, CH-P05, CH-P06, CH-P07, CH-P09, CH-P11, CH-P14, CH-P15, CH-P16, CH-P17]
-    price: {aud_each: 12, basis: estimate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/374-mild-steel-sheet-plates-250gr-as-nzs-3678.html", date: 2026-11-21, note: "72.2 kg of plate and angle in the schedule with the rails' 16 mm end plates CH-P15, the eight 10 mm hinge cheeks CH-P16 with their steps (14.6 kg) and the shear panel's EA 50 x 50 x 5 angles CH-P17 (6.2 kg) (ARK's corner steady brackets come with the steadies, CH-B01), and eight 150 x 150 x 6 plan-brace gussets of 8.5 kg, so 81 kg where it was 78 kg before the cheeks' steps (I2-99) and 60 kg before the hinge cheeks and the panel (CHS-12, CHS-13). Plate is listed at AUD 3.05 to 3.44/kg as sheet. AUD 12/kg covers nesting scrap and laser or plasma cutting and drilling of small thick parts"}
+    covers: [CH-P01, CH-P02, CH-P03, CH-P04, CH-P05, CH-P07, CH-P09, CH-P11, CH-P14, CH-P15, CH-P16, CH-P17]
+    price: {aud_each: 12, basis: estimate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/374-mild-steel-sheet-plates-250gr-as-nzs-3678.html", date: 2026-11-21, note: "66.3 kg of plate and angle in the schedule with the rails' 16 mm end plates CH-P15, the eight 10 mm hinge cheeks CH-P16 with their steps (14.6 kg) and the shear panel's EA 50 x 50 x 5 angles CH-P17 (1.8 kg) (ARK's corner steady brackets come with the steadies, CH-B01), and eight 150 x 150 x 6 plan-brace gussets of 8.5 kg, so 75 kg where it was 81 kg before the panel's rail angles stopped short of the rear airbags' brackets and the jacking pads gave way to Cruisemaster's points under the arms, 78 kg before the cheeks' steps (I2-99) and 60 kg before the hinge cheeks and the panel (CHS-12, CHS-13). Plate is listed at AUD 3.05 to 3.44/kg as sheet. AUD 12/kg covers nesting scrap and laser or plasma cutting and drilling of small thick parts"}
   - id: GLV-01
     group: chassis
     name: Hot-dip galvanising to AS/NZS 4680 of the welded chassis and drawbar, the stone guard frame and the mud flap hangers

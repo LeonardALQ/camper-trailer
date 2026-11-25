@@ -5,7 +5,7 @@ CT-101: general arrangement, plan, side elevation, end views, member schedule an
 CT-102: drawbar and coupling: plan, elevation, coupling plate, chain lugs, jockey wheel bracket, front recovery lugs
         and stone guard.
 CT-103: details, drawn as sections at their true sizes: the composite rail, outrigger root, crossmember to rail,
-        the drawbar overlap's tapered end, the jacking pad, the rear recovery tongue and the spare carrier posts, with
+        the drawbar overlap's tapered end, the jacking point under an arm, the rear recovery tongue and the spare carrier posts, with
         weld symbols to AS 1101.3, and the rails' front ends with their vent and drain holes for galvanising (K).
 """
 from __future__ import annotations
@@ -690,28 +690,39 @@ def ct103(prj, model, bom, checks, reg, dwg):
     S.leader(sh, (xs + 25 + 300 / k, zb), (xs + 62, zb - 6), "WELD ENDS HERE,", ["TOE GROUND (IIW 712)"], size=1.5)
     sh.text(xs + 0.5, zb - gap - 150 / k - 6, "NO TRANSVERSE WELD. ENDS AT X 2,820,", 1.5)
     sh.text(xs + 0.5, zb - gap - 150 / k - 9, "BETWEEN CROSSMEMBERS (FAT-08, FAT-21).", 1.5)
-    # ---- G: jacking pad, section across the rail at the XT centre crossmember, 1:5
-    k = 5.0
+    # ---- G: the jacking point under an XT arm, elevation on the kerb side, 1:10 (Cruisemaster's XT user guide)
+    k = 10.0
     cx = cols[1]
-    _detail_title(sh, cx, top2, "G: JACKING PAD", k)
-    zb = 124.0
-    pad = next(f for f in lay.chassis.data["fittings"] if f["id"] == "CH-P06")
-    cheek = lay.chassis.data["xt_hinges"]["cheek"]
-    face = cx - 25 + rl.b / 2 / k
-    off = round(lay.chassis.V["rail_c"] - rl.b / 2 - lay.chassis.ev(pad["side_y"]) - pad["w"] / 2, 1)
-    x0, x1 = face + off / k, face + (off + pad["w"]) / k
-    rhs(sh, cx - 25, zb + rl.d / 2 / k, rl.b, rl.d, rl.t, rl.ro, k, sty="medium")
-    sh.rect(face, zb, cx + 25, zb + 150 / k, "medium")
-    sh.text(cx + 1, zb + 150 / k + 1, "XT CENTRE CROSSMEMBER", 1.5, "middle")
-    sh.rect(face, zb - cheek["below"] / k, face + cheek["t"] / k, zb, "medium")
-    plate(sh, x0, zb - pad["t"] / k, x1, zb)
-    m = (x0 + x1) / 2
-    sh.path([(m - 5, zb - 2), (m - 3, zb - 6), (m + 3, zb - 6), (m + 5, zb - 2)], "medium")
-    weld_symbol(sh, (x1, zb), (cx + 4, zb - 10), "5", both=True, length="100", note="ALONG THE CM")
-    note = (f"PAD {pad['l']:g}x{pad['w']:g}x{pad['t']:g} WITH A LOCATING CUP, {off:g} mm OFF THE RAIL'S INNER FACE, CLEAR OF "
-            f"THE HINGE CHEEK BEYOND IT. NO WELD ON THE RAIL'S BOTTOM FACE (FAT-11). {chs['results']['pad_n']['pad_n'] / 1000:.1f} kN ON ONE PAD (LOC-04).")
+    _detail_title(sh, cx, top2, "G: JACKING POINT UNDER THE ARM", k)
+    zb = 146.0
+    ch = lay.chassis
+    w = next(w for w in ch.suspension if w["id"] == "RK")
+    (px, _, pz), (hx, _, hz) = w["pivot"], w["hub"]
+    zu = ch.V["rail_underside_z"]
+    bag = ch.data["xt_arms"]["parts"]["airbag"]
+
+    def at(x, z):
+        return cx - 26.0 + (x - px) / k, zb + (z - zu) / k
+
+    r0, r1 = at(px - 60.0, zu), at(hx + 110.0, zu + rl.d)
+    sh.rect(r0[0], r0[1], r1[0], r1[1], "medium")
+    sh.text(r0[0] + 1.0, r1[1] - 4.5, "RAIL", 1.5)
+    p0, p1 = at(px, pz), at(hx, hz)
+    sh.line(p0[0], p0[1], p1[0], p1[1], "thick")
+    sh.circle(p0[0], p0[1], 1.2, "medium")
+    sh.circle(p1[0], p1[1], 1.6, "medium")
+    b0, b1 = at(hx + bag["dx"] - bag["d"] / 2, zu - bag["h"]), at(hx + bag["dx"] + bag["d"] / 2, zu)
+    sh.rect(b0[0], b0[1], b1[0], b1[1], "phantom")
+    tip = (p1[0], p1[1] - 2.0)
+    sh.path([(tip[0], tip[1] - 9.0), tip], "medium")
+    sh.path([(tip[0] - 0.9, tip[1] - 2.2), tip, (tip[0] + 0.9, tip[1] - 2.2)], "medium")
+    S.leader(sh, (tip[0], tip[1] - 6.0), (tip[0] - 14.0, tip[1] - 9.0), "JACK", size=1.5)
+    jack = chs["results"]["pad_n"]
+    note = (f"JACK ONLY UNDER CRUISEMASTER'S JACKING POINT UNDER THE ARM BY THE HUB, THE AIR RELEASED FIRST (ITS XT USER GUIDE), "
+            f"NEVER UNDER THE FRAME. {max(jack['pad_n'], _forces()['pad'] * 1000) / 1000:.1f} kN AT ONE ARM REACHES THE RAIL THROUGH THE "
+            f"BUMP STOP AND THE AIRBAG'S TOP BRACKET, PHANTOM (LOC-04).")
     for i, t in enumerate(S.wrap_mm(note, 44.0, 1.5)):
-        sh.text(cx - 32, zb - 18 - 3 * i, t, 1.5)
+        sh.text(cx - 32, zb - 40 - 3 * i, t, 1.5)
     # ---- H: rear recovery tongue, plan, 1:10
     k = 10.0
     cx = cols[2]
