@@ -388,11 +388,11 @@ class Analysis:
         from that load (I2-94). No tyre can pull the ground, so one that would leaves it and the trailer pitches or rolls
         onto the supports that remain, the `nose` at the ball among them: on its jockey wheel, which cannot pull either, or
         held both ways by the coupled truck (LC8a `reaction` `nose`, est.). A bogged tyre that lifts is taken to stay in its
-        rut, which holds it along and across at its rates (est., `lift` gives each one's rise on the rates). The set of supports in contact is
-        iterated until every one in contact pushes and none off the ground would. Where no set holds the trailer at the
-        whole pull, it tips first, so the pull is taken at the largest share of it that the trailer holds (`scale`).
-        Returns the force the ground puts on each tyre at its contact and on each wheel at its hub, the nose's force, the
-        tyres off the ground, their rise and the scale."""
+        rut, which holds it along and across at its rates (est.). The set of supports in contact is iterated until every
+        one in contact pushes and none off the ground would. Where no set holds the trailer at the whole pull, it tips
+        first, so the pull is taken at the largest share of it that the trailer holds (`scale`). Without `base` no support
+        lifts. Returns the force the ground puts on each tyre at its contact and on each wheel at its hub, the nose's force,
+        the tyres off the ground, their rise on the rates (`lift`) and the scale."""
         r = next(lc for lc in self.ch.data["load_cases"] if lc["id"] == "LC8a")["reaction"]
         springs = []
         for w in self.ch.suspension:
@@ -421,7 +421,7 @@ class Analysis:
         fh = {id(s): -s["k"] * (s["g"][plan] @ uh) for s in flat}
         left = load + sum((fh[id(s)] * s["g"] for s in flat), np.zeros(6))      # what the plan leaves, up, in roll and in pitch
         vert = [s for s in springs if s["d"] == 2]
-        ground = [s for s in vert if s["contact"]]                               # the supports that can only push
+        ground = [s for s in vert if s["contact"]] if base else []              # the supports that can only push, with the weight
         sc = np.array([1.0, 1e-3, 1e-3])                                          # rotations as mm at 1 m
 
         def solve(lam: float):
@@ -711,6 +711,7 @@ class Analysis:
         lc8 = lcs["LC8a"]
         supports = self.recovery_supports(cases)
         self.lc8_arms: dict[str, dict] = {}
+        self.cheek_env: dict[str, dict] = {}
         for lc_id, Fr in (("LC8a", lc8["force_n"]), ("LC8u", lc8["ultimate_n"])):
             for where in ("front", "rear"):
                 for s in (-1, 1):
@@ -737,6 +738,7 @@ class Analysis:
                                          + (f", tipping at {info['scale'] * Fr / 1000:.1f} kN" if info["scale"] < 1.0 - 1e-9 else ""))
                                 take(lc_id, res, label, ultimate=lc_id == "LC8u")
                                 self._recovery_envelope(lc_id, label, info, held)
+                                self._cheek_envelope(lc_id, label, res)
         out = dict(envelope={}, governing={}, deflections={}, twist=twist, balls=balls, residual_n=self.resid,
                    frame=dict(nodes=len(self.f.nodes), elements=sum(1 for e in self.f.elements if not e.sec.rigid),
                               rigid_links=sum(1 for e in self.f.elements if e.sec.rigid)))
@@ -821,25 +823,18 @@ class Analysis:
             out["shear_panel"] = res
         return out
 
-    def cheek_check(self) -> dict:
-        """CHS-14 (I2-92): the hinge cheeks' welds (CH-P16) at the 78.5 kN ultimate pull, all of it along the trailer through
-        one cheek, as a held wheel puts it through a front hinge, which has one, with the largest force across and up that
-        LC8a's solve puts on a held wheel's hinge at the ultimate. The force acts at the cheek's pin, the middle of its
-        `bar_leg` fillets each side down the hinge bar's front or rear face over the bar's top `bar_d` (est.), which pass
-        it but no moment, at the cheek's end. Its two lines on the rail's inner web, the `leg` fillet along its top edge and
-        the flare-bevel weld along the rail's bottom corner, are read as one weld group by the elastic vector method, the
-        force and its moments about the group's centroid, each line on its throat: the fillet's 0.7 leg and the flare
-        bevel's `corner` share of the rail's outside radius, AISC 360 Table J2.2's 5/16 R for a manual metal arc weld."""
-        ch = self.ch
-        mat = ch.data["material"]
-        wcap = mat["weld_phi"] * 0.6 * mat["weld_fuw"]
-        ck = ch.data["xt_hinges"]["cheek"]
-        F = next(lc for lc in ch.data["load_cases"] if lc["id"] == "LC8a")["ultimate_n"]
-        hinge = getattr(self, "lc8_arms", {}).get("LC8u", {}).get("hinge", {})
-        fy_ = max((abs(float(h["f"][1])) for h in hinge.values()), default=0.0)
-        fz_ = max((abs(float(h["f"][2])) for h in hinge.values()), default=0.0)
-        bar = math.sqrt(F ** 2 + fy_ ** 2 + fz_ ** 2) / (2 * ck["bar_d"] * 0.7 * ck["bar_leg"])
-        l, ro = ck["l"], ch.role_sec["rail"].ro
+    def cheek_welds(self, F) -> dict:
+        """The stresses in one hinge cheek's welds (CH-P16, xt_hinges `cheek`, I2-92) under the force F (N, along, across and
+        up) that its pin passes from the hinge bar, at the middle of its `bar_leg` fillets each side down the bar's front or
+        rear face over the bar's top `bar_d` (est.), which pass a force but no moment, at the cheek's end. Its two lines on
+        the rail's inner web, the `leg` fillet along its top edge and the flare-bevel weld along the rail's bottom corner,
+        are one weld group, read by the elastic vector method with the force's moments about the group's centroid, each
+        line on its throat: the fillet's 0.7 leg and the flare bevel's `corner` share of the rail's outside radius, AISC 360
+        Table J2.2's 5/16 R for a manual metal arc weld. The components add at the worst corner whatever their signs."""
+        ck = self.ch.data["xt_hinges"]["cheek"]
+        fx, fy_, fz_ = (abs(float(v)) for v in F)
+        out = {"to the hinge bar": math.sqrt(fx ** 2 + fy_ ** 2 + fz_ ** 2) / (2 * ck["bar_d"] * 0.7 * ck["bar_leg"])}
+        l, ro = ck["l"], self.ch.role_sec["rail"].ro
         lines = [("its top edge's fillet", ck["h"] - ck["below"], 0.7 * ck["leg"]),
                  ("the flare-bevel weld at the rail's bottom corner", 0.0, ck["corner"] * ro)]
         A = sum(a * l for _, _, a in lines)
@@ -847,18 +842,42 @@ class Analysis:
         Ix = sum(a * l * (z - zc) ** 2 for _, z, a in lines)
         Iz = sum(a * l ** 3 / 12 for _, _, a in lines)
         lever = zc + ck["bar_d"] / 2                     # the pin under the group's centroid, at the cheek's end
-        M_in = F * lever + fz_ * l / 2                   # in the web's plane
+        M_in = fx * lever + fz_ * l / 2                  # in the web's plane
         M_x, M_z = fy_ * lever, fy_ * l / 2              # out of it
-        rows = [("to the hinge bar", bar, wcap)]
         for name, z, a in lines:
             dz = abs(z - zc)
-            t_x = F / A + M_in * dz / (Ix + Iz)
+            t_x = fx / A + M_in * dz / (Ix + Iz)
             t_z = fz_ / A + M_in * (l / 2) / (Ix + Iz)
             s_n = fy_ / A + M_x * dz / Ix + M_z * (l / 2) / Iz
-            rows.append((f"to the rail's web, {name}", math.sqrt(t_x ** 2 + t_z ** 2 + s_n ** 2), wcap))
+            out[f"to the rail's web, {name}"] = math.sqrt(t_x ** 2 + t_z ** 2 + s_n ** 2)
+        return out
+
+    def _cheek_envelope(self, lc_id: str, label: str, res):
+        """Each hinge's pin force in one LC8a case, the force its cheeks take from the hinge bar, and the largest stress in
+        each of their welds over the case's hinges (cheek_welds, CHS-14)."""
+        xyz = np.asarray(self.f.nodes)
+        e = self.cheek_env.setdefault(lc_id, {})
+        for wid, k in self.fm.cheek_pins.items():
+            el = self.f.elements[k]
+            R, _ = el.axes(xyz)
+            F = -R.T @ np.asarray(res.forces[k][6:9])
+            n = sum(1 for c in self.ch.hinge_cheeks() if c["wheel"] == wid)
+            for part, mpa in self.cheek_welds(F / n).items():
+                if mpa > e.get(part, {}).get("mpa", 0.0):
+                    e[part] = dict(mpa=mpa, case=label, wheel=wid, f=[float(v) for v in F / n])
+
+    def cheek_check(self) -> dict:
+        """CHS-14 (I2-92): the hinge cheeks' welds (CH-P16) in every LC8a case at 58.9 kN and at the 78.5 kN ultimate, each
+        under the force the frame model's pin passes from the hinge bar into the hinge's cheeks, shared equally where a
+        hinge has two (cheek_welds), against AS 4100 9.7.3's 0.8 x 0.6 fuw."""
+        mat = self.ch.data["material"]
+        wcap = mat["weld_phi"] * 0.6 * mat["weld_fuw"]
+        rows = [(f"{part}, {lc_id}", r["mpa"], wcap) for lc_id in ("LC8a", "LC8u") for part, r in self.cheek_env[lc_id].items()]
+        w = max(((lc_id, part, r) for lc_id in ("LC8a", "LC8u") for part, r in self.cheek_env[lc_id].items()), key=lambda t: t[2]["mpa"])
+        lc_id, part, r = w
         return _local("Hinge cheeks' welds (CH-P16)", rows,
-                      f"the {F / 1000:.1f} kN ultimate pull along the trailer through one cheek, with {fy_ / 1000:.1f} kN across and "
-                      f"{fz_ / 1000:.1f} kN up or down, the held hinges' largest at the ultimate")
+                      f"the pin's force from the hinge bar into one cheek, {r['f'][0] / 1000:+.1f} kN along, {r['f'][1] / 1000:+.1f} kN across and "
+                      f"{r['f'][2] / 1000:+.1f} kN up, at {r['wheel']} in {r['case']}")
 
     def arm_limits(self) -> dict:
         """CHS-15 (I2-94): what LC8a's arms put on their limits and mounts, the worst over every LC8a case at 58.9 kN and

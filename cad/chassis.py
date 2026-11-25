@@ -759,6 +759,7 @@ class FrameModel:
         # `bar`), as Cruisemaster's sheets build it, and the gussets CH-P08 are members, so the hinge's force and moment
         # reach the rail through the crossmember's end, beside its holes (the hinge path study, CHS-12, I2-88)
         self.pivot_nodes = {}
+        self.cheek_pins: dict[str, int] = {}        # each hinge's pin at its cheeks' fillets to the hinge bar, by element
         for w in ch.suspension:
             nd = f.node(w["pivot"])
             if hinges == "crossmember":
@@ -783,6 +784,7 @@ class FrameModel:
                 top = f.node((w["pivot"][0], w["pivot"][1], V["rail_underside_z"]))
                 self._link(nd, bar, f"hinge bar {w['id']}")
                 f.add(bar, pin, PIN, (1, 0, 0), f"cheek pin {w['id']}")
+                self.cheek_pins[w["id"]] = len(f.elements) - 1
                 self._link(top, self.rail_node(w["side"], w["station_x"]), f"cheek welds {w['id']}")
                 f.add(pin, top, sp.frame_section(), (1, 0, 0), f"CH-P16-{w['id']}")
                 self.sec_props[f"CH-P16-{w['id']}"] = sp
