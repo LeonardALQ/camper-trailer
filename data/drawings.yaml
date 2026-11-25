@@ -236,6 +236,7 @@ drawings:
       - {rev: Y, date: 2026-11-24, description: "Memo: the chassis data's revision I in the title block (I2-67, I2-72)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Z, date: 2026-11-24, description: "Notice: end plates 7 mm clear of the drawbar, data revision J (I2-75)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AA, date: 2026-11-24, description: "Notice: end plates 14 mm up, laps 2.5 open, data revision K (I2-79)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AB, date: 2026-11-25, description: "Notice: CM-06 and CM-08 RHS 150x50x6, LC8a at its 78.5 kN ultimate (I2-87)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
@@ -304,6 +305,7 @@ drawings:
       - {rev: X, date: 2026-11-24, description: "Notice: detail K vents and drains the rails' front ends, FAT-20 at FAT 45", drawn: Kiro, checked: "", approved: ""}
       - {rev: Y, date: 2026-11-24, description: "Notice: one rolled dip, K drains both webs, no vent, C, E, F true (I2-79)", drawn: Kiro, checked: "", approved: ""}
       - {rev: Z, date: 2026-11-24, description: "Notice: every closed section drained and vented, the snipes open (I2-84)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AA, date: 2026-11-25, description: "Notice: note 2's apex cut, mitre lines, vents and approval (I2-89 to I2-91)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads

@@ -10,7 +10,7 @@ import { withBase } from '../../lib/url';
 
 export const n = (v) => Math.round(v).toLocaleString('en-AU');
 
-A galvanised ladder frame of two composite rails, set out in `CHASSIS.md` revision O from research report 11. Each
+A galvanised ladder frame of two composite rails, set out in `CHASSIS.md` revision P from research report 11. Each
 composite rail is an RHS 150 x 50 x 4 C450L0 main rail, 4 mm since the 4,000 kg plate, with an RHS 127 x 51 x 3.5 C350L0 raiser welded along its whole
 length, so the two bend as one 277 mm deep section and lift the floor above the tyres. The rails run the full
 {n(t.body_length)} mm of the body. Crossmembers join them at eight stations, an outrigger runs to the body edge at every
@@ -42,7 +42,18 @@ plate and a 10 mm slot under the plate, and vents along the rail to its open rea
 member drains at its apex end and at its mitre, vents at its apex end's top corners and is open at its snipe, and every
 other closed end drains by its floor and vents by its top (CT-103 note 2). CHS-11 reads every closed section in that dip,
 either side down and at every pitch from level to 9 degrees, and fails the build if a low point stands more than 50 mm
-under its nearest drain or a high point more than 50 mm over its nearest vent.
+under its nearest drain or a high point more than 50 mm over its nearest vent. Each shock support plate and each
+rail-to-raiser seam is a seal welded overlap the guide asks to be vented, so each has two 12 mm vents, which CHS-11 reads too.
+
+The recovery case asks no yield at 58.9 kN and no fracture at the 78.5 kN ultimate. CHS-08U reads the ultimate pull,
+every member on its effective section against its yield stress and every hole on its net section against 0.85 of its
+tensile strength, with each rear tongue's pull at its shackle hole. The XT rear shock crossmember and the rear
+crossmember went to 6 mm walls for it, which fixed the rear crossmember's holes, but the grey bay's floor crossmember,
+its holes, the rails at the XT centre crossmember and one services hole still stand up to 3 % over, so CHS-08U is
+reported until the rear bays get a shear path the grey tank leaves room for. CHS-12 runs the frame again with each XT
+hinge welded to its crossmember as Cruisemaster builds it. The recovery pull's reactions then pass through the hinge
+crossmembers' ends, which carry them at about 1.8 times their yield stress, so the hinge joints need a redesign that
+Cruisemaster accepts in writing.
 
 A planning-level proposal for the engineer to check. The drawings are drafts, not for construction.
 

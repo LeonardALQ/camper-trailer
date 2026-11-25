@@ -199,27 +199,31 @@ def _extrema(v: np.ndarray, sign: int) -> list[int]:
 
 
 # ------------------------------------------------------------------ the holes for galvanising, by the hole rules
-def _web_hole(t: Tube, member: str, end: int, web: int, z_l: float, d: float, u_end: float, use: str) -> dict:
-    """A hole in one of a tube's webs, the faces along its depth, `u_end` from the end it serves."""
-    u = u_end if end == 0 else t.L - u_end
+def _web_hole(t: Tube, member: str, end: int, web: int, z_l: float, d: float, u_end: float, use: str, offset: float = 0.0) -> dict:
+    """A hole in one of a tube's webs, `u_end` along the web from the end it serves, that web's end standing `offset` along
+    the axis from the axis's end (a mitre's line on that web). `u_web` and `z_under`, its height over the tube's
+    underside, are the figures the drawings dimension (I2-89)."""
+    u = u_end + offset if end == 0 else t.L - u_end - offset
     return dict(member=member, tube=t.name, tube_L=t.L, end=end, web=web, u=u, z_l=z_l, d=d, use=use, via="own",
-                centre=t.point(u, web * t.sec.b / 2, z_l), normal=web * t.ey)
+                u_web=u_end, z_under=z_l + t.sec.d / 2, centre=t.point(u, web * t.sec.b / 2, z_l), normal=web * t.ey)
 
 
-def end_holes(t: Tube, member: str, end: int, rule: dict, webs=(-1, 1), d=None) -> list[dict]:
+def end_holes(t: Tube, member: str, end: int, rule: dict, webs=(-1, 1), d=None, offsets=None) -> list[dict]:
     """The holes at one closed end, each at the least distances CHS-10 lets it stand: its centre 1.25 d from the end of
     its web's flat, or 1.5 d over `z_bottom_leg` where fillets of that leg run along the bottom edges, and its edge a
     diameter from the end weld's toe. `corners` puts a drain by the floor and a vent by the top of each web, `middle` one
-    hole at mid-depth in each web, where a small section's flat takes no more."""
+    hole at mid-depth in each web, where a small section's flat takes no more. `offsets` gives each web's end along the
+    axis from the axis's end, where the end is a mitre."""
     d = float(d or rule["d"])
     u = rule["leg"] + rule.get("clear", 0.0) + 1.5 * d
+    off = offsets or {}
     if rule["holes"] == "middle":
-        return [_web_hole(t, member, end, w, 0.0, d, u, "drain and vent") for w in webs]
+        return [_web_hole(t, member, end, w, 0.0, d, u, "drain and vent", off.get(w, 0.0)) for w in webs]
     zb = -t.sec.d / 2 + max(t.sec.ro + 1.25 * d, rule.get("z_bottom_leg", 0.0) + 1.5 * d)
     zt = t.sec.d / 2 - (t.sec.ro + 1.25 * d)
     out = []
     for w in webs:
-        out += [_web_hole(t, member, end, w, zb, d, u, "drain"), _web_hole(t, member, end, w, zt, d, u, "vent")]
+        out += [_web_hole(t, member, end, w, zb, d, u, "drain", off.get(w, 0.0)), _web_hole(t, member, end, w, zt, d, u, "vent", off.get(w, 0.0))]
     return out
 
 
@@ -263,8 +267,12 @@ def frame_sections(ch: Chassis) -> tuple[list[Section], list[dict]]:
         rs = mem[f"RS-{side}"]
         sections.append(Section(rs.id, rs.name, [tube(rs)], ("open", "open")))
     # the drawbar members: the A-frame length and the lap length one tube through the open mitre, the apex end capped,
-    # the snipe at the lap's rear end open
+    # the snipe at the lap's rear end open. The apex end is cut square to the member through its axis point (`apex_cut`),
+    # so both webs end there. The mitre's plane halves the angle between the two lengths, so on the web inside the bend
+    # the mitre's line stands half the width times the tangent of half that angle behind the axis point, and on the other
+    # web as far ahead, and each mitre drain stands its distance along its own web from that web's line (I2-89)
     dbr = rules["drawbar"]
+    half = math.atan2(V["rail_c"] - V["db_apex_y"], V["body_x0"] - V["db_apex_x"]) / 2
     for side in ("K", "R"):
         a, b = mem[f"DB-{side}A"], mem[f"DB-{side}B"]
         ta, tb = tube(a), tube(b)
@@ -272,7 +280,9 @@ def frame_sections(ch: Chassis) -> tuple[list[Section], list[dict]]:
                       ("closed", "open" if dbr.get("snipe") == "open" else "closed"))
         apex = [h for h in end_holes(ta, a.id, 0, dict(dbr, holes="corners"))]
         add(sec, apex, 0)
-        mitre = [h for h in end_holes(tb, b.id, 0, dict(dbr, holes="corners")) if h["use"] == "drain"]
+        inside = 1 if side == "K" else -1                  # the web toward the centreline, along the lap's width
+        m = tb.sec.b / 2 * math.tan(half)
+        mitre = [h for h in end_holes(tb, b.id, 0, dict(dbr, holes="corners"), offsets={inside: m, -inside: -m}) if h["use"] == "drain"]
         add(sec, mitre, 1)
         sections.append(sec)
     # crossmembers, outriggers, the cross brace, the plan braces and the hinge crossmembers' gussets: each end welded to
@@ -347,6 +357,31 @@ def end_areas(sec: Section, zone: float) -> list[dict]:
     return out
 
 
+def overlap_rule(area: float) -> tuple[float, int]:
+    """The guide's least vent for a seal welded overlap of `area` mm2 and how many it asks at least (pages 29 and 30):
+    none under 10,000 mm2, 10 mm to 40,000, 12 mm above, 20 mm from 250,000 and one every 250,000, two for the best outcome."""
+    if area < 10000:
+        return 0.0, 0
+    if area >= 250000:
+        return 20.0, max(2, math.ceil(area / 250000))
+    return (10.0 if area <= 40000 else 12.0), 2
+
+
+def overlaps(ch: Chassis) -> list[dict]:
+    """Each seal welded overlap (sealed_overlaps) against the guide's vents, each vent at least the steel's thickness."""
+    out = []
+    for o in ch.data.get("sealed_overlaps") or []:
+        L, W = float(ch.ev(o["l"])), float(o["w"])
+        area = L * W
+        need_d, need_n = overlap_rule(area)
+        ds = [float(v["d"]) for v in o["vents"]]
+        least = max(need_d, float(o["t"]))
+        ok = len(ds) >= need_n and all(d >= least - 1e-9 for d in ds)
+        out.append(dict(id=o["id"], what=o["what"], qty=o["qty"], area=area, need_d=least if need_n else 0.0, need_n=need_n,
+                        vents=ds, ok=ok))
+    return out
+
+
 def check(ch: Chassis) -> dict:
     """CHS-11: every closed section in every hang the dip takes, each low point drained and each high point vented
     within max_depth, every hole at least the guide's least and each closed end's holes at least its table's area."""
@@ -375,4 +410,4 @@ def check(ch: Chassis) -> dict:
                          liquid_l=max(r["liquid_l"] for r in reads), air_l=max(r["air_l"] for r in reads)))
     plain = [dict({k: v for k, v in h.items() if k not in ("centre", "normal")}, x=float(h["centre"][0]), y=float(h["centre"][1]),
                   z=float(h["centre"][2])) for h in holes]
-    return dict(sections=rows, holes=plain, pitches=pitches, roll=dip["roll_deg"], max_depth=cfg["max_depth"])
+    return dict(sections=rows, holes=plain, pitches=pitches, roll=dip["roll_deg"], max_depth=cfg["max_depth"], overlaps=overlaps(ch))

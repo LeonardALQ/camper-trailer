@@ -845,6 +845,14 @@ class Analysis:
                 y = s * (V["rail_c"] - rail.b / 2 + 0.5) if inner else s * (V["rail_c"] + rail.b / 2 - 0.5)
                 rows.append(dict(member=f"RL-{SIDES[s]}", face=face, run=g["use"], x=ch.ev(g["x"]), y=y, z=ch.ev(g["z"]),
                                  d=d, length=d, plate_field=True))
+            # the vents into each rail-to-raiser seam through both walls on its centreline (sealed_overlaps SEAM, I2-90)
+            for o in ch.data.get("sealed_overlaps") or []:
+                if o.get("through") != "seam":
+                    continue
+                for v in o["vents"]:
+                    d = float(v["d"])
+                    rows.append(dict(member=f"RL-{SIDES[s]}", face="top", run="seam vent", x=V["body_x0"] + ch.ev(v["u"]),
+                                     y=s * V["rail_c"], z=V["rail_top_z"], d=d, length=d, late=True))
         # the holes CHS-11 puts in the rails' inner webs inside a crossmember's end, where a fitting covers that web of the
         # crossmember (member_galvanising_holes blocked_webs), each location with its 10 mm check hole in the rail's
         # outer web opposite (the guide's page 19)
@@ -930,17 +938,20 @@ class Analysis:
                 need = rules["toe_factor"] * max(h["d"], o["d"])
                 if g - need < h["toe_mm"] - h["toe_need"]:
                     h["toe_mm"], h["toe_need"], h["toe_weld"] = g, need, f"hole for {', '.join(o['runs'])}"
-        sites = [h for h in sites if not h.get("new")] + self._drawbar_hole_sites(rules) + [h for h in sites if h.get("new")]
-        sites += self._member_hole_sites(rules)
+        late = [h for h in sites if h.get("late")]           # the seam vents keep the ids after every other hole's
+        sites = [h for h in sites if not h.get("new") and not h.get("late")] + self._drawbar_hole_sites(rules) + [h for h in sites if h.get("new")]
+        sites += self._member_hole_sites(rules) + late
         for k, h in enumerate(sites, 1):
             h["id"] = f"H-{k:02d}"
         return sites
 
     def _drawbar_hole_sites(self, rules) -> list[dict]:
-        """The drawbar members' drains for galvanising (drawbar_galvanising_holes, I2-79), in both webs near the apex end,
-        each a hole in the A-frame member's own section: its net section, its edge distance to the web's flat and to the
-        member's sawn end along its line, and its clear distance to the coupling plate's fillets and the chain lug's
-        welds, on the member's web in its own plane (u along the member from its apex end, z up)."""
+        """The drawbar members' apex drains for galvanising, H-33 to H-36, from the dip's own holes (cad/chassis_dip.py, the
+        one place every hole for galvanising stands, I2-89), each a hole in the A-frame member's own section: its net
+        section, its edge distance to the web's flat and to the member's square-cut apex end along its web, and its clear
+        distance to the coupling plate's fillets, the capped apex end's weld and the chain lug's welds, on the member's web
+        in its own plane (u along the member from its apex end, z up)."""
+        from .chassis_dip import frame_sections
         ch, V = self.ch, self.ch.V
         sec = ch.role_sec["drawbar"]
         out = []
@@ -950,41 +961,38 @@ class Analysis:
         plate = next(f for f in ch.data["fittings"] if f["id"] == "CH-P01")
         plate_x1 = ch.ev(plate["at"][0]) + plate["l"] / 2
         lug_top = ch.ev(lug["at"][2]) + lug["w"] / 2
-        for g in ch.data.get("drawbar_galvanising_holes") or []:
-            if "x" not in g:
-                continue
-            d, x, z = float(g["d"]), ch.ev(g["x"]), ch.ev(g["z"])
-            u = (x - V["db_apex_x"]) / math.cos(ang)
-            for s in (-1, 1):
-                for web in ("inner", "outer"):
-                    off = (sec.b / 2 - 0.5) * (1 if web == "outer" else -1)
-                    y = s * (ch.db_y(x) + off / math.cos(ang))
-                    toes = [("coupling plate's fillets", (0.0, zb, (plate_x1 - V["db_apex_x"]) / math.cos(ang), zb + 6)),
-                            ("member's capped apex end", (0.0, zb, 6.0, zt))]
-                    if web == "outer":
-                        u0 = (ch.ev(lug["at"][0]) - lug["l"] / 2 - V["db_apex_x"]) / math.cos(ang)
-                        toes.append(("chain lug's welds", (u0 - 6, lug_top - 6, u0 + lug["l"] + 6, lug_top + 6)))
-                    box = (u - d / 2, z - d / 2, u + d / 2, z + d / 2)
-                    gap, weld = min(((math.hypot(max(b[0] - box[2], box[0] - b[2], 0.0), max(b[1] - box[3], box[1] - b[3], 0.0)), what)
-                                     for what, b in toes), key=lambda t: t[0])
-                    strip = sec.t * d
-                    A = sec.A - strip
-                    zc = (sec.A * V["db_z"] - strip * z) / A
-                    I = sec.I_strong + sec.A * (zc - V["db_z"]) ** 2 - (sec.t * d ** 3 / 12 + strip * (z - zc) ** 2)
-                    Iw = sec.I_weak - (d * sec.t ** 3 / 12 + strip * ((sec.b - sec.t) / 2) ** 2)
-                    edge = min(z - (zb + sec.ro), (zt - sec.ro) - z)
-                    edge_need = rules["edge_factor"] * d
-                    if u / rules["end_factor"] < edge / rules["edge_factor"]:      # the member's sawn end, 1.5 d (Table 9.6.2)
-                        edge, edge_need = u, rules["end_factor"] * d
-                    member = f"DB-{SIDES[s]}A"
-                    out.append(dict(member=member, face=f"{web} web", run=g["use"], x=x, y=y, z=z, d=d, length=d, runs=[g["use"]],
-                                    rows=[f"{member} {web} web"], frame=member, wall=f"the drawbar member's {web} web", open=False,
-                                    fu=rules["fu"]["rail"], fy=sec.fy, box=(x - d / 2, y - 1, z - d / 2, x + d / 2, y + 1, z + d / 2),
-                                    edge_mm=edge, edge_need=edge_need, toe_mm=gap, toe_need=rules["toe_factor"] * d, toe_weld=weld,
-                                    net=dict(A=A, I=I, I_weak=Iw, Aw=sec.Aw_depth - strip, Aw_width=sec.Aw_width,
-                                             z_lever=max(abs(z - d / 2 - zc), abs(z + d / 2 - zc)), y_lever=sec.b / 2,
-                                             k_torsion=(sec.d - sec.t) / max(sec.d - sec.t - d, 1.0),
-                                             base=dict(Z_weak=sec.Z_weak, I_weak=sec.I_weak, C=sec.C, y_max=sec.b / 2))))
+        apex = [h for h in frame_sections(ch)[1] if h["tube"] in ("DB-KA", "DB-RA") and h["use"] == "drain"]
+        for g in sorted(apex, key=lambda h: (h["tube"] != "DB-KA", abs(h["centre"][1]) > ch.db_y(h["centre"][0]))):
+            s = -1 if g["tube"] == "DB-KA" else 1
+            web = "outer" if abs(g["centre"][1]) > ch.db_y(g["centre"][0]) else "inner"
+            d, (x, y, z), u = float(g["d"]), (float(c) for c in g["centre"]), float(g["u_web"])
+            toes = [("coupling plate's fillets", (0.0, zb, (plate_x1 - V["db_apex_x"]) / math.cos(ang), zb + 6)),
+                    ("member's capped apex end", (0.0, zb, 6.0, zt))]
+            if web == "outer":
+                u0 = (ch.ev(lug["at"][0]) - lug["l"] / 2 - V["db_apex_x"]) / math.cos(ang)
+                toes.append(("chain lug's welds", (u0 - 6, lug_top - 6, u0 + lug["l"] + 6, lug_top + 6)))
+            box = (u - d / 2, z - d / 2, u + d / 2, z + d / 2)
+            gap, weld = min(((math.hypot(max(b[0] - box[2], box[0] - b[2], 0.0), max(b[1] - box[3], box[1] - b[3], 0.0)), what)
+                             for what, b in toes), key=lambda t: t[0])
+            strip = sec.t * d
+            A = sec.A - strip
+            zc = (sec.A * V["db_z"] - strip * z) / A
+            I = sec.I_strong + sec.A * (zc - V["db_z"]) ** 2 - (sec.t * d ** 3 / 12 + strip * (z - zc) ** 2)
+            Iw = sec.I_weak - (d * sec.t ** 3 / 12 + strip * ((sec.b - sec.t) / 2) ** 2)
+            edge = min(z - (zb + sec.ro), (zt - sec.ro) - z)
+            edge_need = rules["edge_factor"] * d
+            if u / rules["end_factor"] < edge / rules["edge_factor"]:      # the member's sawn end, 1.5 d (Table 9.6.2)
+                edge, edge_need = u, rules["end_factor"] * d
+            member = f"DB-{SIDES[s]}A"
+            out.append(dict(member=member, face=f"{web} web", run=g["use"], x=x, y=y, z=z, d=d, length=d, runs=[g["use"]],
+                            rows=[f"{member} {web} web"], frame=member, wall=f"the drawbar member's {web} web", open=False,
+                            fu=rules["fu"]["rail"], fy=sec.fy, box=(x - d / 2, y - 1, z - d / 2, x + d / 2, y + 1, z + d / 2),
+                            edge_mm=edge, edge_need=edge_need, toe_mm=gap, toe_need=rules["toe_factor"] * d, toe_weld=weld,
+                            u_web=u, z_under=float(g["z_under"]),
+                            net=dict(A=A, I=I, I_weak=Iw, Aw=sec.Aw_depth - strip, Aw_width=sec.Aw_width,
+                                     z_lever=max(abs(z - d / 2 - zc), abs(z + d / 2 - zc)), y_lever=sec.b / 2,
+                                     k_torsion=(sec.d - sec.t) / max(sec.d - sec.t - d, 1.0),
+                                     base=dict(Z_weak=sec.Z_weak, I_weak=sec.I_weak, C=sec.C, y_max=sec.b / 2))))
         return out
 
     def _member_hole_sites(self, rules) -> list[dict]:
@@ -1011,7 +1019,7 @@ class Analysis:
             sec = m.sec if m else ch.sections[next(f for f in ch.data["fittings"] if f["id"] == "CH-P08")["section"]]
             r = gr[role]
             d, z = h["d"], h["z_l"]
-            u_end = min(h["u"], h["tube_L"] - h["u"])
+            u_end = h.get("u_web", min(h["u"], h["tube_L"] - h["u"]))
             edge = min((sec.d / 2 - sec.ro) - z, z + (sec.d / 2 - sec.ro))
             edge_need = rules["edge_factor"] * d
             if u_end / rules["end_factor"] < edge / rules["edge_factor"]:
