@@ -243,6 +243,7 @@ drawings:
       - {rev: AB, date: 2026-11-25, description: "Notice: CM-06 and CM-08 RHS 150x50x6, LC8a at its 78.5 kN ultimate (I2-87)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AC, date: 2026-11-25, description: "Notice: hinge cheeks, CM-04 x6, CM-05 x5, rear bay shear panel (I2-88)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AD, date: 2026-11-25, description: "Memo: the frame's holes for galvanising show in the views (I2-89)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AE, date: 2026-11-25, description: "Notice: LC8a with the trailer's weight on supports that cannot pull (I2-94)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
@@ -276,6 +277,7 @@ drawings:
       - {rev: U, date: 2026-11-24, description: "Notice: FAT-20 at IIW 424, its root record, plate 7 clear, detail C relaid", drawn: Kiro, checked: "", approved: ""}
       - {rev: V, date: 2026-11-24, description: "Notice: laps open 2.5 and stitched, end plates 14 mm up (I2-79)", drawn: Kiro, checked: "", approved: ""}
       - {rev: W, date: 2026-11-25, description: "Memo: the holes for galvanising show in the views, dimensioned on CT-105", drawn: Kiro, checked: "", approved: ""}
+      - {rev: X, date: 2026-11-25, description: "Notice: the local checks with CHS-15 and the cheeks' welds (I2-92, I2-94)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-103
     title: Chassis details
     subtitle: Composite rail, outrigger root, crossmember to rail, overlap end, jacking pad, recovery tongue, spare posts
