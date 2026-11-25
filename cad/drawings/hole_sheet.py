@@ -124,9 +124,8 @@ def schedule(chs: dict, ch) -> list[tuple[str, list[Hole]]]:
     holes = [Hole(h, ch) for h in CH.records()]
     order = {m["id"]: k for k, m in enumerate(chs["members"])}
     first = {}
-    for k, h in enumerate(holes):
-        base = h.h["member"]
-        first.setdefault(h.section, (order.get(base, len(order)), h.section))
+    for h in holes:
+        first.setdefault(h.section, (order.get(h.h["member"], len(order)), h.section))
     out = []
     for sec in sorted(first, key=lambda s: first[s]):
         mine = sorted((h for h in holes if h.section == sec), key=lambda h: (h.end, h.along, h.web, h.over or 0.0))
@@ -446,7 +445,6 @@ def ct105(prj, model, bom, checks, reg, dwg):
     _plate_detail(sh, ch, 330.0, 150.0)
     _detail_title(sh, 262.0, 133.0, "E: SEAM VENT, SECTION", 2.5)
     _seam_detail(sh, ch, holes, 260.0, 113.0)
-    cut = next(c for c in ch.data["member_galvanising_holes"].get("cut_ends", []))
     S.notes(sh, 292.0, 127.0, [
         "HOT-DIP GALVANISE TO AS/NZS 4680 IN ONE DIP AS CT-103 NOTE 2 AND DETAIL K SAY. DRILL OR HOLE-SAW AND DEBURR EVERY HOLE BEFORE "
         "WELDING (report 02 WLD-05). THE SCHEDULE LISTS EVERY HOLE CHS-09, CHS-10 AND CHS-11 READ, UNDER THE CLOSED SECTION IT DRAINS OR VENTS.",
@@ -456,8 +454,8 @@ def ct105(prj, model, bom, checks, reg, dwg):
         "WEB: FRONT AND REAR FACE THE DRAWBAR AND THE REAR, INNER AND OUTER FACE THE CENTRELINE AND THE SIDE. SEAM: THROUGH THE RAIL'S TOP "
         "AND THE RAISER'S BOTTOM WALL (DETAIL E). THE RAILS' INNER-WEB HOLES AT CM-06 DRAIN AND VENT ITS FRONT CORNERS, EACH WITH A CHECK "
         "HOLE OPPOSITE IN THE OUTER WEB.",
-        f"{cut['member']}'S ENDS ARE ITS RECOVERY TONGUES' FACES, {cut['cut']:g} INSIDE THE RAILS.",
-    ], width_chars=70, size=1.5)
+    ] + [f"{c['member']}'S ENDS ARE ITS RECOVERY TONGUES' FACES, {c['cut']:g} INSIDE THE RAILS."
+         for c in ch.data["member_galvanising_holes"].get("cut_ends", [])], width_chars=70, size=1.5)
     _draft_stamp(sh, 350.0, 74.0)
     _title(sh, dwg, reg, "SEE CT-101 FOR MASSES (TB-11).", dwg["scale"], chs["revision"])
     S.write(sh, OUT / f"{dwg['number']}.svg")
