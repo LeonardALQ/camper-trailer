@@ -454,7 +454,7 @@ class Chassis:
                     L = sum(g_["length"] for g_ in gs) / len(gs)
                 m = sec.kg_m * L / 1000
                 out.append(Fitting(f["id"], f["name"], kind, qty, at, m, "calculated",
-                                   f"Calculated: {L:g} mm of {sec.name} at {sec.kg_m} kg/m", t=sec.t,
+                                   f"Calculated: {round(L, 1):g} mm of {sec.name} at {sec.kg_m} kg/m", t=sec.t,
                                    area_m2_each=sec.area_m2_per_m * L / 1000))
             elif kind == "angles":                  # the shear panel's pieces, each at its own centre (panel_pieces)
                 ps = self.panel_pieces()
