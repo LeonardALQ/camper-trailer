@@ -435,10 +435,10 @@ def ct105(prj, model, bom, checks, reg, dwg):
     for x, rows in zip(LEFT, cols):
         _column(sh, x, TOP, rows)
     mirrored = "KERB SIDE, THE ROAD SIDE MIRRORED"
-    _detail_title(sh, 275.0, 266.0, "A: DRAWBAR APEX END, PLAN", 2.5, mirrored)
-    _apex_detail(sh, ch, holes, 240.0, 212.0)
-    _detail_title(sh, 364.0, 266.0, "B: DRAWBAR MITRE, PLAN", 2.5, mirrored)
-    _mitre_detail(sh, ch, holes, 325.0, 210.0)
+    _detail_title(sh, 275.0, 264.0, "A: DRAWBAR APEX END, PLAN", 2.5, mirrored)
+    _apex_detail(sh, ch, holes, 240.0, 210.0)
+    _detail_title(sh, 364.0, 264.0, "B: DRAWBAR MITRE, PLAN", 2.5, mirrored)
+    _mitre_detail(sh, ch, holes, 325.0, 208.0)
     _detail_title(sh, 268.0, 190.0, "C: ALONG AND OVER, ON A WEB", 5)
     _web_detail(sh, ch, holes, 248.0, 150.0)
     _detail_title(sh, 362.0, 190.0, "D: SHOCK PLATE VENTS, FROM AHEAD", 5, mirrored)

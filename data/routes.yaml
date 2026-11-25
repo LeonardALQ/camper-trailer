@@ -1101,9 +1101,11 @@ runs:
   # (est.). Each is cut to the length with which no turn pulls its
   # span taut, and drawn at that length as the arm holds it straight ahead, so DIM-04 to DIM-07 read it. The SB50 sits on
   # the truck's bracket nearer the pin, so its stiffer lead needs less slack. K-10
-  # leaves the drawbar loom's stack beside it, enters the road rail and leaves it through its inner web ahead of the XT
-  # front hinge crossmember, so no part of it lies in the arms' slot (FIT-05, I2-30). K-11 and K-12 are Bosch's axle
-  # harness, clamped at the junctions within its 200 mm.
+  # leaves the drawbar loom's stack beside it, enters the road rail and leaves it through its outer web 190 mm ahead of the
+  # XT front hinge crossmember, drops outside the rail and crosses under it ahead of the front hinge's front cheek, then
+  # passes that cheek 47.5 mm inboard of the rail's inner face and comes back out to 27.5 mm inboard of it under the
+  # crossmember, so it keeps SVC-01's 20 mm from the cheek and no part of it lies in the arms' slot (FIT-05, I2-30). K-11
+  # and K-12 are Bosch's axle harness, clamped at the junctions within its 200 mm.
   - {id: K-13, system: lamps, kind: lamp12, rides: between, cut_m: 1.34, passes: [DB-HK],
      lift: {clip_mm: 680, arm_mm: 300, arm_kg: 0.18, pivot: [-15, 0], deg: [-25, 75], strap_deg: -15, seat_deg: [-155, 40], torque_nmm: [1500, 1000], why: "The 12-pin lead's arm, the outboard one of the two on the leads' bracket. Its seat is bent to the lead's 69 mm bend radius at its centreline round the arm's tip, from 155 degrees ahead of the strap to 40 degrees behind it, and held on the arm by its web (rules.between.seat, I2-91), so the strap stands at the seat's top when the arm points 15 degrees below level and turns with the arm (I2-83). Its torsion spring lifts the arm with 1.5 N m on the bottom stop and 1.0 N m on the top one (est.), the same spring as the SB50's arm"}, feeds: "The 12-pin flat plug's lead from the truck's socket up to the clip on its sprung arm, down to its clamp on the leads' bracket and along the drawbar member to the junction: the lamps, the brake request on pin 5 and the earth returns", protection: "The truck's lamp fuses and its brake controller",
      serves: [plug lead], from: {line: TB-SK, at: [TB_SK.x1, TB_SK.cy + 40, TB_SK.cz]}, path: [[DB_HK.x0 + 20, DB_HK.y1 - 15, DB_HK.z1 - 20], [600, 320, 555]], to: {line: DB-PL, at: [DB_PL.x0, DB_PL.cy + 20, DB_PL.cz]}}
@@ -1119,8 +1121,8 @@ runs:
                src: "Littelfuse 498 series: 2.1 milliohm cold, and 65 mV at 30 A (0498030.MX1M6, tme.com), so 2.2 milliohm, and 0.1 milliohm a bolted lug (est.)"}],
      serves: [brakes], along: [DB-RA, DB-RB, CH-P04, RL-R, RS-R, CM-04, UF-03, CM-05], from: {line: DB-PL, at: [DB_PL.x1, DB_PL.cy + 23, DB_PL.z0 + 10.5]},
      path: [[880, 365, 470], [1430, 516.7, .], [1700, 611.8, .], [1790, 662, .], [2030, 690, .], [2270, ., .], [2400, 668, 648.5], [2452, 630, 649.5], [2495, 605, 650],
-            [CM_04.x0 - 246, ., .], [CM_04.x0 - 186, 615, 648], [CM_04.x0 - 145, 634.5, 647], [CM_04.x0 - 85, 694.5, 645], [., ., RL_R.z0 - 37], [., RL_R.y0 - 27.5, .], [CM_04.x0 + 2, ., .],
-            [CM_04.x0 + 40, ., tank_z0 - 33], [UF_01.x1 - 46, ., .], [., 60, .]], to: {line: BR-TSC, at: [BR_TSC.x0, ., .]}}
+            [CM_04.x0 - 351, ., .], [CM_04.x0 - 291, 615, 648], [CM_04.x0 - 250, 634.5, 647], [CM_04.x0 - 190, 694.5, 645], [., ., RL_R.z0 - 37], [., RL_R.y0 - 47.5, .],
+            [CM_04.x0 - 10, ., .], [CM_04.x0 + 40, RL_R.y0 - 27.5, tank_z0 - 33], [UF_01.x1 - 46, ., .], [., 60, .]], to: {line: BR-TSC, at: [BR_TSC.x0, ., .]}}
   - {id: K-11, system: dc12, kind: tsc, amps: 4, volts: 12, feeds: "Bosch TSC to the road side drums' magnets and ABS sensors: its axle harness's two wheel bundles to their junction, each with one magnet's 4.0 A", protection: "The TSC's outputs",
      serves: [brakes], along: [UF-03, CM-05], from: {line: BR-TSC, at: [BR_TSC.cx, BR_TSC.y1, BR_TSC.z0 + 5]}, to: {line: BR-DR, at: [., BR_DR.y0, .]}}
   - {id: K-12, system: dc12, kind: tsc, amps: 4, volts: 12, feeds: "Bosch TSC to the kerb side drums' magnets and ABS sensors: its axle harness's two wheel bundles to their junction, each with one magnet's 4.0 A", protection: "The TSC's outputs",

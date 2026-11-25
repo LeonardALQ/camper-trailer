@@ -333,10 +333,11 @@ def frame_sections(ch: Chassis) -> tuple[list[Section], list[dict]]:
                 sections.append(add(Section(m.id, m.name, [t], ("closed", "closed")), end_holes(t, m.id, 0, r) + end_holes(t, m.id, 1, r)))
     g = rules["hinge_gusset"]
     gsec = ch.sections[next(f for f in data["fittings"] if f["id"] == "CH-P08")["section"]]
-    for hg in ch.hinge_gussets():
+    for hg in ch.hinge_gussets():                 # its axis between its two cut faces, each web's end at its mitre
         t = Tube(hg["id"], hg["p0"], hg["p1"], gsec, (0, 0, 1), ds)
-        sections.append(add(Section(hg["id"], f"Hinge crossmember gusset behind {hg['cm']}, {'kerb' if hg['side'] < 0 else 'road'} side", [t],
-                                    ("closed", "closed")), end_holes(t, hg["id"], 0, g) + end_holes(t, hg["id"], 1, g)))
+        sections.append(add(Section(hg["id"], f"Hinge crossmember gusset {'behind' if hg['face'] > 0 else 'ahead of'} {hg['cm']}, "
+                                    f"{'kerb' if hg['side'] < 0 else 'road'} side", [t], ("closed", "closed")),
+                            end_holes(t, hg["id"], 0, g, offsets=hg["offsets"]) + end_holes(t, hg["id"], 1, g, offsets=hg["offsets"])))
     return sections, holes
 
 

@@ -220,10 +220,22 @@ def jerry_cans(fr, V, sp, b):
 
 @product("hdpe_tank")
 def tank(fr, V, sp, b):
-    """A welded HDPE tank with `wall` mm walls, its outlet fitting and two padded stainless straps over its top."""
+    """A welded HDPE tank with `wall` mm walls, its outlet fitting and two padded stainless straps over its top. Its
+    corners are notched round the chassis fittings that reach into its box (Layout.tank_notches): each notch cut from
+    the outside, and grown by the wall, from the inside, so the pocket keeps the tank's walls."""
     W, D, H = fr.W, fr.D, fr.H
     t = sp.get("wall", 6.0)
-    out = [("tank", fr.box(0, 0, 0, W, D, H) - fr.box(t, t, t, W - 2 * t, D - 2 * t, H - 2 * t), HDPE, 0.9),
+    outer, inner = fr.box(0, 0, 0, W, D, H), fr.box(t, t, t, W - 2 * t, D - 2 * t, H - 2 * t)
+    z0 = fr.bx[2]
+    for nt in (b.extra.get("notches") or []) if b is not None else []:
+        (cx, cy), (nx, ny) = nt["corner"], nt["normal"]
+        for k, (za, zb), grown in ((nt["keep"], (nt["z0"], nt["z1"]), False), (nt["keep"] + t * 2 ** 0.5, nt["inner_z"], True)):
+            prism = fr.prism_uv([fr.uv(cx, cy), fr.uv(cx + nx * k, cy), fr.uv(cx, cy + ny * k)], za - z0, zb - z0)
+            if grown:
+                inner = inner - prism
+            else:
+                outer = outer - prism
+    out = [("tank", outer - inner, HDPE, 0.9),
            ("outlet fitting", fr.cyl_v(W - 60, 40, 20, 0, t), GREY, 1.0)]
     for u0 in (W * 0.2, W * 0.8 - 40):
         out.append(("strap", fr.box(u0, 0, H - 2, 40, D, 2), STEEL, 1.0))

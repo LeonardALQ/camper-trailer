@@ -19,6 +19,10 @@ from .frame import G_STEEL, RIGID, Frame, Section
 from .partsdb import DATA, Params
 
 CHASSIS_YAML = DATA / "chassis" / "chassis.yaml"
+
+# a pin between two nodes 1 mm apart: it passes a force each way and almost no moment (the hinge cheeks' fillets to the
+# hinge bar, I2-92). Marked rigid so the stress readings skip it
+PIN = Section("pin", A=1.0e5, I_strong=1.0, I_weak=1.0, J=1.0, rigid=True)
 SECTIONS_YAML = DATA / "chassis" / "sections.yaml"
 SIDES = {-1: "K", 1: "R"}            # kerb side is negative Y, road side positive Y (DIM-01)
 SIDE_WORDS = {-1: "kerb side", 1: "road side"}
@@ -113,6 +117,13 @@ def load_sections() -> dict[str, Props]:
             Aw_depth=2 * (d - 2 * t) * t, Aw_width=2 * (b - 2 * t) * t, area_m2_per_m=area, grade=s.get("grade", ""),
             Ze_strong=ze_x, Ze_weak=ze_y)
     return out
+
+
+@functools.lru_cache(maxsize=1)
+def load_angles() -> dict[str, dict]:
+    """The equal angles of data/chassis/sections.yaml as their rows: leg `d`, thickness `t` and `mass_kg_per_m`."""
+    raw = yaml.safe_load(SECTIONS_YAML.read_text())
+    return {s["id"]: s for s in raw["sections"] if s["shape"] == "equal angle"}
 
 
 def cheek_props(ck: dict, gap: float, n: int = 2) -> Props:
@@ -355,13 +366,17 @@ class Chassis:
             if not all(i in ids for i in pb["between"]):
                 continue  # a body length compared in TRAILER.md with fewer stations
             sa, sb = (ids[i] for i in pb["between"])
-            xa, xb = sa["x"] + V["xm_w"], sb["x"]
+            xa, xb = sa["x"] + V["xm_w"], sb["x"] - pb.get("rear_ahead", 0.0)
             z = V["rail_underside_z"] + rs["rail"].d / 2
             sec = self.sections[pb["section"]]
+            ends = "ends on 6 mm gusset plates welded to the crossmember and the rail web"
+            if pb.get("rear_ahead"):
+                ends = (f"its front end on a 6 mm gusset plate welded to the crossmember and the rail web, its rear end on one "
+                        f"welded to the rail web {pb['rear_ahead']:g} mm ahead of the {pb['between'][1]} crossmember")
             for s in (-1, 1):
                 add(Member(f"PB-{k}{SIDES[s]}", "plan_brace", f"Plan brace between the {pb['between'][0]} and {pb['between'][1]} crossmembers, "
                            f"from the {SIDE_WORDS[s]} rail", sec, (xa, s * y_in, z), (xb, -s * y_in, z), depth_dir=(0, 0, 1),
-                           note="Diagonal at rail height, ends on 6 mm gusset plates welded to the crossmember and the rail web"))
+                           note=f"Diagonal at rail height, {ends}"))
         psec = rs["spare_post"]
         xp = x0 - psec.b / 2
         for s in (-1, 1):
@@ -423,10 +438,17 @@ class Chassis:
                                    area_m2_each=2 * f["l"] * f["w"] * af / 1e6))
             elif kind == "tube":
                 sec = self.sections[f["section"]]
-                m = sec.kg_m * f["length"] / 1000
+                L = self.ev(f["length"])
+                m = sec.kg_m * L / 1000
                 out.append(Fitting(f["id"], f["name"], kind, qty, at, m, "calculated",
-                                   f"Calculated: {f['length']} mm of {sec.name} at {sec.kg_m} kg/m", t=sec.t,
-                                   area_m2_each=sec.area_m2_per_m * f["length"] / 1000))
+                                   f"Calculated: {L:g} mm of {sec.name} at {sec.kg_m} kg/m", t=sec.t,
+                                   area_m2_each=sec.area_m2_per_m * L / 1000))
+            elif kind == "angles":                  # the shear panel's pieces, each at its own centre (panel_pieces)
+                ps = self.panel_pieces()
+                ctr = [tuple((p["boxes"][0][i] + p["boxes"][0][i + 3]) / 2 for i in range(3)) for p in ps]
+                parts = ", ".join(f"{p['length']:.0f} mm of {load_angles()[p['section']]['designation'].replace('x', ' x ')}" for p in ps)
+                out.append(Fitting(f["id"], f["name"], kind, 1, ctr, sum(p["mass_kg"] for p in ps), "calculated",
+                                   f"Calculated: {parts}, at each section's kg/m", t=5.0, area_m2_each=sum(p["area_m2"] for p in ps)))
             elif kind == "strip":
                 L = self.strip_length()
                 out.append(Fitting(f["id"], f["name"], kind, 1, [(self.V["body_x0"] + self.V["body_length"] / 2, 0.0, self.V["floor_underside_z"] - 10)],
@@ -484,40 +506,134 @@ class Chassis:
         return [next(m for m in self.members if m.station == st and m.role == "cm_xt") for st in ("XT front hinge", "XT centre")]
 
     def hinge_gussets(self) -> list[dict]:
-        """The four hinge gussets CH-P08 (xt_hinges `gusset`), the one place the dip, the frame model and the 3D model read
-        them from: each an SHS on the 45 degree line in plan between its hinge crossmember's rear face and the rail's inner
-        face, at the rail's mid-depth. `cm_y` is where its axis meets the crossmember's rear face and `rail_x` where it
-        meets the rail's inner face, `p0` and `p1` the ends of its `length`."""
+        """The six hinge gussets CH-P08 (xt_hinges `gusset`), the one place the dip, the frame model, the 3D model and the
+        sheets read them from: each an SHS on the 45 degree line in plan across the corner between its hinge crossmember's
+        face and the rail's inner face, at the rail's mid-depth, both ends cut on those faces. Its axis meets each face
+        `leg` = length / sqrt 2 from the corner, `p0` at `cm_y` on the crossmember's face and `p1` at `rail_x` on the rail's,
+        the centres of its two end welds. Each side wall ends `b` / 2 inside the axis's ends on the short side, the web
+        `short` across the tube, and as far beyond them on the long side (`offsets`, as the dip reads a mitre), and
+        `outline` is its plan at the two faces: short and long side on the crossmember, long and short side on the rail."""
         V, g = self.V, self.data["xt_hinges"]["gusset"]
         rail = self.role_sec["rail"]
+        sec = self.sections[next(f for f in self.data["fittings"] if f["id"] == "CH-P08")["section"]]
         y_in = V["rail_c"] - rail.b / 2
         z = V["rail_underside_z"] + g.get("z_over_underside", rail.d / 2)
+        length = self.ev(g["length"])
+        leg = length / math.sqrt(2)
+        side = sec.b / 2 * math.sqrt(2)                # each side wall's offset from the axis along either face
         out = []
         for cm in self.hinge_crossmembers():
             for e in g.get("faces", [1]):              # 1 behind the crossmember's rear face, -1 ahead of its front face
                 face = cm.p0[0] + e * cm.sec.b / 2
                 for s in (-1, 1):
-                    c = (face + e * g["behind"], s * (V["rail_c"] - g["inboard"]), z)
-                    d = (e / math.sqrt(2), s / math.sqrt(2), 0.0)
-                    half = g["length"] / 2
                     gid = f"{cm.id}{SIDES[s]}" + ("" if e > 0 else "F")
                     if gid in g.get("omit", []):
                         continue
-                    out.append(dict(id=f"CH-P08-{gid}", cm=cm.id, side=s, rear_x=face, centre=c, dir=d,
-                                    p0=tuple(a - half * b for a, b in zip(c, d)), p1=tuple(a + half * b for a, b in zip(c, d)),
-                                    cm_y=s * (V["rail_c"] - g["inboard"] - g["behind"]), rail_x=face + e * (g["behind"] + g["inboard"] - rail.b / 2),
-                                    y_in=s * y_in, z=z))
+                    p0 = (face, s * (y_in - leg), z)
+                    p1 = (face + e * leg, s * y_in, z)
+                    short = 1 if e * s > 0 else -1     # the web on the corner's side, across the tube's width (cad/chassis_dip.py axes)
+                    out.append(dict(id=f"CH-P08-{gid}", cm=cm.id, side=s, face=e, rear_x=face, length=length, leg=leg,
+                                    centre=tuple((a + b) / 2 for a, b in zip(p0, p1)), dir=(e / math.sqrt(2), s / math.sqrt(2), 0.0),
+                                    p0=p0, p1=p1, cm_y=p0[1], rail_x=p1[0], y_in=s * y_in, z=z, short=short,
+                                    offsets={short: sec.b / 2, -short: -sec.b / 2},
+                                    outline=[(face, s * (y_in - leg + side)), (face, s * (y_in - leg - side)),
+                                             (face + e * (leg + side), s * y_in), (face + e * (leg - side), s * y_in)]))
         return out
 
     def shear_panels(self) -> list[dict]:
         """The steel shear panels under the tanks (shear_panels): each spans its bay from the rear face of one station's
-        crossmember to the front face of the next, between the rails' inner faces."""
+        crossmember to the front face of the next, between the rails' inner faces, as the frame model carries it. `sheet`
+        is the 3 mm sheet as cut (panel_sheet) and `bolts` its bolts, each with its group (panel_pieces)."""
         V, out = self.V, []
         st = {m.station: m for m in self.members if m.role.startswith("cm")}
         for d in self.data.get("shear_panels", []):
             m0, m1 = st[d["from"]], st[d["to"]]
             x0, x1 = m0.p0[0] + m0.sec.b / 2, m1.p0[0] - m1.sec.b / 2
-            out.append(dict(id=d["id"], x0=x0, x1=x1, b=2 * (V["rail_c"] - self.role_sec["rail"].b / 2), t=d["t"], fixing=d.get("fixing")))
+            pieces = self.panel_pieces()
+            out.append(dict(id=d["id"], x0=x0, x1=x1, b=2 * (V["rail_c"] - self.role_sec["rail"].b / 2), t=d["t"], fixing=d.get("fixing"),
+                            sheet=self.panel_sheet(d, x1, pieces), bolts=[b for p in pieces for b in p["bolts"]]))
+        return out
+
+    def panel_sheet(self, d: dict, x_rear: float, pieces: list[dict]) -> dict:
+        """The panel's sheet in plan: its front edge at the jacking pads' rear edges, its rear edge at the next crossmember's
+        face, its sides the stiffener's `edge` inside the rails' inner faces, and a tongue under each crossmember's angle,
+        as wide as the angle and `tongue` short of its flat leg's toe. Each as (x0, y0, x1, y1)."""
+        V = self.V
+        pad = next(f for f in self.data["fittings"] if f["id"] == "CH-P06")
+        stiff = next(f for f in self.data["fittings"] if f["id"] == "CH-P17")["stiffener"]
+        half = V["rail_c"] - self.role_sec["rail"].b / 2 - stiff["edge"]
+        front = self.ev(pad["at"])[0] + pad["l"] / 2
+        tongues = []
+        for p in (p for p in pieces if p["use"] == "crossmember"):
+            toe = p["toe_x"] + p["face"] * d.get("tongue", 0.0)
+            xa, xb = sorted((toe, front if p["face"] > 0 else x_rear))
+            tongues.append((xa, p["y0"], xb, p["y1"]))
+        return dict(rect=(front, -half, x_rear, half), tongues=tongues, front=front, half=half)
+
+    def panel_pieces(self) -> list[dict]:
+        """The shear panel's pieces CH-P17: each angle with its use (rail, crossmember or stiffener), its section, its ends,
+        its legs' boxes, its mass, its galvanised area, its welds as lines (what, from, to) and its bolts (x, y, group).
+        The rails' angles run from `gap` behind the XT centre's rear hinge cheeks' ends to `end` ahead of the XT rear
+        shock crossmember, and each crossmember's angles under their Y ranges, their bolts on the flat leg's `gauge`."""
+        V, spec = self.V, next(f for f in self.data["fittings"] if f["id"] == "CH-P17")
+        ang, rail = load_angles(), self.role_sec["rail"]
+        fix = self.data["shear_panels"][0]["fixing"]
+        y_in = V["rail_c"] - rail.b / 2
+        z_flat = V["rail_underside_z"] - spec["drop"]
+        st = {m.station: m for m in self.members if m.role.startswith("cm")}
+        centre, shock = st["XT centre"], st["XT rear shock"]
+        ck = self.data["xt_hinges"]["cheek"]
+        out = []
+
+        def spaced(a0: float, a1: float, pitch: float, end: float) -> list[float]:
+            n = int(math.floor((a1 - a0 - 2 * end) / pitch + 1e-9)) + 1
+            first = a0 + (a1 - a0 - (n - 1) * pitch) / 2
+            return [first + k * pitch for k in range(n)]
+
+        r = spec["rails"]
+        a = ang[r["section"]]
+        x0 = centre.p0[0] + centre.sec.b / 2 + ck["l"] + r["gap"]
+        x1 = shock.p0[0] - shock.sec.b / 2 - r["end"]
+        for s in (-1, 1):
+            y_web = s * y_in
+            up = (x0, min(y_web, y_web - s * a["t"]), z_flat, x1, max(y_web, y_web - s * a["t"]), z_flat + a["d"])
+            flat = (x0, min(y_web, y_web - s * a["d"]), z_flat, x1, max(y_web, y_web - s * a["d"]), z_flat + a["t"])
+            yb = y_web - s * spec["gauge"]
+            out.append(dict(id=f"CH-P17-R{SIDES[s]}", use="rail", side=s, section=r["section"], x0=x0, x1=x1, length=x1 - x0,
+                            boxes=[up, flat], galvanised=True,
+                            welds=[("top edge", (x0, y_web, z_flat + a["d"]), (x1, y_web, z_flat + a["d"])),
+                                   ("rail's bottom corner", (x0, y_web, V["rail_underside_z"]), (x1, y_web, V["rail_underside_z"]))],
+                            bolts=[dict(x=x, y=yb, group="rail", along="x") for x in spaced(x0, x1, fix["pitch"], fix["end"])]))
+        for c in spec["crossmembers"]:
+            a, m = ang[c["section"]], st[c["station"]]
+            f = c["face"]                       # 1 on the crossmember's rear face, -1 on its front face, the flat leg under it
+            x_web = m.p0[0] + f * m.sec.b / 2
+            heel = x_web + f * a["t"]
+            toe = heel - f * a["d"]
+            front = c["station"] == "XT centre"
+            for k, (y0, y1) in enumerate(c["ys"], 1):
+                up = (min(x_web, heel), y0, z_flat, max(x_web, heel), y1, z_flat + a["d"])
+                flat = (min(toe, heel), y0, z_flat, max(toe, heel), y1, z_flat + a["t"])
+                n = 4 if front else None
+                ys = [(y0 + y1) / 2 + (j - (n - 1) / 2) * fix["front_pitch"] for j in range(n)] if front else spaced(y0, y1, fix["pitch"], fix["end"])
+                out.append(dict(id=f"CH-P17-{m.id}-{k}", use="crossmember", member=m.id, station=c["station"], face=f, section=c["section"],
+                                y0=y0, y1=y1, length=y1 - y0, x_web=x_web, heel_x=heel, toe_x=toe, boxes=[up, flat], galvanised=True,
+                                welds=[("top edge", (x_web, y0, z_flat + a["d"]), (x_web, y1, z_flat + a["d"])),
+                                       ("crossmember's bottom corner", (x_web, y0, V["rail_underside_z"]), (x_web, y1, V["rail_underside_z"]))],
+                                bolts=[dict(x=heel - f * spec["gauge"], y=y, group="front" if front else "rear", along="y") for y in ys]))
+        sk = spec["stiffener"]
+        a = ang[sk["section"]]
+        pad = next(f for f in self.data["fittings"] if f["id"] == "CH-P06")
+        xs = self.ev(pad["at"])[0] + pad["l"] / 2
+        half = y_in - sk["edge"]
+        z_sheet = z_flat - self.data["shear_panels"][0]["t"]
+        out.append(dict(id="CH-P17-S", use="stiffener", section=sk["section"], x0=xs, y0=-half, y1=half, length=2 * half, welds=[], bolts=[],
+                        boxes=[(xs, -half, z_sheet - a["t"], xs + a["d"], half, z_sheet), (xs, -half, z_sheet - a["d"], xs + a["t"], half, z_sheet)],
+                        galvanised=False))
+        for p in out:
+            a = ang[p["section"]]
+            p["mass_kg"] = a["mass_kg_per_m"] * p["length"] / 1000
+            p["area_m2"] = (4 * a["d"] - 2 * a["t"]) * p["length"] / 1e6 if p["galvanised"] else 0.0
         return out
 
     @property
@@ -565,7 +681,7 @@ class Chassis:
             r = rows.setdefault(m.sec.t, dict(t=m.sec.t, area_m2=0.0, kg_per_m2=rate(m.sec.t)))
             r["area_m2"] += m.area_m2
         for f in self.fittings:
-            if f.kind in ("plate", "tube"):
+            if f.kind in ("plate", "tube", "angles"):
                 r = rows.setdefault(f.t, dict(t=f.t, area_m2=0.0, kg_per_m2=rate(f.t)))
                 r["area_m2"] += f.area_m2_each * f.qty
         for r in rows.values():
@@ -575,7 +691,7 @@ class Chassis:
         return dict(rows=sorted(rows.values(), key=lambda r: r["t"]), area_m2=tot_a, mass_kg=tot_m)
 
     def steel_mass(self) -> float:
-        return sum(m.mass_kg for m in self.members) + sum(f.mass_kg for f in self.fittings if f.kind in ("plate", "tube"))
+        return sum(m.mass_kg for m in self.members) + sum(f.mass_kg for f in self.fittings if f.kind in ("plate", "tube", "angles"))
 
     # -- suspension geometry (report 11 section 5.1) -------------------
     def _suspension(self) -> list[dict]:
@@ -651,7 +767,9 @@ class Chassis:
         return dict(crossmember_stations=[self.station_x(st) for st in self.stations], body_x0=V["body_x0"], db_end_x=V["db_end_x"],
                     chain_lug_x=V["chain_lug_x"], jack_x=self.station_x(jack), hub_front_x=self.hub_x("front"), hub_rear_x=self.hub_x("rear"),
                     rear_tongue_x=V["body_x1"] - 70, front_recovery_x=V["front_recovery_x"], root_gusset_toe_x=V["root_gusset_toe_x"],
-                    steady_x=sorted({p["x"] for p in self.steady_poses()}))
+                    steady_x=sorted({p["x"] for p in self.steady_poses()}),
+                    cheek_ends_x=sorted({x for c in self.hinge_cheeks() for x in (c["box"][0], c["box"][3])}),
+                    panel_angle_ends_x=sorted({x for p in self.panel_pieces() if p["use"] == "rail" for x in (p["x0"], p["x1"])}))
 
     # -- the frame model ----------------------------------------------
     def frame(self, body: list[tuple[float, float, float]] | None = None, hinges: str = "crossmember") -> "FrameModel":
@@ -680,6 +798,9 @@ class FrameModel:
         xs |= {w["hub"][0] for w in ch.suspension}
         if hinges == "crossmember":
             xs |= {g["rail_x"] for g in ch.hinge_gussets()}             # where each hinge gusset meets the rail
+        # where a plan brace's end meets a rail away from every crossmember (plan_braces `rear_ahead`)
+        xs |= {p[0] for m in ch.members if m.role == "plan_brace" for p in (m.p0, m.p1)
+               if min(abs(p[0] - ch.station_x(st)) for st in ch.stations) > V["xm_w"]}
         xs = sorted(xs)
         xs = [x for k, x in enumerate(xs) if k == 0 or x - xs[k - 1] > 5.0]   # points within 5 mm share a node
         mesh = [xs[0]]
@@ -755,6 +876,7 @@ class FrameModel:
         # `bar`), as Cruisemaster's sheets build it, and the gussets CH-P08 are members, so the hinge's force and moment
         # reach the rail through the crossmember's end, beside its holes (the hinge path study, CHS-12, I2-88)
         self.pivot_nodes = {}
+        self.cheek_pins: dict[str, int] = {}        # each hinge's pin at its cheeks' fillets to the hinge bar, by element
         for w in ch.suspension:
             nd = f.node(w["pivot"])
             if hinges == "crossmember":
@@ -766,13 +888,22 @@ class FrameModel:
                 self._link(nd, self.rail_node(w["side"], w["station_x"]), f"hinge {w['id']}")
             self.pivot_nodes[w["id"]] = nd
             if hinges == "crossmember":
-                # the hinge's two cheeks (CH-P16) as one member from the pivot to the rail's underside, held there by their
-                # welds along the rail's inner web
+                # the hinge's cheeks (CH-P16) as they are welded (I2-92): the hinge bar rigid from the pivot up to the middle of
+                # the cheeks' fillets to it, `bar_d` under the rail, a pin there, since those short fillets pass a force but no
+                # moment, and the cheeks as one member from the pin to the rail's underside, held there by their welds along
+                # the rail's inner web. So the arm's moment stays in the bar and goes to the crossmember by its weld runs
+                ck = ch.data["xt_hinges"]["cheek"]
                 n = sum(1 for c in ch.hinge_cheeks() if c["wheel"] == w["id"])
-                sp = cheek_props(ch.data["xt_hinges"]["cheek"], ch.xm_w, n)
+                sp = cheek_props(ck, ch.xm_w, n)
+                z_pin = V["rail_underside_z"] - ck["bar_d"] / 2
+                bar = f.node((w["pivot"][0], w["pivot"][1], z_pin - 1.0))
+                pin = f.node((w["pivot"][0], w["pivot"][1], z_pin))
                 top = f.node((w["pivot"][0], w["pivot"][1], V["rail_underside_z"]))
+                self._link(nd, bar, f"hinge bar {w['id']}")
+                f.add(bar, pin, PIN, (1, 0, 0), f"cheek pin {w['id']}")
+                self.cheek_pins[w["id"]] = len(f.elements) - 1
                 self._link(top, self.rail_node(w["side"], w["station_x"]), f"cheek welds {w['id']}")
-                f.add(nd, top, sp.frame_section(), (1, 0, 0), f"CH-P16-{w['id']}")
+                f.add(pin, top, sp.frame_section(), (1, 0, 0), f"CH-P16-{w['id']}")
                 self.sec_props[f"CH-P16-{w['id']}"] = sp
         for g in (ch.hinge_gussets() if hinges == "crossmember" else []):
             gsec = ch.sections[next(fd for fd in ch.data["fittings"] if fd["id"] == "CH-P08")["section"]]
@@ -1088,6 +1219,22 @@ def member_solid(m: Member):
     return cut_member(m, extrude(pl * prof, amount=m.length))
 
 
+def gusset_solid(ch: Chassis, g: dict, name: str):
+    """A hinge gusset as made: its tube run on past both ends of its axis as far as its long side reaches, and cut off on
+    the crossmember's face and the rail's inner face (Chassis.hinge_gussets)."""
+    from .model.prims import box
+    sec = ch.sections[next(f for f in ch.data["fittings"] if f["id"] == "CH-P08")["section"]]
+    run = sec.b / 2
+    p0 = tuple(a - run * d for a, d in zip(g["p0"], g["dir"]))
+    p1 = tuple(a + run * d for a, d in zip(g["p1"], g["dir"]))
+    tube = member_solid(Member(g["id"], "hinge_gusset", name, sec, p0, p1))
+    e, s, z, big = g["face"], g["side"], g["z"], 400.0
+    x_cm, y_rail = g["rear_x"], g["y_in"]
+    beyond_cm = box(x_cm - big if e > 0 else x_cm, min(p0[1], p1[1]) - big, z - big, big, 2 * big + 2 * g["leg"], 2 * big)
+    beyond_rail = box(min(p0[0], p1[0]) - big, y_rail if s > 0 else y_rail - big, z - big, 2 * big + 2 * g["leg"], big, 2 * big)
+    return tube - beyond_cm - beyond_rail
+
+
 PLANES = {"xy": (0, 1, 2), "xz": (0, 2, 1), "yz": (1, 2, 0)}   # which axes the plate's length, width and thickness run along
 
 
@@ -1102,12 +1249,14 @@ def fitting_boxes(ch: Chassis, f: Fitting) -> list[tuple]:
         return [(x0, y0, z0, x0 + dx, y0 + dy, z0 + dz) for x0, y0, z0, dx, dy, dz in (ch.P.eval(b, {}) for b in spec["boxes"])]
     if spec.get("poses") == "steadies":
         return [p["travel"] for p in ch.steady_poses()]
-    if spec.get("poses") == "hinge_gussets":                  # each 45 degree gusset's envelope (xt_hinges, I2-88)
-        h = ch.sections[spec["section"]].b / 2
-        return [tuple(min(g["p0"][i], g["p1"][i]) - h for i in range(3)) + tuple(max(g["p0"][i], g["p1"][i]) + h for i in range(3))
-                for g in ch.hinge_gussets()]
+    if spec.get("poses") == "hinge_gussets":                  # each 45 degree gusset's plan between its two cut faces
+        h = ch.sections[spec["section"]].d / 2
+        return [(min(x for x, _ in g["outline"]), min(y for _, y in g["outline"]), g["z"] - h,
+                 max(x for x, _ in g["outline"]), max(y for _, y in g["outline"]), g["z"] + h) for g in ch.hinge_gussets()]
     if spec.get("poses") == "hinge_cheeks":                   # each hinge cheek's plate (xt_hinges)
         return [c["box"] for c in ch.hinge_cheeks()]
+    if f.kind == "angles":                                    # the shear panel's welded angles, each leg (panel_pieces)
+        return [b for p in ch.panel_pieces() if p["galvanised"] for b in p["boxes"]]
     if f.kind == "strip":
         return []
     if f.kind == "plate":
@@ -1127,7 +1276,6 @@ def fitting_solids(ch: Chassis, f: Fitting) -> list:
     from .model.prims import box
     spec = next(d for d in ch.data["fittings"] if d["id"] == f.id)
     if spec.get("poses") == "hinge_gussets":
-        sec = ch.sections[spec["section"]]
-        return [member_solid(Member(g["id"], "hinge_gusset", f.name, sec, g["p0"], g["p1"])) for g in ch.hinge_gussets()]
+        return [gusset_solid(ch, g, f.name) for g in ch.hinge_gussets()]
     from .chassis_holes import cut_plates
     return cut_plates(ch, f, [box(x0, y0, z0, x1 - x0, y1 - y0, z1 - z0) for x0, y0, z0, x1, y1, z1 in fitting_boxes(ch, f)])

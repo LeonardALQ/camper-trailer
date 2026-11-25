@@ -90,10 +90,11 @@ def _draft_stamp(sh, x, y):
 
 
 def weld_symbol(sh, tip, elbow, size: str, other_side=False, both=False, all_round=False, length: str = "", note: str = "",
-                bevel=False, size_other: str = ""):
+                bevel=False, size_other: str = "", flare=False):
     """AS 1101.3 fillet weld symbol: arrow to the joint, reference line, the triangle below the line for the arrow
     side (above for the other side, both for both sides), the leg size on the left and the length on the right, a
-    circle at the elbow for all round. `bevel` draws the single bevel butt weld's symbol in place of the triangle.
+    circle at the elbow for all round. `bevel` draws the single bevel butt weld's symbol in place of the triangle, and
+    `flare` the flare-bevel weld's, its upright line and an arc bowed toward it, with the effective throat as its size.
     `size_other` gives the other side's leg above the line where both sides are welded to different sizes. The arrow is
     marked as a leader to the joint it points at, so the overrun check sees it (I2-76). With `all_round` it ends on the
     elbow's circle."""
@@ -112,7 +113,11 @@ def weld_symbol(sh, tip, elbow, size: str, other_side=False, both=False, all_rou
     if other_side or both:
         tri.append(1)
     for d in tri:
-        if bevel:
+        if flare:
+            sh.line(xm - 1.3, ey, xm - 1.3, ey + d * 2.6, "medium")
+            arc = [math.radians(-104.9 - k * 150.2 / 6) for k in range(7)]
+            sh.path([(xm + 1.645 + 1.345 * math.cos(a), ey + d * (1.3 + 1.345 * math.sin(a))) for a in arc], "medium")
+        elif bevel:
             sh.path([(xm - 1.3, ey + d * 2.6), (xm - 1.3, ey), (xm + 1.3, ey + d * 2.6)], "medium")
         else:
             sh.path([(xm - 1.3, ey), (xm - 1.3, ey + d * 2.6), (xm + 1.3, ey)], "medium", closed=True)
@@ -238,8 +243,8 @@ def ct101(prj, model, bom, checks, reg, dwg):
     rows = []
     for r in chs["schedule"]:
         rows.append([r["section"], SHORT.get(r["role"], r["name"])[:46], f"{r['qty']}", f"{r['length_mm'] / 1000:.2f}", f"{r['mass_kg']:.1f}"])
-    plates = sum(f["mass_kg"] for f in chs["fittings"] if f["kind"] in ("plate", "tube"))
-    rows.append(["PLATE", "Plates, lugs, pads, gussets (CT-102, CT-103)", f"{sum(f['qty'] for f in chs['fittings'] if f['kind'] in ('plate', 'tube'))}",
+    plates = sum(f["mass_kg"] for f in chs["fittings"] if f["kind"] in ("plate", "tube", "angles"))
+    rows.append(["PLATE", "Plates, lugs, pads, gussets (CT-102, CT-103)", f"{sum(f['qty'] for f in chs['fittings'] if f['kind'] in ('plate', 'tube', 'angles'))}",
                  "-", f"{plates:.1f}"])
     rows.append(["HDG", "Galvanising, inside and out", "-", f"{chs['galvanising']['area_m2']:.1f} m2", f"{chs['galvanising']['mass_kg']:.1f}"])
     yt = S.table(sh, 230.0, 247.0, [("SECTION", 30), ("MEMBERS", 84), ("QTY", 12), ("TOTAL m", 26), ("kg", 28)], rows, size=1.7, row_h=3.2,
@@ -481,11 +486,11 @@ def ct102(prj, model, bom, checks, reg, dwg):
         f = ch_f.get(fid)
         kg = f"{f.mass_kg:.1f}" if f else next(f"{m['mass_kg']:.1f}" for m in chs["members"] if m["id"] == fid)
         rows.append([item, fid, desc[:70], kg])
-    yt = S.table(sh, 232.0, 194.0, [("ITEM", 10), ("MARK", 16), ("DESCRIPTION", 134), ("kg", 16)], rows, size=1.6, row_h=3.0,
+    yt = S.table(sh, 232.0, 194.0, [("ITEM", 10), ("MARK", 16), ("DESCRIPTION", 134), ("kg", 16)], rows, size=1.6, row_h=2.8,
                  title="FITTINGS ON THE DRAWBAR")
     loc = chs["results"]["local"]
     rows = [[v["name"][:42], v["governing"][:32], f"{v['mpa']:.0f} / {v['limit_mpa']:.0f}", f"{100 * v['util']:.0f} %"] for v in loc.values()]
-    S.table(sh, 232.0, yt - 6, [("FITTING", 70), ("GOVERNING PART", 56), ("MPa / LIMIT", 30), ("USE", 20)], rows, size=1.6, row_h=3.0,
+    S.table(sh, 232.0, yt - 6, [("FITTING", 70), ("GOVERNING PART", 56), ("MPa / LIMIT", 30), ("USE", 20)], rows, size=1.6, row_h=2.8,
             title="LOCAL CHECKS (CHASSIS.md)")
     _root_detail(sh, ch, 240.0, 80.0)
     _heel_view(sh, ch, 202.0, 36.0)
@@ -704,7 +709,7 @@ def ct103(prj, model, bom, checks, reg, dwg):
     sh.path([(m - 5, zb - 2), (m - 3, zb - 6), (m + 3, zb - 6), (m + 5, zb - 2)], "medium")
     weld_symbol(sh, (x1, zb), (cx + 4, zb - 10), "5", both=True, length="100", note="ALONG THE CM")
     note = (f"PAD {pad['l']:g}x{pad['w']:g}x{pad['t']:g} WITH A LOCATING CUP, {off:g} mm OFF THE RAIL'S INNER FACE, CLEAR OF "
-            f"THE HINGE CHEEK BEYOND IT. NO WELD ON THE RAIL'S BOTTOM FACE (FAT-11). {_forces()['pad']:.1f} kN ON ONE PAD.")
+            f"THE HINGE CHEEK BEYOND IT. NO WELD ON THE RAIL'S BOTTOM FACE (FAT-11). {chs['results']['pad_n']['pad_n'] / 1000:.1f} kN ON ONE PAD (LOC-04).")
     for i, t in enumerate(S.wrap_mm(note, 44.0, 1.5)):
         sh.text(cx - 32, zb - 18 - 3 * i, t, 1.5)
     # ---- H: rear recovery tongue, plan, 1:10
@@ -757,7 +762,8 @@ def ct103(prj, model, bom, checks, reg, dwg):
     S.notes(sh, 22, 64, [
         "WELDS SP TO AS/NZS 1554.1, E49XX OR W50X. VISUAL ON EVERY WELD, DYE PENETRANT OR MPI ON THE DRAWBAR TO CHASSIS JOINT, THE COUPLING MOUNT AND THE SUSPENSION BRACKETS (report 02 WLD-03). THE RAIL END PLATES' WELD ROOTS BY VIDEOSCOPE FROM INSIDE THE RAILS, RECORDED AS CT-102 NOTE 3 ASKS (FAT-20).",
         "HOT-DIP GALVANISE TO AS/NZS 4680 IN ONE DIP, HUNG AS DETAIL K SAYS, THE SPARE CARRIER POSTS OFF. DRILL BEFORE WELDING WHERE CT-105 DIMENSIONS EACH HOLE (report 02 WLD-05, CHS-11): THE RAILS' FRONT ENDS AS DETAIL K, EACH DRAWBAR MEMBER'S APEX END CUT SQUARE TO IT, 20 IN BOTH WEBS 40 ALONG THE WEB FROM IT, 40 OVER ITS UNDERSIDE AND 40 UNDER ITS TOP, AND 40 ALONG EACH WEB FROM THAT WEB'S MITRE LINE, 40 OVER ITS UNDERSIDE, ITS SNIPE LEFT OPEN, AND AT EVERY OTHER CLOSED END 20 IN BOTH WEBS BY ITS FLOOR AND ITS TOP, 13 IN THE CROSS BRACE, ONE 10 OR 13 IN EACH WEB OF A PLAN BRACE OR HINGE GUSSET, BUT THE XT REAR SHOCK CROSSMEMBER 25 IN ITS REAR WEB AND 16 THROUGH THE RAILS' INNER WEBS AT ITS FRONT CORNERS, A 10 CHECK HOLE IN EACH RAIL'S OUTER WEB OPPOSITE, THE INTERNAL VENTING THE GALVANISER APPROVES IN WRITING BEFORE FABRICATION (GUIDE PAGE 19). VENT EACH SHOCK PLATE THROUGH 12 AT TWO OPPOSITE CORNERS 30 FROM ITS EDGES, AND EACH RAIL-TO-RAISER SEAM THROUGH BOTH WALLS, 12 ON ITS CENTRELINE 60 FROM EACH END, ITS REAR END SEALED BY A 4 FILLET ACROSS IT (GUIDE PAGE 29, CHASSIS.md).",
-        "FILLET SIZES ARE LEGS: 5 mm UNLESS STATED, 8 mm ON THE XT CROSSMEMBER ENDS, 6 mm ON THE OUTRIGGER ROOTS, THE LUGS, THE TONGUES AND THE HINGE CHEEKS.",
+        "FILLET SIZES ARE LEGS: 5 mm UNLESS STATED, 8 mm ON THE XT CROSSMEMBER ENDS, 6 mm ON THE OUTRIGGER ROOTS, THE LUGS, THE TONGUES AND THE HINGE CHEEKS' TOP EDGES, "
+        "10 mm EACH SIDE OF A CHEEK DOWN THE HINGE BAR. EACH CHEEK'S BOTTOM EDGE A FLARE-BEVEL WELD FILLED FLUSH IN THE RAIL'S BOTTOM CORNER (CHS-14).",
     ], width_chars=118, size=1.7)
     _draft_stamp(sh, 125, 75)
     _title(sh, dwg, reg, "SEE CT-101 FOR MASSES (TB-11).", 5, chs["revision"])

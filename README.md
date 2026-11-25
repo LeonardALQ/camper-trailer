@@ -64,7 +64,7 @@ cad/
   export.py             STEP, GLB and three-cad-viewer JSON
   drawings/             A3 sheets: CT-001 (ga.py), CT-002, CT-003 and CT-010 (home_sheets.py), CT-011 to CT-013
                         (layout_sheets.py), CT-101 to CT-103 (chassis_sheets.py), CT-104 (structure_sheets.py), CT-105 (hole_sheet.py),
-                        CT-201 to CT-301 (body_sheets.py), CT-601 to CT-621 (services_sheets.py), CT-701 to CT-704
+                        CT-106 (joint_sheet.py), CT-201 to CT-301 (body_sheets.py), CT-601 to CT-621 (services_sheets.py), CT-701 to CT-704
                         (ute_sheets.py)
   sitedata.py           copies build outputs into the site and generates the research, Car build and parts list pages
   tests/                pytest: design checks and data rules
