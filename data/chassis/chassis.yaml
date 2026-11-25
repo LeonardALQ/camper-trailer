@@ -376,13 +376,13 @@ fatigue_details:
   # FAT-22 and FAT-23 (I2-95): the hinge cheeks CH-P16 and the shear panel's angles CH-P17 are welded along the rail's inner
   # web and its bottom corner, never across it, so each end of their welds is the end of a longitudinal attachment on the
   # rail, IIW 521 by its length along the rail: FAT 63 for a cheek's 150 to 300 mm, FAT 50 over 300 mm for the front
-  # hinge's stepped cheeks' 340 mm (FAT-24, I2-99), and the shear panel's angles keep FAT 50 at 75.6 mm, on the safe side,
+  # hinge's stepped cheeks' 340 mm (FAT-24, I2-99), and the shear panel's angles keep FAT 50 at 76 mm, on the safe side,
   # read on the composite rail's extreme fibre at each end, as FAT-16 reads the steadies' brackets. The weld along the
   # rail's corner is a flare bevel weld, classed here as the fillet it replaces (est.). The angles start 25 mm behind the
   # XT centre's rear cheeks, a set gap, so the two parts' welds end apart and each end is read on its own
   - {id: FAT-22, name: "Hinge cheek's welds along the rail's inner web and bottom corner, their ends (l 150 to 300 mm)", iiw: "521", fat: 63, stress: rail_extreme, where: cheek_ends_x}
   - {id: FAT-24, name: "Hinge cheek with its step at the front hinge, its welds' ends along the rail's inner web (l over 300 mm)", iiw: "521", fat: 50, stress: rail_extreme, where: long_cheek_ends_x}
-  - {id: FAT-23, name: "Shear panel angle's welds along the rail's inner web and bottom corner, their ends (l 75.6 mm, read at FAT 50 on the safe side)", iiw: "521", fat: 50, stress: rail_extreme, where: panel_angle_ends_x}
+  - {id: FAT-23, name: "Shear panel angle's welds along the rail's inner web and bottom corner, their ends (l 76 mm, read at FAT 50 on the safe side)", iiw: "521", fat: 50, stress: rail_extreme, where: panel_angle_ends_x}
 
 # Holes the runs make in the chassis members (data/services.yaml `holes`, the services' list, read here only). A hole is
 # the run's diameter and a bush across, a slot along the member where the run passes on a slant. CHS-09 checks the net

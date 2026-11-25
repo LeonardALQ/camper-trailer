@@ -16,7 +16,7 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 | Ute | Ford Ranger Super Duty single cab chassis. Rear axle 2,546 kg with growth against Ford's 2,800 kg. Combination 7,748 kg against Ford's 8,000 kg, the ute with growth plus the plate |
 | Battery | 25.6 kWh. A design hot day runs 25.1 h when new and 17.2 h at end of life |
 | Water | 385 L fresh, the tanks' net in H21's 5 L steps, all of it in travel, about 41 L a day. 130 L grey |
-| Cost | AUD 200,882 with contingency, built by Leonard (H26) |
+| Cost | AUD 201,063 with contingency, built by Leonard (H26) |
 
 Every fail check passes. The tightest are the tyres' 50 mm under the floor at full bump (FIT-05, 50.0 mm against 50 mm), the towball share with the grey tank full (MAS-12, 9.7 % against 9.0 %), the heaviest towball (MAS-13, 394.8 kg against 420 kg), the gap from the lamp run K-01 to a front recovery lug (SVC-01, 20.4 mm against 20 mm) and the recovery pull with both wheels of one axle held at the 50 kN limit, in the road-side rail (CHS-08U, 0.97 of its section's capacity at the 66.7 kN ultimate) and in the rail's web under a hinge gusset (CHS-16, 0.96). Fully loaded with growth the trailer weighs 3,640.1 kg, 259.9 kg inside the 3,900 kg target (MAS-10).
 
@@ -69,7 +69,7 @@ Masses in kg. The towball comes from moments about the axle group centre at X 4,
 
   Never dig a hole and backfill it. Tie Down's manual installation digs a hole to 2/3 of the anchor's length and backfills it, and Tie Down warns that loose soil may then need a test of the anchor's holding power (p. 6), which the kit cannot do.
 - Awning: close the awning in wind, legs pegged. Peg the legs whenever it is out, and close it before gusts reach 40 km/h, Beaufort force 5, and whenever the trailer is left. Fiamma gives no speed. Its roof bolts are checked with the canopy open in a 60 km/h gust (BDY-11), a check of the fixing only: the 40 km/h rule is what protects the canopy, its arms and its legs.
-- Recovery: pull only from the two front lugs or the two rear tongues, within 30 degrees of the trailer's line sideways and 15 degrees up or down (LC8a). Each point is rated 58.9 kN with every wheel free or one wheel held fast, and 50 kN with both wheels of one axle held fast, the largest pull at which every check holds with that pair held, rounded down to 5 kN (I2-93's working default, one figure in the data). Keep the pull level. Pulled 15 degrees up or down, the empty trailer can tip before the rated pull, from 28.0 kN at 30 degrees sideways and from 42.2 kN along its line, while a level pull holds the rating. CT-003's operating limits give the same rule.
+- Recovery: pull only from the two front lugs or the two rear tongues, within 30 degrees of the trailer's line sideways and 15 degrees up or down (LC8a). Each point is rated 58.9 kN with every wheel free or one wheel held fast, and 50 kN with both wheels of one axle held fast, the largest pull at which every check holds with that pair held, rounded down to 5 kN (I2-93's working default, one figure in the data). Keep the pull level. Pulled 15 degrees up or down, the empty trailer can tip before the rated pull, from 28.1 kN at 30 degrees sideways and from 42.2 kN along its line, while a level pull holds the rating. CT-003's operating limits give the same rule.
 - Jacking: jack the trailer only under the jacking point Cruisemaster builds under each arm by its hub, never under the frame, and release the air from the springs first, re-inflating once the wheel is back on the ground (Cruisemaster's XT user guide). The frame has no jacking pads. LC8b puts 43.6 kN on one arm's point, twice 60 % of the axle group's share at the plate, and the frame takes it through that arm's bump stop and its airbag's top bracket (LOC-04, CT-103 detail G).
 
 ## Structure
@@ -168,19 +168,19 @@ The insert map CT-203 must be final before the panels are ordered, because the m
 
 ## Cost and where to save
 
-The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 154 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 174,555 subtotal carries AUD 26,327 (15.1 %), for AUD 200,882.
+The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 154 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 174,706 subtotal carries AUD 26,357 (15.1 %), for AUD 201,063.
 
 | Group | AUD | Group | AUD |
 |---|---|---|---|
-| Body | 38,360 | Chassis | 8,084 |
+| Body | 38,360 | Chassis | 8,012 |
 | Electrical | 27,292 | Freight and consumables | 5,430 |
 | Living area | 21,186 | Licensed electrician | 4,600 |
 | Running gear | 14,181 | Drawbar box | 4,388 |
-| HVAC and ventilation | 12,667 | Under the floor | 3,442 |
+| HVAC and ventilation | 12,667 | Under the floor | 3,665 |
 | Wet room | 11,627 | Roof | 2,926 |
 | Bed | 8,028 | Coupling and drawbar | 1,962 |
 | Compliance and weld evidence | 8,320 | Lamps, reflectors, the number plate and the brake circuit | 1,326 |
-| Subtotal | 174,555 | Spare wheel | 736 |
+| Subtotal | 174,706 | Spare wheel | 736 |
 
 What the registration needs stays: the licensed electrician and the AS/NZS 3001.2 certificate (ELI-01, CMP-13), the refrigeration fitting in AC-03, the wheel alignment (ALN-01), the engineer's review (CMP-03) and the registration lines. The registration itself also needs papers. A concessional trailer never registered in NSW needs TfNSW's Identity Approval before the examiner can pass it (VIB 78 rule 221.04), and its application, form 5703, is rejected without clear photographs of all four sides and the drawbar, of the vehicle plate and of the VIN stamped in the frame, the weighbridge ticket, and receipts proving the origin of the materials (CMP-04). So keep every receipt for the chassis steel, the running gear, the coupling and the panels from stage B0, and photograph the trailer as AIS Notice 41 and VIB 78 ask.
 
