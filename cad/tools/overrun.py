@@ -1,6 +1,7 @@
-"""The label overrun check on the built sheets (F6-04, fx10, I2-64, I2-69, I2-76, fx18-ovr): every sheet SVG in a folder, read
-in its drawing order, for the text a mark shows through, the texts whose letters overlap, the masks that break a heavy
-line, the leaders that go wrong and the texts that leave the frame, sheet by sheet.
+"""The label overrun check on the built sheets (F6-04, fx10, I2-64, I2-69, I2-76, fx18-ovr, fx20-dwg): every sheet SVG in a
+folder, read in its drawing order, for the text a mark shows through, the texts whose letters overlap, the masks that break
+a heavy line, the leaders that go wrong, the texts that leave the frame and the notes' lines drawn left of their text,
+sheet by sheet.
 
 - A line hit is a stroked line, an arrowhead, a symbol circle or the frame that crosses the cores of a text's letters
   (cad/drawings/sheet.py text_core, each text placed and measured in DejaVu Sans as CairoSVG draws it, from its first
@@ -30,10 +31,13 @@ line, the leaders that go wrong and the texts that leave the frame, sheet by she
   it, past the outer edge of the title block's line (fx18-ovr). The frame and the title block are the rectangles the
   sheet draws in the frame's line (class="frame", sheet.frame and sheet.title_block), the largest the frame, and a text
   whose letters lie wholly inside the title block's line is the title block's own.
+- An indent fault is a note's continuation line drawn left of its note's text (fx20-dwg). sheet.notes marks each line of
+  a note with the note (data-note), and every line under its first must start where the first line's text starts
+  after its number, "N. ", the pen's place after it as CairoSVG draws it (sheet.pen_mm), or right of it.
 
     python -m cad.tools.overrun build/drawings [report.json]
 
-prints each sheet's counts and the places, writes them to the report, and exits 1 when any sheet has any of the five."""
+prints each sheet's counts and the places, writes them to the report, and exits 1 when any sheet has any of the six."""
 from __future__ import annotations
 
 import html
@@ -44,7 +48,8 @@ import sys
 from pathlib import Path
 
 from cad.drawings.sheet import (_SYM_IN, _SYM_OF, CAPS, HEAVY, LEAD_GAP, _crossing, _enters, _gap, _path_pts, _seg_dist, _seg_gap, _segments,
-                                _symbol_circles, in_shape, is_leader, on_target, read_target, symbol_shape, text_core, text_ink)
+                                _symbol_circles, drawn, in_shape, is_leader, on_target, pen_mm, read_target, symbol_shape, text_core,
+                                text_extent, text_ink)
 
 _TEXT = re.compile(r"<text ([^>]*)>(.*)</text>")
 _RECT = re.compile(r'<rect x="([-\d.]+)" y="([-\d.]+)" width="([\d.]+)" height="([\d.]+)" fill="#fff"([^>]*)/>')
@@ -52,7 +57,9 @@ _ROT = re.compile(r'rotate\(([-\d.]+) ([-\d.]+) ([-\d.]+)\)')
 G = 5.0
 TEE_DEG = 20.0     # degrees: a tee's end meets the other flow's run at least this steeply (I2-85)
 ALONG_MM = 3.0     # mm: two marked lines that run within LEAD_GAP of each other further than this lie along each other (I2-85)
-CLASSES = ("line_hits", "text_overlaps", "mask_breaks", "leader_faults", "frame_overruns")
+INDENT_TOL = 0.05  # mm: a note's continuation line may start this far left of its note's text, under half a pixel
+CLASSES = ("line_hits", "text_overlaps", "mask_breaks", "leader_faults", "frame_overruns", "indent_faults")
+_NUMBER = re.compile(r"\d+\. ")
 
 
 def _attr(a: str, name: str, default=None):
@@ -88,7 +95,7 @@ def read_sheet(svg: str) -> dict:
             rot = _ROT.search(_attr(a, "transform", "") or "")
             t = dict(i=n, x=float(_attr(a, "x")), y=float(_attr(a, "y")), s=float(_attr(a, "font-size")),
                      anchor=_attr(a, "text-anchor", "start"), bold=_attr(a, "font-weight") == "bold", t=raw,
-                     rot=float(rot[1]) if rot else 0.0, masked='class="masked"' in a)
+                     rot=float(rot[1]) if rot else 0.0, masked='class="masked"' in a, note=_attr(a, "data-note"))
             t["core"] = text_core(t)[2]
             t["to_sheet"], t["to_local"] = _frame(t["rot"], t["x"], t["y"])
             t["corners"] = _ring(t)
@@ -145,6 +152,36 @@ def frame_overruns(sh: dict) -> list[dict]:
             if not own and not _apart(ink, [(outer[0], outer[2]), (outer[1], outer[2]), (outer[1], outer[3]), (outer[0], outer[3])]):
                 out.append(dict(_place(t), kind="into the title block"))
                 break
+    return out
+
+
+def _pen(t: dict) -> float:
+    """Where a text's pen starts, mm along its baseline from its anchor, as CairoSVG draws it (sheet.text_extent)."""
+    return text_extent(t["t"], t["s"], t["bold"], t["anchor"]).start
+
+
+def indent_faults(sh: dict) -> list[dict]:
+    """The notes' continuation lines drawn left of their note's text (fx20-dwg). sheet.notes marks each line of a note
+    with the note (data-note), and every line under its first must start where the first line's text starts after its
+    number, "N. ", the pen's place after it as CairoSVG draws it (sheet.pen_mm), or right of it, so the note's text
+    hangs clear of its number. A note whose first line has no number is one too."""
+    notes, out = {}, []
+    for t in sh["texts"]:
+        if t["note"]:
+            notes.setdefault(t["note"], []).append(t)
+    for ts in notes.values():
+        to_local = ts[0]["to_local"]
+        ts.sort(key=lambda t: to_local((t["x"], t["y"]))[1])
+        first = ts[0]
+        m = _NUMBER.match(drawn(first["t"]))
+        if not m:
+            out.append(dict(_place(first), kind="its note's first line has no number"))
+            continue
+        start = to_local((first["x"], first["y"]))[0] + _pen(first) + pen_mm(m[0], first["s"], first["bold"])
+        for t in ts[1:]:
+            u = to_local((t["x"], t["y"]))[0] + _pen(t)
+            if u < start - INDENT_TOL:
+                out.append(dict(_place(t), kind=f"{start - u:.2f} mm left of its note's text"))
     return out
 
 
@@ -334,7 +371,8 @@ def check(svg: str) -> dict:
                     and not any(n < f["i"] < c["i"] and _holds(f, c["ring"]) for f in fills):
                 breaks.append(dict(_place(t) if t else dict(text="", at=[]), line=el[n][:80]))
                 break
-    return dict(line_hits=hits, text_overlaps=overlaps, mask_breaks=breaks, leader_faults=leader_faults(sh), frame_overruns=frame_overruns(sh))
+    return dict(line_hits=hits, text_overlaps=overlaps, mask_breaks=breaks, leader_faults=leader_faults(sh), frame_overruns=frame_overruns(sh),
+                indent_faults=indent_faults(sh))
 
 
 def leader_faults(sh: dict) -> list[dict]:
@@ -386,9 +424,9 @@ def main(argv: list[str]) -> int:
     for f in sheets:
         r = check(f.read_text(encoding="utf-8"))
         report[f.stem] = r
-        nh, no, nm, nl, nf = (len(r[k]) for k in CLASSES)
-        bad += bool(nh or no or nm or nl or nf)
-        print(f"{f.stem}: {nh} line hits, {no} text overlaps, {nm} mask breaks, {nl} leader faults, {nf} frame overruns")
+        nh, no, nm, nl, nf, ni = (len(r[k]) for k in CLASSES)
+        bad += bool(nh or no or nm or nl or nf or ni)
+        print(f"{f.stem}: {nh} line hits, {no} text overlaps, {nm} mask breaks, {nl} leader faults, {nf} frame overruns, {ni} indent faults")
         for h in r["line_hits"]:
             print(f"  line hit: {h['text']!r} at {h['at']} by {h['line']}")
         for o in r["text_overlaps"]:
@@ -399,11 +437,14 @@ def main(argv: list[str]) -> int:
             print(f"  leader fault: {x['kind']} at {x['at']} ({x['names']}): {x['line']}")
         for x in r["frame_overruns"]:
             print(f"  frame overrun: {x['text']!r} at {x['at']} {x['kind']}")
+        for x in r["indent_faults"]:
+            print(f"  indent fault: {x['text']!r} at {x['at']} {x['kind']}")
     if len(argv) > 1:
         Path(argv[1]).write_text(json.dumps(report, indent=1), encoding="utf-8")
     n = {k: sum(len(r[k]) for r in report.values()) for k in CLASSES}
     print(f"overrun: {n['line_hits']} line hits, {n['text_overlaps']} text overlaps, {n['mask_breaks']} mask breaks, "
-          f"{n['leader_faults']} leader faults and {n['frame_overruns']} frame overruns on {len(sheets)} sheets, {bad} with any")
+          f"{n['leader_faults']} leader faults, {n['frame_overruns']} frame overruns and {n['indent_faults']} indent faults on {len(sheets)} "
+          f"sheets, {bad} with any")
     return 1 if bad else 0
 
 

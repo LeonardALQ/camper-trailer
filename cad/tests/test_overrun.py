@@ -10,7 +10,8 @@ letters. Its fifth class finds a text whose letters run past the frame, 2 mm pas
 block, while the title block's own texts pass. Each text is measured where CairoSVG draws it: its letters' box holds
 the ink the PNG shows, for capitals, lower case, digits and mixed runs at the sheets' sizes, at each anchor, a line
 through a word's last letter is a hit, and a line of a note that starts with spaces is drawn and checked from its
-anchor (fx18-ovr)."""
+anchor (fx18-ovr). sheet.notes wraps each note by its measured width inside its column and hangs its continuation lines
+from its text, and the sixth class finds a continuation line drawn under its note's number (fx20-dwg)."""
 import io
 import re
 
@@ -30,7 +31,7 @@ def _sheet() -> S.Sheet:
     return sh
 
 
-def _counts(svg: str) -> tuple[int, int, int, int, int]:
+def _counts(svg: str) -> tuple[int, int, int, int, int, int]:
     r = check(svg)
     return tuple(len(r[k]) for k in CLASSES)
 
@@ -42,25 +43,25 @@ def _move(svg: str, text: str, x: float, y: float) -> str:
 
 def test_a_clean_sheet_passes():
     svg = _sheet().svg()
-    assert 'class="masked"' in svg and _counts(svg) == (0, 0, 0, 0, 0)
+    assert 'class="masked"' in svg and _counts(svg) == (0, 0, 0, 0, 0, 0)
 
 
 def test_a_label_moved_onto_a_line_is_a_line_hit():
     svg = _move(_sheet().svg(), "MOVED", 98.0, S.Sheet.H - 40.0)
-    assert _counts(svg) == (1, 0, 0, 0, 0)
+    assert _counts(svg) == (1, 0, 0, 0, 0, 0)
     assert check(svg)["line_hits"][0]["text"] == "MOVED"
 
 
 def test_a_cell_text_across_a_line_is_a_line_hit():
     sh = _sheet()
     sh.text(97, 30, "ACROSS", 2.0, cell=True)
-    assert _counts(sh.svg(clear=False)) == (1, 0, 0, 0, 0)
+    assert _counts(sh.svg(clear=False)) == (1, 0, 0, 0, 0, 0)
 
 
 def test_a_dot_on_a_label_is_a_line_hit():
     sh = _sheet()
     sh.circle(152, 40.6, 0.32, "fill")
-    assert _counts(sh.svg(clear=False)) == (1, 0, 0, 0, 0)
+    assert _counts(sh.svg(clear=False)) == (1, 0, 0, 0, 0, 0)
 
 
 def test_a_cell_text_under_a_line_through_its_capitals_tops_is_a_line_hit():
@@ -68,16 +69,16 @@ def test_a_cell_text_under_a_line_through_its_capitals_tops_is_a_line_hit():
     sh = _sheet()
     sh.text(110, 70, "TOPS", 2.0, cell=True)
     sh.line(105, 70 + 0.68 * 2.0, 130, 70 + 0.68 * 2.0, "thin")
-    assert _counts(sh.svg(clear=False)) == (1, 0, 0, 0, 0)
+    assert _counts(sh.svg(clear=False)) == (1, 0, 0, 0, 0, 0)
 
 
 def test_labels_on_each_other_and_under_a_fill_are_overlaps():
     sh = _sheet()
     sh.text(152, 40.3, "OVER", 2.0)
-    assert _counts(sh.svg(clear=False)) == (0, 1, 0, 0, 0)
+    assert _counts(sh.svg(clear=False)) == (0, 1, 0, 0, 0, 0)
     sh = _sheet()
     sh.fillrect(108, 39, 114, 45)
-    assert _counts(sh.svg(clear=False)) == (0, 1, 0, 0, 0)
+    assert _counts(sh.svg(clear=False)) == (0, 1, 0, 0, 0, 0)
 
 
 def test_a_fill_over_the_tops_of_the_capitals_is_an_overlap():
@@ -85,7 +86,7 @@ def test_a_fill_over_the_tops_of_the_capitals_is_an_overlap():
     sh = _sheet()
     sh.text(200, 100, "DAY", 2.0)
     sh.fillrect(195, 100 + 0.86 * S.CAPS * 2.0, 215, 104)
-    assert _counts(sh.svg(clear=False)) == (0, 1, 0, 0, 0)
+    assert _counts(sh.svg(clear=False)) == (0, 1, 0, 0, 0, 0)
 
 
 @pytest.mark.parametrize("apart", [0.58, 0.65, 0.72])
@@ -94,14 +95,14 @@ def test_lines_of_capitals_set_too_close_are_an_overlap(apart):
     sh = _sheet()
     sh.text(200, 150, "PLATE TO THE WEBS", 2.0)
     sh.text(200, 150 + apart * 2.0, "PLATE TO THE WEBS", 2.0)
-    assert _counts(sh.svg(clear=False)) == (0, 1, 0, 0, 0)
+    assert _counts(sh.svg(clear=False)) == (0, 1, 0, 0, 0, 0)
 
 
 def test_lines_of_capitals_a_capital_apart_pass():
     sh = _sheet()
     sh.text(200, 150, "PLATE TO THE WEBS", 2.0)
     sh.text(200, 150 + 0.75 * 2.0, "PLATE TO THE WEBS", 2.0)
-    assert _counts(sh.svg()) == (0, 0, 0, 0, 0)
+    assert _counts(sh.svg()) == (0, 0, 0, 0, 0, 0)
 
 
 @pytest.mark.parametrize("sty", ["thick", "medium"])
@@ -111,7 +112,7 @@ def test_a_mask_over_a_heavy_outline_is_a_mask_break(sty):
     sh.rect(240, 180, 280, 200, sty)
     sh.text(236, 190, "OUTLINE", 2.0)
     svg = sh.svg(clear=False)
-    assert _counts(svg) == (0, 0, 1, 0, 0) and check(svg)["mask_breaks"][0]["text"] == "OUTLINE"
+    assert _counts(svg) == (0, 0, 1, 0, 0, 0) and check(svg)["mask_breaks"][0]["text"] == "OUTLINE"
 
 
 def test_a_mask_over_a_thin_dimension_line_passes():
@@ -120,7 +121,7 @@ def test_a_mask_over_a_thin_dimension_line_passes():
     S.hdim(sh, 240, 230, 300, 230, 222, "60", size=2.0)
     sh.text(243, 221.3, "ACROSS", 2.0)
     svg = sh.svg()
-    assert svg.count('class="masked"') == 2 and _counts(svg) == (0, 0, 0, 0, 0)
+    assert svg.count('class="masked"') == 2 and _counts(svg) == (0, 0, 0, 0, 0, 0)
 
 
 def test_a_leader_on_what_its_label_names_passes():
@@ -130,7 +131,7 @@ def test_a_leader_on_what_its_label_names_passes():
     sh.text(275, 112, "LOCKER", 2.0)
     sh.lead([(275, 112), (262, 105)], names=(250, 100, 270, 110))
     sh.circle(262, 105, 0.3, "fill")
-    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 0, 0)
+    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 0, 0, 0)
 
 
 def test_a_leader_off_what_its_label_names_is_a_leader_fault():
@@ -140,7 +141,7 @@ def test_a_leader_off_what_its_label_names_is_a_leader_fault():
     sh.text(275, 116, "LOCKER", 2.0)
     sh.lead([(275, 116), (273, 112)], names=(250, 100, 270, 110))
     svg = sh.svg(clear=False)
-    assert _counts(svg) == (0, 0, 0, 1, 0) and check(svg)["leader_faults"][0]["kind"] == "off what it names"
+    assert _counts(svg) == (0, 0, 0, 1, 0, 0) and check(svg)["leader_faults"][0]["kind"] == "off what it names"
 
 
 def test_two_leaders_that_cross_are_a_leader_fault():
@@ -149,7 +150,7 @@ def test_two_leaders_that_cross_are_a_leader_fault():
     sh.lead([(250, 150), (262, 140)], names=(250, 150))
     sh.lead([(262, 150), (250, 140)], names=(262, 150))
     svg = sh.svg(clear=False)
-    assert _counts(svg) == (0, 0, 0, 1, 0) and check(svg)["leader_faults"][0]["kind"] == "crosses or touches a leader"
+    assert _counts(svg) == (0, 0, 0, 1, 0, 0) and check(svg)["leader_faults"][0]["kind"] == "crosses or touches a leader"
 
 
 def test_a_leader_ending_on_another_is_a_leader_fault():
@@ -157,7 +158,7 @@ def test_a_leader_ending_on_another_is_a_leader_fault():
     sh = _sheet()
     sh.lead([(250, 150), (262, 140)], names=(250, 150))
     sh.lead([(262, 150), (256.1, 145.1)], names=(262, 150))
-    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 1, 0)
+    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 1, 0, 0)
 
 
 def test_a_leader_through_a_symbol_is_a_leader_fault():
@@ -166,7 +167,7 @@ def test_a_leader_through_a_symbol_is_a_leader_fault():
     sh.circle(260, 200, 0.9, "medium")
     sh.lead([(255, 200), (265, 200)], names=(265, 200))
     svg = sh.svg(clear=False)
-    assert _counts(svg) == (0, 0, 0, 1, 0) and check(svg)["leader_faults"][0]["kind"] == "through a symbol"
+    assert _counts(svg) == (0, 0, 0, 1, 0, 0) and check(svg)["leader_faults"][0]["kind"] == "through a symbol"
 
 
 def test_a_tag_leader_from_the_gland_it_names_passes():
@@ -175,7 +176,7 @@ def test_a_tag_leader_from_the_gland_it_names_passes():
     sh.circle(260, 230, 0.9, "medium")
     sh.lead([(260, 230), (266, 236)], names=(260, 230))
     sh.circle(260, 230, 0.32, "fill")
-    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 0, 0)
+    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 0, 0, 0)
 
 
 def test_a_letter_on_its_symbols_white_disc_passes():
@@ -186,7 +187,7 @@ def test_a_letter_on_its_symbols_white_disc_passes():
     sh.el.append(f'<circle cx="300.00" cy="{S.Sheet.H - 250:.2f}" r="1.30" fill="#fff" stroke="#000" stroke-width="0.35"/>')
     sh.text(300, 250 - 0.45, "A", 1.1, "middle", bold=True)
     svg = sh.svg(clear=False)
-    assert not re.search(r'<text class="masked"[^>]*>A</text>', svg) and _counts(svg) == (0, 0, 0, 0, 0)
+    assert not re.search(r'<text class="masked"[^>]*>A</text>', svg) and _counts(svg) == (0, 0, 0, 0, 0, 0)
 
 
 def _weld_arrow(sh, tip, elbow):
@@ -204,7 +205,7 @@ def test_a_weld_symbols_arrow_across_a_leader_is_a_leader_fault():
     _weld_arrow(sh, (250, 150), (262, 140))
     sh.lead([(262, 150), (250, 140)], names=(262, 150))
     svg = sh.svg(clear=False)
-    assert svg.count('class="arrow"') == 1 and _counts(svg) == (0, 0, 0, 1, 0)
+    assert svg.count('class="arrow"') == 1 and _counts(svg) == (0, 0, 0, 1, 0, 0)
     assert check(svg)["leader_faults"][0]["kind"] == "crosses or touches a leader"
 
 
@@ -212,7 +213,7 @@ def test_two_arrows_that_cross_are_a_leader_fault():
     sh = _sheet()
     _weld_arrow(sh, (250, 150), (262, 140))
     _weld_arrow(sh, (262, 150), (250, 140))
-    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 1, 0)
+    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 1, 0, 0)
 
 
 def test_a_dimension_lines_arrowheads_mark_no_arrow():
@@ -252,7 +253,7 @@ def test_a_letter_registered_on_its_white_disc_stays_in_its_symbol():
     sh = _sheet()
     _letter_on_a_line(sh, registered=True)
     svg = sh.svg()
-    assert not sh.moves and 'data-in="' in svg and _counts(svg) == (0, 0, 0, 0, 0)
+    assert not sh.moves and 'data-in="' in svg and _counts(svg) == (0, 0, 0, 0, 0, 0)
 
 
 def test_a_letter_moved_out_of_its_symbol_in_the_code_is_a_leader_fault():
@@ -260,8 +261,8 @@ def test_a_letter_moved_out_of_its_symbol_in_the_code_is_a_leader_fault():
     sh = _sheet()
     S.rev_tag(sh, 340, 120, "B")
     svg = sh.svg(clear=False)
-    assert _counts(svg) == (0, 0, 0, 0, 0)
-    assert _counts(_move(svg, "B", 343.5, S.Sheet.H - 120.0 + 0.7)) == (0, 0, 0, 1, 0)
+    assert _counts(svg) == (0, 0, 0, 0, 0, 0)
+    assert _counts(_move(svg, "B", 343.5, S.Sheet.H - 120.0 + 0.7)) == (0, 0, 0, 1, 0, 0)
 
 
 def test_a_weld_arrow_drawn_as_a_leader_counts_once_and_ends_on_its_all_round_circle():
@@ -275,7 +276,7 @@ def test_a_weld_arrow_drawn_as_a_leader_counts_once_and_ends_on_its_all_round_ci
     sh.line(elbow[0], elbow[1], elbow[0] + 16, elbow[1], "medium")
     sh.circle(elbow[0], elbow[1], r, "thin")
     svg = sh.svg(clear=False)
-    assert svg.count('class="leader"') == 1 and 'class="arrow"' not in svg and _counts(svg) == (0, 0, 0, 0, 0)
+    assert svg.count('class="leader"') == 1 and 'class="arrow"' not in svg and _counts(svg) == (0, 0, 0, 0, 0, 0)
 
 
 def _flow(sh, pts, level=None):
@@ -293,7 +294,7 @@ def test_a_polyline_flow_is_read_as_an_arrow_and_its_crossing_fails():
     _flow(sh, [(240, 150), (240, 180), (280, 180)])
     _flow(sh, [(230, 165), (260, 165)])
     svg = sh.svg(clear=False)
-    assert svg.count('class="arrow"') == 2 and _counts(svg) == (0, 0, 0, 1, 0)
+    assert svg.count('class="arrow"') == 2 and _counts(svg) == (0, 0, 0, 1, 0, 0)
 
 
 def test_flows_at_different_levels_may_cross_and_one_level_may_not():
@@ -303,7 +304,7 @@ def test_flows_at_different_levels_may_cross_and_one_level_may_not():
         sh = _sheet()
         _flow(sh, [(240, 150), (240, 180), (280, 180)], lv[0])
         _flow(sh, [(230, 165), (260, 165)], lv[1])
-        assert _counts(sh.svg(clear=False)) == (0, 0, 0, faults, 0), lv
+        assert _counts(sh.svg(clear=False)) == (0, 0, 0, faults, 0, 0), lv
 
 
 def test_a_flow_branching_off_another_at_a_tee_passes():
@@ -311,7 +312,7 @@ def test_a_flow_branching_off_another_at_a_tee_passes():
     sh = _sheet()
     _flow(sh, [(240, 150), (240, 180), (260, 180)])
     _flow(sh, [(240, 165), (260, 165)])
-    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 0, 0)
+    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 0, 0, 0)
 
 
 def test_a_head_set_along_its_line_marks_the_line():
@@ -331,7 +332,7 @@ def test_a_leader_through_a_hardpoints_mark_is_a_leader_fault():
     sh.el[-1] = sh.el[-1][:-2] + ' class="mark"/>'
     sh.text(240, 160, "TAG", 2.0)
     sh.lead([(244, 159), (276, 140)], names=(276, 140))
-    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 1, 0)
+    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 1, 0, 0)
 
 
 def test_two_flows_drawn_over_each_other_are_no_tee_at_any_level():
@@ -346,7 +347,7 @@ def test_two_flows_drawn_over_each_other_are_no_tee_at_any_level():
     sh = _sheet()
     _flow(sh, [(240, 150), (240, 190)], "floor")
     _flow(sh, [(240, 170), (262, 170)], "floor")
-    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 0, 0)
+    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 0, 0, 0)
 
 
 def test_an_end_that_joins_a_run_along_it_is_no_tee():
@@ -360,7 +361,7 @@ def test_an_end_that_joins_a_run_along_it_is_no_tee():
     _flow(sh2, [(240, 150), (240, 190)])
     sh2.path([(262, 165), (240, 165)], "thin")
     S.mark_flow(sh2)
-    assert _counts(sh.svg(clear=False))[3] == 1 and _counts(sh2.svg(clear=False)) == (0, 0, 0, 0, 0)
+    assert _counts(sh.svg(clear=False))[3] == 1 and _counts(sh2.svg(clear=False)) == (0, 0, 0, 0, 0, 0)
 
 
 def test_a_flow_line_without_a_head_is_read_with_the_arrows():
@@ -371,7 +372,7 @@ def test_a_flow_line_without_a_head_is_read_with_the_arrows():
     S.mark_flow(sh)
     _flow(sh, [(240, 150), (240, 180), (280, 180)])
     svg = sh.svg(clear=False)
-    assert svg.count('class="arrow"') == 2 and _counts(svg) == (0, 0, 0, 1, 0)
+    assert svg.count('class="arrow"') == 2 and _counts(svg) == (0, 0, 0, 1, 0, 0)
 
 
 def _title_block(sh: S.Sheet) -> None:
@@ -392,7 +393,7 @@ def test_a_framed_sheet_and_its_title_blocks_own_texts_pass():
     sh = _framed()
     sh.text(22, 280, "NOTES", 2.5, bold=True)
     sh.text(22, 276, "1. A NOTE INSIDE THE FRAME", 2.0)
-    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 0, 0)
+    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 0, 0, 0)
 
 
 def test_a_text_2_mm_past_the_frame_is_a_frame_overrun():
@@ -401,14 +402,14 @@ def test_a_text_2_mm_past_the_frame_is_a_frame_overrun():
     sh = _framed()
     sh.text(410.35 + 2.0, 150, "THE ARM. THE SEAT WEIGHS 0.057 kg ON K-13", 1.2, "end")
     r = check(sh.svg(clear=False))
-    assert _counts(sh.svg(clear=False)) == (1, 0, 0, 0, 1) and r["frame_overruns"][0]["kind"] == "past the frame by 2.70 mm"
+    assert _counts(sh.svg(clear=False)) == (1, 0, 0, 0, 1, 0) and r["frame_overruns"][0]["kind"] == "past the frame by 2.70 mm"
 
 
 def test_a_text_in_the_margin_is_a_frame_overrun():
     """A label set below the frame, where no line crosses it, fails by the fifth class alone."""
     sh = _framed()
     sh.text(100, 5.0, "STRAY", 2.0)
-    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 0, 1)
+    assert _counts(sh.svg(clear=False)) == (0, 0, 0, 0, 1, 0)
 
 
 def test_a_label_into_the_title_block_is_a_frame_overrun():
@@ -417,12 +418,12 @@ def test_a_label_into_the_title_block_is_a_frame_overrun():
     sh = _framed()
     sh.text(300, 65.2, "INTO THE BLOCK", 2.0)
     r = check(sh.svg(clear=False))
-    assert _counts(sh.svg(clear=False)) == (1, 0, 0, 0, 1) and r["frame_overruns"][0]["kind"] == "into the title block"
+    assert _counts(sh.svg(clear=False)) == (1, 0, 0, 0, 1, 0) and r["frame_overruns"][0]["kind"] == "into the title block"
     sh = S.Sheet()
     S.frame(sh)
     sh.text(300, 65.2, "INTO THE BLOCK", 2.0)
     _title_block(sh)
-    assert _counts(sh.svg(clear=False)) == (0, 1, 0, 0, 1)
+    assert _counts(sh.svg(clear=False)) == (0, 1, 0, 0, 1, 0)
 
 
 def test_a_line_through_a_words_last_letter_is_a_line_hit():
@@ -432,7 +433,7 @@ def test_a_line_through_a_words_last_letter_is_a_line_hit():
     sh.text(110, 70, "HELD", 2.0, cell=True)
     x = 110 + S.text_extent("HELD", 2.0).right - 0.05
     sh.line(x, 66, x, 74, "thin")
-    assert _counts(sh.svg(clear=False)) == (1, 0, 0, 0, 0)
+    assert _counts(sh.svg(clear=False)) == (1, 0, 0, 0, 0, 0)
 
 
 def test_a_note_line_that_starts_with_spaces_is_checked_where_it_is_drawn():
@@ -444,7 +445,7 @@ def test_a_note_line_that_starts_with_spaces_is_checked_where_it_is_drawn():
     sh = _sheet()
     sh.text(110, 70, t["t"], 2.0, cell=True)
     sh.line(110.3, 66, 110.3, 74, "thin")
-    assert _counts(sh.svg(clear=False)) == (1, 0, 0, 0, 0)
+    assert _counts(sh.svg(clear=False)) == (1, 0, 0, 0, 0, 0)
 
 
 RUNS = ["EACH ARM IS 300 x 25 x 3 mm 316 STRIP, ITS TORSION SPRING", "EEEEEEEEEEEEEEEEEEEE", "WAVY TAJ AVOW LYTTA",
@@ -489,4 +490,61 @@ def test_a_balloon_too_small_for_its_letters_grows_to_clear_them():
     S.balloon(sh, (250, 150), (262, 160), "CM", 2.4)
     svg = sh.svg(clear=False)
     r = float(re.search(r'<circle cx="262.00" cy="[-\d.]+" r="([\d.]+)"', svg)[1])
-    assert 2.4 < r < 3.0 and _counts(svg) == (0, 0, 0, 0, 0)
+    assert 2.4 < r < 3.0 and _counts(svg) == (0, 0, 0, 0, 0, 0)
+
+
+_NOTE = re.compile(r'<text x="([-\d.]+)" y="([-\d.]+)" font-size="([\d.]+)"[^>]*data-note="([\d.]+)"[^>]*>(.*?)</text>')
+WIDE = "MOW THE WIDE DAMP MEADOW WHEN THE DEW HAS GONE, AND WIND THE WOMBAT'S WOOL ROUND THE MOUNT"
+
+
+def _note_lines(svg: str) -> list[dict]:
+    """The lines sheet.notes drew, in order: each one's anchor, size, note (data-note) and text."""
+    return [dict(x=float(m[1]), y=float(m[2]), s=float(m[3]), note=m[4], t=m[5]) for m in _NOTE.finditer(svg)]
+
+
+def test_notes_wrap_by_width_and_hang_their_continuation_lines_from_their_text():
+    """sheet.notes wraps each note by its measured width, so a note of wide capitals keeps inside its column, where 40
+    of its letters run past it, and draws each continuation line at x plus the measured width of its "N. " with no
+    leading spaces. Rendered as sheet.write renders the PNG, each continuation line's ink starts where its note's text
+    starts, clear of the number, and the check passes the sheet (fx20-dwg)."""
+    import cairosvg
+    import numpy as np
+    from PIL import Image
+    x, size, width = 30.0, 2.0, 40
+    room = width * S.CH * size
+    assert S.text_mm(WIDE[:40], size) > room
+    sh = S.Sheet()
+    S.notes(sh, x, 200, ["A SHORT NOTE", WIDE, "THE LAST NOTE " * 5], size=size, width_chars=width)
+    svg = sh.svg(clear=False)
+    assert _counts(svg) == (0, 0, 0, 0, 0, 0)
+    lines = _note_lines(svg)
+    assert [t["note"] for t in lines].count("1.2") > 2
+    px = S.PNG_PX / S.Sheet.W
+    a = np.asarray(Image.open(io.BytesIO(cairosvg.svg2png(bytestring=svg.encode("utf-8"), output_width=S.PNG_PX))).convert("L")) < 250
+    for t in lines:
+        number = t["note"].split(".")[1] + ". "
+        hang = S.pen_mm(number, size)
+        first = t["t"].startswith(number)
+        assert t["x"] == pytest.approx(x if first else x + hang, abs=0.006)
+        assert t["x"] + S.text_mm(t["t"], size) <= x + hang + room + 0.01
+        if not first:
+            r0, r1 = int((t["y"] - S.CAPS * size) * px), int(t["y"] * px)
+            left = np.where(a[r0:r1].any(axis=0))[0][0] / px
+            assert x + hang - 1 / px <= left <= x + hang + 0.15 * size, (t["t"], left)
+
+
+def test_a_continuation_line_drawn_under_its_notes_number_is_an_indent_fault():
+    """A note's continuation line drawn from the note's own x, as sheet.notes drew it with three leading spaces, which
+    CairoSVG drops, starts left of the note's text by the width of its "1. ": an indent fault, and the only fault."""
+    sh = S.Sheet()
+    S.notes(sh, 30, 200, ["THE FIRST LINE OF A NOTE THAT RUNS ON TO A SECOND LINE"], size=2.0, width_chars=30)
+    svg = sh.svg(clear=False)
+    assert _counts(svg) == (0, 0, 0, 0, 0, 0)
+
+    def flush(m):
+        if m[5].startswith("1. "):
+            return m[0]
+        return m[0].replace(f'x="{m[1]}"', 'x="30.00"', 1).replace(f">{m[5]}<", f">   {m[5]}<", 1)
+    old = _NOTE.sub(flush, svg)
+    assert _counts(old) == (0, 0, 0, 0, 0, 1)
+    assert check(old)["indent_faults"][0]["kind"] == f"{S.pen_mm('1. ', 2.0):.2f} mm left of its note's text"

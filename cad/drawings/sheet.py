@@ -25,6 +25,7 @@ except ImportError:  # pragma: no cover
 GAP, EXT, TXT = 1.0, 2.0, 2.5  # projection-line gap and overshoot, dimension text height (mm)
 FONT, PNG_PX = "DejaVu Sans", 3508
 CAPS = 0.73       # DejaVu Sans capitals stand 1,493 of its 2,048 units, 0.729 of the size, over the baseline
+CH = 0.636        # DejaVu Sans's 0 advances 1,303 of its 2,048 units, 0.636 of the size: the ch a note's column is given in
 HEAVY = 0.35      # mm: a line this wide or wider (medium, symbol, thick, cut, frame, fail) is never broken by a text's mask
 SYMBOL_R = 3.5   # mm: a circle this small is a symbol (gland, mount, balloon), never broken for a label, so its label moves
 # REV-01's columns, their left edges from the table's left edge (mm), its text height and each cell's inset
@@ -282,6 +283,19 @@ def text_mm(s, size, bold=False) -> float:
     and the PNG's hinted ones."""
     e = text_extent(str(s), float(size), bool(bold))
     return e.end - e.start
+
+
+def pen_mm(s, size, bold=False) -> float:
+    """How far CairoSVG's pen moves over `s` drawn inside a line, mm: its letters' advances with its spaces, each run of
+    them as one, as `drawn` gives them before it trims the ends, the wider of the PDF's unhinted and the PNG's hinted
+    metrics. A note's "12. " is its number, its full stop and the space after them (`notes`)."""
+    s = re.sub(" +", " ", str(s))
+    out = 0.0
+    for png in (False, True):
+        c = _metrics(png, bold)
+        c.set_font_size(size if png else 100.0)
+        out = max(out, c.text_extents(s)[4] * (1.0 if png else size / 100.0))
+    return out
 
 
 def wrap_mm(s, width, size, bold=False) -> list[str]:
@@ -1585,21 +1599,24 @@ def parts_list(sh, rows, x0=230.0, x1=410.0, ybase=66.0, row_h=4.6, title="PARTS
 
 
 def notes(sh, x, y, lines, title="NOTES", size=2.0, width_chars=95):
-    """Numbered, wrapped notes. Returns (bottom y, [baseline y of each note's first line])."""
+    """Numbered notes under a title. Each note is wrapped by its measured width (wrap_mm) so that its text takes at most
+    `width_chars` ch, CH of the size each, after its number, and every line ends inside x plus the width of "N. " plus
+    that room. A note's first line opens with its number, "N. ", and each continuation line is drawn at x plus the
+    measured width of "N. " (pen_mm) with no leading spaces, which CairoSVG would drop, so the note's text hangs clear
+    of its number (fx20-dwg). Each line is marked with its note (data-note) for the overrun check's indent rule.
+    Returns (bottom y, [baseline y of each note's first line])."""
     sh.text(x, y, title, 2.5, bold=True)
-    yy = y - 4.2
-    starts = []
+    sh.note_blocks = block = getattr(sh, "note_blocks", 0) + 1
+    room, yy, starts = width_chars * CH * size, y - 4.2, []
     for i, t in enumerate(lines, 1):
         starts.append(yy)
-        words, cur, first = t.split(), "", True
-        for w in words:
-            if len(cur) + len(w) + 1 > width_chars:
-                sh.text(x, yy, (f"{i}. " if first else "   ") + cur, size)
+        number = f"{i}. "
+        hang = pen_mm(number, size)
+        for k, part in enumerate(wrap_mm(t, room, size) or [""]):
+            if k:
                 yy -= size + 1.0
-                cur, first = w, False
-            else:
-                cur = (cur + " " + w).strip()
-        sh.text(x, yy, (f"{i}. " if first else "   ") + cur, size)
+            sh.text(x + hang if k else x, yy, part if k else number + part, size)
+            sh.el[-1] = sh.el[-1].replace(">", f' data-note="{block}.{i}">', 1)
         yy -= size + 1.3
     return yy, starts
 
