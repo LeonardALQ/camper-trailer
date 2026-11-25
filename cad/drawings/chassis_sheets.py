@@ -709,7 +709,7 @@ def ct103(prj, model, bom, checks, reg, dwg):
     sh.path([(m - 5, zb - 2), (m - 3, zb - 6), (m + 3, zb - 6), (m + 5, zb - 2)], "medium")
     weld_symbol(sh, (x1, zb), (cx + 4, zb - 10), "5", both=True, length="100", note="ALONG THE CM")
     note = (f"PAD {pad['l']:g}x{pad['w']:g}x{pad['t']:g} WITH A LOCATING CUP, {off:g} mm OFF THE RAIL'S INNER FACE, CLEAR OF "
-            f"THE HINGE CHEEK BEYOND IT. NO WELD ON THE RAIL'S BOTTOM FACE (FAT-11). {_forces()['pad']:.1f} kN ON ONE PAD.")
+            f"THE HINGE CHEEK BEYOND IT. NO WELD ON THE RAIL'S BOTTOM FACE (FAT-11). {chs['results']['pad_n']['pad_n'] / 1000:.1f} kN ON ONE PAD (LOC-04).")
     for i, t in enumerate(S.wrap_mm(note, 44.0, 1.5)):
         sh.text(cx - 32, zb - 18 - 3 * i, t, 1.5)
     # ---- H: rear recovery tongue, plan, 1:10

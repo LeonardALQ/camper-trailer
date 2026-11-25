@@ -5,7 +5,11 @@
 # cad/chassis_fea.py analyses them. Sections come from data/chassis/sections.yaml (report 11's table).
 id: ASM-CH
 name: Chassis and drawbar
-revision: N     # N, 25 Nov 2026: LC8a reacted by the ground at the tyres, or with one wheel held fast (LC8a reaction), the XT
+revision: O     # O, 25 Nov 2026: LC8a with the trailer's weight and the arms' droop limits (xt_arms), the hinge cheeks pinned
+                # at their fillets to the hinge bar with a flare-bevel corner weld, the gussets cut to bear, the shear panel's
+                # pieces as angles, both front hinges' front cheeks and PB-2's rear ends 200 mm ahead of the front hinge
+                # crossmember (plan_braces `rear_ahead`, I2-92 to I2-95).
+                # N, 25 Nov 2026: LC8a reacted by the ground at the tyres, or with one wheel held fast (LC8a reaction), the XT
                 # hinges tied to their crossmembers in the one frame model with two hinge cheeks each (CH-P16) and the gussets
                 # either side (CH-P08), the hinge crossmembers RHS 150 x 50 x 4 and 5 with 8 mm fillets at the XT crossmembers'
                 # ends (I2-88), and the rear tank's bay a 3 mm steel shear panel on welded angles (shear_panels, CH-P17, I2-87).
