@@ -1,5 +1,5 @@
 # Every cable and pipe of the home trailer from its source to its load (H28), for the 3D services models, the cable
-# and pipe schedules, CT-602, CT-612 and the checks SVC-01 to SVC-12. cad/routes.py resolves it on the solved layout.
+# and pipe schedules, CT-602, CT-612 and the checks SVC-01 to SVC-13. cad/routes.py resolves it on the solved layout.
 #
 # Positions are DIM-01, mm: X from the ball rearward, Y from the centreline with the road side positive, Z up from the
 # ground. A path point is three expressions over the layout's parameters, the envelope boxes (EL_04.x0 is the front
@@ -264,6 +264,12 @@ checks:
     severity: fail
     why: "A cable left hanging chafes on the chassis and fatigues at its terminals on corrugated roads. A cable is held inside a chassis member it is threaded through, by a clip, saddle or tie base on a part it runs along within 30 mm of the part's face, on a cleat, tray or saddle the design adds (rules.supports and the SP fixtures), in the board cabinet, a 230 V conduit, a box it ends at, a gland or a frame, or by the loom it shares a way with. Inside a cabinet only a panel it is clipped to holds it, within the same 30 mm, and under the floor a 230 V cable is held only inside the conduit modelled for it. The longest stretch between held points is its unsupported span."
     source: "VSB1 (Building small trailers) section 7.1: trailer wiring supported at intervals of at most 600 mm. The 30 mm reach of a clip is the design's own (est.)"
+  - id: SVC-13
+    title: Every run keeps 20 mm from the XT kit's parts between the rails at Cruisemaster's places (reported)
+    kind: kit_clearance
+    severity: report
+    why: "SVC-01's rule against the kit's parts as 33XT AIR sheets 2 to 4 place them (est., Chassis.xt_parts): the hinge bars and the arms' hinge plates under the hinge crossmembers, the airbags over their travel under their top brackets on the rails' inner faces, and the shocks over the arm's travel with their brackets. The runs under the floor were laid round an arm drawn outboard of the rail, so the row is reported until they are laid round the kit as Cruisemaster places it (I2-97). A lead's part that rides on its arm is FIT-05's."
+    source: "H27 and H28 for the 20 mm, Cruisemaster's 33XT AIR installation guide rev 3 (27 Jul 2021) sheets 2 to 4 for the places, scaled (est.)"
 
 # The priced quantities the routed ones are compared with on the Electrical and Plumbing pages: BD-11's price items
 # (data/assemblies/trailer.yaml) and LGT-01's lamp loom (data/trailer-parts.yaml). Where the routed quantity is larger,
@@ -1122,7 +1128,7 @@ runs:
      serves: [brakes], along: [DB-RA, DB-RB, CH-P04, RL-R, RS-R, CM-04, UF-03, CM-05], from: {line: DB-PL, at: [DB_PL.x1, DB_PL.cy + 23, DB_PL.z0 + 10.5]},
      path: [[880, 365, 470], [1430, 516.7, .], [1700, 611.8, .], [1790, 662, .], [2030, 690, .], [2270, ., .], [2400, 668, 648.5], [2452, 630, 649.5], [2495, 605, 650],
             [CM_04.x0 - 351, ., .], [CM_04.x0 - 291, 615, 648], [CM_04.x0 - 250, 634.5, 647], [CM_04.x0 - 190, 694.5, 645], [., ., RL_R.z0 - 37], [., RL_R.y0 - 47.5, .],
-            [CM_04.x0 - 10, ., .], [CM_04.x0 + 40, RL_R.y0 - 27.5, tank_z0 - 33], [UF_01.x1 - 46, ., .], [., 60, .]], to: {line: BR-TSC, at: [BR_TSC.x0, ., .]}}
+            [CM_04.x0 - 35, ., RL_R.z0 - 12.5], [., 130, .], [., 60, tank_z0 - 33]], to: {line: BR-TSC, at: [BR_TSC.x0, ., .]}}
   - {id: K-11, system: dc12, kind: tsc, amps: 4, volts: 12, feeds: "Bosch TSC to the road side drums' magnets and ABS sensors: its axle harness's two wheel bundles to their junction, each with one magnet's 4.0 A", protection: "The TSC's outputs",
      serves: [brakes], along: [UF-03, CM-05], from: {line: BR-TSC, at: [BR_TSC.cx, BR_TSC.y1, BR_TSC.z0 + 5]}, to: {line: BR-DR, at: [., BR_DR.y0, .]}}
   - {id: K-12, system: dc12, kind: tsc, amps: 4, volts: 12, feeds: "Bosch TSC to the kerb side drums' magnets and ABS sensors: its axle harness's two wheel bundles to their junction, each with one magnet's 4.0 A", protection: "The TSC's outputs",

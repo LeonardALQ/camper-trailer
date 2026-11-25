@@ -27,24 +27,58 @@ def _from_front(fr):
     return bx, cy, (lambda u: fr.W - u) if flip else (lambda u: u)
 
 
+def _world(fr):
+    """Box and cylinder makers in the model's own coordinates (x, y, z), for parts placed from the chassis data."""
+    z0 = fr.bx[2]
+
+    def wbox(q):
+        (ua, va), (ub, vb) = fr.uv(q[0], q[1]), fr.uv(q[3], q[4])
+        return fr.box(ua, va, q[2] - z0, ub - ua, vb - va, q[5] - q[2])
+
+    def wcyl(p, q, r):
+        return fr.cyl((*fr.uv(p[0], p[1]), p[2] - z0), (*fr.uv(q[0], q[1]), q[2] - z0), r)
+    return wbox, wcyl
+
+
 @product("xt_arm")
 def xt_arm(fr, V, sp, b):
-    """One Cruisemaster XT Freestyle trailing arm between the rail and the wheel: the pivot hanger welded to the rail's
-    outer face, the arm down to the stub axle, the shock to its bracket on the rail, and the LC5 hub on the 12 inch
-    electric drum. `hub` and `hub_w` place the hub centre in the envelope, `top` is the rail's underside and `slot` the
-    clear width between the rail and the tyre. The airbag stands under the outrigger inside the tyre's envelope and is
-    not shown."""
-    bx, cy, mu = _from_front(fr)
-    D, H = fr.D, fr.H
+    """One Cruisemaster XT Freestyle trailing arm in the slot between the rail and the wheel, down to the stub axle.
+    `hub` and `hub_w` place the hub centre in the envelope, `top` is the rail's underside and `slot` the clear width
+    between the rail and the tyre. The kit's parts between the rails are xt_kit's."""
+    _, cy, mu = _from_front(fr)
     hu, hw, top, slot = sp["hub"], sp["hub_w"], sp["top"], sp["slot"]
-    pw = top - 110                                  # the pivot, 110 mm under the rail
-    profile = [(mu(55), pw + 40), (mu(hu + 30), hw + 45), (mu(hu + 30), hw - 45), (mu(55), pw - 40)]
-    return [("pivot hanger", bx(0, 0, pw - 40, 110, 12, H - pw + 40), GALV, 1.0),
-            ("pivot bush", cy((55, 12, pw), (55, slot - 2, pw), 30), BLACK, 1.0),
-            ("trailing arm", fr.prism_uw(profile, 14, slot - 4), "#7b7d7d", 1.0),
-            ("shock bracket", bx(hu - 170, 0, top - 10, 80, 12, H - top + 10), GALV, 1.0),
-            ("shock absorber", cy((hu - 130, slot / 2, top - 10), (hu - 40, slot / 2, hw + 40), 22), "#f1c40f", 1.0),
-            ("stub axle", cy((hu, 14, hw), (hu, D - 90, hw), 35), STEEL, 1.0)]
+    pw = top - 110                                  # the arm's front end, 110 mm under the rail, where its front leg meets it
+    profile = [(mu(0), pw + 40), (mu(hu + 30), hw + 45), (mu(hu + 30), hw - 45), (mu(0), pw - 40)]
+    return [("trailing arm", fr.prism_uw(profile, 14, slot - 4), "#7b7d7d", 1.0),
+            ("stub axle", cy((hu, 14, hw), (hu, fr.D - 90, hw), 35), STEEL, 1.0)]
+
+
+@product("xt_kit")
+def xt_kit(fr, V, sp, b):
+    """One XT arm's parts between the rails at their places in Cruisemaster's 33XT AIR sheets 2 to 4 (Chassis.xt_parts,
+    est.), which its line carries: the hinge bar under its crossmember with the arm's four hinge plates and its pivot
+    tube, the airbag at ride under its top bracket 33SA 013 on the rail's inner face, and the shock absorber at ride from
+    its eye on the arm to its bracket on the next crossmember."""
+    wbox, wcyl = _world(fr)
+    out = []
+    for p in (b.extra.get("xt") or []) if b is not None else []:
+        kind = p["id"].rsplit("-", 1)[0]
+        if kind == "XT-BAR":
+            out.append(("hinge bar", wbox(p["boxes"][0]), GALV, 1.0))
+        elif kind == "XT-HINGE":
+            out += [("hinge plate", wbox(q), GALV, 1.0) for q in p["plates"]]
+            out.append(("pivot tube and bushes", wcyl(*p["tube"], 32), BLACK, 1.0))
+            out.append(("arm's front leg from its outer bush under the rail", wcyl(*p["leg"], 32), "#7b7d7d", 1.0))
+        elif kind == "XT-BAG":
+            (cx, cy), (za, zb) = p["centre"], p["z"]
+            out.append(("airbag", wcyl((cx, cy, za), (cx, cy, zb), p["d"] / 2), BLACK, 1.0))
+        elif kind == "XT-BAGBKT":
+            out.append(("airbag top bracket", wbox(p["boxes"][0]), GALV, 1.0))
+        elif kind == "XT-SHKBKT":
+            out.append(("shock bracket", wbox(p["boxes"][0]), GALV, 1.0))
+        elif kind == "XT-SHOCK":
+            out.append(("shock absorber", wcyl(*p["line"], p["d"] / 2), "#f1c40f", 1.0))
+    return out
 
 
 @product("xt_hub")
@@ -228,6 +262,15 @@ def tank(fr, V, sp, b):
     outer, inner = fr.box(0, 0, 0, W, D, H), fr.box(t, t, t, W - 2 * t, D - 2 * t, H - 2 * t)
     z0 = fr.bx[2]
     for nt in (b.extra.get("notches") or []) if b is not None else []:
+        if nt.get("kind") == "box":                 # a pocket round one of the XT kit's parts (Layout._part_notches)
+            for bx, grown in ((nt["box"], False), (nt["inner"], True)):
+                (ua, va), (ub, vb) = fr.uv(bx[0], bx[1]), fr.uv(bx[3], bx[4])
+                cut = fr.box(ua, va, bx[2] - z0, ub - ua, vb - va, bx[5] - bx[2])
+                if grown:
+                    inner = inner - cut
+                else:
+                    outer = outer - cut
+            continue
         (cx, cy), (nx, ny) = nt["corner"], nt["normal"]
         for k, (za, zb), grown in ((nt["keep"], (nt["z0"], nt["z1"]), False), (nt["keep"] + t * 2 ** 0.5, nt["inner_z"], True)):
             prism = fr.prism_uv([fr.uv(cx, cy), fr.uv(cx + nx * k, cy), fr.uv(cx, cy + ny * k)], za - z0, zb - z0)
@@ -235,8 +278,13 @@ def tank(fr, V, sp, b):
                 inner = inner - prism
             else:
                 outer = outer - prism
+    def walled(u):                                  # the outlet's place on the front wall is not cut by a pocket
+        x, y, z = fr.pt(u, t / 2, 40)
+        return not any(nt.get("kind") == "box" and all(nt["inner"][i] - 20 <= (x, y, z)[i] <= nt["inner"][i + 3] + 20 for i in range(3))
+                       for nt in ((b.extra.get("notches") or []) if b is not None else []))
+    u_out = next((u for u in (W - 60, 60, W / 2) if walled(u)), W - 60)
     out = [("tank", outer - inner, HDPE, 0.9),
-           ("outlet fitting", fr.cyl_v(W - 60, 40, 20, 0, t), GREY, 1.0)]
+           ("outlet fitting", fr.cyl_v(u_out, 40, 20, 0, t), GREY, 1.0)]
     for u0 in (W * 0.2, W * 0.8 - 40):
         out.append(("strap", fr.box(u0, 0, H - 2, 40, D, 2), STEEL, 1.0))
     return out
@@ -261,11 +309,31 @@ def tank_cradle(fr, V, sp, b):
 @product("tank_guard")
 def tank_guard(fr, V, sp, b):
     """A tank guard plate between the rails, in pieces round the `gaps` (u ranges kept open), `half` wide either side of
-    the envelope's centre (the envelope's own half width if not given). Frame front -y: u runs rearward along X."""
+    the envelope's centre (the envelope's own half width if not given). Frame front -y: u runs rearward along X. Where
+    the line carries the rear bay's shear panel (Chassis.shear_panels, UF-03), the piece behind the last gap is the
+    panel, which shear_panel draws."""
     W, D, H = fr.W, fr.D, fr.H
     half = sp.get("half", D / 2)
     cuts = [0.0] + [u for g in sorted(sp.get("gaps", [])) for u in g] + [W]
-    return [("guard plate", fr.box(u0, D / 2 - half, 0, u1 - u0, 2 * half, H), ALU, 1.0) for u0, u1 in zip(cuts[::2], cuts[1::2])]
+    pieces = list(zip(cuts[::2], cuts[1::2]))
+    pn = (b.extra.get("panel") if b is not None else None)
+    return [("guard plate", fr.box(u0, D / 2 - half, 0, u1 - u0, 2 * half, H), ALU, 1.0) for u0, u1 in (pieces[:-1] if pn else pieces)]
+
+
+@product("shear_panel")
+def shear_panel(fr, V, sp, b):
+    """The rear tank bay's shear panel as the chassis data cuts it, which the guards' line carries (Chassis.shear_panels):
+    the 3 mm galvanised sheet, its tongues under the crossmembers' angles and the stiffener under its front edge."""
+    pn = (b.extra.get("panel") if b is not None else None)
+    if not pn:
+        return []
+    wbox, _ = _world(fr)
+    zt, zb = pn["z_top"], pn["z_top"] - pn["t"]
+    sh = pn["sheet"]
+    out = [("shear panel sheet", wbox((sh["rect"][0], sh["rect"][1], zb, sh["rect"][2], sh["rect"][3], zt)), GALV, 1.0)]
+    out += [("shear panel tongue", wbox((x0, y0, zb, x1, y1, zt)), GALV, 1.0) for x0, y0, x1, y1 in sh["tongues"]]
+    out += [("shear panel stiffener", wbox(q), GALV, 1.0) for q in pn["stiffener"]]
+    return out
 
 
 @product("guard_hangers")

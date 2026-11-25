@@ -29,6 +29,8 @@ const jobs = [
   { path: '/plumbing/', name: 'plumbing', viewer: true, full: true, sections: ['pipe-schedule'] },
   // the frame's holes for galvanising in the Chassis page's viewer, close on the XT rear shock crossmember's plate vents (I2-89)
   { path: '/chassis/', name: 'chassis-holes', viewer: true, look: { target: [5300, -560, 670], from: [-900, 500, 700], zoom: 7 } },
+  // the XT kit between the rails where Cruisemaster's sheets put it, from below the road side: hinges, airbags, shocks (I2-97)
+  { path: '/trailer/', name: 'trailer-xt-kit', viewer: true, look: { target: [4500, 300, 560], from: [-1300, 1500, -900], zoom: 2.6 } },
   // each bike on its own, close (decision H27): the Tuareg on the ramp in the loading view, the Street Triple in its bay
   { path: '/ute-garage/', name: 'ute-garage-tuareg', viewer: true, nth: 1, only: 'TU Aprilia', zoom: 2.8 },
   { path: '/ute-garage/', name: 'ute-garage-street-triple', viewer: true, nth: 0, only: 'ST Triumph', zoom: 2.8 },

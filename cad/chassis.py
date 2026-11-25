@@ -744,6 +744,94 @@ class Chassis:
     def hub_x(self, axle: str) -> float:
         return next(w["hub"][0] for w in self.suspension if w["axle"] == axle)
 
+    def xt_arm_turn(self, w: dict, s: float) -> float:
+        """How far wheel w's arm turns about its pivot, in radians, from ride to travel s (mm, up positive)."""
+        V = self.V
+        dz = V["arm_drop"] - s
+        return math.atan2(-dz, math.sqrt(V["arm_r"] ** 2 - dz ** 2)) - math.atan2(-V["arm_drop"], math.sqrt(V["arm_r"] ** 2 - V["arm_drop"] ** 2))
+
+    def shock_line(self, w: dict, s: float = 0.0) -> tuple:
+        """Wheel w's shock absorber at travel s, from its lower eye on the arm, which turns with the arm about the pivot,
+        to its top eye in the inboard clevis of its bracket on the next crossmember's support plate (xt_arms `droop` and
+        `parts`, 33XT AIR sheets 2 to 4, est.): ((x, y, z) lower, (x, y, z) upper)."""
+        V, d, sh = self.V, self.data["xt_arms"]["droop"], self.data["xt_arms"]["parts"]["shock"]
+        cm = next(m for m in self.members if m.station == d["to"][w["axle"]] and m.role.startswith("cm"))
+        plate = self.shock_plate_t(cm)
+        y = w["side"] * self.ev(d["y"])
+        (px, _, pz), (hx, _, hz) = w["pivot"], w["hub"]
+        a = self.xt_arm_turn(w, s)
+        ex, ez = hx + sh["eye"][0] - px, hz + sh["eye"][1] - pz
+        lower = (px + ex * math.cos(a) - ez * math.sin(a), y, pz + ex * math.sin(a) + ez * math.cos(a))
+        upper = (cm.p0[0] - cm.sec.b / 2 - plate - sh["e"], y, V["rail_underside_z"] + d["z_over_underside"])
+        return lower, upper
+
+    def shock_plate_t(self, cm) -> float:
+        """The thickness of the shock support plate CH-P07 on crossmember cm's front face, 0 where the data puts none."""
+        f = next(f for f in self.fittings if f.id == "CH-P07")
+        face = cm.p0[0] - cm.sec.b / 2
+        return f.t if any(abs(p[0] + f.t / 2 - face) < f.t for p in f.at) else 0.0
+
+    def xt_parts(self, steps: int = 12, slab: float = 20.0) -> list[dict]:
+        """The XT kit's parts between the rails at their places in 33XT AIR sheets 2 to 4 (xt_arms `parts`, est.), the one
+        place the layout's fit checks (FIT-03), the services' clearance (SVC-01), the tanks' notches and the 3D model read
+        them from. Each is a dict with its `id`, `what`, wheel and `boxes`: one box for a part fixed to the frame, and for the
+        shock, which turns with the arm, its swept envelope over the arm's whole travel as boxes in `slab` mm bands of
+        height, each holding every point of the shock's body in that band. Each hinge's bar runs under its crossmember for
+        both wheels of its axle."""
+        V, pr = self.V, self.data["xt_arms"]["parts"]
+        rail = self.role_sec["rail"]
+        y_in, y_out, zu = V["rail_c"] - rail.b / 2, V["rail_c"] + rail.b / 2, V["rail_underside_z"]
+        out = []
+        for w in self.suspension:
+            s, wid = w["side"], w["id"]
+            ys = lambda a, b: (min(s * (y_in - a), s * (y_in - b)), max(s * (y_in - a), s * (y_in - b)))  # noqa: E731
+            cm = next(m for m in self.members if m.station == w["station"] and m.role == "cm_xt")
+            xf, xr = cm.p0[0] - cm.sec.b / 2, cm.p0[0] + cm.sec.b / 2
+            ya, yb = sorted((s * y_out, s * (y_in - pr["bar"]["inboard"])))
+            out.append(dict(id=f"XT-BAR-{wid}", what="Cruisemaster's hinge bar under the crossmember", wheel=wid,
+                            boxes=[(xf, ya, zu - pr["bar"]["d"], xr, yb, zu)]))
+            px = w["pivot"][0]
+            hy = ys(*pr["hinge"]["y_in"])
+            pl = pr["plates"]
+            plates = [(px - pl["l"] / 2, min(ys(u - pl["t"] / 2, u + pl["t"] / 2)), zu - pl["below"],
+                       px + pl["l"] / 2, max(ys(u - pl["t"] / 2, u + pl["t"] / 2)), zu - pr["bar"]["d"]) for u in pl["y_in"]]
+            out.append(dict(id=f"XT-HINGE-{wid}", what="the arm's hinge plates, bushes and pivot tube", wheel=wid, plates=plates,
+                            tube=((px, s * (y_in - pl["y_in"][0]), w["pivot"][2]), (px, s * (y_in - pl["y_in"][-1]), w["pivot"][2])),
+                            leg=((px, s * (y_in - pl["y_in"][0]), w["pivot"][2]), (px, s * (y_out + 24.0), w["pivot"][2])),
+                            boxes=[(px - pl["l"] / 2, hy[0], zu - pl["below"], px + pl["l"] / 2, hy[1], zu - pr["bar"]["d"])]))
+            ab, bb = pr["airbag"], pr["bag_bracket"]
+            bx, by = w["hub"][0] + ab["dx"], s * (y_in - ab["y_in"])
+            travel, shift = V["travel"], 12.0                    # the hub's 11.6 mm swing along X over the travel (report 11)
+            out.append(dict(id=f"XT-BAG-{wid}", what="the airbag over its travel", wheel=wid, centre=(bx, by), d=ab["d"], z=(zu - ab["h"], zu),
+                            boxes=[(bx - ab["d"] / 2 - shift, by - ab["d"] / 2, zu - ab["h"] - travel, bx + ab["d"] / 2 + shift, by + ab["d"] / 2, zu)]))
+            yb0 = ys(0.0, bb["reach"])
+            out.append(dict(id=f"XT-BAGBKT-{wid}", what="the airbag's top bracket 33SA 013 on the rail's inner face", wheel=wid,
+                            boxes=[(bx - bb["l"] / 2, yb0[0], zu, bx + bb["l"] / 2, yb0[1], zu + rail.d)]))
+            sb, sh = pr["shock_bracket"], pr["shock"]
+            lower, upper = self.shock_line(w)
+            face = upper[0] + sh["e"]                     # the support plate's face, or the crossmember's where the data has none
+            yk = ys(sb["y_in"], sb["y_in"] + sb["w"])
+            out.append(dict(id=f"XT-SHKBKT-{wid}", what="the shock's bracket on its support plate", wheel=wid,
+                            boxes=[(face - sb["out"], yk[0], zu + sb["z"], face, yk[1], zu + sb["h"])]))
+            r = sh["d"] / 2
+            pts = []
+            for k in range(steps + 1):
+                lo, up = self.shock_line(w, -travel + 2 * travel * k / steps)
+                n = max(2, int(math.dist(lo, up) / 5.0))
+                pts += [tuple(lo[i] + (up[i] - lo[i]) * j / n for i in range(3)) for j in range(n + 1)]
+            z0, z1 = min(p[2] for p in pts) - r, max(p[2] for p in pts) + r
+            bands = []
+            za = z0
+            while za < z1 - 1e-9:
+                zb = min(za + slab, z1)
+                xs = [p[0] for p in pts if p[2] - r < zb and p[2] + r > za]
+                if xs:
+                    bands.append((min(xs) - r, upper[1] - r, za, max(xs) + r, upper[1] + r, zb))
+                za = zb
+            out.append(dict(id=f"XT-SHOCK-{wid}", what="the shock absorber over the arm's travel", wheel=wid, line=(lower, upper), d=sh["d"],
+                            boxes=bands))
+        return out
+
     # -- weld toes on the rails and raisers, for the hole checks (CHS-10) ----------
     def weld_toes(self) -> list[tuple[str, tuple]]:
         """Each weld on a rail or raiser as (what, box): the band its fillet covers on the member's face, its toe at the

@@ -56,6 +56,21 @@ def _centre(b):
     return ((bb[0] + bb[3]) / 2, (bb[1] + bb[4]) / 2, (bb[2] + bb[5]) / 2)
 
 
+def _tank_notches(pr, b, sty):
+    """Tank b's notches in plan, each inside the tank's box (Layout.tank_notches): a corner's triangle round a hinge gusset
+    or a jacking pad, and a pocket round one of the XT kit's parts, its bands drawn as the one rectangle they fill."""
+    pockets = {}
+    for nt in b.extra.get("notches") or []:
+        if nt.get("kind") == "box":
+            r = nt["box"]
+            q = pockets.get(nt["fitting"])
+            pockets[nt["fitting"]] = r if q is None else (min(q[0], r[0]), min(q[1], r[1]), 0, max(q[3], r[3]), max(q[4], r[4]), 0)
+        else:
+            pr.poly([(x, y, 0) for x, y in nt["poly"]], sty, closed=True)
+    for r in pockets.values():
+        pr.box((r[0], r[1], 0, r[3], r[4], 0), sty)
+
+
 def _route(pr, pts, sty, arrow=False, level=None):
     """A flow or a run in plan through pts, with an arrowhead at its end on the line itself, so the overrun check reads
     the whole line as the arrow's, at its `level` where flows at other levels may cross it in plan (I2-81)."""
@@ -899,6 +914,8 @@ def ct603(prj, model, bom, checks, reg, dwg):
     for b in lay.blocks:
         if b.box is not None and (b.id.startswith(UNDER_FLOOR) or b.id in ("UF-01", "UF-01R", "UF-08", "UF-06")):
             pr.box(b.box, "hidden")
+    for b in lay.tanks():
+        _tank_notches(pr, b, "hidden")
     for b in lay.blocks:
         if b.box is not None and b.id.startswith("CM-"):
             q = pr.p((b.box[0] + b.box[3]) / 2, -hb - 110)
@@ -1073,7 +1090,7 @@ def ct611(prj, model, bom, checks, reg, dwg):
     wire(sh, [(55, 256), (55, 246)], "cold", arrow=True)
     wire(sh, [(55, 228), (55, 218)], "cold", arrow=True)
     # tanks
-    box(sh, 98, 250, 152, 270, ["FRESH TANK, FRONT BAY (UF-01)", "6 mm HDPE, BAFFLED, ABOUT 220 L", "VENTED TO THE ROAD SIDE"])
+    box(sh, 98, 250, 152, 270, ["FRESH TANK, FRONT BAY (UF-01)", "6 mm HDPE, BAFFLED, ABOUT 216 L", "VENTED TO THE ROAD SIDE"])
     box(sh, 98, 222, 152, 242, ["FRESH TANK, REAR BAY (UF-01R)", "6 mm HDPE, BAFFLED", "VENTED TO THE ROAD SIDE"])
     wire(sh, [(86, 209), (92, 209), (92, 260), (98, 260)], "cold", arrow=True)
     wire(sh, [(92, 232), (98, 232)], "cold", arrow=True)
@@ -1179,6 +1196,8 @@ def ct612(prj, model, bom, checks, reg, dwg):
             "UF-08", "UF-06"}
     body_plan(sh, pr, lay, res, cut=1000.0, show=show, size=1.2, keep=False, swings=False, light=("UF-01", "UF-01R", "UF-08"),
               hidden=("UF-01", "UF-01R", "UF-08", "UF-06", "WR-10"), nolabel=("LA-11B", "LA-11T", "EL-02", "LA-14", "UF-01", "UF-01R", "UF-08"))
+    for b in lay.tanks():
+        _tank_notches(pr, b, "hidden")
     g = {x["id"]: x for x in svc["glands"]}
     ws = lay.find("WS-01").cog
     # every pipe and hose as routed in data/routes.yaml by cad/routes.py on this layout, its centreline in plan (H28)

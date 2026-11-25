@@ -107,15 +107,19 @@ def test_the_tanks_hold_the_water_the_design_carries():
 def test_the_fresh_tanks_keep_their_clearance_to_every_fitting_they_are_notched_round():
     """FIT-03 reads every place of every chassis fitting (Layout.shapes), each hinge gusset as the prism of its cut
     outline, so the gussets that reach into a fresh tank's corners, and the jacking pads under the XT centre
-    crossmember, stand in the tank's notches (Layout.tank_notches) with the tank's own clearance round them."""
+    crossmember, stand in the tank's notches (Layout.tank_notches) with the tank's own clearance round them. The XT
+    kit's airbags, their top brackets, the shocks over the arm's travel and their brackets stand in the tanks' pockets
+    the same way (Layout._part_notches, I2-97)."""
     from cad.trailer import shape_gap
     lay = EV["layout"]
-    by_id = {b.id: b for b in lay.blocks if "fitting" in b.extra}
+    by_id = {b.id: lay.shapes(b) for b in lay.blocks if "fitting" in b.extra}
+    by_id.update({b.iid: [(bx, None) for bx in b.extra["boxes"]] for b in lay.xt_blocks()})
     for t in lay.tanks():
         notches = t.extra["notches"]
         assert notches, f"{t.iid} has no notches"
+        assert any(nt.get("kind") == "box" for nt in notches), f"{t.iid} has no pockets round the XT kit's parts"
         for fid in {nt["fitting"] for nt in notches}:
-            for s in lay.shapes(by_id[fid]):
+            for s in by_id[fid]:
                 if shape_gap((t.box, None), s) >= 0:
                     continue
                 g = min(shape_gap(piece, s) for piece in lay.tank_pieces(t))
