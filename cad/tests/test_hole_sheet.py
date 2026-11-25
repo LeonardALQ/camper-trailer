@@ -151,14 +151,16 @@ def _meets(bores, c, n, r) -> bool:
 
 
 def test_every_hole_record_is_cut_once_in_the_3d_model():
-    """The chassis model the viewer and chassis.step are written from carries a bore for each record through each wall it
-    names, and in no other solid, and a bore for each shock plate's vent through its plate."""
-    from cad.tests.test_supported import _layouts, model_tree
+    """The chassis model the viewer and chassis.step are written from (chassis_compound) carries a bore for each record
+    through each wall it names, and in no other solid, and a bore for each shock plate's vent through its plate. The model
+    is built here for this test alone, since a compound takes its shapes from any compound built from them before."""
+    from cad.tests.test_supported import _layouts
+    from cad.trailer_model import TrailerModel, chassis_compound
     ch = _layouts()[0].chassis
     geo = {m.id: (m.p0, m.p1, m.depth_dir, m.sec.t) for m in ch.members}
     gsec = ch.sections[next(f for f in ch.data["fittings"] if f["id"] == "CH-P08")["section"]]
     geo.update({g["id"]: (g["p0"], g["p1"], (0.0, 0.0, 1.0), gsec.t) for g in ch.hinge_gussets()})
-    solids = [_bores(s) for s in _leaves(model_tree("chassis"))]
+    solids = [_bores(s) for s in _leaves(chassis_compound(TrailerModel(_layouts()[0])))]
     short = []
     for h in CH.records():
         p0, p1, dd, t = geo[h["member"]]
