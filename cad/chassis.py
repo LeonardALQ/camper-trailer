@@ -366,13 +366,17 @@ class Chassis:
             if not all(i in ids for i in pb["between"]):
                 continue  # a body length compared in TRAILER.md with fewer stations
             sa, sb = (ids[i] for i in pb["between"])
-            xa, xb = sa["x"] + V["xm_w"], sb["x"]
+            xa, xb = sa["x"] + V["xm_w"], sb["x"] - pb.get("rear_ahead", 0.0)
             z = V["rail_underside_z"] + rs["rail"].d / 2
             sec = self.sections[pb["section"]]
+            ends = "ends on 6 mm gusset plates welded to the crossmember and the rail web"
+            if pb.get("rear_ahead"):
+                ends = (f"its front end on a 6 mm gusset plate welded to the crossmember and the rail web, its rear end on one "
+                        f"welded to the rail web {pb['rear_ahead']:g} mm ahead of the {pb['between'][1]} crossmember")
             for s in (-1, 1):
                 add(Member(f"PB-{k}{SIDES[s]}", "plan_brace", f"Plan brace between the {pb['between'][0]} and {pb['between'][1]} crossmembers, "
                            f"from the {SIDE_WORDS[s]} rail", sec, (xa, s * y_in, z), (xb, -s * y_in, z), depth_dir=(0, 0, 1),
-                           note="Diagonal at rail height, ends on 6 mm gusset plates welded to the crossmember and the rail web"))
+                           note=f"Diagonal at rail height, {ends}"))
         psec = rs["spare_post"]
         xp = x0 - psec.b / 2
         for s in (-1, 1):
@@ -794,6 +798,9 @@ class FrameModel:
         xs |= {w["hub"][0] for w in ch.suspension}
         if hinges == "crossmember":
             xs |= {g["rail_x"] for g in ch.hinge_gussets()}             # where each hinge gusset meets the rail
+        # where a plan brace's end meets a rail away from every crossmember (plan_braces `rear_ahead`)
+        xs |= {p[0] for m in ch.members if m.role == "plan_brace" for p in (m.p0, m.p1)
+               if min(abs(p[0] - ch.station_x(st)) for st in ch.stations) > V["xm_w"]}
         xs = sorted(xs)
         xs = [x for k, x in enumerate(xs) if k == 0 or x - xs[k - 1] > 5.0]   # points within 5 mm share a node
         mesh = [xs[0]]

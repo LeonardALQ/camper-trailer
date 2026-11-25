@@ -132,10 +132,14 @@ station_sections:
 # Plan bracing: an X of two diagonals at rail height in free bays between the rails, so the ladder frame carries
 # sideways loads (LC8a recovery at 30 degrees) by truss action. The tanks fill the other bays. The rear bay's braces (PB-3)
 # went with the battery bay: the grey tank fills it. Its 2 mm guard (UF-09) is not counted as a shear plate, so the XT rear shock
-# crossmember is RHS 150 x 50 x 4 (station_sections) and carries the rear recovery pull (CHS-08A).
+# crossmember is RHS 150 x 50 x 4 (station_sections) and carries the rear recovery pull (CHS-08A). Each diagonal runs
+# from one rail's inner face to the other's, from the front crossmember's rear face to the rear one's front face, or
+# where `rear_ahead` is given, to `rear_ahead` mm ahead of the rear crossmember's front face. PB-2's rear ends stand 200 mm
+# ahead of the XT front hinge crossmember, so each tube's footprint on the rail's web stops about 29 mm ahead of that
+# hinge's front cheek (CH-P16), and the frame model ties each end to the rail where it lands.
 plan_braces:
   - {between: ["between front and diesel bay (1)", diesel bay], section: SHS_40x40x2p5}
-  - {between: [diesel bay, XT front hinge], section: SHS_40x40x2p5}
+  - {between: [diesel bay, XT front hinge], section: SHS_40x40x2p5, rear_ahead: 200}
 
 # Welded and bolted fittings. Plates: length x width x thickness in mm, with a count. Bought parts carry a mass and its
 # source. `at` is a position (X, Y, Z), `side_y` repeats the item on both sides at that Y magnitude, `rear_x` adds a
@@ -194,7 +198,7 @@ fittings:
      at: ["axle_x + xt_rear_shock_front - 3", 0, "rail_underside_z + 75"], side_y: "rail_c - 200"}
   - {id: CH-P08, name: "Hinge crossmember gusset, SHS 50 x 50 x 3 at 45 degrees (TB 070), 283 mm on its axis, its ends cut at 45 degrees to bear on the crossmember's face and on the rail's inner web behind the hinge cheek, welded all round, two behind each hinge crossmember and two ahead of the centre's", kind: tube, section: SHS_50x50x3, length: hinge_gusset_l, qty: 6,
      poses: hinge_gussets, fat: null}
-  - {id: CH-P16, name: "Hinge cheek, 10 mm, 150 x 108.5, beside each XT hinge crossmember on the rail's inner face, welded to the web and the hinge bar", kind: plate, l: 150, w: 108.5, t: 10, qty: 6,
+  - {id: CH-P16, name: "Hinge cheek, 10 mm, 150 x 108.5, beside each XT hinge crossmember on the rail's inner face, welded to the web and the hinge bar", kind: plate, l: 150, w: 108.5, t: 10, qty: 8,
      poses: hinge_cheeks, plane: xz, fat: FAT-22}
   # CH-P17, the shear panel PNL-1's pieces (I2-87, fx18-det): EA 50 x 50 x 5 angles, each with its upright leg on a member's
   # web and its flat leg `drop` under the member's underside, level with the tanks' guard, where the 3 mm sheet bolts up
@@ -510,18 +514,18 @@ sealed_overlaps:
 # filled flush in the rail's bottom corner, its effective throat `corner` of the rail's outside radius (AISC 360 Table
 # J2.2's 5/16 R for a manual metal arc weld), never across the rail, and by `bar_leg` fillets each side down the hinge
 # bar's front or rear face over the bar's top `bar_d` (est.), so the hinge's pull along the trailer reaches the rail
-# through them, not through the crossmember's end. The two front hinges have their rear cheeks only (`omit`): the services' run K-10 passes under the
-# road rail ahead of the front hinge crossmember and the plan brace PB-2R ends at the kerb rail there. Every cheek's size
-# keeps 20 mm from the services' runs (SVC-01) and 50 mm from the
+# through them, not through the crossmember's end. Every hinge has both its cheeks: the run K-10 crosses under the road
+# rail ahead of the front hinge's front cheek and passes it inboard, and the plan braces PB-2K and PB-2R end on the rails
+# ahead of it (plan_braces `rear_ahead`). Every cheek keeps 20 mm from the services' runs (SVC-01) and 50 mm from the
 # arms and their leads (FIT-05). The fillets to the bar pass a force but no moment, so the frame model pins the cheeks
 # at one hinge at the middle of those fillets, the bar rigid from there down to the pivot, and carries them as one
-# member from the pin to the rail's underside, held to the rail by their welds above it (CHS-14, I2-92). The gussets ahead of the front hinge crossmember are left
-# out for the runs B-04 and K-10, so that crossmember is RHS 150 x 50 x 6. The gussets' rail ends land behind the cheeks,
-# and the jacking pads stand 61 mm inboard of the rail's inner face.
+# member from the pin to the rail's underside, held to the rail by their welds above it (CHS-14, I2-92). The gussets
+# ahead of the front hinge crossmember are left out for the runs B-04 and K-10, so that crossmember is RHS 150 x 50 x 6.
+# The gussets' rail ends land behind the cheeks, and the jacking pads stand 61 mm inboard of the rail's inner face.
 xt_hinges:
   bar: {leg: 6, run: 80, runs: [50, 150, 250]}
   gusset: {length: hinge_gusset_l, faces: [1, -1], omit: [CM-04KF, CM-04RF], weld: {leg: 5, acute_leg: 5, obtuse_throat: 3}}
-  cheek: {t: 10, l: 150, h: 108.5, below: 26, leg: 6, bar_d: 26, bar_leg: 10, corner: 0.3125, omit: [FRF, FKF]}
+  cheek: {t: 10, l: 150, h: 108.5, below: 26, leg: 6, bar_d: 26, bar_leg: 10, corner: 0.3125, omit: []}
 
 # The XT arms' limits in LC8a (I2-94). An airbag cannot pull. Where an arm's balance about its hinge asks less of its
 # airbag than the airbag gives with the arm at full droop, its force at ride (the weight's) less the air spring's rate
