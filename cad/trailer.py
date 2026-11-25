@@ -182,6 +182,57 @@ def inside(a, z) -> bool:
     return all(a[i] >= z[i] - TOL and a[i + 3] <= z[i + 3] + TOL for i in range(3))
 
 
+def _clip(poly: list, nx: float, ny: float, c: float) -> list:
+    """The convex plan polygon poly cut to the half-plane nx x + ny y >= c."""
+    out = []
+    for i, p in enumerate(poly):
+        q = poly[i - 1]
+        fp, fq = nx * p[0] + ny * p[1] - c, nx * q[0] + ny * q[1] - c
+        if (fp >= 0) != (fq >= 0):
+            k = fq / (fq - fp)
+            out.append((q[0] + k * (p[0] - q[0]), q[1] + k * (p[1] - q[1])))
+        if fp >= 0:
+            out.append(p)
+    return out
+
+
+def _poly_gap(P: list, Q: list) -> float:
+    """Clear distance in plan between two convex polygons, negative (the least overlap across any edge's normal) if
+    they overlap."""
+    least = math.inf
+    for poly in (P, Q):
+        for i, a in enumerate(poly):
+            b = poly[i - 1]
+            n = (b[1] - a[1], a[0] - b[0])
+            ln = math.hypot(*n) or 1.0
+            pa = [(p[0] * n[0] + p[1] * n[1]) / ln for p in P]
+            pb = [(p[0] * n[0] + p[1] * n[1]) / ln for p in Q]
+            least = min(least, min(max(pa), max(pb)) - max(min(pa), min(pb)))
+    if least < 0:
+        def seg(p, a, b):
+            d = (b[0] - a[0], b[1] - a[1])
+            k = max(0.0, min(1.0, ((p[0] - a[0]) * d[0] + (p[1] - a[1]) * d[1]) / ((d[0] ** 2 + d[1] ** 2) or 1.0)))
+            return math.hypot(p[0] - a[0] - k * d[0], p[1] - a[1] - k * d[1])
+        return min(seg(p, R[i - 1], R[i]) for S, R in ((P, Q), (Q, P)) for p in S for i in range(len(R)))
+    return -least
+
+
+def shape_gap(a: tuple, b: tuple) -> float:
+    """Clear distance between two shapes, each (box, poly): a box, or a prism of the convex plan polygon poly over the
+    box's height. Negative, the smallest penetration, if they overlap, as gap() gives it for two boxes."""
+    (ba, pa), (bb, pb) = a, b
+    if pa is None and pb is None:
+        return gap(ba, bb)
+    def rect(bx):
+        return [(bx[0], bx[1]), (bx[3], bx[1]), (bx[3], bx[4]), (bx[0], bx[4])]
+
+    dz = max(ba[2], bb[2]) - min(ba[5], bb[5])
+    d2 = _poly_gap(pa or rect(ba), pb or rect(bb))
+    if dz > 0 and d2 > 0:
+        return math.hypot(dz, d2)
+    return max(dz, d2)
+
+
 # ------------------------------------------------------------------ layout
 class Layout:
     """One evaluation of the block layout for a set of parameter values."""
@@ -201,6 +252,8 @@ class Layout:
             self.blocks.extend(self._expand(it))
         self.blocks.extend(self._crossmembers())
         self.zones = {k: dict(name=z["name"], box=_box(*self.P.eval(z["box"], {}))) for k, z in td["zones"].items()}
+        for b in self.tanks():          # each fresh tank's corners notched round the hinge gussets, for its model
+            b.extra["notches"] = self.tank_notches(b)
         ids = [b.iid for b in self.blocks]
         dup = {i for i in ids if ids.count(i) > 1}
         if dup:
@@ -397,7 +450,9 @@ class Layout:
     def tank_nets(self) -> dict:
         """Each water tank's net capacity (review I2-40), by the grey tank's rule: the inside of its walls less a 10 mm air
         gap under its top and its baffles, each a sheet of the wall's thickness across the tank (`cross`) or along it
-        (`along`), for the inside's height less the air gap. The fresh tanks' sum is what `water_full_l` may be."""
+        (`along`), for the inside's height less the air gap, and less the notches in its corners (tank_notches), each
+        the inside's triangle there over the notch's height and its two walls. The fresh tanks' sum is what `water_full_l`
+        may be."""
         out = {}
         for b in self.blocks:
             n = b.extra.get("net")
@@ -408,13 +463,105 @@ class Layout:
             h = lz - gap
             cross, along = int(n.get("cross", 0)), int(n.get("along", 0))
             baffles = (cross * ly + along * lx - cross * along * t) * t * h
+            w0, w1 = b.box[2] + t, b.box[2] + t + h          # the water's column inside the walls
+            notches = self.tank_notches(b)
+            notched = sum(nt["inner_area"] * max(0.0, min(w1, nt["inner_z"][1]) - max(w0, nt["inner_z"][0])) for nt in notches)
             out[b.id] = dict(inside_mm=[round(lx, 1), round(ly, 1), round(lz, 1)], inside_l=lx * ly * lz / 1e6,
-                             water_h_mm=h, baffles_l=baffles / 1e6, net_l=(lx * ly * h - baffles) / 1e6,
+                             water_h_mm=h, baffles_l=baffles / 1e6, notches_l=notched / 1e6, notches=len(notches),
+                             net_l=(lx * ly * h - baffles - notched) / 1e6,
                              cross=cross, along=along, wall_mm=t, air_gap_mm=gap, fresh=bool(b.extra.get("tank")))
         return out
 
     def fresh_net_l(self) -> float:
         return sum(v["net_l"] for v in self.tank_nets().values() if v["fresh"])
+
+    def tank_notches(self, b) -> list[dict]:
+        """The notches in tank b's corners round the hinge gussets CH-P08 (xt_hinges `gusset`), where its `net` gives a
+        `notch_clear`: where a gusset reaches into the tank's box, the tank's corner is cut away in plan along a line
+        parallel to the gusset's long side and `notch_clear` mm outside it, over the gusset's depth and `notch_clear`
+        above and under it, so the tank keeps that clearance to the steel. Each notch gives its corner's triangle in
+        plan (`poly`), its z range, the half-plane the tank keeps (n . p >= c), and the inside's lost triangle's area
+        and z range for the tank's walls `wall` thick."""
+        n = b.extra.get("net") or {}
+        clear = n.get("notch_clear")
+        if clear is None or b.box is None:
+            return []
+        ch, t = self.chassis, float(n["wall"])
+        sec = ch.sections[next(f for f in ch.data["fittings"] if f["id"] == "CH-P08")["section"]]
+        x0, y0, z0, x1, y1, z1 = b.box
+        out = []
+        for g in ch.hinge_gussets():
+            gz0, gz1 = g["z"] - sec.d / 2 - clear, g["z"] + sec.d / 2 + clear
+            if gz1 <= z0 or gz0 >= z1:
+                continue
+            e, s = g["face"], g["side"]
+            xf, yw = g["p0"][0], g["p1"][1]                 # the crossmember's face and the rail's inner web
+            a_t = (x0 - xf) if e > 0 else (xf - x1)          # the tank's end from the crossmember's face
+            c_t = s * (yw - (y1 if s > 0 else y0))           # the tank's side from the rail's web
+            if a_t < 0 or c_t < 0:
+                continue                                     # the tank lies on the crossmember's or the rail's other side
+            reach = math.dist(g["p0"], (xf, yw, g["p0"][2])) + sec.b / 2 * math.sqrt(2) + clear * math.sqrt(2)
+            leg = reach - a_t - c_t
+            if leg <= 0:
+                continue
+
+            def world(a, c):
+                return (xf + e * a, yw - s * c)
+
+            inner = reach + t * math.sqrt(2) - (a_t + t) - (c_t + t)
+            out.append(dict(fitting="CH-P08", gusset=g["id"], poly=[world(a_t, c_t), world(reach - c_t, c_t), world(a_t, reach - a_t)],
+                            z0=max(gz0, z0), z1=min(gz1, z1), normal=(e, -s), corner=(xf, yw), keep=reach, clear=clear,
+                            inner_area=max(0.0, inner) ** 2 / 2, inner_z=(gz0 - t, gz1 + t)))
+        out += self._corner_chamfers(b, clear, t)
+        return out
+
+    def _corner_chamfers(self, b, clear: float, t: float) -> list[dict]:
+        """The chamfers in tank b's corners round the other chassis fittings that reach into its box at a corner, the
+        jacking pads CH-P06 under the XT centre crossmember among them: the corner cut away in plan at 45 degrees through
+        the far corner of the fitting's place grown by `clear`, from `clear` under it to `clear` over it, or to the tank's
+        bottom or top where less than two walls would be left. A fitting the data gives only one mass point for, fewer
+        places than its count, has no place to clear."""
+        from .chassis import fitting_boxes
+        ch = self.chassis
+        x0, y0, z0, x1, y1, z1 = b.box
+        out = []
+        for f in ch.fittings:
+            spec = next(d for d in ch.data["fittings"] if d["id"] == f.id)
+            if spec.get("poses") == "hinge_gussets" or len(f.at) < f.qty:
+                continue
+            for P in fitting_boxes(ch, f):
+                if overlap(P, b.box) <= 0:
+                    continue
+                corner = next(((xc, yc) for xc in (x0, x1) for yc in (y0, y1)
+                               if P[0] - clear <= xc <= P[3] + clear and P[1] - clear <= yc <= P[4] + clear), None)
+                if corner is None:
+                    continue                                 # not at a corner: FIT-03 reads the clash
+                xc, yc = corner
+                dx, dy = (1 if xc == x0 else -1), (1 if yc == y0 else -1)
+                keep = max(dx * (P[0] - clear - xc), dx * (P[3] + clear - xc)) + max(dy * (P[1] - clear - yc), dy * (P[4] + clear - yc))
+                za, zb = P[2] - clear, P[5] + clear
+                za, zb = (z0 if za - z0 < 2 * t else za), (z1 if z1 - zb < 2 * t else zb)
+                out.append(dict(fitting=f.id, gusset=None, poly=[(xc, yc), (xc + dx * keep, yc), (xc, yc + dy * keep)],
+                                z0=max(za, z0), z1=min(zb, z1), normal=(dx, dy), corner=(xc, yc), keep=keep, clear=clear,
+                                inner_area=max(0.0, keep + t * math.sqrt(2) - 2 * t) ** 2 / 2,
+                                inner_z=(za - (t if za > z0 else 0.0), zb + (t if zb < z1 else 0.0))))
+        return out
+
+    def tank_pieces(self, b) -> list[tuple]:
+        """Tank b notched round the gussets as convex slabs, each (box, poly): its box cut at every notch's top and bottom,
+        and in each slab the plan's rectangle less the notches' corners there."""
+        x0, y0, z0, x1, y1, z1 = b.box
+        notches = b.extra.get("notches") or self.tank_notches(b)
+        zs = sorted({z0, z1} | {v for nt in notches for v in (nt["z0"], nt["z1"])})
+        out = []
+        for za, zb in zip(zs, zs[1:]):
+            poly = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+            for nt in notches:
+                if nt["z0"] <= za + 1e-9 and zb <= nt["z1"] + 1e-9:
+                    (nx, ny), (cx, cy) = nt["normal"], nt["corner"]
+                    poly = _clip(poly, nx, ny, nx * cx + ny * cy + nt["keep"])
+            out.append(((x0, y0, za, x1, y1, zb), poly if len(poly) != 4 else None))
+        return out
 
     def water_cog(self, litres: float):
         ts = self.tanks()
@@ -466,31 +613,52 @@ class Layout:
         return dict(id=case.id, name=case.name, aboard=case.aboard, water_l=water, **res)
 
     # -- geometry checks ------------------------------------------------------
+    def shapes(self, b) -> list[tuple]:
+        """Every place block b stands in, each (box, poly) as shape_gap reads it: a chassis fitting at each of its places
+        (fitting_boxes), a hinge gusset as the prism of its cut outline in plan, a tank notched round the gussets as its
+        slabs (tank_pieces) and any other block as its own box. So a fitting placed in several places is read at each."""
+        if "fitting" in b.extra:
+            from .chassis import fitting_boxes
+            f = b.extra["fitting"]
+            if len(f.at) < f.qty:              # one mass point for many parts, the body mount nut plates CH-P14: no place
+                return []
+            boxes = fitting_boxes(self.chassis, f)
+            spec = next(d for d in self.chassis.data["fittings"] if d["id"] == f.id)
+            if spec.get("poses") == "hinge_gussets":
+                return [(bx, [tuple(p) for p in g["outline"]]) for bx, g in zip(boxes, self.chassis.hinge_gussets())]
+            return [(bx, None) for bx in boxes]
+        if b.extra.get("notches"):
+            return self.tank_pieces(b)
+        return [(b.box, None)] if b.box is not None else []
+
     def fit(self, zone: str, skip: tuple = ()) -> dict:
         z = self.zones[zone]["box"]
         items = [b for b in self.blocks if b.zone == zone and b.box is not None and b.id not in skip]
         solids = [b for b in items if not b.keep_clear]
         keep = [b for b in items if b.keep_clear]
-        others = [b for b in self.blocks if b.solid and not b.hollow and b.zone != zone and overlap(b.box, z) > 0]
+        others = [(b, s) for b in self.blocks if b.zone != zone and not b.keep_clear and not b.hollow
+                  for s in self.shapes(b) if overlap(s[0], z) > 0]
         problems, worst = [], math.inf
         worst_pair = ""
         for b in solids:
             if not inside(b.box, z):
                 problems.append(f"{b.name} ({b.iid}) is outside the zone")
-        pool = [b for b in solids if not b.hollow] + others
-        for i, a in enumerate(pool):
-            for b in pool[i + 1:]:
-                if a.zone != zone and b.zone != zone:
+        pool = [(b, s) for b in solids if not b.hollow for s in self.shapes(b)] + others
+        seen = set()
+        for i, (a, sa) in enumerate(pool):
+            for b, sb in pool[i + 1:]:
+                if (a.zone != zone and b.zone != zone) or a is b:
                     continue
-                g = gap(a.box, b.box)
+                g = shape_gap(sa, sb)
                 if g < worst:
                     worst, worst_pair = g, f"{a.name} to {b.name}"
-                if overlap(a.box, b.box) > 0:
+                if g < -TOL and (a.iid, b.iid, sb[0]) not in seen:
+                    seen.add((a.iid, b.iid, sb[0]))
                     problems.append(f"{a.name} ({a.iid}) overlaps {b.name} ({b.iid}) by {-g:.0f} mm")
         for k in keep:
-            for b in pool:
-                if overlap(k.box, b.box) > 0:
-                    problems.append(f"{b.name} ({b.iid}) stands in the {k.name.lower()} ({k.iid}) by {-gap(k.box, b.box):.0f} mm")
+            for b, sb in pool:
+                if shape_gap((k.box, None), sb) < -TOL:
+                    problems.append(f"{b.name} ({b.iid}) stands in the {k.name.lower()} ({k.iid}) by {-shape_gap((k.box, None), sb):.0f} mm")
         return dict(ok=not problems, problems=problems, smallest_gap_mm=None if worst == math.inf else round(worst, 1),
                     governing=worst_pair, items=len(solids), keep_clear=len(keep))
 

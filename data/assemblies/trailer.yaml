@@ -130,8 +130,8 @@ params:
   # ---------------------------------------------------------------- axle (solved)
   axle_x: 4381               # axle group centre from the ball. The build solves it: the middle of the towball window (H17)
   # ---------------------------------------------------------------- water (H13)
-  water_full_l: 400          # the fresh tanks' net capacity, filled at camp with the transfer pump, CR45 filter and chlorine (H13): 400.2 L net (est.) by the grey tank's rule, Layout.tank_nets, in H21's 5 L steps (I2-40). It was 420 L, more than the tanks' 416.6 L inside
-  water_travel_l: 400        # most fresh and grey water aboard while towing: the fresh tanks' whole net, 400 L (I2-40), since the 4,000 kg plate and its 3,900 kg target (H2 and H13 as amended 23 Nov 2026), so fresh and grey together never pass what the fresh tanks hold. H21 still takes any excess over the target off it in 5 L steps. Before: 280 L, H13's 350 L at the 3,500 kg plate less 70 L by H21
+  water_full_l: 395          # the fresh tanks' net capacity, filled at camp with the transfer pump, CR45 filter and chlorine (H13): 395.9 L net (est.) by the grey tank's rule, Layout.tank_nets, with the tanks' corners notched round the hinge gussets and the jacking pads, in H21's 5 L steps (I2-40). It was 400 L at 400.2 L net before the notches, and 420 L, more than the tanks' 416.6 L inside
+  water_travel_l: 395        # most fresh and grey water aboard while towing: the fresh tanks' whole net, 395 L (I2-40), since the 4,000 kg plate and its 3,900 kg target (H2 and H13 as amended 23 Nov 2026), so fresh and grey together never pass what the fresh tanks hold. H21 still takes any excess over the target off it in 5 L steps. Before: 400 L until the tanks were notched round the hinge gussets, and 280 L, H13's 350 L at the 3,500 kg plate less 70 L by H21
   water_highway_l: 50        # owner's highway figure
   load_sharing: 1            # the XT Air tandem in Cruisemaster's load-sharing configuration, each side's two bags on one circuit (CIS-006 rev 25, RG-01, RG-04). VSB1's 120 % rule is for non-load-sharing close-coupled axles, so MAS-02 checks the axle group load itself (H2 as amended 23 Nov 2026)
   grey_full_l: 130           # grey tank's net capacity (report 21 section 10)
@@ -652,28 +652,28 @@ items:
     material: "6 mm food-grade HDPE, welded, two cross baffles and one lengthwise"
     system: underfloor
     price:
-      - {item: "Welded 6 mm HDPE tank, about 225 L net, two cross baffles and one lengthwise", aud: 650, basis: estimate, url: "https://www.diycaravans.com.au/shop/custom-made-caravan-rv-tanks/", date: 2026-11-20, note: "Made-to-size tanks start at AUD 397, the standard 250 L tank is AUD 549 (research report 22)"}
+      - {item: "Welded 6 mm HDPE tank, about 222 L net, two cross baffles and one lengthwise, its corners notched round the hinge gussets and the jacking pads", aud: 650, basis: estimate, url: "https://www.diycaravans.com.au/shop/custom-made-caravan-rv-tanks/", date: 2026-11-20, note: "Made-to-size tanks start at AUD 397, the standard 250 L tank is AUD 549 (research report 22)"}
       - {item: "Aluminium angle bearers, 10 mm rubber strip, padded stainless straps and bolts", aud: 90, basis: estimate, date: 2026-11-20}
     zone: underfloor
     box: [tank_f_x0, -tank_w / 2, tank_z0, tank_f_l, tank_w, tank_h]
     tank: true
-    net: {wall: 6, air_gap: 10, cross: 2, along: 1}
+    net: {wall: 6, air_gap: 10, cross: 2, along: 1, notch_clear: 10}
     mass: {basis: declared, unit_kg: 19.3, maturity: calculated, source: "Report 13 section 5's 18.8 kg tank (custom welded HDPE, 6 mm walls, two cross baffles and one lengthwise) scaled by area to 830 mm (report 18 section 1.1)", note: "6 mm HDPE kept (saving 1b, H13). Report 22 open point 4 priced 10 mm polypropylene at about 31 kg"}
-    note: Between the XT front hinge and centre crossmembers, over the front axle. About 224 L net (est.) by the grey tank's rule, 818 x 963 x 300.5 mm inside less a 10 mm air gap and its three baffles (Layout.tank_nets, I2-40). It sits on two aluminium angle bearers bolted to the XT crossmembers on 10 mm rubber, held by two padded stainless straps, never hung from the floor.
+    note: Between the XT front hinge and centre crossmembers, over the front axle. About 222 L net (est.) by the grey tank's rule, 818 x 963 x 300.5 mm inside less a 10 mm air gap, its three baffles and its notches (Layout.tank_nets, I2-40). Each corner is notched round the hinge gusset there, 10 mm clear of it over its 50 mm depth and 10 mm above and under it, and the two rear corners are chamfered clear of the jacking pads under the XT centre crossmember, from the bottom to 10 mm over the pads (Layout.tank_notches, FIT-03). It sits on two aluminium angle bearers bolted to the XT crossmembers on 10 mm rubber, held by two padded stainless straps, never hung from the floor.
   - id: UF-01R
     name: Water tank, rear suspension bay
     model: {name: hdpe_tank, wall: 6}
     material: "6 mm food-grade HDPE, welded, one cross baffle"
     system: underfloor
     price:
-      - {item: "Welded 6 mm HDPE tank, about 175 L net, one cross baffle, its kerb side 36 mm narrower than the front tank's", aud: 620, basis: estimate, url: "https://www.diycaravans.com.au/shop/custom-made-caravan-rv-tanks/", date: 2026-11-20}
+      - {item: "Welded 6 mm HDPE tank, about 174 L net, one cross baffle, its kerb side 36 mm narrower than the front tank's, its front corners notched round the hinge gussets", aud: 620, basis: estimate, url: "https://www.diycaravans.com.au/shop/custom-made-caravan-rv-tanks/", date: 2026-11-20}
       - {item: "Aluminium angle bearers, 10 mm rubber strip, padded stainless straps and bolts", aud: 90, basis: estimate, date: 2026-11-20}
     zone: underfloor
     box: [tank_r_x0, -tank_w / 2 + tank_r_kerb, tank_z0, tank_r_l, tank_w - tank_r_kerb, tank_h]
     tank: true
-    net: {wall: 6, air_gap: 10, cross: 1}
+    net: {wall: 6, air_gap: 10, cross: 1, notch_clear: 10}
     mass: {basis: declared, unit_kg: 18.3, maturity: calculated, source: "As UF-01, scaled to 760 mm (report 18 section 1.1)", note: "6 mm HDPE kept (saving 1b, H13)"}
-    note: Between the XT centre and rear shock crossmembers, over the rear axle, its rear end 145 mm ahead of the shower well so the board's runs cross behind it, and its kerb side 36 mm inboard of the front tank's, so the kerb frame G20's 120 mm packing stands over the gap between it and the kerb raiser (I2-33). It sits 5 mm lower with the front tank, so the two keep their water. About 175 L net (est.), so the two tanks hold about 400 L net, filled at camp, and the 400 L of water_full_l may all ride in travel (H13, H21, I2-40).
+    note: Between the XT centre and rear shock crossmembers, over the rear axle, its rear end 145 mm ahead of the shower well so the board's runs cross behind it, and its kerb side 36 mm inboard of the front tank's, so the kerb frame G20's 120 mm packing stands over the gap between it and the kerb raiser (I2-33). It sits 5 mm lower with the front tank, so the two keep their water. About 174 L net (est.), its front corners notched round the hinge gussets behind the XT centre crossmember as the front tank's are and its road-side front corner chamfered clear of the jacking pad, so the two tanks hold 395.9 L net, filled at camp, and the 395 L of water_full_l may all ride in travel (H13, H21, I2-40).
   - id: UF-02
     name: Water in the tanks
     system: underfloor

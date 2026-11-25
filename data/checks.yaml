@@ -217,7 +217,7 @@ trailer_checks:
     zone: underfloor
     severity: fail
     inputs: []
-    why: The fresh tanks sit in the two suspension bays, the grey tank in the rear bay under the grey-bay crossmember and the diesel tank ahead of the XT front hinge, clear of every crossmember and fitting.
+    why: The fresh tanks sit in the two suspension bays, the grey tank in the rear bay under the grey-bay crossmember and the diesel tank ahead of the XT front hinge, clear of every crossmember and fitting. Every chassis fitting is read at each of its places, the hinge gussets as the prisms of their cut outlines in plan, and each fresh tank as its box less the notches in its corners round the gussets and the jacking pads (Layout.tank_notches), 10 mm clear of them.
   - id: FIT-04
     title: The sealed drawbar box holds the two generators, the jerry cans and the shelf
     type: fit

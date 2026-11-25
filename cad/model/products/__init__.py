@@ -67,6 +67,18 @@ class Frame:
             return (x1 - v, y0 + u, z0 + w)
         return (x0 + v, y1 - u, z0 + w)
 
+    def uv(self, x, y) -> tuple:
+        """The frame's (u, v) of the plan point (x, y), as pt places them."""
+        x0, y0, _, x1, y1, _ = self.bx
+        f = self.front
+        if f == "+y":
+            return (x1 - x, y1 - y)
+        if f == "-y":
+            return (x - x0, y - y0)
+        if f == "+x":
+            return (y - y0, x1 - x)
+        return (y1 - y, x - x0)
+
     def box(self, u0, v0, w0, du, dv, dw):
         a, b = self.pt(u0, v0, w0), self.pt(u0 + du, v0 + dv, w0 + dw)
         lo = [min(p, q) for p, q in zip(a, b)]

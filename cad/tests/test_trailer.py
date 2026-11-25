@@ -102,3 +102,21 @@ def test_the_tanks_hold_the_water_the_design_carries():
     assert V["grey_full_l"] <= nets["UF-08"]["net_l"] + 1e-9, f"grey_full_l {V['grey_full_l']:g} L, the grey tank holds {nets['UF-08']['net_l']:.1f} L net"
     for k, n in nets.items():
         assert n["net_l"] < n["inside_l"], f"{k}: its net {n['net_l']:.1f} L is not less than its inside {n['inside_l']:.1f} L"
+
+
+def test_the_fresh_tanks_keep_their_clearance_to_every_fitting_they_are_notched_round():
+    """FIT-03 reads every place of every chassis fitting (Layout.shapes), each hinge gusset as the prism of its cut
+    outline, so the gussets that reach into a fresh tank's corners, and the jacking pads under the XT centre
+    crossmember, stand in the tank's notches (Layout.tank_notches) with the tank's own clearance round them."""
+    from cad.trailer import shape_gap
+    lay = EV["layout"]
+    by_id = {b.id: b for b in lay.blocks if "fitting" in b.extra}
+    for t in lay.tanks():
+        notches = t.extra["notches"]
+        assert notches, f"{t.iid} has no notches"
+        for fid in {nt["fitting"] for nt in notches}:
+            for s in lay.shapes(by_id[fid]):
+                if shape_gap((t.box, None), s) >= 0:
+                    continue
+                g = min(shape_gap(piece, s) for piece in lay.tank_pieces(t))
+                assert g >= notches[0]["clear"] - 1e-6, f"{t.iid}: {fid} at {[round(v) for v in s[0]]} stands {g:.1f} mm from it"
