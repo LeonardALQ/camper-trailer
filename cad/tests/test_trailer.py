@@ -109,7 +109,8 @@ def test_the_fresh_tanks_keep_their_clearance_to_every_fitting_they_are_notched_
     outline, so the gussets that reach into a fresh tank's corners, behind each hinge crossmember, stand in the tank's
     notches (Layout.tank_notches) with the tank's own clearance round them. The XT
     kit's airbags, their top brackets, the shocks over the arm's travel and their brackets stand in the tanks' pockets
-    the same way (Layout._part_notches, I2-97)."""
+    the same way (Layout._part_notches, I2-97). The steps up into the tanks' bottom edges over the arms (Layout._arm_pockets)
+    keep FIT-05's clearance from the arms over their travel, which FIT-05 reads on the tanks as stepped."""
     from cad.trailer import shape_gap
     lay = EV["layout"]
     by_id = {b.id: lay.shapes(b) for b in lay.blocks if "fitting" in b.extra}
@@ -118,7 +119,9 @@ def test_the_fresh_tanks_keep_their_clearance_to_every_fitting_they_are_notched_
         notches = t.extra["notches"]
         assert notches, f"{t.iid} has no notches"
         assert any(nt.get("kind") == "box" for nt in notches), f"{t.iid} has no pockets round the XT kit's parts"
-        for fid in {nt["fitting"] for nt in notches}:
+        steps = [nt for nt in notches if nt["fitting"] == "XT arm"]
+        assert all(nt.get("kind") == "box" and nt["z0"] == t.box[2] for nt in steps), f"{t.iid}: an arm's step not up from its bottom"
+        for fid in {nt["fitting"] for nt in notches} - {"XT arm"}:
             for s in by_id[fid]:
                 if shape_gap((t.box, None), s) >= 0:
                     continue

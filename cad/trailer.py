@@ -856,7 +856,10 @@ class Layout:
         from .model import products as PR
         from .trailer_model import model_specs
         b = next(b for b in self.blocks if b.id == "UF-03")
-        opts, bx = next((o, x) for o, x in PR.placements(model_specs(self)["UF-03"], b, self) if o["name"] == "guard_hangers")
+        spec = model_specs(self).get("UF-03")
+        if spec is None:                 # the models taken out (cad/tests/test_products.py): no hangers to place
+            return []
+        opts, bx = next((o, x) for o, x in PR.placements(spec, b, self) if o["name"] == "guard_hangers")
         _, y0, z0, _, y1, z1 = bx
         f, L, t = opts["foot"], 50.0, 3.0
         ch = self.chassis
@@ -965,7 +968,7 @@ class Layout:
         for b in self.blocks:
             if b.keep_clear or b.load == "none" or b.id in UNSPRUNG or b.id in FLEXIBLE:
                 continue
-            if b.id == "UF-03":                  # the guards and the shear panel as cut, and the guard's hanger angles
+            if b.id == "UF-03" and b.id in specs:  # the guards and the shear panel as cut, and the guard's hanger angles
                 boxes = [s[0] for _, s in self.guard_pieces()] + [bx for _, bx in self.guard_hanger_parts()]
             elif b.extra.get("notches"):         # a tank as its notched and pocketed slabs (tank_pieces)
                 boxes = [s[0] for s in self.tank_pieces(b)]
