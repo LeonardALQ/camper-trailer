@@ -250,8 +250,9 @@ def ct101(prj, model, bom, checks, reg, dwg):
     yt = S.table(sh, 230.0, 247.0, [("SECTION", 30), ("MEMBERS", 84), ("QTY", 12), ("TOTAL m", 26), ("kg", 28)], rows, size=1.7, row_h=3.2,
                  title="MEMBER SCHEDULE (C450L0, LENGTHS ON THE CENTROID AXIS)")
     g = chs["results"]["governing"]
-    # each utilisation from its stress over its limit, since the build stores `util` already rounded to three places
-    rows = [[lc, g[lc]["member"], f"{g[lc]['eq']:.0f}", f"{g[lc]['limit']:.0f}", f"{g[lc]['eq'] / g[lc]['limit']:.2f}"]
+    # each utilisation from its stress over its limit, since the build stores `util` already rounded to three places, and
+    # each stress rounded half up, as the Chassis page and the checks' own text round it (F2-08), so 130.5 MPa reads 131
+    rows = [[lc, g[lc]["member"], f"{int(g[lc]['eq'] + 0.5)}", f"{g[lc]['limit']:.0f}", f"{g[lc]['eq'] / g[lc]['limit']:.2f}"]
             for lc in ("LC1", "LC2", "LC3", "LC4", "LC5a", "LC5b", "LC6", "LC6b", "LC8a", "LC8u", "LC8b")]
     yt = S.table(sh, 230.0, yt - 6, [("CASE", 16), ("GOVERNING MEMBER", 60), ("MPa", 30), ("LIMIT MPa", 34), ("UTIL.", 40)], rows,
                  size=1.7, row_h=3.0, title="FRAME ANALYSIS, PEAK COMBINED STRESS (CHASSIS.md)")
