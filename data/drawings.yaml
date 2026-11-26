@@ -203,6 +203,7 @@ drawings:
       - {rev: P, date: 2026-11-25, description: "Memo: the phantom studs break at the LB-06 labels they touched", drawn: Kiro, checked: "", approved: ""}
       - {rev: Q, date: 2026-11-25, description: "Memo: the stations' X with the axle group at X 4,496.2", drawn: Kiro, checked: "", approved: ""}
       - {rev: R, date: 2026-11-25, description: "Memo: the notes' continuation lines hang under their text, wrapped by width", drawn: Kiro, checked: "", approved: ""}
+      - {rev: S, date: 2026-11-26, description: "Memo: the stations' X with the axle group at X 4,495.4", drawn: Kiro, checked: "", approved: ""}
   - number: CT-012
     title: Sections
     subtitle: Through the bed by day and night, the plinth and bench, the wet room, well and grey tank
@@ -559,6 +560,7 @@ drawings:
       - {rev: U, date: 2026-11-25, description: "Memo: the notes' continuation lines hang under their text, wrapped by width", drawn: Kiro, checked: "", approved: ""}
       - {rev: V, date: 2026-11-26, description: "Memo: the frame's twist from the merged build", drawn: Kiro, checked: "", approved: ""}
       - {rev: W, date: 2026-11-26, description: "Memo: the frame's figures from the build", drawn: Kiro, checked: "", approved: ""}
+      - {rev: X, date: 2026-11-26, description: "Memo: the stations and the body mounts with the axle group at X 4,495.4", drawn: Kiro, checked: "", approved: ""}
   - number: CT-401
     title: Garage and bed general arrangement
     subtitle: Plan, kerb-side section and section looking forward at partition A
@@ -744,6 +746,7 @@ drawings:
       - {rev: U, date: 2026-11-25, description: "Notice: 395 L of fresh water, the tanks notched round the hinge gussets", drawn: Kiro, checked: "", approved: ""}
       - {rev: V, date: 2026-11-25, description: "Memo: the notes' continuation lines hang under their text, wrapped by width", drawn: Kiro, checked: "", approved: ""}
       - {rev: W, date: 2026-11-25, description: "Notice: 385 L of fresh water, the tanks pocketed round the XT kit (I2-97)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: X, date: 2026-11-26, description: "Memo: the positions with the axle group at X 4,495.4", drawn: Kiro, checked: "", approved: ""}
   - number: CT-612
     title: Plumbing layout
     subtitle: Tanks, pump cabinet, drains with their falls, the shower well, fill and dump points
