@@ -370,6 +370,20 @@ def guard_hangers(fr, V, sp, b):
     return out
 
 
+@product("tank_bearers")
+def tank_bearers(fr, V, sp, b):
+    """The fresh tanks' bearers UF-01B at the places the layout finds for them (Layout.tank_bearers, I2-109): each a
+    galvanised steel angle, its upright leg on an XT crossmember's face and its foot under a tank's end, with the rubber
+    strip on its foot, each leg a box in the model's own coordinates."""
+    wbox, _ = _world(fr)
+    out = []
+    for br in (b.extra.get("bearers") or []) if b is not None else []:
+        bx = br["boxes"]
+        out.append(("bearer angle", wbox(bx["upright"]) + wbox(bx["foot"]), GALV, 1.0))
+        out.append(("bearer rubber strip", wbox(bx["rubber"]), RUBBER, 1.0))
+    return out
+
+
 @product("jockey_spacers")
 def jockey_spacers(fr, V, sp, b):
     """Four zinc-plated spacer tubes on M12 bolts between the jockey's bracket plate and the angled drawbar member, each

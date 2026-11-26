@@ -518,6 +518,10 @@ def _blocks_of(lay) -> tuple[dict, list]:
     D-ring, and each corner steady over the box its leg sweeps from folded for travel to standing at 90 degrees."""
     bl = []
     for b in lay.blocks:
+        if b.id == "UF-01B" and hasattr(lay, "bearer_parts"):   # the fresh tanks' bearers as their legs (I2-109)
+            bl += [dict(iid=f"{b.iid} {n}", id=b.id, name=f"{b.name.split(', ')[0]}, {n}", system=b.system, box=bx, hollow=False,
+                        keep_clear=False, role=None) for n, bx in lay.bearer_parts()]
+            continue
         tubes = spacer_tubes(lay, b)
         if b.box is None and not tubes:
             continue
@@ -746,7 +750,7 @@ def _resolve_run(r: dict, ns: dict, K: dict, rule: dict, fixtures: dict, pitch: 
     f = fillet(pts, max(k["bend_r"], way_bend), elbow_r=elbow_r, rigid=rigid)
     length_m = float(r["cut_m"]) if r.get("cut_m") else (f["length"] + slack) / 1000
     if r.get("rides") == "arm":
-        row.update(slack_mm=round(slack, 1), tray=(pts[1], pts[-1]))
+        row.update(slack_mm=round(slack, 1), tray=list(zip(pts[1:-1], pts[2:])))   # the tray along the inner leg and the beam (I2-110)
     if vd is not None:
         vd = k["mv_am"] * r["amps"] * length_m / 1000 + upstream_v(r) + ahead + inline_v(r)
     cores = kind.get("cores", 1)
@@ -1393,7 +1397,7 @@ def supports(res: dict) -> dict:
                   or any(_bar_gap([(p, p)], c) - rad <= clip for c in along_bars)
                   or _in_box(p, board, 0.0) or any(_in_box(p, bx, 1.0) for bx in ends)
                   or any(_pt_box(p, bx) - rad <= clip for bx in holders)
-                  or (r.get("tray") is not None and seg_seg(p, p, *r["tray"]) - rad <= clip)
+                  or any(seg_seg(p, p, *seg) - rad <= clip for seg in r.get("tray") or [])
                   or any(0 <= _pt_box(p, bx) and _pt_box(p, bx) - rad <= clip for bx in carcasses)
                   or (r["system"] == "ac230" and any(_in_box(p, z, 0.0) for z in zones))
                   or any(any(_in_box(p, pb, 1.0) for pb in panels) and math.dist(p[:2] if g["at"] in ("floor", "roof") else p, g["p"][:2] if g["at"] in ("floor", "roof") else g["p"])
