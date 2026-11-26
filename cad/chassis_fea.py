@@ -1592,7 +1592,10 @@ class Analysis:
         and its raiser is one hole in two walls, and an outrigger's root face is the raiser's outer web. Each carries its
         wall, its net section in the composite rail, its edge distance and its clear distance to the nearest weld toe.
         An outrigger's open end under a side marker's cap has no wall. The vent and drain holes for galvanising at each
-        rail's front end (galvanising_holes, I2-75) follow the services' holes, on both rails, their use as their run."""
+        rail's front end (galvanising_holes, I2-75) follow the services' holes, on both rails, their use as their run. The
+        bolt holes of the fresh tanks' bearers and the front guard's hangers (Layout.fixing_holes, I2-109) come after every
+        other hole, so no hole's id moves: those in the rails' webs as the services' are, those in the XT crossmembers'
+        webs on their crossmember's own section (_member_hole_sites)."""
         import yaml
         from .partsdb import DATA
         ch, V, comp = self.ch, self.ch.V, self.ch.comp
@@ -1632,6 +1635,13 @@ class Analysis:
             if h["use"] == "drain":
                 rows.append(dict(member=h["host"], face="road side" if s > 0 else "kerb side", run="check", x=float(c[0]),
                                  y=s * (V["rail_c"] + rail.b / 2 - 0.5), z=V["rail_underside_z"] + rail.d / 2, d=10.0, length=10.0, new=True))
+        fixings = self.lay.fixing_holes() if hasattr(self.lay, "fixing_holes") else []
+        for f in (f for f in fixings if f["member"].startswith("RL-")):
+            s = 1 if f["y"] > 0 else -1
+            inner = f["face"] == "inner web"
+            face = ("kerb side" if s > 0 else "road side") if inner else ("road side" if s > 0 else "kerb side")
+            rows.append(dict(member=f["member"], face=face, run=f["use"], x=f["x"], y=f["y"], z=f["z"], d=float(f["d"]),
+                             length=float(f["length"]), late=True))
         toes = ch.weld_toes()
         z0, zs, z1 = V["rail_underside_z"], V["rail_top_z"], V["raiser_top_z"]
         sites: list[dict] = []
@@ -1700,7 +1710,10 @@ class Analysis:
                     h["toe_mm"], h["toe_need"], h["toe_weld"] = g, need, f"hole for {', '.join(o['runs'])}"
         late = [h for h in sites if h.get("late")]           # the seam vents keep the ids after every other hole's
         sites = [h for h in sites if not h.get("new") and not h.get("late")] + self._drawbar_hole_sites(rules) + [h for h in sites if h.get("new")]
-        sites += self._member_hole_sites(rules) + late
+        bolts = self._fixing_member_holes(fixings)
+        members = self._member_hole_sites(rules, bolts)
+        k = len(members) - len(bolts)
+        sites += members[:k] + late + members[k:]
         for k, h in enumerate(sites, 1):
             h["id"] = f"H-{k:02d}"
         self._read_together(sites)
@@ -1783,14 +1796,35 @@ class Analysis:
                                      base=dict(Z_weak=sec.Z_weak, I_weak=sec.I_weak, C=sec.C, y_max=sec.b / 2))))
         return out
 
-    def _member_hole_sites(self, rules) -> list[dict]:
+    def _fixing_member_holes(self, fixings: list[dict]) -> list[dict]:
+        """The bolt holes the fresh tanks' bearers and the front guard's hanger make in the XT crossmembers' webs
+        (Layout.fixing_holes, I2-109), each as the dip gives a hole in its member's web (cad/chassis_dip.py), its place
+        along the member and across it read from its centre, for _member_hole_sites."""
+        from .chassis_dip import Tube
+        mem = {m.id: m for m in self.ch.members}
+        out = []
+        for f in fixings:
+            m = mem.get(f["member"])
+            if m is None or m.id.startswith("RL-"):
+                continue
+            t = Tube(m.id, m.p0, m.p1, m.sec, m.depth_dir)
+            c = np.array((f["x"], f["y"], f["z"]), float)
+            u, z_l = float(np.dot(c - t.p0, t.ex)), float(np.dot(c - t.p0, t.ez))
+            web = 1 if float(np.dot(c - t.p0, t.ey)) > 0 else -1
+            out.append(dict(member=m.id, tube=t.name, tube_L=t.L, end=0 if u < t.L / 2 else 1, web=web, u=u, z_l=z_l, d=float(f["d"]),
+                            use=f["use"], via="own", u_web=min(u, t.L - u), z_under=z_l + m.sec.d / 2,
+                            centre=t.point(u, web * m.sec.b / 2, z_l), normal=web * t.ey))
+        return out
+
+    def _member_hole_sites(self, rules, bolts=()) -> list[dict]:
         """The holes for galvanising CHS-11 asks of the frame's other closed sections (cad/chassis_dip.py, I2-84), each in
         its member's own web: its net section, its edge distance to the web's flat and to the member's end, and its clear
-        distance to the end weld's toe, to fillets along the member's bottom edges, to the fittings welded on it and to
-        the member's other holes, in the web's own plane (u along the member, z across it). A hole in a rail's inner web
-        inside a crossmember's end is read with the rails' holes (hole_sites). The drawbar members' apex drains are
-        H-33 to H-36 already. The hinge gussets are members of the frame model, so their holes are read on their net
-        sections as the members' are."""
+        distance to the end weld's toe, to fillets along the member's bottom edges, to the fittings welded on it, to the
+        hinge gussets' end welds on a hinge crossmember's face and to the member's other holes, in the web's own plane (u
+        along the member, z across it). A hole in a rail's inner web inside a crossmember's end is read with the rails'
+        holes (hole_sites). The drawbar members' apex drains are H-33 to H-36 already. The hinge gussets are members of
+        the frame model, so their holes are read on their net sections as the members' are. `bolts`, the fixings' bolt
+        holes in the crossmembers' webs (_fixing_member_holes), are read the same way, after the dip's holes."""
         from .chassis import fitting_boxes
         from .chassis_dip import frame_sections
         ch, V = self.ch, self.ch.V
@@ -1803,8 +1837,16 @@ class Analysis:
             if "CH-P07" not in attach[p["member"]]:
                 attach[p["member"]].append("CH-P07")
         boxes = {fid: [b for f in ch.fittings if f.id == fid for b in fitting_boxes(ch, f)] for fids in attach.values() for fid in fids}
+        feet: dict[str, list] = {}                        # each hinge gusset's end weld on its crossmember's face, to its toe
+        gsec = ch.sections[next(f for f in ch.data["fittings"] if f["id"] == "CH-P08")["section"]]
+        g_leg = ch.data["xt_hinges"]["gusset"]["weld"]["leg"]
+        for g in ch.hinge_gussets():
+            (fx, ya), (_, yb) = g["outline"][:2]
+            feet.setdefault(g["cm"], []).append((g["id"], (fx - g_leg, min(ya, yb) - g_leg, g["z"] - gsec.d / 2 - g_leg,
+                                                           fx + g_leg, max(ya, yb) + g_leg, g["z"] + gsec.d / 2 + g_leg)))
         own = [h for h in holes if h["via"] == "own" and not (h["tube"].endswith("A") and h["tube"].startswith("DB-") and h["use"] == "drain")]
-        run_nodes = self._run_nodes(own)
+        own += list(bolts)
+        run_nodes, span_nodes = self._run_nodes(own)
         out = []
         for h in own:
             m = mem.get(h["member"])
@@ -1827,6 +1869,8 @@ class Analysis:
                 for bx in boxes[fid]:
                     gb = (bx[0] - 6, bx[1] - 6, bx[2] - 6, bx[3] + 6, bx[4] + 6, bx[5] + 6)
                     toes.append((_box_gap(hb, gb), f"{fid}'s fillets"))
+            for gid, gb in feet.get(h["member"], []):
+                toes.append((_box_gap(hb, gb), f"{gid}'s end weld"))
             for o in own:
                 if o is not h and o["tube"] == h["tube"] and o["web"] == h["web"]:
                     g = math.hypot(o["u"] - h["u"], o["z_l"] - z) - (o["d"] + d) / 2
@@ -1845,34 +1889,50 @@ class Analysis:
                             open=False, fu=rules["fu"]["raiser" if sec.fy < 400 else "rail"], fy=sec.fy, box=hb, edge_mm=edge, edge_need=edge_need,
                             toe_mm=gap, toe_need=rules["toe_factor"] * d, toe_weld=weld, galv=True, placement_only=frame is None,
                             u_web=u_end, z_under=float(h.get("z_under", z + sec.d / 2)), run_node=run_nodes.get(id(h)),
+                            span_nodes=span_nodes.get(id(h)),
                             gross=gross, strips=strips, levers=levers, face_w=face_w, wall_id=f"{h['member']} web {h['web']}",
                             net=dict(net_section(gross, strips, levers, sec.b / 2, face_w, d),
                                      base=dict(Z_weak=sec.Z_weak, I_weak=sec.I_weak, C=sec.C, y_max=sec.b / 2))))
         return out
 
-    def _run_nodes(self, holes: list[dict]) -> dict[int, int]:
-        """The hinge bar's weld run each hole in a hinge crossmember lies within (I2-112): the frame model lumps each run
-        at its centre, so a hole within a run's length, its centre either side of that node, is read on the element
-        outboard of the node, which carries the run's share of the hinge's force with the inner runs', on the safe side."""
+    def _run_nodes(self, holes: list[dict]) -> tuple[dict[int, int], dict[int, list]]:
+        """Where each hole in a hinge crossmember is read against the hinge bar's weld runs (I2-112, I2-109). The frame model
+        lumps each run at its centre and ties the runs' nodes together through the rigid hinge bar, so between the
+        outermost and the innermost run's nodes the crossmember carries next to nothing. A hole within the outermost run's
+        length, its centre either side of that node, is read on the element outboard of the node, which carries the
+        runs' share of the hinge's force into the rail, on the safe side: the first dict, the node. Any other hole that
+        reaches into the runs' span, from the innermost run's inner end out, is read at both ends of the span, on the
+        element outboard of the outermost run's node and on the element inboard of the innermost run's node, which
+        carries the force across the crossmember, the worse of the two: the second dict, each (node, outboard)."""
         ch = self.ch
         run = ch.data["xt_hinges"]["bar"]["run"]
-        out = {}
+        outer, span = {}, {}
         for cm in ch.hinge_crossmembers():
+            ys = ch.hinge_weld_ys(cm)
             for h in holes:
                 if h["member"] != cm.id:
                     continue
                 y, r = float(h["centre"][1]), h["d"] / 2
-                for yr in ch.hinge_weld_ys(cm):
-                    if yr * y > 0 and abs(y - yr) < run / 2 + r:
-                        out[id(h)] = self.fm.cm_node(cm.id, yr)
-        return out
+                side = sorted((yr for yr in ys if yr * y > 0), key=abs)
+                if not side:
+                    continue
+                y_in, y_out = side[0], side[-1]
+                if abs(y - y_out) < run / 2 + r:
+                    outer[id(h)] = self.fm.cm_node(cm.id, y_out)
+                elif abs(y) + r > abs(y_in) - run / 2 and abs(y) - r < abs(y_out) + run / 2:
+                    span[id(h)] = [(self.fm.cm_node(cm.id, y_out), True), (self.fm.cm_node(cm.id, y_in), False)]
+        return outer, span
 
     def hole_stress(self, res, h) -> dict:
         """Normal and combined stress at a hole's edge on the composite rail's net section, at the element end nearest it.
         A hole for galvanising is read on the element whose span holds it, at that element's end nearer the hole, so a
         load that enters the member between the hole and the next node (a hinge's welds) is counted where it passes. A hole
-        within a hinge bar's weld run's length is read on the element outboard of the run's node, at that node, whichever
-        side of it the hole's centre falls (I2-112)."""
+        within the outermost of a hinge bar's weld runs is read on the element outboard of that run's node, at that node,
+        whichever side of it the hole's centre falls (I2-112), and any other hole in the runs' span at both of the span's
+        ends, the worse (_run_nodes)."""
+        if h.get("span_nodes"):
+            return max((self.hole_stress(res, dict(h, span_nodes=None, run_node=nd, inboard=not outward))
+                        for nd, outward in h["span_nodes"]), key=lambda r: r["eq"])
         best, bd = None, math.inf
         p = np.asarray((h["x"], h["y"], h["z"]), float)
         nd0 = h.get("run_node")
@@ -1880,7 +1940,7 @@ class Analysis:
             for el, fl in zip(self.f.elements, res.forces):
                 if el.member == h["frame"] and nd0 in (el.i, el.j):
                     far = el.j if el.i == nd0 else el.i
-                    if abs(self.f.nodes[far][1]) > abs(self.f.nodes[nd0][1]):
+                    if (abs(self.f.nodes[far][1]) > abs(self.f.nodes[nd0][1])) != bool(h.get("inboard")):
                         best, bd = end_actions(fl)[0 if el.i == nd0 else 1], 0.0
         for span in (() if best is not None else (True, False) if h.get("galv") else (False,)):
             for el, fl in zip(self.f.elements, res.forces):

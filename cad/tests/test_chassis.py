@@ -425,9 +425,11 @@ def test_holes_in_one_section_are_read_together():
 
 
 def test_a_hole_within_a_weld_run_is_read_outboard_of_its_node():
-    """I2-112: the frame model lumps each of a hinge bar's 80 mm weld runs at its centre, so a hole in a hinge
-    crossmember within a run's length is read on the element outboard of the run's node, at that node, whichever side of
-    it the hole's centre falls, and only those holes."""
+    """I2-112 and I2-109: the frame model lumps each of a hinge bar's 80 mm weld runs at its centre and ties the runs
+    together through the rigid bar, so a hole in a hinge crossmember within the outermost run's length is read on the
+    element outboard of that run's node, at that node, whichever side of it the hole's centre falls, and any other hole
+    that reaches into the runs' span is read at both of the span's ends, on the element outboard of the outermost run's
+    node and on the element inboard of the innermost run's node, the worse, and only those holes."""
     import numpy as np
 
     from cad.chassis_fea import Analysis
@@ -435,27 +437,58 @@ def test_a_hole_within_a_weld_run_is_read_outboard_of_its_node():
     sites = an.hole_sites()
     run = CH.data["xt_hinges"]["bar"]["run"]
     hinged = {m.id: m for m in CH.hinge_crossmembers()}
-    within = []
+    ends = []
     for h in sites:
         m = hinged.get(h["member"])
-        hit = [yr for yr in (CH.hinge_weld_ys(m) if m else []) if yr * h["y"] > 0 and abs(h["y"] - yr) < run / 2 + h["d"] / 2]
-        assert (h.get("run_node") is not None) == bool(hit), h["id"]
-        if hit:
-            assert h["run_node"] == an.fm.cm_node(m.id, hit[0])
-            within.append(h)
-    assert {"CM-04", "CM-05"} <= {h["member"] for h in within}
+        side = sorted((yr for yr in (CH.hinge_weld_ys(m) if m else []) if yr * h["y"] > 0), key=abs)
+        r = h["d"] / 2
+        outer = bool(side) and abs(h["y"] - side[-1]) < run / 2 + r
+        span = bool(side) and not outer and abs(h["y"]) + r > abs(side[0]) - run / 2 and abs(h["y"]) - r < abs(side[-1]) + run / 2
+        assert (h.get("run_node") is not None) == outer and bool(h.get("span_nodes")) == span, h["id"]
+        if outer:
+            assert h["run_node"] == an.fm.cm_node(m.id, side[-1])
+            ends.append((h, [(h["run_node"], True)]))
+        if span:
+            assert h["span_nodes"] == [(an.fm.cm_node(m.id, side[-1]), True), (an.fm.cm_node(m.id, side[0]), False)]
+            ends.append((h, h["span_nodes"]))
+    assert {"CM-04", "CM-05"} <= {h["member"] for h, nodes in ends if len(nodes) == 1}
+    assert {"CM-04", "CM-05"} <= {h["member"] for h, nodes in ends if len(nodes) == 2}
 
     class Res:
         forces = None
 
-    for h in within:
-        nd = h["run_node"]
-        els = [k for k, el in enumerate(an.f.elements) if el.member == h["frame"] and nd in (el.i, el.j)]
-        out = [k for k in els if abs(an.f.nodes[an.f.elements[k].j if an.f.elements[k].i == nd else an.f.elements[k].i][1])
-               > abs(an.f.nodes[nd][1])]
-        assert len(out) == 1, h["id"]
-        for k in els:
+    for h, nodes in ends:
+        read, near = set(), set()
+        for nd, outward in nodes:
+            els = [k for k, el in enumerate(an.f.elements) if el.member == h["frame"] and nd in (el.i, el.j)]
+            far = {k: an.f.elements[k].j if an.f.elements[k].i == nd else an.f.elements[k].i for k in els}
+            on_side = [k for k in els if (abs(an.f.nodes[far[k]][1]) > abs(an.f.nodes[nd][1])) == outward]
+            assert len(on_side) == 1, h["id"]
+            read.add(on_side[0])
+            near.update(els)
+        for k in near:
             r = Res()
             r.forces = np.zeros((len(an.f.elements), 12))
             r.forces[k] = 1000.0
-            assert (an.hole_stress(r, h)["eq"] > 0) == (k == out[0]), (h["id"], k)
+            assert (an.hole_stress(r, h)["eq"] > 0) == (k in read), (h["id"], k)
+
+
+def test_the_bearers_and_hangers_bolt_holes_are_read_by_the_hole_checks():
+    """I2-109: every bolt hole the fresh tanks' bearers and the front guard's hangers make (Layout.fixing_holes) is a hole
+    CHS-08U, CHS-09, CHS-10 and CHS-12 read, numbered after every other hole so no id moves: those in the rails' webs on
+    the composite rail's section, those in the XT crossmembers' webs on their crossmember's own, each bolt's hole in one
+    web read with its hole in the other, and every one of them passes."""
+    fix = EV["layout"].fixing_holes()
+    bolts = [h for h in RES["holes"] if any(r.startswith("bolt for") for r in h.get("runs", []))]
+    assert fix and len(bolts) == len(fix)
+    assert sorted(int(h["id"][2:]) for h in bolts) == list(range(len(RES["holes"]) - len(fix) + 1, len(RES["holes"]) + 1))
+    hinged = {m.id for m in CH.hinge_crossmembers()}
+    for f in fix:
+        h = next(h for h in bolts if h["member"] == f["member"] and math.dist((h["x"], h["y"], h["z"]), (f["x"], f["y"], f["z"])) < 1)
+        assert h["runs"] == [f["use"]] and h["d"] == f["d"], h["id"]
+        rail = f["member"].startswith("RL-")
+        assert h["frame"] == f["member"] and (rail or f["member"] in hinged), h["id"]
+        along = (lambda o: o["x"]) if rail else (lambda o: o["y"])
+        pair = [o for o in bolts if o is not h and o["member"] == h["member"] and abs(along(o) - along(h)) < 1]
+        assert len(pair) == 1 and pair[0]["id"] in h.get("with", []), h["id"]
+        assert h["ok"] and h["static_ok"] and h["ultimate"]["util"] <= 1, h["id"]
