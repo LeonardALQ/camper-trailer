@@ -40,25 +40,30 @@ def _world(fr):
     return wbox, wcyl
 
 
+def _wcone(fr, p, q, r0, r1):
+    """A cone from r0 at the point p to r1 at q, both in the model's own coordinates (x, y, z)."""
+    z0 = fr.bx[2]
+    a, c = Vector(*fr.pt(*fr.uv(p[0], p[1]), p[2] - z0)), Vector(*fr.pt(*fr.uv(q[0], q[1]), q[2] - z0))
+    return Solid.make_cone(r0, r1, (c - a).length, Plane(origin=a, z_dir=c - a))
+
+
 @product("xt_arm")
 def xt_arm(fr, V, sp, b):
-    """One Cruisemaster XT Freestyle trailing arm in the slot between the rail and the wheel, down to the stub axle.
-    `hub` and `hub_w` place the hub centre in the envelope, `top` is the rail's underside and `slot` the clear width
-    between the rail and the tyre. The kit's parts between the rails are xt_kit's."""
+    """One Cruisemaster XT Freestyle arm's stub axle, in the slot between the rail and the wheel. `hub` and `hub_w`
+    place the hub centre in the envelope. The arm itself, the A-frame from its pivot tube back to the hub that sheet 4
+    draws, is xt_kit's with the kit's other parts."""
     _, cy, mu = _from_front(fr)
-    hu, hw, top, slot = sp["hub"], sp["hub_w"], sp["top"], sp["slot"]
-    pw = top - 110                                  # the arm's front end, 110 mm under the rail, where its front leg meets it
-    profile = [(mu(0), pw + 40), (mu(hu + 30), hw + 45), (mu(hu + 30), hw - 45), (mu(0), pw - 40)]
-    return [("trailing arm", fr.prism_uw(profile, 14, slot - 4), "#7b7d7d", 1.0),
-            ("stub axle", cy((hu, 14, hw), (hu, fr.D - 90, hw), 35), STEEL, 1.0)]
+    hu, hw = sp["hub"], sp["hub_w"]
+    return [("stub axle", cy((hu, 14, hw), (hu, fr.D - 90, hw), 35), STEEL, 1.0)]
 
 
 @product("xt_kit")
 def xt_kit(fr, V, sp, b):
     """One XT arm's parts between the rails at their places in Cruisemaster's 33XT AIR sheets 2 to 4 (Chassis.xt_parts,
-    est.), which its line carries: the hinge bar under its crossmember with the arm's four hinge plates and its pivot
-    tube, the airbag at ride under its top bracket 33SA 013 on the rail's inner face, and the shock absorber at ride from
-    its eye on the arm to its bracket on the next crossmember."""
+    est.), which its line carries: the hinge bar under its crossmember with the arm's four hinge plates, its pivot tube
+    and the A-frame's two legs from the bushes back to the hub at ride (Chassis.arm_bars), the airbag at ride under its
+    top bracket 33SA 013 on the rail's inner face, and the shock absorber at ride from its eye on the arm to its bracket
+    on the next crossmember."""
     wbox, wcyl = _world(fr)
     out = []
     for p in (b.extra.get("xt") or []) if b is not None else []:
@@ -68,7 +73,7 @@ def xt_kit(fr, V, sp, b):
         elif kind == "XT-HINGE":
             out += [("hinge plate", wbox(q), GALV, 1.0) for q in p["plates"]]
             out.append(("pivot tube and bushes", wcyl(*p["tube"], 32), BLACK, 1.0))
-            out.append(("arm's front leg from its outer bush under the rail", wcyl(*p["leg"], 32), "#7b7d7d", 1.0))
+            out += [("arm's leg from its bush back to the hub", _wcone(fr, *leg), "#7b7d7d", 1.0) for leg in p["legs"]]
         elif kind == "XT-BAG":
             (cx, cy), (za, zb) = p["centre"], p["z"]
             out.append(("airbag", wcyl((cx, cy, za), (cx, cy, zb), p["d"] / 2), BLACK, 1.0))

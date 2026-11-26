@@ -828,6 +828,21 @@ class Chassis:
         upper = (cm.p0[0] - cm.sec.b / 2 - plate - sh["e"], y, V["rail_underside_z"] + d["z_over_underside"])
         return lower, upper
 
+    def arm_bars(self, w: dict, s: float = 0.0) -> list[tuple]:
+        """Wheel w's XT arm as Cruisemaster's 33XT AIR sheet 4 draws it, at travel s (mm, up positive): its pivot tube
+        between the outer and the inner hinge plates, and the A-frame's two legs from the bushes (xt_arms `parts` `arm`,
+        est.) back to the hub, which turn with the arm about the pivot. Each bar is ((x, y, z), (x, y, z), r0, r1) on its
+        axis with its radius at each end: the tube and each leg at its bush `d` round, each leg growing to the arm's
+        arm_depth at the hub. The tube comes first and the inner leg last."""
+        V, pr = self.V, self.data["xt_arms"]["parts"]
+        y_in, sd = V["rail_c"] - self.role_sec["rail"].b / 2, w["side"]
+        (px, _, pz), (hx, hy, hz) = w["pivot"], w["hub"]
+        a = self.xt_arm_turn(w, s)
+        hub = (px + (hx - px) * math.cos(a) - (hz - pz) * math.sin(a), hy, pz + (hx - px) * math.sin(a) + (hz - pz) * math.cos(a))
+        ys, r, rh = pr["plates"]["y_in"], pr["arm"]["d"] / 2, V["arm_depth"] / 2
+        tube = ((px, sd * (y_in - ys[0] - r), pz), (px, sd * (y_in - ys[-1] + r), pz), r, r)   # its round ends at the end plates
+        return [tube] + [((px, sd * (y_in - u), pz), hub, r, rh) for u in pr["arm"]["roots"]]
+
     def shock_plates(self) -> list[dict]:
         """The shock support plates CH-P07, a pair flush on the front face of each crossmember the data's `stations` names,
         `side_y` their middles from the centreline, full crossmember height: each with its member, side, box and centre."""
@@ -871,9 +886,10 @@ class Chassis:
             pl = pr["plates"]
             plates = [(px - pl["l"] / 2, min(ys(u - pl["t"] / 2, u + pl["t"] / 2)), zu - pl["below"],
                        px + pl["l"] / 2, max(ys(u - pl["t"] / 2, u + pl["t"] / 2)), zu - pr["bar"]["d"]) for u in pl["y_in"]]
+            bars = self.arm_bars(w)
             out.append(dict(id=f"XT-HINGE-{wid}", what="the arm's hinge plates, bushes and pivot tube", wheel=wid, plates=plates,
                             tube=((px, s * (y_in - pl["y_in"][0]), w["pivot"][2]), (px, s * (y_in - pl["y_in"][-1]), w["pivot"][2])),
-                            leg=((px, s * (y_in - pl["y_in"][0]), w["pivot"][2]), (px, s * (y_out + 24.0), w["pivot"][2])),
+                            legs=bars[1:],
                             boxes=[(px - pl["l"] / 2, hy[0], zu - pl["below"], px + pl["l"] / 2, hy[1], zu - pr["bar"]["d"])]))
             ab, bb = pr["airbag"], pr["bag_bracket"]
             bx, by = w["hub"][0] + ab["dx"], s * (y_in - ab["y_in"])
@@ -1334,29 +1350,58 @@ def _span_gap(a0: float, a1: float, b0: float, b1: float) -> float:
 
 def swept_parts(ch: Chassis, tyre_w: float, s: float) -> list[dict]:
     """Each wheel's tyre and trailing arm at travel s (mm, up positive) about the arm's pivot (report 11 section 5.1).
-    The tyre is a cylinder of the published diameter in its own plane. The arm is a bar `arm_depth` deep from the pivot
-    to the hub, across the slot from the rail's outer face to the tyre's inner face, where the XT's hanger, bush and
-    arm lie (cad/model/products/outside.py)."""
+    The tyre is a cylinder of the published diameter in its own plane. The arm is Cruisemaster's A-frame as sheet 4
+    draws it (Chassis.arm_bars): its pivot tube between the hinge plates and its two legs from the bushes back to the
+    hub, each a bar `arm_depth` round (est.), whose `bars` FIT-05 measures in space. Its `pivot`, `hub` and `y` give its
+    side view and its span across the trailer."""
     V = ch.V
-    rail_out = V["rail_c"] + ch.role_sec["rail"].b / 2
     out = []
     for w in ch.suspension:
         px, _, pz = w["pivot"]
         dz = V["arm_drop"] - s
         hub = (px + math.sqrt(V["arm_r"] ** 2 - dz ** 2), pz - dz)
-        yc, side = w["hub"][1], w["side"]
-        arm_y = sorted((side * rail_out, side * (abs(yc) - tyre_w / 2)))
+        yc = w["hub"][1]
+        bars = ch.arm_bars(w, s)
+        ys = [q[1] for bar in bars for q in bar[:2]]
         out.append(dict(wheel=w["id"], part="tyre", hub=hub, r=V["tyre_d"] / 2, y=(yc - tyre_w / 2, yc + tyre_w / 2)))
-        out.append(dict(wheel=w["id"], part="arm", hub=hub, pivot=(px, pz), r=V["arm_depth"] / 2, y=tuple(arm_y)))
+        out.append(dict(wheel=w["id"], part="arm", hub=hub, pivot=(px, pz), r=V["arm_depth"] / 2, y=(min(ys), max(ys)), bars=bars))
     return out
+
+
+def _pt_box3(p, b) -> float:
+    return math.sqrt(sum(max(b[i] - p[i], 0.0, p[i] - b[i + 3]) ** 2 for i in range(3)))
+
+
+def _taper_gap(bar: tuple, dist, n: int = 40) -> float:
+    """Least gap from a bar (a, c, r0, r1), its radius growing evenly from r0 at a to r1 at c, to a convex shape whose
+    distance from a point is `dist`, by a ternary search along the bar (the distance less a linear radius is convex)."""
+    a, c, r0, r1 = bar
+    f = lambda t: dist(tuple(a[i] + (c[i] - a[i]) * t for i in range(3))) - (r0 + (r1 - r0) * t)  # noqa: E731
+    lo, hi = 0.0, 1.0
+    for _ in range(n):
+        m1, m2 = lo + (hi - lo) / 3, hi - (hi - lo) / 3
+        if f(m1) < f(m2):
+            hi = m2
+        else:
+            lo = m1
+    return min(f(lo), f(0.0), f(1.0))
+
+
+def _taper_pt(bar: tuple, q) -> float:
+    """The gap from the bar (a, c, r0, r1) to the point q, at the point of its axis nearest q."""
+    a, c, r0, r1 = bar
+    d = [c[i] - a[i] for i in range(3)]
+    dd = sum(v * v for v in d)
+    t = 0.0 if dd < 1e-12 else max(0.0, min(1.0, sum((q[i] - a[i]) * d[i] for i in range(3)) / dd))
+    return math.dist(q, tuple(a[i] + d[i] * t for i in range(3))) - (r0 + (r1 - r0) * t)
 
 
 def _part_bbox(p: dict) -> tuple:
     (hx, hz), r = p["hub"], p["r"]
     if p["part"] == "tyre":
         return (hx - r, p["y"][0], hz - r, hx + r, p["y"][1], hz + r)
-    (px, pz) = p["pivot"]
-    return (min(px, hx) - r, p["y"][0], min(pz, hz) - r, max(px, hx) + r, p["y"][1], max(pz, hz) + r)
+    pts = [q for bar in p["bars"] for q in bar[:2]]
+    return tuple(min(q[i] for q in pts) - r for i in range(3)) + tuple(max(q[i] for q in pts) + r for i in range(3))
 
 
 def wheel_sweep(ch: Chassis, tyre_w: float, boxes: list[tuple[str, tuple]], points: list[tuple[str, tuple, float]],
@@ -1386,17 +1431,19 @@ def wheel_sweep(ch: Chassis, tyre_w: float, boxes: list[tuple[str, tuple]], poin
             hub, r, (y0, y1) = p["hub"], p["r"], p["y"]
             nb, npts = near_of[(p["wheel"], p["part"])]
             for name, b in nb:
-                rect = (b[0], b[2], b[3], b[5])
-                d = (_pt_rect(hub, rect) if p["part"] == "tyre" else _seg_rect(p["pivot"], hub, rect)) - r
-                g = _beside(d, _span_gap(y0, y1, b[1], b[4]))
+                if p["part"] == "tyre":
+                    g = _beside(_pt_rect(hub, (b[0], b[2], b[3], b[5])) - r, _span_gap(y0, y1, b[1], b[4]))
+                else:
+                    g = min(_taper_gap(bar, lambda q, b=b: _pt_box3(q, b)) for bar in p["bars"])
                 if g < least.get(name, math.inf):
                     least[name] = g
                 if g < best.get(p["part"], {}).get("gap_mm", math.inf):
                     best[p["part"]] = dict(gap_mm=g, part=p["part"], wheel=p["wheel"], travel_mm=s, what=name, hub=hub)
             for name, q, rq in npts:
-                c = (q[0], q[2])
-                d = (math.dist(hub, c) if p["part"] == "tyre" else _seg_pt(p["pivot"], hub, c)) - r
-                g = _beside(d, _span_gap(y0, y1, q[1], q[1])) - rq
+                if p["part"] == "tyre":
+                    g = _beside(math.dist(hub, (q[0], q[2])) - r, _span_gap(y0, y1, q[1], q[1])) - rq
+                else:
+                    g = min(_taper_pt(bar, q) for bar in p["bars"]) - rq
                 if g < least.get(name, math.inf):
                     least[name] = g
                 if g < best.get(p["part"], {}).get("gap_mm", math.inf):

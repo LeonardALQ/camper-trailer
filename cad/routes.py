@@ -450,24 +450,43 @@ def hang_bight(pts: list[tuple], idx: list[int], length_mm: float, r: float) -> 
 
 def arms_of(lay) -> dict:
     """Each wheel's trailing arm at ride height (cad/chassis.py swept_parts at no travel): its pivot and hub in the side
-    view, its span across the trailer and its half depth, for the drum leads laid along the arms (I2-50)."""
+    view, its span across the trailer, its bars and how far it turns either way over its travel (`turn`, radians), for
+    the drum leads laid along the arms (I2-50)."""
     ch = getattr(lay, "chassis", None) if lay is not None else None
     if ch is None:
         return {}
     from .chassis import swept_parts
-    return {p["wheel"]: p for p in swept_parts(ch, lay.V["tyre_w"], 0.0) if p["part"] == "arm"}
+    t = ch.V["travel"]
+    turn = {w["id"]: (ch.xt_arm_turn(w, -t), ch.xt_arm_turn(w, t)) for w in ch.suspension}
+    return {p["wheel"]: dict(p, turn=turn[p["wheel"]]) for p in swept_parts(ch, lay.V["tyre_w"], 0.0) if p["part"] == "arm"}
+
+
+LEAD_SLACK_MM = 20.0   # (est.) a drum lead's loop at its clip, past the most the clip-to-tray distance grows over the travel
+
+
+def lead_slack(arm: dict, clip: tuple, first: tuple, steps: int = 12) -> float:
+    """A drum lead's slack in its loop from its clip to its arm (I2-50): the most the straight distance from the clip,
+    on the frame, to the lead's first tie in the arm's tray, which turns with the arm about the pivot, grows over the
+    arm's travel past its length at ride, plus LEAD_SLACK_MM for the loop's own bend (est.), in mm."""
+    (px, pz), (a0, a1) = arm["pivot"], arm["turn"]
+    dx, dz = first[0] - px, first[2] - pz
+    at = lambda a: (px + dx * math.cos(a) - dz * math.sin(a), first[1], pz + dx * math.sin(a) + dz * math.cos(a))  # noqa: E731
+    most = max(math.dist(clip, at(a0 + (a1 - a0) * k / steps)) for k in range(steps + 1))
+    return max(0.0, most - math.dist(clip, first)) + LEAD_SLACK_MM
 
 
 def arm_lead(arm: dict, start: tuple, od: float) -> list[tuple]:
-    """A drum lead's arm part at ride height (I2-50): from its clip on the hanger (`start`) in a loop down beside the
-    pivot's bush to the arm's underside, then along the underside at the slot's middle to the brake's backing plate,
-    45 mm short of the hub. FIT-05 sweeps it with the arm (cad/trailer.py tyre_arc)."""
-    (px, pz), (hx, hz) = arm["pivot"], arm["hub"]
-    y = (arm["y"][0] + arm["y"][1]) / 2
-    n = math.hypot(hx - px, hz - pz)
-    ux, uz = (hx - px) / n, (hz - pz) / n
-    off = arm["r"] + od / 2 + 1.0
-    under = lambda t: (px + t * ux + off * uz, y, pz + t * uz - off * ux)  # noqa: E731
+    """A drum lead's arm part at ride height (I2-50): from its clip beside the arm's inner bush (`start`) in a loop down
+    to the underside of the A-frame's inner leg, where Cruisemaster's harness tray runs (33XT AIR sheet 4 step 7, est.),
+    then along it to the brake's backing plate, 45 mm short of the hub. FIT-05 sweeps it with the arm (cad/trailer.py
+    tyre_arc)."""
+    a, c, r0, r1 = arm["bars"][-1]
+    n = math.dist(a, c)
+    u = tuple((c[i] - a[i]) / n for i in range(3))
+    down = tuple(u[2] * u[i] for i in range(3))
+    down = (down[0], down[1], down[2] - 1.0)
+    k = math.sqrt(sum(v * v for v in down))
+    under = lambda t: tuple(a[i] + t * u[i] + (r0 + (r1 - r0) * t / n + od / 2 + 1.0) * down[i] / k for i in range(3))  # noqa: E731
     return [tuple(start), under(0.0), under(n - 45.0)]
 
 
@@ -678,12 +697,14 @@ def _resolve_run(r: dict, ns: dict, K: dict, rule: dict, fixtures: dict, pitch: 
     for w, p in pitch.items():
         ns[f"L_{w}"] = lane_of(r, w) * p
     pts = _points(r, ns, bundles)
+    slack = 0.0
     if r.get("rides") == "arm" and r.get("wheel") in ns.get("_arms", {}):
         size0 = float(r["size"]) if r.get("size") is not None else max(s for s in kind["sizes"] if s is not None)
         pts = arm_lead(ns["_arms"][r["wheel"]], pts[0], kind["sizes"][size0]["od"])
+        slack = lead_slack(ns["_arms"][r["wheel"]], pts[0], pts[1])
     if r["system"] == "waste" and not r.get("pumped"):
         pts = _apply_fall(pts, rule["fall"])
-    raw = sum(math.dist(pts[i], pts[i + 1]) for i in range(len(pts) - 1)) / 1000
+    raw = (sum(math.dist(pts[i], pts[i + 1]) for i in range(len(pts) - 1)) + slack) / 1000
     if r.get("cut_m"):
         raw = float(r["cut_m"])
     row = dict(r, points=pts, kind_what=kind["what"], group=kind.get("group", r["system"]))
@@ -713,7 +734,9 @@ def _resolve_run(r: dict, ns: dict, K: dict, rule: dict, fixtures: dict, pitch: 
         pts = smooth_jogs(pts, k["bend_r"])
         row["points"] = pts
     f = fillet(pts, max(k["bend_r"], way_bend), elbow_r=elbow_r, rigid=rigid)
-    length_m = float(r["cut_m"]) if r.get("cut_m") else f["length"] / 1000
+    length_m = float(r["cut_m"]) if r.get("cut_m") else (f["length"] + slack) / 1000
+    if r.get("rides") == "arm":
+        row.update(slack_mm=round(slack, 1), tray=(pts[1], pts[-1]))
     if vd is not None:
         vd = k["mv_am"] * r["amps"] * length_m / 1000 + upstream_v(r) + ahead + inline_v(r)
     cores = kind.get("cores", 1)
@@ -1074,9 +1097,8 @@ def clearance(res: dict) -> dict:
 def kit_clearance(res: dict) -> dict:
     """SVC-13: SVC-01's clearance from every run to the XT kit's parts between the rails at Cruisemaster's places (33XT AIR
     sheets 2 to 4, est., Chassis.xt_parts): the hinge bars and the arms' hinge plates, the airbags over their travel and
-    their top brackets, the shocks over the arm's travel and their brackets. The runs were laid round an arm drawn
-    outboard of the rail, so this row is reported until they are laid round the kit as Cruisemaster places it (I2-97).
-    A lead's part that rides on its arm is FIT-05's."""
+    their top brackets, the shocks over the arm's travel and their brackets, and no fixture standing in one of them
+    (I2-97). A lead's part that rides on its arm is FIT-05's."""
     clear = res["data"]["rules"]["clear_mm"]
     kit = [b for b in res["blocks"] if b.get("kit")]
     problems, gaps = [], []
@@ -1324,6 +1346,7 @@ def supports(res: dict) -> dict:
                   or any(_bar_gap([(p, p)], c) - rad <= clip for c in along_bars)
                   or _in_box(p, board, 0.0) or any(_in_box(p, bx, 1.0) for bx in ends)
                   or any(_pt_box(p, bx) - rad <= clip for bx in holders)
+                  or (r.get("tray") is not None and seg_seg(p, p, *r["tray"]) - rad <= clip)
                   or any(0 <= _pt_box(p, bx) and _pt_box(p, bx) - rad <= clip for bx in carcasses)
                   or (r["system"] == "ac230" and any(_in_box(p, z, 0.0) for z in zones))
                   or any(any(_in_box(p, pb, 1.0) for pb in panels) and math.dist(p[:2] if g["at"] in ("floor", "roof") else p, g["p"][:2] if g["at"] in ("floor", "roof") else g["p"])

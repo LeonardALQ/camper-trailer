@@ -265,10 +265,10 @@ checks:
     why: "A cable left hanging chafes on the chassis and fatigues at its terminals on corrugated roads. A cable is held inside a chassis member it is threaded through, by a clip, saddle or tie base on a part it runs along within 30 mm of the part's face, on a cleat, tray or saddle the design adds (rules.supports and the SP fixtures), in the board cabinet, a 230 V conduit, a box it ends at, a gland or a frame, or by the loom it shares a way with. Inside a cabinet only a panel it is clipped to holds it, within the same 30 mm, and under the floor a 230 V cable is held only inside the conduit modelled for it. The longest stretch between held points is its unsupported span."
     source: "VSB1 (Building small trailers) section 7.1: trailer wiring supported at intervals of at most 600 mm. The 30 mm reach of a clip is the design's own (est.)"
   - id: SVC-13
-    title: Every run keeps 20 mm from the XT kit's parts between the rails at Cruisemaster's places (reported)
+    title: Every run keeps 20 mm from the XT kit's parts between the rails at Cruisemaster's places, and no fixture stands in one
     kind: kit_clearance
-    severity: report
-    why: "SVC-01's rule against the kit's parts as 33XT AIR sheets 2 to 4 place them (est., Chassis.xt_parts): the hinge bars and the arms' hinge plates under the hinge crossmembers, the airbags over their travel under their top brackets on the rails' inner faces, and the shocks over the arm's travel with their brackets. The runs under the floor were laid round an arm drawn outboard of the rail, so the row is reported until they are laid round the kit as Cruisemaster places it (I2-97). A lead's part that rides on its arm is FIT-05's."
+    severity: fail
+    why: "SVC-01's rule against the kit's parts as 33XT AIR sheets 2 to 4 place them (est., Chassis.xt_parts): the hinge bars and the arms' hinge plates under the hinge crossmembers, the airbags over their travel under their top brackets on the rails' inner faces, and the shocks over the arm's travel with their brackets, and no fixture of the services stands in one of them (I2-97). A lead's part that rides on its arm is FIT-05's, which reads every run and fixture against the arms themselves."
     source: "H27 and H28 for the 20 mm, Cruisemaster's 33XT AIR installation guide rev 3 (27 Jul 2021) sheets 2 to 4 for the places, scaled (est.)"
 
 # The priced quantities the routed ones are compared with on the Electrical and Plumbing pages: BD-11's price items
@@ -604,14 +604,15 @@ consts:
   DCR_X: rear_x0 - 25               # the battery's riser behind the dryer, to the isolator and the BMS, clipped to the partition
   DCR_Y: -half_in + 55              # the chase's mid row, down through the cabinet's floor: the risers and the loom to G20, 30 mm clear of the water lines
   WSY: -half_in + 12                # the chase's wall strip, outside the cabinet's kerb face: the cables to the kerb frame's outboard row and the tank senders
-  RZ1: RS_K.z1 - 34                 # inside the kerb raiser, clear of its seam with the rail: the breakaway feed B-18 on top,
+  RZ1: RS_K.z1 - 31.5                # inside the kerb raiser, clear of its seam with the rail: the breakaway feed B-18 on top,
   RZ2: RS_K.z1 - 69                 # the ute feed D-14 in the middle
-  RZ3: RS_K.z1 - 102                # and the compressor feed B-16 at the bottom, each 7 mm inboard of the raiser's centre for K-08's riser
-  RZB: RS_K.z1 - 74.5               # below G20 the three come down the gap against the raiser's inner face: B-16 forward at this height,
-  DLZ: RS_K.z1 - 114.5              # D-14 lowest, for its 110 mm bend, and B-18 at RZ1, each into the raiser through its inner web (CHS-10)
-  NLZ: RS_K.z0 - 12.5               # the tank senders forward beside the rail under the three: N-09 to the rear tank,
-  N8Z: RS_K.z0 - 27.5               # N-08 under it, rising over CM-05 to N8H once the three are inside the raiser
-  N8H: RS_K.z1 - 74.5
+  RZ3: RS_K.z1 - 100                # and the compressor feed B-16 at the bottom, each 7 mm inboard of the raiser's centre for K-08's riser
+  RZB: RS_K.z1 - 72.5               # below G20 the three come down the gap against the raiser's inner face: B-16 forward at this height,
+  DLZ: RS_K.z1 - 97.8               # D-14 lowest, 20 mm over the rear kerb airbag's top bracket (SVC-13) and with room under the floor
+                                    # for its 110 mm bend, and B-18 at RZ1, each into the raiser through its inner web (CHS-10)
+  N8H: RS_K.z1 - 74.5               # the tank senders come forward from the kerb frame in the UF way's lanes 3 and 4, over the rear
+                                    # kerb airbag's top bracket, and N-08 goes out beside the raiser behind D-14's exit, forward over
+                                    # CM-05 at this height
   RZ2F: RS_K.z1 - 53                # ahead of CM-02 D-14 rides higher, so B-16 can rise under it to its exit,
   RZ3F: RS_K.z1 - 79                # 39 mm clear of the seam's fillet (CHS-10)
   ZW: floor_z + 165                 # the wall strip's cables cross the end slot to the frames here, over the 230 V conduit
@@ -675,13 +676,14 @@ fixtures:
   - {id: SP-RJ, what: "Loom saddles hung under the rear crossmember CM-08, for the lamp looms from the rear junction box (est.)", line: BD-11, at: [CM_08.cx - 20, 0, CM_08.z0 - 30], size: [90, 1176, 60], obstacle: false, needs_run: false, support: true}
   - {id: SP-D7, what: "A 25 x 25 mm angle on two brackets from CM-06's front face, under D-07 where it crosses the frame just ahead of CM-06 (est.)", line: BD-11, at: [wet_x0 + 75, 0, UFZ - 26 - 19.1 - 7], size: [40, 1080, 12], obstacle: false, needs_run: false, support: true}
   - {id: SP-FD, what: "A 25 x 25 mm angle hung 15 mm under the drawbar members' rear ends across the A-frame at X 1,790, K-07 lying on it (I2-41, est.)", line: BD-11, at: [1790, -232.5, 423.5], size: [30, 1745, 12], obstacle: false, needs_run: false, support: true}
-  # Each drum lead's P-clip on its XT hanger, 15 mm ahead of the arm's pivot and inboard under the rail, where its loop
-  # from the arm ends and its sprung part starts, 52.5 mm clear of the arm across the trailer and 128 mm under the
-  # rail, clear of K-10 above the road ones (I2-50, FIT-05)
-  - {id: SP-L1, what: "P-clip for the front kerb drum's lead on its XT hanger, inboard of the arm's pivot (I2-50, est.)", line: BD-11, at: [CM_04.cx - 13, -575, rail_underside_z - 127.5], size: [30, 20, 20], obstacle: false, needs_run: false, support: true}
-  - {id: SP-L2, what: "P-clip for the rear kerb drum's lead on its XT hanger, inboard of the arm's pivot (I2-50, est.)", line: BD-11, at: [CM_05.cx - 13, -575, rail_underside_z - 127.5], size: [30, 20, 20], obstacle: false, needs_run: false, support: true}
-  - {id: SP-L3, what: "P-clip for the front road drum's lead on its XT hanger, inboard of the arm's pivot (I2-50, est.)", line: BD-11, at: [CM_04.cx - 13, 575, rail_underside_z - 127.5], size: [30, 20, 20], obstacle: false, needs_run: false, support: true}
-  - {id: SP-L4, what: "P-clip for the rear road drum's lead on its XT hanger, inboard of the arm's pivot (I2-50, est.)", line: BD-11, at: [CM_05.cx - 13, 575, rail_underside_z - 127.5], size: [30, 20, 20], obstacle: false, needs_run: false, support: true}
+  # Each drum lead's P-clip at its arm's inner bush (I2-50, FIT-05): on a flat bar bracket from the hinge crossmember's
+  # underside, beside the TSC on the XT centre one, 100 mm from the centreline at the pivot's X and 43.5 mm under it,
+  # under the inner hinge plate's lower edge and 50 mm inboard of the arm's pivot tube, where its sprung part ends and
+  # its arm part starts in a loop to Cruisemaster's harness tray on the A-frame's inner leg (33XT AIR sheet 4 step 7, est.)
+  - {id: SP-L1, what: "P-clip for the front kerb drum's lead at the arm's inner bush, on a bracket under the XT front hinge crossmember (I2-50, est.)", line: BD-11, at: [CM_04.x1 - 23, -100, rail_underside_z - 142.5], size: [30, 20, 20], obstacle: false, needs_run: false, support: true}
+  - {id: SP-L2, what: "P-clip for the rear kerb drum's lead at the arm's inner bush, on a bracket under the XT centre crossmember beside the TSC (I2-50, est.)", line: BD-11, at: [CM_05.x1 - 23, -100, rail_underside_z - 142.5], size: [30, 20, 20], obstacle: false, needs_run: false, support: true}
+  - {id: SP-L3, what: "P-clip for the front road drum's lead at the arm's inner bush, on a bracket under the XT front hinge crossmember (I2-50, est.)", line: BD-11, at: [CM_04.x1 - 23, 100, rail_underside_z - 142.5], size: [30, 20, 20], obstacle: false, needs_run: false, support: true}
+  - {id: SP-L4, what: "P-clip for the rear road drum's lead at the arm's inner bush, on a bracket under the XT centre crossmember beside the TSC (I2-50, est.)", line: BD-11, at: [CM_05.x1 - 23, 100, rail_underside_z - 142.5], size: [30, 20, 20], obstacle: false, needs_run: false, support: true}
   - {id: SP-DK, what: "Cable channel up the front wall's kerb corner from G17 and G23 to the desk top (est.)", line: BD-11, at: [in_x0 + 35, -1090, (floor_z + LA_09.z1) / 2], size: [70, 150, 730], obstacle: false, needs_run: false, support: true}
   - {id: SP-SK, what: "A 25 x 25 x 3 mm aluminium angle across the sink cabinet under the UV-LED's lead B-12, from the road wall to the bench's front panel, the loom's 17 mm pitch below its lane (I2-36, est.)", line: BD-11, at: [LA_07B.cx - 25, (LA_11B.y0 + BKY) / 2, BDZ - 7 * 17 - 25], size: [25, BKY - LA_11B.y0 - 20, 25], obstacle: false, needs_run: false, support: true}
   - {id: SP-SP, what: "A second angle across the sink cabinet under the pump's lead B-11, beside the pump (I2-36, est.)", line: BD-11, at: [LA_07B.cx + 135, (LA_11B.y0 + BKY) / 2, BDZ - 6 * 17 - 22], size: [25, BKY - LA_11B.y0 - 20, 25], obstacle: false, needs_run: false, support: true}
@@ -798,8 +800,11 @@ fixtures:
   # Cruisemaster's jacking points under the arms (fx22-rear), so the junctions keep their places for the services' pass,
   # level with the guard's underside, far inboard of the tyres' and the arms' sweep (FIT-05, I2-30).
   # The lines run along each arm to its pivot, looped there for the arm's 120 mm of travel, and in under the rail.
-  - {id: BR-DK, what: "Brake magnets and ABS sensors of the kerb side drums, their junction with the TSC harness under CM-05", line: RG-03, at: [CM_05.cx, (BR_TSC.y0 - (rail_c - rail_w / 2 - 111)) / 2, UF_03.z0 - 40], size: [80, 80, 80]}
-  - {id: BR-DR, what: "Brake magnets and ABS sensors of the road side drums, their junction with the TSC harness under CM-05", line: RG-03, at: [CM_05.cx, -(BR_TSC.y0 - (rail_c - rail_w / 2 - 111)) / 2, UF_03.z0 - 40], size: [80, 80, 80]}
+  # The drum junctions stand behind the TSC on a bracket from the XT centre crossmember's rear face, 20 mm behind the TSC
+  # and 3 mm under the shear panel's sheet, 30 to 110 mm from the centreline, inboard of the XT centre's hinge bars (their
+  # inner ends 137.5 mm from it) and 50 mm or more clear of the rear arms' pivot tubes over their travel (FIT-05, est.)
+  - {id: BR-DK, what: "Brake magnets and ABS sensors of the kerb side drums, their junction with the TSC harness behind the TSC", line: RG-03, at: [BR_TSC.x1 + 60, -70, UF_03.z0 - 45], size: [80, 80, 80]}
+  - {id: BR-DR, what: "Brake magnets and ABS sensors of the road side drums, their junction with the TSC harness behind the TSC", line: RG-03, at: [BR_TSC.x1 + 60, 70, UF_03.z0 - 45], size: [80, 80, 80]}
 # Every water outlet SVC-05 looks for, with its cold and hot runs tagged "water: <name>".
 water_outlets: [sink, drinking tap, basin, shower, shower bypass, washer, toilet flush, rinse box, Combi]
 
@@ -842,7 +847,7 @@ runs:
      upstream: {what: "TW06, the ute half from the chargers to the towbar Anderson: 7 m of 4 B&S twin", m: 7, mm2: 21.2, mv: 2.12,
                 source: "Car build line TW06 (data/vehicle-parts.yaml), at 4 B&S with D-14 so the feed holds 2 % from the chargers to the Lynx at 32 A, report 20's current after the upgrade"},
      serves: [ute feed], glands: [G20], along: [DB-KA, DB-KB, CH-P11, DB-08, RL-K, RS-K, BD-03], from: {line: DB-AN, at: [DB_AN.x1, DB_AN.cy, DB_AN.cz]},
-     path: [[780, -284.7, 523], [1220, -439.6, 523], [1430, -513.5, 523], [1760, -629.7, .], [1820, -650.8, .], [1942, -651, .], [2130, ., RZ2F], [2252, ., .], [2327, -625, .], [2382, RS_K.cy + 7, .], [2560, ., .], [2680, ., RZ2], [G20_D_14.cx - 447, ., .], [G20_D_14.cx - 383, G20_D_14.cy, .], [G20_D_14.cx - 327, ., .], [G20_D_14.cx - 227, ., DLZ], [G20_D_14.cx, ., .], [., ., ZW], [., WSY, .], [., ., LA_11E.z0 + 195]],
+     path: [[780, -284.7, 523], [1220, -439.6, 523], [1430, -513.5, 523], [1760, -629.7, .], [1820, -650.8, .], [1942, -651, .], [2130, ., RZ2F], [2252, ., .], [2327, -625, .], [2382, RS_K.cy + 7, .], [2560, ., .], [2680, ., RZ2], [G20_D_14.cx - 447, ., .], [G20_D_14.cx - 383, G20_D_14.cy, .], [G20_D_14.cx - 327, ., .], [G20_D_14.cx - 247, ., DLZ], [G20_D_14.cx, ., .], [., ., ZW], [., WSY, .], [., ., LA_11E.z0 + 195]],
      to: {line: BR-LYNX, at: [BR_LYNX.cx, BR_LYNX.y0, .]}}
   - {id: D-15, system: pv, kind: pv, lane: 0, feeds: "PV string 1, the two kerb-side panels in series, through G4, the kerb bulkhead over the wet room and the board's duct to MPPT 1", protection: "None, one string to its controller, a DC isolator at the MPPT",
      serves: [pv1], glands: [G4], passes: [WR-03], along: [BD-02], from: {line: RF-01.4, at: [RF_01_4.x1 - 40, RF_01_4.cy, RF_01_4.z1 + 8]},
@@ -1053,12 +1058,12 @@ runs:
   - {id: N-07, system: data, kind: sig, feeds: "Heat detector in the battery box to the Cerbo GX's input, out of the box's kerb side and up the chase into the cabinet's front", protection: "-", serves: [heat detector],
      along: [BD-03, EL-02], from: {line: SN-03, at: [SN_03.x1, SN_03.cy, SN_03.cz]}, path: [[EL_01.x1 - 15, ., .], [., -half_in + 70, .], [., ., LA_11E.z0 + 30], [BR_CX.cx, BR_CX.cy, .]],
      to: {line: BR-CX, at: [., ., BR_CX.z0]}}
-  - {id: N-08, system: data, kind: sig, lane: {UF: 3}, feeds: "Front fresh tank's level sender, down the chase's wall strip, through the kerb frame, forward low beside the kerb rail under the three raiser cables and up over CM-05 beside the raiser", protection: "-", serves: [tank senders],
+  - {id: N-08, system: data, kind: sig, lane: {UF: 4}, feeds: "Front fresh tank's level sender, down the chase's wall strip, through the kerb frame, forward in the UF way over the rear kerb airbag's top bracket, out beside the raiser behind D-14's exit and over CM-05 beside it", protection: "-", serves: [tank senders],
      glands: [G20], along: [BD-01, BD-03, RS-K, RL-K], from: {line: BR-CX, at: [BR_CX.cx, BR_CX.cy, BR_CX.z0]},
-     path: [[., ., LA_11E.z0 + 20], [G20_N_08.cx, WSY, .], [., ., ZW], [., G20_N_08.cy, .], [., ., N8Z], [., RS_K.y1 + 3.5, .], ["min(CM_05.x1 + 190, G20_D_14.cx - 476)", ., .], ["min(CM_05.x1 + 110, G20_D_14.cx - 556)", ., N8H], [UF_01.cx, ., .]], to: {line: UF-01, at: [., UF_01.y0, .]}}
-  - {id: N-09, system: data, kind: sig, lane: {UF: 4}, feeds: "Rear fresh tank's level sender, forward low beside the kerb rail from the kerb frame", protection: "-", serves: [tank senders],
+     path: [[., ., LA_11E.z0 + 20], [G20_N_08.cx, WSY, .], [., ., ZW], [., G20_N_08.cy, .], [., ., UFZ - L_UF], [UF_01R.x0 + 150, ., .], [UF_01R.x0 + 70, RS_K.y1 + 3.5, .], ["min(CM_05.x1 + 110, G20_D_14.cx - 556)", ., N8H], [UF_01.cx, ., .]], to: {line: UF-01, at: [., UF_01.y0, .]}}
+  - {id: N-09, system: data, kind: sig, lane: {UF: 3}, feeds: "Rear fresh tank's level sender, forward in the UF way from the kerb frame over the rear kerb airbag's top bracket to the tank's kerb face", protection: "-", serves: [tank senders],
      glands: [G20], along: [BD-01, BD-03, RS-K, RL-K], from: {line: BR-CX, at: [BR_CX.cx + 10, BR_CX.cy, BR_CX.z0]},
-     path: [[., ., LA_11E.z0 + 20], [G20_N_09.cx, WSY, .], [., ., ZW], [., G20_N_09.cy, .], [., ., NLZ], [G20_N_09.cx - 60, UF_01R.y0 - 34, .], [UF_01R.cx, ., .]], to: {line: UF-01R, at: [., UF_01R.y0, .]}}
+     path: [[., ., LA_11E.z0 + 20], [G20_N_09.cx, WSY, .], [., ., ZW], [., G20_N_09.cy, .], [., ., UFZ - L_UF], [G20_N_09.cx - 60, UF_01R.y0 - 34, .], [UF_01R.cx, ., .]], to: {line: UF-01R, at: [., UF_01R.y0, .]}}
   - {id: N-10, system: data, kind: sig, feeds: "Grey tank's level sender, back under the floor under the crossing cables to its kerb side", protection: "-", serves: [tank senders],
      glands: [G20], along: [BD-01, BD-03, CM-06, WR-03, RL-K, RS-K], from: {line: BR-CX, at: [BR_CX.cx + 20, BR_CX.cy, BR_CX.z0]},
      path: [[., ., LA_11E.z0 + 20], [G20_N_10.cx, WSY, .], [., ., ZW], [., G20_N_10.cy, .], [., ., UFZ - 62], [UF_08.x0 - 30, ., .], [UF_08.x0 - 10, UF_08.y0 - 35, .], [UF_08.x0 + 56, ., .], [., ., UF_08.z1 - 40]], to: {line: UF-08, at: [., UF_08.y0, .]}}
@@ -1067,7 +1072,7 @@ runs:
   # ================================================================ the lamps and the brakes, at 12 V from the ute's 12-pin plug (data/services.yaml lamps)
   - {id: K-01, system: lamps, kind: lamp7, feeds: "Lamp loom from the 12-pin plug along the road drawbar member and rail to the rear junction", inside: [RL-R], passes: [], protection: "The ute's lamp fuses",
      serves: [lamp loom], along: [DB-RA, DB-RB, RL-R, RS-R], from: {line: DB-PL, at: [DB_PL.x1, DB_PL.cy, DB_PL.cz]},
-     path: [[1430, 514.2, 523], [1760, 630.3, .], [2010, 683, .], [2275, ., .], [2345, 644, 670], [2415, 612, RWZ], [5990, ., .], [6050, 660, .], [UF_08.x1 + 30, ., .], [., ., RL_R.z0 - 37], [., LJ_01.y1 + 40, .]], to: {line: LJ-01, at: [LJ_01.cx - 20, LJ_01.y1, LJ_01.cz]}}
+     path: [[1430, 514.2, 523], [1760, 630.3, .], [2010, 683, .], [2275, ., .], [2345, 644, 670], [2415, 612, RWZ], [3800, ., .], [3850, 616, .], [5155, ., .], [5205, 612, .], [5990, ., .], [6050, 660, .], [UF_08.x1 + 30, ., .], [., ., RL_R.z0 - 37], [., LJ_01.y1 + 40, .]], to: {line: LJ-01, at: [LJ_01.cx - 20, LJ_01.y1, LJ_01.cz]}}
   - {id: K-02, system: lamps, kind: lamp7, feeds: "Road side rear lamps on the rear outrigger", protection: "The ute's lamp fuses",
      serves: [rear lamps], along: [CM-08, RL-R, RS-R, OR-08R], from: {line: LJ-01, at: [LJ_01.cx + 20, LJ_01.y1, LJ_01.cz]}, path: [[body_x1 + 15, 613, .], [., ., 695], [., LM_RR.y0 - 60, .], [., ., LM_RR.cz]], to: {line: LM-RR, at: [LM_RR.cx, LM_RR.y0, .]}}
   - {id: K-03, system: lamps, kind: lamp7, feeds: "Kerb side rear lamps on the rear outrigger", protection: "The ute's lamp fuses",
@@ -1081,9 +1086,9 @@ runs:
   - {id: K-07, system: lamps, kind: lamp7, feeds: "Kerb side front position lamp, across the A-frame on the angle SP-FD hung under the drawbar members", protection: "The ute's lamp fuses",
      serves: [front lamps], along: [DB-RA, DB-KA], from: {line: DB-PL, at: [DB_PL.x1, DB_PL.cy, DB_PL.cz - 30]}, path: [[1430, 514.2, 493], [1560, 560, .], [1670, 690, .], [1790, ., SP_FD.z1 + 4.75], [., LM_FK.cy + 60, .], [., LM_FK.cy, LM_FK.z0 - 60]], to: {line: LM-FK, at: [., ., LM_FK.z0]}}
   - {id: K-08, system: lamps, kind: lamp7, feeds: "Kerb side marker lamps, up inboard of the kerb rail behind the grey tank, into the raiser through its inner web 78 mm above its seam with the rail, forward inside it between D-14 and B-18, out through a round hole in the middle of OR-05K's root and along the outrigger to its end, clear of its welds", inside: [RS-K, OR-05K], passes: [], protection: "The ute's lamp fuses",
-     serves: [side markers], along: [CM-08, RL-K, RS-K, OR-05K], from: {line: LJ-01, at: [LJ_01.cx - 30, LJ_01.y0, LJ_01.cz]}, path: [[6170, -540, .], [., ., KMZ], [6050, ., .], [5950, -628, .], [OR_05K.cx + 254, ., .], [OR_05K.cx + 154, -596, .], [OR_05K.cx - 2, ., .], [., -800, .], [LM_SK.cx, -1100, 800], [., LM_SK.y1 + 10, .]], to: {line: LM-SK, at: [., LM_SK.y1, .]}}
+     serves: [side markers], along: [CM-08, RL-K, RS-K, OR-05K], from: {line: LJ-01, at: [LJ_01.cx - 30, LJ_01.y0, LJ_01.cz]}, path: [[6170, -540, .], [., ., KMZ], [6050, ., .], [5950, -628, .], [OR_05K.cx + 254, ., .], [OR_05K.cx + 154, -596, .], [OR_05K.cx, ., .], [., -800, .], [LM_SK.cx, -1100, 800], [., LM_SK.y1 + 10, .]], to: {line: LM-SK, at: [., LM_SK.y1, .]}}
   - {id: K-09, system: lamps, kind: lamp7, feeds: "Road side marker lamps, up inboard of the road rail behind the grey tank, into the raiser through its inner web at its middle, forward inside it, out through a round hole in the middle of OR-05R's root and along the outrigger to its end, clear of its welds", inside: [RS-R, OR-05R], passes: [], protection: "The ute's lamp fuses",
-     serves: [side markers], along: [CM-08, RL-R, RS-R, OR-05R], from: {line: LJ-01, at: [LJ_01.cx - 30, LJ_01.y1, LJ_01.cz + 22]}, path: [[6182, 540, .], [., ., KRZM], [6060, ., .], [5975, 596, .], [OR_05R.cx - 2, ., .], [., 800, .], [LM_SR.cx, 1100, 800], [., LM_SR.y0 - 10, .]], to: {line: LM-SR, at: [., LM_SR.y0, .]}}
+     serves: [side markers], along: [CM-08, RL-R, RS-R, OR-05R], from: {line: LJ-01, at: [LJ_01.cx - 30, LJ_01.y1, LJ_01.cz + 22]}, path: [[6182, 540, .], [., ., KRZM], [6060, ., .], [5975, 596, .], [OR_05R.cx, ., .], [., 800, .], [LM_SR.cx, 1100, 800], [., LM_SR.y0 - 10, .]], to: {line: LM-SR, at: [., LM_SR.y0, .]}}
   # The brake circuit (I2-32, I2-50): the four magnets draw 4.0 A each, 12 V over the least resistance Cruisemaster's
   # CIS-001 (rev 11) gives a magnet, 3.0 ohm (it rates a brake at 3 A), so the TSC's supply carries 16 A and each drum's
   # lead 4.0 A. Bosch's TSC drives the magnets from its own supply on the brake request from the truck's controller,
@@ -1110,10 +1115,11 @@ runs:
   # span taut, and drawn at that length as the arm holds it straight ahead, so DIM-04 to DIM-07 read it. The SB50 sits on
   # the truck's bracket nearer the pin, so its stiffer lead needs less slack. K-10
   # leaves the drawbar loom's stack beside it, enters the road rail and leaves it through its outer web 190 mm ahead of the
-  # XT front hinge crossmember, drops outside the rail and crosses under it ahead of the front hinge's front cheek, then
-  # passes that cheek 47.5 mm inboard of the rail's inner face and comes back out to 27.5 mm inboard of it under the
-  # crossmember, so it keeps SVC-01's 20 mm from the cheek and no part of it lies in the arms' slot (FIT-05, I2-30). K-11
-  # and K-12 are Bosch's axle harness, clamped at the junctions within its 200 mm.
+  # XT front hinge crossmember, drops outside the rail and crosses under it ahead of the front hinge's front cheek, runs
+  # along the crossmember's front face 35 mm ahead of it and clipped to it to 130 mm from the centreline, and comes back
+  # under the front tank's guard 60 mm road side of the centreline to the TSC's front face, so it keeps SVC-01's 20 mm
+  # from the cheek and the kit and FIT-05's 50 mm from the arms (I2-30, I2-97). K-11 and K-12 are Bosch's axle harness,
+  # from the TSC's rear face under its lower edge to the junctions 20 mm behind it, within its 200 mm.
   - {id: K-13, system: lamps, kind: lamp12, rides: between, cut_m: 1.34, passes: [DB-HK],
      lift: {clip_mm: 680, arm_mm: 300, arm_kg: 0.18, pivot: [-15, 0], deg: [-25, 75], strap_deg: -15, seat_deg: [-155, 40], torque_nmm: [1500, 1000], why: "The 12-pin lead's arm, the outboard one of the two on the leads' bracket. Its seat is bent to the lead's 69 mm bend radius at its centreline round the arm's tip, from 155 degrees ahead of the strap to 40 degrees behind it, and held on the arm by its web (rules.between.seat, I2-91), so the strap stands at the seat's top when the arm points 15 degrees below level and turns with the arm (I2-83). Its torsion spring lifts the arm with 1.5 N m on the bottom stop and 1.0 N m on the top one (est.), the same spring as the SB50's arm"}, feeds: "The 12-pin flat plug's lead from the truck's socket up to the clip on its sprung arm, down to its clamp on the leads' bracket and along the drawbar member to the junction: the lamps, the brake request on pin 5 and the earth returns", protection: "The truck's lamp fuses and its brake controller",
      serves: [plug lead], from: {line: TB-SK, at: [TB_SK.x1, TB_SK.cy + 40, TB_SK.cz]}, path: [[DB_HK.x0 + 20, DB_HK.y1 - 15, DB_HK.z1 - 20], [600, 320, 555]], to: {line: DB-PL, at: [DB_PL.x0, DB_PL.cy + 20, DB_PL.cz]}}
@@ -1132,28 +1138,30 @@ runs:
             [CM_04.x0 - 351, ., .], [CM_04.x0 - 291, 615, 648], [CM_04.x0 - 250, 634.5, 647], [CM_04.x0 - 190, 694.5, 645], [., ., RL_R.z0 - 37], [., RL_R.y0 - 47.5, .],
             [CM_04.x0 - 35, ., RL_R.z0 - 12.5], [., 130, .], [., 60, tank_z0 - 33]], to: {line: BR-TSC, at: [BR_TSC.x0, ., .]}}
   - {id: K-11, system: dc12, kind: tsc, amps: 4, volts: 12, feeds: "Bosch TSC to the road side drums' magnets and ABS sensors: its axle harness's two wheel bundles to their junction, each with one magnet's 4.0 A", protection: "The TSC's outputs",
-     serves: [brakes], along: [UF-03, CM-05], from: {line: BR-TSC, at: [BR_TSC.cx, BR_TSC.y1, BR_TSC.z0 + 5]}, to: {line: BR-DR, at: [., BR_DR.y0, .]}}
+     serves: [brakes], along: [UF-03, CM-05], from: {line: BR-TSC, at: [BR_TSC.x1, BR_DR.cy, BR_TSC.z0 - 13.5]}, to: {line: BR-DR, at: [BR_DR.x0, ., .]}}
   - {id: K-12, system: dc12, kind: tsc, amps: 4, volts: 12, feeds: "Bosch TSC to the kerb side drums' magnets and ABS sensors: its axle harness's two wheel bundles to their junction, each with one magnet's 4.0 A", protection: "The TSC's outputs",
-     serves: [brakes], along: [UF-03, CM-05], from: {line: BR-TSC, at: [BR_TSC.cx, BR_TSC.y0, BR_TSC.z0 + 5]}, to: {line: BR-DK, at: [., BR_DK.y1, .]}}
-  # Each drum's lead (I2-50): its sprung part from the junction under CM-05 out under the tank guard to its P-clip on the
-  # XT hanger (SP-L1 to SP-L4), a run like any other, and its arm part (`rides: arm`) from the clip in a loop down beside
-  # the pivot's bush and along the arm's underside to the brake's backing plate, laid by cad/routes.py on the arm at
-  # ride height and swept with the arm by FIT-05. Each part's drop adds the harness's and the sprung part's (`follows`),
-  # so the magnet's 4.0 A keeps 2 % from the TSC. The road side's front lead passes under K-10 where K-10 turns inboard
-  - {id: K-15, system: dc12, kind: drum, size: 2.5, size_why: "Cruisemaster's extended brake line at 2.5 mm2 (est.), so the front drums' 1.6 m leads keep 2 % from the TSC", amps: 4, volts: 12, follows: [K-12], no_device: "a TSC output's lead to one magnet, a fixed coil of at most 4.0 A, as K-12", feeds: "The front kerb drum's magnet and ABS sensor lead, its sprung part from the junction under CM-05 to its clip on the XT hanger", protection: "The TSC's outputs",
-     serves: [brakes], along: [UF-03, CM-05], from: {line: BR-DK, at: [BR_DK.x0 + 20, BR_DK.y0, BR_DK.cz - 10]}, path: [[., -560, UF_03.z0 - 24.5], [SP_L1.cx + 120, ., .]], to: {line: SP-L1, at: [SP_L1.cx, SP_L1.cy, SP_L1.cz]}}
-  - {id: K-15A, system: dc12, kind: drum, size: 2.5, size_why: "As K-15, one cable", amps: 4, volts: 12, follows: [K-12, K-15], no_device: "the same lead as K-15", rides: arm, wheel: FK, joins: K-15, feeds: "The front kerb drum's lead, its arm part: a loop from its clip beside the pivot's bush and along the arm's underside to the backing plate", protection: "The TSC's outputs",
+     serves: [brakes], along: [UF-03, CM-05], from: {line: BR-TSC, at: [BR_TSC.x1, BR_DK.cy, BR_TSC.z0 - 13.5]}, to: {line: BR-DK, at: [BR_DK.x0, ., .]}}
+  # Each drum's lead (I2-50): its sprung part from the junction behind the TSC, under the TSC and forward under the front
+  # tank's guard for the front arms, to its P-clip at the arm's inner bush (SP-L1 to SP-L4), a run like any other, and
+  # its arm part (`rides: arm`) from the clip in a loop under the inner hinge plate to Cruisemaster's harness tray on the
+  # A-frame's inner leg (33XT AIR sheet 4 step 7), tied in the tray along the leg to the brake's backing plate, laid by
+  # cad/routes.py on the arm at ride height with its loop's slack over the arm's travel (routes.lead_slack) and swept with
+  # the arm by FIT-05. Each part's drop adds the harness's and the sprung part's (`follows`), so the magnet's 4.0 A keeps
+  # 2 % from the TSC. The road side's front lead runs 40 mm road side of K-10, where K-10 comes back to the TSC.
+  - {id: K-15, system: dc12, kind: drum, size: 2.5, size_why: "Cruisemaster's extended brake line at 2.5 mm2 (est.), so the front drums' 1.6 m leads keep 2 % from the TSC", amps: 4, volts: 12, follows: [K-12], no_device: "a TSC output's lead to one magnet, a fixed coil of at most 4.0 A, as K-12", feeds: "The front kerb drum's magnet and ABS sensor lead, its sprung part from the junction behind the TSC, under the TSC and the front tank's guard, to its clip at the arm's inner bush", protection: "The TSC's outputs",
+     serves: [brakes], along: [UF-03, CM-05], from: {line: BR-DK, at: [BR_DK.x0, SP_L1.cy, BR_DK.cz]}, path: [[BR_TSC.x0 - 25, ., .], [BR_TSC.x0 - 85, ., UF_03.z0 - 24.5], [CM_04.x1 + 60, ., .], [SP_L1.cx, ., SP_L1.cz + 45]], to: {line: SP-L1, at: [SP_L1.cx, SP_L1.cy, SP_L1.cz]}}
+  - {id: K-15A, system: dc12, kind: drum, size: 2.5, size_why: "As K-15, one cable", amps: 4, volts: 12, follows: [K-12, K-15], no_device: "the same lead as K-15", rides: arm, wheel: FK, joins: K-15, feeds: "The front kerb drum's lead, its arm part: a loop from its clip under the inner hinge plate to Cruisemaster's harness tray on the A-frame's inner leg and along it to the backing plate", protection: "The TSC's outputs",
      serves: [brakes], passes: [RG-01, RG-02], from: {line: SP-L1, at: [SP_L1.cx, SP_L1.cy, SP_L1.cz]}, to: {line: RG-01, at: [0, 0, 0]}}
-  - {id: K-16, system: dc12, kind: drum, size: 2.5, size_why: "As K-15", amps: 4, volts: 12, follows: [K-12], no_device: "a TSC output's lead to one magnet, as K-15", feeds: "The rear kerb drum's magnet and ABS sensor lead, its sprung part from the junction under CM-05 to its clip on the XT hanger", protection: "The TSC's outputs",
-     serves: [brakes], along: [UF-03, CM-05], from: {line: BR-DK, at: [BR_DK.x0 + 50, BR_DK.y0, BR_DK.cz - 10]}, path: [[., BR_DK.y0 - 25, .], [., -545, .]], to: {line: SP-L2, at: [SP_L2.cx, SP_L2.cy, SP_L2.cz]}}
+  - {id: K-16, system: dc12, kind: drum, size: 2.5, size_why: "As K-15", amps: 4, volts: 12, follows: [K-12], no_device: "a TSC output's lead to one magnet, as K-15", feeds: "The rear kerb drum's magnet and ABS sensor lead, its sprung part from the junction behind the TSC to its clip at the arm's inner bush", protection: "The TSC's outputs",
+     serves: [brakes], along: [UF-03, CM-05], from: {line: BR-DK, at: [BR_DK.x0, BR_DK.cy, BR_DK.cz - 20]}, to: {line: SP-L2, at: [SP_L2.cx, SP_L2.cy, SP_L2.cz]}}
   - {id: K-16A, system: dc12, kind: drum, size: 2.5, size_why: "As K-15, one cable", amps: 4, volts: 12, follows: [K-12, K-16], no_device: "the same lead as K-16", rides: arm, wheel: RK, joins: K-16, feeds: "The rear kerb drum's lead, its arm part, as K-15A", protection: "The TSC's outputs",
      serves: [brakes], passes: [RG-01, RG-02], from: {line: SP-L2, at: [SP_L2.cx, SP_L2.cy, SP_L2.cz]}, to: {line: RG-01, at: [0, 0, 0]}}
-  - {id: K-17, system: dc12, kind: drum, size: 2.5, size_why: "As K-15", amps: 4, volts: 12, follows: [K-11], no_device: "a TSC output's lead to one magnet, as K-15", feeds: "The front road drum's magnet and ABS sensor lead, its sprung part from the junction under CM-05, under K-10 where it turns inboard, to its clip on the XT hanger", protection: "The TSC's outputs",
-     serves: [brakes], along: [UF-03, CM-05], from: {line: BR-DR, at: [BR_DR.x0 + 20, BR_DR.y1, BR_DR.cz - 15]}, path: [[., 532, .], [UF_01.x1 - 110, ., .], [UF_01.x1 - 150, ., UF_03.z0 - 24.5], [SP_L3.cx + 120, ., .]], to: {line: SP-L3, at: [SP_L3.cx, SP_L3.cy, SP_L3.cz]}}
+  - {id: K-17, system: dc12, kind: drum, size: 2.5, size_why: "As K-15", amps: 4, volts: 12, follows: [K-11], no_device: "a TSC output's lead to one magnet, as K-15", feeds: "The front road drum's magnet and ABS sensor lead, its sprung part from the junction behind the TSC, under the TSC and the front tank's guard beside K-10, to its clip at the arm's inner bush", protection: "The TSC's outputs",
+     serves: [brakes], along: [UF-03, CM-05], from: {line: BR-DR, at: [BR_DR.x0, SP_L3.cy, BR_DR.cz]}, path: [[BR_TSC.x0 - 25, ., .], [BR_TSC.x0 - 85, ., UF_03.z0 - 24.5], [CM_04.x1 + 60, ., .], [SP_L3.cx, ., SP_L3.cz + 45]], to: {line: SP-L3, at: [SP_L3.cx, SP_L3.cy, SP_L3.cz]}}
   - {id: K-17A, system: dc12, kind: drum, size: 2.5, size_why: "As K-15, one cable", amps: 4, volts: 12, follows: [K-11, K-17], no_device: "the same lead as K-17", rides: arm, wheel: FR, joins: K-17, feeds: "The front road drum's lead, its arm part, as K-15A", protection: "The TSC's outputs",
      serves: [brakes], passes: [RG-01, RG-02], from: {line: SP-L3, at: [SP_L3.cx, SP_L3.cy, SP_L3.cz]}, to: {line: RG-01, at: [0, 0, 0]}}
-  - {id: K-18, system: dc12, kind: drum, size: 2.5, size_why: "As K-15", amps: 4, volts: 12, follows: [K-11], no_device: "a TSC output's lead to one magnet, as K-15", feeds: "The rear road drum's magnet and ABS sensor lead, its sprung part from the junction under CM-05 to its clip on the XT hanger", protection: "The TSC's outputs",
-     serves: [brakes], along: [UF-03, CM-05], from: {line: BR-DR, at: [BR_DR.x0 + 50, BR_DR.y1, BR_DR.cz - 10]}, path: [[., BR_DR.y1 + 25, .], [., 545, .]], to: {line: SP-L4, at: [SP_L4.cx, SP_L4.cy, SP_L4.cz]}}
+  - {id: K-18, system: dc12, kind: drum, size: 2.5, size_why: "As K-15", amps: 4, volts: 12, follows: [K-11], no_device: "a TSC output's lead to one magnet, as K-15", feeds: "The rear road drum's magnet and ABS sensor lead, its sprung part from the junction behind the TSC to its clip at the arm's inner bush", protection: "The TSC's outputs",
+     serves: [brakes], along: [UF-03, CM-05], from: {line: BR-DR, at: [BR_DR.x0, BR_DR.cy, BR_DR.cz - 20]}, to: {line: SP-L4, at: [SP_L4.cx, SP_L4.cy, SP_L4.cz]}}
   - {id: K-18A, system: dc12, kind: drum, size: 2.5, size_why: "As K-15, one cable", amps: 4, volts: 12, follows: [K-11, K-18], no_device: "the same lead as K-18", rides: arm, wheel: RR, joins: K-18, feeds: "The rear road drum's lead, its arm part, as K-15A", protection: "The TSC's outputs",
      serves: [brakes], passes: [RG-01, RG-02], from: {line: SP-L4, at: [SP_L4.cx, SP_L4.cy, SP_L4.cz]}, to: {line: RG-01, at: [0, 0, 0]}}
   # ================================================================ fresh water, hot water and diesel (TRAILER.md, Plumbing and water; report 20 section 8)
@@ -1168,7 +1176,7 @@ runs:
   - {id: F-02, system: fresh, kind: hose20, feeds: "Balance hose between the fresh tanks over CM-05, on a dip tube to each tank's sump", protection: "-",
      serves: [tank balance], along: [CM-05], from: {line: UF-01, at: [UF_01.x1, 0, UFZ - 35]}, to: {line: UF-01R, at: [UF_01R.x0, ., .]}}
   - {id: F-03, system: fresh, kind: hose12, feeds: "Rear tank's outlet up the road frame through the strainer to the pump", protection: "40-mesh strainer",
-     serves: [pump feed], glands: [G15], passes: [WS-STR], along: [BD-01, RL-R, RS-R], from: {line: UF-01R, at: [G15_F_03.cx, UF_01R.y1, UFZ - 90]},
+     serves: [pump feed], glands: [G15], passes: [WS-STR], along: [BD-01, RL-R, RS-R], from: {line: UF-01R, at: [G15_F_03.cx, UF_01R.y1, UFZ - 70]},
      path: [[., G15_F_03.cy, .], [., ., WS_STR.cz], [WS_STR.cx, ., .]], to: {line: WS-PMP, at: [., WS_PMP.y0, .]}}
   - {id: F-04, system: fresh, kind: hose12, feeds: "Pump to the accumulator", protection: "The pump's pressure switch",
      from: {line: WS-PMP, at: [WS_ACC.cx, WS_PMP.y1, WS_PMP.cz]}, to: {line: WS-ACC, at: [., WS_ACC.y0, .]}}
@@ -1235,7 +1243,7 @@ runs:
      passes: [WR-03], along: [WR-03], from: {line: WR-09, at: [WR_09.x1, SH_01.cy, WR_09.z1 - 60]}, path: [[WFX + 7, ., .]], to: {line: SH-01, at: [., ., SH_01.z0]}}
   - {id: W-01, system: waste, kind: dwv40, feeds: "Sink waste through the bench's front panel, down the road frame and under the floor over CM-06 into the grey tank's top", protection: "The sink's trap",
      serves: [sink waste], glands: [G15], along: [BD-01, RL-R, RS-R, CM-06, CH-P07], from: {line: SK-02, at: [SK_02.cx, SK_02.cy, SK_02.z0]},
-     path: [[., ., 1380], [G15_W_01.cx, ., .], [., G15_W_01.cy, .], [., ., 778], [UF_08.x0 + 74, ., .], [., 450, .]], to: {line: UF-08, at: [., ., UF_08.z1]}}
+     path: [[., ., 1380], [G15_W_01.cx, ., .], [., G15_W_01.cy, .], [., ., 795], [XT_BAGBKT_RR.x1 + 9, ., .], [XT_BAGBKT_RR.x1 + 42, ., 775.6], [UF_08.x0 + 74, ., .], [., 450, .]], to: {line: UF-08, at: [., ., UF_08.z1]}}
   - {id: W-02, system: waste, kind: drain16, pumped: true, sleeve: true, feeds: "The washer's drain hose, up behind the dryer above the battery's zone and through the partition into the basin", protection: "The washer's drain pump",
      serves: [washer drain], passes: [WR-03], along: [WR-03, LA-14], from: {line: LA-02, at: [4450, LA_02.y0, 1400]},
      path: [[., KD_Y, .], [., ., 1850], [WFX + 7, ., .], [., WR_08.y0 + 200, .]], to: {line: WR-08, at: [., ., WR_08.z1]}}

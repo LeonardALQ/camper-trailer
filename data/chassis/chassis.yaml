@@ -208,8 +208,8 @@ fittings:
   # CH-P07 stands flush on the front face of each crossmember `stations` names (Chassis.shock_plates), `side_y` its middle from
   # the centreline, so each shock's bracket stands on its face (FX21-MRG found the rear brackets 0.9 mm into them, a
   # rounding of the plate's place against the member's rounded station)
-  - {id: CH-P07, plane: yz, name: "Shock support plate, 5 mm, full height on the XT rear shock crossmember", kind: plate, l: 300, w: 150, t: 5, qty: 2,
-     poses: shock_plates, stations: [XT rear shock], side_y: "rail_c - 200"}
+  - {id: CH-P07, plane: yz, name: "Shock support plate, 5 mm, full height on the front faces of the XT centre and XT rear shock crossmembers", kind: plate, l: 300, w: 150, t: 5, qty: 4,
+     poses: shock_plates, stations: [XT centre, XT rear shock], side_y: "rail_c - 200"}
   - {id: CH-P08, name: "Hinge crossmember gusset, SHS 50 x 50 x 3 at 45 degrees (TB 070), its ends cut at 45 degrees to bear on the crossmember's face and on the face of the hinge cheek beside it, welded all round, two behind each hinge crossmember", kind: tube, section: SHS_50x50x3, length: hinge_gusset_l, qty: 4,
      poses: hinge_gussets, fat: null}
   - {id: CH-P16, name: "Hinge cheek, 10 mm, 150 x 108.5 beside each XT hinge crossmember on the rail's inner face, with a step where a hinge gusset lands on it, 150 mm behind the front hinge crossmember and 140 mm behind the XT centre's, welded to the web and the hinge bar", kind: plate, l: 150, w: 108.5, t: 10, qty: 8,
@@ -472,8 +472,8 @@ galvanising_check: {pitch_deg: [0, 9], step_deg: 1, max_depth: 50, end_zone: 150
 # plane (page 8), `middle` puts one hole in each web at mid-depth where a small SHS's flat takes no more. Each end so has
 # four holes, or two in an SHS, as Tables 1 to 3 count them. The drawbar members drain at their mitres as at their apex
 # ends, 40 mm behind the body front and 40 mm over the underside in both webs, and vent at the apex end's top corners,
-# and each lap's sniped rear end is left open, the guide's preferred end (page 13, I2-84). CM-06's front web carries the
-# shock support plates from 26 mm to 326 mm from each end (CH-P07), so its front corners drain and vent through 16 mm
+# and each lap's sniped rear end is left open, the guide's preferred end (page 13, I2-84). CM-05's and CM-06's front webs carry the
+# shock support plates from 26 mm to 326 mm from each end (CH-P07), so each one's front corners drain and vent through 16 mm
 # holes in the rail's inner web inside the crossmember's end, the largest CHS-10's toe rule lets stand in its 50 mm, with
 # its rear web's holes at 25 mm. CM-08's ends are its rear recovery tongues' faces, 20 mm inside the rails (CH-P05)
 member_galvanising_holes:
@@ -486,6 +486,7 @@ member_galvanising_holes:
   plan_brace: {d: 10, leg: 5, holes: middle}
   hinge_gusset: {d: 13, leg: 5, holes: middle}
   blocked_webs:
+    - {member: CM-05, web: front, fitting: CH-P07, free_d: 25, internal_d: 16, internal_z: [-45, 45]}
     - {member: CM-06, web: front, fitting: CH-P07, free_d: 25, internal_d: 16, internal_z: [-45, 45]}
   cut_ends:
     - {member: CM-08, cut: 20, leg: 6}
@@ -494,14 +495,14 @@ member_galvanising_holes:
 # overlap a vent of at least 10 mm, over 40,000 mm2 at least 12 mm, from 250,000 mm2 at least 20 mm and one every
 # 250,000 mm2, each at least the steel's thickness, and two for the best outcome, in corners and diagonally opposite.
 # `l` and `w` are each overlap's length and width, `qty` how many there are, and each vent stands `u` along it from its
-# first end and `v` across it from its first edge. Each shock support plate CH-P07 covers 300 x 150 mm of the XT rear
-# shock crossmember's front web, welded all round, and vents through the plate at two opposite corners, clear of the
+# first end and `v` across it from its first edge. Each shock support plate CH-P07 covers 300 x 150 mm of the XT centre
+# or the XT rear shock crossmember's front web, welded all round, and vents through the plate at two opposite corners, clear of the
 # shock bracket in its middle (est.). Each rail-to-raiser seam runs the body's length, 50 mm wide, closed by the
 # continuous fillets along both edges, the end plate's welds at the front and a 4 mm fillet across the seam at the rails'
 # rear ends, outside TB 070's suspension area where the rail carries no bending, and vents through both walls on the
 # seam's centreline 60 mm from each end, holes CHS-09 and CHS-10 read with the rails' other holes
 sealed_overlaps:
-  - {id: CH-P07, what: "shock support plate on the XT rear shock crossmember's front web", qty: 2, l: 300, w: 150, t: 5, through: plate,
+  - {id: CH-P07, what: "shock support plate on the XT centre and XT rear shock crossmembers' front webs", qty: 4, l: 300, w: 150, t: 5, through: plate,
      vents: [{d: 12, u: 30, v: 30}, {d: 12, u: 270, v: 120}]}
   - {id: SEAM, what: "rail-to-raiser seam, the rail's top wall under the raiser's bottom wall", qty: 2, l: body_length, w: 50, t: 4, through: seam,
      vents: [{d: 12, u: 60, v: 25}, {d: 12, u: body_length - 60, v: 25}]}
@@ -596,6 +597,11 @@ xt_arms:
     bar: {d: 44, inboard: 450}
     plates: {y_in: [34, 151, 311, 427], t: 8, l: 82, below: 134}
     hinge: {y_in: [30, 431]}
+    # the arm, an A-frame as sheet 4 draws it (Chassis.arm_bars, est.): its pivot tube from the outer to the inner hinge
+    # plate and its legs from the bushes, midway between the outer pair and between the inner pair, back to the hub, the
+    # tube and each leg at its bush `d` round, as the model drew the pivot tube and the arm's front leg, each leg growing
+    # to the arm's 90 mm (arm_depth) at the hub
+    arm: {roots: [92.5, 369], d: 64}
     airbag: {dx: 8, y_in: 58, d: 194, h: 152}
     bag_bracket: {l: 300, reach: 100}
     shock: {d: 70, eye: [67, -13], e: 40}
