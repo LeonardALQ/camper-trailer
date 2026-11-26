@@ -440,8 +440,8 @@ CHS-10 says where a hole may go and checks its fatigue, with three rules. Its ce
 
 | Hole | Run | Wall, at X | Size, mm | Net section, worst case | Edge to the flat's end, need | Clear to a weld toe or hole, need | Range at the edge | CHS-10 |
 |---|---|---|---|---|---|---|---|---|
-| H-01 | K-08 | Kerb raiser's outer web inside OR-05K's root weld, 4,501 | 16 | 262 of 350 MPa, LC8a | 39.8, 20 | 17.5, 16 | 46.2 of 81.9 MPa | meets |
-| H-03 | K-09 | Road raiser's outer web inside OR-05R's root weld, 4,501 | 16 | 243 of 350 MPa, LC8a | 54.8, 20 | 17.5, 16 | 39.9 of 81.9 MPa | meets |
+| H-01 | K-08 | Kerb raiser's outer web inside OR-05K's root weld, 4,472 | 16 | 262 of 350 MPa, LC8a | 39.8, 20 | 17.5, 16 | 46.2 of 81.9 MPa | meets |
+| H-03 | K-09 | Road raiser's outer web inside OR-05R's root weld, 4,472 | 16 | 243 of 350 MPa, LC8a | 54.8, 20 | 17.5, 16 | 39.9 of 81.9 MPa | meets |
 | H-05 | C9B | Kerb rail's inner web, 1,915 | 16 | 78 of 350 MPa, LC6 | 33.5, 20 | 31.5, 16 | 28.1 of 81.9 MPa | meets |
 | H-06 | C9B | Kerb rail's outer web, 1,915 | 16 | 78 of 350 MPa, LC6 | 33.5, 20 | 31.5, 16 | 28.1 of 81.9 MPa | meets |
 | H-07 | E-07 | Kerb rail's outer web, 2,241 | 20 x 23 slot | 106 of 350 MPa, LC8a | 37.5, 25 | 33.5, 20 | 28.4 of 81.9 MPa | meets |
@@ -452,7 +452,7 @@ CHS-10 says where a hole may go and checks its fatigue, with three rules. Its ce
 | H-12 | B-05 | Road rail's outer web, 1,905 | 14 | 79 of 350 MPa, LC6 | 33.5, 17.5 | 32.5, 14 | 28.2 of 81.9 MPa | meets |
 | H-13 | K-01 | Road rail's outer web, 2,360 | 16 x 39 slot | 114 of 350 MPa, LC8a | 63.5, 20 | 37.0, 30, H-14 | 19.0 of 81.9 MPa | meets |
 | H-14 | K-10 | Road rail's outer web, 2,442 | 30 x 51 slot | 125 of 350 MPa, LC8a | 41.5, 37.5 | 31.5, 30, drawbar overlap's fillet | 23.3 of 81.9 MPa | meets |
-| H-15 | K-10 | Road rail's outer web, 3,328 | 30 x 47 slot | 201 of 350 MPa, LC6 | 39.5, 37.5 | 81.5, 30 | 22.5 of 81.9 MPa | meets |
+| H-15 | K-10 | Road rail's outer web, 3,274 | 30 x 47 slot | 201 of 350 MPa, LC6 | 39.5, 37.5 | 81.5, 30 | 22.5 of 81.9 MPa | meets |
 | H-16 | K-01 | Road rail's outer web, 6,021 | 16 x 25 slot | 112 of 350 MPa, LC8a | 57.5, 20 | 48.9, 16 | 4.0 of 81.9 MPa | meets |
 | H-17 | B-18 | Kerb raiser's inner web, 2,015 | 14 x 54 slot | 101 of 350 MPa, LC8a | 22.8, 17.5 | 84.5, 14 | 34.0 of 81.9 MPa | meets |
 | H-18 | B-16 | Kerb raiser's inner web, 2,267 | 28 x 103 slot | 123 of 350 MPa, LC8a | 39.8, 35 | 30.5, 28 | 35.1 of 81.9 MPa | meets |
