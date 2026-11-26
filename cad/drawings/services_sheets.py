@@ -58,7 +58,7 @@ def _centre(b):
 
 def _tank_notches(pr, b, sty):
     """Tank b's notches in plan, each inside the tank's box (Layout.tank_notches): a corner's triangle round a hinge gusset
-    or a jacking pad, and a pocket round one of the XT kit's parts, its bands drawn as the one rectangle they fill."""
+    or another fitting at its corner, and a pocket round one of the XT kit's parts, its bands drawn as the one rectangle they fill."""
     pockets = {}
     for nt in b.extra.get("notches") or []:
         if nt.get("kind") == "box":
