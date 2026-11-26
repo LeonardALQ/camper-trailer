@@ -646,7 +646,7 @@ class Layout:
             if box[0] >= box[3] or box[1] >= box[4] or box[5] <= z0:
                 continue
             inner = (box[0] - t, box[1] - t, box[2], box[3] + t, box[4] + t, box[5] + t)
-            out.append(dict(fitting="UF-01B", gusset=None, kind="box", box=box, z0=box[2], z1=box[5], clear=c, inner=inner,
+            out.append(dict(fitting=br["id"], gusset=None, kind="box", box=box, z0=box[2], z1=box[5], clear=c, inner=inner,
                             inner_z=(inner[2], inner[5])))
         return out
 
@@ -1920,10 +1920,11 @@ class Trailer:
             elif c.type == "tank_support":
                 t = lay.tank_support()
                 w = t["worst"] or {}
-                row.update(limit="each reading times its case's factor within its strength", measured=round(w.get("util", math.nan), 2),
-                           unit="of strength", margin=round(1.0 - w.get("util", math.nan), 2), ok=t["ok"],
-                           governing=f"{w.get('part')} in {w.get('case')}" if w else "", detail=t["detail"] + f", over {len(t['rows'])} readings of "
-                           f"{t['bearers']} bearers and the rear bay's panel for {len(t['tanks'])} tanks", reads=t["rows"][:0])
+                row.update(limit="<= 100 % of each part's strength, each reading times its case's factor",
+                           measured=round(100 * w.get("util", math.nan), 1), unit="%", margin=round(100 * (1.0 - w.get("util", math.nan)), 1),
+                           ok=t["ok"], governing=f"{w.get('part')} in {w.get('case')}" if w else "",
+                           detail=t["detail"] + f", over {len(t['rows'])} readings of {t['bearers']} bearers and the rear bay's panel for "
+                           f"{len(t['tanks'])} tanks")
             elif c.type == "tyre":
                 t = self.tyre_arc(lay)
                 row.update(limit=f">= {c.min_gap_mm:g} mm from every rigid part, fixture and run", measured=round(t["gap_mm"], 1), unit="mm",

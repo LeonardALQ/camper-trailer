@@ -104,6 +104,29 @@ def test_the_tanks_hold_the_water_the_design_carries():
         assert n["net_l"] < n["inside_l"], f"{k}: its net {n['net_l']:.1f} L is not less than its inside {n['inside_l']:.1f} L"
 
 
+def test_each_fresh_tank_stands_on_bearers_of_its_own_and_chs17_reads_its_path():
+    """I2-109: each fresh tank's ends stand on bearers of its own on the XT crossmembers (UF-01B, Layout.tank_bearers),
+    each tank stepped onto its bearers' rubber once for each bearer, and CHS-17 reads every bearer of both tanks and the
+    rear bay's panel under the rear tank in LC1 to LC3, each reading within its strength. The bearers' bolts make holes
+    in both webs of each crossmember they stand on, which Layout.fixing_holes lists for the hole checks."""
+    lay = EV["layout"]
+    tanks = {t.id for t in lay.tanks()}
+    brs = lay.tank_bearers()
+    assert {b["tank"] for b in brs} == tanks
+    for t in lay.tanks():
+        steps = [n for n in t.extra["notches"] if str(n.get("fitting", "")).startswith("UF-01B")]
+        assert len(steps) == len([b for b in brs if b["tank"] == t.id]), t.id
+        assert all(n["box"][2] == t.box[2] and n["box"][5] > t.box[2] for n in steps), t.id
+    ts = lay.tank_support()
+    assert ts["ok"], ts["detail"]
+    assert {r["case"] for r in ts["rows"]} == {"LC1", "LC2", "LC3"}
+    assert {r["tank"] for r in ts["rows"]} == tanks
+    assert {r["part"] for r in ts["rows"]} >= {b["id"] for b in brs} | {"PNL-1"}
+    holes = lay.fixing_holes()
+    for b in brs:
+        for face in ("front web", "rear web"):
+            assert any(h["member"] == b["member"] and h["face"] == face for h in holes), (b["id"], face)
+
 def test_the_fresh_tanks_keep_their_clearance_to_every_fitting_they_are_notched_round():
     """FIT-03 reads every place of every chassis fitting (Layout.shapes), each hinge gusset as the prism of its cut
     outline, so the gussets that reach into a fresh tank's corners, behind each hinge crossmember, stand in the tank's
@@ -121,12 +144,16 @@ def test_the_fresh_tanks_keep_their_clearance_to_every_fitting_they_are_notched_
         assert any(nt.get("kind") == "box" for nt in notches), f"{t.iid} has no pockets round the XT kit's parts"
         steps = [nt for nt in notches if nt["fitting"] == "XT arm"]
         assert all(nt.get("kind") == "box" and nt["z0"] == t.box[2] for nt in steps), f"{t.iid}: an arm's step not up from its bottom"
-        for fid in {nt["fitting"] for nt in notches} - {"XT arm"}:
+        bearers = {br["id"]: [(bx, None) for bx in br["boxes"].values()] for br in lay.tank_bearers()}
+        for fid in {nt["fitting"] for nt in notches} - {"XT arm"} - set(bearers):
             for s in by_id[fid]:
                 if shape_gap((t.box, None), s) >= 0:
                     continue
                 g = min(shape_gap(piece, s) for piece in lay.tank_pieces(t))
                 assert g >= notches[0]["clear"] - 1e-6, f"{t.iid}: {fid} at {[round(v) for v in s[0]]} stands {g:.1f} mm from it"
+        for fid in {nt["fitting"] for nt in notches} & set(bearers):    # its ends sit on its bearers' rubber (I2-109)
+            g = min(shape_gap(piece, s) for piece in lay.tank_pieces(t) for s in bearers[fid])
+            assert abs(g) <= 0.5, f"{t.iid}: {fid} {g:.1f} mm from the tank, which sits on its rubber"
 
 
 def test_the_rear_bay_clears_the_rear_airbags_their_brackets_and_the_rear_shocks():
