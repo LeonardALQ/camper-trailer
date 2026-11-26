@@ -755,10 +755,11 @@ class Analysis:
                 if k not in he or eq > he[k]["eq"]:
                     he[k] = dict(eq=eq, case=label)
 
-        # every case on each of the frame's models (bar_models, I2-114): the hinge bars rigid, then elastic, each reading the
-        # worse of the two. The recovery's supports, the ball's load and the bare frame's twist are the rigid model's: the
-        # supports and the ball are statically determined, and the body's share of the twist (cad/body.py) is read on it
-        lc1s: list[tuple[Any, dict]] = []
+        # every case on each of the frame's models (bar_models, I2-114): the hinge bars rigid, then elastic on free and on
+        # stiff bushes, each reading the worst of them. The recovery's supports, the ball's load and the bare frame's twist
+        # are the rigid model's: the supports and the ball are statically determined, and the body's share of the twist
+        # (cad/body.py) is read on it
+        lc1s: list[tuple[Any, dict, list]] = []
         defl: dict[str, dict] = {}
         twist: dict = {}
         balls: dict[str, dict] = {}
