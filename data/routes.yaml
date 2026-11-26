@@ -1137,7 +1137,7 @@ runs:
      serves: [brakes], along: [DB-RA, DB-RB, CH-P04, RL-R, RS-R, CM-04, UF-03, CM-05], from: {line: DB-PL, at: [DB_PL.x1, DB_PL.cy + 23, DB_PL.z0 + 10.5]},
      path: [[880, 365, 470], [1430, 516.7, .], [1700, 611.8, .], [1790, 662, .], [2030, 690, .], [2270, ., .], [2400, 668, 648.5], [2452, 630, 649.5], [2495, 605, 650],
             [CM_04.x0 - 351, ., .], [CM_04.x0 - 291, 615, 648], [CM_04.x0 - 250, 634.5, 647], [CM_04.x0 - 190, 694.5, 645], [., ., RL_R.z0 - 37], [., RL_R.y0 - 47.5, .],
-            [CM_04.x0 - 35, ., RL_R.z0 - 12.5], [., 130, .], [., 60, tank_z0 - 33]], to: {line: BR-TSC, at: [BR_TSC.x0, ., .]}}
+            [CM_04.x0 - 35, ., RL_R.z0 - 12.5], [., 130, .], [., 60, UF_03.z0 - 27]], to: {line: BR-TSC, at: [BR_TSC.x0, ., .]}}
   - {id: K-11, system: dc12, kind: tsc, amps: 4, volts: 12, feeds: "Bosch TSC to the road side drums' magnets and ABS sensors: its axle harness's two wheel bundles to their junction, each with one magnet's 4.0 A", protection: "The TSC's outputs",
      serves: [brakes], along: [UF-03, CM-05], from: {line: BR-TSC, at: [BR_TSC.x1, BR_DR.cy, BR_TSC.z0 - 13.5]}, to: {line: BR-DR, at: [BR_DR.x0, ., .]}}
   - {id: K-12, system: dc12, kind: tsc, amps: 4, volts: 12, feeds: "Bosch TSC to the kerb side drums' magnets and ABS sensors: its axle harness's two wheel bundles to their junction, each with one magnet's 4.0 A", protection: "The TSC's outputs",

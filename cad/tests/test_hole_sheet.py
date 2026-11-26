@@ -47,11 +47,12 @@ def _chassis():
 
 
 def test_every_hole_record_stands_once_on_ct105():
+    """Every hole for galvanising and every fixing's bolt or rivet nut hole (CH.bolt_records, I2-109) stands once."""
     recs = CH.records()
-    assert len(recs) > 150
+    assert len(recs) > 150 and CH.bolt_records()
     _, texts = drawn("CT-105")
     ids = Counter(t for _, _, t in texts if HOLE_ID.fullmatch(t))
-    assert ids == Counter(h["id"] for h in recs)
+    assert ids == Counter(h["id"] for h in recs + CH.bolt_records())
     stray = [t for _, _, t in texts if not HOLE_ID.fullmatch(t) and HOLE_ID.search(t)]
     assert not stray, stray
 
@@ -64,7 +65,7 @@ def test_ct105_gives_each_hole_its_records_size_and_distances():
     _, texts = drawn("CT-105")
     width = sum(c[1] for c in COLS)
     members = {m["id"]: m for m in _chassis()["members"]}
-    for h in CH.records():
+    for h in CH.records() + CH.bolt_records():
         x0, y0 = next((x, y) for x, y, t in texts if t == h["id"])
         row = [t for x, y, t in sorted(texts) if abs(y - y0) < 1e-6 and x0 <= x < x0 + width]
         assert len(row) == len(COLS), (h["id"], row)

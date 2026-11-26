@@ -474,12 +474,13 @@ def test_a_hole_within_a_weld_run_is_read_outboard_of_its_node():
 
 
 def test_the_bearers_and_hangers_bolt_holes_are_read_by_the_hole_checks():
-    """I2-109: every bolt hole the fresh tanks' bearers and the front guard's hangers make (Layout.fixing_holes) is a hole
-    CHS-08U, CHS-09, CHS-10 and CHS-12 read, numbered after every other hole so no id moves: those in the rails' webs on
-    the composite rail's section, those in the XT crossmembers' webs on their crossmember's own, each bolt's hole in one
-    web read with its hole in the other, and every one of them passes."""
+    """I2-109, I2-116: every hole the fresh tanks' bearers' bolts and the front guard's hangers' bolts and rivet nuts make
+    (Layout.fixing_holes) is a hole CHS-08U, CHS-09, CHS-10 and CHS-12 read, numbered after every other hole so no id
+    moves: the rivet nuts' in the rails' inner webs on the composite rail's section, alone, since nothing goes through the
+    outer web beside the front tyre, the bolts' in the XT crossmembers' webs on their crossmember's own, each bolt's hole
+    in one web read with its hole in the other, and every one of them passes."""
     fix = EV["layout"].fixing_holes()
-    bolts = [h for h in RES["holes"] if any(r.startswith("bolt for") for r in h.get("runs", []))]
+    bolts = [h for h in RES["holes"] if any(r.startswith(("bolt for", "rivet nut for")) for r in h.get("runs", []))]
     assert fix and len(bolts) == len(fix)
     assert sorted(int(h["id"][2:]) for h in bolts) == list(range(len(RES["holes"]) - len(fix) + 1, len(RES["holes"]) + 1))
     hinged = {m.id for m in CH.hinge_crossmembers()}
@@ -490,5 +491,21 @@ def test_the_bearers_and_hangers_bolt_holes_are_read_by_the_hole_checks():
         assert h["frame"] == f["member"] and (rail or f["member"] in hinged), h["id"]
         along = (lambda o: o["x"]) if rail else (lambda o: o["y"])
         pair = [o for o in bolts if o is not h and o["member"] == h["member"] and abs(along(o) - along(h)) < 1]
-        assert len(pair) == 1 and pair[0]["id"] in h.get("with", []), h["id"]
+        if f["use"].startswith("rivet nut"):
+            assert rail and f["face"] == "inner web" and not pair, h["id"]
+        else:
+            assert len(pair) == 1 and pair[0]["id"] in h.get("with", []), h["id"]
         assert h["ok"] and h["static_ok"] and h["ultimate"]["util"] <= 1, h["id"]
+
+
+def test_every_check_is_read_on_the_hinge_bars_bounds():
+    """I2-114: the frame analysis reads every check on the hinge bars rigid and elastic at their own section, the elastic
+    bar's arm on free and on stiff bushes (xt_hinges `bar` `bounds` and `bushes`), and the elastic models tie each bar to
+    its crossmember at each weld run's two ends and its centre."""
+    assert set(RES["bars"]) == {"rigid", "elastic on free bushes", "elastic on stiff bushes"}
+    assert RES["frame"] == RES["bars"]["rigid"]
+    fm = CH.frame(None, "crossmember", "elastic", "free")
+    for cm in CH.hinge_crossmembers():
+        ys = [y for y, _ in fm.cm_nodes[cm.id]]
+        assert all(any(abs(y - r) < 0.5 for y in ys) for r in CH.hinge_run_points(cm)), cm.id
+    assert sum(1 for el in fm.f.elements if el.member.startswith("XT-BAR-")) > 0

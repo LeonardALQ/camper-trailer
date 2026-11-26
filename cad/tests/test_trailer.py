@@ -226,3 +226,17 @@ def test_the_rear_tank_guard_is_the_shear_panels_sheet_as_the_chassis_data_gives
     price = next(p for p in item["price"] if "shear panel" in p["item"])
     assert f"{m['t']:g} mm {grade}" in price["item"] and f"{m['t']:g} mm" in item["note"] and grade in item["note"]
     assert uf.extra["panel"]["t"] == m["t"] and set(uf.extra["panel"]) == {"sheet", "t", "z_top"}
+
+
+def test_the_front_guard_hangs_clear_under_the_front_tank():
+    """I2-115: wherever the front tank's bottom lies over the front guard's pieces in plan, it stands at least guard_gap
+    over the guard's top, so the guard carries only itself, and the rails' hangers are fixed to their inner webs alone
+    (I2-116), so nothing stands on a rail's outer face beside the front tyre."""
+    lay = EV["layout"]
+    tank = next(b for b in lay.blocks if b.id == "UF-01")
+    guard = [s for n, s in lay.guard_pieces() if n == "UF-03's front piece"]
+    least = min(t[0][2] - g[0][5] for t in lay.tank_pieces(tank) for g in guard
+                if min(t[0][3], g[0][3]) > max(t[0][0], g[0][0]) and min(t[0][4], g[0][4]) > max(t[0][1], g[0][1]))
+    assert least >= lay.V["guard_gap"] - 0.1, least
+    rails = [h for h in lay.fixing_holes() if h["member"].startswith("RL-")]
+    assert rails and all(h["face"] == "inner web" for h in rails)

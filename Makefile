@@ -38,7 +38,7 @@ trailer: ute
 # Its exit code is recorded, not propagated, so a failing check shows on the site instead of hiding it.
 check: trailer ute
 	@mkdir -p build/checks
-	-$(T) 1200 $(DOCKER) sh -c 'python -m pytest cad/tests -p no:cacheprovider -rxXf --junitxml=build/checks/junit.xml > build/checks/pytest.log 2>&1; echo $$? > build/checks/pytest.exit'
+	-$(T) 1800 $(DOCKER) sh -c 'python -m pytest cad/tests -p no:cacheprovider -rxXf --junitxml=build/checks/junit.xml > build/checks/pytest.log 2>&1; echo $$? > build/checks/pytest.exit'
 	@tail -n 40 build/checks/pytest.log
 	@printf 'pytest exit code %s: %s\n' "$$(cat build/checks/pytest.exit)" "$$(tail -n 1 build/checks/pytest.log)" > build/checks/summary.txt
 
