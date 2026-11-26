@@ -1,8 +1,8 @@
 """CT-106, the XT hinge joint and the rear tank bay's shear panel (A3), from the chassis data (cad/chassis.py).
 
 Detail A draws the XT centre crossmember's kerb-side joint in plan and detail B in section on the rail's inner face,
-both at 1:5: the rail, the crossmember's end, the two hinge cheeks, the two gussets on their 45 degree lines with their
-cut ends on the crossmember and the rail and their welds. Detail C draws the rear tank's bay in plan at
+both at 1:5: the rail, the crossmember's end, the two hinge cheeks, the gusset behind it on its 45 degree line with its
+cut ends on the crossmember and the rail and their welds, and none ahead of it, where the front shocks' brackets stand. Detail C draws the rear tank's bay in plan at
 1:10 with the shear panel's angles, the sheet cut clear of the rear airbags and shocks, its tongues with their radiused roots and its bolts, and detail D a section
 across the rail at the panel at 1:2.5. Nothing here places a part: every line is read from Chassis.hinge_gussets,
 hinge_cheeks, panel_pieces and shear_panels and the data they read, so a part the chassis code moves moves here.
@@ -68,7 +68,7 @@ def _brk(sh, p, q):
 
 class Joint:
     """The XT centre crossmember's kerb-side hinge joint as the data has it: the rail, the crossmember, the cheeks
-    either side, the gussets either side and the shear panel's angle along the rail behind it."""
+    either side, the gussets behind it and the shear panel's angle along the rail behind them."""
 
     def __init__(self, ch):
         self.ch, V = ch, ch.V
@@ -375,7 +375,7 @@ def _parts(sh, J: Joint, x: float, y: float) -> float:
     sec = ch.sections[next(f for f in ch.data["fittings"] if f["id"] == "CH-P08")["section"]]
     rows = [["CH-P08", "HINGE GUSSET, BOTH ENDS CUT AT 45 DEG", sec.name.replace(" x ", "x"), _n(g["length"]), str(fit["CH-P08"].qty),
              f"{fit['CH-P08'].mass_each:.2f}"],
-            ["CH-P16", "HINGE CHEEK, SHORT, FRONT HINGE'S FRONT", f"PL {_n(J.ck['l'])}x{_n(J.ck['h'])}x{_n(J.ck['t'])}", "",
+            ["CH-P16", "HINGE CHEEK, SHORT, AHEAD OF ITS CROSSMEMBER", f"PL {_n(J.ck['l'])}x{_n(J.ck['h'])}x{_n(J.ck['t'])}", "",
              str(sum(1 for c in ch.hinge_cheeks() if not c["gusset"])), f"{J.ck['l'] * J.ck['h'] * J.ck['t'] * 7.85e-6:.2f}"]]
     sizes = {}
     for c in ch.hinge_cheeks():

@@ -89,8 +89,8 @@ def chassis_row(c, res: dict) -> dict:
         fat = ", ".join(f"{f['id']} {f['range_mpa']:.1f} of {f['cafl']:.1f} MPa" for f in hp["fatigue"])
         return dict(limit="each case's limit, FAT-03 and FAT-13 within their CAFL", measured=round(100 * w["util"], 1), unit="%",
                     margin=round(100 * (1 - w["util"]), 1), ok=hp["ok"], governing=f"{w['part']}, {w['lc']}, {w['case']}",
-                    detail=(f"With each hinge tied to its crossmember at the hinge bar's welds and to the rail by its cheeks, and the gussets either "
-                            f"side carrying load, the worst is {w['part']}, "
+                    detail=(f"With each hinge tied to its crossmember at the hinge bar's welds and to the rail by its cheeks, and the gussets behind "
+                            f"each crossmember carrying load, the worst is {w['part']}, "
                             f"{w['mpa']:.0f} MPa against {w['limit']:.0f} MPa in {w['lc']}, {w['case']}, {w['util']:.2f}. At the roots and hinges: {fat}."))
     if c.type == "chassis_local":
         r = res["local"][LOCAL[c.item]]

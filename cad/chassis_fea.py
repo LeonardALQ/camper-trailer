@@ -803,7 +803,7 @@ class Analysis:
 
     def hinge_joints(self, out: dict) -> dict:
         """CHS-12 (I2-88): the XT hinge joints as built, each pivot tied to its crossmember at the hinge bar's weld runs and
-        to the rail through the hinge's two cheeks, with the gussets either side: the hinge crossmembers, the gussets, the
+        to the rail through the hinge's two cheeks, with the gussets behind it: the hinge crossmembers, the gussets, the
         cheeks and the crossmembers' holes in every case against that case's limit, and FAT-03 and FAT-13."""
         ch = self.ch
         parts = {m.id for m in ch.hinge_crossmembers()} | {g["id"] for g in ch.hinge_gussets()} | {c["member"] for c in ch.hinge_cheeks()}
