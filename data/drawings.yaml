@@ -292,6 +292,7 @@ drawings:
       - {rev: AM, date: 2026-11-26, description: "Notice: CH-P07 on CM-05's front face, the steel and zinc", drawn: Kiro, checked: "", approved: ""}
       - {rev: AN, date: 2026-11-26, description: "Notice: the chassis data at revision S, the stations 1 mm forward", drawn: Kiro, checked: "", approved: ""}
       - {rev: AO, date: 2026-11-26, description: "Notice: the frame's results with the tanks on their bearers (CHS-17)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AP, date: 2026-11-26, description: "Memo: the chassis data at revision T (I2-109 to I2-113)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
@@ -334,6 +335,7 @@ drawings:
       - {rev: AD, date: 2026-11-26, description: "Memo: CHS-13 to CHS-16 from the merged build", drawn: Kiro, checked: "", approved: ""}
       - {rev: AE, date: 2026-11-26, description: "Memo: the chassis data at revision S", drawn: Kiro, checked: "", approved: ""}
       - {rev: AF, date: 2026-11-26, description: "Memo: the shear panel's bolt figure with the tanks on their bearers", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AG, date: 2026-11-26, description: "Memo: the chassis data at revision T (I2-109 to I2-113)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-103
     title: Chassis details
     subtitle: Composite rail, outrigger root, crossmember to rail, overlap end, jacking point, recovery tongue, spare posts
@@ -386,6 +388,7 @@ drawings:
       - {rev: AN, date: 2026-11-26, description: "Notice: CM-05 drained through the rails as CM-06, the fatigue damage", drawn: Kiro, checked: "", approved: ""}
       - {rev: AO, date: 2026-11-26, description: "Memo: the fatigue table with the stations 1 mm forward", drawn: Kiro, checked: "", approved: ""}
       - {rev: AP, date: 2026-11-26, description: "Memo: the fatigue table with the tanks on their bearers", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AQ, date: 2026-11-26, description: "Memo: the chassis data at revision T (I2-109 to I2-113)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads
@@ -443,6 +446,7 @@ drawings:
       - {rev: D, date: 2026-11-26, description: "Notice: CM-05 at 6 mm with its corner holes, the four hinge gussets' holes", drawn: Kiro, checked: "", approved: ""}
       - {rev: E, date: 2026-11-26, description: "Notice: CM-05's front corners through the rails' webs, B-16 and B-18 holes", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-26, description: "Memo: the holes' stations 1 mm forward with the axle group", drawn: Kiro, checked: "", approved: ""}
+      - {rev: G, date: 2026-11-26, description: "Memo: the chassis data at revision T (I2-109 to I2-113)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-106
     title: XT hinge joint and rear bay shear panel
     subtitle: The kerb-side XT centre joint in plan and section, the rear bay's shear panel and a rail section
@@ -462,6 +466,7 @@ drawings:
       - {rev: G, date: 2026-11-26, description: "Notice: no gusset ahead of the XT centre, its front cheeks unstepped", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-26, description: "Notice: the sheet's front corners stepped 50 mm clear of the rear arms", drawn: Kiro, checked: "", approved: ""}
       - {rev: I, date: 2026-11-26, description: "Notice: the sheet's steps clear of the arms as sheet 2 draws them", drawn: Kiro, checked: "", approved: ""}
+      - {rev: J, date: 2026-11-26, description: "Memo: the chassis data at revision T (I2-109 to I2-113)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-201
     title: Body shell
     subtitle: Kerb, road, front and rear walls, the fixed roof plan, the panels and every opening with its size
