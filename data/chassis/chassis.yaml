@@ -5,7 +5,11 @@
 # cad/chassis_fea.py analyses them. Sections come from data/chassis/sections.yaml (report 11's table).
 id: ASM-CH
 name: Chassis and drawbar
-revision: S     # S, 26 Nov 2026: the shear panel's front corners cut in steps clear of the rear arms' pivot tubes and legs by
+revision: T     # T, 26 Nov 2026: the XT arms as sheet 2 draws them, the fresh tanks on bearers of their own bolted
+                # through the XT crossmembers (CHS-17), the holes within a diameter of one another along their member read on
+                # one net section, a hinge crossmember's holes within or between the weld runs read on the safe side, and the
+                # bearers' and the front guard's hangers' bolt holes read by the hole checks (I2-109 to I2-113).
+                # S, 26 Nov 2026: the shear panel's front corners cut in steps clear of the rear arms' pivot tubes and legs by
                 # FIT-05's 50 mm over their travel (Chassis.arm_cuts), the wings' roots shortened to match.
                 # R, 26 Nov 2026: the front shocks' support plates CH-P07 on the XT centre crossmember's front face, its front
                 # corners drained and vented through the rails' inner webs, and the arms as Cruisemaster's sheet 4 draws them.
