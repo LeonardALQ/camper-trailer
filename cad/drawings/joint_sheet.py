@@ -13,6 +13,7 @@ from __future__ import annotations
 import math
 import time
 
+from ..chassis import arm_clear
 from . import sheet as S
 from .chassis_sheets import OUT, _chassis, _draft_stamp, _layout, _title, plate, rhs, weld_symbol
 from .hole_sheet import _aligned
@@ -225,9 +226,10 @@ def _section_b(sh, J: Joint, x0: float, y0: float, k: float = 5.0):
 
 
 def _sheet_outline(sheet: dict, steps: int = 6) -> list[tuple[float, float]]:
-    """The shear panel's sheet in plan as one outline (Chassis.panel_sheet): its front edge with any front tongues, its
-    sides, the cuts clear of the rear airbags and shocks with their inner corners radiused `cut_r`, and its rear edge with
-    the rear tongues, each tongue's two root corners radiused `root_r`."""
+    """The shear panel's sheet in plan as one outline (Chassis.panel_sheet): its front corners stepped clear of the arms
+    (`steps`), its front edge with any front tongues, its sides, the cuts clear of the rear airbags and shocks with their
+    inner corners radiused `cut_r`, and its rear edge with the rear tongues, each tongue's two root corners radiused
+    `root_r`."""
     x0, y0, x1, y1 = sheet["rect"]
     R = sheet["root_r"]
 
@@ -242,13 +244,23 @@ def _sheet_outline(sheet: dict, steps: int = 6) -> list[tuple[float, float]]:
             pts += (arc0 if R else [(x, r["y0"])]) + [(toe, r["y0"]), (toe, r["y1"])] + (arc1 if R else [(x, r["y1"])])
         return pts
 
+    def stairs(side: int) -> list[tuple[float, float]]:
+        """The front corner on one side as cut clear of the arm (Chassis.arm_cuts), from the front edge along each step's
+        inner side to the sheet's side, or the square corner where it has none."""
+        st = sorted((s for s in sheet.get("steps") or [] if (s[1] + s[3]) * side > 0), key=lambda s: s[0])
+        if not st:
+            return [(x0, y0 if side < 0 else y1)]
+        pts = [p for xa, ya, xb, yb in st for p in ((xa, ya if side > 0 else yb), (xb, ya if side > 0 else yb))]
+        return pts + [(st[-1][2], y0 if side < 0 else y1)]
+
+    kerb_front, road_front = list(reversed(stairs(-1))), stairs(1)
     if not sheet.get("cut"):
-        return [(x0, y0)] + along(x0, -1) + [(x0, y1), (x1, y1)] + list(reversed(along(x1, 1))) + [(x1, y0)]
+        return kerb_front + along(x0, -1) + road_front + [(x1, y1)] + list(reversed(along(x1, 1))) + [(x1, y0)]
     xc, yc = sheet["cut"]
     rc = sheet["cut_r"]
     road = [(xc + rc - rc * math.cos(math.radians(a)), yc + rc - rc * math.sin(math.radians(a))) for a in range(0, 91, 90 // steps)]
     kerb = [(xc + rc - rc * math.sin(math.radians(a)), -yc - rc + rc * math.cos(math.radians(a))) for a in range(0, 91, 90 // steps)]
-    return ([(x0, y0)] + along(x0, -1) + [(x0, y1), (xc, y1)] + road + [(x1, yc)] + list(reversed(along(x1, 1)))
+    return (kerb_front + along(x0, -1) + road_front + [(xc, y1)] + road + [(x1, yc)] + list(reversed(along(x1, 1)))
             + [(x1, -yc)] + kerb + [(xc, y0)])
 
 
@@ -419,13 +431,14 @@ def _notes(J: Joint) -> list[str]:
         f"{steps}, WITH {_n(J.ck['leg'])} FILLETS ALONG ITS TOP AND LOWER EDGES (CHS-16).",
         f"PANEL ANGLES CH-P17: EA 50x50x5, THE FLAT LEG {_n(pw['drop'])} UNDER THE MEMBER. A {_n(pw['weld']['leg'])} FILLET ALONG THE UPRIGHT "
         f"LEG'S TOP EDGE AND A FLARE BEVEL WELD ALONG THE MEMBER'S BOTTOM CORNER, THROAT {_n(pw['weld']['corner_throat'])} (est.). THE RAILS' "
-        f"ANGLES START {_n(pw['rails']['gap'])} BEHIND THE CHEEKS AND STOP {_n(pw['rails']['before'])} SHORT OF THE AIRBAGS' BRACKETS, "
-        f"SO THE WELDS END APART (FAT-22, FAT-23).",
+        f"ANGLES START {_n(pw['rails']['gap'])} BEHIND THE CHEEKS' MAIN PLATES AND STOP {_n(pw['rails']['before'])} SHORT OF THE AIRBAGS' "
+        f"BRACKETS, SO THOSE WELDS END APART (FAT-22, FAT-23). THE XT CENTRE'S REAR STEPS RUN OVER THE WHOLE ANGLE: HOT-SPOT CHECK.",
         f"SHEET {sp['id']}: {_n(sp['t'])} HA250 STEEL, HOT-DIP GALVANISED, M{_n(fix['d'])} 8.8 IN {_n(fix['hole'])} HOLES ON THE ANGLES' "
         f"{_n(pw['gauge'])} GAUGE: {groups.get('rail', 0) // 2} ON EACH RAIL'S ANGLE AT {_n(pw['rails']['pitch'])}, {groups.get('rear', 0)} AT "
         f"{_n(pw['crossmembers'][0]['pitch'])} UNDER THE XT REAR SHOCK CROSSMEMBER, WHERE ITS TONGUES REACH UNDER THE ANGLES, THEIR ROOT "
         f"CORNERS R{_n(sp['sheet']['root_r'])}. CUT {_n(sp['cut_clear'])} CLEAR OF THE REAR AIRBAGS AND SHOCKS OVER THEIR TRAVEL, THE INNER "
-        f"CORNERS R{_n(sp['sheet']['cut_r'])}. NO STIFFENER: THE REAR TANK SITS ON IT (CHS-13).",
+        f"CORNERS R{_n(sp['sheet']['cut_r'])}. THE FRONT CORNERS CUT IN {len(sp['sheet'].get('steps') or []) // 2} STEPS A SIDE "
+        f"{_n(arm_clear())} CLEAR OF THE ARMS OVER THEIR TRAVEL (FIT-05). NO STIFFENER: THE REAR TANK SITS ON IT (CHS-13).",
         "THE HINGE BAR IS CRUISEMASTER'S, DRAWN PHANTOM (est.): TAKE ITS SIZE FROM ITS DRAWING 33XT AIR BEFORE CUTTING THE CHEEKS. THE ROAD "
         "SIDE MIRRORS THE KERB SIDE. EACH HINGE HAS ITS REAR GUSSETS ONLY (CT-101).",
     ]

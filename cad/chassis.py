@@ -888,40 +888,40 @@ class Chassis:
 
     def arm_spheres(self, step: float = 4.0, steps: int = 25) -> list[tuple]:
         """Every XT arm's bars (arm_bars) at FIT-05's travels (wheel_sweep's `steps`), each as balls along its axis `step`
-        apart at its radius there, each (x, y, z, r, side): the arm as FIT-05 sweeps it, which a part over the arms is cut
-        clear of (arm_cuts)."""
+        apart at its radius there, each (x, y, z, r, side, wheel): the arm as FIT-05 sweeps it, which a part over the arms
+        is cut clear of (arm_cuts)."""
         if getattr(self, "_arm_spheres", None) is None:
             travel, out = self.V["travel"], []
             for w in self.suspension:
                 for k in range(steps + 1):
                     for a, c, r0, r1 in self.arm_bars(w, -travel + 2 * travel * k / steps):
                         n = max(1, math.ceil(math.dist(a, c) / step))
-                        out += [(*(a[i] + (c[i] - a[i]) * j / n for i in range(3)), r0 + (r1 - r0) * j / n, w["side"]) for j in range(n + 1)]
+                        out += [(*(a[i] + (c[i] - a[i]) * j / n for i in range(3)), r0 + (r1 - r0) * j / n, w["side"], w["id"])
+                                for j in range(n + 1)]
             self._arm_spheres = out
         return self._arm_spheres
 
     def arm_cuts(self, box: tuple, strip: float = 25.0, margin: float = 0.5) -> list[tuple]:
         """What to cut from a part `box` (x0, y0, z0, x1, y1, z1) over the XT arms so the rest keeps FIT-05's clearance
-        (arm_clear) and `margin` from every arm over its travel (arm_spheres): on each side, in strips `strip` long along X
-        from where the arms first reach the part's underside grown by that clearance, from the least |Y| they reach in the
-        strip out to the part's side, and from its underside up as far as they reach in that plan, the strips sharing their
-        ends. Each (x0, y0, z0, x1, y1, z1), to 0.1 mm outward, so a plate's corner over an arm's pivot tube and inner leg
-        is cut away in steps."""
+        (arm_clear) and `margin` from every arm over its travel (arm_spheres): for each arm, in strips `strip` long along X
+        from where it first reaches the part's underside grown by that clearance to where it last does, from the least |Y|
+        it reaches in the strip out to the part's side on its own side, and from the underside up as far as it reaches in
+        that plan, the strips sharing their ends. Each (x0, y0, z0, x1, y1, z1), to 0.1 mm outward, so a plate's corner
+        over an arm's pivot tube and inner leg is cut away in steps."""
         x0, y0, z0, x1, y1, z1 = box
         R = arm_clear() + margin
         near = []
-        for cx, cy, cz, r, s in self.arm_spheres():
+        for cx, cy, cz, r, s, wid in self.arm_spheres():
             dz = max(z0 - cz, 0.0, cz - z1)
             if dz >= r + R:
                 continue
             rho = math.sqrt((r + R) ** 2 - dz ** 2)
             if cx + rho > x0 and cx - rho < x1 and cy + rho > y0 and cy - rho < y1:
-                near.append((cx, cy, cz, r, s, rho))
+                near.append((cx, cy, cz, r, s, rho, wid))
         out = []
-        for s in (-1, 1):
-            balls = [b for b in near if b[4] == s]
-            if not balls:
-                continue
+        for wid in sorted({b[6] for b in near}):
+            balls = [b[:6] for b in near if b[6] == wid]
+            s = balls[0][4]
             xa0 = math.floor(max(x0, min(b[0] - b[5] for b in balls)) * 10) / 10
             xb0 = math.ceil(min(x1, max(b[0] + b[5] for b in balls)) * 10) / 10
             n = max(1, math.ceil((xb0 - xa0) / strip - 1e-9))
