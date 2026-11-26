@@ -290,6 +290,7 @@ def frame_sections(ch: Chassis) -> tuple[list[Section], list[dict]]:
     for m in ch.members:
         if m.role in ("cm_end", "cm_floor", "cm_xt"):
             r = rules[m.role]
+            r = dict(r, **r.get("by_section", {}).get(m.sec.id, {}))     # a wider section's own holes (the XT hinge crossmembers)
             cut = next((c for c in rules.get("cut_ends", []) if c["member"] == m.id), None)
             if cut:                                  # the rear crossmember's ends at its recovery tongues' faces
                 ex = np.subtract(m.p1, m.p0) / m.length
@@ -302,6 +303,8 @@ def frame_sections(ch: Chassis) -> tuple[list[Section], list[dict]]:
             # rails' webs (I2-107): the members come from the plates' own places, Chassis.shock_plates
             plated = {p["member"] for p in ch.shock_plates()}
             blocked = rules["shock_plate_web"] if m.id in plated else None
+            if blocked:
+                blocked = dict(blocked, **blocked.get("by_section", {}).get(m.sec.id, {}))
             for e in (0, 1):
                 if blocked:
                     free = -_front_web(t) if blocked["web"] == "front" else _front_web(t)

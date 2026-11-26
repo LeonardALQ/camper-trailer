@@ -183,8 +183,8 @@ water_budget:
     - {use: "Cleaning", fresh_l: 2, grey_l: 2, basis: "Estimate"}
   wash: {use: "One wash and dry", fresh_l: 44, grey_l: 44, basis: "Camec 3.5 kg washer, 44 L (WELS, maker). The dryer returns about 2 L as condensate (est.)"}
   stores:
-    - {case: "The full 385 L, in travel (H13, H21) or at camp, no laundry", litres: 385, washes_a_week: 0}
-    - {case: "The full 385 L, three washes a week", litres: 385, washes_a_week: 3}
+    - {case: "The full 370 L, in travel (H13, H21) or at camp, no laundry", litres: 370, washes_a_week: 0}
+    - {case: "The full 370 L, three washes a week", litres: 370, washes_a_week: 3}
   grey_tank_l: 130
   grey_hours_one_wash: 72
 

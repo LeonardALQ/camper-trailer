@@ -395,7 +395,8 @@ class Layout:
         cm = self.td["crossmembers"]
         V = self.V
         w = V["xm_w"]
-        fixed = [dict(id=f["id"], x=self.P.eval(f["x"], {})) for f in cm["fixed"]]
+        # a station whose crossmember is wider than xm_w along X gives its own width `w` (the XT hinge crossmembers)
+        fixed = [dict(id=f["id"], x=self.P.eval(f["x"], {}), **({"w": self.P.eval(f["w"], {})} if "w" in f else {})) for f in cm["fixed"]]
         fixed.sort(key=lambda f: f["x"])
         keep_out = {tuple(k) for k in cm["keep_out"]}
         stations = []
@@ -403,10 +404,10 @@ class Layout:
             stations.append(a)
             if (a["id"], b["id"]) in keep_out:
                 continue
-            span = b["x"] - (a["x"] + w)
+            span = b["x"] - (a["x"] + a.get("w", w))
             n = math.ceil(span / V["xm_max_pitch"]) - 1 if span > V["xm_max_pitch"] else 0
             for k in range(1, n + 1):
-                stations.append(dict(id=f"between {a['id']} and {b['id']} ({k})", x=a["x"] + w + span * k / (n + 1) - w / 2,
+                stations.append(dict(id=f"between {a['id']} and {b['id']} ({k})", x=a["x"] + a.get("w", w) + span * k / (n + 1) - w / 2,
                                      generated=True))
         stations.append(fixed[-1])
         return stations

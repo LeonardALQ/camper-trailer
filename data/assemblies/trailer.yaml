@@ -64,10 +64,12 @@ params:
   rail_in: rail_outer_w / 2 - rail_w            # inner face of a rail
   hub_y: rail_outer_w / 2 + cf - wheel_offset   # tyre centre plane
   xm_w: 50                   # crossmember width along X
+  xt_hinge_w: 100            # the two XT hinge crossmembers' width along X, RHS 150 x 100 x 6 since 26 Nov 2026, each with its rear face where it stood (I2-114)
   xm_max_pitch: 700          # rule for the intermediate crossmembers and outriggers (report 11), the engineer confirms it
   # XT positions about the axle group centre at 900 mm spacing (report 18 section 4.3, from drawing 33XT with the arm unchanged)
   xt_front_hinge_rear: -869
-  xt_centre_front: -19
+  xt_centre_rear: 31         # the XT centre crossmember's rear face, its rear arms' pivots 23 mm ahead of it
+  xt_centre_front: xt_centre_rear - xt_hinge_w
   xt_rear_shock_front: 811
   front_hub_dx: -axle_spacing / 2
   rear_hub_dx: axle_spacing / 2
@@ -130,8 +132,8 @@ params:
   # ---------------------------------------------------------------- axle (solved)
   axle_x: 4381               # axle group centre from the ball. The build solves it: the middle of the towball window (H17)
   # ---------------------------------------------------------------- water (H13)
-  water_full_l: 385          # the fresh tanks' net capacity, filled at camp with the transfer pump, CR45 filter and chlorine (H13): 388.0 L net (est.) by the grey tank's rule, Layout.tank_nets, with the tanks' front corners notched round the hinge gussets, their sides pocketed round the XT kit's airbags, their top brackets and the shocks at Cruisemaster's places (I2-97) and their bottom edges stepped clear of the arms (FIT-05), in H21's 5 L steps (I2-40). It was 395 L at 396.1 L net before the pockets, 400 L at 400.2 L net before the notches, and 420 L, more than the tanks' 416.6 L inside
-  water_travel_l: 385        # most fresh and grey water aboard while towing: the fresh tanks' whole net, 385 L (I2-40, I2-97), since the 4,000 kg plate and its 3,900 kg target (H2 and H13 as amended 23 Nov 2026), so fresh and grey together never pass what the fresh tanks hold. H21 still takes any excess over the target off it in 5 L steps. Before: 395 L until the tanks were pocketed round the XT kit's parts, 400 L until they were notched round the hinge gussets, and 280 L, H13's 350 L at the 3,500 kg plate less 70 L by H21
+  water_full_l: 370          # the fresh tanks' net capacity, filled at camp with the transfer pump, CR45 filter and chlorine (H13): 374.5 L net (est.) by the grey tank's rule, Layout.tank_nets, the front tank 780 mm long since the XT centre crossmember grew 50 mm forward (I2-114), with the tanks' front corners notched round the hinge gussets, their sides pocketed round the XT kit's airbags, their top brackets and the shocks at Cruisemaster's places (I2-97) and their bottom edges stepped clear of the arms (FIT-05), in H21's 5 L steps (I2-40). It was 385 L at 388.0 L net with the front tank 830 mm long, 395 L at 396.1 L net before the pockets, 400 L at 400.2 L net before the notches, and 420 L, more than the tanks' 416.6 L inside
+  water_travel_l: 370        # most fresh and grey water aboard while towing: the fresh tanks' whole net, 370 L (I2-40, I2-97, I2-114), since the 4,000 kg plate and its 3,900 kg target (H2 and H13 as amended 23 Nov 2026), so fresh and grey together never pass what the fresh tanks hold. H21 still takes any excess over the target off it in 5 L steps. Before: 385 L until the front tank lost 50 mm to the XT centre crossmember, 395 L until the tanks were pocketed round the XT kit's parts, 400 L until they were notched round the hinge gussets, and 280 L, H13's 350 L at the 3,500 kg plate less 70 L by H21
   water_highway_l: 50        # owner's highway figure
   load_sharing: 1            # the XT Air tandem in Cruisemaster's load-sharing configuration, each side's two bags on one circuit (CIS-006 rev 25, RG-01, RG-04). VSB1's 120 % rule is for non-load-sharing close-coupled axles, so MAS-02 checks the axle group load itself (H2 as amended 23 Nov 2026)
   grey_full_l: 130           # grey tank's net capacity (report 21 section 10)
@@ -141,9 +143,9 @@ params:
   tank_w: 975                # the tanks keep their size on the wider rails (H22): 100 mm each side to the rails for the airbag and shock mounts (est.)
   tank_r_kerb: 36            # the rear tank's kerb face 36 mm inboard of the front tank's, so the 135.5 mm gap between it and the kerb raiser takes G20's whole 120 mm packing over it (I2-33, I2-40)
   tank_f_x0: axle_x + xt_front_hinge_rear + 10
-  tank_f_l: xt_centre_front - 10 - (xt_front_hinge_rear + 10)          # 830 mm
-  tank_r_x0: axle_x + xt_centre_front + xm_w + 10
-  tank_r_l: min(xt_rear_shock_front - 10, wet_x0 - axle_x) - (xt_centre_front + xm_w + 10)   # to 10 mm ahead of the XT rear shock crossmember, or to the wet room's front (145 mm ahead of the shower well WR-10) if that is nearer, so the board's 230 V and 48 V runs from G20 cross to G15 behind it, ahead of G13's waste (I2-22): 666.8 mm at X 4,497.2 (760 mm before the 4,000 kg plate)
+  tank_f_l: xt_centre_front - 10 - (xt_front_hinge_rear + 10)          # 780 mm, 830 mm before the XT centre crossmember grew 50 mm forward
+  tank_r_x0: axle_x + xt_centre_rear + 10
+  tank_r_l: min(xt_rear_shock_front - 10, wet_x0 - axle_x) - (xt_centre_rear + 10)   # to 10 mm ahead of the XT rear shock crossmember, or to the wet room's front (145 mm ahead of the shower well WR-10) if that is nearer, so the board's 230 V and 48 V runs from G20 cross to G15 behind it, ahead of G13's waste (I2-22): 666.8 mm at X 4,497.2 (760 mm before the 4,000 kg plate)
   grey_x0: axle_x + xt_rear_shock_front + xm_w + 10   # grey tank in the rear bay, behind the XT rear shock crossmember
   grey_l: body_x1 - xm_w - 50 - grey_x0   # to 50 mm ahead of the rear crossmember, where the lamp looms K-01, K-08 and K-09 rise, so it follows the axle: 771.8 mm at X 4,497.2 (890 mm at X 4,379.9 before the 4,000 kg plate)
   grey_w: 1040               # wider than the fresh tanks: the rear bay has no airbag or shock mount, and the rear recovery tongues stand 22 mm outboard of it
@@ -152,7 +154,7 @@ params:
   # ---------------------------------------------------------------- equipment (report 13)
   diesel_l: 15               # heater fuel tank (report 13 open question 6)
   diesel_tank_l: 440         # 440 x 400 x 100 mm HDPE tank, 17.6 L gross (estimate)
-  diesel_tank_x0: min(axle_x + xt_front_hinge_rear - xm_w - 60, 3401) - diesel_tank_l   # ahead of the XT front hinge crossmember, in the braced bay, its rear end no further back than X 3,401, so the runs to G9 and G19 at X 3,392 pass behind it (I2-22). Since the 4,000 kg plate moved the axle back, the bay behind it is longer
+  diesel_tank_x0: min(axle_x + xt_front_hinge_rear - xt_hinge_w - 60, 3401) - diesel_tank_l   # ahead of the XT front hinge crossmember, in the braced bay, its rear end no further back than X 3,401, so the runs to G9 and G19 at X 3,392 pass behind it (I2-22). Since the 4,000 kg plate moved the axle back, the bay behind it is longer
   solar_l: 2054              # Sunman eArc SMF430F-12X12UW, 2,054 x 1,084 x 2 mm, bonded to the roof (report 13 section 4)
   solar_w: 1084
   solar_x0: body_x0 + 156    # array 4,108 x 2,168 mm, centred on the 4,420 mm roof, no roof hatches (report 18 section 1.2)
@@ -178,8 +180,8 @@ crossmembers:
   fixed:
     - {id: front, x: body_x0}
     - {id: diesel bay, x: diesel_tank_x0 - 10 - xm_w}
-    - {id: XT front hinge, x: axle_x + xt_front_hinge_rear - xm_w}
-    - {id: XT centre, x: axle_x + xt_centre_front}
+    - {id: XT front hinge, x: axle_x + xt_front_hinge_rear - xt_hinge_w, w: xt_hinge_w}
+    - {id: XT centre, x: axle_x + xt_centre_front, w: xt_hinge_w}
     - {id: XT rear shock, x: axle_x + xt_rear_shock_front}
     - {id: grey-bay, x: grey_x0 + grey_l / 2 - xm_w / 2}
     - {id: rear, x: body_x1 - xm_w}
@@ -321,7 +323,7 @@ items:
     price:
       - {item: "Bosch Trailer Safety Control, ABS-enabled, tandem kit", aud: 1558.70, basis: listing, url: "https://www.diycaravans.com.au/shop/bosch-trailer-safety-control-tsc-abs-enabled/", date: 2026-11-20, note: "SKU 8037.1, programmed for LT265/75R16 at checkout"}
       - {item: "24 wheel nuts, M14 x 1.5, 20 on the hubs and 4 spare", aud: 96, basis: estimate, date: 2026-11-20}
-    box: [axle_x + xt_centre_front, -100, rail_underside_z - 45, xm_w, 200, 45]
+    box: [axle_x + xt_centre_rear - 50, -100, rail_underside_z - 45, 50, 200, 45]   # under the XT centre crossmember's rear half, between its hinge bars
     mass: {basis: declared, total_kg: 4.2, maturity: estimate, source: "Report 06: TSC 2 to 3 kg and nuts 1.2 kg (estimates)"}
   - id: RG-04
     name: XT Air supply, Cruisemaster Level 3 manual kit, 12 V compressor, 11 litre tank, gauges, pressure switch and air lines, in a sealed box under the floor's front bay
@@ -678,7 +680,7 @@ items:
     note: Between the XT centre and rear shock crossmembers, over the rear axle, its rear end 145 mm ahead of the shower well so the board's runs cross behind it, and its kerb side 36 mm inboard of the front tank's, so the kerb frame G20's 120 mm packing stands over the gap between it and the kerb raiser (I2-33). It sits 5 mm lower with the front tank, so the two keep their water. About 172 L net (est.), its front corners notched round the hinge gussets behind the XT centre crossmember as the front tank's are round those behind the front hinge crossmember, and its sides pocketed 10 mm clear of the rear airbags, the road-side airbag's top bracket and, at its rear end, the rear shocks over the arm's travel (I2-97), and its bottom front edge stepped up to 6.7 mm clear of the rear arms' pivot tubes and inner legs by FIT-05's 50 mm (Layout._arm_pockets), so the two tanks hold 388.0 L net, filled at camp, and the 385 L of water_full_l may all ride in travel (H13, H21, I2-40).
   - id: UF-01B
     name: Fresh tanks' bearers, galvanised steel angles bolted through the XT crossmembers under the tanks' ends
-    model: {name: tank_bearers, box: [axle_x + xt_front_hinge_rear - 10, -rail_in, rail_underside_z - 20, xt_centre_front + xm_w + 70 - xt_front_hinge_rear, 2 * rail_in, 80]}
+    model: {name: tank_bearers, box: [axle_x + xt_front_hinge_rear - 10, -rail_in, rail_underside_z - 20, xt_centre_rear + 70 - xt_front_hinge_rear, 2 * rail_in, 80]}
     material: "Unequal angle 75 x 50 x 6, AS/NZS 3679.1 grade 300, hot-dip galvanised, M10 8.8 galvanised bolts through both webs of each crossmember on crush tubes, 10 mm EPDM strip"
     system: underfloor
     # Layout.tank_bearers places them, a pair either side of the centreline at each place, `y` mm off the centreline. The
@@ -718,8 +720,8 @@ items:
     # panel, its sheet and tongues read from the chassis data (Chassis.shear_panels), bolted up to CH-P17, its envelope
     # the sheet's extent. FIT-05 reads both as cut (Layout.guard_pieces), each front corner stepped clear of the arms
     model: {name: tank_guard, half: rail_in - 3,
-            gaps: [[xt_centre_front + xm_w / 2 - 50 - xt_front_hinge_rear, xt_centre_front + xm_w / 2 + 50 - xt_front_hinge_rear]],
-            extras: [{name: shear_panel, box: [axle_x + xt_centre_front + xm_w + 5, 3 - rail_in, tank_z0 - 8, xt_rear_shock_front + 45 - xt_centre_front - xm_w - 5, 2 * rail_in - 6, 8]},
+            gaps: [[xt_centre_front - 25 - xt_front_hinge_rear, xt_centre_rear + 25 - xt_front_hinge_rear]],
+            extras: [{name: shear_panel, box: [axle_x + xt_centre_rear + 5, 3 - rail_in, tank_z0 - 8, xt_rear_shock_front + 45 - xt_centre_rear - 5, 2 * rail_in - 6, 8]},
                      {name: guard_hangers, foot: 23,
                       box: [axle_x + xt_front_hinge_rear, -rail_in, tank_z0 - guard_gap - 9, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 50 + rail_underside_z - tank_z0 + guard_gap]}]}
     price:
@@ -727,7 +729,7 @@ items:
       - {item: "8 mm HA250 hot-rolled steel sheet for the rear tank's guard, the bay's shear panel, hot-dip galvanised, and its M12 8.8 bolts", aud: 488, basis: estimate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/374-mild-steel-sheet-plates-250gr-as-nzs-3678.html", date: 2026-11-26, note: "A 1200 x 1200 mm piece of 8 mm AS/NZS 1594 HA250 sheet, about 90 kg at about AUD 4 a kg over the AUD 3.05 to 3.44/kg listed for 250 grade sheet (STL-08), AUD 362, the sheet as cut, about 42 kg with its front corners stepped clear of the arms, hot-dip galvanised at GLV-01's AUD 2.75/kg, AUD 115, and 11 M12 8.8 bolts with nyloc nuts, AUD 11 (est.)"}
     box: [axle_x + xt_front_hinge_rear, -rail_in, tank_z0 - guard_gap - 6, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 6]
     parts:
-      - {item: "3 mm five-bar aluminium treadplate, the front tank's bay by the width between the rails", kg: "(xt_centre_front + xm_w / 2 - 50 - xt_front_hinge_rear) * 2 * rail_in * 9.375e-6", basis: estimate, source: "At about 9.4 kg/m2, Austral Wright's approximate 27 kg for a 3 x 1,200 x 2,400 mm five-bar sheet (https://www.australwright.com.au/wp-content/uploads/2012/07/AluminiumTreadplate1.pdf)"}
+      - {item: "3 mm five-bar aluminium treadplate, the front tank's bay by the width between the rails", kg: "(xt_centre_front - 25 - xt_front_hinge_rear) * 2 * rail_in * 9.375e-6", basis: estimate, source: "At about 9.4 kg/m2, Austral Wright's approximate 27 kg for a 3 x 1,200 x 2,400 mm five-bar sheet (https://www.australwright.com.au/wp-content/uploads/2012/07/AluminiumTreadplate1.pdf)"}
       - {item: "{t:g} mm {material}, the rear tank's bay between the rails with its tongues under the crossmembers' angles, bolted as the bay's shear panel (CHS-13)", panel: PNL-1, basis: calculated}
       - {item: "Aluminium angle, rubber strip and fixings", kg: 3.1, basis: estimate, source: "The older block model's 20 kg less the plate at the 1,175 mm rails"}
     note: One guard under each fresh tank, as wide as the space between the rails (H22's 1,275 mm rails make it 1,175 mm). The front one is aluminium treadplate on its hangers. The rear one is the chassis data's shear panel PNL-1, 8 mm AS/NZS 1594 HA250 sheet hot-dip galvanised, cut 10 mm clear of the rear airbags and shocks over their travel, its tongues' roots radiused 25 mm and no stiffener, bolted to the short angles welded to the rails' inner webs ahead of the airbags' brackets and to those under the XT rear shock crossmember (CH-P17), so the rear tank's bay carries the recovery pull's racking through it (CHS-13, I2-87, I2-98). Its mass is the sheet as the chassis data cuts it (Chassis.panel_mass).

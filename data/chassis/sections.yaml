@@ -172,6 +172,33 @@ sections:
     alt_fy_mpa: 350
     source: "Austube Mills DCT Aug 2013, page 3-12 (the same table as the 5.0 mm), read 23 Nov 2026. Not computed by sect.py: the published values are used as they stand, and the corner radius is the method's 2.5 t"
     use: "Drawbar members since 23 Nov 2026 (FAT-07, review I2-47), from the coupling plate to 1,000 mm under the rails."
+  - id: RHS_150x100x6
+    designation: "RHS 150x100x6"
+    shape: RHS
+    d: 150
+    b: 100
+    t: 6
+    ro: 15.0
+    mass_kg_per_m: 21.4
+    A_mm2: 2730.0
+    Ix_e6mm4: 8.17
+    Zx_e3mm3: 109.0
+    Sx_e3mm3: 134.0
+    Iy_e6mm4: 4.36
+    Zy_e3mm3: 87.3
+    Sy_e3mm3: 102.0
+    J_e6mm4: 9.51
+    C_e3mm3: 147.0
+    Ze_x_e3mm3_C450: null
+    Ze_y_e3mm3_C450: null
+    compact_x_C450: C
+    compact_y_C450: N
+    grade: C450L0
+    fy_mpa: 450
+    alt_grade: C350L0
+    alt_fy_mpa: 350
+    source: "Computed by the method above (AS/NZS 1163 nominal geometry, ro 2.5 t), which gives the RHS 150x50x6 row's published values to their three figures, 26 Nov 2026. The published table was not read, so Ze comes from AS 4100 5.2 (cad/chassis.py effective_modulus): 134e3 mm3 about x, compact, and 100.5e3 mm3 about y, its 138 mm faces non-compact at 30.9"
+    use: "The XT front hinge and XT centre crossmembers since 26 Nov 2026 (CHS-08U, CHS-12, I2-114), each keeping its rear face and growing 50 mm forward."
   - id: RHS_127x51x3p5
     designation: "RHS 127x51x3.5"
     shape: RHS

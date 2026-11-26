@@ -5,7 +5,10 @@
 # cad/chassis_fea.py analyses them. Sections come from data/chassis/sections.yaml (report 11's table).
 id: ASM-CH
 name: Chassis and drawbar
-revision: V     # V, 26 Nov 2026: a recovery limit with one wheel held fast (LC8a `held_wheel_n`), by the held-axle limit's rule
+revision: W     # W, 26 Nov 2026: both XT hinge crossmembers RHS 150 x 100 x 6, each with its rear face where it stood and 50 mm
+                # wider forward, the hinge bars Cruisemaster's 50 mm flush with their rear faces, each front cheek run on under
+                # its crossmember to its bar, and the three recovery limits found again by their rule (I2-93, I2-114).
+                # V, 26 Nov 2026: a recovery limit with one wheel held fast (LC8a `held_wheel_n`), by the held-axle limit's rule
                 # on the hinge bars' three models (I2-93, I2-114).
                 # U, 26 Nov 2026: every check read on the hinge bars rigid and elastic at their own section, the elastic bar
                 # with each weld run over its length and its arm on free and on stiff bushes, the worst governing (I2-114).
@@ -149,8 +152,8 @@ station_roles:
 # revision M it and the rear crossmember are RHS 150 x 50 x 6, so the ladder's rear bays carry the 78.5 kN ultimate pull
 # (CHS-08U, I2-87): at 4 mm and 3 mm their webs' holes read 1.14 and 1.19 of 0.85 fu there
 station_sections:
-  XT front hinge: RHS_150x50x6     # revision N (I2-88): with the hinge cheeks, for a held wheel's pull through its hinges
-  XT centre: RHS_150x50x6          # and the rear tank bay's shear panel at the 78.5 kN ultimate, 6 mm since the hinge bars' weld runs stand where sheet 3 draws them (I2-101)
+  XT front hinge: RHS_150x100x6    # revision W (I2-114): each hinge crossmember 100 mm wide along the trailer, its rear face where it stood, for the
+  XT centre: RHS_150x100x6         # couple the arm's two bushes put on the hinge bar across the trailer's line. 150 x 50 x 6 since revisions N and Q
   XT rear shock: RHS_150x50x6
   rear: RHS_150x50x6
 
@@ -224,7 +227,7 @@ fittings:
      poses: shock_plates, stations: [XT centre, XT rear shock], side_y: "rail_c - 200"}
   - {id: CH-P08, name: "Hinge crossmember gusset, SHS 50 x 50 x 3 at 45 degrees (TB 070), its ends cut at 45 degrees to bear on the crossmember's face and on the face of the hinge cheek beside it, welded all round, two behind each hinge crossmember", kind: tube, section: SHS_50x50x3, length: hinge_gusset_l, qty: 4,
      poses: hinge_gussets, fat: null}
-  - {id: CH-P16, name: "Hinge cheek, 10 mm, 150 x 108.5 beside each XT hinge crossmember on the rail's inner face, with a step where a hinge gusset lands on it, 150 mm behind the front hinge crossmember and 140 mm behind the XT centre's, welded to the web and the hinge bar", kind: plate, l: 150, w: 108.5, t: 10, qty: 8,
+  - {id: CH-P16, name: "Hinge cheek, 10 mm, 150 x 108.5 beside each XT hinge crossmember on the rail's inner face, with a step where a hinge gusset lands on it, 150 mm behind the front hinge crossmember and 140 mm behind the XT centre's, the front ones' part under the rail run on 50 mm under their crossmember to the hinge bar's front face, welded to the web and the hinge bar", kind: plate, l: 150, w: 108.5, t: 10, qty: 8,
      poses: hinge_cheeks, plane: xz, fat: FAT-22}
   # CH-P17, the shear panel PNL-1's pieces (I2-87, fx18-det, fx22-rear): EA 50 x 50 x 5 angles, each with its upright leg on
   # a member's web and its flat leg `drop` under the member's underside, level with the tanks' guard, where the sheet bolts
@@ -329,10 +332,10 @@ load_cases:
      accel: [[-1.6, 0, 0], [1.0, 0, 0], [0, 1.0, 0], [0, 0, 0.4]], factor: 1.5, source: "NTC Load Restraint Guide via report 02, factor 2 from report 03"}
   - {id: LC8a, name: "Recovery points: 58.9 kN within 30 degrees sideways and 15 degrees up or down of the rail axis", kind: recovery,
      force_n: 58860, ultimate_n: 78500, factor: 1, source: "Report 11 LC8a: 1.5 x 9.81 x the 4,000 kg plate, as the drawbar case. The ultimate stays TJM's 8 t test load",
-     sideways_deg: 30, vertical_deg: 15, held_wheel_n: 35000,
-     held_wheel_source: "The recovery limit with one wheel held fast at its hub and the pull through it (I2-93, I2-114, the working default of 26 Nov 2026 until Leonard rules): the largest pull at which every check passes with the wheel held on all three of the hinge bars' models, no yield at it and no fracture at its ultimate in LC8a's 78.5 / 58.86 ratio, rounded down to the next 5 kN. The rated 58.9 kN applies with every wheel free. 35 kN since 26 Nov 2026: on the hinge bars elastic on free bushes 40 kN reads the XT centre crossmember at 1.002 of its section's capacity at its 53.3 kN ultimate, the rear road-side point pulled 10.8 degrees sideways through the held rear road-side wheel and 15 degrees down. On the rigid bars and on stiff bushes every check passes at the rated 58.9 kN with one wheel held",
-     held_axle_n: 25000,
-     held_axle_source: "The recovery limit with both wheels of one axle held fast at their hubs (I2-93, the working default of 25 Nov 2026 until Leonard rules): the largest pull at which every check passes with the pair held, no yield at it and no fracture at its ultimate in LC8a's 78.5 / 58.86 ratio, rounded down to the next 5 kN. The rated 58.9 kN applies with every wheel free, and the held-wheel limit with one wheel held. 25 kN since 26 Nov 2026, when every check came to be read on the hinge bars elastic on free bushes too (I2-114): there 30 kN reads the XT front hinge crossmember at 1.10 at its ultimate. It was 50 kN on the rigid bars",
+     sideways_deg: 30, vertical_deg: 15, held_wheel_n: 55000,
+     held_wheel_source: "The recovery limit with one wheel held fast at its hub and the pull through it (I2-93, I2-114, the working default of 26 Nov 2026 until Leonard rules): the largest pull at which every check passes with the wheel held on all three of the hinge bars' models, no yield at it and no fracture at its ultimate in LC8a's 78.5 / 58.86 ratio, rounded down to the next 5 kN. The rated 58.9 kN applies with every wheel free. 55 kN since both hinge crossmembers became RHS 150 x 100 x 6 on 26 Nov 2026: on the hinge bars elastic on free bushes the rated 58.9 kN reads the front road-side hinge's cheeks' welds to the rail at 1.04 of their strength at its 78.5 kN ultimate, the front road-side point pulled 5.4 degrees sideways through the held front road-side wheel and 15 degrees up, and 55 kN reads them at 0.97. It was 35 kN on the RHS 150 x 50 x 6 hinge crossmembers, where 40 kN read the XT centre crossmember at 1.002 of its section's capacity",
+     held_axle_n: 50000,
+     held_axle_source: "The recovery limit with both wheels of one axle held fast at their hubs (I2-93, the working default of 25 Nov 2026 until Leonard rules): the largest pull at which every check passes with the pair held, no yield at it and no fracture at its ultimate in LC8a's 78.5 / 58.86 ratio, rounded down to the next 5 kN. The rated 58.9 kN applies with every wheel free, and the held-wheel limit with one wheel held. 50 kN since both hinge crossmembers became RHS 150 x 100 x 6 on 26 Nov 2026: on the hinge bars elastic on free bushes 55 kN reads the hole H-01 in the kerb-side raiser's outer web at 1.01 of its net section's capacity at its 73.4 kN ultimate, the front kerb-side point pulled 30 degrees sideways and 15 degrees up with both rear wheels held, at the plate and coupled. It was 25 kN on the RHS 150 x 50 x 6 hinge crossmembers once every check was read on the elastic bars on free bushes (I2-114), and 50 kN on the rigid bars before",
      reaction: {kx: 600, ky: 300, kz: 300, held_k: 10000000,
                 weight: [{case: TC1, at: tare}, {case: TC2, at: plate}], nose: [{kz: 300, holds_down: false}, {kz: 300, holds_down: true}],
                 source: "Report 11 gives the pull, not what holds the trailer. The ground holds it at its four unbraked wheels, each force along the trailer through its hub, each tyre on its longitudinal, lateral and vertical rate with its arm (est., 600, 300 and 300 N/mm), or one wheel held fast against an obstacle at its hub's height, the others rolling free, the trailer turned until the pull passes through that hub. held_k is the obstacle's rate, rigid. The trailer's weight acts with the pull (I2-94), at tare and fully loaded at the plate, from the static case's reactions at the tyres and the nose, and no support can pull: a tyre that would leaves the ground and the trailer pitches or rolls onto the supports that remain. The nose stands at the coupling at a tyre's rate (est.), uncoupled on its jockey wheel, which pushes up only, or coupled to the truck, whose ball holds it both ways"}}
@@ -490,19 +493,22 @@ galvanising_check: {pitch_deg: [0, 9], step_deg: 1, max_depth: 50, end_zone: 150
 # and each lap's sniped rear end is left open, the guide's preferred end (page 13, I2-84). CM-05's and CM-06's front webs carry the
 # shock support plates from 26 mm to 326 mm from each end (CH-P07), so each one's front corners drain and vent through 16 mm
 # holes in the rail's inner web inside the crossmember's end, the largest CHS-10's toe rule lets stand in its 50 mm, with
-# its rear web's holes at 25 mm. CM-08's ends are its rear recovery tongues' faces, 20 mm inside the rails (CH-P05)
+# its rear web's holes at 25 mm. Since revision W the guide's tables omit the RHS 150 x 100 x 6 hinge crossmembers, so
+# each closed end asks the one-hole rule's 46 mm, a quarter of the diagonal (cad/chassis_dip.py one_hole_d), 1,662 mm2:
+# `by_section` gives CM-04 24 mm holes and CM-05 22 mm holes through the rails' webs inside its 100 mm end, 37 mm either
+# side of its mid-height, where CHS-10's edge rule lets them stand, beside its rear web's two 25 mm holes. CM-08's ends are its rear recovery tongues' faces, 20 mm inside the rails (CH-P05)
 member_galvanising_holes:
   drawbar: {d: 20, leg: 6, clear: 4, holes: corners, snipe: open}
   cm_end: {d: 20, leg: 5, holes: corners}
   cm_floor: {d: 20, leg: 5, holes: corners}
-  cm_xt: {d: 20, leg: 8, holes: corners, z_bottom_leg: 6}
+  cm_xt: {d: 20, leg: 8, holes: corners, z_bottom_leg: 6, by_section: {RHS_150x100x6: {d: 24}}}
   outrigger: {d: 20, leg: 6, holes: corners}
   brace: {d: 13, leg: 5, holes: corners}
   plan_brace: {d: 10, leg: 5, holes: middle}
   hinge_gusset: {d: 13, leg: 5, holes: middle}
   # each crossmember the shock support plates CH-P07 stand on (Chassis.shock_plates, the plates' `stations`), its front
   # web covered over its end holes: the rear web's holes at free_d and the front corners through the rails' webs
-  shock_plate_web: {web: front, fitting: CH-P07, free_d: 25, internal_d: 16, internal_z: [-45, 45]}
+  shock_plate_web: {web: front, fitting: CH-P07, free_d: 25, internal_d: 16, internal_z: [-45, 45], by_section: {RHS_150x100x6: {internal_d: 22, internal_z: [-37, 37]}}}
   cut_ends:
     - {member: CM-08, cut: 20, leg: 6}
 
@@ -525,7 +531,9 @@ sealed_overlaps:
 # The XT hinges and their gussets (I2-88), the one place the frame model, the dip and the 3D model read them from.
 # Cruisemaster's 33XT AIR sheets 2 and 3: each hinge bar lies square to the rail under its hinge crossmember, its long end
 # flush with the rail's outside, welded to the crossmember only, with 6 mm fillets in three 80 mm runs a side ("3-80",
-# report 11 line 111), and "Weld should not continue under main chassis rail". `runs` are the runs' centres from the
+# report 11 line 111), and "Weld should not continue under main chassis rail". The 50 mm bar stays flush with its
+# crossmember's rear face, from which Cruisemaster's positions run, so under the RHS 150 x 100 x 6 hinge crossmembers
+# (revision W) its front runs lie on the crossmember's bottom face 50 mm behind its front face. `runs` are the runs' centres from the
 # rail's inner face where sheet 3's isometric view draws them, the first from that face and the last to the bar's inboard
 # end (est., scaled at the runs' own 80 mm, I2-101). The frame model ties each hinge's pivot to
 # its crossmember at those runs, so the hinge's force and moment reach the rail through the crossmember's end, beside its
@@ -555,7 +563,9 @@ sealed_overlaps:
 # end meets its crossmember's face where the crossmember's 8 mm end fillet runs round on the web, so over the web the
 # end is coped `cope` mm along the rail at 45 degrees (est., the fillet's leg and 4 mm to spare), and its two welds on
 # the web start there, short of that fillet (I2-100). Below the rail its end stays square on the hinge bar's face for
-# the `bar_leg` fillets. A cheek beside a hinge gusset carries a step where the gusset lands: the same 10 mm plate run on
+# the `bar_leg` fillets, and since revision W each front cheek's part under the rail runs on under its crossmember, 26 mm
+# tall, to the bar's front face 50 mm behind the crossmember's (Chassis.hinge_cheeks). A cheek beside a hinge gusset
+# carries a step where the gusset lands: the same 10 mm plate run on
 # along the rail, `under_gusset` `l` long centred on the gusset's footprint and from `z0` to `z1` over the rail's
 # underside, clear over the shear panel's angle and 20 mm under the run N-08, welded to the web along its top and lower
 # edges by `leg` fillets. The gusset's rail end lands on the step's inboard face, so the step spreads its push and pull
@@ -563,17 +573,17 @@ sealed_overlaps:
 # footprint alone read past 1 at the ultimate. The gussets' axes stand `z_over_underside` over the rail's underside, so
 # the step keeps its clearances, and their ends on the crossmembers stay where they were, so the tanks' notches keep
 # their size. The gussets ahead of the front hinge crossmember are left out for the runs B-04 and K-10, so that
-# crossmember is RHS 150 x 50 x 6. The gussets ahead of the XT centre crossmember are left out for the front shocks
+# crossmember was RHS 150 x 50 x 6, and since revision W both hinge crossmembers are RHS 150 x 100 x 6 (station_sections). The gussets ahead of the XT centre crossmember are left out for the front shocks
 # (fx23-mrg, FIT-08): each shock's bracket stands on that crossmember's front face up to 77 mm over the rail's
 # underside and the shock's body sweeps to 86 mm over it, the face is flat only to 135 mm under its 15 mm corner
 # radius, so a 50 mm gusset has no room over them, and a gusset from the rail's web to the face crosses the shocks'
 # line in plan. TB 070 asks for gussets at the hinge crossmember to rail joints where possible, and that crossmember
-# too is RHS 150 x 50 x 6. So the cheeks ahead of both hinge crossmembers have no gusset and no step, and the
+# too was RHS 150 x 50 x 6 until revision W. So the cheeks ahead of both hinge crossmembers have no gusset and no step, and the
 # gussets' rail ends land behind the cheeks.
 # Cruisemaster's sheets give the hinge bar's size, not its section, nor the stiffness of the arm's greased polyurethane
 # bushes (sheet 2's lubrication note), so the frame model reads every check on each of these, the worst governing
 # (I2-114): the bar rigid from the pivot to its runs' centres, as above, and the bar elastic at its own `section`, a
-# solid bar as wide as its crossmember and xt_arms parts `bar` `d` deep (est.), from the cheeks' fillets past the arm's
+# solid bar xt_arms parts `bar` `w` wide, flush with its crossmember's rear face, and `d` deep (est.), from the cheeks' fillets past the arm's
 # hinge plates and along each run's whole length, tied to the crossmember at each run's ends and centre, its arm on each
 # bound of the bushes' stiffness across the pivot's axis, `bushes` free and stiff (FrameModel._elastic_bar). A hollow
 # bar would be softer still. Cruisemaster confirms the bar's section, its welds and the bushes in writing (CHASSIS.md
@@ -602,7 +612,7 @@ xt_hinges:
 # `parts` are the kit's parts between the rails, each place scaled from 33XT AIR sheet 2's plan and side views (rev 3,
 # 27 Jul 2021, marked do not scale, so each is est. to about 10 mm, as report 11 scaled the pivot), sheet 3's shock mount
 # detail and sheet 4's assembly, in mm. `y_in` is measured inboard from the rail's inner face. The hinge `bar` runs
-# under its crossmember, flush with its faces, from the rail's outer face (its long end, sheet 2) to `inboard` past the
+# under its crossmember, `w` wide and flush with its rear face, from the rail's outer face (its long end, sheet 2) to `inboard` past the
 # rail's inner face, `d` deep, with the arm's four hinge `plates`, `t` thick and `l` along the trailer on the pivot,
 # hanging from the bar to `below` under the rail's underside, the arm's bushes and pivot tube between them (`hinge`
 # is their envelope). The `airbag` stands over the hub, `dx` behind it, `d` across and `h` tall at ride under its top
@@ -617,7 +627,7 @@ xt_arms:
           bolt: {size: M12, a_c: 76.2, fuf: 830, planes: 2}, bracket: {leg: 6, l: 100, gap: 135, e: 40}}
   airbag: {bracket: {leg: 6, l: 200, returns: 20}}
   parts:
-    bar: {d: 44, inboard: 450}
+    bar: {d: 44, w: 50, inboard: 450}
     plates: {y_in: [34, 151, 311, 427], t: 8, l: 82, below: 134}
     hinge: {y_in: [30, 431]}
     # the arm, an A-frame as sheet 2's hinge plan and sheet 4's views draw it (Chassis.arm_bars, est.): its pivot tube from

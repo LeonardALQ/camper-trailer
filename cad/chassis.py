@@ -344,9 +344,14 @@ class Chassis:
     def role_of(self, st: dict) -> str:
         return self.data["station_roles"]["generated" if st.get("generated") else st["id"]]
 
+    def station_w(self, st: dict) -> float:
+        """A crossmember station's width along X: its own `w` where the layout gives one (the XT hinge crossmembers), else
+        xm_w."""
+        return st.get("w", self.V["xm_w"])
+
     def station_x(self, st: dict) -> float:
         """Centre X of a crossmember station (stations give the front face)."""
-        return st["x"] + self.V["xm_w"] / 2
+        return st["x"] + self.station_w(st) / 2
 
     def db_y(self, x: float) -> float:
         """Centreline Y magnitude of a drawbar member at X (the A-frame part, then along the rail)."""
@@ -398,7 +403,7 @@ class Chassis:
             if not all(i in ids for i in pb["between"]):
                 continue  # a body length compared in TRAILER.md with fewer stations
             sa, sb = (ids[i] for i in pb["between"])
-            xa, xb = sa["x"] + V["xm_w"], sb["x"] - pb.get("rear_ahead", 0.0)
+            xa, xb = sa["x"] + self.station_w(sa), sb["x"] - pb.get("rear_ahead", 0.0)
             z = V["rail_underside_z"] + rs["rail"].d / 2
             sec = self.sections[pb["section"]]
             ends = "ends on 6 mm gusset plates welded to the crossmember and the rail web"
@@ -774,11 +779,16 @@ class Chassis:
             for e, tag in ((-1, "F"), (1, "B")):
                 gid = f"{cm.id}{SIDES[w['side']]}" + ("" if e > 0 else "F")
                 gusset = big is not None and e in g.get("faces", [1]) and gid not in g.get("omit", [])
-                face = w["station_x"] + e * V["xm_w"] / 2
+                face = w["station_x"] + e * cm.sec.b / 2
                 x0 = face if e > 0 else face - ck["l"]
                 y0 = w["side"] * y_in - (ck["t"] if w["side"] > 0 else 0.0)
                 box = (x0, y0, z0, x0 + ck["l"], y0 + ck["t"], z0 + ck["h"])
                 boxes, area = [box], ck["l"] * ck["h"]
+                reach = self.hinge_bar_x(cm) - self.data["xt_arms"]["parts"]["bar"].get("w", cm.sec.b) / 2 - face
+                if e < 0 and reach > 1e-6:              # the bar's front face behind the crossmember's: the plate's part under the
+                    tail = (face, y0, z0, face + reach, y0 + ck["t"], V["rail_underside_z"])   # rail runs on under it to the bar
+                    boxes.append(tail)
+                    area += reach * (V["rail_underside_z"] - z0)
                 if gusset:                              # the step where the gusset lands, centred on its footprint (I2-99)
                     xc = face + e * (self.ev(g["length"]) / math.sqrt(2) - ck["t"])
                     ls, z0s, z1s = (self.step_size(cm.station, k) for k in ("l", "z0", "z1"))
@@ -818,16 +828,24 @@ class Chassis:
         return [y + k * half for y in self.hinge_weld_ys(cm) for k in (-1, 0, 1)]
 
     def hinge_bar_section(self, cm: Member) -> Section:
-        """The hinge bar under crossmember cm as a beam along Y (xt_hinges `bar` `section`, I2-114): a solid bar as wide as the
-        crossmember, flush with its faces, and xt_arms parts `bar` `d` deep (est.). Its strong axis bends it in the
+        """The hinge bar under crossmember cm as a beam along Y (xt_hinges `bar` `section`, I2-114): a solid bar xt_arms parts
+        `bar` `w` wide, Cruisemaster's 50 mm for a 50 mm crossmember, flush with the crossmember's rear face, and `d` deep
+        (est.). Its strong axis bends it in the
         vertical plane, its weak axis across, and J is a solid rectangle's, a b cubed (1/3 - 0.21 (b / a) (1 - b^4 / 12 a^4))
         with a the longer side (Roark, Table 10.7)."""
         if self.data["xt_hinges"]["bar"].get("section", "solid") != "solid":
             raise ValueError("xt_hinges bar section: only a solid bar is modelled")
-        w, d = cm.sec.b, self.data["xt_arms"]["parts"]["bar"]["d"]
+        bar = self.data["xt_arms"]["parts"]["bar"]
+        w, d = bar.get("w", cm.sec.b), bar["d"]
         a, b = max(w, d), min(w, d)
         J = a * b ** 3 * (1 / 3 - 0.21 * (b / a) * (1 - b ** 4 / (12 * a ** 4)))
         return Section(f"hinge bar, solid {w:g} x {d:g}", A=w * d, I_strong=w * d ** 3 / 12, I_weak=d * w ** 3 / 12, J=J)
+
+    def hinge_bar_x(self, cm: Member) -> float:
+        """The X of the hinge bar's axis under crossmember cm: the bar flush with the crossmember's rear face, from which
+        Cruisemaster's positions run, so on the XT hinge crossmembers 100 mm wide its front face stands 50 mm behind the
+        crossmember's (xt_arms parts `bar` `w`)."""
+        return cm.p0[0] + cm.sec.b / 2 - self.data["xt_arms"]["parts"]["bar"].get("w", cm.sec.b) / 2
 
     # -- galvanising --------------------------------------------------
     def galv_rate(self, t: float) -> float:
@@ -860,7 +878,7 @@ class Chassis:
         out = []
         for axle, st_id in (("front", "XT front hinge"), ("rear", "XT centre")):
             st = stations[st_id]
-            rear_face = st["x"] + V["xm_w"]
+            rear_face = st["x"] + self.station_w(st)
             px = rear_face - V["pivot_ahead"]
             pz = V["rail_underside_z"] - V["pivot_below"]
             dx = math.sqrt(V["arm_r"] ** 2 - V["arm_drop"] ** 2)
@@ -1030,7 +1048,8 @@ class Chassis:
             s, wid = w["side"], w["id"]
             ys = lambda a, b: (min(s * (y_in - a), s * (y_in - b)), max(s * (y_in - a), s * (y_in - b)))  # noqa: E731
             cm = next(m for m in self.members if m.station == w["station"] and m.role == "cm_xt")
-            xf, xr = cm.p0[0] - cm.sec.b / 2, cm.p0[0] + cm.sec.b / 2
+            xr = cm.p0[0] + cm.sec.b / 2
+            xf = xr - pr["bar"].get("w", cm.sec.b)                 # the bar flush with the crossmember's rear face
             ya, yb = sorted((s * y_out, s * (y_in - pr["bar"]["inboard"])))
             out.append(dict(id=f"XT-BAR-{wid}", what="Cruisemaster's hinge bar under the crossmember", wheel=wid,
                             boxes=[(xf, ya, zu - pr["bar"]["d"], xr, yb, zu)]))
@@ -1267,7 +1286,7 @@ class FrameModel:
                 # the rail's inner web. So the arm's moment stays in the bar and goes to the crossmember by its weld runs
                 ck = ch.data["xt_hinges"]["cheek"]
                 n = sum(1 for c in ch.hinge_cheeks() if c["wheel"] == w["id"])
-                sp = cheek_props(ck, ch.xm_w, n)
+                sp = cheek_props(ck, cm.sec.b, n)
                 z_pin = V["rail_underside_z"] - ck["bar_d"] / 2
                 bar = f.node((w["pivot"][0], w["pivot"][1], z_pin - 1.0))
                 pin = f.node((w["pivot"][0], w["pivot"][1], z_pin))
@@ -1359,7 +1378,7 @@ class FrameModel:
         s, wid = w["side"], w["id"]
         parts = ch.data["xt_arms"]["parts"]
         y_in = V["rail_c"] - ch.role_sec["rail"].b / 2
-        x, z = cm.p0[0], V["rail_underside_z"] - parts["bar"]["d"] / 2
+        x, z = ch.hinge_bar_x(cm), V["rail_underside_z"] - parts["bar"]["d"] / 2
         pin_y = s * (y_in - ch.data["xt_hinges"]["cheek"]["t"] / 2)
         plates = [s * (y_in - u) for u in parts["plates"]["y_in"]]
         runs = [y for y in ch.hinge_run_points(cm) if y * s > 0]
