@@ -78,6 +78,7 @@ class Joint:
         self.cm = next(m for m in ch.members if m.station == "XT centre" and m.role == "cm_xt")
         self.x = self.cm.p0[0]
         self.front, self.rear = self.x - self.cm.sec.b / 2, self.x + self.cm.sec.b / 2
+        self.bar_front = self.rear - ch.data["xt_arms"]["parts"]["bar"].get("w", self.cm.sec.b)   # the bar flush with the rear face
         self.y_in = V["rail_c"] - self.rail.b / 2
         self.y_out = V["rail_c"] + self.rail.b / 2
         self.z0, self.z1 = V["rail_underside_z"], V["rail_underside_z"] + self.rail.d
@@ -177,7 +178,7 @@ def _section_b(sh, J: Joint, x0: float, y0: float, k: float = 5.0):
         for b in c["boxes"]:
             v.box(sh, b[0], b[2], b[3], b[5])
     bar_lo = J.pivot[2] - 25.0
-    v.box(sh, J.front, bar_lo, J.rear, z0, "phantom")
+    v.box(sh, J.bar_front, bar_lo, J.rear, z0, "phantom")
     pc = v.p(J.pivot[0], J.pivot[2])
     sh.circle(pc[0], pc[1], 12.0 / k, "phantom")
     sh.line(pc[0] - 4.0, pc[1], pc[0] + 4.0, pc[1], "centre")
@@ -218,7 +219,7 @@ def _section_b(sh, J: Joint, x0: float, y0: float, k: float = 5.0):
     g = next(g for g in J.gussets if g["face"] > 0)
     S.vdim(sh, *v.p(lo, z0), *v.p(lo, g["z"]), v.p(lo, 0)[0] - 4.0, _n(g["z"] - z0), size=LABEL)
     S.vdim(sh, *v.p(a["x0"], zf), *v.p(a["x0"], z0), v.p(a["x0"], 0)[0] + 4.0, _n(z0 - zf), size=LABEL)
-    S.leader(sh, v.p(J.front + 10.0, bar_lo + 30.0), (v.p(J.front, 0)[0] + 10.0, v.p(0, bar_lo)[1] - 4.0),
+    S.leader(sh, v.p(J.bar_front + 10.0, bar_lo + 30.0), (v.p(J.bar_front, 0)[0] + 10.0, v.p(0, bar_lo)[1] - 4.0),
              "CRUISEMASTER HINGE BAR, PHANTOM (est.)", size=LABEL)
     for x, t in ((hi, "REAR"), (lo, "FRONT")):
         q = v.p(x, z1 + 30.0)
@@ -385,10 +386,12 @@ def _parts(sh, J: Joint, x: float, y: float) -> float:
     fit = {f.id: f for f in ch.fittings}
     g = J.gussets[0]
     sec = ch.sections[next(f for f in ch.data["fittings"] if f["id"] == "CH-P08")["section"]]
+    front = next(c for c in ch.hinge_cheeks() if not c["gusset"])     # its part under the rail run on to the bar (revision W)
+    front_l = max(q[3] for q in front["boxes"]) - min(q[0] for q in front["boxes"])
     rows = [["CH-P08", "HINGE GUSSET, BOTH ENDS CUT AT 45 DEG", sec.name.replace(" x ", "x"), _n(g["length"]), str(fit["CH-P08"].qty),
              f"{fit['CH-P08'].mass_each:.2f}"],
-            ["CH-P16", "HINGE CHEEK, SHORT, AHEAD OF ITS CROSSMEMBER", f"PL {_n(J.ck['l'])}x{_n(J.ck['h'])}x{_n(J.ck['t'])}", "",
-             str(sum(1 for c in ch.hinge_cheeks() if not c["gusset"])), f"{J.ck['l'] * J.ck['h'] * J.ck['t'] * 7.85e-6:.2f}"]]
+            ["CH-P16", "HINGE CHEEK, SHORT, AHEAD OF ITS CROSSMEMBER", f"PL {_n(front_l)}x{_n(J.ck['h'])}x{_n(J.ck['t'])}", "",
+             str(sum(1 for c in ch.hinge_cheeks() if not c["gusset"])), f"{front['area'] * J.ck['t'] * 7.85e-6:.2f}"]]
     sizes = {}
     for c in ch.hinge_cheeks():
         if c["gusset"]:
