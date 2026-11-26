@@ -684,6 +684,7 @@ drawings:
       - {rev: AC, date: 2026-11-25, description: "Notice: K-10 along CM-04's front face to the centreline, clear of the kit", drawn: Kiro, checked: "", approved: ""}
       - {rev: AD, date: 2026-11-26, description: "Notice: the runs and the drum junctions laid round the XT kit (SVC-13)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AE, date: 2026-11-26, description: "Notice: the drum leads' clips 101 mm under the pivots (SVC-13)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AF, date: 2026-11-26, description: "Notice: note 2 names the XT hinges in place of arm hangers (I2-113)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-603
     title: Floor and wall penetrations
     subtitle: Every gland through the floor, walls and roof, its position, hole, fitting and runs
