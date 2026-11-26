@@ -602,11 +602,14 @@ xt_arms:
     bar: {d: 44, inboard: 450}
     plates: {y_in: [34, 151, 311, 427], t: 8, l: 82, below: 134}
     hinge: {y_in: [30, 431]}
-    # the arm, an A-frame as sheet 4 draws it (Chassis.arm_bars, est.): its pivot tube from the outer to the inner hinge
-    # plate and its legs from the bushes, midway between the outer pair and between the inner pair, back to the hub, the
-    # tube and each leg at its bush `d` round, as the model drew the pivot tube and the arm's front leg, each leg growing
-    # to the arm's 90 mm (arm_depth) at the hub
-    arm: {roots: [92.5, 369], d: 64}
+    # the arm, an A-frame as sheet 2's hinge plan and sheet 4's views draw it (Chassis.arm_bars, est.): its pivot tube from
+    # the outer to the inner hinge plate and its legs from the bushes, midway between the outer pair and between the inner
+    # pair, the tube and each leg at its bush `d` round, each leg growing to the arm's 90 mm (arm_depth) at the rear beam.
+    # The outer leg runs straight back along the rail. The inner leg closes on it to `inner_end`, [mm behind the pivot
+    # along X, mm inboard of the rail's inner face], where sheet 4's rear beam carries the airbag's mount, the shocks'
+    # clevises and the stub axle out to the hub. The brace between the legs stands `brace` mm behind the pivot (sheet 2's
+    # plan read at its own 4.408 mm a point, review I2-110, est.)
+    arm: {roots: [92.5, 369], d: 64, inner_end: [423, 205], brace: [64, 168]}
     airbag: {dx: 8, y_in: 58, d: 194, h: 152}
     bag_bracket: {l: 300, reach: 100}
     shock: {d: 70, eye: [67, -13], e: 40}

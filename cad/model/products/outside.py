@@ -41,9 +41,12 @@ def _world(fr):
 
 
 def _wcone(fr, p, q, r0, r1):
-    """A cone from r0 at the point p to r1 at q, both in the model's own coordinates (x, y, z)."""
+    """A cone from r0 at the point p to r1 at q, both in the model's own coordinates (x, y, z), a cylinder where the two
+    radii are equal (the arm's brace and rear beam)."""
     z0 = fr.bx[2]
     a, c = Vector(*fr.pt(*fr.uv(p[0], p[1]), p[2] - z0)), Vector(*fr.pt(*fr.uv(q[0], q[1]), q[2] - z0))
+    if abs(r1 - r0) < 1e-6:
+        return Solid.make_cylinder(r0, (c - a).length, Plane(origin=a, z_dir=c - a))
     return Solid.make_cone(r0, r1, (c - a).length, Plane(origin=a, z_dir=c - a))
 
 
@@ -61,7 +64,7 @@ def xt_arm(fr, V, sp, b):
 def xt_kit(fr, V, sp, b):
     """One XT arm's parts between the rails at their places in Cruisemaster's 33XT AIR sheets 2 to 4 (Chassis.xt_parts,
     est.), which its line carries: the hinge bar under its crossmember with the arm's four hinge plates, its pivot tube
-    and the A-frame's two legs from the bushes back to the hub at ride (Chassis.arm_bars), the airbag at ride under its
+    and the A-frame's legs, brace and rear beam out to the hub at ride (Chassis.arm_bars), the airbag at ride under its
     top bracket 33SA 013 on the rail's inner face, and the shock absorber at ride from its eye on the arm to its bracket
     on the next crossmember."""
     wbox, wcyl = _world(fr)
@@ -73,7 +76,7 @@ def xt_kit(fr, V, sp, b):
         elif kind == "XT-HINGE":
             out += [("hinge plate", wbox(q), GALV, 1.0) for q in p["plates"]]
             out.append(("pivot tube and bushes", wcyl(*p["tube"], 32), BLACK, 1.0))
-            out += [("arm's leg from its bush back to the hub", _wcone(fr, *leg), "#7b7d7d", 1.0) for leg in p["legs"]]
+            out += [("arm's leg, brace or rear beam", _wcone(fr, *leg), "#7b7d7d", 1.0) for leg in p["legs"]]
         elif kind == "XT-BAG":
             (cx, cy), (za, zb) = p["centre"], p["z"]
             out.append(("airbag", wcyl((cx, cy, za), (cx, cy, zb), p["d"] / 2), BLACK, 1.0))
