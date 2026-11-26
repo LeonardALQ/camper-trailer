@@ -487,9 +487,9 @@ member_galvanising_holes:
   brace: {d: 13, leg: 5, holes: corners}
   plan_brace: {d: 10, leg: 5, holes: middle}
   hinge_gusset: {d: 13, leg: 5, holes: middle}
-  blocked_webs:
-    - {member: CM-05, web: front, fitting: CH-P07, free_d: 25, internal_d: 16, internal_z: [-45, 45]}
-    - {member: CM-06, web: front, fitting: CH-P07, free_d: 25, internal_d: 16, internal_z: [-45, 45]}
+  # each crossmember the shock support plates CH-P07 stand on (Chassis.shock_plates, the plates' `stations`), its front
+  # web covered over its end holes: the rear web's holes at free_d and the front corners through the rails' webs
+  shock_plate_web: {web: front, fitting: CH-P07, free_d: 25, internal_d: 16, internal_z: [-45, 45]}
   cut_ends:
     - {member: CM-08, cut: 20, leg: 6}
 

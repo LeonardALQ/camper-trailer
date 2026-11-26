@@ -1565,7 +1565,7 @@ class Analysis:
                     rows.append(dict(member=f"RL-{SIDES[s]}", face="top", run="seam vent", x=V["body_x0"] + ch.ev(v["u"]),
                                      y=s * V["rail_c"], z=V["rail_top_z"], d=d, length=d, late=True))
         # the holes CHS-11 puts in the rails' inner webs inside a crossmember's end, where a fitting covers that web of the
-        # crossmember (member_galvanising_holes blocked_webs), each location with its 10 mm check hole in the rail's
+        # crossmember (member_galvanising_holes shock_plate_web), each location with its 10 mm check hole in the rail's
         # outer web opposite (the guide's page 19)
         from .chassis_dip import frame_sections
         for h in frame_sections(ch)[1]:
@@ -1720,7 +1720,11 @@ class Analysis:
         mem = {m.id: m for m in ch.members}
         gr = ch.data["member_galvanising_holes"]
         _, holes = frame_sections(ch)
-        attach = {"CM-06": ["CH-P07"], "CM-08": ["CH-P05"]}
+        attach = {"CM-08": ["CH-P05"]}                       # the shock plates on each crossmember they stand on (I2-107)
+        for p in ch.shock_plates():
+            attach.setdefault(p["member"], [])
+            if "CH-P07" not in attach[p["member"]]:
+                attach[p["member"]].append("CH-P07")
         boxes = {fid: [b for f in ch.fittings if f.id == fid for b in fitting_boxes(ch, f)] for fids in attach.values() for fid in fids}
         own = [h for h in holes if h["via"] == "own" and not (h["tube"].endswith("A") and h["tube"].startswith("DB-") and h["use"] == "drain")]
         out = []

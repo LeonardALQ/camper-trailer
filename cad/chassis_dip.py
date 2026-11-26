@@ -298,7 +298,10 @@ def frame_sections(ch: Chassis) -> tuple[list[Section], list[dict]]:
             else:
                 t = tube(m)
             sec = Section(m.id, m.name, [t], ("closed", "closed"))
-            blocked = next((bw for bw in rules.get("blocked_webs", []) if bw["member"] == m.id), None)
+            # a crossmember whose front web the shock support plates cover drains and vents its front corners through the
+            # rails' webs (I2-107): the members come from the plates' own places, Chassis.shock_plates
+            plated = {p["member"] for p in ch.shock_plates()}
+            blocked = rules["shock_plate_web"] if m.id in plated else None
             for e in (0, 1):
                 if blocked:
                     free = -_front_web(t) if blocked["web"] == "front" else _front_web(t)
