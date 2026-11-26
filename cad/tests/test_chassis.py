@@ -402,3 +402,60 @@ def test_trailer_md_gives_the_recovery_rule():
     for figure in (f"{r['rated_kn']:.1f} kN", f"{r['held_axle_kn']:g} kN", f"{side:.1f} kN", f"{along:.1f} kN",
                    f"{r['sideways_deg']:g} degrees", f"{r['vertical_deg']:g} degrees"):
         assert figure in line, figure
+
+
+def test_holes_in_one_section_are_read_together():
+    """I2-111: every pair of holes in a rail and its raiser within the larger diameter of one another along the rail, a
+    slot's length added, is read on one net section, each hole with the other, and no pair further apart. Beside the XT
+    centre crossmember the service hole into OR-05 is read with the crossmember's drain, vent and check hole in its rail."""
+    rail = [h for h in RES["holes"] if not h.get("open") and str(h.get("frame", "")).startswith("RL-")]
+    assert rail
+    for a in rail:
+        for b in rail:
+            if a is b or a["frame"] != b["frame"]:
+                continue
+            reach = max(a["d"], b["d"]) + (a["length"] - a["d"]) / 2 + (b["length"] - b["d"]) / 2
+            assert (b["id"] in a.get("with", [])) == (abs(a["x"] - b["x"]) < reach), (a["id"], b["id"])
+    cm = next(m for m in CH.members if m.station == "XT centre" and m.role == "cm_xt")
+    for run in ("K-08", "K-09"):
+        svc = next(h for h in rail if h["runs"] == [run] and h["wall"] == "the raiser's outer web")
+        corner = [h for h in rail if h["frame"] == svc["frame"] and abs(h["x"] - svc["x"]) < 1 and set(h["runs"]) & {"drain", "vent", "check"}]
+        assert len(corner) == 3 and {h["id"] for h in corner} <= set(svc["with"]), run
+        assert abs(svc["x"] - cm.p0[0]) < 1
+
+
+def test_a_hole_within_a_weld_run_is_read_outboard_of_its_node():
+    """I2-112: the frame model lumps each of a hinge bar's 80 mm weld runs at its centre, so a hole in a hinge
+    crossmember within a run's length is read on the element outboard of the run's node, at that node, whichever side of
+    it the hole's centre falls, and only those holes."""
+    import numpy as np
+
+    from cad.chassis_fea import Analysis
+    an = Analysis(EV["layout"], TRAILER, CH)
+    sites = an.hole_sites()
+    run = CH.data["xt_hinges"]["bar"]["run"]
+    hinged = {m.id: m for m in CH.hinge_crossmembers()}
+    within = []
+    for h in sites:
+        m = hinged.get(h["member"])
+        hit = [yr for yr in (CH.hinge_weld_ys(m) if m else []) if yr * h["y"] > 0 and abs(h["y"] - yr) < run / 2 + h["d"] / 2]
+        assert (h.get("run_node") is not None) == bool(hit), h["id"]
+        if hit:
+            assert h["run_node"] == an.fm.cm_node(m.id, hit[0])
+            within.append(h)
+    assert {"CM-04", "CM-05"} <= {h["member"] for h in within}
+
+    class Res:
+        forces = None
+
+    for h in within:
+        nd = h["run_node"]
+        els = [k for k, el in enumerate(an.f.elements) if el.member == h["frame"] and nd in (el.i, el.j)]
+        out = [k for k in els if abs(an.f.nodes[an.f.elements[k].j if an.f.elements[k].i == nd else an.f.elements[k].i][1])
+               > abs(an.f.nodes[nd][1])]
+        assert len(out) == 1, h["id"]
+        for k in els:
+            r = Res()
+            r.forces = np.zeros((len(an.f.elements), 12))
+            r.forces[k] = 1000.0
+            assert (an.hole_stress(r, h)["eq"] > 0) == (k == out[0]), (h["id"], k)

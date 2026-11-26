@@ -1625,17 +1625,12 @@ class Analysis:
                 hole_box = (r["x"] - L / 2, r["y"] - 1, r["z"] - d / 2, r["x"] + L / 2, r["y"] + 1, r["z"] + d / 2)
                 z_lever_pts, y_lever = [r["z"] - d / 2, r["z"] + d / 2], max(rail.b, raiser.b) / 2
                 face_w = tube.d - tube.t
-            A = comp.A - sum(p["dA"] for p in strips)
-            zc = (comp.A * comp.z_centroid - sum(p["dA"] * p["z"] for p in strips)) / A
-            I = comp.I_strong + comp.A * (zc - comp.z_centroid) ** 2 - sum(p["own"] + p["dA"] * (p["z"] - zc) ** 2 for p in strips)
-            Iw = comp.I_weak - sum(p["own_z"] + p["dA"] * p["y"] ** 2 for p in strips)
-            Aw = comp.Aw - sum(p["dA"] for p in strips if p["web"])
-            Aww = rail.Aw_width + raiser.Aw_width - sum(p["dA"] for p in strips if not p["web"])
+            gross = dict(A=comp.A, z=comp.z_centroid, I=comp.I_strong, I_weak=comp.I_weak, Aw=comp.Aw, Aw_width=rail.Aw_width + raiser.Aw_width)
             gap, weld = min(((_box_gap(hole_box, bx), what) for what, bx in toes), key=lambda t: t[0])
             sites.append(dict(r, runs=[r["run"]], rows=[f"{r['member']} {r['face']}"], frame=f"RL-{SIDES[s]}", wall=wall, open=False,
                               d=d, length=L, fu=fu, box=hole_box, edge_mm=edge, edge_need=rules["edge_factor"] * d, toe_mm=gap, toe_need=rules["toe_factor"] * d,
-                              toe_weld=weld, net=dict(A=A, I=I, I_weak=Iw, Aw=Aw, Aw_width=Aww, z_lever=max(abs(z - zc) for z in z_lever_pts),
-                                                      y_lever=y_lever, k_torsion=face_w / max(face_w - d, 1.0))))
+                              toe_weld=weld, gross=gross, strips=strips, levers=z_lever_pts, face_w=face_w,
+                              net=net_section(gross, strips, z_lever_pts, y_lever, face_w, d)))
         walled = [h for h in sites if not h.get("open")]
         for h in walled:
             # the member's sawn ends are edges too (AS 4100 Table 9.6.2, 1.5 d), and two holes keep the larger one's diameter
@@ -1654,7 +1649,37 @@ class Analysis:
         sites += self._member_hole_sites(rules) + late
         for k, h in enumerate(sites, 1):
             h["id"] = f"H-{k:02d}"
+        self._read_together(sites)
         return sites
+
+    def _read_together(self, sites: list[dict]):
+        """Holes that stand within a diameter of one another along their member, the larger of the two, a slot's length
+        added, are read on one net section (I2-111): each hole's section loses every such hole's strip, so a section that
+        cuts several holes, beside the XT centre crossmember a service hole in a raiser's outer web and the drain, check
+        hole and vent in its rail's webs, is read as the section it is. Each hole keeps its own lever to the net section's
+        centroid and its own wall's torsion factor, its wall less every such hole in that wall. Holes a diameter or more
+        apart along the member are read alone. A hinge gusset's holes carry no frame load and are placed only."""
+        axes = {}
+        for el in self.f.elements:
+            if el.member not in axes and not el.sec.rigid:
+                a, b = (np.asarray(self.f.nodes[n], float) for n in (el.i, el.j))
+                axes[el.member] = (b - a) / np.linalg.norm(b - a)
+        walled = [h for h in sites if not h.get("open") and not h.get("placement_only") and h.get("frame") in axes]
+        along = {id(h): float(np.dot((h["x"], h["y"], h["z"]), axes[h["frame"]])) for h in walled}
+
+        def near(a, b):
+            reach = max(a["d"], b["d"]) + (a["length"] - a["d"]) / 2 + (b["length"] - b["d"]) / 2
+            return a["frame"] == b["frame"] and abs(along[id(a)] - along[id(b)]) < reach
+
+        for h in walled:
+            group = [o for o in walled if near(h, o)]
+            if len(group) < 2:
+                continue
+            strips = [p for o in group for p in o["strips"]]
+            d_wall = sum(o["d"] for o in group if o.get("wall_id", o["wall"]) == h.get("wall_id", h["wall"]))
+            net = net_section(h["gross"], strips, h["levers"], h["net"]["y_lever"], h["face_w"], d_wall)
+            h["net"] = dict(net, **({"base": h["net"]["base"]} if "base" in h["net"] else {}))
+            h["with"] = [o["id"] for o in group if o is not h]
 
     def _drawbar_hole_sites(self, rules) -> list[dict]:
         """The drawbar members' apex drains for galvanising, H-33 to H-36, from the dip's own holes (cad/chassis_dip.py, the
@@ -1685,11 +1710,9 @@ class Analysis:
             box = (u - d / 2, z - d / 2, u + d / 2, z + d / 2)
             gap, weld = min(((math.hypot(max(b[0] - box[2], box[0] - b[2], 0.0), max(b[1] - box[3], box[1] - b[3], 0.0)), what)
                              for what, b in toes), key=lambda t: t[0])
-            strip = sec.t * d
-            A = sec.A - strip
-            zc = (sec.A * V["db_z"] - strip * z) / A
-            I = sec.I_strong + sec.A * (zc - V["db_z"]) ** 2 - (sec.t * d ** 3 / 12 + strip * (z - zc) ** 2)
-            Iw = sec.I_weak - (d * sec.t ** 3 / 12 + strip * ((sec.b - sec.t) / 2) ** 2)
+            gross = dict(A=sec.A, z=V["db_z"], I=sec.I_strong, I_weak=sec.I_weak, Aw=sec.Aw_depth, Aw_width=sec.Aw_width)
+            strips = [dict(dA=sec.t * d, z=z, own=sec.t * d ** 3 / 12, y=(sec.b - sec.t) / 2, own_z=d * sec.t ** 3 / 12, web=True)]
+            levers, face_w = [z - d / 2, z + d / 2], sec.d - sec.t
             edge = min(z - (zb + sec.ro), (zt - sec.ro) - z)
             edge_need = rules["edge_factor"] * d
             if u / rules["end_factor"] < edge / rules["edge_factor"]:      # the member's sawn end, 1.5 d (Table 9.6.2)
@@ -1699,10 +1722,8 @@ class Analysis:
                             rows=[f"{member} {web} web"], frame=member, wall=f"the drawbar member's {web} web", open=False,
                             fu=rules["fu"]["rail"], fy=sec.fy, box=(x - d / 2, y - 1, z - d / 2, x + d / 2, y + 1, z + d / 2),
                             edge_mm=edge, edge_need=edge_need, toe_mm=gap, toe_need=rules["toe_factor"] * d, toe_weld=weld,
-                            u_web=u, z_under=float(g["z_under"]),
-                            net=dict(A=A, I=I, I_weak=Iw, Aw=sec.Aw_depth - strip, Aw_width=sec.Aw_width,
-                                     z_lever=max(abs(z - d / 2 - zc), abs(z + d / 2 - zc)), y_lever=sec.b / 2,
-                                     k_torsion=(sec.d - sec.t) / max(sec.d - sec.t - d, 1.0),
+                            u_web=u, z_under=float(g["z_under"]), gross=gross, strips=strips, levers=levers, face_w=face_w,
+                            net=dict(net_section(gross, strips, levers, sec.b / 2, face_w, d),
                                      base=dict(Z_weak=sec.Z_weak, I_weak=sec.I_weak, C=sec.C, y_max=sec.b / 2))))
         return out
 
@@ -1727,6 +1748,7 @@ class Analysis:
                 attach[p["member"]].append("CH-P07")
         boxes = {fid: [b for f in ch.fittings if f.id == fid for b in fitting_boxes(ch, f)] for fids in attach.values() for fid in fids}
         own = [h for h in holes if h["via"] == "own" and not (h["tube"].endswith("A") and h["tube"].startswith("DB-") and h["use"] == "drain")]
+        run_nodes = self._run_nodes(own)
         out = []
         for h in own:
             m = mem.get(h["member"])
@@ -1756,11 +1778,9 @@ class Analysis:
             gap, weld = min(toes, key=lambda t: t[0])
             names = {el.member for el in self.f.elements}
             frame = h["tube"] if h["tube"] in names else (m.id if m and m.id in names else None)
-            strip = sec.t * d
-            A = sec.A - strip
-            zc = -strip * z / A
-            I = sec.I_strong + sec.A * zc ** 2 - (sec.t * d ** 3 / 12 + strip * (z - zc) ** 2)
-            Iw = sec.I_weak - (d * sec.t ** 3 / 12 + strip * ((sec.b - sec.t) / 2) ** 2)
+            gross = dict(A=sec.A, z=0.0, I=sec.I_strong, I_weak=sec.I_weak, Aw=sec.Aw_depth, Aw_width=sec.Aw_width)
+            strips = [dict(dA=sec.t * d, z=z, own=sec.t * d ** 3 / 12, y=(sec.b - sec.t) / 2, own_z=d * sec.t ** 3 / 12, web=True)]
+            levers, face_w = [z - d / 2, z + d / 2], sec.d - sec.t
             word = {"drawbar": "the drawbar member's", "cm_end": "the crossmember's", "cm_floor": "the crossmember's",
                     "cm_xt": "the XT crossmember's", "outrigger": "the outrigger's", "brace": "the cross brace's",
                     "plan_brace": "the plan brace's", "hinge_gusset": "the hinge gusset's"}[role]
@@ -1768,20 +1788,45 @@ class Analysis:
                             length=d, runs=[h["use"]], rows=[f"{h['member']} {h['use']}"], frame=frame, wall=f"{word} web",
                             open=False, fu=rules["fu"]["raiser" if sec.fy < 400 else "rail"], fy=sec.fy, box=hb, edge_mm=edge, edge_need=edge_need,
                             toe_mm=gap, toe_need=rules["toe_factor"] * d, toe_weld=weld, galv=True, placement_only=frame is None,
-                            u_web=u_end, z_under=float(h.get("z_under", z + sec.d / 2)),
-                            net=dict(A=A, I=I, I_weak=Iw, Aw=sec.Aw_depth - strip, Aw_width=sec.Aw_width,
-                                     z_lever=max(abs(z - d / 2 - zc), abs(z + d / 2 - zc)), y_lever=sec.b / 2,
-                                     k_torsion=(sec.d - sec.t) / max(sec.d - sec.t - d, 1.0),
+                            u_web=u_end, z_under=float(h.get("z_under", z + sec.d / 2)), run_node=run_nodes.get(id(h)),
+                            gross=gross, strips=strips, levers=levers, face_w=face_w, wall_id=f"{h['member']} web {h['web']}",
+                            net=dict(net_section(gross, strips, levers, sec.b / 2, face_w, d),
                                      base=dict(Z_weak=sec.Z_weak, I_weak=sec.I_weak, C=sec.C, y_max=sec.b / 2))))
+        return out
+
+    def _run_nodes(self, holes: list[dict]) -> dict[int, int]:
+        """The hinge bar's weld run each hole in a hinge crossmember lies within (I2-112): the frame model lumps each run
+        at its centre, so a hole within a run's length, its centre either side of that node, is read on the element
+        outboard of the node, which carries the run's share of the hinge's force with the inner runs', on the safe side."""
+        ch = self.ch
+        run = ch.data["xt_hinges"]["bar"]["run"]
+        out = {}
+        for cm in ch.hinge_crossmembers():
+            for h in holes:
+                if h["member"] != cm.id:
+                    continue
+                y, r = float(h["centre"][1]), h["d"] / 2
+                for yr in ch.hinge_weld_ys(cm):
+                    if yr * y > 0 and abs(y - yr) < run / 2 + r:
+                        out[id(h)] = self.fm.cm_node(cm.id, yr)
         return out
 
     def hole_stress(self, res, h) -> dict:
         """Normal and combined stress at a hole's edge on the composite rail's net section, at the element end nearest it.
         A hole for galvanising is read on the element whose span holds it, at that element's end nearer the hole, so a
-        load that enters the member between the hole and the next node (a hinge's welds) is counted where it passes."""
+        load that enters the member between the hole and the next node (a hinge's welds) is counted where it passes. A hole
+        within a hinge bar's weld run's length is read on the element outboard of the run's node, at that node, whichever
+        side of it the hole's centre falls (I2-112)."""
         best, bd = None, math.inf
         p = np.asarray((h["x"], h["y"], h["z"]), float)
-        for span in ((True, False) if h.get("galv") else (False,)):
+        nd0 = h.get("run_node")
+        if nd0 is not None:
+            for el, fl in zip(self.f.elements, res.forces):
+                if el.member == h["frame"] and nd0 in (el.i, el.j):
+                    far = el.j if el.i == nd0 else el.i
+                    if abs(self.f.nodes[far][1]) > abs(self.f.nodes[nd0][1]):
+                        best, bd = end_actions(fl)[0 if el.i == nd0 else 1], 0.0
+        for span in (() if best is not None else (True, False) if h.get("galv") else (False,)):
             for el, fl in zip(self.f.elements, res.forces):
                 if el.member != h["frame"]:
                     continue
@@ -1814,7 +1859,7 @@ class Analysis:
         fy = min(ch.role_sec["rail"].fy, ch.role_sec["raiser"].fy)          # the composite rail's checks use the raiser's fy
         out = []
         for k, h in enumerate(sites):
-            row = {key: h[key] for key in ("id", "member", "face", "x", "y", "z", "d", "length", "runs", "wall", "open", "u_web", "z_under") if key in h}
+            row = {key: h[key] for key in ("id", "member", "face", "x", "y", "z", "d", "length", "runs", "wall", "open", "u_web", "z_under", "with") if key in h}
             if h.get("open"):
                 out.append(dict(row, ok=True, static_ok=True, place_ok=True, util=0.0))
                 continue
@@ -2195,6 +2240,20 @@ def recovery_rule(results: dict, lc8: dict) -> dict:
                 sideways_up_kn=least(f"sideways +{vd}"), sideways_down_kn=least(f"sideways -{vd}"),
                 along_up_kn=least(f"along +{vd}"), along_down_kn=least(f"along -{vd}"),
                 level_tips=any(k.endswith(" +0") for k in tc))
+
+
+def net_section(gross: dict, strips: list[dict], levers, y_lever: float, face_w: float, d_wall: float) -> dict:
+    """A member's net section with strips of wall taken out for its holes: `gross` the whole section's area, centroid
+    height, second moments and shear areas, each strip its area, height, own second moments and offset across, in a web
+    or a face. The lever runs from the net centroid to the farthest of `levers`, and the wall's torsion factor is its
+    width over its width less `d_wall`, the holes in it."""
+    A = gross["A"] - sum(p["dA"] for p in strips)
+    zc = (gross["A"] * gross["z"] - sum(p["dA"] * p["z"] for p in strips)) / A
+    I = gross["I"] + gross["A"] * (zc - gross["z"]) ** 2 - sum(p["own"] + p["dA"] * (p["z"] - zc) ** 2 for p in strips)
+    Iw = gross["I_weak"] - sum(p["own_z"] + p["dA"] * p["y"] ** 2 for p in strips)
+    return dict(A=A, I=I, I_weak=Iw, Aw=gross["Aw"] - sum(p["dA"] for p in strips if p["web"]),
+                Aw_width=gross["Aw_width"] - sum(p["dA"] for p in strips if not p["web"]),
+                z_lever=max(abs(z - zc) for z in levers), y_lever=y_lever, k_torsion=face_w / max(face_w - d_wall, 1.0))
 
 
 def kirsch_along(a: float, dx: float, dz: float) -> float:
