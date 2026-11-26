@@ -1243,6 +1243,10 @@ def ct612(prj, model, bom, checks, reg, dwg):
     for b in lay.blocks:          # the crossmembers cut by the centreline, at their own heights
         if b.id.startswith("CM-") and b.box is not None and x0 <= b.box[0] <= x1:
             ve.fill(b.box, "fill")
+    for br in lay.tank_bearers():  # the fresh tanks' bearers beyond the cut, on the crossmembers' faces (UF-01B, I2-109)
+        if br["side"] > 0:
+            for k in ("upright", "foot"):
+                ve.box(br["boxes"][k], "medium")
     a, b_ = ve.p(w[0] - 40, 0, gt[5]), ve.p(w[0] - 40, 0, w[2])
     S.vdim(sh, a[0], a[1], b_[0], b_[1], a[0], f"{w[2] - gt[5]:.0f}", size=1.15, ext=False)
     a, b_ = ve.p(gt[3] - 60, 0, gt[5]), ve.p(gt[3] - 60, 0, V["floor_underside_z"])
@@ -1265,6 +1269,8 @@ def ct612(prj, model, bom, checks, reg, dwg):
         "THE COMBI'S DIESEL LINE COMES UP FROM THE HEATER FUEL TANK (UF-06) THROUGH G9. NO WATER LINE PASSES THE BATTERY'S TERMINAL FACE UNSLEEVED.",
         "THE DRIP TRAY'S DRAIN W-09 JOINS THE BASIN'S WASTE BELOW ITS TRAP, SO IT PASSES A WAVIN HEPVO 32 mm WATERLESS TRAP VALVE (TV-09) LYING "
         "ALONG THE PARTITION'S WET FACE UNDER THE BASIN ON ITS 87.5 DEGREE KNUCKLE ADAPTOR, ARROWS UNDERNEATH AND FALLING (I2-45, I2-52).",
+        "THE FRESH TANKS' ENDS SIT ON GALVANISED 75 x 50 x 6 STEEL ANGLES ON 10 mm RUBBER, EACH BOLTED THROUGH ITS XT CROSSMEMBER (UF-01B), DRAWN "
+        "BEYOND THE CUT, AND THE REAR TANK'S BODY ON THE REAR BAY'S 8 mm PANEL. THE FRONT TANK'S ALUMINIUM GUARD CARRIES ONLY ITSELF (CHS-17, I2-109).",
     ], size=1.42, width_chars=185)
     yb = title(sh, dwg, reg, "TANKS AND FITTINGS IN THE MASS SCHEDULE (TB-11).", "6 mm HDPE TANKS, FOOD-GRADE LINES")
     rows = [["Fill", "G1 on the kerb wall", "The front tank, over CM-04", "Under the bed, down G12"],

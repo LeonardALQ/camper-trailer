@@ -654,7 +654,7 @@ items:
     system: underfloor
     price:
       - {item: "Welded 6 mm HDPE tank, about 217 L net, two cross baffles and one lengthwise, its front corners notched round the hinge gussets, its sides pocketed round the XT kit's airbags, their top brackets and the shocks, and its bottom edges stepped clear of the arms", aud: 650, basis: estimate, url: "https://www.diycaravans.com.au/shop/custom-made-caravan-rv-tanks/", date: 2026-11-20, note: "Made-to-size tanks start at AUD 397, the standard 250 L tank is AUD 549 (research report 22)"}
-      - {item: "Aluminium angle bearers, 10 mm rubber strip, padded stainless straps and bolts", aud: 90, basis: estimate, date: 2026-11-20}
+      - {item: "Two padded stainless straps holding it down to its bearers (UF-01B), with their bolts", aud: 45, basis: estimate, date: 2026-11-26}
     zone: underfloor
     box: [tank_f_x0, -tank_w / 2, tank_z0, tank_f_l, tank_w, tank_h]
     tank: true
@@ -668,13 +668,40 @@ items:
     system: underfloor
     price:
       - {item: "Welded 6 mm HDPE tank, about 172 L net, one cross baffle, its kerb side 36 mm narrower than the front tank's, its front corners notched round the hinge gussets, its sides pocketed round the XT kit's rear airbags, the road-side airbag's top bracket and the rear shocks, and its bottom front edge stepped clear of the arms", aud: 620, basis: estimate, url: "https://www.diycaravans.com.au/shop/custom-made-caravan-rv-tanks/", date: 2026-11-20}
-      - {item: "Aluminium angle bearers, 10 mm rubber strip, padded stainless straps and bolts", aud: 90, basis: estimate, date: 2026-11-20}
+      - {item: "Two padded stainless straps holding it down to its bearers (UF-01B), with their bolts", aud: 45, basis: estimate, date: 2026-11-26}
     zone: underfloor
     box: [tank_r_x0, -tank_w / 2 + tank_r_kerb, tank_z0, tank_r_l, tank_w - tank_r_kerb, tank_h]
     tank: true
     net: {wall: 6, air_gap: 10, cross: 1, notch_clear: 10}
     mass: {basis: declared, unit_kg: 18.3, maturity: calculated, source: "As UF-01, scaled to 760 mm (report 18 section 1.1)", note: "6 mm HDPE kept (saving 1b, H13)"}
     note: Between the XT centre and rear shock crossmembers, over the rear axle, its rear end 145 mm ahead of the shower well so the board's runs cross behind it, and its kerb side 36 mm inboard of the front tank's, so the kerb frame G20's 120 mm packing stands over the gap between it and the kerb raiser (I2-33). It sits 5 mm lower with the front tank, so the two keep their water. About 172 L net (est.), its front corners notched round the hinge gussets behind the XT centre crossmember as the front tank's are round those behind the front hinge crossmember, and its sides pocketed 10 mm clear of the rear airbags, the road-side airbag's top bracket and, at its rear end, the rear shocks over the arm's travel (I2-97), and its bottom front edge stepped up to 6.7 mm clear of the rear arms' pivot tubes and inner legs by FIT-05's 50 mm (Layout._arm_pockets), so the two tanks hold 389.3 L net, filled at camp, and the 385 L of water_full_l may all ride in travel (H13, H21, I2-40).
+  - id: UF-01B
+    name: Fresh tanks' bearers, galvanised steel angles bolted through the XT crossmembers under the tanks' ends
+    model: {name: tank_bearers, box: [axle_x + xt_front_hinge_rear - 10, -rail_in, rail_underside_z - 20, xt_centre_front + xm_w + 70 - xt_front_hinge_rear, 2 * rail_in, 80]}
+    material: "Unequal angle 75 x 50 x 6, AS/NZS 3679.1 grade 300, hot-dip galvanised, M10 8.8 galvanised bolts through both webs of each crossmember on crush tubes, 10 mm EPDM strip"
+    system: underfloor
+    # Layout.tank_bearers places them, a pair either side of the centreline at each place, `y` mm off the centreline. The
+    # foot's underside stands at `z`, which keeps FIT-05's 50 mm from the arms' pivot tubes and legs over their travel and
+    # SVC-01's 20 mm over K-10 (est.). Each tank's end is stepped up over the feet onto the rubber (Layout._bearer_pockets).
+    # At the XT centre crossmember the front and rear pairs share their through bolts, clear of the TSC module and the
+    # CH-P07 plates, and the front tank's front pair stands clear of the front guard's hanger on CM-04 and of the hinge
+    # gussets CH-P08 behind it. CHS-17 reads them
+    bearers:
+      angle: {up: 75, foot: 50, t: 6, fy: 300, fu: 440}
+      z: rail_underside_z - 17.5
+      rubber: 10
+      clear: 5
+      bolts: {size: M10, d: 10, hole: 11, z: 50, per: 2, end: 30, fuf: 830, a_s: 58.0, a_c: 52.3, washer: 20}
+      member_fu: 500
+      hanger_bolts: {size: M8, z: 62.5, hole: 9}
+      places:
+        - {tank: UF-01, member: CM-04, face: rear, y: [35, 345]}
+        - {tank: UF-01, member: CM-05, face: front, y: [110, 255]}
+        - {tank: UF-01R, member: CM-05, face: rear, y: [110, 255]}
+    price: {aud: 90, basis: estimate, date: 2026-11-26, note: "1.2 m of 75 x 50 x 6 unequal angle at about AUD 15 a metre, AUD 18, galvanised at GLV-01's AUD 2.75/kg, AUD 23, eight M10 8.8 galvanised bolts with nyloc nuts and crush tubes, AUD 32, and the EPDM strip, AUD 17 (est.)"}
+    point: [axle_x - 300, 0, rail_underside_z + 15]
+    mass: {basis: declared, total_kg: 8.5, maturity: calculated, source: "1.2 m of 75 x 50 x 6 unequal angle at 5.66 kg/m (AS/NZS 3679.1), 6.8 kg, its zinc 0.2 kg, eight M10 bolts with nuts, washers and crush tubes 0.8 kg and 1.2 m of 10 x 44 mm EPDM strip 0.7 kg (calculated)"}
+    note: "Report 13's two cross-bearers under each tank, bolted to the XT crossmembers (I2-109). The front tank's ends sit on a pair on the XT front hinge crossmember's rear face and a pair on the XT centre crossmember's front face, and the tank spans between them as the welded box it is. The rear tank's front end sits on a pair on the XT centre crossmember's rear face, and its body on the rear bay's shear panel (PNL-1). Each tank's front corners, over the guards' steps, are carried by its end wall to its bearers. CHS-17 reads every bearer, its bolts, the crossmembers' webs at them and the panel's path in LC1 to LC3"
   - id: UF-02
     name: Water in the tanks
     system: underfloor

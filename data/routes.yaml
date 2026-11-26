@@ -268,7 +268,7 @@ checks:
     title: Every run keeps 20 mm from the XT kit's parts between the rails at Cruisemaster's places, and no fixture stands in one
     kind: kit_clearance
     severity: fail
-    why: "SVC-01's rule against the kit's parts as 33XT AIR sheets 2 to 4 place them (est., Chassis.xt_parts): the hinge bars and the arms' hinge plates under the hinge crossmembers, the airbags over their travel under their top brackets on the rails' inner faces, and the shocks over the arm's travel with their brackets, and no fixture of the services stands in one of them (I2-97). A lead's part that rides on its arm is FIT-05's, which reads every run and fixture against the arms themselves, but each drum lead's loop from its clip on the frame to the arm's tray is read here against each of the arm's hinge plates, the tray's end turned with the arm over its travel (cad/routes.py loop_gaps)."
+    why: "SVC-01's rule against the kit's parts as 33XT AIR sheets 2 to 4 place them (est., Chassis.xt_parts): the hinge bars and the arms' hinge plates under the hinge crossmembers, the airbags over their travel under their top brackets on the rails' inner faces, and the shocks over the arm's travel with their brackets, and no fixture of the services stands in one of them (I2-97). A lead's part that rides on its arm is FIT-05's, which reads every run and fixture against the arms themselves, but each drum lead's loop from its clip on the frame to the arm's tray, and its run in the tray along the inner leg and the rear beam to the brake, are read here against each of the arm's hinge plates, the ties turned with the arm over its travel (cad/routes.py loop_gaps, I2-110)."
     source: "H27 and H28 for the 20 mm, Cruisemaster's 33XT AIR installation guide rev 3 (27 Jul 2021) sheets 2 to 4 for the places, scaled (est.)"
 
 # The priced quantities the routed ones are compared with on the Electrical and Plumbing pages: BD-11's price items
@@ -680,7 +680,7 @@ fixtures:
   # underside, beside the TSC on the XT centre one, 100 mm from the centreline at the pivot's X and 101 mm under it, so
   # its loop up to the tray keeps SVC-13's 20 mm from the inner hinge plate's lower edge over the arm's travel, and 50 mm
   # inboard of the arm's pivot tube, where its sprung part ends and its arm part starts in a loop to Cruisemaster's
-  # harness tray on the A-frame's inner leg (33XT AIR sheet 4 step 7, est.)
+  # harness tray on the A-frame's inner leg and its rear beam (33XT AIR sheet 2's plan and sheet 4 step 7, est.)
   - {id: SP-L1, what: "P-clip for the front kerb drum's lead at the arm's inner bush, on a bracket under the XT front hinge crossmember (I2-50, est.)", line: BD-11, at: [CM_04.x1 - 23, -100, rail_underside_z - 200], size: [30, 20, 20], obstacle: false, needs_run: false, support: true}
   - {id: SP-L2, what: "P-clip for the rear kerb drum's lead at the arm's inner bush, on a bracket under the XT centre crossmember beside the TSC (I2-50, est.)", line: BD-11, at: [CM_05.x1 - 23, -100, rail_underside_z - 200], size: [30, 20, 20], obstacle: false, needs_run: false, support: true}
   - {id: SP-L3, what: "P-clip for the front road drum's lead at the arm's inner bush, on a bracket under the XT front hinge crossmember (I2-50, est.)", line: BD-11, at: [CM_04.x1 - 23, 100, rail_underside_z - 200], size: [30, 20, 20], obstacle: false, needs_run: false, support: true}

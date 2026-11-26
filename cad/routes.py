@@ -475,19 +475,28 @@ def lead_slack(arm: dict, clip: tuple, first: tuple, steps: int = 12) -> float:
     return max(0.0, most - math.dist(clip, first)) + LEAD_SLACK_MM
 
 
-def arm_lead(arm: dict, start: tuple, od: float) -> list[tuple]:
-    """A drum lead's arm part at ride height (I2-50): from its clip beside the arm's inner bush (`start`) in a loop down
-    to the underside of the A-frame's inner leg, where Cruisemaster's harness tray runs (33XT AIR sheet 4 step 7, est.),
-    then along it to the brake's backing plate, 45 mm short of the hub. FIT-05 sweeps it with the arm (cad/trailer.py
-    tyre_arc)."""
-    a, c, r0, r1 = arm["bars"][-1]
+def _under_bar(bar: tuple, od: float):
+    """The point under a bar (a, c, r0, r1) of the arm, a distance t along its axis from a, where a lead of outside
+    diameter od lies on its underside: a function of t."""
+    a, c, r0, r1 = bar
     n = math.dist(a, c)
     u = tuple((c[i] - a[i]) / n for i in range(3))
     down = tuple(u[2] * u[i] for i in range(3))
     down = (down[0], down[1], down[2] - 1.0)
     k = math.sqrt(sum(v * v for v in down))
-    under = lambda t: tuple(a[i] + t * u[i] + (r0 + (r1 - r0) * t / n + od / 2 + 1.0) * down[i] / k for i in range(3))  # noqa: E731
-    return [tuple(start), under(0.0), under(n - 45.0)]
+    return lambda t: tuple(a[i] + t * u[i] + (r0 + (r1 - r0) * t / n + od / 2 + 1.0) * down[i] / k for i in range(3))
+
+
+def arm_lead(arm: dict, start: tuple, od: float) -> list[tuple]:
+    """A drum lead's arm part at ride height (I2-50, I2-110): from its clip beside the arm's inner bush (`start`) in a
+    loop down to the underside of the A-frame's inner leg, where Cruisemaster's harness tray runs (33XT AIR sheet 2's
+    plan and sheet 4 step 7, est.), along it to the inner leg's end at the rear beam, then along the beam's underside to
+    the brake's backing plate, 45 mm short of the hub. FIT-05 sweeps it with the arm (cad/trailer.py tyre_arc) and
+    SVC-13 reads it against the arm's hinge plates from its clip to the brake (loop_gaps)."""
+    leg, beam = arm["bars"][-1], arm["bars"][-2]
+    under_leg, under_beam = _under_bar(leg, od), _under_bar(beam, od)
+    n_leg, n_beam = math.dist(leg[0], leg[1]), math.dist(beam[0], beam[1])
+    return [tuple(start), under_leg(0.0), under_leg(n_leg), under_beam(n_beam - 45.0)]
 
 
 def ahead_v(run: dict, done: dict, K: dict) -> float:
@@ -509,6 +518,10 @@ def _blocks_of(lay) -> tuple[dict, list]:
     D-ring, and each corner steady over the box its leg sweeps from folded for travel to standing at 90 degrees."""
     bl = []
     for b in lay.blocks:
+        if b.id == "UF-01B" and hasattr(lay, "bearer_parts"):   # the fresh tanks' bearers as their legs (I2-109)
+            bl += [dict(iid=f"{b.iid} {n}", id=b.id, name=f"{b.name.split(', ')[0]}, {n}", system=b.system, box=bx, hollow=False,
+                        keep_clear=False, role=None) for n, bx in lay.bearer_parts()]
+            continue
         tubes = spacer_tubes(lay, b)
         if b.box is None and not tubes:
             continue
@@ -737,7 +750,7 @@ def _resolve_run(r: dict, ns: dict, K: dict, rule: dict, fixtures: dict, pitch: 
     f = fillet(pts, max(k["bend_r"], way_bend), elbow_r=elbow_r, rigid=rigid)
     length_m = float(r["cut_m"]) if r.get("cut_m") else (f["length"] + slack) / 1000
     if r.get("rides") == "arm":
-        row.update(slack_mm=round(slack, 1), tray=(pts[1], pts[-1]))
+        row.update(slack_mm=round(slack, 1), tray=list(zip(pts[1:-1], pts[2:])))   # the tray along the inner leg and the beam (I2-110)
     if vd is not None:
         vd = k["mv_am"] * r["amps"] * length_m / 1000 + upstream_v(r) + ahead + inline_v(r)
     cores = kind.get("cores", 1)
@@ -1141,26 +1154,28 @@ def kit_clearance(res: dict) -> dict:
 
 
 def loop_gaps(res: dict, steps: int = 12) -> list[dict]:
-    """Each drum lead's loop (I2-50): the part of its arm part from its clip on the frame to its first tie in
-    Cruisemaster's tray on the A-frame's inner leg, the tie turned with the arm about its pivot over the arm's travel
-    (`arm` `turn`), and its least gap at its outside diameter to each of the arm's hinge plates (Chassis.xt_parts
-    `plates`)."""
+    """Each drum lead's arm part (I2-50, I2-110): its loop from its clip on the frame to its first tie in Cruisemaster's
+    tray on the A-frame's inner leg, and its run in the tray along the inner leg and the rear beam to the brake, the
+    ties turned with the arm about its pivot over the arm's travel (`arm` `turn`), and its least gap at its outside
+    diameter to each of the arm's hinge plates (Chassis.xt_parts `plates`). The tray's run is read as the loop is, so
+    the lead keeps SVC-01's clearance from the plates beside the inner bush (FX25-FIT item 2)."""
     plates = [(b["id"], b["name"], pl) for b in res["blocks"] if b.get("kit") and b.get("plates") for pl in b["plates"]]
     out = []
     for run in res["runs"]:
         if run.get("rides") != "arm" or not run.get("arm"):
             continue
         (px, pz), (a0, a1) = run["arm"]["pivot"], run["arm"]["turn"]
-        clip, tie = run["points"][0], run["points"][1]
-        dx, dz = tie[0] - px, tie[2] - pz
+        clip, ties = run["points"][0], run["points"][1:]
         best = None
         for k in range(steps + 1):
             a = a0 + (a1 - a0) * k / steps
-            q = (px + dx * math.cos(a) - dz * math.sin(a), tie[1], pz + dx * math.sin(a) + dz * math.cos(a))
+            qs = [(px + (t[0] - px) * math.cos(a) - (t[2] - pz) * math.sin(a), t[1],
+                   pz + (t[0] - px) * math.sin(a) + (t[2] - pz) * math.cos(a)) for t in ties]
+            segs = list(zip([clip] + qs[:-1], qs))
             for part, name, pl in plates:
                 if math.dist(clip, (pl[0] / 2 + pl[3] / 2, pl[1] / 2 + pl[4] / 2, pl[2] / 2 + pl[5] / 2)) > 400.0:
                     continue
-                d, p = seg_box(clip, q, pl)
+                d, p = min((seg_box(s0, s1, pl) for s0, s1 in segs), key=lambda t: t[0])
                 if best is None or d - run["od"] / 2 < best["gap"]:
                     best = dict(run=run["id"], part=part, name=name, gap=round(d - run["od"] / 2, 1), at=[round(v) for v in p],
                                 turn_deg=round(math.degrees(a), 1))
@@ -1382,7 +1397,7 @@ def supports(res: dict) -> dict:
                   or any(_bar_gap([(p, p)], c) - rad <= clip for c in along_bars)
                   or _in_box(p, board, 0.0) or any(_in_box(p, bx, 1.0) for bx in ends)
                   or any(_pt_box(p, bx) - rad <= clip for bx in holders)
-                  or (r.get("tray") is not None and seg_seg(p, p, *r["tray"]) - rad <= clip)
+                  or any(seg_seg(p, p, *seg) - rad <= clip for seg in r.get("tray") or [])
                   or any(0 <= _pt_box(p, bx) and _pt_box(p, bx) - rad <= clip for bx in carcasses)
                   or (r["system"] == "ac230" and any(_in_box(p, z, 0.0) for z in zones))
                   or any(any(_in_box(p, pb, 1.0) for pb in panels) and math.dist(p[:2] if g["at"] in ("floor", "roof") else p, g["p"][:2] if g["at"] in ("floor", "roof") else g["p"])

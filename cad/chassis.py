@@ -872,19 +872,41 @@ class Chassis:
         return lower, upper
 
     def arm_bars(self, w: dict, s: float = 0.0) -> list[tuple]:
-        """Wheel w's XT arm as Cruisemaster's 33XT AIR sheet 4 draws it, at travel s (mm, up positive): its pivot tube
-        between the outer and the inner hinge plates, and the A-frame's two legs from the bushes (xt_arms `parts` `arm`,
-        est.) back to the hub, which turn with the arm about the pivot. Each bar is ((x, y, z), (x, y, z), r0, r1) on its
-        axis with its radius at each end: the tube and each leg at its bush `d` round, each leg growing to the arm's
-        arm_depth at the hub. The tube comes first and the inner leg last."""
+        """Wheel w's XT arm as Cruisemaster's 33XT AIR sheet 2's hinge plan and sheet 4's views draw it, at travel s (mm,
+        up positive), which turns with the arm about the pivot (xt_arms `parts` `arm`, est.): its pivot tube between the
+        outer and the inner hinge plates, the outer leg from its bush straight back along the rail to the rear beam, the
+        brace between the legs at its front and rear edges, the rear beam from the inner leg's end out to the hub, which
+        carries the airbag's mount, the shocks' clevises and the stub axle, and the inner leg from its bush closing on the
+        outer leg to the beam. Each bar is ((x, y, z), (x, y, z), r0, r1) on its axis with its radius at each end: the
+        tube and each leg at its bush `d` round, each leg growing to the arm's arm_depth at the beam, the beam at
+        arm_depth. The tube comes first, the beam last but one and the inner leg last (routes.arm_lead)."""
         V, pr = self.V, self.data["xt_arms"]["parts"]
         y_in, sd = V["rail_c"] - self.role_sec["rail"].b / 2, w["side"]
         (px, _, pz), (hx, hy, hz) = w["pivot"], w["hub"]
         a = self.xt_arm_turn(w, s)
-        hub = (px + (hx - px) * math.cos(a) - (hz - pz) * math.sin(a), hy, pz + (hx - px) * math.sin(a) + (hz - pz) * math.cos(a))
-        ys, r, rh = pr["plates"]["y_in"], pr["arm"]["d"] / 2, V["arm_depth"] / 2
+        arm = pr["arm"]
+
+        def at(t, y_inboard):
+            """The arm's point a fraction t of the way from the pivot to the hub in the side view, y_inboard of the rail's
+            inner face (negative outboard), turned with the arm."""
+            dx, dz = (hx - px) * t, (hz - pz) * t
+            return (px + dx * math.cos(a) - dz * math.sin(a), sd * (y_in - y_inboard), pz + dx * math.sin(a) + dz * math.cos(a))
+
+        ys, r, rh = pr["plates"]["y_in"], arm["d"] / 2, V["arm_depth"] / 2
+        r_at = lambda t: r + (rh - r) * t  # noqa: E731
+        out_y, in_y = arm["roots"]
+        t_end, end_y = arm["inner_end"][0] / (hx - px), arm["inner_end"][1]
+        hub_in = y_in - abs(hy)                                    # the hub, inboard of the rail's inner face (negative)
+        k = (end_y - out_y) / (end_y - hub_in)                     # where the outer leg meets the beam
+        t_out = t_end + (1 - t_end) * k
+        leg_y = lambda t: in_y + (end_y - in_y) * t / t_end  # noqa: E731
         tube = ((px, sd * (y_in - ys[0] - r), pz), (px, sd * (y_in - ys[-1] + r), pz), r, r)   # its round ends at the end plates
-        return [tube] + [((px, sd * (y_in - u), pz), hub, r, rh) for u in pr["arm"]["roots"]]
+        outer = (at(0.0, out_y), at(t_out, out_y), r, rh)
+        braces = [(at(u / (hx - px), out_y), at(u / (hx - px), leg_y(u / (hx - px))), r_at(u / (hx - px)), r_at(u / (hx - px)))
+                  for u in arm["brace"]]
+        beam = (at(t_end, end_y), at(1.0, hub_in), rh, rh)
+        inner = (at(0.0, in_y), at(t_end, end_y), r, rh)
+        return [tube, outer, *braces, beam, inner]
 
     def arm_spheres(self, step: float = 4.0, steps: int = 25) -> list[tuple]:
         """Every XT arm's bars (arm_bars) at FIT-05's travels (wheel_sweep's `steps`), each as balls along its axis `step`
@@ -1457,9 +1479,9 @@ def _span_gap(a0: float, a1: float, b0: float, b1: float) -> float:
 
 def swept_parts(ch: Chassis, tyre_w: float, s: float) -> list[dict]:
     """Each wheel's tyre and trailing arm at travel s (mm, up positive) about the arm's pivot (report 11 section 5.1).
-    The tyre is a cylinder of the published diameter in its own plane. The arm is Cruisemaster's A-frame as sheet 4
-    draws it (Chassis.arm_bars): its pivot tube between the hinge plates and its two legs from the bushes back to the
-    hub, each a bar `arm_depth` round (est.), whose `bars` FIT-05 measures in space. Its `pivot`, `hub` and `y` give its
+    The tyre is a cylinder of the published diameter in its own plane. The arm is Cruisemaster's A-frame as sheets 2
+    and 4 draw it (Chassis.arm_bars): its pivot tube between the hinge plates, its two legs from the bushes back to the
+    rear beam, the brace between them and the beam out to the hub (est.), whose `bars` FIT-05 measures in space. Its `pivot`, `hub` and `y` give its
     side view and its span across the trailer."""
     V = ch.V
     out = []

@@ -84,9 +84,13 @@ trailer:
     how: bolted
     why: "The spare wheel bolts to the carrier's hub plate on five studs (CHASSIS.md)"
   - lines: [UF-03, UF-09]
-    to: ["RL-*", CH-P17]
+    to: ["RL-*", "CM-*", CH-P17]
     how: bolted
-    why: "The tank guards hang from the rails' inner faces on aluminium angles (UF-03's and UF-09's parts)"
+    why: "The front tank's guard hangs on 50 mm aluminium angles bolted to the rails' inner webs between the XT front hinge and centre crossmembers and to the XT front hinge crossmember's rear face on the centreline (Layout.guard_hanger_parts, I2-104), the rear tank's guard, the bay's shear panel, bolts up under the angles CH-P17 on the rails' inner webs and under the XT rear shock crossmember, and the grey tank's guard hangs from the rails' inner faces on aluminium angles (UF-03's and UF-09's parts)"
+  - lines: [UF-01B]
+    to: ["CM-*"]
+    how: bolted
+    why: "The fresh tanks' bearers bolt through both webs of the XT front hinge and centre crossmembers on crush tubes, the tanks' ends sitting on their feet (Layout.tank_bearers, I2-109)"
   - lines: [UF-06B]
     to: ["RS-*"]
     how: bolted

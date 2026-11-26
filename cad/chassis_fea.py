@@ -118,7 +118,10 @@ class Analysis:
                 area = sum((t.box[3] - t.box[0]) * (t.box[4] - t.box[1]) for t in tanks)
                 for t in tanks:
                     share = m * (t.box[3] - t.box[0]) * (t.box[4] - t.box[1]) / area
-                    out += self._sliced(b.iid, b.name, share, t.box, b.cog[2], "rails")
+                    out += self._tank_items(b.iid, b.name, share, t, b.cog[2])
+                continue
+            if b.extra.get("tank") and hasattr(lay, "tank_bearers"):
+                out += self._tank_items(b.iid, b.name, m, b, b.cog[2])
                 continue
             if b.cog[0] < V["body_x0"] - 100:
                 rule = "drawbar"          # the drawbar box and its contents
@@ -135,6 +138,55 @@ class Analysis:
             else:
                 out.append(Item(b.iid, b.name, m, tuple(b.cog), rule))
         return out + list(self.chassis_items)
+
+    def _tank_items(self, iid, name, m, tank, z) -> list[Item]:
+        """A fresh tank's mass m, or its water's share, where its bearers put it on the frame (I2-109, Layout.tank_bearers):
+        the front tank's two ends on their pairs on the XT crossmembers by the tank's centre's place between their bearing
+        lines, and the rear tank's front end on its pair on the XT centre crossmember as if the tank spanned to its rear
+        end, the rest through the rear bay's shear panel to its bolts on the rails' angles and under the XT rear shock
+        crossmember by the lever rule. Each pair's share goes to its crossmember at each bearer's middle, by its length.
+        A tank with no bearers is shared by the two rails over its box, as before."""
+        lay = self.lay
+        brs = [b for b in lay.tank_bearers() if b["tank"] == tank.id]
+        if not brs:
+            return self._sliced(iid, name, m, tank.box, z, "rails")
+        xc = (tank.box[0] + tank.box[3]) / 2
+        line = {}
+        for b in brs:
+            rx0, _, _, rx1, _, _ = b["boxes"]["rubber"]
+            line[b["e"]] = (max(rx0, tank.box[0]) + rx1) / 2 if b["e"] > 0 else (rx0 + min(rx1, tank.box[3])) / 2
+        out = []
+
+        def on_pair(e, share):
+            pair = [b for b in brs if b["e"] == e]
+            tot = sum(b["length"] for b in pair)
+            for b in pair:
+                out.append(Item(iid, name, share * b["length"] / tot, (line[e], (b["y"][0] + b["y"][1]) / 2, z), f"cm:{b['member']}"))
+
+        if len(line) == 2:
+            xf, xr = line[1], line[-1]
+            front = m * (xr - xc) / (xr - xf)
+            on_pair(1, front)
+            on_pair(-1, m - front)
+            return out
+        e = next(iter(line))
+        xf, xr = line[e], tank.box[3] - 25.0
+        front = m * (xr - xc) / (xr - xf)
+        on_pair(e, front)
+        pn = self.ch.shear_panels()
+        rest = m - front
+        if not pn:
+            return out + self._sliced(iid, name, rest, tank.box, z, "rails")
+        rail_b = [b for b in pn[0]["bolts"] if b["group"] == "rail"]
+        rear_b = [b for b in pn[0]["bolts"] if b["group"] == "rear"]
+        xa, xb = sum(b["x"] for b in rail_b) / len(rail_b), sum(b["x"] for b in rear_b) / len(rear_b)
+        cm6 = pn[0]["ties"][0]["cm"]                      # the crossmember the panel's rear bolts hang under
+        to_rear = rest * min(max((xr - xa) / (xb - xa), 0.0), 1.0)
+        for b in rail_b:
+            out.append(Item(iid, name, (rest - to_rear) / len(rail_b), (b["x"], b["y"], z), "rails"))
+        for b in rear_b:
+            out.append(Item(iid, name, to_rear / len(rear_b), (b["x"], b["y"], z), f"cm:{cm6}"))
+        return out
 
     @staticmethod
     def _sliced(iid, name, m, box, z, rule) -> list[Item]:
@@ -171,6 +223,8 @@ class Analysis:
             return fm.between_rails(x, y)
         if it.rule == "drawbar":
             return fm.drawbar_fractions(x, y)
+        if it.rule.startswith("cm:"):           # on a crossmember at its Y (a fresh tank's bearers, I2-109)
+            return fm.crossmember_fractions(it.rule[3:], y)
         if it.rule == "spare":
             cm = next(m.id for m in self.ch.members if m.station == "front" and m.role.startswith("cm"))
             return fm.crossmember_fractions(cm, -V["spare_post_y"]) + fm.crossmember_fractions(cm, V["spare_post_y"])
