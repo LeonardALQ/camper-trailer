@@ -367,6 +367,8 @@ def _plate_detail(sh, ch, x0: float, y0: float, k: float = 5.0):
     """Detail D: the kerb-side shock support plate CH-P07 from ahead, its outboard end on the right, the road side's
     mirrored, with its vents through the plate as sealed_overlaps places them (cad/chassis_holes.plate_vents)."""
     vents = [v for v in CH.plate_vents(ch) if v["side"] < 0]
+    vents = [v for v in vents if v["box"] == vents[0]["box"]]   # one plate's: every plate is the same and vents alike
+    on = sorted({p["member"] for p in ch.shock_plates()})
 
     def p(u, v):
         return x0 + (vents[0]["l"] - u) / k, y0 + v / k           # u from the outboard end, on the right
@@ -380,8 +382,8 @@ def _plate_detail(sh, ch, x0: float, y0: float, k: float = 5.0):
         S.vdim(sh, p(0, 0)[0], p(0, 0)[1], c[0], c[1], p(0, 0)[0] + 4.0 + 5.0 * i, _n(v["v"]), size=1.4)
     sh.text(p(vents[0]["l"], 0)[0], p(0, vents[0]["w"])[1] + 1.2, "INBOARD", 1.4)
     sh.text(p(0, 0)[0], p(0, vents[0]["w"])[1] + 1.2, "OUTBOARD, BY THE RAIL", 1.4, "end")
-    _caption(sh, x0 - 2.0, y0 - 15.0, f"{vents[0]['plate']}, {vents[0]['t']:g} PLATE SEAL WELDED TO THE FRONT WEB OF THE XT CENTRE AND "
-             f"XT REAR SHOCK CROSSMEMBERS, VENTED THROUGH THE PLATE BY {len(vents)} HOLES {vents[0]['d']:g} AT OPPOSITE CORNERS.", 70.0)
+    _caption(sh, x0 - 2.0, y0 - 15.0, f"{vents[0]['plate']}, {vents[0]['t']:g} PLATE SEAL WELDED TO {' AND '.join(m + chr(39) + 'S' for m in on)} "
+             f"FRONT WEBS, VENTED THROUGH EACH PLATE BY {len(vents)} HOLES {vents[0]['d']:g} AT OPPOSITE CORNERS.", 70.0)
 
 
 def _break(sh, x0: float, x1: float, y: float):

@@ -105,9 +105,10 @@ they are threaded through (`inside`).
   slotted hole in the face it arrives at, ahead of CM-02 (B-16 and B-18 the inner face, D-14 from the drawbar the outer
   face, riding 16 mm higher there so B-16 can rise to its exit under it). Each leaves through the raiser's inner web
   on a slant ahead of the kerb frame G20 (CHS-10), runs rearward in the gap between the raiser and the rear tank against
-  the raiser, D-14 lowest at Z 760 for its 110 mm bend, B-16 at Z 800 and B-18 at Z 840, and rises into G20's
-  outboard row. The chase's loom (B-15, E-07, B-04, B-05) rides inboard of them and crosses the end slot at four
-  heights, and the tank senders N-08 and N-09 run forward low beside the rail.
+  the raiser, D-14 lowest at Z 777, 20 mm over the rear kerb airbag's top bracket and with room under the floor for
+  its 110 mm bend, B-16 at Z 802 and B-18 at Z 843, and rises into G20's outboard row. The chase's loom (B-15, E-07,
+  B-04, B-05) rides inboard of them and crosses the end slot at four heights, and the tank senders N-08 and N-09
+  come forward from the kerb frame in the UF way's lanes over the same bracket (SVC-13).
   SVC-01 also tests every chassis fitting with no box of its own at each of its positions (cad/chassis.py
   `fitting_boxes`): the drawbar root gussets, the recovery lugs and tongues, the plates, the D-rings, and each corner
   steady over the box its leg sweeps from folded to standing. The drawbar's lamp and brake looms and the ute feed run
@@ -161,8 +162,8 @@ they are threaded through (`inside`).
   and 50 mm inboard of the arm's pivot tube, then in a loop under the inner hinge plate to Cruisemaster's harness tray
   on the A-frame's inner leg (33XT AIR sheet 4 step 7) and along it to the backing plate, tied in the tray, its loop
   long enough for the arm's travel (cad/routes.py lead_slack). cad/routes.py lays that arm part on the arm at ride height and FIT-05 sweeps it
-  with the arm through its travel (`rides: arm`), 59.6 mm clear at its least. The leads are 2.5 mm2 (est.), so the
-  front drums' 1.6 m keep 2 % from the TSC with Bosch's harness ahead of them.
+  with the arm through its travel (`rides: arm`), 54.7 mm clear at its least. The leads are 2.5 mm2 (est.), so the
+  front drums' 1.9 m keep 2 % from the TSC with Bosch's harness ahead of them, 1.16 % at the brake.
 - The desk reaches the floor, so its outlets and USB panel are in a power module in the desk top, fed up the front
   wall's kerb corner (G17 for 230 V, G23 for 24 V, 70 mm apart) and through the desk's front leg. The e2 fans C and D
   have their own glands under them (G16, G18).

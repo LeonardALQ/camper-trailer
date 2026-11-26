@@ -66,7 +66,7 @@ Under the body's share of LC5a the shear flow in a joiner leg's bond is 0.97 N/m
 The body bolts to the chassis through the EPDM-faced HDPE bearer strip at every station: one bolt into each raiser and one into each outrigger tip, 32 mounts at the 8 stations. The body is not bonded to the steel (report 12 option B).
 
 - Each mount is an M12 8.8 hot-dip galvanised bolt into a 10 mm nut plate, 80 x 44 mm, welded inside the raiser or the outrigger tip before galvanising (CH-P14). On the floor it bears on a bonded 100 x 100 x 3 mm aluminium spreader over a high-density PVC insert and a GRP crush tube.
-- The worst bolt carries 7.33 kN of tension under LC5a, with TC2's 1,667 kg of body and contents scaled by 1.195 to the 4,000 kg plate, 1,991 kg. The bolt works at 0.31 of a third of its ultimate tension, the plate at 0.17 in bending, its welds at 0.10 and the floor's pull-through at 0.13 (BDY-16). Shear is 0.49 kN per bolt in LC3 braking.
+- The worst bolt carries 7.33 kN of tension under LC5a, with TC2's 1,667 kg of body and contents scaled by 1.193 to the 4,000 kg plate, 1,989 kg. The bolt works at 0.31 of a third of its ultimate tension, the plate at 0.17 in bending, its welds at 0.10 and the floor's pull-through at 0.13 (BDY-16). Shear is 0.49 kN per bolt in LC3 braking.
 - Report 12's Lindapter Hollo-Bolt HB10 would work at 0.86 of its 8.5 kN safe load, so the nut plate is the design.
 
 The tension comes from the body holding the chassis against its own twist, so it is real only while the body stays stiff. A weighed and pull-tested sample replaces these planning numbers.
