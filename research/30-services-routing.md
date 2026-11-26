@@ -163,8 +163,8 @@ they are threaded through (`inside`).
   Cruisemaster's harness tray on the A-frame's inner leg (33XT AIR sheet 4 step 7) and along it to the backing plate,
   tied in the tray, its loop long enough for the arm's travel (cad/routes.py lead_slack). The clip stands low enough
   that its loop keeps SVC-01's 20 mm from the arm's hinge plates over the arm's travel, which SVC-13 reads (cad/routes.py
-  loop_gaps), 20.7 mm at its least under the inner plate. cad/routes.py lays that arm part on the arm at ride height and
-  FIT-05 sweeps it with the arm through its travel (`rides: arm`), 81.2 mm clear at its least. The leads are 2.5 mm2
+  loop_gaps), 20.3 mm at its least under the inner plate. cad/routes.py lays that arm part on the arm at ride height and
+  FIT-05 sweeps it with the arm through its travel (`rides: arm`), 82.0 mm clear at its least. The leads are 2.5 mm2
   (est.), so the front drums' 1.9 m keep 2 % from the TSC with Bosch's harness ahead of them, 1.19 % at the brake.
 - The desk reaches the floor, so its outlets and USB panel are in a power module in the desk top, fed up the front
   wall's kerb corner (G17 for 230 V, G23 for 24 V, 70 mm apart) and through the desk's front leg. The e2 fans C and D
@@ -246,7 +246,7 @@ sees 11.52 V from a 12.0 V battery, over its 10.5 V floor. The flattest waste fa
 1:50 (SVC-07), no two of the 72 pairs measured overlap (SVC-08), the gland fittings keep 23.4 mm over their spacing
 (SVC-09), the closest cable to its rating keeps 0.1 A (SVC-10), the cables keep 133.4 mm over their distance from the
 hot surfaces (SVC-11), the longest unsupported span is 597 mm against 600 mm (SVC-12) and every run keeps 20.0 mm
-from the XT kit's parts, D-14 the closest, at the rear kerb airbag's top bracket, and each drum lead's loop 20.7 mm from its arm's inner hinge plate over the arm's travel (SVC-13). The routed cables are
+from the XT kit's parts, D-14 the closest, at the rear kerb airbag's top bracket, and each drum lead's loop 20.3 mm from its arm's inner hinge plate over the arm's travel (SVC-13). The routed cables are
 285.0 m and 62.4 kg, the pipes and hoses 50.9 m and 6.0 kg with 73 fittings.
 
 ## 7. Open items
