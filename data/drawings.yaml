@@ -444,7 +444,6 @@ drawings:
       - {rev: E, date: 2026-11-25, description: "Notice: the front hinge's steps 150 x 93, clear of the airbags' brackets", drawn: Kiro, checked: "", approved: ""}
       - {rev: F, date: 2026-11-25, description: "Notice: 8 mm sheet cut clear of the rear bags and shocks, no jacking pads", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-26, description: "Notice: no gusset ahead of the XT centre, its front cheeks unstepped", drawn: Kiro, checked: "", approved: ""}
-      - {rev: H, date: 2026-11-26, description: "Notice: the shock support plates on the XT centre crossmember's face", drawn: Kiro, checked: "", approved: ""}
   - number: CT-201
     title: Body shell
     subtitle: Kerb, road, front and rear walls, the fixed roof plan, the panels and every opening with its size
