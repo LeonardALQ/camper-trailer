@@ -403,9 +403,10 @@ def ct003(prj, model, bom, checks, reg, dwg):
         "MATCHING THE RAV ENTRY. NSW ALSO LOOKS FOR THE MODEL AND THE DATE OF MANUFACTURE (VIB 78). THE GTM TO PLATE IS SET WITH THE "
         f"ENGINEER, AT MOST THE NSW CAP OF {rep['caps']['gtm']:,.0f} kg. THE PLATE AND VIN POSITIONS ARE NOT DESIGNED YET. PHOTOGRAPH "
         "THE VIN STAMPING BEFORE AND AFTER GALVANISING (REG-02).", 410 - 2 - 232, 1.4), size=1.4, gap=0.85)
+    fails = [c["id"] for c in rep["checks"] if c["severity"] == "fail" and not c["ok"]]
     yn, _ = S.notes(sh, 232, yq - 3, [
         "EVERY FIGURE ON THIS SHEET COMES FROM THE MODEL'S CHECKS (data/checks.yaml, data/ute/ute.yaml) AT THE SOLVED AXLE.",
-        "A RESULT IN AMBER IS A QUESTION FOR THE INSPECTOR. NO CHECK FAILS.",
+        "A RESULT IN AMBER IS A QUESTION FOR THE INSPECTOR. " + (f"FAILING: {', '.join(fails)} (CT-001)." if fails else "NO CHECK FAILS."),
     ], size=1.4, width_chars=150)
     _lamp_checks(sh, LM, yn - 3.5)
     write(sh, dwg)
