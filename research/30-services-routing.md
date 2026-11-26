@@ -157,8 +157,8 @@ they are threaded through (`inside`).
   channel, and weighs 0.057 kg on K-13's arm and 0.085 kg on K-14's (`seat`, cad/routes.py seat_parts, est.).
   TR-13 measures the leads coupled on 300 mm ramps, each vehicle at its own attitude, where cad/routes.py on_ramps
   reads 439 mm at the least, K-13's span from its plug at full lock (I2-91). Each
-  drum's lead runs from its side's junction behind the TSC, under the TSC and, for a front arm, forward under the front
-  tank's guard, to a P-clip at its arm's inner bush on a bracket from the hinge crossmember, 100 mm from the centreline
+  drum's lead runs from its side's junction behind the TSC, a front drum's forward under the TSC and the front tank's
+  guard, to a P-clip at its arm's inner bush on a bracket from the hinge crossmember, 100 mm from the centreline
   and 50 mm inboard of the arm's pivot tube, then in a loop under the inner hinge plate to Cruisemaster's harness tray
   on the A-frame's inner leg (33XT AIR sheet 4 step 7) and along it to the backing plate, tied in the tray, its loop
   long enough for the arm's travel (cad/routes.py lead_slack). cad/routes.py lays that arm part on the arm at ride height and FIT-05 sweeps it
@@ -235,22 +235,23 @@ Round glands take nylon cable glands of their hole's thread with CMP's locknut s
 
 ## 6. Results on the solved layout
 
-All twelve checks pass. The closest approach of a run to any envelope box is 20.4 mm (SVC-01), the tightest bend,
-K-17's under K-10, comes within 0.1 mm of its least radius (SVC-02), the 230 V keeps 61.8 mm from extra-low voltage (SVC-03), the
+All thirteen checks pass. The closest approach of a run to any envelope box is 20.4 mm (SVC-01), the tightest bends,
+C8's and C9's right-angle turns, allow exactly their 40 mm least radius (SVC-02), the 230 V keeps 61.8 mm from extra-low voltage (SVC-03), the
 nearest wet line is 344 mm from the terminal face (SVC-04) and every one of the 101 needs is served (SVC-05). The
 governing drop is D-14's 1.98 % of 2 % (SVC-06). The TSC's supply holds its 2 % from the truck's socket to the TSC,
 1.96 % with its fuse, and the truck's own feed to that socket, car build line TW07, 2.03 % of its own 3 %, so the TSC
 sees 11.52 V from a 12.0 V battery, over its 10.5 V floor. The flattest waste falls
-1:50 (SVC-07), no two of the 67 pairs measured overlap (SVC-08), the gland fittings keep 23.4 mm over their spacing
+1:50 (SVC-07), no two of the 72 pairs measured overlap (SVC-08), the gland fittings keep 23.4 mm over their spacing
 (SVC-09), the closest cable to its rating keeps 0.1 A (SVC-10), the cables keep 133.4 mm over their distance from the
-hot surfaces (SVC-11) and the longest unsupported span is 597 mm against 600 mm (SVC-12). The routed cables are
-284.1 m and 62.2 kg, the pipes and hoses 50.9 m and 6.0 kg with 71 fittings.
+hot surfaces (SVC-11), the longest unsupported span is 597 mm against 600 mm (SVC-12) and every run keeps 20.0 mm
+from the XT kit's parts, D-14 the closest, at the rear kerb airbag's top bracket (SVC-13). The routed cables are
+284.8 m and 62.4 kg, the pipes and hoses 50.9 m and 6.0 kg with 73 fittings.
 
 ## 7. Open items
 
 - The routed 230 V TPS and cords (76 m) are longer than BD-11's 40 m, the PEX (35 m) longer than its 30 m, and its 47
   fittings more than 40. BD-11's price items are in `data/assemblies/trailer.yaml` and are to be raised with this
-  model as their source. The wastes (2.9 m of DWV with 9 bends, 2.5 m of drain hose) are not priced yet.
+  model as their source. The wastes (3.0 m of DWV with 12 bends, 2.5 m of drain hose) are not priced yet.
 - The bench's plinth is notched over G15's front edge, where the frame stands 30 mm proud of the floor and its C wedge
   54 mm.
 - Moving the SVC checks into `data/checks.yaml` needs a `services` type in `cad/partsdb.py` and one branch in
