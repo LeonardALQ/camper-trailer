@@ -696,7 +696,7 @@ items:
                       box: [axle_x + xt_front_hinge_rear, -rail_in, tank_z0 - 9, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 50 + rail_underside_z - tank_z0]}]}
     price:
       - {item: "3 mm aluminium checker plate for the front tank's guard", aud: 341.75, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/107-aluminium-5-bar-checker-plate-tread.html", date: 2026-11-20, note: "One 1200 x 2400 sheet of 3 mm aluminium checker plate, AUD 261.75 (listing), plus angle and fixings AUD 80 (est.)"}
-      - {item: "8 mm HA250 hot-rolled steel sheet for the rear tank's guard, the bay's shear panel, hot-dip galvanised, and its M12 8.8 bolts", aud: 503, basis: estimate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/374-mild-steel-sheet-plates-250gr-as-nzs-3678.html", date: 2026-11-25, note: "A 1200 x 1200 mm piece of 8 mm AS/NZS 1594 HA250 sheet, about 90 kg at about AUD 4 a kg over the AUD 3.05 to 3.44/kg listed for 250 grade sheet (STL-08), AUD 362, the sheet as cut, about 47 kg, hot-dip galvanised at GLV-01's AUD 2.75/kg, AUD 130, and 11 M12 8.8 bolts with nyloc nuts, AUD 11 (est.)"}
+      - {item: "8 mm HA250 hot-rolled steel sheet for the rear tank's guard, the bay's shear panel, hot-dip galvanised, and its M12 8.8 bolts", aud: 488, basis: estimate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/374-mild-steel-sheet-plates-250gr-as-nzs-3678.html", date: 2026-11-26, note: "A 1200 x 1200 mm piece of 8 mm AS/NZS 1594 HA250 sheet, about 90 kg at about AUD 4 a kg over the AUD 3.05 to 3.44/kg listed for 250 grade sheet (STL-08), AUD 362, the sheet as cut, about 42 kg with its front corners stepped clear of the arms, hot-dip galvanised at GLV-01's AUD 2.75/kg, AUD 115, and 11 M12 8.8 bolts with nyloc nuts, AUD 11 (est.)"}
     box: [axle_x + xt_front_hinge_rear, -rail_in, tank_z0 - 6, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 6]
     parts:
       - {item: "3 mm five-bar aluminium treadplate, the front tank's bay by the width between the rails", kg: "(xt_centre_front + xm_w / 2 - 50 - xt_front_hinge_rear) * 2 * rail_in * 9.375e-6", basis: estimate, source: "At about 9.4 kg/m2, Austral Wright's approximate 27 kg for a 3 x 1,200 x 2,400 mm five-bar sheet (https://www.australwright.com.au/wp-content/uploads/2012/07/AluminiumTreadplate1.pdf)"}
@@ -763,7 +763,7 @@ items:
     parts:
       - {item: "2 mm 5052 aluminium sheet, the grey bay's length by the width between the rails less 55 mm", kg: "grey_l * (2 * rail_in - 55) * 5.4e-6", basis: estimate, source: "At 5.4 kg/m2 (2 mm at 2,680 kg/m3, saving 1f, H13)"}
       - {item: "Rubber strips and bolts", kg: 0.4, basis: estimate}
-    note: Bolted across the rails. It is not counted as a shear plate, because it would buckle at about 4 kN (est.). The RHS 150 x 50 x 4 XT rear shock crossmember carries the rear recovery pull in place of the plan braces this bay had (CHS-08A).
+    note: Bolted across the rails. It is not counted as a shear plate, because it would buckle at about 4 kN (est.). The RHS 150 x 50 x 6 XT rear shock crossmember carries the rear recovery pull in place of the plan braces this bay had (CHS-08A).
 
   # ================================================================ the sealed drawbar box (decision log 12:45, research report 20)
   - id: DB-08

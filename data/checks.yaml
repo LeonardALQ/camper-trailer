@@ -330,12 +330,12 @@ trailer_checks:
     inputs: []
     why: "Report 11 LC8a, 1.5 times the plated ATM's weight (58.9 kN at 4,000 kg), at each front and rear recovery point, with the trailer's weight at tare and fully loaded at the plate, held by the ground at its four tyres or one held wheel through supports that cannot pull, the nose on its jockey wheel or coupled to the truck (review I2-94, CHASSIS.md's analysis)."
   - id: CHS-08B
-    title: Chassis stress, LC8b one side jacked at its pad with gravity times 2, below yield
+    title: Chassis stress, LC8b one side jacked at the jacking point under an arm with gravity times 2, below yield
     type: chassis_stress
     load_case: LC8b
     severity: fail
     inputs: []
-    why: Report 11 LC8b. The jack lifts one side at the pad on the XT centre crossmember.
+    why: Report 11 LC8b. The jack lifts one side at Cruisemaster's jacking point under one of its arms, by the hub, the air released from the springs first, so the frame takes it through the arm's bump stop and hinge (LOC-04).
   - id: LOC-01
     title: Chain lugs hold the VSB1 9.2.2 forces (net tension, bearing, tear-out, weld)
     type: chassis_local
@@ -629,14 +629,14 @@ trailer_checks:
     item: FAT-22
     severity: report
     inputs: []
-    why: "Review I2-95. Report 11 LC10 and section 3.4. IIW-1823-07 detail 521, a longitudinal attachment fillet welded along the member: FAT 63 for 150 to 300 mm along it. Each 10 mm hinge cheek CH-P16 is welded to the rail's inner web along its top edge and along the rail's bottom corner, never across the rail, so each end of its welds is the end of such an attachment, read on the composite rail's extreme fibre at the cheek's ends as FAT-16 reads the steadies' brackets, its step's ends among them where it has one (I2-99). The weld along the corner is a flare bevel weld, classed here as the fillet it replaces (est.). The shear panel's angles start 25 mm behind the XT centre's rear cheeks, so their welds end apart from the cheeks' (FAT-23). The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+    why: "Review I2-95. Report 11 LC10 and section 3.4. IIW-1823-07 detail 521, a longitudinal attachment fillet welded along the member: FAT 63 for 150 to 300 mm along it. Each 10 mm hinge cheek CH-P16 is welded to the rail's inner web along its top edge and along the rail's bottom corner, never across the rail, so each end of its welds is the end of such an attachment, read on the composite rail's extreme fibre at the cheek's ends as FAT-16 reads the steadies' brackets, its step's ends among them where it has one (I2-99). The weld along the corner is a flare bevel weld, classed here as the fillet it replaces (est.). The shear panel's angles start 25 mm behind the XT centre's rear cheeks' main plates, so their welds end apart from those (FAT-23), and the cheeks' steps run on over the angles, which the engineer's hot-spot check reads (CHASSIS.md item 15). The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
   - id: FAT-23
     title: "Fatigue, Shear panel angle's welds along the rail's inner web and bottom corner, their ends (l over 300 mm)"
     type: chassis_fatigue
     item: FAT-23
     severity: report
     inputs: []
-    why: "Review I2-95. Report 11 LC10 and section 3.4. IIW-1823-07 detail 521, a longitudinal attachment fillet welded along the member: FAT 50 over 300 mm along it. Each EA 50 x 50 x 5 angle of the shear panel CH-P17 is welded to the rail's inner web along its upright leg's top edge and along the rail's bottom corner over the rear tank's bay, never across the rail, its front end 25 mm behind the XT centre's rear hinge cheek, a set gap, so the two parts' welds end apart and each end is read on its own. Its ends are read on the composite rail's extreme fibre. The weld along the corner is a flare bevel weld, classed here as the fillet it replaces (est.). The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
+    why: "Review I2-95. Report 11 LC10 and section 3.4. IIW-1823-07 detail 521, a longitudinal attachment fillet welded along the member: FAT 50 over 300 mm along it. Each EA 50 x 50 x 5 angle of the shear panel CH-P17 is welded to the rail's inner web along its upright leg's top edge and along the rail's bottom corner over the rear tank's bay, never across the rail, its front end 25 mm behind the XT centre's rear hinge cheek's main plate, a set gap, so those welds end apart and each end is read on its own, the cheek's step running on over the angle (CHASSIS.md item 15). Its ends are read on the composite rail's extreme fibre. The weld along the corner is a flare bevel weld, classed here as the fillet it replaces (est.). The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
   - id: DIM-01
     title: Overall width within the 2,500 mm of ADR 43/04 and VSB1 5.2
     type: width

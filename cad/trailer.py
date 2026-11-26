@@ -1153,7 +1153,8 @@ class Trailer:
     def tyre_arc(self, lay) -> dict:
         """FIT-05: each tyre and each XT arm swung about the arm's pivot through its travel (report 11 section 5), against
         every rigid part the suspension carries (Layout.sprung_boxes: each solid block, chassis member, fitting and
-        product envelope at its true size), every fixture of the services (data/routes.yaml) and every run at its outside
+        product envelope at its true size, the tanks as stepped and the guards, the shear panel and the guard's hangers
+        as cut), every fixture of the services (data/routes.yaml) and every run at its outside
         diameter. The tyres' least gap to the chassis members alone is kept too: it is the one a smaller C/F closes (SUP-04)."""
         from . import routes as R
         from .chassis import tyre_clearance, wheel_sweep
