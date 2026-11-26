@@ -268,7 +268,7 @@ checks:
     title: Every run keeps 20 mm from the XT kit's parts between the rails at Cruisemaster's places, and no fixture stands in one
     kind: kit_clearance
     severity: fail
-    why: "SVC-01's rule against the kit's parts as 33XT AIR sheets 2 to 4 place them (est., Chassis.xt_parts): the hinge bars and the arms' hinge plates under the hinge crossmembers, the airbags over their travel under their top brackets on the rails' inner faces, and the shocks over the arm's travel with their brackets, and no fixture of the services stands in one of them (I2-97). A lead's part that rides on its arm is FIT-05's, which reads every run and fixture against the arms themselves."
+    why: "SVC-01's rule against the kit's parts as 33XT AIR sheets 2 to 4 place them (est., Chassis.xt_parts): the hinge bars and the arms' hinge plates under the hinge crossmembers, the airbags over their travel under their top brackets on the rails' inner faces, and the shocks over the arm's travel with their brackets, and no fixture of the services stands in one of them (I2-97). A lead's part that rides on its arm is FIT-05's, which reads every run and fixture against the arms themselves, but each drum lead's loop from its clip on the frame to the arm's tray is read here against each of the arm's hinge plates, the tray's end turned with the arm over its travel (cad/routes.py loop_gaps)."
     source: "H27 and H28 for the 20 mm, Cruisemaster's 33XT AIR installation guide rev 3 (27 Jul 2021) sheets 2 to 4 for the places, scaled (est.)"
 
 # The priced quantities the routed ones are compared with on the Electrical and Plumbing pages: BD-11's price items

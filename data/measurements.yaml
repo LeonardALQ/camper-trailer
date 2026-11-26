@@ -995,7 +995,7 @@ inputs:
     title: Fresh water the tanks hold, from empty to full through a water meter
     how: "Drain both fresh tanks through the pump until it runs dry, then fill through a garden water meter until the breather overflows. Record the meter's reading."
     unit: L
-    estimate: {v: 385, src: "The fresh tanks' 389.5 L net (cad/trailer.py tank_nets, I2-40, with their front corners notched round the hinge gussets and their sides pocketed round the XT kit's airbags, their top brackets and the shocks, I2-97) less about 1.5 L a tank left under the pump's dip tube in the rear tank's sump and the balance hose's in the front tank's (est.), water the test from a dry pump cannot count"}
+    estimate: {v: 385, src: "The fresh tanks' 389.3 L net (cad/trailer.py tank_nets, I2-40, with their front corners notched round the hinge gussets and their sides pocketed round the XT kit's airbags, their top brackets and the shocks, I2-97) less about 1.5 L a tank left under the pump's dip tube in the rear tank's sump and the balance hose's in the front tank's (est.), water the test from a dry pump cannot count"}
     measured: {v: null, date: null}
     stage: trailer built
     range: {min: null, max: null, src: "Aim: report 21's 400 L. On its table, 41 L a day and 44 L a wash, a week with two washes needs 375 L and a week with three 419 L, so the estimate's 385 L is about 6.4 days of water with three washes a week, and a week with two washes with 10 L to spare. No limit either way: water_full_l, the water the design carries, follows the reading with the 3 L under the pickups added back, in H21's 5 L steps down, so a reading of 382 L or more keeps 385 L and one under it takes the design to 380 L. The travel limit (H13) caps what rides"}

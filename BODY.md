@@ -15,7 +15,7 @@ Revision C is the body of the home trailer, TRAILER.md revision J. Revision B, t
 - The split's outdoor unit stands on two stays to the chassis, so the rear wall's skin carries none of its weight (BDY-21).
 - A moulded GRP tray covers the wet room floor, and vinyl covers only the rest.
 - The mounts are checked at the 4,000 kg plate (H2 as amended 23 Nov 2026).
-- The body weighs 630.6 kg, 701.8 kg with growth, with both doors and their steps.
+- The body weighs 640.5 kg, 713.6 kg with growth, with both doors and their steps.
 - No check limit changed, and no estimate changed to pass a check.
 
 Terms. A sandwich panel is two thin skins bonded to a light core. D is its bending stiffness per metre width. Wrinkling is a local buckle of a compressed skin into the core. An insert is a dense strip laid into the core where a fixing goes. The body's share of the twist is the part of the bare chassis twist that the body removes when it is bolted on.
@@ -66,7 +66,7 @@ Under the body's share of LC5a the shear flow in a joiner leg's bond is 0.97 N/m
 The body bolts to the chassis through the EPDM-faced HDPE bearer strip at every station: one bolt into each raiser and one into each outrigger tip, 32 mounts at the 8 stations. The body is not bonded to the steel (report 12 option B).
 
 - Each mount is an M12 8.8 hot-dip galvanised bolt into a 10 mm nut plate, 80 x 44 mm, welded inside the raiser or the outrigger tip before galvanising (CH-P14). On the floor it bears on a bonded 100 x 100 x 3 mm aluminium spreader over a high-density PVC insert and a GRP crush tube.
-- The worst bolt carries 7.33 kN of tension under LC5a, with TC2's 1,667 kg of body and contents scaled by 1.193 to the 4,000 kg plate, 1,989 kg. The bolt works at 0.31 of a third of its ultimate tension, the plate at 0.17 in bending, its welds at 0.10 and the floor's pull-through at 0.13 (BDY-16). Shear is 0.49 kN per bolt in LC3 braking.
+- The worst bolt carries 7.32 kN of tension under LC5a, with TC2's 1,667 kg of body and contents scaled by 1.196 to the 4,000 kg plate, 1,993 kg. The bolt works at 0.31 of a third of its ultimate tension, the plate at 0.17 in bending, its welds at 0.10 and the floor's pull-through at 0.13 (BDY-16). Shear is 0.49 kN per bolt in LC3 braking.
 - Report 12's Lindapter Hollo-Bolt HB10 would work at 0.86 of its 8.5 kN safe load, so the nut plate is the design.
 
 The tension comes from the body holding the chassis against its own twist, so it is real only while the body stays stiff. A weighed and pull-tested sample replaces these planning numbers.
@@ -81,7 +81,7 @@ The frame model takes the body as a torsion box on the centreline, tied at every
 |---|---|---|---|---|---|
 | Bare chassis (the chassis checks) | 0.288 degree | 0 | | | 93 MPa |
 | Body, roof joint neglected | 0.278 degree | 4 % | 0.1 kNm | 1.8 kN | 90 MPa |
-| Body, bonded roof (the design) | 0.009 degree | 97 % | 9.3 kNm | 7.94 kN, 7.33 kN after its 1 g share of weight | 47 MPa |
+| Body, bonded roof (the design) | 0.009 degree | 97 % | 9.3 kNm | 7.94 kN, 7.32 kN after its 1 g share of weight | 47 MPa |
 
 The bonded body takes almost all the twist. The closed box loads the mounts and joints most, so the body checks use it, and the chassis checks keep the bare frame, which carries 175 MPa at worst in LC5b without the body's help.
 
@@ -148,7 +148,7 @@ BDY-26 checks the floor round each one with BDY-03's foot standing beside it and
 | BD-10, BD-17 | Mud flaps with hangers, cassette door | 10.7 kg | Mostly calculated | 12.2 kg |
 | BD-11 | Wiring, plumbing and hardware, line by line, with 19.7 kg for the routed runs above their first estimates, 2.5 kg for SVC-12's six cable supports, 2.5 kg for the bench's cleats and the 230 V's conduits under the floor (I2-36) and 0.7 kg left unassigned (the lamps are LG-01) | 63.5 kg | Estimate, kept until the fit-out | 76.2 kg |
 | BD-13 | Fiamma F80s 400 awning on the roof, its brackets, bolts and pads | 36.7 kg | Maker, brackets estimated | 37.2 kg |
-| | Body | 630.6 kg | | 701.8 kg |
+| | Body | 640.5 kg | | 713.6 kg |
 
 The solar panels are in the roof group, the wet room tray in the wet room group, and the 8.8 kg of nut plates in the chassis.
 
@@ -166,10 +166,10 @@ The solar panels are in the roof group, the wet room tray in the wet room group,
 | BDY-11 | Lift-bed rail screws, awning bolts in travel and with the canopy open | 0.12 kN of 1.50 kN, 0.32 kN of 10.0 kN | 0.08 |
 | BDY-13 | Body share of LC5a (reported) | 97 % with the bonded roof, 4 % without | |
 | BDY-14 | Skins and bonded joints in twist | 0.97 N/mm of 22.5 N/mm | 0.04 |
-| BDY-16 | Body mounts, M12 into nut plates | 6.82 kN of 23.3 kN | 0.29 |
+| BDY-16 | Body mounts, M12 into nut plates | 7.32 kN of 23.3 kN | 0.31 |
 | BDY-18 | Opening spacing, 18 openings | Every rule met, the tightest by 0 mm | |
 | BDY-19 | Roof-to-wall joint in a 40 m/s uplift | 0.37 N/mm of 30 N/mm | 0.01 |
-| BDY-20 | Rear wall with its door, as the rear diaphragm | 1.35 N/mm of 22.5 N/mm | 0.06 |
+| BDY-20 | Rear wall with its door, as the rear diaphragm | 1.34 N/mm of 22.5 N/mm | 0.06 |
 | BDY-21 | Outdoor unit's cradle: stays to the chassis, wall bolts | 0.68 kN a stay of 2.0 kN, 0.37 kN a bolt of 22.6 kN | 0.33 |
 | BDY-22 | Inside surface over the wall members, to their ends, and over the joiners on the cold night, at Rsi 0.25 | 10.2 °C against 10 °C | |
 | BDY-24 | Side walls as plates with their openings, in region B's 25-year wind | 18.9 mm of 20.0 mm | |
