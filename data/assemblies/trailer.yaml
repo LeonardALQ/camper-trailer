@@ -686,10 +686,11 @@ items:
     system: underfloor
     # model: the sheet in two pieces either side of the XT centre crossmember and the Bosch TSC module. The
     # front one hangs from the rails' inner faces on three pairs of 50 mm angles (H27). The rear one is the bay's shear
-    # panel, its sheet and tongues read from the chassis data (Chassis.shear_panels), bolted up to CH-P17
+    # panel, its sheet and tongues read from the chassis data (Chassis.shear_panels), bolted up to CH-P17, its envelope
+    # the sheet's extent. FIT-05 reads both as cut (Layout.guard_pieces), each front corner stepped clear of the arms
     model: {name: tank_guard, half: rail_in - 3,
             gaps: [[xt_centre_front + xm_w / 2 - 50 - xt_front_hinge_rear, xt_centre_front + xm_w / 2 + 50 - xt_front_hinge_rear]],
-            extras: [{name: shear_panel, box: [axle_x + xt_centre_front + xm_w - 60, -rail_in, tank_z0 - 31, xt_rear_shock_front - xt_centre_front - xm_w + 120, 2 * rail_in, 31]},
+            extras: [{name: shear_panel, box: [axle_x + xt_centre_front + xm_w + 5, 3 - rail_in, tank_z0 - 8, xt_rear_shock_front + 45 - xt_centre_front - xm_w - 5, 2 * rail_in - 6, 8]},
                      {name: guard_hangers, foot: 23,
                       at: [60, (xt_centre_front + xm_w / 2 - 50 - xt_front_hinge_rear) / 2, xt_centre_front + xm_w / 2 - 110 - xt_front_hinge_rear],
                       box: [axle_x + xt_front_hinge_rear, -rail_in, tank_z0 - 9, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 50 + rail_underside_z - tank_z0]}]}

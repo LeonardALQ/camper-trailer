@@ -94,6 +94,32 @@ def load_data() -> dict:
 
 
 @functools.lru_cache(maxsize=1)
+def arm_clear() -> float:
+    """FIT-05's least gap from the tyres and the XT arms (data/checks.yaml), the one figure the parts over the arms are
+    cut clear by (Chassis.arm_cuts)."""
+    raw = yaml.safe_load((DATA / "checks.yaml").read_text())
+    return float(next(c for c in raw["trailer_checks"] if c["id"] == "FIT-05")["min_gap_mm"])
+
+
+def rect_minus(rect: tuple, cuts: list) -> list[tuple]:
+    """The plan rectangle (x0, y0, x1, y1) less the rectangles `cuts`, as rectangles: cut in strips along X at every
+    cut's ends, and each strip across at the sides of the cuts that cover it."""
+    x0, y0, x1, y1 = rect
+    xs = sorted({x0, x1} | {v for c in cuts for v in (c[0], c[2]) if x0 < v < x1})
+    out = []
+    for xa, xb in zip(xs, xs[1:]):
+        y, free = y0, []
+        for a, b in sorted((c[1], c[3]) for c in cuts if c[0] <= xa + 1e-6 and c[2] >= xb - 1e-6 and c[3] > y0 and c[1] < y1):
+            if a > y:
+                free.append((y, min(a, y1)))
+            y = max(y, b)
+        if y < y1:
+            free.append((y, y1))
+        out += [(xa, a, xb, b) for a, b in free if b - a > 1e-6 and xb - xa > 1e-6]
+    return out
+
+
+@functools.lru_cache(maxsize=1)
 def load_sections() -> dict[str, Props]:
     raw = yaml.safe_load(SECTIONS_YAML.read_text())
     out = {}
@@ -648,8 +674,25 @@ class Chassis:
             corners = [(xc, -yc), (xc, yc)]
             wings = [dict(side=-1, rect=parts[1], root=(front, xc, -yc)), dict(side=1, rect=parts[2], root=(front, xc, yc))]
             holes = [(xc, -half, x_rear, -yc), (xc, yc, x_rear, half)]
+        zt = V["rail_underside_z"] - next(f for f in self.data["fittings"] if f["id"] == "CH-P17")["drop"]
+        steps = [(c[0], c[1], c[3], c[4]) for c in self.arm_cuts((front, -half, zt - d["t"], x_rear, half, zt))]
+        if steps:                                   # the front corners cut away clear of the arms' pivot tubes and inner legs
+            parts = [r for p in parts for r in rect_minus(p, steps)]
+            holes = holes + steps
+            for wg in wings:
+                x0w, x1w, yr = wg["root"]
+                cover = sorted((c[0], c[2]) for c in steps if c[1] - 1e-6 <= yr <= c[3] + 1e-6)
+                free, x = [], x0w
+                for a, b in cover:
+                    if a > x:
+                        free.append((x, min(a, x1w)))
+                    x = max(x, b)
+                if x < x1w:
+                    free.append((x, x1w))
+                wg["root"] = (*max(free, key=lambda f: f[1] - f[0]), yr)
         return dict(rect=(front, -half, x_rear, half), parts=parts, tongues=tongues, roots=roots, root_r=d.get("tongue_r", 0.0),
-                    front=front, half=half, cut=cut, corners=corners, wings=wings, cut_r=(d.get("cut") or {}).get("r", 0.0), holes=holes)
+                    front=front, half=half, cut=cut, corners=corners, wings=wings, cut_r=(d.get("cut") or {}).get("r", 0.0), holes=holes,
+                    steps=steps)
 
     def panel_pieces(self) -> list[dict]:
         """The shear panel's pieces CH-P17: each angle with its use (rail or crossmember), its section, its ends,
@@ -842,6 +885,70 @@ class Chassis:
         ys, r, rh = pr["plates"]["y_in"], pr["arm"]["d"] / 2, V["arm_depth"] / 2
         tube = ((px, sd * (y_in - ys[0] - r), pz), (px, sd * (y_in - ys[-1] + r), pz), r, r)   # its round ends at the end plates
         return [tube] + [((px, sd * (y_in - u), pz), hub, r, rh) for u in pr["arm"]["roots"]]
+
+    def arm_spheres(self, step: float = 4.0, steps: int = 25) -> list[tuple]:
+        """Every XT arm's bars (arm_bars) at FIT-05's travels (wheel_sweep's `steps`), each as balls along its axis `step`
+        apart at its radius there, each (x, y, z, r, side): the arm as FIT-05 sweeps it, which a part over the arms is cut
+        clear of (arm_cuts)."""
+        if getattr(self, "_arm_spheres", None) is None:
+            travel, out = self.V["travel"], []
+            for w in self.suspension:
+                for k in range(steps + 1):
+                    for a, c, r0, r1 in self.arm_bars(w, -travel + 2 * travel * k / steps):
+                        n = max(1, math.ceil(math.dist(a, c) / step))
+                        out += [(*(a[i] + (c[i] - a[i]) * j / n for i in range(3)), r0 + (r1 - r0) * j / n, w["side"]) for j in range(n + 1)]
+            self._arm_spheres = out
+        return self._arm_spheres
+
+    def arm_cuts(self, box: tuple, strip: float = 25.0, margin: float = 0.5) -> list[tuple]:
+        """What to cut from a part `box` (x0, y0, z0, x1, y1, z1) over the XT arms so the rest keeps FIT-05's clearance
+        (arm_clear) and `margin` from every arm over its travel (arm_spheres): on each side, in strips `strip` long along X
+        from where the arms first reach the part's underside grown by that clearance, from the least |Y| they reach in the
+        strip out to the part's side, and from its underside up as far as they reach in that plan, the strips sharing their
+        ends. Each (x0, y0, z0, x1, y1, z1), to 0.1 mm outward, so a plate's corner over an arm's pivot tube and inner leg
+        is cut away in steps."""
+        x0, y0, z0, x1, y1, z1 = box
+        R = arm_clear() + margin
+        near = []
+        for cx, cy, cz, r, s in self.arm_spheres():
+            dz = max(z0 - cz, 0.0, cz - z1)
+            if dz >= r + R:
+                continue
+            rho = math.sqrt((r + R) ** 2 - dz ** 2)
+            if cx + rho > x0 and cx - rho < x1 and cy + rho > y0 and cy - rho < y1:
+                near.append((cx, cy, cz, r, s, rho))
+        out = []
+        for s in (-1, 1):
+            balls = [b for b in near if b[4] == s]
+            if not balls:
+                continue
+            xa0 = math.floor(max(x0, min(b[0] - b[5] for b in balls)) * 10) / 10
+            xb0 = math.ceil(min(x1, max(b[0] + b[5] for b in balls)) * 10) / 10
+            n = max(1, math.ceil((xb0 - xa0) / strip - 1e-9))
+            edges = [xa0] + [round(xa0 + (xb0 - xa0) * k / n, 1) for k in range(1, n)] + [xb0]   # shared, so no sliver is left between
+            for xa, xb in zip(edges, edges[1:]):
+                ys, top = [], z0
+                for cx, cy, cz, r, _, rho in balls:
+                    d = max(xa - cx, 0.0, cx - xb)
+                    if d >= rho:
+                        continue
+                    h = math.sqrt(rho ** 2 - d ** 2)
+                    if cy - h >= y1 or cy + h <= y0:              # it reaches the strip outside the part's sides
+                        continue
+                    ys.append(abs(cy) - h)
+                if not ys:
+                    continue
+                ya, yb = (y0, -max(min(ys), 0.0)) if s < 0 else (max(min(ys), 0.0), y1)
+                if yb <= ya:
+                    continue
+                for cx, cy, cz, r, _, rho in balls:          # how high it reaches inside the strip's plan
+                    dp = math.hypot(max(xa - cx, 0.0, cx - xb), max(ya - cy, 0.0, cy - yb))
+                    if dp < r + R:
+                        top = max(top, cz + math.sqrt((r + R) ** 2 - dp ** 2))
+                if top <= z0:
+                    continue
+                out.append((xa, math.floor(ya * 10) / 10, z0, xb, math.ceil(yb * 10) / 10, min(z1, math.ceil(top * 10) / 10)))
+        return out
 
     def shock_plates(self) -> list[dict]:
         """The shock support plates CH-P07, a pair flush on the front face of each crossmember the data's `stations` names,

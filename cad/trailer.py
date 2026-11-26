@@ -568,6 +568,18 @@ class Layout:
                             inner_area=max(0.0, inner) ** 2 / 2, inner_z=(gz0 - t, gz1 + t)))
         out += self._corner_chamfers(b, clear, t)
         out += self._part_notches(b, clear, t)
+        out += self._arm_pockets(b, t)
+        return out
+
+    def _arm_pockets(self, b, t: float) -> list[dict]:
+        """The steps cut up into tank b's bottom edges over the XT arms' pivot tubes and inner legs (Chassis.arm_cuts), so
+        the tank keeps FIT-05's clearance from each arm over its travel. Inside, the tank's `t` walls go round each step."""
+        from .chassis import arm_clear
+        out = []
+        for c in self.chassis.arm_cuts(b.box):
+            inner = (c[0] - t, c[1] - t, c[2], c[3] + t, c[4] + t, c[5] + t)
+            out.append(dict(fitting="XT arm", gusset=None, kind="box", box=c, z0=c[2], z1=c[5], clear=arm_clear(), inner=inner,
+                            inner_z=(inner[2], inner[5])))
         return out
 
     def guard_openings(self, b, clear: float = 10.0) -> list[tuple]:
@@ -590,6 +602,7 @@ class Layout:
             if r[0] < r[2] and r[1] < r[3]:      # to 0.1 mm outward, so an opening cut to the piece's edge leaves no sliver
                 out.append((math.floor(round(r[0] * 10, 6)) / 10, math.floor(round(r[1] * 10, 6)) / 10,
                             math.ceil(round(r[2] * 10, 6)) / 10, math.ceil(round(r[3] * 10, 6)) / 10))
+        out += [(c[0], c[1], c[3], c[4]) for c in self.chassis.arm_cuts((x0, -half, z0, px1, half, z1))]   # its front corners over the arms
         return out
 
     def xt_parts(self) -> list[dict]:
@@ -832,6 +845,26 @@ class Layout:
             out += [("UF-03's rear piece, the shear panel's sheet", ((x0, y0, zt - pn["t"], x1, y1, zt), None)) for x0, y0, x1, y1 in sh["parts"] + sh["tongues"]]
         return out
 
+    def guard_hanger_parts(self) -> list[tuple[str, tuple]]:
+        """The front tank's guard's hanger angles as the 3D model draws them (guard_hangers), each leg (name, box): at each
+        station of `at` along the rails a pair on the rails' inner webs, each its upright leg on the web and its foot under
+        the plate's edge."""
+        from .model import products as PR
+        from .trailer_model import model_specs
+        b = next(b for b in self.blocks if b.id == "UF-03")
+        out = []
+        for opts, bx in PR.placements(model_specs(self)["UF-03"], b, self):
+            if opts["name"] != "guard_hangers":
+                continue
+            x0, y0, z0, x1, y1, z1 = bx
+            f = opts["foot"]
+            for u in opts["at"]:
+                xa, xb = x0 + u - 25, x0 + u + 25
+                name = f"UF-03's hanger at X {x0 + u:,.0f}"
+                out += [(name, (xa, y0, z0, xb, y0 + 3, z1)), (name, (xa, y0, z0, xb, y0 + f, z0 + 3)),
+                        (name, (xa, y1 - 3, z0, xb, y1, z1)), (name, (xa, y1 - f, z0, xb, y1, z0 + 3))]
+        return out
+
     def kit_fit(self) -> dict:
         """FIT-08 (fx22-rear): every chassis fitting at every place it stands (fitting_parts) and both pieces of the tanks'
         guard UF-03 (guard_pieces) against the XT kit's parts between the rails (xt_parts), the airbags over their travel
@@ -906,7 +939,11 @@ class Layout:
         for b in self.blocks:
             if b.keep_clear or b.load == "none" or b.id in UNSPRUNG or b.id in FLEXIBLE:
                 continue
-            if "fitting" in b.extra:
+            if b.id == "UF-03":                  # the guards and the shear panel as cut, and the guard's hanger angles
+                boxes = [s[0] for _, s in self.guard_pieces()] + [bx for _, bx in self.guard_hanger_parts()]
+            elif b.extra.get("notches"):         # a tank as its notched and pocketed slabs (tank_pieces)
+                boxes = [s[0] for s in self.tank_pieces(b)]
+            elif "fitting" in b.extra:
                 boxes = fitting_boxes(self.chassis, b.extra["fitting"])
             elif b.id in specs:
                 boxes = [bx for _, bx in PR.placements(specs[b.id], b, self)]
