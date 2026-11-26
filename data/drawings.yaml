@@ -65,6 +65,7 @@ drawings:
       - {rev: AU, date: 2026-11-26, description: "Notice: the masses and the axle with the front shocks' plates", drawn: Kiro, checked: "", approved: ""}
       - {rev: AV, date: 2026-11-26, description: "Notice: the masses with the shear panel's sheet stepped clear of the arms", drawn: Kiro, checked: "", approved: ""}
       - {rev: AW, date: 2026-11-26, description: "Notice: the masses with the fresh tanks' bearers (UF-01B)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AX, date: 2026-11-26, description: "Notice: the failing checks CHS-08A, CHS-08U and CHS-12 (I2-114)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-002
     title: Mass and centre of gravity
     subtitle: Every load case with growth, the axle window of H17, the CoG in elevation and across
@@ -294,7 +295,7 @@ drawings:
       - {rev: AN, date: 2026-11-26, description: "Notice: the chassis data at revision S, the stations 1 mm forward", drawn: Kiro, checked: "", approved: ""}
       - {rev: AO, date: 2026-11-26, description: "Notice: the frame's results with the tanks on their bearers (CHS-17)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AP, date: 2026-11-26, description: "Memo: the chassis data at revision T (I2-109 to I2-113)", drawn: Kiro, checked: "", approved: ""}
-      - {rev: AQ, date: 2026-11-26, description: "Memo: the chassis data at revision U (I2-114)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AQ, date: 2026-11-26, description: "Notice: the frame's results on the hinge bars' bounds, data at rev U", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
@@ -338,7 +339,7 @@ drawings:
       - {rev: AE, date: 2026-11-26, description: "Memo: the chassis data at revision S", drawn: Kiro, checked: "", approved: ""}
       - {rev: AF, date: 2026-11-26, description: "Memo: the shear panel's bolt figure with the tanks on their bearers", drawn: Kiro, checked: "", approved: ""}
       - {rev: AG, date: 2026-11-26, description: "Memo: the chassis data at revision T (I2-109 to I2-113)", drawn: Kiro, checked: "", approved: ""}
-      - {rev: AH, date: 2026-11-26, description: "Memo: the chassis data at revision U (I2-114)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AH, date: 2026-11-26, description: "Notice: the fittings' readings on the hinge bars' bounds, data at rev U", drawn: Kiro, checked: "", approved: ""}
   - number: CT-103
     title: Chassis details
     subtitle: Composite rail, outrigger root, crossmember to rail, overlap end, jacking point, recovery tongue, spare posts
