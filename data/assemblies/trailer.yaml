@@ -135,8 +135,9 @@ params:
   water_highway_l: 50        # owner's highway figure
   load_sharing: 1            # the XT Air tandem in Cruisemaster's load-sharing configuration, each side's two bags on one circuit (CIS-006 rev 25, RG-01, RG-04). VSB1's 120 % rule is for non-load-sharing close-coupled axles, so MAS-02 checks the axle group load itself (H2 as amended 23 Nov 2026)
   grey_full_l: 130           # grey tank's net capacity (report 21 section 10)
-  tank_z0: rail_underside_z - 26   # 26 mm below the rails, on the guard below them: 20 mm since the 4,000 kg plate, 5 mm more so the tanks keep the water the rear tank's narrower kerb side gives up (tank_r_kerb, I2-40), and 1 mm more for the 11 mm the 6 mm rear crossmembers moved the axle rearward, which shortened the rear tank (I2-87)
+  tank_z0: rail_underside_z - 26   # 26 mm below the rails. The front tank's ends stand on their bearers UF-01B and its bottom spans between them guard_gap over the front guard, which carries only itself, and the rear tank's front end stands on its bearers and its body on the rear bay's shear panel PNL-1 (I2-109, I2-115). The tanks' bottoms stood on the guards until 26 Nov 2026. 20 mm since the 4,000 kg plate, 5 mm more so the tanks keep the water the rear tank's narrower kerb side gives up (tank_r_kerb, I2-40), and 1 mm more for the 11 mm the 6 mm rear crossmembers moved the axle rearward, which shortened the rear tank (I2-87)
   tank_h: floor_underside_z - 10 - tank_z0
+  guard_gap: 15              # the front guard hangs this far under the front tank's bottom (I2-115): the tank's 6 mm HDPE bottom sags about 10 mm (est.) between its baffles in LC2, and 5 mm to spare
   tank_w: 975                # the tanks keep their size on the wider rails (H22): 100 mm each side to the rails for the airbag and shock mounts (est.)
   tank_r_kerb: 36            # the rear tank's kerb face 36 mm inboard of the front tank's, so the 135.5 mm gap between it and the kerb raiser takes G20's whole 120 mm packing over it (I2-33, I2-40)
   tank_f_x0: axle_x + xt_front_hinge_rear + 10
@@ -693,7 +694,7 @@ items:
       clear: 5
       bolts: {size: M10, d: 10, hole: 11, z: 50, per: 2, end: 30, fuf: 830, a_s: 58.0, a_c: 52.3, washer: 20}
       member_fu: 500
-      hanger_bolts: {size: M8, z: 62.5, hole: 9}
+      hanger_bolts: {size: M8, z: 62.5 + guard_gap, hole: 9, rail: {nut: "M8 steel blind rivet nut, flat head, for a 3.0 to 5.5 mm grip", hole: 11}}
       places:
         - {tank: UF-01, member: CM-04, face: rear, y: [35, 345]}
         - {tank: UF-01, member: CM-05, face: front, y: [110, 255]}
@@ -720,11 +721,11 @@ items:
             gaps: [[xt_centre_front + xm_w / 2 - 50 - xt_front_hinge_rear, xt_centre_front + xm_w / 2 + 50 - xt_front_hinge_rear]],
             extras: [{name: shear_panel, box: [axle_x + xt_centre_front + xm_w + 5, 3 - rail_in, tank_z0 - 8, xt_rear_shock_front + 45 - xt_centre_front - xm_w - 5, 2 * rail_in - 6, 8]},
                      {name: guard_hangers, foot: 23,
-                      box: [axle_x + xt_front_hinge_rear, -rail_in, tank_z0 - 9, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 50 + rail_underside_z - tank_z0]}]}
+                      box: [axle_x + xt_front_hinge_rear, -rail_in, tank_z0 - guard_gap - 9, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 50 + rail_underside_z - tank_z0 + guard_gap]}]}
     price:
       - {item: "3 mm aluminium checker plate for the front tank's guard", aud: 341.75, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/107-aluminium-5-bar-checker-plate-tread.html", date: 2026-11-20, note: "One 1200 x 2400 sheet of 3 mm aluminium checker plate, AUD 261.75 (listing), plus angle and fixings AUD 80 (est.)"}
       - {item: "8 mm HA250 hot-rolled steel sheet for the rear tank's guard, the bay's shear panel, hot-dip galvanised, and its M12 8.8 bolts", aud: 488, basis: estimate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/374-mild-steel-sheet-plates-250gr-as-nzs-3678.html", date: 2026-11-26, note: "A 1200 x 1200 mm piece of 8 mm AS/NZS 1594 HA250 sheet, about 90 kg at about AUD 4 a kg over the AUD 3.05 to 3.44/kg listed for 250 grade sheet (STL-08), AUD 362, the sheet as cut, about 42 kg with its front corners stepped clear of the arms, hot-dip galvanised at GLV-01's AUD 2.75/kg, AUD 115, and 11 M12 8.8 bolts with nyloc nuts, AUD 11 (est.)"}
-    box: [axle_x + xt_front_hinge_rear, -rail_in, tank_z0 - 6, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 6]
+    box: [axle_x + xt_front_hinge_rear, -rail_in, tank_z0 - guard_gap - 6, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 6]
     parts:
       - {item: "3 mm five-bar aluminium treadplate, the front tank's bay by the width between the rails", kg: "(xt_centre_front + xm_w / 2 - 50 - xt_front_hinge_rear) * 2 * rail_in * 9.375e-6", basis: estimate, source: "At about 9.4 kg/m2, Austral Wright's approximate 27 kg for a 3 x 1,200 x 2,400 mm five-bar sheet (https://www.australwright.com.au/wp-content/uploads/2012/07/AluminiumTreadplate1.pdf)"}
       - {item: "{t:g} mm {material}, the rear tank's bay between the rails with its tongues under the crossmembers' angles, bolted as the bay's shear panel (CHS-13)", panel: PNL-1, basis: calculated}

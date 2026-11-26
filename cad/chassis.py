@@ -23,6 +23,12 @@ CHASSIS_YAML = DATA / "chassis" / "chassis.yaml"
 # a pin between two nodes 1 mm apart: it passes a force each way and almost no moment (the hinge cheeks' fillets to the
 # hinge bar, I2-92). Marked rigid so the stress readings skip it
 PIN = Section("pin", A=1.0e5, I_strong=1.0, I_weak=1.0, J=1.0, rigid=True)
+# an XT arm's bush between its pair of hinge plates on the elastic hinge bar (I2-114), a 1 mm link down the pivot's
+# axis' normal, its depth along X: "free" passes a force each way, stiffly, and almost no moment, so the arm holds none
+# of the bar's bending or twist, and "stiff" passes the moments across the pivot's axis too, so the arm's tube holds the
+# bar's bending between its bushes, and turns freely about that axis in both. Marked rigid so the stress readings skip it
+BUSHES = {"free": Section("bush, free", A=1.0e5, I_strong=100.0, I_weak=100.0, J=100.0, rigid=True),
+          "stiff": Section("bush, stiff", A=1.0e5, I_strong=100.0, I_weak=1.0e8, J=1.0e8, rigid=True)}
 SECTIONS_YAML = DATA / "chassis" / "sections.yaml"
 SIDES = {-1: "K", 1: "R"}            # kerb side is negative Y, road side positive Y (DIM-01)
 SIDE_WORDS = {-1: "kerb side", 1: "road side"}
@@ -805,6 +811,24 @@ class Chassis:
         y_in = self.V["rail_c"] - self.role_sec["rail"].b / 2
         return [s * (y_in - u) for s in (-1, 1) for u in self.data["xt_hinges"]["bar"]["runs"]]
 
+    def hinge_run_points(self, cm: Member) -> list[float]:
+        """The Y of each run's two ends and its centre (hinge_weld_ys), both sides, where the elastic hinge bar is tied to
+        its crossmember, so each run acts over its whole length (I2-114)."""
+        half = self.data["xt_hinges"]["bar"]["run"] / 2
+        return [y + k * half for y in self.hinge_weld_ys(cm) for k in (-1, 0, 1)]
+
+    def hinge_bar_section(self, cm: Member) -> Section:
+        """The hinge bar under crossmember cm as a beam along Y (xt_hinges `bar` `section`, I2-114): a solid bar as wide as the
+        crossmember, flush with its faces, and xt_arms parts `bar` `d` deep (est.). Its strong axis bends it in the
+        vertical plane, its weak axis across, and J is a solid rectangle's, a b cubed (1/3 - 0.21 (b / a) (1 - b^4 / 12 a^4))
+        with a the longer side (Roark, Table 10.7)."""
+        if self.data["xt_hinges"]["bar"].get("section", "solid") != "solid":
+            raise ValueError("xt_hinges bar section: only a solid bar is modelled")
+        w, d = cm.sec.b, self.data["xt_arms"]["parts"]["bar"]["d"]
+        a, b = max(w, d), min(w, d)
+        J = a * b ** 3 * (1 / 3 - 0.21 * (b / a) * (1 - b ** 4 / (12 * a ** 4)))
+        return Section(f"hinge bar, solid {w:g} x {d:g}", A=w * d, I_strong=w * d ** 3 / 12, I_weak=d * w ** 3 / 12, J=J)
+
     # -- galvanising --------------------------------------------------
     def galv_rate(self, t: float) -> float:
         """Coating mass in kg/m2 for steel of thickness t (AS/NZS 4680 minimum average)."""
@@ -1110,19 +1134,26 @@ class Chassis:
                     panel_angle_ends_x=sorted({x for p in self.panel_pieces() if p["use"] == "rail" for x in (p["x0"], p["x1"])}))
 
     # -- the frame model ----------------------------------------------
-    def frame(self, body: list[tuple[float, float, float]] | None = None, hinges: str = "crossmember") -> "FrameModel":
+    def frame(self, body: list[tuple[float, float, float]] | None = None, hinges: str = "crossmember",
+              hinge_bar: str = "rigid", bushes: str = "free") -> "FrameModel":
         """The frame model. `body` adds the body as a torsion box (cad/body.py): (x0, x1, GJ in N mm2) per bay between
         stations, tied rigidly to both rails at each station, as the floor's bolts tie it (BODY.md). `hinges` "crossmember"
-        ties each XT pivot to its crossmember at the hinge bar's welds, with the gussets as members (CHS-12)."""
-        return FrameModel(self, body, hinges)
+        ties each XT pivot to its crossmember at the hinge bar's welds, with the gussets as members (CHS-12). `hinge_bar`
+        is one of xt_hinges `bar` `bounds`: "rigid" holds the bar rigid from the pivot to its runs' centres, "elastic" builds
+        it at its own section with each run over its length, its arm on `bushes` "stiff" or "free" (I2-114)."""
+        return FrameModel(self, body, hinges, hinge_bar, bushes)
 
 
 class FrameModel:
     """Nodes and elements of the chassis and drawbar, with the lookups the load mapping needs."""
 
-    def __init__(self, ch: Chassis, body: list[tuple[float, float, float]] | None = None, hinges: str = "crossmember"):
+    def __init__(self, ch: Chassis, body: list[tuple[float, float, float]] | None = None, hinges: str = "crossmember",
+                 hinge_bar: str = "rigid", bushes: str = "free"):
         self.ch = ch
         self.hinges = hinges
+        self.hinge_bar = hinge_bar if hinges == "crossmember" else "rigid"
+        self.bushes = bushes
+        elastic = self.hinge_bar == "elastic"
         V = ch.V
         f = self.f = Frame()
         self.sec_props: dict[str, Any] = {}      # member id -> Props or Composite, for stress recovery
@@ -1164,7 +1195,10 @@ class FrameModel:
                 ys = sorted({-V["rail_c"], V["rail_c"], 0.0, -V["spare_post_y"], V["spare_post_y"],
                              *[V["rail_c"] * k / 3 for k in (-2, -1, 1, 2)],
                              *(ch.hinge_weld_ys(m) + [g["cm_y"] for g in ch.hinge_gussets() if g["cm"] == m.id] if hinges == "crossmember" else [])})
-                ys = [y for k, y in enumerate(ys) if k == 0 or y - ys[k - 1] > 5.0 or abs(y) == V["rail_c"]]
+                # the elastic hinge bar's ties at each run's ends and centre keep their nodes, the others within 5 mm go
+                runs = set(ch.hinge_run_points(m)) if elastic else set()
+                ys = sorted(runs | {y for y in ys if all(abs(y - r) > 5.0 for r in runs)})
+                ys = [y for k, y in enumerate(ys) if k == 0 or y - ys[k - 1] > 5.0 or abs(y) == V["rail_c"] or y in runs]
                 idx = f.chain([(x, y, z) for y in ys], m.sec.frame_section(), (0, 0, 1), m.id)
                 self.cm_nodes[m.id] = list(zip(ys, idx))
                 self.sec_props[m.id] = m.sec
@@ -1220,7 +1254,7 @@ class FrameModel:
             nd = f.node(w["pivot"])
             if hinges == "crossmember":
                 cm = next(m for m in ch.members if m.station == w["station"] and m.role == "cm_xt")
-                for y in ch.hinge_weld_ys(cm):
+                for y in ([] if elastic else ch.hinge_weld_ys(cm)):
                     if y * w["side"] > 0:
                         self._link(nd, self.cm_node(cm.id, y), f"hinge {w['id']}")
             else:
@@ -1238,7 +1272,10 @@ class FrameModel:
                 bar = f.node((w["pivot"][0], w["pivot"][1], z_pin - 1.0))
                 pin = f.node((w["pivot"][0], w["pivot"][1], z_pin))
                 top = f.node((w["pivot"][0], w["pivot"][1], V["rail_underside_z"]))
-                self._link(nd, bar, f"hinge bar {w['id']}")
+                if elastic:
+                    self._elastic_bar(w, cm, nd, bar)
+                else:
+                    self._link(nd, bar, f"hinge bar {w['id']}")
                 f.add(bar, pin, PIN, (1, 0, 0), f"cheek pin {w['id']}")
                 self.cheek_pins[w["id"]] = len(f.elements) - 1
                 self._link(top, self.rail_node(w["side"], w["station_x"]), f"cheek welds {w['id']}")
@@ -1307,6 +1344,40 @@ class FrameModel:
 
     def panels_by_id(self) -> dict:
         return {p["id"]: p for p in self.panels}
+
+    def _elastic_bar(self, w: dict, cm, pivot: int, under_pin: int):
+        """Wheel w's hinge bar as the beam it is (xt_hinges `bar`, I2-114): Chassis.hinge_bar_section along the
+        crossmember's underside, from the cheeks' fillets to it beside the rail's inner web, past the arm's four hinge
+        plates and along the three weld runs, each run tied to the crossmember at its two ends and its centre, so it acts
+        over its whole length. Each pair of plates hangs rigid from the bar with the bolt through them and the bush's
+        sleeve clamped between them, on the pivot's axis. The arm's pivot tube is rigid from the pivot to its two bushes,
+        each bush (BUSHES, `self.bushes`) free, passing a force but almost no moment, so the arm holds the bar at its
+        plates and none of its bending or twist between the pairs, as Cruisemaster's greased polyurethane bushes nearly
+        do, or stiff, holding the bar's bending between them as a rigid tube would. The cheeks hang off the bar at their
+        fillets, `under_pin` being the node under their pin."""
+        ch, f, V = self.ch, self.f, self.ch.V
+        s, wid = w["side"], w["id"]
+        parts = ch.data["xt_arms"]["parts"]
+        y_in = V["rail_c"] - ch.role_sec["rail"].b / 2
+        x, z = cm.p0[0], V["rail_underside_z"] - parts["bar"]["d"] / 2
+        pin_y = s * (y_in - ch.data["xt_hinges"]["cheek"]["t"] / 2)
+        plates = [s * (y_in - u) for u in parts["plates"]["y_in"]]
+        runs = [y for y in ch.hinge_run_points(cm) if y * s > 0]
+        ys = sorted({pin_y, *plates, *runs}, key=lambda y: -abs(y))
+        at = {y: f.node((x, y, z)) for y in ys}
+        sec = ch.hinge_bar_section(cm)
+        for a, b in zip(ys, ys[1:]):
+            f.add(at[a], at[b], sec, (0, 0, 1), f"XT-BAR-{wid}")
+        for y in runs:
+            self._link(at[y], self.cm_node(cm.id, y), f"hinge {wid}")
+        self._link(at[pin_y], under_pin, f"hinge bar {wid}")
+        px, _, pz = w["pivot"]
+        for u, pair in zip(parts["arm"]["roots"], (plates[:2], plates[2:])):
+            bolt, tube = f.node((px, s * (y_in - u), pz)), f.node((px, s * (y_in - u), pz - 1.0))
+            for y in pair:
+                self._link(bolt, at[y], f"hinge plate {wid}")
+            f.add(tube, bolt, BUSHES[self.bushes], (1, 0, 0), f"bush {wid}")
+            self._link(pivot, tube, f"pivot tube {wid}")
 
     def _link(self, a: int, b: int, name: str):
         xyz = [self.f.nodes[a], self.f.nodes[b]]

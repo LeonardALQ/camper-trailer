@@ -22,19 +22,31 @@ from .partsdb import ROOT
 
 RECORDS = ROOT / "build" / "chassis" / "chassis.json"
 GALV_USES = {"vent", "drain", "drain and vent", "check", "seam vent"}   # a hole for galvanising among the holes' runs
+BOLT_USES = ("bolt for ", "rivet nut for ")      # a fixing's hole among the holes' runs (Layout.fixing_holes)
 SEAM = "seam"            # a record whose wall is the rail-to-raiser seam goes through the rail's top and the raiser's bottom
 _cache: dict = {}
 
 
 def records() -> list[dict]:
     """The holes for galvanising in the build's records, in their order, or none before the trailer step has written them."""
+    return _read()["holes"]
+
+
+def bolt_records() -> list[dict]:
+    """The holes the fresh tanks' bearers' bolts and the front guard's hangers' bolts and rivet nuts make in the frame
+    (Layout.fixing_holes, I2-109, I2-116), in the build's records' order, for the hole schedule CT-105."""
+    return _read()["bolts"]
+
+
+def _read() -> dict:
     if not RECORDS.exists():
-        return []
+        return dict(holes=[], bolts=[])
     key = RECORDS.stat().st_mtime_ns
     if _cache.get("key") != key:
         holes = json.loads(RECORDS.read_text(encoding="utf-8"))["results"]["holes"]
-        _cache.update(key=key, holes=[h for h in holes if set(h.get("runs") or []) & GALV_USES])
-    return _cache["holes"]
+        _cache.update(key=key, holes=[h for h in holes if set(h.get("runs") or []) & GALV_USES],
+                      bolts=[h for h in holes if any(str(r).startswith(BOLT_USES) for r in h.get("runs") or [])])
+    return _cache
 
 
 def is_seam(h: dict) -> bool:

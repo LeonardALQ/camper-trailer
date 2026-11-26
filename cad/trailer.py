@@ -1019,11 +1019,14 @@ class Layout:
                             out.append(row)
         h = self.guard_hanger_bolts()
         rail = self.chassis.role_sec["rail"]
+        nut = ((self._bearers_spec() or {}).get("hanger_bolts") or {}).get("rail")
         for name, (x, y, z), dh in h:
             if name.startswith("rail"):
                 s = 1 if y > 0 else -1
-                for web, yy in (("inner web", s * (V["rail_c"] - rail.b / 2)), ("outer web", s * (V["rail_c"] + rail.b / 2))):
-                    out.append(dict(member=f"RL-{'K' if s < 0 else 'R'}", face=web, use="bolt for UF-03's hanger", x=x, y=yy, z=z, d=dh, length=dh))
+                webs = [("inner web", s * (V["rail_c"] - rail.b / 2))] + ([] if nut else [("outer web", s * (V["rail_c"] + rail.b / 2))])
+                for web, yy in webs:
+                    out.append(dict(member=f"RL-{'K' if s < 0 else 'R'}", face=web, use=f"{'rivet nut' if nut else 'bolt'} for UF-03's hanger",
+                                    x=x, y=yy, z=z, d=dh, length=dh))
             else:
                 m = next(m for m in self.chassis.members if m.station == "XT front hinge" and m.role.startswith("cm"))
                 for face, xx in (("front", m.p0[0] - m.sec.b / 2), ("rear", m.p0[0] + m.sec.b / 2)):
@@ -1031,9 +1034,10 @@ class Layout:
         return out
 
     def guard_hanger_bolts(self) -> list[tuple]:
-        """The front guard's hanger angles' bolts (I2-104, I2-109): one through each upright leg and both webs of its rail or
-        of the XT front hinge crossmember, `hanger_bolts` `z` over the angle's foot (UF-01B's `bearers`), each (where,
-        (x, y, z), hole)."""
+        """The front guard's hanger angles' bolts (I2-104, I2-109): one through each upright leg `hanger_bolts` `z` over the
+        angle's foot (UF-01B's `bearers`), on a rail into a blind rivet nut in its inner web, `rail`, so nothing stands on
+        the rail's outer face beside the front tyre (I2-116), and on the XT front hinge crossmember through both its webs,
+        each (where, (x, y, z), hole)."""
         hb = (self._bearers_spec() or {}).get("hanger_bolts")
         legs = self.guard_hanger_parts()
         if not hb or not legs:
@@ -1041,10 +1045,11 @@ class Layout:
         out = []
         for k in range(0, len(legs) - 1, 2):
             name, up = legs[k]
-            zb = up[2] + hb["z"]
+            zb = up[2] + float(self.P.eval(hb["z"], {}))
             on_rail = "rails' webs" in name
             y = up[1] if on_rail and up[1] < 0 else (up[4] if on_rail else (up[1] + up[4]) / 2)
-            out.append(("rail" if on_rail else "crossmember", ((up[0] + up[3]) / 2, y, zb), float(hb["hole"])))
+            hole = (hb.get("rail") or hb)["hole"] if on_rail else hb["hole"]
+            out.append(("rail" if on_rail else "crossmember", ((up[0] + up[3]) / 2, y, zb), float(hole)))
         return out
 
     def tank_support(self) -> dict:

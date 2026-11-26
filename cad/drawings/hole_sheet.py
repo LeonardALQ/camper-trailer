@@ -35,9 +35,11 @@ class Hole:
     """One record read for the schedule: the closed section it serves, its web, the end it is measured from, its distance
     along the web from that end and its height over the underside."""
 
-    def __init__(self, h: dict, ch):
+    def __init__(self, h: dict, ch, words: dict | None = None):
         self.h, self.id, self.d = h, h["id"], float(h["d"])
-        self.use = USE_WORDS[next(r for r in h["runs"] if r in CH.GALV_USES)]
+        galv = next((r for r in h["runs"] if r in CH.GALV_USES), None)
+        self.bolt = galv is None                 # a fixing's hole (CH.bolt_records), its use from `words` by its run
+        self.use = USE_WORDS[galv] if galv else next(w for k, w in (words or {}).items() if any(str(r).startswith(k) for r in h["runs"]))
         mem = {m.id: m for m in ch.members}
         if h["member"] in mem:
             m = mem[h["member"]]
@@ -119,9 +121,11 @@ def section_names(chs: dict, ch) -> dict:
     return out
 
 
-def schedule(chs: dict, ch) -> list[tuple[str, list[Hole]]]:
-    """The holes by closed section, the sections in the members' order and each section's holes by end, distance and web."""
-    holes = [Hole(h, ch) for h in CH.records()]
+def schedule(chs: dict, ch, words: dict | None = None) -> list[tuple[str, list[Hole]]]:
+    """The holes by closed section, the sections in the members' order and each section's holes by end, distance and web:
+    the holes for galvanising and, with `words` naming each fixing's use by its run, the bolt and rivet nut holes of the
+    fresh tanks' bearers and the front guard's hangers (I2-109, I2-116)."""
+    holes = [Hole(h, ch) for h in CH.records()] + ([Hole(h, ch, words) for h in CH.bolt_records()] if words else [])
     order = {m["id"]: k for k, m in enumerate(chs["members"])}
     first = {}
     for h in holes:
@@ -424,8 +428,14 @@ def ct105(prj, model, bom, checks, reg, dwg):
     lay, _ = _layout(prj, model)
     ch = lay.chassis
     chs = _chassis()
-    sections = schedule(chs, ch)
-    holes = [h for _, hs in sections for h in hs]
+    sp = lay._bearers_spec() or {}
+    hb = sp.get("hanger_bolts") or {}
+    words = {"bolt for UF-01B": f"{sp['bolts']['size']} BOLT", "bolt for UF-03": f"{hb['size']} BOLT",
+             "rivet nut for UF-03": f"{hb['size']} RIVET NUT"} if sp else {}
+    sections = schedule(chs, ch, words)
+    every = [h for _, hs in sections for h in hs]
+    holes = [h for h in every if not h.bolt]
+    bolts = [h for h in every if h.bolt]
     names = section_names(chs, ch)
     sh = S.Sheet()
     S.frame(sh)
@@ -433,7 +443,8 @@ def ct105(prj, model, bom, checks, reg, dwg):
     cols = columns(sections, names, per)
     if len(cols) > len(LEFT):
         raise ValueError(f"CT-105's schedule needs {len(cols)} columns where the sheet has {len(LEFT)}")
-    sh.text(LEFT[0], TOP + 2.0, f"HOLES FOR GALVANISING BY CLOSED SECTION, {len(holes)} HOLES IN {len(sections)} SECTIONS", 2.2, bold=True)
+    sh.text(LEFT[0], TOP + 2.0, f"HOLES BY CLOSED SECTION, {len(holes)} FOR GALVANISING AND {len(bolts)} FOR FIXINGS, IN {len(sections)} SECTIONS",
+            2.2, bold=True)
     for x, rows in zip(LEFT, cols):
         _column(sh, x, TOP, rows)
     mirrored = "KERB SIDE, THE ROAD SIDE MIRRORED"
@@ -449,13 +460,15 @@ def ct105(prj, model, bom, checks, reg, dwg):
     _seam_detail(sh, ch, holes, 260.0, 113.0)
     S.notes(sh, 292.0, 127.0, [
         "HOT-DIP GALVANISE TO AS/NZS 4680 IN ONE DIP AS CT-103 NOTE 2 AND DETAIL K SAY. DRILL OR HOLE-SAW AND DEBURR EVERY HOLE BEFORE "
-        "WELDING (report 02 WLD-05). THE SCHEDULE LISTS EVERY HOLE CHS-09, CHS-10 AND CHS-11 READ, UNDER THE CLOSED SECTION IT DRAINS OR VENTS.",
+        "WELDING (report 02 WLD-05). THE SCHEDULE LISTS EVERY HOLE CHS-09, CHS-10 AND CHS-11 READ, UNDER THE CLOSED SECTION IT DRAINS OR VENTS, AND THE FIXINGS' HOLES.",
         "DIMENSIONS ARE TO EACH HOLE'S CENTRE (DETAIL C). FROM GIVES THE END THAT ALONG STARTS AT ON THAT WEB: A MEMBER'S END AT ITS WELD, "
         "THE DRAWBAR MEMBER'S SQUARE APEX CUT OR THAT WEB'S MITRE LINE (DETAILS A AND B), A RAIL'S NEARER END, A ROAD SIDE PLAN BRACE'S "
         "CROSSING, OR A HINGE GUSSET'S FACE ON THE CROSSMEMBER OR THE RAIL.",
         "WEB: FRONT AND REAR FACE THE DRAWBAR AND THE REAR, INNER AND OUTER FACE THE CENTRELINE AND THE SIDE. SEAM: THROUGH THE RAIL'S TOP "
         "AND THE RAISER'S BOTTOM WALL (DETAIL E). THE RAILS' INNER-WEB HOLES AT CM-05 AND CM-06 DRAIN AND VENT THEIR FRONT CORNERS, EACH WITH A CHECK "
         "HOLE OPPOSITE IN THE OUTER WEB.",
+        "BOLT AND RIVET NUT: THE FIXINGS' HOLES, DRILLED BEFORE GALVANISING. A BOLT GOES THROUGH BOTH WEBS, ITS HOLES IN LINE (UF-01B ON "
+        "CM-04 AND CM-05, UF-03 ON CM-04). EACH RAIL'S HANGER UF-03 BOLTS INTO A BLIND RIVET NUT IN THE INNER WEB ONLY.",
     ] + [f"{c['member']}'S ENDS ARE ITS RECOVERY TONGUES' FACES, {c['cut']:g} INSIDE THE RAILS."
          for c in ch.data["member_galvanising_holes"].get("cut_ends", [])], width_chars=70, size=1.5)
     _draft_stamp(sh, 350.0, 74.0)
