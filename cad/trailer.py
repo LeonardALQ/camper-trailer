@@ -985,7 +985,7 @@ class Layout:
             if g < -TOL:
                 found[(name, other, what)] = max(found.get((name, other, what), 0.0), -g)
         pairs = [dict(part=k[0], kit=k[1], what=k[2], mm=round(v, 1)) for k, v in sorted(found.items(), key=lambda kv: -kv[1])]
-        return dict(ok=not pairs, pairs=pairs, smallest_gap_mm=round(worst, 1), governing=worst_pair, parts=len(ours), kit=len(kit))
+        return dict(ok=not pairs, pairs=pairs, smallest_gap_mm=round(worst, 1) + 0.0, governing=worst_pair, parts=len(ours), kit=len(kit))
 
     def tank_loads(self) -> dict:
         """Each fresh tank's full mass (kg) as CHS-17 and the frame model carry it: the tank with its growth and its share
