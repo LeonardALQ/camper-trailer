@@ -1710,9 +1710,11 @@ class Analysis:
             box = (u - d / 2, z - d / 2, u + d / 2, z + d / 2)
             gap, weld = min(((math.hypot(max(b[0] - box[2], box[0] - b[2], 0.0), max(b[1] - box[3], box[1] - b[3], 0.0)), what)
                              for what, b in toes), key=lambda t: t[0])
-            gross = dict(A=sec.A, z=V["db_z"], I=sec.I_strong, I_weak=sec.I_weak, Aw=sec.Aw_depth, Aw_width=sec.Aw_width)
-            strips = [dict(dA=sec.t * d, z=z, own=sec.t * d ** 3 / 12, y=(sec.b - sec.t) / 2, own_z=d * sec.t ** 3 / 12, web=True)]
-            levers, face_w = [z - d / 2, z + d / 2], sec.d - sec.t
+            # heights from the member's axis, as _member_hole_sites gives the member's other holes, so both read together
+            z_l = z - V["db_z"]
+            gross = dict(A=sec.A, z=0.0, I=sec.I_strong, I_weak=sec.I_weak, Aw=sec.Aw_depth, Aw_width=sec.Aw_width)
+            strips = [dict(dA=sec.t * d, z=z_l, own=sec.t * d ** 3 / 12, y=(sec.b - sec.t) / 2, own_z=d * sec.t ** 3 / 12, web=True)]
+            levers, face_w = [z_l - d / 2, z_l + d / 2], sec.d - sec.t
             edge = min(z - (zb + sec.ro), (zt - sec.ro) - z)
             edge_need = rules["edge_factor"] * d
             if u / rules["end_factor"] < edge / rules["edge_factor"]:      # the member's sawn end, 1.5 d (Table 9.6.2)
