@@ -5,7 +5,9 @@
 # cad/chassis_fea.py analyses them. Sections come from data/chassis/sections.yaml (report 11's table).
 id: ASM-CH
 name: Chassis and drawbar
-revision: Q     # Q, 25 Nov 2026: the airbags and the hinge bars' weld runs where Cruisemaster's sheets draw them, the XT
+revision: R     # R, 26 Nov 2026: the front shocks' support plates CH-P07 on the XT centre crossmember's front face, its front
+                # corners drained and vented through the rails' inner webs, and the arms as Cruisemaster's sheet 4 draws them.
+                # Q, 25 Nov 2026: the airbags and the hinge bars' weld runs where Cruisemaster's sheets draw them, the XT
                 # centre crossmember RHS 150 x 50 x 6, the cheeks' steps read as plates, the droop line along each shock, the
                 # front hinge's steps clear of the front airbags' brackets, the shock plates flush on their crossmember, the rear
                 # bay's 8 mm panel cut round the rear airbags and shocks on 76 mm rail angles and M12 bolts, the jacking points

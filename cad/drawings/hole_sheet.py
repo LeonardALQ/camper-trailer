@@ -380,8 +380,8 @@ def _plate_detail(sh, ch, x0: float, y0: float, k: float = 5.0):
         S.vdim(sh, p(0, 0)[0], p(0, 0)[1], c[0], c[1], p(0, 0)[0] + 4.0 + 5.0 * i, _n(v["v"]), size=1.4)
     sh.text(p(vents[0]["l"], 0)[0], p(0, vents[0]["w"])[1] + 1.2, "INBOARD", 1.4)
     sh.text(p(0, 0)[0], p(0, vents[0]["w"])[1] + 1.2, "OUTBOARD, BY THE RAIL", 1.4, "end")
-    _caption(sh, x0 - 2.0, y0 - 15.0, f"{vents[0]['plate']}, {vents[0]['t']:g} PLATE SEAL WELDED TO THE XT REAR SHOCK CROSSMEMBER'S FRONT "
-             f"WEB, VENTED THROUGH THE PLATE BY {len(vents)} HOLES {vents[0]['d']:g} AT OPPOSITE CORNERS.", 70.0)
+    _caption(sh, x0 - 2.0, y0 - 15.0, f"{vents[0]['plate']}, {vents[0]['t']:g} PLATE SEAL WELDED TO THE FRONT WEB OF THE XT CENTRE AND "
+             f"XT REAR SHOCK CROSSMEMBERS, VENTED THROUGH THE PLATE BY {len(vents)} HOLES {vents[0]['d']:g} AT OPPOSITE CORNERS.", 70.0)
 
 
 def _break(sh, x0: float, x1: float, y: float):
@@ -452,7 +452,7 @@ def ct105(prj, model, bom, checks, reg, dwg):
         "THE DRAWBAR MEMBER'S SQUARE APEX CUT OR THAT WEB'S MITRE LINE (DETAILS A AND B), A RAIL'S NEARER END, A ROAD SIDE PLAN BRACE'S "
         "CROSSING, OR A HINGE GUSSET'S FACE ON THE CROSSMEMBER OR THE RAIL.",
         "WEB: FRONT AND REAR FACE THE DRAWBAR AND THE REAR, INNER AND OUTER FACE THE CENTRELINE AND THE SIDE. SEAM: THROUGH THE RAIL'S TOP "
-        "AND THE RAISER'S BOTTOM WALL (DETAIL E). THE RAILS' INNER-WEB HOLES AT CM-06 DRAIN AND VENT ITS FRONT CORNERS, EACH WITH A CHECK "
+        "AND THE RAISER'S BOTTOM WALL (DETAIL E). THE RAILS' INNER-WEB HOLES AT CM-05 AND CM-06 DRAIN AND VENT THEIR FRONT CORNERS, EACH WITH A CHECK "
         "HOLE OPPOSITE IN THE OUTER WEB.",
     ] + [f"{c['member']}'S ENDS ARE ITS RECOVERY TONGUES' FACES, {c['cut']:g} INSIDE THE RAILS."
          for c in ch.data["member_galvanising_holes"].get("cut_ends", [])], width_chars=70, size=1.5)

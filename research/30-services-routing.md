@@ -156,9 +156,11 @@ they are threaded through (`inside`).
   channel, and weighs 0.057 kg on K-13's arm and 0.085 kg on K-14's (`seat`, cad/routes.py seat_parts, est.).
   TR-13 measures the leads coupled on 300 mm ramps, each vehicle at its own attitude, where cad/routes.py on_ramps
   reads 439 mm at the least, K-13's span from its plug at full lock (I2-91). Each
-  drum's lead runs from its side's junction under CM-05 out under the tank guard to a P-clip on its XT hanger, 15 mm
-  ahead of the arm's pivot and 52.5 mm inboard of the arm, then in a loop down beside the bush and along the arm's
-  underside to the backing plate. cad/routes.py lays that arm part on the arm at ride height and FIT-05 sweeps it
+  drum's lead runs from its side's junction behind the TSC, under the TSC and, for a front arm, forward under the front
+  tank's guard, to a P-clip at its arm's inner bush on a bracket from the hinge crossmember, 100 mm from the centreline
+  and 50 mm inboard of the arm's pivot tube, then in a loop under the inner hinge plate to Cruisemaster's harness tray
+  on the A-frame's inner leg (33XT AIR sheet 4 step 7) and along it to the backing plate, tied in the tray, its loop
+  long enough for the arm's travel (cad/routes.py lead_slack). cad/routes.py lays that arm part on the arm at ride height and FIT-05 sweeps it
   with the arm through its travel (`rides: arm`), 59.6 mm clear at its least. The leads are 2.5 mm2 (est.), so the
   front drums' 1.6 m keep 2 % from the TSC with Bosch's harness ahead of them.
 - The desk reaches the floor, so its outlets and USB panel are in a power module in the desk top, fed up the front

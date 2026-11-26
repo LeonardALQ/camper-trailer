@@ -800,11 +800,11 @@ fixtures:
   # Cruisemaster's jacking points under the arms (fx22-rear), so the junctions keep their places for the services' pass,
   # level with the guard's underside, far inboard of the tyres' and the arms' sweep (FIT-05, I2-30).
   # The lines run along each arm to its pivot, looped there for the arm's 120 mm of travel, and in under the rail.
-  # The drum junctions stand behind the TSC on a bracket from the XT centre crossmember's rear face, 20 mm behind the TSC
+  # The drum junctions stand behind the TSC on a bracket from the XT centre crossmember's rear face, 40 mm behind the TSC
   # and 3 mm under the shear panel's sheet, 30 to 110 mm from the centreline, inboard of the XT centre's hinge bars (their
   # inner ends 137.5 mm from it) and 50 mm or more clear of the rear arms' pivot tubes over their travel (FIT-05, est.)
-  - {id: BR-DK, what: "Brake magnets and ABS sensors of the kerb side drums, their junction with the TSC harness behind the TSC", line: RG-03, at: [BR_TSC.x1 + 60, -70, UF_03.z0 - 45], size: [80, 80, 80]}
-  - {id: BR-DR, what: "Brake magnets and ABS sensors of the road side drums, their junction with the TSC harness behind the TSC", line: RG-03, at: [BR_TSC.x1 + 60, 70, UF_03.z0 - 45], size: [80, 80, 80]}
+  - {id: BR-DK, what: "Brake magnets and ABS sensors of the kerb side drums, their junction with the TSC harness behind the TSC", line: RG-03, at: [BR_TSC.x1 + 80, -70, UF_03.z0 - 45], size: [80, 80, 80]}
+  - {id: BR-DR, what: "Brake magnets and ABS sensors of the road side drums, their junction with the TSC harness behind the TSC", line: RG-03, at: [BR_TSC.x1 + 80, 70, UF_03.z0 - 45], size: [80, 80, 80]}
 # Every water outlet SVC-05 looks for, with its cold and hot runs tagged "water: <name>".
 water_outlets: [sink, drinking tap, basin, shower, shower bypass, washer, toilet flush, rinse box, Combi]
 
@@ -1119,7 +1119,7 @@ runs:
   # along the crossmember's front face 35 mm ahead of it and clipped to it to 130 mm from the centreline, and comes back
   # under the front tank's guard 60 mm road side of the centreline to the TSC's front face, so it keeps SVC-01's 20 mm
   # from the cheek and the kit and FIT-05's 50 mm from the arms (I2-30, I2-97). K-11 and K-12 are Bosch's axle harness,
-  # from the TSC's rear face under its lower edge to the junctions 20 mm behind it, within its 200 mm.
+  # from the TSC's rear face under its lower edge to the junctions 40 mm behind it, within its 200 mm.
   - {id: K-13, system: lamps, kind: lamp12, rides: between, cut_m: 1.34, passes: [DB-HK],
      lift: {clip_mm: 680, arm_mm: 300, arm_kg: 0.18, pivot: [-15, 0], deg: [-25, 75], strap_deg: -15, seat_deg: [-155, 40], torque_nmm: [1500, 1000], why: "The 12-pin lead's arm, the outboard one of the two on the leads' bracket. Its seat is bent to the lead's 69 mm bend radius at its centreline round the arm's tip, from 155 degrees ahead of the strap to 40 degrees behind it, and held on the arm by its web (rules.between.seat, I2-91), so the strap stands at the seat's top when the arm points 15 degrees below level and turns with the arm (I2-83). Its torsion spring lifts the arm with 1.5 N m on the bottom stop and 1.0 N m on the top one (est.), the same spring as the SB50's arm"}, feeds: "The 12-pin flat plug's lead from the truck's socket up to the clip on its sprung arm, down to its clamp on the leads' bracket and along the drawbar member to the junction: the lamps, the brake request on pin 5 and the earth returns", protection: "The truck's lamp fuses and its brake controller",
      serves: [plug lead], from: {line: TB-SK, at: [TB_SK.x1, TB_SK.cy + 40, TB_SK.cz]}, path: [[DB_HK.x0 + 20, DB_HK.y1 - 15, DB_HK.z1 - 20], [600, 320, 555]], to: {line: DB-PL, at: [DB_PL.x0, DB_PL.cy + 20, DB_PL.cz]}}
