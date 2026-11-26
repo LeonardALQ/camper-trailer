@@ -64,6 +64,7 @@ drawings:
       - {rev: AT, date: 2026-11-26, description: "Notice: the masses with the 8 mm shear panel and four hinge gussets", drawn: Kiro, checked: "", approved: ""}
       - {rev: AU, date: 2026-11-26, description: "Notice: the masses and the axle with the front shocks' plates", drawn: Kiro, checked: "", approved: ""}
       - {rev: AV, date: 2026-11-26, description: "Notice: the masses with the shear panel's sheet stepped clear of the arms", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AW, date: 2026-11-26, description: "Notice: the masses with the fresh tanks' bearers (UF-01B)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-002
     title: Mass and centre of gravity
     subtitle: Every load case with growth, the axle window of H17, the CoG in elevation and across
@@ -106,6 +107,7 @@ drawings:
       - {rev: AD, date: 2026-11-26, description: "Notice: the masses and the axle window from the merged build", drawn: Kiro, checked: "", approved: ""}
       - {rev: AE, date: 2026-11-26, description: "Notice: the masses and the axle window with the front shocks' plates", drawn: Kiro, checked: "", approved: ""}
       - {rev: AF, date: 2026-11-26, description: "Notice: the masses and the axle window with the panel stepped clear", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AG, date: 2026-11-26, description: "Notice: the masses and the axle window with the tanks' bearers", drawn: Kiro, checked: "", approved: ""}
   - number: CT-003
     title: Compliance
     subtitle: VSB1 items and the standards with the design figures, operating limits and the plate
@@ -154,6 +156,7 @@ drawings:
       - {rev: AJ, date: 2026-11-26, description: "Notice: the masses, the axle group and the peak stress, merged build", drawn: Kiro, checked: "", approved: ""}
       - {rev: AK, date: 2026-11-26, description: "Notice: the masses and the axle group with the front shocks' plates", drawn: Kiro, checked: "", approved: ""}
       - {rev: AL, date: 2026-11-26, description: "Notice: the masses, the axle group and the recovery rule from the build", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AM, date: 2026-11-26, description: "Notice: the masses and the axle group with the fresh tanks' bearers", drawn: Kiro, checked: "", approved: ""}
   - number: CT-010
     title: Floor plan, bed up and bed down
     subtitle: Day and night plans, walkways, door swings, spaces kept clear and the bed positions
@@ -288,6 +291,7 @@ drawings:
       - {rev: AL, date: 2026-11-26, description: "Notice: CM-05 RHS 150x50x6, four hinge gussets, the merged frame's stresses", drawn: Kiro, checked: "", approved: ""}
       - {rev: AM, date: 2026-11-26, description: "Notice: CH-P07 on CM-05's front face, the steel and zinc", drawn: Kiro, checked: "", approved: ""}
       - {rev: AN, date: 2026-11-26, description: "Notice: the chassis data at revision S, the stations 1 mm forward", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AO, date: 2026-11-26, description: "Notice: the frame's results with the tanks on their bearers (CHS-17)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
@@ -329,6 +333,7 @@ drawings:
       - {rev: AC, date: 2026-11-25, description: "Memo: CHS-13 to CHS-16 from the merged build, droop line at the shocks", drawn: Kiro, checked: "", approved: ""}
       - {rev: AD, date: 2026-11-26, description: "Memo: CHS-13 to CHS-16 from the merged build", drawn: Kiro, checked: "", approved: ""}
       - {rev: AE, date: 2026-11-26, description: "Memo: the chassis data at revision S", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AF, date: 2026-11-26, description: "Memo: the shear panel's bolt figure with the tanks on their bearers", drawn: Kiro, checked: "", approved: ""}
   - number: CT-103
     title: Chassis details
     subtitle: Composite rail, outrigger root, crossmember to rail, overlap end, jacking point, recovery tongue, spare posts
@@ -380,6 +385,7 @@ drawings:
       - {rev: AM, date: 2026-11-26, description: "Memo: the fatigue table from the merged build", drawn: Kiro, checked: "", approved: ""}
       - {rev: AN, date: 2026-11-26, description: "Notice: CM-05 drained through the rails as CM-06, the fatigue damage", drawn: Kiro, checked: "", approved: ""}
       - {rev: AO, date: 2026-11-26, description: "Memo: the fatigue table with the stations 1 mm forward", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AP, date: 2026-11-26, description: "Memo: the fatigue table with the tanks on their bearers", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads
@@ -420,6 +426,7 @@ drawings:
       - {rev: AB, date: 2026-11-26, description: "Memo: the body mounts' mass and the peak stress from the merged build", drawn: Kiro, checked: "", approved: ""}
       - {rev: AC, date: 2026-11-26, description: "Memo: the body mounts' mass from the build", drawn: Kiro, checked: "", approved: ""}
       - {rev: AD, date: 2026-11-26, description: "Memo: the body mounts' mass with the panel stepped clear of the arms", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AE, date: 2026-11-26, description: "Memo: the body mounts with the tanks' bearers", drawn: Kiro, checked: "", approved: ""}
   - number: CT-105
     title: Holes for galvanising
     subtitle: Every drain, vent and check hole by section, the apex cut, the mitre lines and the overlaps' vents
@@ -454,6 +461,7 @@ drawings:
       - {rev: F, date: 2026-11-25, description: "Notice: 8 mm sheet cut clear of the rear bags and shocks, no jacking pads", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-26, description: "Notice: no gusset ahead of the XT centre, its front cheeks unstepped", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-26, description: "Notice: the sheet's front corners stepped 50 mm clear of the rear arms", drawn: Kiro, checked: "", approved: ""}
+      - {rev: I, date: 2026-11-26, description: "Notice: the sheet's steps clear of the arms as sheet 2 draws them", drawn: Kiro, checked: "", approved: ""}
   - number: CT-201
     title: Body shell
     subtitle: Kerb, road, front and rear walls, the fixed roof plan, the panels and every opening with its size
@@ -561,6 +569,7 @@ drawings:
       - {rev: V, date: 2026-11-26, description: "Memo: the frame's twist from the merged build", drawn: Kiro, checked: "", approved: ""}
       - {rev: W, date: 2026-11-26, description: "Memo: the frame's figures from the build", drawn: Kiro, checked: "", approved: ""}
       - {rev: X, date: 2026-11-26, description: "Memo: the stations and the body mounts with the axle group at X 4,495.4", drawn: Kiro, checked: "", approved: ""}
+      - {rev: Y, date: 2026-11-26, description: "Memo: the body's figures with the fresh tanks' bearers", drawn: Kiro, checked: "", approved: ""}
   - number: CT-401
     title: Garage and bed general arrangement
     subtitle: Plan, kerb-side section and section looking forward at partition A
@@ -684,6 +693,7 @@ drawings:
       - {rev: AC, date: 2026-11-25, description: "Notice: K-10 along CM-04's front face to the centreline, clear of the kit", drawn: Kiro, checked: "", approved: ""}
       - {rev: AD, date: 2026-11-26, description: "Notice: the runs and the drum junctions laid round the XT kit (SVC-13)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AE, date: 2026-11-26, description: "Notice: the drum leads' clips 101 mm under the pivots (SVC-13)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AF, date: 2026-11-26, description: "Notice: the drum leads' trays along the arms as sheet 2 draws them", drawn: Kiro, checked: "", approved: ""}
   - number: CT-603
     title: Floor and wall penetrations
     subtitle: Every gland through the floor, walls and roof, its position, hole, fitting and runs
@@ -713,6 +723,7 @@ drawings:
       - {rev: Q, date: 2026-11-26, description: "Notice: the tanks' pockets at the airbags' place, the front tank's corners", drawn: Kiro, checked: "", approved: ""}
       - {rev: R, date: 2026-11-26, description: "Notice: the front tank's pockets at the front shocks' plates", drawn: Kiro, checked: "", approved: ""}
       - {rev: S, date: 2026-11-26, description: "Notice: the fresh tanks' bottom edges stepped clear of the arms", drawn: Kiro, checked: "", approved: ""}
+      - {rev: T, date: 2026-11-26, description: "Notice: the fresh tanks' ends stepped onto their bearers (UF-01B)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-611
     title: Plumbing schematic
     subtitle: Fill, fresh tanks, pump, filters, cold and hot lines, drains to the grey tank and the dump
@@ -747,6 +758,7 @@ drawings:
       - {rev: V, date: 2026-11-25, description: "Memo: the notes' continuation lines hang under their text, wrapped by width", drawn: Kiro, checked: "", approved: ""}
       - {rev: W, date: 2026-11-25, description: "Notice: 385 L of fresh water, the tanks pocketed round the XT kit (I2-97)", drawn: Kiro, checked: "", approved: ""}
       - {rev: X, date: 2026-11-26, description: "Memo: the positions with the axle group at X 4,495.4", drawn: Kiro, checked: "", approved: ""}
+      - {rev: Y, date: 2026-11-26, description: "Memo: the rear tank's centre with the axle group 0.4 mm forward", drawn: Kiro, checked: "", approved: ""}
   - number: CT-612
     title: Plumbing layout
     subtitle: Tanks, pump cabinet, drains with their falls, the shower well, fill and dump points
@@ -782,6 +794,7 @@ drawings:
       - {rev: W, date: 2026-11-26, description: "Notice: the tanks' pockets at the airbags' place, the front tank's corners", drawn: Kiro, checked: "", approved: ""}
       - {rev: X, date: 2026-11-26, description: "Notice: F-03's outlet and W-01 over the rear road airbag's bracket", drawn: Kiro, checked: "", approved: ""}
       - {rev: Y, date: 2026-11-26, description: "Notice: the fresh tanks' bottom edges stepped clear of the arms", drawn: Kiro, checked: "", approved: ""}
+      - {rev: Z, date: 2026-11-26, description: "Notice: the fresh tanks' bearers drawn and noted (UF-01B, CHS-17)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-621
     title: HVAC and ventilation
     subtitle: Split, heat-recovery pairs, extract, towing pressurisation, relief, hood, Combi ducts
@@ -846,6 +859,7 @@ drawings:
       - {rev: AC, date: 2026-11-26, description: "Memo: the ute's towing figures from the merged build", drawn: Kiro, checked: "", approved: ""}
       - {rev: AD, date: 2026-11-26, description: "Memo: the ute's towing figures from the build", drawn: Kiro, checked: "", approved: ""}
       - {rev: AE, date: 2026-11-26, description: "Memo: the ute's towing figures from the build", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AF, date: 2026-11-26, description: "Memo: the ute's towing figures from the build", drawn: Kiro, checked: "", approved: ""}
   - number: CT-702
     title: Ute garage box frame and panels
     subtitle: Kerb-side frame elevation, subframe plan on Ford's pads, section at the rear axle, member schedule
