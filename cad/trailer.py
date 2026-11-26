@@ -273,6 +273,7 @@ class Layout:
                     spec = next(f for f in self.chassis.data["fittings"] if f["id"] == "CH-P17")
                     b.extra["panel"] = dict(sheet=pn[0]["sheet"], t=pn[0]["t"], z_top=self.V["rail_underside_z"] - spec["drop"])
                 b.extra["openings"] = self.guard_openings(b)   # the front piece's openings round the kit, for its model
+                b.extra["hangers"] = self.guard_hanger_parts()  # its hanger angles' legs, for its model
         ids = [b.iid for b in self.blocks]
         dup = {i for i in ids if ids.count(i) > 1}
         if dup:
@@ -846,41 +847,66 @@ class Layout:
         return out
 
     def guard_hanger_parts(self) -> list[tuple[str, tuple]]:
-        """The front tank's guard's hanger angles as the 3D model draws them (guard_hangers), each leg (name, box): at each
-        station of `at` along the rails a pair on the rails' inner webs, each its upright leg on the web and its foot under
-        the plate's edge."""
+        """The front tank's guard's hanger angles (I2-104), each leg (name, box), which the 3D model draws (guard_hangers)
+        and FIT-05 and FIT-08 read: a pair on the rails' inner webs at the middle of the longest stretch between the two
+        hinge crossmembers where no hinge cheek, cheek step or kit part stands on the web over the angle's height, and one on
+        the XT front hinge crossmember's rear face on the centreline, between the hinge bars, each 50 mm long, its upright
+        leg on the steel and its foot `foot` long under the guard plate's edge. The XT centre crossmember's front face takes
+        none: between its hinge bars the Bosch TSC module fills it."""
         from .model import products as PR
         from .trailer_model import model_specs
         b = next(b for b in self.blocks if b.id == "UF-03")
-        out = []
-        for opts, bx in PR.placements(model_specs(self)["UF-03"], b, self):
-            if opts["name"] != "guard_hangers":
-                continue
-            x0, y0, z0, x1, y1, z1 = bx
-            f = opts["foot"]
-            for u in opts["at"]:
-                xa, xb = x0 + u - 25, x0 + u + 25
-                name = f"UF-03's hanger at X {x0 + u:,.0f}"
-                out += [(name, (xa, y0, z0, xb, y0 + 3, z1)), (name, (xa, y0, z0, xb, y0 + f, z0 + 3)),
-                        (name, (xa, y1 - 3, z0, xb, y1, z1)), (name, (xa, y1 - f, z0, xb, y1, z0 + 3))]
+        opts, bx = next((o, x) for o, x in PR.placements(model_specs(self)["UF-03"], b, self) if o["name"] == "guard_hangers")
+        _, y0, z0, _, y1, z1 = bx
+        f, L, t = opts["foot"], 50.0, 3.0
+        ch = self.chassis
+        st = {m.station: m for m in ch.members if m.role.startswith("cm")}
+        front, centre = st["XT front hinge"], st["XT centre"]
+        xa, xb = front.p0[0] + front.sec.b / 2, centre.p0[0] - centre.sec.b / 2
+        def at_web(q):                   # a box that reaches the angle's place beside the web: from the web in by its foot
+            a, c = sorted((abs(q[1]), abs(q[4]))) if q[1] * q[4] > 0 else (0.0, max(abs(q[1]), abs(q[4])))
+            return q[2] < z1 and q[5] > z0 and c > -y0 - f and a < -y0
+
+        taken = [(q[0], q[3]) for c in ch.hinge_cheeks() for q in c["boxes"] if at_web(q)]
+        taken += [(q[0], q[3]) for p in self.xt_parts() for q in p["boxes"] if at_web(q)]
+        edges, free, x = sorted((max(a, xa), min(c, xb)) for a, c in taken if c > xa and a < xb), [], xa
+        for a, c in edges:
+            if a > x:
+                free.append((x, a))
+            x = max(x, c)
+        if x < xb:
+            free.append((x, xb))
+        lo, hi = max(free, key=lambda g: g[1] - g[0])
+        if hi - lo < L:
+            raise ValueError(f"UF-03's hangers: the rails' webs are free for {hi - lo:.1f} mm at most between the hinge crossmembers")
+        xm = (lo + hi) / 2
+        web = f"UF-03's hanger on the rails' webs at X {xm:,.0f}"
+        out = [(web, (xm - L / 2, y0, z0, xm + L / 2, y0 + t, z1)), (web, (xm - L / 2, y0, z0, xm + L / 2, y0 + f, z0 + t)),
+               (web, (xm - L / 2, y1 - t, z0, xm + L / 2, y1, z1)), (web, (xm - L / 2, y1 - f, z0, xm + L / 2, y1, z0 + t))]
+        face = f"UF-03's hanger on {front.id}'s rear face"
+        out += [(face, (xa, -L / 2, z0, xa + t, L / 2, z1)), (face, (xa, -L / 2, z0, xa + f, L / 2, z0 + t))]
         return out
 
     def kit_fit(self) -> dict:
-        """FIT-08 (fx22-rear): every chassis fitting at every place it stands (fitting_parts) and both pieces of the tanks'
-        guard UF-03 (guard_pieces) against the XT kit's parts between the rails (xt_parts), the airbags over their travel
-        and the shocks over the arms'. Each fitting and guard is welded or bolted to the frame, so it may touch a part of
-        the kit, as FIT-03 lets two rigid parts touch, and an overlap past TOL is a clash. Every pair that clashes, with
-        how far it overlaps."""
+        """FIT-08 (fx22-rear): every chassis fitting at every place it stands (fitting_parts), both pieces of the tanks'
+        guard UF-03 (guard_pieces) and the front guard's hanger angles (guard_hanger_parts) against the XT kit's parts
+        between the rails (xt_parts), the airbags over their travel and the shocks over the arms', and the hanger angles
+        against the frame's fittings too (I2-104). Each fitting, guard and hanger is welded or bolted to the frame, so it
+        may touch a part of the kit, as FIT-03 lets two rigid parts touch, and an overlap past TOL is a clash. Every pair
+        that clashes, with how far it overlaps."""
         kit = [(p, bx) for p in self.xt_parts() for bx in p["boxes"]]
-        ours = self.fitting_parts() + self.guard_pieces()
+        fittings = self.fitting_parts()
+        hangers = [(n, (bx, None)) for n, bx in self.guard_hanger_parts()]
+        ours = fittings + self.guard_pieces() + hangers
         found, worst, worst_pair = {}, math.inf, ""
-        for name, s in ours:
-            for p, bx in kit:
-                g = shape_gap(s, (bx, None))
-                if g < worst:
-                    worst, worst_pair = g, f"{name} to {p['id']}"
-                if g < -TOL:
-                    found[(name, p["id"], p["what"])] = max(found.get((name, p["id"], p["what"]), 0.0), -g)
+        pairs_in = [(name, s, p["id"], p["what"], (bx, None)) for name, s in ours for p, bx in kit]
+        pairs_in += [(name, s, fn, "a frame fitting", fs) for name, s in hangers for fn, fs in fittings]   # the hangers on the frame's fittings too
+        for name, s, other, what, o in pairs_in:
+            g = shape_gap(s, o)
+            if g < worst:
+                worst, worst_pair = g, f"{name} to {other}"
+            if g < -TOL:
+                found[(name, other, what)] = max(found.get((name, other, what), 0.0), -g)
         pairs = [dict(part=k[0], kit=k[1], what=k[2], mm=round(v, 1)) for k, v in sorted(found.items(), key=lambda kv: -kv[1])]
         return dict(ok=not pairs, pairs=pairs, smallest_gap_mm=round(worst, 1), governing=worst_pair, parts=len(ours), kit=len(kit))
 

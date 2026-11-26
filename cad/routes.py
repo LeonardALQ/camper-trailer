@@ -532,8 +532,8 @@ def _blocks_of(lay) -> tuple[dict, list]:
         bl += [dict(iid=f"{b.iid} #{k}", id=b.id, name=name, system=b.system, box=tuple(bx), hollow=False, keep_clear=False)
                for k, (name, bx) in enumerate(boxes, 1)]
     for b in (lay.xt_blocks() if hasattr(lay, "xt_blocks") else []):   # the XT kit's parts between the rails (Chassis.xt_parts)
-        bl += [dict(iid=f"{b.iid} #{k}", id=b.iid, name=b.name, system=b.system, box=tuple(bx), hollow=False, keep_clear=False, kit=True)
-               for k, bx in enumerate(b.extra["boxes"], 1)]
+        bl += [dict(iid=f"{b.iid} #{k}", id=b.iid, name=b.name, system=b.system, box=tuple(bx), hollow=False, keep_clear=False, kit=True,
+                    plates=b.extra["part"].get("plates")) for k, bx in enumerate(b.extra["boxes"], 1)]
     return dict(lay.V), bl
 
 
@@ -702,6 +702,7 @@ def _resolve_run(r: dict, ns: dict, K: dict, rule: dict, fixtures: dict, pitch: 
         size0 = float(r["size"]) if r.get("size") is not None else max(s for s in kind["sizes"] if s is not None)
         pts = arm_lead(ns["_arms"][r["wheel"]], pts[0], kind["sizes"][size0]["od"])
         slack = lead_slack(ns["_arms"][r["wheel"]], pts[0], pts[1])
+        r = dict(r, arm={k: ns["_arms"][r["wheel"]][k] for k in ("pivot", "turn")})   # for SVC-13's reading of its loop
     if r["system"] == "waste" and not r.get("pumped"):
         pts = _apply_fall(pts, rule["fall"])
     raw = (sum(math.dist(pts[i], pts[i + 1]) for i in range(len(pts) - 1)) + slack) / 1000
@@ -1098,10 +1099,16 @@ def kit_clearance(res: dict) -> dict:
     """SVC-13: SVC-01's clearance from every run to the XT kit's parts between the rails at Cruisemaster's places (33XT AIR
     sheets 2 to 4, est., Chassis.xt_parts): the hinge bars and the arms' hinge plates, the airbags over their travel and
     their top brackets, the shocks over the arm's travel and their brackets, and no fixture standing in one of them
-    (I2-97). A lead's part that rides on its arm is FIT-05's."""
+    (I2-97). A lead's part that rides on its arm is FIT-05's, but its loop from its clip on the frame to the arm's tray
+    is read here against each of the arm's hinge plates, the tray's end turned with the arm over its travel (loop_gaps)."""
     clear = res["data"]["rules"]["clear_mm"]
     kit = [b for b in res["blocks"] if b.get("kit")]
     problems, gaps = [], []
+    for g in loop_gaps(res):
+        gaps.append(dict(g, limit=clear))
+        if g["gap"] < clear - 0.05:
+            p = g["at"]
+            problems.append(f"{g['run']}'s loop passes {g['part']} ({g['name']}) {g['gap']:.1f} mm clear at X {p[0]:.0f} Y {p[1]:.0f} Z {p[2]:.0f}")
     for run in res["runs"]:
         if run.get("rides"):
             continue
@@ -1131,6 +1138,35 @@ def kit_clearance(res: dict) -> dict:
     tested = sorted(gaps, key=lambda g: g["gap"])
     return dict(ok=not problems, problems=problems, closest=tested[:10], smallest=tested[0]["gap"] if tested else None, limit=clear,
                 runs=sorted({p.split()[0] for p in problems}))
+
+
+def loop_gaps(res: dict, steps: int = 12) -> list[dict]:
+    """Each drum lead's loop (I2-50): the part of its arm part from its clip on the frame to its first tie in
+    Cruisemaster's tray on the A-frame's inner leg, the tie turned with the arm about its pivot over the arm's travel
+    (`arm` `turn`), and its least gap at its outside diameter to each of the arm's hinge plates (Chassis.xt_parts
+    `plates`)."""
+    plates = [(b["id"], b["name"], pl) for b in res["blocks"] if b.get("kit") and b.get("plates") for pl in b["plates"]]
+    out = []
+    for run in res["runs"]:
+        if run.get("rides") != "arm" or not run.get("arm"):
+            continue
+        (px, pz), (a0, a1) = run["arm"]["pivot"], run["arm"]["turn"]
+        clip, tie = run["points"][0], run["points"][1]
+        dx, dz = tie[0] - px, tie[2] - pz
+        best = None
+        for k in range(steps + 1):
+            a = a0 + (a1 - a0) * k / steps
+            q = (px + dx * math.cos(a) - dz * math.sin(a), tie[1], pz + dx * math.sin(a) + dz * math.cos(a))
+            for part, name, pl in plates:
+                if math.dist(clip, (pl[0] / 2 + pl[3] / 2, pl[1] / 2 + pl[4] / 2, pl[2] / 2 + pl[5] / 2)) > 400.0:
+                    continue
+                d, p = seg_box(clip, q, pl)
+                if best is None or d - run["od"] / 2 < best["gap"]:
+                    best = dict(run=run["id"], part=part, name=name, gap=round(d - run["od"] / 2, 1), at=[round(v) for v in p],
+                                turn_deg=round(math.degrees(a), 1))
+        if best:
+            out.append(best)
+    return out
 
 
 def keep_clear_boxes(res: dict) -> list:

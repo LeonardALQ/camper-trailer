@@ -685,14 +685,14 @@ items:
     name: Tank guards
     system: underfloor
     # model: the sheet in two pieces either side of the XT centre crossmember and the Bosch TSC module. The
-    # front one hangs from the rails' inner faces on three pairs of 50 mm angles (H27). The rear one is the bay's shear
+    # front one hangs on 50 mm angles (H27) at the places Layout.guard_hanger_parts finds clear of the cheeks and the kit,
+    # a pair on the rails' inner webs and one on the XT front hinge crossmember's rear face (I2-104). The rear one is the bay's shear
     # panel, its sheet and tongues read from the chassis data (Chassis.shear_panels), bolted up to CH-P17, its envelope
     # the sheet's extent. FIT-05 reads both as cut (Layout.guard_pieces), each front corner stepped clear of the arms
     model: {name: tank_guard, half: rail_in - 3,
             gaps: [[xt_centre_front + xm_w / 2 - 50 - xt_front_hinge_rear, xt_centre_front + xm_w / 2 + 50 - xt_front_hinge_rear]],
             extras: [{name: shear_panel, box: [axle_x + xt_centre_front + xm_w + 5, 3 - rail_in, tank_z0 - 8, xt_rear_shock_front + 45 - xt_centre_front - xm_w - 5, 2 * rail_in - 6, 8]},
                      {name: guard_hangers, foot: 23,
-                      at: [60, (xt_centre_front + xm_w / 2 - 50 - xt_front_hinge_rear) / 2, xt_centre_front + xm_w / 2 - 110 - xt_front_hinge_rear],
                       box: [axle_x + xt_front_hinge_rear, -rail_in, tank_z0 - 9, xt_rear_shock_front - xt_front_hinge_rear, 2 * rail_in, 50 + rail_underside_z - tank_z0]}]}
     price:
       - {item: "3 mm aluminium checker plate for the front tank's guard", aud: 341.75, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/107-aluminium-5-bar-checker-plate-tread.html", date: 2026-11-20, note: "One 1200 x 2400 sheet of 3 mm aluminium checker plate, AUD 261.75 (listing), plus angle and fixings AUD 80 (est.)"}
