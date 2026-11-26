@@ -106,8 +106,8 @@ def test_the_tanks_hold_the_water_the_design_carries():
 
 def test_the_fresh_tanks_keep_their_clearance_to_every_fitting_they_are_notched_round():
     """FIT-03 reads every place of every chassis fitting (Layout.shapes), each hinge gusset as the prism of its cut
-    outline, so the gussets that reach into a fresh tank's corners, and the jacking pads under the XT centre
-    crossmember, stand in the tank's notches (Layout.tank_notches) with the tank's own clearance round them. The XT
+    outline, so the gussets that reach into a fresh tank's corners, behind each hinge crossmember, stand in the tank's
+    notches (Layout.tank_notches) with the tank's own clearance round them. The XT
     kit's airbags, their top brackets, the shocks over the arm's travel and their brackets stand in the tanks' pockets
     the same way (Layout._part_notches, I2-97)."""
     from cad.trailer import shape_gap
@@ -146,9 +146,9 @@ def test_the_rear_bay_clears_the_rear_airbags_their_brackets_and_the_rear_shocks
 
 def test_fit08_reads_the_front_guard_less_its_openings():
     """FIT-08 reads UF-03's front piece as the 3D model cuts it (fx23-mrg): the openings round the front airbags and
-    shocks come from the one list the line carries for its model (Layout.guard_openings), the pieces FIT-08 reads cover
-    the front piece's plan less those openings, and every box of the kit's front airbags and shocks that crosses the
-    sheet's height stands at least 10 mm clear of them in plan, as the openings are cut to 0.1 mm."""
+    shocks come from the one list the line carries for its model (Layout.guard_openings), the convex pieces FIT-08
+    reads stand outside every opening, they and the openings fill the piece's plan, and every box of the kit's front
+    airbags and shocks that crosses the sheet's height stands at least 10 mm clear of them in plan."""
     from cad.trailer import shape_gap
     lay = EV["layout"]
     uf = next(b for b in lay.blocks if b.id == "UF-03")
@@ -157,26 +157,28 @@ def test_fit08_reads_the_front_guard_less_its_openings():
     front = [s for n, s in lay.guard_pieces() if n == "UF-03's front piece"]
     cut = [s for s in front if s[1] is not None]
     assert cut, "FIT-08 reads the front piece whole"
+    z0, z1 = cut[0][0][2], cut[0][0][5]
+    for s in cut:
+        for o in ops:
+            assert shape_gap(s, ((o[0], o[1], z0, o[2], o[3], z1), None)) >= -1e-6, (s[0], o)
 
     def area(pc):
         return abs(sum(a[0] * b[1] - b[0] * a[1] for a, b in zip(pc, pc[1:] + pc[:1]))) / 2
 
-    def union_area(rects):              # the openings may overlap each other, so their union by its grid of edges
-        xs = sorted({v for r in rects for v in (r[0], r[2])})
-        ys = sorted({v for r in rects for v in (r[1], r[3])})
-        return sum((xb - xa) * (yb - ya) for xa, xb in zip(xs, xs[1:]) for ya, yb in zip(ys, ys[1:])
-                   if any(r[0] <= xa and r[2] >= xb and r[1] <= ya and r[3] >= yb for r in rects))
-
-    x0, y0 = min([s[0][0] for s in cut] + [o[0] for o in ops]), min([s[0][1] for s in cut] + [o[1] for o in ops])
-    x1, y1 = max([s[0][3] for s in cut] + [o[2] for o in ops]), max([s[0][4] for s in cut] + [o[3] for o in ops])
-    assert sum(area(s[1]) for s in cut) == pytest.approx((x1 - x0) * (y1 - y0) - union_area(ops), rel=1e-6)
-    z0, z1 = cut[0][0][2], cut[0][0][5]
+    x0, y0 = min(s[0][0] for s in cut), min(s[0][1] for s in cut)
+    x1, y1 = max(s[0][3] for s in cut), max(s[0][4] for s in cut)
+    inside = [(max(o[0], x0), max(o[1], y0), min(o[2], x1), min(o[3], y1)) for o in ops]
+    xs = sorted({v for r in inside for v in (r[0], r[2])} | {x0, x1})
+    ys = sorted({v for r in inside for v in (r[1], r[3])} | {y0, y1})
+    held = sum((xb - xa) * (yb - ya) for xa, xb in zip(xs, xs[1:]) for ya, yb in zip(ys, ys[1:])
+               if any(r[0] <= xa and r[2] >= xb and r[1] <= ya and r[3] >= yb for r in inside))
+    assert sum(area(s[1]) for s in cut) + held == pytest.approx((x1 - x0) * (y1 - y0), rel=1e-6)
     for p in lay.xt_parts():
         if p["id"].startswith(("XT-BAG-", "XT-SHOCK-")):
             for bx in p["boxes"]:
                 if bx[2] < z1 and bx[5] > z0 and bx[0] < x1 and bx[3] > x0:
                     g = min(shape_gap((bx, None), s) for s in cut)
-                    assert g >= 10.0 - 0.05 - 1e-6, (p["id"], bx, g)      # the openings are rounded to 0.1 mm
+                    assert g >= 10.0 - 1e-6, (p["id"], bx, g)
     assert not [q for q in lay.kit_fit()["pairs"] if q["part"] == "UF-03's front piece"]
 
 

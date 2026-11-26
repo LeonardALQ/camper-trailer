@@ -587,8 +587,9 @@ class Layout:
                 continue
             r = (max(min(q[0] for q in rects), x0), max(min(q[1] for q in rects), -half), min(max(q[2] for q in rects), px1),
                  min(max(q[3] for q in rects), half))
-            if r[0] < r[2] and r[1] < r[3]:
-                out.append(tuple(round(v, 1) for v in r))
+            if r[0] < r[2] and r[1] < r[3]:      # to 0.1 mm outward, so an opening cut to the piece's edge leaves no sliver
+                out.append((math.floor(round(r[0] * 10, 6)) / 10, math.floor(round(r[1] * 10, 6)) / 10,
+                            math.ceil(round(r[2] * 10, 6)) / 10, math.ceil(round(r[3] * 10, 6)) / 10))
         return out
 
     def xt_parts(self) -> list[dict]:
@@ -650,8 +651,8 @@ class Layout:
         return out
 
     def _corner_chamfers(self, b, clear: float, t: float) -> list[dict]:
-        """The chamfers in tank b's corners round the other chassis fittings that reach into its box at a corner, the
-        jacking pads CH-P06 under the XT centre crossmember among them: the corner cut away in plan at 45 degrees through
+        """The chamfers in tank b's corners round the other chassis fittings that reach into its box at a corner (the
+        jacking pads CH-P06 were one until they went for the arms' jacking points): the corner cut away in plan at 45 degrees through
         the far corner of the fitting's place grown by `clear`, from `clear` under it to `clear` over it, or to the tank's
         bottom or top where less than two walls would be left. A fitting the data gives only one mass point for, fewer
         places than its count, has no place to clear."""
