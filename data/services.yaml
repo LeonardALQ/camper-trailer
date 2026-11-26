@@ -67,8 +67,9 @@ fittings:
 # members (I2-41): C9B and B-05 under the XT Air box and out through the rails 35 mm behind CM-01, E-07 and B-04
 # behind the box and ahead of CM-02 and the plan braces. A hole whose run follows a member that moves with the axle's
 # solve takes its X from that member, `x: {from: member, dx: mm}` (cad/chassis.py hole_x): K-08's and K-09's on
-# OR-05's centre line, and K-10's exit from the road rail 273 mm ahead of the centre line of CM-04, the XT front
-# hinge crossmember, so CHS-10 reads each where its run makes it wherever the axle's window puts the station.
+# OR-05's centre line, and K-10's exit from the road rail 298 mm ahead of the centre line of CM-04, the XT front
+# hinge crossmember, 248 mm ahead of its front face, where the run's path crosses the rail since that crossmember is
+# 100 mm wide, so CHS-10 reads each where its run makes it wherever the axle's window puts the station.
 holes:
   - {member: OR-05K, face: road side, run: K-08, x: {from: OR-05K}, y: -638, z: 826, d: 16, length: 16}
   - {member: OR-05K, face: kerb side, run: K-08, x: {from: OR-05K}, y: -1200, z: 800, d: 16, length: 16}
@@ -84,7 +85,7 @@ holes:
   - {member: RL-R, face: road side, run: B-05, x: 1905, y: 637, z: 704, d: 14, length: 14}
   - {member: RL-R, face: road side, run: K-01, x: 2360, y: 637, z: 671, d: 16, length: 39}
   - {member: RL-R, face: road side, run: K-10, x: 2442, y: 637, z: 649, d: 30, length: 51}
-  - {member: RL-R, face: road side, run: K-10, x: {from: CM-04, dx: -273}, y: 637, z: 647, d: 30, length: 47}
+  - {member: RL-R, face: road side, run: K-10, x: {from: CM-04, dx: -298}, y: 637, z: 647, d: 30, length: 47}
   - {member: RL-R, face: road side, run: K-01, x: 6021, y: 637, z: 680, d: 16, length: 25}
   - {member: RS-K, face: road side, run: B-18, x: 2015, y: -587, z: 843, d: 14, length: 54}
   - {member: RS-K, face: road side, run: B-16, x: 2267, y: -587, z: 796, d: 28, length: 103}
