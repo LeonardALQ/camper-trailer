@@ -388,9 +388,21 @@ def test_lc8a_reads_both_wheels_of_an_axle_held_at_the_recovery_limit():
     assert lc8["held_axle_n"] % 5000 == 0 and lc8["held_axle_n"] < lc8["force_n"]
 
 
+def test_lc8a_reads_one_held_wheel_at_the_held_wheel_limit():
+    """I2-93 and I2-114: LC8a reads every pull through one held wheel at the data's held-wheel limit, a whole 5 kN at most
+    the rated pull and at least the held-axle limit, and every reading a held wheel governs names that limit."""
+    lc8 = next(lc for lc in CH.data["load_cases"] if lc["id"] == "LC8a")
+    assert lc8["held_wheel_n"] % 5000 == 0 and lc8["held_axle_n"] <= lc8["held_wheel_n"] <= lc8["force_n"]
+    cases = [r["case"] for rows in RES["envelope"].values() for r in rows.values()]
+    cases += [h[k]["case"] for h in RES["holes"] for k in ("static", "ultimate") if h.get(k)]
+    held = [c for c in cases if "through wheel" in c]
+    assert held and all(f"held, at the {lc8['held_wheel_n'] / 1000:g} kN limit" in c for c in held)
+
+
 def test_trailer_md_gives_the_recovery_rule():
-    """I2-93 and I2-100: TRAILER.md's recovery rule quotes LC8a's rating and directions, the held-axle limit and the least
-    pulls that tip the trailer, from the data and the frame analysis (chassis_fea.recovery_rule), as CT-003 does."""
+    """I2-93, I2-100 and I2-114: TRAILER.md's recovery rule quotes LC8a's rating and directions, the held-wheel and
+    held-axle limits and the least pulls that tip the trailer, from the data and the frame analysis
+    (chassis_fea.recovery_rule), as CT-003 does."""
     from pathlib import Path
 
     from cad.chassis_fea import recovery_rule
@@ -399,7 +411,7 @@ def test_trailer_md_gives_the_recovery_rule():
     line = next(x for x in text.splitlines() if x.startswith("- Recovery:"))
     side = min(x for x in (r["sideways_up_kn"], r["sideways_down_kn"]) if x is not None)
     along = min(x for x in (r["along_up_kn"], r["along_down_kn"]) if x is not None)
-    for figure in (f"{r['rated_kn']:.1f} kN", f"{r['held_axle_kn']:g} kN", f"{side:.1f} kN", f"{along:.1f} kN",
+    for figure in (f"{r['rated_kn']:.1f} kN", f"{r['held_wheel_kn']:g} kN", f"{r['held_axle_kn']:g} kN", f"{side:.1f} kN", f"{along:.1f} kN",
                    f"{r['sideways_deg']:g} degrees", f"{r['vertical_deg']:g} degrees"):
         assert figure in line, figure
 

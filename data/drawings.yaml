@@ -66,6 +66,7 @@ drawings:
       - {rev: AV, date: 2026-11-26, description: "Notice: the masses with the shear panel's sheet stepped clear of the arms", drawn: Kiro, checked: "", approved: ""}
       - {rev: AW, date: 2026-11-26, description: "Notice: the masses with the fresh tanks' bearers (UF-01B)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AX, date: 2026-11-26, description: "Notice: the failing checks CHS-08A, CHS-08U and CHS-12 (I2-114)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AY, date: 2026-11-26, description: "Notice: CHS-08U and CHS-12 fail with every wheel free (I2-114)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-002
     title: Mass and centre of gravity
     subtitle: Every load case with growth, the axle window of H17, the CoG in elevation and across
@@ -159,6 +160,7 @@ drawings:
       - {rev: AL, date: 2026-11-26, description: "Notice: the masses, the axle group and the recovery rule from the build", drawn: Kiro, checked: "", approved: ""}
       - {rev: AM, date: 2026-11-26, description: "Notice: the masses and the axle group with the fresh tanks' bearers", drawn: Kiro, checked: "", approved: ""}
       - {rev: AN, date: 2026-11-26, description: "Notice: the held-axle limit 25 kN with the hinge bars read on their bounds", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AO, date: 2026-11-26, description: "Notice: the held-wheel limit 35 kN beside the held-axle limit 25 kN", drawn: Kiro, checked: "", approved: ""}
   - number: CT-010
     title: Floor plan, bed up and bed down
     subtitle: Day and night plans, walkways, door swings, spaces kept clear and the bed positions
@@ -296,6 +298,7 @@ drawings:
       - {rev: AO, date: 2026-11-26, description: "Notice: the frame's results with the tanks on their bearers (CHS-17)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AP, date: 2026-11-26, description: "Memo: the chassis data at revision T (I2-109 to I2-113)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AQ, date: 2026-11-26, description: "Notice: the frame's results on the hinge bars' bounds, data at rev U", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AR, date: 2026-11-26, description: "Notice: the frame's results with the held-wheel limit, data at rev V", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
@@ -340,6 +343,7 @@ drawings:
       - {rev: AF, date: 2026-11-26, description: "Memo: the shear panel's bolt figure with the tanks on their bearers", drawn: Kiro, checked: "", approved: ""}
       - {rev: AG, date: 2026-11-26, description: "Memo: the chassis data at revision T (I2-109 to I2-113)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AH, date: 2026-11-26, description: "Notice: the fittings' readings on the hinge bars' bounds, data at rev U", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AI, date: 2026-11-26, description: "Notice: the fittings' readings with the held-wheel limit, data at rev V", drawn: Kiro, checked: "", approved: ""}
   - number: CT-103
     title: Chassis details
     subtitle: Composite rail, outrigger root, crossmember to rail, overlap end, jacking point, recovery tongue, spare posts
@@ -394,6 +398,7 @@ drawings:
       - {rev: AP, date: 2026-11-26, description: "Memo: the fatigue table with the tanks on their bearers", drawn: Kiro, checked: "", approved: ""}
       - {rev: AQ, date: 2026-11-26, description: "Memo: the chassis data at revision T (I2-109 to I2-113)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AR, date: 2026-11-26, description: "Memo: the chassis data at revision U (I2-114)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AS, date: 2026-11-26, description: "Memo: the chassis data at revision V (I2-114)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads
@@ -453,6 +458,7 @@ drawings:
       - {rev: F, date: 2026-11-26, description: "Memo: the holes' stations 1 mm forward with the axle group", drawn: Kiro, checked: "", approved: ""}
       - {rev: G, date: 2026-11-26, description: "Memo: the chassis data at revision T (I2-109 to I2-113)", drawn: Kiro, checked: "", approved: ""}
       - {rev: H, date: 2026-11-26, description: "Notice: the bearers' and hangers' bolt and rivet nut holes, data at U", drawn: Kiro, checked: "", approved: ""}
+      - {rev: I, date: 2026-11-26, description: "Memo: the chassis data at revision V (I2-114)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-106
     title: XT hinge joint and rear bay shear panel
     subtitle: The kerb-side XT centre joint in plan and section, the rear bay's shear panel and a rail section
@@ -474,6 +480,7 @@ drawings:
       - {rev: I, date: 2026-11-26, description: "Notice: the sheet's steps clear of the arms as sheet 2 draws them", drawn: Kiro, checked: "", approved: ""}
       - {rev: J, date: 2026-11-26, description: "Memo: the chassis data at revision T (I2-109 to I2-113)", drawn: Kiro, checked: "", approved: ""}
       - {rev: K, date: 2026-11-26, description: "Memo: the chassis data at revision U (I2-114)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: L, date: 2026-11-26, description: "Memo: the chassis data at revision V (I2-114)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-201
     title: Body shell
     subtitle: Kerb, road, front and rear walls, the fixed roof plan, the panels and every opening with its size

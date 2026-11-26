@@ -597,8 +597,9 @@ class Analysis:
     def _recovery_envelope(self, lc_id: str, label: str, info: dict, held, pull: dict | None = None):
         """LC8a's supports in each case (I2-94): the largest force on each arm's droop limit and airbag, the tyres off the
         ground, the pulls the trailer tips under before they reach their full size, and each held hinge's force. The counts
-        and the tipping pulls are the rated pulls' (every wheel free or one held); `pull` gives the pull's direction, its
-        size and whether both wheels of an axle are held, whose tipping pulls are kept apart (`axle_tipped`)."""
+        and the tipping pulls are those with every wheel free, at the rated pull, or one held, at the held-wheel limit;
+        `pull` gives the pull's direction, its size and whether both wheels of an axle are held, whose tipping pulls are
+        kept apart (`axle_tipped`)."""
         e = self.lc8_arms.setdefault(lc_id, dict(cases=0, lifted=0, nose_off=0, tipped=[], axle_tipped=[], axle_cases=0, droop={}, bag={},
                                                  hinge={}, lift=dict(mm=0.0), nose=dict(up=0.0, down=0.0)))
         off = info["off"]
@@ -843,10 +844,12 @@ class Analysis:
                             fr = [(self.fm.cm_node(cm, s * V["rail_c"]), 1.0)]
                         sd, vd = lc8["sideways_deg"], lc8["vertical_deg"]
                         pulls = [(f"{h:+d} deg sideways", None, math.radians(h), 1.0) for h in (-sd, 0, sd)]
+                        # one wheel held fast at its hub, the pull through it, at the held-wheel limit (I2-93, I2-114)
                         for w in ch.suspension:
                             hdg = math.atan2(p[1] - w["hub"][1], sx * (p[0] - w["hub"][0]))
                             if abs(hdg) <= math.radians(sd) + 1e-9:
-                                pulls.append((f"{math.degrees(hdg):+.1f} deg sideways through wheel {w['id']}, held", w["id"], hdg, 1.0))
+                                pulls.append((f"{math.degrees(hdg):+.1f} deg sideways through wheel {w['id']}, held, at the "
+                                              f"{lc8['held_wheel_n'] / 1000:g} kN limit", w["id"], hdg, lc8["held_wheel_n"] / lc8["force_n"]))
                         # both wheels of one axle held fast at their hubs, at the recovery limit that case takes (I2-93)
                         for axle in ("front", "rear"):
                             pair = tuple(w["id"] for w in ch.suspension if w["axle"] == axle)
@@ -2399,8 +2402,9 @@ def plate_shear_buckling(x0: float, x1: float, y0: float, y1: float, t: float, h
 
 
 def recovery_rule(results: dict, lc8: dict) -> dict:
-    """The user's recovery rule (I2-93, I2-100), from LC8a's data and the frame analysis's recovery summary: the pull each
-    point is rated for and the directions it holds within, the limit with both wheels of one axle held fast, and the least
+    """The user's recovery rule (I2-93, I2-100, I2-114), from LC8a's data and the frame analysis's recovery summary: the pull
+    each point is rated for with every wheel free and the directions it holds within, the limits with one wheel and with
+    both wheels of one axle held fast, and the least
     pull, in kN, that tips the trailer before the rated pull when it is pulled up or down, sideways and along its line,
     and whether any level pull does."""
     tc = results["recovery"]["LC8a"]["tip_classes"]
@@ -2409,7 +2413,8 @@ def recovery_rule(results: dict, lc8: dict) -> dict:
     def least(prefix: str):
         ks = [v["kn"] for k, v in tc.items() if k.startswith(prefix)]
         return min(ks) if ks else None
-    return dict(rated_kn=lc8["force_n"] / 1000, sideways_deg=lc8["sideways_deg"], vertical_deg=vd, held_axle_kn=lc8["held_axle_n"] / 1000,
+    return dict(rated_kn=lc8["force_n"] / 1000, sideways_deg=lc8["sideways_deg"], vertical_deg=vd, held_wheel_kn=lc8["held_wheel_n"] / 1000,
+                held_axle_kn=lc8["held_axle_n"] / 1000,
                 sideways_up_kn=least(f"sideways +{vd}"), sideways_down_kn=least(f"sideways -{vd}"),
                 along_up_kn=least(f"along +{vd}"), along_down_kn=least(f"along -{vd}"),
                 level_tips=any(k.endswith(" +0") for k in tc))
