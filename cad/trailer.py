@@ -926,7 +926,7 @@ class Layout:
         hinge crossmembers where no hinge cheek, cheek step or kit part stands on the web over the angle's height, and one on
         the XT front hinge crossmember's rear face on the centreline, between the hinge bars, each 50 mm long, its upright
         leg on the steel and its foot `foot` long under the guard plate's edge. The XT centre crossmember's front face takes
-        none: between its hinge bars the Bosch TSC module fills it."""
+        none: the guard ends 25 mm ahead of it, and the Bosch TSC module hangs under its rear half between its bars."""
         from .model import products as PR
         from .trailer_model import model_specs
         b = next(b for b in self.blocks if b.id == "UF-03")
