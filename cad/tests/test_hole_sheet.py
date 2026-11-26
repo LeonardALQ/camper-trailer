@@ -170,6 +170,7 @@ def test_every_hole_record_is_cut_once_in_the_3d_model():
             short.append((h["id"], hits, len(CH.targets(h))))
     assert not short, short
     vents = CH.plate_vents(ch)
-    assert len(vents) == 4
+    per_plate = len(next(o for o in ch.data["sealed_overlaps"] if o["id"] == "CH-P07")["vents"])
+    assert len(vents) == per_plate * len(ch.shock_plates())
     for v in vents:
         assert sum(1 for b in solids if _meets(b, np.array(v["centre"]), np.array((1.0, 0.0, 0.0)), v["d"] / 2)) == 1, v
