@@ -103,10 +103,8 @@ hub, the air released from the springs first, and the jack's push reaches the fr
 its airbag's top bracket (LOC-04). Each recovery point is rated 58.9 kN, and the frame
 limits the pull to 40 kN with every wheel free, 15 kN with one wheel held fast and 15 kN with both wheels of one axle held,
 each by the rule the largest pull at which every check passes on the twin hinge crossmembers with the bars' 120 mm runs
-(`CHASSIS.md` revision AE), and CT-003 gives the user the rule: pull at a lug or tongue within 30 degrees sideways, or
-at the coupling along the trailer's line only, all within 15 degrees up or down. Pulled level the trailer does not tip
-within the limits. Pulled 30 degrees sideways and 15 degrees up at a rear tongue the empty trailer can tip from 28.7 kN,
-and pulled 15 degrees up at the coupling from 21.7 kN. Every check is read
+(`CHASSIS.md` revision AE). A pull that tips the trailer never reaches the frame at its full size, so the user's limits
+below keep it on its wheels as well. Every check is read
 on the hinge bars rigid and elastic at their own section on the arms' free and stiff bushes. The hinge bars' weld runs set all three limits, each hinge's runs taking
 the bar's twist from the arm's pull 77 mm under the bar (`CHASSIS.md` revisions AC and AE).
 Every check passes, and
@@ -119,6 +117,36 @@ crossmember's front face, 50 mm further forward than it stood, since no crossmem
 A planning-level proposal for the engineer to check. The drawings are drafts, not for construction.
 
 <Chassis kind="summary" />
+
+## Recovery limits
+
+Pull only at a front lug or a rear tongue within 30 degrees of the trailer's line sideways, or at the coupling along the
+trailer's line only, all within 15 degrees up or down, and no harder than the limit for what can be seen at the point. A
+wheel that cannot be seen down to the ground, or one against a rock, log, stump or bank, counts as held.
+
+| The line on | Every wheel seen free, the line level or falling | Every wheel seen free, the line rising | A wheel not seen free |
+| --- | --- | --- | --- |
+| A front lug | 40 kN | 25 kN | 15 kN |
+| A rear tongue | 30 kN | 20 kN | 15 kN |
+| The coupling | 40 kN | 15 kN | 15 kN |
+
+Each limit is the lesser of the frame's for the wheel states it allows and 75 % of the least pull that tips the trailer
+in it, empty or fully loaded, coupled or not, rounded down to 5 kN, after the mobile crane's practice of rating its load
+at no more than 75 % of the tipping load (SAE J765 and ISO 4305, est. as an analogy). The empty trailer tips from 21.7 kN
+at the coupling pulled along its line and 15 degrees up, 28.7 kN at a rear tongue pulled 30 degrees across the trailer
+and 15 degrees up, 38.1 kN at a front lug pulled 23 degrees across the trailer and 15 degrees up, and 42.8 kN at a rear
+tongue pulled along its line and 15 degrees down. Pulled level it does not tip up to the points' 78.5 kN ultimate, on
+level ground (est.).
+
+The limit is the force at the point, read by a load cell there or set by a winch whose rated line pull on the layer in
+use is no more than the limit, and a snatch block at the point doubles the force there. No kinetic rope or snatch strap
+is used on the trailer, since its peak force is not known. The ute's own traction reaches about 35 kN at its 4,500 kg GVM
+on ground gripping at 0.8 (est.), so the ute pulls the trailer, coupled or on a static strap, only where the limit is
+40 kN. On wet grass a sideways pull slides the empty trailer toward it from 14.7 kN. While the line is loaded everyone
+stands at least 1.5 times its length away, out of its line and off the side the trailer can slide or tip toward, the
+distance [Queensland's Office of Fair Trading](https://productsafety.gov.au/system/files/Recovery%20straps%20safety%20flyer%20%28Queensland%20OFT%29.pdf)
+asks for a recovery strap and [winch makers](https://sdda.semadata.org/Standard/Rough%20Country/92RS4500.pdf) ask for a
+winch cable. CT-003 gives the same table and rules.
 
 ## 3D model
 
