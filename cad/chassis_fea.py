@@ -563,6 +563,18 @@ class Analysis:
                     f[i] = rest[s["d"]]
             return Ft, f
 
+        def sliding(Fv, caps):
+            """Every wheel free and the tyres' grip short of the side force: each tyre across at its grip against it and
+            the hubs along the trailer holding the pull along and in yaw, so the loads up can be found with them before
+            the slide is judged on the tyres' settled loads."""
+            load = np.array([Fv[0], Fv[1], p[0] * Fv[1] - p[1] * Fv[0]])
+            f = np.where(gripped, -math.copysign(1.0, Fv[1]) * caps, 0.0)
+            rest = load + f @ gp
+            K = (gp[~gripped].T * kp[~gripped]) @ gp[~gripped]
+            u = np.zeros(3)
+            u[[0, 2]] = np.linalg.solve(K[np.ix_([0, 2], [0, 2])], rest[[0, 2]])
+            return np.where(gripped, f, -kp * (gp @ u))
+
         def vertical(left):
             """The forces up on the supports that can only push, and the tyres off the ground, or None where it tips."""
             off: set = set()
@@ -591,11 +603,11 @@ class Analysis:
             out = None
             for _ in range(30):
                 caps = np.array([mu * N[s["grip"]] if (mu is not None and s["grip"] is not None) else UNCAPPED for s in flat])
-                fp, Ft, turn = plan(Fv, caps), Fv, False
-                if fp is None:
-                    if not one:
-                        return None, "slides"
+                fp, Ft, turn, slid = plan(Fv, caps), Fv, False, False
+                if fp is None and one:
                     (Ft, fp), turn = turned(Fv, caps), True
+                elif fp is None:
+                    fp, slid = sliding(Fv, caps), True
                 left = np.r_[Ft, np.cross(p, Ft)]
                 for i, s in enumerate(flat):
                     e = np.eye(3)[s["d"]] * fp[i]
@@ -609,7 +621,7 @@ class Analysis:
                 if mu is None or max(abs(Nn[k] - N[k]) for k in N) < 0.5:
                     break
                 N = Nn
-            return out, None
+            return (None, "slides") if slid else (out, None)
 
         lam, (st, why) = 1.0, state(1.0)
         limit = None
