@@ -504,37 +504,81 @@ def test_the_hinge_runs_fail_on_every_case_through_the_joint_and_give_vsb1s_rig_
 
 def test_the_bottom_wall_under_the_front_fillets_is_read_as_the_plate_it_is():
     """The conductor's ruling of 27 Nov 2026: the hinge crossmember's bottom wall under each run's front fillet comes from
-    its plate model (cad/wall_plate.py), which gives Timoshenko's square plate, the data takes its soft bound and gives
-    the stiff one beside it, the frame model's front weld points stand on the wall's flat with the run's share of it in
-    series and the rear ones over the rear web without it, and FAT-25 reads the wall's bending at the fillets' toes."""
+    its plate model (cad/wall_plate.py), which gives Timoshenko's square plate, and the data keeps its bounds for the
+    RHS 150 x 100 x 6 they were read on. Since 27 Nov 2026 the hinge crossmembers are the twin of two RHS 150 x 50 x 6,
+    whose fillets all stand over webs, so the frame model puts no wall in series under any weld point, the wall's flats
+    read none, and FAT-25 reads no wall and says so. On the single tube the front fillet still reads its flat."""
+    from dataclasses import replace
     from cad import wall_plate as WP
+    from cad.chassis import wall_flats
     from cad.frame import E_STEEL
     b = CH.data["xt_hinges"]["bar"]
     wall = b["wall"]
     assert WP.check_square_plate() == pytest.approx(0.01160, rel=0.01)
-    cm = CH.hinge_crossmembers()[0]
-    assert all(m.sec.id == cm.sec.id for m in CH.hinge_crossmembers())
+    single = CH.sections[wall["section"]]
+    assert single.id == "RHS_150x100x6" and single.cells == 1
     y_in = CH.V["rail_c"] - CH.role_sec["rail"].b / 2
     runs = [(u - b["run"] / 2, u + b["run"] / 2) for u in b["runs"]]
     for key, data in (("mid/pinned", wall), ("flat/clamped", wall["other"])):
-        r = WP.model(cm.sec, 2 * y_in, runs, *key.split("/"))
+        r = WP.model(single, 2 * y_in, runs, *key.split("/"))
         assert [q["uniform"] / 1000 for q in r["runs"]] == pytest.approx(data["kn_mm"], abs=0.051), key
         assert [q["hot_even"] * 1000 for q in r["runs"]] == pytest.approx(data["toe_mpa_kn"], abs=0.051), key
         assert all(q["k"] >= q["uniform"] for q in r["runs"])          # the rigid bar's spread is the stiffer
     assert all(a < c for a, c in zip(wall["kn_mm"], wall["other"]["kn_mm"]))
+    bw = CH.data["xt_arms"]["parts"]["bar"]["w"]
+    for cm in CH.hinge_crossmembers():
+        assert cm.sec.cells == 2 and cm.sec.cell == "RHS_150x50x6" and cm.sec.b == 2 * CH.sections["RHS_150x50x6"].b
+        assert wall_flats(CH, cm, CH.hinge_bar_x(cm), bw) == {-1: False, 1: False}, cm.id
+        one = replace(cm, sec=single)
+        assert wall_flats(CH, one, CH.hinge_bar_x(one), bw) == {-1: True, 1: False}, cm.id
     fm = CH.frame(None, "crossmember", "elastic", "free")
-    xyz = fm.f.nodes
     k_weld = E_STEEL * 0.7 * b["leg"] / b["leg"] * b["run"]          # one fillet's normal stiffness over its run, N/mm
     for w in CH.suspension:
-        cmw = next(m for m in CH.members if m.station == w["station"] and m.role == "cm_xt")
-        xb = CH.hinge_bar_x(cmw)
-        rear = sum(E_STEEL * el.sec.A for el in fm.f.elements if el.member == f"hinge {w['id']}" and xyz[el.i][0] > xb)
-        assert rear == pytest.approx(len(b["runs"]) * k_weld, rel=1e-9), w["id"]
-        k_front = sum(1 / (1 / (s * k_weld) + 1 / (s * kw * 1000)) for kw in wall["kn_mm"] for s in (1 / 6, 2 / 3, 1 / 6))
-        k_model = sum(E_STEEL * el.sec.A for el in fm.f.elements if el.member == f"hinge {w['id']}" and xyz[el.i][0] < xb)
-        assert k_model == pytest.approx(k_front, rel=1e-9), w["id"]
+        welds = [el for el in fm.f.elements if el.member == f"hinge {w['id']}"]
+        assert sum(E_STEEL * el.sec.A for el in welds) == pytest.approx(2 * len(b["runs"]) * k_weld, rel=1e-9), w["id"]
     fat = next(f for f in RES["fatigue"] if f["id"] == "FAT-25")
-    assert fat["range_mpa"] > 0 and fat["hot_spot"] and "inboard on CM-" in fat["where"]
+    assert fat["range_mpa"] == 0 and fat["ok"] and "both fillets over webs" in fat["where"]
+
+
+def test_the_twin_hinge_crossmembers_seams_dip_and_bolts():
+    """fx37-twin: each XT hinge crossmember is two RHS 150 x 50 x 6 seam welded. CHS-20 reads the seams in every case
+    through the hinge joint, LC1 to LC5b, LC8a at the pull and its ultimate and LC8b, on all three models, against the
+    weld's strength over each case's factor, with VSB1's rig cases beside it. The dip reads each tube as its own closed
+    section with its own drain and vent through the rail's web at both ends, the two webs face to face are a sealed
+    overlap with the guide's vents, and each bolt of the bearers and the front guard's hanger passes all four webs."""
+    from cad.chassis_dip import frame_sections
+    from cad.chassis_fea import RIG_CASES
+    seams = RES["local"]["hinge_seams"]
+    lcs = {lc["id"]: lc for lc in CH.data["load_cases"]}
+    mat = CH.data["material"]
+    wcap = mat["weld_phi"] * 0.6 * mat["weld_fuw"]
+    assert {p["part"].split(",")[0] for p in seams["parts"]} == {"LC1", "LC2", "LC3", "LC4", "LC5a", "LC5b", "LC8a", "LC8u", "LC8b"}
+    assert {p["part"].split(", the hinge bars ")[1] for p in seams["parts"]} == {"rigid", "elastic on free bushes", "elastic on stiff bushes"}
+    for p in seams["parts"]:
+        lc = p["part"].split(",")[0]
+        assert p["limit_mpa"] == pytest.approx(wcap / (lcs[lc]["factor"] if lc in lcs else 1), rel=1e-12), p["part"]
+    assert {k.split(",")[0] for k in seams["beside"]} == set(RIG_CASES)
+    sd = CH.data["xt_hinges"]["seam"]
+    assert seams["throat_mm"] == pytest.approx(min(sd["throat_r"] * 15.0, 6.0))
+    twins = {cm.id for cm in CH.hinge_crossmembers()}
+    sections, holes = frame_sections(CH)
+    ids = {s.id for s in sections}
+    for cm in twins:
+        assert cm not in ids and {f"{cm}.1", f"{cm}.2"} <= ids
+        for k in (1, 2):
+            for e in (0, 1):
+                mine = [h for h in holes if h["tube"] == f"{cm}.{k}" and h["end"] == e and h["via"] == "host"]
+                assert sorted(h["use"] for h in mine) == ["drain", "vent"], (cm, k, e)
+    assert all(r["ok"] for r in RES["galvanising"]["sections"] if r["id"].split(".")[0] in twins)
+    tw = next(o for o in RES["galvanising"]["overlaps"] if o["id"] == "TWIN")
+    assert tw["ok"] and tw["need_n"] == 2 and tw["need_d"] == 12
+    vents = [h for h in holes if h["member"] in twins and h.get("through")]
+    assert {h["member"] for h in vents} == twins and all(h["d"] >= tw["need_d"] for h in vents)
+    by_bolt: dict = {}
+    for f in EV["layout"].fixing_holes():
+        if f["member"] in twins:
+            by_bolt.setdefault((f["member"], round(f["y"]), round(f["z"])), set()).add(f["face"])
+    assert by_bolt and all(v == {"front web", "front tube's rear web", "rear tube's front web", "rear web"} for v in by_bolt.values())
 
 
 def test_the_coupling_is_a_pull_point_under_the_same_limits():

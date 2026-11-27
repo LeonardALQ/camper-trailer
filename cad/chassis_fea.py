@@ -1844,7 +1844,7 @@ class Analysis:
             best = (0.0, "", "")
             for cid, res in lc1.items():
                 s, where = max(candidates(d, res))
-                if s > best[0]:
+                if s > best[0] or not best[1]:       # a row that reads nothing still says where and why (FAT-25 on the twin)
                     best = (s, where, cid)
             ds, where, cid = best
             cafl = 0.585 * d["fat"]
