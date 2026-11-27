@@ -170,6 +170,7 @@ drawings:
       - {rev: AP, date: 2026-11-26, description: "Notice: recovery limits 55 kN with a wheel held and 50 kN with an axle", drawn: Kiro, checked: "", approved: ""}
       - {rev: AQ, date: 2026-11-26, description: "Memo: 375 L of water, the masses and the tipping pull from the build", drawn: Kiro, checked: "", approved: ""}
       - {rev: AR, date: 2026-11-27, description: "Notice: recovery limits 45 kN free, 40 kN a wheel held, 30 kN an axle held", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AS, date: 2026-11-27, description: "Notice: recovery limits 25 kN free, 15 kN a wheel held, 10 kN an axle held", drawn: Kiro, checked: "", approved: ""}
   - number: CT-010
     title: Floor plan, bed up and bed down
     subtitle: Day and night plans, walkways, door swings, spaces kept clear and the bed positions
@@ -313,6 +314,7 @@ drawings:
       - {rev: AS, date: 2026-11-26, description: "Notice: XT hinge crossmembers RHS 150 x 100 x 6, rear faces kept (I2-114)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AT, date: 2026-11-26, description: "Memo: the axle group at X 4,491.8, the frame's stresses rounded half up", drawn: Kiro, checked: "", approved: ""}
       - {rev: AU, date: 2026-11-27, description: "Notice: the cheek fillers CH-P18, the stresses at the new recovery limits", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AV, date: 2026-11-27, description: "Notice: the stresses at the recovery limits of 25, 15 and 10 kN (I2-121)", drawn: Kiro, checked: "", approved: ""}
   - number: CT-102
     title: Drawbar and coupling
     subtitle: Plan, elevation, coupling plate, chain lugs, jockey wheel, front recovery lugs and stone guard
@@ -360,6 +362,7 @@ drawings:
       - {rev: AI, date: 2026-11-26, description: "Notice: the fittings' readings with the held-wheel limit, data at rev V", drawn: Kiro, checked: "", approved: ""}
       - {rev: AJ, date: 2026-11-26, description: "Notice: the front hinge cheeks run on to the bars, the plate list (I2-114)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AK, date: 2026-11-27, description: "Notice: the hinge bars' weld runs and the bars in the local checks (I2-119)", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AL, date: 2026-11-27, description: "Notice: the hinge runs read run by run, the cheeks' GMAW flare bevels", drawn: Kiro, checked: "", approved: ""}
   - number: CT-103
     title: Chassis details
     subtitle: Composite rail, outrigger root, crossmember to rail, overlap end, jacking point, recovery tongue, spare posts
@@ -417,6 +420,7 @@ drawings:
       - {rev: AS, date: 2026-11-26, description: "Memo: the chassis data at revision V (I2-114)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AT, date: 2026-11-26, description: "Notice: the wider hinge crossmembers' holes and the cheeks' tails (I2-114)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AU, date: 2026-11-27, description: "Memo: the chassis data at revision X and a hole's figure", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AV, date: 2026-11-27, description: "Memo: the fatigue ranges with the hinge bars held at their welds", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads
@@ -507,6 +511,7 @@ drawings:
       - {rev: L, date: 2026-11-26, description: "Memo: the chassis data at revision V (I2-114)", drawn: Kiro, checked: "", approved: ""}
       - {rev: M, date: 2026-11-26, description: "Notice: the hinge joints on RHS 150 x 100 x 6, the front cheeks' tails", drawn: Kiro, checked: "", approved: ""}
       - {rev: N, date: 2026-11-27, description: "Notice: the front hinge cheeks on fillers CH-P18, each at its share", drawn: Kiro, checked: "", approved: ""}
+      - {rev: O, date: 2026-11-27, description: "Notice: GMAW flare bevels at 5/8 R, the fillers' chamfer and end weld", drawn: Kiro, checked: "", approved: ""}
   - number: CT-201
     title: Body shell
     subtitle: Kerb, road, front and rear walls, the fixed roof plan, the panels and every opening with its size
