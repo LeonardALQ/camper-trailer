@@ -5,7 +5,11 @@
 # cad/chassis_fea.py analyses them. Sections come from data/chassis/sections.yaml (report 11's table).
 id: ASM-CH
 name: Chassis and drawbar
-revision: X     # X, 27 Nov 2026: each front hinge cheek welded to a filler CH-P18 under its crossmember's front half, which the
+revision: Y     # Y, 27 Nov 2026: each weld run of the elastic hinge bars held at its welds' own stiffness and read on its own
+                # (CHS-18), the cheeks' and fillers' flare bevels made by GMAW (CHS-14), the grey tank on bearers of its own
+                # UF-08B bolted through the XT rear shock and rear crossmembers, which carry it and its grey water in the
+                # frame model (CHS-17), and the recovery limits found again by their rule (I2-121 to I2-123).
+                # X, 27 Nov 2026: each front hinge cheek welded to a filler CH-P18 under its crossmember's front half, which the
                 # hinge bar's front face meets (xt_hinges `filler`), each cheek read at its own joint and share (CHS-14), the
                 # hinge bars' weld runs read (CHS-18) and the bars and their plates reported (CHS-19), and the recovery limits
                 # found again with every wheel free (LC8a `free_n`), one wheel held and an axle held (I2-118, I2-119).
