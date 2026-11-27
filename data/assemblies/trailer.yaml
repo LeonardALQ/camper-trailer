@@ -148,9 +148,10 @@ params:
   tank_r_l: min(xt_rear_shock_front - 10, wet_x0 - axle_x) - (xt_centre_rear + 10)   # to 10 mm ahead of the XT rear shock crossmember, or to the wet room's front (145 mm ahead of the shower well WR-10) if that is nearer, so the board's 230 V and 48 V runs from G20 cross to G15 behind it, ahead of G13's waste (I2-22): 666.8 mm at X 4,497.2 (760 mm before the 4,000 kg plate)
   grey_x0: axle_x + xt_rear_shock_front + xm_w + 10   # grey tank in the rear bay, behind the XT rear shock crossmember
   grey_l: body_x1 - xm_w - 50 - grey_x0   # to 50 mm ahead of the rear crossmember, where the lamp looms K-01, K-08 and K-09 rise, so it follows the axle: 771.8 mm at X 4,497.2 (890 mm at X 4,379.9 before the 4,000 kg plate)
-  grey_w: 1040               # wider than the fresh tanks: the rear bay has no airbag or shock mount, and the rear recovery tongues stand 22 mm outboard of it
-  grey_z0: rail_underside_z - 44   # 44 mm below the rails, so the grey-bay floor crossmember crosses its middle above it and the guard stays inside the underfloor zone
-  grey_h: 194                # 759.8 x 1,028 x 182 mm inside at X 4,497.2, 133.3 L net with its baffle and a 10 mm air gap (report 21 asks 130 L). Wider and 4 mm deeper than before the 4,000 kg plate, for the bay 126 mm shorter
+  grey_w: 1115               # wider than the fresh tanks: the rear bay has no airbag or shock mount, so it reaches to 10 mm inside the rear recovery tongues CH-P05, 567.5 mm off the centreline (I2-122). 1,040 mm until 27 Nov 2026, when it stood on its guard and was 15 mm deeper
+  grey_guard_gap: 10         # its guard hangs this far under its bottom (I2-122): the 6 mm HDPE bottom sags about 5.5 mm at the most (est.) between its three cross baffles and as the welded box spans its bearers, full at camp, and 4.5 mm to spare
+  grey_z0: rail_underside_z - 50 + 2 + grey_guard_gap   # the guard's 2 mm sheet lies on the underfloor zone's floor, 50 mm under the rails, and the tank's bottom stands grey_guard_gap over it, so the guard carries only itself (I2-122). The grey-bay floor crossmember crosses its middle above it. 44 mm below the rails until 27 Nov 2026, its bottom on the guard
+  grey_h: rail_top_z - grey_z0   # its top at the rails' top, under the shower well, so every drain falls to it
   # ---------------------------------------------------------------- equipment (report 13)
   diesel_l: 15               # heater fuel tank (report 13 open question 6)
   diesel_tank_l: 440         # 440 x 400 x 100 mm HDPE tank, 17.6 L gross (estimate)
@@ -759,19 +760,49 @@ items:
     point: [diesel_tank_x0 + diesel_tank_l / 2, 0, floor_underside_z - 10 - 50]
     mass: {basis: declared, total_kg: 12.6, maturity: spec, source: "Report 13: 15 L at 0.84 kg/L"}
   - id: UF-08
-    name: Grey water tank, 130 L net, welded 6 mm HDPE, one baffle, in the rear bay behind the XT rear shock crossmember
+    name: Grey water tank, 130 L net, welded 6 mm HDPE, three cross baffles, in the rear bay behind the XT rear shock crossmember
     model: {name: hdpe_tank, wall: 6}
     material: "6 mm food-grade HDPE, welded"
     system: underfloor
-    price: {aud: 900, basis: estimate, url: "https://www.plasticonline.com.au/services/plastic-tank-fabrication/", date: 2026-11-20, note: "Welded by a plastic fabricator to the bay's size, with its fittings (research report 21)"}
+    price:
+      - {item: "Welded 6 mm HDPE grey tank, the bay's size, three cross baffles, its ends stepped onto its bearers, with its fittings", aud: 900, basis: estimate, url: "https://www.plasticonline.com.au/services/plastic-tank-fabrication/", date: 2026-11-20, note: "Welded by a plastic fabricator to the bay's size, with its fittings (research report 21)"}
+      - {item: "Two padded stainless straps holding it down to its bearers (UF-08B), with their bolts", aud: 45, basis: estimate, date: 2026-11-27, note: "As each fresh tank's two straps (UF-01)"}
     zone: underfloor
     box: [grey_x0, -grey_w / 2, grey_z0, grey_l, grey_w, grey_h]
-    net: {wall: 6, air_gap: 10, cross: 1}
+    net: {wall: 6, air_gap: 10, cross: 3, notch_clear: 10}
     parts:
       - {item: "Shell of 6 mm HDPE at 950 kg/m3, 5.7 kg/m2, the bay's size", kg: "2 * (grey_l * grey_w + grey_l * grey_h + grey_w * grey_h) * 5.7e-6", basis: calculated, source: "Research report 21 section 10 build, resized to the bay"}
-      - {item: "Baffle of 6 mm HDPE, the tank's section", kg: "grey_w * grey_h * 5.7e-6", basis: calculated}
+      - {item: "Three cross baffles of 6 mm HDPE, each the tank's section", kg: "3 * grey_w * grey_h * 5.7e-6", basis: calculated}
       - {item: "40 mm inlets, vent, level sender, 40 mm outlet with a lever valve and camlock", kg: 0.8, basis: estimate}
-    note: Every drain falls to it by gravity, so its top stays at the rails' top, under the shower well. It sits on two aluminium angle bearers between the XT rear shock and rear crossmembers on 10 mm rubber, strapped up to the grey-bay crossmember. Vent to the road side, outlet and camlock on the kerb side. Empty for travel except in TC7 and TC8.
+      - {item: "Two padded stainless straps and their bolts", kg: 0.5, basis: estimate}
+    note: Every drain falls to it by gravity, so its top stays at the rails' top, under the shower well. Its ends sit on four galvanised steel angles bolted through the XT rear shock and rear crossmembers (UF-08B) on 10 mm rubber, each end stepped up onto the rubber, held down by two padded stainless straps, and the welded box spans between them. Its three cross baffles keep its bottom's sag in each cell to about 5.5 mm at the most (est.), so its guard UF-09 hangs grey_guard_gap under it and carries only itself (I2-122). Vent to the road side, outlet and camlock on the kerb side. Empty for travel except in TC7 and TC8.
+  - id: UF-08B
+    name: Grey tank's bearers, galvanised steel angles bolted through the XT rear shock and rear crossmembers under the tank's ends
+    model: {name: tank_bearers, box: [grey_x0 - 10, -grey_w / 2, rail_underside_z - 20, grey_l + 60, grey_w, 80]}
+    material: "Unequal angle 75 x 50 x 6, AS/NZS 3679.1 grade 300, hot-dip galvanised, M10 8.8 galvanised bolts through both webs of each crossmember on crush tubes, 10 mm EPDM strip"
+    system: underfloor
+    # Layout.tank_bearers places them as UF-01B's, a pair either side of the centreline at each place, `y` mm off the
+    # centreline. A place may set its own `z`, `up`, `foot` and `bolt_z`. On the XT rear shock crossmember's rear face the
+    # bolts stand over the shear panel's angles CH-P17 on its front web, one hole clear of their welds' toes, and between
+    # the shock support plates CH-P07. On the rear crossmember's front face the angle's long leg is its foot, reaching
+    # 25 mm under the tank's end, and the foot stands 20 mm over the lamp looms K-01 and K-09 under the crossmember's
+    # front edge, inboard of the looms K-08 and K-09 where they rise and outboard of the rear junction box LJ-01. CHS-17
+    # reads them, and UF-09's hangers' rivet nuts are `hanger_bolts` as UF-01B's are UF-03's
+    bearers:
+      angle: {up: 75, foot: 50, t: 6, fy: 300, fu: 440}
+      z: rail_underside_z - 12.5
+      rubber: 10
+      clear: 5
+      bolts: {size: M10, d: 10, hole: 11, z: 60, per: 2, end: 30, fuf: 830, a_s: 58.0, a_c: 52.3, washer: 20}
+      member_fu: 500
+      hanger_bolts: {size: M8, z: 80.5, hole: 9, rail: {nut: "M8 steel blind rivet nut, flat head, for a 3.0 to 5.5 mm grip", hole: 11}}
+      places:
+        - {tank: UF-08, station: XT rear shock, face: rear, y: [40, 240]}
+        - {tank: UF-08, station: rear, face: front, y: [360, 485], z: rail_underside_z + 7.5, up: 50, foot: 75, bolt_z: 28}
+    price: {aud: 65, basis: estimate, date: 2026-11-27, note: "0.65 m of 75 x 50 x 6 unequal angle at about AUD 15 a metre, AUD 10, galvanised at GLV-01's AUD 2.75/kg, AUD 11, eight M10 8.8 galvanised bolts with nyloc nuts and crush tubes, AUD 32, and the EPDM strip, AUD 12 (est.), as UF-01B's"}
+    point: [grey_x0 + grey_l / 2, 0, rail_underside_z + 15]
+    mass: {basis: declared, total_kg: 5.0, maturity: calculated, source: "0.65 m of 75 x 50 x 6 unequal angle at 5.66 kg/m (AS/NZS 3679.1), 3.7 kg, its zinc 0.1 kg, eight M10 bolts with nuts, washers and crush tubes 0.8 kg and 0.65 m of 10 mm EPDM strip, 44 mm wide on the front feet and 69 mm on the rear, 0.4 kg (calculated, as UF-01B's)"}
+    note: "Bearers of the grey tank's own (I2-122), as UF-01B's are the fresh tanks'. Its front end sits on a pair on the XT rear shock crossmember's rear face and its rear end on a pair on the rear crossmember's front face, and the tank spans between them as the welded box it is. CHS-17 reads every bearer, its bolts and the crossmembers' webs at them in LC1 to LC3"
   - id: UF-08W
     name: Grey water, 130 L, carried only in the grey-full cases TC7 and TC8
     system: underfloor
@@ -780,20 +811,23 @@ items:
     box: [grey_x0 + 6, -grey_w / 2 + 6, grey_z0 + 6, grey_l - 12, grey_w - 12, grey_full_l * 1e6 / ((grey_l - 12) * (grey_w - 12))]
     mass: {basis: declared, total_kg: 130, maturity: spec, source: "grey_full_l at 1 kg per litre (research report 21 section 10)"}
   - id: UF-09
-    name: Grey tank guard, 2 mm aluminium on rubber, bolted to the rails
+    name: Grey tank guard, 2 mm aluminium on rubber strips on its hangers, hung grey_guard_gap under the grey tank
     material: "2 mm aluminium sheet on rubber strips"
     system: underfloor
-    # model: hung 44 mm under the rails on three pairs of 50 mm angles bolted to the rails' inner faces, 200 mm ahead of the
-    # bay's middle, 60 mm behind it and 40 mm from its rear end, clear of the dump line at X 5,450 and of the rear steadies (H27)
-    model: {name: tank_guard, extras: [{name: guard_hangers, foot: 47.5, at: [grey_l / 2 - 200, grey_l / 2 + 60, grey_l - 40],
-                                        box: [grey_x0, -rail_in, grey_z0 - 9, grey_l, 2 * rail_in, rail_underside_z + 25 - grey_z0 + 9]}]}
+    # model: the sheet on the underfloor zone's floor, 50 mm under the rails, on three pairs of 50 mm angles fixed to the
+    # rails' inner webs, 200 mm ahead of the bay's middle, 60 mm behind it and 30 mm ahead of the rear recovery tongues
+    # CH-P05, clear of the dump line at X 5,450, the level sender's lead N-10 and the rear steadies (H27). Each angle's
+    # foot is 3 mm under the sheet, and an M8 bolt holds its upright in a blind rivet nut in the rail's inner web
+    # (UF-08B's hanger_bolts, Layout.grey_hanger_parts), so nothing stands on the rail's outer face
+    model: {name: tank_guard, extras: [{name: guard_hangers, foot: 47.5, at: [grey_l / 2 - 200, grey_l / 2 + 60, body_x1 - 230 - grey_x0],
+                                        box: [grey_x0, -rail_in, rail_underside_z - 53, grey_l, 2 * rail_in, 103]}]}
     price: {aud: 250, basis: estimate, url: "https://store.allaluminium.com.au/collections/marine-sheet-aluminium", date: 2026-11-21, note: "One 1200 x 2400 sheet of 2 mm 5052, between the listed 1.6 and 2.5 mm sheets (AUD 166.62 and 260.37), plus rubber strip and bolts"}
     zone: underfloor
-    box: [grey_x0, -(rail_in - 27.5), grey_z0 - 6, grey_l, 2 * rail_in - 55, 6]
+    box: [grey_x0, -(rail_in - 27.5), rail_underside_z - 50, grey_l, 2 * rail_in - 55, 2]
     parts:
       - {item: "2 mm 5052 aluminium sheet, the grey bay's length by the width between the rails less 55 mm", kg: "grey_l * (2 * rail_in - 55) * 5.4e-6", basis: estimate, source: "At 5.4 kg/m2 (2 mm at 2,680 kg/m3, saving 1f, H13)"}
-      - {item: "Rubber strips and bolts", kg: 0.4, basis: estimate}
-    note: Bolted across the rails. It is not counted as a shear plate, because it would buckle at about 4 kN (est.). The RHS 150 x 50 x 6 XT rear shock crossmember carries the rear recovery pull in place of the plan braces this bay had (CHS-08A).
+      - {item: "Rubber strips, the six hanger angles, their M8 bolts and blind rivet nuts", kg: 0.6, basis: estimate, source: "Six 50 mm angles of 3 mm aluminium, 0.23 kg, six M8 bolts with their blind rivet nuts, 0.12 kg, and the rubber strips, 0.25 kg (est.). 0.4 kg for the strips and bolts until 27 Nov 2026"}
+    note: Hung across the rails grey_guard_gap under the grey tank's bottom, more than the bottom's sag, so it carries only itself and stones (I2-122). The tank stood on it until 27 Nov 2026. It is not counted as a shear plate, because it would buckle at about 4 kN (est.). The RHS 150 x 50 x 6 XT rear shock crossmember carries the rear recovery pull in place of the plan braces this bay had (CHS-08A).
 
   # ================================================================ the sealed drawbar box (decision log 12:45, research report 20)
   - id: DB-08
