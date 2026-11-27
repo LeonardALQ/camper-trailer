@@ -766,14 +766,25 @@ def test_the_hinge_joints_weld_roots_are_read_in_fatigue():
     assert all(t == pytest.approx(0.0, abs=1e-9) and s == pytest.approx(math.hypot(500, 1000) / (2 * 80 * 4.2)) for _, s, t in across)
     checks = {c["id"]: c for c in yaml.safe_load((DATA / "checks.yaml").read_text())["trailer_checks"]}
     rows = {r["id"]: r for r in RES["fatigue"]}
+    # LC10's braking and cornering blocks (I2-129): damage-equivalent ranges at their counts, read with no knee, their
+    # damage added to the occasional range's at each weld point
+    blocks = {b["id"]: b for b in lc10["horizontal"]}
+    assert set(blocks) == {"braking", "cornering"} and all(b["cycles"] == 2e6 for b in blocks.values())
+    assert blocks["cornering"]["both_ways"] and not blocks["braking"]["both_ways"]
+    for s in (10.0, 20.0, 40.0):
+        assert root_damage(s, 0.0, 36, 80, 2e6, knees=False) == pytest.approx((s / 36) ** 3, rel=1e-6)
+    assert root_damage(0.0, 20.0, 36, 80, 2e6, knees=False) == pytest.approx((20 / 80) ** 5, rel=1e-6)
     for fid in ("FAT-26", "FAT-27"):
         r = rows[fid]
-        assert checks[fid]["severity"] == "fail" and "I2-125" in checks[fid]["why"]
+        assert checks[fid]["severity"] == "fail" and "I2-125" in checks[fid]["why"] and "I2-129" in checks[fid]["why"]
         assert r["fat"] == 36 and r["fat_shear"] == 80 and not r["hot_spot"]
         assert r["cafl"] == pytest.approx(21.1, abs=0.05) and r["shear_cafl"] == pytest.approx(36.6, abs=0.05)
         assert r["range_mpa"] == pytest.approx(r["cafl"] * r["util"], rel=1e-9)
         assert r["util"] == pytest.approx(math.hypot(r["normal_mpa"] / r["cafl"], r["shear_mpa"] / r["shear_cafl"]), rel=1e-9)
         assert r["ok"] == (r["util"] <= 1 + 1e-9 and r["damage"] <= lc10["miner_limit"])
+        assert set(r["parts"]) == {"vertical"} | set(blocks) and r["damage"] == pytest.approx(sum(r["parts"].values()), rel=1e-9)
+        assert r["damage"] >= max([r["occasional_damage"]] + [b["damage"] for b in r["blocks"]]) - 1e-12
+        assert all(b["normal_mpa"] > 0 and b["where"] != "no weld read" for b in r["blocks"])
     assert " inboard, its " in rows["FAT-26"]["where"] and "cheek's" in rows["FAT-27"]["where"]
     assert rows["FAT-27"]["shear_mpa"] == 0.0
 
