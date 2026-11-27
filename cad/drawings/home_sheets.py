@@ -421,18 +421,25 @@ def _recovery_line() -> str:
     from ..chassis_fea import recovery_rule
     cj = json.loads((BUILD / "chassis" / "chassis.json").read_text())
     r = recovery_rule(cj["results"], next(lc for lc in cj["load_cases"] if lc["id"] == "LC8a"))
+    vd = r["vertical_deg"]
     sides = [x for x in (r["sideways_up_kn"], r["sideways_down_kn"]) if x is not None]
     alongs = [x for x in (r["along_up_kn"], r["along_down_kn"]) if x is not None]
-    at = ("FRONT LUGS, REAR TONGUES OR THE COUPLING ONLY, THE COUPLING ALONG THE TRAILER'S LINE," if r.get("coupling")
-          else "FRONT LUGS OR REAR TONGUES ONLY,")
-    limits = (f"{at} WITHIN {r['sideways_deg']:g} DEGREES SIDEWAYS AND {r['vertical_deg']:g} DEGREES UP OR DOWN: "
-              f"{r['free_kn']:g} kN WITH EVERY WHEEL FREE, {r['held_wheel_kn']:g} kN WITH ONE WHEEL HELD FAST, OR {r['held_axle_kn']:g} kN "
-              "WITH BOTH WHEELS OF ONE AXLE HELD FAST.")
-    if not sides and not alongs:                         # no pull within the limits tips it (I2-121)
+    ups = [(x, w) for x, w in ((r.get("coupling_up_kn"), "UP"), (r.get("coupling_down_kn"), "DOWN")) if x is not None]
+    at = (f"FRONT LUGS OR REAR TONGUES WITHIN {r['sideways_deg']:g} DEGREES SIDEWAYS, OR THE COUPLING ALONG THE TRAILER'S LINE ONLY, "
+          f"ALL WITHIN {vd:g} DEGREES UP OR DOWN:" if r.get("coupling")
+          else f"FRONT LUGS OR REAR TONGUES ONLY, WITHIN {r['sideways_deg']:g} DEGREES SIDEWAYS AND {vd:g} DEGREES UP OR DOWN:")
+    limits = (f"{at} {r['free_kn']:g} kN WITH EVERY WHEEL FREE, {r['held_wheel_kn']:g} kN WITH ONE WHEEL HELD FAST, OR "
+              f"{r['held_axle_kn']:g} kN WITH BOTH WHEELS OF ONE AXLE HELD FAST.")
+    if not sides and not alongs and not ups:             # no pull within the limits tips it (I2-121)
         return limits + " WITHIN THESE LIMITS THE TRAILER DOES NOT TIP, LEVEL OR PULLED UP OR DOWN."
-    tips = " AND ".join(([f"{min(sides):.1f} kN AT {r['sideways_deg']:g} DEGREES SIDEWAYS"] if sides else [])
-                        + ([f"{min(alongs):.1f} kN ALONG ITS LINE"] if alongs else []))
-    return limits + f" PULL LEVEL: PULLED {r['vertical_deg']:g} DEGREES UP OR DOWN THE EMPTY TRAILER CAN TIP FROM {tips}."
+    tips = []
+    if sides or alongs:
+        tips.append(f"PULLED {vd:g} DEGREES UP OR DOWN AT A LUG OR TONGUE THE EMPTY TRAILER CAN TIP FROM " + " AND ".join(
+            ([f"{min(sides):.1f} kN AT {r['sideways_deg']:g} DEGREES SIDEWAYS"] if sides else []) + ([f"{min(alongs):.1f} kN ALONG ITS LINE"] if alongs else [])))
+    if ups:
+        x, way = min(ups)
+        tips.append(f"PULLED {vd:g} DEGREES {way} AT THE COUPLING THE EMPTY TRAILER CAN TIP FROM {x:.1f} kN")
+    return limits + " PULL LEVEL: " + ", AND ".join(tips) + "."
 
 
 def _lamp_checks(sh, LM, y):

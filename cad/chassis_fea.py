@@ -1800,13 +1800,15 @@ class Analysis:
             bw, bg = max(e["bag"].items(), key=lambda kv: kv[1]["n"])
             hw, hg = max(e["hinge"].items(), key=lambda kv: abs(kv[1]["f"][0]), default=(None, dict(f=np.zeros(3), case="")))
             least = min(e["tipped"], key=lambda t: t["kn"]) if e["tipped"] else None
-            classes, coupling = {}, {}
+            classes, coupling = {}, {}                     # the lugs' and tongues' tipping pulls, and the coupling's apart
             for t in e["tipped"]:
+                if t.get("where") == "coupling":
+                    if t["kn"] < coupling.get(f"{t['v']:+d}", dict(kn=math.inf))["kn"]:
+                        coupling[f"{t['v']:+d}"] = dict(kn=t["kn"], case=t["case"], weight=t["weight"], coupled=t["coupled"])
+                    continue
                 key = f"{'sideways' if abs(t['h']) >= 20 else 'along'} {t['v']:+d}"
                 if key not in classes or t["kn"] < classes[key]["kn"]:
                     classes[key] = dict(kn=t["kn"], case=t["case"], weight=t["weight"], coupled=t["coupled"])
-                if t.get("where") == "coupling" and t["kn"] < coupling.get(f"{t['v']:+d}", dict(kn=math.inf))["kn"]:
-                    coupling[f"{t['v']:+d}"] = dict(kn=t["kn"], case=t["case"])
             slid = min(e["slid"], key=lambda t: t["kn"]) if e["slid"] else None
             axle_least = min(e["axle_tipped"], key=lambda t: t["kn"]) if e["axle_tipped"] else None
             by_mu = {}
@@ -2897,9 +2899,9 @@ def recovery_rule(results: dict, lc8: dict) -> dict:
     """The user's recovery rule (I2-93, I2-100, I2-114, I2-119), from LC8a's data and the frame analysis's recovery summary:
     the pull each point is rated for, the limit with every wheel free (the rated pull where every check holds it) and the
     directions it holds within, the limits with one wheel and with both wheels of one axle held fast, and the least
-    pull, in kN, that tips the trailer before the rated pull when it is pulled up or down, sideways and along its line,
-    and whether any level pull does, with the least at the coupling pulled up and down, where the pull is along the rail
-    axis only."""
+    pull, in kN, that tips the trailer before the rated pull at a lug or tongue when it is pulled up or down, sideways and
+    along its line, the least at the coupling pulled up and down, where the pull is along the rail axis only, and whether
+    any level pull tips it."""
     rec = results["recovery"]["LC8a"]
     tc = rec["tip_classes"]
     ct = rec.get("coupling_tips", {})
@@ -2914,7 +2916,7 @@ def recovery_rule(results: dict, lc8: dict) -> dict:
                 sideways_up_kn=least(f"sideways +{vd}"), sideways_down_kn=least(f"sideways -{vd}"),
                 along_up_kn=least(f"along +{vd}"), along_down_kn=least(f"along -{vd}"),
                 coupling_up_kn=ct.get(f"+{vd}", {}).get("kn"), coupling_down_kn=ct.get(f"-{vd}", {}).get("kn"),
-                level_tips=any(k.endswith(" +0") for k in tc))
+                level_tips=any(k.endswith(" +0") for k in tc) or "+0" in ct)
 
 
 def net_section(gross: dict, strips: list[dict], levers, y_lever: float, face_w: float, d_wall: float) -> dict:

@@ -383,8 +383,12 @@ def test_lc8a_reads_both_wheels_of_an_axle_held_at_the_recovery_limit():
     """I2-93: LC8a reads every recovery point with both wheels of the front or the rear axle held fast at the data's
     held-axle limit, its ultimate in LC8a's ratio, and the recovery summary keeps those pulls apart from the rated ones."""
     rec = RES["recovery"]["LC8a"]
-    # 264 at the front lugs and rear tongues, and since the coupling became a pull point 60 more there
-    assert rec["cases"] == 264 + 60 and rec["axle"]["cases"] > 0
+    lc8 = next(lc for lc in CH.data["load_cases"] if lc["id"] == "LC8a")
+    k = 3 * len(lc8["reaction"]["weight"]) * len(lc8["reaction"]["nose"]) * len(lc8["reaction"]["mu"])
+    # at the front lugs and rear tongues every wheel free at 3 headings and each wheel held at 5, and at the coupling
+    # every wheel free and each wheel held along the rail axis, each up, level and down, on each support and bound of mu
+    assert rec["cases"] == 4 * (3 + 5 * len(CH.suspension)) * k + (1 + len(CH.suspension)) * k
+    assert rec["axle"]["cases"] == 4 * 2 * 5 * k + 2 * k
     lc8 = next(lc for lc in CH.data["load_cases"] if lc["id"] == "LC8a")
     assert lc8["held_axle_n"] % 5000 == 0 and lc8["held_axle_n"] < lc8["force_n"]
 
@@ -396,7 +400,7 @@ def test_lc8a_reads_one_held_wheel_at_the_held_wheel_limit():
     assert lc8["held_wheel_n"] % 5000 == 0 and lc8["held_axle_n"] <= lc8["held_wheel_n"] <= lc8["force_n"]
     cases = [r["case"] for rows in RES["envelope"].values() for r in rows.values()]
     cases += [h[k]["case"] for h in RES["holes"] for k in ("static", "ultimate") if h.get(k)]
-    held = [c for c in cases if "through wheel" in c]
+    held = [c for c in cases if re.search(r", wheel [FR][KR] held", c)]
     assert held and all(f"held, at the {lc8['held_wheel_n'] / 1000:g} kN limit" in c for c in held)
 
 
@@ -412,10 +416,12 @@ def test_trailer_md_gives_the_recovery_rule():
     line = next(x for x in text.splitlines() if x.startswith("- Recovery:"))
     sides = [x for x in (r["sideways_up_kn"], r["sideways_down_kn"]) if x is not None]
     alongs = [x for x in (r["along_up_kn"], r["along_down_kn"]) if x is not None]
-    tips = [f"{min(x):.1f} kN" for x in (sides, alongs) if x]
+    coupling = [x for x in (r["coupling_up_kn"], r["coupling_down_kn"]) if x is not None]     # along the rail axis only (I2-124)
+    tips = [f"{min(x):.1f} kN" for x in (sides, alongs, coupling) if x]
     for figure in (f"{r['rated_kn']:.1f} kN", f"{r['free_kn']:g} kN", f"{r['held_wheel_kn']:g} kN", f"{r['held_axle_kn']:g} kN",
                    *tips, f"{r['sideways_deg']:g} degrees", f"{r['vertical_deg']:g} degrees"):
         assert figure in line, figure
+    assert "coupling along the trailer's line only" in line
     if not tips:                                      # no pull within the limits tips the trailer (I2-121)
         assert "does not tip" in line
 
@@ -539,15 +545,16 @@ def test_the_bottom_wall_under_the_front_fillets_is_read_as_the_plate_it_is():
 
 def test_the_coupling_is_a_pull_point_under_the_same_limits():
     """The conductor's ruling of 27 Nov 2026: the recovery limits hold wherever the trailer is pulled from, so LC8a pulls
-    at the coupling too, along the rail axis within 15 degrees up or down, with every wheel free, through each held
-    wheel within the points' 30 degrees and with an axle held, under the same three limits."""
+    at the coupling too, along the rail axis only within 15 degrees up or down, with every wheel free, with each wheel
+    held, the free tyres' grip holding the trailer from turning about it as far as it does (I2-124), and with an axle
+    held, under the same three limits, at each bound of the tyres' grip."""
     lc8 = next(lc for lc in CH.data["load_cases"] if lc["id"] == "LC8a")
     assert lc8["coupling"] is True
     pts = RES["recovery"]["LC8a"]["points"]
-    n_sup = len(lc8["reaction"]["weight"]) * len(lc8["reaction"]["nose"])
+    n_sup = len(lc8["reaction"]["weight"]) * len(lc8["reaction"]["nose"]) * len(lc8["reaction"]["mu"])
     assert pts["coupling, every wheel free"] == 3 * n_sup                 # level, 15 degrees up and down, each support
     assert pts["coupling, axle held"] == 2 * 3 * n_sup                    # each axle, along the rail axis
-    assert pts["coupling, wheel held"] == len(CH.suspension) * 3 * n_sup  # each wheel, the pull through its hub
+    assert pts["coupling, wheel held"] == len(CH.suspension) * 3 * n_sup  # each wheel, the pull along the rail axis
     assert all(pts[f"{w}, every wheel free"] == 2 * 3 * 3 * n_sup for w in ("front", "rear"))
 
 
