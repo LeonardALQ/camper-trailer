@@ -383,7 +383,8 @@ def test_lc8a_reads_both_wheels_of_an_axle_held_at_the_recovery_limit():
     """I2-93: LC8a reads every recovery point with both wheels of the front or the rear axle held fast at the data's
     held-axle limit, its ultimate in LC8a's ratio, and the recovery summary keeps those pulls apart from the rated ones."""
     rec = RES["recovery"]["LC8a"]
-    assert rec["cases"] == 264 and rec["axle"]["cases"] > 0
+    # 264 at the front lugs and rear tongues, and since the coupling became a pull point 60 more there
+    assert rec["cases"] == 264 + 60 and rec["axle"]["cases"] > 0
     lc8 = next(lc for lc in CH.data["load_cases"] if lc["id"] == "LC8a")
     assert lc8["held_axle_n"] % 5000 == 0 and lc8["held_axle_n"] < lc8["force_n"]
 
