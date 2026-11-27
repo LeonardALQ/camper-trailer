@@ -37,7 +37,8 @@ def weld_spring(length: float, leg: float, wall: float | None = None) -> Section
     stiffness and no moment. Per mm of weld the fillet's throat a = 0.7 leg shears over its leg at G a / leg along and
     across its line and stretches at E a / leg normal to the face (est., the weld metal's own stiffness). Where the fillet
     stands on a wall's flat between its webs, `wall` is that wall's own stiffness under it normal to the face (N/mm for
-    this point's length), in series with the weld's. Marked rigid so the stress readings skip it."""
+    this point's length), and where it stands over a web, that web's own stretch under it, in series with the weld's.
+    Marked rigid so the stress readings skip it."""
     a, E = 0.7 * leg, 200_000.0
     k_s, k_n = G_STEEL * a / leg * length, E * a / leg * length
     if wall:
@@ -1473,13 +1474,15 @@ class FrameModel:
         forces apart, as its own weld group does, and none at a point. A fillet on the bottom wall's flat between the webs
         has the wall's own bending under it in series, the run's share of `wall` `kn_mm`, the wall's stiffness under each
         run from its plate model (cad/wall_plate.py), on its soft bound. A `wall` that is not a mapping takes the wall as
-        stiff, for the probes that show what the wall moves."""
+        stiff, for the probes that show what the wall moves. A fillet over a web has that web's own stretch under it in
+        series, the run's share of xt_hinges `web` `kn_mm` for the front or rear web, from its plane-stress model
+        (cad/web_plane.py, I2-125)."""
         ch, f = self.ch, self.f
         b = ch.data["xt_hinges"]["bar"]
         bw = ch.data["xt_arms"]["parts"]["bar"].get("w", cm.sec.b)
         zf = cm.box()[2]
         rear_web = cm.p0[0] + cm.sec.b / 2 - cm.sec.t / 2           # the crossmember's rear web's mid-plane
-        wall = b.get("wall")
+        wall, web = b.get("wall"), ch.data["xt_hinges"].get("web")
         y_in = ch.V["rail_c"] - ch.role_sec["rail"].b / 2
         flat = {e: isinstance(wall, dict) and cm.sec.t < rear_web - (x + e * bw / 2) < cm.sec.b - 2 * cm.sec.t for e in (-1, 1)}
         for yc in (y for y in ch.hinge_weld_ys(cm) if y * w["side"] > 0):
@@ -1487,7 +1490,9 @@ class FrameModel:
             for k, share in ((-1, 1 / 6), (0, 2 / 3), (1, 1 / 6)):
                 y = yc + k * b["run"] / 2
                 for e in (-1, 1):
-                    spring = weld_spring(share * b["run"], b["leg"], share * wall["kn_mm"][run] * 1000 if flat[e] else None)
+                    under = (wall["kn_mm"][run] if flat[e] else
+                             web["kn_mm"]["front" if e < 0 else "rear"][run] if isinstance(web, dict) else None)
+                    spring = weld_spring(share * b["run"], b["leg"], share * under * 1000 if under else None)
                     lo, hi = f.node((x + e * bw / 2, y, zf - 0.5)), f.node((x + e * bw / 2, y, zf + 0.5))
                     self._link(at[min(at, key=lambda q: abs(q - y))], lo, f"weld runs {w['id']}")
                     self._link(self.cm_node(cm.id, y), hi, f"weld runs {w['id']}")

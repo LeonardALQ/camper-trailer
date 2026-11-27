@@ -506,7 +506,8 @@ def test_the_bottom_wall_under_the_front_fillets_is_read_as_the_plate_it_is():
     """The conductor's ruling of 27 Nov 2026: the hinge crossmember's bottom wall under each run's front fillet comes from
     its plate model (cad/wall_plate.py), which gives Timoshenko's square plate, the data takes its soft bound and gives
     the stiff one beside it, the frame model's front weld points stand on the wall's flat with the run's share of it in
-    series and the rear ones over the rear web without it, and FAT-25 reads the wall's bending at the fillets' toes."""
+    series and the rear ones over the rear web the web's own stretch in its place (I2-125), and FAT-25 reads the wall's
+    bending at the fillets' toes."""
     from cad import wall_plate as WP
     from cad.frame import E_STEEL
     b = CH.data["xt_hinges"]["bar"]
@@ -529,7 +530,8 @@ def test_the_bottom_wall_under_the_front_fillets_is_read_as_the_plate_it_is():
         cmw = next(m for m in CH.members if m.station == w["station"] and m.role == "cm_xt")
         xb = CH.hinge_bar_x(cmw)
         rear = sum(E_STEEL * el.sec.A for el in fm.f.elements if el.member == f"hinge {w['id']}" and xyz[el.i][0] > xb)
-        assert rear == pytest.approx(len(b["runs"]) * k_weld, rel=1e-9), w["id"]
+        k_rear = sum(1 / (1 / (s * k_weld) + 1 / (s * kw * 1000)) for kw in CH.data["xt_hinges"]["web"]["kn_mm"]["rear"] for s in (1 / 6, 2 / 3, 1 / 6))
+        assert rear == pytest.approx(k_rear, rel=1e-9), w["id"]
         k_front = sum(1 / (1 / (s * k_weld) + 1 / (s * kw * 1000)) for kw in wall["kn_mm"] for s in (1 / 6, 2 / 3, 1 / 6))
         k_model = sum(E_STEEL * el.sec.A for el in fm.f.elements if el.member == f"hinge {w['id']}" and xyz[el.i][0] < xb)
         assert k_model == pytest.approx(k_front, rel=1e-9), w["id"]
@@ -711,3 +713,24 @@ def test_the_hinge_joints_weld_roots_are_read_in_fatigue():
         assert r["ok"] == (r["util"] <= 1 + 1e-9 and r["damage"] <= lc10["miner_limit"])
     assert " inboard, its " in rows["FAT-26"]["where"] and "cheek's" in rows["FAT-27"]["where"]
     assert rows["FAT-27"]["shear_mpa"] == 0.0
+
+
+def test_the_webs_under_the_fillets_over_them_stretch_in_series_with_the_welds():
+    """Review I2-125 and COMMON-RULES-26: a fillet over a web passes its run's force into the web's bottom edge, which the
+    frame model's rigid links from the beam's axis do not stretch, so the web's own stretch stands in series with the
+    weld's, from a plane-stress model of the web (cad/web_plane.py) that gives a strip's even stretch exactly, the data
+    on its stiff bound with the soft one beside, and the frame model's weld points over the webs carry it."""
+    from cad import web_plane as WP
+    web = CH.data["xt_hinges"]["web"]
+    b = CH.data["xt_hinges"]["bar"]
+    assert WP.check_strip() == pytest.approx(1.0, abs=1e-6)
+    cm = CH.hinge_crossmembers()[0]
+    y_in = CH.V["rail_c"] - CH.role_sec["rail"].b / 2
+    runs = [(u - b["run"] / 2, u + b["run"] / 2) for u in b["runs"]]
+    h = cm.sec.d - cm.sec.t
+    for edge in ("front", "rear"):
+        t, fl = web["t"][edge], web["flange"][edge]
+        assert [k / 1000 for k in WP.model(2 * y_in, h / 2, t, fl, runs, hold="both")] == pytest.approx(web["kn_mm"][edge], abs=0.051), edge
+        assert [k / 1000 for k in WP.model(2 * y_in, h, t, fl, runs, hold="up")] == pytest.approx(web["other"]["kn_mm"][edge], abs=0.051), edge
+        assert all(s < f for s, f in zip(web["other"]["kn_mm"][edge], web["kn_mm"][edge]))
+    assert all(k < 0.7 * 200_000 * b["run"] / 1000 / 4 for k in web["kn_mm"]["rear"])      # the web, not the weld, sets the tie
