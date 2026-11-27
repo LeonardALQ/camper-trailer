@@ -657,10 +657,10 @@ trailer_checks:
     severity: report
     inputs: []
     why: "Review I2-95. Report 11 LC10 and section 3.4. IIW-1823-07 detail 521, a longitudinal attachment fillet welded along the member, classed by its length along it: FAT 71 up to 150 mm and FAT 50 over 300 mm. Each EA 50 x 50 x 5 angle of the shear panel CH-P17 is welded to the rail's inner web along its upright leg's top edge and along the rail's bottom corner for its 76 mm along the rail, which stops short of the rear airbag's top bracket, never across the rail, and is read at FAT 50, on the safe side of FAT 71, its front end 25 mm behind the XT centre's rear hinge cheek's main plate, a set gap, so those welds end apart and each end is read on its own, the cheek's step running on over the angle (CHASSIS.md item 15). Its ends are read on the composite rail's extreme fibre. The weld along the corner is a flare bevel weld, classed here as the fillet it replaces (est.). The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."
-  - id: FAT-24
+  - id: FAT-25
     title: "Fatigue, Hinge bar's front fillets on the hinge crossmembers' bottom wall, toe in the wall, the wall's bending at the toe"
     type: chassis_fatigue
-    item: FAT-24
+    item: FAT-25
     severity: report
     inputs: []
     why: "Report 11 LC10 and section 3.4, read by the hot-spot method as the other XT brackets are, IIW Table 3.3-1 no. 6, a load-carrying fillet, FAT 90. On RHS 150 x 100 x 6 each hinge bar run's front fillet stands on the crossmember's bottom wall half-way between its webs, so the run's force through it bends the wall at the fillet's toe. The structural stress there is the wall's bending from its plate model (cad/wall_plate.py), the section unfolded about its corners into one plate continuous over them, its corners at the walls' mid-planes and its ends pinned at the rails, the soft bound, 18.0 MPa per kN at the outer run and 21.2 MPa per kN at the others under the run's load spread along it, times the force the frame model's front weld points pass on the elastic bars, plus the crossmember's nominal stress at its ends. The frequent range (0.5 g either way, at the ATM-scaled cases) must stay under the CAFL, 0.585 FAT, and the occasional range (1.5 g either way, 100,000 cycles) must give a Miner damage of 0.5 or less. Planning method, for the engineer to accept."

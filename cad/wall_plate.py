@@ -1,4 +1,4 @@
-"""The hinge crossmember's bottom wall under the hinge bar's front fillets (xt_hinges `bar` `wall`, CHS-18, FAT-24).
+"""The hinge crossmember's bottom wall under the hinge bar's front fillets (xt_hinges `bar` `wall`, CHS-18, FAT-25).
 
 On RHS 150 x 100 x 6 each run's front fillet stands on the bottom wall's flat at the middle of its width, so the wall
 bends under it. The wall is a plate, part of the closed section: its edges are held by the section's corners and webs,
@@ -11,8 +11,9 @@ the bottom wall's middle (the fillet's line) round the front corner and up the f
 no slope across either middle line. Along the crossmember the plate runs from one rail's inner face to the other's.
 
 The plate is solved by Bogner-Fox-Schmit rectangles (w, w_s, w_y, w_sy at each node, exact in pure bending), Kirchhoff
-plates, E 200 GPa, nu 0.3. Each run's stiffness is the force a rigid run of the bar's length pushes into the wall per mm
-of the wall's deflection under it, the bar being some 40 times stiffer than the wall over 80 mm. The bounds of what the
+plates, E 200 GPa, nu 0.3. Each run's stiffness in the data is the run's force per mm of the wall's mean deflection
+under it with the load spread evenly along the run, the soft side of a rigid bar's spread, which model() gives beside
+it (the bar is some 40 times stiffer than the wall over 80 mm, and pushes the wall harder at the run's ends). The bounds of what the
 model cannot know: the corners at the walls' mid-planes, spans b - t and d - t (the soft bound), or at the ends of the
 flats, b - 2 ro and d - 2 ro, the corners taken as points (the stiff bound), and the crossmember's ends welded to the
 rails' 4 mm webs pinned or clamped. The filler under each front cheek, which stands under the outer run's front half and

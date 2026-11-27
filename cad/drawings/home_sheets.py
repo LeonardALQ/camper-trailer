@@ -423,7 +423,9 @@ def _recovery_line() -> str:
     r = recovery_rule(cj["results"], next(lc for lc in cj["load_cases"] if lc["id"] == "LC8a"))
     sides = [x for x in (r["sideways_up_kn"], r["sideways_down_kn"]) if x is not None]
     alongs = [x for x in (r["along_up_kn"], r["along_down_kn"]) if x is not None]
-    limits = (f"FRONT LUGS OR REAR TONGUES ONLY, WITHIN {r['sideways_deg']:g} DEGREES SIDEWAYS AND {r['vertical_deg']:g} DEGREES UP OR DOWN: "
+    at = ("FRONT LUGS, REAR TONGUES OR THE COUPLING ONLY, THE COUPLING ALONG THE TRAILER'S LINE," if r.get("coupling")
+          else "FRONT LUGS OR REAR TONGUES ONLY,")
+    limits = (f"{at} WITHIN {r['sideways_deg']:g} DEGREES SIDEWAYS AND {r['vertical_deg']:g} DEGREES UP OR DOWN: "
               f"{r['free_kn']:g} kN WITH EVERY WHEEL FREE, {r['held_wheel_kn']:g} kN WITH ONE WHEEL HELD FAST, OR {r['held_axle_kn']:g} kN "
               "WITH BOTH WHEELS OF ONE AXLE HELD FAST.")
     if not sides and not alongs:                         # no pull within the limits tips it (I2-121)

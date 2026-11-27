@@ -505,7 +505,7 @@ def test_the_bottom_wall_under_the_front_fillets_is_read_as_the_plate_it_is():
     """The conductor's ruling of 27 Nov 2026: the hinge crossmember's bottom wall under each run's front fillet comes from
     its plate model (cad/wall_plate.py), which gives Timoshenko's square plate, the data takes its soft bound and gives
     the stiff one beside it, the frame model's front weld points stand on the wall's flat with the run's share of it in
-    series and the rear ones over the rear web without it, and FAT-24 reads the wall's bending at the fillets' toes."""
+    series and the rear ones over the rear web without it, and FAT-25 reads the wall's bending at the fillets' toes."""
     from cad import wall_plate as WP
     from cad.frame import E_STEEL
     b = CH.data["xt_hinges"]["bar"]
@@ -532,7 +532,7 @@ def test_the_bottom_wall_under_the_front_fillets_is_read_as_the_plate_it_is():
         k_front = sum(1 / (1 / (s * k_weld) + 1 / (s * kw * 1000)) for kw in wall["kn_mm"] for s in (1 / 6, 2 / 3, 1 / 6))
         k_model = sum(E_STEEL * el.sec.A for el in fm.f.elements if el.member == f"hinge {w['id']}" and xyz[el.i][0] < xb)
         assert k_model == pytest.approx(k_front, rel=1e-9), w["id"]
-    fat = next(f for f in RES["fatigue"] if f["id"] == "FAT-24")
+    fat = next(f for f in RES["fatigue"] if f["id"] == "FAT-25")
     assert fat["range_mpa"] > 0 and fat["hot_spot"] and "inboard on CM-" in fat["where"]
 
 

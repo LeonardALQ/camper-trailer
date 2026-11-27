@@ -1778,7 +1778,7 @@ class Analysis:
         return out
 
     def wall_toe_stresses(self, res) -> list[tuple[float, str]]:
-        """FAT-24: the structural stress at each hinge bar run's front fillet's toe in its crossmember's bottom wall on the
+        """FAT-25: the structural stress at each hinge bar run's front fillet's toe in its crossmember's bottom wall on the
         elastic bars, the wall's own bending there, its plate model's `toe_mpa_kn` times the force the run's front weld
         points pass (each point's force taken whole, whatever its sign), plus the crossmember's nominal stress at its
         ends (member_end_stress), both at their largest together. The rigid bars pass no fillet's force of their own."""
@@ -2704,7 +2704,7 @@ def recovery_rule(results: dict, lc8: dict) -> dict:
         ks = [v["kn"] for k, v in tc.items() if k.startswith(prefix)]
         return min(ks) if ks else None
     return dict(rated_kn=lc8["force_n"] / 1000, free_kn=lc8.get("free_n", lc8["force_n"]) / 1000, sideways_deg=lc8["sideways_deg"],
-                vertical_deg=vd, held_wheel_kn=lc8["held_wheel_n"] / 1000,
+                vertical_deg=vd, held_wheel_kn=lc8["held_wheel_n"] / 1000, coupling=bool(lc8.get("coupling")),
                 held_axle_kn=lc8["held_axle_n"] / 1000,
                 sideways_up_kn=least(f"sideways +{vd}"), sideways_down_kn=least(f"sideways -{vd}"),
                 along_up_kn=least(f"along +{vd}"), along_down_kn=least(f"along -{vd}"),
