@@ -449,6 +449,29 @@ def test_the_hinge_bars_runs_and_the_fillers_are_read():
     assert "filler's section" in parts and "flare-bevel weld at the rail's outer bottom corner" in parts
 
 
+def test_the_elastic_bars_runs_are_held_at_their_welds():
+    """I2-121: on the elastic models each hinge bar's runs are welded to the crossmember as weld points at each run's two
+    ends and its centre on both fillets, carrying a sixth, two thirds and a sixth of the run at the fillet's own shear
+    stiffness and passing next to no moment, the hinge plates are members of their own section, CHS-18 reads each
+    elastic run on its own, and the same runs in the service cases are read beside it."""
+    from cad.frame import E_STEEL, G_STEEL
+    b = CH.data["xt_hinges"]["bar"]
+    fm = CH.frame(None, "crossmember", "elastic", "free")
+    k_line = G_STEEL * 0.7 * b["leg"] / b["leg"] * b["run"]          # one fillet's shear stiffness over its run, N/mm
+    for w in CH.suspension:
+        welds = [el for el in fm.f.elements if el.member == f"hinge {w['id']}"]
+        assert len(welds) == 2 * 3 * len(b["runs"]), w["id"]
+        k = sum(12 * E_STEEL * el.sec.I_strong for el in welds)          # 1 mm links, 12 E I / L^3
+        assert abs(k - 2 * len(b["runs"]) * k_line) < 1e-6 * k
+        assert all(4 * E_STEEL * el.sec.I_strong < 1e-4 * k_line * b["run"] ** 2 for el in welds)
+        assert sum(1 for el in fm.f.elements if el.member == f"XT-PLATE-{w['id']}") == 4
+    runs = RES["local"]["hinge_runs"]
+    assert {p["part"].split(",")[0] for p in runs["parts"]} == {"LC8a", "LC8u"}
+    service = {k.split(",")[0] for k in runs["service"]}
+    assert service >= {"LC1", "LC2", "LC3", "LC4", "LC5a", "LC5b", "LC6", "LC6b", "LC8b"}
+    assert all(r["util"] >= 0 for r in runs["service"].values())
+
+
 def test_holes_in_one_section_are_read_together():
     """I2-111: every pair of holes in a rail and its raiser within the larger diameter of one another along the rail, a
     slot's length added, is read on one net section, each hole with the other, and no pair further apart. Beside the XT
