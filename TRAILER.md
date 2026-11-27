@@ -16,7 +16,7 @@ The brief is a home for long stays off-grid: a lifted bed over a 1.2 m desk, a w
 | Ute | Ford Ranger Super Duty single cab chassis. Rear axle 2,547 kg with growth against Ford's 2,800 kg. Combination 7,748 kg against Ford's 8,000 kg, the ute with growth plus the plate |
 | Battery | 25.6 kWh. A design hot day runs 25.1 h when new and 17.2 h at end of life |
 | Water | 370 L fresh, the tanks' net in H21's 5 L steps, all of it in travel, about 41 L a day. 130 L grey |
-| Cost | AUD 200,952 with contingency, built by Leonard (H26) |
+| Cost | AUD 201,084 with contingency, built by Leonard (H26) |
 
 Every fail check passes. Both XT hinge crossmembers are RHS 150 x 100 x 6, each front hinge cheek meets a filler under its crossmember and the hinge bars' weld runs are read, so on all three of the hinge bars' models the recovery pull takes a limit of 45 kN with every wheel free, 40 kN with one wheel held fast and 30 kN with both wheels of one axle held, each by its rule, under the points' 58.9 kN rating (open point 18). The tanks' guards, the rear bay's shear panel and the fresh tanks' bottom edges are cut in steps clear of the arms as Cruisemaster's sheets 2 and 4 draw them, so FIT-05 reads 50.5 mm from the arms to them (open point 15), each fresh tank stands on steel bearers of its own, which CHS-17 reads to the frame (open point 17), and the tyres keep its 50 mm under the floor at full bump exactly. The tightest of the rest are the towball share with the grey tank full (MAS-12, 9.7 % against 9.0 %), the heaviest towball (MAS-13, 395.7 kg against 420 kg), the gap from the lamp run K-01 to a front recovery lug (SVC-01, 20.4 mm against 20 mm) and the recovery pull at its limits, where the hinge bars' weld runs read 0.98 of their strength at the ultimate with a wheel or an axle held, on the bars elastic on free bushes (CHS-18), and the rear hinge cheeks' welds 0.95 at the 60.0 kN ultimate with every wheel free (CHS-14). Fully loaded with growth the trailer weighs 3,662.5 kg, 237.5 kg inside the 3,900 kg target (MAS-10).
 
@@ -168,7 +168,7 @@ The insert map CT-203 must be final before the panels are ordered, because the m
 
 ## Cost and where to save
 
-The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 155 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 174,586 subtotal carries AUD 26,366 (15.1 %), for AUD 200,952.
+The parts list is `data/trailer-parts.yaml` with the priced lines of the mass schedule: 156 lines in AUD including GST, each with its source and the date checked. Leonard builds the trailer himself, so the list hires no labour and has one total (H26). Listed prices carry 10 % contingency and rates and estimates 20 %, so the AUD 174,696 subtotal carries AUD 26,388 (15.1 %), for AUD 201,084.
 
 | Group | AUD | Group | AUD |
 |---|---|---|---|
@@ -176,11 +176,11 @@ The parts list is `data/trailer-parts.yaml` with the priced lines of the mass sc
 | Electrical | 27,292 | Freight and consumables | 5,430 |
 | Living area | 21,186 | Licensed electrician | 4,600 |
 | Running gear | 14,181 | Drawbar box | 4,388 |
-| HVAC and ventilation | 12,667 | Under the floor | 3,650 |
+| HVAC and ventilation | 12,667 | Under the floor | 3,760 |
 | Wet room | 11,627 | Roof | 2,926 |
 | Bed | 8,028 | Coupling and drawbar | 1,962 |
 | Compliance and weld evidence | 8,320 | Lamps, reflectors, the number plate and the brake circuit | 1,326 |
-| Subtotal | 174,586 | Spare wheel | 736 |
+| Subtotal | 174,696 | Spare wheel | 736 |
 
 What the registration needs stays: the licensed electrician and the AS/NZS 3001.2 certificate (ELI-01, CMP-13), the refrigeration fitting in AC-03, the wheel alignment (ALN-01), the engineer's review (CMP-03) and the registration lines. The registration itself also needs papers. A concessional trailer never registered in NSW needs TfNSW's Identity Approval before the examiner can pass it (VIB 78 rule 221.04), and its application, form 5703, is rejected without clear photographs of all four sides and the drawbar, of the vehicle plate and of the VIN stamped in the frame, the weighbridge ticket, and receipts proving the origin of the materials (CMP-04). So keep every receipt for the chassis steel, the running gear, the coupling and the panels from stage B0, and photograph the trailer as AIS Notice 41 and VIB 78 ask.
 
