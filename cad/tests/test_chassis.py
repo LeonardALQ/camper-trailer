@@ -598,7 +598,8 @@ def test_the_coupling_is_a_pull_point_under_the_same_limits():
 def test_holes_in_one_section_are_read_together():
     """I2-111: every pair of holes in a rail and its raiser within the larger diameter of one another along the rail, a
     slot's length added, is read on one net section, each hole with the other, and no pair further apart. Beside the XT
-    centre crossmember the service hole into OR-05 is read with the crossmember's drain, vent and check hole in its rail."""
+    centre crossmember the service hole into OR-05 stands between its twin tubes' drains, vents and check holes in its
+    rail, half a tube either side and more than a diameter from it, so it is read alone."""
     rail = [h for h in RES["holes"] if not h.get("open") and str(h.get("frame", "")).startswith("RL-")]
     assert rail
     for a in rail:
@@ -608,10 +609,12 @@ def test_holes_in_one_section_are_read_together():
             reach = max(a["d"], b["d"]) + (a["length"] - a["d"]) / 2 + (b["length"] - b["d"]) / 2
             assert (b["id"] in a.get("with", [])) == (abs(a["x"] - b["x"]) < reach), (a["id"], b["id"])
     cm = next(m for m in CH.members if m.station == "XT centre" and m.role == "cm_xt")
-    for run in ("K-08", "K-09"):
+    for run in ("K-08", "K-09"):        # on the twin each tube's drain, vent and check hole stand half a tube either side
         svc = next(h for h in rail if h["runs"] == [run] and h["wall"] == "the raiser's outer web")
-        corner = [h for h in rail if h["frame"] == svc["frame"] and abs(h["x"] - svc["x"]) < 1 and set(h["runs"]) & {"drain", "vent", "check"}]
-        assert len(corner) == 3 and {h["id"] for h in corner} <= set(svc["with"]), run
+        corner = [h for h in rail if h["frame"] == svc["frame"] and abs(abs(h["x"] - svc["x"]) - cm.sec.cell_b / 2) < 1
+                  and set(h["runs"]) & {"drain", "vent", "check"}]
+        assert cm.sec.cells == 2 and len(corner) == 6, run
+        assert all(cm.sec.cell_b / 2 >= max(h["d"], svc["d"]) for h in corner) and not {h["id"] for h in corner} & set(svc.get("with", [])), run
         assert abs(svc["x"] - cm.p0[0]) < 1
 
 
@@ -676,6 +679,7 @@ def test_the_bearers_and_hangers_bolt_holes_are_read_by_the_hole_checks():
     assert fix and len(bolts) == len(fix)
     assert sorted(int(h["id"][2:]) for h in bolts) == list(range(len(RES["holes"]) - len(fix) + 1, len(RES["holes"]) + 1))
     hinged = {m.id for m in CH.hinge_crossmembers()}
+    mem = {m.id: m for m in CH.members}
     for f in fix:
         h = next(h for h in bolts if h["member"] == f["member"] and math.dist((h["x"], h["y"], h["z"]), (f["x"], f["y"], f["z"])) < 1)
         assert h["runs"] == [f["use"]] and h["d"] == f["d"], h["id"]
@@ -685,8 +689,9 @@ def test_the_bearers_and_hangers_bolt_holes_are_read_by_the_hole_checks():
         pair = [o for o in bolts if o is not h and o["member"] == h["member"] and abs(along(o) - along(h)) < 1]
         if f["use"].startswith("rivet nut"):
             assert rail and f["face"] == "inner web" and not pair, h["id"]
-        else:
-            assert len(pair) == 1 and pair[0]["id"] in h.get("with", []), h["id"]
+        else:                       # a bolt passes every web of its crossmember, four on a twin hinge crossmember
+            webs = 2 * getattr(mem[f["member"]].sec, "cells", 1)
+            assert len(pair) == webs - 1 and all(o["id"] in h.get("with", []) for o in pair), h["id"]
         assert h["ok"] and h["static_ok"] and h["ultimate"]["util"] <= 1, h["id"]
 
 
