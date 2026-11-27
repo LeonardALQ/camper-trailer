@@ -409,7 +409,7 @@ def _twin_sections(ch: Chassis, m: Member, rules: dict, ds: float, holes: list[d
         for e, low in ((0, True), (1, False)):       # the kerb end low and the road end high, diagonally opposite
             for t, outer, _, off in tubes:
                 hv = [h for h in end_holes(t, m.id, e, dict(r, d=tw["vent_d"]), webs=(-outer,)) if (h["use"] == "drain") == low]
-                holes.append(dict(tag(hv, t, off, inner=True)[0], use="vent for the webs' overlap", section=t.name, through=True))
+                holes.append(dict(tag(hv, t, off, inner=True)[0], use="vent", section=t.name, through=True, overlap=True))
     return out
 
 

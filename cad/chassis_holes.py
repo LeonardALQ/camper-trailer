@@ -74,7 +74,7 @@ def centre(h: dict) -> np.ndarray:
     return np.array((h["x"], h["y"], h["z"]), float)
 
 
-def bore(h: dict, p0, p1, depth_dir, t: float) -> tuple[np.ndarray, np.ndarray, float, float] | None:
+def bore(h: dict, p0, p1, depth_dir, t: float, sec=None) -> tuple[np.ndarray, np.ndarray, float, float] | None:
     """The hole's bore in a member from p0 to p1 of wall thickness t: a start point, the unit direction out of the wall
     and the length that takes it through that one wall and no other, or None where its centre lies off the member's
     length (a member drawn short on a sheet). A web's hole runs across the member's width from inside its web, a seam
@@ -86,8 +86,11 @@ def bore(h: dict, p0, p1, depth_dir, t: float) -> tuple[np.ndarray, np.ndarray, 
         return None
     if is_seam(h):
         return c - 8.0 * ez, ez, 16.0, s
-    side = 1.0 if float(np.dot(c - np.asarray(p0, float), ey)) > 0 else -1.0
+    off = float(np.dot(c - np.asarray(p0, float), ey))
+    side = 1.0 if off > 0 else -1.0
     n = side * ey
+    if sec is not None and getattr(sec, "cells", 1) > 1 and abs(off) < sec.b / 2 - sec.t:   # through a twin's two webs at its seam
+        return c - (t + 2.0) * n, n, 2 * t + 4.0, s
     return c - (t + 2.0) * n, n, t + 4.0, s
 
 
@@ -98,7 +101,7 @@ def cut_member(m, solid):
     for h in records():
         if m.id not in targets(h):
             continue
-        b = bore(h, m.p0, m.p1, m.depth_dir, m.sec.t)
+        b = bore(h, m.p0, m.p1, m.depth_dir, m.sec.t, m.sec)
         if b is None:
             continue
         a, n, length, _ = b

@@ -16,7 +16,7 @@ from .. import chassis_holes as CH
 from . import sheet as S
 from .chassis_sheets import OUT, _chassis, _draft_stamp, _layout, _title, plate
 
-SIZE, ROW = 1.4, 2.5            # the schedule's text and row height, mm
+SIZE, ROW = 1.4, 2.2            # the schedule's text and row height, mm, 2.2 since the twin hinge crossmembers' holes
 COLS = (("HOLE", 9.0), ("USE", 14.0), ("DIA", 6.0), ("WEB", 9.5), ("FROM", 13.5), ("ALONG", 8.5), ("OVER", 7.5))
 LEFT = (22.0, 91.0, 160.0)       # the schedule's three columns' left edges, mm
 TOP, BOTTOM = 279.0, 12.0
@@ -69,7 +69,9 @@ class Hole:
             self.web, self.over = "SEAM", None
         else:
             n = (1.0 if float(np.dot(c - np.asarray(p0, float), ey)) > 0 else -1.0) * ey
-            if abs(n[0]) >= abs(n[1]) - 1e-6:
+            if getattr(sec, "cells", 1) > 1 and abs(float(np.dot(c - np.asarray(p0, float), ey))) < sec.b / 2 - sec.t:
+                self.web = "MIDDLE"                  # through a twin crossmember's two webs face to face at its seam
+            elif abs(n[0]) >= abs(n[1]) - 1e-6:
                 self.web = "FRONT" if n[0] < 0 else "REAR"
             else:
                 self.web = "INNER" if n[1] * c[1] < 0 else "OUTER"
@@ -467,10 +469,10 @@ def ct105(prj, model, bom, checks, reg, dwg):
         "DIMENSIONS ARE TO EACH HOLE'S CENTRE (DETAIL C). FROM GIVES THE END THAT ALONG STARTS AT ON THAT WEB: A MEMBER'S END AT ITS WELD, "
         "THE DRAWBAR MEMBER'S SQUARE APEX CUT OR THAT WEB'S MITRE LINE (DETAILS A AND B), A RAIL'S NEARER END, A ROAD SIDE PLAN BRACE'S "
         "CROSSING, OR A HINGE GUSSET'S FACE ON THE CROSSMEMBER OR THE RAIL.",
-        "WEB: FRONT AND REAR FACE THE DRAWBAR AND THE REAR, INNER AND OUTER FACE THE CENTRELINE AND THE SIDE. SEAM: THROUGH THE RAIL'S TOP "
-        "AND THE RAISER'S BOTTOM WALL (DETAIL E). THE RAILS' INNER-WEB HOLES AT CM-05 AND CM-06 DRAIN AND VENT THEIR FRONT CORNERS, EACH WITH A CHECK "
-        "HOLE OPPOSITE IN THE OUTER WEB.",
-        "BOLT AND RIVET NUT: THE FIXINGS' HOLES, DRILLED BEFORE GALVANISING. A BOLT GOES THROUGH BOTH WEBS, ITS HOLES IN LINE (UF-01B ON "
+        "WEB: FRONT AND REAR FACE THE DRAWBAR AND THE REAR, INNER AND OUTER FACE THE CENTRELINE AND THE SIDE, MIDDLE THROUGH A TWIN'S WEBS "
+        "FACE TO FACE. SEAM: THROUGH THE RAIL'S TOP AND THE RAISER'S BOTTOM WALL (DETAIL E). THE RAILS' INNER-WEB HOLES DRAIN AND VENT EACH "
+        "TUBE OF CM-04 AND CM-05 AND CM-06'S FRONT CORNERS, EACH WITH A CHECK HOLE OPPOSITE IN THE OUTER WEB.",
+        "BOLT AND RIVET NUT: THE FIXINGS' HOLES, DRILLED BEFORE GALVANISING. A BOLT GOES THROUGH EVERY WEB, ITS HOLES IN LINE (UF-01B ON "
         "CM-04 AND CM-05, UF-03 ON CM-04, UF-08B ON CM-06 AND CM-08). EACH RAIL'S HANGER UF-03 OR UF-09 BOLTS INTO A BLIND RIVET NUT IN THE INNER WEB ONLY.",
     ] + [f"{c['member']}'S ENDS ARE ITS RECOVERY TONGUES' FACES, {c['cut']:g} INSIDE THE RAILS."
          for c in ch.data["member_galvanising_holes"].get("cut_ends", [])], width_chars=70, size=1.5)
