@@ -39,6 +39,7 @@ CELL = 200.0
 # VSB1's drawbar and chain tests, made with the body held on a rig at its suspension mounts (VSB1 Rev 6 14.2.1): the
 # hinge joints' rows give them beside and do not read them (CHS-18, CHS-19, the conductor's ruling of 27 Nov 2026)
 RIG_CASES = ("LC6", "LC6b")
+UNCAPPED = 1e30                                 # N: the side force cap of a support that holds whatever it is asked (LC8a)
 ROOT_GUSSET, ROOT_END_PLATE = "CH-P03", "CH-P15"   # the drawbar root's gusset and the rail's end plate its heel is welded to
 ROOT_PLACES = {"root_splice": "DB-{side}A's mitre at X {x:.0f}", "root_heel_weld": "CH-P03's heel, DB-{side}",
                "root_end_plate": "CH-P15 on RL-{side}", "root_end_plate_weld": "CH-P15's welds to RL-{side}, {weld}"}
@@ -460,114 +461,225 @@ class Analysis:
         resid = max(abs(v) for v in res.reactions.values())
         return res, dict(ball=R["ball"], arms=arms, residual_n=resid, jack=R.get("jack", [None, None]))
 
-    def recovery_reactions(self, F, p, held: str | None = None, base: dict | None = None, nose: dict | None = None) -> dict:
+    def recovery_reactions(self, F, p, held: str | tuple | None = None, base: dict | None = None, nose: dict | None = None,
+                           mu: float | None = None) -> dict:
         """LC8a's reaction, which report 11 does not give: the ground at the four tyres, the trailer a rigid body on each
         wheel's support stiffness, its tyre and arm in series (LC8a's reaction, est.). The wheels are unbraked, so the
         ground's force on each passes through its hub: along the trailer every wheel takes its share there, or with `held`
-        that wheel is held fast against an obstacle at its hub's height and the other three roll free, or with `held` a pair,
-        both wheels of one axle are (I2-93). Across and up every
-        tyre works at its lateral and vertical rate at its contact. The forces along and across hold the pull in plan, as
-        they always have, and the forces up hold what that leaves, its lift and its moments in roll and pitch.
+        that wheel is held fast against an obstacle at its hub's height and the other three roll free, or with `held` a
+        pair, both wheels of one axle are (I2-93). Up, every tyre works at its vertical rate at its contact, and across at
+        its lateral rate up to its grip, `mu` times its load from the vertical solve (LC8a `reaction` `mu`, I2-124): a tyre
+        the rates would ask for more slides across at its grip, and one off the ground holds nothing across. With one wheel
+        held, its axle-mate rolls along as the trailer turns about the held hub and takes nothing across (est.). Where the
+        free tyres' grip cannot hold the pull's moment about that hub, the trailer turns about it until the pull's line
+        stands where their grip holds it, each of them sliding across at its grip, and the held hub takes the rest. With
+        every wheel free, a side force their grip cannot hold slides the trailer sideways, so the pull is taken at the
+        largest share of it the trailer holds, as a pull that tips it is. `mu` None leaves the side rates uncapped.
 
         `base` is the trailer's weight as the static case reacts it (reactions, 1 g down): each tyre and the nose start
         from that load (I2-94). No tyre can pull the ground, so one that would leaves it and the trailer pitches or rolls
         onto the supports that remain, the `nose` at the ball among them: on its jockey wheel, which cannot pull either, or
-        held both ways by the coupled truck (LC8a `reaction` `nose`, est.). A bogged tyre that lifts is taken to stay in its
-        rut, which holds it along and across at its rates (est.). The set of supports in contact is iterated until every
-        one in contact pushes and none off the ground would. Where no set holds the trailer at the whole pull, it tips
-        first, so the pull is taken at the largest share of it that the trailer holds (`scale`). Without `base` no support
-        lifts. Returns the force the ground puts on each tyre at its contact and on each wheel at its hub, the nose's force,
-        the tyres off the ground, their rise on the rates (`lift`) and the scale."""
+        held both ways by the coupled truck (LC8a `reaction` `nose`, est.). A bogged tyre that lifts stays in its rut
+        along the trailer, which holds it there at its rate (est.). The set of supports in contact is iterated until every
+        one in contact pushes and none off the ground would, and the grip with the tyres' loads until the loads settle.
+        Where no set holds the trailer at the whole pull it tips, so the pull is taken at the largest share of it that the
+        trailer holds (`scale`, `limit` saying whether it tips or slides). Without `base` no support lifts. Returns the
+        force the ground puts on each tyre at its contact and on each wheel at its hub, the nose's force, the pull as the
+        trailer takes it (`pull`, scaled and turned), the tyres off the ground, their rise on the rates (`lift`), the turn
+        (`turn`, the pull's heading off the rail axis asked, taken and through the held hub, in degrees) and the grip."""
         r = next(lc for lc in self.ch.data["load_cases"] if lc["id"] == "LC8a")["reaction"]
+        wheels = self.ch.suspension
         held_ids = () if held is None else (held if isinstance(held, tuple) else (held,))
-        springs = []
-        for w in self.ch.suspension:
-            pre = float(base["contact"][w["id"]][2]) if base else 0.0
-            for d, k in ((0, r["kx"]), (1, r["ky"]), (2, r["kz"])):
-                at = w["hub"] if d == 0 else w["contact"]
-                obstacle = w["id"] in held_ids and d < 2
-                if held is not None and d < 2:
-                    k = r["held_k"] if obstacle else (0.0 if d == 0 else k)
-                    at = w["hub"] if obstacle else at
+        one = isinstance(held, str)
+        mates = {w["id"] for w in wheels if one and w["id"] != held and w["axle"] == next(x["axle"] for x in wheels if x["id"] == held)}
+        flat = []
+        for w in wheels:
+            obstacle = w["id"] in held_ids
+            for d, k in ((0, r["kx"]), (1, r["ky"])):
+                at = w["hub"] if (d == 0 or obstacle) else w["contact"]
+                if held is not None and not obstacle and (d == 0 or w["id"] in mates):
+                    k = 0.0
+                elif obstacle:
+                    k = r["held_k"]
                 if k:
-                    springs.append(dict(w=w["id"], d=d, k=k, e=np.eye(3)[d], at=np.asarray(at, float), pre=pre if d == 2 else 0.0,
-                                        on="hub" if obstacle or d == 0 else "contact", contact=w["id"] if d == 2 else None))
+                    flat.append(dict(w=w["id"], d=d, k=float(k), at=np.asarray(at, float), on="hub" if obstacle or d == 0 else "contact",
+                                     grip=None if obstacle or d == 0 else w["id"]))
+        vert = [dict(w=w["id"], k=r["kz"], at=np.asarray(w["contact"], float), pre=float(base["contact"][w["id"]][2]) if base else 0.0,
+                     on="contact", contact=w["id"]) for w in wheels]
         if base and nose:
-            springs.append(dict(w="nose", d=2, k=nose["kz"], e=np.eye(3)[2], at=np.array([0.0, 0.0, self.ch.V["coupling_z"]]),
-                                pre=float(base["ball"][2]), on="nose", contact=None if nose.get("holds_down") else "nose"))
-        for s in springs:
-            s["g"] = np.r_[s["e"], np.cross(s["at"], s["e"])]
-        F = np.asarray(F, float)
-        load = np.r_[F, np.cross(np.asarray(p, float), F)]
-        # in plan: X, Y and yaw on the forces along and across
-        plan, up = [0, 1, 5], [2, 3, 4]
-        flat = [s for s in springs if s["d"] < 2]
-        Kh = sum(s["k"] * np.outer(s["g"][plan], s["g"][plan]) for s in flat)
-        uh = np.linalg.solve(Kh, load[plan])
-        fh = {id(s): -s["k"] * (s["g"][plan] @ uh) for s in flat}
-        left = load + sum((fh[id(s)] * s["g"] for s in flat), np.zeros(6))      # what the plan leaves, up, in roll and in pitch
-        vert = [s for s in springs if s["d"] == 2]
-        ground = [s for s in vert if s["contact"]] if base else []              # the supports that can only push, with the weight
-        sc = np.array([1.0, 1e-3, 1e-3])                                          # rotations as mm at 1 m
+            vert.append(dict(w="nose", k=nose["kz"], at=np.array([0.0, 0.0, self.ch.V["coupling_z"]]), pre=float(base["ball"][2]),
+                             on="nose", contact=None if nose.get("holds_down") else "nose"))
+        gp = np.array([[1.0, 0.0, -s["at"][1]] if s["d"] == 0 else [0.0, 1.0, s["at"][0]] for s in flat])   # X, Y and yaw
+        kp = np.array([s["k"] for s in flat])
+        gripped = np.array([s["grip"] is not None for s in flat])
+        gv = np.array([[1.0, s["at"][1], -s["at"][0]] for s in vert])                                      # Z, roll and pitch
+        kv = np.array([float(s["k"]) for s in vert])
+        pre = np.array([s["pre"] for s in vert])
+        ground = np.array([bool(base) and s["contact"] is not None for s in vert])
+        sp, sv = np.array([1.0, 1.0, 1e-3]), np.array([1.0, 1e-3, 1e-3])                                # rotations as mm at 1 m
+        p = np.asarray(p, float)
+        F0 = np.asarray(F, float)
 
-        def solve(lam: float):
-            off: set[str] = set()
-            for _ in range(40):
-                act = [s for s in vert if s["contact"] not in off]
-                K = sum((s["k"] * np.outer(s["g"][up], s["g"][up]) for s in act), np.zeros((3, 3)))
-                ev = np.linalg.eigvalsh(K * sc[:, None] * sc[None, :])
-                if ev[0] < 1e-6 * ev[-1]:
+        def plan(Fv, caps):
+            """The forces along and across on the rates, each tyre's across up to its cap (elastic, then sliding at its
+            grip), or None where no set of them holds the pull in plan."""
+            load = np.array([Fv[0], Fv[1], p[0] * Fv[1] - p[1] * Fv[0]])
+            sgn = np.zeros(len(flat))
+            for _ in range(4 * len(flat) + 4):
+                el = sgn == 0
+                K = (gp[el].T * kp[el]) @ gp[el]
+                ev = np.linalg.eigvalsh(K * sp[:, None] * sp[None, :])
+                if ev[0] < 1e-10 * ev[-1]:
                     return None
-                rhs = lam * left[up] - sum((s["pre"] * s["g"][up] for s in vert if s["contact"] in off), np.zeros(3))
-                u = np.linalg.solve(K, rhs)
-                f = {id(s): s["pre"] - s["k"] * (s["g"][up] @ u) for s in vert}
-                neg = [s for s in ground if s["contact"] not in off and f[id(s)] < -1e-6]
-                back = [s for s in ground if s["contact"] in off and f[id(s)] > 1e-6]
-                if neg:
-                    off.add(min(neg, key=lambda s: f[id(s)])["contact"])
-                elif back:
-                    off.discard(max(back, key=lambda s: f[id(s)])["contact"])
+                u = np.linalg.solve(K, load + (sgn * caps)[~el] @ gp[~el])
+                f = -kp * (gp @ u)
+                over = np.where(el & gripped & (np.abs(f) > caps + 1e-6))[0]
+                back = np.where(~el & (caps > 0) & (sgn * f < caps - 1e-6))[0]
+                if len(over):
+                    i = over[np.argmax(np.abs(f[over]) - caps[over])]
+                    sgn[i] = math.copysign(1.0, f[i])
+                elif len(back):
+                    sgn[back[np.argmin(sgn[back] * f[back] - caps[back])]] = 0.0
                 else:
-                    return f, off, {s["contact"]: -f[id(s)] / s["k"] for s in ground if s["contact"] in off}
+                    return np.where(el, f, sgn * caps)
             return None
 
-        lam, got = 1.0, solve(1.0)
-        if got is None:
-            lo, hi, got = 0.0, 1.0, solve(0.0)
+        def turned(Fv, caps):
+            """One wheel held and the free tyres' grip short of the pull's moment about its hub: the trailer turns about
+            the hub until the moment is what their grip holds, each sliding across against the turn, the hub the rest."""
+            h = np.asarray(next(w["hub"] for w in wheels if w["id"] == held), float)
+            d = p[:2] - h[:2]
+            fh = math.hypot(Fv[0], Fv[1])
+            dx = np.array([s["at"][0] - h[0] for s in flat])
+            mf = float(np.sum(np.where(gripped, caps * np.abs(dx), 0.0)))
+            m0 = d[0] * Fv[1] - d[1] * Fv[0]
+            sg = math.copysign(1.0, m0)
+            phi = math.atan2(d[1], d[0]) + (sg * math.asin(min(1.0, mf / (math.hypot(*d) * fh))) if fh > 0 else 0.0)
+            Ft = np.array([fh * math.cos(phi), fh * math.sin(phi), Fv[2]])
+            mt = d[0] * Ft[1] - d[1] * Ft[0]
+            f = np.where(gripped, -(mt / mf if mf > 0 else 0.0) * caps * np.sign(dx), 0.0)
+            rest = -(Ft[:2] + np.array([0.0, float(np.sum(np.where(gripped, f, 0.0)))]))
+            for i, s in enumerate(flat):
+                if s["w"] == held:
+                    f[i] = rest[s["d"]]
+            return Ft, f
+
+        def sliding(Fv, caps):
+            """Every wheel free and the tyres' grip short of the side force: each tyre across at its grip against it and
+            the hubs along the trailer holding the pull along and in yaw, so the loads up can be found with them before
+            the slide is judged on the tyres' settled loads."""
+            load = np.array([Fv[0], Fv[1], p[0] * Fv[1] - p[1] * Fv[0]])
+            f = np.where(gripped, -math.copysign(1.0, Fv[1]) * caps, 0.0)
+            rest = load + f @ gp
+            K = (gp[~gripped].T * kp[~gripped]) @ gp[~gripped]
+            u = np.zeros(3)
+            u[[0, 2]] = np.linalg.solve(K[np.ix_([0, 2], [0, 2])], rest[[0, 2]])
+            return np.where(gripped, f, -kp * (gp @ u))
+
+        def vertical(left):
+            """The forces up on the supports that can only push, and the tyres off the ground, or None where it tips."""
+            off: set = set()
+            for _ in range(40):
+                on = np.array([s["contact"] not in off for s in vert])
+                K = (gv[on].T * kv[on]) @ gv[on]
+                ev = np.linalg.eigvalsh(K * sv[:, None] * sv[None, :])
+                if ev[0] < 1e-6 * ev[-1]:
+                    return None
+                u = np.linalg.solve(K, left - (pre[~on] @ gv[~on] if (~on).any() else 0.0))
+                f = pre - kv * (gv @ u)
+                neg = [i for i, s in enumerate(vert) if ground[i] and on[i] and f[i] < -1e-6]
+                back = [i for i, s in enumerate(vert) if ground[i] and not on[i] and f[i] > 1e-6]
+                if neg:
+                    off.add(vert[min(neg, key=lambda i: f[i])]["contact"])
+                elif back:
+                    off.discard(vert[max(back, key=lambda i: f[i])]["contact"])
+                else:
+                    return f, off, {vert[i]["contact"]: -f[i] / kv[i] for i in range(len(vert)) if ground[i] and not on[i]}
+            return None
+
+        def state(lam: float):
+            """The reaction at `lam` of the pull, the grip iterated with the tyres' loads, or None and why it fails."""
+            Fv = lam * F0
+            N = {s["w"]: max(s["pre"], 0.0) for s in vert if s["on"] == "contact"}
+            out = None
+            for _ in range(30):
+                caps = np.array([mu * N[s["grip"]] if (mu is not None and s["grip"] is not None) else UNCAPPED for s in flat])
+                fp, Ft, turn, slid = plan(Fv, caps), Fv, False, False
+                if fp is None and one:
+                    (Ft, fp), turn = turned(Fv, caps), True
+                elif fp is None:
+                    fp, slid = sliding(Fv, caps), True
+                left = np.r_[Ft, np.cross(p, Ft)]
+                for i, s in enumerate(flat):
+                    e = np.eye(3)[s["d"]] * fp[i]
+                    left = left + np.r_[e, np.cross(s["at"], e)]
+                got = vertical(left[[2, 3, 4]])
+                if got is None:
+                    return None, "tips"
+                f, off, lift = got
+                Nn = {s["w"]: (0.0 if s["contact"] in off else max(float(f[i]), 0.0)) for i, s in enumerate(vert) if s["on"] == "contact"}
+                out = dict(fp=fp, Ft=Ft, turn=turn, f=f, off=off, lift=lift, N=Nn, caps=caps)
+                if mu is None or max(abs(Nn[k] - N[k]) for k in N) < 0.5:
+                    break
+                N = Nn
+            return (None, "slides") if slid else (out, None)
+
+        lam, (st, why) = 1.0, state(1.0)
+        limit = None
+        if st is None:
+            limit = why
+            lo, hi, st = 0.0, 1.0, state(0.0)[0]
             for _ in range(14):
                 mid = (lo + hi) / 2
-                trial = solve(mid)
+                trial, w = state(mid)
                 if trial is None:
-                    hi = mid
+                    hi, limit = mid, w
                 else:
-                    lo, got = mid, trial
+                    lo, st = mid, trial
             lam = lo
-        f, off, lift = got
-        contact = {w["id"]: np.zeros(3) for w in self.ch.suspension}
+        contact = {w["id"]: np.zeros(3) for w in wheels}
         hub, nose_f = {}, np.zeros(3)
-        for s in springs:
-            if s["contact"] in off:
-                continue
-            v = (lam * fh[id(s)] if s["d"] < 2 else f[id(s)]) * s["e"]
-            if s["on"] == "nose":
-                nose_f = nose_f + v
-            elif s["on"] == "hub":
+        for i, s in enumerate(flat):
+            v = np.eye(3)[s["d"]] * float(st["fp"][i])
+            if s["on"] == "hub":
                 hub[s["w"]] = hub.get(s["w"], np.zeros(3)) + v
             else:
                 contact[s["w"]] = contact[s["w"]] + v
-        return dict(contact=contact, hub=hub, nose=nose_f, off=sorted(off), scale=lam, lift=lift)
+        for i, s in enumerate(vert):
+            if s["contact"] in st["off"]:
+                continue
+            v = np.array([0.0, 0.0, float(st["f"][i])])
+            if s["on"] == "nose":
+                nose_f = nose_f + v
+            else:
+                contact[s["w"]] = contact[s["w"]] + v
+        sx = 1.0 if F0[0] >= 0 else -1.0
 
-    def run_recovery(self, F, p, fractions, held: str | None = None, support: dict | None = None):
+        def heading(v) -> float:
+            return math.degrees(math.atan2(v[1], sx * v[0])) if math.hypot(v[0], v[1]) > 0 else 0.0
+        turn = dict(asked=heading(F0), taken=heading(st["Ft"]), turned=bool(st["turn"]))
+        if one:
+            h = next(w["hub"] for w in wheels if w["id"] == held)
+            turn["through"] = heading(p[:2] - np.asarray(h[:2], float))
+        side = float(sum(st["fp"][i] for i in range(len(flat)) if gripped[i]))
+        return dict(contact=contact, hub=hub, nose=nose_f, off=sorted(st["off"]), scale=lam, lift=st["lift"], pull=np.asarray(st["Ft"], float),
+                    limit=limit, turn=turn, grip=dict(mu=mu, side=side, sliding=[flat[i]["w"] for i in range(len(flat))
+                                                                               if gripped[i] and 0 < st["caps"][i] <= abs(st["fp"][i]) + 1e-3]))
+
+    def run_recovery(self, F, p, fractions, held: str | tuple | None = None, support: dict | None = None, mu: float | None = None,
+                     R: dict | None = None):
         """LC8a: the pull at its recovery point with the trailer's weight and its nose's support (`support`, I2-94), the
-        tyres' and the nose's reactions through supports that cannot pull (recovery_reactions), each arm a free body about
-        its hinge, its airbag taking its moment or its droop limit the part its airbag cannot (arm_loads), and the frame
-        held only by the six kinematic supports."""
+        tyres' and the nose's reactions through supports that cannot pull, the tyres' side forces within their grip `mu`
+        (recovery_reactions, or `R` where they are already solved), the pull as the trailer takes it, each arm a free body
+        about its hinge, its airbag taking its moment or its droop limit the part its airbag cannot (arm_loads), and the
+        frame held only by the six kinematic supports."""
         q = np.zeros(self.n)
         acc = (0.0, 0.0, -1.0) if support else (0.0, 0.0, 0.0)
         items = support["items"] if support else []
         base = support["base"] if support else None
-        R = self.recovery_reactions(F, p, held, base, support["nose"] if support else None)
-        self._apply(R["scale"] * np.asarray(F, float), p, fractions, q)
+        if R is None:
+            R = self.recovery_reactions(F, p, held, base, support["nose"] if support else None, mu)
+        self._apply(np.asarray(R["pull"], float), p, fractions, q)
         bag_min = None
         if support:
             q += support["q"]
@@ -577,6 +689,55 @@ class Analysis:
         res = self.kinematic.solve(q)
         self.resid = max(self.resid, max(abs(v) for v in res.reactions.values()))
         return res, dict(R, arms=arms, bag_min=bag_min)
+
+    def recovery_point(self, where: str, s: int) -> tuple[tuple[float, float, float], list[tuple[int, float]], int]:
+        """LC8a's pull point, the frame nodes it loads and the sign of its pull along the trailer: a front lug on side s,
+        pulled forward, a rear tongue at its shackle hole, pulled rearward (rear_recovery_point), or the coupling's ball."""
+        V = self.ch.V
+        if where == "front":
+            x = V["front_recovery_x"]
+            return (x, s * (V["rail_c"] + 35), V["db_z"]), [(self.fm.db_node(s, x), 1.0)], -1
+        if where == "rear":
+            p, cm = self.rear_recovery_point(s)
+            return p, [(self.fm.cm_node(cm, s * V["rail_c"]), 1.0)], 1
+        return (0.0, 0.0, V["coupling_z"]), [(self.fm.ball, 1.0)], -1
+
+    def recovery_pulls(self, lc8: dict, s: int) -> list[tuple[str, Any, float, float]]:
+        """LC8a's pulls at one point, each its label, the wheels held, its heading off the rail axis and its share of the
+        rated pull: every wheel free at the free limit, 30 degrees either way and along the rail axis (I2-118, I2-119),
+        one wheel held at the held-wheel limit (I2-93, I2-124) and both wheels of one axle held at the held-axle limit,
+        each at LC8a's five headings, 30 and 15 degrees either way and along the axis. At the coupling (s 0) every pull
+        is along the rail axis, a held wheel's too, the free tyres' grip turning the trailer about it as far as it does."""
+        sd = lc8["sideways_deg"]
+        rated = lc8["force_n"]
+        free = lc8.get("free_n", rated)
+        at_free = f", at the {free / 1000:g} kN limit" if free < rated - 1e-6 else ""
+        five = (-sd, -sd // 2, 0, sd // 2, sd) if s else (0,)
+        pulls = [(f"{h:+d} deg sideways{at_free}", None, math.radians(h), free / rated) for h in ((-sd, 0, sd) if s else (0,))]
+        for w in self.ch.suspension:
+            pulls += [(f"{h:+d} deg sideways, wheel {w['id']} held, at the {lc8['held_wheel_n'] / 1000:g} kN limit", w["id"], math.radians(h),
+                       lc8["held_wheel_n"] / rated) for h in five]
+        for axle in ("front", "rear"):
+            pair = tuple(w["id"] for w in self.ch.suspension if w["axle"] == axle)
+            pulls += [(f"{h:+d} deg sideways, both {axle} wheels held, at the {lc8['held_axle_n'] / 1000:g} kN limit", pair, math.radians(h),
+                       lc8["held_axle_n"] / rated) for h in five]
+        return pulls
+
+    @staticmethod
+    def recovery_label(where: str, s: int, lab: str, v: int, sup: dict, mus: list, R: dict, shown: float | None, kn: float) -> str:
+        """One LC8a case's label: the point, the pull, how far the trailer turned on a held wheel, the bounds of the tyres'
+        grip it is read at, the pull at the ultimate (`shown`) and the share of it at which the trailer tips or slides."""
+        out = (f"{where} {'kerb' if s < 0 else 'road'}-side point" if s else "the coupling") + f", {lab}, {v:+d} deg up, {sup['label']}"
+        t = R["turn"]
+        if t.get("turned"):
+            out += f", turned to {t['taken']:+.1f} deg (through the hub {t['through']:+.1f})"
+        if mus != [None]:
+            out += f", mu {' or '.join(f'{m:g}' for m in mus)}"
+        if shown is not None:
+            out += f", {shown / 1000:.1f} kN"
+        if R["scale"] < 1.0 - 1e-9:
+            out += f", {'sliding' if R['limit'] == 'slides' else 'tipping'} at {R['scale'] * kn / 1000:.1f} kN"
+        return out
 
     def recovery_supports(self, cases) -> list[dict]:
         """The weights and nose supports LC8a is read with (LC8a `reaction` `weight` and `nose`): each trailer case at
@@ -607,18 +768,33 @@ class Analysis:
         ground, the pulls the trailer tips under before they reach their full size, and each held hinge's force. The counts
         and the tipping pulls are those with every wheel free, at the rated pull, or one held, at the held-wheel limit;
         `pull` gives the pull's direction, its size and whether both wheels of an axle are held, whose tipping pulls are
-        kept apart (`axle_tipped`)."""
+        kept apart (`axle_tipped`). A pull the trailer slides sideways under before it reaches its full size (`slid`, every
+        wheel free, the tyres at their grip) is kept apart from one it tips under, and a held wheel's pulls that turn the
+        trailer are counted with the largest turn and side force at each bound of the grip (`turns`, I2-124)."""
         e = self.lc8_arms.setdefault(lc_id, dict(cases=0, lifted=0, nose_off=0, tipped=[], axle_tipped=[], axle_cases=0, droop={}, bag={},
-                                                 hinge={}, lift=dict(mm=0.0), nose=dict(up=0.0, down=0.0)))
+                                                 hinge={}, lift=dict(mm=0.0), nose=dict(up=0.0, down=0.0), slid=[], turns={}))
         off = info["off"]
         pull = pull or {}
         if pull.get("where"):
             key = f"{pull['where']}, {'axle held' if pull.get('axle') else ('wheel held' if held else 'every wheel free')}"
             e.setdefault("points", {})[key] = e.setdefault("points", {}).get(key, 0) + 1
+        short = info["scale"] < 1.0 - 1e-9
+        if held is not None and not pull.get("axle"):
+            t = e["turns"].setdefault(f"{pull.get('mu')}", dict(cases=0, turned=0, deg=0.0, side_kn=0.0))
+            t["cases"] += 1
+            turn = info.get("turn", {})
+            if turn.get("turned"):
+                t["turned"] += 1
+                deg = abs(turn["taken"] - turn["asked"])
+                if deg > t["deg"]:
+                    t.update(deg=deg, case=label)
+            side = abs(info.get("grip", {}).get("side", 0.0)) / 1000
+            if side > t["side_kn"]:
+                t.update(side_kn=side, side_case=label)
         if pull.get("axle"):
             e["axle_cases"] += 1
-            if info["scale"] < 1.0 - 1e-9:
-                e["axle_tipped"].append(dict(pull, case=label, scale=info["scale"], kn=info["scale"] * pull["kn"]))
+            if short:
+                e["axle_tipped"].append(dict(pull, case=label, scale=info["scale"], kn=info["scale"] * pull["kn"], limit=info.get("limit")))
         else:
             e["cases"] += 1
             e["nose"]["up"] = max(e["nose"]["up"], float(info["nose"][2]))
@@ -628,8 +804,9 @@ class Analysis:
                     e["lift"] = dict(mm=mm, wheel=k, case=label)
             e["lifted"] += sum(1 for o in off if o != "nose")
             e["nose_off"] += "nose" in off
-            if info["scale"] < 1.0 - 1e-9:
-                e["tipped"].append(dict(pull, case=label, scale=info["scale"], kn=info["scale"] * pull.get("kn", 0.0)))
+            if short:
+                e["slid" if info.get("limit") == "slides" else "tipped"].append(dict(pull, case=label, scale=info["scale"],
+                                                                                     kn=info["scale"] * pull.get("kn", 0.0)))
         for wid, a in info["arms"].items():
             if a["droop_n"] > e["droop"].get(wid, {}).get("n", 0.0):
                 e["droop"][wid] = dict(n=a["droop_n"], case=label, airbag_n=a["airbag"], off=off)
@@ -783,6 +960,9 @@ class Analysis:
         self.run_env: dict[str, dict] = {}
         self.seam_env: dict[str, dict] = {}
         self.bar_env: dict[str, dict] = {}
+        main_runs, main_cheeks = self.run_env, self.cheek_env
+        self.lc8_mu = {mu: dict(runs={}, cheeks={}) for mu in (lcs["LC8a"]["reaction"].get("mu") or [None])}
+        rcache: dict = {}                     # LC8a's reactions, the same on every frame model
         for bar, fm in models:
             self._use(fm)
             sites = self.hole_sites()
@@ -845,56 +1025,65 @@ class Analysis:
             # LC8a at each recovery point, at the 58.9 kN pull (no yield) and at the 78.5 kN ultimate (no fracture, LC8u): the
             # members on their AS 4100 effective sections against fy, the holes on their net sections against 0.85 fu. A rear
             # tongue's pull acts at its shackle hole and enters the frame at the rear crossmember's end, where the tongue is
-            # welded through the crossmember and along the rail's web (rear_recovery_point, I2-87)
+            # welded through the crossmember and along the rail's web (rear_recovery_point, I2-87). The coupling is a pull point
+            # too, since most bogged trailers come out with the truck pulling there, along the rail axis within LC8a's 15
+            # degrees up or down (`coupling`, the conductor's ruling of 27 Nov 2026). Each pull is read at each bound of the
+            # tyres' grip (`reaction` `mu`, I2-124), the worse governing every check, CHS-14's and CHS-18's readings at each
+            # bound kept apart beside them (lc8_mu). A pull whose reaction one already read on this model gives, as a held
+            # wheel's pulls that turn the trailer as far as one another do, is counted again and not solved again
             lc8 = lcs["LC8a"]
             supports = self.recovery_supports(cases)
-            # the coupling too, since most bogged trailers come out with the truck pulling there: along the rail axis within
-            # LC8a's 15 degrees up or down, or through a held wheel's hub as the trailer turns on the ball until the pull
-            # passes through it, under the same limits (`coupling`, the conductor's ruling of 27 Nov 2026)
             points = [(where, s) for where in ("front", "rear") for s in (-1, 1)] + ([("coupling", 0)] if lc8.get("coupling") else [])
+            mus = lc8["reaction"].get("mu") or [None]
+            vd = lc8["vertical_deg"]
             for lc_id, Fr in (("LC8a", lc8["force_n"]), ("LC8u", lc8["ultimate_n"])):
+                seen: dict = {}
                 for where, s in points:
-                    if where == "front":
-                        x, sx = V["front_recovery_x"], -1
-                        p, fr = (x, s * (V["rail_c"] + 35), V["db_z"]), [(self.fm.db_node(s, x), 1.0)]
-                    elif where == "rear":
-                        sx = 1
-                        p, cm = self.rear_recovery_point(s)
-                        fr = [(self.fm.cm_node(cm, s * V["rail_c"]), 1.0)]
-                    else:
-                        sx, p, fr = -1, ball_p, [(self.fm.ball, 1.0)]
-                    sd, vd = lc8["sideways_deg"], lc8["vertical_deg"]
-                    hs = (-sd, 0, sd) if s else (0,)
-                    # every wheel free, at the rated pull or at the free limit under it (I2-118, I2-119)
-                    free = lc8.get("free_n", lc8["force_n"])
-                    at_free = f", at the {free / 1000:g} kN limit" if free < lc8["force_n"] - 1e-6 else ""
-                    pulls = [(f"{h:+d} deg sideways{at_free}", None, math.radians(h), free / lc8["force_n"]) for h in hs]
-                    # one wheel held fast at its hub, the pull through it, at the held-wheel limit (I2-93, I2-114)
-                    for w in ch.suspension:
-                        hdg = math.atan2(p[1] - w["hub"][1], sx * (p[0] - w["hub"][0]))
-                        if abs(hdg) <= math.radians(sd) + 1e-9:
-                            pulls.append((f"{math.degrees(hdg):+.1f} deg sideways through wheel {w['id']}, held, at the "
-                                          f"{lc8['held_wheel_n'] / 1000:g} kN limit", w["id"], hdg, lc8["held_wheel_n"] / lc8["force_n"]))
-                    # both wheels of one axle held fast at their hubs, at the recovery limit that case takes (I2-93)
-                    for axle in ("front", "rear"):
-                        pair = tuple(w["id"] for w in ch.suspension if w["axle"] == axle)
-                        pulls += [(f"{h:+d} deg sideways, both {axle} wheels held, at the {lc8['held_axle_n'] / 1000:g} kN limit", pair,
-                                   math.radians(h), lc8["held_axle_n"] / lc8["force_n"]) for h in ((-sd, -sd // 2, 0, sd // 2, sd) if s else (0,))]
-                    for lab, held, hdg, k in pulls:
+                    p, fr, sx = self.recovery_point(where, s)
+                    for lab, held, hdg, k in self.recovery_pulls(lc8, s):
                         for v in (-vd, 0, vd):
                             F = k * Fr * np.array([sx * math.cos(hdg) * math.cos(math.radians(v)), math.sin(hdg) * math.cos(math.radians(v)),
                                                    math.sin(math.radians(v))])
-                            for sup in supports:
-                                res, info = self.run_recovery(F, p, fr, held, sup)
-                                label = ((f"{where} {'kerb' if s < 0 else 'road'}-side point" if s else "the coupling") + f", {lab}, {v:+d} deg up, {sup['label']}"
-                                         + (f", {k * Fr / 1000:.1f} kN" if lc_id == "LC8u" else "")
-                                         + (f", tipping at {info['scale'] * k * Fr / 1000:.1f} kN" if info["scale"] < 1.0 - 1e-9 else "") + tag)
-                                take(lc_id, res, label, ultimate=lc_id == "LC8u")
-                                if first:
-                                    self._recovery_envelope(lc_id, label, info, held, dict(
-                                        where=where, side=s, h=round(math.degrees(hdg), 1), v=v, kn=k * Fr / 1000, axle=isinstance(held, tuple),
-                                        weight=sup["label"].split(",")[0], coupled=bool(sup["nose"].get("holds_down"))))
-                                self._cheek_envelope(lc_id, label, res)
+                            for si, sup in enumerate(supports):
+                                groups: dict = {}
+                                for mu in mus:
+                                    ck = (lc_id, where, s, lab, v, si, mu)
+                                    if ck not in rcache:
+                                        rcache[ck] = self.recovery_reactions(F, p, held, sup["base"], sup["nose"], mu)
+                                    groups.setdefault((where, s, si, _reaction_key(rcache[ck])), []).append(mu)
+                                for key, ms in groups.items():
+                                    R = rcache[(lc_id, where, s, lab, v, si, ms[0])]
+                                    label = self.recovery_label(where, s, lab, v, sup, ms, R, k * Fr if lc_id == "LC8u" else None, k * Fr) + tag
+                                    got = seen.get(key)
+                                    todo = [m for m in ms if got is None or m not in got["mus"]]
+                                    if todo:
+                                        res, info = self.run_recovery(F, p, fr, held, sup, R=R)
+                                        for j, mu in enumerate(todo):
+                                            self.run_env, self.cheek_env = self.lc8_mu[mu]["runs"], self.lc8_mu[mu]["cheeks"]
+                                            if j == 0 and got is None:
+                                                take(lc_id, res, label, ultimate=lc_id == "LC8u")
+                                            else:
+                                                self._hinge_envelope(lc_id, label, res, bar)
+                                            self._cheek_envelope(lc_id, label, res)
+                                        self.run_env, self.cheek_env = main_runs, main_cheeks
+                                        got = seen.setdefault(key, dict(info=info, mus=set()))
+                                        got["mus"].update(todo)
+                                    if first:
+                                        for mu in ms:
+                                            Rm = rcache[(lc_id, where, s, lab, v, si, mu)]
+                                            info = dict(got["info"], turn=Rm["turn"], grip=Rm["grip"], limit=Rm["limit"], scale=Rm["scale"])
+                                            self._recovery_envelope(lc_id, label, info, held, dict(
+                                                where=where, side=s, h=round(math.degrees(hdg), 1), v=v, kn=k * Fr / 1000, axle=isinstance(held, tuple),
+                                                weight=sup["label"].split(",")[0], coupled=bool(sup["nose"].get("holds_down")), mu=mu))
+        # each bound of the tyres' grip read apart, and the worse of them in the envelopes CHS-14 and CHS-18 read
+        for d in self.lc8_mu.values():
+            for name, env_ in (("runs", self.run_env), ("cheeks", self.cheek_env)):
+                for lc_id, e in d[name].items():
+                    for part, r in e.items():
+                        cur = env_.setdefault(lc_id, {}).get(part)
+                        if cur is None or r["mpa"] > cur["mpa"]:
+                            env_[lc_id][part] = dict(r)
+
         self._use(models[0][1])
         out = dict(envelope={}, governing={}, deflections={}, twist=twist, balls=balls, residual_n=self.resid,
                    frame=dict(nodes=len(self.f.nodes), elements=sum(1 for e in self.f.elements if not e.sec.rigid),
@@ -1686,35 +1875,56 @@ class Analysis:
             bag = max((x["n"] for x in e["bag"].values()), default=0.0)
             rows.append((f"airbag's top bracket fillets under its bump load, {lc_id}", bag / ((ab["l"] + 2 * ab["returns"]) * 0.7 * ab["leg"]), wcap))
         u8 = self.lc8_arms["LC8u"]
-        wid, dr = max(u8["droop"].items(), key=lambda kv: kv[1]["n"])
-        return _local("XT arms' droop limits and airbag brackets", rows,
-                      f"LC8a's arms, the worst droop limit {dr['n'] / 1000:.1f} kN at {wid} in {dr['case']}")
+        wid, dr = max(u8["droop"].items(), key=lambda kv: kv[1]["n"], default=(None, None))
+        worst = (f"the worst droop limit {dr['n'] / 1000:.1f} kN at {wid} in {dr['case']}" if wid else
+                 "no arm reaches its droop limit, so the limits and their brackets take nothing")
+        return _local("XT arms' droop limits and airbag brackets", rows, f"LC8a's arms, {worst}")
 
     def recovery_summary(self) -> dict:
         """LC8a's supports over its cases (I2-94), for CHASSIS.md and Cruisemaster's items: the cases read, the tyres off the
         ground, the pulls the trailer tips under and the least share of the pull it holds, each droop limit's and airbag's
         largest force, and the held hinges' largest force along the trailer with the hinge bar's moment from the pivot up to
-        the cheek's pin."""
+        the cheek's pin. With them, the pulls the trailer slides sideways under with every wheel free, the least pull that
+        tips it at the coupling up and down, a held wheel's turns at each bound of the tyres' grip, and CHS-18's and CHS-14's
+        readings at each bound (`mu`, I2-124), the worse of which their rows read."""
         ck = self.ch.data["xt_hinges"]["cheek"]
         depth = self.ch.V["pivot_below"] - ck["bar_d"] / 2
+        mat = self.ch.data["material"]
+        wcap = mat["weld_phi"] * 0.6 * mat["weld_fuw"]
         out = {}
         for lc_id, e in self.lc8_arms.items():
-            dw, dr = max(e["droop"].items(), key=lambda kv: kv[1]["n"])
+            dw, dr = max(e["droop"].items(), key=lambda kv: kv[1]["n"], default=(None, dict(n=0.0, case="", airbag_n=0.0, off=[])))
             bw, bg = max(e["bag"].items(), key=lambda kv: kv[1]["n"])
-            hw, hg = max(e["hinge"].items(), key=lambda kv: abs(kv[1]["f"][0]))
+            hw, hg = max(e["hinge"].items(), key=lambda kv: abs(kv[1]["f"][0]), default=(None, dict(f=np.zeros(3), case="")))
             least = min(e["tipped"], key=lambda t: t["kn"]) if e["tipped"] else None
-            classes = {}
+            classes, coupling = {}, {}                     # the lugs' and tongues' tipping pulls, and the coupling's apart
             for t in e["tipped"]:
+                if t.get("where") == "coupling":
+                    if t["kn"] < coupling.get(f"{t['v']:+d}", dict(kn=math.inf))["kn"]:
+                        coupling[f"{t['v']:+d}"] = dict(kn=t["kn"], case=t["case"], weight=t["weight"], coupled=t["coupled"])
+                    continue
                 key = f"{'sideways' if abs(t['h']) >= 20 else 'along'} {t['v']:+d}"
                 if key not in classes or t["kn"] < classes[key]["kn"]:
                     classes[key] = dict(kn=t["kn"], case=t["case"], weight=t["weight"], coupled=t["coupled"])
+            slid = min(e["slid"], key=lambda t: t["kn"]) if e["slid"] else None
             axle_least = min(e["axle_tipped"], key=lambda t: t["kn"]) if e["axle_tipped"] else None
+            by_mu = {}
+            for mu, d in getattr(self, "lc8_mu", {}).items():
+                runs = {bar: dict(util=r["mpa"] / wcap, mpa=r["mpa"], case=r["case"], wheel=r["wheel"], line=r["line"])
+                        for bar, r in d["runs"].get(lc_id, {}).items()}
+                cheeks = d["cheeks"].get(lc_id, {})
+                part, c = max(cheeks.items(), key=lambda kv: kv[1]["mpa"] / (mat["plate_fy"] if "section" in kv[0] else wcap), default=(None, None))
+                by_mu[f"{mu:g}" if mu is not None else "none"] = dict(
+                    runs=runs, cheeks=dict(part=part, util=c["mpa"] / (mat["plate_fy"] if "section" in part else wcap), case=c["case"]) if part else None,
+                    turns=e["turns"].get(f"{mu}"))
             out[lc_id] = dict(points=dict(e.get("points", {})), cases=e["cases"], lifted=e["lifted"], nose_off=e["nose_off"], tipped=len(e["tipped"]), least=least, lift=e["lift"], nose=e["nose"],
-                              tip_classes=classes, axle=dict(cases=e["axle_cases"], tipped=len(e["axle_tipped"]), least=axle_least),
+                              tip_classes=classes, coupling_tips=coupling, slid=dict(cases=len(e["slid"]), least=slid),
+                              axle=dict(cases=e["axle_cases"], tipped=len(e["axle_tipped"]), least=axle_least),
                               droop=dict(wheel=dw, n=dr["n"], case=dr["case"], airbag_n=dr["airbag_n"], off=dr["off"]),
                               droop_by_wheel={k: v["n"] for k, v in e["droop"].items()},
                               bag=dict(wheel=bw, n=bg["n"], case=bg["case"]),
-                              hinge=dict(wheel=hw, f=[float(x) for x in hg["f"]], case=hg["case"], bar_moment_nmm=abs(float(hg["f"][0])) * depth))
+                              hinge=dict(wheel=hw, f=[float(x) for x in hg["f"]], case=hg["case"], bar_moment_nmm=abs(float(hg["f"][0])) * depth),
+                              mu=by_mu)
         return out
 
     def fy_of_part(self, member: str) -> float:
@@ -2698,6 +2908,12 @@ def _dir(F) -> str:
     return ("+" if F[i] > 0 else "-") + "XYZ"[i]
 
 
+def _reaction_key(R: dict) -> tuple:
+    """LC8a's reaction as the frame takes it, to the mN: two reactions with one key load the frame alike."""
+    parts = [R["pull"], R["nose"]] + [R["contact"][k] for k in sorted(R["contact"])] + [R["hub"][k] for k in sorted(R["hub"])]
+    return tuple(sorted(R["hub"])) + tuple(np.round(np.concatenate([np.asarray(x, float) for x in parts]), 3).tolist())
+
+
 def _box_gap(a, b) -> float:
     """The clear distance between two boxes (x0, y0, z0, x1, y1, z1), 0 where they meet or overlap."""
     return math.sqrt(sum(max(0.0, b[k] - a[k + 3], a[k] - b[k + 3]) ** 2 for k in range(3)))
@@ -2869,9 +3085,12 @@ def recovery_rule(results: dict, lc8: dict) -> dict:
     """The user's recovery rule (I2-93, I2-100, I2-114, I2-119), from LC8a's data and the frame analysis's recovery summary:
     the pull each point is rated for, the limit with every wheel free (the rated pull where every check holds it) and the
     directions it holds within, the limits with one wheel and with both wheels of one axle held fast, and the least
-    pull, in kN, that tips the trailer before the rated pull when it is pulled up or down, sideways and along its line,
-    and whether any level pull does."""
-    tc = results["recovery"]["LC8a"]["tip_classes"]
+    pull, in kN, that tips the trailer before the rated pull at a lug or tongue when it is pulled up or down, sideways and
+    along its line, the least at the coupling pulled up and down, where the pull is along the rail axis only, and whether
+    any level pull tips it."""
+    rec = results["recovery"]["LC8a"]
+    tc = rec["tip_classes"]
+    ct = rec.get("coupling_tips", {})
     vd = lc8["vertical_deg"]
 
     def least(prefix: str):
@@ -2882,7 +3101,8 @@ def recovery_rule(results: dict, lc8: dict) -> dict:
                 held_axle_kn=lc8["held_axle_n"] / 1000,
                 sideways_up_kn=least(f"sideways +{vd}"), sideways_down_kn=least(f"sideways -{vd}"),
                 along_up_kn=least(f"along +{vd}"), along_down_kn=least(f"along -{vd}"),
-                level_tips=any(k.endswith(" +0") for k in tc))
+                coupling_up_kn=ct.get(f"+{vd}", {}).get("kn"), coupling_down_kn=ct.get(f"-{vd}", {}).get("kn"),
+                level_tips=any(k.endswith(" +0") for k in tc) or "+0" in ct)
 
 
 def net_section(gross: dict, strips: list[dict], levers, y_lever: float, face_w: float, d_wall: float) -> dict:
