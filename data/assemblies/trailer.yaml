@@ -778,7 +778,7 @@ items:
     note: Every drain falls to it by gravity, so its top stays at the rails' top, under the shower well. Its ends sit on four galvanised steel angles bolted through the XT rear shock and rear crossmembers (UF-08B) on 10 mm rubber, each end stepped up onto the rubber, held down by two padded stainless straps, and the welded box spans between them. Its three cross baffles keep its bottom's sag in each cell to about 5.4 mm at the most (est.), so its guard UF-09 hangs grey_guard_gap under it and carries only itself (I2-122). Vent to the road side, outlet and camlock on the kerb side. Empty for travel except in TC7 and TC8.
   - id: UF-08B
     name: Grey tank's bearers, galvanised steel angles bolted through the XT rear shock and rear crossmembers under the tank's ends
-    model: {name: tank_bearers, box: [grey_x0 - 10, -grey_w / 2, rail_underside_z - 20, grey_l + 60, grey_w, 80]}
+    model: {name: tank_bearers, box: [grey_x0 - 10, -grey_w / 2, rail_underside_z - 15, grey_l + 60, grey_w, 80]}
     material: "Unequal angle 75 x 50 x 6, AS/NZS 3679.1 grade 300, hot-dip galvanised, M10 8.8 galvanised bolts through both webs of each crossmember on crush tubes, 10 mm EPDM strip"
     system: underfloor
     # Layout.tank_bearers places them as UF-01B's, a pair either side of the centreline at each place, `y` mm off the

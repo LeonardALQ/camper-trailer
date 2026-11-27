@@ -914,7 +914,7 @@ def ct603(prj, model, bom, checks, reg, dwg):
     for b in lay.blocks:
         if b.box is not None and (b.id.startswith(UNDER_FLOOR) or b.id in ("UF-01", "UF-01R", "UF-08", "UF-06")):
             pr.box(b.box, "hidden")
-    for b in lay.tanks():
+    for b in lay.tanks() + [lay.find("UF-08")]:   # the grey tank's steps onto its bearers too (I2-122)
         _tank_notches(pr, b, "hidden")
     for b in lay.blocks:
         if b.box is not None and b.id.startswith("CM-"):
