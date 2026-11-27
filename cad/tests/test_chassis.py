@@ -411,7 +411,7 @@ def test_trailer_md_gives_the_recovery_rule():
     line = next(x for x in text.splitlines() if x.startswith("- Recovery:"))
     sides = [x for x in (r["sideways_up_kn"], r["sideways_down_kn"]) if x is not None]
     alongs = [x for x in (r["along_up_kn"], r["along_down_kn"]) if x is not None]
-    tips = [f"{min(sides):.1f} kN"] * bool(sides) + [f"{min(alongs):.1f} kN"] * bool(alongs)
+    tips = [f"{min(x):.1f} kN" for x in (sides, alongs) if x]
     for figure in (f"{r['rated_kn']:.1f} kN", f"{r['free_kn']:g} kN", f"{r['held_wheel_kn']:g} kN", f"{r['held_axle_kn']:g} kN",
                    *tips, f"{r['sideways_deg']:g} degrees", f"{r['vertical_deg']:g} degrees"):
         assert figure in line, figure

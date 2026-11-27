@@ -428,7 +428,8 @@ def _recovery_line() -> str:
               "WITH BOTH WHEELS OF ONE AXLE HELD FAST.")
     if not sides and not alongs:                         # no pull within the limits tips it (I2-121)
         return limits + " WITHIN THESE LIMITS THE TRAILER DOES NOT TIP, LEVEL OR PULLED UP OR DOWN."
-    tips = " AND ".join([f"{min(sides):.1f} kN AT {r['sideways_deg']:g} DEGREES SIDEWAYS"] * bool(sides) + [f"{min(alongs):.1f} kN ALONG ITS LINE"] * bool(alongs))
+    tips = " AND ".join(([f"{min(sides):.1f} kN AT {r['sideways_deg']:g} DEGREES SIDEWAYS"] if sides else [])
+                        + ([f"{min(alongs):.1f} kN ALONG ITS LINE"] if alongs else []))
     return limits + f" PULL LEVEL: PULLED {r['vertical_deg']:g} DEGREES UP OR DOWN THE EMPTY TRAILER CAN TIP FROM {tips}."
 
 
