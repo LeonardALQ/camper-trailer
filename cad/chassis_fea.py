@@ -42,6 +42,7 @@ RIG_CASES = ("LC6", "LC6b")
 ROOT_GUSSET, ROOT_END_PLATE = "CH-P03", "CH-P15"   # the drawbar root's gusset and the rail's end plate its heel is welded to
 ROOT_PLACES = {"root_splice": "DB-{side}A's mitre at X {x:.0f}", "root_heel_weld": "CH-P03's heel, DB-{side}",
                "root_end_plate": "CH-P15 on RL-{side}", "root_end_plate_weld": "CH-P15's welds to RL-{side}, {weld}"}
+ROOT_READERS = {"run_root": "run_root_stresses", "cheek_root": "cheek_root_stresses"}   # FAT-26 and FAT-27 (I2-125)
 NU = 0.3
 
 
@@ -1757,6 +1758,9 @@ class Analysis:
 
         out = []
         for d in ch.data["fatigue_details"]:
+            if d["stress"] in ROOT_READERS:
+                out.append(self.root_fatigue(d, lc1, lc))
+                continue
             best = (0.0, "", "")
             for cid, res in lc1.items():
                 s, where = max(candidates(d, res))
@@ -1805,6 +1809,75 @@ class Analysis:
             sig = self.member_end_stress(res, cm.id)
             out += [(n / 1000 * wall["toe_mpa_kn"][r] + sig, f"{w['id']}'s run {b['runs'][r]:g} mm inboard on {cm.id}") for r, n in enumerate(per)]
         return out
+
+    def run_root_stresses(self, res) -> list[tuple[float, float, str]]:
+        """FAT-26 (I2-125): the roots of the hinge bars' weld runs in one case, each run read as CHS-18 reads it
+        (_hinge_envelope), the rigid bars' three runs a side as one group and the elastic bars' each on its own under the
+        forces its own welds pass, at each fillet's two ends by the elastic vector method, the throat stress there split
+        into sigma_w normal to the fillet's axis and tau_w along it (group_throat), as (sigma_w, tau_w, where)."""
+        if self.hinges != "crossmember":
+            return []
+        cache = self.__dict__.setdefault("_run_groups", {})
+        rigid = self.fm.hinge_bar != "elastic"
+        out = []
+        for w in self.ch.suspension:
+            key = (w["id"], rigid)
+            if key not in cache:
+                cache[key] = [dict(y=None, g=self.hinge_run_group(w))] if rigid else self.hinge_runs_alone(w)
+            groups = cache[key]
+            for grp, (F, M) in zip(groups, self._run_actions(res, w["id"], groups)):
+                out += [(s, t, f"{name} at {w['id']}" + (", the runs as one group" if rigid else ""))
+                        for name, s, t in group_throat(grp["g"], F, M)]
+        return out
+
+    def cheek_root_stresses(self, res) -> list[tuple[float, float, str]]:
+        """FAT-27 (I2-125): the roots of the hinge cheeks' and fillers' load-carrying welds in one case, under each
+        hinge's pin force and each cheek's share of it, as CHS-14 reads them in LC8a (_cheek_envelope, cheek_welds), each
+        weld's stress taken whole as normal to its throat, on the safe side, with none along it. The filler's own section
+        is no weld and is left out."""
+        if self.hinges != "crossmember":
+            return []
+        xyz = np.asarray(self.f.nodes)
+        cheeks = self.ch.hinge_cheeks()
+        out = []
+        for wid, k in self.fm.cheek_pins.items():
+            el = self.f.elements[k]
+            R, _ = el.axes(xyz)
+            F = -R.T @ np.asarray(res.forces[k][6:9])
+            mine = [c for c in cheeks if c["wheel"] == wid]
+            px = next(w["pivot"][0] for w in self.ch.suspension if w["id"] == wid)
+            for c in mine:
+                out += [(mpa, 0.0, f"the {'front' if c['way'] < 0 else 'rear'} cheek's {part} at {wid}")
+                        for part, mpa in self.cheek_welds(F * self.cheek_share(c, mine, px), c).items() if "section" not in part]
+        return out
+
+    def root_fatigue(self, d: dict, lc1: dict, lc: dict) -> dict:
+        """FAT-26 and FAT-27 (I2-125): a weld's root in LC10 on IIW-1823-07's two curves for the stress in its throat, FAT
+        `fat` on sigma_w normal to the weld's axis (414, slope 3 to its knee at 10 million cycles) and FAT `fat_shear` on
+        tau_w along it (Table 3.2-2 no. 2, slope 5 to its knee at 100 million), the two in phase and combined by IIW's
+        interaction (4.3.1, Table 4.3-1, CV 1.0). The frequent ranges pass when (sigma_w / its CAFL)^2 + (tau_w / its
+        CAFL)^2 is at most 1, and the occasional ranges when the Miner damage they use up by the same interaction
+        (root_damage) is at most LC10's miner_limit, each at its worst point, case and frame model. range_mpa is the
+        frequent's equivalent normal range, the normal CAFL times the root of that sum, so the row compares with its CAFL
+        as the others do."""
+        read = getattr(self, ROOT_READERS[d["stress"]])
+        fat, fs = d["fat"], d["fat_shear"]
+        c_n, c_s = sn_range(fat, 3, 1e7, 1e7), sn_range(fs, 5, 1e8, 1e8)
+        k, n = lc["occasional_factor"], lc["occasional_cycles"]
+        freq, occ = (0.0, 0.0, 0.0, "no weld read", ""), (0.0, 0.0, 0.0, "no weld read", "")
+        for cid, res in lc1.items():
+            for sw, tw, where in read(res):
+                u = math.hypot(sw / c_n, tw / c_s)
+                if u > freq[0]:
+                    freq = (u, sw, tw, where, cid)
+                dmg = root_damage(k * sw, k * tw, fat, fs, n)
+                if dmg > occ[0]:
+                    occ = (dmg, sw, tw, where, cid)
+        u, sw, tw, where, cid = freq
+        return dict(id=d["id"], name=d["name"], iiw=d["iiw"], fat=fat, cafl=c_n, range_mpa=u * c_n, where=where, case=cid,
+                    occasional_range_mpa=k * occ[1], damage=occ[0], ok=u <= 1 + 1e-9 and occ[0] <= lc["miner_limit"],
+                    hot_spot=False, fat_shear=fs, shear_cafl=c_s, util=u, normal_mpa=sw, shear_mpa=tw,
+                    occasional_shear_mpa=k * occ[2], occasional_where=occ[3], occasional_case=occ[4])
 
     def root_stresses(self, res, s: int) -> dict:
         """The body front under the root gusset's heel (FAT-17 to FAT-20, I2-51, I2-60), from the A-frame member's end
@@ -2762,6 +2835,32 @@ def _miner(fat: float, ds_o: float, lc: dict) -> float:
     return lc["occasional_cycles"] / n
 
 
+def sn_range(fat: float, m: float, knee: float, n: float) -> float:
+    """The stress range IIW-1823-07's curve for FAT allows for n cycles, MPa: slope m from 2 million cycles down to the
+    knee at `knee` cycles, then slope 22 (Table 4.3-2), so at n = knee it is the CAFL."""
+    if n <= knee:
+        return fat * (2e6 / n) ** (1 / m)
+    return fat * (2e6 / knee) ** (1 / m) * (knee / n) ** (1 / 22)
+
+
+def root_damage(sigma: float, tau: float, fat: float, fat_shear: float, n: float) -> float:
+    """The Miner damage that n cycles of a weld throat's normal range sigma and shear range tau, in phase, use up by
+    IIW's interaction (IIW-1823-07 4.3.1, Table 4.3-1, CV 1.0): the D at which (sigma / the normal range FAT allows for
+    n / D cycles)^2 + (tau / the shear range FAT_shear allows for n / D)^2 reaches 1 (sn_range, the normal curve's
+    slope 3 to its knee at 10^7 cycles and the shear curve's slope 5 to 10^8). Within the two CAFLs by the same
+    interaction it is none, as _miner takes a range under its CAFL, so with no shear it is _miner's damage."""
+    if math.hypot(sigma / sn_range(fat, 3, 1e7, 1e7), tau / sn_range(fat_shear, 5, 1e8, 1e8)) <= 1:
+        return 0.0
+
+    def over(d):
+        return (sigma / sn_range(fat, 3, 1e7, n / d)) ** 2 + (tau / sn_range(fat_shear, 5, 1e8, n / d)) ** 2 > 1
+    lo, hi = -30.0, 30.0
+    for _ in range(80):
+        mid = (lo + hi) / 2
+        lo, hi = (mid, hi) if over(10 ** mid) else (lo, mid)
+    return 10 ** hi
+
+
 def weld_group(lines: list[tuple[str, tuple, tuple, float]]) -> dict:
     """A weld group for the elastic vector method in three dimensions (CHS-14, CHS-18): each line (name, p0, p1, throat)
     a straight weld from p0 to p1 on its throat. Its throat area A, its centroid c and the inverse of its polar tensor
@@ -2805,6 +2904,23 @@ def group_stress(g: dict, F, at, M=None, worst: bool = True) -> dict:
     for k, name in enumerate(g["names"]):
         s = max(float(np.linalg.norm(F / g["A"] + np.cross(th, p - g["c"]))) for p in (g["P0"][k], g["P1"][k]))
         out[name] = max(out.get(name, 0.0), s)
+    return out
+
+
+def group_throat(g: dict, F, M) -> list[tuple[str, float, float]]:
+    """Each line of weld group g at its two ends under the force F at the group's centroid and the moment M about it, by
+    the elastic vector method as group_stress reads it with its signs (FAT-26): the throat stress's part along the line,
+    tau_w, and the rest, normal to the line's axis, sigma_w, the resultant of sigma and tau across it (IIW-1823-07
+    2.2.2.2, the stress in a weld's throat), as (name, sigma_w, tau_w) in MPa."""
+    F = np.asarray(F, float)
+    th = g["Iinv"] @ np.asarray(M, float)
+    out = []
+    for k, name in enumerate(g["names"]):
+        e = g["e"][k]
+        for p in (g["P0"][k], g["P1"][k]):
+            s = F / g["A"] + np.cross(th, p - g["c"])
+            t = float(s @ e)
+            out.append((name, float(np.linalg.norm(s - t * e)), abs(t)))
     return out
 
 

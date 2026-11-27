@@ -438,6 +438,16 @@ fatigue_details:
   # crossmember's nominal stress at its ends, both taken at their largest together, on IIW's hot-spot curve for a
   # load-carrying fillet (Table 3.3-1 no. 6, FAT 90), as FAT-13 reads the hinge's welds
   - {id: FAT-25, name: "Hinge bar's front fillets on the hinge crossmembers' bottom wall, toe in the wall, the wall's bending at the toe", iiw: "Table 3.3-1 no. 6", fat: 90, stress: wall_toe, hot_spot: true}
+  # FAT-26 and FAT-27 (I2-125): the roots of the hinge joint's load-carrying welds, which the hot-spot readings at their
+  # toes (FAT-13, FAT-25) do not reach. Each weld's throat stress in LC1 is split into sigma_w normal to its axis and
+  # tau_w along it, read on IIW-1823-07's curves for the stress in a weld's throat, FAT 36 for sigma_w (414, slope 3 to
+  # 10 million cycles) and FAT 80 for tau_w (Table 3.2-2 no. 2, slope 5 to 100 million), and combined by IIW's
+  # interaction for stresses in phase (4.3.1, Table 4.3-1, CV 1.0). FAT-26 reads the hinge bars' weld runs as CHS-18
+  # reads them, on all three of the bars' models with the wall as the frame model carries it, and FAT-27 the cheeks' and
+  # fillers' welds as CHS-14 reads them, each weld's stress taken whole as normal to its throat. Both are welds this
+  # build makes, so both are fail rows (the conductor's ruling of 27 Nov 2026)
+  - {id: FAT-26, name: "Hinge bar's weld runs to the hinge crossmembers, 6 mm fillets in 80 mm runs, weld root, FAT 80 along the fillet", iiw: "414 and Table 3.2-2 no. 2", fat: 36, fat_shear: 80, stress: run_root}
+  - {id: FAT-27, name: "Hinge cheeks' and fillers' welds to the hinge bar, the rail and the crossmember, weld root, FAT 80 along the weld", iiw: "414 and Table 3.2-2 no. 2", fat: 36, fat_shear: 80, stress: cheek_root}
 
 # Holes the runs make in the chassis members (data/services.yaml `holes`, the services' list, read here only). A hole is
 # the run's diameter and a bush across, a slot along the member where the run passes on a slant. CHS-09 checks the net

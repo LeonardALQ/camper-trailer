@@ -109,6 +109,16 @@ def chassis_row(c, res: dict) -> dict:
                     detail=f"{t['deg']:.3f} degree between the XT front hinge and rear shock crossmembers, {t['case']}")
     if c.type == "chassis_fatigue":
         f = next(r for r in res["fatigue"] if r["id"] == c.item)
+        if "fat_shear" in f:                     # a weld's root, normal and shear by IIW's interaction (FAT-26, FAT-27)
+            return dict(limit=f"(sigma_w / {f['cafl']:.1f})^2 + (tau_w / {f['shear_cafl']:.1f})^2 <= 1, damage <= 0.5",
+                        measured=round(f["range_mpa"], 1), unit="MPa", margin=round(f["cafl"] - f["range_mpa"], 1), ok=f["ok"],
+                        governing=f"{f['where']}, {f['case']}",
+                        detail=(f"IIW {f['iiw']}, FAT {f['fat']:g} normal to the throat and FAT {f['fat_shear']:g} along it, by IIW's "
+                                f"interaction (CV 1.0): the frequent range {f['normal_mpa']:.1f} MPa normal to the throat and "
+                                f"{f['shear_mpa']:.1f} MPa along it at {f['where']}, {f['util']:.2f} of their CAFLs, an equivalent normal "
+                                f"range of {f['range_mpa']:.1f} MPa against {f['cafl']:.1f} MPa, and the occasional range "
+                                f"{f['occasional_range_mpa']:.0f} MPa normal and {f['occasional_shear_mpa']:.0f} MPa along gives Miner damage "
+                                f"{f['damage']:.2f} at {f['occasional_where']}, {f['occasional_case']}."))
         hs = " Hollow-section T-joint: the engineer checks it by the hot-spot method." if f["hot_spot"] else ""
         return dict(limit=f"range <= CAFL {f['cafl']:.1f} MPa, damage <= 0.5", measured=round(f["range_mpa"], 1), unit="MPa",
                     margin=round(f["cafl"] - f["range_mpa"], 1), ok=f["ok"], governing=f"{f['where']}, {f['case']}",

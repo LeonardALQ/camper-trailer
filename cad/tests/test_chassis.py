@@ -678,3 +678,36 @@ def test_every_check_is_read_on_the_hinge_bars_bounds():
         ys = [y for y, _ in fm.cm_nodes[cm.id]]
         assert all(any(abs(y - r) < 0.5 for y in ys) for r in CH.hinge_run_points(cm)), cm.id
     assert sum(1 for el in fm.f.elements if el.member.startswith("XT-BAR-")) > 0
+
+
+def test_the_hinge_joints_weld_roots_are_read_in_fatigue():
+    """Review I2-125: FAT-26 reads the roots of the hinge bars' weld runs and FAT-27 those of the cheeks' and fillers'
+    welds in LC10, each throat stress split into its part normal to the weld's axis on IIW 414's FAT 36 and its part along
+    it on Table 3.2-2 no. 2's FAT 80, combined by IIW's interaction, and both fail, since this build makes those welds."""
+    import yaml
+    from cad.chassis_fea import _miner, group_throat, root_damage, sn_range, weld_group
+    from cad.partsdb import DATA
+    lc10 = next(lc for lc in CH.data["load_cases"] if lc["id"] == "LC10")
+    assert sn_range(36, 3, 1e7, 1e7) == pytest.approx(21.1, abs=0.05)          # IIW-1823-07 Table 4.3-2's knee points
+    assert sn_range(80, 5, 1e8, 1e8) == pytest.approx(36.6, abs=0.05)
+    for s in (30.0, 60.0, 120.0):
+        assert root_damage(s, 0.0, 36, 80, lc10["occasional_cycles"]) == pytest.approx(_miner(36, s, lc10), rel=1e-6)
+    assert root_damage(15.0, 20.0, 36, 80, lc10["occasional_cycles"]) == 0.0
+    assert root_damage(60.0, 60.0, 36, 80, 1e5) > root_damage(60.0, 0.0, 36, 80, 1e5)
+    g = weld_group([(f"the {e} fillet", (x, -40.0, 0.0), (x, 40.0, 0.0), 4.2) for e, x in (("front", -25.0), ("rear", 25.0))])
+    along = group_throat(g, (0.0, 1000.0, 0.0), (0.0, 0.0, 0.0))
+    across = group_throat(g, (500.0, 0.0, 1000.0), (0.0, 0.0, 0.0))
+    assert all(s == pytest.approx(0.0, abs=1e-9) and t == pytest.approx(1000 / (2 * 80 * 4.2)) for _, s, t in along)
+    assert all(t == pytest.approx(0.0, abs=1e-9) and s == pytest.approx(math.hypot(500, 1000) / (2 * 80 * 4.2)) for _, s, t in across)
+    checks = {c["id"]: c for c in yaml.safe_load((DATA / "checks.yaml").read_text())["trailer_checks"]}
+    rows = {r["id"]: r for r in RES["fatigue"]}
+    for fid in ("FAT-26", "FAT-27"):
+        r = rows[fid]
+        assert checks[fid]["severity"] == "fail" and "I2-125" in checks[fid]["why"]
+        assert r["fat"] == 36 and r["fat_shear"] == 80 and not r["hot_spot"]
+        assert r["cafl"] == pytest.approx(21.1, abs=0.05) and r["shear_cafl"] == pytest.approx(36.6, abs=0.05)
+        assert r["range_mpa"] == pytest.approx(r["cafl"] * r["util"], rel=1e-9)
+        assert r["util"] == pytest.approx(math.hypot(r["normal_mpa"] / r["cafl"], r["shear_mpa"] / r["shear_cafl"]), rel=1e-9)
+        assert r["ok"] == (r["util"] <= 1 + 1e-9 and r["damage"] <= lc10["miner_limit"])
+    assert " inboard, its " in rows["FAT-26"]["where"] and "cheek's" in rows["FAT-27"]["where"]
+    assert rows["FAT-27"]["shear_mpa"] == 0.0
