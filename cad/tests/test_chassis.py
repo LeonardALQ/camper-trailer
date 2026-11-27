@@ -411,9 +411,42 @@ def test_trailer_md_gives_the_recovery_rule():
     line = next(x for x in text.splitlines() if x.startswith("- Recovery:"))
     side = min(x for x in (r["sideways_up_kn"], r["sideways_down_kn"]) if x is not None)
     along = min(x for x in (r["along_up_kn"], r["along_down_kn"]) if x is not None)
-    for figure in (f"{r['rated_kn']:.1f} kN", f"{r['held_wheel_kn']:g} kN", f"{r['held_axle_kn']:g} kN", f"{side:.1f} kN", f"{along:.1f} kN",
-                   f"{r['sideways_deg']:g} degrees", f"{r['vertical_deg']:g} degrees"):
+    for figure in (f"{r['rated_kn']:.1f} kN", f"{r['free_kn']:g} kN", f"{r['held_wheel_kn']:g} kN", f"{r['held_axle_kn']:g} kN",
+                   f"{side:.1f} kN", f"{along:.1f} kN", f"{r['sideways_deg']:g} degrees", f"{r['vertical_deg']:g} degrees"):
         assert figure in line, figure
+
+
+def test_lc8a_reads_every_wheel_free_at_the_free_limit():
+    """I2-118 and I2-119: with every wheel free LC8a reads each pull at the data's free limit where one stands under the
+    rated pull, a whole 5 kN at least the held-wheel limit, and every reading such a pull governs names that limit."""
+    lc8 = next(lc for lc in CH.data["load_cases"] if lc["id"] == "LC8a")
+    free = lc8.get("free_n", lc8["force_n"])
+    assert lc8["held_wheel_n"] <= free <= lc8["force_n"]
+    if free < lc8["force_n"]:
+        assert free % 5000 == 0
+        cases = [h[k]["case"] for h in RES["holes"] for k in ("static", "ultimate") if h.get(k)]
+        cases += [r["case"] for lc_id in ("LC8a", "LC8u") for r in RES["envelope"][lc_id].values()]
+        free_cases = [c for c in cases if "point," in c and "held" not in c]
+        assert free_cases and all(f"at the {free / 1000:g} kN limit" in c for c in free_cases)
+
+
+def test_the_hinge_bars_runs_and_the_fillers_are_read():
+    """I2-118 and I2-119: CHS-18 reads each hinge bar's weld runs on every frame model at the pull and at its ultimate,
+    CHS-19 reports the bars and their plates on the elastic models, and each front cheek meets its filler at its
+    crossmember's front face, CHS-14 reading the filler's welds and section with the cheeks'."""
+    runs = RES["local"]["hinge_runs"]
+    assert {p["part"] for p in runs["parts"]} >= {f"{lc}, the hinge bars {b}" for lc in ("LC8a", "LC8u") for b in
+                                                 ("rigid", "elastic on free bushes", "elastic on stiff bushes")}
+    bar = RES["local"]["hinge_bar"]
+    assert bar["parts"] and bar["plates"]
+    fillers = CH.hinge_fillers()
+    assert len(fillers) == 4
+    for c in CH.hinge_cheeks():
+        fl = next((f for f in fillers if f["wheel"] == c["wheel"]), None)
+        if c["way"] < 0:
+            assert abs(c["joint_x"] - fl["front"]) < 1e-6 and not c["tail"]
+    parts = " ".join(p["part"] for p in RES["local"]["hinge_cheeks"]["parts"])
+    assert "filler's section" in parts and "flare-bevel weld at the rail's outer bottom corner" in parts
 
 
 def test_holes_in_one_section_are_read_together():

@@ -5,7 +5,11 @@
 # cad/chassis_fea.py analyses them. Sections come from data/chassis/sections.yaml (report 11's table).
 id: ASM-CH
 name: Chassis and drawbar
-revision: W     # W, 26 Nov 2026: both XT hinge crossmembers RHS 150 x 100 x 6, each with its rear face where it stood and 50 mm
+revision: X     # X, 27 Nov 2026: each front hinge cheek welded to a filler CH-P18 under its crossmember's front half, which the
+                # hinge bar's front face meets (xt_hinges `filler`), each cheek read at its own joint and share (CHS-14), the
+                # hinge bars' weld runs read (CHS-18) and the bars and their plates reported (CHS-19), and the recovery limits
+                # found again with every wheel free (LC8a `free_n`), one wheel held and an axle held (I2-118, I2-119).
+                # W, 26 Nov 2026: both XT hinge crossmembers RHS 150 x 100 x 6, each with its rear face where it stood and 50 mm
                 # wider forward, the hinge bars Cruisemaster's 50 mm flush with their rear faces, each front cheek run on under
                 # its crossmember to its bar, and the three recovery limits found again by their rule (I2-93, I2-114).
                 # V, 26 Nov 2026: a recovery limit with one wheel held fast (LC8a `held_wheel_n`), by the held-axle limit's rule
@@ -227,8 +231,13 @@ fittings:
      poses: shock_plates, stations: [XT centre, XT rear shock], side_y: "rail_c - 200"}
   - {id: CH-P08, name: "Hinge crossmember gusset, SHS 50 x 50 x 3 at 45 degrees (TB 070), its ends cut at 45 degrees to bear on the crossmember's face and on the face of the hinge cheek beside it, welded all round, two behind each hinge crossmember", kind: tube, section: SHS_50x50x3, length: hinge_gusset_l, qty: 4,
      poses: hinge_gussets, fat: null}
-  - {id: CH-P16, name: "Hinge cheek, 10 mm, 150 x 108.5 beside each XT hinge crossmember on the rail's inner face, with a step where a hinge gusset lands on it, 150 mm behind the front hinge crossmember and 140 mm behind the XT centre's, the front ones' part under the rail run on 50 mm under their crossmember to the hinge bar's front face, welded to the web and the hinge bar", kind: plate, l: 150, w: 108.5, t: 10, qty: 8,
+  - {id: CH-P16, name: "Hinge cheek, 10 mm, 150 x 108.5 beside each XT hinge crossmember on the rail's inner face, with a step where a hinge gusset lands on it, 150 mm behind the front hinge crossmember and 140 mm behind the XT centre's, welded to the web, the rear ones to the hinge bar and the front ones butt welded to their fillers CH-P18", kind: plate, l: 150, w: 108.5, t: 10, qty: 8,
      poses: hinge_cheeks, plane: xz, fat: FAT-22}
+  # CH-P18, the hinge cheek fillers (xt_hinges `filler`, I2-118): a block under the front half of each XT hinge crossmember
+  # at the rail, from its front face to the hinge bar's front face, as deep as the cheeks stand under the rail, from the
+  # front cheek's inboard face out under the rail to its outer face (Chassis.hinge_fillers)
+  - {id: CH-P18, name: "Hinge cheek filler, steel block 50 x 110 x 20 under the front half of each XT hinge crossmember at the rail, from its front face to the hinge bar's front face, the front cheek welded to it, welded to the hinge bar, the crossmember and the rail's outer bottom corner", kind: plate, l: 50, w: 110, t: 20, qty: 4,
+     poses: hinge_fillers, plane: xy, fat: null}
   # CH-P17, the shear panel PNL-1's pieces (I2-87, fx18-det, fx22-rear): EA 50 x 50 x 5 angles, each with its upright leg on
   # a member's web and its flat leg `drop` under the member's underside, level with the tanks' guard, where the sheet bolts
   # up to it on the leg's `gauge` from the heel. Along each rail's inner web the angle's back is on the web and its flat leg
@@ -332,10 +341,12 @@ load_cases:
      accel: [[-1.6, 0, 0], [1.0, 0, 0], [0, 1.0, 0], [0, 0, 0.4]], factor: 1.5, source: "NTC Load Restraint Guide via report 02, factor 2 from report 03"}
   - {id: LC8a, name: "Recovery points: 58.9 kN within 30 degrees sideways and 15 degrees up or down of the rail axis", kind: recovery,
      force_n: 58860, ultimate_n: 78500, factor: 1, source: "Report 11 LC8a: 1.5 x 9.81 x the 4,000 kg plate, as the drawbar case. The ultimate stays TJM's 8 t test load",
-     sideways_deg: 30, vertical_deg: 15, held_wheel_n: 55000,
-     held_wheel_source: "The recovery limit with one wheel held fast at its hub and the pull through it (I2-93, I2-114, the working default of 26 Nov 2026 until Leonard rules): the largest pull at which every check passes with the wheel held on all three of the hinge bars' models, no yield at it and no fracture at its ultimate in LC8a's 78.5 / 58.86 ratio, rounded down to the next 5 kN. The rated 58.9 kN applies with every wheel free. 55 kN since both hinge crossmembers became RHS 150 x 100 x 6 on 26 Nov 2026: on the rigid hinge bars the rated 58.9 kN reads the front road-side hinge's cheeks' welds to the rail at 1.04 of their strength at its 78.5 kN ultimate, the front road-side point pulled 5.4 degrees sideways through the held front road-side wheel and 15 degrees up, and 55 kN reads them at 0.97. It was 35 kN on the RHS 150 x 50 x 6 hinge crossmembers, where 40 kN read the XT centre crossmember at 1.002 of its section's capacity",
-     held_axle_n: 50000,
-     held_axle_source: "The recovery limit with both wheels of one axle held fast at their hubs (I2-93, the working default of 25 Nov 2026 until Leonard rules): the largest pull at which every check passes with the pair held, no yield at it and no fracture at its ultimate in LC8a's 78.5 / 58.86 ratio, rounded down to the next 5 kN. The rated 58.9 kN applies with every wheel free, and the held-wheel limit with one wheel held. 50 kN since both hinge crossmembers became RHS 150 x 100 x 6 on 26 Nov 2026: 55 kN reads the hole H-01 in the kerb-side raiser's outer web at 1.01 of its net section's capacity at its 73.4 kN ultimate, the front kerb-side point pulled 30 degrees sideways and 15 degrees up with both rear wheels held, at the plate and coupled. It was 25 kN on the RHS 150 x 50 x 6 hinge crossmembers once every check was read on the elastic bars on free bushes (I2-114), and 50 kN on the rigid bars before",
+     sideways_deg: 30, vertical_deg: 15, free_n: 45000,
+     free_source: "The recovery limit with every wheel free (I2-118, I2-119, the working default of 27 Nov 2026 until Leonard rules): the largest pull at which every fail check passes with every wheel free on all three of the hinge bars' models, no yield at it and no fracture at its ultimate in LC8a's 78.5 / 58.86 ratio, rounded down to the next 5 kN. The points themselves are rated 58.9 kN (LOC-02, LOC-03). 45 kN since each front hinge cheek meets its filler CH-P18 at the crossmember's front face, 77 mm ahead of the pivot where the rear cheek meets the bar 23 mm behind it, so on the frame model's pin, which passes no moment, the rear cheek takes 77 % of the cheeks' force across and up: 50 kN reads the front road-side hinge's rear cheek's flare-bevel weld at the rail's bottom corner at 1.02 of its strength at its 66.7 kN ultimate. It was the rated 58.9 kN before",
+     held_wheel_n: 40000,
+     held_wheel_source: "The recovery limit with one wheel held fast at its hub and the pull through it (I2-93, I2-114, I2-119, the working default of 26 Nov 2026 until Leonard rules): the largest pull at which every fail check passes with the wheel held on all three of the hinge bars' models, no yield at it and no fracture at its ultimate in LC8a's 78.5 / 58.86 ratio, rounded down to the next 5 kN. 40 kN since the hinge bars' weld runs are read (CHS-18): 40 kN reads the rear kerb-side hinge's runs at 0.98 of their strength at its 53.3 kN ultimate on the bars elastic on free bushes, and 45 kN reads them at 1.12. It was 55 kN before the runs were read, and 35 kN on the RHS 150 x 50 x 6 hinge crossmembers",
+     held_axle_n: 30000,
+     held_axle_source: "The recovery limit with both wheels of one axle held fast at their hubs (I2-93, I2-119, the working default of 25 Nov 2026 until Leonard rules): the largest pull at which every fail check passes with the pair held, no yield at it and no fracture at its ultimate in LC8a's 78.5 / 58.86 ratio, rounded down to the next 5 kN. 30 kN since the hinge bars' weld runs are read (CHS-18): 30 kN reads the rear road-side hinge's runs at 0.98 of their strength at its 40.0 kN ultimate on the bars elastic on free bushes, and 35 kN reads them at 1.13. It was 50 kN before the runs were read, and 25 kN on the RHS 150 x 50 x 6 hinge crossmembers with the bars elastic on free bushes",
      reaction: {kx: 600, ky: 300, kz: 300, held_k: 10000000,
                 weight: [{case: TC1, at: tare}, {case: TC2, at: plate}], nose: [{kz: 300, holds_down: false}, {kz: 300, holds_down: true}],
                 source: "Report 11 gives the pull, not what holds the trailer. The ground holds it at its four unbraked wheels, each force along the trailer through its hub, each tyre on its longitudinal, lateral and vertical rate with its arm (est., 600, 300 and 300 N/mm), or one wheel held fast against an obstacle at its hub's height, the others rolling free, the trailer turned until the pull passes through that hub. held_k is the obstacle's rate, rigid. The trailer's weight acts with the pull (I2-94), at tare and fully loaded at the plate, from the static case's reactions at the tyres and the nose, and no support can pull: a tyre that would leaves the ground and the trailer pitches or rolls onto the supports that remain. The nose stands at the coupling at a tyre's rate (est.), uncoupled on its jockey wheel, which pushes up only, or coupled to the truck, whose ball holds it both ways"}}
@@ -593,6 +604,7 @@ xt_hinges:
   gusset: {length: hinge_gusset_l, faces: [1, -1], omit: [CM-04KF, CM-04RF, CM-05KF, CM-05RF], z_over_underside: 69, weld: {leg: 5, acute_leg: 5, obtuse_throat: 3}}
   cheek: {t: 10, l: 150, h: 108.5, below: 26, leg: 6, bar_d: 26, bar_leg: 10, corner: 0.3125, cope: 12, omit: [],
           under_gusset: {l: {XT front hinge: 150, XT centre: 140}, z0: {XT front hinge: 22.5, XT centre: 39}, z1: {XT front hinge: 115.5, XT centre: 99.5}}}
+  filler: {d: 20, inboard: 60, leg: 6, chamfer: 8}
 
 # The XT arms' limits in LC8a (I2-94). An airbag cannot pull. Where an arm's balance about its hinge asks less of its
 # airbag than the airbag gives with the arm at full droop, its force at ride (the weight's) less the air spring's rate

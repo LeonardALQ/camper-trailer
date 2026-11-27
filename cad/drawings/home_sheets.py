@@ -424,7 +424,7 @@ def _recovery_line() -> str:
     side = min(x for x in (r["sideways_up_kn"], r["sideways_down_kn"]) if x is not None)
     along = min(x for x in (r["along_up_kn"], r["along_down_kn"]) if x is not None)
     return (f"FRONT LUGS OR REAR TONGUES ONLY, WITHIN {r['sideways_deg']:g} DEGREES SIDEWAYS AND {r['vertical_deg']:g} DEGREES UP OR DOWN: "
-            f"{r['rated_kn']:.1f} kN WITH EVERY WHEEL FREE, {r['held_wheel_kn']:g} kN WITH ONE WHEEL HELD FAST, OR {r['held_axle_kn']:g} kN "
+            f"{r['free_kn']:.1f} kN WITH EVERY WHEEL FREE, {r['held_wheel_kn']:g} kN WITH ONE WHEEL HELD FAST, OR {r['held_axle_kn']:g} kN "
             "WITH BOTH WHEELS OF ONE AXLE HELD FAST. PULL LEVEL: PULLED "
             f"{r['vertical_deg']:g} DEGREES UP OR DOWN THE EMPTY TRAILER CAN TIP FROM {side:.1f} kN AT {r['sideways_deg']:g} DEGREES SIDEWAYS "
             f"AND {along:.1f} kN ALONG ITS LINE." + ("" if r["level_tips"] else ""))

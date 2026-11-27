@@ -767,6 +767,8 @@ class Analysis:
         lc6: dict[str, Any] = {}
         self.lc8_arms: dict[str, dict] = {}
         self.cheek_env: dict[str, dict] = {}
+        self.run_env: dict[str, dict] = {}
+        self.bar_env: dict[str, dict] = {}
         for bar, fm in models:
             self._use(fm)
             sites = self.hole_sites()
@@ -843,7 +845,10 @@ class Analysis:
                             p, cm = self.rear_recovery_point(s)
                             fr = [(self.fm.cm_node(cm, s * V["rail_c"]), 1.0)]
                         sd, vd = lc8["sideways_deg"], lc8["vertical_deg"]
-                        pulls = [(f"{h:+d} deg sideways", None, math.radians(h), 1.0) for h in (-sd, 0, sd)]
+                        # every wheel free, at the rated pull or at the free limit under it (I2-118, I2-119)
+                        free = lc8.get("free_n", lc8["force_n"])
+                        at_free = f", at the {free / 1000:g} kN limit" if free < lc8["force_n"] - 1e-6 else ""
+                        pulls = [(f"{h:+d} deg sideways{at_free}", None, math.radians(h), free / lc8["force_n"]) for h in (-sd, 0, sd)]
                         # one wheel held fast at its hub, the pull through it, at the held-wheel limit (I2-93, I2-114)
                         for w in ch.suspension:
                             hdg = math.atan2(p[1] - w["hub"][1], sx * (p[0] - w["hub"][0]))
@@ -870,6 +875,7 @@ class Analysis:
                                             where=where, side=s, h=round(math.degrees(hdg), 1), v=v, kn=k * Fr / 1000, axle=isinstance(held, tuple),
                                             weight=sup["label"].split(",")[0], coupled=bool(sup["nose"].get("holds_down"))))
                                     self._cheek_envelope(lc_id, label, res)
+                                    self._hinge_envelope(lc_id, label, res, bar)
         self._use(models[0][1])
         out = dict(envelope={}, governing={}, deflections={}, twist=twist, balls=balls, residual_n=self.resid,
                    frame=dict(nodes=len(self.f.nodes), elements=sum(1 for e in self.f.elements if not e.sec.rigid),
@@ -890,7 +896,8 @@ class Analysis:
         from .chassis_dip import check as galvanising_check
         out["galvanising"] = galvanising_check(ch)
         out["local"] = self.local_checks(out["pad_n"])
-        out["local"].update(self.panel_checks(), hinge_cheeks=self.cheek_check(), arm_limits=self.arm_limits())
+        out["local"].update(self.panel_checks(), hinge_cheeks=self.cheek_check(), arm_limits=self.arm_limits(),
+                            hinge_runs=self.hinge_runs(), hinge_bar=self.hinge_bar_report())
         out["local"]["hinge_gussets"] = self.gusset_welds()
         out["recovery"] = self.recovery_summary()
         out["fixings"] = self.fixings()
@@ -1140,50 +1147,204 @@ class Analysis:
             out["shear_panel"] = res
         return out
 
-    def cheek_welds(self, F) -> dict:
-        """The stresses in one hinge cheek's welds (CH-P16, xt_hinges `cheek`, I2-92) under the force F (N, along, across and
-        up) that its pin passes from the hinge bar, at the middle of its `bar_leg` fillets each side down the bar's front or
-        rear face over the bar's top `bar_d` (est.), which pass a force but no moment, at the cheek's end. Its two lines on
-        the rail's inner web, the `leg` fillet along its top edge and the flare-bevel weld along the rail's bottom corner,
-        are one weld group, read by the elastic vector method with the force's moments about the group's centroid, each
-        line on its throat: the fillet's 0.7 leg and the flare bevel's `corner` share of the rail's outside radius, AISC 360
-        Table J2.2's 5/16 R for a manual metal arc weld. The components add at the worst corner whatever their signs."""
+    def cheek_lines(self, c: dict) -> tuple[dict, np.ndarray]:
+        """Hinge cheek c's welds to the rail (CH-P16, xt_hinges `cheek`, I2-92, I2-118) as one weld group (weld_group), in
+        the cheek's own axes: u along the rail from its joint to the hinge bar or its filler, away from it, v inboard from
+        the rail's inner face and z up from the rail's underside. On the rail's inner web the `leg` fillet along its top
+        edge and the flare-bevel weld along the rail's bottom corner, its throat the `corner` share of the rail's outside
+        radius (AISC 360 Table J2.2's 5/16 R for a manual metal arc weld), from the cope at its crossmember's face to its far
+        end, each line on its throat, a cheek's `tail` under its crossmember, if it has one, standing between its joint and
+        the cope. Returns the group and the pin's place, at the middle of the cheek's joint over the bar's top `bar_d` under
+        the rail (est.), at the plate's mid-thickness."""
         ck = self.ch.data["xt_hinges"]["cheek"]
-        fx, fy_, fz_ = (abs(float(v)) for v in F)
-        out = {"to the hinge bar": math.sqrt(fx ** 2 + fy_ ** 2 + fz_ ** 2) / (2 * ck["bar_d"] * 0.7 * ck["bar_leg"])}
-        cope = ck.get("cope", 0.0)                      # the cheek's end coped round the crossmember's end fillet (I2-100)
-        l, ro = ck["l"] - cope, self.ch.role_sec["rail"].ro
-        lines = [("its top edge's fillet", ck["h"] - ck["below"], 0.7 * ck["leg"]),
-                 ("the flare-bevel weld at the rail's bottom corner", 0.0, ck["corner"] * ro)]
-        A = sum(a * l for _, _, a in lines)
-        zc = sum(a * l * z for _, z, a in lines) / A
-        Ix = sum(a * l * (z - zc) ** 2 for _, z, a in lines)
-        Iz = sum(a * l ** 3 / 12 for _, _, a in lines)
-        lever = zc + ck["bar_d"] / 2                     # the pin under the group's centroid, at the cheek's end
-        along = cope + l / 2                             # and the group's centroid that far along the rail from it
-        M_in = fx * lever + fz_ * along                  # in the web's plane
-        M_x, M_z = fy_ * lever, fy_ * along              # out of it
-        for name, z, a in lines:
-            dz = abs(z - zc)
-            t_x = fx / A + M_in * dz / (Ix + Iz)
-            t_z = fz_ / A + M_in * (l / 2) / (Ix + Iz)
-            s_n = fy_ / A + M_x * dz / Ix + M_z * (l / 2) / Iz
-            out[f"to the rail's web, {name}"] = math.sqrt(t_x ** 2 + t_z ** 2 + s_n ** 2)
+        ro = self.ch.role_sec["rail"].ro
+        tail, z1 = c.get("tail", 0.0), ck["h"] - ck["below"]
+        u0, u1 = tail + ck.get("cope", 0.0), tail + ck["l"]     # the web's welds start at the cope (I2-100)
+        lines = [("top edge's fillet on the rail's web", (u0, 0.0, z1), (u1, 0.0, z1), 0.7 * ck["leg"]),
+                 ("flare-bevel weld at the rail's bottom corner", (u0, 0.0, 0.0), (u1, 0.0, 0.0), ck["corner"] * ro)]
+        return weld_group(lines), np.array([0.0, ck["t"] / 2, -ck["bar_d"] / 2])
+
+    def filler_of(self, c: dict) -> dict | None:
+        """The filler CH-P18 a front cheek c meets (Chassis.hinge_fillers), or None."""
+        if c["way"] > 0:
+            return None
+        return next((fl for fl in self.ch.hinge_fillers() if fl["wheel"] == c["wheel"]), None)
+
+    def cheek_welds(self, F, c: dict) -> dict:
+        """The stresses in hinge cheek c's welds (CH-P16, xt_hinges `cheek`, I2-92, I2-118) under the force F (N, along,
+        across and up) that its pin passes from the hinge bar at the cheek's joint to it: a rear cheek's `bar_leg` fillets
+        down the bar's rear face on their throats, or a front cheek's butt weld to its filler's front face (filler_of), the
+        plate's `t` over the cheek's `bar_d` under the rail, each passing a force but no moment, and the cheek's welds to the
+        rail's web as one weld group (cheek_lines), read by the elastic vector method with the force's moments about the
+        group's centroid, the components added at the worst corner whatever their signs. A filler's own welds and section
+        follow (filler_welds)."""
+        ck = self.ch.data["xt_hinges"]["cheek"]
+        Fa = np.abs(np.asarray(F, float))
+        fl = self.filler_of(c)
+        depth = min(ck["bar_d"], fl["z1"] - fl["z0"]) if fl else ck["bar_d"]   # the fillets run down the filler's face
+        out = {f"fillets to the {'filler' if fl else 'hinge bar'}": float(np.linalg.norm(Fa)) / (2 * depth * 0.7 * ck["bar_leg"])}
+        g, pin = self.cheek_lines(c)
+        out.update(group_stress(g, Fa, pin))
+        if fl:
+            out.update(self.filler_welds(Fa, fl, depth))
         return out
 
+    def filler_lines(self, fl: dict) -> dict:
+        """Filler fl's welds (CH-P18, xt_hinges `filler`, I2-118) as one weld group in the trailer's axes, each on its
+        throat: a `leg` fillet along its bottom rear edge to the hinge bar's front face, the bar standing deeper than it,
+        and one along its inboard top edge to the crossmember's underside, on 0.7 leg, and the flare-bevel welds along the
+        crossmember's rounded bottom front corner, inboard of the front cheek's fillets, and along the rail's rounded outer
+        bottom corner, each on the cheek's `corner` share of its corner's outside radius (AISC 360 Table J2.2)."""
+        ch = self.ch
+        fd, ck = ch.data["xt_hinges"]["filler"], ch.data["xt_hinges"]["cheek"]
+        a = 0.7 * fd["leg"]
+        cm = next(m for m in ch.members if m.id == fl["cm"])
+        xf, xb, yi, yo, z0, z1 = fl["front"], fl["bar_front"], fl["inner_y"], fl["outer_y"], fl["z0"], fl["z1"]
+        return weld_group([("filler's fillet along its bottom edge to the hinge bar", (xb, yi, z0), (xb, yo, z0), a),
+                           ("filler's fillet along its inboard top edge to the crossmember", (xf, yi, z1), (xb, yi, z1), a),
+                           ("filler's flare-bevel weld in the crossmember's front corner", (xf, yi, z1), (xf, fl["flare_y"], z1),
+                            ck["corner"] * cm.sec.ro),
+                           ("filler's flare-bevel weld at the rail's outer bottom corner", (xf, yo, z1), (xb, yo, z1),
+                            ck["corner"] * ch.role_sec["rail"].ro)])
+
+    def filler_welds(self, Fa, fl: dict, depth: float) -> dict:
+        """Filler fl (I2-118) under its front cheek's share Fa at the middle of the cheek's fillets on its front face,
+        `depth` down it: its welds by the elastic vector method at their worst whatever the signs (filler_lines), and its
+        section at the hinge bar's face under what its fillet on the bar carries (group_share), N / A and M / Z about each
+        axis, the torque by rect_torsion and 1.5 V / A, combined as sqrt(sigma^2 + 3 tau^2), at each sign of the share's
+        components."""
+        ck = self.ch.data["xt_hinges"]["cheek"]
+        g = self.filler_lines(fl)
+        y_cheek = fl["side"] * (self.ch.V["rail_c"] - self.ch.role_sec["rail"].b / 2 - ck["t"] / 2)
+        at = np.array([fl["front"], y_cheek, fl["z1"] - depth / 2])
+        out = group_stress(g, Fa, at)
+        b, d = abs(fl["outer_y"] - fl["inner_y"]), fl["z1"] - fl["z0"]
+        q = np.array([fl["bar_front"], (fl["inner_y"] + fl["outer_y"]) / 2, (fl["z0"] + fl["z1"]) / 2])
+        A, Zy, Zz = b * d, b * d ** 2 / 6, d * b ** 2 / 6
+        best = 0.0
+        for sx in (1, -1):
+            for sy in (1, -1):
+                for sz in (1, -1):
+                    Fs, Ms = group_share(g, np.asarray(Fa, float) * np.array([sx, sy, sz]), at, [0], q)
+                    sig = abs(Fs[0]) / A + abs(Ms[1]) / Zy + abs(Ms[2]) / Zz
+                    tau = rect_torsion(Ms[0], b, d) + 1.5 * max(abs(Fs[1]), abs(Fs[2])) / A
+                    best = max(best, math.sqrt(sig ** 2 + 3 * tau ** 2))
+        out["filler's section at the hinge bar's face"] = best
+        return out
+
+    @staticmethod
+    def cheek_share(c: dict, mine: list[dict], px: float) -> np.ndarray:
+        """The share of its hinge's pin force cheek c takes along, across and up (CHS-14, I2-118). The two cheeks meet the
+        bar in line, so each takes half along the rail. Across and up each takes the worse of half, as they share it if the
+        bar cannot turn between them, and the lever rule's share from the pivot at X px to the other cheek's joint, as they
+        share it if the bar turns freely. A hinge with one cheek gives it the whole force."""
+        if len(mine) < 2:
+            return np.ones(3)
+        o = next(x for x in mine if x is not c)
+        s = max(0.5, abs(px - o["joint_x"]) / abs(c["joint_x"] - o["joint_x"]))
+        return np.array([0.5, s, s])
+
     def _cheek_envelope(self, lc_id: str, label: str, res):
-        """Each hinge's pin force in one LC8a case, the force its cheeks take from the hinge bar, and the largest stress in
-        each of their welds over the case's hinges (cheek_welds, CHS-14)."""
+        """Each hinge's pin force in one LC8a case, the force each of its cheeks takes from the hinge bar (cheek_share),
+        and the largest stress in each of their welds over the case's hinges (cheek_welds, CHS-14)."""
         xyz = np.asarray(self.f.nodes)
         e = self.cheek_env.setdefault(lc_id, {})
+        cheeks = self.ch.hinge_cheeks()
         for wid, k in self.fm.cheek_pins.items():
             el = self.f.elements[k]
             R, _ = el.axes(xyz)
             F = -R.T @ np.asarray(res.forces[k][6:9])
-            n = sum(1 for c in self.ch.hinge_cheeks() if c["wheel"] == wid)
-            for part, mpa in self.cheek_welds(F / n).items():
-                if mpa > e.get(part, {}).get("mpa", 0.0):
-                    e[part] = dict(mpa=mpa, case=label, wheel=wid, f=[float(v) for v in F / n])
+            mine = [c for c in cheeks if c["wheel"] == wid]
+            px = next(w["pivot"][0] for w in self.ch.suspension if w["id"] == wid)
+            for c in mine:
+                f = F * self.cheek_share(c, mine, px)
+                for part, mpa in self.cheek_welds(f, c).items():
+                    key = f"the {'front' if c['way'] < 0 else 'rear'} cheek's {part}"
+                    if mpa > e.get(key, {}).get("mpa", 0.0):
+                        e[key] = dict(mpa=mpa, case=label, wheel=wid, cheek=c["id"], f=[float(v) for v in f])
+
+    def hinge_run_group(self, w: dict) -> dict:
+        """Wheel w's hinge bar's weld runs to its crossmember (xt_hinges `bar`, CHS-18, I2-119) as one weld group in the
+        trailer's axes: each of the three `run` mm runs on its side a `leg` fillet along both of the bar's top edges, its
+        faces `w` apart (xt_arms parts `bar`), on the crossmember's underside, each on its 0.7 leg throat."""
+        ch = self.ch
+        cm = next(m for m in ch.members if m.station == w["station"] and m.role == "cm_xt")
+        b = ch.data["xt_hinges"]["bar"]
+        bw = ch.data["xt_arms"]["parts"]["bar"].get("w", cm.sec.b)
+        x, z = ch.hinge_bar_x(cm), cm.box()[2]
+        y_in = ch.V["rail_c"] - ch.role_sec["rail"].b / 2
+        lines = []
+        for y in sorted((y for y in ch.hinge_weld_ys(cm) if y * w["side"] > 0), key=abs):
+            for e, edge in ((-1, "front"), (1, "rear")):
+                lines.append((f"the run {y_in - abs(y):.0f} mm inboard, its {edge} fillet", (x + e * bw / 2, y - b["run"] / 2, z),
+                              (x + e * bw / 2, y + b["run"] / 2, z), 0.7 * b["leg"]))
+        return weld_group(lines)
+
+    def _links(self, name: str) -> list[int]:
+        """The frame model's elements named `name`, cached on the model in use."""
+        cache = self.fm.__dict__.setdefault("_named", {})
+        if name not in cache:
+            cache[name] = [k for k, el in enumerate(self.f.elements) if el.member == name]
+        return cache[name]
+
+    def _hinge_envelope(self, lc_id: str, label: str, res, bar: str):
+        """In one LC8a case on frame model `bar`: each hinge bar's weld runs, the actions of its links to the crossmember
+        summed about the runs' centroid and read by the elastic vector method (hinge_run_group, CHS-18), and on the
+        elastic bars the bar's largest stress on its estimated section and the force each pair of hinge plates takes from
+        its bush (CHS-19, I2-119)."""
+        xyz = np.asarray(self.f.nodes, float)
+        groups = self.__dict__.setdefault("_run_groups", {})
+        roots = self.ch.data["xt_arms"]["parts"]["arm"]["roots"]
+        y_in = self.ch.V["rail_c"] - self.ch.role_sec["rail"].b / 2
+        for w in self.ch.suspension:
+            wid = w["id"]
+            g = groups.get(wid) or groups.setdefault(wid, self.hinge_run_group(w))
+            F, M = np.zeros(3), np.zeros(3)
+            for k in self._links(f"hinge {wid}"):
+                el = self.f.elements[k]
+                R, _ = el.axes(xyz)
+                fl = np.asarray(res.forces[k], float)
+                Fj, Mj = -R.T @ fl[6:9], -R.T @ fl[9:12]
+                F += Fj
+                M += Mj + np.cross(xyz[el.j] - g["c"], Fj)
+            line, mpa = max(group_stress(g, F, g["c"], M, worst=False).items(), key=lambda kv: kv[1])
+            e = self.run_env.setdefault(lc_id, {}).setdefault(bar, dict(mpa=-1.0))
+            if mpa > e["mpa"]:
+                e.update(mpa=mpa, line=line, case=label, wheel=wid, f=[float(v) for v in F], m=[float(v) for v in M])
+            if bar == "rigid":
+                continue
+            be = self.bar_env.setdefault(lc_id, {}).setdefault(bar, dict(mpa=-1.0, plates={}))
+            s = self.bar_stress(res, w)
+            if s["eq"] > be["mpa"]:
+                be.update(mpa=s["eq"], case=label, wheel=wid, **{k: v for k, v in s.items() if k != "eq"})
+            ys = [w["side"] * (y_in - u) for u in roots]
+            for k in self._links(f"bush {wid}"):
+                el = self.f.elements[k]
+                R, _ = el.axes(xyz)
+                Fb = -R.T @ np.asarray(res.forces[k][6:9], float)
+                pair = "outer" if abs(xyz[el.j][1] - ys[0]) < abs(xyz[el.j][1] - ys[1]) else "inner"
+                pe = be["plates"].setdefault(pair, dict(along=0.0, total=0.0))
+                if abs(Fb[0]) > pe["along"]:
+                    pe.update(along=abs(float(Fb[0])), case=label, wheel=wid)
+                pe["total"] = max(pe["total"], float(np.linalg.norm(Fb)))
+
+    def bar_stress(self, res, w: dict) -> dict:
+        """Wheel w's elastic hinge bar (XT-BAR, I2-119) on its estimated section (Chassis.hinge_bar_section), its largest
+        stress over its elements' ends: N / A and the bending about each axis on the solid rectangle's elastic moduli, the
+        torque by rect_torsion and the shear 1.5 V / A, combined as sqrt(sigma^2 + 3 tau^2)."""
+        cm = next(m for m in self.ch.members if m.station == w["station"] and m.role == "cm_xt")
+        bar = self.ch.data["xt_arms"]["parts"]["bar"]
+        bw, d = bar.get("w", cm.sec.b), bar["d"]
+        A, Zs, Zw = bw * d, bw * d ** 2 / 6, d * bw ** 2 / 6
+        best = dict(eq=0.0)
+        for k in self._links(f"XT-BAR-{w['id']}"):
+            for act in end_actions(res.forces[k]):
+                sig = abs(act["N"]) / A + abs(act["My"]) / Zs + abs(act["Mz"]) / Zw
+                tau = rect_torsion(act["T"], bw, d) + 1.5 * max(abs(act["Vy"]), abs(act["Vz"])) / A
+                eq = math.sqrt(sig ** 2 + 3 * tau ** 2)
+                if eq > best["eq"]:
+                    best = dict(eq=eq, sigma=sig, tau=tau, T=act["T"], M_strong=act["My"], M_weak=act["Mz"])
+        return best
 
     def gusset_elements(self) -> list[tuple[int, dict]]:
         """Each hinge gusset's frame element with the gusset (Chassis.hinge_gussets), its i end on the crossmember's face."""
@@ -1309,12 +1470,51 @@ class Analysis:
         hinge has two (cheek_welds), against AS 4100 9.7.3's 0.8 x 0.6 fuw."""
         mat = self.ch.data["material"]
         wcap = mat["weld_phi"] * 0.6 * mat["weld_fuw"]
-        rows = [(f"{part}, {lc_id}", r["mpa"], wcap) for lc_id in ("LC8a", "LC8u") for part, r in self.cheek_env[lc_id].items()]
-        w = max(((lc_id, part, r) for lc_id in ("LC8a", "LC8u") for part, r in self.cheek_env[lc_id].items()), key=lambda t: t[2]["mpa"])
+
+        def cap(part):                                   # a filler's own section against the plate's fy, the welds on their throats
+            return mat["plate_fy"] if "section" in part else wcap
+        rows = [(f"{part}, {lc_id}", r["mpa"], cap(part)) for lc_id in ("LC8a", "LC8u") for part, r in self.cheek_env[lc_id].items()]
+        w = max(((lc_id, part, r) for lc_id in ("LC8a", "LC8u") for part, r in self.cheek_env[lc_id].items()),
+                key=lambda t: t[2]["mpa"] / cap(t[1]))
         lc_id, part, r = w
         return _local("Hinge cheeks' welds (CH-P16)", rows,
-                      f"the pin's force from the hinge bar into one cheek, {r['f'][0] / 1000:+.1f} kN along, {r['f'][1] / 1000:+.1f} kN across and "
-                      f"{r['f'][2] / 1000:+.1f} kN up, at {r['wheel']} in {r['case']}")
+                      f"the pin's force from the hinge bar into {r['cheek']}, its share, {r['f'][0] / 1000:+.1f} kN along, {r['f'][1] / 1000:+.1f} kN "
+                      f"across and {r['f'][2] / 1000:+.1f} kN up, at {r['wheel']} in {r['case']}")
+
+    def hinge_runs(self) -> dict:
+        """CHS-18 (I2-119): each hinge bar's three weld runs a side to its crossmember (hinge_run_group) in every LC8a case
+        at the pull and at its ultimate, on each of the frame's models, the actions the bar passes the crossmember there
+        read by the elastic vector method against AS 4100 9.7.3's 0.8 x 0.6 fuw."""
+        mat = self.ch.data["material"]
+        wcap = mat["weld_phi"] * 0.6 * mat["weld_fuw"]
+        rows = [(f"{lc_id}, the hinge bars {bar}", r["mpa"], wcap) for lc_id in ("LC8a", "LC8u") for bar, r in self.run_env[lc_id].items()]
+        lc_id, bar, r = max(((lc_id, bar, r) for lc_id in ("LC8a", "LC8u") for bar, r in self.run_env[lc_id].items()), key=lambda t: t[2]["mpa"])
+        return _local("Hinge bars' weld runs to their crossmembers (XT-BAR)", rows,
+                      f"{r['line']} at {r['wheel']}, {abs(r['f'][0]) / 1000:.1f} kN along, {abs(r['f'][1]) / 1000:.1f} kN across and "
+                      f"{abs(r['f'][2]) / 1000:.1f} kN up with {math.hypot(*r['m']) / 1e6:.1f} kNm about the runs' centroid, the hinge bars {bar}, "
+                      f"in {r['case']}")
+
+    def hinge_bar_report(self) -> dict:
+        """CHS-19 (I2-119), reported: Cruisemaster's hinge bars and hinge plates, whose section and grade are not published,
+        in every LC8a case at the pull and at its ultimate on the elastic bars: each bar's largest stress on its estimated
+        section (bar_stress) against the 350 MPa of a grade 350 bar (est.), and each pair of hinge plates' largest force
+        from its bush along the trailer and in all, for Cruisemaster to rate. The rigid bars carry no stress of their own."""
+        rows, plates = [], {}
+        for lc_id in ("LC8a", "LC8u"):
+            for bar, r in self.bar_env.get(lc_id, {}).items():
+                rows.append((f"the bar, {lc_id}, {bar}", r["mpa"], self.ch.data["material"]["plate_fy"]))
+                for pair, p in r["plates"].items():
+                    plates[f"{lc_id}, {bar}, {pair} pair"] = dict(p)
+        if not rows:
+            return dict(name="Hinge bars and hinge plates (reported)", load="no elastic bar", parts=[], util=0.0, governing="", mpa=0.0,
+                        limit_mpa=0.0, plates={}, bars={})
+        lc_id, bar, r = max(((lc_id, bar, r) for lc_id in ("LC8a", "LC8u") for bar, r in self.bar_env[lc_id].items()), key=lambda t: t[2]["mpa"])
+        out = _local("Hinge bars and hinge plates, Cruisemaster's (reported)", rows,
+                     f"the bar at {r['wheel']} on its estimated section, the hinge bars {bar}, in {r['case']}")
+        out["plates"] = plates
+        out["bars"] = {f"{lc_id}, {bar}": dict(mpa=v["mpa"], case=v["case"], wheel=v["wheel"]) for lc_id in ("LC8a", "LC8u")
+                       for bar, v in self.bar_env.get(lc_id, {}).items()}
+        return out
 
     def arm_limits(self) -> dict:
         """CHS-15 (I2-94): what LC8a's arms put on their limits and mounts, the worst over every LC8a case at 58.9 kN and
@@ -2402,9 +2602,9 @@ def plate_shear_buckling(x0: float, x1: float, y0: float, y1: float, t: float, h
 
 
 def recovery_rule(results: dict, lc8: dict) -> dict:
-    """The user's recovery rule (I2-93, I2-100, I2-114), from LC8a's data and the frame analysis's recovery summary: the pull
-    each point is rated for with every wheel free and the directions it holds within, the limits with one wheel and with
-    both wheels of one axle held fast, and the least
+    """The user's recovery rule (I2-93, I2-100, I2-114, I2-119), from LC8a's data and the frame analysis's recovery summary:
+    the pull each point is rated for, the limit with every wheel free (the rated pull where every check holds it) and the
+    directions it holds within, the limits with one wheel and with both wheels of one axle held fast, and the least
     pull, in kN, that tips the trailer before the rated pull when it is pulled up or down, sideways and along its line,
     and whether any level pull does."""
     tc = results["recovery"]["LC8a"]["tip_classes"]
@@ -2413,7 +2613,8 @@ def recovery_rule(results: dict, lc8: dict) -> dict:
     def least(prefix: str):
         ks = [v["kn"] for k, v in tc.items() if k.startswith(prefix)]
         return min(ks) if ks else None
-    return dict(rated_kn=lc8["force_n"] / 1000, sideways_deg=lc8["sideways_deg"], vertical_deg=vd, held_wheel_kn=lc8["held_wheel_n"] / 1000,
+    return dict(rated_kn=lc8["force_n"] / 1000, free_kn=lc8.get("free_n", lc8["force_n"]) / 1000, sideways_deg=lc8["sideways_deg"],
+                vertical_deg=vd, held_wheel_kn=lc8["held_wheel_n"] / 1000,
                 held_axle_kn=lc8["held_axle_n"] / 1000,
                 sideways_up_kn=least(f"sideways +{vd}"), sideways_down_kn=least(f"sideways -{vd}"),
                 along_up_kn=least(f"along +{vd}"), along_down_kn=least(f"along -{vd}"),
@@ -2469,6 +2670,75 @@ def _miner(fat: float, ds_o: float, lc: dict) -> float:
     if n > 1e7:
         n = 1e7 * (cafl / ds_o) ** 22
     return lc["occasional_cycles"] / n
+
+
+def weld_group(lines: list[tuple[str, tuple, tuple, float]]) -> dict:
+    """A weld group for the elastic vector method in three dimensions (CHS-14, CHS-18): each line (name, p0, p1, throat)
+    a straight weld from p0 to p1 on its throat. Its throat area A, its centroid c and the inverse of its polar tensor
+    about c, the sum over the lines of a (|r|^2 1 - r r^T) at each line's centre and a L^2 / 12 (1 - e e^T) along it."""
+    P0 = np.array([ln[1] for ln in lines], float)
+    P1 = np.array([ln[2] for ln in lines], float)
+    d = P1 - P0
+    L = np.linalg.norm(d, axis=1)
+    a = np.array([ln[3] for ln in lines], float) * L
+    m = (P0 + P1) / 2
+    A = float(a.sum())
+    c = (a[:, None] * m).sum(axis=0) / A
+    eye = np.eye(3)
+    I = np.zeros((3, 3))
+    for ak, mk, dk, Lk in zip(a, m, d, L):
+        r, e = mk - c, dk / Lk
+        I += ak * (r @ r * eye - np.outer(r, r)) + ak * Lk ** 2 / 12 * (eye - np.outer(e, e))
+    return dict(names=[ln[0] for ln in lines], P0=P0, P1=P1, a=a, m=m, e=d / L[:, None], L=L, A=A, c=c, Iinv=np.linalg.inv(I))
+
+
+def _cross(v) -> np.ndarray:
+    """The matrix [v]x, so that [v]x @ u is v x u."""
+    return np.array([[0.0, -v[2], v[1]], [v[2], 0.0, -v[0]], [-v[1], v[0], 0.0]])
+
+
+def group_stress(g: dict, F, at, M=None, worst: bool = True) -> dict:
+    """The largest throat stress along each line of weld group g under the force F (N) at the point `at` and the moment M
+    about it, by the elastic vector method: at each point F / A and theta x r, theta = I^-1 Mc with Mc the moment about
+    the centroid, at each line's two ends. `worst` adds each force component's direct and turning parts at their worst
+    whatever their signs, as CHS-14 reads the cheeks, and leaves M out; otherwise the signed vectors."""
+    F = np.asarray(F, float)
+    d = np.asarray(at, float) - g["c"]
+    out: dict[str, float] = {}
+    if worst:
+        Fa, D = np.abs(F), g["Iinv"] @ _cross(d)
+        for k, name in enumerate(g["names"]):
+            s = max(float(np.linalg.norm(Fa / g["A"] + np.abs(_cross(p - g["c"]) @ D) @ Fa)) for p in (g["P0"][k], g["P1"][k]))
+            out[name] = max(out.get(name, 0.0), s)
+        return out
+    th = g["Iinv"] @ ((np.zeros(3) if M is None else np.asarray(M, float)) + np.cross(d, F))
+    for k, name in enumerate(g["names"]):
+        s = max(float(np.linalg.norm(F / g["A"] + np.cross(th, p - g["c"]))) for p in (g["P0"][k], g["P1"][k]))
+        out[name] = max(out.get(name, 0.0), s)
+    return out
+
+
+def group_share(g: dict, F, at, lines: list[int], q) -> tuple[np.ndarray, np.ndarray]:
+    """The force and its moment about q that the lines `lines` of weld group g carry under the force F at `at`, signed,
+    by the elastic vector method: each line's a (F / A + theta x (m - c)) at its centre m, and its own a L^2 / 12
+    (theta - e (e . theta)) along it."""
+    F = np.asarray(F, float)
+    th = g["Iinv"] @ np.cross(np.asarray(at, float) - g["c"], F)
+    Fs, Ms = np.zeros(3), np.zeros(3)
+    for k in lines:
+        f = g["a"][k] * (F / g["A"] + np.cross(th, g["m"][k] - g["c"]))
+        e = g["e"][k]
+        Fs += f
+        Ms += np.cross(g["m"][k] - np.asarray(q, float), f) + g["a"][k] * g["L"][k] ** 2 / 12 * (th - e * (e @ th))
+    return Fs, Ms
+
+
+def rect_torsion(T: float, a: float, b: float) -> float:
+    """The largest shear stress from torque T in a solid rectangle a by b (Roark, Table 10.7): 3 T / (8 a' b'^2) times
+    (1 + 0.6095 r + 0.8865 r^2 - 1.8023 r^3 + 0.9100 r^4), a' and b' the half sides, a' >= b', r = b' / a'."""
+    a, b = max(a, b) / 2, min(a, b) / 2
+    r = b / a
+    return 3 * abs(T) / (8 * a * b ** 2) * (1 + 0.6095 * r + 0.8865 * r ** 2 - 1.8023 * r ** 3 + 0.9100 * r ** 4)
 
 
 def _local(name, rows, load) -> dict:

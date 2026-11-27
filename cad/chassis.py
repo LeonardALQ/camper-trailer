@@ -457,6 +457,8 @@ class Chassis:
                 at = [g["centre"] for g in self.hinge_gussets()]
             elif f.get("poses") == "hinge_cheeks":    # each cheek's mass at its centre (xt_hinges)
                 at = [c["centre"] for c in self.hinge_cheeks()]
+            elif f.get("poses") == "hinge_fillers":   # each filler's mass at its centre (xt_hinges `filler`, I2-118)
+                at = [c["centre"] for c in self.hinge_fillers()]
             elif f.get("poses") == "shock_plates":    # each shock support plate flush on its crossmember's front face
                 at = [p["centre"] for p in self.shock_plates()]
             elif "side_y" in f:
@@ -478,6 +480,13 @@ class Chassis:
                                                                  + (" with its step" if k_[2] > 1 else "") for k_ in kinds)
                                    + f" x {f['t']} mm plate at {dens} kg/m3", t=f["t"], dims=(f["l"], f["w"], f["t"]),
                                    area_m2_each=2 * sum(area) / 1e6 / len(cs)))
+            elif kind == "plate" and f.get("poses") == "hinge_fillers":   # each filler at its own size (I2-118)
+                bs = [c["box"] for c in self.hinge_fillers()]
+                dims = tuple(round(bs[0][i + 3] - bs[0][i], 1) for i in range(3))
+                m = dims[0] * dims[1] * dims[2] * dens / 1e9
+                out.append(Fitting(f["id"], f["name"], "plate", len(bs), at, m, "calculated",
+                                   f"Calculated: {dims[0]:g} x {dims[1]:g} x {dims[2]:g} mm of steel at {dens} kg/m3", t=dims[2], dims=dims,
+                                   area_m2_each=2 * (dims[0] * dims[1] + dims[1] * dims[2] + dims[0] * dims[2]) / 1e6))
             elif kind == "plate":
                 af = f.get("area_factor", 1.0)
                 m = f["l"] * f["w"] * f["t"] * af * dens / 1e9
@@ -767,7 +776,10 @@ class Chassis:
     def hinge_cheeks(self) -> list[dict]:
         """The eight hinge cheeks CH-P16 (xt_hinges `cheek`), two at each XT hinge, one either side of its crossmember:
         a plate on the rail's inner face from `below` under the rail's underside up the rail's web, welded to the web
-        along its top edge and the rail's bottom corner and to the hinge bar's front or rear face (I2-88)."""
+        along its top edge and the rail's bottom corner and to the hinge bar's front or rear face (I2-88). Where the bar's
+        front face stands behind its crossmember's, a front cheek meets the filler CH-P18 there instead (hinge_fillers,
+        I2-118), or with no filler its part under the rail runs on under the crossmember to the bar, its `tail`. `joint_x`
+        is where each cheek meets the bar or its filler."""
         V, ck = self.V, self.data["xt_hinges"]["cheek"]
         g = self.data["xt_hinges"]["gusset"]
         big = ck.get("under_gusset")
@@ -785,9 +797,9 @@ class Chassis:
                 box = (x0, y0, z0, x0 + ck["l"], y0 + ck["t"], z0 + ck["h"])
                 boxes, area = [box], ck["l"] * ck["h"]
                 reach = self.hinge_bar_x(cm) - self.data["xt_arms"]["parts"]["bar"].get("w", cm.sec.b) / 2 - face
-                if e < 0 and reach > 1e-6:              # the bar's front face behind the crossmember's: the plate's part under the
-                    tail = (face, y0, z0, face + reach, y0 + ck["t"], V["rail_underside_z"])   # rail runs on under it to the bar
-                    boxes.append(tail)
+                tail = reach if e < 0 and reach > 1e-6 and not self.data["xt_hinges"].get("filler") else 0.0
+                if tail:                                # the bar's front face behind the crossmember's: the plate's part under the
+                    boxes.append((face, y0, z0, face + reach, y0 + ck["t"], V["rail_underside_z"]))   # rail runs on under it to the bar
                     area += reach * (V["rail_underside_z"] - z0)
                 if gusset:                              # the step where the gusset lands, centred on its footprint (I2-99)
                     xc = face + e * (self.ev(g["length"]) / math.sqrt(2) - ck["t"])
@@ -804,7 +816,39 @@ class Chassis:
                     continue
                 out.append(dict(id=f"CH-P16-{w['id']}{tag}", member=f"CH-P16-{w['id']}", wheel=w["id"], side=w["side"], box=box,
                                 centre=tuple((box[i] + box[i + 3]) / 2 for i in range(3)), l=l, h=h, boxes=boxes, area=area, face=face, way=e,
-                                gusset=f"CH-P08-{gid}" if gusset else None))
+                                gusset=f"CH-P08-{gid}" if gusset else None, tail=tail, joint_x=face + tail))
+        return out
+
+    def hinge_fillers(self) -> list[dict]:
+        """The hinge cheek fillers CH-P18 (xt_hinges `filler`, I2-118): at each XT hinge whose bar's front face stands
+        behind its crossmember's, a steel block `d` deep under the crossmember's front half from the crossmember's front face
+        to the bar's front face, from `inboard` inboard of the rail's inner face out under the rail to its outer face, where
+        the bar's long end stands, so FIT-05 keeps its 50 mm from the arms' pivot tubes (est.). The front cheek's part under
+        the rail meets its front face, so the cheek meets it where it met the bar on a 50 mm crossmember, and its `bar_leg`
+        fillets weld it there. A `leg` fillet welds the filler to the bar's front face along its bottom rear edge, the bar
+        standing deeper, and another to the crossmember's underside along its inboard top edge, and flare-bevel welds join
+        it to the crossmember's rounded bottom front corner inboard of the cheek's fillets and to the rail's rounded outer
+        bottom corner, along the rail, as the corner steadies' brackets are (TB 070), its top rear edge chamfered `chamfer`
+        clear of the bar's first run."""
+        fd = self.data["xt_hinges"].get("filler")
+        if not fd:
+            return []
+        V, rail, ck = self.V, self.role_sec["rail"], self.data["xt_hinges"]["cheek"]
+        y_in, y_out, zu = V["rail_c"] - rail.b / 2, V["rail_c"] + rail.b / 2, V["rail_underside_z"]
+        bar = self.data["xt_arms"]["parts"]["bar"]
+        out = []
+        for w in self.suspension:
+            cm = next(m for m in self.hinge_crossmembers() if abs(m.p0[0] - w["station_x"]) < 1.0)
+            front = w["station_x"] - cm.sec.b / 2
+            bar_front = self.hinge_bar_x(cm) - bar.get("w", cm.sec.b) / 2
+            if bar_front - front < 1e-6:
+                continue
+            s = w["side"]
+            ya, yb = sorted((s * y_out, s * (y_in - fd["inboard"])))
+            box = (front, ya, zu - fd["d"], bar_front, yb, zu)
+            out.append(dict(id=f"CH-P18-{w['id']}", wheel=w["id"], side=s, box=box, front=front, bar_front=bar_front,
+                            inner_y=s * (y_in - fd["inboard"]), outer_y=s * y_out, z0=zu - fd["d"], z1=zu, cm=cm.id,
+                            flare_y=s * (y_in - ck["t"] - ck["bar_leg"]), centre=tuple((box[i] + box[i + 3]) / 2 for i in range(3))))
         return out
 
     def step_size(self, station: str, key: str) -> float:
@@ -1733,6 +1777,8 @@ def fitting_boxes(ch: Chassis, f: Fitting) -> list[tuple]:
                  max(x for x, _ in g["outline"]), max(y for _, y in g["outline"]), g["z"] + h) for g in ch.hinge_gussets()]
     if spec.get("poses") == "hinge_cheeks":                   # each hinge cheek's plate (xt_hinges)
         return [b for c in ch.hinge_cheeks() for b in c["boxes"]]
+    if spec.get("poses") == "hinge_fillers":                  # each filler under its crossmember's front half (I2-118)
+        return [c["box"] for c in ch.hinge_fillers()]
     if spec.get("poses") == "shock_plates":                   # flush on their crossmembers' front faces
         return [p["box"] for p in ch.shock_plates()]
     if f.kind == "angles":                                    # the shear panel's welded angles, each leg (panel_pieces)

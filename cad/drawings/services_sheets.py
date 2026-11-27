@@ -1090,8 +1090,9 @@ def ct611(prj, model, bom, checks, reg, dwg):
     wire(sh, [(55, 256), (55, 246)], "cold", arrow=True)
     wire(sh, [(55, 228), (55, 218)], "cold", arrow=True)
     # tanks
-    box(sh, 98, 250, 152, 270, ["FRESH TANK, FRONT BAY (UF-01)", "6 mm HDPE, BAFFLED, ABOUT 216 L", "VENTED TO THE ROAD SIDE"])
-    box(sh, 98, 222, 152, 242, ["FRESH TANK, REAR BAY (UF-01R)", "6 mm HDPE, BAFFLED", "VENTED TO THE ROAD SIDE"])
+    nets = C["day"].tank_nets()                          # each fresh tank's net from the layout (I2-120)
+    box(sh, 98, 250, 152, 270, ["FRESH TANK, FRONT BAY (UF-01)", f"6 mm HDPE, BAFFLED, {nets['UF-01']['net_l']:.1f} L NET", "VENTED TO THE ROAD SIDE"])
+    box(sh, 98, 222, 152, 242, ["FRESH TANK, REAR BAY (UF-01R)", f"6 mm HDPE, BAFFLED, {nets['UF-01R']['net_l']:.1f} L NET", "VENTED TO THE ROAD SIDE"])
     wire(sh, [(86, 209), (92, 209), (92, 260), (98, 260)], "cold", arrow=True)
     wire(sh, [(92, 232), (98, 232)], "cold", arrow=True)
     sh.text(99, 246.2, f"{V['water_full_l']:.0f} L NET. AT MOST {V['water_travel_l']:.0f} L IN TRAVEL (H13)", 1.15)
