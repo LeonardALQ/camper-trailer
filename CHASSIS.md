@@ -323,7 +323,7 @@ CT-101 and CT-102 carry the member and plate lists, and the site's Downloads pag
 2. Plan bracing in the two bays ahead of the axles. With no bracing, a recovery pull 30 degrees off the rail axis (LC8a) bent the ladder sideways in a Vierendeel shape. The tanks fill the bays behind, so the thicker XT rear shock crossmember takes the rear pull, and the rear tank's guard is a steel shear panel (revision Q).
 3. No jacking pads on the frame. The trailer is jacked under Cruisemaster's jacking point under each arm by the hub, the air released from the springs first (Cruisemaster's XT user guide), so the jack's push reaches the rail through the arm's bump stop and its airbag's top bracket (LOC-04).
 4. The weld toes on the rail at the full-height crossmembers are burr-ground (IIW 512, a CAFL of 60.8 MPa). They see 20.8 MPa (FAT-01).
-5. 8 mm fillets round the ends of the XT crossmembers, 6 mm until revision Q. The root (IIW 414) sees 10.9 MPa against 21.1 MPa (FAT-03), since revision AA at the XT centre crossmember's 100 mm end.
+5. 8 mm fillets round the ends of the XT crossmembers, 6 mm until revision Q. The root (IIW 414) sees 10.6 MPa against 21.1 MPa (FAT-03), since revision AA at the XT centre crossmember's 100 mm end.
 6. Raisers RHS 127 x 51 x 3.5 in place of 100 x 50 x 3, to lift the floor above the 805 mm tyre with 50 mm in hand at full bump.
 7. A fixed station at the diesel bay, so the heater's tank sits between two crossmembers, and one at the grey bay over the grey tank.
 8. The recovery lugs and chain lugs keep report 11's sizes, but each chain lug's hole is 14 mm for its connecting link's 10 mm bow. The front recovery lugs are 20 mm plate, because a 30 degree pull bends them out of their plane.
