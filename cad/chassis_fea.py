@@ -146,6 +146,9 @@ class Analysis:
             if b.extra.get("tank") and hasattr(lay, "tank_bearers"):
                 out += self._tank_items(b.iid, b.name, m, b, b.cog[2])
                 continue
+            if b.id in ("UF-08", "UF-08W") and hasattr(lay, "tank_bearers"):
+                out += self._tank_items(b.iid, b.name, m, lay.find("UF-08"), b.cog[2])
+                continue
             if b.cog[0] < V["body_x0"] - 100:
                 rule = "drawbar"          # the drawbar box and its contents
             elif b.system == "underfloor" or b.id in RAILS:
@@ -163,8 +166,9 @@ class Analysis:
         return out + list(self.chassis_items)
 
     def _tank_items(self, iid, name, m, tank, z) -> list[Item]:
-        """A fresh tank's mass m, or its water's share, where its bearers put it on the frame (I2-109, Layout.tank_bearers):
-        the front tank's two ends on their pairs on the XT crossmembers by the tank's centre's place between their bearing
+        """A tank's mass m, or its water's share, where its bearers put it on the frame (I2-109, I2-122, Layout.tank_bearers):
+        the front tank's two ends on their pairs on the XT crossmembers and the grey tank's, with its grey water, on theirs
+        on the XT rear shock and rear crossmembers (UF-08B), each by the tank's centre's place between their bearing
         lines, and the rear tank's front end on its pair on the XT centre crossmember as if the tank spanned to its rear
         end, the rest through the rear bay's shear panel to its bolts on the rails' angles and under the XT rear shock
         crossmember by the lever rule. Each pair's share goes to its crossmember at each bearer's middle, by its length.
@@ -246,7 +250,7 @@ class Analysis:
             return fm.between_rails(x, y)
         if it.rule == "drawbar":
             return fm.drawbar_fractions(x, y)
-        if it.rule.startswith("cm:"):           # on a crossmember at its Y (a fresh tank's bearers, I2-109)
+        if it.rule.startswith("cm:"):           # on a crossmember at its Y (a tank's bearers, I2-109, I2-122)
             return fm.crossmember_fractions(it.rule[3:], y)
         if it.rule == "spare":
             cm = next(m.id for m in self.ch.members if m.station == "front" and m.role.startswith("cm"))

@@ -570,6 +570,27 @@ def test_the_bearers_and_hangers_bolt_holes_are_read_by_the_hole_checks():
         assert h["ok"] and h["static_ok"] and h["ultimate"]["util"] <= 1, h["id"]
 
 
+def test_the_grey_tank_and_its_water_bear_on_the_frame_at_its_bearers():
+    """I2-109, I2-122: the frame model puts the grey tank and its grey water on the crossmembers its bearers UF-08B stand
+    on, the XT rear shock and rear crossmembers, at each bearer's middle by its length (Analysis._tank_items), as it puts
+    the fresh tanks on theirs, never shared between the rails over the tank's box. Each end's share goes by the tank's
+    centre's place between the two bearing lines, so the shares keep the tank's mass and its moment about its centre."""
+    from cad.chassis_fea import Analysis
+    lay = EV["layout"]
+    tank = lay.find("UF-08")
+    on = {f"cm:{b['member']}" for b in lay.tank_bearers("UF-08B")}
+    case = next(c for c in TRAILER.cases if c.id == "TC7")
+    lines = {b.iid: m for b, m in lay.case_lines(case) if b.id in ("UF-08", "UF-08W") and m > 0}
+    items = Analysis(lay, TRAILER, CH).items(case)
+    xc = (tank.box[0] + tank.box[3]) / 2
+    assert set(lines) == {"UF-08", "UF-08W"} and len(on) == 2
+    for iid, m in lines.items():
+        mine = [it for it in items if it.id == iid]
+        assert {it.rule for it in mine} == on, (iid, {it.rule for it in mine})
+        assert sum(it.m for it in mine) == pytest.approx(m, rel=1e-9), iid
+        assert abs(sum(it.m * (it.p[0] - xc) for it in mine)) < 1e-6 * m * (tank.box[3] - tank.box[0]), iid
+
+
 def test_every_check_is_read_on_the_hinge_bars_bounds():
     """I2-114: the frame analysis reads every check on the hinge bars rigid and elastic at their own section, the elastic
     bar's arm on free and on stiff bushes (xt_hinges `bar` `bounds` and `bushes`), and the elastic models tie each bar to
