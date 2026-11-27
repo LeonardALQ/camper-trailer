@@ -420,7 +420,6 @@ drawings:
       - {rev: AS, date: 2026-11-26, description: "Memo: the chassis data at revision V (I2-114)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AT, date: 2026-11-26, description: "Notice: the wider hinge crossmembers' holes and the cheeks' tails (I2-114)", drawn: Kiro, checked: "", approved: ""}
       - {rev: AU, date: 2026-11-27, description: "Memo: the chassis data at revision X and a hole's figure", drawn: Kiro, checked: "", approved: ""}
-      - {rev: AV, date: 2026-11-27, description: "Memo: the fatigue ranges with the hinge bars held at their welds", drawn: Kiro, checked: "", approved: ""}
   - number: CT-104
     title: Structural load paths and body mounts
     subtitle: Plinth, tower, bed rails, outdoor unit, rear door, partition and the mounts, with loads
@@ -465,6 +464,7 @@ drawings:
       - {rev: AF, date: 2026-11-26, description: "Notice: the load paths and body mounts with the wider hinge crossmembers", drawn: Kiro, checked: "", approved: ""}
       - {rev: AG, date: 2026-11-26, description: "Memo: the stations and the body's figures with 375 L of water", drawn: Kiro, checked: "", approved: ""}
       - {rev: AH, date: 2026-11-27, description: "Memo: the stations, LC1 and the body mounts with the cheek fillers", drawn: Kiro, checked: "", approved: ""}
+      - {rev: AI, date: 2026-11-27, description: "Notice: LC4's stress at 51.5 MPa with the hinge runs held at their welds", drawn: Kiro, checked: "", approved: ""}
   - number: CT-105
     title: Holes for galvanising
     subtitle: Every drain, vent, check and fixing hole by section, the apex cut, the mitre lines and the overlaps' vents
