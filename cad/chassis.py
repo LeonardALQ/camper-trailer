@@ -29,6 +29,18 @@ PIN = Section("pin", A=1.0e5, I_strong=1.0, I_weak=1.0, J=1.0, rigid=True)
 # bar's bending between its bushes, and turns freely about that axis in both. Marked rigid so the stress readings skip it
 BUSHES = {"free": Section("bush, free", A=1.0e5, I_strong=100.0, I_weak=100.0, J=100.0, rigid=True),
           "stiff": Section("bush, stiff", A=1.0e5, I_strong=100.0, I_weak=1.0e8, J=1.0e8, rigid=True)}
+
+
+def weld_spring(length: float, leg: float) -> Section:
+    """A point of a fillet weld on the elastic hinge bar (xt_hinges `bar`, I2-121): a link 1 mm long normal to the
+    crossmember's underside, its depth along X, standing for `length` mm of a `leg` fillet, so it passes the weld's own
+    stiffness and no moment. Per mm of weld the fillet's throat a = 0.7 leg shears over its leg at G a / leg along and
+    across its line and stretches at E a / leg normal to the face (est., the weld metal's own stiffness, the parts beside
+    it taken as stiff). Marked rigid so the stress readings skip it."""
+    a, E = 0.7 * leg, 200_000.0
+    k_s, k_n = G_STEEL * a / leg * length, E * a / leg * length
+    return Section(f"weld, {length:.1f} mm of a {leg:g} mm fillet", A=k_n / E, I_strong=k_s / (12 * E), I_weak=k_s / (12 * E),
+                   J=1.0, rigid=True)
 SECTIONS_YAML = DATA / "chassis" / "sections.yaml"
 SIDES = {-1: "K", 1: "R"}            # kerb side is negative Y, road side positive Y (DIM-01)
 SIDE_WORDS = {-1: "kerb side", 1: "road side"}
@@ -1422,7 +1434,8 @@ class FrameModel:
         s, wid = w["side"], w["id"]
         parts = ch.data["xt_arms"]["parts"]
         y_in = V["rail_c"] - ch.role_sec["rail"].b / 2
-        x, z = ch.hinge_bar_x(cm), V["rail_underside_z"] - parts["bar"]["d"] / 2
+        d = parts["bar"]["d"]
+        x, z = ch.hinge_bar_x(cm), V["rail_underside_z"] - d / 2
         pin_y = s * (y_in - ch.data["xt_hinges"]["cheek"]["t"] / 2)
         plates = [s * (y_in - u) for u in parts["plates"]["y_in"]]
         runs = [y for y in ch.hinge_run_points(cm) if y * s > 0]
@@ -1431,16 +1444,43 @@ class FrameModel:
         sec = ch.hinge_bar_section(cm)
         for a, b in zip(ys, ys[1:]):
             f.add(at[a], at[b], sec, (0, 0, 1), f"XT-BAR-{wid}")
-        for y in runs:
-            self._link(at[y], self.cm_node(cm.id, y), f"hinge {wid}")
+        self._weld_runs(w, cm, at, x)
         self._link(at[pin_y], under_pin, f"hinge bar {wid}")
         px, _, pz = w["pivot"]
+        pl = parts["plates"]
+        psec = Section(f"hinge plate, {pl['t']:g} x {pl['l']:g}", A=pl["t"] * pl["l"], I_strong=pl["t"] * pl["l"] ** 3 / 12,
+                       I_weak=pl["l"] * pl["t"] ** 3 / 12, J=pl["l"] * pl["t"] ** 3 / 3 * (1 - 0.63 * pl["t"] / pl["l"]))
+        self.sec_props.setdefault(f"XT-PLATE-{wid}", psec)
         for u, pair in zip(parts["arm"]["roots"], (plates[:2], plates[2:])):
             bolt, tube = f.node((px, s * (y_in - u), pz)), f.node((px, s * (y_in - u), pz - 1.0))
-            for y in pair:
-                self._link(bolt, at[y], f"hinge plate {wid}")
+            for y in pair:              # each plate welded under the bar, its own section down to the bolt (I2-121)
+                top, foot = f.node((px, y, z - d / 2)), f.node((px, y, pz))
+                self._link(at[y], top, f"hinge plate {wid}")
+                f.add(top, foot, psec, (1, 0, 0), f"XT-PLATE-{wid}")
+                self._link(foot, bolt, f"hinge plate {wid}")
             f.add(tube, bolt, BUSHES[self.bushes], (1, 0, 0), f"bush {wid}")
             self._link(pivot, tube, f"pivot tube {wid}")
+
+    def _weld_runs(self, w: dict, cm, at: dict, x: float):
+        """Wheel w's elastic hinge bar welded to crossmember cm by its weld runs (xt_hinges `bar`, I2-121): each run's two
+        `leg` fillets along the bar's top edges, `w` apart, each a weld point at the run's two ends and its centre carrying
+        a sixth, two thirds and a sixth of its `run` mm (Simpson's rule, so the points give the line's own stiffness along
+        it and against turning), each point a weld_spring between the bar's edge and the crossmember's underside. The bar
+        and the crossmember reach each point by rigid links from their axes, so a run passes a moment only as its welds'
+        forces apart, as its own weld group does, and none at a point."""
+        ch, f = self.ch, self.f
+        b = ch.data["xt_hinges"]["bar"]
+        bw = ch.data["xt_arms"]["parts"]["bar"].get("w", cm.sec.b)
+        zf = cm.box()[2]
+        for yc in (y for y in ch.hinge_weld_ys(cm) if y * w["side"] > 0):
+            for k, share in ((-1, 1 / 6), (0, 2 / 3), (1, 1 / 6)):
+                y = yc + k * b["run"] / 2
+                spring = weld_spring(share * b["run"], b["leg"])
+                for e in (-1, 1):
+                    lo, hi = f.node((x + e * bw / 2, y, zf - 0.5)), f.node((x + e * bw / 2, y, zf + 0.5))
+                    self._link(at[min(at, key=lambda q: abs(q - y))], lo, f"weld runs {w['id']}")
+                    self._link(self.cm_node(cm.id, y), hi, f"weld runs {w['id']}")
+                    f.add(lo, hi, spring, (1, 0, 0), f"hinge {w['id']}")
 
     def _link(self, a: int, b: int, name: str):
         xyz = [self.f.nodes[a], self.f.nodes[b]]

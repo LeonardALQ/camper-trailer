@@ -642,7 +642,7 @@ class Analysis:
         out = {}
         nodes = self.f.nodes
         for el, fl in zip(self.f.elements, res.forces):
-            if el.sec.rigid or el.member in ("BODY", "BODY-MOUNT") or el.member.startswith(("PNL-", "XT-BAR-")):
+            if el.sec.rigid or el.member in ("BODY", "BODY-MOUNT") or el.member.startswith(("PNL-", "XT-BAR-", "XT-PLATE-")):
                 continue
             sp = self.fm.sec_props[el.member]
             for end, act in zip((el.i, el.j), end_actions(fl)):
@@ -727,6 +727,7 @@ class Analysis:
         self.gusset_web_env: dict[str, dict] = {}
 
         def take(lc_id, res, label, extra=None, ultimate=False):
+            self._hinge_envelope(lc_id, label, res, bar)          # the hinge bars' weld runs in every case (CHS-18, I2-121)
             for mem, r in self.stresses(res, ultimate).items():
                 e = env.setdefault(lc_id, {})
                 if mem not in e or r["eq"] > e[mem]["eq"]:
@@ -875,7 +876,6 @@ class Analysis:
                                             where=where, side=s, h=round(math.degrees(hdg), 1), v=v, kn=k * Fr / 1000, axle=isinstance(held, tuple),
                                             weight=sup["label"].split(",")[0], coupled=bool(sup["nose"].get("holds_down"))))
                                     self._cheek_envelope(lc_id, label, res)
-                                    self._hinge_envelope(lc_id, label, res, bar)
         self._use(models[0][1])
         out = dict(envelope={}, governing={}, deflections={}, twist=twist, balls=balls, residual_n=self.resid,
                    frame=dict(nodes=len(self.f.nodes), elements=sum(1 for e in self.f.elements if not e.sec.rigid),
@@ -1287,31 +1287,58 @@ class Analysis:
             cache[name] = [k for k, el in enumerate(self.f.elements) if el.member == name]
         return cache[name]
 
-    def _hinge_envelope(self, lc_id: str, label: str, res, bar: str):
-        """In one LC8a case on frame model `bar`: each hinge bar's weld runs, the actions of its links to the crossmember
-        summed about the runs' centroid and read by the elastic vector method (hinge_run_group, CHS-18), and on the
-        elastic bars the bar's largest stress on its estimated section and the force each pair of hinge plates takes from
-        its bush (CHS-19, I2-119)."""
+    def hinge_runs_alone(self, w: dict) -> list[dict]:
+        """Wheel w's hinge bar's weld runs one by one (CHS-18, I2-121): each run's two fillets as its own weld group, the
+        lines of hinge_run_group, with the Y of the run's centre."""
+        g = self.hinge_run_group(w)
+        by_y: dict[float, list[int]] = {}
+        for k in range(len(g["names"])):
+            by_y.setdefault(round(float(g["m"][k][1]), 1), []).append(k)
+        return [dict(y=y, g=weld_group([(g["names"][k], tuple(g["P0"][k]), tuple(g["P1"][k]), float(g["a"][k] / g["L"][k])) for k in ks]))
+                for y, ks in sorted(by_y.items())]
+
+    def _run_actions(self, res, wid: str, groups: list[dict]) -> list[tuple[np.ndarray, np.ndarray]]:
+        """The force and moment each group in `groups` takes from wheel wid's links to its crossmember (the frame model's
+        elements `hinge <wid>`), each link's force and moment at its crossmember's end summed about the group's centroid,
+        each link given to the group whose centre is nearest it along Y."""
         xyz = np.asarray(self.f.nodes, float)
-        groups = self.__dict__.setdefault("_run_groups", {})
+        acts = [(np.zeros(3), np.zeros(3)) for _ in groups]
+        for k in self._links(f"hinge {wid}"):
+            el = self.f.elements[k]
+            R, _ = el.axes(xyz)
+            fl = np.asarray(res.forces[k], float)
+            Fj, Mj = -R.T @ fl[6:9], -R.T @ fl[9:12]
+            n = min(range(len(groups)), key=lambda i: abs(groups[i]["g"]["c"][1] - xyz[el.j][1]))
+            F, M = acts[n]
+            F += Fj
+            M += Mj + np.cross(xyz[el.j] - groups[n]["g"]["c"], Fj)
+        return acts
+
+    def _hinge_envelope(self, lc_id: str, label: str, res, bar: str):
+        """In one case on frame model `bar`: each hinge bar's weld runs read by the elastic vector method (CHS-18). On the
+        rigid bars the three runs a side act as one group (hinge_run_group), the actions of the bar's links to the
+        crossmember summed about the six lines' centroid, since a rigid bar shares its load among them as the method
+        takes it. On the elastic bars each run is read on its own (hinge_runs_alone) under the forces its own welds pass,
+        the frame model holding each run at the welds' own stiffness along it (FrameModel._weld_runs, I2-121). In LC8a
+        and LC8u on the elastic bars, the bar's largest stress on its estimated section and the force each pair of hinge
+        plates takes from its bush follow (CHS-19, I2-119)."""
+        xyz = np.asarray(self.f.nodes, float)
+        cache = self.__dict__.setdefault("_run_groups", {})
         roots = self.ch.data["xt_arms"]["parts"]["arm"]["roots"]
         y_in = self.ch.V["rail_c"] - self.ch.role_sec["rail"].b / 2
         for w in self.ch.suspension:
             wid = w["id"]
-            g = groups.get(wid) or groups.setdefault(wid, self.hinge_run_group(w))
-            F, M = np.zeros(3), np.zeros(3)
-            for k in self._links(f"hinge {wid}"):
-                el = self.f.elements[k]
-                R, _ = el.axes(xyz)
-                fl = np.asarray(res.forces[k], float)
-                Fj, Mj = -R.T @ fl[6:9], -R.T @ fl[9:12]
-                F += Fj
-                M += Mj + np.cross(xyz[el.j] - g["c"], Fj)
-            line, mpa = max(group_stress(g, F, g["c"], M, worst=False).items(), key=lambda kv: kv[1])
-            e = self.run_env.setdefault(lc_id, {}).setdefault(bar, dict(mpa=-1.0))
-            if mpa > e["mpa"]:
-                e.update(mpa=mpa, line=line, case=label, wheel=wid, f=[float(v) for v in F], m=[float(v) for v in M])
-            if bar == "rigid":
+            key = (wid, bar == "rigid")
+            if key not in cache:
+                cache[key] = [dict(y=None, g=self.hinge_run_group(w))] if bar == "rigid" else self.hinge_runs_alone(w)
+            groups = cache[key]
+            for grp, (F, M) in zip(groups, self._run_actions(res, wid, groups)):
+                line, mpa = max(group_stress(grp["g"], F, grp["g"]["c"], M, worst=False).items(), key=lambda kv: kv[1])
+                e = self.run_env.setdefault(lc_id, {}).setdefault(bar, dict(mpa=-1.0))
+                if mpa > e["mpa"]:
+                    e.update(mpa=mpa, line=line, case=label, wheel=wid, f=[float(v) for v in F], m=[float(v) for v in M],
+                             run=grp["y"])
+            if bar == "rigid" or lc_id not in ("LC8a", "LC8u"):
                 continue
             be = self.bar_env.setdefault(lc_id, {}).setdefault(bar, dict(mpa=-1.0, plates={}))
             s = self.bar_stress(res, w)
@@ -1482,17 +1509,22 @@ class Analysis:
                       f"across and {r['f'][2] / 1000:+.1f} kN up, at {r['wheel']} in {r['case']}")
 
     def hinge_runs(self) -> dict:
-        """CHS-18 (I2-119): each hinge bar's three weld runs a side to its crossmember (hinge_run_group) in every LC8a case
-        at the pull and at its ultimate, on each of the frame's models, the actions the bar passes the crossmember there
-        read by the elastic vector method against AS 4100 9.7.3's 0.8 x 0.6 fuw."""
+        """CHS-18 (I2-119, I2-121): each hinge bar's three weld runs a side to its crossmember in every case on each of the
+        frame's models (_hinge_envelope), LC8a at the pull and at its ultimate and the service cases LC1 to LC6b and LC8b,
+        the rigid bars' runs as one group and the elastic bars' each on its own, by the elastic vector method against AS
+        4100 9.7.3's 0.8 x 0.6 fuw over the case's factor."""
         mat = self.ch.data["material"]
         wcap = mat["weld_phi"] * 0.6 * mat["weld_fuw"]
-        rows = [(f"{lc_id}, the hinge bars {bar}", r["mpa"], wcap) for lc_id in ("LC8a", "LC8u") for bar, r in self.run_env[lc_id].items()]
-        lc_id, bar, r = max(((lc_id, bar, r) for lc_id in ("LC8a", "LC8u") for bar, r in self.run_env[lc_id].items()), key=lambda t: t[2]["mpa"])
+        lcs = {lc["id"]: lc for lc in self.ch.data["load_cases"]}
+        fac = {lc_id: (lcs[lc_id]["factor"] if lc_id in lcs else 1) for lc_id in self.run_env}
+        rows = [(f"{lc_id}, the hinge bars {bar}", r["mpa"], wcap / fac[lc_id]) for lc_id, e in self.run_env.items() for bar, r in e.items()]
+        lc_id, bar, r = max(((lc_id, bar, r) for lc_id, e in self.run_env.items() for bar, r in e.items()),
+                            key=lambda t: t[2]["mpa"] * fac[t[0]])
+        about = "the runs' centroid" if r.get("run") is None else "the run's centroid"
         return _local("Hinge bars' weld runs to their crossmembers (XT-BAR)", rows,
                       f"{r['line']} at {r['wheel']}, {abs(r['f'][0]) / 1000:.1f} kN along, {abs(r['f'][1]) / 1000:.1f} kN across and "
-                      f"{abs(r['f'][2]) / 1000:.1f} kN up with {math.hypot(*r['m']) / 1e6:.1f} kNm about the runs' centroid, the hinge bars {bar}, "
-                      f"in {r['case']}")
+                      f"{abs(r['f'][2]) / 1000:.1f} kN up with {math.hypot(*r['m']) / 1e6:.2f} kNm about {about}, the hinge bars {bar}, "
+                      f"in {lc_id}, {r['case']}")
 
     def hinge_bar_report(self) -> dict:
         """CHS-19 (I2-119), reported: Cruisemaster's hinge bars and hinge plates, whose section and grade are not published,
