@@ -288,6 +288,9 @@ def frame_sections(ch: Chassis) -> tuple[list[Section], list[dict]]:
     # crossmembers, outriggers, the cross brace, the plan braces and the hinge crossmembers' gussets: each end welded to
     # the member it meets is closed, an outrigger's tip under its side marker's cap is open
     for m in ch.members:
+        if m.role == "cm_xt" and getattr(m.sec, "cells", 1) > 1:
+            sections += _twin_sections(ch, m, rules, ds, holes)
+            continue
         if m.role in ("cm_end", "cm_floor", "cm_xt"):
             r = rules[m.role]
             r = dict(r, **r.get("by_section", {}).get(m.sec.id, {}))     # a wider section's own holes (the XT hinge crossmembers)
@@ -345,6 +348,69 @@ def frame_sections(ch: Chassis) -> tuple[list[Section], list[dict]]:
                                     f"{'kerb' if hg['side'] < 0 else 'road'} side", [t], ("closed", "closed")),
                             end_holes(t, hg["id"], 0, g, offsets=hg["offsets"]) + end_holes(t, hg["id"], 1, g, offsets=hg["offsets"])))
     return sections, holes
+
+
+def _twin_sections(ch: Chassis, m: Member, rules: dict, ds: float, holes: list[dict]) -> list[Section]:
+    """A twin hinge crossmember's tubes, each its own closed section between the rails' webs (member_galvanising_holes
+    twin): at each end its outer web's drain and vent where that web is free, and a drain and a vent through the rail's
+    inner web inside its end. Where the shock support plates cover a tube's outer web its drain and vent at each end
+    pass through both webs face to face into the other tube, which also vents the overlap between them, and elsewhere
+    that overlap vents through both webs at two corners diagonally opposite (sealed_overlaps TWIN). A hole through both
+    webs is an opening of the covered tube only, and a hole in each web for the hole checks. Each hole gives its web
+    (`web_id`) and that web's offset from the member's axis (`y_web`)."""
+    tw = rules["twin"]
+    r = dict(rules["cm_xt"], d=tw["own_d"])
+    csec = ch.sections[m.sec.cell]
+    plated = {p["member"] for p in ch.shock_plates()}
+    blocked = rules["shock_plate_web"]["web"] if m.id in plated else None
+    probe = Tube(m.id, m.p0, m.p1, csec, m.depth_dir, ds)
+    bc, n = m.sec.cell_b, m.sec.cells
+    tubes = []
+    for k in range(n):                       # k 0 the tube on -ey, the rear one for a crossmember from kerb to road
+        off = -m.sec.b / 2 + bc / 2 + k * bc
+        t = Tube(f"{m.id}.{k + 1}", np.add(m.p0, off * probe.ey), np.add(m.p1, off * probe.ey), csec, m.depth_dir, ds)
+        outer = -1 if k == 0 else 1
+        front = _front_web(t) == outer
+        tubes.append((t, outer, front, off))
+    out = []
+
+    def tag(hs, t, off, inner=False):
+        for h in hs:
+            h["web_id"] = f"{t.name} web {h['web']}"
+            h["y_web"] = abs(off) - csec.b / 2 + csec.t / 2 if inner else abs(off) + csec.b / 2 - csec.t / 2
+        return hs
+
+    for k, (t, outer, front, off) in enumerate(tubes):
+        sec = Section(t.name, f"{m.name}, its {'front' if front else 'rear'} tube", [t], ("closed", "closed"))
+        covered = blocked == "front" and front
+        for e in (0, 1):
+            hs = [] if covered else tag(end_holes(t, m.id, e, r, webs=(outer,)), t, off)
+            u = 0.0 if e == 0 else t.L
+            for zh in tw["internal_z"]:
+                hs.append(dict(member=m.id, tube=t.name, end=e, web=0, u=u, z_l=zh, d=float(tw["internal_d"]),
+                               use="drain" if zh < 0 else "vent", via="host",
+                               host=f"RL-{'K' if (e == 0) == (float(t.ex[1]) > 0) else 'R'}", centre=t.point(u, 0.0, zh), normal=t.ex))
+            if covered:
+                hs += tag(end_holes(t, m.id, e, dict(r, d=tw["through_d"]), webs=(-outer,)), t, off, inner=True)
+                for h in hs:
+                    if h["via"] == "own":
+                        h["through"] = True
+            for h in hs:
+                sec.add_hole(0, h["u"], h["centre"], h["normal"], h["d"], h["use"], end=h["end"], wall_t=csec.t)
+                holes.append(dict(h, section=sec.id))
+        out.append(sec)
+    # each through hole's twin in the other tube's web face to face, and the overlap's vents where no tube is covered
+    other = {t.name: tubes[1 - k] for k, (t, *_r) in enumerate(tubes)} if n == 2 else {}
+    for h in [h for h in holes if h.get("through") and h["member"] == m.id]:
+        t2, outer2, _, off2 = other[h["tube"]]
+        twin = _web_hole(t2, m.id, h["end"], -outer2, h["z_l"], h["d"], h["u_web"], h["use"])
+        holes.append(dict(tag([twin], t2, off2, inner=True)[0], section=t2.name, through=True))
+    if not any(blocked == "front" and front for _t, _o, front, _off in tubes):
+        for e, low in ((0, True), (1, False)):       # the kerb end low and the road end high, diagonally opposite
+            for t, outer, _, off in tubes:
+                hv = [h for h in end_holes(t, m.id, e, dict(r, d=tw["vent_d"]), webs=(-outer,)) if (h["use"] == "drain") == low]
+                holes.append(dict(tag(hv, t, off, inner=True)[0], use="vent for the webs' overlap", section=t.name, through=True))
+    return out
 
 
 def end_areas(sec: Section, zone: float) -> list[dict]:

@@ -738,6 +738,7 @@ class Analysis:
 
         def take(lc_id, res, label, extra=None, ultimate=False):
             self._hinge_envelope(lc_id, label, res, bar)          # the hinge bars' weld runs in every case (CHS-18, I2-121)
+            self._seam_envelope(lc_id, label, res, bar)           # the twin hinge crossmembers' seams in every case (CHS-20)
             for mem, r in self.stresses(res, ultimate).items():
                 e = env.setdefault(lc_id, {})
                 if mem not in e or r["eq"] > e[mem]["eq"]:
@@ -779,6 +780,7 @@ class Analysis:
         self.lc8_arms: dict[str, dict] = {}
         self.cheek_env: dict[str, dict] = {}
         self.run_env: dict[str, dict] = {}
+        self.seam_env: dict[str, dict] = {}
         self.bar_env: dict[str, dict] = {}
         for bar, fm in models:
             self._use(fm)
@@ -913,7 +915,7 @@ class Analysis:
         out["galvanising"] = galvanising_check(ch)
         out["local"] = self.local_checks(out["pad_n"])
         out["local"].update(self.panel_checks(), hinge_cheeks=self.cheek_check(), arm_limits=self.arm_limits(),
-                            hinge_runs=self.hinge_runs(), hinge_bar=self.hinge_bar_report())
+                            hinge_runs=self.hinge_runs(), hinge_bar=self.hinge_bar_report(), hinge_seams=self.seam_welds())
         out["local"]["hinge_gussets"] = self.gusset_welds()
         out["recovery"] = self.recovery_summary()
         out["fixings"] = self.fixings()
@@ -1549,6 +1551,88 @@ class Analysis:
                          for k, e in self.run_env.items() if k in RIG_CASES for b, v in e.items()}
         return out
 
+    def seam_section(self, cm) -> dict:
+        """The seams of a twin hinge crossmember (xt_hinges `seam`, CHS-20): its outer mid-line's enclosed area for Bredt's
+        shear flow, one cell's first moment about the pair's middle and the pair's weak-axis second moment for the shear
+        flow between the halves, the two seams, top and bottom, and each seam's throat, 5/8 R by GMAW, read at no more than
+        the tubes' walls either side of it carry, what the corners allow (est.)."""
+        sec, sd = cm.sec, self.ch.data["xt_hinges"]["seam"]
+        rm = sec.ro - sec.t / 2
+        am = (sec.b - sec.t) * (sec.d - sec.t) - (4 - math.pi) * rm ** 2
+        a_cell = sec.A / sec.cells
+        return dict(am=am, q=a_cell * sec.cell_b / 2, i=sec.I_weak, seams=2 * (sec.cells - 1),
+                    throat=min(sd["throat_r"] * sec.ro, sec.t), share=float(sd["share"]), run=self.ch.data["xt_hinges"]["bar"]["run"])
+
+    def _seam_envelope(self, lc_id: str, label: str, res, bar: str):
+        """In one case on frame model `bar`: each twin hinge crossmember's seams (CHS-20). Along the crossmember each
+        element end's torque puts the outer perimeter's shear flow T / 2 Am through the seams, and its shear across the
+        trailer's line V Q / I between the halves, half on each seam, the two taken together on the seam where they add.
+        At each run of its hinge bars the rear tube alone takes the run's force and moment (_run_actions), and the front
+        tube's `share` of them crosses the seams over the run's own length, the force spread evenly and each moment about
+        the run's centroid as a linear spread, 6 M / L^2, on the safe side of the seams' length beyond the run. A rigid
+        bar's runs act as one group, as CHS-18 reads them, so its force crosses over the runs' welded length and its
+        moment over the group's length. Each seam is read on its throat by the vector sum of its flow along it and the
+        run's force across it."""
+        ch = self.ch
+        if not ch.data["xt_hinges"].get("seam"):
+            return
+        xyz = np.asarray(self.f.nodes, float)
+        for cm in ch.hinge_crossmembers():
+            if getattr(cm.sec, "cells", 1) < 2:
+                continue
+            p = self.seam_section(cm)
+            flow = 0.0
+            for k in self._links(cm.id):
+                for act in end_actions(res.forces[k]):
+                    flow = max(flow, abs(act["T"]) / (2 * p["am"]) + abs(act["Vy"]) * p["q"] / p["i"] / (p["seams"] / 2) / 2)
+            best = (flow, 0.0, 0.0, None, np.zeros(3), np.zeros(3))
+            runs = ch.data["xt_hinges"]["bar"]["runs"]
+            for w in ch.suspension:
+                if w["station"] != cm.station:
+                    continue
+                key = (w["id"], bar == "rigid")
+                cache = self.__dict__.setdefault("_run_groups", {})
+                if key not in cache:
+                    cache[key] = [dict(y=None, g=self.hinge_run_group(w))] if bar == "rigid" else self.hinge_runs_alone(w)
+                # a rigid bar's runs act as one group, as CHS-18 reads them: its force over the runs' welded length and its
+                # moment over the group's length, where each run of an elastic bar passes its own over its own length
+                lf, lm = (len(runs) * p["run"], max(runs) - min(runs) + p["run"]) if bar == "rigid" else (p["run"], p["run"])
+                for grp, (F, M) in zip(cache[key], self._run_actions(res, w["id"], cache[key])):
+                    qx = p["share"] * (abs(F[0]) / lf + 6 * abs(M[2]) / lm ** 2) / p["seams"]
+                    qz = p["share"] * (abs(F[2]) / lf + 6 * abs(M[0]) / lm ** 2) / p["seams"]
+                    if math.hypot(flow, qx, qz) > math.hypot(*best[:3]):
+                        at = f"{w['id']}'s runs" if grp["y"] is None else f"{w['id']}'s run {grp['y']:+.0f} mm off the centreline"
+                        best = (flow, qx, qz, at, F, M)
+            q = math.hypot(*best[:3])
+            e = self.seam_env.setdefault(lc_id, {}).setdefault(bar, dict(mpa=-1.0))
+            if q / p["throat"] > e["mpa"]:
+                e.update(mpa=q / p["throat"], n_mm=q, along=best[0], across=best[1], up=best[2], at=best[3] or "between the runs",
+                         member=cm.id, case=label, throat=p["throat"], f=[float(v) for v in best[4]], m=[float(v) for v in best[5]])
+
+    def seam_welds(self) -> dict:
+        """CHS-20: each twin hinge crossmember's two seams, flare-V groove welds in the R15 corners where its tubes meet, in
+        every case through the hinge joint, LC1 to LC5b, LC8a at the pull and at its ultimate and LC8b, on each of the
+        frame's models (_seam_envelope), against AS 4100 9.7.3's 0.8 x 0.6 fuw over each case's factor, as CHS-18 reads the
+        runs. VSB1's rig cases LC6 and LC6b are given beside and do not fail it, for CHS-18's reason."""
+        mat = self.ch.data["material"]
+        wcap = mat["weld_phi"] * 0.6 * mat["weld_fuw"]
+        lcs = {lc["id"]: lc for lc in self.ch.data["load_cases"]}
+        fac = {lc_id: (lcs[lc_id]["factor"] if lc_id in lcs else 1) for lc_id in self.seam_env}
+        read = [k for k in self.seam_env if k not in RIG_CASES]
+        if not read:
+            return dict(_local("Twin hinge crossmembers' seams", [("no twin crossmember", 0.0, wcap)], "no seam"), beside={})
+        rows = [(f"{lc_id}, the hinge bars {bar}", r["mpa"], wcap / fac[lc_id]) for lc_id in read for bar, r in self.seam_env[lc_id].items()]
+        lc_id, bar, r = max(((k, b, r) for k in read for b, r in self.seam_env[k].items()), key=lambda t: t[2]["mpa"] * fac[t[0]])
+        out = _local("Twin hinge crossmembers' seams", rows,
+                     f"the seam of {r['member']} at {r['at']}, {r['along']:.0f} N/mm along it from its torque and shear and "
+                     f"{math.hypot(r['across'], r['up']):.0f} N/mm across it from the run, {r['n_mm']:.0f} N/mm on its {r['throat']:.1f} mm "
+                     f"throat, the hinge bars {bar}, in {lc_id}, {r['case']}")
+        out["beside"] = {f"{k}, the hinge bars {b}": dict(util=v["mpa"] * fac[k] / wcap, mpa=v["mpa"], limit_mpa=wcap / fac[k], case=v["case"],
+                                                          member=v["member"], at=v["at"])
+                         for k, e in self.seam_env.items() if k in RIG_CASES for b, v in e.items()}
+        out["throat_mm"] = r["throat"]
+        return out
+
     def hinge_bar_report(self) -> dict:
         """CHS-19 (I2-119), reported: Cruisemaster's hinge bars and hinge plates, whose section and grade are not published,
         in every LC8a case at the pull and at its ultimate on the elastic bars: each bar's largest stress on its estimated
@@ -1781,7 +1865,10 @@ class Analysis:
         """FAT-25: the structural stress at each hinge bar run's front fillet's toe in its crossmember's bottom wall on the
         elastic bars, the wall's own bending there, its plate model's `toe_mpa_kn` times the force the run's front weld
         points pass (each point's force taken whole, whatever its sign), plus the crossmember's nominal stress at its
-        ends (member_end_stress), both at their largest together. The rigid bars pass no fillet's force of their own."""
+        ends (member_end_stress), both at their largest together. The rigid bars pass no fillet's force of their own. Where
+        no run's front fillet stands on a wall's flat (wall_flats), as on the twin hinge crossmembers whose fillets all
+        stand over webs, the row reads no wall."""
+        from .chassis import wall_flats
         ch, V = self.ch, self.ch.V
         b = ch.data["xt_hinges"]["bar"]
         wall = b.get("wall")
@@ -1789,6 +1876,7 @@ class Analysis:
             return []
         xyz = np.asarray(self.f.nodes, float)
         y_in = V["rail_c"] - ch.role_sec["rail"].b / 2
+        bw = ch.data["xt_arms"]["parts"]["bar"]["w"]
         out = []
         for w in ch.suspension:
             links = self._links(f"hinge {w['id']}")
@@ -1796,6 +1884,9 @@ class Analysis:
                 continue
             cm = next(m for m in ch.members if m.station == w["station"] and m.role == "cm_xt")
             xb = ch.hinge_bar_x(cm)
+            if not wall_flats(ch, cm, xb, bw)[-1]:
+                out.append((0.0, f"no wall's flat under {w['id']}'s runs on {cm.id}, both fillets over webs"))
+                continue
             per = [0.0] * len(b["runs"])
             for k in links:
                 p = xyz[self.f.elements[k].i]
@@ -2155,10 +2246,20 @@ class Analysis:
             t = Tube(m.id, m.p0, m.p1, m.sec, m.depth_dir)
             c = np.array((f["x"], f["y"], f["z"]), float)
             u, z_l = float(np.dot(c - t.p0, t.ex)), float(np.dot(c - t.p0, t.ez))
+            row = dict(member=m.id, tube=t.name, tube_L=t.L, end=0 if u < t.L / 2 else 1, u=u, z_l=z_l, d=float(f["d"]),
+                       use=f["use"], via="own", u_web=min(u, t.L - u), z_under=z_l + m.sec.d / 2)
+            if getattr(m.sec, "cells", 1) > 1:       # a twin: the bolt's hole in each tube's webs, as the dip names them
+                k, web = {"front web": (1, 1), "front tube's rear web": (1, -1), "rear tube's front web": (0, 1), "rear web": (0, -1)}[f["face"]]
+                csec, bc = self.ch.sections[m.sec.cell], m.sec.cell_b
+                off = -m.sec.b / 2 + bc / 2 + k * bc
+                tc = Tube(f"{m.id}.{k + 1}", np.add(m.p0, off * t.ey), np.add(m.p1, off * t.ey), csec, m.depth_dir)
+                inner = (k == 0) == (web > 0)
+                out.append(dict(row, tube=tc.name, web=web, centre=tc.point(u, web * csec.b / 2, z_l), normal=web * tc.ey,
+                                web_id=f"{tc.name} web {web}",
+                                y_web=abs(off) - csec.b / 2 + csec.t / 2 if inner else abs(off) + csec.b / 2 - csec.t / 2))
+                continue
             web = 1 if float(np.dot(c - t.p0, t.ey)) > 0 else -1
-            out.append(dict(member=m.id, tube=t.name, tube_L=t.L, end=0 if u < t.L / 2 else 1, web=web, u=u, z_l=z_l, d=float(f["d"]),
-                            use=f["use"], via="own", u_web=min(u, t.L - u), z_under=z_l + m.sec.d / 2,
-                            centre=t.point(u, web * m.sec.b / 2, z_l), normal=web * t.ey))
+            out.append(dict(row, web=web, centre=t.point(u, web * m.sec.b / 2, z_l), normal=web * t.ey))
         return out
 
     def _member_hole_sites(self, rules, bolts=()) -> list[dict]:
@@ -2224,7 +2325,7 @@ class Analysis:
             names = {el.member for el in self.f.elements}
             frame = h["tube"] if h["tube"] in names else (m.id if m and m.id in names else None)
             gross = dict(A=sec.A, z=0.0, I=sec.I_strong, I_weak=sec.I_weak, Aw=sec.Aw_depth, Aw_width=sec.Aw_width)
-            strips = [dict(dA=sec.t * d, z=z, own=sec.t * d ** 3 / 12, y=(sec.b - sec.t) / 2, own_z=d * sec.t ** 3 / 12, web=True)]
+            strips = [dict(dA=sec.t * d, z=z, own=sec.t * d ** 3 / 12, y=h.get("y_web", (sec.b - sec.t) / 2), own_z=d * sec.t ** 3 / 12, web=True)]
             levers, face_w = [z - d / 2, z + d / 2], sec.d - sec.t
             word = {"drawbar": "the drawbar member's", "cm_end": "the crossmember's", "cm_floor": "the crossmember's",
                     "cm_xt": "the XT crossmember's", "outrigger": "the outrigger's", "brace": "the cross brace's",
@@ -2236,7 +2337,7 @@ class Analysis:
                             u_web=u_end, z_under=float(h.get("z_under", z + sec.d / 2)), run_node=run_nodes.get(id(h)),
                             span_nodes=span_nodes.get(id(h)),
                             own=self.fm.hinge_bar == "elastic" and (id(h) in run_nodes or id(h) in span_nodes),
-                            gross=gross, strips=strips, levers=levers, face_w=face_w, wall_id=f"{h['member']} web {h['web']}",
+                            gross=gross, strips=strips, levers=levers, face_w=face_w, wall_id=h.get("web_id", f"{h['member']} web {h['web']}"),
                             net=dict(net_section(gross, strips, levers, sec.b / 2, face_w, d),
                                      base=dict(Z_weak=sec.Z_weak, I_weak=sec.I_weak, C=sec.C, y_max=sec.b / 2))))
         return out

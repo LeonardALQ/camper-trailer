@@ -64,7 +64,7 @@ params:
   rail_in: rail_outer_w / 2 - rail_w            # inner face of a rail
   hub_y: rail_outer_w / 2 + cf - wheel_offset   # tyre centre plane
   xm_w: 50                   # crossmember width along X
-  xt_hinge_w: 100            # the two XT hinge crossmembers' width along X, RHS 150 x 100 x 6 since 26 Nov 2026, each with its rear face where it stood (I2-114)
+  xt_hinge_w: 100            # the two XT hinge crossmembers' width along X, RHS 150 x 100 x 6 from 26 Nov 2026 and two RHS 150 x 50 x 6 seam welded since 27 Nov 2026, each with its rear face where it stood (I2-114)
   xm_max_pitch: 700          # rule for the intermediate crossmembers and outriggers (report 11), the engineer confirms it
   # XT positions about the axle group centre at 900 mm spacing (report 18 section 4.3, from drawing 33XT with the arm unchanged)
   xt_front_hinge_rear: -869
@@ -682,7 +682,7 @@ items:
   - id: UF-01B
     name: Fresh tanks' bearers, galvanised steel angles bolted through the XT crossmembers under the tanks' ends
     model: {name: tank_bearers, box: [axle_x + xt_front_hinge_rear - 10, -rail_in, rail_underside_z - 20, xt_centre_rear + 70 - xt_front_hinge_rear, 2 * rail_in, 80]}
-    material: "Unequal angle 75 x 50 x 6, AS/NZS 3679.1 grade 300, hot-dip galvanised, M10 8.8 galvanised bolts through both webs of each crossmember on crush tubes, 10 mm EPDM strip"
+    material: "Unequal angle 75 x 50 x 6, AS/NZS 3679.1 grade 300, hot-dip galvanised, M10 8.8 galvanised bolts through all four webs of each twin hinge crossmember, a crush tube in each of its two tubes, 10 mm EPDM strip"
     system: underfloor
     # Layout.tank_bearers places them, a pair either side of the centreline at each place, `y` mm off the centreline. The
     # foot's underside stands at `z`, which keeps FIT-05's 50 mm from the arms' pivot tubes and legs over their travel and
@@ -702,9 +702,9 @@ items:
         - {tank: UF-01, member: CM-04, face: rear, y: [35, 345]}
         - {tank: UF-01, member: CM-05, face: front, y: [110, 255]}
         - {tank: UF-01R, member: CM-05, face: rear, y: [110, 255]}
-    price: {aud: 90, basis: estimate, date: 2026-11-26, note: "1.2 m of 75 x 50 x 6 unequal angle at about AUD 15 a metre, AUD 18, galvanised at GLV-01's AUD 2.75/kg, AUD 23, eight M10 8.8 galvanised bolts with nyloc nuts and crush tubes, AUD 32, and the EPDM strip, AUD 17 (est.)"}
+    price: {aud: 94, basis: estimate, date: 2026-11-27, note: "1.2 m of 75 x 50 x 6 unequal angle at about AUD 15 a metre, AUD 18, galvanised at GLV-01's AUD 2.75/kg, AUD 23, eight M10 8.8 galvanised bolts 130 mm long with nyloc nuts and sixteen crush tubes, one in each tube of the twin hinge crossmembers, AUD 36, and the EPDM strip, AUD 17 (est.)"}
     point: [axle_x - 300, 0, rail_underside_z + 15]
-    mass: {basis: declared, total_kg: 8.5, maturity: calculated, source: "1.2 m of 75 x 50 x 6 unequal angle at 5.66 kg/m (AS/NZS 3679.1), 6.8 kg, its zinc 0.2 kg, eight M10 bolts with nuts, washers and crush tubes 0.8 kg and 1.2 m of 10 x 44 mm EPDM strip 0.7 kg (calculated)"}
+    mass: {basis: declared, total_kg: 8.6, maturity: calculated, source: "1.2 m of 75 x 50 x 6 unequal angle at 5.66 kg/m (AS/NZS 3679.1), 6.8 kg, its zinc 0.2 kg, eight M10 bolts 130 mm long with nuts, washers and sixteen crush tubes 0.9 kg and 1.2 m of 10 x 44 mm EPDM strip 0.7 kg (calculated)"}
     note: "Report 13's two cross-bearers under each tank, bolted to the XT crossmembers (I2-109). The front tank's ends sit on a pair on the XT front hinge crossmember's rear face and a pair on the XT centre crossmember's front face, and the tank spans between them as the welded box it is. The rear tank's front end sits on a pair on the XT centre crossmember's rear face, and its body on the rear bay's shear panel (PNL-1). Each tank's front corners, over the guards' steps, are carried by its end wall to its bearers. CHS-17 reads every bearer, its bolts, the crossmembers' webs at them and the panel's path in LC1 to LC3"
   - id: UF-02
     name: Water in the tanks

@@ -172,6 +172,31 @@ sections:
     alt_fy_mpa: 350
     source: "Austube Mills DCT Aug 2013, page 3-12 (the same table as the 5.0 mm), read 23 Nov 2026. Not computed by sect.py: the published values are used as they stand, and the corner radius is the method's 2.5 t"
     use: "Drawbar members since 23 Nov 2026 (FAT-07, review I2-47), from the coupling plate to 1,000 mm under the rails."
+  - id: RHS_150x50x6_TWIN
+    designation: "Twin RHS 150x50x6"
+    shape: RHS
+    cells: 2
+    cell: RHS_150x50x6
+    d: 150
+    b: 100
+    t: 6
+    ro: 15.0
+    mass_kg_per_m: 33.4
+    A_mm2: 4260
+    Ix_e6mm4: 10.1
+    Zx_e3mm3: 134.9
+    Sx_e3mm3: 182.4
+    Iy_e6mm4: 4.38
+    Zy_e3mm3: 87.65
+    Sy_e3mm3: 188.3
+    J_e6mm4: 9.48
+    C_e3mm3: 160.9
+    Ze_x_e3mm3_C450: null
+    Ze_y_e3mm3_C450: null
+    grade: C450L0
+    fy_mpa: 450
+    source: "Two RHS 150x50x6 (Austube Mills DCT Aug 2013) side by side, seam welded along their length in the two R15 corners where they meet, top and bottom, read as one section: twice the area and Ix, Iy with the parallel axes 25 mm off, J by Bredt on the outer mid-line as a two-cell section whose middle webs carry no shear flow in torsion, C = 2 Am t (est., fx36-joint's study). `cells` is the tubes side by side: each cell's own webs, flats and surfaces give the shear areas, the effective moduli and the zinc's area"
+    use: "The XT front hinge and XT centre crossmembers since 27 Nov 2026 (CHASSIS.md item 15), so both of each hinge bar's fillets stand over webs"
   - id: RHS_150x100x6
     designation: "RHS 150x100x6"
     shape: RHS

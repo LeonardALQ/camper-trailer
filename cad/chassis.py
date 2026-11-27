@@ -44,6 +44,39 @@ def weld_spring(length: float, leg: float, wall: float | None = None) -> Section
         k_n = 1.0 / (1.0 / k_n + 1.0 / wall)
     return Section(f"weld, {length:.1f} mm of a {leg:g} mm fillet", A=k_n / E, I_strong=k_s / (12 * E), I_weak=k_s / (12 * E),
                    J=1.0, rigid=True)
+def wall_flats(ch, cm, x: float, bw: float) -> dict[int, bool]:
+    """Whether each of a hinge bar's two fillets, its front (-1) and rear (+1) top edge `bw` apart about X `x`, stands on
+    the flat of crossmember cm's bottom wall between a cell's webs, where that wall bends under it, and not over a web:
+    more than one and a half wall thicknesses inside its cell's faces, as on RHS 150 x 100 x 6 the front fillet stood
+    47 mm from the rear web. Only where the crossmember is the `section` xt_hinges `bar` `wall` was read on, so on the
+    twin of two RHS 150 x 50 x 6, whose rear fillet stands over the rear web and front fillet over the seam's two webs,
+    both are False."""
+    wall = ch.data["xt_hinges"]["bar"].get("wall")
+    sec = cm.sec
+    if not isinstance(wall, dict) or wall.get("section", sec.id) != sec.id:
+        return {-1: False, 1: False}
+    cells = getattr(sec, "cells", 1)
+    bc = sec.b / cells
+    rear_face = cm.p0[0] + sec.b / 2
+    out = {}
+    for e in (-1, 1):
+        p = rear_face - (x + e * bw / 2)
+        k = min(max(int(p // bc), 0), cells - 1)
+        q = p - k * bc
+        out[e] = 1.5 * sec.t < q < bc - 1.5 * sec.t
+    return out
+
+
+def member_webs(m) -> list[tuple[str, float]]:
+    """The webs a bolt across crossmember m passes, front first, each (face, the X of the face the bolt's hole row gives):
+    its two webs, or on a twin both tubes' webs, the two face to face at the seam (the fresh tanks' bearers and the
+    front guard's hanger, Layout.fixing_holes)."""
+    b, x0 = m.sec.b, m.p0[0]
+    if getattr(m.sec, "cells", 1) < 2:
+        return [("front", x0 - b / 2), ("rear", x0 + b / 2)]
+    return [("front", x0 - b / 2), ("front tube's rear", x0), ("rear tube's front", x0), ("rear", x0 + b / 2)]
+
+
 SECTIONS_YAML = DATA / "chassis" / "sections.yaml"
 SIDES = {-1: "K", 1: "R"}            # kerb side is negative Y, road side positive Y (DIM-01)
 SIDE_WORDS = {-1: "kerb side", 1: "road side"}
@@ -75,6 +108,18 @@ class Props:
     grade: str = ""
     Ze_strong: float = 0.0       # AS 4100 5.2 effective section moduli, for the section capacity at the ultimate pull
     Ze_weak: float = 0.0
+    cells: int = 1               # tubes side by side across `b`, seam welded (the twin hinge crossmembers)
+    cell: str = ""               # each tube's own section id, where `cells` is more than one
+
+    @property
+    def cell_b(self) -> float:
+        """One cell's width across `b`."""
+        return self.b / self.cells
+
+    def webs_x(self) -> list[float]:
+        """Each web's mid-plane across `b` from the section's middle, the cells' own webs face to face at each seam."""
+        bc, t = self.cell_b, self.t
+        return [-self.b / 2 + k * bc + e * (bc / 2 - t / 2) + bc / 2 for k in range(self.cells) for e in (-1, 1)]
 
     def frame_section(self) -> Section:
         return Section(self.name, self.A, self.I_strong, self.I_weak, self.J)
@@ -148,21 +193,23 @@ def load_sections() -> dict[str, Props]:
         if s["shape"] not in ("RHS", "SHS"):
             continue
         d, b, t, ro = s["d"], s["b"], s["t"], s["ro"]
+        n = int(s.get("cells", 1))            # a twin's tubes side by side, each cell with its own webs and flats
+        bc = b / n
         zx, zy = s["Zx_e3mm3"] * 1e3, s["Zy_e3mm3"] * 1e3
         zey = s.get("Ze_y_e3mm3_C450")
-        area = (_perimeter(d, b, ro) + _perimeter(d - 2 * t, b - 2 * t, max(ro - t, 0))) / 1000
+        area = n * (_perimeter(d, bc, ro) + _perimeter(d - 2 * t, bc - 2 * t, max(ro - t, 0))) / 1000
         # the Ze values Austube's tables give for C450L0, or AS 4100 5.2 for the section's own grade where they give none
         fy_s = s["fy_mpa"]
         tab_x, tab_y = s.get("Ze_x_e3mm3_C450"), s.get("Ze_y_e3mm3_C450")
         sx, sy = s.get("Sx_e3mm3", s["Zx_e3mm3"]) * 1e3, s.get("Sy_e3mm3", s["Zy_e3mm3"]) * 1e3
-        ze_x = tab_x * 1e3 if tab_x and fy_s >= 450 else effective_modulus(b - 2 * t, d - 2 * t, t, fy_s, zx, sx)
-        ze_y = tab_y * 1e3 if tab_y and fy_s >= 450 else effective_modulus(d - 2 * t, b - 2 * t, t, fy_s, zy, sy)
+        ze_x = tab_x * 1e3 if tab_x and fy_s >= 450 else effective_modulus(bc - 2 * t, d - 2 * t, t, fy_s, zx, sx)
+        ze_y = tab_y * 1e3 if tab_y and fy_s >= 450 else effective_modulus(d - 2 * t, bc - 2 * t, t, fy_s, zy, sy)
         out[s["id"]] = Props(
             id=s["id"], name=s["designation"].replace("x", " x "), d=d, b=b, t=t, ro=ro, kg_m=s["mass_kg_per_m"],
             A=s["A_mm2"], I_strong=s["Ix_e6mm4"] * 1e6, I_weak=s["Iy_e6mm4"] * 1e6, J=s["J_e6mm4"] * 1e6,
             Z_strong=zx, Z_weak=min(zy, zey * 1e3) if zey else zy, C=s["C_e3mm3"] * 1e3, fy=s["fy_mpa"],
-            Aw_depth=2 * (d - 2 * t) * t, Aw_width=2 * (b - 2 * t) * t, area_m2_per_m=area, grade=s.get("grade", ""),
-            Ze_strong=ze_x, Ze_weak=ze_y)
+            Aw_depth=2 * n * (d - 2 * t) * t, Aw_width=2 * n * (bc - 2 * t) * t, area_m2_per_m=area, grade=s.get("grade", ""),
+            Ze_strong=ze_x, Ze_weak=ze_y, cells=n, cell=s.get("cell", ""))
     return out
 
 
@@ -1472,16 +1519,16 @@ class FrameModel:
         and the crossmember reach each point by rigid links from their axes, so a run passes a moment only as its welds'
         forces apart, as its own weld group does, and none at a point. A fillet on the bottom wall's flat between the webs
         has the wall's own bending under it in series, the run's share of `wall` `kn_mm`, the wall's stiffness under each
-        run from its plate model (cad/wall_plate.py), on its soft bound. A `wall` that is not a mapping takes the wall as
-        stiff, for the probes that show what the wall moves."""
+        run from its plate model (cad/wall_plate.py), on its soft bound, where the crossmember is the `section` those
+        figures were read on (wall_flats). A `wall` that is not a mapping takes the wall as stiff, for the probes that show
+        what the wall moves."""
         ch, f = self.ch, self.f
         b = ch.data["xt_hinges"]["bar"]
         bw = ch.data["xt_arms"]["parts"]["bar"].get("w", cm.sec.b)
         zf = cm.box()[2]
-        rear_web = cm.p0[0] + cm.sec.b / 2 - cm.sec.t / 2           # the crossmember's rear web's mid-plane
         wall = b.get("wall")
         y_in = ch.V["rail_c"] - ch.role_sec["rail"].b / 2
-        flat = {e: isinstance(wall, dict) and cm.sec.t < rear_web - (x + e * bw / 2) < cm.sec.b - 2 * cm.sec.t for e in (-1, 1)}
+        flat = wall_flats(ch, cm, x, bw)
         for yc in (y for y in ch.hinge_weld_ys(cm) if y * w["side"] > 0):
             run = min(range(len(b["runs"])), key=lambda i: abs(b["runs"][i] - (y_in - abs(yc))))
             for k, share in ((-1, 1 / 6), (0, 2 / 3), (1, 1 / 6)):
@@ -1777,7 +1824,15 @@ def member_solid(m: Member):
     dz = (dz - ax * dz.dot(ax)).normalized()
     s = m.sec
     pl = Plane(origin=p0, x_dir=dz.cross(ax), z_dir=ax)
-    prof = RectangleRounded(s.b, s.d, s.ro) - RectangleRounded(s.b - 2 * s.t, s.d - 2 * s.t, max(s.ro - s.t, 0.2))
+    if getattr(s, "cells", 1) > 1:              # a twin: each tube's own rounded section, side by side across its width
+        from build123d import Pos
+        bc, prof = s.b / s.cells, None
+        for k in range(s.cells):
+            cell = Pos(-s.b / 2 + bc / 2 + k * bc, 0) * (RectangleRounded(bc, s.d, s.ro) -
+                                                         RectangleRounded(bc - 2 * s.t, s.d - 2 * s.t, max(s.ro - s.t, 0.2)))
+            prof = cell if prof is None else prof + cell
+    else:
+        prof = RectangleRounded(s.b, s.d, s.ro) - RectangleRounded(s.b - 2 * s.t, s.d - 2 * s.t, max(s.ro - s.t, 0.2))
     from .chassis_holes import cut_member
     return cut_member(m, extrude(pl * prof, amount=m.length))
 

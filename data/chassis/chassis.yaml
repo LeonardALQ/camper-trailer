@@ -164,8 +164,10 @@ station_roles:
 # revision M it and the rear crossmember are RHS 150 x 50 x 6, so the ladder's rear bays carry the 78.5 kN ultimate pull
 # (CHS-08U, I2-87): at 4 mm and 3 mm their webs' holes read 1.14 and 1.19 of 0.85 fu there
 station_sections:
-  XT front hinge: RHS_150x100x6    # revision W (I2-114): each hinge crossmember 100 mm wide along the trailer, its rear face where it stood, for the
-  XT centre: RHS_150x100x6         # couple the arm's two bushes put on the hinge bar across the trailer's line. 150 x 50 x 6 since revisions N and Q
+  XT front hinge: RHS_150x50x6_TWIN    # revision W (I2-114): each hinge crossmember 100 mm wide along the trailer, its rear face where it stood, for the
+  XT centre: RHS_150x50x6_TWIN         # couple the arm's two bushes put on the hinge bar across the trailer's line. 150 x 50 x 6 since revisions N and Q,
+                                       # RHS 150 x 100 x 6 from revision W, and since 27 Nov 2026 two RHS 150 x 50 x 6 seam welded, the rear one where
+                                       # Cruisemaster's stands, so both of each hinge bar's fillets stand over webs (fx37-twin, CHASSIS.md item 15)
   XT rear shock: RHS_150x50x6
   rear: RHS_150x50x6
 
@@ -436,7 +438,9 @@ fatigue_details:
   # method as the other XT brackets are: the structural stress at the toe is the wall's own bending there under the run's
   # force through its front fillet (xt_hinges `bar` `wall` `toe_mpa_kn`, from the wall's plate model) plus the
   # crossmember's nominal stress at its ends, both taken at their largest together, on IIW's hot-spot curve for a
-  # load-carrying fillet (Table 3.3-1 no. 6, FAT 90), as FAT-13 reads the hinge's welds
+  # load-carrying fillet (Table 3.3-1 no. 6, FAT 90), as FAT-13 reads the hinge's welds. On the twin hinge crossmembers
+  # since 27 Nov 2026 both of each run's fillets stand over webs (wall_flats), so no wall bends under them and the row
+  # reads none and says so
   - {id: FAT-25, name: "Hinge bar's front fillets on the hinge crossmembers' bottom wall, toe in the wall, the wall's bending at the toe", iiw: "Table 3.3-1 no. 6", fat: 90, stress: wall_toe, hot_spot: true}
 
 # Holes the runs make in the chassis members (data/services.yaml `holes`, the services' list, read here only). A hole is
@@ -530,6 +534,13 @@ member_galvanising_holes:
   cm_end: {d: 20, leg: 5, holes: corners}
   cm_floor: {d: 20, leg: 5, holes: corners}
   cm_xt: {d: 20, leg: 8, holes: corners, z_bottom_leg: 6, by_section: {RHS_150x100x6: {d: 24}}}
+  # the twin hinge crossmembers (RHS_150x50x6_TWIN), each tube a closed section of its own: at each end its outer web's
+  # drain and vent at `own_d` where that web is free, and a drain and a vent through the rail's inner web inside the
+  # tube's end, `internal_d` at `internal_z` either side of its mid-height, as CM-06's front corners have. Where the
+  # tube's outer web is covered by the shock support plates (CM-05's front tube) its drain and vent at each end pass
+  # through both webs face to face into the rear tube at `through_d`, which also vent the overlap between those webs,
+  # and elsewhere that overlap vents through both webs at `vent_d` at two corners diagonally opposite (sealed_overlaps TWIN)
+  twin: {own_d: 25, internal_d: 16, internal_z: [-45, 45], through_d: 24, vent_d: 12}
   outrigger: {d: 20, leg: 6, holes: corners}
   brace: {d: 13, leg: 5, holes: corners}
   plan_brace: {d: 10, leg: 5, holes: middle}
@@ -555,6 +566,13 @@ sealed_overlaps:
      vents: [{d: 12, u: 30, v: 30}, {d: 12, u: 270, v: 120}]}
   - {id: SEAM, what: "rail-to-raiser seam, the rail's top wall under the raiser's bottom wall", qty: 2, l: body_length, w: 50, t: 4, through: seam,
      vents: [{d: 12, u: 60, v: 25}, {d: 12, u: body_length - 60, v: 25}]}
+  # Each twin hinge crossmember's two webs face to face, their flats 120 mm tall between the R15 corners, closed by the
+  # seams along both corners and by the end welds at the rails' webs: 141,000 mm2 asks two 12 mm vents, which pass through
+  # both webs at two corners diagonally opposite, the kerb end low and the road end high (member_galvanising_holes twin),
+  # and on CM-05 the front tube's 24 mm drains and vents through both webs at each end serve as its vents. Opening the
+  # overlap to 2.5 mm as the drawbar's laps are would leave the seams' corners apart, so it is sealed
+  - {id: TWIN, what: "twin hinge crossmember's two webs face to face between the seams", qty: 2, l: 2 * rail_in, w: 120, t: 6, through: webs,
+     vents: [{d: 12, u: 26, v: 15}, {d: 12, u: 2 * rail_in - 26, v: 105}]}
 
 # The XT hinges and their gussets (I2-88), the one place the frame model, the dip and the 3D model read them from.
 # Cruisemaster's 33XT AIR sheets 2 and 3: each hinge bar lies square to the rail under its hinge crossmember, its long end
@@ -620,8 +638,14 @@ sealed_overlaps:
 # the run's ends and centre, each the weld's own stiffness for its share of the run and passing no moment
 # (FrameModel._weld_runs, weld_spring), where rigid six-way ties made the bar turn with the crossmember at every tie as
 # the crossmember twisted, and each hinge plate a member of its own 8 x 82 mm section down to the bolt, the bolt and the
-# bush's sleeve clamped between the plates rigid (est.). Each run's front fillet stands on the crossmember's bottom wall's
-# flat 47 mm from the rear web, half-way between the webs, so the wall bends under it. `wall` is the wall's stiffness
+# bush's sleeve clamped between the plates rigid (est.). On the RHS 150 x 100 x 6 of revision W each run's front fillet
+# stood on the crossmember's bottom wall's flat 47 mm from the rear web, half-way between the webs, so the wall bent under
+# it. Since 27 Nov 2026 each hinge crossmember is two RHS 150 x 50 x 6 seam welded (RHS_150x50x6_TWIN, station_sections),
+# the rear one where Cruisemaster's stands, so each run's rear fillet stands over the rear tube's rear web and its front
+# fillet over the seam, where the rear tube's front web and the front tube's rear web stand face to face, as both stood
+# over the webs on Cruisemaster's RHS 150 x 50. `wall` keeps the plate model's figures for the `section` they were read
+# on, and the frame model puts them in series only under a fillet on that section's flat between its cells' webs
+# (FrameModel._weld_runs), so on the twin it puts none and FAT-25 reads no wall. `wall` is the wall's stiffness
 # under each run, kN/mm for the run's whole 80 mm in the order of `runs`, from its plate model (cad/wall_plate.py): the
 # section unfolded about its corners into one plate continuous over them, its walls stiff in their own planes, the run's
 # load spread evenly along it, with the toe's structural stress per kN of the run's force (`toe_mpa_kn`, FAT-25). The
@@ -631,8 +655,16 @@ sealed_overlaps:
 # the bar's section, its welds and the bushes in writing (CHASSIS.md item 15).
 xt_hinges:
   bar: {leg: 6, run: 80, runs: [40, 221, 400], section: solid, bounds: [rigid, elastic], bushes: [free, stiff],
-        wall: {kn_mm: [85.0, 55.0, 55.0], toe_mpa_kn: [18.0, 21.2, 21.2], bound: "the corners at the walls' mid-planes, the ends pinned",
+        wall: {section: RHS_150x100x6, kn_mm: [85.0, 55.0, 55.0], toe_mpa_kn: [18.0, 21.2, 21.2], bound: "the corners at the walls' mid-planes, the ends pinned",
                other: {kn_mm: [197.4, 112.5, 112.5], toe_mpa_kn: [13.3, 16.6, 16.6], bound: "the corners at the flats' ends, the ends clamped"}}}
+  # The twin's seams (CHS-20): each pair of tubes is joined along its whole length between the rails' inner webs by a
+  # flare-V groove weld in each of the two R15 corners where the tubes meet, top and bottom, filled flush by GMAW to a
+  # procedure proven by a macro section, its effective throat `throat_r` of the corners' outside radius, 5/8 R as the
+  # fillers' flare bevels take (AISC 360 Table J2.2 gives a flare-V by GMAW 3/4 R), 9.4 mm (est.). The seams make the pair
+  # one closed section: they carry the outer perimeter's shear flow in torsion, the shear between the halves in bending
+  # across the trailer's line, and, where the hinge bar loads the rear tube alone, the front tube's half of each run's
+  # force over the run's own length (`share`, est.)
+  seam: {throat_r: 0.625, rule: "flare-V groove filled flush by GMAW to a procedure proven by a macro section", share: 0.5}
   gusset: {length: hinge_gusset_l, faces: [1, -1], omit: [CM-04KF, CM-04RF, CM-05KF, CM-05RF], z_over_underside: 69, weld: {leg: 5, acute_leg: 5, obtuse_throat: 3}}
   cheek: {t: 10, l: 150, h: 108.5, below: 26, leg: 6, bar_d: 26, bar_leg: 10, corner: 0.625, corner_rule: "5/8 R by GMAW to a procedure proven by a macro section", cope: 12, omit: [],
           under_gusset: {l: {XT front hinge: 150, XT centre: 140}, z0: {XT front hinge: 22.5, XT centre: 39}, z1: {XT front hinge: 115.5, XT centre: 99.5}}}

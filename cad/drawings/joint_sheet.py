@@ -172,8 +172,11 @@ def _section_b(sh, J: Joint, x0: float, y0: float, k: float = 5.0):
     for x in (lo, hi):
         v.line(sh, x, z1, x, z1 + 18.0, "thin")
         _brk(sh, v.p(x, z0 - 4), v.p(x, z1 + 22))
-    cx, cy = v.p(J.x, z0 + J.cm.sec.d / 2)
-    rhs(sh, cx, cy, J.cm.sec.b, J.cm.sec.d, J.cm.sec.t, J.cm.sec.ro, k)
+    sec = J.cm.sec
+    n = getattr(sec, "cells", 1)                    # a twin crossmember's tubes side by side, each its own section
+    for kk in range(n):
+        cx, cy = v.p(J.x - sec.b / 2 + sec.b / n * (kk + 0.5), z0 + sec.d / 2)
+        rhs(sh, cx, cy, sec.b / n, sec.d, sec.t, sec.ro, k)
     for c in J.cheeks:
         for b in c["boxes"]:
             v.box(sh, b[0], b[2], b[3], b[5])

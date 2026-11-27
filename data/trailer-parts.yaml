@@ -79,11 +79,11 @@ lines:
     price: {aud_each: 384.77, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-23, note: "133.6 kg at AUD 2.88/kg, the rate of the listed 150 x 50 x 3.0 and 150 x 50 x 5.0 lengths (the 5.0 mm, SKU RHS40, is AUD 326.65). 7.65 m needed, so one length with 0.35 m for the cuts (est.): 5.3 m since the drawbar went to 6 mm for its root's fatigue (FAT-07) and 2.35 m since the two rear crossmembers did for the recovery pull's ultimate (CHS-08U). It was two lengths while the hinge crossmembers were RHS 150 x 50 x 6, which are on STL-10 since 26 Nov 2026. Ask for C450L0 (Austube C450PLUS) on the mill certificate"}
   - id: STL-10
     group: chassis
-    name: RHS 150 x 100 x 6.0, one 8 m length, for the XT front hinge and XT centre crossmembers
+    name: RHS 150 x 50 x 6.0, a second 8 m length, for the twin XT front hinge and XT centre crossmembers
     qty: 1
     unit: 8 m length
     covers: [CM-04, CM-05]
-    price: {aud_each: 493.06, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-26, note: "171.2 kg at 21.4 kg/m and AUD 2.88/kg, the rate of the listed 150 x 50 x 3.0 and 150 x 50 x 5.0 lengths, as STL-03 and STL-09 are priced (est., the stockist's page refused the fetch with HTTP 403 on 26 Nov 2026). 2.35 m needed: both hinge crossmembers 100 mm wide along the trailer, each with its rear face where it stood, for the couple the arms' two bushes put on the hinge bar (CHS-08U, CHS-12, I2-114). The offcut is kept for spares. Ask for C450L0 (Austube C450PLUS) on the mill certificate"}
+    price: {aud_each: 384.77, basis: rate, url: "https://www.rhssteelsupplies.com.au/hikashop-menu-for-categories-listing/category/13-rhs-mild-steel.html", date: 2026-11-27, note: "133.6 kg at AUD 2.88/kg, STL-03's rate. 4.7 m needed: each hinge crossmember two RHS 150 x 50 x 6 seam welded along their length, the rear one where Cruisemaster's stands, so both of each hinge bar's fillets stand over webs (CHS-18, CHS-20, CHASSIS.md item 15), where an RHS 150 x 100 x 6 length at AUD 493.06 (est.) stood until 27 Nov 2026. The offcut is kept for spares. Ask for C450L0 (Austube C450PLUS) on the mill certificate"}
   - id: STL-04
     group: chassis
     name: RHS 75 x 50 x 3.0, one 8 m length, for the drawbar cross brace

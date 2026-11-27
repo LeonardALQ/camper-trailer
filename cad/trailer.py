@@ -1027,6 +1027,7 @@ class Layout:
         data/services.yaml's form for the hole checks: each bolt through both webs of its crossmember, and each rivet nut
         in a rail's inner web, with its member, face, use, place and size. The fresh tanks' bearers and the front guard's
         hangers come first, so their rows keep their order, then the grey tank's bearers and its guard's hangers."""
+        from .chassis import member_webs
         V, out = self.V, []
         ms = {m.id: m for m in self.chassis.members}
         rail = self.chassis.role_sec["rail"]
@@ -1035,7 +1036,7 @@ class Layout:
             rows = []
             for br in brs:
                 m, d = ms[br["member"]], float(br["bolt"]["hole"])
-                for face, x in (("front", m.p0[0] - m.sec.b / 2), ("rear", m.p0[0] + m.sec.b / 2)):
+                for face, x in member_webs(m):
                     for _, y, z in br["bolts"]:
                         row = dict(member=m.id, face=f"{face} web", use=f"bolt for {br['id']}", x=x, y=y, z=z, d=d, length=d)
                         if not any(r["member"] == m.id and r["face"] == row["face"] and abs(r["y"] - y) < 1 for r in rows):
@@ -1055,7 +1056,7 @@ class Layout:
                                     x=x, y=yy, z=z, d=dh, length=dh))
             else:
                 m = next(m for m in self.chassis.members if m.station == "XT front hinge" and m.role.startswith("cm"))
-                for face, xx in (("front", m.p0[0] - m.sec.b / 2), ("rear", m.p0[0] + m.sec.b / 2)):
+                for face, xx in member_webs(m):
                     out.append(dict(member=m.id, face=f"{face} web", use="bolt for UF-03's hanger", x=xx, y=y, z=z, d=dh, length=dh))
         out += bearer_rows([br for lid in self._bearer_lines() if lid != "UF-01B" for br in self.tank_bearers(lid)])
         for (x, y, z), dh in self.grey_hanger_bolts():
