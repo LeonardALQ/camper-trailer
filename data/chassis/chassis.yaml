@@ -686,11 +686,11 @@ xt_hinges:
   # run's stiffness, kN/mm under the run's force spread evenly along its 80 mm, is from a plane-stress model of the web
   # between the rails' inner faces with the bottom wall's share along its bottom edge (cad/web_plane.py): the web held at
   # the beam's axis half-way up (the stiff bound, which reads the runs the higher) or at the top wall's mid-plane (the
-  # soft bound, in `other`). On RHS 150 x 100 x 6 only the rear fillets stand over a web, its rear web, 6 mm with 300 mm2
-  # of the bottom wall beside it, and the front fillets keep the wall's plate model, whose corners hold them, the webs'
-  # own stretch under the wall's 55 to 85 kN/mm moving it under 6 % (est.)
-  web: {kn_mm: {front: [2146.0, 1846.5, 1846.8], rear: [2146.0, 1846.5, 1846.8]}, t: {front: 6, rear: 6}, flange: {front: 300, rear: 300},
-        bound: "the web held at the beam's axis, half-way up", other: {kn_mm: {front: [1637.4, 1114.2, 1119.5], rear: [1637.4, 1114.2, 1119.5]},
+  # soft bound, in `other`). On the twin hinge crossmembers each run's front fillet stands over the two webs face to face
+  # at the seam, 12 mm with 300 mm2 of the two tubes' bottom walls beside them, and its rear fillet over the rear tube's
+  # rear web, 6 mm with 150 mm2 of its bottom wall (est.)
+  web: {kn_mm: {front: [4253.3, 3674.3, 3675.0], rear: [2126.7, 1837.1, 1837.5]}, t: {front: 12, rear: 6}, flange: {front: 300, rear: 150},
+        bound: "the web held at the beam's axis, half-way up", other: {kn_mm: {front: [3222.4, 2207.9, 2215.4], rear: [1611.2, 1104.0, 1107.7]},
         bound: "the web held at the top wall's mid-plane"}}
 
 # The XT arms' limits in LC8a (I2-94). An airbag cannot pull. Where an arm's balance about its hinge asks less of its
