@@ -704,16 +704,16 @@ class Analysis:
 
     def recovery_pulls(self, lc8: dict, s: int) -> list[tuple[str, Any, float, float]]:
         """LC8a's pulls at one point, each its label, the wheels held, its heading off the rail axis and its share of the
-        rated pull: every wheel free at the free limit, 30 degrees either way and along the rail axis (I2-118, I2-119),
-        one wheel held at the held-wheel limit (I2-93, I2-124) and both wheels of one axle held at the held-axle limit,
-        each at LC8a's five headings, 30 and 15 degrees either way and along the axis. At the coupling (s 0) every pull
-        is along the rail axis, a held wheel's too, the free tyres' grip turning the trailer about it as far as it does."""
+        rated pull: every wheel free at the free limit (I2-118, I2-119, I2-127), one wheel held at the held-wheel limit
+        (I2-93, I2-124) and both wheels of one axle held at the held-axle limit, each at LC8a's five headings, 30 and 15
+        degrees either way and along the axis. At the coupling (s 0) every pull is along the rail axis, a held wheel's
+        too, the free tyres' grip turning the trailer about it as far as it does."""
         sd = lc8["sideways_deg"]
         rated = lc8["force_n"]
         free = lc8.get("free_n", rated)
         at_free = f", at the {free / 1000:g} kN limit" if free < rated - 1e-6 else ""
         five = (-sd, -sd // 2, 0, sd // 2, sd) if s else (0,)
-        pulls = [(f"{h:+d} deg sideways{at_free}", None, math.radians(h), free / rated) for h in ((-sd, 0, sd) if s else (0,))]
+        pulls = [(f"{h:+d} deg sideways{at_free}", None, math.radians(h), free / rated) for h in five]
         for w in self.ch.suspension:
             pulls += [(f"{h:+d} deg sideways, wheel {w['id']} held, at the {lc8['held_wheel_n'] / 1000:g} kN limit", w["id"], math.radians(h),
                        lc8["held_wheel_n"] / rated) for h in five]
@@ -1108,6 +1108,7 @@ class Analysis:
                             hinge_runs=self.hinge_runs(), hinge_bar=self.hinge_bar_report(), hinge_seams=self.seam_welds())
         out["local"]["hinge_gussets"] = self.gusset_welds()
         out["recovery"] = self.recovery_summary()
+        out["tipping"] = self.tipping_pulls(self.recovery_supports(cases))
         out["fixings"] = self.fixings()
         out["cross_checks"] = self.cross_checks(out, lc6)
         out["lc1_ball"] = balls
@@ -1926,6 +1927,74 @@ class Analysis:
                               hinge=dict(wheel=hw, f=[float(x) for x in hg["f"]], case=hg["case"], bar_moment_nmm=abs(float(hg["f"][0])) * depth),
                               mu=by_mu)
         return out
+
+    def tipping_pulls(self, supports: list[dict]) -> dict:
+        """The least pull that tips the trailer (I2-127, LC8a `tip`), which the frame's readings cannot give, since a pull
+        that tips it never reaches the frame at its full size. At each recovery point, with every wheel free, each wheel
+        held and each axle held, on each of LC8a's weights and nose supports and at each bound of the grip, each line up,
+        level and down is read across the headings: at the lugs and tongues every `step_deg` within LC8a's sideways range
+        and then every `fine_deg` within one step of the series' least, where the trailer may start to slide just past it,
+        and at the coupling along the rail axis only. Each pull is solved at the `reach_n` (recovery_reactions), which
+        takes it at the largest share the trailer holds, so a pull that tips it within the reach gives its tipping pull,
+        one that slides it its sliding pull, and one it holds to the reach neither. Returns the table at LC8a's own
+        headings, each point's wheel state and line its least tip and slide there, and each point's wheel state and line's
+        least over every heading read (`least`)."""
+        lc8 = next(lc for lc in self.ch.data["load_cases"] if lc["id"] == "LC8a")
+        tp = lc8["tip"]
+        reach, step, fine = tp["reach_n"], tp["step_deg"], tp["fine_deg"]
+        sd, vd = lc8["sideways_deg"], lc8["vertical_deg"]
+        mus = lc8["reaction"].get("mu") or [None]
+        wheels = self.ch.suspension
+        states = [("free", None)] + [("wheel", w["id"]) for w in wheels]
+        states += [("axle", tuple(w["id"] for w in wheels if w["axle"] == a)) for a in ("front", "rear")]
+        points = [(where, s) for where in ("front", "rear") for s in (-1, 1)] + ([("coupling", 0)] if lc8.get("coupling") else [])
+        own = (-sd, -sd // 2, 0, sd // 2, sd)
+        table, least = [], []
+        for where, s in points:
+            p, _, sx = self.recovery_point(where, s)
+            spot = (f"{where} {'kerb' if s < 0 else 'road'}-side point" if s else "the coupling")
+            grid = list(range(-sd, sd + 1, step)) if s else [0]
+            for kind in ("free", "wheel", "axle"):
+                for v in (-vd, 0, vd):
+                    got: dict = {}
+
+                    def read(h, held, sup, mu):
+                        hr, vr = math.radians(h), math.radians(v)
+                        F = reach * np.array([sx * math.cos(hr) * math.cos(vr), math.sin(hr) * math.cos(vr), math.sin(vr)])
+                        R = self.recovery_reactions(F, p, held, sup["base"], sup["nose"], mu)
+                        here = got.setdefault(h, {})
+                        if R["limit"] is None:
+                            return None
+                        who = "" if held is None else (f", wheel {held} held" if isinstance(held, str) else
+                                                       f", both {next(w['axle'] for w in wheels if w['id'] == held[0])} wheels held")
+                        kn = R["scale"] * reach / 1000
+                        out = dict(kn=kn, where=where, side=s, h=h, v=v, held=held,
+                                   case=f"{spot}, {h:+d} deg sideways{who}, {v:+d} deg up, {sup['label']}" + (f", mu {mu:g}" if mu is not None else ""),
+                                   weight=sup["label"].split(",")[0], coupled=bool(sup["nose"].get("holds_down")), mu=mu)
+                        if R["limit"] not in here or kn < here[R["limit"]]["kn"]:
+                            here[R["limit"]] = out
+                        return R["limit"], kn
+
+                    for name, held in states:
+                        if name != kind:
+                            continue
+                        for sup in supports:
+                            for mu in mus:
+                                series = {h: read(h, held, sup, mu) for h in grid}
+                                tips = [(r[1], h) for h, r in series.items() if r and r[0] == "tips"]
+                                if tips and s:
+                                    h0 = min(tips)[1]
+                                    for h in range(max(-sd, h0 - step + fine), min(sd, h0 + step - fine) + 1, fine):
+                                        if h not in series:
+                                            read(h, held, sup, mu)
+                    for h in own if s else (0,):
+                        r = got.get(h, {})
+                        table.append(dict(where=where, side=s, wheels=kind, h=h, v=v, tip=r.get("tips"), slide=r.get("slides")))
+                    tip = min((r["tips"] for r in got.values() if "tips" in r), key=lambda t: t["kn"], default=None)
+                    slide = min((r["slides"] for r in got.values() if "slides" in r), key=lambda t: t["kn"], default=None)
+                    least.append(dict(where=where, side=s, wheels=kind, v=v, tip=tip, slide=slide,
+                                      headings=len(got) if s else 1))
+        return dict(reach_kn=reach / 1000, step_deg=step, fine_deg=fine, table=table, least=least)
 
     def fy_of_part(self, member: str) -> float:
         """The yield stress of a frame part that is not a member (a hinge gusset), from its section."""
@@ -3081,28 +3150,47 @@ def plate_shear_buckling(x0: float, x1: float, y0: float, y1: float, t: float, h
     return float(1.0 / np.max(np.abs(mu)))
 
 
-def recovery_rule(results: dict, lc8: dict) -> dict:
-    """The user's recovery rule (I2-93, I2-100, I2-114, I2-119), from LC8a's data and the frame analysis's recovery summary:
-    the pull each point is rated for, the limit with every wheel free (the rated pull where every check holds it) and the
-    directions it holds within, the limits with one wheel and with both wheels of one axle held fast, and the least
-    pull, in kN, that tips the trailer before the rated pull at a lug or tongue when it is pulled up or down, sideways and
-    along its line, the least at the coupling pulled up and down, where the pull is along the rail axis only, and whether
-    any level pull tips it."""
-    rec = results["recovery"]["LC8a"]
-    tc = rec["tip_classes"]
-    ct = rec.get("coupling_tips", {})
-    vd = lc8["vertical_deg"]
+RECOVERY_LINES = {"low": (-1, 0), "up": (0, 1), "any": (-1, 0, 1)}       # a class's lines, in LC8a's vertical_deg
+RECOVERY_WHEELS = {"free": ("free",), "unseen": ("free", "wheel", "axle")}   # a wheel not seen free counts as held
 
-    def least(prefix: str):
-        ks = [v["kn"] for k, v in tc.items() if k.startswith(prefix)]
-        return min(ks) if ks else None
-    return dict(rated_kn=lc8["force_n"] / 1000, free_kn=lc8.get("free_n", lc8["force_n"]) / 1000, sideways_deg=lc8["sideways_deg"],
-                vertical_deg=vd, held_wheel_kn=lc8["held_wheel_n"] / 1000, coupling=bool(lc8.get("coupling")),
-                held_axle_kn=lc8["held_axle_n"] / 1000,
-                sideways_up_kn=least(f"sideways +{vd}"), sideways_down_kn=least(f"sideways -{vd}"),
-                along_up_kn=least(f"along +{vd}"), along_down_kn=least(f"along -{vd}"),
-                coupling_up_kn=ct.get(f"+{vd}", {}).get("kn"), coupling_down_kn=ct.get(f"-{vd}", {}).get("kn"),
-                level_tips=any(k.endswith(" +0") for k in tc) or "+0" in ct)
+
+def recovery_class_cells(tipping: dict, lc8: dict, c: dict) -> list[dict]:
+    """The tipping table's least entries (Analysis.tipping_pulls) a recovery class covers: its point, both sides, the
+    wheel states it allows and its lines."""
+    vd = lc8["vertical_deg"]
+    return [x for x in tipping["least"] if x["where"] == c["at"] and x["wheels"] in RECOVERY_WHEELS[c["wheels"]]
+            and x["v"] in [k * vd for k in RECOVERY_LINES[c["line"]]]]
+
+
+def recovery_rule(results: dict, lc8: dict) -> dict:
+    """The user's recovery rule (I2-93, I2-100, I2-114, I2-119, I2-127), from LC8a's data and the frame analysis: the pull
+    each point is rated for, the directions it may be pulled in, the fail checks' limits with every wheel free, one wheel
+    held and both wheels of one axle held fast (`free_n`, `held_wheel_n`, `held_axle_n`), and the user's classes (LC8a
+    `classes`), each its limit from the data with the two figures it is the lesser of: the fail checks' limit for the
+    wheel states it allows, and LC8a `tip` `margin` of the least pull that tips the trailer in it (tipping_pulls), rounded
+    down to 5 kN, with which of them governs. With them the least pull that slides the trailer sideways with every wheel
+    free, in kN, and whether any level pull tips it within the reach."""
+    tp = results["tipping"]
+    margin = lc8["tip"]["margin"]
+    rule = {"free": lc8.get("free_n", lc8["force_n"]), "wheel": lc8["held_wheel_n"], "axle": lc8["held_axle_n"]}
+    classes = []
+    for c in lc8["classes"]:
+        cells = recovery_class_cells(tp, lc8, c)
+        tip = min((x["tip"] for x in cells if x["tip"]), key=lambda t: t["kn"], default=None)
+        rule_n = min(rule[k] for k in RECOVERY_WHEELS[c["wheels"]])
+        by_tip = None if tip is None else 5000.0 * math.floor(margin * tip["kn"] / 5.0 + 1e-9)
+        lesser = rule_n if by_tip is None else min(rule_n, by_tip)
+        governs = "fail checks" if by_tip is None or rule_n < by_tip else ("tipping" if by_tip < rule_n else "both")
+        classes.append(dict(id=c["id"], name=c["name"], at=c["at"], wheels=c["wheels"], line=c["line"], limit_kn=c["limit_n"] / 1000,
+                            rule_kn=rule_n / 1000, tip=tip, share_kn=None if tip is None else margin * tip["kn"],
+                            by_tip_kn=None if by_tip is None else by_tip / 1000, lesser_kn=lesser / 1000, governs=governs,
+                            cells=len(cells)))
+    free = [x for x in tp["least"] if x["wheels"] == "free" and x["where"] != "coupling"]
+    slide = min((x["slide"] for x in free if x["slide"]), key=lambda t: t["kn"], default=None)
+    return dict(rated_kn=lc8["force_n"] / 1000, free_kn=rule["free"] / 1000, held_wheel_kn=rule["wheel"] / 1000,
+                held_axle_kn=rule["axle"] / 1000, sideways_deg=lc8["sideways_deg"], vertical_deg=lc8["vertical_deg"],
+                coupling=bool(lc8.get("coupling")), margin=margin, reach_kn=tp["reach_kn"], classes=classes, slide=slide,
+                level_tips=any(x["tip"] for x in tp["least"] if x["v"] == 0))
 
 
 def net_section(gross: dict, strips: list[dict], levers, y_lever: float, face_w: float, d_wall: float) -> dict:

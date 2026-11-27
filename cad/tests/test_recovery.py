@@ -133,13 +133,14 @@ def test_every_wheel_free_slides_where_its_tyres_cannot_hold_the_side_force():
 
 
 def test_lc8a_reads_a_held_wheel_at_five_headings_and_each_bound_of_the_grip():
-    """LC8a reads every pull at both bounds of mu (I2-124), a held wheel at the lugs and tongues at LC8a's five headings
-    as an axle is, and at the coupling every pull along the rail axis only, so every case there reads +0 degrees."""
+    """LC8a reads every pull at both bounds of mu (I2-124), every wheel free and a held wheel at the lugs and tongues at
+    LC8a's five headings as an axle is (I2-127), and at the coupling every pull along the rail axis only, so every case
+    there reads +0 degrees."""
     pts = RES["recovery"]["LC8a"]["points"]
     k = len(LC8["reaction"]["weight"]) * len(LC8["reaction"]["nose"]) * len(MUS) * 3      # supports, bounds, up, level, down
     n = len(CH.suspension)
     for w in ("front", "rear"):
-        assert pts[f"{w}, every wheel free"] == 2 * 3 * k
+        assert pts[f"{w}, every wheel free"] == 2 * 5 * k
         assert pts[f"{w}, wheel held"] == 2 * n * 5 * k
         assert pts[f"{w}, axle held"] == 2 * 2 * 5 * k
     assert (pts["coupling, every wheel free"], pts["coupling, wheel held"], pts["coupling, axle held"]) == (k, n * k, 2 * k)

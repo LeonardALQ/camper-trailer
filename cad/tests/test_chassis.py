@@ -385,9 +385,10 @@ def test_lc8a_reads_both_wheels_of_an_axle_held_at_the_recovery_limit():
     rec = RES["recovery"]["LC8a"]
     lc8 = next(lc for lc in CH.data["load_cases"] if lc["id"] == "LC8a")
     k = 3 * len(lc8["reaction"]["weight"]) * len(lc8["reaction"]["nose"]) * len(lc8["reaction"]["mu"])
-    # at the front lugs and rear tongues every wheel free at 3 headings and each wheel held at 5, and at the coupling
-    # every wheel free and each wheel held along the rail axis, each up, level and down, on each support and bound of mu
-    assert rec["cases"] == 4 * (3 + 5 * len(CH.suspension)) * k + (1 + len(CH.suspension)) * k
+    # at the front lugs and rear tongues every wheel free and each wheel held at LC8a's 5 headings (I2-127), and at the
+    # coupling every wheel free and each wheel held along the rail axis, each up, level and down, on each support and
+    # bound of mu
+    assert rec["cases"] == 4 * (5 + 5 * len(CH.suspension)) * k + (1 + len(CH.suspension)) * k
     assert rec["axle"]["cases"] == 4 * 2 * 5 * k + 2 * k
     lc8 = next(lc for lc in CH.data["load_cases"] if lc["id"] == "LC8a")
     assert lc8["held_axle_n"] % 5000 == 0 and lc8["held_axle_n"] < lc8["force_n"]
@@ -608,7 +609,7 @@ def test_the_coupling_is_a_pull_point_under_the_same_limits():
     assert pts["coupling, every wheel free"] == 3 * n_sup                 # level, 15 degrees up and down, each support
     assert pts["coupling, axle held"] == 2 * 3 * n_sup                    # each axle, along the rail axis
     assert pts["coupling, wheel held"] == len(CH.suspension) * 3 * n_sup  # each wheel, the pull along the rail axis
-    assert all(pts[f"{w}, every wheel free"] == 2 * 3 * 3 * n_sup for w in ("front", "rear"))
+    assert all(pts[f"{w}, every wheel free"] == 2 * 5 * 3 * n_sup for w in ("front", "rear"))   # LC8a's five headings (I2-127)
 
 
 def test_holes_in_one_section_are_read_together():
