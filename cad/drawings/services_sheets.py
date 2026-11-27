@@ -914,7 +914,7 @@ def ct603(prj, model, bom, checks, reg, dwg):
     for b in lay.blocks:
         if b.box is not None and (b.id.startswith(UNDER_FLOOR) or b.id in ("UF-01", "UF-01R", "UF-08", "UF-06")):
             pr.box(b.box, "hidden")
-    for b in lay.tanks():
+    for b in lay.tanks() + [lay.find("UF-08")]:   # the grey tank's steps onto its bearers too (I2-122)
         _tank_notches(pr, b, "hidden")
     for b in lay.blocks:
         if b.box is not None and b.id.startswith("CM-"):
@@ -1146,7 +1146,7 @@ def ct611(prj, model, bom, checks, reg, dwg):
             sh.text(xc + 1.0, 112 - i * 2.0, ln, 1.05)
     wire(sh, [(39, 96), (172, 96)], "drain")
     gt = C["day"].find("UF-08").box
-    box(sh, 40, 66, 172, 92, ["GREY TANK UF-08, 130 L NET, WELDED 6 mm HDPE, ONE BAFFLE", f"BETWEEN THE RAILS IN THE REAR BAY, TOP AT Z {gt[5]:.0f}",
+    box(sh, 40, 66, 172, 92, ["GREY TANK UF-08, 130 L NET, WELDED 6 mm HDPE, THREE BAFFLES", f"ON ITS BEARERS IN THE REAR BAY, TOP AT Z {gt[5]:.0f}",
                               "UNDER EVERY WET ROOM DRAIN, SO EVERY DRAIN FALLS TO IT", "VENTED TO THE ROAD SIDE",
                               "EMPTY FOR TRAVEL. A FULL TANK IS CASES TC7 AND TC8"], size=1.25)
     wire(sh, [(106, 96), (106, 92)], "drain", arrow=True)
@@ -1197,7 +1197,7 @@ def ct612(prj, model, bom, checks, reg, dwg):
             "UF-08", "UF-06"}
     body_plan(sh, pr, lay, res, cut=1000.0, show=show, size=1.2, keep=False, swings=False, light=("UF-01", "UF-01R", "UF-08"),
               hidden=("UF-01", "UF-01R", "UF-08", "UF-06", "WR-10"), nolabel=("LA-11B", "LA-11T", "EL-02", "LA-14", "UF-01", "UF-01R", "UF-08"))
-    for b in lay.tanks():
+    for b in lay.tanks() + [lay.find("UF-08")]:   # the grey tank's steps onto its bearers too (I2-122)
         _tank_notches(pr, b, "hidden")
     g = {x["id"]: x for x in svc["glands"]}
     ws = lay.find("WS-01").cog
@@ -1244,7 +1244,7 @@ def ct612(prj, model, bom, checks, reg, dwg):
     for b in lay.blocks:          # the crossmembers cut by the centreline, at their own heights
         if b.id.startswith("CM-") and b.box is not None and x0 <= b.box[0] <= x1:
             ve.fill(b.box, "fill")
-    for br in lay.tank_bearers():  # the fresh tanks' bearers beyond the cut, on the crossmembers' faces (UF-01B, I2-109)
+    for br in lay.tank_bearers():  # the tanks' bearers beyond the cut, on the crossmembers' faces (UF-01B, UF-08B, I2-109, I2-122)
         if br["side"] > 0:
             for k in ("upright", "foot"):
                 ve.box(br["boxes"][k], "medium")
@@ -1272,7 +1272,8 @@ def ct612(prj, model, bom, checks, reg, dwg):
         "ALONG THE PARTITION'S WET FACE UNDER THE BASIN ON ITS 87.5 DEGREE KNUCKLE ADAPTOR, ARROWS UNDERNEATH AND FALLING (I2-45, I2-52).",
         "THE FRESH TANKS' ENDS SIT ON GALVANISED 75 x 50 x 6 STEEL ANGLES ON 10 mm RUBBER, EACH BOLTED THROUGH ITS XT CROSSMEMBER (UF-01B), DRAWN "
         "BEYOND THE CUT, AND THE REAR TANK'S BODY ON THE REAR BAY'S 8 mm PANEL. THE FRONT TANK'S ALUMINIUM GUARD HANGS "
-        f"{V['guard_gap']:g} mm UNDER THE TANK'S BOTTOM AND CARRIES ONLY ITSELF (CHS-17, I2-109, I2-115).",
+        f"{V['guard_gap']:g} mm UNDER THE TANK'S BOTTOM AND CARRIES ONLY ITSELF (CHS-17, I2-109, I2-115). THE GREY TANK'S ENDS SIT ON FOUR MORE "
+        f"ON THE XT REAR SHOCK AND REAR CROSSMEMBERS (UF-08B), AND ITS 2 mm GUARD HANGS {V['grey_guard_gap']:g} mm UNDER IT (I2-122).",
     ], size=1.42, width_chars=185)
     yb = title(sh, dwg, reg, "TANKS AND FITTINGS IN THE MASS SCHEDULE (TB-11).", "6 mm HDPE TANKS, FOOD-GRADE LINES")
     rows = [["Fill", "G1 on the kerb wall", "The front tank, over CM-04", "Under the bed, down G12"],

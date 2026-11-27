@@ -432,6 +432,9 @@ def ct105(prj, model, bom, checks, reg, dwg):
     hb = sp.get("hanger_bolts") or {}
     words = {"bolt for UF-01B": f"{sp['bolts']['size']} BOLT", "bolt for UF-03": f"{hb['size']} BOLT",
              "rivet nut for UF-03": f"{hb['size']} RIVET NUT"} if sp else {}
+    gp = lay._bearer_lines().get("UF-08B") or {}        # the grey tank's bearers and its guard's hangers (I2-122)
+    ghb = gp.get("hanger_bolts") or {}
+    words.update({"bolt for UF-08B": f"{gp['bolts']['size']} BOLT", "rivet nut for UF-09": f"{ghb['size']} RIVET NUT"} if gp else {})
     sections = schedule(chs, ch, words)
     every = [h for _, hs in sections for h in hs]
     holes = [h for h in every if not h.bolt]
@@ -468,7 +471,7 @@ def ct105(prj, model, bom, checks, reg, dwg):
         "AND THE RAISER'S BOTTOM WALL (DETAIL E). THE RAILS' INNER-WEB HOLES AT CM-05 AND CM-06 DRAIN AND VENT THEIR FRONT CORNERS, EACH WITH A CHECK "
         "HOLE OPPOSITE IN THE OUTER WEB.",
         "BOLT AND RIVET NUT: THE FIXINGS' HOLES, DRILLED BEFORE GALVANISING. A BOLT GOES THROUGH BOTH WEBS, ITS HOLES IN LINE (UF-01B ON "
-        "CM-04 AND CM-05, UF-03 ON CM-04). EACH RAIL'S HANGER UF-03 BOLTS INTO A BLIND RIVET NUT IN THE INNER WEB ONLY.",
+        "CM-04 AND CM-05, UF-03 ON CM-04, UF-08B ON CM-06 AND CM-08). EACH RAIL'S HANGER UF-03 OR UF-09 BOLTS INTO A BLIND RIVET NUT IN THE INNER WEB ONLY.",
     ] + [f"{c['member']}'S ENDS ARE ITS RECOVERY TONGUES' FACES, {c['cut']:g} INSIDE THE RAILS."
          for c in ch.data["member_galvanising_holes"].get("cut_ends", [])], width_chars=70, size=1.5)
     _draft_stamp(sh, 350.0, 74.0)

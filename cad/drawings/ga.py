@@ -186,8 +186,9 @@ def ct001(prj, model, bom, checks, reg, dwg):
         ["Body", f"{V['body_length']:.0f} x {V['body_width']:.0f} mm", f"Fixed roof, {rep['params']['interior_h']:.0f} mm inside, rounded front edges (H12)"],
         ["Overall", f"{ch['overall_length']:.0f} x {ch['overall_width']:.0f} mm", f"Travel height {ch['travel_height']:.0f} mm at the top of {HEIGHT_AT.get(ch['travel_height_at'], ch['travel_height_at'])}"],
         ["Axle group centre", f"X {V['axle_x']:,.0f}", f"Window X {w['x_lo']:,.0f} to {w['x_hi']:,.0f} (H17, MAS-05)"],
-        ["Tare", f"{int(rep['tare_kg'] + 0.5):,} kg", f"{cases['TC1']['growth']['mass_kg']:,.0f} kg with growth"],   # half up, as the title block and the site (I2-56)
-        ["Fully loaded, TC2", f"{tc2['nominal']['mass_kg']:,.0f} kg", f"{tc2['growth']['mass_kg']:,.0f} kg with growth, ATM plate {plate:,.0f} kg"],
+        # every case cell half up, as the title block, CT-003 and the site round them (I2-56, F2-08, I2-123)
+        ["Tare", f"{_kg(rep['tare_kg'])} kg", f"{_kg(cases['TC1']['growth']['mass_kg'])} kg with growth"],
+        ["Fully loaded, TC2", f"{_kg(tc2['nominal']['mass_kg'])} kg", f"{_kg(tc2['growth']['mass_kg'])} kg with growth, ATM plate {plate:,.0f} kg"],
         ["Towball", f"{lo_ball:.0f} to {hi_ball:.0f} kg", f"{chk['MAS-12']['measured']:.1f} % lowest (TC7), {_kg(chk['MAS-13']['measured'])} kg heaviest with growth"],
         ["Ute rear axle", f"{_kg(chk['MAS-03']['measured'])} kg", f"Against the Super Duty's {rep['tow_vehicle']['limits']['rear_axle_kg']:,.0f} kg with growth (MAS-03)"],
         ["Combination", f"{_kg(chk['GCM-01']['measured'])} kg", f"Against Ford's {rep['tow_vehicle']['limits']['gcm_kg']:,.0f} kg GCM (GCM-01)"],

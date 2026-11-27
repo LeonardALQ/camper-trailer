@@ -1065,9 +1065,9 @@ runs:
   - {id: N-09, system: data, kind: sig, lane: {UF: 3}, feeds: "Rear fresh tank's level sender, forward in the UF way from the kerb frame over the rear kerb airbag's top bracket to the tank's kerb face", protection: "-", serves: [tank senders],
      glands: [G20], along: [BD-01, BD-03, RS-K, RL-K], from: {line: BR-CX, at: [BR_CX.cx + 10, BR_CX.cy, BR_CX.z0]},
      path: [[., ., LA_11E.z0 + 20], [G20_N_09.cx, WSY, .], [., ., ZW], [., G20_N_09.cy, .], [., ., UFZ - L_UF], [G20_N_09.cx - 60, UF_01R.y0 - 34, .], [UF_01R.cx, ., .]], to: {line: UF-01R, at: [., UF_01R.y0, .]}}
-  - {id: N-10, system: data, kind: sig, feeds: "Grey tank's level sender, back under the floor under the crossing cables to its kerb side", protection: "-", serves: [tank senders],
+  - {id: N-10, system: data, kind: sig, feeds: "Grey tank's level sender, back under the floor under the crossing cables to its top by its kerb side, 40 mm in from its kerb face (I2-122)", protection: "-", serves: [tank senders],
      glands: [G20], along: [BD-01, BD-03, CM-06, WR-03, RL-K, RS-K], from: {line: BR-CX, at: [BR_CX.cx + 20, BR_CX.cy, BR_CX.z0]},
-     path: [[., ., LA_11E.z0 + 20], [G20_N_10.cx, WSY, .], [., ., ZW], [., G20_N_10.cy, .], [., ., UFZ - 62], [UF_08.x0 - 30, ., .], [UF_08.x0 - 10, UF_08.y0 - 35, .], [UF_08.x0 + 56, ., .], [., ., UF_08.z1 - 40]], to: {line: UF-08, at: [., UF_08.y0, .]}}
+     path: [[., ., LA_11E.z0 + 20], [G20_N_10.cx, WSY, .], [., ., ZW], [., G20_N_10.cy, .], [., ., UFZ - 62], [UF_08.x0 - 30, UF_08.y0 + 40, .], [UF_08.x0 + 56, ., .]], to: {line: UF-08, at: [., ., UF_08.z1]}}
   - {id: N-11, system: data, kind: sig, feeds: "Truma's TIN bus from the Combi to its iNet X panel on the tower's end", protection: "-", serves: [truma panel],
      from: {line: LA-03, at: [LA_03.x0, LA_03.y0 + 265, LA_03.z0 + 175]}, path: [[LA_11T.x0 - 15, ., .], [., TP_01.cy, TP_01.z0 - 40]], to: {line: TP-01, at: [TP_01.cx, ., TP_01.z0]}}
   # ================================================================ the lamps and the brakes, at 12 V from the ute's 12-pin plug (data/services.yaml lamps)
@@ -1259,7 +1259,7 @@ runs:
   - {id: W-06, system: waste, kind: dwv40, feeds: "Wet room floor waste by the rear door, through G24 into the grey tank's top", protection: "Membrane trap", serves: [floor waste],
      glands: [G24], passes: [WR-01], from: {line: FW-01, at: [FW_01.cx, FW_01.cy, FW_01.z0]}, to: {line: UF-08, at: [., ., UF_08.z1]}}
   - {id: W-07, system: waste, kind: dwv40, feeds: "Grey tank's dump line from its kerb face under the rail to the lever valve and camlock", protection: "Lever valve DV-01",
-     serves: [grey dump], along: [UF-09, RL-K, RS-K], from: {line: UF-08, at: [DV_01.cx, UF_08.y0, UF_08.z0 + 27]}, path: [[., -560, .], [., -620, 550]],
+     serves: [grey dump], along: [UF-09, RL-K, RS-K], from: {line: UF-08, at: [DV_01.cx, UF_08.y0, UF_08.z0 + 27]}, path: [[., -620, 550]],
      to: {line: DV-01, at: [., DV_01.y1, DV_01.cz]}}
   - {id: V-02, system: vent, kind: vent12, feeds: "Grey tank's breather up the rear wall's kerb half to a meshed outlet high on the wall", protection: "-", serves: [grey breather],
      glands: [G25, G26], passes: [WR-01], along: [BD-04, CM-08], from: {line: UF-08, at: [UF_08.x1 - 30, -450, UF_08.z1]}, path: [[., ., UFZ - 50], [G25.cx, ., .], [., ., G26.cz]],

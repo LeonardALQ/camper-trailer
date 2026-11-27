@@ -518,9 +518,9 @@ def _blocks_of(lay) -> tuple[dict, list]:
     D-ring, and each corner steady over the box its leg sweeps from folded for travel to standing at 90 degrees."""
     bl = []
     for b in lay.blocks:
-        if b.id == "UF-01B" and hasattr(lay, "bearer_parts"):   # the fresh tanks' bearers as their legs (I2-109)
+        if b.extra.get("bearers") is not None and hasattr(lay, "bearer_parts"):   # the tanks' bearers as their legs (I2-109, I2-122)
             bl += [dict(iid=f"{b.iid} {n}", id=b.id, name=f"{b.name.split(', ')[0]}, {n}", system=b.system, box=bx, hollow=False,
-                        keep_clear=False, role=None) for n, bx in lay.bearer_parts()]
+                        keep_clear=False, role=None) for n, bx in lay.bearer_parts(b.id)]
             continue
         tubes = spacer_tubes(lay, b)
         if b.box is None and not tubes:

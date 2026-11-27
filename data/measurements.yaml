@@ -952,8 +952,8 @@ inputs:
   - id: TW-04
     group: Trailer weighbridge
     part: trailer
-    title: Weighed mass, fully loaded for travel with 375 L of water, the fuel and the gear
-    how: "Load the trailer as for a trip: 375 L of fresh water, the heater's diesel, the jerry cans, the gear and the food, with the grey tank empty. Weigh the whole trailer on a weighbridge, uncoupled on its jockey wheel, or coupled with only the trailer on the scale and the drawbar at its design height."
+    title: Weighed mass, fully loaded for travel with 370 L of water, the fuel and the gear
+    how: "Load the trailer as for a trip: 370 L of fresh water, the heater's diesel, the jerry cans, the gear and the food, with the grey tank empty. Weigh the whole trailer on a weighbridge, uncoupled on its jockey wheel, or coupled with only the trailer on the scale and the drawbar at its design height."
     unit: kg
     estimate: {v: null, src: "The model's TC2 mass without growth is shown beside it"}
     measured: {v: null, date: null}
@@ -995,14 +995,14 @@ inputs:
     title: Fresh water the tanks hold, from empty to full through a water meter
     how: "Drain both fresh tanks through the pump until it runs dry, then fill through a garden water meter until the breather overflows. Record the meter's reading."
     unit: L
-    estimate: {v: 372.3, src: "The fresh tanks' 375.3 L net (cad/trailer.py tank_nets, I2-40, with their front corners notched round the hinge gussets, their sides pocketed round the XT kit's airbags, their top brackets and the shocks, I2-97, and the front tank 780 mm long between the XT hinge crossmembers, I2-114) less about 1.5 L a tank left under the pump's dip tube in the rear tank's sump and the balance hose's in the front tank's (est.), water the test from a dry pump cannot count"}
+    estimate: {v: 371.0, src: "The fresh tanks' 374.0 L net (cad/trailer.py tank_nets, I2-40, with their front corners notched round the hinge gussets, their sides pocketed round the XT kit's airbags, their top brackets and the shocks, I2-97, and the front tank 780 mm long between the XT hinge crossmembers, I2-114) less about 1.5 L a tank left under the pump's dip tube in the rear tank's sump and the balance hose's in the front tank's (est.), water the test from a dry pump cannot count"}
     measured: {v: null, date: null}
     stage: trailer built
-    range: {min: null, max: null, src: "Aim: report 21's 400 L. On its table, 41 L a day and 44 L a wash, a week with two washes needs 375 L and a week with three 419 L, so the estimate's 372.3 L is about 6.2 days of water with three washes a week, and a week with two washes needs its fill on the seventh day. No limit either way: water_full_l, the water the design carries, follows the reading with the 3 L under the pickups added back, in H21's 5 L steps down, so a reading of 372 L or more keeps 375 L and one under it takes the design to 370 L. The travel limit (H13) caps what rides"}
+    range: {min: null, max: null, src: "Aim: report 21's 400 L. On its table, 41 L a day and 44 L a wash, a week with two washes needs 375 L and a week with three 419 L, so the estimate's 371.0 L is about 6.2 days of water with three washes a week, and a week with two washes needs its fill on the seventh day. No limit either way: water_full_l, the water the design carries, follows the reading with the 3 L under the pickups added back, in H21's 5 L steps down, so a reading of 372 L or more takes the design back to 375 L, one of 367 L or more keeps 370 L and one under it takes it to 365 L. The travel limit (H13) caps what rides"}
     affects: [the days of water off-grid]
     thresholds:
       - {at: 375, rule: "Under 375 L even a week with two washes, at report 21's 41 L a day and 44 L a wash, needs a fill before it ends: plan the fills, or wash less often", src: "Report 21 section 10.1's table: 7 days of 41 L and two washes of 44 L"}
-      - {at: 359, rule: "Under 359 L a week with three washes needs its fill on the sixth day, a day earlier than with the estimate's 372.3 L, at the week's 59.9 L a day: plan the fills, or wash less often", src: "Report 21 section 10.1's table: 7 days of 41 L and three washes of 44 L, 419 L"}
+      - {at: 359, rule: "Under 359 L a week with three washes needs its fill on the sixth day, a day earlier than with the estimate's 371.0 L, at the week's 59.9 L a day: plan the fills, or wash less often", src: "Report 21 section 10.1's table: 7 days of 41 L and three washes of 44 L, 419 L"}
   - id: TR-03
     group: Trailer tests
     part: trailer
@@ -1071,7 +1071,7 @@ inputs:
     estimate: {v: 5, src: "DauerShower 2.0, maker"}
     measured: {v: null, date: null}
     stage: trailer built
-    range: {min: null, max: 8, src: "Max: at 8 L the water budget rises to 47 L a day and 375 L lasts about 8.0 days without laundry (est.). No lower limit"}
+    range: {min: null, max: 8, src: "Max: at 8 L the water budget rises to 47 L a day and 370 L lasts about 7.9 days without laundry (est.). No lower limit"}
     affects: [the water budget]
   - id: TR-09
     group: Trailer tests

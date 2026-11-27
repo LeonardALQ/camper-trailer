@@ -261,8 +261,9 @@ class Layout:
             self.blocks.extend(self._expand(it))
         self.blocks.extend(self._crossmembers())
         self.zones = {k: dict(name=z["name"], box=_box(*self.P.eval(z["box"], {}))) for k, z in td["zones"].items()}
-        for b in self.tanks():          # each fresh tank's corners notched round the hinge gussets, for its model
-            b.extra["notches"] = self.tank_notches(b)
+        for b in self.blocks:           # each tank notched round the fittings and stepped onto its bearers, for its model
+            if b.box is not None and (b.extra.get("net") or {}).get("notch_clear") is not None:
+                b.extra["notches"] = self.tank_notches(b)
         for b in self.blocks:           # each XT arm's line carries its wheel's parts between the rails, for its model
             if b.id == "RG-01" and b.box is not None:
                 w = next(w for w in self.chassis.suspension if b.box[0] <= w["hub"][0] <= b.box[3]
@@ -275,8 +276,10 @@ class Layout:
                     b.extra["panel"] = dict(sheet=pn[0]["sheet"], t=pn[0]["t"], z_top=self.V["rail_underside_z"] - spec["drop"])
                 b.extra["openings"] = self.guard_openings(b)   # the front piece's openings round the kit, for its model
                 b.extra["hangers"] = self.guard_hanger_parts()  # its hanger angles' legs, for its model
-            elif b.id == "UF-01B":      # the fresh tanks' bearers at their places on the XT crossmembers (I2-109)
-                b.extra["bearers"] = self.tank_bearers()
+            elif b.id in self._bearer_lines():   # the tanks' bearers at their places on the crossmembers (I2-109, I2-122)
+                b.extra["bearers"] = self.tank_bearers(b.id)
+            elif b.id == "UF-09":       # the grey tank's guard's hanger angles' legs, for its model (I2-122)
+                b.extra["hangers"] = self.grey_hanger_parts()
         ids = [b.iid for b in self.blocks]
         dup = {i for i in ids if ids.count(i) > 1}
         if dup:
@@ -589,26 +592,41 @@ class Layout:
         return out
 
     def _bearers_spec(self) -> dict | None:
-        it = next((i for i in self.td["items"] if i["id"] == "UF-01B"), None)
-        return (it or {}).get("bearers")
+        """The fresh tanks' bearers' spec, UF-01B's `bearers`, which also carries the front guard's hangers' bolts."""
+        return self._bearer_lines().get("UF-01B")
 
-    def tank_bearers(self) -> list[dict]:
-        """The fresh tanks' bearers UF-01B (I2-109), each a hot-dip galvanised steel angle bolted through an XT crossmember's
-        web under a tank's end, a pair either side of the centreline at each place the line's `bearers` gives (from and to
-        mm off the centreline): its upright leg on the crossmember's face from `z`, high enough to keep FIT-05's clearance
-        from the arms' pivot tubes and legs over their travel, its foot reaching under the tank's end with the rubber strip
-        on it, and its `bolts` `per` bolts through the upright and the crossmember's web `z` over the foot's underside and
-        `end` from the angle's ends. Each with its tank, member, face, side, Y range, boxes (upright, foot, rubber), bolts
-        and the rubber's top, where the tank's end sits."""
-        sp = self._bearers_spec()
-        if not sp:
-            return []
-        a, bo = sp["angle"], sp["bolts"]
-        zf, rub = float(self.P.eval(sp["z"], {})), float(sp["rubber"])
+    def _bearer_lines(self) -> dict:
+        """Every line that carries a tank's bearers, its id to its `bearers` spec: the fresh tanks' UF-01B and the grey
+        tank's UF-08B (I2-109, I2-122)."""
+        return {i["id"]: i["bearers"] for i in self.td["items"] if i.get("bearers")}
+
+    def tank_bearers(self, line: str | None = None) -> list[dict]:
+        """The tanks' bearers, UF-01B under the fresh tanks (I2-109) and UF-08B under the grey tank (I2-122), or one line's,
+        each a hot-dip galvanised steel angle bolted through a crossmember's webs under a tank's end, a pair either side of
+        the centreline at each place the line's `bearers` gives (from and to mm off the centreline), on the member it names
+        or the crossmember at its `station`: its upright leg on the crossmember's face from `z`, high enough to keep FIT-05's
+        clearance from the arms' pivot tubes and legs over their travel and SVC-01's from the runs, its foot reaching under
+        the tank's end with the rubber strip on it, and its `bolts` `per` bolts through the upright and the crossmember's
+        webs `z` over the foot's underside and `end` from the angle's ends. A place may set its own `z`, `up`, `foot` and
+        `bolt_z`. Each with its line, tank, member, face, side, Y range, boxes (upright, foot, rubber), bolts, the rubber's
+        top, where the tank's end sits, and the angle, bolts and clearances it was placed with."""
+        out = []
+        for lid, sp in self._bearer_lines().items():
+            if line is not None and lid != line:
+                continue
+            out += self._line_bearers(lid, sp)
+        return out
+
+    def _line_bearers(self, lid: str, sp: dict) -> list[dict]:
+        rub = float(sp["rubber"])
         members = {m.id: m for m in self.chassis.members}
+        stations = {m.station: m for m in self.chassis.members if m.role.startswith("cm")}
         out = []
         for pl in sp["places"]:
-            cm = members[pl["member"]]
+            a = dict(sp["angle"], **{k: float(pl[k]) for k in ("up", "foot") if k in pl})
+            bo = dict(sp["bolts"], **({"z": float(pl["bolt_z"])} if "bolt_z" in pl else {}))
+            zf = float(self.P.eval(pl.get("z", sp["z"]), {}))
+            cm = members[pl["member"]] if "member" in pl else stations[pl["station"]]
             e = 1 if pl["face"] == "rear" else -1          # the way the foot reaches from the crossmember's face
             face = cm.p0[0] + e * cm.sec.b / 2
             ux, fx, rx = (tuple(sorted((face + e * u0, face + e * u1))) for u0, u1 in ((0, a["t"]), (0, a["foot"]), (a["t"], a["foot"])))
@@ -618,29 +636,27 @@ class Layout:
                 ys = [ya + bo["end"] + (yb - ya - 2 * bo["end"]) * k / (n - 1) for k in range(n)] if n > 1 else [(ya + yb) / 2]
                 boxes = dict(upright=(ux[0], ya, zf, ux[1], yb, zf + a["up"]), foot=(fx[0], ya, zf, fx[1], yb, zf + a["t"]),
                              rubber=(rx[0], ya, zf + a["t"], rx[1], yb, zf + a["t"] + rub))
-                out.append(dict(id=f"UF-01B-{cm.id}{'F' if e < 0 else 'B'}{'K' if s < 0 else 'R'}", tank=pl["tank"], member=cm.id, face=pl["face"],
-                                face_x=face, e=e, side=s, y=(ya, yb), length=yb - ya, boxes=boxes,
-                                bolts=[(face, y, zf + bo["z"]) for y in ys], z_top=zf + a["t"] + rub))
+                out.append(dict(id=f"{lid}-{cm.id}{'F' if e < 0 else 'B'}{'K' if s < 0 else 'R'}", line=lid, tank=pl["tank"], member=cm.id,
+                                face=pl["face"], face_x=face, e=e, side=s, y=(ya, yb), length=yb - ya, boxes=boxes,
+                                bolts=[(face, y, zf + bo["z"]) for y in ys], z_top=zf + a["t"] + rub,
+                                angle=a, bolt=bo, member_fu=float(sp["member_fu"]), clear=float(sp["clear"])))
         return out
 
-    def bearer_parts(self) -> list[tuple[str, tuple]]:
-        """Every leg and rubber strip of the fresh tanks' bearers (tank_bearers), each (name, box), which the 3D model draws
-        and FIT-03, FIT-05, FIT-08 and SVC-01 read."""
-        return [(f"{br['id']}'s {k}", bx) for br in self.tank_bearers() for k, bx in br["boxes"].items()]
+    def bearer_parts(self, line: str | None = None) -> list[tuple[str, tuple]]:
+        """Every leg and rubber strip of the tanks' bearers (tank_bearers), or one line's, each (name, box), which the 3D
+        model draws and FIT-03, FIT-05, FIT-08 and SVC-01 read."""
+        return [(f"{br['id']}'s {k}", bx) for br in self.tank_bearers(line) for k, bx in br["boxes"].items()]
 
     def _bearer_pockets(self, b, t: float) -> list[dict]:
-        """The steps cut up into tank b's ends over its bearers' feet (tank_bearers, I2-109): from the tank's end to the
-        foot's toe and over the foot's Y range, grown by the line's `clear` on those sides, and from the tank's bottom up
+        """The steps cut up into tank b's ends over its bearers' feet (tank_bearers, I2-109, I2-122): from the tank's end to
+        the foot's toe and over the foot's Y range, grown by the line's `clear` on those sides, and from the tank's bottom up
         to the rubber's top, where the tank's end sits on the rubber. Inside, the tank's `t` walls go round each step."""
-        sp = self._bearers_spec()
-        if not sp:
-            return []
-        c = float(sp["clear"])
         x0, y0, z0, x1, y1, z1 = b.box
         out = []
         for br in self.tank_bearers():
             if br["tank"] != b.id:
                 continue
+            c = br["clear"]
             fx0, ya, _, fx1, yb, _ = br["boxes"]["foot"]
             px0, px1 = (x0, fx1 + c) if br["e"] > 0 else (fx0 - c, x1)
             box = (max(px0, x0), max(ya - c, y0), z0, min(px1, x1), min(yb + c, y1), br["z_top"])
@@ -860,8 +876,8 @@ class Layout:
             return [(bx, None) for bx in boxes]
         if b.extra.get("notches"):
             return self.tank_pieces(b)
-        if b.id == "UF-01B":
-            return [(bx, None) for _, bx in self.bearer_parts()]
+        if b.id in self._bearer_lines():
+            return [(bx, None) for _, bx in self.bearer_parts(b.id)]
         return [(b.box, None)] if b.box is not None else []
 
     def xt_blocks(self) -> list[Block]:
@@ -966,15 +982,17 @@ class Layout:
 
     def kit_fit(self) -> dict:
         """FIT-08 (fx22-rear): every chassis fitting at every place it stands (fitting_parts), both pieces of the tanks'
-        guard UF-03 (guard_pieces) and the front guard's hanger angles (guard_hanger_parts) against the XT kit's parts
-        between the rails (xt_parts), the airbags over their travel and the shocks over the arms', and the hanger angles
-        against the frame's fittings too (I2-104). Each fitting, guard and hanger is welded or bolted to the frame, so it
+        guard UF-03 (guard_pieces), the front guard's hanger angles (guard_hanger_parts), the tanks' bearers (bearer_parts)
+        and the grey guard's hanger angles (grey_hanger_parts) against the XT kit's parts between the rails (xt_parts), the
+        airbags over their travel and the shocks over the arms', and the hangers and bearers against the frame's fittings
+        too (I2-104, I2-109, I2-122). Each fitting, guard and hanger is welded or bolted to the frame, so it
         may touch a part of the kit, as FIT-03 lets two rigid parts touch, and an overlap past TOL is a clash. Every pair
         that clashes, with how far it overlaps."""
         kit = [(p, bx) for p in self.xt_parts() for bx in p["boxes"]]
         fittings = self.fitting_parts()
         hangers = [(n, (bx, None)) for n, bx in self.guard_hanger_parts()]
-        hangers += [(n, (bx, None)) for n, bx in self.bearer_parts()]      # the tanks' bearers too (I2-109)
+        hangers += [(n, (bx, None)) for n, bx in self.bearer_parts()]      # the tanks' bearers too (I2-109, I2-122)
+        hangers += [(n, (bx, None)) for n, bx in self.grey_hanger_parts()]  # and the grey guard's hangers (I2-122)
         ours = fittings + self.guard_pieces() + hangers
         found, worst, worst_pair = {}, math.inf, ""
         pairs_in = [(name, s, p["id"], p["what"], (bx, None)) for name, s in ours for p, bx in kit]
@@ -989,35 +1007,42 @@ class Layout:
         return dict(ok=not pairs, pairs=pairs, smallest_gap_mm=round(worst, 1) + 0.0, governing=worst_pair, parts=len(ours), kit=len(kit))
 
     def tank_loads(self) -> dict:
-        """Each fresh tank's full mass (kg) as CHS-17 and the frame model carry it: the tank with its growth and its share
-        of the full water, `water_full_l`, by its net (tank_nets), with the tank's centre (x, z) and its ends."""
+        """Each tank's full mass (kg) as CHS-17 carries it: each fresh tank with its growth and its share of the full water,
+        `water_full_l`, by its net (tank_nets), and the grey tank UF-08 with its growth and `grey_full_l` of grey water
+        (I2-122), each with the tank's centre (x, z) and its ends."""
         nets = self.tank_nets()
         fresh = {k: v["net_l"] for k, v in nets.items() if v["fresh"]}
         tot = sum(fresh.values())
+        full = [(b, self.V["water_full_l"] * fresh[b.id] / tot) for b in self.tanks()]
+        full += [(b, float(self.V["grey_full_l"])) for b in self.blocks if b.id == "UF-08" and b.id in nets]
         out = {}
-        for b in self.tanks():
-            water = self.V["water_full_l"] * fresh[b.id] / tot
+        for b, water in full:
             out[b.id] = dict(kg=b.mass_kg * (1 + b.growth) + water, tank_kg=b.mass_kg * (1 + b.growth), water_kg=water,
                              x=(b.box[0] + b.box[3]) / 2, z=b.box[2] + (nets[b.id]["water_h_mm"] + 2 * nets[b.id]["wall_mm"]) / 2,
                              x0=b.box[0], x1=b.box[3], name=b.name)
         return out
 
     def fixing_holes(self) -> list[dict]:
-        """The holes the tanks' bearers and the front guard's hangers make in the frame's members (I2-109), as rows in
-        data/services.yaml's form for the hole checks: each bolt through both webs of its crossmember or rail, with its
-        member, face, use, place and size."""
+        """The holes the tanks' bearers and the guards' hangers make in the frame's members (I2-109, I2-122), as rows in
+        data/services.yaml's form for the hole checks: each bolt through both webs of its crossmember, and each rivet nut
+        in a rail's inner web, with its member, face, use, place and size. The fresh tanks' bearers and the front guard's
+        hangers come first, so their rows keep their order, then the grey tank's bearers and its guard's hangers."""
         V, out = self.V, []
-        sp = self._bearers_spec()
         ms = {m.id: m for m in self.chassis.members}
-        if sp:
-            d = float(sp["bolts"]["hole"])
-            for br in self.tank_bearers():
-                m = ms[br["member"]]
+        rail = self.chassis.role_sec["rail"]
+
+        def bearer_rows(brs):
+            rows = []
+            for br in brs:
+                m, d = ms[br["member"]], float(br["bolt"]["hole"])
                 for face, x in (("front", m.p0[0] - m.sec.b / 2), ("rear", m.p0[0] + m.sec.b / 2)):
                     for _, y, z in br["bolts"]:
                         row = dict(member=m.id, face=f"{face} web", use=f"bolt for {br['id']}", x=x, y=y, z=z, d=d, length=d)
-                        if not any(r["member"] == m.id and r["face"] == row["face"] and abs(r["y"] - y) < 1 for r in out):
-                            out.append(row)
+                        if not any(r["member"] == m.id and r["face"] == row["face"] and abs(r["y"] - y) < 1 for r in rows):
+                            rows.append(row)
+            return rows
+
+        out += bearer_rows(self.tank_bearers("UF-01B"))
         h = self.guard_hanger_bolts()
         rail = self.chassis.role_sec["rail"]
         nut = ((self._bearers_spec() or {}).get("hanger_bolts") or {}).get("rail")
@@ -1032,6 +1057,51 @@ class Layout:
                 m = next(m for m in self.chassis.members if m.station == "XT front hinge" and m.role.startswith("cm"))
                 for face, xx in (("front", m.p0[0] - m.sec.b / 2), ("rear", m.p0[0] + m.sec.b / 2)):
                     out.append(dict(member=m.id, face=f"{face} web", use="bolt for UF-03's hanger", x=xx, y=y, z=z, d=dh, length=dh))
+        out += bearer_rows([br for lid in self._bearer_lines() if lid != "UF-01B" for br in self.tank_bearers(lid)])
+        for (x, y, z), dh in self.grey_hanger_bolts():
+            s = 1 if y > 0 else -1
+            out.append(dict(member=f"RL-{'K' if s < 0 else 'R'}", face="inner web", use="rivet nut for UF-09's hanger",
+                            x=x, y=s * (V["rail_c"] - rail.b / 2), z=z, d=dh, length=dh))
+        return out
+
+    def grey_hanger_parts(self) -> list[tuple[str, tuple]]:
+        """The grey tank's guard's hanger angles (UF-09, I2-122), each leg (name, box), which the 3D model draws
+        (guard_hangers) and FIT-08 reads: a pair at each station `at` of the line's guard_hangers, u mm behind the guard's
+        front edge, each angle 50 mm long and 3 mm thick, its upright leg on a rail's inner web over the hangers' envelope's
+        height and its foot `foot` long under the guard plate's edge, upright first."""
+        from .model import products as PR
+        from .trailer_model import model_specs
+        spec = model_specs(self).get("UF-09")
+        b = next((b for b in self.blocks if b.id == "UF-09"), None)
+        if spec is None or b is None:    # the models taken out (cad/tests/test_products.py): no hangers to place
+            return []
+        opts, bx = next(((o, x) for o, x in PR.placements(spec, b, self) if o["name"] == "guard_hangers"), (None, None))
+        if opts is None:
+            return []
+        x0, y0, z0, _, y1, z1 = bx
+        f, L, t = float(opts["foot"]), 50.0, 3.0
+        out = []
+        for u in opts["at"]:
+            xm = x0 + float(u)
+            for side, yw, yf in (("kerb", (y0, y0 + t), (y0, y0 + f)), ("road", (y1 - t, y1), (y1 - f, y1))):
+                name = f"UF-09's hanger on the {side} rail's web at X {xm:,.0f}"
+                out += [(name, (xm - L / 2, yw[0], z0, xm + L / 2, yw[1], z1)), (name, (xm - L / 2, yf[0], z0, xm + L / 2, yf[1], z0 + t))]
+        return out
+
+    def grey_hanger_bolts(self) -> list[tuple]:
+        """The grey guard's hanger angles' bolts (I2-122): one through each upright leg `hanger_bolts` `z` over the angle's
+        foot (UF-08B's `bearers`) into a blind rivet nut in its rail's inner web, so nothing stands on the rail's outer
+        face, each ((x, y, z), hole)."""
+        hb = (self._bearer_lines().get("UF-08B") or {}).get("hanger_bolts")
+        legs = self.grey_hanger_parts()
+        if not hb or not legs:
+            return []
+        hole = float((hb.get("rail") or hb)["hole"])
+        out = []
+        for k in range(0, len(legs) - 1, 2):
+            up = legs[k][1]
+            y = up[1] if up[1] < 0 else up[4]
+            out.append((((up[0] + up[3]) / 2, y, up[2] + float(self.P.eval(hb["z"], {}))), hole))
         return out
 
     def guard_hanger_bolts(self) -> list[tuple]:
@@ -1054,10 +1124,10 @@ class Layout:
         return out
 
     def tank_support(self) -> dict:
-        """CHS-17 (I2-109): the path from each fresh tank to the frame in LC1 to LC3, each case's accelerations on the tank's
-        full mass (tank_loads) at its centre. The front tank stands on its bearers at both ends (tank_bearers), the tank
-        spanning between them as the welded box it is, and the rear tank's front end on its own, its body on the rear
-        bay's shear panel. A tank's two ends share its weight by its centre's place between their bearing lines, and in
+        """CHS-17 (I2-109, I2-122): the path from each tank to the frame in LC1 to LC3, each case's accelerations on the
+        tank's full mass (tank_loads) at its centre. The front fresh tank and the grey tank stand on their bearers at both
+        ends (tank_bearers), each tank spanning between them as the welded box it is, and the rear fresh tank's front end on
+        its own, its body on the rear bay's shear panel. A tank's two ends share its weight by its centre's place between their bearing lines, and in
         braking the forward pull at the centre's height over the feet loads the front pair the more. Each bearer is read
         in its foot's bending at the angle's root, its bolts in shear and tension together (AS 4100 9.3.2.3), the tension
         from the bearing's lever about the upright's heel, and the crossmember's web and the angle's upright at each bolt
@@ -1066,20 +1136,16 @@ class Layout:
         whole tank behind its front bolts, and each of its bolts in tension and its angles' flat legs in bending under
         them. Each reading times the case's factor over its strength, fy for the steel and the AS 4100 capacity with its
         capacity factor for the bolts and the walls, the largest the row's."""
-        sp = self._bearers_spec()
         loads = self.tank_loads()
         ch = self.chassis
         cases = [c for c in ch.data["load_cases"] if c["id"] in ("LC1", "LC2", "LC3")]
         g = 9.81e-3                                      # kN per kg
         rows = []
-        if not sp:
+        brs = self.tank_bearers()
+        if not brs:
             return dict(ok=False, rows=[], worst=None, detail="no bearers")
-        a, bo = sp["angle"], sp["bolts"]
         members = {m.id: m for m in ch.members}
         phi = 0.8
-        Ntf = bo["a_s"] * bo["fuf"] / 1000              # kN, AS 4100 9.3.2.2
-        Vf = 0.62 * bo["fuf"] * bo["a_c"] / 1000        # kN, threads in the shear plane, AS 4100 9.3.2.1
-        brs = self.tank_bearers()
         for tid, L in loads.items():
             mine = [b for b in brs if b["tank"] == tid]
             if not mine:
@@ -1090,7 +1156,7 @@ class Layout:
             for b in mine:
                 rx0, _, _, rx1, _, _ = b["boxes"]["rubber"]
                 line[b["e"]] = ((max(rx0, L["x0"]) + rx1) / 2) if b["e"] > 0 else ((rx0 + min(rx1, L["x1"])) / 2)
-            z_feet = mine[0]["z_top"]
+            z_feet = min(b["z_top"] for b in mine)       # the lower end's rubber where the ends stand at two heights (UF-08B)
             for c in cases:
                 ax, _, az = c["accel"][0]
                 W = L["kg"] * g
@@ -1109,6 +1175,9 @@ class Layout:
                     pair = [b for b in mine if b["e"] == e]
                     Ltot = sum(b["length"] for b in pair)
                     for b in pair:
+                        a, bo = b["angle"], b["bolt"]
+                        Ntf = bo["a_s"] * bo["fuf"] / 1000              # kN, AS 4100 9.3.2.2
+                        Vf = 0.62 * bo["fuf"] * bo["a_c"] / 1000        # kN, threads in the shear plane, AS 4100 9.3.2.1
                         Rb = Re * b["length"] / Ltot
                         lever = abs(line[e] - (b["face_x"] + e * a["t"]))        # the bearing line from the upright's inner face
                         M = Rb * lever * 1000                                       # N mm at the angle's root
@@ -1118,7 +1187,7 @@ class Layout:
                         cm = members[b["member"]]
                         zb = cm.box()[2]
                         ae_web = b["bolts"][0][2] - zb
-                        fu_cm = float(sp["member_fu"])
+                        fu_cm = b["member_fu"]
                         web = min(0.9 * 3.2 * bo["d"] * cm.sec.t * fu_cm, 0.9 * ae_web * cm.sec.t * fu_cm) / 1000
                         pull = 0.9 * 0.6 * fu_cm * math.pi * bo["washer"] * cm.sec.t / 1000
                         ang = min(0.9 * 3.2 * bo["d"] * a["t"] * a["fu"], 0.9 * (a["up"] - bo["z"]) * a["t"] * a["fu"]) / 1000
@@ -1245,8 +1314,8 @@ class Layout:
                 continue
             if b.id == "UF-03" and b.id in specs:  # the guards and the shear panel as cut, and the guard's hanger angles
                 boxes = [s[0] for _, s in self.guard_pieces()] + [bx for _, bx in self.guard_hanger_parts()]
-            elif b.id == "UF-01B":               # the tanks' bearers, each leg and rubber strip
-                boxes = [bx for _, bx in self.bearer_parts()]
+            elif b.id in self._bearer_lines():   # the tanks' bearers, each leg and rubber strip
+                boxes = [bx for _, bx in self.bearer_parts(b.id)]
             elif b.extra.get("notches"):         # a tank as its notched and pocketed slabs (tank_pieces)
                 boxes = [s[0] for s in self.tank_pieces(b)]
             elif "fitting" in b.extra:

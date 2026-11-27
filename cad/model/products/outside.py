@@ -352,11 +352,12 @@ def shear_panel(fr, V, sp, b):
 @product("guard_hangers")
 def guard_hangers(fr, V, sp, b):
     """The 50 mm long aluminium angles a tank guard hangs on, each angle's upright leg bolted to the steel and its foot
-    `foot` long under the plate's edge: a pair at each u station `at` on the envelope's sides where the line gives them,
-    else at the places the layout finds for the front tank's guard (Layout.guard_hanger_parts, I2-104), each leg a box in
-    the model's own coordinates."""
+    `foot` long under the plate's edge, at the places the layout finds for them, the front tank's guard's
+    (Layout.guard_hanger_parts, I2-104) and the grey tank's guard's pair at each u station `at` on the envelope's sides
+    (Layout.grey_hanger_parts, I2-122), each leg a box in the model's own coordinates."""
     out = []
-    if "at" in sp:                       # a pair at each u station `at` on the envelope's sides (the grey tank's guard)
+    legs = (b.extra.get("hangers") or []) if b is not None else []
+    if "at" in sp and not legs:          # a pair at each u station `at` on the envelope's sides, where the layout gives no legs
         D, H, f = fr.D, fr.H, sp["foot"]
         for u in sp["at"]:
             kerb = fr.box(u - 25, 0, 0, 50, 3, H) + fr.box(u - 25, 0, 0, 50, f, 3)
@@ -364,7 +365,6 @@ def guard_hangers(fr, V, sp, b):
             out += [("hanger angle", kerb, ALU, 1.0), ("hanger angle", road, ALU, 1.0)]
         return out
     wbox, _ = _world(fr)
-    legs = (b.extra.get("hangers") or []) if b is not None else []
     for k in range(0, len(legs) - 1, 2):
         out.append(("hanger angle", wbox(legs[k][1]) + wbox(legs[k + 1][1]), ALU, 1.0))
     return out

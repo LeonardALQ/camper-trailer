@@ -545,12 +545,13 @@ def test_a_hole_within_a_weld_run_is_read_outboard_of_its_node():
 
 
 def test_the_bearers_and_hangers_bolt_holes_are_read_by_the_hole_checks():
-    """I2-109, I2-116: every hole the fresh tanks' bearers' bolts and the front guard's hangers' bolts and rivet nuts make
+    """I2-109, I2-116, I2-122: every hole the tanks' bearers' bolts and the guards' hangers' bolts and rivet nuts make
     (Layout.fixing_holes) is a hole CHS-08U, CHS-09, CHS-10 and CHS-12 read, numbered after every other hole so no id
     moves: the rivet nuts' in the rails' inner webs on the composite rail's section, alone, since nothing goes through the
-    outer web beside the front tyre, the bolts' in the XT crossmembers' webs on their crossmember's own, each bolt's hole
-    in one web read with its hole in the other, and every one of them passes."""
+    outer web, the bolts' in the crossmembers' webs the bearers stand on, the XT crossmembers and the rear one, on their
+    crossmember's own, each bolt's hole in one web read with its hole in the other, and every one of them passes."""
     fix = EV["layout"].fixing_holes()
+    bearing = {b["member"] for b in EV["layout"].tank_bearers()}
     bolts = [h for h in RES["holes"] if any(r.startswith(("bolt for", "rivet nut for")) for r in h.get("runs", []))]
     assert fix and len(bolts) == len(fix)
     assert sorted(int(h["id"][2:]) for h in bolts) == list(range(len(RES["holes"]) - len(fix) + 1, len(RES["holes"]) + 1))
@@ -559,7 +560,7 @@ def test_the_bearers_and_hangers_bolt_holes_are_read_by_the_hole_checks():
         h = next(h for h in bolts if h["member"] == f["member"] and math.dist((h["x"], h["y"], h["z"]), (f["x"], f["y"], f["z"])) < 1)
         assert h["runs"] == [f["use"]] and h["d"] == f["d"], h["id"]
         rail = f["member"].startswith("RL-")
-        assert h["frame"] == f["member"] and (rail or f["member"] in hinged), h["id"]
+        assert h["frame"] == f["member"] and (rail or f["member"] in hinged | bearing), h["id"]
         along = (lambda o: o["x"]) if rail else (lambda o: o["y"])
         pair = [o for o in bolts if o is not h and o["member"] == h["member"] and abs(along(o) - along(h)) < 1]
         if f["use"].startswith("rivet nut"):
