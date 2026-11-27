@@ -4,7 +4,9 @@ Detail A draws the XT centre crossmember's kerb-side joint in plan and detail B 
 both at 1:5: the rail, the crossmember's end, the two hinge cheeks, the gusset behind it on its 45 degree line with its
 cut ends on the crossmember and the rail and their welds, and none ahead of it, where the front shocks' brackets stand. Detail C draws the rear tank's bay in plan at
 1:10 with the shear panel's angles, the sheet cut clear of the rear airbags and shocks, its tongues with their radiused roots and its bolts, and detail D a section
-across the rail at the panel at 1:2.5. Nothing here places a part: every line is read from Chassis.hinge_gussets,
+across the rail at the panel at 1:2.5. Detail E draws the hinge bar from below at 1:10 with its weld runs where
+xt_hinges `bar` puts them, and detail F the twin hinge crossmember cut across at 1:5 with its flare-V seams from
+xt_hinges `seam` (I2-128). Nothing here places a part: every line is read from Chassis.hinge_gussets,
 hinge_cheeks, panel_pieces and shear_panels and the data they read, so a part the chassis code moves moves here.
 Cruisemaster's hinge bar is drawn phantom, its size estimated.
 """
@@ -90,6 +92,18 @@ class Joint:
         self.pivot = next(w for w in ch.suspension if w["id"] == "RK")["pivot"]
         self.angle = next(p for p in ch.panel_pieces() if p["use"] == "rail" and p["side"] < 0)
         self.cm_leg = ch.data["member_galvanising_holes"]["cm_xt"]["leg"]
+        self.seam = ch.data["xt_hinges"].get("seam")
+        self.cells = getattr(self.cm.sec, "cells", 1)
+
+    def run_ends(self) -> list[tuple[float, float]]:
+        """Each of the hinge bar's weld runs a side as (start, end) inboard of the rail's inner face (xt_hinges `bar`
+        `runs` centres and `run` length), so the sheet gives what the frame model reads."""
+        half = self.bar["run"] / 2
+        return [(u - half, u + half) for u in self.bar["runs"]]
+
+    def seam_throat(self) -> float:
+        """The twin crossmember's seams' effective throat, `throat_r` of the tubes' outside corner radius (CHS-20)."""
+        return self.seam["throat_r"] * self.cm.sec.ro
 
 
 def _cheek_plan(J: Joint, c: dict) -> list[tuple[float, float]]:
@@ -238,6 +252,71 @@ def _section_b(sh, J: Joint, x0: float, y0: float, k: float = 5.0):
     for x, t in ((hi, "REAR"), (lo, "FRONT")):
         q = v.p(x, z1 + 30.0)
         sh.text(q[0], q[1], t, LABEL, "middle")
+
+
+def _runs_e(sh, J: Joint, x0: float, y0: float, k: float = 10.0):
+    """Detail E: the XT centre's kerb-side hinge bar from below at 1:10, inboard to the right and the front at the top,
+    its top left corner at sheet (x0, y0): the rail, the crossmember's two tubes and their seam, Cruisemaster's bar
+    phantom from the rail's outer face to its inner end, and its weld runs along both of its edges where the data puts
+    them (Joint.run_ends), each run's ends given from the rail's inner face and none under the rail (I2-128)."""
+    inner = J.ch.data["xt_arms"]["parts"]["bar"]["inboard"]
+    lo, hi = -J.rail.b - 25.0, inner + 45.0
+    v = View(x0, y0, lo, J.front - 30.0, k, sb=-1.0)
+    for u in (-J.rail.b, 0.0):
+        v.line(sh, u, J.front - 30.0, u, J.rear + 30.0)
+    for x in (J.front - 30.0, J.rear + 30.0):
+        _brk(sh, v.p(-J.rail.b - 4.0, x), v.p(4.0, x))
+    for x in (J.front, J.rear):
+        v.line(sh, 0.0, x, hi, x)
+    _brk(sh, v.p(hi, J.front - 4.0), v.p(hi, J.rear + 4.0))
+    v.line(sh, 0.0, J.x, hi, J.x, "thin")                             # the seam between the tubes, flush (detail F)
+    v.box(sh, -J.rail.b, J.bar_front, inner, J.rear, "phantom")
+    leg = J.bar["leg"]
+    for s, e in J.run_ends():
+        for x in (J.bar_front, J.rear):
+            v.solid(sh, s, x - leg / 2, e, x + leg / 2)
+    ends = sorted({v2 for se in J.run_ends() for v2 in se})
+    y_top = v.p(0.0, J.front)[1]
+    S.ordinate_h(sh, [v.p(u, 0.0)[0] for u in ends], y_top, y_top + 7.0, [_n(u) for u in ends], size=LABEL)
+    sh.text(v.p(ends[-1], 0.0)[0] + 4.0, y_top + 8.0, "FROM THE RAIL'S INNER FACE", LABEL)
+    s, e = J.run_ends()[1]
+    tip = v.p(0.5 * (s + e), J.rear)
+    weld_symbol(sh, tip, (tip[0] + 6.0, tip[1] - 9.0), _n(leg), both=True, length=_n(J.bar["run"]),
+                note=f"{len(J.bar['runs'])} RUNS A SIDE, AS DIMENSIONED")
+    q = v.p(-J.rail.b / 2, J.rear)
+    S.leader(sh, q, (q[0] - 6.0, q[1] - 8.0), "NO WELD UNDER THE RAIL", size=LABEL)
+
+
+def _seams_f(sh, J: Joint, x0: float, y0: float, k: float = 5.0):
+    """Detail F: the twin hinge crossmember cut across between the rails at 1:5, looking inboard from the kerb side, the
+    front on the left, the centre of its bottom face at sheet (x0, y0): its two tubes, the flare-V groove welds filled
+    flush in the two R15 corners where they meet, top and bottom (xt_hinges `seam`, CHS-20), and Cruisemaster's bar
+    phantom under the rear tube with its front fillet on the bottom seam's flush face and its rear one in the tube's
+    corner (I2-128)."""
+    sec, ro, z0 = J.cm.sec, J.cm.sec.ro, J.z0
+    v = View(x0, y0, J.x, z0, k)
+    bc = sec.b / J.cells
+    for kk in range(J.cells):
+        cx, cy = v.p(J.front + bc * (kk + 0.5), z0 + sec.d / 2)
+        rhs(sh, cx, cy, bc, sec.d, sec.t, ro, k)
+
+    def arc(cx, cz, a0, a1, n=8):
+        return [(cx + ro * math.cos(math.radians(a0 + (a1 - a0) * j / n)), cz + ro * math.sin(math.radians(a0 + (a1 - a0) * j / n)))
+                for j in range(n + 1)]
+    for zf, sg in ((z0, 1), (z0 + sec.d, -1)):                       # the bottom and the top seam
+        pts = arc(J.x - ro, zf + sg * ro, -90 * sg, 0) + arc(J.x + ro, zf + sg * ro, 180, 180 + 90 * sg)
+        sh.path([v.p(*q) for q in pts], "fill", closed=True)
+    bar = J.ch.data["xt_arms"]["parts"]["bar"]
+    v.box(sh, J.bar_front, z0 - bar["d"], J.rear, z0, "phantom")
+    leg = J.bar["leg"]
+    sh.path([v.p(J.bar_front, z0), v.p(J.bar_front - leg, z0), v.p(J.bar_front, z0 - leg)], "fill", closed=True)
+    sh.path([v.p(*q) for q in arc(J.rear - ro, z0 + ro, -90, -45)] + [v.p(J.rear, z0)], "fill", closed=True)
+    th = _n(J.seam_throat())
+    for zf, dx, dy in ((z0 + sec.d, 12.0, 4.0), (z0, -12.0, -9.0)):
+        tip = v.p(J.x, zf)
+        weld_symbol(sh, tip, (tip[0] + dx, tip[1] + dy), th, flare_v=True, note="GMAW, FLUSH")
+    q = v.p(0.5 * (J.bar_front + J.rear), z0 - bar["d"] / 2)
+    S.leader(sh, q, (q[0] + 9.0, q[1] - 7.0), "BAR'S RUNS, DETAIL E", size=LABEL)
 
 
 def _sheet_outline(sheet: dict, steps: int = 6) -> list[tuple[float, float]]:
@@ -473,6 +552,26 @@ def _notes(J: Joint) -> list[str]:
     ]
 
 
+def _seam_note(J: Joint) -> str:
+    """The twin hinge crossmembers' seams in words, from xt_hinges `seam` (CHS-20)."""
+    if J.cells < 2 or not J.seam:
+        return ""
+    return (f"SEAMS (DETAIL F, CHS-20): EACH HINGE CROSSMEMBER'S {J.cells} RHS {_n(J.cm.sec.d)}x{_n(J.cm.sec.cell_b)}x{_n(J.cm.sec.t)} "
+            f"JOINED ALONG THEIR LENGTH BETWEEN THE RAILS' WEBS IN EACH PAIR OF R{_n(J.cm.sec.ro)} CORNERS, TOP AND BOTTOM, BY A "
+            f"{J.seam['rule'].upper()} (THE PROCEDURE'S SECOND TEST PIECE, CMP-14), EFFECTIVE THROAT {_n(J.seam_throat())} (est., "
+            f"{J.seam['throat_r'] * 8:g}/8 R). WELD BOTH SEAMS AND DRESS THE BOTTOM ONE FLUSH BEFORE THE HINGE BAR IS FITTED: THE BAR'S "
+            "FRONT FILLETS RUN ALONG IT.")
+
+
+def _runs_note(J: Joint) -> str:
+    """The hinge bar's weld runs in words, from xt_hinges `bar` (CHS-18, FAT-26)."""
+    runs = ", ".join(f"{_n(s)} TO {_n(e)}" for s, e in J.run_ends())
+    return (f"HINGE BAR RUNS (DETAIL E, CHS-18, FAT-26): {_n(J.bar['leg'])} FILLETS ALONG BOTH OF THE BAR'S TOP EDGES IN "
+            f"{len(J.bar['runs'])} RUNS OF {_n(J.bar['run'])} A SIDE, {runs} INBOARD OF THE RAIL'S INNER FACE, NONE UNDER THE RAIL, "
+            "THE REAR ONES IN THE REAR TUBE'S BOTTOM CORNER. THESE DEPART FROM PAGE 3 OF CRUISEMASTER'S GUIDE, SO CRUISEMASTER AGREES "
+            "IN WRITING BEFORE WELDING (CHASSIS.md ITEM 15).")
+
+
 def ct106(prj, model, bom, checks, reg, dwg):
     t0 = time.time()
     lay, _ = _layout(prj, model)
@@ -490,8 +589,15 @@ def ct106(prj, model, bom, checks, reg, dwg):
     S.cut_marker(sh, p0, p1, (1.0, 0.0), "D")
     _title_of(sh, 318.0, 257.0, "D-D: ACROSS THE RAIL AT THE PANEL", 2.5, "LOOKING REARWARD")
     _section_d(sh, J, 284.0, 160.0)
+    _title_of(sh, 88.0, 63.0, "E: HINGE BAR'S WELD RUNS FROM BELOW", 10, "INBOARD TO THE RIGHT, FRONT AT THE TOP")
+    _runs_e(sh, J, 60.0, 40.0)
+    welds = [n for n in (_runs_note(J), _seam_note(J)) if n]
+    if J.cells > 1 and J.seam:
+        _title_of(sh, 200.0, 122.0, "F: THE TWIN CROSSMEMBER'S SEAMS", 5, "CUT ACROSS, LOOKING INBOARD, FRONT ON THE LEFT")
+        _seams_f(sh, J, 200.0, 80.0)
+    S.notes(sh, 160.0, 60.0, welds, title="WELDS IN E AND F", width_chars=66, size=1.5)
     _parts(sh, J, 24.0, 96.0)
-    S.notes(sh, 276.0, 146.0, _notes(J), width_chars=108, size=1.5)   # wider since the fillers' note, clear of the stamp (I2-118)
+    S.notes(sh, 276.0, 146.0, [n for n in _notes(J) if n], width_chars=108, size=1.5)   # wider since the fillers' note, clear of the stamp (I2-118)
     _draft_stamp(sh, 318.0, 74.0)
     _title(sh, dwg, reg, "SEE CT-101 FOR MASSES (TB-11).", dwg["scale"], chs["revision"])
     S.write(sh, OUT / f"{dwg['number']}.svg")

@@ -90,11 +90,12 @@ def _draft_stamp(sh, x, y):
 
 
 def weld_symbol(sh, tip, elbow, size: str, other_side=False, both=False, all_round=False, length: str = "", note: str = "",
-                bevel=False, size_other: str = "", flare=False):
+                bevel=False, size_other: str = "", flare=False, flare_v=False):
     """AS 1101.3 fillet weld symbol: arrow to the joint, reference line, the triangle below the line for the arrow
     side (above for the other side, both for both sides), the leg size on the left and the length on the right, a
     circle at the elbow for all round. `bevel` draws the single bevel butt weld's symbol in place of the triangle, and
     `flare` the flare-bevel weld's, its upright line and an arc bowed toward it, with the effective throat as its size.
+    `flare_v` draws the flare-V groove weld's, two arcs bowed toward each other, with its effective throat as its size.
     `size_other` gives the other side's leg above the line where both sides are welded to different sizes. The arrow is
     marked as a leader to the joint it points at, so the overrun check sees it (I2-76). With `all_round` it ends on the
     elbow's circle."""
@@ -113,7 +114,11 @@ def weld_symbol(sh, tip, elbow, size: str, other_side=False, both=False, all_rou
     if other_side or both:
         tri.append(1)
     for d in tri:
-        if flare:
+        if flare_v:
+            arc = [math.radians(-104.9 - k * 150.2 / 6) for k in range(7)]
+            for m in (1, -1):
+                sh.path([(xm + m * (1.645 + 1.345 * math.cos(a)), ey + d * (1.3 + 1.345 * math.sin(a))) for a in arc], "medium")
+        elif flare:
             sh.line(xm - 1.3, ey, xm - 1.3, ey + d * 2.6, "medium")
             arc = [math.radians(-104.9 - k * 150.2 / 6) for k in range(7)]
             sh.path([(xm + 1.645 + 1.345 * math.cos(a), ey + d * (1.3 + 1.345 * math.sin(a))) for a in arc], "medium")
