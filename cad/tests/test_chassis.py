@@ -255,7 +255,7 @@ def test_every_closed_section_drains_and_vents_in_the_dip():
     area, and the lower drawbar member, whose mitre is its low point, drains there."""
     g = RES["galvanising"]
     assert g["sections"] and all(r["ok"] for r in g["sections"])
-    assert {"RL-K", "DB-K", "DB-R", "CM-04", "DB-BR"} <= {r["id"] for r in g["sections"]}
+    assert {"RL-K", "DB-K", "DB-R", "CM-04.1", "CM-04.2", "DB-BR"} <= {r["id"] for r in g["sections"]}   # the twin's two tubes
     mitre = [h for h in g["holes"] if h["tube"] in ("DB-KB", "DB-RB") and h["use"] == "drain"]
     assert len(mitre) == 4 and all(abs(h["x"] - CH.V["body_x0"] - 40) < 10 for h in mitre)
     assert max(r["low_depth"] for r in g["sections"] if r["id"].startswith("DB-") and r["id"] != "DB-BR") <= g["max_depth"]
