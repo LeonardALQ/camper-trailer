@@ -3190,7 +3190,7 @@ def recovery_rule(results: dict, lc8: dict) -> dict:
     return dict(rated_kn=lc8["force_n"] / 1000, free_kn=rule["free"] / 1000, held_wheel_kn=rule["wheel"] / 1000,
                 held_axle_kn=rule["axle"] / 1000, sideways_deg=lc8["sideways_deg"], vertical_deg=lc8["vertical_deg"],
                 coupling=bool(lc8.get("coupling")), margin=margin, reach_kn=tp["reach_kn"], classes=classes, slide=slide,
-                level_tips=any(x["tip"] for x in tp["least"] if x["v"] == 0))
+                mu_hi=max(lc8["reaction"].get("mu") or [0.8]), level_tips=any(x["tip"] for x in tp["least"] if x["v"] == 0))
 
 
 def net_section(gross: dict, strips: list[dict], levers, y_lever: float, face_w: float, d_wall: float) -> dict:

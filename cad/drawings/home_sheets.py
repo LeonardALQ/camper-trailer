@@ -324,12 +324,14 @@ def ct003(prj, model, bom, checks, reg, dwg):
     ]
     y = S.table(sh, 22, 186, [("ITEM", 25), ("THE RULE AND ITS SOURCE", 84), ("THE DESIGN", 72), ("RESULT", 25)], rows, size=1.32,
                 row_h=2.95, title="VSB1 AND THE STANDARDS, ITEM BY ITEM (report 02 section 2, VSB1 REV 6)")
-    S.notes(sh, 22, y - 5, [
+    yl, _ = S.notes(sh, 22, y - 5, [
         f"WIDTH, HEIGHT AND LENGTHS ARE MEASURED ON THE 3D MODEL AT DESIGN RIDE HEIGHT. THE BODY IS {V['body_width']:,.0f} mm. THE ENTRY DOOR'S HANDLE, THE WINDOW FRAMES AND THE HOODS TAKE IT TO {ch['overall_width']:,.0f} mm. THE AWNING SITS ON THE ROOF INSIDE THE BODY WIDTH.",
         "LAMPS, REFLECTORS AND THE NUMBER PLATE ARE SCHEDULED ON CT-011 AND DRAWN ON EACH WALL THERE. THE REAR VIEW SHOWS THEM WITH THEIR "
         "HEIGHTS, AND THE TABLE AT RIGHT GIVES EVERY CHECK (cad/lamps.py, data/services.yaml).",
         "THE WET ROOM HAS ITS OWN OUTSIDE DOOR, SO A 2 kg ABE EXTINGUISHER STANDS BY EACH OUTSIDE DOOR. THE WET ROOM IS COVERED WHETHER OR NOT IT COUNTS AS A SECOND COMPARTMENT FOR VSB1 13.2.2.",
     ], width_chars=185, size=1.45)
+    rec = _recovery(tv)
+    _recovery_block(sh, yl - 6, rec)
 
     # ---- right column: operating limits, the plate, notes
     yb = title(sh, dwg, reg, f"ATM PLATE {rep['caps']['plated']:,.0f} kg. TARE ON THE PLATE FROM THE WEIGHBRIDGE (TW-03) (TB-11).",
@@ -357,7 +359,7 @@ def ct003(prj, model, bom, checks, reg, dwg):
         ("THE UTE (H14)", f"FORD RANGER SUPER DUTY ON FORD'S RATINGS: {lim['gvm_kg']:,.0f} kg GVM, REAR AXLE {lim['rear_axle_kg']:,.0f} kg "
                           f"({_kg(uc['UTE-03']['measured'])} kg TOWING WITH GROWTH)."),
         ("COUPLING HEIGHT", f"{V['coupling_z']:.0f} mm LADEN, PLUS OR MINUS 20 mm. SET THE HITCH'S DROP AT THE FINAL WEIGHING (TW08)."),
-        ("RECOVERY (LC8a, I2-93)", _recovery_line()),
+        ("RECOVERY (LC8a, I2-127)", rec["where"]),
         ("GREY WATER", f"EMPTY FOR TRAVEL. A FULL {V['grey_full_l']:.0f} L TANK IS CHECKED IN CASES TC7 AND TC8."),
         ("LEADS (DIM-04, DIM-08)", "PLUG IN THE SB50 LEAD AND THE 12-PIN LEAD. EACH STAYS CLAMPED ON THE LEADS' BRACKET AHEAD OF THE STONE GUARD "
                                    "AND STRAPPED AT ITS MARK TO THE SEAT ON ITS SPRUNG ARM (CT-601), WHICH LIFTS ITS SLACK. KEEP BOTH ARMS FREE TO SWING. "
@@ -413,33 +415,86 @@ def ct003(prj, model, bom, checks, reg, dwg):
     return time.time() - t0
 
 
-def _recovery_line() -> str:
-    """CT-003's recovery rule (I2-93, I2-100, I2-114), from LC8a's data and the frame analysis (chassis_fea.recovery_rule)."""
+RECOVERY_POINTS = (("front", "FRONT LUG"), ("rear", "REAR TONGUE"), ("coupling", "COUPLING"))
+RECOVERY_COLUMNS = ((("free", "low"), "EVERY WHEEL SEEN FREE, LINE LEVEL OR FALLING"), (("free", "up"), "EVERY WHEEL SEEN FREE, LINE RISING"),
+                    (("unseen", "any"), "A WHEEL NOT SEEN FREE"))
+
+
+def recovery_table(r: dict) -> list[list[str]]:
+    """The recovery classes of chassis_fea.recovery_rule as the user reads them: a row for each point, a column for each
+    wheel state and line, each cell its class's limit."""
+    cl = {(c["at"], c["wheels"], c["line"]): c for c in r["classes"]}
+    return [[name] + [f"{cl[(at, w, ln)]['limit_kn']:g} kN" for (w, ln), _ in RECOVERY_COLUMNS] for at, name in RECOVERY_POINTS]
+
+
+def tip_words(t: dict) -> str:
+    """Where and which way a tipping pull of chassis_fea.tipping_pulls is pulled, in CT-003's words."""
+    at = {"front": "A FRONT LUG", "rear": "A REAR TONGUE"}.get(t["where"], "THE COUPLING")
+    way = "UP" if t["v"] > 0 else "DOWN"
+    if not t["h"]:
+        return f"{at} PULLED ALONG ITS LINE AND {abs(t['v']):g} DEGREES {way}"
+    side = "ACROSS THE TRAILER" if (t["h"] > 0) != (t["side"] > 0) else "OUTWARD"
+    return f"{at} PULLED {abs(t['h']):g} DEGREES {side} AND {abs(t['v']):g} DEGREES {way}"
+
+
+def recovery_tips(r: dict) -> list[dict]:
+    """The tipping pulls the recovery classes' limits rest on (chassis_fea.recovery_rule), the least in each direction,
+    least first."""
+    out: dict = {}
+    for c in r["classes"]:
+        t = c["tip"]
+        if t and c["governs"] != "fail checks":
+            key = tip_words(t)
+            if key not in out or t["kn"] < out[key]["kn"]:
+                out[key] = t
+    return sorted(out.values(), key=lambda t: t["kn"])
+
+
+def recovery_texts(results: dict, lc8: dict, tv: dict) -> dict:
+    """CT-003's recovery rule (I2-93, I2-100, I2-114, I2-127), from LC8a's data and the frame analysis
+    (chassis_fea.recovery_rule): where the trailer may be pulled, for its operating limits, the classes' limits as a
+    table a user reads by the point and what is seen, and the rules that go with them as notes: how the force at the
+    point is known, no kinetic rope or snatch strap, the ute's own traction, which wheel is not free, each tipping pull
+    a limit rests on with its own direction, the slide on wet ground and where people stand."""
+    from ..chassis_fea import recovery_rule
+    r = recovery_rule(results, lc8)
+    vd, sd = r["vertical_deg"], r["sideways_deg"]
+    gvm = tv["limits"]["gvm_kg"]
+    traction = r["mu_hi"] * gvm * 9.81 / 1000
+    cols = [("THE LINE ON", 30)] + [(h, w) for (_, h), w in zip(RECOVERY_COLUMNS, (66, 56, 54))]
+    return dict(
+        where=f"PULL AT A FRONT LUG OR A REAR TONGUE WITHIN {sd:g} DEGREES SIDEWAYS, OR AT THE COUPLING ALONG THE TRAILER'S LINE ONLY, "
+              f"ALL WITHIN {vd:g} DEGREES UP OR DOWN, AND NO HARDER THAN THE RECOVERY LIMITS AT LOWER LEFT ALLOW FOR WHAT YOU SEE.",
+        cols=cols, rows=recovery_table(r),
+        notes=[
+            "THE LIMIT IS THE FORCE AT THE POINT. READ IT WITH A LOAD CELL AT THE POINT, OR PULL WITH A WINCH WHOSE RATED LINE PULL ON THE "
+            "LAYER IN USE IS NO MORE THAN THE LIMIT. A SNATCH BLOCK AT THE POINT DOUBLES THE FORCE THERE, SO A WINCH RIGGED THROUGH ONE "
+            "PULLS AT MOST HALF THE LIMIT.",
+            "NEVER USE A KINETIC ROPE OR A SNATCH STRAP ON THE TRAILER: THEIR PEAK FORCE IS NOT KNOWN. THE UTE'S OWN TRACTION REACHES "
+            f"ABOUT {traction:.0f} kN AT ITS {gvm:,.0f} kg GVM ON GROUND GRIPPING AT {r['mu_hi']:g} (EST.), SO THE UTE PULLS THE TRAILER, "
+            f"COUPLED OR ON A STATIC STRAP, ONLY WHERE THE LIMIT IS {r['free_kn']:g} kN.",
+            "A WHEEL YOU CANNOT SEE DOWN TO THE GROUND, OR ONE AGAINST A ROCK, LOG, STUMP OR BANK, IS NOT FREE.",
+            f"EACH LIMIT IS THE FRAME'S OR {r['margin'] * 100:.0f} % OF THE LEAST PULL THAT TIPS THE TRAILER IN ITS CELL, EMPTY OR FULL, "
+            "COUPLED OR NOT, THE LESSER. THE EMPTY TRAILER TIPS FROM " + ", ".join(f"{t['kn']:.1f} kN AT {tip_words(t)}" for t in recovery_tips(r)) + ".",
+            f"ON WET GRASS A SIDEWAYS PULL SLIDES THE EMPTY TRAILER TOWARD IT FROM {r['slide']['kn']:.1f} kN.",
+            "WHILE THE LINE IS LOADED EVERYONE STANDS AT LEAST 1.5 TIMES THE LINE'S LENGTH AWAY, OUT OF ITS LINE AND OFF THE SIDE THE "
+            "TRAILER CAN SLIDE OR TIP TOWARD, AND NOBODY STEPS OVER IT (QUEENSLAND'S OFFICE OF FAIR TRADING, WARN'S BASIC GUIDE TO WINCHING).",
+        ])
+
+
+def _recovery(tv: dict) -> dict:
+    """CT-003's recovery texts from the build's frame analysis (build/chassis/chassis.json) and the ute's limits."""
     import json
 
     from ..build import BUILD
-    from ..chassis_fea import recovery_rule
     cj = json.loads((BUILD / "chassis" / "chassis.json").read_text())
-    r = recovery_rule(cj["results"], next(lc for lc in cj["load_cases"] if lc["id"] == "LC8a"))
-    vd = r["vertical_deg"]
-    sides = [x for x in (r["sideways_up_kn"], r["sideways_down_kn"]) if x is not None]
-    alongs = [x for x in (r["along_up_kn"], r["along_down_kn"]) if x is not None]
-    ups = [(x, w) for x, w in ((r.get("coupling_up_kn"), "UP"), (r.get("coupling_down_kn"), "DOWN")) if x is not None]
-    at = (f"FRONT LUGS OR REAR TONGUES WITHIN {r['sideways_deg']:g} DEGREES SIDEWAYS, OR THE COUPLING ALONG THE TRAILER'S LINE ONLY, "
-          f"ALL WITHIN {vd:g} DEGREES UP OR DOWN:" if r.get("coupling")
-          else f"FRONT LUGS OR REAR TONGUES ONLY, WITHIN {r['sideways_deg']:g} DEGREES SIDEWAYS AND {vd:g} DEGREES UP OR DOWN:")
-    limits = (f"{at} {r['free_kn']:g} kN WITH EVERY WHEEL FREE, {r['held_wheel_kn']:g} kN WITH ONE WHEEL HELD FAST, OR "
-              f"{r['held_axle_kn']:g} kN WITH BOTH WHEELS OF ONE AXLE HELD FAST.")
-    if not sides and not alongs and not ups:             # no pull within the limits tips it (I2-121)
-        return limits + " WITHIN THESE LIMITS THE TRAILER DOES NOT TIP, LEVEL OR PULLED UP OR DOWN."
-    tips = []
-    if sides or alongs:
-        tips.append(f"PULLED {vd:g} DEGREES UP OR DOWN AT A LUG OR TONGUE THE EMPTY TRAILER CAN TIP FROM " + " AND ".join(
-            ([f"{min(sides):.1f} kN AT {r['sideways_deg']:g} DEGREES SIDEWAYS"] if sides else []) + ([f"{min(alongs):.1f} kN ALONG ITS LINE"] if alongs else [])))
-    if ups:
-        x, way = min(ups)
-        tips.append(f"PULLED {vd:g} DEGREES {way} AT THE COUPLING THE EMPTY TRAILER CAN TIP FROM {x:.1f} kN")
-    return limits + " PULL LEVEL: " + ", AND ".join(tips) + "."
+    return recovery_texts(cj["results"], next(lc for lc in cj["load_cases"] if lc["id"] == "LC8a"), tv)
+
+
+def _recovery_block(sh, y: float, rec: dict) -> float:
+    """CT-003's recovery limits under the left column's notes (I2-127): the table and its notes. Returns the y below."""
+    yt = S.table(sh, 22, y, rec["cols"], rec["rows"], size=1.32, row_h=2.95, title="RECOVERY LIMITS AT THE POINT (LC8a, I2-127)")
+    return S.notes(sh, 22, yt - 5, rec["notes"], title="RECOVERY RULES", width_chars=185, size=1.45)[0]
 
 
 def _lamp_checks(sh, LM, y):
