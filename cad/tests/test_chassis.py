@@ -408,25 +408,22 @@ def test_lc8a_reads_one_held_wheel_at_the_held_wheel_limit():
 
 
 def test_trailer_md_gives_the_recovery_rule():
-    """I2-93, I2-100 and I2-114: TRAILER.md's recovery rule quotes LC8a's rating and directions, the held-wheel and
-    held-axle limits and the least pulls that tip the trailer, from the data and the frame analysis
-    (chassis_fea.recovery_rule), as CT-003 does."""
+    """I2-93, I2-100, I2-114 and I2-127: TRAILER.md's recovery rule quotes LC8a's rating and directions and the frame's
+    three limits, the fail checks' rule with every wheel free, one wheel held and an axle held, which the user's classes
+    take the lesser of with their tipping pulls (chassis_fea.recovery_rule, test_recovery's tests of the classes)."""
     from pathlib import Path
 
     from cad.chassis_fea import recovery_rule
     r = recovery_rule(RES, next(lc for lc in CH.data["load_cases"] if lc["id"] == "LC8a"))
     text = (Path(__file__).resolve().parents[2] / "TRAILER.md").read_text()
-    line = next(x for x in text.splitlines() if x.startswith("- Recovery:"))
-    sides = [x for x in (r["sideways_up_kn"], r["sideways_down_kn"]) if x is not None]
-    alongs = [x for x in (r["along_up_kn"], r["along_down_kn"]) if x is not None]
-    coupling = [x for x in (r["coupling_up_kn"], r["coupling_down_kn"]) if x is not None]     # along the rail axis only (I2-124)
-    tips = [f"{min(x):.1f} kN" for x in (sides, alongs, coupling) if x]
-    for figure in (f"{r['rated_kn']:.1f} kN", f"{r['free_kn']:g} kN", f"{r['held_wheel_kn']:g} kN", f"{r['held_axle_kn']:g} kN",
-                   *tips, f"{r['sideways_deg']:g} degrees", f"{r['vertical_deg']:g} degrees"):
-        assert figure in line, figure
-    assert "coupling along the trailer's line only" in line
-    if not tips:                                      # no pull within the limits tips the trailer (I2-121)
-        assert "does not tip" in line
+    i = next(k for k, x in enumerate(text.splitlines()) if x.startswith("- Recovery:"))
+    rest = text.splitlines()[i + 1:]
+    block = " ".join([text.splitlines()[i]] + rest[:next((k for k, x in enumerate(rest) if x.startswith(("- ", "#"))), len(rest))])
+    frame = (f"{r['free_kn']:g} kN with every wheel free, {r['held_wheel_kn']:g} kN with one wheel held fast and "
+             f"{r['held_axle_kn']:g} kN with both wheels of one axle held fast")
+    for figure in (f"{r['rated_kn']:.1f} kN", frame, f"{r['sideways_deg']:g} degrees", f"{r['vertical_deg']:g} degrees"):
+        assert figure in block, figure
+    assert "coupling along the trailer's line only" in block
 
 
 def test_lc8a_reads_every_wheel_free_at_the_free_limit():
