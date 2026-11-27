@@ -125,7 +125,7 @@ lines:
     qty: 605
     unit: kg galvanised
     covers: [CH-G01]
-    price: {aud_each: 2.75, basis: estimate, url: "https://www.steel.org.au/getattachment/2f694ebb-98a7-4273-be94-e0f61bd74328/Cost-factors-for-hot-dip-galvanised-coatings_INGALSM3.pdf", date: 2026-11-23, note: "585.3 kg of steel with the 4 mm rails (CHS-08A at the 4,000 kg plate), the 6 mm drawbar (FAT-07), the two 6 mm rear crossmembers (CHS-08U), the two RHS 150 x 100 x 6 hinge crossmembers (I2-114, 11.0 kg more than at 150 x 50 x 6), their cheeks, the four shock plates (CHASSIS.md revision V) and the rear tank bay's angles (CHS-12, CHS-13), 16.7 kg of zinc and the guard frame and hangers, 600.3 kg galvanised. Galvanisers charge by the galvanised mass. The industry's AUD 1.20/kg for light fabrications is an older figure, so AUD 2.75/kg allows for rises and a one-off frame (research report 22). No NSW bath takes the 2.4 m frame level across, so it goes in one dip at Valmont Coatings Hexham, rolled about 46 degrees across (CHASSIS.md revision N)"}
+    price: {aud_each: 2.75, basis: estimate, url: "https://www.steel.org.au/getattachment/2f694ebb-98a7-4273-be94-e0f61bd74328/Cost-factors-for-hot-dip-galvanised-coatings_INGALSM3.pdf", date: 2026-11-23, note: "588.3 kg of steel with the 4 mm rails (CHS-08A at the 4,000 kg plate), the 6 mm drawbar (FAT-07), the two 6 mm rear crossmembers (CHS-08U), the two RHS 150 x 100 x 6 hinge crossmembers (I2-114, 11.0 kg more than at 150 x 50 x 6), their cheeks and the cheeks' fillers (CHASSIS.md revision AB), the four shock plates (CHASSIS.md revision V) and the rear tank bay's angles (CHS-12, CHS-13), and 16.7 kg of zinc, 605 kg galvanised, as CHASSIS.md gives them, with the stone guard's frame and the mud flap hangers in the same dip (I2-123). The note gave 585.3 kg and 600.3 kg until 27 Nov 2026. Galvanisers charge by the galvanised mass. The industry's AUD 1.20/kg for light fabrications is an older figure, so AUD 2.75/kg allows for rises and a one-off frame (research report 22). No NSW bath takes the 2.4 m frame level across, so it goes in one dip at Valmont Coatings Hexham, rolled about 46 degrees across (CHASSIS.md revision N)"}
   # ================================================================ running gear service
   - id: ALN-01
     group: running_gear
@@ -308,7 +308,7 @@ savings:
     name: A plain low-flow shower in place of the DauerShower 2.0
     removes: {lines: [WR-09, WR-10]}
     mass_kg: -9
-    costs: "Two 20 min showers at 6 L/min use about 240 L a day in place of about 10 L, so the budget rises to 271 L a day and the 375 L aboard lasts about 1.4 days. The shower requirement (two hot 20 min showers a day) fails"
+    costs: "Two 20 min showers at 6 L/min use about 240 L a day in place of about 10 L, so the budget rises to 271 L a day and the 370 L aboard lasts about 1.4 days. The shower requirement (two hot 20 min showers a day) fails"
   - id: SV-05
     name: A fixed bed at the night height in place of the lift bed
     removes: {lines: [LB-04, LB-04M, LB-05, LB-06], parts: [{line: CON-09, item: "Lippert HappiJac kit"}]}

@@ -164,7 +164,7 @@ they are threaded through (`inside`).
   tied in the tray, its loop long enough for the arm's travel (cad/routes.py lead_slack). The clip stands low enough
   that its loop keeps SVC-01's 20 mm from the arm's hinge plates over the arm's travel, which SVC-13 reads (cad/routes.py
   loop_gaps), 20.3 mm at its least under the inner plate. cad/routes.py lays that arm part on the arm at ride height and
-  FIT-05 sweeps it with the arm through its travel (`rides: arm`), 71.5 mm clear at its least. The leads are 2.5 mm2
+  FIT-05 sweeps it with the arm through its travel (`rides: arm`), 72.0 mm clear at its least. The leads are 2.5 mm2
   (est.), so the front drums' 1.9 m keep 2 % from the TSC with Bosch's harness ahead of them, 1.19 % at the brake.
 - The desk reaches the floor, so its outlets and USB panel are in a power module in the desk top, fed up the front
   wall's kerb corner (G17 for 230 V, G23 for 24 V, 70 mm apart) and through the desk's front leg. The e2 fans C and D

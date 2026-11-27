@@ -29,7 +29,7 @@ GROUPS = [
     ("Fresh tanks at the travel limit", ("UF-01", "UF-01R", "UF-03"),
      "Angle bearers on 10 mm rubber bolted to the XT crossmembers, padded stainless straps"),
     ("Grey tank, full", ("UF-08", "UF-08W", "UF-09"),
-     "Angle bearers between the XT rear shock and rear crossmembers, strapped up to the grey-bay crossmember"),
+     "Angle bearers on 10 mm rubber bolted to the XT rear shock and rear crossmembers (UF-08B), padded stainless straps"),
     ("Drawbar box, generators and fuel", ("DX-01", "GS-01", "GS-02", "GS-04", "PL-03A"),
      "Brackets across the drawbar members at X 1,150 to 1,470"),
 ]

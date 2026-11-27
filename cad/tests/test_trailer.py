@@ -111,7 +111,7 @@ def test_each_fresh_tank_stands_on_bearers_of_its_own_and_chs17_reads_its_path()
     in both webs of each crossmember they stand on, which Layout.fixing_holes lists for the hole checks."""
     lay = EV["layout"]
     tanks = {t.id for t in lay.tanks()}
-    brs = lay.tank_bearers()
+    brs = lay.tank_bearers("UF-01B")
     assert {b["tank"] for b in brs} == tanks
     for t in lay.tanks():
         steps = [n for n in t.extra["notches"] if str(n.get("fitting", "")).startswith("UF-01B")]
@@ -120,12 +120,47 @@ def test_each_fresh_tank_stands_on_bearers_of_its_own_and_chs17_reads_its_path()
     ts = lay.tank_support()
     assert ts["ok"], ts["detail"]
     assert {r["case"] for r in ts["rows"]} == {"LC1", "LC2", "LC3"}
-    assert {r["tank"] for r in ts["rows"]} == tanks
+    assert {r["tank"] for r in ts["rows"]} >= tanks
     assert {r["part"] for r in ts["rows"]} >= {b["id"] for b in brs} | {"PNL-1"}
     holes = lay.fixing_holes()
     for b in brs:
         for face in ("front web", "rear web"):
             assert any(h["member"] == b["member"] and h["face"] == face for h in holes), (b["id"], face)
+
+def test_the_grey_tank_stands_on_bearers_of_its_own_and_its_guard_hangs_clear_under_it():
+    """I2-122: the grey tank's ends stand on bearers of its own on the XT rear shock and rear crossmembers (UF-08B,
+    Layout.tank_bearers), the tank stepped onto each bearer's rubber and sitting on it, and CHS-17 reads every one of them
+    in LC1 to LC3 within its strength. Wherever the tank lies over its guard UF-09 in plan it stands grey_guard_gap over
+    the guard's top, so the guard carries only itself, and the guard's hangers stand on the rails' inner webs ahead of the
+    rear recovery tongues. The bearers' bolts make holes in both webs of each crossmember they stand on, and the hangers'
+    rivet nuts in the rails' inner webs alone, which Layout.fixing_holes lists for the hole checks."""
+    from cad.trailer import shape_gap
+    lay = EV["layout"]
+    tank, guard = lay.find("UF-08"), lay.find("UF-09")
+    brs = lay.tank_bearers("UF-08B")
+    assert {b["tank"] for b in brs} == {"UF-08"} and {b["e"] for b in brs} == {1, -1}
+    steps = [n for n in tank.extra["notches"] if str(n.get("fitting", "")).startswith("UF-08B")]
+    assert len(steps) == len(brs) and all(n["box"][2] == tank.box[2] and n["box"][5] > tank.box[2] for n in steps)
+    for b in brs:
+        g = min(shape_gap(piece, (bx, None)) for piece in lay.tank_pieces(tank) for bx in b["boxes"].values())
+        assert abs(g) <= 0.5, f"{b['id']} {g:.1f} mm from the grey tank, which sits on its rubber"
+    ts = lay.tank_support()
+    grey = [r for r in ts["rows"] if r["tank"] == "UF-08"]
+    assert {r["case"] for r in grey} == {"LC1", "LC2", "LC3"} and {r["part"] for r in grey} == {b["id"] for b in brs}
+    assert all(r["util"] <= 1.0 for r in grey), max(grey, key=lambda r: r["util"])
+    over = [p[0][2] - guard.box[5] for p in lay.tank_pieces(tank)
+            if min(p[0][3], guard.box[3]) > max(p[0][0], guard.box[0]) and min(p[0][4], guard.box[4]) > max(p[0][1], guard.box[1])]
+    assert over and min(over) >= lay.V["grey_guard_gap"] - 0.1, min(over)
+    tongues = [bx for n, bx in lay.fitting_parts() if n.startswith("CH-P05")]
+    for name, leg in lay.grey_hanger_parts():
+        assert all(shape_gap((leg, None), t) > 0 for t in tongues), name
+    holes = lay.fixing_holes()
+    for b in brs:
+        for face in ("front web", "rear web"):
+            assert any(h["member"] == b["member"] and h["face"] == face and h["use"] == f"bolt for {b['id']}" for h in holes), (b["id"], face)
+    nuts = [h for h in holes if h["use"] == "rivet nut for UF-09's hanger"]
+    assert len(nuts) == len(lay.grey_hanger_parts()) // 2 and all(h["member"].startswith("RL-") and h["face"] == "inner web" for h in nuts)
+
 
 def test_the_fresh_tanks_keep_their_clearance_to_every_fitting_they_are_notched_round():
     """FIT-03 reads every place of every chassis fitting (Layout.shapes), each hinge gusset as the prism of its cut

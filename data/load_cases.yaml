@@ -2,7 +2,7 @@
 # ballast. `water_l` is the fresh water in the tanks, an expression over the trailer parameters. `load` lists the
 # payload tags carried (assemblies/trailer.yaml): fuel (the heater's diesel and the jerry cans in the drawbar box),
 # gear (food, clothes and other gear, 150 kg) and grey (130 L in the grey tank). H13 and H21 as amended 23 Nov 2026: at
-# most 375 L of fresh and grey water ride while towing, the fresh tanks' whole net with the grey tank empty (I2-40), or less fresh
+# most 370 L of fresh and grey water ride while towing, the fresh tanks' whole net with the grey tank empty (I2-40), or less fresh
 # water with grey water aboard. The grey tank is empty for travel except in TC7 and TC8, which must still pass every limit. Every case here is one the trailer may be towed in, so every one
 # is a travel case for the towball checks.
 trailer_cases:
@@ -13,7 +13,7 @@ trailer_cases:
     load: []
   - id: TC2
     name: Travel fully loaded
-    aboard: 375 L of fresh water, the full tanks and the travel limit (H13 and H21), fuel and gear
+    aboard: 370 L of fresh water, the full tanks and the travel limit (H13 and H21), fuel and gear
     water_l: water_travel_l
     load: [fuel, gear]
     towball_target: true
@@ -24,7 +24,7 @@ trailer_cases:
     load: [fuel, gear]
   - id: TC4
     name: Water at the travel limit, no gear
-    aboard: 375 L of fresh water and fuel, no gear
+    aboard: 370 L of fresh water and fuel, no gear
     water_l: water_travel_l
     load: [fuel]
   - id: TC5
@@ -39,7 +39,7 @@ trailer_cases:
     load: [fuel]
   - id: TC7
     name: Grey tank full, at the travel limit
-    aboard: 130 L of grey water and 245 L of fresh water (375 L in all, H13 and H21), fuel and gear
+    aboard: 130 L of grey water and 240 L of fresh water (370 L in all, H13 and H21), fuel and gear
     water_l: water_travel_l - grey_full_l
     load: [fuel, gear, grey]
   - id: TC8
