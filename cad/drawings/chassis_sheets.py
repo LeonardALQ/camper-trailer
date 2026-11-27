@@ -488,13 +488,13 @@ def ct102(prj, model, bom, checks, reg, dwg):
         f = ch_f.get(fid)
         kg = f"{f.mass_kg:.1f}" if f else next(f"{m['mass_kg']:.1f}" for m in chs["members"] if m["id"] == fid)
         rows.append([item, fid, desc[:70], kg])
-    # the two tables stand 2 mm higher and 1 mm closer since CHS-18 and CHS-19 added two local checks, so the second
-    # ends clear of detail C's title (I2-119)
-    yt = S.table(sh, 232.0, 196.0, [("ITEM", 10), ("MARK", 16), ("DESCRIPTION", 134), ("kg", 16)], rows, size=1.6, row_h=2.8,
+    # the two tables stand 3 mm higher and 2 mm closer since CHS-18, CHS-19 and CHS-20 added three local checks, so the
+    # second ends clear of detail C's title (I2-119)
+    yt = S.table(sh, 232.0, 197.0, [("ITEM", 10), ("MARK", 16), ("DESCRIPTION", 134), ("kg", 16)], rows, size=1.6, row_h=2.8,
                  title="FITTINGS ON THE DRAWBAR")
     loc = chs["results"]["local"]
     rows = [[v["name"][:42], v["governing"][:32], f"{v['mpa']:.0f} / {v['limit_mpa']:.0f}", f"{100 * v['util']:.0f} %"] for v in loc.values()]
-    S.table(sh, 232.0, yt - 5, [("FITTING", 70), ("GOVERNING PART", 56), ("MPa / LIMIT", 30), ("USE", 20)], rows, size=1.6, row_h=2.8,
+    S.table(sh, 232.0, yt - 4, [("FITTING", 70), ("GOVERNING PART", 56), ("MPa / LIMIT", 30), ("USE", 20)], rows, size=1.6, row_h=2.8,
             title="LOCAL CHECKS (CHASSIS.md)")
     _root_detail(sh, ch, 240.0, 80.0)
     _heel_view(sh, ch, 202.0, 36.0)
