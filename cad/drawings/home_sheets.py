@@ -421,13 +421,15 @@ def _recovery_line() -> str:
     from ..chassis_fea import recovery_rule
     cj = json.loads((BUILD / "chassis" / "chassis.json").read_text())
     r = recovery_rule(cj["results"], next(lc for lc in cj["load_cases"] if lc["id"] == "LC8a"))
-    side = min(x for x in (r["sideways_up_kn"], r["sideways_down_kn"]) if x is not None)
-    along = min(x for x in (r["along_up_kn"], r["along_down_kn"]) if x is not None)
-    return (f"FRONT LUGS OR REAR TONGUES ONLY, WITHIN {r['sideways_deg']:g} DEGREES SIDEWAYS AND {r['vertical_deg']:g} DEGREES UP OR DOWN: "
-            f"{r['free_kn']:g} kN WITH EVERY WHEEL FREE, {r['held_wheel_kn']:g} kN WITH ONE WHEEL HELD FAST, OR {r['held_axle_kn']:g} kN "
-            "WITH BOTH WHEELS OF ONE AXLE HELD FAST. PULL LEVEL: PULLED "
-            f"{r['vertical_deg']:g} DEGREES UP OR DOWN THE EMPTY TRAILER CAN TIP FROM {side:.1f} kN AT {r['sideways_deg']:g} DEGREES SIDEWAYS "
-            f"AND {along:.1f} kN ALONG ITS LINE." + ("" if r["level_tips"] else ""))
+    sides = [x for x in (r["sideways_up_kn"], r["sideways_down_kn"]) if x is not None]
+    alongs = [x for x in (r["along_up_kn"], r["along_down_kn"]) if x is not None]
+    limits = (f"FRONT LUGS OR REAR TONGUES ONLY, WITHIN {r['sideways_deg']:g} DEGREES SIDEWAYS AND {r['vertical_deg']:g} DEGREES UP OR DOWN: "
+              f"{r['free_kn']:g} kN WITH EVERY WHEEL FREE, {r['held_wheel_kn']:g} kN WITH ONE WHEEL HELD FAST, OR {r['held_axle_kn']:g} kN "
+              "WITH BOTH WHEELS OF ONE AXLE HELD FAST.")
+    if not sides and not alongs:                         # no pull within the limits tips it (I2-121)
+        return limits + " WITHIN THESE LIMITS THE TRAILER DOES NOT TIP, LEVEL OR PULLED UP OR DOWN."
+    tips = " AND ".join([f"{min(sides):.1f} kN AT {r['sideways_deg']:g} DEGREES SIDEWAYS"] * bool(sides) + [f"{min(alongs):.1f} kN ALONG ITS LINE"] * bool(alongs))
+    return limits + f" PULL LEVEL: PULLED {r['vertical_deg']:g} DEGREES UP OR DOWN THE EMPTY TRAILER CAN TIP FROM {tips}."
 
 
 def _lamp_checks(sh, LM, y):
