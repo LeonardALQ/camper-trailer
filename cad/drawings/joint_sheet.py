@@ -210,13 +210,15 @@ def _section_b(sh, J: Joint, x0: float, y0: float, k: float = 5.0):
     weld_symbol(sh, top_mid, (top_mid[0] - 4.0, top_mid[1] + 16.0), _n(J.ck["leg"]), note="TOP EDGE")
     fb = next(c for c in J.cheeks if not c["id"].endswith("B"))["box"]
     corner = v.p(fb[0] + 40.0, z0 + ro / 2)
-    weld_symbol(sh, corner, (corner[0] + 5.0, corner[1] - 9.0), _n(J.ck["corner"] * ro), flare=True, note="RAIL CORNER")
+    weld_symbol(sh, corner, (corner[0] + 5.0, corner[1] - 9.0), f"{J.ck['corner'] * ro:g}", flare=True, note="RAIL CORNER")
     bar_tip = v.p(J.rear, z0 - J.ck["bar_d"] / 2)
     weld_symbol(sh, bar_tip, (bar_tip[0] + 9.0, bar_tip[1] - 11.0), _n(J.ck["bar_leg"]), both=True, length=_n(J.ck["bar_d"]),
                 note="TO THE BAR")
     fl = next((f for f in J.ch.hinge_fillers() if f["wheel"] == "RK"), None)
     if fl:                                               # the front cheek's filler under the crossmember's front half (I2-118)
-        v.box(sh, fl["front"], fl["z0"], fl["bar_front"], fl["z1"])
+        ch8 = J.ch.data["xt_hinges"]["filler"]["chamfer"]      # its top rear edge chamfered clear of the bar's first run (I2-123)
+        v.poly(sh, [(fl["front"], fl["z0"]), (fl["bar_front"], fl["z0"]), (fl["bar_front"], fl["z1"] - ch8),
+                    (fl["bar_front"] - ch8, fl["z1"]), (fl["front"], fl["z1"])])
         depth = fl["z1"] - fl["z0"]
         butt = v.p(fl["front"], fl["z1"] - depth / 2)
         weld_symbol(sh, butt, (butt[0] + 8.0, butt[1] - 14.4), _n(J.ck["bar_leg"]), both=True, length=_n(depth),
@@ -440,12 +442,16 @@ def _notes(J: Joint) -> list[str]:
         f"FILLETS ON THE TOP AND BOTTOM WALLS, A {_n(w['acute_leg'])} FILLET IN THE 45 DEG ANGLE, ITS PROCEDURE QUALIFIED TO AS/NZS 1554.1, "
         f"AND THE 135 DEG SIDE BEVELLED AND BUTT WELDED TO THE WALL'S {_n(w['obtuse_throat'])} (CHS-16).",
         f"CHEEKS CH-P16: A {_n(J.ck['leg'])} FILLET ALONG THE TOP EDGE ON THE RAIL'S WEB AND A FLARE-BEVEL WELD FILLED FLUSH IN THE "
-        f"RAIL'S R{_n(J.rail.ro)} BOTTOM CORNER, EFFECTIVE THROAT {_n(J.ck['corner'] * J.rail.ro)} (5/16 R, AISC 360 TABLE J2.2), NONE "
+        f"RAIL'S R{_n(J.rail.ro)} BOTTOM CORNER, EFFECTIVE THROAT {J.ck['corner'] * J.rail.ro:g} ({J.ck['corner_rule'].upper()}, "
+        f"AISC 360 TABLE J2.2), NONE "
         f"ACROSS THE RAIL (TB 070). A REAR CHEEK TAKES {_n(J.ck['bar_leg'])} FILLETS BOTH SIDES DOWN THE HINGE BAR'S FACE OVER ITS TOP "
         f"{_n(J.ck['bar_d'])}, A FRONT ONE THE SAME DOWN ITS FILLER CH-P18'S FRONT FACE. EACH FILLER TAKES "
         f"{_n(J.ch.data['xt_hinges']['filler']['leg'])} FILLETS ALONG ITS BOTTOM REAR EDGE TO THE BAR AND ITS INBOARD TOP EDGE TO THE "
-        f"CROSSMEMBER, AND FLARE BEVELS IN THE CROSSMEMBER'S FRONT CORNER INBOARD OF THE CHEEK AND ALONG THE RAIL'S OUTER BOTTOM CORNER, "
-        f"ITS TOP REAR EDGE CHAMFERED {_n(J.ch.data['xt_hinges']['filler']['chamfer'])} CLEAR OF THE BAR'S FIRST RUN (CHS-14). "
+        f"CROSSMEMBER, AND FLARE BEVELS IN THE CROSSMEMBER'S R{_n(J.cm.sec.ro)} FRONT CORNER INBOARD OF THE CHEEK, THROAT "
+        f"{math.floor(J.ck['corner'] * J.cm.sec.ro * 10 + 0.5) / 10:g}, AND ALONG THE RAIL'S OUTER BOTTOM CORNER, THROAT "
+        f"{J.ck['corner'] * J.rail.ro:g}, BY GMAW AS THE CHEEKS' ARE, ITS TOP REAR EDGE CHAMFERED "
+        f"{_n(J.ch.data['xt_hinges']['filler']['chamfer'])} CLEAR OF THE BAR'S FIRST RUN, AND THE CROSSMEMBER'S END WELD GROUND FLUSH "
+        f"IN THE RAIL'S INNER BOTTOM CORNER OVER IT (CHS-14). "
         f"OVER THE WEB EACH CHEEK'S END IS COPED {_n(J.ck['cope'])} x 45 DEG CLEAR OF {J.cm.id}'S "
         f"{_n(J.cm_leg)} END FILLET, ITS WEB WELDS STOPPED THERE. A CHEEK BESIDE A GUSSET CARRIES A STEP CENTRED ON IT, "
         f"{steps}, WITH {_n(J.ck['leg'])} FILLETS ALONG ITS TOP AND LOWER EDGES (CHS-16).",

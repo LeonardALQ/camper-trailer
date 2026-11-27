@@ -1152,7 +1152,7 @@ class Analysis:
         the cheek's own axes: u along the rail from its joint to the hinge bar or its filler, away from it, v inboard from
         the rail's inner face and z up from the rail's underside. On the rail's inner web the `leg` fillet along its top
         edge and the flare-bevel weld along the rail's bottom corner, its throat the `corner` share of the rail's outside
-        radius (AISC 360 Table J2.2's 5/16 R for a manual metal arc weld), from the cope at its crossmember's face to its far
+        radius (AISC 360 Table J2.2's 5/8 R for GMAW to a procedure proven by a macro section, `corner_rule`), from the cope at its crossmember's face to its far
         end, each line on its throat, a cheek's `tail` under its crossmember, if it has one, standing between its joint and
         the cope. Returns the group and the pin's place, at the middle of the cheek's joint over the bar's top `bar_d` under
         the rail (est.), at the plate's mid-thickness."""
@@ -1172,9 +1172,9 @@ class Analysis:
 
     def cheek_welds(self, F, c: dict) -> dict:
         """The stresses in hinge cheek c's welds (CH-P16, xt_hinges `cheek`, I2-92, I2-118) under the force F (N, along,
-        across and up) that its pin passes from the hinge bar at the cheek's joint to it: a rear cheek's `bar_leg` fillets
-        down the bar's rear face on their throats, or a front cheek's butt weld to its filler's front face (filler_of), the
-        plate's `t` over the cheek's `bar_d` under the rail, each passing a force but no moment, and the cheek's welds to the
+        across and up) that its pin passes from the hinge bar at the cheek's joint to it: a rear cheek's two `bar_leg` fillets
+        down the bar's rear face over the cheek's `bar_d` under the rail, or a front cheek's two down its filler's front face
+        over the filler's depth (filler_of), on their throats, each passing a force but no moment, and the cheek's welds to the
         rail's web as one weld group (cheek_lines), read by the elastic vector method with the force's moments about the
         group's centroid, the components added at the worst corner whatever their signs. A filler's own welds and section
         follow (filler_welds)."""
@@ -1509,22 +1509,28 @@ class Analysis:
                       f"across and {r['f'][2] / 1000:+.1f} kN up, at {r['wheel']} in {r['case']}")
 
     def hinge_runs(self) -> dict:
-        """CHS-18 (I2-119, I2-121): each hinge bar's three weld runs a side to its crossmember in every case on each of the
-        frame's models (_hinge_envelope), LC8a at the pull and at its ultimate and the service cases LC1 to LC6b and LC8b,
-        the rigid bars' runs as one group and the elastic bars' each on its own, by the elastic vector method against AS
-        4100 9.7.3's 0.8 x 0.6 fuw over the case's factor."""
+        """CHS-18 (I2-119, I2-121): each hinge bar's three weld runs a side to its crossmember in every LC8a case at the pull
+        and at its ultimate on each of the frame's models (_hinge_envelope), the rigid bars' runs as one group and the
+        elastic bars' each on its own, by the elastic vector method against AS 4100 9.7.3's 0.8 x 0.6 fuw. The same runs in
+        the other cases, LC1 to LC6b and LC8b, read the same way against that strength over each case's factor, are given
+        beside it in `service`, so the model's ties can be judged by what the joint carries in service."""
         mat = self.ch.data["material"]
         wcap = mat["weld_phi"] * 0.6 * mat["weld_fuw"]
         lcs = {lc["id"]: lc for lc in self.ch.data["load_cases"]}
         fac = {lc_id: (lcs[lc_id]["factor"] if lc_id in lcs else 1) for lc_id in self.run_env}
-        rows = [(f"{lc_id}, the hinge bars {bar}", r["mpa"], wcap / fac[lc_id]) for lc_id, e in self.run_env.items() for bar, r in e.items()]
-        lc_id, bar, r = max(((lc_id, bar, r) for lc_id, e in self.run_env.items() for bar, r in e.items()),
-                            key=lambda t: t[2]["mpa"] * fac[t[0]])
+        rec = ("LC8a", "LC8u")
+        rows = [(f"{lc_id}, the hinge bars {bar}", r["mpa"], wcap) for lc_id in rec for bar, r in self.run_env[lc_id].items()]
+        lc_id, bar, r = max(((lc_id, bar, r) for lc_id in rec for bar, r in self.run_env[lc_id].items()), key=lambda t: t[2]["mpa"])
         about = "the runs' centroid" if r.get("run") is None else "the run's centroid"
-        return _local("Hinge bars' weld runs to their crossmembers (XT-BAR)", rows,
-                      f"{r['line']} at {r['wheel']}, {abs(r['f'][0]) / 1000:.1f} kN along, {abs(r['f'][1]) / 1000:.1f} kN across and "
-                      f"{abs(r['f'][2]) / 1000:.1f} kN up with {math.hypot(*r['m']) / 1e6:.2f} kNm about {about}, the hinge bars {bar}, "
-                      f"in {lc_id}, {r['case']}")
+        out = _local("Hinge bars' weld runs to their crossmembers (XT-BAR)", rows,
+                     f"{r['line']} at {r['wheel']}, {abs(r['f'][0]) / 1000:.1f} kN along, {abs(r['f'][1]) / 1000:.1f} kN across and "
+                     f"{abs(r['f'][2]) / 1000:.1f} kN up with {math.hypot(*r['m']) / 1e6:.2f} kNm about {about}, the hinge bars {bar}, "
+                     f"in {lc_id}, {r['case']}")
+        # the same runs in the other cases, read the same way and reported beside the check (I2-121, COMMON-RULES-26)
+        out["service"] = {f"{k}, the hinge bars {b}": dict(util=v["mpa"] * fac[k] / wcap, mpa=v["mpa"], limit_mpa=wcap / fac[k], case=v["case"],
+                                                           wheel=v["wheel"], line=v["line"])
+                          for k, e in self.run_env.items() if k not in rec for b, v in e.items()}
+        return out
 
     def hinge_bar_report(self) -> dict:
         """CHS-19 (I2-119), reported: Cruisemaster's hinge bars and hinge plates, whose section and grade are not published,

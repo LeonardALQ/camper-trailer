@@ -231,11 +231,12 @@ fittings:
      poses: shock_plates, stations: [XT centre, XT rear shock], side_y: "rail_c - 200"}
   - {id: CH-P08, name: "Hinge crossmember gusset, SHS 50 x 50 x 3 at 45 degrees (TB 070), its ends cut at 45 degrees to bear on the crossmember's face and on the face of the hinge cheek beside it, welded all round, two behind each hinge crossmember", kind: tube, section: SHS_50x50x3, length: hinge_gusset_l, qty: 4,
      poses: hinge_gussets, fat: null}
-  - {id: CH-P16, name: "Hinge cheek, 10 mm, 150 x 108.5 beside each XT hinge crossmember on the rail's inner face, with a step where a hinge gusset lands on it, 150 mm behind the front hinge crossmember and 140 mm behind the XT centre's, welded to the web, the rear ones to the hinge bar and the front ones butt welded to their fillers CH-P18", kind: plate, l: 150, w: 108.5, t: 10, qty: 8,
+  - {id: CH-P16, name: "Hinge cheek, 10 mm, 150 x 108.5 beside each XT hinge crossmember on the rail's inner face, with a step where a hinge gusset lands on it, 150 mm behind the front hinge crossmember and 140 mm behind the XT centre's, welded to the web, the rear ones by two fillets down the hinge bar's rear face and the front ones by two down their fillers CH-P18's front faces", kind: plate, l: 150, w: 108.5, t: 10, qty: 8,
      poses: hinge_cheeks, plane: xz, fat: FAT-22}
-  # CH-P18, the hinge cheek fillers (xt_hinges `filler`, I2-118): a block under the front half of each XT hinge crossmember
-  # at the rail, from its front face to the hinge bar's front face, as deep as the cheeks stand under the rail, from the
-  # front cheek's inboard face out under the rail to its outer face (Chassis.hinge_fillers)
+  # CH-P18, the hinge cheek fillers (xt_hinges `filler`, I2-118, I2-123): a block `d` 20 mm deep under the front half of
+  # each XT hinge crossmember at the rail, from its front face to the hinge bar's front face, from `inboard` 60 mm inboard
+  # of the rail's inner face out under the rail to its outer face, its top rear edge chamfered `chamfer` 8 mm clear of the
+  # bar's first run (Chassis.hinge_fillers)
   - {id: CH-P18, name: "Hinge cheek filler, steel block 50 x 110 x 20 under the front half of each XT hinge crossmember at the rail, from its front face to the hinge bar's front face, the front cheek welded to it, welded to the hinge bar, the crossmember and the rail's outer bottom corner", kind: plate, l: 50, w: 110, t: 20, qty: 4,
      poses: hinge_fillers, plane: xy, fat: null}
   # CH-P17, the shear panel PNL-1's pieces (I2-87, fx18-det, fx22-rear): EA 50 x 50 x 5 angles, each with its upright leg on
@@ -562,10 +563,12 @@ sealed_overlaps:
 # The hinge cheeks CH-P16 (I2-88): at each XT hinge 10 mm plates on the rail's inner face, one either side of the hinge
 # crossmember, `l` along the rail and `h` tall, standing `below` under the rail's underside beside the hinge bar, their
 # tops 82.5 mm up the web. Each is welded to the rail's web by a `leg` fillet along its top edge and a flare-bevel weld
-# filled flush in the rail's bottom corner, its effective throat `corner` of the rail's outside radius (AISC 360 Table
-# J2.2's 5/16 R for a manual metal arc weld), never across the rail, and by `bar_leg` fillets each side down the hinge
+# filled flush in the rail's bottom corner, never across the rail, and by `bar_leg` fillets each side down the hinge
 # bar's front or rear face over the bar's top `bar_d` (est.), so the hinge's pull along the trailer reaches the rail
-# through them, not through the crossmember's end. Every hinge has both its cheeks: the run K-10 crosses under the road
+# through them, not through the crossmember's end. A flare bevel's effective throat is `corner` of its corner's outside
+# radius: the cheeks' and the fillers' flare bevels are made by GMAW to a procedure proven by a macro section, so AISC
+# 360 Table J2.2 gives them 5/8 R (`corner_rule`), 6.25 mm in the rails' R10 corners and 9.4 mm in the crossmembers'
+# R15 (est.), where a manual metal arc weld takes the table's 5/16 R. Every hinge has both its cheeks: the run K-10 crosses under the road
 # rail ahead of the front hinge's front cheek and passes it inboard, and the plan braces PB-2K and PB-2R end on the rails
 # ahead of it (plan_braces `rear_ahead`). Every cheek keeps 20 mm from the services' runs (SVC-01) and 50 mm from the
 # arms and their leads (FIT-05). The fillets to the bar pass a force but no moment, so the frame model pins the cheeks
@@ -595,14 +598,20 @@ sealed_overlaps:
 # bushes (sheet 2's lubrication note), so the frame model reads every check on each of these, the worst governing
 # (I2-114): the bar rigid from the pivot to its runs' centres, as above, and the bar elastic at its own `section`, a
 # solid bar xt_arms parts `bar` `w` wide, flush with its crossmember's rear face, and `d` deep (est.), from the cheeks' fillets past the arm's
-# hinge plates and along each run's whole length, tied to the crossmember at each run's ends and centre, its arm on each
-# bound of the bushes' stiffness across the pivot's axis, `bushes` free and stiff (FrameModel._elastic_bar). A hollow
-# bar would be softer still. Cruisemaster confirms the bar's section, its welds and the bushes in writing (CHASSIS.md
-# item 15).
+# hinge plates and along each run's whole length, its arm on each bound of the bushes' stiffness across the pivot's axis,
+# `bushes` free and stiff (FrameModel._elastic_bar). A hollow bar would be softer still. Since I2-121 the elastic bar is
+# welded to the crossmember as the runs are: each run's two fillets along the bar's top edges a line of weld points at
+# the run's ends and centre, each the weld's own stiffness for its share of the run and passing no moment
+# (FrameModel._weld_runs, weld_spring), where rigid six-way ties made the bar turn with the crossmember at every tie as
+# the crossmember twisted, and each hinge plate a member of its own 8 x 82 mm section down to the bolt, the bolt and the
+# bush's sleeve clamped between the plates rigid (est.). `wall` rigid takes the crossmember's bottom wall as stiff under
+# the front fillets, which stand on its flat 47 mm from the rear web, and `wall` own would put the wall's own bending in
+# series with them (wall_rate, est.), a bound this model does not yet carry (CHASSIS.md item 15). Cruisemaster confirms
+# the bar's section, its welds and the bushes in writing (CHASSIS.md item 15).
 xt_hinges:
-  bar: {leg: 6, run: 80, runs: [40, 221, 400], section: solid, bounds: [rigid, elastic], bushes: [free, stiff]}
+  bar: {leg: 6, run: 80, runs: [40, 221, 400], section: solid, bounds: [rigid, elastic], bushes: [free, stiff], wall: rigid}
   gusset: {length: hinge_gusset_l, faces: [1, -1], omit: [CM-04KF, CM-04RF, CM-05KF, CM-05RF], z_over_underside: 69, weld: {leg: 5, acute_leg: 5, obtuse_throat: 3}}
-  cheek: {t: 10, l: 150, h: 108.5, below: 26, leg: 6, bar_d: 26, bar_leg: 10, corner: 0.3125, cope: 12, omit: [],
+  cheek: {t: 10, l: 150, h: 108.5, below: 26, leg: 6, bar_d: 26, bar_leg: 10, corner: 0.625, corner_rule: "5/8 R by GMAW to a procedure proven by a macro section", cope: 12, omit: [],
           under_gusset: {l: {XT front hinge: 150, XT centre: 140}, z0: {XT front hinge: 22.5, XT centre: 39}, z1: {XT front hinge: 115.5, XT centre: 99.5}}}
   filler: {d: 20, inboard: 60, leg: 6, chamfer: 8}
 
