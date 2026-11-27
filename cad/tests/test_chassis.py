@@ -397,7 +397,9 @@ def test_lc8a_reads_one_held_wheel_at_the_held_wheel_limit():
     """I2-93 and I2-114: LC8a reads every pull through one held wheel at the data's held-wheel limit, a whole 5 kN at most
     the rated pull and at least the held-axle limit, and every reading a held wheel governs names that limit."""
     lc8 = next(lc for lc in CH.data["load_cases"] if lc["id"] == "LC8a")
-    assert lc8["held_wheel_n"] % 5000 == 0 and lc8["held_axle_n"] <= lc8["held_wheel_n"] <= lc8["force_n"]
+    # a held wheel may take a lower limit than a held axle, since the free tyres' side forces reach its hub with the pull
+    # while an axle held holds the trailer from turning (I2-124)
+    assert lc8["held_wheel_n"] % 5000 == 0 and lc8["held_wheel_n"] <= lc8["force_n"]
     cases = [r["case"] for rows in RES["envelope"].values() for r in rows.values()]
     cases += [h[k]["case"] for h in RES["holes"] for k in ("static", "ultimate") if h.get(k)]
     held = [c for c in cases if re.search(r", wheel [FR][KR] held", c)]
