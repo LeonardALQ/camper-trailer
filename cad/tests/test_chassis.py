@@ -469,10 +469,85 @@ def test_the_elastic_bars_runs_are_held_at_their_welds():
         assert all(4 * E_STEEL * el.sec.I_strong < 1e-4 * k_line * b["run"] ** 2 for el in welds)
         assert sum(1 for el in fm.f.elements if el.member == f"XT-PLATE-{w['id']}") == 4
     runs = RES["local"]["hinge_runs"]
-    assert {p["part"].split(",")[0] for p in runs["parts"]} == {"LC8a", "LC8u"}
-    service = {k.split(",")[0] for k in runs["service"]}
-    assert service >= {"LC1", "LC2", "LC3", "LC4", "LC5a", "LC5b", "LC6", "LC6b", "LC8b"}
-    assert all(r["util"] >= 0 for r in runs["service"].values())
+    assert {p["part"].split(",")[0] for p in runs["parts"]} >= {"LC8a", "LC8u"}
+    assert all(r["util"] >= 0 for r in runs["beside"].values())
+
+
+def test_the_hinge_runs_fail_on_every_case_through_the_joint_and_give_vsb1s_rig_beside():
+    """The conductor's ruling of 27 Nov 2026: CHS-18 fails on every case in which the trailer's own loads pass through
+    the hinge joint, LC1 to LC5b, LC8a at the pull and its ultimate and LC8b, each read against the weld's strength over
+    the case's factor. VSB1's drawbar and chain tests hold the body on a rig at its suspension mounts (VSB1 Rev 6
+    14.2.1), so CHS-18 and CHS-19 give LC6 and LC6b beside their rows and do not read them, and their whys say why."""
+    import yaml
+    from cad.chassis_fea import RIG_CASES
+    runs, bar = RES["local"]["hinge_runs"], RES["local"]["hinge_bar"]
+    lcs = {lc["id"]: lc for lc in CH.data["load_cases"]}
+    mat = CH.data["material"]
+    wcap = mat["weld_phi"] * 0.6 * mat["weld_fuw"]
+    assert RIG_CASES == ("LC6", "LC6b")
+    assert {p["part"].split(",")[0] for p in runs["parts"]} == {"LC1", "LC2", "LC3", "LC4", "LC5a", "LC5b", "LC8a", "LC8u", "LC8b"}
+    for p in runs["parts"]:
+        lc = p["part"].split(",")[0]
+        assert p["limit_mpa"] == pytest.approx(wcap / (lcs[lc]["factor"] if lc in lcs else 1), rel=1e-12), p["part"]
+    assert runs["util"] == pytest.approx(max(p["util"] for p in runs["parts"]), rel=1e-12)
+    assert {k.split(",")[0] for k in runs["beside"]} == set(RIG_CASES)
+    assert {p["part"].split(", ")[1] for p in bar["parts"]} == {"LC8a", "LC8u"}
+    assert {k.split(",")[0] for k in bar["beside"]} == set(RIG_CASES)
+    assert all(v["mpa"] > 0 and v["plates"] for v in bar["beside"].values())
+    from cad.partsdb import DATA
+    checks = {c["id"]: c for c in yaml.safe_load((DATA / "checks.yaml").read_text())["trailer_checks"]}
+    for cid in ("CHS-18", "CHS-19"):
+        assert "14.2.1" in checks[cid]["why"] and "LC6b" in checks[cid]["why"], cid
+    assert "LC1 to LC5b, LC8a and LC8b" in checks["CHS-18"]["why"]
+
+
+def test_the_bottom_wall_under_the_front_fillets_is_read_as_the_plate_it_is():
+    """The conductor's ruling of 27 Nov 2026: the hinge crossmember's bottom wall under each run's front fillet comes from
+    its plate model (cad/wall_plate.py), which gives Timoshenko's square plate, the data takes its soft bound and gives
+    the stiff one beside it, the frame model's front weld points stand on the wall's flat with the run's share of it in
+    series and the rear ones over the rear web without it, and FAT-24 reads the wall's bending at the fillets' toes."""
+    from cad import wall_plate as WP
+    from cad.frame import E_STEEL
+    b = CH.data["xt_hinges"]["bar"]
+    wall = b["wall"]
+    assert WP.check_square_plate() == pytest.approx(0.01160, rel=0.01)
+    cm = CH.hinge_crossmembers()[0]
+    assert all(m.sec.id == cm.sec.id for m in CH.hinge_crossmembers())
+    y_in = CH.V["rail_c"] - CH.role_sec["rail"].b / 2
+    runs = [(u - b["run"] / 2, u + b["run"] / 2) for u in b["runs"]]
+    for key, data in (("mid/pinned", wall), ("flat/clamped", wall["other"])):
+        r = WP.model(cm.sec, 2 * y_in, runs, *key.split("/"))
+        assert [q["uniform"] / 1000 for q in r["runs"]] == pytest.approx(data["kn_mm"], abs=0.051), key
+        assert [q["hot_even"] * 1000 for q in r["runs"]] == pytest.approx(data["toe_mpa_kn"], abs=0.051), key
+        assert all(q["k"] >= q["uniform"] for q in r["runs"])          # the rigid bar's spread is the stiffer
+    assert all(a < c for a, c in zip(wall["kn_mm"], wall["other"]["kn_mm"]))
+    fm = CH.frame(None, "crossmember", "elastic", "free")
+    xyz = fm.f.nodes
+    k_weld = E_STEEL * 0.7 * b["leg"] / b["leg"] * b["run"]          # one fillet's normal stiffness over its run, N/mm
+    for w in CH.suspension:
+        cmw = next(m for m in CH.members if m.station == w["station"] and m.role == "cm_xt")
+        xb = CH.hinge_bar_x(cmw)
+        rear = sum(E_STEEL * el.sec.A for el in fm.f.elements if el.member == f"hinge {w['id']}" and xyz[el.i][0] > xb)
+        assert rear == pytest.approx(len(b["runs"]) * k_weld, rel=1e-9), w["id"]
+        k_front = sum(1 / (1 / (s * k_weld) + 1 / (s * kw * 1000)) for kw in wall["kn_mm"] for s in (1 / 6, 2 / 3, 1 / 6))
+        k_model = sum(E_STEEL * el.sec.A for el in fm.f.elements if el.member == f"hinge {w['id']}" and xyz[el.i][0] < xb)
+        assert k_model == pytest.approx(k_front, rel=1e-9), w["id"]
+    fat = next(f for f in RES["fatigue"] if f["id"] == "FAT-24")
+    assert fat["range_mpa"] > 0 and fat["hot_spot"] and "inboard on CM-" in fat["where"]
+
+
+def test_the_coupling_is_a_pull_point_under_the_same_limits():
+    """The conductor's ruling of 27 Nov 2026: the recovery limits hold wherever the trailer is pulled from, so LC8a pulls
+    at the coupling too, along the rail axis within 15 degrees up or down, with every wheel free, through each held
+    wheel within the points' 30 degrees and with an axle held, under the same three limits."""
+    lc8 = next(lc for lc in CH.data["load_cases"] if lc["id"] == "LC8a")
+    assert lc8["coupling"] is True
+    pts = RES["recovery"]["LC8a"]["points"]
+    n_sup = len(lc8["reaction"]["weight"]) * len(lc8["reaction"]["nose"])
+    assert pts["coupling, every wheel free"] == 3 * n_sup                 # level, 15 degrees up and down, each support
+    assert pts["coupling, axle held"] == 2 * 3 * n_sup                    # each axle, along the rail axis
+    assert pts["coupling, wheel held"] == len(CH.suspension) * 3 * n_sup  # each wheel, the pull through its hub
+    assert all(pts[f"{w}, every wheel free"] == 2 * 3 * 3 * n_sup for w in ("front", "rear"))
 
 
 def test_holes_in_one_section_are_read_together():

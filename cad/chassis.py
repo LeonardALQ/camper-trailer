@@ -44,18 +44,6 @@ def weld_spring(length: float, leg: float, wall: float | None = None) -> Section
         k_n = 1.0 / (1.0 / k_n + 1.0 / wall)
     return Section(f"weld, {length:.1f} mm of a {leg:g} mm fillet", A=k_n / E, I_strong=k_s / (12 * E), I_weak=k_s / (12 * E),
                    J=1.0, rigid=True)
-
-
-def wall_rate(sec, at: float, length: float) -> float:
-    """The stiffness normal to an RHS wall's flat of a line load `length` mm long along the member, `at` mm from one web's
-    mid-plane (I2-121): the wall a strip between its webs' mid-planes, s = b - t, held fixed at both by the webs and the
-    corners, as wide as the load's length and its spread at 45 degrees to the nearer web each way (est.), 3 E' I s^3 /
-    (a^3 b^3) for a point load a and b from the ends of a fixed beam, E' = E / (1 - 0.3^2) for a plate. Returns N/mm."""
-    E, t = 200_000.0 / (1 - 0.3 ** 2), sec.t
-    s = sec.b - t
-    a, b = at, s - at
-    width = length + 2 * min(a, b)
-    return 3 * E * (width * t ** 3 / 12) * s ** 3 / (a ** 3 * b ** 3)
 SECTIONS_YAML = DATA / "chassis" / "sections.yaml"
 SIDES = {-1: "K", 1: "R"}            # kerb side is negative Y, road side positive Y (DIM-01)
 SIDE_WORDS = {-1: "kerb side", 1: "road side"}
@@ -1482,24 +1470,24 @@ class FrameModel:
         a sixth, two thirds and a sixth of its `run` mm (Simpson's rule, so the points give the line's own stiffness along
         it and against turning), each point a weld_spring between the bar's edge and the crossmember's underside. The bar
         and the crossmember reach each point by rigid links from their axes, so a run passes a moment only as its welds'
-        forces apart, as its own weld group does, and none at a point. With `wall` own, a fillet on the bottom wall's flat
-        between the webs has the wall's own bending under it in series (wall_rate, est.), and with `wall` rigid, the data's
-        choice, the wall is taken as stiff there."""
+        forces apart, as its own weld group does, and none at a point. A fillet on the bottom wall's flat between the webs
+        has the wall's own bending under it in series, the run's share of `wall` `kn_mm`, the wall's stiffness under each
+        run from its plate model (cad/wall_plate.py), on its soft bound. A `wall` that is not a mapping takes the wall as
+        stiff, for the probes that show what the wall moves."""
         ch, f = self.ch, self.f
         b = ch.data["xt_hinges"]["bar"]
         bw = ch.data["xt_arms"]["parts"]["bar"].get("w", cm.sec.b)
         zf = cm.box()[2]
         rear_web = cm.p0[0] + cm.sec.b / 2 - cm.sec.t / 2           # the crossmember's rear web's mid-plane
-        walls = {}
-        for e in (-1, 1):                                            # a fillet on the bottom wall's flat bends the wall under it
-            off = rear_web - (x + e * bw / 2)
-            on_flat = cm.sec.t < off < cm.sec.b - 2 * cm.sec.t and b.get("wall", "rigid") == "own"
-            walls[e] = wall_rate(cm.sec, off, b["run"]) if on_flat else None
+        wall = b.get("wall")
+        y_in = ch.V["rail_c"] - ch.role_sec["rail"].b / 2
+        flat = {e: isinstance(wall, dict) and cm.sec.t < rear_web - (x + e * bw / 2) < cm.sec.b - 2 * cm.sec.t for e in (-1, 1)}
         for yc in (y for y in ch.hinge_weld_ys(cm) if y * w["side"] > 0):
+            run = min(range(len(b["runs"])), key=lambda i: abs(b["runs"][i] - (y_in - abs(yc))))
             for k, share in ((-1, 1 / 6), (0, 2 / 3), (1, 1 / 6)):
                 y = yc + k * b["run"] / 2
                 for e in (-1, 1):
-                    spring = weld_spring(share * b["run"], b["leg"], walls[e] and share * walls[e])
+                    spring = weld_spring(share * b["run"], b["leg"], share * wall["kn_mm"][run] * 1000 if flat[e] else None)
                     lo, hi = f.node((x + e * bw / 2, y, zf - 0.5)), f.node((x + e * bw / 2, y, zf + 0.5))
                     self._link(at[min(at, key=lambda q: abs(q - y))], lo, f"weld runs {w['id']}")
                     self._link(self.cm_node(cm.id, y), hi, f"weld runs {w['id']}")
