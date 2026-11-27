@@ -26,10 +26,10 @@ trailer:
     to: ["RL-*", "RS-*", CH-P03]
     how: welded
     why: "The rails' end plates are welded full penetration to the rails' webs and top flanges and the raisers' bottom walls, and the root gussets' heels to them, their bottom edges 7 mm clear of the drawbar members for the galvanising (CHASSIS.md, CT-102 detail C, I2-75)"
-  - lines: [CH-P05, CH-P07, CH-P08, CH-P16, CH-P17]
+  - lines: [CH-P05, CH-P07, CH-P08, CH-P16, CH-P17, CH-P18]
     to: ["CM-*", "RL-*"]
     how: welded
-    why: "The rear recovery tongues through the rear crossmember, the shock plates, hinge gussets, hinge cheeks and the rear tank's shear panel angles (CHASSIS.md)"
+    why: "The rear recovery tongues through the rear crossmember, the shock plates, hinge gussets, hinge cheeks, the front hinge cheeks' fillers under the XT hinge crossmembers, welded to the crossmember's underside and front corner and along the rail's outer bottom corner (CHASSIS.md revision AB, I2-118), and the rear tank's shear panel angles (CHASSIS.md)"
   - lines: [CH-P09]
     to: ["SP-P?"]
     how: welded
