@@ -50,3 +50,23 @@ def test_ct106_gives_the_datas_figures():
     rails = next(f for f in ch.data["fittings"] if f["id"] == "CH-P17")["rails"]
     side = sum(1 for b in sp["bolts"] if b["group"] == "rail" and b["y"] > 0)
     assert f"{side} M{sp['fixing']['d']:g} AT {rails['pitch']:g}" in words
+
+
+def test_ct106_gives_the_hinge_bars_runs_and_the_seams_from_the_data():
+    """Review I2-128: detail E gives each of the hinge bar's weld runs a side by its ends inboard of the rail's inner
+    face, none under the rail, with its fillet's leg and length, and detail F the twin crossmember's flare-V seams with
+    their effective throat and process, welded and dressed flush before the bar is fitted, each from xt_hinges `bar` and
+    `seam`, so the sheet follows the data if the welds change."""
+    from cad.drawings.chassis_sheets import _layout
+    ch = _layout(None, None)[0].chassis
+    texts = _drawn()[1]
+    words = " ".join(texts)
+    b, seam = ch.data["xt_hinges"]["bar"], ch.data["xt_hinges"]["seam"]
+    for e in sorted({round(c + s * b["run"] / 2, 1) for c in b["runs"] for s in (-1, 1)}):
+        assert f"{e:g}" in texts, f"no ordinate at {e:g} from the rail's inner face"
+    assert ", ".join(f"{c - b['run'] / 2:g} TO {c + b['run'] / 2:g}" for c in b["runs"]) in words
+    assert "NO WELD UNDER THE RAIL" in texts and "NONE UNDER THE RAIL" in words
+    assert f"{len(b['runs'])} RUNS A SIDE, AS DIMENSIONED" in texts and f"{b['run']:g}" in texts and f"{b['leg']:g}" in texts
+    cm = next(m for m in ch.members if m.station == "XT centre" and m.role == "cm_xt")
+    assert texts.count(f"{round(seam['throat_r'] * cm.sec.ro, 1):g}") >= 2        # the two flare-V symbols, top and bottom
+    assert seam["rule"].upper() in words and "DRESS THE BOTTOM ONE FLUSH BEFORE THE HINGE BAR IS FITTED" in words

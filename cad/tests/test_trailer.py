@@ -122,6 +122,11 @@ def test_each_fresh_tank_stands_on_bearers_of_its_own_and_chs17_reads_its_path()
     assert {r["case"] for r in ts["rows"]} == {"LC1", "LC2", "LC3"}
     assert {r["tank"] for r in ts["rows"]} >= tanks
     assert {r["part"] for r in ts["rows"]} >= {b["id"] for b in brs} | {"PNL-1"}
+    split = ts["by_tank"]                          # each tank's own bearers apart from the panel, as CHASSIS.md quotes them (I2-131)
+    assert set(split) == {r["tank"] for r in ts["rows"] if r["on"] == "bearers"} >= tanks
+    for t, r in split.items():
+        assert r["on"] == "bearers" and r["util"] == max(x["util"] for x in ts["rows"] if x["tank"] == t and x["on"] == "bearers")
+        assert f"{t}'s {100 * r['util']:.0f} % in {r['part']}'s" in ts["detail"]
     holes = lay.fixing_holes()
     for b in brs:
         for face in ("front web", "rear web"):

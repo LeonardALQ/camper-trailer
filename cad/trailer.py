@@ -1199,14 +1199,18 @@ class Layout:
                                  (f"{cm.id}'s web in pull-through", f * N1 / pull, f"{N1:.2f} kN a bolt"),
                                  ("the upright's bearing and tear-out", f * V1 / ang, f"{V1:.2f} kN a bolt")]
                         for what, u, val in reads:
-                            rows.append(dict(tank=tid, case=c["id"], part=b["id"], what=what, util=u, value=val))
+                            rows.append(dict(tank=tid, case=c["id"], part=b["id"], what=what, util=u, value=val, on="bearers"))
             if len(ends) == 1:
-                rows += self._panel_reads(tid, L, cases, g)
+                rows += [dict(r, on="panel") for r in self._panel_reads(tid, L, cases, g)]
         worst = max(rows, key=lambda r: r["util"]) if rows else None
         ok = bool(rows) and worst["util"] <= 1.0 + 1e-9
-        return dict(ok=ok, rows=rows, worst=worst, bearers=len(brs), tanks=sorted({r["tank"] for r in rows}),
-                    detail=(f"{worst['util']:.2f} of its strength, {worst['part']}'s {worst['what']} in {worst['case']} ({worst['value']})"
-                            if worst else "nothing read"))
+        # each tank's own bearers apart from the rear bay's panel, the split CHASSIS.md quotes (I2-131)
+        by_tank = {tid: max((r for r in rows if r["tank"] == tid and r["on"] == "bearers"), key=lambda r: r["util"])
+                   for tid in sorted({r["tank"] for r in rows if r["on"] == "bearers"})}
+        split = ", ".join(f"{t}'s {100 * r['util']:.0f} % in {r['part']}'s {r['what']} in {r['case']}" for t, r in by_tank.items())
+        return dict(ok=ok, rows=rows, worst=worst, bearers=len(brs), tanks=sorted({r["tank"] for r in rows}), by_tank=by_tank,
+                    detail=(f"{worst['util']:.2f} of its strength, {worst['part']}'s {worst['what']} in {worst['case']} ({worst['value']}), "
+                            f"each tank's own bearers at the most {split}" if worst else "nothing read"))
 
     def _panel_reads(self, tid: str, L: dict, cases: list, g: float) -> list[dict]:
         """CHS-17's readings of the rear bay's shear panel under the rear tank (tank_support): the sheet as a strip the

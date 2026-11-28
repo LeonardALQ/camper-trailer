@@ -962,6 +962,7 @@ class Analysis:
         self.bar_env: dict[str, dict] = {}
         main_runs, main_cheeks = self.run_env, self.cheek_env
         self.lc8_mu = {mu: dict(runs={}, cheeks={}) for mu in (lcs["LC8a"]["reaction"].get("mu") or [None])}
+        self.lc10h: dict[str, dict] = {}      # LC10's braking and cornering blocks' two ends, by LC1's case label
         rcache: dict = {}                     # LC8a's reactions, the same on every frame model
         for bar, fm in models:
             self._use(fm)
@@ -981,6 +982,7 @@ class Analysis:
                             defl[c.id + tag] = self.deflections(res)
                             if first:
                                 balls[c.id] = dict(ball_kg=info["ball"][2] / G, scale=k, model_kg=m0)
+                self.lc10h[c.id + tag] = self.horizontal_ends(items, lcs["LC10"], lc1[c.id + tag])
                 lc = lcs["LC5a"]
                 hub_y = ch.suspension[0]["contact"][1]
                 for sgn in (1, -1):
@@ -1122,7 +1124,7 @@ class Analysis:
         for fm, lc1, sites in models:
             self._use(fm)
             rows = read(lc1, sites)
-            best = rows if not best else [r if r.get(key, 0.0) > b.get(key, 0.0) + 1e-9 else b for b, r in zip(best, rows)]
+            best = rows if not best else [_worse_row(b, r, key) for b, r in zip(best, rows)]
         self._use(models[0][0])
         return best
 
@@ -2178,11 +2180,29 @@ class Analysis:
             out += [(n / 1000 * wall["toe_mpa_kn"][r] + sig, f"{w['id']}'s run {b['runs'][r]:g} mm inboard on {cm.id}") for r, n in enumerate(per)]
         return out
 
-    def run_root_stresses(self, res) -> list[tuple[float, float, str]]:
+    def horizontal_ends(self, items, lc10: dict, base) -> dict:
+        """LC10's braking and cornering blocks (`horizontal`, I2-129) in one case on the frame model in use: each block's
+        two ends, the case at 1 g down with the block's acceleration and the case at 1 g down alone (LC1's result,
+        `base`), or with the acceleration one way and the other where the block runs both ways, so a weld's range in the
+        block is the change of its throat stress between them."""
+        out = {}
+        down = np.asarray(lc10["accel"][0], float)
+        for b in lc10.get("horizontal") or []:
+            ends = []
+            for s in ((1, -1) if b.get("both_ways") else (1,)):
+                res, info = self.run_static(items, down + s * np.asarray(b["accel"], float))
+                self.resid = max(self.resid, info["residual_n"])
+                ends.append(res)
+            out[b["id"]] = (ends[0], ends[1] if len(ends) > 1 else base)
+        return out
+
+    def run_root_stresses(self, res, base=None) -> list[tuple[float, float, str]]:
         """FAT-26 (I2-125): the roots of the hinge bars' weld runs in one case, each run read as CHS-18 reads it
         (_hinge_envelope), the rigid bars' three runs a side as one group and the elastic bars' each on its own under the
         forces its own welds pass, at each fillet's two ends by the elastic vector method, the throat stress there split
-        into sigma_w normal to the fillet's axis and tau_w along it (group_throat), as (sigma_w, tau_w, where)."""
+        into sigma_w normal to the fillet's axis and tau_w along it (group_throat), as (sigma_w, tau_w, where). With
+        `base`, each group's actions are their change from `base` to `res`, so the stresses are the ranges between the
+        two (I2-129), the points in the same order."""
         if self.hinges != "crossmember":
             return []
         cache = self.__dict__.setdefault("_run_groups", {})
@@ -2193,16 +2213,20 @@ class Analysis:
             if key not in cache:
                 cache[key] = [dict(y=None, g=self.hinge_run_group(w))] if rigid else self.hinge_runs_alone(w)
             groups = cache[key]
-            for grp, (F, M) in zip(groups, self._run_actions(res, w["id"], groups)):
+            acts = self._run_actions(res, w["id"], groups)
+            if base is not None:
+                acts = [(F - F0, M - M0) for (F, M), (F0, M0) in zip(acts, self._run_actions(base, w["id"], groups))]
+            for grp, (F, M) in zip(groups, acts):
                 out += [(s, t, f"{name} at {w['id']}" + (", the runs as one group" if rigid else ""))
                         for name, s, t in group_throat(grp["g"], F, M)]
         return out
 
-    def cheek_root_stresses(self, res) -> list[tuple[float, float, str]]:
+    def cheek_root_stresses(self, res, base=None) -> list[tuple[float, float, str]]:
         """FAT-27 (I2-125): the roots of the hinge cheeks' and fillers' load-carrying welds in one case, under each
         hinge's pin force and each cheek's share of it, as CHS-14 reads them in LC8a (_cheek_envelope, cheek_welds), each
         weld's stress taken whole as normal to its throat, on the safe side, with none along it. The filler's own section
-        is no weld and is left out."""
+        is no weld and is left out. With `base`, the pin force is its change from `base` to `res`, so the stresses are
+        the ranges between the two (I2-129)."""
         if self.hinges != "crossmember":
             return []
         xyz = np.asarray(self.f.nodes)
@@ -2212,6 +2236,8 @@ class Analysis:
             el = self.f.elements[k]
             R, _ = el.axes(xyz)
             F = -R.T @ np.asarray(res.forces[k][6:9])
+            if base is not None:
+                F = F + R.T @ np.asarray(base.forces[k][6:9])
             mine = [c for c in cheeks if c["wheel"] == wid]
             px = next(w["pivot"][0] for w in self.ch.suspension if w["id"] == wid)
             for c in mine:
@@ -2227,25 +2253,45 @@ class Analysis:
         CAFL)^2 is at most 1, and the occasional ranges when the Miner damage they use up by the same interaction
         (root_damage) is at most LC10's miner_limit, each at its worst point, case and frame model. range_mpa is the
         frequent's equivalent normal range, the normal CAFL times the root of that sum, so the row compares with its CAFL
-        as the others do."""
+        as the others do. LC10's braking and cornering blocks (`horizontal`, I2-129) are read at each weld point as the
+        change of its throat stress between each block's two ends (horizontal_ends), each block's damage by the same
+        interaction on the curves' slopes without their knees, since each is a damage-equivalent range at its count, and
+        added to the occasional range's damage at that point, the cycles being of one kind, so `damage` is the worst
+        point's sum, `parts` its share from each, and `blocks` each block's worst point on its own."""
         read = getattr(self, ROOT_READERS[d["stress"]])
         fat, fs = d["fat"], d["fat_shear"]
         c_n, c_s = sn_range(fat, 3, 1e7, 1e7), sn_range(fs, 5, 1e8, 1e8)
         k, n = lc["occasional_factor"], lc["occasional_cycles"]
+        blocks = lc.get("horizontal") or []
         freq, occ = (0.0, 0.0, 0.0, "no weld read", ""), (0.0, 0.0, 0.0, "no weld read", "")
+        total = dict(damage=0.0, parts={}, where="no weld read", case="")
+        alone = {b["id"]: dict(id=b["id"], cycles=b["cycles"], damage=0.0, normal_mpa=0.0, shear_mpa=0.0, where="no weld read", case="")
+                 for b in blocks}
         for cid, res in lc1.items():
-            for sw, tw, where in read(res):
+            ranges = {b["id"]: read(*self.lc10h[cid][b["id"]]) for b in blocks}
+            for i, (sw, tw, where) in enumerate(read(res)):
                 u = math.hypot(sw / c_n, tw / c_s)
                 if u > freq[0]:
                     freq = (u, sw, tw, where, cid)
                 dmg = root_damage(k * sw, k * tw, fat, fs, n)
                 if dmg > occ[0]:
                     occ = (dmg, sw, tw, where, cid)
+                parts = dict(vertical=dmg)
+                for b in blocks:
+                    bs, bt, _ = ranges[b["id"]][i]
+                    parts[b["id"]] = root_damage(bs, bt, fat, fs, b["cycles"], knees=False)
+                    if parts[b["id"]] > alone[b["id"]]["damage"]:
+                        alone[b["id"]].update(damage=parts[b["id"]], normal_mpa=bs, shear_mpa=bt, where=where, case=cid)
+                if sum(parts.values()) > total["damage"]:
+                    total = dict(damage=sum(parts.values()), parts=parts, where=where, case=cid)
         u, sw, tw, where, cid = freq
+        dmg = total["damage"] if blocks else occ[0]
         return dict(id=d["id"], name=d["name"], iiw=d["iiw"], fat=fat, cafl=c_n, range_mpa=u * c_n, where=where, case=cid,
-                    occasional_range_mpa=k * occ[1], damage=occ[0], ok=u <= 1 + 1e-9 and occ[0] <= lc["miner_limit"],
+                    occasional_range_mpa=k * occ[1], damage=dmg, ok=u <= 1 + 1e-9 and dmg <= lc["miner_limit"],
                     hot_spot=False, fat_shear=fs, shear_cafl=c_s, util=u, normal_mpa=sw, shear_mpa=tw,
-                    occasional_shear_mpa=k * occ[2], occasional_where=occ[3], occasional_case=occ[4])
+                    occasional_shear_mpa=k * occ[2], occasional_damage=occ[0], occasional_where=occ[3], occasional_case=occ[4],
+                    blocks=list(alone.values()), parts=total["parts"], damage_where=total["where"], damage_case=total["case"],
+                    miner_limit=lc["miner_limit"])
 
     def root_stresses(self, res, s: int) -> dict:
         """The body front under the root gusset's heel (FAT-17 to FAT-20, I2-51, I2-60), from the A-frame member's end
@@ -3250,17 +3296,37 @@ def sn_range(fat: float, m: float, knee: float, n: float) -> float:
     return fat * (2e6 / knee) ** (1 / m) * (knee / n) ** (1 / 22)
 
 
-def root_damage(sigma: float, tau: float, fat: float, fat_shear: float, n: float) -> float:
+def _worse_row(b: dict, r: dict, key: str) -> dict:
+    """The worse of one row read on two frame models (Analysis._worse): the row whose `key` is the higher, and for a
+    weld root's row (FAT-26, FAT-27) each of its damages, the occasional range's, the summed one and each block's, from
+    whichever model reads it the higher, its `ok` taken again on them."""
+    w = r if r.get(key, 0.0) > b.get(key, 0.0) + 1e-9 else b
+    if "parts" not in w:
+        return w
+    w = dict(w)
+    o = r if r["occasional_damage"] > b["occasional_damage"] else b
+    w.update({f: o[f] for f in ("occasional_range_mpa", "occasional_shear_mpa", "occasional_damage", "occasional_where", "occasional_case")})
+    s = r if r["damage"] > b["damage"] else b
+    w.update({f: s[f] for f in ("damage", "parts", "damage_where", "damage_case")})
+    w["blocks"] = [x if x["damage"] > y["damage"] else y for x, y in zip(r["blocks"], b["blocks"])]
+    w["ok"] = w["util"] <= 1 + 1e-9 and w["damage"] <= w["miner_limit"]
+    return w
+
+
+def root_damage(sigma: float, tau: float, fat: float, fat_shear: float, n: float, knees: bool = True) -> float:
     """The Miner damage that n cycles of a weld throat's normal range sigma and shear range tau, in phase, use up by
     IIW's interaction (IIW-1823-07 4.3.1, Table 4.3-1, CV 1.0): the D at which (sigma / the normal range FAT allows for
     n / D cycles)^2 + (tau / the shear range FAT_shear allows for n / D)^2 reaches 1 (sn_range, the normal curve's
     slope 3 to its knee at 10^7 cycles and the shear curve's slope 5 to 10^8). Within the two CAFLs by the same
-    interaction it is none, as _miner takes a range under its CAFL, so with no shear it is _miner's damage."""
-    if math.hypot(sigma / sn_range(fat, 3, 1e7, 1e7), tau / sn_range(fat_shear, 5, 1e8, 1e8)) <= 1:
+    interaction it is none, as _miner takes a range under its CAFL, so with no shear it is _miner's damage. With `knees`
+    False the curves run on at their slopes 3 and 5 with no knee, for a damage-equivalent range (LC10's horizontal
+    blocks, I2-129)."""
+    kn, ks = (1e7, 1e8) if knees else (math.inf, math.inf)
+    if knees and math.hypot(sigma / sn_range(fat, 3, 1e7, 1e7), tau / sn_range(fat_shear, 5, 1e8, 1e8)) <= 1:
         return 0.0
 
     def over(d):
-        return (sigma / sn_range(fat, 3, 1e7, n / d)) ** 2 + (tau / sn_range(fat_shear, 5, 1e8, n / d)) ** 2 > 1
+        return (sigma / sn_range(fat, 3, kn, n / d)) ** 2 + (tau / sn_range(fat_shear, 5, ks, n / d)) ** 2 > 1
     lo, hi = -30.0, 30.0
     for _ in range(80):
         mid = (lo + hi) / 2

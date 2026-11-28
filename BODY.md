@@ -87,7 +87,7 @@ The bonded body takes almost all the twist. The closed box loads the mounts and 
 
 ## The rear wall as a diaphragm
 
-The rear wall closes the box's rear end and racks in shear under the torque the floor bolts put into the box's rear half. The racking force is T / 2h, with T that torque and h the box's height. The rear door's cut-out leaves 1,335 mm of full panel. The worst case is LC5a with the bonded roof: 12.2 kNm into the rear half, 3.00 kN of racking. The skins carry 0.75 MPa against 22.2 MPa and the joiner 1.29 N/mm against 22.5 N/mm (BDY-20, 0.06), so the door needs no extra posts or header.
+The rear wall closes the box's rear end and racks in shear under the torque the floor bolts put into the box's rear half. The racking force is T / 2h, with T that torque and h the box's height. The rear door's cut-out leaves 1,335 mm of full panel. The worst case is LC5a with the bonded roof: 12.3 kNm into the rear half, 3.01 kN of racking. The skins carry 0.75 MPa against 22.2 MPa and the joiner 1.29 N/mm against 22.5 N/mm (BDY-20, 0.06), so the door needs no extra posts or header.
 
 ## The side walls in wind
 
