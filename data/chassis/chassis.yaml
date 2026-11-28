@@ -5,7 +5,11 @@
 # cad/chassis_fea.py analyses them. Sections come from data/chassis/sections.yaml (report 11's table).
 id: ASM-CH
 name: Chassis and drawbar
-revision: AA    # AA, 27 Nov 2026: the twin hinge crossmembers, two RHS 150 x 50 x 6 seam welded (CHS-20), the
+revision: AB    # AB, 28 Nov 2026: LC8a reads every wheel free at its five headings with the least tipping pulls
+                # (LC8a `tip`, results.tipping) and the user's nine recovery classes (LC8a `classes`), LC10 reads
+                # braking and cornering blocks for FAT-26 and FAT-27 (LC10 `horizontal`), and CT-106 draws the bars'
+                # runs and the seams (CHASSIS.md revision AF, the conductor's working defaults).
+                # AA, 27 Nov 2026: the twin hinge crossmembers, two RHS 150 x 50 x 6 seam welded (CHS-20), the
                 # webs under the hinge bars' fillets at their own stretch (xt_hinges `web`), the runs' and the cheeks' roots
                 # in fatigue (FAT-26, FAT-27), the bars welded by 6 mm fillets in three 120 mm runs a side by the round's
                 # fatigue rule, each tyre's side force within its grip and a held wheel at five headings in LC8a, and the
