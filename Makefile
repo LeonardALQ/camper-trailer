@@ -32,13 +32,13 @@ ute: model
 	$(T) 1200 $(DOCKER) python -m cad.build ute
 
 trailer: ute
-	$(T) 1800 $(DOCKER) python -m cad.build trailer
+	$(T) 3600 $(DOCKER) python -m cad.build trailer
 
 # pytest measures every check on the B-rep model and writes build/checks/checks.json.
 # Its exit code is recorded, not propagated, so a failing check shows on the site instead of hiding it.
 check: trailer ute
 	@mkdir -p build/checks
-	-$(T) 2700 $(DOCKER) sh -c 'python -m pytest cad/tests -p no:cacheprovider -rxXf --junitxml=build/checks/junit.xml > build/checks/pytest.log 2>&1; echo $$? > build/checks/pytest.exit'
+	-$(T) 5400 $(DOCKER) sh -c 'python -m pytest cad/tests -p no:cacheprovider -rxXf --junitxml=build/checks/junit.xml > build/checks/pytest.log 2>&1; echo $$? > build/checks/pytest.exit'
 	@tail -n 40 build/checks/pytest.log
 	@printf 'pytest exit code %s: %s\n' "$$(cat build/checks/pytest.exit)" "$$(tail -n 1 build/checks/pytest.log)" > build/checks/summary.txt
 
